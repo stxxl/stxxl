@@ -113,17 +113,17 @@ public:
 			return p_vector->bid (offset);
 		};
 		
-		difference_type operator - (const _Self & a)
+		difference_type operator - (const _Self & a) const
 		{
 			return offset - a.offset;
 		};
 		
-		_Self operator - (size_type op)
+		_Self operator - (size_type op) const
 		{
 			return _Self(p_vector,offset - op);
 		};
 		
-		_Self operator + (size_type op)
+		_Self operator + (size_type op) const
 		{
 			return _Self(p_vector,offset + op);
 		};
@@ -167,22 +167,30 @@ public:
 		}
 		bool operator == (const _Self &a) const
 		{
-			return ((offset) == (a.offset));
+			assert(p_vector == a.p_vector);
+			return offset == a.offset;
 		}
 		bool operator != (const _Self &a) const
 		{
-			return ((offset) != (a.offset));
-		}
+			assert(p_vector == a.p_vector);
+			return offset != a.offset;
+		}	
 		bool operator < (const _Self &a) const
 		{
-			return ((offset) < (a.offset));
-		}	
+			assert(p_vector == a.p_vector);
+			return offset < a.offset;
+		}
 		
 		void flush()
 		{
 			p_vector->flush();
 		}
-		
+		/*
+		std::ostream & operator<< (std::ostream & o) const
+		{
+			o << "vectorpointer: "  << ((void*)p_vector) <<" offset: "<<offset;
+			return o;
+		}*/
 		
 	};
 
@@ -250,17 +258,17 @@ public:
 			return p_vector->bid (offset);
 		}
 		
-		difference_type operator - (const _Self & a)
+		difference_type operator - (const _Self & a) const
 		{
 			return offset - a.offset;
 		}
 		
-		_Self operator - (size_type op)
+		_Self operator - (size_type op) const
 		{
 			return _Self(p_vector,offset - op);
 		}
 		
-		_Self operator + (size_type op)
+		_Self operator + (size_type op) const
 		{
 			return _Self(p_vector,offset + op);
 		}
@@ -299,21 +307,31 @@ public:
 		}
 		bool operator == (const _Self &a) const
 		{
-			return ((p_vector + offset) == (a.p_vector + a.offset));
+			assert(p_vector == a.p_vector);
+			return offset == a.offset; // or (offset + off_t(p_vector))
 		}
 		bool operator != (const _Self &a) const
 		{
-			return ((p_vector + offset) != (a.p_vector + a.offset));
+			assert(p_vector == a.p_vector);
+			return offset != a.offset;
 		}	
 		bool operator < (const _Self &a) const
 		{
-			return ((p_vector + offset) < (a.p_vector + a.offset));
+			assert(p_vector == a.p_vector);
+			return offset < a.offset;
 		}	
 		void flush()
 		{
 			p_vector->flush();
 		}
+		
+		std::ostream & operator<< (std::ostream & o) const
+		{
+			o << "vectorpointer: "  << ((void*)p_vector) <<" offset: "<<offset;
+			return o;
+		}
 	};	
+	
 	
 	//! \brief External vector container
   
