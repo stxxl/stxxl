@@ -46,11 +46,13 @@ __STXXL_BEGIN_NAMESPACE
 		// states of request
 		enum { OP = 0, DONE = 1, READY2DIE = 2 };	// OP - operating, DONE - request served, 
 																							// READY2DIE - can be destroyed
+		/*
 		ufs_file_base *file;
 		void *buffer;
 		off_t offset;
 		size_t bytes;
 		request_type type;
+		*/
 		
 		state _state;
 		mutex waiters_mutex;
@@ -63,12 +65,12 @@ __STXXL_BEGIN_NAMESPACE
 				size_t b, 
 				request_type t,
 				completion_handler on_cmpl):
-					request (on_cmpl),
-					file (f), 
+					request (on_cmpl,f,buf,off,b,t),
+			/*		file (f), 
 					buffer (buf), 
 					offset (off), 
 					bytes (b),
-					type(t),
+					type(t), */
 					_state (OP)
 		{
 #ifdef STXXL_CHECK_BLOCK_ALIGNING

@@ -87,11 +87,11 @@ __STXXL_BEGIN_NAMESPACE
 				iostats->write_started (size());
 			#endif
 		}
-		// file->set_size(offset+bytes);
+		// static_cast<syscall_file*>(file_)->set_size(offset+bytes);
 		#ifdef STXXL_MMAP_EXPERIMENT1
 		int prot = (type == READ)? PROT_READ: PROT_WRITE;
 
-		void *mem = mmap (buffer, bytes,prot, MAP_SHARED|MAP_FIXED , file->get_file_des (), offset);
+		void *mem = mmap (buffer, bytes,prot, MAP_SHARED|MAP_FIXED , static_cast<syscall_file*>(file_)->get_file_des (), offset);
 		//STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
 		if (mem == MAP_FAILED)
 		{
@@ -122,8 +122,8 @@ __STXXL_BEGIN_NAMESPACE
 		}
 		#else
 		int prot = (type == READ)? PROT_READ: PROT_WRITE;
-		void *mem = mmap (NULL, bytes, prot , MAP_SHARED, file->get_file_des (), offset);
-		// void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , file->get_file_des (), offset);
+		void *mem = mmap (NULL, bytes, prot , MAP_SHARED, static_cast<syscall_file*>(file_)->get_file_des (), offset);
+		// void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , static_cast<syscall_file*>(file_)->get_file_des (), offset);
 		// STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
 		if (mem == MAP_FAILED)
 		{

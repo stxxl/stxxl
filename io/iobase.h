@@ -210,9 +210,17 @@ __STXXL_BEGIN_NAMESPACE
 		completion_handler on_complete;
 		int ref_cnt;
     	mutex ref_cnt_mutex;
-    
+	
+	public:
 		enum request_type { READ, WRITE };
 		
+	protected:	
+		file * file_;
+		void *buffer;
+		off_t offset;
+		size_t bytes;
+		request_type type;
+    
 		void completed ()
 		{
 			on_complete(this);
@@ -228,7 +236,18 @@ __STXXL_BEGIN_NAMESPACE
 		}
 		
 	public:
-		request(completion_handler on_compl):on_complete(on_compl),ref_cnt(0)
+		request(	completion_handler on_compl, 
+						file *file__,
+						void * buffer_,
+						off_t offset_,
+						size_t bytes_,
+						request_type type_):
+						on_complete(on_compl),ref_cnt(0),
+						file_(file__),
+						buffer(buffer_),
+						offset(offset_),
+						bytes(bytes_),
+						type(type_)
     {
       STXXL_VERBOSE3("request "<< unsigned(this) <<": creation, cnt: "<<ref_cnt)
     }
@@ -244,9 +263,24 @@ __STXXL_BEGIN_NAMESPACE
 			return "none";
 		};
 		virtual ~request()
-    {
-        STXXL_VERBOSE3("request "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
-    }
+    	{
+        	STXXL_VERBOSE3("request "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
+    	}
+		file * get_file() const { return file_; }
+		void * get_buffer() const { return buffer; }
+		off_t get_offset() const { return offset; }
+		size_t get_size() const { return bytes; }
+		request_type get_type() const { return type; }
+		
+		virtual std::ostream & print(std::ostream & out) const
+		{
+			out << "File object address: "<<(void*)get_file();
+			out << " Bufffer address: "<<(void*)get_buffer();
+			out << " File offset: "<<get_offset();
+			out << " Transfer size: "<<get_size()<<" bytes";
+			out << " Type of transfer: "<<((get_type()==READ)?"READ":"WRITE");
+			return out;
+		}
 	private:
     // Following methods are declared but not implemented 
     // intentionnaly to forbid their usage
@@ -273,6 +307,11 @@ __STXXL_BEGIN_NAMESPACE
 		  return (val==0);
 		}
 	};
+	
+	std::ostream & operator << (std::ostream & out, const request & req)  
+	{
+			return req.print(out);
+	}
 
   //! \brief A smart wrapper for \c request pointer.
   

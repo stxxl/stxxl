@@ -286,7 +286,7 @@ namespace stxxl
 	
 	void sim_disk_request::serve ()
 	{
-		//      file->set_size(offset+bytes);
+		//      static_cast<syscall_file*>(file_)->set_size(offset+bytes);
 		double op_start = stxxl_timestamp();
 		stats * iostats = stats::get_instance();
 		if (type == READ)
@@ -303,7 +303,7 @@ namespace stxxl
 		}
 				
 		void *mem =
-			mmap (NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED,file->get_file_des (), offset);
+			mmap (NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED,static_cast<syscall_file*>(file_)->get_file_des (), offset);
 		if (mem == MAP_FAILED)
 		{
 			STXXL_ERRMSG( "Mapping failed." )
@@ -330,7 +330,7 @@ namespace stxxl
 			}
 
 		double delay =
-			(static_cast <sim_disk_file * >(file))->get_delay (offset, bytes);
+			(static_cast <sim_disk_file * >(file_))->get_delay (offset, bytes);
 		
 		delay = delay - stxxl_timestamp() + op_start;
 		

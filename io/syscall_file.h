@@ -83,16 +83,16 @@ __STXXL_BEGIN_NAMESPACE
 				<<nref()<<") "<<
 			 " this="<<long(this)<<
 			 " File descriptor="<<
-                         file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes 
+                         static_cast<syscall_file*>(file_)->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes 
 			 << " type=" <<((type == READ)?"READ":"WRITE") )
 		}
 		STXXL_VERBOSE2("syscall_request::serve(): Buffer at "<<((void*)buffer)
 			<<" offset: "<<offset<<" bytes: "<<bytes<<((type== READ)?" READ":" WRITE")
-			<<" file: "<<file->get_file_des());
+			<<" file: "<<static_cast<syscall_file*>(file_)->get_file_des());
 		
-		stxxl_ifcheck_i(::lseek (file->get_file_des (), offset, SEEK_SET),
+		stxxl_ifcheck_i(::lseek (static_cast<syscall_file*>(file_)->get_file_des (), offset, SEEK_SET),
 			" this="<<long(this)<<" File descriptor="<<
-			file->get_file_des()<< " offset="<<offset<<" buffer="<<
+			static_cast<syscall_file*>(file_)->get_file_des()<< " offset="<<offset<<" buffer="<<
 			buffer<<" bytes="<<bytes
 		    	<< " type=" <<((type == READ)?"READ":"WRITE") )
 		else
@@ -105,9 +105,9 @@ __STXXL_BEGIN_NAMESPACE
 				
 				debugmon::get_instance()->io_started((char*)buffer);
 				
-				stxxl_ifcheck_i(::read (file->get_file_des(), buffer, bytes),
+				stxxl_ifcheck_i(::read (static_cast<syscall_file*>(file_)->get_file_des(), buffer, bytes),
 					" this="<<long(this)<<" File descriptor="<<
-					file->get_file_des()<< " offset="<<offset<<
+					static_cast<syscall_file*>(file_)->get_file_des()<< " offset="<<offset<<
 					" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
 					((type == READ)?"READ":"WRITE")<<" nref= "<<nref())
 				
@@ -125,9 +125,9 @@ __STXXL_BEGIN_NAMESPACE
 				
 				debugmon::get_instance()->io_started((char*)buffer);
 				
-				stxxl_ifcheck_i(::write (file->get_file_des (), buffer, bytes),
+				stxxl_ifcheck_i(::write (static_cast<syscall_file*>(file_)->get_file_des (), buffer, bytes),
 					" this="<<long(this)<<" File descriptor="<<
-					file->get_file_des()<< " offset="<<offset<<" buffer="<<
+					static_cast<syscall_file*>(file_)->get_file_des()<< " offset="<<offset<<" buffer="<<
 					buffer<<" bytes="<<bytes<< " type=" <<
 					((type == READ)?"READ":"WRITE")<<" nref= "<<nref());
 				
@@ -142,7 +142,7 @@ __STXXL_BEGIN_NAMESPACE
 		if(nref() < 2)
 		{
 			STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref="<<nref()<<") "<<
-			 " this="<<long(this)<<" File descriptor="<<file->get_file_des()<< 
+			 " this="<<long(this)<<" File descriptor="<<static_cast<syscall_file*>(file_)->get_file_des()<< 
 			" offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes << 
 			" type=" <<((type == READ)?"READ":"WRITE"))
 		}
