@@ -227,6 +227,11 @@ namespace priority_queue_local
         ++nsequences;
         nelements += size_type(segment->size())*block_type::size + first_size;
         // assert(nsequences <= arity);
+		if(nsequences>arity)
+		{
+			STXXL_VERBOSE1("ext_merger::insert_segment(..) "
+							"INSERTING SEGMENT OVER CAPACITY, CAPACITY:"<<arity<<" SEQUENCES: "<<nsequences)
+		}
         sequence_type new_sequence;
         new_sequence.current = block_type::size - first_size;
         new_sequence.block = first_block;
@@ -510,7 +515,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
 void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
 {
-  STXXL_VERBOSE1("looser_tree::insert_segment("<< to <<","<< sz<<")")
+  STXXL_VERBOSE2("looser_tree::insert_segment("<< to <<","<< sz<<")")
   //std::copy(to,to + sz,std::ostream_iterator<ValTp_>(std::cout, "\n"));
   
   if (sz > 0)
@@ -1067,7 +1072,7 @@ inline void priority_queue<Config_>::pop()
 template <class Config_>
 inline void priority_queue<Config_>::push(const value_type & obj)
 {
-  //STXXL_VERBOSE1("priority_queue::push("<< obj <<")")
+  //STXXL_VERBOSE3("priority_queue::push("<< obj <<")")
   if(insertHeap.size() == N) 
      emptyInsertHeap();
   
@@ -1083,7 +1088,7 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
   p_pool(p_pool_),w_pool(w_pool_),
   activeLevels(0), size_(0)
 {
-  STXXL_VERBOSE1("priority_queue::priority_queue()")
+  STXXL_VERBOSE2("priority_queue::priority_queue()")
   etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
   
   buffer1[BufferSize1] = cmp.min_value(); // sentinel
@@ -1098,7 +1103,7 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
 template <class Config_>
 priority_queue<Config_>::~priority_queue()
 {
-  STXXL_VERBOSE1("priority_queue::~priority_queue()")
+  STXXL_VERBOSE2("priority_queue::~priority_queue()")
   delete [] etree;
 }
 
@@ -1108,7 +1113,7 @@ priority_queue<Config_>::~priority_queue()
 template <class Config_>
 int priority_queue<Config_>::refillBuffer2(int j)
 {
-  STXXL_VERBOSE1("priority_queue::refillBuffer2("<<j<<")")
+  STXXL_VERBOSE2("priority_queue::refillBuffer2("<<j<<")")
   
   value_type * oldTarget;
   int deleteSize;
@@ -1150,7 +1155,7 @@ int priority_queue<Config_>::refillBuffer2(int j)
 template <class Config_>
 void priority_queue<Config_>::refillBuffer1() 
 {
-  STXXL_VERBOSE1("priority_queue::refillBuffer1()")
+  STXXL_VERBOSE2("priority_queue::refillBuffer1()")
   
   size_type totalSize = 0;
   int sz;
@@ -1234,7 +1239,7 @@ void priority_queue<Config_>::refillBuffer1()
 template <class Config_>
 int priority_queue<Config_>::makeSpaceAvailable(int level)
 {
-  STXXL_VERBOSE1("priority_queue::makeSpaceAvailable("<<level<<")")
+  STXXL_VERBOSE2("priority_queue::makeSpaceAvailable("<<level<<")")
   int finalLevel;
   assert(level < Levels);
   assert(level <= activeLevels);
@@ -1288,7 +1293,7 @@ int priority_queue<Config_>::makeSpaceAvailable(int level)
 template <class Config_>
 void priority_queue<Config_>::emptyInsertHeap()
 {
-  STXXL_VERBOSE1("priority_queue::emptyInsertHeap()")
+  STXXL_VERBOSE2("priority_queue::emptyInsertHeap()")
   const value_type sup = getSupremum();
 
   // build new segment

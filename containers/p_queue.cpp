@@ -60,7 +60,8 @@ int main()
   */
   //typedef priority_queue<priority_queue_config<my_type,my_cmp,
   //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,3*1024*1024,3*1024*1024/sizeof(my_type)>::result pq_type;
+  const unsigned volume = 128*1024; // GB
+  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,20*1024*1024,volume/sizeof(my_type)>::result pq_type;
   typedef pq_type::block_type block_type;
  
   STXXL_MSG("Block size: "<<block_type::raw_size)
@@ -73,10 +74,15 @@ int main()
   prefetch_pool<block_type> p_pool(10);
   write_pool<block_type>    w_pool(10);
   pq_type p(p_pool,w_pool);
-  off_t nelements = off_t(128*1024*1024/sizeof(my_type))*1024,i;
+  off_t nelements = off_t(volume/sizeof(my_type))*1024,i;
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
+  STXXL_MSG("Max elements: "<<nelements)
   for(i = 0;i<nelements ;i++ )
+  {
+    if((i%(1024*1024)) == 0)
+		STXXL_MSG("Inserting element "<<i)
     p.push(my_type(nelements - i));
+  }
   
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   for(i = 0; i<(nelements) ;i++ )
@@ -85,6 +91,8 @@ int main()
     STXXL_MSG( p.top() )
     assert(p.top().key == i+1);
     p.pop();
+	if((i%(1024*1024)) == 0)
+		STXXL_MSG("Element "<<i<<" poped")
   }
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   
