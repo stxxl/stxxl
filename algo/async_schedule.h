@@ -39,7 +39,7 @@ int simulate_async_write(
 {
 	typedef std::priority_queue<sim_event,std::vector<sim_event>,sim_event_cmp> event_queue_type;
 	typedef std::queue<int> disk_queue_type;
-	
+	assert(L >= D);	
 	disk_queue_type * disk_queues = new disk_queue_type[L];
 	event_queue_type event_queue;
 	
@@ -141,6 +141,11 @@ void compute_prefetch_schedule(
 {
 	typedef std::pair<int,int>  pair_type;
 	int L = last - first;
+	if(L <= D)
+	{
+		for(int i=0;i<L;++i) out_first[i] = i;
+		return;
+	}
 	pair_type * write_order = new pair_type[L];
 	
 	int w_steps=simulate_async_write(first,L,m,D,write_order);
@@ -173,6 +178,7 @@ void simulate_async_write(
 	typedef std::queue<int> disk_queue_type;
 	
 	const int L = input.size();
+	assert(L >= D);
 	disk_queue_type * disk_queues = new disk_queue_type[L];
 	event_queue_type event_queue;
 	
@@ -254,6 +260,11 @@ void compute_prefetch_schedule(
 {
 	typedef std::pair<int,int>  pair_type;
 	const int L = input.size();
+	if(L <= D)
+	{
+		for(int i=0;i<L;++i) out_first[i] = i;
+		return;
+	}
 	pair_type * write_order = new pair_type[L];
 	
 	simulate_async_write(input,m,D,write_order);
@@ -283,8 +294,8 @@ void simulate_async_write(
 	
 	int m = m_init;
 	int i = L - 1;
-        int oldtime = 0;
-        bool * disk_busy = new bool [D];
+    int oldtime = 0;
+    bool * disk_busy = new bool [D];
 		       
 	while(m && (i>=0))
 	{
@@ -360,6 +371,11 @@ void compute_prefetch_schedule(
 {
 	typedef std::pair<int,int>  pair_type;
 	const int L = input_end - input_begin;
+	if(L <= D)
+	{
+		for(int i=0;i<L;++i) out_first[i] = i;
+		return;
+	}
 	pair_type * write_order = new pair_type[L];
 	
 	simulate_async_write(input_begin,L,m,D,write_order);
