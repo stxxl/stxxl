@@ -9,6 +9,9 @@
 #include "../common/timer.h"
 using namespace stxxl;
 
+//! \example containers/p_queue.cpp
+//! This is an example of how to use \c stxxl::PRIORITY_QUEUE_GENERATOR
+//! and \c stxxl::priority_queue
 
 struct my_type
 {
@@ -48,7 +51,7 @@ struct my_cmp // greater
 {
   bool operator () (const my_type & a, const my_type & b) const { return a.key > b.key; }
   my_type min_value() const { return my_type(std::numeric_limits<my_type::key_type>::max()); }
-  my_type max_value() const { return my_type(std::numeric_limits<my_type::key_type>::min()); }
+  
 }; 
 /*
 struct my_cmp: public std::greater<my_type>

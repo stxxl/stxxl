@@ -9,7 +9,7 @@
 
 #include "stack.h"
 
-//! \example test_mstack.cpp
+//! \example containers/test_mstack.cpp
 //! This is an example of how to use \c stxxl::STACK_GENERATOR class
 //! to generate an \b migrating stack with critical size \c critical_size ,
 //! external implementation \c normal_stack , \b four blocks per page,

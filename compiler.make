@@ -39,7 +39,7 @@ DEBUG = -g # -DNDEBUG #-g # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3
 DEBUG = # -DNDEBUG #-g # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3 
 
 # this variable is used internally for development compilations
-GCC=$(COMPILER) -Wall $(LARGE_FILE) $(NO_OVR) $(OPT) $(PROF) $(DEBUG) $(STXXL_SPECIFIC)
+GCC=$(COMPILER) -Wall $(LARGE_FILE) $(NO_OVR) $(OPT) $(PROF) $(DEBUG) $(STXXL_SPECIFIC) # -ftemplate-depth-65000
 
 
 STXXL_LIB = -lpthread -lstxxl -L$(STXXL_ROOT)/io/
@@ -49,6 +49,6 @@ STXXL_OBJ = $(STXXL_LIB)
 # put variable STXXL_VARS as a g++ parameter when you compile code 
 # that uses stxxl
 # for example: g++ external_MST.cpp -o MST $(STXXL_VARS)
-STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB)
+STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB) -ftemplate-depth-65000
 
 

@@ -18,6 +18,10 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup stlcontinternals
+//! \{
+
+//! \internal
 namespace priority_queue_local
 {
   template <  class BlockType_, 
@@ -921,7 +925,7 @@ struct priority_queue_config
   };
 };
 
-
+//! \brief External priority queue data structure
 template <class Config_>
 class priority_queue
 {
@@ -939,10 +943,12 @@ public:
     ExtKMAX = Config::ExtKMAX
   };
   
+  //! \brief The type of object stored in the \b priority_queue
   typedef typename Config::value_type value_type;
+  //! \brief Comparison object
   typedef typename Config::comparator_type comparator_type;
   typedef typename Config::alloc_strategy_type alloc_strategy_type; 
-  
+  //! \brief An unsigned integral type (64 bit)
   typedef off_t size_type;
   typedef typed_block<BlockSize,value_type> block_type;
   
@@ -1003,14 +1009,53 @@ protected:
   priority_queue();
   priority_queue & operator = (const priority_queue &);  
 public:
+  //! \brief Constructs external priority queue object
+  //! \param p_pool_ pool of blocks that will be used 
+  //! for data prefetching for the disk<->memory transfers 
+  //! happenning in the priority queue. Larger pool size 
+  //! helps to speed up operations.
+  //! \param w_pool_ pool of blocks that will be used 
+  //! for writing data for the memory<->disk transfers 
+  //! happenning in the priority queue. Larger pool size 
+  //! helps to speed up operations.
   priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_);
   virtual ~priority_queue();
+  //! \brief Returns number of elements contained
+  //! \return number of elements contained
   size_type size() const;
+  //! \brief Returns true if queue has no elements
+  //! \return \b true if queue has no elements, \b false otherwise
   bool empty() const { return (size()==0); }
+  
+  //! \brief Returns "largest" element
+  //!
+  //! Returns a const reference to the element at the 
+  //! top of the priority_queue. The element at the top is 
+  //! guaranteed to be the largest element in the \b priority queue, 
+  //! as determined by the comparison function \b Config_::comparator_type 
+  //! (the same as the second parameter of PRIORITY_QUEUE_GENERATOR utility 
+  //! class). That is, 
+  //! for every other element \b x in the priority_queue, 
+  //! \b Config_::comparator_type(Q.top(), x) is false. 
+  //! Precondition: \c empty() is false.
   const value_type & top() const;
+  //! \brief Removes the element at the top
+  //!
+  //! Removes the element at the top of the priority_queue, that 
+  //! is, the largest element in the \b priority_queue. 
+  //! Precondition: \c empty() is \b false. 
+  //! Postcondition: \c size() will be decremented by 1.
   void  pop();
+  //! \brief Inserts x into the priority_queue.
+  //!
+  //! Inserts x into the priority_queue. Postcondition: 
+  //! \c size() will be incremented by 1.
   void  push(const value_type & obj);
   
+  //! \brief Returns number of bytes consumed by 
+  //! the \b priority_queue
+  //! \brief number of bytes consumed by the \b priority_queue from 
+  //! the internal memory not including pools (see the constructor)
   unsigned mem_cons() const 
   {
     unsigned dynam_alloc_mem(0),i(0);
@@ -1026,7 +1071,6 @@ public:
               dynam_alloc_mem );
   }
 };
-
 
 
 template <class Config_>  
@@ -1458,7 +1502,72 @@ namespace priority_queue_local
 
 };
 
+//! \}
 
+//! \addtogroup stlcont
+//! \{
+
+//! \brief Priority queue type generator
+
+//! Template parameters:
+//! - Tp_ type of the contained objects
+//! - Cmp_ the comparison type used to determine 
+//! whether one element is smaller than another element. 
+//! If Cmp_(x,y) is true, then x is smaller than y. The element 
+//! returned by Q.top() is the largest element in the priority 
+//! queue. That is, it has the property that, for every other 
+//! element \b x in the priority queue, Compare(Q.top(), x) is false.
+//! Cmp_ must also provide min_value method, that returns value of type Tp_ that is 
+//! smaller than any element of the queue \b x , i.e. Cmp_(Cmp_.min_value(),x) is
+//! always \b true . <BR> 
+//! <BR>
+//! Example: comparison object for priority queue 
+//! where \b top() returns the \b smallest contained integer: 
+//! \verbatim
+//! struct CmpIntGreater
+//! {
+//!   bool operator () (const int & a, const int & b) const { return a>b; }
+//!   int min_value() const  { return std::numeric_limits<int>::max(); }
+//! };
+//! \endverbatim
+//! Example: comparison object for priority queue 
+//! where \b top() returns the \b largest contained integer: 
+//! \verbatim
+//! struct CmpIntGreater
+//! {
+//!   bool operator () (const int & a, const int & b) const { return a<b; }
+//!   int min_value() const  { return std::numeric_limits<int>::min(); }
+//! };
+//! \endverbatim
+//! Note that Cmp_ must define strict weak ordering.
+//! (<A HREF="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">see what it is</A>)
+//! - \c IntM_ upper limit for internal memory consumption in bytes. 
+//! - \c MaxS_ upper limit for number of elements contained in the priority queue (in 1024 units).
+//! Example: if you are sure that priority queue contains no more than 
+//! one million elements in a time, then the right parameter is (1000000/1024)= 976 .
+//! - \c Tune_ tuning parameter. Try to play with it if the code does not compile 
+//! (larger than default values might help). Code does not compile
+//! if no suitable internal parameters were found for given IntM_ and MaxS_
+//! <BR>
+//! \c PRIORITY_QUEUE_GENERATOR is template meta program that searches 
+//! for \b 7 configuration parameters of \b stxxl::priority_queue that both 
+//! minimize internal memory consumption of the priority queue to 
+//! match IntM_ and maximize performance of priority queue operations.
+//! Actual memory consumption might be larger (use 
+//! \c stxxl::priority_queue::mem_cons() method to track it), since the search 
+//! assumes rather optimistic schedule of push'es and pop'es for the
+//! estimation of the maximum memory consumption. To keep actual memory 
+//! requirements low increase the value of MaxS_ parameter.
+//! <BR>
+//! For functioning a priority queue object requires two pools of blocks 
+//! (See constructor of \c priority_queue ). To construct \c \<stxxl\> block 
+//! pools you might need \b block \b type that will be used by priority queue.
+//! Note that block's size and hence it's type is generated by 
+//! the \c PRIORITY_QUEUE_GENERATOR in compile type from IntM_, MaxS_ and sizeof(Tp_) and
+//! not given directly by user as a template parameter. Block type can be extracted as
+//! \c PRIORITY_QUEUE_GENERATOR<some_parameters>::result::block_type .
+//! For an example see p_queue.cpp .
+//! Configured priority queue type is available as \c PRIORITY_QUEUE_GENERATOR<>::result. <BR> <BR>
 template <class Tp_,class Cmp_,unsigned IntM_,unsigned MaxS_,unsigned Tune_=6>
 class PRIORITY_QUEUE_GENERATOR
 {
@@ -1479,7 +1588,7 @@ class PRIORITY_QUEUE_GENERATOR
   };
 public:
   enum {
-    //! \brief Estimation of maximum internal memory consumption (in bytes)
+    // Estimation of maximum internal memory consumption (in bytes)
     EConsumption = X*settings::E + settings::B*AE + ((MaxS_/X)/AE)*settings::B*1024
   };
   /*
@@ -1494,6 +1603,7 @@ public:
   typedef priority_queue<priority_queue_config<Tp_,Cmp_,Buffer1Size,N,AI,2,B,AE,2> > result;
 };
 
+//! \}
 
 __STXXL_END_NAMESPACE
 
