@@ -517,6 +517,68 @@ private:
   void rebuildLooserTree();
   bool segmentIsEmpty(int i);
   void multi_merge_k(Element * to, int l);
+  template <unsigned LogK>
+  void multi_merge_f(Element *to, int l)
+  {
+    //Entry *currentPos;
+    //Element currentKey;
+    //int currentIndex; // leaf pointed to by current entry
+    Element *done = to + l;
+    Entry    *regEntry   = entry;
+    Element **regCurrent = current;
+    int      winnerIndex = regEntry[0].index;
+    Element  winnerKey   = regEntry[0].key;
+    Element *winnerPos;
+    //Element sup = dummy; // supremum
+    
+    assert(logK >= LogK);
+    while (to != done)
+    {
+      winnerPos = regCurrent[winnerIndex];
+      
+      // write result
+      *to   = winnerKey;
+      
+      // advance winner segment
+      ++winnerPos;
+      regCurrent[winnerIndex] = winnerPos;
+      winnerKey = *winnerPos;
+      
+      // remove winner segment if empty now
+      if (is_sentinel(winnerKey))
+      { 
+        deallocateSegment(winnerIndex); 
+      } 
+      ++to;
+      
+      // update looser tree
+#define TreeStep(L)\
+      if (1 << LogK >= 1 << L) {\
+        Entry  *pos##L = regEntry+((winnerIndex+(1<<LogK)) >> (((int(LogK-L)+1)>=0)?((LogK-L)+1):0));\
+        Element key##L = pos##L->key;\
+        if (cmp(winnerKey,key##L)) {\
+          int index##L  = pos##L->index;\
+          pos##L->key   = winnerKey;\
+          pos##L->index = winnerIndex;\
+          winnerKey     = key##L;\
+          winnerIndex   = index##L;\
+        }\
+      }
+      TreeStep(10);
+      TreeStep(9);
+      TreeStep(8);
+      TreeStep(7);
+      TreeStep(6);
+      TreeStep(5);
+      TreeStep(4);
+      TreeStep(3);
+      TreeStep(2);
+      TreeStep(1);
+#undef TreeStep      
+    }
+    regEntry[0].index = winnerIndex;
+    regEntry[0].key   = winnerKey;  
+  }
   
   bool is_sentinel(const Element & a)
   {
@@ -851,15 +913,15 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
     if (segmentIsEmpty(1)) deallocateSegment(1); 
     if (segmentIsEmpty(2)) deallocateSegment(2); 
     if (segmentIsEmpty(3)) deallocateSegment(3);
-    break;/*
-  case  3: multiMergeUnrolled3(to, l); break;
-  case  4: multiMergeUnrolled4(to, l); break;
-  case  5: multiMergeUnrolled5(to, l); break;
-  case  6: multiMergeUnrolled6(to, l); break;
-  case  7: multiMergeUnrolled7(to, l); break;
-  case  8: multiMergeUnrolled8(to, l); break;
-  case  9: multiMergeUnrolled9(to, l); break;
-  case 10: multiMergeUnrolled10(to, l); break; */
+    break;
+  case  3: multi_merge_f<3>(to, l); break;
+  case  4: multi_merge_f<4>(to, l); break;
+  case  5: multi_merge_f<5>(to, l); break;
+  case  6: multi_merge_f<6>(to, l); break;
+  case  7: multi_merge_f<7>(to, l); break;
+  case  8: multi_merge_f<8>(to, l); break;
+  case  9: multi_merge_f<9>(to, l); break;
+  case 10: multi_merge_f<10>(to, l); break; 
   default: multi_merge_k(to, l); break;
   }
   
@@ -882,6 +944,14 @@ inline bool looser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
 {
   return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
 }
+
+// multi-merge for fixed K
+/*
+template <class ValTp_,class Cmp_,unsigned KNKMAX> template <unsigned LogK>
+void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge_f<LogK>(Element *to, int l)
+{
+}
+*/
 
 // multi-merge for arbitrary K
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
@@ -926,7 +996,7 @@ multi_merge_k(Element *to, int l)
       }
     }
 
-    to++;
+    ++to;
   }
   entry[0].index = winnerIndex;
   entry[0].key   = winnerKey;  
