@@ -520,7 +520,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 			runs_left -= runs2merge;
 		}
 		// allocate blocks for the new runs
-		if( cur_out_run == 1 &&  blocks_in_new_run==_n && (input_bids->storage->get_id() == -1))
+		if( cur_out_run == 1 &&  blocks_in_new_run==int(_n) && (input_bids->storage->get_id() == -1))
 		{
 			// if we sort a file we can reuse the input bids for the output
 			input_bid_iterator cur = input_bids;
