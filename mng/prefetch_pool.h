@@ -14,6 +14,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup schedlayer
+//! \{
   
 //! \brief Implements dynamically resizable prefetching pool
 template <class BlockType>
@@ -162,6 +164,7 @@ public:
   }
 };
 
+//! \}
 
 __STXXL_END_NAMESPACE
 

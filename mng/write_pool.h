@@ -14,6 +14,10 @@
  
 __STXXL_BEGIN_NAMESPACE
  
+//! \addtogroup schedlayer
+//! \{
+ 
+ 
 //! \brief Implements dynamically resizable buffered writing pool
 template <class BlockType>
 class write_pool
@@ -177,6 +181,8 @@ public:
   }
 };
  
+//! \}
+
 __STXXL_END_NAMESPACE
  
  #endif
