@@ -18,5 +18,8 @@ blk:
 	$(GCC) block.cpp -o block $(STXXL_OBJ)
 
 
+stack_band: stack_band.cpp
+	$(GCC) stack_band.cpp -o stack_band $(STXXL_OBJ)
+
 clean:
 	rm -f *.o threads dev
