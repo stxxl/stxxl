@@ -1,16 +1,16 @@
-/*! \mainpage Documentation for \<<small>STXXL</small>\> library
+/*! \mainpage Documentation for <small>STXXL</small> library
  *
  *  \image html logo1.png
  *
  * <BR><BR>
- * The core of \c \<S<small>TXXL</small>\> is an implementation of the C++
+ * The core of \c S<small>TXXL</small> is an implementation of the C++
  * standard template library STL for external memory (out-of-core)
- * computations, i.e., \c \<S<small>TXXL</small>\> implements containers and algorithms
+ * computations, i.e., \c S<small>TXXL</small> implements containers and algorithms
  * that can process huge volumes of data that only fit on 
  * disks. While the compatibility to the STL supports
  * ease of use and compatibility with existing applications,
  * another design priority is high performance. 
- * Here is a selection of \c \<S<small>TXXL</small>\> performance features:
+ * Here is a selection of \c S<small>TXXL</small> performance features:
  * - transparent support of multiple disks
  * - variable block lengths
  * - overlapping of I/O and computation
@@ -20,8 +20,9 @@
  * \section platforms Platforms supported
  * Linux (kernel >= 2.4.18)
  * 
- * Questions concerning use and development of the \c \<S<small>TXXL</small>\> library mail to Roman
- *  Dementiev <A href='mailto:dementiev@mpi-sb.mpg.de'>dementiev@mpi-sb.mpg.de</A>.
+ * Questions concerning use and development of the \c S<small>TXXL</small> library mail to <A 
+ * href="http://i10www.ira.uka.de/dementiev/" >Roman
+ *  Dementiev</A>.
  *
  * \link installation Installation \endlink
  *
@@ -39,28 +40,28 @@
  * - Change file \c compiler.make according to your system configuration
  *   - name of your make program
  *   - name of your compiler
- *   - \c \<S<small>TXXL</small>\> root directory ( \c directory_where_you_unpacked_the_tar_ball/stxxl )
+ *   - \c S<small>TXXL</small> root directory ( \c directory_where_you_unpacked_the_tar_ball/stxxl )
  * - Run: \verbatim make lib \endverbatim
  * - Run: \verbatim make tests \endverbatim (optional, if you want to run some test programs)
  * 
- * In your makefiles of programs that will use \c \<S<small>TXXL</small>\> you should include 
+ * In your makefiles of programs that will use \c S<small>TXXL</small> you should include 
  * the file \c compiler.make
  * file (add the line 'include ../compiler.make') because it contains a useful variable (STXXL_VARS) 
  * that includes all compiler definitions and library paths that you need to compile an 
- * \c \<S<small>TXXL</small>\> program.
+ * \c S<small>TXXL</small> program.
  *
  * For example: <BR> \verbatim g++  my_example.cpp -o my_example -g $(STXXL_VARS) \endverbatim
  * 
- * Before you try to run one of the \c \<S<small>TXXL</small>\> examples 
- * (or your \c \<S<small>TXXL</small>\> program) you must configure the disk 
+ * Before you try to run one of the \c S<small>TXXL</small> examples 
+ * (or your \c S<small>TXXL</small> program) you must configure the disk 
  * space that will be used as external memory for the library. See the next section.
  *
  *
  * \section space Disk space
  *
- * To get best performance with \c \<S<small>TXXL</small>\>  you should assign separate disks to it. 
+ * To get best performance with \c S<small>TXXL</small>  you should assign separate disks to it. 
  * These disks should be used by the library only.
- * Since \c \<S<small>TXXL</small>\> is developed to exploit disk parallelism, the performance of your 
+ * Since \c S<small>TXXL</small> is developed to exploit disk parallelism, the performance of your 
  * external memory application will increase if you use more than one disk. 
  * But from how many disks your application can benefit depends on how "I/O bound" it is.
  * With modern disk bandwidths
@@ -80,7 +81,7 @@
  * \section configuration Disk configuration file
  * 
  * You must define the disk configuration for an 
- * \c \<S<small>TXXL</small>\> program in a file named \c '.stxxl' that must reside 
+ * \c S<small>TXXL</small> program in a file named \c '.stxxl' that must reside 
  * in the same directory where you execute the program. 
  * You can change the default file name for the configuration 
  * file by setting the enviroment variable \c STXXLCFG . 
@@ -91,12 +92,12 @@
  * \c disk=full_disk_filename,capacity,access_method
  *
  * Description of the parameters:
- * - \c full_disk_filename : full disk filename. In order to access disks \<S<small>TXXL</small>\> uses file 
+ * - \c full_disk_filename : full disk filename. In order to access disks S<small>TXXL</small> uses file 
  * access methods. Each disk is respresented as a file. If you have a disk that is mapped in unix
  * to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be
  * \c /mnt/disk0/some_file_name ,
  * - \c capacity : maximum capacity of the disk in megabytes
- * - \c access_method : \c \<S<small>TXXL</small>\> has a number of different file access implementations, choose one of them:
+ * - \c access_method : \c S<small>TXXL</small> has a number of different file access implementations, choose one of them:
  *   - \c syscall uses \c read and \c write system calls which perform disk transfers directly 
  *   on user memory pages without superfluous copy (currently the fastest method)
  *   - \c mmap : performs disks transfers using \c mmap and \c munmap system calls
@@ -109,9 +110,9 @@
  * \section excreation Formatting external memory files
  *
  * In order to get the maximum performance one should format disk files described in the configuration file,
- * before running \c \<S<small>TXXL</small>\> applications.
+ * before running \c S<small>TXXL</small> applications.
  *
- * The format utility is included into a set of \c \<S<small>TXXL</small>\> utilities ( \c utils/createdisks ). Run this utility
+ * The format utility is included into a set of \c S<small>TXXL</small> utilities ( \c utils/createdisks ). Run this utility
  * for each disk described in your disk configuration file.
  *
  * 

@@ -547,6 +547,10 @@ public:
     {
       return const_element(0);
     }
+	//! \brief Construct vector from a file
+	//! \param from file to be constructed from
+	//! \warning Only one \c vector can be assigned to a file 
+	//! (does not matter whether the files are different \c file objects).
     vector (file * from):
 			_size(size_from_file_length(from->size())),
 			_bids(div_and_round_up(_size,block_type::size)),
