@@ -11,10 +11,19 @@
 //! \example test_stack.cpp
 //! This is an example of how to use \c stxxl::stack data structure
 
-int main()
+using namespace stxxl;
+
+int main(int argc, char * argv[])
 {
-  stxxl::stack<int,stxxl::RC,4096,4> my_stack;
-  int test_size = 1*1024*1024/sizeof(int),i;
+  typedef stack<grow_shrink_stack<stack_config_generator<int,4,RC,4096> > > ext_stack_type;
+  
+  if(argc<2)
+  {
+    STXXL_MSG("Usage: "<<argv[0]<<" test_size_in_pages")
+    abort();
+  }
+  ext_stack_type my_stack;
+  int test_size = atoi(argv[1])*4*4096/sizeof(int),i;
   
   for(i = 0; i < test_size;i++)
   {
@@ -53,7 +62,8 @@ int main()
     assert(int_stack.size() == i+1);
   }
   
-  stxxl::stack<int,stxxl::RC,4096,4> my_stack1(int_stack);
+  
+  ext_stack_type my_stack1(int_stack);
   
   for(i=test_size-1;i>=0;i--)
   { 

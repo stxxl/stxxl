@@ -108,7 +108,8 @@ module.include.files=\
 	io/completion_handler.h\
 	algo/inmemsort.h\
 	containers/stack.h\
-	containers/migrating_stack.h
+	containers/migrating_stack.h\
+	common/timer.h
 
 module.source.name=.
 module.source.type=

@@ -7,16 +7,20 @@
  ****************************************************************************/
 
 
-#include "migrating_stack.h"
-
+#include "stack.h"
 
 //! \example test_mstack.cpp
 //! This is an example of how to use \c stxxl::migrating_stack data structure
 
+using namespace stxxl;
+
 int main()
 {
   const unsigned critical_size = 8*4096; 
-  stxxl::migrating_stack<int,critical_size,stxxl::RC,4096,4> my_stack;
+  typedef stack<normal_stack<stack_config_generator<int,4,RC,4096> > > ext_stack_type;
+  typedef stack<migrating_stack<(8*4096),ext_stack_type,std::stack<int> > > migrating_stack_type;
+  
+  migrating_stack_type my_stack;
   int test_size = 1*1024*1024/sizeof(int),i;
   
   for(i = 0; i < test_size;i++)

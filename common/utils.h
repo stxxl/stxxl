@@ -38,7 +38,13 @@ __STXXL_BEGIN_NAMESPACE
 
 #define STXXL_MSG(x) { std::cout << x << std::endl; std::cout.flush(); };
 #define STXXL_ERRMSG(x) { std::cerr << x << std::endl; std::cerr.flush(); };
-	
+  
+#ifdef STXXL_VERBOSE_ON
+#define STXXL_VERBOSE(x) { std::cout << x << std::endl; std::cerr.flush(); };
+#else
+#define STXXL_VERBOSE(x) (0);
+#endif
+  
 	inline void
 stxxl_perror (const char *errmsg, int errcode)
 {

@@ -5,11 +5,10 @@ include ../compiler.make
 vector: 
 	$(GCC) test.cpp -o test_vector $(STXXL_OBJ) 
 
-
-stack:
+stack: test_stack.cpp
 	$(GCC) test_stack.cpp -o test_stack $(STXXL_OBJ)
 
-mstack:
+mstack: test_mstack.cpp
 	$(GCC) test_mstack.cpp -o test_mstack $(STXXL_OBJ)
 
 clean:
