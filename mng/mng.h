@@ -718,13 +718,22 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		}
 	};
   
+  //! \brief Allocator functor adaptor
   
+  //! Gives offset to disk number sequence defined in constructor
   template <class BaseAllocator_>
   struct offset_allocator
   {
     BaseAllocator_ base;
     int offset;
+    //! \brief Creates functor based on \c BaseAllocator_ functor created 
+    //! with default cunstructor with offset \c offset_
+    //! \param offset_ offset
     offset_allocator(int offset_) : base(),offset(offset_) {}
+    //! \brief Creates functor based on instance of \c BaseAllocator_ functor 
+    //! with offset \c ofset_
+    //! \param offset_ offset
+    //! \param base_ used to create a copy
     offset_allocator(int offset_,BaseAllocator_ & base_) : base(base_),offset(offset_) {}
     int operator() (int i)
     {
