@@ -634,9 +634,20 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 			runs_left -= runs2merge;
 		}
 		// allocate blocks in the new runs
-		mng->new_blocks( interleaved_alloc_strategy(new_nruns, 0, ndisks),
+		if( cur_out_run == 1 &&  blocks_in_new_run==int(_n) && (input_bids->storage->get_id() == -1))
+		{
+			// if we sort a file we can reuse the input bids for the output
+			input_bid_iterator cur = input_bids;
+			for(int i=0;cur != (input_bids+_n) ; ++cur)
+			{
+				(*new_runs[0])[i++].bid = *cur;
+			}
+		}
+		else
+			mng->new_blocks( interleaved_alloc_strategy(new_nruns, 0, ndisks),
 						 RunsToBIDArrayAdaptor2<block_type::raw_size,run_type> (new_runs,0,new_nruns,blocks_in_new_run),
 						 RunsToBIDArrayAdaptor2<block_type::raw_size,run_type> (new_runs,_n,new_nruns,blocks_in_new_run));
+		
 		// merge all
 		runs_left = nruns;
 		cur_out_run = 0;
