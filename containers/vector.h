@@ -394,6 +394,7 @@ public:
 
 			bm->new_blocks (_alloc_strategy, _bids.begin (),
 					_bids.end ());
+			
 		}
     size_type capacity()
     {
