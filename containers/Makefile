@@ -2,7 +2,7 @@ all: vector stack mstack
 
 include ../compiler.make
 
-vector: 
+vector: test.cpp 
 	$(GCC) test.cpp -o test_vector $(STXXL_OBJ) 
 
 stack: test_stack.cpp

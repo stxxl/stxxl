@@ -3,7 +3,9 @@
 #include <algorithm>
 
 //! \example containers/test.cpp 
-//! This is an example of use of \c stxxl::vector
+//! This is an example of use of \c stxxl::vector and 
+//! \c stxxl::VECTOR_GENERATOR. Vector type is configured
+//! to store 64-bit integers and have 2 pages each of 1 block
 
 using namespace stxxl;
 
@@ -22,12 +24,13 @@ struct counter
 
 int main()
 {
-	stxxl::vector<int64> v(4*int64(1024*1024));
-	stxxl::vector<int64>::iterator it = v.begin();
-	stxxl::vector<int64>::const_iterator c_it = v.begin();
+  typedef stxxl::VECTOR_GENERATOR<int64,2,1>::result vector_type;
+	vector_type v(4*int64(1024*1024));
+	vector_type::iterator it = v.begin();
+	vector_type::const_iterator c_it = v.begin();
 	STXXL_MSG(v.end().bid() - c_it.bid() )
-	STXXL_MSG( c_it.block_offset() )
-	STXXL_MSG( v.end().block_offset() )
+	STXXL_MSG(c_it.block_offset() )
+	STXXL_MSG(v.end().block_offset() )
 	
 	stxxl::random_number32 rnd;
 	int offset = rnd();
