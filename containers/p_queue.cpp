@@ -60,7 +60,7 @@ int main()
   */
   //typedef priority_queue<priority_queue_config<my_type,my_cmp,
   //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,128*1024*1024,128*1024*1024/sizeof(my_type)>::result pq_type;
+  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,3*1024*1024,3*1024*1024/sizeof(my_type)>::result pq_type;
   typedef pq_type::block_type block_type;
  
   STXXL_MSG("Block size: "<<block_type::raw_size)
