@@ -133,6 +133,11 @@ public:
 			return p_vector->const_element(offset);
 		}
 		
+		void touch()
+		{
+			p_vector->touch(offset);
+		}
+		
 		_Self & operator ++()
 		{
 			offset++;
@@ -172,6 +177,8 @@ public:
 		{
 			p_vector->flush();
 		}
+		
+		
 	};
 
 	//! \brief Const external vector iterator, model of \c ext_random_access_iterator concept
@@ -252,6 +259,11 @@ public:
 		const_reference operator *() const
 		{
 			return p_vector->const_element(offset);
+		}
+		
+		void touch()
+		{
+			p_vector->touch(offset);
 		}
 		
 		_Self & operator ++()
@@ -545,7 +557,7 @@ public:
 				int page_no = _page_no[i];
 				if(non_free_pages[i])
 				{
-					// STXXL_MSG("Flushing page "<<i<< " address: "<<(page_no*block_type::size*page_size));
+					STXXL_VERBOSE1("Flushing page "<<i<< " address: "<<(page_no*block_type::size*page_size));
 					if(_page_status[page_no] & dirty)
 						write_page(page_no,i);
 				
@@ -569,6 +581,7 @@ private:
 		}
 		void read_page(int page_no, int cache_page) const
 		{
+			STXXL_VERBOSE1("vector: reading page_no="<<page_no<<" cache_page="<<cache_page)
 			request_ptr * reqs = new request_ptr [page_size];
 			int block_no = page_no*page_size;
 			int last_block = 	std::min(block_no + page_size,int(_bids.size()));
@@ -580,6 +593,7 @@ private:
 		}
 		void write_page(int page_no, int cache_page) const
 		{
+			STXXL_VERBOSE1("vector: writing page_no="<<page_no<<" cache_page="<<cache_page)
 			request_ptr * reqs = new request_ptr [page_size];
 			int block_no = page_no*page_size;
 			int last_block = std::min(block_no + page_size,int(_bids.size()));
@@ -648,6 +662,10 @@ private:
 				return _cache[last_page*page_size + page_offset/block_type::size][page_offset % block_type::size];
 			}
 		};
+		void touch(size_type offset)
+		{
+			_page_status[offset/(block_type::size*page_size)] = 0;
+		}
 		const_reference const_element(size_type offset) const
 		{
 			int page_no = offset/(block_type::size*page_size);

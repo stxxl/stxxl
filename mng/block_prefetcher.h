@@ -89,8 +89,10 @@ public:
 		nextconsume(0),
 		nreadblocks(nextread)
 	{
-    assert(seq_length > 0);
-    assert(_prefetch_buf_size > 0);
+		STXXL_VERBOSE1("block_prefetcher: seq_length="<<seq_length);
+		STXXL_VERBOSE1("block_prefetcher: _prefetch_buf_size="<<_prefetch_buf_size);
+    	assert(seq_length > 0);
+    	assert(_prefetch_buf_size > 0);
 		int i;
 		read_buffers = new block_type[nreadblocks];
 		read_reqs = new request_ptr[nreadblocks];
@@ -102,7 +104,7 @@ public:
 		
 		for (i = 0; i < nreadblocks; ++i)
 		{
-      
+      		STXXL_VERBOSE2("block_prefetcher: reading block "<<i);
 			assert( prefetch_seq[i] < int(seq_length));
       		assert( prefetch_seq[i] >= 0 );
 			read_reqs[i] = read_buffers[i].read (

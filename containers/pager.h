@@ -46,7 +46,7 @@ public:
 	};
 	void hit(int ipage)
 	{
-		assert(ipage < npages_);
+		assert(ipage < int(npages_));
 		assert(ipage >= 0);
 	};
 };
@@ -74,7 +74,7 @@ public:
 	};
 	void hit(int ipage)
 	{
-		assert(ipage < npages_);
+		assert(ipage < int(npages_));
 		assert(ipage >= 0);
 		history.splice(history.begin(),history,history_entry[ipage]);
 	};

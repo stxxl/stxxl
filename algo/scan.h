@@ -42,7 +42,7 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 	_ExtIterator _cur = _begin - _begin.block_offset();
 	
 	// leave part of the block before _begin untouched (e.g. copy)
-	for( ;_cur != _begin;_cur++)
+	for( ;_cur != _begin;++_cur)
 	{
 		typename _ExtIterator::value_type tmp;
 		in >> tmp;
@@ -50,7 +50,7 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 	}
 	
 	// apply _functor to the range [_begin,_end)
-	for( ;_cur != _end;_cur++)
+	for( ;_cur != _end;++_cur)
 	{
 		typename _ExtIterator::value_type tmp;
 		in >> tmp;
@@ -62,7 +62,7 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 	if(_end.block_offset())
 	{
 		_ExtIterator _last_block_end = _end - _end.block_offset() + _ExtIterator::block_type::size;
-		for( ;_cur != _last_block_end; _cur++)
+		for( ;_cur != _last_block_end; ++_cur)
 		{
 			typename _ExtIterator::value_type tmp;
 			in >> tmp;
@@ -94,11 +94,11 @@ _ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityCompara
 	_ExtIterator _cur = _begin - _begin.block_offset();
 	
 	// skip part of the block before _begin untouched
-	for( ;_cur != _begin;_cur++)
+	for( ;_cur != _begin;++_cur)
 		++in;
 	
 	// search in the the range [_begin,_end)
-	for( ;_cur != _end;_cur++)
+	for( ;_cur != _end;++_cur)
 	{
 		typename _ExtIterator::value_type tmp;
 		in >> tmp;

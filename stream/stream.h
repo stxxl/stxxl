@@ -12,6 +12,7 @@
 #include "../mng/buf_istream.h"
 #include "../mng/buf_ostream.h"
 #include "../common/tuple.h"
+#include "../containers/vector.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -43,7 +44,7 @@ namespace stream
   //!
   //! \{
   
-  //! \brief A model of steam that outputs data from an input iterator
+  //! \brief A model of steam that retrieves the data from an input iterator
   //! For convinience use \c streamify function instead of direct instantiation
   //! of \c iterator2stream .
   template <class InputIterator_>
@@ -93,13 +94,153 @@ namespace stream
     return iterator2stream<InputIterator_>(begin,end);
   }
   
+  //! \brief A model of steam that retrieves data from an external \c stxxl::vector iterator.
+  //! It is more efficient than generic \c iterator2stream thanks to use of overlapping
+  //! For convinience use \c streamify function instead of direct instantiation
+  //! of \c vector_iterator2stream .
+  template <class InputIterator_>
+  class vector_iterator2stream
+  {
+    InputIterator_ current_,end_;
+	typedef buf_istream<typename InputIterator_::block_type,
+	  	typename InputIterator_::bids_container_iterator> buf_istream_type;
+	  
+	mutable std::auto_ptr<buf_istream_type> in;
+
+    //! \brief Default construction is forbidden
+    vector_iterator2stream() {};
+  public:
+	 typedef vector_iterator2stream<InputIterator_> Self_;
+  
+    //! \brief Standard stream typedef
+    typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
+      
+    vector_iterator2stream(InputIterator_ begin,InputIterator_ end, unsigned nbuffers = 0): 
+      current_(begin),end_(end)
+  	{
+		
+		begin.flush(); // flush container
+		in.reset(new buf_istream_type(begin.bid(),end.bid() + ((end.block_offset())?1:0),nbuffers?nbuffers:
+  			(2 * config::get_instance()->disks_number())));
+		
+		InputIterator_	cur = begin - begin.block_offset();
+	
+		// skip the beginning of the block
+		for( ;cur != begin;++cur) 
+			++(*in);
+		
+	}
+    
+    vector_iterator2stream(const Self_ & a): current_(a.current_),end_(a.end_),in(a.in) {}
+       
+    //! \brief Standard stream method
+    const value_type & operator * () const
+    {
+    	return **in;
+    }
+	
+    //! \brief Standard stream method
+    Self_ &  operator ++()
+    {
+      assert(end_ != current_);
+      ++current_;
+	  ++(*in);
+      return *this;
+    }
+    
+    //! \brief Standard stream method
+    bool empty() const
+    {
+      return (current_==end_);
+    }
+  };
+  
+  //! \brief Input external \c stxxl::vector iterator range to stream convertor
+  //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
+  //! \param begin iterator, pointing to the first value
+  //! \param end iterator, pointing to the last + 1 position, i.e. beyond the range 
+  //! \param nbuffers number of blocks used for overlapped reading (0 is default,
+  //! which equals to (2 * number_of_disks)
+  //! \return an instance of a stream object
+  
+  template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
+		unsigned BlkSize_, typename PgTp_, unsigned PgSz_ > 
+  vector_iterator2stream<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
+  	streamify(
+  		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> begin,
+  		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
+  		unsigned nbuffers = 0)
+  {
+    	return vector_iterator2stream<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
+	  		(begin,end,nbuffers);
+  }
+  
+  
+  //! \brief Stores consecutively stream content to an output \c stxxl::vector iterator
+  //! \param in stream to be stored used as source
+  //! \param out output \c stxxl::vector iterator used as destination
+  //! \param nbuffers number of blocks used for overlapped writing (0 is default,
+  //! which equals to (2 * number_of_disks)
+  //! \return value of the output iterator after all increments, 
+  //! i.e. points to the first unwritten value
+  template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
+		unsigned BlkSize_, typename PgTp_, unsigned PgSz_,class StreamAlgorithm_ > 
+  stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> 
+  	materialize(StreamAlgorithm_ & in,
+  		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> out,
+  		unsigned nbuffers = 0)
+  {
+  	typedef stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_>  ExtIterator;
+	typedef stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> ConstExtIterator;
+	typedef buf_ostream<typename ExtIterator::block_type,typename ExtIterator::bids_container_iterator> buf_ostream_type;
+	  
+	  
+	while(out.block_offset()) //  go to the beginning of the block 
+											//  of the external vector
+	{
+		if(in.empty()) return out;
+		*out = *in;
+      	++out;
+      	++in;
+	}
+	  
+	if (nbuffers == 0) nbuffers =  2 * config::get_instance()->disks_number();	
+	
+	out.flush(); // flush container
+	
+	// create buffered write stream for blocks
+	buf_ostream_type outstream(out.bid(),nbuffers); 
+	
+	assert(out.block_offset() == 0);
+	
+	while(!in.empty())
+	{
+		if(out.block_offset() ==0 ) out.touch();
+		*outstream  = * in;
+		++out;
+		++outstream;
+		++in;
+	}
+	
+	ConstExtIterator const_out = out;
+	
+	while(const_out.block_offset())
+	{
+		*outstream =  * const_out;
+		++const_out;
+		++outstream;
+	}
+	out.flush();
+	
+    return out;
+  }
+
   //! \brief Stores consecutively stream content to an output iterator
-  //! \param 
-  template <class OutputIterator_,class StreamAlgorithm_>
   //! \param in stream to be stored used as source
   //! \param out output iterator used as destination
   //! \return value of the output iterator after all increments, 
   //! i.e. points to the first unwritten value
+  template <class OutputIterator_,class StreamAlgorithm_>
   OutputIterator_ materialize(StreamAlgorithm_ & in,OutputIterator_ out)
   {
     while(!in.empty())
@@ -110,7 +251,7 @@ namespace stream
     }
     return out;
   }
-
+  
   
   //! \brief A model of steam that outputs data from an adaptable generator functor
   //! For convinience use \c streamify function instead of direct instantiation
