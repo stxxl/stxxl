@@ -204,8 +204,7 @@ create_runs(
                         run_size*block_type::size ),
                         cmp);
 		else 
-			std::sort(Blocks1[0].elem, 
-                Blocks1[run_size].elem, cmp);
+			std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
   
   wait_all(write_reqs, m2);
   for (i = 0; i < run_size; ++i)

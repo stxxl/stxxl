@@ -135,10 +135,9 @@ __STXXL_BEGIN_NAMESPACE
 		{
       		STXXL_VERBOSE3("ufs_request_base "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
 	
-			
-			if(_state() != DONE && _state()!= READY2DIE )
-				STXXL_ERRMSG("WARNING: serious stxxl error requiest being deleted while I/O did not finish "<<
-					"! Please inform the stxxl author(s) <dementiev@mpi-sb.mpg.de>")
+			// if(_state() != DONE && _state()!= READY2DIE )
+			//	STXXL_ERRMSG("WARNING: serious stxxl error requiest being deleted while I/O did not finish "<<
+			//		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>")
 			
 			_state.wait_for (READY2DIE);
 		};

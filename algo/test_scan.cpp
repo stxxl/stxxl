@@ -44,7 +44,7 @@ int main()
 	int64 i;
 	stxxl::vector<int64> v(64*int64(1024*1024));
 	double b,e;
-	
+
 	STXXL_MSG("write "<<(v.end() - v.begin())<< " elements ...")
 	
 	stxxl::generate(v.begin(),v.end(),counter<int64>(),4);	
@@ -64,7 +64,7 @@ int main()
 	}
 
 	STXXL_MSG("Pos of value    1023: "<< (stxxl::find(v.begin(),v.end(),1023,4) - v.begin()))
-	STXXL_MSG("Pos of value 1048576: "<< (stxxl::find(v.begin(),v.end(),1024*1024,4) - v.begin())) 
+	STXXL_MSG("Pos of value 1048576: "<< (stxxl::find(v.begin(),v.end(),1024*1024,4) - v.begin()))
 	STXXL_MSG("Pos of value    1024: "<< (stxxl::find(v.begin(),v.end(),32*32,4) - v.begin())) 
 	
 	STXXL_MSG("generate ...")

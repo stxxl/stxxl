@@ -217,7 +217,16 @@ __STXXL_BEGIN_NAMESPACE
 		void completed ()
 		{
 			on_complete(this);
-		};
+		}
+		
+		// returns number of references
+		int nref()
+		{
+			ref_cnt_mutex.lock();
+			int ref_cnt_ = ref_cnt;
+			ref_cnt_mutex.unlock();
+			return ref_cnt_;
+		}
 		
 	public:
 		request(completion_handler on_compl):on_complete(on_compl),ref_cnt(0)
