@@ -59,6 +59,10 @@ class lru_pager
 	
 	list_type history;
 	simple_vector<list_type::iterator> history_entry;
+	
+private:
+	lru_pager(const lru_pager &);
+	lru_pager & operator = (const lru_pager &); // forbidden
 public:
 	enum { n_pages = npages_ };
 	
@@ -66,22 +70,37 @@ public:
 	{
 		for(unsigned i=0;i<npages_;i++)
 			history_entry[i] = history.insert(history.end(),static_cast<int>(i));
-	};
-	~lru_pager() {};
+	}
+	~lru_pager() {}
 	int kick()
 	{
 		return history.back();
-	};
+	}
 	void hit(int ipage)
 	{
 		assert(ipage < int(npages_));
 		assert(ipage >= 0);
 		history.splice(history.begin(),history,history_entry[ipage]);
-	};
+	}
+	void swap(lru_pager & obj)
+	{
+		std::swap(history,obj.history);
+		std::swap(history_entry,obj.history_entry);
+	}
 };
 
 //! \}
 
 __STXXL_END_NAMESPACE
+
+namespace std
+{
+	template <unsigned npages_>
+	void swap(	stxxl::lru_pager<npages_> & a,
+				stxxl::lru_pager<npages_> & b)
+	{
+		a.swap(b);
+	}
+}
 
 #endif

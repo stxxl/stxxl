@@ -51,6 +51,11 @@ int main(int argc, char * argv[])
       assert(my_stack.size() == i+1);
     }
     
+	// test swap
+	ext_stack_type s2;
+	std::swap(s2,my_stack);
+	std::swap(s2,my_stack);
+	
     for(i=test_size-1;i>=0;i--)
     { 
       assert(my_stack.top() == i);
@@ -108,6 +113,11 @@ int main(int argc, char * argv[])
       assert(my_stack.size() == i+1);
     }
     
+	// test swap
+	ext_stack_type2 s2(p_pool,w_pool,0);
+	std::swap(s2,my_stack);
+	std::swap(s2,my_stack);
+	
     for(i=test_size-1;i>=0;i--)
     { 
       assert(my_stack.top() == i);

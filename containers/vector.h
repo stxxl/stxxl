@@ -33,7 +33,7 @@ namespace stxxl
 
 		bid_vector (size_type _sz):_Derived (_sz)
 		{
-		};
+		}
 	};
   
 
@@ -92,7 +92,7 @@ public:
 		  vector_iterator (vector_type * v, size_type o):offset (o),
 			p_vector (v)
 		{
-		};
+		}
 public:
 	    vector_iterator ():offset (0), p_vector (NULL){}
 		vector_iterator (const _Self & a):
@@ -227,11 +227,11 @@ protected:
 		  const_vector_iterator (vector_type * v, size_type o):offset (o),
 			p_vector (v)
 		{
-		};
+		}
 public:
 	  const_vector_iterator ():offset (0), p_vector (NULL)
 		{
-		};
+		}
 		const_vector_iterator (const _Self & a):
 			offset (a.offset),
 			p_vector (a.p_vector) {}
@@ -244,26 +244,26 @@ public:
 		{
 			return static_cast < block_offset_type >
 				(offset % block_type::size);
-		};
+		}
 		bids_container_iterator bid () const
 		{
 			return p_vector->bid (offset);
-		};
+		}
 		
 		difference_type operator - (const _Self & a)
 		{
 			return offset - a.offset;
-		};
+		}
 		
 		_Self operator - (size_type op)
 		{
 			return _Self(p_vector,offset - op);
-		};
+		}
 		
 		_Self operator + (size_type op)
 		{
 			return _Self(p_vector,offset + op);
-		};
+		}
 		
 		const_reference operator *() const
 		{
@@ -416,6 +416,19 @@ public:
 			bm->new_blocks (_alloc_strategy, _bids.begin (),
 					_bids.end ());
 			
+		}
+		
+		void swap(vector & obj)
+		{
+			std::swap(_alloc_strategy,obj._alloc_strategy); 
+			std::swap(_size,obj._size); 
+			std::swap(_bids,obj._bids); 
+			std::swap(pager,obj.pager); 
+			std::swap(_page_status,obj._page_status); 
+			std::swap(_last_page,obj._last_page); 
+			std::swap(_page_no,obj._page_no); 
+			std::swap(_free_pages,obj._free_pages); 
+			std::swap(_cache,obj._cache);
 		}
     size_type capacity()
     {
@@ -820,6 +833,22 @@ private:
     
     
   //! \}
+}
+
+namespace std
+{
+	template < 
+    	typename Tp_,
+    	unsigned PgSz_,
+    	typename PgTp_,
+    	unsigned BlkSize_ ,
+		typename AllocStr_ ,
+    	typename SzTp_ >
+	void swap(	stxxl::vector<Tp_,PgSz_,PgTp_,BlkSize_,AllocStr_,SzTp_> & a,
+				stxxl::vector<Tp_,PgSz_,PgTp_,BlkSize_,AllocStr_,SzTp_> & b )
+	{
+		a.swap(b);
+	}
 }
 
 

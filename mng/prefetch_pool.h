@@ -47,6 +47,9 @@ protected:
   hash_map_type busy_blocks;
   
   unsigned free_blocks_size;
+private:
+	prefetch_pool(const prefetch_pool & pool); // forbidden
+	prefetch_pool & operator =(const prefetch_pool & pool); // forbidden
 public:
   
   //! \brief Constructs pool
@@ -56,6 +59,13 @@ public:
     unsigned i = 0;
     for(;i<init_size;++i)
       free_blocks.push_back(new block_type);
+  }
+  
+  void swap(prefetch_pool & obj)
+  {
+	  std::swap(free_blocks,obj.free_blocks);
+	  std::swap(busy_blocks,obj.busy_blocks);
+	  std::swap(free_blocks_size,obj.free_blocks_size);
   }
   
   //! \brief Waits for completion of all ongoing read requests and frees memory
@@ -198,5 +208,15 @@ public:
 //! \}
 
 __STXXL_END_NAMESPACE
+
+namespace std
+{
+	template <class BlockType>
+	void swap(	stxxl::prefetch_pool<BlockType> & a,
+				stxxl::prefetch_pool<BlockType> & b)
+	{
+		a.swap(b);
+	}
+}
 
 #endif

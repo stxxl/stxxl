@@ -17,12 +17,12 @@ template <typename run_cursor_type,
 					unsigned buffer_size>
 class looser_tree
 {
-	looser_tree ()
-	{
-	};
+	looser_tree () {} // forbidden
+	looser_tree (const looser_tree &);// forbidden
+	looser_tree & operator = (const looser_tree &);// forbidden
+	
 	int logK;
 	int k;
-
 	int *entry;
 	run_cursor_type *current;
 	run_cursor_cmp_type cmp;
@@ -48,7 +48,7 @@ class looser_tree
 				return right;
 			}
 		}
-	};
+	}
 public:
 	typedef typename run_cursor_type::prefetcher_type prefetcher_type;
 	typedef typename run_cursor_type::value_type value_type;
@@ -92,6 +92,15 @@ public:
 	{
 		delete [] current;
 		delete [] entry;
+	}
+	
+	void swap(looser_tree & obj)
+	{
+		std::swap(logK,obj.logK);
+		std::swap(k,obj.k);
+		std::swap(entry,obj.entry);
+		std::swap(current,obj.current);
+		std::swap(cmp,obj.cmp);
 	}
 
 private:
@@ -230,5 +239,17 @@ public:
 };
 
 __STXXL_END_NAMESPACE
+
+namespace std
+{
+	template <	typename run_cursor_type, 
+				typename run_cursor_cmp_type,
+				unsigned buffer_size>
+	void swap(stxxl::looser_tree<run_cursor_type,run_cursor_cmp_type,buffer_size> & a,
+	          stxxl::looser_tree<run_cursor_type,run_cursor_cmp_type,buffer_size> & b)
+	{
+		a.swap(b);
+	}
+}
 
 #endif

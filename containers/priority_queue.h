@@ -303,6 +303,10 @@ void merge4(
       
       prefetch_pool<block_type> & p_pool;
       write_pool<block_type> & w_pool;
+	private:
+	  ext_merger(); // forbiden
+	  ext_merger(const ext_merger &); // forbiden
+	  ext_merger & operator = (const ext_merger &);// forbiden
     public:
       ext_merger( prefetch_pool<block_type> & p_pool_,
                   write_pool<block_type> & w_pool_):
@@ -312,6 +316,15 @@ void merge4(
       {
         STXXL_VERBOSE2("ext_merger::ext_merger(...)")
       }
+	  void swap(ext_merger & obj)
+	  {
+		  std::swap(nsequences,obj.nsequences);
+          std::swap(nelements,obj.nelements);
+          std::swap(sequences,obj.sequences);
+      	  std::swap(min_elements,obj.min_elements);
+      	  // std::swap(p_pool,obj.p_pool);
+      	  // std::swap(w_pool,obj.w_pool);
+	  }
       unsigned mem_cons() const // only raugh estimation
       {
         return (nsequences * block_type::raw_size);
@@ -504,8 +517,8 @@ private:
   // leaf information
   // note that Knuth uses indices k..k-1
   // while we use 0..k-1
-  Element *current[KNKMAX]; // pointer to actual element
-  Element *segment[KNKMAX]; // start of Segments
+  Element * current[KNKMAX]; // pointer to actual element
+  Element * segment[KNKMAX]; // start of Segments
   unsigned segment_size[KNKMAX];
 
   unsigned mem_cons_;
@@ -591,11 +604,30 @@ private:
   {
     return cmp(cmp.min_value(),a);
   }
+private:
+	looser_tree & operator = (const looser_tree &); // forbidden
+	looser_tree(const looser_tree &); // forbidden
 public:
   looser_tree();
   ~looser_tree();
   void init(); 
 
+  void swap(looser_tree & obj)
+  {
+	    std::swap(cmp,obj.cmp);
+  		swap_1D_arrays(empty,obj.empty,KNKMAX);
+  		std::swap(lastFree,obj.lastFree);
+		std::swap(size_,obj.size_);
+  		std::swap(logK,obj.logK);
+  		std::swap(k,obj.k);
+ 		std::swap(dummy,obj.dummy);
+		swap_1D_arrays(entry,obj.entry,KNKMAX);
+		swap_1D_arrays(current,obj.current,KNKMAX);
+		swap_1D_arrays(segment,obj.segment,KNKMAX);
+  		swap_1D_arrays(segment_size,obj.segment_size,KNKMAX);
+  		std::swap(mem_cons_,obj.mem_cons_);
+  }
+	
   void multi_merge(Element * begin, Element * end)
   {
     multi_merge(begin,end-begin);
@@ -1047,6 +1079,29 @@ struct priority_queue_config
   };
 };
 
+__STXXL_END_NAMESPACE
+
+namespace std
+{
+	template <  class BlockType_, 
+          		class Cmp_,
+              	unsigned Arity_,
+              	class AllocStr_ >
+	void swap(stxxl::priority_queue_local::ext_merger<BlockType_,Cmp_,Arity_,AllocStr_> & a,
+			  stxxl::priority_queue_local::ext_merger<BlockType_,Cmp_,Arity_,AllocStr_> & b )
+	{
+		a.swap(b);
+	}
+	template <class ValTp_,class Cmp_,unsigned KNKMAX>
+	void swap(	stxxl::priority_queue_local::looser_tree<ValTp_,Cmp_,KNKMAX> & a,
+				stxxl::priority_queue_local::looser_tree<ValTp_,Cmp_,KNKMAX> & b)
+	{
+		a.swap(b);
+	}		
+}
+
+__STXXL_BEGIN_NAMESPACE
+
 //! \brief External priority queue data structure
 template <class Config_>
 class priority_queue
@@ -1131,6 +1186,7 @@ protected:
   // forbidden cals
   priority_queue();
   priority_queue & operator = (const priority_queue &);  
+  priority_queue(const priority_queue & );
 public:
     
   //! \brief Constructs external priority queue object
@@ -1144,8 +1200,23 @@ public:
   //! helps to speed up operations.
   priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_);
     
-  // not implemented yet
-  priority_queue(const priority_queue & );
+  void swap(priority_queue & obj)
+  {
+	  swap_1D_arrays(itree,obj.itree,IntLevels);
+      // std::swap(p_pool,obj.p_pool);
+      // std::swap(w_pool,obj.w_pool);
+      std::swap(etree,obj.etree);
+	  for(unsigned i1=0;i1<Levels;++i1)
+		for(unsigned i2=0;i2< (N + 1);++i2)
+			std::swap(buffer2[i1][i2],obj.buffer2[i1][i2]);
+	  swap_1D_arrays(minBuffer2,obj.minBuffer2,Levels);
+      swap_1D_arrays(buffer1,obj.buffer1,BufferSize1 + 1); 
+      std::swap(minBuffer1,obj.minBuffer1);
+	  std::swap(cmp,obj.cmp);
+  	  std::swap(insertHeap,obj.insertHeap);
+	  std::swap(activeLevels,obj.activeLevels);
+	  std::swap(size_,obj.size_);
+  }
     
   virtual ~priority_queue();
   
@@ -1744,5 +1815,16 @@ public:
 //! \}
 
 __STXXL_END_NAMESPACE
+
+
+namespace std
+{
+	template <class Config_>
+	void swap(stxxl::priority_queue<Config_> & a,
+	          stxxl::priority_queue<Config_> & b)
+	{
+		a.swap(b);
+	}
+}
 
 #endif

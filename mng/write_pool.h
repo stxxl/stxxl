@@ -54,6 +54,10 @@ protected:
   //hash_map_type block_track;
   
   unsigned free_blocks_size,busy_blocks_size;
+
+private:
+	write_pool(const write_pool &); // forbidden
+	write_pool & operator=(const write_pool &);// forbidden
 public:
   //! \brief Constructs pool
   //! \param init_size initial number of blocks in the pool
@@ -63,6 +67,15 @@ public:
     for(;i<init_size;++i)
       free_blocks.push_back(new block_type);
   }
+  
+  void swap(write_pool & obj)
+  {
+	  std::swap(free_blocks,obj.free_blocks);
+	  std::swap(busy_blocks,obj.busy_blocks);
+	  std::swap(free_blocks_size,obj.free_blocks_size);
+	  std::swap(busy_blocks_size,busy_blocks_size);
+  }
+  
   //! \brief Waits for completion of all ongoing write requests and frees memory
   virtual ~write_pool()
   {
@@ -206,5 +219,16 @@ protected:
 //! \}
 
 __STXXL_END_NAMESPACE
- 
+
+
+namespace std
+{
+	template <class BlockType>
+	void swap(stxxl::write_pool<BlockType> & a,
+	          stxxl::write_pool<BlockType> & b)
+	{
+		a.swap(b);
+	}
+}
+
  #endif

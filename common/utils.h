@@ -278,5 +278,12 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last,
 	
 }
 
+template <class T>
+void swap_1D_arrays(T * a,T * b, unsigned size)
+{
+	for(unsigned i=0;i<size;++i)
+		std::swap(a[i],b[i]);
+}
+
 __STXXL_END_NAMESPACE
 #endif

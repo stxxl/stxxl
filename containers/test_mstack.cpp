@@ -35,6 +35,11 @@ int main()
     assert((my_stack.size() >= critical_size) == my_stack.external() );
   }
   
+  // test swap
+  migrating_stack_type my_stack2;
+  std::swap(my_stack2,my_stack);
+  std::swap(my_stack2,my_stack);
+  
   for(i=test_size-1;i>=0;i--)
   { 
     assert(my_stack.top() == i);

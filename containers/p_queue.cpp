@@ -95,6 +95,7 @@ int main()
   prefetch_pool<block_type> p_pool((mem_for_pools/2)/block_type::raw_size);
   write_pool<block_type>    w_pool((mem_for_pools/2)/block_type::raw_size);
   pq_type p(p_pool,w_pool);
+  
   off_t nelements = off_t(volume/sizeof(my_type))*1024,i;
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   STXXL_MSG("Max elements: "<<nelements)
@@ -106,6 +107,11 @@ int main()
   }
   Timer.stop();
   STXXL_MSG("Time spent for filling: "<<Timer.seconds()<< " sec")
+  
+  // test swap
+  pq_type p1(p_pool,w_pool);
+  std::swap(p,p1);
+  std::swap(p,p1);
   
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   Timer.reset();

@@ -28,6 +28,7 @@ int main()
   typedef stxxl::VECTOR_GENERATOR<int64,2,1>::result vector_type;
 	vector_type v(4*int64(1024*1024));
 	
+	
 	vector_type::const_iterator c_it = v.begin();
 	
 	stxxl::random_number32 rnd;
@@ -54,6 +55,10 @@ int main()
 		
 	stxxl::ran32State = 0xdeadbeef;
 
+	// testing swap
+	vector_type a;
+	std::swap(v,a);
+	std::swap(v,a); 
 	
 	for(i=0;i<v.size();i++)
 	{

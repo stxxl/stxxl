@@ -71,6 +71,9 @@ private:
   typename simple_vector<block_type>::iterator back_page;
   std::vector<bid_type> bids;
   alloc_strategy alloc_strategy_;
+
+  normal_stack(const normal_stack & obj); // forbidden
+  normal_stack & operator = (const normal_stack & obj); // forbidden
 public:
   normal_stack(): 
            size_(0),
@@ -83,6 +86,19 @@ public:
   {
     bids.reserve(blocks_per_page);
   }
+  
+  void swap(normal_stack & obj)
+  {
+	  std::swap(size_,obj.size_);
+	  std::swap(cache_offset,obj.cache_offset);
+	  std::swap(curent_element,obj.current_element);
+	  std::swap(cache,obj.cache);
+	  std::swap(front_page,obj.front_page);
+	  std::swap(back_page,obj.back_page);
+	  std::swap(bids,obj.bids);
+	  std::swap(alloc_strategy_,obj.alloc_strategy_);
+  }
+  
   //! \brief Construction from a stack
   //! \param stack_ stack object (could be external or internal, important is that it must
   //! have a copy constructor, \c top() and \c pop() methods )
@@ -253,6 +269,9 @@ private:
   simple_vector<request_ptr> requests;
   std::vector<bid_type> bids;
   alloc_strategy alloc_strategy_;
+
+
+  grow_shrink_stack & operator = (const grow_shrink_stack & obj); // forbidden
 public:
   grow_shrink_stack(): 
            size_(0),
@@ -266,6 +285,20 @@ public:
   {
     bids.reserve(blocks_per_page);
   }
+  
+  void swap(grow_shrink_stack & obj)
+  {
+	  std::swap(size_,obj.size_);
+	  std::swap(cache_offset,obj.cache_offset);
+	  std::swap(current_element,obj.current_element);
+	  std::swap(cache,obj.cache);
+	  std::swap(cache_buffers,obj.cache_buffers);
+	  std::swap(overlap_buffers,obj.overlap_buffers);
+	  std::swap(requests,obj.requests);
+	  std::swap(bids,obj.bids);
+	  std::swap(alloc_strategy_,obj.alloc_strategy_);
+  }
+  
   //! \brief Construction from a stack
   //! \param stack_ stack object (could be external or internal, important is that it must
   //! have a copy constructor, \c top() and \c pop() methods )
@@ -429,6 +462,8 @@ private:
   write_pool<block_type>    & w_pool;
   // for a moment forbid default construction
   grow_shrink_stack2();
+  grow_shrink_stack2(const grow_shrink_stack2 & obj); // forbidden
+  grow_shrink_stack2 & operator = (const grow_shrink_stack2 & obj); // forbidden
 public:
   //! \brief Constructs stack
   //! \param p_pool_ prefetch pool, that will be used for block prefetching
@@ -447,6 +482,20 @@ public:
   {
     STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)")
   }
+  
+  void swap(grow_shrink_stack2 & obj)
+  {
+	  std::swap(size_,obj.size_);
+	  std::swap(cache_offset,obj.cache_offset);
+	  std::swap(cache,obj.cache);
+	  std::swap(current,obj.current);
+	  std::swap(bids,obj.bids);
+	  std::swap(alloc_strategy_,obj.alloc_strategy_);
+	  std::swap(pref_aggr,obj.pref_aggr);
+	  //std::swap(p_pool,obj.p_pool);
+	  //std::swap(w_pool,obj.w_pool);
+  }
+  
   virtual ~ grow_shrink_stack2()
   {
     STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()")
@@ -625,11 +674,20 @@ private:
   int_stack_type * int_impl;
   ext_stack_type * ext_impl;
 
-public:
-  migrating_stack(): int_impl(new int_stack_type()),ext_impl(NULL) {}
   // not implemented yet
   template <class stack_type> 
   migrating_stack(const stack_type & stack_);  
+  
+  migrating_stack & operator = (const migrating_stack &); // forbidden
+public:
+  migrating_stack(): int_impl(new int_stack_type()),ext_impl(NULL) {}
+  
+  void swap(migrating_stack & obj)
+  {
+	  std::swap(int_impl,obj.int_impl);
+	  std::swap(ext_impl,obj.ext_impl);
+  }
+	  
   //! \brief Returns true if current implementation is internal, otherwise false
   bool internal() const
   { 
@@ -797,4 +855,36 @@ public:
 
 __STXXL_END_NAMESPACE
  
+
+namespace std
+{
+	template <class Config_>
+	void swap(	stxxl::normal_stack<Config_> & a,
+				stxxl::normal_stack<Config_> & b)
+	{
+		a.swap(b);
+	}
+	
+	template <class Config_>
+	void swap(	stxxl::grow_shrink_stack<Config_> & a,
+				stxxl::grow_shrink_stack<Config_> & b)
+	{
+		a.swap(b);
+	}
+	
+	template <class Config_>
+	void swap(	stxxl::grow_shrink_stack2<Config_> & a,
+				stxxl::grow_shrink_stack2<Config_> & b)
+	{
+		a.swap(b);
+	}
+	
+	template <unsigned CritSize, class ExternalStack, class InternalStack>
+	void swap(	stxxl::migrating_stack<CritSize,ExternalStack,InternalStack> & a,
+				stxxl::migrating_stack<CritSize,ExternalStack,InternalStack> & b)
+	{
+		a.swap(b);
+	}
+}
+
  #endif
