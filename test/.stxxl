@@ -1,8 +1,1 @@
-#disk=/mnt/hdc/stxxl,50000,syscall
-disk=/mnt/hde/stxxl,50000,syscall
-disk=/mnt/hdg/stxxl,50000,syscall
-disk=/mnt/hdi/stxxl,50000,syscall
-#disk=/mnt/hdm/stxxl,50000,syscall
-disk=/mnt/hdk/stxxl,50000,syscall
-#disk=/mnt/hdq/stxxl,50000,syscall
-#disk=/mnt/hds/stxxl,50000,syscall
+disk=/tmp/stxxl,70000,syscall 
