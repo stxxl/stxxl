@@ -166,6 +166,13 @@ template < unsigned
 		typedef BID<_BlkSz> bid_type;
 		trigger_iterator_type value;
 		
+		// STL typedefs
+		typedef bid_type value_type;
+		typedef std::random_access_iterator_tag iterator_category;
+		typedef int difference_type;
+		typedef value_type * pointer;
+		typedef value_type & reference;
+		
 		enum { block_size = _BlkSz };
 		
 		trigger_entry_iterator(const _Self & a):value(a.value) {};
@@ -243,4 +250,3 @@ template < unsigned
 __STXXL_END_NAMESPACE
 
 #endif
-

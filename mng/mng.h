@@ -35,11 +35,12 @@ __STXXL_BEGIN_NAMESPACE
 	
 	//! Stores block identity, given by file and offset within the file
 	template < unsigned SIZE > 
-  struct BID
+    struct BID
 	{
 		enum 
 		{
-			size = SIZE  //!< Block size
+			size = SIZE,  //!< Block size
+			t_size = SIZE	//!< Blocks size, given by the parameter
 		};
 		file * storage; //!< pointer to the file of the block
 		off_t offset; //!< offset within the file of the block
@@ -56,6 +57,10 @@ __STXXL_BEGIN_NAMESPACE
 		file * storage; //!< pointer to the file of the block
 		off_t offset; //!< offset within the file of the block
     unsigned size;  //!< size of the block in bytes
+		enum 
+		{
+			t_size = 0	//!< Blocks size, given by the parameter
+		};
     BID():storage(NULL),offset(0),size(0) {}
     BID(file * f, off_t o, unsigned s) : storage(f), offset(o), size(s) {}
     bool valid() const { return storage; }
@@ -884,6 +889,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
   //! \}
   
+  /* deprecated
+  
 	//! \brief Traits for models of \b bid_iterator concept
 	template < class bid_it > 
   struct bid_iterator_traits
@@ -904,27 +911,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		};
 	};
 
-/*
-	template < unsigned _blk_sz > struct bid_iterator_traits<
-		std::__normal_iterator< BID<_blk_sz> * ,std::vector< BID<_blk_sz> ,std::allocator<BID<_blk_sz> > >  > >
-			 
-	{
-		enum
-		{
-			block_size = _blk_sz
-		};	
-	};
-*/
-/*
-	template < unsigned _blk_sz > struct bid_iterator_traits<
-		__gnu_cxx::__normal_iterator< BID<_blk_sz> * ,std::vector< BID<_blk_sz> ,std::allocator<BID<_blk_sz> > >  > >
-	{
-		enum
-		{
-			block_size = _blk_sz
-		};	
-	};	*/
-  
+
   template < unsigned blk_sz,class X > 
   struct bid_iterator_traits< __gnu_cxx::__normal_iterator< BID<blk_sz> *,  X> >
 	{
@@ -951,7 +938,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			block_size = blk_sz
 		};	
 	};
-
+*/
 	//! \brief Block manager class
 	
 	//! Manages allocation and deallocation of blocks in multiple/single disk setting
@@ -975,14 +962,26 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		//! given by \b functor and stores block identifiers
 		//! to the range [ \b bidbegin, \b bidend)
 		//! \param functor object of model of \b allocation_strategy concept
-		//! \param bidbegin iterator object of \b bid_iterator concept
-		//! \param bidend iterator object of \b bid_iterator concept
+		//! \param bidbegin bidirectional BID iterator object
+		//! \param bidend bidirectional BID iterator object 
 		template < class DiskAssgnFunctor, class BIDIteratorClass >
 		void new_blocks (
 					 DiskAssgnFunctor functor,
-					 const BIDIteratorClass & bidbegin,
-					 const BIDIteratorClass & bidend);
+					 BIDIteratorClass bidbegin,
+					 BIDIteratorClass bidend);
 
+		//! Allocates new blocks according to the strategy 
+		//! given by \b functor and stores block identifiers
+		//! to the output iterator \b out
+		//! \param functor object of model of \b allocation_strategy concept
+		//! \param out iterator object of OutputIterator concept
+		template < class DiskAssgnFunctor, class BIDIteratorClass >
+		void new_blocks (
+					 const unsigned nblocks,
+					 DiskAssgnFunctor functor,
+					 BIDIteratorClass out);
+		
+		
 		//! \brief Deallocates blocks
 		
 		//! Deallocates blocks in the range [ \b bidbegin, \b bidend)
@@ -1041,51 +1040,43 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		delete[]disk_files;
 	}
 
-
 	template < class DiskAssgnFunctor, class BIDIteratorClass >
 		void block_manager::new_blocks (
-						DiskAssgnFunctor functor,
-						const BIDIteratorClass & bidbegin,
-						const BIDIteratorClass & bidend)
+					 const unsigned nblocks,
+					 DiskAssgnFunctor functor,
+					 BIDIteratorClass out)
 	{
-    typedef  BIDArray<bid_iterator_traits <BIDIteratorClass >::block_size> bid_array_type;
-		unsigned nblocks = 0;//std::distance(bidbegin,bidend);
-    
-    BIDIteratorClass bidbegin_copy(bidbegin);
-    while(bidbegin_copy != bidend)
-    {
-      ++bidbegin_copy;
-      ++nblocks;
-    }
+		typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
+		typedef  BIDArray<bid_type::t_size> bid_array_type;
 
 		int *bl = new int[ndisks];
 		bid_array_type * disk_bids = new bid_array_type[ndisks];
-
+	
 		memset(bl, 0, ndisks * sizeof (int));
 
 		unsigned i = 0;
-		BIDIteratorClass it = bidbegin;
-		for (; i < nblocks; i++, it++)
+		BIDIteratorClass it = out;
+		for (; i < nblocks; ++i, ++it)
 		{
 			int disk = functor (i);
 			(*it).storage = disk_files[disk];
 			bl[disk]++;
 		}
 
-		for (i = 0; i < ndisks; i++)
+		for (i = 0; i < ndisks; ++i)
 		{
 			if (bl[i])
 				disk_bids[i].resize (bl[i]);
 		}
     
-    memset (bl, 0, ndisks * sizeof (int));
+    	memset (bl, 0, ndisks * sizeof (int));
     
-		for (i=0,it = bidbegin; it != bidend; it++, i++)
+		for (i=0,it = out; i != nblocks; ++it, ++i)
 		{
 			int disk = (*it).storage->get_disk_number ();
 			disk_bids[disk][bl[disk]++] = (*it);
 		}
-    for (i = 0; i < ndisks; i++)
+    	for (i = 0; i < ndisks; ++i)
 		{
 			if (bl[i])
 				disk_allocators[i]->new_blocks (disk_bids[i]);
@@ -1093,14 +1084,35 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
 		memset (bl, 0, ndisks * sizeof (int));
     
-		for (i=0,it = bidbegin; it != bidend; it++, i++)
+		for (i=0,it = out; i != nblocks; ++it, ++i)
 		{
 			int disk = (*it).storage->get_disk_number ();
 			(*it).offset = disk_bids[disk][bl[disk]++].offset;
 		}
 
-		delete[]bl;
-		delete[]disk_bids;
+		delete [] bl;
+		delete [] disk_bids;
+	}
+
+	template < class DiskAssgnFunctor, class BIDIteratorClass >
+		void block_manager::new_blocks (
+						DiskAssgnFunctor functor,
+						BIDIteratorClass bidbegin,
+						BIDIteratorClass bidend)
+	{
+		typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
+		typedef  BIDArray<bid_type::t_size> bid_array_type;
+    	//typedef  BIDArray<bid_iterator_traits <BIDIteratorClass >::block_size> bid_array_type;
+		unsigned nblocks = 0;
+    
+    	BIDIteratorClass bidbegin_copy(bidbegin);
+    	while(bidbegin_copy != bidend)
+    	{
+      	++bidbegin_copy;
+      	++nblocks;
+    	}
+	
+		new_blocks(nblocks, functor, bidbegin );
 	}
 
 

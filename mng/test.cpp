@@ -69,7 +69,7 @@ int main ()
 	delete [] reqs;
 	delete block;
 
-	// variable-size blocks
+	// variable-size blocks, not supported currently
 	BIDArray<0> vbids (nblocks);
   for(i=0;i<nblocks;i++)
     vbids[i].size = 1024 + i;
