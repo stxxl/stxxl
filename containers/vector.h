@@ -543,13 +543,13 @@ private:
 		bids_container_iterator bid (const size_type & offset)
 		{
 			return (_bids.begin () +
-				static_cast < bids_container_type::size_type >
+				static_cast < typename bids_container_type::size_type >
 				(offset / block_type::size));
 		}
 		const_bids_container_iterator bid (const size_type & offset) const
 		{
 			return (_bids.begin () +
-				static_cast < bids_container_type::size_type >
+				static_cast < typename bids_container_type::size_type >
 				(offset / block_type::size));
 		}
 		void read_page(int page_no, int cache_page)
@@ -725,12 +725,11 @@ private:
 		typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
     pager_type Pager_ = lru
 	>
-  class VECTOR_GENERATOR
+  struct VECTOR_GENERATOR
   {
-      typedef IF<Pager_==lru,
+      typedef typename IF<Pager_==lru,
         lru_pager<Pages_>,random_pager<Pages_> >::result PagerType;
     
-    public:
       typedef vector<Tp_,PgSz_,PagerType,BlkSize_,AllocStr_> result;
   };
     

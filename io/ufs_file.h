@@ -129,8 +129,9 @@ __STXXL_BEGIN_NAMESPACE
 								std::hex << buffer << std::dec << ")");
 		};
 	public:
-		~ufs_request_base ()
+		virtual ~ufs_request_base ()
 		{
+      STXXL_VERBOSE3("ufs_request_base "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
 			_state.wait_for (READY2DIE);
 		};
 

@@ -278,7 +278,7 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 			return &(array[(pos) % dim_size][(pos) / dim_size]);
 		};
 
-		const data_type & operator [] (pos_type n)
+		const data_type & operator [] (pos_type n) const
 		{
 			n += pos;
 			return array[(n) % dim_size][(n) / dim_size];

@@ -342,7 +342,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	
 	config *cfg = config::get_instance();
 	block_manager *mng = block_manager::get_instance ();
-	int ndisks = cfg->disks_number ();
+	const unsigned ndisks = cfg->disks_number ();
 	
 	//STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+"
 	//	   << partial_runs) 
@@ -405,7 +405,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		{
 			int runs2merge = STXXL_MIN(runs_left,merge_factor);
 			blocks_in_new_run = 0;
-			for(int i = nruns - runs_left; i < (nruns - runs_left + runs2merge);i++)
+			for(unsigned i = nruns - runs_left; i < (nruns - runs_left + runs2merge);i++)
 				blocks_in_new_run += runs[i]->size();
 			// allocate run
 			new_runs[cur_out_run++] = new run_type(blocks_in_new_run);
@@ -438,6 +438,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	
 	
 	end = stxxl_timestamp ();
+  (void)(begin);
 
 	STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Run creation time: " << 
 	after_runs_creation - begin << " s")
@@ -582,7 +583,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				*first.bid() = first_bid;
 				*last.bid() = last_bid; 
 				
-				run_type::iterator it = out->begin(); it++;
+				typename run_type::iterator it = out->begin(); it++;
 				typename ExtIterator_::bids_container_iterator cur_bid = first.bid(); cur_bid ++;
 				
 				for(;cur_bid != last.bid(); cur_bid++,it++)
@@ -660,7 +661,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				
 				*first.bid() = first_bid;
 				
-				run_type::iterator it = out->begin(); it++;
+				typename run_type::iterator it = out->begin(); it++;
 				typename ExtIterator_::bids_container_iterator cur_bid = first.bid(); cur_bid ++;
 				
 				for(;cur_bid != last.bid(); cur_bid++,it++)
@@ -739,7 +740,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				
 				*last.bid() = last_bid; 
 				
-				run_type::iterator it = out->begin();
+				typename run_type::iterator it = out->begin();
 				typename ExtIterator_::bids_container_iterator cur_bid = first.bid();
 				
 				for(;cur_bid != last.bid(); cur_bid++,it++)
@@ -766,7 +767,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 													typename ExtIterator_::bids_container_iterator >
 														 (first.bid(),n,M/block_type::raw_size,cmp);
 				
-				run_type::iterator it = out->begin();
+				typename run_type::iterator it = out->begin();
 				typename ExtIterator_::bids_container_iterator cur_bid = first.bid();
 				
 				for(;cur_bid != last.bid(); cur_bid++,it++)

@@ -33,7 +33,7 @@ class buffered_writer
 protected:
 	typedef typename block_type::bid_type bid_type;
 	
-	const int nwriteblocks;
+	const unsigned int nwriteblocks;
 	block_type *write_buffers;
 	bid_type * write_bids;
 	request_ptr * write_reqs;
@@ -65,7 +65,7 @@ public:
 	//! \param write_buf_size number of write buffers to use
 	//! \param write_batch_size number of blocks to accumulate in 
 	//!        order to flush write requests (bulk buffered writing)
-	buffered_writer(int write_buf_size, int write_batch_size):
+	buffered_writer(unsigned write_buf_size, unsigned write_batch_size):
 		nwriteblocks ((write_buf_size > 2) ? write_buf_size : 2),
 		writebatchsize(write_batch_size ? write_batch_size : 1)
 	{

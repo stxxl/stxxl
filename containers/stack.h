@@ -64,8 +64,8 @@ private:
   unsigned cache_offset;
   value_type * current_element;
   simple_vector<block_type> cache;
-  simple_vector<block_type>::iterator front_page;
-  simple_vector<block_type>::iterator back_page;
+  typename simple_vector<block_type>::iterator front_page;
+  typename simple_vector<block_type>::iterator back_page;
   std::vector<bid_type> bids;
   alloc_strategy alloc_strategy_;
 public:
@@ -74,8 +74,8 @@ public:
            cache_offset(0),
            current_element(NULL),
            cache(blocks_per_page*2),
-           back_page(cache.begin()),
            front_page(cache.begin() + blocks_per_page),
+           back_page(cache.begin()),
            bids(0)
   {
     bids.reserve(blocks_per_page);
@@ -89,8 +89,8 @@ public:
            cache_offset(0),
            current_element(NULL),
            cache(blocks_per_page*2),
-           back_page(cache.begin()),
            front_page(cache.begin() + blocks_per_page),
+           back_page(cache.begin()),
            bids(0)
   {
     bids.reserve(blocks_per_page);
@@ -143,13 +143,16 @@ public:
       STXXL_VERBOSE2("growing, size: "<<size_)
       
       bids.resize(bids.size() + blocks_per_page);
-      std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
+      typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
       block_manager::get_instance()->new_blocks(
           offset_allocator<alloc_strategy>(cur_bid-bids.begin(),alloc_strategy_),cur_bid,bids.end());
+      
       simple_vector<request_ptr> requests(blocks_per_page);
       
       for(int i=0;i<blocks_per_page;i++,cur_bid++)
+      {
         requests[i] = (back_page + i)->write(*cur_bid);
+      }
       
       
       std::swap(back_page,front_page);
@@ -184,7 +187,7 @@ public:
      
       simple_vector<request_ptr> requests(blocks_per_page);
       
-      std::vector<bid_type>::const_iterator cur_bid = bids.end() - 1;
+      typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - 1;
       for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
         requests[i] = (front_page+i)->read(*cur_bid);
         
@@ -242,8 +245,8 @@ private:
   unsigned cache_offset;
   value_type * current_element;
   simple_vector<block_type> cache;
-  simple_vector<block_type>::iterator cache_buffers;
-  simple_vector<block_type>::iterator overlap_buffers;
+  typename simple_vector<block_type>::iterator cache_buffers;
+  typename simple_vector<block_type>::iterator overlap_buffers;
   simple_vector<request_ptr> requests;
   std::vector<bid_type> bids;
   alloc_strategy alloc_strategy_;
@@ -325,7 +328,7 @@ public:
       STXXL_VERBOSE2("growing, size: "<<size_)
       
       bids.resize(bids.size() + blocks_per_page);
-      std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
+      typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
       block_manager::get_instance()->new_blocks(
           offset_allocator<alloc_strategy>(cur_bid-bids.begin(),alloc_strategy_),cur_bid,bids.end());
       
@@ -371,7 +374,7 @@ public:
       if(bids.size() > blocks_per_page)
       {
         STXXL_VERBOSE2("prefetching, size: "<<size_)
-        std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page - 1;
+        typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page - 1;
         for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
           requests[i] = (overlap_buffers+i)->read(*cur_bid);
         
@@ -582,13 +585,13 @@ class STACK_GENERATOR
 {
   typedef stack_config_generator<ValTp,BlocksPerPage,BlkSz,AllocStr,SzTp> cfg;
   
-  typedef IF<Behaviour==normal, normal_stack<cfg>,grow_shrink_stack<cfg> >::result ExtStackTp;
-  typedef IF<Externality==migrating, 
+  typedef typename IF<Behaviour==normal, normal_stack<cfg>,grow_shrink_stack<cfg> >::result ExtStackTp;
+  typedef typename IF<Externality==migrating, 
     migrating_stack<MigrCritSize,ExtStackTp,IntStackTp>,ExtStackTp>::result MigrOrNotStackTp;
   
 public:
   
-  typedef IF<Externality==internal,IntStackTp,MigrOrNotStackTp>::result result;
+  typedef typename IF<Externality==internal,IntStackTp,MigrOrNotStackTp>::result result;
 
 };
 

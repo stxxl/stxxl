@@ -12,9 +12,13 @@
 
 #include "../common/utils.h"
 
-__STXXL_BEGIN_NAMESPACE template < size_t ALIGNMENT > 
+__STXXL_BEGIN_NAMESPACE 
+
+
+template < size_t ALIGNMENT > 
 inline void * aligned_alloc (size_t size)
 {
+  // TODO: use posix_memalign() and free() on Linux
 	char *buffer = new char[size + ALIGNMENT];
 	char *result = buffer + ALIGNMENT - (unsigned (buffer) % ALIGNMENT);
 	*(((char **) result) - 1) = buffer;

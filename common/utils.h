@@ -43,7 +43,7 @@ __STXXL_BEGIN_NAMESPACE
 #if STXXL_VERBOSE_LEVEL > 0
 #define STXXL_VERBOSE1(x) { std::cout << x << std::endl; std::cerr.flush(); };
 #else
-#define STXXL_VERBOSE1(x) (0);
+#define STXXL_VERBOSE1(x)  
 #endif
   
 #define STXXL_VERBOSE(x) STXXL_VERBOSE1(x) 
@@ -51,13 +51,13 @@ __STXXL_BEGIN_NAMESPACE
 #if STXXL_VERBOSE_LEVEL > 1
 #define STXXL_VERBOSE2(x) { std::cout << x << std::endl; std::cerr.flush(); };
 #else
-#define STXXL_VERBOSE2(x) (0);
+#define STXXL_VERBOSE2(x) 
 #endif  
 
 #if STXXL_VERBOSE_LEVEL > 2
 #define STXXL_VERBOSE3(x) { std::cout << x << std::endl; std::cerr.flush(); };
 #else
-#define STXXL_VERBOSE3(x) (0);
+#define STXXL_VERBOSE3(x) 
 #endif    
   
   
@@ -183,8 +183,8 @@ int2str (int i)
 	return std::string (buf);
 }
 
-#define STXXL_MIN(a,b) ( ((a)<(b))?(a):(b)  )
-#define STXXL_MAX(a,b) ( ((a)>(b))?(a):(b)  )
+#define STXXL_MIN(a,b) ( std::min(a,b) )
+#define STXXL_MAX(a,b) ( std::max(a,b) )
 #define STXXL_L2_SIZE  (512*1024)
 
 #define div_and_round_up(a,b) ( (a)/(b) + !(!((a)%(b))))

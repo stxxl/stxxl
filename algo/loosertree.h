@@ -102,15 +102,17 @@ private:
 			(*winnerE)++;
 
 
-#define TreeStep(L)																																	\
-      if (LogK >= L )																																\
-      {																																							\
-				currentE = current + regEntry[ (winnerIndex+(1<<LogK)) >> ((LogK-L)+1) ];		\
-				if( cmp(*currentE,*winnerE) )																								\
-				{																																						\
-					swap(regEntry[(winnerIndex+(1<<LogK)) >> ((LogK-L)+1)],winnerIndex);	    \
-					winnerE = currentE;																												\
-				}																																						\
+#define TreeStep(L)																																	    \
+      if (LogK >= L )																																    \
+      {																																							    \
+				currentE = current +                                                            \
+          regEntry[ (winnerIndex+(1<<LogK)) >> (((int(LogK-L)+1)>=0)?((LogK-L)+1):0) ];\
+				if( cmp(*currentE,*winnerE) )																								    \
+				{																																						    \
+					swap(regEntry[(winnerIndex+(1<<LogK))                                         \
+            >> (((int(LogK-L)+1)>=0)?((LogK-L)+1):0) ],winnerIndex);	                  \
+					winnerE = currentE;																												    \
+				}																																						    \
       }
 
 			TreeStep (10);
@@ -162,7 +164,7 @@ private:
 	};
 
 public:
-	run_cursor_cmp_type multi_merge (value_type * to)
+	void multi_merge (value_type * to)
 	{
 		switch (logK)
 		{

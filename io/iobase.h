@@ -242,7 +242,7 @@ __STXXL_BEGIN_NAMESPACE
     {
       ref_cnt_mutex.lock();
       STXXL_VERBOSE3("request "<< unsigned(this) <<": subtracting reference cnt: "<<ref_cnt)
-      int val=ref_cnt--;
+      int val=--ref_cnt;
       ref_cnt_mutex.unlock();
       assert(val>=0);
       return (val==0);

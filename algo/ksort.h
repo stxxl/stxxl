@@ -219,7 +219,7 @@ create_runs(
 		bm->delete_block(bid);
 	}
 	
-	int k = 0;
+	unsigned k = 0;
 	const int shift1 = sizeof(typename block_type::value_type::key_type)*8 - log_k1;
 	const int shift2 = shift1 - log_k2;
 
@@ -247,7 +247,7 @@ create_runs(
 		
 		int out_block = 0;
 		int out_pos = 0;
-		int next_run_size = (k < nruns - 1)?(runs[k + 1]->size ()):0;
+		unsigned int next_run_size = (k < nruns - 1)?(runs[k + 1]->size ()):0;
 		
 		// recurse on each bucket
 		type_key_ *c = refs2;
@@ -314,12 +314,12 @@ struct run_cursor2_cmp
 //#include "loosertree.h"
 
 template < typename block_type,typename run_type, typename key_extractor>
-void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m, key_extractor keyobj)
+void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned  _m, key_extractor keyobj)
 {
 	typedef block_prefetcher<block_type,typename run_type::iterator> prefetcher_type;
 	typedef run_cursor2<block_type,prefetcher_type> run_cursor_type;
 	
-	int i;
+	unsigned int i;
 	run_type consume_seq(out_run->size());
 
 	int * prefetch_seq = new int[out_run->size()];
@@ -335,7 +335,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	}
 	std::sort (consume_seq.begin (), consume_seq.end ());
 
-	int disks_number = config::get_instance()->disks_number ();
+	unsigned disks_number = config::get_instance()->disks_number ();
 	
 	#ifdef PLAY_WITH_OPT_PREF
 	const int n_write_buffers = 4 * disks_number;
@@ -365,7 +365,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	
 	buffered_writer<block_type> writer(n_write_buffers,n_write_buffers/2);
 	
-	int out_run_size = out_run->size();
+	unsigned out_run_size = out_run->size();
 
 	run_cursor2_cmp<block_type,prefetcher_type,key_extractor> cmp(keyobj);
 	looser_tree<
@@ -505,7 +505,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		{
 			int runs2merge = STXXL_MIN(runs_left,merge_factor);
 			blocks_in_new_run = 0;
-			for(int i = nruns - runs_left; i < (nruns - runs_left + runs2merge);i++)
+			for(unsigned i = nruns - runs_left; i < (nruns - runs_left + runs2merge);i++)
 				blocks_in_new_run += runs[i]->size();
 			// allocate run
 			new_runs[cur_out_run++] = new run_type(blocks_in_new_run);
@@ -690,7 +690,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 				*first_.bid() = first_bid;
 				*last_.bid() = last_bid; 
 				
-				run_type::iterator it = out->begin(); it++;
+				typename run_type::iterator it = out->begin(); it++;
 				typename ExtIterator_::bids_container_iterator cur_bid = first_.bid(); cur_bid ++;
 				
 				for(;cur_bid != last_.bid(); cur_bid++,it++)
@@ -768,7 +768,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 				
 				*first_.bid() = first_bid;
 				
-				run_type::iterator it = out->begin(); it++;
+				typename run_type::iterator it = out->begin(); it++;
 				typename ExtIterator_::bids_container_iterator cur_bid = first_.bid(); cur_bid ++;
 				
 				for(;cur_bid != last_.bid(); cur_bid++,it++)
@@ -846,7 +846,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 				
 				*last_.bid() = last_bid; 
 				
-				run_type::iterator it = out->begin();
+				typename run_type::iterator it = out->begin();
 				typename ExtIterator_::bids_container_iterator cur_bid = first_.bid();
 				
 				for(;cur_bid != last_.bid(); cur_bid++,it++)
@@ -875,7 +875,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 													KeyExtractor_>
 														 (first_.bid(),n,M__/block_type::raw_size,keyobj);
 				
-				run_type::iterator it = out->begin();
+				typename run_type::iterator it = out->begin();
 				typename ExtIterator_::bids_container_iterator cur_bid = first_.bid();
 				
 				for(;cur_bid != last_.bid(); cur_bid++,it++)
