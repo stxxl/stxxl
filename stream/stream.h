@@ -202,6 +202,8 @@ namespace stream
   //! \return value of the output iterator after all increments, 
   //! i.e. points to the first unwritten value
   //! \pre Output range is large enough to hold the all elements in the input stream
+  //!
+  //! This function is useful when you do not know the length of the stream beforehand.
   template <class OutputIterator_,class StreamAlgorithm_>
   OutputIterator_ materialize(StreamAlgorithm_ & in,OutputIterator_ outbegin, OutputIterator_ outend)
   {
@@ -224,6 +226,8 @@ namespace stream
   //! \return value of the output iterator after all increments, 
   //! i.e. points to the first unwritten value
   //! \pre Output range is large enough to hold the all elements in the input stream
+  //!
+  //! This function is useful when you do not know the length of the stream beforehand.
   template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
 		unsigned BlkSize_, typename PgTp_, unsigned PgSz_,class StreamAlgorithm_ > 
   stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> 

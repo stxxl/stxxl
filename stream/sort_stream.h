@@ -418,6 +418,13 @@ namespace stream
 			if(write_reqs[i].get()) write_reqs[i]->wait();
 		
 	}
+	void cleanup()
+	{
+			delete [] write_reqs;
+    		delete [] ((Blocks1<Blocks2)?Blocks1:Blocks2);
+			write_reqs = NULL;
+			Blocks1 = Blocks2 = NULL;
+	}
   public:
     //! \brief Creates the object
     //! \param c comparator object
@@ -436,8 +443,8 @@ namespace stream
 	
 	~runs_creator()
 	{
-			delete [] write_reqs;
-    		delete [] ((Blocks1<Blocks2)?Blocks1:Blocks2);
+			if(!output_requested)
+				cleanup();
 	}
 	
 	//! \brief Adds new element to the sorter
@@ -496,6 +503,7 @@ namespace stream
       {
         finish_result();
         output_requested = true;
+		cleanup();
       }
       return result_;
     }
@@ -762,6 +770,16 @@ namespace stream
     runs_merger(); // forbidden
     runs_merger(const runs_merger &); // forbidden
 	runs_merger & operator = (const runs_merger &); // copying is forbidden
+	void deallocate_prefetcher()
+	{
+		if(prefetcher)
+		{
+			delete loosers;
+      		delete prefetcher;
+      		delete [] prefetch_seq;
+			prefetcher = NULL;
+		}
+	}
   public:
     //! \brief Standard stream typedef
     typedef typename sorted_runs_type::value_type value_type;
@@ -863,6 +881,9 @@ namespace stream
       loosers->multi_merge(current_block->elem);
       current_value = current_block->elem[0];
       buffer_pos = 1;
+	  
+	  if(elements_remaining <= block_type::size) deallocate_prefetcher();
+		  
     }
     
     //! \brief Standard stream method
@@ -894,7 +915,10 @@ namespace stream
           current_value = current_block->elem[0];  
           buffer_pos = 1;
         }
+		if(elements_remaining <= block_type::size)
+			deallocate_prefetcher();
       }
+	 
       
 	  #ifdef STXXL_CHECK_ORDER_IN_SORTS
 	  if(!empty())
@@ -916,9 +940,7 @@ namespace stream
     //! \remark Deallocates blocks of the input sorted runs object
     virtual ~runs_merger()
     {
-      delete loosers;
-      delete prefetcher;
-      delete [] prefetch_seq;
+	  deallocate_prefetcher();
       delete current_block;
       block_manager * bm = block_manager::get_instance();
       // free blocks in runs
