@@ -67,6 +67,7 @@ STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB) -ftemplate-depth-65000
 # use -DSTXXL_CHECK_ORDER_IN_SORTS compile option
 #
 # if your program aborts with message "read/write: wrong parameter"
+# or "Invalid argument"
 # this could be that your kernel does not support direct I/O
 # then try to set it off recompiling your code with option
 # -DSTXXL_DIRECT_IO_OFF (the libs must be also recompiled)

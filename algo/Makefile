@@ -7,13 +7,15 @@ STXXL_LIB += -DSTXXL_CHECK_ORDER_IN_SORTS
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 
-# experimental
 main: test_ksort.cpp $(DEPENDENCIES)
 	$(GCC) test_ksort.cpp -o test_ksort $(STXXL_LIB)
-	
-#experimental
+
 main_opt: test_ksort.cpp $(DEPENDENCIES)
 	$(GCC) test_ksort.cpp -o test_ksort_op $(STXXL_LIB) # -DSORT_OPT_PREFETCHING
+
+mains: test_sort.cpp
+	$(GCC) test_sort.cpp -o test_sort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
+	
 
 asch: test_asch.cpp $(DEPENDENCIES)
 	$(GCC) test_asch.cpp -o test_asch $(STXXL_LIB)

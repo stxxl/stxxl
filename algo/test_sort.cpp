@@ -16,6 +16,7 @@ int n_opt_prefetch_buffers;
 
 #include "../mng/mng.h"
 #include "sort.h"
+#include "scan.h"
 #include "../containers/vector"
 #include "../common/rand.h"
 
@@ -29,17 +30,47 @@ struct my_type
 	typedef unsigned key_type;
 	
 	key_type _key;
-	char _data[RECORD_SIZE - sizeof(key_type)];
+	// char _data[RECORD_SIZE - sizeof(key_type)];
 	
 	my_type() {};
 	my_type(key_type __key):_key(__key) {};
 
 };
 
+std::ostream & operator << (std::ostream & o, const my_type obj)
+{
+	o << obj._key ;
+	return o;
+}
+
+
+
 bool operator < (const my_type & a, const my_type & b)
 {
 	return a._key < b._key;
 }
+
+bool operator != (const my_type & a, const my_type & b)
+{
+	return a._key != b._key;
+}
+
+struct Cmp
+{
+	bool operator () (const my_type & a, const my_type & b) const
+	{
+		return a._key < b._key;
+	}
+	
+	static my_type min_value()
+	{
+		return my_type(0);
+	}
+	static my_type max_value()
+	{
+		return my_type(0xffffffff);
+	}
+};
 
 #define MB (1024*1024)
 
@@ -77,15 +108,14 @@ void test(stxxl::int64 records_to_sort,unsigned memory_to_use,unsigned n_prefetc
 	STXXL_MSG("Seed " << stxxl::ran32State )
 	STXXL_MSG("Filling vector...")
 
-	std::generate(v.begin(),v.end(),stxxl::random_number32());
-	//std::generate(v.begin(),v.end(),zero());
+	stxxl::generate(v.begin(),v.end(),stxxl::random_number32(),32);
 	
 	stxxl::wait_time_counter = 0.0;
 	
 	STXXL_MSG("Sorting vector...")
 	reset_io_wait_time();
 	
-	stxxl::sort(v.begin(),v.end(),std::less<my_type>(),memory_to_use);
+	stxxl::sort(v.begin(),v.end(),Cmp(),memory_to_use);
 	
 	// STXXL_MSG("Checking order...")
 	// STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
@@ -178,4 +208,3 @@ int main(int argc, char * argv[])
 	
 	return 0;
 }
-

@@ -179,6 +179,7 @@ extern double stxxl::wait_time_counter;
 #ifdef COUNT_WAIT_TIME
 		//! \brief Resets I/O wait time counter
 		void _reset_io_wait_time() { stxxl::wait_time_counter = 0.0; }
+		// void reset_io_wait_time() { stxxl::wait_time_counter = 0.0; }
 		//! \brief Returns I/O wait time counter
 		//! \return number of seconds spent in I/O waiting functions 
 		//!  \link request::wait request::wait \endlink,

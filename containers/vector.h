@@ -195,7 +195,8 @@ public:
 			BlkSize_,PgTp_,PgSz_ > _Self;
 		typedef vector_iterator < Tp_, AllocStr_, SzTp_,DiffTp_,
 			BlkSize_,PgTp_,PgSz_ > _NonConstIterator;
-		
+
+		friend class _NonConstIterator;
 public:
 		typedef _Self const_iterator;
 		typedef _NonConstIterator iterator;
@@ -239,10 +240,6 @@ public:
 			offset (a.offset),
 			p_vector (a.p_vector) {}
 				
-		const_vector_iterator (const _NonConstIterator & a):offset (a.offset),
-			p_vector (a.p_vector)
-		{
-		};
 		block_offset_type block_offset () const
 		{
 			return static_cast < block_offset_type >
@@ -543,6 +540,7 @@ public:
       STXXL_ERRMSG("stxxl::vector copy constructor is not implemented yet");
       abort();
     }
+	
   public:
 		size_type size () const
 		{
