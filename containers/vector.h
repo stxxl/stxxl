@@ -489,11 +489,14 @@ public:
 			}
 			
 		}
-    vector(const vector & obj)
+  private:
+    vector(const vector & obj) // Copying external vectors is discouraged
+  											   // (and not implemented)
     {
       STXXL_MSG("stxxl::vector copy constructor is not implemented yet");
       abort();
     }
+  public:
 		size_type size () const
 		{
 			return _size;
