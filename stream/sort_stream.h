@@ -1206,8 +1206,8 @@ namespace stream
     //! \brief Creates the object
     //! \param in input stream
     //! \param c comparator object
-    //! \param memory_to_use memory amount that is allowed to used by the runs creator in bytes
-    //! \param memory_to_use memory amount that is allowed to used by the merger in bytes
+    //! \param memory_to_use_rc memory amount that is allowed to used by the runs creator in bytes
+    //! \param memory_to_use_m memory amount that is allowed to used by the merger in bytes
     sort(Input_ & in,Cmp_ c,unsigned memory_to_use_rc, unsigned memory_to_use_m):
       creator(in,c,memory_to_use_rc),
       merger(creator.result(),c,memory_to_use_m)
