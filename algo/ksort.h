@@ -201,7 +201,9 @@ create_runs(
 	run = *runs;
 	int run_size = (*runs)->size ();
 	key_type offset = 0;
-	const int log_k1 = static_cast<int>(ceil(log2(m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE)));
+	const int log_k1 = 
+	  static_cast<int>(ceil(log2((m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE)?
+	  	(m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE):2)));
 	const int log_k2 = int(log2(m2 * Blocks1->size)) - log_k1 - 1;
 	STXXL_VERBOSE("log_k1: "<<log_k1<<" log_k2:"<<log_k2)
 	const int k1 = 1 << log_k1;
@@ -458,10 +460,13 @@ void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned
 	#ifdef PLAY_WITH_OPT_PREF
 	const int n_write_buffers = 4 * disks_number;
 	#else
-	const int n_prefetch_buffers = std::max( 2 * disks_number , (3 * (int(_m) - nruns) / 4));
-        const int n_write_buffers = std::max( 2 * disks_number , int(_m) - nruns - n_prefetch_buffers );
+	const int n_prefetch_buffers = std::max( int(2 * disks_number) , (3 * (int(_m) - int(nruns)) / 4));
+	STXXL_VERBOSE("Prefetch buffers "<<n_prefetch_buffers)
+    const int n_write_buffers = std::max( int(2 * disks_number) , int(_m) - int(nruns) - int(n_prefetch_buffers) );
+	STXXL_VERBOSE("Write buffers "<<n_write_buffers)
 	// heuristic
-	const int n_opt_prefetch_buffers = 2 * disks_number + (3*(n_prefetch_buffers - 2 * disks_number))/10;
+	const int n_opt_prefetch_buffers = 2 * int(disks_number) + (3*(int(n_prefetch_buffers) - int(2 * disks_number)))/10;
+	STXXL_VERBOSE("Prefetch buffers "<<n_opt_prefetch_buffers)
 	#endif
 	
 	#ifdef SORT_OPT_PREFETCHING
