@@ -481,7 +481,7 @@ namespace stream
 		
 		result_.runs.push_back(run); 
 	
-		swap(Blocks1,Blocks2);
+		std::swap(Blocks1,Blocks2);
 		
 		push(val);
 	}
