@@ -280,7 +280,7 @@ public:
     
     if(cache_offset == blocks_per_page*block_type::size) // cache overflow
     {
-      STXXL_VERBOSE2("growing")
+      STXXL_VERBOSE2("growing, size: "<<size_)
       
       bids.resize(bids.size() + blocks_per_page);
       std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -319,7 +319,7 @@ public:
     
     if(cache_offset == 1 && growing && bids.size() >= blocks_per_page)
     {
-      STXXL_VERBOSE2("shrinking after growing")
+      STXXL_VERBOSE2("shrinking after growing, size: "<<size_)
       growing = false;
       if(requests[0].get())
         wait_all(requests.begin(),blocks_per_page);
@@ -328,7 +328,7 @@ public:
       
       if(bids.size() > blocks_per_page)
       {
-        STXXL_VERBOSE2("prefetching")
+        STXXL_VERBOSE2("prefetching, size: "<<size_)
         std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page - 1;
         for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
           requests[i] = (overlap_buffers+i)->read(*cur_bid);
@@ -345,14 +345,14 @@ public:
     }
     if(cache_offset == 1 && bids.size() >= blocks_per_page)
     {
-      STXXL_VERBOSE2("shrinking")
+      STXXL_VERBOSE2("shrinking, size: "<<size_)
       
       if(requests[0].get())
         wait_all(requests.begin(),blocks_per_page);
       
       if(bids.size() > blocks_per_page)
       {
-        STXXL_VERBOSE2("prefetching")
+        STXXL_VERBOSE2("prefetching, size: "<<size_)
         std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page - 1;
         for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
           requests[i] = (cache_buffers+i)->read(*cur_bid);
@@ -369,58 +369,7 @@ public:
       
       return;
     }
-      
-    /*
-    if(cache_offset == 1 && bids.size() >= blocks_per_page)
-    {
-      // need to load from disk
-      STXXL_VERBOSE("shrinking")
-      if(growing)
-      { 
-        std::vector<bid_type>::const_iterator cur_bid = --bids.end();
-      
-        //if(requests[0].get())
-        //  wait_all(requests.begin(),blocks_per_page);
-        
-        for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
-          requests[i] = (overlap_buffers+i)->read(*cur_bid);
-        
-        block_manager::get_instance()->delete_blocks(bids.end() - blocks_per_page,bids.end());
-        bids.resize(bids.size() - blocks_per_page);
-        
-        growing = false;
-      }
-      
-      if(requests[0].get())
-        wait_all(requests.begin(),blocks_per_page);
-      
-      if(bids.size() >= blocks_per_page)
-      {
-        std::vector<bid_type>::const_iterator cur_bid = --bids.end();
-      
-        for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
-          requests[i] = (cache_buffers+i)->read(*cur_bid);
-      
-        block_manager::get_instance()->delete_blocks(bids.end() - blocks_per_page,bids.end());
-        bids.resize(bids.size() - blocks_per_page);
-      }
-      else
-        growing = true;
-
-      std::swap(cache_buffers,overlap_buffers);
-      cache_offset = blocks_per_page*block_type::size;
-      --size_;
-      current_element = &((*(cache_buffers+(blocks_per_page - 1)))[block_type::size - 1]);
-      
-      return;
-    }
-    if(cache_offset == 1 && size_ == (blocks_per_page*block_type::size + 1))
-    {
-      cache_offset = blocks_per_page*block_type::size + 1;
-      std::swap(cache_buffers,overlap_buffers);
-      wait_all(requests.begin(),blocks_per_page);
-    }
-    */  
+       
     --size_;
     unsigned cur_offset = (--cache_offset) - 1;
     current_element = &((*(cache_buffers + cur_offset/block_type::size))[cur_offset%block_type::size]);
