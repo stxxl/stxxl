@@ -815,7 +815,7 @@ namespace stream
       elements_remaining(r.elements),
       current_block(NULL),
   #ifdef STXXL_CHECK_ORDER_IN_SORTS
-  		,last_element(cmp.min_value()),
+  		last_element(cmp.min_value()),
   #endif
       prefetcher(NULL)
     {
