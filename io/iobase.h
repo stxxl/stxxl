@@ -27,7 +27,6 @@
 //#define O_DIRECT 0
 //#endif
 
-
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>

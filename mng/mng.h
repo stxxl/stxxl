@@ -11,7 +11,7 @@
 #include "../io/io.h"
 #include "../common/rand.h"
 #include "../common/aligned_alloc.h"
-
+#include "../common/debug.h"
 
 #include <iostream>
 #include <fstream>

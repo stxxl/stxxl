@@ -15,7 +15,7 @@
 #include "mmap_file.h"
 #include "simdisk_file.h"
 #include "iostats.h"
-#include "common/debug.h"
+
 
 //! \brief \c \<stxxl\> library namespace
 __STXXL_BEGIN_NAMESPACE

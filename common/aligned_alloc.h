@@ -10,7 +10,9 @@
  ****************************************************************************/
 
 
+#include "../common/debug.h"
 #include "../common/utils.h"
+
 
 __STXXL_BEGIN_NAMESPACE 
 
