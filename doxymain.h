@@ -1,6 +1,6 @@
 /*! \mainpage Documentation for \<<small>STXXL</small>\> library
  *
- *  \image html logo.png
+ *  \image html logo1.png
  *
  * <BR><BR>
  * The core of \c \<S<small>TXXL</small>\> is an implementation of the C++

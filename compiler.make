@@ -3,7 +3,7 @@
 # change to make or gmake
 MAKE = make
 # change to the name of your compiler
-COMPILER = g++-3.2 # we support only g++ >= 3.2
+COMPILER = g++-3.3 # we support only g++ >= 3.2
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = /home/rdementi/projects/stxxl
