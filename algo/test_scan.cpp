@@ -35,11 +35,11 @@ int main()
 {
 	int64 i;
 	stxxl::vector<int64> v(64*int64(1024*1024));
-	stxxl::vector<int64>::iterator it = v.begin();
-	stxxl::vector<int64>::const_iterator c_it = v.begin();
+	//stxxl::vector<int64>::iterator it = v.begin();
+	//stxxl::vector<int64>::const_iterator c_it = v.begin();
 	
 	
-	stxxl::random_number rnd;
+	//stxxl::random_number<> rnd;
 	
 	STXXL_MSG("write "<<(v.end() - v.begin()))
 	

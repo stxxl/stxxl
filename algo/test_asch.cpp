@@ -23,7 +23,7 @@ int main(int argc, char * argv[])
 	for(i=0;i<D;i++)
 		count[i] =  0;
 	
-	stxxl::random_number rnd;
+	stxxl::random_number<> rnd;
 	for(i=0;i<L;i++)
 	{	
 		disks[i] = rnd(D);

@@ -1,33 +1,37 @@
-all: main
+all: asch scan genfile sortfile ksort stable sort 
 
 include ../compiler.make
 
-main: 
-	$(GCC) test_ksort.cpp -o test_ksort $(STXXL_OBJ)
+DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 
-main_opt:
-	$(GCC) test_ksort.cpp -o test_ksort_op $(STXXL_OBJ) -DSORT_OPT_PREFETCHING
+# experimental
+main: test_ksort.cpp $(DEPENDENCIES)
+	$(GCC) test_ksort.cpp -o test_ksort $(STXXL_LIB)
+	
+#experimental
+main_opt: test_ksort.cpp $(DEPENDENCIES)
+	$(GCC) test_ksort.cpp -o test_ksort_op $(STXXL_LIB) # -DSORT_OPT_PREFETCHING
 
-asch:
-	$(GCC) test_asch.cpp -o test_asch $(STXXL_OBJ)
+asch: test_asch.cpp $(DEPENDENCIES)
+	$(GCC) test_asch.cpp -o test_asch $(STXXL_LIB)
 
-scan:
-	$(GCC) test_scan.cpp -o test_scan $(STXXL_OBJ)
+scan: test_scan.cpp $(DEPENDENCIES)
+	$(GCC) test_scan.cpp -o test_scan $(STXXL_LIB)
 
-genfile:
-	$(GCC) gen_file.cpp -o gen_file $(STXXL_OBJ)
+genfile: gen_file.cpp $(DEPENDENCIES)
+	$(GCC) gen_file.cpp -o gen_file $(STXXL_LIB)
 
-sortfile:
-	$(GCC) sort_file.cpp -o sort_file $(STXXL_OBJ)
+sortfile: sort_file.cpp $(DEPENDENCIES)
+	$(GCC) sort_file.cpp -o sort_file $(STXXL_LIB)
 
-ksort: ksort.cpp ksort.h
-	$(GCC) ksort.cpp -o ksort $(STXXL_OBJ) -DSTXXL_VERBOSE_LEVEL=1
+ksort: ksort.cpp $(DEPENDENCIES)
+	$(GCC) ksort.cpp -o ksort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
 
-stable:
-	$(GCC) stable_ksort.cpp -o stable_ksort $(STXXL_OBJ) -DCOUNT_WAIT_TIME
+stable: stable_ksort.cpp $(DEPENDENCIES)
+	$(GCC) stable_ksort.cpp -o stable_ksort $(STXXL_LIB) -DCOUNT_WAIT_TIME
 
-sort:
-	$(GCC) sort.cpp -o ssort $(STXXL_OBJ)
+sort: sort.cpp $(DEPENDENCIES)
+	$(GCC) sort.cpp -o ssort $(STXXL_LIB)
 
 clean:
-	rm -f *.o sort 
+	rm -f *.o ssort stable_ksort ksort sort_file gen_file test_scan test_asch test_ksort_op test_ksort

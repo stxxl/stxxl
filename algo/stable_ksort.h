@@ -75,7 +75,7 @@ namespace stable_ksort_local
 		typedef bid_type & reference;
 		typedef AllocStrategy_ alloc_strategy;
 		typedef typename simple_vector<bid_type>::size_type size_type;
-		typedef simple_vector<bid_type>::iterator iterator;
+		typedef typename simple_vector<bid_type>::iterator iterator;
 	protected:
 		simple_vector<bid_type> * bids;
 		alloc_strategy alloc_strategy_;
@@ -214,23 +214,25 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 	
 
 	double begin = stxxl_timestamp();
-	
-	int i=0;
+	(void)(begin);
+  
+  
+	unsigned int i=0;
 	config * cfg = config::get_instance();
-	const int m = M/block_type::raw_size;
-	const int write_buffers_multiple = 2;
-	const int read_buffers_multiple = 2;
-	const int ndisks = cfg->ndisks();
-	const int nmaxbuckets = m - (write_buffers_multiple + read_buffers_multiple)*ndisks;
-	const int lognbuckets = static_cast<int>(log2(nmaxbuckets));
-	const int nbuckets = 1<<lognbuckets;
-	const int est_bucket_size = div_and_round_up((last-first)/int64(nbuckets),
+	const unsigned int m = M/block_type::raw_size;
+	const unsigned int write_buffers_multiple = 2;
+	const unsigned int read_buffers_multiple = 2;
+	const unsigned int ndisks = cfg->ndisks();
+	const unsigned int nmaxbuckets = m - (write_buffers_multiple + read_buffers_multiple)*ndisks;
+	const unsigned int lognbuckets = static_cast<unsigned>(log2(nmaxbuckets));
+	const unsigned int nbuckets = 1<<lognbuckets;
+	const unsigned int est_bucket_size = div_and_round_up((last-first)/int64(nbuckets),
 		int64(block_type::size)); //in blocks
 
 	STXXL_MSG("Elements to sort: " << (last - first))
 	STXXL_MSG("Number of buckets has to be reduced from "<<nmaxbuckets<<" to "<< nbuckets)
-	const int nread_buffers = (m - nbuckets)*read_buffers_multiple/(read_buffers_multiple+write_buffers_multiple);
-	const int nwrite_buffers = (m - nbuckets)*write_buffers_multiple/(read_buffers_multiple+write_buffers_multiple);
+	const unsigned int nread_buffers = (m - nbuckets)*read_buffers_multiple/(read_buffers_multiple+write_buffers_multiple);
+	const unsigned int nwrite_buffers = (m - nbuckets)*write_buffers_multiple/(read_buffers_multiple+write_buffers_multiple);
 
 	STXXL_MSG("Read buffers in distribution phase: "<<nread_buffers)
 	STXXL_MSG("Write buffers in distribution phase: "<<nwrite_buffers)
@@ -251,14 +253,16 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 			read_buffers_multiple*ndisks );
 			
 	double dist_end = stxxl_timestamp(),end;
+  (void)(dist_end);
 	#ifdef COUNT_WAIT_TIME
 	double io_wait_after_d = stxxl::wait_time_counter;
+  (void)(io_wait_after_d);
 	#endif
 
 {
 	// sort buckets
-	int write_buffers_multiple_bs = 2; 
-	int max_bucket_size_bl = (m - write_buffers_multiple_bs*ndisks)/2; // in number of blocks
+	unsigned int write_buffers_multiple_bs = 2; 
+	unsigned int max_bucket_size_bl = (m - write_buffers_multiple_bs*ndisks)/2; // in number of blocks
 	int64 max_bucket_size_rec = int64(max_bucket_size_bl)*block_type::size; // in number of records
 	int64 max_bucket_size_act = 0; // actual max bucket size
 	// establish output stream
@@ -282,7 +286,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 		max_bucket_size_bl<<" to "<<max_bucket_size_act_bl)
 	max_bucket_size_rec = max_bucket_size_act;
 	max_bucket_size_bl = max_bucket_size_act_bl;
-	const int nwrite_buffers_bs = m - 2*max_bucket_size_bl;
+	const unsigned int nwrite_buffers_bs = m - 2*max_bucket_size_bl;
 	STXXL_MSG("Write buffers in bucket sorting phase: "<<nwrite_buffers_bs)
 	
 	typedef buf_ostream<block_type,typename ExtIterator_::bids_container_iterator> buf_ostream_type;
@@ -312,7 +316,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 	type_key_ *refs2 = new type_key_[max_bucket_size_rec];
 	
 	// submit reading first 2 buckets (Peter's scheme)
-	int nbucket_blocks = div_and_round_up(bucket_sizes[0],block_type::size);
+	unsigned int nbucket_blocks = div_and_round_up(bucket_sizes[0],block_type::size);
 	for(i=0; i<nbucket_blocks; i++)
 		reqs1[i] = blocks1[i].read(bucket_bids[0][i]);
 	
@@ -321,17 +325,17 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 		reqs2[i] = blocks2[i].read(bucket_bids[1][i]);
 	
 	key_type offset = 0;
-	int log_k1 = static_cast<int>(ceil(log2(max_bucket_size_rec*sizeof(type_key_)/STXXL_L2_SIZE)));
-	int k1 = 1 << log_k1;
+	unsigned log_k1 = static_cast<int>(ceil(log2(max_bucket_size_rec*sizeof(type_key_)/STXXL_L2_SIZE)));
+	unsigned k1 = 1 << log_k1;
 	int *bucket1 = new int[k1];
 	
-	const int shift = sizeof(key_type)*8 - lognbuckets;
-	const int shift1 = shift - log_k1;
+	const unsigned int shift = sizeof(key_type)*8 - lognbuckets;
+	const unsigned int shift1 = shift - log_k1;
 	
-	for(int k=0;k<nbuckets;k++)
+	for(unsigned k=0;k<nbuckets;k++)
 	{
 		nbucket_blocks = div_and_round_up(bucket_sizes[k],block_type::size);
-		log_k1 = static_cast<int>(ceil(log2(bucket_sizes[k]*sizeof(type_key_)/STXXL_L2_SIZE)));
+		log_k1 = static_cast<unsigned>(ceil(log2(bucket_sizes[k]*sizeof(type_key_)/STXXL_L2_SIZE)));
 		k1 = 1 << log_k1;
 		std::fill(bucket1,bucket1 + k1,0);
 
@@ -346,7 +350,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 			stable_ksort_local::classify_block(blocks1[i].begin(),blocks1[i].end(),ref_ptr,bucket1,offset1,shift1/*,k1*/);
 		}
 		// last block might be non-full
-		const int last_block_size = bucket_sizes[k] - int64(nbucket_blocks - 1)*block_type::size;
+		const unsigned int last_block_size = bucket_sizes[k] - int64(nbucket_blocks - 1)*block_type::size;
 		reqs1[i]->wait();
 		
 		//STXXL_MSG("block_type::size: "<<block_type::size<<" last_block_size:"<<last_block_size)
@@ -363,10 +367,10 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 			type_key_ *cEnd = refs2 + bucket1[i];
 			type_key_ *dEnd = refs1 + bucket1[i];
 			
-			const int log_k2 = static_cast<int>(log2(bucket1[i])) - 1; // adaptive bucket size
-			const int k2 = 1 << log_k2;
+			const unsigned int log_k2 = static_cast<unsigned>(log2(bucket1[i])) - 1; // adaptive bucket size
+			const unsigned int k2 = 1 << log_k2;
 			int *bucket2 = new int[k2];
-			const int shift2 = shift1 - log_k2;
+			const unsigned shift2 = shift1 - log_k2;
 		
 			// STXXL_MSG("Sorting bucket "<<k<<":"<<i)
 			l1sort (c, cEnd, d, bucket2, k2,
@@ -382,7 +386,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 			d = dEnd;
 		}
 		// submit next read
-		const int bucket2submit = k+2;
+		const unsigned bucket2submit = k+2;
 		if( bucket2submit < nbuckets )
 		{
 			nbucket_blocks = div_and_round_up(bucket_sizes[bucket2submit],block_type::size);

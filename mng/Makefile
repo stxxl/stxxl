@@ -1,9 +1,14 @@
-all: main
+all_tests: main streams 
 
 include ../compiler.make
 
-main:
-	$(GCC) test.cpp -o mngtest $(STXXL_OBJ) 
+DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES)
 
-streams:
-	$(GCC) test_streams.cpp -o test_streams $(STXXL_OBJ)
+
+main: test.cpp $(DEPENDENCIES)
+	$(GCC) test.cpp -o mngtest $(STXXL_LIB) 
+
+streams: test_streams.cpp $(DEPENDENCIES)
+	$(GCC) test_streams.cpp -o test_streams $(STXXL_LIB)
+
+

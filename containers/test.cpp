@@ -26,7 +26,7 @@ int main()
 {
   typedef stxxl::VECTOR_GENERATOR<int64,2,1>::result vector_type;
 	vector_type v(4*int64(1024*1024));
-	vector_type::iterator it = v.begin();
+	//vector_type::iterator it = v.begin();
 	vector_type::const_iterator c_it = v.begin();
 	STXXL_MSG(v.end().bid() - c_it.bid() )
 	STXXL_MSG(c_it.block_offset() )

@@ -58,7 +58,7 @@ public:
 		,not_finished(true)
 #endif
 	{
-		int i;
+		//int i;
 		const unsigned int ndisks = config::get_instance()->disks_number();
 		const int seq_length = _end - _begin;
 		prefetch_seq = new int[seq_length];

@@ -35,16 +35,16 @@ int main()
 	bm->new_blocks (striping (), bids.begin (), bids.end ());
 	{
 		buf_ostream_type out(bids.begin(),2);
-		for(int i=0;i<nelements;i++)
+		for(unsigned i=0;i<nelements;i++)
 			out << i ;
 	}
 	{
 		buf_istream_type in(bids.begin(),bids.end(),2);
-		for(int i=0;i<nelements;i++)
+		for(unsigned i=0;i<nelements;i++)
 		{
 			int value;
 			in >> value;
-			if(value != i)
+			if(value != int(i))
 			{
 				STXXL_ERRMSG("Error at position "<< i << " (" << value <<") block "<<(i/block_type::size) )
 			}

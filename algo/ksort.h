@@ -433,6 +433,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 #endif
 	
 	double begin = stxxl_timestamp (), after_runs_creation, end;
+  (void)(begin);
 
 	run_type **runs = new run_type *[nruns];
 

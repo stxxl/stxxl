@@ -136,7 +136,7 @@ int main(int argc, char * argv[])
   off_t offset = off_t(GB)*off_t(atoi(argv[1])) ;
   std::vector<std::string> disks_arr;
 
-  for(i=1;i<argc - 1 ;i++)
+  for(i=1;i<unsigned(argc - 1) ;i++)
   {
   	std::cout << "Add disk: " << disk_names_dev[atoi(argv[i+1])]
 		<< std::endl;
