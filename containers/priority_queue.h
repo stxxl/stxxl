@@ -628,7 +628,7 @@ multi_merge_k(Element *to, int l)
   int      winnerIndex = entry[0].index;
   Element  winnerKey   = entry[0].key;
   Element *winnerPos;
-  
+  Element sup = dummy; // supremum
   while (to != done)
   {
     winnerPos = current[winnerIndex];
