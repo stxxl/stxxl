@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 PROJECT_NAME           = <stxxl> 
 PROJECT_NUMBER         = 0.01
-OUTPUT_DIRECTORY       = /home/rdementi/projects/stxxl/doxy/
+OUTPUT_DIRECTORY       = doxy/
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = NO
 EXTRACT_PRIVATE        = NO
@@ -56,23 +56,23 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = /home/rdementi/projects/stxxl/doxymain.h \
-			 /home/rdementi/projects/stxxl/io/ \
-                         /home/rdementi/projects/stxxl/common/ \
-			 /home/rdementi/projects/stxxl/mng/ \
-			 /home/rdementi/projects/stxxl/containers/ \
-			 /home/rdementi/projects/stxxl/algo/ \
-			 /home/rdementi/projects/stxxl/utils/
+INPUT                  = doxymain.h \
+			 io/ \
+                         common/ \
+			 mng/ \
+			 containers/ \
+			 algo/ \
+			 utils/
 FILE_PATTERNS          = *.h \
                          *.cpp
 RECURSIVE              = NO
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
-EXAMPLE_PATH           = /home/rdementi/projects/stxxl/
+EXAMPLE_PATH           = . 
 EXAMPLE_PATTERNS       = *.cpp
 EXAMPLE_RECURSIVE      = YES
-IMAGE_PATH             = /home/rdementi/projects/stxxl/logo/ 
+IMAGE_PATH             = logo/ 
 INPUT_FILTER           = 
 FILTER_SOURCE_FILES    = NO
 #---------------------------------------------------------------------------
