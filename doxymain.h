@@ -1,4 +1,4 @@
-/*! \mainpage a documentation for \<stxxl\> library
+/*! \mainpage Documentation for \<stxxl\> library
  *
  *  \image html logo.png
  *

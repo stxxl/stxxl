@@ -16,7 +16,7 @@
 #include "simdisk_file.h"
 #include "iostats.h"
 
-//! \brief An \c \<stxxl\> library namespace
+//! \brief \c \<stxxl\> library namespace
 __STXXL_BEGIN_NAMESPACE
 
 disk_queues * disk_queues::instance = NULL;
