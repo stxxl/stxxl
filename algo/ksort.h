@@ -612,7 +612,7 @@ public:
 //! \param first_ object of model of \c ext_random_access_iterator concept
 //! \param last_ object of model of \c ext_random_access_iterator concept
 //! \param keyobj \link key_extractor key extractor \endlink object
-//! \param M__ amount of buffers for internal use
+//! \param M__ amount of memory for internal use (in bytes)
 //! \remark Implements external merge sort described in [Dementiev & Sanders'03]
 //! \remark Order in the result is non-stable
 template <typename ExtIterator_,typename KeyExtractor_>

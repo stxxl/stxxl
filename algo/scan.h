@@ -22,7 +22,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \param _begin object of model of \c ext_random_access_iterator concept
 //! \param _end object of model of \c ext_random_access_iterator concept
 //! \param _functor function object of model of \c std::UnaryFunction concept 
-//! \param nbuffers number of buffers for internal use (should be at least 2*D )
+//! \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D )
 //! \return function object \c _functor after it has been applied to the each element of the given range
 template <typename _ExtIterator,typename _UnaryFunction>
 _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int nbuffers)
@@ -78,7 +78,7 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 //! \param _begin object of model of \c ext_random_access_iterator concept
 //! \param _end object of model of \c ext_random_access_iterator concept
 //! \param _value value that is equality comparable to the _ExtIterator's value type
-//! \param nbuffers number of buffers for internal use (should be at least 2*D )
+//! \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D )
 //! \return first iterator \c i in the range [_begin,_end) such that *( \c i ) == \c _value, if no
 //!         such exists then \c _end
 template <typename _ExtIterator,typename _EqualityComparable>

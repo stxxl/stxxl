@@ -470,7 +470,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 //! \param first object of model of \c ext_random_access_iterator concept
 //! \param last object of model of \c ext_random_access_iterator concept
 //! \param cmp comparison object
-//! \param M amount of buffers for internal use
+//! \param M amount of memory for internal use (in bytes)
 //! \remark Implements external merge sort described in [Dementiev & Sanders'03]
 //! \remark non-stable
 template <typename ExtIterator_,typename StrictWeakOrdering_>
