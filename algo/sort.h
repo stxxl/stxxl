@@ -247,7 +247,7 @@ create_runs(
 				 }
 				 wait_all(reqs,reqs + nblocks);
 				 
-				 if(off 	&& (!cmp(blocks[0][0],last)) )
+				 if(off 	&& cmp(blocks[0][0],last) )
 				 { 
 					 STXXL_MSG("check_sorted_runs  wrong first value in the run "<<irun)
 					 STXXL_MSG(" first value: "<<blocks[0][0])
