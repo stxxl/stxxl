@@ -158,18 +158,18 @@ template < unsigned
   BLOCK_ADAPTOR_OPERATORS (RunsToBIDArrayAdaptor2)
 
 		 
-	template <typename trigger_type,unsigned _BlkSz>
+	template <typename trigger_iterator_type,unsigned _BlkSz>
 	struct trigger_entry_iterator
 	{
-		typedef trigger_entry_iterator<trigger_type,_BlkSz> _Self;
+		typedef trigger_entry_iterator<trigger_iterator_type,_BlkSz> _Self;
 		
-		typedef typename trigger_type::bid_type bid_type;
-		trigger_type * value;
+		typedef BID<_BlkSz> bid_type;
+		trigger_iterator_type value;
 		
 		enum { block_size = _BlkSz };
 		
 		trigger_entry_iterator(const _Self & a):value(a.value) {};
-		trigger_entry_iterator(trigger_type * v):value(v) {};
+		trigger_entry_iterator(trigger_iterator_type v):value(v) {};
 	
 		bid_type & operator * ()
 		{

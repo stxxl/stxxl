@@ -154,7 +154,7 @@ namespace stable_ksort_local
 		
 		// skip part of the block before first untouched
 		for( ;cur != first;cur++)
-			in++;
+			++in;
 		
 		const int shift = sizeof(key_type)*8 - lognbuckets;
 		// search in the the range [_begin,_end)

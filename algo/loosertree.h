@@ -58,11 +58,16 @@ public:
 		int nruns, 
 		run_cursor_cmp_type c): cmp(c)
 	{
-		run_cursor_type::prefetcher() = p;
 		int i;
 		logK = static_cast < int >(ceil (log (nruns) / log (2.)));	// replace with something smart
 		int kReg = k = (1 << logK);
+    
+    #ifdef STXXL_SORT_SINGLE_PREFETCHER
 		current = new run_cursor_type[kReg];
+    run_cursor_type::prefetcher() = p;
+    #else
+    current = new run_cursor_type[kReg](p);
+    #endif
 		entry = new int[(kReg << 1)];
 		// init cursors
 		for (i = 0; i < nruns; i++)

@@ -95,7 +95,7 @@ _ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityCompara
 	
 	// skip part of the block before _begin untouched
 	for( ;_cur != _begin;_cur++)
-		in++;
+		++in;
 	
 	// search in the the range [_begin,_end)
 	for( ;_cur != _end;_cur++)

@@ -103,14 +103,21 @@ public:
 	
 	//! \brief Returns reference to the current record in the stream
 	//! \return reference to the current record in the stream
-	reference current()
+	reference current() /* const */
 	{
 		return current_blk->elem[current_elem];
 	}
 	
+  //! \brief Returns reference to the current record in the stream
+	//! \return reference to the current record in the stream
+	reference operator *() /* const */
+	{
+		return current_blk->elem[current_elem];
+	}
+  
 	//! \brief Moves to the next record in the stream
 	//! \return reference to itself after the advance
-	_Self & operator ++(int)
+	_Self & operator ++()
 	{
 		#ifdef BUF_ISTREAM_CHECK_END
 		assert(not_finished);

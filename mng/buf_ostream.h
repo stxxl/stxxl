@@ -69,12 +69,19 @@ public:
 	{
 		return current_blk->elem[current_elem];
 	}
+  
+  //! \brief Returns reference to the current record
+	//! \return reference to the current record
+	reference operator *()
+	{
+		return current_blk->elem[current_elem];
+	}
 	
 	//! \brief Moves to the next record in the stream
 	//! \return reference to itself after the advance
-	_Self & operator ++ (int)
+	_Self & operator ++ ()
 	{
-		current_elem++;
+		++current_elem;
 		if(current_elem >= block_type::size)
 		{
 			current_elem = 0;
@@ -82,6 +89,7 @@ public:
 		}
 		return (*this);
 	}
+  
 	
 	//! \brief Deallocates internal objects
 	virtual ~buf_ostream()

@@ -106,7 +106,7 @@ create_runs(
 	typedef typename block_type::bid_type bid_type;
 	
 	int m2 = _m / 2;
-	block_manager *bm = block_manager::get_instance ();
+	block_manager *bm = block_manager::get_instance();
 	block_type *Blocks1 = new block_type[m2];
 	block_type *Blocks2 = new block_type[m2];
 	request_ptr * read_reqs1 = new request_ptr[m2];
@@ -115,7 +115,6 @@ create_runs(
 	bid_type * bids = new bid_type[m2];
 	run_type * run;
 
-	//  STXXL_VERBOSE("Creating runs")
 	disk_queues::get_instance ()->set_priority_op(disk_queue::WRITE);
 
 	int i;
@@ -170,9 +169,11 @@ create_runs(
 		if(block_type::has_filler)
 		      std::sort(
 		              TwoToOneDimArrayRowAdaptor< block_type,
-                    typename block_type::value_type,block_type::size > (Blocks1,k?0:_first_element_offset ),
+                    typename block_type::value_type,
+                    block_type::size > (Blocks1,k?0:_first_element_offset ),
 		              TwoToOneDimArrayRowAdaptor< block_type,
-                    typename block_type::value_type,block_type::size > (Blocks1, run_size*block_type::size )
+                    typename block_type::value_type,block_type::size > (Blocks1, 
+                    run_size*block_type::size )
 		              ,cmp);
 		else 
 			std::sort(Blocks1[0].elem + (k?0:_first_element_offset), Blocks1[run_size].elem, cmp);
@@ -368,8 +369,8 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		for(i=0;i<nruns;i++)
 		{
 			mng->new_blocks(	alloc_strategy(0,ndisks),
-												trigger_entry_iterator<trigger_entry_type,block_type::raw_size>(runs[i]->begin()),
-												trigger_entry_iterator<trigger_entry_type,block_type::raw_size>(runs[i]->end())	);
+								trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i]->begin()),
+								trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i]->end())	);
 		}
 	
 	create_runs< block_type,
@@ -413,7 +414,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 			new_runs[cur_out_run++] = new run_type(blocks_in_new_run);
 			runs_left -= runs2merge;
 		}
-		// allocate blocks in the new runs
+		// allocate blocks for the new runs
 		mng->new_blocks( interleaved_alloc_strategy(new_nruns, 0, ndisks),
 						 RunsToBIDArrayAdaptor2<block_type::raw_size,run_type> (new_runs,0,new_nruns,blocks_in_new_run),
 						 RunsToBIDArrayAdaptor2<block_type::raw_size,run_type> (new_runs,_n,new_nruns,blocks_in_new_run));
@@ -469,7 +470,6 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 //! \param last object of model of \c ext_random_access_iterator concept
 //! \param cmp comparison object
 //! \param M amount of buffers for internal use
-//! \return comparison object \c cmp after being applied
 //! \remark Implements external merge sort described in [Dementiev & Sanders'03]
 //! \remark non-stable
 template <typename ExtIterator_,typename StrictWeakOrdering_>

@@ -43,7 +43,7 @@ __STXXL_BEGIN_NAMESPACE
 #if STXXL_VERBOSE_LEVEL > 0
 #define STXXL_VERBOSE1(x) { std::cout << x << std::endl; std::cerr.flush(); };
 #else
-#define STXXL_VERBOSE1(x)  
+#define STXXL_VERBOSE1(x) ;
 #endif
   
 #define STXXL_VERBOSE(x) STXXL_VERBOSE1(x) 
@@ -51,13 +51,13 @@ __STXXL_BEGIN_NAMESPACE
 #if STXXL_VERBOSE_LEVEL > 1
 #define STXXL_VERBOSE2(x) { std::cout << x << std::endl; std::cerr.flush(); };
 #else
-#define STXXL_VERBOSE2(x) 
+#define STXXL_VERBOSE2(x) ;
 #endif  
 
 #if STXXL_VERBOSE_LEVEL > 2
 #define STXXL_VERBOSE3(x) { std::cout << x << std::endl; std::cerr.flush(); };
 #else
-#define STXXL_VERBOSE3(x) 
+#define STXXL_VERBOSE3(x) ;
 #endif    
   
   

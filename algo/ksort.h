@@ -467,8 +467,8 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		for(i=0;i<nruns;i++)
 		{
 			mng->new_blocks(	alloc_strategy(0,ndisks),
-												trigger_entry_iterator<trigger_entry_type,block_type::raw_size>(runs[i]->begin()),
-												trigger_entry_iterator<trigger_entry_type,block_type::raw_size>(runs[i]->end())	);
+						trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i]->begin()),
+						trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i]->end())	);
 		}
 #endif
 	  
@@ -572,14 +572,49 @@ public:
   }
 };
 
+/*! \page key_extractor Key extractor concept
+ 
+  Model of \b Key \b extractor concept must:
+   - define type \b key_type ,
+   - provide \b operator() that returns key value of an object of user type
+   - provide \b max_value method that returns a value that is \b greater than all  
+   other objects of user type in respect to the key obtained by this key extractor ,
+   - provide \b min_value method that returns a value that is \b less than all 
+   other objects of user type in respect to the key obtained by this key extractor ,
+   - operator > , operator <, operator == and operator != on type \b key_type must be defined.
+ 
+  Example: extractor class \b GetWeight, that extracts weight from an \b Edge
+  \verbatim
+ 
+  struct Edge
+  {
+     unsigned src,dest,weight;
+     Edge(unsigned s,unsigned d,unsigned w):src(s),dest(d),weight(w){}
+  };
+ 
+  struct GetWeight
+  {
+    typedef unsigned key_type;
+    key_type operator() (const Edge & e)
+    {
+ 		  return e.weight;
+    }
+    Edge min_value() const { return Edge(0,0,0); };
+    Edge max_value() const { return Edge(0,0,0xffffffff); };
+  };
+  \endverbatim
+ 
+ */
+
+
 
 //! \brief External sorting routine for records with keys
 //! \param first_ object of model of \c ext_random_access_iterator concept
 //! \param last_ object of model of \c ext_random_access_iterator concept
-//! \param keyobj key extractor object
+//! \param keyobj \link key_extractor key extractor \endlink object
 //! \param M__ amount of buffers for internal use
 //! \remark Implements external merge sort described in [Dementiev & Sanders'03]
-//! \remark non-stable
+//! \remark Order in the result is non-stable
 template <typename ExtIterator_,typename KeyExtractor_>
 void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned M__)
 {
@@ -914,7 +949,16 @@ struct ksort_defaultkey
 //! \param last_ object of model of \c ext_random_access_iterator concept
 //! \param M__ amount of buffers for internal use
 //! \remark Implements external merge sort described in [Dementiev & Sanders'03]
-//! \remark non-stable
+//! \remark Order in the result is non-stable
+/*!
+  Record's type must:
+   - provide \b max_value method that returns an object that is \b greater than all
+   other objects of user type ,
+   - provide \b min_value method that returns an object that is \b less than all 
+   other objects of user type ,
+   - \b operator \b < that must define strict weak ordering on record's values
+    (<A HREF="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">see what it is</A>).
+*/
 template <typename ExtIterator_>
 void ksort(ExtIterator_ first_, ExtIterator_ last_,unsigned M__)
 {

@@ -62,6 +62,7 @@ INPUT                  = doxymain.h \
 			 mng/ \
 			 containers/ \
 			 algo/ \
+			 stream/ \
 			 utils/
 FILE_PATTERNS          = *.h \
                          *.cpp

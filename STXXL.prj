@@ -111,7 +111,10 @@ module.include.files=\
 	utils/malloc.h\
 	mng/write_pool.h\
 	mng/prefetch_pool.h\
-	containers/priority_queue.h
+	containers/priority_queue.h\
+	algo/run_cursor.h\
+	stream/stream.h\
+	stream/sort_stream.h
 
 module.source.name=.
 module.source.type=
@@ -148,7 +151,9 @@ module.source.files=\
 	mng/write_pool.cpp\
 	mng/prefetch_pool.cpp\
 	containers/ext_merger.cpp\
-	containers/p_queue.cpp
+	containers/p_queue.cpp\
+	containers/bench_pqueue.cpp\
+	stream/stream.cpp
 
 module.pixmap.name=.
 module.pixmap.type=

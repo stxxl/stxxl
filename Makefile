@@ -7,6 +7,10 @@ lib:
 	cd utils; $(MAKE) create ; cd ..
 	echo "Building library is completed."
 
+lib_debug:
+	cd io; $(MAKE) lib_debug; cd ..
+	echo "Building debug version of the library is completed."
+
 tests: lib
 	cd io; $(MAKE); cd ..
 	cd mng; $(MAKE); cd ..

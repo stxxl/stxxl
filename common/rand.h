@@ -18,7 +18,8 @@ namespace stxxl
 
 	struct random_number32
 	{
-		inline unsigned operator () () const
+    typedef unsigned value_type;
+		inline value_type operator () () const
 		{
 			return (ran32State = 1664525 * ran32State + 1013904223);
 		};
@@ -27,8 +28,9 @@ namespace stxxl
 	//! \brief Fast uniform [0,1] pseudo-random generator
 	struct random_uniform_fast
 	{
+    typedef double value_type;
 		random_number32 rnd32;
-		inline double operator() () const
+		inline value_type operator() () const
 		{
 			return ((double)rnd32() * (0.5 / 0x80000000));
 		}
@@ -39,7 +41,8 @@ namespace stxxl
 	//! \warning Seed is not the same as in the fast generator \c random_uniform_fast
 	struct random_uniform_slow
 	{
-		inline double operator() () const
+    typedef double value_type;
+		inline value_type operator() () const
 		{
 			return drand48();
 		}
@@ -48,19 +51,21 @@ namespace stxxl
 	template <class UniformRGen_ = random_uniform_fast>
 	struct random_number
 	{
+    typedef unsigned value_type;
 		UniformRGen_ uniform;
-		inline unsigned operator () (int N) const
+		inline value_type operator () (int N) const
 		{
-			return ((unsigned)(uniform() * (N)));
+			return ((value_type)(uniform() * (N)));
 		};
 	};
 	
 	struct random_number64
 	{
+    typedef unsigned long long value_type;
 		random_uniform_slow uniform;
-		inline unsigned long long operator() () const
+		inline value_type operator() () const
 		{
-			return static_cast<unsigned long long>(uniform()*(18446744073709551616.));
+			return static_cast<value_type>(uniform()*(18446744073709551616.));
 		}
 	};
 	

@@ -107,7 +107,8 @@ OutputIterator_ flush_to_iterator(OutputIterator_ out,LazyAlgorithm_ & in)
 {
   while(!in.empty())
   {
-    *out++ = in.current();
+    *out = in.current();
+    ++out;
     in.next();
   }
   return out;

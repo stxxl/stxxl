@@ -20,8 +20,8 @@ struct my_type
 	my_type() {};
 	my_type(key_type __key):_key(__key) {};
 									
-	static my_type min_value(){ return my_type(0); };
-	static my_type max_value(){ return my_type(0xffffffff); };
+	my_type min_value() const { return my_type(0); };
+	my_type max_value() const { return my_type(0xffffffff); };
 };
 
 struct get_key
@@ -31,8 +31,8 @@ struct get_key
 	{
 		return obj._key;
 	}
-	static my_type min_value(){ return my_type(0); };
-	static my_type max_value(){ return my_type(0xffffffff); };
+	my_type min_value(){ return my_type(0); };
+	my_type max_value(){ return my_type(0xffffffff); };
 };
 
 

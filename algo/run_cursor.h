@@ -29,26 +29,43 @@ struct run_cursor
 	}
 };
 
+#ifdef STXXL_SORT_SINGLE_PREFETCHER
 
 struct have_prefetcher
 {
 	static void * untyped_prefetcher;
 };
 
+#endif
+
 template <typename block_type,
 					typename prefetcher_type_>
-struct run_cursor2:public run_cursor<block_type>,public have_prefetcher
+struct run_cursor2:public run_cursor<block_type>
+#ifdef STXXL_SORT_SINGLE_PREFETCHER
+    ,public have_prefetcher
+#endif
 {
 	typedef prefetcher_type_ prefetcher_type;
 	typedef run_cursor2<block_type,prefetcher_type> _Self;
 	typedef typename block_type::value_type value_type;
-											
+			
+#ifdef STXXL_SORT_SINGLE_PREFETCHER
 	static prefetcher_type *& prefetcher() // sorry, a hack
 	{
 		return (prefetcher_type * &) untyped_prefetcher;
-	};
-	
-	run_cursor2 () { };
+	}
+  run_cursor2 () { }
+#else
+  prefetcher_type * prefetcher_;
+  prefetcher_type *& prefetcher() // sorry, a hack
+	{
+		return prefetcher_;
+	}
+  private:
+  run_cursor2();// intentionally not defined to forbid default construction
+  public:
+  run_cursor2(prefetcher_type * p):prefetcher_(p) {}
+#endif
 	
 	inline bool empty () const
 	{
@@ -61,12 +78,13 @@ struct run_cursor2:public run_cursor<block_type>,public have_prefetcher
 	};
 };
 
+#ifdef STXXL_SORT_SINGLE_PREFETCHER
 void * have_prefetcher::untyped_prefetcher = NULL;
+#endif
 
 template <typename block_type,
 					typename prefetcher_type>
-void
-run_cursor2<block_type,prefetcher_type>::operator ++ (int)
+void run_cursor2<block_type,prefetcher_type>::operator ++ (int)
 {
 	pos++;
 	if (UNLIKELY(pos >= block_type::size))
