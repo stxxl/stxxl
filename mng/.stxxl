@@ -1,0 +1,2 @@
+disk=/var/tmp/stxxl,120,syscall
+##disk=/mnt/ramdisk/stxxl,120,syscall

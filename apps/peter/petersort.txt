@@ -1,0 +1,29 @@
+Any commercial use requires a separate license.
+Date: Wed, 18 Sep 2002 10:08:42 +0200 (MEST)
+From: Peter Sanders <sanders@mpi-sb.mpg.de>
+To: rdementi@mpi-sb.mpg.de, naeher@mpi-sb.mpg.de
+Subject: fast sorting
+
+Hallo Roman,
+
+in ~sanders/c++/sort/radix/fastsort.h
+
+findest Du einen schnellen average case sorter.
+bis zu 2.5x schnaller als stlsort.
+
+Auf meinem notebook sind folgende Parametereinstellungen gut:
+Bis ca. 100000 Els l1sort, darueber l2sort.
+logK1 + logK2 = log(n) - 1, d.h. Buckets sollten
+im Mittel Groesse 2 haben.
+
+logK1 sollte hoechstens 13 oder 14 sein.
+logK2 noch kleiner.
+
+viele Gruesse
+
+Peter
+
+
+
+
+

@@ -1,0 +1,221 @@
+#include "../AIO2/akernel_syscall.cpp"
+#include "../common/perm.h"
+
+#include <iostream>
+#include <vector>
+
+#define ACCESS_METHOD SYSCALL
+
+typedef AIOFile<ACCESS_METHOD> File;
+typedef AIORequest<ACCESS_METHOD> Request;
+typedef AIOMC<ACCESS_METHOD> MC;
+
+class Storage: public File
+{
+  int disk;
+  Storage() {};
+public:
+  Storage(int d):disk(d) {};
+  int get_disk() { return disk; };
+};
+
+
+struct BID
+{
+  Storage * storage;
+  off_t offset;
+};
+
+
+class GenBlock
+{
+ public:
+  void * ptr;
+  GenBlock() : ptr(NULL) {};
+};
+
+template <unsigned SIZE>
+class SizedBlock: public GenBlock
+{
+ public:
+};
+
+template <unsigned SIZE, class T, unsigned REF_NUM>
+class TypedBlock : public SizedBlock<SIZE>
+{
+public:
+  TypedBlock<SIZE,T,REF_NUM> & operator = (SizedBlock<SIZE> & sizedblock)
+  {
+    ptr = sizedblock.ptr;
+    return (*this);
+  };
+};
+
+
+enum BMType { FileSystem };
+
+template <BMType bmtype, int BLOCK_SIZE>
+class BlockManager
+{
+public:
+  BlockManager();
+
+  int getNumDisks();
+  vector<string> getDiskNames();
+
+  //  vector<BID> newBlocks(int disk);
+  //  vector<BID> newBlocks(vector<int> disks);
+};
+
+
+template<int BLOCK_SIZE>
+class BlockManager<FileSystem,BLOCK_SIZE>
+{
+  vector<string> disk_names;
+public:
+  BlockManager()
+  {
+    //    disk_names.push_back("/ZB/IMPRS/rdementi/tmp/dsk0/");
+    //    disk_names.push_back("/ZB/IMPRS/rdementi/tmp/dsk1");
+    //    disk_names.push_back("/ZB/IMPRS/rdementi/tmp/dsk2");
+    //    disk_names.push_back("/ZB/IMPRS/rdementi/tmp/dsk3");
+    disk_names.push_back("/tmp/dsk0/");
+    disk_names.push_back("/tmp/dsk1/");
+    disk_names.push_back("/tmp/dsk2/");
+    disk_names.push_back("/tmp/dsk3/");
+    for(unsigned int i=0;i<disk_names.size();i++)
+      mkdir(disk_names[i].c_str(),0777);
+  };
+  int getNumDisks()
+  { 
+    return disk_names.size();; 
+  };
+  vector<string> getDiskNames()
+  {
+    return disk_names;
+  };
+};
+
+
+template <BMType bmtype, int BLOCK_SIZE>
+class BlockGroup  // Group of blocks that can reside on several disks
+{
+public:
+  enum AllocStrategy { FR,S,SR,RC };
+  BlockGroup(const vector<int> & disks, BlockManager<bmtype,BLOCK_SIZE> * mng );
+  BlockGroup(int n,AllocStrategy as, BlockManager<bmtype,BLOCK_SIZE> * mng );
+  ~BlockGroup();
+  BID & operator[] (int i); // access to allocated blocks
+};
+
+
+template<int BLOCK_SIZE>
+class BlockGroup<FileSystem,BLOCK_SIZE>
+{
+  BID * BIDArray;
+  int nblocks;
+  Storage ** files;
+  int ndisks;
+  BlockManager<FileSystem,BLOCK_SIZE> * mng;
+  void arbitrary_allocation(const vector<int> & block_disks)
+  {
+    vector<string> disk_names = mng->getDiskNames();
+    files=new Storage *[ndisks];
+    int i=0;
+    for(;i<ndisks;i++)
+      {
+	files[i] = NULL;
+      }
+
+    nblocks = block_disks.size();
+    BIDArray = new BID[nblocks];
+
+    for(i=0;i<nblocks;i++)
+      {
+	int disk = block_disks[i];
+	if(files[disk] == NULL )
+	  {
+	    files[disk] = new Storage(disk);
+	    files[disk]->open(mytmpfilename(disk_names[disk],"STXXL_").c_str(),AIO_RDWR|AIO_CREAT);
+	  }
+	off_t file_size=files[disk]->size();
+	BIDArray[disk].offset = file_size;
+	BIDArray[disk].storage = files[disk];
+	files[disk]->set_size(file_size + BLOCK_SIZE);
+      }
+  }
+public:
+  enum AllocStrategy { FR,S,SR,RC };
+  BlockGroup(const vector<int> & block_disks, BlockManager<FileSystem,BLOCK_SIZE> * _mng): 
+    BIDArray(NULL),nblocks(0),mng(_mng)
+  {
+    ndisks = mng->getNumDisks();
+    arbitrary_allocation(block_disks);
+  };
+  BlockGroup(int n, AllocStrategy as,BlockManager<FileSystem,BLOCK_SIZE> * _mng): 
+    BIDArray(new BID[n]),nblocks(n),mng(_mng)
+  {
+    int i=0,rand_offset;;
+    ndisks = mng->getNumDisks();
+    vector<int> block_disks(nblocks);
+    int *disk_perm;
+
+    switch(as)
+      {
+      case FR:
+	for(i=0;i<nblocks;i++)
+	  {
+	    block_disks[i] = rand() % ndisks;
+	  }
+	arbitrary_allocation(block_disks);
+	break;
+      case S:
+	for(i=0;i<nblocks;i++)
+	  {
+	    block_disks[i] = i % ndisks;
+	  }
+	arbitrary_allocation(block_disks);
+	break;
+      case SR:
+	rand_offset = rand();
+	for(i=0;i<nblocks;i++)
+	  {
+	    block_disks[i] = (i + rand_offset) % ndisks;
+	  }
+	arbitrary_allocation(block_disks);
+	break;
+      case RC:
+	disk_perm = new int[ndisks];
+	for(i=0;i<ndisks;i++)
+	  disk_perm[i] = i;
+	knuthPerm(disk_perm,ndisks);
+	for(i=0;i<nblocks;i++)
+	  block_disks[i] = disk_perm[ i % ndisks ];
+	delete [] disk_perm;
+	break;
+
+      default:
+	cerr << "Allocation strategy "<< as<<" not supported yet.";
+	exit(-1);
+      };
+  };
+  ~BlockGroup()
+  {
+    int i=0;
+    for(;i<ndisks;i++)
+      {
+	if(files[i])
+	  {
+	    files[i]->close();
+	    delete files[i];
+	  }
+      }
+    delete [] files;
+    delete [] BIDArray;
+  };
+
+  BID operator[] (int i)
+  {
+    return BIDArray[i];
+  };
+};

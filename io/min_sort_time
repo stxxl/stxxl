@@ -1,0 +1,41 @@
+#!/usr/bin/perl -w
+
+
+
+	$filename = "./zone_speed";
+
+	open FILE, $filename or die "Can't open file ".$filename;
+
+	my $total = 0;
+	
+
+	while(<FILE>)
+	{
+		
+		if(/Disk offset (\d+) MB (\d+) MB\/s,(\d+) MB\/s.*/)
+		{
+			$write_time[$1/64] = 64./$2;
+			$read_time[$1/64] = 64./$3;
+			$total++;
+		}
+		else
+		{
+			die "Parse error";
+		}
+	}	
+
+	close FILE;
+
+	print "# GB to sort; ns per byte\n";
+	for($i = 0 ; $i < $total/2 ; $i++)
+	{
+		$sort_time[$i] = 0;
+		for($j = 0; $j < 2*$i; $j++)
+		{
+			$sort_time[$i] += $write_time[$j] + $read_time[$j];
+		}
+
+		printf "%d %f\n",(64*$i*8)/1024,1.0e9*$sort_time[$i]/(64*$i*8*1024*1024) if (!($i % 16) and $i > 0);
+	}
+
+	

@@ -1,0 +1,14 @@
+disk=/mnt/hdc/stxxl,50000,syscall
+disk=/mnt/hde/stxxl,50000,syscall
+disk=/mnt/hdg/stxxl,50000,syscall
+disk=/mnt/hdi/stxxl,50000,syscall
+disk=/mnt/hdm/stxxl,50000,syscall
+disk=/mnt/hdk/stxxl,50000,syscall
+disk=/mnt/hdq/stxxl,50000,syscall
+disk=/mnt/hds/stxxl,50000,syscall
+##disk=/mnt/hdu/stxxl,0000,syscall
+##disk=/mnt/hdw/stxxl,0000,syscall
+##disk=/dev/raw/raw1,50000,syscall
+##disk=/dev/raw/raw2,50000,syscall
+##disk=/dev/raw/raw3,50000,syscall
+##disk=/dev/raw/raw4,50000,syscall

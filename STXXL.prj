@@ -1,0 +1,196 @@
+# Anjuta Version 1.0.0 
+Compatibility Level: 1 
+
+<PROJECT_DESCRIPTION_START>
+STL-like library for external computations
+<PROJECT_DESCRIPTION_END>
+<CONFIG_PROGS_START>
+<CONFIG_PROGS_END>
+<CONFIG_LIBS_START>
+<CONFIG_LIBS_END>
+<CONFIG_HEADERS_START>
+<CONFIG_HEADERS_END>
+<CONFIG_CHARACTERISTICS_START>
+<CONFIG_CHARACTERISTICS_END>
+<CONFIG_LIB_FUNCS_START>
+<CONFIG_LIB_FUNCS_END>
+<CONFIG_ADDITIONAL_START>
+<CONFIG_ADDITIONAL_END>
+<CONFIG_FILES_START>
+<CONFIG_FILES_END>
+<MAKEFILE_AM_START>
+<MAKEFILE_AM_END>
+
+props.file.type=project
+
+anjuta.version=1.0.0
+anjuta.compatibility.level=1
+
+project.name=STXXL
+project.type=GENERIC
+project.target.type=EXECUTABLE
+project.version=0.01
+project.author=Roman Dementiev
+project.source.target=Linux/Solaris
+
+project.excluded.modules=\
+	intl
+
+project.has.gettext=0
+
+project.programming.language=C_C++
+
+project.menu.entry=STXXL Version 0.01
+project.menu.group=Application
+project.menu.comment=STXXL Version 0.01
+project.menu.icon=
+project.menu.need.terminal=0
+
+project.configure.options=
+
+anjuta.program.arguments=
+
+project.config.blocked=1
+
+project.config.disable.overwriting=1 1 1 1 1 1 1 1 1 
+project.config.extra.modules.before=
+project.config.extra.modules.after=
+
+module.include.name=.
+module.include.type=
+module.include.expanded=1
+module.include.files=\
+	mng/adaptor.h\
+	mng/mng.h\
+	apps/msort.h\
+	apps/loosertree.h\
+	apps/prefetcher.h\
+	common/mutex.h\
+	common/rand.h\
+	common/perm.h\
+	common/rwlock.h\
+	common/semaphore.h\
+	common/switch.h\
+	common/state.h\
+	common/utils.h\
+	common/myutils.h\
+	common/aligned_alloc.h\
+	io/io.h\
+	io/iobase.h\
+	io/mmap_file.h\
+	io/simdisk_file.h\
+	io/syscall_file.h\
+	io/ufs_file.h\
+	io/iostats.h\
+	containers/vector.h\
+	apps/mkeysort.h\
+	apps/intkeysort.h\
+	apps/keysort.h\
+	algo/ksort.h\
+	algo/loosertree.h\
+	algo/interleaved_alloc.h\
+	containers/pager.h\
+	common/simple_vector.h\
+	algo/async_schedule.h\
+	algo/intksort.h\
+	algo/kprefetcher.h\
+	algo/koptprefetcher.h\
+	algo/ksort_exp.h\
+	mng/block_prefetcher.h\
+	mng/buf_writer.h\
+	mng/buf_istream.h\
+	mng/buf_ostream.h\
+	algo/scan.h\
+	common/gprof.h\
+	algo/sort.h\
+	algo/stable_ksort.h\
+	algo/adaptor.h\
+	io/completion_handler.h\
+	algo/inmemsort.h\
+	containers/stack.h\
+	containers/migrating_stack.h
+
+module.source.name=.
+module.source.type=
+module.source.expanded=1
+module.source.files=\
+	mng/test.cpp\
+	apps/msort.cpp\
+	apps/simdisk.cpp\
+	apps/foo.c\
+	apps/foo.cpp\
+	test/dev.cpp\
+	test/features.cpp\
+	test/threads.cpp\
+	io/diskqueue.cpp\
+	io/test.cpp\
+	io/disktest.cpp\
+	containers/test.cpp\
+	algo/test.cpp\
+	apps/mkeysort.cpp\
+	algo/test_ksort.cpp\
+	test/test_thr.cpp\
+	test/block.cpp\
+	algo/test_asch.cpp\
+	mng/test_streams.cpp\
+	algo/test_scan.cpp\
+	algo/sort_file.cpp\
+	algo/gen_file.cpp\
+	algo/ksort.cpp\
+	algo/sort.cpp\
+	algo/test_sort.cpp\
+	algo/stable_ksort.cpp\
+	containers/test_mstack.cpp\
+	containers/test_stack.cpp
+
+module.pixmap.name=.
+module.pixmap.type=
+module.pixmap.expanded=0
+module.pixmap.files=
+
+module.data.name=.
+module.data.type=
+module.data.expanded=0
+module.data.files=
+
+module.help.name=.
+module.help.type=
+module.help.expanded=0
+module.help.files=
+
+module.doc.name=.
+module.doc.type=
+module.doc.expanded=0
+module.doc.files=
+
+module.po.expanded=0
+module.po.files=
+
+compiler.options.supports=
+
+compiler.options.include.paths=\
+	.\
+	..
+
+compiler.options.library.paths=
+
+compiler.options.libraries=
+compiler.options.libraries.selected=
+
+compiler.options.defines=\
+	HAVE_CONFIG_H
+
+compiler.options.warning.buttons=0 0 1 1 0 1 0 0 0 0 0 0 0 1 0 0 
+
+compiler.options.optimize.buttons=0 0 1 0 
+
+compiler.options.other.buttons=1 0 
+
+compiler.options.other.c.flags=
+
+compiler.options.other.l.flags=
+
+compiler.options.other.l.libs=
+
+project.source.paths=
+
