@@ -27,7 +27,6 @@ int main(int argc, char * argv[])
     abort();
   }
   {
-    /*
     ext_stack_type my_stack;
     int test_size = atoi(argv[1])*4*4096/sizeof(int),i;
     
@@ -77,13 +76,12 @@ int main(int argc, char * argv[])
       my_stack1.pop();
       assert(my_stack1.size() == i);
     };
-    */
     STXXL_MSG("Test 1 passed.")
   }
   {
     prefetch_pool<ext_stack_type2::block_type> p_pool(10);
     write_pool<ext_stack_type2::block_type> w_pool(10);
-    ext_stack_type2 my_stack(p_pool,w_pool,2);
+    ext_stack_type2 my_stack(p_pool,w_pool,0);
     int test_size = atoi(argv[1])*4*4096/sizeof(int),i;
     
     for(i = 0; i < test_size;i++)

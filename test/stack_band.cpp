@@ -26,9 +26,11 @@ using namespace stxxl;
 
 int main(int argc, char * argv[])
 {
-		typedef grow_shrink_stack<stack_config_generator<my_type,4,(256*1024),RC> >  ext_stack_type;
+		typedef grow_shrink_stack2<stack_config_generator<my_type,1,(2*256*1024),RC> >  ext_stack_type;
 		stxxl::int64 i,size = atol(argv[1])*(1024*1024*1024)/sizeof(my_type);
-		ext_stack_type Stack;
+		write_pool<ext_stack_type::block_type> w_pool(4);
+		prefetch_pool<ext_stack_type::block_type> p_pool(4);
+		ext_stack_type Stack(p_pool,w_pool,0);
 //		stxxl::vector<my_type,stxxl::striping,(2*1024*1024),stxxl::lru_pager<4>,2> Vector(size);
 		stxxl::timer Timer;
 		
@@ -43,7 +45,7 @@ int main(int argc, char * argv[])
 //		int j;
 //		stxxl::for_each(Vector.begin(),Vector.end(),counter(),16);
 		Timer.stop();
-		
+		Stack.set_prefetch_aggr(4);
 		STXXL_MSG("Push bandwidth = "<< int(size*sizeof(my_type)/Timer.seconds())/(1024*1024)<<" MB/s" )
 
 		Timer.reset();
