@@ -195,7 +195,7 @@ namespace stream
   }
  
   
-  //! \brief Stores consecutively stream content to an output iterator range until end of stream or end of iterator the range is reached
+  //! \brief Stores consecutively stream content to an output iterator range \b until end of the stream or end of the iterator range is reached
   //! \param in stream to be stored used as source
   //! \param outbegin output iterator used as destination
   //! \param outend output end iterator, pointing beyond the output range 
@@ -215,7 +215,7 @@ namespace stream
   }
 
 
-  //! \brief Stores consecutively stream content to an output \c stxxl::vector iterator until end of stream or end of iterator the range is reached
+  //! \brief Stores consecutively stream content to an output \c stxxl::vector iterator \b until end of the stream or end of the iterator range is reached
   //! \param in stream to be stored used as source
   //! \param outbegin output \c stxxl::vector iterator used as destination
   //! \param outend output end iterator, pointing beyond the output range 
