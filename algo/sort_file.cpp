@@ -37,7 +37,7 @@ int main()
 {
 		syscall_file f("./in",file::DIRECT|file::RDWR);
 			
-		unsigned memory_to_use = 100*1024*1024;
+		unsigned memory_to_use = 50*1024*1024;
 		typedef stxxl::vector<my_type> vector_type;
 		vector_type v(&f);
 	
