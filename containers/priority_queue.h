@@ -24,6 +24,223 @@ __STXXL_BEGIN_NAMESPACE
 //! \internal
 namespace priority_queue_local
 {
+  
+  
+/////////////////////////////////////////////////////////////////////
+// auxiliary functions
+
+// merge sz element from the two sentinel terminated input
+// sequences *f0 and *f1 to "to"
+// advance *fo and *f1 accordingly.
+// require: at least sz nonsentinel elements available in f0, f1
+// require: to may overwrite one of the sources as long as
+//   *fx + sz is before the end of fx
+template <class Value_,class Cmp_>
+void merge(Value_ **f0,
+           Value_ **f1,
+           Value_  *to, int sz, Cmp_ cmp) 
+{
+  Value_ *from0   = *f0;
+  Value_ *from1   = *f1;
+  Value_ *done    = to + sz;
+
+  while (to != done)
+  {
+    if(cmp(*from0,*from1))
+    {
+      *to = *from1;
+      ++from1;
+    }
+    else
+    {
+      *to = *from0; 
+      ++from0; 
+    }
+    ++to;
+  }
+  *f0   = from0;
+  *f1   = from1;
+}
+
+
+// merge sz element from the three sentinel terminated input
+// sequences *f0, *f1 and *f2 to "to"
+// advance *f0, *f1 and *f2 accordingly.
+// require: at least sz nonsentinel elements available in f0, f1 and f2
+// require: to may overwrite one of the sources as long as
+//   *fx + sz is before the end of fx
+template <class Value_,class Cmp_>
+void merge3(
+           Value_ **f0,
+           Value_ **f1,
+           Value_ **f2,
+           Value_  *to, int sz,Cmp_ cmp) 
+{
+  Value_ *from0   = *f0;
+  Value_ *from1   = *f1;
+  Value_ *from2   = *f2;
+  Value_ *done    = to + sz;
+
+  if (cmp(*from1,*from0)) {
+    if (cmp(*from2,*from1))   { goto s012; }
+    else { 
+      if (cmp(*from0,*from2)) { goto s201; }
+      else             { goto s021; }
+    }
+  } else {
+    if (cmp(*from2,*from1)) {
+      if (cmp(*from2,*from0)) { goto s102; }
+      else             { goto s120; }
+    } else             { goto s210; }
+  }
+
+#define Merge3Case(a,b,c)\
+  s ## a ## b ## c :\
+  if (to == done) goto finish;\
+  *to = * from ## a ;\
+  ++to;\
+  ++from ## a ;\
+  if (cmp(*from ## b , *from ## a )) goto s ## a ## b ## c;\
+  if (cmp(*from ## c , *from ## a )) goto s ## b ## a ## c;\
+  goto s ## b ## c ## a;
+
+  // the order is choosen in such a way that 
+  // four of the trailing gotos can be eliminated by the optimizer
+  Merge3Case(0, 1, 2);
+  Merge3Case(1, 2, 0);
+  Merge3Case(2, 0, 1);
+  Merge3Case(1, 0, 2);
+  Merge3Case(0, 2, 1);
+  Merge3Case(2, 1, 0);
+
+ finish:
+  *f0   = from0;
+  *f1   = from1;
+  *f2   = from2;
+}
+
+
+// merge sz element from the three sentinel terminated input
+// sequences *f0, *f1, *f2 and *f3 to "to"
+// advance *f0, *f1, *f2 and *f3 accordingly.
+// require: at least sz nonsentinel elements available in f0, f1, f2 and f2
+// require: to may overwrite one of the sources as long as
+//   *fx + sz is before the end of fx
+template <class Value_, class Cmp_>
+void merge4(
+           Value_ **f0,
+           Value_ **f1,
+           Value_ **f2,
+           Value_ **f3,
+           Value_  *to, int sz, Cmp_ cmp) 
+{
+  Value_ *from0   = *f0;
+  Value_ *from1   = *f1;
+  Value_ *from2   = *f2;
+  Value_ *from3   = *f3;
+  Value_ *done    = to + sz;
+
+#define StartMerge4(a, b, c, d)\
+  if ( (!cmp(*from##a ,*from##b )) && (!cmp(*from##b ,*from##c )) && (!cmp(*from##c ,*from##d )) )\
+    goto s ## a ## b ## c ## d ;
+
+  // b>a c>b d>c
+  // a<b b<c c<d
+  // a<=b b<=c c<=d
+  // !(a>b) !(b>c) !(c>d)
+  
+  StartMerge4(0, 1, 2, 3);
+  StartMerge4(1, 2, 3, 0);
+  StartMerge4(2, 3, 0, 1);
+  StartMerge4(3, 0, 1, 2);
+
+  StartMerge4(0, 3, 1, 2);
+  StartMerge4(3, 1, 2, 0);
+  StartMerge4(1, 2, 0, 3);
+  StartMerge4(2, 0, 3, 1);
+
+  StartMerge4(0, 2, 3, 1);
+  StartMerge4(2, 3, 1, 0);
+  StartMerge4(3, 1, 0, 2);
+  StartMerge4(1, 0, 2, 3);
+
+  StartMerge4(2, 0, 1, 3);
+  StartMerge4(0, 1, 3, 2);
+  StartMerge4(1, 3, 2, 0);
+  StartMerge4(3, 2, 0, 1);
+
+  StartMerge4(3, 0, 2, 1);
+  StartMerge4(0, 2, 1, 3);
+  StartMerge4(2, 1, 3, 0);
+  StartMerge4(1, 3, 0, 2);
+
+  StartMerge4(1, 0, 3, 2);
+  StartMerge4(0, 3, 2, 1);
+  StartMerge4(3, 2, 1, 0);
+  StartMerge4(2, 1, 0, 3);
+
+#define Merge4Case(a, b, c, d)\
+  s ## a ## b ## c ## d:\
+  if (to == done) goto finish;\
+  *to = *from ## a ;\
+  ++to;\
+  ++from ## a ;\
+  if (cmp(*from ## c , *from ## a))\
+  {\
+    if (cmp(*from ## b, *from ## a )) \
+      goto s ## a ## b ## c ## d; \
+    else \
+      goto s ## b ## a ## c ## d; \
+  }\
+  else \
+  {\
+    if (cmp(*from ## d, *from ## a))\
+      goto s ## b ## c ## a ## d; \
+    else \
+      goto s ## b ## c ## d ## a; \
+  }
+  
+  Merge4Case(0, 1, 2, 3);
+  Merge4Case(1, 2, 3, 0);
+  Merge4Case(2, 3, 0, 1);
+  Merge4Case(3, 0, 1, 2);
+
+  Merge4Case(0, 3, 1, 2);
+  Merge4Case(3, 1, 2, 0);
+  Merge4Case(1, 2, 0, 3);
+  Merge4Case(2, 0, 3, 1);
+
+  Merge4Case(0, 2, 3, 1);
+  Merge4Case(2, 3, 1, 0);
+  Merge4Case(3, 1, 0, 2);
+  Merge4Case(1, 0, 2, 3);
+
+  Merge4Case(2, 0, 1, 3);
+  Merge4Case(0, 1, 3, 2);
+  Merge4Case(1, 3, 2, 0);
+  Merge4Case(3, 2, 0, 1);
+
+  Merge4Case(3, 0, 2, 1);
+  Merge4Case(0, 2, 1, 3);
+  Merge4Case(2, 1, 3, 0);
+  Merge4Case(1, 3, 0, 2);
+
+  Merge4Case(1, 0, 3, 2);
+  Merge4Case(0, 3, 2, 1);
+  Merge4Case(3, 2, 1, 0);
+  Merge4Case(2, 1, 0, 3);
+
+ finish:
+  *f0   = from0;
+  *f1   = from1;
+  *f2   = from2;
+  *f3   = from3;
+}
+
+  
+  
+  
+  
   template <  class BlockType_, 
               class Cmp_,
               unsigned Arity_,
@@ -93,7 +310,7 @@ namespace priority_queue_local
       {
         STXXL_VERBOSE2("ext_merger::ext_merger(...)")
       }
-      unsigned mem_cons() const // only raff estimation
+      unsigned mem_cons() const // only raugh estimation
       {
         return (nsequences * block_type::raw_size);
       }
@@ -215,7 +432,7 @@ namespace priority_queue_local
         typename std::list<bid_type>::iterator curbid = bids->begin();
         for(unsigned i=0;i<nblocks;i++,curbid++)
         {
-          block_type *b = w_pool.get();
+          block_type *b = w_pool.steal();
           another_merger.multi_merge(b->begin(),b->end());
           w_pool.write(b,*curbid);
         }
@@ -605,7 +822,48 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
 {
   STXXL_VERBOSE3("looser_tree::multi_merge("<< to <<","<< l<<")")
   
+  /*
   multi_merge_k(to,l);
+  */
+  switch(logK) {
+  case 0: 
+    assert(k == 1);
+    assert(entry[0].index == 0);
+    assert(lastFree == -1 || l == 0);
+    //memcpy(to, current[0], l * sizeof(Element));
+    std::copy_n(current[0],l,to);
+    current[0] += l;
+    entry[0].key = **current;
+    if (segmentIsEmpty(0)) deallocateSegment(0); 
+    break;
+  case 1:
+    assert(k == 2);
+    merge(current + 0, current + 1, to, l,cmp);
+    rebuildLooserTree();
+    if (segmentIsEmpty(0)) deallocateSegment(0); 
+    if (segmentIsEmpty(1)) deallocateSegment(1); 
+    break;
+  case 2:
+    assert(k == 4);
+    merge4(current + 0, current + 1, current + 2, current + 3, to, l,cmp);
+    rebuildLooserTree();
+    if (segmentIsEmpty(0)) deallocateSegment(0); 
+    if (segmentIsEmpty(1)) deallocateSegment(1); 
+    if (segmentIsEmpty(2)) deallocateSegment(2); 
+    if (segmentIsEmpty(3)) deallocateSegment(3);
+    break;/*
+  case  3: multiMergeUnrolled3(to, l); break;
+  case  4: multiMergeUnrolled4(to, l); break;
+  case  5: multiMergeUnrolled5(to, l); break;
+  case  6: multiMergeUnrolled6(to, l); break;
+  case  7: multiMergeUnrolled7(to, l); break;
+  case  8: multiMergeUnrolled8(to, l); break;
+  case  9: multiMergeUnrolled9(to, l); break;
+  case 10: multiMergeUnrolled10(to, l); break; */
+  default: multi_merge_k(to, l); break;
+  }
+  
+  
   
   size_ -= l;
 
@@ -673,221 +931,6 @@ multi_merge_k(Element *to, int l)
   entry[0].index = winnerIndex;
   entry[0].key   = winnerKey;  
 }
-
-
-
-/////////////////////////////////////////////////////////////////////
-// auxiliary functions
-
-// merge sz element from the two sentinel terminated input
-// sequences *f0 and *f1 to "to"
-// advance *fo and *f1 accordingly.
-// require: at least sz nonsentinel elements available in f0, f1
-// require: to may overwrite one of the sources as long as
-//   *fx + sz is before the end of fx
-template <class Value_,class Cmp_>
-void merge(Value_ **f0,
-           Value_ **f1,
-           Value_  *to, int sz, Cmp_ cmp) 
-{
-  Value_ *from0   = *f0;
-  Value_ *from1   = *f1;
-  Value_ *done    = to + sz;
-
-  while (to != done)
-  {
-    if(cmp(*from0,*from1))
-    {
-      *to = *from1;
-      ++from1;
-    }
-    else
-    {
-      *to = *from0; 
-      ++from0; 
-    }
-    ++to;
-  }
-  *f0   = from0;
-  *f1   = from1;
-}
-
-
-// merge sz element from the three sentinel terminated input
-// sequences *f0, *f1 and *f2 to "to"
-// advance *f0, *f1 and *f2 accordingly.
-// require: at least sz nonsentinel elements available in f0, f1 and f2
-// require: to may overwrite one of the sources as long as
-//   *fx + sz is before the end of fx
-template <class Value_,class Cmp_>
-void merge3(
-           Value_ **f0,
-           Value_ **f1,
-           Value_ **f2,
-           Value_  *to, int sz,Cmp_ cmp) 
-{
-  Value_ *from0   = *f0;
-  Value_ *from1   = *f1;
-  Value_ *from2   = *f2;
-  Value_ *done    = to + sz;
-
-  if (cmp(*from1,*from0)) {
-    if (cmp(*from2,*from1))   { goto s012; }
-    else { 
-      if (cmp(*from0,*from2)) { goto s201; }
-      else             { goto s021; }
-    }
-  } else {
-    if (cmp(*from2,*from1)) {
-      if (cmp(*from2,*from0)) { goto s102; }
-      else             { goto s120; }
-    } else             { goto s210; }
-  }
-
-#define Merge3Case(a,b,c)\
-  s ## a ## b ## c :\
-  if (to == done) goto finish;\
-  *to = * from ## a ;\
-  ++to;\
-  ++from ## a ;\
-  if (cmp(*from ## b , *from ## a )) goto s ## a ## b ## c;\
-  if (cmp(*from ## c , *from ## a )) goto s ## b ## a ## c;\
-  goto s ## b ## c ## a;
-
-  // the order is choosen in such a way that 
-  // four of the trailing gotos can be eliminated by the optimizer
-  Merge3Case(0, 1, 2);
-  Merge3Case(1, 2, 0);
-  Merge3Case(2, 0, 1);
-  Merge3Case(1, 0, 2);
-  Merge3Case(0, 2, 1);
-  Merge3Case(2, 1, 0);
-
- finish:
-  *f0   = from0;
-  *f1   = from1;
-  *f2   = from2;
-}
-
-
-// merge sz element from the three sentinel terminated input
-// sequences *f0, *f1, *f2 and *f3 to "to"
-// advance *f0, *f1, *f2 and *f3 accordingly.
-// require: at least sz nonsentinel elements available in f0, f1, f2 and f2
-// require: to may overwrite one of the sources as long as
-//   *fx + sz is before the end of fx
-template <class Value_, class Cmp_>
-void merge4(
-           Value_ **f0,
-           Value_ **f1,
-           Value_ **f2,
-           Value_ **f3,
-           Value_  *to, int sz, Cmp_ cmp) 
-{
-  Value_ *from0   = *f0;
-  Value_ *from1   = *f1;
-  Value_ *from2   = *f2;
-  Value_ *from3   = *f3;
-  Value_ *done    = to + sz;
-
-#define StartMerge4(a, b, c, d)\
-  if ( (!cmp(*from##a ,*from##b )) && (!cmp(*from##b ,*from##c )) && (!cmp(*from##c ,*from##d )) )\
-    goto s ## a ## b ## c ## d ;
-
-  // b>a c>b d>c
-  // a<b b<c c<d
-  // a<=b b<=c c<=d
-  // !(a>b) !(b>c) !(c>d)
-  
-  StartMerge4(0, 1, 2, 3);
-  StartMerge4(1, 2, 3, 0);
-  StartMerge4(2, 3, 0, 1);
-  StartMerge4(3, 0, 1, 2);
-
-  StartMerge4(0, 3, 1, 2);
-  StartMerge4(3, 1, 2, 0);
-  StartMerge4(1, 2, 0, 3);
-  StartMerge4(2, 0, 3, 1);
-
-  StartMerge4(0, 2, 3, 1);
-  StartMerge4(2, 3, 1, 0);
-  StartMerge4(3, 1, 0, 2);
-  StartMerge4(1, 0, 2, 3);
-
-  StartMerge4(2, 0, 1, 3);
-  StartMerge4(0, 1, 3, 2);
-  StartMerge4(1, 3, 2, 0);
-  StartMerge4(3, 2, 0, 1);
-
-  StartMerge4(3, 0, 2, 1);
-  StartMerge4(0, 2, 1, 3);
-  StartMerge4(2, 1, 3, 0);
-  StartMerge4(1, 3, 0, 2);
-
-  StartMerge4(1, 0, 3, 2);
-  StartMerge4(0, 3, 2, 1);
-  StartMerge4(3, 2, 1, 0);
-  StartMerge4(2, 1, 0, 3);
-
-#define Merge4Case(a, b, c, d)\
-  s ## a ## b ## c ## d:\
-  if (to == done) goto finish;\
-  *to = *from ## a ;\
-  ++to;\
-  ++from ## a ;\
-  if (cmp(*from ## c , *from ## a))\
-  {\
-    if (cmp(*from ## b, *from ## a )) \
-      goto s ## a ## b ## c ## d; \
-    else \
-      goto s ## b ## a ## c ## d; \
-  }\
-  else \
-  {\
-    if (cmp(*from ## d, *from ## a))\
-      goto s ## b ## c ## a ## d; \
-    else \
-      goto s ## b ## c ## d ## a; \
-  }
-  
-  Merge4Case(0, 1, 2, 3);
-  Merge4Case(1, 2, 3, 0);
-  Merge4Case(2, 3, 0, 1);
-  Merge4Case(3, 0, 1, 2);
-
-  Merge4Case(0, 3, 1, 2);
-  Merge4Case(3, 1, 2, 0);
-  Merge4Case(1, 2, 0, 3);
-  Merge4Case(2, 0, 3, 1);
-
-  Merge4Case(0, 2, 3, 1);
-  Merge4Case(2, 3, 1, 0);
-  Merge4Case(3, 1, 0, 2);
-  Merge4Case(1, 0, 2, 3);
-
-  Merge4Case(2, 0, 1, 3);
-  Merge4Case(0, 1, 3, 2);
-  Merge4Case(1, 3, 2, 0);
-  Merge4Case(3, 2, 0, 1);
-
-  Merge4Case(3, 0, 2, 1);
-  Merge4Case(0, 2, 1, 3);
-  Merge4Case(2, 1, 3, 0);
-  Merge4Case(1, 3, 0, 2);
-
-  Merge4Case(1, 0, 3, 2);
-  Merge4Case(0, 3, 2, 1);
-  Merge4Case(3, 2, 1, 0);
-  Merge4Case(2, 1, 0, 3);
-
- finish:
-  *f0   = from0;
-  *f1   = from1;
-  *f2   = from2;
-  *f3   = from3;
-}
-
-
 
 };
 
