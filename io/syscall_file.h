@@ -78,29 +78,31 @@ __STXXL_BEGIN_NAMESPACE
 		if(nref() < 2)
 		{
 			STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="<<nref()<<") "<<
-			 " this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes )
+			 " this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes 
+			 << " type=" <<(type == READ)?"READ":"WRITE" )
 		}
 		
 		stxxl_ifcheck_i(::lseek (file->get_file_des (), offset, SEEK_SET),
-			" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes)
+			" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes
+		    << " type=" <<(type == READ)?"READ":"WRITE" )
 		else
 		{
 			if (type == READ)
 			{
 				stxxl_ifcheck_i(::read (file->get_file_des(), buffer, bytes),
-					" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes)
+					" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<(type == READ)?"READ":"WRITE")
 			}
 			else
 			{
 				stxxl_ifcheck_i(::write (file->get_file_des (), buffer, bytes),
-					" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes);
+					" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<(type == READ)?"READ":"WRITE");
 			}
 		}
 		
 		if(nref() < 2)
 		{
 			STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref="<<nref()<<") "<<
-			 " this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes )
+			 " this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes << " type=" <<(type == READ)?"READ":"WRITE")
 		}
 
 		_state.set_to (DONE);
