@@ -40,6 +40,7 @@ extern double stxxl::wait_time_counter;
 		double p_begin_io;
 		int acc_ios;
 		int acc_reads, acc_writes;	// number of requests, participating in parallel operation
+		double last_reset;
 		mutex read_mutex, write_mutex, io_mutex;
 		static stats * instance;
 		  stats ():
@@ -55,7 +56,8 @@ extern double stxxl::wait_time_counter;
 			p_begin_write (0.0),
 			p_ios (0.0),
 			p_begin_io (0),
-			acc_ios (0), acc_reads (0), acc_writes (0)
+			acc_ios (0), acc_reads (0), acc_writes (0),
+			last_reset(stxxl_timestamp())
 		{
 		}
 	public:
@@ -131,15 +133,20 @@ extern double stxxl::wait_time_counter;
 		{
 			return p_ios;
 		}
+		//! \brief Return time of the last reset
+		//! \return The returned value is in seconds
+		double get_last_reset_time() const
+		{
+			return last_reset;
+		}
 		//! \brief Resets I/O time counters (including I/O wait counter)
 		void reset()
 		{
 			read_mutex.lock ();
 			//      assert(acc_reads == 0);
 			if (acc_reads)
-				std::cerr << "Warning: " << acc_reads <<
-					" read(s) not yet finished" << std::
-					endl;
+				STXXL_ERRMSG( "Warning: " << acc_reads <<
+					" read(s) not yet finished")
 
 			reads = 0;
 			volume_read = 0;
@@ -149,22 +156,21 @@ extern double stxxl::wait_time_counter;
 			write_mutex.lock ();
 			//      assert(acc_writes == 0);
 			if (acc_writes)
-				std::cerr << "Warning: " << acc_writes <<
-					" write(s) not yet finished" << std::
-					endl;
+				STXXL_ERRMSG("Warning: " << acc_writes <<
+					" write(s) not yet finished")
 
 			writes = 0;
 			volume_written = 0;
 			t_writes = 0.0;
 			p_writes = 0.0;
 			write_mutex.unlock ();
+			last_reset = stxxl_timestamp();
 
 			io_mutex.lock ();
 			//      assert(acc_ios == 0);
 			if (acc_ios)
-				std::cerr << "Warning: " << acc_ios <<
-					" io(s) not yet finished" << std::
-					endl;
+				STXXL_ERRMSG( "Warning: " << acc_ios <<
+					" io(s) not yet finished" )
 
 			p_ios = 0.0;
 			io_mutex.unlock ();
@@ -206,7 +212,7 @@ extern double stxxl::wait_time_counter;
 		double increment_io_wait_time(double val) { return -1.0; }
 #endif
 		
-	protected:
+	// for library use
 		void write_started (unsigned size_)
 		{
 			write_mutex.lock ();
@@ -292,6 +298,7 @@ extern double stxxl::wait_time_counter;
 		o<< " time spent in writing (parallel write time): "<< s.get_pwrite_time() << " sec."<< std::endl;
 		o<< " time spent in I/O (parallel I/O time)      : "<< s.get_pio_time() << " sec."<< std::endl;
 		o<< " I/O wait time                              : "<< s.get_io_wait_time() << " sec."<< std::endl;
+		o<< " Time since the last reset                  : "<< (stxxl_timestamp()-s.get_last_reset_time()) << " sec."<< std::endl;
 		return o;
 	}
 	

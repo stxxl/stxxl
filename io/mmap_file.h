@@ -74,6 +74,19 @@ __STXXL_BEGIN_NAMESPACE
 
 	void mmap_request::serve()
 	{
+		stats * iostats = stats::get_instance();
+		if (type == READ)
+		{
+			#ifdef STXXL_IO_STATS
+				iostats->read_started (size());
+			#endif
+		}
+		else
+		{
+			#ifdef STXXL_IO_STATS
+				iostats->write_started (size());
+			#endif
+		}
 		// file->set_size(offset+bytes);
 		void *mem = mmap (NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file->get_file_des (), offset);
 		if (mem == MAP_FAILED)
@@ -90,11 +103,12 @@ __STXXL_BEGIN_NAMESPACE
 		}
 		else
 		{
-			if (type == READ)
-			{
-				stxxl_ifcheck (memcpy (buffer, mem, bytes))
-				else
-				stxxl_ifcheck (munmap ((char *) mem, bytes))}
+				if (type == READ)
+				{
+					stxxl_ifcheck (memcpy (buffer, mem, bytes))
+					else
+					stxxl_ifcheck (munmap ((char *) mem, bytes))
+				}
 				else
 				{
 					stxxl_ifcheck (memcpy (mem, buffer, bytes))
@@ -103,6 +117,19 @@ __STXXL_BEGIN_NAMESPACE
 				}
 		}
 
+		if (type == READ)
+		{
+			#ifdef STXXL_IO_STATS
+				iostats->read_finished ();
+			#endif
+		}
+		else
+		{
+			#ifdef STXXL_IO_STATS
+				iostats->write_finished ();
+			#endif
+		}
+		
 		_state.set_to (DONE);
 
 		waiters_mutex.lock ();

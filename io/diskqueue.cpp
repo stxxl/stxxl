@@ -78,15 +78,9 @@ namespace stxxl
 					pthis->write_queue.pop ();
 
 					pthis->write_mutex.unlock ();
-#ifdef STXXL_IO_STATS
-					pthis->iostats->write_started (req->size());
-#endif
 
 					req->serve ();
 
-#ifdef STXXL_IO_STATS
-					pthis->iostats->write_finished ();
-#endif
 				}
 				else
 				{
@@ -114,19 +108,11 @@ namespace stxxl
 					pthis->read_queue.pop ();
 					pthis->read_mutex.unlock ();
 
-#ifdef STXXL_IO_STATS
-					pthis->iostats->read_started (req->size());
-#endif
-
 					STXXL_VERBOSE2( "queue: before serve request has "<< req->nref()<< " references ")
 					// assert(req->nref() > 1);
 					req->serve ();
 					STXXL_VERBOSE2( "queue: after serve request has "<< req->nref()<< " references ")
 					
-
-#ifdef STXXL_IO_STATS
-					pthis->iostats->read_finished ();
-#endif
 				}
 				else
 				{

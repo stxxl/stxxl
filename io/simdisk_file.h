@@ -288,6 +288,19 @@ namespace stxxl
 	{
 		//      file->set_size(offset+bytes);
 		double op_start = stxxl_timestamp();
+		stats * iostats = stats::get_instance();
+		if (type == READ)
+		{
+			#ifdef STXXL_IO_STATS
+				iostats->read_started (size());
+			#endif
+		}
+		else
+		{
+			#ifdef STXXL_IO_STATS
+				iostats->write_started (size());
+			#endif
+		}
 				
 		void *mem =
 			mmap (NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED,file->get_file_des (), offset);
@@ -329,6 +342,20 @@ namespace stxxl
 
 		usleep ((unsigned long) ((delay - seconds_to_wait) * 1000000.));
 
+		if (type == READ)
+		{
+			#ifdef STXXL_IO_STATS
+				iostats->read_finished ();
+			#endif
+		}
+		else
+		{
+			#ifdef STXXL_IO_STATS
+				iostats->write_finished ();
+			#endif
+		}
+		
+		
 		_state.set_to (DONE);
 
 		waiters_mutex.lock ();

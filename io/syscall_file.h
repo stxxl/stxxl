@@ -75,6 +75,7 @@ __STXXL_BEGIN_NAMESPACE
 
 	void syscall_request::serve ()
 	{
+		stats * iostats = stats::get_instance();
 		if(nref() < 2)
 		{
 			STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="<<nref()<<") "<<
@@ -89,13 +90,29 @@ __STXXL_BEGIN_NAMESPACE
 		{
 			if (type == READ)
 			{
+				#ifdef STXXL_IO_STATS
+					iostats->read_started (size());
+				#endif
+				
 				stxxl_ifcheck_i(::read (file->get_file_des(), buffer, bytes),
 					" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<((type == READ)?"READ":"WRITE"))
+				
+				#ifdef STXXL_IO_STATS
+					iostats->read_finished ();
+				#endif
 			}
 			else
 			{
+				#ifdef STXXL_IO_STATS
+					iostats->write_started (size());
+				#endif
+				
 				stxxl_ifcheck_i(::write (file->get_file_des (), buffer, bytes),
 					" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<((type == READ)?"READ":"WRITE"));
+				
+				#ifdef STXXL_IO_STATS
+					iostats->write_finished ();
+				#endif
 			}
 		}
 		
