@@ -34,7 +34,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! \internal
+/*! \internal
+*/
 namespace sort_local
 {
 	template <typename BIDTp_,typename ValTp_>

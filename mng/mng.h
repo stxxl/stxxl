@@ -235,10 +235,11 @@ __STXXL_BEGIN_NAMESPACE
 			size = block_w_info<T_,RawSize_,NRef_,InfoType_>::size //!< number of elements in block
 		};
 		
-		//! \brief Writes block to the disk(s)
-		//! \param bid block identifier, points the file(disk) and position
-		//! \param on_cmpl completion handler
-        //! \return \c pointer_ptr object to track status I/O operation after the call
+		/*! \brief Writes block to the disk(s)
+		    \param bid block identifier, points the file(disk) and position
+		    \param on_cmpl completion handler
+         \return \c pointer_ptr object to track status I/O operation after the call
+		*/
 		request_ptr write (const BID<raw_size> & bid, 
 			    completion_handler on_cmpl = default_completion_handler())
 		{
@@ -249,10 +250,11 @@ __STXXL_BEGIN_NAMESPACE
 					    on_cmpl);
 		};
 
-		//! \brief Reads block from the disk(s)
-		//! \param bid block identifier, points the file(disk) and position
-		//! \param on_cmpl completion handler
-        //! \return \c pointer_ptr object to track status I/O operation after the call
+		/*! 	\brief Reads block from the disk(s)
+		    	\param bid block identifier, points the file(disk) and position
+		  	\param on_cmpl completion handler
+				\return \c pointer_ptr object to track status I/O operation after the call
+		*/
 		request_ptr read (const BID < raw_size > &bid,
 			   completion_handler on_cmpl = default_completion_handler())
 		{

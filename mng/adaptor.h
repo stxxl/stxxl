@@ -16,7 +16,7 @@ namespace stxxl
 {
   
   //! \addtogroup mnglayer
-  
+  //!
   //! \{
   
 	template < class Tp_, class Distance_ > struct r_a_iterator

@@ -108,8 +108,8 @@ public:
 		return current_blk->elem[current_elem];
 	}
 	
-  //! \brief Returns reference to the current record in the stream
-	//! \return reference to the current record in the stream
+    //! \brief Returns reference to the current record in the stream
+    //! \return reference to the current record in the stream
 	reference operator *() /* const */
 	{
 		return current_blk->elem[current_elem];

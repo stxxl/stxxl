@@ -19,9 +19,11 @@
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcontinternals
+//!
 //! \{
 
-//! \internal
+/*! \internal
+*/
 namespace priority_queue_local
 {
   
@@ -442,7 +444,8 @@ void merge4(
       size_type  size() const { return nelements; }
       
  protected:
-      //! \param first_size number of elements in the first block
+      /*! \param first_size number of elements in the first block
+ 		*/
       void insert_segment(std::list<bid_type> * segment, block_type * first_block, unsigned first_size)
       {
         STXXL_VERBOSE1("ext_merger::insert_segment(segment_bids,...) "<<this)

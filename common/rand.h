@@ -37,7 +37,7 @@ namespace stxxl
 	};
 	
 	//! \brief Slow and precise uniform [0,1] pseudo-random generator
-	
+	//!
 	//! \warning Seed is not the same as in the fast generator \c random_uniform_fast
 	struct random_uniform_slow
 	{
