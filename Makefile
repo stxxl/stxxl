@@ -4,6 +4,7 @@ include compiler.make
 
 lib:
 	cd io; $(MAKE) lib; cd ..
+	cd utils; $(MAKE) create ; cd ..
 	echo "Building library is completed."
 
 tests: lib

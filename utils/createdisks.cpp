@@ -90,7 +90,7 @@ int main(int argc, char * argv[])
   off_t offset = 0;
   std::vector<std::string> disks_arr;
 
-  for(i=1;i<argc - 1 ;i++)
+  for(i=1;i<unsigned(argc - 1) ;i++)
   {
     unlink(argv[i+1]);
   	std::cout << "Add disk: " << argv[i+1] << std::endl;
