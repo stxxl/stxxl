@@ -60,7 +60,7 @@ public:
   explicit write_pool(unsigned init_size=1):free_blocks_size(init_size),busy_blocks_size(0)
   {
     unsigned i = 0;
-    for(;i<init_size;i++)
+    for(;i<init_size;++i)
       free_blocks.push_back(new block_type);
   }
   //! \brief Waits for completion of all ongoing write requests and frees memory
@@ -75,7 +75,7 @@ public:
     }
     
     busy_blocks_iterator i2 = busy_blocks.begin();
-    for(;i2 != busy_blocks.end();i2++)
+    for(;i2 != busy_blocks.end();++i2)
     {
       i2->req->wait();
       delete i2->block;
@@ -114,12 +114,12 @@ public:
     }
     STXXL_VERBOSE1("write_pool::steal : all "<<busy_blocks_size<<" are busy")
     busy_blocks_iterator completed = wait_any(busy_blocks.begin(),busy_blocks.end());
-    
     assert(completed != busy_blocks.end()); // we got something reasonable from wait_any
     assert(completed->req->poll()); // and it is *really* completed
     block_type * p = completed->block;
     busy_blocks.erase(completed);
     --busy_blocks_size;
+    check_all_busy(); // for debug
     return p;
   }
   
@@ -150,7 +150,7 @@ public:
   request_ptr get_request(bid_type bid)
   {
     busy_blocks_iterator i2 = busy_blocks.begin();
-    for(;i2 != busy_blocks.end();i2++)
+    for(;i2 != busy_blocks.end();++i2)
     {
       if(i2->bid == bid)
         return i2->req;
@@ -162,7 +162,7 @@ public:
   block_type * steal(bid_type bid)
   {
     busy_blocks_iterator i2 = busy_blocks.begin();
-    for(;i2 != busy_blocks.end();i2++)
+    for(;i2 != busy_blocks.end();++i2)
     {
       if(i2->bid == bid)
       {
@@ -180,6 +180,25 @@ public:
   {
     free_blocks.push_back(block);
     ++free_blocks_size;
+  }
+protected:
+  void check_all_busy()
+  {
+    busy_blocks_iterator cur = busy_blocks.begin();
+    int cnt = 0,busy_blocks_size_old = busy_blocks_size;
+    for(;cur!=busy_blocks.end();++cur)
+    {
+      if(cur->req->poll())
+      {
+        free_block.push_back(cur->block);
+        busy_blocks.erase(cur);
+        ++cnt;
+        --busy_blocks_size;
+        ++free_blocks_size;
+      }
+    }
+    STXXL_VERBOSE1("write_pool::check_all_busy : "<<cnt<<
+      " are completed out of "<<busy_blocks_size_old<<" busy blocks")
   }
 };
  
