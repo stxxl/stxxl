@@ -237,13 +237,13 @@ namespace stream
   	{
 		if(end - begin < block_type::size )
 		{
-			STXXL_ERRMSG("Choosing iterator2stream<InputIterator_>")
+			STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator_>")
 			it_stream = new iterator2stream<InputIterator_>(begin, end);
 			vec_it_stream = NULL;
 		}
 		else
 		{
-			STXXL_ERRMSG("Choosing vector_iterator2stream<InputIterator_>")
+			STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing vector_iterator2stream<InputIterator_>")
 			it_stream = NULL;
 			vec_it_stream = new vector_iterator2stream<InputIterator_>(begin,end,nbuffers);
 		}
