@@ -5,7 +5,7 @@
  *            loosertree.h
  *
  *  Sat Aug 24 23:52:58 2002
- *  Copyright  2002  Roman Dementiev
+ *  Copyright  2002  Roman Dementiev, Peter Sanders
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 #include "../common/utils.h"
