@@ -651,7 +651,8 @@ public:
 				int page_no = _page_no[i];
 				if(non_free_pages[i])
 				{
-					STXXL_VERBOSE1("vector: flushing page "<<i<< " address: "<<(page_no*block_type::size*page_size));
+					STXXL_VERBOSE1("vector: flushing page "<<i<< " address: "<<(int64(page_no)*
+						int64(block_type::size)*int64(page_size)));
 					if(_page_status[page_no] & dirty)
 						write_page(page_no,i);
 				
