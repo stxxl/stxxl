@@ -192,6 +192,7 @@ protected:
       {
         free_blocks.push_back(cur->block);
         busy_blocks.erase(cur);
+        cur = busy_blocks.begin();
         ++cnt;
         --busy_blocks_size;
         ++free_blocks_size;
