@@ -126,7 +126,7 @@ private:
           regEntry[ (winnerIndex+(1<<LogK)) >> (((int(LogK-L)+1)>=0)?((LogK-L)+1):0) ];\
 				if( cmp(*currentE,*winnerE) )																								    \
 				{																																						    \
-					swap(regEntry[(winnerIndex+(1<<LogK))                                         \
+					std::swap(regEntry[(winnerIndex+(1<<LogK))                                         \
             >> (((int(LogK-L)+1)>=0)?((LogK-L)+1):0) ],winnerIndex);	                  \
 					winnerE = currentE;																												    \
 				}																																						    \
@@ -182,7 +182,7 @@ private:
 
 				if (cmp (*currentE, *winnerE))
 				{
-					swap (entry[i], winnerIndex);
+					std::swap (entry[i], winnerIndex);
 					winnerE = currentE;
 				}
 			}
