@@ -224,7 +224,7 @@ private:
 };
 
 
-//! \brief Efficient implementation that uses prefetching and overlapping.
+//! \brief Efficient implementation that uses prefetching and overlapping using internal buffers
 
 //! Use it if your access patttern consists of many repeated push'es and pop's
 //! For semantics of the methods see documentation of the STL \c std::vector.
@@ -401,7 +401,7 @@ public:
   
 };
 
-
+//! \brief Efficient implementation that uses prefetching and overlapping using (shared) buffers pools
 template <class Config_>
 class grow_shrink_stack2
 {
@@ -430,10 +430,14 @@ private:
   // for a moment forbid default construction
   grow_shrink_stack2();
 public:
+  //! \brief Constructs stack
+  //! \param p_pool_ prefetch pool, that will be used for block prefetching
+  //! \param w_pool_ write pool, that will be used for block writing
+  //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
   grow_shrink_stack2(
        prefetch_pool<block_type> & p_pool_,
        write_pool<block_type>    & w_pool_,
-       unsigned prefetch_aggressiveness):
+       unsigned prefetch_aggressiveness = 0):
        size_(0),
        cache_offset(0),
        cache(new block_type),
@@ -556,6 +560,9 @@ public:
       current = (*cache)[cache_offset - 1];
     --size_;
   }
+  //! \brief Sets level of prefetch aggressiveness (number 
+  //! of blocks from the prefetch pool used for prefetching)
+  //! \param new_p new value for the prefetch aggressiveness
   void set_prefetch_aggr(unsigned new_p)
   {
     if(pref_aggr > new_p)
@@ -580,7 +587,7 @@ public:
     }
     pref_aggr = new_p;
   }
-
+  //! \brief Returns number of blocks used for prefetching
   unsigned get_prefetch_aggr() const
   {
     return pref_aggr;
