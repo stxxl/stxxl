@@ -40,7 +40,7 @@ int main()
     assert(my_stack.top() == i);
     my_stack.pop();
     assert(my_stack.size() == i);
-    assert(my_stack.external() == (test_size >= critical_size));
+    assert(my_stack.external() == (test_size >= int(critical_size)));
   };
   
   STXXL_MSG("Test passed.")

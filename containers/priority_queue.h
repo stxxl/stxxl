@@ -1010,10 +1010,12 @@ protected:
   int getSize1( ) const { return ( buffer1 + BufferSize1) - minBuffer1; }
   int getSize2(int i) const { return &(buffer2[i][N])     - minBuffer2[i]; }
   
+    
   // forbidden cals
   priority_queue();
   priority_queue & operator = (const priority_queue &);  
 public:
+    
   //! \brief Constructs external priority queue object
   //! \param p_pool_ pool of blocks that will be used 
   //! for data prefetching for the disk<->memory transfers 
@@ -1024,10 +1026,16 @@ public:
   //! happenning in the priority queue. Larger pool size 
   //! helps to speed up operations.
   priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_);
+    
+  // not implemented yet
+  priority_queue(const priority_queue & );
+    
   virtual ~priority_queue();
+  
   //! \brief Returns number of elements contained
   //! \return number of elements contained
   size_type size() const;
+  
   //! \brief Returns true if queue has no elements
   //! \return \b true if queue has no elements, \b false otherwise
   bool empty() const { return (size()==0); }
@@ -1044,6 +1052,7 @@ public:
   //! \b Config_::comparator_type(Q.top(), x) is false. 
   //! Precondition: \c empty() is false.
   const value_type & top() const;
+  
   //! \brief Removes the element at the top
   //!
   //! Removes the element at the top of the priority_queue, that 
@@ -1051,6 +1060,7 @@ public:
   //! Precondition: \c empty() is \b false. 
   //! Postcondition: \c size() will be decremented by 1.
   void  pop();
+  
   //! \brief Inserts x into the priority_queue.
   //!
   //! Inserts x into the priority_queue. Postcondition: 

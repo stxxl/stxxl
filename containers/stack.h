@@ -627,12 +627,9 @@ private:
 
 public:
   migrating_stack(): int_impl(new int_stack_type()),ext_impl(NULL) {}
-  template <class stack_type>
-  migrating_stack(const stack_type & stack_)
-  {
-    STXXL_ERRMSG(__PRETTY_FUNCTION__ << " is NOT IMPLEMENTED, aborting.")
-    abort();
-  } 
+  // not implemented yet
+  template <class stack_type> 
+  migrating_stack(const stack_type & stack_);  
   //! \brief Returns true if current implementation is internal, otherwise false
   bool internal() 
   { 
@@ -713,27 +710,6 @@ public:
 
 //! \}
 
-/*
-template <class BaseStack>
-class stack: public BaseStack
-{
-public:
-  typedef typename BaseStack::cfg cfg;
-  typedef typename cfg::value_type value_type;
-  typedef typename cfg::alloc_strategy alloc_strategy;
-  typedef typename cfg::size_type size_type;
-  enum {  blocks_per_page = cfg::blocks_per_page,
-          block_size = cfg::block_size };
-  
-  stack() : BaseStack() {}
-    
-  //! \brief Construction from a stack
-  //! \param stack_ stack object (could be external or internal, important is that it must
-  //! have a copy constructor, \c top() and \c pop() methods )
-  template <class stack_type>
-  stack(const stack_type & stack_) : BaseStack(stack_) {} 
-};
-*/
 
 //! \addtogroup stlcont
 //! \{
