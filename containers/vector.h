@@ -459,6 +459,22 @@ public:
       }*/
       _size = n;
     }
+	void clear()
+	{	
+		_size = 0;
+		bm->delete_blocks(_bids.begin(),_bids.end());
+		
+        _bids.clear();
+		_page_status.clear();
+		_last_page.clear();
+		while(!_free_pages.empty())
+			_free_pages.pop();
+		
+		for(int i=0;i<n_pages;i++)
+			_free_pages.push(i);
+		
+		        
+	}
     void push_back(const_reference obj)
     {
       size_type old_size = _size;
@@ -574,6 +590,10 @@ public:
 				}
 			};
 		}
+		~vector()
+		{
+			bm->delete_blocks(_bids.begin(),_bids.end());
+		}
 private:
 		bids_container_iterator bid (const size_type & offset)
 		{
@@ -594,7 +614,7 @@ private:
 			int block_no = page_no*page_size;
 			int last_block = 	std::min(block_no + page_size,int(_bids.size()));
 			int i=cache_page*page_size,j=0;
-			for(;block_no < last_block; block_no++,i++,j++)
+			for(;block_no < last_block; ++block_no,++i,++j)
 				reqs[j] = _cache[i].read(_bids[block_no]);
 			wait_all(reqs,last_block - page_no*page_size);
 			delete [] reqs;
@@ -606,7 +626,7 @@ private:
 			int block_no = page_no*page_size;
 			int last_block = std::min(block_no + page_size,int(_bids.size()));
 			int i=cache_page*page_size,j=0;
-			for(;block_no < last_block; block_no++,i++,j++)
+			for(;block_no < last_block; ++block_no,++i,++j)
 			{
 				reqs[j] = _cache[i].write(_bids[block_no]);
 			}

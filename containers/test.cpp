@@ -62,6 +62,7 @@ int main()
 		assert(v[i] == rnd() );
 	}
 	
+	
 	/*
 	STXXL_MSG("rnd read")
 	i = v.size();
