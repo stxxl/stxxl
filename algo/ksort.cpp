@@ -14,7 +14,7 @@ struct my_type
 				
 	key_type _key;
 	key_type _key_copy;
-	char _data[128 - 2*sizeof(key_type)];
+	char _data[32 - 2*sizeof(key_type)];
 	key_type key() const {return _key; };
 							
 	my_type() {};
@@ -44,12 +44,12 @@ bool operator < (const my_type & a, const my_type & b)
 int main()
 {	
 		unsigned memory_to_use = 32*1024*1024;
-		typedef stxxl::VECTOR_GENERATOR<my_type,2,1>::result vector_type;
-		const stxxl::int64 n_records = 32*stxxl::int64(1024*1024)/sizeof(my_type);
+		typedef stxxl::VECTOR_GENERATOR<my_type,2,2>::result vector_type;
+		const stxxl::int64 n_records = 3*32*stxxl::int64(1024*1024)/sizeof(my_type);
 		vector_type v(n_records);
 	
 		random_number64 rnd;
-		STXXL_MSG("Filling vector... "<< rnd() <<" "<< rnd()<<" "<<rnd())
+		STXXL_MSG("Filling vector... ")
 		for(stxxl::int64 i=0; i < v.size(); i++)
 		{
 			v[i]._key = rnd();

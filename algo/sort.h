@@ -113,7 +113,7 @@ create_runs(
 	bid_type * bids = new bid_type[m2];
 	run_type * run;
 
-	//  STXXL_MSG("Creating runs")
+	//  STXXL_VERBOSE("Creating runs")
 	disk_queues::get_instance ()->set_priority_op(disk_queue::WRITE);
 
 	int i;
@@ -344,7 +344,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	block_manager *mng = block_manager::get_instance ();
 	int ndisks = cfg->disks_number ();
 	
-	//STXXL_MSG ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+"
+	//STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+"
 	//	   << partial_runs) 
 	
 #ifdef STXXL_IO_STATS
@@ -392,7 +392,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	while(nruns > 1)
 	{
 		int new_nruns = div_and_round_up(nruns,merge_factor);
-		STXXL_MSG("Starting new merge phase: nruns: "<<nruns<<
+		STXXL_VERBOSE("Starting new merge phase: nruns: "<<nruns<<
 			" opt_merge_factor: "<<merge_factor<<" m:"<<_m<<" new_nruns: "<<new_nruns)
 		
 		new_runs = new run_type *[new_nruns];
@@ -421,7 +421,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		while(runs_left > 0)
 		{
 				int runs2merge = STXXL_MIN(runs_left,merge_factor);
-				STXXL_MSG("Merging "<<runs2merge<<" runs")
+				STXXL_VERBOSE("Merging "<<runs2merge<<" runs")
 				merge_runs<block_type,run_type> (runs + nruns - runs_left, 
 						runs2merge ,*(new_runs + (cur_out_run++)),_m,cmp,
             _first_element_offset,_last_element_offset);
@@ -439,20 +439,20 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	
 	end = stxxl_timestamp ();
 
-	STXXL_MSG ("Elapsed time        : " << end - begin << " s. Run creation time: " << 
+	STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Run creation time: " << 
 	after_runs_creation - begin << " s")
 #ifdef STXXL_IO_STATS
-	STXXL_MSG ("reads               : " << iostats->get_reads ()) 
-	STXXL_MSG ("writes              : " << iostats->get_writes ())
-	STXXL_MSG ("read time           : " << iostats->get_read_time () << " s") 
-	STXXL_MSG ("write time          : " << iostats->get_write_time () <<" s")
-	STXXL_MSG ("parallel read time  : " << iostats->get_pread_time () << " s")
-	STXXL_MSG ("parallel write time : " << iostats->get_pwrite_time () << " s")
-	STXXL_MSG ("parallel io time    : " << iostats->get_pio_time () << " s")
+	STXXL_VERBOSE ("reads               : " << iostats->get_reads ()) 
+	STXXL_VERBOSE ("writes              : " << iostats->get_writes ())
+	STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s") 
+	STXXL_VERBOSE ("write time          : " << iostats->get_write_time () <<" s")
+	STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s")
+	STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s")
+	STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s")
 #endif
 #ifdef COUNT_WAIT_TIME
-	STXXL_MSG ("Time in I/O wait(rf): " << io_wait_after_rf << " s")
-	STXXL_MSG ("Time in I/O wait    : " << stxxl::wait_time_counter << " s")
+	STXXL_VERBOSE ("Time in I/O wait(rf): " << io_wait_after_rf << " s")
+	STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s")
 #endif
 	
 	return result;

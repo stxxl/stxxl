@@ -178,8 +178,8 @@ void
 create_runs(
 		input_bid_iterator it,
 		run_type ** runs,
-		int nruns,
-		int _m,
+		const unsigned nruns,
+		const unsigned m2,
 		key_extractor keyobj)
 {
 	typedef typename block_type::value_type type;
@@ -187,7 +187,6 @@ create_runs(
 	typedef type_key<type> type_key_;
 	typedef typename type_key_::key_type key_type;
 	
-	const int m2 = div_and_round_up(_m , 2);
 	block_manager *bm = block_manager::get_instance ();
 	block_type *Blocks1 = new block_type[m2];
 	block_type *Blocks2 = new block_type[m2];
@@ -204,7 +203,7 @@ create_runs(
 	key_type offset = 0;
 	const int log_k1 = static_cast<int>(ceil(log2(m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE)));
 	const int log_k2 = int(log2(m2 * Blocks1->size)) - log_k1 - 1;
-	STXXL_MSG("log_k1: "<<log_k1<<" log_k2:"<<log_k2)
+	STXXL_VERBOSE("log_k1: "<<log_k1<<" log_k2:"<<log_k2)
 	const int k1 = 1 << log_k1;
 	const int k2 = 1 << log_k2;
 	int *bucket1 = new int[k1];
@@ -412,6 +411,11 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 	
 	unsigned int m2 = div_and_round_up(_m,2);
+  const unsigned int m2_rf = m2 * block_type::raw_size / 
+    (block_type::raw_size + block_type::size*sizeof(type_key<type>));
+  STXXL_VERBOSE("Reducing number of blocks in a run from "<< m2 << " to "<<
+    m2_rf<<" due to key size: "<<sizeof(typename type::key_type)<<" bytes")
+  m2 = m2_rf;
 	unsigned int full_runs = _n / m2;
 	unsigned int partial_runs = ((_n % m2) ? 1 : 0);
 	unsigned int nruns = full_runs + partial_runs;
@@ -421,7 +425,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	block_manager *mng = block_manager::get_instance ();
 	int ndisks = cfg->disks_number ();
 	
-	STXXL_MSG ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs) 
+	STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs) 
 	
 #ifdef STXXL_IO_STATS
 	stats *iostats = stats::get_instance ();
@@ -466,12 +470,11 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 												trigger_entry_iterator<trigger_entry_type,block_type::raw_size>(runs[i]->end())	);
 		}
 #endif
-	
-	
+	  
 	create_runs< block_type,
 							 run_type,
 							 input_bid_iterator,
-							 key_extractor> (input_bids, runs, nruns,_m,keyobj);
+							 key_extractor> (input_bids, runs, nruns,m2,keyobj);
 
 	after_runs_creation = stxxl_timestamp ();
 		
@@ -480,110 +483,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 #endif
 
 	disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
-
-	#ifndef OPT_MERGING
-		
-	unsigned int full_runsize = m2;
-	run_type **new_runs;
-
-	while (nruns > 1)
-	{
-		STXXL_MSG("Starting new merging phase")
-		full_runsize = full_runsize * _m;
-		unsigned int new_full_runs = _n / full_runsize;
-		unsigned int new_partial_runs = ((_n % full_runsize) ? 1 : 0);
-		unsigned int new_nruns = new_full_runs + new_partial_runs;
-
-		new_runs = new run_type *[new_nruns];
-
-		for (i = 0; i < new_full_runs; i++)
-			new_runs[i] = new run_type (full_runsize);
-
-		if (nruns - new_full_runs * _m == 1)
-		{
-			// case where one partial run is left to be sorted
-			//      STXXL_MSG("case where one partial run is left to be sorted")
-			new_runs[i] = new run_type (_n - full_runsize * new_full_runs);
-			
-			run_type *tmp = runs[new_full_runs * _m];
-			std::copy (tmp->begin (), tmp->end (),
-				   new_runs[i]->begin ());
-
-			mng->new_blocks (interleaved_alloc_strategy
-					 (new_nruns - 1, 0, ndisks),
-					 RunsToBIDArrayAdaptor <
-					 block_type::raw_size,run_type > (new_runs, 0,
-							    new_nruns - 1),
-					 RunsToBIDArrayAdaptor <
-					 block_type::raw_size,run_type > (new_runs,
-							    new_full_runs *
-							    full_runsize,
-							    new_nruns - 1));
-
-			
-			for (i = 0; i < new_full_runs; i++)
-			{
-				merge_runs<block_type,run_type,key_extractor> (runs + i * _m, _m,*(new_runs + i),_m,keyobj);
-			}
-
-		}
-		else
-		{
-
-			//allocate output blocks
-			if (new_partial_runs)
-			{
-				unsigned int last_run_size =
-					_n - full_runsize * new_full_runs;
-				new_runs[i] = new run_type (last_run_size);
-
-				mng->new_blocks (interleaved_alloc_strategy
-						 (new_nruns, 0, ndisks),
-						 RunsToBIDArrayAdaptor2 <
-						 block_type::raw_size,run_type > (new_runs,
-								    0,
-								    new_nruns,
-								    last_run_size),
-						 RunsToBIDArrayAdaptor2 <
-						 block_type::raw_size,run_type > (new_runs,
-								    _n,
-								    new_nruns,
-								    last_run_size));
-			}
-			else
-				mng->new_blocks (interleaved_alloc_strategy
-						 (new_nruns, 0, ndisks),
-						 RunsToBIDArrayAdaptor <
-						 block_type::raw_size,run_type > (new_runs,
-								    0,
-								    new_nruns),
-						 RunsToBIDArrayAdaptor <
-						 block_type::raw_size,run_type > (new_runs,
-								    _n,
-								    new_nruns));
-
-
-			//      STXXL_MSG("Output runs:" << new_nruns << "=" << new_full_runs << "+" << new_partial_runs)
-			for (i = 0; i < new_full_runs; i++)
-			{
-				//        STXXL_MSG("Merge of m ("<< _m <<") runs")
-				merge_runs<block_type,run_type,key_extractor>(runs + i * _m, _m, *(new_runs + i),_m,keyobj);
-			}
-
-			if (new_partial_runs)
-			{
-				//      STXXL_MSG("Partial merge of "<< (nruns - i*_m) <<" runs")
-				merge_runs<block_type,run_type,key_extractor>(runs + i * _m, nruns - i * _m,*(new_runs + i),_m,keyobj);
-			}
-
-		}
-
-		nruns = new_nruns;
-		delete[]runs;
-		runs = new_runs;
-
-	}
-	#else
+    
 	// Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) at once
 		
 	const int merge_factor = static_cast<int>(ceil(pow(nruns,1./ceil(log(nruns)/log(_m)))));
@@ -592,7 +492,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	while(nruns > 1)
 	{
 		int new_nruns = div_and_round_up(nruns,merge_factor);
-		STXXL_MSG("Starting new merge phase: nruns: "<<nruns<<
+		STXXL_VERBOSE("Starting new merge phase: nruns: "<<nruns<<
 			" opt_merge_factor: "<<merge_factor<<" m:"<<_m<<" new_nruns: "<<new_nruns)
 		
 		new_runs = new run_type *[new_nruns];
@@ -621,7 +521,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		while(runs_left > 0)
 		{
 				int runs2merge = STXXL_MIN(runs_left,merge_factor);
-				STXXL_MSG("Merging "<<runs2merge<<" runs")
+				STXXL_VERBOSE("Merging "<<runs2merge<<" runs")
 				merge_runs<block_type,run_type,key_extractor> (runs + nruns - runs_left, 
 						runs2merge ,*(new_runs + (cur_out_run++)),_m,keyobj);
 				runs_left -= runs2merge;
@@ -631,27 +531,27 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		delete [] runs;
 		runs = new_runs;
 	}
-	#endif
+	
 	
 	run_type * result = *runs;
 	delete [] runs;
 	
 	end = stxxl_timestamp ();
 
-	STXXL_MSG ("Elapsed time        : " << end - begin << " s. Run creation time: " << 
+	STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Run creation time: " << 
 	after_runs_creation - begin << " s")
 #ifdef STXXL_IO_STATS
-	STXXL_MSG ("reads               : " << iostats->get_reads ()) 
-	STXXL_MSG ("writes              : " << iostats->get_writes ())
-	STXXL_MSG ("read time           : " << iostats->get_read_time () << " s") 
-	STXXL_MSG ("write time          : " << iostats->get_write_time () <<" s")
-	STXXL_MSG ("parallel read time  : " << iostats->get_pread_time () << " s")
-	STXXL_MSG ("parallel write time : " << iostats->get_pwrite_time () << " s")
-	STXXL_MSG ("parallel io time    : " << iostats->get_pio_time () << " s")
+	STXXL_VERBOSE ("reads               : " << iostats->get_reads ()) 
+	STXXL_VERBOSE ("writes              : " << iostats->get_writes ())
+	STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s") 
+	STXXL_VERBOSE ("write time          : " << iostats->get_write_time () <<" s")
+	STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s")
+	STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s")
+	STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s")
 #endif
 #ifdef COUNT_WAIT_TIME
-	STXXL_MSG ("Time in I/O wait(rf): " << io_wait_after_rf << " s")
-	STXXL_MSG ("Time in I/O wait    : " << stxxl::wait_time_counter << " s")
+	STXXL_VERBOSE ("Time in I/O wait(rf): " << io_wait_after_rf << " s")
+	STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s")
 #endif
 	
 	return result; 

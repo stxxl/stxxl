@@ -20,8 +20,8 @@ genfile:
 sortfile:
 	$(GCC) sort_file.cpp -o sort_file $(STXXL_OBJ)
 
-ksort:
-	$(GCC) ksort.cpp -o ksort $(STXXL_OBJ)
+ksort: ksort.cpp ksort.h
+	$(GCC) ksort.cpp -o ksort $(STXXL_OBJ) -DSTXXL_VERBOSE_LEVEL=1
 
 stable:
 	$(GCC) stable_ksort.cpp -o stable_ksort $(STXXL_OBJ) -DCOUNT_WAIT_TIME
