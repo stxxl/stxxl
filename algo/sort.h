@@ -258,7 +258,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 						copy_start	);
 	}
 	
-	std::sort(consume_seq.begin (), consume_seq.end (),
+	std::stable_sort(consume_seq.begin (), consume_seq.end (),
 					trigger_entry_cmp<bid_type,value_type,value_cmp>(cmp));
 
 	int disks_number = config::get_instance ()->disks_number ();

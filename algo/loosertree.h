@@ -61,23 +61,25 @@ public:
 		int i;
 		logK = static_cast < int >(ceil (log (nruns) / log (2.)));	// replace with something smart
 		int kReg = k = (1 << logK);
+		
+		STXXL_VERBOSE2("looser_tree: logK="<<logK<<" nruns="<<nruns<<" K="<<kReg)
     
     #ifdef STXXL_SORT_SINGLE_PREFETCHER
 		current = new run_cursor_type[kReg];
-    run_cursor_type::prefetcher() = p;
+    	run_cursor_type::prefetcher() = p;
     #else
-    current = new run_cursor_type[kReg](p);
+    	current = new run_cursor_type[kReg](p);
     #endif
 		entry = new int[(kReg << 1)];
 		// init cursors
-		for (i = 0; i < nruns; i++)
+		for (i = 0; i < nruns; ++i)
 		{
 			current[i].buffer = p->pull_block();
-			current[i].pos = 0;
+			//current[i].pos = 0; // done in constructor
 			entry[kReg + i] = i;
 		}
 
-		for (i = nruns; i < kReg; i++)
+		for (i = nruns; i < kReg; ++i)
 		{
 			current[i].make_inf ();
 			entry[kReg + i] = i;
@@ -98,7 +100,7 @@ private:
 		run_cursor_type *currentE, *winnerE;
 		int *regEntry = entry;
 		value_type *done = to + buffer_size;
-		int winnerIndex = entry[0];
+		int winnerIndex = regEntry[0];
 
 		while (LIKELY (to < done))
 		{
@@ -139,6 +141,17 @@ private:
 		regEntry[0] = winnerIndex;
 		
 	};
+	
+	void multi_merge_unrolled_0 (value_type * to)
+	{
+		const value_type *done = to + buffer_size;
+		while (to < done)
+		{
+			*to = current->current ();
+			++to;
+			(*current)++;
+		}
+	};
 
 	void multi_merge_k (value_type * to)
 	{
@@ -174,6 +187,12 @@ public:
 	{
 		switch (logK)
 		{
+		case 0:
+			multi_merge_unrolled_0 (to);
+			break;
+		case 1:
+			multi_merge_unrolled < 1 > (to);
+			break;
 		case 2:
 			multi_merge_unrolled < 2 > (to);
 			break;

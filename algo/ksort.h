@@ -333,7 +333,7 @@ void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned
 						in_runs[i]->end (),
 						copy_start	);
 	}
-	std::sort (consume_seq.begin (), consume_seq.end ());
+	std::stable_sort (consume_seq.begin (), consume_seq.end ());
 
 	unsigned disks_number = config::get_instance()->disks_number ();
 	

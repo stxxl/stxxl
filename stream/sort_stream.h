@@ -79,6 +79,7 @@ namespace stream
     
     runs_creator();// default construction is forbidden
     runs_creator(const runs_creator & );// copy construction is forbidden
+  	runs_creator & operator = (const runs_creator &); // copying is forbidden
     
     
     void compute_result();
@@ -348,6 +349,7 @@ namespace stream
  
     runs_creator();// default construction is forbidden
     runs_creator(const runs_creator & );// copy construction is forbidden
+    runs_creator & operator = (const runs_creator &); // copying is forbidden
     
   public:
     //! \brief Creates the object
@@ -538,11 +540,15 @@ namespace stream
     prefetcher_type * prefetcher;
     looser_tree_type * loosers;
     int * prefetch_seq;
+	#ifdef STXXL_CHECK_ORDER_IN_SORTS
+	typename block_type::value_type last_element;
+	#endif
     
     void merge_recursively();
     
     runs_merger(); // forbidden
     runs_merger(const runs_merger &); // forbidden
+	runs_merger & operator = (const runs_merger &); // copying is forbidden
   public:
     //! \brief Standard stream typedef
     typedef typename sorted_runs_type::value_type value_type;
@@ -554,7 +560,15 @@ namespace stream
     runs_merger(const sorted_runs_type & r,value_cmp c,unsigned memory_to_use):
       sruns(r),m_(memory_to_use/block_type::raw_size /* - 1 */),cmp(c),
       elements_remaining(r.elements)
+  #ifdef STXXL_CHECK_ORDER_IN_SORTS
+  		,last_element(cmp.min_value())
+  #endif
     {
+		
+	 #ifdef STXXL_CHECK_ORDER_IN_SORTS
+	 assert(check_sorted_runs(r,c));
+	 #endif
+		
       disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
       
       unsigned nruns = sruns.runs.size();
@@ -565,7 +579,7 @@ namespace stream
         // merge recursively:
         STXXL_ERRMSG("An implementation requires more than one merge pass, therefore for a better")
         STXXL_ERRMSG("efficiency decrease block size of run storage (a parameter of the run_creator)")
-        STXXL_ERRMSG("or increase the ammount memory dedicated to the merger.")
+        STXXL_ERRMSG("or increase the amount memory dedicated to the merger.")
         STXXL_ERRMSG("m = "<< m_<<" nruns="<<nruns)
         
         merge_recursively();
@@ -599,13 +613,14 @@ namespace stream
                 copy_start	);
       }
       
-      std::sort(consume_seq.begin (), consume_seq.end (),
+      std::stable_sort(consume_seq.begin (), consume_seq.end (),
               sort_local::trigger_entry_cmp<bid_type,value_type,value_cmp>(cmp));
     
       int disks_number = config::get_instance ()->disks_number ();
       
       const int n_prefetch_buffers = std::max( 2 * disks_number , (int(m_) - int(nruns)) );
     
+	  
       #ifdef SORT_OPT_PREFETCHING
       // heuristic
       const int n_opt_prefetch_buffers = 2 * disks_number + (3*(n_prefetch_buffers - 2 * disks_number))/10;
@@ -657,11 +672,22 @@ namespace stream
         if(!empty())
         {
           loosers->multi_merge(current_block.elem);
+		  #ifdef STXXL_CHECK_ORDER_IN_SORTS
+		  assert(is_sorted(current_block.elem,current_block.elem +current_block.size,cmp));
+		  assert(!cmp(current_block.elem[0],current_value));
+		  #endif 
           current_value = current_block.elem[0];  
           buffer_pos = 1;
         }
       }
       
+	  #ifdef STXXL_CHECK_ORDER_IN_SORTS
+	  if(!empty())
+	  {
+		 assert(!cmp(current_value,last_element));
+	  	 last_element = current_value;
+	  }
+	  #endif
       
       return *this;
     }
@@ -869,7 +895,9 @@ namespace stream
     //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
     sort(Input_ & in,Cmp_ c,unsigned memory_to_use):
       creator(in,c,memory_to_use),
-      merger(creator.result(),c,memory_to_use) {}
+      merger(creator.result(),c,memory_to_use)
+  {
+  }
         
     //! \brief Standard stream method
     const value_type & operator * () const

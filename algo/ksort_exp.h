@@ -562,8 +562,6 @@ merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
 {
 	typedef prefetcher_writer<run_type,block_type,run_cursor_type,
 		run_cursor2_type,trigger_entry_type> prefetcher_writer_type;
-	
-	
 
 	int i;
 	run_type consume_seq(out_run->size());
@@ -581,7 +579,7 @@ merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
 						in_runs[i]->end (),
 						copy_start	);
 	}
-	std::sort (consume_seq.begin (), consume_seq.end ());
+	std::stable_sort (consume_seq.begin (), consume_seq.end ());
 
 	int disks_number = config::get_instance ()->disks_number ();
 	

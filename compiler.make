@@ -52,4 +52,8 @@ STXXL_OBJ = $(STXXL_LIB)
 # for example: g++ external_MST.cpp -o MST $(STXXL_VARS)
 STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB) -ftemplate-depth-65000
 
+#
+# for automatical checking of order of the pipelined sorters
+# use -DSTXXL_CHECK_ORDER_IN_SORTS compile option
+#
 

@@ -18,6 +18,8 @@ struct run_cursor
 {
 	unsigned int pos;
 	block_type *buffer;
+	
+	run_cursor(): pos(0),buffer(NULL){}
 
 	inline const typename block_type::type & current () const
 	{
@@ -86,6 +88,7 @@ template <typename block_type,
 					typename prefetcher_type>
 void run_cursor2<block_type,prefetcher_type>::operator ++ (int)
 {
+	assert(!empty());
 	pos++;
 	if (UNLIKELY(pos >= block_type::size))
 	{
@@ -94,16 +97,15 @@ void run_cursor2<block_type,prefetcher_type>::operator ++ (int)
 };
 
 
-
 template <typename block_type>
 struct run_cursor_cmp
 {
 	typedef run_cursor<block_type> cursor_type;
-	
+	/*
 	inline bool operator  () (const cursor_type & a, const cursor_type & b)	// greater or equal
 	{
 		return !((*a.buffer)[a.pos] < (*b.buffer)[b.pos]);
-	};
+	}*/
 };
 
 __STXXL_END_NAMESPACE
