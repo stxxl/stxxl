@@ -7,6 +7,7 @@
 #include "containers/vector.h"
 #include "containers/stack.h"
 #include "containers/priority_queue.h"
+#include "containers/map.h"
 
 #include "stream/stream.h"
 #include "stream/sort_stream.h"

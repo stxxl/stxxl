@@ -18,3 +18,11 @@ tests: lib
 	cd algo; $(MAKE); cd ..
 	cd stream; $(MAKE); cd ..
 	echo "Building tests is completed."
+	
+clean:
+	cd io; $(MAKE) clean; cd ..
+	cd mng; $(MAKE) clean; cd ..
+	cd containers; $(MAKE) clean; cd ..
+	cd algo; $(MAKE) clean; cd ..
+	cd stream; $(MAKE) clean; cd ..
+	echo "Cleaning completed"

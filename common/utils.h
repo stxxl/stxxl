@@ -70,7 +70,9 @@ stxxl_perror (const char *errmsg, int errcode)
 	exit (errcode);
 }
 
+#ifndef STXXL_DEBUG_ON
 #define STXXL_DEBUG_ON
+#endif
 
 #ifdef STXXL_DEBUG_ON
 

@@ -22,8 +22,10 @@ MNG_LAYER_FILES = ../mng/adaptor.h  ../mng/async_schedule.h  ../mng/block_prefet
 ../mng/buf_istream.h  ../mng/buf_ostream.h  ../mng/buf_writer.h  ../mng/mng.h \
 ../mng/write_pool.h ../mng/prefetch_pool.h
 
+CONTAINER_MAP_FILES = $(STXXL_ROOT)/containers/map.impl/*.h
+
 CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/vector.h \
-../containers/priority_queue.h
+../containers/priority_queue.h $(CONTAINER_MAP_FILES)
 
 ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/run_cursor.h \
 ../algo/sort.h ../algo/async_schedule.h ../algo/interleaved_alloc.h ../algo/ksort.h \
@@ -51,6 +53,8 @@ DEBUG =  # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3
 # this variable is used internally for development compilations
 GCC=$(COMPILER) -Wall $(LARGE_FILE) $(NO_OVR) $(OPT) $(PROF) $(DEBUG) $(STXXL_SPECIFIC) # -ftemplate-depth-65000
 
+# this variable is used internally for development debug compilations
+DGCC=$(COMPILER) -g -Wall $(LARGE_FILE) $(NO_OVR) $(PROF) $(DEBUG) $(STXXL_SPECIFIC) # -ftemplate-depth-65000
 
 STXXL_LIB = -lpthread -lstxxl -L$(STXXL_ROOT)/io/
 
