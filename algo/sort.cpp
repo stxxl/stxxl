@@ -54,7 +54,7 @@ int main()
 		const stxxl::int64 n_records = 4*32*1024*1024/sizeof(my_type) - 2*1024*1024/sizeof(my_type);
 		vector_type v(n_records);
 	
-    	random_number32 rnd;
+    		random_number32 rnd;
 		STXXL_MSG("Filling vector...")
 		for(stxxl::int64 i=0; i < v.size(); i++)
 			v[i]._key = 1 + (rnd()%0xffff);

@@ -48,7 +48,7 @@ inline void * aligned_alloc (size_t size)
 		abort();
 	}
 	STXXL_VERBOSE1("stxxl::aligned_alloc<"<<ALIGNMENT <<
-		">() POSIX VERSION sking for "<<size<<
+		">() POSIX VERSION asking for "<<size<<
 	    " bytes,  returning block starting at "<<result);
 	
 	return result;
