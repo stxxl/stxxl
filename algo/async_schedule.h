@@ -11,6 +11,8 @@
 #include "../io/io.h"
 #include "../common/utils.h"
 #include <queue>
+#include <ext/hash_map>
+#include <ext/hash_set>
 #include <algorithm>
 
 __STXXL_BEGIN_NAMESPACE
@@ -289,13 +291,17 @@ void simulate_async_write(
 	typedef std::priority_queue<sim_event,std::vector<sim_event>,sim_event_cmp> event_queue_type;
 	typedef std::queue<int> disk_queue_type;
 	
-	disk_queue_type * disk_queues = new disk_queue_type[L];
+	//disk_queue_type * disk_queues = new disk_queue_type[L];
+	typedef __gnu_cxx::hash_map<int,disk_queue_type> disk_queues_type;
+	disk_queues_type  disk_queues;
 	event_queue_type event_queue;
 	
 	int m = m_init;
 	int i = L - 1;
     int oldtime = 0;
-    bool * disk_busy = new bool [D];
+    //bool * disk_busy = new bool [D];
+	__gnu_cxx::hash_set<int> disk_busy;
+	
 		       
 	while(m && (i>=0))
 	{
@@ -305,6 +311,7 @@ void simulate_async_write(
 		m--;
 	}
 	
+	/*
 	for(int i=0;i<D;i++)
 		if(!disk_queues[i].empty())
 		{
@@ -312,6 +319,14 @@ void simulate_async_write(
 			disk_queues[i].pop();
 			event_queue.push(sim_event(1,j));
 		}
+	*/
+	disk_queues_type::iterator it = disk_queues.begin();
+	for(;it != disk_queues.end(); ++it)
+	{
+		int j = (*it).second.front();
+		(*it).second.pop();
+		event_queue.push(sim_event(1,j));
+	}
 	
 	while(! event_queue.empty())
 	{
@@ -320,9 +335,10 @@ void simulate_async_write(
 		if(oldtime != cur.timestamp)
     {
 			// clear disk_busy
-			for(int i=0;i<D;i++)
-				disk_busy[i] = false;
-			
+			//for(int i=0;i<D;i++)
+			//	disk_busy[i] = false;
+			disk_busy.clear();	
+		
 			oldtime = cur.timestamp;
     }
 		o_time[cur.iblock] = std::pair<int,int>(cur.iblock,cur.timestamp + 1);
@@ -332,14 +348,14 @@ void simulate_async_write(
 		{
 			m--;
 			int disk = (*(input + i)).storage->get_disk_number();
-			if(disk_busy[disk])
+			if(disk_busy.find(disk)!=disk_busy.end())
 			{
 				disk_queues[disk].push(i);
 			}
 			else
 			{
 				event_queue.push(sim_event(cur.timestamp + 1, i));
-				disk_busy[disk] = true;
+				disk_busy.insert(disk);
 			}	
 			
 			i--;
@@ -347,17 +363,17 @@ void simulate_async_write(
 		
 		// add next block to write
 		int disk = (*(input + cur.iblock)).storage->get_disk_number();
-		if(!disk_busy[disk] && !disk_queues[disk].empty())
+		if(disk_busy.find(disk)==disk_busy.end() && !disk_queues[disk].empty())
 		{
 			event_queue.push(sim_event(cur.timestamp + 1,disk_queues[disk].front()));
 			disk_queues[disk].pop();
-			disk_busy[disk] = true;
+			disk_busy.insert(disk);
 		}
 		
 	};
 	
-	delete [] disk_busy;
-	delete [] disk_queues;
+	//delete [] disk_busy;
+	//delete [] disk_queues;
 }
 
 
@@ -369,8 +385,10 @@ void compute_prefetch_schedule(
 		int m,
 		int D)
 {
+	
 	typedef std::pair<int,int>  pair_type;
 	const int L = input_end - input_begin;
+	STXXL_VERBOSE1("compute_prefetch_schedule: sequence length="<<L<<" disks="<<D)
 	if(L <= D)
 	{
 		for(int i=0;i<L;++i) out_first[i] = i;

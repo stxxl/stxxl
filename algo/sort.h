@@ -87,6 +87,18 @@ namespace sort_local
 		};
 	};
 
+template <typename block_type,typename bid_type>
+struct write_completion_handler1
+{
+	block_type * block;
+	bid_type bid;
+	request_ptr * req;
+	void operator () (request * completed_req)
+	{
+		*req = block->read(bid);
+	}
+};
+	
 	
 template <
 					typename block_type,
@@ -113,6 +125,8 @@ create_runs(
   	request_ptr * read_reqs2 = new request_ptr[m2];
 	request_ptr * write_reqs = new request_ptr[m2];
 	bid_type * bids = new bid_type[m2];
+	write_completion_handler1<block_type,bid_type> * next_run_reads = 
+		new write_completion_handler1<block_type,bid_type>[m2];
 	run_type * run;
 
 	disk_queues::get_instance ()->set_priority_op(disk_queue::WRITE);
@@ -128,6 +142,7 @@ create_runs(
 	assert(run_size == m2);
   	for(i = 0; i < run_size; ++i)
   	{
+		STXXL_VERBOSE1("stxxl::create_runs posting read "<<long(Blocks1[i].elem))
     	bids[i] = *(it++);
     	read_reqs1[i] = Blocks1[i].read(bids[i]);
   	}
@@ -135,6 +150,18 @@ create_runs(
   	for (i = 0; i < run_size; ++i)
 		bm->delete_block(bids[i]);
   
+	run_size = runs[1]->size();
+
+	for(i = 0; i < run_size; ++i)
+	{
+	  STXXL_VERBOSE1("stxxl::create_runs posting read "<<long(Blocks2[i].elem))
+	  bids[i] = *(it++);
+	  read_reqs2[i] = Blocks2[i].read(bids[i]);
+	}
+	
+	for (i = 0; i < run_size; ++i)
+		bm->delete_block(bids[i]);	
+	
 	for(k=0; k < nruns-1; ++k)
 	{
 		run = runs[k];
@@ -143,18 +170,10 @@ create_runs(
     	next_run_size = runs[k+1]->size();
 		assert( (next_run_size == m2)|| (next_run_size <= m2 && k==nruns-2));
 
-		for(i = 0; i < next_run_size; ++i)
-      	{
-          bids[i] = *(it++);
-          read_reqs2[i] = Blocks2[i].read(bids[i]);
-      	}
-		
-		for (i = 0; i < next_run_size; ++i)
-        	bm->delete_block(bids[i]);
 
-
+		STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1")
 		wait_all(read_reqs1, run_size);
-
+		STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1")
 		
 		if(block_type::has_filler)
 		      std::sort(
@@ -168,12 +187,36 @@ create_runs(
 		else 
 			std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
 
+		STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs")
 		if(k) wait_all(write_reqs, m2);
+		STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs")
 
-		for (i = 0; i < m2; ++i)
-		{
-			(*run)[i].value = Blocks1[i][0];
-			write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
+		if(k == nruns-2)
+		{  // do not need to post read of run k+1
+			for (i = 0; i < m2; ++i)
+			{
+				STXXL_VERBOSE1("stxxl::create_runs posting write "<<long(Blocks1[i].elem))
+				(*run)[i].value = Blocks1[i][0];
+				write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
+			}
+		}
+		else
+		{   // do need to post read of run k+1
+			int runplus2size = runs[k+2]->size();
+			for (i = 0; i < m2; ++i)
+			{
+				STXXL_VERBOSE1("stxxl::create_runs posting write "<<long(Blocks1[i].elem))
+				(*run)[i].value = Blocks1[i][0];
+				if(i >= runplus2size)
+					write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
+				else
+				{
+					next_run_reads[i].block = Blocks1 + i;
+					next_run_reads[i].req = read_reqs1 +i;
+					bm->delete_block(next_run_reads[i].bid = *(it++));
+					write_reqs[i] = Blocks1[i].write ((*run)[i].bid, next_run_reads[i]);
+				}
+			}
 		}
 		std::swap (Blocks1, Blocks2);
     	std::swap (read_reqs1, read_reqs2);
@@ -181,8 +224,9 @@ create_runs(
 
   run = runs[k];
   run_size = run->size();
+  STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1")
   wait_all(read_reqs1, run_size);
-  
+  STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1")
   
   if(block_type::has_filler)
 		      std::sort(  
@@ -195,15 +239,21 @@ create_runs(
                         cmp);
 		else 
 			std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
-  
+    
+	STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs")
   	wait_all(write_reqs, m2);
+	STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs")
+	
   	for (i = 0; i < run_size; ++i)
 	{
+			STXXL_VERBOSE1("stxxl::create_runs posting write "<<long(Blocks1[i].elem))
 			(*run)[i].value = Blocks1[i][0];
 			write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
 	}
-	wait_all(write_reqs, run_size);
 
+	STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs")
+	wait_all(write_reqs, run_size);
+    STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs")
 
 	delete [] Blocks1;
 	delete [] Blocks2;
@@ -211,7 +261,7 @@ create_runs(
   	delete [] read_reqs2;
 	delete [] write_reqs;
 	delete [] bids;
-	
+	delete [] next_run_reads;
 }
 
 

@@ -56,6 +56,7 @@ protected:
 	
 	block_type * wait(int iblock)
 	{	
+		STXXL_VERBOSE1("block_prefetcher: waiting block "<<iblock);
 		START_COUNT_WAIT_TIME
 		
 		#ifdef NO_OVERLAPPING
@@ -64,7 +65,9 @@ protected:
 		
 		completed[iblock].wait_for_on();
 		END_COUNT_WAIT_TIME
+		STXXL_VERBOSE1("block_prefetcher: finished waiting block "<<iblock);
 		int ibuffer = pref_buffer[iblock];
+		STXXL_VERBOSE1("block_prefetcher: returning buffer "<<ibuffer);
 		assert(ibuffer >= 0 && ibuffer < nreadblocks );
 		return (read_buffers + ibuffer); 
 	}
@@ -104,7 +107,8 @@ public:
 		
 		for (i = 0; i < nreadblocks; ++i)
 		{
-      		STXXL_VERBOSE2("block_prefetcher: reading block "<<i);
+      		STXXL_VERBOSE1("block_prefetcher: reading block "<<i
+				<<" prefetch_seq["<<i<<"]="<<prefetch_seq[i]);
 			assert( prefetch_seq[i] < int(seq_length));
       		assert( prefetch_seq[i] >= 0 );
 			read_reqs[i] = read_buffers[i].read (
@@ -118,6 +122,7 @@ public:
 	//! \return Pointer to the already prefetched block from the internal buffer pool
 	block_type * pull_block()
 	{
+		STXXL_VERBOSE1("block_prefetcher: pulling a block");
 		return wait(nextconsume++);
 	}
 	//! \brief Exchanges buffers between prefetcher and application
@@ -128,6 +133,7 @@ public:
 	bool block_consumed(block_type * & buffer)
 	{
 		int ibuffer = buffer - read_buffers;
+		STXXL_VERBOSE1("block_prefetcher: buffer "<<ibuffer<<" consumed");
 		if(read_reqs[ibuffer].valid()) read_reqs[ibuffer]->wait();
 		read_reqs[ibuffer] = NULL;
 		
@@ -135,6 +141,7 @@ public:
 		{
 			assert(ibuffer >=0 && ibuffer <nreadblocks);
 			int next_2_prefetch = prefetch_seq[nextread++];
+			STXXL_VERBOSE1("block_prefetcher: prefetching block "<<next_2_prefetch);
 			
 			assert(next_2_prefetch <int(seq_length) && next_2_prefetch >= 0 );
 			assert( !completed[next_2_prefetch].is_on() );
