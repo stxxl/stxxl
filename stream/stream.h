@@ -15,7 +15,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-
+//! \brief Stream package subnamespace
 namespace stream
 {
   //! \weakgroup streampack Stream package
@@ -23,6 +23,8 @@ namespace stream
   //! and scans of the external data avoiding the saving the intermediate
   //! results on the disk, e.g. the output of a sort can be directly
   //! fed into a scan procedure without the need to save it on a disk.
+  //! All components of the package are contained in the \c stxxl::stream 
+  //! namespace.
   //!
   //!    STREAM ALGORITHM CONCEPT (Do not confuse with C++ input/output streams)
   //!
