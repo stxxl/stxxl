@@ -50,11 +50,11 @@ int main()
 	stxxl::generate(v.begin(),v.end(),counter<int64>(),4);	
 	
 	
-	STXXL_MSG("for_each ...")
+	STXXL_MSG("for_each_m ...")
 	b = stxxl_timestamp();
-	stxxl::for_each(v.begin(),v.end(),square<int64>(),4);
+	stxxl::for_each_m(v.begin(),v.end(),square<int64>(),4);
 	e = stxxl_timestamp();
-	STXXL_MSG("for_each time: "<<(e-b))
+	STXXL_MSG("for_each_m time: "<<(e-b))
 	
 	
 	STXXL_MSG("check")

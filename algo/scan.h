@@ -28,6 +28,55 @@ template <typename _ExtIterator,typename _UnaryFunction>
 _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int nbuffers)
 {
 	typedef buf_istream<typename _ExtIterator::block_type,typename _ExtIterator::bids_container_iterator> buf_istream_type;
+	
+	_begin.flush(); // flush container
+	
+	// create prefetching stream, 
+	buf_istream_type in(_begin.bid(),_end.bid() + ((_end.block_offset())?1:0),nbuffers/2); 
+	
+	_ExtIterator _cur = _begin - _begin.block_offset();
+	
+	// leave part of the block before _begin untouched (e.g. copy)
+	for( ;_cur != _begin;++_cur)
+	{
+		typename _ExtIterator::value_type tmp;
+		in >> tmp;
+	}
+	
+	// apply _functor to the range [_begin,_end)
+	for( ;_cur != _end;++_cur)
+	{
+		typename _ExtIterator::value_type tmp;
+		in >> tmp;
+		_functor(tmp);
+	}
+	
+	// leave part of the block after _end untouched
+	if(_end.block_offset())
+	{
+		_ExtIterator _last_block_end = _end - _end.block_offset() + _ExtIterator::block_type::size;
+		for( ;_cur != _last_block_end; ++_cur)
+		{
+			typename _ExtIterator::value_type tmp;
+			in >> tmp;
+		}
+	}	
+	
+	return _functor;
+}
+
+
+//! \brief External equivalent of std::for_each (mutating)
+//! \remark The implementation exploits \c \<stxxl\> buffered streams (computation and I/O overlapped)
+//! \param _begin object of model of \c ext_random_access_iterator concept
+//! \param _end object of model of \c ext_random_access_iterator concept
+//! \param _functor 
+//! \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D )
+//! \return function object \c _functor after it has been applied to the each element of the given range
+template <typename _ExtIterator,typename _UnaryFunction>
+_UnaryFunction for_each_m(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int nbuffers)
+{
+	typedef buf_istream<typename _ExtIterator::block_type,typename _ExtIterator::bids_container_iterator> buf_istream_type;
 	typedef buf_ostream<typename _ExtIterator::block_type,typename _ExtIterator::bids_container_iterator> buf_ostream_type;
 	
 	_begin.flush(); // flush container

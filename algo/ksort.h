@@ -927,6 +927,8 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 					*cur_bid = (*it).bid;
 				}
 				
+				delete out;
+				
 			}
 		}
 		

@@ -125,6 +125,7 @@ create_runs(
   
   	run = runs[0];
 	run_size = run->size ();
+	assert(run_size == m2);
   	for(i = 0; i < run_size; ++i)
   	{
     	bids[i] = *(it++);
@@ -138,8 +139,9 @@ create_runs(
 	{
 		run = runs[k];
 		run_size = run->size ();
+		assert(run_size == m2);
     	next_run_size = runs[k+1]->size();
-
+		assert( (next_run_size == m2)|| (next_run_size <= m2 && k==nruns-2));
 
 		for(i = 0; i < next_run_size; ++i)
       	{
@@ -180,6 +182,7 @@ create_runs(
   run = runs[k];
   run_size = run->size();
   wait_all(read_reqs1, run_size);
+  
   
   if(block_type::has_filler)
 		      std::sort(  
@@ -237,6 +240,11 @@ create_runs(
          if(blocks[j][0] != (*runs[irun])[j].value)
 		 {
 		   STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<j)
+		   STXXL_MSG("                   trigger value: "<<(*runs[irun])[j].value)
+		   STXXL_MSG("Data in block:")
+		   for(unsigned k=0; k<block_type::size;++k)
+			   STXXL_MSG("Element "<<k<<" in blocks is :"<<blocks[j][k])
+		   
            return false;
 		 }
        }
@@ -253,6 +261,9 @@ create_runs(
                   ),cmp) )
 	   {
 		   STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
+		   STXXL_MSG("Data in block:")
+		   for(unsigned k=0; k<block_type::size;++k)
+			   STXXL_MSG("Element "<<k<<" in blocks is :"<<blocks[j][k])
            return false;
 	   }
        
@@ -364,6 +375,8 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 		unsigned sz = in_runs[i]->size ();
 		for (unsigned j = 0; j < sz; ++j)
 			bm->delete_block ((*in_runs[i])[j].bid);
+		
+		delete in_runs[i];
 	}
 	
 }
@@ -518,7 +531,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 };
 
 
-//! \brief External sorting routine for records with defined operator <
+//! \brief External sorting routine for records that allow only comparisons
 //! \param first object of model of \c ext_random_access_iterator concept
 //! \param last object of model of \c ext_random_access_iterator concept
 //! \param cmp comparison object
@@ -842,6 +855,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 					*cur_bid = (*it).bid;
 				}
 				
+				delete out;
 			}
 		}
 	}

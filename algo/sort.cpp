@@ -43,7 +43,7 @@ int main()
 {	
 		unsigned memory_to_use = 64*1024*1024;
 		typedef stxxl::vector<my_type> vector_type;
-		const stxxl::int64 n_records = 4*32*1024*1024/sizeof(my_type) - 234;
+		const stxxl::int64 n_records = 4*32*1024*1024/sizeof(my_type) - 2*1024*1024/sizeof(my_type);
 		vector_type v(n_records);
 	
     	random_number32 rnd;
