@@ -31,7 +31,7 @@ int main(int argc, char * argv[])
 		write_pool<ext_stack_type::block_type> w_pool(4);
 		prefetch_pool<ext_stack_type::block_type> p_pool(4);
 		ext_stack_type Stack(p_pool,w_pool,0);
-		stxxl::VECTOR_GENERATOR<my_type,4,8>::result Vector(size);
+//		stxxl::VECTOR_GENERATOR<my_type,4,8>::result Vector;
 		stxxl::timer Timer;
 		
 		Timer.start();
@@ -39,8 +39,8 @@ int main(int argc, char * argv[])
 		{
 				my_type cur;
 				cur.array[0]=int(i);
-		//		Stack.push(cur);
-				Vector.push_back(cur);
+				Stack.push(cur);
+//				Vector.push_back(cur);
 		}
 //		int j;
 //		stxxl::for_each(Vector.begin(),Vector.end(),counter(),16);

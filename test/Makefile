@@ -21,5 +21,9 @@ blk:
 stack_band: stack_band.cpp ../compiler.make
 	$(GCC) stack_band.cpp -o stack_band $(STXXL_OBJ) -DSTXXL_VERBOSE_LEVEL=0
 
+
+vector_band: vector_band.cpp ../compiler.make
+	$(GCC) vector_band.cpp -o vector_band $(STXXL_OBJ) -DSTXXL_VERBOSE_LEVEL=0
+
 clean:
 	rm -f *.o threads dev
