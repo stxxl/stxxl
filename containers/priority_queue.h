@@ -263,7 +263,10 @@ private:
   // while we use 0..k-1
   Element *current[KNKMAX]; // pointer to actual element
   Element *segment[KNKMAX]; // start of Segments
+  unsigned segment_size[KNKMAX];
 
+  unsigned mem_cons_;
+  
   // private member functions
   int initWinner(int root);
   void updateOnInsert(int node, const Element & newKey, int newIndex, 
@@ -277,6 +280,7 @@ private:
   
 public:
   looser_tree();
+  ~looser_tree();
   void init(); // before, no consistent state is reached :-(
 
   void multi_merge(Element * begin, Element * end)
@@ -285,6 +289,7 @@ public:
   }
   void multi_merge(Element *, unsigned l);
   
+  unsigned mem_cons() const { return mem_cons_; }
   bool  spaceIsAvailable() // for new segment
   { return k < KNKMAX || lastFree >= 0; } 
      
@@ -294,7 +299,7 @@ public:
 
 ///////////////////////// LooserTree ///////////////////////////////////
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-looser_tree<ValTp_,Cmp_,KNKMAX>::looser_tree() : lastFree(0), size_(0), logK(0), k(1)
+looser_tree<ValTp_,Cmp_,KNKMAX>::looser_tree() : lastFree(0), size_(0), logK(0), k(1),mem_cons_(0)
 {
   empty  [0] = 0;
   segment[0] = 0;
@@ -412,8 +417,10 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::doubleK()
   // and push them on the free stack
   assert(lastFree == -1); // stack was empty (probably not needed)
   assert(k < KNKMAX);
-  for (int i = 2*k - 1;  i >= int(k);  i--) {
+  for (int i = 2*k - 1;  i >= int(k);  i--)
+  {
     current[i] = &dummy;
+    segment[i] = NULL;
     lastFree++;
     empty[lastFree] = i;
   }
@@ -436,12 +443,25 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
   // compact all nonempty segments to the left
   int from = 0;
   int to   = 0;
-  for(;  from < int(k);  from++) {
-    if (*(current[from]) != sup) {
+  for(;  from < int(k);  from++)
+  {
+    if (*(current[from]) != sup)
+    {
+      segment_size[to] = segment_size[from];
       current[to] = current[from];
       segment[to] = segment[from];
       to++;
-    } 
+    }
+    else
+    {
+      if(segment[from])
+      {
+        STXXL_VERBOSE2("looser_tree::~compactTree() deleting segment "<<from)
+        delete [] segment[from];
+        segment[from] = 0;
+        mem_cons_ -= segment_size[from];
+      }
+    }
   }
 
   // half degree as often as possible
@@ -472,7 +492,8 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
   STXXL_VERBOSE1("looser_tree::insert_segment("<< to <<","<< sz<<")")
   //std::copy(to,to + sz,std::ostream_iterator<ValTp_>(std::cout, "\n"));
   
-  if (sz > 0) {
+  if (sz > 0)
+  {
     assert( to[0   ] != cmp.min_value());
     assert( to[sz-1] != cmp.min_value());
     // get a free slot
@@ -485,6 +506,8 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
 
     // link new segment
     current[index] = segment[index] = to;
+    segment_size[index] = sz;
+    mem_cons_ += sz;
     size_ += sz;
     
     // propagate new information up the tree
@@ -503,10 +526,25 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
 }
 
 
+template <class ValTp_,class Cmp_,unsigned KNKMAX>
+looser_tree<ValTp_,Cmp_,KNKMAX>::~looser_tree()
+{
+  STXXL_VERBOSE2("looser_tree::~looser_tree()")
+  for(unsigned i=0;i<k;++i)
+  {
+    if(segment[i])
+    {
+      STXXL_VERBOSE2("looser_tree::~looser_tree() deleting segment "<<i)
+      delete [] segment[i];
+      mem_cons_ -= segment_size[i];
+    }
+  }
+  assert(mem_cons_ == 0);
+}
+
 // free an empty segment
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::
-deallocateSegment(int index)
+void looser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int index)
 {
   // reroute current pointer to some empty dummy segment
   // with a sentinel key
@@ -514,7 +552,8 @@ deallocateSegment(int index)
 
   // free memory
   delete [] segment[index];
-  segment[index] = 0;
+  segment[index] = NULL;
+  mem_cons_ -= segment_size[index];
   
   // push on the stack of free segment indices
   lastFree++;
@@ -530,7 +569,7 @@ deallocateSegment(int index)
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
 void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
 {
-  STXXL_VERBOSE1("looser_tree::multi_merge("<< to <<","<< l<<")")
+  STXXL_VERBOSE3("looser_tree::multi_merge("<< to <<","<< l<<")")
   
   multi_merge_k(to,l);
   
@@ -547,8 +586,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
 
 // is this segment empty and does not point to dummy yet?
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-inline int looser_tree<ValTp_,Cmp_,KNKMAX>::
-segmentIsEmpty(int i)
+inline int looser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
 {
   return *(current[i]) == cmp.min_value() && current[i] != &dummy;
 }
@@ -1114,7 +1152,7 @@ void priority_queue<Config_>::refillBuffer1()
   // which can make the assumption that
   // they find all they are asked to find in the buffers
   minBuffer1 = buffer1 + BufferSize1 - sz;
-  STXXL_MSG("Active levels = "<<activeLevels)
+  STXXL_VERBOSE2("Active levels = "<<activeLevels)
   switch(activeLevels)
   {
   case 0: break;
@@ -1132,10 +1170,10 @@ void priority_queue<Config_>::refillBuffer1()
                  &(minBuffer2[2]), minBuffer1, sz,cmp);
           break;
   case 4: 
-    STXXL_MSG("=1="<<minBuffer2[0][0]) //std::copy(minBuffer2[0],(&(buffer2[0][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-    STXXL_MSG("=2="<<minBuffer2[1][0]) //std::copy(minBuffer2[1],(&(buffer2[1][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-    STXXL_MSG("=3="<<minBuffer2[2][0]) //std::copy(minBuffer2[2],(&(buffer2[2][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-    STXXL_MSG("=4="<<minBuffer2[3][0]) //std::copy(minBuffer2[3],(&(buffer2[3][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
+    STXXL_VERBOSE2("=1="<<minBuffer2[0][0]) //std::copy(minBuffer2[0],(&(buffer2[0][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
+    STXXL_VERBOSE2("=2="<<minBuffer2[1][0]) //std::copy(minBuffer2[1],(&(buffer2[1][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
+    STXXL_VERBOSE2("=3="<<minBuffer2[2][0]) //std::copy(minBuffer2[2],(&(buffer2[2][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
+    STXXL_VERBOSE2("=4="<<minBuffer2[3][0]) //std::copy(minBuffer2[3],(&(buffer2[3][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
           priority_queue_local::merge4(
                  &(minBuffer2[0]), 
                  &(minBuffer2[1]),

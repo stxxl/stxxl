@@ -49,7 +49,7 @@ int main()
   for(i = 0;i<nelements ;i++ )
     p.push(nelements - i);
   
-  for(i = 0; i<nelements ;i++ )
+  for(i = 0; i<(nelements) ;i++ )
   {
     assert( !p.empty() );
     STXXL_MSG( p.top() )

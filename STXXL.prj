@@ -110,7 +110,8 @@ module.include.files=\
 	common/tmeta.h\
 	utils/malloc.h\
 	mng/write_pool.h\
-	mng/prefetch_pool.h
+	mng/prefetch_pool.h\
+	containers/priority_queue.h
 
 module.source.name=.
 module.source.type=

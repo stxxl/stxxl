@@ -1,4 +1,4 @@
-// Stoled from Peter Sanders
+// Stolen from Peter Sanders
 // pieces of code for computing random permutations.
 #ifndef PERM_HEADER
 #define PERM_HEADER
