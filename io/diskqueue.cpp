@@ -79,6 +79,7 @@ namespace stxxl
 
 					pthis->write_mutex.unlock ();
 
+					//assert(req->nref() > 1);
 					req->serve ();
 
 				}
@@ -109,7 +110,7 @@ namespace stxxl
 					pthis->read_mutex.unlock ();
 
 					STXXL_VERBOSE2( "queue: before serve request has "<< req->nref()<< " references ")
-					// assert(req->nref() > 1);
+					//assert(req->nref() > 1);
 					req->serve ();
 					STXXL_VERBOSE2( "queue: after serve request has "<< req->nref()<< " references ")
 					

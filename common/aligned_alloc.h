@@ -27,6 +27,7 @@ inline void * aligned_alloc (size_t size)
 		">(), allocated at "<<std::hex <<((unsigned long)buffer)<<" returning "<< ((unsigned long)result)
 		<<std::dec) 
 	//abort();
+	debugmon::get_instance()->block_allocated(result);
 	return result;
 };
 
@@ -34,6 +35,7 @@ template < size_t ALIGNMENT > inline void
 aligned_dealloc (void *ptr)
 {
 	STXXL_VERBOSE2("stxxl::aligned_dealloc(<"<<ALIGNMENT <<">), ptr = "<<ptr) 
+	debugmon::get_instance()->block_deallocated(ptr);
 	delete[] * (((char **) ptr) - 1);
 };
 

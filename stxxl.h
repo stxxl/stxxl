@@ -10,3 +10,6 @@
 
 #include "stream/stream.h"
 #include "stream/sort_stream.h"
+
+#include "common/debug.h"
+

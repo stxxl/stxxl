@@ -252,27 +252,27 @@ __STXXL_BEGIN_NAMESPACE
     // Following methods are declared but not implemented 
     // intentionnaly to forbid their usage
 		request(const request &);
-    request & operator=(const request &);
+    	request & operator=(const request &);
 		request();
-    
-    void add_ref()
-    {
-      ref_cnt_mutex.lock();
-      ref_cnt++;
-	  STXXL_VERBOSE3("request add_ref() "<< unsigned(this) <<": adding reference, cnt: "<<ref_cnt)
-	  
-      ref_cnt_mutex.unlock();
-    }
-    bool sub_ref()
-    {
-      ref_cnt_mutex.lock();
-      int val=--ref_cnt;
-	  STXXL_VERBOSE3("request sub_ref() "<< unsigned(this) <<": subtracting reference cnt: "<<ref_cnt)
-	  
-      ref_cnt_mutex.unlock();
-      assert(val>=0);
-      return (val==0);
-    }
+		
+		void add_ref()
+		{
+		  ref_cnt_mutex.lock();
+		  ref_cnt++;
+		  STXXL_VERBOSE3("request add_ref() "<< unsigned(this) <<": adding reference, cnt: "<<ref_cnt)
+		  
+		  ref_cnt_mutex.unlock();
+		}
+		bool sub_ref()
+		{
+		  ref_cnt_mutex.lock();
+		  int val=--ref_cnt;
+		  STXXL_VERBOSE3("request sub_ref() "<< unsigned(this) <<": subtracting reference cnt: "<<ref_cnt)
+		  
+		  ref_cnt_mutex.unlock();
+		  assert(val>=0);
+		  return (val==0);
+		}
 	};
 
   //! \brief A smart wrapper for \c request pointer.
@@ -308,11 +308,13 @@ __STXXL_BEGIN_NAMESPACE
     //! \brief Constucts an \c request_ptr from \c request pointer
     request_ptr(request *ptr_=NULL):ptr(ptr_) { 
 		STXXL_VERBOSE3("create constructor (request ="<<unsigned(ptr)<<") this="<<unsigned(this))
-		add_ref(); }
+		add_ref(); 
+	}
     //! \brief Constucts an \c request_ptr from a \c request_ptr object
     request_ptr(const request_ptr & p): ptr(p.ptr) { 
 		STXXL_VERBOSE3("copy constructor (copying "<<unsigned(ptr)<<") this="<<unsigned(this))
-		add_ref(); }
+		add_ref(); 
+	}
     //! \brief Destructor
     ~request_ptr()
 	{

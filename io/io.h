@@ -15,12 +15,14 @@
 #include "mmap_file.h"
 #include "simdisk_file.h"
 #include "iostats.h"
+#include "common/debug.h"
 
 //! \brief \c \<stxxl\> library namespace
 __STXXL_BEGIN_NAMESPACE
 
 disk_queues * disk_queues::instance = NULL;
 stats * stats::instance = NULL;
+debugmon * debugmon::instance = NULL;
 
 #ifdef COUNT_WAIT_TIME
 double stxxl::wait_time_counter = .0;

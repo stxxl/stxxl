@@ -10,6 +10,7 @@
 
 
 #include "ufs_file.h"
+#include "../common/debug.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -99,11 +100,15 @@ __STXXL_BEGIN_NAMESPACE
 					iostats->read_started (size());
 				#endif
 				
+				debugmon::get_instance()->io_started(buffer);
+				
 				stxxl_ifcheck_i(::read (file->get_file_des(), buffer, bytes),
 					" this="<<long(this)<<" File descriptor="<<
 					file->get_file_des()<< " offset="<<offset<<
 					" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
-					((type == READ)?"READ":"WRITE"))
+					((type == READ)?"READ":"WRITE")<<" nref= "<<nref())
+				
+				debugmon::get_instance()->io_finished(buffer);
 				
 				#ifdef STXXL_IO_STATS
 					iostats->read_finished ();
@@ -115,11 +120,15 @@ __STXXL_BEGIN_NAMESPACE
 					iostats->write_started (size());
 				#endif
 				
+				debugmon::get_instance()->io_started(buffer);
+				
 				stxxl_ifcheck_i(::write (file->get_file_des (), buffer, bytes),
 					" this="<<long(this)<<" File descriptor="<<
 					file->get_file_des()<< " offset="<<offset<<" buffer="<<
 					buffer<<" bytes="<<bytes<< " type=" <<
-					((type == READ)?"READ":"WRITE"));
+					((type == READ)?"READ":"WRITE")<<" nref= "<<nref());
+				
+				debugmon::get_instance()->io_finished(buffer);
 				
 				#ifdef STXXL_IO_STATS
 					iostats->write_finished ();
