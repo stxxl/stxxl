@@ -592,6 +592,10 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			return NULL;
 		};
 	};
+  
+  //! \weakgroup alloc Allocation functors
+  //! Standard allocation strategies incapsulated in functors
+  //! \{
 
 	//! \brief striping disk allocation scheme functor
 	//! \remarks model of \b allocation_strategy concept
@@ -714,6 +718,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		}
 	};
   
+  
   template <class BaseAllocator_>
   struct offset_allocator
   {
@@ -727,6 +732,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     }
   };
 
+  //! \}
+  
 	//! \brief Traits for models of \b bid_iterator concept
 	template < class bid_it > struct bid_iterator_traits
 	{
