@@ -149,7 +149,7 @@ namespace priority_queue_local
               {
                 STXXL_VERBOSE2("ext_merger::multi_merge(...) one more block exists in a sequence: "<<
                 "flushing this block in write cache (if not written yet) and giving hint to prefetcher")
-                bid_type next_bid = s.bids->front();
+                bid_type next_bid = s.bids->front();/*
                 request_ptr r = w_pool.get_request(next_bid);
                 if(r.valid()) 
                 {
@@ -161,7 +161,8 @@ namespace priority_queue_local
                 {
                   STXXL_VERBOSE2("ext_merger::multi_merge(...) block was not in write pool ")
                 }
-                p_pool.hint(next_bid);
+                p_pool.hint(next_bid);*/
+                  p_pool.hint(next_bid,w_pool);
               }
               p_pool.read(s.block,bid)->wait();
               block_manager::get_instance()->delete_block(bid);
@@ -520,8 +521,8 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
 {
   STXXL_VERBOSE2("looser_tree::insert_segment("<< to <<","<< sz<<")")
   //std::copy(to,to + sz,std::ostream_iterator<ValTp_>(std::cout, "\n"));
-  assert(sz != 0);
-  //if (sz > 0)
+  
+  if (sz > 0)
   {
     assert( not_sentinel(to[0])   );
     assert( not_sentinel(to[sz-1]));
@@ -545,13 +546,13 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
     int dummyMask;
     updateOnInsert((index + k) >> 1, *to, index, 
                    &dummyKey, &dummyIndex, &dummyMask);
-  } /*else {
+  } else {
     // immediately deallocate
     // this is not only an optimization 
     // but also needed to keep empty segments from
     // clogging up the tree
     delete [] to; 
-  }*/
+  }
 }
 
 

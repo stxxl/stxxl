@@ -73,7 +73,7 @@ int main()
   */
   //typedef priority_queue<priority_queue_config<my_type,my_cmp,
   //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-  const unsigned volume = 1*1024*1024; // in MB
+  const unsigned volume = 255*1024; // in MB
   typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,64*1024*1024,volume/sizeof(my_type)> gen;
   typedef gen::result pq_type;
   typedef pq_type::block_type block_type;
@@ -91,7 +91,7 @@ int main()
   timer Timer;
   Timer.start();
   
-  const unsigned mem_for_pools = 256*1024*1024;
+  const unsigned mem_for_pools = 128*1024*1024;
   prefetch_pool<block_type> p_pool((mem_for_pools/2)/block_type::raw_size);
   write_pool<block_type>    w_pool((mem_for_pools/2)/block_type::raw_size);
   pq_type p(p_pool,w_pool);

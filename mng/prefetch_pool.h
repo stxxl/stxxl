@@ -9,6 +9,7 @@
  ****************************************************************************/
 #include "../common/utils.h"
 #include "../mng/mng.h"
+#include "write_pool.h"
 #include <list>
 #include <ext/hash_map>
 
@@ -101,6 +102,36 @@ public:
       return true;
     }
     STXXL_VERBOSE2("prefetch_pool::hint bid=" << bid<<" => no free blocks for prefetching")
+    return false;
+  }
+  
+  bool hint(bid_type bid, write_pool<block_type> & w_pool)
+  {
+    // if block is already hinted, no need to hint it again
+    if(busy_blocks.find(bid) != busy_blocks.end())
+      return true;
+    
+    if(free_blocks_size) //  only if we have a free block
+    {
+      STXXL_VERBOSE2("prefetch_pool::hint2 bid= " << bid<<" => prefetching")
+      --free_blocks_size;
+      block_type * block = free_blocks.back();
+      free_blocks.pop_back();
+      request_ptr req = w_pool.get_request(bid);
+      if(req.valid())
+      {
+         STXXL_VERBOSE2("prefetch_pool::hint2 bid= " << bid<<" was in write cache")
+         block_type * w_block = w_pool.steal(bid);
+         assert(w_block != 0);
+         w_pool.add(block);
+         busy_blocks[bid] = busy_entry(w_block,req);
+         return true;
+      }
+      req = block->read(bid);
+      busy_blocks[bid] = busy_entry(block,req);
+      return true;
+    }
+    STXXL_VERBOSE2("prefetch_pool::hint2 bid=" << bid<<" => no free blocks for prefetching")
     return false;
   }
   
