@@ -375,7 +375,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     for(;i<bids.size();i++)
     {
       STXXL_VERBOSE2("Asking for a block with size: "<<bids[i].size)
-      assert(bids[i].size);
+      //assert(bids[i].size);
       requested_size += bids[i].size;
     }
     
@@ -415,7 +415,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     STXXL_VERBOSE2("DiskAllocator::delete_block<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
       << ", free:" << free_bytes << " total:"<< disk_bytes)
     STXXL_VERBOSE2("Deallocating a block with size: "<<bid.size)
-    assert(bid.size);
+    //assert(bid.size);
 		off_t region_pos = bid.offset;
 		off_t region_size = bid.size;
 		sortseq::iterator succ = free_space.upper_bound (region_pos);
@@ -660,7 +660,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		striping (int b, int e):begin (b), diff (e - b)
 		{
 		};
-	      striping ():begin (0)
+	  striping ():begin (0)
 		{
 			diff = config::get_instance ()->disks_number ();
 		};

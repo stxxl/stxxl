@@ -115,7 +115,7 @@ public:
 
 		return (write_buffers + ibuffer);
 	}
-	//! \brief Submi/home/rdementi/ts block for writing
+	//! \brief Submits block for writing
 	//! \param filled_block pointer to the block
 	//! \remark parameter \c filled_block must be value returned by \c get_free_block() or \c write() methods
 	//! \param bid block identifier, a place to write data of the \c filled_block

@@ -51,7 +51,7 @@ public:
   
   //! \brief Constructs pool
   //! \param init_size initial number of blocks in the pool
-  prefetch_pool(unsigned init_size=1): free_blocks_size(init_size)
+  explicit prefetch_pool(unsigned init_size=1): free_blocks_size(init_size)
   {
     unsigned i = 0;
     for(;i<init_size;i++)
