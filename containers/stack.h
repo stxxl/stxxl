@@ -110,8 +110,9 @@ public:
       this->push(tmp[i]);
     
   }
-  ~normal_stack()
+  virtual ~normal_stack()
   {
+    STXXL_VERBOSE(__PRETTY_FUNCTION__);
     block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
   }
   size_type size() const
@@ -290,8 +291,10 @@ public:
       this->push(tmp[i]);
     
   }
-  ~grow_shrink_stack()
+  virtual ~grow_shrink_stack()
   {
+    STXXL_VERBOSE(__PRETTY_FUNCTION__);
+    if(requests[0].get()) wait_all(requests.begin(),blocks_per_page);  
     block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
   }
   size_type size() const
@@ -491,7 +494,7 @@ public:
     else
       ext_impl->pop();
   }
-  ~migrating_stack()
+  virtual ~migrating_stack()
   {
     assert((int_impl && !ext_impl)||(!int_impl && ext_impl));
     

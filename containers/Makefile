@@ -11,5 +11,9 @@ stack: test_stack.cpp
 mstack: test_mstack.cpp
 	$(GCC) test_mstack.cpp -o test_mstack $(STXXL_OBJ)
 
+
+many: many_stacks.cpp
+	$(GCC) many_stacks.cpp -o many_stacks $(STXXL_OBJ) -DSTXXL_VERBOSE_LEVEL=1
+
 clean:
 	rm -f *.o sort 

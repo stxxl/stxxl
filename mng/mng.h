@@ -45,6 +45,20 @@ __STXXL_BEGIN_NAMESPACE
     bool valid() const { return storage; }
 	};
 
+  //! \brief Specialization of block identifier class (BID) for variable size block size
+	
+	//! Stores block identity, given by file, offset within the file, and size of the block
+	template <> 
+  struct BID<0>
+	{
+		file * storage; //!< pointer to the file of the block
+		off_t offset; //!< offset within the file of the block
+    unsigned size;  //!< size of the block in bytes
+    BID():storage(NULL),offset(0),size(0) {}
+    BID(file * f, off_t o, unsigned s) : storage(f), offset(o), size(s) {}
+    bool valid() const { return storage; }
+	};
+  
 	
 	template <unsigned bytes>
 	class filler_struct__
