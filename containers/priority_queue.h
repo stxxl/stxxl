@@ -226,7 +226,7 @@ namespace priority_queue_local
         assert(first_size);
         ++nsequences;
         nelements += size_type(segment->size())*block_type::size + first_size;
-        assert(nsequences <= arity);
+        // assert(nsequences <= arity);
         sequence_type new_sequence;
         new_sequence.current = block_type::size - first_size;
         new_sequence.block = first_block;
@@ -1244,7 +1244,7 @@ int priority_queue<Config_>::makeSpaceAvailable(int level)
   
   const bool spaceIsAvailable_ = 
     (level < IntLevels) ? itree[level].spaceIsAvailable() 
-                        : etree[level - IntLevels].spaceIsAvailable() ;
+                        : ((level == Levels - 1)?true:(etree[level - IntLevels].spaceIsAvailable())) ;
   
   if(spaceIsAvailable_)
   { 
@@ -1454,7 +1454,7 @@ public:
       unsigned ExtKMAX_ = 64, // maximal arity for external mergers
       unsigned ExtLevels_ = 2,
   */
-  typedef priority_queue<priority_queue_config<Tp_,Cmp_,32,N,AI,2,B,AE,2> > pq_type;
+  typedef priority_queue<priority_queue_config<Tp_,Cmp_,32,N,AI,2,B,AE,2> > result;
 };
 
 

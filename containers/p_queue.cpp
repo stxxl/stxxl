@@ -12,10 +12,11 @@ using namespace stxxl;
 
 struct my_type
 {
-	int key;
-	//char data[128 - sizeof(int)];
+    typedef long long int key_type;
+	key_type key;
+	char data[128 - sizeof(key_type)];
 	my_type(){}
-	explicit my_type(int k):key(k) {}
+	explicit my_type(key_type k):key(k) {}
 };
 
 std::ostream & operator << (std::ostream & o,const my_type & obj)
@@ -43,8 +44,8 @@ struct dummy_merger
 struct my_cmp // greater
 {
   bool operator () (const my_type & a, const my_type & b) const { return a.key > b.key; }
-  my_type min_value() const { return my_type(std::numeric_limits<int>::max()); }
-  my_type max_value() const { return my_type(std::numeric_limits<int>::min()); }
+  my_type min_value() const { return my_type(std::numeric_limits<my_type::key_type>::max()); }
+  my_type max_value() const { return my_type(std::numeric_limits<my_type::key_type>::min()); }
 };
 
 int main()
@@ -57,11 +58,12 @@ int main()
       unsigned ExtKMAX_ = 64, // maximal arity for external mergers
       unsigned ExtLevels_ = 2,
   */
-  typedef priority_queue<priority_queue_config<my_type,my_cmp,
-    32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-  //typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,128*1024*1024,128*1024*1024/sizeof(my_type)>::result pq_type;
+  //typedef priority_queue<priority_queue_config<my_type,my_cmp,
+  //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
+  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,128*1024*1024,128*1024*1024/sizeof(my_type)>::result pq_type;
   typedef pq_type::block_type block_type;
-  
+ 
+  STXXL_MSG("Block size: "<<block_type::raw_size)
   //STXXL_MSG(settings::EConsumption);
   /*
   STXXL_MSG(settings::AE);
@@ -71,7 +73,7 @@ int main()
   prefetch_pool<block_type> p_pool(10);
   write_pool<block_type>    w_pool(10);
   pq_type p(p_pool,w_pool);
-  off_t nelements = 5*off_t(1024*1024),i;
+  off_t nelements = off_t(128*1024*1024/sizeof(my_type))*1024,i;
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   for(i = 0;i<nelements ;i++ )
     p.push(my_type(nelements - i));
