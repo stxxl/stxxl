@@ -353,7 +353,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	
 #ifdef STXXL_IO_STATS
 	stats *iostats = stats::get_instance();
-	iostats->reset();
+	// iostats->reset();
 #endif
 	
 	double begin = stxxl_timestamp (), after_runs_creation, end;
@@ -384,6 +384,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 
 #ifdef COUNT_WAIT_TIME
 	double io_wait_after_rf = stxxl::wait_time_counter;
+	io_wait_after_rf += 0.0;
 #endif
 
 	disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);

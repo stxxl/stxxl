@@ -208,7 +208,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 	
 #ifdef STXXL_IO_STATS
 	stats *iostats = stats::get_instance ();
-	iostats->reset ();
+	 // iostats->reset ();
 #endif
 	
 	reset_io_wait_time();

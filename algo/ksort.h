@@ -429,7 +429,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	
 #ifdef STXXL_IO_STATS
 	stats *iostats = stats::get_instance ();
-	iostats->reset ();
+	// iostats->reset ();
 #endif
 	
 	double begin = stxxl_timestamp (), after_runs_creation, end;
