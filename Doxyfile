@@ -61,7 +61,8 @@ INPUT                  = /home/rdementi/projects/stxxl/doxymain.h \
                          /home/rdementi/projects/stxxl/common/ \
 			 /home/rdementi/projects/stxxl/mng/ \
 			 /home/rdementi/projects/stxxl/containers/ \
-			 /home/rdementi/projects/stxxl/algo/ 
+			 /home/rdementi/projects/stxxl/algo/ \
+			 /home/rdementi/projects/stxxl/utils/
 FILE_PATTERNS          = *.h \
                          *.cpp
 RECURSIVE              = NO

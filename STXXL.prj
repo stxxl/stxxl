@@ -107,7 +107,8 @@ module.include.files=\
 	algo/inmemsort.h\
 	containers/stack.h\
 	common/timer.h\
-	common/tmeta.h
+	common/tmeta.h\
+	utils/malloc.h
 
 module.source.name=.
 module.source.type=

@@ -99,9 +99,10 @@ public:
   
 };
 
+//! \brief Prints current malloc statistics in a convinient way
 std::ostream & operator << (std::ostream & s, const malloc_stats & st)
 {
-  s << "MALLOC statistics BEGIN" << std::endl;
+  s << "MALLOC statistics" << std::endl;
   s << "=================================================================" << std::endl ;
   s << "Space allocated from system not using mmap: "<<st.from_system_nmmap() << " bytes"<<std::endl ;
   s << "       number of free chunks                       : "<<st.free_chunks() << std::endl;
