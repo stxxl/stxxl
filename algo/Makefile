@@ -3,7 +3,7 @@ all: asch scan genfile sortfile ksort stable sort
 include ../compiler.make
 
 
-STXXL_LIB += -DSTXXL_CHECK_ORDER_IN_SORTS
+# STXXL_LIB += -DSTXXL_CHECK_ORDER_IN_SORTS
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 
@@ -27,7 +27,7 @@ genfile: gen_file.cpp $(DEPENDENCIES)
 	$(GCC) gen_file.cpp -o gen_file $(STXXL_LIB)
 
 sortfile: sort_file.cpp $(DEPENDENCIES)
-	$(GCC) sort_file.cpp -o sort_file $(STXXL_LIB)
+	$(GCC) sort_file.cpp -o sort_file $(STXXL_LIB) 
 
 ksort: ksort.cpp $(DEPENDENCIES)
 	$(GCC) ksort.cpp -o ksort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_CHECK_ORDER_IN_SORTS

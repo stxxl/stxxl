@@ -525,6 +525,9 @@ public:
 			// initialize from file
 			assert(from->get_disk_number() == -1);
 			
+			bm = block_manager::get_instance ();
+			cfg = config::get_instance ();
+			
 			int all_pages = div_and_round_up (_bids.size(), page_size);
 			int i=0;
 			for(;i<all_pages;++i)

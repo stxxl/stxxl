@@ -1005,6 +1005,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
 	block_manager::~block_manager()
 	{
+		STXXL_MSG("Block manager deconstructor")
 		for (unsigned i = 0; i < ndisks; i++)
 		{
 			delete disk_allocators[i];
