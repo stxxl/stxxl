@@ -89,57 +89,11 @@ __STXXL_BEGIN_NAMESPACE
 		typedef unsigned char byte_type;
 	};
 
-		
-	template < unsigned SIZE, class T, unsigned REF_NUM, bool NEEDS_FILLER>
-	class typed_block_base
-	{
-	};
-	
-	template < unsigned SIZE, class T, unsigned REF_NUM>
-	class typed_block_base<SIZE,T,REF_NUM,false>
-	{
-	 public:
-
-		BID<SIZE> ref[REF_NUM];
-		
-		BID<SIZE> & operator ()(int i)
-		{
-			return ref[i];
-		};
-	};
-
-	
-	template < unsigned SIZE, class T > 
-	class typed_block_base < SIZE, T, 0,false >
-	{
-	};
-
-	// one has to add filler in order to make sizeof(typed_block) == SIZE
-	template < unsigned SIZE, class T, unsigned REF_NUM>
-	class typed_block_base<SIZE,T,REF_NUM,true>
-	{
-		filler_struct__<SIZE-((SIZE-sizeof(BID<SIZE>)*REF_NUM)/sizeof(T))*sizeof(T)> __filler;
-	 public:
-		BID < SIZE > ref[REF_NUM];
-
-		BID < SIZE > & operator ()(int i)
-		{
-			return ref[i];
-		};
-	};
-
-	// one has to add filler in order to make sizeof(typed_block) == SIZE
-	template < unsigned SIZE, class T > 
-	class typed_block_base < SIZE, T, 0,true >
-	{
-    filler_struct__<SIZE - (SIZE / sizeof (T))*sizeof (T)> __filler;
-	};
-	
-	//! \brief Block containing elements of fixed length
-	template < unsigned SIZE, class T, unsigned REF_NUM = 0>
-	class typed_block: public typed_block_base<SIZE,T,REF_NUM,SIZE % sizeof(T)>
-	{
-	public:
+    //! \brief Contains data elements for \c stxxl::typed_block , not intended for direct use
+    template <class T, unsigned Size_>
+    class element_block
+    {
+      public:
 		typedef T type;
 		typedef T value_type;
 		typedef T & reference;
@@ -148,70 +102,161 @@ __STXXL_BEGIN_NAMESPACE
 		typedef pointer iterator;
 		typedef const pointer const_iterator;
 		
-		enum { has_filler = SIZE % sizeof(T) };
-		
-		typedef BID<SIZE> bid_type;
-		
+        enum 
+        { 
+            size = Size_ //!< number of elements in the block 
+        };
+      
 		//! Array of elements of type T
-		T elem[(SIZE - sizeof(BID < SIZE >) * REF_NUM) / sizeof (T)];
+		T elem[size];
 		
-		typed_block() {};
+		element_block() {}
 	
 		//! An operator to access elements in the block
 		reference operator [](int i)
 		{
 			return elem[i];
-		};
-		
-		enum
-		{ 
-			raw_size = SIZE, //!< size of block in bytes
-			size = (SIZE - sizeof (BID < SIZE >) * REF_NUM) / sizeof (T) //!< number of elements in block
-		};
+		}
 
 		//! \brief Returns \c iterator pointing to the first element
 		iterator begin()
 		{
 			return elem;
-		};
+		}
 		//! \brief Returns \c const_iterator pointing to the first element
 		const_iterator begin() const
 		{
 			return elem;
-		};
+		}
 		//! \brief Returns \c iterator pointing to the end element
 		iterator end()
 		{
 			return elem + size;
-		};
+		}
 		//! \brief Returns \c const_iterator pointing to the end element
 		const_iterator end() const
 		{
 			return elem + size;
+		}
+    };
+    
+    //! \brief Contains BID references for \c stxxl::typed_block , not intended for direct use
+    template <class T,unsigned Size_,unsigned RawSize_, unsigned NBids_ = 0>
+    class block_w_bids: public element_block<T,Size_>
+    {
+        public:
+         enum
+        {
+            raw_size = RawSize_,
+            nbids = NBids_
+        };
+         typedef BID<raw_size> bid_type;
+         
+         //! Array of BID references
+         bid_type ref[nbids];
+		
+        //! An operator to access bid references
+		 bid_type & operator ()(int i)
+		 {
+			return ref[i];
+		 }
+    };
+
+    template <class T,unsigned Size_,unsigned RawSize_>
+    class block_w_bids<T,Size_,RawSize_,0>: public element_block<T,Size_>
+    {
+        public:
+         enum
+        {
+            raw_size = RawSize_,
+            nbids = 0
+        };
+         typedef BID<raw_size> bid_type;
+    };    
+  
+    //! \brief Contains per block information for \c stxxl::typed_block , not intended for direct use
+    template <class T_,unsigned RawSize_,unsigned NBids_,class InfoType_ = void>
+    class block_w_info : 
+        public block_w_bids<T_,((RawSize_ - sizeof(BID<RawSize_> )*NBids_ - sizeof(InfoType_))/sizeof(T_)),RawSize_,NBids_>
+    {
+       public:
+        //! \brief Type of per block information element
+        typedef InfoType_   info_type;
+       
+        //! \brief Per block information element
+        info_type info;
+        
+        enum { size = ((RawSize_ - sizeof(BID<RawSize_>)*NBids_ - sizeof(InfoType_) )/sizeof(T_)) };
+    };
+    
+    template <class T_,unsigned RawSize_,unsigned NBids_>
+    class block_w_info<T_,RawSize_,NBids_,void> : 
+        public block_w_bids<T_,((RawSize_ - sizeof(BID<RawSize_>)*NBids_)/sizeof(T_)),RawSize_,NBids_>
+    {
+        public:
+        typedef void   info_type;
+        enum {size  = ((RawSize_ - sizeof(BID<RawSize_>)*NBids_)/sizeof(T_)) };
+    };
+    
+    //! \brief Block containing elements of fixed length
+    
+    //! Template parameters:
+    //! - \c RawSize_ size of block in bytes
+    //! - \c T_ type of block's records
+    //! - \c NRef_ number of block references (BIDs) that can be stored in the block (default is 0)
+    //! - \c InfoType_ type of per block information (default is no information - void)
+    //!
+    //! The data array of type T_ is contained in the parent class \c stxxl::element_block, see related information there.
+    //! The BID array of references is contained in the parent class \c stxxl::block_w_bids, see relared information there.
+    //! The "per block information" is contained in the parent class \c stxxl::block_w_info, see relared information there.
+    template <unsigned RawSize_, class T_, unsigned NRef_ = 0, class InfoType_ = void>
+    class typed_block : 
+        public block_w_info<T_,RawSize_,NRef_,InfoType_>,
+        public filler_struct__<(RawSize_ - sizeof(block_w_info<T_,RawSize_,NRef_,InfoType_>)) >
+    {
+      public:
+		typedef T_ type;
+		typedef T_ value_type;
+		typedef T_ & reference;
+		typedef const T_ & const_reference;
+		typedef type * pointer;
+		typedef pointer iterator;
+		typedef const pointer const_iterator;
+		
+		enum { has_filler = (RawSize_ != sizeof(block_w_info<T_,RawSize_,NRef_,InfoType_>) ) };
+		
+		typedef BID<RawSize_> bid_type;
+		
+		typed_block() {};
+
+		enum
+		{ 
+			raw_size = RawSize_, //!< size of block in bytes
+			size = block_w_info<T_,RawSize_,NRef_,InfoType_>::size //!< number of elements in block
 		};
 		
 		//! \brief Writes block to the disk(s)
 		//! \param bid block identifier, points the file(disk) and position
 		//! \param on_cmpl completion handler
-    //! \return \c pointer_ptr object to track status I/O operation after the call
-		request_ptr write (const BID<SIZE> & bid, 
+        //! \return \c pointer_ptr object to track status I/O operation after the call
+		request_ptr write (const BID<raw_size> & bid, 
 			    completion_handler on_cmpl = default_completion_handler())
 		{
 			return bid.storage->awrite(
 						this, 
 						bid.offset, 
-						SIZE, 
-					  on_cmpl);
+						raw_size, 
+					    on_cmpl);
 		};
 
 		//! \brief Reads block from the disk(s)
 		//! \param bid block identifier, points the file(disk) and position
 		//! \param on_cmpl completion handler
-    //! \return \c pointer_ptr object to track status I/O operation after the call
-		request_ptr read (const BID < SIZE > &bid,
+        //! \return \c pointer_ptr object to track status I/O operation after the call
+		request_ptr read (const BID < raw_size > &bid,
 			   completion_handler on_cmpl = default_completion_handler())
 		{
-			return bid.storage->aread(this, bid.offset, SIZE, on_cmpl);
+			return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
 		};
 		
 		void *operator      new[] (size_t bytes)
@@ -230,9 +275,8 @@ __STXXL_BEGIN_NAMESPACE
 		{
 			aligned_dealloc < BLOCK_ALIGN > (ptr);
 		}
-	};
-	
-
+    };
+ 
 	
 /*
 template <unsigned BLK_SIZE>
@@ -563,12 +607,12 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			STXXL_ERRMSG("Using default disk configuration." )
 			DiskEntry entry1 = { "/var/tmp/stxxl", "syscall",
 				100 * 1024 * 1024
-			};
+			}; /*
 			DiskEntry entry2 =
 				{ "/tmp/stxxl1", "mmap", 100 * 1024 * 1024 };
 			DiskEntry entry3 = { "/tmp/stxxl2", "simdisk",
 				100 * 1024 * 1024
-			};
+			}; */
 			disks_props.push_back (entry1);
 			//disks_props.push_back (entry2);
 			//disks_props.push_back (entry3);
