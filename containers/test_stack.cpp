@@ -79,8 +79,11 @@ int main(int argc, char * argv[])
     STXXL_MSG("Test 1 passed.")
   }
   {
+    // prefetch pool with 10 blocks (> D is recommended)
     prefetch_pool<ext_stack_type2::block_type> p_pool(10);
+    // write pool with 10 blocks (> D is recommended)
     write_pool<ext_stack_type2::block_type> w_pool(10);
+    // create a stack that does not prefetch (level of prefetch agrssiveness 0)
     ext_stack_type2 my_stack(p_pool,w_pool,0);
     int test_size = atoi(argv[1])*4*4096/sizeof(int),i;
     
@@ -90,7 +93,7 @@ int main(int argc, char * argv[])
       assert(my_stack.top() == i);
       assert(my_stack.size() == i+1);
     }
-    
+    my_stack.set_prefetch_aggr(10);
     for(i=test_size-1;i>=0;i--)
     { 
       assert(my_stack.top() == i);
