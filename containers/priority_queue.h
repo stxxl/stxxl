@@ -162,7 +162,7 @@ namespace priority_queue_local
                   STXXL_VERBOSE2("ext_merger::multi_merge(...) block was not in write pool ")
                 }
                 p_pool.hint(next_bid);*/
-                  p_pool.hint(next_bid,w_pool);
+                p_pool.hint(next_bid,w_pool);
               }
               p_pool.read(s.block,bid)->wait();
               block_manager::get_instance()->delete_block(bid);
@@ -182,7 +182,8 @@ namespace priority_queue_local
         assert(segment_size);
         unsigned nblocks = segment_size / block_type::size; 
         STXXL_VERBOSE2("ext_merger::insert_segment(merger,...) inserting segment with "<<nblocks<<" blocks")
-        //assert(nblocks); // at least one block 
+        //assert(nblocks); // at least one block
+		STXXL_VERBOSE1("ext_merger::insert_segment nblocks="<<nblocks)
         if(nblocks == 0)
         {
           STXXL_VERBOSE1("ext_merger::insert_segment(merger,...) WARNING: inserting a segment with "<<

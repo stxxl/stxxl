@@ -411,10 +411,13 @@ public:
     }
     void resize(size_type n)
     {
+	  reserve(n);		
+	  /*
       unsigned old_bids_size = _bids.size();
       unsigned new_bids_size = div_and_round_up (n, block_type::size);
       
-      if(new_bids_size > old_bids_size)
+      
+	  if(new_bids_size > old_bids_size)
       {
         reserve(n);
       }
@@ -427,7 +430,7 @@ public:
         std::fill(_page_status.begin() + first_page_to_evict,
                   _page_status.end(), 0); // clear dirty flag, so this pages 
                                           // will be never written
-      }
+      }*/
       _size = n;
     }
     void push_back(const_reference obj)
