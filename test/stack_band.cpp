@@ -3,7 +3,7 @@
 #include "../algo/scan.h"
 #include "../common/timer.h"
 
-#define STRUCT_SIZE (1) 
+#define STRUCT_SIZE (16) 
 
 struct my_type
 {
@@ -36,7 +36,7 @@ int main(int argc, char * argv[])
 		for(i=0;i<size;i++)
 		{
 				my_type cur;
-				cur.array[0]=i;
+				cur.array[0]=int(i);
 				Stack.push(cur);
 				//Vector.push_back(cur);
 		}
@@ -44,5 +44,16 @@ int main(int argc, char * argv[])
 //		stxxl::for_each(Vector.begin(),Vector.end(),counter(),16);
 		Timer.stop();
 		
-		STXXL_MSG("Bandwidth = "<< int(size*sizeof(my_type)/Timer.seconds())/(1024*1024)<<" MB/s" )
+		STXXL_MSG("Push bandwidth = "<< int(size*sizeof(my_type)/Timer.seconds())/(1024*1024)<<" MB/s" )
+
+		Timer.reset();
+		Timer.start();
+		for(i=0;i<size;i++)
+		{
+			my_type cur = Stack.top();
+			assert(cur.array[0] == int(size - i - 1));
+			Stack.pop();
+		};
+		Timer.stop();
+		STXXL_MSG("Pop bandwidth = "<< int(size*sizeof(my_type)/Timer.seconds())/(1024*1024)<<" MB/s" )
 }

@@ -18,8 +18,8 @@ blk:
 	$(GCC) block.cpp -o block $(STXXL_OBJ)
 
 
-stack_band: stack_band.cpp
-	$(GCC) stack_band.cpp -o stack_band $(STXXL_OBJ)
+stack_band: stack_band.cpp ../compiler.make
+	$(GCC) stack_band.cpp -o stack_band $(STXXL_OBJ) -DSTXXL_VERBOSE_LEVEL=0
 
 clean:
 	rm -f *.o threads dev
