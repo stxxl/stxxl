@@ -51,6 +51,16 @@
 #include <set>
 
 
+#ifndef O_SYNC
+#define O_SYNC 0
+#endif
+#ifndef O_RSYNC
+#define O_RSYNC 0
+#endif
+#ifndef O_DSYNC
+#define O_DSYNC 0
+#endif
+
 
 #if defined(__linux__)
 //# include <asm/fcntl.h>
