@@ -27,6 +27,11 @@ bool operator < (const my_type & a, const my_type & b)
 	return a.key() < b.key();
 }
 
+std::ostream & operator << (std::ostream & o, const my_type & obj)
+{
+	o << obj._key;
+	return o;
+}
 
 int main()
 {

@@ -25,6 +25,7 @@ stats * stats::instance = NULL;
 #ifdef COUNT_WAIT_TIME
 double stxxl::wait_time_counter = .0;
 #endif
+	
 
 __STXXL_END_NAMESPACE
 

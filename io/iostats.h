@@ -276,7 +276,9 @@ extern double stxxl::wait_time_counter;
 			io_mutex.unlock ();
 		}
 	};
-
+	
+	#ifndef DISKQUEUE_HEADER
+	
 	std::ostream & operator << (std::ostream & o, const stats & s)
 	{
 		o<< "STXXL I/O statistics"<<std::endl;
@@ -293,6 +295,7 @@ extern double stxxl::wait_time_counter;
 		return o;
 	}
 	
+	#endif
 	
 //! \}
 
