@@ -217,7 +217,8 @@ create_runs(
 
   template < typename block_type,typename run_type , typename value_cmp>
   bool check_sorted_runs(		run_type ** runs, 
-								unsigned nruns, 
+								unsigned nruns,
+								unsigned m,
 								value_cmp cmp)
   {
     typedef typename block_type::value_type value_type;
@@ -225,68 +226,93 @@ create_runs(
     //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
 	STXXL_MSG("check_sorted_runs  Runs: "<<nruns)
     unsigned irun=0;
+		m = m/4;
     for(irun = 0; irun < nruns; ++irun)
     {
-       const unsigned nblocks = runs[irun]->size();
-	   const unsigned nelements = nblocks*block_type::size ;
-       block_type * blocks = new block_type[nblocks];
-       request_ptr * reqs = new request_ptr[nblocks];
-       for(unsigned j=0;j<nblocks;++j)
-       {
-         reqs[j] = blocks[j].read((*runs[irun])[j].bid);
-       }
-       wait_all(reqs,reqs + nblocks);
-       for(unsigned j=0;j<nblocks;++j)
-       {
-         if(blocks[j][0] != (*runs[irun])[j].value)
-		 {
-		   STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<j)
-		   STXXL_MSG("                   trigger value: "<<(*runs[irun])[j].value)
-		   STXXL_MSG("Data in the block:")
-		   for(unsigned k=0; k<block_type::size;++k)
-			   STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k])
-		   
-		   STXXL_MSG("BIDS:")
-		   for(unsigned k=0; k<nblocks;++k)
-		   {
-				if( k == j) STXXL_MSG("Bad one comes next.")
-		   		STXXL_MSG("BID "<<k<<" is: "<<((*runs[irun])[k].bid))
-		   }
+       const unsigned nblocks_per_run = runs[irun]->size();
+			 unsigned blocks_left = nblocks_per_run;
+			 block_type * blocks = new block_type[m];
+			 request_ptr * reqs = new request_ptr[m];
+			 value_type last;
 			
-           return false;
-		 }
-       }
-       if(!is_sorted(
-                  TwoToOneDimArrayRowAdaptor< 
-                    block_type,
-                    value_type,
-                    block_type::size > (blocks,0 ),
-                  TwoToOneDimArrayRowAdaptor< 
-                    block_type,
-                    value_type,
-                    block_type::size > (blocks, 
-	   				  nelements
-                  ),cmp) )
-	   {
-		   STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
-		   STXXL_MSG("Data in blocks:")
-		   for(unsigned j=0;j<nblocks;++j)
-		   {
-		   	   for(unsigned k=0; k<block_type::size;++k)
-			        STXXL_MSG("     Element "<<k<<" in block "<< j <<" is :"<<blocks[j][k])
-		   }
-		   STXXL_MSG("BIDS:")
-		   for(unsigned k=0; k<nblocks;++k)
-		   {
-		   		STXXL_MSG("BID "<<k<<" is: "<<((*runs[irun])[k].bid))
-		   }
-		   
-           return false;
-	   }
-       
-       delete [] reqs;
-       delete [] blocks;
-    }
+			 for(unsigned off = 0; off < nblocks_per_run ; off += m)
+			 {
+				 const unsigned nblocks = STXXL_MIN(blocks_left,m);
+				 const unsigned nelements = nblocks*block_type::size ;
+				 blocks_left -= nblocks;
+			
+				 for(unsigned j=0;j<nblocks;++j)
+				 {
+					 reqs[j] = blocks[j].read((*runs[irun])[j+off].bid);
+				 }
+				 wait_all(reqs,reqs + nblocks);
+				 
+				 if(off && (!cmp(blocks[0][0],last)) )
+				 { 
+					 STXXL_MSG("check_sorted_runs  wrong first value in the run "<<irun)
+					 STXXL_MSG(" first value: "<<blocks[0][0])
+					 STXXL_MSG(" last  value: "<<last)
+					 for(unsigned k=0; k<block_type::size;++k)
+						 STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[0][k])
+					 
+					 return false;
+				 }
+				 
+				 for(unsigned j=0;j<nblocks;++j)
+				 {
+					 if(blocks[j][0] != (*runs[irun])[j+off].value)
+			 {
+				 STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<(j+off))
+				 STXXL_MSG("                   trigger value: "<<(*runs[irun])[j+off].value)
+				 STXXL_MSG("Data in the block:")
+				 for(unsigned k=0; k<block_type::size;++k)
+					 STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k])
+				 
+				 STXXL_MSG("BIDS:")
+				 for(unsigned k=0; k<nblocks;++k)
+				 {
+					if( k == j) STXXL_MSG("Bad one comes next.")
+						STXXL_MSG("BID "<<(k+off)<<" is: "<<((*runs[irun])[k+off].bid))
+				 }
+				
+						 return false;
+			 }
+				 }
+				 if(!is_sorted(
+										TwoToOneDimArrayRowAdaptor< 
+											block_type,
+											value_type,
+											block_type::size > (blocks,0 ),
+										TwoToOneDimArrayRowAdaptor< 
+											block_type,
+											value_type,
+											block_type::size > (blocks, 
+								nelements
+										),cmp) )
+			 {
+				 STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
+				 STXXL_MSG("Data in blocks:")
+				 for(unsigned j=0;j<nblocks;++j)
+				 {
+						 for(unsigned k=0; k<block_type::size;++k)
+								STXXL_MSG("     Element "<<k<<" in block "<< (j+off) <<" is :"<<blocks[j][k])
+				 }
+				 STXXL_MSG("BIDS:")
+				 for(unsigned k=0; k<nblocks;++k)
+				 {
+						STXXL_MSG("BID "<<(k+off)<<" is: "<<((*runs[irun])[k+off].bid))
+				 }
+				 
+						 return false;
+			 }
+				 
+				 last = blocks[nblocks - 1][block_type::size - 1];
+			}
+			
+			assert(blocks_left == 0);
+			delete [] reqs;
+			delete [] blocks;
+		}
 
     return true;
   }
@@ -505,7 +531,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		{
 				int runs2merge = STXXL_MIN(runs_left,merge_factor);
 				#ifdef STXXL_CHECK_ORDER_IN_SORTS
-				assert((check_sorted_runs<block_type,run_type,value_cmp>(runs + nruns - runs_left,runs2merge,cmp) ));
+				assert((check_sorted_runs<block_type,run_type,value_cmp>(runs + nruns - runs_left,runs2merge,m2,cmp) ));
 				#endif
 				STXXL_VERBOSE("Merging "<<runs2merge<<" runs")
 				merge_runs<block_type,run_type> (runs + nruns - runs_left, 
