@@ -64,4 +64,8 @@ main ()
 	delete [] reqs;
 	delete block;
 
+	// variable-size blocks
+	BIDArray<0> vbids (nblocks);
+	bm->new_blocks (striping (), vbids.begin (), vbids.end ());
+	
 }

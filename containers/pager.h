@@ -21,7 +21,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 //! \}
 
-//! \weakgroup stlcontinternals Container internals
+//! \weakgroup stlcontinternals Internals
 //! \ingroup stlcont
 //! \{
 

@@ -227,7 +227,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 };
 */
 
-	template<unsigned BLK_SIZE> class BIDArray
+	template<unsigned BLK_SIZE> 
+  class BIDArray
 	{
 	protected:
 		unsigned _size;
@@ -347,8 +348,11 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	}
 
 	template < unsigned BLK_SIZE >
-		void DiskAllocator::new_blocks (BIDArray < BLK_SIZE > &bids)
+		void DiskAllocator::new_blocks (BIDArray < BLK_SIZE > & bids)
 	{
+    STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
+      << ", free:" << free_bytes << " total:"<< disk_bytes)
+    
 		off_t requested_size = off_t(bids.size()) * off_t(BLK_SIZE);
 		sortseq::iterator space = 
 			std::find_if (free_space.begin (), free_space.end (),
@@ -382,6 +386,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	template < unsigned BLK_SIZE >
 		void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
 	{
+    STXXL_VERBOSE2("DiskAllocator::delete_block<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
+      << ", free:" << free_bytes << " total:"<< disk_bytes)
 		off_t region_pos = bid.offset;
 		off_t region_size = BLK_SIZE;
 		sortseq::iterator succ = free_space.upper_bound (region_pos);
@@ -410,7 +416,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	template < unsigned BLK_SIZE >
 		void DiskAllocator::delete_blocks (const BIDArray < BLK_SIZE > &bids)
 	{
-		//  STXXL_MSG("delete free:" << free_bytes << " total:"<< disk_bytes )
+		STXXL_VERBOSE2("DiskAllocator::delete_blocks<BLK_SIZE> BLK_SIZE="<< BLK_SIZE <<
+      ", free:" << free_bytes << " total:"<< disk_bytes )
 		for (int i = 0; i < bids.size (); i++)
 		{
 			off_t region_pos = bids[i].offset;
