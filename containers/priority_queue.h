@@ -463,7 +463,6 @@ template <class ValTp_,class Cmp_,unsigned KNKMAX>
 void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
 {
   assert(logK > 0);
-  Element sup = dummy;
 
   // compact all nonempty segments to the left
   int from = 0;
@@ -629,7 +628,7 @@ multi_merge_k(Element *to, int l)
   int      winnerIndex = entry[0].index;
   Element  winnerKey   = entry[0].key;
   Element *winnerPos;
-  Element sup = dummy; // supremum
+  
   while (to != done)
   {
     winnerPos = current[winnerIndex];

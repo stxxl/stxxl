@@ -12,10 +12,10 @@ using namespace stxxl;
 
 struct my_type
 {
-  //typedef long long int key_type;
-  typedef int key_type;
+    typedef long long int key_type;
+  //typedef int key_type;
 	key_type key;
-	char data[128 - sizeof(key_type)];
+	char data[10 - sizeof(key_type)];
 	my_type(){}
 	explicit my_type(key_type k):key(k) {}
 };
@@ -70,8 +70,8 @@ int main()
   */
   //typedef priority_queue<priority_queue_config<my_type,my_cmp,
   //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-  const unsigned volume = 128*1024; // GB
-  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,20*1024*1024,volume/sizeof(my_type),7> gen;
+  const unsigned volume = 22*1024*1024; // in GB
+  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,32*1024*1024,volume/sizeof(my_type)> gen;
   typedef gen::result pq_type;
   typedef pq_type::block_type block_type;
  
