@@ -569,6 +569,7 @@ looser_tree<ValTp_,Cmp_,KNKMAX>::~looser_tree()
       mem_cons_ -= segment_size[i];
     }
   }
+  // check whether we did not loose memory
   assert(mem_cons_ == 0);
 }
 
