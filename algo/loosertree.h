@@ -26,6 +26,7 @@ class looser_tree
 	int *entry;
 	run_cursor_type *current;
 	run_cursor_cmp_type cmp;
+  
 	int init_winner (int root)
 	{
 		if (root >= k)

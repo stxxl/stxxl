@@ -192,6 +192,8 @@ __STXXL_BEGIN_NAMESPACE
 	class request
 	{
     friend int wait_any(request_ptr req_array[], int count);
+    template <class request_iterator_> friend 
+    request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end);
 		friend class file;
 		friend class disk_queue;
 		friend class disk_queues;
@@ -325,7 +327,13 @@ __STXXL_BEGIN_NAMESPACE
     //! \return reference to owned \c request object 
     //! \warning Creation another \c request_ptr from the returned \c request or deletion 
     //!  causes unpredictable behaviour. Do not do that!
-    request * get() { return ptr; }
+    request * get() const { return ptr; }
+    
+    //! \brief Returns true if object is initialized
+    bool valid() const { return ptr; }
+    
+    //! \brief Returns true if object is not initialized
+    bool empty() const { return !ptr; }
   };
   
 	//! \brief Collection of functions to track statuses of a number of requests
@@ -354,7 +362,16 @@ __STXXL_BEGIN_NAMESPACE
 			req_array[i]->wait ();
 		}
 	}
-
+  
+  template <class request_iterator_>
+  void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+	{
+    while(reqs_begin != reqs_end)
+    {
+			(request_ptr(*reqs_begin))->wait ();
+      ++reqs_begin;
+    }
+	}
   
 	bool poll_any (request_ptr req_array[], int count, int &index)
 	{
@@ -369,6 +386,19 @@ __STXXL_BEGIN_NAMESPACE
 		};
 		return false;
 	}
+  
+  template <class request_iterator_>
+  request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+	{
+		while(reqs_begin != reqs_end)
+		{
+			if ((request_ptr(*reqs_begin))->poll())
+				return reqs_begin;
+			++reqs_begin;
+		};
+		return reqs_end;
+	}
+  
 
 	int wait_any (request_ptr req_array[], int count)
 	{
@@ -402,6 +432,46 @@ __STXXL_BEGIN_NAMESPACE
 
 		END_COUNT_WAIT_TIME
 		return index;
+	}
+  
+  template <class request_iterator_>
+  request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+	{
+		START_COUNT_WAIT_TIME
+		onoff_switch sw;
+		
+    request_iterator_ cur = reqs_begin, result = reqs_end;
+    
+		for (; cur != reqs_end; cur++)
+		{
+			if ((request_ptr(*cur))->add_waiter (&sw))
+			{
+				// already done
+				result = cur;
+
+        if(cur != reqs_begin)
+        {
+          while (--cur != reqs_begin)
+            (request_ptr(*cur))->delete_waiter (&sw);
+          (request_ptr(*cur))->delete_waiter (&sw);
+        }
+
+				END_COUNT_WAIT_TIME
+				return result;
+			}
+		}
+
+		sw.wait_for_on ();
+
+		for (cur = reqs_begin; cur != reqs_end; cur++)
+		{
+			(request_ptr(*cur))->delete_waiter (&sw);
+			if (result == reqs_end && (request_ptr(*cur))->poll ())
+				result = cur;
+		}
+
+		END_COUNT_WAIT_TIME
+		return result;
 	}
 
 	class disk_queue

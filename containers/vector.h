@@ -35,6 +35,7 @@ namespace stxxl
 		{
 		};
 	};
+  
 
 	template < 
     typename Tp_,
@@ -300,6 +301,8 @@ public:
   //!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
   //!  default is RC <BR>
   //! Memory consumption: BlkSize_*x*PgSz_ bytes
+  //! \warning Do not store references to the elements of an external vector. Such references 
+  //! might be invalidated during any following access to elements of the vector
 	template < 
     typename Tp_,
     unsigned PgSz_ = 4,
@@ -314,7 +317,7 @@ public:
 		typedef Tp_ value_type;
 		typedef value_type & reference;
 		typedef const value_type & const_reference;
-		typedef value_type *pointer;
+		typedef value_type * pointer;
 		typedef SzTp_ size_type;
 		typedef SzTp_ difference_type;
 		typedef const value_type *const_pointer;
@@ -718,6 +721,8 @@ private:
   //!    - \c VECTOR_GENERATOR<double,8,2,512*1024,RC,lru>::result external vector of \c double's ,
   //!      with 8 blocks per page, 2 pages, 512 KB blocks, Random Cyclic allocation
   //!      and lru cache replacement strategy
+  //! \warning Do not store references to the elements of an external vector. Such references 
+  //! might be invalidated during any following access to elements of the vector
 	template
   < 
     typename Tp_,

@@ -14,9 +14,11 @@
 #include "../mng/mng.h"
 #include "../common/simple_vector.h"
 #include "../common/tmeta.h"
+#include "../mng/write_pool.h"
+#include "../mng/prefetch_pool.h"
 #include <stack>
 #include <vector>
- 
+
  
  __STXXL_BEGIN_NAMESPACE
  
@@ -399,6 +401,193 @@ public:
   
 };
 
+
+template <class Config_>
+class grow_shrink_stack2
+{
+public:
+  typedef Config_ cfg;
+  typedef typename cfg::value_type value_type;
+  typedef typename cfg::alloc_strategy alloc_strategy;
+  typedef typename cfg::size_type size_type;
+  enum {  blocks_per_page = cfg::blocks_per_page, // stack of this type has only one page
+          block_size = cfg::block_size,
+       };
+          
+  typedef typed_block<block_size,value_type> block_type;
+  typedef BID<block_size> bid_type;
+
+private:
+  size_type size_;
+  unsigned cache_offset;
+  block_type * cache;
+  value_type current;
+  std::vector<bid_type> bids;
+  alloc_strategy alloc_strategy_;
+  unsigned pref_aggr;
+  prefetch_pool<block_type> & p_pool;
+  write_pool<block_type>    & w_pool;
+  // for a moment forbid default construction
+  grow_shrink_stack2();
+public:
+  grow_shrink_stack2(
+       prefetch_pool<block_type> & p_pool_,
+       write_pool<block_type>    & w_pool_,
+       unsigned prefetch_aggressiveness):
+       size_(0),
+       cache_offset(0),
+       cache(new block_type),
+       pref_aggr(prefetch_aggressiveness),
+       p_pool(p_pool_),
+       w_pool(w_pool_)
+  {
+    STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)")
+  }
+  virtual ~ grow_shrink_stack2()
+  {
+    STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()")
+    const int bids_size = bids.size();
+    const int last_pref = std::max(int(bids_size) - int(pref_aggr),0);
+    int i;
+    for(i=bids_size - 1 ; i >= last_pref ; --i )
+    {
+        if(p_pool.in_prefetching(bids[i]));
+          p_pool.read(cache,bids[i])->wait();  // clean the prefetch buffer
+    }
+    typename std::vector<bid_type>::iterator cur = bids.begin();
+    typename std::vector<bid_type>::const_iterator end = bids.end();
+    for(;cur!=end;++cur)
+    {
+       block_type * b = w_pool.steal(*cur);
+       if(b)
+       {
+         w_pool.add(cache); // return buffer
+         cache = b;
+       }
+    }
+    delete cache;
+    block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
+  }
+  size_type size() const { return size_; }
+  void push(const value_type & val)
+  {
+    STXXL_VERBOSE3("grow_shrink_stack2::push("<< val <<")")
+    assert(cache_offset <= block_type::size);
+    
+    if(cache_offset == block_type::size)
+    {
+      STXXL_VERBOSE2("grow_shrink_stack2::push("<< val <<") growing, size: "<<size_)
+      
+      bids.resize(bids.size() + 1);
+      typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
+      block_manager::get_instance()->new_blocks(
+          offset_allocator<alloc_strategy>(cur_bid-bids.begin(),alloc_strategy_),cur_bid,bids.end());
+      w_pool.write(cache,bids.back());
+      cache = w_pool.steal();
+      const int bids_size = bids.size();
+      const int last_pref = std::max(int(bids_size) - int(pref_aggr) - 1,0);
+      for(int i=bids_size - 2 ; i >= last_pref ; --i )
+      {
+        if(p_pool.in_prefetching(bids[i]))
+            p_pool.read(cache,bids[i])->wait(); //  clean prefetch buffers
+      }
+      cache_offset = 0;
+    }
+    current = val;
+    (*cache)[cache_offset] = val;
+    ++size_;
+    ++cache_offset;
+    
+    assert(cache_offset > 0);
+    assert(cache_offset <= block_type::size);
+  }
+  value_type & top()
+  {
+    assert(size_ > 0);
+    assert(cache_offset > 0);
+    assert(cache_offset <= block_type::size);
+    return current;
+  }
+  const value_type & top() const
+  {
+    assert(size_ > 0);
+    assert(cache_offset > 0);
+    assert(cache_offset <= block_type::size);
+    return current;
+  }
+  void pop()
+  {
+    STXXL_VERBOSE3("grow_shrink_stack2::pop()")
+    assert(size_ > 0);
+    assert(cache_offset > 0);
+    assert(cache_offset <= block_type::size);
+    if(cache_offset == 1 && (!bids.empty()) )
+    {
+      STXXL_VERBOSE2("grow_shrink_stack2::pop() shrinking, size = "<<size_)
+      
+      bid_type last_block = bids.back();
+      bids.pop_back();
+      /*block_type * b = w_pool.steal(last_block);
+      if(b)
+      {
+        STXXL_VERBOSE2("grow_shrink_stack2::pop() block is still in write buffer")
+        w_pool.add(cache);
+        cache = b;
+      }
+      else*/
+      {
+        //STXXL_VERBOSE2("grow_shrink_stack2::pop() block is no longer in write buffer"
+        //  ", reading from prefetch/read pool")
+        p_pool.read(cache,last_block)->wait();
+      }
+      block_manager::get_instance()->delete_block(last_block);
+      const int bids_size = bids.size();
+      const int last_pref = std::max(int(bids_size) - int(pref_aggr),0);
+      for(int i=bids_size - 1; i >= last_pref ; --i )
+      {
+        p_pool.hint(bids[i]); // prefetch
+      }
+      cache_offset = block_type::size + 1;
+      
+    }
+    
+    --cache_offset;
+    if(cache_offset > 0)
+      current = (*cache)[cache_offset - 1];
+    --size_;
+  }
+  void set_prefetch_aggr(unsigned new_p)
+  {
+    if(pref_aggr > new_p)
+    {
+      const int bids_size = bids.size();
+      const int last_pref = std::max(int(bids_size) - int(pref_aggr),0);
+      for(int i=bids_size - new_p - 1 ; i >= last_pref ; --i )
+      {
+        if(p_pool.in_prefetching(bids[i]))
+            p_pool.read(cache,bids[i])->wait(); //  clean prefetch buffers
+      }
+    }
+    else
+    if(pref_aggr < new_p)
+    {
+      const int bids_size = bids.size();
+      const int last_pref = std::max(int(bids_size) - int(new_p),0);
+      for(int i=bids_size - 1 ; i >= last_pref ; --i )
+      {
+        p_pool.hint(bids[i]); // prefetch
+      }
+    }
+    pref_aggr = new_p;
+  }
+
+  unsigned get_prefetch_aggr() const
+  {
+    return pref_aggr;
+  }
+};
+
+
 //! \brief A stack that migrates from internal memory to external when its size exceeds a certain threshold
 
 //! For semantics of the methods see documentation of the STL \c std::vector.
@@ -537,7 +726,7 @@ public:
 //! \{
 
 enum stack_externality { external, migrating, internal };
-enum stack_behaviour { normal, grow_shrink };
+enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
 //! \brief Stack type generator
 
@@ -592,7 +781,10 @@ class STACK_GENERATOR
 {
   typedef stack_config_generator<ValTp,BlocksPerPage,BlkSz,AllocStr,SzTp> cfg;
   
-  typedef typename IF<Behaviour==normal, normal_stack<cfg>,grow_shrink_stack<cfg> >::result ExtStackTp;
+  typedef typename IF<Behaviour==grow_shrink,
+          grow_shrink_stack<cfg>,
+          grow_shrink_stack2<cfg> >::result GrShrTp;
+  typedef typename IF<Behaviour==normal, normal_stack<cfg>, GrShrTp >::result ExtStackTp;
   typedef typename IF<Externality==migrating, 
     migrating_stack<MigrCritSize,ExtStackTp,IntStackTp>,ExtStackTp>::result MigrOrNotStackTp;
   

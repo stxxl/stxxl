@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <list>
 #include <map>
 #include <algorithm>
 #include <string>
@@ -58,6 +59,21 @@ __STXXL_BEGIN_NAMESPACE
     BID(file * f, off_t o, unsigned s) : storage(f), offset(o), size(s) {}
     bool valid() const { return storage; }
 	};
+  
+  template <unsigned blk_sz>
+  bool operator == (const BID<blk_sz> & a, const BID<blk_sz> & b)
+  {
+      return (a.storage == b.storage) && (a.offset == b.offset) && (a.size == b.size);
+  }
+  
+  template <unsigned blk_sz>
+  std::ostream & operator << (std::ostream & s, const BID<blk_sz> & bid)
+  {
+    s << " storage file addr: "<<bid.storage;
+    s << " offset: "<<bid.offset;
+    s << " size: "<<bid.size;
+    return s;
+  }
   
 	
 	template <unsigned bytes>
@@ -347,13 +363,22 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		free_space[0] = disk_size;
 	}
 
-	template < unsigned BLK_SIZE >
+  
+  template < unsigned BLK_SIZE >
 		void DiskAllocator::new_blocks (BIDArray < BLK_SIZE > & bids)
 	{
     STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
       << ", free:" << free_bytes << " total:"<< disk_bytes)
     
-		off_t requested_size = off_t(bids.size()) * off_t(BLK_SIZE);
+		off_t requested_size = 0;
+    unsigned i = 0;
+    for(;i<bids.size();i++)
+    {
+      STXXL_VERBOSE2("Asking for a block with size: "<<bids[i].size)
+      assert(bids[i].size);
+      requested_size += bids[i].size;
+    }
+    
 		sortseq::iterator space = 
 			std::find_if (free_space.begin (), free_space.end (),
 				      bind2nd(FirstFit (), requested_size));
@@ -366,11 +391,10 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			if (region_size > requested_size)
 				free_space[region_pos + requested_size] = region_size - requested_size;
 
-			for (unsigned i = 0; i < bids.size (); i++)
+      bids[0].offset = region_pos;
+			for (i = 1; i < bids.size (); i++)
 			{
-				bids[i].offset =
-					region_pos +
-					off_t (i) * off_t (BLK_SIZE);
+				bids[i].offset = bids[i-1].offset + bids[i-1].size;
 			}
 			free_bytes -= requested_size;
 		}
@@ -381,15 +405,19 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 				" bytes free" )
 			abort();
 		}
-	};
+	}
+  
+
 
 	template < unsigned BLK_SIZE >
 		void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
 	{
     STXXL_VERBOSE2("DiskAllocator::delete_block<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
       << ", free:" << free_bytes << " total:"<< disk_bytes)
+    STXXL_VERBOSE2("Deallocating a block with size: "<<bid.size)
+    assert(bid.size);
 		off_t region_pos = bid.offset;
-		off_t region_size = BLK_SIZE;
+		off_t region_size = bid.size;
 		sortseq::iterator succ = free_space.upper_bound (region_pos);
 		sortseq::iterator pred = succ;
 		pred--;
@@ -410,7 +438,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		}
 
 		free_space[region_pos] = region_size;
-		free_bytes += off_t (BLK_SIZE);
+		free_bytes += off_t (bid.size);
 	}
 
 	template < unsigned BLK_SIZE >
@@ -418,10 +446,15 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	{
 		STXXL_VERBOSE2("DiskAllocator::delete_blocks<BLK_SIZE> BLK_SIZE="<< BLK_SIZE <<
       ", free:" << free_bytes << " total:"<< disk_bytes )
-		for (int i = 0; i < bids.size (); i++)
+    
+    unsigned i=0;
+		for (; i < bids.size (); i++)
 		{
 			off_t region_pos = bids[i].offset;
-			off_t region_size = BLK_SIZE;
+			off_t region_size = bids[i].size;
+      STXXL_VERBOSE2("Deallocating a block with size: "<<region_size)
+      assert(bids[i].size);
+      
 			sortseq::iterator succ =
 				free_space.upper_bound (region_pos);
 			sortseq::iterator pred = succ;
@@ -447,7 +480,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
 			free_space[region_pos] = region_size;
 		};
-		free_bytes += off_t (bids.size ()) * off_t (BLK_SIZE);
+    for(;i<bids.size();i++)
+      free_bytes += off_t(bids[i].size);
 	}
 
 	//! \brief Access point to disks properties
@@ -765,7 +799,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
   //! \}
   
 	//! \brief Traits for models of \b bid_iterator concept
-	template < class bid_it > struct bid_iterator_traits
+	template < class bid_it > 
+  struct bid_iterator_traits
 	{
 		bid_it *a;
 		enum
@@ -774,7 +809,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		};
 	};
 
-	template < unsigned blk_sz > struct bid_iterator_traits <BID <blk_sz > *>
+	template < unsigned blk_sz > 
+  struct bid_iterator_traits <BID <blk_sz > *>
 	{
 		enum
 		{
@@ -793,7 +829,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		};	
 	};
 */
-
+/*
 	template < unsigned _blk_sz > struct bid_iterator_traits<
 		__gnu_cxx::__normal_iterator< BID<_blk_sz> * ,std::vector< BID<_blk_sz> ,std::allocator<BID<_blk_sz> > >  > >
 	{
@@ -801,7 +837,34 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		{
 			block_size = _blk_sz
 		};	
-	};	
+	};	*/
+  
+  template < unsigned blk_sz,class X > 
+  struct bid_iterator_traits< __gnu_cxx::__normal_iterator< BID<blk_sz> *,  X> >
+	{
+		enum
+		{
+			block_size = blk_sz
+		};	
+	};
+  
+  template < unsigned blk_sz,class X , class Y> 
+  struct bid_iterator_traits< std::_List_iterator<BID<blk_sz>,X,Y > >
+	{
+		enum
+		{
+			block_size = blk_sz
+		};	
+	}; 
+  
+  template < unsigned blk_sz, class X > 
+  struct bid_iterator_traits< typename std::vector< BID<blk_sz> , X >::iterator >
+	{
+		enum
+		{
+			block_size = blk_sz
+		};	
+	};
 
 	//! \brief Block manager class
 	
@@ -898,11 +961,18 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 						const BIDIteratorClass & bidbegin,
 						const BIDIteratorClass & bidend)
 	{
-		unsigned nblocks = bidend - bidbegin;
+    typedef  BIDArray<bid_iterator_traits <BIDIteratorClass >::block_size> bid_array_type;
+		unsigned nblocks = std::distance(bidbegin,bidend);
+    /*
+    BIDIteratorClass bidbegin_copy(bidbegin);
+    while(bidbegin_copy != bidend)
+    {
+      ++bidbegin_copy;
+      ++nblocks;
+    } */
 
 		int *bl = new int[ndisks];
-		BIDArray < bid_iterator_traits <BIDIteratorClass >::block_size > *disk_bids =
-			new BIDArray < bid_iterator_traits <BIDIteratorClass >::block_size >[ndisks];
+		bid_array_type * disk_bids = new bid_array_type[ndisks];
 
 		memset(bl, 0, ndisks * sizeof (int));
 
@@ -918,21 +988,28 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		for (i = 0; i < ndisks; i++)
 		{
 			if (bl[i])
-			{
 				disk_bids[i].resize (bl[i]);
+		}
+    
+    memset (bl, 0, ndisks * sizeof (int));
+    
+		for (i=0,it = bidbegin; it != bidend; it++, i++)
+		{
+			int disk = (*it).storage->get_disk_number ();
+			disk_bids[disk][bl[disk]++] = (*it);
+		}
+    for (i = 0; i < ndisks; i++)
+		{
+			if (bl[i])
 				disk_allocators[i]->new_blocks (disk_bids[i]);
-			}
 		}
 
 		memset (bl, 0, ndisks * sizeof (int));
-
-		i = 0;
-		for (it = bidbegin; it != bidend; it++, i++)
+    
+		for (i=0,it = bidbegin; it != bidend; it++, i++)
 		{
 			int disk = (*it).storage->get_disk_number ();
-			//    std::cout << disk_bids[disk][bl[disk]].offset << " "<<std::endl;
 			(*it).offset = disk_bids[disk][bl[disk]++].offset;
-			//    std::cout <<   (*it).offset << " "<<std::endl;
 		}
 
 		delete[]bl;

@@ -6,9 +6,13 @@ DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES)
 
 
 main: test.cpp $(DEPENDENCIES)
-	$(GCC) test.cpp -o mngtest $(STXXL_LIB) -DSTXXL_VERBOSE_ 
+	$(GCC) test.cpp -o mngtest $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2 
 
 streams: test_streams.cpp $(DEPENDENCIES)
 	$(GCC) test_streams.cpp -o test_streams $(STXXL_LIB)
 
+write_pool: write_pool.cpp $(DEPENDENCIES)
+	$(GCC) write_pool.cpp -o test_write_pool $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2
 
+prefetch_pool: prefetch_pool.cpp $(DEPENDENCIES)
+	$(GCC) prefetch_pool.cpp -o test_prefetch_pool $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2

@@ -17,5 +17,11 @@ mstack: test_mstack.cpp $(DEPENDENCIES)
 many: many_stacks.cpp $(DEPENDENCIES)
 	$(GCC) many_stacks.cpp -o many_stacks $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
 
+p_queue: p_queue.cpp $(DEPENDENCIES)
+	$(GCC) p_queue.cpp -o p_queue $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2
+
+ext_merger: ext_merger.cpp $(DEPENDENCIES)
+	$(GCC) ext_merger.cpp -o ext_merger $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2
+
 clean:
 	rm -f *.o sort 
