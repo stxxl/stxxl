@@ -144,6 +144,35 @@ public:
 
 		return get_free_block (); 
 	}
+	//! \brief Flushes not yet written buffers
+	void flush()
+	{
+		int ibuffer;
+		while (!batch_write_blocks.empty ())
+		{
+			ibuffer = batch_write_blocks.top ().ibuffer;
+			batch_write_blocks.pop();
+
+			write_reqs[ibuffer] = write_buffers[ibuffer].write(write_bids[ibuffer]);
+			
+			busy_write_blocks.push_back (ibuffer);
+		}
+		for (std::vector<int>::const_iterator it =
+		     busy_write_blocks.begin ();
+		     it != busy_write_blocks.end (); it++)
+		{
+			ibuffer = *it;
+			write_reqs[ibuffer]->wait ();
+		}
+		
+		assert(batch_write_blocks.empty ());
+		free_write_blocks.clear();
+		busy_write_blocks.clear();
+		
+		for (unsigned i = 0; i < nwriteblocks; i++)
+			free_write_blocks.push_back (i);
+	}
+	
 	//! \brief Flushes not yet written buffers and frees used memory
 	~buffered_writer ()
 	{
