@@ -26,6 +26,7 @@ template < class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */  >
 
   simple_vector (size_type sz):_size (sz)
 	{
+		assert(sz);
 		//    _array = _data_allocator.allocate(sz);
 		_array = new _Tp[sz];
 	}
@@ -67,4 +68,3 @@ template < class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */  >
 __STXXL_END_NAMESPACE
 
 #endif
-

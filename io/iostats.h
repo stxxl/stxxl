@@ -40,7 +40,7 @@ extern double stxxl::wait_time_counter;
 		int acc_ios;
 		int acc_reads, acc_writes;	// number of requests, participating in parallel operation
 		mutex read_mutex, write_mutex, io_mutex;
-		static stats *instance;
+		static stats * instance;
 		  stats ():reads (0),
 			writes (0),
 			t_reads (0.0),

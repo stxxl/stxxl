@@ -300,11 +300,208 @@ namespace stream
     
   }
   
+  
+  //! \brief Input strategy for \c runs_creator class
+  //!
+  //! This strategy together with \c runs_creator class 
+  //! allows to create sorted runs 
+  //! data structure usable for \c runs_merger 
+  //! pushing elements into the sorter 
+  //! (using runs_creator::push())
   template <class ValueType_>
   struct use_push
   {
 		typedef ValueType_ value_type;
   };
+  
+  //! \brief Forms sorted runs of elements passed in push() method
+  //!
+  //! A specialization of \c runs_creator that
+  //! allows to create sorted runs 
+  //! data structure usable for \c runs_merger from
+  //! elements passed in sorted push() method. <BR>
+  //! Template parameters:
+  //! - \c ValueType_ type of values (parameter for \c use_push strategy)
+  //! - \c Cmp_ type of comparison object used for sorting the runs
+  //! - \c BlockSize_ size of blocks used to store the runs
+  //! - \c AllocStr_ functor that defines allocation strategy for the runs
+  template <  
+  			  class ValueType_,
+              class Cmp_,
+              unsigned BlockSize_,
+              class AllocStr_>
+  class runs_creator<
+	  	use_push<ValueType_>,
+	  	Cmp_ ,
+  		BlockSize_,
+  		AllocStr_>
+  {
+    Cmp_ cmp;
+  public:
+	typedef ValueType_ value_type;
+    typedef BID<BlockSize_> bid_type;
+    typedef typed_block<BlockSize_,value_type> block_type;
+    typedef sort_local::trigger_entry<bid_type,value_type> trigger_entry_type;
+    typedef sorted_runs<value_type,trigger_entry_type> sorted_runs_type;
+  private:
+    typedef typename sorted_runs_type::run_type run_type;
+    sorted_runs_type result_; // stores the result (sorted runs)
+    unsigned m_; // memory for internal use in blocks
+    
+    bool output_requested; // true after the result() method was called for the first time
+  
+    const unsigned m2;
+    const unsigned el_in_run;
+	unsigned cur_el;  
+    block_type *Blocks1;
+    block_type *Blocks2;
+    request_ptr * write_reqs;
+    run_type run;
+  
+  
+    runs_creator();// default construction is forbidden
+    runs_creator(const runs_creator & );// copy construction is forbidden
+  	runs_creator & operator = (const runs_creator &); // copying is forbidden
+    
+    
+    void sort_run(block_type * run,unsigned elements)
+    {
+      if(block_type::has_filler)
+        std::sort(
+                  TwoToOneDimArrayRowAdaptor< 
+                    block_type,
+                    value_type,
+                    block_type::size > (run,0 ),
+                  TwoToOneDimArrayRowAdaptor< 
+                    block_type,
+                    value_type,
+                    block_type::size > (run, 
+                      elements )
+                  ,cmp);
+      else 
+        std::sort(run[0].elem, run[0].elem + elements, cmp);
+    }
+	void finish_result()
+	{
+		if(cur_el == 0) return;
+			
+		unsigned cur_el_reg = cur_el;
+		sort_run(Blocks1, cur_el_reg);
+		result_.elements += cur_el_reg;
+		const unsigned cur_run_size = div_and_round_up(cur_el_reg, block_type::size); // in blocks
+		run.resize(cur_run_size);
+		block_manager * bm = block_manager::get_instance();
+		bm->new_blocks(AllocStr_(),
+		  trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(run.begin()),
+		  trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(run.end())
+		);
+		
+		disk_queues::get_instance ()->set_priority_op(disk_queue::WRITE);
+		
+		result_.runs_sizes.push_back(cur_el_reg);
+		
+		// fill the rest of the last block with max values
+		for(;cur_el_reg!=el_in_run;++cur_el_reg)
+			Blocks1[cur_el_reg/block_type::size][cur_el_reg%block_type::size] = cmp.max_value();
+		
+		unsigned i=0;
+		for (; i < cur_run_size; ++i)
+		{
+			run[i].value = Blocks1[i][0];
+			if(write_reqs[i].get()) write_reqs[i]->wait();
+			write_reqs[i] = Blocks1[i].write(run[i].bid);
+		}
+		result_.runs.push_back(run);
+		
+		for (i=0; i < m2; ++i)
+			if(write_reqs[i].get()) write_reqs[i]->wait();
+		
+	}
+  public:
+    //! \brief Creates the object
+    //! \param c comparator object
+    //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
+    runs_creator(Cmp_ c,unsigned memory_to_use):
+      	cmp(c),m_(memory_to_use/BlockSize_),output_requested(false),
+      	m2(m_ / 2),
+    	el_in_run(m2* block_type::size),
+  		cur_el(0),
+  		Blocks1(new block_type[m2*2]),
+  		Blocks2(Blocks1 + m2),
+  		write_reqs(new request_ptr[m2])
+    {
+		result_.elements = 0;
+    }
+	
+	~runs_creator()
+	{
+			delete [] write_reqs;
+    		delete [] ((Blocks1<Blocks2)?Blocks1:Blocks2);
+	}
+	
+	//! \brief Adds new element to the sorter
+	//! \param val value to be added
+	void push(const value_type & val)
+	{
+		assert(output_requested == false);
+		unsigned cur_el_reg = cur_el;
+		if(cur_el_reg < el_in_run)
+		{
+			Blocks1[cur_el_reg/block_type::size][cur_el_reg%block_type::size] = val;
+			++cur_el;
+			return;
+		}
+		
+		assert(el_in_run == cur_el);
+		cur_el = 0;
+		
+		//sort and store Blocks1
+		sort_run(Blocks1,el_in_run);
+		result_.elements += el_in_run;
+		
+		const unsigned cur_run_size = div_and_round_up(el_in_run,block_type::size); // in blocks
+		run.resize(cur_run_size);
+		block_manager * bm = block_manager::get_instance();
+		bm->new_blocks(AllocStr_(),
+		  trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(run.begin()),
+		  trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(run.end())
+		);
+		
+		disk_queues::get_instance ()->set_priority_op(disk_queue::WRITE);
+		
+		result_.runs_sizes.push_back(el_in_run);
+		
+		for (unsigned i = 0; i < cur_run_size; ++i)
+		{
+			run[i].value = Blocks1[i][0];
+			if( write_reqs[i].get() ) write_reqs[i]->wait();
+			write_reqs[i] = Blocks1[i].write(run[i].bid);
+		}
+		
+		result_.runs.push_back(run); 
+	
+		swap(Blocks1,Blocks2);
+		
+		push(val);
+	}
+    
+    //! \brief Returns the sorted runs object
+    //! \return Sorted runs object.
+    //! \remark Returned object is intended to be used by \c runs_merger object as input
+    const sorted_runs_type & result()
+    {
+      
+	  if(!output_requested)
+      {
+        finish_result();
+        output_requested = true;
+      }
+      return result_;
+    }
+  };
+  
+  
+ 
   
   //! \brief Input strategy for \c runs_creator class
   //!
@@ -317,7 +514,8 @@ namespace stream
   {
 		typedef ValueType_ value_type;
   };
- 
+  
+  
   //! \brief Forms sorted runs of data taking elements in sorted order (element by element)
   //!
   //! A specialization of \c runs_creator that

@@ -158,7 +158,8 @@ module.source.files=\
 	containers/bench_pqueue.cpp\
 	stream/stream.cpp\
 	stream/test_stream.cpp\
-	stream/sorted_runs.cpp
+	stream/sorted_runs.cpp\
+	stream/push_sort.cpp
 
 module.pixmap.name=.
 module.pixmap.type=
