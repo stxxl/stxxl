@@ -244,6 +244,7 @@ private:
 
 //! Use it if your access patttern consists of many repeated push'es and pop's
 //! For semantics of the methods see documentation of the STL \c std::stack.
+//! \warning The amortized complexity of operation is not O(1/DB), rather O(DB)
 template <class Config_>
 class grow_shrink_stack
 {

@@ -211,6 +211,109 @@ namespace stream
 	  		(begin,end,nbuffers);
   }
 
+  //! \brief Version of  \c iterator2stream. Switches between \c vector_iterator2stream and \c iterator2stream .
+  //!
+  //! small range switches between
+  //! \c vector_iterator2stream and \c iterator2stream .
+  //! iterator2stream is chosen if the input iterator range
+  //! is small ( < B )
+  template <class InputIterator_>
+  class vector_iterator2stream_sr
+  {
+	vector_iterator2stream<InputIterator_> * vec_it_stream;
+	iterator2stream<InputIterator_> *  it_stream;
+
+    //! \brief Default construction is forbidden
+    vector_iterator2stream_sr();
+
+	typedef typename InputIterator_::block_type block_type;	  
+  public:
+	 typedef vector_iterator2stream_sr<InputIterator_> Self_;
+ 
+    //! \brief Standard stream typedef
+    typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
+      
+    vector_iterator2stream_sr(InputIterator_ begin,InputIterator_ end, unsigned nbuffers = 0) 
+  	{
+		if(end - begin < block_type::size )
+		{
+			STXXL_ERRMSG("Choosing iterator2stream<InputIterator_>")
+			it_stream = new iterator2stream<InputIterator_>(begin, end);
+			vec_it_stream = NULL;
+		}
+		else
+		{
+			STXXL_ERRMSG("Choosing vector_iterator2stream<InputIterator_>")
+			it_stream = NULL;
+			vec_it_stream = new vector_iterator2stream<InputIterator_>(begin,end,nbuffers);
+		}
+	}
+    
+    vector_iterator2stream_sr(const Self_ & a): vec_it_stream(a.vec_it_stream), it_stream(a.it_stream) {}
+       
+    //! \brief Standard stream method
+    const value_type & operator * () const
+    {
+    	if(it_stream)
+			return **it_stream;
+		return **vec_it_stream;
+    }
+	
+    //! \brief Standard stream method
+    Self_ &  operator ++()
+    {
+      if(it_stream)
+		  ++(*it_stream);
+	  else
+		  ++(*vec_it_stream);
+	  
+      return *this;
+    }
+    
+    //! \brief Standard stream method
+    bool empty() const
+    {
+		if(it_stream)
+			return it_stream->empty();
+		return vec_it_stream->empty();
+    }
+	virtual ~vector_iterator2stream_sr() 
+	{
+		if(it_stream)
+			delete it_stream;
+		else
+			delete vec_it_stream;
+	}
+  };
+  
+  //! \brief Version of  \c streamify. Switches from \c vector_iterator2stream to \c iterator2stream for small ranges.
+    template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
+		unsigned BlkSize_, typename PgTp_, unsigned PgSz_ > 
+  vector_iterator2stream_sr<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
+  	streamify_sr(
+  		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> begin,
+  		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
+  		unsigned nbuffers = 0)
+  {
+	  	STXXL_VERBOSE1("streamify_sr for vector_iterator range is called")
+    	return vector_iterator2stream_sr<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
+	  		(begin,end,nbuffers);
+  }
+  
+  //! \brief Version of  \c streamify. Switches from \c vector_iterator2stream to \c iterator2stream for small ranges.
+  template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
+		unsigned BlkSize_, typename PgTp_, unsigned PgSz_ > 
+  vector_iterator2stream_sr<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
+  	streamify_sr(
+  		stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> begin,
+  		stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
+  		unsigned nbuffers = 0)
+  {
+	  	STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called")
+    	return vector_iterator2stream_sr<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
+	  		(begin,end,nbuffers);
+  }
+  
   //! \brief Stores consecutively stream content to an output iterator
   //! \param in stream to be stored used as source
   //! \param out output iterator used as destination
@@ -1484,7 +1587,7 @@ namespace stream
 				++input;
 		} 
 		//! \brief Standard stream method
-		value_type operator * () const { return current; } 
+		const value_type operator * () const { return current; } 
 		//! \brief Standard stream method
 		bool empty() const { return input.empty(); }
 	};

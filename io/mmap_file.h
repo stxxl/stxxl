@@ -88,11 +88,14 @@ __STXXL_BEGIN_NAMESPACE
 			#endif
 		}
 		// file->set_size(offset+bytes);
-		void *mem = mmap (NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file->get_file_des (), offset);
+		int prot = (type == READ)? PROT_READ: PROT_WRITE;
+		void *mem = mmap (NULL, bytes, prot , MAP_SHARED, file->get_file_des (), offset);
+		// void *mem = mmap (buffer, bytes, PROT_READ | PROT_WRITE, MAP_SHARED|MAP_FIXED , file->get_file_des (), offset);
+		// STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
 		if (mem == MAP_FAILED)
 		{
 			STXXL_ERRMSG("Mapping failed.")
-			STXXL_ERRMSG("Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size" << 
+			STXXL_ERRMSG("Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " << 
 				(offset % sysconf(_SC_PAGESIZE)))
 			abort ();
 		}
