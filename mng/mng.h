@@ -507,7 +507,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		STXXL_VERBOSE2("DiskAllocator::delete_blocks<BLK_SIZE> BLK_SIZE="<< BLK_SIZE <<
       ", free:" << free_bytes << " total:"<< disk_bytes )
     
-    unsigned i=0;
+    	unsigned i=0;
 		for (; i < bids.size (); i++)
 		{
 			off_t region_pos = bids[i].offset;
