@@ -481,6 +481,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		
 #ifdef COUNT_WAIT_TIME
 	double io_wait_after_rf = stxxl::wait_time_counter;
+	io_wait_after_rf += 0.0; // to get rid of the 'unused variable warning'
 #endif
 
 	disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
