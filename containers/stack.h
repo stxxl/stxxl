@@ -473,6 +473,12 @@ public:
     block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
   }
   size_type size() const { return size_; }
+    
+  bool empty() const
+  {
+    return (!size_);
+  }
+    
   void push(const value_type & val)
   {
     STXXL_VERBOSE3("grow_shrink_stack2::push("<< val <<")")
