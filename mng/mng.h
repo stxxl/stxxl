@@ -659,7 +659,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	//! \remarks model of \b allocation_strategy concept
 	struct RC:public striping
 	{
-		std::vector < int >perm;
+		std::vector<int> perm;
 		 
 		RC (int b, int e):striping (b, e), perm (diff)
 		{
