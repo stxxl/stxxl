@@ -94,14 +94,15 @@ public:
 		{
 		};
 public:
-	  vector_iterator ():offset (0), p_vector (NULL)
-		{
-		};
+	    vector_iterator ():offset (0), p_vector (NULL){}
 		vector_iterator (const _Self & a):
 			offset (a.offset),
-			p_vector (a.p_vector)
-		{
-		};
+			p_vector (a.p_vector) {}
+				
+		vector_iterator (const const_iterator & a):
+			offset (a.offset),
+			p_vector (a.p_vector) {}
+				
 		block_offset_type block_offset () const
 		{
 			return static_cast < block_offset_type >
@@ -232,9 +233,12 @@ public:
 		};
 		const_vector_iterator (const _Self & a):
 			offset (a.offset),
-			p_vector (a.p_vector)
-		{
-		};
+			p_vector (a.p_vector) {}
+		
+		const_vector_iterator (const iterator & a):
+			offset (a.offset),
+			p_vector (a.p_vector) {}
+				
 		const_vector_iterator (const _NonConstIterator & a):offset (a.offset),
 			p_vector (a.p_vector)
 		{
@@ -402,13 +406,13 @@ public:
 			
 			int all_pages = div_and_round_up (_bids.size(), page_size);
 			int i=0;
-			for(;i<all_pages;i++)
+			for(;i<all_pages;++i)
 			{
 				_page_status[i] = uninitialized;
 				_last_page[i] = on_disk;
 			}
 			
-			for(i=0;i<n_pages;i++)
+			for(i=0;i<n_pages;++i)
 				_free_pages.push(i);
 		
 
