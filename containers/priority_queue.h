@@ -1443,7 +1443,9 @@ namespace priority_queue_local
       B = B_,
       m = m_,
       c = k - m_,
-      fits = c>10 && ((k-m)*(m)*(m*B/(E*4*1024))) >= int(MaxS_),
+      // memory occ. by block must be at least 10 times larger than size of ext sequence
+      // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
+      fits = c>10 && ((k-m)*(m)*(m*B/(E*4*1024))) >= int(MaxS_) && (MaxS_<((k-m)*m/(2*E))*1024 || m >= 128),
       step = 1
     };
     
@@ -1547,7 +1549,8 @@ namespace priority_queue_local
 //! one million elements in a time, then the right parameter is (1000000/1024)= 976 .
 //! - \c Tune_ tuning parameter. Try to play with it if the code does not compile 
 //! (larger than default values might help). Code does not compile
-//! if no suitable internal parameters were found for given IntM_ and MaxS_
+//! if no suitable internal parameters were found for given IntM_ and MaxS_. 
+//! It might also happen that given IntM_ is too small for given MaxS_, try larger values.
 //! <BR>
 //! \c PRIORITY_QUEUE_GENERATOR is template meta program that searches 
 //! for \b 7 configuration parameters of \b stxxl::priority_queue that both 

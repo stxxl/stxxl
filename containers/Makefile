@@ -23,5 +23,9 @@ p_queue: p_queue.cpp $(DEPENDENCIES)
 ext_merger: ext_merger.cpp $(DEPENDENCIES)
 	$(GCC) ext_merger.cpp -o ext_merger $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2
 
+
+bench_pqueue: bench_pqueue.cpp $(DEPENDENCIES)
+	$(GCC) bench_pqueue.cpp -o bench_pqueue $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=0
+
 clean:
 	rm -f *.o sort 
