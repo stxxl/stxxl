@@ -68,6 +68,11 @@ namespace stream
     {
       return *current_;
     }
+	
+	const value_type * operator -> () const
+    {
+      return &current_;
+    }
     
     //! \brief Standard stream method
     iterator2stream &  operator ++()
@@ -146,6 +151,11 @@ namespace stream
     const value_type & operator * () const
     {
     	return **in;
+    }
+	
+	const value_type * operator -> () const
+    {
+      return (*in).operator->();
     }
 	
     //! \brief Standard stream method
@@ -257,6 +267,13 @@ namespace stream
     	if(it_stream)
 			return **it_stream;
 		return **vec_it_stream;
+    }
+	
+	const value_type * operator -> () const
+    {
+		if(it_stream)
+			return (*it_stream).operator->();
+		return (*vec_it_stream).operator->();
     }
 	
     //! \brief Standard stream method
@@ -514,6 +531,11 @@ namespace stream
       return current_;
     }
     
+	const value_type * operator -> () const
+	{
+		return &current_;
+	}
+	
     //! \brief Standard stream method
     generator2stream &  operator ++()
     {
@@ -585,6 +607,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     transform &  operator ++()
@@ -642,6 +669,11 @@ namespace stream
       return current;
     }
     
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
+	
     //! \brief Standard stream method
     transform &  operator ++()
     {
@@ -693,6 +725,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     transform &  operator ++()
@@ -751,6 +788,11 @@ namespace stream
       return current;
     }
     
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
+	
     //! \brief Standard stream method
     transform &  operator ++()
     {
@@ -811,6 +853,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     transform &  operator ++()
@@ -878,6 +925,11 @@ namespace stream
       return current;
     }
     
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
+	
     //! \brief Standard stream method
     transform &  operator ++()
     {
@@ -957,6 +1009,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     make_tuple &  operator ++()
@@ -1027,6 +1084,11 @@ namespace stream
       return current;
     }
     
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
+	
     //! \brief Standard stream method
     make_tuple &  operator ++()
     {
@@ -1089,6 +1151,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     make_tuple &  operator ++()
@@ -1158,6 +1225,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     make_tuple &  operator ++()
@@ -1235,6 +1307,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     make_tuple &  operator ++()
@@ -1297,6 +1374,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     choose &  operator ++()
@@ -1348,6 +1430,11 @@ namespace stream
       return current;
     }
     
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
+	
     //! \brief Standard stream method
     choose &  operator ++()
     {
@@ -1397,6 +1484,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     choose &  operator ++()
@@ -1447,6 +1539,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     choose &  operator ++()
@@ -1498,6 +1595,11 @@ namespace stream
       return current;
     }
     
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
+	
     //! \brief Standard stream method
     choose &  operator ++()
     {
@@ -1547,6 +1649,11 @@ namespace stream
     {
       return current;
     }
+	
+	const value_type * operator -> () const
+	{
+		return &current;
+	}
     
     //! \brief Standard stream method
     choose &  operator ++()
@@ -1593,6 +1700,12 @@ namespace stream
 		//! \brief Standard stream method
 		const value_type operator * () const { return current; } 
 		//! \brief Standard stream method
+		const value_type * operator -> () const
+		{
+			return &current;
+		}
+		
+		//! \brief Standard stream method
 		bool empty() const { return input.empty(); }
 	};
   
@@ -1619,6 +1732,13 @@ namespace stream
 		} 
 		//! \brief Standard stream method
 		value_type operator * () const { return current; } 
+		
+		//! \brief Standard stream method
+		const value_type * operator -> () const
+		{
+			return &current;
+		}
+		
 		//! \brief Standard stream method
 		bool empty() const { return input.empty(); }
 	};

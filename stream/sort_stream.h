@@ -1036,6 +1036,15 @@ namespace stream
       assert(!empty());
       return current_value;
     }
+	
+	//! \brief Standard stream method
+    const value_type * operator -> () const
+    {
+      assert(!empty());
+      return &current_value;
+    }
+	
+	
     //! \brief Destructor
     //! \remark Deallocates blocks of the input sorted runs object
     virtual ~runs_merger()
@@ -1248,8 +1257,15 @@ namespace stream
     //! \brief Standard stream method
     const value_type & operator * () const
     {
-      return *merger;
+		assert(!empty());
+      	return *merger;
     }
+	
+	const value_type * operator -> () const
+    {	
+      	assert(!empty());
+		return merger.operator->();
+	}
     
     //! \brief Standard stream method
     sort & operator ++()

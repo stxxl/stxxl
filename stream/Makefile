@@ -1,4 +1,4 @@
-all: test 
+all: test stream sruns push_sort 
 
 include ../compiler.make
 
