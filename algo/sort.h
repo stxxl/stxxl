@@ -352,7 +352,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	//	   << partial_runs) 
 	
 #ifdef STXXL_IO_STATS
-	stats *iostats = stats::get_instance();
+	// stats *iostats = stats::get_instance();
 	// iostats->reset();
 #endif
 	

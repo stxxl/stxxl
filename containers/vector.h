@@ -609,6 +609,7 @@ private:
 		{
 			int page_no = offset/(block_type::size*page_size);
 			int page_offset = offset % (block_type::size*page_size);
+			assert(page_no < int(_last_page.size()) ); // fails if offset is too large, out of bound access
 			int last_page = _last_page[page_no];
 			if(last_page < 0)  // == on_disk
 			{ 
@@ -664,12 +665,15 @@ private:
 		};
 		void touch(size_type offset)
 		{
+			// fails if offset is too large, out of bound access
+			assert(offset/(block_type::size*page_size) < _page_status.size() );
 			_page_status[offset/(block_type::size*page_size)] = 0;
 		}
 		const_reference const_element(size_type offset) const
 		{
 			int page_no = offset/(block_type::size*page_size);
 			int page_offset = offset % (block_type::size*page_size);
+			assert(page_no < int(_last_page.size()) ); // fails if offset is too large, out of bound access
 			int last_page = _last_page[page_no];
 			if(last_page < 0)  // == on_disk
 			{ 

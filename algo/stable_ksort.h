@@ -207,7 +207,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 	first.flush(); // flush container
 	
 #ifdef STXXL_IO_STATS
-	stats *iostats = stats::get_instance ();
+	// stats *iostats = stats::get_instance ();
 	 // iostats->reset ();
 #endif
 	
