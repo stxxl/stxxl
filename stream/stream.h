@@ -109,6 +109,11 @@ namespace stream
 
     //! \brief Default construction is forbidden
     vector_iterator2stream() {};
+		
+	void delete_stream()
+	{
+		in.reset();
+	}
   public:
 	 typedef vector_iterator2stream<InputIterator_> Self_;
   
@@ -116,7 +121,7 @@ namespace stream
     typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
       
     vector_iterator2stream(InputIterator_ begin,InputIterator_ end, unsigned nbuffers = 0): 
-      current_(begin),end_(end)
+      current_(begin),end_(end), in(NULL)
   	{
 		
 		begin.flush(); // flush container
@@ -133,7 +138,6 @@ namespace stream
 			for( ;cur != begin;++cur) 
 				++(*in);
 		}
-		
 	}
     
     vector_iterator2stream(const Self_ & a): current_(a.current_),end_(a.end_),in(a.in) {}
@@ -150,6 +154,7 @@ namespace stream
       assert(end_ != current_);
       ++current_;
 	  ++(*in);
+	  if(empty()) delete_stream();  
       return *this;
     }
     
@@ -158,6 +163,10 @@ namespace stream
     {
       return (current_==end_);
     }
+	virtual ~vector_iterator2stream() 
+	{
+		delete_stream();  // not needed actually
+	}
   };
   
   //! \brief Input external \c stxxl::vector iterator range to stream convertor
