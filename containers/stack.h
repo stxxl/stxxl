@@ -631,13 +631,13 @@ public:
   template <class stack_type> 
   migrating_stack(const stack_type & stack_);  
   //! \brief Returns true if current implementation is internal, otherwise false
-  bool internal() 
+  bool internal() const
   { 
     assert((int_impl && !ext_impl)||(!int_impl && ext_impl));
     return int_impl; 
   }
   //! \brief Returns true if current implementation is external, otherwise false
-  bool external() 
+  bool external() const
   {
     assert((int_impl && !ext_impl)||(!int_impl && ext_impl));
     return ext_impl; 
@@ -662,6 +662,15 @@ public:
     return ext_impl->size();
   }
   value_type & top()
+  {
+    assert((int_impl && !ext_impl)||(!int_impl && ext_impl));
+    
+    if(int_impl)
+      return int_impl->top();
+    
+    return ext_impl->top();
+  }
+  const value_type & top() const
   {
     assert((int_impl && !ext_impl)||(!int_impl && ext_impl));
     
@@ -730,6 +739,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!  - \c Behaviour ,  choses \b external implementation, one of:
 //!    - \c normal , conservative version, implemented in \c stxxl::normal_stack , is default
 //!    - \c grow_shrink , efficient version, implemented in \c stxxl::grow_shrink_stack
+//!    - \c grow_shrink2 , efficient version, implemented in \c stxxl::grow_shrink_stack2
 //!  - \c BlocksPerPage defines how many blocks has one page of internal cache of an 
 //!       \b external implementation, default is four. All \b external implementations have 
 //!       \b two pages.
