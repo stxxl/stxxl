@@ -1,4 +1,4 @@
-# Anjuta Version 1.0.0 
+# Anjuta Version 1.1.97 
 Compatibility Level: 1 
 
 <PROJECT_DESCRIPTION_START>
@@ -23,7 +23,7 @@ STL-like library for external computations
 
 props.file.type=project
 
-anjuta.version=1.0.0
+anjuta.version=1.1.97
 anjuta.compatibility.level=1
 
 project.name=STXXL
@@ -32,13 +32,15 @@ project.target.type=EXECUTABLE
 project.version=0.01
 project.author=Roman Dementiev
 project.source.target=Linux/Solaris
-
-project.excluded.modules=\
-	intl
-
 project.has.gettext=0
-
+project.gui.command=
 project.programming.language=C_C++
+project.excluded.modules=	intl
+
+project.config.extra.modules.before=
+project.config.extra.modules.after=
+project.config.blocked=1
+project.config.disable.overwriting=1 1 1 1 1 1 1 1 1 
 
 project.menu.entry=STXXL Version 0.01
 project.menu.group=Application
@@ -47,18 +49,26 @@ project.menu.icon=
 project.menu.need.terminal=0
 
 project.configure.options=
-
 anjuta.program.arguments=
-
-project.config.blocked=1
-
-project.config.disable.overwriting=1 1 1 1 1 1 1 1 1 
-project.config.extra.modules.before=
-project.config.extra.modules.after=
+preferences.build.option.jobs=0
+preferences.build.option.silent=0
+preferences.build.option.autosave=0
+preferences.anjuta.make.options=-k
+preferences.make=make
+preferences.build.option.keep.going=1
+preferences.build.option.warn.undef=0
+preferences.autoformat.custom.style= -i8 -sc -bli0 -bl0 -cbi0 -ss
+preferences.autoformat.style=Style of Kangleipak
+preferences.indent.opening=0
+preferences.autoformat.disable=1
+preferences.indent.automatic=1
+preferences.use.tabs=1
+preferences.indent.size=4
+preferences.tabsize=4
+preferences.indent.closing=0
 
 module.include.name=.
 module.include.type=
-module.include.expanded=1
 module.include.files=\
 	mng/adaptor.h\
 	mng/mng.h\
@@ -112,7 +122,6 @@ module.include.files=\
 
 module.source.name=.
 module.source.type=
-module.source.expanded=1
 module.source.files=\
 	mng/test.cpp\
 	apps/msort.cpp\
@@ -152,52 +161,37 @@ module.source.files=\
 
 module.pixmap.name=.
 module.pixmap.type=
-module.pixmap.expanded=0
 module.pixmap.files=
 
 module.data.name=.
 module.data.type=
-module.data.expanded=0
 module.data.files=
 
 module.help.name=.
 module.help.type=
-module.help.expanded=0
 module.help.files=
 
 module.doc.name=.
 module.doc.type=
-module.doc.expanded=0
 module.doc.files=
 
-module.po.expanded=0
 module.po.files=
 
 compiler.options.supports=
-
 compiler.options.include.paths=\
 	.\
 	..
-
 compiler.options.library.paths=
-
 compiler.options.libraries=
 compiler.options.libraries.selected=
-
 compiler.options.defines=\
 	HAVE_CONFIG_H
-
+compiler.options.defines.selected=
 compiler.options.warning.buttons=0 0 1 1 0 1 0 0 0 0 0 0 0 1 0 0 
-
 compiler.options.optimize.buttons=0 0 1 0 
-
 compiler.options.other.buttons=1 0 
-
 compiler.options.other.c.flags=
-
 compiler.options.other.l.flags=
-
 compiler.options.other.l.libs=
 
-project.source.paths=
-
+project.src.paths=
