@@ -54,15 +54,18 @@
  *   - name of your make program
  *   - name of your compiler
  *   - \c \<stxxl\> root directory ( \c directory_where_you_unpacked_the_tar_ball/stxxl )
- * - Run: \c make \c lib
- * - Run: \c make \c tests (optional, if you want to run some test programs)
+ * - Run: \verbatim make lib \endverbatim
+ * - Run: \verbatim make tests \endverbatim (optional, if you want to run some test programs)
  * 
  * In your makefiles of programs that will use \c \<stxxl\> you should include the file \c compiler.make
  * file (add the line 'include ../compiler.make') because it contains a useful variable (STXXL_VARS) 
  * that includes all compiler definitions and library paths that you need to compile an \c \<stxxl\> program.
  *
+ * For example: <BR> \verbatim g++  my_example.cpp -o my_example -g $(STXXL_VARS) \endverbatim
+ * 
  * Before you try to run one of the \c \<stxxl\> examples (or your \c \<stxxl\> program) you must configure the disk 
  * space that will be used as external memory for the library. See next section.
+ *
  *
  * \section space Disk space
  *
