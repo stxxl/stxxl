@@ -128,6 +128,8 @@ __STXXL_BEGIN_NAMESPACE
 					      unsigned (buffer) % BLOCK_ALIGN << " (" << 
 								std::hex << buffer << std::dec << ")");
 		}
+		
+		unsigned size() const { return bytes; }
 	public:
 		virtual ~ufs_request_base ()
 		{

@@ -32,6 +32,7 @@ extern double stxxl::wait_time_counter;
 	{
 		friend class disk_queue;
 		unsigned reads, writes;	// number of operations
+		int64 volume_read,volume_written; // number of bytes read/written
 		double t_reads, t_writes;	//  seconds spent in operations
 		double p_reads, p_writes;	// seconds spent in parallel operations
 		double p_begin_read, p_begin_write;	// start time of parallel operation
@@ -41,8 +42,11 @@ extern double stxxl::wait_time_counter;
 		int acc_reads, acc_writes;	// number of requests, participating in parallel operation
 		mutex read_mutex, write_mutex, io_mutex;
 		static stats * instance;
-		  stats ():reads (0),
+		  stats ():
+			reads (0),
 			writes (0),
+			volume_read(0),
+			volume_written(0),
 			t_reads (0.0),
 			t_writes (0.0),
 			p_reads (0.0),
@@ -74,6 +78,18 @@ extern double stxxl::wait_time_counter;
 		unsigned get_writes ()
 		{
 			return writes;
+		};
+		//! \brief Returns number of bytes read from disks
+		//! \return number of bytes read
+		int64 get_read_volume ()
+		{
+			return volume_read;
+		};
+		//! \brief Returns number of bytes written to the disks
+		//! \return number of bytes written
+		int64 get_written_volume ()
+		{
+			return volume_written;
 		};
 		//! \brief Returns time spent in serving all read requests
 		//! \remarks If there are \c n read requests that are served simultaneously
@@ -126,6 +142,7 @@ extern double stxxl::wait_time_counter;
 					endl;
 
 			reads = 0;
+			volume_read = 0;
 			t_reads = 0;
 			p_reads = 0.0;
 			read_mutex.unlock ();
@@ -137,6 +154,7 @@ extern double stxxl::wait_time_counter;
 					endl;
 
 			writes = 0;
+			volume_written = 0;
 			t_writes = 0.0;
 			p_writes = 0.0;
 			write_mutex.unlock ();
@@ -184,11 +202,12 @@ extern double stxxl::wait_time_counter;
 #endif
 		
 	protected:
-		void write_started ()
+		void write_started (unsigned size_)
 		{
 			write_mutex.lock ();
 			double now = stxxl_timestamp ();
-			writes++;
+			++writes;
+			volume_written += size_;
 			double diff = now - p_begin_write;
 			t_writes += double (acc_writes) * diff;
 			p_begin_write = now;
@@ -217,11 +236,12 @@ extern double stxxl::wait_time_counter;
 			p_begin_io = now;
 			io_mutex.unlock ();
 		}
-		void read_started ()
+		void read_started (unsigned size_)
 		{
 			read_mutex.lock ();
 			double now = stxxl_timestamp ();
-			reads++;
+			++reads;
+			volume_read += size_;
 			double diff = now - p_begin_read;
 			t_reads += double (acc_reads) * diff;
 			p_begin_read = now;

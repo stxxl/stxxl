@@ -199,17 +199,18 @@ __STXXL_BEGIN_NAMESPACE
 		friend class file;
 		friend class disk_queue;
 		friend class disk_queues;
-    friend class request_ptr;
+    	friend class request_ptr;
 		
 	protected:
 		virtual bool add_waiter (onoff_switch * sw) = 0;
 		virtual void delete_waiter (onoff_switch * sw) = 0;
 		//virtual void enqueue () = 0;
 		virtual void serve () = 0;
+		virtual unsigned size() const = 0;
 	
 		completion_handler on_complete;
 		int ref_cnt;
-    mutex ref_cnt_mutex;
+    	mutex ref_cnt_mutex;
     
 		enum request_type { READ, WRITE };
 		

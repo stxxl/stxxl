@@ -543,7 +543,9 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	after_runs_creation - begin << " s")
 #ifdef STXXL_IO_STATS
 	STXXL_VERBOSE ("reads               : " << iostats->get_reads ()) 
-	STXXL_VERBOSE ("writes              : " << iostats->get_writes ())
+	STXXL_VERBOSE ("reads(volume)       : " << iostats->get_read_volume ()<< " bytes") 
+	STXXL_VERBOSE ("writes              : " << iostats->get_writes () << " bytes")
+	STXXL_VERBOSE ("writes(volume)      : " << iostats->get_written_volume ())
 	STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s") 
 	STXXL_VERBOSE ("write time          : " << iostats->get_write_time () <<" s")
 	STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s")
@@ -623,7 +625,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 	typedef typename ExtIterator_::vector_type::value_type value_type;
 	typedef typename ExtIterator_::block_type block_type;
 	
-	assert(2*block_type::raw_size <= M);
+	assert(2*block_type::raw_size <= M__);
 	
 	unsigned n=0;
 	block_manager *mng = block_manager::get_instance ();

@@ -283,6 +283,7 @@ namespace stxxl
 		sim_disk_request();
 	};
 
+	
 	void sim_disk_request::serve ()
 	{
 		//      file->set_size(offset+bytes);

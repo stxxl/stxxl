@@ -79,7 +79,7 @@ namespace stxxl
 
 					pthis->write_mutex.unlock ();
 #ifdef STXXL_IO_STATS
-					pthis->iostats->write_started ();
+					pthis->iostats->write_started (req->size());
 #endif
 
 					req->serve ();
@@ -115,7 +115,7 @@ namespace stxxl
 					pthis->read_mutex.unlock ();
 
 #ifdef STXXL_IO_STATS
-					pthis->iostats->read_started ();
+					pthis->iostats->read_started (req->size());
 #endif
 
 					req->serve ();
