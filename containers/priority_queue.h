@@ -479,17 +479,18 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
       current[to] = current[from];
       segment[to] = segment[from];
       to++;
-    }
+    }/*
     else
     {
       if(segment[from])
       {
-        STXXL_VERBOSE2("looser_tree::~compactTree() deleting segment "<<from)
+        STXXL_VERBOSE2("looser_tree::compactTree() deleting segment "<<from<<
+					" address: "<<segment[from]<<" size: "<<segment_size[from])
         delete [] segment[from];
         segment[from] = 0;
         mem_cons_ -= segment_size[from];
       }
-    }
+    }*/
   }
 
   // half degree as often as possible
@@ -519,8 +520,8 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
 {
   STXXL_VERBOSE2("looser_tree::insert_segment("<< to <<","<< sz<<")")
   //std::copy(to,to + sz,std::ostream_iterator<ValTp_>(std::cout, "\n"));
-  
-  if (sz > 0)
+  assert(sz != 0);
+  //if (sz > 0)
   {
     assert( not_sentinel(to[0])   );
     assert( not_sentinel(to[sz-1]));
@@ -544,13 +545,13 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
     int dummyMask;
     updateOnInsert((index + k) >> 1, *to, index, 
                    &dummyKey, &dummyIndex, &dummyMask);
-  } else {
+  } /*else {
     // immediately deallocate
     // this is not only an optimization 
     // but also needed to keep empty segments from
     // clogging up the tree
-    delete [] to;
-  }
+    delete [] to; 
+  }*/
 }
 
 
@@ -576,11 +577,13 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int index)
 {
   // reroute current pointer to some empty dummy segment
   // with a sentinel key
+	STXXL_VERBOSE2("looser_tree::deallocateSegment() deleting segment "<<
+		index<<" address: "<<segment[index]<<" size: "<<segment_size[index])
   current[index] = &dummy;
 
   // free memory
   delete [] segment[index];
-  segment[index] = NULL;
+  segment[index] = 0;
   mem_cons_ -= segment_size[index];
   
   // push on the stack of free segment indices
@@ -1199,7 +1202,7 @@ int priority_queue<Config_>::refillBuffer2(int j)
  
  
 // move elements from the 2nd level buffers 
-// to the delete buffer
+// to the buffer
 template <class Config_>
 void priority_queue<Config_>::refillBuffer1() 
 {

@@ -20,6 +20,9 @@ many: many_stacks.cpp $(DEPENDENCIES)
 p_queue: p_queue.cpp $(DEPENDENCIES)
 	$(GCC) p_queue.cpp -o p_queue $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1 
 
+p_bug: testPQueue.cpp $(DEPENDENCIES)
+	$(GCC) testPQueue.cpp -o p_bug  $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2 -g
+
 ext_merger: ext_merger.cpp $(DEPENDENCIES)
 	$(GCC) ext_merger.cpp -o ext_merger $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2
 
