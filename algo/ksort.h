@@ -330,76 +330,102 @@ public:
 template < typename block_type,typename run_type , typename key_ext_>
   bool check_ksorted_runs(		run_type ** runs, 
 								unsigned nruns, 
+								unsigned m,
 								key_ext_ keyext)
   {
     typedef typename block_type::value_type value_type;
 	  
     //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
-	STXXL_MSG("check_sorted_runs  Runs: "<<nruns)
+	  STXXL_MSG("check_sorted_runs  Runs: "<<nruns)
     unsigned irun=0;
     for(irun = 0; irun < nruns; ++irun)
     {
-       const unsigned nblocks = runs[irun]->size();
-	   const unsigned nelements = nblocks*block_type::size ;
-       block_type * blocks = new block_type[nblocks];
-       request_ptr * reqs = new request_ptr[nblocks];
-       for(unsigned j=0;j<nblocks;++j)
-       {
-         reqs[j] = blocks[j].read((*runs[irun])[j].bid);
-       }
-       wait_all(reqs,reqs + nblocks);
-       for(unsigned j=0;j<nblocks;++j)
-       {
-         if(keyext(blocks[j][0]) != (*runs[irun])[j].key)
-		 {
-		   STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<j)
-		   STXXL_MSG("                   trigger value: "<<(*runs[irun])[j].key)
-		   STXXL_MSG("Data in the block:")
-		   for(unsigned k=0; k<block_type::size;++k)
-			   STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k]<<" with key: "<<keyext(blocks[j][k]))
-		   
-		   STXXL_MSG("BIDS:")
-		   for(unsigned k=0; k<nblocks;++k)
-		   {
-				if( k == j) STXXL_MSG("Bad one comes next.")
-		   		STXXL_MSG("BID "<<k<<" is: "<<((*runs[irun])[k].bid))
-		   }
+       const unsigned nblocks_per_run = runs[irun]->size();
+			 unsigned blocks_left = nblocks_per_run;
+			 block_type * blocks = new block_type[m];
+			 request_ptr * reqs = new request_ptr[m];
+			 value_type last;
 			
-           return false;
-		 }
-       }
-       if(!is_sorted(
-                  TwoToOneDimArrayRowAdaptor< 
-                    block_type,
-                    value_type,
-                    block_type::size > (blocks,0 ),
-                  TwoToOneDimArrayRowAdaptor< 
-                    block_type,
-                    value_type,
-                    block_type::size > (blocks, 
-	   				  nelements
-                  ),key_comparison<value_type,key_ext_>()) )
-	   {
-		   STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
-		   STXXL_MSG("Data in blocks:")
-		   for(unsigned j=0;j<nblocks;++j)
-		   {
-		   	   for(unsigned k=0; k<block_type::size;++k)
-			        STXXL_MSG("     Element "<<k<<" in block "<< j <<" is :"<<blocks[j][k]<<" with key: "<<keyext(blocks[j][k]))
-		   }
-		   STXXL_MSG("BIDS:")
-		   for(unsigned k=0; k<nblocks;++k)
-		   {
-		   		STXXL_MSG("BID "<<k<<" is: "<<((*runs[irun])[k].bid))
-		   }
-		   
-           return false;
-	   }
-       
-       delete [] reqs;
-       delete [] blocks;
-    }
-
+			 for(unsigned off = 0; off < nblocks_per_run ; off += m)
+			 {
+				 const unsigned nblocks = STXXL_MIN(blocks_left,m);
+				 const unsigned nelements = nblocks*block_type::size ;
+				 blocks_left -= nblocks;
+				 
+				 for(unsigned j=0;j<nblocks;++j)
+				 {
+					 reqs[j] = blocks[j].read((*runs[irun])[off + j].bid);
+				 }
+				 wait_all(reqs,reqs + nblocks);
+				 
+				 if(off && (!(keyext(blocks[0][0]) < keyext(last))))
+				 { 
+					 STXXL_MSG("check_sorted_runs  wrong first value in the run "<<irun)
+					 STXXL_MSG(" first value: "<<blocks[0][0]<<" with key"<<keyext(blocks[0][0]))
+					 STXXL_MSG(" last  value: "<<last<<" with key"<<keyext(last))
+					 for(unsigned k=0; k<block_type::size;++k)
+						 STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[0][k]<< " key: "<<keyext(blocks[0][k]))
+					 return false;
+				 }
+					 
+				 for(unsigned j=0;j<nblocks;++j)
+				 {
+					 if(keyext(blocks[j][0]) != (*runs[irun])[off + j].key)
+			 {
+				 STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<(off + j))
+				 STXXL_MSG("                   trigger value: "<<(*runs[irun])[off + j].key)
+				 STXXL_MSG("Data in the block:")
+				 for(unsigned k=0; k<block_type::size;++k)
+					 STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k]<<" with key: "<<keyext(blocks[j][k]))
+				 
+				 STXXL_MSG("BIDS:")
+				 for(unsigned k=0; k<nblocks;++k)
+				 {
+					if( k == j) STXXL_MSG("Bad one comes next.")
+						STXXL_MSG("BID "<<(off+k)<<" is: "<<((*runs[irun])[off + k].bid))
+				 }
+				
+						 return false;
+			 }
+				 }
+				 if(!is_sorted(
+										TwoToOneDimArrayRowAdaptor< 
+											block_type,
+											value_type,
+											block_type::size > (blocks,0 ),
+										TwoToOneDimArrayRowAdaptor< 
+											block_type,
+											value_type,
+											block_type::size > (blocks, 
+								nelements
+										),key_comparison<value_type,key_ext_>()) )
+			 {
+				 STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
+				 STXXL_MSG("Data in blocks:")
+				 for(unsigned j=0;j<nblocks;++j)
+				 {
+						 for(unsigned k=0; k<block_type::size;++k)
+								STXXL_MSG("     Element "<<k<<" in block "<< (off+j) <<" is :"<<blocks[j][k]<<" with key: "<<keyext(blocks[j][k]))
+				 }
+				 STXXL_MSG("BIDS:")
+				 for(unsigned k=0; k<nblocks;++k)
+				 {
+						STXXL_MSG("BID "<<(k+off)<<" is: "<<((*runs[irun])[k+off].bid))
+				 }
+				 
+				 return false;
+			 }
+			 last = blocks[nblocks - 1][block_type::size - 1];
+				 
+				 
+			}
+			
+			assert(blocks_left == 0);
+			delete [] reqs;
+			delete [] blocks;
+			
+		}
+			
     return true;
   }
 	
@@ -618,7 +644,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		{
 				int runs2merge = STXXL_MIN(runs_left,merge_factor);
 				#ifdef STXXL_CHECK_ORDER_IN_SORTS
-				assert((check_ksorted_runs<block_type,run_type,key_extractor>(runs + nruns - runs_left,runs2merge,keyobj) ));
+				assert((check_ksorted_runs<block_type,run_type,key_extractor>(runs + nruns - runs_left,runs2merge,m2,keyobj) ));
 				#endif
 				STXXL_VERBOSE("Merging "<<runs2merge<<" runs")
 				merge_runs<block_type,run_type,key_extractor> (runs + nruns - runs_left, 

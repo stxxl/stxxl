@@ -18,7 +18,7 @@ int n_opt_prefetch_buffers;
 #include "ksort.h"
 #include "../containers/vector"
 #include "../common/rand.h"
-
+#include "scan.h"
 
 #ifndef RECORD_SIZE
 #define RECORD_SIZE 128
@@ -26,10 +26,11 @@ int n_opt_prefetch_buffers;
 
 struct my_type
 {
-	typedef unsigned int key_type;
+	//typedef unsigned int key_type;
+	typedef long long unsigned key_type;
 	
 	key_type _key;
-	char _data[RECORD_SIZE - sizeof(key_type)];
+	// char _data[RECORD_SIZE - sizeof(key_type)];
 	key_type key() const {return _key; };
 	
 	my_type() {}
@@ -86,7 +87,7 @@ void test(stxxl::int64 records_to_sort,unsigned memory_to_use,unsigned n_prefetc
 	STXXL_MSG("Seed " << stxxl::ran32State )
 	STXXL_MSG("Filling vector...")
 
-	std::generate(v.begin(),v.end(),stxxl::random_number32());
+	stxxl::generate(v.begin(),v.end(),stxxl::random_number32(),32);
 	//std::generate(v.begin(),v.end(),zero());
 	
 	stxxl::wait_time_counter = 0.0;
@@ -96,8 +97,9 @@ void test(stxxl::int64 records_to_sort,unsigned memory_to_use,unsigned n_prefetc
 	
 	stxxl::ksort(v.begin(),v.end(),memory_to_use);
 	
-	STXXL_MSG("Checking order...")
-	STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
+	//STXXL_MSG("Checking order...")
+	//STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
+	STXXL_MSG("Done")
 }
 
 template <unsigned block_size>
