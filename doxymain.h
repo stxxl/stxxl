@@ -53,7 +53,7 @@
  * 
  * Before you try to run one of the \c \<S<small>TXXL</small>\> examples 
  * (or your \c \<S<small>TXXL</small>\> program) you must configure the disk 
- * space that will be used as external memory for the library. See next section.
+ * space that will be used as external memory for the library. See the next section.
  *
  *
  * \section space Disk space

@@ -716,7 +716,10 @@ namespace stream
        for(unsigned j=0;j<nblocks;++j)
        {
          if(blocks[j][0] != sruns.runs[irun][j].value)
+		 {
+		   STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run")
            return false;
+		 }
        }
        if(!is_sorted(
                   TwoToOneDimArrayRowAdaptor< 
@@ -731,7 +734,10 @@ namespace stream
                       //(irun<nruns-1)?(nblocks*block_type::size): (sruns.elements%(nblocks*block_type::size))
 	   				sruns.runs_sizes[irun]
                   ),cmp) )
+	   {
+		   STXXL_ERRMSG("check_sorted_runs  wrong order in the run")
            return false;
+	   }
        
        delete [] reqs;
        delete [] blocks;
