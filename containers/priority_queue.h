@@ -515,7 +515,7 @@ private:
   void doubleK();
   void compactTree();
   void rebuildLooserTree();
-  int segmentIsEmpty(int i);
+  bool segmentIsEmpty(int i);
   void multi_merge_k(Element * to, int l);
   
   bool is_sentinel(const Element & a)
@@ -878,9 +878,9 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
 
 // is this segment empty and does not point to dummy yet?
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-inline int looser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
+inline bool looser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
 {
-  return *(current[i]) == cmp.min_value() && current[i] != &dummy;
+  return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
 }
 
 // multi-merge for arbitrary K
