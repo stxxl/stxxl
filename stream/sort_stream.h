@@ -159,13 +159,30 @@ namespace stream
     unsigned i = 0;
     unsigned m2 = m_ / 2;
     const unsigned el_in_run = m2* block_type::size; // # el in a run
-    block_manager * bm = block_manager::get_instance();
+	STXXL_VERBOSE1("runs_creator::compute_result m2="<<m2)
+	unsigned pos = 0;	
+	  
+#ifndef STXXL_SMALL_INPUT_PSORT_OPT
     block_type * Blocks1 = new block_type[m2*2];
-    block_type * Blocks2 = Blocks1 + m2;
-    request_ptr * write_reqs = new request_ptr[m2];
-    run_type run;
-    
-    unsigned pos = 0;
+#else
+	block_type * Blocks1 = new block_type[1]; // allocate only one block first
+	                                                                        // if needed reallocate
+	
+	while(!input.empty() && pos != block_type::size)
+    {
+      Blocks1[pos/block_type::size][pos%block_type::size] = *input;
+      ++input;
+      ++pos;
+    }
+	if(pos == block_type::size && !input.empty())
+	{      // ennlarge/reallocate Blocks1 array
+			block_type * NewBlocks = new block_type[m2*2];
+			std::copy(Blocks1[0].begin(), Blocks1[0].end(), NewBlocks[0].begin());
+			delete [] Blocks1;
+			Blocks1 = NewBlocks;
+	}
+#endif
+	
     while(!input.empty() && pos != el_in_run)
     {
       Blocks1[pos/block_type::size][pos%block_type::size] = *input;
@@ -181,10 +198,16 @@ namespace stream
 		STXXL_VERBOSE1("runs_creator: Small input optimization, input length: "<<pos);
 		result_.small.resize(pos);
 		std::copy(Blocks1[0].begin(), Blocks1[0].begin()+pos, result_.small.begin());
-		delete [] write_reqs;
       	delete [] Blocks1;
 		return;
 	}
+
+	
+	block_type * Blocks2 = Blocks1 + m2;
+	block_manager * bm = block_manager::get_instance();
+	request_ptr * write_reqs = new request_ptr[m2];
+    run_type run;
+    
 	
     unsigned cur_run_size = div_and_round_up(pos,block_type::size); // in blocks
     run.resize(cur_run_size);
