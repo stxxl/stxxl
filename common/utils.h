@@ -36,12 +36,12 @@ __STXXL_BEGIN_NAMESPACE
 
 #define __STXXL_STRING(x) #x
 
-#define STXXL_MSG(x) { std::cout << x << std::endl; std::cout.flush(); };
-#define STXXL_ERRMSG(x) { std::cerr << x << std::endl; std::cerr.flush(); };
+#define STXXL_MSG(x) { std::cout << "[STXXL-MSG] "<< x << std::endl; std::cout.flush(); };
+#define STXXL_ERRMSG(x) { std::cerr << "[STXXL-ERRMSG] "<< x << std::endl; std::cerr.flush(); };
   
 
 #if STXXL_VERBOSE_LEVEL > 0
-#define STXXL_VERBOSE1(x) { std::cout << x << std::endl; std::cerr.flush(); };
+#define STXXL_VERBOSE1(x) { std::cout << "[STXXL-VERBOSE1] "<<x << std::endl; std::cerr.flush(); };
 #else
 #define STXXL_VERBOSE1(x) ;
 #endif
@@ -49,13 +49,13 @@ __STXXL_BEGIN_NAMESPACE
 #define STXXL_VERBOSE(x) STXXL_VERBOSE1(x) 
 
 #if STXXL_VERBOSE_LEVEL > 1
-#define STXXL_VERBOSE2(x) { std::cout << x << std::endl; std::cerr.flush(); };
+#define STXXL_VERBOSE2(x) { std::cout << "[STXXL-VERBOSE2] "<< x << std::endl; std::cerr.flush(); };
 #else
 #define STXXL_VERBOSE2(x) ;
 #endif  
 
 #if STXXL_VERBOSE_LEVEL > 2
-#define STXXL_VERBOSE3(x) { std::cout << x << std::endl; std::cerr.flush(); };
+#define STXXL_VERBOSE3(x) { std::cout << "[STXXL-VERBOSE3] "<< x << std::endl; std::cerr.flush(); };
 #else
 #define STXXL_VERBOSE3(x) ;
 #endif    
