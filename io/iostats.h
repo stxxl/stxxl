@@ -131,7 +131,7 @@ extern double stxxl::wait_time_counter;
 		{
 			return p_ios;
 		};
-		//! \brief Resets I/O time counters
+		//! \brief Resets I/O time counters (including I/O wait counter)
 		void reset()
 		{
 			read_mutex.lock ();
@@ -169,6 +169,10 @@ extern double stxxl::wait_time_counter;
 			p_ios = 0.0;
 			io_mutex.unlock ();
 
+#ifdef COUNT_WAIT_TIME
+			stxxl::wait_time_counter = 0.0;
+#endif
+			
 		};
 		
 		
