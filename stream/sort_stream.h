@@ -47,6 +47,19 @@ namespace stream
 	std::vector<unsigned> runs_sizes;
     
     sorted_runs():elements(0) {}
+		
+	//! \brief Deallocates the blocks which the runs occupy
+	//!
+	//! \remark Usually there is no need in calling this method,
+	//! since the \c runs_merger calls it when it is being destructed
+	void deallocate_blocks()
+	{
+		block_manager * bm = block_manager::get_instance();
+		 for(unsigned i=0; i < runs.size();++i)
+          bm->delete_blocks(
+          trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i].begin()),
+          trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i].end()) );
+	}
   };
   
   //! \brief Forms sorted runs of data from a stream
@@ -941,13 +954,11 @@ namespace stream
     virtual ~runs_merger()
     {
 	  deallocate_prefetcher();
+	
       delete current_block;
-      block_manager * bm = block_manager::get_instance();
-      // free blocks in runs
-      for(unsigned i=0;i<sruns.runs.size();++i)
-        bm->delete_blocks(
-          trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(sruns.runs[i].begin()),
-          trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(sruns.runs[i].end()) );
+      
+      // free blocks in runs , (or the user should do it?)
+	  sruns.deallocate_blocks();
     }
   private:
     // cache for the current value
