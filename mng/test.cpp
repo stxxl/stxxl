@@ -19,7 +19,7 @@
 struct MyType
 {
 	int integer;
-	char chars[5];
+	char chars[4];
 };
 
 using namespace stxxl;
@@ -33,12 +33,13 @@ struct my_handler
 	}
 };
 
-int
-main ()
+typedef typed_block<BLOCK_SIZE,MyType> block_type;
+
+int main ()
 {
 
 	STXXL_MSG(sizeof(MyType)<<" "<<(BLOCK_SIZE % sizeof(MyType)));
-	STXXL_MSG(sizeof(typed_block < BLOCK_SIZE, MyType >)<<" "<<BLOCK_SIZE);
+	STXXL_MSG(sizeof(block_type)<<" "<<BLOCK_SIZE);
 	const unsigned nblocks = 64;
 	BIDArray < BLOCK_SIZE > bids (nblocks);
 	std::vector < int >disks (nblocks, 2);
@@ -46,9 +47,13 @@ main ()
 	block_manager *bm = block_manager::get_instance ();
 	bm->new_blocks (striping (), bids.begin (), bids.end ());
 
-	typed_block < BLOCK_SIZE, MyType > * block = new typed_block < BLOCK_SIZE, MyType >; 
+	block_type * block = new block_type;
+	STXXL_MSG(std::hex)
+	STXXL_MSG("Allocated block address    : "<<unsigned(block))
+	STXXL_MSG("Allocated block address + 1: "<<unsigned(block+1))
+	STXXL_MSG(std::dec)
 	unsigned i = 0;
-	for (i = 0; i < typed_block < BLOCK_SIZE, MyType >::size; i++)
+	for (i = 0; i < block_type::size; i++)
 	{
 		block->elem[i].integer = 0xdeadbeef;
 		memcpy (block->elem[i].chars, "STXXL", 5);

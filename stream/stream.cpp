@@ -44,6 +44,7 @@ int main()
 	typedef stream::runs_creator<Input,Cmp,4096*MULT,stxxl::RC> CreateRunsAlg;
 	typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 	
+  STXXL_MSG("Size of block type "<<sizeof(CreateRunsAlg::block_type))
     unsigned size = MULT*1024*128/(sizeof(Input::value_type)*2);
 	Input in(size+1);
 	CreateRunsAlg SortedRuns(in,Cmp(),1024*128*MULT);

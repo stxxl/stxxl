@@ -209,6 +209,9 @@ __STXXL_BEGIN_NAMESPACE
     //! The data array of type T_ is contained in the parent class \c stxxl::element_block, see related information there.
     //! The BID array of references is contained in the parent class \c stxxl::block_w_bids, see relared information there.
     //! The "per block information" is contained in the parent class \c stxxl::block_w_info, see relared information there.
+	//!  \warning If \c RawSize_ > 2MB object(s) of this type can not be allocated on the stack (as a 
+	//! function variable for example), because Linux POSIX library limits the stack size for the 
+	//! main thread to (2MB - system page size)
     template <unsigned RawSize_, class T_, unsigned NRef_ = 0, class InfoType_ = void>
     class typed_block : 
         public block_w_info<T_,RawSize_,NRef_,InfoType_>,
@@ -277,6 +280,17 @@ __STXXL_BEGIN_NAMESPACE
 		{
 			aligned_dealloc < BLOCK_ALIGN > (ptr);
 		}
+		
+		// STRANGE: implementing deconstructor makes g++ allocate 
+		// additional 4 bytes in the beginning of every array
+		// of this type !? makes aligning to 4K boundaries difficult
+		//
+		// http://www.cc.gatech.edu/grads/j/Seung.Won.Jun/tips/pl/node4.html :
+		// "One interesting thing is the array allocator requires more memory 
+		//  than the array size multiplied by the size of an element, by a 
+		//  difference of delta for metadata a compiler needs. It happens to 
+		//  be 8 bytes long in g++."
+		// ~typed_block() { }
     };
  
 	
