@@ -62,9 +62,6 @@ module.include.expanded=1
 module.include.files=\
 	mng/adaptor.h\
 	mng/mng.h\
-	apps/msort.h\
-	apps/loosertree.h\
-	apps/prefetcher.h\
 	common/mutex.h\
 	common/rand.h\
 	common/perm.h\
@@ -83,9 +80,6 @@ module.include.files=\
 	io/ufs_file.h\
 	io/iostats.h\
 	containers/vector.h\
-	apps/mkeysort.h\
-	apps/intkeysort.h\
-	apps/keysort.h\
 	algo/ksort.h\
 	algo/loosertree.h\
 	algo/interleaved_alloc.h\
@@ -153,7 +147,8 @@ module.source.files=\
 	containers/ext_merger.cpp\
 	containers/p_queue.cpp\
 	containers/bench_pqueue.cpp\
-	stream/stream.cpp
+	stream/stream.cpp\
+	stream/test_stream.cpp
 
 module.pixmap.name=.
 module.pixmap.type=

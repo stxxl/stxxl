@@ -76,6 +76,7 @@ namespace stream
     bool result_computed; // true result is already computed (used in 'result' method)
     
     runs_creator();// default construction is forbidden
+    runs_creator(const runs_creator & );// copy construction is forbidden
     
     
     void compute_result();
@@ -360,6 +361,7 @@ namespace stream
     void merge_recursively();
     
     runs_merger(); // forbidden
+    runs_merger(const runs_merger &); // forbidden
   public:
     //! \brief Standard stream typedef
     typedef typename sorted_runs_type::value_type value_type;
@@ -413,10 +415,11 @@ namespace stream
       int disks_number = config::get_instance ()->disks_number ();
       
       const int n_prefetch_buffers = std::max( 2 * disks_number , (int(m_) - int(nruns)) );
+    
+      #ifdef SORT_OPT_PREFETCHING
       // heuristic
       const int n_opt_prefetch_buffers = 2 * disks_number + (3*(n_prefetch_buffers - 2 * disks_number))/10;
       
-      #ifdef SORT_OPT_PREFETCHING
       compute_prefetch_schedule(
           consume_seq,
           prefetch_seq,
@@ -646,6 +649,7 @@ namespace stream
     runs_merger_type merger;
     
     sort(); // forbidden
+    sort(const sort &); // forbidden
   public:
     //! \brief Standard stream typedef
     typedef typename Input_::value_type value_type;
