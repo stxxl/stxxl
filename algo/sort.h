@@ -188,7 +188,7 @@ create_runs(
 			write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
 		}
 		std::swap (Blocks1, Blocks2);
-    std::swap (read_reqs1, read_reqs2);
+    	std::swap (read_reqs1, read_reqs2);
 	}
 
   run = runs[k];
@@ -225,7 +225,7 @@ create_runs(
 	delete [] Blocks1;
 	delete [] Blocks2;
 	delete [] read_reqs1;
-  delete [] read_reqs2;
+  	delete [] read_reqs2;
 	delete [] write_reqs;
 	delete [] bids;
 	
@@ -300,10 +300,28 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 
 	block_type *out_buffer = writer.get_free_block();
 
+	#ifdef STXXL_CHECK_ORDER_IN_SORTS
+	value_type last_elem;
+	#endif
+	
 	for (i = 0; i < out_run_size; i++)
 	{
 		loosers.multi_merge(out_buffer->elem);
 		(*out_run)[i].value = *(out_buffer->elem);
+		
+		#ifdef STXXL_CHECK_ORDER_IN_SORTS
+		
+		assert(stxxl::is_sorted(
+		             	out_buffer->begin(),
+						out_buffer->end()
+		              ,cmp));
+		
+		if(i) assert( cmp(*(out_buffer->elem), last_elem) == false);
+		
+		last_elem = (*out_buffer).elem[block_type::size - 1];
+		
+		#endif
+		
 		out_buffer = writer.write(out_buffer,(*out_run)[i].bid);
 	}
 	
