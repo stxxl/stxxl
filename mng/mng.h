@@ -417,13 +417,13 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
       << ", free:" << free_bytes << " total:"<< disk_bytes)
     
 		off_t requested_size = 0;
-    unsigned i = 0;
-    for(;i<bids.size();i++)
-    {
-      STXXL_VERBOSE2("Asking for a block with size: "<<bids[i].size)
-      //assert(bids[i].size);
-      requested_size += bids[i].size;
-    }
+    	unsigned i = 0;
+    	for(;i<bids.size();i++)
+    	{
+      		STXXL_VERBOSE2("Asking for a block with size: "<<bids[i].size)
+      		//assert(bids[i].size);
+      		requested_size += bids[i].size;
+    	}
     
 		sortseq::iterator space = 
 			std::find_if (free_space.begin (), free_space.end (),
@@ -437,7 +437,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			if (region_size > requested_size)
 				free_space[region_pos + requested_size] = region_size - requested_size;
 
-      bids[0].offset = region_pos;
+      		bids[0].offset = region_pos;
 			for (i = 1; i < bids.size (); i++)
 			{
 				bids[i].offset = bids[i-1].offset + bids[i-1].size;
@@ -446,9 +446,9 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		}
 		else
 		{
-			STXXL_ERRMSG( "Allocation error: " << requested_size <<
+			STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
 				" bytes requested, " << free_bytes <<
-				" bytes free" )
+				" bytes free, aborting." )
 			abort();
 		}
 	}

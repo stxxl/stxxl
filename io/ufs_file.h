@@ -167,8 +167,10 @@ __STXXL_BEGIN_NAMESPACE
 			int disk): file (disk), file_des (-1)
 	{
 		int fmode = 0;
+		#ifndef STXXL_DIRECT_IO_OFF
 		if (mode & DIRECT)
 			fmode |= O_SYNC | O_RSYNC | O_DSYNC | O_DIRECT;
+		#endif
 		if (mode & RDONLY)
 			fmode |= O_RDONLY;
 		if (mode & WRONLY)

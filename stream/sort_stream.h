@@ -210,17 +210,30 @@ namespace stream
       for(;pos!=2*el_in_run;++pos)
         Blocks1[pos/block_type::size][pos%block_type::size] = cmp.max_value();
       
-      for (i = 0; i < cur_run_size; ++i)
+	  assert(cur_run_size > m2);
+	  
+	  for (i = 0; i < m2; ++i)
       {
         run[i].value = Blocks1[i][0];
         write_reqs[i]->wait();
         write_reqs[i] = Blocks1[i].write(run[i].bid);
       }
 	  
+	  request_ptr * write_reqs1 = new request_ptr[cur_run_size - m2];
+	  
+      for (;i < cur_run_size; ++i)
+      {
+        run[i].value = Blocks1[i][0];
+        write_reqs1[i-m2] = Blocks1[i].write(run[i].bid);
+      }
+	  
       result_.runs[0] = run;
       
-      wait_all(write_reqs,write_reqs+cur_run_size);
+      wait_all(write_reqs,write_reqs+m2);
       delete [] write_reqs;
+	  wait_all(write_reqs1,write_reqs1+cur_run_size - m2);
+      delete [] write_reqs1;	  
+	  
       delete [] Blocks1;
       
       return;

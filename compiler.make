@@ -39,11 +39,15 @@ OPT = # -O6
 DEBUG = -g # -DNDEBUG #-g # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3 
 DEBUG = # -DNDEBUG #-g # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3 
 
+# switch the direct I/O off
+# STXXL_SPECIFIC += -DSTXXL_DIRECT_IO_OFF
+
 # this variable is used internally for development compilations
 GCC=$(COMPILER) -Wall $(LARGE_FILE) $(NO_OVR) $(OPT) $(PROF) $(DEBUG) $(STXXL_SPECIFIC) # -ftemplate-depth-65000
 
 
 STXXL_LIB = -lpthread -lstxxl -L$(STXXL_ROOT)/io/
+
 STXXL_OBJ = $(STXXL_LIB)
 
 
@@ -53,8 +57,19 @@ STXXL_OBJ = $(STXXL_LIB)
 STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB) -ftemplate-depth-65000
 
 #
-# for automatical checking of order of the output elements in
+# Troubleshooting
+#
+# For automatical checking of order of the output elements in
 # the pipelined sorters stxxl::stream::sort and stxxl::stream::merge_runs
 # use -DSTXXL_CHECK_ORDER_IN_SORTS compile option
 #
-
+# if your program aborts with message "read/write: wrong parameter"
+# this could be that your kernel does not support direct I/O
+# then try to set it off recompiling your code with option
+# -DSTXXL_DIRECT_IO_OFF (the libs must be also recompiled)
+# The best way for doing it is to modify the STXXL_SPECIFIC
+# variable (see above).
+# But for the best performance it is strongly recommended 
+# to reconfigure the kernel for the support of the direct I/O.
+#
+#
