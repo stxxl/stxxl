@@ -295,14 +295,13 @@ private:
   int segmentIsEmpty(int i);
   void multi_merge_k(Element * to, int l);
   
-  
-  bool equal(const Element & a,const Element & b)
+  bool is_sentinel(const Element & a)
   {
-    return (!cmp(a,b)) && (!cmp(b,a));
+    return !(cmp(cmp.min_value(),a));
   }
-  bool nequal(const Element & a,const Element & b)
+  bool not_sentinel(const Element & a)
   {
-    return cmp(a,b) || cmp(b,a);
+    return cmp(cmp.min_value(),a);
   }
 public:
   looser_tree();
@@ -471,7 +470,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
   int to   = 0;
   for(;  from < int(k);  from++)
   {
-    if (nequal(*(current[from]) , sup))
+    if (not_sentinel(*(current[from])))
     {
       segment_size[to] = segment_size[from];
       current[to] = current[from];
@@ -520,8 +519,8 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
   
   if (sz > 0)
   {
-    assert( nequal(to[0   ],cmp.min_value()) );
-    assert( nequal(to[sz-1],cmp.min_value()) );
+    assert( not_sentinel(to[0])   );
+    assert( not_sentinel(to[sz-1]));
     // get a free slot
     if (lastFree < 0) { // tree is too small
       doubleK();
@@ -644,7 +643,7 @@ multi_merge_k(Element *to, int l)
     winnerKey = *winnerPos;
 
     // remove winner segment if empty now
-    if (equal(winnerKey,sup))
+    if (is_sentinel(winnerKey)) // 
       deallocateSegment(winnerIndex); 
     
     // go up the entry-tree
