@@ -44,8 +44,9 @@ __STXXL_BEGIN_NAMESPACE
 		};
 		file * storage; //!< pointer to the file of the block
 		off_t offset; //!< offset within the file of the block
-    BID():storage(NULL),offset(0) {}
-    bool valid() const { return storage; }
+    	BID():storage(NULL),offset(0) {}
+    	bool valid() const { return storage; }
+		BID(file * s, off_t o) : storage(s), offset(o) {}
 	};
 
   //! \brief Specialization of block identifier class (BID) for variable size block size
@@ -951,6 +952,12 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		unsigned ndisks;
 		block_manager ();
 	
+	protected:
+		template < class BIDType, class DiskAssgnFunctor, class BIDIteratorClass >
+		void new_blocks_int (
+					 const unsigned nblocks,
+					 DiskAssgnFunctor functor,
+					 BIDIteratorClass out);
 	public:
 		//! \brief Returns instance of block_manager
 		//! \return pointer to the only instance of block_manager
@@ -976,7 +983,9 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		//! \param nblocks the number of blocks to allocate
 		//! \param functor object of model of \b allocation_strategy concept
 		//! \param out iterator object of OutputIterator concept
-		template < class DiskAssgnFunctor, class BIDIteratorClass >
+		//!
+		//! The \c BlockType template parameter defines the type of block to allocate
+		template < class BlockType, class DiskAssgnFunctor, class BIDIteratorClass >
 		void new_blocks (
 					 const unsigned nblocks,
 					 DiskAssgnFunctor functor,
@@ -1041,58 +1050,81 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		delete[]disk_files;
 	}
 
-	template < class DiskAssgnFunctor, class BIDIteratorClass >
-		void block_manager::new_blocks (
+	template < class BIDType, class DiskAssgnFunctor, class OutputIterator >
+		void block_manager::new_blocks_int (
 					 const unsigned nblocks,
 					 DiskAssgnFunctor functor,
-					 BIDIteratorClass out)
+					 OutputIterator out)
 	{
-		typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
+		typedef BIDType bid_type;
 		typedef  BIDArray<bid_type::t_size> bid_array_type;
 
+		bid_type tmpbid;
 		int *bl = new int[ndisks];
 		bid_array_type * disk_bids = new bid_array_type[ndisks];
+		file ** disk_ptrs = new file * [nblocks];
 	
 		memset(bl, 0, ndisks * sizeof (int));
 
 		unsigned i = 0;
-		BIDIteratorClass it = out;
-		for (; i < nblocks; ++i, ++it)
+		//OutputIterator  it = out;
+		for (; i < nblocks; ++i /* , ++it*/)
 		{
 			int disk = functor (i);
-			(*it).storage = disk_files[disk];
+			disk_ptrs[i] = disk_files[disk];
+			//(*it).storage = disk_files[disk];
 			bl[disk]++;
 		}
 
+		/*
 		for (i = 0; i < ndisks; ++i)
 		{
 			if (bl[i])
 				disk_bids[i].resize (bl[i]);
 		}
     
+		
     	memset (bl, 0, ndisks * sizeof (int));
     
-		for (i=0,it = out; i != nblocks; ++it, ++i)
+		for (i=0 ,it = out; i != nblocks; ++it, ++i)
 		{
 			int disk = (*it).storage->get_disk_number ();
 			disk_bids[disk][bl[disk]++] = (*it);
-		}
+		} */
+		
     	for (i = 0; i < ndisks; ++i)
 		{
 			if (bl[i])
+			{
+				disk_bids[i].resize (bl[i]);
 				disk_allocators[i]->new_blocks (disk_bids[i]);
+			}
 		}
 
 		memset (bl, 0, ndisks * sizeof (int));
     
-		for (i=0,it = out; i != nblocks; ++it, ++i)
+		OutputIterator  it = out;
+		for (i=0/*,it = out */; i != nblocks; ++it, ++i)
 		{
-			int disk = (*it).storage->get_disk_number ();
-			(*it).offset = disk_bids[disk][bl[disk]++].offset;
+			//int disk = (*it).storage->get_disk_number ();
+			//(*it).offset = disk_bids[disk][bl[disk]++].offset;
+			int disk = disk_ptrs[i]->get_disk_number();
+			*it = bid_type(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
 		}
 
 		delete [] bl;
 		delete [] disk_bids;
+		delete [] disk_ptrs;
+	}	
+	
+	template < class BlockType, class DiskAssgnFunctor, class OutputIterator >
+		void block_manager::new_blocks (
+					 const unsigned nblocks,
+					 DiskAssgnFunctor functor,
+					 OutputIterator out)
+	{
+		typedef typename BlockType::bid_type bid_type;
+		new_blocks_int<bid_type>(nblocks,functor,out);
 	}
 
 	template < class DiskAssgnFunctor, class BIDIteratorClass >
@@ -1102,8 +1134,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 						BIDIteratorClass bidend)
 	{
 		typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
-		typedef  BIDArray<bid_type::t_size> bid_array_type;
-    	//typedef  BIDArray<bid_iterator_traits <BIDIteratorClass >::block_size> bid_array_type;
+   
 		unsigned nblocks = 0;
     
     	BIDIteratorClass bidbegin_copy(bidbegin);
@@ -1113,7 +1144,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
       	++nblocks;
     	}
 	
-		new_blocks(nblocks, functor, bidbegin );
+		new_blocks_int<bid_type>(nblocks,functor, bidbegin);
 	}
 
 
@@ -1121,6 +1152,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	template < unsigned BLK_SIZE >
 	void block_manager::delete_block (const BID < BLK_SIZE > &bid)
 	{
+		// do not uncomment it
 		//assert(bid.storage->get_disk_number () < config::get_instance ()->disks_number ());
 		if (bid.storage->get_disk_number () == -1) return; // self managed disk
 		assert(bid.storage->get_disk_number () >= 0 );

@@ -523,9 +523,11 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		
 		for(i=0;i<nruns;++i)
 		{
+
 			mng->new_blocks(	alloc_strategy(0,ndisks),
 								trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i]->begin()),
 								trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i]->end())	);
+			
 		}
 	
 	create_runs< block_type,

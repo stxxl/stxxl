@@ -70,6 +70,7 @@ int main ()
 	delete block;
 
 	// variable-size blocks, not supported currently
+	/*
 	BIDArray<0> vbids (nblocks);
   for(i=0;i<nblocks;i++)
     vbids[i].size = 1024 + i;
@@ -79,5 +80,5 @@ int main ()
   for(i=0;i<nblocks;i++)
     STXXL_MSG("Allocated block: offset="<<vbids[i].offset<<", size="<<vbids[i].size)
   
-  bm->delete_blocks(vbids.begin (), vbids.end ()); 
+  bm->delete_blocks(vbids.begin (), vbids.end ());  */
 }

@@ -141,8 +141,12 @@ public:
 				// write the back block
 				// need to allocate new block
 				bid_type newbid;
+				
 				offset_allocator<alloc_strategy> alloc_str(alloc_counter++);
-				bm->new_blocks(1, alloc_str, &newbid);
+				
+				//bm->new_blocks<block_type>(1, alloc_str, &newbid);
+				bm->new_blocks(alloc_str, &newbid,(&newbid) +1);
+				
 				bids.push_back(newbid);
 				w_pool->write(back_block,newbid);
 			}
