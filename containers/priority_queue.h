@@ -831,7 +831,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
     assert(entry[0].index == 0);
     assert(lastFree == -1 || l == 0);
     //memcpy(to, current[0], l * sizeof(Element));
-    std::copy_n(current[0],l,to);
+    std::copy(current[0],current[0]+l,to);
     current[0] += l;
     entry[0].key = **current;
     if (segmentIsEmpty(0)) deallocateSegment(0); 
