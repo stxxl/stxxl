@@ -100,7 +100,7 @@ __STXXL_BEGIN_NAMESPACE
 					iostats->read_started (size());
 				#endif
 				
-				debugmon::get_instance()->io_started(buffer);
+				debugmon::get_instance()->io_started((char*)buffer);
 				
 				stxxl_ifcheck_i(::read (file->get_file_des(), buffer, bytes),
 					" this="<<long(this)<<" File descriptor="<<
@@ -108,7 +108,7 @@ __STXXL_BEGIN_NAMESPACE
 					" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
 					((type == READ)?"READ":"WRITE")<<" nref= "<<nref())
 				
-				debugmon::get_instance()->io_finished(buffer);
+				debugmon::get_instance()->io_finished((char*)buffer);
 				
 				#ifdef STXXL_IO_STATS
 					iostats->read_finished ();
@@ -120,7 +120,7 @@ __STXXL_BEGIN_NAMESPACE
 					iostats->write_started (size());
 				#endif
 				
-				debugmon::get_instance()->io_started(buffer);
+				debugmon::get_instance()->io_started((char*)buffer);
 				
 				stxxl_ifcheck_i(::write (file->get_file_des (), buffer, bytes),
 					" this="<<long(this)<<" File descriptor="<<
@@ -128,7 +128,7 @@ __STXXL_BEGIN_NAMESPACE
 					buffer<<" bytes="<<bytes<< " type=" <<
 					((type == READ)?"READ":"WRITE")<<" nref= "<<nref());
 				
-				debugmon::get_instance()->io_finished(buffer);
+				debugmon::get_instance()->io_finished((char*)buffer);
 				
 				#ifdef STXXL_IO_STATS
 					iostats->write_finished ();
