@@ -231,6 +231,60 @@ create_runs(
 	
 }
 
+
+  template < typename block_type,typename run_type , typename value_cmp>
+  bool check_sorted_runs(		run_type ** runs, 
+								unsigned nruns, 
+								// unsigned  _m,
+								value_cmp cmp)
+  {
+    typedef typename block_type::value_type value_type;
+	  
+    STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
+    unsigned irun=0;
+    for(irun = 0; irun < nruns; ++irun)
+    {
+       const unsigned nblocks = runs[irun]->size();
+	   const unsigned nelements = nblocks*block_type::size ;
+       block_type * blocks = new block_type[nblocks];
+       request_ptr * reqs = new request_ptr[nblocks];
+       for(unsigned j=0;j<nblocks;++j)
+       {
+         reqs[j] = blocks[j].read((*runs[irun])[j].bid);
+       }
+       wait_all(reqs,reqs + nblocks);
+       for(unsigned j=0;j<nblocks;++j)
+       {
+         if(blocks[j][0] != (*runs[irun])[j].value)
+		 {
+		   STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run")
+           return false;
+		 }
+       }
+       if(!is_sorted(
+                  TwoToOneDimArrayRowAdaptor< 
+                    block_type,
+                    value_type,
+                    block_type::size > (blocks,0 ),
+                  TwoToOneDimArrayRowAdaptor< 
+                    block_type,
+                    value_type,
+                    block_type::size > (blocks, 
+                       //nblocks*block_type::size
+                      //(irun<nruns-1)?(nblocks*block_type::size): (sruns.elements%(nblocks*block_type::size))
+	   				  nelements
+                  ),cmp) )
+	   {
+		   STXXL_ERRMSG("check_sorted_runs  wrong order in the run")
+           return false;
+	   }
+       
+       delete [] reqs;
+       delete [] blocks;
+    }
+
+    return true;
+  }
 	
 	
 template < typename block_type,typename run_type , typename value_cmp>
@@ -292,7 +346,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	
 	int out_run_size = out_run->size ();
 
-	looser_tree<run_cursor_type,
+	looser_tree<			run_cursor_type,
 							run_cursor2_cmp_type,
 							block_type::size> loosers (&prefetcher, nruns,run_cursor2_cmp_type(cmp)
               );
@@ -304,7 +358,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	value_type last_elem;
 	#endif
 	
-	for (i = 0; i < out_run_size; i++)
+	for (i = 0; i < out_run_size; ++i)
 	{
 		loosers.multi_merge(out_buffer->elem);
 		(*out_run)[i].value = *(out_buffer->elem);
@@ -386,7 +440,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		if (partial_runs)
 			runs[i] = new run_type (_n - full_runs * m2);
 		
-		for(i=0;i<nruns;i++)
+		for(i=0;i<nruns;++i)
 		{
 			mng->new_blocks(	alloc_strategy(0,ndisks),
 								trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i]->begin()),
@@ -445,10 +499,13 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		while(runs_left > 0)
 		{
 				int runs2merge = STXXL_MIN(runs_left,merge_factor);
+				#ifdef STXXL_CHECK_ORDER_IN_SORTS
+				assert((check_sorted_runs<block_type,run_type,value_cmp>(runs + nruns - runs_left,runs2merge,cmp) ));
+				#endif
 				STXXL_VERBOSE("Merging "<<runs2merge<<" runs")
 				merge_runs<block_type,run_type> (runs + nruns - runs_left, 
 						runs2merge ,*(new_runs + (cur_out_run++)),_m,cmp,
-            _first_element_offset,_last_element_offset);
+            			_first_element_offset,_last_element_offset);
 				runs_left -= runs2merge;
 		}
 		
