@@ -24,7 +24,7 @@ __STXXL_BEGIN_NAMESPACE
 	{
 	protected:
 		int file_des;	// file descriptor
-		
+		int mode_; // open mode
 		ufs_file_base (const std::string & filename, int mode, int disk);
 	private:
 		ufs_file_base ();
@@ -175,7 +175,7 @@ __STXXL_BEGIN_NAMESPACE
 	ufs_file_base::ufs_file_base (
 			const std::string & filename, 
 			int mode, 
-			int disk): file (disk), file_des (-1)
+			int disk): file (disk), file_des (-1),mode_(mode)
 	{
 		int fmode = 0;
 		#ifndef STXXL_DIRECT_IO_OFF
@@ -218,7 +218,7 @@ __STXXL_BEGIN_NAMESPACE
 	{
 		off_t cur_size = size();
 		
-		stxxl_ifcheck(::ftruncate(file_des,newsize));
+		if(!(mode_&RDONLY)) stxxl_ifcheck(::ftruncate(file_des,newsize));
 		
 		if (newsize > cur_size)
 		{
