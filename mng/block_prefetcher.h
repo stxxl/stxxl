@@ -104,7 +104,7 @@ public:
 		{
       
 			assert( prefetch_seq[i] < int(seq_length));
-      assert( prefetch_seq[i] >= 0 );
+      		assert( prefetch_seq[i] >= 0 );
 			read_reqs[i] = read_buffers[i].read (
 										*(consume_seq_begin + prefetch_seq[i]),
 										set_switch_handler(*(completed + prefetch_seq[i])) );

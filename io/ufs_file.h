@@ -105,14 +105,14 @@ __STXXL_BEGIN_NAMESPACE
 			waiters_mutex.lock ();
 			waiters.erase (sw);
 			waiters_mutex.unlock ();
-		};
+		}
 		int nwaiters () // returns number of waiters
 		{
 			waiters_mutex.lock ();
 			int size = waiters.size ();
 			waiters_mutex.unlock ();
 			return size;
-		};
+		}
 		void check_aligning ()
 		{
 			if (offset % BLOCK_ALIGN)
@@ -127,7 +127,10 @@ __STXXL_BEGIN_NAMESPACE
 					      << BLOCK_ALIGN << " = " <<
 					      unsigned (buffer) % BLOCK_ALIGN << " (" << 
 								std::hex << buffer << std::dec << ")");
-		};
+			#ifndef STXXL_DIRECT_IO_OFF
+			abort();
+			#endif
+		}
 	public:
 		virtual ~ufs_request_base ()
 		{

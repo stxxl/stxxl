@@ -227,7 +227,7 @@ __STXXL_BEGIN_NAMESPACE
 		
 		typedef BID<RawSize_> bid_type;
 		
-		typed_block() {};
+		typed_block() { STXXL_VERBOSE2("typed_block()")  };
 
 		enum
 		{ 
@@ -263,11 +263,15 @@ __STXXL_BEGIN_NAMESPACE
 		
 		void *operator      new[] (size_t bytes)
 		{
-			return aligned_alloc < BLOCK_ALIGN > (bytes);
+			void * result = aligned_alloc < BLOCK_ALIGN > (bytes);
+			STXXL_VERBOSE2("typed_block new[] returning "<<std::hex <<unsigned(result) <<std::dec)
+			return result;
 		}
 		void *operator      new (size_t bytes)
 		{
-			return aligned_alloc < BLOCK_ALIGN > (bytes);
+			void * result = aligned_alloc < BLOCK_ALIGN > (bytes);
+			STXXL_VERBOSE2("typed_block new returning "<<std::hex <<unsigned(result) <<std::dec)
+			return result;
 		}
 		void operator      delete (void *ptr)
 		{
@@ -276,6 +280,10 @@ __STXXL_BEGIN_NAMESPACE
 		void operator      delete[] (void *ptr)
 		{
 			aligned_dealloc < BLOCK_ALIGN > (ptr);
+		}
+		virtual ~typed_block()
+		{
+			STXXL_VERBOSE2("~typed_block()") 
 		}
     };
  

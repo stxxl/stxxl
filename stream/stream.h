@@ -245,8 +245,7 @@ namespace stream
   //! adaptable functor that takes 1 parameter)
   //! - \c Input1_ type of the input
   //! \remark This is a specialization of \c transform .
-  template <class Operation_, class Input1_
-           >
+  template <class Operation_, class Input1_ >
   class transform<Operation_,Input1_,Stopper,Stopper,Stopper,Stopper,Stopper>
   {
     Operation_ op;

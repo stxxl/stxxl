@@ -21,6 +21,8 @@
 #define USE_EXTERNAL_ARRAY // comment if you want to use internal vectors as
                            // input/output of the algorithm
 
+#define block_size (8*1024)
+
 typedef stxxl::tuple<char,int> tuple_type;
 
 #ifdef USE_EXTERNAL_ARRAY
@@ -105,7 +107,7 @@ int main()
   #ifdef USE_FORMRUNS_N_MERGE
   // sort tuples by character 
   // 1. form runs
-  typedef stream::runs_creator<tuple1_stream_type,cmp_type,4096> run_creator_type;
+  typedef stream::runs_creator<tuple1_stream_type,cmp_type,block_size> run_creator_type;
   run_creator_type runscreator(tuples1_stream,cmp_type(),128*1024);
   // 2. merge runs
   typedef stream::runs_merger<run_creator_type::sorted_runs_type,cmp_type> runs_merger_type;
@@ -113,7 +115,7 @@ int main()
   #else
   // sort tuples by character 
   // (combination of the previous two steps in one algorithm: form runs and merge)
-  typedef stream::sort<tuple1_stream_type,cmp_type,4096> sorted_stream_type;
+  typedef stream::sort<tuple1_stream_type,cmp_type,block_size> sorted_stream_type;
   sorted_stream_type sorted_stream(tuples1_stream,cmp_type(),128*1024);
   #endif
   
