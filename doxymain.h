@@ -18,14 +18,6 @@
  *
  * \section platforms Platforms supported
  * Linux (kernel >= 2.4.18)
- *
- * \section current Current version
- * prerelease 0.21 contains a first implementation of the lower layers
- * (memory management, disk virtualization, prefetching,...).
- * From the higher layers, sorting,scanning and basic containers
- * (vectors, stacks, priority queues) are supported.
- * Currently that sums to about 14000 lines of code.
- *
  * 
  * Questions concerning use and development of the \c \<S<small>TXXL</small>\> library mail to Roman
  *  Dementiev <A href='mailto:dementiev@mpi-sb.mpg.de'>dementiev@mpi-sb.mpg.de</A>.

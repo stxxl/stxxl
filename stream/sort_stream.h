@@ -55,7 +55,8 @@ namespace stream
   //! - \c Cmp_ type of omparison object used for sorting the runs
   //! - \c BlockSize_ size of blocks used to store the runs
   //! - \c AllocStr_ functor that defines allocation strategy for the runs
-  template <  class Input_,
+  template <  
+  			  class Input_,
               class Cmp_,
               unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE(typename Input_::value_type),
               class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
@@ -273,6 +274,13 @@ namespace stream
     delete [] ((Blocks1<Blocks2)?Blocks1:Blocks2);
     
   }
+  
+  template <class ValueType_>
+  struct use_push
+  {
+		typedef ValueType_ value_type;
+  };
+  
   
   //! \brief Checker for the sorted runs object created by the \c runs_creator .
   //! \param sruns sorted runs object

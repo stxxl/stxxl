@@ -288,7 +288,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 */
 
 	template<unsigned BLK_SIZE> 
-  class BIDArray
+    class BIDArray
 	{
 	protected:
 		unsigned _size;
