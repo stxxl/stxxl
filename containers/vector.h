@@ -132,7 +132,7 @@ public:
 			return p_vector->element(offset);
 		}
     
-    const_reference operator *() const
+    	const_reference operator *() const
 		{
 			return p_vector->const_element(offset);
 		}
@@ -473,7 +473,6 @@ public:
 		for(int i=0;i<n_pages;++i)
 			_free_pages.push(i);
 		
-		        
 	}
     void push_back(const_reference obj)
     {
@@ -493,6 +492,14 @@ public:
     {
       return element(0);
     }
+	const_reference back() const
+    {
+      return const_element(_size - 1);
+    }
+    const_reference front() const
+    {
+      return const_element(0);
+    }
     vector (file * from):
 			_size(from->size()/sizeof(value_type)),
 			_bids(div_and_round_up(_size,block_type::size)),
@@ -506,19 +513,19 @@ public:
 			
 			int all_pages = div_and_round_up (_bids.size(), page_size);
 			int i=0;
-			for(;i<all_pages;i++)
+			for(;i<all_pages;++i)
 			{
 				_page_status[i] = 0;
 				_last_page[i] = on_disk;
 			}
 			
-			for(i=0;i<n_pages;i++)
+			for(i=0;i<n_pages;++i)
 				_free_pages.push(i);
 		
 			
 			size_type offset = 0; 
 			bids_container_iterator it = _bids.begin();
-			for(;it!=_bids.end();it++,offset+=(block_type::size*sizeof(value_type)) )
+			for(;it!=_bids.end();++it,offset+=(block_type::size*sizeof(value_type)) )
 			{
 				(*it).storage = from;
 				(*it).offset = offset;
@@ -529,13 +536,17 @@ public:
     vector(const vector & obj) // Copying external vectors is discouraged
   											   // (and not implemented)
     {
-      STXXL_MSG("stxxl::vector copy constructor is not implemented yet");
+      STXXL_ERRMSG("stxxl::vector copy constructor is not implemented yet");
       abort();
     }
   public:
 		size_type size () const
 		{
 			return _size;
+		}
+		bool empty() const
+		{
+			return (!_size);
 		}
 		iterator begin ()
 		{
@@ -775,7 +786,7 @@ private:
   //!    - \c lru , is default
   //!
   //! Memory consumption of constructed vector is BlkSize_*Pages_*PgSz_ bytes
-  //! Configured stack type is available as \c STACK_GENERATOR<>::result. <BR> <BR>
+  //! Configured vector type is available as \c STACK_GENERATOR<>::result. <BR> <BR>
   //! Examples:
   //!    - \c VECTOR_GENERATOR<double>::result external vector of \c double's ,
   //!    - \c VECTOR_GENERATOR<double,8>::result external vector of \c double's ,

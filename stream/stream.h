@@ -171,10 +171,31 @@ namespace stream
   		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
   		unsigned nbuffers = 0)
   {
+	  	STXXL_VERBOSE1("streamify for vector_iterator range is called")
     	return vector_iterator2stream<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
 	  		(begin,end,nbuffers);
   }
   
+  //! \brief Input external \c stxxl::vector const iterator range to stream convertor
+  //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
+  //! \param begin const iterator, pointing to the first value
+  //! \param end const iterator, pointing to the last + 1 position, i.e. beyond the range 
+  //! \param nbuffers number of blocks used for overlapped reading (0 is default,
+  //! which equals to (2 * number_of_disks)
+  //! \return an instance of a stream object
+  
+  template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
+		unsigned BlkSize_, typename PgTp_, unsigned PgSz_ > 
+  vector_iterator2stream<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
+  	streamify(
+  		stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> begin,
+  		stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
+  		unsigned nbuffers = 0)
+  {
+	  	STXXL_VERBOSE1("streamify for const_vector_iterator range is called")
+    	return vector_iterator2stream<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
+	  		(begin,end,nbuffers);
+  }
 
   //! \brief Stores consecutively stream content to an output iterator
   //! \param in stream to be stored used as source

@@ -123,49 +123,37 @@ create_runs(
 	
 	assert(nruns >= 2);
   
-  run = runs[0];
+  	run = runs[0];
 	run_size = run->size ();
-  for(i = 0; i < run_size; i++)
-  {
-    bids[i] = *(it++);
-    read_reqs1[i] = Blocks1[i].read(bids[i]);
-  }
+  	for(i = 0; i < run_size; ++i)
+  	{
+    	bids[i] = *(it++);
+    	read_reqs1[i] = Blocks1[i].read(bids[i]);
+  	}
   
-  for (i = 0; i < run_size; ++i)
-			bm->delete_block(bids[i]);
+  	for (i = 0; i < run_size; ++i)
+		bm->delete_block(bids[i]);
   
-	for(k=0; k < nruns-1; k++)
+	for(k=0; k < nruns-1; ++k)
 	{
 		run = runs[k];
 		run_size = run->size ();
     	next_run_size = runs[k+1]->size();
-/*
-    if(_last_element_offset && k == nruns - 2)
-    {
-      for(i = 1; i < next_run_size; i++)
-      {
+
+
+		for(i = 0; i < next_run_size; ++i)
+      	{
           bids[i] = *(it++);
           read_reqs2[i] = Blocks2[i].read(bids[i]);
-      }
-      
-      read_reqs2[0] = Blocks2[0].read(*(it++));
-      
-      for (i = 1; i < next_run_size ; i++)
-        bm->delete_block(bids[i]);
-    }
-    else */
-    {
-      for(i = 0; i < next_run_size; ++i)
-      {
-          bids[i] = *(it++);
-          read_reqs2[i] = Blocks2[i].read(bids[i]);
-      }
-      for (i = 0; i < next_run_size; ++i)
-        bm->delete_block(bids[i]);
-    }
+      	}
+		
+		for (i = 0; i < next_run_size; ++i)
+        	bm->delete_block(bids[i]);
+
 
 		wait_all(read_reqs1, run_size);
 
+		
 		if(block_type::has_filler)
 		      std::sort(
 		              TwoToOneDimArrayRowAdaptor< block_type,
@@ -178,8 +166,7 @@ create_runs(
 		else 
 			std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
 
-		if(k)
-			wait_all(write_reqs, m2);
+		if(k) wait_all(write_reqs, m2);
 
 		for (i = 0; i < m2; ++i)
 		{
@@ -206,8 +193,8 @@ create_runs(
 		else 
 			std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
   
-  wait_all(write_reqs, m2);
-  for (i = 0; i < run_size; ++i)
+  	wait_all(write_reqs, m2);
+  	for (i = 0; i < run_size; ++i)
 	{
 			(*run)[i].value = Blocks1[i][0];
 			write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
@@ -439,8 +426,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	create_runs< block_type,
 							 run_type,
 							 input_bid_iterator,
-							 value_cmp > (input_bids, runs, nruns,_m,cmp
-                            );
+							 value_cmp > (input_bids, runs, nruns,_m,cmp );
 
 	after_runs_creation = stxxl_timestamp ();
 
@@ -508,7 +494,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	
 	
 	end = stxxl_timestamp ();
-  (void)(begin);
+  	(void)(begin);
 
 	STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Run creation time: " << 
 	after_runs_creation - begin << " s")
@@ -628,7 +614,9 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				
 				reqs[0] = first_block->read(first_bid);
 				reqs[1] = sorted_first_block->read((*(out->begin())).bid);
-				wait_all(reqs,2);
+				
+				reqs[0]->wait();
+				reqs[1]->wait();
 				
 				reqs[0] = last_block->read(last_bid);
 				reqs[1] = sorted_last_block->read( ((*out)[out->size() - 1]).bid);
@@ -637,7 +625,9 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				{
 					first_block->elem[i] = sorted_first_block->elem[i];
 				}
-				wait_all(reqs,2);
+				
+				reqs[0]->wait();
+				reqs[1]->wait();
 				
 				req = first_block->write(first_bid);
 				
@@ -656,8 +646,8 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				*first.bid() = first_bid;
 				*last.bid() = last_bid; 
 				
-				typename run_type::iterator it = out->begin(); it++;
-				typename ExtIterator_::bids_container_iterator cur_bid = first.bid(); cur_bid ++;
+				typename run_type::iterator it = out->begin(); ++it;
+				typename ExtIterator_::bids_container_iterator cur_bid = first.bid(); ++cur_bid;
 				
 				for(;cur_bid != last.bid(); ++cur_bid,++it)
 				{
@@ -721,7 +711,9 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				
 				reqs[0] = first_block->read(first_bid);
 				reqs[1] = sorted_first_block->read((*(out->begin())).bid);
-				wait_all(reqs,2);
+				
+				reqs[0]->wait();
+				reqs[1]->wait();
 				
 				for(i=first.block_offset();i<block_type::size;++i)
 				{
@@ -800,7 +792,9 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				
 				reqs[0] = last_block->read(last_bid);
 				reqs[1] = sorted_last_block->read( ((*out)[out->size() - 1]).bid);
-				wait_all(reqs,2);
+				
+				reqs[0]->wait();
+				reqs[1]->wait();
 				
 				for(i=0;i<last.block_offset();++i)
 				{

@@ -69,7 +69,7 @@ __STXXL_BEGIN_NAMESPACE
     // Following methods are declared but not implemented 
     // intentionnaly to forbid their usage
 		syscall_request(const syscall_request &);
-    syscall_request & operator=(const syscall_request &);
+    	syscall_request & operator=(const syscall_request &);
 		syscall_request();
 	};
 

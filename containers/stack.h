@@ -44,7 +44,7 @@
  
 //! Conservative implementation. Fits best if you access pattern consists of irregulary mixed
 //! push'es and pop's.
-//! For semantics of the methods see documentation of the STL \c std::vector. <BR>
+//! For semantics of the methods see documentation of the STL \c std::stack. <BR>
 //! To gain full bandwidth of disks \c Config_::BlocksPerPage must >= number of disks <BR>
 //! \internal
 template <class Config_>
@@ -104,12 +104,12 @@ public:
     
     std::vector<value_type> tmp(sz);
     
-    for(i=0;i<sz;i++)
+    for(i=0;i<sz;++i)
     {
       tmp[sz - i - 1] = stack_copy.top();
       stack_copy.pop();
     }
-    for(i=0;i<sz;i++)
+    for(i=0;i<sz;++i)
       this->push(tmp[i]);
     
   }
@@ -152,7 +152,7 @@ public:
       
       simple_vector<request_ptr> requests(blocks_per_page);
       
-      for(int i=0;i<blocks_per_page;i++,cur_bid++)
+      for(int i=0;i<blocks_per_page;++i,++cur_bid)
       {
         requests[i] = (back_page + i)->write(*cur_bid);
       }
@@ -227,7 +227,7 @@ private:
 //! \brief Efficient implementation that uses prefetching and overlapping using internal buffers
 
 //! Use it if your access patttern consists of many repeated push'es and pop's
-//! For semantics of the methods see documentation of the STL \c std::vector.
+//! For semantics of the methods see documentation of the STL \c std::stack.
 template <class Config_>
 class grow_shrink_stack
 {
@@ -288,12 +288,12 @@ public:
     
     std::vector<value_type> tmp(sz);
     
-    for(i=0;i<sz;i++)
+    for(i=0;i<sz;++i)
     {
       tmp[sz - i - 1] = stack_copy.top();
       stack_copy.pop();
     }
-    for(i=0;i<sz;i++)
+    for(i=0;i<sz;++i)
       this->push(tmp[i]);
     
   }
@@ -335,7 +335,7 @@ public:
       block_manager::get_instance()->new_blocks(
           offset_allocator<alloc_strategy>(cur_bid-bids.begin(),alloc_strategy_),cur_bid,bids.end());
       
-      for(int i=0;i<blocks_per_page;i++,cur_bid++)
+      for(int i=0;i<blocks_per_page;++i,++cur_bid)
       {
         if(requests[i].get()) requests[i]->wait();
         requests[i] = (cache_buffers + i)->write(*cur_bid);
@@ -378,7 +378,7 @@ public:
       {
         STXXL_VERBOSE2("prefetching, size: "<<size_)
         typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page - 1;
-        for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
+        for(int i=blocks_per_page-1 ;i>=0;--i,--cur_bid)
           requests[i] = (overlap_buffers+i)->read(*cur_bid);
         
       }
@@ -603,7 +603,7 @@ public:
 
 //! \brief A stack that migrates from internal memory to external when its size exceeds a certain threshold
 
-//! For semantics of the methods see documentation of the STL \c std::vector.
+//! For semantics of the methods see documentation of the STL \c std::stack.
 template <unsigned CritSize, class ExternalStack, class InternalStack>
 class migrating_stack
 {
@@ -752,7 +752,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!    - \c STACK_GENERATOR<double,migrating,grow_shrink,1,512*1024>::result migrating 
 //!      grow-shrink stack of \c double's with 1 block per page and block size 512 KB
 //!      (total memory occupied = 1 MB).
-//! For configured stack method semantics see documentation of the STL \c std::vector.
+//! For configured stack method semantics see documentation of the STL \c std::stack.
 template  <
             class ValTp,
             stack_externality  Externality = external,

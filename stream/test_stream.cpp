@@ -96,6 +96,7 @@ int main()
   typedef typeof(streamify(input.begin(),input.end())) input_stream_type;
   input_stream_type input_stream = streamify(input.begin(),input.end());
   
+  
   // create counter stream
   typedef typeof(streamify(counter_type())) counter_stream_type;
   counter_stream_type counter_stream = streamify(counter_type());
