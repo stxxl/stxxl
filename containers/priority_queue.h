@@ -1170,6 +1170,7 @@ protected:
   
   // total size not counting insertBuffer and buffer1
   size_type size_;
+  bool  deallocate_pools;
 
   // private member functions
   void refillBuffer1();
@@ -1200,6 +1201,17 @@ public:
   //! helps to speed up operations.
   priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_);
     
+  //! \brief Constructs external priority queue object
+  //! \param p_pool_mem memory (in bytes) for prefetch pool that will be used 
+  //! for data prefetching for the disk<->memory transfers 
+  //! happenning in the priority queue. Larger pool size 
+  //! helps to speed up operations.
+  //! \param w_pool_mem memory (in bytes) for buffered write pool that will be used 
+  //! for writing data for the memory<->disk transfers 
+  //! happenning in the priority queue. Larger pool size 
+  //! helps to speed up operations.
+  priority_queue(unsigned p_pool_mem, unsigned w_pool_mem);
+
   void swap(priority_queue & obj)
   {
 	  swap_1D_arrays(itree,obj.itree,IntLevels);
@@ -1216,6 +1228,7 @@ public:
   	  std::swap(insertHeap,obj.insertHeap);
 	  std::swap(activeLevels,obj.activeLevels);
 	  std::swap(size_,obj.size_);
+	  //std::swap(deallocate_pools,obj.deallocate_pools);
   }
     
   virtual ~priority_queue();
@@ -1335,7 +1348,29 @@ inline void priority_queue<Config_>::push(const value_type & obj)
 template <class Config_>
 priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) : 
   p_pool(p_pool_),w_pool(w_pool_),
-  activeLevels(0), size_(0)
+  activeLevels(0), size_(0),
+  deallocate_pools(false)
+{
+  STXXL_VERBOSE2("priority_queue::priority_queue()")
+  etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
+  value_type sentinel = cmp.min_value();
+  buffer1[BufferSize1] = sentinel; // sentinel
+  insertHeap.push(sentinel); // always keep the sentinel
+  minBuffer1 = buffer1 + BufferSize1; // empty
+  for (int i = 0;  i < Levels;  i++)
+  { 
+    buffer2[i][N] = sentinel; // sentinel
+    minBuffer2[i] = &(buffer2[i][N]); // empty
+  }
+  
+}
+
+template <class Config_>
+priority_queue<Config_>::priority_queue(unsigned p_pool_mem, unsigned w_pool_mem) : 
+  p_pool(*(new prefetch_pool<block_type>(p_pool_mem/BlockSize))),
+  w_pool(*(new write_pool<block_type>(w_pool_mem/BlockSize))),
+  activeLevels(0), size_(0),
+  deallocate_pools(true)
 {
   STXXL_VERBOSE2("priority_queue::priority_queue()")
   etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
@@ -1355,6 +1390,11 @@ template <class Config_>
 priority_queue<Config_>::~priority_queue()
 {
   STXXL_VERBOSE2("priority_queue::~priority_queue()")
+  if(deallocate_pools)
+  {
+	  delete &p_pool;
+	  delete &w_pool;
+  }
   delete [] etree;
 }
 

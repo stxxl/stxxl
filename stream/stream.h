@@ -464,7 +464,7 @@ namespace stream
 	
 	while(!in.empty())
 	{
-		if(out.block_offset() ==0 ) out.touch();
+		if(out.block_offset() ==0 ) out.touch(); // tells the vector that the block was modified
 		*outstream  = * in;
 		++out;
 		++outstream;
@@ -475,8 +475,8 @@ namespace stream
 	
 	while(const_out.block_offset())
 	{
-		*outstream =  * const_out;
-		++const_out;
+		*outstream =  * const_out; // might cause I/Os for loading the page that
+		++const_out;                     // contains data beyond out
 		++outstream;
 	}
 	out.flush();

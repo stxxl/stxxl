@@ -86,6 +86,9 @@ __STXXL_BEGIN_NAMESPACE
                          file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes 
 			 << " type=" <<((type == READ)?"READ":"WRITE") )
 		}
+		STXXL_VERBOSE2("syscall_request::serve(): Buffer at "<<((void*)buffer)
+			<<" offset: "<<offset<<" bytes: "<<bytes<<((type== READ)?" READ":" WRITE")
+			<<" file: "<<file->get_file_des());
 		
 		stxxl_ifcheck_i(::lseek (file->get_file_des (), offset, SEEK_SET),
 			" this="<<long(this)<<" File descriptor="<<
