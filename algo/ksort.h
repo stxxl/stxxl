@@ -224,6 +224,7 @@ create_runs(
 	unsigned k = 0;
 	const int shift1 = sizeof(typename block_type::value_type::key_type)*8 - log_k1;
 	const int shift2 = shift1 - log_k2;
+	STXXL_VERBOSE("shift1: "<<shift1<<" shift2:"<<shift2)
 
 	for (; k < nruns; k++)
 	{

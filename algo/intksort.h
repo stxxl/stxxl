@@ -310,7 +310,7 @@ template <typename type,typename type_key,typename key_extractor>
 void classify_block(type * begin,type * end,type_key * & out,
 	int * bucket,typename type::key_type offset, unsigned shift, key_extractor keyobj)
 {
-	assert(shift <33);
+	assert(shift <(sizeof(typename type::key_type)*8+1));
 	for (type * p = begin;p<end; p++,out++)	// count & create references
 	{
 		out->ptr = p;
@@ -321,10 +321,10 @@ void classify_block(type * begin,type * end,type_key * & out,
 	}
 }
 template <typename type,typename type_key,typename key_extractor>
-void classify_block(type * begin,type * end,type_key * & out,int * bucket,typename type::key_type offset, unsigned shift, 
+void classify_block(type * begin,type * end,type_key * & out,int * bucket, typename type::key_type offset, unsigned shift, 
 	const int  K, key_extractor keyobj)
 {
-	assert(shift <33);
+	assert(shift <(sizeof(typename type::key_type)*8+1));
 	for (type * p = begin;p<end; p++,out++)	// count & create references
 	{
 		out->ptr = p;
