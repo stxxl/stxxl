@@ -535,11 +535,14 @@ public:
 		}
   private:
     vector(const vector & obj) // Copying external vectors is discouraged
-  											   // (and not implemented)
+                               // (and not implemented)
     {
       STXXL_ERRMSG("stxxl::vector copy constructor is not implemented yet");
       abort();
     }
+	
+	vector & operator = (const vector & obj); // Copying external vectors is discouraged
+                                              // (and not implemented)
 	
   public:
 		size_type size () const
