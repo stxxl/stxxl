@@ -13,7 +13,7 @@ using namespace stxxl;
 struct my_type
 {
 	int key;
-	char data[128 - sizeof(int)];
+	//char data[128 - sizeof(int)];
 	my_type(){}
 	explicit my_type(int k):key(k) {}
 };

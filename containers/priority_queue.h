@@ -290,10 +290,19 @@ private:
   int segmentIsEmpty(int i);
   void multi_merge_k(Element * to, int l);
   
+  
+  bool equal(const Element & a,const Element & b)
+  {
+    return (!cmp(a,b)) && (!cmp(b,a));
+  }
+  bool nequal(const Element & a,const Element & b)
+  {
+    return cmp(a,b) || cmp(b,a);
+  }
 public:
   looser_tree();
   ~looser_tree();
-  void init(); // before, no consistent state is reached :-(
+  void init(); 
 
   void multi_merge(Element * begin, Element * end)
   {
@@ -355,7 +364,7 @@ int looser_tree<ValTp_,Cmp_,KNKMAX>::initWinner(int root)
     int right = initWinner(2*root + 1);
     Element lk    = *(current[left ]);
     Element rk    = *(current[right]);
-    if (lk <= rk) { // right subtree looses
+    if (!(cmp(lk,rk))) { // right subtree looses
       entry[root].index = right;
       entry[root].key   = rk;
       return left;
@@ -386,7 +395,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
     *mask = 1 << (logK - 1);    
     *winnerKey   = entry[0].key;
     *winnerIndex = entry[0].index;
-    if (newKey < entry[node].key) 
+    if (cmp(entry[node].key,newKey)) 
     {
       entry[node].key   = newKey;
       entry[node].index = newIndex;
@@ -396,8 +405,8 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
     Element looserKey   = entry[node].key;
     int looserIndex = entry[node].index;
     if ((*winnerIndex & *mask) != (newIndex & *mask)) { // different subtrees
-      if (newKey < looserKey) { // newKey will have influence here
-        if (newKey < *winnerKey) { // old winner loses here
+      if (cmp(looserKey,newKey)) { // newKey will have influence here
+        if (cmp(*winnerKey,newKey) ) { // old winner loses here
           entry[node].key   = *winnerKey;
           entry[node].index = *winnerIndex;
         } else { // new entry looses here
@@ -457,7 +466,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
   int to   = 0;
   for(;  from < int(k);  from++)
   {
-    if (*(current[from]) != sup)
+    if (nequal(*(current[from]) , sup))
     {
       segment_size[to] = segment_size[from];
       current[to] = current[from];
@@ -506,8 +515,8 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
   
   if (sz > 0)
   {
-    assert( to[0   ] != cmp.min_value());
-    assert( to[sz-1] != cmp.min_value());
+    assert( nequal(to[0   ],cmp.min_value()) );
+    assert( nequal(to[sz-1],cmp.min_value()) );
     // get a free slot
     if (lastFree < 0) { // tree is too small
       doubleK();
@@ -630,14 +639,14 @@ multi_merge_k(Element *to, int l)
     winnerKey = *winnerPos;
 
     // remove winner segment if empty now
-    if (winnerKey == sup)
+    if (equal(winnerKey,sup))
       deallocateSegment(winnerIndex); 
     
     // go up the entry-tree
     for (int i = (winnerIndex + kReg) >> 1;  i > 0;  i >>= 1) {
       currentPos = entry + i;
       currentKey = currentPos->key;
-      if (currentKey < winnerKey) {
+      if (cmp(winnerKey,currentKey)) {
         currentIndex      = currentPos->index;
         currentPos->key   = winnerKey;
         currentPos->index = winnerIndex;
