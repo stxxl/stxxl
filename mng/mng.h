@@ -692,10 +692,11 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	struct single_disk
 	{
 		const int disk;
-		single_disk (int d):disk (d)
+		single_disk(int d):disk(d)
 		{
 		};
-	      single_disk ():disk (0)
+	  
+    single_disk():disk(0)
 		{
 		};
 		int operator() (int i) const
@@ -714,7 +715,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     BaseAllocator_ base;
     int offset;
     offset_allocator(int offset_) : base(),offset(offset_) {}
-    offset_allocator(int offset_,int a,int b) : base(a,b),offset(offset_) {}
+    offset_allocator(int offset_,BaseAllocator_ & base_) : base(base_),offset(offset_) {}
     int operator() (int i)
     {
       return base(offset + i);

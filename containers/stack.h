@@ -54,6 +54,7 @@ private:
   value_type * current_element_;
   simple_vector<block_type> cache_;
   std::vector<bid_type> bids_;
+  alloc_strategy alloc_strategy_;
 public:
   normal_stack(): size_(0),
            cache_offset_(0),
@@ -123,7 +124,7 @@ public:
       bids_.resize(bids_.size() + cache_size);
       std::vector<bid_type>::iterator cur_bid = bids_.end() - cache_size;
       block_manager::get_instance()->new_blocks(
-        offset_allocator<alloc_strategy>(cur_bid-bids.begin()),cur_bid,bids_.end());
+        offset_allocator<alloc_strategy>(cur_bid - bids_.begin(),alloc_strategy_),cur_bid,bids_.end());
       
       request_ptr reqs[cache_size];
       for(int i=0;i<cache_size;i++,cur_bid++)
@@ -205,6 +206,7 @@ private:
   simple_vector<block_type>::iterator overlap_buffers;
   simple_vector<request_ptr> requests;
   std::vector<bid_type> bids;
+  alloc_strategy alloc_strategy_;
 public:
   grow_shrink_stack(): 
            size_(0),
@@ -283,7 +285,7 @@ public:
       bids.resize(bids.size() + blocks_per_page);
       std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
       block_manager::get_instance()->new_blocks(
-          offset_allocator<alloc_strategy>(cur_bid-bids.begin()),cur_bid,bids.end());
+          offset_allocator<alloc_strategy>(cur_bid-bids.begin(),alloc_strategy_),cur_bid,bids.end());
       
       for(int i=0;i<blocks_per_page;i++,cur_bid++)
       {

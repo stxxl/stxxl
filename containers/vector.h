@@ -394,7 +394,8 @@ public:
       _last_page.resize(new_pages,on_disk);
       
       _bids.resize(new_bids_size);
-      bm->new_blocks(_alloc_strategy,_bids.begin() + old_bids_size,_bids.end());
+      bm->new_blocks(offset_allocator<alloc_strategy>(old_bids_size,_alloc_strategy),
+          _bids.begin() + old_bids_size,_bids.end());
     }
     void resize(size_type n)
     {
