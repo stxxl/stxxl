@@ -14,6 +14,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+
+//! \addtogroup schedlayer
+//! \{
+
+
 //! \brief Buffered output stream
 //!
 //! Writes data records to the stream of blocks.
@@ -84,6 +89,8 @@ public:
 		assert(current_elem == 0);
 	}
 };
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

@@ -15,6 +15,18 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \weakgroup stlcont Containers
+//! \ingroup stllayer
+//! Containers with STL-compatible interface
+//! \{
+
+
+enum pager_type
+{
+  random,
+  lru
+};
+
 //! \brief Pager with \b random replacement strategy
 template <unsigned npages_>
 class random_pager
@@ -57,6 +69,8 @@ public:
 		history.splice(history.begin(),history,history_entry[ipage]);
 	};
 };
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

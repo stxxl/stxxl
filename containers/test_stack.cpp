@@ -9,14 +9,17 @@
 #include "stack.h"
 
 //! \example test_stack.cpp
-//! This is an example of how to use \c stxxl::stack data structure
+//! This is an example of how to use \c stxxl::STACK_GENERATOR class
+//! to generate an \b external stack type 
+//! with \c stxxl::grow_shrink_stack implementation, \b four blocks per page,
+//! block size \b 4096 bytes
 
 using namespace stxxl;
 
 int main(int argc, char * argv[])
 {
-  typedef stack<grow_shrink_stack<stack_config_generator<int,4,RC,4096> > > ext_stack_type;
-
+  typedef STACK_GENERATOR<int,external,grow_shrink,4,4096>::result ext_stack_type;
+  
   if(argc<2)
   {
     STXXL_MSG("Usage: "<<argv[0]<<" test_size_in_pages")

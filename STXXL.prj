@@ -93,8 +93,6 @@ module.include.files=\
 	common/simple_vector.h\
 	algo/async_schedule.h\
 	algo/intksort.h\
-	algo/kprefetcher.h\
-	algo/koptprefetcher.h\
 	algo/ksort_exp.h\
 	mng/block_prefetcher.h\
 	mng/buf_writer.h\
@@ -108,8 +106,8 @@ module.include.files=\
 	io/completion_handler.h\
 	algo/inmemsort.h\
 	containers/stack.h\
-	containers/migrating_stack.h\
-	common/timer.h
+	common/timer.h\
+	common/tmeta.h
 
 module.source.name=.
 module.source.type=

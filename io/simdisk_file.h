@@ -15,7 +15,9 @@
 
 namespace stxxl
 {
-
+  //! \addtogroup fileimpl
+  //! \{
+  
 	#define AVERAGE_SPEED (15*1024*1024)	
 		
 	class DiskGeometry
@@ -368,7 +370,8 @@ namespace stxxl
 		#endif
 		return req;
 	};
-
+  
+//! \}
 
 }
 

@@ -14,6 +14,11 @@
 
 namespace stxxl
 {
+  
+  //! \addtogroup mnglayer
+  
+  //! \{
+  
 	template < class Tp_, class Distance_ > struct r_a_iterator
 	{
 		typedef std::random_access_iterator_tag iterator_category;
@@ -288,7 +293,7 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 
 	};
 
-
+  //! \}
 };
 
 #endif

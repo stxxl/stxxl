@@ -13,6 +13,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+  //! \addtogroup fileimpl
+  //! \{
+
 	//! \brief Implementation of file based on UNIX syscalls
 	class syscall_file:public ufs_file_base
 	{
@@ -139,6 +142,9 @@ __STXXL_BEGIN_NAMESPACE
 		return req;
 	};
 
+  
+  //! \}
+  
 __STXXL_END_NAMESPACE
 
 

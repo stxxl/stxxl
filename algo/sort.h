@@ -30,6 +30,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup stlalgo
+//! \{
+
 namespace sort_local
 {
 	template <typename BIDTp_,typename ValTp_>
@@ -775,6 +778,8 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 		}
 	}
 };
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

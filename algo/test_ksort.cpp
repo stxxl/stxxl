@@ -60,7 +60,7 @@ struct zero
 template <typename alloc_strategy_type,unsigned block_size>
 void test(stxxl::int64 records_to_sort,unsigned memory_to_use,unsigned n_prefetch_blocks)
 {
-	typedef stxxl::vector<my_type,alloc_strategy_type,block_size,stxxl::lru_pager<8>,2> vector_type;
+	typedef stxxl::vector<my_type,2,stxxl::lru_pager<8>,block_size,alloc_strategy_type> vector_type;
 	
 	memory_to_use = div_and_round_up(memory_to_use,vector_type::block_type::raw_size)*vector_type::block_type::raw_size;
 	

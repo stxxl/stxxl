@@ -33,7 +33,13 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \weakgroup stllayer STL-user layer
+//! Layer which groups STL compatible algorithms and containters
 
+//! \weakgroup stlalgo Algorithms
+//! \ingroup stllayer
+//! Algorithms with STL-compatible interface
+//! \{
 
 template <typename _BIDTp,typename _KeyTp>
 struct trigger_entry
@@ -1016,8 +1022,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,unsigned M__)
 }
 
 
-
-
+//! \}
 
 __STXXL_END_NAMESPACE
 

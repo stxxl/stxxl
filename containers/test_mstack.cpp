@@ -4,21 +4,25 @@
  *  Fri May  2 13:34:25 2003
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
+ **************************************************************************/
 
 
 #include "stack.h"
 
 //! \example test_mstack.cpp
-//! This is an example of how to use \c stxxl::migrating_stack data structure
-
+//! This is an example of how to use \c stxxl::STACK_GENERATOR class
+//! to generate an \b migrating stack with critical size \c critical_size ,
+//! external implementation \c normal_stack , \b four blocks per page,
+//! block size \b 4096 bytes, and internal implementation
+//! \c std::stack<int>
 using namespace stxxl;
 
 int main()
 {
-  const unsigned critical_size = 8*4096; 
-  typedef stack<normal_stack<stack_config_generator<int,4,RC,4096> > > ext_stack_type;
-  typedef stack<migrating_stack<(8*4096),ext_stack_type,std::stack<int> > > migrating_stack_type;
+  const unsigned critical_size = 8*4096;
+  typedef STACK_GENERATOR<int, \
+    migrating,normal,4,4096,std::stack<int>,critical_size>::result migrating_stack_type;
+  
   
   migrating_stack_type my_stack;
   int test_size = 1*1024*1024/sizeof(int),i;

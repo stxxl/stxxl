@@ -16,6 +16,10 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+  //! \addtogroup iolayer
+  //!
+  //! \{
+
 #ifdef COUNT_WAIT_TIME
 extern double stxxl::wait_time_counter;
 #endif
@@ -247,6 +251,8 @@ extern double stxxl::wait_time_counter;
 			io_mutex.unlock ();
 		}
 	};
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

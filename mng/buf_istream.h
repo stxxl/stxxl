@@ -14,6 +14,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup schedlayer
+//! \{
+
+
+
 // a paranoic check
 #define BUF_ISTREAM_CHECK_END
 
@@ -133,6 +138,8 @@ public:
 	}
 	
 };
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

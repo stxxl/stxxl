@@ -15,6 +15,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup schedlayer
+//! \{
+
+
+
 class set_switch_handler
 {
   onoff_switch & switch_;
@@ -148,7 +153,10 @@ public:
 		delete [] read_buffers;
 		delete [] read_reqs;
 	}
+  
 };
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

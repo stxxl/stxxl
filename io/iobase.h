@@ -76,6 +76,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \defgroup iolayer I/O primitives layer
+//! Group of classes which enable abstraction from operating system calls and support
+//! system-independent interfaces for asynchronous I/O.
+//! \{
+
 #define BLOCK_ALIGN 4096
 
 	typedef void *(*thread_function_t) (void *);
@@ -480,6 +485,8 @@ __STXXL_BEGIN_NAMESPACE
 	extern double wait_time_counter;
 #endif
 
+//! \}
+  
 __STXXL_END_NAMESPACE
 
 

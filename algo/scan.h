@@ -14,6 +14,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \addtogroup stlalgo
+//! \{
+
 //! \brief External equivalent of std::for_each
 //! \remark The implementation exploits \c \<stxxl\> buffered streams (computation and I/O overlapped)
 //! \param _begin object of model of \c ext_random_access_iterator concept
@@ -105,6 +108,9 @@ _ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityCompara
 	
 	return _cur;
 }
+
+//! \}
+
 __STXXL_END_NAMESPACE
 
 #endif

@@ -13,16 +13,20 @@
 #include "../common/utils.h"
 #include "../mng/mng.h"
 #include "../common/simple_vector.h"
+#include "../common/tmeta.h"
 #include <stack>
 #include <vector>
  
  
  __STXXL_BEGIN_NAMESPACE
  
+//! \addtogroup stlcont
+//! \{
+ 
  template <class ValTp,
            unsigned BlocksPerPage = 4,
-           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
            unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
+           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
            class SzTp = off_t>
  struct stack_config_generator
  {
@@ -32,7 +36,14 @@
    enum { block_size = BlkSz };
    typedef SzTp size_type;
  };
+
  
+//! \brief External vector container
+ 
+//! Conservative implementation. Fits best if you access pattern consists of irregulary mixed
+//! push'es and pop's.
+//! For semantics of the methods see documentation of the STL \c std::vector. <BR>
+//! To gain full bandwidth of disks \c Config_::BlocksPerPage must >= number of disks <BR>
 template <class Config_>
 class normal_stack
 {
@@ -43,38 +54,46 @@ public:
   typedef typename cfg::size_type size_type;
   enum {  blocks_per_page = cfg::blocks_per_page,
           block_size = cfg::block_size,
-          cache_size = blocks_per_page };
+       };
           
   typedef typed_block<block_size,value_type> block_type;
   typedef BID<block_size> bid_type;
 
 private:
   size_type size_;
-  unsigned cache_offset_;
-  value_type * current_element_;
-  simple_vector<block_type> cache_;
-  std::vector<bid_type> bids_;
+  unsigned cache_offset;
+  value_type * current_element;
+  simple_vector<block_type> cache;
+  simple_vector<block_type>::iterator front_page;
+  simple_vector<block_type>::iterator back_page;
+  std::vector<bid_type> bids;
   alloc_strategy alloc_strategy_;
 public:
-  normal_stack(): size_(0),
-           cache_offset_(0),
-           current_element_(NULL),
-           cache_(cache_size),
-           bids_(0)
+  normal_stack(): 
+           size_(0),
+           cache_offset(0),
+           current_element(NULL),
+           cache(blocks_per_page*2),
+           back_page(cache.begin()),
+           front_page(cache.begin() + blocks_per_page),
+           bids(0)
   {
-    bids_.reserve(cache_size);
+    bids.reserve(blocks_per_page);
   }
   //! \brief Construction from a stack
   //! \param stack_ stack object (could be external or internal, important is that it must
   //! have a copy constructor, \c top() and \c pop() methods )
   template <class stack_type>
-  normal_stack(const stack_type & stack_): size_(0),
-           cache_offset_(0),
-           current_element_(NULL),
-           cache_(cache_size),
-           bids_(0)
+  normal_stack(const stack_type & stack_): 
+           size_(0),
+           cache_offset(0),
+           current_element(NULL),
+           cache(blocks_per_page*2),
+           back_page(cache.begin()),
+           front_page(cache.begin() + blocks_per_page),
+           bids(0)
   {
-    bids_.reserve(cache_size);
+    bids.reserve(blocks_per_page);
     
     stack_type stack_copy = stack_;
     const size_type sz=stack_copy.size();
@@ -93,7 +112,7 @@ public:
   }
   ~normal_stack()
   {
-    block_manager::get_instance()->delete_blocks(bids_.begin(),bids_.end());
+    block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
   }
   size_type size() const
   {
@@ -106,82 +125,102 @@ public:
   value_type & top()
   {
     assert(size_ > 0);
-    return (*current_element_);
+    return (*current_element);
   }
   const value_type & top() const
   {
     assert(size_ > 0);
-    return (*current_element_);
+    return (*current_element);
   }
   void push(const value_type & val)
   {
-    assert(cache_offset_ <= cache_size*block_type::size);
-    assert(cache_offset_ >= 0);
-   
-    if(cache_offset_ == cache_size*block_type::size) // cache overflow
+    assert(cache_offset <= 2*blocks_per_page*block_type::size);
+    assert(cache_offset >= 0);
+    
+    if(cache_offset == 2*blocks_per_page*block_type::size) // cache overflow
     {
-      // write cache on disk
-      bids_.resize(bids_.size() + cache_size);
-      std::vector<bid_type>::iterator cur_bid = bids_.end() - cache_size;
+      STXXL_VERBOSE2("growing, size: "<<size_)
+      
+      bids.resize(bids.size() + blocks_per_page);
+      std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
       block_manager::get_instance()->new_blocks(
-        offset_allocator<alloc_strategy>(cur_bid - bids_.begin(),alloc_strategy_),cur_bid,bids_.end());
+          offset_allocator<alloc_strategy>(cur_bid-bids.begin(),alloc_strategy_),cur_bid,bids.end());
+      simple_vector<request_ptr> requests(blocks_per_page);
       
-      request_ptr reqs[cache_size];
-      for(int i=0;i<cache_size;i++,cur_bid++)
-        reqs[i] = cache_[i].write(*cur_bid);
+      for(int i=0;i<blocks_per_page;i++,cur_bid++)
+        requests[i] = (back_page + i)->write(*cur_bid);
       
-      bids_.reserve(bids_.size() + cache_size);
       
-      cache_offset_ = 1;
-      current_element_ = &(cache_[0][0]);
+      std::swap(back_page,front_page);
+      
+      bids.reserve(bids.size() + blocks_per_page);
+      
+      cache_offset = blocks_per_page*block_type::size + 1;
+      current_element = &((*front_page)[0]);
       ++size_;
- 
-      wait_all(reqs,cache_size);
- 
-      *current_element_=val;
+      
+      wait_all(requests.begin(),blocks_per_page);
+      
+      *current_element=val;
       
       return;
     }
     
-    current_element_ = &(cache_[cache_offset_/block_type::size][cache_offset_%block_type::size]);
-    *current_element_=val;
+    current_element = element(cache_offset);
+    *current_element=val;
     ++size_;
-    ++cache_offset_;
+    ++cache_offset;
   }
   void pop()
   {
-    assert(cache_offset_ <= cache_size*block_type::size);
-    assert(cache_offset_ > 0);
+    assert(cache_offset <= 2*blocks_per_page*block_type::size);
+    assert(cache_offset > 0);
     assert(size_ > 0);
     
-    if(cache_offset_ == 1 && bids_.size() >= cache_size)
-    {
-      // need to load from disk
+    if(cache_offset == 1 && bids.size() >= blocks_per_page)
+    { 
+      STXXL_VERBOSE2("shrinking, size: "<<size_)
+     
+      simple_vector<request_ptr> requests(blocks_per_page);
       
-      std::vector<bid_type>::const_iterator cur_bid = --bids_.end();
-      request_ptr reqs[cache_size];
-      for(int i=cache_size-1 ;i>=0;i--,cur_bid--)
-        reqs[i] = cache_[i].read(*cur_bid);
-      
-      cache_offset_ = cache_size*block_type::size;
+      std::vector<bid_type>::const_iterator cur_bid = bids.end() - 1;
+      for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
+        requests[i] = (front_page+i)->read(*cur_bid);
+        
+      std::swap(front_page,back_page);
+            
+      cache_offset = blocks_per_page*block_type::size;
       --size_;
-      current_element_ = &(cache_[cache_size - 1][block_type::size - 1]);
+      current_element = &((*(back_page+(blocks_per_page - 1)))[block_type::size - 1]);
       
-      wait_all(reqs,cache_size);
+      wait_all(requests.begin(),blocks_per_page);
       
-      block_manager::get_instance()->delete_blocks(bids_.end() - cache_size,bids_.end());
-      bids_.resize(bids_.size() - cache_size);
+      block_manager::get_instance()->delete_blocks(bids.end() - blocks_per_page,bids.end());
+      bids.resize(bids.size() - blocks_per_page);
       
       return;
     }
-    
+       
     --size_;
-    unsigned cur_offset = (--cache_offset_) - 1;
-    current_element_ = &(cache_[cur_offset/block_type::size][cur_offset%block_type::size]);
+    
+    current_element = element((--cache_offset) - 1);
+  }
+private:
+  value_type * element(unsigned offset)
+  {
+    if(offset < blocks_per_page*block_type::size)
+      return &((*(back_page + offset/block_type::size))[offset%block_type::size]);
+    
+    unsigned unbiased_offset = offset - blocks_per_page*block_type::size;
+    return &((*(front_page + unbiased_offset/block_type::size))[unbiased_offset%block_type::size]);
   }
 };
 
-//! \brief Efficient implementation for ...
+
+//! \brief Efficient implementation that uses prefetching and overlapping.
+
+//! Use it if your access patttern consists of many repeated push'es and pop's
+//! For semantics of the methods see documentation of the STL \c std::vector.
 template <class Config_>
 class grow_shrink_stack
 {
@@ -353,6 +392,9 @@ public:
   
 };
 
+//! \brief A stack that migrates from internal memory to external when its size exceeds a certain threshold
+
+//! For semantics of the methods see documentation of the STL \c std::vector.
 template <unsigned CritSize, class ExternalStack, class InternalStack>
 class migrating_stack
 {
@@ -459,7 +501,7 @@ public:
       delete ext_impl;
   }
 };
-
+/*
 template <class BaseStack>
 class stack: public BaseStack
 {
@@ -479,8 +521,75 @@ public:
   template <class stack_type>
   stack(const stack_type & stack_) : BaseStack(stack_) {} 
 };
+*/
 
+enum stack_externality { external, migrating, internal };
+enum stack_behaviour { normal, grow_shrink };
 
+//! \brief Stack type generator
+
+//! Template parameters:
+//!  - \c ValTp type of contained objects
+//!  - \c Externality one of
+//!    - \c external , \b external container, implementation is chosen according 
+//!      to \c Behaviour parameter, is default
+//!    - \c migrating , migrates from internal implementation given by \c IntStackTp parameter
+//!      to external implementation given by \c Behaviour parameter when size exceeds \c MigrCritSize
+//!    - \c internal , choses \c IntStackTp implementation
+//!  - \c Behaviour ,  choses \b external implementation, one of:
+//!    - \c normal , conservative version, implemented in \c stxxl::normal_stack , is default
+//!    - \c grow_shrink , efficient version, implemented in \c stxxl::grow_shrink_stack
+//!  - \c BlocksPerPage defines how many blocks has one page of internal cache of an 
+//!       \b external implementation, default is four. All \b external implementations have 
+//!       \b two pages.
+//!  - \c BlkSz external block size in bytes, default is 2 Mbytes
+//!  - \c IntStackTp type of internal stack used for some implementations
+//!  - \c MigrCritSize threshold value for number of elements when 
+//!    \c stxxl::migrating_stack migrates to the external memory
+//!  - \c AllocStr one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+//!    default is RC
+//!  - \c SzTp size type, default is \c off_t
+//!
+//! Configured stack type is available as \c STACK_GENERATOR<>::result. <BR> <BR>
+//! Examples:
+//!    - \c STACK_GENERATOR<double>::result external stack of \c double's ,
+//!    - \c STACK_GENERATOR<double,internal>::result internal stack of \c double's ,
+//!    - \c STACK_GENERATOR<double,external,grow_shrink>::result external 
+//!      grow-shrink stack of \c double's ,
+//!    - \c STACK_GENERATOR<double,migrating,grow_shrink>::result migrating 
+//!      grow-shrink stack of \c double's, internal implementation is \c std::stack<double> ,
+//!    - \c STACK_GENERATOR<double,migrating,grow_shrink,1,512*1024>::result migrating 
+//!      grow-shrink stack of \c double's with 1 block per page and block size 512 KB
+//!      (total memory occupied = 1 MB).
+//! For configured stack method semantics see documentation of the STL \c std::vector.
+template  <
+            class ValTp,
+            stack_externality  Externality = external,
+            stack_behaviour    Behaviour = normal,
+            unsigned BlocksPerPage = 4,
+            unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
+
+            class IntStackTp = std::stack<ValTp>,
+            unsigned MigrCritSize = (2*BlocksPerPage*BlkSz),
+
+            class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+            class SzTp = off_t
+          >
+class STACK_GENERATOR
+{
+  typedef stack_config_generator<ValTp,BlocksPerPage,BlkSz,AllocStr,SzTp> cfg;
+  
+  typedef IF<Behaviour==normal, normal_stack<cfg>,grow_shrink_stack<cfg> >::result ExtStackTp;
+  typedef IF<Externality==migrating, 
+    migrating_stack<MigrCritSize,ExtStackTp,IntStackTp>,ExtStackTp>::result MigrOrNotStackTp;
+  
+public:
+  
+  typedef IF<Externality==internal,IntStackTp,MigrOrNotStackTp>::result result;
+
+};
+
+//! \}
 
 __STXXL_END_NAMESPACE
  

@@ -11,12 +11,16 @@
 
 
 #include "../mng/mng.h"
+#include "../common/tmeta.h"
 #include "pager.h"
 #include <vector>
 
+
 namespace stxxl
 {
-
+  //! \addtogroup stlcont
+  //! \{
+  
 	template < unsigned BlkSize_ >
 		class bid_vector:public std::vector < BID < BlkSize_ > >
 	{
@@ -32,11 +36,13 @@ namespace stxxl
 		};
 	};
 
-	template < typename Tp_,
+	template < 
+    typename Tp_,
+    unsigned PgSz_,
+    typename PgTp_,
+    unsigned BlkSize_ ,
 		typename AllocStr_ ,
-		unsigned BlkSize_ ,
-		typename PgTp_ ,
-		unsigned PgSz_>
+    typename SzTp_ >
 	class vector;
 	
 	
@@ -58,7 +64,7 @@ public:
 		typedef SzTp_ size_type;
 		typedef DiffTp_ difference_type;
 		typedef unsigned block_offset_type;
-		typedef vector < Tp_, AllocStr_, BlkSize_,PgTp_,PgSz_ > vector_type;
+		typedef vector < Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_,SzTp_> vector_type;
 		friend class vector_type;
 		typedef bid_vector < BlkSize_ > bids_container_type;
 		typedef typename bids_container_type::iterator bids_container_iterator;
@@ -175,7 +181,7 @@ public:
 		typedef SzTp_ size_type;
 		typedef DiffTp_ difference_type;
 		typedef unsigned block_offset_type;
-		typedef vector < Tp_, AllocStr_, BlkSize_,PgTp_,PgSz_ > vector_type;
+		typedef vector < Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_,SzTp_> vector_type;
 		friend class vector_type;
 		typedef bid_vector < BlkSize_ > bids_container_type;
 		typedef typename bids_container_type::iterator bids_container_iterator;
@@ -287,18 +293,21 @@ public:
   //! For semantics of the methods see documentation of the STL std::vector
   //! Template parameters:
   //!  - \c Tp_ type of contained objects
-  //!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
-  //!  default is RC 
-  //!  - \c BlkSize_ external block size in bytes, default is 2 Mbytes
+  //!  - \c PgSz_ number of blocks in a page 
   //!  - \c PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages, 
   //!  default is \c lru_pager<8>
-  //!  - \c PgSz_ number of blocks in a page <BR>
+  //!  - \c BlkSize_ external block size in bytes, default is 2 Mbytes
+  //!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+  //!  default is RC <BR>
   //! Memory consumption: BlkSize_*x*PgSz_ bytes
-	template < typename Tp_,
-		typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
+	template < 
+    typename Tp_,
+    unsigned PgSz_ = 4,
+    typename PgTp_ = lru_pager<8>,
 		unsigned BlkSize_ = STXXL_DEFAULT_BLOCK_SIZE (Tp_),
-		typename PgTp_ = lru_pager<8>,
-		unsigned PgSz_ = 4>
+    typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
+    typename SzTp_ = off_t
+		>
 	class vector 
   {
   public:
@@ -306,8 +315,8 @@ public:
 		typedef value_type & reference;
 		typedef const value_type & const_reference;
 		typedef value_type *pointer;
-		typedef off_t size_type;
-		typedef off_t difference_type;
+		typedef SzTp_ size_type;
+		typedef SzTp_ difference_type;
 		typedef const value_type *const_pointer;
 		
 		typedef PgTp_ pager_type;
@@ -681,7 +690,52 @@ private:
 			}
 		};
 	};
-
+  
+  
+  
+  
+	//! \brief External vector type generator
+  
+  //! Parameters:
+  //!  - \c Tp_ type of contained objects
+  //!  - \c PgSz_ number of blocks in a page
+  //!  - \c Pages_ number of pages
+  //!  - \c BlkSize_ external block size in bytes, default is 2 Mbytes
+  //!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+  //!  default is RC 
+  //!  - \c Pager_ pager type:
+  //!    - \c random ,
+  //!    - \c lru , is default
+  //!
+  //! Memory consumption of constructed vector is BlkSize_*Pages_*PgSz_ bytes
+  //! Configured stack type is available as \c STACK_GENERATOR<>::result. <BR> <BR>
+  //! Examples:
+  //!    - \c VECTOR_GENERATOR<double>::result external vector of \c double's ,
+  //!    - \c VECTOR_GENERATOR<double,8>::result external vector of \c double's ,
+  //!      with 8 blocks per page,
+  //!    - \c VECTOR_GENERATOR<double,8,2,512*1024,RC,lru>::result external vector of \c double's ,
+  //!      with 8 blocks per page, 2 pages, 512 KB blocks, Random Cyclic allocation
+  //!      and lru cache replacement strategy
+	template
+  < 
+    typename Tp_,
+    unsigned PgSz_ = 4,
+    unsigned Pages_ = 8,
+    unsigned BlkSize_ = STXXL_DEFAULT_BLOCK_SIZE (Tp_),
+		typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
+    pager_type Pager_ = lru
+	>
+  class VECTOR_GENERATOR
+  {
+      typedef IF<Pager_==lru,
+        lru_pager<Pages_>,random_pager<Pages_> >::result PagerType;
+    
+    public:
+      typedef vector<Tp_,PgSz_,PagerType,BlkSize_,AllocStr_> result;
+  };
+    
+    
+  //! \}
 }
 
 

@@ -14,6 +14,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+  //! \addtogroup fileimpl
+  //! \{
+
 	class ufs_request_base;
 
 	//! \brief Base for UNIX file system implementations
@@ -203,6 +206,8 @@ __STXXL_BEGIN_NAMESPACE
 			stxxl_ifcheck (::lseek (file_des, newsize - 1,SEEK_SET));
 		}
 	};
+  
+  //! \}
 
 __STXXL_END_NAMESPACE
 

@@ -14,6 +14,15 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+
+//! \weakgroup schedlayer Block scheduling sublayer
+//! \ingroup mnglayer
+//! Group of classes which help in scheduling 
+//! sequences of read and write requests
+//! via prefetching and buffered writing
+//! \{
+
+
 //! \brief Encapsulates asynchronous buffered block writing engine
 //!
 //! \c buffered_writer overlaps I/Os with filling of output buffer.
@@ -162,6 +171,8 @@ public:
 	}
 	
 };
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

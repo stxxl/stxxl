@@ -24,6 +24,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+  //! \defgroup mnglayer Block management layer
+  //! Group of classes which help controlling external memory space,
+  //! managing disks, and allocating and deallocating blocks of external storage
+  //! \{
+
 	//! \brief Block identifier class
 	
 	//! Stores block identity, given by file and offset within the file
@@ -922,6 +927,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
   #define STXXL_DEFAULT_ALLOC_STRATEGY RC   
   #define STXXL_DEFAULT_BLOCK_SIZE(type) (2*1024*1024)	// use traits
+  
+  //! \}
   
 __STXXL_END_NAMESPACE
 

@@ -14,6 +14,12 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+  //! \weakgroup fileimpl File implementations
+  //! \ingroup iolayer
+  //! Implemantations of \c stxxl::file and \c stxxl::request 
+  //! for various file access methods
+  //! \{
+
 	//! \brief Implementation of memory mapped access file
 	class mmap_file:public ufs_file_base
 	{
@@ -160,6 +166,8 @@ __STXXL_BEGIN_NAMESPACE
     return req;
 	};
 
+//! \}
+  
 __STXXL_END_NAMESPACE
 
 #endif
