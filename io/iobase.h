@@ -200,7 +200,10 @@ __STXXL_BEGIN_NAMESPACE
 		};
 		
 	public:
-		request(completion_handler on_compl):on_complete(on_compl),ref_cnt(0) {};
+		request(completion_handler on_compl):on_complete(on_compl),ref_cnt(0)
+    {
+      STXXL_VERBOSE3("request "<< unsigned(this) <<": creation, cnt: "<<ref_cnt)
+    }
 		//! \brief Suspends calling thread until completion of the request
 		virtual void wait () = 0;
 		//! \brief Polls the status of the request
@@ -212,7 +215,10 @@ __STXXL_BEGIN_NAMESPACE
 		{
 			return "none";
 		};
-		virtual ~ request() {};
+		virtual ~request()
+    {
+        STXXL_VERBOSE3("request "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
+    }
 	private:
     // Following methods are declared but not implemented 
     // intentionnaly to forbid their usage
@@ -223,15 +229,18 @@ __STXXL_BEGIN_NAMESPACE
     void add_ref()
     {
       ref_cnt_mutex.lock();
+      STXXL_VERBOSE3("request "<< unsigned(this) <<": adding reference, cnt: "<<ref_cnt)
       ref_cnt++;
       ref_cnt_mutex.unlock();
     }
     bool sub_ref()
     {
       ref_cnt_mutex.lock();
+      STXXL_VERBOSE3("request "<< unsigned(this) <<": subtracting reference cnt: "<<ref_cnt)
       ref_cnt--;
       ref_cnt_mutex.unlock();
-      return (ref_cnt<=0);
+      assert(ref_cnt>=0);
+      return (ref_cnt==0);
     }
 	};
 
@@ -243,7 +252,6 @@ __STXXL_BEGIN_NAMESPACE
     request * ptr;
     void add_ref()
     {
-      
       if(ptr)
       {
         ptr->add_ref();
@@ -271,6 +279,7 @@ __STXXL_BEGIN_NAMESPACE
     //! \return reference to itself
     request_ptr & operator= (const request_ptr & p)
     {
+      assert(p.ptr);
       return (*this = p.ptr);
     }
     //! \brief Assignment operator from \c request pointer

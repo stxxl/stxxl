@@ -39,13 +39,29 @@ __STXXL_BEGIN_NAMESPACE
 #define STXXL_MSG(x) { std::cout << x << std::endl; std::cout.flush(); };
 #define STXXL_ERRMSG(x) { std::cerr << x << std::endl; std::cerr.flush(); };
   
-#ifdef STXXL_VERBOSE_ON
-#define STXXL_VERBOSE(x) { std::cout << x << std::endl; std::cerr.flush(); };
+
+#if STXXL_VERBOSE_LEVEL > 0
+#define STXXL_VERBOSE1(x) { std::cout << x << std::endl; std::cerr.flush(); };
 #else
-#define STXXL_VERBOSE(x) (0);
+#define STXXL_VERBOSE1(x) (0);
 #endif
   
-	inline void
+#define STXXL_VERBOSE(x) STXXL_VERBOSE1(x) 
+
+#if STXXL_VERBOSE_LEVEL > 1
+#define STXXL_VERBOSE2(x) { std::cout << x << std::endl; std::cerr.flush(); };
+#else
+#define STXXL_VERBOSE2(x) (0);
+#endif  
+
+#if STXXL_VERBOSE_LEVEL > 2
+#define STXXL_VERBOSE3(x) { std::cout << x << std::endl; std::cerr.flush(); };
+#else
+#define STXXL_VERBOSE3(x) (0);
+#endif    
+  
+  
+inline void
 stxxl_perror (const char *errmsg, int errcode)
 {
 	std::cerr << errmsg << " error code " << errcode;
