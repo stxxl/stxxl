@@ -352,7 +352,8 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	//	   << partial_runs) 
 	
 #ifdef STXXL_IO_STATS
-	// stats *iostats = stats::get_instance();
+	stats *iostats = stats::get_instance();
+	iostats += 0;
 	// iostats->reset();
 #endif
 	
@@ -784,6 +785,10 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 			}
 		}
 	}
+	
+	#ifdef STXXL_CHECK_ORDER_IN_SORTS
+	assert(stxxl::is_sorted(first,last,cmp));
+	#endif
 };
 
 //! \}

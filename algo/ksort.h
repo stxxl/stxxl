@@ -428,7 +428,8 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs) 
 	
 #ifdef STXXL_IO_STATS
-	// stats *iostats = stats::get_instance ();
+	stats *iostats = stats::get_instance ();
+	iostats += 0;
 	// iostats->reset ();
 #endif
 	
@@ -565,9 +566,9 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 template <typename record_type, typename key_extractor>
 class key_comparison
 {
-  key_comparison() {}
   key_extractor ke;
 public:
+  key_comparison() {}
   key_comparison(key_extractor ke_): ke(ke_){}
   bool operator () (const record_type & a, const record_type & b)
   {
@@ -928,6 +929,10 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 		}
 		
 	}
+	
+	#ifdef STXXL_CHECK_ORDER_IN_SORTS
+	assert(stxxl::is_sorted(first_,last_,key_comparison<value_type,KeyExtractor_>()));
+	#endif
 };
 
 template<typename record_type>

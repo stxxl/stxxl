@@ -2,6 +2,9 @@ all: asch scan genfile sortfile ksort stable sort
 
 include ../compiler.make
 
+
+STXXL_LIB += -DSTXXL_CHECK_ORDER_IN_SORTS
+
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 
 # experimental

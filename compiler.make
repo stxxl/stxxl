@@ -60,7 +60,8 @@ STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB) -ftemplate-depth-65000
 # Troubleshooting
 #
 # For automatical checking of order of the output elements in
-# the pipelined sorters stxxl::stream::sort and stxxl::stream::merge_runs
+# the sorters: stxxl::stream::sort, stxxl::stream::merge_runs,
+# stxxl::sort, and stxxl::ksort
 # use -DSTXXL_CHECK_ORDER_IN_SORTS compile option
 #
 # if your program aborts with message "read/write: wrong parameter"
