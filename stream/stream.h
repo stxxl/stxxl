@@ -439,6 +439,10 @@ namespace stream
 	typedef stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> ConstExtIterator;
 	typedef buf_ostream<typename ExtIterator::block_type,typename ExtIterator::bids_container_iterator> buf_ostream_type;
 	  
+	  // on the I/O complexity of "materialize":
+	  // crossing block boundary causes O(1) I/Os
+	  // if you stay in a block, then materialize function accesses only the cache of the
+	  // vector (only one block indeed), amortized complexity should apply here
 	  
 	while(out.block_offset()) //  go to the beginning of the block 
 											//  of the external vector
