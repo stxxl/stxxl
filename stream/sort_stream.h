@@ -45,7 +45,14 @@ namespace stream
     size_type elements;
     std::vector<run_type> runs;
 	std::vector<unsigned> runs_sizes;
-    
+
+	 // Optimization:
+    // if the input is small such that its total size is	  
+	// less than B (block_type::size)
+	// then input is sorted internally
+	// and kept in the array "small"
+	std::vector<ValueType> small;
+	  
     sorted_runs():elements(0) {}
 		
 	//! \brief Deallocates the blocks which the runs occupy
@@ -59,6 +66,8 @@ namespace stream
           bm->delete_blocks(
           trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i].begin()),
           trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(runs[i].end()) );
+		 
+		 runs.clear();
 	}
   };
   
@@ -163,6 +172,16 @@ namespace stream
     // sort first run
     sort_run(Blocks1,pos);
     result_.elements = pos;
+	if(pos <  block_type::size && input.empty() ) // small input, do not flush it on the disk(s)
+	{
+		STXXL_VERBOSE1("runs_creator: Small input optimization, input length: "<<pos);
+		result_.small.resize(pos);
+		std::copy(Blocks1[0].begin(), Blocks1[0].begin()+pos, result_.small.begin());
+		delete [] write_reqs;
+      	delete [] Blocks1;
+		return;
+	}
+	
     unsigned cur_run_size = div_and_round_up(pos,block_type::size); // in blocks
     run.resize(cur_run_size);
     bm->new_blocks(AllocStr_(),
@@ -404,6 +423,15 @@ namespace stream
 		unsigned cur_el_reg = cur_el;
 		sort_run(Blocks1, cur_el_reg);
 		result_.elements += cur_el_reg;
+		if(cur_el_reg <  block_type::size &&  
+			result_.elements == cur_el_reg) // small input, do not flush it on the disk(s)
+		{
+			STXXL_VERBOSE1("runs_creator(use_push): Small input optimization, input length: "<<cur_el_reg);
+			result_.small.resize(cur_el_reg);
+			std::copy(Blocks1[0].begin(), Blocks1[0].begin()+cur_el_reg, result_.small.begin());
+			return;
+		}
+		
 		const unsigned cur_run_size = div_and_round_up(cur_el_reg, block_type::size); // in blocks
 		run.resize(cur_run_size);
 		block_manager * bm = block_manager::get_instance();
@@ -801,6 +829,8 @@ namespace stream
       		delete [] prefetch_seq;
 			prefetcher = NULL;
 		}
+		// free blocks in runs , (or the user should do it?)
+	  	sruns.deallocate_blocks();
 	}
   public:
     //! \brief Standard stream typedef
@@ -822,12 +852,26 @@ namespace stream
 		
 	  if(empty()) return;
 		  
+	  
+	  if(!sruns.small.empty()) // we have a small input < B, 
+		  								 // that is kept in the main memory
+	  {
+		  STXXL_VERBOSE1("runs_merger: small input optimization, input length: "<<elements_remaining)
+		  assert(elements_remaining == sruns.small.size());
+		  current_block = new block_type;
+		  std::copy(sruns.small.begin(), sruns.small.end(), current_block->begin());
+		  current_value = current_block->elem[0];
+      	  buffer_pos = 1;
+		  
+		  return;
+	  }
+		  
 	 #ifdef STXXL_CHECK_ORDER_IN_SORTS
 	 assert(check_sorted_runs(r,c));
 	 #endif
 		
 	  current_block = new block_type;
-		
+	  
       disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
       
       unsigned nruns = sruns.runs.size();
@@ -969,7 +1013,6 @@ namespace stream
 	  deallocate_prefetcher();
 	
       if(current_block) delete current_block;
-      
       // free blocks in runs , (or the user should do it?)
 	  sruns.deallocate_blocks();
     }
