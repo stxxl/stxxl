@@ -11,6 +11,7 @@
 #include "../mng/prefetch_pool.h"
 #include "../mng/write_pool.h"
 #include "../mng/mng.h"
+#include "../common/tmeta.h"
 #include <queue>
 #include <list>
 #include <iterator>
@@ -87,6 +88,10 @@ namespace priority_queue_local
                       w_pool(w_pool_)
       {
         STXXL_VERBOSE2("ext_merger::ext_merger(...)")
+      }
+      unsigned mem_cons() const // only raff estimation
+      {
+        return (nsequences * block_type::raw_size);
       }
       virtual ~ext_merger()
       {
@@ -170,8 +175,15 @@ namespace priority_queue_local
       {
         STXXL_VERBOSE2("ext_merger::insert_segment(merger,...)")
         assert(segment_size);
-        unsigned nblocks = segment_size / block_type::size;
-        assert(nblocks); // at least one block 
+        unsigned nblocks = segment_size / block_type::size; 
+        STXXL_VERBOSE2("ext_merger::insert_segment(merger,...) inserting segment with "<<nblocks<<" blocks")
+        //assert(nblocks); // at least one block 
+        if(nblocks == 0)
+        {
+          STXXL_VERBOSE1("ext_merger::insert_segment(merger,...) WARNING: inserting a segment with "<<
+            nblocks<<" blocks")
+          STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS")
+        }
         unsigned first_size = segment_size % block_type::size;
         if(first_size == 0)
         {
@@ -506,10 +518,10 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
 
     // link new segment
     current[index] = segment[index] = to;
-    segment_size[index] = sz;
-    mem_cons_ += sz;
+    segment_size[index] = (sz + 1)*sizeof(value_type);
+    mem_cons_ += (sz + 1)*sizeof(value_type);
     size_ += sz;
-    
+     
     // propagate new information up the tree
     Element dummyKey;
     int dummyIndex;
@@ -855,7 +867,6 @@ void merge4(
 
 
 
-
 };
 
 /*
@@ -942,8 +953,8 @@ protected:
 
   
   int_merger_type itree[IntLevels];
-  prefetch_pool<block_type> p_pool;
-  write_pool<block_type>    w_pool;
+  prefetch_pool<block_type> & p_pool;
+  write_pool<block_type>    & w_pool;
   ext_merger_type * etree;
 
   // one delete buffer for each tree (extra space for sentinel)
@@ -975,15 +986,33 @@ protected:
   value_type getSupremum() const { return cmp.min_value(); } //{ return buffer2[0][KNN].key; }
   int getSize1( ) const { return ( buffer1 + BufferSize1) - minBuffer1; }
   int getSize2(int i) const { return &(buffer2[i][N])     - minBuffer2[i]; }
-public:
-    
+  
+  // forbidden cals
   priority_queue();
+  priority_queue & operator = (const priority_queue &);  
+public:
+  priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_);
   virtual ~priority_queue();
   size_type size() const;
   bool empty() const { return (size()==0); }
   const value_type & top() const;
   void  pop();
   void  push(const value_type & obj);
+  
+  unsigned mem_cons() const 
+  {
+    unsigned dynam_alloc_mem(0),i(0);
+    //dynam_alloc_mem += w_pool.mem_cons();
+    //dynam_alloc_mem += p_pool.mem_cons();
+    for(;i<IntLevels;++i)
+      dynam_alloc_mem += itree[i].mem_cons();
+    for(i=0;i<ExtLevels;++i)
+      dynam_alloc_mem += etree[i].mem_cons();
+    
+    return (  sizeof(*this) + 
+              sizeof(ext_merger_type)*ExtLevels + 
+              dynam_alloc_mem );
+  }
 };
 
 
@@ -1041,8 +1070,8 @@ inline void priority_queue<Config_>::push(const value_type & obj)
 ////////////////////////////////////////////////////////////////
 
 template <class Config_>
-priority_queue<Config_>::priority_queue() : 
-  p_pool(10),w_pool(10),
+priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) : 
+  p_pool(p_pool_),w_pool(w_pool_),
   activeLevels(0), size_(0)
 {
   STXXL_VERBOSE1("priority_queue::priority_queue()")
@@ -1327,6 +1356,97 @@ void priority_queue<Config_>::emptyInsertHeap()
     refillBuffer1();
 }
 
+namespace priority_queue_local
+{
+  struct Parameters_for_priority_queue_not_found_Increase_IntM
+  {
+    enum { fits = false };
+    typedef Parameters_for_priority_queue_not_found_Increase_IntM result;
+  };
+  
+  struct dummy
+  {
+    enum { fits = false };
+    typedef dummy result;
+  };
+  
+  template <int E_,int IntM_,unsigned MaxS_,int B_,int m_,bool stop = false>
+  struct find_B_m
+  {
+    typedef find_B_m<E_,IntM_,MaxS_,B_,m_,stop> Self;
+    enum { 
+      k = IntM_/B_ ,
+      E = E_,
+      IntM = IntM_,
+      B = B_,
+      m = m_,
+      c = k - m_,
+      fits = c>10 && ((k-m)*(m)*(m*B/(E*4*1024))) >= int(MaxS_),
+      step = 1
+    };
+    
+    typedef typename find_B_m<E,IntM,MaxS_,B,m+step,fits || (m >= k- step)>::result candidate1;
+    typedef typename find_B_m<E,IntM,MaxS_,B/2,1,fits || candidate1::fits >::result candidate2;
+    typedef typename IF<fits,Self, typename IF<candidate1::fits,candidate1,candidate2>::result >::result result;
+    
+  };
+  
+  // specialization for the case when no valid parameters are found
+  template <int E_,int IntM_,unsigned MaxS_,bool stop>
+  struct find_B_m<E_,IntM_,MaxS_,2048,1,stop>
+  {
+    enum { fits = false };
+    typedef Parameters_for_priority_queue_not_found_Increase_IntM result;
+  };
+  
+  // to speedup search
+  template <int E_,int IntM_,unsigned MaxS_,int B_,int m_>
+  struct find_B_m<E_,IntM_,MaxS_,B_,m_,true>
+  {
+    enum { fits = false };
+    typedef dummy result;
+  };
+  
+  template <int E_,int IntM_,unsigned MaxS_>
+  struct find_settings
+  {
+    typedef typename find_B_m<E_,IntM_,MaxS_,(8*1024*1024),1>::result result;
+  };
+
+
+};
+
+
+template <class Tp_,class Cmp_,unsigned IntM_,unsigned MaxS_,unsigned Tune_=6>
+class PRIORITY_QUEUE_GENERATOR
+{
+  public:
+  typedef typename priority_queue_local::find_settings<sizeof(Tp_),IntM_,MaxS_>::result settings;
+  enum{
+     AI = 1<<Tune_,
+     AHI = AI*AI,
+     B = settings::B,
+     m = settings::m,
+     X = B*(settings::k - m)/settings::E,
+     N = X/AHI,
+     AE = m/2
+  };
+public:
+  enum {
+    //! \brief Estimation of maximum internal memory consumption (in bytes)
+    EConsumption = X*settings::E + settings::B*AE + ((MaxS_/X)/AE)*settings::B*1024
+  };
+  /*
+      unsigned BufferSize1_ = 32, // equalize procedure call overheads etc. 
+      unsigned N_ = 512, // bandwidth
+      unsigned IntKMAX_ = 64, // maximal arity for internal mergers
+      unsigned IntLevels_ = 4, 
+      unsigned BlockSize_ = (2*1024*1024),
+      unsigned ExtKMAX_ = 64, // maximal arity for external mergers
+      unsigned ExtLevels_ = 2,
+  */
+  typedef priority_queue<priority_queue_config<Tp_,Cmp_,32,N,AI,2,B,AE,2> > pq_type;
+};
 
 
 __STXXL_END_NAMESPACE

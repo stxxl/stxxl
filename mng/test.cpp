@@ -74,5 +74,5 @@ main ()
   for(i=0;i<nblocks;i++)
     STXXL_MSG("Allocated block: offset="<<vbids[i].offset<<", size="<<vbids[i].size)
   
-  bm->delete_blocks(vbids.begin (), vbids.end ());
+  bm->delete_blocks(vbids.begin (), vbids.end ()); 
 }

@@ -10,7 +10,6 @@
 using namespace stxxl;
 
 typedef int my_type;
-typedef typed_block<4096,my_type> block_type;
 
 struct dummy_merger
 {
@@ -44,11 +43,26 @@ int main()
       unsigned ExtKMAX_ = 64, // maximal arity for external mergers
       unsigned ExtLevels_ = 2,
   */
-  priority_queue<priority_queue_config<my_type,my_cmp,2,512,2,3,4096,1024,1> > p;
-  off_t nelements = 10*1024,i;
+  //typedef priority_queue<priority_queue_config<my_type,my_cmp,
+  //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
+  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,128*1024*1024,128*1024*1024/sizeof(my_type)>::result pq_type;
+  typedef pq_type::block_type block_type;
+  
+  STXXL_MSG(settings::EConsumption);
+  /*
+  STXXL_MSG(settings::AE);
+  STXXL_MSG(settings::settings::B);
+  STXXL_MSG(settings::N); */
+  
+  prefetch_pool<block_type> p_pool(10);
+  write_pool<block_type>    w_pool(10);
+  pq_type p(p_pool,w_pool);
+  off_t nelements = 5*off_t(1024*1024),i;
+  STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   for(i = 0;i<nelements ;i++ )
     p.push(nelements - i);
   
+  STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   for(i = 0; i<(nelements) ;i++ )
   {
     assert( !p.empty() );
@@ -56,5 +70,6 @@ int main()
     assert(p.top() == i+1);
     p.pop();
   }
+  STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   
 }
