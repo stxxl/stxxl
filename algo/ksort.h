@@ -311,7 +311,99 @@ struct run_cursor2_cmp
 };
 
 
+
+template <typename record_type, typename key_extractor>
+class key_comparison
+{
+  key_extractor ke;
+public:
+  key_comparison() {}
+  key_comparison(key_extractor ke_): ke(ke_){}
+  bool operator () (const record_type & a, const record_type & b)
+  {
+    return ke(a) < ke(b);
+  }
+};
+
 //#include "loosertree.h"
+
+template < typename block_type,typename run_type , typename key_ext_>
+  bool check_ksorted_runs(		run_type ** runs, 
+								unsigned nruns, 
+								key_ext_ keyext)
+  {
+    typedef typename block_type::value_type value_type;
+	  
+    //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
+	STXXL_MSG("check_sorted_runs  Runs: "<<nruns)
+    unsigned irun=0;
+    for(irun = 0; irun < nruns; ++irun)
+    {
+       const unsigned nblocks = runs[irun]->size();
+	   const unsigned nelements = nblocks*block_type::size ;
+       block_type * blocks = new block_type[nblocks];
+       request_ptr * reqs = new request_ptr[nblocks];
+       for(unsigned j=0;j<nblocks;++j)
+       {
+         reqs[j] = blocks[j].read((*runs[irun])[j].bid);
+       }
+       wait_all(reqs,reqs + nblocks);
+       for(unsigned j=0;j<nblocks;++j)
+       {
+         if(keyext(blocks[j][0]) != (*runs[irun])[j].key)
+		 {
+		   STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<j)
+		   STXXL_MSG("                   trigger value: "<<(*runs[irun])[j].key)
+		   STXXL_MSG("Data in the block:")
+		   for(unsigned k=0; k<block_type::size;++k)
+			   STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k]<<" with key: "<<keyext(blocks[j][k]))
+		   
+		   STXXL_MSG("BIDS:")
+		   for(unsigned k=0; k<nblocks;++k)
+		   {
+				if( k == j) STXXL_MSG("Bad one comes next.")
+		   		STXXL_MSG("BID "<<k<<" is: "<<((*runs[irun])[k].bid))
+		   }
+			
+           return false;
+		 }
+       }
+       if(!is_sorted(
+                  TwoToOneDimArrayRowAdaptor< 
+                    block_type,
+                    value_type,
+                    block_type::size > (blocks,0 ),
+                  TwoToOneDimArrayRowAdaptor< 
+                    block_type,
+                    value_type,
+                    block_type::size > (blocks, 
+	   				  nelements
+                  ),key_comparison<value_type,key_ext_>()) )
+	   {
+		   STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
+		   STXXL_MSG("Data in blocks:")
+		   for(unsigned j=0;j<nblocks;++j)
+		   {
+		   	   for(unsigned k=0; k<block_type::size;++k)
+			        STXXL_MSG("     Element "<<k<<" in block "<< j <<" is :"<<blocks[j][k]<<" with key: "<<keyext(blocks[j][k]))
+		   }
+		   STXXL_MSG("BIDS:")
+		   for(unsigned k=0; k<nblocks;++k)
+		   {
+		   		STXXL_MSG("BID "<<k<<" is: "<<((*runs[irun])[k].bid))
+		   }
+		   
+           return false;
+	   }
+       
+       delete [] reqs;
+       delete [] blocks;
+    }
+
+    return true;
+  }
+	
+
 
 template < typename block_type,typename run_type, typename key_extractor>
 void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned  _m, key_extractor keyobj)
@@ -394,6 +486,7 @@ void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned
 		delete in_runs[i];
 	}
 }
+
 
 
 template <typename block_type,
@@ -524,6 +617,9 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		while(runs_left > 0)
 		{
 				int runs2merge = STXXL_MIN(runs_left,merge_factor);
+				#ifdef STXXL_CHECK_ORDER_IN_SORTS
+				assert((check_ksorted_runs<block_type,run_type,key_extractor>(runs + nruns - runs_left,runs2merge,keyobj) ));
+				#endif
 				STXXL_VERBOSE("Merging "<<runs2merge<<" runs")
 				merge_runs<block_type,run_type,key_extractor> (runs + nruns - runs_left, 
 						runs2merge ,*(new_runs + (cur_out_run++)),_m,keyobj);
@@ -563,18 +659,6 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 }
 
 
-template <typename record_type, typename key_extractor>
-class key_comparison
-{
-  key_extractor ke;
-public:
-  key_comparison() {}
-  key_comparison(key_extractor ke_): ke(ke_){}
-  bool operator () (const record_type & a, const record_type & b)
-  {
-    return ke(a) < ke(b);
-  }
-};
 
 /*! \page key_extractor Key extractor concept
  

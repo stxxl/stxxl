@@ -40,7 +40,7 @@ namespace stxxl
 						       (&mutex));
 			  stxxl_nassert (pthread_cond_destroy (&cond));
 
-		};
+		}
 		// function increments the semaphore and signals any threads that
 		// are blocked waiting a change in the semaphore
 		int operator ++ (int)

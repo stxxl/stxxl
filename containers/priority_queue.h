@@ -1653,7 +1653,7 @@ namespace priority_queue_local
 //! If Cmp_(x,y) is true, then x is smaller than y. The element 
 //! returned by Q.top() is the largest element in the priority 
 //! queue. That is, it has the property that, for every other 
-//! element \b x in the priority queue, Compare(Q.top(), x) is false.
+//! element \b x in the priority queue, Cmp_(Q.top(), x) is false.
 //! Cmp_ must also provide min_value method, that returns value of type Tp_ that is 
 //! smaller than any element of the queue \b x , i.e. Cmp_(Cmp_.min_value(),x) is
 //! always \b true . <BR> 
@@ -1670,7 +1670,7 @@ namespace priority_queue_local
 //! Example: comparison object for priority queue 
 //! where \b top() returns the \b largest contained integer: 
 //! \verbatim
-//! struct CmpIntGreater
+//! struct CmpIntLess
 //! {
 //!   bool operator () (const int & a, const int & b) const { return a<b; }
 //!   int min_value() const  { return std::numeric_limits<int>::min(); }

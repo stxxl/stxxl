@@ -7,13 +7,14 @@
 
 using namespace stxxl;
 
+#define RECORD_SIZE 8
 
 struct my_type
 {
 	typedef unsigned key_type;
 				
 	key_type _key;
-	char _data[128 - sizeof(key_type)];
+	char _data[RECORD_SIZE - sizeof(key_type)];
 	key_type key() const {return _key; };
 							
 	my_type() {};
@@ -58,14 +59,14 @@ int main()
 		for(stxxl::int64 i=0; i < v.size(); i++)
 			v[i]._key = 1 + (rnd()%0xffff);
 	
-		STXXL_MSG("Checking order...")
-		STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
+		//STXXL_MSG("Checking order...")
+		//STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
 	
 		STXXL_MSG("Sorting...")
 		stxxl::sort(v.begin(),v.end(),cmp(),memory_to_use);
 	
-		STXXL_MSG("Checking order...")
-		STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
+		//STXXL_MSG("Checking order...")
+		//STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
 		
 	
 		return 0;

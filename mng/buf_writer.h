@@ -84,7 +84,7 @@ public:
 	{
 		int ibuffer;
 		for (std::vector<int>::iterator it = busy_write_blocks.begin ();
-		     it != busy_write_blocks.end (); it++)
+		     it != busy_write_blocks.end (); ++it)
 		{
 			if (write_reqs[ibuffer = (*it)]->poll())
 			{
@@ -99,7 +99,7 @@ public:
 			int size = busy_write_blocks.size ();
 			request_ptr * reqs = new request_ptr[size];
 			int i = 0;
-			for (; i < size; i++)
+			for (; i < size; ++i)
 			{
 				reqs[i] = write_reqs[busy_write_blocks[i]];
 			}
@@ -130,6 +130,7 @@ public:
 				int ibuffer = batch_write_blocks.top ().ibuffer;
 				batch_write_blocks.pop ();
 
+				if(write_reqs[ibuffer].valid()) write_reqs[ibuffer]->wait();
 				write_reqs[ibuffer] = write_buffers[ibuffer].write (write_bids[ibuffer]);
 
 				busy_write_blocks.push_back(ibuffer);
@@ -153,6 +154,7 @@ public:
 			ibuffer = batch_write_blocks.top ().ibuffer;
 			batch_write_blocks.pop();
 
+			if(write_reqs[ibuffer].valid()) write_reqs[ibuffer]->wait();
 			write_reqs[ibuffer] = write_buffers[ibuffer].write(write_bids[ibuffer]);
 			
 			busy_write_blocks.push_back (ibuffer);
@@ -182,6 +184,7 @@ public:
 			ibuffer = batch_write_blocks.top ().ibuffer;
 			batch_write_blocks.pop();
 
+			if(write_reqs[ibuffer].valid()) write_reqs[ibuffer]->wait();
 			write_reqs[ibuffer] = write_buffers[ibuffer].write(write_bids[ibuffer]);
 			
 			busy_write_blocks.push_back (ibuffer);

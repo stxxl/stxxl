@@ -24,6 +24,12 @@ struct my_type
 	my_type max_value() const { return my_type(0xffffffff); };
 };
 
+std::ostream & operator << (std::ostream & o, const my_type & obj)
+{
+	o << obj._key << " "<<obj._key_copy;
+	return o;
+}
+
 struct get_key
 {
 	typedef my_type::key_type key_type;

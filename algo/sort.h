@@ -222,7 +222,8 @@ create_runs(
   {
     typedef typename block_type::value_type value_type;
 	  
-    STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
+    //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
+	STXXL_MSG("check_sorted_runs  Runs: "<<nruns)
     unsigned irun=0;
     for(irun = 0; irun < nruns; ++irun)
     {
@@ -241,10 +242,17 @@ create_runs(
 		 {
 		   STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<j)
 		   STXXL_MSG("                   trigger value: "<<(*runs[irun])[j].value)
-		   STXXL_MSG("Data in block:")
+		   STXXL_MSG("Data in the block:")
 		   for(unsigned k=0; k<block_type::size;++k)
 			   STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k])
 		   
+		   STXXL_MSG("BIDS:")
+		   for(unsigned k=0; k<nblocks;++k)
+		   {
+				if( k == j) STXXL_MSG("Bad one comes next.")
+		   		STXXL_MSG("BID "<<k<<" is: "<<((*runs[irun])[k].bid))
+		   }
+			
            return false;
 		 }
        }
@@ -267,6 +275,12 @@ create_runs(
 		   	   for(unsigned k=0; k<block_type::size;++k)
 			        STXXL_MSG("     Element "<<k<<" in block "<< j <<" is :"<<blocks[j][k])
 		   }
+		   STXXL_MSG("BIDS:")
+		   for(unsigned k=0; k<nblocks;++k)
+		   {
+		   		STXXL_MSG("BID "<<k<<" is: "<<((*runs[irun])[k].bid))
+		   }
+		   
            return false;
 	   }
        

@@ -28,7 +28,7 @@ sortfile: sort_file.cpp $(DEPENDENCIES)
 	$(GCC) sort_file.cpp -o sort_file $(STXXL_LIB)
 
 ksort: ksort.cpp $(DEPENDENCIES)
-	$(GCC) ksort.cpp -o ksort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
+	$(GCC) ksort.cpp -o ksort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_CHECK_ORDER_IN_SORTS
 
 stable: stable_ksort.cpp $(DEPENDENCIES)
 	$(GCC) stable_ksort.cpp -o stable_ksort $(STXXL_LIB) -DCOUNT_WAIT_TIME

@@ -128,6 +128,7 @@ public:
 	bool block_consumed(block_type * & buffer)
 	{
 		int ibuffer = buffer - read_buffers;
+		if(read_reqs[ibuffer].valid()) read_reqs[ibuffer]->wait();
 		read_reqs[ibuffer] = NULL;
 		
 		if (nextread < seq_length)
