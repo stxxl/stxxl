@@ -9,7 +9,7 @@ template < class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */  >
 
 	simple_vector ()
 	{
-	};
+	}
   public:
 	typedef size_t size_type;
 	typedef _Tp value_type;
@@ -26,7 +26,7 @@ template < class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */  >
 
   simple_vector (size_type sz):_size (sz)
 	{
-		assert(sz);
+		//assert(sz);
 		//    _array = _data_allocator.allocate(sz);
 		_array = new _Tp[sz];
 	}
