@@ -573,7 +573,7 @@ looser_tree<ValTp_,Cmp_,KNKMAX>::~looser_tree()
   assert(mem_cons_ == 0);
 }
 
-// free an empty segment
+// free an empty segment .
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
 void looser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int index)
 {
