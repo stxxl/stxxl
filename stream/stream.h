@@ -175,6 +175,108 @@ namespace stream
 	  		(begin,end,nbuffers);
   }
   
+
+  //! \brief Stores consecutively stream content to an output iterator
+  //! \param in stream to be stored used as source
+  //! \param out output iterator used as destination
+  //! \return value of the output iterator after all increments, 
+  //! i.e. points to the first unwritten value
+  //! \pre Output (range) is large enough to hold the all elements in the input stream
+  template <class OutputIterator_,class StreamAlgorithm_>
+  OutputIterator_ materialize(StreamAlgorithm_ & in,OutputIterator_ out)
+  {
+    while(!in.empty())
+    {
+      *out = *in;
+      ++out;
+      ++in;
+    }
+    return out;
+  }
+ 
+  
+  //! \brief Stores consecutively stream content to an output iterator range until end of stream or end of iterator the range is reached
+  //! \param in stream to be stored used as source
+  //! \param outbegin output iterator used as destination
+  //! \param outend output end iterator, pointing beyond the output range 
+  //! \return value of the output iterator after all increments, 
+  //! i.e. points to the first unwritten value
+  //! \pre Output range is large enough to hold the all elements in the input stream
+  template <class OutputIterator_,class StreamAlgorithm_>
+  OutputIterator_ materialize(StreamAlgorithm_ & in,OutputIterator_ outbegin, OutputIterator_ outend)
+  {
+    while((!in.empty()) && outend != outbegin)
+    {
+      *outbegin = *in;
+      ++outbegin;
+      ++in;
+    }
+    return outbegin;
+  }
+
+
+  //! \brief Stores consecutively stream content to an output \c stxxl::vector iterator until end of stream or end of iterator the range is reached
+  //! \param in stream to be stored used as source
+  //! \param outbegin output \c stxxl::vector iterator used as destination
+  //! \param outend output end iterator, pointing beyond the output range 
+  //! \param nbuffers number of blocks used for overlapped writing (0 is default,
+  //! which equals to (2 * number_of_disks)
+  //! \return value of the output iterator after all increments, 
+  //! i.e. points to the first unwritten value
+  //! \pre Output range is large enough to hold the all elements in the input stream
+  template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
+		unsigned BlkSize_, typename PgTp_, unsigned PgSz_,class StreamAlgorithm_ > 
+  stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> 
+  	materialize(StreamAlgorithm_ & in,
+  		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> outbegin,
+		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> outend,
+  		unsigned nbuffers = 0)
+  {
+  	typedef stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_>  ExtIterator;
+	typedef stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> ConstExtIterator;
+	typedef buf_ostream<typename ExtIterator::block_type,typename ExtIterator::bids_container_iterator> buf_ostream_type;
+	  
+	  
+	while(outbegin.block_offset()) //  go to the beginning of the block 
+													//  of the external vector
+	{
+		if(in.empty() || outbegin==outend) return outbegin;
+		*outbegin = *in;
+      	++outbegin;
+      	++in;
+	}
+	  
+	if (nbuffers == 0) nbuffers =  2 * config::get_instance()->disks_number();	
+	
+	outbegin.flush(); // flush container
+	
+	// create buffered write stream for blocks
+	buf_ostream_type outstream(outbegin.bid(),nbuffers); 
+	
+	assert(outbegin.block_offset() == 0);
+	
+	while(!in.empty() && outend != outbegin )
+	{
+		if(outbegin.block_offset() ==0 ) outbegin.touch();
+		*outstream  = * in;
+		++outbegin;
+		++outstream;
+		++in;
+	}
+	
+	ConstExtIterator const_out = outbegin;
+	
+	while(const_out.block_offset()) // filling the rest of the block
+	{
+		*outstream =  * const_out;
+		++const_out;
+		++outstream;
+	}
+	outbegin.flush();
+	
+    return outbegin;
+  }
+  
   
   //! \brief Stores consecutively stream content to an output \c stxxl::vector iterator
   //! \param in stream to be stored used as source
@@ -183,6 +285,7 @@ namespace stream
   //! which equals to (2 * number_of_disks)
   //! \return value of the output iterator after all increments, 
   //! i.e. points to the first unwritten value
+  //! \pre Output (range) is large enough to hold the all elements in the input stream
   template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
 		unsigned BlkSize_, typename PgTp_, unsigned PgSz_,class StreamAlgorithm_ > 
   stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> 
@@ -209,9 +312,9 @@ namespace stream
 	out.flush(); // flush container
 	
 	// create buffered write stream for blocks
-	buf_ostream_type outstream(out.bid(),nbuffers); 
+	buf_ostream_type outstream(out.bid(), nbuffers); 
 	
-	assert(out.block_offset() == 0);
+	assert( out.block_offset() == 0 );
 	
 	while(!in.empty())
 	{
@@ -235,22 +338,6 @@ namespace stream
     return out;
   }
 
-  //! \brief Stores consecutively stream content to an output iterator
-  //! \param in stream to be stored used as source
-  //! \param out output iterator used as destination
-  //! \return value of the output iterator after all increments, 
-  //! i.e. points to the first unwritten value
-  template <class OutputIterator_,class StreamAlgorithm_>
-  OutputIterator_ materialize(StreamAlgorithm_ & in,OutputIterator_ out)
-  {
-    while(!in.empty())
-    {
-      *out = *in;
-      ++out;
-      ++in;
-    }
-    return out;
-  }
   
   
   //! \brief A model of steam that outputs data from an adaptable generator functor

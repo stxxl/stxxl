@@ -120,7 +120,9 @@ int main()
   #endif
   
   // HERE streaming part ends (materializing)
-  materialize(sorted_stream,output.begin());
+  output_array_type::iterator o = materialize(sorted_stream,output.begin(),output.end());
+  // or materialize(sorted_stream,output.begin());
+  assert(o == output.end() );
   
   
   STXXL_MSG("input string (character,position) :")
