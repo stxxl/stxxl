@@ -174,7 +174,7 @@ namespace stream
       ++input;
       ++pos;
     }
-	if(pos == block_type::size ) // && !input.empty())
+	if(pos == block_type::size ) 
 	{      // ennlarge/reallocate Blocks1 array
 			block_type * NewBlocks = new block_type[m2*2];
 			std::copy(Blocks1[0].begin(), Blocks1[0].end(), NewBlocks[0].begin());
