@@ -243,7 +243,7 @@ create_runs(
 		   STXXL_MSG("                   trigger value: "<<(*runs[irun])[j].value)
 		   STXXL_MSG("Data in block:")
 		   for(unsigned k=0; k<block_type::size;++k)
-			   STXXL_MSG("Element "<<k<<" in blocks is :"<<blocks[j][k])
+			   STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k])
 		   
            return false;
 		 }
@@ -264,9 +264,8 @@ create_runs(
 		   STXXL_MSG("Data in blocks:")
 		   for(unsigned j=0;j<nblocks;++j)
 		   {
-			   STXXL_MSG("        Block "<< j <<":")
 		   	   for(unsigned k=0; k<block_type::size;++k)
-			        STXXL_MSG("     Element "<<k<<" in blocks is :"<<blocks[j][k])
+			        STXXL_MSG("     Element "<<k<<" in block "<< j <<" is :"<<blocks[j][k])
 		   }
            return false;
 	   }
