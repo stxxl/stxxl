@@ -962,14 +962,14 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 						const BIDIteratorClass & bidend)
 	{
     typedef  BIDArray<bid_iterator_traits <BIDIteratorClass >::block_size> bid_array_type;
-		unsigned nblocks = std::distance(bidbegin,bidend);
-    /*
+		unsigned nblocks = 0;//std::distance(bidbegin,bidend);
+    
     BIDIteratorClass bidbegin_copy(bidbegin);
     while(bidbegin_copy != bidend)
     {
       ++bidbegin_copy;
       ++nblocks;
-    } */
+    }
 
 		int *bl = new int[ndisks];
 		bid_array_type * disk_bids = new bid_array_type[ndisks];

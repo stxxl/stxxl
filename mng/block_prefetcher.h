@@ -100,7 +100,7 @@ public:
 		
 		for (i = 0; i < nreadblocks; i++)
 		{
-			assert( prefetch_seq[i] < seq_length && prefetch_seq[i] >= 0 );
+			assert( prefetch_seq[i] < int(seq_length) && prefetch_seq[i] >= 0 );
 			read_reqs[i] = read_buffers[i].read (
 										*(consume_seq_begin + prefetch_seq[i]),
 										set_switch_handler(*(completed + prefetch_seq[i])) );
@@ -128,7 +128,7 @@ public:
 			assert(ibuffer >=0 && ibuffer <nreadblocks);
 			int next_2_prefetch = prefetch_seq[nextread++];
 			
-			assert(next_2_prefetch <seq_length && next_2_prefetch >= 0 );
+			assert(next_2_prefetch <int(seq_length) && next_2_prefetch >= 0 );
 			assert( !completed[next_2_prefetch].is_on() );
 			
 			pref_buffer[next_2_prefetch] = ibuffer;

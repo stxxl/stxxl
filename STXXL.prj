@@ -108,7 +108,9 @@ module.include.files=\
 	containers/stack.h\
 	common/timer.h\
 	common/tmeta.h\
-	utils/malloc.h
+	utils/malloc.h\
+	mng/write_pool.h\
+	mng/prefetch_pool.h
 
 module.source.name=.
 module.source.type=
@@ -141,7 +143,11 @@ module.source.files=\
 	algo/test_sort.cpp\
 	algo/stable_ksort.cpp\
 	containers/test_mstack.cpp\
-	containers/test_stack.cpp
+	containers/test_stack.cpp\
+	mng/write_pool.cpp\
+	mng/prefetch_pool.cpp\
+	containers/ext_merger.cpp\
+	containers/p_queue.cpp
 
 module.pixmap.name=.
 module.pixmap.type=
