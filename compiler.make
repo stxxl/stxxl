@@ -3,10 +3,10 @@
 # change to make or gmake
 MAKE = make
 # change to the name of your compiler
-COMPILER = g++-3.2 # we support only g++ >= 3.2
+COMPILER = g++ # we support only g++ >= 3.2
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /KM/usr/rdementi/projects/stxxl
+STXXL_ROOT = /home/dementiev/projects/stxxl
 
 
 COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h    ../common/perm.h  \
