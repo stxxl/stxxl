@@ -199,7 +199,7 @@ protected:
   {
     busy_blocks_iterator cur = busy_blocks.begin();
     int cnt = 0;
-	#if STXXL_VERBOSE_LEVEL > 1
+	#if STXXL_VERBOSE_LEVEL > 0
 	int busy_blocks_size_old = busy_blocks_size;
 	#endif 
     for(;cur!=busy_blocks.end();++cur)
