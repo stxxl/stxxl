@@ -194,8 +194,8 @@ public:
 			write_reqs[ibuffer]->wait ();
 		}
 
-		delete [] write_buffers;
 		delete [] write_reqs;
+		delete [] write_buffers;
 		delete [] write_bids;
 	}
 	

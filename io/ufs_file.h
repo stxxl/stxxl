@@ -134,11 +134,14 @@ __STXXL_BEGIN_NAMESPACE
 		virtual ~ufs_request_base ()
 		{
       		STXXL_VERBOSE3("ufs_request_base "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
+	
 			_state.wait_for (READY2DIE);
 		};
 
 		void wait ()
 		{
+			STXXL_VERBOSE3("ufs_request_base : "<< unsigned(this) <<" wait ")
+			
 			START_COUNT_WAIT_TIME 
 			
 			#ifdef NO_OVERLAPPING

@@ -249,15 +249,17 @@ __STXXL_BEGIN_NAMESPACE
     void add_ref()
     {
       ref_cnt_mutex.lock();
-      STXXL_VERBOSE3("request "<< unsigned(this) <<": adding reference, cnt: "<<ref_cnt)
       ref_cnt++;
+	  STXXL_VERBOSE3("request add_ref() "<< unsigned(this) <<": adding reference, cnt: "<<ref_cnt)
+	  
       ref_cnt_mutex.unlock();
     }
     bool sub_ref()
     {
       ref_cnt_mutex.lock();
-      STXXL_VERBOSE3("request "<< unsigned(this) <<": subtracting reference cnt: "<<ref_cnt)
       int val=--ref_cnt;
+	  STXXL_VERBOSE3("request sub_ref() "<< unsigned(this) <<": subtracting reference cnt: "<<ref_cnt)
+	  
       ref_cnt_mutex.unlock();
       assert(val>=0);
       return (val==0);
@@ -283,18 +285,31 @@ __STXXL_BEGIN_NAMESPACE
       {
         if(ptr->sub_ref())
         {
+		  STXXL_VERBOSE3("the last copy "<<unsigned(ptr)<<" this="<<unsigned(this))
           delete ptr;
           ptr = NULL;
         }
+		else
+		{
+		  STXXL_VERBOSE3("more copies "<<unsigned(ptr)<<" this="<<unsigned(this))
+		}
       }
     }
   public:
     //! \brief Constucts an \c request_ptr from \c request pointer
-    request_ptr(request *ptr_=NULL):ptr(ptr_) { add_ref(); }
+    request_ptr(request *ptr_=NULL):ptr(ptr_) { 
+		STXXL_VERBOSE3("create constructor (request ="<<unsigned(ptr)<<") this="<<unsigned(this))
+		add_ref(); }
     //! \brief Constucts an \c request_ptr from a \c request_ptr object
-    request_ptr(const request_ptr & p): ptr(p.ptr) { add_ref(); }
+    request_ptr(const request_ptr & p): ptr(p.ptr) { 
+		STXXL_VERBOSE3("copy constructor (copying "<<unsigned(ptr)<<") this="<<unsigned(this))
+		add_ref(); }
     //! \brief Destructor
-    ~request_ptr() { sub_ref(); }
+    ~request_ptr()
+	{
+		STXXL_VERBOSE3("Destructor of a request_ptr pointing to "<<unsigned(ptr)<< " this="<<unsigned(this))
+		sub_ref(); 
+	}
     //! \brief Assignment operator from \c request_ptr object
     //! \return reference to itself
     request_ptr & operator= (const request_ptr & p)
@@ -306,12 +321,14 @@ __STXXL_BEGIN_NAMESPACE
     //! \return reference to itself
     request_ptr & operator= (request * p)
     {
+	  STXXL_VERBOSE3("assign operator begin (assigning "<<unsigned(p)<<") this="<<unsigned(this))
       if(p != ptr)
       {
         sub_ref();
         ptr = p;
         add_ref();
       }
+	  STXXL_VERBOSE3("assign operator end (assigning "<<unsigned(p)<<") this="<<unsigned(this))
       return *this;
     }
     //! \brief "Star" operator
