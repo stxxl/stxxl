@@ -185,8 +185,9 @@ __STXXL_BEGIN_NAMESPACE
 			fmode |= O_TRUNC;
 
 
-		stxxl_ifcheck ((file_des =::open (filename.c_str(), fmode,
-				      S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP)));
+		stxxl_ifcheck_i ((file_des =::open (filename.c_str(), fmode,
+				      S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP)),
+				"Filedescriptor="<<file_des<<" filename="<<filename<< " fmode="<<fmode);
 	};
 	ufs_file_base::~ufs_file_base ()
 	{

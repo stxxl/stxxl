@@ -82,6 +82,8 @@ stxxl_perror (const char *errmsg, int errcode)
 
 #define stxxl_ifcheck(expr) if((expr)<0) { std::cerr<<"Error in function "<<__PRETTY_FUNCTION__<<" "; stxxl_error(__STXXL_STRING(expr));}
 
+#define stxxl_ifcheck_i(expr,info) if((expr)<0) { std::cerr<<"Error in function "<<__PRETTY_FUNCTION__<<" Info: "<< info<<" "; stxxl_error(__STXXL_STRING(expr)); }
+
 #define stxxl_debug(expr) expr
 
 #else

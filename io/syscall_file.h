@@ -75,18 +75,19 @@ __STXXL_BEGIN_NAMESPACE
 
 	void syscall_request::serve ()
 	{
-		stxxl_ifcheck (::lseek (file->get_file_des (), offset, SEEK_SET))
+		stxxl_ifcheck_i(::lseek (file->get_file_des (), offset, SEEK_SET),
+			" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes)
 		else
 		{
 			if (type == READ)
 			{
-				stxxl_ifcheck (::read (file->get_file_des(),
-							     buffer, bytes))
+				stxxl_ifcheck_i(::read (file->get_file_des(), buffer, bytes),
+					" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes)
 			}
 			else
 			{
-				stxxl_ifcheck (::write (file->get_file_des (),
-						      buffer, bytes));
+				stxxl_ifcheck_i(::write (file->get_file_des (), buffer, bytes),
+					" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes);
 			}
 		}
 
