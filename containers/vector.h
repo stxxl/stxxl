@@ -18,7 +18,7 @@
 
 namespace stxxl
 {
-  //! \addtogroup stlcont
+  //! \addtogroup stlcontinternals
   //! \{
   
 	template < unsigned BlkSize_ >
@@ -691,8 +691,10 @@ private:
 		};
 	};
   
+  //! \}
   
-  
+  //! \addtogroup stlcont
+  //! \{
   
 	//! \brief External vector type generator
   

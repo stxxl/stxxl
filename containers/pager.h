@@ -19,7 +19,11 @@ __STXXL_BEGIN_NAMESPACE
 //! \ingroup stllayer
 //! Containers with STL-compatible interface
 //! \{
+//! \}
 
+//! \weakgroup stlcontinternals Container internals
+//! \ingroup stlcont
+//! \{
 
 enum pager_type
 {

@@ -20,7 +20,7 @@
  
  __STXXL_BEGIN_NAMESPACE
  
-//! \addtogroup stlcont
+//! \addtogroup stlcontinternals
 //! \{
  
  template <class ValTp,
@@ -44,6 +44,7 @@
 //! push'es and pop's.
 //! For semantics of the methods see documentation of the STL \c std::vector. <BR>
 //! To gain full bandwidth of disks \c Config_::BlocksPerPage must >= number of disks <BR>
+//! \internal
 template <class Config_>
 class normal_stack
 {
@@ -507,6 +508,9 @@ public:
       delete ext_impl;
   }
 };
+
+//! \}
+
 /*
 template <class BaseStack>
 class stack: public BaseStack
@@ -528,6 +532,9 @@ public:
   stack(const stack_type & stack_) : BaseStack(stack_) {} 
 };
 */
+
+//! \addtogroup stlcont
+//! \{
 
 enum stack_externality { external, migrating, internal };
 enum stack_behaviour { normal, grow_shrink };

@@ -33,6 +33,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup stlalgo
 //! \{
 
+
+//! \internal
 namespace sort_local
 {
 	template <typename BIDTp_,typename ValTp_>

@@ -25,7 +25,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup stlalgo
 //! \{
 
-// don't waste <stxxl> namespace !!!
+//! \internal
 namespace stable_ksort_local
 {
   template <class type_,class type_key>
