@@ -108,6 +108,7 @@ namespace stream
     runs_creator(Input_ & i,Cmp_ c,unsigned memory_to_use):
       input(i),cmp(c),m_(memory_to_use/BlockSize_),result_computed(false)
     {
+		assert (2*BlockSize_ <= memory_to_use);
     }
     
     //! \brief Returns the sorted runs object
@@ -430,7 +431,7 @@ namespace stream
   		Blocks2(Blocks1 + m2),
   		write_reqs(new request_ptr[m2])
     {
-		result_.elements = 0;
+		assert (2*BlockSize_ <= memory_to_use);
     }
 	
 	~runs_creator()
@@ -576,6 +577,7 @@ namespace stream
   		iblock(0),
   		irun(0)
     {
+		assert (2*BlockSize_ <= memory_to_use);
     }
 	
 	//! \brief Adds new element to the current run

@@ -221,6 +221,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 	unsigned int i=0;
 	config * cfg = config::get_instance();
 	const unsigned int m = M/block_type::raw_size;
+	assert(2*block_type::raw_size <= M);
 	const unsigned int write_buffers_multiple = 2;
 	const unsigned int read_buffers_multiple = 2;
 	const unsigned int ndisks = cfg->ndisks();

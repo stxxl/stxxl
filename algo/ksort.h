@@ -623,6 +623,8 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 	typedef typename ExtIterator_::vector_type::value_type value_type;
 	typedef typename ExtIterator_::block_type block_type;
 	
+	assert(2*block_type::raw_size <= M);
+	
 	unsigned n=0;
 	block_manager *mng = block_manager::get_instance ();
 	

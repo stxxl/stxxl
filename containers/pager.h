@@ -44,7 +44,11 @@ public:
 	{
 		return rnd(npages_);
 	};
-	void hit(int ipage) {};
+	void hit(int ipage)
+	{
+		assert(ipage < npages_);
+		assert(ipage >= 0);
+	};
 };
 
 //! \brief Pager with \b LRU replacement strategy
@@ -70,6 +74,8 @@ public:
 	};
 	void hit(int ipage)
 	{
+		assert(ipage < npages_);
+		assert(ipage >= 0);
 		history.splice(history.begin(),history,history_entry[ipage]);
 	};
 };
@@ -79,4 +85,3 @@ public:
 __STXXL_END_NAMESPACE
 
 #endif
-
