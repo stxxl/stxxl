@@ -707,6 +707,19 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			return "single disk";
 		}
 	};
+  
+  template <class BaseAllocator_>
+  struct offset_allocator
+  {
+    BaseAllocator_ base;
+    int offset;
+    offset_allocator(int offset_) : base(),offset(offset_) {}
+    offset_allocator(int offset_,int a,int b) : base(a,b),offset(offset_) {}
+    int operator() (int i)
+    {
+      return base(offset + i);
+    }
+  };
 
 	//! \brief Traits for models of \b bid_iterator concept
 	template < class bid_it > struct bid_iterator_traits

@@ -122,7 +122,8 @@ public:
       // write cache on disk
       bids_.resize(bids_.size() + cache_size);
       std::vector<bid_type>::iterator cur_bid = bids_.end() - cache_size;
-      block_manager::get_instance()->new_blocks(alloc_strategy(),cur_bid,bids_.end());
+      block_manager::get_instance()->new_blocks(
+        offset_allocator<alloc_strategy>(cur_bid-bids.begin()),cur_bid,bids_.end());
       
       request_ptr reqs[cache_size];
       for(int i=0;i<cache_size;i++,cur_bid++)
@@ -281,7 +282,8 @@ public:
       
       bids.resize(bids.size() + blocks_per_page);
       std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-      block_manager::get_instance()->new_blocks(alloc_strategy(),cur_bid,bids.end());
+      block_manager::get_instance()->new_blocks(
+          offset_allocator<alloc_strategy>(cur_bid-bids.begin()),cur_bid,bids.end());
       
       for(int i=0;i<blocks_per_page;i++,cur_bid++)
       {
