@@ -470,7 +470,7 @@ public:
 		while(!_free_pages.empty())
 			_free_pages.pop();
 		
-		for(int i=0;i<n_pages;i++)
+		for(int i=0;i<n_pages;++i)
 			_free_pages.push(i);
 		
 		        

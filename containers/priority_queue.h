@@ -321,7 +321,7 @@ void merge4(
         STXXL_VERBOSE2("ext_merger::~ext_merger()")
         block_manager * bm = block_manager::get_instance();
         sequences_iterator i = sequences.begin();
-        for(;i!=sequences.end();i++)
+        for(;i!=sequences.end();++i)
         {
           bm->delete_blocks(i->bids->begin(),i->bids->end());
           delete i->block;
@@ -432,7 +432,7 @@ void merge4(
         assert(w_pool.size() > 0);
         
         typename std::list<bid_type>::iterator curbid = bids->begin();
-        for(unsigned i=0;i<nblocks;i++,curbid++)
+        for(unsigned i=0;i<nblocks;++i,++curbid)
         {
           block_type *b = w_pool.steal();
           another_merger.multi_merge(b->begin(),b->end());
