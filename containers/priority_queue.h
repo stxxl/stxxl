@@ -168,7 +168,7 @@ namespace priority_queue_local
           min_elements.push(m);
         }
       }
-      bool spaceIsAvailable() const { return nsequences <= arity; }
+      bool spaceIsAvailable() const { return nsequences < arity; }
       
       template <class Merger>
       void insert_segment(Merger & another_merger, size_type segment_size)
@@ -222,16 +222,16 @@ namespace priority_queue_local
       //! \param first_size number of elements in the first block
       void insert_segment(std::list<bid_type> * segment, block_type * first_block, unsigned first_size)
       {
-        STXXL_VERBOSE2("ext_merger::insert_segment(segment_bids,...)")
+        STXXL_VERBOSE1("ext_merger::insert_segment(segment_bids,...) "<<this)
         assert(first_size);
         ++nsequences;
         nelements += size_type(segment->size())*block_type::size + first_size;
         // assert(nsequences <= arity);
-		if(nsequences>arity)
-		{
-			STXXL_VERBOSE1("ext_merger::insert_segment(..) "
-							"INSERTING SEGMENT OVER CAPACITY, CAPACITY:"<<arity<<" SEQUENCES: "<<nsequences)
-		}
+        if(nsequences>arity)
+        {
+          STXXL_VERBOSE1("ext_merger::insert_segment(..) "
+                  "INSERTING SEGMENT OVER CAPACITY, CAPACITY:"<<arity<<" SEQUENCES: "<<nsequences)
+        }
         sequence_type new_sequence;
         new_sequence.current = block_type::size - first_size;
         new_sequence.block = first_block;
@@ -1143,7 +1143,7 @@ int priority_queue<Config_>::refillBuffer2(int j)
     etree[j-IntLevels].multi_merge(oldTarget + bufferSize, 
             oldTarget + bufferSize + deleteSize);
   
-  STXXL_MSG(deleteSize + bufferSize)
+  //STXXL_MSG(deleteSize + bufferSize)
   //std::copy(oldTarget,oldTarget + deleteSize + bufferSize,std::ostream_iterator<value_type>(std::cout, "\n"));
   
   return deleteSize + bufferSize;
@@ -1427,6 +1427,30 @@ namespace priority_queue_local
     typedef typename find_B_m<E_,IntM_,MaxS_,(8*1024*1024),1>::result result;
   };
 
+  struct Parameters_not_found_Try_to_change_Tune_parameter
+  {
+    typedef Parameters_not_found_Try_to_change_Tune_parameter result;
+  };
+  
+  
+  template <int AI_,int X_,int CriticalSize_>
+  struct compute_N
+  {
+    typedef compute_N<AI_,X_,CriticalSize_> Self;
+    enum
+    {
+      X = X_,
+      AI = AI_,
+      N = X/(AI*AI)
+    };
+    typedef typename IF<(N>=CriticalSize_),Self, typename compute_N<AI/2,X,CriticalSize_>::result >::result result;
+  };
+  
+  template <int X_,int CriticalSize_>
+  struct compute_N<1,X_,CriticalSize_>
+  {
+    typedef Parameters_not_found_Try_to_change_Tune_parameter result;
+  };
 
 };
 
@@ -1437,12 +1461,16 @@ class PRIORITY_QUEUE_GENERATOR
   public:
   typedef typename priority_queue_local::find_settings<sizeof(Tp_),IntM_,MaxS_>::result settings;
   enum{
-     AI = 1<<Tune_,
-     AHI = AI*AI,
      B = settings::B,
      m = settings::m,
      X = B*(settings::k - m)/settings::E,
-     N = X/AHI,
+     Buffer1Size = 32 
+  };
+  typedef typename priority_queue_local::compute_N<(1<<Tune_),X,4*Buffer1Size>::result ComputeN; 
+  enum
+  {
+     N = ComputeN::N,
+     AI = ComputeN::AI,
      AE = m/2
   };
 public:
@@ -1459,7 +1487,7 @@ public:
       unsigned ExtKMAX_ = 64, // maximal arity for external mergers
       unsigned ExtLevels_ = 2,
   */
-  typedef priority_queue<priority_queue_config<Tp_,Cmp_,32,N,AI,2,B,AE,2> > result;
+  typedef priority_queue<priority_queue_config<Tp_,Cmp_,Buffer1Size,N,AI,2,B,AE,2> > result;
 };
 
 

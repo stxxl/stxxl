@@ -12,7 +12,8 @@ using namespace stxxl;
 
 struct my_type
 {
-    typedef long long int key_type;
+  //typedef long long int key_type;
+  typedef int key_type;
 	key_type key;
 	char data[128 - sizeof(key_type)];
 	my_type(){}
@@ -24,6 +25,8 @@ std::ostream & operator << (std::ostream & o,const my_type & obj)
 	o << obj.key;
 	return o;
 }
+
+//typedef int my_type;
 
 struct dummy_merger
 {
@@ -46,7 +49,14 @@ struct my_cmp // greater
   bool operator () (const my_type & a, const my_type & b) const { return a.key > b.key; }
   my_type min_value() const { return my_type(std::numeric_limits<my_type::key_type>::max()); }
   my_type max_value() const { return my_type(std::numeric_limits<my_type::key_type>::min()); }
-};
+}; 
+/*
+struct my_cmp: public std::greater<my_type>
+{
+  my_type min_value() const { return my_type(std::numeric_limits<my_type>::max()); }
+  my_type max_value() const { return my_type(std::numeric_limits<my_type>::min()); }
+};*/
+
 
 int main()
 {/*
@@ -61,15 +71,19 @@ int main()
   //typedef priority_queue<priority_queue_config<my_type,my_cmp,
   //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
   const unsigned volume = 128*1024; // GB
-  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,20*1024*1024,volume/sizeof(my_type)>::result pq_type;
+  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,20*1024*1024,volume/sizeof(my_type),7> gen;
+  typedef gen::result pq_type;
   typedef pq_type::block_type block_type;
  
   STXXL_MSG("Block size: "<<block_type::raw_size)
   //STXXL_MSG(settings::EConsumption);
   /*
   STXXL_MSG(settings::AE);
-  STXXL_MSG(settings::settings::B);
-  STXXL_MSG(settings::N); */
+  STXXL_MSG(settings::settings::B); */
+  STXXL_MSG("AI: "<<gen::AI);
+  STXXL_MSG("X : "<<gen::X);
+  STXXL_MSG("N : "<<gen::N);
+  STXXL_MSG("AE: "<<gen::AE);
   
   prefetch_pool<block_type> p_pool(10);
   write_pool<block_type>    w_pool(10);
@@ -85,14 +99,14 @@ int main()
   }
   
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
-  for(i = 0; i<(nelements) ;i++ )
+  for(i = 0; i<(nelements) ;++i )
   {
     assert( !p.empty() );
-    STXXL_MSG( p.top() )
+    //STXXL_MSG( p.top() )
     assert(p.top().key == i+1);
     p.pop();
-	if((i%(1024*1024)) == 0)
-		STXXL_MSG("Element "<<i<<" poped")
+    if((i%(1024*1024)) == 0)
+      STXXL_MSG("Element "<<i<<" popped")
   }
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   
