@@ -1,9 +1,12 @@
-all: testmap vector stack mstack p_queue map
+all: testmap vector stack mstack p_queue queue map
 
 include ../compiler.make
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
+
+queue: $(DEPENDENCIES)
+	$(GCC) testqueue.cpp -o testqueue $(STXXL_OBJ)
 
 map: $(DEPENDENCIES)
 	cd map.impl; $(MAKE); cd .. 
@@ -38,5 +41,5 @@ bench_pqueue: bench_pqueue.cpp $(DEPENDENCIES)
 	$(GCC) bench_pqueue.cpp -o bench_pqueue $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
 
 clean:
-	rm -f *.o bench_pqueue ext_merger p_bug p_queue many_stacks test_mstack test_stack test_vector
+	rm -f *.o bench_pqueue ext_merger p_bug p_queue many_stacks test_mstack test_stack test_vector testqueue
 	cd map.impl; $(MAKE) clean; cd ..

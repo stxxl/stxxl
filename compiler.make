@@ -25,7 +25,7 @@ MNG_LAYER_FILES = ../mng/adaptor.h  ../mng/async_schedule.h  ../mng/block_prefet
 CONTAINER_MAP_FILES = $(STXXL_ROOT)/containers/map.impl/*.h
 
 CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/vector.h \
-../containers/priority_queue.h $(CONTAINER_MAP_FILES)
+../containers/priority_queue.h ../containers/queue.h $(CONTAINER_MAP_FILES)
 
 ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/run_cursor.h \
 ../algo/sort.h ../algo/async_schedule.h ../algo/interleaved_alloc.h ../algo/ksort.h \

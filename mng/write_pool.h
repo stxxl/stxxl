@@ -198,7 +198,10 @@ protected:
   void check_all_busy()
   {
     busy_blocks_iterator cur = busy_blocks.begin();
-    int cnt = 0,busy_blocks_size_old = busy_blocks_size;
+    int cnt = 0;
+	#if STXXL_VERBOSE_LEVEL > 1
+	int busy_blocks_size_old = busy_blocks_size;
+	#endif 
     for(;cur!=busy_blocks.end();++cur)
     {
       if(cur->req->poll())
