@@ -108,6 +108,9 @@
  *   - \c mmap : performs disks transfers using \c mmap and \c munmap system calls
  *   - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point 
  *     to a file on a RAM disk partition with sufficient space
+ *
+ *
+ * See also example configuration file \c 'stxxl/config_example' included into the tarball.
  * 
  * \section excreation Formatting external memory files
  *
