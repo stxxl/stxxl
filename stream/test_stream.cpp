@@ -94,7 +94,8 @@ int main()
   // HERE streaming part begins (streamifying)
   // create input stream
   typedef typeof(streamify(input.begin(),input.end())) input_stream_type;
-  input_stream_type input_stream = streamify(input.begin(),input.end());
+  //input_stream_type input_stream = streamify(input.begin(),input.end());
+  input_stream_type input_stream = streamify(input.begin(),input.begin());
   
   
   // create counter stream

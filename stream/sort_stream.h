@@ -146,8 +146,8 @@ namespace stream
     unsigned m2 = m_ / 2;
     const unsigned el_in_run = m2* block_type::size; // # el in a run
     block_manager * bm = block_manager::get_instance();
-    block_type *Blocks1 = new block_type[m2*2];
-    block_type *Blocks2 = Blocks1 + m2;
+    block_type * Blocks1 = new block_type[m2*2];
+    block_type * Blocks2 = Blocks1 + m2;
     request_ptr * write_reqs = new request_ptr[m2];
     run_type run;
     
@@ -809,16 +809,20 @@ namespace stream
     //! \param memory_to_use amount of memory available for the merger in bytes
     runs_merger(const sorted_runs_type & r,value_cmp c,unsigned memory_to_use):
       sruns(r),m_(memory_to_use/block_type::raw_size /* - 1 */),cmp(c),
-      elements_remaining(r.elements)
+      elements_remaining(r.elements),
+      current_block(NULL),
   #ifdef STXXL_CHECK_ORDER_IN_SORTS
-  		,last_element(cmp.min_value())
+  		,last_element(cmp.min_value()),
   #endif
+      prefetcher(NULL)
     {
 		
+	  if(empty()) return;
+		  
 	 #ifdef STXXL_CHECK_ORDER_IN_SORTS
 	 assert(check_sorted_runs(r,c));
 	 #endif
-
+		
 	  current_block = new block_type;
 		
       disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
@@ -961,7 +965,7 @@ namespace stream
     {
 	  deallocate_prefetcher();
 	
-      delete current_block;
+      if(current_block) delete current_block;
       
       // free blocks in runs , (or the user should do it?)
 	  sruns.deallocate_blocks();

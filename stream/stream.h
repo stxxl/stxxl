@@ -120,14 +120,19 @@ namespace stream
   	{
 		
 		begin.flush(); // flush container
-		in.reset(new buf_istream_type(begin.bid(),end.bid() + ((end.block_offset())?1:0),nbuffers?nbuffers:
-  			(2 * config::get_instance()->disks_number())));
+		typename InputIterator_::bids_container_iterator end_iter = end.bid() + ((end.block_offset())?1:0);
 		
-		InputIterator_	cur = begin - begin.block_offset();
+		if(end_iter - begin.bid() > 0)
+		{
+			in.reset(new buf_istream_type(begin.bid(),end_iter,nbuffers?nbuffers:
+  				(2 * config::get_instance()->disks_number())));
+		
+			InputIterator_	cur = begin - begin.block_offset();
 	
-		// skip the beginning of the block
-		for( ;cur != begin;++cur) 
-			++(*in);
+			// skip the beginning of the block
+			for( ;cur != begin;++cur) 
+				++(*in);
+		}
 		
 	}
     
@@ -892,8 +897,13 @@ namespace stream
       Input1_ & i1_,
       Input2_ & i2_
       ):
-        i1(i1_),i2(i2_),
-        current(value_type(*i1,*i2)) {}
+        i1(i1_),i2(i2_)
+  	{
+		if(!empty())
+		{
+			current = value_type(*i1,*i2);
+		}
+	}
       
     //! \brief Standard stream method
     const value_type & operator * () const
