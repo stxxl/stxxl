@@ -261,9 +261,13 @@ create_runs(
                   ),cmp) )
 	   {
 		   STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
-		   STXXL_MSG("Data in block:")
-		   for(unsigned k=0; k<block_type::size;++k)
-			   STXXL_MSG("Element "<<k<<" in blocks is :"<<blocks[j][k])
+		   STXXL_MSG("Data in blocks:")
+		   for(unsigned j=0;j<nblocks;++j)
+		   {
+			   STXXL_MSG("        Block "<< j <<":")
+		   	   for(unsigned k=0; k<block_type::size;++k)
+			        STXXL_MSG("     Element "<<k<<" in blocks is :"<<blocks[j][k])
+		   }
            return false;
 	   }
        

@@ -23,6 +23,12 @@ struct my_type
 	static my_type max_value(){ return my_type(0xffffffff); };
 };
 
+std::ostream & operator << (std::ostream & o, const my_type & obj)
+{
+	o << obj._key;
+	return o;
+}
+
 bool operator < (const my_type & a, const my_type & b)
 {
 	return a.key() < b.key();
@@ -38,6 +44,7 @@ struct cmp: public std::less<my_type>
   	my_type min_value() const { return my_type(0); };
 	my_type max_value() const { return my_type(0xffffffff); };
 };
+
 
 int main()
 {	
