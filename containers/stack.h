@@ -40,7 +40,7 @@
  };
 
  
-//! \brief External vector container
+//! \brief External stack container
  
 //! Conservative implementation. Fits best if you access pattern consists of irregulary mixed
 //! push'es and pop's.

@@ -410,22 +410,21 @@ private:
 		
 		size_type size_from_file_length(off_t file_length)
 		{
-			off_t blocks_fit = file_length/block_type::raw_size;
-			size_type cur_size = blocks_fit*block_type::size;
-			off_t rest = file_length - blocks_fit*block_type::raw_size;
-			cur_size += rest/sizeof(value_type);
-			return cur_size;
+			off_t blocks_fit = file_length/off_t(block_type::raw_size);
+			size_type cur_size = blocks_fit*off_t(block_type::size);
+			off_t rest = file_length - blocks_fit*off_t(block_type::raw_size);
+			return (cur_size + rest/off_t(sizeof(value_type)));
 		}
 		off_t file_length()
 		{
 			size_type cur_size = size();
-			if(cur_size % block_type::size)
+			if(cur_size % size_type(block_type::size))
 			{
-				off_t full_blocks_length = (_bids.size()-1)*block_type::raw_size;
-				size_type rest = cur_size - (_bids.size()-1)*block_type::size;
-				return full_blocks_length + rest*sizeof(value_type);
+				off_t full_blocks_length = size_type(_bids.size()-1)*size_type(block_type::raw_size);
+				size_type rest = cur_size - size_type(_bids.size()-1)*size_type(block_type::size);
+				return full_blocks_length + rest*size_type(sizeof(value_type));
 			}
-			return _bids.size()*block_type::raw_size;
+			return size_type(_bids.size())*size_type(block_type::raw_size);
 		}
 public:
 		vector (size_type n = 0):
@@ -490,13 +489,15 @@ public:
           		_bids.begin() + old_bids_size,_bids.end());
 	  else
 	  {
-		  size_type offset = old_bids_size*block_type::raw_size; 
+		  size_type offset = size_type(old_bids_size)*size_type(block_type::raw_size); 
 		  bids_container_iterator it = _bids.begin() + old_bids_size;
-		  for(;it!=_bids.end();++it,offset+=(block_type::raw_size) )
+		  for(;it!=_bids.end();++it,offset+=size_type(block_type::raw_size) )
 		  {
 			  (*it).storage = _from;
 			  (*it).offset = offset;
 		  }
+		  STXXL_VERBOSE1("vector::reserve(): Changing size of file "<<((void *)_from)<<" to "
+					<<offset);
 		  _from->set_size(offset);
 	  }
     }
@@ -571,7 +572,7 @@ public:
 	//! (does not matter whether the files are different \c file objects).
     vector (file * from):
 			_size(size_from_file_length(from->size())),
-			_bids(div_and_round_up(_size,block_type::size)),
+			_bids(div_and_round_up(_size,size_type(block_type::size))),
 			_page_status(div_and_round_up (_bids.size(), page_size)),
 			_last_page(div_and_round_up (_bids.size(), page_size)),
 			_page_no(n_pages),
@@ -598,7 +599,7 @@ public:
 			
 			size_type offset = 0; 
 			bids_container_iterator it = _bids.begin();
-			for(;it!=_bids.end(); ++it, offset+=(block_type::raw_size) )
+			for(;it!=_bids.end(); ++it, offset+=size_type(block_type::raw_size) )
 			{
 				(*it).storage = from;
 				(*it).offset = offset;
@@ -685,6 +686,9 @@ public:
 			bm->delete_blocks(_bids.begin(),_bids.end());
 			if(_from) // file must be truncated
 			{
+				STXXL_VERBOSE1("~vector(): Changing size of file "<<((void *)_from)<<" to "
+					<<file_length());
+				STXXL_VERBOSE1("~vector(): size of the vector is "<<size())
 				_from->set_size(file_length());
 			}
 		}
