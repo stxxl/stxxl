@@ -257,7 +257,7 @@ create_runs(
        {
          if(blocks[j][0] != (*runs[irun])[j].value)
 		 {
-		   STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run")
+		   STXXL_MSG("check_sorted_runs  wrong trigger in the run")
            return false;
 		 }
        }
@@ -275,7 +275,7 @@ create_runs(
 	   				  nelements
                   ),cmp) )
 	   {
-		   STXXL_ERRMSG("check_sorted_runs  wrong order in the run")
+		   STXXL_MSG("check_sorted_runs  wrong order in the run")
            return false;
 	   }
        
