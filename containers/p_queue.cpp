@@ -6,7 +6,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 #include "priority_queue.h"
-
+#include "../common/timer.h"
 using namespace stxxl;
 
 
@@ -15,7 +15,7 @@ struct my_type
     typedef long long int key_type;
   //typedef int key_type;
 	key_type key;
-	char data[10 - sizeof(key_type)];
+	char data[20 - sizeof(key_type)];
 	my_type(){}
 	explicit my_type(key_type k):key(k) {}
 };
@@ -70,8 +70,8 @@ int main()
   */
   //typedef priority_queue<priority_queue_config<my_type,my_cmp,
   //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-  const unsigned volume = 22*1024*1024; // in GB
-  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,32*1024*1024,volume/sizeof(my_type)> gen;
+  const unsigned volume = 200*1024*1024; // in GB
+  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,512*1024*1024,volume/sizeof(my_type)> gen;
   typedef gen::result pq_type;
   typedef pq_type::block_type block_type;
  
@@ -84,9 +84,13 @@ int main()
   STXXL_MSG("X : "<<gen::X);
   STXXL_MSG("N : "<<gen::N);
   STXXL_MSG("AE: "<<gen::AE);
+ 
+  timer Timer;
+  Timer.start();
   
-  prefetch_pool<block_type> p_pool(10);
-  write_pool<block_type>    w_pool(10);
+  const unsigned mem_for_pools = 256*1024*1024;
+  prefetch_pool<block_type> p_pool((mem_for_pools/2)/block_type::raw_size);
+  write_pool<block_type>    w_pool((mem_for_pools/2)/block_type::raw_size);
   pq_type p(p_pool,w_pool);
   off_t nelements = off_t(volume/sizeof(my_type))*1024,i;
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
@@ -97,8 +101,12 @@ int main()
 		STXXL_MSG("Inserting element "<<i)
     p.push(my_type(nelements - i));
   }
+  Timer.stop();
+  STXXL_MSG("Time spent for filling: "<<Timer.seconds()<< " sec")
   
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
+  Timer.reset();
+  Timer.start();
   for(i = 0; i<(nelements) ;++i )
   {
     assert( !p.empty() );
@@ -108,6 +116,8 @@ int main()
     if((i%(1024*1024)) == 0)
       STXXL_MSG("Element "<<i<<" popped")
   }
+  Timer.stop();
+  STXXL_MSG("Time spent for removing elements: "<<Timer.seconds()<< " sec")
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   
 }
