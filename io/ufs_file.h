@@ -122,10 +122,10 @@ __STXXL_BEGIN_NAMESPACE
 			if (bytes % BLOCK_ALIGN)
 				STXXL_ERRMSG ("Size is multiple of " <<
 					      BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
-			if (unsigned (buffer) % BLOCK_ALIGN)
+			if (long (buffer) % BLOCK_ALIGN)
 				STXXL_ERRMSG ("Buffer is not aligned: modulo "
 					      << BLOCK_ALIGN << " = " <<
-					      unsigned (buffer) % BLOCK_ALIGN << " (" << 
+					      long (buffer) % BLOCK_ALIGN << " (" << 
 								std::hex << buffer << std::dec << ")");
 		}
 		

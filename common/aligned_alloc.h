@@ -21,10 +21,10 @@ inline void * aligned_alloc (size_t size)
 	STXXL_VERBOSE2("stxxl::aligned_alloc<"<<ALIGNMENT <<">(), size = "<<size) 
     // TODO: use posix_memalign() and free() on Linux
 	char *buffer = new char[size + ALIGNMENT];
-	char *result = buffer + ALIGNMENT - (unsigned (buffer) % (ALIGNMENT));
+	char *result = buffer + ALIGNMENT - (((unsigned long) buffer) % (ALIGNMENT));
 	*(((char **) result) - 1) = buffer;
 	STXXL_VERBOSE2("stxxl::aligned_alloc<"<<ALIGNMENT <<
-		">(), allocated at "<<std::hex <<unsigned(buffer)<<" returning "<< unsigned(result)
+		">(), allocated at "<<std::hex <<((unsigned long)buffer)<<" returning "<< ((unsigned long)result)
 		<<std::dec) 
 	//abort();
 	return result;

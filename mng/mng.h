@@ -622,12 +622,12 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			STXXL_ERRMSG("Warning: no config file found." )
 			STXXL_ERRMSG("Using default disk configuration." )
 			DiskEntry entry1 = { "/var/tmp/stxxl", "syscall",
-				100 * 1024 * 1024
+				1000 * 1024 * 1024
 			}; /*
 			DiskEntry entry2 =
 				{ "/tmp/stxxl1", "mmap", 100 * 1024 * 1024 };
 			DiskEntry entry3 = { "/tmp/stxxl2", "simdisk",
-				100 * 1024 * 1024
+				1000 * 1024 * 1024
 			}; */
 			disks_props.push_back (entry1);
 			//disks_props.push_back (entry2);

@@ -78,14 +78,19 @@ __STXXL_BEGIN_NAMESPACE
 		stats * iostats = stats::get_instance();
 		if(nref() < 2)
 		{
-			STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="<<nref()<<") "<<
-			 " this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes 
+			STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
+				<<nref()<<") "<<
+			 " this="<<long(this)<<
+			 " File descriptor="<<
+                         file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes 
 			 << " type=" <<((type == READ)?"READ":"WRITE") )
 		}
 		
 		stxxl_ifcheck_i(::lseek (file->get_file_des (), offset, SEEK_SET),
-			" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes
-		    << " type=" <<((type == READ)?"READ":"WRITE") )
+			" this="<<long(this)<<" File descriptor="<<
+			file->get_file_des()<< " offset="<<offset<<" buffer="<<
+			buffer<<" bytes="<<bytes
+		    	<< " type=" <<((type == READ)?"READ":"WRITE") )
 		else
 		{
 			if (type == READ)
@@ -95,7 +100,10 @@ __STXXL_BEGIN_NAMESPACE
 				#endif
 				
 				stxxl_ifcheck_i(::read (file->get_file_des(), buffer, bytes),
-					" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<((type == READ)?"READ":"WRITE"))
+					" this="<<long(this)<<" File descriptor="<<
+					file->get_file_des()<< " offset="<<offset<<
+					" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
+					((type == READ)?"READ":"WRITE"))
 				
 				#ifdef STXXL_IO_STATS
 					iostats->read_finished ();
@@ -108,7 +116,10 @@ __STXXL_BEGIN_NAMESPACE
 				#endif
 				
 				stxxl_ifcheck_i(::write (file->get_file_des (), buffer, bytes),
-					" this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<((type == READ)?"READ":"WRITE"));
+					" this="<<long(this)<<" File descriptor="<<
+					file->get_file_des()<< " offset="<<offset<<" buffer="<<
+					buffer<<" bytes="<<bytes<< " type=" <<
+					((type == READ)?"READ":"WRITE"));
 				
 				#ifdef STXXL_IO_STATS
 					iostats->write_finished ();
@@ -119,7 +130,9 @@ __STXXL_BEGIN_NAMESPACE
 		if(nref() < 2)
 		{
 			STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref="<<nref()<<") "<<
-			 " this="<<unsigned(this)<<" File descriptor="<<file->get_file_des()<< " offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes << " type=" <<((type == READ)?"READ":"WRITE"))
+			 " this="<<long(this)<<" File descriptor="<<file->get_file_des()<< 
+			" offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes << 
+			" type=" <<((type == READ)?"READ":"WRITE"))
 		}
 
 		_state.set_to (DONE);
