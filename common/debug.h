@@ -26,7 +26,8 @@ class debugmon
 	
 	debugmon() {}
 public:
-	#ifdef NDEBUG
+	//#ifdef NDEBUG
+	#if 1
 	void block_allocated(void * ptr)
 	{
 	}
