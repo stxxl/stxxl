@@ -190,7 +190,7 @@ protected:
     {
       if(cur->req->poll())
       {
-        free_block.push_back(cur->block);
+        free_blocks.push_back(cur->block);
         busy_blocks.erase(cur);
         ++cnt;
         --busy_blocks_size;

@@ -54,7 +54,7 @@ public:
   explicit prefetch_pool(unsigned init_size=1): free_blocks_size(init_size)
   {
     unsigned i = 0;
-    for(;i<init_size;i++)
+    for(;i<init_size;++i)
       free_blocks.push_back(new block_type);
   }
   
@@ -68,7 +68,7 @@ public:
     }
     
     busy_blocks_iterator i2 = busy_blocks.begin();
-    for(;i2 != busy_blocks.end();i2++)
+    for(;i2 != busy_blocks.end();++i2)
     {
       i2->second.second->wait();
       delete i2->second.first;
