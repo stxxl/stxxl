@@ -1475,7 +1475,7 @@ class PRIORITY_QUEUE_GENERATOR
   {
      N = ComputeN::N,
      AI = ComputeN::AI,
-     AE = m/2
+     AE = (m/2 < 2)?2:(m/2)
   };
 public:
   enum {
