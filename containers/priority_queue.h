@@ -628,7 +628,7 @@ multi_merge_k(Element *to, int l)
   int      winnerIndex = entry[0].index;
   Element  winnerKey   = entry[0].key;
   Element *winnerPos;
-  Element sup = dummy; // supremum
+  
   while (to != done)
   {
     winnerPos = current[winnerIndex];
@@ -1034,7 +1034,7 @@ inline typename priority_queue<Config_>::size_type priority_queue<Config_>::size
 { 
   return 
     size_ + 
-    insertHeap.size() + 
+    insertHeap.size() - 1 + 
     ((buffer1 + BufferSize1) - minBuffer1); 
 }
 
@@ -1042,7 +1042,9 @@ inline typename priority_queue<Config_>::size_type priority_queue<Config_>::size
 template <class Config_>
 inline const typename priority_queue<Config_>::value_type & priority_queue<Config_>::top() const
 {
-  if((!insertHeap.empty()) && cmp(*minBuffer1,insertHeap.top()))
+  assert(!insertHeap.empty());
+  
+  if( /*(!insertHeap.empty()) && */ cmp(*minBuffer1,insertHeap.top()))
     return insertHeap.top();
   
   return *minBuffer1;
@@ -1052,10 +1054,10 @@ template <class Config_>
 inline void priority_queue<Config_>::pop()
 {
   //STXXL_VERBOSE1("priority_queue::pop()")
+  assert(!insertHeap.empty());
   
-  if((!insertHeap.empty()) && cmp(*minBuffer1,insertHeap.top()))
+  if(/*(!insertHeap.empty()) && */ cmp(*minBuffer1,insertHeap.top()))
   {
-    assert(!insertHeap.empty());
     insertHeap.pop();
   }
   else
@@ -1071,8 +1073,10 @@ template <class Config_>
 inline void priority_queue<Config_>::push(const value_type & obj)
 {
   //STXXL_VERBOSE3("priority_queue::push("<< obj <<")")
-  if(insertHeap.size() == N) 
+  if(insertHeap.size() == N + 1) 
      emptyInsertHeap();
+  
+  assert(!insertHeap.empty());
   
   insertHeap.push(obj);
 }
@@ -1088,14 +1092,16 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
 {
   STXXL_VERBOSE2("priority_queue::priority_queue()")
   etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
-  
-  buffer1[BufferSize1] = cmp.min_value(); // sentinel
+  value_type sentinel = cmp.min_value();
+  buffer1[BufferSize1] = sentinel; // sentinel
+  insertHeap.push(sentinel); // always keep the sentinel
   minBuffer1 = buffer1 + BufferSize1; // empty
   for (int i = 0;  i < Levels;  i++)
   { 
-    buffer2[i][N] = cmp.min_value(); // sentinel
+    buffer2[i][N] = sentinel; // sentinel
     minBuffer2[i] = &(buffer2[i][N]); // empty
   }
+  
 }
 
 template <class Config_>
@@ -1310,7 +1316,7 @@ void priority_queue<Config_>::emptyInsertHeap()
     ++SortTo;
   }
   
-  assert(insertHeap.empty());
+  assert(insertHeap.size() == 1);
   
   newSegment[N] = sup; // sentinel
 
