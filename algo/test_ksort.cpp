@@ -91,8 +91,8 @@ void test(stxxl::int64 records_to_sort,unsigned memory_to_use,unsigned n_prefetc
 	
 	stxxl::ksort(v.begin(),v.end(),memory_to_use);
 	
-	// STXXL_MSG("Checking order...")
-	// STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
+	STXXL_MSG("Checking order...")
+	STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
 }
 
 template <unsigned block_size>

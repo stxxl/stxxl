@@ -3,7 +3,7 @@
 #include "../algo/scan.h"
 #include "../common/timer.h"
 
-#define STRUCT_SIZE (50) 
+#define STRUCT_SIZE (5) 
 
 struct my_type
 {
@@ -26,7 +26,7 @@ using namespace stxxl;
 
 int main(int argc, char * argv[])
 {
-		typedef stack<grow_shrink_stack<stack_config_generator<my_type,4,RC,(1024*1024)> > > ext_stack_type;
+		typedef grow_shrink_stack<stack_config_generator<my_type,4,(256*1024),RC> >  ext_stack_type;
 		stxxl::int64 i,size = atol(argv[1])*(1024*1024*1024)/sizeof(my_type);
 		ext_stack_type Stack;
 //		stxxl::vector<my_type,stxxl::striping,(2*1024*1024),stxxl::lru_pager<4>,2> Vector(size);
