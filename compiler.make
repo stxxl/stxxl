@@ -53,7 +53,8 @@ STXXL_OBJ = $(STXXL_LIB)
 STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB) -ftemplate-depth-65000
 
 #
-# for automatical checking of order of the pipelined sorters
+# for automatical checking of order of the output elements in
+# the pipelined sorters stxxl::stream::sort and stxxl::stream::merge_runs
 # use -DSTXXL_CHECK_ORDER_IN_SORTS compile option
 #
 
