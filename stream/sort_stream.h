@@ -144,6 +144,9 @@ namespace stream
       {
         compute_result();
         result_computed = true;
+		#ifdef STXXL_PRINT_STAT_AFTER_RF
+		 STXXL_MSG(*stats::get_instance())
+		#endif
       }
       return result_;
     }
@@ -548,6 +551,9 @@ namespace stream
         finish_result();
         output_requested = true;
 		cleanup();
+		 #ifdef STXXL_PRINT_STAT_AFTER_RF
+		 STXXL_MSG(*stats::get_instance())
+		#endif
       }
       return result_;
     }
