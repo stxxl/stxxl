@@ -13,6 +13,7 @@
 #include "../common/aligned_alloc.h"
 #include "../common/debug.h"
 
+#include <memory>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -264,7 +265,7 @@ __STXXL_BEGIN_NAMESPACE
 			return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
 		};
 		
-		void *operator      new[] (size_t bytes)
+		static void *operator      new[] (size_t bytes)
 		{
 			void * result = aligned_alloc < BLOCK_ALIGN > (bytes);
 			char * tmp = (char*)result;
@@ -277,7 +278,7 @@ __STXXL_BEGIN_NAMESPACE
 			}
 			return result;
 		}
-		void *operator      new (size_t bytes)
+		static void *operator      new (size_t bytes)
 		{
 			void * result = aligned_alloc < BLOCK_ALIGN > (bytes);
 			char * tmp = (char*)result;
@@ -290,7 +291,12 @@ __STXXL_BEGIN_NAMESPACE
 			}
 			return result;
 		}
-		void operator      delete (void *ptr)
+		
+		static void *  operator new (size_t bytes, void * & ptr) // construct object in existing memory
+		{
+			return ptr;
+		}
+		static void operator      delete (void *ptr)
 		{
 			debugmon::get_instance()->block_deallocated((char*)ptr);
 			aligned_dealloc < BLOCK_ALIGN > (ptr);
@@ -1130,4 +1136,5 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
   
 __STXXL_END_NAMESPACE
 
+	
 #endif

@@ -45,7 +45,7 @@ class debugmon
 	
 	debugmon() {}
 public:
-	#ifdef NDEBUG
+	#ifndef STXXL_DEBUGMON
 	void block_allocated(char * ptr, char * end, size_t size)
 	{
 	}

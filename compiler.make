@@ -46,6 +46,8 @@ DEBUG =  # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3
 
 # STXXL_SPECIFIC += -DSTXXL_CHECK_ORDER_IN_SORTS
 
+# STXXL_SPECIFIC += -DSTXXL_DEBUGMON
+
 # this variable is used internally for development compilations
 GCC=$(COMPILER) -Wall $(LARGE_FILE) $(NO_OVR) $(OPT) $(PROF) $(DEBUG) $(STXXL_SPECIFIC) # -ftemplate-depth-65000
 
