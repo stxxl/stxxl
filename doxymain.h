@@ -15,6 +15,7 @@
  * - variable block lengths
  * - overlapping of I/O and computation
  * - prevention of OS file buffering overhead
+ * - algorithm pipelining
  *
  * \section platforms Platforms supported
  * Linux (kernel >= 2.4.18)
