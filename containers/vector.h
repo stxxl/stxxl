@@ -386,9 +386,29 @@ private:
 		mutable simple_vector<int> _page_no;
 		mutable std::queue<int> _free_pages;
 		mutable simple_vector<block_type> _cache;
+		file * _from;
 		block_manager *bm;
 		config *cfg;
 		
+		size_type size_from_file_length(off_t file_length)
+		{
+			off_t blocks_fit = file_length/block_type::raw_size;
+			size_type cur_size = blocks_fit*block_type::size;
+			off_t rest = file_length - blocks_fit*block_type::raw_size;
+			cur_size += rest/sizeof(value_type);
+			return cur_size;
+		}
+		off_t file_length()
+		{
+			size_type cur_size = size();
+			if(cur_size % block_type::size)
+			{
+				off_t full_blocks_length = (_bids.size()-1)*block_type::raw_size;
+				size_type rest = cur_size - (_bids.size()-1)*block_type::size;
+				return full_blocks_length + rest*sizeof(value_type);
+			}
+			return _bids.size()*block_type::raw_size;
+		}
 public:
 		vector (size_type n = 0):
 			_size (n),
@@ -396,7 +416,8 @@ public:
 			_page_status(div_and_round_up (_bids.size(), page_size)),
 			_last_page(div_and_round_up (_bids.size(), page_size)),
 			_page_no(n_pages),
-			_cache(n_pages * page_size)
+			_cache(n_pages * page_size),
+			_from(NULL)
 		{
 			bm = block_manager::get_instance ();
 			cfg = config::get_instance ();
@@ -446,8 +467,20 @@ public:
       _last_page.resize(new_pages,on_disk);
       
       _bids.resize(new_bids_size);
-      bm->new_blocks(offset_allocator<alloc_strategy>(old_bids_size,_alloc_strategy),
-          _bids.begin() + old_bids_size,_bids.end());
+	  if(_from == NULL)
+      		bm->new_blocks(offset_allocator<alloc_strategy>(old_bids_size,_alloc_strategy),
+          		_bids.begin() + old_bids_size,_bids.end());
+	  else
+	  {
+		  size_type offset = old_bids_size*block_type::raw_size; 
+		  bids_container_iterator it = _bids.begin() + old_bids_size;
+		  for(;it!=_bids.end();++it,offset+=(block_type::raw_size) )
+		  {
+			  (*it).storage = _from;
+			  (*it).offset = offset;
+		  }
+		  _from->set_size(offset);
+	  }
     }
     void resize(size_type n)
     {
@@ -515,12 +548,13 @@ public:
       return const_element(0);
     }
     vector (file * from):
-			_size(from->size()/sizeof(value_type)),
+			_size(size_from_file_length(from->size())),
 			_bids(div_and_round_up(_size,block_type::size)),
 			_page_status(div_and_round_up (_bids.size(), page_size)),
 			_last_page(div_and_round_up (_bids.size(), page_size)),
 			_page_no(n_pages),
-			_cache(n_pages * page_size)
+			_cache(n_pages * page_size),
+			_from(from)
 		{
 			// initialize from file
 			assert(from->get_disk_number() == -1);
@@ -542,12 +576,12 @@ public:
 			
 			size_type offset = 0; 
 			bids_container_iterator it = _bids.begin();
-			for(;it!=_bids.end();++it,offset+=(block_type::size*sizeof(value_type)) )
+			for(;it!=_bids.end(); ++it, offset+=(block_type::raw_size) )
 			{
 				(*it).storage = from;
 				(*it).offset = offset;
 			}
-			
+			from->set_size(offset);
 		}
   private:
     vector(const vector & obj) // Copying external vectors is discouraged
@@ -624,7 +658,12 @@ public:
 		}
 		~vector()
 		{
+			flush();
 			bm->delete_blocks(_bids.begin(),_bids.end());
+			if(_from) // file must be truncated
+			{
+				_from->set_size(file_length());
+			}
 		}
 private:
 		bids_container_iterator bid (const size_type & offset)

@@ -216,7 +216,11 @@ __STXXL_BEGIN_NAMESPACE
 	};
 	void ufs_file_base::set_size (off_t newsize)
 	{
-		if (newsize > size ())
+		off_t cur_size = size();
+		
+		stxxl_ifcheck(::ftruncate(file_des,newsize));
+		
+		if (newsize > cur_size)
 		{
 			stxxl_ifcheck (::lseek (file_des, newsize - 1,SEEK_SET));
 		}
