@@ -127,6 +127,11 @@ public:
 		{
 			return p_vector->element(offset);
 		}
+    
+    const_reference operator *() const
+		{
+			return p_vector->const_element(offset);
+		}
 		
 		_Self & operator ++()
 		{
@@ -244,7 +249,7 @@ public:
 			return _Self(p_vector,offset + op);
 		};
 		
-		const_reference operator *()
+		const_reference operator *() const
 		{
 			return p_vector->const_element(offset);
 		}
@@ -352,14 +357,14 @@ private:
 		size_type _size;
 		bids_container_type _bids;
 		//bids_container_iterator _bids_finish;
-		pager_type pager;
+		mutable pager_type pager;
 
 		enum { uninitialized = 1, dirty= 2 };
-		std::vector<unsigned char> _page_status;
-		std::vector<int> _last_page;
-		simple_vector<int> _page_no;
-		std::queue<int> _free_pages;
-		simple_vector<block_type> _cache;
+		mutable std::vector<unsigned char> _page_status;
+		mutable std::vector<int> _last_page;
+		mutable simple_vector<int> _page_no;
+		mutable std::queue<int> _free_pages;
+		mutable simple_vector<block_type> _cache;
 		block_manager *bm;
 		config *cfg;
 		
@@ -558,7 +563,7 @@ private:
 				static_cast < typename bids_container_type::size_type >
 				(offset / block_type::size));
 		}
-		void read_page(int page_no, int cache_page)
+		void read_page(int page_no, int cache_page) const
 		{
 			request_ptr * reqs = new request_ptr [page_size];
 			int block_no = page_no*page_size;
@@ -569,7 +574,7 @@ private:
 			wait_all(reqs,last_block - page_no*page_size);
 			delete [] reqs;
 		}
-		void write_page(int page_no, int cache_page)
+		void write_page(int page_no, int cache_page) const
 		{
 			request_ptr * reqs = new request_ptr [page_size];
 			int block_no = page_no*page_size;

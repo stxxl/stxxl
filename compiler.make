@@ -29,6 +29,7 @@ ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/ru
 ../algo/sort.h ../algo/async_schedule.h ../algo/interleaved_alloc.h ../algo/ksort.h \
 ../algo/loosertree.h ../algo/scan.h ../algo/stable_ksort.h
 
+STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 
 STXXL_SPECIFIC = -DSORT_OPT_PREFETCHING -DUSE_MALLOC_LOCK
 LARGE_FILE = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE

@@ -16,4 +16,5 @@ tests: lib
 	cd mng; $(MAKE); cd ..
 	cd containers; $(MAKE); cd ..
 	cd algo; $(MAKE); cd ..
+	cd stream; $(MAKE); cd ..
 	echo "Building tests is completed."

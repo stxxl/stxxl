@@ -168,7 +168,7 @@ namespace stream
     if(input.empty())
     {
       // return
-      wait_all(write_reqs,write_reqs+m2);
+      wait_all(write_reqs,write_reqs + cur_run_size);
       delete [] write_reqs;
       delete [] Blocks1;
       return;
@@ -191,6 +191,7 @@ namespace stream
       wait_all(write_reqs,write_reqs + cur_run_size);
       bm->delete_blocks(trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(run.begin()),
         trigger_entry_iterator<typename run_type::iterator,block_type::raw_size>(run.end()) );
+      
       cur_run_size = div_and_round_up(pos,block_type::size);
       run.resize(cur_run_size);
       bm->new_blocks(AllocStr_(),
@@ -210,7 +211,7 @@ namespace stream
       }
       result_.runs[0] = run;
       
-      wait_all(write_reqs,write_reqs+m2);
+      wait_all(write_reqs,write_reqs+cur_run_size);
       delete [] write_reqs;
       delete [] Blocks1;
       
@@ -426,6 +427,7 @@ namespace stream
         prefetch_seq[i] = i;
       #endif
       
+     
       prefetcher = new prefetcher_type(	consume_seq.begin(),
                                         consume_seq.end(),
                                         prefetch_seq,
@@ -434,7 +436,6 @@ namespace stream
     
       loosers  =  new looser_tree_type(prefetcher, nruns,run_cursor2_cmp_type(cmp));
       
-      assert(elements_remaining >= block_type::size);
       loosers->multi_merge(current_block.elem);
       current_value = current_block.elem[0];
       buffer_pos = 1;
@@ -649,9 +650,13 @@ namespace stream
     //! \brief Standard stream typedef
     typedef typename Input_::value_type value_type;
    
+    //! \brief Creates the object
+    //! \param in input stream
+    //! \param c comparator object
+    //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
     sort(Input_ & in,Cmp_ c,unsigned memory_to_use):
-      creator(in,cmp,memory_to_use),
-      merger(creator.result(),cmp,memory_to_use) {}
+      creator(in,c,memory_to_use),
+      merger(creator.result(),c,memory_to_use) {}
         
     //! \brief Standard stream method
     const value_type & operator * () const

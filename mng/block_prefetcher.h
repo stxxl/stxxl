@@ -85,10 +85,12 @@ public:
 		consume_seq_end(_cons_end),
 		seq_length(_cons_end - _cons_begin),
 		prefetch_seq(_pref_seq),
-		nextread(_prefetch_buf_size),
+		nextread(std::min(unsigned(_prefetch_buf_size),seq_length)),
 		nextconsume(0),
 		nreadblocks(nextread)
 	{
+    assert(seq_length > 0);
+    assert(_prefetch_buf_size > 0);
 		int i;
 		read_buffers = new block_type[nreadblocks];
 		read_reqs = new request_ptr[nreadblocks];
@@ -98,14 +100,17 @@ public:
 
 		completed = new onoff_switch[seq_length];
 		
-		for (i = 0; i < nreadblocks; i++)
+		for (i = 0; i < nreadblocks; ++i)
 		{
-			assert( prefetch_seq[i] < int(seq_length) && prefetch_seq[i] >= 0 );
+      
+			assert( prefetch_seq[i] < int(seq_length));
+      assert( prefetch_seq[i] >= 0 );
 			read_reqs[i] = read_buffers[i].read (
 										*(consume_seq_begin + prefetch_seq[i]),
 										set_switch_handler(*(completed + prefetch_seq[i])) );
 			pref_buffer[prefetch_seq[i]] = i;
-		}; 
+		};
+    
 	}
 	//! \brief Pulls next unconsumed block from the consumption sequence
 	//! \return Pointer to the already prefetched block from the internal buffer pool

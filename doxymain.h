@@ -20,20 +20,13 @@
  * Linux (kernel >= 2.4.18)
  *
  * \section current Current version
- * prerelease 0.2 contains a first implementation of the lower layers
+ * prerelease 0.21 contains a first implementation of the lower layers
  * (memory management, disk virtualization, prefetching,...).
- * From the higher layers, sorting and basic containers
- * (vectors, stacks) are supported.
- * Currently that sums to about 8000 lines of code.
+ * From the higher layers, sorting,scanning and basic containers
+ * (vectors, stacks, priority queues) are supported.
+ * Currently that sums to about 14000 lines of code.
  *
- * \section soon Coming soon
- * Priority queues and search trees (B+ trees) are the main nontrivial algorithms
- * missing from a complete implementation of STL. 
- * We are also working on a first expansion of STL that allows
- * pipelining several simple algorithms (sorting, filtering,...)
- * to minimize I/O volume. We will also soon have several nontrivial
- * example applications (minimum spanning trees, suffix array construction).
- *
+ * 
  * Questions concerning use and development of the \c \<stxxl\> library mail to Roman
  *  Dementiev <A href='mailto:dementiev@mpi-sb.mpg.de'>dementiev@mpi-sb.mpg.de</A>.
  *

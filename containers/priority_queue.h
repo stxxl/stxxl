@@ -1640,6 +1640,9 @@ namespace priority_queue_local
 
 //! \brief Priority queue type generator
 
+//! Implements a data structure from "Peter Sanders. Fast Priority Queues 
+//! for Cached Memory. ALENEX'99" for external memory.
+//! <BR>
 //! Template parameters:
 //! - Tp_ type of the contained objects
 //! - Cmp_ the comparison type used to determine 

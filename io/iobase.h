@@ -315,12 +315,14 @@ __STXXL_BEGIN_NAMESPACE
     //! \return reference to owned \c request object 
     request & operator * () const
     {
+      assert(ptr);
       return *ptr;
     }
     //! \brief "Arrow" operator
     //! \return pointer to owned \c request object 
     request * operator -> () const
     {
+      assert(ptr);
       return ptr;
     }
     //! \brief Access to owned \c request object (sinonym for \c operator->() )
