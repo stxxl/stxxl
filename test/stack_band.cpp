@@ -22,10 +22,13 @@ struct counter
 					
 int counter::cnt = 0;
 
+using namespace stxxl;
+
 int main(int argc, char * argv[])
 {
+		typedef stack<grow_shrink_stack<stack_config_generator<int,4,RC,4096> > > ext_stack_type;
 		stxxl::int64 i,size = atol(argv[1])*(1024*1024*1024)/sizeof(my_type);
-		stxxl::stack<my_type> Stack;
+		ext_stack_type Stack;
 //		stxxl::vector<my_type,stxxl::striping,(2*1024*1024),stxxl::lru_pager<4>,2> Vector(size);
 		stxxl::timer Timer;
 		
