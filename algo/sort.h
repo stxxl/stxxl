@@ -226,7 +226,6 @@ create_runs(
     //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
 	STXXL_MSG("check_sorted_runs  Runs: "<<nruns)
     unsigned irun=0;
-		m = m/4;
     for(irun = 0; irun < nruns; ++irun)
     {
        const unsigned nblocks_per_run = runs[irun]->size();

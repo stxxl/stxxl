@@ -6,7 +6,7 @@ MAKE = make
 COMPILER = g++-3.3 # we support only g++ >= 3.2
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /home/rdementi/projects/stxxl
+STXXL_ROOT = /home/rdementi/projects/testsort/stxxl
 
 
 COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h    ../common/perm.h  \
@@ -35,12 +35,14 @@ STXXL_SPECIFIC = -DSORT_OPT_PREFETCHING -DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I$(
 LARGE_FILE = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 NO_OVR = #  -DNO_OVERLAPPING
 PROF = # -DSTXXL_THREAD_PROFILING -pg
-OPT = # -O6
-DEBUG = -g # -DNDEBUG #-g # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3 
+OPT = -O6
+DEBUG =  #-g # -DNDEBUG #-g # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3 
 # DEBUG = # -DNDEBUG #-g # -DNDEBUG # -g # -DSTXXL_VERBOSE_LEVEL=3 
 
 # switch the direct I/O off
 # STXXL_SPECIFIC += -DSTXXL_DIRECT_IO_OFF
+
+# STXXL_SPECIFIC += -DSTXXL_CHECK_ORDER_IN_SORTS
 
 # this variable is used internally for development compilations
 GCC=$(COMPILER) -Wall $(LARGE_FILE) $(NO_OVR) $(OPT) $(PROF) $(DEBUG) $(STXXL_SPECIFIC) # -ftemplate-depth-65000

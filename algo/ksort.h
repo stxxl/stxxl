@@ -358,7 +358,7 @@ template < typename block_type,typename run_type , typename key_ext_>
 				 }
 				 wait_all(reqs,reqs + nblocks);
 				 
-				 if(off && (!(keyext(blocks[0][0]) < keyext(last))))
+				 if(off && (keyext(blocks[0][0]) < keyext(last)))
 				 { 
 					 STXXL_MSG("check_sorted_runs  wrong first value in the run "<<irun)
 					 STXXL_MSG(" first value: "<<blocks[0][0]<<" with key"<<keyext(blocks[0][0]))
