@@ -87,17 +87,22 @@ int main()
   input_array_type input;
   output_array_type output;
   
+  stxxl::stats * s = stxxl::stats::get_instance();
+	
+  std::cout << *s;
+	
   fill_input_array(input,phrase);
   
   output.resize(input.size());
   
+	
   // HERE streaming part begins (streamifying)
   // create input stream
   typedef typeof(streamify(input.begin(),input.end())) input_stream_type;
   //input_stream_type input_stream = streamify(input.begin(),input.end());
-  input_stream_type input_stream = streamify(input.begin(),input.begin());
+  input_stream_type input_stream = streamify(input.begin(),input.end());
   
-  
+
   // create counter stream
   typedef typeof(streamify(counter_type())) counter_stream_type;
   counter_stream_type counter_stream = streamify(counter_type());
@@ -137,5 +142,7 @@ int main()
   {
     STXXL_MSG("('"<<output[i].first<<"',"<<output[i].second<<")")
   }
+
+  std::cout << *s;
   
 }

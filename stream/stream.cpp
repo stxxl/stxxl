@@ -37,12 +37,16 @@ struct Cmp
 
 using namespace stxxl;
 
-#define MULT (2)
+#define MULT (1000)
 
 int main()
 {
 	typedef stream::runs_creator<Input,Cmp,4096*MULT,stxxl::RC> CreateRunsAlg;
 	typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
+
+  stxxl::stats * s = stxxl::stats::get_instance();
+	
+  std::cout << *s;
 	
   STXXL_MSG("Size of block type "<<sizeof(CreateRunsAlg::block_type))
     unsigned size = MULT*1024*128/(sizeof(Input::value_type)*2);
@@ -68,8 +72,7 @@ int main()
   assert(is_sorted(array.begin(),array.end(),Cmp()));
   assert(merger.empty());
   
-  
+  std::cout << *s;
   
 	return 0;
 }
-
