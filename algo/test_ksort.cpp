@@ -32,8 +32,8 @@ struct my_type
 	char _data[RECORD_SIZE - sizeof(key_type)];
 	key_type key() const {return _key; };
 	
-	my_type() {};
-	my_type(key_type __key):_key(__key) {};
+	my_type() {}
+	my_type(key_type __key):_key(__key) {}
 	
 	static my_type min_value(){ return my_type(0); };
 	static my_type max_value(){ return my_type(0xffffffff); };
@@ -44,6 +44,11 @@ bool operator < (const my_type & a, const my_type & b)
 	return a.key() < b.key();
 }
 
+std::ostream & operator << (std::ostream & o, const my_type & a)
+{
+	o << a.key() ;
+	return o;
+}
 
 
 #define MB (1024*1024)
@@ -182,4 +187,3 @@ int main(int argc, char * argv[])
 	
 	return 0;
 }
-
