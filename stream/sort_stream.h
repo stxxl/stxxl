@@ -548,7 +548,7 @@ namespace stream
     value_cmp cmp;
     size_type elements_remaining;
     unsigned buffer_pos;
-    block_type current_block;
+    block_type * current_block;
     run_type consume_seq;
     prefetcher_type * prefetcher;
     looser_tree_type * loosers;
@@ -581,6 +581,8 @@ namespace stream
 	 #ifdef STXXL_CHECK_ORDER_IN_SORTS
 	 assert(check_sorted_runs(r,c));
 	 #endif
+
+	  current_block = new block_type;
 		
       disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
       
@@ -658,8 +660,8 @@ namespace stream
     
       loosers  =  new looser_tree_type(prefetcher, nruns,run_cursor2_cmp_type(cmp));
       
-      loosers->multi_merge(current_block.elem);
-      current_value = current_block.elem[0];
+      loosers->multi_merge(current_block->elem);
+      current_value = current_block->elem[0];
       buffer_pos = 1;
     }
     
@@ -677,19 +679,19 @@ namespace stream
       
       if(buffer_pos != block_type::size)
       {
-        current_value = current_block.elem[buffer_pos];
+        current_value = current_block->elem[buffer_pos];
         ++buffer_pos;
       }
       else
       {
         if(!empty())
         {
-          loosers->multi_merge(current_block.elem);
+          loosers->multi_merge(current_block->elem);
 		  #ifdef STXXL_CHECK_ORDER_IN_SORTS
-		  assert(is_sorted(current_block.elem,current_block.elem +current_block.size,cmp));
-		  assert(!cmp(current_block.elem[0],current_value));
+		  assert(is_sorted(current_block->elem,current_block->elem +current_block->size,cmp));
+		  assert(!cmp(current_block->elem[0],current_value));
 		  #endif 
-          current_value = current_block.elem[0];  
+          current_value = current_block->elem[0];  
           buffer_pos = 1;
         }
       }
@@ -717,7 +719,7 @@ namespace stream
       delete loosers;
       delete prefetcher;
       delete [] prefetch_seq;
-      
+      delete current_block;
       block_manager * bm = block_manager::get_instance();
       // free blocks in runs
       for(unsigned i=0;i<sruns.runs.size();++i)

@@ -37,18 +37,20 @@ struct Cmp
 
 using namespace stxxl;
 
+#define MULT (1024/2)
+
 int main()
 {
-	typedef stream::runs_creator<Input,Cmp,4096,stxxl::RC> CreateRunsAlg;
+	typedef stream::runs_creator<Input,Cmp,4096*MULT,stxxl::RC> CreateRunsAlg;
 	typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 	
-  unsigned size = 30*1024*128/(sizeof(Input::value_type)*2);
+    unsigned size = MULT*1024*128/(sizeof(Input::value_type)*2);
 	Input in(size+1);
-	CreateRunsAlg SortedRuns(in,Cmp(),1024*128);
+	CreateRunsAlg SortedRuns(in,Cmp(),1024*128*MULT);
 	SortedRunsType Runs = SortedRuns.result();
 	assert(check_sorted_runs(Runs,Cmp()));	
 	// merge the runs
-  stream::runs_merger<SortedRunsType,Cmp> merger(Runs,Cmp(),1024*128/10);
+  stream::runs_merger<SortedRunsType,Cmp> merger(Runs,Cmp(),MULT*1024*128);
   std::vector<Input::value_type> array;
   STXXL_MSG(size << " "<<Runs.elements)
   STXXL_MSG("CRC: "<<in.crc)
