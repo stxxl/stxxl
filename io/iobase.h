@@ -308,7 +308,7 @@ __STXXL_BEGIN_NAMESPACE
 		}
 	};
 	
-	std::ostream & operator << (std::ostream & out, const request & req)  
+	inline std::ostream & operator << (std::ostream & out, const request & req)  
 	{
 			return req.print(out);
 	}
