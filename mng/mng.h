@@ -227,7 +227,7 @@ __STXXL_BEGIN_NAMESPACE
 		
 		typedef BID<RawSize_> bid_type;
 		
-		typed_block() { STXXL_VERBOSE2("typed_block()")  };
+		typed_block() {  STXXL_VERBOSE2("typed_block()")  };
 
 		enum
 		{ 
@@ -281,7 +281,7 @@ __STXXL_BEGIN_NAMESPACE
 		{
 			aligned_dealloc < BLOCK_ALIGN > (ptr);
 		}
-		virtual ~typed_block()
+		~typed_block()
 		{
 			STXXL_VERBOSE2("~typed_block()") 
 		}
