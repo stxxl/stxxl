@@ -16,3 +16,7 @@ write_pool: write_pool.cpp $(DEPENDENCIES)
 
 prefetch_pool: prefetch_pool.cpp $(DEPENDENCIES)
 	$(GCC) prefetch_pool.cpp -o test_prefetch_pool $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=2
+
+test1: test_1.cpp $(DEPENDENCIES)
+	$(GCC) test_1.cpp -o test_1 $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=0
+

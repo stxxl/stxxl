@@ -79,6 +79,7 @@ namespace stream
     Input_ & input;
     Cmp_ cmp;
   public:
+	typedef Cmp_ cmp_type;
 	typedef typename Input_::value_type value_type;
     typedef BID<BlockSize_> bid_type;
     typedef typed_block<BlockSize_,value_type> block_type;
@@ -352,6 +353,7 @@ namespace stream
   {
     Cmp_ cmp;
   public:
+	typedef Cmp_ cmp_type;
 	typedef ValueType_ value_type;
     typedef BID<BlockSize_> bid_type;
     typedef typed_block<BlockSize_,value_type> block_type;
@@ -568,6 +570,7 @@ namespace stream
     Cmp_ cmp;
 	 
   public:
+	typedef Cmp_ cmp_type;
     typedef sorted_runs<value_type,trigger_entry_type> sorted_runs_type;
   private:
     typedef typename sorted_runs_type::run_type run_type;

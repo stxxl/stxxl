@@ -1081,6 +1081,9 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	template < unsigned BLK_SIZE >
 	void block_manager::delete_block (const BID < BLK_SIZE > &bid)
 	{
+		//assert(bid.storage->get_disk_number () < config::get_instance ()->disks_number ());
+		if (bid.storage->get_disk_number () == -1) return; // self managed disk
+		assert(bid.storage->get_disk_number () >= 0 );
 		disk_allocators[bid.storage->get_disk_number ()]->delete_block (bid);
 	}
 
