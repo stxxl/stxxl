@@ -199,7 +199,7 @@ extern double stxxl::wait_time_counter;
 		//!  \c wait_any and
 		//!  \c wait_all 
 		//! \return number of seconds
-		double get_io_wait_time() { return -1.0; }
+		double get_io_wait_time() const { return -1.0; }
 		//! \brief Increments I/O wait time counter
 		//! \param val increment value in seconds
 		//! \return new value of I/O wait time counter in seconds
