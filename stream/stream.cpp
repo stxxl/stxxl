@@ -37,7 +37,7 @@ struct Cmp
 
 using namespace stxxl;
 
-#define MULT (1024/2)
+#define MULT (2)
 
 int main()
 {

@@ -3,7 +3,7 @@
 # change to make or gmake
 MAKE = make
 # change to the name of your compiler
-COMPILER = g++-3.2 # we support only g++ >= 3.2
+COMPILER = g++-3.3 # we support only g++ >= 3.2
 
 # change this path
 STXXL_ROOT = /home/rdementi/projects/stxxl
@@ -31,7 +31,7 @@ ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/ru
 
 STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 
-STXXL_SPECIFIC = -DSORT_OPT_PREFETCHING -DUSE_MALLOC_LOCK
+STXXL_SPECIFIC = -DSORT_OPT_PREFETCHING -DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME
 LARGE_FILE = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 NO_OVR = #  -DNO_OVERLAPPING
 PROF = # -DSTXXL_THREAD_PROFILING -pg
