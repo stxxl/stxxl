@@ -996,7 +996,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		{
 			disk_files[i] = fc.create (cfg->disk_io_impl (i),
 						   cfg->disk_path (i),
-						   stxxl::file::CREAT | stxxl::file::RDWR  //| stxxl::file::DIRECT
+						   stxxl::file::CREAT | stxxl::file::RDWR  | stxxl::file::DIRECT
 						   ,i);
 			disk_files[i]->set_size (cfg->disk_size (i));
 			disk_allocators[i] = new DiskAllocator (cfg->disk_size (i));
