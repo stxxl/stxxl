@@ -60,8 +60,12 @@ namespace stxxl
 			BlkSize_,PgTp_,PgSz_ > _Self;
 		typedef const_vector_iterator < Tp_, AllocStr_, SzTp_,DiffTp_,
 			BlkSize_,PgTp_,PgSz_ > _CIterator;
+		
 		friend class _CIterator;
 public:
+		typedef _CIterator const_iterator;
+		typedef _Self iterator;
+
 		typedef SzTp_ size_type;
 		typedef DiffTp_ difference_type;
 		typedef unsigned block_offset_type;
@@ -190,7 +194,11 @@ public:
 			BlkSize_,PgTp_,PgSz_ > _Self;
 		typedef vector_iterator < Tp_, AllocStr_, SzTp_,DiffTp_,
 			BlkSize_,PgTp_,PgSz_ > _NonConstIterator;
+		
 public:
+		typedef _Self const_iterator;
+		typedef _NonConstIterator iterator;
+
 		typedef SzTp_ size_type;
 		typedef DiffTp_ difference_type;
 		typedef unsigned block_offset_type;

@@ -174,7 +174,7 @@ public:
 	}
 	
 	//! \brief Flushes not yet written buffers and frees used memory
-	~buffered_writer ()
+	virtual ~buffered_writer ()
 	{
 		int ibuffer;
 		while (!batch_write_blocks.empty ())

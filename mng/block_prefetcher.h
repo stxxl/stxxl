@@ -155,6 +155,9 @@ public:
 	//! \brief Frees used memory
 	~block_prefetcher()
 	{
+		for(int i = 0 ; i< nreadblocks ; ++i)
+			if(read_reqs[i].valid()) read_reqs[i]->wait();
+		
 		delete [] completed;
 		delete [] pref_buffer;
 		delete [] read_buffers;

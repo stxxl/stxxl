@@ -73,6 +73,54 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 	return _functor;
 }
 
+
+//! \brief External equivalent of std::generate
+//! \remark The implementation exploits \c \<stxxl\> buffered streams (computation and I/O overlapped)
+//! \param _begin object of model of \c ext_random_access_iterator concept
+//! \param _end object of model of \c ext_random_access_iterator concept
+//! \param _generator function object of model of \c std::Generator concept 
+//! \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D )
+template <typename _ExtIterator,typename _Generator>
+void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator,int nbuffers)
+{
+	typedef typename _ExtIterator::block_type block_type;
+	typedef buf_ostream<block_type, typename _ExtIterator::bids_container_iterator> buf_ostream_type;
+	
+	
+	while(_begin.block_offset()) //  go to the beginning of the block 
+								 //  of the external vector
+	{
+		if(_begin==_end) return;
+		*_begin = _generator();
+      	++_begin;
+	}
+	  
+	_begin.flush(); // flush container
+	
+	// create buffered write stream for blocks
+	buf_ostream_type outstream(_begin.bid(),nbuffers); 
+	
+	assert(_begin.block_offset() == 0);
+	
+	while(_end != _begin)
+	{
+		if(_begin.block_offset() == 0) _begin.touch();
+		*outstream  = _generator();
+		++_begin;
+		++outstream;
+	}
+	
+	typename _ExtIterator::const_iterator out = _begin;
+	
+	while(out.block_offset()) // filling the rest of the block
+	{
+		*outstream =  * out;
+		++out;
+		++outstream;
+	}
+	_begin.flush();
+}
+
 //! \brief External equivalent of std::find
 //! \remark The implementation exploits \c \<stxxl\> buffered streams (computation and I/O overlapped)
 //! \param _begin object of model of \c ext_random_access_iterator concept

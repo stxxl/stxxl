@@ -133,7 +133,7 @@ __STXXL_BEGIN_NAMESPACE
 	public:
 		virtual ~ufs_request_base ()
 		{
-      STXXL_VERBOSE3("ufs_request_base "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
+      		STXXL_VERBOSE3("ufs_request_base "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
 			_state.wait_for (READY2DIE);
 		};
 

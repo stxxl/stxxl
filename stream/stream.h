@@ -242,7 +242,7 @@ namespace stream
 	  
 	  
 	while(outbegin.block_offset()) //  go to the beginning of the block 
-													//  of the external vector
+								   //  of the external vector
 	{
 		if(in.empty() || outbegin==outend) return outbegin;
 		*outbegin = *in;
