@@ -973,6 +973,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		//! Allocates new blocks according to the strategy 
 		//! given by \b functor and stores block identifiers
 		//! to the output iterator \b out
+		//! \param nblocks the number of blocks to allocate
 		//! \param functor object of model of \b allocation_strategy concept
 		//! \param out iterator object of OutputIterator concept
 		template < class DiskAssgnFunctor, class BIDIteratorClass >
