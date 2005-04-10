@@ -1,4 +1,0 @@
-disk=/mnt/hdq/stxxl,70000,syscall
-disk=/mnt/hdi/stxxl,70000,syscall
-disk=/mnt/hdk/stxxl,70000,syscall
-disk=/mnt/hde/stxxl,70000,syscall
