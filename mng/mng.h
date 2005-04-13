@@ -494,7 +494,17 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		{
 			STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
 				" bytes requested, " << free_bytes <<
-				" bytes free, aborting." )
+				" bytes free" )
+			STXXL_ERRMSG("Memory regions dump:")
+			off_t total = 0;
+			sortseq::const_iterator cur =	free_space.begin ();
+			for(;cur!=free_space.end();++cur)
+			{
+				STXXL_ERRMSG("Free chunk: begin: "<<(cur->first)<<" size: "<<(cur->second))
+				total += cur->second;
+			}
+			STXXL_ERRMSG("Total bytes: "<<total)
+			STXXL_ERRMSG("Aborting.")
 			abort();
 		}
 	}
