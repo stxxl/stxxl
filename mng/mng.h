@@ -427,6 +427,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		off_t free_bytes;
 		off_t disk_bytes;
 	
+		void dump();
+	
   public:
 		DiskAllocator (off_t disk_size);
 
@@ -441,6 +443,10 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
 		template < unsigned BLK_SIZE >
 		void new_blocks (BIDArray < BLK_SIZE > &bids);
+		
+		template < unsigned BLK_SIZE >
+		void new_blocks (BID< BLK_SIZE > * begin,
+									 BID< BLK_SIZE > * end);
 		
 		template < unsigned BLK_SIZE >
 		void delete_blocks (const BIDArray < BLK_SIZE > &bids);
@@ -459,43 +465,77 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
   template < unsigned BLK_SIZE >
 		void DiskAllocator::new_blocks (BIDArray < BLK_SIZE > & bids)
 	{
-    STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
-      << ", free:" << free_bytes << " total:"<< disk_bytes)
+		new_blocks(bids.begin(),bids.end());
+	}
+  
+	template < unsigned BLK_SIZE >
+		void DiskAllocator::new_blocks (BID<BLK_SIZE> * begin,
+															  BID<BLK_SIZE> * end)
+	{
+   
+	STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
+      << ", free:" << free_bytes << " total:"<< disk_bytes<<
+		" begin: "<<((void*)(begin))<<" end: "<<((void*)(end)))
     
 		off_t requested_size = 0;
-    	unsigned i = 0;
-    	for(;i<bids.size();i++)
+    	
+		typename BIDArray<BLK_SIZE>::iterator cur = begin;
+    	for(;cur != end;++cur)
     	{
-      		STXXL_VERBOSE2("Asking for a block with size: "<<bids[i].size)
-      		//assert(bids[i].size);
-      		requested_size += bids[i].size;
+      		STXXL_VERBOSE2("Asking for a block with size: "<< (cur->size) )
+      		requested_size += cur->size;
     	}
-    
+		
+    	// dump();
+		
 		sortseq::iterator space = 
 			std::find_if (free_space.begin (), free_space.end (),
 				      bind2nd(FirstFit (), requested_size));
 
 		if (space != free_space.end ())
-		{
+		{	
 			off_t region_pos = (*space).first;
 			off_t region_size = (*space).second;
 			free_space.erase (space);
 			if (region_size > requested_size)
 				free_space[region_pos + requested_size] = region_size - requested_size;
 
-      		bids[0].offset = region_pos;
-			for (i = 1; i < bids.size (); i++)
+      		begin->offset = region_pos;
+			for (++begin; begin != end; ++begin)
 			{
-				bids[i].offset = bids[i-1].offset + bids[i-1].size;
+				begin->offset = (begin-1)->offset + (begin-1)->size;
 			}
 			free_bytes -= requested_size;
+			//dump();
+			return;
 		}
-		else
+		
+		// no contiguous region found
+		STXXL_VERBOSE1("Warning, when allocation a external memory space, no contiguos region found")
+		STXXL_VERBOSE1("It might harm the performance")
+		if(requested_size <= BLK_SIZE )
 		{
 			STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
-				" bytes requested, " << free_bytes <<
-				" bytes free" )
-			STXXL_ERRMSG("Memory regions dump:")
+			" bytes requested, " << free_bytes <<
+			" bytes free" )
+			if(free_bytes>=requested_size)
+				STXXL_ERRMSG("Too severe external memory space defragmentation.")
+			
+			dump();
+			
+			STXXL_ERRMSG("Aborting.")
+			abort();
+		}
+		assert(end-begin > 1);
+		
+		typename  BIDArray<BLK_SIZE>::iterator middle =  begin + ((end-begin)/2);
+		new_blocks(begin,middle);
+		new_blocks(middle,end);
+	
+	}
+  
+	void DiskAllocator::dump()
+	{
 			off_t total = 0;
 			sortseq::const_iterator cur =	free_space.begin ();
 			for(;cur!=free_space.end();++cur)
@@ -504,12 +544,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 				total += cur->second;
 			}
 			STXXL_ERRMSG("Total bytes: "<<total)
-			STXXL_ERRMSG("Aborting.")
-			abort();
-		}
 	}
-  
-
 
 	template < unsigned BLK_SIZE >
 		void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
@@ -518,29 +553,37 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
       << ", free:" << free_bytes << " total:"<< disk_bytes)
     STXXL_VERBOSE2("Deallocating a block with size: "<<bid.size)
     //assert(bid.size);
+    	
+		//dump();
 		off_t region_pos = bid.offset;
 		off_t region_size = bid.size;
-		sortseq::iterator succ = free_space.upper_bound (region_pos);
-		sortseq::iterator pred = succ;
-		pred--;
-		if (succ != free_space.end ()
-		    && (*succ).first == region_pos + region_size)
+		STXXL_VERBOSE2("Deallocating a block with size: "<<region_size<<" position: "<<region_pos)
+		if(!free_space.empty())
 		{
-			// coalesce with successor
-			region_size += (*succ).second;
-			free_space.erase (succ);
-		}
-		if (pred != free_space.end ()
-		    && (*pred).first + (*pred).second == region_pos)
-		{
-			// coalesce with predecessor
-			region_size += (*pred).second;
-			region_pos = (*pred).first;
-			free_space.erase (pred);
+			sortseq::iterator succ = free_space.upper_bound (region_pos);
+			sortseq::iterator pred = succ;
+			pred--;
+			if (succ != free_space.end ()
+				&& (*succ).first == region_pos + region_size)
+			{
+				// coalesce with successor
+				region_size += (*succ).second;
+				free_space.erase (succ);
+			}
+			if (pred != free_space.end ()
+				&& (*pred).first + (*pred).second == region_pos)
+			{
+				// coalesce with predecessor
+				region_size += (*pred).second;
+				region_pos = (*pred).first;
+				free_space.erase (pred);
+			}
 		}
 
 		free_space[region_pos] = region_size;
 		free_bytes += off_t (bid.size);
+		
+		//dump();
 	}
 
 	template < unsigned BLK_SIZE >
@@ -554,36 +597,39 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		{
 			off_t region_pos = bids[i].offset;
 			off_t region_size = bids[i].size;
-      STXXL_VERBOSE2("Deallocating a block with size: "<<region_size)
-      assert(bids[i].size);
+      		STXXL_VERBOSE2("Deallocating a block with size: "<<region_size)
+      		assert(bids[i].size);
       
-			sortseq::iterator succ =
-				free_space.upper_bound (region_pos);
-			sortseq::iterator pred = succ;
-			pred--;
-
-			if (succ != free_space.end ()
-			    && (*succ).first == region_pos + region_size)
+			if(!free_space.empty())
 			{
-				// coalesce with successor
-
-				region_size += (*succ).second;
-				free_space.erase (succ);
+				sortseq::iterator succ =
+					free_space.upper_bound (region_pos);
+				sortseq::iterator pred = succ;
+				pred--;
+	
+				if (succ != free_space.end ()
+					&& (*succ).first == region_pos + region_size)
+				{
+					// coalesce with successor
+	
+					region_size += (*succ).second;
+					free_space.erase (succ);
+				}
+				if (pred != free_space.end ()
+					&& (*pred).first + (*pred).second == region_pos)
+				{
+					// coalesce with predecessor
+	
+					region_size += (*pred).second;
+					region_pos = (*pred).first;
+					free_space.erase (pred);
+				}
 			}
-			if (pred != free_space.end ()
-			    && (*pred).first + (*pred).second == region_pos)
-			{
-				// coalesce with predecessor
-
-				region_size += (*pred).second;
-				region_pos = (*pred).first;
-				free_space.erase (pred);
-			}
-
 			free_space[region_pos] = region_size;
+			
 		};
-    for(;i<bids.size();i++)
-      free_bytes += off_t(bids[i].size);
+    	for(;i<bids.size();i++)
+      			free_bytes += off_t(bids[i].size);
 	}
 
 	//! \brief Access point to disks properties
