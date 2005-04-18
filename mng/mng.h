@@ -447,9 +447,9 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		template < unsigned BLK_SIZE >
 		void new_blocks (BID< BLK_SIZE > * begin,
 									 BID< BLK_SIZE > * end);
-		
+/*		
 		template < unsigned BLK_SIZE >
-		void delete_blocks (const BIDArray < BLK_SIZE > &bids);
+		void delete_blocks (const BIDArray < BLK_SIZE > &bids); */
 		template < unsigned BLK_SIZE > 
 		void delete_block (const BID <BLK_SIZE > & bid);
 	};
@@ -585,7 +585,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		
 		//dump();
 	}
-
+/*
 	template < unsigned BLK_SIZE >
 		void DiskAllocator::delete_blocks (const BIDArray < BLK_SIZE > &bids)
 	{
@@ -593,7 +593,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
       ", free:" << free_bytes << " total:"<< disk_bytes )
     
     	unsigned i=0;
-		for (; i < bids.size (); i++)
+		for (; i < bids.size (); ++i)
 		{
 			off_t region_pos = bids[i].offset;
 			off_t region_size = bids[i].size;
@@ -627,10 +627,10 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			}
 			free_space[region_pos] = region_size;
 			
-		};
-    	for(;i<bids.size();i++)
+		}
+    	for(i=0;i<bids.size();++i)
       			free_bytes += off_t(bids[i].size);
-	}
+	} */
 
 	//! \brief Access point to disks properties
 	//! \remarks is a singleton
