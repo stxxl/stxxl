@@ -656,8 +656,6 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 	unsigned n=0;
 	block_manager *mng = block_manager::get_instance ();
 	
-	
-	
 	first.flush();
 	
 	if((last - first)*sizeof(value_type) < M)
