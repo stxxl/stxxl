@@ -563,20 +563,47 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			sortseq::iterator succ = free_space.upper_bound (region_pos);
 			sortseq::iterator pred = succ;
 			pred--;
-			if (succ != free_space.end ()
-				&& (*succ).first == region_pos + region_size)
+			if(succ == free_space.end ())
 			{
-				// coalesce with successor
-				region_size += (*succ).second;
-				free_space.erase (succ);
-			}
-			if (pred != free_space.end ()
+				if (pred != free_space.end ()
 				&& (*pred).first + (*pred).second == region_pos)
+				{
+					// coalesce with predecessor
+					region_size += (*pred).second;
+					region_pos = (*pred).first;
+					free_space.erase (pred);
+				}
+			}
+			else
 			{
-				// coalesce with predecessor
-				region_size += (*pred).second;
-				region_pos = (*pred).first;
-				free_space.erase (pred);
+				if(free_space.size() > 1 )
+				{
+					if (succ != free_space.end ()
+					&& (*succ).first == region_pos + region_size)
+					{
+						// coalesce with successor
+						region_size += (*succ).second;
+						free_space.erase (succ);
+					}
+					if (pred != free_space.end ()
+						&& (*pred).first + (*pred).second == region_pos)
+					{
+						// coalesce with predecessor
+						region_size += (*pred).second;
+						region_pos = (*pred).first;
+						free_space.erase (pred);
+					}
+				}
+				else
+				{
+						if (succ != free_space.end ()
+							&& (*succ).first == region_pos + region_size)
+						{
+							// coalesce with successor
+							region_size += (*succ).second;
+							free_space.erase (succ);
+						}
+				}	
 			}
 		}
 
