@@ -565,8 +565,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			pred--;
 			if(succ == free_space.end ())
 			{
-				if (pred != free_space.end ()
-				&& (*pred).first + (*pred).second == region_pos)
+				assert(pred != free_space.end ());
+				if ((*pred).first + (*pred).second == region_pos)
 				{
 					// coalesce with predecessor
 					region_size += (*pred).second;
@@ -578,15 +578,14 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			{
 				if(free_space.size() > 1 )
 				{
-					if (succ != free_space.end ()
-					&& (*succ).first == region_pos + region_size)
+					if ((*succ).first == region_pos + region_size)
 					{
 						// coalesce with successor
 						region_size += (*succ).second;
 						free_space.erase (succ);
 					}
-					if (pred != free_space.end ()
-						&& (*pred).first + (*pred).second == region_pos)
+					assert(pred != free_space.end ());
+					if ((*pred).first + (*pred).second == region_pos)
 					{
 						// coalesce with predecessor
 						region_size += (*pred).second;
@@ -596,8 +595,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 				}
 				else
 				{
-						if (succ != free_space.end ()
-							&& (*succ).first == region_pos + region_size)
+						if ((*succ).first == region_pos + region_size)
 						{
 							// coalesce with successor
 							region_size += (*succ).second;
