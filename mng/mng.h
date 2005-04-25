@@ -521,6 +521,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			if(free_bytes>=requested_size)
 				STXXL_ERRMSG("Too severe external memory space defragmentation.")
 			
+			STXXL_ERRMSG("Free regions dump:")
 			dump();
 			
 			STXXL_ERRMSG("Aborting.")

@@ -82,6 +82,18 @@ struct cmp_type
   value_type max_value() const  { return value_type(std::numeric_limits<char>::max(),0); }
 };
 
+struct cmp_int
+{
+  typedef int value_type;
+  bool operator () (const value_type & a, const value_type & b) const
+  {
+    return a > b;
+  }
+  
+  value_type max_value() const  { return (std::numeric_limits<value_type>::min()); }
+  value_type min_value() const  { return (std::numeric_limits<value_type>::max()); }
+};
+
 int main()
 {
   input_array_type input;
@@ -144,5 +156,13 @@ int main()
   }
 
   std::cout << *s;
+  
+  std::vector<int> InternalArray(1024*1024);
+  std::sort(InternalArray.begin(),InternalArray.end(),cmp_int());
+  stxxl::sort<1024*1024>(					InternalArray.begin(),
+  															InternalArray.end(),
+  															cmp_int(),
+  															1024*1024*10,
+  															stxxl::RC());
   
 }

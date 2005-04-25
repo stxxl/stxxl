@@ -1281,13 +1281,42 @@ namespace stream
     }
     
   };
-    
   
 //! \}
   
 };
 
+//! \addtogroup stlalgo
+//! \{
 
+//! \brief Sorts range of any random access iterators externally
+
+//! \param begin iterator pointing to the first element of the range
+//! \param end iterator pointing to the last+1 element of the range
+//! \param cmp comparison object
+//! \param MemSize memory to use for sorting (in bytes)
+//! \param AS allocation strategy
+//!
+//! The \c BlockSize template parameter defines the block size to use (in bytes)
+//! \warning Slower than External Iterator Sort
+template <	unsigned BlockSize, 
+					class RandomAccessIterator, 
+					class CmpType, 
+				   	class  AllocStr>
+void sort(RandomAccessIterator begin, 
+				RandomAccessIterator end, 
+				CmpType cmp, 
+				unsigned MemSize,
+				AllocStr  AS)
+{
+	typedef typeof(stream::streamify(begin,end)) InputType;
+	InputType Input(begin,end);
+	typedef stream::sort<InputType,CmpType,BlockSize,AllocStr> sorter_type;
+	sorter_type	Sort(Input, cmp, MemSize);
+	stream::materialize(Sort, begin);
+}  
+
+//! \}
 
 __STXXL_END_NAMESPACE
 
