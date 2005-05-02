@@ -521,7 +521,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			if(free_bytes>=requested_size)
 				STXXL_ERRMSG("Too severe external memory space defragmentation.")
 			
-			STXXL_ERRMSG("Free regions dump:")
+			
 			dump();
 			
 			STXXL_ERRMSG("Aborting.")
@@ -539,6 +539,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	{
 			off_t total = 0;
 			sortseq::const_iterator cur =	free_space.begin ();
+			STXXL_ERRMSG("Free regions dump:")
 			for(;cur!=free_space.end();++cur)
 			{
 				STXXL_ERRMSG("Free chunk: begin: "<<(cur->first)<<" size: "<<(cur->second))
@@ -566,7 +567,17 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			pred--;
 			if(succ == free_space.end ())
 			{
-				assert(pred != free_space.end ());
+				if(pred == free_space.end ())
+				{
+					STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
+					STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"))
+					STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"))
+					STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"))
+					STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"))
+					STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
+					dump();
+					assert(pred != free_space.end ());
+				}
 				if ((*pred).first + (*pred).second == region_pos)
 				{
 					// coalesce with predecessor
@@ -579,13 +590,34 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			{
 				if(free_space.size() > 1 )
 				{
+					if(pred == succ)
+					{
+						STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
+						STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"))
+						STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"))
+						STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"))
+						STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"))
+						STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
+						dump();
+						assert(pred != succ);
+					}
 					if ((*succ).first == region_pos + region_size)
 					{
 						// coalesce with successor
 						region_size += (*succ).second;
 						free_space.erase (succ);
 					}
-					assert(pred != free_space.end ());
+					if(pred == free_space.end ())
+					{
+						STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
+						STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"))
+						STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"))
+						STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"))
+						STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"))
+						STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
+						dump();
+						assert(pred != free_space.end ());
+					}
 					if ((*pred).first + (*pred).second == region_pos)
 					{
 						// coalesce with predecessor
