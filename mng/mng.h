@@ -540,7 +540,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			off_t total = 0;
 			sortseq::const_iterator cur =	free_space.begin ();
 			STXXL_ERRMSG("Free regions dump:")
-			for(;cur!=free_space.end();++cur)
+			for(;cur!=free_space.end();++cur)	
 			{
 				STXXL_ERRMSG("Free chunk: begin: "<<(cur->first)<<" size: "<<(cur->second))
 				total += cur->second;
@@ -589,7 +589,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			else
 			{
 				if(free_space.size() > 1 )
-				{
+				{ /*
 					if(pred == succ)
 					{
 						STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
@@ -600,30 +600,34 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 						STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
 						dump();
 						assert(pred != succ);
-					}
+					} */
+					bool succ_is_not_the_first = (succ != free_space.begin());
 					if ((*succ).first == region_pos + region_size)
 					{
 						// coalesce with successor
 						region_size += (*succ).second;
 						free_space.erase (succ);
 					}
-					if(pred == free_space.end ())
+					if(succ_is_not_the_first)
 					{
-						STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
-						STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"))
-						STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"))
-						STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"))
-						STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"))
-						STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
-						dump();
-						assert(pred != free_space.end ());
-					}
-					if ((*pred).first + (*pred).second == region_pos)
-					{
-						// coalesce with predecessor
-						region_size += (*pred).second;
-						region_pos = (*pred).first;
-						free_space.erase (pred);
+						if(pred == free_space.end ())
+						{
+							STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
+							STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"))
+							STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"))
+							STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"))
+							STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"))
+							STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
+							dump();
+							assert(pred != free_space.end ());
+						}
+						if ((*pred).first + (*pred).second == region_pos)
+						{
+							// coalesce with predecessor
+							region_size += (*pred).second;
+							region_pos = (*pred).first;
+							free_space.erase (pred);
+						}
 					}
 				}
 				else
