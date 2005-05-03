@@ -43,10 +43,10 @@ __STXXL_BEGIN_NAMESPACE
 			t_size = SIZE	//!< Blocks size, given by the parameter
 		};
 		file * storage; //!< pointer to the file of the block
-		off_t offset; //!< offset within the file of the block
+		stxxl::int64 offset; //!< offset within the file of the block
     	BID():storage(NULL),offset(0) {}
     	bool valid() const { return storage; }
-		BID(file * s, off_t o) : storage(s), offset(o) {}
+		BID(file * s, stxxl::int64 o) : storage(s), offset(o) {}
 	};
 
   //! \brief Specialization of block identifier class (BID) for variable size block size
@@ -56,14 +56,14 @@ __STXXL_BEGIN_NAMESPACE
   struct BID<0>
 	{
 		file * storage; //!< pointer to the file of the block
-		off_t offset; //!< offset within the file of the block
+		stxxl::int64 offset; //!< offset within the file of the block
     unsigned size;  //!< size of the block in bytes
 		enum 
 		{
 			t_size = 0	//!< Blocks size, given by the parameter
 		};
     BID():storage(NULL),offset(0),size(0) {}
-    BID(file * f, off_t o, unsigned s) : storage(f), offset(o), size(s) {}
+    BID(file * f, stxxl::int64 o, unsigned s) : storage(f), offset(o), size(s) {}
     bool valid() const { return storage; }
 	};
   
@@ -398,19 +398,19 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
 	class DiskAllocator
 	{
-		typedef std::pair < off_t, off_t > place;
-		struct FirstFit:public std::binary_function < place, off_t,bool >
+		typedef std::pair < stxxl::int64, stxxl::int64 > place;
+		struct FirstFit:public std::binary_function < place, stxxl::int64,bool >
 		{
 			bool operator     () (
 								const place & entry,
-					      const off_t size) const
+					      const stxxl::int64 size) const
 			{
 				return (entry.second >= size);
 			}
 		};
 		struct OffCmp
 		{
-			bool operator      () (const off_t & off1,const off_t & off2)
+			bool operator      () (const stxxl::int64 & off1,const stxxl::int64 & off2)
 			{
 				return off1 < off2;
 			};
@@ -421,22 +421,22 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		};
 	protected:
 		
-		typedef std::map < off_t, off_t > sortseq;
+		typedef std::map < stxxl::int64, stxxl::int64 > sortseq;
 		sortseq free_space;
 		//  sortseq used_space;
-		off_t free_bytes;
-		off_t disk_bytes;
+		stxxl::int64 free_bytes;
+		stxxl::int64 disk_bytes;
 	
 		void dump();
 	
   public:
-		DiskAllocator (off_t disk_size);
+		DiskAllocator (stxxl::int64 disk_size);
 
-		off_t get_free_bytes () const
+		stxxl::int64 get_free_bytes () const
 		{
 			return free_bytes;
 		};
-		off_t get_used_bytes () const
+		stxxl::int64 get_used_bytes () const
 		{
 			return disk_bytes - free_bytes;
 		};
@@ -454,7 +454,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		void delete_block (const BID <BLK_SIZE > & bid);
 	};
 
-  DiskAllocator::DiskAllocator (off_t disk_size):
+  DiskAllocator::DiskAllocator (stxxl::int64 disk_size):
 		free_bytes(disk_size),
 		disk_bytes(disk_size)
 	{
@@ -477,7 +477,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
       << ", free:" << free_bytes << " total:"<< disk_bytes<<
 		" begin: "<<((void*)(begin))<<" end: "<<((void*)(end)))
     
-		off_t requested_size = 0;
+		stxxl::int64 requested_size = 0;
     	
 		typename BIDArray<BLK_SIZE>::iterator cur = begin;
     	for(;cur != end;++cur)
@@ -494,8 +494,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
 		if (space != free_space.end ())
 		{	
-			off_t region_pos = (*space).first;
-			off_t region_size = (*space).second;
+			stxxl::int64 region_pos = (*space).first;
+			stxxl::int64 region_size = (*space).second;
 			free_space.erase (space);
 			if (region_size > requested_size)
 				free_space[region_pos + requested_size] = region_size - requested_size;
@@ -537,7 +537,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
   
 	void DiskAllocator::dump()
 	{
-			off_t total = 0;
+			stxxl::int64 total = 0;
 			sortseq::const_iterator cur =	free_space.begin ();
 			STXXL_ERRMSG("Free regions dump:")
 			for(;cur!=free_space.end();++cur)	
@@ -557,8 +557,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     //assert(bid.size);
     	
 		//dump();
-		off_t region_pos = bid.offset;
-		off_t region_size = bid.size;
+		stxxl::int64 region_pos = bid.offset;
+		stxxl::int64 region_size = bid.size;
 		STXXL_VERBOSE2("Deallocating a block with size: "<<region_size<<" position: "<<region_pos)
 		if(!free_space.empty())
 		{
@@ -643,7 +643,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		}
 
 		free_space[region_pos] = region_size;
-		free_bytes += off_t (bid.size);
+		free_bytes += stxxl::int64 (bid.size);
 		
 		//dump();
 	}
@@ -657,8 +657,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     	unsigned i=0;
 		for (; i < bids.size (); ++i)
 		{
-			off_t region_pos = bids[i].offset;
-			off_t region_size = bids[i].size;
+			stxxl::int64 region_pos = bids[i].offset;
+			stxxl::int64 region_size = bids[i].size;
       		STXXL_VERBOSE2("Deallocating a block with size: "<<region_size)
       		assert(bids[i].size);
       
@@ -691,7 +691,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			
 		}
     	for(i=0;i<bids.size();++i)
-      			free_bytes += off_t(bids[i].size);
+      			free_bytes += stxxl::int64(bids[i].size);
 	} */
 
 	//! \brief Access point to disks properties
@@ -702,7 +702,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		{
 			std::string path;
 			std::string io_impl;
-			off_t size;
+			stxxl::int64 size;
 		};
 		std::vector < DiskEntry > disks_props;
 		
@@ -730,7 +730,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		//! \brief Returns disk size
 		//! \param disk disk's identifier
 		//! \return disk size in bytes
-		off_t disk_size (int disk)
+		stxxl::int64 disk_size (int disk)
 		{
 			return disks_props[disk].size;
 		};
@@ -799,8 +799,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 				{
 					tmp = split (tmp[1], ",");
 					DiskEntry entry = { tmp[0], tmp[2],
-							off_t (str2int (tmp[1])) *
-							off_t (1024 * 1024)
+							stxxl::int64 (str2int (tmp[1])) *
+							stxxl::int64 (1024 * 1024)
 					};
 					disks_props.push_back (entry);
 				}

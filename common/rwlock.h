@@ -11,6 +11,9 @@
 
 
 #include "utils.h"
+
+#if 0 // not used
+
 #include <pthread.h>
 
 
@@ -45,5 +48,7 @@ namespace stxxl
 	};
 
 }
+
+#endif
 
 #endif

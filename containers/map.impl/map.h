@@ -76,8 +76,6 @@ __STXXL_END_NAMESPACE
 #define STXXL_ASSERT(expr)
 #endif
 
-#define _SIZE_TYPE 									unsigned long long
+#define _SIZE_TYPE 									stxxl::uint64
 
 #endif // ___MAP_H___
-
-

@@ -250,7 +250,7 @@ void merge4(
   class ext_merger
   {
     public:
-      typedef off_t size_type;
+      typedef stxxl::int64 size_type;
       typedef BlockType_ block_type;
       typedef typename block_type::bid_type bid_type;
       typedef typename block_type::value_type value_type;
@@ -1126,7 +1126,7 @@ public:
   typedef typename Config::comparator_type comparator_type;
   typedef typename Config::alloc_strategy_type alloc_strategy_type; 
   //! \brief An unsigned integral type (64 bit)
-  typedef off_t size_type;
+  typedef stxxl::int64 size_type;
   typedef typed_block<BlockSize,value_type> block_type;
   
   

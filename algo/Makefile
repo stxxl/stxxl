@@ -39,4 +39,4 @@ sort: sort.cpp $(DEPENDENCIES)
 	$(GCC) sort.cpp -o ssort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
 
 clean:
-	rm -f *.o ssort stable_ksort ksort sort_file gen_file test_scan test_asch test_ksort_op test_ksort
+	rm -f *.o *~ ssort stable_ksort ksort sort_file gen_file test_scan test_asch test_ksort_op test_ksort test_sort

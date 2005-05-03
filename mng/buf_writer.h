@@ -45,9 +45,9 @@ protected:
 
 	struct batch_entry
 	{
-		off_t offset;
+		stxxl::int64 offset;
 		int ibuffer;
-		batch_entry (off_t o, int b):offset (o), ibuffer (b) {};
+		batch_entry (stxxl::int64 o, int b):offset (o), ibuffer (b) {};
 	};
 	struct batch_entry_cmp
 	{

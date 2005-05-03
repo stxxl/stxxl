@@ -9,6 +9,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#ifdef STXXL_BOOST_CONFIG
+#include <boost/config.hpp>
+#endif
+
 
 #include <iostream>
 #include <assert.h>
@@ -24,6 +28,10 @@
 #include <math.h>
 #include <vector>
 #include <string>
+
+#ifdef STXXL_BOOST_TIMESTAMP
+#include <boost/date_time/posix_time/posix_time.hpp>
+#endif
 
 #define __STXXL_BEGIN_NAMESPACE namespace stxxl {
 #define __STXXL_END_NAMESPACE }
@@ -106,9 +114,19 @@ stxxl_perror (const char *errmsg, int errcode)
 inline double
 stxxl_timestamp ()
 {
+	#ifdef STXXL_BOOST_TIMESTAMP
+	boost::posix_time::ptime MyTime = boost::posix_time::microsec_clock::local_time();
+	boost::posix_time::time_duration Duration = MyTime.time_of_day();
+	double sec= double(Duration.hours())*3600. +
+						  double(Duration.minutes())*60. +
+						  double(Duration.seconds()) +
+						  double(Duration.fractional_seconds())/(pow(10.,Duration.num_fractional_digits()));
+	return sec;
+	#else
 	struct timeval tp;
 	gettimeofday (&tp, NULL);
 	return double (tp.tv_sec) + tp.tv_usec / 1000000.;
+	#endif
 }
 
 
@@ -236,9 +254,18 @@ inline double io_wait_time()
 
 #endif
 
-
+#ifdef STXXL_BOOST_CONFIG
+	#ifdef BOOST_MSVC
+	typedef __int64 int64;
+	typedef unsigned __int64 uint64;
+	#else
+	typedef long long int int64;
+	typedef unsigned long long uint64;
+	#endif
+#else
 typedef long long int int64;
-
+typedef unsigned long long uint64;
+#endif
 
 /* since STD library lacks following functions in opposite to STL */	
 template <class _Tp>

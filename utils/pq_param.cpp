@@ -1,7 +1,8 @@
 #include <iostream>
 #include <math.h>
+#include "../common/utils.h"
 
-typedef long long int int64;
+typedef stxxl::int64 int64;
 
 int64 D(int64 m, int64 k, int64 MaxS, int64 E, int64 B)
 {

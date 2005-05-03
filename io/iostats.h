@@ -41,7 +41,11 @@ extern double stxxl::wait_time_counter;
 		int acc_ios;
 		int acc_reads, acc_writes;	// number of requests, participating in parallel operation
 		double last_reset;
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex read_mutex, write_mutex, io_mutex;
+		#else
 		mutex read_mutex, write_mutex, io_mutex;
+		#endif
 		static stats * instance;
 		  stats ():
 			reads (0),
@@ -142,7 +146,11 @@ extern double stxxl::wait_time_counter;
 		//! \brief Resets I/O time counters (including I/O wait counter)
 		void reset()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock ReadLock(read_mutex);
+			#else
 			read_mutex.lock ();
+			#endif
 			//      assert(acc_reads == 0);
 			if (acc_reads)
 				STXXL_ERRMSG( "Warning: " << acc_reads <<
@@ -152,8 +160,15 @@ extern double stxxl::wait_time_counter;
 			volume_read = 0;
 			t_reads = 0;
 			p_reads = 0.0;
+			
+			#ifdef STXXL_BOOST_THREADS
+			ReadLock.unlock();
+			boost::mutex::scoped_lock WriteLock(write_mutex);
+			#else
 			read_mutex.unlock ();
 			write_mutex.lock ();
+			#endif
+			
 			//      assert(acc_writes == 0);
 			if (acc_writes)
 				STXXL_ERRMSG("Warning: " << acc_writes <<
@@ -163,17 +178,33 @@ extern double stxxl::wait_time_counter;
 			volume_written = 0;
 			t_writes = 0.0;
 			p_writes = 0.0;
+			
+			#ifdef STXXL_BOOST_THREADS
+			WriteLock.unlock();
+			#else
 			write_mutex.unlock ();
+			#endif
+			
 			last_reset = stxxl_timestamp();
 
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock IOLock(io_mutex);
+			#else
 			io_mutex.lock ();
+			#endif
+			
 			//      assert(acc_ios == 0);
 			if (acc_ios)
 				STXXL_ERRMSG( "Warning: " << acc_ios <<
 					" io(s) not yet finished" )
 
 			p_ios = 0.0;
+			
+			#ifdef STXXL_BOOST_THREADS
+			IOLock.unlock();
+			#else
 			io_mutex.unlock ();
+			#endif
 
 #ifdef COUNT_WAIT_TIME
 			stxxl::wait_time_counter = 0.0;
@@ -215,7 +246,11 @@ extern double stxxl::wait_time_counter;
 	// for library use
 		void write_started (unsigned size_)
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock WriteLock(write_mutex);
+			#else
 			write_mutex.lock ();
+			#endif
 			double now = stxxl_timestamp ();
 			++writes;
 			volume_written += size_;
@@ -223,33 +258,60 @@ extern double stxxl::wait_time_counter;
 			t_writes += double (acc_writes) * diff;
 			p_begin_write = now;
 			p_writes += (acc_writes++) ? diff : 0.0;
+			
+			#ifdef STXXL_BOOST_THREADS
+			WriteLock.unlock();
+			boost::mutex::scoped_lock IOLock(io_mutex);
+			#else
 			write_mutex.unlock ();
-
 			io_mutex.lock ();
+			#endif
+			
 			diff = now - p_begin_io;
 			p_ios += (acc_ios++) ? diff : 0.0;
 			p_begin_io = now;
+			
+			#ifndef STXXL_BOOST_THREADS
 			io_mutex.unlock ();
+			#endif
 		}
 		void write_finished ()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock WriteLock(write_mutex);
+			#else
 			write_mutex.lock ();
+			#endif
+			
 			double now = stxxl_timestamp ();
 			double diff = now - p_begin_write;
 			t_writes += double (acc_writes) * diff;
 			p_begin_write = now;
 			p_writes += (acc_writes--) ? diff : 0.0;
+			
+			#ifdef STXXL_BOOST_THREADS
+			WriteLock.unlock();
+			boost::mutex::scoped_lock IOLock(io_mutex);
+			#else
 			write_mutex.unlock ();
-
 			io_mutex.lock ();
+			#endif
+			
 			diff = now - p_begin_io;
 			p_ios += (acc_ios--) ? diff : 0.0;
 			p_begin_io = now;
+			
+			#ifndef STXXL_BOOST_THREADS
 			io_mutex.unlock ();
+			#endif
 		}
 		void read_started (unsigned size_)
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock ReadLock(read_mutex);
+			#else
 			read_mutex.lock ();
+			#endif
 			double now = stxxl_timestamp ();
 			++reads;
 			volume_read += size_;
@@ -257,29 +319,52 @@ extern double stxxl::wait_time_counter;
 			t_reads += double (acc_reads) * diff;
 			p_begin_read = now;
 			p_reads += (acc_reads++) ? diff : 0.0;
+			
+			#ifdef STXXL_BOOST_THREADS
+			ReadLock.unlock();
+			boost::mutex::scoped_lock IOLock(io_mutex);
+			#else
 			read_mutex.unlock ();
-
 			io_mutex.lock ();
+			#endif
+			
 			diff = now - p_begin_io;
 			p_ios += (acc_ios++) ? diff : 0.0;
 			p_begin_io = now;
+			
+			#ifndef STXXL_BOOST_THREADS
 			io_mutex.unlock ();
+			#endif
 		}
 		void read_finished ()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock ReadLock(read_mutex);
+			#else
 			read_mutex.lock ();
+			#endif
+			
 			double now = stxxl_timestamp ();
 			double diff = now - p_begin_read;
 			t_reads += double (acc_reads) * diff;
 			p_begin_read = now;
 			p_reads += (acc_reads--) ? diff : 0.0;
+			
+			#ifdef STXXL_BOOST_THREADS
+			ReadLock.unlock();
+			boost::mutex::scoped_lock IOLock(io_mutex);
+			#else
 			read_mutex.unlock ();
-
 			io_mutex.lock ();
+			#endif
+			
 			diff = now - p_begin_io;
 			p_ios += (acc_ios--) ? diff : 0.0;
 			p_begin_io = now;
+			
+			#ifndef STXXL_BOOST_THREADS
 			io_mutex.unlock ();
+			#endif
 		}
 	};
 	

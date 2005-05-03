@@ -125,7 +125,11 @@ public:
 		// private memebers
 		std::queue<btree_request_base_ptr>* _p_request_queue;
 		request_ptr                         _sp_io_request;
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex	_node_mutex;
+		#else
 		mutex                               _node_mutex;
+		#endif
 		state                               _state;
 
 
@@ -348,9 +352,17 @@ public:
 		//! destructor
 		~btnode()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			_terminate();
+			#ifdef STXXL_BOOST_THREADS
+			Lock.unlock();
+			#else
 			_node_mutex.unlock();
+			#endif
 			STXXL_VERBOSE3( "btnode\t\t" << this <<": destruction" );
 
 			#ifdef STXXL_BTREE_STATISTIC
@@ -364,31 +376,49 @@ public:
 		// Helpfull functions
 		// -------------------------------------------------------
 
-		//! stes the dirty flag
+		//! sets the dirty flag
 		void set_dirty( bool val)
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			_dirty = val;
+			#else
 			_node_mutex.lock();
 			_dirty = val;
 			_node_mutex.unlock();
+			#endif
 		}
 
 		//! gets the value of dirty flag
 		bool dirty()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			return _dirty;
+			#else
 			_node_mutex.lock();
 			bool ret = _dirty;
 			_node_mutex.unlock();
 			return ret;
+			#endif
 		}
 
 		//! return an iterator to the begin of node
 		iterator begin()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			STXXL_ASSERT( _p_block );
+			_Self *me = this;
+			Lock.unlock();
+			return iterator( me, 0 );
+			#else
 			_node_mutex.lock();
 			STXXL_ASSERT( _p_block );
 			_Self *me = this;
 			_node_mutex.unlock();
 			return iterator( me, 0 );
+			#endif
 		}
 
 		//! return an iterator to the begin of node
@@ -409,22 +439,39 @@ public:
 		//! return an iterator to the element behin last entry of node
 		iterator end()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			STXXL_ASSERT( _p_block );
+			_Self *me = this;
+			Lock.unlock();
+			return iterator( me, _p_block->elem->_cur_count );
+			#else
 			_node_mutex.lock();
 			STXXL_ASSERT( _p_block );
 			_Self *me = this;
 			_node_mutex.unlock();
 			return iterator( me, _p_block->elem->_cur_count );
+			#endif
 		}
 
 		//! return an iterator to the last element of node
 		iterator last()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			STXXL_ASSERT( _p_block );
+			STXXL_ASSERT( _p_block->elem->_cur_count );
+			_Self *me = this;
+			Lock.unlock();
+			return iterator( me,_p_block->elem->_cur_count - 1);
+			#else
 			_node_mutex.lock();
 			STXXL_ASSERT( _p_block );
 			STXXL_ASSERT( _p_block->elem->_cur_count );
 			_Self *me = this;
 			_node_mutex.unlock();
 			return iterator( me,_p_block->elem->_cur_count - 1);
+			#endif
 		}
 
 		//! after a node is readed brodcast all request, waiting for the node
@@ -432,11 +479,15 @@ public:
 		{
 			smart_ptr< btree_request_base> sp_req;
 
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 
 			STXXL_ASSERT( _state() == READING || _state() == WRITING );
 
-			_state = READY;
+			_state.set_to(READY); // was: _state = READY, !! wrong
 			if ( _p_request_queue )
 			{
 				while( !_p_request_queue->empty () )
@@ -448,10 +499,12 @@ public:
 				delete _p_request_queue;
 			}
 			_p_request_queue = NULL;
-			_state = DONE;
+			_state.set_to(DONE); // was: _state = DONE;!
 			_dirty = false;
 
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 		}
 
 		//! adds a new request to the node's requests queue
@@ -459,7 +512,11 @@ public:
 		{
 			smart_ptr<btree_request_base>  sp_req = p_req;
 
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock ();
+			#endif
 
 			switch ( _state() )
 			{
@@ -483,7 +540,9 @@ public:
 					STXXL_ASSERT( 0 );
 					break;
 			}
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 
 			return _sp_io_request;
 		}
@@ -578,13 +637,19 @@ public:
 		// internal delete
 		bool _delete( size_type pos1, size_type pos2 )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			STXXL_ASSERT( _p_block );
 			store_type* ptr = (store_type*) _p_values;
 			_p_block->elem->_cur_count -= pos2 - pos1;
 			while( pos1 != _p_block->elem->_cur_count ) ptr[pos1++] = ptr[pos2++];
 			_dirty = true;
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 			return true;
 		}
 
@@ -592,10 +657,15 @@ public:
 		// Will be used by node caching.
 		int IncLum()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			return _n_ref;
+			#else
 			_node_mutex.lock();
 			int ret = _n_ref;
 			_node_mutex.unlock();
 			return ret;
+			#endif
 		}
 
 	public:
@@ -618,22 +688,34 @@ public:
 		//! access to the entries of node
 		mapped_type& operator [] ( const key_type& key )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			STXXL_ASSERT( _p_store );
 			size_type pos = _find_lower( 0, _p_store->_cur_count, key );
 			_dirty = true;
 			mapped_type& ret = _p_values[ pos ].second;
+			#ifndef  STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 			return ret;
 		}
 
 		//! access to a key
 		key_type get_key_at( size_type pos )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			key_type k = _p_values[ pos ].first;
+			return k;
+			#else
 			_node_mutex.lock();
 			key_type k = _p_values[ pos ].first;
 			_node_mutex.unlock();
 			return k;
+			#endif
 		}
 
 		// ****************************************************
@@ -662,17 +744,27 @@ public:
     //! internal memory allocation
 		void allocate_block( block_manager* p_block_manager )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			_allocate_block( p_block_manager );
+			#else
 			_node_mutex.lock();
 			_allocate_block( p_block_manager );
 			_node_mutex.unlock();
+			#endif
 		}
 
 		//!  internal memory releasing
 		void free_block( block_manager* p_block_manager )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			_free_block( p_block_manager );
+			#else
 			_node_mutex.lock();
 			_free_block( p_block_manager );
 			_node_mutex.unlock();
+			#endif
 		}
 
 		//! relese external memory coresponds to the node
@@ -689,9 +781,15 @@ public:
 		//! external memory read will be call
 		request_ptr read()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			_read();
+			Lock.unlock();
+			#else
 			_node_mutex.lock();
 			_read();
 			_node_mutex.unlock();
+			#endif
 
 			_sp_io_request->wait();
 			return _sp_io_request;
@@ -700,9 +798,17 @@ public:
 		//! external memory write will be call
 		request_ptr write ( async_btnode_manager_base<SIZE_> *p_manager )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			request_ptr ret = _write( p_manager );
+			#ifdef STXXL_BOOST_THREADS
+			Lock.unlock();
+			#else
 			_node_mutex.unlock();
+			#endif
 
 			if ( ret.get() ) ret->wait();
 			return ret;
@@ -807,11 +913,17 @@ public:
 		//! sets BID of the successor of the node
 		void bid_next( stxxl::BID<SIZE_> bid )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			STXXL_ASSERT( _p_block );
 			_dirty = true;
 			_p_block->elem->_bid_next = bid ;
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 		}
 
 		//! returns BID of the predecessor of the node
@@ -827,11 +939,17 @@ public:
 		//! sets BID of the predecessor of the node
 		void bid_prev( stxxl::BID<SIZE_> bid )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			STXXL_ASSERT( _p_block );
 			_dirty = true;
 			_p_block->elem->_bid_prev = bid ;
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 		}
 
 		// this functions are not thread secure.
@@ -849,7 +967,11 @@ public:
 		{
 			iterator ret;
 
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 
 			STXXL_ASSERT( _p_block );
 			size_type pos = _find_lower( 0, _p_block->elem->_cur_count, key );
@@ -858,7 +980,9 @@ public:
 			else
 				ret = iterator( this, pos );
 
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 
 			return ret;
 		}
@@ -866,14 +990,20 @@ public:
 		//! find lower_bound
 		iterator lower_bound( const key_type& key )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 
 			STXXL_ASSERT( _p_block );
 			size_type s = 0;
 			size_type e = _p_block->elem->_cur_count;
 			iterator ret = iterator( this, _find_lower( s, e, key ) );
 
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 
 			return ret;
 		}
@@ -881,7 +1011,11 @@ public:
 		//! find less_bound
 		iterator less_bound( const key_type& key )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			STXXL_ASSERT( _p_block );
 			size_type s = 0;
 			size_type e = _p_block->elem->_cur_count;
@@ -890,7 +1024,9 @@ public:
 			if ( l == 0 ) ret = iterator( this, _p_block->elem->_cur_count);
 			else ret = iterator( this, l - 1);
 
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 
 			return ret;
 		}
@@ -1180,8 +1316,14 @@ public:
 		//! function wich copies some entries from the successor
 		key_type steal_right( _Self& node )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			boost::mutex::scoped_lock NodeLock(node._node_mutex);
+			#else
 			_node_mutex.lock();
 			node._node_mutex.lock();
+			#endif
+			
 
 			STXXL_ASSERT( _p_block );
 			if( !half() ) dump(std::cout);
@@ -1207,8 +1349,10 @@ public:
 			_dirty = true;
 			node._dirty = true;
 
+			#ifndef STXXL_BOOST_THREADS
 			node._node_mutex.unlock();
 			_node_mutex.unlock();
+			#endif
 
 			return ret;
 		}
@@ -1216,8 +1360,13 @@ public:
 		//! function wich copies some entries from the predecessor
 		key_type steal_left( _Self& node )
 		{
-			node._node_mutex.lock();
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			boost::mutex::scoped_lock NodeLock(node._node_mutex);
+			#else
 			_node_mutex.lock();
+			node._node_mutex.lock();
+			#endif
 			STXXL_ASSERT( _p_block );
 			STXXL_ASSERT( half() );
 
@@ -1246,8 +1395,10 @@ public:
 			}
 			_dirty = node._dirty = true;
 
+			#ifndef STXXL_BOOST_THREADS
 			node._node_mutex.unlock();
 			_node_mutex.unlock();
+			#endif
 
 			return ret;
 		}
@@ -1255,12 +1406,18 @@ public:
 		//! function replace only the key of an entry
 		void replace_key( iterator iter, key_type key )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			store_type*	ptr = (store_type*) _p_values;
 			ptr += iter.offset();
 			*ptr = store_type( key, (*ptr).second );
 			_dirty = true;
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 		}
 
 		//! prety print function
@@ -1304,14 +1461,20 @@ public:
 		//! Simple consistency test
 		bool valid()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_node_mutex);
+			#else
 			_node_mutex.lock();
+			#endif
 			_n_ref++;
 			bool ret =
 				_p_block->elem->_cur_count >= 0 &&
 				_p_block->elem->_cur_count <= _max_count && is_sorted( begin(), end(), value_comp() ) ;
 
 			_n_ref--;
+			#ifndef STXXL_BOOST_THREADS
 			_node_mutex.unlock();
+			#endif
 			return ret;
 		}
 
@@ -1429,7 +1592,11 @@ public:
 	template<typename Key_,typename Data_, typename Compare_, unsigned SIZE_,bool unique_,unsigned CACHE_SIZE_>
 	void btnode<Key_,Data_,Compare_,SIZE_,unique_,CACHE_SIZE_>::splitt(btnode<Key_,Data_,Compare_,SIZE_,unique_,CACHE_SIZE_>* p_node)
 	{
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex::scoped_lock Lock(_node_mutex);
+		#else
 		_node_mutex.lock();
+		#endif
 		
 		STXXL_ASSERT( _p_block );
 		STXXL_ASSERT( full() );
@@ -1460,7 +1627,9 @@ public:
 
 		_dirty = true;
 		sp_node->_dirty = true;
+		#ifndef STXXL_BOOST_THREADS
 		_node_mutex.unlock();
+		#endif
 	}
 
 	template<typename Key_,typename Data_, typename Compare_, unsigned SIZE_,bool unique_,unsigned CACHE_SIZE_>
@@ -1470,8 +1639,13 @@ public:
 		// **********************************************************
 		// lock both nodes
 		// **********************************************************
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex::scoped_lock Lock(_node_mutex);
+		boost::mutex::scoped_lock NodeLock(node._node_mutex);
+		#else
 		_node_mutex.lock();
 		node._node_mutex.lock();
+		#endif
 
 		STXXL_ASSERT( _p_block );
 		STXXL_ASSERT( node._p_block );
@@ -1495,8 +1669,10 @@ public:
 		// **********************************************************
 		// unlock both nodes
 		// **********************************************************
+		#ifndef STXXL_BOOST_THREADS
 		node._node_mutex.unlock();
 		_node_mutex.unlock();
+		#endif
  	
 		return ret;
 	} 	

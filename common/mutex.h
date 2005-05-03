@@ -11,6 +11,14 @@
 
 
 #include "utils.h"
+
+#ifdef STXXL_BOOST_THREADS
+
+// stxxl::mutex is not needed since boost:mutex exists
+#include <boost/thread/mutex.hpp>
+
+#else
+
 #include <pthread.h>
 
 namespace stxxl
@@ -46,8 +54,8 @@ namespace stxxl
 			stxxl_nassert(pthread_mutex_unlock (&_mutex));
 		};
 	};
-
-
 };
+
+#endif
 
 #endif

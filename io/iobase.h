@@ -34,7 +34,17 @@
 #include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
+
+#ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
+// Boost.Threads headers
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/bind.hpp>
+
+#else
 #include <pthread.h>
+#endif
+
 #include <string.h>
 #include <errno.h>
 #include <sys/resource.h>
@@ -95,7 +105,7 @@ __STXXL_BEGIN_NAMESPACE
 #define BLOCK_ALIGN 4096
 
 	typedef void *(*thread_function_t) (void *);
-	typedef long long int DISKID;
+	typedef stxxl::int64 DISKID;
 
 	class request;
   class request_ptr;
@@ -149,7 +159,7 @@ __STXXL_BEGIN_NAMESPACE
 		//! \param bytes number of bytes to transfer
 		//! \param on_cmpl I/O completion handler
 		//! \return \c request_ptr object, that can be used to track the status of the operation
-		virtual request_ptr aread (void *buffer, off_t pos, size_t bytes,
+		virtual request_ptr aread (void *buffer, stxxl::int64 pos, size_t bytes,
 				    completion_handler on_cmpl ) = 0;
 		//! \brief Schedules asynchronous write request to the file
 		//! \param buffer pointer to memory buffer to write from
@@ -157,15 +167,15 @@ __STXXL_BEGIN_NAMESPACE
 		//! \param bytes number of bytes to transfer
 		//! \param on_cmpl I/O completion handler
 		//! \return \c request_ptr object, that can be used to track the status of the operation
-		virtual request_ptr awrite (void *buffer, off_t pos, size_t bytes, 
+		virtual request_ptr awrite (void *buffer, stxxl::int64 pos, size_t bytes, 
             completion_handler on_cmpl ) = 0;
 
 		//! \brief Changes the size of the file
 		//! \param newsize value of the new file size
-		virtual void set_size (off_t newsize) = 0;
+		virtual void set_size (stxxl::int64 newsize) = 0;
 		//! \brief Returns size of the file
 		//! \return file size in bytes
-		virtual off_t size () = 0;
+		virtual stxxl::int64 size () = 0;
 		//! \brief depricated, use \c stxxl::file::get_id() instead
 		int get_disk_number () 
 		{
@@ -209,7 +219,12 @@ __STXXL_BEGIN_NAMESPACE
 	
 		completion_handler on_complete;
 		int ref_cnt;
+		
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex ref_cnt_mutex;
+		#else
     	mutex ref_cnt_mutex;
+		#endif
 	
 	public:
 		enum request_type { READ, WRITE };
@@ -217,7 +232,7 @@ __STXXL_BEGIN_NAMESPACE
 	protected:	
 		file * file_;
 		void *buffer;
-		off_t offset;
+		stxxl::int64 offset;
 		size_t bytes;
 		request_type type;
     
@@ -229,17 +244,22 @@ __STXXL_BEGIN_NAMESPACE
 		// returns number of references
 		int nref()
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(ref_cnt_mutex);
+			return ref_cnt;
+			#else
 			ref_cnt_mutex.lock();
 			int ref_cnt_ = ref_cnt;
 			ref_cnt_mutex.unlock();
 			return ref_cnt_;
+			#endif
 		}
 		
 	public:
 		request(	completion_handler on_compl, 
 						file *file__,
 						void * buffer_,
-						off_t offset_,
+						stxxl::int64 offset_,
 						size_t bytes_,
 						request_type type_):
 						on_complete(on_compl),ref_cnt(0),
@@ -268,7 +288,7 @@ __STXXL_BEGIN_NAMESPACE
     	}
 		file * get_file() const { return file_; }
 		void * get_buffer() const { return buffer; }
-		off_t get_offset() const { return offset; }
+		stxxl::int64 get_offset() const { return offset; }
 		size_t get_size() const { return bytes; }
 		request_type get_type() const { return type; }
 		
@@ -290,19 +310,34 @@ __STXXL_BEGIN_NAMESPACE
 		
 		void add_ref()
 		{
+		  #ifdef STXXL_BOOST_THREADS
+		  boost::mutex::scoped_lock Lock(ref_cnt_mutex);
+		  ref_cnt++;
+		  STXXL_VERBOSE3("request add_ref() "<< unsigned(this) <<": adding reference, cnt: "<<ref_cnt)
+			
+		  #else
 		  ref_cnt_mutex.lock();
 		  ref_cnt++;
 		  STXXL_VERBOSE3("request add_ref() "<< unsigned(this) <<": adding reference, cnt: "<<ref_cnt)
-		  
 		  ref_cnt_mutex.unlock();
+		  #endif
 		}
 		bool sub_ref()
 		{
+		  #ifdef STXXL_BOOST_THREADS
+		  boost::mutex::scoped_lock Lock(ref_cnt_mutex);
+		  int val=--ref_cnt;
+		  STXXL_VERBOSE3("request sub_ref() "<< unsigned(this) <<": subtracting reference cnt: "<<ref_cnt)
+		  Lock.unlock();
+			
+		  #else
+			
 		  ref_cnt_mutex.lock();
 		  int val=--ref_cnt;
 		  STXXL_VERBOSE3("request sub_ref() "<< unsigned(this) <<": subtracting reference cnt: "<<ref_cnt)
 		  
 		  ref_cnt_mutex.unlock();
+		  #endif
 		  assert(val>=0);
 		  return (val==0);
 		}
@@ -550,13 +585,26 @@ __STXXL_BEGIN_NAMESPACE
 	public:
 		enum priority_op { READ, WRITE, NONE };
 	private:
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex write_mutex;
+		boost::mutex read_mutex;
+		#else
 		mutex write_mutex;
 		mutex read_mutex;
+		#endif
 		std::queue < request_ptr > write_queue;
 		std::queue < request_ptr > read_queue;
+	
 		semaphore sem;
-		pthread_t thread;
+	
 		priority_op _priority_op;
+	
+		#ifdef STXXL_BOOST_THREADS
+		boost::thread thread;
+		#else
+		pthread_t thread;
+		#endif
+	
 
 #ifdef STXXL_IO_STATS
 		stats *iostats;
@@ -581,9 +629,7 @@ __STXXL_BEGIN_NAMESPACE
 	{
 	protected:
 		std::map < DISKID, disk_queue * > queues;
-		disk_queues ()
-		{
-		};
+		disk_queues () {}
 	public:
 		void add_readreq (request_ptr & req, DISKID disk)
 		{

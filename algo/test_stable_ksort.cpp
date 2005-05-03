@@ -24,7 +24,7 @@
 
 struct my_type
 {
-	typedef unsigned long long key_type;
+	typedef stxxl::uint64 key_type;
 	
 	key_type _key;
 	char _data[RECORD_SIZE - sizeof(key_type)];
@@ -168,4 +168,3 @@ int main(int argc, char * argv[])
 	
 	return 0;
 }
-

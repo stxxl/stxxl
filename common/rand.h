@@ -11,6 +11,7 @@
  ****************************************************************************/
 #include <time.h>
 #include <stdlib.h>
+#include "utils.h"
 
 namespace stxxl
 {
@@ -61,7 +62,7 @@ namespace stxxl
 	
 	struct random_number64
 	{
-    typedef unsigned long long value_type;
+    typedef stxxl::uint64 value_type;
 		random_uniform_slow uniform;
 		inline value_type operator() () const
 		{

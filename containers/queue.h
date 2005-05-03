@@ -30,11 +30,11 @@ __STXXL_BEGIN_NAMESPACE
 //! - ValTp type of the contained objects
 //! - BlkSz size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)
 //! - AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
-//! - SzTp size data type, default is \c off_t
+//! - SzTp size data type, default is \c stxxl::int64
  template <	class ValTp,
 						unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
 	 					class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY, 
-						class SzTp = off_t>
+						class SzTp = stxxl::int64>
 class queue
 {
 public:

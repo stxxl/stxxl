@@ -128,12 +128,17 @@ public:
 	public: 
 
 		map_queue() : sem (0)
+		#ifdef STXXL_BOOST_THREADS
+			,thread(boost::bind(worker,static_cast<void *>( this )))
+		#endif
 		{
+			#ifndef STXXL_BOOST_THREADS
 			stxxl_nassert( pthread_create(
 				&thread,
 				NULL,
 				(thread_function_t) worker,
 				static_cast<void *>( this ) ) );
+			#endif
 		}
 
 		static char* GetTyp()
@@ -145,6 +150,17 @@ public:
 		~map_queue()
 		{
 			smart_ptr< map_request<map> > req;
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(this->worker_mutex);
+			while( !this->worker_queue.empty () )
+			{
+				req = this->worker_queue.front ();
+				Lock.unlock();
+				req->wait();
+				Lock.lock();
+			}
+			// TODO/possible BUG: MUST DESTROY THE THREAD HERE!!
+			#else
 			this->worker_mutex.lock ();
 			while( !this->worker_queue.empty () )
 			{
@@ -155,26 +171,44 @@ public:
 			}
 			this->worker_mutex.unlock ();
 			stxxl_nassert ( pthread_cancel ( thread ) );
+			#endif
 		}
 
 		//! append a request into queue.
 		void map_queue::add_request ( smart_ptr< map_request<map> > & p_req )
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(worker_mutex);
+			worker_queue.push ( p_req );
+			Lock.unlock();
+			#else
 			worker_mutex.lock ();
 			worker_queue.push ( p_req );
 			worker_mutex.unlock ();
+			#endif
 			this->sem++;
 		}
 
 	private:
 
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex worker_mutex;
+		boost::mutex lock_mutex;
+		#else
 		mutex worker_mutex;
 		mutex lock_mutex;
+		#endif
 
 		lock_table_type 																	lock_table;
 		std::queue< smart_ptr < map_request<map> > >			worker_queue;
 		semaphore sem;
 
+		#ifdef STXXL_BOOST_THREADS
+		boost::thread thread;
+		#else
+		pthread_t thread;
+		#endif
+	
 		//! This function works on the quiries.
 		/*!
 		The function read a request from queue.
@@ -182,7 +216,6 @@ public:
 		If any we will wait.
 		And finally the request will be moved into \c stxxl::map_internal::btree_request
 		*/
-		pthread_t thread;
 		static void* map_queue::worker (void *arg)
 		{
 			// ******************************************************************
@@ -192,8 +225,10 @@ public:
 			map_queue *pthis = static_cast<map_queue*>(arg);
 			smart_ptr< btree_request<btree> > sp_bt_req;
 			smart_ptr< map_request<map> > sp_map_req;
+			#ifndef STXXL_BOOST_THREADS
 			stxxl_nassert (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL));
 			stxxl_nassert (pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL));
+			#endif
 
 			// ******************************************************************
 			// forever
@@ -205,12 +240,19 @@ public:
 				// ****************************************************************
 				// get next request
 				// ****************************************************************
-
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock WorkerLock(pthis->worker_mutex);
+				#else
 				pthis->worker_mutex.lock ();
+				#endif
 				STXXL_ASSERT( !pthis->worker_queue.empty () );
 				sp_map_req = pthis->worker_queue.front ();
 				pthis->worker_queue.pop ();
+				#ifdef STXXL_BOOST_THREADS
+				WorkerLock.unlock();
+				#else
 				pthis->worker_mutex.unlock ();
+				#endif
 
 
 				// ****************************************************************
@@ -219,7 +261,12 @@ public:
 
 				lock_type* p_lock = (lock_type*) sp_map_req->_sp_int_request->_p_lock;
 
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(pthis->lock_mutex);
+				#else
 				pthis->lock_mutex.lock();
+				#endif
+				
 				STXXL_ASSERT( p_lock );
 
 				if( pthis->lock_table.size() )
@@ -238,7 +285,11 @@ public:
 					}
 				}
 				pthis->lock_table.push_back(p_lock);
+				#ifdef STXXL_BOOST_THREADS
+				Lock.unlock();
+				#else
 				pthis->lock_mutex.unlock();
+				#endif
 
 				// ****************************************************************
 				// the request will be moved into the btree_queue

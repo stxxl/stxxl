@@ -34,8 +34,8 @@ __STXXL_BEGIN_NAMESPACE
 			return file_des;
 		};
 		~ufs_file_base();
-		off_t size ();
-		void set_size(off_t newsize);
+		stxxl::int64 size ();
+		void set_size(stxxl::int64 newsize);
 	};
 
 	//! \brief Base for UNIX file system implementations
@@ -49,19 +49,23 @@ __STXXL_BEGIN_NAMESPACE
 		/*
 		ufs_file_base *file;
 		void *buffer;
-		off_t offset;
+		stxxl::int64 offset;
 		size_t bytes;
 		request_type type;
 		*/
 		
 		state _state;
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex waiters_mutex;
+		#else
 		mutex waiters_mutex;
+		#endif
 		std::set < onoff_switch * > waiters;
 
 		ufs_request_base (
 				ufs_file_base * f, 
 				void *buf, 
-				off_t off,
+				stxxl::int64 off,
 				size_t b, 
 				request_type t,
 				completion_handler on_cmpl):
@@ -89,31 +93,49 @@ __STXXL_BEGIN_NAMESPACE
 		};*/
 		bool add_waiter (onoff_switch * sw)
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(waiters_mutex);
+			#else
 			waiters_mutex.lock ();
+			#endif
 
 			if (poll ()) // request already finished
 			{
+				#ifndef STXXL_BOOST_THREADS
 				waiters_mutex.unlock ();
+				#endif
 				return true;
 			}
 
 			waiters.insert (sw);
+			#ifndef STXXL_BOOST_THREADS
 			waiters_mutex.unlock ();
+			#endif
 
 			return false;
 		};
 		void delete_waiter (onoff_switch * sw)
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(waiters_mutex);
+			waiters.erase (sw);
+			#else
 			waiters_mutex.lock ();
 			waiters.erase (sw);
 			waiters_mutex.unlock ();
+			#endif
 		}
 		int nwaiters () // returns number of waiters
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(waiters_mutex);
+			return waiters.size();
+			#else
 			waiters_mutex.lock ();
 			int size = waiters.size ();
 			waiters_mutex.unlock ();
 			return size;
+			#endif
 		}
 		void check_aligning ()
 		{
@@ -210,15 +232,15 @@ __STXXL_BEGIN_NAMESPACE
 		else
 			stxxl_function_error;
 	};
-	off_t ufs_file_base::size ()
+	stxxl::int64 ufs_file_base::size ()
 	{
 		struct stat st;
 		stxxl_ifcheck (fstat (file_des, &st));
 		return st.st_size;
 	};
-	void ufs_file_base::set_size (off_t newsize)
+	void ufs_file_base::set_size (stxxl::int64 newsize)
 	{
-		off_t cur_size = size();
+		stxxl::int64 cur_size = size();
 		
 		if(!(mode_&RDONLY)) stxxl_ifcheck(::ftruncate(file_des,newsize));
 		

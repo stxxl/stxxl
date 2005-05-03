@@ -62,8 +62,11 @@ namespace map_internal
 		friend class smart_ptr<btree_request_base>;
 
 	protected:
-
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex waiters_mutex;
+		#else
 		mutex waiters_mutex;
+		#endif
 		std::set < onoff_switch * > waiters;
 		state _state;
 		btree_completion_handler on_complete;
@@ -77,30 +80,48 @@ namespace map_internal
 		
 		bool add_waiter (onoff_switch * sw)
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(waiters_mutex);
+			#else
 			waiters_mutex.lock ();
+			#endif
 			if (poll ()) // request already finished
 			{
+				#ifndef STXXL_BOOST_THREADS
 				waiters_mutex.unlock ();
+				#endif
 				return true;
 			}
 			waiters.insert (sw);
+			#ifndef STXXL_BOOST_THREADS
 			waiters_mutex.unlock ();
+			#endif
 			return false;
 		};
 
 		void delete_waiter (onoff_switch * sw)
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(waiters_mutex);
+			waiters.erase (sw);
+			#else
 			waiters_mutex.lock ();
 			waiters.erase (sw);
 			waiters_mutex.unlock ();
+			#endif
 		}
 
 		int nwaiters () // returns number of waiters
 		{
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(waiters_mutex);
+			return waiters.size ();
+			#else
 			waiters_mutex.lock ();
 			int size = waiters.size ();
 			waiters_mutex.unlock ();
 			return size;
+			#endif
 		}
 
 

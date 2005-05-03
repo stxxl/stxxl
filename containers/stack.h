@@ -29,7 +29,7 @@
            unsigned BlocksPerPage = 4,
            unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
            class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-           class SzTp = off_t>
+           class SzTp = stxxl::int64>
  struct stack_config_generator
  {
    typedef ValTp value_type;
@@ -808,7 +808,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!    \c stxxl::migrating_stack migrates to the external memory
 //!  - \c AllocStr one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
 //!    default is RC
-//!  - \c SzTp size type, default is \c off_t
+//!  - \c SzTp size type, default is \c stxxl::int64
 //!
 //! Configured stack type is available as \c STACK_GENERATOR<>::result. <BR> <BR>
 //! Examples:
@@ -833,7 +833,7 @@ template  <
             unsigned MigrCritSize = (2*BlocksPerPage*BlkSz),
 
             class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-            class SzTp = off_t
+            class SzTp = stxxl::int64
           >
 class STACK_GENERATOR
 {

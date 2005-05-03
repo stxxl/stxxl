@@ -40,7 +40,7 @@ namespace stream
     typedef TriggerEntryType trigger_entry_type;
     typedef ValueType value_type;
     typedef typename trigger_entry_type::bid_type bid_type;
-    typedef off_t size_type;
+    typedef stxxl::int64 size_type;
     typedef std::vector<trigger_entry_type> run_type;
     typedef typed_block<bid_type::size,value_type> block_type;
     size_type elements;

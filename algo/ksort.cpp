@@ -10,7 +10,7 @@ using namespace stxxl;
 
 struct my_type
 {
-	typedef unsigned long long key_type;
+	typedef stxxl::uint64 key_type;
 				
 	key_type _key;
 	key_type _key_copy;

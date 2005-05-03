@@ -33,9 +33,15 @@ ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/ru
 
 STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 
+
+#BOOST_VARS = -DSTXXL_BOOST_THREADS -lboost_thread-gcc-mt-1_32 -pthread \
+# -DSTXXL_BOOST_TIMESTAMP -lboost_date_time-gcc-mt-1_32 \
+# -DSTXXL_BOOST_TIMESTAMP -DSTXXL_BOOST_CONFIG
+
 STXXL_SPECIFIC = -D_XOPEN_SOURCE=600 -DSTXXL_USE_POSIX_MEMALIGN_ALLOC \
 	-DSORT_OPT_PREFETCHING \
-	-DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I$(STXXL_ROOT)/
+	-DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I$(STXXL_ROOT)/ \
+    $(BOOST_VARS)	
 LARGE_FILE = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 NO_OVR = #  -DNO_OVERLAPPING
 PROF = # -DSTXXL_THREAD_PROFILING -pg
@@ -56,6 +62,7 @@ GCC=$(COMPILER) -Wall $(LARGE_FILE) $(NO_OVR) $(OPT) $(PROF) $(DEBUG) $(STXXL_SP
 # this variable is used internally for development debug compilations
 DGCC=$(COMPILER) -g -Wall $(LARGE_FILE) $(NO_OVR) $(PROF) $(DEBUG) $(STXXL_SPECIFIC) # -ftemplate-depth-65000
 
+
 STXXL_LIB = -lpthread -lstxxl -L$(STXXL_ROOT)/io/
 
 STXXL_OBJ = $(STXXL_LIB)
@@ -64,7 +71,7 @@ STXXL_OBJ = $(STXXL_LIB)
 # put variable STXXL_VARS as a g++ parameter when you compile code 
 # that uses stxxl
 # for example: g++ external_MST.cpp -o MST $(STXXL_VARS)
-STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB) -ftemplate-depth-65000
+STXXL_VARS = $(STXXL_SPECIFIC) $(LARGE_FILE) $(STXXL_LIB) -ftemplate-depth-65000 $(BOOST_VARS)
 
 #
 # Troubleshooting

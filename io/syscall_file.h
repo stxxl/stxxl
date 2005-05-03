@@ -35,12 +35,12 @@ __STXXL_BEGIN_NAMESPACE
 		};
 		request_ptr aread(
 				void *buffer, 
-				off_t pos, 
+				stxxl::int64 pos, 
 				size_t bytes,
 				completion_handler on_cmpl);
 		request_ptr awrite(
 				void *buffer, 
-				off_t pos,
+				stxxl::int64 pos,
 				size_t bytes,
 				completion_handler on_cmpl);
 	};
@@ -53,7 +53,7 @@ __STXXL_BEGIN_NAMESPACE
 		syscall_request(
 				syscall_file * f, 
 				void *buf, 
-				off_t off,	
+				stxxl::int64 off,	
 				size_t b, 
 				request_type t,
 				completion_handler on_cmpl):
@@ -149,15 +149,22 @@ __STXXL_BEGIN_NAMESPACE
 
 		_state.set_to (DONE);
 
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex::scoped_lock Lock(waiters_mutex);
+		#else
 		waiters_mutex.lock ();
+		#endif
 		// << notification >>
 		std::for_each(
 			waiters.begin(),
 			waiters.end(),
 			std::mem_fun(&onoff_switch::on) );
 		
-		
+		#ifdef STXXL_BOOST_THREADS
+		Lock.unlock();
+		#else
 		waiters_mutex.unlock ();
+		#endif
 
 		completed ();
 		_state.set_to (READY2DIE);
@@ -165,7 +172,7 @@ __STXXL_BEGIN_NAMESPACE
 
 	request_ptr syscall_file::aread (
 			void *buffer, 
-			off_t pos, 
+			stxxl::int64 pos, 
 			size_t bytes,
 			completion_handler on_cmpl)
 	{
@@ -183,7 +190,7 @@ __STXXL_BEGIN_NAMESPACE
 	};
 	request_ptr syscall_file::awrite (
 			void *buffer, 
-			off_t pos, 
+			stxxl::int64 pos, 
 			size_t bytes,
 			completion_handler on_cmpl)
 	{

@@ -41,7 +41,11 @@ namespace map_internal
 	class ref_counter
 	{
 		public:
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex _mutex_ref;
+			#else
 			mutex _mutex_ref;
+			#endif
 			int _n_ref;
 		public:
 
@@ -50,34 +54,56 @@ namespace map_internal
 
 			int get_count()
 			{
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(_mutex_ref);
+				return _n_ref;
+				#else
 				_mutex_ref.lock();
 				int ret = _n_ref;
 				_mutex_ref.unlock();
 				return ret;
+				#endif
 			}
 
 			_Self* add_ref()
 			{
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(_mutex_ref);
+				STXXL_VERBOSE3( "add_ref " << this << " count=" << _n_ref );
+				++_n_ref;
+				_Self* ptr = (_Self*)this;
+				#else
 				_mutex_ref.lock();
 				STXXL_VERBOSE3( "add_ref " << this << " count=" << _n_ref );
 				++_n_ref;
 				_Self* ptr = (_Self*)this;
 				_mutex_ref.unlock();
+				#endif
 				return ptr;
 			}
 
 			bool sub_ref()
 			{
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(_mutex_ref);
+				STXXL_VERBOSE3( "sub_ref " << this << " count=" << _n_ref );
+				bool ret = !--_n_ref;
+				#else
 				_mutex_ref.lock();
 				STXXL_VERBOSE3( "sub_ref " << this << " count=" << _n_ref );
 				bool ret = !--_n_ref;
 				_mutex_ref.unlock();
+				#endif
 				return ret;
 			}
 
 			ref_counter() : _n_ref(0) {};
 
-			virtual ~ref_counter() { _mutex_ref.lock(); }
+			virtual ~ref_counter() { 
+				#ifndef STXXL_BOOST_THREADS
+				_mutex_ref.lock();  // To Thomas: why needed?
+				#endif
+				}
 			
 	}; // class ref_counter
 

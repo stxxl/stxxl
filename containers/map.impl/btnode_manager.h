@@ -82,7 +82,11 @@ namespace map_internal
 
 			static _Self* _p_instance ;				// a instance of async_btnode_manager
 
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex _mutex; // a member for synchronize access
+			#else
 			mutex 				_mutex;							// a member for synchronize access
+			#endif
 			map_type 			_internal;					// this is a container for nodes
 			block_manager* _p_block_manager;	// a pointer to the block_manager
 
@@ -133,11 +137,19 @@ namespace map_internal
 			//! Call this function to remove the node from local cache.
 			virtual void remove( const stxxl::BID<SIZE_>&  bid )
 			{
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(_mutex);
+				#else
 				_mutex.lock();
+				#endif
 				// this is a member can be used for debuging.
 				// assert( _all.find( bid ) != _all.end() );
 				_internal.erase( _internal.find( bid ) );
+				#ifdef STXXL_BOOST_THREADS
+				Lock.unlock();
+				#else
 				_mutex.unlock();
+				#endif
 				--_count;
 			}
 
@@ -158,11 +170,17 @@ namespace map_internal
 				(*ppNode)->allocate_block( _p_block_manager );
 				(*ppNode)->add_ref();
 
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(_mutex);
+				#else
 				_mutex.lock();
+				#endif
 				_internal.insert( map_value_type( (*ppNode)->bid(), node_ptr(*ppNode) ));
 				// this is a member can be used for debuging.
   			// _all.insert( bool_map_type::value_type( (*ppNode)->bid(), true ) );
+				#ifndef STXXL_BOOST_THREADS
 				_mutex.unlock();
+				#endif
 			}
 
 			//! A new node will be created.
@@ -192,14 +210,20 @@ namespace map_internal
 				// ************************************************************************
 				// insert the new node into lacal cache
 				// ************************************************************************
-
+		
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(_mutex);
+				#else
 				_mutex.lock();
+				#endif
 				_internal.insert( map_value_type( (*ppNode)->bid(), node_ptr(*ppNode) ));
 
 				// this is a member can be used for debuging.
   			// _all.insert( bool_map_type::value_type( (*ppNode)->bid(), true ) );
 
+				#ifndef STXXL_BOOST_THREADS
 				_mutex.unlock();
+				#endif
 			}
 
 			//! Returns a node for a BID.
@@ -225,7 +249,11 @@ namespace map_internal
 				// *******************************************************************
 
 				//STXXL_MSG( "SEARCH start" << bid );
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(_mutex);
+				#else
 				_mutex.lock();
+				#endif
 
 				// this is a member can be used for debuging.
 				// assert( _all.find( bid ) != _all.end() );
@@ -234,7 +262,11 @@ namespace map_internal
 				if ( iter != _internal.end() )
 				{
 					sp_node = (*iter).second;
+					#ifdef STXXL_BOOST_THREADS
+					Lock.unlock();
+					#else
 					_mutex.unlock();
+					#endif
 					*ppNode = sp_node.get();
 					sp_node->add_ref();
 					STXXL_ASSERT( (*iter).first == (*ppNode)->bid() );
@@ -249,7 +281,11 @@ namespace map_internal
 				*ppNode = new Node( bid );
 				_internal.insert( map_value_type( bid, node_ptr( *ppNode ) ));
 
+				#ifdef STXXL_BOOST_THREADS
+				Lock.unlock();
+				#else
 				_mutex.unlock();
+				#endif
 				sp_node = *ppNode;
 				sp_node->add_ref();
 				sp_node->read();
@@ -268,7 +304,11 @@ namespace map_internal
 				request_ptr ptr;
 				node_ptr sp_node;
 
+				#ifdef STXXL_BOOST_THREADS
+				boost::mutex::scoped_lock Lock(_mutex);
+				#else
 				_mutex.lock();
+				#endif
 
 				//! \todo this is a member can be used for debuging.
   			// assert( _all.find( bid ) != _all.end() );
@@ -280,7 +320,11 @@ namespace map_internal
 					sp_node = (*iter).second;
 					_internal.erase( iter );
 				}
+				#ifdef STXXL_BOOST_THREADS
+				Lock.unlock();
+				#else
 				_mutex.unlock();
+				#endif
 
 				if( sp_node.get() ) sp_node->set_dirty( false );
 				Node::free_block( bid, _p_block_manager );
@@ -290,7 +334,11 @@ namespace map_internal
 		{
 			smart_ptr<Node> sp_node;
 			_count.wait_for(0);
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_mutex);
+			#else
 			_mutex.lock();
+			#endif
 
 			//! @todo remove this
 			STXXL_MSG( "DUMP SIZE = " << _all.size() );
@@ -301,7 +349,9 @@ namespace map_internal
 			// while( iter != _all.end() )
 			// STXXL_VERBOSE2( count++ << ": " << (iter++)->first );
 
+			#ifndef STXXL_BOOST_THREADS
 			_mutex.unlock();
+			#endif
 		}
 
 		void cleen()
@@ -309,7 +359,11 @@ namespace map_internal
 			smart_ptr<Node> sp_node;
 			_count.wait_for(0);
    
+			#ifdef STXXL_BOOST_THREADS
+			boost::mutex::scoped_lock Lock(_mutex);
+			#else
 			_mutex.lock();
+			#endif
 			map_iterator_type iter = _internal.begin();
 
 			for(;;)
@@ -317,13 +371,17 @@ namespace map_internal
   
 				if ( CACHE_SIZE_ > _internal.size() )
 				{
+					#ifndef STXXL_BOOST_THREADS
 					_mutex.unlock();
+					#endif
 					return;
 				}
 
 				if( iter == _internal.end() )
 				{
+					#ifndef STXXL_BOOST_THREADS
 					_mutex.unlock();
+					#endif
 					return;
 				}
 
@@ -333,7 +391,11 @@ namespace map_internal
 					sp_node = (*iter).second;
 				}
 
+				#ifdef STXXL_BOOST_THREADS
+				Lock.unlock();
+				#else
 				_mutex.unlock();
+				#endif
    
 				if ( sp_node.get() )
 				{
@@ -341,7 +403,11 @@ namespace map_internal
 					sp_node.release();
 				}
 
+				#ifdef STXXL_BOOST_THREADS
+				Lock.lock();
+				#else
 				_mutex.lock();
+				#endif
 				++iter;
 			}
 		}
@@ -358,4 +424,3 @@ __STXXL_END_NAMESPACE
 
 
 #endif
-

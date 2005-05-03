@@ -15,7 +15,7 @@ using namespace stxxl;
 
 struct my_type
 {
-    typedef long long int key_type;
+    typedef stxxl::int64 key_type;
   //typedef int key_type;
 	key_type key;
 	char data[128 - sizeof(key_type)];
@@ -96,7 +96,7 @@ int main()
   write_pool<block_type>    w_pool((mem_for_pools/2)/block_type::raw_size);
   pq_type p(p_pool,w_pool);
   
-  off_t nelements = off_t(volume/sizeof(my_type))*1024,i;
+  stxxl::int64 nelements = stxxl::int64(volume/sizeof(my_type))*1024,i;
   STXXL_MSG("Internal memory consumption of the priority queue: "<<p.mem_cons()<<" bytes")
   STXXL_MSG("Max elements: "<<nelements)
   for(i = 0;i<nelements ;i++ )

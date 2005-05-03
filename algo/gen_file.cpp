@@ -42,7 +42,7 @@ int main()
 			for(unsigned j=0; j < records_in_block;j++)
 				array[j]._key = cur_key--;
 	
-			req = f.awrite((void *)array,off_t(i)*block_size,block_size,stxxl::default_completion_handler());
+			req = f.awrite((void *)array,stxxl::int64(i)*block_size,block_size,stxxl::default_completion_handler());
 			req->wait();
 		};
 	

@@ -1,6 +1,9 @@
 #ifndef GPROF_HEADER
 #define GPROF_HEADER
 
+
+#ifndef STXXL_BOOST_THREADS
+
 /* 
  * pthread_create wrapper for gprof compatibility
  * stolen from http://sam.zoy.org/doc/programming/gprof.html
@@ -75,5 +78,7 @@ static void * wrapper_routine(void * data)
     /* Call the real function */
     return start_routine(arg);
 }
+
+#endif
 
 #endif

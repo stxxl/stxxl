@@ -27,7 +27,7 @@ int n_opt_prefetch_buffers;
 struct my_type
 {
 	//typedef unsigned int key_type;
-	typedef long long unsigned key_type;
+	typedef stxxl::uint64 key_type;
 	
 	key_type _key;
 	// char _data[RECORD_SIZE - sizeof(key_type)];

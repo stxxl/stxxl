@@ -88,7 +88,7 @@ namespace stxxl
 		DiskGeometry ()
 		{
 		};
-		double get_delay (off_t offset, size_t size)	// returns delay in s
+		double get_delay (stxxl::int64 offset, size_t size)	// returns delay in s
 		{
 			/*
 			  
@@ -211,8 +211,8 @@ namespace stxxl
 					   16 * 1024 *
 					   1024) << " s" << std::endl;
 			  std::cout << "Transfer 16 Mb from zone 30: " <<
-				get_delay (off_t (158204036) *
-					   off_t (bytes_per_sector),
+				get_delay (stxxl::int64 (158204036) *
+					   stxxl::int64 (bytes_per_sector),
 					   16 * 1024 *
 					   1024) << " s" << std::endl;
 		};
@@ -236,14 +236,14 @@ namespace stxxl
 				"' is resided on swap memory partition!" <<
 				std::endl;
 		};
-		request_ptr aread(void *buffer, off_t pos, size_t bytes,
+		request_ptr aread(void *buffer, stxxl::int64 pos, size_t bytes,
 			    completion_handler on_cmpl);
-		request_ptr awrite(void *buffer, off_t pos, size_t bytes,
+		request_ptr awrite(void *buffer, stxxl::int64 pos, size_t bytes,
 			    completion_handler on_cmpl);
-		void set_size (off_t newsize);
+		void set_size (stxxl::int64 newsize);
 	};
 
-	void sim_disk_file::set_size (off_t newsize)
+	void sim_disk_file::set_size (stxxl::int64 newsize)
     {
          if (newsize > size ())
          {
@@ -258,7 +258,7 @@ namespace stxxl
 	{
 		friend class sim_disk_file;
 	protected:
-		  sim_disk_request (sim_disk_file * f, void *buf, off_t off,
+		  sim_disk_request (sim_disk_file * f, void *buf, stxxl::int64 off,
 				    size_t b, request_type t,
 				    completion_handler on_cmpl):
 				ufs_request_base (f,
@@ -358,18 +358,28 @@ namespace stxxl
 		
 		_state.set_to (DONE);
 
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex::scoped_lock Lock(waiters_mutex);
+		#else
 		waiters_mutex.lock ();
+		#endif
+		
 		// << notification >>
 		for (std::set < onoff_switch * >::iterator i =
 		     waiters.begin (); i != waiters.end (); i++)
 			(*i)->on ();
+		
+		#ifdef STXXL_BOOST_THREADS
+		Lock.unlock();
+		#else
 		waiters_mutex.unlock ();
+		#endif
 
 		completed ();
 		_state.set_to (READY2DIE);
 	}
 
-	request_ptr sim_disk_file::aread (void *buffer, off_t pos, size_t bytes,
+	request_ptr sim_disk_file::aread (void *buffer, stxxl::int64 pos, size_t bytes,
 				   completion_handler on_cmpl)
 	{
 		request_ptr req = new sim_disk_request (this, buffer, pos, bytes,
@@ -384,7 +394,7 @@ namespace stxxl
     return req;
 	};
 	request_ptr sim_disk_file::awrite (
-						void *buffer, off_t pos, size_t bytes,
+						void *buffer, stxxl::int64 pos, size_t bytes,
 				    completion_handler on_cmpl)
 	{
 		request_ptr req = new sim_disk_request (this, buffer, pos, bytes,

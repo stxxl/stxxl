@@ -41,5 +41,5 @@ bench_pqueue: bench_pqueue.cpp $(DEPENDENCIES)
 	$(GCC) bench_pqueue.cpp -o bench_pqueue $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
 
 clean:
-	rm -f *.o bench_pqueue ext_merger p_bug p_queue many_stacks test_mstack test_stack test_vector testqueue
+	rm -f *.o bench_pqueue ext_merger p_bug p_queue many_stacks test_mstack test_stack test_vector testqueue testmap *~
 	cd map.impl; $(MAKE) clean; cd ..

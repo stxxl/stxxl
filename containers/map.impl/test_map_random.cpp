@@ -81,11 +81,11 @@ int main( int argc, char* argv[] )
 			PERCENT_FIND +
 			PERCENT_ITERATOR) == 1000 );
 
-  unsigned long long MAX_STEP = atoi( argv[1] );
+  stxxl::uint64 MAX_STEP = atoi( argv[1] );
 	std_map_type stdmap;
 	xxl_map_type xxlmap;
 
-	for( unsigned long long i = 0; i < MAX_STEP; i++ )
+	for( stxxl::uint64  i = 0; i < MAX_STEP; i++ )
 	{
 
 		// ***************************************************

@@ -132,8 +132,8 @@ int main(int argc, char * argv[])
 #define MB (1024*1024)
 #define GB (1024*1024*1024)
 
-  off_t offset = 0;
-  off_t end_offset = off_t(GB)*off_t(atoi(argv[1])) ;
+  stxxl::int64 offset = 0;
+  stxxl::int64 end_offset = stxxl::int64(GB)*stxxl::int64(atoi(argv[1])) ;
   std::vector<std::string> disks_arr;
 
   for(i=1;i<unsigned(argc - 1) ;i++)
@@ -200,7 +200,7 @@ int main(int argc, char * argv[])
   out_stat(begin,end,r_finish_times,ndisks,disks_arr);
 #endif
   	
-	offset+= /* 4*off_t(GB); */ buffer_size;
+	offset+= /* 4*stxxl::int64(GB); */ buffer_size;
   }
 
   delete [] reqs;
@@ -214,4 +214,3 @@ int main(int argc, char * argv[])
 
   return 0;
 }
-

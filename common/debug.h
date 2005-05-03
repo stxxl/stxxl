@@ -39,7 +39,12 @@ class debugmon
 		}
 	};
 	__gnu_cxx::hash_map<char *, tag, hash_fct, eqt > tags;
+	
+	#ifdef STXXL_BOOST_THREADS
+	boost::mutex mutex1;
+	#else
 	mutex mutex1;
+	#endif
 	
 	static debugmon * instance;
 	
@@ -61,7 +66,11 @@ public:
 	#else
 	void block_allocated(char * ptr, char * end, size_t size)
 	{
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex::scoped_lock Lock(mutex1);
+		#else
 		mutex1.lock();
+		#endif
 		// checks are here
 		STXXL_VERBOSE1("debugmon: block "<<long(ptr)<<" allocated")
 		assert(tags.find(ptr) == tags.end()); // not allocated
@@ -70,11 +79,18 @@ public:
 		t.end = end;
 		t.size = size;
 		tags[ptr] = t;
+		#ifndef STXXL_BOOST_THREADS
 		mutex1.unlock();
+		#endif
 	}
 	void block_deallocated(char * ptr)
 	{
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex::scoped_lock Lock(mutex1);
+		#else
 		mutex1.lock();
+		#endif
+		
 		STXXL_VERBOSE1("debugmon: block_deallocated from "<<long(ptr))
 		assert(tags.find(ptr) != tags.end()); // allocated
 		tag t = tags[ptr];
@@ -96,11 +112,18 @@ public:
 			tags.erase(ptr1);
 			ptr1 += size;
 		}
+		#ifndef STXXL_BOOST_THREADS
 		mutex1.unlock();
+		#endif
 	}
 	void io_started(char * ptr)
 	{
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex::scoped_lock Lock(mutex1);
+		#else
 		mutex1.lock();
+		#endif
+		
 		STXXL_VERBOSE1("debugmon: I/O on block "<<long(ptr)<<" started")
 		assert(tags.find(ptr) != tags.end()); // allocated
 		tag t = tags[ptr];
@@ -109,11 +132,19 @@ public:
 			STXXL_ERRMSG("debugmon: I/O on block "<<long(ptr)<<" started, but block is already busy")
 		t.ongoing = true;
 		tags[ptr] = t;
+		
+		#ifndef STXXL_BOOST_THREADS
 		mutex1.unlock();
+		#endif
 	}
 	void io_finished(char * ptr)
 	{
+		#ifdef STXXL_BOOST_THREADS
+		boost::mutex::scoped_lock Lock(mutex1);
+		#else
 		mutex1.lock();
+		#endif
+		
 		STXXL_VERBOSE1("debugmon: I/O on block "<<long(ptr)<<" finished")
 		assert(tags.find(ptr) != tags.end()); // allocated
 		tag t = tags[ptr];
@@ -122,7 +153,10 @@ public:
 			STXXL_ERRMSG("debugmon: I/O on block "<<long(ptr)<<" finished, but block was not busy")
 		t.ongoing = false;
 		tags[ptr] = t;
+		
+		#ifndef STXXL_BOOST_THREADS
 		mutex1.unlock();
+		#endif
 	}
 	#endif
 	static debugmon *get_instance ()

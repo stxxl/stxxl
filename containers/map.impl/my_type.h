@@ -16,8 +16,8 @@
 #define MAX_unsigned	0xFFFFFFFF
 
 
-typedef unsigned long long key_type;
-typedef unsigned long long data_type;
+typedef stxxl::uint64 key_type;
+typedef stxxl::uint64 data_type;
 
 namespace stxxl
 {
@@ -76,11 +76,11 @@ namespace map_test
 	class my_iterator
   {
 
-    long long int _pos;
+    stxxl::int64 _pos;
 
   public:
 
-    my_iterator( long long int pos = -1 ): _pos(pos) {}
+    my_iterator( stxxl::int64 pos = -1 ): _pos(pos) {}
     my_iterator( const my_iterator& i ): _pos(i._pos) {}
 
     my_iterator& operator=( const my_iterator& i )
@@ -99,7 +99,7 @@ namespace map_test
       ++_pos; return *this;
     }
 
-    my_iterator operator+=( long long int o )
+    my_iterator operator+=( stxxl::int64 o )
     {
       _pos += o;
       return *this;
@@ -115,7 +115,7 @@ namespace map_test
       --_pos; return *this;
     }
 
-    my_iterator operator-=( long long int o )
+    my_iterator operator-=( stxxl::int64 o )
     {
       _pos -= o;
       return *this;
@@ -126,9 +126,9 @@ namespace map_test
       return my_type(_pos,_pos);
     }
     
-    friend long long int operator-( const my_iterator& i1, const my_iterator& i2 );
-    friend my_iterator operator+( const my_iterator& i1, long long int o );
-    friend my_iterator operator-( const my_iterator& i1, long long int o );
+    friend stxxl::int64 operator-( const my_iterator& i1, const my_iterator& i2 );
+    friend my_iterator operator+( const my_iterator& i1, stxxl::int64 o );
+    friend my_iterator operator-( const my_iterator& i1, stxxl::int64 o );
     friend bool operator==( const my_iterator& i1, const my_iterator& i2 );
     friend bool operator<( const my_iterator& i1, const my_iterator& i2 );
     friend bool operator<=( const my_iterator& i1, const my_iterator& i2 );
@@ -173,29 +173,29 @@ namespace map_test
     return i1._pos != i2._pos ;
   }
 
-  long long int operator-( const my_iterator& i1, const my_iterator& i2 )
+  stxxl::int64 operator-( const my_iterator& i1, const my_iterator& i2 )
   {
     return i1._pos - i2._pos;
   }
 
-  my_iterator operator-( const my_iterator& i1, long long int o )
+  my_iterator operator-( const my_iterator& i1, stxxl::int64 o )
   {
     return my_iterator ( i1._pos - o );
   }
 
-  my_iterator operator+( const my_iterator& i1, long long int o )
+  my_iterator operator+( const my_iterator& i1, stxxl::int64 o )
   {
     return my_iterator ( i1._pos + o );
   }
 
   class my_insert
   {
-    long long int _end;
-    long long int _begin;
+    stxxl::int64 _end;
+    stxxl::int64 _begin;
 
   public:
     typedef my_iterator iterator;
-    my_insert( long long int begin, long long int end )
+    my_insert( stxxl::int64 begin, stxxl::int64 end )
     {
       _end = end;
       _begin = begin;

@@ -14,7 +14,7 @@
 
 #include "map.h"
 #define BTREE_NODE_SIZE 						4096
-#define _SIZE_TYPE 									unsigned long long
+#define _SIZE_TYPE 									stxxl::uint64
 
 __STXXL_BEGIN_NAMESPACE
 
