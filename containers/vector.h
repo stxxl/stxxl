@@ -61,7 +61,7 @@ namespace stxxl
 		typedef const_vector_iterator < Tp_, AllocStr_, SzTp_,DiffTp_,
 			BlkSize_,PgTp_,PgSz_ > _CIterator;
 		
-		friend class _CIterator;
+		friend class const_vector_iterator < Tp_, AllocStr_, SzTp_,DiffTp_, BlkSize_,PgTp_,PgSz_>;
 public:
 		typedef _CIterator const_iterator;
 		typedef _Self iterator;
@@ -70,7 +70,7 @@ public:
 		typedef DiffTp_ difference_type;
 		typedef unsigned block_offset_type;
 		typedef vector < Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_,SzTp_> vector_type;
-		friend class vector_type;
+		friend class vector < Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_,SzTp_>;
 		typedef bid_vector < BlkSize_ > bids_container_type;
 		typedef typename bids_container_type::iterator bids_container_iterator;
 		typedef typed_block<BlkSize_, Tp_> block_type;
@@ -204,7 +204,7 @@ public:
 		typedef vector_iterator < Tp_, AllocStr_, SzTp_,DiffTp_,
 			BlkSize_,PgTp_,PgSz_ > _NonConstIterator;
 
-		friend class _NonConstIterator;
+		friend class vector_iterator < Tp_, AllocStr_, SzTp_,DiffTp_, BlkSize_,PgTp_,PgSz_ >;
 public:
 		typedef _Self const_iterator;
 		typedef _NonConstIterator iterator;
@@ -213,7 +213,7 @@ public:
 		typedef DiffTp_ difference_type;
 		typedef unsigned block_offset_type;
 		typedef vector < Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_,SzTp_> vector_type;
-		friend class vector_type;
+		friend class vector < Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_,SzTp_>;
 		typedef bid_vector < BlkSize_ > bids_container_type;
 		typedef typename bids_container_type::iterator bids_container_iterator;
 		typedef typed_block<BlkSize_, Tp_> block_type;
@@ -290,9 +290,9 @@ public:
 		}
 		_Self operator ++(int)
 		{
-			_Self __tmp = *this;
+			_Self tmp_ = *this;
 			offset++;
-			return _tmp;
+			return tmp_;
 		}
 		_Self & operator --()
 		{
@@ -377,10 +377,10 @@ public:
 
 		typedef vector_iterator < value_type, alloc_strategy, size_type,
 			difference_type,block_size,pager_type,page_size > iterator;
-		friend class iterator;
+		friend class vector_iterator < value_type, alloc_strategy, size_type, difference_type,block_size,pager_type,page_size >;
 		typedef const_vector_iterator < value_type, alloc_strategy,
 			size_type,difference_type, block_size,pager_type,page_size > const_iterator;
-		friend class const_iterator;
+		friend class const_vector_iterator < value_type, alloc_strategy, size_type,difference_type, block_size,pager_type,page_size >;
 
 		typedef bid_vector < block_size > bids_container_type;
 		typedef typename bids_container_type::

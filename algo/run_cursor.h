@@ -50,7 +50,11 @@ struct run_cursor2:public run_cursor<block_type>
 	typedef prefetcher_type_ prefetcher_type;
 	typedef run_cursor2<block_type,prefetcher_type> _Self;
 	typedef typename block_type::value_type value_type;
-			
+		
+	
+	using run_cursor<block_type>::pos;
+	using run_cursor<block_type>::buffer;
+	
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
 	static prefetcher_type *& prefetcher() // sorry, a hack
 	{
@@ -63,9 +67,8 @@ struct run_cursor2:public run_cursor<block_type>
 	{
 		return prefetcher_;
 	}
-  private:
-  run_cursor2();// intentionally not defined to forbid default construction
   public:
+  run_cursor2() {}
   run_cursor2(prefetcher_type * p):prefetcher_(p) {}
 #endif
 	

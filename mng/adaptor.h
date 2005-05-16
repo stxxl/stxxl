@@ -167,43 +167,43 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 template <unsigned _blk_sz,typename _run_type,class __pos_type>						\
 inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> & operator -= (		\
       two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> & a,			\
-      typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type n)		\
+      typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type off)		\
 {											\
-  a.pos-=n;										\
+  a.pos-=off;										\
   return a;										\
 }											\
 											\
 template <unsigned _blk_sz,typename _run_type,class __pos_type>						\
 inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> & operator += (		\
       two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> & a,			\
-      typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type n)		\
+      typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type off)		\
 {											\
-  a.pos+=n;										\
+  a.pos+=off;										\
   return a;										\
 }											\
 											\
 template <unsigned _blk_sz,typename _run_type,class __pos_type>						\
 inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator + (		\
      const two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> & a,			\
-     typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type pos)		\
+     typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type off)		\
 {											\
-  return two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>(a.array,a.pos + pos);	\
+  return two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>(a.array,a.pos + off);	\
 }											\
 											\
 template <unsigned _blk_sz,typename _run_type,class __pos_type>						\
 inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator + (		\
-      typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type n,		\
+      typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type off,		\
       const two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> & a)			\
 {											\
-  return two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>(a.array,a.pos + pos);	\
+  return two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>(a.array,a.pos + off);	\
 }											\
 											\
 template <unsigned _blk_sz,typename _run_type,class __pos_type>						\
 inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator - (		\
       const two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> & a,			\
-      typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type pos)		\
+      typename two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>::_pos_type off)		\
 {											\
-  return two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>(a.array,a.pos - pos);	\
+  return two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type>(a.array,a.pos - off);	\
 }
 
 
@@ -216,8 +216,13 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 	{
 		typedef TwoToOneDimArrayRowAdaptor < one_dim_array_type,
 			data_type, dim_size, pos_type > _Self;
+		
+		typedef TwoToOneDimArrayAdaptorBase < one_dim_array_type,
+	 	data_type, pos_type > _Parent;
+		using _Parent::array;
+		using _Parent::pos;
 
-		  TwoToOneDimArrayRowAdaptor (one_dim_array_type * a,
+		TwoToOneDimArrayRowAdaptor (one_dim_array_type * a,
 					      pos_type
 					      p):TwoToOneDimArrayAdaptorBase <
 			one_dim_array_type, data_type, pos_type > (a, p)

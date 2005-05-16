@@ -24,6 +24,11 @@ struct RunsToBIDArrayAdaptor: public TwoToOneDimArrayAdaptorBase < _run_type *, 
 	enum	{ block_size = _blk_sz };
 
 	unsigned dim_size;
+	
+	typedef TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >,
+		__pos_type > _Parent;
+	using _Parent::array;
+	using _Parent::pos;
 
 	  RunsToBIDArrayAdaptor (_run_type * *a, __pos_type p,
 				 unsigned d):TwoToOneDimArrayAdaptorBase <

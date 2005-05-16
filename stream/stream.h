@@ -1321,7 +1321,6 @@ namespace stream
       ++i3;
       ++i4;
       ++i5;
-      ++i6;
       
       if(!empty())
         current = value_type(*i1,*i2,*i3,*i4,*i5);
@@ -1367,7 +1366,7 @@ namespace stream
     //! \brief Construction
     choose( Input_ & in_):
         in(in_),
-        current((*i).first) {}
+        current((*in_).first) {}
       
     //! \brief Standard stream method
     const value_type & operator * () const
@@ -1422,7 +1421,7 @@ namespace stream
     //! \brief Construction
     choose( Input_ & in_):
         in(in_),
-        current((*i).second) {}
+        current((*in_).second) {}
       
     //! \brief Standard stream method
     const value_type & operator * () const
@@ -1477,7 +1476,7 @@ namespace stream
     //! \brief Construction
     choose( Input_ & in_):
         in(in_),
-        current((*i).third) {}
+        current((*in_).third) {}
       
     //! \brief Standard stream method
     const value_type & operator * () const
@@ -1532,7 +1531,7 @@ namespace stream
     //! \brief Construction
     choose( Input_ & in_):
         in(in_),
-        current((*i).fourth) {}
+        current((*in_).fourth) {}
       
     //! \brief Standard stream method
     const value_type & operator * () const
@@ -1587,7 +1586,7 @@ namespace stream
     //! \brief Construction
     choose( Input_ & in_):
         in(in_),
-        current((*i).fifth) {}
+        current((*in_).fifth) {}
       
     //! \brief Standard stream method
     const value_type & operator * () const
@@ -1642,7 +1641,7 @@ namespace stream
     //! \brief Construction
     choose( Input_ & in_):
         in(in_),
-        current((*i).sixth) {}
+        current((*in_).sixth) {}
       
     //! \brief Standard stream method
     const value_type & operator * () const

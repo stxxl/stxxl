@@ -68,7 +68,9 @@ public:
 		current = new run_cursor_type[kReg];
     	run_cursor_type::prefetcher() = p;
     #else
-    	current = new run_cursor_type[kReg](p);
+    	current = new run_cursor_type[kReg];
+        for (i = 0; i < kReg; ++i)
+            current[i].prefetcher() = p;
     #endif
 		entry = new int[(kReg << 1)];
 		// init cursors
