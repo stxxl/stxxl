@@ -7,11 +7,14 @@
 #include "containers/vector.h"
 #include "containers/stack.h"
 #include "containers/priority_queue.h"
-#include "containers/map.h"
+
+#if not(__GNUC__==3 && __GNUC_MINOR__ == 4)
+#include "containers/map.h" // not compatible with g++ 3.4.x
+#endif
+
 #include "containers/queue.h"
 
 #include "stream/stream.h"
 #include "stream/sort_stream.h"
 
 #include "common/debug.h"
-
