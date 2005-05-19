@@ -88,6 +88,11 @@ template < unsigned
 	     typedef RunsToBIDArrayAdaptor2 < _blk_sz, _run_type,__pos_type > _Self;
 	     typedef BID < _blk_sz > data_type;
 
+		 typedef TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >,__pos_type> ParentClass_;
+		 
+		 using ParentClass_::pos;
+		 using ParentClass_::array;
+		 
 	     enum
 	     { block_size = _blk_sz };
 

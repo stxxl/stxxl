@@ -91,7 +91,7 @@ public:
   {
 	  std::swap(size_,obj.size_);
 	  std::swap(cache_offset,obj.cache_offset);
-	  std::swap(curent_element,obj.current_element);
+	  std::swap(current_element,obj.current_element);
 	  std::swap(cache,obj.cache);
 	  std::swap(front_page,obj.front_page);
 	  std::swap(back_page,obj.back_page);

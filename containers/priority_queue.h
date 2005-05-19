@@ -301,21 +301,27 @@ void merge4(
                   std::vector<sequence_element>,
                   sequence_element_comparator> min_elements;
       
-      prefetch_pool<block_type> & p_pool;
-      write_pool<block_type> & w_pool;
+      prefetch_pool<block_type> * p_pool;
+      write_pool<block_type> * w_pool;
 	private:
-	  ext_merger(); // forbiden
 	  ext_merger(const ext_merger &); // forbiden
 	  ext_merger & operator = (const ext_merger &);// forbiden
     public:
-      ext_merger( prefetch_pool<block_type> & p_pool_,
-                  write_pool<block_type> & w_pool_):
+	  ext_merger(): nsequences(0),nelements(0) {}
+      ext_merger( prefetch_pool<block_type> * p_pool_,
+                  write_pool<block_type> * w_pool_):
                       nsequences(0),nelements(0),
                       p_pool(p_pool_),
                       w_pool(w_pool_)
       {
         STXXL_VERBOSE2("ext_merger::ext_merger(...)")
       }
+	  void set_pools(prefetch_pool<block_type> * p_pool_,
+                  			   write_pool<block_type> * w_pool_)
+	 {
+		 p_pool = p_pool_;
+		 w_pool = w_pool_;
+	 }
 	  void swap(ext_merger & obj)
 	  {
 		  std::swap(nsequences,obj.nsequences);
@@ -325,7 +331,7 @@ void merge4(
       	  // std::swap(p_pool,obj.p_pool);
       	  // std::swap(w_pool,obj.w_pool);
 	  }
-      unsigned mem_cons() const // only raugh estimation
+      unsigned mem_cons() const // only rough estimation
       {
         return (nsequences * block_type::raw_size);
       }
@@ -382,7 +388,7 @@ void merge4(
                 STXXL_VERBOSE2("ext_merger::multi_merge(...) one more block exists in a sequence: "<<
                 "flushing this block in write cache (if not written yet) and giving hint to prefetcher")
                 bid_type next_bid = s.bids->front();/*
-                request_ptr r = w_pool.get_request(next_bid);
+                request_ptr r = w_pool->get_request(next_bid);
                 if(r.valid()) 
                 {
                   STXXL_VERBOSE2("ext_merger::multi_merge(...) block was in write pool: "<<
@@ -393,10 +399,10 @@ void merge4(
                 {
                   STXXL_VERBOSE2("ext_merger::multi_merge(...) block was not in write pool ")
                 }
-                p_pool.hint(next_bid);*/
-                p_pool.hint(next_bid,w_pool);
+                p_pool->hint(next_bid);*/
+                p_pool->hint(next_bid,*w_pool);
               }
-              p_pool.read(s.block,bid)->wait();
+              p_pool->read(s.block,bid)->wait();
               block_manager::get_instance()->delete_block(bid);
               s.current = 0;
             }
@@ -436,20 +442,20 @@ void merge4(
             first_block->begin() + (block_type::size - first_size), 
             first_block->end());
         /*
-        if(w_pool.size() < nblocks)
+        if(w_pool->size() < nblocks)
         {
           STXXL_MSG("ext_merger::insert_segment write pool is too small: "<<
-            w_pool.size()<<" blocks, resizing to "<<nblocks)
-          w_pool.resize(nblocks);
+            w_pool->size()<<" blocks, resizing to "<<nblocks)
+          w_pool->resize(nblocks);
         }*/
-        assert(w_pool.size() > 0);
+        assert(w_pool->size() > 0);
         
         typename std::list<bid_type>::iterator curbid = bids->begin();
         for(unsigned i=0;i<nblocks;++i,++curbid)
         {
-          block_type *b = w_pool.steal();
+          block_type *b = w_pool->steal();
           another_merger.multi_merge(b->begin(),b->end());
-          w_pool.write(b,*curbid);
+          w_pool->write(b,*curbid);
         }
         
         insert_segment(bids,first_block,first_size);
@@ -1214,7 +1220,8 @@ public:
 
   void swap(priority_queue & obj)
   {
-	  swap_1D_arrays(itree,obj.itree,IntLevels);
+	  //swap_1D_arrays(itree,obj.itree,IntLevels); // does not work in g++ 3.4.3 :( bug?
+	  for(unsigned i=0;i<IntLevels;++i) std::swap(itree[i],obj.itree[i]);
       // std::swap(p_pool,obj.p_pool);
       // std::swap(w_pool,obj.w_pool);
       std::swap(etree,obj.etree);
@@ -1352,7 +1359,10 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
   deallocate_pools(false)
 {
   STXXL_VERBOSE2("priority_queue::priority_queue()")
-  etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
+  //etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
+  etree = new ext_merger_type[ExtLevels];
+  for(int j=0;j<ExtLevels;++j)
+	  etree[j].set_pools(&p_pool,&w_pool);
   value_type sentinel = cmp.min_value();
   buffer1[BufferSize1] = sentinel; // sentinel
   insertHeap.push(sentinel); // always keep the sentinel

@@ -81,9 +81,16 @@ namespace stable_ksort_local
 		simple_vector<bid_type> * bids;
 		alloc_strategy alloc_strategy_;
 		
-		bid_sequence() {}
+		
 	public:
+		bid_sequence() {}
 		bid_sequence(size_type size_)
+		{
+			bids = new simple_vector<bid_type>(size_);
+			block_manager * mng = block_manager::get_instance();
+			mng->new_blocks(alloc_strategy_,bids->begin(),bids->end());
+		}
+		void init(size_type size_)
 		{
 			bids = new simple_vector<bid_type>(size_);
 			block_manager * mng = block_manager::get_instance();
@@ -240,7 +247,9 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 	STXXL_MSG("Read buffers in distribution phase: "<<nread_buffers)
 	STXXL_MSG("Write buffers in distribution phase: "<<nwrite_buffers)
 
-	bucket_bids_type * bucket_bids = new bucket_bids_type[nbuckets](est_bucket_size);
+	bucket_bids_type * bucket_bids = new bucket_bids_type[nbuckets];
+	for(i=0;i<nbuckets;++i)
+		bucket_bids[i].init(est_bucket_size);
 	int64 * bucket_sizes = new int64[nbuckets];
 	
 	disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);

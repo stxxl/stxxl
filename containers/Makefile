@@ -1,9 +1,12 @@
-all: testmap vector stack mstack p_queue queue map
+all: vector stack mstack p_queue queue 
 
 include ../compiler.make
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
+# Btree (map) is not yet compatible with g++ 3.4.x, therefore it is not
+# included into the main tests (the Makefile goal above)
+btree_map_test: testmap map
 
 queue: $(DEPENDENCIES)
 	$(GCC) testqueue.cpp -o testqueue $(STXXL_OBJ)

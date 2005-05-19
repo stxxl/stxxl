@@ -109,6 +109,8 @@ namespace stxxl
 		typedef TwoToOneDimArrayAdaptorBase < one_dim_array_type,
 			data_type, pos_type > _Self;
 
+		
+		
 		TwoToOneDimArrayAdaptorBase ()
 		{
 		};
@@ -261,6 +263,9 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 		typedef TwoToOneDimArrayColumnAdaptor < one_dim_array_type,
 			data_type, dim_size, pos_type > _Self;
 
+		using TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type >::pos;
+		using TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type >::array;
+		
 		  TwoToOneDimArrayColumnAdaptor (one_dim_array_type * a,
 						 pos_type
 						 p):TwoToOneDimArrayAdaptorBase

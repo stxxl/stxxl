@@ -18,7 +18,13 @@ tests: lib
 	cd algo; $(MAKE); cd ..
 	cd stream; $(MAKE); cd ..
 	echo "Building tests is completed."
-	
+
+# Btree (map) is not yet compatible with g++ 3.4.x, therefore it is not
+# included into the main tests (the Makefile goal above)
+btree_map_test:
+	cd containers; $(MAKE) btree_map_test; cd ..
+	echo "Building btree (map) tests is completed."
+
 clean:
 	cd io; $(MAKE) clean; cd ..
 	cd mng; $(MAKE) clean; cd ..
