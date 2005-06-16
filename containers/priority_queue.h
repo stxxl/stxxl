@@ -1383,7 +1383,9 @@ priority_queue<Config_>::priority_queue(unsigned p_pool_mem, unsigned w_pool_mem
   deallocate_pools(true)
 {
   STXXL_VERBOSE2("priority_queue::priority_queue()")
-  etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
+  etree = new ext_merger_type[ExtLevels];
+	for(int j=0;j<ExtLevels;++j)
+	  etree[j].set_pools(&p_pool,&w_pool);
   value_type sentinel = cmp.min_value();
   buffer1[BufferSize1] = sentinel; // sentinel
   insertHeap.push(sentinel); // always keep the sentinel
