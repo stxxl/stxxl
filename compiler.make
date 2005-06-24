@@ -6,7 +6,7 @@ MAKE = make
 COMPILER = g++ # we support only g++ >= 3.2
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /home/dementiev/projects/stxxl
+STXXL_ROOT = /KM/usr/rdementi/projects/stxxl
 
 
 COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h    ../common/perm.h  \
@@ -38,10 +38,15 @@ STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 # -DSTXXL_BOOST_TIMESTAMP -lboost_date_time-gcc-mt-1_32 \
 # -DSTXXL_BOOST_TIMESTAMP -DSTXXL_BOOST_CONFIG
 
-STXXL_SPECIFIC = -D_XOPEN_SOURCE=600 -DSTXXL_USE_POSIX_MEMALIGN_ALLOC \
+POSIX_MEMALIGN = -DSTXXL_USE_POSIX_MEMALIGN_ALLOC
+XOPEN_SOURCE = -D_XOPEN_SOURCE=600
+
+STXXL_SPECIFIC = $(XOPEN_SOURCE) $(POSIX_MEMALIGN) \
 	-DSORT_OPT_PREFETCHING \
 	-DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I$(STXXL_ROOT)/ \
     $(BOOST_VARS)	
+
+
 LARGE_FILE = -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 NO_OVR = #  -DNO_OVERLAPPING
 PROF = # -DSTXXL_THREAD_PROFILING -pg

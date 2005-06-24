@@ -175,12 +175,13 @@ namespace map_internal
 		bool valid()
 		{
 			STXXL_ASSERT( _n_offset >= 0 );
-			STXXL_ASSERT( _n_offset <= node_type::MAX_SIZE()
 
 #ifdef STXXL_DEBUG_ON
-			|| _sp_node->is_nil
+			STXXL_ASSERT( _n_offset <= node_type::MAX_SIZE() || _sp_node->is_nil);
+#else
+			STXXL_ASSERT( _n_offset <= node_type::MAX_SIZE());
 #endif
-			);
+		
 
 			STXXL_ASSERT( _sp_node == NULL || _n_offset <= _sp_node->size() );
 

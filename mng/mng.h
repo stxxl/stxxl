@@ -1177,7 +1177,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		typedef BIDType bid_type;
 		typedef  BIDArray<bid_type::t_size> bid_array_type;
 
-		bid_type tmpbid;
+		// bid_type tmpbid;
 		int *bl = new int[ndisks];
 		bid_array_type * disk_bids = new bid_array_type[ndisks];
 		file ** disk_ptrs = new file * [nblocks];
