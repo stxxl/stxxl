@@ -15,7 +15,8 @@ push_sort: stream.h push_sort.cpp $(DEPENDENCIES)
 	$(GCC) push_sort.cpp -o push_sort $(STXXL_LIB) -g -DSTXXL_VERBOSE_LEVEL=1
 	
 test:	stream.h test_stream.cpp $(DEPENDENCIES)
-	$(GCC) test_stream.cpp -o test $(STXXL_LIB) -g -DSTXXL_VERBOSE_LEVEL=1
+	$(GCC) test_stream.cpp -o test $(STXXL_LIB) -g -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_SMALL_INPUT_PSORT_OPT
+	
 
 clean:
 	rm -rf stream  push_sort sruns test

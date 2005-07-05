@@ -165,21 +165,40 @@ namespace stream
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
     block_type * Blocks1 = new block_type[m2*2];
 #else
-	block_type * Blocks1 = new block_type[1]; // allocate only one block first
+	/*
+	block_type * Blocks1 = new block_type[1];       // allocate only one block first
 	                                                                        // if needed reallocate
-	
 	while(!input.empty() && pos != block_type::size)
     {
       Blocks1[pos/block_type::size][pos%block_type::size] = *input;
       ++input;
       ++pos;
-    }
-	if(pos == block_type::size ) 
+    }*/
+	
+	
+	while(!input.empty() && pos != block_type::size)
+	{
+		result_.small.push_back(*input);
+		++input;
+      	++pos;
+	}		
+	
+	block_type * Blocks1;	
+	
+	if( pos == block_type::size ) 
 	{      // ennlarge/reallocate Blocks1 array
 			block_type * NewBlocks = new block_type[m2*2];
-			std::copy(Blocks1[0].begin(), Blocks1[0].end(), NewBlocks[0].begin());
-			delete [] Blocks1;
+			std::copy(result_.small.begin(), result_.small.end(), NewBlocks[0].begin());
+			result_.small.clear();
+			//delete [] Blocks1;
 			Blocks1 = NewBlocks;
+	}
+	else
+	{
+		STXXL_VERBOSE1("runs_creator: Small input optimization, input length: "<<pos);
+		result_.elements = pos;
+		std::sort(result_.small.begin(), result_.small.end(), cmp);
+		return;		
 	}
 #endif
 	
