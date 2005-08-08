@@ -1,7 +1,7 @@
 # Change this file according to your paths
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /home/dementiev/projects/stxxl_win/stxxl#
+STXXL_ROOT = /home/dementiev/projects/stxxl#
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
@@ -42,7 +42,7 @@ BOOST_COMPILER_OPTIONS =  \
 COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h    ../common/perm.h  \
 ../common/rand.h    ../common/semaphore.h      ../common/state.h   ../common/timer.h \
 ../common/utils.h ../common/gprof.h ../common/rwlock.h  ../common/simple_vector.h  \
-../common/switch.h  ../common/tmeta.h ../compiler.make
+../common/switch.h  ../common/tmeta.h ../make.settings
 
 IO_LAYER_FILES = ../io/completion_handler.h  ../io/io.h  ../io/iobase.h  \
  ../io/iostats.h  ../io/mmap_file.h  ../io/simdisk_file.h  ../io/syscall_file.h  \
@@ -52,7 +52,7 @@ MNG_LAYER_FILES = ../mng/adaptor.h  ../mng/async_schedule.h  ../mng/block_prefet
 ../mng/buf_istream.h  ../mng/buf_ostream.h  ../mng/buf_writer.h  ../mng/mng.h \
 ../mng/write_pool.h ../mng/prefetch_pool.h
 
-CONTAINER_MAP_FILES = $(STXXL_ROOT)/containers/map.impl/*.h
+CONTAINER_MAP_FILES = # $(STXXL_ROOT)/containers/map.impl/*.h
 
 CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/vector.h \
 ../containers/priority_queue.h ../containers/queue.h $(CONTAINER_MAP_FILES)

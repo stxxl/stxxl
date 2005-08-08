@@ -2,8 +2,12 @@ main: lib
 
 include make.settings
 
-lib:
+library:
 	cd io;$(MAKE) lib;cd ..
+	cd mng;$(MAKE) lib;cd ..
+	cd algo;$(MAKE) lib;cd ..
+	cd common;$(MAKE) lib;cd ..
+	cd lib;$(MAKE);cd ..
 	cd utils;$(MAKE) create;cd ..
 	@echo "Building library is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"

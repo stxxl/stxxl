@@ -26,7 +26,7 @@ prefetch_pool: prefetch_pool.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) prefetch_pool.$(OBJEXT) write_pool.$(OBJEXT)
-	$(RM) test_streams.$(OBJEXT) test.$(OBJEXT)
+	$(RM) *.$(OBJEXT)
+	$(RM) test.$(EXEEXT)
 	$(RM) prefetch_pool.$(EXEEXT) write_pool.$(EXEEXT)
-	$(RM) test_streams.$(EXEEXT) test.$(EXEEXT)
+	$(RM) test_streams.$(EXEEXT) 
