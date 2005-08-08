@@ -1,4 +1,3 @@
-# Use '#' at the beginning of the line for writing comments
 disk=/mnt/hdc/stxxl,70000,syscall
 disk=/mnt/hde/stxxl,70000,syscall
 disk=/mnt/hdg/stxxl,70000,syscall
