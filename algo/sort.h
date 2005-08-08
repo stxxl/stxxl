@@ -400,8 +400,8 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	#ifdef PLAY_WITH_OPT_PREF
 	const int n_write_buffers = 4 * disks_number;
 	#else
-	const int n_prefetch_buffers = std::max( 2 * disks_number , (3 * (int(_m) - nruns) / 4));
-        const int n_write_buffers = std::max( 2 * disks_number , int(_m) - nruns - n_prefetch_buffers );
+	const int n_prefetch_buffers = STXXL_MAX( 2 * disks_number , (3 * (int(_m) - nruns) / 4));
+        const int n_write_buffers = STXXL_MAX( 2 * disks_number , int(_m) - nruns - n_prefetch_buffers );
 	// heuristic
 	const int n_opt_prefetch_buffers = 2 * disks_number + (3*(n_prefetch_buffers - 2 * disks_number))/10;
 	#endif
@@ -530,7 +530,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 			
 		}
 	
-	create_runs< block_type,
+		sort_local::create_runs< block_type,
 							 run_type,
 							 input_bid_iterator,
 							 value_cmp > (input_bids, runs, nruns,_m,cmp );
@@ -546,7 +546,8 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 
 	// Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) runs at once
 		
-	const int merge_factor = static_cast<int>(ceil(pow(nruns,1./ceil(log(nruns)/log(_m)))));
+	const int merge_factor = static_cast<int>(ceil(pow(nruns,1./ceil(log(double(nruns))/
+		log(double(_m))))));
 	run_type **new_runs;
 	
 	while(nruns > 1)
@@ -879,7 +880,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				req->wait();
 				
 			
-				for(unsigned i=last.block_offset(); i < block_type::size;++i)
+				for(i=last.block_offset(); i < block_type::size;++i)
 				{
 					last_block->elem[i] = cmp.max_value();
 				}

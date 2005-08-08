@@ -59,7 +59,7 @@ public:
 		run_cursor_cmp_type c): cmp(c)
 	{
 		int i;
-		logK = static_cast < int >(ceil (log (nruns) / log (2.)));	// replace with something smart
+		logK = static_cast < int >(ceil (log (double(nruns)) / log (2.)));	// replace with something smart
 		int kReg = k = (1 << logK);
 		
 		STXXL_VERBOSE2("looser_tree: logK="<<logK<<" nruns="<<nruns<<" K="<<kReg)

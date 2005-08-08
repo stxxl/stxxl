@@ -10,6 +10,11 @@
  ****************************************************************************/
 
 #include "ufs_file.h"
+
+#ifdef BOOST_MSVC
+// mmap call does not exist in Windows
+#else
+
 #include <sys/mman.h>
 
 __STXXL_BEGIN_NAMESPACE
@@ -241,5 +246,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \}
   
 __STXXL_END_NAMESPACE
+
+#endif
 
 #endif

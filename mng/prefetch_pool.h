@@ -11,7 +11,13 @@
 #include "../mng/mng.h"
 #include "write_pool.h"
 #include <list>
+
+#ifdef BOOST_MSVC
+#include <hash_map>
+#else
 #include <ext/hash_map>
+#endif
+ 
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -35,9 +41,29 @@ protected:
         size_t(bid.offset & 0xffffffff) + size_t(bid.offset>>32);
       return result;
     }
+	#ifdef BOOST_MSVC
+	bool operator()(const bid_type & bid1, const bid_type & bid2) const
+    {
+	  if(long(bid1.storage)<long(bid2.storage))
+		  return true;
+	  if(long(bid1.storage)>long(bid2.storage))
+		  return false;
+
+      return (bid1.offset < bid2.offset);
+    }
+	enum
+	{	// parameters for hash table
+		bucket_size = 4,	// 0 < bucket_size
+		min_buckets = 8
+	};	// min_buckets = 2 ^^ N, 0 < N
+	#endif
   };
   typedef std::pair<block_type *,request_ptr> busy_entry;
+  #ifdef BOOST_MSVC
+  typedef stdext::hash_map < bid_type, busy_entry , bid_hash > hash_map_type;
+  #else
   typedef __gnu_cxx::hash_map < bid_type, busy_entry , bid_hash > hash_map_type;
+  #endif
   typedef typename std::list<block_type *>::iterator free_blocks_iterator;
   typedef typename hash_map_type::iterator busy_blocks_iterator;
   

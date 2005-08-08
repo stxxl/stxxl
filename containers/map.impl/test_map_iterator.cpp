@@ -29,8 +29,8 @@ typedef stxxl::map<key_type,data_type,cmp2,4096,2 >		xxl_map_type;
 #define LOWER 10
 #define UPPER 1000
 
-#define MSG_TEST_START STXXL_MSG( "TEST : test_map_iterator " << __PRETTY_FUNCTION__ << " start" );
-#define MSG_TEST_FINISH STXXL_MSG( "TEST : test_map_iterator " << __PRETTY_FUNCTION__ << " finish" );
+#define MSG_TEST_START STXXL_MSG( "TEST : test_map_iterator " << STXXL_PRETTY_FUNCTION_NAME << " start" );
+#define MSG_TEST_FINISH STXXL_MSG( "TEST : test_map_iterator " << STXXL_PRETTY_FUNCTION_NAME << " finish" );
 
 
 void test_next1( std_map_type& stdmap, xxl_map_type& xxlmap )

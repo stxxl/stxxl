@@ -35,8 +35,8 @@ struct dummy_merger
 
 struct my_cmp: public std::greater<my_type>
 {
-  my_type min_value() { return std::numeric_limits<my_type>::max(); }
-  my_type max_value() { return std::numeric_limits<my_type>::min(); }
+  my_type min_value() { return (std::numeric_limits<my_type>::max)(); }
+  my_type max_value() { return (std::numeric_limits<my_type>::min)(); }
 };
 
 int main()
@@ -47,8 +47,7 @@ int main()
   dummy_merger dummy(cnt);
   std::vector<my_type> output(1024*3);
   
- /* 
-  ext_merger<block_type,my_cmp,5> merger(p_pool,w_pool);
+  ext_merger<block_type,my_cmp,5> merger(&p_pool,&w_pool);
   merger.insert_segment(dummy,1024*3);
   cnt = 20;
   merger.insert_segment(dummy,1024*4);
@@ -57,7 +56,7 @@ int main()
   cnt = -100;
   merger.insert_segment(dummy,1024*4);
   merger.insert_segment(dummy,1024*4);
-  merger.multi_merge(output.begin(),output.end()); */
+  merger.multi_merge(output.begin(),output.end()); 
   
   //template <class ValTp_,class Cmp_,unsigned KNKMAX>
   looser_tree<my_type,my_cmp,10> looser;
@@ -81,10 +80,7 @@ int main()
   
   looser.multi_merge(out,out + 1024);
   std::copy(out,out + 1024,std::ostream_iterator<my_type>(std::cout, "\n"));
-  delete [] seq1;
-  delete [] seq2;
-  delete [] seq3;
-  delete [] seq4;
+
   delete [] out;
   
 }

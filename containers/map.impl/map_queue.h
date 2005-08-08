@@ -175,7 +175,7 @@ public:
 		}
 
 		//! append a request into queue.
-		void map_queue::add_request ( smart_ptr< map_request<map> > & p_req )
+		void add_request ( smart_ptr< map_request<map> > & p_req )
 		{
 			#ifdef STXXL_BOOST_THREADS
 			boost::mutex::scoped_lock Lock(worker_mutex);
@@ -216,7 +216,7 @@ public:
 		If any we will wait.
 		And finally the request will be moved into \c stxxl::map_internal::btree_request
 		*/
-		static void* map_queue::worker (void *arg)
+		static void* worker (void *arg)
 		{
 			// ******************************************************************
 			// a thrae will be initialize

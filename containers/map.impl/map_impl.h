@@ -40,9 +40,10 @@ namespace map_internal
 template <typename Key_, typename Data_, typename Compare_, unsigned BlkSize_, unsigned PrefCacheSize_>
 class map_impl : public ref_counter< map_impl<Key_,Data_,Compare_,BlkSize_,PrefCacheSize_> >
 {
-
+	#ifndef BOOST_MSVC
 		__glibcpp_class_requires(Data_, _SGIAssignableConcept)
 		__glibcpp_class_requires4(_Compare, bool, Key_, Key_, _BinaryFunctionConcept)
+	#endif
 
 private:
 

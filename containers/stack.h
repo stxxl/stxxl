@@ -131,7 +131,7 @@ public:
   }
   virtual ~normal_stack()
   {
-    STXXL_VERBOSE(__PRETTY_FUNCTION__);
+    STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
     block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
   }
   size_type size() const
@@ -333,7 +333,7 @@ public:
   }
   virtual ~grow_shrink_stack()
   {
-    STXXL_VERBOSE(__PRETTY_FUNCTION__);
+    STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
     if(requests[0].get()) wait_all(requests.begin(),blocks_per_page);  
     block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
   }
@@ -501,7 +501,7 @@ public:
   {
     STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()")
     const int bids_size = bids.size();
-    const int last_pref = std::max(int(bids_size) - int(pref_aggr),0);
+    const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr),0);
     int i;
     for(i=bids_size - 1 ; i >= last_pref ; --i )
     {
@@ -545,7 +545,7 @@ public:
       w_pool.write(cache,bids.back());
       cache = w_pool.steal();
       const int bids_size = bids.size();
-      const int last_pref = std::max(int(bids_size) - int(pref_aggr) - 1,0);
+      const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr) - 1,0);
       for(int i=bids_size - 2 ; i >= last_pref ; --i )
       {
         if(p_pool.in_prefetching(bids[i]))
@@ -602,7 +602,7 @@ public:
       }
       block_manager::get_instance()->delete_block(last_block);
       const int bids_size = bids.size();
-      const int last_pref = std::max(int(bids_size) - int(pref_aggr),0);
+      const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr),0);
       for(int i=bids_size - 1; i >= last_pref ; --i )
       {
         p_pool.hint(bids[i]); // prefetch
@@ -624,7 +624,7 @@ public:
     if(pref_aggr > new_p)
     {
       const int bids_size = bids.size();
-      const int last_pref = std::max(int(bids_size) - int(pref_aggr),0);
+      const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr),0);
       for(int i=bids_size - new_p - 1 ; i >= last_pref ; --i )
       {
         if(p_pool.in_prefetching(bids[i]))
@@ -635,7 +635,7 @@ public:
     if(pref_aggr < new_p)
     {
       const int bids_size = bids.size();
-      const int last_pref = std::max(int(bids_size) - int(new_p),0);
+      const int last_pref = STXXL_MAX(int(bids_size) - int(new_p),0);
       for(int i=bids_size - 1 ; i >= last_pref ; --i )
       {
         p_pool.hint(bids[i]); // prefetch

@@ -29,8 +29,8 @@ bool operator < (const my_type & a, const my_type & b)
 
 int main()
 {
-		my_type::key_type max_key = 16*1024*1024;
-		unsigned int block_size = 16*1024*1024;
+		my_type::key_type max_key = 1*1024*1024;
+		unsigned int block_size = 1*1024*1024;
 		unsigned int records_in_block = block_size / sizeof(my_type);
 		my_type * array = (my_type *) aligned_alloc<BLOCK_ALIGN>(block_size);
 		syscall_file f("./in",file::CREAT|file::RDWR);

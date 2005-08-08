@@ -27,13 +27,25 @@
 //#define O_DIRECT 0
 //#endif
 
+#include "../common/utils.h"
+
 #include <iostream>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#ifdef BOOST_MSVC
+#include <io.h>
+
+#else
 #include <sys/time.h>
-#include <fcntl.h>
 #include <unistd.h>
+#include <sys/resource.h>
+#include <sys/wait.h>
+#endif
+
+#include <fcntl.h>
+
 
 #ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
 // Boost.Threads headers
@@ -47,9 +59,8 @@
 
 #include <string.h>
 #include <errno.h>
-#include <sys/resource.h>
-#include <sys/types.h>
-#include <sys/wait.h>
+
+
 #include <stdlib.h>
 
 // STL includes
@@ -87,7 +98,7 @@
 
 
 #include "iostats.h"
-#include "../common/utils.h"
+
 #include "../common/semaphore.h"
 #include "../common/mutex.h"
 //#include "../common/rwlock.h"

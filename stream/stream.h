@@ -89,6 +89,7 @@ namespace stream
     }
   };
   
+
   //! \brief Input iterator range to stream convertor
   //! \param begin iterator, pointing to the first value
   //! \param end iterator, pointing to the last + 1 position, i.e. beyond the range 
@@ -98,6 +99,14 @@ namespace stream
   {
     return iterator2stream<InputIterator_>(begin,end);
   }
+
+  //! \brief Traits class of \c streamify function
+  template <class InputIterator_>
+  struct streamify_traits
+  {
+	  //! \brief return type (stream type) of \c´streamify for \c InputIterator_
+	  typedef iterator2stream<InputIterator_> stream_type;
+  };
   
   //! \brief A model of steam that retrieves data from an external \c stxxl::vector iterator.
   //! It is more efficient than generic \c iterator2stream thanks to use of overlapping
@@ -199,6 +208,13 @@ namespace stream
     	return vector_iterator2stream<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
 	  		(begin,end,nbuffers);
   }
+
+  template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
+		unsigned BlkSize_, typename PgTp_, unsigned PgSz_ > 
+  struct streamify_traits<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> >
+  {
+	  typedef vector_iterator2stream<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> >  stream_type;
+  };
   
   //! \brief Input external \c stxxl::vector const iterator range to stream convertor
   //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
@@ -220,6 +236,14 @@ namespace stream
     	return vector_iterator2stream<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
 	  		(begin,end,nbuffers);
   }
+
+  template < typename Tp_, typename AllocStr_, typename SzTp_,typename DiffTp_,
+		unsigned BlkSize_, typename PgTp_, unsigned PgSz_ > 
+  struct streamify_traits<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> >
+  {
+	  typedef vector_iterator2stream<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> >  stream_type;
+  };
+  
 
   //! \brief Version of  \c iterator2stream. Switches between \c vector_iterator2stream and \c iterator2stream .
   //!

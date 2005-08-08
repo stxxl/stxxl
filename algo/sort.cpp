@@ -7,7 +7,7 @@
 
 using namespace stxxl;
 
-#define RECORD_SIZE 8
+#define RECORD_SIZE 128
 
 struct my_type
 {
@@ -49,15 +49,15 @@ struct cmp: public std::less<my_type>
 
 int main()
 {	
-		unsigned memory_to_use = 64*1024*1024;
+		unsigned memory_to_use = 256*1024*1024;
 		typedef stxxl::vector<my_type> vector_type;
-		const stxxl::int64 n_records = 4*32*1024*1024/sizeof(my_type) - 2*1024*1024/sizeof(my_type);
+		const stxxl::int64 n_records = stxxl::int64(2*1024+512)*stxxl::int64(1024*1024)/sizeof(my_type) - 2*1024*1024/sizeof(my_type);
 		vector_type v(n_records);
 	
     		random_number32 rnd;
-		STXXL_MSG("Filling vector...")
+		STXXL_MSG("Filling vector..., input size ="<<v.size())
 		for(stxxl::int64 i=0; i < v.size(); i++)
-			v[i]._key = 1 + (rnd()%0xffff);
+			v[i]._key = 1 + (rnd()%0xfffffff);
 	
 		STXXL_MSG("Checking order...")
 		STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
@@ -68,7 +68,7 @@ int main()
 		STXXL_MSG("Checking order...")
 		STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
 		
-		STXXL_MSG("Done")
+		STXXL_MSG("Done, output size="<<v.size())
 	
 		return 0;
 }

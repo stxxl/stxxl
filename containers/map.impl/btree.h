@@ -402,6 +402,7 @@ public:
 				STXXL_ASSERT( 0 );
 				break;
 			}
+			return false;
 	}
 
 	// ***********************************************************************
@@ -450,6 +451,7 @@ public:
 			default:
 				STXXL_ASSERT ( 0 ); break;
 			}
+			return false;
 	}
 
 private:
@@ -5388,7 +5390,8 @@ public:
 	btree_queue<btree<Key_,Data_,Compare_,BlkSize_,unique_,PrefCacheBlkSize_> > btree<Key_,Data_,Compare_,BlkSize_,unique_,PrefCacheBlkSize_>::_btree_queue;
 
 	template<typename Key_,typename Data_, typename Compare_, unsigned BlkSize_,bool unique_,unsigned PrefCacheBlkSize_>
-	void btree<Key_,Data_,Compare_,BlkSize_,unique_,PrefCacheBlkSize_>::_replace_key( btree<Key_,Data_,Compare_,BlkSize_,unique_,PrefCacheBlkSize_>::iterator& iter, unsigned height, Key_ key )
+	void btree<Key_,Data_,Compare_,BlkSize_,unique_,PrefCacheBlkSize_>::_replace_key( 
+		typename btree<Key_,Data_,Compare_,BlkSize_,unique_,PrefCacheBlkSize_>::iterator& iter, unsigned height, Key_ key )
 	{
 		if ( iter == end() || height > _height ) return;
 		if ( height == 1 )

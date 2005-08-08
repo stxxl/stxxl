@@ -9,7 +9,9 @@
 //! \brief This file contains a halpfully macros.
 
 #include <mng/mng.h>
+#ifndef BOOST_MSVC
 #include <pthread.h>
+#endif
 #include <queue>
 #include <common/semaphore.h>
 #include <common/mutex.h>

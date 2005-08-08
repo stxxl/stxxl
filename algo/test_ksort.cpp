@@ -7,7 +7,6 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#define COUNT_WAIT_TIME
 
 // #define PLAY_WITH_OPT_PREF
 
@@ -81,7 +80,7 @@ void test(stxxl::int64 records_to_sort,unsigned memory_to_use,unsigned n_prefetc
 	STXXL_MSG("Prefetch buffers "<<n_prefetch_blocks<<" = "<<(double(n_prefetch_blocks)/ndisks)<<"*D")
 	n_prefetch_buffers = n_prefetch_blocks;
 	STXXL_MSG("OPT Prefetch buffers "<<n_opt_prefetch_buffers<<" = "<<(double(n_opt_prefetch_buffers)/ndisks)<<"*D")
-	const int n_write_blocks = std::max( 2 * ndisks , int(memory_to_use/vector_type::block_type::raw_size) - 
+	const int n_write_blocks = STXXL_MAX( 2 * ndisks , int(memory_to_use/vector_type::block_type::raw_size) - 
 			int(2*(records_to_sort*sizeof(my_type))/memory_to_use) - n_prefetch_blocks );
 	STXXL_MSG("Write buffers "<< (n_write_blocks) <<" = "<< (double(n_write_blocks)/ndisks)<<"*D")
 	STXXL_MSG("Seed " << stxxl::ran32State )
@@ -139,7 +138,11 @@ int main(int argc, char * argv[])
 		return -1;
 	}
 	
+	#ifdef BOOST_MSVC
+	stxxl::int64 n_records = (_atoi64(argv[1])*MB)/sizeof(my_type);
+	#else
 	stxxl::int64 n_records = (atoll(argv[1])*MB)/sizeof(my_type);
+	#endif
 	int sort_mem = atoi(argv[2])*MB;
 	int strategy = atoi(argv[3]);
 	int block_size = atoi(argv[4]);

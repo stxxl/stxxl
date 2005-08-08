@@ -1,0 +1,4 @@
+# Use '#' at the beginning of the line for writing comments
+disk=c:\stxxl,70000,wincall
+disk=d:\stxxl,70000,wincall
+disk=e:\stxxl,70000,wincall

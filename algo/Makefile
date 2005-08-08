@@ -1,43 +1,61 @@
 all: asch scan genfile sortfile ksort stable sort 
 
-include ../compiler.make
+include ../make.settings
 
 
-# STXXL_LIB += -DSTXXL_CHECK_ORDER_IN_SORTS
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 
-main: test_ksort.cpp $(DEPENDENCIES)
-	$(GCC) test_ksort.cpp -o test_ksort $(STXXL_LIB)
 
-main_opt: test_ksort.cpp $(DEPENDENCIES)
-	$(GCC) test_ksort.cpp -o test_ksort_op $(STXXL_LIB) # -DSORT_OPT_PREFETCHING
+lib: async_schedule.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c async_schedule.cpp
 
-mains: test_sort.cpp
-	$(GCC) test_sort.cpp -o test_sort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
+manyunits:
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c munits1.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c munits2.cpp
+	$(LINKER) munits1.$(OBJEXT) munits2.$(OBJEXT) $(OUT)munits.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+
+
+main: test_ksort.cpp $(DEPENDENCIES) # takes long to compile 
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ksort.cpp
+	$(LINKER)  test_ksort.$(OBJEXT) $(OUT)test_ksort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+mains: test_sort.cpp # takes long to compile
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_sort.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(LINKER)  test_sort.$(OBJEXT) $(OUT)test_sort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 	
-
 asch: test_asch.cpp $(DEPENDENCIES)
-	$(GCC) test_asch.cpp -o test_asch $(STXXL_LIB)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_asch.cpp
+	$(LINKER)  test_asch.$(OBJEXT) $(OUT)test_asch.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 scan: test_scan.cpp $(DEPENDENCIES)
-	$(GCC) test_scan.cpp -o test_scan $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_scan.cpp
+	$(LINKER)  test_scan.$(OBJEXT) $(OUT)test_scan.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 genfile: gen_file.cpp $(DEPENDENCIES)
-	$(GCC) gen_file.cpp -o gen_file $(STXXL_LIB)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c gen_file.cpp
+	$(LINKER)  gen_file.$(OBJEXT) $(OUT)gen_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 sortfile: sort_file.cpp $(DEPENDENCIES)
-	$(GCC) sort_file.cpp -o sort_file $(STXXL_LIB) 
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c sort_file.cpp
+	$(LINKER)  sort_file.$(OBJEXT) $(OUT)sort_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 ksort: ksort.cpp $(DEPENDENCIES)
-	$(GCC) ksort.cpp -o ksort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_CHECK_ORDER_IN_SORTS
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c ksort.cpp -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_CHECK_ORDER_IN_SORTS
+	$(LINKER)  ksort.$(OBJEXT) $(OUT)ksort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 stable: stable_ksort.cpp $(DEPENDENCIES)
-	$(GCC) stable_ksort.cpp -o stable_ksort $(STXXL_LIB) -DCOUNT_WAIT_TIME
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stable_ksort.cpp -DCOUNT_WAIT_TIME
+	$(LINKER)  stable_ksort.$(OBJEXT) $(OUT)stable_ksort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 sort: sort.cpp $(DEPENDENCIES)
-	$(GCC) sort.cpp -o ssort $(STXXL_LIB) -DSTXXL_VERBOSE_LEVEL=1 
-	
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c sort.cpp -DSTXXL_VERBOSE_LEVEL=0
+	$(LINKER)  sort.$(OBJEXT) $(OUT)sort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 clean:
-	rm -f *.o *~ ssort stable_ksort ksort sort_file gen_file test_scan test_asch test_ksort_op test_ksort test_sort
+	$(RM) *.$(OBJEXT) sort.$(EXEEXT) stable_ksort.$(EXEEXT) 
+	$(RM) ksort.$(EXEEXT) sort_file.$(EXEEXT) gen_file.$(EXEEXT) 
+	$(RM) test_scan.$(EXEEXT) test_asch.$(EXEEXT) test_ksort.$(EXEEXT) 
+	$(RM) test_sort.$(EXEEXT) munits.$(EXEEXT)
+

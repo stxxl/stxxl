@@ -25,8 +25,8 @@ using namespace stxxl::map_test;
 typedef std::map<key_type,data_type,cmp2>							std_map;
 typedef stxxl::map<key_type,data_type,cmp2,4096,0 >		xxl_map;
 
-#define MSG_TEST_START STXXL_MSG( "TEST : test_map_iterator " << __PRETTY_FUNCTION__ << " start" );
-#define MSG_TEST_FINISH STXXL_MSG( "TEST : test_map_iterator " << __PRETTY_FUNCTION__ << " finish" );
+#define MSG_TEST_START STXXL_MSG( "TEST : test_map_iterator " << STXXL_PRETTY_FUNCTION_NAME << " start" );
+#define MSG_TEST_FINISH STXXL_MSG( "TEST : test_map_iterator " << STXXL_PRETTY_FUNCTION_NAME << " finish" );
 
 #define TEST_COUTER_START		unsigned test_couter = 1;
 #define TEST_COUTER_STEP(x)\

@@ -6,7 +6,10 @@
 #include "../common/utils.h"
 
 #include <time.h>
+
+#ifndef BOOST_MSVC
 #include <sys/time.h>
+#endif
 
 #ifdef STXXL_BOOST_TIMESTAMP
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -21,15 +24,15 @@ class timer
 	bool running;
 	double accumulated;
 	double last_clock;
-	double timestamp();
+	inline  double timestamp();
 public:
-	timer();
-	void start();
-	void stop();
-	void reset();
-	double seconds();
-	double mseconds();
-	double useconds();
+	inline timer();
+	inline void start();
+	inline void stop();
+	inline void reset();
+	inline double seconds();
+	inline double mseconds();
+	inline double useconds();
 };
 
 timer::timer():running(false),accumulated(0.)

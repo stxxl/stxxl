@@ -10,7 +10,12 @@
 #include "../common/utils.h"
 #include "../mng/mng.h"
 #include <list> 
+
+#ifdef BOOST_MSVC
+#include <hash_map>
+#else
 #include <ext/hash_map>
+#endif
  
 __STXXL_BEGIN_NAMESPACE
  

@@ -1,34 +1,36 @@
-all_tests: lib main disktest flushbuffers
+all_tests: main disktest flushbuffers
 
-include ../compiler.make
+include ../make.settings
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)
 
 
-lib: diskqueue
-	ar cr libstxxl.a diskqueue.o
+lib: diskqueue.cpp wfs_file.cpp ufs_file.cpp syscall_file.cpp wincall_file.cpp iostats.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c ufs_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c syscall_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wincall_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wfs_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c iostats.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c diskqueue.cpp
 
-lib_debug: diskqueue_debug
-	ar cr libstxxl.a diskqueue.o
 
-main: test lib 
-	$(GCC) test.o -o main $(STXXL_LIB) 
+main: test
+	$(LINKER) test.$(OBJEXT) $(OUT)test.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test: test.cpp $(DEPENDENCIES)
-	$(GCC) -c test.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test.cpp
 
-diskqueue: diskqueue.cpp $(DEPENDENCIES)
-	$(GCC) -c diskqueue.cpp
-
-diskqueue_debug: diskqueue.cpp $(DEPENDENCIES)
-	$(GCC) -c diskqueue.cpp -g
 
 disktest: disktest.cpp $(DEPENDENCIES)
-	$(GCC) disktest.cpp -o disktest $(STXXL_LIB)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c disktest.cpp  
+	$(LINKER) disktest.$(OBJEXT) $(OUT)disktest.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
+	
 
 flushbuffers: flushbuffers.cpp $(DEPENDENCIES)
-	$(GCC) flushbuffers.cpp -o flush $(STXXL_LIB) 
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c flushbuffers.cpp
+	$(LINKER) flushbuffers.$(OBJEXT) $(OUT)flushbuffers.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 clean:
-	rm -f *.o *.a main disktest flush 
+	$(RM) *.$(OBJEXT) *.$(LIBEXT) disktest.$(EXEEXT)
+	$(RM) flushbuffers.$(EXEEXT) test.$(EXEEXT)
 

@@ -15,14 +15,20 @@
 
 
 #include <iostream>
+#include <algorithm>
 #include <assert.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+
+#ifdef BOOST_MSVC
+#else
 #include <sys/time.h>
+#include <unistd.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -33,10 +39,14 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #endif
 
+#ifdef STXXL_BOOST_FILESYSTEM
+#include "boost/filesystem/operations.hpp"
+#endif
+
 #define __STXXL_BEGIN_NAMESPACE namespace stxxl {
 #define __STXXL_END_NAMESPACE }
 
-
+#include "log.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -44,12 +54,22 @@ __STXXL_BEGIN_NAMESPACE
 
 #define __STXXL_STRING(x) #x
 
-#define STXXL_MSG(x) { std::cout << "[STXXL-MSG] "<< x << std::endl; std::cout.flush(); };
-#define STXXL_ERRMSG(x) { std::cerr << "[STXXL-ERRMSG] "<< x << std::endl; std::cerr.flush(); };
+#define STXXL_MSG(x) \
+ { std::cout << "[STXXL-MSG] "<< x << std::endl; std::cout.flush(); \
+ stxxl::logger::get_instance()->log_stream() << "[STXXL-MSG] "<< x << std::endl; stxxl::logger::get_instance()->log_stream().flush(); \
+ };
+
+#define STXXL_ERRMSG(x) \
+  { std::cerr << "[STXXL-ERRMSG] "<< x << std::endl; std::cerr.flush(); \
+    stxxl::logger::get_instance()->errlog_stream() << "[STXXL-ERRMSG] "<< x << std::endl; stxxl::logger::get_instance()->errlog_stream().flush(); \
+  };
   
 
 #if STXXL_VERBOSE_LEVEL > 0
-#define STXXL_VERBOSE1(x) { std::cout << "[STXXL-VERBOSE1] "<<x << std::endl; std::cerr.flush(); };
+#define STXXL_VERBOSE1(x) \
+	{ std::cout << "[STXXL-VERBOSE1] "<<x << std::endl; std::cerr.flush(); \
+	stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE1] "<< x << std::endl; stxxl::logger::get_instance()->log_stream().flush(); \
+	};
 #else
 #define STXXL_VERBOSE1(x) ;
 #endif
@@ -57,13 +77,19 @@ __STXXL_BEGIN_NAMESPACE
 #define STXXL_VERBOSE(x) STXXL_VERBOSE1(x) 
 
 #if STXXL_VERBOSE_LEVEL > 1
-#define STXXL_VERBOSE2(x) { std::cout << "[STXXL-VERBOSE2] "<< x << std::endl; std::cerr.flush(); };
+#define STXXL_VERBOSE2(x) \
+	{ std::cout << "[STXXL-VERBOSE2] "<< x << std::endl; std::cerr.flush(); \
+	stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE2] "<< x << std::endl; stxxl::logger::get_instance()->log_stream().flush(); \
+	};
 #else
 #define STXXL_VERBOSE2(x) ;
 #endif  
 
 #if STXXL_VERBOSE_LEVEL > 2
-#define STXXL_VERBOSE3(x) { std::cout << "[STXXL-VERBOSE3] "<< x << std::endl; std::cerr.flush(); };
+#define STXXL_VERBOSE3(x) \
+	{ std::cout << "[STXXL-VERBOSE3] "<< x << std::endl; std::cerr.flush(); \
+	stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE3] "<< x << std::endl; stxxl::logger::get_instance()->log_stream().flush(); \
+	};
 #else
 #define STXXL_VERBOSE3(x) ;
 #endif    
@@ -72,9 +98,7 @@ __STXXL_BEGIN_NAMESPACE
 inline void
 stxxl_perror (const char *errmsg, int errcode)
 {
-	std::cerr << errmsg << " error code " << errcode;
-	std::cerr << " : " << strerror (errcode) << std::endl;
-
+//	STXXL_ERRMSG(errmsg << " error code " << errcode << " : " << strerror (errcode) );
 	exit (errcode);
 }
 
@@ -86,15 +110,45 @@ stxxl_perror (const char *errmsg, int errcode)
 
 #define stxxl_error(errmsg) { perror(errmsg); exit(errno); }
 
-#define stxxl_function_error stxxl_error(__PRETTY_FUNCTION__)
+#ifdef BOOST_MSVC
+#define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
+#else
+#define STXXL_PRETTY_FUNCTION_NAME __PRETTY_FUNCTION__
+#endif
 
-#define stxxl_nassert(expr) { int ass_res=expr; if(ass_res) {  std::cerr << "Error in function: " << __PRETTY_FUNCTION__ << " ";  stxxl_perror(__STXXL_STRING(expr),ass_res); }}
+#define stxxl_function_error stxxl_error(STXXL_PRETTY_FUNCTION_NAME)
 
-#define stxxl_ifcheck(expr) if((expr)<0) { std::cerr<<"Error in function "<<__PRETTY_FUNCTION__<<" "; stxxl_error(__STXXL_STRING(expr));}
 
-#define stxxl_ifcheck_i(expr,info) if((expr)<0) { std::cerr<<"Error in function "<<__PRETTY_FUNCTION__<<" Info: "<< info<<" "; stxxl_error(__STXXL_STRING(expr)); }
+#define stxxl_nassert(expr) { int ass_res=expr; if(ass_res) {  std::cerr << "Error in function: " << STXXL_PRETTY_FUNCTION_NAME << " ";  stxxl_perror(__STXXL_STRING(expr),ass_res); }}
+
+#define stxxl_ifcheck(expr) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" "; stxxl_error(__STXXL_STRING(expr));}
+#define stxxl_ifcheck_win(expr) if((expr)==0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" "; stxxl_error(__STXXL_STRING(expr));}
+
+#define stxxl_ifcheck_i(expr,info) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" Info: "<< info<<" "; stxxl_error(__STXXL_STRING(expr)); }
 
 #define stxxl_debug(expr) expr
+
+#ifdef BOOST_MSVC
+
+#define stxxl_win_lasterror_exit(errmsg)  \
+{ \
+    TCHAR szBuf[80];  \
+    LPVOID lpMsgBuf; \
+    DWORD dw = GetLastError(); \
+    FormatMessage( \
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | \
+        FORMAT_MESSAGE_FROM_SYSTEM, \
+        NULL, \
+        dw, \
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), \
+        (LPTSTR) &lpMsgBuf, \
+        0, NULL ); \
+	STXXL_ERRMSG("Error in "<< errmsg <<", error code "<<dw<<": "<<((char*)lpMsgBuf)); \
+    LocalFree(lpMsgBuf); \
+    ExitProcess(dw);  \
+} 
+
+#endif
 
 #else
 
@@ -107,6 +161,10 @@ stxxl_perror (const char *errmsg, int errcode)
 #define stxxl_ifcheck(expr) expr; if(0) {}
 
 #define stxxl_debug(expr) ;
+
+#ifdef BOOST_MSVC
+#define stxxl_win_lasterror_exit(errmsg) ;
+#endif
 
 #endif
 
@@ -148,17 +206,17 @@ stxxl_tmpfilename (std::string dir, std::string prefix)
 		result = dir + prefix + buffer;
 
 	}
+#ifdef STXXL_BOOST_FILESYSTEM
+	while(boost::filesystem::exists(result));
+	
+	return result;
+#else
 	while (!lstat (result.c_str (), &st));
 
 	if (errno != ENOENT)
 		stxxl_function_error
-			//  char * temp_name = tempnam(dir.c_str(),prefix.c_str());
-			//  if(!temp_name)
-			//    stxxl_function_error
-			//  std::string result(temp_name);
-			//  free(temp_name);
-			//  stxxl_debug(cerr << __PRETTY_FUNCTION__ << ":" <<result << endl);
 			return result;
+#endif
 }
 
 inline
@@ -205,8 +263,14 @@ int2str (int i)
 	return std::string (buf);
 }
 
+#ifndef BOOST_MSVC
 #define STXXL_MIN(a,b) ( std::min(a,b) )
 #define STXXL_MAX(a,b) ( std::max(a,b) )
+#else
+#define STXXL_MIN(a,b) ( (std::min)(a,b) )
+#define STXXL_MAX(a,b) ( (std::max)(a,b) )
+#endif
+
 #define STXXL_L2_SIZE  (512*1024)
 
 #define div_and_round_up(a,b) ( (a)/(b) + !(!((a)%(b))))
@@ -354,7 +418,7 @@ template <class T>
 
        // return maximum number of elements that can be allocated
        size_type max_size () const throw() {
-           return std::numeric_limits<std::size_t>::max() / sizeof(T);
+           return (std::numeric_limits<std::size_t>::max)() / sizeof(T);
        }
 
        // allocate but don't initialize num elements of type T

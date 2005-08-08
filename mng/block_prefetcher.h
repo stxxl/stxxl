@@ -88,7 +88,7 @@ public:
 		consume_seq_end(_cons_end),
 		seq_length(_cons_end - _cons_begin),
 		prefetch_seq(_pref_seq),
-		nextread(std::min(unsigned(_prefetch_buf_size),seq_length)),
+		nextread(STXXL_MIN(unsigned(_prefetch_buf_size),seq_length)),
 		nextconsume(0),
 		nreadblocks(nextread)
 	{

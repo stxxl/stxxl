@@ -5,9 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "priority_queue.h"
-#include "../common/timer.h"
-using namespace stxxl;
+#include <stxxl>
+#include <limits>
+
 
 //! \example containers/p_queue.cpp
 //! This is an example of how to use \c stxxl::PRIORITY_QUEUE_GENERATOR
@@ -15,8 +15,8 @@ using namespace stxxl;
 
 struct my_type
 {
-    typedef stxxl::int64 key_type;
-  //typedef int key_type;
+    //typedef stxxl::int64 key_type;
+	typedef int key_type;
 	key_type key;
 	char data[128 - sizeof(key_type)];
 	my_type(){}
@@ -47,10 +47,15 @@ struct dummy_merger
   }
 };
 
+
 struct my_cmp // greater
 {
   bool operator () (const my_type & a, const my_type & b) const { return a.key > b.key; }
-  my_type min_value() const { return my_type(std::numeric_limits<my_type::key_type>::max()); }
+
+  my_type min_value() const
+  {		
+	  return my_type((std::numeric_limits<int>::max)());
+  }
   
 }; 
 /*
@@ -60,9 +65,11 @@ struct my_cmp: public std::greater<my_type>
   my_type max_value() const { return my_type(std::numeric_limits<my_type>::min()); }
 };*/
 
+using namespace std;
 
 int main()
-{/*
+{
+	/*
       unsigned BufferSize1_ = 32, // equalize procedure call overheads etc. 
       unsigned N_ = 512, // bandwidth
       unsigned IntKMAX_ = 64, // maximal arity for internal mergers
@@ -74,7 +81,7 @@ int main()
   //typedef priority_queue<priority_queue_config<my_type,my_cmp,
   //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
   const unsigned volume = 255*1024; // in KB
-  typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,64*1024*1024,volume/sizeof(my_type)> gen;
+  typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,64*1024*1024,volume/sizeof(my_type)> gen;
   typedef gen::result pq_type;
   typedef pq_type::block_type block_type;
  
@@ -88,12 +95,12 @@ int main()
   STXXL_MSG("N : "<<gen::N);
   STXXL_MSG("AE: "<<gen::AE);
  
-  timer Timer;
+  stxxl::timer Timer;
   Timer.start();
   
   const unsigned mem_for_pools = 128*1024*1024;
-  prefetch_pool<block_type> p_pool((mem_for_pools/2)/block_type::raw_size);
-  write_pool<block_type>    w_pool((mem_for_pools/2)/block_type::raw_size);
+  stxxl::prefetch_pool<block_type> p_pool((mem_for_pools/2)/block_type::raw_size);
+  stxxl::write_pool<block_type>    w_pool((mem_for_pools/2)/block_type::raw_size);
   pq_type p(p_pool,w_pool);
   
   stxxl::int64 nelements = stxxl::int64(volume/sizeof(my_type))*1024,i;

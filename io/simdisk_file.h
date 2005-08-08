@@ -13,6 +13,10 @@
 #include "ufs_file.h"
 #include <math.h>
 
+#ifdef BOOST_MSVC
+// mmap call does not exist in Windows
+#else
+
 namespace stxxl
 {
   //! \addtogroup fileimpl
@@ -413,5 +417,6 @@ namespace stxxl
 
 }
 
+#endif
 
 #endif

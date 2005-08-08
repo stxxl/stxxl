@@ -12,7 +12,12 @@
 #include "../common/utils.h"
 #include "../common/mutex.h"
 #include <map>
+
+#ifdef BOOST_MSVC
+#include <hash_map>
+#else
 #include <ext/hash_map>
+#endif
 
 __STXXL_BEGIN_NAMESPACE 
 
@@ -26,19 +31,40 @@ class debugmon
 	};
 	struct hash_fct
 	{
-		size_t operator () (char * arg) const
+		inline size_t operator () (char * arg) const
 		{
 			return long(arg);
 		}
 	};
 	struct eqt
 	{
-		bool operator () (char * arg1, char * arg2) const
+		inline bool operator () (char * arg1, char * arg2) const
 		{
 			return arg1 == arg2;
 		}
 	};
+	#ifdef BOOST_MSVC
+	struct my_hash_comp
+	{
+		size_t operator()(char * arg) const
+		{	
+			return long(arg);
+		}
+		bool operator()(char * a, char * b) const
+		{
+			return (long(a)<long(b));
+		}
+		enum
+		{	// parameters for hash table
+			bucket_size = 4,	// 0 < bucket_size
+			min_buckets = 8
+		};	// min_buckets = 2 ^^ N, 0 < N
+
+	};
+	stdext::hash_map<char *, tag, my_hash_comp > tags;
+	#else
 	__gnu_cxx::hash_map<char *, tag, hash_fct, eqt > tags;
+	#endif
 	
 	#ifdef STXXL_BOOST_THREADS
 	boost::mutex mutex1;
@@ -48,118 +74,15 @@ class debugmon
 	
 	static debugmon * instance;
 	
-	debugmon() {}
+	inline debugmon() {}
 public:
-	#ifndef STXXL_DEBUGMON
-	void block_allocated(char * ptr, char * end, size_t size)
-	{
-	}
-	void block_deallocated(char * ptr)
-	{
-	}
-	void io_started(char * ptr)
-	{
-	}
-	void io_finished(char * ptr)
-	{
-	}
-	#else
-	void block_allocated(char * ptr, char * end, size_t size)
-	{
-		#ifdef STXXL_BOOST_THREADS
-		boost::mutex::scoped_lock Lock(mutex1);
-		#else
-		mutex1.lock();
-		#endif
-		// checks are here
-		STXXL_VERBOSE1("debugmon: block "<<long(ptr)<<" allocated")
-		assert(tags.find(ptr) == tags.end()); // not allocated
-		tag t;
-		t.ongoing = false;
-		t.end = end;
-		t.size = size;
-		tags[ptr] = t;
-		#ifndef STXXL_BOOST_THREADS
-		mutex1.unlock();
-		#endif
-	}
-	void block_deallocated(char * ptr)
-	{
-		#ifdef STXXL_BOOST_THREADS
-		boost::mutex::scoped_lock Lock(mutex1);
-		#else
-		mutex1.lock();
-		#endif
-		
-		STXXL_VERBOSE1("debugmon: block_deallocated from "<<long(ptr))
-		assert(tags.find(ptr) != tags.end()); // allocated
-		tag t = tags[ptr];
-		assert(t.ongoing == false); // not ongoing
-		tags.erase(ptr);
-		size_t size = t.size;
-		STXXL_VERBOSE1("debugmon: block_deallocated to "<<long(t.end))
-		char * endptr =(char *) t.end; 
-		char * ptr1 = (char *) ptr;
-		ptr1 += size;
-		while(ptr1 < endptr)
-		{
-			STXXL_VERBOSE1("debugmon: block_deallocated next "<<long(ptr1))
-			assert(tags.find(ptr1) != tags.end()); // allocated
-			tag t = tags[ptr1];
-			assert(t.ongoing == false); // not ongoing
-			assert(t.size == size); // chunk size
-			assert(t.end == endptr); // array end address
-			tags.erase(ptr1);
-			ptr1 += size;
-		}
-		#ifndef STXXL_BOOST_THREADS
-		mutex1.unlock();
-		#endif
-	}
-	void io_started(char * ptr)
-	{
-		#ifdef STXXL_BOOST_THREADS
-		boost::mutex::scoped_lock Lock(mutex1);
-		#else
-		mutex1.lock();
-		#endif
-		
-		STXXL_VERBOSE1("debugmon: I/O on block "<<long(ptr)<<" started")
-		assert(tags.find(ptr) != tags.end()); // allocated
-		tag t = tags[ptr];
-		//assert(t.ongoing == false); // not ongoing
-		if(t.ongoing == true)
-			STXXL_ERRMSG("debugmon: I/O on block "<<long(ptr)<<" started, but block is already busy")
-		t.ongoing = true;
-		tags[ptr] = t;
-		
-		#ifndef STXXL_BOOST_THREADS
-		mutex1.unlock();
-		#endif
-	}
-	void io_finished(char * ptr)
-	{
-		#ifdef STXXL_BOOST_THREADS
-		boost::mutex::scoped_lock Lock(mutex1);
-		#else
-		mutex1.lock();
-		#endif
-		
-		STXXL_VERBOSE1("debugmon: I/O on block "<<long(ptr)<<" finished")
-		assert(tags.find(ptr) != tags.end()); // allocated
-		tag t = tags[ptr];
-		//assert(t.ongoing == true); // ongoing
-		if(t.ongoing == false)
-			STXXL_ERRMSG("debugmon: I/O on block "<<long(ptr)<<" finished, but block was not busy")
-		t.ongoing = false;
-		tags[ptr] = t;
-		
-		#ifndef STXXL_BOOST_THREADS
-		mutex1.unlock();
-		#endif
-	}
-	#endif
-	static debugmon *get_instance ()
+	
+	void block_allocated(char * ptr, char * end, size_t size);
+	void block_deallocated(char * ptr);
+	void io_started(char * ptr);
+	void io_finished(char * ptr);
+
+	inline static debugmon *get_instance ()
 	{
 			if (!instance)
 				instance = new debugmon ();

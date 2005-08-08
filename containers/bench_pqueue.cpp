@@ -5,8 +5,8 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "priority_queue.h"
-#include "../common/timer.h"
+#include "../stxxl"
+
 using namespace stxxl;
 
 #define RECORD_SIZE 20 
@@ -31,7 +31,7 @@ std::ostream & operator << (std::ostream & o,const my_type & obj)
 struct my_cmp // greater
 {
   bool operator () (const my_type & a, const my_type & b) const { return a.key > b.key; }
-  my_type min_value() const { return my_type(std::numeric_limits<my_type::key_type>::max()); }
+  my_type min_value() const { return my_type((std::numeric_limits<my_type::key_type>::max)()); }
   
 }; 
 

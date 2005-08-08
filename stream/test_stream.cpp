@@ -35,6 +35,7 @@ typedef stxxl::tuple<char,int> tuple_type;
 
 using namespace stxxl;
 using stxxl::stream::streamify;
+using stxxl::stream::streamify_traits;
 using stxxl::stream::make_tuple;
 using stxxl::tuple;
 
@@ -78,8 +79,8 @@ struct cmp_type
     return a.first < b.first;
   }
   
-  value_type min_value() const  { return value_type(std::numeric_limits<char>::min(),0); }
-  value_type max_value() const  { return value_type(std::numeric_limits<char>::max(),0); }
+  value_type min_value() const  { return value_type((std::numeric_limits<char>::min)(),0); }
+  value_type max_value() const  { return value_type((std::numeric_limits<char>::max)(),0); }
 };
 
 struct cmp_int
@@ -90,8 +91,8 @@ struct cmp_int
     return a > b;
   }
   
-  value_type max_value() const  { return (std::numeric_limits<value_type>::min()); }
-  value_type min_value() const  { return (std::numeric_limits<value_type>::max()); }
+  value_type max_value() const  { return ((std::numeric_limits<value_type>::min)()); }
+  value_type min_value() const  { return ((std::numeric_limits<value_type>::max)()); }
 };
 
 int main()
@@ -107,16 +108,23 @@ int main()
   
   output.resize(input.size());
   
-	
   // HERE streaming part begins (streamifying)
   // create input stream
+  #ifdef BOOST_MSVC
+  typedef streamify_traits<input_array_type::iterator>::stream_type input_stream_type;
+  #else
   typedef typeof(streamify(input.begin(),input.end())) input_stream_type;
-  //input_stream_type input_stream = streamify(input.begin(),input.end());
+  #endif
+  
   input_stream_type input_stream = streamify(input.begin(),input.end());
   
 
   // create counter stream
-  typedef typeof(streamify(counter_type())) counter_stream_type;
+  #ifdef BOOST_MSVC
+  typedef stxxl::stream::generator2stream<counter_type> counter_stream_type;
+  #else
+  typedef __typeof(streamify(counter_type())) counter_stream_type;
+  #endif
   counter_stream_type counter_stream = streamify(counter_type());
   
   // create tuple stream
@@ -164,5 +172,5 @@ int main()
   															cmp_int(),
   															1024*1024*10,
   															stxxl::RC());
-  
+
 }

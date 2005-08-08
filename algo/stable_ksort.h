@@ -234,7 +234,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 	const unsigned int read_buffers_multiple = 2;
 	const unsigned int ndisks = cfg->ndisks();
 	const unsigned int nmaxbuckets = m - (write_buffers_multiple + read_buffers_multiple)*ndisks;
-	const unsigned int lognbuckets = static_cast<unsigned>(log2(nmaxbuckets));
+	const unsigned int lognbuckets = static_cast<unsigned>(log2(double(nmaxbuckets)));
 	const unsigned int nbuckets = 1<<lognbuckets;
 	const unsigned int est_bucket_size = div_and_round_up((last-first)/int64(nbuckets),
 		int64(block_type::size)); //in blocks
@@ -337,7 +337,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 		reqs2[i] = blocks2[i].read(bucket_bids[1][i]);
 	
 	key_type offset = 0;
-	unsigned log_k1 = static_cast<int>(ceil(log2(max_bucket_size_rec*sizeof(type_key_)/STXXL_L2_SIZE)));
+	unsigned log_k1 = static_cast<int>(ceil(log2(double(max_bucket_size_rec*
+		sizeof(type_key_)/STXXL_L2_SIZE))));
 	unsigned k1 = 1 << log_k1;
 	int *bucket1 = new int[k1];
 	
@@ -347,7 +348,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 	for(unsigned k=0;k<nbuckets;k++)
 	{
 		nbucket_blocks = div_and_round_up(bucket_sizes[k],block_type::size);
-		log_k1 = static_cast<unsigned>(ceil(log2(bucket_sizes[k]*sizeof(type_key_)/STXXL_L2_SIZE)));
+		log_k1 = static_cast<unsigned>(ceil(log2(double(bucket_sizes[k]*
+			sizeof(type_key_)/STXXL_L2_SIZE))));
 		k1 = 1 << log_k1;
 		std::fill(bucket1,bucket1 + k1,0);
 
@@ -379,7 +381,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last,unsigned M)
 			type_key_ *cEnd = refs2 + bucket1[i];
 			type_key_ *dEnd = refs1 + bucket1[i];
 			
-			const unsigned int log_k2 = static_cast<unsigned>(log2(bucket1[i])) - 1; // adaptive bucket size
+			const unsigned int log_k2 = static_cast<unsigned>(log2(double(bucket1[i]))) - 1; // adaptive bucket size
 			const unsigned int k2 = 1 << log_k2;
 			int *bucket2 = new int[k2];
 			const unsigned shift2 = shift1 - log_k2;

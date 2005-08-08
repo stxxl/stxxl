@@ -34,9 +34,10 @@ int main()
 	
 	STXXL_MSG("Testing special case 4")
 	cnt = stxxl::queue<my_type>::block_type::size;
+	stxxl::random_number32 rnd;
 	while(cnt--)
 	{
-		my_type val = random();
+		my_type val = rnd();
 		xqueue.push(val); squeue.push(val); 
 		check(xqueue,squeue);
 	}
@@ -52,10 +53,10 @@ int main()
 	{
 		if((cnt%1000000) == 0)
 			STXXL_MSG("Operations left: "<<cnt<<" queue size "<<squeue.size());
-		int rnd = random() % 3;
-		if(rnd > 0 || squeue.empty())
+		int rndtmp = rnd() % 3;
+		if(rndtmp > 0 || squeue.empty())
 		{
-			my_type val = random();
+			my_type val = rnd();
 			xqueue.push(val); squeue.push(val); 
 			check(xqueue,squeue);
 		}
@@ -69,10 +70,10 @@ int main()
 	{
 		if((cnt++%1000000) == 0)
 			STXXL_MSG("Operations: "<<cnt<<" queue size "<<squeue.size());
-		int rnd = random() % 4;
-		if(rnd >= 3 )
+		int rndtmp = rnd() % 4;
+		if(rndtmp >= 3 )
 		{
-			my_type val = random();
+			my_type val = rnd();
 			xqueue.push(val); squeue.push(val); 
 			check(xqueue,squeue);
 		}
@@ -87,10 +88,10 @@ int main()
 	{
 		if((cnt%1000000) == 0)
 			STXXL_MSG("Operations left: "<<cnt<<" queue size "<<squeue.size());
-		int rnd = random() % 3;
-		if(rnd > 0 || squeue.empty())
+		int rndtmp = rnd() % 3;
+		if(rndtmp > 0 || squeue.empty())
 		{
-			my_type val = random();
+			my_type val = rnd();
 			xqueue.push(val); squeue.push(val); 
 			check(xqueue,squeue);
 		}
@@ -111,10 +112,10 @@ int main()
 	{
 		if((cnt%1000000) == 0)
 			STXXL_MSG("Operations left: "<<cnt<<" queue size "<<squeue1.size());
-		int rnd = random() % 3;
-		if(rnd > 0 || squeue1.empty())
+		int rndtmp = rnd() % 3;
+		if(rndtmp > 0 || squeue1.empty())
 		{
-			my_type val = random();
+			my_type val = rnd();
 			xqueue1.push(val); squeue1.push(val); 
 			check(xqueue1,squeue1);
 		}

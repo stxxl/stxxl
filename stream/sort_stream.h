@@ -52,7 +52,7 @@ namespace stream
 	// less than B (block_type::size)
 	// then input is sorted internally
 	// and kept in the array "small"
-	std::vector<ValueType> small;
+	std::vector<ValueType> small_;
 	  
     sorted_runs():elements(0) {}
 		
@@ -215,8 +215,8 @@ namespace stream
 	if(pos <  block_type::size && input.empty() ) // small input, do not flush it on the disk(s)
 	{
 		STXXL_VERBOSE1("runs_creator: Small input optimization, input length: "<<pos);
-		result_.small.resize(pos);
-		std::copy(Blocks1[0].begin(), Blocks1[0].begin()+pos, result_.small.begin());
+		result_.small_.resize(pos);
+		std::copy(Blocks1[0].begin(), Blocks1[0].begin()+pos, result_.small_.begin());
       	delete [] Blocks1;
 		return;
 	}
@@ -473,8 +473,8 @@ namespace stream
 			result_.elements == cur_el_reg) // small input, do not flush it on the disk(s)
 		{
 			STXXL_VERBOSE1("runs_creator(use_push): Small input optimization, input length: "<<cur_el_reg);
-			result_.small.resize(cur_el_reg);
-			std::copy(Blocks1[0].begin(), Blocks1[0].begin()+cur_el_reg, result_.small.begin());
+			result_.small_.resize(cur_el_reg);
+			std::copy(Blocks1[0].begin(), Blocks1[0].begin()+cur_el_reg, result_.small_.begin());
 			return;
 		}
 		
@@ -902,13 +902,13 @@ namespace stream
 	  if(empty()) return;
 		  
 	  
-	  if(!sruns.small.empty()) // we have a small input < B, 
+	  if(!sruns.small_.empty()) // we have a small input < B, 
 		  								 // that is kept in the main memory
 	  {
 		  STXXL_VERBOSE1("runs_merger: small input optimization, input length: "<<elements_remaining)
-		  assert(elements_remaining == sruns.small.size());
+		  assert(elements_remaining == sruns.small_.size());
 		  current_block = new block_type;
-		  std::copy(sruns.small.begin(), sruns.small.end(), current_block->begin());
+		  std::copy(sruns.small_.begin(), sruns.small_.end(), current_block->begin());
 		  current_value = current_block->elem[0];
       	  buffer_pos = 1;
 		  
@@ -970,7 +970,7 @@ namespace stream
     
       int disks_number = config::get_instance ()->disks_number ();
       
-      const int n_prefetch_buffers = std::max( 2 * disks_number , (int(m_) - int(nruns)) );
+      const int n_prefetch_buffers = STXXL_MAX( 2 * disks_number , (int(m_) - int(nruns)) );
     
 	  
       #ifdef SORT_OPT_PREFETCHING
@@ -1088,7 +1088,8 @@ namespace stream
     unsigned nwrite_buffers = 2*ndisks;
     
     unsigned nruns = sruns.runs.size();
-    const unsigned merge_factor = static_cast<unsigned>(ceil(pow(nruns,1./ceil(log(nruns)/log(m_)))));
+    const unsigned merge_factor = static_cast<unsigned>(ceil(pow(nruns,1./ceil(
+		log(double(nruns))/log(double(m_))))));
     assert(merge_factor <= m_);
     while(nruns > m_)
     {
@@ -1328,7 +1329,11 @@ void sort(RandomAccessIterator begin,
 				unsigned MemSize,
 				AllocStr  AS)
 {
+	#ifdef BOOST_MSVC
+	typedef typename streamify_traits<RandomAccessIterator>::stream_type InputType;
+	#else
 	typedef typeof(stream::streamify(begin,end)) InputType;
+	#endif
 	InputType Input(begin,end);
 	typedef stream::sort<InputType,CmpType,BlockSize,AllocStr> sorter_type;
 	sorter_type	Sort(Input, cmp, MemSize);

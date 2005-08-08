@@ -14,8 +14,8 @@ typedef unsigned int data_type;
 
 struct cmp: public std::less<key_type>
 {
-                key_type min_value() const { return std::numeric_limits<key_type>::min(); };
-                key_type max_value() const { return std::numeric_limits<key_type>::max(); };
+                key_type min_value() const { return (std::numeric_limits<key_type>::min)(); };
+                key_type max_value() const { return (std::numeric_limits<key_type>::max)(); };
 };
 
 #define BLOCK_SIZE (128*1024)
@@ -43,16 +43,17 @@ int main()
 			Map[i] = i+1;
 		}
 		double writes = double(bm->get_writes())/double(el);
-		double logel = log(el)/log(BLOCK_SIZE);
+		double logel = log(double(el))/log(double(BLOCK_SIZE));
 		STXXL_MSG("Logs: writes "<<writes<<" logel "<<logel<<" writes/logel "<<(writes/logel) )
 		STXXL_MSG(*bm)
 		bm->reset();
 		STXXL_MSG("Doing search")
 		unsigned queries = el;
 		const map_type & ConstMap = Map;
+		stxxl::random_number32 myrandom;
 		for(unsigned i = 0; i< queries ; ++i)
 		{
-			key_type key = random()%el;
+			key_type key = myrandom()%el;
 			map_type::const_iterator result = ConstMap.find(key);
 			assert((*result).second == key + 1);
 		}

@@ -113,10 +113,12 @@ namespace map_internal
 		( serve returns btree_request_base::OP )
 		*/
 		std::queue< smart_ptr<btree_request<Btree> > > worker_queue;
-		static void *btree_queue::worker (void *arg)
+
+		static void * worker (void *arg)
 		{
 			//sp_req;
-			btree_queue *pthis = static_cast<btree_queue*>(arg);
+			btree_queue * pthis = static_cast<btree_queue*>(arg);
+
 			#ifndef STXXL_BOOST_THREADS
 			stxxl_nassert (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL));
 			stxxl_nassert (pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL));

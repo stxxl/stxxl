@@ -1679,8 +1679,8 @@ public:
 
 	template<typename Key_,typename Data_, typename Compare_, unsigned SIZE_,bool unique_,unsigned CACHE_SIZE_>
 	void btnode<Key_,Data_,Compare_,SIZE_,unique_,CACHE_SIZE_>::erase_in_tree(
-		btnode<Key_,Data_,Compare_,SIZE_,unique_,CACHE_SIZE_>::iterator& iter,
-		btnode<Key_,Data_,Compare_,SIZE_,unique_,CACHE_SIZE_>* p_node,
+		typename btnode<Key_,Data_,Compare_,SIZE_,unique_,CACHE_SIZE_>::iterator & iter,
+		btnode<Key_,Data_,Compare_,SIZE_,unique_,CACHE_SIZE_> * p_node,
 		int type )
 	{
 

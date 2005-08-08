@@ -710,7 +710,7 @@ private:
 			STXXL_VERBOSE1("vector: reading page_no="<<page_no<<" cache_page="<<cache_page)
 			request_ptr * reqs = new request_ptr [page_size];
 			int block_no = page_no*page_size;
-			int last_block = 	std::min(block_no + page_size,int(_bids.size()));
+			int last_block = STXXL_MIN(block_no + page_size,int(_bids.size()));
 			int i=cache_page*page_size,j=0;
 			for(;block_no < last_block; ++block_no,++i,++j)
 				reqs[j] = _cache[i].read(_bids[block_no]);
@@ -722,7 +722,7 @@ private:
 			STXXL_VERBOSE1("vector: writing page_no="<<page_no<<" cache_page="<<cache_page)
 			request_ptr * reqs = new request_ptr [page_size];
 			int block_no = page_no*page_size;
-			int last_block = std::min(block_no + page_size,int(_bids.size()));
+			int last_block = STXXL_MIN(block_no + page_size,int(_bids.size()));
 			int i=cache_page*page_size,j=0;
 			for(;block_no < last_block; ++block_no,++i,++j)
 			{

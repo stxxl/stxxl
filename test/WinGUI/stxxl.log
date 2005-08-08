@@ -1,0 +1,50 @@
+[STXXL-MSG] Disk 'C:\DOKUME~1\ROMAND~1\LOKALE~1\Temp\stxxl' is allocated, space: 1000 Mb, I/O implementation: wincall
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), size = 67108864
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>() address 26480640 lost 4032 bytes
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), allocated at 1940040 returning 1941000
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), size = 8388608
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>() address 93655040 lost 4032 bytes
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), allocated at 5950040 returning 5951000
+[STXXL-VERBOSE1] vector: reading page_no=6 cache_page=0
+[STXXL-VERBOSE1] vector: flushing page 0 address: 3145728
+[STXXL-VERBOSE1] ~vector(): Changing size of file 0193FB6C to 53686272
+[STXXL-VERBOSE1] ~vector(): size of the vector is 3355392
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), size = 67108864
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>() address 27529216 lost 4032 bytes
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), allocated at 1a40040 returning 1a41000
+[STXXL-VERBOSE1] stl_in_memory_sort, range: 3355392
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), size = 54525952
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>() address 104206336 lost 4032 bytes
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), allocated at 6360040 returning 6361000
+[STXXL-VERBOSE1] ~vector(): Changing size of file 01A3FB6C to 53686272
+[STXXL-VERBOSE1] ~vector(): size of the vector is 3355392
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), size = 67108864
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>() address 28577792 lost 4032 bytes
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), allocated at 1b40040 returning 1b41000
+[STXXL-VERBOSE1] stl_in_memory_sort, range: 3355392
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), size = 54525952
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>() address 104206336 lost 4032 bytes
+[STXXL-VERBOSE1] stxxl::aligned_alloc<4096>(), allocated at 6360040 returning 6361000
+[STXXL-VERBOSE1] vector: reading page_no=0 cache_page=0
+[STXXL-VERBOSE1] vector: reading page_no=1 cache_page=1
+[STXXL-VERBOSE1] vector: reading page_no=2 cache_page=2
+[STXXL-VERBOSE1] vector: reading page_no=3 cache_page=3
+[STXXL-VERBOSE1] vector: reading page_no=4 cache_page=4
+[STXXL-VERBOSE1] vector: reading page_no=5 cache_page=5
+[STXXL-VERBOSE1] vector: reading page_no=6 cache_page=6
+[STXXL-VERBOSE1] vector: flushing page 0 address: 0
+[STXXL-VERBOSE1] vector: writing page_no=0 cache_page=0
+[STXXL-VERBOSE1] vector: flushing page 1 address: 524288
+[STXXL-VERBOSE1] vector: writing page_no=1 cache_page=1
+[STXXL-VERBOSE1] vector: flushing page 2 address: 1048576
+[STXXL-VERBOSE1] vector: writing page_no=2 cache_page=2
+[STXXL-VERBOSE1] vector: flushing page 3 address: 1572864
+[STXXL-VERBOSE1] vector: writing page_no=3 cache_page=3
+[STXXL-VERBOSE1] vector: flushing page 4 address: 2097152
+[STXXL-VERBOSE1] vector: writing page_no=4 cache_page=4
+[STXXL-VERBOSE1] vector: flushing page 5 address: 2621440
+[STXXL-VERBOSE1] vector: writing page_no=5 cache_page=5
+[STXXL-VERBOSE1] vector: flushing page 6 address: 3145728
+[STXXL-VERBOSE1] vector: writing page_no=6 cache_page=6
+[STXXL-VERBOSE1] ~vector(): Changing size of file 01B3FB70 to 53686272
+[STXXL-VERBOSE1] ~vector(): size of the vector is 3355392

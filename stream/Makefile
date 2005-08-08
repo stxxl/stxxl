@@ -1,22 +1,26 @@
 all: test stream sruns push_sort 
 
-include ../compiler.make
+include ../make.settings
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) \
                $(CONTAINER_FILES) $(ALGO_FILES) $(STREAM_FILES)
 
 stream: stream.h stream.cpp $(DEPENDENCIES)
-	$(GCC) stream.cpp -o stream $(STXXL_LIB) -g -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stream.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(LINKER)  stream.$(OBJEXT) $(OUT)stream.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 sruns: stream.h sorted_runs.cpp $(DEPENDENCIES)
-	$(GCC) sorted_runs.cpp -o sruns $(STXXL_LIB) -g -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c sorted_runs.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(LINKER)  sorted_runs.$(OBJEXT) $(OUT)sorted_runs.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 push_sort: stream.h push_sort.cpp $(DEPENDENCIES)
-	$(GCC) push_sort.cpp -o push_sort $(STXXL_LIB) -g -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c push_sort.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(LINKER)  push_sort.$(OBJEXT) $(OUT)push_sort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 	
 test:	stream.h test_stream.cpp $(DEPENDENCIES)
-	$(GCC) test_stream.cpp -o test $(STXXL_LIB) -g -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_SMALL_INPUT_PSORT_OPT
-	
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_stream.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(LINKER)  test_stream.$(OBJEXT) $(OUT)test_stream.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 clean:
-	rm -rf stream  push_sort sruns test
+	$(RM) *.$(OBJEXT) stream.$(EXEEXT) sorted_runs.$(EXEEXT)
+	$(RM) push_sort.$(EXEEXT) test.$(EXEEXT) test_stream.$(EXEEXT)

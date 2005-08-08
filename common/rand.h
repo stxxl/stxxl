@@ -13,9 +13,13 @@
 #include <stdlib.h>
 #include "utils.h"
 
-namespace stxxl
-{
-	unsigned ran32State = time (NULL);
+#ifdef STXXL_BOOST_RANDOM
+#include "boost/random.hpp"
+#endif
+
+__STXXL_BEGIN_NAMESPACE
+
+	extern unsigned ran32State;
 
 	struct random_number32
 	{
@@ -42,10 +46,23 @@ namespace stxxl
 	//! \warning Seed is not the same as in the fast generator \c random_uniform_fast
 	struct random_uniform_slow
 	{
-    typedef double value_type;
-		inline value_type operator() () const
+		typedef double value_type;
+		#ifdef STXXL_BOOST_RANDOM
+		typedef boost::minstd_rand base_generator_type;
+		base_generator_type generator;
+		boost::uniform_real<> uni_dist;
+		boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni;
+
+		random_uniform_slow() : uni(generator, uni_dist) {}
+		#endif
+
+		inline value_type operator() ()
 		{
+			#ifdef STXXL_BOOST_RANDOM
+			return uni();
+			#else
 			return drand48();
+			#endif
 		}
 	};
 	
@@ -64,12 +81,12 @@ namespace stxxl
 	{
     typedef stxxl::uint64 value_type;
 		random_uniform_slow uniform;
-		inline value_type operator() () const
+		inline value_type operator() ()
 		{
 			return static_cast<value_type>(uniform()*(18446744073709551616.));
 		}
 	};
 	
-}
+__STXXL_END_NAMESPACE
 
 #endif

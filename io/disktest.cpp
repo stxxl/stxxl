@@ -10,7 +10,10 @@
 #include "io.h"
 #include "stdio.h"
 #include <vector>
+
+#ifndef BOOST_MSVC
 #include <unistd.h>
+#endif
 
 #include "../common/aligned_alloc.h"
 

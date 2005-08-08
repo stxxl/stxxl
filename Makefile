@@ -1,34 +1,34 @@
-main: lib
+default:
+	@echo "Choose one of the goals: library_msvc library_g++ tests_msvc tests_g++ btree_map_test_g++ clean_msvc clean_g++"
 
-include compiler.make
+settings_msvc:
+	copy make.settings.msvc make.settings
 
-lib:
-	cd io; $(MAKE) lib; cd ..
-	cd utils; $(MAKE) create ; cd ..
-	echo "Building library is completed."
+settings_g++:
+	cp make.settings.g++ make.settings
 
-lib_debug:
-	cd io; $(MAKE) lib_debug; cd ..
-	echo "Building debug version of the library is completed."
+library_g++: settings_g++
+	make -f Makefile.g++ library
 
-tests: lib
-	cd io; $(MAKE); cd ..
-	cd mng; $(MAKE); cd ..
-	cd containers; $(MAKE); cd ..
-	cd algo; $(MAKE); cd ..
-	cd stream; $(MAKE); cd ..
-	echo "Building tests is completed."
+library_msvc: settings_msvc
+	nmake /F Makefile.msvc library
+	
+tests_g++: settings_g++
+	make -f Makefile.g++ tests
 
-# Btree (map) is not yet compatible with g++ 3.4.x, therefore it is not
-# included into the main tests (the Makefile goal above)
-btree_map_test:
-	cd containers; $(MAKE) btree_map_test; cd ..
-	echo "Building btree (map) tests is completed."
+tests_msvc: settings_msvc
+	nmake /F Makefile.msvc tests
 
-clean:
-	cd io; $(MAKE) clean; cd ..
-	cd mng; $(MAKE) clean; cd ..
-	cd containers; $(MAKE) clean; cd ..
-	cd algo; $(MAKE) clean; cd ..
-	cd stream; $(MAKE) clean; cd ..
-	echo "Cleaning completed"
+# Btree (map) is not yet compatible with g++ 3.4.x and Microsoft
+# Visual C++, therefore it is not included into the main tests 
+# (the Makefile goal above)
+btree_map_test_g++: settings_g++
+	make -f Makefile.g++ btree_map_test
+
+clean_g++: settings_g++
+	make -f Makefile.g++ clean
+
+clean_msvc: settings_msvc
+	nmake /F Makefile.msvc clean
+
+

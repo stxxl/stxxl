@@ -129,8 +129,8 @@ public:
 	template <typename Key_>
 	class operator_less: public std::less<Key_>
 	{
-		Key_ min_value() const { return std::numeric_limits<Key_>::min(); };
-		Key_ max_value() const { return std::numeric_limits<Key_>::max(); };
+		Key_ min_value() const { return (std::numeric_limits<Key_>::min)(); };
+		Key_ max_value() const { return (std::numeric_limits<Key_>::max)(); };
 	};
 	//! \}
 	

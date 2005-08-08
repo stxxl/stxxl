@@ -15,6 +15,7 @@
 
 namespace stxxl
 {
+	typedef default_completion_handler default_bree_completion_handler;
 
 	using namespace map_internal;
 

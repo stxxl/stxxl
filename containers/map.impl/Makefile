@@ -1,5 +1,5 @@
-STXXL_ROOT = ../../
-include $(STXXL_ROOT)/compiler.make
+
+include ../../make.settings
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
 # test_handlers.h \
@@ -34,77 +34,79 @@ map: test_map_erase test_map_insert test_map_search test_map_iterator test_map_r
 
 
 # *******************************************************************
-# test for speed
+# tests for speed
 # *******************************************************************
 
-speed_test_map_erase: speed_test_map_erase.o
-	$(GCC) speed_test_map_erase.o -o speed_test_map_erase $(STXXL_LIB)
+speed_test_map_erase: speed_test_map_erase.$(OBJEXT)
+	$(LINKER)  speed_test_map_erase.$(OBJEXT) $(OUT)speed_test_map_erase.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-speed_test_map_erase.o: speed_test_map_erase.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(GCC) -c speed_test_map_erase.cpp -o speed_test_map_erase.o
+speed_test_map_erase.$(OBJEXT): speed_test_map_erase.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS)  -c speed_test_map_erase.cpp
 
-speed_test_map_insert: speed_test_map_insert.o
-	$(GCC) speed_test_map_insert.o -o speed_test_map_insert $(STXXL_LIB)
+speed_test_map_insert: speed_test_map_insert.$(OBJEXT)
+	$(LINKER)  speed_test_map_insert.$(OBJEXT) $(OUT)speed_test_map_insert.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-speed_test_map_insert.o: speed_test_map_insert.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(GCC) -c speed_test_map_insert.cpp -o speed_test_map_insert.o
+speed_test_map_insert.$(OBJEXT): speed_test_map_insert.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS)  -c speed_test_map_insert.cpp
 
-speed_test_map_search: speed_test_map_search.o
-	$(GCC) speed_test_map_search.o -o speed_test_map_search $(STXXL_LIB)
+speed_test_map_search: speed_test_map_search.$(OBJEXT)
+	$(LINKER)  speed_test_map_search.$(OBJEXT) $(OUT)speed_test_map_search.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-speed_test_map_search.o: speed_test_map_search.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(GCC) -c speed_test_map_search.cpp -o speed_test_map_search.o
+speed_test_map_search.$(OBJEXT): speed_test_map_search.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c speed_test_map_search.cpp
 
-speed_test_map_iterate: speed_test_map_iterate.o
-	$(GCC) speed_test_map_iterate.o -o speed_test_map_iterate $(STXXL_LIB)
+speed_test_map_iterate: speed_test_map_iterate.$(OBJEXT)
+	$(LINKER)  speed_test_map_iterate.$(OBJEXT) $(OUT)speed_test_map_iterate.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-speed_test_map_iterate.o: speed_test_map_iterate.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(GCC) -c speed_test_map_iterate.cpp -o speed_test_map_iterate.o
+speed_test_map_iterate.$(OBJEXT): speed_test_map_iterate.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c speed_test_map_iterate.cpp
 
 
 
 # *******************************************************************
-# test for corectnes
+# tests for correctness
 # *******************************************************************
 
-test_map_random: test_map_random.o
-	$(DGCC) test_map_random.o -o test_map_random $(STXXL_LIB)
+test_map_random: test_map_random.$(OBJEXT)
+	$(LINKER)  test_map_random.$(OBJEXT) $(OUT)test_map_random.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test_map_erase: test_map_erase.o
-	$(DGCC) test_map_erase.o -o test_map_erase $(STXXL_LIB)
+test_map_erase: test_map_erase.$(OBJEXT)
+	$(LINKER)  test_map_erase.$(OBJEXT) $(OUT)test_map_erase.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test_map_search: test_map_search.o
-	$(DGCC) test_map_search.o -o test_map_search $(STXXL_LIB)
+test_map_search: test_map_search.$(OBJEXT)
+	$(LINKER)  test_map_search.$(OBJEXT) $(OUT)test_map_search.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test_map_iterator: test_map_iterator.o
-	$(DGCC) test_map_iterator.o -o test_map_iterator $(STXXL_LIB)
+test_map_iterator: test_map_iterator.$(OBJEXT)
+	$(LINKER)  test_map_iterator.$(OBJEXT) $(OUT)test_map_iterator.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test_map_insert: test_map_insert.o
-	$(DGCC) test_map_insert.o -o test_map_insert $(STXXL_LIB)
+test_map_insert: test_map_insert.$(OBJEXT)
+	$(LINKER)  test_map_insert.$(OBJEXT) $(OUT)test_map_insert.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-#-lncurses
 
-test.o: test.cpp $(MAP_FILES)
-	$(DGCC) -c test.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
 
-test_map_random.o: test_map_random.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(DGCC) -c test_map_random.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
+test.$(OBJEXT): test.cpp $(MAP_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS)  -c test.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
 
-test_map_erase.o: test_map_erase.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(DGCC) -c test_map_erase.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
+test_map_random.$(OBJEXT): test_map_random.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS)  -c test_map_random.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
 
-test_map_iterator.o: test_map_iterator.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(DGCC) -c test_map_iterator.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
+test_map_erase.$(OBJEXT): test_map_erase.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS)  -c test_map_erase.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
 
-test_map_insert.o: test_map_insert.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(DGCC) -c test_map_insert.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
+test_map_iterator.$(OBJEXT): test_map_iterator.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS)  -c test_map_iterator.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
 
-test_map_search.o: test_map_search.cpp $(MAP_FILES) $(MAP_TEST_FILES)
-	$(DGCC) -c test_map_search.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
+test_map_insert.$(OBJEXT): test_map_insert.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS)  -c test_map_insert.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
+
+test_map_search.$(OBJEXT): test_map_search.cpp $(MAP_FILES) $(MAP_TEST_FILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_map_search.cpp -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_DEBUG_ON -DSTXXL_BTREE_STATISTIC -DSTXXL_MAP_MAX_COUNT=6
 
 
 clean:
-	rm -f *~ *.o speed_test_map_erase speed_test_map_insert speed_test_map_iterate \
-	speed_test_map_search test_map_erase test_map_insert test_map_iterator \
-	test_map_random test_map_search \
-	test_btree test_btnode
+	$(RM) *.$(OBJEXT) speed_test_map_erase.$(EXEEXT)
+	$(RM) speed_test_map_insert.$(EXEEXT) speed_test_map_iterate.$(EXEEXT)
+	$(RM) speed_test_map_search.$(EXEEXT) test_map_erase.$(EXEEXT)
+	$(RM) test_map_insert.$(EXEEXT) test_map_iterator.$(EXEEXT)
+	$(RM) test_map_random.$(EXEEXT) test_map_search.$(EXEEXT)
+	$(RM) test_btree.$(EXEEXT) test_btnode.$(EXEEXT)

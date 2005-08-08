@@ -203,8 +203,8 @@ create_runs(
 	key_type offset = 0;
 	const int log_k1 = 
 	  static_cast<int>(ceil(log2((m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE)?
-	  	(m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE):2)));
-	const int log_k2 = int(log2(m2 * Blocks1->size)) - log_k1 - 1;
+	  	(double(m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE)):2.)));
+	const int log_k2 = int(log2(double(m2 * Blocks1->size))) - log_k1 - 1;
 	STXXL_VERBOSE("log_k1: "<<log_k1<<" log_k2:"<<log_k2)
 	const int k1 = 1 << log_k1;
 	const int k2 = 1 << log_k2;
@@ -461,9 +461,9 @@ void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned
 	#ifdef PLAY_WITH_OPT_PREF
 	const int n_write_buffers = 4 * disks_number;
 	#else
-	const int n_prefetch_buffers = std::max( int(2 * disks_number) , (3 * (int(_m) - int(nruns)) / 4));
+	const int n_prefetch_buffers = STXXL_MAX( int(2 * disks_number) , (3 * (int(_m) - int(nruns)) / 4));
 	STXXL_VERBOSE("Prefetch buffers "<<n_prefetch_buffers)
-    const int n_write_buffers = std::max( int(2 * disks_number) , int(_m) - int(nruns) - int(n_prefetch_buffers) );
+    const int n_write_buffers = STXXL_MAX( int(2 * disks_number) , int(_m) - int(nruns) - int(n_prefetch_buffers) );
 	STXXL_VERBOSE("Write buffers "<<n_write_buffers)
 	// heuristic
 	const int n_opt_prefetch_buffers = 2 * int(disks_number) + (3*(int(n_prefetch_buffers) - int(2 * disks_number)))/10;
@@ -614,7 +614,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
     
 	// Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) at once
 		
-	const int merge_factor = static_cast<int>(ceil(pow(nruns,1./ceil(log(nruns)/log(_m)))));
+	const int merge_factor = static_cast<int>(ceil(pow(nruns,1./ceil(log(double(nruns))/log(double(_m))))));
 	run_type **new_runs;
 	
 	while(nruns > 1)
@@ -974,7 +974,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 				mng->new_blocks( FR(), &last_bid,(&last_bid) + 1);
 				req->wait();
 			
-				for(unsigned i=last_.block_offset(); i < block_type::size;i++)
+				for(i=last_.block_offset(); i < block_type::size;i++)
 				{
 					last_block->elem[i] = keyobj.max_value();
 				}

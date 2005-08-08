@@ -1,0 +1,11 @@
+// Microsoft Visual C++ generated Help ID include file.
+// Used by WinGUI.rc
+//
+#define HIDC_CHECKASCBUTTON             0x806603f3    // IDD_WINGUI_DIALOG [English (U.S.)]
+#define HIDC_CHECKDESCBUTTON            0x806603f4    // IDD_WINGUI_DIALOG [English (U.S.)]
+#define HIDC_CHECKDUPLBUTTON            0x806603f6    // IDD_WINGUI_DIALOG [English (U.S.)]
+#define HIDC_FILLRANDOMBUTTON           0x806603e8    // IDD_WINGUI_DIALOG [English (U.S.)]
+#define HIDC_FILLVALUEBUTTON            0x806603ec    // IDD_WINGUI_DIALOG [English (U.S.)]
+#define HIDC_REMDUPLBUTTON              0x806603f5    // IDD_WINGUI_DIALOG [English (U.S.)]
+#define HIDC_SORTASCBUTTON              0x806603f1    // IDD_WINGUI_DIALOG [English (U.S.)]
+#define HIDC_SORTDESCBUTTON4            0x806603f2    // IDD_WINGUI_DIALOG [English (U.S.)]
