@@ -144,7 +144,7 @@
  *   - change BOOST_ROOT variable according to the Boost root path
  *   - set OPT variable to /O2 or other VC++ optimization level you like (optionally)
  *   - set DEBUG variable to /MDd for debug version of the \c Stxxl library or to /MD for the version without debugging information in object files
- * - Run: \verbatim make library_msvc \endverbatim
+ * - Run: \verbatim make library_msvc  \endverbatim
  * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
  * 
  * Programs using Stxxl can be compiled using g++ command line options from \c compiler.options 
