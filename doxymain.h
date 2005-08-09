@@ -126,7 +126,6 @@
  * The format utility is included into the set of \c S<small>TXXL</small> utilities ( \c utils/createdisks.bin ). Run this utility
  * for each disk you have defined in the disk configuration file.
  *
- * 
  * */
 
 
