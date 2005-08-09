@@ -284,7 +284,8 @@ __STXXL_BEGIN_NAMESPACE
 		return req;
 	};
   
+__STXXL_END_NAMESPACE
 
 #endif
 
-__STXXL_END_NAMESPACE
+

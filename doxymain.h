@@ -144,23 +144,43 @@
  *   - change BOOST_ROOT variable according to the Boost root path
  *   - set OPT variable to /O2 or other VC++ optimization level you like (optionally)
  *   - set DEBUG variable to /MDd for debug version of the \c Stxxl library or to /MD for the version without debugging information in object files
- * - Run: \verbatim make library_msvc  \endverbatim
- * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
+ * - Open the \c stxxl.vcproj file (VS Solution Object) in Visual Studio .NET.  The file is located in the \c STXXL_ROOT directory
+ * - Press F7 to build the library. The library file (libstxxl.lib) should appear in \c STXXL_ROOT\\lib directory
+ * - In the configuration manager ('Build' drop-down menu) choose 'Library and tests' as active solution configuration. Press OK.
+ * - Press F7 to build \c stxxl test programs.
  * 
- * Programs using Stxxl can be compiled using g++ command line options from \c compiler.options 
- * file. The linking options you can find in \c linker.options file. Alternatively you can
+ * Programs using Stxxl can be compiled using options from \c compiler.options 
+ * file (in the \c STXXL_ROOT directory). The linking options for the VC++ 
+ * linker you can find in \c linker.options file. In order to accomplish this
+ * do the following:
+ * - Open project property pages (menu Progect->Properties)
+ * - Choose C/C++->Command Line page.
+ * - In the 'Additional Options' field insert the contents of the \c compiler.options file.
+ * Make sure that the Runtime libraries/debug options (/MDd or /MD or /MT or /MTd) of
+ * the \c Stxxl library (see above) do not conflict with the options of your project.
+ * Use the same options in the \c Stxxl and your project.
+ * - Choose Linker->Command Line page.
+ * - In the 'Additional Options' field insert the contents of the \c linker.options file.
+ * 
+ * <BR> 
+ * If you use make files you can
  * include \c make.settings file in your make files and use \c STXXL_COMPILER_OPTIONS and 
  * \c STXXL_LINKER_OPTIONS variables, defined therein.
  *
  * For example: <BR> 
- * \verbatim g++ -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <BR>
- * \verbatim g++ my_example.o -o my_example.bin $(STXXL_LINKER_OPTIONS) \endverbatim
+ * \verbatim cl -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <BR>
+ * \verbatim link my_example.obj /out:my_example.exe $(STXXL_LINKER_OPTIONS) \endverbatim
  * 
  * Before you try to run one of the \c S<small>TXXL</small> examples 
  * (or your own \c S<small>TXXL</small> program) you must configure the disk 
  * space that will be used as external memory for the library. For instructions how to do that, 
  * see the next section.
  *
+ * <BR>
+ * The \c STXXL_ROOT\\test\\WinGUI directory contains an example MFC GUI project
+ * that uses \c Stxxl. In order to compile it open the WinGUI.vcproj file in
+ * Visual Studio .NET. Change if needed the Compiler and Linker Options of the project
+ * (see above).
  *
  * \section space Disk space
  *
@@ -172,16 +192,6 @@
  * With modern disk bandwidths
  * about of 50-75 MB/s most of applications are I/O bound for one disk. This means that if you add another disk
  * the running time will be halved. Adding more disks might also increase performance significantly.
- *
- * \section filesystem Recommended file system
- * 
- * Our library take benefit of direct user memory - disk transfers (direct access) which avoids 
- * superfluous copies.  
- * We recommend to use the 
- * \c XFS file system <A href="http://oss.sgi.com/projects/xfs/">link</A> that
- * gives good read and write performance for large files. 
- * Note that file creation speed of \c XFS is slow, so that disk
- * files should be precreated.
  * 
  * \section configuration Disk configuration file
  * 
@@ -198,26 +208,25 @@
  *
  * Description of the parameters:
  * - \c full_disk_filename : full disk filename. In order to access disks S<small>TXXL</small> uses file 
- * access methods. Each disk is respresented as a file. If you have a disk that is mapped in unix
- * to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be
- * \c /mnt/disk0/some_file_name ,
+ * access methods. Each disk is respresented as a file. If you have a disk called \c e:
+ * then the correct value for the \c full_disk_filename would be
+ * \c e:\\some_file_name ,
  * - \c capacity : maximum capacity of the disk in megabytes
- * - \c access_method : \c S<small>TXXL</small> has a number of different file access implementations for POSIX systems, choose one of them:
- *   - \c syscall uses \c read and \c write system calls which perform disk transfers directly 
- *   on user memory pages without superfluous copy (currently the fastest method)
- *   - \c mmap : performs disks transfers using \c mmap and \c munmap system calls
- *   - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point 
- *     to a file on a RAM disk partition with sufficient space
+ * - \c access_method : \c S<small>TXXL</small> has a number of different file access implementations for WINDOWS, choose one of them:
+ *   - \c syscall: uses \c read and \c write POSIX system calls (slow)
+ *   - \c wincall: performs disks transfers using \c ReadFile and \c WriteFile WinAPI calls
+ *   This method supports direct I/O that avoid superfluous copying of data pages 
+ *   in the Windows kernel. This is the best (and default) method in Stxxl for Windows.
  *
  *
- * See also example configuration file \c 'stxxl/config_example' included into the tarball.
+ * See also example configuration file \c 'STXXL_ROOT\\config_example_win' included into the package.
  * 
  * \section excreation Formatting external memory files
  *
- * In order to get the maximum performance one should format disk files described in the configuration file,
+ * In order to get the maximum performance one should precreate disk files described in the configuration file,
  * before running \c S<small>TXXL</small> applications.
  *
- * The format utility is included into the set of \c S<small>TXXL</small> utilities ( \c utils/createdisks.bin ). Run this utility
+ * The precreation utility is included into the set of \c S<small>TXXL</small> utilities ( \c utils\\createdisks.exe ). Run this utility
  * for each disk you have defined in the disk configuration file.
  *
  * 

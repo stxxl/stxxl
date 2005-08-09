@@ -67,6 +67,12 @@ nmake tests_msvc"
 					RelativePath=".\io\iostats.cpp">
 				</File>
 				<File
+					RelativePath=".\io\mmap_file.cpp">
+				</File>
+				<File
+					RelativePath=".\io\simdisk_file.cpp">
+				</File>
+				<File
 					RelativePath=".\io\syscall_file.cpp">
 				</File>
 				<File
