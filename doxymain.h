@@ -217,7 +217,6 @@
  *   This method supports direct I/O that avoids superfluous copying of data pages 
  *   in the Windows kernel. This is the best (and default) method in Stxxl for Windows.
  *
- *
  * See also example configuration file \c 'STXXL_ROOT\\config_example_win' included into the package.
  * 
  * \section excreation Formatting external memory files
