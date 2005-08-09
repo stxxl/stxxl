@@ -214,7 +214,7 @@
  * - \c access_method : \c S<small>TXXL</small> has a number of different file access implementations for WINDOWS, choose one of them:
  *   - \c syscall: uses \c read and \c write POSIX system calls (slow)
  *   - \c wincall: performs disks transfers using \c ReadFile and \c WriteFile WinAPI calls
- *   This method supports direct I/O that avoid superfluous copying of data pages 
+ *   This method supports direct I/O that avoids superfluous copying of data pages 
  *   in the Windows kernel. This is the best (and default) method in Stxxl for Windows.
  *
  *
