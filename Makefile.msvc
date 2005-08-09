@@ -79,5 +79,8 @@ clean:
 	cd utils
 	$(MAKE) clean
 	cd ..
+	cd common
+	$(MAKE) clean
+	cd ..
 	@echo "Cleaning completed"
 
