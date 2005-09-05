@@ -41,7 +41,7 @@
  * - \link installation_linux_g++ Installation (Linux/g++) \endlink
  * - \link installation_sunos_g++ Installation (SunOS/g++) \endlink
  * - \link installation_msvc Installation (Windows/MS Visual C++ 7.1) \endlink
- * - \link installation Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
+ * - \link installation_old Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
  */
 
 /*!
