@@ -164,7 +164,7 @@ namespace stream
 	
 	const value_type * operator -> () const
     {
-      return (*in).operator->();
+      return &(**in);
     }
 	
     //! \brief Standard stream method
@@ -296,8 +296,8 @@ namespace stream
 	const value_type * operator -> () const
     {
 		if(it_stream)
-			return (*it_stream).operator->();
-		return (*vec_it_stream).operator->();
+			return &(**it_stream);
+		return &(**vec_it_stream);
     }
 	
     //! \brief Standard stream method
