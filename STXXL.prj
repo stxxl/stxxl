@@ -1,0 +1,231 @@
+# Anjuta Version 1.2.1 
+Compatibility Level: 1 
+
+<PROJECT_DESCRIPTION_START>
+STL-like library for external computations
+<PROJECT_DESCRIPTION_END>
+<CONFIG_PROGS_START>
+<CONFIG_PROGS_END>
+<CONFIG_LIBS_START>
+<CONFIG_LIBS_END>
+<CONFIG_HEADERS_START>
+<CONFIG_HEADERS_END>
+<CONFIG_CHARACTERISTICS_START>
+<CONFIG_CHARACTERISTICS_END>
+<CONFIG_LIB_FUNCS_START>
+<CONFIG_LIB_FUNCS_END>
+<CONFIG_ADDITIONAL_START>
+<CONFIG_ADDITIONAL_END>
+<CONFIG_FILES_START>
+<CONFIG_FILES_END>
+<MAKEFILE_AM_START>
+<MAKEFILE_AM_END>
+
+props.file.type=project
+
+anjuta.version=1.2.1
+anjuta.compatibility.level=1
+
+project.name=STXXL
+project.type=GENERIC
+project.target.type=EXECUTABLE
+project.version=0.01
+project.author=Roman Dementiev
+project.source.target=Linux/Solaris
+project.has.gettext=0
+project.gui.command=
+project.programming.language=C_C++
+project.excluded.modules=	intl
+
+project.config.extra.modules.before=
+project.config.extra.modules.after=
+project.config.blocked=1
+project.config.disable.overwriting=1 1 1 1 1 1 1 1 1 
+
+project.menu.entry=STXXL Version 0.01
+project.menu.group=Application
+project.menu.comment=STXXL Version 0.01
+project.menu.icon=
+project.menu.need.terminal=0
+
+project.configure.options=
+anjuta.program.arguments=
+preferences.build.option.jobs=0
+preferences.build.option.silent=0
+preferences.build.option.autosave=0
+preferences.anjuta.make.options=-k
+preferences.make=make
+preferences.build.option.keep.going=1
+preferences.build.option.warn.undef=0
+preferences.autoformat.custom.style= -i8 -sc -bli0 -bl0 -cbi0 -ss
+preferences.indent.opening=0
+preferences.autoformat.disable=1
+preferences.indent.automatic=1
+preferences.use.tabs=1
+preferences.indent.size=4
+preferences.tabsize=4
+preferences.indent.closing=0
+
+module.include.name=.
+module.include.type=
+module.include.files=\
+	mng/adaptor.h\
+	mng/mng.h\
+	common/mutex.h\
+	common/rand.h\
+	common/perm.h\
+	common/rwlock.h\
+	common/semaphore.h\
+	common/switch.h\
+	common/state.h\
+	common/utils.h\
+	common/myutils.h\
+	common/aligned_alloc.h\
+	io/io.h\
+	io/iobase.h\
+	io/mmap_file.h\
+	io/simdisk_file.h\
+	io/syscall_file.h\
+	io/ufs_file.h\
+	io/iostats.h\
+	containers/vector.h\
+	algo/ksort.h\
+	algo/loosertree.h\
+	algo/interleaved_alloc.h\
+	containers/pager.h\
+	common/simple_vector.h\
+	algo/async_schedule.h\
+	algo/intksort.h\
+	algo/ksort_exp.h\
+	mng/block_prefetcher.h\
+	mng/buf_writer.h\
+	mng/buf_istream.h\
+	mng/buf_ostream.h\
+	algo/scan.h\
+	common/gprof.h\
+	algo/sort.h\
+	algo/stable_ksort.h\
+	algo/adaptor.h\
+	io/completion_handler.h\
+	algo/inmemsort.h\
+	containers/stack.h\
+	common/timer.h\
+	common/tmeta.h\
+	utils/malloc.h\
+	mng/write_pool.h\
+	mng/prefetch_pool.h\
+	containers/priority_queue.h\
+	algo/run_cursor.h\
+	stream/stream.h\
+	stream/sort_stream.h\
+	common/debug.h\
+	containers/map.impl/bt_counter.h\
+	containers/map.impl/btnode.h\
+	containers/map.impl/btnode_iterator.h\
+	containers/map.impl/btnode_manager.h\
+	containers/map.impl/btree.h\
+	containers/map.impl/btree_completion_handler.h\
+	containers/map.impl/btree_iterator.h\
+	containers/map.impl/btree_queue.h\
+	containers/map.impl/btree_request.h\
+	containers/map.impl/fbtnode.h\
+	containers/map.impl/map.h\
+	containers/map.impl/map_async.h\
+	containers/map.impl/map_impl.h\
+	containers/map.impl/map_iterator.h\
+	containers/map.impl/map_queue.h\
+	containers/map.impl/map_request.h\
+	containers/map.impl/map_test.h\
+	containers/map.impl/my_type.h\
+	containers/map.impl/smart_ptr.h\
+	containers/map.impl/test_handlers.h\
+	containers/queue.h\
+	stxxl.h
+
+module.source.name=.
+module.source.type=
+module.source.files=\
+	mng/test.cpp\
+	test/dev.cpp\
+	test/features.cpp\
+	test/threads.cpp\
+	io/diskqueue.cpp\
+	io/test.cpp\
+	io/disktest.cpp\
+	containers/test.cpp\
+	algo/test.cpp\
+	algo/test_ksort.cpp\
+	test/test_thr.cpp\
+	test/block.cpp\
+	algo/test_asch.cpp\
+	mng/test_streams.cpp\
+	algo/test_scan.cpp\
+	algo/sort_file.cpp\
+	algo/gen_file.cpp\
+	algo/ksort.cpp\
+	algo/sort.cpp\
+	algo/test_sort.cpp\
+	algo/stable_ksort.cpp\
+	containers/test_mstack.cpp\
+	containers/test_stack.cpp\
+	mng/write_pool.cpp\
+	mng/prefetch_pool.cpp\
+	containers/ext_merger.cpp\
+	containers/p_queue.cpp\
+	containers/bench_pqueue.cpp\
+	stream/stream.cpp\
+	stream/test_stream.cpp\
+	stream/sorted_runs.cpp\
+	stream/push_sort.cpp\
+	containers/testqueue.cpp\
+	io/flushbuffers.cpp\
+	containers/map.impl/speed_test_map_erase.cpp\
+	containers/map.impl/speed_test_map_insert.cpp\
+	containers/map.impl/speed_test_map_iterate.cpp\
+	containers/map.impl/speed_test_map_search.cpp\
+	containers/map.impl/test.cpp\
+	containers/map.impl/test_map_erase.cpp\
+	containers/map.impl/test_map_insert.cpp\
+	containers/map.impl/test_map_iterator.cpp\
+	containers/map.impl/test_map_random.cpp\
+	containers/map.impl/test_map_search.cpp\
+	algo/test_stable_ksort.cpp\
+	utils/pq_param.cpp\
+	utils/createdisks.cpp
+
+module.pixmap.name=.
+module.pixmap.type=
+module.pixmap.files=
+
+module.data.name=.
+module.data.type=
+module.data.files=
+
+module.help.name=.
+module.help.type=
+module.help.files=
+
+module.doc.name=.
+module.doc.type=
+module.doc.files=
+
+module.po.files=
+
+compiler.options.supports=
+compiler.options.include.paths=\
+	.\
+	..
+compiler.options.library.paths=
+compiler.options.libraries=
+compiler.options.libraries.selected=
+compiler.options.defines=\
+	HAVE_CONFIG_H
+compiler.options.defines.selected=
+compiler.options.warning.buttons=0 0 1 1 0 1 0 0 0 0 0 0 0 1 0 0 
+compiler.options.optimize.buttons=0 0 1 0 
+compiler.options.other.buttons=1 0 
+compiler.options.other.c.flags=
+compiler.options.other.l.flags=
+compiler.options.other.l.libs=
+
+project.src.paths=
