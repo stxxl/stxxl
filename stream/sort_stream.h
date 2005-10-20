@@ -616,7 +616,6 @@ namespace stream
 		typedef ValueType_ value_type;
   };
   
-  
   //! \brief Forms sorted runs of data taking elements in sorted order (element by element)
   //!
   //! A specialization of \c runs_creator that
@@ -825,6 +824,8 @@ namespace stream
 
     return true;
   }
+  
+  
   
   //! \brief Merges sorted runs
   //!
@@ -1300,6 +1301,23 @@ namespace stream
       return merger.empty();
     }
     
+  };
+  
+  //! \brief Computes sorted runs type from value type and block size
+  //!
+  //! Template parameters
+  //! - \c ValueType_ type of values ins sorted runs
+  //! - \c BlockSize_ size of blocks where sorted runs stored
+  template <  
+  			  class ValueType_,
+              unsigned BlockSize_>
+  class compute_sorted_runs_type
+  {
+    typedef ValueType_ value_type;
+    typedef BID<BlockSize_> bid_type;
+    typedef sort_local::trigger_entry<bid_type,value_type> trigger_entry_type;
+  public:
+    typedef sorted_runs<value_type,trigger_entry_type> result;
   };
   
 //! \}
