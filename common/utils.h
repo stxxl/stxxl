@@ -331,14 +331,8 @@ typedef long long int int64;
 typedef unsigned long long uint64;
 #endif
 
-/* since STD library lacks following functions in opposite to STL */	
-template <class _Tp>
-inline void swap(_Tp& __a, _Tp& __b)
-{ 
-    _Tp __tmp = __a;
-    __a = __b;
-    __b = __tmp;
-}
+
+
 
 template <class _ForwardIter>
 bool is_sorted(_ForwardIter __first, _ForwardIter __last)

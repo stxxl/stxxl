@@ -11,9 +11,9 @@
 #include "containers/stack.h"
 #include "containers/priority_queue.h"
 
-#if (__GNUC__==3 && __GNUC_MINOR__ == 4)
+#if ((__GNUC__==3 && __GNUC_MINOR__ == 4) || __GNUC__== 4 )
 #else
-#include "containers/map.h" // not compatible with g++ 3.4.x
+#include "containers/map.h" // not compatible with g++ > 3.4.x
 #endif
 
 #include "containers/queue.h"

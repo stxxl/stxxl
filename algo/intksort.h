@@ -86,12 +86,12 @@ sort3 (T & a, T & b, T & c)
 			}
 			else
 			{	// c <=b < a
-				swap (c, a);
+				std::swap (c, a);
 			}
 		}
 		else
 		{		// b < a <=c
-			swap (a, b);
+			std::swap (a, b);
 		}
 	}
 	else
@@ -107,7 +107,7 @@ sort3 (T & a, T & b, T & c)
 		{		// a <=b , c
 			if (c < b)
 			{	// a <=c < b
-				swap (b, c);
+				std::swap (b, c);
 			}
 		}
 	}
@@ -124,8 +124,8 @@ sort4 (T & a, T & b, T & c, T & d)
 	{			// c minimal, a < b
 		if (d < a)
 		{		// c < d < a < b
-			swap (a, c);
-			swap (b, d);
+			std::swap (a, c);
+			std::swap (b, d);
 		}
 		else
 		{		// c < a < {db}
@@ -159,7 +159,7 @@ sort4 (T & a, T & b, T & c, T & d)
 			}
 			else
 			{	// a < c < b < d
-				swap (b, c);
+				std::swap (b, c);
 			}
 		}		// else sorted
 	}
@@ -174,12 +174,12 @@ sort5 (T & a, T & b, T & c, T & d, T & e)
 	sort2 (d, e);
 	if (d < a)
 	{
-		swap (a, d);
-		swap (b, e);
+		std::swap (a, d);
+		std::swap (b, e);
 	}			// a < d < e, a < b
 	if (d < c)
 	{
-		swap (c, d);	// a minimal, c < {de}
+		std::swap (c, d);	// a minimal, c < {de}
 		sort2 (d, e);
 	}
 	else
