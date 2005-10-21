@@ -7,7 +7,7 @@
 
 using namespace stxxl;
 
-#define RECORD_SIZE 128
+#define RECORD_SIZE 512
 
 struct my_type
 {
@@ -49,9 +49,10 @@ struct cmp: public std::less<my_type>
 
 int main()
 {	
-		unsigned memory_to_use = 256*1024*1024;
+		unsigned memory_to_use = 512*1024*1024;
 		typedef stxxl::vector<my_type> vector_type;
-		const stxxl::int64 n_records = stxxl::int64(2*1024+512)*stxxl::int64(1024*1024)/sizeof(my_type) - 2*1024*1024/sizeof(my_type);
+		const stxxl::int64 n_records = 
+			stxxl::int64(1*1024+512)*stxxl::int64(1024*1024)/sizeof(my_type);
 		vector_type v(n_records);
 	
     		random_number32 rnd;
