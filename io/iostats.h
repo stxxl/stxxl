@@ -21,11 +21,7 @@ __STXXL_BEGIN_NAMESPACE
   //! \{
 
 #ifdef COUNT_WAIT_TIME
-#ifdef BOOST_MSVC
 extern double wait_time_counter;
-#else
-extern double stxxl::wait_time_counter;
-#endif
 #endif
 
 	class disk_queue;
