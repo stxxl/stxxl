@@ -178,7 +178,7 @@ namespace stream
 	
 	while(!input.empty() && pos != block_type::size)
 	{
-		result_.small.push_back(*input);
+		result_.small_.push_back(*input);
 		++input;
       	++pos;
 	}		
@@ -188,8 +188,8 @@ namespace stream
 	if( pos == block_type::size ) 
 	{      // ennlarge/reallocate Blocks1 array
 			block_type * NewBlocks = new block_type[m2*2];
-			std::copy(result_.small.begin(), result_.small.end(), NewBlocks[0].begin());
-			result_.small.clear();
+			std::copy(result_.small_.begin(), result_.small_.end(), NewBlocks[0].begin());
+			result_.small_.clear();
 			//delete [] Blocks1;
 			Blocks1 = NewBlocks;
 	}
@@ -197,7 +197,7 @@ namespace stream
 	{
 		STXXL_VERBOSE1("runs_creator: Small input optimization, input length: "<<pos);
 		result_.elements = pos;
-		std::sort(result_.small.begin(), result_.small.end(), cmp);
+		std::sort(result_.small_.begin(), result_.small_.end(), cmp);
 		return;		
 	}
 #endif
