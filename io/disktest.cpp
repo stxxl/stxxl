@@ -24,7 +24,7 @@ using namespace stxxl;
 
 #define BLOCK_ALIGN  4096
 
-#define NOREAD
+//#define NOREAD
 
 //#define DO_ONLY_READ
 
@@ -128,7 +128,7 @@ int main(int argc, char * argv[])
   "/mnt/hdu/stxxl",
   "/mnt/hdw/stxxl",
   "/mnt/raid/stxxl",
-  "/mnt/raid1/stxxl"
+  "stxxl"
 };
 
 #endif 
@@ -163,12 +163,22 @@ int main(int argc, char * argv[])
 
   for(i=0;i<ndisks;i++)
   {
+  #ifdef BOOST_MSVC
+  #ifdef RAW_ACCESS 
+    disks[i] = new wincall_file(disks_arr[i],
+		    file::CREAT | file::RDWR  | file::DIRECT ,i);
+  #else
+  	disks[i] = new wincall_file(disks_arr[i],
+			file::CREAT | file::RDWR ,i);
+  #endif
+  #else
   #ifdef RAW_ACCESS 
     disks[i] = new syscall_file(disks_arr[i],
 		    file::CREAT | file::RDWR  | file::DIRECT ,i);
   #else
   	disks[i] = new syscall_file(disks_arr[i],
 			file::CREAT | file::RDWR ,i);
+  #endif
   #endif
   }
 	
