@@ -7,7 +7,7 @@
 
 using namespace stxxl;
 
-#define RECORD_SIZE 512
+#define RECORD_SIZE 8
 
 struct my_type
 {
