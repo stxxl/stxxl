@@ -56,7 +56,7 @@ __STXXL_BEGIN_NAMESPACE
 		random_uniform_slow() : uni(generator, uni_dist) {}
 		#endif
 
-		inline value_type operator() ()
+		inline value_type operator() () const
 		{
 			#ifdef STXXL_BOOST_RANDOM
 			return uni();

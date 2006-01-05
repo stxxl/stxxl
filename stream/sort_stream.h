@@ -930,7 +930,7 @@ namespace stream
       {
         // can not merge runs in one pass
         // merge recursively:
-        STXXL_ERRMSG("An implementation requires more than one merge pass, therefore for a better")
+        STXXL_ERRMSG("The implementation of sort requires more than one merge pass, therefore for a better")
         STXXL_ERRMSG("efficiency decrease block size of run storage (a parameter of the run_creator)")
         STXXL_ERRMSG("or increase the amount memory dedicated to the merger.")
         STXXL_ERRMSG("m = "<< m_<<" nruns="<<nruns)

@@ -1,4 +1,4 @@
-# Anjuta Version 1.2.1 
+# Anjuta Version 1.2.2 
 Compatibility Level: 1 
 
 <PROJECT_DESCRIPTION_START>
@@ -23,7 +23,7 @@ STL-like library for external computations
 
 props.file.type=project
 
-anjuta.version=1.2.1
+anjuta.version=1.2.2
 anjuta.compatibility.level=1
 
 project.name=STXXL
@@ -140,7 +140,8 @@ module.include.files=\
 	containers/map.impl/smart_ptr.h\
 	containers/map.impl/test_handlers.h\
 	containers/queue.h\
-	stxxl.h
+	stxxl.h\
+	common/log.h
 
 module.source.name=.
 module.source.type=

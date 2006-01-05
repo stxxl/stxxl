@@ -16,10 +16,17 @@
 #include <vector>
 
 
+
 namespace stxxl
 {
-  //! \addtogroup stlcontinternals
-  //! \{
+//! \weakgroup stlcont Containers
+//! \ingroup stllayer
+//! Containers with STL-compatible interface
+
+	
+//! \weakgroup stlcontinternals Internals
+//! \ingroup stlcont
+//! \{
   
 	template < unsigned BlkSize_ >
 		class bid_vector:public std::vector < BID < BlkSize_ > >
@@ -903,6 +910,8 @@ private:
     
   //! \}
 }
+
+
 
 namespace std
 {

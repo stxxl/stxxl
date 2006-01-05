@@ -1,4 +1,4 @@
-all: vector stack mstack many p_queue queue ext_merger bench_pqueue
+all: vector stack mstack many p_queue queue ext_merger bench_pqueue copy_file
 
 include ../make.settings
 
@@ -19,6 +19,11 @@ map: $(DEPENDENCIES)
 testmap: testmap.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c testmap.cpp
 	$(LINKER)  testmap.$(OBJEXT) $(OUT)testmap.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+copy_file: copy_file.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c copy_file.cpp	
+	$(LINKER) copy_file.$(OBJEXT) $(OUT)copy_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+	
 
 vector: test.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test.cpp
@@ -53,4 +58,4 @@ clean:
 	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT)
 	$(RM) ext_merger.$(EXEEXT) p_queue.$(EXEEXT) many_stacks.$(EXEEXT)
 	$(RM) test_mstack.$(EXEEXT) test_stack.$(EXEEXT) test.$(EXEEXT)
-	$(RM) testqueue.$(EXEEXT) testmap.$(EXEEXT)
+	$(RM) testqueue.$(EXEEXT) testmap.$(EXEEXT) copy_file.$(EXEEXT)
