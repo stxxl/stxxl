@@ -303,10 +303,11 @@ __STXXL_BEGIN_NAMESPACE
 			return result;
 		}
 		
-		static void *  operator new (size_t bytes, void * & ptr) // construct object in existing memory
+		static void *  operator new (size_t bytes, void * ptr) // construct object in existing memory
 		{
 			return ptr;
 		}
+		
 		static void operator      delete (void *ptr)
 		{
 			debugmon::get_instance()->block_deallocated((char*)ptr);
