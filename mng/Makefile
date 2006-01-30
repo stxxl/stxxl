@@ -1,4 +1,4 @@
-all_tests: main streams write_pool prefetch_pool
+all_tests: main test1 streams write_pool prefetch_pool
 
 include ../make.settings
 
@@ -11,6 +11,10 @@ lib: mng.cpp
 main: test.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test.cpp -DSTXXL_VERBOSE_LEVEL=2 
 	$(LINKER) test.$(OBJEXT) $(OUT)test.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+test1: test1.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test1.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(LINKER) test1.$(OBJEXT) $(OUT)test1.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 streams: test_streams.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_streams.cpp
