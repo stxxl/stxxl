@@ -1,4 +1,4 @@
-# Anjuta Version 1.2.2 
+# Anjuta Version 1.2.4 
 Compatibility Level: 1 
 
 <PROJECT_DESCRIPTION_START>
@@ -23,7 +23,7 @@ STL-like library for external computations
 
 props.file.type=project
 
-anjuta.version=1.2.2
+anjuta.version=1.2.4
 anjuta.compatibility.level=1
 
 project.name=STXXL
@@ -119,29 +119,18 @@ module.include.files=\
 	stream/stream.h\
 	stream/sort_stream.h\
 	common/debug.h\
-	containers/map.impl/bt_counter.h\
-	containers/map.impl/btnode.h\
-	containers/map.impl/btnode_iterator.h\
-	containers/map.impl/btnode_manager.h\
-	containers/map.impl/btree.h\
-	containers/map.impl/btree_completion_handler.h\
-	containers/map.impl/btree_iterator.h\
-	containers/map.impl/btree_queue.h\
-	containers/map.impl/btree_request.h\
-	containers/map.impl/fbtnode.h\
-	containers/map.impl/map.h\
-	containers/map.impl/map_async.h\
-	containers/map.impl/map_impl.h\
-	containers/map.impl/map_iterator.h\
-	containers/map.impl/map_queue.h\
-	containers/map.impl/map_request.h\
-	containers/map.impl/map_test.h\
-	containers/map.impl/my_type.h\
-	containers/map.impl/smart_ptr.h\
-	containers/map.impl/test_handlers.h\
 	containers/queue.h\
 	stxxl.h\
-	common/log.h
+	common/log.h\
+	containers/pmbtree/leaf.h\
+	containers/btree/leaf.h\
+	containers/btree/btree.h\
+	containers/btree/iterator.h\
+	containers/btree/iterator_map.h\
+	containers/btree/node.h\
+	containers/btree/node_cache.h\
+	containers/btree/root_node.h\
+	containers/btree/splitter.h
 
 module.source.name=.
 module.source.type=
@@ -173,26 +162,18 @@ module.source.files=\
 	mng/prefetch_pool.cpp\
 	containers/ext_merger.cpp\
 	containers/p_queue.cpp\
-	containers/bench_pqueue.cpp\
 	stream/stream.cpp\
 	stream/test_stream.cpp\
 	stream/sorted_runs.cpp\
 	stream/push_sort.cpp\
 	containers/testqueue.cpp\
 	io/flushbuffers.cpp\
-	containers/map.impl/speed_test_map_erase.cpp\
-	containers/map.impl/speed_test_map_insert.cpp\
-	containers/map.impl/speed_test_map_iterate.cpp\
-	containers/map.impl/speed_test_map_search.cpp\
-	containers/map.impl/test.cpp\
-	containers/map.impl/test_map_erase.cpp\
-	containers/map.impl/test_map_insert.cpp\
-	containers/map.impl/test_map_iterator.cpp\
-	containers/map.impl/test_map_random.cpp\
-	containers/map.impl/test_map_search.cpp\
 	algo/test_stable_ksort.cpp\
 	utils/pq_param.cpp\
-	utils/createdisks.cpp
+	utils/createdisks.cpp\
+	containers/pmbtree/test_leaf.cpp\
+	containers/btree/test_leaf.cpp\
+	containers/btree/test_btree.cpp
 
 module.pixmap.name=.
 module.pixmap.type=
