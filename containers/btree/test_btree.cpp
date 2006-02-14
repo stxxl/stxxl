@@ -1,23 +1,18 @@
 /***************************************************************************
- *            test_leaf.cpp
+ *            test_btree.cpp
  *
- *  Mon Feb  6 18:20:22 2006
+ *  Tue Feb 14 20:39:53 2006
  *  Copyright  2006  Roman Dementiev
  *  Email
  ****************************************************************************/
 
-#include "leaf.h"
-
-
-using namespace stxxl::btree;
-
-
-typedef normal_leaf<int,int,18,std::less<int> > myleaf_type;
-typedef myleaf_type::value_type pair_type;
+#include "btree.h"
+						
+typedef stxxl::btree::btree<int,double,std::less<int>,5,8> btree_type;
 
 int main()
 {
-
+	btree_type BTree1;
 	
-	return 1;
+	return 0;
 }

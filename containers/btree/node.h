@@ -1,13 +1,14 @@
 /***************************************************************************
- *            leaf.h
+ *            node.h
  *
- *  Mon Feb  6 17:04:11 2006
+ *  Tue Feb 14 21:02:51 2006
  *  Copyright  2006  Roman Dementiev
  *  Email
  ****************************************************************************/
 
-#ifndef _LEAF_H
-#define _LEAF_H
+#ifndef _NODE_H
+#define _NODE_H
+
 
 #include <stxxl>
 #include "iterator.h"
@@ -18,8 +19,8 @@ __STXXL_BEGIN_NAMESPACE
 namespace btree
 {
 	
-	template <class KeyType_, class DataType_, class KeyCmp_, unsigned LogNElem_, class BTreeType>
-	class normal_leaf
+	template <class KeyType_, class KeyCmp_, unsigned LogNElem_, class BTreeType>
+	class normal_node
 	{
 			
 		public:
@@ -28,33 +29,35 @@ namespace btree
 				magic_block_size = 4096
 			};
 			typedef KeyType_ key_type;
-			typedef DataType_ data_type;
 			typedef KeyCmp_ key_compare;
-			typedef std::pair<key_type,data_type>  value_type;
+			
+			typedef std::pair<key_type,BID<magic_block_size> >  dummy_value_type;
 			
 			enum {
-				raw_size_not_4Krounded = sizeof(value_type [nelements])
-					+ 3*sizeof(BID<magic_block_size>) // succ, pred links and my bid
+				raw_size_not_4Krounded = sizeof(dummy_value_type [nelements])
+					+ sizeof(BID<magic_block_size>) //  my bid
 					+ sizeof(unsigned),	// current size
 				raw_size = (raw_size_not_4Krounded/4096 + 1)*4096
 			};
 			typedef BID<raw_size> bid_type;
+			typedef std::pair<key_type,bid_type>  value_type;
 			struct InfoType
 			{
-				bid_type me, pred, succ ;
+				bid_type me;
 				unsigned cur_size;
 			};
 			typedef typed_block<raw_size,value_type,0,InfoType> block_type;			
-			typedef btree_iterator<bid_type> iterator;
-			typedef btree_const_iterator<bid_type> const_iterator;
-			
-			typedef node_cache<normal_leaf> leaf_cache_type;
 			typedef BTreeType btree_type;
+			typedef typename btree_type::iterator  iterator;
+			typedef typename btree_type::const_iterator const_iterator;
+			
+			typedef node_cache<normal_node> node_cache_type;
+
 			
 private:
-			normal_leaf();
+			normal_node();
 
-			struct value_compare : public std::binary_function<value_type, value_type, bool> 
+			struct value_compare : public std::binary_function<value_type, bid_type, bool> 
 			{
 					key_compare comp;
 				
@@ -74,12 +77,12 @@ private:
 			value_compare vcmp_;
 
 public:
-			virtual ~normal_leaf()
+			virtual ~normal_node()
 			{
 				delete block_;
 			}
 			
-			normal_leaf(	btree_type * btree__,
+			normal_node(	btree_type * btree__,
 								unsigned min_nelements, 
 								unsigned max_nelements, 
 								key_compare cmp): 
@@ -106,7 +109,7 @@ public:
 			*/
 			
 			template <class InputIterator>
-			normal_leaf(InputIterator begin_, InputIterator end_,
+			normal_node(InputIterator begin_, InputIterator end_,
 				btree_type * btree__,
 				unsigned min_nelements, unsigned max_nelements,
 				key_compare cmp): 
@@ -178,4 +181,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif /* _LEAF_H */
+
+#endif /* _NODE_H */
