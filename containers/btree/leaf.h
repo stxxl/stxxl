@@ -48,7 +48,9 @@ namespace btree
 			typedef btree_iterator<bid_type> iterator;
 			typedef btree_const_iterator<bid_type> const_iterator;
 			
-			typedef node_cache<normal_leaf> leaf_cache_type;
+			typedef BTreeType btree_type;
+			
+			typedef node_cache<normal_leaf,btree_type> leaf_cache_type;
 			typedef BTreeType btree_type;
 			
 private:
@@ -172,6 +174,28 @@ public:
 			{
 				return block_->info.cur_size;
 			}
+			
+			bid_type my_bid() const 
+			{
+				return block_->info.me;
+			}
+			
+			void save()
+			{
+				// TODO
+			}
+			
+			void load(const bid_type & bid)
+			{
+				// TODO 
+			}
+			
+			void init(const bid_type & my_bid_)
+			{
+				block_->info.me = my_bid_;
+				block_->info.cur_size = 0;
+			}
+
 	};
 };
 

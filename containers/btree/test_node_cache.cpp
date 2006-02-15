@@ -1,20 +1,22 @@
 /***************************************************************************
- *            test_btree.cpp
+ *            test_node_cache.cpp
  *
- *  Tue Feb 14 20:39:53 2006
+ *  Wed Feb 15 14:32:43 2006
  *  Copyright  2006  Roman Dementiev
  *  Email
  ****************************************************************************/
 
 #include "btree.h"
-						
+
 typedef stxxl::btree::btree<int,double,std::less<int>,5,8,stxxl::SR> btree_type;
 
 int main()
 {
-	btree_type BTree1(1024*1024*16,1024*1024*16);
+	btree_type BTree1;
+	typedef btree_type::node_cache_type node_cache_type;
+	node_cache_type NodeCache(1024*1024*50,&BTree1,0,1000,btree_type::key_compare());
 	
-	
+
 	
 	return 0;
 }
