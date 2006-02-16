@@ -31,6 +31,7 @@ namespace btree
 			typedef DataType_ data_type;
 			typedef KeyCmp_ key_compare;
 			typedef std::pair<key_type,data_type>  value_type;
+			typedef value_type  & reference;
 			
 			enum {
 				raw_size_not_4Krounded = sizeof(value_type [nelements])
@@ -44,17 +45,22 @@ namespace btree
 				bid_type me, pred, succ ;
 				unsigned cur_size;
 			};
+
 			typedef typed_block<raw_size,value_type,0,InfoType> block_type;			
-			typedef btree_iterator<bid_type> iterator;
-			typedef btree_const_iterator<bid_type> const_iterator;
-			
 			typedef BTreeType btree_type;
+			typedef btree_iterator_base<btree_type> iterator_base;
+			typedef btree_iterator<btree_type>  iterator;
+			typedef btree_const_iterator<btree_type> const_iterator;
+			
+			
 			
 			typedef node_cache<normal_leaf,btree_type> leaf_cache_type;
-			typedef BTreeType btree_type;
+			
 			
 private:
 			normal_leaf();
+			normal_leaf(const normal_leaf &);
+			normal_leaf & operator = (const normal_leaf &);
 
 			struct value_compare : public std::binary_function<value_type, value_type, bool> 
 			{
@@ -121,7 +127,7 @@ public:
 			{
 				assert(min_nelements < max_nelements);
 				assert(max_nelements <= nelements);
-				assert(unsigned(block_type::size) >= nelements +1); // extra space for an overflow
+				assert(unsigned(block_type::size) >= nelements +1); // extra space for an overflow element
 				
 				unsigned new_size = end_ - begin_;
 				assert(new_size <= max_nelements_);
@@ -182,18 +188,82 @@ public:
 			
 			void save()
 			{
-				// TODO
+				request_ptr req = block_->write(my_bid());
+				req->wait();
 			}
 			
 			void load(const bid_type & bid)
 			{
-				// TODO 
+				request_ptr req = block_->read(bid);
+				req->wait();
 			}
 			
 			void init(const bid_type & my_bid_)
 			{
 				block_->info.me = my_bid_;
 				block_->info.cur_size = 0;
+			}
+			
+			reference operator [] (int i)
+			{
+				return (*block_)[i];
+			}
+			
+			void dump()
+			{
+				STXXL_VERBOSE1("Dump og leaf "<<this)
+				for(int i=0;i<size();++i)
+					STXXL_VERBOSE1((*this)[i].first<<" "<<(*this)[i].second)
+			}
+			
+			std::pair<iterator,bool> insert(
+					const value_type & x, 
+					std::pair<key_type,bid_type> & splitter)
+			{
+				assert(size() <= max_nelements_);
+				typename block_type::iterator it = 
+					std::lower_bound(block_->begin(),block_->begin() + size(), x ,vcmp_);
+				
+				if(!(vcmp_(*it,x) || vcmp_(x,*it))) // *it == x
+				{
+					// already exists
+					return std::pair<iterator,bool>(
+						iterator(btree_,my_bid(),it - block_->begin())
+						,false);
+				}
+				
+				typename block_type::iterator cur = block_->begin() + size() - 1;
+
+				for(; cur>=it; --cur)
+					*(cur+1) = *cur;  // copy elements to make space for the new element
+				
+				*it = x;
+				
+				std::vector<iterator_base *> Iterators2Fix;
+				btree_->iterator_map_.find(my_bid(),it - block_->begin(),size() - 1,Iterators2Fix);				
+				typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
+				for(;it2fix!=Iterators2Fix.end();++it2fix)
+				{
+					btree_->iterator_map_.unregister_iterator(*it2fix);
+					++((*it2fix)->pos); // fixing iterators
+					btree_->iterator_map_.register_iterator(*it2fix);
+				}
+				
+				++(block_->info.cur_size);
+				
+				if(size() <= max_nelements_)
+				{
+					// no overflow
+					dump();
+					
+					return std::pair<iterator,bool>(
+						iterator(btree_,my_bid(),it - block_->begin())
+						,true);
+				}
+				
+				abort();
+				
+				return std::pair<iterator,bool>();
 			}
 
 	};

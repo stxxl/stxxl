@@ -23,24 +23,11 @@ namespace btree
         list_type history;
         std::vector<list_type::iterator> history_entry;
 
+	
+        lru_pager(const lru_pager & obj);
+        lru_pager & operator = (const lru_pager & obj);
 	public:
-        lru_pager(const lru_pager & obj):
-				npages_(obj.npages_),
-				history(obj.history),
-				history_entry(obj.history_entry)
-		{
-		}
-        lru_pager & operator = (const lru_pager & obj)
-		{
-			if(&obj != this)
-			{
-				npages_ = obj.npages_;
-				history = obj.history;
-				history_entry = obj.history_entry;
-			}
 			
-			return *this;
-		}
         lru_pager(): npages_(0)
 		{
 		}
@@ -63,6 +50,7 @@ namespace btree
         }
         void swap(lru_pager & obj)
         {
+				std::swap(npages_,obj.npages_);
                 std::swap(history,obj.history);
                 std::swap(history_entry,obj.history_entry);
         }
@@ -71,5 +59,16 @@ namespace btree
 }
 
 __STXXL_END_NAMESPACE
+
+namespace std
+{
+
+        void swap(      stxxl::btree::lru_pager & a,
+                             stxxl::btree::lru_pager & b)
+        {
+                a.swap(b);
+        }
+}
+
 
 #endif /* _BTREE_PAGER_H */

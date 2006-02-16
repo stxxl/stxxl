@@ -79,7 +79,10 @@ namespace btree
 					nodes_.push_back(new node_type(btree_,min_node_elements_,max_node_elements_,comp_));
 					free_nodes_.push_back(i);
 				}
-				pager_ = pager_type(nnodes);
+				
+				pager_type tmp_pager(nnodes);
+				std::swap(pager_,tmp_pager);
+				
 			}
 			
 			unsigned size() const 
@@ -89,13 +92,14 @@ namespace btree
 			
 			~node_cache()
 			{
-				// TODO: flush, delete nodes in BID2node_
+				STXXL_VERBOSE1("btree::node_cache deconstructor addr="<<this)
 				typename BID2node_type::const_iterator i = BID2node_.begin();
 				for(;i!=BID2node_.end();++i)
 				{
 					nodes_[(*i).second]->save();
-					delete nodes_[(*i).second];
 				}
+				for(int i=0;i<size();++i)
+					delete nodes_[i];
 			}
 		
 			node_type * get_new_node(bid_type & new_bid)
@@ -121,7 +125,7 @@ namespace btree
 					
 					nodes_[node2kick]->save();
 					BID2node_.erase(nodes_[node2kick]->my_bid());
-					bm->new_blocks(1,alloc_strategy_,&new_bid);
+					bm->new_blocks<block_type>(1,alloc_strategy_,&new_bid);
 					
 					BID2node_[new_bid] = node2kick;
 					
@@ -136,7 +140,7 @@ namespace btree
 				free_nodes_.pop_back();
 				assert(fixed_[free_node] == false);
 				
-				bm->new_blocks(1,alloc_strategy_,&new_bid);
+				bm->new_blocks<block_type>(1,alloc_strategy_,&new_bid);
 				BID2node_[new_bid] = free_node;
 				nodes_[free_node]->init(new_bid);
 				

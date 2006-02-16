@@ -56,6 +56,8 @@ namespace btree
 			
 private:
 			normal_node();
+			normal_node(const normal_node &);
+			normal_node & operator = (const normal_node &);
 
 			struct value_compare : public std::binary_function<value_type, bid_type, bool> 
 			{
