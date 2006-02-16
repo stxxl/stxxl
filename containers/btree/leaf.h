@@ -244,9 +244,9 @@ public:
 				typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
 				for(;it2fix!=Iterators2Fix.end();++it2fix)
 				{
-					btree_->iterator_map_.unregister_iterator(*it2fix);
+					btree_->iterator_map_.unregister_iterator(**it2fix);
 					++((*it2fix)->pos); // fixing iterators
-					btree_->iterator_map_.register_iterator(*it2fix);
+					btree_->iterator_map_.register_iterator(**it2fix);
 				}
 				
 				++(block_->info.cur_size);
