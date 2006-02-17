@@ -46,7 +46,7 @@ namespace btree
 			
 			btree_iterator_base()
 			{
-				STXXL_VERBOSE1("btree_iterator_base def contruct addr="<<this);
+				STXXL_VERBOSE3("btree_iterator_base def contruct addr="<<this);
 				make_invalid();
 			}
 			
@@ -56,7 +56,7 @@ namespace btree
 				unsigned p
 				): btree_(btree__), bid(b), pos(p)
 			{
-				STXXL_VERBOSE1("btree_iterator_base parameter contruct addr="<<this);
+				STXXL_VERBOSE3("btree_iterator_base parameter contruct addr="<<this);
 				btree_->iterator_map_.register_iterator(*this);
 			}
 			
@@ -67,7 +67,7 @@ namespace btree
 			
 			btree_iterator_base( const btree_iterator_base & obj)
 			{
-				STXXL_VERBOSE1("btree_iterator_base constr from"<<(&obj)<<" to "<<this);
+				STXXL_VERBOSE3("btree_iterator_base constr from"<<(&obj)<<" to "<<this);
 				btree_ = obj.btree_;
 				bid = obj.bid;
 				pos = obj.pos;
@@ -76,7 +76,7 @@ namespace btree
 			
 			btree_iterator_base & operator = (const btree_iterator_base & obj)
 			{
-				STXXL_VERBOSE1("btree_iterator_base copy from"<<(&obj)<<" to "<<this);
+				STXXL_VERBOSE3("btree_iterator_base copy from"<<(&obj)<<" to "<<this);
 				if(&obj != this)
 				{
 					if(btree_) btree_->iterator_map_.unregister_iterator(*this);
@@ -104,7 +104,7 @@ namespace btree
 		public:	
 			virtual ~btree_iterator_base()
 			{
-				STXXL_VERBOSE1("btree_iterator_base deconst "<<this);
+				STXXL_VERBOSE3("btree_iterator_base deconst "<<this);
 				if(btree_) btree_->iterator_map_.unregister_iterator(*this);
 			}
 	};

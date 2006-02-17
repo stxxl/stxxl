@@ -71,6 +71,8 @@ namespace btree
 					bm(block_manager::get_instance())
 			{
 				const unsigned nnodes = cache_size_in_bytes/block_type::raw_size;
+				STXXL_VERBOSE1("btree::node_cache constructor nodes="<<nnodes)
+				assert(nnodes >= 3);
 				nodes_.reserve(nnodes);
 				free_nodes_.reserve(nnodes);
 				fixed_.resize(nnodes,false);
@@ -121,7 +123,7 @@ namespace btree
 						}
 						pager_.hit(node2kick);
 							
-					} while (!(fixed_[node2kick]));
+					} while (fixed_[node2kick]);
 					
 					nodes_[node2kick]->save();
 					BID2node_.erase(nodes_[node2kick]->my_bid());
@@ -133,8 +135,11 @@ namespace btree
 					
 					assert(size() == BID2node_.size() + free_nodes_.size());
 					
+					STXXL_VERBOSE1("btree::node_cache get_new_node, need to kick node "<<node2kick)
+					
 					return nodes_[node2kick];
 				}
+				
 				
 				int free_node = free_nodes_.back();
 				free_nodes_.pop_back();
@@ -148,6 +153,8 @@ namespace btree
 				
 				assert(size() == BID2node_.size() + free_nodes_.size());
 				
+				STXXL_VERBOSE1("btree::node_cache get_new_node, free node "<<free_node<<"available")
+				
 				return nodes_[free_node];
 			}
 			
@@ -159,6 +166,7 @@ namespace btree
 				{
 					// the node is in cache
 					int nodeindex = BID2node_[bid];
+					STXXL_VERBOSE1("btree::node_cache get_node, the node "<<nodeindex<<"is in cache , fix="<<fix)
 					fixed_[nodeindex] = fix;
 					pager_.hit(nodeindex);
 					return nodes_[nodeindex];
@@ -182,7 +190,7 @@ namespace btree
 						}
 						pager_.hit(node2kick);
 							
-					} while (!(fixed_[node2kick]));
+					} while (fixed_[node2kick]);
 					
 					nodes_[node2kick]->save();
 					BID2node_.erase(nodes_[node2kick]->my_bid());
@@ -193,6 +201,8 @@ namespace btree
 					fixed_[node2kick] = fix;
 					
 					assert(size() == BID2node_.size() + free_nodes_.size());
+					
+					STXXL_VERBOSE1("btree::node_cache get_node, need to kick node"<<node2kick<<" fix="<<fix)
 					
 					return nodes_[node2kick];
 				}
@@ -209,6 +219,8 @@ namespace btree
 				fixed_[free_node] = fix;
 				
 				assert(size() == BID2node_.size() + free_nodes_.size());
+				
+				STXXL_VERBOSE1("btree::node_cache get_node, free node "<< free_node<<"available, fix="<<fix)
 				
 				return nodes_[free_node];
 			}
@@ -231,6 +243,7 @@ namespace btree
 			{
 				assert(BID2node_.find(bid) != BID2node_.end());
 				fixed_[BID2node_[bid] ] = false;
+				STXXL_VERBOSE1("btree::node_cache unfix_node,  node "<< BID2node_[bid] )
 			}			
 	};
 	

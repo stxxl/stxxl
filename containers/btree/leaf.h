@@ -80,6 +80,70 @@ private:
 			const unsigned max_nelements_;
 			key_compare cmp_;
 			value_compare vcmp_;
+			
+			void split(std::pair<key_type,bid_type> & splitter)
+			{
+				bid_type NewBid;
+				btree_->leaf_cache_.get_new_node(NewBid); // new (left) leaf
+				normal_leaf * NewLeaf = btree_->leaf_cache_.get_node(NewBid,true);
+				assert(NewLeaf);
+				
+				// update links
+				NewLeaf->succ() = my_bid();
+				if(pred().valid())
+				{
+					NewLeaf->pred() = pred();
+					normal_leaf * PredLeaf = btree_->leaf_cache_.get_node(pred());
+					PredLeaf->succ() = NewBid;
+				}
+				pred() = NewBid;
+				
+				std::vector<iterator_base *> Iterators2Fix;
+				btree_->iterator_map_.find(my_bid(),0,size(),Iterators2Fix);
+				
+				const unsigned end_of_smaller_part = size()/2;
+				
+				splitter.first = ((*block_)[end_of_smaller_part-1]).first;
+				splitter.second = NewBid;
+				
+				const unsigned old_size = size();
+				// copy the smaller part
+				std::copy(block_->begin(),block_->begin() + end_of_smaller_part, NewLeaf->block_->begin());
+				NewLeaf->block_->info.cur_size = end_of_smaller_part;	
+				// copy the larger part
+				std::copy(	block_->begin() + end_of_smaller_part,
+								block_->begin() + old_size, block_->begin());
+				block_->info.cur_size = old_size - end_of_smaller_part;
+				assert(size() + NewLeaf->size() == old_size);
+				
+				// fix iterators
+				typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
+				for(;it2fix!=Iterators2Fix.end();++it2fix)
+				{
+					btree_->iterator_map_.unregister_iterator(**it2fix);
+					
+					if((*it2fix)->pos < end_of_smaller_part) // belongs to the smaller part
+						(*it2fix)->bid = NewBid;
+					else
+						(*it2fix)->pos -= end_of_smaller_part;  
+					
+					btree_->iterator_map_.register_iterator(**it2fix);
+				}
+				
+				btree_->leaf_cache_.unfix_node(NewBid);
+				
+				STXXL_VERBOSE1("btree::normal_leaf split leaf "<<this
+					<<" splitter: "<<splitter.first)
+			}
+			
+			bid_type & succ()
+			{
+				return block_->info.succ;
+			}
+			bid_type & pred()
+			{
+				return block_->info.pred;
+			}
 
 public:
 			virtual ~normal_leaf()
@@ -211,9 +275,9 @@ public:
 			
 			void dump()
 			{
-				STXXL_VERBOSE1("Dump og leaf "<<this)
+				STXXL_VERBOSE2("Dump og leaf "<<this)
 				for(int i=0;i<size();++i)
-					STXXL_VERBOSE1((*this)[i].first<<" "<<(*this)[i].second)
+					STXXL_VERBOSE2((*this)[i].first<<" "<<(*this)[i].second);
 			}
 			
 			std::pair<iterator,bool> insert(
@@ -221,6 +285,8 @@ public:
 					std::pair<key_type,bid_type> & splitter)
 			{
 				assert(size() <= max_nelements_);
+				splitter.first = key_compare::max_value();
+				
 				typename block_type::iterator it = 
 					std::lower_bound(block_->begin(),block_->begin() + size(), x ,vcmp_);
 				
@@ -240,7 +306,7 @@ public:
 				*it = x;
 				
 				std::vector<iterator_base *> Iterators2Fix;
-				btree_->iterator_map_.find(my_bid(),it - block_->begin(),size() - 1,Iterators2Fix);				
+				btree_->iterator_map_.find(my_bid(),it - block_->begin(),size(),Iterators2Fix);				
 				typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
 				for(;it2fix!=Iterators2Fix.end();++it2fix)
 				{
@@ -251,19 +317,20 @@ public:
 				
 				++(block_->info.cur_size);
 				
+				std::pair<iterator,bool> result(iterator(btree_,my_bid(),it - block_->begin()),true);
+				
 				if(size() <= max_nelements_)
 				{
 					// no overflow
 					dump();
-					
-					return std::pair<iterator,bool>(
-						iterator(btree_,my_bid(),it - block_->begin())
-						,true);
+					return result;	
 				}
 				
-				abort();
+				// overflow
 				
-				return std::pair<iterator,bool>();
+				split(splitter);
+				
+				return result;
 			}
 
 	};
