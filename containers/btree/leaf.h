@@ -332,6 +332,11 @@ public:
 				
 				return result;
 			}
+			
+			iterator begin()
+			{
+				return iterator(btree_,my_bid(),0);
+			}
 
 	};
 };

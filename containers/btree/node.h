@@ -322,6 +322,18 @@ public:
 				
 			}
 			
+			iterator begin(unsigned height)
+			{
+				bid_type FirstBid = block_->begin()->first;
+				if(height == 2) // FirstBid points to a leaf
+				{
+				}
+				else
+				{ // FirstBid points to a node
+					
+				}
+			}
+			
 	};
 };
 

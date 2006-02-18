@@ -52,9 +52,14 @@ __STXXL_BEGIN_NAMESPACE
     	BID():storage(NULL),offset(0) {}
     	bool valid() const { return storage; }
 		BID(file * s, stxxl::int64 o) : storage(s), offset(o) {}
+		BID(const BID & obj): storage(obj.storage),offset(obj.offset) {}		
+		template <unsigned BlockSize>
+		explicit BID(const BID<BlockSize> & obj): storage(obj.storage),offset(obj.offset) {}		
 	};
+	
+	
 
-  //! \brief Specialization of block identifier class (BID) for variable size block size
+    //! \brief Specialization of block identifier class (BID) for variable size block size
 	
 	//! Stores block identity, given by file, offset within the file, and size of the block
 	template <> 
@@ -78,6 +83,7 @@ __STXXL_BEGIN_NAMESPACE
       return (a.storage == b.storage) && (a.offset == b.offset) && (a.size == b.size);
   }
   
+   
   template <unsigned blk_sz>
   std::ostream & operator << (std::ostream & s, const BID<blk_sz> & bid)
   {

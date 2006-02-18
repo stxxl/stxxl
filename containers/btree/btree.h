@@ -216,6 +216,28 @@ namespace btree
 			}
 			
 		}
+		
+		iterator begin()
+		{
+			root_node_iterator_type it = root_node_.begin();
+			assert(it != root_node_.end() );			
+			
+			if(height_ == 2) // 'it' points to a leaf
+			{
+				STXXL_VERBOSE1("btree: retrieveing begin() from the first leaf");
+				leaf_type * Leaf = leaf_cache_.get_node((leaf_bid_type)it->second,true);
+				assert(Leaf);
+				return Leaf->begin();
+			}
+			else
+			{  // 'it' points to a node
+				STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
+				node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
+				assert(Node);
+				return Node->begin(height_-1);
+			}
+			
+		}
 	
 	};
 	

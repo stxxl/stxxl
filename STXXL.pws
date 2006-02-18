@@ -1,15 +1,15 @@
 
 [filenumbers]
-0=1
-1=48
-2=18
-3=15
-4=13
-5=12
-6=32
-7=30
-8=20
-9=180
+0=53
+1=27
+2=338
+3=332
+4=30
+5=237
+6=12
+7=75
+8=25
+9=86
 10=300
 11=128
 12=71
@@ -147,16 +147,15 @@ RunInTerminal=true
 clean before build=false
 
 [filelist]
-0=/home/dementiev/projects/stxxl/containers/test.cpp
-1=/home/dementiev/projects/stxxl/containers/btree/node.h
-2=/home/dementiev/projects/stxxl/containers/btree/root_node.h
-3=/home/dementiev/projects/stxxl/containers/btree/test_btree.cpp
-4=/home/dementiev/projects/stxxl/containers/btree/iterator_map.h
-5=/home/dementiev/projects/stxxl/containers/btree/node_cache.h
+0=/home/dementiev/projects/stxxl/mng/mng.h
+1=/home/dementiev/projects/stxxl/containers/btree/btree_pager.h
+2=/home/dementiev/projects/stxxl/containers/btree/leaf.h
+3=/home/dementiev/projects/stxxl/containers/btree/node.h
+4=/home/dementiev/projects/stxxl/containers/btree/test_btree.cpp
+5=/home/dementiev/projects/stxxl/containers/btree/btree.h
 6=/home/dementiev/projects/stxxl/containers/btree/iterator.h
-7=/home/dementiev/projects/stxxl/containers/btree/btree.h
-8=/home/dementiev/projects/stxxl/containers/btree/test_leaf.cpp
-9=/home/dementiev/projects/stxxl/containers/btree/leaf.h
+7=/home/dementiev/projects/stxxl/containers/btree/node_cache.h
+8=/home/dementiev/projects/stxxl/containers/btree/iterator_map.h
 
 [Project Tree]
 0=0
