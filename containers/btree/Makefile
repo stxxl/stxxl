@@ -1,4 +1,4 @@
-all: test_corr_insert_scan
+all: test_corr_insert_scan test_btree
 
 include ../../make.settings
 

@@ -40,11 +40,11 @@ int main(int argc, char * argv [])
 	stxxl::random_number32 rnd;
 	
 	// .begin() .end() test
-	BTree1.insert(std::pair<int,double>(10,100));
+	BTree1[10] = 100.;
 	btree_type::iterator begin = BTree1.begin();
 	btree_type::iterator end = BTree1.end();
 	assert(begin == BTree1.begin());
-	BTree1.insert(std::pair<int,double>(5,50));
+	BTree1[5] = 50.;
 	btree_type::iterator nbegin = BTree1.begin();
 	btree_type::iterator nend = BTree1.end();
 	assert(nbegin == BTree1.begin());
@@ -62,7 +62,8 @@ int main(int argc, char * argv [])
 	for(int i= 0;i<nins;++i)
 	{
 		//btree_type::iterator i1 = BTree1.insert(std::pair<int,double>(rnd(nins),10.1)).first;
-		btree_type::iterator i1 = BTree1.insert(std::pair<int,double>(rnd()%nins,10.1)).first;
+		//btree_type::iterator i1 = BTree1.insert(std::pair<int,double>(rnd()%nins,10.1)).first;
+		BTree1[rnd()%nins] = 10.1;
 		//STXXL_MSG(*i1)
 		//btree_type::iterator i2 = BTree1.insert(std::pair<int,double>(20,20.1)).first;
 		//STXXL_MSG(*i2)

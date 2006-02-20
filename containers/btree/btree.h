@@ -248,6 +248,11 @@ namespace btree
 		{
 			return end_iterator;
 		}
+		
+		data_type & operator []  (const key_type & k)
+		{
+			return (*((insert(value_type(k, data_type()))).first)).second;
+		}
 	
 	};
 	
