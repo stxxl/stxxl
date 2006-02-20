@@ -83,6 +83,7 @@ private:
 			
 			void split(std::pair<key_type,bid_type> & splitter)
 			{
+				
 				bid_type NewBid;
 				btree_->leaf_cache_.get_new_node(NewBid); // new (left) leaf
 				normal_leaf * NewLeaf = btree_->leaf_cache_.get_node(NewBid,true);
@@ -90,10 +91,12 @@ private:
 				
 				// update links
 				NewLeaf->succ() = my_bid();
+				normal_leaf * PredLeaf = NULL ;
 				if(pred().valid())
 				{
 					NewLeaf->pred() = pred();
-					normal_leaf * PredLeaf = btree_->leaf_cache_.get_node(pred());
+					PredLeaf = btree_->leaf_cache_.get_node(pred());
+					assert(vcmp_(PredLeaf->back(),front()));
 					PredLeaf->succ() = NewBid;
 				}
 				pred() = NewBid;
@@ -130,10 +133,24 @@ private:
 					btree_->iterator_map_.register_iterator(**it2fix);
 				}
 				
-				btree_->leaf_cache_.unfix_node(NewBid);
+
 				
 				STXXL_VERBOSE1("btree::normal_leaf split leaf "<<this
 					<<" splitter: "<<splitter.first)
+				
+				#if STXXL_VERBOSE_LEVEL >= 1
+				if(PredLeaf)
+				{
+					STXXL_VERBOSE1("btree::normal_leaf pred_part.smallest    = "<<PredLeaf->front().first)
+					STXXL_VERBOSE1("btree::normal_leaf pred_part.largest     = "<<PredLeaf->back().first)
+				}
+				#endif
+				STXXL_VERBOSE1("btree::normal_leaf smaller_part.smallest = "<<NewLeaf->front().first)
+				STXXL_VERBOSE1("btree::normal_leaf smaller_part.largest  = "<<NewLeaf->back().first)
+				STXXL_VERBOSE1("btree::normal_leaf larger_part.smallest  = "<<front().first)
+				STXXL_VERBOSE1("btree::normal_leaf larger_part.largest   = "<<back().first)
+					
+				btree_->leaf_cache_.unfix_node(NewBid);
 			}
 			
 			bid_type & succ()
@@ -260,17 +277,30 @@ public:
 			{
 				request_ptr req = block_->read(bid);
 				req->wait();
+				assert(bid == my_bid());
 			}
 			
 			void init(const bid_type & my_bid_)
 			{
 				block_->info.me = my_bid_;
+				block_->info.succ = bid_type();
+				block_->info.pred = bid_type();
 				block_->info.cur_size = 0;
 			}
 			
 			reference operator [] (int i)
 			{
 				return (*block_)[i];
+			}
+			
+			reference back()
+			{
+				return (*block_)[size()-1];
+			}
+			
+			reference front()
+			{
+				return *(block_->begin());
 			}
 			
 			void dump()
@@ -337,7 +367,52 @@ public:
 			{
 				return iterator(btree_,my_bid(),0);
 			}
-
+			
+			iterator end()
+			{
+				return iterator(btree_,my_bid(),size());
+			}
+			
+			void increment_iterator(iterator_base & it)
+			{
+				assert(it.bid == my_bid());
+				assert(it.pos != size());
+				
+				btree_->iterator_map_.unregister_iterator(it);
+				
+				++(it.pos);
+				if(it.pos == size() && succ().valid())
+				{
+					// run to the end of the leaf
+					STXXL_VERBOSE1("btree::normal_leaf jumping to the next block")
+					it.pos = 0;
+					it.bid = succ();
+				}
+				btree_->iterator_map_.register_iterator(it);
+			}
+			
+			void decrement_iterator(iterator_base & it)
+			{
+				assert(it.bid == my_bid());
+				
+				btree_->iterator_map_.unregister_iterator(it);
+				
+				if(it.pos == 0)
+				{
+					assert(pred().valid());
+					
+					it.bid = pred();
+					normal_leaf * PredLeaf = btree_->leaf_cache_.get_node(pred());
+					assert(PredLeaf);
+					it.pos = PredLeaf->size() - 1;
+					
+				}
+				else 
+					--it.pos;
+				
+				btree_->iterator_map_.register_iterator(it);
+			}
+			
 	};
 };
 

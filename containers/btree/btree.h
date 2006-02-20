@@ -84,6 +84,8 @@ namespace btree
 		typedef typename root_node_type::iterator root_node_iterator_type;
 		typedef std::pair<key_type,node_bid_type> root_node_pair_type;
 		root_node_type root_node_;
+	
+		iterator end_iterator;
 		
 	
 		btree() {}
@@ -161,6 +163,8 @@ namespace btree
 			leaf_type * NewLeaf = leaf_cache_.get_new_node(NewBid);
 			assert(NewLeaf);
 			
+			end_iterator = NewLeaf->end(); // initialize end() iterator
+			
 			root_node_.insert(root_node_pair_type(key_compare::max_value(),(node_bid_type)NewBid));
 		}
 		
@@ -234,9 +238,15 @@ namespace btree
 				STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
 				node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
 				assert(Node);
-				return Node->begin(height_-1);
+				iterator result = Node->begin(height_-1);
+				node_cache_.unfix_node((node_bid_type)it->second);
+				return result;
 			}
-			
+		}
+		
+		iterator end()
+		{
+			return end_iterator;
 		}
 	
 	};

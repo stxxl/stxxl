@@ -27,11 +27,37 @@ std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 
 int main(int argc, char * argv [])
 {
-	btree_type BTree1(1024*16*4,1024*16*8);
+	if(argc <2)
+	{
+		STXXL_MSG("Usage: "<<argv[0]<<" #ins")	
+		return 1;
+	}
 	
+	btree_type BTree1(1024*16*4,1024*16*8);
+		
 	const unsigned nins = atoi(argv[1]);
 	
 	stxxl::random_number32 rnd;
+	
+	// .begin() .end() test
+	BTree1.insert(std::pair<int,double>(10,100));
+	btree_type::iterator begin = BTree1.begin();
+	btree_type::iterator end = BTree1.end();
+	assert(begin == BTree1.begin());
+	BTree1.insert(std::pair<int,double>(5,50));
+	btree_type::iterator nbegin = BTree1.begin();
+	btree_type::iterator nend = BTree1.end();
+	assert(nbegin == BTree1.begin());
+	assert(begin!=nbegin);
+	assert(end == nend);
+	assert(begin != end);
+	assert(nbegin != end);
+	assert(begin->first == 10);
+	assert(begin->second == 100);
+	assert(nbegin->first == 5);
+	assert(nbegin->second == 50);
+	
+	
 	
 	for(int i= 0;i<nins;++i)
 	{

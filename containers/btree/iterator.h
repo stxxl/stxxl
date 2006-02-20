@@ -23,7 +23,6 @@ namespace btree
 	template <class KeyType_, class DataType_, class KeyCmp_, unsigned LogNElem_, class BTreeType>
 	class normal_leaf;
 	
-	
 	template <class BTreeType>
 	class btree_iterator_base
 	{
@@ -100,6 +99,38 @@ namespace btree
 			{
 				return non_const_access();
 			}
+			
+			bool operator == (const btree_iterator_base & obj) const
+			{
+				return bid == obj.bid && pos == obj.pos;
+			}
+			
+			bool operator != (const btree_iterator_base & obj) const
+			{
+				return bid != obj.bid || pos != obj.pos;
+			}
+			
+			btree_iterator_base & operator ++ ()
+			{
+				assert(btree_);
+				bid_type cur_bid = bid;
+				typename btree_type::leaf_type *Leaf = btree_->leaf_cache_.get_node(bid,true);
+				assert(Leaf);
+				Leaf->increment_iterator(*this);
+				btree_->leaf_cache_.unfix_node(cur_bid);
+				return *this;
+			}
+			
+			btree_iterator_base & operator -- ()
+			{
+				assert(btree_);
+				bid_type cur_bid = bid;
+				typename btree_type::leaf_type *Leaf = btree_->leaf_cache_.get_node(bid,true);
+				assert(Leaf);
+				Leaf->decrement_iterator(*this);
+				btree_->leaf_cache_.unfix_node(cur_bid);
+				return *this;
+			}
 	
 		public:	
 			virtual ~btree_iterator_base()
@@ -151,6 +182,43 @@ namespace btree
 				return &(non_const_access());
 			}
 			
+			bool operator == (const btree_iterator & obj) const
+			{
+				return btree_iterator_base<btree_type>::operator ==(obj);
+			}
+			
+			bool operator != (const btree_iterator & obj) const
+			{
+				return btree_iterator_base<btree_type>::operator !=(obj);
+			}
+			
+			btree_iterator & operator ++ ()
+			{
+				assert(*this != btree_iterator_base<btree_type>::btree_->end());
+				btree_iterator_base<btree_type>::operator++();
+				return *this;
+			}
+			
+			btree_iterator & operator -- ()
+			{
+				btree_iterator_base<btree_type>::operator--();
+				return *this;
+			}
+			
+			btree_iterator operator ++ (int )
+			{
+				assert(*this != btree_iterator_base<btree_type>::btree_->end());
+				btree_iterator result(*this);
+				btree_iterator_base<btree_type>::operator++();
+				return result;
+			}
+			
+			btree_iterator operator -- (int )
+			{
+				btree_iterator result(*this);
+				btree_iterator_base<btree_type>::operator--();
+				return result;
+			}
 
 		private:
 			btree_iterator(

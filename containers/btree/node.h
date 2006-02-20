@@ -260,6 +260,7 @@ public:
 			{
 				request_ptr req = block_->read(bid);
 				req->wait(); 
+				assert(bid == my_bid());
 			}
 			
 			void init(const bid_type & my_bid_)
@@ -324,13 +325,23 @@ public:
 			
 			iterator begin(unsigned height)
 			{
-				bid_type FirstBid = block_->begin()->first;
+				bid_type FirstBid = block_->begin()->second;
 				if(height == 2) // FirstBid points to a leaf
 				{
+					assert(size() > 1);
+					STXXL_VERBOSE1("btree::node retrieveing begin() from the first leaf");
+					leaf_type * Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)FirstBid,true);
+					assert(Leaf);
+					return Leaf->begin();
 				}
 				else
 				{ // FirstBid points to a node
-					
+					STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
+					node_type * Node = btree_->node_cache_.get_node((node_bid_type)FirstBid,true);
+					assert(Node);
+					iterator result = Node->begin(height-1);
+					btree_->node_cache_.unfix_node((node_bid_type)FirstBid);
+					return result;
 				}
 			}
 			
