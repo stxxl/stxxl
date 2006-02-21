@@ -1,4 +1,4 @@
-all: test_corr_insert_scan test_btree
+all: test_corr_insert_find
 
 include ../../make.settings
 
@@ -6,6 +6,9 @@ DEPENDENCIES +=  btree.h leaf.h iterator.h iterator_map.h node_cache.h
 
 STXXL_COMPILER_OPTIONS+= -DSTXXL_VERBOSE_LEVEL=0 -O3
 
+test_corr_insert_find: $(DEPENDENCIES) test_corr_insert_find.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_corr_insert_find.cpp
+	$(LINKER) test_corr_insert_find.$(OBJEXT) $(OUT)test_corr_insert_find.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_corr_insert_scan: $(DEPENDENCIES) test_corr_insert_scan.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_corr_insert_scan.cpp

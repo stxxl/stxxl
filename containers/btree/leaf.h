@@ -54,6 +54,7 @@ namespace btree
 			
 			
 			
+			
 			typedef node_cache<normal_leaf,btree_type> leaf_cache_type;
 			
 			
@@ -220,22 +221,6 @@ public:
 			}
 			
 			/*
-			iterator find(const key_type & Key)
-			{
-				const value_type searchVal(Key,data_type());
-				iterator lb = std::lower_bound(begin(),end(),searchVal,vcmp_);
-				if(lb == end() || lb->first != Key)
-					return end();
-				return lb;
-			}
-			const_iterator find(const key_type & Key) const
-			{
-				const value_type searchVal(Key,data_type());
-				const_iterator lb = std::lower_bound(begin(),end(),searchVal,vcmp_);
-				if(lb == end() || lb->first != Key)
-					return end();
-				return lb;
-			}
 			
 			iterator lower_bound(const key_type & Key)
 			{
@@ -305,7 +290,7 @@ public:
 			
 			void dump()
 			{
-				STXXL_VERBOSE2("Dump og leaf "<<this)
+				STXXL_VERBOSE2("Dump of leaf "<<this)
 				for(int i=0;i<size();++i)
 					STXXL_VERBOSE2((*this)[i].first<<" "<<(*this)[i].second);
 			}
@@ -411,6 +396,17 @@ public:
 					--it.pos;
 				
 				btree_->iterator_map_.register_iterator(it);
+			}
+			
+			iterator find(const key_type & k)
+			{
+				value_type searchVal(k,data_type());
+				typename block_type::iterator lb = 
+					std::lower_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
+				if(lb == block_->begin()+size() || lb->first != k)
+					return btree_->end();
+				
+				return iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
 			
 	};

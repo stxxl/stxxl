@@ -203,22 +203,6 @@ public:
 			}
 			
 			/*
-			iterator find(const key_type & Key)
-			{
-				const value_type searchVal(Key,data_type());
-				iterator lb = std::lower_bound(begin(),end(),searchVal,vcmp_);
-				if(lb == end() || lb->first != Key)
-					return end();
-				return lb;
-			}
-			const_iterator find(const key_type & Key) const
-			{
-				const value_type searchVal(Key,data_type());
-				const_iterator lb = std::lower_bound(begin(),end(),searchVal,vcmp_);
-				if(lb == end() || lb->first != Key)
-					return end();
-				return lb;
-			}
 			
 			iterator lower_bound(const key_type & Key)
 			{
@@ -344,6 +328,39 @@ public:
 					return result;
 				}
 			}
+			
+		iterator find(const key_type & k, unsigned height)
+		{
+			value_type Key2Search(k,bid_type());
+			
+			typename block_type::iterator it = 
+				std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
+				
+			assert(it != (block_->begin() + size()));
+				
+			bid_type found_bid = it->second;
+			
+			if(height == 2) // found_bid points to a leaf
+			{
+				STXXL_VERBOSE1("Searching in a leaf");
+				leaf_type * Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)found_bid,true);
+				assert(Leaf);
+				iterator result = Leaf->find(k);
+				btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+				
+				return result;
+			}
+			
+			// found_bid points to a node
+			STXXL_VERBOSE1("Searching in a node");
+			node_type * Node = btree_->node_cache_.get_node((node_bid_type)found_bid,true);
+			assert(Node);
+			iterator result = Node->find(k,height-1);
+			btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+			
+			return result;
+
+		}
 			
 	};
 };

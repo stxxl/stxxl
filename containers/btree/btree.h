@@ -200,25 +200,24 @@ namespace btree
 				
 				return result;
 			}
-			else
-			{	// 'it' points to a node
-				STXXL_VERBOSE1("Inserting new value into a node");
-				node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
-				assert(Node);
-				std::pair<key_type,node_bid_type> Splitter;
-				std::pair<iterator, bool> result = Node->insert(x,height_-1,Splitter);
-				if(result.second) ++size_;	
-				node_cache_.unfix_node((node_bid_type)it->second);
-				if(key_compare::max_value() == Splitter.first)
-					return result;	// no overflow/splitting happened
-				
-				STXXL_VERBOSE1("Inserting new value into root node");
-				
-				insert_into_root(Splitter);
-				
-				return result;
-			}
 			
+			// 'it' points to a node
+			STXXL_VERBOSE1("Inserting new value into a node");
+			node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
+			assert(Node);
+			std::pair<key_type,node_bid_type> Splitter;
+			std::pair<iterator, bool> result = Node->insert(x,height_-1,Splitter);
+			if(result.second) ++size_;	
+			node_cache_.unfix_node((node_bid_type)it->second);
+			if(key_compare::max_value() == Splitter.first)
+				return result;	// no overflow/splitting happened
+			
+			STXXL_VERBOSE1("Inserting new value into root node");
+				
+			insert_into_root(Splitter);
+				
+			return result;
+				
 		}
 		
 		iterator begin()
@@ -233,15 +232,15 @@ namespace btree
 				assert(Leaf);
 				return Leaf->begin();
 			}
-			else
-			{  // 'it' points to a node
-				STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
-				node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
-				assert(Node);
-				iterator result = Node->begin(height_-1);
-				node_cache_.unfix_node((node_bid_type)it->second);
-				return result;
-			}
+			
+			// 'it' points to a node
+			STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
+			node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
+			assert(Node);
+			iterator result = Node->begin(height_-1);
+			node_cache_.unfix_node((node_bid_type)it->second);
+			return result;
+			
 		}
 		
 		iterator end()
@@ -252,6 +251,34 @@ namespace btree
 		data_type & operator []  (const key_type & k)
 		{
 			return (*((insert(value_type(k, data_type()))).first)).second;
+		}
+		
+		iterator find(const key_type & k)
+		{
+			root_node_iterator_type it = root_node_.lower_bound(k);
+			assert(it != root_node_.end());
+			
+			if(height_ == 2) // 'it' points to a leaf
+			{
+				STXXL_VERBOSE1("Searching in a leaf");
+				leaf_type * Leaf = leaf_cache_.get_node((leaf_bid_type)it->second,true);
+				assert(Leaf);
+				iterator result = Leaf->find(k);
+				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				assert(result == end() || result->first == k);
+				return result;
+			}
+			
+			// 'it' points to a node
+			STXXL_VERBOSE1("Searching in a node");
+			node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
+			assert(Node);
+			iterator result = Node->find(k,height_-1);
+			node_cache_.unfix_node((node_bid_type)it->second);
+			
+			assert(result == end() || result->first == k);
+			return result;
+
 		}
 	
 	};

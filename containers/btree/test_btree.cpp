@@ -1,6 +1,6 @@
 /***************************************************************************
  *            test_btree.cpp
- *
+ *  A very basic test
  *  Tue Feb 14 20:39:53 2006
  *  Copyright  2006  Roman Dementiev
  *  Email
@@ -57,6 +57,17 @@ int main(int argc, char * argv [])
 	assert(nbegin->first == 5);
 	assert(nbegin->second == 50);
 	
+	BTree1[10] = 200.;
+	assert(begin->second == 200.);
+	
+	btree_type::iterator it = BTree1.find(5);
+	assert(it != BTree1.end());
+	assert(it->first == 5);
+	assert(it->second == 50.);
+	it = BTree1.find(6);
+	assert(it==BTree1.end());
+	it = BTree1.find(1000);
+	assert(it==BTree1.end());
 	
 	
 	for(int i= 0;i<nins;++i)
