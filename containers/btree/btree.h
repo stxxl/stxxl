@@ -145,7 +145,61 @@ namespace btree
 				STXXL_MSG("btree Increasing height to "<<height_)
 				assert(node_cache_.size()>= (height_-1));
 			}
-		}		
+		}
+		
+		template <class CacheType>
+		void fuse_or_balance(root_node_iterator_type UIt, CacheType & cache_)
+		{
+			typedef typename CacheType::node_type local_node_type;
+			typedef typename local_node_type::bid_type local_bid_type;
+			
+			root_node_iterator_type leftIt,rightIt;
+			if(UIt->first == key_compare::max_value()) // UIt is the last entry in the root
+			{
+				assert(UIt != root_node_.begin());
+				rightIt = UIt;
+				leftIt = --UIt;
+			}
+			else
+			{
+				leftIt = UIt;
+				rightIt = ++UIt;
+				assert(rightIt != root_node_.end());
+			}
+			
+			// now fuse or balance nodes pointed by leftIt and rightIt
+			local_bid_type LeftBid = (local_bid_type) leftIt->second;
+			local_bid_type RightBid = (local_bid_type) rightIt->second;
+			local_node_type * LeftNode = cache_.get_node(LeftBid,true);
+			local_node_type * RightNode = cache_.get_node(RightBid,true);
+			
+			const unsigned TotalSize = LeftNode->size() + RightNode->size();
+			if(TotalSize <= RightNode->max_nelements())
+			{
+				// fuse
+				RightNode->fuse(*LeftNode); // add the content of LeftNode to RightNode
+				
+				cache_.unfix_node(RightBid);
+				cache_.delete_node(LeftBid); // 'delete_node' unfixes LeftBid also
+				
+				root_node_.erase(leftIt); // delete left BID from the root
+			}
+			else
+			{
+				// balance
+				
+				key_type NewSplitter = RightNode->balance(*LeftNode);
+				
+				root_node_.erase(leftIt); // delete left BID from the root
+				// reinsert with the new key
+				root_node_.insert(root_node_pair_type(NewSplitter,(node_bid_type)LeftBid)); 
+			
+				cache_.unfix_node(LeftBid);
+				cache_.unfix_node(RightBid);				
+				
+			}
+		}
+		
 	public:
 		btree(	unsigned node_cache_size_in_bytes,
 					unsigned leaf_cache_size_in_bytes
@@ -278,7 +332,44 @@ namespace btree
 			
 			assert(result == end() || result->first == k);
 			return result;
-
+		}
+		
+		size_type erase(const key_type & k)
+		{
+			root_node_iterator_type it = root_node_.lower_bound(k);
+			assert(it != root_node_.end());
+			if(height_ == 2) // 'it' points to a leaf
+			{
+				STXXL_VERBOSE1("Deleting key from a leaf")
+				leaf_type * Leaf = leaf_cache_.get_node((leaf_bid_type)it->second,true);
+				assert(Leaf);
+				size_type result = Leaf->erase(k);
+				size_ -= result;
+				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				if((!Leaf->underflows()) || root_node_.size() == 1)
+					return result;	// no underflow or root has a special degree 1 (too few elements)
+				
+				STXXL_VERBOSE1("Fusing or rebalancing a leaf")
+				fuse_or_balance(it,leaf_cache_);
+				
+				return result;
+			}
+			
+			// 'it' points to a node
+			STXXL_VERBOSE1("Deleting key from a node")
+			assert(root_node_.size()>=2);
+			node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
+			assert(Node);
+			size_type result = Node->erase(k,height_-1);
+			size_ -= result;
+			node_cache_.unfix_node((node_bid_type)it->second);
+			if(!Node->underflows())
+				return result;	// no underflow happened
+			
+			STXXL_VERBOSE1("Fusing or rebalancing a node")
+			fuse_or_balance(it,node_cache_);
+				
+			return result;
 		}
 	
 	};

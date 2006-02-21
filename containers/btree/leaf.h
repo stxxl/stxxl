@@ -32,6 +32,7 @@ namespace btree
 			typedef KeyCmp_ key_compare;
 			typedef std::pair<key_type,data_type>  value_type;
 			typedef value_type  & reference;
+			typedef const value_type  & const_reference;
 			
 			enum {
 				raw_size_not_4Krounded = sizeof(value_type [nelements])
@@ -48,12 +49,10 @@ namespace btree
 
 			typedef typed_block<raw_size,value_type,0,InfoType> block_type;			
 			typedef BTreeType btree_type;
+			typedef typename btree_type::size_type size_type;
 			typedef btree_iterator_base<btree_type> iterator_base;
 			typedef btree_iterator<btree_type>  iterator;
 			typedef btree_const_iterator<btree_type> const_iterator;
-			
-			
-			
 			
 			typedef node_cache<normal_leaf,btree_type> leaf_cache_type;
 			
@@ -188,6 +187,9 @@ public:
 			bool overflows () const { return block_->info.cur_size > max_nelements_; }
 			bool underflows () const { return block_->info.cur_size < min_nelements_; }
 			
+			unsigned max_nelements() const { return max_nelements_; }
+			unsigned min_nelements() const { return min_nelements_; }
+			
 			/*
 			iterator begin() { return block_->begin(); };
 			const_iterator begin() const { return block_->begin(); };
@@ -207,7 +209,8 @@ public:
 				cmp_(cmp),
 				vcmp_(cmp)
 			{
-				assert(min_nelements < max_nelements);
+				assert(min_nelements >=2);
+				assert(2*min_nelements - 1 <= max_nelements);
 				assert(max_nelements <= nelements);
 				assert(unsigned(block_type::size) >= nelements +1); // extra space for an overflow element
 				
@@ -278,12 +281,27 @@ public:
 				return (*block_)[i];
 			}
 			
+			const_reference operator [] (int i) const
+			{
+				return (*block_)[i];
+			}
+			
 			reference back()
 			{
 				return (*block_)[size()-1];
 			}
 			
 			reference front()
+			{
+				return *(block_->begin());
+			}
+			
+			const_reference back() const
+			{
+				return (*block_)[size()-1];
+			}
+			
+			const_reference front() const
 			{
 				return *(block_->begin());
 			}
@@ -305,7 +323,7 @@ public:
 				typename block_type::iterator it = 
 					std::lower_bound(block_->begin(),block_->begin() + size(), x ,vcmp_);
 				
-				if(!(vcmp_(*it,x) || vcmp_(x,*it))) // *it == x
+				if(!(vcmp_(*it,x) || vcmp_(x,*it)) && it!=(block_->begin() + size())) // *it == x
 				{
 					// already exists
 					return std::pair<iterator,bool>(
@@ -316,7 +334,7 @@ public:
 				typename block_type::iterator cur = block_->begin() + size() - 1;
 
 				for(; cur>=it; --cur)
-					*(cur+1) = *cur;  // copy elements to make space for the new element
+					*(cur+1) = *cur;  // move elements to make space for the new element
 				
 				*it = x;
 				
@@ -409,6 +427,160 @@ public:
 				return iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
 			
+			size_type erase(const key_type & k)
+			{
+				value_type searchVal(k,data_type());
+				typename block_type::iterator it = 
+					std::lower_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
+				
+				if(it == block_->begin()+size() || it->first != k)
+					return 0; // no such element
+				
+				// move elements one position left
+				std::copy(it+1,block_->begin()+size(),it);
+				
+				std::vector<iterator_base *> Iterators2Fix;
+				btree_->iterator_map_.find(my_bid(),it +1 - block_->begin(),size(),Iterators2Fix);				
+				typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
+				for(;it2fix!=Iterators2Fix.end();++it2fix)
+				{
+					btree_->iterator_map_.unregister_iterator(**it2fix);
+					--((*it2fix)->pos); // fixing iterators
+					btree_->iterator_map_.register_iterator(**it2fix);
+				}
+				
+				--(block_->info.cur_size);
+				
+				return 1;
+			}
+			
+			void fuse(const normal_leaf & Src)
+			{
+				assert(vcmp_(Src.back(),front()));
+				const unsigned SrcSize = Src.size();
+				
+				typename block_type::iterator cur = block_->begin() + size() - 1;
+				typename block_type::const_iterator begin = block_->begin() ;
+
+				for(; cur>= begin; --cur)
+					*(cur+SrcSize) = *cur;  // move elements to make space for Src elements
+				
+				// copy Src to *this leaf
+				std::copy(Src.block_->begin(), Src.block_->begin() + SrcSize, block_->begin());
+				
+				
+				std::vector<iterator_base *> Iterators2Fix;
+				btree_->iterator_map_.find(my_bid(),0,size(),Iterators2Fix);				
+				typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
+				for(;it2fix!=Iterators2Fix.end();++it2fix)
+				{
+					btree_->iterator_map_.unregister_iterator(**it2fix);
+					((*it2fix)->pos)+=SrcSize; // fixing iterators
+					btree_->iterator_map_.register_iterator(**it2fix);
+				}
+				
+				Iterators2Fix.clear();
+				btree_->iterator_map_.find(Src.my_bid(),0,SrcSize,Iterators2Fix);
+				it2fix = Iterators2Fix.begin();
+				for(;it2fix!=Iterators2Fix.end();++it2fix)
+				{
+					btree_->iterator_map_.unregister_iterator(**it2fix);
+					((*it2fix)->bid) = my_bid(); // fixing iterators
+					btree_->iterator_map_.register_iterator(**it2fix);
+				}
+				
+				block_->info.cur_size += SrcSize;
+			}
+			
+			key_type balance(normal_leaf & Left)
+			{
+				const unsigned TotalSize =Left.size() + size();
+				unsigned newLeftSize = TotalSize/2;
+				assert(newLeftSize <= Left.max_nelements());
+				assert(newLeftSize >= Left.min_nelements());
+				unsigned newRightSize = TotalSize - newLeftSize;
+				assert(newRightSize <= max_nelements());
+				assert(newRightSize >= min_nelements());
+				
+				assert(vcmp_(Left.back(),front()));
+				
+				if(newLeftSize < Left.size())
+				{	
+					const unsigned nEl2Move = Left.size() - newLeftSize;// #elements to move from Left to *this
+					
+					typename block_type::iterator cur = block_->begin() + size() - 1;
+					typename block_type::const_iterator begin = block_->begin() ;
+	
+					for(; cur>= begin; --cur)
+						*(cur+nEl2Move) = *cur;  // move elements to make space for Src elements
+					
+					// copy Left to *this leaf
+					std::copy(	Left.block_->begin() + newLeftSize, 
+									Left.block_->begin() + Left.size(), block_->begin());
+						
+					std::vector<iterator_base *> Iterators2Fix;
+					btree_->iterator_map_.find(my_bid(),0,size(),Iterators2Fix);				
+					typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
+					for(;it2fix!=Iterators2Fix.end();++it2fix)
+					{
+						btree_->iterator_map_.unregister_iterator(**it2fix);
+						((*it2fix)->pos)+=nEl2Move; // fixing iterators
+						btree_->iterator_map_.register_iterator(**it2fix);
+					}
+					
+					Iterators2Fix.clear();
+					btree_->iterator_map_.find(Left.my_bid(),newLeftSize,Left.size(),Iterators2Fix);
+					it2fix = Iterators2Fix.begin();
+					for(;it2fix!=Iterators2Fix.end();++it2fix)
+					{
+						btree_->iterator_map_.unregister_iterator(**it2fix);
+						((*it2fix)->bid) = my_bid(); // fixing iterators
+						((*it2fix)->pos) -= newLeftSize; // fixing iterators
+						btree_->iterator_map_.register_iterator(**it2fix);
+					}
+				
+				}
+				else
+				{
+					assert(newRightSize < size());
+					
+					const unsigned nEl2Move = size() - newRightSize;// #elements to move from *this to Left
+					
+					// copy *this to Left
+					std::copy(	block_->begin(), 
+									block_->begin() + nEl2Move, Left.block_->begin() + Left.size());
+					// move elements in *this
+					std::copy(	block_->begin() + nEl2Move, 
+									block_->begin() + size(), block_->begin() );
+					
+					std::vector<iterator_base *> Iterators2Fix;
+					btree_->iterator_map_.find(my_bid(),nEl2Move,size(),Iterators2Fix);				
+					typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
+					for(;it2fix!=Iterators2Fix.end();++it2fix)
+					{
+						btree_->iterator_map_.unregister_iterator(**it2fix);
+						((*it2fix)->pos) -= nEl2Move; // fixing iterators
+						btree_->iterator_map_.register_iterator(**it2fix);
+					}
+					
+					Iterators2Fix.clear();
+					btree_->iterator_map_.find(my_bid(),0,nEl2Move-1,Iterators2Fix);
+					it2fix = Iterators2Fix.begin();
+					for(;it2fix!=Iterators2Fix.end();++it2fix)
+					{
+						btree_->iterator_map_.unregister_iterator(**it2fix);
+						((*it2fix)->bid) = Left.my_bid(); // fixing iterators
+						((*it2fix)->pos) += Left.size(); // fixing iterators
+						btree_->iterator_map_.register_iterator(**it2fix);
+					}
+					
+				}
+				
+				block_->info.cur_size = newRightSize; // update size
+				Left.block_->info.cur_size = newLeftSize; // update size
+				
+				return Left.back().first;
+			}
 	};
 };
 

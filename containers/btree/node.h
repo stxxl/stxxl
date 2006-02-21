@@ -44,6 +44,10 @@ namespace btree
 			typedef bid_type 	node_bid_type;
 			typedef SelfType	node_type;
 			typedef std::pair<key_type,bid_type>  value_type;
+			typedef value_type  & reference;
+			typedef const value_type  & const_reference;
+			
+			
 			struct InfoType
 			{
 				bid_type me;
@@ -51,8 +55,10 @@ namespace btree
 			};
 			typedef typed_block<raw_size,value_type,0,InfoType> block_type;			
 			typedef typename block_type::iterator block_iterator;
+			typedef typename block_type::const_iterator block_const_iterator;
 			
 			typedef BTreeType btree_type;
+			typedef typename btree_type::size_type size_type;
 			typedef typename btree_type::iterator  iterator;
 			typedef typename btree_type::const_iterator const_iterator;
 			
@@ -139,6 +145,59 @@ private:
 				
 				return result;
 			}
+			
+			template <class CacheType>
+			void fuse_or_balance(block_iterator UIt, CacheType & cache_)
+			{
+				typedef typename CacheType::node_type local_node_type;
+				typedef typename local_node_type::bid_type local_bid_type;
+				
+				block_iterator leftIt,rightIt;
+				if(UIt == (block_->begin() + size()-1) ) // UIt is the last entry in the root
+				{
+					assert(UIt != block_->begin());
+					rightIt = UIt;
+					leftIt = --UIt;
+				}
+				else
+				{
+					leftIt = UIt;
+					rightIt = ++UIt;
+					assert(rightIt != (block_->begin() + size()));
+				}
+				
+				// now fuse or balance nodes pointed by leftIt and rightIt
+				local_bid_type LeftBid = (local_bid_type) leftIt->second;
+				local_bid_type RightBid = (local_bid_type) rightIt->second;
+				local_node_type * LeftNode = cache_.get_node(LeftBid,true);
+				local_node_type * RightNode = cache_.get_node(RightBid,true);
+				
+				const unsigned TotalSize = LeftNode->size() + RightNode->size();
+				if(TotalSize <= RightNode->max_nelements())
+				{
+					// fuse
+					RightNode->fuse(*LeftNode); // add the content of LeftNode to RightNode
+					
+					cache_.unfix_node(RightBid);
+					cache_.delete_node(LeftBid); // 'delete_node' unfixes LeftBid also
+					
+					root_node_.erase(leftIt); // delete left BID from the root
+				}
+				else
+				{
+					// balance
+					
+					key_type NewSplitter = RightNode->balance(*LeftNode);
+					
+					root_node_.erase(leftIt); // delete left BID from the root
+					// reinsert with the new key
+					root_node_.insert(root_node_pair_type(NewSplitter,(node_bid_type)LeftBid)); 
+				
+					cache_.unfix_node(LeftBid);
+					cache_.unfix_node(RightBid);				
+					
+				}
+			}
 
 public:
 			virtual ~normal_node()
@@ -170,6 +229,9 @@ public:
 			bool overflows () const { return block_->info.cur_size > max_nelements_; }
 			bool underflows () const { return block_->info.cur_size < min_nelements_; }
 			
+			unsigned max_nelements() const { return max_nelements_; }
+			unsigned min_nelements() const { return min_nelements_; }
+			
 			/*
 			iterator begin() { return block_->begin(); };
 			const_iterator begin() const { return block_->begin(); };
@@ -189,7 +251,8 @@ public:
 				cmp_(cmp),
 				vcmp_(cmp)
 			{
-				assert(min_nelements < max_nelements);
+				assert(min_nelements >=2);
+				assert(2*min_nelements - 1 <= max_nelements);
 				assert(max_nelements <= nelements);
 				assert(unsigned(block_type::size) >= nelements +1); // extra space for an overflow
 				
@@ -253,6 +316,37 @@ public:
 				block_->info.cur_size = 0;
 			}
 			
+			reference operator [] (int i)
+			{
+				return (*block_)[i];
+			}
+			
+			const_reference operator [] (int i) const
+			{
+				return (*block_)[i];
+			}
+			
+			reference back()
+			{
+				return (*block_)[size()-1];
+			}
+			
+			reference front()
+			{
+				return *(block_->begin());
+			}
+			
+			const_reference back() const
+			{
+				return (*block_)[size()-1];
+			}
+			
+			const_reference front() const
+			{
+				return *(block_->begin());
+			}
+			
+			
 			std::pair<iterator,bool> insert(
 					const btree_value_type & x,
 					unsigned height,
@@ -262,7 +356,7 @@ public:
 				splitter.first = key_compare::max_value();
 				
 				value_type Key2Search(x.first,bid_type());
-				typename block_type::iterator it = 
+				block_iterator it = 
 					std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
 				
 				assert(it != (block_->begin() + size()));
@@ -333,7 +427,7 @@ public:
 		{
 			value_type Key2Search(k,bid_type());
 			
-			typename block_type::iterator it = 
+			block_iterator it = 
 				std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
 				
 			assert(it != (block_->begin() + size()));
@@ -361,6 +455,116 @@ public:
 			return result;
 
 		}
+		
+			void fuse(const normal_node & Src)
+			{
+				assert(vcmp_(Src.back(),front()));
+				const unsigned SrcSize = Src.size();
+				
+				block_iterator cur = block_->begin() + size() - 1;
+				block_const_iterator begin = block_->begin() ;
+
+				for(; cur>= begin; --cur)
+					*(cur+SrcSize) = *cur;  // move elements to make space for Src elements
+				
+				// copy Src to *this leaf
+				std::copy(Src.block_->begin(), Src.block_->begin() + SrcSize, block_->begin());
+				
+				block_->info.cur_size += SrcSize;
+			}
+			
+			
+			key_type balance(normal_node & Left)
+			{
+				const unsigned TotalSize =Left.size() + size();
+				unsigned newLeftSize = TotalSize/2;
+				assert(newLeftSize <= Left.max_nelements());
+				assert(newLeftSize >= Left.min_nelements());
+				unsigned newRightSize = TotalSize - newLeftSize;
+				assert(newRightSize <= max_nelements());
+				assert(newRightSize >= min_nelements());
+				
+				assert(vcmp_(Left.back(),front()));
+				
+				if(newLeftSize < Left.size())
+				{	
+					const unsigned nEl2Move = Left.size() - newLeftSize;// #elements to move from Left to *this
+					
+					block_iterator cur = block_->begin() + size() - 1;
+					block_const_iterator begin = block_->begin() ;
+	
+					for(; cur>= begin; --cur)
+						*(cur+nEl2Move) = *cur;  // move elements to make space for Src elements
+					
+					// copy Left to *this leaf
+					std::copy(	Left.block_->begin() + newLeftSize, 
+									Left.block_->begin() + Left.size(), block_->begin());
+
+				}
+				else
+				{
+					assert(newRightSize < size());
+					
+					const unsigned nEl2Move = size() - newRightSize;// #elements to move from *this to Left
+					
+					// copy *this to Left
+					std::copy(	block_->begin(), 
+									block_->begin() + nEl2Move, Left.block_->begin() + Left.size());
+					// move elements in *this
+					std::copy(	block_->begin() + nEl2Move, 
+									block_->begin() + size(), block_->begin() );
+										
+				}
+				
+				block_->info.cur_size = newRightSize; // update size
+				Left.block_->info.cur_size = newLeftSize; // update size
+				
+				return Left.back().first;
+			}
+			
+			size_type erase(const key_type & k, unsigned height)
+			{
+				value_type Key2Search(k,bid_type());
+			
+				block_iterator it = 
+					std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
+				
+				assert(it != (block_->begin() + size()));
+				
+				bid_type found_bid = it->second;
+				
+				assert(size()>=2);
+				
+				if(height == 2) // 'found_bid' points to a leaf
+				{
+					STXXL_VERBOSE1("btree::normal_node Deleting key from a leaf")
+					leaf_type * Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)found_bid,true);
+					assert(Leaf);
+					size_type result = Leaf->erase(k);
+					btree_->leaf_cache_.unfix_node((leaf_bid_type)it->second);
+					if(!Leaf->underflows())
+						return result;	// no underflow or root has a special degree 1 (too few elements)
+					
+					STXXL_VERBOSE1("btree::normal_node Fusing or rebalancing a leaf")
+					fuse_or_balance(it,btree_->leaf_cache_);
+					
+					return result;
+				}
+				
+				// 'found_bid' points to a node
+				STXXL_VERBOSE1("btree::normal_node Deleting key from a node")
+				node_type * Node = btree_->node_cache_.get_node((node_bid_type)found_bid,true);
+				assert(Node);
+				size_type result = Node->erase(k,height-1);
+				btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+				if(!Node->underflows())
+					return result;	// no underflow happened
+				
+				STXXL_VERBOSE1("btree::normal_node Fusing or rebalancing a node")
+				fuse_or_balance(it,btree_->node_cache_);
+					
+				return result;
+			}
 			
 	};
 };

@@ -59,7 +59,7 @@ int main(int argc, char * argv [])
 	
 	BTree1[10] = 200.;
 	assert(begin->second == 200.);
-	
+
 	btree_type::iterator it = BTree1.find(5);
 	assert(it != BTree1.end());
 	assert(it->first == 5);
@@ -69,6 +69,15 @@ int main(int argc, char * argv [])
 	it = BTree1.find(1000);
 	assert(it==BTree1.end());
 	
+	
+	bool f = BTree1.erase(10);
+	assert(f);
+	f = BTree1.erase(5);
+	assert(f);
+	f = BTree1.erase(6);
+	assert(!f);
+	f = BTree1.erase(5);
+	assert(!f);
 	
 	for(int i= 0;i<nins;++i)
 	{
