@@ -6,6 +6,10 @@ DEPENDENCIES +=  btree.h leaf.h iterator.h iterator_map.h node_cache.h
 
 STXXL_COMPILER_OPTIONS+= -DSTXXL_VERBOSE_LEVEL=0 -O3
 
+test_corr_insert_erase: $(DEPENDENCIES) test_corr_insert_erase.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_corr_insert_erase.cpp
+	$(LINKER) test_corr_insert_erase.$(OBJEXT) $(OUT)test_corr_insert_erase.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 test_corr_insert_find: $(DEPENDENCIES) test_corr_insert_find.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_corr_insert_find.cpp
 	$(LINKER) test_corr_insert_find.$(OBJEXT) $(OUT)test_corr_insert_find.$(EXEEXT) $(STXXL_LINKER_OPTIONS)

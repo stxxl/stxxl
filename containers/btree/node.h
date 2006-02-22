@@ -181,7 +181,8 @@ private:
 					cache_.unfix_node(RightBid);
 					cache_.delete_node(LeftBid); // 'delete_node' unfixes LeftBid also
 					
-					root_node_.erase(leftIt); // delete left BID from the root
+					std::copy(leftIt + 1, block_->begin() + size(),leftIt ); // delete left BID from the root
+					--(block_->info.cur_size);
 				}
 				else
 				{
@@ -189,9 +190,9 @@ private:
 					
 					key_type NewSplitter = RightNode->balance(*LeftNode);
 					
-					root_node_.erase(leftIt); // delete left BID from the root
-					// reinsert with the new key
-					root_node_.insert(root_node_pair_type(NewSplitter,(node_bid_type)LeftBid)); 
+					
+					leftIt->first = NewSplitter; // change key
+					assert(vcmp_(*leftIt,*rightIt));
 				
 					cache_.unfix_node(LeftBid);
 					cache_.unfix_node(RightBid);				

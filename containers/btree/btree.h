@@ -368,9 +368,46 @@ namespace btree
 			
 			STXXL_VERBOSE1("Fusing or rebalancing a node")
 			fuse_or_balance(it,node_cache_);
+			
+			if(root_node_.size() == 1)
+			{
+				STXXL_VERBOSE1("btree Root has size 1 and height > 2")
+				STXXL_VERBOSE1("btree Deallocate root and decrease height")
+				it = root_node_.begin();
+				node_bid_type RootBid = it->second;
+				assert(it->first == key_compare::max_value());
+				node_type * RootNode = node_cache_.get_node(RootBid);
+				assert(RootNode);
+				assert(RootNode->back().first == key_compare::max_value());
+				root_node_.clear();
+				root_node_.insert(	RootNode->block().begin(),
+											RootNode->block().begin() + RootNode->size());
+				
+				node_cache_.delete_node(RootBid);
+				--height_;
+				STXXL_MSG("btree Decresing height to "<<height_)
+			}
 				
 			return result;
 		}
+		
+		size_type count(const key_type & k)
+		{
+			if(find(k) == end())
+				return 0;
+			return 1;
+		}
+		
+		void erase(iterator pos)
+		{
+			erase(pos->first);
+		}
+		
+		iterator insert(iterator pos, const value_type& x)
+		{
+			return insert(x).first; // pos ignored in the current version
+		}
+		
 	
 	};
 	

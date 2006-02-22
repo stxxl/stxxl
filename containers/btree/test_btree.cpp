@@ -70,14 +70,26 @@ int main(int argc, char * argv [])
 	assert(it==BTree1.end());
 	
 	
-	bool f = BTree1.erase(10);
-	assert(f);
-	f = BTree1.erase(5);
-	assert(f);
+	int f = BTree1.erase(5);
+	assert(f==1);
 	f = BTree1.erase(6);
-	assert(!f);
+	assert(f==0);
 	f = BTree1.erase(5);
-	assert(!f);
+	assert(f==0);
+	
+	assert(BTree1.count(10) == 1);
+	assert(BTree1.count(5) == 0);
+	
+	it = BTree1.insert(BTree1.begin(),std::pair<int,double>(7,70.));
+	assert(it->second == 70.);
+	assert(BTree1.size() == 2);
+	it = BTree1.insert(BTree1.begin(),std::pair<int,double>(10,300.));
+	assert(it->second == 200.);
+	assert(BTree1.size() == 2);
+	
+	BTree1.erase(it);
+	assert(BTree1.size() == 1);
+	
 	
 	for(int i= 0;i<nins;++i)
 	{
