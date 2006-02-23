@@ -112,5 +112,11 @@ int main(int argc, char * argv [])
 	
 	btree_type BTree2(comp_type(),1024*16,1024*16);
 	
+	STXXL_MSG("Constuction of BTree3 from BTree1 that has "<< BTree1.size()<<" elements")
+	btree_type BTree3(BTree1.begin(),BTree1.end(),comp_type(),1024*16,1024*16);
+	
+	STXXL_MSG("Bulk constuction of BTree4 from BTree1 that has "<< BTree1.size()<<" elements")
+	btree_type BTree4(BTree1.begin(),BTree1.end(),comp_type(),1024*16,1024*16,true);
+	
 	return 0;
 }

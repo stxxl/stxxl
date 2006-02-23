@@ -485,7 +485,7 @@ public:
 				assert(newRightSize <= max_nelements());
 				assert(newRightSize >= min_nelements());
 				
-				assert(vcmp_(Left.back(),front()));
+				assert(vcmp_(Left.back(),front()) || size()==0);
 				
 				if(newLeftSize < Left.size())
 				{	
@@ -591,6 +591,12 @@ public:
 						btree_->node_cache_.delete_node((node_bid_type)it->second); 
 					}
 				}
+			}
+			
+			void push_back(const value_type & x)
+			{
+				(*this)[size()] = x;
+				++(block_->info.cur_size);
 			}
 			
 	};
