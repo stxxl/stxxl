@@ -110,7 +110,7 @@ int main(int argc, char * argv [])
 	
 	STXXL_MSG("Size of map: "<<BTree1.size())
 	
-	
+	btree_type BTree2(comp_type(),1024*16,1024*16);
 	
 	return 0;
 }

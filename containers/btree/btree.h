@@ -250,6 +250,23 @@ namespace btree
 			STXXL_VERBOSE1(" bytes in a node: "<<node_bid_type::size)
 			STXXL_VERBOSE1(" bytes in a leaf: "<<leaf_bid_type::size)
 			
+			create_empty_leaf();
+		}
+		
+		btree(	const key_compare & c_,
+					unsigned node_cache_size_in_bytes,
+					unsigned leaf_cache_size_in_bytes
+				): 
+			key_compare_(c_),
+			node_cache_(node_cache_size_in_bytes,this,1<<(LogNodeSize-1),1<<LogNodeSize,key_compare_),
+			leaf_cache_(leaf_cache_size_in_bytes,this,1<<(LogLeafSize-1),1<<LogLeafSize,key_compare_),
+			size_(0),
+			height_(2),
+			bm_(block_manager::get_instance())
+		{
+			STXXL_VERBOSE1("Creating a btree, addr="<<this)
+			STXXL_VERBOSE1(" bytes in a node: "<<node_bid_type::size)
+			STXXL_VERBOSE1(" bytes in a leaf: "<<leaf_bid_type::size)
 			
 			create_empty_leaf();
 		}
