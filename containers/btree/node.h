@@ -567,6 +567,32 @@ public:
 				return result;
 			}
 			
+			void deallocate_children(unsigned height)
+			{
+				if(height == 2)
+				{
+					// we have children leaves here
+					block_const_iterator it = block().begin();
+					for(;it!=block().begin() + size();++it)
+					{
+						// delete from leaf cache and deallocate bid
+						btree_->leaf_cache_.delete_node((leaf_bid_type)it->second); 
+					}
+				}
+				else
+				{
+					block_const_iterator it = block().begin();
+					for(;it!=block().begin() + size();++it)
+					{
+						node_type * Node = btree_->node_cache_.get_node((node_bid_type)it->second);
+						assert(Node);
+						Node->deallocate_children(height-1);
+						// delete from node cache and deallocate bid
+						btree_->node_cache_.delete_node((node_bid_type)it->second); 
+					}
+				}
+			}
+			
 	};
 };
 

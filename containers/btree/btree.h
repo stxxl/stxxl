@@ -82,6 +82,7 @@ namespace btree
 	
 		typedef std::map<key_type,node_bid_type,key_compare> root_node_type;
 		typedef typename root_node_type::iterator root_node_iterator_type;
+		typedef typename root_node_type::const_iterator root_node_const_iterator_type;
 		typedef std::pair<key_type,node_bid_type> root_node_pair_type;
 		root_node_type root_node_;
 	
@@ -200,6 +201,41 @@ namespace btree
 			}
 		}
 		
+		void create_empty_leaf()
+		{
+			leaf_bid_type NewBid;
+			leaf_type * NewLeaf = leaf_cache_.get_new_node(NewBid);
+			assert(NewLeaf);
+			end_iterator = NewLeaf->end(); // initialize end() iterator
+			root_node_.insert(root_node_pair_type(key_compare::max_value(),(node_bid_type)NewBid));
+		}
+		
+		void deallocate_children()
+		{
+			if(height_ == 2)
+			{
+				// we have children leaves here
+				root_node_const_iterator_type it = root_node_.begin();
+				for(;it!=root_node_.end();++it)
+				{
+					// delete from leaf cache and deallocate bid
+					leaf_cache_.delete_node((leaf_bid_type)it->second); 
+				}
+			}
+			else
+			{
+				root_node_const_iterator_type it = root_node_.begin();
+				for(;it!=root_node_.end();++it)
+				{
+					node_type * Node = node_cache_.get_node((node_bid_type)it->second);
+					assert(Node);
+					Node->deallocate_children(height_-1);
+					// delete from node cache and deallocate bid
+					node_cache_.delete_node((node_bid_type)it->second); 
+				}
+			}
+		}
+		
 	public:
 		btree(	unsigned node_cache_size_in_bytes,
 					unsigned leaf_cache_size_in_bytes
@@ -213,13 +249,14 @@ namespace btree
 			STXXL_VERBOSE1("Creating a btree, addr="<<this)
 			STXXL_VERBOSE1(" bytes in a node: "<<node_bid_type::size)
 			STXXL_VERBOSE1(" bytes in a leaf: "<<leaf_bid_type::size)
-			leaf_bid_type NewBid;
-			leaf_type * NewLeaf = leaf_cache_.get_new_node(NewBid);
-			assert(NewLeaf);
 			
-			end_iterator = NewLeaf->end(); // initialize end() iterator
 			
-			root_node_.insert(root_node_pair_type(key_compare::max_value(),(node_bid_type)NewBid));
+			create_empty_leaf();
+		}
+		
+		virtual ~btree()
+		{
+			deallocate_children();
 		}
 		
 		size_type size() const
@@ -408,6 +445,17 @@ namespace btree
 			return insert(x).first; // pos ignored in the current version
 		}
 		
+		void clear()
+		{
+			deallocate_children();
+			
+			root_node_.clear();
+			
+			size_= 0;
+			height_ = 2,
+			
+			create_empty_leaf();
+		}
 	
 	};
 	
