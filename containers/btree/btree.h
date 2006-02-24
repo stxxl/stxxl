@@ -620,7 +620,7 @@ namespace btree
 				
 				node_cache_.delete_node(RootBid);
 				--height_;
-				STXXL_MSG("btree Decresing height to "<<height_)
+				STXXL_MSG("btree Decreasing height to "<<height_)
 			}
 				
 			return result;
