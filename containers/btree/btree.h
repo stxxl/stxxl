@@ -531,7 +531,6 @@ namespace btree
 				assert(Leaf);
 				iterator result = Leaf->lower_bound(k);
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
-				assert(result == end() || result->first == k);
 				return result;
 			}
 			

@@ -103,6 +103,7 @@ int main(int argc, char * argv [])
 	it = BTree1.lower_bound(11);
 	assert(it == BTree1.end());
 	
+	it = BTree1.lower_bound(0);
 	BTree1.erase(it);
 	assert(BTree1.size() == 1);
 	
