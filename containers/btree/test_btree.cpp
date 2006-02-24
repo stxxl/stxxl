@@ -88,6 +88,8 @@ int main(int argc, char * argv [])
 	assert(it->second == 200.);
 	assert(BTree1.size() == 2);
 	
+	// test lower_bound
+	
 	it = BTree1.lower_bound(6);
 	assert(it != BTree1.end());
 	assert(it->first == 7);
@@ -102,6 +104,28 @@ int main(int argc, char * argv [])
 	
 	it = BTree1.lower_bound(11);
 	assert(it == BTree1.end());
+	
+	// test upper_bound
+	
+	it = BTree1.upper_bound(6);
+	assert(it != BTree1.end());
+	assert(it->first == 7);
+	
+	it = BTree1.upper_bound(7);
+	assert(it != BTree1.end());
+	assert(it->first == 10);
+	
+	it = BTree1.upper_bound(8);
+	assert(it != BTree1.end());
+	assert(it->first == 10);
+	
+	it = BTree1.upper_bound(10);
+	assert(it == BTree1.end());
+	
+	it = BTree1.upper_bound(11);
+	assert(it == BTree1.end());
+	
+	//
 	
 	it = BTree1.lower_bound(0);
 	BTree1.erase(it);
