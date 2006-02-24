@@ -569,6 +569,19 @@ namespace btree
 			return result;
 		}
 		
+		std::pair<iterator,iterator> equal_range(const key_type & k)
+		{
+			iterator l = lower_bound(k); // l->first >= k
+			
+			if(l == end() || key_compare_(k,l->first)) // if (k < l->first)
+				return std::pair<iterator,iterator>(l,l); // then upper_bound == lower_bound
+			
+			iterator u = l;
+			++u; // only one element ==k can exist
+			
+			return std::pair<iterator,iterator>(l,u); // then upper_bound == (lower_bound+1)
+		}
+		
 		size_type erase(const key_type & k)
 		{
 			root_node_iterator_type it = root_node_.lower_bound(k);

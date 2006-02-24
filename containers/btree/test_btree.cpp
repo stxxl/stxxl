@@ -125,6 +125,28 @@ int main(int argc, char * argv [])
 	it = BTree1.upper_bound(11);
 	assert(it == BTree1.end());
 	
+	// test equal_range
+	
+	std::pair<btree_type::iterator,btree_type::iterator> it_pair = BTree1.equal_range(1);
+	assert(BTree1.find(7) == it_pair.first);
+	assert(BTree1.find(7) == it_pair.second);
+	
+	it_pair = BTree1.equal_range(7);
+	assert(BTree1.find(7) == it_pair.first);
+	assert(BTree1.find(10) == it_pair.second);
+	
+	it_pair = BTree1.equal_range(8);
+	assert(BTree1.find(10) == it_pair.first);
+	assert(BTree1.find(10) == it_pair.second);
+	
+	it_pair = BTree1.equal_range(10);
+	assert(BTree1.find(10) == it_pair.first);
+	assert(BTree1.end() == it_pair.second);
+	
+	it_pair = BTree1.equal_range(11);
+	assert(BTree1.end() == it_pair.first);
+	assert(BTree1.end() == it_pair.second);
+	
 	//
 	
 	it = BTree1.lower_bound(0);
@@ -152,12 +174,12 @@ int main(int argc, char * argv [])
 	
 	btree_type BTree2(comp_type(),1024*16,1024*16);
 	
-	STXXL_MSG("Constuction of BTree3 from BTree1 that has "<< BTree1.size()<<" elements")
+	STXXL_MSG("Construction of BTree3 from BTree1 that has "<< BTree1.size()<<" elements")
 	btree_type BTree3(BTree1.begin(),BTree1.end(),comp_type(),1024*16,1024*16);
 	
 	assert(BTree3 == BTree1);
 	
-	STXXL_MSG("Bulk constuction of BTree4 from BTree1 that has "<< BTree1.size()<<" elements")
+	STXXL_MSG("Bulk construction of BTree4 from BTree1 that has "<< BTree1.size()<<" elements")
 	btree_type BTree4(BTree1.begin(),BTree1.end(),comp_type(),1024*16,1024*16,true);
 	
 	STXXL_MSG("Size of BTree1: "<<BTree1.size())
