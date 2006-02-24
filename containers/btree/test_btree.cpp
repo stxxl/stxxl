@@ -115,8 +115,39 @@ int main(int argc, char * argv [])
 	STXXL_MSG("Constuction of BTree3 from BTree1 that has "<< BTree1.size()<<" elements")
 	btree_type BTree3(BTree1.begin(),BTree1.end(),comp_type(),1024*16,1024*16);
 	
+	assert(BTree3 == BTree1);
+	
 	STXXL_MSG("Bulk constuction of BTree4 from BTree1 that has "<< BTree1.size()<<" elements")
 	btree_type BTree4(BTree1.begin(),BTree1.end(),comp_type(),1024*16,1024*16,true);
+	
+	STXXL_MSG("Size of BTree1: "<<BTree1.size())
+	STXXL_MSG("Size of BTree4: "<<BTree4.size())
+	
+	assert(BTree4 == BTree1);
+	assert(BTree3 == BTree4);
+	
+	BTree4.begin()->second = 0;
+	assert(BTree3 != BTree4);
+	assert(BTree4 < BTree3);
+	
+	BTree4.begin()->second = 1000;
+	assert(BTree4 > BTree3);
+	
+	assert(BTree3 != BTree4);
+	
+	it = BTree4.begin();
+	++it;
+	STXXL_MSG("Size of Btree4 before erase: "<<BTree4.size());
+	BTree4.erase(it,BTree4.end());
+	STXXL_MSG("Size of Btree4 after erase: "<<BTree4.size());
+	assert(BTree4.size()==1);
+	
+	
+	STXXL_MSG("Size of Btree1 before erase: "<<BTree1.size());
+	BTree1.erase(BTree1.begin(),BTree1.end());
+	STXXL_MSG("Size of Btree1 after erase: "<<BTree1.size());
+	assert(BTree1.empty());
+	
 	
 	return 0;
 }

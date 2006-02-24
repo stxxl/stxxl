@@ -75,6 +75,7 @@ namespace btree
 		
 		
 	private:
+	
 		key_compare key_compare_;
 		node_cache_type node_cache_;
 		leaf_cache_type leaf_cache_;
@@ -93,7 +94,9 @@ namespace btree
 		iterator end_iterator;
 		
 	
-		btree() {}
+		btree(); // forbidden
+		btree(const btree &); // forbidden
+		btree & operator = (const btree &); // forbidden
 			
 		template <class BIDType>
 		void insert_into_root(const std::pair<key_type,BIDType> & splitter)
@@ -148,7 +151,14 @@ namespace btree
 				
 				++height_;
 				STXXL_MSG("btree Increasing height to "<<height_)
-				assert(node_cache_.size()>= (height_-1));
+				if(node_cache_.size() < (height_-1))
+				{
+					STXXL_ERRMSG("The height of the tree ("<<height_<<") has exceeded the required capacity ("
+						<<(node_cache_.size()+1)<<") of the node cache.")
+					STXXL_ERRMSG("Increase the node cache size.")
+					STXXL_ERRMSG("aborting.")
+					abort();	
+				}
 			}
 		}
 		
@@ -238,6 +248,123 @@ namespace btree
 					node_cache_.delete_node((node_bid_type)it->second); 
 				}
 			}
+		}
+		
+		template <class InputIterator>
+		void bulk_construction(InputIterator b, InputIterator e)
+		{
+			key_type lastKey = key_compare::max_value();
+			
+			typedef std::pair<key_type,node_bid_type> key_bid_pair;
+				typedef typename stxxl::VECTOR_GENERATOR<key_bid_pair,1,1,
+					node_block_type::raw_size>::result key_bid_vector_type;
+				
+			key_bid_vector_type Bids;
+			
+			leaf_bid_type NewBid;
+			leaf_type * Leaf = leaf_cache_.get_new_node(NewBid);
+			
+			while(b!=e)
+			{
+				// write data in leaves
+								
+				// if *b not equal to the last element
+				if(key_compare_(b->first,lastKey) || key_compare_(lastKey,b->first))
+				{
+					++size_;
+					if(Leaf->size() == Leaf->max_nelements())
+					{
+						// overflow, need a new block
+						Bids.push_back(key_bid_pair(Leaf->back().first,NewBid));
+						
+						leaf_type * NewLeaf = leaf_cache_.get_new_node(NewBid);
+						assert(NewLeaf);
+						// Setting links
+						Leaf->succ() = NewLeaf->my_bid();
+						NewLeaf->pred() = Leaf->my_bid();
+						
+						Leaf = NewLeaf;
+					}
+					Leaf->push_back(*b);
+					lastKey = b->first;
+				}
+				++b;
+			}
+			
+			// balance the last leaf
+			if(Leaf->underflows() && !Bids.empty())
+			{
+				leaf_type * LeftLeaf = leaf_cache_.get_node(Bids.back().second);
+				assert(LeftLeaf);
+				const key_type NewSplitter = Leaf->balance(*LeftLeaf);
+				Bids.back().first = NewSplitter;
+				assert(!LeftLeaf->overflows() && !LeftLeaf->underflows());
+			}
+			
+			assert(!Leaf->overflows() && (!Leaf->underflows() || size_<=max_leaf_size));
+			
+			end_iterator = Leaf->end(); // initialize end() iterator
+			
+			Bids.push_back(key_bid_pair(key_compare::max_value(),NewBid));
+			
+						
+			while(Bids.size() > max_node_size)
+			{
+				key_bid_vector_type ParentBids;
+				
+				stxxl::uint64 nparents = div_and_round_up( Bids.size(),stxxl::uint64(max_node_size));
+				assert(nparents >= 2);
+				STXXL_VERBOSE1("btree bulk constructBids.size() "<<Bids.size()<<" nparents: "<<nparents <<" max_ns: "
+				 <<max_node_size)
+				typename key_bid_vector_type::const_iterator it = Bids.begin();
+				
+				do
+				{
+					node_bid_type NewBid;
+					node_type * Node = node_cache_.get_new_node(NewBid);
+					assert(Node);
+					unsigned cnt =0;
+					for(;cnt<max_node_size && it!=Bids.end();++cnt,++it)
+					{
+						Node->push_back(*it);
+					}
+					STXXL_VERBOSE1("btree bulk construct Node size : "<<Node->size()<<" limits: "<<
+						Node->min_nelements()<<" "<<Node->max_nelements())
+					
+					if(Node->underflows())
+					{
+						assert(it==Bids.end()); // this can happen only at the end
+						assert(!ParentBids.empty());
+						// TODO 
+						node_type * LeftNode = node_cache_.get_node(ParentBids.back().second);
+						assert(LeftNode);
+						const key_type NewSplitter = Node->balance(*LeftNode);
+						ParentBids.back().first = NewSplitter;
+						assert(!LeftNode->overflows() && !LeftNode->underflows());
+					}
+					assert(!Node->overflows() && !Node->underflows());
+					
+					ParentBids.push_back(key_bid_pair(Node->back().first,NewBid));
+					
+				} while(it!=Bids.end());
+				
+				std::swap(ParentBids,Bids);
+				
+				assert(nparents == Bids.size());
+				
+				++height_;
+				STXXL_MSG("Increasing height to "<<height_)
+				if(node_cache_.size() < (height_-1))
+				{
+					STXXL_ERRMSG("The height of the tree ("<<height_<<") has exceeded the required capacity ("
+						<<(node_cache_.size()+1)<<") of the node cache.")
+					STXXL_ERRMSG("Increase the node cache size.")
+					STXXL_ERRMSG("aborting.")
+					abort();	
+				}
+			}
+			
+			root_node_.insert(Bids.begin(),Bids.end());
 		}
 		
 	public:
@@ -483,8 +610,7 @@ namespace btree
 		{
 			while(b!=e)
 			{
-				insert(*b);
-				++b;
+				insert(*(b++));
 			}
 		}
 		
@@ -514,110 +640,133 @@ namespace btree
 				return;
 			}
 			
-			// bulk construction
+			bulk_construction(b,e);
+		}
+		
+		
+		template <class InputIterator>
+		btree(	InputIterator b,
+					InputIterator e,
+					unsigned node_cache_size_in_bytes,
+					unsigned leaf_cache_size_in_bytes,
+					bool range_sorted = false
+				): 
+			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
+			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			size_(0),
+			height_(2),
+			bm_(block_manager::get_instance())
+		{
+			STXXL_VERBOSE1("Creating a btree, addr="<<this)
+			STXXL_VERBOSE1(" bytes in a node: "<<node_bid_type::size)
+			STXXL_VERBOSE1(" bytes in a leaf: "<<leaf_bid_type::size)
 			
-			// To be continued
-			key_type lastKey = key_compare::max_value();
-
-			
-			typedef std::pair<key_type,node_bid_type> key_bid_pair;
-				typedef typename stxxl::VECTOR_GENERATOR<key_bid_pair,1,1,
-					node_block_type::raw_size>::result key_bid_vector_type;
-				
-			key_bid_vector_type Bids;
-			
-			leaf_bid_type NewBid;
-			leaf_type * Leaf = leaf_cache_.get_new_node(NewBid);
-			
-			while(b!=e)
+			if(range_sorted == false)
 			{
-				// write data in leaves
-								
-				// if *b not equal to the last element
-				if(key_compare_(b->first,lastKey) || key_compare_(lastKey,b->first))
-				{
-					++size_;
-					if(Leaf->size() == Leaf->max_nelements())
-					{
-						// overflow, need a new block
-						Bids.push_back(key_bid_pair(Leaf->back().first,NewBid));
-						// TODO: Links!
-						Leaf = leaf_cache_.get_new_node(NewBid);
-					}
-					Leaf->push_back(*b);
-					lastKey = b->first;
-				}
-				++b;
+				create_empty_leaf();
+				insert(b,e);
+				return;
 			}
 			
-			// balance the last leaf
-			if(Leaf->underflows() && !Bids.empty())
-			{
-				leaf_type * LeftLeaf = leaf_cache_.get_node(Bids.back().second);
-				assert(LeftLeaf);
-				const key_type NewSplitter = Leaf->balance(*LeftLeaf);
-				Bids.back().first = NewSplitter;
-				assert(!LeftLeaf->overflows() && !LeftLeaf->underflows());
-			}
-			
-			assert(!Leaf->overflows() && (!Leaf->underflows() || size_<=max_leaf_size));
-			
-			Bids.push_back(key_bid_pair(key_compare::max_value(),NewBid));
-			
-						
-			while(Bids.size() > max_node_size)
-			{
-				key_bid_vector_type ParentBids;
+			bulk_construction(b,e);
+		}
 				
-				stxxl::uint64 nparents = div_and_round_up( Bids.size(),stxxl::uint64(max_node_size));
-				assert(nparents >= 2);
-				STXXL_VERBOSE1("btree bulk constructBids.size() "<<Bids.size()<<" nparents: "<<nparents <<" max_ns: "
-				 <<max_node_size)
-				typename key_bid_vector_type::const_iterator it = Bids.begin();
-				
-				do
-				{
-					node_bid_type NewBid;
-					node_type * Node = node_cache_.get_new_node(NewBid);
-					assert(Node);
-					unsigned cnt =0;
-					for(;cnt<max_node_size && it!=Bids.end();++cnt,++it)
-					{
-						Node->push_back(*it);
-					}
-					STXXL_VERBOSE1("btree bulk construct Node size : "<<Node->size()<<" limits: "<<
-						Node->min_nelements()<<" "<<Node->max_nelements())
-					
-					if(Node->underflows())
-					{
-						assert(it==Bids.end()); // this can happen only at the end
-						assert(!ParentBids.empty());
-						// TODO 
-						node_type * LeftNode = node_cache_.get_node(ParentBids.back().second);
-						assert(LeftNode);
-						const key_type NewSplitter = Node->balance(*LeftNode);
-						ParentBids.back().first = NewSplitter;
-						assert(!LeftNode->overflows() && !LeftNode->underflows());
-					}
-					assert(!Node->overflows() && !Node->underflows());
-					
-					ParentBids.push_back(key_bid_pair(Node->back().first,NewBid));
-					
-				} while(it!=Bids.end());
-				
-				std::swap(ParentBids,Bids);
-				
-				assert(nparents == Bids.size());
-				
-				++height_;
-				STXXL_MSG("Increasing height to "<<height_)
-			}
-			
-			root_node_.insert(Bids.begin(),Bids.end());
+		void erase(iterator first, iterator last)
+		{
+			if(first == begin() && last == end())
+				clear();
+			else
+				while(first != last)
+					erase(first++);
+		
 		}
 		
 	
 	};
+	
+	// TODO: fix me, parameters must be CONST references
+	template <	class KeyType, 
+						class DataType, 
+						class CompareType, 
+						unsigned LogNodeSize,
+						unsigned LogLeafSize,
+						class PDAllocStrategy
+					>
+	inline bool operator == (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	{
+		return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+	}
+	
+	// TODO: fix me, parameters must be CONST references
+	template <	class KeyType, 
+						class DataType, 
+						class CompareType, 
+						unsigned LogNodeSize,
+						unsigned LogLeafSize,
+						class PDAllocStrategy
+					>
+	inline bool operator != (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	{
+		return !(a==b);
+	}
+	
+	// TODO: fix me, parameters must be CONST references
+	template <	class KeyType, 
+						class DataType, 
+						class CompareType, 
+						unsigned LogNodeSize,
+						unsigned LogLeafSize,
+						class PDAllocStrategy
+					>
+	inline bool operator < (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	{
+		return std::lexicographical_compare(a.begin(),a.end(),b.begin(),b.end());
+	}
+	
+	// TODO: fix me, parameters must be CONST references
+	template <	class KeyType, 
+						class DataType, 
+						class CompareType, 
+						unsigned LogNodeSize,
+						unsigned LogLeafSize,
+						class PDAllocStrategy
+					>
+	inline bool operator > (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	{
+		return b < a;
+	}
+	
+	// TODO: fix me, parameters must be CONST references
+	template <	class KeyType, 
+						class DataType, 
+						class CompareType, 
+						unsigned LogNodeSize,
+						unsigned LogLeafSize,
+						class PDAllocStrategy
+					>
+	inline bool operator <= (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	{
+		return !(b < a);
+	}
+	
+	// TODO: fix me, parameters must be CONST references
+	template <	class KeyType, 
+						class DataType, 
+						class CompareType, 
+						unsigned LogNodeSize,
+						unsigned LogLeafSize,
+						class PDAllocStrategy
+					>
+	inline bool operator >= (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	{
+		return !(a < b);
+	}
 	
 }
 

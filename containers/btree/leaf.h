@@ -152,15 +152,6 @@ private:
 					
 				btree_->leaf_cache_.unfix_node(NewBid);
 			}
-			
-			bid_type & succ()
-			{
-				return block_->info.succ;
-			}
-			bid_type & pred()
-			{
-				return block_->info.pred;
-			}
 
 public:
 			virtual ~normal_leaf()
@@ -189,6 +180,16 @@ public:
 			
 			unsigned max_nelements() const { return max_nelements_; }
 			unsigned min_nelements() const { return min_nelements_; }
+			
+			
+			bid_type & succ()
+			{
+				return block_->info.succ;
+			}
+			bid_type & pred()
+			{
+				return block_->info.pred;
+			}
 			
 			/*
 			iterator begin() { return block_->begin(); };
