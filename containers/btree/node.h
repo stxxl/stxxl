@@ -457,6 +457,39 @@ public:
 
 		}
 		
+		iterator lower_bound(const key_type & k, unsigned height)
+		{
+			value_type Key2Search(k,bid_type());
+			
+			block_iterator it = 
+				std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
+				
+			assert(it != (block_->begin() + size()));
+				
+			bid_type found_bid = it->second;
+			
+			if(height == 2) // found_bid points to a leaf
+			{
+				STXXL_VERBOSE1("Searching lower bound in a leaf");
+				leaf_type * Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)found_bid,true);
+				assert(Leaf);
+				iterator result = Leaf->lower_bound(k);
+				btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+				
+				return result;
+			}
+			
+			// found_bid points to a node
+			STXXL_VERBOSE1("Searching in a node");
+			node_type * Node = btree_->node_cache_.get_node((node_bid_type)found_bid,true);
+			assert(Node);
+			iterator result = Node->lower_bound(k,height-1);
+			btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+			
+			return result;
+
+		}
+		
 			void fuse(const normal_node & Src)
 			{
 				assert(vcmp_(Src.back(),front()));

@@ -428,6 +428,15 @@ public:
 				return iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
 			
+			iterator lower_bound(const key_type & k)
+			{
+				value_type searchVal(k,data_type());
+				typename block_type::iterator lb = 
+					std::lower_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
+				
+				return iterator(btree_,my_bid(),lb - block_->begin()); 
+			}
+			
 			size_type erase(const key_type & k)
 			{
 				value_type searchVal(k,data_type());

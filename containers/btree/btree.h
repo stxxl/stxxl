@@ -519,6 +519,32 @@ namespace btree
 			return result;
 		}
 		
+		iterator lower_bound(const key_type & k)
+		{
+			root_node_iterator_type it = root_node_.lower_bound(k);
+			assert(it != root_node_.end());
+			
+			if(height_ == 2) // 'it' points to a leaf
+			{
+				STXXL_VERBOSE1("Searching lower bound in a leaf");
+				leaf_type * Leaf = leaf_cache_.get_node((leaf_bid_type)it->second,true);
+				assert(Leaf);
+				iterator result = Leaf->lower_bound(k);
+				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				assert(result == end() || result->first == k);
+				return result;
+			}
+			
+			// 'it' points to a node
+			STXXL_VERBOSE1("Searching lower bound in a node");
+			node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
+			assert(Node);
+			iterator result = Node->lower_bound(k,height_-1);
+			node_cache_.unfix_node((node_bid_type)it->second);
+			
+			return result;
+		}
+		
 		size_type erase(const key_type & k)
 		{
 			root_node_iterator_type it = root_node_.lower_bound(k);

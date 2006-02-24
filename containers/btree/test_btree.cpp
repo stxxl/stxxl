@@ -88,6 +88,21 @@ int main(int argc, char * argv [])
 	assert(it->second == 200.);
 	assert(BTree1.size() == 2);
 	
+	it = BTree1.lower_bound(6);
+	assert(it != BTree1.end());
+	assert(it->first == 7);
+	
+	it = BTree1.lower_bound(7);
+	assert(it != BTree1.end());
+	assert(it->first == 7);
+	
+	it = BTree1.lower_bound(8);
+	assert(it != BTree1.end());
+	assert(it->first == 10);
+	
+	it = BTree1.lower_bound(11);
+	assert(it == BTree1.end());
+	
 	BTree1.erase(it);
 	assert(BTree1.size() == 1);
 	
