@@ -244,6 +244,8 @@ int main(int argc, char * argv [])
 	
 	std::pair<btree_type::const_iterator,btree_type::const_iterator> cit_pair = CBTree3.equal_range(1);
 	
+	assert(CBTree3.max_size() >= CBTree3.size());
+	
 	STXXL_MSG("All tests passed successufully")
 	
 	return 0;
