@@ -957,7 +957,6 @@ namespace btree
 		return !(b < a);
 	}
 	
-	// TODO: fix me, parameters must be CONST references
 	template <	class KeyType, 
 						class DataType, 
 						class CompareType, 
@@ -965,8 +964,8 @@ namespace btree
 						unsigned LogLeafSize,
 						class PDAllocStrategy
 					>
-	inline bool operator >= (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
-										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	inline bool operator >= (const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
 	{
 		return !(a < b);
 	}
