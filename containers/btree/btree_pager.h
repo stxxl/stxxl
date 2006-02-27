@@ -10,6 +10,7 @@
 #define _BTREE_PAGER_H
 
 #include <stxxl>
+#include <list>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -59,6 +60,7 @@ namespace btree
 }
 
 __STXXL_END_NAMESPACE
+
 
 namespace std
 {

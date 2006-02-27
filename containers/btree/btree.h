@@ -52,6 +52,7 @@ namespace btree
 		typedef value_type & reference;
 		typedef const value_type & const_reference;
 		typedef value_type * pointer;
+		typedef value_type const * const_pointer;
 			
 		// leaf type declarations
 		typedef normal_leaf<key_type,data_type,key_compare,log_leaf_size,SelfType> leaf_type;
@@ -77,8 +78,8 @@ namespace btree
 	private:
 	
 		key_compare key_compare_;
-		node_cache_type node_cache_;
-		leaf_cache_type leaf_cache_;
+		mutable node_cache_type node_cache_;
+		mutable leaf_cache_type leaf_cache_;
 		iterator_map_type iterator_map_;
 		size_type size_;
 		unsigned height_;
@@ -89,8 +90,9 @@ namespace btree
 		typedef typename root_node_type::iterator root_node_iterator_type;
 		typedef typename root_node_type::const_iterator root_node_const_iterator_type;
 		typedef std::pair<key_type,node_bid_type> root_node_pair_type;
-		root_node_type root_node_;
+
 	
+		root_node_type root_node_;
 		iterator end_iterator;
 		
 	
@@ -373,6 +375,7 @@ namespace btree
 				): 
 			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
 			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			iterator_map_(this),
 			size_(0),
 			height_(2),
 			bm_(block_manager::get_instance())
@@ -391,6 +394,7 @@ namespace btree
 			key_compare_(c_),
 			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
 			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			iterator_map_(this),
 			size_(0),
 			height_(2),
 			bm_(block_manager::get_instance())
@@ -478,11 +482,37 @@ namespace btree
 			assert(Node);
 			iterator result = Node->begin(height_-1);
 			node_cache_.unfix_node((node_bid_type)it->second);
-			return result;
+			return result;	
+		}
+		
+		const_iterator begin() const
+		{
+			root_node_const_iterator_type it = root_node_.begin();
+			assert(it != root_node_.end() );			
 			
+			if(height_ == 2) // 'it' points to a leaf
+			{
+				STXXL_VERBOSE1("btree: retrieveing begin() from the first leaf");
+				leaf_type const * Leaf = leaf_cache_.get_const_node((leaf_bid_type)it->second,true);
+				assert(Leaf);
+				return Leaf->begin();
+			}
+			
+			// 'it' points to a node
+			STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
+			node_type const * Node = node_cache_.get_const_node((node_bid_type)it->second,true);
+			assert(Node);
+			const_iterator result = Node->begin(height_-1);
+			node_cache_.unfix_node((node_bid_type)it->second);
+			return result;	
 		}
 		
 		iterator end()
+		{
+			return end_iterator;
+		}
+		
+		const_iterator end() const 
 		{
 			return end_iterator;
 		}
@@ -519,6 +549,33 @@ namespace btree
 			return result;
 		}
 		
+		const_iterator find(const key_type & k) const
+		{
+			root_node_const_iterator_type it = root_node_.lower_bound(k);
+			assert(it != root_node_.end());
+			
+			if(height_ == 2) // 'it' points to a leaf
+			{
+				STXXL_VERBOSE1("Searching in a leaf");
+				leaf_type const * Leaf = leaf_cache_.get_const_node((leaf_bid_type)it->second,true);
+				assert(Leaf);
+				const_iterator result = Leaf->find(k);
+				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				assert(result == end() || result->first == k);
+				return result;
+			}
+			
+			// 'it' points to a node
+			STXXL_VERBOSE1("Searching in a node");
+			node_type const * Node = node_cache_.get_const_node((node_bid_type)it->second,true);
+			assert(Node);
+			const_iterator result = Node->find(k,height_-1);
+			node_cache_.unfix_node((node_bid_type)it->second);
+			
+			assert(result == end() || result->first == k);
+			return result;
+		}
+		
 		iterator lower_bound(const key_type & k)
 		{
 			root_node_iterator_type it = root_node_.lower_bound(k);
@@ -539,6 +596,31 @@ namespace btree
 			node_type * Node = node_cache_.get_node((node_bid_type)it->second,true);
 			assert(Node);
 			iterator result = Node->lower_bound(k,height_-1);
+			node_cache_.unfix_node((node_bid_type)it->second);
+			
+			return result;
+		}
+		
+		const_iterator lower_bound(const key_type & k) const
+		{
+			root_node_const_iterator_type it = root_node_.lower_bound(k);
+			assert(it != root_node_.end());
+			
+			if(height_ == 2) // 'it' points to a leaf
+			{
+				STXXL_VERBOSE1("Searching lower bound in a leaf");
+				leaf_type const * Leaf = leaf_cache_.get_const_node((leaf_bid_type)it->second,true);
+				assert(Leaf);
+				const_iterator result = Leaf->lower_bound(k);
+				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				return result;
+			}
+			
+			// 'it' points to a node
+			STXXL_VERBOSE1("Searching lower bound in a node");
+			node_type const * Node = node_cache_.get_const_node((node_bid_type)it->second,true);
+			assert(Node);
+			const_iterator result = Node->lower_bound(k,height_-1);
 			node_cache_.unfix_node((node_bid_type)it->second);
 			
 			return result;
@@ -569,6 +651,31 @@ namespace btree
 			return result;
 		}
 		
+		const_iterator upper_bound(const key_type & k) const
+		{
+			root_node_const_iterator_type it = root_node_.upper_bound(k);
+			assert(it != root_node_.end());
+			
+			if(height_ == 2) // 'it' points to a leaf
+			{
+				STXXL_VERBOSE1("Searching upper bound in a leaf");
+				leaf_type const * Leaf = leaf_cache_.get_const_node((leaf_bid_type)it->second,true);
+				assert(Leaf);
+				const_iterator result = Leaf->upper_bound(k);
+				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				return result;
+			}
+			
+			// 'it' points to a node
+			STXXL_VERBOSE1("Searching upper bound in a node");
+			node_type const * Node = node_cache_.get_const_node((node_bid_type)it->second,true);
+			assert(Node);
+			const_iterator result = Node->upper_bound(k,height_-1);
+			node_cache_.unfix_node((node_bid_type)it->second);
+			
+			return result;
+		}
+		
 		std::pair<iterator,iterator> equal_range(const key_type & k)
 		{
 			iterator l = lower_bound(k); // l->first >= k
@@ -580,6 +687,19 @@ namespace btree
 			++u; // only one element ==k can exist
 			
 			return std::pair<iterator,iterator>(l,u); // then upper_bound == (lower_bound+1)
+		}
+		
+		std::pair<const_iterator,const_iterator> equal_range(const key_type & k) const
+		{
+			const_iterator l = lower_bound(k); // l->first >= k
+			
+			if(l == end() || key_compare_(k,l->first)) // if (k < l->first)
+				return std::pair<const_iterator,const_iterator>(l,l); // then upper_bound == lower_bound
+			
+			const_iterator u = l;
+			++u; // only one element ==k can exist
+			
+			return std::pair<const_iterator,const_iterator>(l,u); // then upper_bound == (lower_bound+1)
 		}
 		
 		size_type erase(const key_type & k)
@@ -688,6 +808,7 @@ namespace btree
 			key_compare_(c_),
 			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
 			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			iterator_map_(this),
 			size_(0),
 			height_(2),
 			bm_(block_manager::get_instance())
@@ -716,6 +837,7 @@ namespace btree
 				): 
 			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
 			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			iterator_map_(this),
 			size_(0),
 			height_(2),
 			bm_(block_manager::get_instance())
@@ -744,10 +866,29 @@ namespace btree
 		
 		}
 		
+		// invalidates all iterators
+		void swap(btree & obj)
+		{
+			std::swap(key_compare_,obj.key_compare_); // OK
+			
+			std::swap(node_cache_,obj.node_cache_);  // OK
+			std::swap(leaf_cache_,obj.leaf_cache_);  // OK
+			
+			
+			std::swap(iterator_map_,obj.iterator_map_); // must update all iterators
+			
+			std::swap(end_iterator,obj.end_iterator);
+			std::swap(size_,obj.size_);
+			std::swap(height_,obj.height_);	
+			std::swap(alloc_strategy_,obj.alloc_strategy_);
+			std::swap(root_node_,obj.root_node_);
+			
+			
+		}
+		
 	
 	};
 	
-	// TODO: fix me, parameters must be CONST references
 	template <	class KeyType, 
 						class DataType, 
 						class CompareType, 
@@ -755,13 +896,12 @@ namespace btree
 						unsigned LogLeafSize,
 						class PDAllocStrategy
 					>
-	inline bool operator == (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
-										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	inline bool operator == (const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
 	{
 		return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
 	}
 	
-	// TODO: fix me, parameters must be CONST references
 	template <	class KeyType, 
 						class DataType, 
 						class CompareType, 
@@ -769,13 +909,13 @@ namespace btree
 						unsigned LogLeafSize,
 						class PDAllocStrategy
 					>
-	inline bool operator != (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
-										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	inline bool operator != (const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
 	{
 		return !(a==b);
 	}
 	
-	// TODO: fix me, parameters must be CONST references
+	
 	template <	class KeyType, 
 						class DataType, 
 						class CompareType, 
@@ -783,13 +923,13 @@ namespace btree
 						unsigned LogLeafSize,
 						class PDAllocStrategy
 					>
-	inline bool operator < (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
-										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	inline bool operator < (const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
 	{
 		return std::lexicographical_compare(a.begin(),a.end(),b.begin(),b.end());
 	}
 	
-	// TODO: fix me, parameters must be CONST references
+	
 	template <	class KeyType, 
 						class DataType, 
 						class CompareType, 
@@ -797,13 +937,13 @@ namespace btree
 						unsigned LogLeafSize,
 						class PDAllocStrategy
 					>
-	inline bool operator > (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
-										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	inline bool operator > (const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
 	{
 		return b < a;
 	}
 	
-	// TODO: fix me, parameters must be CONST references
+	
 	template <	class KeyType, 
 						class DataType, 
 						class CompareType, 
@@ -811,8 +951,8 @@ namespace btree
 						unsigned LogLeafSize,
 						class PDAllocStrategy
 					>
-	inline bool operator <= (btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
-										btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	inline bool operator <= (const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+										const btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
 	{
 		return !(b < a);
 	}
@@ -834,5 +974,22 @@ namespace btree
 }
 
 __STXXL_END_NAMESPACE
+
+
+namespace std
+{
+	template <	class KeyType, 
+						class DataType, 
+						class CompareType, 
+						unsigned LogNodeSize,
+						unsigned LogLeafSize,
+						class PDAllocStrategy
+					>
+	void swap(stxxl::btree::btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & a, 
+				   stxxl::btree::btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> & b)
+	{
+		if(&a != &b) a.swap(b);
+	}
+}
 
 #endif /* _BTREE_H */

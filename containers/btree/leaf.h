@@ -17,12 +17,18 @@ __STXXL_BEGIN_NAMESPACE
 
 namespace btree
 {
+	template <class NodeType, class BTreeType>
+	class node_cache;
 	
 	template <class KeyType_, class DataType_, class KeyCmp_, unsigned LogNElem_, class BTreeType>
 	class normal_leaf
 	{
 			
 		public:
+			typedef	normal_leaf<KeyType_,DataType_,KeyCmp_,LogNElem_,BTreeType> SelfType;
+			
+			friend class node_cache<SelfType,BTreeType>;
+				
 			enum {
 				nelements = 1<<LogNElem_,
 				magic_block_size = 4096
@@ -372,6 +378,11 @@ public:
 				return iterator(btree_,my_bid(),0);
 			}
 			
+			const_iterator begin() const
+			{
+				return const_iterator(btree_,my_bid(),0);
+			}
+			
 			iterator end()
 			{
 				return iterator(btree_,my_bid(),size());
@@ -428,6 +439,17 @@ public:
 				return iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
 			
+			const_iterator find(const key_type & k) const
+			{
+				value_type searchVal(k,data_type());
+				typename block_type::iterator lb = 
+					std::lower_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
+				if(lb == block_->begin()+size() || lb->first != k)
+					return btree_->end();
+				
+				return const_iterator(btree_,my_bid(),lb - block_->begin()); 
+			}
+			
 			iterator lower_bound(const key_type & k)
 			{
 				value_type searchVal(k,data_type());
@@ -437,6 +459,15 @@ public:
 				return iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
 			
+			const_iterator lower_bound(const key_type & k) const
+			{
+				value_type searchVal(k,data_type());
+				typename block_type::iterator lb = 
+					std::lower_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
+				
+				return const_iterator(btree_,my_bid(),lb - block_->begin()); 
+			}
+			
 			iterator upper_bound(const key_type & k)
 			{
 				value_type searchVal(k,data_type());
@@ -444,6 +475,15 @@ public:
 					std::upper_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
 				
 				return iterator(btree_,my_bid(),lb - block_->begin()); 
+			}
+			
+			const_iterator upper_bound(const key_type & k) const
+			{
+				value_type searchVal(k,data_type());
+				typename block_type::iterator lb = 
+					std::upper_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
+				
+				return const_iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
 			
 			size_type erase(const key_type & k)

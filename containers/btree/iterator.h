@@ -14,7 +14,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-// TODO get dirty flag support enabled
 
 namespace btree
 {
@@ -97,17 +96,20 @@ namespace btree
 			
 			const_reference const_access() const
 			{
-				return non_const_access();
+				assert(btree_);
+				typename btree_type::leaf_type const * Leaf = btree_->leaf_cache_.get_const_node(bid);
+				assert(Leaf);
+				return (reference)((*Leaf)[pos]);
 			}
 			
 			bool operator == (const btree_iterator_base & obj) const
 			{
-				return bid == obj.bid && pos == obj.pos;
+				return bid == obj.bid && pos == obj.pos && btree_ == obj.btree_;
 			}
 			
 			bool operator != (const btree_iterator_base & obj) const
 			{
-				return bid != obj.bid || pos != obj.pos;
+				return bid != obj.bid || pos != obj.pos || btree_!= obj.btree_;
 			}
 			
 			btree_iterator_base & operator ++ ()
@@ -131,8 +133,8 @@ namespace btree
 				btree_->leaf_cache_.unfix_node(cur_bid);
 				return *this;
 			}
-	
-		public:	
+			
+	public:	
 			virtual ~btree_iterator_base()
 			{
 				STXXL_VERBOSE3("btree_iterator_base deconst "<<this);
@@ -229,15 +231,117 @@ namespace btree
 			{
 			}
 			
-			
 	};
 	
 	template <class BTreeType>
 	class btree_const_iterator : public btree_iterator_base<BTreeType>
 	{
 		public:
+			typedef btree_iterator<BTreeType> iterator;
+		
+			typedef BTreeType btree_type;
+			typedef typename btree_type::leaf_bid_type bid_type;
+			typedef typename btree_type::value_type value_type;
+			typedef typename btree_type::const_reference reference;
+			typedef typename btree_type::const_pointer pointer;
+		
+			template <class KeyType_, class DataType_, 
+							class KeyCmp_, unsigned LogNElem_, class BTreeType__>
+			friend class normal_leaf;
+		
+			using btree_iterator_base<btree_type>::const_access;
+		
+			btree_const_iterator(): btree_iterator_base<btree_type>()
+			{}
+				
+			btree_const_iterator(const btree_const_iterator & obj):
+				btree_iterator_base<btree_type>(obj)
+			{
+			}
+			
+			btree_const_iterator(const iterator & obj):
+				btree_iterator_base<btree_type>(obj)
+			{
+			}
+			
+			btree_const_iterator & operator = (const btree_const_iterator & obj)
+			{
+				btree_iterator_base<btree_type>::operator =(obj);
+				return *this;
+			}
+			
+			reference operator * ()
+			{
+				return const_access();
+			}
+			
+			pointer operator -> ()
+			{
+				return &(const_access());
+			}
+			
+			bool operator == (const btree_const_iterator & obj) const
+			{
+				return btree_iterator_base<btree_type>::operator ==(obj);
+			}
+			
+			bool operator != (const btree_const_iterator & obj) const
+			{
+				return btree_iterator_base<btree_type>::operator !=(obj);
+			}
+			
+			btree_const_iterator & operator ++ ()
+			{
+				assert(*this != btree_iterator_base<btree_type>::btree_->end());
+				btree_iterator_base<btree_type>::operator++();
+				return *this;
+			}
+			
+			btree_const_iterator & operator -- ()
+			{
+				btree_iterator_base<btree_type>::operator--();
+				return *this;
+			}
+			
+			btree_const_iterator operator ++ (int )
+			{
+				assert(*this != btree_iterator_base<btree_type>::btree_->end());
+				btree_const_iterator result(*this);
+				btree_iterator_base<btree_type>::operator++();
+				return result;
+			}
+			
+			btree_const_iterator operator -- (int )
+			{
+				btree_const_iterator result(*this);
+				btree_iterator_base<btree_type>::operator--();
+				return result;
+			}
+
+		private:
+			btree_const_iterator(
+				btree_type * btree__, 
+				const bid_type & b, 
+				unsigned p
+				): btree_iterator_base<btree_type>(btree__,b,p)
+			{
+			}
 			
 	};
+	
+	template <class BTreeType>
+	inline bool operator == (const btree_iterator<BTreeType> & a,
+										const btree_const_iterator<BTreeType> & b)
+	{
+		return b == a;
+	}
+	
+	template <class BTreeType>
+	inline bool operator != (const btree_iterator<BTreeType> & a,
+										const btree_const_iterator<BTreeType> & b)
+	{
+		return b != a;
+	}
 	
 }
 

@@ -210,6 +210,41 @@ int main(int argc, char * argv [])
 	STXXL_MSG("Size of Btree1 after erase: "<<BTree1.size());
 	assert(BTree1.empty());
 	
+	// a copy of BTree3
+	btree_type BTree5(BTree3.begin(),BTree3.end(),comp_type(),1024*16,1024*16,true);
+	assert(BTree5 == BTree3);
+	
+	btree_type::iterator b3 = BTree3.begin();
+	btree_type::iterator b4 = BTree4.begin();
+	btree_type::iterator e3 = BTree3.end();
+	btree_type::iterator e4 = BTree4.end();
+	
+	STXXL_MSG("Testing swapping operation (std::swap)")
+	std::swap(BTree4,BTree3);
+	assert(b3 == BTree4.begin());
+	assert(b4 == BTree3.begin());
+	assert(e3 == BTree4.end());
+	assert(e4 == BTree3.end());
+		
+	assert(BTree5 == BTree4);
+	assert(BTree5 != BTree3);
+	
+	btree_type::const_iterator cb = BTree3.begin();
+	btree_type::const_iterator ce = BTree3.end();
+	const btree_type & CBTree3 = BTree3;
+	cb = CBTree3.begin();
+	b3==cb;
+	b3!=cb;
+	cb==b3;
+	cb!=b3;
+	ce = CBTree3.end();
+	btree_type::const_iterator cit = CBTree3.find(0);
+	cit = CBTree3.lower_bound(0);
+	cit = CBTree3.upper_bound(0);
+	
+	std::pair<btree_type::const_iterator,btree_type::const_iterator> cit_pair = CBTree3.equal_range(1);
+	
+	STXXL_MSG("All tests passed successufully")
 	
 	return 0;
 }

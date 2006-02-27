@@ -18,6 +18,8 @@ __STXXL_BEGIN_NAMESPACE
 
 namespace btree
 {
+	template <class NodeType, class BTreeType>
+	class node_cache;
 	
 	template <class KeyType_, class KeyCmp_, unsigned LogNElem_, class BTreeType>
 	class normal_node
@@ -25,6 +27,9 @@ namespace btree
 			
 		public:
 			typedef	normal_node<KeyType_,KeyCmp_,LogNElem_,BTreeType> SelfType;
+		
+			friend class node_cache<SelfType,BTreeType>;
+		
 			enum {
 				nelements = 1<<LogNElem_,
 				magic_block_size = 4096
@@ -424,6 +429,28 @@ public:
 				}
 			}
 			
+			const_iterator begin(unsigned height) const
+			{
+				bid_type FirstBid = block_->begin()->second;
+				if(height == 2) // FirstBid points to a leaf
+				{
+					assert(size() > 1);
+					STXXL_VERBOSE1("btree::node retrieveing begin() from the first leaf");
+					leaf_type const * Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)FirstBid,true);
+					assert(Leaf);
+					return Leaf->begin();
+				}
+				else
+				{ // FirstBid points to a node
+					STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
+					node_type const * Node = btree_->node_cache_.get_const_node((node_bid_type)FirstBid,true);
+					assert(Node);
+					const_iterator result = Node->begin(height-1);
+					btree_->node_cache_.unfix_node((node_bid_type)FirstBid);
+					return result;
+				}
+			}
+			
 		iterator find(const key_type & k, unsigned height)
 		{
 			value_type Key2Search(k,bid_type());
@@ -451,6 +478,39 @@ public:
 			node_type * Node = btree_->node_cache_.get_node((node_bid_type)found_bid,true);
 			assert(Node);
 			iterator result = Node->find(k,height-1);
+			btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+			
+			return result;
+
+		}
+		
+		const_iterator find(const key_type & k, unsigned height) const
+		{
+			value_type Key2Search(k,bid_type());
+			
+			block_iterator it = 
+				std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
+				
+			assert(it != (block_->begin() + size()));
+				
+			bid_type found_bid = it->second;
+			
+			if(height == 2) // found_bid points to a leaf
+			{
+				STXXL_VERBOSE1("Searching in a leaf");
+				leaf_type const * Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)found_bid,true);
+				assert(Leaf);
+				const_iterator result = Leaf->find(k);
+				btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+				
+				return result;
+			}
+			
+			// found_bid points to a node
+			STXXL_VERBOSE1("Searching in a node");
+			node_type const * Node = btree_->node_cache_.get_const_node((node_bid_type)found_bid,true);
+			assert(Node);
+			const_iterator result = Node->find(k,height-1);
 			btree_->node_cache_.unfix_node((node_bid_type)found_bid);
 			
 			return result;
@@ -490,6 +550,39 @@ public:
 
 		}
 		
+		const_iterator lower_bound(const key_type & k, unsigned height) const
+		{
+			value_type Key2Search(k,bid_type());
+			
+			block_iterator it = 
+				std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
+				
+			assert(it != (block_->begin() + size()));
+				
+			bid_type found_bid = it->second;
+			
+			if(height == 2) // found_bid points to a leaf
+			{
+				STXXL_VERBOSE1("Searching lower bound in a leaf");
+				leaf_type const * Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)found_bid,true);
+				assert(Leaf);
+				const_iterator result = Leaf->lower_bound(k);
+				btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+				
+				return result;
+			}
+			
+			// found_bid points to a node
+			STXXL_VERBOSE1("Searching lower bound in a node");
+			node_type const * Node = btree_->node_cache_.get_const_node((node_bid_type)found_bid,true);
+			assert(Node);
+			const_iterator result = Node->lower_bound(k,height-1);
+			btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+			
+			return result;
+
+		}
+		
 		iterator upper_bound(const key_type & k, unsigned height)
 		{
 			value_type Key2Search(k,bid_type());
@@ -517,6 +610,39 @@ public:
 			node_type * Node = btree_->node_cache_.get_node((node_bid_type)found_bid,true);
 			assert(Node);
 			iterator result = Node->upper_bound(k,height-1);
+			btree_->node_cache_.unfix_node((node_bid_type)found_bid);
+			
+			return result;
+
+		}
+		
+		const_iterator upper_bound(const key_type & k, unsigned height) const
+		{
+			value_type Key2Search(k,bid_type());
+			
+			block_iterator it = 
+				std::upper_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
+				
+			assert(it != (block_->begin() + size()));
+				
+			bid_type found_bid = it->second;
+			
+			if(height == 2) // found_bid points to a leaf
+			{
+				STXXL_VERBOSE1("Searching upper bound in a leaf");
+				leaf_type const * Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)found_bid,true);
+				assert(Leaf);
+				const_iterator result = Leaf->upper_bound(k);
+				btree_->leaf_cache_.unfix_node((leaf_bid_type)found_bid);
+				
+				return result;
+			}
+			
+			// found_bid points to a node
+			STXXL_VERBOSE1("Searching upper bound in a node");
+			node_type const * Node = btree_->node_cache_.get_const_node((node_bid_type)found_bid,true);
+			assert(Node);
+			const_iterator result = Node->upper_bound(k,height-1);
 			btree_->node_cache_.unfix_node((node_bid_type)found_bid);
 			
 			return result;

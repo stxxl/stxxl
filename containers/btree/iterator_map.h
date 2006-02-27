@@ -56,10 +56,31 @@ namespace btree
 		typedef std::multimap<Key,iterator_base *,KeyCmp> multimap_type;
 		
 		multimap_type It2Addr_;
+		btree_type * btree_;
+		
 		typedef typename multimap_type::value_type pair_type;
 		typedef typename multimap_type::iterator mmiterator_type;
 		
+		iterator_map(); // forbidden
+		iterator_map(const iterator_map &); // forbidden
+		iterator_map & operator = (const iterator_map &); // forbidden
+		
+		
+		// changes btree pointer in all contained iterators
+		void change_btree_pointers(btree_type * b)
+		{
+			mmiterator_type it = It2Addr_.begin();
+			for(;it!=It2Addr_.end();++it)
+			{
+				(it->second)->btree_ = b;
+			}
+		}
+		
 	public:
+		
+		iterator_map(btree_type * b): btree_(b)
+		{
+		}
 			
 		void register_iterator(iterator_base & it)
 		{
@@ -119,10 +140,29 @@ namespace btree
 			for(;it!=It2Addr_.end();++it)
 				(it->second)->make_invalid();
 		}
+		
+		void swap(iterator_map & obj)
+		{
+			std::swap(It2Addr_,obj.It2Addr_);
+			change_btree_pointers(btree_);
+			obj.change_btree_pointers(obj.btree_);
+		}
+		
 	};
 		
 }
 
 __STXXL_END_NAMESPACE
+
+
+namespace std
+{
+	template <class BTreeType>
+	void swap( stxxl::btree::iterator_map<BTreeType> & a,
+					stxxl::btree::iterator_map<BTreeType> & b)
+	{
+		a.swap(b);
+	}
+}
 
 #endif /* _ITERATOR_MAP_H */
