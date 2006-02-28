@@ -112,27 +112,28 @@ namespace btree
 				return bid != obj.bid || pos != obj.pos || btree_!= obj.btree_;
 			}
 			
-			btree_iterator_base & operator ++ ()
+			btree_iterator_base & increment ()
 			{
 				assert(btree_);
 				bid_type cur_bid = bid;
-				typename btree_type::leaf_type *Leaf = btree_->leaf_cache_.get_node(bid,true);
+				typename btree_type::leaf_type const * Leaf = btree_->leaf_cache_.get_const_node(bid,true);
 				assert(Leaf);
 				Leaf->increment_iterator(*this);
 				btree_->leaf_cache_.unfix_node(cur_bid);
 				return *this;
 			}
 			
-			btree_iterator_base & operator -- ()
+			btree_iterator_base & decrement ()
 			{
 				assert(btree_);
 				bid_type cur_bid = bid;
-				typename btree_type::leaf_type *Leaf = btree_->leaf_cache_.get_node(bid,true);
+				typename btree_type::leaf_type const *Leaf = btree_->leaf_cache_.get_const_node(bid,true);
 				assert(Leaf);
 				Leaf->decrement_iterator(*this);
 				btree_->leaf_cache_.unfix_node(cur_bid);
 				return *this;
 			}
+			
 			
 	public:	
 			virtual ~btree_iterator_base()
@@ -197,13 +198,13 @@ namespace btree
 			btree_iterator & operator ++ ()
 			{
 				assert(*this != btree_iterator_base<btree_type>::btree_->end());
-				btree_iterator_base<btree_type>::operator++();
+				btree_iterator_base<btree_type>::increment();
 				return *this;
 			}
 			
 			btree_iterator & operator -- ()
 			{
-				btree_iterator_base<btree_type>::operator--();
+				btree_iterator_base<btree_type>::decrement();
 				return *this;
 			}
 			
@@ -211,14 +212,14 @@ namespace btree
 			{
 				assert(*this != btree_iterator_base<btree_type>::btree_->end());
 				btree_iterator result(*this);
-				btree_iterator_base<btree_type>::operator++();
+				btree_iterator_base<btree_type>::increment();
 				return result;
 			}
 			
 			btree_iterator operator -- (int )
 			{
 				btree_iterator result(*this);
-				btree_iterator_base<btree_type>::operator--();
+				btree_iterator_base<btree_type>::decrement();
 				return result;
 			}
 
@@ -280,6 +281,17 @@ namespace btree
 				return &(const_access());
 			}
 			
+			
+			bool operator == (const iterator & obj) const
+			{
+				return btree_iterator_base<btree_type>::operator ==(obj);
+			}
+			
+			bool operator != (const iterator & obj) const
+			{
+				return btree_iterator_base<btree_type>::operator !=(obj);
+			}
+			
 			bool operator == (const btree_const_iterator & obj) const
 			{
 				return btree_iterator_base<btree_type>::operator ==(obj);
@@ -293,13 +305,13 @@ namespace btree
 			btree_const_iterator & operator ++ ()
 			{
 				assert(*this != btree_iterator_base<btree_type>::btree_->end());
-				btree_iterator_base<btree_type>::operator++();
+				btree_iterator_base<btree_type>::increment();
 				return *this;
 			}
 			
 			btree_const_iterator & operator -- ()
 			{
-				btree_iterator_base<btree_type>::operator--();
+				btree_iterator_base<btree_type>::decrement();
 				return *this;
 			}
 			
@@ -307,14 +319,14 @@ namespace btree
 			{
 				assert(*this != btree_iterator_base<btree_type>::btree_->end());
 				btree_const_iterator result(*this);
-				btree_iterator_base<btree_type>::operator++();
+				btree_iterator_base<btree_type>::increment();
 				return result;
 			}
 			
 			btree_const_iterator operator -- (int )
 			{
 				btree_const_iterator result(*this);
-				btree_iterator_base<btree_type>::operator--();
+				btree_iterator_base<btree_type>::decrement();
 				return result;
 			}
 
@@ -333,14 +345,14 @@ namespace btree
 	inline bool operator == (const btree_iterator<BTreeType> & a,
 										const btree_const_iterator<BTreeType> & b)
 	{
-		return b == a;
+		return a.btree_iterator_base<BTreeType>::operator ==(b);
 	}
 	
 	template <class BTreeType>
 	inline bool operator != (const btree_iterator<BTreeType> & a,
 										const btree_const_iterator<BTreeType> & b)
 	{
-		return b != a;
+		return a.btree_iterator_base<BTreeType>::operator !=(b);
 	}
 	
 }

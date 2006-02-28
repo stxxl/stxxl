@@ -1,10 +1,15 @@
-all: test_btree
+all: test_const_scan
 
 include ../../make.settings
 
 DEPENDENCIES +=  btree.h leaf.h iterator.h iterator_map.h node_cache.h
 
-STXXL_COMPILER_OPTIONS+= -DSTXXL_VERBOSE_LEVEL=0 
+STXXL_COMPILER_OPTIONS+= -DSTXXL_VERBOSE_LEVEL=0  -O3 -DNDEBUG -pg
+STXXL_LINKER_OPTIONS +=  -pg
+
+test_const_scan: $(DEPENDENCIES) test_const_scan.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_const_scan.cpp
+	$(LINKER) test_const_scan.$(OBJEXT) $(OUT)test_const_scan.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_corr_insert_erase: $(DEPENDENCIES) test_corr_insert_erase.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_corr_insert_erase.cpp

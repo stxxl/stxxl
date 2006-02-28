@@ -16,7 +16,7 @@ struct comp_type : public std::less<int>
 	static int max_value() { return std::numeric_limits<int>::max(); }
 };
 						
-typedef stxxl::btree::btree<int,double,comp_type,2,3,stxxl::SR> btree_type;
+typedef stxxl::btree::btree<int,double,comp_type,10,10,stxxl::SR> btree_type;
 
 std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 {
@@ -24,6 +24,8 @@ std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 	return o;
 }
 
+#define node_cache_size (25*1024*1024)
+#define leaf_cache_size (25*1024*1024)
 
 int main(int argc, char * argv [])
 {
@@ -34,7 +36,7 @@ int main(int argc, char * argv [])
 		return 1;
 	}
 	
-	btree_type BTree1(1024*16,1024*16);
+	btree_type BTree1(node_cache_size,leaf_cache_size);
 		
 	const unsigned nins = atoi(argv[1]);
 	
@@ -172,15 +174,15 @@ int main(int argc, char * argv [])
 	
 	STXXL_MSG("Size of map: "<<BTree1.size())
 	
-	btree_type BTree2(comp_type(),1024*16,1024*16);
+	btree_type BTree2(comp_type(),node_cache_size,leaf_cache_size);
 	
 	STXXL_MSG("Construction of BTree3 from BTree1 that has "<< BTree1.size()<<" elements")
-	btree_type BTree3(BTree1.begin(),BTree1.end(),comp_type(),1024*16,1024*16);
+	btree_type BTree3(BTree1.begin(),BTree1.end(),comp_type(),node_cache_size,leaf_cache_size);
 	
 	assert(BTree3 == BTree1);
 	
 	STXXL_MSG("Bulk construction of BTree4 from BTree1 that has "<< BTree1.size()<<" elements")
-	btree_type BTree4(BTree1.begin(),BTree1.end(),comp_type(),1024*16,1024*16,true);
+	btree_type BTree4(BTree1.begin(),BTree1.end(),comp_type(),node_cache_size,leaf_cache_size,true);
 	
 	STXXL_MSG("Size of BTree1: "<<BTree1.size())
 	STXXL_MSG("Size of BTree4: "<<BTree4.size())
@@ -211,7 +213,7 @@ int main(int argc, char * argv [])
 	assert(BTree1.empty());
 	
 	// a copy of BTree3
-	btree_type BTree5(BTree3.begin(),BTree3.end(),comp_type(),1024*16,1024*16,true);
+	btree_type BTree5(BTree3.begin(),BTree3.end(),comp_type(),node_cache_size,leaf_cache_size,true);
 	assert(BTree5 == BTree3);
 	
 	btree_type::iterator b3 = BTree3.begin();
@@ -245,6 +247,30 @@ int main(int argc, char * argv [])
 	std::pair<btree_type::const_iterator,btree_type::const_iterator> cit_pair = CBTree3.equal_range(1);
 	
 	assert(CBTree3.max_size() >= CBTree3.size());
+	
+	double sum ;
+	
+	STXXL_MSG(*stxxl::stats::get_instance());
+	
+	stxxl::timer Timer2;
+	Timer2.start();
+	cit = BTree5.begin();
+	for(;cit!=BTree5.end();++cit)
+		sum += cit->second;
+	Timer2.stop();
+	STXXL_MSG("Scanning with const iterator: "<<Timer2.mseconds()<<" msec")
+	
+	STXXL_MSG(*stxxl::stats::get_instance());
+	
+	stxxl::timer Timer1;
+	Timer1.start();
+	it = BTree5.begin();
+	for(;it!=BTree5.end();++it)
+		sum += it->second;
+	Timer1.stop();
+	STXXL_MSG("Scanning with non const iterator: "<<Timer1.mseconds()<<" msec")
+	
+	STXXL_MSG(*stxxl::stats::get_instance());
 	
 	STXXL_MSG("All tests passed successufully")
 	

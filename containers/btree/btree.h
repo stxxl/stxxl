@@ -277,7 +277,7 @@ namespace btree
 					if(Leaf->size() == Leaf->max_nelements())
 					{
 						// overflow, need a new block
-						Bids.push_back(key_bid_pair(Leaf->back().first,NewBid));
+						Bids.push_back(key_bid_pair(Leaf->back().first,(node_bid_type)NewBid));
 						
 						leaf_type * NewLeaf = leaf_cache_.get_new_node(NewBid);
 						assert(NewLeaf);
@@ -296,7 +296,7 @@ namespace btree
 			// balance the last leaf
 			if(Leaf->underflows() && !Bids.empty())
 			{
-				leaf_type * LeftLeaf = leaf_cache_.get_node(Bids.back().second);
+				leaf_type * LeftLeaf = leaf_cache_.get_node((leaf_bid_type)(Bids.back().second));
 				assert(LeftLeaf);
 				const key_type NewSplitter = Leaf->balance(*LeftLeaf);
 				Bids.back().first = NewSplitter;
@@ -307,7 +307,7 @@ namespace btree
 			
 			end_iterator = Leaf->end(); // initialize end() iterator
 			
-			Bids.push_back(key_bid_pair(key_compare::max_value(),NewBid));
+			Bids.push_back(key_bid_pair(key_compare::max_value(),(node_bid_type)NewBid));
 			
 						
 			while(Bids.size() > max_node_size)

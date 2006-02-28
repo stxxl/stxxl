@@ -197,6 +197,15 @@ public:
 				return block_->info.pred;
 			}
 			
+			const bid_type & succ() const
+			{
+				return block_->info.succ;
+			}
+			const bid_type & pred() const 
+			{
+				return block_->info.pred;
+			}
+			
 			/*
 			iterator begin() { return block_->begin(); };
 			const_iterator begin() const { return block_->begin(); };
@@ -388,7 +397,7 @@ public:
 				return iterator(btree_,my_bid(),size());
 			}
 			
-			void increment_iterator(iterator_base & it)
+			void increment_iterator(iterator_base & it) const
 			{
 				assert(it.bid == my_bid());
 				assert(it.pos != size());
@@ -406,7 +415,7 @@ public:
 				btree_->iterator_map_.register_iterator(it);
 			}
 			
-			void decrement_iterator(iterator_base & it)
+			void decrement_iterator(iterator_base & it) const
 			{
 				assert(it.bid == my_bid());
 				
@@ -417,7 +426,7 @@ public:
 					assert(pred().valid());
 					
 					it.bid = pred();
-					normal_leaf * PredLeaf = btree_->leaf_cache_.get_node(pred());
+					normal_leaf const * PredLeaf = btree_->leaf_cache_.get_const_node(pred());
 					assert(PredLeaf);
 					it.pos = PredLeaf->size() - 1;
 					
