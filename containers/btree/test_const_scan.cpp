@@ -25,7 +25,7 @@ std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 }
 
 #define node_cache_size (25*1024*1024)
-#define leaf_cache_size (1*1024*1024)
+#define leaf_cache_size (25*1024*1024)
 
 void NC(btree_type & BTree)
 {

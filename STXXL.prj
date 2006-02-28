@@ -130,7 +130,8 @@ module.include.files=\
 	containers/btree/node.h\
 	containers/btree/node_cache.h\
 	containers/btree/root_node.h\
-	containers/btree/btree_pager.h
+	containers/btree/btree_pager.h\
+	containers/map.h
 
 module.source.name=.
 module.source.type=

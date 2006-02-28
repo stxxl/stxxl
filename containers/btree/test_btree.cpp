@@ -248,6 +248,10 @@ int main(int argc, char * argv [])
 	
 	assert(CBTree3.max_size() >= CBTree3.size());
 	
+	
+	CBTree3.key_comp();
+	CBTree3.value_comp();
+	
 	double sum ;
 	
 	STXXL_MSG(*stxxl::stats::get_instance());

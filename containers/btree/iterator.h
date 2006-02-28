@@ -19,6 +19,10 @@ namespace btree
 {
 	template <class BTreeType>
 	class iterator_map;
+	template <class BTreeType>
+	class btree_iterator;
+	template <class BTreeType>
+	class btree_const_iterator;
 	template <class KeyType_, class DataType_, class KeyCmp_, unsigned LogNElem_, class BTreeType>
 	class normal_leaf;
 	
@@ -36,6 +40,13 @@ namespace btree
 			template <class KeyType_, class DataType_, 
 							class KeyCmp_, unsigned LogNElem_, class BTreeType__>
 			friend class normal_leaf;
+				
+			template <class BTreeType_>
+			friend bool operator == (const btree_iterator<BTreeType_> & a,
+													const btree_const_iterator<BTreeType_> & b);
+			template <class BTreeType_>
+			friend bool operator != (const btree_iterator<BTreeType_> & a,
+													const btree_const_iterator<BTreeType_> & b);
 		
 		protected:
 			btree_type * btree_;

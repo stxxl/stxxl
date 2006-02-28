@@ -64,7 +64,25 @@ public:
   typedef NilCase result;
 };
 
+template <unsigned Input>
+class LOG
+{
+public:
+	enum 
+	{
+		value = LOG<Input/2>::value +1
+	};
+};
 
+template <>
+class LOG<0>
+{
+public:
+	enum 
+	{
+		value = 0
+	};
+};
 
 __STXXL_END_NAMESPACE
  

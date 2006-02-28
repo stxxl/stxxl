@@ -67,7 +67,7 @@ private:
 			normal_leaf();
 			normal_leaf(const normal_leaf &);
 			normal_leaf & operator = (const normal_leaf &);
-
+public:
 			struct value_compare : public std::binary_function<value_type, value_type, bool> 
 			{
 					key_compare comp;
@@ -79,7 +79,7 @@ private:
 						return comp(x.first, y.first);
 					}
 			};
-
+private:
 			block_type * block_;
 			btree_type * btree_;
 			const unsigned min_nelements_;

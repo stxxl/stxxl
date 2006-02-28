@@ -23,10 +23,11 @@ struct cmp: public std::less<key_type>
 
 #define CACHE_ELEMENTS (BLOCK_SIZE*CACHE_SIZE/(sizeof(key_type) + sizeof(data_type)))
 
-typedef stxxl::map<key_type, data_type , cmp, BLOCK_SIZE, CACHE_SIZE > map_type;
+typedef stxxl::map<key_type, data_type , cmp, BLOCK_SIZE, BLOCK_SIZE > map_type;
 
 int main()
 {
+/*
 	stxxl::stats * bm = stxxl::stats::get_instance();
 	STXXL_MSG(*bm)
 
@@ -64,7 +65,7 @@ int main()
 		bm->reset();
 	}
 	
-	
+*/	
 	
 	return 0;	
 }

@@ -48,11 +48,13 @@ namespace btree
 		typedef PDAllocStrategy alloc_strategy_type;
 			
 		typedef stxxl::uint64	size_type;
+		typedef stxxl::int64 difference_type;
 		typedef std::pair<const key_type,data_type> value_type;
 		typedef value_type & reference;
 		typedef const value_type & const_reference;
 		typedef value_type * pointer;
 		typedef value_type const * const_pointer;
+		
 			
 		// leaf type declarations
 		typedef normal_leaf<key_type,data_type,key_compare,log_leaf_size,SelfType> leaf_type;
@@ -74,6 +76,7 @@ namespace btree
 		typedef node_cache<node_type,SelfType> node_cache_type;
 		friend class node_cache<node_type,SelfType>;
 		
+		typedef typename leaf_type::value_compare value_compare;
 		
 	private:
 	
@@ -871,7 +874,15 @@ namespace btree
 		
 		}
 		
-		// invalidates all iterators
+		key_compare key_comp() const 
+		{ 
+			return key_compare_; 
+		}
+		value_compare value_comp() const 
+		{ 
+			return value_compare(key_compare_); 
+		}
+		
 		void swap(btree & obj)
 		{
 			std::swap(key_compare_,obj.key_compare_); // OK
