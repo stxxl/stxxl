@@ -175,7 +175,10 @@ module.source.files=\
 	containers/btree/test_leaf.cpp\
 	containers/btree/test_btree.cpp\
 	containers/btree/test_node_cache.cpp\
-	containers/btree/test_corr_insert_scan.cpp
+	containers/btree/test_corr_insert_scan.cpp\
+	containers/btree/test_corr_insert_find.cpp\
+	containers/btree/test_corr_insert_erase.cpp\
+	containers/btree/test_const_scan.cpp
 
 module.pixmap.name=.
 module.pixmap.type=

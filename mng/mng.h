@@ -248,7 +248,7 @@ __STXXL_BEGIN_NAMESPACE
 		typedef const T_ & const_reference;
 		typedef type * pointer;
 		typedef pointer iterator;
-		typedef const pointer const_iterator;
+		typedef type const * const_iterator;
 		
 		enum { has_filler = (RawSize_ != sizeof(block_w_info<T_,RawSize_,NRef_,InfoType_>) ) };
 		
