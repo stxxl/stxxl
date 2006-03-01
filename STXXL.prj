@@ -131,7 +131,8 @@ module.include.files=\
 	containers/btree/node_cache.h\
 	containers/btree/root_node.h\
 	containers/btree/btree_pager.h\
-	containers/map.h
+	containers/map.h\
+	containers/map_test_handlers.h
 
 module.source.name=.
 module.source.type=
@@ -172,14 +173,14 @@ module.source.files=\
 	algo/test_stable_ksort.cpp\
 	utils/pq_param.cpp\
 	utils/createdisks.cpp\
-	containers/pmbtree/test_leaf.cpp\
 	containers/btree/test_leaf.cpp\
 	containers/btree/test_btree.cpp\
 	containers/btree/test_node_cache.cpp\
 	containers/btree/test_corr_insert_scan.cpp\
 	containers/btree/test_corr_insert_find.cpp\
 	containers/btree/test_corr_insert_erase.cpp\
-	containers/btree/test_const_scan.cpp
+	containers/btree/test_const_scan.cpp\
+	containers/test_map_random.cpp
 
 module.pixmap.name=.
 module.pixmap.type=

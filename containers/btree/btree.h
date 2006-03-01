@@ -59,6 +59,7 @@ namespace btree
 		// leaf type declarations
 		typedef normal_leaf<key_type,data_type,key_compare,log_leaf_size,SelfType> leaf_type;
 		friend class normal_leaf<key_type,data_type,key_compare,log_leaf_size,SelfType>;
+		typedef typename leaf_type::block_type leaf_block_type;
 		typedef typename leaf_type::bid_type leaf_bid_type;
 		typedef node_cache<leaf_type,SelfType> leaf_cache_type;
 		friend class node_cache<leaf_type,SelfType>;
@@ -449,6 +450,8 @@ namespace btree
 				
 				insert_into_root(Splitter);
 				
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return result;
 			}
 			
@@ -467,8 +470,10 @@ namespace btree
 				
 			insert_into_root(Splitter);
 				
-			return result;
-				
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
+			
+			return result;	
 		}
 		
 		iterator begin()
@@ -479,8 +484,11 @@ namespace btree
 			if(height_ == 2) // 'it' points to a leaf
 			{
 				STXXL_VERBOSE1("btree: retrieveing begin() from the first leaf");
-				leaf_type * Leaf = leaf_cache_.get_node((leaf_bid_type)it->second,true);
+				leaf_type * Leaf = leaf_cache_.get_node((leaf_bid_type)it->second);
 				assert(Leaf);
+				
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return Leaf->begin();
 			}
 			
@@ -490,6 +498,10 @@ namespace btree
 			assert(Node);
 			iterator result = Node->begin(height_-1);
 			node_cache_.unfix_node((node_bid_type)it->second);
+			
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
+			
 			return result;	
 		}
 		
@@ -501,8 +513,10 @@ namespace btree
 			if(height_ == 2) // 'it' points to a leaf
 			{
 				STXXL_VERBOSE1("btree: retrieveing begin() from the first leaf");
-				leaf_type const * Leaf = leaf_cache_.get_const_node((leaf_bid_type)it->second,true);
+				leaf_type const * Leaf = leaf_cache_.get_const_node((leaf_bid_type)it->second);
 				assert(Leaf);
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return Leaf->begin();
 			}
 			
@@ -512,6 +526,8 @@ namespace btree
 			assert(Node);
 			const_iterator result = Node->begin(height_-1);
 			node_cache_.unfix_node((node_bid_type)it->second);
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			return result;	
 		}
 		
@@ -543,6 +559,8 @@ namespace btree
 				iterator result = Leaf->find(k);
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
 				assert(result == end() || result->first == k);
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return result;
 			}
 			
@@ -554,6 +572,8 @@ namespace btree
 			node_cache_.unfix_node((node_bid_type)it->second);
 			
 			assert(result == end() || result->first == k);
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			return result;
 		}
 		
@@ -570,6 +590,8 @@ namespace btree
 				const_iterator result = Leaf->find(k);
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
 				assert(result == end() || result->first == k);
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return result;
 			}
 			
@@ -581,6 +603,8 @@ namespace btree
 			node_cache_.unfix_node((node_bid_type)it->second);
 			
 			assert(result == end() || result->first == k);
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			return result;
 		}
 		
@@ -596,6 +620,8 @@ namespace btree
 				assert(Leaf);
 				iterator result = Leaf->lower_bound(k);
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return result;
 			}
 			
@@ -606,6 +632,8 @@ namespace btree
 			iterator result = Node->lower_bound(k,height_-1);
 			node_cache_.unfix_node((node_bid_type)it->second);
 			
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			return result;
 		}
 		
@@ -621,6 +649,9 @@ namespace btree
 				assert(Leaf);
 				const_iterator result = Leaf->lower_bound(k);
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return result;
 			}
 			
@@ -631,6 +662,8 @@ namespace btree
 			const_iterator result = Node->lower_bound(k,height_-1);
 			node_cache_.unfix_node((node_bid_type)it->second);
 			
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			return result;
 		}
 		
@@ -646,6 +679,9 @@ namespace btree
 				assert(Leaf);
 				iterator result = Leaf->upper_bound(k);
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return result;
 			}
 			
@@ -656,6 +692,8 @@ namespace btree
 			iterator result = Node->upper_bound(k,height_-1);
 			node_cache_.unfix_node((node_bid_type)it->second);
 			
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			return result;
 		}
 		
@@ -671,6 +709,9 @@ namespace btree
 				assert(Leaf);
 				const_iterator result = Leaf->upper_bound(k);
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return result;
 			}
 			
@@ -681,6 +722,8 @@ namespace btree
 			const_iterator result = Node->upper_bound(k,height_-1);
 			node_cache_.unfix_node((node_bid_type)it->second);
 			
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			return result;
 		}
 		
@@ -693,6 +736,9 @@ namespace btree
 			
 			iterator u = l;
 			++u; // only one element ==k can exist
+			
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			
 			return std::pair<iterator,iterator>(l,u); // then upper_bound == (lower_bound+1)
 		}
@@ -707,6 +753,8 @@ namespace btree
 			const_iterator u = l;
 			++u; // only one element ==k can exist
 			
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			return std::pair<const_iterator,const_iterator>(l,u); // then upper_bound == (lower_bound+1)
 		}
 		
@@ -722,11 +770,17 @@ namespace btree
 				size_type result = Leaf->erase(k);
 				size_ -= result;
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
+				
 				if((!Leaf->underflows()) || root_node_.size() == 1)
 					return result;	// no underflow or root has a special degree 1 (too few elements)
 				
-				STXXL_VERBOSE1("Fusing or rebalancing a leaf")
+				STXXL_VERBOSE1("btree: Fusing or rebalancing a leaf")
 				fuse_or_balance(it,leaf_cache_);
+				
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				
 				return result;
 			}
@@ -739,6 +793,8 @@ namespace btree
 			size_type result = Node->erase(k,height_-1);
 			size_ -= result;
 			node_cache_.unfix_node((node_bid_type)it->second);
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 			if(!Node->underflows())
 				return result;	// no underflow happened
 			
@@ -763,6 +819,9 @@ namespace btree
 				--height_;
 				STXXL_MSG("btree Decreasing height to "<<height_)
 			}
+			
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 				
 			return result;
 		}
@@ -776,7 +835,14 @@ namespace btree
 		
 		void erase(iterator pos)
 		{
+			assert(pos != end());
+			#ifndef NDEBUG
+			size_type old_size = size();
+			#endif
+			
 			erase(pos->first);
+			
+			assert(size() == old_size-1);
 		}
 		
 		iterator insert(iterator pos, const value_type& x)
@@ -794,6 +860,8 @@ namespace btree
 			height_ = 2,
 			
 			create_empty_leaf();
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 		}
 		
 		template <class InputIterator>
@@ -829,10 +897,14 @@ namespace btree
 			{
 				create_empty_leaf();
 				insert(b,e);
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return;
 			}
 			
 			bulk_construction(b,e);
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 		}
 		
 		
@@ -858,10 +930,14 @@ namespace btree
 			{
 				create_empty_leaf();
 				insert(b,e);
+				assert(leaf_cache_.nfixed() == 0);
+				assert(node_cache_.nfixed() == 0);
 				return;
 			}
 			
 			bulk_construction(b,e);
+			assert(leaf_cache_.nfixed() == 0);
+			assert(node_cache_.nfixed() == 0);
 		}
 				
 		void erase(iterator first, iterator last)

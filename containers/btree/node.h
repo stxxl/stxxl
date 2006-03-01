@@ -238,13 +238,6 @@ public:
 			unsigned max_nelements() const { return max_nelements_; }
 			unsigned min_nelements() const { return min_nelements_; }
 			
-			/*
-			iterator begin() { return block_->begin(); };
-			const_iterator begin() const { return block_->begin(); };
-			iterator end() { return block_->begin() + block_->info.cur_size; };
-			const_iterator end() const { return block_->begin() + block_->info.cur_size; };
-			*/
-			
 			template <class InputIterator>
 			normal_node(InputIterator begin_, InputIterator end_,
 				btree_type * btree__,
@@ -270,28 +263,6 @@ public:
 				assert(stxxl::is_sorted(block_->begin(),block_->begin() + new_size, vcmp_));
 				block_->info.cur_size = new_size;
 			}
-			
-			/*
-			
-			iterator lower_bound(const key_type & Key)
-			{
-				return std::lower_bound(begin(),end(),vcmp_);
-			}
-			const_iterator lower_bound(const key_type & Key) const
-			{
-				return std::lower_bound(begin(),end(),vcmp_);
-			}
-			
-			iterator upper_bound(const key_type & Key)
-			{
-				return std::upper_bound(begin(),end(),vcmp_);
-			}
-			
-			const_iterator upper_bound(const key_type & Key) const
-			{
-				return std::upper_bound(begin(),end(),vcmp_);
-			}
-			*/
 			
 			unsigned size() const
 			{
@@ -414,7 +385,7 @@ public:
 				{
 					assert(size() > 1);
 					STXXL_VERBOSE1("btree::node retrieveing begin() from the first leaf");
-					leaf_type * Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)FirstBid,true);
+					leaf_type * Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)FirstBid);
 					assert(Leaf);
 					return Leaf->begin();
 				}
@@ -436,7 +407,7 @@ public:
 				{
 					assert(size() > 1);
 					STXXL_VERBOSE1("btree::node retrieveing begin() from the first leaf");
-					leaf_type const * Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)FirstBid,true);
+					leaf_type const * Leaf = btree_->leaf_cache_.get_const_node((leaf_bid_type)FirstBid);
 					assert(Leaf);
 					return Leaf->begin();
 				}
@@ -520,7 +491,7 @@ public:
 		iterator lower_bound(const key_type & k, unsigned height)
 		{
 			value_type Key2Search(k,bid_type());
-			
+			assert(!vcmp_(back(),Key2Search));
 			block_iterator it = 
 				std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
 				
@@ -553,7 +524,7 @@ public:
 		const_iterator lower_bound(const key_type & k, unsigned height) const
 		{
 			value_type Key2Search(k,bid_type());
-			
+			assert(!vcmp_(back(),Key2Search));
 			block_iterator it = 
 				std::lower_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
 				
@@ -586,7 +557,7 @@ public:
 		iterator upper_bound(const key_type & k, unsigned height)
 		{
 			value_type Key2Search(k,bid_type());
-			
+			assert(vcmp_(Key2Search,back()));
 			block_iterator it = 
 				std::upper_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
 				
@@ -619,7 +590,7 @@ public:
 		const_iterator upper_bound(const key_type & k, unsigned height) const
 		{
 			value_type Key2Search(k,bid_type());
-			
+			assert(vcmp_(Key2Search,back()));
 			block_iterator it = 
 				std::upper_bound(block_->begin(),block_->begin() + size(), Key2Search ,vcmp_);
 				

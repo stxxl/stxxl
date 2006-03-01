@@ -106,6 +106,18 @@ namespace btree
 				return nodes_.size();
 			}
 			
+			// returns the number of fixed pages
+			unsigned nfixed() const 
+			{
+				typename BID2node_type::const_iterator i = BID2node_.begin();
+				unsigned cnt = 0;
+				for(;i!=BID2node_.end();++i)
+				{
+					if(fixed_[(*i).second]) ++cnt;
+				}
+				return cnt;
+			}
+			
 			~node_cache()
 			{
 				STXXL_VERBOSE1("btree::node_cache deconstructor addr="<<this)

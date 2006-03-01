@@ -20,8 +20,8 @@ namespace btree
 template <	class KeyType,
 					class DataType,
 					class CompareType,
-					unsigned RawNodeSize,
-					unsigned RawLeafSize,
+					unsigned RawNodeSize = 16*1024, // 16 KBytes default
+					unsigned RawLeafSize = 128*1024, // 128 KBytes default
 					class PDAllocStrategy = stxxl::SR
 				>
 class map 
@@ -41,8 +41,12 @@ class map
 	map& operator=(const map&); // forbidden
 	
 public:
+	typedef typename impl_type::node_block_type node_block_type;
+	typedef typename impl_type::leaf_block_type leaf_block_type;
+
 	typedef typename impl_type::key_type key_type;
 	typedef typename impl_type::data_type data_type;
+	typedef typename impl_type::data_type mapped_type;
 	typedef typename impl_type::value_type value_type;
 	typedef typename impl_type::key_compare key_compare;
 	typedef typename impl_type::value_compare value_compare;
@@ -63,6 +67,18 @@ public:
 	bool empty() const { return Impl.empty(); }
 	key_compare key_comp() const { return Impl.key_comp(); }
 	value_compare value_comp() const { return Impl.value_comp(); }
+	
+	map(	unsigned node_cache_size_in_bytes,
+				unsigned leaf_cache_size_in_bytes
+				) : Impl(node_cache_size_in_bytes,leaf_cache_size_in_bytes)
+	{}
+	
+	map(	const key_compare & c_,
+				unsigned node_cache_size_in_bytes,
+				unsigned leaf_cache_size_in_bytes
+				) : Impl(c_,node_cache_size_in_bytes,leaf_cache_size_in_bytes)
+	{}		
+	
 	
 	template <class InputIterator>
 	map(	InputIterator b,

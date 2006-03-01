@@ -102,6 +102,7 @@ private:
 				{
 					NewLeaf->pred() = pred();
 					PredLeaf = btree_->leaf_cache_.get_node(pred());
+					assert(PredLeaf);
 					assert(vcmp_(PredLeaf->back(),front()));
 					PredLeaf->succ() = NewBid;
 				}
@@ -206,13 +207,6 @@ public:
 				return block_->info.pred;
 			}
 			
-			/*
-			iterator begin() { return block_->begin(); };
-			const_iterator begin() const { return block_->begin(); };
-			iterator end() { return block_->begin() + block_->info.cur_size; };
-			const_iterator end() const { return block_->begin() + block_->info.cur_size; };
-			*/
-			
 			template <class InputIterator>
 			normal_leaf(InputIterator begin_, InputIterator end_,
 				btree_type * btree__,
@@ -239,34 +233,12 @@ public:
 				block_->info.cur_size = new_size;
 			}
 			
-			/*
-			
-			iterator lower_bound(const key_type & Key)
-			{
-				return std::lower_bound(begin(),end(),vcmp_);
-			}
-			const_iterator lower_bound(const key_type & Key) const
-			{
-				return std::lower_bound(begin(),end(),vcmp_);
-			}
-			
-			iterator upper_bound(const key_type & Key)
-			{
-				return std::upper_bound(begin(),end(),vcmp_);
-			}
-			
-			const_iterator upper_bound(const key_type & Key) const
-			{
-				return std::upper_bound(begin(),end(),vcmp_);
-			}
-			*/
-			
 			unsigned size() const
 			{
 				return block_->info.cur_size;
 			}
 			
-			bid_type my_bid() const 
+			const bid_type & my_bid() const 
 			{
 				return block_->info.me;
 			}
@@ -462,8 +434,15 @@ public:
 			iterator lower_bound(const key_type & k)
 			{
 				value_type searchVal(k,data_type());
+				
 				typename block_type::iterator lb = 
 					std::lower_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
+				
+				// lower_bound is in the succ block
+				if(lb == block_->begin()+size() && succ().valid()) 
+				{
+					return iterator(btree_,succ(),0); 
+				}
 				
 				return iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
@@ -474,6 +453,12 @@ public:
 				typename block_type::iterator lb = 
 					std::lower_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
 				
+				// lower_bound is in the succ block
+				if(lb == block_->begin()+size() && succ().valid()) 
+				{
+					return iterator(btree_,succ(),0); 
+				}
+				
 				return const_iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
 			
@@ -483,6 +468,12 @@ public:
 				typename block_type::iterator lb = 
 					std::upper_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
 				
+				// upper_bound is in the succ block
+				if(lb == block_->begin()+size() && succ().valid()) 
+				{
+					return iterator(btree_,succ(),0); 
+				}
+				
 				return iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
 			
@@ -491,6 +482,12 @@ public:
 				value_type searchVal(k,data_type());
 				typename block_type::iterator lb = 
 					std::upper_bound(block_->begin(),block_->begin()+size(),searchVal,vcmp_);
+				
+				// upper_bound is in the succ block
+				if(lb == block_->begin()+size() && succ().valid()) 
+				{
+					return const_iterator(btree_,succ(),0); 
+				}
 				
 				return const_iterator(btree_,my_bid(),lb - block_->begin()); 
 			}
@@ -512,6 +509,7 @@ public:
 				typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
 				for(;it2fix!=Iterators2Fix.end();++it2fix)
 				{
+					STXXL_VERBOSE2("btree::normal_leaf updating iterator "<<(*it2fix)<<" (pos--)")
 					btree_->iterator_map_.unregister_iterator(**it2fix);
 					--((*it2fix)->pos); // fixing iterators
 					btree_->iterator_map_.register_iterator(**it2fix);
@@ -524,6 +522,7 @@ public:
 			
 			void fuse(const normal_leaf & Src)
 			{
+				STXXL_VERBOSE1("btree::normal_leaf Fusing")
 				assert(vcmp_(Src.back(),front()));
 				const unsigned SrcSize = Src.size();
 				
@@ -542,6 +541,8 @@ public:
 				typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
 				for(;it2fix!=Iterators2Fix.end();++it2fix)
 				{
+					STXXL_VERBOSE2("btree::normal_leaf updating iterator "<<(*it2fix)<<
+						" (pos+"<<SrcSize<<")")
 					btree_->iterator_map_.unregister_iterator(**it2fix);
 					((*it2fix)->pos)+=SrcSize; // fixing iterators
 					btree_->iterator_map_.register_iterator(**it2fix);
@@ -552,16 +553,29 @@ public:
 				it2fix = Iterators2Fix.begin();
 				for(;it2fix!=Iterators2Fix.end();++it2fix)
 				{
+					STXXL_VERBOSE2("btree::normal_leaf updating iterator "<<(*it2fix)<<
+						" (bid="<<my_bid()<<")")
 					btree_->iterator_map_.unregister_iterator(**it2fix);
 					((*it2fix)->bid) = my_bid(); // fixing iterators
 					btree_->iterator_map_.register_iterator(**it2fix);
 				}
 				
 				block_->info.cur_size += SrcSize;
+				
+				// update links
+				pred() = Src.pred();
+				if(pred().valid())
+				{ // update successor link
+					normal_leaf * NewPred = btree_->leaf_cache_.get_node(pred());
+					assert(NewPred);
+					NewPred->succ() = my_bid();
+				}
 			}
 			
 			key_type balance(normal_leaf & Left)
 			{
+				STXXL_VERBOSE1("btree::normal_leaf Balancing leaves with bids "<<
+					Left.my_bid()<<" and "<<my_bid())
 				const unsigned TotalSize =Left.size() + size();
 				unsigned newLeftSize = TotalSize/2;
 				assert(newLeftSize <= Left.max_nelements());
@@ -586,21 +600,27 @@ public:
 					std::copy(	Left.block_->begin() + newLeftSize, 
 									Left.block_->begin() + Left.size(), block_->begin());
 						
-					std::vector<iterator_base *> Iterators2Fix;
-					btree_->iterator_map_.find(my_bid(),0,size(),Iterators2Fix);				
-					typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
-					for(;it2fix!=Iterators2Fix.end();++it2fix)
+					std::vector<iterator_base *> Iterators2Fix1;
+					std::vector<iterator_base *> Iterators2Fix2;
+					btree_->iterator_map_.find(my_bid(),0,size(),Iterators2Fix1);
+					btree_->iterator_map_.find(Left.my_bid(),newLeftSize,Left.size(),Iterators2Fix2);
+					
+					typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix1.begin();
+					for(;it2fix!=Iterators2Fix1.end();++it2fix)
 					{
+						STXXL_VERBOSE2("btree::normal_leaf updating iterator "<<(*it2fix)<<
+						" (pos+"<<nEl2Move<<")")
 						btree_->iterator_map_.unregister_iterator(**it2fix);
 						((*it2fix)->pos)+=nEl2Move; // fixing iterators
 						btree_->iterator_map_.register_iterator(**it2fix);
 					}
 					
-					Iterators2Fix.clear();
-					btree_->iterator_map_.find(Left.my_bid(),newLeftSize,Left.size(),Iterators2Fix);
-					it2fix = Iterators2Fix.begin();
-					for(;it2fix!=Iterators2Fix.end();++it2fix)
+					
+					it2fix = Iterators2Fix2.begin();
+					for(;it2fix!=Iterators2Fix2.end();++it2fix)
 					{
+						STXXL_VERBOSE2("btree::normal_leaf updating iterator "<<(*it2fix)<<
+						" (pos-"<<newLeftSize<<" bid="<< my_bid() <<")")
 						btree_->iterator_map_.unregister_iterator(**it2fix);
 						((*it2fix)->bid) = my_bid(); // fixing iterators
 						((*it2fix)->pos) -= newLeftSize; // fixing iterators
@@ -621,21 +641,27 @@ public:
 					std::copy(	block_->begin() + nEl2Move, 
 									block_->begin() + size(), block_->begin() );
 					
-					std::vector<iterator_base *> Iterators2Fix;
-					btree_->iterator_map_.find(my_bid(),nEl2Move,size(),Iterators2Fix);				
-					typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix.begin();
-					for(;it2fix!=Iterators2Fix.end();++it2fix)
+					std::vector<iterator_base *> Iterators2Fix1;
+					std::vector<iterator_base *> Iterators2Fix2;
+					btree_->iterator_map_.find(my_bid(),nEl2Move,size(),Iterators2Fix1);				
+					btree_->iterator_map_.find(my_bid(),0,nEl2Move-1,Iterators2Fix2);
+					
+					typename std::vector<iterator_base *>::iterator  it2fix = Iterators2Fix1.begin();
+					for(;it2fix!=Iterators2Fix1.end();++it2fix)
 					{
+						STXXL_VERBOSE2("btree::normal_leaf updating iterator "<<(*it2fix)<<
+							" (pos-"<<nEl2Move<<")")
 						btree_->iterator_map_.unregister_iterator(**it2fix);
 						((*it2fix)->pos) -= nEl2Move; // fixing iterators
 						btree_->iterator_map_.register_iterator(**it2fix);
 					}
 					
-					Iterators2Fix.clear();
-					btree_->iterator_map_.find(my_bid(),0,nEl2Move-1,Iterators2Fix);
-					it2fix = Iterators2Fix.begin();
-					for(;it2fix!=Iterators2Fix.end();++it2fix)
+					
+					it2fix = Iterators2Fix2.begin();
+					for(;it2fix!=Iterators2Fix2.end();++it2fix)
 					{
+						STXXL_VERBOSE2("btree::normal_leaf updating iterator "<<(*it2fix)<<
+						" (pos+"<<Left.size()<<" bid="<< Left.my_bid() <<")")
 						btree_->iterator_map_.unregister_iterator(**it2fix);
 						((*it2fix)->bid) = Left.my_bid(); // fixing iterators
 						((*it2fix)->pos) += Left.size(); // fixing iterators

@@ -4,21 +4,19 @@ include ../make.settings
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
-# Btree (map) is not yet compatible with g++ 3.4.x and Microsoft
-# Visual C++, therefore it is not
-# included into the main tests (the Makefile goal above)
-btree_map_test: testmap map
 
 queue: $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c testqueue.cpp
 	$(LINKER) testqueue.$(OBJEXT) $(OUT)testqueue.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-map: $(DEPENDENCIES)
-	cd map.impl;$(MAKE);cd .. 
 
 testmap: testmap.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c testmap.cpp
 	$(LINKER)  testmap.$(OBJEXT) $(OUT)testmap.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+test_map_random: test_map_random.cpp map_test_handlers.h $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_map_random.cpp
+	$(LINKER) test_map_random.$(OBJEXT) $(OUT)test_map_random.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 copy_file: copy_file.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c copy_file.cpp	

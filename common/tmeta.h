@@ -75,6 +75,16 @@ public:
 };
 
 template <>
+class LOG<1>
+{
+public:
+	enum 
+	{
+		value = 0
+	};
+};
+
+template <>
 class LOG<0>
 {
 public:
