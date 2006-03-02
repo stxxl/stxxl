@@ -17,8 +17,7 @@
 			ConfigurationType="0">
 			<Tool
 				Name="VCNMakeTool"
-				BuildCommandLine="nmake library_msvc
-nmake tests_msvc"
+				BuildCommandLine="nmake library_msvc"
 				ReBuildCommandLine="nmake library_msvc
 nmake tests_msvc"
 				CleanCommandLine="nmake clean_msvc"

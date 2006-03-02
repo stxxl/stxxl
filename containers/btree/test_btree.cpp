@@ -13,7 +13,7 @@
 
 struct comp_type : public std::less<int>
 {
-	static int max_value() { return std::numeric_limits<int>::max(); }
+	static int max_value() { return (std::numeric_limits<int>::max)(); }
 };
 						
 typedef stxxl::btree::btree<int,double,comp_type,10,10,stxxl::SR> btree_type;

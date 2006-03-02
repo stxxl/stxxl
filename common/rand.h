@@ -51,7 +51,7 @@ __STXXL_BEGIN_NAMESPACE
 		typedef boost::minstd_rand base_generator_type;
 		base_generator_type generator;
 		boost::uniform_real<> uni_dist;
-		boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni;
+		mutable boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni;
 
 		random_uniform_slow() : uni(generator, uni_dist) {}
 		#endif

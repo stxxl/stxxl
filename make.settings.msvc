@@ -7,10 +7,10 @@ BOOST_ROOT = c:\boost#
 MAKE = nmake
 COMPILER = cl
 LINKER = link
-OPT = #/O2
+OPT = /O2 -DNDEBUG
 
-#DEBUG = /MD # debug is off
-DEBUG = /MDd # debug is on
+DEBUG = /MD # debug is off
+#DEBUG = /MDd # debug is on
 
 #### BOOST OPTIONS ###############################################
 
