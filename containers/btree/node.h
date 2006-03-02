@@ -280,11 +280,12 @@ public:
 				req->wait();
 			}
 			
-			void load(const bid_type & bid)
+			request_ptr load(const bid_type & bid)
 			{
 				request_ptr req = block_->read(bid);
 				req->wait(); 
 				assert(bid == my_bid());
+				return req;
 			}
 			
 			void init(const bid_type & my_bid_)

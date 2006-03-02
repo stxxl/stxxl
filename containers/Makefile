@@ -15,7 +15,7 @@ testmap: testmap.cpp $(DEPENDENCIES)
 	$(LINKER)  testmap.$(OBJEXT) $(OUT)testmap.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_map_random: test_map_random.cpp map_test_handlers.h $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_map_random.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_map_random.cpp -O3 
 	$(LINKER) test_map_random.$(OBJEXT) $(OUT)test_map_random.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 copy_file: copy_file.cpp $(DEPENDENCIES)

@@ -79,6 +79,7 @@ namespace btree
 			};
 					
 			std::vector<node_type *> nodes_;
+			std::vector<request_ptr> reqs_;
 			std::vector<bool> fixed_;
 			std::vector<bool> dirty_;
 			std::vector<int> free_nodes_;
@@ -123,6 +124,7 @@ namespace btree
 				STXXL_VERBOSE1("btree::node_cache constructor nodes="<<nnodes)
 				assert(nnodes >= 3);
 				nodes_.reserve(nnodes);
+				reqs_.resize(nnodes);
 				free_nodes_.reserve(nnodes);
 				fixed_.resize(nnodes,false);
 				dirty_.resize(nnodes,true);
@@ -163,6 +165,7 @@ namespace btree
 				for(;i!=end;++i)
 				{
 					const unsigned p = (*i).second;
+					if(reqs_[p].valid()) reqs_[p]->wait();
 					if(dirty_[p]) nodes_[p]->save();
 				}
 				for(int i=0;i<size();++i)
@@ -195,6 +198,8 @@ namespace btree
 					
 					if(dirty_[node2kick]) Node.save();
 						
+					//reqs_[node2kick] = request_ptr(); // reset request
+						
 					BID2node_.erase(Node.my_bid());
 					bm->new_blocks<block_type>(1,alloc_strategy_,&new_bid);
 					
@@ -222,6 +227,8 @@ namespace btree
 				node_type & Node = *(nodes_[free_node]);
 				Node.init(new_bid);
 				
+				// assert(!(reqs_[free_node].valid()));
+								
 				pager_.hit(free_node);
 				
 				dirty_[free_node] = true;
@@ -246,6 +253,9 @@ namespace btree
 					fixed_[nodeindex] = fix;
 					pager_.hit(nodeindex);
 					dirty_[nodeindex] = true;
+					
+					if(reqs_[nodeindex].valid()) reqs_[nodeindex]->wait();
+					
 					return nodes_[nodeindex];
 				}
 					
@@ -273,10 +283,11 @@ namespace btree
 					node_type & Node = *(nodes_[node2kick]);
 					
 					if(dirty_[node2kick]) Node.save();
+					
 						
 					BID2node_.erase(Node.my_bid());
 					
-					Node.load(bid);
+					reqs_[node2kick] = Node.load(bid);
 					BID2node_[bid] = node2kick;
 					
 					fixed_[node2kick] = fix;
@@ -295,7 +306,7 @@ namespace btree
 				assert(fixed_[free_node] == false);
 				
 				node_type & Node = *(nodes_[free_node]);
-				Node.load(bid);
+				reqs_[free_node] = Node.load(bid);
 				BID2node_[bid] = free_node;
 				
 				pager_.hit(free_node);
@@ -321,6 +332,8 @@ namespace btree
 					STXXL_VERBOSE1("btree::node_cache get_node, the node "<<nodeindex<<"is in cache , fix="<<fix)
 					fixed_[nodeindex] = fix;
 					pager_.hit(nodeindex);
+					
+					if(reqs_[nodeindex].valid()) reqs_[nodeindex]->wait();
 					
 					return nodes_[nodeindex];
 				}
@@ -351,7 +364,7 @@ namespace btree
 						
 					BID2node_.erase(Node.my_bid());
 					
-					Node.load(bid);
+					reqs_[node2kick] = Node.load(bid);
 					BID2node_[bid] = node2kick;
 					
 					fixed_[node2kick] = fix;
@@ -370,7 +383,7 @@ namespace btree
 				assert(fixed_[free_node] == false);
 				
 				node_type & Node = *(nodes_[free_node]);
-				Node.load(bid);
+				reqs_[free_node] = Node.load(bid);
 				BID2node_[bid] = free_node;
 				
 				pager_.hit(free_node);
@@ -391,8 +404,11 @@ namespace btree
 				typename BID2node_type::const_iterator it = BID2node_.find(bid);
 				if(it != BID2node_.end())
 				{
-					// the node is in the cache
+					// the node is in the cach
 					const int nodeindex = it->second;
+					STXXL_VERBOSE1("btree::node_cache delete_node "<< nodeindex<<" from cache.")
+					if(reqs_[nodeindex].valid()) reqs_[nodeindex]->wait();
+					//reqs_[nodeindex] = request_ptr(); // reset request
 					free_nodes_.push_back(nodeindex);
 					BID2node_.erase(bid);
 					fixed_[nodeindex] = false;
@@ -415,6 +431,7 @@ namespace btree
 				std::swap(max_node_elements_,obj.max_node_elements_);
 				std::swap(comp_,obj.comp_);
 				std::swap(nodes_,obj.nodes_);
+				std::swap(reqs_,obj.reqs_);
 				change_btree_pointers(btree_);
 				obj.change_btree_pointers(obj.btree_);
 				std::swap(fixed_,obj.fixed_);

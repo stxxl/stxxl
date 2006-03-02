@@ -409,7 +409,7 @@ __STXXL_BEGIN_NAMESPACE
     //! \return reference to itself
     request_ptr & operator= (const request_ptr & p)
     {
-      assert(p.ptr);
+      // assert(p.ptr);
       return (*this = p.ptr);
     }
     //! \brief Assignment operator from \c request pointer
