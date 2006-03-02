@@ -385,8 +385,13 @@ namespace btree
 			bm_(block_manager::get_instance())
 		{
 			STXXL_VERBOSE1("Creating a btree, addr="<<this)
-			STXXL_VERBOSE1(" bytes in a node: "<<node_bid_type::size)
-			STXXL_VERBOSE1(" bytes in a leaf: "<<leaf_bid_type::size)
+			STXXL_MSG(" bytes in a node: "<<node_bid_type::size)
+			STXXL_MSG(" bytes in a leaf: "<<leaf_bid_type::size)
+			STXXL_MSG(" elements in a node: "<<node_block_type::size)
+			STXXL_MSG(" elements in a leaf: "<<leaf_block_type::size)
+			STXXL_MSG(" size of a node element: "<<sizeof(typename node_block_type::value_type))
+			STXXL_MSG(" size of a leaf element: "<<sizeof(typename leaf_block_type::value_type))
+			
 			
 			create_empty_leaf();
 		}
