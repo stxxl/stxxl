@@ -10,6 +10,13 @@
 #define _NODE_CACHE_H
 
 #include <stxxl>
+
+#ifdef BOOST_MSVC
+#include <hash_map>
+#else
+#include <ext/hash_map>
+#endif
+
 #include "btree_pager.h"
 
 __STXXL_BEGIN_NAMESPACE
@@ -50,11 +57,40 @@ namespace btree
  				}
 			};
 			
+			struct bid_hash
+		  	{
+					size_t operator()(const bid_type & bid) const
+					{
+				  		size_t result = size_t(bid.storage) +
+							size_t(bid.offset & 0xffffffff) + size_t(bid.offset>>32);
+					  	return result;
+					}
+					#ifdef BOOST_MSVC
+					bool operator () (const bid_type & a, const bid_type & b) const
+  					{
+	      				return (a.storage < b.storage) || ( a.storage == b.storage && a.offset < b.offset);
+ 					}
+					enum
+					{       // parameters for hash table
+							bucket_size = 4,        // 0 < bucket_size
+							min_buckets = 8
+					};      // min_buckets = 2 ^^ N, 0 < N
+					#endif
+			};
+					
 			std::vector<node_type *> nodes_;
 			std::vector<bool> fixed_;
 			std::vector<bool> dirty_;
 			std::vector<int> free_nodes_;
-			typedef std::map<bid_type,int,bid_comp> BID2node_type;
+			#ifdef BOOST_MSVC
+  			typedef stdext::hash_map < bid_type, int , bid_hash > hash_map_type;
+  			#else
+  			typedef __gnu_cxx::hash_map < bid_type, int , bid_hash > hash_map_type;
+  			#endif
+			
+			//typedef std::map<bid_type,int,bid_comp> BID2node_type;
+			typedef hash_map_type BID2node_type;
+			
 			BID2node_type BID2node_;
 			stxxl::btree::lru_pager pager_;	
 			block_manager * bm;
@@ -110,8 +146,9 @@ namespace btree
 			unsigned nfixed() const 
 			{
 				typename BID2node_type::const_iterator i = BID2node_.begin();
+				typename BID2node_type::const_iterator end = BID2node_.end();
 				unsigned cnt = 0;
-				for(;i!=BID2node_.end();++i)
+				for(;i!=end;++i)
 				{
 					if(fixed_[(*i).second]) ++cnt;
 				}
@@ -122,9 +159,11 @@ namespace btree
 			{
 				STXXL_VERBOSE1("btree::node_cache deconstructor addr="<<this)
 				typename BID2node_type::const_iterator i = BID2node_.begin();
-				for(;i!=BID2node_.end();++i)
+				typename BID2node_type::const_iterator end = BID2node_.end();
+				for(;i!=end;++i)
 				{
-					if(dirty_[(*i).second]) nodes_[(*i).second]->save();
+					const unsigned p = (*i).second;
+					if(dirty_[p]) nodes_[p]->save();
 				}
 				for(int i=0;i<size();++i)
 					delete nodes_[i];
@@ -136,11 +175,12 @@ namespace btree
 				{
 					// need to kick a node
 					int node2kick, i = 0;
+					unsigned int max_tries = size() +1;
 					do
 					{
 						++i;
 						node2kick = pager_.kick();
-						if(i==size()+1)
+						if(i == max_tries )
 						{
 							STXXL_ERRMSG(
 								"The node cache is too small, no node can be kicked out (all nodes are fixed) !");
@@ -151,14 +191,16 @@ namespace btree
 							
 					} while (fixed_[node2kick]);
 					
-					if(dirty_[node2kick]) nodes_[node2kick]->save();
+					node_type & Node = *(nodes_[node2kick]);
+					
+					if(dirty_[node2kick]) Node.save();
 						
-					BID2node_.erase(nodes_[node2kick]->my_bid());
+					BID2node_.erase(Node.my_bid());
 					bm->new_blocks<block_type>(1,alloc_strategy_,&new_bid);
 					
 					BID2node_[new_bid] = node2kick;
 					
-					nodes_[node2kick]->init(new_bid);
+					Node.init(new_bid);
 					
 					dirty_[node2kick] = true;
 					
@@ -167,7 +209,7 @@ namespace btree
 					
 					STXXL_VERBOSE1("btree::node_cache get_new_node, need to kick node "<<node2kick)
 					
-					return nodes_[node2kick];
+					return &Node;
 				}
 				
 				
@@ -177,7 +219,8 @@ namespace btree
 				
 				bm->new_blocks<block_type>(1,alloc_strategy_,&new_bid);
 				BID2node_[new_bid] = free_node;
-				nodes_[free_node]->init(new_bid);
+				node_type & Node = *(nodes_[free_node]);
+				Node.init(new_bid);
 				
 				pager_.hit(free_node);
 				
@@ -187,17 +230,18 @@ namespace btree
 				
 				STXXL_VERBOSE1("btree::node_cache get_new_node, free node "<<free_node<<"available")
 				
-				return nodes_[free_node];
+				return &Node;
 			}
 			
 			
 			
 			node_type * get_node(const bid_type & bid, bool fix = false)
 			{
-				if(BID2node_.find(bid) != BID2node_.end())
+				typename BID2node_type::const_iterator it = BID2node_.find(bid);
+				if(it != BID2node_.end())
 				{
 					// the node is in cache
-					int nodeindex = BID2node_[bid];
+					const int nodeindex = it->second;
 					STXXL_VERBOSE1("btree::node_cache get_node, the node "<<nodeindex<<"is in cache , fix="<<fix)
 					fixed_[nodeindex] = fix;
 					pager_.hit(nodeindex);
@@ -210,11 +254,12 @@ namespace btree
 				{
 					// need to kick a node
 					int node2kick, i = 0;
+					const unsigned max_tries = size()+1;
 					do
 					{
 						++i;
 						node2kick = pager_.kick();
-						if(i==size()+1)
+						if(i == max_tries)
 						{
 							STXXL_ERRMSG(
 								"The node cache is too small, no node can be kicked out (all nodes are fixed) !");
@@ -225,11 +270,13 @@ namespace btree
 							
 					} while (fixed_[node2kick]);
 					
-					if(dirty_[node2kick]) nodes_[node2kick]->save();
-						
-					BID2node_.erase(nodes_[node2kick]->my_bid());
+					node_type & Node = *(nodes_[node2kick]);
 					
-					nodes_[node2kick]->load(bid);
+					if(dirty_[node2kick]) Node.save();
+						
+					BID2node_.erase(Node.my_bid());
+					
+					Node.load(bid);
 					BID2node_[bid] = node2kick;
 					
 					fixed_[node2kick] = fix;
@@ -240,14 +287,15 @@ namespace btree
 					
 					STXXL_VERBOSE1("btree::node_cache get_node, need to kick node"<<node2kick<<" fix="<<fix)
 					
-					return nodes_[node2kick];
+					return &Node;
 				}
 				
 				int free_node = free_nodes_.back();
 				free_nodes_.pop_back();
 				assert(fixed_[free_node] == false);
 				
-				nodes_[free_node]->load(bid);
+				node_type & Node = *(nodes_[free_node]);
+				Node.load(bid);
 				BID2node_[bid] = free_node;
 				
 				pager_.hit(free_node);
@@ -260,15 +308,16 @@ namespace btree
 				
 				STXXL_VERBOSE1("btree::node_cache get_node, free node "<< free_node<<"available, fix="<<fix)
 				
-				return nodes_[free_node];
+				return &Node;
 			}
 			
 			node_type const * get_const_node(const bid_type & bid, bool fix = false)
 			{
-				if(BID2node_.find(bid) != BID2node_.end())
+				typename BID2node_type::const_iterator it = BID2node_.find(bid);
+				if(it != BID2node_.end())
 				{
 					// the node is in cache
-					int nodeindex = BID2node_[bid];
+					const int nodeindex = it->second;
 					STXXL_VERBOSE1("btree::node_cache get_node, the node "<<nodeindex<<"is in cache , fix="<<fix)
 					fixed_[nodeindex] = fix;
 					pager_.hit(nodeindex);
@@ -281,11 +330,12 @@ namespace btree
 				{
 					// need to kick a node
 					int node2kick, i = 0;
+					const unsigned max_tries = size() +1;
 					do
 					{
 						++i;
 						node2kick = pager_.kick();
-						if(i==size()+1)
+						if(i==max_tries)
 						{
 							STXXL_ERRMSG(
 								"The node cache is too small, no node can be kicked out (all nodes are fixed) !");
@@ -296,11 +346,12 @@ namespace btree
 							
 					} while (fixed_[node2kick]);
 					
-					if(dirty_[node2kick]) nodes_[node2kick]->save();
+					node_type & Node = *(nodes_[node2kick]);
+					if(dirty_[node2kick]) Node.save();
 						
-					BID2node_.erase(nodes_[node2kick]->my_bid());
+					BID2node_.erase(Node.my_bid());
 					
-					nodes_[node2kick]->load(bid);
+					Node.load(bid);
 					BID2node_[bid] = node2kick;
 					
 					fixed_[node2kick] = fix;
@@ -311,14 +362,15 @@ namespace btree
 					
 					STXXL_VERBOSE1("btree::node_cache get_node, need to kick node"<<node2kick<<" fix="<<fix)
 					
-					return nodes_[node2kick];
+					return &Node;
 				}
 				
 				int free_node = free_nodes_.back();
 				free_nodes_.pop_back();
 				assert(fixed_[free_node] == false);
 				
-				nodes_[free_node]->load(bid);
+				node_type & Node = *(nodes_[free_node]);
+				Node.load(bid);
 				BID2node_[bid] = free_node;
 				
 				pager_.hit(free_node);
@@ -331,15 +383,16 @@ namespace btree
 				
 				STXXL_VERBOSE1("btree::node_cache get_node, free node "<< free_node<<"available, fix="<<fix)
 				
-				return nodes_[free_node];
+				return &Node;
 			}
 			
 			void delete_node(const bid_type & bid)
 			{
-				if(BID2node_.find(bid) != BID2node_.end())
+				typename BID2node_type::const_iterator it = BID2node_.find(bid);
+				if(it != BID2node_.end())
 				{
 					// the node is in the cache
-					int nodeindex = BID2node_[bid];
+					const int nodeindex = it->second;
 					free_nodes_.push_back(nodeindex);
 					BID2node_.erase(bid);
 					fixed_[nodeindex] = false;

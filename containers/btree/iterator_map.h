@@ -60,6 +60,7 @@ namespace btree
 		
 		typedef typename multimap_type::value_type pair_type;
 		typedef typename multimap_type::iterator mmiterator_type;
+		typedef typename multimap_type::const_iterator mmconst_iterator_type;
 		
 		iterator_map(); // forbidden
 		iterator_map(const iterator_map &); // forbidden
@@ -69,7 +70,7 @@ namespace btree
 		// changes btree pointer in all contained iterators
 		void change_btree_pointers(btree_type * b)
 		{
-			mmiterator_type it = It2Addr_.begin();
+			mmconst_iterator_type it = It2Addr_.begin();
 			for(;it!=It2Addr_.end();++it)
 			{
 				(it->second)->btree_ = b;
@@ -125,10 +126,10 @@ namespace btree
 		{
 			Key firstkey(bid,first_pos);
 			Key lastkey(bid,last_pos);
-			mmiterator_type begin = It2Addr_.lower_bound(firstkey);
-			mmiterator_type end = It2Addr_.upper_bound(lastkey);
+			mmconst_iterator_type begin = It2Addr_.lower_bound(firstkey);
+			mmconst_iterator_type end = It2Addr_.upper_bound(lastkey);
 			
-			mmiterator_type i = begin;
+			mmconst_iterator_type i = begin;
 			for(;i!=end;++i)
 			{
 				assert(bid == (*i).first.bid);
@@ -138,7 +139,7 @@ namespace btree
 		
 		virtual ~iterator_map()
 		{
-			mmiterator_type it = It2Addr_.begin();
+			mmconst_iterator_type it = It2Addr_.begin();
 			for(;it!=It2Addr_.end();++it)
 				(it->second)->make_invalid();
 		}

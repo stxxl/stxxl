@@ -42,15 +42,10 @@ protected:
       return result;
     }
 	#ifdef BOOST_MSVC
-	bool operator()(const bid_type & bid1, const bid_type & bid2) const
-    {
-	  if(long(bid1.storage)<long(bid2.storage))
-		  return true;
-	  if(long(bid1.storage)>long(bid2.storage))
-		  return false;
-
-      return (bid1.offset < bid2.offset);
-    }
+	bool operator () (const bid_type & a, const bid_type & b) const
+  	{
+    	return (a.storage < b.storage) || ( a.storage == b.storage && a.offset < b.offset);
+ 	}
 	enum
 	{	// parameters for hash table
 		bucket_size = 4,	// 0 < bucket_size
