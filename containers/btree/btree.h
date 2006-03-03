@@ -88,6 +88,7 @@ namespace btree
 		iterator_map_type iterator_map_;
 		size_type size_;
 		unsigned height_;
+		bool prefetching_enabled_;
 		block_manager * bm_;
 		alloc_strategy_type alloc_strategy_;
 	
@@ -383,6 +384,7 @@ namespace btree
 			iterator_map_(this),
 			size_(0),
 			height_(2),
+			prefetching_enabled_(true),
 			bm_(block_manager::get_instance())
 		{
 			STXXL_VERBOSE1("Creating a btree, addr="<<this)
@@ -407,6 +409,7 @@ namespace btree
 			iterator_map_(this),
 			size_(0),
 			height_(2),
+			prefetching_enabled_(true),
 			bm_(block_manager::get_instance())
 		{
 			STXXL_VERBOSE1("Creating a btree, addr="<<this)
@@ -893,6 +896,7 @@ namespace btree
 			iterator_map_(this),
 			size_(0),
 			height_(2),
+			prefetching_enabled_(true),
 			bm_(block_manager::get_instance())
 		{
 			STXXL_VERBOSE1("Creating a btree, addr="<<this)
@@ -926,6 +930,7 @@ namespace btree
 			iterator_map_(this),
 			size_(0),
 			height_(2),
+			prefetching_enabled_(true),
 			bm_(block_manager::get_instance())
 		{
 			STXXL_VERBOSE1("Creating a btree, addr="<<this)
@@ -982,6 +987,19 @@ namespace btree
 			std::swap(root_node_,obj.root_node_);
 			
 			
+		}
+		
+		void enable_prefetching()
+		{
+			prefetching_enabled_ = true;
+		}
+		void disable_prefetching()
+		{
+			prefetching_enabled_ = false;
+		}
+		bool prefetching_enabled()
+		{
+			return prefetching_enabled_;
 		}
 		
 	

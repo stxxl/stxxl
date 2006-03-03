@@ -382,7 +382,7 @@ public:
 					STXXL_VERBOSE1("btree::normal_leaf jumping to the next block")
 					it.pos = 0;
 					it.bid = succ();
-				} else if(it.pos == 1) // increment of pos from 0 to 1
+				} else if(it.pos == 1 && btree_->prefetching_enabled_) // increment of pos from 0 to 1
 				{
 					// prefetch the succ leaf
 					if(succ().valid())	btree_->leaf_cache_.prefetch_node(succ());
@@ -407,7 +407,8 @@ public:
 					it.pos = PredLeaf->size() - 1;
 					
 					// prefetch the pred leaf of PredLeaf
-					if(PredLeaf->pred().valid())	btree_->leaf_cache_.prefetch_node(PredLeaf->pred());
+					if(btree_->prefetching_enabled_ && PredLeaf->pred().valid())	
+						btree_->leaf_cache_.prefetch_node(PredLeaf->pred());
 					
 					btree_->leaf_cache_.unfix_node(pred());
 				}

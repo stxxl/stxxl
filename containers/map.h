@@ -171,6 +171,19 @@ public:
 		return Impl[k];
 	}	
 	
+	void enable_prefetching()
+	{
+		Impl.enable_prefetching();
+	}
+	void disable_prefetching()
+	{
+		Impl.disable_prefetching();
+	}
+	bool prefetching_enabled()
+	{
+		return Impl.prefetching_enabled();
+	}
+	
 	//////////////////////////////////////////////////
 	template <	class KeyType_,
 					class DataType_,

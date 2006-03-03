@@ -277,6 +277,11 @@ int main(int argc, char * argv [])
 	
 	STXXL_MSG(*stxxl::stats::get_instance());
 	
+	BTree5.disable_prefetching();
+	BTree5.enable_prefetching();
+	BTree5.prefetching_enabled();
+	assert(BTree5.prefetching_enabled());
+	
 	STXXL_MSG("All tests passed successufully")
 	
 	return 0;
