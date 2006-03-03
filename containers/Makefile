@@ -5,10 +5,9 @@ include ../make.settings
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
 write_vector: $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c write_vector.cpp -g
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c write_vector.cpp
 	$(LINKER) write_vector.$(OBJEXT) $(OUT)write_vector.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-				
 
 queue: $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c testqueue.cpp

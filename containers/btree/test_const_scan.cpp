@@ -35,7 +35,7 @@ std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 }
 
 #define node_cache_size (25*1024*1024)
-#define leaf_cache_size (3*LEAF_BLOCK_SIZE)
+#define leaf_cache_size (6*LEAF_BLOCK_SIZE)
 
 void NC(btree_type & BTree)
 {
@@ -73,6 +73,10 @@ int main(int argc, char * argv [])
 	}
 		
 	const unsigned nins = atoi(argv[1]);
+
+	STXXL_MSG("Data set size  : "<<nins*sizeof(std::pair<int,my_type>)<<" bytes")
+	STXXL_MSG("Node cache size: "<<node_cache_size<<" bytes")
+	STXXL_MSG("Leaf cache size: "<<leaf_cache_size<<" bytes")
 	
 	stxxl::random_number32 rnd;
 	

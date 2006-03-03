@@ -47,7 +47,7 @@ typedef stxxl::map<key_type,data_type,cmp2,
 
 
 //#define MAX_KEY 1000
-#define MAX_KEY 10000
+#define MAX_KEY 1000000
 
 //#define MAX_STEP 0x0001000
 
@@ -91,7 +91,7 @@ int main( int argc, char* argv[] )
   	stxxl::uint64 MAX_STEP = atoi( argv[1] );
 	assert(MAX_STEP > 1000);
 	std_map_type stdmap;
-	xxl_map_type xxlmap(NODE_BLOCK_SIZE*3,LEAF_BLOCK_SIZE*3);
+	xxl_map_type xxlmap(NODE_BLOCK_SIZE*4,LEAF_BLOCK_SIZE*3);
 
 	for( stxxl::uint64  i = 0; i < MAX_STEP; i++ )
 	{
