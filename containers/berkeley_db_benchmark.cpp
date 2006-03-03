@@ -14,9 +14,9 @@
 #define NODE_BLOCK_SIZE 	(32*1024)
 #define LEAF_BLOCK_SIZE 		(32*1024)
 
-#define TOTAL_CACHE_SIZE 	(32*1024*1024)
-#define NODE_CACHE_SIZE 	(3*TOTAL_CACHE_SIZE/4)
-#define LEAF_CACHE_SIZE 		(1*TOTAL_CACHE_SIZE/4)
+#define TOTAL_CACHE_SIZE 	(2*32*1024*1024)
+#define NODE_CACHE_SIZE 	(TOTAL_CACHE_SIZE)
+#define LEAF_CACHE_SIZE 		(TOTAL_CACHE_SIZE)
 
 struct my_key
 {
@@ -104,7 +104,8 @@ int main()
 	            
 	for (; i > 0; --i)
 	{
-		element.first.keybuf[(i % KEY_SIZE)] = letters[(i % 26)];
+		element.first.keybuf[(i % KEY_SIZE)] = letters[(rand() % 26)];
+		//STXXL_MSG("Inserting "<<element.first)
 		Map.insert(element);
 	}
 
