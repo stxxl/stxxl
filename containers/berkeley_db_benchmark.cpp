@@ -106,9 +106,10 @@ int main()
 	{
 		element.first.keybuf[(i % KEY_SIZE)] = letters[(i % 26)];
 		Map.insert(element);
-    }
+	}
 
 	Timer.stop();
+	STXXL_MSG("Records in map: "<<Map.size())
 	STXXL_MSG("elapsed time: "<<(Timer.mseconds()/1000.)<<
 				" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 }

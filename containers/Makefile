@@ -5,7 +5,7 @@ include ../make.settings
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
 berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c berkeley_db_benchmark.cpp -g
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c berkeley_db_benchmark.cpp -DNDEBUG 
 	$(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 
