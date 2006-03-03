@@ -122,7 +122,12 @@ namespace btree
 			{
 				const unsigned nnodes = cache_size_in_bytes/block_type::raw_size;
 				STXXL_VERBOSE1("btree::node_cache constructor nodes="<<nnodes)
-				assert(nnodes >= 3);
+				if(nnodes < 3)
+				{
+					STXXL_ERRMSG("btree: Too few memory for a node cache (<3)")
+					STXXL_ERRMSG("aborting.")
+					abort();
+				}
 				nodes_.reserve(nnodes);
 				reqs_.resize(nnodes);
 				free_nodes_.reserve(nnodes);
@@ -194,6 +199,8 @@ namespace btree
 							
 					} while (fixed_[node2kick]);
 					
+					if(reqs_[node2kick].valid()) reqs_[node2kick]->wait();
+						
 					node_type & Node = *(nodes_[node2kick]);
 					
 					if(dirty_[node2kick]) Node.save();
@@ -280,6 +287,8 @@ namespace btree
 							
 					} while (fixed_[node2kick]);
 					
+					if(reqs_[node2kick].valid()) reqs_[node2kick]->wait();
+					
 					node_type & Node = *(nodes_[node2kick]);
 					
 					if(dirty_[node2kick]) Node.save();
@@ -359,6 +368,8 @@ namespace btree
 							
 					} while (fixed_[node2kick]);
 					
+					if(reqs_[node2kick].valid()) reqs_[node2kick]->wait();
+					
 					node_type & Node = *(nodes_[node2kick]);
 					if(dirty_[node2kick]) Node.save();
 						
@@ -415,6 +426,76 @@ namespace btree
 				}
 				
 				bm->delete_block(bid);
+			}
+			
+			
+			void prefetch_node(const bid_type & bid)
+			{
+				if(BID2node_.find(bid) != BID2node_.end()) return;
+					
+				// the node is not in cache
+				if(free_nodes_.empty())
+				{
+					// need to kick a node
+					int node2kick, i = 0;
+					const unsigned max_tries = size()+1;
+					do
+					{
+						++i;
+						node2kick = pager_.kick();
+						if(i == max_tries)
+						{
+							STXXL_ERRMSG(
+								"The node cache is too small, no node can be kicked out (all nodes are fixed) !");
+							STXXL_ERRMSG("Returning NULL node.")
+							return;
+						}
+						pager_.hit(node2kick);
+							
+					} while (fixed_[node2kick]);
+					
+					if(reqs_[node2kick].valid()) reqs_[node2kick]->wait();
+					
+					node_type & Node = *(nodes_[node2kick]);
+					
+					if(dirty_[node2kick]) Node.save();
+					
+						
+					BID2node_.erase(Node.my_bid());
+					
+					reqs_[node2kick] = Node.prefetch(bid);
+					BID2node_[bid] = node2kick;
+					
+					fixed_[node2kick] = false;
+					
+					dirty_[node2kick] = false;
+					
+					assert(size() == BID2node_.size() + free_nodes_.size());
+					
+					STXXL_VERBOSE1("btree::node_cache prefetch_node, need to kick node"<<node2kick<<" ")
+					
+					return;
+				}
+				
+				int free_node = free_nodes_.back();
+				free_nodes_.pop_back();
+				assert(fixed_[free_node] == false);
+				
+				node_type & Node = *(nodes_[free_node]);
+				reqs_[free_node] = Node.prefetch(bid);
+				BID2node_[bid] = free_node;
+				
+				pager_.hit(free_node);
+				
+				fixed_[free_node] = false;
+				
+				dirty_[free_node] = false;
+				
+				assert(size() == BID2node_.size() + free_nodes_.size());
+				
+				STXXL_VERBOSE1("btree::node_cache prefetch_node, free node "<< free_node<<"available")
+				
+				return;
 			}
 			
 			void unfix_node(const bid_type & bid)

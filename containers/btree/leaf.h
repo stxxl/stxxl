@@ -257,6 +257,11 @@ public:
 				return req;
 			}
 			
+			request_ptr prefetch(const bid_type & bid)
+			{
+				return block_->read(bid);
+			}
+			
 			void init(const bid_type & my_bid_)
 			{
 				block_->info.me = my_bid_;
@@ -384,6 +389,11 @@ public:
 					STXXL_VERBOSE1("btree::normal_leaf jumping to the next block")
 					it.pos = 0;
 					it.bid = succ();
+				} else if(it.pos == 1) // increment of pos from 0 to 1
+				{
+					// prefetch the succ leaf
+					if(succ().valid())	btree_->leaf_cache_.prefetch_node(succ());
+					
 				}
 				btree_->iterator_map_.register_iterator(it);
 			}
@@ -399,10 +409,14 @@ public:
 					assert(pred().valid());
 					
 					it.bid = pred();
-					normal_leaf const * PredLeaf = btree_->leaf_cache_.get_const_node(pred());
+					normal_leaf const * PredLeaf = btree_->leaf_cache_.get_const_node(pred(),true);
 					assert(PredLeaf);
 					it.pos = PredLeaf->size() - 1;
 					
+					// prefetch the pred leaf of PredLeaf
+					if(PredLeaf->pred().valid())	btree_->leaf_cache_.prefetch_node(PredLeaf->pred());
+					
+					btree_->leaf_cache_.unfix_node(pred());
 				}
 				else 
 					--it.pos;

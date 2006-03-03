@@ -56,6 +56,10 @@ typedef stxxl::map<key_type,data_type,cmp2,
 
 int main( int argc, char* argv[] )
 {
+#ifdef NDEBUG
+	STXXL_MSG("Program is compiled with NDEBUG option, which makes the testing wrong.")
+	return 1;
+#endif
 
 	typedef std::vector<std::pair<key_type,data_type> > vector_type;
 	

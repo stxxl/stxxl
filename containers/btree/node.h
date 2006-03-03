@@ -288,6 +288,11 @@ public:
 				return req;
 			}
 			
+			request_ptr prefetch(const bid_type & bid)
+			{
+				return block_->read(bid);
+			}
+			
 			void init(const bid_type & my_bid_)
 			{
 				block_->info.me = my_bid_;

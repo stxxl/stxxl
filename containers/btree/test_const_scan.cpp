@@ -16,7 +16,7 @@ struct comp_type : public std::less<int>
 	static int max_value() { return (std::numeric_limits<int>::max)(); }
 };
 						
-typedef stxxl::btree::btree<int,double,comp_type,10,10,stxxl::SR> btree_type;
+typedef stxxl::btree::btree<int,double,comp_type,10,14,stxxl::SR> btree_type;
 
 std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 {
@@ -25,7 +25,7 @@ std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 }
 
 #define node_cache_size (25*1024*1024)
-#define leaf_cache_size (25*1024*1024)
+#define leaf_cache_size (1*1024*1024)
 
 void NC(btree_type & BTree)
 {
