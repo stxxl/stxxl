@@ -53,6 +53,8 @@ typedef stxxl::map<key_type,data_type,cmp2,
 
 #define NODE_BLOCK_SIZE xxl_map_type::node_block_type::raw_size
 #define LEAF_BLOCK_SIZE xxl_map_type::leaf_block_type::raw_size
+#define NODE_MELEMENTS xxl_map_type::node_block_type::size
+#define LEAF_MELEMENTS xxl_map_type::leaf_block_type::size
 
 int main( int argc, char* argv[] )
 {
@@ -65,6 +67,8 @@ int main( int argc, char* argv[] )
 	
 	STXXL_MSG("Node block size: "<<NODE_BLOCK_SIZE<<" bytes")
 	STXXL_MSG("Leaf block size: "<<LEAF_BLOCK_SIZE<<" bytes")
+	STXXL_MSG("Node max elements: "<<NODE_MELEMENTS)
+	STXXL_MSG("Leaf max elements: "<<LEAF_MELEMENTS)
 
 	stxxl::random_number32 rnd;
 	stxxl::ran32State = 1141225706;

@@ -20,19 +20,15 @@ namespace btree
 	template <class NodeType, class BTreeType>
 	class node_cache;
 	
-	template <class KeyType_, class DataType_, class KeyCmp_, unsigned LogNElem_, class BTreeType>
+	template <class KeyType_, class DataType_, class KeyCmp_, unsigned RawSize_, class BTreeType>
 	class normal_leaf
 	{
 			
 		public:
-			typedef	normal_leaf<KeyType_,DataType_,KeyCmp_,LogNElem_,BTreeType> SelfType;
+			typedef	normal_leaf<KeyType_,DataType_,KeyCmp_,RawSize_,BTreeType> SelfType;
 			
 			friend class node_cache<SelfType,BTreeType>;
 				
-			enum {
-				nelements = 1<<LogNElem_,
-				magic_block_size = 4096
-			};
 			typedef KeyType_ key_type;
 			typedef DataType_ data_type;
 			typedef KeyCmp_ key_compare;
@@ -41,10 +37,7 @@ namespace btree
 			typedef const value_type  & const_reference;
 			
 			enum {
-				raw_size_not_4Krounded = sizeof(value_type [nelements])
-					+ 3*sizeof(BID<magic_block_size>) // succ, pred links and my bid
-					+ sizeof(unsigned),	// current size
-				raw_size = (raw_size_not_4Krounded/4096 + 1)*4096
+				raw_size = RawSize_
 			};
 			typedef BID<raw_size> bid_type;
 			struct InfoType
@@ -53,7 +46,13 @@ namespace btree
 				unsigned cur_size;
 			};
 
-			typedef typed_block<raw_size,value_type,0,InfoType> block_type;			
+			typedef typed_block<raw_size,value_type,0,InfoType> block_type;
+			enum {
+				nelements = block_type::size - 1,
+				max_size = nelements,
+				min_size = nelements/2
+			};
+			
 			typedef BTreeType btree_type;
 			typedef typename btree_type::size_type size_type;
 			typedef btree_iterator_base<btree_type> iterator_base;
@@ -82,8 +81,7 @@ public:
 private:
 			block_type * block_;
 			btree_type * btree_;
-			const unsigned min_nelements_;
-			const unsigned max_nelements_;
+			
 			key_compare cmp_;
 			value_compare vcmp_;
 			
@@ -167,26 +165,23 @@ public:
 			}
 			
 			normal_leaf(	btree_type * btree__,
-								unsigned min_nelements, 
-								unsigned max_nelements, 
 								key_compare cmp): 
 				block_(new block_type),
 				btree_(btree__),
-				min_nelements_(min_nelements),
-				max_nelements_(max_nelements),
 				cmp_(cmp),
 				vcmp_(cmp)
 			{
-				assert(min_nelements < max_nelements);
-				assert(max_nelements <= nelements);
+				assert(min_nelements() >=2);
+				assert(2*min_nelements() - 1 <= max_nelements());
+				assert(max_nelements() <= nelements);
 				assert(unsigned(block_type::size) >= nelements +1); // extra space for an overflow
 			}
 			
-			bool overflows () const { return block_->info.cur_size > max_nelements_; }
-			bool underflows () const { return block_->info.cur_size < min_nelements_; }
+			bool overflows () const { return block_->info.cur_size > max_nelements(); }
+			bool underflows () const { return block_->info.cur_size < min_nelements(); }
 			
-			unsigned max_nelements() const { return max_nelements_; }
-			unsigned min_nelements() const { return min_nelements_; }
+			unsigned max_nelements() const { return max_size; }
+			unsigned min_nelements() const { return min_size; }
 			
 			
 			bid_type & succ()
@@ -207,31 +202,29 @@ public:
 				return block_->info.pred;
 			}
 			
+			/*
 			template <class InputIterator>
 			normal_leaf(InputIterator begin_, InputIterator end_,
 				btree_type * btree__,
-				unsigned min_nelements, unsigned max_nelements,
 				key_compare cmp): 
 				block_(new block_type),
 				btree_(btree__),
-				min_nelements_(min_nelements),
-				max_nelements_(max_nelements),
 				cmp_(cmp),
 				vcmp_(cmp)
 			{
-				assert(min_nelements >=2);
-				assert(2*min_nelements - 1 <= max_nelements);
-				assert(max_nelements <= nelements);
+				assert(min_nelements() >=2);
+				assert(2*min_nelements() - 1 <= max_nelements());
+				assert(max_nelements() <= nelements);
 				assert(unsigned(block_type::size) >= nelements +1); // extra space for an overflow element
 				
 				unsigned new_size = end_ - begin_;
-				assert(new_size <= max_nelements_);
-				assert(new_size >= min_nelements_);
+				assert(new_size <= max_nelements());
+				assert(new_size >= min_nelements());
 				
 				std::copy(begin_,end_,block_->begin());
 				assert(stxxl::is_sorted(block_->begin(),block_->begin() + new_size, vcmp_));
 				block_->info.cur_size = new_size;
-			}
+			}*/
 			
 			unsigned size() const
 			{
@@ -311,7 +304,7 @@ public:
 					const value_type & x, 
 					std::pair<key_type,bid_type> & splitter)
 			{
-				assert(size() <= max_nelements_);
+				assert(size() <= max_nelements());
 				splitter.first = key_compare::max_value();
 				
 				typename block_type::iterator it = 
@@ -346,7 +339,7 @@ public:
 				
 				std::pair<iterator,bool> result(iterator(btree_,my_bid(),it - block_->begin()),true);
 				
-				if(size() <= max_nelements_)
+				if(size() <= max_nelements())
 				{
 					// no overflow
 					dump();

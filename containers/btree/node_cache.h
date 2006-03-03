@@ -45,8 +45,6 @@ namespace btree
 		private:
 		
 			btree_type * btree_;
-			unsigned min_node_elements_;
-			unsigned max_node_elements_;
 			key_compare comp_;
 		
 			struct bid_comp
@@ -110,13 +108,9 @@ namespace btree
 		public:
 			node_cache(	unsigned cache_size_in_bytes,
 								btree_type * btree__,
-								unsigned min_node_elements__,
-								unsigned max_node_elements__,
 								key_compare comp__
 								): 
 					btree_(btree__),
-					min_node_elements_(min_node_elements__),
-					max_node_elements_(max_node_elements__),
 					comp_(comp__),
 					bm(block_manager::get_instance())
 			{
@@ -135,7 +129,7 @@ namespace btree
 				dirty_.resize(nnodes,true);
 				for(unsigned i= 0; i<nnodes;++i)
 				{
-					nodes_.push_back(new node_type(btree_,min_node_elements_,max_node_elements_,comp_));
+					nodes_.push_back(new node_type(btree_,comp_));
 					free_nodes_.push_back(i);
 				}
 				
@@ -507,9 +501,6 @@ namespace btree
 			
 			void swap(node_cache & obj)
 			{
-				//std::swap(btree_,obj.btree_);
-				std::swap(min_node_elements_,obj.min_node_elements_);
-				std::swap(max_node_elements_,obj.max_node_elements_);
 				std::swap(comp_,obj.comp_);
 				std::swap(nodes_,obj.nodes_);
 				std::swap(reqs_,obj.reqs_);

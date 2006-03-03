@@ -26,13 +26,7 @@ template <	class KeyType,
 				>
 class map 
 {
-	enum {
-		apx_node_size = RawNodeSize/sizeof(std::pair<KeyType,BID<1> >),
-		apx_leaf_size = RawLeafSize/sizeof(std::pair<KeyType,DataType >) ,
-		log_node_size = LOG<apx_node_size>::value,
-		log_leaf_size = LOG<apx_leaf_size>::value
-	};
-	typedef btree::btree<KeyType,DataType,CompareType,log_node_size,log_leaf_size,PDAllocStrategy> impl_type;
+	typedef btree::btree<KeyType,DataType,CompareType,RawNodeSize,RawLeafSize,PDAllocStrategy> impl_type;
 	
 	impl_type Impl;
 	

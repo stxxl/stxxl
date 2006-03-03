@@ -18,8 +18,8 @@ struct comp_type : public std::less<int>
 	static int min_value() { return std::numeric_limits<int>::min(); }
 };
 						
-typedef stxxl::btree::btree<int,double,comp_type,2,3,stxxl::SR> btree_type;
-//typedef stxxl::btree::btree<int,double,comp_type,10,11,stxxl::SR> btree_type;
+typedef stxxl::btree::btree<int,double,comp_type,4096,4096,stxxl::SR> btree_type;
+
 
 std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 {

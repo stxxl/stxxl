@@ -16,7 +16,7 @@ struct comp_type : public std::less<int>
 	static int max_value() { return (std::numeric_limits<int>::max)(); }
 };
 						
-typedef stxxl::btree::btree<int,double,comp_type,10,10,stxxl::SR> btree_type;
+typedef stxxl::btree::btree<int,double,comp_type,4096,4096,stxxl::SR> btree_type;
 
 std::ostream & operator << (std::ostream & o, const std::pair<int,double> & obj)
 {
@@ -38,7 +38,8 @@ int main(int argc, char * argv [])
 	
 	btree_type BTree1(node_cache_size,leaf_cache_size);
 		
-	const unsigned nins = atoi(argv[1]);
+	unsigned nins = atoi(argv[1]);
+	if(nins < 100) nins = 100;
 	
 	stxxl::random_number32 rnd;
 	

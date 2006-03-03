@@ -25,25 +25,19 @@ namespace btree
 	template <	class KeyType, 
 						class DataType, 
 						class CompareType, 
-						unsigned LogNodeSize,
-						unsigned LogLeafSize,
+						unsigned RawNodeSize,
+						unsigned RawLeafSize,
 						class PDAllocStrategy
 					>
 	class btree
 	{
-		public:
-			typedef KeyType key_type;
-			typedef DataType	data_type;
-			typedef CompareType key_compare;
-			enum {
-				log_node_size = LogNodeSize,
-				log_leaf_size = LogLeafSize,
-				min_node_size = 1<<(LogNodeSize-1),
-				max_node_size = 1<<(LogNodeSize),
-				min_leaf_size = 1<<(LogLeafSize-1),
-				max_leaf_size = 1<<(LogLeafSize)
-			};
-		typedef btree<KeyType,DataType,CompareType,LogNodeSize,LogLeafSize,PDAllocStrategy> SelfType;
+		
+	public:
+		typedef KeyType key_type;
+		typedef DataType	data_type;
+		typedef CompareType key_compare;
+
+		typedef btree<KeyType,DataType,CompareType,RawNodeSize,RawLeafSize,PDAllocStrategy> SelfType;
 			
 		typedef PDAllocStrategy alloc_strategy_type;
 			
@@ -57,8 +51,8 @@ namespace btree
 		
 			
 		// leaf type declarations
-		typedef normal_leaf<key_type,data_type,key_compare,log_leaf_size,SelfType> leaf_type;
-		friend class normal_leaf<key_type,data_type,key_compare,log_leaf_size,SelfType>;
+		typedef normal_leaf<key_type,data_type,key_compare,RawLeafSize,SelfType> leaf_type;
+		friend class normal_leaf<key_type,data_type,key_compare,RawLeafSize,SelfType>;
 		typedef typename leaf_type::block_type leaf_block_type;
 		typedef typename leaf_type::bid_type leaf_bid_type;
 		typedef node_cache<leaf_type,SelfType> leaf_cache_type;
@@ -70,14 +64,21 @@ namespace btree
 		// iterator map type
 		typedef iterator_map<SelfType> iterator_map_type;
 		// node type declarations
-		typedef normal_node<key_type,key_compare,log_node_size,SelfType> node_type;
+		typedef normal_node<key_type,key_compare,RawNodeSize,SelfType> node_type;
 		typedef typename node_type::block_type node_block_type;
-		friend class normal_node<key_type,key_compare,log_node_size,SelfType>;
+		friend class normal_node<key_type,key_compare,RawNodeSize,SelfType>;
 		typedef typename node_type::bid_type node_bid_type;
 		typedef node_cache<node_type,SelfType> node_cache_type;
 		friend class node_cache<node_type,SelfType>;
 		
 		typedef typename leaf_type::value_compare value_compare;
+		
+		enum {
+				min_node_size = node_type::min_size,
+				max_node_size = node_type::max_size,
+				min_leaf_size = leaf_type::min_size,
+				max_leaf_size = leaf_type::max_size
+			};
 		
 	private:
 	
@@ -377,8 +378,8 @@ namespace btree
 		btree(	unsigned node_cache_size_in_bytes,
 					unsigned leaf_cache_size_in_bytes
 				): 
-			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
-			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			node_cache_(node_cache_size_in_bytes,this,key_compare_),
+			leaf_cache_(leaf_cache_size_in_bytes,this,key_compare_),
 			iterator_map_(this),
 			size_(0),
 			height_(2),
@@ -401,8 +402,8 @@ namespace btree
 					unsigned leaf_cache_size_in_bytes
 				): 
 			key_compare_(c_),
-			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
-			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			node_cache_(node_cache_size_in_bytes,this,key_compare_),
+			leaf_cache_(leaf_cache_size_in_bytes,this,key_compare_),
 			iterator_map_(this),
 			size_(0),
 			height_(2),
@@ -887,8 +888,8 @@ namespace btree
 					bool range_sorted = false
 				): 
 			key_compare_(c_),
-			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
-			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			node_cache_(node_cache_size_in_bytes,this,key_compare_),
+			leaf_cache_(leaf_cache_size_in_bytes,this,key_compare_),
 			iterator_map_(this),
 			size_(0),
 			height_(2),
@@ -920,8 +921,8 @@ namespace btree
 					unsigned leaf_cache_size_in_bytes,
 					bool range_sorted = false
 				): 
-			node_cache_(node_cache_size_in_bytes,this,min_node_size,max_node_size,key_compare_),
-			leaf_cache_(leaf_cache_size_in_bytes,this,min_leaf_size,max_leaf_size,key_compare_),
+			node_cache_(node_cache_size_in_bytes,this,key_compare_),
+			leaf_cache_(leaf_cache_size_in_bytes,this,key_compare_),
 			iterator_map_(this),
 			size_(0),
 			height_(2),

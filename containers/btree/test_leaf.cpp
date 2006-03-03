@@ -12,7 +12,7 @@
 using namespace stxxl::btree;
 
 
-typedef normal_leaf<int,int,18,std::less<int> > myleaf_type;
+typedef normal_leaf<int,int,4096,std::less<int> > myleaf_type;
 typedef myleaf_type::value_type pair_type;
 
 int main()
