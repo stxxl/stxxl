@@ -442,6 +442,7 @@ namespace btree
 		std::pair<iterator, bool> insert(const value_type & x)
 		{
 			root_node_iterator_type it = root_node_.lower_bound(x.first);
+			assert(!root_node_.empty());
 			assert(it != root_node_.end());
 			if(height_ == 2) // 'it' points to a leaf
 			{
