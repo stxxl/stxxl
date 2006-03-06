@@ -12,11 +12,11 @@
 #define DATA_SIZE 	32
 
 #define NODE_BLOCK_SIZE 	(32*1024)
-#define LEAF_BLOCK_SIZE 		(32*1024)
+#define LEAF_BLOCK_SIZE 	(32*1024)
 
-#define TOTAL_CACHE_SIZE 	(2*32*1024*1024)
-#define NODE_CACHE_SIZE 	(TOTAL_CACHE_SIZE)
-#define LEAF_CACHE_SIZE 		(TOTAL_CACHE_SIZE)
+#define TOTAL_CACHE_SIZE 	(16*1024*1024)
+#define NODE_CACHE_SIZE 	(2*TOTAL_CACHE_SIZE)
+#define LEAF_CACHE_SIZE 	(TOTAL_CACHE_SIZE)
 
 struct my_key
 {
@@ -84,9 +84,15 @@ struct comp_type
 
 typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map_type;
 
-int main()
+int main(int argc, char * argv[])
 {
-	stxxl::int64 ops = 1000000;
+	if(argc < 2)
+	{
+		STXXL_MSG("Usage: "<<argv[0]<<" #ops")
+		return 0;
+	}
+
+	stxxl::int64 ops = atoll(argv[1]);
 	
 	map_type Map(NODE_CACHE_SIZE,LEAF_CACHE_SIZE);
 	
