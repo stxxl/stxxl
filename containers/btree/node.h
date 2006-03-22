@@ -344,7 +344,9 @@ public:
 					std::pair<key_type,leaf_bid_type> BotSplitter;
 					std::pair<iterator, bool> result = Leaf->insert(x,BotSplitter);
 					btree_->leaf_cache_.unfix_node((leaf_bid_type)it->second);
-					if(key_compare::max_value() == BotSplitter.first)
+					//if(key_compare::max_value() == BotSplitter.first)
+					if(!(cmp_(key_compare::max_value(),BotSplitter.first) ||
+						 cmp_(BotSplitter.first,key_compare::max_value()) ))
 						return result;	// no overflow/splitting happened
 					
 					STXXL_VERBOSE1("btree::normal_node Inserting new value in *this");
@@ -362,7 +364,9 @@ public:
 					std::pair<key_type,node_bid_type> BotSplitter;
 					std::pair<iterator, bool> result = Node->insert(x,height-1,BotSplitter);
 					btree_->node_cache_.unfix_node((node_bid_type)it->second);
-					if(key_compare::max_value() == BotSplitter.first)
+					//if(key_compare::max_value() == BotSplitter.first)
+					if(!(cmp_(key_compare::max_value(),BotSplitter.first) ||
+						 cmp_(BotSplitter.first,key_compare::max_value()) ))
 						return result;	// no overflow/splitting happened
 					
 					STXXL_VERBOSE1("btree::normal_node Inserting new value in *this");

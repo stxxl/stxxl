@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XMI xmlns:UML="http://schema.omg.org/spec/UML/1.3" verified="false" timestamp="2006-02-14T21:20:41" xmi.version="1.2" >
+<XMI xmlns:UML="http://schema.omg.org/spec/UML/1.3" verified="false" timestamp="2006-03-07T11:58:58" xmi.version="1.2" >
  <XMI.header>
   <XMI.documentation>
    <XMI.exporter>umbrello uml modeller http://uml.sf.net</XMI.exporter>
@@ -33,25 +33,25 @@
       <UML:Attribute isSpecification="false" visibility="private" xmi.id="441" type="2" name="height" />
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="82" isRoot="false" isAbstract="false" isQuery="false" name="insert" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4677" type="269" />
+        <UML:Parameter kind="return" xmi.id="4810" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="1752" value="" type="1737" name="v" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="86" isRoot="false" isAbstract="false" isQuery="false" name="erase" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4678" type="2" />
+        <UML:Parameter kind="return" xmi.id="4811" type="2" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="3625" value="" type="137" name="k" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="87" isRoot="false" isAbstract="false" isQuery="false" name="find" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4679" type="269" />
+        <UML:Parameter kind="return" xmi.id="4812" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="167" value="" type="137" name="k" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="2427" isRoot="false" isAbstract="false" isQuery="false" name="lower_bound" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4680" type="269" />
+        <UML:Parameter kind="return" xmi.id="4813" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="2428" value="" type="137" name="k" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -63,21 +63,21 @@
       <UML:Attribute isSpecification="false" visibility="private" xmi.id="3376" type="2" name="size" />
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="130" isRoot="false" isAbstract="false" isQuery="false" name="find" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4681" type="269" />
+        <UML:Parameter kind="return" xmi.id="4814" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="178" value="" type="137" name="k" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="466" value="" type="2" name="h" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="2127" isRoot="false" isAbstract="false" isQuery="false" name="lower_bound" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4682" type="269" />
+        <UML:Parameter kind="return" xmi.id="4815" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="2128" value="" type="137" name="k" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="2138" value="" type="2" name="h" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="2276" isRoot="false" isAbstract="false" isQuery="false" name="insert" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4683" type="269" />
+        <UML:Parameter kind="return" xmi.id="4816" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="2277" value="" type="1737" name="v" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="2288" value="" type="2" name="h" />
         <UML:Parameter isSpecification="false" kind="out" visibility="private" xmi.id="2299" value="" type="2198" name="s" />
@@ -99,7 +99,7 @@
       <UML:Attribute isSpecification="false" visibility="private" xmi.id="3407" type="2" name="size" />
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="209" isRoot="false" isAbstract="false" isQuery="false" name="find" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4684" type="269" />
+        <UML:Parameter kind="return" xmi.id="4817" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="214" value="" type="137" name="k" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -115,13 +115,13 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="2365" isRoot="false" isAbstract="false" isQuery="false" name="lower_bound" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4685" type="269" />
+        <UML:Parameter kind="return" xmi.id="4818" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="2366" value="" type="137" name="k" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="2688" isRoot="false" isAbstract="false" isQuery="false" name="insert" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4686" type="269" />
+        <UML:Parameter kind="return" xmi.id="4819" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="2689" value="" type="1737" name="v" />
         <UML:Parameter isSpecification="false" kind="out" visibility="private" xmi.id="2703" value="" type="2198" name="s" />
        </UML:BehavioralFeature.parameter>
@@ -141,13 +141,13 @@
       <UML:Attribute isSpecification="false" visibility="private" xmi.id="4494" type="4495" name="freeNodes" />
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="88" isRoot="false" isAbstract="false" isQuery="false" name="getNode" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4687" type="13" />
+        <UML:Parameter kind="return" xmi.id="4820" type="13" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="111" value="" type="92" name="b" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="3045" isRoot="false" isAbstract="false" isQuery="false" name="getNewNode" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4688" type="14" />
+        <UML:Parameter kind="return" xmi.id="4821" type="14" />
         <UML:Parameter isSpecification="false" kind="out" visibility="private" xmi.id="3046" value="" type="92" name="b" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -172,7 +172,7 @@
      <UML:Classifier.feature>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="188" isRoot="false" isAbstract="false" isQuery="false" name="getLeaf" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4689" type="14" />
+        <UML:Parameter kind="return" xmi.id="4822" type="14" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="189" value="" type="92" name="b" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -183,7 +183,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="1862" isRoot="false" isAbstract="false" isQuery="false" name="getNewLeaf" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4690" type="14" />
+        <UML:Parameter kind="return" xmi.id="4823" type="14" />
         <UML:Parameter isSpecification="false" kind="out" visibility="private" xmi.id="1863" value="" type="92" name="b" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -209,7 +209,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="85" isRoot="false" isAbstract="false" isQuery="false" name="find" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4691" type="92" />
+        <UML:Parameter kind="return" xmi.id="4824" type="92" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="160" value="" type="137" name="k" />
        </UML:BehavioralFeature.parameter>
       </UML:Operation>
@@ -229,7 +229,7 @@
       </UML:Operation>
       <UML:Operation isSpecification="false" isLeaf="false" visibility="public" xmi.id="591" isRoot="false" isAbstract="false" isQuery="false" name="find" >
        <UML:BehavioralFeature.parameter>
-        <UML:Parameter kind="return" xmi.id="4692" type="269" />
+        <UML:Parameter kind="return" xmi.id="4825" type="269" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="598" value="" type="92" name="b" />
         <UML:Parameter isSpecification="false" visibility="private" xmi.id="618" value="" type="2" name="pos" />
        </UML:BehavioralFeature.parameter>
@@ -370,20 +370,20 @@
   </UML:Model>
  </XMI.content>
  <XMI.extensions xmi.extender="umbrello" >
-  <docsettings viewid="1" documentation="" uniqueid="4692" />
+  <docsettings viewid="1" documentation="" uniqueid="4825" />
   <diagrams>
-   <diagram snapgrid="0" showattsig="1" fillcolor="#ffffc0" linewidth="0" zoom="100" showgrid="0" showopsig="1" usefillcolor="1" snapx="10" canvaswidth="1319" snapy="10" showatts="1" xmi.id="1" documentation="" type="402" showops="1" showpackage="0" name="class diagram" localid="900000" showstereotype="0" showscope="1" snapcsgrid="0" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="#ff0000" canvasheight="830" >
+   <diagram snapgrid="0" showattsig="1" fillcolor="#ffffc0" linewidth="0" zoom="100" showgrid="0" showopsig="1" usefillcolor="1" snapx="10" canvaswidth="1462" snapy="10" showatts="1" xmi.id="1" documentation="" type="402" showops="1" showpackage="0" name="class diagram" localid="900000" showstereotype="0" showscope="1" snapcsgrid="0" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="#ff0000" canvasheight="834" >
     <widgets>
      <classwidget usesdiagramfillcolour="0" width="380" showattsigs="601" usesdiagramusefillcolour="0" x="421" y="10" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="132" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="11" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
-     <classwidget usesdiagramfillcolour="0" width="437" showattsigs="601" usesdiagramusefillcolour="0" x="814" y="669" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="154" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="13" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
+     <classwidget usesdiagramfillcolour="0" width="437" showattsigs="601" usesdiagramusefillcolour="0" x="852" y="665" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="154" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="13" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
      <classwidget usesdiagramfillcolour="0" width="376" showattsigs="601" usesdiagramusefillcolour="0" x="16" y="584" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="242" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="14" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
      <classwidget usesdiagramfillcolour="0" width="297" showattsigs="601" usesdiagramusefillcolour="0" x="986" y="286" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="220" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="15" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
-     <classwidget usesdiagramfillcolour="0" width="290" showattsigs="601" usesdiagramusefillcolour="0" x="407" y="296" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="121" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="16" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
+     <classwidget usesdiagramfillcolour="0" width="290" showattsigs="601" usesdiagramusefillcolour="0" x="435" y="292" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="121" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="16" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
      <classwidget usesdiagramfillcolour="0" width="222" showattsigs="601" usesdiagramusefillcolour="0" x="1093" y="56" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="99" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="17" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
      <classwidget usesdiagramfillcolour="1" width="297" showattsigs="601" usesdiagramusefillcolour="1" x="9" y="13" showopsigs="601" linewidth="none" fillcolour="none" height="99" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="18" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="none" />
-     <classwidget usesdiagramfillcolour="0" width="375" showattsigs="601" usesdiagramusefillcolour="0" x="427" y="603" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="85" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="269" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
+     <classwidget usesdiagramfillcolour="0" width="375" showattsigs="601" usesdiagramusefillcolour="0" x="435" y="623" showopsigs="601" linewidth="none" fillcolour="#ffffc0" height="85" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="269" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="#ff0000" />
      <classwidget usesdiagramfillcolour="1" width="84" showattsigs="601" usesdiagramusefillcolour="1" x="18" y="168" showopsigs="601" linewidth="none" fillcolour="none" height="77" usefillcolor="1" showpubliconly="0" showattributes="1" isinstance="0" xmi.id="2198" showoperations="1" showpackage="0" showscope="1" font="Sans Serif,12,-1,5,75,0,0,0,0,0" linecolor="none" />
-     <notewidget usesdiagramfillcolour="1" width="116" usesdiagramusefillcolour="1" x="234" y="183" linewidth="none" fillcolour="none" height="160" usefillcolor="1" isinstance="0" xmi.id="4019" text="LeafCache caches at least $height$ blocks" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
+     <notewidget usesdiagramfillcolour="1" width="116" usesdiagramusefillcolour="1" x="234" y="183" linewidth="none" fillcolour="none" height="160" usefillcolor="1" isinstance="0" xmi.id="4019" text="NodeCache caches at least $height-1$ blocks" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
     </widgets>
     <messages/>
     <associations>
@@ -392,32 +392,32 @@
        <startpoint startx="801" starty="76" />
        <endpoint endx="1093" endy="105" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="18" usesdiagramusefillcolour="1" x="792" y="79" linewidth="none" posttext="" role="701" fillcolour="none" height="26" usefillcolor="1" pretext="" isinstance="0" xmi.id="4576" text="1" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="18" usesdiagramusefillcolour="1" x="792" y="79" linewidth="none" posttext="" role="701" fillcolour="none" height="26" usefillcolor="1" pretext="" isinstance="0" xmi.id="4693" text="1" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="5" indexa="2" totalcountb="2" indexb="1" linewidth="none" widgetbid="16" widgetaid="11" xmi.id="35" linecolor="none" >
       <linepath>
        <startpoint startx="573" starty="142" />
-       <endpoint endx="552" endy="296" />
+       <endpoint endx="580" endy="292" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="18" usesdiagramusefillcolour="1" x="635" y="144" linewidth="none" posttext="" role="701" fillcolour="none" height="26" usefillcolor="1" pretext="" isinstance="0" xmi.id="4577" text="1" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="18" usesdiagramusefillcolour="1" x="613" y="144" linewidth="none" posttext="" role="701" fillcolour="none" height="26" usefillcolor="1" pretext="" isinstance="0" xmi.id="4694" text="1" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="5" indexa="4" totalcountb="2" indexb="1" linewidth="none" widgetbid="15" widgetaid="11" xmi.id="40" linecolor="none" >
       <linepath>
        <startpoint startx="725" starty="142" />
        <endpoint endx="986" endy="396" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="18" usesdiagramusefillcolour="1" x="683" y="135" linewidth="none" posttext="" role="701" fillcolour="none" height="26" usefillcolor="1" pretext="" isinstance="0" xmi.id="4578" text="1" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="18" usesdiagramusefillcolour="1" x="683" y="135" linewidth="none" posttext="" role="701" fillcolour="none" height="26" usefillcolor="1" pretext="" isinstance="0" xmi.id="4695" text="1" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="5" indexa="3" totalcountb="2" indexb="1" linewidth="none" widgetbid="15" widgetaid="13" xmi.id="52" linecolor="none" >
       <linepath>
-       <startpoint startx="1076" starty="669" />
+       <startpoint startx="1114" starty="665" />
        <endpoint endx="1134" endy="506" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="5" indexa="1" totalcountb="4" indexb="3" linewidth="none" widgetbid="16" widgetaid="13" xmi.id="62" linecolor="none" >
       <linepath>
-       <startpoint startx="901" starty="669" />
-       <endpoint endx="624" endy="417" />
+       <startpoint startx="939" starty="665" />
+       <endpoint endx="652" endy="413" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" totalcountb="2" indexb="1" linewidth="none" widgetbid="18" widgetaid="11" xmi.id="65" linecolor="none" >
@@ -425,17 +425,17 @@
        <startpoint startx="421" starty="76" />
        <endpoint endx="306" endy="62" />
       </linepath>
-      <floatingtext usesdiagramfillcolour="1" width="32" usesdiagramusefillcolour="1" x="406" y="47" linewidth="none" posttext="" role="701" fillcolour="none" height="32" usefillcolor="1" pretext="" isinstance="0" xmi.id="4579" text="1" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
+      <floatingtext usesdiagramfillcolour="1" width="32" usesdiagramusefillcolour="1" x="406" y="47" linewidth="none" posttext="" role="701" fillcolour="none" height="32" usefillcolor="1" pretext="" isinstance="0" xmi.id="4696" text="1" font="Sans Serif,12,-1,5,50,0,0,0,0,0" linecolor="none" />
      </assocwidget>
      <assocwidget totalcounta="5" indexa="3" totalcountb="5" indexb="2" linewidth="none" widgetbid="13" widgetaid="11" xmi.id="68" linecolor="none" >
       <linepath>
        <startpoint startx="649" starty="142" />
-       <endpoint endx="988" endy="669" />
+       <endpoint endx="1026" endy="665" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" totalcountb="3" indexb="2" linewidth="none" widgetbid="14" widgetaid="13" xmi.id="71" linecolor="none" >
       <linepath>
-       <startpoint startx="814" starty="746" />
+       <startpoint startx="852" starty="742" />
        <endpoint endx="392" endy="745" />
       </linepath>
      </assocwidget>
@@ -447,20 +447,20 @@
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" totalcountb="4" indexb="2" linewidth="none" widgetbid="16" widgetaid="269" xmi.id="702" linecolor="none" >
       <linepath>
-       <startpoint startx="612" starty="603" />
-       <endpoint endx="552" endy="417" />
+       <startpoint startx="622" starty="623" />
+       <endpoint endx="580" endy="413" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="2" indexa="1" totalcountb="3" indexb="1" linewidth="none" widgetbid="14" widgetaid="269" xmi.id="953" linecolor="none" >
       <linepath>
-       <startpoint startx="425" starty="645" />
+       <startpoint startx="435" starty="665" />
        <endpoint endx="392" endy="664" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="4" indexa="3" totalcountb="4" indexb="1" linewidth="none" widgetbid="16" widgetaid="14" xmi.id="1550" linecolor="none" >
       <linepath>
        <startpoint startx="298" starty="584" />
-       <endpoint endx="479" endy="417" />
+       <endpoint endx="507" endy="413" />
       </linepath>
      </assocwidget>
      <assocwidget totalcounta="5" indexa="1" totalcountb="4" indexb="2" linewidth="none" widgetbid="14" widgetaid="11" xmi.id="1947" linecolor="none" >
@@ -471,10 +471,10 @@
      </assocwidget>
      <assocwidget totalcounta="5" indexa="4" totalcountb="0" indexb="0" linewidth="none" widgetbid="13" widgetaid="13" xmi.id="1977" linecolor="none" >
       <linepath>
-       <startpoint startx="923" starty="669" />
-       <endpoint endx="1141" endy="669" />
-       <point x="922" y="619" />
-       <point x="1023" y="619" />
+       <startpoint startx="961" starty="665" />
+       <endpoint endx="1179" endy="665" />
+       <point x="960" y="615" />
+       <point x="1061" y="615" />
       </linepath>
      </assocwidget>
     </associations>
@@ -775,7 +775,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        btree.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        btree.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="441" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -798,7 +798,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="1947" field_type="1" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="1947" field_type="1" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -833,7 +833,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="26" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="26" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -868,7 +868,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="35" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="35" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -903,7 +903,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="40" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="40" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -938,7 +938,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="49" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="49" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -973,7 +973,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="65" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="65" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -1097,7 +1097,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        node.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        node.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:54:28&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="1174" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -1140,7 +1140,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="49" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="49" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -1294,7 +1294,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        leaf.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        leaf.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="1159" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -1377,7 +1377,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="1947" field_type="1" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="1947" field_type="1" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -1501,7 +1501,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        nodecache.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        nodecache.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="4392" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -1584,7 +1584,7 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="40" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="40" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -1688,10 +1688,10 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        leafcache.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        leafcache.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:54:25&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
-      <codeclassfield parent_id="35" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="35" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -1790,10 +1790,10 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        rootnode.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        rootnode.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
-      <codeclassfield parent_id="26" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="26" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -1892,10 +1892,10 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        iteratormap.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        iteratormap.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
-      <codeclassfield parent_id="65" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="65" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
@@ -1964,7 +1964,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        iterator.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 20:29:44&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        iterator.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:57:56&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -2010,7 +2010,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        splitter.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        splitter.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="2209" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -2076,7 +2076,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        array.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        array.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -2101,7 +2101,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        map.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        map.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -2126,7 +2126,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        pager.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        pager.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -2151,7 +2151,7 @@
       </hierarchicalcodeblock>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        list.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        list.cpp - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.cpp&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -2395,7 +2395,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        btree.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        btree.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="441" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -2418,11 +2418,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="1947" field_type="1" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="1947" field_type="1" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="1947" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" Leaf ;" >
+       <ccfdeclarationcodeblock parent_id="1947" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" BTree ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -2453,11 +2453,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="26" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="26" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="26" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" RootNode ;" >
+       <ccfdeclarationcodeblock parent_id="26" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" BTree ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -2488,11 +2488,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="35" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="35" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="35" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" LeafCache ;" >
+       <ccfdeclarationcodeblock parent_id="35" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" BTree ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -2523,11 +2523,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="40" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="40" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="40" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" NodeCache ;" >
+       <ccfdeclarationcodeblock parent_id="40" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" BTree ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -2558,11 +2558,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="49" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="49" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="49" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" Node ;" >
+       <ccfdeclarationcodeblock parent_id="49" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" BTree ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -2593,11 +2593,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="65" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="65" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="65" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" IteratorMap ;" >
+       <ccfdeclarationcodeblock parent_id="65" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="0" text=" BTree ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -2885,7 +2885,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        node.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        node.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:54:28&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="1174" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -2928,11 +2928,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="49" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="49" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="49" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" BTree ;" >
+       <ccfdeclarationcodeblock parent_id="49" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" Node ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -3260,7 +3260,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        leaf.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        leaf.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="1159" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -3343,11 +3343,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="1947" field_type="1" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="1947" field_type="1" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="1947" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" BTree ;" >
+       <ccfdeclarationcodeblock parent_id="1947" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" Leaf ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -3670,7 +3670,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        nodecache.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        nodecache.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="4392" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -3753,11 +3753,11 @@
         </header>
        </codeaccessormethod>
       </codeclassfield>
-      <codeclassfield parent_id="40" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="40" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="40" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" BTree ;" >
+       <ccfdeclarationcodeblock parent_id="40" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" NodeCache ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -4013,14 +4013,14 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        leafcache.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        leafcache.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:54:25&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
-      <codeclassfield parent_id="35" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="35" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="35" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" BTree ;" >
+       <ccfdeclarationcodeblock parent_id="35" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" LeafCache ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -4271,14 +4271,14 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        rootnode.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        rootnode.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
-      <codeclassfield parent_id="26" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="26" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="26" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" BTree ;" >
+       <ccfdeclarationcodeblock parent_id="26" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" RootNode ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -4529,14 +4529,14 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        iteratormap.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        iteratormap.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
-      <codeclassfield parent_id="65" field_type="4" initialValue="" role_id="0" writeOutMethods="true" listClassName="" >
+      <codeclassfield parent_id="65" field_type="4" initialValue="" role_id="1" writeOutMethods="true" listClassName="" >
        <header>
         <cppcodedocumentation tag="" />
        </header>
-       <ccfdeclarationcodeblock parent_id="65" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" BTree ;" >
+       <ccfdeclarationcodeblock parent_id="65" tag="" canDelete="false" writeOutText="false" indentLevel="1" role_id="1" text=" IteratorMap ;" >
         <header>
          <cppcodedocumentation tag="" writeOutText="false" indentLevel="1" />
         </header>
@@ -4782,7 +4782,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        iterator.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 20:29:44&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        iterator.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:57:56&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -5020,7 +5020,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        splitter.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        splitter.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields>
       <codeclassfield parent_id="2209" field_type="0" initialValue="" role_id="-1" writeOutMethods="true" listClassName="" >
@@ -5267,7 +5267,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        array.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        array.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -5473,7 +5473,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        map.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        map.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -5679,7 +5679,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        pager.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        pager.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>
@@ -5885,7 +5885,7 @@
       </codeblockwithcomments>
      </textblocks>
      <header>
-      <codecomment tag="" text="/************************************************************************&amp;#010;                        list.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Feb 14 2006 at 18:12:35&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
+      <codecomment tag="" text="/************************************************************************&amp;#010;                        list.h - Copyright dementiev&amp;#010;&amp;#010;Here you can write a license for your code, some comments or any other&amp;#010;information you want to have in your generated code. To to this simply&amp;#010;configure the &quot;headings&quot; directory in uml to point to a directory&amp;#010;where you have your heading files.&amp;#010;&amp;#010;or you can just replace the contents of this file with your own.&amp;#010;If you want to do this, this file is located at&amp;#010;&amp;#010;/opt/kde3/share/apps/umbrello/headings/heading.h&amp;#010;&amp;#010;-->Code Generators searches for heading files based on the file extension&amp;#010;   i.e. it will look for a file name ending in &quot;.h&quot; to include in C++ header&amp;#010;   files, and for a file name ending in &quot;.java&quot; to include in all generated&amp;#010;   java code.&amp;#010;   If you name the file &quot;heading.&lt;extension>&quot;, Code Generator will always&amp;#010;   choose this file even if there are other files with the same extension in the&amp;#010;   directory. If you name the file something else, it must be the only one with that&amp;#010;   extension in the directory to guarantee that Code Generator will choose it.&amp;#010;&amp;#010;you can use variables in your heading files which are replaced at generation&amp;#010;time. possible variables are : author, date, time, filename and filepath.&amp;#010;just write %variable_name%&amp;#010;&amp;#010;This file was generated on Tue Mar 7 2006 at 11:53:53&amp;#010;The original location of this file is &amp;#010;**************************************************************************/&amp;#010;" />
      </header>
      <classfields/>
     </classifiercodedocument>

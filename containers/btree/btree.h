@@ -158,7 +158,7 @@ namespace btree
 				
 				
 				++height_;
-				STXXL_MSG("btree Increasing height to "<<height_)
+				STXXL_VERBOSE1("btree Increasing height to "<<height_)
 				if(node_cache_.size() < (height_-1))
 				{
 					STXXL_ERRMSG("The height of the tree ("<<height_<<") has exceeded the required capacity ("
@@ -361,7 +361,7 @@ namespace btree
 				assert(nparents == Bids.size());
 				
 				++height_;
-				STXXL_MSG("Increasing height to "<<height_)
+				STXXL_VERBOSE1("Increasing height to "<<height_)
 				if(node_cache_.size() < (height_-1))
 				{
 					STXXL_ERRMSG("The height of the tree ("<<height_<<") has exceeded the required capacity ("
@@ -453,7 +453,9 @@ namespace btree
 				std::pair<iterator, bool> result = Leaf->insert(x,Splitter);
 				if(result.second) ++size_;	
 				leaf_cache_.unfix_node((leaf_bid_type)it->second);
-				if(key_compare::max_value() == Splitter.first)
+				//if(key_compare::max_value() == Splitter.first)
+				if(!(key_compare_(key_compare::max_value(),Splitter.first) ||
+					key_compare_(Splitter.first,key_compare::max_value()) ))
 					return result;	// no overflow/splitting happened
 				
 				STXXL_VERBOSE1("Inserting new value into root node");
@@ -473,7 +475,9 @@ namespace btree
 			std::pair<iterator, bool> result = Node->insert(x,height_-1,Splitter);
 			if(result.second) ++size_;	
 			node_cache_.unfix_node((node_bid_type)it->second);
-			if(key_compare::max_value() == Splitter.first)
+			//if(key_compare::max_value() == Splitter.first)
+			if(!(key_compare_(key_compare::max_value(),Splitter.first) ||
+					key_compare_(Splitter.first,key_compare::max_value()) ))
 				return result;	// no overflow/splitting happened
 			
 			STXXL_VERBOSE1("Inserting new value into root node");
@@ -827,7 +831,7 @@ namespace btree
 				
 				node_cache_.delete_node(RootBid);
 				--height_;
-				STXXL_MSG("btree Decreasing height to "<<height_)
+				STXXL_VERBOSE1("btree Decreasing height to "<<height_)
 			}
 			
 			assert(leaf_cache_.nfixed() == 0);
