@@ -66,10 +66,6 @@ public:
 				unsigned leaf_cache_size_in_bytes
 				) : Impl(node_cache_size_in_bytes,leaf_cache_size_in_bytes)
 	{
-		STXXL_VERBOSE1("stxxl::map constructor apx_node_size: "<<apx_node_size)
-		STXXL_VERBOSE1("stxxl::map constructor log_node_size: "<<log_node_size)
-		STXXL_VERBOSE1("stxxl::map constructor apx_leaf_size: "<<apx_leaf_size)
-		STXXL_VERBOSE1("stxxl::map constructor log_node_size: "<<log_leaf_size)
 	}
 	
 	map(	const key_compare & c_,

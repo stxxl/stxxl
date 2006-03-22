@@ -71,7 +71,7 @@ int main( int argc, char* argv[] )
 	STXXL_MSG("Leaf max elements: "<<LEAF_MELEMENTS)
 
 	stxxl::random_number32 rnd;
-	stxxl::ran32State = 1141225706;
+	//stxxl::ran32State = 1141225706;
 	STXXL_MSG("Init random seed: "<<stxxl::ran32State)
 	
 	int a = (PERCENT_CLEAR +
@@ -88,6 +88,12 @@ int main( int argc, char* argv[] )
 	
 	assert(a == 1000);
 
+	if(argc < 2)
+	{
+		STXXL_MSG("Usage: "<<argv[0]<<" STEP ")
+		STXXL_MSG("Note, that STEP must be > 1000")
+		return 0;
+	}
   	stxxl::uint64 MAX_STEP = atoi( argv[1] );
 	assert(MAX_STEP > 1000);
 	std_map_type stdmap;

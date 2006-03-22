@@ -1,12 +1,12 @@
-all: vector stack mstack many p_queue queue ext_merger bench_pqueue copy_file
+all: vector stack mstack many p_queue queue ext_merger bench_pqueue copy_file testmap test_map_random
 
 include ../make.settings
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
 berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c berkeley_db_benchmark.cpp -DNDEBUG -pg
-	$(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS) -pg
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c berkeley_db_benchmark.cpp 
+	$(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
 
 
 write_vector: $(DEPENDENCIES)
@@ -62,7 +62,7 @@ bench_pqueue: bench_pqueue.cpp $(DEPENDENCIES)
 	$(LINKER)  bench_pqueue.$(OBJEXT) $(OUT)bench_pqueue.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
 
 clean:
-	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT)
+	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT) testmap.$(EXEEXT) test_map_random.$(EXEEXT)
 	$(RM) ext_merger.$(EXEEXT) p_queue.$(EXEEXT) many_stacks.$(EXEEXT)
 	$(RM) test_mstack.$(EXEEXT) test_stack.$(EXEEXT) test.$(EXEEXT)
 	$(RM) testqueue.$(EXEEXT) testmap.$(EXEEXT) copy_file.$(EXEEXT)

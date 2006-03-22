@@ -14,12 +14,12 @@ typedef unsigned int data_type;
 
 struct cmp: public std::less<key_type>
 {
-                key_type min_value() const { return (std::numeric_limits<key_type>::min)(); };
-                key_type max_value() const { return (std::numeric_limits<key_type>::max)(); };
+                static key_type min_value() { return (std::numeric_limits<key_type>::min)(); };
+                static key_type max_value() { return (std::numeric_limits<key_type>::max)(); };
 };
 
-#define BLOCK_SIZE (128*1024)
-#define CACHE_SIZE (128*1024/BLOCK_SIZE)
+#define BLOCK_SIZE (32*1024)
+#define CACHE_SIZE (2*1024*1024/BLOCK_SIZE)
 
 #define CACHE_ELEMENTS (BLOCK_SIZE*CACHE_SIZE/(sizeof(key_type) + sizeof(data_type)))
 
@@ -27,7 +27,7 @@ typedef stxxl::map<key_type, data_type , cmp, BLOCK_SIZE, BLOCK_SIZE > map_type;
 
 int main()
 {
-/*
+
 	stxxl::stats * bm = stxxl::stats::get_instance();
 	STXXL_MSG(*bm)
 
@@ -38,7 +38,7 @@ int main()
 		const unsigned el = mult*(CACHE_ELEMENTS/8);
 		STXXL_MSG("Elements to insert "<< el <<" volume ="<<
 			(el*(sizeof(key_type) + sizeof(data_type)))/1024<<" kb")
-		map_type  Map;
+		map_type  Map(CACHE_SIZE*BLOCK_SIZE/2,CACHE_SIZE*BLOCK_SIZE/2);
 		for(unsigned i = 0; i < el; ++i)
 		{
 			Map[i] = i+1;
@@ -65,7 +65,7 @@ int main()
 		bm->reset();
 	}
 	
-*/	
+	
 	
 	return 0;	
 }

@@ -29,11 +29,11 @@ std::ostream & operator << (std::ostream & o, my_key & obj)
 		o << obj.keybuf[i];
 	return o;
 }
-
+/*
 bool operator == (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) == 0;
-}
+}*/
 /*
 bool operator != (const my_key & a, const my_key & b)
 {
