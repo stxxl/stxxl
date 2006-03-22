@@ -23,7 +23,7 @@ typedef int data_type;
 
 struct cmp2 : public std::less<int>
 {
-	static int max_value() { return std::numeric_limits<int>::max(); }
+	static int max_value() { return (std::numeric_limits<int>::max)(); }
 };
 
 #define DATA_NODE_BLOCK_SIZE (4096)
@@ -47,7 +47,7 @@ typedef stxxl::map<key_type,data_type,cmp2,
 
 
 //#define MAX_KEY 1000
-#define MAX_KEY 1000000
+#define MAX_KEY 10000
 
 //#define MAX_STEP 0x0001000
 
