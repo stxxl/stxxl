@@ -19,12 +19,6 @@ tests_g++: settings_g++
 tests_msvc: settings_msvc
 	nmake /F Makefile.msvc tests
 
-# Btree (map) is not yet compatible with g++ 3.4.x and Microsoft
-# Visual C++, therefore it is not included into the main tests 
-# (the Makefile goal above)
-btree_map_test_g++: settings_g++
-	make -f Makefile.g++ btree_map_test
-
 clean_g++: settings_g++
 	make -f Makefile.g++ clean
 

@@ -17,6 +17,44 @@ namespace btree
 	class btree;
 }	
 	
+//! \addtogroup stlcont
+//! \{
+
+//! \brief Priority queue type generator
+
+//! Template parameters:
+//! - KeyType key type
+//! - DataType data type
+//! - CompareType comparison type used to determine 
+//! whether a key is smaller than another one. 
+//! If CompareType()(x,y) is true, then x is smaller than y. 
+//! CompareType must also provide a static \c max_value method, that returns 
+//! a value of type KeyType that is 
+//! larger than any key stored in map : i.e. for all \b x in map holds 
+//! CompareType()(x,CompareType::max_value()) <BR> 
+//! <BR>
+//! Example: : 
+//! \verbatim
+//! struct CmpIntGreater
+//! {
+//!   bool operator () (const int & a, const int & b) const { return a>b; }
+//!   static int max_value() { return std::numeric_limits<int>::max(); }
+//! };
+//! \endverbatim
+//! Anpother example: 
+//! \verbatim
+//! struct CmpIntLess
+//! {
+//!   bool operator () (const int & a, const int & b) const { return a<b; }
+//!   static int max_value() const  { return std::numeric_limits<int>::min(); }
+//! };
+//! \endverbatim
+//! Note that CompareType must define a strict weak ordering.
+//! (<A HREF="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">see what it is</A>)
+//! - \c RawNodeSize size of internal nodes of map in bytes (btree implementation). 
+//! - \c RawLeafSize size of leaves of map in bytes (btree implementation). 
+//! - \c PDAllocStrategy parallel disk allocation strategy (\c stxxl::SR is recommended and default)
+//!
 template <	class KeyType,
 					class DataType,
 					class CompareType,
@@ -62,19 +100,32 @@ public:
 	key_compare key_comp() const { return Impl.key_comp(); }
 	value_compare value_comp() const { return Impl.value_comp(); }
 	
+	//! \brief A constructor
+	//! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
+	//! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
 	map(	unsigned node_cache_size_in_bytes,
 				unsigned leaf_cache_size_in_bytes
 				) : Impl(node_cache_size_in_bytes,leaf_cache_size_in_bytes)
 	{
 	}
 	
+	//! \brief A constructor
+	//! \param c_ comparator object
+	//! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
+	//! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
 	map(	const key_compare & c_,
 				unsigned node_cache_size_in_bytes,
 				unsigned leaf_cache_size_in_bytes
 				) : Impl(c_,node_cache_size_in_bytes,leaf_cache_size_in_bytes)
 	{}		
 	
-	
+	//! \brief Constructs a map from a given input range
+	//! \param b beginning of the range
+	//! \param e end of the range
+	//! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
+	//! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
+	//! \param range_sorted if \c true than the constructor assumes that the range is sorted
+	//! and performs a fast bottom-up bulk construction of the map (btree implementation)
 	template <class InputIterator>
 	map(	InputIterator b,
 				InputIterator e,
@@ -85,6 +136,14 @@ public:
 	{
 	}
 	
+	//! \brief Constructs a map from a given input range
+	//! \param b beginning of the range
+	//! \param e end of the range
+	//! \param c_ comparator object
+	//! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
+	//! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
+	//! \param range_sorted if \c true than the constructor assumes that the range is sorted
+	//! and performs a fast bottom-up bulk construction of the map (btree implementation)
 	template <class InputIterator>
 	map(	InputIterator b,
 				InputIterator e,
@@ -167,14 +226,19 @@ public:
 		return Impl[k];
 	}	
 	
+	//! \brief Enables leaf prefetching during scanning
 	void enable_prefetching()
 	{
 		Impl.enable_prefetching();
 	}
+	
+	//! \brief Disables leaf prefetching during scanning
 	void disable_prefetching()
 	{
 		Impl.disable_prefetching();
 	}
+	
+	//! \brief Returns the status of leaf prefetching during scanning
 	bool prefetching_enabled()
 	{
 		return Impl.prefetching_enabled();
@@ -314,6 +378,8 @@ inline bool operator >= (const map<KeyType,DataType,CompareType,RawNodeSize,RawL
 {
 	return a.Impl >= b.Impl;
 }
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

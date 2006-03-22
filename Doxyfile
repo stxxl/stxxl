@@ -61,7 +61,7 @@ INPUT                  = doxymain.h \
                          common/ \
 			 mng/ \
 			 containers/ \
-			 containers/map.impl/ \
+			 containers/btree/ \
 			 algo/ \
 			 stream/ \
 			 utils/

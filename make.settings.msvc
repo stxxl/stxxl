@@ -54,7 +54,7 @@ MNG_LAYER_FILES = ../mng/adaptor.h  ../mng/async_schedule.h  ../mng/block_prefet
 ../mng/buf_istream.h  ../mng/buf_ostream.h  ../mng/buf_writer.h  ../mng/mng.h \
 ../mng/write_pool.h ../mng/prefetch_pool.h
 
-CONTAINER_MAP_FILES = $(STXXL_ROOT)/containers/map.impl/*.h
+CONTAINER_MAP_FILES = # 
 
 CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/vector.h \
 ../containers/priority_queue.h ../containers/queue.h $(CONTAINER_MAP_FILES)
