@@ -1,4 +1,4 @@
-all: asch scan genfile sortfile ksort stable sort 
+all: asch scan genfile sortfile ksort stable sort manyunits 
 
 include ../make.settings
 
