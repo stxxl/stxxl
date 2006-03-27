@@ -22,14 +22,30 @@ struct counter
 	};	
 };
 
+template <class my_vec_type>
+void test_const_iterator(const my_vec_type &x)
+{
+    typename my_vec_type::const_iterator i = x.begin();
+	i = x.end();
+	i.touch();
+	i.flush();
+	i++;
+	++i;
+	--i;
+	i--;
+	*i;
+}
+
 
 int main()
 {
   typedef stxxl::VECTOR_GENERATOR<int64,2,1>::result vector_type;
 	vector_type v(4*int64(1024*1024));
 	
-	
+	// test assignment const_iterator = iterator
 	vector_type::const_iterator c_it = v.begin();
+	
+	test_const_iterator(v);
 	
 	stxxl::random_number32 rnd;
 	int offset = rnd();

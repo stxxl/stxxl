@@ -114,26 +114,26 @@ public:
 		{
 			return static_cast < block_offset_type >
 				(offset % block_type::size);
-		};
+		}
 		bids_container_iterator bid () const
 		{
 			return p_vector->bid (offset);
-		};
+		}
 		
 		difference_type operator - (const _Self & a) const
 		{
 			return offset - a.offset;
-		};
+		}
 		
 		_Self operator - (size_type op) const
 		{
 			return _Self(p_vector,offset - op);
-		};
+		}
 		
 		_Self operator + (size_type op) const
 		{
 			return _Self(p_vector,offset + op);
-		};
+		}
 		
 		reference operator *()
 		{
@@ -237,9 +237,9 @@ public:
 
 protected:
 		  size_type offset;
-		vector_type *p_vector;
+		const vector_type *p_vector;
 	      private:
-		  const_vector_iterator (vector_type * v, size_type o):offset (o),
+		  const_vector_iterator (const vector_type * v, size_type o):offset (o),
 			p_vector (v)
 		{
 		}
@@ -475,7 +475,7 @@ public:
 			std::swap(_free_pages,obj._free_pages); 
 			std::swap(_cache,obj._cache);
 		}
-    size_type capacity()
+    size_type capacity() const
     {
       return size_type(_bids.size())*block_type::size;
     }
@@ -658,7 +658,7 @@ public:
 			return const_element(offset);
 		}
 		
-		void flush()
+		void flush() const
 		{
 			simple_vector<bool> non_free_pages(n_pages);
 			int i=0;
@@ -796,7 +796,7 @@ private:
 				return _cache[last_page*page_size + page_offset/block_type::size][page_offset % block_type::size];
 			}
 		};
-		void touch(size_type offset)
+		void touch(size_type offset) const
 		{
 			// fails if offset is too large, out of bound access
 			assert(offset/(block_type::size*page_size) < _page_status.size() );
