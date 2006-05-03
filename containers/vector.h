@@ -135,6 +135,18 @@ public:
 			return _Self(p_vector,offset + op);
 		}
 		
+		_Self & operator -= (size_type op) const
+		{
+			offset -= op;
+			return *this;
+		}
+		
+		_Self & operator += (size_type op) const
+		{
+			offset += op;
+			return *this;
+		}
+		
 		reference operator *()
 		{
 			return p_vector->element(offset);
@@ -278,6 +290,18 @@ public:
 		_Self operator + (size_type op) const
 		{
 			return _Self(p_vector,offset + op);
+		}
+		
+		_Self & operator -= (size_type op) const
+		{
+			offset -= op;
+			return *this;
+		}
+		
+		_Self & operator += (size_type op) const
+		{
+			offset += op;
+			return *this;
 		}
 		
 		const_reference operator *() const
