@@ -26,7 +26,7 @@ template <class my_vec_type>
 void test_const_iterator(const my_vec_type &x)
 {
     typename my_vec_type::const_iterator i = x.begin();
-	i = x.end();
+	i = x.end()-1;
 	i.touch();
 	i.flush();
 	i++;
