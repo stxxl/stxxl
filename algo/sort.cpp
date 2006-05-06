@@ -68,6 +68,7 @@ int main()
 	
 		STXXL_MSG("Checking order...")
 		STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
+
 		
 		STXXL_MSG("Done, output size="<<v.size())
 	

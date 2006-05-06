@@ -301,8 +301,13 @@ void compute_prefetch_schedule(
 	
 	std::stable_sort(write_order,write_order + L,write_time_cmp());
 	
+	STXXL_VERBOSE1("Computed prefetch order for "<<L<<" blocks with "<<
+		D<<" disks and "<<m<<" blocks")
 	for(int i=0;i<L;i++)
+	{
 		out_first[i] = write_order[i].first;
+		STXXL_VERBOSE1(write_order[i].first)
+	}
 
 	delete [] write_order;
 }

@@ -64,12 +64,15 @@ public:
 		prefetch_seq = new int[seq_length];
 		
 		// obvious schedule
-		//for(i = 0; i< seq_length; i++)
+		//for(int i = 0; i< seq_length; i++)
 		//	prefetch_seq[i] = i;
 		
 		// optimal schedule
+		nbuffers = STXXL_MAX(2*ndisks,unsigned(nbuffers - 1));
 		compute_prefetch_schedule(_begin,_end,prefetch_seq,
-			STXXL_MIN(2*ndisks,unsigned(nbuffers - 1)),ndisks);
+			nbuffers,ndisks);
+		
+		
 		
 		prefetcher = new prefetcher_type(_begin,_end,prefetch_seq,nbuffers);
 		
