@@ -10,28 +10,24 @@
 
 // efficiently writes data into an stxxl::vector with overlapping of I/O and
 // computation
-template <class VectorType>
+template <class ExtIterator>
 class write_vector
 {
 	write_vector(); // forbidden
-	typedef VectorType	vector_type;
-	typedef typename vector_type::size_type size_type;
-	typedef typename vector_type::value_type value_type;
-	typedef typename vector_type::block_type block_type;
-	typedef typename vector_type::iterator  ExtIterator;
-	typedef typename vector_type::const_iterator ConstExtIterator;
+	typedef typename ExtIterator::size_type size_type;
+	typedef typename ExtIterator::value_type value_type;
+	typedef typename ExtIterator::block_type block_type;
+	typedef typename ExtIterator::const_iterator ConstExtIterator;
 	typedef stxxl::buf_ostream<block_type,typename ExtIterator::bids_container_iterator> buf_ostream_type;
 	
-	vector_type & Vec;
 	ExtIterator it;
 	unsigned nbuffers;
 	buf_ostream_type * outstream;
 public:
-	write_vector(	vector_type & Vec_,
+	write_vector(	ExtIterator begin,
 							unsigned nbuffers_ // buffers to use for overlapping (>=2 recommended)
-						): Vec(Vec_), it(Vec_.begin()),nbuffers(nbuffers_)
+						): it(begin),nbuffers(nbuffers_)
 	{
-		assert(!Vec.empty()); // precondition: Vec is empty
 		outstream = new buf_ostream_type(it.bid(),nbuffers);
 	}
 	
@@ -44,7 +40,6 @@ public:
 	
 	write_vector & operator ++()
 	{
-		assert(Vec.end() != it);
 		++it;
 		++(*outstream);
 		return *this;
@@ -105,7 +100,7 @@ int main(int argc, char * argv[])
 
                 vector_type::const_iterator it = InputVector.begin(); // creating const iterator
 
-				write_vector<vector_type> Writer(OutputVector,6);
+				write_vector<vector_type::iterator> Writer(OutputVector.begin(),2);
 
                 for(;it!=InputVector.end();++it,++Writer) // iterate through InputVector
                 {
