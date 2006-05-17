@@ -180,7 +180,8 @@ module.source.files=\
 	containers/btree/test_corr_insert_erase.cpp\
 	containers/btree/test_const_scan.cpp\
 	containers/test_map_random.cpp\
-	containers/write_vector.cpp
+	containers/write_vector.cpp\
+	containers/write_vector2.cpp
 
 module.pixmap.name=.
 module.pixmap.type=
