@@ -1,0 +1,118 @@
+/***************************************************************************
+ *            write_vector.cpp
+ *
+ *  Fri Mar  3 12:26:05 2006
+ *  Copyright  2006  Roman Dementiev
+ *  Email
+ ****************************************************************************/
+
+#include <stxxl>
+
+// efficiently writes data into an stxxl::vector with overlapping of I/O and
+// computation
+template <class VectorType>
+class write_vector
+{
+	write_vector(); // forbidden
+	typedef VectorType	vector_type;
+	typedef typename vector_type::size_type size_type;
+	typedef typename vector_type::value_type value_type;
+	typedef typename vector_type::block_type block_type;
+	typedef typename vector_type::iterator  ExtIterator;
+	typedef typename vector_type::const_iterator ConstExtIterator;
+	typedef stxxl::buf_ostream<block_type,typename ExtIterator::bids_container_iterator> buf_ostream_type;
+	
+	vector_type & Vec;
+	ExtIterator it;
+	unsigned nbuffers;
+	buf_ostream_type * outstream;
+public:
+	write_vector(	vector_type & Vec_,
+							unsigned nbuffers_ // buffers to use for overlapping (>=2 recommended)
+						): Vec(Vec_), it(Vec_.begin()),nbuffers(nbuffers_)
+	{
+		assert(!Vec.empty()); // precondition: Vec is empty
+		outstream = new buf_ostream_type(it.bid(),nbuffers);
+	}
+	
+	value_type & operator * ()
+	{
+		if(it.block_offset() ==0 ) it.touch(); // tells the vector that the block was modified
+		return **outstream;
+		
+	}
+	
+	write_vector & operator ++()
+	{
+		assert(Vec.end() != it);
+		++it;
+		++(*outstream);
+		return *this;
+	}
+	
+	void flush()
+	{
+		ConstExtIterator const_out = it;
+	
+		while(const_out.block_offset())
+		{
+			**outstream =  * const_out; // might cause I/Os for loading the page that
+			++const_out;                     // contains data beyond out
+			++(*outstream);
+		}
+		
+		it.flush();
+		delete outstream;
+		outstream = NULL;
+	}
+	
+	virtual ~write_vector()
+	{
+		if(outstream) flush();
+	}
+};
+
+typedef unsigned char my_type;
+
+// copies a file to another file
+
+using stxxl::syscall_file;
+using stxxl::file;
+
+int main(int argc, char * argv[])
+{
+
+                if(argc < 3)
+                {
+                        std::cout << "Usage: "<<argv[0]<<" input_file output_file "<<std::endl;
+                        return 0;
+                }
+
+                unlink(argv[2]); // delete output file
+
+                syscall_file InputFile(argv[1],file::RDONLY); // Input file object
+                syscall_file OutputFile(argv[2],file::RDWR|file::CREAT); // Output file object
+
+                typedef stxxl::vector<my_type> vector_type;
+
+                std::cout << "Copying file "<< argv[1] << " to "<<argv[2]<<std::endl;
+
+                vector_type InputVector(&InputFile);   // InputVector is mapped to InputFile
+                vector_type OutputVector(&OutputFile); // OutputVector is mapped to OutputFile
+				OutputVector.resize(InputVector.size());
+
+                std::cout << "File "<<argv[1]<<" has size "<< InputVector.size() << " bytes."<<std::endl;
+
+                vector_type::const_iterator it = InputVector.begin(); // creating const iterator
+
+				write_vector<vector_type> Writer(OutputVector,6);
+
+                for(;it!=InputVector.end();++it,++Writer) // iterate through InputVector
+                {
+                        *Writer=*it;
+                }
+				Writer.flush(); // flush buffers
+
+
+                return 0;
+}

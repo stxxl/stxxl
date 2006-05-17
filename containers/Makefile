@@ -12,7 +12,10 @@ berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
 write_vector: $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c write_vector.cpp
 	$(LINKER) write_vector.$(OBJEXT) $(OUT)write_vector.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-
+	
+write_vector2: $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c write_vector2.cpp
+	$(LINKER) write_vector2.$(OBJEXT) $(OUT)write_vector2.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 queue: $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c testqueue.cpp
