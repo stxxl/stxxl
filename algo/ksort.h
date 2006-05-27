@@ -648,6 +648,21 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 			{
 				(*new_runs[0])[i++].bid = *cur;
 			}
+			
+			bid_type & firstBID = (*new_runs[0])[0].bid;
+			if(firstBID.storage->get_id() != -1)
+			{
+				// the first block does not belong to the file
+				// need to reallocate it
+				mng->new_blocks( FR(), &firstBID,(&firstBID)+1);
+			}
+			bid_type & lastBID = (*new_runs[0])[_n-1].bid;
+			if(lastBID.storage->get_id() != -1)
+			{
+				// the first block does not belong to the file
+				// need to reallocate it
+				mng->new_blocks( FR(), &lastBID,(&lastBID)+1);
+			}
 		}
 		else
 			mng->new_blocks( interleaved_alloc_strategy(new_nruns, 0, ndisks),

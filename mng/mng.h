@@ -448,6 +448,29 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	
 		void dump();
 	
+		void check_corruption(stxxl::int64 region_pos,stxxl::int64 region_size,
+				sortseq::iterator pred, sortseq::iterator succ)
+		{
+			if(pred != free_space.end ())
+			{
+				if(pred->first <= region_pos && pred->first + pred->second > region_pos)
+				{
+					STXXL_ERRMSG("Error: double deallocation of external memory ")
+					STXXL_ERRMSG("System info: P "<<pred->first<<" "<<pred->second<<" "<<region_pos)
+					abort();
+				}
+			}
+			if(succ!=free_space.end ())
+			{
+				if(region_pos <= succ->first && region_pos + region_size > succ->first)
+				{
+					STXXL_ERRMSG("Error: double deallocation of external memory ")
+					STXXL_ERRMSG("System info: S "<<region_pos<<" "<<region_size<<" "<<succ->first)
+					abort();
+				}
+			}
+		}
+	
   public:
 		inline DiskAllocator (stxxl::int64 disk_size);
 
@@ -573,6 +596,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			sortseq::iterator succ = free_space.upper_bound (region_pos);
 			sortseq::iterator pred = succ;
 			pred--;
+			check_corruption(region_pos,region_size,pred,succ);
 			if(succ == free_space.end ())
 			{
 				if(pred == free_space.end ())

@@ -1,14 +1,14 @@
 
 [filenumbers]
-0=214
-1=1
-2=79
-3=69
-4=1
-5=36
-6=1355
-7=1
-8=1864
+0=586
+1=41
+2=917
+3=465
+4=43
+5=1
+6=79
+7=69
+8=1
 9=1
 10=347
 11=36
@@ -147,11 +147,15 @@ RunInTerminal=true
 clean before build=false
 
 [filelist]
-0=/home/dementiev/projects/stxxl/containers/vector.h
-1=/home/dementiev/projects/stxxl/mng/buf_writer.h
-2=/home/dementiev/projects/stxxl/mng/buf_ostream.h
-3=/home/dementiev/projects/stxxl/containers/write_vector2.cpp
-4=/home/dementiev/projects/stxxl/containers/write_vector.cpp
+0=/home/dementiev/projects/stxxl/algo/sort.h
+1=/home/dementiev/projects/stxxl/algo/ksort.cpp
+2=/home/dementiev/projects/stxxl/algo/ksort.h
+3=/home/dementiev/projects/stxxl/mng/mng.h
+4=/home/dementiev/projects/stxxl/containers/vector.h
+5=/home/dementiev/projects/stxxl/mng/buf_writer.h
+6=/home/dementiev/projects/stxxl/mng/buf_ostream.h
+7=/home/dementiev/projects/stxxl/containers/write_vector2.cpp
+8=/home/dementiev/projects/stxxl/containers/write_vector.cpp
 
 [Project Tree]
 0=0

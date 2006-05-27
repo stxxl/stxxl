@@ -1,5 +1,6 @@
 #include "../mng/mng.h"
 #include "ksort.h"
+#include "sort.h"
 #include "../containers/vector"
 
 //! \example algo/sort_file.cpp 
@@ -22,10 +23,21 @@ struct my_type
 	static my_type max_value(){ return my_type(0xffffffff); };
 };
 
+
 bool operator < (const my_type & a, const my_type & b)
 {
 	return a.key() < b.key();
 }
+
+struct Cmp
+{
+	bool operator () (const my_type & a, const my_type & b) const
+	{
+		return a < b;
+	}
+	static my_type min_value(){ return my_type(0); }
+	static my_type max_value(){ return my_type(0xffffffff); }
+};
 
 std::ostream & operator << (std::ostream & o, const my_type & obj)
 {
@@ -39,6 +51,7 @@ int main()
 			
 		unsigned memory_to_use = 50*1024*1024;
 		typedef stxxl::vector<my_type> vector_type;
+		{
 		vector_type v(&f);
 	
 	/*
@@ -51,10 +64,12 @@ int main()
 	
 		STXXL_MSG("Sorting...")
 		stxxl::ksort(v.begin(),v.end(),memory_to_use);
+		//stxxl::sort(v.begin(),v.end()-101,Cmp(),memory_to_use);
 	
 		STXXL_MSG("Checking order...")
 		STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
-		
+		}
+		STXXL_MSG("OK")
 	
 		return 0;
 }
