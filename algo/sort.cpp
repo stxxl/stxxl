@@ -49,10 +49,10 @@ struct cmp: public std::less<my_type>
 
 int main()
 {	
-		unsigned memory_to_use = 512*1024*1024;
+		unsigned memory_to_use = 128*1024*1024;
 		typedef stxxl::vector<my_type> vector_type;
 		const stxxl::int64 n_records = 
-			stxxl::int64(1*1024+512)*stxxl::int64(1024*1024)/sizeof(my_type);
+			stxxl::int64(384)*stxxl::int64(1024*1024)/sizeof(my_type);
 		vector_type v(n_records);
 	
     		random_number32 rnd;

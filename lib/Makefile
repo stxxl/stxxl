@@ -14,8 +14,8 @@ LIB_OBJECTS = \
 
 
 lib: $(LIB_OBJECTS)
-	$(LIBGEN)libstxxl.$(LIBEXT) $(LIB_OBJECTS)
+	$(LIBGEN)lib$(LIBNAME).$(LIBEXT) $(LIB_OBJECTS)
 
 clean:
-	$(RM) libstxxl.$(LIBEXT)
+	$(RM) lib$(LIBNAME).$(LIBEXT)
 

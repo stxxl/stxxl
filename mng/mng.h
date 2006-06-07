@@ -813,6 +813,8 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
 			return NULL;
 		};
+
+		virtual ~FileCreator() { }
 	};
   
   //! \weakgroup alloc Allocation functors

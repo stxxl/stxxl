@@ -102,7 +102,7 @@ int main(int argc, char * argv[])
 
 
 /*
-  char * disk_names_dev[] =
+  const char * disk_names_dev[] =
 {
   "/dev/raw/raw1", 
   "/dev/raw/raw2", 
@@ -115,7 +115,7 @@ int main(int argc, char * argv[])
 };
 */
 
-  char * disk_names_dev[] =
+  const char * disk_names_dev[] =
 {
   "/mnt/hdc/stxxl", 
   "/mnt/hde/stxxl", 

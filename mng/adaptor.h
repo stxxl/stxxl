@@ -224,6 +224,9 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 		using _Parent::array;
 		using _Parent::pos;
 
+		TwoToOneDimArrayRowAdaptor ()
+		{
+		};
 		TwoToOneDimArrayRowAdaptor (one_dim_array_type * a,
 					      pos_type
 					      p):TwoToOneDimArrayAdaptorBase <

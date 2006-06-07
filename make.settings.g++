@@ -1,7 +1,7 @@
 # Change this file according to your paths
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /home/dementiev/projects/stxxl#
+STXXL_ROOT = /home/singler/code/stxxl#
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
@@ -13,6 +13,7 @@ MAKE = make # or gmake
 COMPILER = g++
 LINKER = g++ 
 OPT = -O3 # compiler optimization level
+LIBNAME = stxxl
 
 DEBUG = # put here -g option to include the debug inormation into the binaries
 
@@ -103,7 +104,7 @@ STXXL_SPECIFIC = \
 
 STXXL_COMPILER_OPTIONS = $(STXXL_SPECIFIC) $(WARNINGS) \
  $(DEBUG) $(OPT)
-STXXL_LINKER_OPTIONS = -L$(STXXL_ROOT)/lib/ -lstxxl -lpthread
+STXXL_LINKER_OPTIONS = -L$(STXXL_ROOT)/lib/ -l$(LIBNAME) -lpthread
 
 ifeq ($(strip $(USE_BOOST)),yes)
 STXXL_COMPILER_OPTIONS += $(BOOST_COMPILER_OPTIONS)

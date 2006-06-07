@@ -30,9 +30,9 @@ int main()
   const int size = 1024 * 384;
   char *buffer = new char[size];
   #ifdef BOOST_MSVC
-  char * paths[2] = {"data1", "data2"};
+  const char * paths[2] = {"data1", "data2"};
   #else
-  char * paths[2] = {"/var/tmp/data1", "/var/tmp/data2"};
+  const char * paths[2] = {"/var/tmp/data1", "/var/tmp/data2"};
   mmap_file file1(paths[0],file::CREAT | file::RDWR /* | file::DIRECT */,0);
   file1.set_size(size*1024);
   #endif
