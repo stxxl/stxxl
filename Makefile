@@ -1,5 +1,5 @@
 default:
-	@echo "Choose one of the goals: library_msvc library_g++ tests_msvc tests_g++ btree_map_test_g++ clean_msvc clean_g++"
+	@echo "Choose one of the goals: library_msvc library_g++ tests_msvc tests_g++ clean_msvc clean_g++"
 
 settings_msvc:
 	copy make.settings.msvc make.settings
