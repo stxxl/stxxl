@@ -1,4 +1,0 @@
-./speed_test_map_insert 10000 20000 40000 80000
-./speed_test_map_erase 10000 20000 40000 80000
-./speed_test_map_iterate 10000 20000 40000 80000 
-./speed_test_map_search 10000 20000 40000 80000

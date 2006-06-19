@@ -8,8 +8,8 @@
 #include "containers/stack.h"
 #include "containers/priority_queue.h"
 
-#if not(__GNUC__==3 && __GNUC_MINOR__ == 4)
-#include "containers/map.h" // not compatible with g++ 3.4.x
+#if (__GNUC__ == 3  && __GNUC_MINOR__ < 4)
+#include "containers/map.h" // not compatible with g++ <3 and 3.4.x and above
 #endif
 
 #include "containers/queue.h"

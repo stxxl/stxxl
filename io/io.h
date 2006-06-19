@@ -25,7 +25,7 @@ stats * stats::instance = NULL;
 debugmon * debugmon::instance = NULL;
 
 #ifdef COUNT_WAIT_TIME
-double stxxl::wait_time_counter = .0;
+double wait_time_counter = .0;
 #endif
 	
 
