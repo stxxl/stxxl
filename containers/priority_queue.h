@@ -601,7 +601,8 @@ private:
     regEntry[0].index = winnerIndex;
     regEntry[0].key   = winnerKey;  
   }
-  
+ 
+public:
   bool is_sentinel(const Element & a)
   {
     return !(cmp(cmp.min_value(),a));
@@ -1340,6 +1341,7 @@ template <class Config_>
 inline void priority_queue<Config_>::push(const value_type & obj)
 {
   //STXXL_VERBOSE3("priority_queue::push("<< obj <<")")
+  assert(itree->not_sentinel(obj));
   if(insertHeap.size() == N + 1) 
      emptyInsertHeap();
   
