@@ -8,6 +8,8 @@
 
 #include <stxxl>
 
+#include <db_cxx.h>
+
 #define KEY_SIZE 		8
 #define DATA_SIZE 	32
 
@@ -18,6 +20,16 @@
 #define TOTAL_CACHE_SIZE    (96*1024*1024)
 #define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
 #define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
+
+// BDB settings
+u_int32_t    pagesize = 32 * 1024;
+u_int        bulkbufsize = 4 * 1024 * 1024;
+u_int        logbufsize = 8 * 1024 * 1024;
+u_int        cachesize = TOTAL_CACHE_SIZE;
+u_int        datasize = DATA_SIZE;
+u_int        keysize = KEY_SIZE;
+u_int        numitems = 0;
+
 
 struct my_key
 {
@@ -80,22 +92,53 @@ struct comp_type
 		return obj;
 	}
 };
-
-
-
 typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map_type;
 
-int main(int argc, char * argv[])
+void run_bdb_btree(stxxl::int64 ops)
 {
-	if(argc < 2)
-	{
-		STXXL_MSG("Usage: "<<argv[0]<<" #ops")
-		return 0;
-	}
-
-	stxxl::int64 ops = atoll(argv[1]);
+	char *filename = "/var/tmp/bdb_file";
+	char *letters = "abcdefghijklmnopqrstuvwxuz";
+	std::pair<my_key,my_data> element;
+    
+	memset(element.first.keybuf, 'a', KEY_SIZE);
+	memset(element.second.databuf, 'b', DATA_SIZE);
 	
+	Db db(NULL, 0);               // Instantiate the Db object
+	
+	u_int32_t oFlags = DB_CREATE; // Open flags;
+	
+	try {
+		
+		db.set_errfile(stderr);
+		db.set_pagesize(pagesize);
+    	// Open the database
+    	db.open(NULL,                // Transaction pointer 
+            filename,          // Database file name 
+            NULL,                // Optional logical database name
+            DB_BTREE,            // Database access method
+            DB_CREATE,              // Open flags
+            0);                  // File mode (using defaults)
+
+		
+		// here we start with the tests
+		
+		db.close(0);
+	}
+	catch(DbException &e)
+	{
+    	STXXL_ERRMSG("DbException happened")
+	} 
+	catch(std::exception &e)
+	{
+    	STXXL_ERRMSG("std::exception happened")
+	} 
+	
+}
+
+void run_stxxl_map(stxxl::int64 ops)
+{
 	map_type Map(NODE_CACHE_SIZE,LEAF_CACHE_SIZE);
+	Map.enable_prefetching();
 	
 	char *letters = "abcdefghijklmnopqrstuvwxuz";
 	std::pair<my_key,my_data> element;
@@ -117,7 +160,7 @@ int main(int argc, char * argv[])
 	
 	Timer.start();
 	            
-	for (i = 0; i < n_inserts; ++n_inserts)
+	for (i = 0; i < n_inserts; ++i)
 	{
 		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
 		Map.insert(element);
@@ -134,7 +177,7 @@ int main(int argc, char * argv[])
 	
 	Timer.start();
 
-	for (i = 0; i < n_locates; ++n_locates)
+	for (i = 0; i < n_locates; ++i)
 	{
 		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
 		CMap.lower_bound(element.first);
@@ -147,8 +190,10 @@ int main(int argc, char * argv[])
 	Timer.reset();
 	
 	Timer.start();
+	
+	stxxl::int64 n_scanned = 0, skipped_qieries=0;
 
-	for (i = 0; i < n_range_queries; ++n_range_queries)
+	for (i = 0; i < n_range_queries; ++i)
 	{
 		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
 		my_key begin_key = element.first;
@@ -157,13 +202,66 @@ int main(int argc, char * argv[])
 		map_type::const_iterator beyond=CMap.lower_bound(element.first);
 		if(element.first<begin_key)
 			std::swap(begin,beyond);
-		
+		while(begin!=beyond)
+		{
+			my_data tmp =  begin->second;
+			++n_scanned;
+			++begin;
+		}
+		if(n_scanned >= 10*n_range_queries)	break;
+	}
+	
+	n_range_queries = i;
+
+	Timer.stop();
+	STXXL_MSG("Range query elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
+		" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
+	
+	
+	stxxl::ran32State = 0xdeadbeef;
+	memset(element.first.keybuf, 'a', KEY_SIZE);
+	memset(element.second.databuf, 'b', DATA_SIZE);
+	
+	Timer.reset();
+	Timer.start();
+
+	for (i = 0; i < n_deletes; ++i)
+	{
+		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		Map.erase(element.first);
 	}
 
 	Timer.stop();
-	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
-		" seconds : "<< (double(n_range_queries)/(Timer.mseconds()/1000.))<<
-		" key/data pairs per sec, #scanned elements: ")
+	STXXL_MSG("Records in map: "<<Map.size())
+	STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+}
+
+
+int main(int argc, char * argv[])
+{
+	if(argc < 3)
+	{
+		STXXL_MSG("Usage: "<<argv[0]<<" version #ops")
+		STXXL_MSG("\t version = 1: test stxxl map")
+		STXXL_MSG("\t version = 2: test Berkeley DB btree")
+		return 0;
+	}
+
+	int version = atoi(argv[1]);
+	stxxl::int64 ops = atoll(argv[2]);
 	
+	switch(version)
+	{
+		case 1:
+			run_stxxl_map(ops);
+			break;
+		case 2:
+			run_bdb_btree(ops);
+			break;
+		default:
+			STXXL_MSG("Unsupported version "<<version)
+	}
 	
 }
