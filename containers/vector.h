@@ -274,7 +274,7 @@ public:
 		}
 		bids_container_iterator bid () const
 		{
-			return p_vector->bid (offset);
+			return ((vector_type *)p_vector)->bid (offset);
 		}
 		
 		difference_type operator - (const _Self & a) const
