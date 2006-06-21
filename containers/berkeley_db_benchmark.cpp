@@ -100,6 +100,8 @@ void run_bdb_btree(stxxl::int64 ops)
 	char *letters = "abcdefghijklmnopqrstuvwxuz";
 	std::pair<my_key,my_data> element;
     
+	unlink(filename);
+	
 	memset(element.first.keybuf, 'a', KEY_SIZE);
 	memset(element.second.databuf, 'b', DATA_SIZE);
 	
