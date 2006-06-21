@@ -108,7 +108,7 @@ public:
 				
 		vector_iterator (const const_iterator & a):
 			offset (a.offset),
-			p_vector (a.p_vector) {}
+			p_vector ((vector_type *)a.p_vector) {}
 				
 		block_offset_type block_offset () const
 		{
@@ -738,19 +738,22 @@ private:
 		}
 		void read_page(int page_no, int cache_page) const
 		{
-			STXXL_VERBOSE1("vector: reading page_no="<<page_no<<" cache_page="<<cache_page)
+			STXXL_VERBOSE1("vector "<<this<<": reading page_no="<<page_no<<" cache_page="<<cache_page)
 			request_ptr * reqs = new request_ptr [page_size];
 			int block_no = page_no*page_size;
 			int last_block = STXXL_MIN(block_no + page_size,int(_bids.size()));
 			int i=cache_page*page_size,j=0;
 			for(;block_no < last_block; ++block_no,++i,++j)
+			{
 				reqs[j] = _cache[i].read(_bids[block_no]);
+			}
+			assert(last_block - page_no*page_size > 0);
 			wait_all(reqs,last_block - page_no*page_size);
 			delete [] reqs;
 		}
 		void write_page(int page_no, int cache_page) const
 		{
-			STXXL_VERBOSE1("vector: writing page_no="<<page_no<<" cache_page="<<cache_page)
+			STXXL_VERBOSE1("vector "<< this<<": writing page_no="<<page_no<<" cache_page="<<cache_page)
 			request_ptr * reqs = new request_ptr [page_size];
 			int block_no = page_no*page_size;
 			int last_block = STXXL_MIN(block_no + page_size,int(_bids.size()));
@@ -759,6 +762,7 @@ private:
 			{
 				reqs[j] = _cache[i].write(_bids[block_no]);
 			}
+			assert(last_block - page_no*page_size > 0);	
 			wait_all(reqs,last_block - page_no*page_size);
 			delete [] reqs;
 		}
