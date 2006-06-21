@@ -40,12 +40,12 @@ bool operator != (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) != 0;
 }
-/*
+
 bool operator < (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) < 0;
 }
-
+/*
 bool operator > (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) > 0;
@@ -105,21 +105,28 @@ int main(int argc, char * argv[])
 
 	
 	stxxl::timer Timer;
-	stxxl::int64 i = ops, j=ops;
+	stxxl::int64 n_inserts = ops, n_locates=ops, n_range_queries=ops, n_deletes = ops;
+	stxxl::int64 i;
 	comp_type cmp_;
+	
+	stxxl::ran32State = 0xdeadbeef;
+	
+	stxxl::random_number32 myrand;
+	
+	STXXL_MSG("Records in map: "<<Map.size())
+	
 	Timer.start();
 	            
-	for (; i > 0; --i)
+	for (i = 0; i < n_inserts; ++n_inserts)
 	{
-		element.first.keybuf[(i % KEY_SIZE)] = letters[(rand() % 26)];
-		//STXXL_MSG("Inserting "<<element.first)
+		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
 		Map.insert(element);
 	}
 
 	Timer.stop();
 	STXXL_MSG("Records in map: "<<Map.size())
-	STXXL_MSG("(Writing) elapsed time: "<<(Timer.mseconds()/1000.)<<
-				" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
 	Timer.reset();
 
@@ -127,14 +134,36 @@ int main(int argc, char * argv[])
 	
 	Timer.start();
 
-	for (; j > 0; --j)
+	for (i = 0; i < n_locates; ++n_locates)
 	{
-		element.first.keybuf[(i % KEY_SIZE)] = letters[(rand() % 26)];
-		CMap.find(element.first);
+		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		CMap.lower_bound(element.first);
 	}
 
 	Timer.stop();
-	STXXL_MSG("Records in map: "<<Map.size())
-	STXXL_MSG("(Reading) elapsed time: "<<(Timer.mseconds()/1000.)<<
+	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	Timer.reset();
+	
+	Timer.start();
+
+	for (i = 0; i < n_range_queries; ++n_range_queries)
+	{
+		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		my_key begin_key = element.first;
+		map_type::const_iterator begin=CMap.lower_bound(element.first);
+		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		map_type::const_iterator beyond=CMap.lower_bound(element.first);
+		if(element.first<begin_key)
+			std::swap(begin,beyond);
+		
+	}
+
+	Timer.stop();
+	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(n_range_queries)/(Timer.mseconds()/1000.))<<
+		" key/data pairs per sec, #scanned elements: ")
+	
+	
 }
