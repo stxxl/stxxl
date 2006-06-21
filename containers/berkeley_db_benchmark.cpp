@@ -11,12 +11,13 @@
 #define KEY_SIZE 		8
 #define DATA_SIZE 	32
 
-#define NODE_BLOCK_SIZE 	(32*1024)
+#define NODE_BLOCK_SIZE 	(16*1024)
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
-#define TOTAL_CACHE_SIZE 	(16*1024*1024)
-#define NODE_CACHE_SIZE 	(2*TOTAL_CACHE_SIZE)
-#define LEAF_CACHE_SIZE 	(TOTAL_CACHE_SIZE)
+//#define TOTAL_CACHE_SIZE 	(5*128*1024*1024/4)
+#define TOTAL_CACHE_SIZE    (96*1024*1024)
+#define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
+#define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
 
 struct my_key
 {
@@ -29,17 +30,17 @@ std::ostream & operator << (std::ostream & o, my_key & obj)
 		o << obj.keybuf[i];
 	return o;
 }
-/*
+
 bool operator == (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) == 0;
-}*/
-/*
+}
+
 bool operator != (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) != 0;
 }
-
+/*
 bool operator < (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) < 0;
@@ -104,7 +105,7 @@ int main(int argc, char * argv[])
 
 	
 	stxxl::timer Timer;
-	stxxl::int64 i = ops;
+	stxxl::int64 i = ops, j=ops;
 	comp_type cmp_;
 	Timer.start();
 	            
@@ -117,6 +118,23 @@ int main(int argc, char * argv[])
 
 	Timer.stop();
 	STXXL_MSG("Records in map: "<<Map.size())
-	STXXL_MSG("elapsed time: "<<(Timer.mseconds()/1000.)<<
+	STXXL_MSG("(Writing) elapsed time: "<<(Timer.mseconds()/1000.)<<
 				" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+
+	Timer.reset();
+
+	map_type & CMap(Map); // const map reference
+	
+	Timer.start();
+
+	for (; j > 0; --j)
+	{
+		element.first.keybuf[(i % KEY_SIZE)] = letters[(rand() % 26)];
+		CMap.find(element.first);
+	}
+
+	Timer.stop();
+	STXXL_MSG("Records in map: "<<Map.size())
+	STXXL_MSG("(Reading) elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 }
