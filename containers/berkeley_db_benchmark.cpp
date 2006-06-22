@@ -17,9 +17,11 @@
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
 
-#define TOTAL_CACHE_SIZE    (96*1024*1024)
+#define TOTAL_CACHE_SIZE    (120*1024*1024)
 #define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
 #define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
+
+#define BDB_FILE "/data3/bdb_file"
 
 // BDB settings
 u_int32_t    pagesize = 32 * 1024;
@@ -99,7 +101,7 @@ typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map
 
 void run_bdb_btree(stxxl::int64 ops)
 {
-	char *filename = "/var/tmp/bdb_file";
+	char *filename = BDB_FILE;
 	char *letters = "abcdefghijklmnopqrstuvwxuz";
 	
 	my_key key1_storage;
