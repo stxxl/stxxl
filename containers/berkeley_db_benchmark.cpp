@@ -24,7 +24,7 @@
 #define BDB_FILE "/data3/bdb_file"
 
 // BDB settings
-u_int32_t    pagesize = 32 * 1024;
+u_int32_t    pagesize = LEAF_BLOCK_SIZE;
 u_int        bulkbufsize = 4 * 1024 * 1024;
 u_int        logbufsize = 8 * 1024 * 1024;
 u_int        cachesize = TOTAL_CACHE_SIZE;
@@ -96,7 +96,7 @@ struct comp_type
 };
 typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map_type;
 
-#define KEYPOS 	(myrand() % KEY_SIZE)
+#define KEYPOS 	(i % KEY_SIZE)
 #define VALUE 		(myrand() % 26)
 
 void run_bdb_btree(stxxl::int64 ops)
@@ -297,7 +297,7 @@ void run_stxxl_map(stxxl::int64 ops)
 	////////////////////////////////////////////////
 	Timer.reset();
 
-	map_type & CMap(Map); // const map reference
+	const map_type & CMap(Map); // const map reference
 	
 	Timer.start();
 
@@ -380,6 +380,7 @@ int main(int argc, char * argv[])
 	STXXL_MSG("Running version      : "<<version)
 	STXXL_MSG("Operations to perform: "<<ops);
 	STXXL_MSG("Btree cache size     : "<<TOTAL_CACHE_SIZE<<" bytes")
+	STXXL_MSG("Leaf block size      : "<<LEAF_BLOCK_SIZE<<" bytes")
 	
 	switch(version)
 	{
