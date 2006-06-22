@@ -16,7 +16,7 @@
 #define NODE_BLOCK_SIZE 	(16*1024)
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
-//#define TOTAL_CACHE_SIZE 	(5*128*1024*1024/4)
+
 #define TOTAL_CACHE_SIZE    (96*1024*1024)
 #define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
 #define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
@@ -57,7 +57,7 @@ bool operator < (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) < 0;
 }
-/*
+
 bool operator > (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) > 0;
@@ -72,7 +72,7 @@ bool operator >= (const my_key & a, const my_key & b)
 {
 	return strncmp(a.keybuf,b.keybuf,KEY_SIZE) >= 0;
 }
-*/
+
 
 struct my_data
 {
@@ -94,16 +94,21 @@ struct comp_type
 };
 typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map_type;
 
+#define KEYPOS 	(myrand() % KEY_SIZE)
+#define VALUE 		(myrand() % 26)
+
 void run_bdb_btree(stxxl::int64 ops)
 {
 	char *filename = "/var/tmp/bdb_file";
 	char *letters = "abcdefghijklmnopqrstuvwxuz";
-	std::pair<my_key,my_data> element;
+	
+	my_key key1_storage;
+	my_data data1_storage;
     
 	unlink(filename);
 	
-	memset(element.first.keybuf, 'a', KEY_SIZE);
-	memset(element.second.databuf, 'b', DATA_SIZE);
+	memset(key1_storage.keybuf, 'a', KEY_SIZE);
+	memset(data1_storage.databuf, 'b', DATA_SIZE);
 	
 	Db db(NULL, 0);               // Instantiate the Db object
 	
@@ -123,6 +128,119 @@ void run_bdb_btree(stxxl::int64 ops)
 
 		
 		// here we start with the tests
+		Dbt key1(key1_storage.keybuf,  KEY_SIZE);
+		Dbt data1(data1_storage.databuf, DATA_SIZE);
+		
+		stxxl::timer Timer;
+		stxxl::int64 n_inserts = ops, n_locates=ops, n_range_queries=ops, n_deletes = ops;
+		stxxl::int64 i;
+		comp_type cmp_;
+		
+		stxxl::ran32State = 0xdeadbeef;
+		stxxl::random_number32 myrand;
+		
+		DB_BTREE_STAT * dbstat;
+		
+		db.stat(NULL,&dbstat,0);
+		STXXL_MSG("Records in map: "<<dbstat->bt_ndata)
+		
+		Timer.start();
+					
+		for (i = 0; i < n_inserts; ++i)
+		{
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			db.put(NULL, &key1, &data1, DB_NOOVERWRITE);
+		}
+	
+		Timer.stop();
+		db.stat(NULL,&dbstat,0);
+		STXXL_MSG("Records in map: "<<dbstat->bt_ndata)
+		STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
+					" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+
+		/////////////////////////////////////////
+		Timer.reset();
+		Timer.start();
+		
+	
+		Dbc *cursorp;
+		db.cursor(NULL, &cursorp, 0);
+		
+		for (i = 0; i < n_locates; ++i)
+		{
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+			Dbt datax(data1_storage.databuf, DATA_SIZE);
+			
+			cursorp->get(&keyx, &datax, DB_SET_RANGE);
+		}
+	
+		Timer.stop();
+		STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
+			" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+
+		
+		////////////////////////////////////
+		Timer.reset();
+		
+		Timer.start();		
+		
+		stxxl::int64 n_scanned = 0;
+	
+		for (i = 0; i < n_range_queries; ++i)
+		{
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			my_key last_key = key1_storage;
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			if(last_key<key1_storage)
+				std::swap(last_key,key1_storage);
+			
+			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+			Dbt datax(data1_storage.databuf, DATA_SIZE);
+			
+			if( cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
+				continue;
+			
+			while(*((my_key *)keyx.get_data()) <= last_key)
+			{
+				++n_scanned;
+				if(cursorp->get(&keyx, &datax, DB_NEXT)==DB_NOTFOUND)
+					break;
+			}
+			
+			if(n_scanned >= 10*n_range_queries)	break;
+		}
+	
+		n_range_queries = i;
+		
+		Timer.stop();
+		if (cursorp != NULL) cursorp->close();
+			
+		STXXL_MSG("Range query elapsed time: "<<(Timer.mseconds()/1000.)<<
+			" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
+			" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
+		
+		//////////////////////////////////////
+		
+		stxxl::ran32State = 0xdeadbeef;
+		memset(key1_storage.keybuf, 'a', KEY_SIZE);
+		
+		Timer.reset();
+		Timer.start();
+	
+		for (i = 0; i < n_deletes; ++i)
+		{
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+			db.del(NULL, &keyx, 0);
+		}
+	
+		Timer.stop();
+		db.stat(NULL,&dbstat,0);
+		STXXL_MSG("Records in map: "<<dbstat->bt_ndata)
+		STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
 		
 		db.close(0);
 	}
@@ -164,7 +282,7 @@ void run_stxxl_map(stxxl::int64 ops)
 	            
 	for (i = 0; i < n_inserts; ++i)
 	{
-		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		element.first.keybuf[KEYPOS] = letters[VALUE];
 		Map.insert(element);
 	}
 
@@ -173,6 +291,7 @@ void run_stxxl_map(stxxl::int64 ops)
 	STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
 				" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
+	////////////////////////////////////////////////
 	Timer.reset();
 
 	map_type & CMap(Map); // const map reference
@@ -181,7 +300,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
 	for (i = 0; i < n_locates; ++i)
 	{
-		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		element.first.keybuf[KEYPOS] = letters[VALUE];
 		CMap.lower_bound(element.first);
 	}
 
@@ -189,6 +308,7 @@ void run_stxxl_map(stxxl::int64 ops)
 	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 	
+	////////////////////////////////////
 	Timer.reset();
 	
 	Timer.start();
@@ -197,10 +317,10 @@ void run_stxxl_map(stxxl::int64 ops)
 
 	for (i = 0; i < n_range_queries; ++i)
 	{
-		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		element.first.keybuf[KEYPOS] = letters[VALUE];
 		my_key begin_key = element.first;
 		map_type::const_iterator begin=CMap.lower_bound(element.first);
-		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		element.first.keybuf[KEYPOS] = letters[VALUE];
 		map_type::const_iterator beyond=CMap.lower_bound(element.first);
 		if(element.first<begin_key)
 			std::swap(begin,beyond);
@@ -220,7 +340,7 @@ void run_stxxl_map(stxxl::int64 ops)
 		" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
 		" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
 	
-	
+	//////////////////////////////////////
 	stxxl::ran32State = 0xdeadbeef;
 	memset(element.first.keybuf, 'a', KEY_SIZE);
 	memset(element.second.databuf, 'b', DATA_SIZE);
@@ -230,7 +350,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
 	for (i = 0; i < n_deletes; ++i)
 	{
-		element.first.keybuf[(i % KEY_SIZE)] = letters[(myrand() % 26)];
+		element.first.keybuf[KEYPOS] = letters[VALUE];
 		Map.erase(element.first);
 	}
 
