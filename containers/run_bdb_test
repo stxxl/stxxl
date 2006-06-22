@@ -2,7 +2,7 @@
 
 export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.4/lib/
 
-SUF=2
+SUF=4
 
 #LIMIT=1073741824
 #LIMIT=4194304

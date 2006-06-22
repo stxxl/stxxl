@@ -17,18 +17,19 @@
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
 
-#define TOTAL_CACHE_SIZE    (120*1024*1024)
+#define TOTAL_CACHE_SIZE    (110*1024*1024)
 #define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
 #define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
 
-//#define BDB_FILE "/data3/bdb_file"
-#define BDB_FILE "/var/tmp/bdb_file"
+#define BDB_FILE "/data3/bdb_file"
+//#define BDB_FILE "/var/tmp/bdb_file"
 
 // BDB settings
 u_int32_t    pagesize = LEAF_BLOCK_SIZE;
 u_int        bulkbufsize = 4 * 1024 * 1024;
 u_int        logbufsize = 8 * 1024 * 1024;
-u_int        cachesize = TOTAL_CACHE_SIZE;
+u_int        cachesize = 3*TOTAL_CACHE_SIZE/5;
+//u_int        cachesize = 1*TOTAL_CACHE_SIZE/5;
 u_int        datasize = DATA_SIZE;
 u_int        keysize = KEY_SIZE;
 u_int        numitems = 0;
@@ -116,17 +117,13 @@ void run_bdb_btree(stxxl::int64 ops)
 	
 	Db db(NULL, 0);               // Instantiate the Db object
 	
-	u_int32_t oFlags = DB_CREATE; // Open flags;
-	
 	try {
 	
-		DbEnv * dbenv = db.get_env();
-		if(dbenv==NULL) abort();
-		int retx = dbenv->set_flags(DB_DIRECT_DB|DB_DIRECT_LOG|DB_TXN_NOSYNC,1);
-		if(retx != 0) abort();
 		
 		db.set_errfile(stderr);
 		db.set_pagesize(pagesize);
+		db.set_cachesize(0,cachesize,1);
+		
     	// Open the database
     	db.open(NULL,                // Transaction pointer 
             filename,          // Database file name 
