@@ -254,7 +254,8 @@ void run_bdb_btree(stxxl::int64 ops)
 	{
     	STXXL_ERRMSG("std::exception happened")
 	} 
-	
+
+	unlink(filename);
 }
 
 void run_stxxl_map(stxxl::int64 ops)
@@ -375,6 +376,10 @@ int main(int argc, char * argv[])
 
 	int version = atoi(argv[1]);
 	stxxl::int64 ops = atoll(argv[2]);
+
+	STXXL_MSG("Running version      : "<<version)
+	STXXL_MSG("Operations to perform: "<<ops);
+	STXXL_MSG("Btree cache size     : "<<TOTAL_CACHE_SIZE<<" bytes")
 	
 	switch(version)
 	{

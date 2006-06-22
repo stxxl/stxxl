@@ -1,0 +1,20 @@
+#!/bin/bash
+
+export LD_LIBRARY_PATH=/usr/local/BerkeleyDB.4.4/lib/
+
+SUF=1
+
+#LIMIT=1073741824
+#LIMIT=4194304
+LIMIT=16777216
+
+for ((n=1024; n <= LIMIT ; n=n*2)) 
+do
+  echo "Running test with $n items"
+
+  ./berkeley_db_benchmark.bin 1 $n  >> map_${n}.log.$SUF 2>> map_${n}.log.$SUF
+
+  ./berkeley_db_benchmark.bin 2 $n  >> bdb_${n}.log.$SUF 2>> bdb_${n}.log.$SUF
+  
+done
+	
