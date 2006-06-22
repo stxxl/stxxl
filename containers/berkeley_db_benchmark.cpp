@@ -21,7 +21,8 @@
 #define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
 #define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
 
-#define BDB_FILE "/data3/bdb_file"
+//#define BDB_FILE "/data3/bdb_file"
+#define BDB_FILE "/var/tmp/bdb_file"
 
 // BDB settings
 u_int32_t    pagesize = LEAF_BLOCK_SIZE;
@@ -112,11 +113,17 @@ void run_bdb_btree(stxxl::int64 ops)
 	memset(key1_storage.keybuf, 'a', KEY_SIZE);
 	memset(data1_storage.databuf, 'b', DATA_SIZE);
 	
+	
 	Db db(NULL, 0);               // Instantiate the Db object
 	
 	u_int32_t oFlags = DB_CREATE; // Open flags;
 	
 	try {
+	
+		DbEnv * dbenv = db.get_env();
+		if(dbenv==NULL) abort();
+		int retx = dbenv->set_flags(DB_DIRECT_DB|DB_DIRECT_LOG|DB_TXN_NOSYNC,1);
+		if(retx != 0) abort();
 		
 		db.set_errfile(stderr);
 		db.set_pagesize(pagesize);
