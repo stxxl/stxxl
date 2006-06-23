@@ -23,9 +23,11 @@
 #define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
 #define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
 
+#define SORTER_MEM			(TOTAL_CACHE_SIZE - 1024*1024*2*4)
 
-//#define BDB_FILE "/data3/bdb_file"
-#define BDB_FILE "/var/tmp/bdb_file"
+
+#define BDB_FILE "/data3/bdb_file"
+//#define BDB_FILE "/var/tmp/bdb_file"
 
 // BDB settings
 u_int32_t    pagesize = LEAF_BLOCK_SIZE;
@@ -43,6 +45,8 @@ struct my_key
 {
 	char keybuf[KEY_SIZE];
 };
+
+
 
 std::ostream & operator << (std::ostream & o, my_key & obj)
 {
@@ -107,6 +111,11 @@ struct comp_type
 	}
 };
 typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map_type;
+
+
+typedef stxxl::VECTOR_GENERATOR<std::pair<my_key,my_data>,1,1>::result  vector_type;
+//typedef stxxl::vector<std::pair<my_key,my_data>,1,stxxl::lru_pager<1>,512*1024>  vector_type;
+
 
 #define KEYPOS 	(i % KEY_SIZE)
 #define VALUE 		(myrand() % 26)
@@ -472,19 +481,19 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	
 	stxxl::random_number32 myrand;
 	
-	typedef stxxl::VECTOR_GENERATOR<my_key,1,1>  vector_type;
-	stxxl::vector<std::pair<my_key,my_data> > SortedSeq(n);
-	const stxxl::vector<std::pair<my_key,my_data> >  & CSortedSeq(SortedSeq);
+	
+	vector_type SortedSeq(n);
+	const vector_type  & CSortedSeq(SortedSeq);
+	{
 	rand_key_gen Gen(n,element.first);
 	typedef stxxl::stream::sort<rand_key_gen,comp_type> sorter_type;
-	sorter_type Sorter(Gen,comp_type(),TOTAL_CACHE_SIZE);
+	sorter_type Sorter(Gen,comp_type(),SORTER_MEM);
 	typedef key2pair<sorter_type> key2pair_type;
 	key2pair_type Key2Pair(Sorter);
-	stxxl::vector<std::pair<my_key,my_data> >::iterator it = stxxl::stream::materialize(Key2Pair,SortedSeq.begin());
+	stxxl::stream::materialize(Key2Pair,SortedSeq.begin());
+	}
 	
-	
-	
-	
+
 	Stats->reset();
 	
 	Timer.start();
@@ -622,20 +631,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 	
 	try {
 	
-		
-		db.set_errfile(stderr);
-		db.set_pagesize(pagesize);
-		db.set_cachesize(0,cachesize,1);
-		
-    	// Open the database
-    	db.open(NULL,                // Transaction pointer 
-            filename,          // Database file name 
-            NULL,                // Optional logical database name
-            DB_BTREE,            // Database access method
-            DB_CREATE,              // Open flags
-            0);                  // File mode (using defaults)
-
-		
 		// here we start with the tests
 		Dbt key1(key1_storage.keybuf,  KEY_SIZE);
 		Dbt data1(data1_storage.databuf, DATA_SIZE);
@@ -649,16 +644,29 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		stxxl::random_number32 myrand;
 		
 		
-		typedef stxxl::VECTOR_GENERATOR<my_key,1,1>  vector_type;
-		stxxl::vector<std::pair<my_key,my_data> > SortedSeq(n);
-		const stxxl::vector<std::pair<my_key,my_data> >  & CSortedSeq(SortedSeq);
+		vector_type SortedSeq(n);
+		const vector_type  & CSortedSeq(SortedSeq);
+		{
 		rand_key_gen Gen(n,key1_storage);
 		typedef stxxl::stream::sort<rand_key_gen,comp_type> sorter_type;
-		sorter_type Sorter(Gen,comp_type(),TOTAL_CACHE_SIZE);
+		sorter_type Sorter(Gen,comp_type(),SORTER_MEM);
 		typedef key2pair<sorter_type> key2pair_type;
 		key2pair_type Key2Pair(Sorter);
-		stxxl::vector<std::pair<my_key,my_data> >::iterator it = stxxl::stream::materialize(Key2Pair,SortedSeq.begin());
+		stxxl::stream::materialize(Key2Pair,SortedSeq.begin());
+		}
 		
+
+		db.set_errfile(stderr);
+		db.set_pagesize(pagesize);
+		db.set_cachesize(0,cachesize,1);
+		
+    		// Open the database
+    		db.open(NULL,                // Transaction pointer 
+            		filename,          // Database file name 
+            		NULL,                // Optional logical database name
+            		DB_BTREE,            // Database access method
+            		DB_CREATE,              // Open flags
+            		0);                  // File mode (using defaults)
 		
 		db.get_env()->memp_stat(NULL,NULL,DB_STAT_CLEAR);
 		
@@ -667,7 +675,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		// DBD does not have bulk construction
 		// however insering in sorted order might help
 		// to improve performance
-		stxxl::vector<std::pair<my_key,my_data> >::const_iterator cit = SortedSeq.begin();
+		vector_type::const_iterator cit = SortedSeq.begin();
 		for (i = 0; i < n; ++i,++cit)
 		{
 			key1_storage = cit->first;
