@@ -117,8 +117,15 @@ typedef stxxl::VECTOR_GENERATOR<std::pair<my_key,my_data>,1,1>::result  vector_t
 //typedef stxxl::vector<std::pair<my_key,my_data>,1,stxxl::lru_pager<1>,512*1024>  vector_type;
 
 
-#define KEYPOS 	(i % KEY_SIZE)
-#define VALUE 		(myrand() % 26)
+//#define KEYPOS 	(i % KEY_SIZE)
+//#define VALUE 		(myrand() % 26)
+stxxl::random_number32  myrand;
+
+inline void rand_key(stxxl::int64 pos, my_key & Key)
+{
+	for(int i = 0; i<KEY_SIZE;++i)
+		Key.keybuf[i] = letters[myrand() % 26];
+}
 
 void run_bdb_btree(stxxl::int64 ops)
 {
@@ -174,7 +181,8 @@ void run_bdb_btree(stxxl::int64 ops)
 					
 		for (i = 0; i < n_inserts; ++i)
 		{
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			db.put(NULL, &key1, &data1, DB_NOOVERWRITE);
 		}
 	
@@ -196,7 +204,8 @@ void run_bdb_btree(stxxl::int64 ops)
 		
 		for (i = 0; i < n_locates; ++i)
 		{
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
 			Dbt datax(data1_storage.databuf, DATA_SIZE);
 			
@@ -218,9 +227,11 @@ void run_bdb_btree(stxxl::int64 ops)
 	
 		for (i = 0; i < n_range_queries; ++i)
 		{
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			my_key last_key = key1_storage;
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			if(last_key<key1_storage)
 				std::swap(last_key,key1_storage);
 			
@@ -261,7 +272,8 @@ void run_bdb_btree(stxxl::int64 ops)
 	
 		for (i = 0; i < n_deletes; ++i)
 		{
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
 			db.del(NULL, &keyx, 0);
 		}
@@ -294,7 +306,6 @@ void run_stxxl_map(stxxl::int64 ops)
 	Map.enable_prefetching();
 	stxxl::stats * Stats = stxxl::stats::get_instance();
 	
-	char *letters = "abcdefghijklmnopqrstuvwxuz";
 	std::pair<my_key,my_data> element;
     
 	memset(element.first.keybuf, 'a', KEY_SIZE);
@@ -318,7 +329,8 @@ void run_stxxl_map(stxxl::int64 ops)
 	            
 	for (i = 0; i < n_inserts; ++i)
 	{
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		Map.insert(element);
 	}
 
@@ -340,7 +352,8 @@ void run_stxxl_map(stxxl::int64 ops)
 
 	for (i = 0; i < n_locates; ++i)
 	{
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		CMap.lower_bound(element.first);
 	}
 
@@ -360,10 +373,12 @@ void run_stxxl_map(stxxl::int64 ops)
 
 	for (i = 0; i < n_range_queries; ++i)
 	{
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		my_key begin_key = element.first;
 		map_type::const_iterator begin=CMap.lower_bound(element.first);
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		map_type::const_iterator beyond=CMap.lower_bound(element.first);
 		if(element.first<begin_key)
 			std::swap(begin,beyond);
@@ -396,7 +411,8 @@ void run_stxxl_map(stxxl::int64 ops)
 
 	for (i = 0; i < n_deletes; ++i)
 	{
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		Map.erase(element.first);
 	}
 
@@ -421,8 +437,9 @@ class rand_key_gen
 		rand_key_gen(stxxl::int64 el, my_key & cur): 
 			counter(el), current(cur)
 		{
-			const stxxl::int64  & i = counter;
-			current.keybuf[KEYPOS] = letters[VALUE];
+			//const stxxl::int64  & i = counter;
+			//current.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(counter,current);
 		}
 		const my_key & operator * () { return current; } 
 		const my_key * operator -> () { return &current; } 
@@ -430,8 +447,9 @@ class rand_key_gen
 		rand_key_gen & operator ++ ()
 		{
 			--counter;
-			const stxxl::int64  & i = counter;
-			current.keybuf[KEYPOS] = letters[VALUE];
+			//const stxxl::int64  & i = counter;
+			//current.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(counter,current);
 			return *this;
 		}
 		bool empty() const { return counter==0; }
@@ -520,7 +538,8 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 
 	for (i = 0; i < n_inserts; ++i)
 	{
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		Map.insert(element);
 	}
 
@@ -545,7 +564,8 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 
 	for (i = 0; i < n_locates; ++i)
 	{
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		CMap.lower_bound(element.first);
 	}
 
@@ -565,10 +585,12 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 
 	for (i = 0; i < n_range_queries; ++i)
 	{
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		my_key begin_key = element.first;
 		map_type::const_iterator begin=CMap.lower_bound(element.first);
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		map_type::const_iterator beyond=CMap.lower_bound(element.first);
 		if(element.first<begin_key)
 			std::swap(begin,beyond);
@@ -601,7 +623,8 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 
 	for (i = n_deletes; i > 0; --i)
 	{
-		element.first.keybuf[KEYPOS] = letters[VALUE];
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.first);
 		Map.erase(element.first);
 	}
 
@@ -699,7 +722,8 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 					
 		for (i = 0; i < n_inserts; ++i)
 		{
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			db.put(NULL, &key1, &data1, DB_NOOVERWRITE);
 		}
 	
@@ -721,7 +745,8 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		
 		for (i = 0; i < n_locates; ++i)
 		{
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
 			Dbt datax(data1_storage.databuf, DATA_SIZE);
 			
@@ -743,9 +768,11 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 	
 		for (i = 0; i < n_range_queries; ++i)
 		{
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			my_key last_key = key1_storage;
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			if(last_key<key1_storage)
 				std::swap(last_key,key1_storage);
 			
@@ -786,7 +813,8 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 	
 		for (i = 0; i < n_deletes; ++i)
 		{
-			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			//key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			rand_key(i,key1_storage);
 			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
 			db.del(NULL, &keyx, 0);
 		}
