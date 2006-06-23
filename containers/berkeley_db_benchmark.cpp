@@ -17,12 +17,15 @@
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
 
+#define LEAF_BLOCK_SIZE 	(32*1024)
+
 #define TOTAL_CACHE_SIZE    (110*1024*1024)
 #define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
 #define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
 
-#define BDB_FILE "/data3/bdb_file"
-//#define BDB_FILE "/var/tmp/bdb_file"
+
+//#define BDB_FILE "/data3/bdb_file"
+#define BDB_FILE "/var/tmp/bdb_file"
 
 // BDB settings
 u_int32_t    pagesize = LEAF_BLOCK_SIZE;
@@ -150,6 +153,8 @@ void run_bdb_btree(stxxl::int64 ops)
 		db.stat(NULL,&dbstat,0);
 		STXXL_MSG("Records in map: "<<dbstat->bt_ndata)
 		
+		db.get_env()->memp_stat(NULL,NULL,DB_STAT_CLEAR);
+		
 		Timer.start();
 					
 		for (i = 0; i < n_inserts; ++i)
@@ -164,6 +169,8 @@ void run_bdb_btree(stxxl::int64 ops)
 		STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
 					" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
+		
 		/////////////////////////////////////////
 		Timer.reset();
 		Timer.start();
@@ -185,6 +192,7 @@ void run_bdb_btree(stxxl::int64 ops)
 		STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
 			" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 		
 		////////////////////////////////////
 		Timer.reset();
@@ -226,6 +234,8 @@ void run_bdb_btree(stxxl::int64 ops)
 			" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
 			" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
 		
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
+		
 		//////////////////////////////////////
 		
 		stxxl::ran32State = 0xdeadbeef;
@@ -247,6 +257,7 @@ void run_bdb_btree(stxxl::int64 ops)
 		STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 	
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 		
 		db.close(0);
 	}
@@ -266,6 +277,7 @@ void run_stxxl_map(stxxl::int64 ops)
 {
 	map_type Map(NODE_CACHE_SIZE,LEAF_CACHE_SIZE);
 	Map.enable_prefetching();
+	stxxl::stats * Stats = stxxl::stats::get_instance();
 	
 	char *letters = "abcdefghijklmnopqrstuvwxuz";
 	std::pair<my_key,my_data> element;
@@ -285,6 +297,8 @@ void run_stxxl_map(stxxl::int64 ops)
 	
 	STXXL_MSG("Records in map: "<<Map.size())
 	
+	Stats->reset();
+	
 	Timer.start();
 	            
 	for (i = 0; i < n_inserts; ++i)
@@ -294,9 +308,13 @@ void run_stxxl_map(stxxl::int64 ops)
 	}
 
 	Timer.stop();
+
 	STXXL_MSG("Records in map: "<<Map.size())
 	STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
 				" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	Stats->reset();
 
 	////////////////////////////////////////////////
 	Timer.reset();
@@ -314,6 +332,9 @@ void run_stxxl_map(stxxl::int64 ops)
 	Timer.stop();
 	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	Stats->reset();
 	
 	////////////////////////////////////
 	Timer.reset();
@@ -347,6 +368,9 @@ void run_stxxl_map(stxxl::int64 ops)
 		" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
 		" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
 	
+	std::cout << *Stats;
+	Stats->reset();
+	
 	//////////////////////////////////////
 	stxxl::ran32State = 0xdeadbeef;
 	memset(element.first.keybuf, 'a', KEY_SIZE);
@@ -365,6 +389,9 @@ void run_stxxl_map(stxxl::int64 ops)
 	STXXL_MSG("Records in map: "<<Map.size())
 	STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+
+	std::cout << *Stats;
+	Stats->reset();	
 }
 
 
