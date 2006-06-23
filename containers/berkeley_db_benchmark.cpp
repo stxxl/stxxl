@@ -754,7 +754,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 					break;
 			}
 			
-			if(n_scanned >= 10*n_range_queries)	break;
+			if(n_scanned >= 2*n)	break;
 		}
 	
 		n_range_queries = i;
