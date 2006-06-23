@@ -151,10 +151,20 @@ public:
 		{
 			return p_vector->element(offset);
 		}
+		
+		pointer operator ->()
+		{
+			return &(p_vector->element(offset));
+		}
     
     	const_reference operator *() const
 		{
 			return p_vector->const_element(offset);
+		}
+		
+		const_pointer operator ->() const
+		{
+			return &(p_vector->const_element(offset));
 		}
 		
 		void touch()
@@ -307,6 +317,11 @@ public:
 		const_reference operator *() const
 		{
 			return p_vector->const_element(offset);
+		}
+		
+		const_pointer operator ->() const
+		{
+			return &(p_vector->const_element(offset));
 		}
 		
 		void touch()

@@ -37,6 +37,7 @@ u_int        datasize = DATA_SIZE;
 u_int        keysize = KEY_SIZE;
 u_int        numitems = 0;
 
+char *letters = "abcdefghijklmnopqrstuvwxuz";
 
 struct my_key
 {
@@ -98,6 +99,12 @@ struct comp_type
 		memset(obj.keybuf, (std::numeric_limits<char>::max)() , KEY_SIZE);
 		return obj;
 	}
+	static my_key min_value()
+	{ 
+		my_key obj;
+		memset(obj.keybuf, (std::numeric_limits<char>::min)() , KEY_SIZE);
+		return obj;
+	}
 };
 typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map_type;
 
@@ -107,7 +114,6 @@ typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map
 void run_bdb_btree(stxxl::int64 ops)
 {
 	char *filename = BDB_FILE;
-	char *letters = "abcdefghijklmnopqrstuvwxuz";
 	
 	my_key key1_storage;
 	my_data data1_storage;
@@ -331,7 +337,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
 	Timer.stop();
 	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
-		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+		" seconds : "<< (double(n_locates)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 	
 	std::cout << *Stats;
 	Stats->reset();
@@ -388,10 +394,415 @@ void run_stxxl_map(stxxl::int64 ops)
 	Timer.stop();
 	STXXL_MSG("Records in map: "<<Map.size())
 	STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
-		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+		" seconds : "<< (double(n_deletes)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
 	std::cout << *Stats;
 	Stats->reset();	
+}
+
+class rand_key_gen
+{
+		stxxl::int64 counter;
+		my_key & current;
+		stxxl::random_number32  myrand;
+		rand_key_gen();
+	public:
+		typedef my_key value_type;	
+		
+		rand_key_gen(stxxl::int64 el, my_key & cur): 
+			counter(el), current(cur)
+		{
+			const stxxl::int64  & i = counter;
+			current.keybuf[KEYPOS] = letters[VALUE];
+		}
+		const my_key & operator * () { return current; } 
+		const my_key * operator -> () { return &current; } 
+		
+		rand_key_gen & operator ++ ()
+		{
+			--counter;
+			const stxxl::int64  & i = counter;
+			current.keybuf[KEYPOS] = letters[VALUE];
+			return *this;
+		}
+		bool empty() const { return counter==0; }
+};
+
+template <class InputType>
+class key2pair
+{
+		InputType & in;
+		std::pair<my_key,my_data>  current;
+		key2pair();
+	public:
+		typedef std::pair<my_key,my_data> value_type;	
+		
+		key2pair(InputType & in_): in(in_)
+		{
+			if(!in.empty()) current.first = *in;
+		}
+		const value_type & operator * () { return current; } 
+		const value_type * operator -> () { return &current; } 
+		
+		key2pair & operator ++ ()
+		{
+			++in;
+			if(!empty()) current.first = *in;
+				
+			return *this;
+		}
+		bool empty() const { return in.empty(); }
+};
+
+void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
+{
+	stxxl::stats * Stats = stxxl::stats::get_instance();
+	
+	std::pair<my_key,my_data> element;
+    
+	memset(element.first.keybuf, 'a', KEY_SIZE);
+	memset(element.second.databuf, 'b', DATA_SIZE);
+	
+	stxxl::timer Timer;
+	stxxl::int64 n_inserts=ops,n_locates=ops, n_range_queries=ops, n_deletes = ops;
+	stxxl::int64 i;
+	comp_type cmp_;
+	
+	stxxl::ran32State = 0xdeadbeef;
+	
+	stxxl::random_number32 myrand;
+	
+	typedef stxxl::VECTOR_GENERATOR<my_key,1,1>  vector_type;
+	stxxl::vector<std::pair<my_key,my_data> > SortedSeq(n);
+	const stxxl::vector<std::pair<my_key,my_data> >  & CSortedSeq(SortedSeq);
+	rand_key_gen Gen(n,element.first);
+	typedef stxxl::stream::sort<rand_key_gen,comp_type> sorter_type;
+	sorter_type Sorter(Gen,comp_type(),TOTAL_CACHE_SIZE);
+	typedef key2pair<sorter_type> key2pair_type;
+	key2pair_type Key2Pair(Sorter);
+	stxxl::vector<std::pair<my_key,my_data> >::iterator it = stxxl::stream::materialize(Key2Pair,SortedSeq.begin());
+	
+	
+	
+	
+	Stats->reset();
+	
+	Timer.start();
+	      
+	// bulk construction
+	map_type Map(CSortedSeq.begin(),
+								CSortedSeq.end(),
+								NODE_CACHE_SIZE,LEAF_CACHE_SIZE,true);
+
+	Timer.stop();
+	
+	Map.enable_prefetching();	
+
+	STXXL_MSG("Records in map: "<<Map.size())
+	STXXL_MSG("Construction elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(n)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	Stats->reset(); 
+	////////////////////////////////////////
+	Timer.reset();
+
+	Timer.start();
+
+	for (i = 0; i < n_inserts; ++i)
+	{
+		element.first.keybuf[KEYPOS] = letters[VALUE];
+		Map.insert(element);
+	}
+
+	Timer.stop();
+
+	STXXL_MSG("Records in map: "<<Map.size())
+	STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	Stats->reset();
+	
+	////////////////////////////////////
+
+	
+	////////////////////////////////////////////////
+	Timer.reset();
+
+	const map_type & CMap(Map); // const map reference
+	
+	Timer.start();
+
+	for (i = 0; i < n_locates; ++i)
+	{
+		element.first.keybuf[KEYPOS] = letters[VALUE];
+		CMap.lower_bound(element.first);
+	}
+
+	Timer.stop();
+	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	Stats->reset();
+	
+	////////////////////////////////////
+	Timer.reset();
+	
+	Timer.start();
+	
+	stxxl::int64 n_scanned = 0, skipped_qieries=0;
+
+	for (i = 0; i < n_range_queries; ++i)
+	{
+		element.first.keybuf[KEYPOS] = letters[VALUE];
+		my_key begin_key = element.first;
+		map_type::const_iterator begin=CMap.lower_bound(element.first);
+		element.first.keybuf[KEYPOS] = letters[VALUE];
+		map_type::const_iterator beyond=CMap.lower_bound(element.first);
+		if(element.first<begin_key)
+			std::swap(begin,beyond);
+		while(begin!=beyond)
+		{
+			my_data tmp =  begin->second;
+			++n_scanned;
+			++begin;
+		}
+		if(n_scanned >= 2*n)	break;
+	}
+	
+	n_range_queries = i;
+
+	Timer.stop();
+	STXXL_MSG("Range query elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
+		" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
+	
+	std::cout << *Stats;
+	Stats->reset();
+	
+	//////////////////////////////////////
+	stxxl::ran32State = 0xdeadbeef;
+	memset(element.first.keybuf, 'a', KEY_SIZE);
+	memset(element.second.databuf, 'b', DATA_SIZE);
+	
+	Timer.reset();
+	Timer.start();
+
+	for (i = n_deletes; i > 0; --i)
+	{
+		element.first.keybuf[KEYPOS] = letters[VALUE];
+		Map.erase(element.first);
+	}
+
+	Timer.stop();
+	STXXL_MSG("Records in map: "<<Map.size())
+	STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+
+	std::cout << *Stats;
+	Stats->reset();
+}
+
+void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
+{
+	char *filename = BDB_FILE;
+	
+	my_key key1_storage;
+	my_data data1_storage;
+    
+	unlink(filename);
+	
+	memset(key1_storage.keybuf, 'a', KEY_SIZE);
+	memset(data1_storage.databuf, 'b', DATA_SIZE);
+	
+	
+	Db db(NULL, 0);               // Instantiate the Db object
+	
+	try {
+	
+		
+		db.set_errfile(stderr);
+		db.set_pagesize(pagesize);
+		db.set_cachesize(0,cachesize,1);
+		
+    	// Open the database
+    	db.open(NULL,                // Transaction pointer 
+            filename,          // Database file name 
+            NULL,                // Optional logical database name
+            DB_BTREE,            // Database access method
+            DB_CREATE,              // Open flags
+            0);                  // File mode (using defaults)
+
+		
+		// here we start with the tests
+		Dbt key1(key1_storage.keybuf,  KEY_SIZE);
+		Dbt data1(data1_storage.databuf, DATA_SIZE);
+		
+		stxxl::timer Timer;
+		stxxl::int64 n_inserts = ops, n_locates=ops, n_range_queries=ops, n_deletes = ops;
+		stxxl::int64 i;
+		comp_type cmp_;
+		
+		stxxl::ran32State = 0xdeadbeef;
+		stxxl::random_number32 myrand;
+		
+		
+		typedef stxxl::VECTOR_GENERATOR<my_key,1,1>  vector_type;
+		stxxl::vector<std::pair<my_key,my_data> > SortedSeq(n);
+		const stxxl::vector<std::pair<my_key,my_data> >  & CSortedSeq(SortedSeq);
+		rand_key_gen Gen(n,key1_storage);
+		typedef stxxl::stream::sort<rand_key_gen,comp_type> sorter_type;
+		sorter_type Sorter(Gen,comp_type(),TOTAL_CACHE_SIZE);
+		typedef key2pair<sorter_type> key2pair_type;
+		key2pair_type Key2Pair(Sorter);
+		stxxl::vector<std::pair<my_key,my_data> >::iterator it = stxxl::stream::materialize(Key2Pair,SortedSeq.begin());
+		
+		
+		db.get_env()->memp_stat(NULL,NULL,DB_STAT_CLEAR);
+		
+		Timer.start();
+			  
+		// DBD does not have bulk construction
+		// however insering in sorted order might help
+		// to improve performance
+		stxxl::vector<std::pair<my_key,my_data> >::const_iterator cit = SortedSeq.begin();
+		for (i = 0; i < n; ++i,++cit)
+		{
+			key1_storage = cit->first;
+			db.put(NULL, &key1, &data1, DB_NOOVERWRITE);
+		}
+	
+		Timer.stop();
+	
+		DB_BTREE_STAT * dbstat;
+		db.stat(NULL,&dbstat,0);
+		STXXL_MSG("Records in map: "<<dbstat->bt_ndata)
+		STXXL_MSG("Construction elapsed time: "<<(Timer.mseconds()/1000.)<<
+					" seconds : "<< (double(n)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
+		////////////////////////////////////////
+			
+		
+		Timer.reset();
+		Timer.start();
+					
+		for (i = 0; i < n_inserts; ++i)
+		{
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			db.put(NULL, &key1, &data1, DB_NOOVERWRITE);
+		}
+	
+		Timer.stop();
+		db.stat(NULL,&dbstat,0);
+		STXXL_MSG("Records in map: "<<dbstat->bt_ndata)
+		STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
+					" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
+		
+		/////////////////////////////////////////
+		Timer.reset();
+		Timer.start();
+		
+	
+		Dbc *cursorp;
+		db.cursor(NULL, &cursorp, 0);
+		
+		for (i = 0; i < n_locates; ++i)
+		{
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+			Dbt datax(data1_storage.databuf, DATA_SIZE);
+			
+			cursorp->get(&keyx, &datax, DB_SET_RANGE);
+		}
+	
+		Timer.stop();
+		STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
+			" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
+		
+		////////////////////////////////////
+		Timer.reset();
+		
+		Timer.start();		
+		
+		stxxl::int64 n_scanned = 0;
+	
+		for (i = 0; i < n_range_queries; ++i)
+		{
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			my_key last_key = key1_storage;
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			if(last_key<key1_storage)
+				std::swap(last_key,key1_storage);
+			
+			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+			Dbt datax(data1_storage.databuf, DATA_SIZE);
+			
+			if( cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
+				continue;
+			
+			while(*((my_key *)keyx.get_data()) <= last_key)
+			{
+				++n_scanned;
+				if(cursorp->get(&keyx, &datax, DB_NEXT)==DB_NOTFOUND)
+					break;
+			}
+			
+			if(n_scanned >= 10*n_range_queries)	break;
+		}
+	
+		n_range_queries = i;
+		
+		Timer.stop();
+		if (cursorp != NULL) cursorp->close();
+			
+		STXXL_MSG("Range query elapsed time: "<<(Timer.mseconds()/1000.)<<
+			" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
+			" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
+		
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
+		
+		//////////////////////////////////////
+		
+		stxxl::ran32State = 0xdeadbeef;
+		memset(key1_storage.keybuf, 'a', KEY_SIZE);
+		
+		Timer.reset();
+		Timer.start();
+	
+		for (i = 0; i < n_deletes; ++i)
+		{
+			key1_storage.keybuf[KEYPOS] = letters[VALUE];
+			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+			db.del(NULL, &keyx, 0);
+		}
+	
+		Timer.stop();
+		db.stat(NULL,&dbstat,0);
+		STXXL_MSG("Records in map: "<<dbstat->bt_ndata)
+		STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
+		
+		db.close(0);
+	}
+	catch(DbException &e)
+	{
+    	STXXL_ERRMSG("DbException happened")
+	} 
+	catch(std::exception &e)
+	{
+    	STXXL_ERRMSG("std::exception happened")
+	} 
+
+	unlink(filename);
 }
 
 
@@ -402,6 +813,8 @@ int main(int argc, char * argv[])
 		STXXL_MSG("Usage: "<<argv[0]<<" version #ops")
 		STXXL_MSG("\t version = 1: test stxxl map")
 		STXXL_MSG("\t version = 2: test Berkeley DB btree")
+		STXXL_MSG("\t version = 3: big test stxxl map")
+		STXXL_MSG("\t version = 4: big test Berkeley DB btree")
 		return 0;
 	}
 
@@ -420,6 +833,12 @@ int main(int argc, char * argv[])
 			break;
 		case 2:
 			run_bdb_btree(ops);
+			break;
+		case 3:
+			run_stxxl_map_big(ops,100000);
+			break;
+		case 4:
+			run_bdb_btree_big(ops,100000);
 			break;
 		default:
 			STXXL_MSG("Unsupported version "<<version)
