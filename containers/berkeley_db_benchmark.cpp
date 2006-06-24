@@ -19,21 +19,22 @@
 
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
-#define TOTAL_CACHE_SIZE    (110*1024*1024)
-#define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/5))
-#define LEAF_CACHE_SIZE 	(4*(TOTAL_CACHE_SIZE/5))
+#define TOTAL_CACHE_SIZE    (90*1024*1024)
+#define T1					(TOTAL_CACHE_SIZE)
+#define NODE_CACHE_SIZE 	(1*(T1/5))
+#define LEAF_CACHE_SIZE 	(4*(T1/5))
 
 #define SORTER_MEM			(TOTAL_CACHE_SIZE - 1024*1024*2*4)
 
 
-//#define BDB_FILE "/data3/bdb_file"
-#define BDB_FILE "/var/tmp/bdb_file"
+#define BDB_FILE "/data3/bdb_file"
+//#define BDB_FILE "/var/tmp/bdb_file"
 
 // BDB settings
 u_int32_t    pagesize = LEAF_BLOCK_SIZE;
 u_int        bulkbufsize = 4 * 1024 * 1024;
 u_int        logbufsize = 8 * 1024 * 1024;
-u_int        cachesize = 3*TOTAL_CACHE_SIZE/5;
+u_int        cachesize = 4*TOTAL_CACHE_SIZE/5;
 //u_int        cachesize = 1*TOTAL_CACHE_SIZE/5;
 u_int        datasize = DATA_SIZE;
 u_int        keysize = KEY_SIZE;
