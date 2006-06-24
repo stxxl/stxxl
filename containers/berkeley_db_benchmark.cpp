@@ -26,8 +26,8 @@
 #define SORTER_MEM			(TOTAL_CACHE_SIZE - 1024*1024*2*4)
 
 
-#define BDB_FILE "/data3/bdb_file"
-//#define BDB_FILE "/var/tmp/bdb_file"
+//#define BDB_FILE "/data3/bdb_file"
+#define BDB_FILE "/var/tmp/bdb_file"
 
 // BDB settings
 u_int32_t    pagesize = LEAF_BLOCK_SIZE;
@@ -119,7 +119,13 @@ typedef stxxl::VECTOR_GENERATOR<std::pair<my_key,my_data>,1,1>::result  vector_t
 
 //#define KEYPOS 	(i % KEY_SIZE)
 //#define VALUE 		(myrand() % 26)
-stxxl::random_number32  myrand;
+
+unsigned ran32State = 0xdeadbeef;
+
+inline unsigned myrand()
+{
+		return (ran32State = 1664525 * ran32State + 1013904223);
+}
 
 inline void rand_key(stxxl::int64 pos, my_key & Key)
 {
@@ -167,8 +173,8 @@ void run_bdb_btree(stxxl::int64 ops)
 		stxxl::int64 i;
 		comp_type cmp_;
 		
-		stxxl::ran32State = 0xdeadbeef;
-		stxxl::random_number32 myrand;
+		ran32State = 0xdeadbeef;
+		
 		
 		DB_BTREE_STAT * dbstat;
 		
@@ -264,7 +270,7 @@ void run_bdb_btree(stxxl::int64 ops)
 		
 		//////////////////////////////////////
 		
-		stxxl::ran32State = 0xdeadbeef;
+		ran32State = 0xdeadbeef;
 		memset(key1_storage.keybuf, 'a', KEY_SIZE);
 		
 		Timer.reset();
@@ -317,7 +323,7 @@ void run_stxxl_map(stxxl::int64 ops)
 	stxxl::int64 i;
 	comp_type cmp_;
 	
-	stxxl::ran32State = 0xdeadbeef;
+	ran32State = 0xdeadbeef;
 	
 	stxxl::random_number32 myrand;
 	
@@ -402,7 +408,7 @@ void run_stxxl_map(stxxl::int64 ops)
 	Stats->reset();
 	
 	//////////////////////////////////////
-	stxxl::ran32State = 0xdeadbeef;
+	ran32State = 0xdeadbeef;
 	memset(element.first.keybuf, 'a', KEY_SIZE);
 	memset(element.second.databuf, 'b', DATA_SIZE);
 	
@@ -495,7 +501,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	stxxl::int64 i;
 	comp_type cmp_;
 	
-	stxxl::ran32State = 0xdeadbeef;
+	ran32State = 0xdeadbeef;
 	
 	stxxl::random_number32 myrand;
 	
@@ -614,7 +620,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	Stats->reset();
 	
 	//////////////////////////////////////
-	stxxl::ran32State = 0xdeadbeef;
+	ran32State = 0xdeadbeef;
 	memset(element.first.keybuf, 'a', KEY_SIZE);
 	memset(element.second.databuf, 'b', DATA_SIZE);
 	
@@ -663,8 +669,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		stxxl::int64 i;
 		comp_type cmp_;
 		
-		stxxl::ran32State = 0xdeadbeef;
-		stxxl::random_number32 myrand;
+		ran32State = 0xdeadbeef;
 		
 		
 		vector_type SortedSeq(n);
@@ -805,7 +810,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		
 		//////////////////////////////////////
 		
-		stxxl::ran32State = 0xdeadbeef;
+		ran32State = 0xdeadbeef;
 		memset(key1_storage.keybuf, 'a', KEY_SIZE);
 		
 		Timer.reset();
