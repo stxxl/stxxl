@@ -332,7 +332,19 @@ typedef unsigned long long uint64;
 #endif
 
 
-
+        inline uint64 longhash1(uint64 key_)
+        {
+             key_ += ~(key_ << 32);
+             key_ ^= (key_ >> 22);
+             key_ += ~(key_ << 13);
+             key_ ^= (key_ >> 8);
+             key_ += (key_ << 3);
+             key_ ^= (key_ >> 15);
+             key_ += ~(key_ << 27);
+             key_ ^= (key_ >> 31);
+             return key_;
+       }
+																	   
 
 template <class _ForwardIter>
 bool is_sorted(_ForwardIter __first, _ForwardIter __last)
