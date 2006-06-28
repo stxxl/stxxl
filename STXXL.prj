@@ -90,7 +90,7 @@ module.include.files=\
 	io/iostats.h\
 	containers/vector.h\
 	algo/ksort.h\
-	algo/loosertree.h\
+	algo/losertree.h\
 	algo/interleaved_alloc.h\
 	containers/pager.h\
 	common/simple_vector.h\

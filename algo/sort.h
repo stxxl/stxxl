@@ -10,6 +10,10 @@
 
 #include <list>
 
+#ifdef __MCSTL__
+#include <mcstl.h>
+#endif
+
 #include "../mng/mng.h"
 #include "../common/rand.h"
 #include "../mng/adaptor.h"
@@ -22,7 +26,7 @@
 #include "../mng/block_prefetcher.h"
 #include "../mng/buf_writer.h"
 #include "run_cursor.h"
-#include "loosertree.h"
+#include "losertree.h"
 #include "inmemsort.h"
 
 //#define SORT_OPT_PREFETCHING
@@ -460,8 +464,6 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	}
 	
 #else
-	#define STXXL_CHECK_ORDER_IN_SORTS
-	
 	typedef stxxl::int64 diff_type;
 	typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
 	std::vector<sequence> seqs(nruns);
@@ -481,31 +483,31 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	{
 		diff_type rest = block_type::size;	//elements still to merge for this output block
 	
-		STXXL_MSG("output block " << j);
+		STXXL_VERBOSE1("output block " << j);
 		do
 		{
 			value_type min_last = *(seqs[0].second - 1);	//minimum of the sequences' last elements
 			diff_type total_size = 0;
 			
 			total_size += seqs[0].second - seqs[0].first;
-			STXXL_MSG("last " << *(seqs[0].second - 1) << " block size " << (seqs[0].second - seqs[0].first));
+			STXXL_VERBOSE1("last " << *(seqs[0].second - 1) << " block size " << (seqs[0].second - seqs[0].first));
 			
 			for(int i = 1; i < seqs.size(); i++)
 			{
 				min_last = cmp(min_last, *(seqs[i].second - 1)) ? min_last : *(seqs[i].second - 1);
 				
 				total_size += seqs[i].second - seqs[i].first;
-				STXXL_MSG("last " << *(seqs[i].second - 1) << " block size " << (seqs[i].second - seqs[i].first));
+				STXXL_VERBOSE1("last " << *(seqs[i].second - 1) << " block size " << (seqs[i].second - seqs[i].first));
 			}
 			
-			STXXL_MSG("min_last " << min_last << " total size " << total_size + (block_type::size - rest));
+			STXXL_VERBOSE1("min_last " << min_last << " total size " << total_size + (block_type::size - rest));
 			
 			diff_type less_equal_than_min_last = 0;
 			//locate this element in all sequences
 			for(int i = 0; i < seqs.size(); i++)
 			{
 				typename block_type::iterator position = upper_bound(seqs[i].first, seqs[i].second, min_last, cmp);
-				STXXL_MSG("greater equal than " << position - seqs[i].first);
+				STXXL_VERBOSE1("greater equal than " << position - seqs[i].first);
 				less_equal_than_min_last += position - seqs[i].first;
 			}
 			
@@ -525,13 +527,13 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 					{
 						seqs[i].first = buffers[i]->begin();	//reset iterator
 						seqs[i].second = buffers[i]->end();
-						STXXL_MSG("block ran empty " << i);
+						STXXL_VERBOSE1("block ran empty " << i);
 					}
 					else
 					{
 						seqs.erase(seqs.begin() + i);	//remove this sequence
 						buffers.erase(buffers.begin() + i);
-						STXXL_MSG("seq removed " << i);
+						STXXL_VERBOSE1("seq removed " << i);
 					}
 				}
 			}
@@ -544,7 +546,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 			for(value_type* i = out_buffer->begin() + 1; i != out_buffer->end(); i++)
 				if(cmp(*i, *(i - 1)))
 				{
-					STXXL_MSG("Error at position " << (i - out_buffer->begin()));
+					STXXL_VERBOSE1("Error at position " << (i - out_buffer->begin()));
 				}
 			assert(false);
 		}

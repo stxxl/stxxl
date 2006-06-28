@@ -849,7 +849,7 @@ namespace stream
     typedef block_prefetcher<block_type,typename run_type::iterator> prefetcher_type;
     typedef run_cursor2<block_type,prefetcher_type> run_cursor_type;
     typedef sort_local::run_cursor2_cmp<block_type,prefetcher_type,value_cmp> run_cursor2_cmp_type;
-    typedef looser_tree<run_cursor_type,run_cursor2_cmp_type,block_type::size> looser_tree_type;
+    typedef loser_tree<run_cursor_type,run_cursor2_cmp_type,block_type::size> loser_tree_type;
     
     sorted_runs_type sruns;
     unsigned m_; //  blocks to use - 1
@@ -859,7 +859,7 @@ namespace stream
     block_type * current_block;
     run_type consume_seq;
     prefetcher_type * prefetcher;
-    looser_tree_type * loosers;
+    loser_tree_type * losers;
     int * prefetch_seq;
 	#ifdef STXXL_CHECK_ORDER_IN_SORTS
 	typename block_type::value_type last_element;
@@ -874,7 +874,7 @@ namespace stream
 	{
 		if(prefetcher)
 		{
-			delete loosers;
+			delete losers;
       		delete prefetcher;
       		delete [] prefetch_seq;
 			prefetcher = NULL;
@@ -996,9 +996,9 @@ namespace stream
                                         nruns + n_prefetch_buffers);
       
     
-      loosers  =  new looser_tree_type(prefetcher, nruns,run_cursor2_cmp_type(cmp));
+      losers  =  new loser_tree_type(prefetcher, nruns,run_cursor2_cmp_type(cmp));
       
-      loosers->multi_merge(current_block->elem);
+      losers->multi_merge(current_block->elem);
       current_value = current_block->elem[0];
       buffer_pos = 1;
 	  
@@ -1027,7 +1027,7 @@ namespace stream
       {
         if(!empty())
         {
-          loosers->multi_merge(current_block->elem);
+          losers->multi_merge(current_block->elem);
 		  #ifdef STXXL_CHECK_ORDER_IN_SORTS
 		  assert(is_sorted(current_block->elem,current_block->elem +current_block->size,cmp));
 		  assert(!cmp(current_block->elem[0],current_value));
