@@ -87,8 +87,8 @@ namespace btree
   			typedef __gnu_cxx::hash_map < bid_type, int , bid_hash > hash_map_type;
   			#endif 
 			
-			typedef std::map<bid_type,int,bid_comp> BID2node_type;
-			//typedef hash_map_type BID2node_type;
+			//typedef std::map<bid_type,int,bid_comp> BID2node_type;
+			typedef hash_map_type BID2node_type;
 			
 			BID2node_type BID2node_;
 			stxxl::btree::lru_pager pager_;	
