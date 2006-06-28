@@ -11,7 +11,7 @@
 #include <db_cxx.h>
 
 #define KEY_SIZE 		8
-#define DATA_SIZE 	32
+#define DATA_SIZE 		32
 
 #define NODE_BLOCK_SIZE 	(32*1024)
 #define LEAF_BLOCK_SIZE 	(32*1024)
@@ -553,7 +553,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	////////////////////////////////////////
 	Timer.reset();
 
-/*
+
 	Map.disable_prefetching();
 
 	Timer.start();
@@ -580,9 +580,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	////////////////////////////////////////////////
 	Timer.reset();
 
-*/
+
 	const map_type & CMap(Map); // const map reference
-/*
+
 	Timer.start();
 
 	for (i = 0; i < n_locates; ++i)
@@ -601,7 +601,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	
 	////////////////////////////////////
 	Timer.reset();
-	*/
+	
 	Map.enable_prefetching();
 
 	Timer.start();
@@ -621,7 +621,6 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 			std::swap(begin,beyond);
 		while(begin!=beyond)
 		{
-			//my_data tmp =  begin->second;
 			++n_scanned;
 			++begin;
 		}
@@ -638,7 +637,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	
 	std::cout << *Stats;
 	Stats->reset();
-	/*
+	
 	//////////////////////////////////////
 	ran32State = 0xdeadbeef;
 	memset(element.first.keybuf, 'a', KEY_SIZE);
@@ -662,7 +661,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
 	std::cout << *Stats;
-	Stats->reset(); */
+	Stats->reset(); 
 }
 
 void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
