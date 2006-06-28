@@ -121,6 +121,10 @@ void init()
 
 typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map_type;
 
+#define REAL_NODE_BLOCK_SIZE map_type::node_block_type::raw_size
+#define REAL_LEAF_BLOCK_SIZE map_type::leaf_block_type::raw_size
+#define REAL_NODE_MELEMENTS map_type::node_block_type::size
+#define REAL_LEAF_MELEMENTS map_type::leaf_block_type::size
 
 typedef stxxl::VECTOR_GENERATOR<std::pair<my_key,my_data>,1,1>::result  vector_type;
 //typedef stxxl::vector<std::pair<my_key,my_data>,1,stxxl::lru_pager<1>,512*1024>  vector_type;
@@ -877,6 +881,11 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
 int main(int argc, char * argv[])
 {
+	STXXL_MSG("stxxl::map Real Node block size: "<<REAL_NODE_BLOCK_SIZE<<" bytes")
+    STXXL_MSG("stxxl::map Real Leaf block size: "<<REAL_LEAF_BLOCK_SIZE<<" bytes")
+    STXXL_MSG("stxxl::map Node max elements   : "<<REAL_NODE_MELEMENTS)
+    STXXL_MSG("stxxl::map Leaf max elements   : "<<REAL_LEAF_MELEMENTS)
+	
 	if(argc < 3)
 	{
 		STXXL_MSG("Usage: "<<argv[0]<<" version #ops")
@@ -896,6 +905,7 @@ int main(int argc, char * argv[])
 	STXXL_MSG("Operations to perform: "<<ops);
 	STXXL_MSG("Btree cache size     : "<<TOTAL_CACHE_SIZE<<" bytes")
 	STXXL_MSG("Leaf block size      : "<<LEAF_BLOCK_SIZE<<" bytes")
+
 	
 	switch(version)
 	{
