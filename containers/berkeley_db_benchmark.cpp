@@ -881,10 +881,15 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
 int main(int argc, char * argv[])
 {
-	STXXL_MSG("stxxl::map Real Node block size: "<<REAL_NODE_BLOCK_SIZE<<" bytes")
+    STXXL_MSG("stxxl::map Real Node block size: "<<REAL_NODE_BLOCK_SIZE<<" bytes")
     STXXL_MSG("stxxl::map Real Leaf block size: "<<REAL_LEAF_BLOCK_SIZE<<" bytes")
     STXXL_MSG("stxxl::map Node max elements   : "<<REAL_NODE_MELEMENTS)
     STXXL_MSG("stxxl::map Leaf max elements   : "<<REAL_LEAF_MELEMENTS)
+    	#ifdef STXXL_DIRECT_IO_OFF
+	STXXL_MSG("STXXL_DIRECT_IO_OFF is defined")
+	#else
+	STXXL_MSG("STXXL_DIRECT_IO_OFF is NOT defined")
+	#endif
 	
 	if(argc < 3)
 	{
