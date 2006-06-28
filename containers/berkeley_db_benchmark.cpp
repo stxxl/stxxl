@@ -10,6 +10,8 @@
 
 #include <db_cxx.h>
 
+#define BDB_BULK_SCAN
+
 #define KEY_SIZE 		8
 #define DATA_SIZE 		32
 
@@ -20,6 +22,7 @@
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
 #define TOTAL_CACHE_SIZE    (750*1024*1024)
+//#define TOTAL_CACHE_SIZE    (150*1024*1024)
 
 //#define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/40))
 //#define LEAF_CACHE_SIZE 	(39*(TOTAL_CACHE_SIZE/40))
@@ -674,6 +677,10 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 	
 	my_key key1_storage;
 	my_data data1_storage;
+	
+	#ifdef BDB_BULK_SCAN
+	int * bulk_buffer = new int [logbufsize/sizeof(int)];
+	#endif
     
 	unlink(filename);
 	
@@ -813,17 +820,39 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 			if(last_key<key1_storage)
 				std::swap(last_key,key1_storage);
 			
-			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
-			Dbt datax(data1_storage.databuf, DATA_SIZE);
+			//STXXL_MSG("Looking     "<<key1_storage)
+			//STXXL_MSG("Upper bound "<<last_key)
 			
+			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+			#ifdef BDB_BULK_SCAN
+			Dbt datax(bulk_buffer, DATA_SIZE);
+			datax.set_ulen(logbufsize);
+			datax.set_flags(DB_DBT_USERMEM);
+			#else
+			Dbt datax(data1_storage.databuf, DATA_SIZE);
+			#endif
+			
+			#ifdef BDB_BULK_SCAN
+			if( cursorp->get(&keyx, &datax, DB_SET_RANGE|DB_MULTIPLE_KEY) == DB_NOTFOUND)
+				continue;
+			DbMultipleKeyDataIterator BulkIterator(datax);
+			if(!BulkIterator.next(keyx,datax)) continue;
+			#else
 			if( cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
 				continue;
+			#endif
 			
 			while(*((my_key *)keyx.get_data()) <= last_key)
 			{
 				++n_scanned;
+				//STXXL_MSG("Result      "<<*((my_key *)keyx.get_data()))
+				#ifdef BDB_BULK_SCAN
+				//Dbt key1,data1;
+				if(!BulkIterator.next(keyx,datax)) break;
+				#else
 				if(cursorp->get(&keyx, &datax, DB_NEXT)==DB_NOTFOUND)
 					break;
+				#endif
 			}
 			
 			if(n_scanned >= 2*n)	break;
@@ -876,6 +905,10 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 	} 
 
 	unlink(filename);
+	
+	#ifdef BDB_BULK_SCAN
+	delete []  bulk_buffer;
+	#endif
 }
 
 
