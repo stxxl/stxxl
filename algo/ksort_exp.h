@@ -412,7 +412,7 @@ struct run_cursor2_cmp
 };
 
 
-#include "loosertree.h"
+#include "losertree.h"
 
 template <typename run_type,
 					typename prefetcher_writer_type,
@@ -628,12 +628,12 @@ merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
 		return;
 	}
 
-	looser_tree<type,
+	loser_tree<type,
 							run_cursor2_type,
 							run_cursor2_cmp<bid_type,key_type,block_type,block_size,run_type>,
 							prefetcher_writer_type,
 							block_size> 
-														loosers (&prefetcher, nruns);
+														losers (&prefetcher, nruns);
 
 	int i_out_buffer = prefetcher.get_free_write_block ();
 	//  STXXL_MSG("Block "<<i_out_buffer<<" taken")
@@ -641,7 +641,7 @@ merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
 
 	for (i = 0; i < out_run_size; i++)
 	{
-		loosers.multi_merge (out_buffer);
+		losers.multi_merge (out_buffer);
 
 		i_out_buffer = prefetcher.block_filled (i_out_buffer);
 		//    STXXL_MSG("Block "<<i_out_buffer<<" taken")

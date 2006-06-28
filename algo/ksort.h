@@ -23,7 +23,7 @@
 #include "../mng/block_prefetcher.h"
 #include "../mng/buf_writer.h"
 #include "run_cursor.h"
-#include "loosertree.h"
+#include "losertree.h"
 #include "inmemsort.h"
 
 //#define SORT_OPT_PREFETCHING
@@ -328,7 +328,7 @@ public:
   }
 };
 
-//#include "loosertree.h"
+//#include "losertree.h"
 
 template < typename block_type,typename run_type , typename key_ext_>
   bool check_ksorted_runs(		run_type ** runs, 
@@ -492,17 +492,17 @@ void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned
 	unsigned out_run_size = out_run->size();
 
 	run_cursor2_cmp<block_type,prefetcher_type,key_extractor> cmp(keyobj);
-	looser_tree<
+	loser_tree<
 							run_cursor_type,
 							run_cursor2_cmp<block_type,prefetcher_type,key_extractor>,
-							block_type::size> loosers (&prefetcher, nruns, cmp);
+							block_type::size> losers (&prefetcher, nruns, cmp);
 
 
 	block_type *out_buffer = writer.get_free_block();
 
 	for (i = 0; i < out_run_size; i++)
 	{
-		loosers.multi_merge (out_buffer->elem);
+		losers.multi_merge (out_buffer->elem);
 		(*out_run)[i].key = keyobj(out_buffer->elem[0]);
 		out_buffer = writer.write(out_buffer,(*out_run)[i].bid);
 	}
