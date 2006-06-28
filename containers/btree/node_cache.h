@@ -54,13 +54,13 @@ namespace btree
       				return (a.storage < b.storage) || ( a.storage == b.storage && a.offset < b.offset);
  				}
 			};
-			
+
 			struct bid_hash
 		  	{
 					size_t operator()(const bid_type & bid) const
 					{
-				  		size_t result = size_t(bid.storage) +
-							size_t(bid.offset & 0xffffffff) + size_t(bid.offset>>32);
+				  		size_t result = 
+							longhash1(bid.offset + uint64(bid.storage)); 
 					  	return result;
 					}
 					#ifdef BOOST_MSVC
@@ -80,15 +80,15 @@ namespace btree
 			std::vector<request_ptr> reqs_;
 			std::vector<bool> fixed_;
 			std::vector<bool> dirty_;
-			std::vector<int> free_nodes_;
+			std::vector<int> free_nodes_; 
 			#ifdef BOOST_MSVC
   			typedef stdext::hash_map < bid_type, int , bid_hash > hash_map_type;
   			#else
   			typedef __gnu_cxx::hash_map < bid_type, int , bid_hash > hash_map_type;
-  			#endif
+  			#endif 
 			
-			//typedef std::map<bid_type,int,bid_comp> BID2node_type;
-			typedef hash_map_type BID2node_type;
+			typedef std::map<bid_type,int,bid_comp> BID2node_type;
+			//typedef hash_map_type BID2node_type;
 			
 			BID2node_type BID2node_;
 			stxxl::btree::lru_pager pager_;	
@@ -254,8 +254,9 @@ namespace btree
 					fixed_[nodeindex] = fix;
 					pager_.hit(nodeindex);
 					dirty_[nodeindex] = true;
-					
-					if(reqs_[nodeindex].valid()) reqs_[nodeindex]->wait();
+				
+					if(reqs_[nodeindex].valid() && !reqs_[nodeindex]->poll()) 
+							reqs_[nodeindex]->wait();
 					
 					return nodes_[nodeindex];
 				}
@@ -335,8 +336,9 @@ namespace btree
 					STXXL_VERBOSE1("btree::node_cache get_node, the node "<<nodeindex<<"is in cache , fix="<<fix)
 					fixed_[nodeindex] = fix;
 					pager_.hit(nodeindex);
-					
-					if(reqs_[nodeindex].valid()) reqs_[nodeindex]->wait();
+				
+					if(reqs_[nodeindex].valid() && !reqs_[nodeindex]->poll()) 
+							reqs_[nodeindex]->wait();
 					
 					return nodes_[nodeindex];
 				}

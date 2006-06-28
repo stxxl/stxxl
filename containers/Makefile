@@ -5,11 +5,12 @@ include ../make.settings
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
 BERKELEY_DB_COMPILE_OPTIONS = -I/usr/local/BerkeleyDB.4.4/include
-BERKELEY_DB_LINK_OPTIONS = -L/usr/local/BerkeleyDB.4.4/lib -ldb_cxx
+BERKELEY_DB_LINK_OPTIONS = -L/usr/local/BerkeleyDB.4.4/lib/ -ldb_cxx
+QUANTIFY = # quantify #-best-effort
 
 berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) -c berkeley_db_benchmark.cpp -DNDEBUG 
-	$(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(BERKELEY_DB_LINK_OPTIONS) $(STXXL_LINKER_OPTIONS)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) -c berkeley_db_benchmark.cpp -DNDEBUG
+	$(QUANTIFY) $(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(BERKELEY_DB_LINK_OPTIONS) $(STXXL_LINKER_OPTIONS)
 
 
 write_vector: $(DEPENDENCIES)

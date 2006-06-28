@@ -13,18 +13,21 @@
 #define KEY_SIZE 		8
 #define DATA_SIZE 	32
 
-#define NODE_BLOCK_SIZE 	(16*1024)
+#define NODE_BLOCK_SIZE 	(32*1024)
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
 
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
-#define TOTAL_CACHE_SIZE    (90*1024*1024)
-#define T1					(TOTAL_CACHE_SIZE)
-#define NODE_CACHE_SIZE 	(1*(T1/5))
-#define LEAF_CACHE_SIZE 	(4*(T1/5))
+#define TOTAL_CACHE_SIZE    (750*1024*1024)
 
-#define SORTER_MEM			(TOTAL_CACHE_SIZE - 1024*1024*2*4)
+//#define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/40))
+//#define LEAF_CACHE_SIZE 	(39*(TOTAL_CACHE_SIZE/40))
+
+#define NODE_CACHE_SIZE		(25*1024*1024)
+#define LEAF_CACHE_SIZE		(TOTAL_CACHE_SIZE - NODE_CACHE_SIZE)
+
+#define SORTER_MEM		(TOTAL_CACHE_SIZE - 1024*1024*2*4)
 
 
 #define BDB_FILE "/data3/bdb_file"
@@ -34,8 +37,7 @@
 u_int32_t    pagesize = LEAF_BLOCK_SIZE;
 u_int        bulkbufsize = 4 * 1024 * 1024;
 u_int        logbufsize = 8 * 1024 * 1024;
-u_int        cachesize = 4*TOTAL_CACHE_SIZE/5;
-//u_int        cachesize = 1*TOTAL_CACHE_SIZE/5;
+u_int        cachesize = (TOTAL_CACHE_SIZE < 500*1024*1024)? (4*(TOTAL_CACHE_SIZE/5)):(TOTAL_CACHE_SIZE-100*1024*1024);
 u_int        datasize = DATA_SIZE;
 u_int        keysize = KEY_SIZE;
 u_int        numitems = 0;
@@ -92,6 +94,8 @@ struct my_data
 	char databuf[DATA_SIZE];
 };
 
+my_key min_key,max_key;
+
 struct comp_type
 {
 	bool operator () (const my_key & a, const my_key & b) const
@@ -100,17 +104,21 @@ struct comp_type
 	}
 	static my_key max_value()
 	{ 
-		my_key obj;
-		memset(obj.keybuf, (std::numeric_limits<char>::max)() , KEY_SIZE);
-		return obj;
+		return max_key;
 	}
 	static my_key min_value()
 	{ 
-		my_key obj;
-		memset(obj.keybuf, (std::numeric_limits<char>::min)() , KEY_SIZE);
-		return obj;
+		return min_key;
 	}
 };
+
+
+void init()
+{
+	memset(max_key.keybuf, (std::numeric_limits<char>::max)() , KEY_SIZE);
+	memset(min_key.keybuf, (std::numeric_limits<char>::min)() , KEY_SIZE);
+}
+
 typedef stxxl::map<my_key,my_data,comp_type,NODE_BLOCK_SIZE,LEAF_BLOCK_SIZE> map_type;
 
 
@@ -506,6 +514,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	
 	stxxl::random_number32 myrand;
 	
+	Timer.start();
 	
 	vector_type SortedSeq(n);
 	const vector_type  & CSortedSeq(SortedSeq);
@@ -519,8 +528,12 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	}
 	
 
+	Timer.stop();
 	Stats->reset();
 	
+	STXXL_MSG("Finished sorting input. Elapsed time: "<<(Timer.mseconds()/1000.)<<" seconds.")
+
+	Timer.reset();
 	Timer.start();
 	      
 	// bulk construction
@@ -530,7 +543,6 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 
 	Timer.stop();
 	
-	Map.enable_prefetching();	
 
 	STXXL_MSG("Records in map: "<<Map.size())
 	STXXL_MSG("Construction elapsed time: "<<(Timer.mseconds()/1000.)<<
@@ -540,6 +552,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	Stats->reset(); 
 	////////////////////////////////////////
 	Timer.reset();
+
+/*
+	Map.disable_prefetching();
 
 	Timer.start();
 
@@ -565,8 +580,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	////////////////////////////////////////////////
 	Timer.reset();
 
+*/
 	const map_type & CMap(Map); // const map reference
-	
+/*
 	Timer.start();
 
 	for (i = 0; i < n_locates; ++i)
@@ -585,7 +601,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	
 	////////////////////////////////////
 	Timer.reset();
-	
+	*/
+	Map.enable_prefetching();
+
 	Timer.start();
 	
 	stxxl::int64 n_scanned = 0, skipped_qieries=0;
@@ -603,11 +621,12 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 			std::swap(begin,beyond);
 		while(begin!=beyond)
 		{
-			my_data tmp =  begin->second;
+			//my_data tmp =  begin->second;
 			++n_scanned;
 			++begin;
 		}
 		if(n_scanned >= 2*n)	break;
+		
 	}
 	
 	n_range_queries = i;
@@ -619,13 +638,15 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	
 	std::cout << *Stats;
 	Stats->reset();
-	
+	/*
 	//////////////////////////////////////
 	ran32State = 0xdeadbeef;
 	memset(element.first.keybuf, 'a', KEY_SIZE);
 	memset(element.second.databuf, 'b', DATA_SIZE);
 	
 	Timer.reset();
+	Map.disable_prefetching();
+
 	Timer.start();
 
 	for (i = n_deletes; i > 0; --i)
@@ -641,7 +662,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
 	std::cout << *Stats;
-	Stats->reset();
+	Stats->reset(); */
 }
 
 void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
@@ -672,6 +693,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		
 		ran32State = 0xdeadbeef;
 		
+		Timer.start();
 		
 		vector_type SortedSeq(n);
 		const vector_type  & CSortedSeq(SortedSeq);
@@ -683,11 +705,16 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		key2pair_type Key2Pair(Sorter);
 		stxxl::stream::materialize(Key2Pair,SortedSeq.begin());
 		}
+
+		Timer.stop();
 		
+		STXXL_MSG("Finished sorting input. Elapsed time: "<<(Timer.mseconds()/1000.)<<" seconds.")
 
 		db.set_errfile(stderr);
 		db.set_pagesize(pagesize);
-		db.set_cachesize(0,cachesize,1);
+		db.set_cachesize(0,cachesize,10);
+
+		STXXL_MSG("BDB cache size set.")
 		
     		// Open the database
     		db.open(NULL,                // Transaction pointer 
@@ -699,6 +726,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		
 		db.get_env()->memp_stat(NULL,NULL,DB_STAT_CLEAR);
 		
+		Timer.reset();
 		Timer.start();
 			  
 		// DBD does not have bulk construction
@@ -859,6 +887,8 @@ int main(int argc, char * argv[])
 		STXXL_MSG("\t version = 4: big test Berkeley DB btree")
 		return 0;
 	}
+
+	init();
 
 	int version = atoi(argv[1]);
 	stxxl::int64 ops = atoll(argv[2]);
