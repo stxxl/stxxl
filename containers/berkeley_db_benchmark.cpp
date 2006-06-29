@@ -54,7 +54,7 @@ struct my_key
 
 
 
-std::ostream & operator << (std::ostream & o, my_key & obj)
+std::ostream & operator << (std::ostream & o, const my_key & obj)
 {
 	for(int i = 0;i<KEY_SIZE;++i)
 		o << obj.keybuf[i];
@@ -270,7 +270,11 @@ void run_bdb_btree(stxxl::int64 ops)
 					break;
 			}
 			
-			if(n_scanned >= 10*n_range_queries)	break;
+			if(n_scanned >= 10*n_range_queries)
+			{
+				++i;
+				break;
+			}
 		}
 	
 		n_range_queries = i;
@@ -410,7 +414,11 @@ void run_stxxl_map(stxxl::int64 ops)
 			++n_scanned;
 			++begin;
 		}
-		if(n_scanned >= 10*n_range_queries)	break;
+		if(n_scanned >= 10*n_range_queries)
+		{
+			++i;
+			break;
+		}
 	}
 	
 	n_range_queries = i;
@@ -626,12 +634,28 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 		map_type::const_iterator beyond=CMap.lower_bound(element.first);
 		if(element.first<begin_key)
 			std::swap(begin,beyond);
+		/*
+		STXXL_MSG("Looking     "<<element.first<<" scanned: "<<n_scanned)
+		
+		if(beyond==CMap.end())
+		{
+			STXXL_MSG("Upper bound "<<"END")
+		}
+		else
+		{
+			STXXL_MSG("Upper bound "<<((element.first>begin_key)?element.first:begin_key))
+		}*/
+
 		while(begin!=beyond)
 		{
 			++n_scanned;
 			++begin;
 		}
-		if(n_scanned >= 2*n)	break;
+		if(n_scanned >= 2*n)
+		{
+			++i;
+			break;
+		}
 		
 	}
 	
@@ -820,7 +844,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 			if(last_key<key1_storage)
 				std::swap(last_key,key1_storage);
 			
-			//STXXL_MSG("Looking     "<<key1_storage)
+			//STXXL_MSG("Looking     "<<key1_storage<<" scanned: "<<n_scanned)
 			//STXXL_MSG("Upper bound "<<last_key)
 			
 			Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
@@ -832,30 +856,47 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 			Dbt datax(data1_storage.databuf, DATA_SIZE);
 			#endif
 			
+			
 			#ifdef BDB_BULK_SCAN
 			if( cursorp->get(&keyx, &datax, DB_SET_RANGE|DB_MULTIPLE_KEY) == DB_NOTFOUND)
 				continue;
-			DbMultipleKeyDataIterator BulkIterator(datax);
-			if(!BulkIterator.next(keyx,datax)) continue;
+
+			do
+			{
+				DbMultipleKeyDataIterator BulkIterator(datax);
+				Dbt key1,data1;
+				while(BulkIterator.next(key1,data1) && 
+					*((my_key *)key1.get_data()) <= last_key)
+				{
+					++n_scanned;	
+					//STXXL_MSG("Result      "<<*((my_key *)key1.get_data()))
+				}
+				if( cursorp->get(&keyx, &datax, DB_NEXT|DB_MULTIPLE_KEY) == 			DB_NOTFOUND)
+					break;
+
+				if(*((my_key *)keyx.get_data()) > last_key)
+				{
+					break;
+				}
+		
+			} while (1);
+			
 			#else
 			if( cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
 				continue;
-			#endif
-			
 			while(*((my_key *)keyx.get_data()) <= last_key)
 			{
 				++n_scanned;
-				//STXXL_MSG("Result      "<<*((my_key *)keyx.get_data()))
-				#ifdef BDB_BULK_SCAN
-				//Dbt key1,data1;
-				if(!BulkIterator.next(keyx,datax)) break;
-				#else
 				if(cursorp->get(&keyx, &datax, DB_NEXT)==DB_NOTFOUND)
 					break;
-				#endif
 			}
+			#endif
 			
-			if(n_scanned >= 2*n)	break;
+			if(n_scanned >= 2*n)
+			{
+				++i;
+				break;
+			}
 		}
 	
 		n_range_queries = i;
