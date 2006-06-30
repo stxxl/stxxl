@@ -1020,10 +1020,10 @@ int main(int argc, char * argv[])
 			run_bdb_btree(ops);
 			break;
 		case 3:
-			run_stxxl_map_big(ops,100000);
+			run_stxxl_map_big(ops,30000);
 			break;
 		case 4:
-			run_bdb_btree_big(ops,100000);
+			run_bdb_btree_big(ops,30000);
 			break;
 		default:
 			STXXL_MSG("Unsupported version "<<version)
