@@ -33,6 +33,8 @@
 #define SORTER_MEM		(TOTAL_CACHE_SIZE - 1024*1024*2*4)
 
 
+#define SCAN_LIMIT(x)	(x)
+
 #define BDB_FILE "/data3/bdb_file"
 //#define BDB_FILE "/var/tmp/bdb_file"
 
@@ -136,18 +138,34 @@ typedef stxxl::VECTOR_GENERATOR<std::pair<my_key,my_data>,1,1>::result  vector_t
 //#define KEYPOS 	(i % KEY_SIZE)
 //#define VALUE 		(myrand() % 26)
 
-unsigned ran32State = 0xdeadbeef;
 
+#if 0
+unsigned ran32State = 0xdeadbeef;
 inline unsigned myrand()
 {
 		return (ran32State = 1664525 * ran32State + 1013904223);
 }
-
 inline void rand_key(stxxl::int64 pos, my_key & Key)
 {
 	for(int i = 0; i<KEY_SIZE;++i)
 		Key.keybuf[i] = letters[myrand() % 26];
 }
+#else // a longer pseudo random sequence
+long long unsigned ran32State = 0xdeadbeef;
+inline long long unsigned myrand()
+{
+		return (ran32State = (ran32State*0x5DEECE66DULL + 0xBULL)&0xFFFFFFFFFFFFULL );
+}
+inline void rand_key(stxxl::int64 pos, my_key & Key)
+{
+	long long unsigned r = myrand();
+	for(int i = 0; i<KEY_SIZE;++i)
+	{
+		Key.keybuf[i] = letters[r % 26];
+		r >>= 5;
+	}
+}
+#endif
 
 void run_bdb_btree(stxxl::int64 ops)
 {
@@ -651,7 +669,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 			++n_scanned;
 			++begin;
 		}
-		if(n_scanned >= 2*n)
+		if(n_scanned >= SCAN_LIMIT(n))
 		{
 			++i;
 			break;
@@ -895,7 +913,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 			}
 			#endif
 			
-			if(n_scanned >= 2*n)
+			if(n_scanned >= SCAN_LIMIT(n))
 			{
 				++i;
 				break;
