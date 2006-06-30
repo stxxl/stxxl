@@ -781,6 +781,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		STXXL_MSG("Construction elapsed time: "<<(Timer.mseconds()/1000.)<<
 					" seconds : "<< (double(n)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 	
+		db.stat_print(0);
 		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 		////////////////////////////////////////
 			
@@ -801,6 +802,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
 					" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
+		db.stat_print(0);
 		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 		
 		/////////////////////////////////////////
@@ -825,6 +827,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
 			" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
+		db.stat_print(0);
 		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 		
 		////////////////////////////////////
@@ -908,6 +911,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 			" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
 			" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
 		
+		db.stat_print(0);
 		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 		
 		//////////////////////////////////////
@@ -932,6 +936,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 		STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 	
+		db.stat_print(0);
 		db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 		
 		db.close(0);
