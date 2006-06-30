@@ -669,6 +669,7 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 			++n_scanned;
 			++begin;
 		}
+
 		if(n_scanned >= SCAN_LIMIT(n))
 		{
 			++i;
@@ -913,6 +914,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 			}
 			#endif
 			
+
 			if(n_scanned >= SCAN_LIMIT(n))
 			{
 				++i;
