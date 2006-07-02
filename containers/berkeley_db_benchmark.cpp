@@ -21,8 +21,8 @@
 
 #define LEAF_BLOCK_SIZE 	(32*1024)
 
-#define TOTAL_CACHE_SIZE    (750*1024*1024)
-//#define TOTAL_CACHE_SIZE    (150*1024*1024)
+//#define TOTAL_CACHE_SIZE    (750*1024*1024)
+#define TOTAL_CACHE_SIZE    (150*1024*1024)
 
 //#define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/40))
 //#define LEAF_CACHE_SIZE 	(39*(TOTAL_CACHE_SIZE/40))
@@ -564,8 +564,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	Timer.stop();
 	Stats->reset();
 	
-	STXXL_MSG("Finished sorting input. Elapsed time: "<<(Timer.mseconds()/1000.)<<" seconds.")
-
+	STXXL_MSG("Finished sorting input. Elapsed time: "<<
+		(Timer.mseconds()/1000.)<<" seconds.")
+	
 	Timer.reset();
 	Timer.start();
 	      
@@ -581,6 +582,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	STXXL_MSG("Construction elapsed time: "<<(Timer.mseconds()/1000.)<<
 				" seconds : "<< (double(n)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 	
+	using std::cout;
+	Map.print_statistics(cout);
+	Map.reset_statistics();
 	std::cout << *Stats;
 	Stats->reset(); 
 	////////////////////////////////////////
@@ -603,6 +607,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	STXXL_MSG("Records in map: "<<Map.size())
 	STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
 				" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	Map.print_statistics(cout);
+	Map.reset_statistics();
 	
 	std::cout << *Stats;
 	Stats->reset();
@@ -629,6 +636,8 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 	
+	Map.print_statistics(cout);
+	Map.reset_statistics();
 	std::cout << *Stats;
 	Stats->reset();
 	
@@ -685,6 +694,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 		" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
 		" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
 	
+	Map.print_statistics(cout);
+	Map.reset_statistics();
+	
 	std::cout << *Stats;
 	Stats->reset();
 	
@@ -710,6 +722,8 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
 		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
 
+	Map.print_statistics(cout);
+	Map.reset_statistics();
 	std::cout << *Stats;
 	Stats->reset(); 
 }

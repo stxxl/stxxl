@@ -95,6 +95,13 @@ namespace btree
 			block_manager * bm;
 			alloc_strategy_type alloc_strategy_;
 			
+			int64 n_found;
+			int64 n_not_found;
+			int64 n_created;
+			int64 n_read;
+			int64 n_written;
+			int64 n_clean_forced;
+			
 			// changes btree pointer in all contained iterators
 			void change_btree_pointers(btree_type * b)
 			{
@@ -112,7 +119,13 @@ namespace btree
 								): 
 					btree_(btree__),
 					comp_(comp__),
-					bm(block_manager::get_instance())
+					bm(block_manager::get_instance()),
+					n_found(0),
+					n_not_found(0),
+					n_created(0),
+					n_read(0),
+					n_written(0),
+					n_clean_forced(0)
 			{
 				const unsigned nnodes = cache_size_in_bytes/block_type::raw_size;
 				STXXL_VERBOSE1("btree::node_cache constructor nodes="<<nnodes)
@@ -173,6 +186,8 @@ namespace btree
 		
 			node_type * get_new_node(bid_type & new_bid)
 			{
+				++n_created;
+				
 				if(free_nodes_.empty())
 				{
 					// need to kick a node
@@ -193,11 +208,18 @@ namespace btree
 							
 					} while (fixed_[node2kick]);
 					
+					
 					if(reqs_[node2kick].valid()) reqs_[node2kick]->wait();
 						
 					node_type & Node = *(nodes_[node2kick]);
 					
-					if(dirty_[node2kick]) Node.save();
+					if(dirty_[node2kick]) 
+					{
+						Node.save();
+						++n_written;
+					}
+					else
+						++n_clean_forced;
 						
 					//reqs_[node2kick] = request_ptr(); // reset request
 						
@@ -211,7 +233,6 @@ namespace btree
 					dirty_[node2kick] = true;
 					
 					assert(size() == BID2node_.size() + free_nodes_.size());
-					
 					
 					STXXL_VERBOSE1("btree::node_cache get_new_node, need to kick node "<<node2kick)
 					
@@ -246,6 +267,8 @@ namespace btree
 			node_type * get_node(const bid_type & bid, bool fix = false)
 			{
 				typename BID2node_type::const_iterator it = BID2node_.find(bid);
+				++n_read;
+				
 				if(it != BID2node_.end())
 				{
 					// the node is in cache
@@ -258,8 +281,11 @@ namespace btree
 					if(reqs_[nodeindex].valid() && !reqs_[nodeindex]->poll()) 
 							reqs_[nodeindex]->wait();
 					
+					++n_found;
 					return nodes_[nodeindex];
 				}
+				
+				++n_not_found;
 					
 				// the node is not in cache
 				if(free_nodes_.empty())
@@ -286,7 +312,13 @@ namespace btree
 					
 					node_type & Node = *(nodes_[node2kick]);
 					
-					if(dirty_[node2kick]) Node.save();
+					if(dirty_[node2kick])
+					{
+						Node.save();
+						++n_written;
+					}
+					else
+						++n_clean_forced;
 					
 						
 					BID2node_.erase(Node.my_bid());
@@ -329,6 +361,8 @@ namespace btree
 			node_type const * get_const_node(const bid_type & bid, bool fix = false)
 			{
 				typename BID2node_type::const_iterator it = BID2node_.find(bid);
+				++n_read;
+				
 				if(it != BID2node_.end())
 				{
 					// the node is in cache
@@ -340,8 +374,11 @@ namespace btree
 					if(reqs_[nodeindex].valid() && !reqs_[nodeindex]->poll()) 
 							reqs_[nodeindex]->wait();
 					
+					++n_found;
 					return nodes_[nodeindex];
 				}
+				
+				++n_not_found;
 					
 				// the node is not in cache
 				if(free_nodes_.empty())
@@ -367,7 +404,13 @@ namespace btree
 					if(reqs_[node2kick].valid()) reqs_[node2kick]->wait();
 					
 					node_type & Node = *(nodes_[node2kick]);
-					if(dirty_[node2kick]) Node.save();
+					if(dirty_[node2kick])
+					{
+						Node.save();
+						++n_written;
+					}
+					else
+						++n_clean_forced;
 						
 					BID2node_.erase(Node.my_bid());
 					
@@ -454,7 +497,13 @@ namespace btree
 					
 					node_type & Node = *(nodes_[node2kick]);
 					
-					if(dirty_[node2kick]) Node.save();
+					if(dirty_[node2kick])
+					{
+						Node.save();
+						++n_written;
+					}
+					else
+						++n_clean_forced;
 					
 						
 					BID2node_.erase(Node.my_bid());
@@ -512,7 +561,37 @@ namespace btree
 				std::swap(free_nodes_,obj.free_nodes_);
 				std::swap(BID2node_,obj.BID2node_);
 				std::swap(pager_,obj.pager_);
-				std::swap(alloc_strategy_,obj.alloc_strategy_);		
+				std::swap(alloc_strategy_,obj.alloc_strategy_);
+				std::swap(n_found,obj.n_found);
+				std::swap(n_not_found,obj.n_found);
+				std::swap(n_created,obj.n_created);
+				std::swap(n_read,obj.n_read);
+				std::swap(n_written,obj.n_written);
+				std::swap(n_clean_forced,obj.n_clean_forced);
+			}
+			
+			void print_statistics(std::ostream & o) const
+			{
+				if(n_read)
+				o << "Found blocks                      : " << n_found<<" ("<< 
+					100.*double(n_found)/double(n_read)<<"%)"<<std::endl;
+				else
+				o << "Found blocks                      : " << n_found<<" ("<< 
+					100<<"%)"<<std::endl;
+				o << "Not found blocks                  : " << n_not_found<<std::endl;
+				o << "Created in the cache blocks       : " << n_created<<std::endl;
+				o << "Read blocks                       : " << n_read<<std::endl;
+				o << "Written blocks                    : " << n_written<<std::endl;
+				o << "Clean blocks forced from the cache: " << n_clean_forced<<std::endl;
+			}
+			void reset_statistics()
+			{
+				n_found=0;
+				n_not_found=0;
+				n_created =0;
+				n_read =0;
+				n_written =0;
+				n_clean_forced =0;
 			}
 	};
 	

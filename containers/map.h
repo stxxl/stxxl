@@ -244,6 +244,18 @@ public:
 		return Impl.prefetching_enabled();
 	}
 	
+	//! \brief Prints cache statistics
+	void print_statistics(std::ostream & o) const
+	{
+		Impl.print_statistics(o);
+	}
+	
+	//! \brief Resets cache statistics
+	void reset_statistics()
+	{
+		Impl.reset_statistics();
+	}
+	
 	//////////////////////////////////////////////////
 	template <	class KeyType_,
 					class DataType_,

@@ -1007,6 +1007,18 @@ namespace btree
 			return prefetching_enabled_;
 		}
 		
+		void print_statistics(std::ostream & o) const
+		{
+			o << "Node cache statistics:"<<std::endl;
+			node_cache_.print_statistics(o);
+			o << "Leaf cache statistics:"<<std::endl;
+			leaf_cache_.print_statistics(o);
+		}
+		void reset_statistics()
+		{
+			node_cache_.reset_statistics();
+			leaf_cache_.reset_statistics();
+		}
 	
 	};
 	
