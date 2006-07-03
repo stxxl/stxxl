@@ -117,18 +117,16 @@ int main(int argc, char * argv[])
 
   const char * disk_names_dev[] =
 {
-  "/mnt/hdc/stxxl", 
-  "/mnt/hde/stxxl", 
-  "/mnt/hdg/stxxl", 
-  "/mnt/hdi/stxxl", 
-  "/mnt/hdk/stxxl", 
-  "/mnt/hdm/stxxl", 
-  "/mnt/hdq/stxxl", 
-  "/mnt/hds/stxxl",
-  "/mnt/hdu/stxxl",
-  "/mnt/hdw/stxxl",
-  "/mnt/raid/stxxl",
-  "stxxl"
+  "/data01/stxxl",
+  "/data02/stxxl",
+  "/data03/stxxl",
+  "/data04/stxxl",
+  "/data05/stxxl",
+  "/data06/stxxl",
+  "/data07/stxxl",
+  "/data08/stxxl",
+  "/data09/stxxl",
+  "/data10/stxxl"
 };
 
 #endif 

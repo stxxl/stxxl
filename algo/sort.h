@@ -431,9 +431,10 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	int out_run_size = out_run->size ();
 	
 	block_type *out_buffer = writer.get_free_block();
+	
+//#define MERGE_SEQUENTIAL
 
-#ifndef __MCSTL__
-
+#if !defined(__MCSTL__) || defined(MERGE_SEQUENTIAL)
 	loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size> 
 		losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
