@@ -98,6 +98,7 @@ namespace btree
 			int64 n_found;
 			int64 n_not_found;
 			int64 n_created;
+			int64 n_deleted;
 			int64 n_read;
 			int64 n_written;
 			int64 n_clean_forced;
@@ -123,6 +124,7 @@ namespace btree
 					n_found(0),
 					n_not_found(0),
 					n_created(0),
+					n_deleted(0),
 					n_read(0),
 					n_written(0),
 					n_clean_forced(0)
@@ -463,7 +465,7 @@ namespace btree
 					BID2node_.erase(bid);
 					fixed_[nodeindex] = false;
 				}
-				
+				++n_deleted;
 				bm->delete_block(bid);
 			}
 			
@@ -565,6 +567,7 @@ namespace btree
 				std::swap(n_found,obj.n_found);
 				std::swap(n_not_found,obj.n_found);
 				std::swap(n_created,obj.n_created);
+				std::swap(n_deleted,obj.n_deleted);
 				std::swap(n_read,obj.n_read);
 				std::swap(n_written,obj.n_written);
 				std::swap(n_clean_forced,obj.n_clean_forced);
@@ -580,6 +583,7 @@ namespace btree
 					100<<"%)"<<std::endl;
 				o << "Not found blocks                  : " << n_not_found<<std::endl;
 				o << "Created in the cache blocks       : " << n_created<<std::endl;
+				o << "Deleted blocks                    : " << n_deleted<<std::endl;
 				o << "Read blocks                       : " << n_read<<std::endl;
 				o << "Written blocks                    : " << n_written<<std::endl;
 				o << "Clean blocks forced from the cache: " << n_clean_forced<<std::endl;
@@ -589,6 +593,7 @@ namespace btree
 				n_found=0;
 				n_not_found=0;
 				n_created =0;
+				n_deleted=0;
 				n_read =0;
 				n_written =0;
 				n_clean_forced =0;
