@@ -80,7 +80,7 @@ typedef pq_type::block_type block_type;
 unsigned ran32State = 0xdeadbeef;
 inline int myrand()
 {
-		return (ran32State = 1664525 * ran32State + 1013904223)&0x7fffffffUL;
+		return ((int)((ran32State = 1664525 * ran32State + 1013904223)>>1))-1;
 }
 #else // a longer pseudo random sequence
 long long unsigned ran32State = 0xdeadbeef;
