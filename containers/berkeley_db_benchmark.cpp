@@ -27,7 +27,7 @@
 //#define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/40))
 //#define LEAF_CACHE_SIZE 	(39*(TOTAL_CACHE_SIZE/40))
 
-#define NODE_CACHE_SIZE		(25*1024*1024)
+#define NODE_CACHE_SIZE		(64*1024*1024)
 #define LEAF_CACHE_SIZE		(TOTAL_CACHE_SIZE - NODE_CACHE_SIZE)
 
 #define SORTER_MEM		(TOTAL_CACHE_SIZE - 1024*1024*2*4)
@@ -1034,10 +1034,10 @@ int main(int argc, char * argv[])
 			run_bdb_btree(ops);
 			break;
 		case 3:
-			run_stxxl_map_big(ops,30000);
+			run_stxxl_map_big(ops,100000);
 			break;
 		case 4:
-			run_bdb_btree_big(ops,30000);
+			run_bdb_btree_big(ops,100000);
 			break;
 		default:
 			STXXL_MSG("Unsupported version "<<version)
