@@ -154,6 +154,73 @@ void run_stxxl_insert_all_delete_all(stxxl::int64 ops)
 }
 
 
+void run_stxxl_intermixed(stxxl::int64 ops)
+{
+	stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE/BLOCK_SIZE);
+  	stxxl::write_pool<block_type>    w_pool(WRITE_POOL_SIZE/BLOCK_SIZE);
+	
+	pq_type PQ(p_pool,w_pool);
+	
+	stxxl::int64 i;
+	
+	my_record cur;
+	
+	stxxl::stats * Stats = stxxl::stats::get_instance();
+	Stats->reset();
+	
+	stxxl::timer Timer;
+	Timer.start();
+	
+	for(i=0;i<ops;++i)
+	{
+		cur.key = myrand();
+		PQ.push(cur);
+	}
+	
+	Timer.stop();
+	
+	STXXL_MSG("Records in PQ: "<<PQ.size())
+	if(i != PQ.size())
+	{
+		STXXL_MSG("Size does not match")
+		abort();
+	}
+	
+	STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	Stats->reset();
+
+	////////////////////////////////////////////////
+	Timer.reset();
+	
+	for(i=0;i<ops;++i)
+	{
+		int o = myrand()%3;
+		if(o == 0)
+		{
+			cur.key = myrand();
+			PQ.push(cur);
+		}
+		else
+		{
+			assert(!PQ.empty());
+			PQ.pop();
+		}
+	}
+	
+	Timer.stop();
+	
+	STXXL_MSG("Records in PQ: "<<PQ.size())
+	
+	STXXL_MSG("Deletions/Insertion elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	
+}
+
 int main(int argc, char * argv[])
 {
     STXXL_MSG("stxxl::pq lock size: "<<BLOCK_SIZE<<" bytes")
@@ -187,6 +254,9 @@ int main(int argc, char * argv[])
 	{
 		case 1:
 			run_stxxl_insert_all_delete_all(ops);
+			break;
+		case 2:
+			run_stxxl_intermixed(ops);
 			break;
 		default:
 			STXXL_MSG("Unsupported version "<<version)
