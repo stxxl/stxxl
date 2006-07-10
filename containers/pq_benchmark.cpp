@@ -63,7 +63,7 @@ struct comp_type
 	}
 	static my_record min_value()
 	{ 
-		return my_record((std::numeric_limits<char>::max)(),0);
+		return my_record((std::numeric_limits<int>::max)(),0);
 	}
 };
 
@@ -93,6 +93,64 @@ inline long long unsigned myrand()
 
 void run_stxxl_insert_all_delete_all(stxxl::int64 ops)
 {
+	stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE/BLOCK_SIZE);
+  	stxxl::write_pool<block_type>    w_pool(WRITE_POOL_SIZE/BLOCK_SIZE);
+	
+	pq_type PQ(p_pool,w_pool);
+	
+	stxxl::int64 i;
+	
+	my_record cur;
+	
+	stxxl::stats * Stats = stxxl::stats::get_instance();
+	Stats->reset();
+	
+	stxxl::timer Timer;
+	Timer.start();
+	
+	for(i=0;i<ops;++i)
+	{
+		cur.key = myrand();
+		PQ.push(cur);
+	}
+	
+	Timer.stop();
+	
+	STXXL_MSG("Records in PQ: "<<PQ.size())
+	if(i != PQ.size())
+	{
+		STXXL_MSG("Size does not match")
+		abort();
+	}
+	
+	STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	Stats->reset();
+
+	////////////////////////////////////////////////
+	Timer.reset();
+	
+	for(i=0;i<ops;++i)
+	{
+		PQ.pop();
+	}
+	
+	Timer.stop();
+	
+	STXXL_MSG("Records in PQ: "<<PQ.size())
+	if(!PQ.empty())
+	{
+		STXXL_MSG("PQ must be empty")
+		abort();
+	}
+	
+	STXXL_MSG("Deletions elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	std::cout << *Stats;
+	
 }
 
 
