@@ -242,11 +242,6 @@ int main(int argc, char * argv[])
 	int version = atoi(argv[1]);
 	stxxl::int64 ops = atoll(argv[2]);
 	
-	if(ops > MAX_ELEMENTS)
-	{
-		STXXL_MSG("#ops can not be larger than "<<MAX_ELEMENTS)
-		return 0;
-	}
 
 	STXXL_MSG("Running version      : "<<version)
 	STXXL_MSG("Operations to perform: "<<ops);
