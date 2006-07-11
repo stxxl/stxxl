@@ -234,7 +234,8 @@ int main(int argc, char * argv[])
 	if(argc < 3)
 	{
 		STXXL_MSG("Usage: "<<argv[0]<<" version #ops")
-		STXXL_MSG("\t version = 1: insert-all-delete-all stxxl map")
+		STXXL_MSG("\t version = 1: insert-all-delete-all stxxl pq")
+		STXXL_MSG("\t version = 2: intermixed insert/delete stxxl pq")
 		return 0;
 	}
 
