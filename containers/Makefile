@@ -13,6 +13,10 @@ berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
 	$(QUANTIFY) $(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(BERKELEY_DB_LINK_OPTIONS) $(STXXL_LINKER_OPTIONS)
 
 
+stack_benchmark: $(DEPENDENCIES) stack_benchmark.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stack_benchmark.cpp
+	$(LINKER) stack_benchmark.$(OBJEXT) $(OUT)stack_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 pq_benchmark: $(DEPENDENCIES) pq_benchmark.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c pq_benchmark.cpp -DNDEBUG
 	$(LINKER) pq_benchmark.$(OBJEXT) $(OUT)pq_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)

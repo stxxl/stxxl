@@ -1,10 +1,11 @@
 /***************************************************************************
- *            berkeley_db_benchmark.cpp
+ *            pq_benchmark.cpp
  *
- *  Mon Jul 10 16:01:47 2006
+ *  Wed Jul 12 18:25:58 2006
  *  Copyright  2006  User Roman Dementiev
  *  Email
  ****************************************************************************/
+
 
 #include <stxxl>
 
@@ -131,6 +132,7 @@ void run_stxxl_insert_all_delete_all(stxxl::int64 ops)
 
 	////////////////////////////////////////////////
 	Timer.reset();
+	Timer.start();
 	
 	for(i=0;i<ops;++i)
 	{
@@ -194,6 +196,7 @@ void run_stxxl_intermixed(stxxl::int64 ops)
 
 	////////////////////////////////////////////////
 	Timer.reset();
+	Timer.start();
 	
 	for(i=0;i<ops;++i)
 	{
