@@ -48,6 +48,8 @@
 
 #include "log.h"
 
+//#define STXXL_VERBOSE_LEVEL 1
+
 __STXXL_BEGIN_NAMESPACE
 
 //#define assert(x)  

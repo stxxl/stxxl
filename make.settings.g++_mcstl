@@ -2,7 +2,8 @@
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = /home/singler/code/stxxl#
-MCSTL_ROOT = /home/singler/code/mcstl/trunk#
+MCSTL_BRANCH = branches/release#
+MCSTL_ROOT = /home/singler/code/mcstl/$(MCSTL_BRANCH)#
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
