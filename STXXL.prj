@@ -1,4 +1,4 @@
-# Anjuta Version 1.2.4 
+# Anjuta Version 1.2.4a 
 Compatibility Level: 1 
 
 <PROJECT_DESCRIPTION_START>
@@ -23,7 +23,7 @@ STL-like library for external computations
 
 props.file.type=project
 
-anjuta.version=1.2.4
+anjuta.version=1.2.4a
 anjuta.compatibility.level=1
 
 project.name=STXXL
@@ -181,7 +181,17 @@ module.source.files=\
 	containers/btree/test_const_scan.cpp\
 	containers/test_map_random.cpp\
 	containers/write_vector.cpp\
-	containers/write_vector2.cpp
+	containers/write_vector2.cpp\
+	containers/berkeley_db_benchmark.cpp\
+	io/iostats.cpp\
+	io/mmap_file.cpp\
+	io/simdisk_file.cpp\
+	io/syscall_file.cpp\
+	io/ufs_file.cpp\
+	io/wfs_file.cpp\
+	io/wincall_file.cpp\
+	containers/pq_benchmark.cpp\
+	containers/stack_benchmark.cpp
 
 module.pixmap.name=.
 module.pixmap.type=

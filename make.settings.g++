@@ -11,7 +11,7 @@ BOOST_INCLUDE = /usr/include/boost-1_33/#
 
 MAKE = make # or gmake
 COMPILER = g++
-LINKER = g++ 
+LINKER = g++
 OPT = -O3 # compiler optimization level
 LIBNAME = stxxl
 

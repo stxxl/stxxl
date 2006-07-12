@@ -18,7 +18,7 @@ void DiskAllocator::dump()
 			STXXL_ERRMSG("Total bytes: "<<total)
 }
 
-config *config::get_instance ()
+	config *config::get_instance ()
 	{
 		if (!instance)
 		{
@@ -155,5 +155,3 @@ config *config::get_instance ()
 
 
 __STXXL_END_NAMESPACE
-
-
