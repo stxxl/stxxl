@@ -68,7 +68,9 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 	
 	std::cout << *Stats;
 	Stats->reset();
-
+	
+	Stack.set_prefetch_aggr(DISKS*8);
+	
 	////////////////////////////////////////////////
 	Timer.reset();
 	Timer.start();
@@ -93,6 +95,7 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 	std::cout << *Stats;
 	
 }
+
 
 
 
