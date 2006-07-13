@@ -14,7 +14,7 @@ berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
 
 
 stack_benchmark: $(DEPENDENCIES) stack_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stack_benchmark.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stack_benchmark.cpp -DNDEBUG
 	$(LINKER) stack_benchmark.$(OBJEXT) $(OUT)stack_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 pq_benchmark: $(DEPENDENCIES) pq_benchmark.cpp
