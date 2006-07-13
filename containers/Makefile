@@ -29,6 +29,18 @@ leda_sm_pq_benchmark: $(DEPENDENCIES) leda_sm_pq_benchmark.cpp
  -Xlinker -rpath -Xlinker /software/LEDA/4.2.1/ -Xlinker -rpath -Xlinker /home/dementiev/projects/LEDA-SM-1.3 -Xlinker -rpath -Xlinker /usr/X11R6/lib \
  -lW -lP -lG -lL -lX11 -lm  -lLEDA-SM
 
+
+tpie_stack_benchmark: $(DEPENDENCIES) tpie_stack_benchmark.cpp
+	g++  -I/home/dementiev/projects/tpie_091905/include -DHAVE_CONFIG_H -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3  -c -o tpie_stack_benchmark.o tpie_stack_benchmark.cpp -DNDEBUG
+	g++  -I/home/dementiev/projects/tpie_091905/include -DHAVE_CONFIG_H -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3 tpie_stack_benchmark.o -L/home/dementiev/projects/tpie_091905/lib -ltpie -lm  -o tpie_stack_benchmark.bin
+
+leda_sm_stack_benchmark: $(DEPENDENCIES) leda_sm_stack_benchmark.cpp
+	/usr/local/bin/g++-2.95.3 -I/software/LEDA/4.2.1//incl -I/home/dementiev/projects/LEDA-SM-1.3/incl  -fpic -D_LINUX -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -O3 -c leda_sm_stack_benchmark.cpp
+	/usr/local/bin/g++-2.95.3 -o leda_sm_stack_benchmark.bin leda_sm_stack_benchmark.o -L/software/LEDA/4.2.1/ \
+ -L/home/dementiev/projects/LEDA-SM-1.3 -L/usr/X11R6/lib \
+ -Xlinker -rpath -Xlinker /software/LEDA/4.2.1/ -Xlinker -rpath -Xlinker /home/dementiev/projects/LEDA-SM-1.3 -Xlinker -rpath -Xlinker /usr/X11R6/lib \
+ -lW -lP -lG -lL -lX11 -lm  -lLEDA-SM
+
 write_vector: $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c write_vector.cpp
 	$(LINKER) write_vector.$(OBJEXT) $(OUT)write_vector.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
