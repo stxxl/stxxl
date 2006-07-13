@@ -6,26 +6,27 @@
  *  Email
  ****************************************************************************/
 
-#include "app_config.h"
-
-#include <portability.h>
-#include <versions.h>
-
-// Get the AMI_stack definition.
-#include <ami_stack.h>
-
-// Utitlities for ascii output.
-#include <ami_scan_utils.h>
+#include <LEDA-SM/ext_stack.h>
+#include <LEDA-SM/ext_memory_manager.h>
+#include <LEDA-SM/debug.h>
+#include <assert.h>
+#include <LEDA/random_source.h>
+#include <LEDA/stack.h>
+#include <LEDA-SM/block.h>
+#include <LEDA-SM/name_server.h>
+#define DEBUG 0
+#define DD 500
 
 #include "../common/utils_ledasm.h"
 #include "../common/timer.h"
 
 
+
 #define MEM_2_RESERVE    (768*1024*1024)
 
 
-#define    BLOCK_SIZE (2*1024*1024)
-
+#define    BLOCK_SIZE1 (EXT_BLK_SZ*4)
+#define    BLOCK_SIZE2 (DISK_BLOCK_SIZE*4)
 
 
 #ifndef DISKS
@@ -44,9 +45,7 @@ template <class my_record>
 void run_stack(stxxl::int64 volume)
 {
 
-	typedef AMI_stack<my_record> stack_type;
-
-	MM_manager.set_memory_limit(BLOCK_SIZE*DISKS*8);
+	typedef ext_stack<my_record> stack_type;
 
 	STXXL_MSG("Record size: "<<sizeof(my_record)<<" bytes")
 	
@@ -68,8 +67,8 @@ void run_stack(stxxl::int64 volume)
 	
 	Timer.stop();
 	
-	STXXL_MSG("Records in Stack: "<<Stack.stream_len())
-	if(i != Stack.stream_len())
+	STXXL_MSG("Records in Stack: "<<Stack.size())
+	if(i != Stack.size())
 	{
 		STXXL_MSG("Size does not match")
 		abort();
@@ -79,22 +78,23 @@ void run_stack(stxxl::int64 volume)
 				" seconds : "<< (double(volume)/(1024.*1024.*Timer.mseconds()/1000.))<<
 				" MB/s")
 	
-		
+	ext_mem_mgr.print_statistics();
+        ext_mem_mgr.reset_statistics();
+	
+	
 	////////////////////////////////////////////////
 	Timer.reset();
 	Timer.start();
-
-	my_record * out;
 	
 	for(i=0;i<ops;++i)
 	{
-		Stack.pop(&out);
+		Stack.pop();
 	}
 	
 	Timer.stop();
 	
-	STXXL_MSG("Records in Stack: "<<Stack.stream_len())
-	if(Stack.stream_len()!=0)
+	STXXL_MSG("Records in Stack: "<<Stack.size())
+	if(!Stack.empty())
 	{
 		STXXL_MSG("Stack must be empty")
 		abort();
@@ -104,6 +104,7 @@ void run_stack(stxxl::int64 volume)
 				" seconds : "<< (double(volume)/(1024.*1024.*Timer.mseconds()/1000.))<<
 				" MB/s")
 	
+	ext_mem_mgr.print_statistics();
 	
 }
 
@@ -111,33 +112,15 @@ void run_stack(stxxl::int64 volume)
 
 int main(int argc, char * argv[])
 {
-	using namespace std;
-	#ifdef BTE_COLLECTION_IMP_MMAP
-        cout << "BTE_COLLECTION_IMP_MMAP is defined"<< endl;
-        #endif
-        #ifdef BTE_COLLECTION_IMP_UFS
-        cout << "BTE_COLLECTION_IMP_UFS is defined"<< endl;
-        #endif
-        #ifdef BTE_STREAM_IMP_UFS
-        cout << "BTE_STREAM_IMP_UFS is defined"<< endl;
-        cout << "BTE_STREAM_UFS_BLOCK_FACTOR is "<<BTE_STREAM_UFS_BLOCK_FACTOR<< endl;
-        cout << "Actual block size is "<< (TPIE_OS_BLOCKSIZE()*BTE_STREAM_UFS_BLOCK_FACTOR/1024) <<" kb"<<endl;
-        #endif
-        #ifdef BTE_STREAM_IMP_MMAP
-        cout << "BTE_STREAM_IMP_MMAP is defined"<< endl;
-        cout << "BTE_STREAM_MMAP_BLOCK_FACTOR is " << BTE_STREAM_MMAP_BLOCK_FACTOR << endl;
-        cout << "Actual block size is "<< (TPIE_OS_BLOCKSIZE()*BTE_STREAM_MMAP_BLOCK_FACTOR/1024) <<" kb"<<endl;
-        #endif
-        #ifdef BTE_STREAM_IMP_STDIO
-        cout << "BTE_STREAM_IMP_STDIO is defined"<<endl;
-        #endif
-        cout << "TPIE_OS_BLOCKSIZE() is "<< TPIE_OS_BLOCKSIZE() << endl;
-
+	STXXL_MSG("block size 1: "<<BLOCK_SIZE1<<" bytes")
+        STXXL_MSG("block size 2: "<<BLOCK_SIZE2<<" bytes")
+    
+    
    	if(argc < 3)
 	{
 		STXXL_MSG("Usage: "<<argv[0]<<" version #volume")
-		STXXL_MSG("\t version = 1: TPIE stack with 4 byte records")
-		STXXL_MSG("\t version = 2: TPIE stack with 32 byte records")
+		STXXL_MSG("\t version = 1: LEDA-SM stack with 4 byte records")
+		STXXL_MSG("\t version = 2: LEDA-SM stack with 32 byte records")
 		return 0;
 	}
 
@@ -146,8 +129,7 @@ int main(int argc, char * argv[])
 	
 	STXXL_MSG("Allocating array with size "<<MEM_2_RESERVE
 		<<" bytes to prevent file buffering.")
-	//int * array = new int[MEM_2_RESERVE/sizeof(int)];
-	int * array = (int*) malloc(MEM_2_RESERVE);
+	int * array = new int[MEM_2_RESERVE/sizeof(int)];
 	std::fill(array,array+(MEM_2_RESERVE/sizeof(int)),0);
 	
 	STXXL_MSG("Running version: "<<version)
@@ -165,6 +147,6 @@ int main(int argc, char * argv[])
 			STXXL_MSG("Unsupported version "<<version)
 	}
 	
-	//delete [] array;
-	free(array);
+	delete [] array;
+	
 }

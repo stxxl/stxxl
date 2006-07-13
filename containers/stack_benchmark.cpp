@@ -188,9 +188,9 @@ int main(int argc, char * argv[])
 	{
 		STXXL_MSG("Usage: "<<argv[0]<<" version #volume")
 		STXXL_MSG("\t version = 1: grow-shrink-stack2 with 4 byte records")
-		STXXL_MSG("\t version = 2: grow-shrink-stack2 with 16 byte records")
+		STXXL_MSG("\t version = 2: grow-shrink-stack2 with 32 byte records")
 		STXXL_MSG("\t version = 3: normal-stack with 4 byte records")
-		STXXL_MSG("\t version = 4: normal-stack with 16 byte records")
+		STXXL_MSG("\t version = 4: normal-stack with 32 byte records")
 		return 0;
 	}
 
@@ -211,13 +211,13 @@ int main(int argc, char * argv[])
 			run_stxxl_growshrink2_stack<my_record_<4> >(volume);
 			break;
 		case 2:
-			run_stxxl_growshrink2_stack<my_record_<16> >(volume);
+			run_stxxl_growshrink2_stack<my_record_<32> >(volume);
 			break;
 		case 3:
 			run_stxxl_normal_stack<my_record_<4> >(volume);
 			break;
 		case 4:
-			run_stxxl_normal_stack<my_record_<16> >(volume);
+			run_stxxl_normal_stack<my_record_<32> >(volume);
 			break;
 		default:
 			STXXL_MSG("Unsupported version "<<version)

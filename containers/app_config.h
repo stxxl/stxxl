@@ -84,7 +84,7 @@ extern int random_seed;
 #ifdef _WIN32
 #define BTE_STREAM_MMAP_BLOCK_FACTOR 4
 #else
-#define BTE_STREAM_MMAP_BLOCK_FACTOR 32
+#define BTE_STREAM_MMAP_BLOCK_FACTOR 512 
 #endif
 #endif
 
@@ -110,7 +110,7 @@ extern int random_seed;
 #ifdef _WIN32
 #define BTE_STREAM_UFS_BLOCK_FACTOR 4
 #else
-#define BTE_STREAM_UFS_BLOCK_FACTOR 32
+#define BTE_STREAM_UFS_BLOCK_FACTOR 512 
 #endif
 #endif
 
