@@ -467,4 +467,11 @@ template <class T>
    }
 
 __STXXL_END_NAMESPACE
+
+#ifdef __MCSTL__
+#define STXXL_SORT_MEMORY_FACTOR ((mcstl::HEURISTIC::sort_algorithm == mcstl::HEURISTIC::DSS) ? 2 : 1)
+#else
+#define STXXL_SORT_MEMORY_FACTOR (1)
+#endif
+
 #endif
