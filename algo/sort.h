@@ -433,8 +433,8 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	
 	block_type *out_buffer = writer.get_free_block();
 	
-//#define MERGE_SEQUENTIAL
-#if !defined(__MCSTL__) || defined(MERGE_SEQUENTIAL)
+//#define STXXL_PARALLEL_MULTIWAY_MERGE
+#if !defined(__MCSTL__) || !defined(STXXL_PARALLEL_MULTIWAY_MERGE)
 	loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size> 
 		losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
