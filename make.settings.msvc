@@ -62,7 +62,7 @@ CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/ve
 
 ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/run_cursor.h \
 ../algo/sort.h ../algo/async_schedule.h ../algo/interleaved_alloc.h ../algo/ksort.h \
-../algo/loosertree.h ../algo/scan.h ../algo/stable_ksort.h
+../algo/losertree.h ../algo/scan.h ../algo/stable_ksort.h
 
 STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 

@@ -1,8 +1,8 @@
-#ifndef LOOSERTREE_HEADER
-#define LOOSERTREE_HEADER
+#ifndef LOSERTREE_HEADER
+#define LOSERTREE_HEADER
 
 /***************************************************************************
- *            loosertree.h
+ *            losertree.h
  *
  *  Sat Aug 24 23:52:58 2002
  *  Copyright  2002  Roman Dementiev, Peter Sanders
@@ -15,11 +15,11 @@ __STXXL_BEGIN_NAMESPACE
 template <typename run_cursor_type, 
 					typename run_cursor_cmp_type,
 					unsigned buffer_size>
-class looser_tree
+class loser_tree
 {
-	looser_tree () {} // forbidden
-	looser_tree (const looser_tree &);// forbidden
-	looser_tree & operator = (const looser_tree &);// forbidden
+	loser_tree () {} // forbidden
+	loser_tree (const loser_tree &);// forbidden
+	loser_tree & operator = (const loser_tree &);// forbidden
 	
 	int logK;
 	int k;
@@ -53,7 +53,7 @@ public:
 	typedef typename run_cursor_type::prefetcher_type prefetcher_type;
 	typedef typename run_cursor_type::value_type value_type;
 	
-	looser_tree (
+	loser_tree (
 		prefetcher_type * p, 
 		int nruns, 
 		run_cursor_cmp_type c): cmp(c)
@@ -62,7 +62,7 @@ public:
 		logK = static_cast < int >(ceil (log (double(nruns)) / log (2.)));	// replace with something smart
 		int kReg = k = (1 << logK);
 		
-		STXXL_VERBOSE2("looser_tree: logK="<<logK<<" nruns="<<nruns<<" K="<<kReg)
+		STXXL_VERBOSE2("loser_tree: logK="<<logK<<" nruns="<<nruns<<" K="<<kReg)
     
     #ifdef STXXL_SORT_SINGLE_PREFETCHER
 		current = new run_cursor_type[kReg];
@@ -90,13 +90,13 @@ public:
 		entry[0] = init_winner (1);
 
 	}
-	~looser_tree()
+	~loser_tree()
 	{
 		delete [] current;
 		delete [] entry;
 	}
 	
-	void swap(looser_tree & obj)
+	void swap(loser_tree & obj)
 	{
 		std::swap(logK,obj.logK);
 		std::swap(k,obj.k);
@@ -247,8 +247,8 @@ namespace std
 	template <	typename run_cursor_type, 
 				typename run_cursor_cmp_type,
 				unsigned buffer_size>
-	void swap(stxxl::looser_tree<run_cursor_type,run_cursor_cmp_type,buffer_size> & a,
-	          stxxl::looser_tree<run_cursor_type,run_cursor_cmp_type,buffer_size> & b)
+	void swap(stxxl::loser_tree<run_cursor_type,run_cursor_cmp_type,buffer_size> & a,
+	          stxxl::loser_tree<run_cursor_type,run_cursor_cmp_type,buffer_size> & b)
 	{
 		a.swap(b);
 	}

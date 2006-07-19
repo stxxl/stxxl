@@ -2,7 +2,8 @@
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = /home/singler/code/stxxl#
-MCSTL_ROOT = /home/singler/code/mcstl#
+MCSTL_BRANCH = # please enter mcstl branch, leave empty for default branch
+MCSTL_ROOT = # please enter path to MCSTL directory 
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
@@ -13,7 +14,7 @@ BOOST_INCLUDE = /usr/include/boost-1_33/#
 MAKE = make # or gmake
 COMPILER = g++-4.2.0
 LINKER = g++-4.2.0
-OPT = -O3 -fopenmp -I$(MCSTL_ROOT)/c++ # compiler optimization level and MCSTL library
+OPT = -O3 -fopenmp -I$(MCSTL_ROOT)/c++ -D__MCSTL__# compiler optimization level and MCSTL library
 LINKER_OPT = -fopenmp
 LIBNAME = mcstxxl
 
@@ -62,7 +63,7 @@ CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/ve
 
 ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/run_cursor.h \
 ../algo/sort.h ../algo/async_schedule.h ../algo/interleaved_alloc.h ../algo/ksort.h \
-../algo/loosertree.h ../algo/scan.h ../algo/stable_ksort.h
+../algo/losertree.h ../algo/scan.h ../algo/stable_ksort.h
 
 STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 

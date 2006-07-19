@@ -11,7 +11,7 @@
 
 using namespace stxxl;
 using priority_queue_local::ext_merger;
-using priority_queue_local::looser_tree;
+using priority_queue_local::loser_tree;
 
 typedef int my_type;
 typedef typed_block<4096,my_type> block_type;
@@ -59,7 +59,7 @@ int main()
   merger.multi_merge(output.begin(),output.end()); 
   
   //template <class ValTp_,class Cmp_,unsigned KNKMAX>
-  looser_tree<my_type,my_cmp,10> looser;
+  loser_tree<my_type,my_cmp,10> loser;
   my_type * seq1 = new my_type[1024];
   dummy.multi_merge(seq1,seq1 + 1024);
   cnt = 20;
@@ -72,13 +72,13 @@ int main()
   my_type * seq4 = new my_type[1024];
   my_type * out = new my_type[4*1024];
   dummy.multi_merge(seq4,seq4 + 1024);
-  looser.init();
-  looser.insert_segment(seq1,1024);
-  looser.insert_segment(seq2,1024);
-  looser.insert_segment(seq3,1024);
-  looser.insert_segment(seq4,1024);
+  loser.init();
+  loser.insert_segment(seq1,1024);
+  loser.insert_segment(seq2,1024);
+  loser.insert_segment(seq3,1024);
+  loser.insert_segment(seq4,1024);
   
-  looser.multi_merge(out,out + 1024);
+  loser.multi_merge(out,out + 1024);
   std::copy(out,out + 1024,std::ostream_iterator<my_type>(std::cout, "\n"));
 
   delete [] out;

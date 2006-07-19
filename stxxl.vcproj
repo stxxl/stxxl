@@ -479,7 +479,7 @@ nmake tests_msvc"
 					RelativePath=".\algo\ksort_exp.h">
 				</File>
 				<File
-					RelativePath=".\algo\loosertree.h">
+					RelativePath=".\algo\losertree.h">
 				</File>
 				<File
 					RelativePath=".\algo\run_cursor.h">

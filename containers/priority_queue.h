@@ -491,7 +491,7 @@ void merge4(
   //////////////////////////////////////////////////////////////////////
 // The data structure from Knuth, "Sorting and Searching", Section 5.4.1
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-class looser_tree
+class loser_tree
 {
 public:
   typedef ValTp_ value_type;
@@ -516,7 +516,7 @@ private:
 
   Element dummy; // target of empty segment pointers
 
-  // upper levels of looser trees
+  // upper levels of loser trees
   // entry[0] contains the winner info
   Entry entry[KNKMAX]; 
 
@@ -573,7 +573,7 @@ private:
       } 
       ++to;
       
-      // update looser tree
+      // update loser tree
 #define TreeStep(L)\
       if (1 << LogK >= 1 << L) {\
         Entry  *pos##L = regEntry+((winnerIndex+(1<<LogK)) >> (((int(LogK-L)+1)>=0)?((LogK-L)+1):0));\
@@ -612,14 +612,14 @@ public:
     return cmp(cmp.min_value(),a);
   }
 private:
-	looser_tree & operator = (const looser_tree &); // forbidden
-	looser_tree(const looser_tree &); // forbidden
+	loser_tree & operator = (const loser_tree &); // forbidden
+	loser_tree(const loser_tree &); // forbidden
 public:
-  looser_tree();
-  ~looser_tree();
+  loser_tree();
+  ~loser_tree();
   void init(); 
 
-  void swap(looser_tree & obj)
+  void swap(loser_tree & obj)
   {
 	    std::swap(cmp,obj.cmp);
   		swap_1D_arrays(empty,obj.empty,KNKMAX);
@@ -651,7 +651,7 @@ public:
 
 ///////////////////////// LooserTree ///////////////////////////////////
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-looser_tree<ValTp_,Cmp_,KNKMAX>::looser_tree() : lastFree(0), size_(0), logK(0), k(1),mem_cons_(0)
+loser_tree<ValTp_,Cmp_,KNKMAX>::loser_tree() : lastFree(0), size_(0), logK(0), k(1),mem_cons_(0)
 {
   empty  [0] = 0;
   segment[0] = 0;
@@ -662,7 +662,7 @@ looser_tree<ValTp_,Cmp_,KNKMAX>::looser_tree() : lastFree(0), size_(0), logK(0),
 }
 
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::init()
+void loser_tree<ValTp_,Cmp_,KNKMAX>::init()
 {
   dummy      = cmp.min_value();
   rebuildLooserTree();
@@ -670,9 +670,9 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::init()
 }
 
 
-// rebuild looser tree information from the values in current
+// rebuild loser tree information from the values in current
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::rebuildLooserTree()
+void loser_tree<ValTp_,Cmp_,KNKMAX>::rebuildLooserTree()
 {  
   int winner = initWinner(1);
   entry[0].index = winner;
@@ -686,7 +686,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::rebuildLooserTree()
 // initialize entry[root].index and the subtree rooted there
 // return winner index
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-int looser_tree<ValTp_,Cmp_,KNKMAX>::initWinner(int root)
+int loser_tree<ValTp_,Cmp_,KNKMAX>::initWinner(int root)
 {
   if (root >= int(k)) { // leaf reached
     return root - k;
@@ -710,11 +710,11 @@ int looser_tree<ValTp_,Cmp_,KNKMAX>::initWinner(int root)
 
 // first go up the tree all the way to the root
 // hand down old winner for the respective subtree
-// based on new value, and old winner and looser 
+// based on new value, and old winner and loser 
 // update each node on the path to the root top down.
 // This is implemented recursively
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
+void loser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
                int node, 
                const Element  & newKey, 
                int      newIndex, 
@@ -733,10 +733,10 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
     }
   } else {
     updateOnInsert(node >> 1, newKey, newIndex, winnerKey, winnerIndex, mask);
-    Element looserKey   = entry[node].key;
-    int looserIndex = entry[node].index;
+    Element loserKey   = entry[node].key;
+    int loserIndex = entry[node].index;
     if ((*winnerIndex & *mask) != (newIndex & *mask)) { // different subtrees
-      if (cmp(looserKey,newKey)) { // newKey will have influence here
+      if (cmp(loserKey,newKey)) { // newKey will have influence here
         if (cmp(*winnerKey,newKey) ) { // old winner loses here
           entry[node].key   = *winnerKey;
           entry[node].index = *winnerIndex;
@@ -745,8 +745,8 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
           entry[node].index = newIndex;
         }
       } 
-      *winnerKey   = looserKey;
-      *winnerIndex = looserIndex;
+      *winnerKey   = loserKey;
+      *winnerIndex = loserIndex;
     }
     // note that nothing needs to be done if
     // the winner came from the same subtree
@@ -763,7 +763,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
 // make the tree two times as wide
 // may only be called if no free slots are left ?? necessary ??
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::doubleK()
+void loser_tree<ValTp_,Cmp_,KNKMAX>::doubleK()
 {
   // make all new entries empty
   // and push them on the free stack
@@ -780,14 +780,14 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::doubleK()
   // double the size
   k *= 2;  logK++;
 
-  // recompute looser tree information
+  // recompute loser tree information
   rebuildLooserTree();
 }
 
 
 // compact nonempty segments in the left half of the tree
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
+void loser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
 {
   assert(logK > 0);
 
@@ -807,7 +807,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
     {
       if(segment[from])
       {
-        STXXL_VERBOSE2("looser_tree::compactTree() deleting segment "<<from<<
+        STXXL_VERBOSE2("loser_tree::compactTree() deleting segment "<<from<<
 					" address: "<<segment[from]<<" size: "<<segment_size[from])
         delete [] segment[from];
         segment[from] = 0;
@@ -831,7 +831,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
     current[to] = &dummy;
   }
 
-  // recompute looser tree information
+  // recompute loser tree information
   rebuildLooserTree();
 }
 
@@ -839,9 +839,9 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
 // insert segment beginning at to
 // require: spaceIsAvailable() == 1 
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
+void loser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
 {
-  STXXL_VERBOSE2("looser_tree::insert_segment("<< to <<","<< sz<<")")
+  STXXL_VERBOSE2("loser_tree::insert_segment("<< to <<","<< sz<<")")
   //std::copy(to,to + sz,std::ostream_iterator<ValTp_>(std::cout, "\n"));
   
   if (sz > 0)
@@ -879,14 +879,14 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
 
 
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-looser_tree<ValTp_,Cmp_,KNKMAX>::~looser_tree()
+loser_tree<ValTp_,Cmp_,KNKMAX>::~loser_tree()
 {
-  STXXL_VERBOSE2("looser_tree::~looser_tree()")
+  STXXL_VERBOSE2("loser_tree::~loser_tree()")
   for(unsigned i=0;i<k;++i)
   {
     if(segment[i])
     {
-      STXXL_VERBOSE2("looser_tree::~looser_tree() deleting segment "<<i)
+      STXXL_VERBOSE2("loser_tree::~loser_tree() deleting segment "<<i)
       delete [] segment[i];
       mem_cons_ -= segment_size[i];
     }
@@ -897,11 +897,11 @@ looser_tree<ValTp_,Cmp_,KNKMAX>::~looser_tree()
 
 // free an empty segment .
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int index)
+void loser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int index)
 {
   // reroute current pointer to some empty dummy segment
   // with a sentinel key
-	STXXL_VERBOSE2("looser_tree::deallocateSegment() deleting segment "<<
+	STXXL_VERBOSE2("loser_tree::deallocateSegment() deleting segment "<<
 		index<<" address: "<<segment[index]<<" size: "<<segment_size[index])
   current[index] = &dummy;
 
@@ -922,9 +922,9 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int index)
 // - there are at least l elements
 // - segments are ended by sentinels
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
+void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
 {
-  STXXL_VERBOSE3("looser_tree::multi_merge("<< to <<","<< l<<")")
+  STXXL_VERBOSE3("loser_tree::multi_merge("<< to <<","<< l<<")")
   
   /*
   multi_merge_k(to,l);
@@ -982,7 +982,7 @@ void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
 
 // is this segment empty and does not point to dummy yet?
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-inline bool looser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
+inline bool loser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
 {
   return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
 }
@@ -990,14 +990,14 @@ inline bool looser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
 // multi-merge for fixed K
 /*
 template <class ValTp_,class Cmp_,unsigned KNKMAX> template <unsigned LogK>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge_f<LogK>(Element *to, int l)
+void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge_f<LogK>(Element *to, int l)
 {
 }
 */
 
 // multi-merge for arbitrary K
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void looser_tree<ValTp_,Cmp_,KNKMAX>::
+void loser_tree<ValTp_,Cmp_,KNKMAX>::
 multi_merge_k(Element *to, int l)
 {
   Entry *currentPos;
@@ -1100,8 +1100,8 @@ namespace std
 		a.swap(b);
 	}
 	template <class ValTp_,class Cmp_,unsigned KNKMAX>
-	void swap(	stxxl::priority_queue_local::looser_tree<ValTp_,Cmp_,KNKMAX> & a,
-				stxxl::priority_queue_local::looser_tree<ValTp_,Cmp_,KNKMAX> & b)
+	void swap(	stxxl::priority_queue_local::loser_tree<ValTp_,Cmp_,KNKMAX> & a,
+				stxxl::priority_queue_local::loser_tree<ValTp_,Cmp_,KNKMAX> & b)
 	{
 		a.swap(b);
 	}		
@@ -1142,7 +1142,7 @@ protected:
   typedef std::priority_queue<value_type,std::vector<value_type>,comparator_type> 
                       insert_heap_type;
   
-  typedef priority_queue_local::looser_tree<
+  typedef priority_queue_local::loser_tree<
             value_type,
             comparator_type,
             IntKMAX>  int_merger_type;

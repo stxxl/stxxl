@@ -1,5 +1,5 @@
 default:
-	@echo "Choose one of the goals: library_msvc library_g++ tests_msvc tests_g++ clean_msvc clean_g++"
+	@echo "Choose one of the goals: library_msvc library_g++ library_g++_mcstl tests_msvc tests_g++ tests_g++_mcstl clean_msvc clean_g++ clean_g++_mcstl"
 
 settings_msvc:
 	copy make.settings.msvc make.settings
@@ -29,6 +29,9 @@ tests_msvc: settings_msvc
 	nmake /F Makefile.msvc tests
 
 clean_g++: settings_g++
+	make -f Makefile.g++ clean
+
+clean_g++_mcstl: settings_g++_mcstl
 	make -f Makefile.g++ clean
 
 clean_msvc: settings_msvc
