@@ -8,7 +8,14 @@
 
 #include <stxxl>
 
+///// BDB header ////////////
 #include <db_cxx.h>
+
+///////// TPIE headers //////////
+#include "app_config.h"
+#include <portability.h>
+#include <ami_btree.h>
+////////////////////////////
 
 #define BDB_BULK_SCAN
 
@@ -37,6 +44,7 @@
 
 #define BDB_FILE "/data3/bdb_file"
 //#define BDB_FILE "/var/tmp/bdb_file"
+
 
 // BDB settings
 u_int32_t    pagesize = LEAF_BLOCK_SIZE;
@@ -116,6 +124,31 @@ struct comp_type
 		return min_key;
 	}
 };
+
+
+/// TPIE  declarations
+// Key type.
+typedef my_key bkey_t;
+
+// Element type for the btree.
+struct el_t {
+  bkey_t key_;
+  my_data data_;
+  el_t(bkey_t k): key_(k) {}
+  el_t() {}
+};
+struct key_from_el {
+  bkey_t operator()(const el_t& v) const { return v.key_; }
+};
+
+
+// Temporary distinction btw UN*X and WIN, since there are some
+// problems with the MMAP collection implementation.
+#ifdef _WIN32
+typedef AMI_btree< bkey_t,el_t,less<bkey_t>,key_from_el,BTE_COLLECTION_UFS > u_btree_t;
+#else
+typedef AMI_btree< bkey_t,el_t,less<bkey_t>,key_from_el > u_btree_t;
+#endif
 
 
 void init()
@@ -728,6 +761,191 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 	Stats->reset(); 
 }
 
+/////////////////////////////////////////////////////////////////////////
+
+typedef AMI_STREAM< el_t > stream_t;
+
+void run_tpie_btree_big(stxxl::int64 n,unsigned ops)
+{
+
+	el_t element;
+    
+	memset(element.key_.keybuf, 'a', KEY_SIZE);
+	memset(element.data_.databuf, 'b', DATA_SIZE);
+
+	// Log debugging info from the application, but not from the library.
+  	tpie_log_init(TPIE_LOG_APP_DEBUG);
+  	MM_manager.set_memory_limit(TOTAL_CACHE_SIZE);
+  	MM_manager.enforce_memory_limit();
+
+	stream_t* is = new stream_t;
+	
+	stxxl::timer Timer;
+	stxxl::int64 n_inserts=ops,n_locates=ops, n_range_queries=ops, n_deletes = ops;
+	stxxl::int64 i;
+	comp_type cmp_;
+	
+	ran32State = 0xdeadbeef;
+	
+	stxxl::random_number32 myrand;
+	
+	Timer.start();
+	
+
+	{
+		rand_key_gen Gen(n,element.key_);
+		typedef stxxl::stream::sort<rand_key_gen,comp_type> sorter_type;
+		sorter_type Sorter(Gen,comp_type(),SORTER_MEM);
+		//typedef key2pair<sorter_type> key2pair_type;
+		//key2pair_type Key2Pair(Sorter);
+		while(!Sorter.empty())
+		{
+			is->write_item(*Sorter);
+			++Sorter;
+		}
+	}
+	
+	Timer.stop();
+	
+	
+	STXXL_MSG("Finished sorting input. Elapsed time: "<<
+		(Timer.mseconds()/1000.)<<" seconds.")
+	
+	
+	Timer.reset();
+	Timer.start();
+	      
+	// bulk construction
+	u_btree_t *u_btree;
+  	AMI_btree_params params;
+  	params.node_block_factor = 1; 
+  	params.leaf_block_factor = 1;
+  	params.leaf_cache_size = LEAF_CACHE_SIZE/LEAF_BLOCK_SIZE;
+  	params.node_cache_size = NODE_CACHE_SIZE/NODE_BLOCK_SIZE;
+
+  	u_btree = new u_btree_t(params);
+
+	using std::cout;
+	using std::cerr;
+
+  	if (!u_btree->is_valid()) {
+    		cerr << "Error initializing btree. Aborting.\n";
+    		delete u_btree;
+    		exit(1);
+  	}
+
+	if (u_btree->load_sorted(is) != AMI_ERROR_NO_ERROR)
+        	cerr << "Error during bulk loading.\n";
+        	
+	Timer.stop();
+
+	STXXL_MSG("Records in map: "<<u_btree->size())
+	STXXL_MSG("Construction elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(n)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	
+	
+	////////////////////////////////////////
+	Timer.reset();
+
+
+	Timer.start();
+
+	for (i = 0; i < n_inserts; ++i)
+	{
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.key_);
+		u_btree->insert(element);
+	}
+
+	Timer.stop();
+
+	STXXL_MSG("Records in map: "<<u_btree->size())
+	STXXL_MSG("Insertions elapsed time: "<<(Timer.mseconds()/1000.)<<
+				" seconds : "<< (double(n_inserts)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+
+	
+	////////////////////////////////////////////////
+	Timer.reset();
+
+
+	Timer.start();
+
+
+	el_t result;
+	for (i = 0; i < n_locates; ++i)
+	{
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.key_);
+		u_btree->succ(element.key_,result);
+	}
+
+	Timer.stop();
+	STXXL_MSG("Locates elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+	
+	
+	////////////////////////////////////
+	Timer.reset();
+	
+
+	Timer.start();
+	
+	stxxl::int64 n_scanned = 0, skipped_qieries=0;
+
+	for (i = 0; i < n_range_queries; ++i)
+	{
+		
+		rand_key(i,element.key_);
+		my_key begin_key = element.key_;
+		rand_key(i,element.key_);
+		if(element.key_<begin_key)
+			n_scanned += u_btree->range_query(element.key_, begin_key, NULL);
+		else
+			n_scanned += u_btree->range_query(begin_key,element.key_, NULL);
+			
+
+		if(n_scanned >= SCAN_LIMIT(n))
+		{
+			++i;
+			break;
+		}
+		
+	}
+	
+	n_range_queries = i;
+
+	Timer.stop();
+	STXXL_MSG("Range query elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(n_scanned)/(Timer.mseconds()/1000.))<<
+		" key/data pairs per sec, #queries "<< n_range_queries<<" #scanned elements: "<<n_scanned)
+	
+	
+	
+	//////////////////////////////////////
+	ran32State = 0xdeadbeef;
+	memset(element.key_.keybuf, 'a', KEY_SIZE);
+	memset(element.data_.databuf, 'b', DATA_SIZE);
+	
+	Timer.reset();
+
+	Timer.start();
+
+	for (i = n_deletes; i > 0; --i)
+	{
+		//element.first.keybuf[KEYPOS] = letters[VALUE];
+		rand_key(i,element.key_);
+		u_btree->erase(element.key_);
+	}
+
+	Timer.stop();
+	STXXL_MSG("Records in map: "<<u_btree->size())
+	STXXL_MSG("Erase elapsed time: "<<(Timer.mseconds()/1000.)<<
+		" seconds : "<< (double(ops)/(Timer.mseconds()/1000.))<<" key/data pairs per sec")
+
+}
+
 void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 {
 	char *filename = BDB_FILE;
@@ -1011,6 +1229,7 @@ int main(int argc, char * argv[])
 		STXXL_MSG("\t version = 2: test Berkeley DB btree")
 		STXXL_MSG("\t version = 3: big test stxxl map")
 		STXXL_MSG("\t version = 4: big test Berkeley DB btree")
+		STXXL_MSG("\t version = 5: big test TPIE btree")
 		return 0;
 	}
 
@@ -1038,6 +1257,9 @@ int main(int argc, char * argv[])
 			break;
 		case 4:
 			run_bdb_btree_big(ops,100000);
+			break;
+		case 5:
+			run_tpie_btree_big(ops,100000);
 			break;
 		default:
 			STXXL_MSG("Unsupported version "<<version)

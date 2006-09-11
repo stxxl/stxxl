@@ -15,7 +15,7 @@
 #endif
 
 #ifndef DISKS
-#define DISKS 1
+#define DISKS 4 
 #endif
 
 template <unsigned RECORD_SIZE>
@@ -34,8 +34,8 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 
 	STXXL_MSG("Record size: "<<sizeof(my_record)<<" bytes")
 	
-	stxxl::prefetch_pool<block_type> p_pool(DISKS*8);
-  	stxxl::write_pool<block_type>    w_pool(DISKS*8);
+	stxxl::prefetch_pool<block_type> p_pool(DISKS*4);
+  	stxxl::write_pool<block_type>    w_pool(DISKS*4);
 	
 	stack_type Stack(p_pool,w_pool);
 	

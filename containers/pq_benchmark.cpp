@@ -70,7 +70,7 @@ struct comp_type
 
 
 typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_record,comp_type,
-	PQ_MEM_SIZE,MAX_ELEMENTS/1024>::result pq_type;
+	PQ_MEM_SIZE,MAX_ELEMENTS/(1024/8)>::result pq_type;
 
 typedef pq_type::block_type block_type;
 

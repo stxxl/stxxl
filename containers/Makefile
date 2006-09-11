@@ -8,9 +8,12 @@ BERKELEY_DB_COMPILE_OPTIONS = -I/usr/local/BerkeleyDB.4.4/include
 BERKELEY_DB_LINK_OPTIONS = -L/usr/local/BerkeleyDB.4.4/lib/ -ldb_cxx
 QUANTIFY = # quantify #-best-effort
 
+TPIE_COMPILER_OPTIONS = -I/home/dementiev/projects/tpie_091905/include -DHAVE_CONFIG_H 
+TPIE_LINKER_OPTIONS = -L/home/dementiev/projects/tpie_091905/lib -ltpie -lm
+
 berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) -c berkeley_db_benchmark.cpp -DNDEBUG
-	$(QUANTIFY) $(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(BERKELEY_DB_LINK_OPTIONS) $(STXXL_LINKER_OPTIONS)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) $(TPIE_COMPILER_OPTIONS) -c berkeley_db_benchmark.cpp -DNDEBUG
+	$(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(BERKELEY_DB_LINK_OPTIONS) $(STXXL_LINKER_OPTIONS) $(TPIE_LINKER_OPTIONS) 
 
 
 stack_benchmark: $(DEPENDENCIES) stack_benchmark.cpp
@@ -31,8 +34,8 @@ leda_sm_pq_benchmark: $(DEPENDENCIES) leda_sm_pq_benchmark.cpp
 
 
 tpie_stack_benchmark: $(DEPENDENCIES) tpie_stack_benchmark.cpp
-	g++  -I/home/dementiev/projects/tpie_091905/include -DHAVE_CONFIG_H -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3  -c -o tpie_stack_benchmark.o tpie_stack_benchmark.cpp -DNDEBUG
-	g++  -I/home/dementiev/projects/tpie_091905/include -DHAVE_CONFIG_H -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3 tpie_stack_benchmark.o -L/home/dementiev/projects/tpie_091905/lib -ltpie -lm  -o tpie_stack_benchmark.bin
+	$(COMPILER)  $(TPIE_COMPILER_OPTIONS) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3  -c -o tpie_stack_benchmark.o tpie_stack_benchmark.cpp -DNDEBUG
+	$(LINKER) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3 tpie_stack_benchmark.o $(TPIE_LINKER_OPTIONS)  -o tpie_stack_benchmark.bin
 
 leda_sm_stack_benchmark: $(DEPENDENCIES) leda_sm_stack_benchmark.cpp
 	/usr/local/bin/g++-2.95.3 -I/software/LEDA/4.2.1//incl -I/home/dementiev/projects/LEDA-SM-1.3/incl  -fpic -D_LINUX -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -O3 -c leda_sm_stack_benchmark.cpp
