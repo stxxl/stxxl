@@ -818,8 +818,8 @@ void run_tpie_btree_big(stxxl::int64 n,unsigned ops)
 	// bulk construction
 	u_btree_t *u_btree;
   	AMI_btree_params params;
-  	params.node_block_factor = 1; 
-  	params.leaf_block_factor = 1;
+  	params.node_block_factor = NODE_BLOCK_SIZE/4096; 
+  	params.leaf_block_factor = LEAF_BLOCK_SIZE/4096;
   	params.leaf_cache_size = LEAF_CACHE_SIZE/LEAF_BLOCK_SIZE;
   	params.node_cache_size = NODE_CACHE_SIZE/NODE_BLOCK_SIZE;
 
