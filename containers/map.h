@@ -126,13 +126,18 @@ public:
 	//! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
 	//! \param range_sorted if \c true than the constructor assumes that the range is sorted
 	//! and performs a fast bottom-up bulk construction of the map (btree implementation)
+	//! \param node_fill_factor node fill factor in [0,1] for bulk construction
+	//! \param leaf_fill_factor leaf fill factor in [0,1] for bulk construction
 	template <class InputIterator>
 	map(	InputIterator b,
 				InputIterator e,
 				unsigned node_cache_size_in_bytes,
 				unsigned leaf_cache_size_in_bytes,
-				bool range_sorted = false
-				) : Impl(b,e,node_cache_size_in_bytes,leaf_cache_size_in_bytes,range_sorted) 
+				bool range_sorted = false,
+				double node_fill_factor = 0.75,
+				double leaf_fill_factor = 0.6
+				) : Impl(b,e,node_cache_size_in_bytes,leaf_cache_size_in_bytes,
+							range_sorted,node_fill_factor,leaf_fill_factor) 
 	{
 	}
 	
@@ -144,14 +149,19 @@ public:
 	//! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
 	//! \param range_sorted if \c true than the constructor assumes that the range is sorted
 	//! and performs a fast bottom-up bulk construction of the map (btree implementation)
+	//! \param node_fill_factor node fill factor in [0,1] for bulk construction
+	//! \param leaf_fill_factor leaf fill factor in [0,1] for bulk construction
 	template <class InputIterator>
 	map(	InputIterator b,
 				InputIterator e,
 				const key_compare & c_,
 				unsigned node_cache_size_in_bytes,
 				unsigned leaf_cache_size_in_bytes,
-				bool range_sorted = false
-			): Impl(b,e,c_,node_cache_size_in_bytes,leaf_cache_size_in_bytes,range_sorted)
+				bool range_sorted = false,
+				double node_fill_factor = 0.75,
+				double leaf_fill_factor = 0.6
+			): Impl(b,e,c_,node_cache_size_in_bytes,leaf_cache_size_in_bytes,
+							range_sorted,node_fill_factor,leaf_fill_factor)
 	{
 	}
 	

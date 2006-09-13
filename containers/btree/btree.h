@@ -259,8 +259,10 @@ namespace btree
 		}
 		
 		template <class InputIterator>
-		void bulk_construction(InputIterator b, InputIterator e)
+		void bulk_construction(InputIterator b, InputIterator e, double node_fill_factor, double leaf_fill_factor)
 		{
+			assert(node_fill_factor >= 0.5);
+			assert(leaf_fill_factor >= 0.5);
 			key_type lastKey = key_compare::max_value();
 			
 			typedef std::pair<key_type,node_bid_type> key_bid_pair;
@@ -271,6 +273,7 @@ namespace btree
 			
 			leaf_bid_type NewBid;
 			leaf_type * Leaf = leaf_cache_.get_new_node(NewBid);
+			const unsigned max_leaf_elements = unsigned(double(Leaf->max_nelements())*leaf_fill_factor);
 			
 			while(b!=e)
 			{
@@ -280,7 +283,7 @@ namespace btree
 				if(key_compare_(b->first,lastKey) || key_compare_(lastKey,b->first))
 				{
 					++size_;
-					if(Leaf->size() == Leaf->max_nelements())
+					if(Leaf->size() == max_leaf_elements)
 					{
 						// overflow, need a new block
 						Bids.push_back(key_bid_pair(Leaf->back().first,(node_bid_type)NewBid));
@@ -315,15 +318,16 @@ namespace btree
 			
 			Bids.push_back(key_bid_pair(key_compare::max_value(),(node_bid_type)NewBid));
 			
-						
-			while(Bids.size() > max_node_size)
+			const unsigned max_node_elements = unsigned(double(max_node_size)*node_fill_factor);
+			
+			while(Bids.size() > max_node_elements)
 			{
 				key_bid_vector_type ParentBids;
 				
-				stxxl::uint64 nparents = div_and_round_up( Bids.size(),stxxl::uint64(max_node_size));
+				stxxl::uint64 nparents = div_and_round_up( Bids.size(),stxxl::uint64(max_node_elements));
 				assert(nparents >= 2);
 				STXXL_VERBOSE1("btree bulk constructBids.size() "<<Bids.size()<<" nparents: "<<nparents <<" max_ns: "
-				 <<max_node_size)
+				 <<max_node_elements)
 				typename key_bid_vector_type::const_iterator it = Bids.begin();
 				
 				do
@@ -332,12 +336,12 @@ namespace btree
 					node_type * Node = node_cache_.get_new_node(NewBid);
 					assert(Node);
 					unsigned cnt =0;
-					for(;cnt<max_node_size && it!=Bids.end();++cnt,++it)
+					for(;cnt<max_node_elements && it!=Bids.end();++cnt,++it)
 					{
 						Node->push_back(*it);
 					}
 					STXXL_VERBOSE1("btree bulk construct Node size : "<<Node->size()<<" limits: "<<
-						Node->min_nelements()<<" "<<Node->max_nelements())
+						Node->min_nelements()<<" "<<Node->max_nelements()<<" max_node_elements: "<<max_node_elements)
 					
 					if(Node->underflows())
 					{
@@ -893,7 +897,9 @@ namespace btree
 					const key_compare & c_,
 					unsigned node_cache_size_in_bytes,
 					unsigned leaf_cache_size_in_bytes,
-					bool range_sorted = false
+					bool range_sorted = false,
+					double node_fill_factor = 0.75,
+					double leaf_fill_factor = 0.6
 				): 
 			key_compare_(c_),
 			node_cache_(node_cache_size_in_bytes,this,key_compare_),
@@ -917,7 +923,7 @@ namespace btree
 				return;
 			}
 			
-			bulk_construction(b,e);
+			bulk_construction(b,e,node_fill_factor,leaf_fill_factor);
 			assert(leaf_cache_.nfixed() == 0);
 			assert(node_cache_.nfixed() == 0);
 		}
@@ -928,7 +934,9 @@ namespace btree
 					InputIterator e,
 					unsigned node_cache_size_in_bytes,
 					unsigned leaf_cache_size_in_bytes,
-					bool range_sorted = false
+					bool range_sorted = false,
+					double node_fill_factor = 0.75,
+					double leaf_fill_factor = 0.6
 				): 
 			node_cache_(node_cache_size_in_bytes,this,key_compare_),
 			leaf_cache_(leaf_cache_size_in_bytes,this,key_compare_),
@@ -951,7 +959,7 @@ namespace btree
 				return;
 			}
 			
-			bulk_construction(b,e);
+			bulk_construction(b,e,node_fill_factor,leaf_fill_factor);
 			assert(leaf_cache_.nfixed() == 0);
 			assert(node_cache_.nfixed() == 0);
 		}
