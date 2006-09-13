@@ -765,8 +765,9 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 
 typedef AMI_STREAM< el_t > stream_t;
 
+char dummy;
+
 class MyFilter {
-	char dummy;
   public:
     bool operator()(const el_t & v) const 
   	{ 
@@ -845,7 +846,7 @@ void run_tpie_btree_big(stxxl::int64 n,unsigned ops)
     		exit(1);
   	}
 
-	if (u_btree->load_sorted(is) != AMI_ERROR_NO_ERROR)
+	if (u_btree->load_sorted(is,1.0,1.0) != AMI_ERROR_NO_ERROR)
         	cerr << "Error during bulk loading.\n";
         	
 	Timer.stop();
