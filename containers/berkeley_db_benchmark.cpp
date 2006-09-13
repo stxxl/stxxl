@@ -765,6 +765,17 @@ void run_stxxl_map_big(stxxl::int64 n,unsigned ops)
 
 typedef AMI_STREAM< el_t > stream_t;
 
+class MyFilter {
+	char dummy;
+  public:
+    bool operator()(const el_t & v) const 
+  	{ 
+		dummy += v.key_.keybuf[0]; // touch element
+		return true;
+	}
+  };
+
+
 void run_tpie_btree_big(stxxl::int64 n,unsigned ops)
 {
 
@@ -893,7 +904,8 @@ void run_tpie_btree_big(stxxl::int64 n,unsigned ops)
 	Timer.start();
 	
 	stxxl::int64 n_scanned = 0, skipped_qieries=0;
-
+	MyFilter filter;
+	
 	for (i = 0; i < n_range_queries; ++i)
 	{
 		
@@ -901,9 +913,9 @@ void run_tpie_btree_big(stxxl::int64 n,unsigned ops)
 		my_key begin_key = element.key_;
 		rand_key(i,element.key_);
 		if(element.key_<begin_key)
-			n_scanned += u_btree->range_query(element.key_, begin_key, NULL);
+			n_scanned += u_btree->range_query(element.key_, begin_key, NULL,filter);
 		else
-			n_scanned += u_btree->range_query(begin_key,element.key_, NULL);
+			n_scanned += u_btree->range_query(begin_key,element.key_, NULL,filter);
 			
 
 		if(n_scanned >= SCAN_LIMIT(n))
