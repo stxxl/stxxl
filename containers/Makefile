@@ -20,6 +20,10 @@ stack_benchmark: $(DEPENDENCIES) stack_benchmark.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stack_benchmark.cpp -DNDEBUG
 	$(LINKER) stack_benchmark.$(OBJEXT) $(OUT)stack_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_deque: test_deque.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_deque.cpp
+	$(LINKER) test_deque.$(OBJEXT) $(OUT)test_deque.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 pq_benchmark: $(DEPENDENCIES) pq_benchmark.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c pq_benchmark.cpp -DNDEBUG
 	$(LINKER) pq_benchmark.$(OBJEXT) $(OUT)pq_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
