@@ -13,6 +13,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+
+
 template <class T, class VectorType>
 class deque;
 
@@ -243,7 +245,18 @@ public:
 		
 };
 
+//! \addtogroup stlcont
+//! \{
 
+//! \brief A deque container
+//!
+//! It is an adaptor of the \c VectorType.
+//! The implementation wraps the elements around 
+//! the end of the \c VectorType circularly.
+//! Template parameters:
+//! - \c T the element type
+//! - \c VectorType the type of the underlying vector container, 
+//! the default is \c stxxl::vector<T>
 template <class T, class VectorType = stxxl::vector<T> >
 class deque
 {
@@ -459,6 +472,20 @@ public:
 		}
 		
 };
+
+template <class T, class VectorType>
+bool operator == (const deque<T,VectorType> & a, const deque<T,VectorType> & b)
+{
+	return std::equal(a.begin(),a.end(),b.begin());
+}
+
+template <class T, class VectorType>
+bool operator < (const deque<T,VectorType> & a, const deque<T,VectorType> & b)
+{
+	return std::lexicographical_compare(a.begin(),a.end(),b.begin(),b.end());
+}
+
+//! \}
 
 __STXXL_END_NAMESPACE
 
