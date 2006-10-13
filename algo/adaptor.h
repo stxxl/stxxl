@@ -15,6 +15,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+
 template < unsigned _blk_sz, typename _run_type, class __pos_type = int >
 struct RunsToBIDArrayAdaptor: public TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz > , __pos_type >
 {
