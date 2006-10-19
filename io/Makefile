@@ -5,7 +5,7 @@ include ../make.settings
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)
 
 
-lib: diskqueue.cpp wfs_file.cpp ufs_file.cpp syscall_file.cpp wincall_file.cpp iostats.cpp mmap_file.cpp simdisk_file.cpp
+lib: diskqueue.cpp wfs_file.cpp ufs_file.cpp syscall_file.cpp wincall_file.cpp iostats.cpp mmap_file.cpp simdisk_file.cpp boostfd_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c ufs_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c syscall_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wincall_file.cpp
@@ -14,6 +14,7 @@ lib: diskqueue.cpp wfs_file.cpp ufs_file.cpp syscall_file.cpp wincall_file.cpp i
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c diskqueue.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mmap_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c simdisk_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c boostfd_file.cpp
 
 main: test
 	$(LINKER) test.$(OBJEXT) $(OUT)test.$(EXEEXT) $(STXXL_LINKER_OPTIONS)

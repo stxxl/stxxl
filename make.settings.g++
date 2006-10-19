@@ -1,13 +1,13 @@
 # Change this file according to your paths
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /home/singler/code/stxxl#
+STXXL_ROOT = /home/dementiev/workspace/Stxxl#
 
-USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
+USE_BOOST = yes # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
 
 # change this path, do not leave spaces at the end of the line
-BOOST_INCLUDE = /usr/include/boost-1_33/#
+BOOST_INCLUDE = /usr/local/include/boost-1_33_1/#
 
 MAKE = make # or gmake
 COMPILER = g++
@@ -22,7 +22,8 @@ DEBUG = # put here -g option to include the debug inormation into the binaries
 
 
 BOOST_LINKER_OPTIONS = -lboost_thread-gcc-mt \
-             -lboost_date_time-gcc-mt 
+-lboost_date_time-gcc-mt -lboost_iostreams-gcc-mt \
+-lboost_filesystem-gcc-mt
 
 
 BOOST_COMPILER_OPTIONS =  \

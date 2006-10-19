@@ -1,6 +1,14 @@
 #ifndef STXXL_MAP_INCLUDE
 #define STXXL_MAP_INCLUDE
 
+/***************************************************************************
+ *            map.h
+ *
+ *  Copyright  2006  Roman Dementiev
+ *  Email 
+ ****************************************************************************/
+
+
 #include "btree/btree.h"
 
 __STXXL_BEGIN_NAMESPACE

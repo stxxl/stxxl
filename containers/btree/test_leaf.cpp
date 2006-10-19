@@ -18,6 +18,5 @@ typedef myleaf_type::value_type pair_type;
 int main()
 {
 
-	
 	return 1;
 }

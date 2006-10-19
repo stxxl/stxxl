@@ -25,7 +25,8 @@ DEBUG = # put here -g option to include the debug inormation into the binaries
 
 
 BOOST_LINKER_OPTIONS = -lboost_thread-gcc-mt \
-             -lboost_date_time-gcc-mt 
+ -lboost_date_time-gcc-mt -lboost_iostreams-gcc-mt \
+ -lboost_filesystem-gcc-mt
 
 
 BOOST_COMPILER_OPTIONS =  \

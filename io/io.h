@@ -14,6 +14,7 @@
 #include "mmap_file.h"
 #include "simdisk_file.h"
 #include "wincall_file.h"
+#include "boostfd_file.h"
 #include "iostats.h"
 
 #ifdef BOOST_MSVC

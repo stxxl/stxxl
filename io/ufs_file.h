@@ -70,7 +70,6 @@ __STXXL_BEGIN_NAMESPACE
 		void delete_waiter (onoff_switch * sw);
 		int nwaiters (); // returns number of waiters
 		void check_aligning ();
-		unsigned size() const ;
 	public:
 		virtual ~ufs_request_base ();
 		void wait ();

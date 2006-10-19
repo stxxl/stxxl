@@ -40,7 +40,7 @@ void test_const_iterator(const my_vec_type &x)
 int main()
 {
   typedef stxxl::VECTOR_GENERATOR<int64,2,1>::result vector_type;
-	vector_type v(4*int64(1024*1024));
+	vector_type v(int64(16*1024*1024)/sizeof(int64));
 	
 	// test assignment const_iterator = iterator
 	vector_type::const_iterator c_it = v.begin();
@@ -78,7 +78,7 @@ int main()
 	
 	for(i=0;i<v.size();i++)
 	{
-		assert(v[i] == rnd() );
+		assert(v[i] == rnd());
 	}
 	
 	// check again
@@ -88,7 +88,7 @@ int main()
 		
 	stxxl::ran32State = 0xdeadbeef + 10;
 	
-	v.resize(4*int64(1024*1024));
+	v.resize(int64(16*1024*1024)/sizeof(int64));
 	
 	STXXL_MSG("write "<<v.size()<<" elements")
 	stxxl::generate(v.begin(),v.end(),stxxl::random_number32(),4);

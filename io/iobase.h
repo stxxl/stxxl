@@ -226,7 +226,7 @@ __STXXL_BEGIN_NAMESPACE
 		virtual void delete_waiter (onoff_switch * sw) = 0;
 		//virtual void enqueue () = 0;
 		virtual void serve () = 0;
-		virtual unsigned size() const = 0;
+		//virtual unsigned size() const;
 	
 		completion_handler on_complete;
 		int ref_cnt;
@@ -301,6 +301,7 @@ __STXXL_BEGIN_NAMESPACE
 		void * get_buffer() const { return buffer; }
 		stxxl::int64 get_offset() const { return offset; }
 		size_t get_size() const { return bytes; }
+    size_t size() const { return bytes; }
 		request_type get_type() const { return type; }
 		
 		virtual std::ostream & print(std::ostream & out) const
@@ -378,14 +379,14 @@ __STXXL_BEGIN_NAMESPACE
       {
         if(ptr->sub_ref())
         {
-		  STXXL_VERBOSE3("the last copy "<<unsigned(ptr)<<" this="<<unsigned(this))
+		      STXXL_VERBOSE3("the last copy "<<unsigned(ptr)<<" this="<<unsigned(this))
           delete ptr;
           ptr = NULL;
         }
-		else
-		{
-		  STXXL_VERBOSE3("more copies "<<unsigned(ptr)<<" this="<<unsigned(this))
-		}
+		    else
+		    {
+		      STXXL_VERBOSE3("more copies "<<unsigned(ptr)<<" this="<<unsigned(this))
+		    }
       }
     }
   public:

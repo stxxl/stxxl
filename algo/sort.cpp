@@ -42,8 +42,8 @@ bool operator != (const my_type & a, const my_type & b)
 
 struct cmp: public std::less<my_type>
 {
-  	my_type min_value() const { return my_type(0); };
-	my_type max_value() const { return my_type(0xffffffff); };
+  my_type min_value() const { return my_type(0); };
+  my_type max_value() const { return my_type(0xffffffff); };
 };
 
 

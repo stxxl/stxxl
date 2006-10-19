@@ -95,8 +95,6 @@ __STXXL_BEGIN_NAMESPACE
 					      long (buffer) % BLOCK_ALIGN << " (" << 
 								std::hex << buffer << std::dec << ")");
 		}
-		
-		unsigned wfs_request_base::size() const { return bytes; }
 	
 		wfs_request_base::~wfs_request_base ()
 		{

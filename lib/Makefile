@@ -6,7 +6,8 @@ LIB_OBJECTS = \
 ../io/diskqueue.$(OBJEXT) ../io/wfs_file.$(OBJEXT) \
 ../io/ufs_file.$(OBJEXT) ../io/syscall_file.$(OBJEXT) \
 ../io/simdisk_file.$(OBJEXT) ../io/mmap_file.$(OBJEXT) \
-../io/wincall_file.$(OBJEXT) ../io/iostats.$(OBJEXT) \
+../io/wincall_file.$(OBJEXT) ../io/boostfd_file.$(OBJEXT) \
+../io/iostats.$(OBJEXT) \
 ../mng/mng.$(OBJEXT) \
 ../algo/async_schedule.$(OBJEXT) \
 ../common/log.$(OBJEXT) ../common/debug.$(OBJEXT) \

@@ -832,6 +832,9 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 				return new stxxl::wincall_file (filename,
 							     options, disk);
 			#endif
+      else if (io_impl == "boostfd")
+        return new stxxl::boostfd_file (filename,
+                   options, disk);
 
 			STXXL_ERRMSG("Unsupported disk I/O implementation " <<
 				io_impl << " ." )
