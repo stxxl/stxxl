@@ -142,7 +142,7 @@ void DiskAllocator::dump()
 
 	block_manager::~block_manager()
 	{
-		STXXL_MSG("Block manager deconstructor")
+		STXXL_VERBOSE1("Block manager deconstructor")
 		for (unsigned i = 0; i < ndisks; i++)
 		{
 			delete disk_allocators[i];

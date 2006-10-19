@@ -482,12 +482,16 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		{
 			return disk_bytes - free_bytes;
 		}
+    inline stxxl::int64 get_total_bytes () const
+    {
+      return disk_bytes;
+    }
 
 		template < unsigned BLK_SIZE >
-		void new_blocks (BIDArray < BLK_SIZE > &bids);
+		stxxl::int64 new_blocks (BIDArray < BLK_SIZE > &bids);
 		
 		template < unsigned BLK_SIZE >
-		void new_blocks (BID< BLK_SIZE > * begin,
+		stxxl::int64 new_blocks (BID< BLK_SIZE > * begin,
 									 BID< BLK_SIZE > * end);
 /*		
 		template < unsigned BLK_SIZE >
@@ -505,30 +509,47 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
   
   template < unsigned BLK_SIZE >
-		void DiskAllocator::new_blocks (BIDArray < BLK_SIZE > & bids)
+		stxxl::int64 DiskAllocator::new_blocks (BIDArray < BLK_SIZE > & bids)
 	{
-		new_blocks(bids.begin(),bids.end());
+		return new_blocks(bids.begin(),bids.end());
 	}
   
 	template < unsigned BLK_SIZE >
-		void DiskAllocator::new_blocks (BID<BLK_SIZE> * begin,
+		stxxl::int64 DiskAllocator::new_blocks (BID<BLK_SIZE> * begin,
 															  BID<BLK_SIZE> * end)
 	{
    
-	STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
-      << ", free:" << free_bytes << " total:"<< disk_bytes<<
-		" begin: "<<((void*)(begin))<<" end: "<<((void*)(end)))
+  	STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
+        << ", free:" << free_bytes << " total:"<< disk_bytes<<
+  		" begin: "<<((void*)(begin))<<" end: "<<((void*)(end)))
+      
+  	stxxl::int64 requested_size = 0;
+      	
+  	typename BIDArray<BLK_SIZE>::iterator cur = begin;
+    for(;cur != end;++cur)
+    {
+       STXXL_VERBOSE2("Asking for a block with size: "<< (cur->size) )
+       requested_size += cur->size;
+    }
     
-		stxxl::int64 requested_size = 0;
-    	
-		typename BIDArray<BLK_SIZE>::iterator cur = begin;
-    	for(;cur != end;++cur)
-    	{
-      		STXXL_VERBOSE2("Asking for a block with size: "<< (cur->size) )
-      		requested_size += cur->size;
-    	}
-		
-    	// dump();
+    if(free_bytes < requested_size)
+    {
+      STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
+       " bytes requested, " << free_bytes <<
+       " bytes free. Trying to extend the external memory space..." )
+      
+      
+      begin->offset = disk_bytes; // allocate at the end
+      for (++begin; begin != end; ++begin)
+      {
+        begin->offset = (begin-1)->offset + (begin-1)->size;
+      }
+      disk_bytes += requested_size;
+      
+      return disk_bytes;
+    }
+  		
+    // dump();
 		
 		sortseq::iterator space = 
 			std::find_if (free_space.begin (), free_space.end (),
@@ -542,39 +563,44 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			if (region_size > requested_size)
 				free_space[region_pos + requested_size] = region_size - requested_size;
 
-      		begin->offset = region_pos;
+      begin->offset = region_pos;
 			for (++begin; begin != end; ++begin)
 			{
 				begin->offset = (begin-1)->offset + (begin-1)->size;
 			}
 			free_bytes -= requested_size;
 			//dump();
-			return;
+			return disk_bytes;
 		}
 		
 		// no contiguous region found
 		STXXL_VERBOSE1("Warning, when allocation a external memory space, no contiguos region found")
 		STXXL_VERBOSE1("It might harm the performance")
-		if(requested_size <= BLK_SIZE )
+		if(requested_size == BLK_SIZE )
 		{
+      assert(end-begin == 1);
+      
+      STXXL_ERRMSG("Warning: Severe external memory space defragmentation!")
+      dump();
+        
 			STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
-			" bytes requested, " << free_bytes <<
-			" bytes free" )
-			if(free_bytes>=requested_size)
-				STXXL_ERRMSG("Too severe external memory space defragmentation.")
+			 " bytes requested, " << free_bytes <<
+			 " bytes free. Trying to extend the external memory space..." )
 			
-			
-			dump();
-			
-			STXXL_ERRMSG("Aborting.")
-			abort();
+      begin->offset = disk_bytes; // allocate at the end
+      disk_bytes += BLK_SIZE;
+		  
+			return disk_bytes;
 		}
+    
+    assert(requested_size > BLK_SIZE);
 		assert(end-begin > 1);
 		
 		typename  BIDArray<BLK_SIZE>::iterator middle =  begin + ((end-begin)/2);
 		new_blocks(begin,middle);
 		new_blocks(middle,end);
 	
+    return disk_bytes;
 	}
   
 	
@@ -1098,7 +1124,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		typedef  BIDArray<bid_type::t_size> bid_array_type;
 
 		// bid_type tmpbid;
-		int *bl = new int[ndisks];
+		int * bl = new int[ndisks];
 		bid_array_type * disk_bids = new bid_array_type[ndisks];
 		file ** disk_ptrs = new file * [nblocks];
 	
@@ -1108,34 +1134,25 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		//OutputIterator  it = out;
 		for (; i < nblocks; ++i /* , ++it*/)
 		{
-			int disk = functor (i);
+			const int disk = functor (i);
 			disk_ptrs[i] = disk_files[disk];
 			//(*it).storage = disk_files[disk];
 			bl[disk]++;
 		}
-
-		/*
-		for (i = 0; i < ndisks; ++i)
-		{
-			if (bl[i])
-				disk_bids[i].resize (bl[i]);
-		}
-    
 		
-    	memset (bl, 0, ndisks * sizeof (int));
-    
-		for (i=0 ,it = out; i != nblocks; ++it, ++i)
-		{
-			int disk = (*it).storage->get_disk_number ();
-			disk_bids[disk][bl[disk]++] = (*it);
-		} */
-		
-    	for (i = 0; i < ndisks; ++i)
+    for (i = 0; i < ndisks; ++i)
 		{
 			if (bl[i])
 			{
 				disk_bids[i].resize (bl[i]);
-				disk_allocators[i]->new_blocks (disk_bids[i]);
+        const stxxl::int64 old_capacity = 
+          disk_allocators[i]->get_total_bytes();
+        const stxxl::int64 new_capacity = 
+          disk_allocators[i]->new_blocks (disk_bids[i]);
+				if(old_capacity != new_capacity)
+        { // resize the file
+          disk_files[i]->set_size(new_capacity);
+        }
 			}
 		}
 
@@ -1146,7 +1163,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		{
 			//int disk = (*it).storage->get_disk_number ();
 			//(*it).offset = disk_bids[disk][bl[disk]++].offset;
-			int disk = disk_ptrs[i]->get_disk_number();
+			const int disk = disk_ptrs[i]->get_disk_number();
 			*it = bid_type(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
 		}
 
