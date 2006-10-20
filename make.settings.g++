@@ -7,7 +7,7 @@ USE_BOOST = yes # set 'yes' to use Boost libraries or 'no' to not use Boost libr
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
 
 # change this path, do not leave spaces at the end of the line
-BOOST_INCLUDE = /usr/local/include/boost-1_33_1/#
+BOOST_INCLUDE = /usr/include/boost-1_33_1/#
 
 MAKE = make # or gmake
 COMPILER = g++
