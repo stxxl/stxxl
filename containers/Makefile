@@ -1,4 +1,4 @@
-all: vector stack mstack many test_pqueue queue ext_merger bench_pqueue copy_file testmap test_map_random test_deque
+all: test_vector test_stack test_migr_stack test_many_stacks test_pqueue test_queue test_ext_merger bench_pqueue copy_file test_map test_map_random test_deque
 
 include ../make.settings
 
@@ -56,14 +56,14 @@ write_vector2: $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c write_vector2.cpp
 	$(LINKER) write_vector2.$(OBJEXT) $(OUT)write_vector2.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-queue: $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c testqueue.cpp
-	$(LINKER) testqueue.$(OBJEXT) $(OUT)testqueue.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_queue: $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_queue.cpp
+	$(LINKER) test_queue.$(OBJEXT) $(OUT)test_queue.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 
-testmap: testmap.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c testmap.cpp
-	$(LINKER)  testmap.$(OBJEXT) $(OUT)testmap.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_map: test_map.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_map.cpp
+	$(LINKER)  test_map.$(OBJEXT) $(OUT)test_map.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_map_random: test_map_random.cpp map_test_handlers.h $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_map_random.cpp 
@@ -74,37 +74,37 @@ copy_file: copy_file.cpp $(DEPENDENCIES)
 	$(LINKER) copy_file.$(OBJEXT) $(OUT)copy_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 	
 
-vector: test.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test.cpp
-	$(LINKER)  test.$(OBJEXT) $(OUT)test.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_vector: test_vector.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_vector.cpp
+	$(LINKER)  test_vector.$(OBJEXT) $(OUT)test_vector.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-stack: test_stack.cpp $(DEPENDENCIES)
+test_stack: test_stack.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_stack.cpp
 	$(LINKER)  test_stack.$(OBJEXT) $(OUT)test_stack.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-mstack: test_mstack.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_mstack.cpp
-	$(LINKER)  test_mstack.$(OBJEXT) $(OUT)test_mstack.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_migr_stack: test_migr_stack.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_migr_stack.cpp
+	$(LINKER)  test_migr_stack.$(OBJEXT) $(OUT)test_migr_stack.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 
-many: many_stacks.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c many_stacks.cpp -DSTXXL_VERBOSE_LEVEL=1
-	$(LINKER)  many_stacks.$(OBJEXT) $(OUT)many_stacks.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_many_stacks: test_many_stacks.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_many_stacks.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(LINKER)  test_many_stacks.$(OBJEXT) $(OUT)test_many_stacks.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_pqueue: test_pqueue.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_pqueue.cpp
 	$(LINKER)  test_pqueue.$(OBJEXT) $(OUT)test_pqueue.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-ext_merger: ext_merger.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c ext_merger.cpp -DSTXXL_VERBOSE_LEVEL=2
-	$(LINKER)  ext_merger.$(OBJEXT) $(OUT)ext_merger.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_ext_merger: test_ext_merger.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ext_merger.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(LINKER)  test_ext_merger.$(OBJEXT) $(OUT)test_ext_merger.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 bench_pqueue: bench_pqueue.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c bench_pqueue.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  bench_pqueue.$(OBJEXT) $(OUT)bench_pqueue.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
 
 clean:
-	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT) testmap.$(EXEEXT) test_map_random.$(EXEEXT)
-	$(RM) ext_merger.$(EXEEXT) p_queue.$(EXEEXT) many_stacks.$(EXEEXT)
-	$(RM) test_mstack.$(EXEEXT) test_stack.$(EXEEXT) test.$(EXEEXT)
-	$(RM) testqueue.$(EXEEXT) testmap.$(EXEEXT) copy_file.$(EXEEXT)
+	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT) test_map.$(EXEEXT) test_map_random.$(EXEEXT)
+	$(RM) test_ext_merger.$(EXEEXT) test_pqueue.$(EXEEXT) test_many_stacks.$(EXEEXT)
+	$(RM) test_migr_stack.$(EXEEXT) test_stack.$(EXEEXT) test_vector.$(EXEEXT)
+	$(RM) test_queue.$(EXEEXT) copy_file.$(EXEEXT) test_deque.$(EXEEXT)
