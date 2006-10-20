@@ -11,7 +11,7 @@ Build Log
 </h3>
 </pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
 Command Lines
-</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Creating temporary file "c:\stxxl\test\WinGUI\Release\RSP000008.rsp" with contents
+</font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Creating temporary file "c:\stxxl\test\WinGUI\Release\RSP000001.rsp" with contents
 [
 /O2 /D "WIN32" /D "_WINDOWS" /D "NDEBUG" /D "_AFXDLL" /D "_MBCS" /FD /EHsc /MD /GS /Zc:wchar_t /Yu"stdafx.h" /Fp"Release/WinGUI.pch" /Fo"Release/" /Fd"Release/vc70.pdb" /W3 /c /Wp64 /Zi /TP  -DSORT_OPT_PREFETCHING -DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I../../ -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE /MD /O2 -D_RTLDLL -DBOOST_LIB_DIAGNOSTIC -DBOOST_ALL_DYN_LINK -DSTXXL_BOOST_TIMESTAMP -DSTXXL_BOOST_CONFIG -DSTXXL_BOOST_FILESYSTEM -DSTXXL_BOOST_THREADS -DSTXXL_BOOST_RANDOM -Ic:\boost /EHsc /EHs /wd4820 /wd4217 /wd4668 /wd4619 /wd4625 /wd4626 /wd4355 /wd4244 /wd4267 /wd4311 /wd4800 /wd4101 /wd4003 /wd4307
 .\WorkDialog.cpp
@@ -19,14 +19,15 @@ Command Lines
 .\WinGUI.cpp
 .\StxxlWorkThread.cpp
 ]
-Creating command line "cl.exe @c:\stxxl\test\WinGUI\Release\RSP000008.rsp /nologo"
-Creating temporary file "c:\stxxl\test\WinGUI\Release\RSP000009.rsp" with contents
+Creating command line "cl.exe @c:\stxxl\test\WinGUI\Release\RSP000001.rsp /nologo"
+Creating temporary file "c:\stxxl\test\WinGUI\Release\RSP000002.rsp" with contents
 [
 /O2 /D "WIN32" /D "_WINDOWS" /D "NDEBUG" /D "_AFXDLL" /D "_MBCS" /FD /EHsc /MD /GS /Zc:wchar_t /Yc"stdafx.h" /Fp"Release/WinGUI.pch" /Fo"Release/" /Fd"Release/vc70.pdb" /W3 /c /Wp64 /Zi /TP  -DSORT_OPT_PREFETCHING -DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I../../ -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE /MD /O2 -D_RTLDLL -DBOOST_LIB_DIAGNOSTIC -DBOOST_ALL_DYN_LINK -DSTXXL_BOOST_TIMESTAMP -DSTXXL_BOOST_CONFIG -DSTXXL_BOOST_FILESYSTEM -DSTXXL_BOOST_THREADS -DSTXXL_BOOST_RANDOM -Ic:\boost /EHsc /EHs /wd4820 /wd4217 /wd4668 /wd4619 /wd4625 /wd4626 /wd4355 /wd4244 /wd4267 /wd4311 /wd4800 /wd4101 /wd4003 /wd4307
 .\stdafx.cpp
 ]
-Creating command line "cl.exe @c:\stxxl\test\WinGUI\Release\RSP000009.rsp /nologo"
-Creating temporary file "c:\stxxl\test\WinGUI\Release\RSP00000A.rsp" with contents
+Creating command line "cl.exe @c:\stxxl\test\WinGUI\Release\RSP000002.rsp /nologo"
+Creating command line "rc.exe /d "NDEBUG" /d "_AFXDLL" /l 0x409 /I "Release" /fo"Release/WinGUI.res" .\WinGUI.rc"
+Creating temporary file "c:\stxxl\test\WinGUI\Release\RSP000003.rsp" with contents
 [
 /OUT:"Release/WinGUI.exe" /INCREMENTAL:NO /NOLOGO /DEBUG /PDB:"Release/WinGUI.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /MACHINE:X86 /LIBPATH:..\..\lib\ /LIBPATH:c:\boost\lib\ 
 .\Release\stdafx.obj
@@ -36,7 +37,7 @@ Creating temporary file "c:\stxxl\test\WinGUI\Release\RSP00000A.rsp" with conten
 .\Release\WorkDialog.obj
 .\Release\WinGUI.res
 ]
-Creating command line "link.exe @c:\stxxl\test\WinGUI\Release\RSP00000A.rsp"
+Creating command line "link.exe @c:\stxxl\test\WinGUI\Release\RSP000003.rsp"
 </pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
 Output Window
 </font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>Compiling...
@@ -53,13 +54,12 @@ Linking to lib file: boost_date_time-vc71-mt-1_32.lib
 Linking to lib file: boost_filesystem-vc71-mt-1_32.lib
 Linking to lib file: boost_thread-vc71-mt-1_32.lib
 Generating Code...
+Compiling resources...
 Linking...
-msvcrt.lib(cinitexe.obj) : warning LNK4098: defaultlib 'msvcrtd.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
 LINK : warning LNK4089: all references to 'OLEAUT32.dll' discarded by /OPT:REF
-LINK : warning LNK4089: all references to 'boost_date_time-vc71-mt-gd-1_32.dll' discarded by /OPT:REF
 </pre></table><table width=100% bgcolor=#DFDFE5><tr><td><font face=arial size=+2>
 Results
 </font></table><table width=* cellspacing=0 cellpadding=0><tr><td width=0 bgcolor=#EDEDF5>&nbsp;</td><td width=0 bgcolor=#FFFFFF>&nbsp;</td><td width=*><pre>
 Build log was saved at "file://c:\stxxl\test\WinGUI\Release\BuildLog.htm"
-WinGUI - 0 error(s), 3 warning(s)</pre></table><table   width=100% height=20 bgcolor=#CFCFE5><tr><td><font face=arial size=+2>
+WinGUI - 0 error(s), 1 warning(s)</pre></table><table   width=100% height=20 bgcolor=#CFCFE5><tr><td><font face=arial size=+2>
 </font></table></body></html>

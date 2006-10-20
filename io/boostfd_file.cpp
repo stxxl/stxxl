@@ -130,7 +130,8 @@ __STXXL_BEGIN_NAMESPACE
       int disk): file (disk),mode_(mode)
   {
     BOOST_IOS::openmode boostfd_mode;
-    
+
+
     #ifndef STXXL_DIRECT_IO_OFF
     if (mode & DIRECT)
     {
@@ -152,34 +153,36 @@ __STXXL_BEGIN_NAMESPACE
     {
       boostfd_mode = BOOST_IOS::out | BOOST_IOS::in;
     }
+
+	const boost::filesystem::path fspath(filename,
+		boost::filesystem::native);
     
     if (mode & TRUNC)
     {
-      if(boost::filesystem::exists(filename))
+      if(boost::filesystem::exists(fspath))
       {
-        boost::filesystem::remove(filename);
-        boost::filesystem::ofstream f(filename);
+        boost::filesystem::remove(fspath);
+        boost::filesystem::ofstream f(fspath);
         f.close();
-        assert(boost::filesystem::exists(filename));
+        assert(boost::filesystem::exists(fspath));
       }
     }
 
     if (mode & CREAT)
     {
       // need to be emulated:
-      if(!boost::filesystem::exists(filename))
+      if(!boost::filesystem::exists(fspath))
       {
-        boost::filesystem::ofstream f(filename);
+        boost::filesystem::ofstream f(fspath);
         f.close();
-        assert(boost::filesystem::exists(filename));
+        assert(boost::filesystem::exists(fspath));
       }
     }
-    
 
     file_des.open(filename,boostfd_mode,boostfd_mode);
     
     // catch exceptions ?
-    
+
   }
   
   boostfd_file::~boostfd_file ()
@@ -199,8 +202,6 @@ __STXXL_BEGIN_NAMESPACE
     file_des.seek(newsize,BOOST_IOS::beg);
     file_des.seek(0,BOOST_IOS::beg); // not important ?
     assert(size() >= oldsize);
-    
-    // TODO: does it work under windows?
   }
   
   void boostfd_request::serve ()
@@ -219,7 +220,7 @@ __STXXL_BEGIN_NAMESPACE
     
     boostfd_file::fd_type fd = static_cast<boostfd_file*>(file_)->get_file_des(); 
     fd.seek(offset,BOOST_IOS::beg);
-    
+   
     // catch/throw exception ?
     //  stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve() offset="<<offset
     //    <<" this="<<long(this)<<" buffer="<<

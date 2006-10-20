@@ -23,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
   class boostfd_request;
 
   //! \brief Implementation based on boost::iostreams::file_decriptor
-  class boostfd_file:public file
+  class boostfd_file: public file
   {
   public:
     typedef boost::iostreams::file_descriptor fd_type;

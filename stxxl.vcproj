@@ -54,6 +54,9 @@ nmake tests_msvc"
 				Name="io"
 				Filter="">
 				<File
+					RelativePath=".\io\boostfd_file.cpp">
+				</File>
+				<File
 					RelativePath=".\io\diskqueue.cpp">
 				</File>
 				<File
@@ -123,6 +126,9 @@ nmake tests_msvc"
 				</File>
 				<File
 					RelativePath=".\containers\rnd_test.cpp">
+				</File>
+				<File
+					RelativePath=".\containers\test_map_random.cpp">
 				</File>
 				<File
 					RelativePath=".\containers\test_mstack.cpp">
@@ -306,6 +312,9 @@ nmake tests_msvc"
 			<Filter
 				Name="io"
 				Filter="">
+				<File
+					RelativePath=".\io\boostfd_file.h">
+				</File>
 				<File
 					RelativePath=".\io\completion_handler.h">
 				</File>
