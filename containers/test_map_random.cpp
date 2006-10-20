@@ -15,7 +15,7 @@
 #include "map_test_handlers.h"
 
 
-//! \example containers/map/test_map_random.cpp
+//! \example containers/test_map_random.cpp
 //! This is an example of use of \c stxxl::map container.
 
 typedef int key_type;
