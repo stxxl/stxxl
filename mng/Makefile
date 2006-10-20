@@ -1,4 +1,4 @@
-all_tests: main test1 streams write_pool prefetch_pool
+all_tests: test_mng test_mng1 test_streams test_write_pool test_prefetch_pool
 
 include ../make.settings
 
@@ -8,29 +8,29 @@ lib: mng.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mng.cpp
 	
 
-main: test.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test.cpp -DSTXXL_VERBOSE_LEVEL=2 
-	$(LINKER) test.$(OBJEXT) $(OUT)test.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_mng: test_mng.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_mng.cpp -DSTXXL_VERBOSE_LEVEL=2 
+	$(LINKER) test_mng.$(OBJEXT) $(OUT)test_mng.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test1: test1.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test1.cpp -DSTXXL_VERBOSE_LEVEL=2
-	$(LINKER) test1.$(OBJEXT) $(OUT)test1.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_mng1: test_mng1.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_mng1.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(LINKER) test_mng1.$(OBJEXT) $(OUT)test_mng1.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-streams: test_streams.cpp $(DEPENDENCIES)
+test_streams: test_streams.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_streams.cpp
 	$(LINKER) test_streams.$(OBJEXT) $(OUT)test_streams.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-write_pool: write_pool.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c write_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
-	$(LINKER) write_pool.$(OBJEXT) $(OUT)write_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_write_pool: test_write_pool.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_write_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(LINKER) test_write_pool.$(OBJEXT) $(OUT)test_write_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-prefetch_pool: prefetch_pool.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c prefetch_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
-	$(LINKER) prefetch_pool.$(OBJEXT) $(OUT)prefetch_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_prefetch_pool: test_prefetch_pool.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_prefetch_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(LINKER) test_prefetch_pool.$(OBJEXT) $(OUT)test_prefetch_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 
 clean:
 	$(RM) *.$(OBJEXT)
-	$(RM) test.$(EXEEXT)
-	$(RM) prefetch_pool.$(EXEEXT) write_pool.$(EXEEXT)
+	$(RM) test_mng.$(EXEEXT) test_mng1.$(EXEEXT)
+	$(RM) test_prefetch_pool.$(EXEEXT) test_write_pool.$(EXEEXT)
 	$(RM) test_streams.$(EXEEXT) 
