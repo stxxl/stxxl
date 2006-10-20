@@ -1,4 +1,4 @@
-all: vector stack mstack many p_queue queue ext_merger bench_pqueue copy_file testmap test_map_random test_deque
+all: vector stack mstack many test_pqueue queue ext_merger bench_pqueue copy_file testmap test_map_random test_deque
 
 include ../make.settings
 
@@ -91,9 +91,9 @@ many: many_stacks.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c many_stacks.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  many_stacks.$(OBJEXT) $(OUT)many_stacks.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-p_queue: p_queue.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c p_queue.cpp
-	$(LINKER)  p_queue.$(OBJEXT) $(OUT)p_queue.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_pqueue: test_pqueue.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_pqueue.cpp
+	$(LINKER)  test_pqueue.$(OBJEXT) $(OUT)test_pqueue.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 ext_merger: ext_merger.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c ext_merger.cpp -DSTXXL_VERBOSE_LEVEL=2
