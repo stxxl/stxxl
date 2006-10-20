@@ -1,4 +1,4 @@
-all_tests: main disktest flushbuffers
+all_tests: test_io benchmark_disks 
 
 include ../make.settings
 
@@ -16,16 +16,13 @@ lib: diskqueue.cpp wfs_file.cpp ufs_file.cpp syscall_file.cpp wincall_file.cpp i
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c simdisk_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c boostfd_file.cpp
 
-main: test
-	$(LINKER) test.$(OBJEXT) $(OUT)test.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_io: test_io.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_io.cpp
+	$(LINKER) test_io.$(OBJEXT) $(OUT)test_io.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test: test.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test.cpp
-
-
-disktest: disktest.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c disktest.cpp  
-	$(LINKER) disktest.$(OBJEXT) $(OUT)disktest.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
+benchmark_disks: benchmark_disks.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_disks.cpp  
+	$(LINKER) benchmark_disks.$(OBJEXT) $(OUT)benchmark_disks.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
 	
 
 flushbuffers: flushbuffers.cpp $(DEPENDENCIES)
@@ -33,6 +30,6 @@ flushbuffers: flushbuffers.cpp $(DEPENDENCIES)
 	$(LINKER) flushbuffers.$(OBJEXT) $(OUT)flushbuffers.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(LIBEXT) disktest.$(EXEEXT)
-	$(RM) flushbuffers.$(EXEEXT) test.$(EXEEXT)
+	$(RM) *.$(OBJEXT) *.$(LIBEXT) benchmark_disks.$(EXEEXT)
+	$(RM) flushbuffers.$(EXEEXT) test_io.$(EXEEXT)
 
