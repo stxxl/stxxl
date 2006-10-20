@@ -8,7 +8,7 @@
 	  fixed by 					 : Roman Dementiev (01.03.2006)
  ***************************************************************************/
 
-//! \file test_map_random.cpp
+//! \file containers/test_map_random.cpp
 //! \brief File for testing functionality of stxxl::map.
 
 #include <stxxl>

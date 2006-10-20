@@ -2,7 +2,7 @@
 #include "ksort.h"
 #include "../containers/vector"
 
-//! \example algo/ksort.cpp 
+//! \example algo/test_ksort1.cpp 
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
 using namespace stxxl;

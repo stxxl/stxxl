@@ -10,7 +10,7 @@
 #include "../mng/mng.h"
 #include "prefetch_pool.h"
 
-//! \example mng/prefetch_pool.cpp 
+//! \example mng/test_prefetch_pool.cpp 
 
 #define BLOCK_SIZE (1024*512)
 

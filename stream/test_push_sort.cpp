@@ -10,7 +10,7 @@
 #include "stream.h"
 
 
-//! \example stream/push_sort.cpp 
+//! \example stream/test_push_sort.cpp 
 //! This is an example of how to use some basic algorithms from
 //! stream package. This example shows how to create
 //! \c sorted_runs data structure

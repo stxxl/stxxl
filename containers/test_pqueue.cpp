@@ -9,7 +9,7 @@
 #include <limits>
 
 
-//! \example containers/p_queue.cpp
+//! \example containers/test_pqueue.cpp
 //! This is an example of how to use \c stxxl::PRIORITY_QUEUE_GENERATOR
 //! and \c stxxl::priority_queue
 

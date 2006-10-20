@@ -10,7 +10,7 @@
 #include "../mng/mng.h"
 #include "write_pool.h"
 
-//! \example mng/write_pool.cpp 
+//! \example mng/test_write_pool.cpp 
 
 #define BLOCK_SIZE (1024*512)
 

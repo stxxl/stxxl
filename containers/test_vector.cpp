@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 
-//! \example containers/test.cpp 
+//! \example containers/test_vector.cpp 
 //! This is an example of use of \c stxxl::vector and 
 //! \c stxxl::VECTOR_GENERATOR. Vector type is configured
 //! to store 64-bit integers and have 2 pages each of 1 block

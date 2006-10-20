@@ -8,7 +8,7 @@
 
 #include "stack.h"
 
-//! \example test_stack.cpp
+//! \example containers/test_many_stacks.cpp
 //! This is an example of how to use \c stxxl::STACK_GENERATOR class
 //! to generate an \b external stack type 
 //! with \c stxxl::grow_shrink_stack implementation, \b four blocks per page,

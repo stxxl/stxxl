@@ -2,7 +2,7 @@
 #include "sort.h"
 #include "../containers/vector"
 
-//! \example algo/sort.cpp 
+//! \example algo/test_sort1.cpp 
 //! This is an example of how to use \c stxxl::sort() algorithm
 
 using namespace stxxl;

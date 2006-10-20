@@ -9,7 +9,7 @@
 #include "stream.h"
 
 
-//! \example stream/sorted_runs.cpp 
+//! \example stream/test_sorted_runs.cpp 
 //! This is an example of how to use some basic algorithms from
 //! stream package. This example shows how to create
 //! \c sorted_runs data structure from sorted sequences

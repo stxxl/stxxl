@@ -10,7 +10,7 @@
 #include <iostream>
 #include "mng.h"
 
-//! \example mng/test.cpp 
+//! \example mng/test_mng.cpp 
 //! This is an example of use of completion handlers, \c stxxl::block_manager, and
 //! \c stxxl::typed_block
 
