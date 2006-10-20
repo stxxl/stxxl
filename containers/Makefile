@@ -1,4 +1,4 @@
-all: vector stack mstack many p_queue queue ext_merger bench_pqueue copy_file testmap test_map_random
+all: vector stack mstack many p_queue queue ext_merger bench_pqueue copy_file testmap test_map_random test_deque
 
 include ../make.settings
 
