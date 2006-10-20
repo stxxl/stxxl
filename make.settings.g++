@@ -3,7 +3,7 @@
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = /home/dementiev/workspace/Stxxl#
 
-USE_BOOST = yes # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
+USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
 
 # change this path, do not leave spaces at the end of the line
