@@ -40,7 +40,7 @@ using stxxl::stream::make_tuple;
 using stxxl::tuple;
 
 
-const char * phrase = "Astalavista, baby";
+const char * phrase = "Hasta la vista, baby";
 
 
 template <class Container_,class It_>
