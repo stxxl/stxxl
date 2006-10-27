@@ -49,7 +49,7 @@ __STXXL_BEGIN_NAMESPACE
 			stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve() offset="<<offset
 				<<" this="<<long(this)<<" buffer="<<
 				buffer<<" bytes="<<bytes
-		    	<< " type=" <<((type == READ)?"READ":"WRITE"))
+		    	<< " type=" <<((type == READ)?"READ":"WRITE"),io_error)
 
 		{
 			if (type == READ)
@@ -67,7 +67,7 @@ __STXXL_BEGIN_NAMESPACE
 						" offset="<<offset<<
 						" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
 						((type == READ)?"READ":"WRITE")<<" nref= "<<nref()<<
-						" NumberOfBytesRead= "<<NumberOfBytesRead)
+						" NumberOfBytesRead= "<<NumberOfBytesRead,io_error)
 				}
 				
 				debugmon::get_instance()->io_finished((char*)buffer);
@@ -92,7 +92,7 @@ __STXXL_BEGIN_NAMESPACE
 						" offset="<<offset<<
 						" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
 						((type == READ)?"READ":"WRITE")<<" nref= "<<nref()<<
-						" NumberOfBytesWritten= "<<NumberOfBytesWritten)
+						" NumberOfBytesWritten= "<<NumberOfBytesWritten,io_error)
 				}
 
 				debugmon::get_instance()->io_finished((char*)buffer);
@@ -152,7 +152,7 @@ __STXXL_BEGIN_NAMESPACE
 					request::READ, on_cmpl);
 		
 		if(!req.get())
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 		
 		#ifndef NO_OVERLAPPING
 		disk_queues::get_instance ()->add_readreq(req,get_id());
@@ -169,7 +169,7 @@ __STXXL_BEGIN_NAMESPACE
 					   request::WRITE, on_cmpl);
     
 		if(!req.get())
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 		
 		#ifndef NO_OVERLAPPING
 		disk_queues::get_instance ()->add_writereq(req,get_id());

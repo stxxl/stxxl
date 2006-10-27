@@ -49,7 +49,7 @@ void DiskAllocator::dump()
 				1000 * 1024 * 1024
 			};
 			char * tmpstr = new char[255]; 
-			stxxl_ifcheck_win(GetTempPath(255,tmpstr));
+			stxxl_ifcheck_win(GetTempPath(255,tmpstr),resource_error);
 			entry1.path = tmpstr;
 			entry1.path += "stxxl";
 			delete [] tmpstr;

@@ -175,7 +175,7 @@ __STXXL_BEGIN_NAMESPACE
 		#ifdef BOOST_MSVC
 		stxxl_ifcheck_i ((file_des =::open (filename.c_str(), fmode,
 				      S_IREAD | S_IWRITE )),
-				"Filedescriptor="<<file_des<<" filename="<<filename<< " fmode="<<fmode);
+				"Filedescriptor="<<file_des<<" filename="<<filename<< " fmode="<<fmode,io_error);
 		#else
 		stxxl_ifcheck_i ((file_des =::open (filename.c_str(), fmode,
 				      S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP)),

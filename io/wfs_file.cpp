@@ -123,7 +123,7 @@ __STXXL_BEGIN_NAMESPACE
 			
 			END_COUNT_WAIT_TIME
       
-      check_errors();
+			check_errors();
 		}
 		bool wfs_request_base::poll()
 		{
@@ -131,9 +131,9 @@ __STXXL_BEGIN_NAMESPACE
 			/*if(_state () < DONE)*/ wait();
 			#endif
       
-      bool s = _state() >= DONE;
+			bool s = _state() >= DONE;
 			
-      check_errors();
+			check_errors();
       
 			return s;
 		}
@@ -195,14 +195,14 @@ __STXXL_BEGIN_NAMESPACE
 			dwCreationDisposition,dwFlagsAndAttributes,NULL);
 
 		if(file_des == INVALID_HANDLE_VALUE)
-			stxxl_win_lasterror_exit("CreateFile  filename="<<filename)
+			stxxl_win_lasterror_exit("CreateFile  filename="<<filename,io_error)
 
 
 	};
 	wfs_file_base::~wfs_file_base ()
 	{
 		if(!CloseHandle(file_des))
-			stxxl_win_lasterror_exit("closing file (call of ::CloseHandle) ")
+			stxxl_win_lasterror_exit("closing file (call of ::CloseHandle) ",io_error)
 	
 		file_des = INVALID_HANDLE_VALUE;
 	};
@@ -210,7 +210,7 @@ __STXXL_BEGIN_NAMESPACE
 	{
 		LARGE_INTEGER result;
 		if(!GetFileSizeEx(file_des,&result))
-			stxxl_win_lasterror_exit("GetFileSizeEx ")
+			stxxl_win_lasterror_exit("GetFileSizeEx ",io_error)
 
 		return result.QuadPart;
 	};
@@ -223,11 +223,11 @@ __STXXL_BEGIN_NAMESPACE
 
 		if(!SetFilePointerEx(file_des,desired_pos,NULL,FILE_BEGIN))
 			stxxl_win_lasterror_exit("SetFilePointerEx in wfs_file_base::set_size(..) oldsize="<<cur_size<<
-			" newsize="<<newsize<<" ")
+			" newsize="<<newsize<<" ",io_error)
 		
 		if(!SetEndOfFile(file_des))
 			stxxl_win_lasterror_exit("SetEndOfFile oldsize="<<cur_size<<
-			" newsize="<<newsize<<" ")
+			" newsize="<<newsize<<" ",io_error)
 
 	};
   

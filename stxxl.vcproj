@@ -264,6 +264,9 @@ nmake tests_msvc"
 					RelativePath=".\common\debug.h">
 				</File>
 				<File
+					RelativePath=".\common\exceptions.h">
+				</File>
+				<File
 					RelativePath=".\common\gprof.h">
 				</File>
 				<File

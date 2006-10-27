@@ -160,7 +160,15 @@ if((expr)<0) \
 }   
 
 
-#define stxxl_ifcheck_win(expr) if((expr)==0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" "; stxxl_error(__STXXL_STRING(expr));}
+#define stxxl_ifcheck_win(expr,exception_type) \
+if((expr)==0) \
+{ \
+	std::ostringstream str_; \
+	str_ << "Error in function " << \
+    STXXL_PRETTY_FUNCTION_NAME << \
+    " " << perror_string(); \
+	throw exception_type(str_.str()); \
+}
 
 // #define stxxl_ifcheck_i(expr,info) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" Info: "<< info<<" "; stxxl_error(__STXXL_STRING(expr)); }
 
@@ -182,7 +190,7 @@ if((expr)<0) \
 
 #ifdef BOOST_MSVC
 
-#define stxxl_win_lasterror_exit(errmsg)  \
+#define stxxl_win_lasterror_exit(errmsg,exception_type)  \
 { \
     TCHAR szBuf[80];  \
     LPVOID lpMsgBuf; \
@@ -195,9 +203,10 @@ if((expr)<0) \
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), \
         (LPTSTR) &lpMsgBuf, \
         0, NULL ); \
-	STXXL_ERRMSG("Error in "<< errmsg <<", error code "<<dw<<": "<<((char*)lpMsgBuf)); \
+	std::ostringstream str_; \
+	str_ << "Error in "<< errmsg <<", error code "<<dw<<": "<<((char*)lpMsgBuf); \
     LocalFree(lpMsgBuf); \
-    ExitProcess(dw);  \
+    throw exception_type(str_.str());  \
 } 
 
 #endif
