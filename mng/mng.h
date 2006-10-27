@@ -455,18 +455,18 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			{
 				if(pred->first <= region_pos && pred->first + pred->second > region_pos)
 				{
-					STXXL_ERRMSG("Error: double deallocation of external memory ")
-					STXXL_ERRMSG("System info: P "<<pred->first<<" "<<pred->second<<" "<<region_pos)
-					abort();
+          STXXL_FORMAT_ERROR_MSG(msg,"DiskAllocator::check_corruption Error: double deallocation of external memory "<<
+            "System info: P "<<pred->first<<" "<<pred->second<<" "<<region_pos)
+					throw bad_ext_alloc(msg.str());
 				}
 			}
 			if(succ!=free_space.end ())
 			{
 				if(region_pos <= succ->first && region_pos + region_size > succ->first)
 				{
-					STXXL_ERRMSG("Error: double deallocation of external memory ")
-					STXXL_ERRMSG("System info: S "<<region_pos<<" "<<region_size<<" "<<succ->first)
-					abort();
+					STXXL_FORMAT_ERROR_MSG(msg,"DiskAllocator::check_corruption Error: double deallocation of external memory "
+					 << "System info: S "<<region_pos<<" "<<region_size<<" "<<succ->first)
+					throw bad_ext_alloc(msg.str());
 				}
 			}
 		}
@@ -838,9 +838,9 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
                    options, disk);
       #endif
 
-			STXXL_ERRMSG("Unsupported disk I/O implementation " <<
+			STXXL_FORMAT_ERROR_MSG(msg,"FileCreator::create Unsupported disk I/O implementation " <<
 				io_impl << " ." )
-			abort ();
+      throw std::runtime_error(msg.str());
 
 			return NULL;
 		};

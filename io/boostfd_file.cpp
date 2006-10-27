@@ -110,6 +110,8 @@ __STXXL_BEGIN_NAMESPACE
       _state.wait_for (READY2DIE);
       
       END_COUNT_WAIT_TIME
+      
+      check_errors();
     }
     bool boostfd_request::poll()
     {
@@ -117,7 +119,11 @@ __STXXL_BEGIN_NAMESPACE
       /*if(_state () < DONE)*/ wait();
       #endif
       
-      return (_state () >= DONE);
+      const bool s = _state() >= DONE;
+      
+      check_errors();
+      
+      return s;
     }
     const char *boostfd_request::io_type ()
     {
@@ -154,8 +160,9 @@ __STXXL_BEGIN_NAMESPACE
       boostfd_mode = BOOST_IOS::out | BOOST_IOS::in;
     }
 
-	const boost::filesystem::path fspath(filename,
-		boost::filesystem::native);
+    
+	  const boost::filesystem::path fspath(filename,
+		  boost::filesystem::native);
     
     if (mode & TRUNC)
     {
@@ -179,21 +186,19 @@ __STXXL_BEGIN_NAMESPACE
       }
     }
 
-    file_des.open(filename,boostfd_mode,boostfd_mode);
     
-    // catch exceptions ?
-
+    file_des.open(filename,boostfd_mode,boostfd_mode);
+       
+    
   }
   
   boostfd_file::~boostfd_file ()
   {
     file_des.close();    
-    // catch exceptions ?
   }
   stxxl::int64 boostfd_file::size ()
   {
-    stxxl::int64 size_ = file_des.seek(0,BOOST_IOS::end);
-    // catch exceptions ? 
+    stxxl::int64 size_ = file_des.seek(0,BOOST_IOS::end); 
     return size_;
   }
   void boostfd_file::set_size (stxxl::int64 newsize)
@@ -218,15 +223,22 @@ __STXXL_BEGIN_NAMESPACE
       <<" offset: "<<offset<<" bytes: "<<bytes<<((type== READ)?" READ":" WRITE")
       );
     
-    boostfd_file::fd_type fd = static_cast<boostfd_file*>(file_)->get_file_des(); 
-    fd.seek(offset,BOOST_IOS::beg);
+    boostfd_file::fd_type fd = static_cast<boostfd_file*>(file_)->get_file_des();
+    
+    try
+    {
+      fd.seek(offset,BOOST_IOS::beg);
+    }
+    catch(const std::exception & ex)
+    {
+      STXXL_FORMAT_ERROR_MSG(msg,"seek() in boostfd_request::serve() offset="<<offset
+        <<" this="<<long(this)<<" buffer="<<
+        buffer<<" bytes="<<bytes
+        << " type=" <<((type == READ)?"READ":"WRITE")<< " : "<<ex.what() )
+     
+      error_occured(msg.str());
+    }
    
-    // catch/throw exception ?
-    //  stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve() offset="<<offset
-    //    <<" this="<<long(this)<<" buffer="<<
-    //    buffer<<" bytes="<<bytes
-    //      << " type=" <<((type == READ)?"READ":"WRITE"))
-
     {
       if (type == READ)
       {
@@ -236,16 +248,20 @@ __STXXL_BEGIN_NAMESPACE
         
         debugmon::get_instance()->io_started((char*)buffer);
         
-        fd.read((char*)buffer,bytes);
-        
-        /* catch/throw exception ?
+        try
         {
-          stxxl_win_lasterror_exit("ReadFile this="<<long(this)<<
-            " offset="<<offset<<
-            " buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
-            ((type == READ)?"READ":"WRITE")<<" nref= "<<nref()<<
-            " NumberOfBytesRead= "<<NumberOfBytesRead)
-        }*/
+          fd.read((char*)buffer,bytes);
+        }
+        catch(const std::exception & ex)
+        {
+          STXXL_FORMAT_ERROR_MSG(msg,"read() in boostfd_request::serve() offset="<<offset
+            <<" this="<<long(this)<<" buffer="<<
+            buffer<<" bytes="<<bytes
+            << " type=" <<((type == READ)?"READ":"WRITE")<< 
+            " nref= "<<nref() <<" : "<<ex.what() )
+     
+           error_occured(msg.str());
+        }
         
         debugmon::get_instance()->io_finished((char*)buffer);
         
@@ -260,17 +276,21 @@ __STXXL_BEGIN_NAMESPACE
         #endif
         
         debugmon::get_instance()->io_started((char*)buffer);
-        
-        fd.write((char*)buffer,bytes);
-        
-        /* catch/throw exception ?
+     
+        try
+        {   
+          fd.write((char*)buffer,bytes);
+        }
+        catch(const std::exception & ex)
         {
-          stxxl_win_lasterror_exit("ReadFile this="<<long(this)<<
-            " offset="<<offset<<
-            " buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
-            ((type == READ)?"READ":"WRITE")<<" nref= "<<nref()<<
-            " NumberOfBytesWritten= "<<NumberOfBytesWritten)
-        }*/
+          STXXL_FORMAT_ERROR_MSG(msg,"write() in boostfd_request::serve() offset="<<offset
+            <<" this="<<long(this)<<" buffer="<<
+            buffer<<" bytes="<<bytes
+            << " type=" <<((type == READ)?"READ":"WRITE")<< 
+            " nref= "<<nref() <<" : "<<ex.what() )
+     
+           error_occured(msg.str());
+        }
 
         debugmon::get_instance()->io_finished((char*)buffer);
         
@@ -322,7 +342,7 @@ __STXXL_BEGIN_NAMESPACE
           request::READ, on_cmpl);
     
     if(!req.get())
-      stxxl_function_error;
+      stxxl_function_error(io_error);
     
     #ifndef NO_OVERLAPPING
     disk_queues::get_instance ()->add_readreq(req,get_id());
@@ -339,7 +359,7 @@ __STXXL_BEGIN_NAMESPACE
              request::WRITE, on_cmpl);
     
     if(!req.get())
-      stxxl_function_error;
+      stxxl_function_error(io_error);
     
     #ifndef NO_OVERLAPPING
     disk_queues::get_instance ()->add_writereq(req,get_id());

@@ -41,11 +41,14 @@ __STXXL_BEGIN_NAMESPACE
 			<<" offset: "<<offset<<" bytes: "<<bytes<<((type== READ)?" READ":" WRITE")
 			<<" file: "<<static_cast<syscall_file*>(file_)->get_file_des());
 		
+    try
+    {
+    
 		stxxl_ifcheck_i(::lseek (static_cast<syscall_file*>(file_)->get_file_des (), offset, SEEK_SET),
 			" this="<<long(this)<<" File descriptor="<<
 			static_cast<syscall_file*>(file_)->get_file_des()<< " offset="<<offset<<" buffer="<<
 			buffer<<" bytes="<<bytes
-		    	<< " type=" <<((type == READ)?"READ":"WRITE") )
+		    	<< " type=" <<((type == READ)?"READ":"WRITE"),io_error )
 		else
 		{
 			if (type == READ)
@@ -60,7 +63,7 @@ __STXXL_BEGIN_NAMESPACE
 					" this="<<long(this)<<" File descriptor="<<
 					static_cast<syscall_file*>(file_)->get_file_des()<< " offset="<<offset<<
 					" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
-					((type == READ)?"READ":"WRITE")<<" nref= "<<nref())
+					((type == READ)?"READ":"WRITE")<<" nref= "<<nref(),io_error)
 				
 				debugmon::get_instance()->io_finished((char*)buffer);
 				
@@ -80,7 +83,7 @@ __STXXL_BEGIN_NAMESPACE
 					" this="<<long(this)<<" File descriptor="<<
 					static_cast<syscall_file*>(file_)->get_file_des()<< " offset="<<offset<<" buffer="<<
 					buffer<<" bytes="<<bytes<< " type=" <<
-					((type == READ)?"READ":"WRITE")<<" nref= "<<nref());
+					((type == READ)?"READ":"WRITE")<<" nref= "<<nref(),io_error);
 				
 				debugmon::get_instance()->io_finished((char*)buffer);
 				
@@ -89,6 +92,14 @@ __STXXL_BEGIN_NAMESPACE
 				#endif
 			}
 		}
+    
+    }
+    catch(const io_error & ex)
+    {
+      error_occured(ex.what());
+    }
+    
+   
 		
 		if(nref() < 2)
 		{
@@ -97,8 +108,12 @@ __STXXL_BEGIN_NAMESPACE
 			" offset="<<offset<<" buffer="<<buffer<<" bytes="<<bytes << 
 			" type=" <<((type == READ)?"READ":"WRITE"))
 		}
+    
+   
 
-		_state.set_to (DONE);
+		_state.set_to(DONE);
+    
+   
 
 		#ifdef STXXL_BOOST_THREADS
 		boost::mutex::scoped_lock Lock(waiters_mutex);
@@ -107,6 +122,8 @@ __STXXL_BEGIN_NAMESPACE
 		#endif
 		// << notification >>
 		
+   
+    
 #ifdef __MCSTL__		
 		std::for_each(
 			waiters.begin(),
@@ -120,6 +137,8 @@ __STXXL_BEGIN_NAMESPACE
 			std::mem_fun(&onoff_switch::on) );
 #endif
 		
+   
+    
 		#ifdef STXXL_BOOST_THREADS
 		Lock.unlock();
 		#else
@@ -127,7 +146,9 @@ __STXXL_BEGIN_NAMESPACE
 		#endif
 
 		completed ();
+   
 		_state.set_to (READY2DIE);
+   
 	}
 
 	request_ptr syscall_file::aread (
@@ -141,7 +162,7 @@ __STXXL_BEGIN_NAMESPACE
 					request::READ, on_cmpl);
 		
 		if(!req.get())
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 		
 		#ifndef NO_OVERLAPPING
 		disk_queues::get_instance ()->add_readreq(req,get_id());
@@ -158,7 +179,7 @@ __STXXL_BEGIN_NAMESPACE
 					   request::WRITE, on_cmpl);
     
 		if(!req.get())
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 		
 		#ifndef NO_OVERLAPPING
 		disk_queues::get_instance ()->add_writereq(req,get_id());

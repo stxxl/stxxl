@@ -104,6 +104,7 @@
 //#include "../common/rwlock.h"
 #include "../common/switch.h"
 #include "../common/state.h"
+#include "../common/exceptions.h"
 #include "completion_handler.h"
 
 __STXXL_BEGIN_NAMESPACE
@@ -230,6 +231,7 @@ __STXXL_BEGIN_NAMESPACE
 	
 		completion_handler on_complete;
 		int ref_cnt;
+    std::auto_ptr<stxxl::io_error> error;
 		
 		#ifdef STXXL_BOOST_THREADS
 		boost::mutex ref_cnt_mutex;
@@ -294,9 +296,9 @@ __STXXL_BEGIN_NAMESPACE
 			return "none";
 		};
 		virtual ~request()
-    	{
+    {
         	STXXL_VERBOSE3("request "<< unsigned(this) <<": deletion, cnt: "<<ref_cnt)
-    	}
+    }
 		file * get_file() const { return file_; }
 		void * get_buffer() const { return buffer; }
 		stxxl::int64 get_offset() const { return offset; }
@@ -313,6 +315,27 @@ __STXXL_BEGIN_NAMESPACE
 			out << " Type of transfer: "<<((get_type()==READ)?"READ":"WRITE");
 			return out;
 		}
+    
+    //! \brief Inform the request object that an error occured 
+    //! during the I/O execution
+    void error_occured(const char * msg)
+    {
+      error.reset(new stxxl::io_error(msg));
+    }
+    
+    //! \brief Inform the request object that an error occured 
+    //! during the I/O execution
+    void error_occured(const std::string & msg)
+    {
+      error.reset(new stxxl::io_error(msg));
+    }
+    
+    //! \brief Rises an exception if there were error with the I/O 
+    void check_errors() throw (stxxl::io_error)
+    {
+      if(error.get()) throw *(error.get());
+    }
+    
 	private:
     // Following methods are declared but not implemented 
     // intentionnaly to forbid their usage
@@ -535,6 +558,9 @@ __STXXL_BEGIN_NAMESPACE
 					req_array[i]->delete_waiter (&sw);
 
 				END_COUNT_WAIT_TIME
+        
+        req_array[index]->check_errors();
+        
 				return index;
 			}
 		}
@@ -575,6 +601,9 @@ __STXXL_BEGIN_NAMESPACE
         }
 
 				END_COUNT_WAIT_TIME
+        
+        (request_ptr(*result))->check_errors();
+        
 				return result;
 			}
 		}

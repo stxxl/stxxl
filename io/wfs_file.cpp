@@ -122,14 +122,20 @@ __STXXL_BEGIN_NAMESPACE
 			_state.wait_for (READY2DIE);
 			
 			END_COUNT_WAIT_TIME
+      
+      check_errors();
 		}
 		bool wfs_request_base::poll()
 		{
 			#ifdef NO_OVERLAPPING
 			/*if(_state () < DONE)*/ wait();
 			#endif
+      
+      bool s = _state() >= DONE;
 			
-			return (_state () >= DONE);
+      check_errors();
+      
+			return s;
 		}
 		const char *wfs_request_base::io_type ()
 		{

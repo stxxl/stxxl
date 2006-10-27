@@ -154,8 +154,8 @@ __STXXL_BEGIN_NAMESPACE
          if (newsize > size ())
          {
              stxxl_ifcheck (::lseek (file_des, newsize - 1,
-                            SEEK_SET));
-             stxxl_ifcheck(::write(file_des,"",1));
+                            SEEK_SET),io_error);
+             stxxl_ifcheck(::write(file_des,"",1),io_error);
          }
     };
 	
@@ -176,32 +176,35 @@ __STXXL_BEGIN_NAMESPACE
 				iostats->write_started (size());
 			#endif
 		}
+    
+    try {
 				
 		void *mem =
 			mmap (NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED,static_cast<sim_disk_file*>(file_)->get_file_des (), offset);
 		if (mem == MAP_FAILED)
 		{
-			STXXL_ERRMSG( "Mapping failed." )
-			STXXL_ERRMSG( "Page size: " << sysconf (_SC_PAGESIZE)
-				<< " offset modulo page size" << (offset % sysconf(_SC_PAGESIZE)) )
-			abort ();
+			STXXL_FORMAT_ERROR_MSG(msg,"Mapping failed. " <<
+       "Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " << 
+        (offset % sysconf(_SC_PAGESIZE)))
+        
+      error_occured(msg.str());
 		}
 		else if (mem == 0)
 		{
-			stxxl_function_error
+			stxxl_function_error(io_error)
 		}
 		else
 		{
 			if (type == READ)
 			{
-				stxxl_ifcheck (memcpy (buffer, mem, bytes))
+				stxxl_ifcheck (memcpy (buffer, mem, bytes),io_error)
 				else
-				stxxl_ifcheck (munmap ((char *) mem, bytes))}
+				stxxl_ifcheck (munmap ((char *) mem, bytes),io_error)}
 			else
 			{
-				stxxl_ifcheck (memcpy (mem, buffer, bytes))
+				stxxl_ifcheck (memcpy (mem, buffer, bytes),io_error)
 				else
-				stxxl_ifcheck (munmap ((char *) mem, bytes))}
+				stxxl_ifcheck (munmap ((char *) mem, bytes),io_error)}
 			}
 
 		double delay =
@@ -216,6 +219,13 @@ __STXXL_BEGIN_NAMESPACE
 			sleep (seconds_to_wait);
 
 		usleep ((unsigned long) ((delay - seconds_to_wait) * 1000000.));
+
+
+    }
+    catch(const io_error & ex)
+    {
+      error_occured(ex.what());
+    }
 
 		if (type == READ)
 		{
@@ -260,7 +270,7 @@ __STXXL_BEGIN_NAMESPACE
 		request_ptr req = new sim_disk_request (this, buffer, pos, bytes,
 					    request::READ, on_cmpl);
 		if (!req.get())
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 		
 		#ifndef NO_OVERLAPPING
 		disk_queues::get_instance ()->add_readreq(req,get_id());
@@ -276,7 +286,7 @@ __STXXL_BEGIN_NAMESPACE
 					    request::WRITE, on_cmpl);
     
 		if (!req.get())
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 		
 		#ifndef NO_OVERLAPPING
 		disk_queues::get_instance ()->add_writereq(req,get_id());

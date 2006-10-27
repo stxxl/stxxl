@@ -25,6 +25,10 @@ __STXXL_BEGIN_NAMESPACE
 			#endif
 		}
 		// static_cast<syscall_file*>(file_)->set_size(offset+bytes);
+    
+    try
+    {
+    
 		#ifdef STXXL_MMAP_EXPERIMENT1
 		int prot = (type == READ)? PROT_READ: PROT_WRITE;
 
@@ -32,15 +36,16 @@ __STXXL_BEGIN_NAMESPACE
 		//STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
 		if (mem == MAP_FAILED)
 		{
-			STXXL_ERRMSG("Mapping failed.")
-			STXXL_ERRMSG("Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " << 
+      STXXL_FORMAT_ERROR_MSG(msg,"Mapping failed. " <<
+       "Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " << 
 				(offset % sysconf(_SC_PAGESIZE)))
-			abort ();
+        
+      error_occured(msg.str());
 		}
 		else 
 		if (mem == 0)
 		{ 
-			stxxl_function_error
+			stxxl_function_error(io_error)
 		}
 		else
 		{
@@ -64,32 +69,40 @@ __STXXL_BEGIN_NAMESPACE
 		// STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
 		if (mem == MAP_FAILED)
 		{
-			STXXL_ERRMSG("Mapping failed.")
-			STXXL_ERRMSG("Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " << 
-				(offset % sysconf(_SC_PAGESIZE)))
-			abort ();
+			STXXL_FORMAT_ERROR_MSG(msg,"Mapping failed. " <<
+       "Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " << 
+        (offset % sysconf(_SC_PAGESIZE)));
+        
+      error_occured(msg.str());
 		}
 		else 
 		if (mem == 0)
 		{ 
-			stxxl_function_error
+			stxxl_function_error(io_error)
 		}
 		else
 		{
 				if (type == READ)
 				{
-					stxxl_ifcheck (memcpy (buffer, mem, bytes))
+					stxxl_ifcheck (memcpy (buffer, mem, bytes),io_error)
 					else
-					stxxl_ifcheck (munmap ((char *) mem, bytes))
+					stxxl_ifcheck (munmap ((char *) mem, bytes),io_error)
 				}
 				else
 				{
-					stxxl_ifcheck (memcpy (mem, buffer, bytes))
+					stxxl_ifcheck (memcpy (mem, buffer, bytes),io_error)
 					else
-					stxxl_ifcheck (munmap ((char *) mem, bytes))
+					stxxl_ifcheck (munmap ((char *) mem, bytes),io_error)
 				}
 		}
 		#endif
+
+    }
+    catch(const io_error & ex)
+    {
+      error_occured(ex.what());
+    }
+
 
 		if (type == READ)
 		{
@@ -103,6 +116,7 @@ __STXXL_BEGIN_NAMESPACE
 				iostats->write_finished ();
 			#endif
 		}
+    
 		
 		_state.set_to (DONE);
 
@@ -151,7 +165,7 @@ __STXXL_BEGIN_NAMESPACE
 					on_cmpl);
 		
 		if (!req.get())
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 		
 		#ifndef NO_OVERLAPPING
 		disk_queues::get_instance ()->add_readreq(req,get_id());
@@ -174,7 +188,7 @@ __STXXL_BEGIN_NAMESPACE
 				on_cmpl);
 		
 		if (!req.get())
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 		
 		#ifndef NO_OVERLAPPING
 		disk_queues::get_instance ()->add_writereq(req,get_id());

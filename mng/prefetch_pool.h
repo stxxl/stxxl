@@ -98,11 +98,17 @@ public:
       free_blocks.pop_back();
     }
     
-    busy_blocks_iterator i2 = busy_blocks.begin();
-    for(;i2 != busy_blocks.end();++i2)
+    try
     {
-      i2->second.second->wait();
-      delete i2->second.first;
+      busy_blocks_iterator i2 = busy_blocks.begin();
+      for(;i2 != busy_blocks.end();++i2)
+      {
+        i2->second.second->wait();
+        delete i2->second.first;
+      }
+    }
+    catch(...)
+    {
     }
   }
   //! \brief Returns number of owned blocks

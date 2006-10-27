@@ -282,8 +282,8 @@ private:
 		deque(const deque&)// Copying external deques is discouraged
                                					// (and not implemented)
     	{
-      		STXXL_ERRMSG("stxxl::deque copy constructor is not implemented yet");
-      		abort();
+      		STXXL_FORMAT_ERROR_MSG(msg,"deque::deque, stxxl::deque copy constructor is not implemented yet");
+      		throw std::runtime_error(msg.str());
     	}
 		
 		deque& operator=(const deque&); // not implemented, and forbidden

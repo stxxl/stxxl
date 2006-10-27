@@ -40,6 +40,7 @@ __STXXL_BEGIN_NAMESPACE
 			<<" offset: "<<offset<<" bytes: "<<bytes<<((type== READ)?" READ":" WRITE")
 			);
 		
+    try {
 		
 		LARGE_INTEGER desired_pos;
 		desired_pos.QuadPart = offset;
@@ -87,7 +88,7 @@ __STXXL_BEGIN_NAMESPACE
 				if(!WriteFile(static_cast<wincall_file*>(file_)->get_file_des(),buffer,bytes,
 					&NumberOfBytesWritten,NULL))
 				{
-					stxxl_win_lasterror_exit("ReadFile this="<<long(this)<<
+					stxxl_win_lasterror_exit("WriteFile this="<<long(this)<<
 						" offset="<<offset<<
 						" buffer="<<buffer<<" bytes="<<bytes<< " type=" <<
 						((type == READ)?"READ":"WRITE")<<" nref= "<<nref()<<
@@ -102,6 +103,13 @@ __STXXL_BEGIN_NAMESPACE
 			}
 		}
 		
+    
+    }
+    catch(const io_error & ex)
+    {
+      error_occured(ex.what());
+    }
+    
 		if(nref() < 2)
 		{
 			STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref="<<nref()<<") "<<

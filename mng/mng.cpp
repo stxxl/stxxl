@@ -96,8 +96,8 @@ void DiskAllocator::dump()
 
 		if (disks_props.empty ())
 		{
-			STXXL_ERRMSG( "No disks found in '" << config_path << "' ." )
-			abort ();
+			STXXL_FORMAT_ERROR_MSG(msg,"config::config No disks found in '" << config_path << "' .")
+      throw std::runtime_error(msg.str());
 		}
 		else
 		{

@@ -41,7 +41,9 @@ namespace stxxl
 		#ifdef STXXL_BOOST_THREADS
 		// nothing to do
 		#else
-		stxxl_nassert(pthread_create(&thread, NULL, (thread_function_t) worker, static_cast<void *>(this)));
+		stxxl_nassert(pthread_create(&thread, NULL, 
+      (thread_function_t) worker, static_cast<void *>(this)),
+      resource_error);
 		#endif
 	}
 
@@ -79,7 +81,7 @@ namespace stxxl
 		#ifdef STXXL_BOOST_THREADS
 		// Boost.Threads do not support cancellation ?
 		#else
-		stxxl_nassert (pthread_cancel (thread));
+		stxxl_nassert (pthread_cancel (thread),resource_error);
 		#endif
 	}
 
@@ -91,9 +93,9 @@ namespace stxxl
 		#ifdef STXXL_BOOST_THREADS
 		#else
 		stxxl_nassert (pthread_setcancelstate
-			       (PTHREAD_CANCEL_ENABLE, NULL));
+			       (PTHREAD_CANCEL_ENABLE, NULL),resource_error);
 		stxxl_nassert (pthread_setcanceltype
-			       (PTHREAD_CANCEL_DEFERRED, NULL));
+			       (PTHREAD_CANCEL_DEFERRED, NULL),resource_error);
 		// Allow cancellation in semaphore operator-- call 
 		#endif
 		

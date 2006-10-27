@@ -1409,6 +1409,7 @@ priority_queue<Config_>::~priority_queue()
 	  delete &p_pool;
 	  delete &w_pool;
   }
+  
   delete [] etree;
 }
 
@@ -1529,8 +1530,8 @@ void priority_queue<Config_>::refillBuffer1()
                  &(minBuffer2[3]), minBuffer1, sz,cmp);
           break;
   default:
-        STXXL_ERRMSG("Number of buffers on 2nd level in stxxl::priority_queue is currently limited to 4")
-        abort();
+        STXXL_FORMAT_ERROR_MSG(msg,"priority_queue<...>::refillBuffer1(): Overflow! The number of buffers on 2nd level in stxxl::priority_queue is currently limited to 4")
+        throw std::runtime_error(msg.str());
   }
   
   //std::copy(minBuffer1,minBuffer1 + sz,std::ostream_iterator<value_type>(std::cout, "\n"));

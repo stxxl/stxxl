@@ -92,11 +92,17 @@ public:
       free_blocks.pop_back();
     }
     
-    busy_blocks_iterator i2 = busy_blocks.begin();
-    for(;i2 != busy_blocks.end();++i2)
+    try
     {
-      i2->req->wait();
-      delete i2->block;
+      busy_blocks_iterator i2 = busy_blocks.begin();
+      for(;i2 != busy_blocks.end();++i2)
+      {
+        i2->req->wait();
+        delete i2->block;
+      }
+    }
+    catch(...)
+    {
     }
   }
   

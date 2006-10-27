@@ -25,6 +25,25 @@ __STXXL_BEGIN_NAMESPACE
      }
   };
 
+  class resource_error : public std::runtime_error
+  {
+    public:
+     resource_error () throw(): std::runtime_error("") {}
+     resource_error (const std::string & msg_) throw(): 
+      std::runtime_error(msg_)
+     {
+     }
+  };
+  
+  class bad_ext_alloc : public std::runtime_error
+  {
+    public:
+     bad_ext_alloc () throw(): std::runtime_error("") {}
+     bad_ext_alloc (const std::string & msg_) throw(): 
+      std::runtime_error(msg_)
+     {
+     }
+  };
 
 __STXXL_END_NAMESPACE 
 

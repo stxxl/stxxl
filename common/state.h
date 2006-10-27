@@ -36,8 +36,8 @@ namespace stxxl
 		  state (int s = 0):_state (s)
 		{
 			#ifndef STXXL_BOOST_THREADS
-			stxxl_nassert (pthread_mutex_init (&mutex, NULL));
-			stxxl_nassert (pthread_cond_init (&cond, NULL));
+			stxxl_nassert (pthread_mutex_init (&mutex, NULL),resource_error);
+			stxxl_nassert (pthread_cond_init (&cond, NULL),resource_error);
 			#endif
 		};
 		 ~state ()
@@ -47,13 +47,13 @@ namespace stxxl
 
 			if (res == 0 || res == EBUSY)
 				  stxxl_nassert (pthread_mutex_unlock
-						 (&mutex))
+						 (&mutex),resource_error)
 				else
-				  stxxl_function_error
+				  stxxl_function_error(resource_error)
 					stxxl_nassert (pthread_mutex_destroy
-						       (&mutex));
+						       (&mutex),resource_error);
 
-			  stxxl_nassert (pthread_cond_destroy (&cond));
+			  stxxl_nassert (pthread_cond_destroy (&cond),resource_error);
 			 #endif
 		};
 		void set_to (int new_state)
@@ -64,10 +64,10 @@ namespace stxxl
 			Lock.unlock();
 			cond.notify_all();
 			#else
-			stxxl_nassert (pthread_mutex_lock (&mutex));
+			stxxl_nassert (pthread_mutex_lock (&mutex),resource_error);
 			_state = new_state;
-			stxxl_nassert (pthread_mutex_unlock (&mutex));
-			stxxl_nassert (pthread_cond_broadcast (&cond));
+			stxxl_nassert (pthread_mutex_unlock (&mutex),resource_error);
+			stxxl_nassert (pthread_cond_broadcast (&cond),resource_error);
 			#endif
 		};
 		void wait_for (int needed_state)
@@ -77,11 +77,11 @@ namespace stxxl
 			while (needed_state != _state)
 				cond.wait(Lock);
 			#else
-			stxxl_nassert (pthread_mutex_lock (&mutex));
+			stxxl_nassert (pthread_mutex_lock (&mutex),resource_error);
 			while (needed_state != _state)
 				stxxl_nassert (pthread_cond_wait
-					       (&cond, &mutex));
-			stxxl_nassert (pthread_mutex_unlock (&mutex));
+					       (&cond, &mutex),resource_error);
+			stxxl_nassert (pthread_mutex_unlock (&mutex),resource_error);
 			#endif
 		};
 		int operator () ()
@@ -91,9 +91,9 @@ namespace stxxl
 			return  _state;
 			#else
 			int res;
-			stxxl_nassert (pthread_mutex_lock (&mutex));
+			stxxl_nassert (pthread_mutex_lock (&mutex),resource_error);
 			res = _state;
-			stxxl_nassert (pthread_mutex_unlock (&mutex));
+			stxxl_nassert (pthread_mutex_unlock (&mutex),resource_error);
 			return res;
 			#endif
 		};

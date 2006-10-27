@@ -334,7 +334,13 @@ public:
   virtual ~grow_shrink_stack()
   {
     STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
-    if(requests[0].get()) wait_all(requests.begin(),blocks_per_page);  
+    try
+    {
+      if(requests[0].get()) wait_all(requests.begin(),blocks_per_page);
+    }
+    catch(const io_error & ex)
+    {
+    }  
     block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
   }
   size_type size() const
@@ -499,6 +505,9 @@ public:
   
   virtual ~ grow_shrink_stack2()
   {
+    try
+    {
+      
     STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()")
     const int bids_size = bids.size();
     const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr),0);
@@ -520,6 +529,11 @@ public:
        }
     }
     delete cache;
+    
+    }
+    catch (const io_error & ex)
+    {
+    }
     block_manager::get_instance()->delete_blocks(bids.begin(),bids.end());
   }
   size_type size() const { return size_; }

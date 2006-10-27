@@ -123,14 +123,21 @@ __STXXL_BEGIN_NAMESPACE
 			_state.wait_for (READY2DIE);
 			
 			END_COUNT_WAIT_TIME
+      
+      check_errors();
+    
 		}
 		bool ufs_request_base::poll()
 		{
 			#ifdef NO_OVERLAPPING
 			/*if(_state () < DONE)*/ wait();
 			#endif
+      
+      bool s = _state() >= DONE;
+      
+      check_errors();
 			
-			return (_state () >= DONE);
+			return s;
 		};
 		const char *ufs_request_base::io_type ()
 		{
@@ -172,7 +179,7 @@ __STXXL_BEGIN_NAMESPACE
 		#else
 		stxxl_ifcheck_i ((file_des =::open (filename.c_str(), fmode,
 				      S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP)),
-				"Filedescriptor="<<file_des<<" filename="<<filename<< " fmode="<<fmode);
+				"Filedescriptor="<<file_des<<" filename="<<filename<< " fmode="<<fmode,io_error)
 		#endif
 
 
@@ -186,12 +193,12 @@ __STXXL_BEGIN_NAMESPACE
 		if (res >= 0)
 			file_des = -1;
 		else
-			stxxl_function_error;
+			stxxl_function_error(io_error);
 	}
 	stxxl::int64 ufs_file_base::size ()
 	{
 		struct stat st;
-		stxxl_ifcheck (fstat (file_des, &st));
+		stxxl_ifcheck (fstat (file_des, &st),io_error);
 		return st.st_size;
 	}
 	void ufs_file_base::set_size (stxxl::int64 newsize)
@@ -201,12 +208,12 @@ __STXXL_BEGIN_NAMESPACE
 		#ifdef BOOST_MSVC
 		// FIXME: ADD TRUNCATION HERE, CURRENTLY NO SUITABLE FUNCTION FOUND
 		#else
-		if(!(mode_&RDONLY)) stxxl_ifcheck(::ftruncate(file_des,newsize));
+		if(!(mode_&RDONLY)) stxxl_ifcheck(::ftruncate(file_des,newsize),io_error);
 		#endif
 		
 		if (newsize > cur_size)
 		{
-			stxxl_ifcheck (::lseek (file_des, newsize - 1,SEEK_SET));
+			stxxl_ifcheck (::lseek (file_des, newsize - 1,SEEK_SET),io_error);
 		}
 	}
 

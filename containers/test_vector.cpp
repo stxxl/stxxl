@@ -39,8 +39,12 @@ void test_const_iterator(const my_vec_type &x)
 
 int main()
 {
-  typedef stxxl::VECTOR_GENERATOR<int64,2,1>::result vector_type;
-	vector_type v(int64(16*1024*1024)/sizeof(int64));
+  
+try
+{
+  // use non-randomized striping to avoid side effects on random generator
+  typedef stxxl::VECTOR_GENERATOR<int64,2,2,(2*1024*1024),striping>::result vector_type;
+	vector_type v(int64(64*1024*1024)/sizeof(int64));
 	
 	// test assignment const_iterator = iterator
 	vector_type::const_iterator c_it = v.begin();
@@ -88,7 +92,7 @@ int main()
 		
 	stxxl::ran32State = 0xdeadbeef + 10;
 	
-	v.resize(int64(16*1024*1024)/sizeof(int64));
+	v.resize(int64(64*1024*1024)/sizeof(int64));
 	
 	STXXL_MSG("write "<<v.size()<<" elements")
 	stxxl::generate(v.begin(),v.end(),stxxl::random_number32(),4);
@@ -101,6 +105,15 @@ int main()
 	{
 		assert(v[i] == rnd() );
 	}
+}
+catch(const std::exception & ex)
+{
+  STXXL_MSG("Cought exception: "<<ex.what())
+}
+catch(...)
+{
+  STXXL_MSG("Cought unknown exception.")
+}
 	
 	return 0;
 };

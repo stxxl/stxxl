@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <sstream> 
+
 
 #ifdef BOOST_MSVC
 #else
@@ -47,6 +49,7 @@
 #define __STXXL_END_NAMESPACE }
 
 #include "log.h"
+#include "exceptions.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -94,13 +97,13 @@ __STXXL_BEGIN_NAMESPACE
 #define STXXL_VERBOSE3(x) ;
 #endif    
   
-  
+/* DEPRICATED 
 inline void
 stxxl_perror (const char *errmsg, int errcode)
 {
-//	STXXL_ERRMSG(errmsg << " error code " << errcode << " : " << strerror (errcode) );
 	exit (errcode);
 }
+*/
 
 #ifndef STXXL_DEBUG_ON
 #define STXXL_DEBUG_ON
@@ -108,7 +111,14 @@ stxxl_perror (const char *errmsg, int errcode)
 
 #ifdef STXXL_DEBUG_ON
 
+/* DEPRICATED
 #define stxxl_error(errmsg) { perror(errmsg); exit(errno); }
+*/ 
+
+inline std::string perror_string()
+{
+  return std::string(strerror(errno));
+}
 
 #ifdef BOOST_MSVC
 #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
@@ -116,17 +126,59 @@ stxxl_perror (const char *errmsg, int errcode)
 #define STXXL_PRETTY_FUNCTION_NAME __PRETTY_FUNCTION__
 #endif
 
-#define stxxl_function_error stxxl_error(STXXL_PRETTY_FUNCTION_NAME)
+#define stxxl_function_error(exception_type) \
+{ \
+  std::ostringstream str_; \
+  str_ << "Error in function " << \
+    STXXL_PRETTY_FUNCTION_NAME << \
+    " " << perror_string(); \
+  throw exception_type(str_.str()); \
+}
+
+#define stxxl_nassert(expr,exception_type) \
+{ \
+  int ass_res=expr; \
+  if(ass_res) \
+  { \
+    std::ostringstream str_; \
+    str_ << "Error in function: " << \
+      STXXL_PRETTY_FUNCTION_NAME << " " \
+      << __STXXL_STRING(expr) ; \
+    throw exception_type(str_.str()); \
+  } \
+}
+
+//#define stxxl_ifcheck(expr) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" "; stxxl_error(__STXXL_STRING(expr));}
+#define stxxl_ifcheck(expr,exception_type) \
+if((expr)<0) \
+{ \
+  std::ostringstream str_; \
+  str_ << "Error in function " << \
+    STXXL_PRETTY_FUNCTION_NAME << \
+    " " << perror_string(); \
+  throw exception_type(str_.str()); \
+}   
 
 
-#define stxxl_nassert(expr) { int ass_res=expr; if(ass_res) {  std::cerr << "Error in function: " << STXXL_PRETTY_FUNCTION_NAME << " ";  stxxl_perror(__STXXL_STRING(expr),ass_res); }}
-
-#define stxxl_ifcheck(expr) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" "; stxxl_error(__STXXL_STRING(expr));}
 #define stxxl_ifcheck_win(expr) if((expr)==0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" "; stxxl_error(__STXXL_STRING(expr));}
 
-#define stxxl_ifcheck_i(expr,info) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" Info: "<< info<<" "; stxxl_error(__STXXL_STRING(expr)); }
+// #define stxxl_ifcheck_i(expr,info) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" Info: "<< info<<" "; stxxl_error(__STXXL_STRING(expr)); }
+
+#define stxxl_ifcheck_i(expr,info,exception_type) \
+if((expr)<0) \
+{ \
+  std::ostringstream str_; \
+  str_ << "Error in function " << \
+    STXXL_PRETTY_FUNCTION_NAME <<" Info: "<< \
+    info << " " << perror_string(); \
+  throw exception_type(str_.str()); \
+}   
 
 #define stxxl_debug(expr) expr
+
+#define STXXL_FORMAT_ERROR_MSG(str_,errmsg_) \
+ std::ostringstream str_; str_ << "Error in " << errmsg_ ;
+  
 
 #ifdef BOOST_MSVC
 
@@ -214,8 +266,9 @@ stxxl_tmpfilename (std::string dir, std::string prefix)
 	while (!lstat (result.c_str (), &st));
 
 	if (errno != ENOENT)
-		stxxl_function_error
-			return result;
+		stxxl_function_error(io_error)
+    
+	return result;
 #endif
 }
 

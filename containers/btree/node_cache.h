@@ -133,9 +133,9 @@ namespace btree
 				STXXL_VERBOSE1("btree::node_cache constructor nodes="<<nnodes)
 				if(nnodes < 3)
 				{
-					STXXL_ERRMSG("btree: Too few memory for a node cache (<3)")
-					STXXL_ERRMSG("aborting.")
-					abort();
+					STXXL_FORMAT_ERROR_MSG(msg,"btree::node_cache::node_cache  Too few memory for a node cache (<3)")
+					
+					throw std::runtime_error(msg.str());
 				}
 				nodes_.reserve(nnodes);
 				reqs_.resize(nnodes);
@@ -454,6 +454,9 @@ namespace btree
 			void delete_node(const bid_type & bid)
 			{
 				typename BID2node_type::const_iterator it = BID2node_.find(bid);
+        try
+        {
+          
 				if(it != BID2node_.end())
 				{
 					// the node is in the cach
@@ -466,6 +469,12 @@ namespace btree
 					fixed_[nodeindex] = false;
 				}
 				++n_deleted;
+        
+        }catch(const io_error & ex)
+        {
+          bm->delete_block(bid);
+          throw io_error(ex.what());
+        }
 				bm->delete_block(bid);
 			}
 			

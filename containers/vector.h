@@ -656,8 +656,8 @@ public:
     vector(const vector & obj) // Copying external vectors is discouraged
                                // (and not implemented)
     {
-      STXXL_ERRMSG("stxxl::vector copy constructor is not implemented yet");
-      abort();
+      STXXL_FORMAT_ERROR_MSG(msg,"vector::vector, stxxl::vector copy constructor is not implemented yet");
+      throw std::runtime_error(msg.str());
     }
 	
 	vector & operator = (const vector & obj); // Copying external vectors is discouraged
@@ -728,15 +728,25 @@ public:
 		}
 		~vector()
 		{
-			flush();
-			bm->delete_blocks(_bids.begin(),_bids.end());
-			if(_from) // file must be truncated
-			{
-				STXXL_VERBOSE1("~vector(): Changing size of file "<<((void *)_from)<<" to "
-					<<file_length());
-				STXXL_VERBOSE1("~vector(): size of the vector is "<<size())
-				_from->set_size(file_length());
-			}
+      try
+      {  
+  			flush();
+      }
+      catch(...)
+      {
+        STXXL_VERBOSE("An exception in the ~vector()")
+      }
+      
+  		bm->delete_blocks(_bids.begin(),_bids.end());
+      
+  		if(_from) // file must be truncated
+  		{
+  			STXXL_VERBOSE1("~vector(): Changing size of file "<<((void *)_from)<<" to "
+  					<<file_length());
+  			STXXL_VERBOSE1("~vector(): size of the vector is "<<size())
+  				_from->set_size(file_length());
+  		}
+      
 		}
 private:
 		bids_container_iterator bid (const size_type & offset)
