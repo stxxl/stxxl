@@ -1,11 +1,12 @@
 #include "boostfd_file.h"
 #include "../common/debug.h"
 
-#include "boost/filesystem/operations.hpp"
-#include "boost/filesystem/fstream.hpp"
-
 
 #ifdef STXXL_BOOST_CONFIG
+
+
+#include "boost/filesystem/operations.hpp"
+#include "boost/filesystem/fstream.hpp"
 
 __STXXL_BEGIN_NAMESPACE
 

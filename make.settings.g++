@@ -1,7 +1,7 @@
 # Change this file according to your paths
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /home/dementiev/workspace/Stxxl#
+STXXL_ROOT = /home/dementiev/projects/stxxl#
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
@@ -87,9 +87,9 @@ endif
 
 STXXL_SPECIFIC = \
  -DSORT_OPT_PREFETCHING \
- -DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I$(STXXL_ROOT)/ \
+ -DUSE_MALLOC_LOCK -I$(STXXL_ROOT)/ \
  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
- $(POSIX_MEMALIGN) $(XOPEN_SOURCE)
+ $(POSIX_MEMALIGN) $(XOPEN_SOURCE) -DCOUNT_WAIT_TIME 
 
 # switch the direct I/O off
 # STXXL_SPECIFIC += -DSTXXL_DIRECT_IO_OFF

@@ -22,7 +22,7 @@ int n_opt_prefetch_buffers;
 
 
 #ifndef RECORD_SIZE
-#define RECORD_SIZE 128
+#define RECORD_SIZE 4 
 #endif
 
 struct my_type

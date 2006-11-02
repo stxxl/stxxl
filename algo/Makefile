@@ -21,7 +21,7 @@ test_ksort: test_ksort.cpp $(DEPENDENCIES) # takes long to compile
 	$(LINKER)  test_ksort.$(OBJEXT) $(OUT)test_ksort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_sort: test_sort.cpp # takes long to compile
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_sort.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_sort.cpp 
 	$(LINKER)  test_sort.$(OBJEXT) $(OUT)test_sort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 	
 asch: test_asch.cpp $(DEPENDENCIES)
