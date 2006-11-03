@@ -12,10 +12,10 @@ USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
 BOOST_INCLUDE = /usr/include/boost-1_33/#
 
 MAKE = make # or gmake
-COMPILER = g++-4.2.0
-LINKER = g++-4.2.0
-OPT = -O3 -fopenmp -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ROOT)/originals/_usr_local_include_c++_4.2.0 -D__MCSTL__# compiler optimization level and MCSTL library
-LINKER_OPT = -fopenmp
+COMPILER = icpc
+LINKER = icpc
+OPT = -O3 -openmp -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ROOT)/originals/_usr_include_c++_4.0.2 -D__MCSTL__# compiler optimization level and MCSTL library
+LINKER_OPT = -openmp
 LIBNAME = mcstxxl
 
 DEBUG = # put here -g option to include the debug inormation into the binaries

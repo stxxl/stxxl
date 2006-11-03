@@ -2,21 +2,18 @@
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = /home/singler/code/stxxl/trunk#
-MCSTL_BRANCH = branches/standalone# please enter mcstl branch, leave empty for default branch
-MCSTL_ROOT = /home/singler/code/mcstl/$(MCSTL_BRANCH)# please enter path to MCSTL directory 
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
 
 # change this path, do not leave spaces at the end of the line
-BOOST_INCLUDE = /usr/include/boost-1_33/#
+BOOST_INCLUDE = /usr/include/boost-1_33_1/#
 
 MAKE = make # or gmake
-COMPILER = g++-4.2.0
-LINKER = g++-4.2.0
-OPT = -O3 -fopenmp -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ROOT)/originals/_usr_local_include_c++_4.2.0 -D__MCSTL__# compiler optimization level and MCSTL library
-LINKER_OPT = -fopenmp
-LIBNAME = mcstxxl
+COMPILER = icpc
+LINKER = icpc
+OPT = -O3 # compiler optimization level
+LIBNAME = stxxl
 
 DEBUG = # put here -g option to include the debug inormation into the binaries
 
@@ -25,8 +22,8 @@ DEBUG = # put here -g option to include the debug inormation into the binaries
 
 
 BOOST_LINKER_OPTIONS = -lboost_thread-gcc-mt \
- -lboost_date_time-gcc-mt -lboost_iostreams-gcc-mt \
- -lboost_filesystem-gcc-mt
+-lboost_date_time-gcc-mt -lboost_iostreams-gcc-mt \
+-lboost_filesystem-gcc-mt
 
 
 BOOST_COMPILER_OPTIONS =  \
@@ -108,7 +105,7 @@ STXXL_SPECIFIC = \
 
 STXXL_COMPILER_OPTIONS = $(STXXL_SPECIFIC) $(WARNINGS) \
  $(DEBUG) $(OPT)
-STXXL_LINKER_OPTIONS = -L$(STXXL_ROOT)/lib/ -l$(LIBNAME) -lpthread $(LINKER_OPT)
+STXXL_LINKER_OPTIONS = -L$(STXXL_ROOT)/lib/ -l$(LIBNAME) -lpthread
 
 ifeq ($(strip $(USE_BOOST)),yes)
 STXXL_COMPILER_OPTIONS += $(BOOST_COMPILER_OPTIONS)

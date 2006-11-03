@@ -124,7 +124,7 @@ __STXXL_BEGIN_NAMESPACE
 		typedef const T & const_reference;
 		typedef type * pointer;
 		typedef pointer iterator;
-		typedef const pointer const_iterator;
+		typedef const type * const_iterator;
 		
         enum 
         { 
