@@ -106,7 +106,7 @@ __STXXL_BEGIN_NAMESPACE
 		typedef unsigned char byte_type;
 		byte_type filler_array_[bytes];
 	public:
-		filler_struct__ () {STXXL_MSG("filler_struct__ is allocated")}
+		filler_struct__ () {STXXL_VERBOSE2("filler_struct__ is allocated")}
 	};
 	
 	template <>
@@ -114,7 +114,7 @@ __STXXL_BEGIN_NAMESPACE
 	{
 		typedef unsigned char byte_type;
 	public:
-		filler_struct__ () {STXXL_MSG("filler_struct__ is allocated")}
+		filler_struct__ () {STXXL_VERBOSE2("filler_struct__ is allocated")}
 	};
 
     //! \brief Contains data elements for \c stxxl::typed_block , not intended for direct use
@@ -138,7 +138,7 @@ __STXXL_BEGIN_NAMESPACE
 		//! Array of elements of type T
 		T elem[size];
 		
-		element_block () {STXXL_MSG("element_block is allocated")}
+		element_block () {STXXL_VERBOSE2("element_block is allocated")}
 	
 		//! An operator to access elements in the block
 		reference operator [](int i)
@@ -189,7 +189,7 @@ __STXXL_BEGIN_NAMESPACE
 			return ref[i];
 		 }
 	
-		 block_w_bids () {STXXL_MSG("block_w_bids is allocated")}
+		 block_w_bids () {STXXL_VERBOSE2("block_w_bids is allocated")}
     };
 
     template <class T,unsigned Size_,unsigned RawSize_>
@@ -203,7 +203,7 @@ __STXXL_BEGIN_NAMESPACE
         };
          typedef BID<raw_size> bid_type;
 	
-		block_w_bids () {STXXL_MSG("block_w_bids is allocated")}
+		block_w_bids () {STXXL_VERBOSE2("block_w_bids is allocated")}
     };    
   
     //! \brief Contains per block information for \c stxxl::typed_block , not intended for direct use
@@ -220,7 +220,7 @@ __STXXL_BEGIN_NAMESPACE
         
         enum { size = ((RawSize_ - sizeof(BID<RawSize_>)*NBids_ - sizeof(InfoType_) )/sizeof(T_)) };
 	public:
-		block_w_info () {STXXL_MSG("block_w_info is allocated")}
+		block_w_info () {STXXL_VERBOSE2("block_w_info is allocated")}
     };
     
     template <class T_,unsigned RawSize_,unsigned NBids_>
@@ -231,7 +231,7 @@ __STXXL_BEGIN_NAMESPACE
         typedef void   info_type;
         enum {size  = ((RawSize_ - sizeof(BID<RawSize_>)*NBids_)/sizeof(T_)) };
 	public:
-		block_w_info () {STXXL_MSG("block_w_info is allocated")}
+		block_w_info () {STXXL_VERBOSE2("block_w_info is allocated")}
     };
     
     //! \brief Block containing elements of fixed length
@@ -268,7 +268,7 @@ __STXXL_BEGIN_NAMESPACE
 		
 		typed_block()
 		{
-			STXXL_MSG("typed_block is allocated")
+			STXXL_VERBOSE2("typed_block is allocated")
 		}
 
 		enum
