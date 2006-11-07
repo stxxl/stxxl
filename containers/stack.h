@@ -206,9 +206,13 @@ public:
      
       simple_vector<request_ptr> requests(blocks_per_page);
       
-      typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - 1;
-      for(int i=blocks_per_page-1 ;i>=0;i--,cur_bid--)
-        requests[i] = (front_page+i)->read(*cur_bid);
+	  {
+		typename std::vector<bid_type>::const_iterator cur_bid = bids.end();
+		for(int i=blocks_per_page-1 ;i>=0;--i)
+		{
+			requests[i] = (front_page+i)->read(*(--cur_bid));
+		}
+	  }
         
       std::swap(front_page,back_page);
             
@@ -417,9 +421,9 @@ public:
       if(bids.size() > blocks_per_page)
       {
         STXXL_VERBOSE2("prefetching, size: "<<size_)
-        typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page - 1;
-        for(int i=blocks_per_page-1 ;i>=0;--i,--cur_bid)
-          requests[i] = (overlap_buffers+i)->read(*cur_bid);
+        typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page;
+        for(int i=blocks_per_page-1 ;i>=0;--i)
+          requests[i] = (overlap_buffers+i)->read(*(--cur_bid));
         
       }
             

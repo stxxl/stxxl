@@ -134,6 +134,11 @@ public:
 		return Offset != a.Offset;
 	}
 	
+	bool operator < (const _Self &a) const
+	{
+		assert(Deque == a.Deque);
+		return (a - (*this))>0;
+	}
 };
 
 template <class DequeType>
@@ -241,6 +246,12 @@ public:
 	{
 		assert(Deque == a.Deque);
 		return Offset != a.Offset;
+	}
+
+	bool operator < (const _Self &a) const
+	{
+		assert(Deque == a.Deque);
+		return (a - (*this))>0;
 	}
 		
 };

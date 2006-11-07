@@ -225,6 +225,7 @@ namespace btree
 						
 					//reqs_[node2kick] = request_ptr(); // reset request
 						
+					assert(BID2node_.find(Node.my_bid()) != BID2node_.end());
 					BID2node_.erase(Node.my_bid());
 					bm->new_blocks<block_type>(1,alloc_strategy_,&new_bid);
 					
