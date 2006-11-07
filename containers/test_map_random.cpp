@@ -63,14 +63,6 @@ int main( int argc, char* argv[] )
 	return 1;
 #endif
 
-	{// buggy VC STL test
-		stdext::hash_map<DWORD_PTR, int> map;
-		map[100] = 1; map[200] = 2; map[300] = 3;
-		stdext::hash_map<DWORD_PTR, int>::iterator itr =
-		map.find(100);
-		map.erase(itr); // assertion here
-	}
-
 	typedef std::vector<std::pair<key_type,data_type> > vector_type;
 	
 	STXXL_MSG("Node block size: "<<NODE_BLOCK_SIZE<<" bytes")
