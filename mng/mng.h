@@ -105,12 +105,16 @@ __STXXL_BEGIN_NAMESPACE
 	{
 		typedef unsigned char byte_type;
 		byte_type filler_array_[bytes];
+	public:
+		filler_struct__ () {STXXL_MSG("filler_struct__ is allocated")}
 	};
 	
 	template <>
 	class filler_struct__<0>
 	{
 		typedef unsigned char byte_type;
+	public:
+		filler_struct__ () {STXXL_MSG("filler_struct__ is allocated")}
 	};
 
     //! \brief Contains data elements for \c stxxl::typed_block , not intended for direct use
@@ -134,7 +138,7 @@ __STXXL_BEGIN_NAMESPACE
 		//! Array of elements of type T
 		T elem[size];
 		
-		element_block() {}
+		element_block () {STXXL_MSG("element_block is allocated")}
 	
 		//! An operator to access elements in the block
 		reference operator [](int i)
@@ -184,6 +188,8 @@ __STXXL_BEGIN_NAMESPACE
 		 {
 			return ref[i];
 		 }
+	
+		 block_w_bids () {STXXL_MSG("block_w_bids is allocated")}
     };
 
     template <class T,unsigned Size_,unsigned RawSize_>
@@ -196,6 +202,8 @@ __STXXL_BEGIN_NAMESPACE
             nbids = 0
         };
          typedef BID<raw_size> bid_type;
+	
+		block_w_bids () {STXXL_MSG("block_w_bids is allocated")}
     };    
   
     //! \brief Contains per block information for \c stxxl::typed_block , not intended for direct use
@@ -211,6 +219,8 @@ __STXXL_BEGIN_NAMESPACE
         info_type info;
         
         enum { size = ((RawSize_ - sizeof(BID<RawSize_>)*NBids_ - sizeof(InfoType_) )/sizeof(T_)) };
+	public:
+		block_w_info () {STXXL_MSG("block_w_info is allocated")}
     };
     
     template <class T_,unsigned RawSize_,unsigned NBids_>
@@ -220,6 +230,8 @@ __STXXL_BEGIN_NAMESPACE
         public:
         typedef void   info_type;
         enum {size  = ((RawSize_ - sizeof(BID<RawSize_>)*NBids_)/sizeof(T_)) };
+	public:
+		block_w_info () {STXXL_MSG("block_w_info is allocated")}
     };
     
     //! \brief Block containing elements of fixed length
@@ -254,7 +266,10 @@ __STXXL_BEGIN_NAMESPACE
 		
 		typedef BID<RawSize_> bid_type;
 		
-		typed_block() { }
+		typed_block()
+		{
+			STXXL_MSG("typed_block is allocated")
+		}
 
 		enum
 		{ 

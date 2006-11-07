@@ -223,6 +223,7 @@ protected:
         ++cnt;
         --busy_blocks_size;
         ++free_blocks_size;
+		if(busy_blocks.empty()) break;
       }
     }
     STXXL_VERBOSE1("write_pool::check_all_busy : "<<cnt<<
