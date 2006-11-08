@@ -52,7 +52,7 @@ class lru_pager
 {
 	typedef std::list<int> list_type;
 	
-	list_type history;
+	std::auto_ptr<list_type> history;
 	simple_vector<list_type::iterator> history_entry;
 	
 private:
@@ -61,21 +61,21 @@ private:
 public:
 	enum { n_pages = npages_ };
 	
-	lru_pager(): history_entry(npages_)
+	lru_pager(): history(new list_type),history_entry(npages_)
 	{
 		for(unsigned i=0;i<npages_;i++)
-			history_entry[i] = history.insert(history.end(),static_cast<int>(i));
+			history_entry[i] = history->insert(history->end(),static_cast<int>(i));
 	}
 	~lru_pager() {}
 	int kick()
 	{
-		return history.back();
+		return history->back();
 	}
 	void hit(int ipage)
 	{
 		assert(ipage < int(npages_));
 		assert(ipage >= 0);
-		history.splice(history.begin(),history,history_entry[ipage]);
+		history->splice(history->begin(),*history,history_entry[ipage]);
 	}
 	void swap(lru_pager & obj)
 	{

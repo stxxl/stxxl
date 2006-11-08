@@ -21,33 +21,38 @@ namespace btree
         unsigned npages_;
         typedef std::list<int> list_type;
 
-        list_type history;
-        std::vector<list_type::iterator> history_entry;
+		std::auto_ptr<list_type> history;
+		std::vector<list_type::iterator> history_entry;
 
 	
         lru_pager(const lru_pager & obj);
         lru_pager & operator = (const lru_pager & obj);
 	public:
 			
-        lru_pager(): npages_(0)
+        lru_pager(): npages_(0),history(NULL)
 		{
 		}
 
-        lru_pager(unsigned npages): npages_(npages),history_entry(npages_)
+        lru_pager(unsigned npages): 
+			npages_(npages),
+			history(new list_type),
+			history_entry(npages_)
         {
                 for(unsigned i=0;i<npages_;i++)
-                        history_entry[i] = history.insert(history.end(),static_cast<int>(i));
+				{
+                        history_entry[i] = history->insert(history->end(),static_cast<int>(i));
+				}
         }
         ~lru_pager() {}
         int kick()
         {
-                return history.back();
+                return history->back();
         }
         void hit(int ipage)
         {
                 assert(ipage < int(npages_));
                 assert(ipage >= 0);
-                history.splice(history.begin(),history,history_entry[ipage]);
+                history->splice(history->begin(),*history,history_entry[ipage]);
         }
         void swap(lru_pager & obj)
         {
