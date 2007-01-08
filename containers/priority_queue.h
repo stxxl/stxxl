@@ -1832,7 +1832,7 @@ namespace priority_queue_local
 //! \c PRIORITY_QUEUE_GENERATOR<some_parameters>::result::block_type .
 //! For an example see p_queue.cpp .
 //! Configured priority queue type is available as \c PRIORITY_QUEUE_GENERATOR<>::result. <BR> <BR>
-template <class Tp_,class Cmp_,unsigned IntM_,unsigned MaxS_,unsigned Tune_=6>
+template <class Tp_,class Cmp_,unsigned_type IntM_,unsigned MaxS_,unsigned Tune_=6>
 class PRIORITY_QUEUE_GENERATOR
 {
   public:
