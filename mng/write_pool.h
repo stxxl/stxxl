@@ -58,7 +58,7 @@ protected:
   
   //hash_map_type block_track;
   
-  unsigned free_blocks_size,busy_blocks_size;
+  unsigned_type free_blocks_size,busy_blocks_size;
 
 private:
 	write_pool(const write_pool &); // forbidden
@@ -66,9 +66,9 @@ private:
 public:
   //! \brief Constructs pool
   //! \param init_size initial number of blocks in the pool
-  explicit write_pool(unsigned init_size=1):free_blocks_size(init_size),busy_blocks_size(0)
+  explicit write_pool(unsigned_type init_size=1):free_blocks_size(init_size),busy_blocks_size(0)
   {
-    unsigned i = 0;
+    unsigned_type i = 0;
     for(;i<init_size;++i)
       free_blocks.push_back(new block_type);
   }
@@ -107,7 +107,7 @@ public:
   }
   
   //! \brief Returns number of owned blocks
-  unsigned size() const { return free_blocks_size + busy_blocks_size; }
+  unsigned_type size() const { return free_blocks_size + busy_blocks_size; }
   
   //! \brief Passes a block to the pool for writing
   //! \param block block to write. Ownership of the block goes to the pool. 
@@ -155,9 +155,9 @@ public:
   
   //! \brief Resizes size of the pool
   //! \param new_size new size of the pool after the call
-  void resize(unsigned new_size)
+  void resize(unsigned_type new_size)
   {
-    int diff = int(new_size) - int(size());
+    int_type diff = int_type(new_size) - int_type(size());
     if(diff > 0 )
     {
       free_blocks_size += diff;
@@ -209,9 +209,9 @@ protected:
   void check_all_busy()
   {
     busy_blocks_iterator cur = busy_blocks.begin();
-    int cnt = 0;
+    int_type cnt = 0;
 	#if STXXL_VERBOSE_LEVEL > 0
-	int busy_blocks_size_old = busy_blocks_size;
+	int_type busy_blocks_size_old = busy_blocks_size;
 	#endif 
     for(;cur!=busy_blocks.end();++cur)
     {

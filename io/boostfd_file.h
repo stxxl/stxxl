@@ -77,7 +77,7 @@ __STXXL_BEGIN_NAMESPACE
 
     bool add_waiter (onoff_switch * sw);
     void delete_waiter (onoff_switch * sw);
-    int nwaiters (); // returns number of waiters
+    int nwaiters (); // returns the number of waiters
     void check_aligning ();
     void serve ();
     

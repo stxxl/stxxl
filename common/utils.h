@@ -394,6 +394,32 @@ typedef unsigned long long uint64;
 #endif
 
 
+// integer types declarations
+enum { my_pointer_size = sizeof(void *) };
+
+template <int PtrSize>
+struct choose_int_types
+{
+};
+
+template <>
+struct choose_int_types<4>
+{
+        typedef int int_type;
+        typedef unsigned unsigned_type;
+};
+
+template <>
+struct choose_int_types<8>
+{
+        typedef long long int int_type;
+        typedef long long unsigned unsigned_type;
+};
+
+typedef choose_int_types<my_pointer_size>::int_type int_type;
+typedef choose_int_types<my_pointer_size>::unsigned_type unsigned_type;
+
+
         inline uint64 longhash1(uint64 key_)
         {
              key_ += ~(key_ << 32);

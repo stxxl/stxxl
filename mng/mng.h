@@ -372,7 +372,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     class BIDArray
 	{
 	protected:
-		unsigned _size;
+		unsigned_type _size;
 		BID < BLK_SIZE > *array;
 	public:
 		typedef BID<BLK_SIZE> & reference;
@@ -390,19 +390,19 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			return array + _size;
 		};
 		
-	  BIDArray (unsigned size):_size (size)
+	  BIDArray (unsigned_type size):_size (size)
 		{
 			array = new BID < BLK_SIZE >[size];
 		};
-		unsigned size ()
+		unsigned_type size ()
 		{
 			return _size;
 		};
-		reference operator [](int i)
+		reference operator [](int_type i)
 		{
 			return array[i];
 		};
-		void resize (unsigned newsize)
+		void resize (unsigned_type newsize)
 		{
 			if (array)
 			{
@@ -995,17 +995,17 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
   struct offset_allocator
   {
     BaseAllocator_ base;
-    int offset;
+    int_type offset;
     //! \brief Creates functor based on \c BaseAllocator_ functor created 
-    //! with default cunstructor with offset \c offset_
+    //! with default constructor with offset \c offset_
     //! \param offset_ offset
-    offset_allocator(int offset_) : base(),offset(offset_) {}
+    offset_allocator(int_type offset_) : base(),offset(offset_) {}
     //! \brief Creates functor based on instance of \c BaseAllocator_ functor 
     //! with offset \c ofset_
     //! \param offset_ offset
     //! \param base_ used to create a copy
-    offset_allocator(int offset_,BaseAllocator_ & base_) : base(base_),offset(offset_) {}
-    int operator() (int i)
+    offset_allocator(int_type offset_,BaseAllocator_ & base_) : base(base_),offset(offset_) {}
+    int operator() (int_type i)
     {
       return base(offset + i);
     }
@@ -1078,7 +1078,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	protected:
 		template < class BIDType, class DiskAssgnFunctor, class BIDIteratorClass >
 		void new_blocks_int (
-					 const unsigned nblocks,
+					 const unsigned_type nblocks,
 					 DiskAssgnFunctor functor,
 					 BIDIteratorClass out);
 	public:
@@ -1110,7 +1110,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		//! The \c BlockType template parameter defines the type of block to allocate
 		template < class BlockType, class DiskAssgnFunctor, class BIDIteratorClass >
 		void new_blocks (
-					 const unsigned nblocks,
+					 const unsigned_type nblocks,
 					 DiskAssgnFunctor functor,
 					 BIDIteratorClass out);
 		
@@ -1136,7 +1136,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	
 	template < class BIDType, class DiskAssgnFunctor, class OutputIterator >
 		void block_manager::new_blocks_int (
-					 const unsigned nblocks,
+					 const unsigned_type nblocks,
 					 DiskAssgnFunctor functor,
 					 OutputIterator out)
 	{
@@ -1144,13 +1144,13 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 		typedef  BIDArray<bid_type::t_size> bid_array_type;
 
 		// bid_type tmpbid;
-		int * bl = new int[ndisks];
+		int_type * bl = new int_type[ndisks];
 		bid_array_type * disk_bids = new bid_array_type[ndisks];
 		file ** disk_ptrs = new file * [nblocks];
 	
-		memset(bl, 0, ndisks * sizeof (int));
+		memset(bl, 0, ndisks * sizeof (int_type));
 
-		unsigned i = 0;
+		unsigned_type i = 0;
 		//OutputIterator  it = out;
 		for (; i < nblocks; ++i /* , ++it*/)
 		{
@@ -1176,7 +1176,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 			}
 		}
 
-		memset (bl, 0, ndisks * sizeof (int));
+		memset (bl, 0, ndisks * sizeof (int_type));
     
 		OutputIterator  it = out;
 		for (i=0/*,it = out */; i != nblocks; ++it, ++i)
@@ -1194,7 +1194,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	
 	template < class BlockType, class DiskAssgnFunctor, class OutputIterator >
 		void block_manager::new_blocks (
-					 const unsigned nblocks,
+					 const unsigned_type nblocks,
 					 DiskAssgnFunctor functor,
 					 OutputIterator out)
 	{
@@ -1210,7 +1210,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	{
 		typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
    
-		unsigned nblocks = 0;
+		unsigned_type nblocks = 0;
     
     	BIDIteratorClass bidbegin_copy(bidbegin);
     	while(bidbegin_copy != bidend)
