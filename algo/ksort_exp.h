@@ -94,14 +94,14 @@ struct write_completion_handler: public generic_completion_handler
 
 
 template <typename type,typename type_key, typename key_extractor>
-void classify_block(type * begin,type * end,type_key * & out,int * bucket,
-	unsigned offset, unsigned shift,key_extractor keyobj)
+void classify_block(type * begin,type * end,type_key * & out,int_type * bucket,
+	unsigned_type offset, unsigned shift,key_extractor keyobj)
 {
 	for (type * p = begin;p<end; p++,out++)	// count & create references
 	{
 		out->ptr = p;
 		typename key_extractor::key_type key = keyobj(*p);
-		int ibucket = (key - offset) >> shift;
+		int_type ibucket = (key - offset) >> shift;
 		out->key = key;
 		bucket[ibucket]++;
 	}
@@ -120,8 +120,8 @@ inline void write_out(
 					type_key * end,
 					block_type *& cur_blk,
 					const block_type * end_blk,
-					int & out_block,
-					int & out_pos,
+					int_type & out_block,
+					int_type & out_pos,
 					run_type & run,
 					write_completion_handler<block_type,bid_type> *& next_read,
 					request ** write_reqs,
@@ -177,10 +177,10 @@ void
 create_runs(
 		input_bid_iterator it,
 		run_type ** runs,
-		int nruns,
-		int _m )
+		int_type nruns,
+		int_type _m )
 {
-	const int m2 = _m / 2;
+	const int_type m2 = _m / 2;
 	block_manager *bm = block_manager::get_instance ();
 	block_type *Blocks1 = new block_type[m2];
 	block_type *Blocks2 = new block_type[m2];
@@ -191,21 +191,21 @@ create_runs(
 	write_completion_handler<block_type,bid_type> * next_run_reads = 
 		new write_completion_handler<block_type,bid_type>[m2];
 	
-	const int offset = 0;
+	const int_type offset = 0;
 	const int log_k1 = 10;
 	const int log_k2 = int(log2 (m2 * Blocks1->size)) - log_k1 - 1;
 	const int k1 = 1 << log_k1;
 	const int k2 = 1 << log_k2;
-	int *bucket1 = new int[k1];
-	int *bucket2 = new int[k2];
-	int i;
+	int_type *bucket1 = new int_type[k1];
+	int_type *bucket2 = new int_type[k2];
+	int_type i;
 	
 	run_type *run;
 
 	disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
 
 	run = *runs;
-	int run_size = (*runs)->size ();
+	int_type run_size = (*runs)->size ();
 	
 	for (i = 0; i < run_size; i++)
 	{
@@ -214,7 +214,7 @@ create_runs(
 		bm->delete_block(bid);
 	}
 	
-	int k = 0;
+	int_type k = 0;
 	int shift1 = sizeof(typename type::key_type)*8 - log_k1;
 	int shift2 = shift1 - log_k2;
 
@@ -250,9 +250,9 @@ create_runs(
 		classify(refs1, refs1 + run_size * Blocks1->size, refs2, bucket1,
 			  offset, shift1);
 		
-		int out_block = 0;
-		int out_pos = 0;
-		int next_run_size = (k < nruns - 1)?(runs[k + 1]->size ()):0;
+		int_type out_block = 0;
+		int_type out_pos = 0;
+		int_type next_run_size = (k < nruns - 1)?(runs[k + 1]->size ()):0;
 		
 		// recurse on each bucket
 		type_key *c = refs2;
@@ -299,7 +299,7 @@ create_runs(
 template <typename block_type>
 struct run_cursor
 {
-	unsigned int pos;
+	unsigned pos;
 	block_type *buffer;
 
 	inline const typename block_type::type & current () const
@@ -419,11 +419,11 @@ template <typename run_type,
 					typename block_type,
 					unsigned block_size>
 void
-merge_2runs (run_type ** in_runs, prefetcher_writer_type & prefetcher, unsigned nblocks)
+merge_2runs (run_type ** in_runs, prefetcher_writer_type & prefetcher, unsigned_type nblocks)
 {
-	unsigned pos1 = 0, pos2 = 0, out_buf_pos = 0, i_out_buf =
+	unsigned_type pos1 = 0, pos2 = 0, out_buf_pos = 0, i_out_buf =
 		prefetcher.get_free_write_block();
-	unsigned blocks_written = 0;
+	unsigned_type blocks_written = 0;
 	block_type *buf1 = prefetcher.r_block (0), *buf2 =
 		prefetcher.r_block (1), *out_buf =
 		prefetcher.w_block (i_out_buf);
@@ -558,16 +558,16 @@ template <typename type,
 					typename run_cursor2_type,
 					typename trigger_entry_type>
 void
-merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
+merge_runs_lt (run_type ** in_runs, int_type nruns, run_type * out_run,unsigned_type  _m)
 {
 	typedef prefetcher_writer<run_type,block_type,run_cursor_type,
 		run_cursor2_type,trigger_entry_type> prefetcher_writer_type;
 
-	int i;
+	int_type i;
 	run_type consume_seq(out_run->size());
 
 	#ifdef SORT_OPT_PREFETCHING
-	int * prefetch_seq = new int[out_run->size()];
+	int_type * prefetch_seq = new int_type[out_run->size()];
 	#endif
 
 	typename run_type::iterator copy_start = consume_seq.begin ();
@@ -589,7 +589,7 @@ merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
 	//const int n_write_buffers = 3 * disks_number;
 	//const int n_prefetch_buffers = std::max( 2 * disks_number , int(_m) - nruns - n_write_buffers );
 	
-	const int n_write_buffers = std::max( 2 * disks_number , int(_m) - nruns - n_prefetch_buffers );
+	const int_type n_write_buffers = std::max( 2 * disks_number , int_type(_m) - nruns - n_prefetch_buffers );
 	
 	#ifdef SORT_OPT_PREFETCHING
 	compute_prefetch_schedule(
@@ -618,7 +618,7 @@ merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
 				    n_write_buffers/2 );
 	#endif
 
-	int out_run_size = out_run->size ();
+	int_type out_run_size = out_run->size ();
 
 	
 	switch (nruns)
@@ -635,7 +635,7 @@ merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
 							block_size> 
 														losers (&prefetcher, nruns);
 
-	int i_out_buffer = prefetcher.get_free_write_block ();
+	int_type i_out_buffer = prefetcher.get_free_write_block ();
 	//  STXXL_MSG("Block "<<i_out_buffer<<" taken")
 	type *out_buffer = prefetcher.w_block (i_out_buffer)->elem;
 
@@ -655,8 +655,8 @@ merge_runs_lt (run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m)
 	block_manager *bm = block_manager::get_instance ();
 	for (i = 0; i < nruns; i++)
 	{
-		unsigned sz = in_runs[i]->size ();
-		for (unsigned j = 0; j < sz; j++)
+		unsigned_type sz = in_runs[i]->size ();
+		for (unsigned_type j = 0; j < sz; j++)
 			bm->delete_block ((*in_runs[i])[j].bid);
 	}
 }
@@ -668,16 +668,16 @@ template <typename type,
 					typename alloc_strategy,
 					typename input_bid_iterator>
 simple_vector< trigger_entry<bid_type,typename type::key_type> > * 
-	ksort_blocks(input_bid_iterator input_bids,unsigned _n,unsigned _m)
+	ksort_blocks(input_bid_iterator input_bids,unsigned_type _n,unsigned_type _m)
 {
 	typedef trigger_entry<bid_type,typename type::key_type> trigger_entry_type;
 	typedef simple_vector< trigger_entry_type > run_type;
 	typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
-	unsigned int m2 = _m / 2;
-	unsigned int full_runs = _n / m2;
-	unsigned int partial_runs = ((_n % m2) ? 1 : 0);
-	unsigned int nruns = full_runs + partial_runs;
-	unsigned int i;
+	unsigned_type m2 = _m / 2;
+	unsigned_type full_runs = _n / m2;
+	unsigned_type partial_runs = ((_n % m2) ? 1 : 0);
+	unsigned_type nruns = full_runs + partial_runs;
+	unsigned_type i;
 	
 	config *cfg = config::get_instance ();
 	block_manager *mng = block_manager::get_instance ();
@@ -703,7 +703,7 @@ simple_vector< trigger_entry<bid_type,typename type::key_type> > *
 #ifdef INTERLEAVED_ALLOC
 	if (partial_runs)
 	{
-		unsigned int last_run_size = _n - full_runs * m2;
+		unsigned_type last_run_size = _n - full_runs * m2;
 		runs[i] = new run_type (last_run_size);
 
 		mng->new_blocks (interleaved_alloc_strategy (nruns, 0, ndisks),
@@ -750,15 +750,15 @@ simple_vector< trigger_entry<bid_type,typename type::key_type> > *
 
 	disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
 
-	unsigned int full_runsize = m2;
+	unsigned_type full_runsize = m2;
 	run_type **new_runs;
 
 	while (nruns > 1)
 	{
 		full_runsize = full_runsize * _m;
-		unsigned int new_full_runs = _n / full_runsize;
-		unsigned int new_partial_runs = ((_n % full_runsize) ? 1 : 0);
-		unsigned int new_nruns = new_full_runs + new_partial_runs;
+		unsigned_type new_full_runs = _n / full_runsize;
+		unsigned_type new_partial_runs = ((_n % full_runsize) ? 1 : 0);
+		unsigned_type new_nruns = new_full_runs + new_partial_runs;
 
 		new_runs = new run_type *[new_nruns];
 
@@ -811,7 +811,7 @@ simple_vector< trigger_entry<bid_type,typename type::key_type> > *
 			//allocate output blocks
 			if (new_partial_runs)
 			{
-				unsigned int last_run_size =
+				unsigned_type last_run_size =
 					_n - full_runsize * new_full_runs;
 				new_runs[i] = new run_type (last_run_size);
 
@@ -907,14 +907,14 @@ simple_vector< trigger_entry<bid_type,typename type::key_type> > *
 }
 
 template <typename _RAIter>
-void ksort(_RAIter __first, _RAIter __last,unsigned __M)
+void ksort(_RAIter __first, _RAIter __last,unsigned_type __M)
 {
 	typedef simple_vector< trigger_entry<typename _RAIter::bid_type,
 			typename _RAIter::vector_type::value_type::key_type> > run_type;
 	typedef typename _RAIter::vector_type::value_type value_type;
 	typedef typename _RAIter::block_type block_type;
 	
-	unsigned n=0;
+	unsigned_type n=0;
 	block_manager *mng = block_manager::get_instance ();
 	
 	__first.flush();
@@ -944,7 +944,7 @@ void ksort(_RAIter __first, _RAIter __last,unsigned __M)
 			
 				last_block->read(*__last.bid(),req);
 				
-				unsigned i=0;
+				unsigned_type i=0;
 				for(;i<__first.block_offset();i++)
 				{
 					first_block->elem[i] = value_type::min_value();
@@ -1054,7 +1054,7 @@ void ksort(_RAIter __first, _RAIter __last,unsigned __M)
 				req->wait();
 				delete req;
 				
-				unsigned i=0;
+				unsigned_type i=0;
 				for(;i<__first.block_offset();i++)
 				{
 					first_block->elem[i] = value_type::min_value();
@@ -1131,14 +1131,14 @@ void ksort(_RAIter __first, _RAIter __last,unsigned __M)
 				typename _RAIter::block_type * last_block = new typename _RAIter::block_type;
 				typename _RAIter::bid_type last_bid;
 				request *req;
-				unsigned i;
+				unsigned_type i;
 				
 				last_block->read(*__last.bid(),req);
 				mng->new_blocks( FR(), &last_bid,(&last_bid) + 1);
 				req->wait();
 				delete req;
 			
-				for(unsigned i=__last.block_offset(); i < block_type::size;i++)
+				for(unsigned_type i=__last.block_offset(); i < block_type::size;i++)
 				{
 					last_block->elem[i] = value_type::max_value();
 				}

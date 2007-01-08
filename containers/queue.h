@@ -59,10 +59,10 @@ private:
 	value_type * front_element;
 	value_type * back_element;
 	//alloc_strategy alloc_strategy_;
-	unsigned alloc_counter;
+	unsigned_type alloc_counter;
 	std::deque<bid_type> bids;
 	block_manager * bm;
-	unsigned blocks2prefetch;
+	unsigned_type blocks2prefetch;
 
 	queue(const queue & obj); // forbidden
   	queue & operator = (const queue & obj); // forbidden
@@ -73,7 +73,7 @@ public:
 	//! \param w_pool_size  number of blocks in the write pool, must be at least 2
 	//! \param p_pool_size   number of blocks in the prefetch pool, must be at least 1
 	//! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side) , default is 1
-	queue(unsigned w_pool_size, unsigned p_pool_size, unsigned blocks2prefetch_ = 1):
+	queue(unsigned_type w_pool_size, unsigned_type p_pool_size, unsigned_type blocks2prefetch_ = 1):
 		size_(0),
 		delete_pools(true),
 		alloc_counter(0),
@@ -113,13 +113,13 @@ public:
 	}
 	
 	//! \brief Defines the number of blocks to prefetch (\c front side)
-	void set_prefetch_aggr(unsigned blocks2prefetch_)
+	void set_prefetch_aggr(unsigned_type blocks2prefetch_)
 	{
 		blocks2prefetch = blocks2prefetch_;
 	}
 	
 	//! \brief Returns the number of blocks prefetched from the \c front side
-	unsigned get_prefetch_aggr() const
+	unsigned_type get_prefetch_aggr() const
 	{
 		return blocks2prefetch;
 	}
@@ -198,7 +198,7 @@ public:
 			
 			assert(!bids.empty());
 			request_ptr req = p_pool->read(front_block, bids.front());
-			for(unsigned i=0;i <blocks2prefetch && i < bids.size() -1; ++i )
+			for(unsigned_type i=0;i <blocks2prefetch && i < bids.size() -1; ++i )
 			{ // give prefetching hints
 				STXXL_VERBOSE1("queue::pop Case Hints")
 				p_pool->hint(bids[i+1], *w_pool);

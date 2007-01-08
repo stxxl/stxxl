@@ -114,15 +114,15 @@ void
 create_runs(
 		input_bid_iterator it,
 		run_type ** runs,
-		int nruns,
-		int _m,
+		int_type nruns,
+		int_type _m,
 		value_cmp cmp )
 {
 	typedef typename block_type::value_type type;
 	typedef typename block_type::bid_type bid_type;
 	STXXL_VERBOSE1("stxxl::create_runs nruns="<<nruns<<" m="<<_m)
 	
-	int m2 = _m / 2;
+	int_type m2 = _m / 2;
 	block_manager *bm = block_manager::get_instance();
 	block_type *Blocks1 = new block_type[m2];
 	block_type *Blocks2 = new block_type[m2];
@@ -136,9 +136,9 @@ create_runs(
 
 	disk_queues::get_instance ()->set_priority_op(disk_queue::WRITE);
 
-	int i;
-	int k = 0;
-	int run_size = 0,next_run_size=0;
+	int_type i;
+	int_type k = 0;
+	int_type run_size = 0,next_run_size=0;
 	
 	assert(nruns >= 2);
   
@@ -207,7 +207,7 @@ create_runs(
 		}
 		else
 		{   // do need to post read of run k+1
-			int runplus2size = runs[k+2]->size();
+			int_type runplus2size = runs[k+2]->size();
 			for (i = 0; i < m2; ++i)
 			{
 				STXXL_VERBOSE1("stxxl::create_runs posting write "<<long(Blocks1[i].elem))
@@ -272,30 +272,30 @@ create_runs(
 
   template < typename block_type,typename run_type , typename value_cmp>
   bool check_sorted_runs(		run_type ** runs, 
-								unsigned nruns,
-								unsigned m,
+								unsigned_type nruns,
+								unsigned_type m,
 								value_cmp cmp)
   {
     typedef typename block_type::value_type value_type;
 	  
     //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
 	STXXL_MSG("check_sorted_runs  Runs: "<<nruns)
-    unsigned irun=0;
+    unsigned_type irun=0;
     for(irun = 0; irun < nruns; ++irun)
     {
-       const unsigned nblocks_per_run = runs[irun]->size();
-			 unsigned blocks_left = nblocks_per_run;
+       const unsigned_type nblocks_per_run = runs[irun]->size();
+			 unsigned_type blocks_left = nblocks_per_run;
 			 block_type * blocks = new block_type[m];
 			 request_ptr * reqs = new request_ptr[m];
 			 value_type last;
 			
-			 for(unsigned off = 0; off < nblocks_per_run ; off += m)
+			 for(unsigned_type off = 0; off < nblocks_per_run ; off += m)
 			 {
-				 const unsigned nblocks = STXXL_MIN(blocks_left,m);
-				 const unsigned nelements = nblocks*block_type::size ;
+				 const unsigned_type nblocks = STXXL_MIN(blocks_left,m);
+				 const unsigned_type nelements = nblocks*block_type::size ;
 				 blocks_left -= nblocks;
 			
-				 for(unsigned j=0;j<nblocks;++j)
+				 for(unsigned_type j=0;j<nblocks;++j)
 				 {
 					 reqs[j] = blocks[j].read((*runs[irun])[j+off].bid);
 				 }
@@ -306,24 +306,24 @@ create_runs(
 					 STXXL_MSG("check_sorted_runs  wrong first value in the run "<<irun)
 					 STXXL_MSG(" first value: "<<blocks[0][0])
 					 STXXL_MSG(" last  value: "<<last)
-					 for(unsigned k=0; k<block_type::size;++k)
+					 for(unsigned_type k=0; k<block_type::size;++k)
 						 STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[0][k])
 					 
 					 return false;
 				 }
 				 
-				 for(unsigned j=0;j<nblocks;++j)
+				 for(unsigned_type j=0;j<nblocks;++j)
 				 {
 					 if(blocks[j][0] != (*runs[irun])[j+off].value)
 			 {
 				 STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<(j+off))
 				 STXXL_MSG("                   trigger value: "<<(*runs[irun])[j+off].value)
 				 STXXL_MSG("Data in the block:")
-				 for(unsigned k=0; k<block_type::size;++k)
+				 for(unsigned_type k=0; k<block_type::size;++k)
 					 STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k])
 				 
 				 STXXL_MSG("BIDS:")
-				 for(unsigned k=0; k<nblocks;++k)
+				 for(unsigned_type k=0; k<nblocks;++k)
 				 {
 					if( k == j) STXXL_MSG("Bad one comes next.")
 						STXXL_MSG("BID "<<(k+off)<<" is: "<<((*runs[irun])[k+off].bid))
@@ -346,13 +346,13 @@ create_runs(
 			 {
 				 STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
 				 STXXL_MSG("Data in blocks:")
-				 for(unsigned j=0;j<nblocks;++j)
+				 for(unsigned_type j=0;j<nblocks;++j)
 				 {
-						 for(unsigned k=0; k<block_type::size;++k)
+						 for(unsigned_type k=0; k<block_type::size;++k)
 								STXXL_MSG("     Element "<<k<<" in block "<< (j+off) <<" is :"<<blocks[j][k])
 				 }
 				 STXXL_MSG("BIDS:")
-				 for(unsigned k=0; k<nblocks;++k)
+				 for(unsigned_type k=0; k<nblocks;++k)
 				 {
 						STXXL_MSG("BID "<<(k+off)<<" is: "<<((*runs[irun])[k+off].bid))
 				 }
@@ -373,7 +373,7 @@ create_runs(
 	
 	
 template < typename block_type,typename run_type , typename value_cmp>
-void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,value_cmp cmp
+void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned_type  _m,value_cmp cmp
                 )
 {
 	typedef typename block_type::bid_type bid_type;
@@ -382,10 +382,10 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	typedef run_cursor2<block_type,prefetcher_type> run_cursor_type;
 	typedef run_cursor2_cmp<block_type,prefetcher_type,value_cmp> run_cursor2_cmp_type;
 	
-	int i;
+	int_type i;
 	run_type consume_seq(out_run->size());
 
-	int * prefetch_seq = new int[out_run->size()];
+	int_type * prefetch_seq = new int_type[out_run->size()];
 
 	typename run_type::iterator copy_start = consume_seq.begin ();
 	for (i = 0; i < nruns; i++)
@@ -400,15 +400,15 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	std::stable_sort(consume_seq.begin (), consume_seq.end (),
 					trigger_entry_cmp<bid_type,value_type,value_cmp>(cmp));
 
-	int disks_number = config::get_instance ()->disks_number ();
+	int_type disks_number = config::get_instance ()->disks_number ();
 	
 	#ifdef PLAY_WITH_OPT_PREF
-	const int n_write_buffers = 4 * disks_number;
+	const int_type n_write_buffers = 4 * disks_number;
 	#else
-	const int n_prefetch_buffers = STXXL_MAX( 2 * disks_number , (3 * (int(_m) - nruns) / 4));
-        const int n_write_buffers = STXXL_MAX( 2 * disks_number , int(_m) - nruns - n_prefetch_buffers );
+	const int_type n_prefetch_buffers = STXXL_MAX( 2 * disks_number , (3 * (int_type(_m) - nruns) / 4));
+        const int_type n_write_buffers = STXXL_MAX( 2 * disks_number , int_type(_m) - nruns - n_prefetch_buffers );
 	// heuristic
-	const int n_opt_prefetch_buffers = 2 * disks_number + (3*(n_prefetch_buffers - 2 * disks_number))/10;
+	const int_type n_opt_prefetch_buffers = 2 * disks_number + (3*(n_prefetch_buffers - 2 * disks_number))/10;
 	#endif
 	
 	#ifdef SORT_OPT_PREFETCHING
@@ -429,7 +429,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	
 	buffered_writer<block_type> writer(n_write_buffers,n_write_buffers/2);
 	
-	int out_run_size = out_run->size ();
+	int_type out_run_size = out_run->size ();
 	
 	block_type *out_buffer = writer.get_free_block();
 	
@@ -509,7 +509,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 			std::vector<sequence> seqs(nruns);
 			std::vector<block_type*> buffers(nruns);
 			
-			for(int i = 0; i < nruns; i++)	//initialize sequences
+			for(int_type i = 0; i < nruns; i++)	//initialize sequences
 			{
 				buffers[i] = prefetcher.pull_block();
 				seqs[i] = std::make_pair(buffers[i]->begin(), buffers[i]->end());
@@ -519,7 +519,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 			value_type last_elem;
 			#endif
 			
-			for (int j = 0; j < out_run_size; ++j)	//for the whole output run
+			for (int_type j = 0; j < out_run_size; ++j)	//for the whole output run
 			{
 				diff_type rest = block_type::size;	//elements still to merge for this output block
 			
@@ -534,7 +534,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 					total_size += seqs[0].second - seqs[0].first;
 					STXXL_VERBOSE1("last " << *(seqs[0].second - 1) << " block size " << (seqs[0].second - seqs[0].first));
 					
-					for(int i = 1; i < seqs.size(); i++)
+					for(int_type i = 1; i < seqs.size(); i++)
 					{
 						assert(seqs[i].first != seqs[i].second);
 				
@@ -548,7 +548,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 					
 					diff_type less_equal_than_min_last = 0;
 					//locate this element in all sequences
-					for(int i = 0; i < seqs.size(); i++)
+					for(int_type i = 0; i < seqs.size(); i++)
 					{
 						typename block_type::iterator position = upper_bound(seqs[i].first, seqs[i].second, min_last, cmp);
 						STXXL_VERBOSE1("greater equal than " << position - seqs[i].first);
@@ -571,7 +571,7 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 					
 					STXXL_VERBOSE1("so long");
 					
-					for(int i = 0; i < seqs.size(); i++)
+					for(int_type i = 0; i < seqs.size(); i++)
 					{
 						if(seqs[i].first == seqs[i].second)	//run empty
 						{
@@ -621,8 +621,8 @@ void merge_runs(run_type ** in_runs, int nruns, run_type * out_run,unsigned  _m,
 	block_manager *bm = block_manager::get_instance ();
 	for (i = 0; i < nruns; ++i)
 	{
-		unsigned sz = in_runs[i]->size ();
-		for (unsigned j = 0; j < sz; ++j)
+		unsigned_type sz = in_runs[i]->size ();
+		for (unsigned_type j = 0; j < sz; ++j)
 			bm->delete_block ((*in_runs[i])[j].bid);
 		
 		delete in_runs[i];
@@ -637,8 +637,8 @@ template <typename block_type,
 					typename value_cmp>
 simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::value_type> > * 
 	sort_blocks(  input_bid_iterator input_bids,
-                unsigned _n,
-                unsigned _m,
+                unsigned_type _n,
+                unsigned_type _m,
                 value_cmp cmp
 		)
 {
@@ -648,15 +648,15 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	typedef simple_vector< trigger_entry_type > run_type;
 	typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 	
-	unsigned int m2 = _m / 2;
-	unsigned int full_runs = _n / m2;
-	unsigned int partial_runs = ((_n % m2) ? 1 : 0);
-	unsigned int nruns = full_runs + partial_runs;
-	unsigned int i;
+	unsigned_type m2 = _m / 2;
+	unsigned_type full_runs = _n / m2;
+	unsigned_type partial_runs = ((_n % m2) ? 1 : 0);
+	unsigned_type nruns = full_runs + partial_runs;
+	unsigned_type i;
 	
 	config *cfg = config::get_instance();
 	block_manager *mng = block_manager::get_instance ();
-	const unsigned ndisks = cfg->disks_number ();
+	const unsigned_type ndisks = cfg->disks_number ();
 	
 	//STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+"
 	//	   << partial_runs) 
@@ -703,38 +703,38 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 
 	// Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) runs at once
 		
-	const int merge_factor = static_cast<int>(ceil(pow(nruns,1./ceil(log(double(nruns))/
+	const int_type merge_factor = static_cast<int_type>(ceil(pow(nruns,1./ceil(log(double(nruns))/
 		log(double(_m))))));
 	run_type **new_runs;
 	
 	while(nruns > 1)
 	{
-		int new_nruns = div_and_round_up(nruns,merge_factor);
+		int_type new_nruns = div_and_round_up(nruns,merge_factor);
 		STXXL_VERBOSE("Starting new merge phase: nruns: "<<nruns<<
 			" opt_merge_factor: "<<merge_factor<<" m:"<<_m<<" new_nruns: "<<new_nruns)
 		
 		new_runs = new run_type *[new_nruns];
 		
-		int runs_left = nruns;
-		int cur_out_run = 0;
-		int blocks_in_new_run = 0;
+		int_type runs_left = nruns;
+		int_type cur_out_run = 0;
+		int_type blocks_in_new_run = 0;
 		
 		while(runs_left > 0)
 		{
-			int runs2merge = STXXL_MIN(runs_left,merge_factor);
+			int_type runs2merge = STXXL_MIN(runs_left,merge_factor);
 			blocks_in_new_run = 0;
-			for(unsigned i = nruns - runs_left; i < (nruns - runs_left + runs2merge);i++)
+			for(unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge);i++)
 				blocks_in_new_run += runs[i]->size();
 			// allocate run
 			new_runs[cur_out_run++] = new run_type(blocks_in_new_run);
 			runs_left -= runs2merge;
 		}
 		// allocate blocks for the new runs
-		if( cur_out_run == 1 &&  blocks_in_new_run==int(_n) && (input_bids->storage->get_id() == -1))
+		if( cur_out_run == 1 &&  blocks_in_new_run==int_type(_n) && (input_bids->storage->get_id() == -1))
 		{
 			// if we sort a file we can reuse the input bids for the output
 			input_bid_iterator cur = input_bids;
-			for(int i=0;cur != (input_bids+_n) ; ++cur)
+			for(int_type i=0;cur != (input_bids+_n) ; ++cur)
 			{
 				(*new_runs[0])[i++].bid = *cur;
 			}
@@ -765,7 +765,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		cur_out_run = 0;
 		while(runs_left > 0)
 		{
-				int runs2merge = STXXL_MIN(runs_left,merge_factor);
+				int_type runs2merge = STXXL_MIN(runs_left,merge_factor);
 				#ifdef STXXL_CHECK_ORDER_IN_SORTS
 				assert((check_sorted_runs<block_type,run_type,value_cmp>(runs + nruns - runs_left,runs2merge,m2,cmp) ));
 				#endif
@@ -818,7 +818,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 //! \remark Implements external merge sort described in [Dementiev & Sanders'03]
 //! \remark non-stable
 template <typename ExtIterator_,typename StrictWeakOrdering_>
-void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned M)
+void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned_type M)
 {
 	typedef simple_vector< sort_local::trigger_entry<typename ExtIterator_::bid_type, 
 		typename ExtIterator_::vector_type::value_type> > run_type;
@@ -826,8 +826,8 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 	typedef typename ExtIterator_::vector_type::value_type value_type;
 	typedef typename ExtIterator_::block_type block_type;
 	
-	unsigned n=0;
-	unsigned sort_factor = 1;
+	unsigned_type n=0;
+	unsigned_type sort_factor = 1;
 	
 #ifdef __MCSTL__
 	if(mcstl::HEURISTIC::sort_algorithm == mcstl::HEURISTIC::PMWMS)
@@ -864,7 +864,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 			
 				req = last_block->read(*last.bid());
 				
-				unsigned i=0;
+				unsigned_type i=0;
 				for(;i<first.block_offset();++i)
 				{
 					first_block->elem[i] = cmp.min_value();
@@ -975,7 +975,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				req->wait();
 				
 				
-				unsigned i=0;
+				unsigned_type i=0;
 				for(;i<first.block_offset();++i)
 				{
 					first_block->elem[i] = cmp.min_value();
@@ -1052,7 +1052,7 @@ void sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering_ cmp,unsigned
 				typename ExtIterator_::block_type * last_block = new typename ExtIterator_::block_type;
 				typename ExtIterator_::bid_type last_bid;
 				request_ptr req;
-				unsigned i;
+				unsigned_type i;
 				
 				req = last_block->read(*last.bid());
 				mng->new_blocks( FR(), &last_bid,(&last_bid) + 1);

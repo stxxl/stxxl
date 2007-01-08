@@ -16,7 +16,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-template < unsigned _blk_sz, typename _run_type, class __pos_type = int >
+template < unsigned _blk_sz, typename _run_type, class __pos_type = int_type >
 struct RunsToBIDArrayAdaptor: public TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz > , __pos_type >
 {
 	typedef RunsToBIDArrayAdaptor < _blk_sz, _run_type,__pos_type > _Self;
@@ -24,7 +24,7 @@ struct RunsToBIDArrayAdaptor: public TwoToOneDimArrayAdaptorBase < _run_type *, 
 
 	enum	{ block_size = _blk_sz };
 
-	unsigned dim_size;
+	unsigned_type dim_size;
 	
 	typedef TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >,
 		__pos_type > _Parent;
@@ -32,7 +32,7 @@ struct RunsToBIDArrayAdaptor: public TwoToOneDimArrayAdaptorBase < _run_type *, 
 	using _Parent::pos;
 
 	  RunsToBIDArrayAdaptor (_run_type * *a, __pos_type p,
-				 unsigned d):TwoToOneDimArrayAdaptorBase <
+				 unsigned_type d):TwoToOneDimArrayAdaptorBase <
 		_run_type *, BID < _blk_sz >, __pos_type > (a, p), dim_size (d)
 	{
 	};
@@ -82,7 +82,7 @@ struct RunsToBIDArrayAdaptor: public TwoToOneDimArrayAdaptorBase < _run_type *, 
 
 template < unsigned
      _blk_sz,typename _run_type, class __pos_type =
-	     int >struct RunsToBIDArrayAdaptor2:public
+	     int_type >struct RunsToBIDArrayAdaptor2:public
 	     TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >,
 	     __pos_type >
      {
@@ -99,8 +99,8 @@ template < unsigned
 
 	     __pos_type w, h, K;
 
-	       RunsToBIDArrayAdaptor2 (_run_type * *a, __pos_type p, int _w,
-				       int _h):TwoToOneDimArrayAdaptorBase <
+	       RunsToBIDArrayAdaptor2 (_run_type * *a, __pos_type p, int_type _w,
+				       int_type _h):TwoToOneDimArrayAdaptorBase <
 		     _run_type *, BID < _blk_sz >, __pos_type > (a, p), w (_w),
 		     h (_h), K (_w * _h)
 	     {
@@ -180,7 +180,7 @@ template < unsigned
 		// STL typedefs
 		typedef bid_type value_type;
 		typedef std::random_access_iterator_tag iterator_category;
-		typedef int difference_type;
+		typedef int_type difference_type;
 		typedef value_type * pointer;
 		typedef value_type & reference;
 		
@@ -197,11 +197,11 @@ template < unsigned
 		{
 			return &(value->bid);
 		}
-		const bid_type & operator [] (int n) const
+		const bid_type & operator [] (int_type n) const
 		{
 			return (value + n)->bid;
 		}
-		bid_type & operator [] (int n)
+		bid_type & operator [] (int_type n)
 		{
 			return (value + n)->bid;
 		}
@@ -236,21 +236,21 @@ template < unsigned
 		{
 			return value != a.value;	
 		}	
-		_Self operator += (int n)
+		_Self operator += (int_type n)
 		{
 			value += n;
 			return *this;
 		}
-		_Self operator -= (int n)
+		_Self operator -= (int_type n)
 		{
 			value -= n;
 			return *this;
 		}
-		int operator - (const _Self & a) const
+		int_type operator - (const _Self & a) const
 		{
 			return value - a.value;
 		}
-		int operator + (const _Self & a) const
+		int_type operator + (const _Self & a) const
 		{
 			return value + a.value;
 		}

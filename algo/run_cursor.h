@@ -16,7 +16,7 @@ __STXXL_BEGIN_NAMESPACE
 template <typename block_type>
 struct run_cursor
 {
-	unsigned int pos;
+	unsigned pos;
 	block_type *buffer;
 	
 	run_cursor(): pos(0),buffer(NULL){}

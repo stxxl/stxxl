@@ -35,13 +35,13 @@ public:
 	enum { n_pages = npages_ };
 	random_pager() {};
 	~random_pager() {};
-	int kick()
+	int_type kick()
 	{
 		return rnd(npages_);
 	};
-	void hit(int ipage)
+	void hit(int_type ipage)
 	{
-		assert(ipage < int(npages_));
+		assert(ipage < int_type(npages_));
 		assert(ipage >= 0);
 	};
 };
@@ -50,7 +50,7 @@ public:
 template <unsigned npages_>
 class lru_pager
 {
-	typedef std::list<int> list_type;
+	typedef std::list<int_type> list_type;
 	
 	std::auto_ptr<list_type> history;
 	simple_vector<list_type::iterator> history_entry;
@@ -63,17 +63,17 @@ public:
 	
 	lru_pager(): history(new list_type),history_entry(npages_)
 	{
-		for(unsigned i=0;i<npages_;i++)
-			history_entry[i] = history->insert(history->end(),static_cast<int>(i));
+		for(unsigned_type i=0;i<npages_;i++)
+			history_entry[i] = history->insert(history->end(),static_cast<int_type>(i));
 	}
 	~lru_pager() {}
-	int kick()
+	int_type kick()
 	{
 		return history->back();
 	}
-	void hit(int ipage)
+	void hit(int_type ipage)
 	{
-		assert(ipage < int(npages_));
+		assert(ipage < int_type(npages_));
 		assert(ipage >= 0);
 		history->splice(history->begin(),*history,history_entry[ipage]);
 	}

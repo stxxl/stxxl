@@ -18,8 +18,8 @@ namespace btree
 {
 	class lru_pager
 	{
-        unsigned npages_;
-        typedef std::list<int> list_type;
+        unsigned_type npages_;
+        typedef std::list<int_type> list_type;
 
 		std::auto_ptr<list_type> history;
 		std::vector<list_type::iterator> history_entry;
@@ -33,24 +33,24 @@ namespace btree
 		{
 		}
 
-        lru_pager(unsigned npages): 
+        lru_pager(unsigned_type npages): 
 			npages_(npages),
 			history(new list_type),
 			history_entry(npages_)
         {
-                for(unsigned i=0;i<npages_;i++)
+                for(unsigned_type i=0;i<npages_;i++)
 				{
-                        history_entry[i] = history->insert(history->end(),static_cast<int>(i));
+                        history_entry[i] = history->insert(history->end(),static_cast<int_type>(i));
 				}
         }
         ~lru_pager() {}
-        int kick()
+        int_type kick()
         {
                 return history->back();
         }
-        void hit(int ipage)
+        void hit(int_type ipage)
         {
-                assert(ipage < int(npages_));
+                assert(ipage < int_type(npages_));
                 assert(ipage >= 0);
                 history->splice(history->begin(),*history,history_entry[ipage]);
         }

@@ -403,14 +403,14 @@ struct choose_int_types
 };
 
 template <>
-struct choose_int_types<4>
+struct choose_int_types<4>  // for 32-bit processors/compilers
 {
         typedef int int_type;
         typedef unsigned unsigned_type;
 };
 
 template <>
-struct choose_int_types<8>
+struct choose_int_types<8> // for 64-bit processors/compilers
 {
         typedef long long int int_type;
         typedef long long unsigned unsigned_type;
@@ -466,9 +466,9 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last,
 }
 
 template <class T>
-void swap_1D_arrays(T * a,T * b, unsigned size)
+void swap_1D_arrays(T * a,T * b, unsigned_type size)
 {
-	for(unsigned i=0;i<size;++i)
+	for(unsigned_type i=0;i<size;++i)
 		std::swap(a[i],b[i]);
 }
 

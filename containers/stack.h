@@ -64,7 +64,7 @@ public:
 
 private:
   size_type size_;
-  unsigned cache_offset;
+  unsigned_type cache_offset;
   value_type * current_element;
   simple_vector<block_type> cache;
   typename simple_vector<block_type>::iterator front_page;
@@ -233,12 +233,12 @@ public:
     current_element = element((--cache_offset) - 1);
   }
 private:
-  value_type * element(unsigned offset)
+  value_type * element(unsigned_type offset)
   {
     if(offset < blocks_per_page*block_type::size)
       return &((*(back_page + offset/block_type::size))[offset%block_type::size]);
     
-    unsigned unbiased_offset = offset - blocks_per_page*block_type::size;
+    unsigned_type unbiased_offset = offset - blocks_per_page*block_type::size;
     return &((*(front_page + unbiased_offset/block_type::size))[unbiased_offset%block_type::size]);
   }
 };
@@ -266,7 +266,7 @@ public:
 
 private:
   size_type size_;
-  unsigned cache_offset;
+  unsigned_type cache_offset;
   value_type * current_element;
   simple_vector<block_type> cache;
   typename simple_vector<block_type>::iterator cache_buffers;
@@ -438,7 +438,7 @@ public:
     }
        
     --size_;
-    unsigned cur_offset = (--cache_offset) - 1;
+    unsigned_type cur_offset = (--cache_offset) - 1;
     current_element = &((*(cache_buffers + cur_offset/block_type::size))[cur_offset%block_type::size]);
     
   }
@@ -463,12 +463,12 @@ public:
 
 private:
   size_type size_;
-  unsigned cache_offset;
+  unsigned_type cache_offset;
   block_type * cache;
   value_type current;
   std::vector<bid_type> bids;
   alloc_strategy alloc_strategy_;
-  unsigned pref_aggr;
+  unsigned_type pref_aggr;
   prefetch_pool<block_type> & p_pool;
   write_pool<block_type>    & w_pool;
   // for a moment forbid default construction
@@ -483,7 +483,7 @@ public:
   grow_shrink_stack2(
        prefetch_pool<block_type> & p_pool_,
        write_pool<block_type>    & w_pool_,
-       unsigned prefetch_aggressiveness = 0):
+       unsigned_type prefetch_aggressiveness = 0):
        size_(0),
        cache_offset(0),
        cache(new block_type),
@@ -513,9 +513,9 @@ public:
     {
       
     STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()")
-    const int bids_size = bids.size();
-    const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr),0);
-    int i;
+    const int_type bids_size = bids.size();
+    const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr),(int_type)0);
+    int_type i;
     for(i=bids_size - 1 ; i >= last_pref ; --i )
     {
         if(p_pool.in_prefetching(bids[i]));
@@ -562,9 +562,9 @@ public:
           offset_allocator<alloc_strategy>(cur_bid-bids.begin(),alloc_strategy_),cur_bid,bids.end());
       w_pool.write(cache,bids.back());
       cache = w_pool.steal();
-      const int bids_size = bids.size();
-      const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr) - 1,0);
-      for(int i=bids_size - 2 ; i >= last_pref ; --i )
+      const int_type bids_size = bids.size();
+      const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr) - 1,(int_type)0);
+      for(int_type i=bids_size - 2 ; i >= last_pref ; --i )
       {
         if(p_pool.in_prefetching(bids[i]))
             p_pool.read(cache,bids[i])->wait(); //  clean prefetch buffers
@@ -619,9 +619,9 @@ public:
         p_pool.read(cache,last_block)->wait();
       }
       block_manager::get_instance()->delete_block(last_block);
-      const int bids_size = bids.size();
-      const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr),0);
-      for(int i=bids_size - 1; i >= last_pref ; --i )
+      const int_type bids_size = bids.size();
+      const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr),(int_type)0);
+      for(int_type i=bids_size - 1; i >= last_pref ; --i )
       {
         p_pool.hint(bids[i]); // prefetch
       }
@@ -637,13 +637,13 @@ public:
   //! \brief Sets level of prefetch aggressiveness (number 
   //! of blocks from the prefetch pool used for prefetching)
   //! \param new_p new value for the prefetch aggressiveness
-  void set_prefetch_aggr(unsigned new_p)
+  void set_prefetch_aggr(unsigned_type new_p)
   {
     if(pref_aggr > new_p)
     {
-      const int bids_size = bids.size();
-      const int last_pref = STXXL_MAX(int(bids_size) - int(pref_aggr),0);
-      for(int i=bids_size - new_p - 1 ; i >= last_pref ; --i )
+      const int_type bids_size = bids.size();
+      const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr),(int_type)0);
+      for(int_type i=bids_size - new_p - 1 ; i >= last_pref ; --i )
       {
         if(p_pool.in_prefetching(bids[i]))
             p_pool.read(cache,bids[i])->wait(); //  clean prefetch buffers
@@ -652,9 +652,9 @@ public:
     else
     if(pref_aggr < new_p)
     {
-      const int bids_size = bids.size();
-      const int last_pref = STXXL_MAX(int(bids_size) - int(new_p),0);
-      for(int i=bids_size - 1 ; i >= last_pref ; --i )
+      const int_type bids_size = bids.size();
+      const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(new_p),(int_type)0);
+      for(int_type i=bids_size - 1 ; i >= last_pref ; --i )
       {
         p_pool.hint(bids[i]); // prefetch
       }
@@ -662,7 +662,7 @@ public:
     pref_aggr = new_p;
   }
   //! \brief Returns number of blocks used for prefetching
-  unsigned get_prefetch_aggr() const
+  unsigned_type get_prefetch_aggr() const
   {
     return pref_aggr;
   }
@@ -672,7 +672,7 @@ public:
 //! \brief A stack that migrates from internal memory to external when its size exceeds a certain threshold
 
 //! For semantics of the methods see documentation of the STL \c std::stack.
-template <unsigned CritSize, class ExternalStack, class InternalStack>
+template <unsigned_type CritSize, class ExternalStack, class InternalStack>
 class migrating_stack
 {
 public:
@@ -848,7 +848,7 @@ template  <
             unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
 
             class IntStackTp = std::stack<ValTp>,
-            unsigned MigrCritSize = (2*BlocksPerPage*BlkSz),
+            unsigned_type MigrCritSize = (2*BlocksPerPage*BlkSz),
 
             class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
             class SzTp = stxxl::int64
@@ -898,7 +898,7 @@ namespace std
 		a.swap(b);
 	}
 	
-	template <unsigned CritSize, class ExternalStack, class InternalStack>
+	template <stxxl::unsigned_type CritSize, class ExternalStack, class InternalStack>
 	void swap(	stxxl::migrating_stack<CritSize,ExternalStack,InternalStack> & a,
 				stxxl::migrating_stack<CritSize,ExternalStack,InternalStack> & b)
 	{

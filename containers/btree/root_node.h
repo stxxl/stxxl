@@ -16,7 +16,7 @@ namespace btree
 	template <class KeyType, class BIDType>
 	class root_node
 	{
-		
+		// a place for a future custom root node tree implementation
 	};
 	
 }
