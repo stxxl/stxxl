@@ -24,6 +24,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \param _functor function object of model of \c std::UnaryFunction concept 
 //! \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D )
 //! \return function object \c _functor after it has been applied to the each element of the given range
+//! 
+//! \warning nested stxxl::for_each are not supported
 template <typename _ExtIterator,typename _UnaryFunction>
 _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int nbuffers)
 {
@@ -73,6 +75,8 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 //! \param _functor 
 //! \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D )
 //! \return function object \c _functor after it has been applied to the each element of the given range
+//!
+//! \warning nested stxxl::for_each_m are not supported
 template <typename _ExtIterator,typename _UnaryFunction>
 _UnaryFunction for_each_m(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int nbuffers)
 {
