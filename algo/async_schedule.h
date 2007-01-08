@@ -187,9 +187,9 @@ void simulate_async_write(
 	
 	//disk_queue_type * disk_queues = new disk_queue_type[L];
 	#ifndef BOOST_MSVC
-	typedef __gnu_cxx::hash_map<int_type,disk_queue_type> disk_queues_type;
+	typedef __gnu_cxx::hash_map<int,disk_queue_type> disk_queues_type;
 	#else
-	typedef stdext::hash_map<int_type,disk_queue_type> disk_queues_type;
+	typedef stdext::hash_map<int,disk_queue_type> disk_queues_type;
 	#endif
 	disk_queues_type  disk_queues;
 	event_queue_type event_queue;
@@ -199,9 +199,9 @@ void simulate_async_write(
     int_type oldtime = 0;
     //bool * disk_busy = new bool [D];
 	#ifndef BOOST_MSVC
-	__gnu_cxx::hash_set<int_type> disk_busy;
+	__gnu_cxx::hash_set<int> disk_busy;
 	#else
-	stdext::hash_set<int_type> disk_busy;
+	stdext::hash_set<int> disk_busy;
 	#endif
 		       
 	while(m && (i>=0))
