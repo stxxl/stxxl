@@ -29,7 +29,11 @@ flushbuffers: flushbuffers.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c flushbuffers.cpp
 	$(LINKER) flushbuffers.$(OBJEXT) $(OUT)flushbuffers.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+unittest: unittest.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
+	$(LINKER) unittest.$(OBJEXT) $(OUT)unittest.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
+
 clean:
 	$(RM) *.$(OBJEXT) *.$(LIBEXT) benchmark_disks.$(EXEEXT)
-	$(RM) flushbuffers.$(EXEEXT) test_io.$(EXEEXT)
+	$(RM) flushbuffers.$(EXEEXT) test_io.$(EXEEXT) unittest.$(EXEEXT)
 

@@ -28,9 +28,15 @@ test_prefetch_pool: test_prefetch_pool.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_prefetch_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
 	$(LINKER) test_prefetch_pool.$(OBJEXT) $(OUT)test_prefetch_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+unittest: unittest.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
+	$(LINKER) unittest.$(OBJEXT) $(OUT)unittest.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
+
+				
 
 clean:
 	$(RM) *.$(OBJEXT)
 	$(RM) test_mng.$(EXEEXT) test_mng1.$(EXEEXT)
 	$(RM) test_prefetch_pool.$(EXEEXT) test_write_pool.$(EXEEXT)
-	$(RM) test_streams.$(EXEEXT) 
+	$(RM) test_streams.$(EXEEXT) unittest.$(EXEEXT)
+	
