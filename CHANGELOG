@@ -1,0 +1,68 @@
+
+Version 1.0d (??)
+
+* Support of Visual Studio 2005 Express (VC++ 8.0)
+* 
+
+-------------------------------------------
+Version 1.0c (21 September 2006)
+
+* An implementation of an I/O-efficient deque
+
+* STXXL uses MCSTL library (optional) to improve the performance of stxxl::sort and pipelined sort on SMP and multicore processors.
+
+-------------------------------------------
+Version 0.99 (22 March 2006)
+
+* Better compiler support: g++ (versions 3.3.x-4.0.x) and Microsoft Visual C++ 7.1 (.NET)
+
+* New B+Tree-based implementation of map (compatible with all listed above compilers): I/O-efficient map
+
+------------------------------------------
+Version 0.9 (9 August 2005)
+
+* STXXL has been ported to Windows. It now can be run under Windows XP and Windows 2000
+
+* STXXL can be compiled now by g++ (versions 3.0.x-3.4.x, 4.0.x) and Microsoft Visual C++ 7.1 (.NET)
+
+* New data structure: I/O efficient FIFO queue
+
+------------------------------------------
+Version 0.77 (24 March 2005)
+
+* An implementation of queue is available
+
+------------------------------------------
+Version 0.75 (23 March 2005)
+
+* An implementation of map based on B+tree is available
+
+------------------------------------------
+Version 0.7 (25 January 2005)
+
+* The implementation of pipelining is extended and improved 
+
+------------------------------------------
+Version 0.6 (5 September 2004)
+
+* Tested implementation of the stream package (aka pipelining) is available
+
+------------------------------------------
+Version 0.5 (21 November 2003)
+
+* The first implementation of the stream package (aka pipelining) is available
+
+* Priority queue is available
+
+------------------------------------------
+Version 0.2 (Summer 2003)
+
+* The first public release 
+
+* Vectors, stacks, sorting, scanning are available
+
+
+
+
+
+
