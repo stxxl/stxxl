@@ -56,7 +56,7 @@ int main()
 	assert(check_sorted_runs(Runs,Cmp()));	
 	// merge the runs
   stream::runs_merger<SortedRunsType,Cmp> merger(Runs,Cmp(),MULT*1024*128);
-  std::vector<Input::value_type> array;
+  stxxl::vector<Input::value_type> array;
   STXXL_MSG(size << " "<<Runs.elements)
   STXXL_MSG("CRC: "<<in.crc)
   Input::value_type crc(0);

@@ -259,7 +259,8 @@ namespace stream
       delete [] Blocks1;
       return;
     }
-      
+    
+	STXXL_VERBOSE1("Filling the second part of the allocated blocks")
     pos = 0;
     while(!input.empty() && pos != el_in_run)
     {
@@ -821,6 +822,8 @@ namespace stream
        delete [] reqs;
        delete [] blocks;
     }
+
+	STXXL_MSG("Checking runs finished successfully")
 
     return true;
   }
