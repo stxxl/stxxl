@@ -64,7 +64,7 @@ int main()
 	
 	// merge the runs
   	stream::runs_merger<SortedRunsType,Cmp> merger(Runs,Cmp(),1024*128/10);
-  	std::vector<value_type> array;
+  	stxxl::vector<value_type> array;
   	STXXL_MSG(size << " "<<Runs.elements)
   	STXXL_MSG("CRC: "<<oldcrc)
   	value_type crc(0);
