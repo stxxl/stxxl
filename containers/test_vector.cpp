@@ -1,5 +1,4 @@
-#include "vector"
-#include "../algo/scan.h"
+#include <stxxl>
 #include <iostream>
 #include <algorithm>
 
@@ -37,11 +36,13 @@ void test_const_iterator(const my_vec_type &x)
 }
 
 
+
 int main()
 {
   
 try
 {
+
   // use non-randomized striping to avoid side effects on random generator
   typedef stxxl::VECTOR_GENERATOR<int64,2,2,(2*1024*1024),striping>::result vector_type;
 	vector_type v(int64(64*1024*1024)/sizeof(int64));
