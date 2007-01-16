@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 //! 
 //! \warning nested stxxl::for_each are not supported
 template <typename _ExtIterator,typename _UnaryFunction>
-_UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int nbuffers)
+_UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int_type nbuffers)
 {
 	typedef buf_istream<typename _ExtIterator::block_type,typename _ExtIterator::bids_container_iterator> buf_istream_type;
 	
@@ -78,7 +78,7 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 //!
 //! \warning nested stxxl::for_each_m are not supported
 template <typename _ExtIterator,typename _UnaryFunction>
-_UnaryFunction for_each_m(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int nbuffers)
+_UnaryFunction for_each_m(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor,int_type nbuffers)
 {
 	typedef buf_istream<typename _ExtIterator::block_type,typename _ExtIterator::bids_container_iterator> buf_istream_type;
 	typedef buf_ostream<typename _ExtIterator::block_type,typename _ExtIterator::bids_container_iterator> buf_ostream_type;
@@ -134,7 +134,7 @@ _UnaryFunction for_each_m(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction
 //! \param _generator function object of model of \c std::Generator concept 
 //! \param nbuffers number of buffers (blocks) for internal use (should be at least 2*D )
 template <typename _ExtIterator,typename _Generator>
-void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator,int nbuffers)
+void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator,int_type nbuffers)
 {
 	typedef typename _ExtIterator::block_type block_type;
 	typedef buf_ostream<block_type, typename _ExtIterator::bids_container_iterator> buf_ostream_type;
@@ -183,7 +183,7 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator,int 
 //! \return first iterator \c i in the range [_begin,_end) such that *( \c i ) == \c _value, if no
 //!         such exists then \c _end
 template <typename _ExtIterator,typename _EqualityComparable>
-_ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityComparable & _value,int nbuffers)
+_ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityComparable & _value,int_type nbuffers)
 {
 	typedef buf_istream<typename _ExtIterator::block_type,typename _ExtIterator::bids_container_iterator> buf_istream_type;
 	

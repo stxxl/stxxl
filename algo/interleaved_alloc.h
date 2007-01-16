@@ -18,14 +18,16 @@ __STXXL_BEGIN_NAMESPACE
 
 struct interleaved_striping
 {
-	int nruns, begindisk, diff;
-	  interleaved_striping (int _nruns, int _begindisk,
+	int_type nruns;
+  int begindisk;
+  int diff;
+	  interleaved_striping (int_type _nruns, int _begindisk,
 			       int _enddisk):nruns (_nruns),
 		begindisk (_begindisk), diff (_enddisk - _begindisk)
 	{
 	};
 
-	int operator () (int i) const
+	int operator () (int_type i) const
 	{
 		return begindisk + (i / nruns) % diff;
 	};
@@ -33,13 +35,13 @@ struct interleaved_striping
 
 struct interleaved_FR:public interleaved_striping
 {
-	interleaved_FR (int _nruns, int _begindisk,
+	interleaved_FR (int_type _nruns, int _begindisk,
 		       int _enddisk):interleaved_striping (_nruns, _begindisk,
 							  _enddisk)
 	{
 	};
 	random_number<random_uniform_fast> rnd;
-	int operator () (int i) const
+	int operator () (int_type i) const
 	{
 		return begindisk + rnd(diff);
 	};
@@ -49,17 +51,17 @@ struct interleaved_SR:public interleaved_striping
 {
 	std::vector < int >offsets;
 
-	  interleaved_SR (int _nruns, int _begindisk,
+	  interleaved_SR (int_type _nruns, int _begindisk,
 			 int _enddisk):interleaved_striping (_nruns,
 							    _begindisk,
 							    _enddisk)
 	{
 		random_number<random_uniform_fast> rnd;
-		for (int i = 0; i < nruns; i++)
+		for (int_type i = 0; i < nruns; i++)
 			offsets.push_back(rnd(diff));
 	};
 
-	int operator () (int i) const
+	int operator () (int_type i) const
 	{
 		return begindisk + (i / nruns + offsets[i % nruns]) % diff;
 	};
@@ -71,13 +73,13 @@ struct interleaved_RC:public interleaved_striping
 {
 	std::vector < std::vector < int > > perms;
 
-	  interleaved_RC (int _nruns, int _begindisk,
+	  interleaved_RC (int_type _nruns, int _begindisk,
 			 int _enddisk):interleaved_striping (_nruns,
 							    _begindisk,
 							    _enddisk),
 		perms (nruns, std::vector < int >(diff))
 	{
-		for (int i = 0; i < nruns; i++)
+		for (int_type i = 0; i < nruns; i++)
 		{
 			for (int j = 0; j < diff; j++)
 				perms[i][j] = j;
@@ -88,7 +90,7 @@ struct interleaved_RC:public interleaved_striping
 		}
 	};
 
-	int operator () (int i) const
+	int operator () (int_type i) const
 	{
 		return begindisk + perms[i % nruns][(i / nruns) % diff];
 	};

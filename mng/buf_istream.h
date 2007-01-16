@@ -38,11 +38,11 @@ protected:
 	typedef block_prefetcher<block_type,bid_iterator_type> prefetcher_type;
 	prefetcher_type * prefetcher;
 	bid_iterator_type begin_bid,end_bid;
-	int current_elem;
+	int_type current_elem;
 	block_type * current_blk;
-	int * prefetch_seq;
+	int_type * prefetch_seq;
 #ifdef BUF_ISTREAM_CHECK_END
-	bool not_finished;
+	bool not_finished; 
 #endif
 public:
 	typedef typename block_type::reference reference;
@@ -52,23 +52,23 @@ public:
 	//! \param _begin \c bid_iterator pointing to the first block of the stream
 	//! \param _end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
 	//! \param nbuffers number of buffers for internal use
-	buf_istream(bid_iterator_type _begin,bid_iterator_type _end,int nbuffers):
+	buf_istream(bid_iterator_type _begin,bid_iterator_type _end,int_type nbuffers):
 		current_elem(0)
 #ifdef BUF_ISTREAM_CHECK_END
 		,not_finished(true)
 #endif
 	{
-		//int i;
-		const unsigned int ndisks = config::get_instance()->disks_number();
-		const int seq_length = _end - _begin;
-		prefetch_seq = new int[seq_length];
+		//int_type i;
+		const unsigned_type ndisks = config::get_instance()->disks_number();
+		const int_type seq_length = _end - _begin;
+		prefetch_seq = new int_type[seq_length];
 		
 		// obvious schedule
-		//for(int i = 0; i< seq_length; i++)
+		//for(int_type i = 0; i< seq_length; ++i)
 		//	prefetch_seq[i] = i;
 		
 		// optimal schedule
-		nbuffers = STXXL_MAX(2*ndisks,unsigned(nbuffers - 1));
+		nbuffers = STXXL_MAX(2*ndisks,unsigned_type(nbuffers - 1));
 		compute_prefetch_schedule(_begin,_end,prefetch_seq,
 			nbuffers,ndisks);
 		

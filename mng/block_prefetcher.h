@@ -39,22 +39,22 @@ class block_prefetcher
 protected:
 	bid_iterator_type consume_seq_begin;
 	bid_iterator_type consume_seq_end;
-	unsigned seq_length;
+	unsigned_type seq_length;
 	
-	int * prefetch_seq;
+	int_type * prefetch_seq;
 		
-	unsigned nextread;
-	unsigned nextconsume;
+	unsigned_type nextread;
+	unsigned_type nextconsume;
 	
-	const int nreadblocks;
+	const int_type nreadblocks;
 		
 	block_type *read_buffers;
 	request_ptr * read_reqs;
 
 	onoff_switch * completed;
-	int * pref_buffer;
+	int_type * pref_buffer;
 	
-	block_type * wait(int iblock)
+	block_type * wait(int_type iblock)
 	{	
 		STXXL_VERBOSE1("block_prefetcher: waiting block "<<iblock);
 		START_COUNT_WAIT_TIME
@@ -66,7 +66,7 @@ protected:
 		completed[iblock].wait_for_on();
 		END_COUNT_WAIT_TIME
 		STXXL_VERBOSE1("block_prefetcher: finished waiting block "<<iblock);
-		int ibuffer = pref_buffer[iblock];
+		int_type ibuffer = pref_buffer[iblock];
 		STXXL_VERBOSE1("block_prefetcher: returning buffer "<<ibuffer);
 		assert(ibuffer >= 0 && ibuffer < nreadblocks );
 		return (read_buffers + ibuffer); 
@@ -81,14 +81,14 @@ public:
 	block_prefetcher(
 			bid_iterator_type _cons_begin, 
 			bid_iterator_type _cons_end,
-			int * _pref_seq,
-			int _prefetch_buf_size
+			int_type * _pref_seq,
+			int_type _prefetch_buf_size
 			):
 		consume_seq_begin(_cons_begin),
 		consume_seq_end(_cons_end),
 		seq_length(_cons_end - _cons_begin),
 		prefetch_seq(_pref_seq),
-		nextread(STXXL_MIN(unsigned(_prefetch_buf_size),seq_length)),
+		nextread(STXXL_MIN(unsigned_type(_prefetch_buf_size),seq_length)),
 		nextconsume(0),
 		nreadblocks(nextread)
 	{
@@ -96,10 +96,10 @@ public:
 		STXXL_VERBOSE1("block_prefetcher: _prefetch_buf_size="<<_prefetch_buf_size);
     	assert(seq_length > 0);
     	assert(_prefetch_buf_size > 0);
-		int i;
+		int_type i;
 		read_buffers = new block_type[nreadblocks];
 		read_reqs = new request_ptr[nreadblocks];
-		pref_buffer = new int [seq_length];
+		pref_buffer = new int_type [seq_length];
 		
 		std::fill(pref_buffer,pref_buffer + seq_length,-1);
 
@@ -109,7 +109,7 @@ public:
 		{
       		STXXL_VERBOSE1("block_prefetcher: reading block "<<i
 				<<" prefetch_seq["<<i<<"]="<<prefetch_seq[i]);
-			assert( prefetch_seq[i] < int(seq_length));
+			assert( prefetch_seq[i] < int_type(seq_length));
       		assert( prefetch_seq[i] >= 0 );
 			read_reqs[i] = read_buffers[i].read (
 										*(consume_seq_begin + prefetch_seq[i]),
@@ -132,7 +132,7 @@ public:
 	//! \return \c false if there are no blocks to prefetch left, \c true if consumption sequence is not emptied
 	bool block_consumed(block_type * & buffer)
 	{
-		int ibuffer = buffer - read_buffers;
+		int_type ibuffer = buffer - read_buffers;
 		STXXL_VERBOSE1("block_prefetcher: buffer "<<ibuffer<<" consumed");
 		if(read_reqs[ibuffer].valid()) read_reqs[ibuffer]->wait();
 		read_reqs[ibuffer] = NULL;
@@ -140,10 +140,10 @@ public:
 		if (nextread < seq_length)
 		{
 			assert(ibuffer >=0 && ibuffer <nreadblocks);
-			int next_2_prefetch = prefetch_seq[nextread++];
+			int_type next_2_prefetch = prefetch_seq[nextread++];
 			STXXL_VERBOSE1("block_prefetcher: prefetching block "<<next_2_prefetch);
 			
-			assert(next_2_prefetch <int(seq_length) && next_2_prefetch >= 0 );
+			assert(next_2_prefetch <int_type(seq_length) && next_2_prefetch >= 0 );
 			assert( !completed[next_2_prefetch].is_on() );
 			
 			pref_buffer[next_2_prefetch] = ibuffer;
@@ -163,7 +163,7 @@ public:
 	//! \brief Frees used memory
 	~block_prefetcher()
 	{
-		for(int i = 0 ; i< nreadblocks ; ++i)
+		for(int_type i = 0 ; i< nreadblocks ; ++i)
 			if(read_reqs[i].valid()) read_reqs[i]->wait();
 					
 		delete [] read_reqs;

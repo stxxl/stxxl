@@ -22,12 +22,12 @@ class loser_tree
 	loser_tree & operator = (const loser_tree &);// forbidden
 	
 	int logK;
-	int k;
-	int *entry;
+	int_type k;
+	int_type *entry;
 	run_cursor_type *current;
 	run_cursor_cmp_type cmp;
   
-	int init_winner (int root)
+	int_type init_winner (int_type root)
 	{
 		if (root >= k)
 		{
@@ -35,8 +35,8 @@ class loser_tree
 		}
 		else
 		{
-			int left = init_winner (2 * root);
-			int right = init_winner (2 * root + 1);
+			int_type left = init_winner (2 * root);
+			int_type right = init_winner (2 * root + 1);
 			if (cmp (current[left], current[right]))
 			{
 				entry[root] = right;
@@ -55,12 +55,12 @@ public:
 	
 	loser_tree (
 		prefetcher_type * p, 
-		int nruns, 
+		int_type nruns, 
 		run_cursor_cmp_type c): cmp(c)
 	{
-		int i;
+		int_type i;
 		logK = static_cast < int >(ceil (log (double(nruns)) / log (2.)));	// replace with something smart
-		int kReg = k = (1 << logK);
+		int_type kReg = k = (1 << logK);
 		
 		STXXL_VERBOSE2("loser_tree: logK="<<logK<<" nruns="<<nruns<<" K="<<kReg)
     
@@ -72,7 +72,7 @@ public:
         for (i = 0; i < kReg; ++i)
             current[i].prefetcher() = p;
     #endif
-		entry = new int[(kReg << 1)];
+		entry = new int_type[(kReg << 1)];
 		// init cursors
 		for (i = 0; i < nruns; ++i)
 		{
@@ -109,9 +109,9 @@ private:
 	template < unsigned LogK > void multi_merge_unrolled (value_type * to)
 	{
 		run_cursor_type *currentE, *winnerE;
-		int *regEntry = entry;
+		int_type *regEntry = entry;
 		value_type *done = to + buffer_size;
-		int winnerIndex = regEntry[0];
+		int_type winnerIndex = regEntry[0];
 
 		while (LIKELY (to < done))
 		{
@@ -167,9 +167,9 @@ private:
 	void multi_merge_k (value_type * to)
 	{
 		run_cursor_type *currentE, *winnerE;
-		int kReg = k;
+		int_type kReg = k;
 		value_type *done = to + buffer_size;
-		int winnerIndex = entry[0];
+		int_type winnerIndex = entry[0];
 
 		while (LIKELY (to < done))
 		{
@@ -178,7 +178,7 @@ private:
 
 			(*winnerE)++;
 
-			for (int i = (winnerIndex + kReg) >> 1; i > 0;i >>= 1)
+			for (int_type i = (winnerIndex + kReg) >> 1; i > 0;i >>= 1)
 			{
 				currentE = current + entry[i];
 

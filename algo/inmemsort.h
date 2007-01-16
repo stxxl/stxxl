@@ -22,17 +22,17 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last,StrictWeakOrdering
 	typedef typename ExtIterator_::block_type block_type;
 
 	STXXL_VERBOSE("stl_in_memory_sort, range: "<<(last - first) );
-  unsigned nblocks = last.bid() - first.bid() + (last.block_offset()?1:0); 
+  unsigned_type nblocks = last.bid() - first.bid() + (last.block_offset()?1:0); 
   simple_vector<block_type> blocks(nblocks);
   simple_vector<request_ptr> reqs(nblocks);
-  unsigned i;
+  unsigned_type i;
   
   for(i=0;i<nblocks;++i)
     reqs[i] = blocks[i].read(*(first.bid() + i));
   
   wait_all(reqs.begin(),nblocks);
   
-  unsigned last_block_correction = last.block_offset()?(block_type::size - last.block_offset()):0;
+  unsigned_type last_block_correction = last.block_offset()?(block_type::size - last.block_offset()):0;
   if(block_type::has_filler)
 		std::sort(
 		              TwoToOneDimArrayRowAdaptor< block_type,

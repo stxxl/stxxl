@@ -67,7 +67,7 @@ protected:
   // blocks that are in reading or already read but not retrieved by user
   hash_map_type busy_blocks;
   
-  unsigned free_blocks_size;
+  unsigned_type free_blocks_size;
 private:
 	prefetch_pool(const prefetch_pool & pool); // forbidden
 	prefetch_pool & operator =(const prefetch_pool & pool); // forbidden
@@ -75,9 +75,9 @@ public:
   
   //! \brief Constructs pool
   //! \param init_size initial number of blocks in the pool
-  explicit prefetch_pool(unsigned init_size=1): free_blocks_size(init_size)
+  explicit prefetch_pool(unsigned_type init_size=1): free_blocks_size(init_size)
   {
-    unsigned i = 0;
+    unsigned_type i = 0;
     for(;i<init_size;++i)
       free_blocks.push_back(new block_type);
   }
@@ -112,7 +112,7 @@ public:
     }
   }
   //! \brief Returns number of owned blocks
-  unsigned size() const { return free_blocks_size + busy_blocks.size(); }
+  unsigned_type size() const { return free_blocks_size + busy_blocks.size(); }
   
   //! \brief Gives a hint for prefetching a block
   //! \param bid address of a block to be prefetched
@@ -209,9 +209,9 @@ public:
   //! Only free blocks (not in prefetching) can be freed by reducing
   //! the size of the pool calling this method.
   //! \return new size of the pool
-  unsigned resize(unsigned new_size)
+  unsigned_type resize(unsigned_type new_size)
   {
-    int diff = int(new_size) - int(size());
+    int_type diff = int_type(new_size) - int_type(size());
     if(diff > 0)
     {
       free_blocks_size += diff;

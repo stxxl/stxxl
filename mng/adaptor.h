@@ -212,7 +212,7 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 //////////////////////////
 	template < class one_dim_array_type, class data_type,
 		unsigned dim_size, class pos_type =
-		int >struct TwoToOneDimArrayRowAdaptor:public
+		int_type >struct TwoToOneDimArrayRowAdaptor:public
 		TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
 		pos_type >
 	{
@@ -259,7 +259,7 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 
 	template < class one_dim_array_type, class data_type,
 		unsigned dim_size, class pos_type =
-		int >struct TwoToOneDimArrayColumnAdaptor:public
+		int_type >struct TwoToOneDimArrayColumnAdaptor:public
 		TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
 		pos_type >
 	{

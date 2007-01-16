@@ -394,6 +394,32 @@ typedef unsigned long long uint64;
 #endif
 
 
+// integer types declarations
+enum { my_pointer_size = sizeof(void *) };
+
+template <int PtrSize>
+struct choose_int_types
+{
+};
+
+template <>
+struct choose_int_types<4>  // for 32-bit processors/compilers
+{
+        typedef int int_type;
+        typedef unsigned unsigned_type;
+};
+
+template <>
+struct choose_int_types<8> // for 64-bit processors/compilers
+{
+        typedef long long int int_type;
+        typedef long long unsigned unsigned_type;
+};
+
+typedef choose_int_types<my_pointer_size>::int_type int_type;
+typedef choose_int_types<my_pointer_size>::unsigned_type unsigned_type;
+
+
         inline uint64 longhash1(uint64 key_)
         {
              key_ += ~(key_ << 32);
@@ -440,9 +466,9 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last,
 }
 
 template <class T>
-void swap_1D_arrays(T * a,T * b, unsigned size)
+void swap_1D_arrays(T * a,T * b, unsigned_type size)
 {
-	for(unsigned i=0;i<size;++i)
+	for(unsigned_type i=0;i<size;++i)
 		std::swap(a[i],b[i]);
 }
 

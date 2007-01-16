@@ -87,7 +87,7 @@ namespace btree
 		mutable leaf_cache_type leaf_cache_;
 		iterator_map_type iterator_map_;
 		size_type size_;
-		unsigned height_;
+		unsigned_type height_;
 		bool prefetching_enabled_;
 		block_manager * bm_;
 		alloc_strategy_type alloc_strategy_;
@@ -123,9 +123,9 @@ namespace btree
 				node_type * RightNode = node_cache_.get_new_node(RightBid);
 				assert(RightNode);
 				
-				const unsigned old_size = root_node_.size();
-				const unsigned half = root_node_.size()/2;
-				unsigned i = 0;
+				const unsigned_type old_size = root_node_.size();
+				const unsigned_type half = root_node_.size()/2;
+				unsigned_type i = 0;
 				root_node_iterator_type it=root_node_.begin();
 				typename node_block_type::iterator block_it = LeftNode->block().begin();
 				while(i<half) // copy smaller part
@@ -146,7 +146,7 @@ namespace btree
 					++block_it;
 					++it;
 				}
-				unsigned right_size = RightNode->block().info.cur_size = old_size - half;
+				unsigned_type right_size = RightNode->block().info.cur_size = old_size - half;
 				key_type RightKey = (RightNode->block()[right_size-1]).first;
 				
 				assert(old_size == RightNode->size() + LeftNode->size());
@@ -195,7 +195,7 @@ namespace btree
 			local_node_type * LeftNode = cache_.get_node(LeftBid,true);
 			local_node_type * RightNode = cache_.get_node(RightBid,true);
 			
-			const unsigned TotalSize = LeftNode->size() + RightNode->size();
+			const unsigned_type TotalSize = LeftNode->size() + RightNode->size();
 			if(TotalSize <= RightNode->max_nelements())
 			{
 				// fuse
@@ -272,7 +272,7 @@ namespace btree
 			
 			leaf_bid_type NewBid;
 			leaf_type * Leaf = leaf_cache_.get_new_node(NewBid);
-			const unsigned max_leaf_elements = unsigned(double(Leaf->max_nelements())*leaf_fill_factor);
+			const unsigned_type max_leaf_elements = unsigned_type(double(Leaf->max_nelements())*leaf_fill_factor);
 			
 			while(b!=e)
 			{
@@ -317,7 +317,7 @@ namespace btree
 			
 			Bids.push_back(key_bid_pair(key_compare::max_value(),(node_bid_type)NewBid));
 			
-			const unsigned max_node_elements = unsigned(double(max_node_size)*node_fill_factor);
+			const unsigned_type max_node_elements = unsigned_type(double(max_node_size)*node_fill_factor);
 			
 			while(Bids.size() > max_node_elements)
 			{
@@ -334,7 +334,7 @@ namespace btree
 					node_bid_type NewBid;
 					node_type * Node = node_cache_.get_new_node(NewBid);
 					assert(Node);
-					unsigned cnt =0;
+					unsigned_type cnt =0;
 					for(;cnt<max_node_elements && it!=Bids.end();++cnt,++it)
 					{
 						Node->push_back(*it);
@@ -379,8 +379,8 @@ namespace btree
 		}
 		
 	public:
-		btree(	unsigned node_cache_size_in_bytes,
-					unsigned leaf_cache_size_in_bytes
+		btree(	unsigned_type node_cache_size_in_bytes,
+					unsigned_type leaf_cache_size_in_bytes
 				): 
 			node_cache_(node_cache_size_in_bytes,this,key_compare_),
 			leaf_cache_(leaf_cache_size_in_bytes,this,key_compare_),
@@ -403,8 +403,8 @@ namespace btree
 		}
 		
 		btree(	const key_compare & c_,
-					unsigned node_cache_size_in_bytes,
-					unsigned leaf_cache_size_in_bytes
+					unsigned_type node_cache_size_in_bytes,
+					unsigned_type leaf_cache_size_in_bytes
 				): 
 			key_compare_(c_),
 			node_cache_(node_cache_size_in_bytes,this,key_compare_),
@@ -900,8 +900,8 @@ namespace btree
 		btree(	InputIterator b,
 					InputIterator e,
 					const key_compare & c_,
-					unsigned node_cache_size_in_bytes,
-					unsigned leaf_cache_size_in_bytes,
+					unsigned_type node_cache_size_in_bytes,
+					unsigned_type leaf_cache_size_in_bytes,
 					bool range_sorted = false,
 					double node_fill_factor = 0.75,
 					double leaf_fill_factor = 0.6
@@ -937,8 +937,8 @@ namespace btree
 		template <class InputIterator>
 		btree(	InputIterator b,
 					InputIterator e,
-					unsigned node_cache_size_in_bytes,
-					unsigned leaf_cache_size_in_bytes,
+					unsigned_type node_cache_size_in_bytes,
+					unsigned_type leaf_cache_size_in_bytes,
 					bool range_sorted = false,
 					double node_fill_factor = 0.75,
 					double leaf_fill_factor = 0.6

@@ -121,8 +121,8 @@ inline void write_out(
 					type_key_ * end,
 					block_type *& cur_blk,
 					const block_type * end_blk,
-					int & out_block,
-					int & out_pos,
+					int_type & out_block,
+					int_type & out_pos,
 					run_type & run,
 					write_completion_handler<block_type,typename block_type::bid_type> *& next_read,
 					request_ptr * write_reqs,
@@ -178,8 +178,8 @@ void
 create_runs(
 		input_bid_iterator it,
 		run_type ** runs,
-		const unsigned nruns,
-		const unsigned m2,
+		const unsigned_type nruns,
+		const unsigned_type m2,
 		key_extractor keyobj)
 {
 	typedef typename block_type::value_type type;
@@ -199,18 +199,18 @@ create_runs(
 	
 	run_type *run;
 	run = *runs;
-	int run_size = (*runs)->size ();
+	int_type run_size = (*runs)->size ();
 	key_type offset = 0;
 	const int log_k1 = 
 	  static_cast<int>(ceil(log2((m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE)?
 	  	(double(m2 * block_type::size * sizeof(type_key_)/STXXL_L2_SIZE)):2.)));
 	const int log_k2 = int(log2(double(m2 * Blocks1->size))) - log_k1 - 1;
 	STXXL_VERBOSE("log_k1: "<<log_k1<<" log_k2:"<<log_k2)
-	const int k1 = 1 << log_k1;
-	const int k2 = 1 << log_k2;
-	int *bucket1 = new int[k1];
-	int *bucket2 = new int[k2];
-	int i;
+	const int_type k1 = 1 << log_k1;
+	const int_type k2 = 1 << log_k2;
+	int_type *bucket1 = new int_type[k1];
+	int_type *bucket2 = new int_type[k2];
+	int_type i;
 	
 	disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
 	
@@ -221,7 +221,7 @@ create_runs(
 		bm->delete_block(bid);
 	}
 	
-	unsigned k = 0;
+	unsigned_type k = 0;
 	const int shift1 = sizeof(typename block_type::value_type::key_type)*8 - log_k1;
 	const int shift2 = shift1 - log_k2;
 	STXXL_VERBOSE("shift1: "<<shift1<<" shift2:"<<shift2)
@@ -248,9 +248,9 @@ create_runs(
 		classify(refs1, refs1 + run_size * Blocks1->size, refs2, bucket1,
 			  offset, shift1);
 		
-		int out_block = 0;
-		int out_pos = 0;
-		unsigned int next_run_size = (k < nruns - 1)?(runs[k + 1]->size ()):0;
+		int_type out_block = 0;
+		int_type out_pos = 0;
+		unsigned_type next_run_size = (k < nruns - 1)?(runs[k + 1]->size ()):0;
 		
 		// recurse on each bucket
 		type_key_ *c = refs2;
@@ -332,30 +332,30 @@ public:
 
 template < typename block_type,typename run_type , typename key_ext_>
   bool check_ksorted_runs(		run_type ** runs, 
-								unsigned nruns, 
-								unsigned m,
+								unsigned_type nruns, 
+								unsigned_type m,
 								key_ext_ keyext)
   {
     typedef typename block_type::value_type value_type;
 	  
     //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
 	  STXXL_MSG("check_sorted_runs  Runs: "<<nruns)
-    unsigned irun=0;
+    unsigned_type irun=0;
     for(irun = 0; irun < nruns; ++irun)
     {
-       const unsigned nblocks_per_run = runs[irun]->size();
-			 unsigned blocks_left = nblocks_per_run;
+       const unsigned_type nblocks_per_run = runs[irun]->size();
+			 unsigned_type blocks_left = nblocks_per_run;
 			 block_type * blocks = new block_type[m];
 			 request_ptr * reqs = new request_ptr[m];
 			 value_type last;
 			
-			 for(unsigned off = 0; off < nblocks_per_run ; off += m)
+			 for(unsigned_type off = 0; off < nblocks_per_run ; off += m)
 			 {
-				 const unsigned nblocks = STXXL_MIN(blocks_left,m);
-				 const unsigned nelements = nblocks*block_type::size ;
+				 const unsigned_type nblocks = STXXL_MIN(blocks_left,m);
+				 const unsigned_type nelements = nblocks*block_type::size ;
 				 blocks_left -= nblocks;
 				 
-				 for(unsigned j=0;j<nblocks;++j)
+				 for(unsigned_type j=0;j<nblocks;++j)
 				 {
 					 reqs[j] = blocks[j].read((*runs[irun])[off + j].bid);
 				 }
@@ -366,23 +366,23 @@ template < typename block_type,typename run_type , typename key_ext_>
 					 STXXL_MSG("check_sorted_runs  wrong first value in the run "<<irun)
 					 STXXL_MSG(" first value: "<<blocks[0][0]<<" with key"<<keyext(blocks[0][0]))
 					 STXXL_MSG(" last  value: "<<last<<" with key"<<keyext(last))
-					 for(unsigned k=0; k<block_type::size;++k)
+					 for(unsigned_type k=0; k<block_type::size;++k)
 						 STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[0][k]<< " key: "<<keyext(blocks[0][k]))
 					 return false;
 				 }
 					 
-				 for(unsigned j=0;j<nblocks;++j)
+				 for(unsigned_type j=0;j<nblocks;++j)
 				 {
 					 if(keyext(blocks[j][0]) != (*runs[irun])[off + j].key)
 			 {
 				 STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<(off + j))
 				 STXXL_MSG("                   trigger value: "<<(*runs[irun])[off + j].key)
 				 STXXL_MSG("Data in the block:")
-				 for(unsigned k=0; k<block_type::size;++k)
+				 for(unsigned_type k=0; k<block_type::size;++k)
 					 STXXL_MSG("Element "<<k<<" in the block is :"<<blocks[j][k]<<" with key: "<<keyext(blocks[j][k]))
 				 
 				 STXXL_MSG("BIDS:")
-				 for(unsigned k=0; k<nblocks;++k)
+				 for(unsigned_type k=0; k<nblocks;++k)
 				 {
 					if( k == j) STXXL_MSG("Bad one comes next.")
 						STXXL_MSG("BID "<<(off+k)<<" is: "<<((*runs[irun])[off + k].bid))
@@ -405,13 +405,13 @@ template < typename block_type,typename run_type , typename key_ext_>
 			 {
 				 STXXL_MSG("check_sorted_runs  wrong order in the run "<<irun)
 				 STXXL_MSG("Data in blocks:")
-				 for(unsigned j=0;j<nblocks;++j)
+				 for(unsigned_type j=0;j<nblocks;++j)
 				 {
-						 for(unsigned k=0; k<block_type::size;++k)
+						 for(unsigned_type k=0; k<block_type::size;++k)
 								STXXL_MSG("     Element "<<k<<" in block "<< (off+j) <<" is :"<<blocks[j][k]<<" with key: "<<keyext(blocks[j][k]))
 				 }
 				 STXXL_MSG("BIDS:")
-				 for(unsigned k=0; k<nblocks;++k)
+				 for(unsigned_type k=0; k<nblocks;++k)
 				 {
 						STXXL_MSG("BID "<<(k+off)<<" is: "<<((*runs[irun])[k+off].bid))
 				 }
@@ -435,15 +435,15 @@ template < typename block_type,typename run_type , typename key_ext_>
 
 
 template < typename block_type,typename run_type, typename key_extractor>
-void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned  _m, key_extractor keyobj)
+void merge_runs(run_type ** in_runs, unsigned_type nruns, run_type * out_run,unsigned_type  _m, key_extractor keyobj)
 {
 	typedef block_prefetcher<block_type,typename run_type::iterator> prefetcher_type;
 	typedef run_cursor2<block_type,prefetcher_type> run_cursor_type;
 	
-	unsigned int i;
+	unsigned_type i;
 	run_type consume_seq(out_run->size());
 
-	int * prefetch_seq = new int[out_run->size()];
+	int_type * prefetch_seq = new int_type[out_run->size()];
 
 	typename run_type::iterator copy_start = consume_seq.begin ();
 	for (i = 0; i < nruns; i++)
@@ -459,14 +459,14 @@ void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned
 	unsigned disks_number = config::get_instance()->disks_number ();
 	
 	#ifdef PLAY_WITH_OPT_PREF
-	const int n_write_buffers = 4 * disks_number;
+	const int_type n_write_buffers = 4 * disks_number;
 	#else
-	const int n_prefetch_buffers = STXXL_MAX( int(2 * disks_number) , (3 * (int(_m) - int(nruns)) / 4));
+	const int_type n_prefetch_buffers = STXXL_MAX( int_type(2 * disks_number) , (3 * (int_type(_m) - int_type(nruns)) / 4));
 	STXXL_VERBOSE("Prefetch buffers "<<n_prefetch_buffers)
-    const int n_write_buffers = STXXL_MAX( int(2 * disks_number) , int(_m) - int(nruns) - int(n_prefetch_buffers) );
+    const int_type n_write_buffers = STXXL_MAX( int_type(2 * disks_number) , int_type(_m) - int_type(nruns) - int_type(n_prefetch_buffers) );
 	STXXL_VERBOSE("Write buffers "<<n_write_buffers)
 	// heuristic
-	const int n_opt_prefetch_buffers = 2 * int(disks_number) + (3*(int(n_prefetch_buffers) - int(2 * disks_number)))/10;
+	const int_type n_opt_prefetch_buffers = 2 * int_type(disks_number) + (3*(int_type(n_prefetch_buffers) - int_type(2 * disks_number)))/10;
 	STXXL_VERBOSE("Prefetch buffers "<<n_opt_prefetch_buffers)
 	#endif
 	
@@ -489,7 +489,7 @@ void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned
 	
 	buffered_writer<block_type> writer(n_write_buffers,n_write_buffers/2);
 	
-	unsigned out_run_size = out_run->size();
+	unsigned_type out_run_size = out_run->size();
 
 	run_cursor2_cmp<block_type,prefetcher_type,key_extractor> cmp(keyobj);
 	loser_tree<
@@ -512,8 +512,8 @@ void merge_runs(run_type ** in_runs, unsigned nruns, run_type * out_run,unsigned
 	block_manager *bm = block_manager::get_instance ();
 	for (i = 0; i < nruns; i++)
 	{
-		unsigned sz = in_runs[i]->size ();
-		for (unsigned j = 0; j < sz; j++)
+		unsigned_type sz = in_runs[i]->size ();
+		for (unsigned_type j = 0; j < sz; j++)
 			bm->delete_block((*in_runs[i])[j].bid);
 		delete in_runs[i];
 	}
@@ -527,7 +527,7 @@ template <typename block_type,
 					typename key_extractor>
 
 simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::value_type::key_type> > * 
-	ksort_blocks(input_bid_iterator input_bids,unsigned _n,unsigned _m,key_extractor keyobj)
+	ksort_blocks(input_bid_iterator input_bids,unsigned_type _n,unsigned_type _m,key_extractor keyobj)
 {
 	typedef typename block_type::value_type type;
 	typedef typename block_type::bid_type bid_type;
@@ -535,16 +535,16 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 	typedef simple_vector< trigger_entry_type > run_type;
 	typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 	
-	unsigned int m2 = div_and_round_up(_m,2);
-  const unsigned int m2_rf = m2 * block_type::raw_size / 
+	unsigned_type m2 = div_and_round_up(_m,2);
+  const unsigned_type m2_rf = m2 * block_type::raw_size / 
     (block_type::raw_size + block_type::size*sizeof(type_key<type>));
   STXXL_VERBOSE("Reducing number of blocks in a run from "<< m2 << " to "<<
     m2_rf<<" due to key size: "<<sizeof(typename type::key_type)<<" bytes")
   m2 = m2_rf;
-	unsigned int full_runs = _n / m2;
-	unsigned int partial_runs = ((_n % m2) ? 1 : 0);
-	unsigned int nruns = full_runs + partial_runs;
-	unsigned int i;
+	unsigned_type full_runs = _n / m2;
+	unsigned_type partial_runs = ((_n % m2) ? 1 : 0);
+	unsigned_type nruns = full_runs + partial_runs;
+	unsigned_type i;
 	
 	config *cfg = config::get_instance ();
 	block_manager *mng = block_manager::get_instance ();
@@ -569,7 +569,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 #ifdef INTERLEAVED_ALLOC
 	if (partial_runs)
 	{
-		unsigned int last_run_size = _n - full_runs * m2;
+		unsigned_type last_run_size = _n - full_runs * m2;
 		runs[i] = new run_type (last_run_size);
 
 		mng->new_blocks (interleaved_alloc_strategy (nruns, 0, ndisks),
@@ -614,37 +614,37 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
     
 	// Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) at once
 		
-	const int merge_factor = static_cast<int>(ceil(pow(nruns,1./ceil(log(double(nruns))/log(double(_m))))));
+	const int_type merge_factor = static_cast<int_type>(ceil(pow(nruns,1./ceil(log(double(nruns))/log(double(_m))))));
 	run_type **new_runs;
 	
 	while(nruns > 1)
 	{
-		int new_nruns = div_and_round_up(nruns,merge_factor);
+		int_type new_nruns = div_and_round_up(nruns,merge_factor);
 		STXXL_VERBOSE("Starting new merge phase: nruns: "<<nruns<<
 			" opt_merge_factor: "<<merge_factor<<" m:"<<_m<<" new_nruns: "<<new_nruns)
 		
 		new_runs = new run_type *[new_nruns];
 		
-		int runs_left = nruns;
-		int cur_out_run = 0;
-		int blocks_in_new_run = 0;
+		int_type runs_left = nruns;
+		int_type cur_out_run = 0;
+		int_type blocks_in_new_run = 0;
 		
 		while(runs_left > 0)
 		{
-			int runs2merge = STXXL_MIN(runs_left,merge_factor);
+			int_type runs2merge = STXXL_MIN(runs_left,merge_factor);
 			blocks_in_new_run = 0;
-			for(unsigned i = nruns - runs_left; i < (nruns - runs_left + runs2merge);i++)
+			for(unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge);i++)
 				blocks_in_new_run += runs[i]->size();
 			// allocate run
 			new_runs[cur_out_run++] = new run_type(blocks_in_new_run);
 			runs_left -= runs2merge;
 		}
 		// allocate blocks in the new runs
-		if( cur_out_run == 1 &&  blocks_in_new_run==int(_n) && (input_bids->storage->get_id() == -1))
+		if( cur_out_run == 1 &&  blocks_in_new_run==int_type(_n) && (input_bids->storage->get_id() == -1))
 		{
 			// if we sort a file we can reuse the input bids for the output
 			input_bid_iterator cur = input_bids;
-			for(int i=0;cur != (input_bids+_n) ; ++cur)
+			for(int_type i=0;cur != (input_bids+_n) ; ++cur)
 			{
 				(*new_runs[0])[i++].bid = *cur;
 			}
@@ -674,7 +674,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 		cur_out_run = 0;
 		while(runs_left > 0)
 		{
-				int runs2merge = STXXL_MIN(runs_left,merge_factor);
+				int_type runs2merge = STXXL_MIN(runs_left,merge_factor);
 				#ifdef STXXL_CHECK_ORDER_IN_SORTS
 				assert((check_ksorted_runs<block_type,run_type,key_extractor>(runs + nruns - runs_left,runs2merge,m2,keyobj) ));
 				#endif
@@ -762,7 +762,7 @@ simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::
 //! \remark Implements external merge sort described in [Dementiev & Sanders'03]
 //! \remark Order in the result is non-stable
 template <typename ExtIterator_,typename KeyExtractor_>
-void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned M__)
+void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned_type M__)
 {
 	typedef simple_vector< trigger_entry<typename ExtIterator_::bid_type,
       typename KeyExtractor_::key_type> > run_type;
@@ -771,7 +771,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 	
 	
 	
-	unsigned n=0;
+	unsigned_type n=0;
 	block_manager *mng = block_manager::get_instance ();
 	
 	first_.flush();
@@ -802,7 +802,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 			
 				req = last_block->read(*last_.bid());
 				
-				unsigned i=0;
+				unsigned_type i=0;
 				for(;i<first_.block_offset();i++)
 				{
 					first_block->elem[i] = keyobj.min_value();
@@ -908,7 +908,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 				req->wait();
 				
 				
-				unsigned i=0;
+				unsigned_type i=0;
 				for(;i<first_.block_offset();i++)
 				{
 					first_block->elem[i] = keyobj.min_value();
@@ -983,7 +983,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_,KeyExtractor_ keyobj,unsigned
 				typename ExtIterator_::block_type * last_block = new typename ExtIterator_::block_type;
 				typename ExtIterator_::bid_type last_bid;
 				request_ptr req;
-				unsigned i;
+				unsigned_type i;
 				
 				req = last_block->read(*last_.bid());
 				mng->new_blocks( FR(), &last_bid,(&last_bid) + 1);
@@ -1116,7 +1116,7 @@ struct ksort_defaultkey
     (<A HREF="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">see what it is</A>).
 */
 template <typename ExtIterator_>
-void ksort(ExtIterator_ first_, ExtIterator_ last_,unsigned M__)
+void ksort(ExtIterator_ first_, ExtIterator_ last_,unsigned_type M__)
 {
   ksort(first_,last_,
     ksort_defaultkey<typename ExtIterator_::vector_type::value_type>(),M__);

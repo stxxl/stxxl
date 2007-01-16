@@ -32,7 +32,7 @@ class buf_ostream
 protected:
 	buffered_writer<block_type> writer;
 	bid_iterator_type current_bid;
-	int current_elem;
+	int_type current_elem;
 	block_type * current_blk;
 public:
 	typedef typename block_type::const_reference const_reference;
@@ -42,7 +42,7 @@ public:
 	//! \brief Constructs output stream object
 	//! \param first_bid \c bid_iterator pointing to the first block of the stream
 	//! \param nbuffers number of buffers for internal use
-	buf_ostream(bid_iterator_type first_bid,int nbuffers):
+	buf_ostream(bid_iterator_type first_bid,int_type nbuffers):
 		writer(nbuffers,nbuffers/2),current_bid(first_bid),
 		current_elem(0)
 	{

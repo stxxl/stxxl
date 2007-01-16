@@ -104,7 +104,7 @@ namespace stream
   template <class InputIterator_>
   struct streamify_traits
   {
-	  //! \brief return type (stream type) of \c´streamify for \c InputIterator_
+	  //! \brief return type (stream type) of \cï¿½streamify for \c InputIterator_
 	  typedef iterator2stream<InputIterator_> stream_type;
   };
   
@@ -134,7 +134,7 @@ namespace stream
     //! \brief Standard stream typedef
     typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
       
-    vector_iterator2stream(InputIterator_ begin,InputIterator_ end, unsigned nbuffers = 0): 
+    vector_iterator2stream(InputIterator_ begin,InputIterator_ end, unsigned_type nbuffers = 0): 
       current_(begin),end_(end), in(NULL)
   	{
 		
@@ -202,7 +202,7 @@ namespace stream
   	streamify(
   		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> begin,
   		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
-  		unsigned nbuffers = 0)
+  		unsigned_type nbuffers = 0)
   {
 	  	STXXL_VERBOSE1("streamify for vector_iterator range is called")
     	return vector_iterator2stream<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
@@ -230,7 +230,7 @@ namespace stream
   	streamify(
   		stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> begin,
   		stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
-  		unsigned nbuffers = 0)
+  		unsigned_type nbuffers = 0)
   {
 	  	STXXL_VERBOSE1("streamify for const_vector_iterator range is called")
     	return vector_iterator2stream<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
@@ -267,7 +267,7 @@ namespace stream
     //! \brief Standard stream typedef
     typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
       
-    vector_iterator2stream_sr(InputIterator_ begin,InputIterator_ end, unsigned nbuffers = 0) 
+    vector_iterator2stream_sr(InputIterator_ begin,InputIterator_ end, unsigned_type nbuffers = 0) 
   	{
 		if(end - begin < block_type::size )
 		{
@@ -334,7 +334,7 @@ namespace stream
   	streamify_sr(
   		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> begin,
   		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
-  		unsigned nbuffers = 0)
+  		unsigned_type nbuffers = 0)
   {
 	  	STXXL_VERBOSE1("streamify_sr for vector_iterator range is called")
     	return vector_iterator2stream_sr<stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
@@ -348,7 +348,7 @@ namespace stream
   	streamify_sr(
   		stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> begin,
   		stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> end,
-  		unsigned nbuffers = 0)
+  		unsigned_type nbuffers = 0)
   {
 	  	STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called")
     	return vector_iterator2stream_sr<stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> > 
@@ -413,7 +413,7 @@ namespace stream
   	materialize(StreamAlgorithm_ & in,
   		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> outbegin,
 		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> outend,
-  		unsigned nbuffers = 0)
+  		unsigned_type nbuffers = 0)
   {
   	typedef stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_>  ExtIterator;
 	typedef stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> ConstExtIterator;
@@ -474,7 +474,7 @@ namespace stream
   stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> 
   	materialize(StreamAlgorithm_ & in,
   		stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> out,
-  		unsigned nbuffers = 0)
+  		unsigned_type nbuffers = 0)
   {
   	typedef stxxl::vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_>  ExtIterator;
 	typedef stxxl::const_vector_iterator<Tp_,AllocStr_,SzTp_,DiffTp_,BlkSize_,PgTp_,PgSz_> ConstExtIterator;

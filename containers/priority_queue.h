@@ -40,7 +40,7 @@ namespace priority_queue_local
 template <class Value_,class Cmp_>
 void merge(Value_ **f0,
            Value_ **f1,
-           Value_  *to, int sz, Cmp_ cmp) 
+           Value_  *to, int_type sz, Cmp_ cmp) 
 {
   Value_ *from0   = *f0;
   Value_ *from1   = *f1;
@@ -76,7 +76,7 @@ void merge3(
            Value_ **f0,
            Value_ **f1,
            Value_ **f2,
-           Value_  *to, int sz,Cmp_ cmp) 
+           Value_  *to, int_type sz,Cmp_ cmp) 
 {
   Value_ *from0   = *f0;
   Value_ *from1   = *f1;
@@ -134,7 +134,7 @@ void merge4(
            Value_ **f1,
            Value_ **f2,
            Value_ **f3,
-           Value_  *to, int sz, Cmp_ cmp) 
+           Value_  *to, int_type sz, Cmp_ cmp) 
 {
   Value_ *from0   = *f0;
   Value_ *from1   = *f1;
@@ -262,11 +262,11 @@ void merge4(
     protected:
       struct sequence_type
       {
-        unsigned current;
+        unsigned_type current;
         block_type * block;
         std::list<bid_type> * bids;
         sequence_type() {}
-        sequence_type(unsigned c,block_type * bl, std::list<bid_type> * bi):
+        sequence_type(unsigned_type c,block_type * bl, std::list<bid_type> * bi):
           current(c),block(bl),bids(bi) {}
         value_type & operator *()
         {
@@ -292,7 +292,7 @@ void merge4(
         }
       };
       
-      unsigned nsequences;
+      unsigned_type nsequences;
       size_type nelements;
       std::list<sequence_type> sequences;
       //typename std::list<sequence_type>::iterator last_sequence;
@@ -331,7 +331,7 @@ void merge4(
       	  // std::swap(p_pool,obj.p_pool);
       	  // std::swap(w_pool,obj.w_pool);
 	  }
-      unsigned mem_cons() const // only rough estimation
+      unsigned_type mem_cons() const // only rough estimation
       {
         return (nsequences * block_type::raw_size);
       }
@@ -418,7 +418,7 @@ void merge4(
       {
         STXXL_VERBOSE2("ext_merger::insert_segment(merger,...)")
         assert(segment_size);
-        unsigned nblocks = segment_size / block_type::size; 
+        unsigned_type nblocks = segment_size / block_type::size; 
         STXXL_VERBOSE2("ext_merger::insert_segment(merger,...) inserting segment with "<<nblocks<<" blocks")
         //assert(nblocks); // at least one block
 		STXXL_VERBOSE1("ext_merger::insert_segment nblocks="<<nblocks)
@@ -428,7 +428,7 @@ void merge4(
             nblocks<<" blocks")
           STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS")
         }
-        unsigned first_size = segment_size % block_type::size;
+        unsigned_type first_size = segment_size % block_type::size;
         if(first_size == 0)
         {
           first_size = block_type::size;
@@ -451,7 +451,7 @@ void merge4(
         assert(w_pool->size() > 0);
         
         typename std::list<bid_type>::iterator curbid = bids->begin();
-        for(unsigned i=0;i<nblocks;++i,++curbid)
+        for(unsigned_type i=0;i<nblocks;++i,++curbid)
         {
           block_type *b = w_pool->steal();
           another_merger.multi_merge(b->begin(),b->end());
@@ -465,7 +465,7 @@ void merge4(
  protected:
       /*! \param first_size number of elements in the first block
  		*/
-      void insert_segment(std::list<bid_type> * segment, block_type * first_block, unsigned first_size)
+      void insert_segment(std::list<bid_type> * segment, block_type * first_block, unsigned_type first_size)
       {
         STXXL_VERBOSE1("ext_merger::insert_segment(segment_bids,...) "<<this)
         assert(first_size);
@@ -502,17 +502,17 @@ private:
   struct Entry 
   {
     value_type key;   // Key of Looser element (winner for 0)
-    int index;        // number of loosing segment
+    int_type index;        // number of loosing segment
   };
 
   comparator_type cmp;
   // stack of empty segments
-  int empty[KNKMAX]; // indices of empty segments
-  int lastFree;  // where in "empty" is the last valid entry?
+  int_type empty[KNKMAX]; // indices of empty segments
+  int_type lastFree;  // where in "empty" is the last valid entry?
 
-  unsigned size_; // total number of elements stored
+  unsigned_type size_; // total number of elements stored
   unsigned logK; // log of current tree size
-  unsigned k; // invariant k = 1 << logK
+  unsigned_type k; // invariant k = 1 << logK
 
   Element dummy; // target of empty segment pointers
 
@@ -525,22 +525,22 @@ private:
   // while we use 0..k-1
   Element * current[KNKMAX]; // pointer to actual element
   Element * segment[KNKMAX]; // start of Segments
-  unsigned segment_size[KNKMAX];
+  unsigned_type segment_size[KNKMAX];
 
-  unsigned mem_cons_;
+  unsigned_type mem_cons_;
   
   // private member functions
-  int initWinner(int root);
-  void updateOnInsert(int node, const Element & newKey, int newIndex, 
-                      Element * winnerKey, int * winnerIndex, int * mask);
-  void deallocateSegment(int index);
+  int_type initWinner(int_type root);
+  void updateOnInsert(int_type node, const Element & newKey, int_type newIndex, 
+                      Element * winnerKey, int_type * winnerIndex, int_type * mask);
+  void deallocateSegment(int_type index);
   void doubleK();
   void compactTree();
   void rebuildLooserTree();
-  bool segmentIsEmpty(int i);
-  void multi_merge_k(Element * to, int l);
+  bool segmentIsEmpty(int_type i);
+  void multi_merge_k(Element * to, int_type l);
   template <unsigned LogK>
-  void multi_merge_f(Element *to, int l)
+  void multi_merge_f(Element *to, int_type l)
   {
     //Entry *currentPos;
     //Element currentKey;
@@ -548,7 +548,7 @@ private:
     Element *done = to + l;
     Entry    *regEntry   = entry;
     Element **regCurrent = current;
-    int      winnerIndex = regEntry[0].index;
+    int_type      winnerIndex = regEntry[0].index;
     Element  winnerKey   = regEntry[0].key;
     Element *winnerPos;
     //Element sup = dummy; // supremum
@@ -579,7 +579,7 @@ private:
         Entry  *pos##L = regEntry+((winnerIndex+(1<<LogK)) >> (((int(LogK-L)+1)>=0)?((LogK-L)+1):0));\
         Element key##L = pos##L->key;\
         if (cmp(winnerKey,key##L)) {\
-          int index##L  = pos##L->index;\
+          int_type index##L  = pos##L->index;\
           pos##L->key   = winnerKey;\
           pos##L->index = winnerIndex;\
           winnerKey     = key##L;\
@@ -639,14 +639,14 @@ public:
   {
     multi_merge(begin,end-begin);
   }
-  void multi_merge(Element *, unsigned l);
+  void multi_merge(Element *, unsigned_type l);
   
-  unsigned mem_cons() const { return mem_cons_; }
+  unsigned_type mem_cons() const { return mem_cons_; }
   bool  spaceIsAvailable() // for new segment
   { return k < KNKMAX || lastFree >= 0; } 
      
-  void insert_segment(Element *to, unsigned sz); // insert segment beginning at to
-  unsigned  size() { return size_; }
+  void insert_segment(Element *to, unsigned_type sz); // insert segment beginning at to
+  unsigned_type  size() { return size_; }
 };  
 
 ///////////////////////// LooserTree ///////////////////////////////////
@@ -674,7 +674,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::init()
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
 void loser_tree<ValTp_,Cmp_,KNKMAX>::rebuildLooserTree()
 {  
-  int winner = initWinner(1);
+  int_type winner = initWinner(1);
   entry[0].index = winner;
   entry[0].key   = *(current[winner]);
 }
@@ -686,13 +686,13 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::rebuildLooserTree()
 // initialize entry[root].index and the subtree rooted there
 // return winner index
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-int loser_tree<ValTp_,Cmp_,KNKMAX>::initWinner(int root)
+int_type loser_tree<ValTp_,Cmp_,KNKMAX>::initWinner(int_type root)
 {
-  if (root >= int(k)) { // leaf reached
+  if (root >= int_type(k)) { // leaf reached
     return root - k;
   } else {
-    int left  = initWinner(2*root    );
-    int right = initWinner(2*root + 1);
+    int_type left  = initWinner(2*root    );
+    int_type right = initWinner(2*root + 1);
     Element lk    = *(current[left ]);
     Element rk    = *(current[right]);
     if (!(cmp(lk,rk))) { // right subtree looses
@@ -715,12 +715,12 @@ int loser_tree<ValTp_,Cmp_,KNKMAX>::initWinner(int root)
 // This is implemented recursively
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
 void loser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
-               int node, 
+               int_type node, 
                const Element  & newKey, 
-               int      newIndex, 
+               int_type      newIndex, 
                Element *winnerKey, 
-               int *winnerIndex, // old winner
-               int *mask) // 1 << (ceil(log KNK) - dist-from-root)
+               int_type *winnerIndex, // old winner
+               int_type *mask) // 1 << (ceil(log KNK) - dist-from-root)
 {
   if (node == 0) { // winner part of root
     *mask = 1 << (logK - 1);    
@@ -734,7 +734,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::updateOnInsert(
   } else {
     updateOnInsert(node >> 1, newKey, newIndex, winnerKey, winnerIndex, mask);
     Element loserKey   = entry[node].key;
-    int loserIndex = entry[node].index;
+    int_type loserIndex = entry[node].index;
     if ((*winnerIndex & *mask) != (newIndex & *mask)) { // different subtrees
       if (cmp(loserKey,newKey)) { // newKey will have influence here
         if (cmp(*winnerKey,newKey) ) { // old winner loses here
@@ -769,7 +769,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::doubleK()
   // and push them on the free stack
   assert(lastFree == -1); // stack was empty (probably not needed)
   assert(k < KNKMAX);
-  for (int i = 2*k - 1;  i >= int(k);  i--)
+  for (int_type i = 2*k - 1;  i >= int_type(k);  i--)
   {
     current[i] = &dummy;
     segment[i] = NULL;
@@ -792,9 +792,9 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
   assert(logK > 0);
 
   // compact all nonempty segments to the left
-  int from = 0;
-  int to   = 0;
-  for(;  from < int(k);  from++)
+  int_type from = 0;
+  int_type to   = 0;
+  for(;  from < int_type(k);  from++)
   {
     if (not_sentinel(*(current[from])))
     {
@@ -817,13 +817,13 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
   }
 
   // half degree as often as possible
-  while (to < int(k/2)) {
+  while (to < int_type(k/2)) {
     k /= 2;  logK--;
   }
 
   // overwrite garbage and compact the stack of empty segments
   lastFree = -1; // none free
-  for (;  to < int(k);  to++) {
+  for (;  to < int_type(k);  to++) {
     // push 
     lastFree++;
     empty[lastFree] = to;
@@ -839,7 +839,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
 // insert segment beginning at to
 // require: spaceIsAvailable() == 1 
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void loser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
+void loser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned_type sz)
 {
   STXXL_VERBOSE2("loser_tree::insert_segment("<< to <<","<< sz<<")")
   //std::copy(to,to + sz,std::ostream_iterator<ValTp_>(std::cout, "\n"));
@@ -852,7 +852,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
     if (lastFree < 0) { // tree is too small
       doubleK();
     }
-    int index = empty[lastFree];
+    int_type index = empty[lastFree];
     lastFree--; // pop
 
 
@@ -864,8 +864,8 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned sz)
      
     // propagate new information up the tree
     Element dummyKey;
-    int dummyIndex;
-    int dummyMask;
+    int_type dummyIndex;
+    int_type dummyMask;
     updateOnInsert((index + k) >> 1, *to, index, 
                    &dummyKey, &dummyIndex, &dummyMask);
   } else {
@@ -882,7 +882,7 @@ template <class ValTp_,class Cmp_,unsigned KNKMAX>
 loser_tree<ValTp_,Cmp_,KNKMAX>::~loser_tree()
 {
   STXXL_VERBOSE2("loser_tree::~loser_tree()")
-  for(unsigned i=0;i<k;++i)
+  for(unsigned_type i=0;i<k;++i)
   {
     if(segment[i])
     {
@@ -897,7 +897,7 @@ loser_tree<ValTp_,Cmp_,KNKMAX>::~loser_tree()
 
 // free an empty segment .
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void loser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int index)
+void loser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int_type index)
 {
   // reroute current pointer to some empty dummy segment
   // with a sentinel key
@@ -922,7 +922,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int index)
 // - there are at least l elements
 // - segments are ended by sentinels
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
+void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned_type l)
 {
   STXXL_VERBOSE3("loser_tree::multi_merge("<< to <<","<< l<<")")
   
@@ -972,7 +972,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
   size_ -= l;
 
   // compact tree if it got considerably smaller
-  if (k > 1 && int(lastFree) >= int(3*k/5 - 1) ) { 
+  if (k > 1 && int_type(lastFree) >= int_type(3*k/5 - 1) ) { 
     // using k/2 would be worst case inefficient
     compactTree(); 
   }
@@ -982,7 +982,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned l)
 
 // is this segment empty and does not point to dummy yet?
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
-inline bool loser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
+inline bool loser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int_type i)
 {
   return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
 }
@@ -990,7 +990,7 @@ inline bool loser_tree<ValTp_,Cmp_,KNKMAX>::segmentIsEmpty(int i)
 // multi-merge for fixed K
 /*
 template <class ValTp_,class Cmp_,unsigned KNKMAX> template <unsigned LogK>
-void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge_f<LogK>(Element *to, int l)
+void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge_f<LogK>(Element *to, int_type l)
 {
 }
 */
@@ -998,14 +998,14 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge_f<LogK>(Element *to, int l)
 // multi-merge for arbitrary K
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
 void loser_tree<ValTp_,Cmp_,KNKMAX>::
-multi_merge_k(Element *to, int l)
+multi_merge_k(Element *to, int_type l)
 {
   Entry *currentPos;
   Element currentKey;
-  int currentIndex; // leaf pointed to by current entry
-  int kReg = k;
+  int_type currentIndex; // leaf pointed to by current entry
+  int_type kReg = k;
   Element *done = to + l;
-  int      winnerIndex = entry[0].index;
+  int_type      winnerIndex = entry[0].index;
   Element  winnerKey   = entry[0].key;
   Element *winnerPos;
   
@@ -1026,7 +1026,7 @@ multi_merge_k(Element *to, int l)
       deallocateSegment(winnerIndex); 
     
     // go up the entry-tree
-    for (int i = (winnerIndex + kReg) >> 1;  i > 0;  i >>= 1) {
+    for (int_type i = (winnerIndex + kReg) >> 1;  i > 0;  i >>= 1) {
       currentPos = entry + i;
       currentKey = currentPos->key;
       if (cmp(winnerKey,currentKey)) {
@@ -1173,7 +1173,7 @@ protected:
   insert_heap_type insertHeap;
 
   // how many levels are active
-  int activeLevels;
+  int_type activeLevels;
   
   // total size not counting insertBuffer and buffer1
   size_type size_;
@@ -1181,14 +1181,14 @@ protected:
 
   // private member functions
   void refillBuffer1();
-  int refillBuffer2(int k);
+  int_type refillBuffer2(int_type k);
   
-  int makeSpaceAvailable(int level);
+  int_type makeSpaceAvailable(int_type level);
   void emptyInsertHeap();
   
   value_type getSupremum() const { return cmp.min_value(); } //{ return buffer2[0][KNN].key; }
-  int getSize1( ) const { return ( buffer1 + BufferSize1) - minBuffer1; }
-  int getSize2(int i) const { return &(buffer2[i][N])     - minBuffer2[i]; }
+  int_type getSize1( ) const { return ( buffer1 + BufferSize1) - minBuffer1; }
+  int_type getSize2(int_type i) const { return &(buffer2[i][N])     - minBuffer2[i]; }
   
     
   // forbidden cals
@@ -1217,17 +1217,17 @@ public:
   //! for writing data for the memory<->disk transfers 
   //! happenning in the priority queue. Larger pool size 
   //! helps to speed up operations.
-  priority_queue(unsigned p_pool_mem, unsigned w_pool_mem);
+  priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem);
 
   void swap(priority_queue & obj)
   {
 	  //swap_1D_arrays(itree,obj.itree,IntLevels); // does not work in g++ 3.4.3 :( bug?
-	  for(unsigned i=0;i<IntLevels;++i) std::swap(itree[i],obj.itree[i]);
+	  for(unsigned_type i=0;i<IntLevels;++i) std::swap(itree[i],obj.itree[i]);
       // std::swap(p_pool,obj.p_pool);
       // std::swap(w_pool,obj.w_pool);
       std::swap(etree,obj.etree);
-	  for(unsigned i1=0;i1<Levels;++i1)
-		for(unsigned i2=0;i2< (N + 1);++i2)
+	  for(unsigned_type i1=0;i1<Levels;++i1)
+		for(unsigned_type i2=0;i2< (N + 1);++i2)
 			std::swap(buffer2[i1][i2],obj.buffer2[i1][i2]);
 	  swap_1D_arrays(minBuffer2,obj.minBuffer2,Levels);
       swap_1D_arrays(buffer1,obj.buffer1,BufferSize1 + 1); 
@@ -1280,9 +1280,9 @@ public:
   //! the \b priority_queue
   //! \brief number of bytes consumed by the \b priority_queue from 
   //! the internal memory not including pools (see the constructor)
-  unsigned mem_cons() const 
+  unsigned_type mem_cons() const 
   {
-    unsigned dynam_alloc_mem(0),i(0);
+    unsigned_type dynam_alloc_mem(0),i(0);
     //dynam_alloc_mem += w_pool.mem_cons();
     //dynam_alloc_mem += p_pool.mem_cons();
     for(;i<IntLevels;++i)
@@ -1363,13 +1363,13 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
   STXXL_VERBOSE2("priority_queue::priority_queue()")
   //etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
   etree = new ext_merger_type[ExtLevels];
-  for(int j=0;j<ExtLevels;++j)
+  for(int_type j=0;j<ExtLevels;++j)
 	  etree[j].set_pools(&p_pool,&w_pool);
   value_type sentinel = cmp.min_value();
   buffer1[BufferSize1] = sentinel; // sentinel
   insertHeap.push(sentinel); // always keep the sentinel
   minBuffer1 = buffer1 + BufferSize1; // empty
-  for (int i = 0;  i < Levels;  i++)
+  for (int_type i = 0;  i < Levels;  i++)
   { 
     buffer2[i][N] = sentinel; // sentinel
     minBuffer2[i] = &(buffer2[i][N]); // empty
@@ -1378,7 +1378,7 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
 }
 
 template <class Config_>
-priority_queue<Config_>::priority_queue(unsigned p_pool_mem, unsigned w_pool_mem) : 
+priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem) : 
   p_pool(*(new prefetch_pool<block_type>(p_pool_mem/BlockSize))),
   w_pool(*(new write_pool<block_type>(w_pool_mem/BlockSize))),
   activeLevels(0), size_(0),
@@ -1386,13 +1386,13 @@ priority_queue<Config_>::priority_queue(unsigned p_pool_mem, unsigned w_pool_mem
 {
   STXXL_VERBOSE2("priority_queue::priority_queue()")
   etree = new ext_merger_type[ExtLevels];
-	for(int j=0;j<ExtLevels;++j)
+	for(int_type j=0;j<ExtLevels;++j)
 	  etree[j].set_pools(&p_pool,&w_pool);
   value_type sentinel = cmp.min_value();
   buffer1[BufferSize1] = sentinel; // sentinel
   insertHeap.push(sentinel); // always keep the sentinel
   minBuffer1 = buffer1 + BufferSize1; // empty
-  for (int i = 0;  i < Levels;  i++)
+  for (int_type i = 0;  i < Levels;  i++)
   { 
     buffer2[i][N] = sentinel; // sentinel
     minBuffer2[i] = &(buffer2[i][N]); // empty
@@ -1417,14 +1417,14 @@ priority_queue<Config_>::~priority_queue()
 
 // refill buffer2[j] and return number of elements found
 template <class Config_>
-int priority_queue<Config_>::refillBuffer2(int j)
+int_type priority_queue<Config_>::refillBuffer2(int_type j)
 {
   STXXL_VERBOSE2("priority_queue::refillBuffer2("<<j<<")")
   
   value_type * oldTarget;
-  int deleteSize;
+  int_type deleteSize;
   size_type treeSize = (j<IntLevels) ? itree[j].size() : etree[ j - IntLevels].size();
-  int bufferSize = (&(buffer2[j][0]) + N) - minBuffer2[j];
+  int_type bufferSize = (&(buffer2[j][0]) + N) - minBuffer2[j];
   if (treeSize + bufferSize >= size_type(N) ) 
   { // buffer will be filled
     oldTarget = &(buffer2[j][0]);
@@ -1432,7 +1432,7 @@ int priority_queue<Config_>::refillBuffer2(int j)
   }
   else
   {
-    oldTarget = &(buffer2[j][0]) + N - int(treeSize) - bufferSize;
+    oldTarget = &(buffer2[j][0]) + N - int_type(treeSize) - bufferSize;
     deleteSize = treeSize;
   }
 
@@ -1464,8 +1464,8 @@ void priority_queue<Config_>::refillBuffer1()
   STXXL_VERBOSE2("priority_queue::refillBuffer1()")
   
   size_type totalSize = 0;
-  int sz;
-  for (int i = activeLevels - 1;  i >= 0;  i--)
+  int_type sz;
+  for (int_type i = activeLevels - 1;  i >= 0;  i--)
   {
     if((&(buffer2[i][0]) + N) - minBuffer2[i] < BufferSize1)
     {
@@ -1543,10 +1543,10 @@ void priority_queue<Config_>::refillBuffer1()
 // empty this level if necessary leading to a recursive call.
 // return the level where space was finally available
 template <class Config_>
-int priority_queue<Config_>::makeSpaceAvailable(int level)
+int_type priority_queue<Config_>::makeSpaceAvailable(int_type level)
 {
   STXXL_VERBOSE2("priority_queue::makeSpaceAvailable("<<level<<")")
-  int finalLevel;
+  int_type finalLevel;
   assert(level < Levels);
   assert(level <= activeLevels);
   
@@ -1567,7 +1567,7 @@ int priority_queue<Config_>::makeSpaceAvailable(int level)
     
     if(level < IntLevels - 1) // from internal to internal tree
     {
-      int segmentSize = itree[level].size();
+      int_type segmentSize = itree[level].size();
       value_type * newSegment = new value_type[segmentSize + 1];
       itree[level].multi_merge(newSegment, segmentSize); // empty this level
       
@@ -1581,7 +1581,7 @@ int priority_queue<Config_>::makeSpaceAvailable(int level)
     { 
       if(level == IntLevels - 1) // from internal to external tree
       {
-        const int segmentSize = itree[IntLevels - 1].size();
+        const int_type segmentSize = itree[IntLevels - 1].size();
         etree[0].insert_segment(itree[IntLevels - 1],segmentSize);
       }
       else // from external to external tree
@@ -1624,10 +1624,10 @@ void priority_queue<Config_>::emptyInsertHeap()
 
   // copy the buffer1 and buffer2[0] to temporary storage
   // (the temporary can be eliminated using some dirty tricks)
-  const int tempSize = N + BufferSize1;
+  const int_type tempSize = N + BufferSize1;
   value_type temp[tempSize + 1]; 
-  int sz1 = getSize1();
-  int sz2 = getSize2(0);
+  int_type sz1 = getSize1();
+  int_type sz2 = getSize2(0);
   value_type * pos = temp + tempSize - sz1 - sz2;
   std::copy(minBuffer1,minBuffer1 + sz1 ,pos);
   std::copy(minBuffer2[0],minBuffer2[0] + sz2, pos + sz1);
@@ -1649,7 +1649,7 @@ void priority_queue<Config_>::emptyInsertHeap()
   priority_queue_local::merge(&pos, &newPos, newSegment, N,cmp);
   
   // and insert it
-  int freeLevel = makeSpaceAvailable(0);
+  int_type freeLevel = makeSpaceAvailable(0);
   assert(freeLevel == 0 || itree[0].size() == 0);
   itree[0].insert_segment(newSegment, N);
 
@@ -1657,7 +1657,7 @@ void priority_queue<Config_>::emptyInsertHeap()
   // by inserting them into tree 0 (which is almost empty in this case)
   if (freeLevel > 0)
   {
-    for (int i = freeLevel;  i >= 0;  i--)
+    for (int_type i = freeLevel;  i >= 0;  i--)
     { // reverse order not needed 
       // but would allow immediate refill
       
@@ -1690,7 +1690,7 @@ namespace priority_queue_local
     typedef dummy result;
   };
   
-  template <int E_,int IntM_,unsigned MaxS_,int B_,int m_,bool stop = false>
+  template <int_type E_,int_type IntM_,unsigned_type MaxS_,int_type B_,int_type m_,bool stop = false>
   struct find_B_m
   {
     typedef find_B_m<E_,IntM_,MaxS_,B_,m_,stop> Self;
@@ -1703,7 +1703,7 @@ namespace priority_queue_local
       c = k - m_,
       // memory occ. by block must be at least 10 times larger than size of ext sequence
       // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
-      fits = c>10 && ((k-m)*(m)*(m*B/(E*4*1024))) >= int(MaxS_) && (MaxS_<((k-m)*m/(2*E))*1024 || m >= 128),
+      fits = c>10 && ((k-m)*(m)*(m*B/(E*4*1024))) >= int_type(MaxS_) && (MaxS_<((k-m)*m/(2*E))*1024 || m >= 128),
       step = 1
     };
     
@@ -1714,7 +1714,7 @@ namespace priority_queue_local
   };
   
   // specialization for the case when no valid parameters are found
-  template <int E_,int IntM_,unsigned MaxS_,bool stop>
+  template <int_type E_,int_type IntM_,unsigned_type MaxS_,bool stop>
   struct find_B_m<E_,IntM_,MaxS_,2048,1,stop>
   {
     enum { fits = false };
@@ -1722,14 +1722,14 @@ namespace priority_queue_local
   };
   
   // to speedup search
-  template <int E_,int IntM_,unsigned MaxS_,int B_,int m_>
+  template <int_type E_,int_type IntM_,unsigned_type MaxS_,int_type B_,int_type m_>
   struct find_B_m<E_,IntM_,MaxS_,B_,m_,true>
   {
     enum { fits = false };
     typedef dummy result;
   };
   
-  template <int E_,int IntM_,unsigned MaxS_>
+  template <int_type E_,int_type IntM_,unsigned_type MaxS_>
   struct find_settings
   {
     typedef typename find_B_m<E_,IntM_,MaxS_,(8*1024*1024),1>::result result;
@@ -1741,7 +1741,7 @@ namespace priority_queue_local
   };
   
   
-  template <int AI_,int X_,int CriticalSize_>
+  template <int_type AI_,int_type X_,int_type CriticalSize_>
   struct compute_N
   {
     typedef compute_N<AI_,X_,CriticalSize_> Self;
@@ -1754,7 +1754,7 @@ namespace priority_queue_local
     typedef typename IF<(N>=CriticalSize_),Self, typename compute_N<AI/2,X,CriticalSize_>::result >::result result;
   };
   
-  template <int X_,int CriticalSize_>
+  template <int_type X_,int_type CriticalSize_>
   struct compute_N<1,X_,CriticalSize_>
   {
     typedef Parameters_not_found_Try_to_change_Tune_parameter result;
@@ -1832,7 +1832,7 @@ namespace priority_queue_local
 //! \c PRIORITY_QUEUE_GENERATOR<some_parameters>::result::block_type .
 //! For an example see p_queue.cpp .
 //! Configured priority queue type is available as \c PRIORITY_QUEUE_GENERATOR<>::result. <BR> <BR>
-template <class Tp_,class Cmp_,unsigned IntM_,unsigned MaxS_,unsigned Tune_=6>
+template <class Tp_,class Cmp_,unsigned_type IntM_,unsigned MaxS_,unsigned Tune_=6>
 class PRIORITY_QUEUE_GENERATOR
 {
   public:

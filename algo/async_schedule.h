@@ -28,9 +28,9 @@ __STXXL_BEGIN_NAMESPACE
 
 struct sim_event // only one type of event: WRITE COMPLETED
 {
-	int timestamp;
-	int iblock;
-	inline sim_event(int t, int b):timestamp(t),iblock(b) {};
+	int_type timestamp;
+	int_type iblock;
+	inline sim_event(int_type t, int_type b):timestamp(t),iblock(b) {};
 };
 
 struct sim_event_cmp
@@ -41,60 +41,60 @@ struct sim_event_cmp
 	}
 };
 
-int simulate_async_write(
+int_type simulate_async_write(
 	int *disks,
-	const int L,
-	const int m_init,
-	const int D,
-	std::pair<int,int> * o_time);
+	const int_type L,
+	const int_type m_init,
+	const int_type D,
+	std::pair<int_type,int_type> * o_time);
 
 struct write_time_cmp
 {
-	inline bool operator () (const std::pair<int,int> & a, const std::pair<int,int> & b)
+	inline bool operator () (const std::pair<int_type,int_type> & a, const std::pair<int_type,int_type> & b)
 	{
 		return a.second > b.second;
 	}
 };
 
 void compute_prefetch_schedule(
-		int * first,
-		int * last,
-		int * out_first,
-		int m,
-		int D);
+		int_type * first,
+		int_type * last,
+		int_type * out_first,
+		int_type m,
+		int_type D);
 
 template <typename run_type>
 void simulate_async_write(
 											const run_type & input,
-											const int m_init,
-											const int D,
-											std::pair<int,int> * o_time)
+											const int_type m_init,
+											const int_type D,
+											std::pair<int_type,int_type> * o_time)
 {
 	typedef std::priority_queue<sim_event,std::vector<sim_event>,sim_event_cmp> event_queue_type;
-	typedef std::queue<int> disk_queue_type;
+	typedef std::queue<int_type> disk_queue_type;
 	
-	const int L = input.size();
+	const int_type L = input.size();
 	assert(L >= D);
 	disk_queue_type * disk_queues = new disk_queue_type[L];
 	event_queue_type event_queue;
 	
-	int m = m_init;
-	int i = L - 1;
-        int oldtime = 0;
+	int_type m = m_init;
+	int_type i = L - 1;
+        int_type oldtime = 0;
         bool * disk_busy = new bool [D];
 		       
 	while(m && (i>=0))
 	{
-		int disk = input[i].bid.storage->get_disk_number();
+		int_type disk = input[i].bid.storage->get_disk_number();
 		disk_queues[disk].push(i);
 		i--;
 		m--;
 	}
 	
-	for(int ii=0;ii<D;ii++)
+	for(int_type ii=0;ii<D;ii++)
 		if(!disk_queues[ii].empty())
 		{
-			int j = disk_queues[ii].front();
+			int_type j = disk_queues[ii].front();
 			disk_queues[ii].pop();
 			event_queue.push(sim_event(1,j));
 		} 
@@ -106,18 +106,18 @@ void simulate_async_write(
 		if(oldtime != cur.timestamp)
     {
 			// clear disk_busy
-			for(int i=0;i<D;i++)
+			for(int_type i=0;i<D;i++)
 				disk_busy[i] = false;
 			
 			oldtime = cur.timestamp;
     }
-		o_time[cur.iblock] = std::pair<int,int>(cur.iblock,cur.timestamp + 1);
+		o_time[cur.iblock] = std::pair<int_type,int_type>(cur.iblock,cur.timestamp + 1);
 		
 		m++;
 		if(i >= 0)
 		{
 			m--;
-			int disk = input[i].bid.storage->get_disk_number();
+			int_type disk = input[i].bid.storage->get_disk_number();
 			if(disk_busy[disk])
 			{
 				disk_queues[disk].push(i);
@@ -132,7 +132,7 @@ void simulate_async_write(
 		}
 		
 		// add next block to write
-		int disk = input[cur.iblock].bid.storage->get_disk_number();
+		int_type disk = input[cur.iblock].bid.storage->get_disk_number();
 		if(!disk_busy[disk] && !disk_queues[disk].empty())
 		{
 			event_queue.push(sim_event(cur.timestamp + 1,disk_queues[disk].front()));
@@ -150,15 +150,15 @@ void simulate_async_write(
 template <typename run_type>
 void compute_prefetch_schedule(
 		const run_type & input,
-		int * out_first,
-		int m,
-		int D)
+		int_type * out_first,
+		int_type m,
+		int_type D)
 {
-	typedef std::pair<int,int>  pair_type;
-	const int L = input.size();
+	typedef std::pair<int_type,int_type>  pair_type;
+	const int_type L = input.size();
 	if(L <= D)
 	{
-		for(int i=0;i<L;++i) out_first[i] = i;
+		for(int_type i=0;i<L;++i) out_first[i] = i;
 		return;
 	}
 	pair_type * write_order = new pair_type[L];
@@ -167,7 +167,7 @@ void compute_prefetch_schedule(
 	
 	std::stable_sort(write_order,write_order + L,write_time_cmp());
 	
-	for(int i=0;i<L;i++)
+	for(int_type i=0;i<L;i++)
 		out_first[i] = write_order[i].first;
 
 	delete [] write_order;
@@ -177,13 +177,13 @@ void compute_prefetch_schedule(
 template <typename bid_iterator_type>
 void simulate_async_write(
 											bid_iterator_type input,
-											const int L,
-											const int m_init,
-											const int D,
-											std::pair<int,int> * o_time)
+											const int_type L,
+											const int_type m_init,
+											const int_type D,
+											std::pair<int_type,int_type> * o_time)
 {
 	typedef std::priority_queue<sim_event,std::vector<sim_event>,sim_event_cmp> event_queue_type;
-	typedef std::queue<int> disk_queue_type;
+	typedef std::queue<int_type> disk_queue_type;
 	
 	//disk_queue_type * disk_queues = new disk_queue_type[L];
 	#ifndef BOOST_MSVC
@@ -194,9 +194,9 @@ void simulate_async_write(
 	disk_queues_type  disk_queues;
 	event_queue_type event_queue;
 	
-	int m = m_init;
-	int i = L - 1;
-    int oldtime = 0;
+	int_type m = m_init;
+	int_type i = L - 1;
+    int_type oldtime = 0;
     //bool * disk_busy = new bool [D];
 	#ifndef BOOST_MSVC
 	__gnu_cxx::hash_set<int> disk_busy;
@@ -206,17 +206,17 @@ void simulate_async_write(
 		       
 	while(m && (i>=0))
 	{
-		int disk = (*(input + i)).storage->get_disk_number();
+		int_type disk = (*(input + i)).storage->get_disk_number();
 		disk_queues[disk].push(i);
 		i--;
 		m--;
 	}
 	
 	/*
-	for(int i=0;i<D;i++)
+	for(int_type i=0;i<D;i++)
 		if(!disk_queues[i].empty())
 		{
-			int j = disk_queues[i].front();
+			int_type j = disk_queues[i].front();
 			disk_queues[i].pop();
 			event_queue.push(sim_event(1,j));
 		}
@@ -224,7 +224,7 @@ void simulate_async_write(
 	disk_queues_type::iterator it = disk_queues.begin();
 	for(;it != disk_queues.end(); ++it)
 	{
-		int j = (*it).second.front();
+		int_type j = (*it).second.front();
 		(*it).second.pop();
 		event_queue.push(sim_event(1,j));
 	}
@@ -236,19 +236,19 @@ void simulate_async_write(
 		if(oldtime != cur.timestamp)
     {
 			// clear disk_busy
-			//for(int i=0;i<D;i++)
+			//for(int_type i=0;i<D;i++)
 			//	disk_busy[i] = false;
 			disk_busy.clear();	
 		
 			oldtime = cur.timestamp;
     }
-		o_time[cur.iblock] = std::pair<int,int>(cur.iblock,cur.timestamp + 1);
+		o_time[cur.iblock] = std::pair<int_type,int_type>(cur.iblock,cur.timestamp + 1);
 		
 		m++;
 		if(i >= 0)
 		{
 			m--;
-			int disk = (*(input + i)).storage->get_disk_number();
+			int_type disk = (*(input + i)).storage->get_disk_number();
 			if(disk_busy.find(disk)!=disk_busy.end())
 			{
 				disk_queues[disk].push(i);
@@ -263,7 +263,7 @@ void simulate_async_write(
 		}
 		
 		// add next block to write
-		int disk = (*(input + cur.iblock)).storage->get_disk_number();
+		int_type disk = (*(input + cur.iblock)).storage->get_disk_number();
 		if(disk_busy.find(disk)==disk_busy.end() && !disk_queues[disk].empty())
 		{
 			event_queue.push(sim_event(cur.timestamp + 1,disk_queues[disk].front()));
@@ -282,17 +282,17 @@ template <typename bid_iterator_type>
 void compute_prefetch_schedule(
 		bid_iterator_type input_begin,
 		bid_iterator_type input_end,
-		int * out_first,
-		int m,
-		int D)
+		int_type * out_first,
+		int_type m,
+		int_type D)
 {
 	
-	typedef std::pair<int,int>  pair_type;
-	const int L = input_end - input_begin;
+	typedef std::pair<int_type,int_type>  pair_type;
+	const int_type L = input_end - input_begin;
 	STXXL_VERBOSE1("compute_prefetch_schedule: sequence length="<<L<<" disks="<<D)
 	if(L <= D)
 	{
-		for(int i=0;i<L;++i) out_first[i] = i;
+		for(int_type i=0;i<L;++i) out_first[i] = i;
 		return;
 	}
 	pair_type * write_order = new pair_type[L];
@@ -303,7 +303,7 @@ void compute_prefetch_schedule(
 	
 	STXXL_VERBOSE1("Computed prefetch order for "<<L<<" blocks with "<<
 		D<<" disks and "<<m<<" blocks")
-	for(int i=0;i<L;i++)
+	for(int_type i=0;i<L;i++)
 	{
 		out_first[i] = write_order[i].first;
 		STXXL_VERBOSE1(write_order[i].first)

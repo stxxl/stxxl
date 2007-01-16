@@ -111,8 +111,8 @@ public:
 	//! \brief A constructor
 	//! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
 	//! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
-	map(	unsigned node_cache_size_in_bytes,
-				unsigned leaf_cache_size_in_bytes
+	map(	unsigned_type node_cache_size_in_bytes,
+				unsigned_type leaf_cache_size_in_bytes
 				) : Impl(node_cache_size_in_bytes,leaf_cache_size_in_bytes)
 	{
 	}
@@ -122,8 +122,8 @@ public:
 	//! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
 	//! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
 	map(	const key_compare & c_,
-				unsigned node_cache_size_in_bytes,
-				unsigned leaf_cache_size_in_bytes
+				unsigned_type node_cache_size_in_bytes,
+				unsigned_type leaf_cache_size_in_bytes
 				) : Impl(c_,node_cache_size_in_bytes,leaf_cache_size_in_bytes)
 	{}		
 	
@@ -139,8 +139,8 @@ public:
 	template <class InputIterator>
 	map(	InputIterator b,
 				InputIterator e,
-				unsigned node_cache_size_in_bytes,
-				unsigned leaf_cache_size_in_bytes,
+				unsigned_type node_cache_size_in_bytes,
+				unsigned_type leaf_cache_size_in_bytes,
 				bool range_sorted = false,
 				double node_fill_factor = 0.75,
 				double leaf_fill_factor = 0.6
@@ -163,8 +163,8 @@ public:
 	map(	InputIterator b,
 				InputIterator e,
 				const key_compare & c_,
-				unsigned node_cache_size_in_bytes,
-				unsigned leaf_cache_size_in_bytes,
+				unsigned_type node_cache_size_in_bytes,
+				unsigned_type leaf_cache_size_in_bytes,
 				bool range_sorted = false,
 				double node_fill_factor = 0.75,
 				double leaf_fill_factor = 0.6
