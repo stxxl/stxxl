@@ -1,8 +1,11 @@
 
-Version 1.0d (??)
+Version 1.0d (16 January 2007)
 
 * Support of Visual Studio 2005 Express (VC++ 8.0)
-* 
+
+* Algorithms and data structures of Stxxl can now use more than 4GB of main memory on 64-bit processors/compilers
+
+* Support of error reporting using the C++ exception mechanism
 
 -------------------------------------------
 Version 1.0c (21 September 2006)
