@@ -4,7 +4,7 @@
 # General configuration options
 #---------------------------------------------------------------------------
 PROJECT_NAME           = Stxxl
-PROJECT_NUMBER         = 0.9
+PROJECT_NUMBER         = 1.0
 OUTPUT_DIRECTORY       = doxy/
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = NO

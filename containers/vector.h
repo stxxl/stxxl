@@ -616,8 +616,8 @@ public:
 	//! \param from file to be constructed from
 	//! \warning Only one \c vector can be assigned to a file 
 	//! (does not matter whether the files are different \c file objects).
-  //! \warning The block size of the vector must me a multiple of the element size
-  //! \c sizeof(value_type) and the page size (4096).
+	//! The block size of the vector must me a multiple of the element size
+	//! \c sizeof(value_type) and the page size (4096).
     vector (file * from):
 			_size(size_from_file_length(from->size())),
 			_bids(div_and_round_up(_size,size_type(block_type::size))),
