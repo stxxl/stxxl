@@ -131,7 +131,8 @@ module.include.files=\
 	containers/btree/node_cache.h\
 	containers/btree/btree_pager.h\
 	containers/map.h\
-	containers/map_test_handlers.h
+	containers/map_test_handlers.h\
+	containers/deque.h
 
 module.source.name=.
 module.source.type=

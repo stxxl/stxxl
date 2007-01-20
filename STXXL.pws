@@ -1,20 +1,20 @@
 
 [filenumbers]
-0=22
-1=1209
-2=1
-3=32
-4=254
-5=251
-6=1019
-7=29
-8=391
-9=9
-10=747
-11=1
-12=79
-13=69
-14=1
+0=69
+1=22
+2=255
+3=17
+4=118
+5=42
+6=154
+7=901
+8=122
+9=1
+10=6
+11=50
+12=251
+13=939
+14=29
 15=79
 16=90
 17=295
@@ -147,14 +147,21 @@ RunInTerminal=true
 clean before build=false
 
 [filelist]
-0=/home/dementiev/projects/stxxl/mng/mng.cpp
-1=/home/dementiev/projects/stxxl/mng/mng.h
-2=/home/dementiev/projects/stxxl/containers/priority_queue.h
-3=/home/dementiev/projects/stxxl/containers/stack_benchmark.cpp
-4=/home/dementiev/projects/stxxl/containers/map.h
-5=/home/dementiev/projects/stxxl/containers/btree/node_cache.h
-6=/home/dementiev/projects/stxxl/containers/btree/btree.h
-7=/home/dementiev/projects/stxxl/common/rand.h
+0=/home/dementiev/projects/stxxl/containers/test_deque.cpp
+1=/home/dementiev/projects/stxxl/containers/vector.h
+2=/home/dementiev/projects/stxxl/containers/deque.h
+3=/home/dementiev/projects/stxxl/containers/btree/node.h
+4=/home/dementiev/projects/stxxl/containers/btree/leaf.h
+5=/home/dementiev/projects/stxxl/containers/berkeley_db_benchmark.cpp
+6=/home/dementiev/projects/stxxl/stream/stream.h
+7=/home/dementiev/projects/stxxl/stream/sort_stream.h
+8=/home/dementiev/projects/stxxl/mng/mng.h
+9=/home/dementiev/projects/stxxl/containers/priority_queue.h
+10=/home/dementiev/projects/stxxl/containers/stack_benchmark.cpp
+11=/home/dementiev/projects/stxxl/containers/map.h
+12=/home/dementiev/projects/stxxl/containers/btree/node_cache.h
+13=/home/dementiev/projects/stxxl/containers/btree/btree.h
+14=/home/dementiev/projects/stxxl/common/rand.h
 
 [Project Tree]
 0=0

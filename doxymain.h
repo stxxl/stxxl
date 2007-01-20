@@ -1,4 +1,4 @@
-/*! \mainpage Documentation for <small>STXXL</small> library
+/*! \mainpage Documentation for STXXL library
  *
  *  \image html logo1.png
  *

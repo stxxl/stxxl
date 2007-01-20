@@ -33,7 +33,7 @@ public:
 //! object that can be passed as a parameter
 //! to asynchronous I/O calls \c stxxl::file::aread
 //! and \c stxxl::file::awrite .
-//! For an example of use see \link mng/test.cpp mng/test.cpp \endlink
+//! For an example of use see \link mng/test_mng.cpp mng/test_mng.cpp \endlink
 class completion_handler
 {
 public:
