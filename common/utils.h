@@ -257,7 +257,10 @@ stxxl_tmpfilename (std::string dir, std::string prefix)
 	int rnd;
 	char buffer[1024];
 	std::string result;
+
+#ifndef STXXL_BOOST_FILESYSTEM
 	struct stat st;
+#endif
 
 	do
 	{
