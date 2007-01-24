@@ -4,7 +4,7 @@
 STXXL_ROOT = /home/dementiev/workspace/Stxxl#
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
-USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
+USE_LINUX = yes # set 'yes' if you run Linux, 'no'  otherwise
 
 # change this path, do not leave spaces at the end of the line
 BOOST_INCLUDE = /usr/include/boost-1_33_1/#
