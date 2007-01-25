@@ -549,13 +549,15 @@ public:
     }
     void resize(size_type n)
     {
-	  reserve(n);		
-	  /*
+      #ifndef STXXL_FREE_EXTMEMORY_ON_VECTOR_RESIZE 
+      reserve(n);
+      #else		
+	  
       unsigned_type old_bids_size = _bids.size();
       unsigned_type new_bids_size = div_and_round_up (n, block_type::size);
       
       
-	  if(new_bids_size > old_bids_size)
+	    if(new_bids_size > old_bids_size)
       {
         reserve(n);
       }
@@ -568,7 +570,9 @@ public:
         std::fill(_page_status.begin() + first_page_to_evict,
                   _page_status.end(), 0); // clear dirty flag, so this pages 
                                           // will be never written
-      }*/
+      }
+      #endif
+      
       _size = n;
     }
 	void clear()
