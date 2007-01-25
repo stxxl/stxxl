@@ -308,13 +308,13 @@ l1sort (type_key * a,
 
 template <typename type,typename type_key,typename key_extractor>
 void classify_block(type * begin,type * end,type_key * & out,
-	int_type * bucket,typename type::key_type offset, unsigned shift, key_extractor keyobj)
+	int_type * bucket,typename key_extractor::key_type offset, unsigned shift, key_extractor keyobj)
 {
-	assert(shift <(sizeof(typename type::key_type)*8+1));
+	assert(shift <(sizeof(typename key_extractor::key_type)*8+1));
 	for (type * p = begin;p<end; p++,out++)	// count & create references
 	{
 		out->ptr = p;
-		typename type::key_type key = keyobj(*p);
+		typename key_extractor::key_type key = keyobj(*p);
 		int_type ibucket = (key - offset) >> shift;
 		out->key = key;
 		bucket[ibucket]++;

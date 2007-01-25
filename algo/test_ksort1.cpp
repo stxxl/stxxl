@@ -10,18 +10,18 @@ using namespace stxxl;
 
 struct my_type
 {
-	typedef stxxl::uint64 key_type;
+	typedef stxxl::uint64 key_type1;
 				
-	key_type _key;
-	key_type _key_copy;
-	char _data[32 - 2*sizeof(key_type)];
-	key_type key() const {return _key; };
+	key_type1 _key;
+	key_type1 _key_copy;
+	char _data[32 - 2*sizeof(key_type1)];
+	key_type1 key() const {return _key; };
 							
 	my_type() {};
-	my_type(key_type __key):_key(__key) {};
+	my_type(key_type1 __key):_key(__key) {};
 									
-	my_type min_value() const { return my_type(0); };
-	my_type max_value() const { return my_type(0xffffffff); };
+	//my_type min_value() const { return my_type(0); };
+	//my_type max_value() const { return my_type(0xffffffff); };
 };
 
 std::ostream & operator << (std::ostream & o, const my_type & obj)
@@ -32,7 +32,7 @@ std::ostream & operator << (std::ostream & o, const my_type & obj)
 
 struct get_key
 {
-	typedef my_type::key_type key_type;
+	typedef my_type::key_type1 key_type;
 	key_type operator() (const my_type & obj)
 	{
 		return obj._key;

@@ -72,10 +72,10 @@ inline bool operator > (const trigger_entry<_BIDTp,_KeyTp> & a,
 	return (a.key > b.key);
 };
 
-template <typename type>
+template <typename type, typename key_type1>
 struct type_key
 {
-	typedef typename type::key_type key_type;
+	typedef key_type1 key_type;
 	key_type key;
 	type * ptr;
 	
@@ -85,14 +85,14 @@ struct type_key
 	};
 };
 
-template <typename type>
-bool operator  < (const type_key<type> & a, const type_key<type> & b)
+template <typename type,typename key1>
+bool operator  < (const type_key<type,key1> & a, const type_key<type,key1> & b)
 {
 		return a.key < b.key;
 }
 
-template <typename type>
-bool operator  > (const type_key<type> & a, const type_key<type> & b)
+template <typename type,typename key1>
+bool operator  > (const type_key<type,key1> & a, const type_key<type,key1> & b)
 {
 		return a.key > b.key;
 }
@@ -184,8 +184,8 @@ create_runs(
 {
 	typedef typename block_type::value_type type;
 	typedef typename block_type::bid_type bid_type;
-	typedef type_key<type> type_key_;
-	typedef typename type_key_::key_type key_type;
+	typedef typename key_extractor::key_type key_type;
+	typedef type_key<type,key_type> type_key_;
 	
 	block_manager *bm = block_manager::get_instance ();
 	block_type *Blocks1 = new block_type[m2];
@@ -222,7 +222,7 @@ create_runs(
 	}
 	
 	unsigned_type k = 0;
-	const int shift1 = sizeof(typename block_type::value_type::key_type)*8 - log_k1;
+	const int shift1 = sizeof(key_type)*8 - log_k1;
 	const int shift2 = shift1 - log_k2;
 	STXXL_VERBOSE("shift1: "<<shift1<<" shift2:"<<shift2)
 
@@ -526,20 +526,21 @@ template <typename block_type,
 					typename input_bid_iterator,
 					typename key_extractor>
 
-simple_vector< trigger_entry<typename block_type::bid_type,typename block_type::value_type::key_type> > * 
+simple_vector< trigger_entry<typename block_type::bid_type,typename key_extractor::key_type> > * 
 	ksort_blocks(input_bid_iterator input_bids,unsigned_type _n,unsigned_type _m,key_extractor keyobj)
 {
 	typedef typename block_type::value_type type;
+	typedef typename key_extractor::key_type key_type;
 	typedef typename block_type::bid_type bid_type;
-	typedef trigger_entry< bid_type,typename type::key_type> trigger_entry_type;
+	typedef trigger_entry< bid_type,typename key_extractor::key_type> trigger_entry_type;
 	typedef simple_vector< trigger_entry_type > run_type;
 	typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 	
 	unsigned_type m2 = div_and_round_up(_m,2);
   const unsigned_type m2_rf = m2 * block_type::raw_size / 
-    (block_type::raw_size + block_type::size*sizeof(type_key<type>));
+    (block_type::raw_size + block_type::size*sizeof(type_key<type,key_type>));
   STXXL_VERBOSE("Reducing number of blocks in a run from "<< m2 << " to "<<
-    m2_rf<<" due to key size: "<<sizeof(typename type::key_type)<<" bytes")
+    m2_rf<<" due to key size: "<<sizeof(typename key_extractor::key_type)<<" bytes")
   m2 = m2_rf;
 	unsigned_type full_runs = _n / m2;
 	unsigned_type partial_runs = ((_n % m2) ? 1 : 0);
