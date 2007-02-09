@@ -967,6 +967,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned_type l)
   {
     assert(k == 2);
 #if defined(__MCSTL__) && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+    {
     if(l > 0)
     	std::cout << "binary merge " << l << std::endl;
     std::pair<Element*, Element*> seqs[2] = { 	std::make_pair(current[0], current_end[0]), 
@@ -974,6 +975,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned_type l)
     mcstl::multiway_merge(seqs, seqs + 2, to, cmp, l, false);
     current[0] = seqs[0].first;
     current[1] = seqs[1].first;
+    }
 #else
     merge(current + 0, current + 1, to, l,cmp);
 #endif
@@ -984,13 +986,51 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned_type l)
   }
   case 2:
     assert(k == 4);
-    merge4(current + 0, current + 1, current + 2, current + 3, to, l,cmp);
+#if defined(__MCSTL__) && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+    {
+    if(l > 0)
+    	std::cout << "4-way merge " << l << std::endl;
+    std::pair<Element*, Element*> seqs[4] = { 	std::make_pair(current[0], current_end[0]), 
+    						std::make_pair(current[1], current_end[1]),
+    						std::make_pair(current[2], current_end[2]), 
+    						std::make_pair(current[3], current_end[3]) };
+    mcstl::multiway_merge(seqs, seqs + 4, to, cmp, l, false);
+    current[0] = seqs[0].first;
+    current[1] = seqs[1].first;
+    current[2] = seqs[2].first;
+    current[3] = seqs[3].first;
+    }
+#else
+    merge4(current + 0, current + 1, current + 2, current + 3, to, l, cmp);
+#endif
     rebuildLooserTree();
     if (segmentIsEmpty(0)) deallocateSegment(0); 
     if (segmentIsEmpty(1)) deallocateSegment(1); 
     if (segmentIsEmpty(2)) deallocateSegment(2); 
     if (segmentIsEmpty(3)) deallocateSegment(3);
     break;
+#if defined(__MCSTL__) && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+    default:
+    {
+	if(l > 0)
+		std::cout << k << "-way merge " << l << std::endl;
+	std::pair<Element*, Element*> seqs[k];
+	for(int i = 0; i < k; i++)
+		seqs[i] = std::make_pair(current[i], current_end[i]);
+	
+	mcstl::multiway_merge(seqs, seqs + k, to, cmp, l, false);
+
+	for(int i = 0; i < k; i++)
+		current[i] = seqs[i].first;
+		
+	rebuildLooserTree();
+	for(int i = 0; i < k; i++)
+		if(segmentIsEmpty(i))
+			deallocateSegment(i); 
+	break;
+    }
+	
+#else
   case  3: multi_merge_f<3>(to, l); break;
   case  4: multi_merge_f<4>(to, l); break;
   case  5: multi_merge_f<5>(to, l); break;
@@ -1000,6 +1040,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned_type l)
   case  9: multi_merge_f<9>(to, l); break;
   case 10: multi_merge_f<10>(to, l); break; 
   default: multi_merge_k(to, l); break;
+#endif
   }
   
   
