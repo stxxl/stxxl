@@ -16,6 +16,11 @@
 #include <list>
 #include <iterator>
 
+#define STXXL_PARALLEL_MULTIWAY_MERGE
+#if defined(__MCSTL__) && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+#include <bits/mcstl_multiway_merge.h>
+#endif
+
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcontinternals
@@ -360,7 +365,7 @@ void merge4(
           sequence_element m = min_elements.top();
           min_elements.pop();
           STXXL_VERBOSE2("ext_merger::multi_merge(...) extracting value: " << m.value)
-          *begin = m.value;
+          *begin = m.value;	//write output
           ++begin;
           --nelements;
           sequence_type & s = *(m.sequence);
@@ -411,6 +416,7 @@ void merge4(
           min_elements.push(m);
         }
       }
+      
       bool spaceIsAvailable() const { return nsequences < arity; }
       
       template <class Merger>
@@ -438,6 +444,8 @@ void merge4(
         std::list<bid_type> * bids = new std::list<bid_type>(nblocks);
         bm->new_blocks(alloc_strategy(),bids->begin(),bids->end());
         block_type * first_block = new block_type;
+        
+        //MERGE
         another_merger.multi_merge(
             first_block->begin() + (block_type::size - first_size), 
             first_block->end());
@@ -454,6 +462,7 @@ void merge4(
         for(unsigned_type i=0;i<nblocks;++i,++curbid)
         {
           block_type *b = w_pool->steal();
+          //MERGE
           another_merger.multi_merge(b->begin(),b->end());
           w_pool->write(b,*curbid);
         }
@@ -524,6 +533,7 @@ private:
   // note that Knuth uses indices k..k-1
   // while we use 0..k-1
   Element * current[KNKMAX]; // pointer to actual element
+  Element * current_end[KNKMAX]; // pointer to end of block for actual element
   Element * segment[KNKMAX]; // start of Segments
   unsigned_type segment_size[KNKMAX];
 
@@ -540,6 +550,9 @@ private:
   bool segmentIsEmpty(int_type i);
   void multi_merge_k(Element * to, int_type l);
   template <unsigned LogK>
+  
+  //starting point for parallelization
+  
   void multi_merge_f(Element *to, int_type l)
   {
     //Entry *currentPos;
@@ -605,11 +618,11 @@ private:
 public:
   bool is_sentinel(const Element & a)
   {
-    return !(cmp(cmp.min_value(),a));
+    return !(cmp(cmp.min_value(),a));	//a <= cmp.min_value()
   }
   bool not_sentinel(const Element & a)
   {
-    return cmp(cmp.min_value(),a);
+    return cmp(cmp.min_value(),a);	//a > cmp.min_value()
   }
 private:
 	loser_tree & operator = (const loser_tree &); // forbidden
@@ -630,6 +643,7 @@ public:
  		std::swap(dummy,obj.dummy);
 		swap_1D_arrays(entry,obj.entry,KNKMAX);
 		swap_1D_arrays(current,obj.current,KNKMAX);
+		swap_1D_arrays(current_end,obj.current_end,KNKMAX);
 		swap_1D_arrays(segment,obj.segment,KNKMAX);
   		swap_1D_arrays(segment_size,obj.segment_size,KNKMAX);
   		std::swap(mem_cons_,obj.mem_cons_);
@@ -656,6 +670,7 @@ loser_tree<ValTp_,Cmp_,KNKMAX>::loser_tree() : lastFree(0), size_(0), logK(0), k
   empty  [0] = 0;
   segment[0] = 0;
   current[0] = &dummy;
+  current_end[0] = &dummy;
   // entry and dummy are initialized by init
   // since they need the value of supremum
   init();
@@ -667,6 +682,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::init()
   dummy      = cmp.min_value();
   rebuildLooserTree();
   assert(current[entry[0].index] == &dummy);
+  assert(current_end[entry[0].index] == &dummy);
 }
 
 
@@ -772,6 +788,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::doubleK()
   for (int_type i = 2*k - 1;  i >= int_type(k);  i--)
   {
     current[i] = &dummy;
+    current_end[i] = &dummy;
     segment[i] = NULL;
     lastFree++;
     empty[lastFree] = i;
@@ -800,6 +817,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
     {
       segment_size[to] = segment_size[from];
       current[to] = current[from];
+      current_end[to] = current_end[from];
       segment[to] = segment[from];
       to++;
     }/*
@@ -829,6 +847,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::compactTree()
     empty[lastFree] = to;
 
     current[to] = &dummy;
+    current_end[to] = &dummy;
   }
 
   // recompute loser tree information
@@ -858,6 +877,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::insert_segment(Element *to, unsigned_type s
 
     // link new segment
     current[index] = segment[index] = to;
+    current_end[index] = to + sz;
     segment_size[index] = (sz + 1)*sizeof(value_type);
     mem_cons_ += (sz + 1)*sizeof(value_type);
     size_ += sz;
@@ -904,6 +924,7 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int_type index)
 	STXXL_VERBOSE2("loser_tree::deallocateSegment() deleting segment "<<
 		index<<" address: "<<segment[index]<<" size: "<<segment_size[index])
   current[index] = &dummy;
+  current_end[index] = &dummy;
 
   // free memory
   delete [] segment[index];
@@ -924,6 +945,8 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::deallocateSegment(int_type index)
 template <class ValTp_,class Cmp_,unsigned KNKMAX>
 void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned_type l)
 {
+	//starting point for parallelization
+
   STXXL_VERBOSE3("loser_tree::multi_merge("<< to <<","<< l<<")")
   
   /*
@@ -941,12 +964,24 @@ void loser_tree<ValTp_,Cmp_,KNKMAX>::multi_merge(Element *to, unsigned_type l)
     if (segmentIsEmpty(0)) deallocateSegment(0); 
     break;
   case 1:
+  {
     assert(k == 2);
+#if defined(__MCSTL__) && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+    if(l > 0)
+    	std::cout << "binary merge " << l << std::endl;
+    std::pair<Element*, Element*> seqs[2] = { 	std::make_pair(current[0], current_end[0]), 
+    						std::make_pair(current[1], current_end[1]) };
+    mcstl::multiway_merge(seqs, seqs + 2, to, cmp, l, false);
+    current[0] = seqs[0].first;
+    current[1] = seqs[1].first;
+#else
     merge(current + 0, current + 1, to, l,cmp);
+#endif
     rebuildLooserTree();
     if (segmentIsEmpty(0)) deallocateSegment(0); 
     if (segmentIsEmpty(1)) deallocateSegment(1); 
     break;
+  }
   case 2:
     assert(k == 4);
     merge4(current + 0, current + 1, current + 2, current + 3, to, l,cmp);
