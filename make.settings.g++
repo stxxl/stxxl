@@ -15,7 +15,7 @@ LINKER = g++
 OPT = -O3 # compiler optimization level
 LIBNAME = stxxl
 
-DEBUG = # put here -g option to include the debug inormation into the binaries
+DEBUG = # put here -g option to include the debug information into the binaries
 
 
 #### BOOST OPTIONS ###############################################

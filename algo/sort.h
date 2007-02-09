@@ -536,6 +536,8 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 					
 					for(int_type i = 1; i < seqs.size(); i++)
 					{
+						if(seqs[i].first == seqs[i].second) 
+							continue;	//empty subsequence
 						assert(seqs[i].first != seqs[i].second);
 				
 						min_last = cmp(min_last, *(seqs[i].second - 1)) ? min_last : *(seqs[i].second - 1);
@@ -550,6 +552,8 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 					//locate this element in all sequences
 					for(int_type i = 0; i < seqs.size(); i++)
 					{
+						if(seqs[i].first == seqs[i].second) 
+							continue;	//empty subsequence
 						typename block_type::iterator position = upper_bound(seqs[i].first, seqs[i].second, min_last, cmp);
 						STXXL_VERBOSE1("greater equal than " << position - seqs[i].first);
 						less_equal_than_min_last += position - seqs[i].first;

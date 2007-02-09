@@ -10,6 +10,7 @@
 #include "io.h"
 #include "stdio.h"
 #include <vector>
+#include <iomanip>
 
 #ifndef BOOST_MSVC
 #include <unistd.h>
@@ -76,7 +77,7 @@ void out_stat(double start,double end, double * times, unsigned n, const std::ve
 int main(int argc, char * argv[])
 {
   unsigned ndisks = 8;
-  unsigned buffer_size = 1024*1024*64;
+  unsigned buffer_size = 1024*1024*256;
   unsigned buffer_size_int = buffer_size / sizeof(int);
 
   unsigned i=0,j=0;
@@ -117,16 +118,16 @@ int main(int argc, char * argv[])
 
   const char * disk_names_dev[] =
 {
+  "/data00/stxxl",
   "/data01/stxxl",
   "/data02/stxxl",
   "/data03/stxxl",
   "/data04/stxxl",
-  "/data05/stxxl",
-  "/data06/stxxl",
-  "/data07/stxxl",
-  "/data08/stxxl",
-  "/data09/stxxl",
-  "/data10/stxxl"
+  "/data05/stxxl"//,
+  //"/data06/stxxl",
+  //"/data07/stxxl",
+  //"/data08/stxxl",
+  //"/data09/stxxl"
 };
 
 #endif 
@@ -183,7 +184,7 @@ int main(int argc, char * argv[])
   while(count --)
   {
 
-  std::cout << "Disk offset "<< offset/MB <<" MB ";
+  std::cout << "Disk offset "<< std::setw(5) << offset/MB <<" MB: ";
   
 
   double begin = stxxl_timestamp(),end;
@@ -208,18 +209,18 @@ int main(int argc, char * argv[])
 #endif
 
   end = stxxl_timestamp();
-/*
-  std::cout << "WRITE\nDisks: " << ndisks 
+
+/*  std::cout << "WRITE\nDisks: " << ndisks 
   	<<" \nElapsed time: "<< end-begin
   	<< " \nThroughput: "<< int(1e-6*(buffer_size*ndisks)/(end-begin)) 
   	<< " Mb/s \nPer one disk:"
 	<< int(1e-6*(buffer_size)/(end-begin)) << " Mb/s"
-	<< std::endl;
-*/
+	<< std::endl;*/
+
 #ifdef WATCH_TIMES
   out_stat(begin,end,w_finish_times,ndisks,disks_arr);
 #endif
-	std::cout << int(1e-6*(buffer_size)/(end-begin)) << " MB/s,";
+  std::cout << std::setw(2) << ndisks << " * " << std::setw(3) << int(1e-6*(buffer_size)/(end-begin)) << " = " << std::setw(3) << int(1e-6*(buffer_size*ndisks)/(end-begin)) << " MB/s write,";
 
 #endif
 
@@ -243,16 +244,16 @@ int main(int argc, char * argv[])
 #endif
 
   end = stxxl_timestamp();
-/*
-  std::cout << "READ\nDisks: " << ndisks
+
+/*  std::cout << "READ\nDisks: " << ndisks
   	<<" \nElapsed time: "<< end-begin 
   	<< " \nThroughput: "<< int(1e-6*(buffer_size*ndisks)/(end-begin))
   	<< " Mb/s \nPer one disk:"
   	<< int(1e-6*(buffer_size)/(end-begin)) << " Mb/s" 
-	    << std::endl;
-*/
+	    << std::endl;*/
 
-  std::cout << int(1e-6*(buffer_size)/(end-begin)) << " MB/s"<<std::endl;
+
+  std::cout << std::setw(2) << ndisks << " * " << std::setw(3) << int(1e-6*(buffer_size)/(end-begin)) << " = " << std::setw(3) << int(1e-6*(buffer_size*ndisks)/(end-begin)) << " MB/s read" << std::endl;
 #else
   std::cout << std::endl;
 #endif
