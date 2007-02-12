@@ -22,6 +22,8 @@ struct my_type
 									
 	static my_type min_value(){ return my_type(0); };
 	static my_type max_value(){ return my_type(0xffffffff); };
+
+	~my_type() {}
 };
 
 std::ostream & operator << (std::ostream & o, const my_type & obj)

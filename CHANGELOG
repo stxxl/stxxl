@@ -1,4 +1,9 @@
+Repository version (see the web page for the last modification date)
 
+* Bugfix: for objects with the deconstructors, memory block were allocated in a non-aligned fashion
+
+
+------------------------------------------
 Version 1.0d (16 January 2007)
 
 * Support of Visual Studio 2005 Express (VC++ 8.0)

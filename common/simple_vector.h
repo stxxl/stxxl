@@ -32,7 +32,9 @@ template < class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */  >
 	{
 		//assert(sz);
 		//    _array = _data_allocator.allocate(sz);
+    STXXL_VERBOSE1("simple_vector: Allocating "<<sz<<" objects of size "<<sizeof(value_type))
 		_array = new _Tp[sz];
+    STXXL_VERBOSE1("Allocated at address "<<((unsigned long long)_array))
 	}
 	void swap(simple_vector & obj)
 	{

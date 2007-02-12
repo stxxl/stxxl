@@ -78,12 +78,6 @@ OUT    = -o # output file option for the compiler and linker
 
 ###################################################################
 
-ifeq ($(strip $(USE_LINUX)),yes)
-	POSIX_MEMALIGN = -DSTXXL_USE_POSIX_MEMALIGN_ALLOC
-	XOPEN_SOURCE = -D_XOPEN_SOURCE=600
-endif
-
-
 
 STXXL_SPECIFIC = \
  -DSORT_OPT_PREFETCHING \

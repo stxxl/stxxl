@@ -20,6 +20,7 @@ struct MyType
 {
 	int integer;
 	//char chars[4];
+	~MyType() {}
 };
 
 using namespace stxxl;
@@ -47,7 +48,7 @@ int main ()
 	block_manager *bm = block_manager::get_instance ();
 	bm->new_blocks (striping (), bids.begin (), bids.end ());
 
-	block_type * block = new block_type;
+	block_type * block = new block_type[2];
 	STXXL_MSG(std::hex)
 	STXXL_MSG("Allocated block address    : "<<long(block))
 	STXXL_MSG("Allocated block address + 1: "<<long(block+1))
@@ -83,7 +84,7 @@ int main ()
 	bm->delete_blocks (bids.begin(), bids.end ());
 
 	delete [] reqs;
-	delete block;
+	delete [] block;
 
 	// variable-size blocks, not supported currently
 	/*

@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-#include "io.h"
+#include <stxxl> 
 
 //! \example io/test_io.cpp
 //! This is an example of use of \c \<stxxl\> files, requests, and 
@@ -28,7 +28,7 @@ int main()
 {
   std::cout << sizeof(void *) << std::endl;
   const int size = 1024 * 384;
-  char *buffer = new char[size];
+  char *buffer = (char*)stxxl::aligned_alloc<4096>(size);
   #ifdef BOOST_MSVC
   const char * paths[2] = {"data1", "data2"};
   #else
@@ -46,7 +46,7 @@ int main()
   
   wait_all(req,16);
   
-  delete [] buffer;
+  stxxl::aligned_dealloc<4096>(buffer);
 
   return 0;
 }

@@ -305,7 +305,10 @@ __STXXL_BEGIN_NAMESPACE
 		
 		static void *operator      new[] (size_t bytes)
 		{
-			void * result = aligned_alloc < BLOCK_ALIGN > (bytes);
+			unsigned_type meta_info_size = bytes % raw_size;
+			STXXL_VERBOSE1("typed::block operator new: Meta info size: "<<meta_info_size)
+
+			void * result = aligned_alloc < BLOCK_ALIGN > (bytes,meta_info_size);
 			char * tmp = (char*)result;
 			debugmon::get_instance()->block_allocated(tmp,tmp+bytes,RawSize_);
 			tmp += RawSize_;
@@ -318,7 +321,10 @@ __STXXL_BEGIN_NAMESPACE
 		}
 		static void *operator      new (size_t bytes)
 		{
-			void * result = aligned_alloc < BLOCK_ALIGN > (bytes);
+			unsigned_type meta_info_size = bytes % raw_size;
+			STXXL_VERBOSE1("typed::block operator new: Meta info size: "<<meta_info_size)
+
+			void * result = aligned_alloc < BLOCK_ALIGN > (bytes,meta_info_size);
 			char * tmp = (char*)result;
 			debugmon::get_instance()->block_allocated(tmp,tmp+bytes,RawSize_);
 			tmp += RawSize_;
