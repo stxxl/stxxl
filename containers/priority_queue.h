@@ -256,235 +256,613 @@ void merge4(
       typedef typename block_type::value_type value_type;
       typedef Cmp_ comparator_type;
       typedef AllocStr_ alloc_strategy;
+      typedef value_type Element;
     
-      enum { arity = Arity_ };
+      enum { arity = Arity_, KNKMAX = Arity_ };
     
     protected:
+    
+      comparator_type cmp;
+      
+      bool is_sentinel(const Element & a) const
+      {
+        return !(cmp(cmp.min_value(),a));
+      }
+      bool not_sentinel(const Element & a) const
+      {
+        return cmp(cmp.min_value(),a);
+      }
+      
       struct sequence_type
       {
         unsigned_type current;
         block_type * block;
-        std::list<bid_type> * bids;
-        sequence_type() {}
-        sequence_type(unsigned_type c,block_type * bl, std::list<bid_type> * bi):
-          current(c),block(bl),bids(bi) {}
+        std::list<bid_type> * bids; // TODO: really need a pointer ?
+        comparator_type cmp;
+        ext_merger * merger;
+          
         value_type & operator *()
         {
           return (*block)[current];
         }
-      };
-    
-      typedef typename std::list<sequence_type>::iterator sequences_iterator;
-      
-      struct sequence_element
-      {
-        value_type value;
-        sequences_iterator sequence;
-        sequence_element() {}
-        sequence_element(const value_type & v, const sequences_iterator & s):
-          value(v),sequence(s) {}
-      };
-      struct sequence_element_comparator
-      {
-        bool operator () (const sequence_element & a, const sequence_element & b) const
+        
+        sequence_type(): block(new block_type),bids(NULL)
         {
-          return comparator_type()(a.value,b.value);
+          make_inf();
         }
-      };
-      
-      unsigned_type nsequences;
-      size_type nelements;
-      std::list<sequence_type> sequences;
-      //typename std::list<sequence_type>::iterator last_sequence;
-      std::priority_queue< 
-                  sequence_element,
-                  std::vector<sequence_element>,
-                  sequence_element_comparator> min_elements;
-      
-      prefetch_pool<block_type> * p_pool;
-      write_pool<block_type> * w_pool;
-	private:
-	  ext_merger(const ext_merger &); // forbiden
-	  ext_merger & operator = (const ext_merger &);// forbiden
-    public:
-	  ext_merger(): nsequences(0),nelements(0) {}
-      ext_merger( prefetch_pool<block_type> * p_pool_,
-                  write_pool<block_type> * w_pool_):
-                      nsequences(0),nelements(0),
-                      p_pool(p_pool_),
-                      w_pool(w_pool_)
-      {
-        STXXL_VERBOSE2("ext_merger::ext_merger(...)")
-      }
-	  void set_pools(prefetch_pool<block_type> * p_pool_,
-                  			   write_pool<block_type> * w_pool_)
-	 {
-		 p_pool = p_pool_;
-		 w_pool = w_pool_;
-	 }
-	  void swap(ext_merger & obj)
-	  {
-		  std::swap(nsequences,obj.nsequences);
-          std::swap(nelements,obj.nelements);
-          std::swap(sequences,obj.sequences);
-      	  std::swap(min_elements,obj.min_elements);
-      	  // std::swap(p_pool,obj.p_pool);
-      	  // std::swap(w_pool,obj.w_pool);
-	  }
-      unsigned_type mem_cons() const // only rough estimation
-      {
-        return (nsequences * block_type::raw_size);
-      }
-      virtual ~ext_merger()
-      {
-        STXXL_VERBOSE2("ext_merger::~ext_merger()")
-        block_manager * bm = block_manager::get_instance();
-        sequences_iterator i = sequences.begin();
-        for(;i!=sequences.end();++i)
+        
+        sequence_type(unsigned_type c,block_type * bl, std::list<bid_type> * bi):
+          current(c),block(bl),bids(bi)
         {
-          bm->delete_blocks(i->bids->begin(),i->bids->end());
-          delete i->block;
-          delete i->bids;
         }
-      }
-      template <class OutputIterator>
-      void multi_merge(OutputIterator begin, OutputIterator end)
-      {
-        STXXL_VERBOSE2("ext_merger::multi_merge(...)")
-        while(begin != end)
+        
+        ~sequence_type()
         {
-          assert(nelements);
-          assert(nsequences);
-          assert(!min_elements.empty());
-          
-          sequence_element m = min_elements.top();
-          min_elements.pop();
-          STXXL_VERBOSE2("ext_merger::multi_merge(...) extracting value: " << m.value)
-          *begin = m.value;
-          ++begin;
-          --nelements;
-          sequence_type & s = *(m.sequence);
-          ++(s.current);
-          if(s.current == s.block->size )
+          STXXL_VERBOSE1("ext_merger sequence_type::~sequence_type()") 
+          if(bids)
           {
-            STXXL_VERBOSE2("ext_merger::multi_merge(...) crossing block border ")
+            block_manager * bm = block_manager::get_instance();
+            bm->delete_blocks(bids->begin(),bids->end());
+            delete bids;
+          }
+          assert(block);
+          delete block;
+        }
+        
+        void make_inf()
+        {
+          current = 0;
+          (*block)[0] = cmp.min_value();
+        }
+        
+        bool is_sentinel(const Element & a) const
+        {
+          return !(cmp(cmp.min_value(),a));
+        }
+        bool not_sentinel(const Element & a) const
+        {
+          return cmp(cmp.min_value(),a);
+        }
+        
+        sequence_type & operator = (sequence_type & obj)
+        {
+          if(&obj != this)
+          {
+            assert(is_sentinel((*block)[current]));
+            current = obj.current;
+            std::swap(block,obj.block);
+            std::swap(bids,obj.bids);
+          }
+          return *this;
+        }
+        
+        sequence_type & operator ++ ()
+        {
+          assert(not_sentinel((*block)[current]));
+          assert(current < block->size);
+          
+          ++current;
+          
+          if(current == block->size )
+          {
+            STXXL_VERBOSE2("ext_merger sequence_type operator++ crossing block border ")
             // go to the next block
-            if(s.bids->empty()) // if there is no next block
+            assert(bids);
+            if(bids->empty()) // if there is no next block
             {
-              STXXL_VERBOSE2("ext_merger::multi_merge(...) it was the last block in the sequence ")
-              --nsequences;
-              delete s.bids;
-              delete s.block;
-              sequences.erase(m.sequence);
-              continue;
+              STXXL_VERBOSE2("ext_merger sequence_type operator++ it was the last block in the sequence ")
+              delete bids;
+              bids = NULL;
+              make_inf();
             }
             else
             {
-              STXXL_VERBOSE2("ext_merger::multi_merge(...) there is another block ")
-              bid_type bid = s.bids->front();
-              s.bids->pop_front();
-              if(!(s.bids->empty()))
+              STXXL_VERBOSE2("ext_merger sequence_type operator++ there is another block ")
+              bid_type bid = bids->front();
+              bids->pop_front();
+              if(!(bids->empty()))
               {
-                STXXL_VERBOSE2("ext_merger::multi_merge(...) one more block exists in a sequence: "<<
+                STXXL_VERBOSE2("ext_merger sequence_type operator++ one more block exists in a sequence: "<<
                 "flushing this block in write cache (if not written yet) and giving hint to prefetcher")
-                bid_type next_bid = s.bids->front();/*
-                request_ptr r = w_pool->get_request(next_bid);
-                if(r.valid()) 
-                {
-                  STXXL_VERBOSE2("ext_merger::multi_merge(...) block was in write pool: "<<
-                    ((r->poll())?"already written":"not yet written") )
-                  r->wait();
-                }
-                else
-                {
-                  STXXL_VERBOSE2("ext_merger::multi_merge(...) block was not in write pool ")
-                }
-                p_pool->hint(next_bid);*/
-                p_pool->hint(next_bid,*w_pool);
+                bid_type next_bid = bids->front();
+                merger->p_pool->hint(next_bid,*(merger->w_pool));
               }
-              p_pool->read(s.block,bid)->wait();
+              merger->p_pool->read(block,bid)->wait();
               block_manager::get_instance()->delete_block(bid);
-              s.current = 0;
+              current = 0;
             }
           }
-          m.value = *s;
-          min_elements.push(m);
+          return *this;
+        }
+      };
+    
+    
+      // this version of ext_merger is based on the loser tree data structure
+      
+      struct Entry 
+      {
+        value_type key;   // Key of Looser element (winner for 0)
+        int_type index;   // the number of losing segment
+      };
+      
+      // stack of empty segments
+      int_type empty[KNKMAX]; // indices of empty segments
+      int_type lastFree;  // where in "empty" is the last valid entry?
+      
+      unsigned_type size_; // total number of elements stored
+      // previously size_type nelements;
+      unsigned logK; // log of current tree size
+      unsigned_type k; // invariant k = 1 << logK
+      
+      Element dummy; // target of empty segment pointers
+
+      // upper levels of loser trees
+      // entry[0] contains the winner info
+      Entry entry[KNKMAX];
+      
+      // leaf information
+      // note that Knuth uses indices k..k-1
+      // while we use 0..k-1
+      sequence_type current[KNKMAX]; // pointer to actual element
+      
+      prefetch_pool<block_type> * p_pool;
+      write_pool<block_type> * w_pool;
+       
+      // private member functions
+      /*
+      int_type initWinner(int_type root);
+      void updateOnInsert(int_type node, const Element & newKey, int_type newIndex, 
+                        Element * winnerKey, int_type * winnerIndex, int_type * mask);
+      void deallocateSegment(int_type index);
+      void doubleK();
+      void compactTree();
+      void rebuildLooserTree();
+      bool segmentIsEmpty(int_type i);
+      void multi_merge_k(Element * to, int_type l);
+      */
+      
+	private:
+	  ext_merger(const ext_merger &); // forbiden
+	  ext_merger & operator = (const ext_merger &);// forbiden
+  public:
+  
+  
+	  ext_merger(): lastFree(0), size_(0), logK(0), k(1)
+    {
+      for(int_type i = 0;i<KNKMAX;++i)
+        current[i].merger = this;
+        
+      empty  [0] = 0;
+      current[0].make_inf();
+      init();
+    }
+    
+    ext_merger( prefetch_pool<block_type> * p_pool_,
+                  write_pool<block_type> * w_pool_):
+                      lastFree(0), size_(0), logK(0), k(1),
+                      p_pool(p_pool_),
+                      w_pool(w_pool_)
+    {
+        STXXL_VERBOSE2("ext_merger::ext_merger(...)")
+        empty  [0] = 0;
+        current[0].make_inf();
+        init();
+    }
+      
+    void set_pools(prefetch_pool<block_type> * p_pool_,
+                           write_pool<block_type> * w_pool_)
+   {
+     p_pool = p_pool_;
+     w_pool = w_pool_;
+   }
+    
+    void init()
+    {
+      rebuildLooserTree();
+      assert(is_sentinel(*current[entry[0].index]));
+    }
+    
+    // rebuild loser tree information from the values in current
+    void rebuildLooserTree()
+    {  
+        int_type winner = initWinner(1);
+        entry[0].index = winner;
+        entry[0].key   = *(current[winner]);
+    }
+    
+    
+    // given any values in the leaves this
+    // routing recomputes upper levels of the tree
+    // from scratch in linear time
+    // initialize entry[root].index and the subtree rooted there
+    // return winner index
+    int_type initWinner(int_type root)
+    {
+      if (root >= int_type(k)) { // leaf reached
+        return root - k;
+      } else {
+        int_type left  = initWinner(2*root    );
+        int_type right = initWinner(2*root + 1);
+        Element lk    = *(current[left ]);
+        Element rk    = *(current[right]);
+        if (!(cmp(lk,rk))) { // right subtree looses
+          entry[root].index = right;
+          entry[root].key   = rk;
+          return left;
+        } else {
+          entry[root].index = left;
+          entry[root].key   = lk;
+          return right;
         }
       }
-      bool spaceIsAvailable() const { return nsequences < arity; }
+    }
+    
+    // first go up the tree all the way to the root
+    // hand down old winner for the respective subtree
+    // based on new value, and old winner and loser 
+    // update each node on the path to the root top down.
+    // This is implemented recursively
+    void updateOnInsert(
+                   int_type node, 
+                   const Element & newKey, 
+                   int_type      newIndex, 
+                   Element * winnerKey, 
+                   int_type * winnerIndex, // old winner
+                   int_type * mask) // 1 << (ceil(log KNK) - dist-from-root)
+    {
+      if (node == 0) { // winner part of root
+        *mask = 1 << (logK - 1);    
+        *winnerKey   = entry[0].key;
+        *winnerIndex = entry[0].index;
+        if (cmp(entry[node].key,newKey)) 
+        {
+          entry[node].key   = newKey;
+          entry[node].index = newIndex;
+        }
+      } else {
+        updateOnInsert(node >> 1, newKey, newIndex, winnerKey, winnerIndex, mask);
+        Element loserKey   = entry[node].key;
+        int_type loserIndex = entry[node].index;
+        if ((*winnerIndex & *mask) != (newIndex & *mask)) { // different subtrees
+          if (cmp(loserKey,newKey)) { // newKey will have influence here
+            if (cmp(*winnerKey,newKey) ) { // old winner loses here
+              entry[node].key   = *winnerKey;
+              entry[node].index = *winnerIndex;
+            } else { // new entry looses here
+              entry[node].key   = newKey;
+              entry[node].index = newIndex;
+            }
+          } 
+          *winnerKey   = loserKey;
+          *winnerIndex = loserIndex;
+        }
+        // note that nothing needs to be done if
+        // the winner came from the same subtree
+        // a) newKey <= winnerKey => even more reason for the other tree to loose
+        // b) newKey >  winnerKey => the old winner will beat the new
+        //                           entry further down the tree
+        // also the same old winner is handed down the tree
+    
+        *mask >>= 1; // next level
+      }
+    }
+    
+    // make the tree two times as wide
+    // may only be called if no free slots are left ?? necessary ??
+    void doubleK()
+    {
+      // make all new entries empty
+      // and push them on the free stack
+      assert(lastFree == -1); // stack was empty (probably not needed)
+      assert(k < KNKMAX);
+      for (int_type i = 2*k - 1;  i >= int_type(k);  i--)
+      {
+        current[i].make_inf();
+        lastFree++;
+        empty[lastFree] = i;
+      }
+    
+      // double the size
+      k *= 2;  logK++;
+    
+      // recompute loser tree information
+      rebuildLooserTree();
+    }
+    
+    
+    // compact nonempty segments in the left half of the tree
+    void compactTree()
+    {
+      assert(logK > 0);
+    
+      // compact all nonempty segments to the left
+      int_type from = 0;
+      int_type to   = 0;
+      for(;  from < int_type(k);  from++)
+      {
+        if (not_sentinel(*(current[from])))
+        {
+          current[to] = current[from];
+          to++;
+        }
+      }
+    
+      // half degree as often as possible
+      while (to < int_type(k/2)) {
+        k /= 2;  logK--;
+      }
+    
+      // overwrite garbage and compact the stack of empty segments
+      lastFree = -1; // none free
+      for (;  to < int_type(k);  to++) {
+        // push 
+        lastFree++;
+        empty[lastFree] = to;
+    
+        current[to].make_inf();
+      }
+    
+      // recompute loser tree information
+      rebuildLooserTree();
+    }
+        
+    
+	  void swap(ext_merger & obj)
+	  {
+      std::swap(cmp,obj.cmp);
+      swap_1D_arrays(empty,obj.empty,KNKMAX);
+      std::swap(lastFree,obj.lastFree);
+      std::swap(size_,obj.size_);
+      std::swap(logK,obj.logK);
+      std::swap(k,obj.k);
+      swap_1D_arrays(entry,obj.entry,KNKMAX);
+      swap_1D_arrays(current,obj.current,KNKMAX);
       
+      // std::swap(p_pool,obj.p_pool);
+      // std::swap(w_pool,obj.w_pool);
+	  }
+      unsigned_type mem_cons() const // only rough estimation
+      {
+        return (KNKMAX * block_type::raw_size);
+      }
+      virtual ~ext_merger()
+      {
+        STXXL_VERBOSE1("ext_merger::~ext_merger()")
+      }
+      
+      // delete the (begin-end) smallest elements and write them to "to"
+      // empty segments are deallocated
+      // require:
+      // - there are at least l elements
+      // - segments are ended by sentinels
+      //void multi_merge(Element *to, unsigned_type l)
+      template <class OutputIterator>
+      void multi_merge(OutputIterator begin, OutputIterator end)
+      {
+        size_type l = end-begin;
+        STXXL_VERBOSE2("ext_meerger::multi_merge l = "<< l)
+        
+        
+        multi_merge_k(begin,end);
+        
+        /*
+        switch(logK) {
+        case 0: 
+          assert(k == 1);
+          assert(entry[0].index == 0);
+          assert(lastFree == -1 || l == 0);
+          //memcpy(to, current[0], l * sizeof(Element));
+          std::copy(current[0],current[0]+l,to);
+          current[0] += l;
+          entry[0].key = **current;
+          if (segmentIsEmpty(0)) deallocateSegment(0); 
+          break;
+        case 1:
+          assert(k == 2);
+          merge(current + 0, current + 1, to, l,cmp);
+          rebuildLooserTree();
+          if (segmentIsEmpty(0)) deallocateSegment(0); 
+          if (segmentIsEmpty(1)) deallocateSegment(1); 
+          break;
+        case 2:
+          assert(k == 4);
+          merge4(current + 0, current + 1, current + 2, current + 3, to, l,cmp);
+          rebuildLooserTree();
+          if (segmentIsEmpty(0)) deallocateSegment(0); 
+          if (segmentIsEmpty(1)) deallocateSegment(1); 
+          if (segmentIsEmpty(2)) deallocateSegment(2); 
+          if (segmentIsEmpty(3)) deallocateSegment(3);
+          break;
+        case  3: multi_merge_f<3>(to, l); break;
+        case  4: multi_merge_f<4>(to, l); break;
+        case  5: multi_merge_f<5>(to, l); break;
+        case  6: multi_merge_f<6>(to, l); break;
+        case  7: multi_merge_f<7>(to, l); break;
+        case  8: multi_merge_f<8>(to, l); break;
+        case  9: multi_merge_f<9>(to, l); break;
+        case 10: multi_merge_f<10>(to, l); break; 
+        default: multi_merge_k(to, l); break;
+        }
+        
+        */
+        
+        size_ -= l;
+      
+        // compact tree if it got considerably smaller
+        if (k > 1 && int_type(lastFree) >= int_type(3*k/5 - 1) ) { 
+          // using k/2 would be worst case inefficient
+          compactTree(); 
+        }
+      }
+      
+      // multi-merge for arbitrary K
+      template <class OutputIterator>
+      void multi_merge_k(OutputIterator begin, OutputIterator end)
+      //void multi_merge_k(Element *to, int_type l)
+      {
+        Entry * currentPos;
+        Element currentKey;
+        int_type currentIndex; // leaf pointed to by current entry
+        int_type kReg = k;
+        OutputIterator done = end;
+        OutputIterator to = begin;
+        int_type winnerIndex = entry[0].index;
+        Element  winnerKey   = entry[0].key;
+        
+        while (to != done)
+        {
+          // write result
+          *to   = *(current[winnerIndex]);
+      
+          // advance winner segment
+          ++(current[winnerIndex]);
+          
+          winnerKey = *(current[winnerIndex]);
+      
+          // remove winner segment if empty now
+          if (is_sentinel(winnerKey)) // 
+            deallocateSegment(winnerIndex); 
+          
+          // go up the entry-tree
+          for (int_type i = (winnerIndex + kReg) >> 1;  i > 0;  i >>= 1) {
+            currentPos = entry + i;
+            currentKey = currentPos->key;
+            if (cmp(winnerKey,currentKey)) {
+              currentIndex      = currentPos->index;
+              currentPos->key   = winnerKey;
+              currentPos->index = winnerIndex;
+              winnerKey         = currentKey;
+              winnerIndex       = currentIndex;
+            }
+          }
+      
+          ++to;
+        }
+        entry[0].index = winnerIndex;
+        entry[0].key   = winnerKey;  
+      }
+      
+      
+      bool  spaceIsAvailable() const // for new segment
+      { 
+        return k < KNKMAX || lastFree >= 0; 
+      } 
+
+
+      // insert segment beginning at to
+      // require: spaceIsAvailable() == 1 
+      //void insert_segment(Element *to, unsigned_type sz)
       template <class Merger>
       void insert_segment(Merger & another_merger, size_type segment_size)
       {
         STXXL_VERBOSE2("ext_merger::insert_segment(merger,...)")
-        assert(segment_size);
-        unsigned_type nblocks = segment_size / block_type::size; 
-        STXXL_VERBOSE2("ext_merger::insert_segment(merger,...) inserting segment with "<<nblocks<<" blocks")
-        //assert(nblocks); // at least one block
-		STXXL_VERBOSE1("ext_merger::insert_segment nblocks="<<nblocks)
-        if(nblocks == 0)
-        {
-          STXXL_VERBOSE1("ext_merger::insert_segment(merger,...) WARNING: inserting a segment with "<<
-            nblocks<<" blocks")
-          STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS")
-        }
-        unsigned_type first_size = segment_size % block_type::size;
-        if(first_size == 0)
-        {
-          first_size = block_type::size;
-          --nblocks;
-        }
-        block_manager * bm = block_manager::get_instance();
-        std::list<bid_type> * bids = new std::list<bid_type>(nblocks);
-        bm->new_blocks(alloc_strategy(),bids->begin(),bids->end());
-        block_type * first_block = new block_type;
-        another_merger.multi_merge(
-            first_block->begin() + (block_type::size - first_size), 
-            first_block->end());
-        /*
-        if(w_pool->size() < nblocks)
-        {
-          STXXL_MSG("ext_merger::insert_segment write pool is too small: "<<
-            w_pool->size()<<" blocks, resizing to "<<nblocks)
-          w_pool->resize(nblocks);
-        }*/
-        assert(w_pool->size() > 0);
         
-        typename std::list<bid_type>::iterator curbid = bids->begin();
-        for(unsigned_type i=0;i<nblocks;++i,++curbid)
+        if (segment_size > 0)
         {
-          block_type *b = w_pool->steal();
-          another_merger.multi_merge(b->begin(),b->end());
-          w_pool->write(b,*curbid);
+          // get a free slot
+          if (lastFree < 0) { // tree is too small
+            doubleK();
+          }
+          int_type index = empty[lastFree];
+          lastFree--; // pop
+      
+      
+          // link new segment
+          assert(segment_size);
+          unsigned_type nblocks = segment_size / block_type::size; 
+          STXXL_VERBOSE2("ext_merger::insert_segment(merger,...) inserting segment with "<<nblocks<<" blocks")
+          //assert(nblocks); // at least one block
+          STXXL_VERBOSE1("ext_merger::insert_segment nblocks="<<nblocks)
+          if(nblocks == 0)
+          {
+            STXXL_VERBOSE1("ext_merger::insert_segment(merger,...) WARNING: inserting a segment with "<<
+              nblocks<<" blocks")
+            STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS")
+          }
+          unsigned_type first_size = segment_size % block_type::size;
+          if(first_size == 0)
+          {
+            first_size = block_type::size;
+            --nblocks;
+          }
+          block_manager * bm = block_manager::get_instance();
+          std::list<bid_type> * bids = new std::list<bid_type>(nblocks);
+          bm->new_blocks(alloc_strategy(),bids->begin(),bids->end());
+          block_type * first_block = new block_type;
+          another_merger.multi_merge(
+              first_block->begin() + (block_type::size - first_size), 
+              first_block->end());
+          
+          assert(w_pool->size() > 0);
+          
+          typename std::list<bid_type>::iterator curbid = bids->begin();
+          for(unsigned_type i=0;i<nblocks;++i,++curbid)
+          {
+            block_type *b = w_pool->steal();
+            another_merger.multi_merge(b->begin(),b->end());
+            w_pool->write(b,*curbid);
+          }
+          
+          insert_segment(bids,first_block,first_size,index);
+          
+          size_ += segment_size;
+           
+          // propagate new information up the tree
+          Element dummyKey;
+          int_type dummyIndex;
+          int_type dummyMask;
+          updateOnInsert((index + k) >> 1, *(current[index]), index, 
+                         &dummyKey, &dummyIndex, &dummyMask);
+        } else {
+          // deallocate memory ?
+          STXXL_VERBOSE1("Merged segment with zero size.")
         }
-        
-        insert_segment(bids,first_block,first_size);
       }
-      size_type  size() const { return nelements; }
+      
+      size_type  size() const { return size_; }
       
  protected:
       /*! \param first_size number of elements in the first block
  		*/
-      void insert_segment(std::list<bid_type> * segment, block_type * first_block, unsigned_type first_size)
+      void insert_segment(std::list<bid_type> * segment, block_type * first_block, 
+              unsigned_type first_size, int_type index)
       {
         STXXL_VERBOSE1("ext_merger::insert_segment(segment_bids,...) "<<this)
         assert(first_size);
-        ++nsequences;
-        nelements += size_type(segment->size())*block_type::size + first_size;
+        
         // assert(nsequences <= arity);
-        if(nsequences>arity)
+        if(!spaceIsAvailable())
         {
-          STXXL_VERBOSE1("ext_merger::insert_segment(..) "
-                  "INSERTING SEGMENT OVER CAPACITY, CAPACITY:"<<arity<<" SEQUENCES: "<<nsequences)
+          STXXL_ERRMSG("ext_merger::insert_segment(..) "
+                  "INSERTING SEGMENT OVER CAPACITY")
         }
-        sequence_type new_sequence;
+        sequence_type & new_sequence = current[index];
         new_sequence.current = block_type::size - first_size;
-        new_sequence.block = first_block;
-        new_sequence.bids = segment;
-        sequences.push_front(new_sequence);
-        min_elements.push(sequence_element(*new_sequence,sequences.begin()));
-        //last_sequence = sequences.begin();
+        std::swap(new_sequence.block,first_block);
+        delete first_block;
+        std::swap(new_sequence.bids,segment);
       }
+      
+      // free an empty segment .
+      void deallocateSegment(int_type index)
+      {
+        // reroute current pointer to some empty dummy segment
+        // with a sentinel key
+        STXXL_VERBOSE2("loser_tree::deallocateSegment() deleting segment "<<
+          index)
+          
+        current[index].make_inf();
+                
+        // push on the stack of free segment indices
+        lastFree++;
+        empty[lastFree] = index;
+      }
+      
+      // is this segment empty and does not point to dummy yet?
+      //bool segmentIsEmpty(int_type i)
+      //{
+      //  return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
+      //}
   };
   
   
@@ -525,7 +903,7 @@ private:
   // while we use 0..k-1
   Element * current[KNKMAX]; // pointer to actual element
   Element * segment[KNKMAX]; // start of Segments
-  unsigned_type segment_size[KNKMAX];
+  unsigned_type segment_size[KNKMAX]; // just to count the internal memory consumption
 
   unsigned_type mem_cons_;
   
