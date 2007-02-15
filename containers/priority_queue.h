@@ -1021,17 +1021,17 @@ void merge4_iterator(
         STXXL_VERBOSE1("ext_merger::insert_segment(segment_bids,...) "<<this)
         assert(first_size);
         
-        // assert(nsequences <= arity);
-        if(!spaceIsAvailable())
-        {
-          STXXL_ERRMSG("ext_merger::insert_segment(..) "
-                  "INSERTING SEGMENT OVER CAPACITY")
-        }
         sequence_type & new_sequence = current[index];
         new_sequence.current = block_type::size - first_size;
         std::swap(new_sequence.block,first_block);
         delete first_block;
         std::swap(new_sequence.bids,segment);
+        assert(segment == NULL || segment->empty());
+        if(segment)
+        {
+          assert(segment->empty());
+          delete segment;
+        }
       }
       
       // free an empty segment .
