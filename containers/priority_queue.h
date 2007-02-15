@@ -64,6 +64,32 @@ void merge(Value_ **f0,
   *f1   = from1;
 }
 
+// iterator version
+template <class InputIterator, class OutputIterator,class Cmp_>
+void merge_iterator(
+           InputIterator & from0,
+           InputIterator & from1,
+           OutputIterator to, int_type sz, Cmp_ cmp) 
+{
+  OutputIterator done = to + sz;
+
+  while (to != done)
+  {
+    if(cmp(*from0,*from1))
+    {
+      *to = *from1;
+      ++from1;
+    }
+    else
+    {
+      *to = *from0; 
+      ++from0; 
+    }
+    ++to;
+  }
+}
+
+
 
 // merge sz element from the three sentinel terminated input
 // sequences *f0, *f1 and *f2 to "to"
@@ -241,6 +267,112 @@ void merge4(
 
   
   
+// iterator version
+template <class InputIterator, class OutputIterator, class Cmp_>
+void merge4_iterator(
+           InputIterator & from0,
+           InputIterator & from1,
+           InputIterator & from2,
+           InputIterator & from3,
+           OutputIterator to, int_type sz, Cmp_ cmp) 
+{
+  OutputIterator done    = to + sz;
+
+#define StartMerge4(a, b, c, d)\
+  if ( (!cmp(*from##a ,*from##b )) && (!cmp(*from##b ,*from##c )) && (!cmp(*from##c ,*from##d )) )\
+    goto s ## a ## b ## c ## d ;
+
+  // b>a c>b d>c
+  // a<b b<c c<d
+  // a<=b b<=c c<=d
+  // !(a>b) !(b>c) !(c>d)
+  
+  StartMerge4(0, 1, 2, 3);
+  StartMerge4(1, 2, 3, 0);
+  StartMerge4(2, 3, 0, 1);
+  StartMerge4(3, 0, 1, 2);
+
+  StartMerge4(0, 3, 1, 2);
+  StartMerge4(3, 1, 2, 0);
+  StartMerge4(1, 2, 0, 3);
+  StartMerge4(2, 0, 3, 1);
+
+  StartMerge4(0, 2, 3, 1);
+  StartMerge4(2, 3, 1, 0);
+  StartMerge4(3, 1, 0, 2);
+  StartMerge4(1, 0, 2, 3);
+
+  StartMerge4(2, 0, 1, 3);
+  StartMerge4(0, 1, 3, 2);
+  StartMerge4(1, 3, 2, 0);
+  StartMerge4(3, 2, 0, 1);
+
+  StartMerge4(3, 0, 2, 1);
+  StartMerge4(0, 2, 1, 3);
+  StartMerge4(2, 1, 3, 0);
+  StartMerge4(1, 3, 0, 2);
+
+  StartMerge4(1, 0, 3, 2);
+  StartMerge4(0, 3, 2, 1);
+  StartMerge4(3, 2, 1, 0);
+  StartMerge4(2, 1, 0, 3);
+
+#define Merge4Case(a, b, c, d)\
+  s ## a ## b ## c ## d:\
+  if (to == done) goto finish;\
+  *to = *from ## a ;\
+  ++to;\
+  ++from ## a ;\
+  if (cmp(*from ## c , *from ## a))\
+  {\
+    if (cmp(*from ## b, *from ## a )) \
+      goto s ## a ## b ## c ## d; \
+    else \
+      goto s ## b ## a ## c ## d; \
+  }\
+  else \
+  {\
+    if (cmp(*from ## d, *from ## a))\
+      goto s ## b ## c ## a ## d; \
+    else \
+      goto s ## b ## c ## d ## a; \
+  }
+  
+  Merge4Case(0, 1, 2, 3);
+  Merge4Case(1, 2, 3, 0);
+  Merge4Case(2, 3, 0, 1);
+  Merge4Case(3, 0, 1, 2);
+
+  Merge4Case(0, 3, 1, 2);
+  Merge4Case(3, 1, 2, 0);
+  Merge4Case(1, 2, 0, 3);
+  Merge4Case(2, 0, 3, 1);
+
+  Merge4Case(0, 2, 3, 1);
+  Merge4Case(2, 3, 1, 0);
+  Merge4Case(3, 1, 0, 2);
+  Merge4Case(1, 0, 2, 3);
+
+  Merge4Case(2, 0, 1, 3);
+  Merge4Case(0, 1, 3, 2);
+  Merge4Case(1, 3, 2, 0);
+  Merge4Case(3, 2, 0, 1);
+
+  Merge4Case(3, 0, 2, 1);
+  Merge4Case(0, 2, 1, 3);
+  Merge4Case(2, 1, 3, 0);
+  Merge4Case(1, 3, 0, 2);
+
+  Merge4Case(1, 0, 3, 2);
+  Merge4Case(0, 3, 2, 1);
+  Merge4Case(3, 2, 1, 0);
+  Merge4Case(2, 1, 0, 3);
+
+ finish:
+   return;
+}
+
+
   
   
   template <  class BlockType_, 
@@ -281,7 +413,7 @@ void merge4(
         comparator_type cmp;
         ext_merger * merger;
           
-        value_type & operator *()
+        const value_type & operator *() const
         {
           return (*block)[current];
         }
@@ -641,50 +773,49 @@ void merge4(
       {
         size_type l = end-begin;
         STXXL_VERBOSE2("ext_meerger::multi_merge l = "<< l)
+
         
-        
-        multi_merge_k(begin,end);
-        
-        /*
         switch(logK) {
         case 0: 
           assert(k == 1);
           assert(entry[0].index == 0);
           assert(lastFree == -1 || l == 0);
           //memcpy(to, current[0], l * sizeof(Element));
-          std::copy(current[0],current[0]+l,to);
-          current[0] += l;
+          //std::copy(current[0],current[0]+l,to);
+          for(size_type i = 0; i<l; ++i,++(current[0]),++begin)
+            *begin = *(current[0]);
+
           entry[0].key = **current;
           if (segmentIsEmpty(0)) deallocateSegment(0); 
           break;
         case 1:
           assert(k == 2);
-          merge(current + 0, current + 1, to, l,cmp);
+          merge_iterator(current[0],current[1], begin, l,cmp);
           rebuildLooserTree();
           if (segmentIsEmpty(0)) deallocateSegment(0); 
           if (segmentIsEmpty(1)) deallocateSegment(1); 
           break;
         case 2:
           assert(k == 4);
-          merge4(current + 0, current + 1, current + 2, current + 3, to, l,cmp);
+          merge4_iterator(current[0], current[1], current[2], current[3], begin, l,cmp);
           rebuildLooserTree();
           if (segmentIsEmpty(0)) deallocateSegment(0); 
           if (segmentIsEmpty(1)) deallocateSegment(1); 
           if (segmentIsEmpty(2)) deallocateSegment(2); 
           if (segmentIsEmpty(3)) deallocateSegment(3);
           break;
-        case  3: multi_merge_f<3>(to, l); break;
-        case  4: multi_merge_f<4>(to, l); break;
-        case  5: multi_merge_f<5>(to, l); break;
-        case  6: multi_merge_f<6>(to, l); break;
-        case  7: multi_merge_f<7>(to, l); break;
-        case  8: multi_merge_f<8>(to, l); break;
-        case  9: multi_merge_f<9>(to, l); break;
-        case 10: multi_merge_f<10>(to, l); break; 
-        default: multi_merge_k(to, l); break;
+        case  3: multi_merge_f<OutputIterator,3>(begin,end); break;
+        case  4: multi_merge_f<OutputIterator,4>(begin,end); break;
+        case  5: multi_merge_f<OutputIterator,5>(begin,end); break;
+        case  6: multi_merge_f<OutputIterator,6>(begin, end); break;
+        case  7: multi_merge_f<OutputIterator,7>(begin, end); break;
+        case  8: multi_merge_f<OutputIterator,8>(begin, end); break;
+        case  9: multi_merge_f<OutputIterator,9>(begin, end); break;
+        case 10: multi_merge_f<OutputIterator,10>(begin, end); break; 
+        default: multi_merge_k(begin, end); break;
         }
         
-        */
+        
         
         size_ -= l;
       
@@ -740,6 +871,66 @@ void merge4(
         }
         entry[0].index = winnerIndex;
         entry[0].key   = winnerKey;  
+      }
+      
+      template <class OutputIterator, unsigned LogK>
+      //void multi_merge_f(Element *to, int_type l)
+      void multi_merge_f(OutputIterator begin, OutputIterator end)
+      {
+        //int_type kReg = k;
+        OutputIterator done = end;
+        OutputIterator to = begin;
+        int_type winnerIndex = entry[0].index;
+        Entry    *regEntry   = entry;
+        sequence_type * regCurrent = current;
+        Element  winnerKey   = entry[0].key;
+        
+        
+        assert(logK >= LogK);
+        while (to != done)
+        {          
+          // write result
+          *to   = *(regCurrent[winnerIndex]);
+          
+          // advance winner segment
+          ++(regCurrent[winnerIndex]);
+          
+          winnerKey = *(regCurrent[winnerIndex]);
+          
+          
+          // remove winner segment if empty now
+          if (is_sentinel(winnerKey))
+            deallocateSegment(winnerIndex); 
+          
+          ++to;
+          
+          // update loser tree
+    #define TreeStep(L)\
+          if (1 << LogK >= 1 << L) {\
+            Entry  *pos##L = regEntry+((winnerIndex+(1<<LogK)) >> (((int(LogK-L)+1)>=0)?((LogK-L)+1):0));\
+            Element key##L = pos##L->key;\
+            if (cmp(winnerKey,key##L)) {\
+              int_type index##L  = pos##L->index;\
+              pos##L->key   = winnerKey;\
+              pos##L->index = winnerIndex;\
+              winnerKey     = key##L;\
+              winnerIndex   = index##L;\
+            }\
+          }
+          TreeStep(10);
+          TreeStep(9);
+          TreeStep(8);
+          TreeStep(7);
+          TreeStep(6);
+          TreeStep(5);
+          TreeStep(4);
+          TreeStep(3);
+          TreeStep(2);
+          TreeStep(1);
+    #undef TreeStep      
+        }
+        regEntry[0].index = winnerIndex;
+        regEntry[0].key   = winnerKey;  
       }
       
       
@@ -858,11 +1049,12 @@ void merge4(
         empty[lastFree] = index;
       }
       
-      // is this segment empty and does not point to dummy yet?
-      //bool segmentIsEmpty(int_type i)
-      //{
-      //  return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
-      //}
+      // is this segment empty ?
+      bool segmentIsEmpty(int_type i) const
+      {
+        //return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
+        return is_sentinel(*(current[i]));
+      }
   };
   
   
