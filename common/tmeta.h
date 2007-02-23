@@ -94,6 +94,7 @@ public:
 	};
 };
 
+
 __STXXL_END_NAMESPACE
  
 #endif

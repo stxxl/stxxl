@@ -81,7 +81,7 @@ int main()
   //typedef priority_queue<priority_queue_config<my_type,my_cmp,
   //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
   const unsigned volume = 255*1024; // in KB
-	  typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,64*1024*1024,volume/sizeof(my_type)> gen;
+	  typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,32*1024*1024,volume/sizeof(my_type)> gen;
   typedef gen::result pq_type;
   typedef pq_type::block_type block_type;
  

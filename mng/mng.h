@@ -130,10 +130,10 @@ __STXXL_BEGIN_NAMESPACE
 		typedef pointer iterator;
 		typedef const type * const_iterator;
 		
-        enum 
-        { 
-            size = Size_ //!< number of elements in the block 
-        };
+    enum 
+    { 
+        size = Size_ //!< number of elements in the block 
+    };
       
 		//! Array of elements of type T
 		T elem[size];
@@ -253,7 +253,7 @@ __STXXL_BEGIN_NAMESPACE
         public block_w_info<T_,RawSize_,NRef_,InfoType_>,
         public filler_struct__<(RawSize_ - sizeof(block_w_info<T_,RawSize_,NRef_,InfoType_>)) >
     {
-      public:
+   public:
 		typedef T_ type;
 		typedef T_ value_type;
 		typedef T_ & reference;

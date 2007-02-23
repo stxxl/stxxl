@@ -35,8 +35,8 @@ struct dummy_merger
 
 struct my_cmp: public std::greater<my_type>
 {
-  my_type min_value() { return (std::numeric_limits<my_type>::max)(); }
-  my_type max_value() { return (std::numeric_limits<my_type>::min)(); }
+  my_type min_value() const { return (std::numeric_limits<my_type>::max)(); }
+  my_type max_value() const { return (std::numeric_limits<my_type>::min)(); }
 };
 
 int main()
