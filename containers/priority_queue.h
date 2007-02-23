@@ -602,7 +602,7 @@ void merge4_iterator(
       
     virtual ~ext_merger()
     {
-	  STXXL_VERBOSE1("ext_merger::~ext_merger()")
+	    STXXL_VERBOSE1("ext_merger::~ext_merger()")
       for(int_type i = 0;i<arity;++i)
       {
          delete current[i].block;
@@ -715,7 +715,7 @@ void merge4_iterator(
       // and push them on the free stack
       assert(lastFree == -1); // stack was empty (probably not needed)
       assert(k < KNKMAX);
-      STXXL_MSG("ext_merger::doubleK (before) k: "<<k<<" KNKMAX:"<<KNKMAX)
+      STXXL_VERBOSE1("ext_merger::doubleK (before) k: "<<k<<" KNKMAX:"<<KNKMAX)
       
       for (int_type i = 2*k - 1;  i >= int_type(k);  i--)
       {
@@ -733,7 +733,7 @@ void merge4_iterator(
       // recompute loser tree information
       rebuildLooserTree();
       
-      STXXL_MSG("ext_merger::doubleK (after) k: "<<k<<" KNKMAX:"<<KNKMAX)
+      STXXL_VERBOSE1("ext_merger::doubleK (after) k: "<<k<<" KNKMAX:"<<KNKMAX)
     }
     
     
