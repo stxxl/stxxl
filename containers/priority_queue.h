@@ -389,8 +389,9 @@ void merge4_iterator(
       typedef Cmp_ comparator_type;
       typedef AllocStr_ alloc_strategy;
       typedef value_type Element;
+      typedef typed_block<sizeof(value_type),value_type> sentinel_block_type;
     
-      enum { arity = Arity_, KNKMAX = Arity_ };
+      enum { arity = Arity_, KNKMAX = 1UL<<(LOG<Arity_>::value+1) };
     
     protected:
     
@@ -418,15 +419,10 @@ void merge4_iterator(
           return (*block)[current];
         }
         
-        sequence_type(): block(new block_type),bids(NULL)
+        sequence_type(): bids(NULL)
         {
-          make_inf();
         }
         
-        sequence_type(unsigned_type c,block_type * bl, std::list<bid_type> * bi):
-          current(c),block(bl),bids(bi)
-        {
-        }
         
         ~sequence_type()
         {
@@ -437,8 +433,6 @@ void merge4_iterator(
             bm->delete_blocks(bids->begin(),bids->end());
             delete bids;
           }
-          assert(block);
-          delete block;
         }
         
         void make_inf()
@@ -526,7 +520,7 @@ void merge4_iterator(
       unsigned logK; // log of current tree size
       unsigned_type k; // invariant k = 1 << logK
       
-      Element dummy; // target of empty segment pointers
+      //Element dummy; // target of empty segment pointers
 
       // upper levels of loser trees
       // entry[0] contains the winner info
@@ -540,6 +534,8 @@ void merge4_iterator(
       prefetch_pool<block_type> * p_pool;
       write_pool<block_type> * w_pool;
        
+      sentinel_block_type sentinel_block;
+      
       // private member functions
       /*
       int_type initWinner(int_type root);
@@ -561,11 +557,20 @@ void merge4_iterator(
   
 	  ext_merger(): lastFree(0), size_(0), logK(0), k(1)
     {
+      sentinel_block[0] = cmp.min_value(); 
+      
       for(int_type i = 0;i<KNKMAX;++i)
+      {
         current[i].merger = this;
+        if(i >= arity)
+          current[i].block = (block_type *) &(sentinel_block);
+        else
+          current[i].block = new block_type;
+         
+        current[i].make_inf();
+      }
         
       empty  [0] = 0;
-      current[0].make_inf();
       init();
     }
     
@@ -575,10 +580,32 @@ void merge4_iterator(
                       p_pool(p_pool_),
                       w_pool(w_pool_)
     {
-        STXXL_VERBOSE2("ext_merger::ext_merger(...)")
-        empty  [0] = 0;
-        current[0].make_inf();
-        init();
+       STXXL_VERBOSE2("ext_merger::ext_merger(...)")
+        
+       sentinel_block[0] = cmp.min_value();
+        
+       for(int_type i = 0;i<KNKMAX;++i)
+       {
+         current[i].merger = this;
+         if(i >= arity)
+           current[i].block = (block_type *) &(sentinel_block);
+         else
+           current[i].block = new block_type;
+         
+         current[i].make_inf();
+       } 
+        
+        
+       empty  [0] = 0;
+       init();
+    }
+      
+    ~ext_merger()
+    {
+      for(int_type i = 0;i<arity;++i)
+      {
+         delete current[i].block;
+      }
     }
       
     void set_pools(prefetch_pool<block_type> * p_pool_,
@@ -687,18 +714,25 @@ void merge4_iterator(
       // and push them on the free stack
       assert(lastFree == -1); // stack was empty (probably not needed)
       assert(k < KNKMAX);
+      STXXL_MSG("ext_merger::doubleK (before) k: "<<k<<" KNKMAX:"<<KNKMAX)
+      
       for (int_type i = 2*k - 1;  i >= int_type(k);  i--)
       {
         current[i].make_inf();
-        lastFree++;
-        empty[lastFree] = i;
+        if(i<arity)
+        {
+          lastFree++;
+          empty[lastFree] = i;
+        }
       }
-    
+      
       // double the size
       k *= 2;  logK++;
     
       // recompute loser tree information
       rebuildLooserTree();
+      
+      STXXL_MSG("ext_merger::doubleK (after) k: "<<k<<" KNKMAX:"<<KNKMAX)
     }
     
     
@@ -728,9 +762,11 @@ void merge4_iterator(
       lastFree = -1; // none free
       for (;  to < int_type(k);  to++) {
         // push 
-        lastFree++;
-        empty[lastFree] = to;
-    
+        if(to < arity)
+        {
+          lastFree++;
+          empty[lastFree] = to;
+        }
         current[to].make_inf();
       }
     
@@ -936,7 +972,7 @@ void merge4_iterator(
       
       bool  spaceIsAvailable() const // for new segment
       { 
-        return k < KNKMAX || lastFree >= 0; 
+        return k < arity || lastFree >= 0; 
       } 
 
 
@@ -2265,11 +2301,11 @@ namespace priority_queue_local
   {
     typedef find_B_m<E_,IntM_,MaxS_,B_,m_,stop> Self;
     enum { 
-      k = IntM_/B_ ,
-      E = E_,
-      IntM = IntM_,
-      B = B_,
-      m = m_,
+      k = IntM_/B_ , // number of blocks that fit into M
+      E = E_,        
+      IntM = IntM_,  
+      B = B_,        // block size
+      m = m_,        // ???
       c = k - m_,
       // memory occ. by block must be at least 10 times larger than size of ext sequence
       // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
@@ -2302,12 +2338,13 @@ namespace priority_queue_local
   template <int_type E_,int_type IntM_,unsigned_type MaxS_>
   struct find_settings
   {
+    // start from block size (8*1024*1024) bytes
     typedef typename find_B_m<E_,IntM_,MaxS_,(8*1024*1024),1>::result result;
   };
 
-  struct Parameters_not_found_Try_to_change_Tune_parameter
+  struct Parameters_not_found_Try_to_change_the_Tune_parameter
   {
-    typedef Parameters_not_found_Try_to_change_Tune_parameter result;
+    typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
   };
   
   
@@ -2327,7 +2364,7 @@ namespace priority_queue_local
   template <int_type X_,int_type CriticalSize_>
   struct compute_N<1,X_,CriticalSize_>
   {
-    typedef Parameters_not_found_Try_to_change_Tune_parameter result;
+    typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
   };
 
 };
