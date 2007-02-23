@@ -600,8 +600,9 @@ void merge4_iterator(
        init();
     }
       
-    ~ext_merger()
+    virtual ~ext_merger()
     {
+	  STXXL_VERBOSE1("ext_merger::~ext_merger()")
       for(int_type i = 0;i<arity;++i)
       {
          delete current[i].block;
@@ -791,11 +792,7 @@ void merge4_iterator(
 	  }
       unsigned_type mem_cons() const // only rough estimation
       {
-        return (KNKMAX * block_type::raw_size);
-      }
-      virtual ~ext_merger()
-      {
-        STXXL_VERBOSE1("ext_merger::~ext_merger()")
+        return (arity * block_type::raw_size);
       }
       
       // delete the (begin-end) smallest elements and write them to "to"
