@@ -106,10 +106,6 @@ public:
 			offset (a.offset),
 			p_vector (a.p_vector) {}
 				
-		vector_iterator (const const_iterator & a):
-			offset (a.offset),
-			p_vector ((vector_type *)a.p_vector) {}
-				
 		block_offset_type block_offset () const
 		{
 			return static_cast < block_offset_type >
@@ -124,6 +120,11 @@ public:
 		{
 			return offset - a.offset;
 		}
+    
+    difference_type operator - (const const_iterator & a) const
+    {
+      return offset - a.offset;
+    }
 		
 		_Self operator - (size_type op) const
 		{
@@ -209,6 +210,22 @@ public:
 			assert(p_vector == a.p_vector);
 			return offset < a.offset;
 		}
+    
+    bool operator == (const const_iterator &a) const
+    {
+      assert(p_vector == a.p_vector);
+      return offset == a.offset;
+    }
+    bool operator != (const const_iterator &a) const
+    {
+      assert(p_vector == a.p_vector);
+      return offset != a.offset;
+    } 
+    bool operator < (const const_iterator &a) const
+    {
+      assert(p_vector == a.p_vector);
+      return offset < a.offset;
+    }
 		
 		void flush()
 		{
@@ -291,6 +308,11 @@ public:
 		{
 			return offset - a.offset;
 		}
+    
+    difference_type operator - (const iterator & a) const
+    {
+      return offset - a.offset;
+    }
 		
 		_Self operator - (size_type op) const
 		{
@@ -365,7 +387,24 @@ public:
 		{
 			assert(p_vector == a.p_vector);
 			return offset < a.offset;
-		}	
+		}
+    
+    bool operator == (const iterator &a) const
+    {
+      assert(p_vector == a.p_vector);
+      return offset == a.offset; // or (offset + stxxl::int64(p_vector))
+    }
+    bool operator != (const iterator &a) const
+    {
+      assert(p_vector == a.p_vector);
+      return offset != a.offset;
+    } 
+    bool operator < (const iterator &a) const
+    {
+      assert(p_vector == a.p_vector);
+      return offset < a.offset;
+    }
+    	
 		void flush()
 		{
 			p_vector->flush();

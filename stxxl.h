@@ -15,6 +15,8 @@
 
 #include "containers/queue.h"
 
+#include "containers/deque.h"
+
 #include "stream/stream.h"
 #include "stream/sort_stream.h"
 

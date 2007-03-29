@@ -20,6 +20,10 @@ stack_benchmark: $(DEPENDENCIES) stack_benchmark.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stack_benchmark.cpp -DNDEBUG
 	$(LINKER) stack_benchmark.$(OBJEXT) $(OUT)stack_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_iterators: test_iterators.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_iterators.cpp
+	$(LINKER) test_iterators.$(OBJEXT) $(OUT)test_iterators.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 test_deque: test_deque.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_deque.cpp
 	$(LINKER) test_deque.$(OBJEXT) $(OUT)test_deque.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
@@ -70,7 +74,7 @@ test_map_random: test_map_random.cpp map_test_handlers.h $(DEPENDENCIES)
 	$(LINKER) test_map_random.$(OBJEXT) $(OUT)test_map_random.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 copy_file: copy_file.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c copy_file.cpp	
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c copy_file.cpp
 	$(LINKER) copy_file.$(OBJEXT) $(OUT)copy_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 	
 
@@ -93,7 +97,7 @@ test_many_stacks: test_many_stacks.cpp $(DEPENDENCIES)
 
 test_pqueue: test_pqueue.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_pqueue.cpp
-	$(LINKER)  test_pqueue.$(OBJEXT) $(OUT)test_pqueue.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+	$(LINKER)  test_pqueue.$(OBJEXT) $(OUT)test_pqueue.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
 
 test_ext_merger: test_ext_merger.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ext_merger.cpp -DSTXXL_VERBOSE_LEVEL=2

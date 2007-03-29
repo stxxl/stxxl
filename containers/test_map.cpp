@@ -45,6 +45,7 @@ int main()
 		{
 			Map[i] = i+1;
 		}
+
 		double writes = double(bm->get_writes())/double(el);
 		double logel = log(double(el))/log(double(BLOCK_SIZE));
 		STXXL_MSG("Logs: writes "<<writes<<" logel "<<logel<<" writes/logel "<<(writes/logel) )

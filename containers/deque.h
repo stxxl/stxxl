@@ -33,6 +33,8 @@ class deque_iterator
 	deque_iterator(DequeType * Deque_, size_type Offset_): 
 		Deque(Deque_), Offset(Offset_)
 	{ }
+  
+  friend class const_deque_iterator<DequeType>;
 	
 public:
 	typedef typename DequeType::value_type  value_type;
@@ -43,7 +45,6 @@ public:
 	typedef deque_iterator<DequeType> iterator;
 	typedef const_deque_iterator<DequeType> const_iterator;
 	friend class deque<value_type,vector_type>;
-	friend class const_deque_iterator<DequeType>;
 	typedef std::random_access_iterator_tag iterator_category;
 	typedef size_type difference_type;
 		
@@ -58,6 +59,16 @@ public:
 		
 		return SelfAbsOffset-aAbsOffset;
 	}
+  
+  size_type operator - (const const_iterator & a) const
+  {
+    size_type SelfAbsOffset = (Offset >= Deque->begin_o)?
+      Offset:(Deque->Vector.size() + Offset);
+    size_type aAbsOffset = (a.Offset >= Deque->begin_o)?
+      a.Offset:(Deque->Vector.size() + a.Offset);
+    
+    return SelfAbsOffset-aAbsOffset;
+  }
 	
 	_Self operator - (size_type op) const
 	{
@@ -139,6 +150,23 @@ public:
 		assert(Deque == a.Deque);
 		return (a - (*this))>0;
 	}
+  
+  bool operator == (const const_iterator &a) const
+  {
+    assert(Deque == a.Deque);
+    return Offset == a.Offset;
+  }
+  bool operator != (const const_iterator &a) const
+  {
+    assert(Deque == a.Deque);
+    return Offset != a.Offset;
+  }
+  
+  bool operator < (const const_iterator &a) const
+  {
+    assert(Deque == a.Deque);
+    return (a - (*this))>0;
+  }
 };
 
 template <class DequeType>
@@ -163,6 +191,7 @@ public:
 	typedef deque_iterator<DequeType> iterator;
 	typedef const_deque_iterator<DequeType> const_iterator;
 	friend class deque<value_type,vector_type>;
+  friend class deque_iterator<DequeType>;
 		
 	typedef std::random_access_iterator_tag iterator_category;
 	typedef size_type difference_type;
@@ -182,6 +211,16 @@ public:
 		
 		return SelfAbsOffset-aAbsOffset;
 	}
+  
+  size_type operator - (const iterator & a) const
+  {
+    size_type SelfAbsOffset = (Offset >=Deque->begin_o)?
+      Offset:(Deque->Vector.size() + Offset);
+    size_type aAbsOffset = (a.Offset >=Deque->begin_o)?
+      a.Offset:(Deque->Vector.size() + a.Offset);
+    
+    return SelfAbsOffset-aAbsOffset;
+  }
 	
 	_Self operator - (size_type op) const
 	{
@@ -253,6 +292,23 @@ public:
 		assert(Deque == a.Deque);
 		return (a - (*this))>0;
 	}
+  
+    bool operator == (const iterator &a) const
+  {
+    assert(Deque == a.Deque);
+    return Offset == a.Offset;
+  }
+  bool operator != (const iterator &a) const
+  {
+    assert(Deque == a.Deque);
+    return Offset != a.Offset;
+  }
+
+  bool operator < (const iterator &a) const
+  {
+    assert(Deque == a.Deque);
+    return (a - (*this))>0;
+  }
 		
 };
 
@@ -319,7 +375,8 @@ public:
 		}
 		
 		deque(size_type n)
-		: Vector(std::max((STXXL_DEFAULT_BLOCK_SIZE(T))/sizeof(T),2*n)), begin_o(0),end_o(n),size_(n)
+		: Vector(std::max((size_type)(STXXL_DEFAULT_BLOCK_SIZE(T))/sizeof(T),2*n)), 
+        begin_o(0),end_o(n),size_(n)
 		{
 		}
 		
