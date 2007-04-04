@@ -438,7 +438,7 @@ public:
     typename PgTp_ = lru_pager<8>,
 		unsigned BlkSize_ = STXXL_DEFAULT_BLOCK_SIZE (Tp_),
     typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
-    typename SzTp_ = stxxl::int64
+    typename SzTp_ = stxxl::uint64
 		>
 	class vector 
   {
@@ -493,19 +493,19 @@ private:
 		block_manager *bm;
 		config *cfg;
 		
-		size_type size_from_file_length(stxxl::int64 file_length)
+		size_type size_from_file_length(stxxl::uint64 file_length)
 		{
-			stxxl::int64 blocks_fit = file_length/stxxl::int64(block_type::raw_size);
-			size_type cur_size = blocks_fit*stxxl::int64(block_type::size);
-			stxxl::int64 rest = file_length - blocks_fit*stxxl::int64(block_type::raw_size);
-			return (cur_size + rest/stxxl::int64(sizeof(value_type)));
+			stxxl::uint64 blocks_fit = file_length/stxxl::uint64(block_type::raw_size);
+			size_type cur_size = blocks_fit*stxxl::uint64(block_type::size);
+			stxxl::uint64 rest = file_length - blocks_fit*stxxl::uint64(block_type::raw_size);
+			return (cur_size + rest/stxxl::uint64(sizeof(value_type)));
 		}
-		stxxl::int64 file_length()
+		stxxl::uint64 file_length()
 		{
 			size_type cur_size = size();
 			if(cur_size % size_type(block_type::size))
 			{
-				stxxl::int64 full_blocks_length = size_type(_bids.size()-1)*size_type(block_type::raw_size);
+				stxxl::uint64 full_blocks_length = size_type(_bids.size()-1)*size_type(block_type::raw_size);
 				size_type rest = cur_size - size_type(_bids.size()-1)*size_type(block_type::size);
 				return full_blocks_length + rest*size_type(sizeof(value_type));
 			}
