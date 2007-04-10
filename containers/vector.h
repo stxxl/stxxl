@@ -438,7 +438,7 @@ public:
     typename PgTp_ = lru_pager<8>,
 		unsigned BlkSize_ = STXXL_DEFAULT_BLOCK_SIZE (Tp_),
     typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
-    typename SzTp_ = stxxl::uint64
+    typename SzTp_ = stxxl::uint64 // will be depricated soon
 		>
 	class vector 
   {
@@ -448,7 +448,7 @@ public:
 		typedef const value_type & const_reference;
 		typedef value_type * pointer;
 		typedef SzTp_ size_type;
-		typedef SzTp_ difference_type;
+		typedef stxxl::int64 difference_type;
 		typedef const value_type *const_pointer;
 		
 		typedef PgTp_ pager_type;
