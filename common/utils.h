@@ -539,7 +539,7 @@ template <class T>
        }
 
        // deallocate storage p of deleted elements
-       void deallocate (pointer p, size_type num)
+       void deallocate (pointer p, size_type /*num*/)
 	   {
            T::operator delete((void*)p);
        }

@@ -41,7 +41,7 @@ struct interleaved_FR:public interleaved_striping
 	{
 	};
 	random_number<random_uniform_fast> rnd;
-	int operator () (int_type i) const
+	int operator () (int_type /*i*/) const
 	{
 		return begindisk + rnd(diff);
 	};

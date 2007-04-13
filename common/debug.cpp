@@ -6,16 +6,16 @@ __STXXL_BEGIN_NAMESPACE
 	debugmon * debugmon::instance = NULL;
 	
 	#ifndef STXXL_DEBUGMON
-	void debugmon::block_allocated(char * ptr, char * end, size_t size)
+	void debugmon::block_allocated(char * /*ptr*/, char * /*end*/, size_t /*size*/)
 	{
 	}
-	void debugmon::block_deallocated(char * ptr)
+	void debugmon::block_deallocated(char * /*ptr*/)
 	{
 	}
-	void debugmon::io_started(char * ptr)
+	void debugmon::io_started(char * /*ptr*/)
 	{
 	}
-	void debugmon::io_finished(char * ptr)
+	void debugmon::io_finished(char * /*ptr*/)
 	{
 	}
 	#else

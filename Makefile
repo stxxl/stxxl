@@ -18,48 +18,48 @@ settings_msvc:
 
 
 library_g++: settings_g++
-	make -f Makefile.g++ library
+	$(MAKE) -f Makefile.g++ library
 
 library_g++_mcstl: settings_g++_mcstl
-	make -f Makefile.g++ library
+	$(MAKE) -f Makefile.g++ library
 
 library_icpc: settings_icpc
-	make -f Makefile.icpc library
+	$(MAKE) -f Makefile.icpc library
 
 library_icpc_mcstl: settings_icpc_mcstl
-	make -f Makefile.icpc library
+	$(MAKE) -f Makefile.icpc library
 
 library_msvc: settings_msvc
 	nmake /F Makefile.msvc library
 	
 
 tests_g++: settings_g++
-	make -f Makefile.g++ tests
+	$(MAKE) -f Makefile.g++ tests
 
 tests_g++_mcstl: settings_g++_mcstl
-	make -f Makefile.g++ tests
+	$(MAKE) -f Makefile.g++ tests
 
 tests_icpc: settings_icpc
-	make -f Makefile.icpc tests
+	$(MAKE) -f Makefile.icpc tests
 
 tests_icpc_mcstl: settings_icpc_mcstl
-	make -f Makefile.icpc tests
+	$(MAKE) -f Makefile.icpc tests
 
 tests_msvc: settings_msvc
 	nmake /F Makefile.msvc tests
 
 
 clean_g++: settings_g++
-	make -f Makefile.g++ clean
+	$(MAKE) -f Makefile.g++ clean
 
 clean_g++_mcstl: settings_g++_mcstl
-	make -f Makefile.g++ clean
+	$(MAKE) -f Makefile.g++ clean
 
 clean_icpc: settings_icpc
-	make -f Makefile.icpc clean
+	$(MAKE) -f Makefile.icpc clean
 
 clean_icpc_mcstl: settings_icpc_mcstl
-	make -f Makefile.icpc clean
+	$(MAKE) -f Makefile.icpc clean
 
 clean_msvc: settings_msvc
 	nmake /F Makefile.msvc clean

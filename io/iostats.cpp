@@ -1,3 +1,5 @@
+#ifndef STXXL_IOSTATS_H
+#define STXXL_IOSTATS_H
 
 #include "iostats.h"
 
@@ -295,13 +297,23 @@ __STXXL_BEGIN_NAMESPACE
 		o<< "STXXL I/O statistics"<<std::endl;
 		o<< " total number of reads                      : "<< s.get_reads() << std::endl;
 		o<< " number of bytes read from disks            : "<< s.get_read_volume() << std::endl;
-		o<< " time spent in serving all read requests    : "<< s.get_read_time() << " sec."<<std::endl;
-		o<< " time spent in reading (parallel read time) : "<< s.get_pread_time() << " sec."<< std::endl;
+		o<< " time spent in serving all read requests    : "<< s.get_read_time() << " sec."
+			<< " @ " << (s.get_read_volume() / 1048576.0 / s.get_read_time()) << " MB/sec."
+			<< std::endl;
+		o<< " time spent in reading (parallel read time) : "<< s.get_pread_time() << " sec."
+			<< " @ " << (s.get_read_volume() / 1048576.0 / s.get_pread_time()) << " MB/sec."
+			<< std::endl;
 		o<< " total number of writes                     : "<< s.get_writes() << std::endl;
 		o<< " number of bytes written to disks           : "<< s.get_written_volume() << std::endl;
-		o<< " time spent in serving all write requests   : "<< s.get_write_time() << " sec."<< std::endl;
-		o<< " time spent in writing (parallel write time): "<< s.get_pwrite_time() << " sec."<< std::endl;
-		o<< " time spent in I/O (parallel I/O time)      : "<< s.get_pio_time() << " sec."<< std::endl;
+		o<< " time spent in serving all write requests   : "<< s.get_write_time() << " sec."
+			<< " @ " << (s.get_written_volume() / 1048576.0 / s.get_write_time()) << " MB/sec."
+			<< std::endl;
+		o<< " time spent in writing (parallel write time): "<< s.get_pwrite_time() << " sec."
+			<< " @ " << (s.get_written_volume() / 1048576.0 / s.get_pwrite_time()) << " MB/sec."
+			<< std::endl;
+		o<< " time spent in I/O (parallel I/O time)      : "<< s.get_pio_time() << " sec."
+			<< " @ " << ((s.get_read_volume()+s.get_written_volume()) / 1048576.0 / s.get_pio_time()) << " MB/sec."
+			<< std::endl;
 		o<< " I/O wait time                              : "<< s.get_io_wait_time() << " sec."<< std::endl;
 		o<< " Time since the last reset                  : "<< (stxxl_timestamp()-s.get_last_reset_time()) << " sec."<< std::endl;
 		return o;
@@ -311,4 +323,6 @@ __STXXL_BEGIN_NAMESPACE
 	
 
 __STXXL_END_NAMESPACE
+
+#endif
 

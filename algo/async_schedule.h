@@ -179,7 +179,7 @@ void simulate_async_write(
 											bid_iterator_type input,
 											const int_type L,
 											const int_type m_init,
-											const int_type D,
+											const int_type /*D*/,
 											std::pair<int_type,int_type> * o_time)
 {
 	typedef std::priority_queue<sim_event,std::vector<sim_event>,sim_event_cmp> event_queue_type;

@@ -98,7 +98,7 @@ struct write_completion_handler1
 	block_type * block;
 	bid_type bid;
 	request_ptr * req;
-	void operator () (request * completed_req)
+	void operator () (request * /*completed_req*/)
 	{
 		*req = block->read(bid);
 	}

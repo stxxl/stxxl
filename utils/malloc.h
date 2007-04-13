@@ -5,6 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+#ifndef STXXL_MALLOC_H
+#define STXXL_MALLOC_H
+
 #include "../common/utils.h"
 #include <ostream>
 #include <malloc.h>
@@ -100,7 +103,7 @@ public:
 };
 
 //! \brief Prints current malloc statistics in a convinient way
-std::ostream & operator << (std::ostream & s, const malloc_stats & st)
+inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
 {
   s << "MALLOC statistics" << std::endl;
   s << "=================================================================" << std::endl ;
@@ -127,3 +130,6 @@ class malloc_setup
 };
 
 __STXXL_END_NAMESPACE
+
+#endif
+

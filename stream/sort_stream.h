@@ -1348,7 +1348,7 @@ void sort(RandomAccessIterator begin,
 				RandomAccessIterator end, 
 				CmpType cmp, 
 				unsigned_type MemSize,
-				AllocStr  AS)
+				AllocStr  /*AS*/)
 {
 	#ifdef BOOST_MSVC
 	typedef typename streamify_traits<RandomAccessIterator>::stream_type InputType;

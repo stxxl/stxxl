@@ -23,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
 			first_cyl = last_cyl + 1;
 		}
 	      
-		double DiskGeometry::get_delay (stxxl::int64 offset, size_t size)	// returns delay in s
+		double DiskGeometry::get_delay (stxxl::int64 /*offset*/, size_t size)	// returns delay in s
 		{
 			/*
 			  

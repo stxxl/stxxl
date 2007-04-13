@@ -336,7 +336,7 @@ __STXXL_BEGIN_NAMESPACE
 			return result;
 		}
 		
-		static void *  operator new (size_t bytes, void * ptr) // construct object in existing memory
+		static void *  operator new (size_t /*bytes*/, void * ptr) // construct object in existing memory
 		{
 			return ptr;
 		}
@@ -906,7 +906,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 	  FR ():striping ()
 		{
 		};
-		int operator     () (int i) const
+		int operator     () (int /*i*/) const
 		{
 			return begin + rnd(diff);
 		}
@@ -984,7 +984,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     single_disk():disk(0)
 		{
 		};
-		int operator() (int i) const
+		int operator() (int /*i*/) const
 		{
 			return disk;
 		};

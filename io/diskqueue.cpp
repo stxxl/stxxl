@@ -28,7 +28,7 @@ namespace stxxl
 
 	disk_queues * disk_queues::instance = NULL;
 
-	disk_queue::disk_queue (int n):sem (0), _priority_op (WRITE)	//  n is ignored
+	disk_queue::disk_queue (int /*n*/):sem (0), _priority_op (WRITE)	//  n is ignored
 	#ifdef STXXL_BOOST_THREADS
 		, thread(boost::bind(worker,static_cast<void *>(this)))
 	#endif

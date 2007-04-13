@@ -155,7 +155,7 @@ public:
   void push(const value_type & val)
   {
     assert(cache_offset <= 2*blocks_per_page*block_type::size);
-    assert(cache_offset >= 0);
+    //assert(cache_offset >= 0);
     
     if(cache_offset == 2*blocks_per_page*block_type::size) // cache overflow
     {
@@ -368,7 +368,7 @@ public:
   void push(const value_type & val)
   {
     assert(cache_offset <= blocks_per_page*block_type::size);
-    assert(cache_offset >= 0);
+    //assert(cache_offset >= 0);
     
     if(cache_offset == blocks_per_page*block_type::size) // cache overflow
     {

@@ -25,7 +25,7 @@ class set_switch_handler
   onoff_switch & switch_;
 public:
   set_switch_handler(onoff_switch & switch__):switch_(switch__) {}
-	void operator() (request * req) { switch_.on(); }
+	void operator() (request * /*req*/) { switch_.on(); }
 };
 
 //! \brief Encapsulates asynchronous prefetching engine
