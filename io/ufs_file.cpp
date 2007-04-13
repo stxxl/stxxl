@@ -1,6 +1,9 @@
 
 #include "ufs_file.h"
 
+#include <unistd.h>
+#include <fcntl.h>
+
 __STXXL_BEGIN_NAMESPACE
 
 
@@ -8,6 +11,22 @@ __STXXL_BEGIN_NAMESPACE
 	{
 		return file_des;
 	}
+  
+  void ufs_file_base::lock()
+  {
+    #ifdef BOOST_MSVC
+      // not yet implemented
+    #else
+    flock lock_struct;
+    lock_struct.l_type = F_RDLCK | F_WRLCK;
+    lock_struct.l_whence = SEEK_SET;
+    lock_struct.l_start = 0;
+    lock_struct.l_len = 0; // lock all bytes
+    stxxl_ifcheck_i ((::fcntl (file_des,F_SETLK,&lock_struct)),
+        "Filedescriptor="<<file_des,io_error)
+    #endif
+    
+  }
 
 	
 	ufs_request_base::ufs_request_base (
@@ -181,9 +200,6 @@ __STXXL_BEGIN_NAMESPACE
 				      S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP)),
 				"Filedescriptor="<<file_des<<" filename="<<filename<< " fmode="<<fmode,io_error)
 		#endif
-
-
-
 	}
 	ufs_file_base::~ufs_file_base ()
 	{

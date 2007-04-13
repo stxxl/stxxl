@@ -33,6 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 		~ufs_file_base();
 		stxxl::int64 size ();
 		void set_size(stxxl::int64 newsize);
+    void lock();
 	};
 
 	//! \brief Base for UNIX file system implementations

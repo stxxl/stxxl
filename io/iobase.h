@@ -200,7 +200,11 @@ __STXXL_BEGIN_NAMESPACE
 		{
 			return id;
 		};
-		virtual ~ file () { };
+    
+    //! \brief Locks file for reading and writing
+    virtual void lock() {}
+    
+		virtual ~ file () {}
 	};
 
 	class mc;

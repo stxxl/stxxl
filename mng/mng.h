@@ -836,18 +836,31 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 					      const std::string & filename,
 					      int options, int disk)
 		{
+      
 			if (io_impl == "syscall")
-				return new stxxl::syscall_file (filename,
+      {
+				stxxl::ufs_file_base * result =  new stxxl::syscall_file (filename,
 								options,
 								disk);
+        result->lock();
+        return result;
+      }
 			#ifndef BOOST_MSVC
 			else if (io_impl == "mmap")
-				return new stxxl::mmap_file (filename,
+      {
+				stxxl::ufs_file_base * result = new stxxl::mmap_file (filename,
 							     options, disk);
+        result->lock();
+        return result;
+      }
 			else if (io_impl == "simdisk")
-				return new stxxl::sim_disk_file (filename,
+      {
+				stxxl::ufs_file_base * result = new stxxl::sim_disk_file (filename,
 								 options,
 								 disk);
+        result->lock();
+        return result;
+      }
 			#else
 			else if (io_impl == "wincall")
 				return new stxxl::wincall_file (filename,
