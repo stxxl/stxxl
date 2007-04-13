@@ -1,8 +1,10 @@
 
 #include "ufs_file.h"
 
+#ifndef BOOST_MSVC
 #include <unistd.h>
 #include <fcntl.h>
+#endif
 
 __STXXL_BEGIN_NAMESPACE
 

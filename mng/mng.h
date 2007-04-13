@@ -863,8 +863,12 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
       }
 			#else
 			else if (io_impl == "wincall")
-				return new stxxl::wincall_file (filename,
+			{
+				stxxl::wfs_file_base * result = new stxxl::wincall_file (filename,
 							     options, disk);
+				result->lock();
+				return result;
+			}
 			#endif
       #ifdef STXXL_BOOST_CONFIG
       else if (io_impl == "boostfd")

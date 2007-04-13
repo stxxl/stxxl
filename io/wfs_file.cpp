@@ -11,6 +11,12 @@ __STXXL_BEGIN_NAMESPACE
 			return file_des;
 		}
 
+		void wfs_file_base::lock()
+		{
+			if(LockFile(file_des,0,0,0xffffffff,0xffffffff) == 0)
+				stxxl_win_lasterror_exit("LockFile ",io_error)
+		}
+
 		wfs_request_base::wfs_request_base (
 				wfs_file_base * f, 
 				void *buf, 

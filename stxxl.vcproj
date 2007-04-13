@@ -1,39 +1,61 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="8,00"
 	Name="stxxl"
 	ProjectGUID="{26082884-8591-49FC-BA2E-471EA5236214}"
-	Keyword="MakeFileProj">
+	RootNamespace="stxxl"
+	Keyword="MakeFileProj"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Library and tests|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="nmake library_msvc"
-				ReBuildCommandLine="nmake library_msvc
-nmake tests_msvc"
+				ReBuildCommandLine="nmake tests_msvc"
 				CleanCommandLine="nmake clean_msvc"
-				Output="stxxl.exe"/>
+				Output=""
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 		<Configuration
 			Name="Library|Win32"
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
-			ConfigurationType="0">
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
 			<Tool
 				Name="VCNMakeTool"
 				BuildCommandLine="nmake library_msvc"
 				ReBuildCommandLine="nmake library_msvc"
 				CleanCommandLine="nmake clean_msvc"
-				Output="stxxl.exe"/>
+				Output="stxxl.exe"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -42,488 +64,708 @@ nmake tests_msvc"
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<Filter
 				Name="utils"
-				Filter="">
+				>
 				<File
-					RelativePath=".\utils\createdisks.cpp">
+					RelativePath=".\utils\createdisks.cpp"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="io"
-				Filter="">
+				>
 				<File
-					RelativePath=".\io\boostfd_file.cpp">
+					RelativePath=".\io\boostfd_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\diskqueue.cpp">
+					RelativePath=".\io\diskqueue.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\disktest.cpp">
+					RelativePath=".\io\disktest.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\flushbuffers.cpp">
+					RelativePath=".\io\flushbuffers.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\iostats.cpp">
+					RelativePath=".\io\iostats.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\mmap_file.cpp">
+					RelativePath=".\io\simdisk_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\simdisk_file.cpp">
+					RelativePath=".\io\syscall_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\syscall_file.cpp">
+					RelativePath=".\io\test.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\test.cpp">
+					RelativePath=".\io\ufs_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\ufs_file.cpp">
+					RelativePath=".\io\wfs_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\io\wfs_file.cpp">
-				</File>
-				<File
-					RelativePath=".\io\wincall_file.cpp">
+					RelativePath=".\io\wincall_file.cpp"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="mng"
-				Filter="">
+				>
 				<File
-					RelativePath=".\mng\mng.cpp">
+					RelativePath=".\mng\mng.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\prefetch_pool.cpp">
+					RelativePath=".\mng\test_mng.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\test.cpp">
+					RelativePath=".\mng\test_mng1.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\test_streams.cpp">
+					RelativePath=".\mng\test_prefetch_pool.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\write_pool.cpp">
+					RelativePath=".\mng\test_streams.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\mng\test_write_pool.cpp"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="containers"
-				Filter="">
+				>
 				<File
-					RelativePath=".\containers\bench_pqueue.cpp">
+					RelativePath=".\containers\bench_pqueue.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\ext_merger.cpp">
+					RelativePath=".\containers\berkeley_db_benchmark.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\many_stacks.cpp">
+					RelativePath=".\containers\copy_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\p_queue.cpp">
+					RelativePath=".\containers\ext_merger.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\rnd_test.cpp">
+					RelativePath=".\containers\leda_sm_pq_benchmark.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\test_map_random.cpp">
+					RelativePath=".\containers\leda_sm_stack_benchmark.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\test_mstack.cpp">
+					RelativePath=".\containers\pq_benchmark.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\test_stack.cpp">
+					RelativePath=".\containers\rnd_test.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\testmap.cpp">
+					RelativePath=".\containers\stack_benchmark.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\testqueue.cpp">
+					RelativePath=".\containers\test_deque.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_ext_merger.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_many_stacks.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_map.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_map_random.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_migr_stack.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_mstack.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_pqueue.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_queue.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_stack.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_vector.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\tpie_stack_benchmark.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\write_vector.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\write_vector2.cpp"
+					>
 				</File>
 				<Filter
 					Name="map.impl"
-					Filter="">
+					>
 					<File
-						RelativePath=".\containers\map.impl\speed_test_map_erase.cpp">
+						RelativePath=".\containers\map.impl\speed_test_map_erase.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\speed_test_map_insert.cpp">
+						RelativePath=".\containers\map.impl\speed_test_map_insert.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\speed_test_map_iterate.cpp">
+						RelativePath=".\containers\map.impl\speed_test_map_iterate.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\speed_test_map_search.cpp">
+						RelativePath=".\containers\map.impl\speed_test_map_search.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\test.cpp">
+						RelativePath=".\containers\map.impl\test.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\test_map_erase.cpp">
+						RelativePath=".\containers\map.impl\test_map_erase.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\test_map_insert.cpp">
+						RelativePath=".\containers\map.impl\test_map_insert.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\test_map_iterator.cpp">
+						RelativePath=".\containers\map.impl\test_map_iterator.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\test_map_random.cpp">
+						RelativePath=".\containers\map.impl\test_map_random.cpp"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\test_map_search.cpp">
+						RelativePath=".\containers\map.impl\test_map_search.cpp"
+						>
 					</File>
 				</Filter>
 			</Filter>
 			<Filter
 				Name="algo"
-				Filter="">
+				>
 				<File
-					RelativePath=".\algo\asynch_schedule.cpp">
+					RelativePath=".\algo\async_schedule.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\gen_file.cpp">
+					RelativePath=".\algo\asynch_schedule.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\ksort.cpp">
+					RelativePath=".\algo\gen_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\sort.cpp">
+					RelativePath=".\io\mmap_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\sort_file.cpp">
+					RelativePath=".\algo\sort_file.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\stable_ksort.cpp">
+					RelativePath=".\algo\test.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\test.cpp">
+					RelativePath=".\algo\test_asch.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\test_asch.cpp">
+					RelativePath=".\algo\test_ksort.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\test_ksort.cpp">
+					RelativePath=".\algo\test_ksort1.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\test_scan.cpp">
+					RelativePath=".\algo\test_manyunits1.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\test_sort.cpp">
+					RelativePath=".\algo\test_manyunits2.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\test_stable_ksort.cpp">
+					RelativePath=".\algo\test_scan.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\algo\test_sort.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\algo\test_sort1.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\algo\test_stable_ksort.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\algo\test_stable_ksort1.cpp"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="stream"
-				Filter="">
+				>
 				<File
-					RelativePath=".\stream\push_sort.cpp">
+					RelativePath=".\stream\push_sort.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\stream\se_lcp.cpp">
+					RelativePath=".\stream\se_lcp.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\stream\sorted_runs.cpp">
+					RelativePath=".\stream\sorted_runs.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\stream\stream.cpp">
+					RelativePath=".\stream\stream.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\stream\test_stream.cpp">
+					RelativePath=".\stream\test_stream.cpp"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="common"
-				Filter="">
+				>
 				<File
-					RelativePath=".\common\debug.cpp">
+					RelativePath=".\common\debug.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\common\log.cpp">
+					RelativePath=".\common\log.cpp"
+					>
 				</File>
 				<File
-					RelativePath=".\common\rand.cpp">
+					RelativePath=".\common\rand.cpp"
+					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<Filter
 				Name="common"
-				Filter="">
+				>
 				<File
-					RelativePath=".\common\aligned_alloc.h">
+					RelativePath=".\common\aligned_alloc.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\debug.h">
+					RelativePath=".\common\debug.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\exceptions.h">
+					RelativePath=".\common\exceptions.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\gprof.h">
+					RelativePath=".\common\gprof.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\log.h">
+					RelativePath=".\common\log.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\mutex.h">
+					RelativePath=".\common\mutex.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\myutils.h">
+					RelativePath=".\common\myutils.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\perm.h">
+					RelativePath=".\common\perm.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\rand.h">
+					RelativePath=".\common\rand.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\rwlock.h">
+					RelativePath=".\common\rwlock.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\semaphore.h">
+					RelativePath=".\common\semaphore.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\simple_vector.h">
+					RelativePath=".\common\simple_vector.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\state.h">
+					RelativePath=".\common\state.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\switch.h">
+					RelativePath=".\common\switch.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\timer.h">
+					RelativePath=".\common\timer.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\tmeta.h">
+					RelativePath=".\common\tmeta.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\tuple.h">
+					RelativePath=".\common\tuple.h"
+					>
 				</File>
 				<File
-					RelativePath=".\common\utils.h">
+					RelativePath=".\common\utils.h"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="io"
-				Filter="">
+				>
 				<File
-					RelativePath=".\io\boostfd_file.h">
+					RelativePath=".\io\boostfd_file.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\completion_handler.h">
+					RelativePath=".\io\completion_handler.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\io.h">
+					RelativePath=".\io\io.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\iobase.h">
+					RelativePath=".\io\iobase.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\iostats.h">
+					RelativePath=".\io\iostats.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\mmap_file.h">
+					RelativePath=".\io\mmap_file.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\simdisk_file.h">
+					RelativePath=".\io\simdisk_file.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\syscall_file.h">
+					RelativePath=".\io\syscall_file.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\ufs_file.h">
+					RelativePath=".\io\ufs_file.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\wfs_file.h">
+					RelativePath=".\io\wfs_file.h"
+					>
 				</File>
 				<File
-					RelativePath=".\io\wincall_file.h">
+					RelativePath=".\io\wincall_file.h"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="mng"
-				Filter="">
+				>
 				<File
-					RelativePath=".\mng\adaptor.h">
+					RelativePath=".\mng\adaptor.h"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\async_schedule.h">
+					RelativePath=".\mng\async_schedule.h"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\block_prefetcher.h">
+					RelativePath=".\mng\block_prefetcher.h"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\buf_istream.h">
+					RelativePath=".\mng\buf_istream.h"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\buf_ostream.h">
+					RelativePath=".\mng\buf_ostream.h"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\buf_writer.h">
+					RelativePath=".\mng\buf_writer.h"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\mng.h">
+					RelativePath=".\mng\mng.h"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\prefetch_pool.h">
+					RelativePath=".\mng\prefetch_pool.h"
+					>
 				</File>
 				<File
-					RelativePath=".\mng\write_pool.h">
+					RelativePath=".\mng\write_pool.h"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="containers"
-				Filter="">
+				>
 				<File
-					RelativePath=".\containers\map.h">
+					RelativePath=".\containers\app_config.h"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\pager.h">
+					RelativePath=".\containers\deque.h"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\priority_queue.h">
+					RelativePath=".\containers\map.h"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\queue.h">
+					RelativePath=".\containers\map_test_handlers.h"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\stack.h">
+					RelativePath=".\containers\pager.h"
+					>
 				</File>
 				<File
-					RelativePath=".\containers\vector.h">
+					RelativePath=".\containers\priority_queue.h"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\queue.h"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\stack.h"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\vector.h"
+					>
 				</File>
 				<Filter
 					Name="map.impl"
-					Filter="">
+					>
 					<File
-						RelativePath=".\containers\map.impl\bt_counter.h">
+						RelativePath=".\containers\map.impl\bt_counter.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\btnode.h">
+						RelativePath=".\containers\map.impl\btnode.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\btnode_iterator.h">
+						RelativePath=".\containers\map.impl\btnode_iterator.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\btnode_manager.h">
+						RelativePath=".\containers\map.impl\btnode_manager.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\btree.h">
+						RelativePath=".\containers\map.impl\btree.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\btree_completion_handler.h">
+						RelativePath=".\containers\map.impl\btree_completion_handler.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\btree_iterator.h">
+						RelativePath=".\containers\map.impl\btree_iterator.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\btree_queue.h">
+						RelativePath=".\containers\map.impl\btree_queue.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\btree_request.h">
+						RelativePath=".\containers\map.impl\btree_request.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\fbtnode.h">
+						RelativePath=".\containers\map.impl\fbtnode.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\map.h">
+						RelativePath=".\containers\map.impl\map.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\map_async.h">
+						RelativePath=".\containers\map.impl\map_async.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\map_impl.h">
+						RelativePath=".\containers\map.impl\map_impl.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\map_iterator.h">
+						RelativePath=".\containers\map.impl\map_iterator.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\map_queue.h">
+						RelativePath=".\containers\map.impl\map_queue.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\map_request.h">
+						RelativePath=".\containers\map.impl\map_request.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\map_test.h">
+						RelativePath=".\containers\map.impl\map_test.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\my_type.h">
+						RelativePath=".\containers\map.impl\my_type.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\smart_ptr.h">
+						RelativePath=".\containers\map.impl\smart_ptr.h"
+						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\test_handlers.h">
+						RelativePath=".\containers\map.impl\test_handlers.h"
+						>
 					</File>
 				</Filter>
 			</Filter>
 			<Filter
 				Name="algo"
-				Filter="">
+				>
 				<File
-					RelativePath=".\algo\adaptor.h">
+					RelativePath=".\algo\adaptor.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\async_schedule.h">
+					RelativePath=".\algo\async_schedule.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\inmemsort.h">
+					RelativePath=".\algo\inmemsort.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\interleaved_alloc.h">
+					RelativePath=".\algo\interleaved_alloc.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\intksort.h">
+					RelativePath=".\algo\intksort.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\ksort.h">
+					RelativePath=".\algo\ksort.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\ksort_exp.h">
+					RelativePath=".\algo\ksort_exp.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\losertree.h">
+					RelativePath=".\algo\losertree.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\run_cursor.h">
+					RelativePath=".\algo\run_cursor.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\scan.h">
+					RelativePath=".\algo\scan.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\sort.h">
+					RelativePath=".\algo\sort.h"
+					>
 				</File>
 				<File
-					RelativePath=".\algo\stable_ksort.h">
+					RelativePath=".\algo\stable_ksort.h"
+					>
 				</File>
 			</Filter>
 			<Filter
 				Name="stream"
-				Filter="">
+				>
 				<File
-					RelativePath=".\stream\sort_stream.h">
+					RelativePath=".\stream\sort_stream.h"
+					>
 				</File>
 				<File
-					RelativePath=".\stream\stream.h">
+					RelativePath=".\stream\stream.h"
+					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
 		</Filter>
 		<File
-			RelativePath=".\readme.txt">
+			RelativePath=".\readme.txt"
+			>
 		</File>
 	</Files>
 	<Globals>

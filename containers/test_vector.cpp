@@ -49,6 +49,13 @@ try
 	
 	// test assignment const_iterator = iterator
 	vector_type::const_iterator c_it = v.begin();
+
+	unsigned int big_size=1024*1024*16*16*2;
+	typedef stxxl::vector<double> vec_big;
+	vec_big my_vec(big_size);
+
+	vec_big::iterator big_it = my_vec.begin();
+	big_it += 6;
 	
 	test_const_iterator(v);
 	
