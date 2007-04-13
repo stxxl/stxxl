@@ -518,7 +518,7 @@ public:
     int_type i;
     for(i=bids_size - 1 ; i >= last_pref ; --i )
     {
-        if(p_pool.in_prefetching(bids[i]));
+        if(p_pool.in_prefetching(bids[i]))
           p_pool.read(cache,bids[i])->wait();  // clean the prefetch buffer
     }
     typename std::vector<bid_type>::iterator cur = bids.begin();
