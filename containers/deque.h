@@ -111,6 +111,16 @@ public:
 	{
 		return &(Deque->Vector[Offset]);
 	}
+  
+  reference operator [] (size_type op)
+  {
+      return Deque->Vector[(Offset + op)%Deque->Vector.size()];
+  }
+  
+  const_reference operator [] (size_type op) const
+  {
+      return Deque->Vector[(Offset + op)%Deque->Vector.size()];
+  }
 	
 	_Self & operator ++()
 	{
@@ -253,6 +263,11 @@ public:
 	{
 		return &(Deque->Vector[Offset]);
 	}
+  
+  const_reference operator [] (size_type op) const
+  {
+      return Deque->Vector[(Offset + op)%Deque->Vector.size()];
+  }
 	
 	_Self & operator ++()
 	{

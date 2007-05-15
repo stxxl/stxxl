@@ -64,15 +64,22 @@ void test(svt & sv)
 }
 
 template <typename svt>
-void test_subtraction(svt & sv)
+void test_random_access(svt & sv)
 {
   typename svt::const_iterator svci = sv.begin();
   typename svt::iterator xsvi = sv.begin();
   
   // test subtraction of const and non-const iterators
   svci - xsvi;
-  xsvi - svci;  
+  xsvi - svci;
+  
+  // bracket operators
+  svci[0];
+  xsvi[0];
+  //svci[0] = 1; // read-only
+  xsvi[0] = 1;
 }
+
 
 
 typedef unsigned int key_type;
@@ -98,15 +105,15 @@ int main()
 { 
   stxxl::vector<int> Vector(8);
   test(Vector);
-  test_subtraction(Vector); 
+  test_random_access(Vector);
   
   typedef stxxl::map<key_type,data_type,cmp,4096,4096> map_type;
   map_type Map(4096*10,4096*10);
   test(Map); 
   
-  stxxl::deque<int> Deque;
+  stxxl::deque<int> Deque(1);
   test(Deque);
-  test_subtraction(Deque);
+  test_random_access(Deque);
     
   return 0;
 }
