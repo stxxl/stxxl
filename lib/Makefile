@@ -1,5 +1,7 @@
 all: lib
 
+tests:
+
 include ../make.settings
 
 LIB_OBJECTS = \

@@ -1,4 +1,6 @@
-all_tests: test_mng test_mng1 test_streams test_write_pool test_prefetch_pool
+TESTS	 = test_mng test_mng1 test_streams test_write_pool test_prefetch_pool
+
+tests: $(TESTS)
 
 include ../make.settings
 

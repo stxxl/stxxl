@@ -1,9 +1,13 @@
-all: test_stream test_stream1 test_sorted_runs test_push_sort 
+TESTS	 = test_stream test_stream1 test_sorted_runs test_push_sort 
+
+tests: $(TESTS)
 
 include ../make.settings
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) \
                $(CONTAINER_FILES) $(ALGO_FILES) $(STREAM_FILES)
+
+lib:
 
 test_stream1: stream.h test_stream1.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_stream1.cpp -DSTXXL_VERBOSE_LEVEL=1

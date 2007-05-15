@@ -1,4 +1,4 @@
-all:
+tests:
 
 include ../make.settings
 

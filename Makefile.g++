@@ -1,37 +1,46 @@
+THISMAKEFILE	:= $(lastword $(MAKEFILE_LIST))
+
 main: lib
 
 include make.settings
 
-library:
-	$(MAKE) -C io lib
-	$(MAKE) -C mng lib
-	$(MAKE) -C algo lib
-	$(MAKE) -C common lib
+SUBDIRS	= algo common containers io lib mng stream utils
+
+SUBDIRS-lib: $(SUBDIRS:%=lib-in-%)
+SUBDIRS-tests: $(SUBDIRS:%=tests-in-%)
+SUBDIRS-clean: $(SUBDIRS:%=clean-in-%)
+
+lib-in-lib:
+	@# nothing to compile
+lib-in-%:
+	$(MAKE) -C $* lib
+
+library: SUBDIRS-lib
 	$(MAKE) -C lib
 	$(MAKE) -C utils create
+	@echo ""
 	@echo "Building library is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
 	@echo "Use the following linker options with programs using Stxxl: $(STXXL_LINKER_OPTIONS)"
 	@echo $(STXXL_COMPILER_OPTIONS) > compiler.options
 	@echo $(STXXL_LINKER_OPTIONS) > linker.options
 
+lib/lib$(LIBNAME).$(LIBEXT)::
+	$(MAKE) -f $(THISMAKEFILE) library
+
+tests-in-%: lib/lib$(LIBNAME).$(LIBEXT)
+	$(MAKE) -C $* tests
+
 tests: lib
-	$(MAKE) -C io
-	$(MAKE) -C mng
-	$(MAKE) -C containers
-	$(MAKE) -C algo
-	$(MAKE) -C stream
+tests: SUBDIRS-tests
+	@echo ""
 	@echo "Building tests is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
 	@echo "Use the following linker options with programs using Stxxl: $(STXXL_LINKER_OPTIONS)"
 
-clean:
-	$(MAKE) -C io clean
-	$(MAKE) -C mng clean
-	$(MAKE) -C containers clean
-	$(MAKE) -C algo clean
-	$(MAKE) -C stream clean
-	$(MAKE) -C utils clean
-	$(MAKE) -C common clean
+clean-in-%:
+	$(MAKE) -C $* clean
+
+clean: SUBDIRS-clean
 	@echo "Cleaning completed"
 

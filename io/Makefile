@@ -1,4 +1,6 @@
-all_tests: test_io benchmark_disks 
+TESTS	 = test_io benchmark_disks 
+
+tests: $(TESTS)
 
 include ../make.settings
 

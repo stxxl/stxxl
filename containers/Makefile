@@ -1,8 +1,12 @@
-all: test_vector test_stack test_migr_stack test_many_stacks test_pqueue test_queue test_ext_merger bench_pqueue copy_file test_map test_map_random test_deque
+TESTS	 = test_vector test_stack test_migr_stack test_many_stacks test_pqueue test_queue test_ext_merger bench_pqueue copy_file test_map test_map_random test_deque test_iterators
+
+tests: $(TESTS)
 
 include ../make.settings
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
+
+lib:
 
 BERKELEY_DB_COMPILE_OPTIONS = -I/usr/local/BerkeleyDB.4.4/include
 BERKELEY_DB_LINK_OPTIONS = -L/usr/local/BerkeleyDB.4.4/lib/ -ldb_cxx
@@ -111,4 +115,4 @@ clean:
 	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT) test_map.$(EXEEXT) test_map_random.$(EXEEXT)
 	$(RM) test_ext_merger.$(EXEEXT) test_pqueue.$(EXEEXT) test_many_stacks.$(EXEEXT)
 	$(RM) test_migr_stack.$(EXEEXT) test_stack.$(EXEEXT) test_vector.$(EXEEXT)
-	$(RM) test_queue.$(EXEEXT) copy_file.$(EXEEXT) test_deque.$(EXEEXT)
+	$(RM) test_queue.$(EXEEXT) copy_file.$(EXEEXT) test_deque.$(EXEEXT) test_iterators.$(EXEEXT)

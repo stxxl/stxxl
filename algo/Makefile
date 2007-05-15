@@ -1,4 +1,6 @@
-all: test_scan gen_file sort_file test_ksort1 test_stable_ksort test_sort1 test_manyunits 
+TESTS	 = test_scan gen_file sort_file test_ksort1 test_stable_ksort test_sort1 test_manyunits 
+
+tests: $(TESTS)
 
 include ../make.settings
 
