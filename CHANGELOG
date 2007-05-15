@@ -4,6 +4,7 @@ Repository version (see the web page for the last modification date)
 * Internal CPU efficiency of Stxxl priority queue is improved (loser trees in external mergers are integrated)
 * Fixed bug with conversion of const/non-const iterators, implemented comparison and difference operations on const/non-const iterators (for vector, map, and deque) 
 * Added operator[] to vector and deque iterators
+* Allow parallel build for g++
 
 ------------------------------------------
 Version 1.0d (16 January 2007)
