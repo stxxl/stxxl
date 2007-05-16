@@ -314,7 +314,7 @@ create_runs(
 				 
 				 for(unsigned_type j=0;j<nblocks;++j)
 				 {
-					 if(blocks[j][0] != (*runs[irun])[j+off].value)
+					 if(!(blocks[j][0] == (*runs[irun])[j+off].value))
 			 {
 				 STXXL_MSG("check_sorted_runs  wrong trigger in the run "<<irun<<" block "<<(j+off))
 				 STXXL_MSG("                   trigger value: "<<(*runs[irun])[j+off].value)
