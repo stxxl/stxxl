@@ -473,7 +473,7 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 	}
 	else
 	{
-		if(mcstl::HEURISTIC::p <= 1)
+		if(mcstl::HEURISTIC::num_threads <= 1)
 		{
 			loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size> 
 				losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
@@ -556,7 +556,7 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 					{
 						if(seqs[i].first == seqs[i].second) 
 							continue;	//empty subsequence
-						typename block_type::iterator position = upper_bound(seqs[i].first, seqs[i].second, min_last, cmp);
+						typename block_type::iterator position = std::upper_bound(seqs[i].first, seqs[i].second, min_last, cmp);
 						STXXL_VERBOSE1("greater equal than " << position - seqs[i].first);
 						less_equal_than_min_last += position - seqs[i].first;
 					}
