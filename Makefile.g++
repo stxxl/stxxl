@@ -24,6 +24,9 @@ library: SUBDIRS-lib
 	@echo "Use the following linker options with programs using Stxxl: $(STXXL_LINKER_OPTIONS)"
 	@echo $(STXXL_COMPILER_OPTIONS) > compiler.options
 	@echo $(STXXL_LINKER_OPTIONS) > linker.options
+	@echo "STXXL_CXX	 = $(COMPILER)" > stxxl.mk
+	@echo "STXXL_CPPFLAGS	 = $(STXXL_SPECIFIC)" >> stxxl.mk
+	@echo "STXXL_LDLIBS	 = $(STXXL_LINKER_OPTIONS)" >> stxxl.mk
 
 lib/lib$(LIBNAME).$(LIBEXT)::
 	echo $(MAKEFILE_LIST)
@@ -43,5 +46,6 @@ clean-in-%:
 	$(MAKE) -C $* clean
 
 clean: SUBDIRS-clean
+	$(RM) stxxl.mk
 	@echo "Cleaning completed"
 

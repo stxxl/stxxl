@@ -182,7 +182,7 @@ namespace btree
 					if(reqs_[p].valid()) reqs_[p]->wait();
 					if(dirty_[p]) nodes_[p]->save();
 				}
-				for(int_type i=0;i<size();++i)
+				for(unsigned_type i=0;i<size();++i)
 					delete nodes_[i];
 			}
 		
@@ -193,8 +193,9 @@ namespace btree
 				if(free_nodes_.empty())
 				{
 					// need to kick a node
-					int_type node2kick, i = 0;
-					unsigned_type max_tries = size() +1;
+					int_type node2kick;
+					unsigned_type i = 0;
+					const unsigned_type max_tries = size() +1;
 					do
 					{
 						++i;
@@ -294,7 +295,8 @@ namespace btree
 				if(free_nodes_.empty())
 				{
 					// need to kick a node
-					int_type node2kick, i = 0;
+					int_type node2kick;
+					unsigned_type i = 0;
 					const unsigned_type max_tries = size()+1;
 					do
 					{
@@ -387,7 +389,8 @@ namespace btree
 				if(free_nodes_.empty())
 				{
 					// need to kick a node
-					int_type node2kick, i = 0;
+					int_type node2kick;
+					unsigned_type i = 0;
 					const unsigned_type max_tries = size() +1;
 					do
 					{
@@ -488,7 +491,8 @@ namespace btree
 				if(free_nodes_.empty())
 				{
 					// need to kick a node
-					int_type node2kick, i = 0;
+					int_type node2kick;
+					unsigned_type i = 0;
 					const unsigned_type max_tries = size()+1;
 					do
 					{

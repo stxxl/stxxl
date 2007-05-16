@@ -407,8 +407,10 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 	#else
 	const int_type n_prefetch_buffers = STXXL_MAX( 2 * disks_number , (3 * (int_type(_m) - nruns) / 4));
         const int_type n_write_buffers = STXXL_MAX( 2 * disks_number , int_type(_m) - nruns - n_prefetch_buffers );
+	#ifdef SORT_OPT_PREFETCHING
 	// heuristic
 	const int_type n_opt_prefetch_buffers = 2 * disks_number + (3*(n_prefetch_buffers - 2 * disks_number))/10;
+	#endif
 	#endif
 	
 	#ifdef SORT_OPT_PREFETCHING

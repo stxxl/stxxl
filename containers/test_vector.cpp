@@ -65,13 +65,13 @@ try
 	STXXL_MSG("write "<<v.size()<<" elements")
 
 	stxxl::ran32State = 0xdeadbeef;
-	int64 i;
+	vector_type::size_type i;
 	
 	// fill the vector with increasing sequence of integer numbers
 	for(i=0; i < v.size();++i)
 	{
 		v[i] = i + offset;
-		assert(v[i] == i + offset);
+		assert(v[i] == int64(i + offset));
 	}
 	
   

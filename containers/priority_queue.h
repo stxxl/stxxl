@@ -392,6 +392,11 @@ void merge4_iterator(
       typedef typed_block<sizeof(value_type),value_type> sentinel_block_type;
     
       enum { arity = Arity_, KNKMAX = 1UL<<(LOG<Arity_>::value+1) };
+      
+      block_type * convert_block_pointer(sentinel_block_type * arg)
+      {
+         return (block_type *)arg; 
+      } 
     
     protected:
     
@@ -588,7 +593,7 @@ void merge4_iterator(
        {
          current[i].merger = this;
          if(i >= arity)
-           current[i].block = (block_type *) &(sentinel_block);
+           current[i].block = convert_block_pointer(&(sentinel_block));
          else
            current[i].block = new block_type;
          

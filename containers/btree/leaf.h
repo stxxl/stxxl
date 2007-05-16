@@ -296,7 +296,7 @@ public:
 			void dump()
 			{
 				STXXL_VERBOSE2("Dump of leaf "<<this)
-				for(int i=0;i<size();++i)
+				for(unsigned i=0;i<size();++i)
 					STXXL_VERBOSE2((*this)[i].first<<" "<<(*this)[i].second);
 			}
 			

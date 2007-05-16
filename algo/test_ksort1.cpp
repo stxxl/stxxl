@@ -17,7 +17,7 @@ struct my_type
 	char _data[32 - 2*sizeof(key_type1)];
 	key_type1 key() const {return _key; };
 							
-	my_type() {};
+	my_type():_key(0),_key_copy(0) {};
 	my_type(key_type1 __key):_key(__key) {};
 									
 	//my_type min_value() const { return my_type(0); };
@@ -56,7 +56,7 @@ int main()
 	
 		random_number64 rnd;
 		STXXL_MSG("Filling vector... ")
-		for(stxxl::int64 i=0; i < v.size(); i++)
+		for(vector_type::size_type i=0; i < v.size(); i++)
 		{
 			v[i]._key = rnd();
 			v[i]._key_copy = v[i]._key;
@@ -74,7 +74,7 @@ int main()
 		STXXL_MSG(((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
 		STXXL_MSG("Checking content...")
 		my_type prev;
-		for(stxxl::int64 i=0; i < v.size(); i++)
+		for(vector_type::size_type i=0; i < v.size(); i++)
 		{
 			if( v[i]._key != v[i]._key_copy)
 			{

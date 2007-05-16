@@ -46,11 +46,11 @@ public:
 	typedef const_deque_iterator<DequeType> const_iterator;
 	friend class deque<value_type,vector_type>;
 	typedef std::random_access_iterator_tag iterator_category;
-	typedef size_type difference_type;
+	typedef typename DequeType::difference_type difference_type;
 		
 	deque_iterator(): Deque(NULL),Offset(0) {}
 		
-	size_type operator - (const _Self & a) const
+	difference_type operator - (const _Self & a) const
 	{
 		size_type SelfAbsOffset = (Offset >= Deque->begin_o)?
 			Offset:(Deque->Vector.size() + Offset);
@@ -60,7 +60,7 @@ public:
 		return SelfAbsOffset-aAbsOffset;
 	}
   
-  size_type operator - (const const_iterator & a) const
+  difference_type operator - (const const_iterator & a) const
   {
     size_type SelfAbsOffset = (Offset >= Deque->begin_o)?
       Offset:(Deque->Vector.size() + Offset);
@@ -204,7 +204,7 @@ public:
   friend class deque_iterator<DequeType>;
 		
 	typedef std::random_access_iterator_tag iterator_category;
-	typedef size_type difference_type;
+	typedef typename DequeType::difference_type difference_type;
 		
 	const_deque_iterator() : Deque(NULL),Offset(0){}
 	const_deque_iterator(const deque_iterator<DequeType> & it ): 
@@ -212,7 +212,7 @@ public:
 	{
 	}
 	
-	size_type operator - (const _Self & a) const
+	difference_type operator - (const _Self & a) const
 	{
 		size_type SelfAbsOffset = (Offset >=Deque->begin_o)?
 			Offset:(Deque->Vector.size() + Offset);
@@ -222,7 +222,7 @@ public:
 		return SelfAbsOffset-aAbsOffset;
 	}
   
-  size_type operator - (const iterator & a) const
+  difference_type operator - (const iterator & a) const
   {
     size_type SelfAbsOffset = (Offset >=Deque->begin_o)?
       Offset:(Deque->Vector.size() + Offset);

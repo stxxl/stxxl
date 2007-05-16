@@ -41,7 +41,7 @@ struct fill_value
 
 int main()
 {
-	int64 i;
+	stxxl::vector<int64>::size_type i;
 	stxxl::vector<int64> v(64*int64(1024*1024));
 	double b,e;
 
@@ -60,7 +60,7 @@ int main()
 	STXXL_MSG("check")
 	for(i=0;i<v.size();++i)
 	{
-		if(v[i] != i*i ) STXXL_MSG("Error at position "<<i)
+		if(v[i] != int64(i*i) ) STXXL_MSG("Error at position "<<i)
 	}
 
 	STXXL_MSG("Pos of value    1023: "<< (stxxl::find(v.begin(),v.end(),1023,4) - v.begin()))
@@ -76,7 +76,7 @@ int main()
 	
 	STXXL_MSG("check")
 	if(v[0] != 0) STXXL_MSG("Error at position "<<i)
-	if(v[v.size()-1] != (v.size()-1)*(v.size()-1) ) STXXL_MSG("Error at position "<<i)
+	if(v[v.size()-1] != int64((v.size()-1)*(v.size()-1)) ) STXXL_MSG("Error at position "<<i)
 		
 	for(i=1;i<v.size()-1;++i)
 	{

@@ -347,7 +347,7 @@ template < typename block_type,typename run_type , typename key_ext_>
 			 unsigned_type blocks_left = nblocks_per_run;
 			 block_type * blocks = new block_type[m];
 			 request_ptr * reqs = new request_ptr[m];
-			 value_type last;
+			 value_type last=keyext.min_value();
 			
 			 for(unsigned_type off = 0; off < nblocks_per_run ; off += m)
 			 {
