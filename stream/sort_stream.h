@@ -470,8 +470,8 @@ namespace stream
 		unsigned_type cur_el_reg = cur_el;
 		sort_run(Blocks1, cur_el_reg);
 		result_.elements += cur_el_reg;
-		if(cur_el_reg <  block_type::size &&  
-			result_.elements == cur_el_reg) // small input, do not flush it on the disk(s)
+		if(cur_el_reg <  unsigned_type(block_type::size) &&  
+			unsigned_type(result_.elements) == cur_el_reg) // small input, do not flush it on the disk(s)
 		{
 			STXXL_VERBOSE1("runs_creator(use_push): Small input optimization, input length: "<<cur_el_reg);
 			result_.small_.resize(cur_el_reg);
@@ -910,7 +910,7 @@ namespace stream
 		  								 // that is kept in the main memory
 	  {
 		  STXXL_VERBOSE1("runs_merger: small input optimization, input length: "<<elements_remaining)
-		  assert(elements_remaining == sruns.small_.size());
+		  assert(elements_remaining == size_type(sruns.small_.size()));
 		  current_block = new block_type;
 		  std::copy(sruns.small_.begin(), sruns.small_.end(), current_block->begin());
 		  current_value = current_block->elem[0];
