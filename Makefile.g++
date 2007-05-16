@@ -1,4 +1,4 @@
-THISMAKEFILE	:= Makefile.g++ 
+THISMAKEFILE	:= $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)) 
 
 main: lib
 
