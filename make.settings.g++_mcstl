@@ -12,14 +12,13 @@ USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
 BOOST_INCLUDE = /usr/include/boost-1_33/#
 
 MAKE = make # or gmake
-COMPILER = g++-4.2.0
-LINKER = g++-4.2.0
-OPT = -O3 -fopenmp -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ROOT)/originals/_usr_local_include_c++_4.2.0 -D__MCSTL__# compiler optimization level and MCSTL library
-LINKER_OPT = -fopenmp
+COMPILER	 = g++-4.2.0
+LINKER		 = $(COMPILER)
+OPT		 = -O3 # compiler optimization level
+WARNINGS	 = -Wall
+DEBUG		 = # put here -g option to include the debug information into the binaries
+
 LIBNAME = mcstxxl
-
-DEBUG = # put here -g option to include the debug inormation into the binaries
-
 
 #### BOOST OPTIONS ###############################################
 
@@ -84,7 +83,9 @@ OUT    = -o # output file option for the compiler and linker
 
 STXXL_SPECIFIC = \
  -DSORT_OPT_PREFETCHING \
- -DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I$(STXXL_ROOT)/ \
+ -DUSE_MALLOC_LOCK \
+ -DCOUNT_WAIT_TIME \
+ -I$(STXXL_ROOT)/ \
  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
  $(POSIX_MEMALIGN) $(XOPEN_SOURCE)
 
@@ -102,7 +103,7 @@ STXXL_SPECIFIC = \
 
 STXXL_COMPILER_OPTIONS = $(STXXL_SPECIFIC) $(WARNINGS) \
  $(DEBUG) $(OPT)
-STXXL_LINKER_OPTIONS = -L$(STXXL_ROOT)/lib/ -l$(LIBNAME) -lpthread $(LINKER_OPT)
+STXXL_LINKER_OPTIONS = -L$(STXXL_ROOT)/lib/ -l$(LIBNAME) -lpthread
 
 ifeq ($(strip $(USE_BOOST)),yes)
 STXXL_COMPILER_OPTIONS += $(BOOST_COMPILER_OPTIONS)

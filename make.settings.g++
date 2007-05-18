@@ -4,26 +4,26 @@
 STXXL_ROOT = /home/dementiev/workspace/Stxxl#
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
-USE_LINUX = yes # set 'yes' if you run Linux, 'no'  otherwise
+USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
 
 # change this path, do not leave spaces at the end of the line
-BOOST_INCLUDE = /usr/include/boost-1_33_1/#
+BOOST_INCLUDE = /usr/include/boost-1_33/#
 
 MAKE = make # or gmake
-COMPILER = g++
-LINKER =  g++
-OPT = -O3 -Wall # compiler optimization level
+COMPILER	 = g++
+LINKER		 = $(COMPILER)
+OPT		 = -O3 # compiler optimization level
+WARNINGS	 = -Wall
+DEBUG		 = # put here -g option to include the debug information into the binaries
+
 LIBNAME = stxxl
-
-DEBUG = # put here -g option to include the debug information into the binaries
-
 
 #### BOOST OPTIONS ###############################################
 
 
 BOOST_LINKER_OPTIONS = -lboost_thread-gcc-mt \
--lboost_date_time-gcc-mt -lboost_iostreams-gcc-mt \
--lboost_filesystem-gcc-mt
+ -lboost_date_time-gcc-mt -lboost_iostreams-gcc-mt \
+ -lboost_filesystem-gcc-mt
 
 
 BOOST_COMPILER_OPTIONS =  \
@@ -81,9 +81,11 @@ OUT    = -o # output file option for the compiler and linker
 
 STXXL_SPECIFIC = \
  -DSORT_OPT_PREFETCHING \
- -DUSE_MALLOC_LOCK -I$(STXXL_ROOT)/ \
+ -DUSE_MALLOC_LOCK \
+ -DCOUNT_WAIT_TIME \
+ -I$(STXXL_ROOT)/ \
  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
- $(POSIX_MEMALIGN) $(XOPEN_SOURCE) -DCOUNT_WAIT_TIME 
+ $(POSIX_MEMALIGN) $(XOPEN_SOURCE)
 
 # switch the direct I/O off
 # STXXL_SPECIFIC += -DSTXXL_DIRECT_IO_OFF
