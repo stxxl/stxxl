@@ -1,6 +1,6 @@
 THISMAKEFILE	:= $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)) 
 
-main: lib
+main: library
 
 include make.settings
 
@@ -9,6 +9,18 @@ SUBDIRS	= algo common containers io lib mng stream utils
 SUBDIRS-lib: $(SUBDIRS:%=lib-in-%)
 SUBDIRS-tests: $(SUBDIRS:%=tests-in-%)
 SUBDIRS-clean: $(SUBDIRS:%=clean-in-%)
+
+# compute STXXL_CPPFLAGS/STXXL_LDLIBS for stxxl.mk
+stxxl_mk_cppflags	 = $$(STXXL_CPPFLAGS_STXXL)
+stxxl_mk_ldlibs		 = $$(STXXL_LDLIBS_STXXL)
+ifeq ($(strip $(USE_BOOST)),yes)
+stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_BOOST)
+stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_BOOST)
+endif
+ifeq ($(strip $(USE_MCSTL)),yes)
+stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_MCSTL)
+stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_MCSTL)
+endif
 
 lib-in-lib:
 	@# nothing to compile
@@ -25,8 +37,14 @@ library: SUBDIRS-lib
 	@echo $(STXXL_COMPILER_OPTIONS) > compiler.options
 	@echo $(STXXL_LINKER_OPTIONS) > linker.options
 	@echo "STXXL_CXX	 = $(COMPILER)" > stxxl.mk
-	@echo "STXXL_CPPFLAGS	 = $(STXXL_SPECIFIC)" >> stxxl.mk
-	@echo "STXXL_LDLIBS	 = $(STXXL_LINKER_OPTIONS)" >> stxxl.mk
+	@echo 'STXXL_CPPFLAGS	 = $(stxxl_mk_cppflags)' >> stxxl.mk
+	@echo 'STXXL_LDLIBS	 = $(stxxl_mk_ldlibs)' >> stxxl.mk
+	@echo "STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)" >> stxxl.mk
+	@echo "STXXL_LDLIBS_STXXL	 = $(STXXL_LINKER_OPTIONS)" >> stxxl.mk
+	@echo "STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)" >> stxxl.mk
+	@echo "STXXL_LDLIBS_BOOST	 = $(BOOST_LINKER_OPTIONS)" >> stxxl.mk
+	@echo "STXXL_CPPFLAGS_MCSTL	 = $(MCSTL_CPPFLAGS)" >> stxxl.mk
+	@echo "STXXL_LDLIBS_MCSTL	 = $(MCSTL_LDLIBS)" >> stxxl.mk
 
 lib/lib$(LIBNAME).$(LIBEXT)::
 	echo $(MAKEFILE_LIST)
@@ -35,7 +53,6 @@ lib/lib$(LIBNAME).$(LIBEXT)::
 tests-in-%: lib/lib$(LIBNAME).$(LIBEXT)
 	$(MAKE) -C $* tests
 
-tests: lib
 tests: SUBDIRS-tests
 	@echo ""
 	@echo "Building tests is completed."
@@ -49,3 +66,4 @@ clean: SUBDIRS-clean
 	$(RM) stxxl.mk
 	@echo "Cleaning completed"
 
+.PHONY: main library tests clean
