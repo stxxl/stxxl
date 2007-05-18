@@ -7,6 +7,7 @@ MCSTL_ROOT = /home/singler/code/mcstl/$(MCSTL_BRANCH)# please enter path to MCST
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
+USE_MCSTL = yes
 
 # change this path, do not leave spaces at the end of the line
 BOOST_INCLUDE = /usr/include/boost-1_33/#
@@ -37,6 +38,37 @@ BOOST_COMPILER_OPTIONS =  \
  -I$(BOOST_INCLUDE) \
  -pthread
  
+
+##################################################################
+
+
+#### MCSTL OPTIONS ###############################################
+
+ifeq ($(strip $(USE_MCSTL)),yes)
+
+# find a KEY=VALUE element in WORDS and return VALUE
+# usage: $(call get_value,KEY,WORDS)
+get_value		 = $(subst $(1)=,,$(filter $(1)=%,$(2)))
+empty			 =#
+space			 = $(empty) $(empty)
+gcc_version_result	:= $(shell $(COMPILER) -v 2>&1)
+gcc_version		 = $(call get_value,THE_GCC_VERSION,$(subst gcc$(space)version$(space),THE_GCC_VERSION=,$(gcc_version_result)))
+gcc_prefix		 = $(call get_value,--prefix,$(gcc_version_result))
+gcc_gxx_incdir		 = $(call get_value,--with-gxx-include-dir,$(gcc_version_result))
+MCSTL_ORIGINAL_INC_CXX	?= $(firstword $(wildcard $(gcc_gxx_incdir) $(gcc_prefix)/include/c++/$(gcc_version)))
+MCSTL_ORIGINALS		?= $(MCSTL_ROOT)/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
+
+ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
+$(error ERROR: could not determine MCSTL_ORIGINAL_INC_CXX, please set this variable manually, it's your compilers ($(COMPILER)) include/c++ path)
+endif
+ifeq (,$(strip $(wildcard $(MCSTL_ORIGINALS)/original)))
+$(error ERROR: your mcstl in $(MCSTL_ROOT) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
+endif
+
+MCSTL_CPPFLAGS		+= -fopenmp -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ORIGINALS) -D__MCSTL__
+MCSTL_LDFLAGS		+= -fopenmp
+
+endif
 
 ##################################################################
 
@@ -111,6 +143,11 @@ STXXL_LINKER_OPTIONS += $(BOOST_LINKER_OPTIONS)
 endif
 
 
+ifeq ($(strip $(USE_MCSTL)),yes)
+STXXL_COMPILER_OPTIONS        += $(MCSTL_CPPFLAGS)
+STXXL_LINKER_OPTIONS  += $(MCSTL_LDFLAGS)
+endif
+
 #
 # Troubleshooting
 #
@@ -130,3 +167,4 @@ endif
 # to reconfigure the kernel for the support of the direct I/O.
 #
 #
+# vim: syn=make
