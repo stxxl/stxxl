@@ -314,7 +314,7 @@ void random_shuffle(    stxxl::vector_iterator<Tp_,AllocStrategy_,SzTp_,DiffTp_,
     buckets[j]->set_prefetch_aggr(PageSize_);
   }
   
-  stxxl::int64 space_left = M - k*BlockSize_ - 
+  unsigned_type space_left = M - k*BlockSize_ - 
     PageSize_*BlockSize_;// remaining int space  
   random_shuffle_local::write_vector<ExtIterator_> 
     Writer(first,2*PageSize_);
