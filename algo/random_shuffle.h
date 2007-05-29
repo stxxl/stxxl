@@ -14,7 +14,9 @@
 //        (free stacks buffers)
 
 
-#include <stxxl>
+#include "../stream/stream.h"
+#include "../algo/scan.h"
+#include "../containers/stack.h"
 
 __STXXL_BEGIN_NAMESPACE
 
