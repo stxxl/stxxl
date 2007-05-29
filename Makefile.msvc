@@ -1,3 +1,5 @@
+# This -*- Makefile -*- is intended for processing with nmake.
+
 main: library
 
 include make.settings

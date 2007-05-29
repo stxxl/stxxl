@@ -1,3 +1,4 @@
+# This -*- Makefile -*- is intended for processing with GNU make.
 THISMAKEFILE	:= $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)) 
 
 main: library
@@ -11,6 +12,7 @@ SUBDIRS-tests: $(SUBDIRS:%=tests-in-%)
 SUBDIRS-clean: $(SUBDIRS:%=clean-in-%)
 
 # compute STXXL_CPPFLAGS/STXXL_LDLIBS for stxxl.mk
+# don't include optimization, warning and debug flags
 stxxl_mk_cppflags	 = $$(STXXL_CPPFLAGS_STXXL)
 stxxl_mk_ldlibs		 = $$(STXXL_LDLIBS_STXXL)
 ifeq ($(strip $(USE_BOOST)),yes)

@@ -1,33 +1,40 @@
+# This -*- Makefile -*- is intended for processing with GNU make.
+
+# instead of modifying this file, you could also set your modified variables
+# in make.settings.local (needs to be created first)
+-include $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))make.settings.local
+
 # Change this file according to your paths
 
-# change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /home/singler/code/stxxl/trunk#
-MCSTL_BRANCH = branches/standalone# please enter mcstl branch, leave empty for default branch
-MCSTL_ROOT = /home/singler/code/mcstl/$(MCSTL_BRANCH)# please enter path to MCSTL directory 
+USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
+USE_LINUX	?= yes	# set 'yes' if you run Linux, 'no' otherwise
+USE_MCSTL	?= yes
 
-USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
-USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
-USE_MCSTL = yes
+STXXL_ROOT	?= /home/singler/code/stxxl/trunk
 
-# change this path, do not leave spaces at the end of the line
-BOOST_INCLUDE = /usr/include/boost-1_33/#
+MCSTL_BASE	?= /home/singler/code/mcstl# please enter path to MCSTL base directory 
+MCSTL_BRANCH	?= branches/standalone# please enter mcstl branch, leave empty for default branch
+MCSTL_ROOT	?= $(strip $(MCSTL_BASE))/$(strip $(MCSTL_BRANCH))
 
-MAKE = make # or gmake
-COMPILER	 = g++-4.2.0
-LINKER		 = $(COMPILER)
-OPT		 = -O3 # compiler optimization level
-WARNINGS	 = -Wall
-DEBUG		 = # put here -g option to include the debug information into the binaries
+BOOST_INCLUDE	?= /usr/include/boost-1_33
 
-LIBNAME = mcstxxl
+COMPILER	?= g++-4.2.0
+LINKER		?= $(COMPILER)
+OPT		?= -O3 # compiler optimization level
+WARNINGS	?= -Wall
+DEBUG		?= # put here -g option to include the debug information into the binaries
+
+LIBNAME		?= mcstxxl
+
+
+#### you usually shouldn't need to change the sections below #####
+
 
 #### BOOST OPTIONS ###############################################
-
 
 BOOST_LINKER_OPTIONS = -lboost_thread-gcc-mt \
  -lboost_date_time-gcc-mt -lboost_iostreams-gcc-mt \
  -lboost_filesystem-gcc-mt
-
 
 BOOST_COMPILER_OPTIONS =  \
  -DSTXXL_BOOST_TIMESTAMP \
@@ -35,10 +42,9 @@ BOOST_COMPILER_OPTIONS =  \
  -DSTXXL_BOOST_FILESYSTEM \
  -DSTXXL_BOOST_THREADS \
  -DSTXXL_BOOST_RANDOM \
- -I$(BOOST_INCLUDE) \
+ -I$(strip $(BOOST_INCLUDE)) \
  -pthread
  
-
 ##################################################################
 
 
@@ -56,13 +62,13 @@ gcc_version		 = $(call get_value,THE_GCC_VERSION,$(subst gcc$(space)version$(spa
 gcc_prefix		 = $(call get_value,--prefix,$(gcc_version_result))
 gcc_gxx_incdir		 = $(call get_value,--with-gxx-include-dir,$(gcc_version_result))
 MCSTL_ORIGINAL_INC_CXX	?= $(firstword $(wildcard $(gcc_gxx_incdir) $(gcc_prefix)/include/c++/$(gcc_version)))
-MCSTL_ORIGINALS		?= $(MCSTL_ROOT)/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
+MCSTL_ORIGINALS		?= $(MCSTL_BASE)/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
 
 ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
 $(error ERROR: could not determine MCSTL_ORIGINAL_INC_CXX, please set this variable manually, it's your compilers ($(COMPILER)) include/c++ path)
 endif
 ifeq (,$(strip $(wildcard $(MCSTL_ORIGINALS)/original)))
-$(error ERROR: your mcstl in $(MCSTL_ROOT) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
+$(error ERROR: your mcstl in $(MCSTL_BASE) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
 endif
 
 MCSTL_CPPFLAGS		+= -fopenmp -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ORIGINALS) -D__MCSTL__
@@ -88,7 +94,7 @@ MNG_LAYER_FILES = ../mng/adaptor.h  ../mng/async_schedule.h  ../mng/block_prefet
 ../mng/buf_istream.h  ../mng/buf_ostream.h  ../mng/buf_writer.h  ../mng/mng.h \
 ../mng/write_pool.h ../mng/prefetch_pool.h
 
-CONTAINER_MAP_FILES = # $(STXXL_ROOT)/containers/map.impl/*.h
+CONTAINER_MAP_FILES = # $(strip $(STXXL_ROOT))/containers/map.impl/*.h
 
 CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/vector.h \
 ../containers/priority_queue.h ../containers/queue.h $(CONTAINER_MAP_FILES)
@@ -100,6 +106,7 @@ ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/ru
 STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 
 ###################################################################
+
 
 ###### MISC #######################################################
 
@@ -117,7 +124,7 @@ STXXL_SPECIFIC = \
  -DSORT_OPT_PREFETCHING \
  -DUSE_MALLOC_LOCK \
  -DCOUNT_WAIT_TIME \
- -I$(STXXL_ROOT)/ \
+ -I$(strip $(STXXL_ROOT)) \
  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
  $(POSIX_MEMALIGN) $(XOPEN_SOURCE)
 
@@ -129,13 +136,9 @@ STXXL_SPECIFIC = \
 # STXXL_SPECIFIC += -DSTXXL_DEBUGMON
 
 
-# WARNINGS = -Wall
-
-
-
 STXXL_COMPILER_OPTIONS = $(STXXL_SPECIFIC) $(WARNINGS) \
  $(DEBUG) $(OPT)
-STXXL_LINKER_OPTIONS = -L$(STXXL_ROOT)/lib/ -l$(LIBNAME) -lpthread
+STXXL_LINKER_OPTIONS = -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME) -lpthread
 
 ifeq ($(strip $(USE_BOOST)),yes)
 STXXL_COMPILER_OPTIONS += $(BOOST_COMPILER_OPTIONS)

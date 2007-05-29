@@ -1,4 +1,7 @@
-default:
+# This -*- Makefile -*- gets processed with both GNU make and nmake.
+# So keep it simple and compatible.
+
+usage:
 	@echo -e "Choose one of the goals:\nlibrary_g++ library_g++_mcstl library_icpc library_icpc_mcstl library_msvc\ntests_g++ tests_g++_mcstl tests_icpc tests_icpc_mcstl tests_msvc\nclean_g++ clean_g++_mcstl clean_icpc clean_icpc_mcstl clean_msvc "
 
 settings_g++:
