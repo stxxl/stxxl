@@ -52,7 +52,7 @@
  * - Download gzipped tar ball from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl.tgz">here</A>. 
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl ,
- * - Change \c make.settings.g++ file according to your system configuration
+ * - Change \c make.settings.g++ or \c make.settings.local file according to your system configuration
  *   - \c S<small>TXXL</small> root directory \c STXXL_ROOT variable( \c directory_where_you_unpacked_the_tar_ball/stxxl )
  *   - change USE_BOOST variable to yes if you want Stxxl to use <A href="http://www.boost.org">Boost</A> libraries (you should have Boost libraries already installed)
  *   - change BOOST_INCLUDE variable according to the Boost include path (if you set USE_BOOST to 'yes')
@@ -65,6 +65,8 @@
  * file. The linking options you can find in \c linker.options file. Alternatively you can
  * include \c make.settings file in your make files and use \c STXXL_COMPILER_OPTIONS and 
  * \c STXXL_LINKER_OPTIONS variables, defined therein.
+ * See also a shorter \c stxxl.mk file that contains Stxxl settings and can be 
+ * included in your make files.
  *
  * For example: <BR> 
  * \verbatim g++ -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <BR>
@@ -248,7 +250,7 @@
  * - Download gzipped tar ball from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl.tgz">here</A>. 
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl ,
- * - Change \c make.settings.g++ file according to your system configuration
+ * - Change \c make.settings.g++ or \c make.settings.local file according to your system configuration
  *   - \c S<small>TXXL</small> root directory \c STXXL_ROOT variable( \c directory_where_you_unpacked_the_tar_ball/stxxl )
  *   - change USE_BOOST variable to 'yes' if you want Stxxl to use <A href="http://www.boost.org">Boost</A> libraries (you should have Boost libraries already installed)
  *   - change USE_LINUX variable to 'no'
@@ -262,6 +264,8 @@
  * file. The linking options you can find in \c linker.options file. Alternatively you can
  * include \c make.settings file in your make files and use \c STXXL_COMPILER_OPTIONS and 
  * \c STXXL_LINKER_OPTIONS variables, defined therein.
+ * See also a shorter \c stxxl.mk file that contains Stxxl settings and can be 
+ * included in your make files.
  *
  * For example: <BR> 
  * \verbatim g++ -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <BR>
