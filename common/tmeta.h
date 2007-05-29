@@ -28,6 +28,27 @@ struct IF<false,Type1,Type2>
   typedef Type2 result;
 };
 
+
+//! If \c Flag is \c true then \c IF<>::result is Num1
+//! otherwise of \c IF<>::result is Num2
+template <bool Flag,unsigned Num1, unsigned Num2>
+struct IF_N
+{
+  enum
+  {
+    result = Num1
+  };
+};
+
+template <unsigned Num1, unsigned Num2>
+struct IF_N<false,Num1,Num2>
+{
+  enum
+  {
+    result = Num2
+  };
+};
+
 const int DEFAULT = ~(~0u >> 1); // initialize with the smallest int
 
 struct NilCase {};

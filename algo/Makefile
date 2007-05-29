@@ -1,4 +1,4 @@
-TESTS	 = test_scan gen_file sort_file test_ksort1 test_stable_ksort test_sort1 test_manyunits 
+TESTS	 = test_scan gen_file sort_file test_ksort1 test_stable_ksort test_sort1 test_manyunits test_random_shuffle 
 
 tests: $(TESTS)
 
@@ -54,9 +54,14 @@ test_sort1: test_sort1.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_sort1.cpp -DSTXXL_VERBOSE_LEVEL=0
 	$(LINKER)  test_sort1.$(OBJEXT) $(OUT)test_sort1.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_random_shuffle: test_random_shuffle.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_random_shuffle.cpp -DSTXXL_VERBOSE_LEVEL=0
+	$(LINKER)  test_random_shuffle.$(OBJEXT) $(OUT)test_random_shuffle.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 clean:
 	$(RM) *.$(OBJEXT) test_sort1.$(EXEEXT) test_stable_ksort.$(EXEEXT) 
 	$(RM) sort_file.$(EXEEXT) gen_file.$(EXEEXT) 
 	$(RM) test_scan.$(EXEEXT) test_asch.$(EXEEXT) test_ksort.$(EXEEXT) 
 	$(RM) test_sort.$(EXEEXT) test_manyunits.$(EXEEXT) test_ksort1.$(EXEEXT)
+	$(RM) test_random_shuffle.$(EXEEXT)
 

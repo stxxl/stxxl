@@ -6,6 +6,7 @@
 #include "algo/sort.h"
 #include "algo/ksort.h"
 #include "algo/scan.h"
+#include "algo/random_shuffle.h"
 
 #include "containers/vector.h"
 #include "containers/stack.h"
