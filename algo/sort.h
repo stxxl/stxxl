@@ -508,6 +508,7 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 		{
 			typedef stxxl::int64 diff_type;
 			typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
+			typedef typename std::vector<sequence>::size_type seqs_size_type;
 			std::vector<sequence> seqs(nruns);
 			std::vector<block_type*> buffers(nruns);
 			
@@ -536,7 +537,7 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 					total_size += seqs[0].second - seqs[0].first;
 					STXXL_VERBOSE1("last " << *(seqs[0].second - 1) << " block size " << (seqs[0].second - seqs[0].first));
 					
-					for(int_type i = 1; i < seqs.size(); i++)
+					for(seqs_size_type i = 1; i < seqs.size(); i++)
 					{
 						if(seqs[i].first == seqs[i].second) 
 							continue;	//empty subsequence
@@ -552,7 +553,7 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 					
 					diff_type less_equal_than_min_last = 0;
 					//locate this element in all sequences
-					for(int_type i = 0; i < seqs.size(); i++)
+					for(seqs_size_type i = 0; i < seqs.size(); i++)
 					{
 						if(seqs[i].first == seqs[i].second) 
 							continue;	//empty subsequence
@@ -577,7 +578,7 @@ void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run,unsigned
 					
 					STXXL_VERBOSE1("so long");
 					
-					for(int_type i = 0; i < seqs.size(); i++)
+					for(seqs_size_type i = 0; i < seqs.size(); i++)
 					{
 						if(seqs[i].first == seqs[i].second)	//run empty
 						{
