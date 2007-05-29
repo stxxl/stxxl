@@ -9,7 +9,7 @@
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX	?= yes	# set 'yes' if you run Linux, 'no' otherwise
 
-STXXL_ROOT	?= /home/dementiev/workspace/Stxxl
+STXXL_ROOT	?= $(HOME)/work/stxxl
 
 BOOST_INCLUDE	?= /usr/include/boost-1_33
 

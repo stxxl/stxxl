@@ -10,11 +10,16 @@ USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libr
 USE_LINUX	?= yes	# set 'yes' if you run Linux, 'no' otherwise
 USE_MCSTL	?= yes
 
-STXXL_ROOT	?= /home/singler/code/stxxl/trunk
+STXXL_ROOT	?= $(HOME)/work/mcstxxl
 
-MCSTL_BASE	?= /home/singler/code/mcstl# please enter path to MCSTL base directory 
-MCSTL_BRANCH	?= branches/standalone# please enter mcstl branch, leave empty for default branch
-MCSTL_ROOT	?= $(strip $(MCSTL_BASE))/$(strip $(MCSTL_BRANCH))
+# the base directory of your MCSTL installation
+MCSTL_BASE	?= $(HOME)/work/mcstl
+# mcstl branch, leave empty for default branch (e.g. if installed from release tarball)
+MCSTL_BRANCH	?= #branches/standalone
+# only set the following variables if autodetection does not work:
+#MCSTL_ROOT		?= $(MCSTL_BASE)/$(MCSTL_BRANCH)
+#MCSTL_ORIGINAL_INC_CXX	?= /path/to/your/$(COMPILER)'s/include/c++
+#MCSTL_ORIGINALS	?= /where/you/put/the/original/symlink
 
 BOOST_INCLUDE	?= /usr/include/boost-1_33
 
@@ -62,8 +67,12 @@ gcc_version		 = $(call get_value,THE_GCC_VERSION,$(subst gcc$(space)version$(spa
 gcc_prefix		 = $(call get_value,--prefix,$(gcc_version_result))
 gcc_gxx_incdir		 = $(call get_value,--with-gxx-include-dir,$(gcc_version_result))
 MCSTL_ORIGINAL_INC_CXX	?= $(firstword $(wildcard $(gcc_gxx_incdir) $(gcc_prefix)/include/c++/$(gcc_version)))
-MCSTL_ORIGINALS		?= $(MCSTL_BASE)/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
+MCSTL_ORIGINALS		?= $(strip $(MCSTL_BASE))/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
+MCSTL_ROOT		?= $(strip $(MCSTL_BASE))$(if $(strip $(MCSTL_BRANCH)),/$(strip $(MCSTL_BRANCH)))
 
+ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/mcstl.h)))
+$(error ERROR: could not find a MCSTL installation in MCSTL_ROOT=$(MCSTL_ROOT))
+endif
 ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
 $(error ERROR: could not determine MCSTL_ORIGINAL_INC_CXX, please set this variable manually, it's your compilers ($(COMPILER)) include/c++ path)
 endif
