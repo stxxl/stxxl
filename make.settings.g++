@@ -1,13 +1,15 @@
 # This -*- Makefile -*- is intended for processing with GNU make.
 
-# instead of modifying this file, you could also set your modified variables
-# in make.settings.local (needs to be created first)
+# Change this file according to your paths.
+
+# Instead of modifying this file, you could also set your modified variables
+# in make.settings.local (needs to be created first).
 -include $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))make.settings.local
 
-# Change this file according to your paths
 
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX	?= yes	# set 'yes' if you run Linux, 'no' otherwise
+USE_MCSTL	?= no
 
 STXXL_ROOT	?= $(HOME)/work/stxxl
 
@@ -22,7 +24,45 @@ DEBUG		?= # put here -g option to include the debug information into the binarie
 LIBNAME		?= stxxl
 
 
-#### you usually shouldn't need to change the sections below #####
+#### TROUBLESHOOTING
+#
+# For automatical checking of order of the output elements in
+# the sorters: stxxl::stream::sort, stxxl::stream::merge_runs,
+# stxxl::sort, and stxxl::ksort use
+#
+#STXXL_SPECIFIC	+= -DSTXXL_CHECK_ORDER_IN_SORTS
+#
+# If your program aborts with message "read/write: wrong parameter"
+# or "Invalid argument"
+# this could be that your kernel does not support direct I/O
+# then try to set it off recompiling the libs and your code with option
+#
+#STXXL_SPECIFIC	+= -DSTXXL_DIRECT_IO_OFF
+#
+# But for the best performance it is strongly recommended 
+# to reconfigure the kernel for the support of the direct I/O.
+#
+# FIXME: documentation needed
+#
+#STXXL_SPECIFIC += -DSTXXL_DEBUGMON
+
+
+#### You usually shouldn't need to change the sections below #####
+
+
+#### STXXL OPTIONS ###############################################
+
+STXXL_SPECIFIC	+= \
+	-DSORT_OPT_PREFETCHING \
+	-DUSE_MALLOC_LOCK \
+	-DCOUNT_WAIT_TIME \
+	-I$(strip $(STXXL_ROOT)) \
+	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
+	$(POSIX_MEMALIGN) $(XOPEN_SOURCE)
+
+STXXL_LDLIBS	+= -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME) -lpthread
+
+##################################################################
 
 
 #### BOOST OPTIONS ###############################################
@@ -74,63 +114,27 @@ STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 
 ###### MISC #######################################################
 
-OBJEXT = o # extension of object files
-LIBEXT = a # static library file extension
-EXEEXT = bin # executable file extension
-RM = rm -f # remove file command
-LIBGEN = ar cr # library generation
-OUT    = -o # output file option for the compiler and linker
+OBJEXT	 = o		# extension of object files
+LIBEXT	 = a		# static library file extension
+EXEEXT	 = bin		# executable file extension
+RM	 = rm -f	# remove file command
+LIBGEN	 = ar cr	# library generation
+OUT	 = -o		# output file option for the compiler and linker
 
 ###################################################################
-
-
-STXXL_SPECIFIC = \
- -DSORT_OPT_PREFETCHING \
- -DUSE_MALLOC_LOCK \
- -DCOUNT_WAIT_TIME \
- -I$(strip $(STXXL_ROOT)) \
- -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
- $(POSIX_MEMALIGN) $(XOPEN_SOURCE)
-
-# switch the direct I/O off
-# STXXL_SPECIFIC += -DSTXXL_DIRECT_IO_OFF
-
-# STXXL_SPECIFIC += -DSTXXL_CHECK_ORDER_IN_SORTS
-
-# STXXL_SPECIFIC += -DSTXXL_DEBUGMON
 
 
 CPPUNIT_COMPILER_OPTIONS = -I/usr/include
 CPPUNIT_LINKER_OPTIONS = -L/usr/lib -lcppunit -ldl
 
 
-STXXL_COMPILER_OPTIONS = $(STXXL_SPECIFIC) $(WARNINGS) \
- $(DEBUG) $(OPT)
-STXXL_LINKER_OPTIONS = -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME) -lpthread
+STXXL_COMPILER_OPTIONS	+= $(STXXL_SPECIFIC)
+STXXL_COMPILER_OPTIONS	+= $(OPT) $(DEBUG) $(WARNINGS)
+STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS)
 
 ifeq ($(strip $(USE_BOOST)),yes)
-STXXL_COMPILER_OPTIONS += $(BOOST_COMPILER_OPTIONS)
-STXXL_LINKER_OPTIONS += $(BOOST_LINKER_OPTIONS)
+STXXL_COMPILER_OPTIONS	+= $(BOOST_COMPILER_OPTIONS)
+STXXL_LINKER_OPTIONS	+= $(BOOST_LINKER_OPTIONS)
 endif
 
-
-#
-# Troubleshooting
-#
-# For automatical checking of order of the output elements in
-# the sorters: stxxl::stream::sort, stxxl::stream::merge_runs,
-# stxxl::sort, and stxxl::ksort
-# use -DSTXXL_CHECK_ORDER_IN_SORTS compile option
-#
-# if your program aborts with message "read/write: wrong parameter"
-# or "Invalid argument"
-# this could be that your kernel does not support direct I/O
-# then try to set it off recompiling your code with option
-# -DSTXXL_DIRECT_IO_OFF (the libs must be also recompiled)
-# The best way for doing it is to modify the STXXL_SPECIFIC
-# variable (see above).
-# But for the best performance it is strongly recommended 
-# to reconfigure the kernel for the support of the direct I/O.
-#
-#
 # vim: syn=make
