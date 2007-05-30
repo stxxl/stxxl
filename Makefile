@@ -8,10 +8,6 @@ settings_g++:
 	cmp -s make.settings.g++ make.settings || \
 		cp make.settings.g++ make.settings
 
-settings_g++_mcstl:
-	cmp -s make.settings.g++_mcstl make.settings || \
-		cp make.settings.g++_mcstl make.settings
-
 settings_icpc:
 	cmp -s make.settings.icpc make.settings || \
 		cp make.settings.icpc make.settings
@@ -25,10 +21,10 @@ settings_msvc:
 
 
 library_g++: settings_g++
-	$(MAKE) -f Makefile.g++ library
+	$(MAKE) -f Makefile.g++ library USE_MCSTL=no
 
-library_g++_mcstl: settings_g++_mcstl
-	$(MAKE) -f Makefile.g++ library
+library_g++_mcstl: settings_g++
+	$(MAKE) -f Makefile.g++ library USE_MCSTL=yes
 
 library_icpc: settings_icpc
 	$(MAKE) -f Makefile.icpc library
@@ -41,10 +37,10 @@ library_msvc: settings_msvc
 	
 
 tests_g++: settings_g++
-	$(MAKE) -f Makefile.g++ tests
+	$(MAKE) -f Makefile.g++ tests USE_MCSTL=no
 
-tests_g++_mcstl: settings_g++_mcstl
-	$(MAKE) -f Makefile.g++ tests
+tests_g++_mcstl: settings_g++
+	$(MAKE) -f Makefile.g++ tests USE_MCSTL=yes
 
 tests_icpc: settings_icpc
 	$(MAKE) -f Makefile.icpc tests
@@ -57,10 +53,10 @@ tests_msvc: settings_msvc
 
 
 clean_g++: settings_g++
-	$(MAKE) -f Makefile.g++ clean
+	$(MAKE) -f Makefile.g++ clean USE_MCSTL=no
 
-clean_g++_mcstl: settings_g++_mcstl
-	$(MAKE) -f Makefile.g++ clean
+clean_g++_mcstl: settings_g++
+	$(MAKE) -f Makefile.g++ clean USE_MCSTL=yes
 
 clean_icpc: settings_icpc
 	$(MAKE) -f Makefile.icpc clean

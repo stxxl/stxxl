@@ -15,13 +15,13 @@ SUBDIRS-clean: $(SUBDIRS:%=clean-in-%)
 # don't include optimization, warning and debug flags
 stxxl_mk_cppflags	 = $$(STXXL_CPPFLAGS_STXXL)
 stxxl_mk_ldlibs		 = $$(STXXL_LDLIBS_STXXL)
-ifeq ($(strip $(USE_BOOST)),yes)
-stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_BOOST)
-stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_BOOST)
-endif
 ifeq ($(strip $(USE_MCSTL)),yes)
 stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_MCSTL)
 stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_MCSTL)
+endif
+ifeq ($(strip $(USE_BOOST)),yes)
+stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_BOOST)
+stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_BOOST)
 endif
 
 lib-in-lib:
@@ -29,27 +29,30 @@ lib-in-lib:
 lib-in-%:
 	$(MAKE) -C $* lib
 
-library: SUBDIRS-lib
+build-lib: SUBDIRS-lib
 	$(MAKE) -C lib
 	$(MAKE) -C utils create
+
+$(LIBNAME).mk: build-lib
+	echo 'STXXL_CXX	 = $(COMPILER)'	> $@
+	echo 'STXXL_CPPFLAGS	 = $(stxxl_mk_cppflags)'	>> $@
+	echo 'STXXL_LDLIBS	 = $(stxxl_mk_ldlibs)'	>> $@
+	echo 'STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)'	>> $@
+	echo 'STXXL_LDLIBS_STXXL	 = $(STXXL_LDLIBS)'	>> $@
+	echo 'STXXL_CPPFLAGS_MCSTL	 = $(MCSTL_CPPFLAGS)'	>> $@
+	echo 'STXXL_LDLIBS_MCSTL	 = $(MCSTL_LDFLAGS)'	>> $@
+	echo 'STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)'	>> $@
+	echo 'STXXL_LDLIBS_BOOST	 = $(BOOST_LINKER_OPTIONS)'	>> $@
+
+library: $(LIBNAME).mk
 	@echo ""
 	@echo "Building library is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
 	@echo "Use the following linker options with programs using Stxxl: $(STXXL_LINKER_OPTIONS)"
 	@echo $(STXXL_COMPILER_OPTIONS) > compiler.options
 	@echo $(STXXL_LINKER_OPTIONS) > linker.options
-	@echo "STXXL_CXX	 = $(COMPILER)" > stxxl.mk
-	@echo 'STXXL_CPPFLAGS	 = $(stxxl_mk_cppflags)' >> stxxl.mk
-	@echo 'STXXL_LDLIBS	 = $(stxxl_mk_ldlibs)' >> stxxl.mk
-	@echo "STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)" >> stxxl.mk
-	@echo "STXXL_LDLIBS_STXXL	 = $(STXXL_LINKER_OPTIONS)" >> stxxl.mk
-	@echo "STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)" >> stxxl.mk
-	@echo "STXXL_LDLIBS_BOOST	 = $(BOOST_LINKER_OPTIONS)" >> stxxl.mk
-	@echo "STXXL_CPPFLAGS_MCSTL	 = $(MCSTL_CPPFLAGS)" >> stxxl.mk
-	@echo "STXXL_LDLIBS_MCSTL	 = $(MCSTL_LDLIBS)" >> stxxl.mk
 
 lib/lib$(LIBNAME).$(LIBEXT)::
-	echo $(MAKEFILE_LIST)
 	$(MAKE) -f $(THISMAKEFILE) library
 
 tests-in-%: lib/lib$(LIBNAME).$(LIBEXT)
@@ -65,7 +68,7 @@ clean-in-%:
 	$(MAKE) -C $* clean
 
 clean: SUBDIRS-clean
-	$(RM) stxxl.mk
+	$(RM) $(LIBNAME).mk
 	@echo "Cleaning completed"
 
 .PHONY: main library tests clean
