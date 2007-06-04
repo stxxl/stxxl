@@ -6,8 +6,8 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _NODE_CACHE_H
-#define _NODE_CACHE_H
+#ifndef STXXL_CONTAINERS_BTREE__NODE_CACHE_H
+#define STXXL_CONTAINERS_BTREE__NODE_CACHE_H
 
 #ifdef BOOST_MSVC
 #include <hash_map>
@@ -631,4 +631,4 @@ namespace std
 	}
 }
 
-#endif /* _NODE_CACHE_H */
+#endif /* STXXL_CONTAINERS_BTREE__NODE_CACHE_H */

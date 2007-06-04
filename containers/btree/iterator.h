@@ -6,8 +6,8 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _BTREEITERATOR_H
-#define _BTREEITERATOR_H
+#ifndef STXXL_CONTAINERS_BTREE__ITERATOR_H
+#define STXXL_CONTAINERS_BTREE__ITERATOR_H
 
 
 #include "../../common/utils.h"
@@ -370,4 +370,4 @@ namespace btree
 
 __STXXL_END_NAMESPACE
 
-#endif /* _ITERATOR_H */
+#endif /* STXXL_CONTAINERS_BTREE__ITERATOR_H */

@@ -6,8 +6,8 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _BTREE_PAGER_H
-#define _BTREE_PAGER_H
+#ifndef STXXL_CONTAINERS_BTREE__BTREE_PAGER_H
+#define STXXL_CONTAINERS_BTREE__BTREE_PAGER_H
 
 #include <list>
 
@@ -83,4 +83,4 @@ namespace std
 }
 
 
-#endif /* _BTREE_PAGER_H */
+#endif /* STXXL_CONTAINERS_BTREE__BTREE_PAGER_H */

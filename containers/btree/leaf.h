@@ -6,8 +6,8 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _LEAF_H
-#define _LEAF_H
+#ifndef STXXL_CONTAINERS_BTREE__LEAF_H
+#define STXXL_CONTAINERS_BTREE__LEAF_H
 
 #include "iterator.h"
 #include "node_cache.h"
@@ -695,4 +695,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif /* _LEAF_H */
+#endif /* STXXL_CONTAINERS_BTREE__LEAF_H */

@@ -6,8 +6,8 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _ITERATOR_MAP_H
-#define _ITERATOR_MAP_H
+#ifndef STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
+#define STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 
 #include "iterator.h"
 
@@ -168,4 +168,4 @@ namespace std
 	}
 }
 
-#endif /* _ITERATOR_MAP_H */
+#endif /* STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H */

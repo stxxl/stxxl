@@ -6,8 +6,8 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _NODE_H
-#define _NODE_H
+#ifndef STXXL_CONTAINERS_BTREE__NODE_H
+#define STXXL_CONTAINERS_BTREE__NODE_H
 
 
 #include "iterator.h"
@@ -768,4 +768,4 @@ public:
 __STXXL_END_NAMESPACE
 
 
-#endif /* _NODE_H */
+#endif /* STXXL_CONTAINERS_BTREE__NODE_H */

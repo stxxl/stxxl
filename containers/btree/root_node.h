@@ -6,8 +6,8 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _ROOT_NODE_H
-#define _ROOT_NODE_H
+#ifndef STXXL_CONTAINERS_BTREE__ROOT_NODE_H
+#define STXXL_CONTAINERS_BTREE__ROOT_NODE_H
 
 #include "../../common/utils.h"
 
@@ -25,4 +25,4 @@ namespace btree
 
 __STXXL_END_NAMESPACE
 
-#endif /* _ROOT_NODE_H */
+#endif /* STXXL_CONTAINERS_BTREE__ROOT_NODE_H */

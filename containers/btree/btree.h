@@ -6,8 +6,8 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _BTREE_H
-#define _BTREE_H
+#ifndef STXXL_CONTAINERS_BTREE__BTREE_H
+#define STXXL_CONTAINERS_BTREE__BTREE_H
 
 #include "iterator.h"
 #include "iterator_map.h"
@@ -1136,4 +1136,4 @@ namespace std
 	}
 }
 
-#endif /* _BTREE_H */
+#endif /* STXXL_CONTAINERS_BTREE__BTREE_H */
