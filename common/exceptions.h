@@ -11,7 +11,7 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
-#include "../common/utils.h"
+#include "../common/namespace.h"
 
 __STXXL_BEGIN_NAMESPACE 
 

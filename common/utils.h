@@ -45,11 +45,10 @@
 #include "boost/filesystem/operations.hpp"
 #endif
 
-#define __STXXL_BEGIN_NAMESPACE namespace stxxl {
-#define __STXXL_END_NAMESPACE }
-
+#include "namespace.h"
 #include "log.h"
 #include "exceptions.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

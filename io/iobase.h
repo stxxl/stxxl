@@ -120,7 +120,7 @@ __STXXL_BEGIN_NAMESPACE
 	typedef stxxl::int64 DISKID;
 
 	class request;
-  class request_ptr;
+    class request_ptr;
 	
 	//! \brief Default completion handler class
 	

@@ -9,8 +9,8 @@
 #ifndef COMPLETION_HANDLER_HEADER
 #define COMPLETION_HANDLER_HEADER
 
-#include "../common/utils.h"
-#include "iobase.h"
+#include "../common/namespace.h"
+#include <memory>
 
 __STXXL_BEGIN_NAMESPACE
 
