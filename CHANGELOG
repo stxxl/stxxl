@@ -1,5 +1,10 @@
 Repository version (see the web page for the last modification date)
 
+* no changes so far
+
+------------------------------------------
+Version 1.0e (4 June 2007)
+
 * Bugfix: for objects with the deconstructors, memory block were allocated in a non-aligned fashion
 * Internal CPU efficiency of Stxxl priority queue is improved (loser trees in external mergers are integrated)
 * Fixed bug with conversion of const/non-const iterators, implemented comparison and difference operations on const/non-const iterators (for vector, map, and deque) 
