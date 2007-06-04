@@ -9,7 +9,6 @@
 #ifndef _LEAF_H
 #define _LEAF_H
 
-#include <stxxl>
 #include "iterator.h"
 #include "node_cache.h"
 

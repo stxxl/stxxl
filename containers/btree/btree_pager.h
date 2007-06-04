@@ -9,8 +9,9 @@
 #ifndef _BTREE_PAGER_H
 #define _BTREE_PAGER_H
 
-#include <stxxl>
 #include <list>
+
+#include "../../common/utils.h"
 
 __STXXL_BEGIN_NAMESPACE
 

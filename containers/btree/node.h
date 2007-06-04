@@ -10,7 +10,6 @@
 #define _NODE_H
 
 
-#include <stxxl>
 #include "iterator.h"
 #include "node_cache.h"
 

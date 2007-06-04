@@ -9,13 +9,15 @@
 #ifndef _NODE_CACHE_H
 #define _NODE_CACHE_H
 
-#include <stxxl>
-
 #ifdef BOOST_MSVC
 #include <hash_map>
 #else
 #include <ext/hash_map>
 #endif
+
+#include "../../common/utils.h"
+#include "../../io/iobase.h"
+#include "../../mng/mng.h"
 
 #include "btree_pager.h"
 

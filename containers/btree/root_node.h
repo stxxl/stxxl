@@ -9,6 +9,8 @@
 #ifndef _ROOT_NODE_H
 #define _ROOT_NODE_H
 
+#include "../../common/utils.h"
+
 __STXXL_BEGIN_NAMESPACE
 
 namespace btree

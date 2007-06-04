@@ -9,7 +9,6 @@
 #ifndef _ITERATOR_MAP_H
 #define _ITERATOR_MAP_H
 
-#include <stxxl>
 #include "iterator.h"
 
 #include <map>

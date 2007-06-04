@@ -12,6 +12,7 @@
 #include <queue>
 #include "../common/utils.h"
 #include "../common/switch.h"
+#include "../io/iobase.h"
 
 __STXXL_BEGIN_NAMESPACE
 

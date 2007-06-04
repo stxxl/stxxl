@@ -14,6 +14,7 @@
 #include "../algo/sort.h"
 #include "../mng/buf_istream.h"
 #include "../mng/buf_ostream.h"
+#include "../stream/stream.h"
 
 __STXXL_BEGIN_NAMESPACE
 

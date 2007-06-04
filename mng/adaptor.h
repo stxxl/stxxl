@@ -12,6 +12,8 @@
 
 #include <iterator>
 
+#include "../common/utils.h"
+
 namespace stxxl
 {
   

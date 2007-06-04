@@ -1,6 +1,8 @@
 #ifndef SIMPLE_VECTOR_HEADER
 #define SIMPLE_VECTOR_HEADER
 
+#include "../common/utils.h"
+
 __STXXL_BEGIN_NAMESPACE
 
 template < class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */  >

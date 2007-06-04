@@ -9,14 +9,13 @@
 #ifndef _BTREE_H
 #define _BTREE_H
 
-#include <stxxl>
-
 #include "iterator.h"
 #include "iterator_map.h"
 #include "leaf.h"
 #include "node_cache.h"
 #include "root_node.h"
 #include "node.h"
+#include "../../containers/vector.h"
 
 __STXXL_BEGIN_NAMESPACE
 

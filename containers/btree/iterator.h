@@ -10,7 +10,7 @@
 #define _BTREEITERATOR_H
 
 
-#include <stxxl>
+#include "../../common/utils.h"
 
 __STXXL_BEGIN_NAMESPACE
 
