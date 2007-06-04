@@ -9,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
  
-#include "../common/utils.h"
+#include "../common/namespace.h"
 #include "../common/rand.h"
 #include "../common/simple_vector.h"
 #include <list>

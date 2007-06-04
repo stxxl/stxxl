@@ -8,7 +8,7 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/utils.h"
+#include "../common/namespace.h"
  
 __STXXL_BEGIN_NAMESPACE
 

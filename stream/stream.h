@@ -7,7 +7,7 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/utils.h"
+#include "../common/namespace.h"
 #include "../algo/sort.h"
 #include "../mng/buf_istream.h"
 #include "../mng/buf_ostream.h"

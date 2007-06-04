@@ -14,7 +14,6 @@
 
 #include <math.h>
 #include "../mng/mng.h"
-#include "../common/utils.h"
 #include "../mng/buf_istream.h"
 #include "../mng/buf_ostream.h"
 #include "../common/simple_vector.h"

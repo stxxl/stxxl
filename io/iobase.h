@@ -27,7 +27,7 @@
 //#define O_DIRECT 0
 //#endif
 
-#include "../common/utils.h"
+#include "../common/namespace.h"
 
 #include <iostream>
 #include <stdio.h>

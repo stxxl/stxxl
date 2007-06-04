@@ -16,9 +16,8 @@
 #include <vector>
 
 
+__STXXL_BEGIN_NAMESPACE
 
-namespace stxxl
-{
 //! \weakgroup stlcont Containers
 //! \ingroup stllayer
 //! Containers with STL-compatible interface
@@ -1030,8 +1029,8 @@ private:
     
     
   //! \}
-}
 
+__STXXL_END_NAMESPACE
 
 
 namespace std
@@ -1043,7 +1042,7 @@ namespace std
     	unsigned BlkSize_ ,
 		typename AllocStr_ ,
     	typename SzTp_ >
-	void swap(	stxxl::vector<Tp_,PgSz_,PgTp_,BlkSize_,AllocStr_,SzTp_> & a,
+	void swap( stxxl::vector<Tp_,PgSz_,PgTp_,BlkSize_,AllocStr_,SzTp_> & a,
 				stxxl::vector<Tp_,PgSz_,PgTp_,BlkSize_,AllocStr_,SzTp_> & b )
 	{
 		a.swap(b);

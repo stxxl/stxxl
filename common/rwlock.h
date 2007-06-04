@@ -10,15 +10,14 @@
  ****************************************************************************/
 
 
-#include "utils.h"
-
 #if 0 // not used
+
+#include "namespace.h"
 
 #include <pthread.h>
 
 
-namespace stxxl
-{
+__STXXL_BEGIN_NAMESPACE
 
 	class RWLock
 	{
@@ -47,7 +46,7 @@ namespace stxxl
 		};
 	};
 
-}
+__STXXL_END_NAMESPACE
 
 #endif
 

@@ -17,8 +17,7 @@
 #include <pthread.h>
 #endif
 
-namespace stxxl
-{
+__STXXL_BEGIN_NAMESPACE
 
 	class state
 	{
@@ -99,7 +98,6 @@ namespace stxxl
 		};
 	};
 
-
-}
+__STXXL_END_NAMESPACE
 
 #endif

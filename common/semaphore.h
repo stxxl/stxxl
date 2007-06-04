@@ -19,8 +19,7 @@
 #include "utils.h"
 
 
-namespace stxxl
-{
+__STXXL_BEGIN_NAMESPACE
 
 	class semaphore
 	{
@@ -123,6 +122,6 @@ namespace stxxl
 	};
 
 
-}
+__STXXL_END_NAMESPACE
 
 #endif

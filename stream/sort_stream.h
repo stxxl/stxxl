@@ -10,7 +10,7 @@
  ****************************************************************************/
 
 
-#include "../common/utils.h"
+#include "../common/namespace.h"
 #include "../algo/sort.h"
 #include "../mng/buf_istream.h"
 #include "../mng/buf_ostream.h"

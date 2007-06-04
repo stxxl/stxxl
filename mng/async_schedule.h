@@ -9,7 +9,6 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 #include "../io/io.h"
-#include "../common/utils.h"
 #include <queue>
 #include <algorithm>
 

@@ -21,8 +21,7 @@
 
 #include <pthread.h>
 
-namespace stxxl
-{
+__STXXL_BEGIN_NAMESPACE
 
 	class mutex
 	{
@@ -54,7 +53,8 @@ namespace stxxl
 			stxxl_nassert(pthread_mutex_unlock (&_mutex),resource_error);
 		};
 	};
-};
+
+__STXXL_END_NAMESPACE
 
 #endif
 

@@ -9,7 +9,7 @@
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
 
-#include "../common/utils.h"
+#include "../common/namespace.h"
 
 #include <iostream>
 #include <fstream>

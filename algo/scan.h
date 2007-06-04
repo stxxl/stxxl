@@ -8,7 +8,7 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/utils.h"
+#include "../common/namespace.h"
 #include "../mng/buf_istream.h"
 #include "../mng/buf_ostream.h"
 

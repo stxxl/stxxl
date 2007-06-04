@@ -3,7 +3,7 @@
 
 /* Simple timer class by Roman Dementiev 
  */
-#include "../common/utils.h"
+#include "../common/namespace.h"
 
 #include <time.h>
 

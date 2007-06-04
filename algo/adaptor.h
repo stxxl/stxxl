@@ -10,7 +10,6 @@
 
 #include "../mng/mng.h"
 #include "../mng/adaptor.h"
-#include "../common/utils.h"
 #include "../algo/interleaved_alloc.h"
 
 

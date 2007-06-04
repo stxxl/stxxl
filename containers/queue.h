@@ -8,7 +8,6 @@
 #ifndef STXXL_QUEUE_HEADER
 #define  STXXL_QUEUE_HEADER
 
-#include "../common/utils.h"
 #include "../mng/mng.h"
 #include "../common/simple_vector.h"
 #include "../common/tmeta.h"

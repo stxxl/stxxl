@@ -19,8 +19,7 @@
 #endif
 
 
-namespace stxxl
-{
+__STXXL_BEGIN_NAMESPACE
 
 	//#define onoff_switch Switch
 
@@ -128,6 +127,7 @@ namespace stxxl
 			#endif
 		};
 	};
-}
+
+__STXXL_END_NAMESPACE
 
 #endif

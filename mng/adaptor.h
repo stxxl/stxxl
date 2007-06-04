@@ -14,9 +14,9 @@
 
 #include "../common/utils.h"
 
-namespace stxxl
-{
-  
+
+__STXXL_BEGIN_NAMESPACE
+
   //! \addtogroup mnglayer
   //!
   //! \{
@@ -309,6 +309,7 @@ inline two_to_one_dim_array_adaptor_base<_blk_sz,_run_type,__pos_type> operator 
 	};
 
   //! \}
-};
+
+__STXXL_END_NAMESPACE
 
 #endif

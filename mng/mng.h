@@ -8,8 +8,6 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "../common/utils.h"
-
 #include "../io/io.h"
 #include "../common/rand.h"
 #include "../common/aligned_alloc.h"

@@ -10,7 +10,6 @@
  ****************************************************************************/
 #include <vector>
 #include <queue>
-#include "../common/utils.h"
 #include "../common/switch.h"
 #include "../io/iobase.h"
 

@@ -138,6 +138,7 @@ COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h    ../common/perm.h 
 ../common/utils.h ../common/gprof.h ../common/rwlock.h  ../common/simple_vector.h  \
 ../common/switch.h  ../common/tmeta.h ../make.settings
 COMMON_FILES	+= ../common/log.h ../common/exceptions.h ../common/debug.h ../common/tuple.h
+COMMON_FILES	+= ../common/namespace.h
 
 IO_LAYER_FILES = ../io/completion_handler.h  ../io/io.h  ../io/iobase.h  \
  ../io/iostats.h  ../io/mmap_file.h  ../io/simdisk_file.h  ../io/syscall_file.h  \

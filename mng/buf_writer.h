@@ -10,7 +10,6 @@
  ****************************************************************************/
 #include <vector>
 #include "mng.h"
-#include "../common/utils.h"
 
 __STXXL_BEGIN_NAMESPACE
 
