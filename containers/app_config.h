@@ -37,9 +37,9 @@ extern int random_seed;
 // <><><> Choose default BTE COLLECTION  <><><> //
 // <><><><><><><><><><><><><><><><><><><><><><> //
 
-#if (!defined(BTE_COLLECTION_IMP_MMAP) && !defined(BTE_COLLECTION_IMP_UFS) && !defined(BTE_COLLECTION_IMP_USER_DEFINED))
+#if (!defined (BTE_COLLECTION_IMP_MMAP) && !defined (BTE_COLLECTION_IMP_UFS) && !defined (BTE_COLLECTION_IMP_USER_DEFINED))
 // Define only one (default is BTE_COLLECTION_IMP_MMAP)
-#define BTE_COLLECTION_IMP_MMAP
+ #define BTE_COLLECTION_IMP_MMAP
 //#define BTE_COLLECTION_IMP_UFS
 //#define BTE_COLLECTION_IMP_USER_DEFINED
 #endif
@@ -64,8 +64,8 @@ extern int random_seed;
 //  0    (synchronous writes)
 //  1    (asynchronous writes using MS_ASYNC - see msync(2))
 //  2    (asynchronous bulk writes) [default]
-#ifndef BTE_COLLECTION_MMAP_LAZY_WRITE 
-#define BTE_COLLECTION_MMAP_LAZY_WRITE 2
+#ifndef BTE_COLLECTION_MMAP_LAZY_WRITE
+ #define BTE_COLLECTION_MMAP_LAZY_WRITE 2
 #endif
 
 // <><><><><><><><><><><><><><><><><><><><><><><><> //
@@ -80,15 +80,15 @@ extern int random_seed;
 
 #ifdef BTE_STREAM_IMP_MMAP
 // Define logical blocksize factor (default is 32)
-#ifndef BTE_STREAM_MMAP_BLOCK_FACTOR
-#ifdef _WIN32
-#define BTE_STREAM_MMAP_BLOCK_FACTOR 4
-#else
-#define BTE_STREAM_MMAP_BLOCK_FACTOR 512 
-#endif
-#endif
+ #ifndef BTE_STREAM_MMAP_BLOCK_FACTOR
+  #ifdef _WIN32
+   #define BTE_STREAM_MMAP_BLOCK_FACTOR 4
+  #else
+   #define BTE_STREAM_MMAP_BLOCK_FACTOR 512
+  #endif
+ #endif
 
- // Enable/disable TPIE read ahead; default is enabled (set to 1)
+// Enable/disable TPIE read ahead; default is enabled (set to 1)
 //#define BTE_STREAM_MMAP_READ_AHEAD 1
 
 // read ahead method, ignored unless BTE_STREAM_MMAP_READ_AHEAD is set
@@ -105,21 +105,21 @@ extern int random_seed;
 // <><><><><><><><><><><><><><><><><><><><><><><><> //
 
 #ifdef BTE_STREAM_IMP_UFS
- // Define logical blocksize factor (default is 32)
-#ifndef BTE_STREAM_UFS_BLOCK_FACTOR
-#ifdef _WIN32
-#define BTE_STREAM_UFS_BLOCK_FACTOR 4
-#else
-#define BTE_STREAM_UFS_BLOCK_FACTOR 512 
-#endif
-#endif
+// Define logical blocksize factor (default is 32)
+ #ifndef BTE_STREAM_UFS_BLOCK_FACTOR
+  #ifdef _WIN32
+   #define BTE_STREAM_UFS_BLOCK_FACTOR 4
+  #else
+   #define BTE_STREAM_UFS_BLOCK_FACTOR 512
+  #endif
+ #endif
 
- // Enable/disable TPIE read ahead; default is disabled (set to 0)
-#define BTE_STREAM_UFS_READ_AHEAD 0
+// Enable/disable TPIE read ahead; default is disabled (set to 0)
+ #define BTE_STREAM_UFS_READ_AHEAD 0
 // read ahead method, ignored unless BTE_STREAM_UFS_READ_AHEAD is set
 // to 1; if USE_LIBAIO is set to 1, use asynchronous IO read ahead;
 // otherwise no TPIE read ahead is done; default is disabled (set to 0)
-#define USE_LIBAIO 0
+ #define USE_LIBAIO 0
 #endif
 
 
@@ -132,14 +132,14 @@ extern int random_seed;
 
 // Use logs if requested.
 #if TP_LOG_APPS
-#define TPL_LOGGING 1
+ #define TPL_LOGGING 1
 #endif
 
 #include <tpie_log.h>
 
 // Enable assertions if requested.
 #if TP_ASSERT_APPS
-#define DEBUG_ASSERTIONS 1
+ #define DEBUG_ASSERTIONS 1
 #endif
 
 #include <tpie_assert.h>

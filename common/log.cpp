@@ -1,6 +1,6 @@
 #include "log.h"
 
-__STXXL_BEGIN_NAMESPACE 
+__STXXL_BEGIN_NAMESPACE
 
 logger * logger::instance = NULL;
 

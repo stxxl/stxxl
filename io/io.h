@@ -18,7 +18,7 @@
 #include "iostats.h"
 
 #ifdef BOOST_MSVC
-#pragma comment (lib, "libstxxl.lib")
+ #pragma comment (lib, "libstxxl.lib")
 #endif
 
 //! \brief \c \<stxxl\> library namespace

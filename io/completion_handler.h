@@ -1,4 +1,4 @@
- /***************************************************************************
+/***************************************************************************
  *            completion_handler.h
  *
  *  Mon Apr 21 02:45:45 2003
@@ -19,9 +19,9 @@ class request;
 class completion_handler_impl
 {
 public:
-  virtual void operator()(request * ) = 0;
-  virtual completion_handler_impl * clone() const = 0;
-  virtual ~completion_handler_impl() {}
+    virtual void operator() (request * ) = 0;
+    virtual completion_handler_impl * clone() const = 0;
+    virtual ~completion_handler_impl() { }
 };
 
 //! \brief Completion handler class (Loki-style)
@@ -37,48 +37,47 @@ public:
 class completion_handler
 {
 public:
-  completion_handler():sp_impl_(0) {}
-  completion_handler(const completion_handler & obj):sp_impl_(obj.sp_impl_.get()->clone()){}
-  completion_handler& operator = (const completion_handler & obj)
-  {
-    completion_handler copy(obj);
-    completion_handler_impl* p = sp_impl_.release();
-    sp_impl_.reset(copy.sp_impl_.release());
-    copy.sp_impl_.reset(p);
-    return *this; 
-  }
-  void operator()(request * req)
-  {
-    (*sp_impl_)(req);
-  }
-  template <typename handler_type>
-  completion_handler(const handler_type & handler__);
+    completion_handler() : sp_impl_(0) { }
+    completion_handler(const completion_handler & obj) : sp_impl_(obj.sp_impl_.get()->clone()) { }
+    completion_handler & operator = (const completion_handler & obj)
+    {
+        completion_handler copy(obj);
+        completion_handler_impl * p = sp_impl_.release();
+        sp_impl_.reset(copy.sp_impl_.release());
+        copy.sp_impl_.reset(p);
+        return *this;
+    }
+    void operator() (request * req)
+    {
+        (*sp_impl_)(req);
+    }
+    template <typename handler_type>
+    completion_handler(const handler_type & handler__);
 private:
-  std::auto_ptr<completion_handler_impl> sp_impl_;
+    std::auto_ptr<completion_handler_impl> sp_impl_;
 };
 
 template <typename handler_type>
-class completion_handler1: public completion_handler_impl
+class completion_handler1 : public completion_handler_impl
 {
 private:
-  handler_type handler_;
+    handler_type handler_;
 public:
-  completion_handler1(const handler_type & handler__): handler_(handler__) {}
-  completion_handler1* clone() const
-  {
-    return new completion_handler1(*this);
-  }
-  void operator()(request * req)
-  {
-    handler_(req);
-  }
+    completion_handler1(const handler_type & handler__) : handler_(handler__) { }
+    completion_handler1 * clone() const
+    {
+        return new completion_handler1(*this);
+    }
+    void operator() (request * req)
+    {
+        handler_(req);
+    }
 };
 
 template <typename handler_type>
-completion_handler::completion_handler(const handler_type & handler__): 
-  sp_impl_(new completion_handler1<handler_type>(handler__))
-{
-}
+completion_handler::completion_handler(const handler_type & handler__) :
+    sp_impl_(new completion_handler1<handler_type>(handler__))
+{ }
 
 __STXXL_END_NAMESPACE
 

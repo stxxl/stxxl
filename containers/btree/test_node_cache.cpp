@@ -8,15 +8,15 @@
 
 #include "btree.h"
 
-typedef stxxl::btree::btree<int,double,std::less<int>,4096,4096,stxxl::SR> btree_type;
+typedef stxxl::btree::btree < int, double, std::less<int>, 4096, 4096, stxxl::SR > btree_type;
 
 int main()
 {
-	btree_type BTree1;
-	typedef btree_type::node_cache_type node_cache_type;
-	node_cache_type NodeCache(1024*1024*50,&BTree1,btree_type::key_compare());
-	
+    btree_type BTree1;
+    typedef btree_type::node_cache_type node_cache_type;
+    node_cache_type NodeCache(1024 * 1024 * 50, &BTree1, btree_type::key_compare());
 
-	
-	return 0;
+
+
+    return 0;
 }

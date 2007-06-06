@@ -12,7 +12,7 @@
 #include "containers/stack.h"
 #include "containers/priority_queue.h"
 
-#include "containers/map.h" 
+#include "containers/map.h"
 
 #include "containers/queue.h"
 

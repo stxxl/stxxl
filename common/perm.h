@@ -41,21 +41,21 @@ typedef int Element;
 
 ///////////// Knuths algorithm ////////////////////////////////////////////
 /*
-void
-knuthPerm (register Element * input, int n)
-{
-	register double nDouble = (double) n;
-	register Element temp;
-	register Element *beyond = input + n - 1;
-	register Element *other;
+   void
+   knuthPerm (register Element * input, int n)
+   {
+        register double nDouble = (double) n;
+        register Element temp;
+        register Element *beyond = input + n - 1;
+        register Element *other;
 
-	for (; input < beyond; input++, nDouble--)
-	{
-		other = input + rand0K (nDouble);
-		temp = *input;
-		*input = *other;
-		*other = temp;
-	}
-}
-*/
+        for (; input < beyond; input++, nDouble--)
+        {
+                other = input + rand0K (nDouble);
+                temp = *input;
+ *input = *other;
+ *other = temp;
+        }
+   }
+ */
 #endif

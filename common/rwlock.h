@@ -12,39 +12,39 @@
 
 #if 0 // not used
 
-#include "namespace.h"
+ #include "namespace.h"
 
-#include <pthread.h>
+ #include <pthread.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-	class RWLock
-	{
-		pthread_rwlock_t rwlock;
-	      public:
+class RWLock
+{
+    pthread_rwlock_t rwlock;
+public:
 
-		  RWLock ()
-		{
-			stxxl_nassert (pthread_rwlock_init (&rwlock, NULL));
-		};
-		 ~RWLock ()
-		{
-			stxxl_nassert (pthread_rwlock_destroy (&rwlock));
-		};
-		void rdlock ()
-		{
-			stxxl_nassert (pthread_rwlock_rdlock (&rwlock));
-		};
-		void wrlock ()
-		{
-			stxxl_nassert (pthread_rwlock_rdlock (&wrlock));
-		};
-		void unlock ()
-		{
-			stxxl_nassert (pthread_rwlock_unlock (&mutex));
-		};
-	};
+    RWLock ()
+    {
+        stxxl_nassert (pthread_rwlock_init (&rwlock, NULL));
+    };
+    ~RWLock ()
+    {
+        stxxl_nassert (pthread_rwlock_destroy (&rwlock));
+    };
+    void rdlock ()
+    {
+        stxxl_nassert (pthread_rwlock_rdlock (&rwlock));
+    };
+    void wrlock ()
+    {
+        stxxl_nassert (pthread_rwlock_rdlock (&wrlock));
+    };
+    void unlock ()
+    {
+        stxxl_nassert (pthread_rwlock_unlock (&mutex));
+    };
+};
 
 __STXXL_END_NAMESPACE
 
