@@ -186,7 +186,7 @@ public:
     //! \brief Returns size of the file
     //! \return file size in bytes
     virtual stxxl::int64 size () = 0;
-    //! \brief depricated, use \c stxxl::file::get_id() instead
+    //! \brief deprecated, use \c stxxl::file::get_id() instead
     int get_disk_number ()
     {
         return id;

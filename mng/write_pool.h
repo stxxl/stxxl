@@ -146,7 +146,7 @@ public:
         return p;
     }
 
-    // depricated name for the steal()
+    // deprecated name for the steal()
     block_type * get()
     {
         return steal();

@@ -12,7 +12,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#error Header perm.h is depricated
+#error Header perm.h is deprecated
 
 #define register
 

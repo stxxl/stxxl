@@ -18,7 +18,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-/* depricated
+/* deprecated
    template < unsigned blk_sz,class Y,class X >
    struct bid_iterator_traits<
     __gnu_cxx::__normal_iterator<  sort_local::trigger_entry<BID<blk_sz>,Y> * ,  X> >

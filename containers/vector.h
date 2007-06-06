@@ -448,7 +448,7 @@ template <
           typename PgTp_ = lru_pager<8>,
           unsigned BlkSize_ = STXXL_DEFAULT_BLOCK_SIZE (Tp_),
           typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
-          typename SzTp_ = stxxl::uint64 // will be depricated soon
+          typename SzTp_ = stxxl::uint64 // will be deprecated soon
 >
 class vector
 {
