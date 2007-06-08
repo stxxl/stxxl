@@ -75,6 +75,8 @@ STXXL_SPECIFIC	+= \
 
 STXXL_LDLIBS	+= -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME) -lpthread
 
+STXXL_LIBDEPS	+= $(strip $(STXXL_ROOT))/lib/lib$(LIBNAME).$(LIBEXT)
+
 ##################################################################
 
 

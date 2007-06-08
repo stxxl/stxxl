@@ -39,6 +39,7 @@ $(LIBNAME).mk: build-lib
 	echo 'STXXL_LDLIBS	 = $(stxxl_mk_ldlibs)'	>> $@
 	echo 'STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)'	>> $@
 	echo 'STXXL_LDLIBS_STXXL	 = $(STXXL_LDLIBS)'	>> $@
+	echo 'STXXL_LIBDEPS		 = $(STXXL_LIBDEPS)'	>> $@
 	echo 'STXXL_CPPFLAGS_MCSTL	 = $(MCSTL_CPPFLAGS)'	>> $@
 	echo 'STXXL_LDLIBS_MCSTL	 = $(MCSTL_LDFLAGS)'	>> $@
 	echo 'STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)'	>> $@
