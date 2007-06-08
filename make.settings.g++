@@ -133,7 +133,7 @@ BOOST_COMPILER_OPTIONS =  \
 
 #### DEPENDENCIES ################################################
 
-COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h    ../common/perm.h  \
+COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h \
 ../common/rand.h    ../common/semaphore.h      ../common/state.h   ../common/timer.h \
 ../common/utils.h ../common/gprof.h ../common/rwlock.h  ../common/simple_vector.h  \
 ../common/switch.h  ../common/tmeta.h ../make.settings
