@@ -1,0 +1,4 @@
+#include "stxxl/algo/sort.h"
+#include "stxxl/algo/ksort.h"
+#include "stxxl/algo/scan.h"
+#include "stxxl/algo/random_shuffle.h"
