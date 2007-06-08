@@ -8,11 +8,13 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
 #include <vector>
-#include "mng.h"
+
+#include "stxxl/mng/mng.h"
+
 
 __STXXL_BEGIN_NAMESPACE
-
 
 //! \weakgroup schedlayer Block scheduling sublayer
 //! \ingroup mnglayer

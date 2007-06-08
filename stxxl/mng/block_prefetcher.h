@@ -8,10 +8,13 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
 #include <vector>
 #include <queue>
-#include "../common/switch.h"
-#include "../io/iobase.h"
+
+#include "stxxl/common/switch.h"
+#include "stxxl/io/iobase.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

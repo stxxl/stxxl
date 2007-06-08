@@ -1,5 +1,6 @@
 #ifndef STABLE_KSORT_HEADER
 #define STABLE_KSORT_HEADER
+
 /***************************************************************************
  *            stable_ksort.h
  *
@@ -8,16 +9,18 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
 
+
 #include <math.h>
-#include "../mng/mng.h"
-#include "../mng/buf_istream.h"
-#include "../mng/buf_ostream.h"
-#include "../common/simple_vector.h"
-#include "intksort.h"
+
+#include "stxxl/mng/mng.h"
+#include "stxxl/mng/buf_istream.h"
+#include "stxxl/mng/buf_ostream.h"
+#include "stxxl/common/simple_vector.h"
+#include "stxxl/algo/intksort.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

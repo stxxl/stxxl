@@ -1,7 +1,6 @@
 #ifndef STXXL_RAND_HEADER
 #define STXXL_RAND_HEADER
 
-
 /***************************************************************************
  *            rand.h
  *
@@ -9,13 +8,16 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
 #include <time.h>
 #include <stdlib.h>
-#include "utils.h"
+
+#include "stxxl/common/utils.h"
 
 #ifdef STXXL_BOOST_RANDOM
- #include "boost/random.hpp"
+ #include <boost/random.hpp>
 #endif
+
 
 __STXXL_BEGIN_NAMESPACE
 

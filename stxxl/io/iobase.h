@@ -1,5 +1,6 @@
 #ifndef IOBASE_HEADER
 #define IOBASE_HEADER
+
 /***************************************************************************
  *            iobase.h
  *
@@ -8,9 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-
 #define STXXL_IO_STATS
-
 
 #if defined (__linux__)
  #define STXXL_CHECK_BLOCK_ALIGNING
@@ -22,12 +21,10 @@
 //# endif
 //#endif
 
-
 //#ifdef __sun__
 //#define O_DIRECT 0
 //#endif
 
-#include "../common/namespace.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -95,16 +92,16 @@
 #endif
 
 
+#include "stxxl/common/namespace.h"
+#include "stxxl/io/iostats.h"
+#include "stxxl/common/semaphore.h"
+#include "stxxl/common/mutex.h"
+//#include "stxxl/common/rwlock.h"
+#include "stxxl/common/switch.h"
+#include "stxxl/common/state.h"
+#include "stxxl/common/exceptions.h"
+#include "stxxl/io/completion_handler.h"
 
-#include "iostats.h"
-
-#include "../common/semaphore.h"
-#include "../common/mutex.h"
-//#include "../common/rwlock.h"
-#include "../common/switch.h"
-#include "../common/state.h"
-#include "../common/exceptions.h"
-#include "completion_handler.h"
 
 __STXXL_BEGIN_NAMESPACE
 

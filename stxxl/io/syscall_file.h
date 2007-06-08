@@ -1,5 +1,6 @@
 #ifndef SYSCALL_HEADER
 #define SYSCALL_HEADER
+
 /***************************************************************************
  *            syscall_file.h
  *
@@ -8,9 +9,9 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#include "stxxl/io/ufs_file.h"
+#include "stxxl/common/debug.h"
 
-#include "ufs_file.h"
-#include "../common/debug.h"
 
 __STXXL_BEGIN_NAMESPACE
 

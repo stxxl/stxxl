@@ -1,5 +1,6 @@
 #ifndef STXXL_META_TEMPLATE_PROGRAMMING
 #define STXXL_META_TEMPLATE_PROGRAMMING
+
 /***************************************************************************
  *            tmeta.h
  *  Template Metaprogramming Tools
@@ -8,7 +9,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/namespace.h"
+
+#include "stxxl/common/namespace.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -9,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "iobase.h"
+#include "stxxl/io/iobase.h"
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -9,13 +9,15 @@
 #ifndef STXXL_CONTAINERS_BTREE__BTREE_H
 #define STXXL_CONTAINERS_BTREE__BTREE_H
 
-#include "iterator.h"
-#include "iterator_map.h"
-#include "leaf.h"
-#include "node_cache.h"
-#include "root_node.h"
-#include "node.h"
-#include "../../containers/vector.h"
+#include "stxxl/common/namespace.h"
+#include "stxxl/containers/btree/iterator.h"
+#include "stxxl/containers/btree/iterator_map.h"
+#include "stxxl/containers/btree/leaf.h"
+#include "stxxl/containers/btree/node_cache.h"
+#include "stxxl/containers/btree/root_node.h"
+#include "stxxl/containers/btree/node.h"
+#include "stxxl/containers/vector.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

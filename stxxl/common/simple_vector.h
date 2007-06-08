@@ -1,7 +1,8 @@
 #ifndef SIMPLE_VECTOR_HEADER
 #define SIMPLE_VECTOR_HEADER
 
-#include "../common/utils.h"
+#include "stxxl/common/utils.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

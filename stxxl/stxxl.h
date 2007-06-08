@@ -1,28 +1,28 @@
 #ifndef STXXL_MAIN_HEADER
 #define STXXL_MAIN_HEADER
 
-#include "common/utils.h"
+#include "stxxl/common/utils.h"
 
-#include "algo/sort.h"
-#include "algo/ksort.h"
-#include "algo/scan.h"
-#include "algo/random_shuffle.h"
+#include "stxxl/algo/sort.h"
+#include "stxxl/algo/ksort.h"
+#include "stxxl/algo/scan.h"
+#include "stxxl/algo/random_shuffle.h"
 
-#include "containers/vector.h"
-#include "containers/stack.h"
-#include "containers/priority_queue.h"
+#include "stxxl/containers/vector.h"
+#include "stxxl/containers/stack.h"
+#include "stxxl/containers/priority_queue.h"
 
-#include "containers/map.h"
+#include "stxxl/containers/map.h"
 
-#include "containers/queue.h"
+#include "stxxl/containers/queue.h"
 
-#include "containers/deque.h"
+#include "stxxl/containers/deque.h"
 
-#include "stream/stream.h"
-#include "stream/sort_stream.h"
+#include "stxxl/stream/stream.h"
+#include "stxxl/stream/sort_stream.h"
 
-#include "common/debug.h"
+#include "stxxl/common/debug.h"
 
-#include "common/timer.h"
+#include "stxxl/common/timer.h"
 
 #endif // STXXL_MAIN_HEADER

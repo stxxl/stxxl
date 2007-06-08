@@ -13,7 +13,6 @@
  #include <boost/config.hpp>
 #endif
 
-
 #include <iostream>
 #include <algorithm>
 #include <assert.h>
@@ -21,7 +20,6 @@
 #include <errno.h>
 #include <string.h>
 #include <sstream>
-
 
 #ifdef BOOST_MSVC
 #else
@@ -42,12 +40,12 @@
 #endif
 
 #ifdef STXXL_BOOST_FILESYSTEM
- #include "boost/filesystem/operations.hpp"
+ #include <boost/filesystem/operations.hpp>
 #endif
 
-#include "namespace.h"
-#include "log.h"
-#include "exceptions.h"
+#include "stxxl/common/namespace.h"
+#include "stxxl/common/log.h"
+#include "stxxl/common/exceptions.h"
 
 
 __STXXL_BEGIN_NAMESPACE

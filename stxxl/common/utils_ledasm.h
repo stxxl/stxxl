@@ -13,7 +13,6 @@
  #include <boost/config.hpp>
 #endif
 
-
 #include <iostream>
 #include <algorithm>
 #include <assert.h>
@@ -38,12 +37,12 @@
 #endif
 
 #ifdef STXXL_BOOST_FILESYSTEM
- #include "boost/filesystem/operations.hpp"
+ #include <boost/filesystem/operations.hpp>
 #endif
 
-#include "namespace.h"
+#include "stxxl/common/namespace.h"
+#include "stxxl/common/log.h"
 
-#include "log.h"
 
 __STXXL_BEGIN_NAMESPACE
 

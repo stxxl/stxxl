@@ -1,5 +1,6 @@
 #ifndef MNG_HEADER
 #define MNG_HEADER
+
 /***************************************************************************
  *            mng.h
  *
@@ -8,10 +9,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "../io/io.h"
-#include "../common/rand.h"
-#include "../common/aligned_alloc.h"
-#include "../common/debug.h"
+#include "stxxl/io/io.h"
+#include "stxxl/common/rand.h"
+#include "stxxl/common/aligned_alloc.h"
+#include "stxxl/common/debug.h"
 
 #include <memory>
 #include <iostream>
@@ -26,6 +27,7 @@
 #ifdef BOOST_MSVC
 #include <memory.h>
 #endif
+
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -1,5 +1,6 @@
 #ifndef WRITE_POOL_HEADER
 #define WRITE_POOL_HEADER
+
 /***************************************************************************
  *            write_pool.h
  *
@@ -7,7 +8,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../mng/mng.h"
+
+#include "stxxl/mng/mng.h"
+
 #include <list>
 
 #ifdef BOOST_MSVC
@@ -15,6 +18,7 @@
 #else
  #include <ext/hash_map>
 #endif
+
 
 __STXXL_BEGIN_NAMESPACE
 

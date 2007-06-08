@@ -9,11 +9,12 @@
  *
  ****************************************************************************/
 
-#include "iobase.h"
-
 #ifdef STXXL_BOOST_CONFIG // if boost is available
 
+ #include <stxxl/io/iobase.h>
+
  #include <boost/iostreams/device/file_descriptor.hpp>
+
 
 __STXXL_BEGIN_NAMESPACE
 

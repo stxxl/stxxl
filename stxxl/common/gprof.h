@@ -9,8 +9,9 @@
  * stolen from http://sam.zoy.org/doc/programming/gprof.html
  */
 
- #include <pthread.h>
- #include <sys/time.h>
+#include <pthread.h>
+#include <sys/time.h>
+
 
 typedef struct wrapper_s
 {

@@ -1,5 +1,6 @@
 #ifndef INTERLEAVED_ALLOC_HEADER
 #define INTERLEAVED_ALLOC_HEADER
+
 /***************************************************************************
  *            interleaved_alloc.h
  *
@@ -7,8 +8,10 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../mng/mng.h"
-#include "../common/rand.h"
+ 
+#include "stxxl/mng/mng.h"
+#include "stxxl/common/rand.h"
+
 #include <vector>
 
 

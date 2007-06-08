@@ -9,9 +9,10 @@
 #ifndef STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 #define STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 
-#include "iterator.h"
+#include "stxxl/containers/btree/iterator.h"
 
 #include <map>
+
 
 __STXXL_BEGIN_NAMESPACE
 

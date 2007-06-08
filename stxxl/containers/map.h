@@ -8,8 +8,8 @@
  *  Email
  ****************************************************************************/
 
+#include "stxxl/containers/btree/btree.h"
 
-#include "btree/btree.h"
 
 __STXXL_BEGIN_NAMESPACE
 

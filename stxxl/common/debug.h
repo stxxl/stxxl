@@ -9,8 +9,8 @@
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
 
-#include "../common/namespace.h"
-#include "../common/mutex.h"
+#include "stxxl/common/namespace.h"
+#include "stxxl/common/mutex.h"
 #include <map>
 
 #ifdef BOOST_MSVC
@@ -18,6 +18,7 @@
 #else
  #include <ext/hash_map>
 #endif
+
 
 __STXXL_BEGIN_NAMESPACE
 

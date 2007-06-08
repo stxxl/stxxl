@@ -9,13 +9,14 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "iobase.h"
-#include "syscall_file.h"
-#include "mmap_file.h"
-#include "simdisk_file.h"
-#include "wincall_file.h"
-#include "boostfd_file.h"
-#include "iostats.h"
+#include "stxxl/io/iobase.h"
+#include "stxxl/io/syscall_file.h"
+#include "stxxl/io/mmap_file.h"
+#include "stxxl/io/simdisk_file.h"
+#include "stxxl/io/wincall_file.h"
+#include "stxxl/io/boostfd_file.h"
+#include "stxxl/io/iostats.h"
+
 
 #ifdef BOOST_MSVC
  #pragma comment (lib, "libstxxl.lib")

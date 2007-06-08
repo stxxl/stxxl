@@ -16,7 +16,7 @@
  #include <pthread.h>
 #endif
 
-#include "utils.h"
+#include "stxxl/common/utils.h"
 
 
 __STXXL_BEGIN_NAMESPACE

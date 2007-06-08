@@ -9,9 +9,6 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-
-#include "utils.h"
-
 #ifdef STXXL_BOOST_THREADS
 
 // stxxl::mutex is not needed since boost:mutex exists
@@ -19,7 +16,10 @@
 
 #else
 
+ #include "stxxl/common/utils.h"
+
  #include <pthread.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

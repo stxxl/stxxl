@@ -9,11 +9,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#include "stxxl/mng/buf_writer.h"
 
-#include "../mng/buf_writer.h"
 
 __STXXL_BEGIN_NAMESPACE
-
 
 //! \addtogroup schedlayer
 //! \{

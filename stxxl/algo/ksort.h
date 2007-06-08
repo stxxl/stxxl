@@ -11,20 +11,21 @@
 
 #include <list>
 
-#include "../mng/mng.h"
-#include "../common/rand.h"
-#include "../mng/adaptor.h"
-#include "../common/simple_vector.h"
-#include "../common/switch.h"
-#include "interleaved_alloc.h"
-#include "intksort.h"
-#include "adaptor.h"
-#include "async_schedule.h"
-#include "../mng/block_prefetcher.h"
-#include "../mng/buf_writer.h"
-#include "run_cursor.h"
-#include "losertree.h"
-#include "inmemsort.h"
+#include "stxxl/mng/mng.h"
+#include "stxxl/common/rand.h"
+#include "stxxl/mng/adaptor.h"
+#include "stxxl/common/simple_vector.h"
+#include "stxxl/common/switch.h"
+#include "stxxl/algo/interleaved_alloc.h"
+#include "stxxl/algo/intksort.h"
+#include "stxxl/algo/adaptor.h"
+#include "stxxl/algo/async_schedule.h"
+#include "stxxl/mng/block_prefetcher.h"
+#include "stxxl/mng/buf_writer.h"
+#include "stxxl/algo/run_cursor.h"
+#include "stxxl/algo/losertree.h"
+#include "stxxl/algo/inmemsort.h"
+
 
 //#define SORT_OPT_PREFETCHING
 //#define INTERLEAVED_ALLOC
@@ -331,7 +332,6 @@ public:
     }
 };
 
-//#include "losertree.h"
 
 template < typename block_type, typename run_type, typename key_ext_>
 bool check_ksorted_runs(              run_type * * runs,

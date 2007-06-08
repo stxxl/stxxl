@@ -3,7 +3,8 @@
 
 /* Simple timer class by Roman Dementiev
  */
-#include "../common/namespace.h"
+
+#include "stxxl/common/namespace.h"
 
 #include <time.h>
 
@@ -16,8 +17,8 @@
  #include <math.h>
 #endif
 
-__STXXL_BEGIN_NAMESPACE
 
+__STXXL_BEGIN_NAMESPACE
 
 class timer
 {

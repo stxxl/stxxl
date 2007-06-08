@@ -1,5 +1,6 @@
 #ifndef WINCALL_HEADER
 #define WINCALL_HEADER
+
 /***************************************************************************
  *            wincall_file.h
  *
@@ -8,10 +9,11 @@
  *  dementiev@ira.uka.de
  ****************************************************************************/
 
-#include "wfs_file.h"
-#include "../common/debug.h"
-
 #ifdef BOOST_MSVC
+
+#include "stxxl/io/wfs_file.h"
+#include "stxxl/common/debug.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

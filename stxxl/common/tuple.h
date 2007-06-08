@@ -1,5 +1,6 @@
 #ifndef TUPLE_HEADER
 #define TUPLE_HEADER
+
 /***************************************************************************
  *            tuple.h
  *
@@ -7,8 +8,10 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/namespace.h"
-#include "../common/tmeta.h"
+
+#include "stxxl/common/namespace.h"
+#include "stxxl/common/tmeta.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

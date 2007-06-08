@@ -8,7 +8,8 @@
  *  Copyright  2002 Peter Sanders
  *  sanders@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/utils.h"
+
+#include "stxxl/common/utils.h"
 
 __STXXL_BEGIN_NAMESPACE
 

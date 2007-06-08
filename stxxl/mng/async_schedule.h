@@ -8,10 +8,11 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../io/io.h"
+
 #include <queue>
 #include <algorithm>
 
-#include "../algo/async_schedule.h"
+#include "stxxl/io/io.h"
+#include "stxxl/algo/async_schedule.h"
 
 #endif

@@ -1,5 +1,6 @@
 #ifndef ALGO_ADAPTOR_HEADER
 #define ALGO_ADAPTOR_HEADER
+
 /***************************************************************************
  *            adaptor.h
  *
@@ -8,13 +9,12 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "../mng/mng.h"
-#include "../mng/adaptor.h"
-#include "../algo/interleaved_alloc.h"
+#include "stxxl/mng/mng.h"
+#include "stxxl/mng/adaptor.h"
+#include "stxxl/algo/interleaved_alloc.h"
 
 
 __STXXL_BEGIN_NAMESPACE
-
 
 template < unsigned _blk_sz, typename _run_type, class __pos_type = int_type >
 struct RunsToBIDArrayAdaptor : public TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz > , __pos_type >

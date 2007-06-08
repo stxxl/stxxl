@@ -1,5 +1,6 @@
 #ifndef IN_MEMORY_SORT_HEADER
 #define IN_MEMORY_SORT_HEADER
+
 /***************************************************************************
  *            inmemsort.h
  *
@@ -7,11 +8,14 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/namespace.h"
-#include "../common/simple_vector.h"
-#include "adaptor.h"
-#include "../mng/adaptor.h"
+
+#include "stxxl/common/namespace.h"
+#include "stxxl/common/simple_vector.h"
+#include "stxxl/algo/adaptor.h"
+#include "stxxl/mng/adaptor.h"
+
 #include <algorithm>
+
 
 __STXXL_BEGIN_NAMESPACE
 

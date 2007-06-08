@@ -1,5 +1,6 @@
 #ifndef STATE_HEADER
 #define STATE_HEADER
+
 /***************************************************************************
  *            state.h
  *
@@ -8,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "utils.h"
+#include "stxxl/common/utils.h"
 
 #ifdef STXXL_BOOST_THREADS
  #include <boost/thread/mutex.hpp>
@@ -16,6 +17,7 @@
 #else
  #include <pthread.h>
 #endif
+
 
 __STXXL_BEGIN_NAMESPACE
 

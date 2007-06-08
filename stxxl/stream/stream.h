@@ -1,5 +1,6 @@
 #ifndef STREAM_HEADER
 #define STREAM_HEADER
+
 /***************************************************************************
  *            stream.h
  *
@@ -7,12 +8,14 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/namespace.h"
-#include "../algo/sort.h"
-#include "../mng/buf_istream.h"
-#include "../mng/buf_ostream.h"
-#include "../common/tuple.h"
-#include "../containers/vector.h"
+
+#include "stxxl/common/namespace.h"
+#include "stxxl/algo/sort.h"
+#include "stxxl/mng/buf_istream.h"
+#include "stxxl/mng/buf_ostream.h"
+#include "stxxl/common/tuple.h"
+#include "stxxl/containers/vector.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -1810,6 +1813,6 @@ namespace stream
 
 __STXXL_END_NAMESPACE
 
-#include "sort_stream.h"
+#include "stxxl/stream/sort_stream.h"
 
 #endif

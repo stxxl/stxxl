@@ -9,10 +9,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#include "stxxl/mng/mng.h"
+#include "stxxl/common/tmeta.h"
+#include "stxxl/containers/pager.h"
 
-#include "../mng/mng.h"
-#include "../common/tmeta.h"
-#include "pager.h"
 #include <vector>
 
 

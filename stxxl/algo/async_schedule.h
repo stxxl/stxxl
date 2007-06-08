@@ -8,10 +8,11 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../io/io.h"
+
+#include "stxxl/io/io.h"
+
 #include <queue>
 #include <algorithm>
-
 
 #ifdef BOOST_MSVC
  #include <hash_map>
@@ -21,7 +22,6 @@
  #include <ext/hash_set>
 #endif
 
-#include <algorithm>
 
 __STXXL_BEGIN_NAMESPACE
 

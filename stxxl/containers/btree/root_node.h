@@ -9,7 +9,8 @@
 #ifndef STXXL_CONTAINERS_BTREE__ROOT_NODE_H
 #define STXXL_CONTAINERS_BTREE__ROOT_NODE_H
 
-#include "../../common/namespace.h"
+#include "stxxl/common/namespace.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

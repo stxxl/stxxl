@@ -8,9 +8,11 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/namespace.h"
-#include "../mng/buf_istream.h"
-#include "../mng/buf_ostream.h"
+
+#include "stxxl/common/namespace.h"
+#include "stxxl/mng/buf_istream.h"
+#include "stxxl/mng/buf_ostream.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

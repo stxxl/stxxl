@@ -9,8 +9,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#include "stxxl/io/ufs_file.h"
 
-#include "ufs_file.h"
 #include <math.h>
 
 #ifdef BOOST_MSVC

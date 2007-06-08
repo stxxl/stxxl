@@ -1,3 +1,6 @@
+#ifndef STXXL_QUEUE_HEADER
+#define STXXL_QUEUE_HEADER
+
 /***************************************************************************
  *            queue.h
  *
@@ -5,17 +8,17 @@
  *  Copyright  2005  Roman Dementiev
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
-#ifndef STXXL_QUEUE_HEADER
-#define  STXXL_QUEUE_HEADER
 
-#include "../mng/mng.h"
-#include "../common/simple_vector.h"
-#include "../common/tmeta.h"
-#include "../mng/write_pool.h"
-#include "../mng/prefetch_pool.h"
+#include "stxxl/mng/mng.h"
+#include "stxxl/common/simple_vector.h"
+#include "stxxl/common/tmeta.h"
+#include "stxxl/mng/write_pool.h"
+#include "stxxl/mng/prefetch_pool.h"
+
 #include <vector>
 #include <queue>
 #include <deque>
+
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -1,5 +1,6 @@
 #ifndef PREFETCH_POOL_HEADER
 #define PREFETCH_POOL_HEADER
+
 /***************************************************************************
  *            prefetch_pool.h
  *
@@ -7,8 +8,10 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../mng/mng.h"
-#include "write_pool.h"
+
+#include "stxxl/mng/mng.h"
+#include "stxxl/mng/write_pool.h"
+
 #include <list>
 
 #ifdef BOOST_MSVC

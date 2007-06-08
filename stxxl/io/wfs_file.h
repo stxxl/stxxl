@@ -9,9 +9,10 @@
  *  dementiev@ira.uka.de
  ****************************************************************************/
 
-#include "iobase.h"
-
 #ifdef BOOST_MSVC
+
+#include "stxxl/io/iobase.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

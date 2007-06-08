@@ -8,7 +8,9 @@
  *  Copyright  2002  Roman Dementiev, Peter Sanders
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../common/utils.h"
+
+#include "stxxl/common/utils.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

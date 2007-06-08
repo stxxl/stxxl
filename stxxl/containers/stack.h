@@ -9,12 +9,12 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#include "stxxl/mng/mng.h"
+#include "stxxl/common/simple_vector.h"
+#include "stxxl/common/tmeta.h"
+#include "stxxl/mng/write_pool.h"
+#include "stxxl/mng/prefetch_pool.h"
 
-#include "../mng/mng.h"
-#include "../common/simple_vector.h"
-#include "../common/tmeta.h"
-#include "../mng/write_pool.h"
-#include "../mng/prefetch_pool.h"
 #include <stack>
 #include <vector>
 

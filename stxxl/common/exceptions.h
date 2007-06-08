@@ -1,17 +1,20 @@
+#ifndef STXXL_EXCEPTIONS_H_
+#define STXXL_EXCEPTIONS_H_
+
 /***************************************************************************
- *            debug.h
+ *            exceptions.h
  *
  *  Thu Oct 26 18:16:00 2006
  *  Copyright  2006  Roman Dementiev
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
-#ifndef STXXL_EXCEPTIONS_H_
-#define STXXL_EXCEPTIONS_H_
 
 #include <iostream>
 #include <string>
 #include <stdexcept>
-#include "../common/namespace.h"
+
+#include "stxxl/common/namespace.h"
+
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -1,5 +1,6 @@
 #ifndef PRIORITY_QUEUE_HEADER
 #define PRIORITY_QUEUE_HEADER
+
 /***************************************************************************
  *            priority_queue.h
  *
@@ -7,13 +8,16 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../mng/mng.h"
-#include "../mng/prefetch_pool.h"
-#include "../mng/write_pool.h"
-#include "../common/tmeta.h"
+
+#include "stxxl/mng/mng.h"
+#include "stxxl/mng/prefetch_pool.h"
+#include "stxxl/mng/write_pool.h"
+#include "stxxl/common/tmeta.h"
+
 #include <queue>
 #include <list>
 #include <iterator>
+
 
 __STXXL_BEGIN_NAMESPACE
 

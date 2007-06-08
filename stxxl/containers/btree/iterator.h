@@ -9,8 +9,8 @@
 #ifndef STXXL_CONTAINERS_BTREE__ITERATOR_H
 #define STXXL_CONTAINERS_BTREE__ITERATOR_H
 
+#include "stxxl/common/utils.h"
 
-#include "../../common/utils.h"
 
 __STXXL_BEGIN_NAMESPACE
 

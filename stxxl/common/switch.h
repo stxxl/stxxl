@@ -9,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "utils.h"
+#include "stxxl/common/utils.h"
 
 #ifdef STXXL_BOOST_THREADS
  #include <boost/thread/mutex.hpp>

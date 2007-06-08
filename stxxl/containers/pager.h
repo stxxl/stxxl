@@ -9,13 +9,14 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "../common/namespace.h"
-#include "../common/rand.h"
-#include "../common/simple_vector.h"
+#include "stxxl/common/namespace.h"
+#include "stxxl/common/rand.h"
+#include "stxxl/common/simple_vector.h"
+
 #include <list>
 
-__STXXL_BEGIN_NAMESPACE
 
+__STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcontinternals
 //! \{

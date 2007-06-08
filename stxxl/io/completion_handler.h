@@ -1,3 +1,6 @@
+#ifndef COMPLETION_HANDLER_HEADER
+#define COMPLETION_HANDLER_HEADER
+
 /***************************************************************************
  *            completion_handler.h
  *
@@ -6,11 +9,11 @@
  *  dementiev@mpi-sb.mpg.de
  *  Loki-style completion handler (functors)
  ****************************************************************************/
-#ifndef COMPLETION_HANDLER_HEADER
-#define COMPLETION_HANDLER_HEADER
 
-#include "../common/namespace.h"
+#include "stxxl/common/namespace.h"
+
 #include <memory>
+
 
 __STXXL_BEGIN_NAMESPACE
 

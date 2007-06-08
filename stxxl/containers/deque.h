@@ -1,3 +1,6 @@
+#ifndef _STXXL_DEQUE_H
+#define _STXXL_DEQUE_H
+
 /***************************************************************************
  *            deque.h
  *
@@ -6,14 +9,10 @@
  *  Email
  ****************************************************************************/
 
-#ifndef _STXXL_DEQUE_H
-#define _STXXL_DEQUE_H
+#include "stxxl/containers/vector.h"
 
-#include "vector.h"
 
 __STXXL_BEGIN_NAMESPACE
-
-
 
 template <class T, class VectorType>
 class deque;
