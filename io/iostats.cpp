@@ -1,7 +1,5 @@
-#ifndef STXXL_IOSTATS_H
-#define STXXL_IOSTATS_H
 
-#include "iostats.h"
+#include "stxxl/io/iostats.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -340,6 +338,4 @@ std::ostream & operator << (std::ostream & o, const stats & s)
 
 
 __STXXL_END_NAMESPACE
-
-#endif
 

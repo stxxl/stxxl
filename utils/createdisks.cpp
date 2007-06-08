@@ -7,15 +7,16 @@
  ****************************************************************************/
 
 
-#include "../io/io.h"
-#include "stdio.h"
+#include "stxxl/io/io.h"
+
+#include <cstdio>
 #include <vector>
 
 #ifndef BOOST_MSVC
  #include <unistd.h>
 #endif
 
-#include "../common/aligned_alloc.h"
+#include "stxxl/common/aligned_alloc.h"
 
 using namespace stxxl;
 #ifdef BLOCK_ALIGN

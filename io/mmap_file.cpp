@@ -1,5 +1,5 @@
 
-#include "mmap_file.h"
+#include "stxxl/io/mmap_file.h"
 
 #ifdef BOOST_MSVC
 // mmap call does not exist in Windows
@@ -201,5 +201,4 @@ request_ptr mmap_file::awrite (
 __STXXL_END_NAMESPACE
 
 #endif
-
 

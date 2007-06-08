@@ -1,4 +1,4 @@
-#include "mng.h"
+#include "stxxl/mng/mng.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -151,6 +151,5 @@ block_manager::~block_manager()
     delete[] disk_files;
 }
 
-
-
 __STXXL_END_NAMESPACE
+

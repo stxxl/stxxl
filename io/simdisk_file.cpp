@@ -1,4 +1,4 @@
-#include "simdisk_file.h"
+#include "stxxl/io/simdisk_file.h"
 
 #ifdef BOOST_MSVC
 // mmap call does not exist in Windows
