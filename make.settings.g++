@@ -176,6 +176,23 @@ RM	 = rm -f	# remove file command
 LIBGEN	 = ar cr	# library generation
 OUT	 = -o		# output file option for the compiler and linker
 
+o	?= $(strip $(OBJEXT))
+bin	?= $(strip $(EXEEXT))
+
+###################################################################
+
+
+###### COMPILE/LINK RULES #########################################
+
+%.$o: %.cpp
+	@$(RM) $*.d
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $*.dT -c $< && mv $*.dT $*.d
+
+LINK_STXXL	 = $(LINKER) $1 -o $@ $(STXXL_LINKER_OPTIONS)
+
+%.$(bin): %.$o $(STXXL_LIBDEPS)
+	$(call LINK_STXXL, $<)
+
 ###################################################################
 
 
@@ -192,5 +209,7 @@ ifeq ($(strip $(USE_BOOST)),yes)
 STXXL_COMPILER_OPTIONS	+= $(BOOST_COMPILER_OPTIONS)
 STXXL_LINKER_OPTIONS	+= $(BOOST_LINKER_OPTIONS)
 endif
+
+STXXL_COMPILER_OPTIONS	+= $(CPPFLAGS)
 
 # vim: syn=make
