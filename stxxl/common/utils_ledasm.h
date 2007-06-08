@@ -87,7 +87,7 @@ __STXXL_BEGIN_NAMESPACE
 
 
 inline void
-stxxl_perror (const char * errmsg, int errcode)
+stxxl_perror (const char * /*errmsg*/, int errcode)
 {
 //	STXXL_ERRMSG(errmsg << " error code " << errcode << " : " << strerror (errcode) );
     exit (errcode);
