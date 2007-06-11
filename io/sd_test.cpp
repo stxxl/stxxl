@@ -8,9 +8,9 @@
 
 
 
-#include "io.h"
-#include "../common/rand.h"
-#include <math.h>
+#include "stxxl/io/io.h"
+#include "stxxl/common/rand.h"
+#include <cmath>
 
 using namespace stxxl;
 

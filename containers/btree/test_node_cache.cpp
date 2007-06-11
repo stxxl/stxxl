@@ -6,7 +6,7 @@
  *  Email
  ****************************************************************************/
 
-#include "btree.h"
+#include "stxxl/containers/btree/btree.h"
 
 typedef stxxl::btree::btree < int, double, std::less<int>, 4096, 4096, stxxl::SR > btree_type;
 

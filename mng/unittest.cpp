@@ -7,7 +7,7 @@
 
 
 #include <iostream>
-#include <stxxl>
+#include "stxxl/stxxl"
 
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/extensions/HelperMacros.h>

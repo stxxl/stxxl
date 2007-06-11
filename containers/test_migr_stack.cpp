@@ -7,7 +7,7 @@
  **************************************************************************/
 
 
-#include "stack.h"
+#include "stxxl/stack"
 
 //! \example containers/test_migr_stack.cpp
 //! This is an example of how to use \c stxxl::STACK_GENERATOR class

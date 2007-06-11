@@ -6,7 +6,7 @@
  *  Email
  ****************************************************************************/
 
-#include "leaf.h"
+#include "stxxl/containers/btree/leaf.h"
 
 
 using namespace stxxl::btree;

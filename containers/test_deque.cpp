@@ -7,9 +7,7 @@
  ****************************************************************************/
 
 
-#include <stxxl>
-
-#include "deque.h"
+#include "stxxl/stxxl"
 
 
 int main()

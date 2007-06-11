@@ -6,7 +6,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stack.h"
+#include "stxxl/stack"
 
 //! \example containers/test_many_stacks.cpp
 //! This is an example of how to use \c stxxl::STACK_GENERATOR class

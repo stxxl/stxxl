@@ -1,6 +1,6 @@
-#include "../mng/mng.h"
-#include "ksort.h"
-#include "../containers/vector"
+#include "stxxl/mng/mng.h"
+#include "stxxl/ksort"
+#include "stxxl/vector"
 
 using namespace stxxl;
 

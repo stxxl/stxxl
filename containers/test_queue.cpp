@@ -6,7 +6,7 @@
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
 
-#include "queue.h"
+#include "stxxl/queue"
 #include <queue>
 
 typedef unsigned my_type;

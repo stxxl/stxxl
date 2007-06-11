@@ -1,4 +1,4 @@
-#include "vector"
+#include "stxxl/vector"
 #include <iostream>
 #include <algorithm>
 

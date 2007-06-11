@@ -1,4 +1,4 @@
-#include <stxxl>
+#include "stxxl/stxxl"
 #include <iostream>
 #include <algorithm>
 

@@ -7,8 +7,8 @@
  ****************************************************************************/
 
 #include <iostream>
-#include "../mng/mng.h"
-#include "write_pool.h"
+#include "stxxl/mng/mng.h"
+#include "stxxl/mng/write_pool.h"
 
 //! \example mng/test_write_pool.cpp
 

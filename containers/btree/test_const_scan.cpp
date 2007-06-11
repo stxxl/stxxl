@@ -8,7 +8,8 @@
 
 #include <iostream>
 
-#include "btree.h"
+#include "stxxl/containers/btree/btree.h"
+#include "stxxl/common/timer.h"
 
 
 struct comp_type : public std::less<int>

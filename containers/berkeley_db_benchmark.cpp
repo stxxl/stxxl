@@ -6,7 +6,7 @@
  *  Email
  ****************************************************************************/
 
-#include <stxxl>
+#include "stxxl/stxxl"
 
 ///// BDB header ////////////
 #include <db_cxx.h>

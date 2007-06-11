@@ -7,7 +7,7 @@
  ****************************************************************************/
 
 
-#include "stream.h"
+#include "stxxl/stream/stream.h"
 
 
 //! \example stream/test_push_sort.cpp

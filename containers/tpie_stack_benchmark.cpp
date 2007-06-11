@@ -17,8 +17,8 @@
 // Utitlities for ascii output.
 #include <ami_scan_utils.h>
 
-#include "../common/utils_ledasm.h"
-#include "../common/timer.h"
+#include "stxxl/common/utils_ledasm.h"
+#include "stxxl/common/timer.h"
 
 
 #define MEM_2_RESERVE    (768 * 1024 * 1024)

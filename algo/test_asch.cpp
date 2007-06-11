@@ -1,6 +1,6 @@
-#include "async_schedule.h"
-#include "../common/rand.h"
-#include <stdlib.h>
+#include "stxxl/algo/async_schedule.h"
+#include "stxxl/common/rand.h"
+#include <cstdlib>
 
 
 int main(int argc, char * argv[])
