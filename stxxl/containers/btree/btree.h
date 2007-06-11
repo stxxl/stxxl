@@ -875,7 +875,7 @@ namespace btree
             assert(size() == old_size - 1);
         }
 
-        iterator insert(iterator pos, const value_type & x)
+        iterator insert(iterator /*pos*/, const value_type & x)
         {
             return insert(x).first;             // pos ignored in the current version
         }

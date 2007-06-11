@@ -72,13 +72,13 @@ struct iterator_traits
 
 
 template <typename _Iter>
-void _some_algorithm_with_use_of_keys(_Iter first, _Iter last)
+void _some_algorithm_with_use_of_keys(_Iter /*first*/, _Iter /*last*/)
 {
     std::cout << "Use keys" << std::endl;
 }
 
 template <typename _Iter>
-void _some_algorithm_without_use_of_keys(_Iter first, _Iter last)
+void _some_algorithm_without_use_of_keys(_Iter /*first*/, _Iter /*last*/)
 {
     std::cout << "Don't use keys" << std::endl;
 }
@@ -97,7 +97,7 @@ void some_algorithm(_Iter first, _Iter last)
 
 int main()
 {
-    with_key * f, * l;
+    with_key * f = NULL, * l = NULL;
 
     some_algorithm(f, l);
 

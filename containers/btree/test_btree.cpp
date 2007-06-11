@@ -163,7 +163,7 @@ int main(int argc, char * argv [])
     BTree1.clear();
     assert(BTree1.size() == 0);
 
-    for (int i = 0; i < nins / 2; ++i)
+    for (unsigned int i = 0; i < nins / 2; ++i)
     {
         BTree1[rnd() % nins] = 10.1;
     }
@@ -172,7 +172,7 @@ int main(int argc, char * argv [])
 
     BTree1.clear();
 
-    for (int i = 0; i < nins / 2; ++i)
+    for (unsigned int i = 0; i < nins / 2; ++i)
     {
         BTree1[rnd() % nins] = 10.1;
     }

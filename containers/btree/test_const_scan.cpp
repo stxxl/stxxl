@@ -83,11 +83,11 @@ int main(int argc, char * argv [])
     STXXL_MSG("Node cache size: " << node_cache_size << " bytes")
     STXXL_MSG("Leaf cache size: " << leaf_cache_size << " bytes")
 
-    stxxl::random_number32 rnd;
+    //stxxl::random_number32 rnd;
 
     std::vector<std::pair<int, my_type> > Data(nins);
 
-    for (int i = 0; i < nins; ++i)
+    for (unsigned int i = 0; i < nins; ++i)
     {
         Data[i].first = i;
     }
