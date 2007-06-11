@@ -135,34 +135,30 @@ BOOST_COMPILER_OPTIONS =  \
 
 #### DEPENDENCIES ################################################
 
-COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h \
-../common/rand.h    ../common/semaphore.h      ../common/state.h   ../common/timer.h \
-../common/utils.h ../common/gprof.h ../common/rwlock.h  ../common/simple_vector.h  \
-../common/switch.h  ../common/tmeta.h ../make.settings
-COMMON_FILES	+= ../common/log.h ../common/exceptions.h ../common/debug.h ../common/tuple.h
-COMMON_FILES	+= ../common/namespace.h
+HEADER_FILES_COMMON	+= aligned_alloc.h mutex.h rand.h semaphore.h state.h
+HEADER_FILES_COMMON	+= timer.h utils.h gprof.h rwlock.h simple_vector.h
+HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h debug.h tuple.h
+HEADER_FILES_COMMON	+= namespace.h utils_ledasm.h
 
-IO_LAYER_FILES = ../io/completion_handler.h  ../io/io.h  ../io/iobase.h  \
- ../io/iostats.h  ../io/mmap_file.h  ../io/simdisk_file.h  ../io/syscall_file.h  \
- ../io/ufs_file.h
-IO_LAYER_FILES	+= ../io/wincall_file.h ../io/wfs_file.h ../io/boostfd_file.h
+HEADER_FILES_IO		+= completion_handler.h io.h iobase.h iostats.h
+HEADER_FILES_IO		+= mmap_file.h simdisk_file.h syscall_file.h
+HEADER_FILES_IO		+= ufs_file.h wincall_file.h wfs_file.h boostfd_file.h
 
-MNG_LAYER_FILES = ../mng/adaptor.h  ../mng/async_schedule.h  ../mng/block_prefetcher.h \
-../mng/buf_istream.h  ../mng/buf_ostream.h  ../mng/buf_writer.h  ../mng/mng.h \
-../mng/write_pool.h ../mng/prefetch_pool.h
+HEADER_FILES_MNG	+= adaptor.h async_schedule.h block_prefetcher.h
+HEADER_FILES_MNG	+= buf_istream.h buf_ostream.h buf_writer.h mng.h
+HEADER_FILES_MNG	+= write_pool.h prefetch_pool.h
 
-CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/vector.h \
-../containers/priority_queue.h ../containers/queue.h
-CONTAINER_FILES	+= ../containers/map.h ../containers/deque.h
+HEADER_FILES_CONTAINERS	+= pager.h stack.h vector.h priority_queue.h queue.h
+HEADER_FILES_CONTAINERS	+= map.h deque.h
 
-HEADER_FILES_CONTAINERS_BTREE	+= btree.h iterator_map.h leaf.h node_cache.h root_node.h node.h btree_pager.h iterator.h
+HEADER_FILES_CONTAINERS_BTREE	+= btree.h iterator_map.h leaf.h node_cache.h
+HEADER_FILES_CONTAINERS_BTREE	+= root_node.h node.h btree_pager.h iterator.h
 
-ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/run_cursor.h \
-../algo/sort.h ../algo/async_schedule.h ../algo/interleaved_alloc.h ../algo/ksort.h \
-../algo/losertree.h ../algo/scan.h ../algo/stable_ksort.h
-ALGO_FILES	+= ../algo/random_shuffle.h
+HEADER_FILES_ALGO	+= adaptor.h inmemsort.h intksort.h run_cursor.h sort.h
+HEADER_FILES_ALGO	+= async_schedule.h interleaved_alloc.h ksort.h
+HEADER_FILES_ALGO	+= losertree.h scan.h stable_ksort.h random_shuffle.h
 
-STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
+HEADER_FILES_STREAM	+= stream.h sort_stream.h
 
 HEADER_FILES_UTILS	+= malloc.h
 

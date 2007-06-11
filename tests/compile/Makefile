@@ -14,22 +14,20 @@ CPPFLAGS	+= -MD
 #include ../mcstxxl.mk
 #OPT		 = -O2
 
-SKIP_HEADERS		 = ../make.settings
-ALL_HEADERS		+= ../stxxl.h
-ALL_HEADERS		+= $(COMMON_FILES)
-ALL_HEADERS		+= ../common/utils_ledasm.h
-ALL_HEADERS		+= $(IO_LAYER_FILES)
-ALL_HEADERS		+= $(MNG_LAYER_FILES)
-ALL_HEADERS		+= $(CONTAINER_FILES)
-ALL_HEADERS		+= $(HEADER_FILES_CONTAINERS_BTREE:%=../containers/btree/%)
-ALL_HEADERS		+= $(ALGO_FILES)
-ALL_HEADERS		+= $(STREAM_FILES)
-ALL_HEADERS		+= $(HEADER_FILES_UTILS:%=stxxl/utils/%)
-USER_HEADERS		+= stxxl
-USER_HEADERS		+= vector stack queue priority_queue deque map
-USER_HEADERS		+= algorithm scan sort ksort
-HEADERS			 = $(filter-out $(SKIP_HEADERS), $(USER_HEADERS:%=stxxl/%) $(ALL_HEADERS))
-HEADERS_ESCAPED		 = $(subst ..,stxxl,$(subst /,~,$(HEADERS)))
+STXXL_HEADERS		+= stxxl
+STXXL_HEADERS		+= vector stack queue priority_queue deque map
+STXXL_HEADERS		+= algorithm scan sort ksort
+STXXL_HEADERS		+= stxxl.h
+STXXL_HEADERS		+= $(HEADER_FILES_COMMON:%=common/%)
+STXXL_HEADERS		+= $(HEADER_FILES_IO:%=io/%)
+STXXL_HEADERS		+= $(HEADER_FILES_MNG:%=mng/%)
+STXXL_HEADERS		+= $(HEADER_FILES_CONTAINER:%=containers/%)
+STXXL_HEADERS		+= $(HEADER_FILES_CONTAINERS_BTREE:%=containers/btree/%)
+STXXL_HEADERS		+= $(HEADER_FILES_ALGO:%=algo/%)
+STXXL_HEADERS		+= $(HEADER_FILES_STREAM:%=stream/%)
+STXXL_HEADERS		+= $(HEADER_FILES_UTILS:%=utils/%)
+HEADERS			 = $(STXXL_HEADERS:%=stxxl/%)
+HEADERS_ESCAPED		 = $(subst /,~,$(HEADERS))
 
 
 #all: preprocess-test
