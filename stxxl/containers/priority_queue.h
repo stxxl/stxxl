@@ -573,7 +573,7 @@ finish:
             {
                 current[i].merger = this;
                 if (i >= arity)
-                    current[i].block = (block_type *) &(sentinel_block);
+                    current[i].block = convert_block_pointer(&(sentinel_block));
 
                 else
                     current[i].block = new block_type;
