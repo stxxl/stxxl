@@ -22,4 +22,4 @@ $(TESTS_BDB:=.$(bin)) $(TESTS_LEDASM:=.$(bin)) $(TESTS_TPIE:=.$(bin)):
 
 
 clean::
-	$(RM) btree/*.o btree/*.d btree/*.dT
+	$(RM) btree/*.$o btree/*.$d btree/*.dT

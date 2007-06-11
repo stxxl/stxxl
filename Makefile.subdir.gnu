@@ -9,7 +9,7 @@ lib: $(LIB_SRC:.cpp=.$o)
 
 clean::
 	$(RM) *.$o
-	$(RM) *.d *.dT
+	$(RM) *.$d *.dT
 	$(RM) $(TEST_BINARIES)
 
 -include *.d
