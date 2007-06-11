@@ -8,10 +8,10 @@
 #ifndef STXXL_MALLOC_H
 #define STXXL_MALLOC_H
 
-#include "../common/namespace.h"
+#include "stxxl/common/namespace.h"
 #include <ostream>
 #include <malloc.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 __STXXL_BEGIN_NAMESPACE
 

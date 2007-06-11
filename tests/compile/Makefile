@@ -24,6 +24,7 @@ ALL_HEADERS		+= $(CONTAINER_FILES)
 ALL_HEADERS		+= $(HEADER_FILES_CONTAINERS_BTREE:%=../containers/btree/%)
 ALL_HEADERS		+= $(ALGO_FILES)
 ALL_HEADERS		+= $(STREAM_FILES)
+ALL_HEADERS		+= $(HEADER_FILES_UTILS:%=stxxl/utils/%)
 USER_HEADERS		+= stxxl
 USER_HEADERS		+= vector stack queue priority_queue deque map
 USER_HEADERS		+= algorithm scan sort ksort

@@ -164,6 +164,8 @@ ALGO_FILES	+= ../algo/random_shuffle.h
 
 STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
 
+HEADER_FILES_UTILS	+= malloc.h
+
 ###################################################################
 
 
