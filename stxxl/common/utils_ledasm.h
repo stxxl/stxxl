@@ -2,12 +2,19 @@
 #define MYUTILS_HEADER
 
 /***************************************************************************
- *            utils.h
+ *            utils_ledasm.h
  *
  *  Sat Aug 24 23:54:29 2002
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+/*
+ * Abgespeckte Version von common/utils.h für LEDA-SM/TPIE Tests
+ * (containers/leda_sm_pq_benchmark.cpp und andere). Mit originalem
+ * common/utils.h gibt es name collisions mit Stxxl (LEDA-SM/TPIE
+ * benutzen keine namespaces) und auch andere Probleme.
+ */
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
@@ -15,22 +22,21 @@
 
 #include <iostream>
 #include <algorithm>
-#include <assert.h>
-#include <stdio.h>
-#include <errno.h>
+#include <vector>
+
+#include <cassert>
+#include <cstdio>
+#include <cerrno>
+#include <cstdlib>
+#include <cmath>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef BOOST_MSVC
 #else
  #include <sys/time.h>
  #include <unistd.h>
 #endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <vector>
 
 #ifdef STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>

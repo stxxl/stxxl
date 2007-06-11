@@ -13,6 +13,7 @@
 #include "stxxl/common/rand.h"
 #include "stxxl/common/simple_vector.h"
 
+#include <memory>
 #include <list>
 
 

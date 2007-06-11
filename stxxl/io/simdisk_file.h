@@ -11,7 +11,7 @@
 
 #include "stxxl/io/ufs_file.h"
 
-#include <math.h>
+#include <cmath>
 
 #ifdef BOOST_MSVC
 // mmap call does not exist in Windows

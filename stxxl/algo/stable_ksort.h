@@ -13,7 +13,7 @@
 // I rework the stable_ksort when I would have a time
 
 
-#include <math.h>
+#include <cmath>
 
 #include "stxxl/mng/mng.h"
 #include "stxxl/mng/buf_istream.h"

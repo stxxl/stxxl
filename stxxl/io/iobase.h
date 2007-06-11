@@ -15,25 +15,29 @@
  #define STXXL_CHECK_BLOCK_ALIGNING
 #endif
 
-//#if defined(__linux__)
-//# if !defined(O_DIRECT) && (defined(__alpha__) || defined(__i386__))
-//#  define O_DIRECT 040000 /* direct disk access */
-//# endif
-//#endif
-
 //#ifdef __sun__
 //#define O_DIRECT 0
 //#endif
 
 
-#include <iostream>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cerrno>
+
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <iostream>
+#include <algorithm>
+#include <string>
+#include <queue>
+#include <map>
+#include <set>
+
 #ifdef BOOST_MSVC
  #include <io.h>
-
 #else
  #include <sys/time.h>
  #include <unistd.h>
@@ -41,31 +45,14 @@
  #include <sys/wait.h>
 #endif
 
-#include <fcntl.h>
-
-
 #ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
 // Boost.Threads headers
  #include <boost/thread/thread.hpp>
  #include <boost/thread/mutex.hpp>
  #include <boost/bind.hpp>
-
 #else
  #include <pthread.h>
 #endif
-
-#include <string.h>
-#include <errno.h>
-
-
-#include <stdlib.h>
-
-// STL includes
-#include <algorithm>
-#include <string>
-#include <queue>
-#include <map>
-#include <set>
 
 
 #ifndef O_SYNC
@@ -80,7 +67,7 @@
 
 
 #if defined (__linux__)
-//# include <asm/fcntl.h>
+//#include <asm/fcntl.h>
  #if !defined (O_DIRECT) && (defined (__alpha__) || defined (__i386__))
   #define O_DIRECT 040000       /* direct disk access */
  #endif

@@ -10,7 +10,7 @@
  ****************************************************************************/
 
 #include <time.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "stxxl/common/utils.h"
 

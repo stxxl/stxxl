@@ -9,6 +9,7 @@
 #ifndef STXXL_CONTAINERS_BTREE__BTREE_PAGER_H
 #define STXXL_CONTAINERS_BTREE__BTREE_PAGER_H
 
+#include <memory>
 #include <list>
 
 #include "stxxl/common/utils.h"

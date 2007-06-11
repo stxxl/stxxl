@@ -14,26 +14,26 @@
 #endif
 
 #include <iostream>
-#include <algorithm>
-#include <assert.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
 #include <sstream>
+#include <algorithm>
+#include <vector>
+#include <string>
+#include <limits>
+
+#include <cassert>
+#include <cstdio>
+#include <cerrno>
+#include <cstring>
+#include <cstdlib>
+#include <cmath>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef BOOST_MSVC
 #else
  #include <sys/time.h>
  #include <unistd.h>
 #endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <vector>
-#include <string>
 
 #ifdef STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>

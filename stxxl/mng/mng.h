@@ -22,7 +22,7 @@
 #include <map>
 #include <algorithm>
 #include <string>
-#include <stdlib.h>
+#include <cstdlib>
 
 #ifdef BOOST_MSVC
 #include <memory.h>

@@ -14,7 +14,7 @@
 
 #ifdef STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>
- #include <math.h>
+ #include <cmath>
 #endif
 
 
