@@ -35,6 +35,10 @@ unittest: unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
 	$(LINKER) unittest.$(OBJEXT) $(OUT)unittest.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
 
+sdtest: sd_test.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c sd_test.cpp
+	$(LINKER) sd_test.$(OBJEXT) $(OUT)sd_test.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
+
 clean:
 	$(RM) *.$(OBJEXT) *.$(LIBEXT) benchmark_disks.$(EXEEXT)
 	$(RM) flushbuffers.$(EXEEXT) test_io.$(EXEEXT) unittest.$(EXEEXT)

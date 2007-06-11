@@ -7,12 +7,15 @@
  ****************************************************************************/
 
 
-
 #include "io.h"
 #include "../common/rand.h"
 #include <math.h>
 
 using namespace stxxl;
+
+// Tests sim_disk file implementation
+// must be run on in-memory swap partition !
+
 
 int main()
 {
@@ -27,22 +30,11 @@ int main()
     sim_disk_file file2(paths[1], file::CREAT | file::RDWR /* | file::DIRECT */, 1);
     file2.set_size(disk_size);
 
-    request * reqs[16];
     unsigned i = 0;
-
-    /*
-       for(;i<16;i++)
-       file1.awrite(buffer,pos,,req[i],NULL,NULL);
-
-       mc::wait_all(req,16);
-
-       for(i=0;i<16;i++)
-       delete reqs[i];
-     */
 
     stxxl::int64 pos = 0;
 
-    request * req;
+    request_ptr req;
 
     STXXL_MSG("Estimated time:" << block_size / double (AVERAGE_SPEED))
     STXXL_MSG("Sequential write")
@@ -50,9 +42,8 @@ int main()
     for (i = 0; i < 40; i++)
     {
         double begin = stxxl_timestamp();
-        file1.awrite(buffer, pos, block_size, req, NULL, NULL);
+        req = file1.awrite(buffer, pos, block_size, stxxl::default_completion_handler());
         req->wait();
-        delete req;
         double end = stxxl_timestamp();
 
         STXXL_MSG("Pos: " << pos << " block_size:" << block_size << " time:" << (end - begin));
@@ -62,15 +53,14 @@ int main()
     double sum = 0.;
     double sum2 = 0.;
     STXXL_MSG("Random write")
-    const int times = 80;
+    const unsigned int times = 80;
     for (i = 0; i < times; i++)
     {
-        random_number rnd;
+        random_number<> rnd;
         pos = rnd(disk_size / block_size) * block_size;
         double begin = stxxl_timestamp();
-        file1.awrite(buffer, pos, block_size, req, NULL, NULL);
+        req = file1.awrite(buffer, pos, block_size,stxxl::default_completion_handler());
         req->wait();
-        delete req;
         double diff = stxxl_timestamp() - begin;
 
         sum += diff;
