@@ -10,11 +10,19 @@
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX	?= yes	# set 'yes' if you run Linux, 'no' otherwise
 USE_MCSTL	?= no	# will be overriden from main Makefile
+USE_ICPC	?= no	# will be overriden from main Makefile
 
 STXXL_ROOT	?= $(HOME)/work/stxxl
 
+ifeq ($(strip $(USE_ICPC)),yes)
+COMPILER	?= icpc
+ICPC_GCC	?= gcc
+OPENMPFLAG	?= -openmp
+endif
+
 ifeq ($(strip $(USE_MCSTL)),yes)
 COMPILER	?= g++-4.2
+OPENMPFLAG	?= -fopenmp
 LIBNAME		?= mcstxxl
 # the base directory of your MCSTL installation
 MCSTL_BASE	?= $(HOME)/work/mcstl
@@ -80,6 +88,18 @@ STXXL_LIBDEPS	+= $(strip $(STXXL_ROOT))/lib/lib$(LIBNAME).$(LIBEXT)
 ##################################################################
 
 
+#### ICPC OPTIONS ################################################
+
+ifeq ($(strip $(USE_ICPC)),yes)
+
+# does not work, uses gcc
+#STXXL_SPECIFIC	+= -gcc-name=$(ICPC_GCC)
+
+endif
+
+##################################################################
+
+
 #### MCSTL OPTIONS ###############################################
 
 ifeq ($(strip $(USE_MCSTL)),yes)
@@ -89,7 +109,7 @@ ifeq ($(strip $(USE_MCSTL)),yes)
 get_value		 = $(subst $(1)=,,$(filter $(1)=%,$(2)))
 empty			 =#
 space			 = $(empty) $(empty)
-gcc_version_result	:= $(shell $(COMPILER) -v 2>&1)
+gcc_version_result	:= $(shell $(if $(filter yes,$(USE_ICPC)),$(ICPC_GCC),$(COMPILER)) -v 2>&1)
 gcc_version		 = $(call get_value,THE_GCC_VERSION,$(subst gcc$(space)version$(space),THE_GCC_VERSION=,$(gcc_version_result)))
 gcc_prefix		 = $(call get_value,--prefix,$(gcc_version_result))
 gcc_gxx_incdir		 = $(call get_value,--with-gxx-include-dir,$(gcc_version_result))
@@ -107,8 +127,8 @@ ifeq (,$(strip $(wildcard $(MCSTL_ORIGINALS)/original)))
 $(error ERROR: your mcstl in $(MCSTL_BASE) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
 endif
 
-MCSTL_CPPFLAGS		+= -fopenmp -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ORIGINALS) -D__MCSTL__
-MCSTL_LDFLAGS		+= -fopenmp
+MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ORIGINALS) -D__MCSTL__
+MCSTL_LDFLAGS		+= $(OPENMPFLAG)
 
 endif
 
