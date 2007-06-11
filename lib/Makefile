@@ -1,8 +1,9 @@
+include ../make.settings
+
 all: lib
 
 tests:
 
-include ../make.settings
 
 LIB_OBJECTS = \
 ../io/diskqueue.$(OBJEXT) ../io/wfs_file.$(OBJEXT) \

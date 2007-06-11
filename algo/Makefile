@@ -1,16 +1,14 @@
-TESTS	 = test_scan gen_file sort_file test_ksort1 test_stable_ksort test_sort1 test_manyunits test_random_shuffle 
+include Makefile.common
+include ../make.settings
 
 tests: $(TESTS)
 
-include ../make.settings
-
+lib: $(LIB_SRC)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c async_schedule.cpp
 
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 
-
-lib: async_schedule.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c async_schedule.cpp
 
 test_manyunits:
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_manyunits1.cpp
@@ -57,6 +55,7 @@ test_sort1: test_sort1.cpp $(DEPENDENCIES)
 test_random_shuffle: test_random_shuffle.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_random_shuffle.cpp -DSTXXL_VERBOSE_LEVEL=0
 	$(LINKER)  test_random_shuffle.$(OBJEXT) $(OUT)test_random_shuffle.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) *.$(OBJEXT) test_sort1.$(EXEEXT) test_stable_ksort.$(EXEEXT) 
