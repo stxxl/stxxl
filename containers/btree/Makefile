@@ -23,10 +23,6 @@ test_corr_insert_scan: $(DEPENDENCIES) test_corr_insert_scan.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_corr_insert_scan.cpp
 	$(LINKER) test_corr_insert_scan.$(OBJEXT) $(OUT)test_corr_insert_scan.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test_node_cache: $(DEPENDENCIES) test_node_cache.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_node_cache.cpp
-	$(LINKER) test_node_cache.$(OBJEXT) $(OUT)test_node_cache.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-
 test_btree: $(DEPENDENCIES) test_btree.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_btree.cpp
 	$(LINKER) test_btree.$(OBJEXT) $(OUT)test_btree.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
