@@ -2,6 +2,10 @@
 #include "stxxl/common/rand.h"
 #include <cstdlib>
 
+#include "async_schedule.cpp"
+
+// Test async schedule algorithm
+
 
 int main(int argc, char * argv[])
 {
