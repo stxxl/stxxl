@@ -50,8 +50,6 @@ library: $(LIBNAME).mk
 	@echo "Building library is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
 	@echo "Use the following linker options with programs using Stxxl: $(STXXL_LINKER_OPTIONS)"
-	@echo $(STXXL_COMPILER_OPTIONS) > compiler.options
-	@echo $(STXXL_LINKER_OPTIONS) > linker.options
 
 lib/lib$(LIBNAME).$(LIBEXT): make.settings
 	$(MAKE) -f $(THISMAKEFILE) library
@@ -70,6 +68,7 @@ clean-in-%:
 
 clean: SUBDIRS-clean
 	$(RM) $(LIBNAME).mk
+	$(RM) compiler.options linker.options
 	@echo "Cleaning completed"
 
 .PHONY: main library tests clean
