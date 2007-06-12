@@ -1,4 +1,4 @@
-#include "stxxl/mng/mng.h"
+#include "stxxl/mng"
 
 __STXXL_BEGIN_NAMESPACE
 

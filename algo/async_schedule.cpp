@@ -1,4 +1,4 @@
-#include "stxxl/algo/async_schedule.h"
+#include "stxxl/bits/algo/async_schedule.h"
 
 __STXXL_BEGIN_NAMESPACE
 

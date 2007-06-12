@@ -6,8 +6,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/io/iobase.h"
-#include "stxxl/common/gprof.h"
+#include "stxxl/bits/io/iobase.h"
+#include "stxxl/bits/common/gprof.h"
 
 
 #ifndef STXXL_BOOST_THREADS

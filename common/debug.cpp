@@ -1,4 +1,4 @@
-#include "stxxl/common/debug.h"
+#include "stxxl/bits/common/debug.h"
 
 
 __STXXL_BEGIN_NAMESPACE

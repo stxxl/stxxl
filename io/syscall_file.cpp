@@ -1,4 +1,4 @@
-#include "stxxl/io/syscall_file.h"
+#include "stxxl/bits/io/syscall_file.h"
 
 __STXXL_BEGIN_NAMESPACE
 

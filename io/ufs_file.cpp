@@ -1,5 +1,5 @@
 
-#include "stxxl/io/ufs_file.h"
+#include "stxxl/bits/io/ufs_file.h"
 
 #ifndef BOOST_MSVC
  #include <unistd.h>

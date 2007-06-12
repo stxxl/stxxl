@@ -1,5 +1,5 @@
 
-#include "stxxl/io/iostats.h"
+#include "stxxl/bits/io/iostats.h"
 
 __STXXL_BEGIN_NAMESPACE
 
