@@ -18,8 +18,10 @@
 
 #include "stxxl/stream"
 
+#include "stxxl/random"
+
 #include "stxxl/bits/common/debug.h"
 
-#include "stxxl/bits/common/timer.h"
+#include "stxxl/timer"
 
 #endif // STXXL_MAIN_HEADER
