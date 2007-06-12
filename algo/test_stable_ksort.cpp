@@ -1,5 +1,5 @@
-#include "stxxl/mng/mng.h"
-#include "stxxl/algo/stable_ksort.h"
+#include "stxxl/mng"
+#include "stxxl/stable_ksort"
 #include "stxxl/ksort"
 #include "stxxl/vector"
 

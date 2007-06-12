@@ -17,8 +17,8 @@
 #define DEBUG 0
 #define DD 500
 
-#include "stxxl/common/utils_ledasm.h"
-#include "stxxl/common/timer.h"
+#include "stxxl/bits/common/utils_ledasm.h"
+#include "stxxl/timer"
 
 
 

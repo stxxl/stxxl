@@ -7,8 +7,8 @@
  ****************************************************************************/
 
 #include <iostream>
-#include "stxxl/mng/mng.h"
-#include "stxxl/mng/prefetch_pool.h"
+#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/mng/prefetch_pool.h"
 
 //! \example mng/test_prefetch_pool.cpp
 

@@ -1,5 +1,5 @@
-#include "stxxl/algo/async_schedule.h"
-#include "stxxl/common/rand.h"
+#include "stxxl/bits/algo/async_schedule.h"
+#include "stxxl/random"
 #include <cstdlib>
 
 #include "async_schedule.cpp"

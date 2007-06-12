@@ -1,4 +1,4 @@
-#include "stxxl/mng/mng.h"
+#include "stxxl/mng"
 #include "stxxl/sort"
 #include "stxxl/vector"
 

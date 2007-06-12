@@ -12,10 +12,10 @@
 // #define PLAY_WITH_OPT_PREF
 
 
-#include "stxxl/mng/mng.h"
-#include "stxxl/algo/stable_ksort.h"
+#include "stxxl/mng"
+#include "stxxl/stable_ksort"
 #include "stxxl/vector"
-#include "stxxl/common/rand.h"
+#include "stxxl/random"
 
 
 #ifndef RECORD_SIZE

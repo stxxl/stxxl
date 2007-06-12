@@ -5,6 +5,7 @@
  *  Copyright  2005  Roman Dementiev
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
+
 #include "stxxl/map"
 #include <algorithm>
 #include <cmath>

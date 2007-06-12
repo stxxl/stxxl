@@ -7,8 +7,8 @@
  ****************************************************************************/
 
 
-#include "stxxl/io/io.h"
-#include "stxxl/common/rand.h"
+#include "stxxl/io"
+#include "stxxl/random"
 #include <cmath>
 
 using namespace stxxl;

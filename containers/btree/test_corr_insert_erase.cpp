@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "stxxl/containers/btree/btree.h"
+#include "stxxl/bits/containers/btree/btree.h"
 #include "stxxl/algorithm"
 
 

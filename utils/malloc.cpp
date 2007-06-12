@@ -1,7 +1,7 @@
 #include <iostream>
 #include <malloc.h>
 #include <cstdlib>
-#include "stxxl/common/utils.h"
+#include "stxxl/bits/common/utils.h"
 
 using namespace std;
 

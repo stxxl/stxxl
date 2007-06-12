@@ -1,1 +1,1 @@
-#include <stxxl/stxxl>
+#include <stxxl.h>

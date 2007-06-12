@@ -1,4 +1,4 @@
-#include "stxxl/stream/stream.h"
+#include "stxxl/stream"
 
 
 struct Input

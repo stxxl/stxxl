@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cmath>
-#include "stxxl/common/utils.h"
+#include "stxxl/bits/common/utils.h"
 
 typedef stxxl::int64 int64;
 
