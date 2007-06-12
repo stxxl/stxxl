@@ -23,7 +23,7 @@ void print_malloc_stats()
     STXXL_MSG("number of bytes allocated but not in use       : " << info.fordblks)
     STXXL_MSG("top-most, releasable (via malloc_trim) space   : " << info.keepcost)
     STXXL_MSG("================================================================")
-};
+}
 
 int main(int argc, char * argv[])
 {
@@ -44,4 +44,4 @@ int main(int argc, char * argv[])
     delete [] ptr;
     cout << "Deallocated " << endl;
     print_malloc_stats();
-};
+}

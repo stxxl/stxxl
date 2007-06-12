@@ -171,7 +171,7 @@ request_ptr mmap_file::aread(
  #endif
 
     return req;
-};
+}
 request_ptr mmap_file::awrite (
     void * buffer,
     stxxl::int64 pos,
@@ -195,7 +195,7 @@ request_ptr mmap_file::awrite (
  #endif
 
     return req;
-};
+}
 
 
 __STXXL_END_NAMESPACE

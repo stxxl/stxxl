@@ -160,7 +160,7 @@ bool ufs_request_base::poll()
     check_errors();
 
     return s;
-};
+}
 const char * ufs_request_base::io_type ()
 {
     return "ufs_base";

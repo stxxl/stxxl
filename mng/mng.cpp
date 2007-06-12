@@ -108,7 +108,7 @@ config::config (const char * config_path)
                       " Mb, I/O implementation: " << (*it).io_impl )
         }
     }
-};
+}
 
 block_manager * block_manager::get_instance ()
 {
@@ -137,7 +137,7 @@ block_manager::block_manager ()
         disk_files[i]->set_size (cfg->disk_size (i));
         disk_allocators[i] = new DiskAllocator (cfg->disk_size (i));
     }
-};
+}
 
 block_manager::~block_manager()
 {

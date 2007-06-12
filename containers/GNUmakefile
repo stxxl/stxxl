@@ -1,6 +1,5 @@
 include Makefile.common
 
-TESTS		+= $(TESTS_LONG_COMPILE)
 #TESTS		+= $(TESTS_BDB)
 #TESTS		+= $(TESTS_LEDASM)
 #TESTS		+= $(TESTS_TPIE)
