@@ -109,14 +109,13 @@ gcc_version_result	:= $(shell $(COMPILER) -v 2>&1)
 gcc_version		 = $(call get_value,THE_GCC_VERSION,$(subst gcc$(space)version$(space),THE_GCC_VERSION=,$(gcc_version_result)))
 gcc_prefix		 = $(call get_value,--prefix,$(gcc_version_result))
 gcc_gxx_incdir		 = $(call get_value,--with-gxx-include-dir,$(gcc_version_result))
-ifeq ($(strip $(USE_ICPC)),yes)
-ifeq (,$(strip $(icpc_cxx_incdir)))
-icpc_vector_deps	:= $(shell echo -e '\043include <vector>' > icpc-deptest.cpp; $(COMPILER) -M icpc-deptest.cpp 2>/dev/null; $(RM) icpc-deptest.cpp)
-icpc_cxx_incdir		 = $(patsubst %/vector,%,$(firstword $(filter %/vector, $(icpc_vector_deps))))
-export icpc_cxx_incdir
+MCSTL_ORIGINAL_INC_CXX	?= $(firstword $(wildcard $(gcc_gxx_incdir) $(gcc_prefix)/include/c++/$(gcc_version)) $(cxx_incdir_from_compile))
+ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
+# do a test compilation, generate dependencies and parse the header paths
+compile_test_vector_deps:= $(shell echo -e '\043include <vector>' > cxx-header-path-test.cpp; $(COMPILER) -M cxx-header-path-test.cpp 2>/dev/null; $(RM) cxx-header-path-test.cpp)
+cxx_incdir_from_compile	 = $(patsubst %/vector,%,$(firstword $(filter %/vector, $(compile_test_vector_deps))))
+export cxx_incdir_from_compile
 endif
-endif
-MCSTL_ORIGINAL_INC_CXX	?= $(firstword $(wildcard $(icpc_cxx_incdir) $(gcc_gxx_incdir) $(gcc_prefix)/include/c++/$(gcc_version)))
 MCSTL_ORIGINALS		?= $(strip $(MCSTL_BASE))/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
 MCSTL_ROOT		?= $(strip $(MCSTL_BASE))$(if $(strip $(MCSTL_BRANCH)),/$(strip $(MCSTL_BRANCH)))
 
