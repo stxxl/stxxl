@@ -1,1 +1,1 @@
-#include "stxxl/containers/queue.h"
+#include "stxxl/bits/containers/queue.h"

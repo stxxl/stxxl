@@ -1,1 +1,1 @@
-#include "stxxl/containers/vector.h"
+#include "stxxl/bits/containers/vector.h"

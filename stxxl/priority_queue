@@ -1,1 +1,1 @@
-#include "stxxl/containers/priority_queue.h"
+#include "stxxl/bits/containers/priority_queue.h"

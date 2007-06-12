@@ -1,1 +1,1 @@
-#include "stxxl/algo/sort.h"
+#include "stxxl/bits/algo/sort.h"

@@ -1,1 +1,1 @@
-#include "stxxl/containers/deque.h"
+#include "stxxl/bits/containers/deque.h"
