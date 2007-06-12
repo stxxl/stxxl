@@ -55,7 +55,7 @@ public:
     typedef typename cfg::alloc_strategy alloc_strategy;
     typedef typename cfg::size_type size_type;
     enum {  blocks_per_page = cfg::blocks_per_page,
-            block_size = cfg::block_size,};
+            block_size = cfg::block_size };
 
     typedef typed_block<block_size, value_type> block_type;
     typedef BID<block_size> bid_type;

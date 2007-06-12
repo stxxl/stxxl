@@ -266,7 +266,7 @@ stxxl_tmpfilename (std::string dir, std::string prefix)
     do
     {
         rnd = rand ();
-        sprintf (buffer, "%u", rnd);
+        sprintf (buffer, "%d", rnd);
         result = dir + prefix + buffer;
     }
 #ifdef STXXL_BOOST_FILESYSTEM

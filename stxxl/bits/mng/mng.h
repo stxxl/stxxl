@@ -898,7 +898,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
         striping (int b, int e):begin (b), diff (e - b)
         {
         };
-      striping ():begin (0)
+        striping ():begin (0)
         {
             diff = config::get_instance ()->disks_number ();
         };
@@ -910,6 +910,9 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
         {
             return "striping";
         }
+        virtual ~striping()
+        {
+        }
     };
 
     //! \brief fully randomized disk allocation scheme functor
@@ -920,7 +923,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
         FR (int b, int e):striping (b, e)
         {
         };
-      FR ():striping ()
+        FR ():striping ()
         {
         };
         int operator     () (int /*i*/) const
@@ -998,7 +1001,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
         {
         };
 
-    single_disk():disk(0)
+        single_disk():disk(0)
         {
         };
         int operator() (int /*i*/) const

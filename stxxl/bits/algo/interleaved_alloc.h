@@ -32,7 +32,11 @@ struct interleaved_striping
     int operator ()  (int_type i) const
     {
         return begindisk + (i / nruns) % diff;
-    };
+    }
+
+    virtual ~interleaved_striping()
+    {
+    }
 };
 
 struct interleaved_FR : public interleaved_striping

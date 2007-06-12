@@ -1738,7 +1738,7 @@ struct priority_queue_config
         IntLevels = IntLevels_,
         ExtLevels = ExtLevels_,
         BlockSize = BlockSize_,
-        ExtKMAX = ExtKMAX_,
+        ExtKMAX = ExtKMAX_
     };
 };
 
