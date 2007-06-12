@@ -1329,7 +1329,7 @@ namespace stream
     };
 
 //! \}
-};
+}
 
 //! \addtogroup stlalgo
 //! \{

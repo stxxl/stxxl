@@ -202,7 +202,7 @@ namespace stable_ksort_local
         delete [] bucket_block_offsets;
         delete [] bucket_iblock;
     }
-};
+}
 
 template <typename ExtIterator_>
 void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)

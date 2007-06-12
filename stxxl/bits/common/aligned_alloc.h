@@ -31,14 +31,14 @@ inline void * aligned_alloc (size_t size, size_t meta_info_size = 0)
                                            << std::dec)
 
     return result;
-};
+}
 
 template < size_t ALIGNMENT > inline void
 aligned_dealloc (void * ptr)
 {
     STXXL_VERBOSE2("stxxl::aligned_dealloc(<" << ALIGNMENT << ">), ptr = 0x" << std::hex << (unsigned long)(ptr) << std::dec)
     delete[] * (((char * *) ptr) - 1);
-};
+}
 
 
 

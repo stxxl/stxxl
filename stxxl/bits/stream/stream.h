@@ -1808,7 +1808,7 @@ namespace stream
 
 
 //! \}
-};
+}
 
 __STXXL_END_NAMESPACE
 

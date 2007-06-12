@@ -315,7 +315,7 @@ split (const std::string & str, const std::string & sep)
 
 
     return result;
-};
+}
 
 #define str2int(str) atoi(str.c_str())
 

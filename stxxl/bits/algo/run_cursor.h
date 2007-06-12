@@ -99,7 +99,7 @@ void run_cursor2<block_type, prefetcher_type>::operator ++ (int)
         if ( prefetcher()->block_consumed(buffer) ) pos = 0;
 
     }
-};
+}
 
 
 template <typename block_type>

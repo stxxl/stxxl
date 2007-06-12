@@ -57,7 +57,7 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
 
 
     wait_all(reqs.begin(), nblocks);
-};
+}
 
 
 __STXXL_END_NAMESPACE

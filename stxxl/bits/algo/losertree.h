@@ -153,7 +153,7 @@ private:
 
         regEntry[0] = winnerIndex;
 
-    };
+    }
 
     void multi_merge_unrolled_0 (value_type * to)
     {

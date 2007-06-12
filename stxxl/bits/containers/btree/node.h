@@ -756,7 +756,7 @@ namespace btree
             ++ (block_->info.cur_size);
         }
     };
-};
+}
 
 
 __STXXL_END_NAMESPACE

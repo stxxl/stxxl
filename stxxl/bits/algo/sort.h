@@ -830,7 +830,7 @@ namespace sort_local
 
                 return result;
             }
-        };
+        }
 
 
 //! \brief External sorting routine for records that allow only comparisons
@@ -1173,7 +1173,7 @@ namespace sort_local
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
             assert(stxxl::is_sorted(first, last, cmp));
 #endif
-        };
+        }
 
 //! \}
 

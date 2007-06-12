@@ -82,7 +82,7 @@ namespace random_shuffle_local
 
         }
     };
-};
+}
 
 
 //! \addtogroup stlalgo

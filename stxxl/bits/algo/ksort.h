@@ -64,14 +64,14 @@ inline bool operator < (const trigger_entry<_BIDTp, _KeyTp> & a,
                         const trigger_entry<_BIDTp, _KeyTp> & b)
 {
     return (a.key < b.key);
-};
+}
 
 template <typename _BIDTp, typename _KeyTp>
 inline bool operator > (const trigger_entry<_BIDTp, _KeyTp> & a,
                         const trigger_entry<_BIDTp, _KeyTp> & b)
 {
     return (a.key > b.key);
-};
+}
 
 template <typename type, typename key_type1>
 struct type_key
@@ -1087,7 +1087,7 @@ bool check_ksorted_runs(              run_type * * runs,
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
             assert(stxxl::is_sorted(first_, last_, key_comparison<value_type, KeyExtractor_>()));
 #endif
-        };
+        }
 
         template<typename record_type>
         struct ksort_defaultkey

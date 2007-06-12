@@ -1700,7 +1700,7 @@ finish:
         entry[0].index = winnerIndex;
         entry[0].key   = winnerKey;
     }
-};
+}
 
 /*
 
@@ -2427,7 +2427,7 @@ namespace priority_queue_local
     {
         typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
     };
-};
+}
 
 //! \}
 
