@@ -65,6 +65,10 @@ __STXXL_BEGIN_NAMESPACE
     };
 
 
+#ifndef STXXL_VERBOSE_LEVEL
+#define STXXL_VERBOSE_LEVEL 0
+#endif
+
 #if STXXL_VERBOSE_LEVEL > 0
  #define STXXL_VERBOSE1(x) \
     { std::cout << "[STXXL-VERBOSE1] " << x << std::endl; std::cerr.flush(); \
