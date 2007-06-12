@@ -8,7 +8,8 @@
 #ifndef STXXL_MALLOC_H
 #define STXXL_MALLOC_H
 
-#include "stxxl/common/namespace.h"
+#include "stxxl/bits/namespace.h"
+
 #include <ostream>
 #include <malloc.h>
 #include <cstdlib>

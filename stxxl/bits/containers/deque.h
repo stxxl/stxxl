@@ -9,7 +9,7 @@
  *  Email
  ****************************************************************************/
 
-#include "stxxl/containers/vector.h"
+#include "stxxl/vector"
 
 
 __STXXL_BEGIN_NAMESPACE

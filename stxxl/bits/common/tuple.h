@@ -9,8 +9,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/common/namespace.h"
-#include "stxxl/common/tmeta.h"
+#include "stxxl/bits/namespace.h"
+#include "stxxl/bits/common/tmeta.h"
 
 
 __STXXL_BEGIN_NAMESPACE

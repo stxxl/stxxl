@@ -79,15 +79,15 @@
 #endif
 
 
-#include "stxxl/common/namespace.h"
-#include "stxxl/io/iostats.h"
-#include "stxxl/common/semaphore.h"
-#include "stxxl/common/mutex.h"
-//#include "stxxl/common/rwlock.h"
-#include "stxxl/common/switch.h"
-#include "stxxl/common/state.h"
-#include "stxxl/common/exceptions.h"
-#include "stxxl/io/completion_handler.h"
+#include "stxxl/bits/namespace.h"
+#include "stxxl/bits/io/iostats.h"
+#include "stxxl/bits/common/semaphore.h"
+#include "stxxl/bits/common/mutex.h"
+//#include "stxxl/bits/common/rwlock.h"
+#include "stxxl/bits/common/switch.h"
+#include "stxxl/bits/common/state.h"
+#include "stxxl/bits/common/exceptions.h"
+#include "stxxl/bits/io/completion_handler.h"
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -9,11 +9,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/common/namespace.h"
-#include "stxxl/algo/sort.h"
-#include "stxxl/mng/buf_istream.h"
-#include "stxxl/mng/buf_ostream.h"
-#include "stxxl/stream/stream.h"
+#include "stxxl/bits/stream/stream.h"
+#include "stxxl/sort"
 
 
 __STXXL_BEGIN_NAMESPACE

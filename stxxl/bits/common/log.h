@@ -9,7 +9,7 @@
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
 
-#include "stxxl/common/namespace.h"
+#include "stxxl/bits/namespace.h"
 
 #include <iostream>
 #include <fstream>

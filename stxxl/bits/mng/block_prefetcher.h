@@ -12,8 +12,8 @@
 #include <vector>
 #include <queue>
 
-#include "stxxl/common/switch.h"
-#include "stxxl/io/iobase.h"
+#include "stxxl/bits/common/switch.h"
+#include "stxxl/bits/io/iobase.h"
 
 
 __STXXL_BEGIN_NAMESPACE

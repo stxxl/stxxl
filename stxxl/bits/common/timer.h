@@ -4,7 +4,7 @@
 /* Simple timer class by Roman Dementiev
  */
 
-#include "stxxl/common/namespace.h"
+#include "stxxl/bits/namespace.h"
 
 #include <time.h>
 

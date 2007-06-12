@@ -12,7 +12,7 @@
 #include <queue>
 #include <algorithm>
 
-#include "stxxl/io/io.h"
-#include "stxxl/algo/async_schedule.h"
+#include "stxxl/io"
+#include "stxxl/bits/algo/async_schedule.h"
 
 #endif

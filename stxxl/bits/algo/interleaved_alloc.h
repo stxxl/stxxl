@@ -9,8 +9,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
  
-#include "stxxl/mng/mng.h"
-#include "stxxl/common/rand.h"
+#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/common/rand.h"
 
 #include <vector>
 

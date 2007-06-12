@@ -15,20 +15,20 @@
  #include <mcstl.h>
 #endif
 
-#include "stxxl/mng/mng.h"
-#include "stxxl/common/rand.h"
-#include "stxxl/mng/adaptor.h"
-#include "stxxl/common/simple_vector.h"
-#include "stxxl/common/switch.h"
-#include "stxxl/algo/interleaved_alloc.h"
-#include "stxxl/algo/intksort.h"
-#include "stxxl/algo/adaptor.h"
-#include "stxxl/algo/async_schedule.h"
-#include "stxxl/mng/block_prefetcher.h"
-#include "stxxl/mng/buf_writer.h"
-#include "stxxl/algo/run_cursor.h"
-#include "stxxl/algo/losertree.h"
-#include "stxxl/algo/inmemsort.h"
+#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/common/rand.h"
+#include "stxxl/bits/mng/adaptor.h"
+#include "stxxl/bits/common/simple_vector.h"
+#include "stxxl/bits/common/switch.h"
+#include "stxxl/bits/algo/interleaved_alloc.h"
+#include "stxxl/bits/algo/intksort.h"
+#include "stxxl/bits/algo/adaptor.h"
+#include "stxxl/bits/algo/async_schedule.h"
+#include "stxxl/bits/mng/block_prefetcher.h"
+#include "stxxl/bits/mng/buf_writer.h"
+#include "stxxl/bits/algo/run_cursor.h"
+#include "stxxl/bits/algo/losertree.h"
+#include "stxxl/bits/algo/inmemsort.h"
 
 
 //#define SORT_OPT_PREFETCHING

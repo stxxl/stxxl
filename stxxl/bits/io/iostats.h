@@ -9,8 +9,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/common/namespace.h"
-#include "stxxl/common/mutex.h"
+#include "stxxl/bits/namespace.h"
+#include "stxxl/bits/common/mutex.h"
 
 #include <iostream>
 

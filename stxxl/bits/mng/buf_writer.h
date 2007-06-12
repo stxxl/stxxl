@@ -11,7 +11,7 @@
 
 #include <vector>
 
-#include "stxxl/mng/mng.h"
+#include "stxxl/bits/mng/mng.h"
 
 
 __STXXL_BEGIN_NAMESPACE

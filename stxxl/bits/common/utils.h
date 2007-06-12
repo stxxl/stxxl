@@ -43,9 +43,9 @@
  #include <boost/filesystem/operations.hpp>
 #endif
 
-#include "stxxl/common/namespace.h"
-#include "stxxl/common/log.h"
-#include "stxxl/common/exceptions.h"
+#include "stxxl/bits/namespace.h"
+#include "stxxl/bits/common/log.h"
+#include "stxxl/bits/common/exceptions.h"
 
 
 __STXXL_BEGIN_NAMESPACE

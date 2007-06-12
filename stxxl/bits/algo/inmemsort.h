@@ -9,10 +9,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/common/namespace.h"
-#include "stxxl/common/simple_vector.h"
-#include "stxxl/algo/adaptor.h"
-#include "stxxl/mng/adaptor.h"
+#include "stxxl/bits/namespace.h"
+#include "stxxl/bits/common/simple_vector.h"
+#include "stxxl/bits/algo/adaptor.h"
+#include "stxxl/bits/mng/adaptor.h"
 
 #include <algorithm>
 

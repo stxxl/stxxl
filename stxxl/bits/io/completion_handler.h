@@ -10,7 +10,7 @@
  *  Loki-style completion handler (functors)
  ****************************************************************************/
 
-#include "stxxl/common/namespace.h"
+#include "stxxl/bits/namespace.h"
 
 #include <memory>
 

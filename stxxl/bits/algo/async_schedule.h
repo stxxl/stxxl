@@ -9,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/io/io.h"
+#include "stxxl/io"
 
 #include <queue>
 #include <algorithm>

@@ -9,9 +9,9 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/mng/mng.h"
-#include "stxxl/mng/block_prefetcher.h"
-#include "stxxl/algo/async_schedule.h"
+#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/mng/block_prefetcher.h"
+#include "stxxl/bits/algo/async_schedule.h"
 
 
 __STXXL_BEGIN_NAMESPACE

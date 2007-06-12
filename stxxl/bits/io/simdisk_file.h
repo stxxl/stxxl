@@ -9,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/io/ufs_file.h"
+#include "stxxl/bits/io/ufs_file.h"
 
 #include <cmath>
 

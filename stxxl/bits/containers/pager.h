@@ -9,9 +9,9 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/common/namespace.h"
-#include "stxxl/common/rand.h"
-#include "stxxl/common/simple_vector.h"
+#include "stxxl/bits/namespace.h"
+#include "stxxl/bits/common/rand.h"
+#include "stxxl/bits/common/simple_vector.h"
 
 #include <memory>
 #include <list>

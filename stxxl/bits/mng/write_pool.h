@@ -9,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/mng/mng.h"
+#include "stxxl/bits/mng/mng.h"
 
 #include <list>
 

@@ -11,7 +11,7 @@
 
 #ifdef BOOST_MSVC
 
-#include "stxxl/io/iobase.h"
+#include "stxxl/bits/io/iobase.h"
 
 
 __STXXL_BEGIN_NAMESPACE

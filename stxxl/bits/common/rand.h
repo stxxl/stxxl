@@ -12,7 +12,7 @@
 #include <time.h>
 #include <cstdlib>
 
-#include "stxxl/common/utils.h"
+#include "stxxl/bits/common/utils.h"
 
 #ifdef STXXL_BOOST_RANDOM
  #include <boost/random.hpp>

@@ -16,7 +16,7 @@
 
 #else
 
- #include "stxxl/common/utils.h"
+ #include "stxxl/bits/common/utils.h"
 
  #include <pthread.h>
 

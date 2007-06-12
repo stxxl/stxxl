@@ -9,9 +9,9 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/mng/mng.h"
-#include "stxxl/mng/adaptor.h"
-#include "stxxl/algo/interleaved_alloc.h"
+#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/mng/adaptor.h"
+#include "stxxl/bits/algo/interleaved_alloc.h"
 
 
 __STXXL_BEGIN_NAMESPACE

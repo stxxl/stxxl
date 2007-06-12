@@ -9,8 +9,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/mng/mng.h"
-#include "stxxl/mng/write_pool.h"
+#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/mng/write_pool.h"
 
 #include <list>
 

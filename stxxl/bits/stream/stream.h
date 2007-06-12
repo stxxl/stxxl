@@ -9,12 +9,11 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/common/namespace.h"
-#include "stxxl/algo/sort.h"
-#include "stxxl/mng/buf_istream.h"
-#include "stxxl/mng/buf_ostream.h"
-#include "stxxl/common/tuple.h"
-#include "stxxl/containers/vector.h"
+#include "stxxl/bits/namespace.h"
+#include "stxxl/bits/mng/buf_istream.h"
+#include "stxxl/bits/mng/buf_ostream.h"
+#include "stxxl/bits/common/tuple.h"
+#include "stxxl/vector"
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -1812,7 +1811,5 @@ namespace stream
 };
 
 __STXXL_END_NAMESPACE
-
-#include "stxxl/stream/sort_stream.h"
 
 #endif

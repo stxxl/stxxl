@@ -9,7 +9,7 @@
 #ifndef STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 #define STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 
-#include "stxxl/containers/btree/iterator.h"
+#include "stxxl/bits/containers/btree/iterator.h"
 
 #include <map>
 

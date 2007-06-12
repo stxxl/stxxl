@@ -9,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/mng/buf_writer.h"
+#include "stxxl/bits/mng/buf_writer.h"
 
 
 __STXXL_BEGIN_NAMESPACE

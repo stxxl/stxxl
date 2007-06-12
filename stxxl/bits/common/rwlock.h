@@ -12,7 +12,7 @@
 
 #if 0 // not used
 
- #include "stxxl/common/namespace.h"
+ #include "stxxl/bits/namespace.h"
 
  #include <pthread.h>
 

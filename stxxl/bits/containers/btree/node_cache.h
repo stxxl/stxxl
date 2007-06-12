@@ -15,10 +15,10 @@
  #include <ext/hash_map>
 #endif
 
-#include "stxxl/io/iobase.h"
-#include "stxxl/mng/mng.h"
+#include "stxxl/bits/io/iobase.h"
+#include "stxxl/bits/mng/mng.h"
 
-#include "stxxl/containers/btree/btree_pager.h"
+#include "stxxl/bits/containers/btree/btree_pager.h"
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -9,8 +9,8 @@
 #ifndef STXXL_CONTAINERS_BTREE__NODE_H
 #define STXXL_CONTAINERS_BTREE__NODE_H
 
-#include "stxxl/containers/btree/iterator.h"
-#include "stxxl/containers/btree/node_cache.h"
+#include "stxxl/bits/containers/btree/iterator.h"
+#include "stxxl/bits/containers/btree/node_cache.h"
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -9,10 +9,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/mng/mng.h"
-#include "stxxl/mng/prefetch_pool.h"
-#include "stxxl/mng/write_pool.h"
-#include "stxxl/common/tmeta.h"
+#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/mng/prefetch_pool.h"
+#include "stxxl/bits/mng/write_pool.h"
+#include "stxxl/bits/common/tmeta.h"
 
 #include <queue>
 #include <list>
