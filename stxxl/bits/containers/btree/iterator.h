@@ -35,6 +35,8 @@ namespace btree
         typedef typename btree_type::value_type value_type;
         typedef typename btree_type::reference reference;
         typedef typename btree_type::const_reference const_reference;
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef typename btree_type::difference_type difference_type;
 
         friend class iterator_map<btree_type>;
         template <class KeyType_, class DataType_,
