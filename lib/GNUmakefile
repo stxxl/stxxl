@@ -1,13 +1,14 @@
 include Makefile.common
-include ../make.settings
 
 all: lib
 
-tests:
+include ../Makefile.subdir.gnu
 
-lib: $(LIB_OBJECTS)
+lib: lib$(LIBNAME).$(LIBEXT)
+
+lib$(LIBNAME).$(LIBEXT): $(LIB_OBJECTS)
 	$(LIBGEN)lib$(LIBNAME).$(LIBEXT) $(LIB_OBJECTS)
 
-clean:
+clean::
 	$(RM) lib$(LIBNAME).$(LIBEXT)
 
