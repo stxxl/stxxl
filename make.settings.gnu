@@ -139,18 +139,20 @@ endif
 
 #### BOOST OPTIONS ###############################################
 
-BOOST_LINKER_OPTIONS = -lboost_thread-gcc-mt \
- -lboost_date_time-gcc-mt -lboost_iostreams-gcc-mt \
- -lboost_filesystem-gcc-mt
+BOOST_COMPILER_OPTIONS	 = \
+	-DSTXXL_BOOST_TIMESTAMP \
+	-DSTXXL_BOOST_CONFIG \
+	-DSTXXL_BOOST_FILESYSTEM \
+	-DSTXXL_BOOST_THREADS \
+	-DSTXXL_BOOST_RANDOM \
+	-I$(strip $(BOOST_INCLUDE)) \
+	-pthread
 
-BOOST_COMPILER_OPTIONS =  \
- -DSTXXL_BOOST_TIMESTAMP \
- -DSTXXL_BOOST_CONFIG \
- -DSTXXL_BOOST_FILESYSTEM \
- -DSTXXL_BOOST_THREADS \
- -DSTXXL_BOOST_RANDOM \
- -I$(strip $(BOOST_INCLUDE)) \
- -pthread
+BOOST_LINKER_OPTIONS	 = \
+	-lboost_thread-gcc-mt \
+	-lboost_date_time-gcc-mt \
+	-lboost_iostreams-gcc-mt \
+	-lboost_filesystem-gcc-mt
 
 ##################################################################
 
@@ -189,7 +191,7 @@ HEADER_FILES_UTILS	+= malloc.h
 ###################################################################
 
 
-###### MISC #######################################################
+#### MISC #########################################################
 
 DEPEXT	 = $(LIBNAME).d # extension of dependency files
 OBJEXT	 = $(LIBNAME).o	# extension of object files
@@ -206,7 +208,7 @@ bin	?= $(strip $(EXEEXT))
 ###################################################################
 
 
-###### COMPILE/LINK RULES #########################################
+#### COMPILE/LINK RULES ###########################################
 
 %.$o: %.cpp ../make.settings
 	@$(RM) $*.$d
