@@ -157,6 +157,15 @@ BOOST_LINKER_OPTIONS	 = \
 ##################################################################
 
 
+#### CPPUNIT OPTIONS ############################################
+
+CPPUNIT_COMPILER_OPTIONS	+=
+
+CPPUNIT_LINKER_OPTIONS		+= -lcppunit -ldl
+
+##################################################################
+
+
 #### DEPENDENCIES ################################################
 
 HEADER_FILES_BITS	+= namespace.h
