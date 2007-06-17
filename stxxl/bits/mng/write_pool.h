@@ -14,6 +14,10 @@
 
 #include <list>
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #ifdef BOOST_MSVC
  #include <hash_map>
 #else

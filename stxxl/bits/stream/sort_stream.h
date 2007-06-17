@@ -12,6 +12,10 @@
 #include "stxxl/bits/stream/stream.h"
 #include "stxxl/sort"
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 
 __STXXL_BEGIN_NAMESPACE
 

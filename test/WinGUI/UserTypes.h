@@ -1,7 +1,7 @@
 #ifndef INCLUDE_USER_TYPES
 #define INCLUDE_USER_TYPES
 
-#include <stxxl>
+#include <stxxl/all>
 #include <limits>
 
 struct type1

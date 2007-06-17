@@ -9,6 +9,10 @@
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/common/mutex.h"
 

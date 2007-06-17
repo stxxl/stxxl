@@ -11,6 +11,10 @@
 
 #include "stxxl/bits/io/ufs_file.h"
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #ifdef BOOST_MSVC
 // mmap call does not exist in Windows
 #else

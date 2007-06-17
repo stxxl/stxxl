@@ -14,6 +14,10 @@
 #include <queue>
 #include <algorithm>
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #ifdef BOOST_MSVC
  #include <hash_map>
  #include <hash_set>

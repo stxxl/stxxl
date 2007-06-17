@@ -315,7 +315,7 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
     p_pool.resize(PageSize_);
 
     // Set prefetch aggr to PageSize_
-    for (int_type j = 0; j < k; j++) {
+    for (j=0; j < k; j++) {
         buckets[j]->set_prefetch_aggr(PageSize_);
     }
 

@@ -11,6 +11,11 @@
 
 #define STXXL_IO_STATS
 
+
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #if defined (__linux__)
  #define STXXL_CHECK_BLOCK_ALIGNING
 #endif

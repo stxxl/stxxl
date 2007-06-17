@@ -9,6 +9,10 @@
 #ifndef STXXL_CONTAINERS_BTREE__NODE_CACHE_H
 #define STXXL_CONTAINERS_BTREE__NODE_CACHE_H
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #ifdef BOOST_MSVC
  #include <hash_map>
 #else

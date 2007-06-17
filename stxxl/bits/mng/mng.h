@@ -24,6 +24,10 @@
 #include <string>
 #include <cstdlib>
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #ifdef BOOST_MSVC
 #include <memory.h>
 #endif

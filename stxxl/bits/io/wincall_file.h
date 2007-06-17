@@ -9,6 +9,12 @@
  *  dementiev@ira.uka.de
  ****************************************************************************/
 
+
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
+
 #ifdef BOOST_MSVC
 
 #include "stxxl/bits/io/wfs_file.h"
