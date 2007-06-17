@@ -19,7 +19,7 @@ void ufs_file_base::lock()
 #ifdef BOOST_MSVC
     // not yet implemented
 #else
-    flock lock_struct;
+    struct flock lock_struct;
     lock_struct.l_type = F_RDLCK | F_WRLCK;
     lock_struct.l_whence = SEEK_SET;
     lock_struct.l_start = 0;
