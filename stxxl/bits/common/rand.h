@@ -9,10 +9,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include <time.h>
+#include <ctime>
 #include <cstdlib>
 
-#include "stxxl/bits/common/utils.h"
+#include "stxxl/bits/common/types.h"
 
 #ifdef STXXL_BOOST_RANDOM
  #include <boost/random.hpp>
