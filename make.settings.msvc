@@ -94,6 +94,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/exceptions.h \
 	$(HEADER_PATH)/common/debug.h \
 	$(HEADER_PATH)/common/tuple.h \
+	$(HEADER_PATH)/common/types.h \
 	../make.settings
 
 IO_LAYER_FILES	 = \
