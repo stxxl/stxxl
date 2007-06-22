@@ -720,8 +720,8 @@ public:
         from->set_size(offset);
     }
 private:
-    vector(const vector & obj) // Copying external vectors is discouraged
-                               // (and not implemented)
+    vector(const vector & /*obj*/) // Copying external vectors is discouraged
+                                   // (and not implemented)
     {
         STXXL_FORMAT_ERROR_MSG(msg, "vector::vector, stxxl::vector copy constructor is not implemented yet");
         throw std::runtime_error(msg.str());
