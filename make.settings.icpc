@@ -1,7 +1,7 @@
 # Change this file according to your paths
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = /home/singler/code/stxxl/trunk#
+STXXL_ROOT = $(HOME)/code/stxxl/trunk#
 
 USE_BOOST = no # set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_LINUX = yes # set 'yes' if you run Linux, 'no' otherwise
