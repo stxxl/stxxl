@@ -14,7 +14,7 @@
 #include "../common/tmeta.h"
 #include "pager.h"
 #include <vector>
-
+#include <algorithm>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -563,6 +563,7 @@ public:
         std::swap(_page_no, obj._page_no);
         std::swap(_free_pages, obj._free_pages);
         std::swap(_cache, obj._cache);
+        std::swap(_from, obj._from);
     }
     size_type capacity() const
     {
@@ -719,18 +720,49 @@ public:
         }
         from->set_size(offset);
     }
-private:
-    vector(const vector & obj) // Copying external vectors is discouraged
-                               // (and not implemented)
+
+    vector(const vector & obj):
+        _size (obj.size()),
+        _bids (div_and_round_up (obj.size(), block_type::size)),
+        _page_status(div_and_round_up (_bids.size(), page_size)),
+        _last_page(div_and_round_up (_bids.size(), page_size)),
+        _page_no(n_pages),
+        _cache(n_pages * page_size),
+        _from(NULL)
     {
-        STXXL_FORMAT_ERROR_MSG(msg, "vector::vector, stxxl::vector copy constructor is not implemented yet");
-        throw std::runtime_error(msg.str());
+        bm = block_manager::get_instance ();
+        cfg = config::get_instance ();
+
+        int_type all_pages = div_and_round_up (_bids.size(), page_size);
+        int_type i = 0;
+        for ( ; i < all_pages; ++i)
+        {
+            _page_status[i] = uninitialized;
+            _last_page[i] = on_disk;
+        }
+
+        for (i = 0; i < n_pages; ++i)
+            _free_pages.push(i);
+
+
+        bm->new_blocks (_alloc_strategy, _bids.begin (),
+                        _bids.end ());
+
+        const_iterator inbegin = obj.begin();
+        const_iterator inend = obj.end();
+        std::copy(inbegin,inend,begin());
     }
 
-    vector & operator = (const vector & obj);     // Copying external vectors is discouraged
-    // (and not implemented)
+    vector & operator = (const vector & obj)
+    {
+        if(&obj != this)
+        {
+            vector tmp(obj);
+            this->swap(tmp);
+        }
+        return *this;
+    }
 
-public:
     size_type size () const
     {
         return _size;
@@ -982,6 +1014,96 @@ private:
     };
 };
 
+template <
+          typename Tp_,
+          unsigned PgSz_,
+          typename PgTp_,
+          unsigned BlkSize_,
+          typename AllocStr_,
+          typename SzTp_ >
+inline bool operator == ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_ > & a,
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_> & b )
+{
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+}
+
+template <
+          typename Tp_,
+          unsigned PgSz_,
+          typename PgTp_,
+          unsigned BlkSize_,
+          typename AllocStr_,
+          typename SzTp_ >
+inline bool operator != ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_ > & a,
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_> & b )
+{
+    return !(a==b);
+}
+
+template <
+          typename Tp_,
+          unsigned PgSz_,
+          typename PgTp_,
+          unsigned BlkSize_,
+          typename AllocStr_,
+          typename SzTp_ >
+inline bool operator < ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_ > & a,
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_> & b )
+{
+    return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
+}
+
+template <
+          typename Tp_,
+          unsigned PgSz_,
+          typename PgTp_,
+          unsigned BlkSize_,
+          typename AllocStr_,
+          typename SzTp_ >
+inline bool operator > ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_ > & a,
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_> & b )
+{
+    return b < a;
+}
+
+template <
+          typename Tp_,
+          unsigned PgSz_,
+          typename PgTp_,
+          unsigned BlkSize_,
+          typename AllocStr_,
+          typename SzTp_ >
+inline bool operator <= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_ > & a,
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_> & b )
+{
+    return !(b < a);
+}
+
+template <
+          typename Tp_,
+          unsigned PgSz_,
+          typename PgTp_,
+          unsigned BlkSize_,
+          typename AllocStr_,
+          typename SzTp_ >
+inline bool operator >= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_ > & a,
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
+                          AllocStr_, SzTp_> & b )
+{
+    return !(a < b);
+}
+
 //! \}
 
 //! \addtogroup stlcont
@@ -1049,6 +1171,7 @@ namespace std
         a.swap(b);
     }
 }
+
 
 
 #endif
