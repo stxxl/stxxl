@@ -20,7 +20,7 @@
 #include <list>
 #include "async_schedule.h"
 
-//#define SORT_OPT_PREFETCHING
+//#define SORT_OPTIMAL_PREFETCHING
 //#define INTERLEAVED_ALLOC
 
 
@@ -356,7 +356,7 @@ struct run_cursor2 : public run_cursor<block_type>, public have_prefetcher
 
 void * have_prefetcher::untyped_prefetcher = NULL;
 
-#ifdef SORT_OPT_PREFETCHING
+#ifdef SORT_OPTIMAL_PREFETCHING
  #include "koptprefetcher.h"
 #else
  #include "kprefetcher.h"
@@ -566,7 +566,7 @@ merge_runs_lt (run_type * * in_runs, int_type nruns, run_type * out_run, unsigne
     int_type i;
     run_type consume_seq(out_run->size());
 
-#ifdef SORT_OPT_PREFETCHING
+#ifdef SORT_OPTIMAL_PREFETCHING
     int_type * prefetch_seq = new int_type[out_run->size()];
 #endif
 
@@ -591,7 +591,7 @@ merge_runs_lt (run_type * * in_runs, int_type nruns, run_type * out_run, unsigne
 
     const int_type n_write_buffers = std::max( 2 * disks_number, int_type(_m) - nruns - n_prefetch_buffers );
 
-#ifdef SORT_OPT_PREFETCHING
+#ifdef SORT_OPTIMAL_PREFETCHING
     compute_prefetch_schedule(
         consume_seq,
         prefetch_seq,
@@ -599,7 +599,7 @@ merge_runs_lt (run_type * * in_runs, int_type nruns, run_type * out_run, unsigne
         disks_number );
 #endif
 
-#ifdef SORT_OPT_PREFETCHING
+#ifdef SORT_OPTIMAL_PREFETCHING
     prefetcher_writer_type prefetcher(
         &consume_seq,
         prefetch_seq,
@@ -648,7 +648,7 @@ merge_runs_lt (run_type * * in_runs, int_type nruns, run_type * out_run, unsigne
         out_buffer = prefetcher.w_block (i_out_buffer)->elem;
     }
 
-#ifdef SORT_OPT_PREFETCHING
+#ifdef SORT_OPTIMAL_PREFETCHING
     delete [] prefetch_seq;
 #endif
 

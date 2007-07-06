@@ -987,7 +987,7 @@ namespace stream
             const int_type n_prefetch_buffers = STXXL_MAX( 2 * disks_number, (int_type(m_) - int_type(nruns)) );
 
 
-#ifdef SORT_OPT_PREFETCHING
+#ifdef SORT_OPTIMAL_PREFETCHING
             // heuristic
             const int_type n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
 

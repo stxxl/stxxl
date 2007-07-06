@@ -26,7 +26,7 @@
 #include "losertree.h"
 #include "inmemsort.h"
 
-//#define SORT_OPT_PREFETCHING
+//#define SORT_OPTIMAL_PREFETCHING
 //#define INTERLEAVED_ALLOC
 
 #define OPT_MERGING
@@ -472,7 +472,7 @@ bool check_ksorted_runs(              run_type * * runs,
             STXXL_VERBOSE("Prefetch buffers " << n_opt_prefetch_buffers)
 #endif
 
-#ifdef SORT_OPT_PREFETCHING
+#ifdef SORT_OPTIMAL_PREFETCHING
             compute_prefetch_schedule(
                 consume_seq,
                 prefetch_seq,

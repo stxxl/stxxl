@@ -81,7 +81,7 @@ OUT    = /out:# output file for linking and compilation
 ###################################################################
 
 STXXL_SPECIFIC = \
- -DSORT_OPT_PREFETCHING \
+ -DSORT_OPTIMAL_PREFETCHING \
  -DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I$(STXXL_ROOT)/ \
  -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
