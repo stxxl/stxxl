@@ -100,6 +100,18 @@ endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
 
+MCSTL_ROOT		?= $(strip $(MCSTL_BASE))$(if $(strip $(MCSTL_BRANCH)),/$(strip $(MCSTL_BRANCH)))
+
+ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/mcstl.h)))
+$(error ERROR: could not find a MCSTL installation in MCSTL_ROOT=$(MCSTL_ROOT))
+endif
+
+MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -D__MCSTL__ -I$(MCSTL_ROOT)/c++
+MCSTL_LDFLAGS		+= $(OPENMPFLAG)
+
+ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/bits/stl_algo.h)))
+# not from libstdc++ branch, need to find the correct original symlink
+
 # find a KEY=VALUE element in WORDS and return VALUE
 # usage: $(call get_value,KEY,WORDS)
 get_value		 = $(subst $(1)=,,$(filter $(1)=%,$(2)))
@@ -117,11 +129,7 @@ cxx_incdir_from_compile	 = $(patsubst %/vector,%,$(firstword $(filter %/vector, 
 export cxx_incdir_from_compile
 endif
 MCSTL_ORIGINALS		?= $(strip $(MCSTL_BASE))/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
-MCSTL_ROOT		?= $(strip $(MCSTL_BASE))$(if $(strip $(MCSTL_BRANCH)),/$(strip $(MCSTL_BRANCH)))
 
-ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/mcstl.h)))
-$(error ERROR: could not find a MCSTL installation in MCSTL_ROOT=$(MCSTL_ROOT))
-endif
 ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
 $(error ERROR: could not determine MCSTL_ORIGINAL_INC_CXX, please set this variable manually, it's your compilers ($(COMPILER)) include/c++ path)
 endif
@@ -129,8 +137,9 @@ ifeq (,$(strip $(wildcard $(MCSTL_ORIGINALS)/original)))
 $(error ERROR: your mcstl in $(MCSTL_BASE) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
 endif
 
-MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ORIGINALS) -D__MCSTL__
-MCSTL_LDFLAGS		+= $(OPENMPFLAG)
+MCSTL_CPPFLAGS		+= -I$(MCSTL_ORIGINALS)
+
+endif # not from libstdc++ branch
 
 endif
 
