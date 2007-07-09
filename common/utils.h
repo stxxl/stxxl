@@ -563,5 +563,14 @@ bool operator!= (const new_alloc<T1> &,
     return false;
 }
 
+inline unsigned_type sort_memory_usage_factor()
+{
+#ifdef __MCSTL__
+    return (mcstl::HEURISTIC::sort_algorithm == mcstl::HEURISTIC::PMWMS) ? 2 : 1;
+#else
+    return 1;
+#endif
+}
+
 __STXXL_END_NAMESPACE
 #endif
