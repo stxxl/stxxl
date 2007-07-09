@@ -101,9 +101,9 @@ endif
 ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
 $(error ERROR: could not determine MCSTL_ORIGINAL_INC_CXX, please set this variable manually, it's your compilers ($(COMPILER)) include/c++ path)
 endif
-ifeq (,$(strip $(wildcard $(MCSTL_ORIGINALS)/original)))
-$(error ERROR: your mcstl in $(MCSTL_ROOT) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
-endif
+#ifeq (,$(strip $(wildcard $(MCSTL_ORIGINALS)/original)))
+#$(error ERROR: your mcstl in $(MCSTL_ROOT) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
+#endif
 
 MCSTL_CPPFLAGS		+= -fopenmp -I$(MCSTL_ROOT)/c++ -I$(MCSTL_ORIGINALS) -D__MCSTL__
 MCSTL_LDFLAGS		+= -fopenmp
