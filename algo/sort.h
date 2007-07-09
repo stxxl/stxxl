@@ -19,6 +19,7 @@
 #include "../mng/adaptor.h"
 #include "../common/simple_vector.h"
 #include "../common/switch.h"
+#include "common/settings.h"
 #include "interleaved_alloc.h"
 #include "intksort.h"
 #include "adaptor.h"
@@ -29,7 +30,7 @@
 #include "losertree.h"
 #include "inmemsort.h"
 
-//#define SORT_OPTIMAL_PREFETCHING
+//#define SORT_OPT_PREFETCHING
 //#define INTERLEAVED_ALLOC
 //#define STXXL_CHECK_ORDER_IN_SORTS
 
@@ -419,13 +420,13 @@ namespace sort_local
 #else
                 const int_type n_prefetch_buffers = STXXL_MAX( 2 * disks_number, (3 * (int_type(_m) - nruns) / 4));
                 const int_type n_write_buffers = STXXL_MAX( 2 * disks_number, int_type(_m) - nruns - n_prefetch_buffers );
- #ifdef SORT_OPTIMAL_PREFETCHING
+ #ifdef SORT_OPT_PREFETCHING
                 // heuristic
                 const int_type n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
  #endif
 #endif
 
-#ifdef SORT_OPTIMAL_PREFETCHING
+#ifdef SORT_OPT_PREFETCHING
                 compute_prefetch_schedule(
                     consume_seq,
                     prefetch_seq,
@@ -448,73 +449,16 @@ namespace sort_local
 
                 block_type * out_buffer = writer.get_free_block();
 
-#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
-                if (mcstl::HEURISTIC::stxxl_native_merge)
-                {
-#endif
-                loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size>
-                losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
-
-#ifdef STXXL_CHECK_ORDER_IN_SORTS
-                value_type last_elem;
-#endif
-
-                for (i = 0; i < out_run_size; ++i)
-                {
-                    losers.multi_merge(out_buffer->elem);
-                    (*out_run)[i].value = *(out_buffer->elem);
-
-#ifdef STXXL_CHECK_ORDER_IN_SORTS
-                    assert(stxxl::is_sorted(
-                               out_buffer->begin(),
-                               out_buffer->end()
-                               , cmp));
-
-                    if (i) assert( cmp(*(out_buffer->elem), last_elem) == false);
-
-
-                    last_elem = (*out_buffer).elem[block_type::size - 1];
-#endif
-
-
-                    out_buffer = writer.write(out_buffer, (*out_run)[i].bid);
-                }
+//If parallelism is activated, one can still fall back to the 
+//native merge routine by setting stxxl::SETTINGS::native_merge= true, //otherwise, it is used anyway.
 
 #if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
-            }
-            else
-            {
-                if (mcstl::HEURISTIC::num_threads <= 1)
-                {
-                    loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size>
-                    losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
- #ifdef STXXL_CHECK_ORDER_IN_SORTS
-                    value_type last_elem;
- #endif
+// begin of STL-style merging
 
-                    for (i = 0; i < out_run_size; ++i)
-                    {
-                        losers.multi_merge(out_buffer->elem);
-                        (*out_run)[i].value = *(out_buffer->elem);
+                //taks: merge 
 
- #ifdef STXXL_CHECK_ORDER_IN_SORTS
-                        assert(stxxl::is_sorted(
-                                   out_buffer->begin(),
-                                   out_buffer->end()
-                                   , cmp));
-
-                        if (i) assert( cmp(*(out_buffer->elem), last_elem) == false);
-
-
-                        last_elem = (*out_buffer).elem[block_type::size - 1];
- #endif
-
-
-                        out_buffer = writer.write(out_buffer, (*out_run)[i].bid);
-                    }
-                }
-                else
+                if (!stxxl::SETTINGS::native_merge && mcstl::HEURISTIC::num_threads >= 1)
                 {
                     typedef stxxl::int64 diff_type;
                     typedef std::pair < typename block_type::iterator, typename block_type::iterator > sequence;
@@ -524,52 +468,50 @@ namespace sort_local
 
                     for (int_type i = 0; i < nruns; i++)        //initialize sequences
                     {
-                        buffers[i] = prefetcher.pull_block();
-                        seqs[i] = std::make_pair(buffers[i]->begin(), buffers[i]->end());
+                        buffers[i] = prefetcher.pull_block();	//get first block of each run
+                        seqs[i] = std::make_pair(buffers[i]->begin(), buffers[i]->end());	//this memory location stays the same, only the data is exchanged
                     }
 
  #ifdef STXXL_CHECK_ORDER_IN_SORTS
                     value_type last_elem;
  #endif
 
-                    for (int_type j = 0; j < out_run_size; ++j)         //for the whole output run
+                    for (int_type j = 0; j < out_run_size; ++j)         //for the whole output run, out_run_size is in blocks
                     {
                         diff_type rest = block_type::size;              //elements still to merge for this output block
 
                         STXXL_VERBOSE1("output block " << j);
                         do
                         {
-                            assert(seqs[0].first != seqs[0].second);
-
-                            value_type min_last = *(seqs[0].second - 1);                //minimum of the sequences' last elements
+                            value_type* min_last_element = NULL;	//no element found yet
                             diff_type total_size = 0;
 
-                            total_size += seqs[0].second - seqs[0].first;
-                            STXXL_VERBOSE1("last " << *(seqs[0].second - 1) << " block size " << (seqs[0].second - seqs[0].first));
-
-                            for (seqs_size_type i = 1; i < seqs.size(); i++)
+                            for (seqs_size_type i = 0; i < seqs.size(); i++)
                             {
                                 if (seqs[i].first == seqs[i].second)
-                                    continue;
-                                //empty subsequence
-                                assert(seqs[i].first != seqs[i].second);
+                                    continue;    //run empty
 
-                                min_last = cmp(min_last, *(seqs[i].second - 1)) ? min_last : *(seqs[i].second - 1);
+                                if (min_last_element == NULL)
+                                    min_last_element = &(*(seqs[i].second - 1));
+                                else 
+                                    min_last_element = cmp(*min_last_element, *(seqs[i].second - 1)) ? min_last_element : &(*(seqs[i].second - 1));
 
                                 total_size += seqs[i].second - seqs[i].first;
                                 STXXL_VERBOSE1("last " << *(seqs[i].second - 1) << " block size " << (seqs[i].second - seqs[i].first));
                             }
 
-                            STXXL_VERBOSE1("min_last " << min_last << " total size " << total_size + (block_type::size - rest));
+                            assert(min_last_element != NULL);	//there must be some element
+
+                            STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (block_type::size - rest));
 
                             diff_type less_equal_than_min_last = 0;
                             //locate this element in all sequences
                             for (seqs_size_type i = 0; i < seqs.size(); i++)
                             {
                                 if (seqs[i].first == seqs[i].second)
-                                    continue;
-                                //empty subsequence
-                                typename block_type::iterator position = std::upper_bound(seqs[i].first, seqs[i].second, min_last, cmp);
+                                    continue;    //empty subsequence
+
+                                typename block_type::iterator position = std::upper_bound(seqs[i].first, seqs[i].second, *min_last_element, cmp);
                                 STXXL_VERBOSE1("greater equal than " << position - seqs[i].first);
                                 less_equal_than_min_last += position - seqs[i].first;
                             }
@@ -631,9 +573,49 @@ namespace sort_local
 
                         out_buffer = writer.write(out_buffer, (*out_run)[j].bid);
                     }
+                    
+// end of STL-style merging
                 }
-            }
+                else
+                {
 #endif
+
+// begin of native merging procedure
+
+                loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size>
+                losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
+
+#ifdef STXXL_CHECK_ORDER_IN_SORTS
+                value_type last_elem;
+#endif
+
+                for (i = 0; i < out_run_size; ++i)
+                {
+                    losers.multi_merge(out_buffer->elem);
+                    (*out_run)[i].value = *(out_buffer->elem);
+
+#ifdef STXXL_CHECK_ORDER_IN_SORTS
+                    assert(stxxl::is_sorted(
+                               out_buffer->begin(),
+                               out_buffer->end()
+                               , cmp));
+
+                    if (i) assert( cmp(*(out_buffer->elem), last_elem) == false);
+
+
+                    last_elem = (*out_buffer).elem[block_type::size - 1];
+#endif
+
+
+                    out_buffer = writer.write(out_buffer, (*out_run)[i].bid);
+                }
+
+// end of native merging procedure
+
+#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
+		}
+#endif
+
 
                 delete [] prefetch_seq;
 
@@ -847,25 +829,18 @@ namespace sort_local
             typedef typename ExtIterator_::block_type block_type;
 
             unsigned_type n = 0;
-            unsigned_type sort_factor = 1;
-
-#ifdef __MCSTL__
-            if (mcstl::HEURISTIC::sort_algorithm == mcstl::HEURISTIC::PMWMS)
-                sort_factor = 2;
-
-#endif
 
             block_manager * mng = block_manager::get_instance ();
 
             first.flush();
 
-            if ((last - first) * sizeof(value_type) * sort_factor < M)
+            if ((last - first) * sizeof(value_type) * sort_memory_usage_factor() < M)
             {
                 stl_in_memory_sort(first, last, cmp);
             }
             else
             {
-                assert(2 * block_type::raw_size * sort_factor <= M);
+                assert(2 * block_type::raw_size * sort_memory_usage_factor() <= M);
 
                 if (first.block_offset())
                 {
@@ -921,7 +896,7 @@ namespace sort_local
                             typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator >
-                        (first.bid(), n, M / sort_factor / block_type::raw_size, cmp);
+                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
                         first_block = new typename ExtIterator_::block_type;
@@ -1020,7 +995,7 @@ namespace sort_local
                             typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator >
-                        (first.bid(), n, M / sort_factor / block_type::raw_size, cmp);
+                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
                         first_block = new typename ExtIterator_::block_type;
@@ -1103,7 +1078,7 @@ namespace sort_local
                             typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator >
-                        (first.bid(), n, M / sort_factor / block_type::raw_size, cmp);
+                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
                         last_block = new typename ExtIterator_::block_type;
@@ -1152,7 +1127,7 @@ namespace sort_local
                             sort_local::sort_blocks <        typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator >
-                        (first.bid(), n, M / sort_factor / block_type::raw_size, cmp);
+                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
                         typename run_type::iterator it = out->begin();
                         typename ExtIterator_::bids_container_iterator cur_bid = first.bid();
