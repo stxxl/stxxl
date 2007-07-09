@@ -121,11 +121,12 @@ int main(int argc, char * argv[])
         "/data02/stxxl",
         "/data03/stxxl",
         "/data04/stxxl",
-        "/data05/stxxl" //,
-        //"/data06/stxxl",
-        //"/data07/stxxl",
-        //"/data08/stxxl",
-        //"/data09/stxxl"
+        "/data05/stxxl",
+        "/data06/stxxl",
+        "/data07/stxxl",
+        "/data08/stxxl",
+        "/data09/stxxl",
+        "/data10/stxxl"
     };
 #endif
 
