@@ -1,7 +1,10 @@
 # $Id$
 
+INSTANCE	?= stxxl
+INSTANCE	?= mcstxxl
+
 include ../../make.settings
-include ../../stxxl.mk
+-include ../../$(INSTANCE).mk
 
 CXX		 = $(STXXL_CXX)
 OPT		 = -O3
@@ -10,9 +13,6 @@ WARNINGS	 = -W -Wall
 CPPFLAGS	+= $(STXXL_CPPFLAGS)
 CPPFLAGS	+= $(OPT) $(WARNINGS)
 CPPFLAGS	+= -MD
-
-#include ../mcstxxl.mk
-#OPT		 = -O2
 
 STXXL_MAIN_HEADER	+= stxxl.h
 STXXL_HEADERS		+= all
@@ -36,16 +36,16 @@ HEADERS_ESCAPED		 = $(subst /,~,$(HEADERS))
 #all: preprocess-test
 all: compile-test
 
-preprocess-test: $(HEADERS_ESCAPED:%=test-header-%.ii)
-compile-test: $(HEADERS_ESCAPED:%=test-header-%.o)
+preprocess-test: $(HEADERS_ESCAPED:%=test-header-%.$(INSTANCE).ii)
+compile-test: $(HEADERS_ESCAPED:%=test-header-%.$(INSTANCE).o)
 
 test-header-%.cpp::
 	echo '#include "$(subst ~,/,$*)"' > $@
 
-%.ii: %.cpp
+%.$(INSTANCE).ii: %.cpp
 	$(CXX) $(CPPFLAGS) -E $< -o $@
 
-%.o: %.cpp
+%.$(INSTANCE).o: %.cpp
 	$(COMPILE.cc) $(OUTPUT_OPTION) $<
 
 clean:
