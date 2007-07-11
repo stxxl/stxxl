@@ -73,6 +73,7 @@ LIBNAME		?= stxxl
 #### STXXL OPTIONS ###############################################
 
 STXXL_SPECIFIC	+= \
+	$(CPPFLAGS_ARCH) \
 	-DSORT_OPT_PREFETCHING \
 	-DUSE_MALLOC_LOCK \
 	-DCOUNT_WAIT_TIME \
@@ -83,6 +84,10 @@ STXXL_SPECIFIC	+= \
 STXXL_LDLIBS	+= -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME) -lpthread
 
 STXXL_LIBDEPS	+= $(strip $(STXXL_ROOT))/lib/lib$(LIBNAME).$(LIBEXT)
+
+UNAME_M		:= $(shell uname -m)
+CPPFLAGS_ARCH	+= $(CPPFLAGS_$(UNAME_M))
+CPPFLAGS_i686	?= -march=i686
 
 ##################################################################
 
