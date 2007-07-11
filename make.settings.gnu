@@ -106,7 +106,7 @@ ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/mcstl.h)))
 $(error ERROR: could not find a MCSTL installation in MCSTL_ROOT=$(MCSTL_ROOT))
 endif
 
-MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -D__MCSTL__ -I$(MCSTL_ROOT)/c++
+MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -D__MCSTL__ $(MCSTL_INCLUDES_PREPEND) -I$(MCSTL_ROOT)/c++
 MCSTL_LDFLAGS		+= $(OPENMPFLAG)
 
 ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/bits/stl_algo.h)))
@@ -139,7 +139,11 @@ endif
 
 MCSTL_CPPFLAGS		+= -I$(MCSTL_ORIGINALS)
 
-endif # not from libstdc++ branch
+else # from libstdc++ branch
+
+MCSTL_INCLUDES_PREPEND	+= $(if $(findstring 4.3,$(COMPILER)),-I$(MCSTL_ROOT)/c++/mod_stl/gcc-4.3)
+
+endif # (not) from libstdc++ branch
 
 endif
 
