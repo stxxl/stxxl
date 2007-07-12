@@ -1,0 +1,483 @@
+% Peter's Makros
+\newcommand{\Id}[1]{\ensuremath{\mathit{#1}}}
+\newcommand{\vek}[1]{\mathbf{#1}}
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\ceil}[1]{\left\lceil #1\right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1\right\rfloor}
+\newcommand{\abs}[1]{\left| #1\right|}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\enorm}[1]{\norm{#1}_{2}}
+\newcommand{\sumnorm}[1]{\norm{#1}_{1}}
+\newcommand{\maxnorm}[1]{\norm{#1}_{\infty}}
+\newcommand{\xor}{\oplus}
+\newcommand{\set}[1]{\left\{ #1\right\}}
+\newcommand{\sset}[1]{\set{#1}} % synomym?
+\newcommand{\gilt}{:}
+%\newcommand{\sodass}{\,:\,}
+\newcommand{\sodass}{\mid}
+\newcommand{\setGilt}[2]{\left\{ #1\gilt #2\right\}}
+\newcommand{\seqGilt}[2]{\left\langle #1\gilt #2\right\rangle}
+\newcommand{\Litem}[1]{\seq{#1}}
+\newcommand{\Def}{:=}
+\newcommand{\zvektor}[2]{\left(#1,#2\right)}
+\newcommand{\vektor}[2]{\left(\begin{smallmatrix}#1\\#2\end{smallmatrix}\right)}
+\newcommand{\vektord}[3]{\left(\begin{smallmatrix}#1\\#2\\#3\end{smallmatrix}\right)}
+\newcommand{\condition}[1]{\left[#1\right]}
+\newcommand{\binomial}[2]{\binom{#1}{#2}}
+\newcommand{\even}{\mathrm{even}}
+\newcommand{\odd}{\mathrm{odd}}
+\newcommand{\mymod}{\,\bmod\,}
+% \newcommand{\divides}{|}
+%\newcommand{\Div}{\,\mathrm{div}\,}
+
+% Typen
+\newcommand{\nat}{\mathbb{N}}
+\newcommand{\natnull}{\mathbb{N}_{0}}
+\newcommand{\natplus}{\mathbb{N}_{+}}
+%\newcommand{\natless}[1]{\mathbb{N}_{<#1}}
+\newcommand{\natless}[1]{\mathbb{N}_{#1}}
+\newcommand{\nplus}{\mathbb{N}_+}
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\rplus}{\mathbb{R}_+}
+\newcommand{\rnneg}{\mathbb{R}_*}
+\newcommand{\integer}{\mathbb{Z}}
+% \newcommand{\intint}[2]{\set{#1,\ldots, #2}}
+\newcommand{\intint}[2]{{#1}..{#2}}
+\newcommand{\realrange}[2]{\left[#1, #2\right]}
+\newcommand{\realrangeo}[2]{\left(#1, #2\right)}
+\newcommand{\realrangelo}[2]{\left(#1, #2\right]}
+\newcommand{\realrangero}[2]{\left[#1, #2\right)}
+\newcommand{\unitrange}[2]{\realrange{0}{1}}
+\newcommand{\bool}{\set{0,1}}
+%\newcommand{\boolean}{\mathbb{B}}
+%\newcommand{\mapping}[2]{#1\rightarrow #2}
+\newcommand{\mapping}[2]{{#2}^{#1}}
+\newcommand{\powerset}[1]{{\cal P}\left(#1\right)}
+\newcommand{\NP}{\mathbf{NP}}
+\newcommand{\Bild}{\mathbf{Bild}\:}
+
+% Typannotation
+\newcommand{\withtype}[1]{\in#1}
+
+% Wahrscheinlichkeitsrechnung
+\newcommand{\condprob}[2]{{\mathbb{P}}\left(#1\;|\;#2\right)}
+\newcommand{\condexpect}[2]{{\mathbb{E}}\left(#1\;|\;#2\right)}
+\newcommand{\var}{{\mathbb{V}}}
+\newcommand{\quant}[2]{\tilde{#1}_{#2}}
+
+% asymptotische Notation
+\newcommand{\whpO}[1]{\tilde{\mathrm{O}}\left( #1\right)}
+\newcommand{\Oschlange}{$\tilde{\mathrm{O}}$}
+\newcommand{\Ohh}[1]{\mathcal{O}\!\left( #1\right)}
+\newcommand{\Oh}[1]{\mathcal{O}\!\left( #1\right)}
+\newcommand{\Ohlarge}[1]{\mathcal{O}\!\left( #1\right)}
+% \newcommand{\Oh}[1]{{\mathcal{O}}(#1)}
+\newcommand{\Ohsmall}[1]{\mathcal{O}(#1)}
+\newcommand{\oh}[1]{\mathrm{o}\!\left( #1\right)}
+\newcommand{\Th}[1]{\Theta\!\left( #1\right)}
+\newcommand{\Om}[1]{\Omega\left(#1\right)}
+\newcommand{\om}[1]{\omega\!\left( #1\right)}
+\newcommand{\Oleq}{\preceq}
+
+% local reference
+\newcommand{\lref}[1]{\ref{\labelprefix:#1}}
+\newcommand{\llabel}[1]{\label{\labelprefix:#1}}
+\newcommand{\labelprefix}{} % later redefined using renewcommand
+
+
+% open issues
+%\marginparwidth5cm
+\marginparpush2mm
+\marginparsep1mm
+%\newcommand{\frage}[1]{}
+%\newcommand{\frage}[1]{[{\sf#1}]\marginpar{?}}
+\newcommand{\frage}[1]{[{\sf#1}]\marginpar[\hfill$\Longrightarrow$]{$\Longleftarrow$}}
+%\newcommand{\frage}[1]{\makebox[0cm]{$\bigotimes$}\marginpar{\tiny #1}}
+
+\newcommand{\mysubsubsection}[1]{\par\vspace{2mm}\noindent{\bf #1 }}
+
+% punkt am ende von display math
+\newcommand{\punkt}{\enspace .}
+
+% Pseudocode Unterst\"utzung
+\newcommand{\labelcommand}{}
+\newcommand{\captiontext}{}
+\newsavebox{\buchalgorithmparam}
+\newcounter{lineNumber}
+\newenvironment{buchalgorithmpos}[3]{%
+\renewcommand{\labelcommand}{#2}%
+\renewcommand{\captiontext}{#3}%
+\sbox{\buchalgorithmparam}{\parbox{\textwidth}{#3}}%
+\begin{figure}[#1]\begin{center}\begin{code}\setcounter{lineNumber}{1}}{%
+\end{code}\end{center}\caption{\llabel{\labelcommand}\captiontext}\end{figure}}
+
+\newenvironment{buchalgorithm}[2]{\begin{buchalgorithmpos}{htbp}{#1}{#2}}%
+{\end{buchalgorithmpos}}
+
+\newenvironment{code}{\noindent\it%
+\begin{tabbing}%
+\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
+\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
+\kill}{\end{tabbing}}
+
+% 1=pos, 2=llable, 3=caption
+%\newcommand{\labelcommand}{}
+%\newcommand{\captiontext}{}
+%\newsavebox{\codeparam}
+%\newcounter{lineNumber}
+%\newenvironment{buchalgorithmpos}[3]{%
+%\renewcommand{\labelcommand}{#2}%
+%\renewcommand{\captiontext}{#3}%
+%\sbox{\codeparam}{\parbox{\textwidth}{#3}}%
+%\begin{figure}[#1]\begin{center}\begin{code}\setcounter{lineNumber}{1}}{%
+%\end{code}\end{center}\caption{\llabel{\labelcommand}\captiontext}\end{figure}}
+
+%\newenvironment{buchalgorithm}[2]{\begin{buchalgorithmpos}{htb}{#1}{#2}}%
+%{\end{buchalgorithmpos}}
+
+% code in text 
+%\newcommand{\codel}[1]{{\sf #1}}
+%\newcommand{\codem}[1]{\mathsf{#1}}
+\newcommand{\codel}[1]{\mbox{\rm "`#1"'}}
+\newcommand{\codem}[1]{\mathrm{#1}}
+
+\newcommand{\Assert}{{\bf assert\ }}
+\newcommand{\Invariant}{{\bf invariant\ }}
+\newcommand{\Class}{{\bf Class\ }}
+\newcommand{\Constant}{{\bf Constant\ }}
+\newcommand{\Array}{{\bf Array\ }}
+\newcommand{\Of}{{\bf of\ }}
+\newcommand{\Function} {{\bf Function\ }}
+\newcommand{\Funct}[3]{\Function #1\Declare{{\rm (}{#2\rm )}}{#3}}
+\newcommand{\Procedure}{{\bf Procedure\ }}
+\newcommand{\Operator}{{\bf Operator\ }}
+\newcommand{\Type}{{\bf Type\ }}
+\newcommand{\Address}{{\bf address of\ }}
+\newcommand{\Pointer}{{\bf Pointer\ }}
+\newcommand{\Points}{\ensuremath{\rightarrow}}
+\newcommand{\Allocate}{{\bf allocate\ }}
+\newcommand{\This}{{\bf this\ }}
+\newcommand{\Null}{{\bf null\ }}
+\newcommand{\Dispose}{{\bf dispose\ }}
+\newcommand{\Deallocate}{{\bf dispose\ }}
+\newcommand{\Delete}{{\bf dispose\ }}
+\newcommand{\Process}{{\bf process\ }}
+\newcommand{\While}    {{\bf while\ }}
+\newcommand{\Repeat}   {{\bf repeat\ }}
+\newcommand{\Until}    {{\bf until\ }}
+\newcommand{\Loop}     {{\bf loop\ }}
+\newcommand{\Exit}     {{\bf exit\ }}
+\newcommand{\Goto}     {{\bf goto\ }}
+\newcommand{\Do}       {{\bf do\ }}
+\newcommand{\Od}       {{\bf od\ }}
+\newcommand{\Dopar}       {{\bf dopar\ }}
+\newcommand{\For}      {{\bf for\ }}
+\newcommand{\Foreach}      {{\bf foreach\ }}
+\newcommand{\Rof}      {{\bf rof\ }}
+\newcommand{\Is}{\mbox{\rm := }}
+\newcommand{\Forall}      {{\bf forall\ }}
+\newcommand{\ForFromTo}[3]{{\For $#1$ \Is $#2$ \To $#3$ \Do}}
+\newcommand{\ForFromToWhile}[4]{{\For $#1$ \Is $#2$ \To $#3$ \While $#4$ \Do}}
+\newcommand{\ForFromDowntoWhile}[4]{{\For $#1$ \Is $#2$ \To $#3$ \While $#4$ \Do}}
+\newcommand{\ForFromDownto}[3]{{\For $#1$ \Is $#2$ \Downto $#3$ \Do}}
+\newcommand{\ForFromWhile}[3]{{\For $#1$ \Is $#2$ \To $\infty$ \While $#3$ \Do}}
+\newcommand{\ForFromdownWhile}[3]{{\For $#1$ \Is $#2$ \Downto $-\infty$ \While $#3$ \Do}}
+\newcommand{\ForFromToStep}[4]{{\For $#1$ \Is $#2$ \To $#3$ \Step $#4$  \Do}}
+\newcommand{\ForFromDowntoStep}[4]{{\For $#1$ \Is $#2$ \Downto $#3$  \Step $#4$ \Do}}
+\newcommand{\ForFromStepWhile}[4]{{\For $#1$ \Is $#2$ \To $\infty$ \Step $#3$  \While $#4$ \Do}}
+\newcommand{\ForFromdownStepWhile}[4]{{\For $#1$ \Is $#2$ \Downto $-\infty$ \Step $#3$  \While $#4$ \Do}}
+%\newcommand{\ForFromTo}[3]{{\For $#1\in #2..#3$ \Do}}
+%\newcommand{\ForFromToDown}[3]{{\For $#1\in #2..#3$ {\bf downwards} \Do}}
+%\newcommand{\ForFromWhile}[3]{{\For $#1\in #2..$ \While $#3$ \Do}}
+%\newcommand{\ForFromDownWhile}[3]{{\For $#1\in #2..$ {\bf downwards} \While $#3$ \Do}}
+%\newcommand{\ForFromToStep}[4]{{\For $#1\in #2..#3$ \Step $#4$ \Do}}
+%\newcommand{\ForFromToDownStep}[4]{{\For $#1\in #2..#3$ {\bf downwards} \Step $#4$  \Do}}
+%\newcommand{\ForFromWhileStep}[4]{{\For $#1\in #2..$ \While $#3$ \Step $#4$  \Do}}
+%\newcommand{\ForFromDownWhileStep}[4]{{\For $#1\in #2..$ {\bf downwards} \While $#3$ \Step $#4$  \Do}}
+\newcommand{\To}       {{\bf to\ }}
+\newcommand{\Step}       {{\bf step\ }}
+\newcommand{\Downto}       {{\bf downto\ }}
+\newcommand{\If}       {{\bf if\ }}
+\newcommand{\Endif}    {{\bf endif\ }}
+\newcommand{\Fi}       {{\bf fi\ }}
+\newcommand{\Then}     {{\bf then\ }}
+\newcommand{\Else}     {{\bf else\ }}
+\newcommand{\Elsif}    {{\bf elsif\ }}
+\newcommand{\Return}   {{\bf return\ }}
+\newcommand{\Set}      {{\bf set\ }}
+\newcommand{\Boolean}  {{\bf boolean\ }}
+\newcommand{\Integer}  {$\integer$}
+\newcommand{\True}     {{\bf true\ }}
+\newcommand{\False}    {{\bf false\ }}
+\newcommand{\Bitand}   {{\bf bitand\ }}
+\newcommand{\Var}      {{\bf var\ }}
+\newcommand{\Xor}       {{\bf\ xor\ }}
+\newcommand{\Not}       {{\bf\ not\ }}
+\newcommand{\Or}       {{\bf\ or\ }}
+\newcommand{\Div}       {{\bf\ div\ }}
+\newcommand{\Mod}       {{\bf\ mod\ }}
+\newcommand{\Decrement}  {\ensuremath{\mathbf{-}\mathbf{-}\ }}
+\newcommand{\Increment}  {\ensuremath{\mathbf{+}\mathbf{+}\ }}
+\newcommand{\End}       {{\bf end\ }}
+\newcommand{\Endfor}       {{\bf endfor\ }}
+%\newcommand{\Rem}[1]   {{\bf (*~}{\rm#1}{\bf ~*)}}
+\newcommand{\Rem}[1]   {{\bf //\hspace{0.5mm}{\rm#1}}}
+% rechtsbuendiger Kommentar
+%\newcommand{\RRem}[1]   {\`{$\mathbf{(*}$~ }{\rm#1}{~$\mathbf{*)}$}}
+%\newcommand{\RRem}[1]   {\`{\bf --\hspace{0.5mm}--~}{\rm#1}}
+\newcommand{\RRem}[1]   {\`{\bf //\hspace{0.5mm}~}{\rm#1}}
+\newcommand{\Flush}[1]   {\`{\bf \hspace{0.5mm}~}{\rm#1}}
+\newcommand{\RRemNL}[1]   {\`{\bf (*~ }{\rm#1}{\bf ~*)}%
+{\tiny\arabic{lineNumber}}\stepcounter{lineNumber}}
+\newcommand{\Declare}[2]{#1\mbox{ \rm : }#2}
+\newcommand{\DeclareInit}[3]{#1$=$#3 \mbox{ \rm : }#2}
+\newcommand{\At}[1]{\left\langle#1\right\rangle}
+\newcommand{\NL}{\`{\tiny\arabic{lineNumber}}\stepcounter{lineNumber}}
+
+% Beweise
+\newdimen\endofsize\endofsize=0.5em
+\def\endofbeweis{~\quad\hglue\hsize minus\hsize
+                 \hbox{\vrule height \endofsize width
+\endofsize}\par}
+% gibt es in amsmath schon
+% \newcommand{\platsch}{\hglue\hsize minus\hsize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Kurts Makros
+
+
+
+\newcommand{\widebinop}[1]{\hspace{0.5em}#1\hspace{0.5em}}
+
+\newcommand{\donotshow}[1]{}
+\newcommand{\maths}{mathematics'}
+\newcommand{\apostrophe}{'}
+\newcommand{\dapostrophe}{''}
+
+\newcommand{\ignore}[1]{}
+\newcommand{\pnegskip}{\vspace*{-\baselineskip}\vspace*{-\belowdisplayskip}\par}
+
+\newcommand{\proofendswithequation}{\vspace*{-\baselineskip}\vspace*{-\belowdisplayskip}\par}
+
+\newcommand{\eqndot}{\ .}\newcommand{\eqncomma}{\ ,}
+
+
+%\newcommand{\qed}{\rule[-0.2ex]{0.3em}{1.4ex}}
+
+
+\providecommand{\mod}{\mathop{\rm mod}}
+\newcommand{\conv}{\mathop{\rm conv}}
+
+\newcommand{\F}{{\cal F}}
+
+\newcommand{\dom}{\mathop{\rm dom}\nolimits}
+\newcommand{\op}{\mathbin{\rm op}}
+\newcommand{\mes}{\mathop {\rm mes}}
+\newcommand{\ind}{\mathop {\rm ind}}
+\newcommand{\size}{\mathop {\rm size}}
+\newcommand{\fl}{\mathop {\rm fl}}
+
+\newcommand{\cl}{\mathop {\rm cl}}
+\newcommand{\inn}{\mathop {\rm int}}
+\newcommand{\cpl}{\mathop {\rm cpl}}
+\newcommand{\reg}{\mathop {\rm reg}}
+\newcommand{\bd}{\mathop {\rm bd}}
+\newcommand{\bR}{\mathop {\rm bR}}
+
+
+\newcommand{\loglog}{\mathop {\rm loglog}}
+
+
+\newcommand{\CC}{C\raisebox{.08ex}{\hbox{\tt ++}}}
+\newcommand{\Cminus}{C\raisebox{.08ex}{\hbox{\tt ++}}\raisebox{.25ex}{-}}
+\newcommand{\GG}{g\raisebox{.08ex}{\hbox{\tt ++}}}
+\newcommand{\Gminus} {g\raisebox{.08ex}{\hbox{\tt ++}}\raisebox{.25ex}{-}}
+\newcommand{\R}{I\! \!R}
+\newcommand{\N}{I\! \!N}
+\newcommand{\Z}{I\! \!Z}
+\newcommand{\Rp}{I\! \!R_{>0}}
+\newcommand{\Rn}{I\! \!R_{<0}}
+\newcommand{\Rnn}{I\! \!R_{\ge 0}}
+\newcommand{\progitem}[1]{$\langle$#1$\rangle$ }
+
+
+\newcommand{\strecke}[2]{{#1#2}$^{\hspace{-.6cm}\longrightarrow}$ \ }
+\newcommand{\punktstrecke}[2]{{#1#2}$^{\hspace{-.6cm}\longrightarrow}\ $}
+
+
+
+\providecommand{\3}{\ss}
+
+\newcommand{\la}{$\langle$}
+\newcommand{\ra}{$\rangle$\ }
+%\newcommand{\Litem}[2]{$\langle$#1,#2$\rangle$\ }
+\newcommand{\Listitem}[1]{$\langle$#1$\rangle$\ }
+
+%\newcommand{\range}[2]{[#1 \, \ldots \, #2]}
+\providecommand{\range}[2]{[#1\, ..\,  #2]}
+
+%\newcommand{\halfrange}[2]{[#1 \, \ldots \, #2)}
+\newcommand{\halfrange}[2]{[#1\,  ..\,  #2)}
+
+
+%\newcommand{\precond}{\\ {\em precondition}: }
+\newcommand{\Kurt}{\htmladdnormallink{Kurt Mehlhorn}{http://www.mpi-sb.mpg.de/\~{}mehlhorn}}
+\newcommand{\Stefan}{\htmladdnormallink{Stefan N\"aher}{http://www.informatik.uni-halle.de/\~{}naeher}}
+\newcommand{\Christian}{\htmladdnormallink{Christian Uhrig}{http://www.mpi-sb.mpg.de/\~{}uhrig}}
+\newcommand{\LEDA}{\htmladdnormallink{LEDA}{http://www.mpi-sb.mpg.de/LEDA/leda.html}}
+\newcommand{\GmbH}{\htmladdnormallink{LEDA Software
+GmbH}{http://www.mpi-sb.mpg.de/LEDA/GMBH/gmbh.html}}
+
+\newcommand{\SB}{Saarbr\"{u}cken}
+
+\newcommand{\figlabel}[1]{\label{fig:#1}}
+\newcommand{\figref}[1]{\ref{fig:#1}}
+\newcommand{\Hline}{\hspace{0.0in}\hrulefill\hspace{0.0in}}
+
+
+\newcommand{\uedge}[1]{\sset{#1}}
+
+%\providecommand{\path}[1]{[\hspace{\setspacing} #1 \hspace{\setspacing}]}
+\providecommand{\Path}[1]{[#1]}
+\newcommand{\seq}[1]{\langle#1\rangle}
+
+\newcommand{\Exp}[1]{{\rm E}[ #1 ]}
+\newcommand{\prob}[1]{{\rm prob}( #1 )}
+
+
+\newcommand{\disjointcup}{\mathbin {\dot{\cup}}}
+
+\newcommand{\Kmarginpar}[1]{\marginpar{\footnotesize #1}}
+
+
+
+
+
+
+\newcommand{\mbegin}{\{\ \ }
+\newcommand{\mend}{\}}
+\newcommand{\memptyline}{\\[-2ex]}
+
+\newlength{\mleftindent}
+\setlength{\mleftindent}{\parindent}
+\newlength{\mindent}
+\settowidth{\mindent}{\mbegin}
+\newlength{\mboxwidth}
+\newcommand{\mincrement}{\addtolength{\mboxwidth}{-\mindent}}
+\newcommand{\mdecrement}{\addtolength{\mboxwidth}{\mindent}}
+
+
+
+\newlength{\preprogramskip}
+\newlength{\postprogramskip}
+\setlength{\preprogramskip}{\smallskipamount}
+\setlength{\postprogramskip}{\smallskipamount}
+
+
+\newlength{\mexpwidth}
+\newlength{\mexpindent}
+\newcommand{\indentafterkeyword}{\hspace*{0.5em}}
+
+
+\newcommand{\mwhile}[2]
+{\While #1 \Do\+\\ #2\-\\}
+
+\newcommand{\mforall}[2]
+{\Forall #1 \Do\+\\ #2\-\\}
+
+\newcommand{\mifthen}[2]
+{\If #1 \Then\+\\ #2\-\\}
+
+\newcommand{\monelinewhile}[2]
+{\While #1 \Do  #2\\}
+
+\newcommand{\monelineifthen}[2]
+{\If #1 \Then #2 \\}
+
+\newcommand{\mifelse}[3]
+{\If #1 \Then\+\\ #2\-\\\Else\+\\ #3\-\\}
+
+\newcommand{\mtwolineifelse}[3]
+{\If #1 \Then #2\\\Else#3\\}
+
+\newcommand{\monelineifelse}[3]
+{\If #1 \Then #2 \Else #3\\}
+
+\providecommand{\Path}[1]{[#1]}
+
+\newcommand{\mindentcommand}[3]
+{\setlength{\mexpwidth}{\mboxwidth}%
+\settowidth{\mexpindent}{{\bf #1}\indentafterkeyword #2}%
+\addtolength{\mboxwidth}{-\mexpindent}%
+{\bf #1}\indentafterkeyword #2 \mbegin%
+\parbox[t]{\mboxwidth}{#3}\\%
+\hspace*{\mexpindent}\mend%
+\addtolength{\mboxwidth}{\mexpindent}
+}
+
+
+%---------------------------------------------------------------------
+
+\newlength{\proofpostskipamount}
+\setlength{\proofpostskipamount}{0.5ex}
+\newlength{\proofpreskipamount}
+\setlength{\proofpostskipamount}{0.5ex}
+
+
+\newenvironment{myproof}%
+               {\par\vspace{\proofpreskipamount}\noindent{\bf Proof:}\hspace{0.5em}}% 0.5 before
+               {\nopagebreak%
+                \strut\nopagebreak%
+                \hspace{\fill}\qed\par\vspace{\proofpostskipamount}\noindent}
+
+\newenvironment{Proof}[1]%
+               {\par\vspace{0.5ex}\noindent{\bf Proof #1:}\hspace{0.5em}}%
+               {\nopagebreak%
+                \strut\nopagebreak%
+                \hspace{\fill}\qed\par\medskip\noindent}
+
+
+\newcommand{\highqed}{\vspace{-\belowdisplayskip -2.0\baselineskip}\par}
+
+
+\newlength{\mydefwidth}
+\newlength{\mytextwidth}
+
+\newcommand{\myurl}[1]{{\footnotesize \url{#1}}}
+
+
+%---------------------------------------------------------------------
+%%% macros for use of the old book
+
+\newcommand{\textdef}[1]{\emph{#1}}
+\newcommand{\betonung}[1]{\emph{#1}}
+\newcommand{\usw}{\ldots}
+\newcommand{\alphaq}{\overline{\alpha}}
+
+\newcommand{\gr}[1]{{\mathit #1\/}}
+\newcommand{\rmid}{;\ }
+
+\newcommand{\case}[2]{#1: #2}
+
+
+
+\newcommand{\Eins}{1}
+\newcommand{\Zwei}{2}
+\newcommand{\Drei}{3}
+
+\newcounter{abbnummer}
+\newcounter{plusabbnummber}
+\newcounter{zweiplusabbnummer}
+
+
+
+
+
+
+
+
+
+
+
+
+
