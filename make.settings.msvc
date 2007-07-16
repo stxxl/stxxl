@@ -38,7 +38,7 @@ LIBNAME = stxxl
 #### STXXL OPTIONS ###############################################
 
 STXXL_SPECIFIC	 = \
-	-DSORT_OPT_PREFETCHING \
+	-DSORT_OPTIMAL_PREFETCHING \
 	-DUSE_MALLOC_LOCK \
 	-DCOUNT_WAIT_TIME \
 	-I$(STXXL_ROOT)/ \
