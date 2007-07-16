@@ -117,6 +117,11 @@ MCSTL_LDFLAGS		+= $(OPENMPFLAG)
 ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/bits/stl_algo.h)))
 # not from libstdc++ branch, need to find the correct original symlink
 
+ifneq (,$(strip $(wildcard $(MCSTL_ROOT)/originals)))
+MCSTL_ORIG_BASE		?= $(MCSTL_ROOT)
+endif
+MCSTL_ORIG_BASE		?= $(MCSTL_BASE)
+
 # find a KEY=VALUE element in WORDS and return VALUE
 # usage: $(call get_value,KEY,WORDS)
 get_value		 = $(subst $(1)=,,$(filter $(1)=%,$(2)))
@@ -133,13 +138,13 @@ compile_test_vector_deps:= $(shell echo -e '\043include <vector>' > cxx-header-p
 cxx_incdir_from_compile	 = $(patsubst %/vector,%,$(firstword $(filter %/vector, $(compile_test_vector_deps))))
 export cxx_incdir_from_compile
 endif
-MCSTL_ORIGINALS		?= $(strip $(MCSTL_BASE))/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
+MCSTL_ORIGINALS		?= $(strip $(MCSTL_ORIG_BASE))/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
 
 ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
 $(error ERROR: could not determine MCSTL_ORIGINAL_INC_CXX, please set this variable manually, it's your compilers ($(COMPILER)) include/c++ path)
 endif
 ifeq (,$(strip $(wildcard $(MCSTL_ORIGINALS)/original)))
-$(error ERROR: your mcstl in $(MCSTL_BASE) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
+$(error ERROR: your mcstl in $(MCSTL_ORIG_BASE) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
 endif
 
 MCSTL_CPPFLAGS		+= -I$(MCSTL_ORIGINALS)
