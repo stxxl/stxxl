@@ -218,6 +218,10 @@ public:
         assert(p_vector == a.p_vector);
         return offset < a.offset;
     }
+    bool operator > (const _Self &a) const
+    {
+        return a < *this;
+    }
 
     bool operator == (const const_iterator &a) const
     {
@@ -233,6 +237,10 @@ public:
     {
         assert(p_vector == a.p_vector);
         return offset < a.offset;
+    }
+    bool operator > (const const_iterator &a) const
+    {
+        return a < *this;
     }
 
     void flush()
