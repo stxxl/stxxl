@@ -9,6 +9,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#ifdef __MCSTL__
+ #include <mcstl.h>
+#endif
+
 #include "stxxl/bits/stream/stream.h"
 #include "stxxl/sort"
 
@@ -135,9 +139,9 @@ namespace stream
         //! \param c comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
         runs_creator(Input_ & i, Cmp_ c, unsigned_type memory_to_use) :
-            input(i), cmp(c), m_(memory_to_use / BlockSize_), result_computed(false)
+            input(i), cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), result_computed(false)
         {
-            assert (2 * BlockSize_ <= memory_to_use);
+            assert (2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
         }
 
         //! \brief Returns the sorted runs object
@@ -532,7 +536,7 @@ namespace stream
         //! \param c comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
         runs_creator(Cmp_ c, unsigned_type memory_to_use) :
-            cmp(c), m_(memory_to_use / BlockSize_), output_requested(false),
+            cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), output_requested(false),
             m2(m_ / 2),
             el_in_run(m2 * block_type::size),
             cur_el(0),
@@ -540,7 +544,7 @@ namespace stream
             Blocks2(Blocks1 + m2),
             write_reqs(new request_ptr[m2])
         {
-            assert (2 * BlockSize_ <= memory_to_use);
+            assert (2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
         }
 
         ~runs_creator()
@@ -683,14 +687,14 @@ namespace stream
         //! Recommended value: 2 * block_size * D
         runs_creator(Cmp_ c, unsigned_type memory_to_use) :
             cmp(c),
-            m_(memory_to_use / BlockSize_),
+            m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()),
             writer(m_, m_ / 2),
             cur_block(writer.get_free_block()),
             offset(0),
             iblock(0),
             irun(0)
         {
-            assert (2 * BlockSize_ <= memory_to_use);
+            assert (2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
         }
 
         //! \brief Adds new element to the current run
@@ -905,7 +909,7 @@ namespace stream
         //! \param c comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
-            sruns(r), m_(memory_to_use / block_type::raw_size /* - 1 */), cmp(c),
+            sruns(r), m_(memory_to_use / block_type::raw_size / sort_memory_usage_factor() /* - 1 */), cmp(c),
             elements_remaining(r.elements),
             current_block(NULL),
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
