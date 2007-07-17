@@ -1,0 +1,4 @@
+TESTS			 = test_mng test_mng1 test_streams test_write_pool test_prefetch_pool
+TESTS_UNITTEST		 = unittest
+
+LIB_SRC			 = mng.cpp
