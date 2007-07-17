@@ -7,6 +7,7 @@ lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c log.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c debug.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c rand.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c version.cpp
 
 
 clean:

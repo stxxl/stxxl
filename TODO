@@ -1,0 +1,6 @@
+
+* make release PHASE=snapshot,alpha#,beta#,rc#,release
+  - svn export ...
+  - needs to create common/version.defs:
+    #define STXXL_VERSION_STRING_DATE "YYYYMMDD"
+    #define STXXL_VERSION_STRING_PHASE "$(PHASE)"

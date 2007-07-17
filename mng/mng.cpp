@@ -1,4 +1,5 @@
 #include "stxxl/mng"
+#include "stxxl/bits/version.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -37,6 +38,7 @@ config * config::get_instance ()
 
 config::config (const char * config_path)
 {
+    STXXL_MSG(stxxl::get_version_string());
     std::ifstream cfg_file (config_path);
     if (!cfg_file)
     {

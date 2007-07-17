@@ -191,7 +191,7 @@ CPPUNIT_LINKER_OPTIONS		+= -lcppunit -ldl
 
 #### DEPENDENCIES ################################################
 
-HEADER_FILES_BITS	+= namespace.h
+HEADER_FILES_BITS	+= namespace.h version.h
 
 HEADER_FILES_COMMON	+= aligned_alloc.h mutex.h rand.h semaphore.h state.h
 HEADER_FILES_COMMON	+= timer.h utils.h gprof.h rwlock.h simple_vector.h

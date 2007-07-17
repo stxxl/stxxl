@@ -54,6 +54,27 @@ library: $(LIBNAME).mk
 lib/lib$(LIBNAME).$(LIBEXT): make.settings
 	$(MAKE) -f $(THISMAKEFILE) library
 
+ifneq (,$(wildcard .svn))
+lib-in-common: common/version_svn.defs
+
+ifeq (,$(strip $(shell svnversion . | tr -d 0-9)))
+# clean checkout - use svn info
+VERSION_DATE	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Date/{s/.*: //;s/ .*//;s/-//gp}')
+VERSION_SVN_REV	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Rev/s/.*: //p')
+else
+# modified, mixed, ... checkout - use svnversion and today
+VERSION_DATE	:= $(shell date "+%Y%m%d")
+VERSION_SVN_REV	:= $(shell svnversion .)
+endif
+
+.PHONY: common/version_svn.defs
+common/version_svn.defs:
+	echo '#define STXXL_VERSION_STRING_DATE "$(VERSION_DATE)"' > $@.tmp
+	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(VERSION_SVN_REV)"' >> $@.tmp
+	cmp -s $@ $@.tmp || mv $@.tmp $@
+	$(RM) $@.tmp
+endif
+
 tests-in-%: lib/lib$(LIBNAME).$(LIBEXT)
 	$(MAKE) -C $* tests
 
@@ -67,6 +88,7 @@ clean-in-%:
 	$(MAKE) -C $* clean
 
 clean: SUBDIRS-clean
+	$(RM) common/version_svn.defs
 	$(RM) $(LIBNAME).mk
 	$(RM) compiler.options linker.options
 	@echo "Cleaning completed"

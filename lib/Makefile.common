@@ -12,5 +12,6 @@ LIB_OBJECTS = \
 	../algo/async_schedule.$(OBJEXT) \
 	../common/log.$(OBJEXT) \
 	../common/debug.$(OBJEXT) \
-	../common/rand.$(OBJEXT)
+	../common/rand.$(OBJEXT) \
+	../common/version.$(OBJEXT)
 
