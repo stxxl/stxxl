@@ -102,7 +102,7 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
 //! \param beyond end of the range to shuffle
 //! \param rand random number generator object (functor)
 //! \param M number of bytes for internal use
-//! \param RC paralel disk allocation strategy
+//! \param AS parallel disk allocation strategy
 //!
 //! - BlockSize_ size of the block to use for external memory data structures
 //! - PageSize_ page size in blocks to use for external memory data structures

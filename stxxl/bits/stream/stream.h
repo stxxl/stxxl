@@ -106,7 +106,7 @@ namespace stream
     template <class InputIterator_>
     struct streamify_traits
     {
-        //! \brief return type (stream type) of \c�streamify for \c InputIterator_
+        //! \brief return type (stream type) of \c streamify for \c InputIterator_
         typedef iterator2stream<InputIterator_> stream_type;
     };
 
