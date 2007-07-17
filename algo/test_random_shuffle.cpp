@@ -1,4 +1,4 @@
-#include "random_shuffle.h"
+#include "stxxl/bits/algo/random_shuffle.h"
 
 
 //! \example algo/test_random_shuffle.cpp

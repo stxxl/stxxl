@@ -6,7 +6,7 @@
  *  Email
  ****************************************************************************/
 
-#include <stxxl>
+#include "stxxl.h"
 
 // efficiently writes data into an stxxl::vector with overlapping of I/O and
 // computation

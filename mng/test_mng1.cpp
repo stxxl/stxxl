@@ -1,4 +1,4 @@
-#include <stxxl>
+#include "stxxl.h"
 
 
 int main()

@@ -1,4 +1,4 @@
-#include "rand.h"
+#include "stxxl/bits/common/rand.h"
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -9,7 +9,8 @@
 
 #include <iostream>
 
-#include "btree.h"
+#include "stxxl/bits/containers/btree/btree.h"
+#include "stxxl/algorithm"
 
 
 struct comp_type : public std::less<int>

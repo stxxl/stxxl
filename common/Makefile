@@ -1,11 +1,14 @@
-tests:
-
+include Makefile.common
 include ../make.settings
 
-lib: log.cpp debug.cpp
+tests: $(TESTS)
+
+lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c log.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c debug.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c rand.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c version.cpp
+
 
 clean:
 	$(RM) *.$(OBJEXT)

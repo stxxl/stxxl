@@ -1,12 +1,13 @@
-TESTS	 = test_vector test_stack test_migr_stack test_many_stacks test_pqueue test_queue test_ext_merger bench_pqueue copy_file test_map test_map_random test_deque test_iterators
+include Makefile.common
+include ../make.settings
 
 tests: $(TESTS)
 
-include ../make.settings
+lib: $(LIB_SRC)
+
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
-lib:
 
 BERKELEY_DB_COMPILE_OPTIONS = -I/usr/local/BerkeleyDB.4.4/include
 BERKELEY_DB_LINK_OPTIONS = -L/usr/local/BerkeleyDB.4.4/lib/ -ldb_cxx
@@ -110,6 +111,7 @@ test_ext_merger: test_ext_merger.cpp $(DEPENDENCIES)
 bench_pqueue: bench_pqueue.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c bench_pqueue.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  bench_pqueue.$(OBJEXT) $(OUT)bench_pqueue.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT) test_map.$(EXEEXT) test_map_random.$(EXEEXT)

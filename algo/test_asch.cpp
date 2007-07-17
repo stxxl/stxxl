@@ -1,6 +1,10 @@
-#include "async_schedule.h"
-#include "../common/rand.h"
-#include <stdlib.h>
+#include "stxxl/bits/algo/async_schedule.h"
+#include "stxxl/random"
+#include <cstdlib>
+
+#include "async_schedule.cpp"
+
+// Test async schedule algorithm
 
 
 int main(int argc, char * argv[])

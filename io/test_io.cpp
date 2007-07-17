@@ -6,8 +6,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-
-#include <stxxl>
+#include "stxxl.h"
 
 //! \example io/test_io.cpp
 //! This is an example of use of \c \<stxxl\> files, requests, and

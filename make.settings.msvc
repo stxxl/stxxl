@@ -1,37 +1,53 @@
-# Change this file according to your paths
+# This -*- Makefile -*- is intended for processing with nmake.
+
+# Change this file according to your paths.
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = c:\stxxl#
+STXXL_ROOT = c:\anbe#
 BOOST_ROOT = c:\boost#
 
 MAKE = nmake
 COMPILER = cl
 LINKER = link
 OPT = /O2
-LIBNAME = stxxl
-
+WARNINGS =
 DEBUG = /MD # debug is off
 # DEBUG = /MDd /Zi # debug is on
 
-#### BOOST OPTIONS ###############################################
+LIBNAME = stxxl
 
 
+#### TROUBLESHOOTING
+#
+# For automatical checking of order of the output elements in
+# the sorters: stxxl::stream::sort, stxxl::stream::merge_runs,
+# stxxl::sort, and stxxl::ksort add
+#
+#     -DSTXXL_CHECK_ORDER_IN_SORTS
+#
+# to the compile options.
+#
+# FIXME: documentation needed
+#
+#STXXL_SPECIFIC += -DSTXXL_DEBUGMON
 
-BOOST_VARS =  \
- -D_RTLDLL -DBOOST_LIB_DIAGNOSTIC -DSTXXL_BOOST_TIMESTAMP \
- -DSTXXL_BOOST_CONFIG \
- -DSTXXL_BOOST_FILESYSTEM \
- -DSTXXL_BOOST_THREADS \
- -DSTXXL_BOOST_RANDOM \
- -I$(BOOST_ROOT)
 
+#### You usually shouldn't need to change the sections below #####
+
+
+#### STXXL OPTIONS ###############################################
+
+STXXL_SPECIFIC	 = \
+	-DSORT_OPTIMAL_PREFETCHING \
+	-DUSE_MALLOC_LOCK \
+	-DCOUNT_WAIT_TIME \
+	-I$(STXXL_ROOT)/ \
+	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
 ##################################################################
 
 
-
 #### MICROSOFT VC OPTIONS ########################################
-
 
 MSVC_COMPILER_OPTIONS = /EHsc /EHs /wd4820 /wd4217 /wd4668 /wd4619 \
  /wd4625 /wd4626 /wd4355 /wd4996 -D_SCL_SECURE_NO_DEPRECATE
@@ -40,31 +56,107 @@ MSVC_LINKER_OPTIONS = /LIBPATH:$(STXXL_ROOT)\lib\ \
 
 ##################################################################
 
+
+#### BOOST OPTIONS ###############################################
+
+BOOST_COMPILER_OPTIONS	 = \
+	-D_RTLDLL \
+	-DBOOST_LIB_DIAGNOSTIC \
+	-DSTXXL_BOOST_TIMESTAMP \
+	-DSTXXL_BOOST_CONFIG \
+	-DSTXXL_BOOST_FILESYSTEM \
+	-DSTXXL_BOOST_THREADS \
+	-DSTXXL_BOOST_RANDOM \
+	-I$(BOOST_ROOT)
+
+##################################################################
+
+
 #### DEPENDENCIES ################################################
 
-COMMON_FILES = ../common/aligned_alloc.h  ../common/mutex.h    ../common/perm.h  \
-../common/rand.h    ../common/semaphore.h      ../common/state.h   ../common/timer.h \
-../common/utils.h ../common/gprof.h ../common/rwlock.h  ../common/simple_vector.h  \
-../common/switch.h  ../common/tmeta.h ../make.settings
+HEADER_PATH	 = ../stxxl/bits
 
-IO_LAYER_FILES = ../io/completion_handler.h  ../io/io.h  ../io/iobase.h  \
- ../io/iostats.h  ../io/mmap_file.h  ../io/simdisk_file.h  ../io/syscall_file.h  \
- ../io/ufs_file.h
+COMMON_FILES	 = \
+	$(HEADER_PATH)/namespace.h \
+	$(HEADER_PATH)/version.h \
+	$(HEADER_PATH)/common/aligned_alloc.h \
+	$(HEADER_PATH)/common/mutex.h \
+	$(HEADER_PATH)/common/rand.h \
+	$(HEADER_PATH)/common/semaphore.h \
+	$(HEADER_PATH)/common/state.h \
+	$(HEADER_PATH)/common/timer.h \
+	$(HEADER_PATH)/common/utils.h \
+	$(HEADER_PATH)/common/gprof.h \
+	$(HEADER_PATH)/common/rwlock.h \
+	$(HEADER_PATH)/common/simple_vector.h \
+	$(HEADER_PATH)/common/switch.h \
+	$(HEADER_PATH)/common/tmeta.h \
+	$(HEADER_PATH)/common/log.h \
+	$(HEADER_PATH)/common/exceptions.h \
+	$(HEADER_PATH)/common/debug.h \
+	$(HEADER_PATH)/common/tuple.h \
+	$(HEADER_PATH)/common/types.h \
+	$(HEADER_PATH)/common/settings.h \
+	../make.settings
 
-MNG_LAYER_FILES = ../mng/adaptor.h  ../mng/async_schedule.h  ../mng/block_prefetcher.h \
-../mng/buf_istream.h  ../mng/buf_ostream.h  ../mng/buf_writer.h  ../mng/mng.h \
-../mng/write_pool.h ../mng/prefetch_pool.h
+IO_LAYER_FILES	 = \
+	$(HEADER_PATH)/io/completion_handler.h \
+	$(HEADER_PATH)/io/io.h \
+	$(HEADER_PATH)/io/iobase.h \
+	$(HEADER_PATH)/io/iostats.h \
+	$(HEADER_PATH)/io/mmap_file.h \
+	$(HEADER_PATH)/io/simdisk_file.h \
+	$(HEADER_PATH)/io/syscall_file.h \
+	$(HEADER_PATH)/io/ufs_file.h \
+	$(HEADER_PATH)/io/wincall_file.h \
+	$(HEADER_PATH)/io/wfs_file.h \
+	$(HEADER_PATH)/io/boostfd_file.h
 
-CONTAINER_MAP_FILES = # 
+MNG_LAYER_FILES	 = \
+	$(HEADER_PATH)/mng/adaptor.h \
+	$(HEADER_PATH)/mng/async_schedule.h \
+	$(HEADER_PATH)/mng/block_prefetcher.h \
+	$(HEADER_PATH)/mng/buf_istream.h \
+	$(HEADER_PATH)/mng/buf_ostream.h \
+	$(HEADER_PATH)/mng/buf_writer.h \
+	$(HEADER_PATH)/mng/mng.h \
+	$(HEADER_PATH)/mng/write_pool.h \
+	$(HEADER_PATH)/mng/prefetch_pool.h
 
-CONTAINER_FILES = ../containers/pager.h  ../containers/stack.h  ../containers/vector.h \
-../containers/priority_queue.h ../containers/queue.h $(CONTAINER_MAP_FILES)
+CONTAINER_FILES	 = \
+	$(HEADER_PATH)/containers/pager.h \
+	$(HEADER_PATH)/containers/stack.h \
+	$(HEADER_PATH)/containers/vector.h \
+	$(HEADER_PATH)/containers/priority_queue.h \
+	$(HEADER_PATH)/containers/queue.h \
+	$(HEADER_PATH)/containers/map.h \
+	$(HEADER_PATH)/containers/deque.h \
+	$(HEADER_PATH)/containers/btree/btree.h \
+	$(HEADER_PATH)/containers/btree/iterator_map.h \
+	$(HEADER_PATH)/containers/btree/leaf.h \
+	$(HEADER_PATH)/containers/btree/node_cache.h \
+	$(HEADER_PATH)/containers/btree/root_node.h \
+	$(HEADER_PATH)/containers/btree/node.h \
+	$(HEADER_PATH)/containers/btree/btree_pager.h \
+	$(HEADER_PATH)/containers/btree/iterator.h
 
-ALGO_FILES = ../algo/adaptor.h ../algo/inmemsort.h ../algo/intksort.h ../algo/run_cursor.h \
-../algo/sort.h ../algo/async_schedule.h ../algo/interleaved_alloc.h ../algo/ksort.h \
-../algo/losertree.h ../algo/scan.h ../algo/stable_ksort.h
+ALGO_FILES	 = \
+	$(HEADER_PATH)/algo/adaptor.h \
+	$(HEADER_PATH)/algo/inmemsort.h \
+	$(HEADER_PATH)/algo/intksort.h \
+	$(HEADER_PATH)/algo/run_cursor.h \
+	$(HEADER_PATH)/algo/sort.h \
+	$(HEADER_PATH)/algo/async_schedule.h \
+	$(HEADER_PATH)/algo/interleaved_alloc.h \
+	$(HEADER_PATH)/algo/ksort.h \
+	$(HEADER_PATH)/algo/losertree.h \
+	$(HEADER_PATH)/algo/scan.h \
+	$(HEADER_PATH)/algo/stable_ksort.h \
+	$(HEADER_PATH)/algo/random_shuffle.h
 
-STREAM_FILES = ../stream/stream.h ../stream/sort_stream.h
+STREAM_FILES	 = \
+	$(HEADER_PATH)/stream/stream.h \
+	$(HEADER_PATH)/stream/sort_stream.h
 
 ###################################################################
 
@@ -80,52 +172,16 @@ OUT    = /out:# output file for linking and compilation
 
 ###################################################################
 
-STXXL_SPECIFIC = \
- -DSORT_OPTIMAL_PREFETCHING \
- -DUSE_MALLOC_LOCK -DCOUNT_WAIT_TIME -I$(STXXL_ROOT)/ \
- -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+
+STXXL_COMPILER_OPTIONS	 = \
+	$(STXXL_SPECIFIC) \
+	$(OPT) $(DEBUG) $(WARNINGS) \
+	$(BOOST_COMPILER_OPTIONS) \
+	$(MSVC_COMPILER_OPTIONS)
+
+STXXL_LINKER_OPTIONS	 = \
+	$(MSVC_LINKER_OPTIONS) \
+	$(DEBUG)
 
 
-
-
-
-
-
-# switch the direct I/O off
-# STXXL_SPECIFIC += -DSTXXL_DIRECT_IO_OFF
-
-# STXXL_SPECIFIC += -DSTXXL_CHECK_ORDER_IN_SORTS
-
-# STXXL_SPECIFIC += -DSTXXL_DEBUGMON
-
-
-# WARNINGS = -Wall
-
-
-
-
-STXXL_COMPILER_OPTIONS = $(STXXL_SPECIFIC) $(WARNINGS) \
- $(DEBUG) $(OPT) $(BOOST_VARS) $(MSVC_COMPILER_OPTIONS)
-STXXL_LINKER_OPTIONS = $(MSVC_LINKER_OPTIONS) $(DEBUG)
-
-
-
-#
-# Troubleshooting
-#
-# For automatical checking of order of the output elements in
-# the sorters: stxxl::stream::sort, stxxl::stream::merge_runs,
-# stxxl::sort, and stxxl::ksort
-# use -DSTXXL_CHECK_ORDER_IN_SORTS compile option
-#
-# if your program aborts with message "read/write: wrong parameter"
-# or "Invalid argument"
-# this could be that your kernel does not support direct I/O
-# then try to set it off recompiling your code with option
-# -DSTXXL_DIRECT_IO_OFF (the libs must be also recompiled)
-# The best way for doing it is to modify the STXXL_SPECIFIC
-# variable (see above).
-# But for the best performance it is strongly recommended 
-# to reconfigure the kernel for the support of the direct I/O.
-#
-#
+# vim: syn=make

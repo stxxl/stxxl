@@ -14,11 +14,11 @@
 int n_prefetch_buffers;
 int n_opt_prefetch_buffers;
 
-#include "../mng/mng.h"
-#include "sort.h"
-#include "scan.h"
-#include "../containers/vector"
-#include "../common/rand.h"
+#include "stxxl/mng"
+#include "stxxl/sort"
+#include "stxxl/scan"
+#include "stxxl/vector"
+#include "stxxl/random"
 
 
 #ifndef RECORD_SIZE

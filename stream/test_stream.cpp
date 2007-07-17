@@ -5,8 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "stream.h"
-#include "../containers/vector.h"
+
+#include "stxxl/stream"
+#include "stxxl/vector"
 #include <vector>
 
 //! \example stream/test_stream.cpp

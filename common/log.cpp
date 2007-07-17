@@ -1,4 +1,4 @@
-#include "log.h"
+#include "stxxl/bits/common/log.h"
 
 __STXXL_BEGIN_NAMESPACE
 

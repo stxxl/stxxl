@@ -6,8 +6,7 @@
  *  Email dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-
-#include "stream.h"
+#include "stxxl/stream"
 
 
 //! \example stream/test_push_sort.cpp

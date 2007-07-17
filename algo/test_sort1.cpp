@@ -1,6 +1,6 @@
-#include "../mng/mng.h"
-#include "sort.h"
-#include "../containers/vector"
+#include "stxxl/mng"
+#include "stxxl/sort"
+#include "stxxl/vector"
 
 //! \example algo/test_sort1.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm

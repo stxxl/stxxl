@@ -8,9 +8,9 @@
 
 
 #include <iostream>
-#include "mng.h"
-#include "buf_ostream.h"
-#include "buf_istream.h"
+#include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/mng/buf_ostream.h"
+#include "stxxl/bits/mng/buf_istream.h"
 
 //! \example mng/test_streams.cpp
 //! This is an example of use of \c stxxl::buf_istream and \c stxxl::buf_ostream

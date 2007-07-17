@@ -17,8 +17,8 @@
 #include <LEDA/random.h>
 #include <algorithm>
 
-#include "../common/utils_ledasm.h"
-#include "../common/timer.h"
+#include "stxxl/bits/common/utils_ledasm.h"
+#include "stxxl/timer"
 
 
 #define PQ_MEM_SIZE     (512 * 1024 * 1024)

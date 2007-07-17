@@ -1,4 +1,4 @@
-#include <stxxl>
+#include "stxxl.h"
 
 // Test some iterator operations
 // March 29, 2007 (c) Roman Dementiev

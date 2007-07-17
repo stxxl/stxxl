@@ -1,14 +1,14 @@
-TESTS	 = test_mng test_mng1 test_streams test_write_pool test_prefetch_pool
+include Makefile.common
+include ../make.settings
 
 tests: $(TESTS)
 
-include ../make.settings
+lib: $(LIB_SRC)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mng.cpp
+
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES)
 
-lib: mng.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mng.cpp
-	
 
 test_mng: test_mng.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_mng.cpp -DSTXXL_VERBOSE_LEVEL=2 
@@ -34,7 +34,6 @@ unittest: unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
 	$(LINKER) unittest.$(OBJEXT) $(OUT)unittest.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
 
-				
 
 clean:
 	$(RM) *.$(OBJEXT)

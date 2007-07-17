@@ -1,5 +1,5 @@
 
-#include "wfs_file.h"
+#include "stxxl/bits/io/wfs_file.h"
 
 #ifdef BOOST_MSVC
 

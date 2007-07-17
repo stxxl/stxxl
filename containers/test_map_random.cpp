@@ -11,7 +11,7 @@
 //! \file containers/test_map_random.cpp
 //! \brief File for testing functionality of stxxl::map.
 
-#include <stxxl>
+#include "stxxl.h"
 #include "map_test_handlers.h"
 
 

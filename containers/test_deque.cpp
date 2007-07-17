@@ -6,10 +6,7 @@
  *  Email
  ****************************************************************************/
 
-
-#include <stxxl>
-
-#include "deque.h"
+#include "stxxl.h"
 
 
 int main()

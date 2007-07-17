@@ -5,7 +5,8 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "priority_queue.h"
+
+#include "stxxl/priority_queue"
 #include <limits>
 #include <iterator>
 

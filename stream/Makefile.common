@@ -1,0 +1,3 @@
+TESTS			 = test_stream test_stream1 test_sorted_runs test_push_sort 
+
+LIB_SRC			 =

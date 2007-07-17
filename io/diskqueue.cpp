@@ -1,6 +1,3 @@
-#ifndef DISKQUEUE_HEADER
-#define DISKQUEUE_HEADER
-
 /***************************************************************************
  *            diskqueue.cpp
  *
@@ -9,10 +6,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-
-
-#include "iobase.h"
-#include "../common/gprof.h"
+#include "stxxl/bits/io/iobase.h"
+#include "stxxl/bits/common/gprof.h"
 
 
 #ifndef STXXL_BOOST_THREADS
@@ -23,8 +18,8 @@
 
 #endif
 
-namespace stxxl
-{
+__STXXL_BEGIN_NAMESPACE
+
     disk_queues * disk_queues::instance = NULL;
 
     disk_queue::disk_queue (int /*n*/) : sem (0), _priority_op (WRITE)          //  n is ignored
@@ -192,6 +187,6 @@ namespace stxxl
 
         return NULL;
     }
-};
 
-#endif
+__STXXL_END_NAMESPACE
+

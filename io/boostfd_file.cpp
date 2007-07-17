@@ -1,9 +1,8 @@
-#include "boostfd_file.h"
-#include "../common/debug.h"
-
 
 #ifdef STXXL_BOOST_CONFIG
 
+#include "stxxl/bits/io/boostfd_file.h"
+#include "stxxl/bits/common/debug.h"
 
  #include "boost/filesystem/operations.hpp"
  #include "boost/filesystem/fstream.hpp"

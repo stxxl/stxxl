@@ -1,0 +1,6 @@
+TESTS			 =
+TESTS_EXTRA		 = malloc off_t_size pq_param
+
+LIB_SRC			 =
+
+UTIL_BINARIES		 = createdisks

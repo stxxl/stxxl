@@ -9,7 +9,7 @@
 #include <LEDA-SM/ext_stack.h>
 #include <LEDA-SM/ext_memory_manager.h>
 #include <LEDA-SM/debug.h>
-#include <assert.h>
+#include <cassert>
 #include <LEDA/random_source.h>
 #include <LEDA/stack.h>
 #include <LEDA-SM/block.h>
@@ -17,8 +17,8 @@
 #define DEBUG 0
 #define DD 500
 
-#include "../common/utils_ledasm.h"
-#include "../common/timer.h"
+#include "stxxl/bits/common/utils_ledasm.h"
+#include "stxxl/timer"
 
 
 

@@ -1,4 +1,4 @@
-#include <stxxl>
+#include "stxxl.h"
 
 typedef unsigned char my_type;
 

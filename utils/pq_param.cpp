@@ -1,6 +1,6 @@
 #include <iostream>
-#include <math.h>
-#include "../common/utils.h"
+#include <cmath>
+#include "stxxl/bits/common/utils.h"
 
 typedef stxxl::int64 int64;
 
@@ -12,12 +12,12 @@ int64 D(int64 m, int64 k, int64 MaxS, int64 E, int64 B)
 using std::cout;
 using std::endl;
 
-int main(int argc, char * argv[])
+int main(int /*argc*/, char * /*argv*/[])
 {
     int64 IntM = 128 * 1024 * 1024;
     int64 E = 4;
     int64 B = 8 * 1024 * 1024;
-    int64 Bstep = 128 * 1024;
+    //int64 Bstep = 128 * 1024;
     int64 MaxS = (int64(128) * int64(1024 * 1024 * 1024)) / E;
 
     for ( ; B > 4096; B = B / 2 )

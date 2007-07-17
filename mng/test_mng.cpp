@@ -8,7 +8,7 @@
 
 
 #include <iostream>
-#include "mng.h"
+#include "stxxl/mng"
 
 //! \example mng/test_mng.cpp
 //! This is an example of use of completion handlers, \c stxxl::block_manager, and

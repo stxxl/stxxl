@@ -5,9 +5,10 @@
  *  Copyright  2005  Roman Dementiev
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
-#include "map.h"
+
+#include "stxxl/map"
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 
 typedef unsigned int key_type;
 typedef unsigned int data_type;

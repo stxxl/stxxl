@@ -1,7 +1,8 @@
-#include "../containers/vector"
+#include "stxxl/vector"
+#include "stxxl/scan"
+
 #include <iostream>
 #include <algorithm>
-#include "scan.h"
 
 //! \example algo/test_scan.cpp
 //! This is an example of how to use \c stxxl::for_each() and \c stxxl::find() algorithms
@@ -90,4 +91,4 @@ int main()
 
                         return 0;
 
-                };
+                }

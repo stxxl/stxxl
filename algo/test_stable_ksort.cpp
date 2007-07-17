@@ -1,7 +1,7 @@
-#include "../mng/mng.h"
-#include "stable_ksort.h"
-#include "ksort.h"
-#include "../containers/vector"
+#include "stxxl/mng"
+#include "stxxl/stable_ksort"
+#include "stxxl/ksort"
+#include "stxxl/vector"
 
 //! \example algo/test_stable_ksort1.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm

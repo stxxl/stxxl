@@ -1,4 +1,4 @@
-#include "syscall_file.h"
+#include "stxxl/bits/io/syscall_file.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -164,7 +164,7 @@ request_ptr syscall_file::aread (
     disk_queues::get_instance ()->add_readreq(req, get_id());
 #endif
     return req;
-};
+}
 request_ptr syscall_file::awrite (
     void * buffer,
     stxxl::int64 pos,

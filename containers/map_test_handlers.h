@@ -29,7 +29,7 @@ bool there( MAPTYPE & map_, const typename MAPTYPE::key_type & key, typename MAP
         return false;
     }
     return true;
-};
+}
 
 // ***********************************************
 // IS EQUAL END
@@ -39,7 +39,7 @@ template<typename MAPTYPE>
 bool is_equal_end( MAPTYPE & map_, typename MAPTYPE::iterator & iter )
 {
     return iter == map_.end();
-};
+}
 
 // ***********************************************
 // IS SAME
@@ -65,7 +65,7 @@ template<typename MAPTYPE>
 bool not_there( MAPTYPE & map_, const typename MAPTYPE::key_type & key )
 {
     return map_.find( key ) == map_.end();
-};
+}
 
 // ***********************************************
 // IS EMPTY
@@ -75,7 +75,7 @@ template<typename MAPTYPE>
 bool is_empty( MAPTYPE & map_ )
 {
     return map_.empty();
-};
+}
 
 // ***********************************************
 // IS END

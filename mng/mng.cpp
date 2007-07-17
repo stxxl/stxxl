@@ -1,4 +1,5 @@
-#include "mng.h"
+#include "stxxl/mng"
+#include "stxxl/bits/version.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -37,6 +38,7 @@ config * config::get_instance ()
 
 config::config (const char * config_path)
 {
+    STXXL_MSG(stxxl::get_version_string());
     std::ifstream cfg_file (config_path);
     if (!cfg_file)
     {
@@ -108,7 +110,7 @@ config::config (const char * config_path)
                       " Mb, I/O implementation: " << (*it).io_impl )
         }
     }
-};
+}
 
 block_manager * block_manager::get_instance ()
 {
@@ -137,7 +139,7 @@ block_manager::block_manager ()
         disk_files[i]->set_size (cfg->disk_size (i));
         disk_allocators[i] = new DiskAllocator (cfg->disk_size (i));
     }
-};
+}
 
 block_manager::~block_manager()
 {
@@ -151,6 +153,5 @@ block_manager::~block_manager()
     delete[] disk_files;
 }
 
-
-
 __STXXL_END_NAMESPACE
+

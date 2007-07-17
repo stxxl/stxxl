@@ -7,8 +7,8 @@
  ****************************************************************************/
 
 
-#include "io.h"
-#include "stdio.h"
+#include "stxxl/io"
+#include <cstdio>
 #include <vector>
 #include <iomanip>
 
@@ -16,7 +16,7 @@
  #include <unistd.h>
 #endif
 
-#include "../common/aligned_alloc.h"
+#include "stxxl/bits/common/aligned_alloc.h"
 
 using namespace stxxl;
 #ifdef BLOCK_ALIGN

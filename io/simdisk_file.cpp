@@ -1,4 +1,4 @@
-#include "simdisk_file.h"
+#include "stxxl/bits/io/simdisk_file.h"
 
 #ifdef BOOST_MSVC
 // mmap call does not exist in Windows
@@ -144,7 +144,7 @@ IC35L080AVVA07::IC35L080AVVA07 ()
                stxxl::int64 (bytes_per_sector),
                16 * 1024 *
                1024) << " s" << std::endl;
-};
+}
 
 
 
@@ -156,7 +156,7 @@ void sim_disk_file::set_size (stxxl::int64 newsize)
                                 SEEK_SET), io_error);
         stxxl_ifcheck(::write(file_des, "", 1), io_error);
     }
-};
+}
 
 void sim_disk_request::serve ()
 {
@@ -277,7 +277,7 @@ void sim_disk_request::serve ()
  #endif
 
                 return req;
-            };
+            }
             request_ptr sim_disk_file::awrite (
                 void * buffer, stxxl::int64 pos, size_t bytes,
                 completion_handler on_cmpl)
@@ -293,7 +293,7 @@ void sim_disk_request::serve ()
                 disk_queues::get_instance ()->add_writereq(req, get_id());
  #endif
                 return req;
-            };
+            }
 
             __STXXL_END_NAMESPACE
 

@@ -5,7 +5,8 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
-#include "../stxxl"
+
+#include "stxxl.h"
 
 using namespace stxxl;
 

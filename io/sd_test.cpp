@@ -7,9 +7,9 @@
  ****************************************************************************/
 
 
-#include "io.h"
-#include "../common/rand.h"
-#include <math.h>
+#include "stxxl/io"
+#include "stxxl/random"
+#include <cmath>
 
 using namespace stxxl;
 
@@ -23,7 +23,7 @@ int main()
     std::cout << sizeof(void *) << std::endl;
     const int block_size = 4 * 1024 * 1024;
     char * buffer = new char[block_size];
-    char * paths[2] = { "/tmp/data1", "/tmp/data2" };
+    const char * paths[2] = { "/tmp/data1", "/tmp/data2" };
     sim_disk_file file1(paths[0], file::CREAT | file::RDWR /* | file::DIRECT */, 0);
     file1.set_size(disk_size);
 

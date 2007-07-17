@@ -1,7 +1,7 @@
-#include "../mng/mng.h"
-#include "ksort.h"
-#include "sort.h"
-#include "../containers/vector"
+#include "stxxl/mng"
+#include "stxxl/ksort"
+#include "stxxl/sort"
+#include "stxxl/vector"
 
 //! \example algo/sort_file.cpp
 //! This is an example of how to create \c stxxl::vector from an external file
