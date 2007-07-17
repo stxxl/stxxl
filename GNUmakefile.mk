@@ -27,11 +27,11 @@ tests: lib
 	$(NICE) $(MAKE) -f Makefile tests_$(MODE) tests_$(MODE)_mcstl
 
 header-compile-test: lib
-	$(NICE) $(MAKE) -C tests/compile-stxxl-headers
-	$(NICE) $(MAKE) -C tests/compile-stxxl-headers INSTANCE=mcstxxl
+	$(NICE) $(MAKE) -C test/compile-stxxl-headers
+	$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl
 
 clean:
 	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_mcstl
-	$(MAKE) -C tests/compile-stxxl-headers clean
+	$(MAKE) -C test/compile-stxxl-headers clean
 
 .PHONY: all default-all doxy lib tests header-compile-test clean
