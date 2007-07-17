@@ -17,6 +17,7 @@ STXXL_ROOT	?= $(HOME)/work/stxxl
 ifeq ($(strip $(USE_ICPC)),yes)
 COMPILER	?= icpc
 OPENMPFLAG	?= -openmp
+ICPC_MCSTL_CPPFLAGS	?= -gcc-version=420 -cxxlib=$(FAKEGCC)
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
@@ -109,6 +110,10 @@ MCSTL_ROOT		?= $(strip $(MCSTL_BASE))$(if $(strip $(MCSTL_BRANCH)),/$(strip $(MC
 
 ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/mcstl.h)))
 $(error ERROR: could not find a MCSTL installation in MCSTL_ROOT=$(MCSTL_ROOT))
+endif
+
+ifeq ($(strip $(USE_ICPC)),yes)
+MCSTL_CPPFLAGS		+= $(ICPC_MCSTL_CPPFLAGS)
 endif
 
 MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -D__MCSTL__ $(MCSTL_INCLUDES_PREPEND) -I$(MCSTL_ROOT)/c++
