@@ -64,7 +64,15 @@ INPUT                  = doxymain.h \
 			 containers/btree/ \
 			 algo/ \
 			 stream/ \
-			 utils/
+			 utils/ \
+			 stxxl/bits/algo/ \
+			 stxxl/bits/common/ \
+			 stxxl/bits/containers/ \
+			 stxxl/bits/containers/btree/ \
+			 stxxl/bits/io/ \
+			 stxxl/bits/mng/ \
+			 stxxl/bits/stream/ \
+			 stxxl/bits/utils/
 FILE_PATTERNS          = *.h \
                          *.cpp
 RECURSIVE              = NO

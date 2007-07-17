@@ -31,7 +31,7 @@ header-compile-test: lib
 	$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl
 
 clean:
-	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_mcstl
+	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_mcstl clean_doxy
 	$(MAKE) -C test/compile-stxxl-headers clean
 
 .PHONY: all default-all doxy lib tests header-compile-test clean
