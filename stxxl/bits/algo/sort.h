@@ -10,6 +10,7 @@
  ****************************************************************************/
 
 #include <list>
+#include <functional>
 
 #ifdef __MCSTL__
  #include <mcstl.h>
@@ -62,7 +63,7 @@ namespace sort_local
     };
 
     template <typename BIDTp_, typename ValTp_, typename ValueCmp_>
-    struct trigger_entry_cmp
+    struct trigger_entry_cmp : public std::binary_function<trigger_entry<BIDTp_, ValTp_>, trigger_entry<BIDTp_, ValTp_>, bool>
     {
         typedef trigger_entry<BIDTp_, ValTp_> trigger_entry_type;
         ValueCmp_ cmp;

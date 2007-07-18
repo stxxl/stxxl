@@ -13,6 +13,7 @@
 
 #include <queue>
 #include <algorithm>
+#include <functional>
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
@@ -36,7 +37,7 @@ struct sim_event // only one type of event: WRITE COMPLETED
     inline sim_event(int_type t, int_type b) : timestamp(t), iblock(b) { };
 };
 
-struct sim_event_cmp
+struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
 {
     inline bool operator ()  (const sim_event & a, const sim_event & b) const
     {
