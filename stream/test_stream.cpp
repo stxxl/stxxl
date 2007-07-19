@@ -72,7 +72,7 @@ struct counter
 
 typedef counter<int> counter_type;
 
-struct cmp_type
+struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
 {
     typedef tuple_type value_type;
     bool operator ()  (const value_type & a, const value_type & b) const
@@ -90,7 +90,7 @@ struct cmp_type
     }
 };
 
-struct cmp_int
+struct cmp_int : std::binary_function<int, int, bool>
 {
     typedef int value_type;
     bool operator ()  (const value_type & a, const value_type & b) const
