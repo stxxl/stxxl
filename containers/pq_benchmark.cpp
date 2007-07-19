@@ -116,15 +116,15 @@ void run_stxxl_insert_all_delete_all(stxxl::int64 ops)
 
     Timer.stop();
 
-    STXXL_MSG("Records in PQ: " << PQ.size())
+    STXXL_MSG("Records in PQ: " << PQ.size());
     if (i != PQ.size())
     {
-        STXXL_MSG("Size does not match")
+        STXXL_MSG("Size does not match");
         abort();
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec")
+              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
     Stats->reset();
@@ -140,15 +140,15 @@ void run_stxxl_insert_all_delete_all(stxxl::int64 ops)
 
     Timer.stop();
 
-    STXXL_MSG("Records in PQ: " << PQ.size())
+    STXXL_MSG("Records in PQ: " << PQ.size());
     if (!PQ.empty())
     {
-        STXXL_MSG("PQ must be empty")
+        STXXL_MSG("PQ must be empty");
         abort();
     }
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec")
+              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
 }
@@ -179,15 +179,15 @@ void run_stxxl_intermixed(stxxl::int64 ops)
 
     Timer.stop();
 
-    STXXL_MSG("Records in PQ: " << PQ.size())
+    STXXL_MSG("Records in PQ: " << PQ.size());
     if (i != PQ.size())
     {
-        STXXL_MSG("Size does not match")
+        STXXL_MSG("Size does not match");
         abort();
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec")
+              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
     Stats->reset();
@@ -213,29 +213,29 @@ void run_stxxl_intermixed(stxxl::int64 ops)
 
     Timer.stop();
 
-    STXXL_MSG("Records in PQ: " << PQ.size())
+    STXXL_MSG("Records in PQ: " << PQ.size());
 
     STXXL_MSG("Deletions/Insertion elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec")
+              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
 }
 
 int main(int argc, char * argv[])
 {
-    STXXL_MSG("stxxl::pq lock size: " << BLOCK_SIZE << " bytes")
+    STXXL_MSG("stxxl::pq lock size: " << BLOCK_SIZE << " bytes");
 
 #ifdef STXXL_DIRECT_IO_OFF
-    STXXL_MSG("STXXL_DIRECT_IO_OFF is defined")
+    STXXL_MSG("STXXL_DIRECT_IO_OFF is defined");
 #else
-    STXXL_MSG("STXXL_DIRECT_IO_OFF is NOT defined")
+    STXXL_MSG("STXXL_DIRECT_IO_OFF is NOT defined");
 #endif
 
     if (argc < 3)
     {
-        STXXL_MSG("Usage: " << argv[0] << " version #ops")
-        STXXL_MSG("\t version = 1: insert-all-delete-all stxxl pq")
-        STXXL_MSG("\t version = 2: intermixed insert/delete stxxl pq")
+        STXXL_MSG("Usage: " << argv[0] << " version #ops");
+        STXXL_MSG("\t version = 1: insert-all-delete-all stxxl pq");
+        STXXL_MSG("\t version = 2: intermixed insert/delete stxxl pq");
         return 0;
     }
 
@@ -243,7 +243,7 @@ int main(int argc, char * argv[])
     stxxl::int64 ops = atoll(argv[2]);
 
 
-    STXXL_MSG("Running version      : " << version)
+    STXXL_MSG("Running version      : " << version);
     STXXL_MSG("Operations to perform: " << ops);
 
     switch (version)
@@ -255,6 +255,6 @@ int main(int argc, char * argv[])
         run_stxxl_intermixed(ops);
         break;
     default:
-        STXXL_MSG("Unsupported version " << version)
+        STXXL_MSG("Unsupported version " << version);
     }
 }

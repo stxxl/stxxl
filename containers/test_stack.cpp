@@ -23,7 +23,7 @@ int main(int argc, char * argv[])
 
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " test_size_in_pages")
+        STXXL_MSG("Usage: " << argv[0] << " test_size_in_pages");
         abort();
     }
     {
@@ -81,7 +81,7 @@ int main(int argc, char * argv[])
             my_stack1.pop();
             assert(my_stack1.size() == i);
         };
-        STXXL_MSG("Test 1 passed.")
+        STXXL_MSG("Test 1 passed.");
     }
     {
         // prefetch pool with 10 blocks (> D is recommended)
@@ -126,7 +126,7 @@ int main(int argc, char * argv[])
         };
 
 
-        STXXL_MSG("Test 2 passed.")
+        STXXL_MSG("Test 2 passed.");
     }
 
     return 0;

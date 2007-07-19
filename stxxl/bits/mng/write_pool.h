@@ -93,7 +93,7 @@ public:
     virtual ~write_pool()
     {
         STXXL_VERBOSE2("write_pool::~write_pool free_blocks_size: " <<
-                       free_blocks_size << " busy_blocks_size: " << busy_blocks_size)
+                       free_blocks_size << " busy_blocks_size: " << busy_blocks_size);
         while (!free_blocks.empty())
         {
             delete free_blocks.back();
@@ -137,13 +137,13 @@ public:
         assert(size() > 0);
         if (free_blocks_size)
         {
-            STXXL_VERBOSE1("write_pool::steal : " << free_blocks_size << " free blocks available")
+            STXXL_VERBOSE1("write_pool::steal : " << free_blocks_size << " free blocks available");
             -- free_blocks_size;
             block_type * p = free_blocks.back();
             free_blocks.pop_back();
             return p;
         }
-        STXXL_VERBOSE1("write_pool::steal : all " << busy_blocks_size << " are busy")
+        STXXL_VERBOSE1("write_pool::steal : all " << busy_blocks_size << " are busy");
         busy_blocks_iterator completed = wait_any(busy_blocks.begin(), busy_blocks.end());
         assert(completed != busy_blocks.end()); // we got something reasonable from wait_any
         assert(completed->req->poll()); // and it is *really* completed
@@ -238,7 +238,7 @@ protected:
             }
         }
         STXXL_VERBOSE1("write_pool::check_all_busy : " << cnt <<
-                       " are completed out of " << busy_blocks_size_old << " busy blocks")
+                       " are completed out of " << busy_blocks_size_old << " busy blocks");
     }
 };
 

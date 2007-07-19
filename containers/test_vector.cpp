@@ -60,7 +60,7 @@ int main()
         stxxl::random_number32 rnd;
         int offset = rnd();
 
-        STXXL_MSG("write " << v.size() << " elements")
+        STXXL_MSG("write " << v.size() << " elements");
 
         stxxl::ran32State = 0xdeadbeef;
         vector_type::size_type i;
@@ -77,7 +77,7 @@ int main()
         stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
         v.flush();
 
-        STXXL_MSG("seq read of " << v.size() << " elements")
+        STXXL_MSG("seq read of " << v.size() << " elements");
 
         stxxl::ran32State = 0xdeadbeef;
 
@@ -92,7 +92,7 @@ int main()
         }
 
         // check again
-        STXXL_MSG("clear")
+        STXXL_MSG("clear");
 
         v.clear();
 
@@ -100,12 +100,12 @@ int main()
 
         v.resize(int64(64 * 1024 * 1024) / sizeof(int64));
 
-        STXXL_MSG("write " << v.size() << " elements")
+        STXXL_MSG("write " << v.size() << " elements");
         stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
 
         stxxl::ran32State = 0xdeadbeef + 10;
 
-        STXXL_MSG("seq read of " << v.size() << " elements")
+        STXXL_MSG("seq read of " << v.size() << " elements");
 
         for (i = 0; i < v.size(); i++)
         {
@@ -120,11 +120,11 @@ int main()
     }
     catch (const std::exception & ex)
     {
-        STXXL_MSG("Cought exception: " << ex.what())
+        STXXL_MSG("Cought exception: " << ex.what());
     }
     catch (...)
     {
-        STXXL_MSG("Cought unknown exception.")
+        STXXL_MSG("Cought unknown exception.");
     }
 
     return 0;

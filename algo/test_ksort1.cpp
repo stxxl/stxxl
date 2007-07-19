@@ -64,40 +64,40 @@ int main()
     vector_type v(n_records);
 
     random_number64 rnd;
-    STXXL_MSG("Filling vector... ")
+    STXXL_MSG("Filling vector... ");
     for (vector_type::size_type i = 0; i < v.size(); i++)
     {
         v[i]._key = rnd();
         v[i]._key_copy = v[i]._key;
     }
 
-    //STXXL_MSG("Checking order...")
+    //STXXL_MSG("Checking order...");
     //STXXL_MSG(((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
 
-    STXXL_MSG("Sorting...")
+    STXXL_MSG("Sorting...");
     stxxl::ksort(v.begin(), v.end(), get_key(), memory_to_use);
     //stxxl::ksort(v.begin(),v.end(),memory_to_use);
 
 
-    STXXL_MSG("Checking order...")
+    STXXL_MSG("Checking order...");
     STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
-    STXXL_MSG("Checking content...")
+    STXXL_MSG("Checking content...");
     my_type prev;
     for (vector_type::size_type i = 0; i < v.size(); i++)
     {
         if ( v[i]._key != v[i]._key_copy)
         {
-            STXXL_MSG("Bug at position " << i)
+            STXXL_MSG("Bug at position " << i);
             abort();
         }
         if (i > 0 && prev._key == v[i]._key)
         {
-            STXXL_MSG("Duplicate at position " << i)
+            STXXL_MSG("Duplicate at position " << i);
             //abort();
         }
         prev = v[i];
     }
-    STXXL_MSG("OK")
+    STXXL_MSG("OK");
 
     return 0;
 }

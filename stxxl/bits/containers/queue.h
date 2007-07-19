@@ -139,11 +139,11 @@ public:
             if (front_block == back_block)
             {             // can not write the back block because it
                 // is the same as the front block, must keep it memory
-                STXXL_VERBOSE1("queue::push Case 1")
+                STXXL_VERBOSE1("queue::push Case 1");
             }
             else
             {
-                STXXL_VERBOSE1("queue::push Case 2")
+                STXXL_VERBOSE1("queue::push Case 2");
                 // write the back block
                 // need to allocate new block
                 bid_type newbid;
@@ -178,7 +178,7 @@ public:
             // if there is only one block, it implies ...
             if (back_block == front_block)
             {
-                STXXL_VERBOSE1("queue::pop Case 3")
+                STXXL_VERBOSE1("queue::pop Case 3");
                 assert(size() == 1);
                 assert(back_element == front_element);
                 assert(bids.empty());
@@ -192,7 +192,7 @@ public:
             --size_;
             if (size_ <= block_type::size)
             {
-                STXXL_VERBOSE1("queue::pop Case 4")
+                STXXL_VERBOSE1("queue::pop Case 4");
                 assert(bids.empty());
                 // the back_block is the next block
                 w_pool->add(front_block);
@@ -200,13 +200,13 @@ public:
                 front_element = back_block->elem;
                 return;
             }
-            STXXL_VERBOSE1("queue::pop Case 5")
+            STXXL_VERBOSE1("queue::pop Case 5");
 
             assert(!bids.empty());
             request_ptr req = p_pool->read(front_block, bids.front());
             for (unsigned_type i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i )
             {             // give prefetching hints
-                STXXL_VERBOSE1("queue::pop Case Hints")
+                STXXL_VERBOSE1("queue::pop Case Hints");
                 p_pool->hint(bids[i + 1], *w_pool);
             }
 

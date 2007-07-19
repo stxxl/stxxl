@@ -141,19 +141,19 @@ namespace btree
 
 
             STXXL_VERBOSE1("btree::normal_leaf split leaf " << this
-                                                            << " splitter: " << splitter.first)
+                                                            << " splitter: " << splitter.first);
 
 #if STXXL_VERBOSE_LEVEL >= 1
             if (PredLeaf)
             {
-                STXXL_VERBOSE1("btree::normal_leaf pred_part.smallest    = " << PredLeaf->front().first)
-                STXXL_VERBOSE1("btree::normal_leaf pred_part.largest     = " << PredLeaf->back().first)
+                STXXL_VERBOSE1("btree::normal_leaf pred_part.smallest    = " << PredLeaf->front().first);
+                STXXL_VERBOSE1("btree::normal_leaf pred_part.largest     = " << PredLeaf->back().first);
             }
 #endif
-            STXXL_VERBOSE1("btree::normal_leaf smaller_part.smallest = " << NewLeaf->front().first)
-            STXXL_VERBOSE1("btree::normal_leaf smaller_part.largest  = " << NewLeaf->back().first)
-            STXXL_VERBOSE1("btree::normal_leaf larger_part.smallest  = " << front().first)
-            STXXL_VERBOSE1("btree::normal_leaf larger_part.largest   = " << back().first)
+            STXXL_VERBOSE1("btree::normal_leaf smaller_part.smallest = " << NewLeaf->front().first);
+            STXXL_VERBOSE1("btree::normal_leaf smaller_part.largest  = " << NewLeaf->back().first);
+            STXXL_VERBOSE1("btree::normal_leaf larger_part.smallest  = " << front().first);
+            STXXL_VERBOSE1("btree::normal_leaf larger_part.largest   = " << back().first);
 
             btree_->leaf_cache_.unfix_node(NewBid);
         }
@@ -295,7 +295,7 @@ namespace btree
 
         void dump()
         {
-            STXXL_VERBOSE2("Dump of leaf " << this)
+            STXXL_VERBOSE2("Dump of leaf " << this);
             for (unsigned i = 0; i < size(); ++i)
                 STXXL_VERBOSE2((*this)[i].first << " " << (*this)[i].second);
 
@@ -381,7 +381,7 @@ namespace btree
             if (it.pos == size() && succ().valid())
             {
                 // run to the end of the leaf
-                STXXL_VERBOSE1("btree::normal_leaf jumping to the next block")
+                STXXL_VERBOSE1("btree::normal_leaf jumping to the next block");
                 it.pos = 0;
                 it.bid = succ();
             } else if (it.pos == 1 && btree_->prefetching_enabled_)                    // increment of pos from 0 to 1
@@ -525,7 +525,7 @@ namespace btree
             typename std::vector<iterator_base *>::iterator it2fix = Iterators2Fix.begin();
             for ( ; it2fix != Iterators2Fix.end(); ++it2fix)
             {
-                STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) << " (pos--)")
+                STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) << " (pos--)");
                 btree_->iterator_map_.unregister_iterator(**it2fix);
                 -- ((*it2fix)->pos);                        // fixing iterators
                 btree_->iterator_map_.register_iterator(**it2fix);
@@ -538,7 +538,7 @@ namespace btree
 
         void fuse(const normal_leaf & Src)
         {
-            STXXL_VERBOSE1("btree::normal_leaf Fusing")
+            STXXL_VERBOSE1("btree::normal_leaf Fusing");
             assert(vcmp_(Src.back(), front()));
             const unsigned SrcSize = Src.size();
 
@@ -559,7 +559,7 @@ namespace btree
             for ( ; it2fix != Iterators2Fix.end(); ++it2fix)
             {
                 STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) <<
-                               " (pos+" << SrcSize << ")")
+                               " (pos+" << SrcSize << ")");
                 btree_->iterator_map_.unregister_iterator(**it2fix);
                 ((*it2fix)->pos) += SrcSize;                       // fixing iterators
                 btree_->iterator_map_.register_iterator(**it2fix);
@@ -571,7 +571,7 @@ namespace btree
             for ( ; it2fix != Iterators2Fix.end(); ++it2fix)
             {
                 STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) <<
-                               " (bid=" << my_bid() << ")")
+                               " (bid=" << my_bid() << ")");
                 btree_->iterator_map_.unregister_iterator(**it2fix);
                 ((*it2fix)->bid) = my_bid();                         // fixing iterators
                 btree_->iterator_map_.register_iterator(**it2fix);
@@ -592,7 +592,7 @@ namespace btree
         key_type balance(normal_leaf & Left)
         {
             STXXL_VERBOSE1("btree::normal_leaf Balancing leaves with bids " <<
-                           Left.my_bid() << " and " << my_bid())
+                           Left.my_bid() << " and " << my_bid());
             const unsigned TotalSize = Left.size() + size();
             unsigned newLeftSize = TotalSize / 2;
             assert(newLeftSize <= Left.max_nelements());
@@ -627,7 +627,7 @@ namespace btree
                 for ( ; it2fix != Iterators2Fix1.end(); ++it2fix)
                 {
                     STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) <<
-                                   " (pos+" << nEl2Move << ")")
+                                   " (pos+" << nEl2Move << ")");
                     btree_->iterator_map_.unregister_iterator(**it2fix);
                     ((*it2fix)->pos) += nEl2Move;                           // fixing iterators
                     btree_->iterator_map_.register_iterator(**it2fix);
@@ -638,7 +638,7 @@ namespace btree
                 for ( ; it2fix != Iterators2Fix2.end(); ++it2fix)
                 {
                     STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) <<
-                                   " (pos-" << newLeftSize << " bid=" << my_bid() << ")")
+                                   " (pos-" << newLeftSize << " bid=" << my_bid() << ")");
                     btree_->iterator_map_.unregister_iterator(**it2fix);
                     ((*it2fix)->bid) = my_bid();                             // fixing iterators
                     ((*it2fix)->pos) -= newLeftSize;                             // fixing iterators
@@ -667,7 +667,7 @@ namespace btree
                 for ( ; it2fix != Iterators2Fix1.end(); ++it2fix)
                 {
                     STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) <<
-                                   " (pos-" << nEl2Move << ")")
+                                   " (pos-" << nEl2Move << ")");
                     btree_->iterator_map_.unregister_iterator(**it2fix);
                     ((*it2fix)->pos) -= nEl2Move;                             // fixing iterators
                     btree_->iterator_map_.register_iterator(**it2fix);
@@ -678,7 +678,7 @@ namespace btree
                 for ( ; it2fix != Iterators2Fix2.end(); ++it2fix)
                 {
                     STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) <<
-                                   " (pos+" << Left.size() << " bid=" << Left.my_bid() << ")")
+                                   " (pos+" << Left.size() << " bid=" << Left.my_bid() << ")");
                     btree_->iterator_map_.unregister_iterator(**it2fix);
                     ((*it2fix)->bid) = Left.my_bid();                             // fixing iterators
                     ((*it2fix)->pos) += Left.size();                             // fixing iterators

@@ -165,15 +165,15 @@ int main()
     assert(o == output.end() );
 
 
-    STXXL_MSG("input string (character,position) :")
+    STXXL_MSG("input string (character,position) :");
     for (unsigned i = 0; i < input.size(); ++i)
     {
-        STXXL_MSG("('" << input[i] << "'," << i << ")")
+        STXXL_MSG("('" << input[i] << "'," << i << ")");
     }
-    STXXL_MSG("sorted tuples (character,position):")
+    STXXL_MSG("sorted tuples (character,position):");
     for (unsigned i = 0; i < input.size(); ++i)
     {
-        STXXL_MSG("('" << output[i].first << "'," << output[i].second << ")")
+        STXXL_MSG("('" << output[i].first << "'," << output[i].second << ")");
     }
 
     std::cout << *s;

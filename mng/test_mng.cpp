@@ -30,7 +30,7 @@ struct my_handler
 {
     void operator ()  (request * req)
     {
-        STXXL_MSG( req << " done, type=" << req->io_type() )
+        STXXL_MSG( req << " done, type=" << req->io_type() );
     }
 };
 
@@ -48,10 +48,10 @@ int main ()
     bm->new_blocks (striping (), bids.begin (), bids.end ());
 
     block_type * block = new block_type[2];
-    STXXL_MSG(std::hex)
-    STXXL_MSG("Allocated block address    : " << long (block))
-    STXXL_MSG("Allocated block address + 1: " << long (block + 1))
-    STXXL_MSG(std::dec)
+    STXXL_MSG(std::hex);
+    STXXL_MSG("Allocated block address    : " << long (block));
+    STXXL_MSG("Allocated block address + 1: " << long (block + 1));
+    STXXL_MSG(std::dec);
     unsigned i = 0;
     for (i = 0; i < block_type::size; ++i)
     {
@@ -74,7 +74,7 @@ int main ()
             if (j != block->elem[j].integer)
             {
                 STXXL_MSG("Error in block " << std::hex << i << " pos: " << j
-                                            << " value read: " << block->elem[j].integer)
+                                            << " value read: " << block->elem[j].integer);
             }
         }
     }
@@ -95,7 +95,7 @@ int main ()
        bm->new_blocks (striping (), vbids.begin (), vbids.end ());
 
        for(i=0;i<nblocks;i++)
-       STXXL_MSG("Allocated block: offset="<<vbids[i].offset<<", size="<<vbids[i].size)
+       STXXL_MSG("Allocated block: offset="<<vbids[i].offset<<", size="<<vbids[i].size);
 
        bm->delete_blocks(vbids.begin (), vbids.end ());  */
 }

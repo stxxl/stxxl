@@ -110,7 +110,7 @@ __STXXL_BEGIN_NAMESPACE
         typedef unsigned char byte_type;
         byte_type filler_array_[bytes];
     public:
-        filler_struct__ () {STXXL_VERBOSE2("filler_struct__ is allocated")}
+        filler_struct__ () {STXXL_VERBOSE2("filler_struct__ is allocated");}
     };
 
     template <>
@@ -118,7 +118,7 @@ __STXXL_BEGIN_NAMESPACE
     {
         typedef unsigned char byte_type;
     public:
-        filler_struct__ () {STXXL_VERBOSE2("filler_struct__ is allocated")}
+        filler_struct__ () {STXXL_VERBOSE2("filler_struct__ is allocated");}
     };
 
     //! \brief Contains data elements for \c stxxl::typed_block , not intended for direct use
@@ -142,7 +142,7 @@ __STXXL_BEGIN_NAMESPACE
         //! Array of elements of type T
         T elem[size];
 
-        element_block () {STXXL_VERBOSE2("element_block is allocated")}
+        element_block () {STXXL_VERBOSE2("element_block is allocated");}
 
         //! An operator to access elements in the block
         reference operator [](int i)
@@ -193,7 +193,7 @@ __STXXL_BEGIN_NAMESPACE
             return ref[i];
          }
 
-         block_w_bids () {STXXL_VERBOSE2("block_w_bids is allocated")}
+         block_w_bids () {STXXL_VERBOSE2("block_w_bids is allocated");}
     };
 
     template <class T,unsigned Size_,unsigned RawSize_>
@@ -207,7 +207,7 @@ __STXXL_BEGIN_NAMESPACE
         };
          typedef BID<raw_size> bid_type;
 
-        block_w_bids () {STXXL_VERBOSE2("block_w_bids is allocated")}
+        block_w_bids () {STXXL_VERBOSE2("block_w_bids is allocated");}
     };
 
     //! \brief Contains per block information for \c stxxl::typed_block , not intended for direct use
@@ -224,7 +224,7 @@ __STXXL_BEGIN_NAMESPACE
 
         enum { size = ((RawSize_ - sizeof(BID<RawSize_>)*NBids_ - sizeof(InfoType_) )/sizeof(T_)) };
     public:
-        block_w_info () {STXXL_VERBOSE2("block_w_info is allocated")}
+        block_w_info () {STXXL_VERBOSE2("block_w_info is allocated");}
     };
 
     template <class T_,unsigned RawSize_,unsigned NBids_>
@@ -235,7 +235,7 @@ __STXXL_BEGIN_NAMESPACE
         typedef void   info_type;
         enum {size  = ((RawSize_ - sizeof(BID<RawSize_>)*NBids_)/sizeof(T_)) };
     public:
-        block_w_info () {STXXL_VERBOSE2("block_w_info is allocated")}
+        block_w_info () {STXXL_VERBOSE2("block_w_info is allocated");}
     };
 
     //! \brief Block containing elements of fixed length
@@ -272,7 +272,7 @@ __STXXL_BEGIN_NAMESPACE
 
         typed_block()
         {
-            STXXL_VERBOSE2("typed_block is allocated")
+            STXXL_VERBOSE2("typed_block is allocated");
         }
 
         enum
@@ -310,7 +310,7 @@ __STXXL_BEGIN_NAMESPACE
         static void *operator      new[] (size_t bytes)
         {
             unsigned_type meta_info_size = bytes % raw_size;
-            STXXL_VERBOSE1("typed::block operator new: Meta info size: "<<meta_info_size)
+            STXXL_VERBOSE1("typed::block operator new: Meta info size: "<<meta_info_size);
 
             void * result = aligned_alloc < BLOCK_ALIGN > (bytes,meta_info_size);
             char * tmp = (char*)result;
@@ -326,7 +326,7 @@ __STXXL_BEGIN_NAMESPACE
         static void *operator      new (size_t bytes)
         {
             unsigned_type meta_info_size = bytes % raw_size;
-            STXXL_VERBOSE1("typed::block operator new: Meta info size: "<<meta_info_size)
+            STXXL_VERBOSE1("typed::block operator new: Meta info size: "<<meta_info_size);
 
             void * result = aligned_alloc < BLOCK_ALIGN > (bytes,meta_info_size);
             char * tmp = (char*)result;
@@ -546,14 +546,14 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
 
       STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
         << ", free:" << free_bytes << " total:"<< disk_bytes<<
-          " begin: "<<((void*)(begin))<<" end: "<<((void*)(end)))
+          " begin: "<<((void*)(begin))<<" end: "<<((void*)(end)));
 
       stxxl::int64 requested_size = 0;
 
       typename BIDArray<BLK_SIZE>::iterator cur = begin;
     for(;cur != end;++cur)
     {
-       STXXL_VERBOSE2("Asking for a block with size: "<< (cur->size) )
+       STXXL_VERBOSE2("Asking for a block with size: "<< (cur->size) );
        requested_size += cur->size;
     }
 
@@ -561,7 +561,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
     {
       STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
        " bytes requested, " << free_bytes <<
-       " bytes free. Trying to extend the external memory space..." )
+       " bytes free. Trying to extend the external memory space..." );
 
 
       begin->offset = disk_bytes; // allocate at the end
@@ -599,18 +599,18 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
         }
 
         // no contiguous region found
-        STXXL_VERBOSE1("Warning, when allocation a external memory space, no contiguos region found")
-        STXXL_VERBOSE1("It might harm the performance")
+        STXXL_VERBOSE1("Warning, when allocation a external memory space, no contiguos region found");
+        STXXL_VERBOSE1("It might harm the performance");
         if(requested_size == BLK_SIZE )
         {
       assert(end-begin == 1);
 
-      STXXL_ERRMSG("Warning: Severe external memory space defragmentation!")
+      STXXL_ERRMSG("Warning: Severe external memory space defragmentation!");
       dump();
 
             STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
              " bytes requested, " << free_bytes <<
-             " bytes free. Trying to extend the external memory space..." )
+             " bytes free. Trying to extend the external memory space..." );
 
       begin->offset = disk_bytes; // allocate at the end
       disk_bytes += BLK_SIZE;
@@ -634,14 +634,14 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
         void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
     {
     STXXL_VERBOSE2("DiskAllocator::delete_block<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
-      << ", free:" << free_bytes << " total:"<< disk_bytes)
-    STXXL_VERBOSE2("Deallocating a block with size: "<<bid.size)
+      << ", free:" << free_bytes << " total:"<< disk_bytes);
+    STXXL_VERBOSE2("Deallocating a block with size: "<<bid.size);
     //assert(bid.size);
 
         //dump();
         stxxl::int64 region_pos = bid.offset;
         stxxl::int64 region_size = bid.size;
-        STXXL_VERBOSE2("Deallocating a block with size: "<<region_size<<" position: "<<region_pos)
+        STXXL_VERBOSE2("Deallocating a block with size: "<<region_size<<" position: "<<region_pos);
         if(!free_space.empty())
         {
             sortseq::iterator succ = free_space.upper_bound (region_pos);
@@ -652,12 +652,12 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
             {
                 if(pred == free_space.end ())
                 {
-                    STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
-                    STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"))
-                    STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"))
-                    STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"))
-                    STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"))
-                    STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
+                    STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size);
+                    STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"));
+                    STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"));
+                    STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"));
+                    STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"));
+                    STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"));
                     dump();
                     assert(pred != free_space.end ());
                 }
@@ -675,12 +675,12 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
                 { /*
                     if(pred == succ)
                     {
-                        STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
-                        STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"))
-                        STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"))
-                        STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"))
-                        STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"))
-                        STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
+                        STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size);
+                        STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"));
+                        STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"));
+                        STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"));
+                        STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"));
+                        STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"));
                         dump();
                         assert(pred != succ);
                     } */
@@ -695,12 +695,12 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
                     {
                         if(pred == free_space.end ())
                         {
-                            STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size)
-                            STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"))
-                            STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"))
-                            STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"))
-                            STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"))
-                            STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"))
+                            STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size);
+                            STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"));
+                            STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"));
+                            STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"));
+                            STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"));
+                            STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"));
                             dump();
                             assert(pred != free_space.end ());
                         }
@@ -735,14 +735,14 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
         void DiskAllocator::delete_blocks (const BIDArray < BLK_SIZE > &bids)
     {
         STXXL_VERBOSE2("DiskAllocator::delete_blocks<BLK_SIZE> BLK_SIZE="<< BLK_SIZE <<
-      ", free:" << free_bytes << " total:"<< disk_bytes )
+      ", free:" << free_bytes << " total:"<< disk_bytes );
 
         unsigned i=0;
         for (; i < bids.size (); ++i)
         {
             stxxl::int64 region_pos = bids[i].offset;
             stxxl::int64 region_size = bids[i].size;
-              STXXL_VERBOSE2("Deallocating a block with size: "<<region_size)
+              STXXL_VERBOSE2("Deallocating a block with size: "<<region_size);
               assert(bids[i].size);
 
             if(!free_space.empty())

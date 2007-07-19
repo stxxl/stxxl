@@ -47,7 +47,7 @@ void run_stack(stxxl::int64 volume)
 
     MM_manager.set_memory_limit(BLOCK_SIZE * DISKS * 8);
 
-    STXXL_MSG("Record size: " << sizeof(my_record) << " bytes")
+    STXXL_MSG("Record size: " << sizeof(my_record) << " bytes");
 
     stack_type Stack;
 
@@ -67,16 +67,16 @@ void run_stack(stxxl::int64 volume)
 
     Timer.stop();
 
-    STXXL_MSG("Records in Stack: " << Stack.stream_len())
+    STXXL_MSG("Records in Stack: " << Stack.stream_len());
     if (i != Stack.stream_len())
     {
-        STXXL_MSG("Size does not match")
+        STXXL_MSG("Size does not match");
         abort();
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MB/s")
+              " MB/s");
 
 
     ////////////////////////////////////////////////
@@ -92,16 +92,16 @@ void run_stack(stxxl::int64 volume)
 
     Timer.stop();
 
-    STXXL_MSG("Records in Stack: " << Stack.stream_len())
+    STXXL_MSG("Records in Stack: " << Stack.stream_len());
     if (Stack.stream_len() != 0)
     {
-        STXXL_MSG("Stack must be empty")
+        STXXL_MSG("Stack must be empty");
         abort();
     }
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MB/s")
+              " MB/s");
 }
 
 
@@ -132,9 +132,9 @@ int main(int argc, char * argv[])
 
     if (argc < 3)
     {
-        STXXL_MSG("Usage: " << argv[0] << " version #volume")
-        STXXL_MSG("\t version = 1: TPIE stack with 4 byte records")
-        STXXL_MSG("\t version = 2: TPIE stack with 32 byte records")
+        STXXL_MSG("Usage: " << argv[0] << " version #volume");
+        STXXL_MSG("\t version = 1: TPIE stack with 4 byte records");
+        STXXL_MSG("\t version = 2: TPIE stack with 32 byte records");
         return 0;
     }
 
@@ -142,12 +142,12 @@ int main(int argc, char * argv[])
     stxxl::int64 volume = atoll(argv[2]);
 
     STXXL_MSG("Allocating array with size " << MEM_2_RESERVE
-                                            << " bytes to prevent file buffering.")
+                                            << " bytes to prevent file buffering.");
     //int * array = new int[MEM_2_RESERVE/sizeof(int)];
     int * array = (int *) malloc(MEM_2_RESERVE);
     std::fill(array, array + (MEM_2_RESERVE / sizeof(int)), 0);
 
-    STXXL_MSG("Running version: " << version)
+    STXXL_MSG("Running version: " << version);
     STXXL_MSG("Data volume    : " << volume << " bytes");
 
     switch (version)
@@ -159,7 +159,7 @@ int main(int argc, char * argv[])
         run_stack < my_record_ < 32 > > (volume);
         break;
     default:
-        STXXL_MSG("Unsupported version " << version)
+        STXXL_MSG("Unsupported version " << version);
     }
 
     //delete [] array;

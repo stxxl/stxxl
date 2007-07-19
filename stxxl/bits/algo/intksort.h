@@ -27,7 +27,7 @@ count (type_key * a, type_key * aEnd, int_type * bucket, int_type K, typename ty
         int_type i = (p->key - offset) >> shift;
         /*if(!(i<K && i>=0))
            {
-                STXXL_ERRMSG("i: "<<i)
+                STXXL_ERRMSG("i: "<<i);
                 abort();
            }*/
         bucket[i]++;
@@ -334,7 +334,7 @@ void classify_block(type * begin, type * end, type_key * & out, int_type * bucke
         int_type ibucket = (key - offset) >> shift;
         /*if(!(ibucket<K && ibucket>=0))
            {
-                STXXL_ERRMSG("ibucket: "<<ibucket<<" K:"<<K)
+                STXXL_ERRMSG("ibucket: "<<ibucket<<" K:"<<K);
                 abort();
            }*/
         out->key = key;

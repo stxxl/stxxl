@@ -204,7 +204,7 @@ create_runs(
         static_cast<int>(ceil(log2((m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
                                    (double (m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE)) : 2.)));
     const int log_k2 = int (log2(double (m2 * Blocks1->size))) - log_k1 - 1;
-    STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2)
+    STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
     const int_type k1 = 1 << log_k1;
     const int_type k2 = 1 << log_k2;
     int_type * bucket1 = new int_type[k1];
@@ -223,7 +223,7 @@ create_runs(
     unsigned_type k = 0;
     const int shift1 = sizeof(key_type) * 8 - log_k1;
     const int shift2 = shift1 - log_k2;
-    STXXL_VERBOSE("shift1: " << shift1 << " shift2:" << shift2)
+    STXXL_VERBOSE("shift1: " << shift1 << " shift2:" << shift2);
 
     for ( ; k < nruns; k++)
     {
@@ -341,8 +341,8 @@ bool check_ksorted_runs(              run_type * * runs,
 {
     typedef typename block_type::value_type value_type;
 
-    //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
-    STXXL_MSG("check_sorted_runs  Runs: " << nruns)
+    //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns);
+    STXXL_MSG("check_sorted_runs  Runs: " << nruns);
     unsigned_type irun = 0;
     for (irun = 0; irun < nruns; ++irun)
     {
@@ -366,11 +366,11 @@ bool check_ksorted_runs(              run_type * * runs,
 
             if (off && (keyext(blocks[0][0]) < keyext(last)))
             {
-                STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun)
-                STXXL_MSG(" first value: " << blocks[0][0] << " with key" << keyext(blocks[0][0]))
-                STXXL_MSG(" last  value: " << last << " with key" << keyext(last))
+                STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun);
+                STXXL_MSG(" first value: " << blocks[0][0] << " with key" << keyext(blocks[0][0]));
+                STXXL_MSG(" last  value: " << last << " with key" << keyext(last));
                 for (unsigned_type k = 0; k < block_type::size; ++k)
-                    STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k] << " key: " << keyext(blocks[0][k]))
+                    STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k] << " key: " << keyext(blocks[0][k]));
                     return false;
 
             }
@@ -379,17 +379,17 @@ bool check_ksorted_runs(              run_type * * runs,
             {
                 if (keyext(blocks[j][0]) != (*runs[irun])[off + j].key)
                 {
-                    STXXL_MSG("check_sorted_runs  wrong trigger in the run " << irun << " block " << (off + j))
-                    STXXL_MSG("                   trigger value: " << (*runs[irun])[off + j].key)
-                    STXXL_MSG("Data in the block:")
+                    STXXL_MSG("check_sorted_runs  wrong trigger in the run " << irun << " block " << (off + j));
+                    STXXL_MSG("                   trigger value: " << (*runs[irun])[off + j].key);
+                    STXXL_MSG("Data in the block:");
                     for (unsigned_type k = 0; k < block_type::size; ++k)
-                        STXXL_MSG("Element " << k << " in the block is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]))
+                        STXXL_MSG("Element " << k << " in the block is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]));
 
-                        STXXL_MSG("BIDS:")
+                        STXXL_MSG("BIDS:");
                         for (unsigned_type k = 0; k < nblocks; ++k)
                         {
-                            if ( k == j) STXXL_MSG("Bad one comes next.")
-                                STXXL_MSG("BID " << (off + k) << " is: " << ((*runs[irun])[off + k].bid))
+                            if ( k == j) STXXL_MSG("Bad one comes next.");
+                                STXXL_MSG("BID " << (off + k) << " is: " << ((*runs[irun])[off + k].bid));
                                 }
 
                                 return false;
@@ -408,17 +408,17 @@ bool check_ksorted_runs(              run_type * * runs,
                                                                        nelements
                         ), key_comparison<value_type, key_ext_>()) )
                 {
-                    STXXL_MSG("check_sorted_runs  wrong order in the run " << irun)
-                    STXXL_MSG("Data in blocks:")
+                    STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
+                    STXXL_MSG("Data in blocks:");
                     for (unsigned_type j = 0; j < nblocks; ++j)
                     {
                         for (unsigned_type k = 0; k < block_type::size; ++k)
-                            STXXL_MSG("     Element " << k << " in block " << (off + j) << " is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]))
+                            STXXL_MSG("     Element " << k << " in block " << (off + j) << " is :" << blocks[j][k] << " with key: " << keyext(blocks[j][k]));
                             }
-                            STXXL_MSG("BIDS:")
+                            STXXL_MSG("BIDS:");
                             for (unsigned_type k = 0; k < nblocks; ++k)
                             {
-                                STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid))
+                                STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
                             }
 
                         return false;
@@ -464,12 +464,12 @@ bool check_ksorted_runs(              run_type * * runs,
             const int_type n_write_buffers = 4 * disks_number;
 #else
             const int_type n_prefetch_buffers = STXXL_MAX( int_type(2 * disks_number), (3 * (int_type(_m) - int_type(nruns)) / 4));
-            STXXL_VERBOSE("Prefetch buffers " << n_prefetch_buffers)
+            STXXL_VERBOSE("Prefetch buffers " << n_prefetch_buffers);
             const int_type n_write_buffers = STXXL_MAX( int_type(2 * disks_number), int_type(_m) - int_type(nruns) - int_type(n_prefetch_buffers) );
-            STXXL_VERBOSE("Write buffers " << n_write_buffers)
+            STXXL_VERBOSE("Write buffers " << n_write_buffers);
             // heuristic
             const int_type n_opt_prefetch_buffers = 2 * int_type(disks_number) + (3 * (int_type(n_prefetch_buffers) - int_type(2 * disks_number))) / 10;
-            STXXL_VERBOSE("Prefetch buffers " << n_opt_prefetch_buffers)
+            STXXL_VERBOSE("Prefetch buffers " << n_opt_prefetch_buffers);
 #endif
 
 #ifdef SORT_OPTIMAL_PREFETCHING
@@ -544,7 +544,7 @@ bool check_ksorted_runs(              run_type * * runs,
             const unsigned_type m2_rf = m2 * block_type::raw_size /
                                         (block_type::raw_size + block_type::size * sizeof(type_key < type, key_type >));
             STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
-                          m2_rf << " due to key size: " << sizeof(typename key_extractor::key_type) << " bytes")
+                          m2_rf << " due to key size: " << sizeof(typename key_extractor::key_type) << " bytes");
             m2 = m2_rf;
             unsigned_type full_runs = _n / m2;
             unsigned_type partial_runs = ((_n % m2) ? 1 : 0);
@@ -555,7 +555,7 @@ bool check_ksorted_runs(              run_type * * runs,
             block_manager * mng = block_manager::get_instance ();
             int ndisks = cfg->disks_number ();
 
-            STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs)
+            STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
 
 #ifdef STXXL_IO_STATS
             stats * iostats = stats::get_instance ();
@@ -627,7 +627,7 @@ bool check_ksorted_runs(              run_type * * runs,
             {
                 int_type new_nruns = div_and_round_up(nruns, merge_factor);
                 STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
-                              " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns)
+                              " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 
                 new_runs = new run_type *[new_nruns];
 
@@ -686,7 +686,7 @@ bool check_ksorted_runs(              run_type * * runs,
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
                     assert((check_ksorted_runs < block_type, run_type, key_extractor > (runs + nruns - runs_left, runs2merge, m2, keyobj) ));
 #endif
-                    STXXL_VERBOSE("Merging " << runs2merge << " runs")
+                    STXXL_VERBOSE("Merging " << runs2merge << " runs");
                     merge_runs<block_type, run_type, key_extractor> (runs + nruns - runs_left,
                                                                      runs2merge, * (new_runs + (cur_out_run++)), _m, keyobj);
                     runs_left -= runs2merge;
@@ -704,21 +704,21 @@ bool check_ksorted_runs(              run_type * * runs,
             end = stxxl_timestamp ();
 
             STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Run creation time: " <<
-                           after_runs_creation - begin << " s")
+                           after_runs_creation - begin << " s");
 #ifdef STXXL_IO_STATS
-            STXXL_VERBOSE ("reads               : " << iostats->get_reads ())
-            STXXL_VERBOSE ("reads(volume)       : " << iostats->get_read_volume () << " bytes")
-            STXXL_VERBOSE ("writes              : " << iostats->get_writes () << " bytes")
-            STXXL_VERBOSE ("writes(volume)      : " << iostats->get_written_volume ())
-            STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s")
-            STXXL_VERBOSE ("write time          : " << iostats->get_write_time () << " s")
-            STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s")
-            STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s")
-            STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s")
+            STXXL_VERBOSE ("reads               : " << iostats->get_reads ());
+            STXXL_VERBOSE ("reads(volume)       : " << iostats->get_read_volume () << " bytes");
+            STXXL_VERBOSE ("writes              : " << iostats->get_writes () << " bytes");
+            STXXL_VERBOSE ("writes(volume)      : " << iostats->get_written_volume ());
+            STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s");
+            STXXL_VERBOSE ("write time          : " << iostats->get_write_time () << " s");
+            STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s");
+            STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s");
+            STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s");
 #endif
 #ifdef COUNT_WAIT_TIME
-            STXXL_VERBOSE ("Time in I/O wait(rf): " << io_wait_after_rf << " s")
-            STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s")
+            STXXL_VERBOSE ("Time in I/O wait(rf): " << io_wait_after_rf << " s");
+            STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
 #endif
 
             return result;

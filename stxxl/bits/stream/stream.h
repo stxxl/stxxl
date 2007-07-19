@@ -207,7 +207,7 @@ namespace stream
         stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> end,
         unsigned_type nbuffers = 0)
     {
-        STXXL_VERBOSE1("streamify for vector_iterator range is called")
+        STXXL_VERBOSE1("streamify for vector_iterator range is called");
         return vector_iterator2stream<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
                (begin, end, nbuffers);
     }
@@ -235,7 +235,7 @@ namespace stream
         stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> end,
         unsigned_type nbuffers = 0)
     {
-        STXXL_VERBOSE1("streamify for const_vector_iterator range is called")
+        STXXL_VERBOSE1("streamify for const_vector_iterator range is called");
         return vector_iterator2stream<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
                (begin, end, nbuffers);
     }
@@ -274,13 +274,13 @@ namespace stream
         {
             if (end - begin < block_type::size )
             {
-                STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator_>")
+                STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator_>");
                 it_stream = new iterator2stream<InputIterator_>(begin, end);
                 vec_it_stream = NULL;
             }
             else
             {
-                STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing vector_iterator2stream<InputIterator_>")
+                STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing vector_iterator2stream<InputIterator_>");
                 it_stream = NULL;
                 vec_it_stream = new vector_iterator2stream<InputIterator_>(begin, end, nbuffers);
             }
@@ -346,7 +346,7 @@ namespace stream
         stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> end,
         unsigned_type nbuffers = 0)
     {
-        STXXL_VERBOSE1("streamify_sr for vector_iterator range is called")
+        STXXL_VERBOSE1("streamify_sr for vector_iterator range is called");
         return vector_iterator2stream_sr<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
                (begin, end, nbuffers);
     }
@@ -360,7 +360,7 @@ namespace stream
         stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> end,
         unsigned_type nbuffers = 0)
     {
-        STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called")
+        STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called");
         return vector_iterator2stream_sr<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
                (begin, end, nbuffers);
     }

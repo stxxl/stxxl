@@ -26,13 +26,13 @@ void check(const q1type & q1, const q2type & q2)
 int main()
 {
     unsigned cnt;
-    STXXL_MSG("Elements in a block: " << stxxl::queue<my_type>::block_type::size)
+    STXXL_MSG("Elements in a block: " << stxxl::queue<my_type>::block_type::size);
 
     stxxl::queue<my_type>  xqueue(2, 2, 2 );
     std::queue<my_type>  squeue;
     check(xqueue, squeue);
 
-    STXXL_MSG("Testing special case 4")
+    STXXL_MSG("Testing special case 4");
     cnt = stxxl::queue < my_type > ::block_type::size;
     stxxl::random_number32 rnd;
     while (cnt--)
@@ -49,7 +49,7 @@ int main()
         squeue.pop();
         check(xqueue, squeue);
     }
-    STXXL_MSG("Testing other cases ")
+    STXXL_MSG("Testing other cases ");
     cnt = 100 * stxxl::queue<my_type>::block_type::size;
     while (cnt--)
     {

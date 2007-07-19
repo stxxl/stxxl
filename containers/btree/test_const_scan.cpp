@@ -52,7 +52,7 @@ void NC(btree_type & BTree)
         sum += it->second.data;
 
     Timer1.stop();
-    STXXL_MSG("Scanning with non const iterator: " << Timer1.mseconds() << " msec")
+    STXXL_MSG("Scanning with non const iterator: " << Timer1.mseconds() << " msec");
 }
 
 void C(btree_type & BTree)
@@ -66,22 +66,22 @@ void C(btree_type & BTree)
         sum += it->second.data;
 
     Timer1.stop();
-    STXXL_MSG("Scanning with const iterator: " << Timer1.mseconds() << " msec")
+    STXXL_MSG("Scanning with const iterator: " << Timer1.mseconds() << " msec");
 }
 
 int main(int argc, char * argv [])
 {
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " #ins")
+        STXXL_MSG("Usage: " << argv[0] << " #ins");
         return 1;
     }
 
     const unsigned nins = atoi(argv[1]);
 
-    STXXL_MSG("Data set size  : " << nins * sizeof(std::pair < int, my_type >) << " bytes")
-    STXXL_MSG("Node cache size: " << node_cache_size << " bytes")
-    STXXL_MSG("Leaf cache size: " << leaf_cache_size << " bytes")
+    STXXL_MSG("Data set size  : " << nins * sizeof(std::pair < int, my_type >) << " bytes");
+    STXXL_MSG("Node cache size: " << node_cache_size << " bytes");
+    STXXL_MSG("Leaf cache size: " << leaf_cache_size << " bytes");
 
     //stxxl::random_number32 rnd;
 
@@ -111,7 +111,7 @@ int main(int argc, char * argv [])
         btree_type BTree1(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
         btree_type BTree2(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);
 
-        STXXL_MSG("Disabling prefetching")
+        STXXL_MSG("Disabling prefetching");
         BTree1.disable_prefetching();
         BTree2.disable_prefetching();
 
@@ -125,7 +125,7 @@ int main(int argc, char * argv [])
 
         //STXXL_MSG(*stxxl::stats::get_instance());
     }
-    STXXL_MSG("All tests passed successufully")
+    STXXL_MSG("All tests passed successufully");
 
     return 0;
 }

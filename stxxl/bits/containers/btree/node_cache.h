@@ -136,7 +136,7 @@ namespace btree
             n_clean_forced(0)
         {
             const unsigned_type nnodes = cache_size_in_bytes / block_type::raw_size;
-            STXXL_VERBOSE1("btree::node_cache constructor nodes=" << nnodes)
+            STXXL_VERBOSE1("btree::node_cache constructor nodes=" << nnodes);
             if (nnodes < 3)
             {
                 STXXL_FORMAT_ERROR_MSG(msg, "btree::node_cache::node_cache  Too few memory for a node cache (<3)")
@@ -179,7 +179,7 @@ namespace btree
 
         ~node_cache()
         {
-            STXXL_VERBOSE1("btree::node_cache deconstructor addr=" << this)
+            STXXL_VERBOSE1("btree::node_cache deconstructor addr=" << this);
             typename BID2node_type::const_iterator i = BID2node_.begin();
             typename BID2node_type::const_iterator end = BID2node_.end();
             for ( ; i != end; ++i)
@@ -213,7 +213,7 @@ namespace btree
                     {
                         STXXL_ERRMSG(
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                        STXXL_ERRMSG("Returning NULL node.")
+                        STXXL_ERRMSG("Returning NULL node.");
                         return NULL;
                     }
                     pager_.hit(node2kick);
@@ -248,7 +248,7 @@ namespace btree
 
                 assert(size() == BID2node_.size() + free_nodes_.size());
 
-                STXXL_VERBOSE1("btree::node_cache get_new_node, need to kick node " << node2kick)
+                STXXL_VERBOSE1("btree::node_cache get_new_node, need to kick node " << node2kick);
 
                 return &Node;
             }
@@ -271,7 +271,7 @@ namespace btree
 
             assert(size() == BID2node_.size() + free_nodes_.size());
 
-            STXXL_VERBOSE1("btree::node_cache get_new_node, free node " << free_node << "available")
+            STXXL_VERBOSE1("btree::node_cache get_new_node, free node " << free_node << "available");
 
             return &Node;
         }
@@ -287,7 +287,7 @@ namespace btree
             {
                 // the node is in cache
                 const int_type nodeindex = it->second;
-                STXXL_VERBOSE1("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix)
+                STXXL_VERBOSE1("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
                 fixed_[nodeindex] = fix;
                 pager_.hit(nodeindex);
                 dirty_[nodeindex] = true;
@@ -317,7 +317,7 @@ namespace btree
                     {
                         STXXL_ERRMSG(
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                        STXXL_ERRMSG("Returning NULL node.")
+                        STXXL_ERRMSG("Returning NULL node.");
                         return NULL;
                     }
                     pager_.hit(node2kick);
@@ -349,7 +349,7 @@ namespace btree
 
                 assert(size() == BID2node_.size() + free_nodes_.size());
 
-                STXXL_VERBOSE1("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix)
+                STXXL_VERBOSE1("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix);
 
                 return &Node;
             }
@@ -370,7 +370,7 @@ namespace btree
 
             assert(size() == BID2node_.size() + free_nodes_.size());
 
-            STXXL_VERBOSE1("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix)
+            STXXL_VERBOSE1("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix);
 
             return &Node;
         }
@@ -384,7 +384,7 @@ namespace btree
             {
                 // the node is in cache
                 const int_type nodeindex = it->second;
-                STXXL_VERBOSE1("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix)
+                STXXL_VERBOSE1("btree::node_cache get_node, the node " << nodeindex << "is in cache , fix=" << fix);
                 fixed_[nodeindex] = fix;
                 pager_.hit(nodeindex);
 
@@ -413,7 +413,7 @@ namespace btree
                     {
                         STXXL_ERRMSG(
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                        STXXL_ERRMSG("Returning NULL node.")
+                        STXXL_ERRMSG("Returning NULL node.");
                         return NULL;
                     }
                     pager_.hit(node2kick);
@@ -443,7 +443,7 @@ namespace btree
 
                 assert(size() == BID2node_.size() + free_nodes_.size());
 
-                STXXL_VERBOSE1("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix)
+                STXXL_VERBOSE1("btree::node_cache get_node, need to kick node" << node2kick << " fix=" << fix);
 
                 return &Node;
             }
@@ -464,7 +464,7 @@ namespace btree
 
             assert(size() == BID2node_.size() + free_nodes_.size());
 
-            STXXL_VERBOSE1("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix)
+            STXXL_VERBOSE1("btree::node_cache get_node, free node " << free_node << "available, fix=" << fix);
 
             return &Node;
         }
@@ -478,7 +478,7 @@ namespace btree
                 {
                     // the node is in the cach
                     const int_type nodeindex = it->second;
-                    STXXL_VERBOSE1("btree::node_cache delete_node " << nodeindex << " from cache.")
+                    STXXL_VERBOSE1("btree::node_cache delete_node " << nodeindex << " from cache.");
                     if (reqs_[nodeindex].valid()) reqs_[nodeindex]->wait();
 
                     //reqs_[nodeindex] = request_ptr(); // reset request
@@ -516,7 +516,7 @@ namespace btree
                     {
                         STXXL_ERRMSG(
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
-                        STXXL_ERRMSG("Returning NULL node.")
+                        STXXL_ERRMSG("Returning NULL node.");
                         return;
                     }
                     pager_.hit(node2kick);
@@ -548,7 +548,7 @@ namespace btree
 
                 assert(size() == BID2node_.size() + free_nodes_.size());
 
-                STXXL_VERBOSE1("btree::node_cache prefetch_node, need to kick node" << node2kick << " ")
+                STXXL_VERBOSE1("btree::node_cache prefetch_node, need to kick node" << node2kick << " ");
 
                 return;
             }
@@ -569,7 +569,7 @@ namespace btree
 
             assert(size() == BID2node_.size() + free_nodes_.size());
 
-            STXXL_VERBOSE1("btree::node_cache prefetch_node, free node " << free_node << "available")
+            STXXL_VERBOSE1("btree::node_cache prefetch_node, free node " << free_node << "available");
 
             return;
         }
@@ -578,7 +578,7 @@ namespace btree
         {
             assert(BID2node_.find(bid) != BID2node_.end());
             fixed_[BID2node_[bid] ] = false;
-            STXXL_VERBOSE1("btree::node_cache unfix_node,  node " << BID2node_[bid] )
+            STXXL_VERBOSE1("btree::node_cache unfix_node,  node " << BID2node_[bid] );
         }
 
         void swap(node_cache & obj)

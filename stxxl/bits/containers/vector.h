@@ -843,7 +843,7 @@ public:
         }
         catch (...)
         {
-            STXXL_VERBOSE("An exception in the ~vector()")
+            STXXL_VERBOSE("An exception in the ~vector()");
         }
 
         bm->delete_blocks(_bids.begin(), _bids.end());
@@ -852,7 +852,7 @@ public:
         {
             STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
                                                                << file_length());
-            STXXL_VERBOSE1("~vector(): size of the vector is " << size())
+            STXXL_VERBOSE1("~vector(): size of the vector is " << size());
             _from->set_size(file_length());
         }
     }
@@ -871,7 +871,7 @@ private:
     }
     void read_page(int_type page_no, int_type cache_page) const
     {
-        STXXL_VERBOSE1("vector " << this << ": reading page_no=" << page_no << " cache_page=" << cache_page)
+        STXXL_VERBOSE1("vector " << this << ": reading page_no=" << page_no << " cache_page=" << cache_page);
         request_ptr * reqs = new request_ptr [page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
@@ -886,7 +886,7 @@ private:
     }
     void write_page(int_type page_no, int_type cache_page) const
     {
-        STXXL_VERBOSE1("vector " << this << ": writing page_no=" << page_no << " cache_page=" << cache_page)
+        STXXL_VERBOSE1("vector " << this << ": writing page_no=" << page_no << " cache_page=" << cache_page);
         request_ptr * reqs = new request_ptr [page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));

@@ -28,7 +28,7 @@ struct my_handler
 {
     void operator ()  (request * req)
     {
-        STXXL_MSG( req << " done, type=" << req->io_type() )
+        STXXL_MSG( req << " done, type=" << req->io_type() );
     }
 };
 
@@ -58,10 +58,10 @@ public:
         bm->new_blocks (striping (), bids.begin (), bids.end ());
 
         block_type * block = new block_type;
-        STXXL_MSG(std::hex)
-        STXXL_MSG("Allocated block address    : " << long (block))
-        STXXL_MSG("Allocated block address + 1: " << long (block + 1))
-        STXXL_MSG(std::dec)
+        STXXL_MSG(std::hex);
+        STXXL_MSG("Allocated block address    : " << long (block));
+        STXXL_MSG("Allocated block address + 1: " << long (block + 1));
+        STXXL_MSG(std::dec);
         unsigned i = 0;
         for (i = 0; i < block_type::size; ++i)
         {

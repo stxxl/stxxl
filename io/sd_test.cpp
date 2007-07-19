@@ -36,8 +36,8 @@ int main()
 
     request_ptr req;
 
-    STXXL_MSG("Estimated time:" << block_size / double (AVERAGE_SPEED))
-    STXXL_MSG("Sequential write")
+    STXXL_MSG("Estimated time:" << block_size / double (AVERAGE_SPEED));
+    STXXL_MSG("Sequential write");
 
     for (i = 0; i < 40; i++)
     {
@@ -52,7 +52,7 @@ int main()
 
     double sum = 0.;
     double sum2 = 0.;
-    STXXL_MSG("Random write")
+    STXXL_MSG("Random write");
     const unsigned int times = 80;
     for (i = 0; i < times; i++)
     {

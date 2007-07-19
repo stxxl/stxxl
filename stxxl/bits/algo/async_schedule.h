@@ -294,7 +294,7 @@ void compute_prefetch_schedule(
 {
     typedef std::pair<int_type, int_type>  pair_type;
     const int_type L = input_end - input_begin;
-    STXXL_VERBOSE1("compute_prefetch_schedule: sequence length=" << L << " disks=" << D)
+    STXXL_VERBOSE1("compute_prefetch_schedule: sequence length=" << L << " disks=" << D);
     if (L <= D)
     {
         for (int_type i = 0; i < L; ++i) out_first[i] = i;
@@ -308,11 +308,11 @@ void compute_prefetch_schedule(
     std::stable_sort(write_order, write_order + L, write_time_cmp());
 
     STXXL_VERBOSE1("Computed prefetch order for " << L << " blocks with " <<
-                   D << " disks and " << m << " blocks")
+                   D << " disks and " << m << " blocks");
     for (int_type i = 0; i < L; i++)
     {
         out_first[i] = write_order[i].first;
-        STXXL_VERBOSE1(write_order[i].first)
+        STXXL_VERBOSE1(write_order[i].first);
     }
 
     delete [] write_order;

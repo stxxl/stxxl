@@ -113,7 +113,7 @@ namespace btree
 
             if (size() > max_nelements())                    // overflow! need to split
             {
-                STXXL_VERBOSE1("btree::normal_node::insert overflow happened, splitting")
+                STXXL_VERBOSE1("btree::normal_node::insert overflow happened, splitting");
 
                 bid_type NewBid;
                 btree_->node_cache_.get_new_node(NewBid);                         // new (left) node
@@ -139,7 +139,7 @@ namespace btree
                 btree_->node_cache_.unfix_node(NewBid);
 
                 STXXL_VERBOSE1("btree::normal_node split leaf " << this
-                                                                << " splitter: " << result.first)
+                                                                << " splitter: " << result.first);
             }
 
             return result;
@@ -693,7 +693,7 @@ namespace btree
 
             if (height == 2)                    // 'found_bid' points to a leaf
             {
-                STXXL_VERBOSE1("btree::normal_node Deleting key from a leaf")
+                STXXL_VERBOSE1("btree::normal_node Deleting key from a leaf");
                 leaf_type * Leaf = btree_->leaf_cache_.get_node((leaf_bid_type)found_bid, true);
                 assert(Leaf);
                 size_type result = Leaf->erase(k);
@@ -702,14 +702,14 @@ namespace btree
                     return result;
                 // no underflow or root has a special degree 1 (too few elements)
 
-                STXXL_VERBOSE1("btree::normal_node Fusing or rebalancing a leaf")
+                STXXL_VERBOSE1("btree::normal_node Fusing or rebalancing a leaf");
                 fuse_or_balance(it, btree_->leaf_cache_);
 
                 return result;
             }
 
             // 'found_bid' points to a node
-            STXXL_VERBOSE1("btree::normal_node Deleting key from a node")
+            STXXL_VERBOSE1("btree::normal_node Deleting key from a node");
             node_type * Node = btree_->node_cache_.get_node((node_bid_type)found_bid, true);
             assert(Node);
             size_type result = Node->erase(k, height - 1);
@@ -718,7 +718,7 @@ namespace btree
                 return result;
             // no underflow happened
 
-            STXXL_VERBOSE1("btree::normal_node Fusing or rebalancing a node")
+            STXXL_VERBOSE1("btree::normal_node Fusing or rebalancing a node");
             fuse_or_balance(it, btree_->node_cache_);
 
             return result;

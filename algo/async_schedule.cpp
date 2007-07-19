@@ -35,7 +35,7 @@ int simulate_async_write(
             int j = disk_queues[ii].front();
             disk_queues[ii].pop();
             event_queue.push(sim_event(1, j));
-//			STXXL_MSG("Block "<<j<<" scheduled")
+            //STXXL_MSG("Block "<<j<<" scheduled");
         }
 
     while (!event_queue.empty())
@@ -52,7 +52,7 @@ int simulate_async_write(
         }
 
 
-        STXXL_MSG("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock])
+        STXXL_MSG("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock]);
         o_time[cur.iblock] = std::pair < int, int > (cur.iblock, cur.timestamp);
 
         m++;
@@ -66,7 +66,7 @@ int simulate_async_write(
             }
             else
             {
-//				STXXL_MSG("Block "<<i<<" scheduled for time "<< cur.timestamp + 1)
+                //STXXL_MSG("Block "<<i<<" scheduled for time "<< cur.timestamp + 1);
                 event_queue.push(sim_event(cur.timestamp + 1, i));
                 disk_busy[disk] = true;
             }
@@ -78,7 +78,7 @@ int simulate_async_write(
         int disk = disks[cur.iblock];
         if (!disk_busy[disk] && !disk_queues[disk].empty())
         {
-//			STXXL_MSG("Block "<<disk_queues[disk].front()<<" scheduled for time "<< cur.timestamp + 1)
+            //STXXL_MSG("Block "<<disk_queues[disk].front()<<" scheduled for time "<< cur.timestamp + 1);
             event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
             disk_queues[disk].pop();
             disk_busy[disk] = true;
@@ -118,10 +118,10 @@ void compute_prefetch_schedule(
 
     int w_steps = simulate_async_write(first, L, m, D, write_order);
 
-    STXXL_MSG("Write steps: " << w_steps )
+    STXXL_MSG("Write steps: " << w_steps );
 
     for (int i = 0; i < L; i++)
-        STXXL_MSG(first[i] << " " << write_order[i].first << " " << write_order[i].second )
+        STXXL_MSG(first[i] << " " << write_order[i].first << " " << write_order[i].second );
 
         std::stable_sort(write_order, write_order + L, write_time_cmp());
 
@@ -130,12 +130,11 @@ void compute_prefetch_schedule(
     {
         out_first[i] = write_order[i].first;
         //if(out_first[i] != i)
-        STXXL_MSG(i << " " << out_first[i])
+        STXXL_MSG(i << " " << out_first[i]);
     }
 
     delete [] write_order;
 }
-
 
 
 __STXXL_END_NAMESPACE

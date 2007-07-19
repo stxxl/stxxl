@@ -62,20 +62,20 @@ typedef stxxl::map<key_type, data_type, cmp2,
 int main( int argc, char * argv[] )
 {
 #ifdef NDEBUG
-    STXXL_MSG("Program is compiled with NDEBUG option, which makes the testing wrong.")
+    STXXL_MSG("Program is compiled with NDEBUG option, which makes the testing wrong.");
     return 1;
 #endif
 
     typedef std::vector<std::pair<key_type, data_type> > vector_type;
 
-    STXXL_MSG("Node block size: " << NODE_BLOCK_SIZE << " bytes")
-    STXXL_MSG("Leaf block size: " << LEAF_BLOCK_SIZE << " bytes")
-    STXXL_MSG("Node max elements: " << NODE_MELEMENTS)
-    STXXL_MSG("Leaf max elements: " << LEAF_MELEMENTS)
+    STXXL_MSG("Node block size: " << NODE_BLOCK_SIZE << " bytes");
+    STXXL_MSG("Leaf block size: " << LEAF_BLOCK_SIZE << " bytes");
+    STXXL_MSG("Node max elements: " << NODE_MELEMENTS);
+    STXXL_MSG("Leaf max elements: " << LEAF_MELEMENTS);
 
     stxxl::random_number32 rnd;
     //stxxl::ran32State = 1141225706;
-    STXXL_MSG("Init random seed: " << stxxl::ran32State)
+    STXXL_MSG("Init random seed: " << stxxl::ran32State);
 
     int a = (PERCENT_CLEAR +
              PERCENT_SIZING +
@@ -93,8 +93,8 @@ int main( int argc, char * argv[] )
 
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " STEP ")
-        STXXL_MSG("Note, that STEP must be > 1000")
+        STXXL_MSG("Usage: " << argv[0] << " STEP ");
+        STXXL_MSG("Note, that STEP must be > 1000");
         return 0;
     }
     stxxl::uint64 MAX_STEP = atoi( argv[1] );

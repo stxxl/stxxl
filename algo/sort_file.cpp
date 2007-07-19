@@ -70,21 +70,22 @@ int main()
         vector_type v( &f);
 
         /*
-                STXXL_MSG("Printing...")
+                STXXL_MSG("Printing...");
                 for(stxxl::int64 i=0; i < v.size(); i++)
-                        STXXL_MSG(v[i].key()); */
+                        STXXL_MSG(v[i].key());
+	*/
 
-        STXXL_MSG("Checking order...")
+        STXXL_MSG("Checking order...");
         STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
 
-        STXXL_MSG("Sorting...")
+        STXXL_MSG("Sorting...");
         stxxl::ksort(v.begin(), v.end(), memory_to_use);
         //stxxl::sort(v.begin(),v.end()-101,Cmp(),memory_to_use);
 
-        STXXL_MSG("Checking order...")
+        STXXL_MSG("Checking order...");
         STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
     }
-    STXXL_MSG("OK")
+    STXXL_MSG("OK");
 
     return 0;
 }

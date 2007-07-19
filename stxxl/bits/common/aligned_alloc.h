@@ -17,18 +17,18 @@ __STXXL_BEGIN_NAMESPACE
 template < size_t ALIGNMENT >
 inline void * aligned_alloc (size_t size, size_t meta_info_size = 0)
 {
-    STXXL_VERBOSE1("stxxl::aligned_alloc<" << ALIGNMENT << ">(), size = " << size << ", meta info size = " << meta_info_size)
+    STXXL_VERBOSE1("stxxl::aligned_alloc<" << ALIGNMENT << ">(), size = " << size << ", meta info size = " << meta_info_size);
     char * buffer = new char[size + ALIGNMENT + sizeof(char *) + meta_info_size];
     char * reserve_buffer = buffer + sizeof(char *) + meta_info_size;
     char * result = reserve_buffer + ALIGNMENT -
                     (((unsigned long) reserve_buffer) % (ALIGNMENT)) - meta_info_size;
     STXXL_VERBOSE1("stxxl::aligned_alloc<" << ALIGNMENT << ">() address 0x" << std::hex << long (result)
-                                           << std::dec << " lost " << unsigned (result - buffer) << " bytes")
+                                           << std::dec << " lost " << unsigned (result - buffer) << " bytes");
     assert( int (result - buffer) >= int (sizeof(char *)) );
     *(((char * *) result) - 1) = buffer;
     STXXL_VERBOSE1("stxxl::aligned_alloc<" << ALIGNMENT <<
                    ">(), allocated at " << std::hex << ((unsigned long)buffer) << " returning " << ((unsigned long)result)
-                                           << std::dec)
+                                           << std::dec);
 
     return result;
 }
@@ -36,7 +36,7 @@ inline void * aligned_alloc (size_t size, size_t meta_info_size = 0)
 template < size_t ALIGNMENT > inline void
 aligned_dealloc (void * ptr)
 {
-    STXXL_VERBOSE2("stxxl::aligned_dealloc(<" << ALIGNMENT << ">), ptr = 0x" << std::hex << (unsigned long)(ptr) << std::dec)
+    STXXL_VERBOSE2("stxxl::aligned_dealloc(<" << ALIGNMENT << ">), ptr = 0x" << std::hex << (unsigned long)(ptr) << std::dec);
     delete[] * (((char * *) ptr) - 1);
 }
 

@@ -53,7 +53,7 @@ int main(int argc, char * argv [])
 {
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " #log_ins")
+        STXXL_MSG("Usage: " << argv[0] << " #log_ins");
         return 1;
     }
 
@@ -65,18 +65,18 @@ int main(int argc, char * argv [])
 
 
     stxxl::vector<int> Values(nins);
-    STXXL_MSG("Generating " << nins << " random values")
+    STXXL_MSG("Generating " << nins << " random values");
     stxxl::generate(Values.begin(), Values.end(), rnd_gen(), 4);
 
     stxxl::vector<int>::const_iterator it = Values.begin();
-    STXXL_MSG("Inserting " << nins << " random values into btree")
+    STXXL_MSG("Inserting " << nins << " random values into btree");
     for ( ; it != Values.end(); ++it)
         BTree.insert(std::pair < int, double > (*it, double (*it) + 1.0));
 
 
-    STXXL_MSG("Number of elements in btree: " << BTree.size())
+    STXXL_MSG("Number of elements in btree: " << BTree.size());
 
-    STXXL_MSG("Searching " << nins << " existing elements")
+    STXXL_MSG("Searching " << nins << " existing elements");
     stxxl::vector<int>::const_iterator vIt = Values.begin();
 
     for ( ; vIt != Values.end(); ++vIt)
@@ -86,7 +86,7 @@ int main(int argc, char * argv [])
         assert(bIt->first == *vIt);
     }
 
-    STXXL_MSG("Searching " << nins << " non-existing elements")
+    STXXL_MSG("Searching " << nins << " non-existing elements");
     stxxl::vector<int>::const_iterator vIt1 = Values.begin();
 
     for ( ; vIt1 != Values.end(); ++vIt1)
@@ -95,7 +95,7 @@ int main(int argc, char * argv [])
         assert(bIt == BTree.end());
     }
 
-    STXXL_MSG("Test passed.")
+    STXXL_MSG("Test passed.");
 
     return 0;
 }

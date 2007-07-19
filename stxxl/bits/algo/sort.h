@@ -126,7 +126,7 @@ namespace sort_local
     {
         typedef typename block_type::value_type type;
         typedef typename block_type::bid_type bid_type;
-        STXXL_VERBOSE1("stxxl::create_runs nruns=" << nruns << " m=" << _m)
+        STXXL_VERBOSE1("stxxl::create_runs nruns=" << nruns << " m=" << _m);
 
         int_type m2 = _m / 2;
         block_manager * bm = block_manager::get_instance();
@@ -153,7 +153,7 @@ namespace sort_local
         assert(run_size == m2);
         for (i = 0; i < run_size; ++i)
         {
-            STXXL_VERBOSE1("stxxl::create_runs posting read " << long (Blocks1[i].elem))
+            STXXL_VERBOSE1("stxxl::create_runs posting read " << long (Blocks1[i].elem));
             bids[i] = *(it++);
             read_reqs1[i] = Blocks1[i].read(bids[i]);
         }
@@ -166,7 +166,7 @@ namespace sort_local
 
         for (i = 0; i < run_size; ++i)
         {
-            STXXL_VERBOSE1("stxxl::create_runs posting read " << long (Blocks2[i].elem))
+            STXXL_VERBOSE1("stxxl::create_runs posting read " << long (Blocks2[i].elem));
             bids[i] = *(it++);
             read_reqs2[i] = Blocks2[i].read(bids[i]);
         }
@@ -184,9 +184,9 @@ namespace sort_local
             assert( (next_run_size == m2) || (next_run_size <= m2 && k == nruns - 2));
 
 
-            STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1")
+            STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
             wait_all(read_reqs1, run_size);
-            STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1")
+            STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1");
 
             if (block_type::has_filler)
                 std::sort(
@@ -202,16 +202,16 @@ namespace sort_local
                 std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
 
 
-            STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs")
+            STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
             if (k) wait_all(write_reqs, m2);
 
-            STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs")
+            STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs");
 
             if (k == nruns - 2)
             {      // do not need to post read of run k+1
                 for (i = 0; i < m2; ++i)
                 {
-                    STXXL_VERBOSE1("stxxl::create_runs posting write " << long (Blocks1[i].elem))
+                    STXXL_VERBOSE1("stxxl::create_runs posting write " << long (Blocks1[i].elem));
                     (*run)[i].value = Blocks1[i][0];
                     write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
                 }
@@ -221,7 +221,7 @@ namespace sort_local
                 int_type runplus2size = runs[k + 2]->size();
                 for (i = 0; i < m2; ++i)
                 {
-                    STXXL_VERBOSE1("stxxl::create_runs posting write " << long (Blocks1[i].elem))
+                    STXXL_VERBOSE1("stxxl::create_runs posting write " << long (Blocks1[i].elem));
                     (*run)[i].value = Blocks1[i][0];
                     if (i >= runplus2size)
                         write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
@@ -241,9 +241,9 @@ namespace sort_local
 
         run = runs[k];
         run_size = run->size();
-        STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1")
+        STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
         wait_all(read_reqs1, run_size);
-        STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1")
+        STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1");
 
         if (block_type::has_filler)
             std::sort(
@@ -259,20 +259,20 @@ namespace sort_local
             std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
 
 
-        STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs")
+        STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
         wait_all(write_reqs, m2);
-        STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs")
+        STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs");
 
         for (i = 0; i < run_size; ++i)
         {
-            STXXL_VERBOSE1("stxxl::create_runs posting write " << long (Blocks1[i].elem))
+            STXXL_VERBOSE1("stxxl::create_runs posting write " << long (Blocks1[i].elem));
             (*run)[i].value = Blocks1[i][0];
             write_reqs[i] = Blocks1[i].write ((*run)[i].bid);
         }
 
-        STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs")
+        STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
         wait_all(write_reqs, run_size);
-        STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs")
+        STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs");
 
         delete [] Blocks1;
         delete [] Blocks2;
@@ -292,8 +292,8 @@ namespace sort_local
     {
         typedef typename block_type::value_type value_type;
 
-        //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns)
-        STXXL_MSG("check_sorted_runs  Runs: " << nruns)
+        //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns);
+        STXXL_MSG("check_sorted_runs  Runs: " << nruns);
         unsigned_type irun = 0;
         for (irun = 0; irun < nruns; ++irun)
         {
@@ -317,11 +317,11 @@ namespace sort_local
 
                 if (off         && cmp(blocks[0][0], last) )
                 {
-                    STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun)
-                    STXXL_MSG(" first value: " << blocks[0][0])
-                    STXXL_MSG(" last  value: " << last)
+                    STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun);
+                    STXXL_MSG(" first value: " << blocks[0][0]);
+                    STXXL_MSG(" last  value: " << last);
                     for (unsigned_type k = 0; k < block_type::size; ++k)
-                        STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k])
+                        STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k]);
 
                         return false;
 
@@ -331,17 +331,17 @@ namespace sort_local
                 {
                     if (!(blocks[j][0] == (*runs[irun])[j + off].value))
                     {
-                        STXXL_MSG("check_sorted_runs  wrong trigger in the run " << irun << " block " << (j + off))
-                        STXXL_MSG("                   trigger value: " << (*runs[irun])[j + off].value)
-                        STXXL_MSG("Data in the block:")
+                        STXXL_MSG("check_sorted_runs  wrong trigger in the run " << irun << " block " << (j + off));
+                        STXXL_MSG("                   trigger value: " << (*runs[irun])[j + off].value);
+                        STXXL_MSG("Data in the block:");
                         for (unsigned_type k = 0; k < block_type::size; ++k)
-                            STXXL_MSG("Element " << k << " in the block is :" << blocks[j][k])
+                            STXXL_MSG("Element " << k << " in the block is :" << blocks[j][k]);
 
-                            STXXL_MSG("BIDS:")
+                            STXXL_MSG("BIDS:");
                             for (unsigned_type k = 0; k < nblocks; ++k)
                             {
-                                if ( k == j) STXXL_MSG("Bad one comes next.")
-                                    STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid))
+                                if ( k == j) STXXL_MSG("Bad one comes next.");
+                                    STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
                                     }
 
                                     return false;
@@ -360,17 +360,17 @@ namespace sort_local
                                                                            nelements
                             ), cmp) )
                     {
-                        STXXL_MSG("check_sorted_runs  wrong order in the run " << irun)
-                        STXXL_MSG("Data in blocks:")
+                        STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
+                        STXXL_MSG("Data in blocks:");
                         for (unsigned_type j = 0; j < nblocks; ++j)
                         {
                             for (unsigned_type k = 0; k < block_type::size; ++k)
-                                STXXL_MSG("     Element " << k << " in block " << (j + off) << " is :" << blocks[j][k])
+                                STXXL_MSG("     Element " << k << " in block " << (j + off) << " is :" << blocks[j][k]);
                                 }
-                                STXXL_MSG("BIDS:")
+                                STXXL_MSG("BIDS:");
                                 for (unsigned_type k = 0; k < nblocks; ++k)
                                 {
-                                    STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid))
+                                    STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
                                 }
 
                             return false;
@@ -664,7 +664,7 @@ namespace sort_local
                 const unsigned_type ndisks = cfg->disks_number ();
 
                 //STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+"
-                //	   << partial_runs)
+                //	   << partial_runs);
 
 #ifdef STXXL_IO_STATS
                 stats * iostats = stats::get_instance();
@@ -716,7 +716,7 @@ namespace sort_local
                 {
                     int_type new_nruns = div_and_round_up(nruns, merge_factor);
                     STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
-                                  " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns)
+                                  " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 
                     new_runs = new run_type *[new_nruns];
 
@@ -775,7 +775,7 @@ namespace sort_local
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
                         assert((check_sorted_runs < block_type, run_type, value_cmp > (runs + nruns - runs_left, runs2merge, m2, cmp) ));
 #endif
-                        STXXL_VERBOSE("Merging " << runs2merge << " runs")
+                        STXXL_VERBOSE("Merging " << runs2merge << " runs");
                         merge_runs<block_type, run_type> (runs + nruns - runs_left,
                                                           runs2merge, * (new_runs + (cur_out_run++)), _m, cmp
                         );
@@ -795,19 +795,19 @@ namespace sort_local
                 (void)(begin);
 
                 STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Run creation time: " <<
-                               after_runs_creation - begin << " s")
+                               after_runs_creation - begin << " s");
 #ifdef STXXL_IO_STATS
-                STXXL_VERBOSE ("reads               : " << iostats->get_reads ())
-                STXXL_VERBOSE ("writes              : " << iostats->get_writes ())
-                STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s")
-                STXXL_VERBOSE ("write time          : " << iostats->get_write_time () << " s")
-                STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s")
-                STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s")
-                STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s")
+                STXXL_VERBOSE ("reads               : " << iostats->get_reads ());
+                STXXL_VERBOSE ("writes              : " << iostats->get_writes ());
+                STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s");
+                STXXL_VERBOSE ("write time          : " << iostats->get_write_time () << " s");
+                STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s");
+                STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s");
+                STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s");
 #endif
 #ifdef COUNT_WAIT_TIME
-                STXXL_VERBOSE ("Time in I/O wait(rf): " << io_wait_after_rf << " s")
-                STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s")
+                STXXL_VERBOSE ("Time in I/O wait(rf): " << io_wait_after_rf << " s");
+                STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
 #endif
 
                 return result;

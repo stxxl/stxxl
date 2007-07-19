@@ -80,34 +80,34 @@ void test(stxxl::int64 records_to_sort, unsigned memory_to_use, unsigned n_prefe
 
     vector_type v(records_to_sort);
     unsigned ndisks = stxxl::config::get_instance()->disks_number();
-    STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(my_type) )
-    STXXL_MSG("Total volume " << (records_to_sort * sizeof(my_type)) / MB << " MB")
-    STXXL_MSG("Using " << memory_to_use / MB << " MB")
-    STXXL_MSG("Using " << ndisks << " disks")
-    STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ")
-    STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KB")
-    STXXL_MSG("Prefetch buffers " << n_prefetch_blocks << " = " << (double (n_prefetch_blocks) / ndisks) << "*D")
+    STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(my_type) );
+    STXXL_MSG("Total volume " << (records_to_sort * sizeof(my_type)) / MB << " MB");
+    STXXL_MSG("Using " << memory_to_use / MB << " MB");
+    STXXL_MSG("Using " << ndisks << " disks");
+    STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ");
+    STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KB");
+    STXXL_MSG("Prefetch buffers " << n_prefetch_blocks << " = " << (double (n_prefetch_blocks) / ndisks) << "*D");
     n_prefetch_buffers = n_prefetch_blocks;
-    STXXL_MSG("OPT Prefetch buffers " << n_opt_prefetch_buffers << " = " << (double (n_opt_prefetch_buffers) / ndisks) << "*D")
+    STXXL_MSG("OPT Prefetch buffers " << n_opt_prefetch_buffers << " = " << (double (n_opt_prefetch_buffers) / ndisks) << "*D");
     const int n_write_blocks = STXXL_MAX( 2 * ndisks, int (memory_to_use / vector_type::block_type::raw_size) -
                                           int (2 * (records_to_sort * sizeof(my_type)) / memory_to_use) - n_prefetch_blocks );
-    STXXL_MSG("Write buffers " << (n_write_blocks) << " = " << (double (n_write_blocks) / ndisks) << "*D")
-    STXXL_MSG("Seed " << stxxl::ran32State )
-    STXXL_MSG("Filling vector...")
+    STXXL_MSG("Write buffers " << (n_write_blocks) << " = " << (double (n_write_blocks) / ndisks) << "*D");
+    STXXL_MSG("Seed " << stxxl::ran32State );
+    STXXL_MSG("Filling vector...");
 
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 32);
     //std::generate(v.begin(),v.end(),zero());
 
     stxxl::wait_time_counter = 0.0;
 
-    STXXL_MSG("Sorting vector...")
+    STXXL_MSG("Sorting vector...");
     reset_io_wait_time();
 
     stxxl::ksort(v.begin(), v.end(), memory_to_use);
 
-    //STXXL_MSG("Checking order...")
+    //STXXL_MSG("Checking order...");
     //STXXL_MSG( ((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
-    STXXL_MSG("Done")
+    STXXL_MSG("Done");
 }
 
 template <unsigned block_size>
@@ -132,7 +132,7 @@ void test_all_strategies(
         test<stxxl::RC, block_size>(records_to_sort, memory_to_use, n_prefetch_blocks);
         break;
     default:
-        STXXL_ERRMSG("Unknown allocation strategy: " << strategy << ", aborting")
+        STXXL_ERRMSG("Unknown allocation strategy: " << strategy << ", aborting");
         abort();
     };
 }
@@ -142,7 +142,7 @@ int main(int argc, char * argv[])
     if (argc < 8)
     {
         STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MB to sort> <MB to use> <alloc_strategy> <blk_size> <prefetch_buffers> <opt_pref_b> <seed>")
+                     " <MB to sort> <MB to use> <alloc_strategy> <blk_size> <prefetch_buffers> <opt_pref_b> <seed>");
         return -1;
     }
 
@@ -194,7 +194,7 @@ int main(int argc, char * argv[])
         test_all_strategies < (896 * 1024) > (n_records, sort_mem, n_prefetch_buffers, strategy);
         break;
     default:
-        STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting")
+        STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");
         abort();
     };
 

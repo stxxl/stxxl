@@ -32,7 +32,7 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
                                             stxxl::grow_shrink2, DISKS, BLOCK_SIZE>::result stack_type;
     typedef typename stack_type::block_type block_type;
 
-    STXXL_MSG("Record size: " << sizeof(my_record) << " bytes")
+    STXXL_MSG("Record size: " << sizeof(my_record) << " bytes");
 
     stxxl::prefetch_pool<block_type> p_pool(DISKS * 4);
     stxxl::write_pool<block_type>    w_pool(DISKS * 4);
@@ -58,16 +58,16 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 
     Timer.stop();
 
-    STXXL_MSG("Records in Stack: " << Stack.size())
+    STXXL_MSG("Records in Stack: " << Stack.size());
     if (i != Stack.size())
     {
-        STXXL_MSG("Size does not match")
+        STXXL_MSG("Size does not match");
         abort();
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MB/s")
+              " MB/s");
 
     std::cout << *Stats;
     Stats->reset();
@@ -85,16 +85,16 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 
     Timer.stop();
 
-    STXXL_MSG("Records in Stack: " << Stack.size())
+    STXXL_MSG("Records in Stack: " << Stack.size());
     if (!Stack.empty())
     {
-        STXXL_MSG("Stack must be empty")
+        STXXL_MSG("Stack must be empty");
         abort();
     }
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MB/s")
+              " MB/s");
 
     std::cout << *Stats;
 }
@@ -107,7 +107,7 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
                                             stxxl::normal, DISKS, BLOCK_SIZE>::result stack_type;
     typedef typename stack_type::block_type block_type;
 
-    STXXL_MSG("Record size: " << sizeof(my_record) << " bytes")
+    STXXL_MSG("Record size: " << sizeof(my_record) << " bytes");
 
     stack_type Stack;
 
@@ -130,16 +130,16 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
 
     Timer.stop();
 
-    STXXL_MSG("Records in Stack: " << Stack.size())
+    STXXL_MSG("Records in Stack: " << Stack.size());
     if (i != Stack.size())
     {
-        STXXL_MSG("Size does not match")
+        STXXL_MSG("Size does not match");
         abort();
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MB/s")
+              " MB/s");
 
     std::cout << *Stats;
     Stats->reset();
@@ -156,16 +156,16 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
 
     Timer.stop();
 
-    STXXL_MSG("Records in Stack: " << Stack.size())
+    STXXL_MSG("Records in Stack: " << Stack.size());
     if (!Stack.empty())
     {
-        STXXL_MSG("Stack must be empty")
+        STXXL_MSG("Stack must be empty");
         abort();
     }
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MB/s")
+              " MB/s");
 
     std::cout << *Stats;
 }
@@ -174,21 +174,21 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
 
 int main(int argc, char * argv[])
 {
-    STXXL_MSG("stxxl::pq block size: " << BLOCK_SIZE << " bytes")
+    STXXL_MSG("stxxl::pq block size: " << BLOCK_SIZE << " bytes");
 
 #ifdef STXXL_DIRECT_IO_OFF
-    STXXL_MSG("STXXL_DIRECT_IO_OFF is defined")
+    STXXL_MSG("STXXL_DIRECT_IO_OFF is defined");
 #else
-    STXXL_MSG("STXXL_DIRECT_IO_OFF is NOT defined")
+    STXXL_MSG("STXXL_DIRECT_IO_OFF is NOT defined");
 #endif
 
     if (argc < 3)
     {
-        STXXL_MSG("Usage: " << argv[0] << " version #volume")
-        STXXL_MSG("\t version = 1: grow-shrink-stack2 with 4 byte records")
-        STXXL_MSG("\t version = 2: grow-shrink-stack2 with 32 byte records")
-        STXXL_MSG("\t version = 3: normal-stack with 4 byte records")
-        STXXL_MSG("\t version = 4: normal-stack with 32 byte records")
+        STXXL_MSG("Usage: " << argv[0] << " version #volume");
+        STXXL_MSG("\t version = 1: grow-shrink-stack2 with 4 byte records");
+        STXXL_MSG("\t version = 2: grow-shrink-stack2 with 32 byte records");
+        STXXL_MSG("\t version = 3: normal-stack with 4 byte records");
+        STXXL_MSG("\t version = 4: normal-stack with 32 byte records");
         return 0;
     }
 
@@ -196,11 +196,11 @@ int main(int argc, char * argv[])
     stxxl::int64 volume = atoll(argv[2]);
 
     STXXL_MSG("Allocating array with size " << MEM_2_RESERVE
-                                            << " bytes to prevent file buffering.")
+                                            << " bytes to prevent file buffering.");
     int * array = new int[MEM_2_RESERVE / sizeof(int)];
     std::fill(array, array + (MEM_2_RESERVE / sizeof(int)), 0);
 
-    STXXL_MSG("Running version: " << version)
+    STXXL_MSG("Running version: " << version);
     STXXL_MSG("Data volume    : " << volume << " bytes");
 
     switch (version)
@@ -218,7 +218,7 @@ int main(int argc, char * argv[])
         run_stxxl_normal_stack < my_record_ < 32 > > (volume);
         break;
     default:
-        STXXL_MSG("Unsupported version " << version)
+        STXXL_MSG("Unsupported version " << version);
     }
 
     delete [] array;

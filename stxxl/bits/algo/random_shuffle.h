@@ -123,7 +123,7 @@ void random_shuffle(   ExtIterator_ first,
     BlockSize_, void, 0, AllocStrategy_ > ::result stack_type;
     typedef typename stack_type::block_type block_type;
 
-    STXXL_VERBOSE1("random_shuffle: Plain Version")
+    STXXL_VERBOSE1("random_shuffle: Plain Version");
 
     stxxl::int64 n = beyond - first; // the number of input elements
 
@@ -143,7 +143,7 @@ void random_shuffle(   ExtIterator_ first,
     temp_vector_type * temp_vector;
 
     stxxl::prefetch_pool<block_type> p_pool(0); // no read buffers
-    STXXL_VERBOSE1("random_shuffle: " << M / BlockSize_ - k << " write buffers for " << k << " buckets")
+    STXXL_VERBOSE1("random_shuffle: " << M / BlockSize_ - k << " write buffers for " << k << " buckets");
     stxxl::write_pool<block_type> w_pool(M / BlockSize_ - k); // M/B-k write buffers
 
     stack_type * * buckets;
@@ -269,7 +269,7 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
                                             stxxl::grow_shrink2, PageSize_, BlockSize_>::result stack_type;
     typedef typename stack_type::block_type block_type;
 
-    STXXL_VERBOSE1("random_shuffle: Vector Version")
+    STXXL_VERBOSE1("random_shuffle: Vector Version");
 
     // make sure we have at least 6 blocks + 1 page
     if (M < 6 * BlockSize_ + PageSize_ * BlockSize_)

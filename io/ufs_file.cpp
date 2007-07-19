@@ -122,20 +122,20 @@ void ufs_request_base::check_aligning ()
 
 ufs_request_base::~ufs_request_base ()
 {
-    STXXL_VERBOSE3("ufs_request_base " << unsigned (this) << ": deletion, cnt: " << ref_cnt)
+    STXXL_VERBOSE3("ufs_request_base " << unsigned (this) << ": deletion, cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 
     // if(_state() != DONE && _state()!= READY2DIE )
     //	STXXL_ERRMSG("WARNING: serious stxxl error requiest being deleted while I/O did not finish "<<
-    //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>")
+    //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
 
     // _state.wait_for (READY2DIE); // does not make sense ?
 }
 
 void ufs_request_base::wait ()
 {
-    STXXL_VERBOSE3("ufs_request_base : " << unsigned (this) << " wait ")
+    STXXL_VERBOSE3("ufs_request_base : " << unsigned (this) << " wait ");
 
     START_COUNT_WAIT_TIME
 

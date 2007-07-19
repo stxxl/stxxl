@@ -32,10 +32,10 @@ void wincall_request::serve ()
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
                                 << nref() << ") " <<
                      " this=" << long (this) << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
-                                << " type=" << ((type == READ) ? "READ" : "WRITE") )
+                                << " type=" << ((type == READ) ? "READ" : "WRITE") );
     }
     STXXL_VERBOSE2("wincall_request::serve(): Buffer at " << ((void *)buffer)
-                                                          << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE")
+                                                          << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE");
     );
 
     try {
@@ -112,7 +112,7 @@ void wincall_request::serve ()
             STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
                          " this=" << long (this) <<
                          " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes <<
-                         " type=" << ((type == READ) ? "READ" : "WRITE"))
+                         " type=" << ((type == READ) ? "READ" : "WRITE"));
         }
 
         _state.set_to (DONE);

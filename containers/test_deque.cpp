@@ -89,7 +89,7 @@ int main()
         if (!(ops % 100000))
         {
             assert(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin()));
-            STXXL_MSG("Operations done: " << ops << " size: " << STDDeque.size())
+            STXXL_MSG("Operations done: " << ops << " size: " << STDDeque.size());
         }
         ++ops;
     }

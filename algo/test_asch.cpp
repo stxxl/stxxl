@@ -11,7 +11,7 @@ int main(int argc, char * argv[])
 {
     if (argc < 5)
     {
-        STXXL_ERRMSG("Usage: " << argv[0] << " D L m seed")
+        STXXL_ERRMSG("Usage: " << argv[0] << " D L m seed");
         return -1;
     }
     int i;

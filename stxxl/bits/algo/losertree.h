@@ -64,7 +64,7 @@ public:
         logK = static_cast < int >(ceil (log (double (nruns)) / log (2.)));             // replace with something smart
         int_type kReg = k = (1 << logK);
 
-        STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg)
+        STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
         current = new run_cursor_type[kReg];

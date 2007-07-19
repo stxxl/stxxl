@@ -60,7 +60,7 @@ int main()
     typedef gen::result pq_type;
     typedef pq_type::block_type block_type;
 
-    STXXL_MSG("Block size: " << block_type::raw_size)
+    STXXL_MSG("Block size: " << block_type::raw_size);
     STXXL_MSG("AI: " << gen::AI);
     STXXL_MSG("X : " << gen::X);
     STXXL_MSG("N : " << gen::N);
@@ -74,32 +74,32 @@ int main()
     pq_type p(p_pool, w_pool);
     stxxl::int64 nelements = stxxl::int64(volume / sizeof(my_type)) * 1024, i;
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
-    STXXL_MSG("Max elements: " << nelements)
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Max elements: " << nelements);
     for (i = 0; i < nelements; i++ )
     {
         if ((i % (1024 * 1024)) == 0)
-            STXXL_MSG("Inserting element " << i)
+            STXXL_MSG("Inserting element " << i);
             p.push(my_type(nelements - i));
 
     }
     Timer.stop();
-    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec")
+    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec");
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
     Timer.reset();
     Timer.start();
     for (i = 0; i < (nelements); ++i )
     {
         assert( !p.empty() );
-        //STXXL_MSG( p.top() )
+        //STXXL_MSG( p.top() );
         assert(p.top().key == i + 1);
         p.pop();
         if ((i % (1024 * 1024)) == 0)
-            STXXL_MSG("Element " << i << " popped")
+            STXXL_MSG("Element " << i << " popped");
             }
             Timer.stop();
 
-        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec")
-        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
+        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
+        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
     }

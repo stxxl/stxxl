@@ -436,7 +436,7 @@ finish:
 
             ~sequence_type()
             {
-                STXXL_VERBOSE1("ext_merger sequence_type::~sequence_type()")
+                STXXL_VERBOSE1("ext_merger sequence_type::~sequence_type()");
                 if (bids)
                 {
                     block_manager * bm = block_manager::get_instance();
@@ -481,25 +481,25 @@ finish:
 
                 if (current == block->size )
                 {
-                    STXXL_VERBOSE2("ext_merger sequence_type operator++ crossing block border ")
+                    STXXL_VERBOSE2("ext_merger sequence_type operator++ crossing block border ");
                     // go to the next block
                     assert(bids);
                     if (bids->empty()) // if there is no next block
                     {
-                        STXXL_VERBOSE2("ext_merger sequence_type operator++ it was the last block in the sequence ")
+                        STXXL_VERBOSE2("ext_merger sequence_type operator++ it was the last block in the sequence ");
                         delete bids;
                         bids = NULL;
                         make_inf();
                     }
                     else
                     {
-                        STXXL_VERBOSE2("ext_merger sequence_type operator++ there is another block ")
+                        STXXL_VERBOSE2("ext_merger sequence_type operator++ there is another block ");
                         bid_type bid = bids->front();
                         bids->pop_front();
                         if (!(bids->empty()))
                         {
                             STXXL_VERBOSE2("ext_merger sequence_type operator++ one more block exists in a sequence: " <<
-                                           "flushing this block in write cache (if not written yet) and giving hint to prefetcher")
+                                           "flushing this block in write cache (if not written yet) and giving hint to prefetcher");
                             bid_type next_bid = bids->front();
                             merger->p_pool->hint(next_bid, *(merger->w_pool));
                         }
@@ -592,7 +592,7 @@ finish:
             p_pool(p_pool_),
             w_pool(w_pool_)
         {
-            STXXL_VERBOSE2("ext_merger::ext_merger(...)")
+            STXXL_VERBOSE2("ext_merger::ext_merger(...)");
 
             sentinel_block[0] = cmp.min_value();
 
@@ -616,7 +616,7 @@ finish:
 
         virtual ~ext_merger()
         {
-            STXXL_VERBOSE1("ext_merger::~ext_merger()")
+            STXXL_VERBOSE1("ext_merger::~ext_merger()");
             for (int_type i = 0; i < arity; ++i)
             {
                 delete current[i].block;
@@ -729,7 +729,7 @@ finish:
             // and push them on the free stack
             assert(lastFree == -1); // stack was empty (probably not needed)
             assert(k < KNKMAX);
-            STXXL_VERBOSE1("ext_merger::doubleK (before) k: " << k << " KNKMAX:" << KNKMAX)
+            STXXL_VERBOSE1("ext_merger::doubleK (before) k: " << k << " KNKMAX:" << KNKMAX);
 
             for (int_type i = 2 * k - 1;  i >= int_type(k);  i--)
             {
@@ -748,7 +748,7 @@ finish:
             // recompute loser tree information
             rebuildLooserTree();
 
-            STXXL_VERBOSE1("ext_merger::doubleK (after) k: " << k << " KNKMAX:" << KNKMAX)
+            STXXL_VERBOSE1("ext_merger::doubleK (after) k: " << k << " KNKMAX:" << KNKMAX);
         }
 
 
@@ -821,7 +821,7 @@ finish:
         void multi_merge(OutputIterator begin, OutputIterator end)
         {
             size_type l = end - begin;
-            STXXL_VERBOSE2("ext_meerger::multi_merge l = " << l)
+            STXXL_VERBOSE2("ext_meerger::multi_merge l = " << l);
 
 
             switch (logK) {
@@ -1014,7 +1014,7 @@ finish:
         template <class Merger>
         void insert_segment(Merger & another_merger, size_type segment_size)
         {
-            STXXL_VERBOSE2("ext_merger::insert_segment(merger,...)")
+            STXXL_VERBOSE2("ext_merger::insert_segment(merger,...)");
 
             if (segment_size > 0)
             {
@@ -1029,14 +1029,14 @@ finish:
                 // link new segment
                 assert(segment_size);
                 unsigned_type nblocks = segment_size / block_type::size;
-                STXXL_VERBOSE2("ext_merger::insert_segment(merger,...) inserting segment with " << nblocks << " blocks")
+                STXXL_VERBOSE2("ext_merger::insert_segment(merger,...) inserting segment with " << nblocks << " blocks");
                 //assert(nblocks); // at least one block
-                STXXL_VERBOSE1("ext_merger::insert_segment nblocks=" << nblocks)
+                STXXL_VERBOSE1("ext_merger::insert_segment nblocks=" << nblocks);
                 if (nblocks == 0)
                 {
                     STXXL_VERBOSE1("ext_merger::insert_segment(merger,...) WARNING: inserting a segment with " <<
-                                   nblocks << " blocks")
-                    STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS")
+                                   nblocks << " blocks");
+                    STXXL_VERBOSE1("THIS IS INEFFICIENT: TRY TO CHANGE PRIORITY QUEUE PARAMETERS");
                 }
                 unsigned_type first_size = segment_size % block_type::size;
                 if (first_size == 0)
@@ -1074,7 +1074,7 @@ finish:
                                &dummyKey, &dummyIndex, &dummyMask);
             } else {
                 // deallocate memory ?
-                STXXL_VERBOSE1("Merged segment with zero size.")
+                STXXL_VERBOSE1("Merged segment with zero size.");
             }
         }
 
@@ -1086,7 +1086,7 @@ finish:
         void insert_segment(std::list < bid_type > * segment, block_type * first_block,
                             unsigned_type first_size, int_type index)
         {
-            STXXL_VERBOSE1("ext_merger::insert_segment(segment_bids,...) " << this)
+            STXXL_VERBOSE1("ext_merger::insert_segment(segment_bids,...) " << this);
             assert(first_size);
 
             sequence_type & new_sequence = current[index];
@@ -1108,7 +1108,7 @@ finish:
             // reroute current pointer to some empty dummy segment
             // with a sentinel key
             STXXL_VERBOSE2("loser_tree::deallocateSegment() deleting segment " <<
-                           index)
+                           index);
 
             current[index].make_inf();
 
@@ -1447,7 +1447,7 @@ finish:
         if(segment[from])
         {
         STXXL_VERBOSE2("loser_tree::compactTree() deleting segment "<<from<<
-                                        " address: "<<segment[from]<<" size: "<<segment_size[from])
+                                        " address: "<<segment[from]<<" size: "<<segment_size[from]);
         delete [] segment[from];
         segment[from] = 0;
         mem_cons_ -= segment_size[from];
@@ -1481,7 +1481,7 @@ finish:
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::insert_segment(Element * to, unsigned_type sz)
     {
-        STXXL_VERBOSE2("loser_tree::insert_segment(" << to << "," << sz << ")")
+        STXXL_VERBOSE2("loser_tree::insert_segment(" << to << "," << sz << ")");
         //std::copy(to,to + sz,std::ostream_iterator<ValTp_>(std::cout, "\n"));
 
         if (sz > 0)
@@ -1521,12 +1521,12 @@ finish:
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     loser_tree<ValTp_, Cmp_, KNKMAX>::~loser_tree()
     {
-        STXXL_VERBOSE2("loser_tree::~loser_tree()")
+        STXXL_VERBOSE2("loser_tree::~loser_tree()");
         for (unsigned_type i = 0; i < k; ++i)
         {
             if (segment[i])
             {
-                STXXL_VERBOSE2("loser_tree::~loser_tree() deleting segment " << i)
+                STXXL_VERBOSE2("loser_tree::~loser_tree() deleting segment " << i);
                 delete [] segment[i];
                 mem_cons_ -= segment_size[i];
             }
@@ -1542,7 +1542,7 @@ finish:
         // reroute current pointer to some empty dummy segment
         // with a sentinel key
         STXXL_VERBOSE2("loser_tree::deallocateSegment() deleting segment " <<
-                       index << " address: " << segment[index] << " size: " << segment_size[index])
+                       index << " address: " << segment[index] << " size: " << segment_size[index]);
         current[index] = &dummy;
 
         // free memory
@@ -1564,7 +1564,7 @@ finish:
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::multi_merge(Element * to, unsigned_type l)
     {
-        STXXL_VERBOSE3("loser_tree::multi_merge(" << to << "," << l << ")")
+        STXXL_VERBOSE3("loser_tree::multi_merge(" << to << "," << l << ")");
 
         /*
            multi_merge_k(to,l);
@@ -1982,7 +1982,7 @@ inline const typename priority_queue<Config_>::value_type & priority_queue<Confi
 template <class Config_>
 inline void priority_queue<Config_>::pop()
 {
-    //STXXL_VERBOSE1("priority_queue::pop()")
+    //STXXL_VERBOSE1("priority_queue::pop()");
     assert(!insertHeap.empty());
 
     if ( /*(!insertHeap.empty()) && */ cmp(*minBuffer1, insertHeap.top()))
@@ -2002,7 +2002,7 @@ inline void priority_queue<Config_>::pop()
 template <class Config_>
 inline void priority_queue<Config_>::push(const value_type & obj)
 {
-    //STXXL_VERBOSE3("priority_queue::push("<< obj <<")")
+    //STXXL_VERBOSE3("priority_queue::push("<< obj <<")");
     assert(itree->not_sentinel(obj));
     if (insertHeap.size() == N + 1)
         emptyInsertHeap();
@@ -2023,7 +2023,7 @@ priority_queue<Config_>::priority_queue(prefetch_pool < block_type > &p_pool_, w
     activeLevels(0), size_(0),
     deallocate_pools(false)
 {
-    STXXL_VERBOSE2("priority_queue::priority_queue()")
+    STXXL_VERBOSE2("priority_queue::priority_queue()");
     //etree = new ext_merger_type[ExtLevels](p_pool,w_pool);
     etree = new ext_merger_type[ExtLevels];
     for (int_type j = 0; j < ExtLevels; ++j)
@@ -2047,7 +2047,7 @@ priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type 
     activeLevels(0), size_(0),
     deallocate_pools(true)
 {
-    STXXL_VERBOSE2("priority_queue::priority_queue()")
+    STXXL_VERBOSE2("priority_queue::priority_queue()");
     etree = new ext_merger_type[ExtLevels];
     for (int_type j = 0; j < ExtLevels; ++j)
         etree[j].set_pools(&p_pool, &w_pool);
@@ -2066,7 +2066,7 @@ priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type 
 template <class Config_>
 priority_queue<Config_>::~priority_queue()
 {
-    STXXL_VERBOSE2("priority_queue::~priority_queue()")
+    STXXL_VERBOSE2("priority_queue::~priority_queue()");
     if (deallocate_pools)
     {
         delete & p_pool;
@@ -2082,7 +2082,7 @@ priority_queue<Config_>::~priority_queue()
 template <class Config_>
 int_type priority_queue<Config_>::refillBuffer2(int_type j)
 {
-    STXXL_VERBOSE2("priority_queue::refillBuffer2(" << j << ")")
+    STXXL_VERBOSE2("priority_queue::refillBuffer2(" << j << ")");
 
     value_type * oldTarget;
     int_type deleteSize;
@@ -2114,7 +2114,7 @@ int_type priority_queue<Config_>::refillBuffer2(int_type j)
                                          oldTarget + bufferSize + deleteSize);
 
 
-    //STXXL_MSG(deleteSize + bufferSize)
+    //STXXL_MSG(deleteSize + bufferSize);
     //std::copy(oldTarget,oldTarget + deleteSize + bufferSize,std::ostream_iterator<value_type>(std::cout, "\n"));
 
     return deleteSize + bufferSize;
@@ -2126,7 +2126,7 @@ int_type priority_queue<Config_>::refillBuffer2(int_type j)
 template <class Config_>
 void priority_queue<Config_>::refillBuffer1()
 {
-    STXXL_VERBOSE2("priority_queue::refillBuffer1()")
+    STXXL_VERBOSE2("priority_queue::refillBuffer1()");
 
     size_type totalSize = 0;
     int_type sz;
@@ -2167,7 +2167,7 @@ void priority_queue<Config_>::refillBuffer1()
     // which can make the assumption that
     // they find all they are asked to find in the buffers
     minBuffer1 = buffer1 + BufferSize1 - sz;
-    STXXL_VERBOSE2("Active levels = " << activeLevels)
+    STXXL_VERBOSE2("Active levels = " << activeLevels);
     switch (activeLevels)
     {
     case 0: break;
@@ -2185,10 +2185,10 @@ void priority_queue<Config_>::refillBuffer1()
             &(minBuffer2[2]), minBuffer1, sz, cmp);
         break;
     case 4:
-        STXXL_VERBOSE2("=1=" << minBuffer2[0][0]) //std::copy(minBuffer2[0],(&(buffer2[0][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-        STXXL_VERBOSE2("=2=" << minBuffer2[1][0]) //std::copy(minBuffer2[1],(&(buffer2[1][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-        STXXL_VERBOSE2("=3=" << minBuffer2[2][0]) //std::copy(minBuffer2[2],(&(buffer2[2][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-        STXXL_VERBOSE2("=4=" << minBuffer2[3][0]) //std::copy(minBuffer2[3],(&(buffer2[3][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
+        STXXL_VERBOSE2("=1=" << minBuffer2[0][0]); //std::copy(minBuffer2[0],(&(buffer2[0][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
+        STXXL_VERBOSE2("=2=" << minBuffer2[1][0]); //std::copy(minBuffer2[1],(&(buffer2[1][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
+        STXXL_VERBOSE2("=3=" << minBuffer2[2][0]); //std::copy(minBuffer2[2],(&(buffer2[2][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
+        STXXL_VERBOSE2("=4=" << minBuffer2[3][0]); //std::copy(minBuffer2[3],(&(buffer2[3][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
         priority_queue_local::merge4(
             &(minBuffer2[0]),
             &(minBuffer2[1]),
@@ -2211,7 +2211,7 @@ void priority_queue<Config_>::refillBuffer1()
 template <class Config_>
 int_type priority_queue<Config_>::makeSpaceAvailable(int_type level)
 {
-    STXXL_VERBOSE2("priority_queue::makeSpaceAvailable(" << level << ")")
+    STXXL_VERBOSE2("priority_queue::makeSpaceAvailable(" << level << ")");
     int_type finalLevel;
     assert(level < Levels);
     assert(level <= activeLevels);
@@ -2266,7 +2266,7 @@ int_type priority_queue<Config_>::makeSpaceAvailable(int_type level)
 template <class Config_>
 void priority_queue<Config_>::emptyInsertHeap()
 {
-    STXXL_VERBOSE2("priority_queue::emptyInsertHeap()")
+    STXXL_VERBOSE2("priority_queue::emptyInsertHeap()");
     const value_type sup = getSupremum();
 
     // build new segment

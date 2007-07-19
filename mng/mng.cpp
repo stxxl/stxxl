@@ -10,13 +10,13 @@ void DiskAllocator::dump()
 {
     stxxl::int64 total = 0;
     sortseq::const_iterator cur =   free_space.begin ();
-    STXXL_ERRMSG("Free regions dump:")
+    STXXL_ERRMSG("Free regions dump:");
     for ( ; cur != free_space.end(); ++cur)
     {
-        STXXL_ERRMSG("Free chunk: begin: " << (cur->first) << " size: " << (cur->second))
+        STXXL_ERRMSG("Free chunk: begin: " << (cur->first) << " size: " << (cur->second));
         total += cur->second;
     }
-    STXXL_ERRMSG("Total bytes: " << total)
+    STXXL_ERRMSG("Total bytes: " << total);
 }
 
 config * config::get_instance ()
@@ -42,8 +42,8 @@ config::config (const char * config_path)
     std::ifstream cfg_file (config_path);
     if (!cfg_file)
     {
-        STXXL_ERRMSG("Warning: no config file found." )
-        STXXL_ERRMSG("Using default disk configuration." )
+        STXXL_ERRMSG("Warning: no config file found." );
+        STXXL_ERRMSG("Using default disk configuration." );
 #ifndef BOOST_MSVC
         DiskEntry entry1 = { "/var/tmp/stxxl", "syscall",
                              1000 * 1024 * 1024 };
@@ -107,7 +107,7 @@ config::config (const char * config_path)
         {
             STXXL_MSG("Disk '" << (*it).path << "' is allocated, space: " <<
                       ((*it).size) / (1024 * 1024) <<
-                      " Mb, I/O implementation: " << (*it).io_impl )
+                      " Mb, I/O implementation: " << (*it).io_impl );
         }
     }
 }
@@ -143,7 +143,7 @@ block_manager::block_manager ()
 
 block_manager::~block_manager()
 {
-    STXXL_VERBOSE1("Block manager deconstructor")
+    STXXL_VERBOSE1("Block manager deconstructor");
     for (unsigned i = 0; i < ndisks; i++)
     {
         delete disk_allocators[i];

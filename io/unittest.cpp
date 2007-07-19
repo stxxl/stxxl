@@ -16,7 +16,7 @@ struct my_handler
 {
     void operator ()  (request * ptr)
     {
-        STXXL_MSG("Request completed: " << ptr)
+        STXXL_MSG("Request completed: " << ptr);
     }
 };
 

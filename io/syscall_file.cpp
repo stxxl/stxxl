@@ -33,7 +33,7 @@ void syscall_request::serve ()
                      " this=" << long (this) <<
                      " File descriptor=" <<
                      static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
-                                << " type=" << ((type == READ) ? "READ" : "WRITE") )
+                                << " type=" << ((type == READ) ? "READ" : "WRITE") );
     }
     STXXL_VERBOSE2("syscall_request::serve(): Buffer at " << ((void *)buffer)
                                                           << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE")
@@ -102,7 +102,7 @@ void syscall_request::serve ()
         STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
                      " this=" << long (this) << " File descriptor=" << static_cast<syscall_file *>(file_)->get_file_des() <<
                      " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"))
+                     " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
 
 

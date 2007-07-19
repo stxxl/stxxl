@@ -114,7 +114,7 @@ namespace btree
             assert(result.second == true);
             if (root_node_.size() > max_node_size)            // root overflow
             {
-                STXXL_VERBOSE1("btree::insert_into_root, overlow happened, splitting")
+                STXXL_VERBOSE1("btree::insert_into_root, overlow happened, splitting");
 
                 node_bid_type LeftBid;
                 node_type * LeftNode = node_cache_.get_new_node(LeftBid);
@@ -158,7 +158,7 @@ namespace btree
 
 
                 ++height_;
-                STXXL_VERBOSE1("btree Increasing height to " << height_)
+                STXXL_VERBOSE1("btree Increasing height to " << height_);
                 if (node_cache_.size() < (height_ - 1))
                 {
                     STXXL_FORMAT_ERROR_MSG(msg, "btree::bulk_construction The height of the tree (" << height_ << ") has exceeded the required capacity ("
@@ -325,7 +325,7 @@ namespace btree
                 stxxl::uint64 nparents = div_and_round_up( Bids.size(), stxxl::uint64(max_node_elements));
                 assert(nparents >= 2);
                 STXXL_VERBOSE1("btree bulk constructBids.size() " << Bids.size() << " nparents: " << nparents << " max_ns: "
-                                                                  << max_node_elements)
+                                                                  << max_node_elements);
                 typename key_bid_vector_type::const_iterator it = Bids.begin();
 
                 do
@@ -339,7 +339,7 @@ namespace btree
                         Node->push_back(*it);
                     }
                     STXXL_VERBOSE1("btree bulk construct Node size : " << Node->size() << " limits: " <<
-                                   Node->min_nelements() << " " << Node->max_nelements() << " max_node_elements: " << max_node_elements)
+                                   Node->min_nelements() << " " << Node->max_nelements() << " max_node_elements: " << max_node_elements);
 
                     if (Node->underflows())
                     {
@@ -362,7 +362,7 @@ namespace btree
                 assert(nparents == Bids.size());
 
                 ++height_;
-                STXXL_VERBOSE1("Increasing height to " << height_)
+                STXXL_VERBOSE1("Increasing height to " << height_);
                 if (node_cache_.size() < (height_ - 1))
                 {
                     STXXL_FORMAT_ERROR_MSG(msg, "btree::bulk_construction The height of the tree (" << height_ << ") has exceeded the required capacity ("
@@ -388,13 +388,13 @@ namespace btree
             prefetching_enabled_(true),
             bm_(block_manager::get_instance())
         {
-            STXXL_VERBOSE1("Creating a btree, addr=" << this)
-            STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size)
-            STXXL_VERBOSE1(" bytes in a leaf: " << leaf_bid_type::size)
-            STXXL_VERBOSE1(" elements in a node: " << node_block_type::size)
-            STXXL_VERBOSE1(" elements in a leaf: " << leaf_block_type::size)
-            STXXL_VERBOSE1(" size of a node element: " << sizeof(typename node_block_type::value_type))
-            STXXL_VERBOSE1(" size of a leaf element: " << sizeof(typename leaf_block_type::value_type))
+            STXXL_VERBOSE1("Creating a btree, addr=" << this);
+            STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
+            STXXL_VERBOSE1(" bytes in a leaf: " << leaf_bid_type::size);
+            STXXL_VERBOSE1(" elements in a node: " << node_block_type::size);
+            STXXL_VERBOSE1(" elements in a leaf: " << leaf_block_type::size);
+            STXXL_VERBOSE1(" size of a node element: " << sizeof(typename node_block_type::value_type));
+            STXXL_VERBOSE1(" size of a leaf element: " << sizeof(typename leaf_block_type::value_type));
 
 
             create_empty_leaf();
@@ -413,9 +413,9 @@ namespace btree
             prefetching_enabled_(true),
             bm_(block_manager::get_instance())
         {
-            STXXL_VERBOSE1("Creating a btree, addr=" << this)
-            STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size)
-            STXXL_VERBOSE1(" bytes in a leaf: " << leaf_bid_type::size)
+            STXXL_VERBOSE1("Creating a btree, addr=" << this);
+            STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
+            STXXL_VERBOSE1(" bytes in a leaf: " << leaf_bid_type::size);
 
             create_empty_leaf();
         }
@@ -791,7 +791,7 @@ namespace btree
             assert(it != root_node_.end());
             if (height_ == 2)            // 'it' points to a leaf
             {
-                STXXL_VERBOSE1("Deleting key from a leaf")
+                STXXL_VERBOSE1("Deleting key from a leaf");
                 leaf_type * Leaf = leaf_cache_.get_node((leaf_bid_type)it->second, true);
                 assert(Leaf);
                 size_type result = Leaf->erase(k);
@@ -804,7 +804,7 @@ namespace btree
                     return result;
                 // no underflow or root has a special degree 1 (too few elements)
 
-                STXXL_VERBOSE1("btree: Fusing or rebalancing a leaf")
+                STXXL_VERBOSE1("btree: Fusing or rebalancing a leaf");
                 fuse_or_balance(it, leaf_cache_);
 
                 assert(leaf_cache_.nfixed() == 0);
@@ -814,7 +814,7 @@ namespace btree
             }
 
             // 'it' points to a node
-            STXXL_VERBOSE1("Deleting key from a node")
+            STXXL_VERBOSE1("Deleting key from a node");
             assert(root_node_.size() >= 2);
             node_type * Node = node_cache_.get_node((node_bid_type)it->second, true);
             assert(Node);
@@ -827,13 +827,13 @@ namespace btree
                 return result;
             // no underflow happened
 
-            STXXL_VERBOSE1("Fusing or rebalancing a node")
+            STXXL_VERBOSE1("Fusing or rebalancing a node");
             fuse_or_balance(it, node_cache_);
 
             if (root_node_.size() == 1)
             {
-                STXXL_VERBOSE1("btree Root has size 1 and height > 2")
-                STXXL_VERBOSE1("btree Deallocate root and decrease height")
+                STXXL_VERBOSE1("btree Root has size 1 and height > 2");
+                STXXL_VERBOSE1("btree Deallocate root and decrease height");
                 it = root_node_.begin();
                 node_bid_type RootBid = it->second;
                 assert(it->first == key_compare::max_value());
@@ -846,7 +846,7 @@ namespace btree
 
                 node_cache_.delete_node(RootBid);
                 --height_;
-                STXXL_VERBOSE1("btree Decreasing height to " << height_)
+                STXXL_VERBOSE1("btree Decreasing height to " << height_);
             }
 
             assert(leaf_cache_.nfixed() == 0);
@@ -922,9 +922,9 @@ namespace btree
             prefetching_enabled_(true),
             bm_(block_manager::get_instance())
         {
-            STXXL_VERBOSE1("Creating a btree, addr=" << this)
-            STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size)
-            STXXL_VERBOSE1(" bytes in a leaf: " << leaf_bid_type::size)
+            STXXL_VERBOSE1("Creating a btree, addr=" << this);
+            STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
+            STXXL_VERBOSE1(" bytes in a leaf: " << leaf_bid_type::size);
 
             if (range_sorted == false)
             {
@@ -958,9 +958,9 @@ namespace btree
             prefetching_enabled_(true),
             bm_(block_manager::get_instance())
         {
-            STXXL_VERBOSE1("Creating a btree, addr=" << this)
-            STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size)
-            STXXL_VERBOSE1(" bytes in a leaf: " << leaf_bid_type::size)
+            STXXL_VERBOSE1("Creating a btree, addr=" << this);
+            STXXL_VERBOSE1(" bytes in a node: " << node_bid_type::size);
+            STXXL_VERBOSE1(" bytes in a leaf: " << leaf_bid_type::size);
 
             if (range_sorted == false)
             {

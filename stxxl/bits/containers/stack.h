@@ -157,7 +157,7 @@ public:
 
         if (cache_offset == 2 * blocks_per_page * block_type::size) // cache overflow
         {
-            STXXL_VERBOSE2("growing, size: " << size_)
+            STXXL_VERBOSE2("growing, size: " << size_);
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -200,7 +200,7 @@ public:
 
         if (cache_offset == 1 && bids.size() >= blocks_per_page)
         {
-            STXXL_VERBOSE2("shrinking, size: " << size_)
+            STXXL_VERBOSE2("shrinking, size: " << size_);
 
             simple_vector<request_ptr> requests(blocks_per_page);
 
@@ -370,7 +370,7 @@ public:
 
         if (cache_offset == blocks_per_page * block_type::size) // cache overflow
         {
-            STXXL_VERBOSE2("growing, size: " << size_)
+            STXXL_VERBOSE2("growing, size: " << size_);
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -410,7 +410,7 @@ public:
 
         if (cache_offset == 1 && bids.size() >= blocks_per_page)
         {
-            STXXL_VERBOSE2("shrinking, size: " << size_)
+            STXXL_VERBOSE2("shrinking, size: " << size_);
 
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
@@ -420,7 +420,7 @@ public:
 
             if (bids.size() > blocks_per_page)
             {
-                STXXL_VERBOSE2("prefetching, size: " << size_)
+                STXXL_VERBOSE2("prefetching, size: " << size_);
                 typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page;
                 for (int i = blocks_per_page - 1; i >= 0; --i)
                     requests[i] = (overlap_buffers + i)->read(*(--cur_bid));
@@ -488,7 +488,7 @@ public:
         p_pool(p_pool_),
         w_pool(w_pool_)
     {
-        STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)")
+        STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
 
     void swap(grow_shrink_stack2 & obj)
@@ -508,7 +508,7 @@ public:
     {
         try
         {
-            STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()")
+            STXXL_VERBOSE2("grow_shrink_stack2::~grow_shrink_stack2()");
             const int_type bids_size = bids.size();
             const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
             int_type i;
@@ -544,12 +544,12 @@ public:
 
     void push(const value_type & val)
     {
-        STXXL_VERBOSE3("grow_shrink_stack2::push(" << val << ")")
+        STXXL_VERBOSE3("grow_shrink_stack2::push(" << val << ")");
         assert(cache_offset <= block_type::size);
 
         if (cache_offset == block_type::size)
         {
-            STXXL_VERBOSE2("grow_shrink_stack2::push(" << val << ") growing, size: " << size_)
+            STXXL_VERBOSE2("grow_shrink_stack2::push(" << val << ") growing, size: " << size_);
 
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
@@ -591,27 +591,27 @@ public:
     }
     void pop()
     {
-        STXXL_VERBOSE3("grow_shrink_stack2::pop()")
+        STXXL_VERBOSE3("grow_shrink_stack2::pop()");
         assert(size_ > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
         if (cache_offset == 1 && (!bids.empty()) )
         {
-            STXXL_VERBOSE2("grow_shrink_stack2::pop() shrinking, size = " << size_)
+            STXXL_VERBOSE2("grow_shrink_stack2::pop() shrinking, size = " << size_);
 
             bid_type last_block = bids.back();
             bids.pop_back();
             /*block_type * b = w_pool.steal(last_block);
                if(b)
                {
-               STXXL_VERBOSE2("grow_shrink_stack2::pop() block is still in write buffer")
+               STXXL_VERBOSE2("grow_shrink_stack2::pop() block is still in write buffer");
                w_pool.add(cache);
                cache = b;
                }
                else*/
             {
                 //STXXL_VERBOSE2("grow_shrink_stack2::pop() block is no longer in write buffer"
-                //  ", reading from prefetch/read pool")
+                //  ", reading from prefetch/read pool");
                 p_pool.read(cache, last_block)->wait();
             }
             block_manager::get_instance()->delete_block(last_block);

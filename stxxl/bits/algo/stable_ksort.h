@@ -194,7 +194,7 @@ namespace stable_ksort_local
             bucket_sizes[i] = int64(block_type::size) * bucket_iblock[i] +
                               bucket_block_offsets[i];
             STXXL_MSG("Bucket " << i << " has size " << bucket_sizes[i] <<
-                      ", estimated size: " << ((last - first) / int64(nbuckets)))
+                      ", estimated size: " << ((last - first) / int64(nbuckets)));
         }
 
 
@@ -243,13 +243,13 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type est_bucket_size = div_and_round_up((last - first) / int64(nbuckets),
                                                            int64(block_type::size)); //in blocks
 
-    STXXL_MSG("Elements to sort: " << (last - first))
-    STXXL_MSG("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets)
+    STXXL_MSG("Elements to sort: " << (last - first));
+    STXXL_MSG("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets);
     const unsigned_type nread_buffers = (m - nbuckets) * read_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
     const unsigned_type nwrite_buffers = (m - nbuckets) * write_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
 
-    STXXL_MSG("Read buffers in distribution phase: " << nread_buffers)
-    STXXL_MSG("Write buffers in distribution phase: " << nwrite_buffers)
+    STXXL_MSG("Read buffers in distribution phase: " << nread_buffers);
+    STXXL_MSG("Write buffers in distribution phase: " << nwrite_buffers);
 
     bucket_bids_type * bucket_bids = new bucket_bids_type[nbuckets];
     for (i = 0; i < nbuckets; ++i)
@@ -299,11 +299,11 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         // ... and decrease max_bucket_size_bl
         const int_type max_bucket_size_act_bl = div_and_round_up(max_bucket_size_act, block_type::size);
         STXXL_MSG("Reducing required number of required blocks per bucket from " <<
-                  max_bucket_size_bl << " to " << max_bucket_size_act_bl)
+                  max_bucket_size_bl << " to " << max_bucket_size_act_bl);
         max_bucket_size_rec = max_bucket_size_act;
         max_bucket_size_bl = max_bucket_size_act_bl;
         const unsigned_type nwrite_buffers_bs = m - 2 * max_bucket_size_bl;
-        STXXL_MSG("Write buffers in bucket sorting phase: " << nwrite_buffers_bs)
+        STXXL_MSG("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
 
         typedef buf_ostream < block_type, typename ExtIterator_::bids_container_iterator > buf_ostream_type;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
@@ -360,7 +360,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
             std::fill(bucket1, bucket1 + k1, 0);
 
             STXXL_MSG("Classifying bucket " << k << " size:" << bucket_sizes[k] <<
-                      " blocks:" << nbucket_blocks << " log_k1:" << log_k1)
+                      " blocks:" << nbucket_blocks << " log_k1:" << log_k1);
             // classify first nbucket_blocks-1 blocks, they are full
             type_key_ * ref_ptr = refs1;
             key_type offset1 = offset + (key_type(1) << key_type(shift)) * key_type(k);
@@ -373,7 +373,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
             const unsigned_type last_block_size = bucket_sizes[k] - int64(nbucket_blocks - 1) * block_type::size;
             reqs1[i]->wait();
 
-            //STXXL_MSG("block_type::size: "<<block_type::size<<" last_block_size:"<<last_block_size)
+            //STXXL_MSG("block_type::size: "<<block_type::size<<" last_block_size:"<<last_block_size);
 
             classify_block(blocks1[i].begin(), blocks1[i].begin() + last_block_size, ref_ptr, bucket1, offset1, shift1);
 
@@ -392,7 +392,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                 int_type * bucket2 = new int_type[k2];
                 const unsigned shift2 = shift1 - log_k2;
 
-                // STXXL_MSG("Sorting bucket "<<k<<":"<<i)
+                // STXXL_MSG("Sorting bucket "<<k<<":"<<i);
                 l1sort (c, cEnd, d, bucket2, k2,
                         offset1 + (key_type(1) << key_type(shift1)) * key_type(i),
                         shift2);
@@ -448,19 +448,19 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     }
 
     STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Distribution time: " <<
-                   dist_end - begin << " s")
+                   dist_end - begin << " s");
 #ifdef STXXL_IO_STATS
-    STXXL_VERBOSE ("reads               : " << iostats->get_reads ())
-    STXXL_VERBOSE ("writes              : " << iostats->get_writes ())
-    STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s")
-    STXXL_VERBOSE ("write time          : " << iostats->get_write_time () << " s")
-    STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s")
-    STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s")
-    STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s")
+    STXXL_VERBOSE ("reads               : " << iostats->get_reads ());
+    STXXL_VERBOSE ("writes              : " << iostats->get_writes ());
+    STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s");
+    STXXL_VERBOSE ("write time          : " << iostats->get_write_time () << " s");
+    STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s");
+    STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s");
+    STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s");
 #endif
 #ifdef COUNT_WAIT_TIME
-    STXXL_VERBOSE ("Time in I/O wait(ds): " << io_wait_after_d << " s")
-    STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s")
+    STXXL_VERBOSE ("Time in I/O wait(ds): " << io_wait_after_d << " s");
+    STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
 #endif
 }
 

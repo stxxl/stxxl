@@ -154,7 +154,7 @@ namespace stream
                 compute_result();
                 result_computed = true;
 #ifdef STXXL_PRINT_STAT_AFTER_RF
-                STXXL_MSG(*stats::get_instance())
+                STXXL_MSG(*stats::get_instance());
 #endif
             }
             return result_;
@@ -168,7 +168,7 @@ namespace stream
         unsigned_type i = 0;
         unsigned_type m2 = m_ / 2;
         const unsigned_type el_in_run = m2 * block_type::size; // # el in a run
-        STXXL_VERBOSE1("runs_creator::compute_result m2=" << m2)
+        STXXL_VERBOSE1("runs_creator::compute_result m2=" << m2);
         unsigned_type pos = 0;
 
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
@@ -257,7 +257,7 @@ namespace stream
         {
             run[i].value = Blocks1[i][0];
             write_reqs[i] = Blocks1[i].write(run[i].bid);
-            //STXXL_MSG("BID: "<<run[i].bid<<" val: "<<run[i].value)
+            //STXXL_MSG("BID: "<<run[i].bid<<" val: "<<run[i].value);
         }
         result_.runs.push_back(run); // #
 
@@ -270,7 +270,7 @@ namespace stream
             return;
         }
 
-        STXXL_VERBOSE1("Filling the second part of the allocated blocks")
+        STXXL_VERBOSE1("Filling the second part of the allocated blocks");
         pos = 0;
         while (!input.empty() && pos != el_in_run)
         {
@@ -612,7 +612,7 @@ namespace stream
                 output_requested = true;
                 cleanup();
 #ifdef STXXL_PRINT_STAT_AFTER_RF
-                STXXL_MSG(*stats::get_instance())
+                STXXL_MSG(*stats::get_instance());
 #endif
             }
             return result_;
@@ -794,9 +794,9 @@ namespace stream
     {
         typedef typename RunsType_::block_type block_type;
         typedef typename block_type::value_type value_type;
-        STXXL_VERBOSE2("Elements: " << sruns.elements)
+        STXXL_VERBOSE2("Elements: " << sruns.elements);
         unsigned_type nruns = sruns.runs.size();
-        STXXL_VERBOSE2("Runs: " << nruns)
+        STXXL_VERBOSE2("Runs: " << nruns);
         unsigned_type irun = 0;
         for (irun = 0; irun < nruns; ++irun)
         {
@@ -812,7 +812,7 @@ namespace stream
             {
                 if (blocks[j][0] != sruns.runs[irun][j].value)
                 {
-                    STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run")
+                    STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run");
                     return false;
                 }
             }
@@ -830,7 +830,7 @@ namespace stream
                                                                    sruns.runs_sizes[irun]
                     ), cmp) )
             {
-                STXXL_ERRMSG("check_sorted_runs  wrong order in the run")
+                STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
                 return false;
             }
 
@@ -838,7 +838,7 @@ namespace stream
             delete [] blocks;
         }
 
-        STXXL_MSG("Checking runs finished successfully")
+        STXXL_MSG("Checking runs finished successfully");
 
         return true;
     }
@@ -924,7 +924,7 @@ namespace stream
             if (!sruns.small_.empty()) // we have a small input < B,
             // that is kept in the main memory
             {
-                STXXL_VERBOSE1("runs_merger: small input optimization, input length: " << elements_remaining)
+                STXXL_VERBOSE1("runs_merger: small input optimization, input length: " << elements_remaining);
                 assert(elements_remaining == size_type(sruns.small_.size()));
                 current_block = new block_type;
                 std::copy(sruns.small_.begin(), sruns.small_.end(), current_block->begin());
@@ -948,10 +948,10 @@ namespace stream
             {
                 // can not merge runs in one pass
                 // merge recursively:
-                STXXL_ERRMSG("The implementation of sort requires more than one merge pass, therefore for a better")
-                STXXL_ERRMSG("efficiency decrease block size of run storage (a parameter of the run_creator)")
-                STXXL_ERRMSG("or increase the amount memory dedicated to the merger.")
-                STXXL_ERRMSG("m = " << m_ << " nruns=" << nruns)
+                STXXL_ERRMSG("The implementation of sort requires more than one merge pass, therefore for a better");
+                STXXL_ERRMSG("efficiency decrease block size of run storage (a parameter of the run_creator)");
+                STXXL_ERRMSG("or increase the amount memory dedicated to the merger.");
+                STXXL_ERRMSG("m = " << m_ << " nruns=" << nruns);
 
                 merge_recursively();
 
@@ -1117,7 +1117,7 @@ namespace stream
         {
             unsigned_type new_nruns = div_and_round_up(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
-                          " opt_merge_factor: " << merge_factor << " m:" << m_ << " new_nruns: " << new_nruns)
+                          " opt_merge_factor: " << merge_factor << " m:" << m_ << " new_nruns: " << new_nruns);
 
             sorted_runs_type new_runs;
             new_runs.runs.resize(new_nruns);
@@ -1164,7 +1164,7 @@ namespace stream
             while (runs_left > 0)
             {
                 unsigned_type runs2merge = STXXL_MIN(runs_left, merge_factor);
-                STXXL_VERBOSE("Merging " << runs2merge << " runs")
+                STXXL_VERBOSE("Merging " << runs2merge << " runs");
 
                 sorted_runs_type cur_runs;
                 cur_runs.runs.resize(runs2merge);

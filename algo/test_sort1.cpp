@@ -73,22 +73,22 @@ int main()
     vector_type v(n_records);
 
     random_number32 rnd;
-    STXXL_MSG("Filling vector..., input size =" << v.size())
+    STXXL_MSG("Filling vector..., input size =" << v.size());
     for (vector_type::size_type i = 0; i < v.size(); i++)
         v[i]._key = 1 + (rnd() % 0xfffffff);
 
 
-    STXXL_MSG("Checking order...")
+    STXXL_MSG("Checking order...");
     STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
 
-    STXXL_MSG("Sorting...")
+    STXXL_MSG("Sorting...");
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
-    STXXL_MSG("Checking order...")
+    STXXL_MSG("Checking order...");
     STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
 
 
-    STXXL_MSG("Done, output size=" << v.size())
+    STXXL_MSG("Done, output size=" << v.size());
 
     return 0;
 }

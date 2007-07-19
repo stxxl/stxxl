@@ -92,7 +92,7 @@ void stats::reset()
     //      assert(acc_reads == 0);
     if (acc_reads)
         STXXL_ERRMSG( "Warning: " << acc_reads <<
-                      " read(s) not yet finished")
+                      " read(s) not yet finished");
 
         reads = 0;
 
@@ -111,7 +111,7 @@ void stats::reset()
     //      assert(acc_writes == 0);
     if (acc_writes)
         STXXL_ERRMSG("Warning: " << acc_writes <<
-                     " write(s) not yet finished")
+                     " write(s) not yet finished");
 
         writes = 0;
 
@@ -136,7 +136,7 @@ void stats::reset()
     //      assert(acc_ios == 0);
     if (acc_ios)
         STXXL_ERRMSG( "Warning: " << acc_ios <<
-                      " io(s) not yet finished" )
+                      " io(s) not yet finished" );
 
         p_ios = 0.0;
 

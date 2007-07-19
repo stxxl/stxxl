@@ -94,14 +94,14 @@ void boostfd_request::check_aligning ()
 
 boostfd_request::~boostfd_request ()
 {
-    STXXL_VERBOSE3("boostfd_request " << unsigned (this) << ": deletion, cnt: " << ref_cnt)
+    STXXL_VERBOSE3("boostfd_request " << unsigned (this) << ": deletion, cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 }
 
 void boostfd_request::wait ()
 {
-    STXXL_VERBOSE3("boostfd_request : " << unsigned (this) << " wait ")
+    STXXL_VERBOSE3("boostfd_request : " << unsigned (this) << " wait ");
 
     START_COUNT_WAIT_TIME
 
@@ -217,7 +217,7 @@ void boostfd_request::serve ()
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
         << nref() << ") " <<
                      " this=" << long (this) << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
-        << " type=" << ((type == READ) ? "READ" : "WRITE") )
+        << " type=" << ((type == READ) ? "READ" : "WRITE") );
     }
     STXXL_VERBOSE2("boostfd_request::serve(): Buffer at " << ((void *)buffer)
                                                           << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE")
@@ -305,7 +305,7 @@ void boostfd_request::serve ()
         STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
                      " this=" << long (this) <<
                      " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"))
+                     " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
 
     _state.set_to (DONE);

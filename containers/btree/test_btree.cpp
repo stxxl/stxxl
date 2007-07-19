@@ -35,7 +35,7 @@ int main(int argc, char * argv [])
 {
     if (argc < 2)
     {
-        STXXL_MSG("Usage: " << argv[0] << " #ins")
+        STXXL_MSG("Usage: " << argv[0] << " #ins");
         return 1;
     }
 
@@ -167,7 +167,7 @@ int main(int argc, char * argv [])
     {
         BTree1[rnd() % nins] = 10.1;
     }
-    STXXL_MSG("Size of map: " << BTree1.size())
+    STXXL_MSG("Size of map: " << BTree1.size());
 
 
     BTree1.clear();
@@ -177,20 +177,20 @@ int main(int argc, char * argv [])
         BTree1[rnd() % nins] = 10.1;
     }
 
-    STXXL_MSG("Size of map: " << BTree1.size())
+    STXXL_MSG("Size of map: " << BTree1.size());
 
     btree_type BTree2(comp_type(), node_cache_size, leaf_cache_size);
 
-    STXXL_MSG("Construction of BTree3 from BTree1 that has " << BTree1.size() << " elements")
+    STXXL_MSG("Construction of BTree3 from BTree1 that has " << BTree1.size() << " elements");
     btree_type BTree3(BTree1.begin(), BTree1.end(), comp_type(), node_cache_size, leaf_cache_size);
 
     assert(BTree3 == BTree1);
 
-    STXXL_MSG("Bulk construction of BTree4 from BTree1 that has " << BTree1.size() << " elements")
+    STXXL_MSG("Bulk construction of BTree4 from BTree1 that has " << BTree1.size() << " elements");
     btree_type BTree4(BTree1.begin(), BTree1.end(), comp_type(), node_cache_size, leaf_cache_size, true);
 
-    STXXL_MSG("Size of BTree1: " << BTree1.size())
-    STXXL_MSG("Size of BTree4: " << BTree4.size())
+    STXXL_MSG("Size of BTree1: " << BTree1.size());
+    STXXL_MSG("Size of BTree4: " << BTree4.size());
 
     assert(BTree4 == BTree1);
     assert(BTree3 == BTree4);
@@ -226,7 +226,7 @@ int main(int argc, char * argv [])
     btree_type::iterator e3 = BTree3.end();
     btree_type::iterator e4 = BTree4.end();
 
-    STXXL_MSG("Testing swapping operation (std::swap)")
+    STXXL_MSG("Testing swapping operation (std::swap)");
     std::swap(BTree4, BTree3);
     assert(b3 == BTree4.begin());
     assert(b4 == BTree3.begin());
@@ -268,7 +268,7 @@ int main(int argc, char * argv [])
         sum += cit->second;
 
     Timer2.stop();
-    STXXL_MSG("Scanning with const iterator: " << Timer2.mseconds() << " msec")
+    STXXL_MSG("Scanning with const iterator: " << Timer2.mseconds() << " msec");
 
     STXXL_MSG(*stxxl::stats::get_instance());
 
@@ -279,7 +279,7 @@ int main(int argc, char * argv [])
         sum += it->second;
 
     Timer1.stop();
-    STXXL_MSG("Scanning with non const iterator: " << Timer1.mseconds() << " msec")
+    STXXL_MSG("Scanning with non const iterator: " << Timer1.mseconds() << " msec");
 
     STXXL_MSG(*stxxl::stats::get_instance());
 
@@ -288,7 +288,7 @@ int main(int argc, char * argv [])
     BTree5.prefetching_enabled();
     assert(BTree5.prefetching_enabled());
 
-    STXXL_MSG("All tests passed successufully")
+    STXXL_MSG("All tests passed successufully");
 
     return 0;
 }
