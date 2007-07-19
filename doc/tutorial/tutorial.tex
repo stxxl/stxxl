@@ -81,6 +81,8 @@ under development
 \begin{center}
 {\huge \stxxl Tutorial}\\
 
+for \stxxl 1.1
+
 \vspace{3mm}
 
 {\LARGE Roman Dementiev\\[2mm]}
@@ -391,7 +393,7 @@ internal memory data structures and algorithms by their \stxxl
 counterparts. The changes are underlined.
 
 \begin{lstlisting}
-@#include <stxxl>@
+@#include <stxxl.h>@
 // the rest of the code remains the same
 int main(int argc, char * argv[])
 {
@@ -427,18 +429,18 @@ As you note the changes are minimal. Only the namespaces and some
 memory specific parameters had to be changed.
 
 To compile the \stxxl billing program you may use the following {\tt
-Makefile} (if you use {\tt g++}): 
+Makefile}: 
 
 
 \begin{verbatim}
 all: phonebills
-# path to compiler.make file
+# path to stxxl.mk file
 # from your stxxl installation
-include ~/stxxl/make.settings                
+include ~/stxxl/stxxl.mk
 
 phonebills: phonebills.cpp
-        g++ -c phonebills.cpp $(STXXL_COMPILER_OPTIONS)
-        g++ phonebills.o -o phonebills.bin $(STXXL_LINKER_OPTIONS)
+        $(STXXL_CXX) -c phonebills.cpp $(STXXL_CPPFLAGS)
+        $(STXXL_CXX) phonebills.o -o phonebills.bin $(STXXL_LDLIBS)
 clean:
         rm -f phonebills.bin phonebills.o
 \end{verbatim}
