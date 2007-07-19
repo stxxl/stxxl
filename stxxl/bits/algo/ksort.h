@@ -320,7 +320,7 @@ private:
 
 
 template <typename record_type, typename key_extractor>
-class key_comparison
+class key_comparison : public std::binary_function<record_type, record_type, bool>
 {
     key_extractor ke;
 public:
