@@ -6,10 +6,10 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include <stxxl>
+#include <stxxl.h>
 
 #include <fstream>
-#include <time.h>
+#include <ctime>
 
 struct LogEntry
 {

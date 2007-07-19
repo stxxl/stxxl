@@ -6,12 +6,12 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include <stxxl>         // Stxxl header
+#include <stxxl.h>       // Stxxl header
 #include <algorithm>     // for STL sort
 #include <vector>        // for STL vector
 
 #include <fstream>
-#include <time.h>
+#include <ctime>
 
 #define CT_PER_MIN 2
 
