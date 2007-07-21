@@ -941,10 +941,12 @@ namespace stream
 
 // begin of native merging procedure
 
-                losers  =  new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
+                     losers  =  new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
 // end of native merging procedure
+#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
 		}
+#endif
         }
         
         void fill_current_block()
@@ -1059,9 +1061,10 @@ namespace stream
 
             losers->multi_merge(current_block->elem);
 
-
+#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
 // end of native merging procedure
 		}
+#endif
         }
         
     public:

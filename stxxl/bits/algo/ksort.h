@@ -326,7 +326,7 @@ class key_comparison : public std::binary_function<record_type, record_type, boo
 public:
     key_comparison() { }
     key_comparison(key_extractor ke_) : ke(ke_) { }
-    bool operator ()  (const record_type & a, const record_type & b)
+    bool operator ()  (const record_type & a, const record_type & b) const
     {
         return ke(a) < ke(b);
     }
@@ -1093,15 +1093,15 @@ bool check_ksorted_runs(              run_type * * runs,
         struct ksort_defaultkey
         {
             typedef typename record_type::key_type key_type;
-            key_type operator()  (const record_type & obj)
+            key_type operator()  (const record_type & obj) const
             {
                 return obj.key();
             }
-            record_type max_value()
+            record_type max_value() const
             {
                 return record_type::max_value();
             }
-            record_type min_value()
+            record_type min_value() const
             {
                 return record_type::min_value();
             }

@@ -36,15 +36,15 @@ std::ostream & operator << (std::ostream & o, const my_type & obj)
 struct get_key
 {
     typedef my_type::key_type1 key_type;
-    key_type operator()  (const my_type & obj)
+    key_type operator()  (const my_type & obj) const
     {
         return obj._key;
     }
-    my_type min_value()
+    my_type min_value() const
     {
         return my_type(0);
     };
-    my_type max_value()
+    my_type max_value() const
     {
         return my_type(0xffffffff);
     };
