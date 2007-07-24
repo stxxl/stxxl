@@ -41,7 +41,7 @@ STXXL_SPECIFIC	 = \
 	-DSORT_OPTIMAL_PREFETCHING \
 	-DUSE_MALLOC_LOCK \
 	-DCOUNT_WAIT_TIME \
-	-I$(STXXL_ROOT)/ \
+	-I$(STXXL_ROOT)/include \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
 ##################################################################
@@ -74,7 +74,7 @@ BOOST_COMPILER_OPTIONS	 = \
 
 #### DEPENDENCIES ################################################
 
-HEADER_PATH	 = ../stxxl/bits
+HEADER_PATH	 = ../stxxl/bits/include
 
 COMMON_FILES	 = \
 	$(HEADER_PATH)/namespace.h \
