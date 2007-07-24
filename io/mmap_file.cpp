@@ -50,15 +50,15 @@ void mmap_request::serve()
         {
             if (type == READ)
             {
-                //stxxl_ifcheck (memcpy (buffer, mem, bytes))
+                //stxxl_ifcheck (memcpy (buffer, mem, bytes));
                 //else
-                //stxxl_ifcheck (munmap ((char *) mem, bytes))
+                //stxxl_ifcheck (munmap ((char *) mem, bytes));
             }
             else
             {
-                //stxxl_ifcheck (memcpy (mem, buffer, bytes))
+                //stxxl_ifcheck (memcpy (mem, buffer, bytes));
                 //else
-                //stxxl_ifcheck (munmap ((char *) mem, bytes))
+                //stxxl_ifcheck (munmap ((char *) mem, bytes));
             }
         }
  #else
@@ -83,15 +83,15 @@ void mmap_request::serve()
         {
             if (type == READ)
             {
-                stxxl_ifcheck (memcpy (buffer, mem, bytes), io_error)
+                stxxl_ifcheck (memcpy (buffer, mem, bytes), io_error);
                 else
-                    stxxl_ifcheck (munmap ((char *) mem, bytes), io_error)
+                    stxxl_ifcheck (munmap ((char *) mem, bytes), io_error);
                     }
                     else
                     {
-                        stxxl_ifcheck (memcpy (mem, buffer, bytes), io_error)
+                        stxxl_ifcheck (memcpy (mem, buffer, bytes), io_error);
                         else
-                            stxxl_ifcheck (munmap ((char *) mem, bytes), io_error)
+                            stxxl_ifcheck (munmap ((char *) mem, bytes), io_error);
                             }
                             }
  #endif

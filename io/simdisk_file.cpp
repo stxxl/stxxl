@@ -195,14 +195,14 @@ void sim_disk_request::serve ()
         {
             if (type == READ)
             {
-                stxxl_ifcheck (memcpy (buffer, mem, bytes), io_error)
+                stxxl_ifcheck (memcpy (buffer, mem, bytes), io_error);
                 else
-                    stxxl_ifcheck (munmap ((char *) mem, bytes), io_error) }
+                    stxxl_ifcheck (munmap ((char *) mem, bytes), io_error); }
                     else
                     {
-                        stxxl_ifcheck (memcpy (mem, buffer, bytes), io_error)
+                        stxxl_ifcheck (memcpy (mem, buffer, bytes), io_error);
                         else
-                            stxxl_ifcheck (munmap ((char *) mem, bytes), io_error) }
+                            stxxl_ifcheck (munmap ((char *) mem, bytes), io_error); }
                             }
 
                             double delay =

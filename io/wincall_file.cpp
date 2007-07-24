@@ -46,7 +46,7 @@ void wincall_request::serve ()
             stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve() offset=" << offset
                                                                                             << " this=" << long (this) << " buffer=" <<
                                      buffer << " bytes=" << bytes
-                                                                                            << " type=" << ((type == READ) ? "READ" : "WRITE"), io_error)
+                                                                                            << " type=" << ((type == READ) ? "READ" : "WRITE"), io_error);
 
             {
                 if (type == READ)
