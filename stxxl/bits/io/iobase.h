@@ -720,10 +720,6 @@ private:
     static disk_queues * instance;
 };
 
-#ifdef COUNT_WAIT_TIME
-extern double wait_time_counter;
-#endif
-
 //! \}
 
 __STXXL_END_NAMESPACE

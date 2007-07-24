@@ -51,19 +51,22 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//#define assert(x)
+template<typename U>
+inline void UNUSED(const U &)
+{ }
 
 #define __STXXL_STRING(x) # x
 
+
 #define STXXL_MSG(x) \
-    { std::cout << "[STXXL-MSG] " << x << std::endl; std::cout.flush(); \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-MSG] " << x << std::endl; stxxl::logger::get_instance()->log_stream().flush(); \
-    };
+    { std::cout << "[STXXL-MSG] " << x << std::endl << std::flush; \
+      stxxl::logger::get_instance()->log_stream() << "[STXXL-MSG] " << x << std::endl << std::flush; \
+    }
 
 #define STXXL_ERRMSG(x) \
-    { std::cerr << "[STXXL-ERRMSG] " << x << std::endl; std::cerr.flush(); \
-      stxxl::logger::get_instance()->errlog_stream() << "[STXXL-ERRMSG] " << x << std::endl; stxxl::logger::get_instance()->errlog_stream().flush(); \
-    };
+    { std::cerr << "[STXXL-ERRMSG] " << x << std::endl << std::flush; \
+      stxxl::logger::get_instance()->errlog_stream() << "[STXXL-ERRMSG] " << x << std::endl << std::flush; \
+    }
 
 
 #ifndef STXXL_VERBOSE_LEVEL
@@ -72,61 +75,54 @@ __STXXL_BEGIN_NAMESPACE
 
 #if STXXL_VERBOSE_LEVEL > 0
  #define STXXL_VERBOSE1(x) \
-    { std::cout << "[STXXL-VERBOSE1] " << x << std::endl; std::cerr.flush(); \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE1] " << x << std::endl; stxxl::logger::get_instance()->log_stream().flush(); \
-    };
+    { std::cout << "[STXXL-VERBOSE1] " << x << std::endl << std::flush; \
+      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE1] " << x << std::endl << std::flush; \
+    }
 #else
- #define STXXL_VERBOSE1(x) ;
+ #define STXXL_VERBOSE1(x)
 #endif
 
 #define STXXL_VERBOSE(x) STXXL_VERBOSE1(x)
 
 #if STXXL_VERBOSE_LEVEL > 1
  #define STXXL_VERBOSE2(x) \
-    { std::cout << "[STXXL-VERBOSE2] " << x << std::endl; std::cerr.flush(); \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE2] " << x << std::endl; stxxl::logger::get_instance()->log_stream().flush(); \
+    { std::cout << "[STXXL-VERBOSE2] " << x << std::endl << std::flush; \
+      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE2] " << x << std::endl << std::flush; \
     };
 #else
- #define STXXL_VERBOSE2(x) ;
+ #define STXXL_VERBOSE2(x)
 #endif
 
 #if STXXL_VERBOSE_LEVEL > 2
  #define STXXL_VERBOSE3(x) \
-    { std::cout << "[STXXL-VERBOSE3] " << x << std::endl; std::cerr.flush(); \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE3] " << x << std::endl; stxxl::logger::get_instance()->log_stream().flush(); \
+    { std::cout << "[STXXL-VERBOSE3] " << x << std::endl << std::flush; \
+      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE3] " << x << std::endl << std::flush; \
     };
 #else
- #define STXXL_VERBOSE3(x) ;
+ #define STXXL_VERBOSE3(x)
 #endif
 
-/* DEPRICATED
-   inline void
-   stxxl_perror (const char *errmsg, int errcode)
-   {
-        exit (errcode);
-   }
- */
+
+#ifdef BOOST_MSVC
+ #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
+#else
+ #define STXXL_PRETTY_FUNCTION_NAME __PRETTY_FUNCTION__
+#endif
+
+#define STXXL_FORMAT_ERROR_MSG(str_, errmsg_) \
+    std::ostringstream str_; str_ << "Error in " << errmsg_;
+
 
 #ifndef STXXL_DEBUG_ON
- #define STXXL_DEBUG_ON
+ #define STXXL_DEBUG_ON 1
 #endif
 
-#ifdef STXXL_DEBUG_ON
-
-/* DEPRICATED
- #define stxxl_error(errmsg) { perror(errmsg); exit(errno); }
- */
+#if STXXL_DEBUG_ON
 
 inline std::string perror_string()
 {
     return std::string(strerror(errno));
 }
-
- #ifdef BOOST_MSVC
-  #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
- #else
-  #define STXXL_PRETTY_FUNCTION_NAME __PRETTY_FUNCTION__
- #endif
 
  #define stxxl_function_error(exception_type) \
     { \
@@ -150,7 +146,6 @@ inline std::string perror_string()
         } \
     }
 
-//#define stxxl_ifcheck(expr) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" "; stxxl_error(__STXXL_STRING(expr));}
  #define stxxl_ifcheck(expr, exception_type) \
     if ((expr) < 0) \
     { \
@@ -161,7 +156,6 @@ inline std::string perror_string()
         throw exception_type(str_.str()); \
     }
 
-
  #define stxxl_ifcheck_win(expr, exception_type) \
     if ((expr) == 0) \
     { \
@@ -171,8 +165,6 @@ inline std::string perror_string()
         " " << perror_string(); \
         throw exception_type(str_.str()); \
     }
-
-// #define stxxl_ifcheck_i(expr,info) if((expr)<0) { std::cerr<<"Error in function "<<STXXL_PRETTY_FUNCTION_NAME<<" Info: "<< info<<" "; stxxl_error(__STXXL_STRING(expr)); }
 
  #define stxxl_ifcheck_i(expr, info, exception_type) \
     if ((expr) < 0) \
@@ -185,9 +177,6 @@ inline std::string perror_string()
     }
 
  #define stxxl_debug(expr) expr
-
- #define STXXL_FORMAT_ERROR_MSG(str_, errmsg_) \
-    std::ostringstream str_; str_ << "Error in " << errmsg_;
 
 
  #ifdef BOOST_MSVC
@@ -215,18 +204,20 @@ inline std::string perror_string()
 
 #else
 
- #define stxxl_error(errmsg) ;
+ #define stxxl_function_error(exception_type)
 
- #define stxxl_function_error ;
+ #define stxxl_nassert(expr, exception_type) expr
 
- #define stxxl_nassert(expr) expr;
+ #define stxxl_ifcheck(expr, exception_type) expr; if (0) { }
 
- #define stxxl_ifcheck(expr) expr; if (0) { }
+ #define stxxl_ifcheck_win(expr, exception_type) expr; if (0) { }
 
- #define stxxl_debug(expr) ;
+ #define stxxl_ifcheck_i(expr, info, exception_type) expr; if (0) { }
+
+ #define stxxl_debug(expr)
 
  #ifdef BOOST_MSVC
-  #define stxxl_win_lasterror_exit(errmsg) ;
+  #define stxxl_win_lasterror_exit(errmsg) stxxl::UNUSED(42)
  #endif
 
 #endif
@@ -278,22 +269,19 @@ stxxl_tmpfilename (std::string dir, std::string prefix)
     while (!lstat (result.c_str (), &st));
 
     if (errno != ENOENT)
-        stxxl_function_error(io_error)
+        stxxl_function_error(io_error);
 
         return result;
-
 #endif
 }
 
 inline
-std::vector <
-             std::string >
+std::vector < std::string >
 split (const std::string & str, const std::string & sep)
 {
     std::vector < std::string > result;
     if (str.empty ())
         return result;
-
 
     std::string::size_type CurPos (0), LastPos (0);
     while (1)
@@ -302,7 +290,6 @@ split (const std::string & str, const std::string & sep)
         if (CurPos == std::string::npos)
             break;
 
-
         std::string sub =
             str.substr (LastPos,
                         std::string::size_type (CurPos -
@@ -310,14 +297,12 @@ split (const std::string & str, const std::string & sep)
         if (sub.size ())
             result.push_back (sub);
 
-
         LastPos = CurPos + sep.size ();
     };
 
     std::string sub = str.substr (LastPos);
     if (sub.size ())
         result.push_back (sub);
-
 
     return result;
 }
@@ -350,7 +335,6 @@ int2str (int i)
 
 //#define HAVE_BUILTIN_EXPECT
 
-
 #ifdef HAVE_BUILTIN_EXPECT
  #define LIKELY(c)   __builtin_expect((c), 1)
 #else
@@ -363,27 +347,30 @@ int2str (int i)
  #define UNLIKELY(c)   c
 #endif
 
+
 //#define COUNT_WAIT_TIME
 
 #ifdef COUNT_WAIT_TIME
- #define START_COUNT_WAIT_TIME   double count_wait_begin = stxxl_timestamp();
- #define END_COUNT_WAIT_TIME             stxxl::wait_time_counter += (stxxl_timestamp() - count_wait_begin);
+
+ #define START_COUNT_WAIT_TIME  double count_wait_begin = stxxl_timestamp();
+ #define END_COUNT_WAIT_TIME    stxxl::wait_time_counter += (stxxl_timestamp() - count_wait_begin);
 
  #define reset_io_wait_time() stxxl::wait_time_counter = 0.0;
 
  #define io_wait_time() (stxxl::wait_time_counter)
 
-
 #else
+
  #define START_COUNT_WAIT_TIME
  #define END_COUNT_WAIT_TIME
+
 inline void reset_io_wait_time()
-{ };
+{ }
 
 inline double io_wait_time()
 {
     return -1.0;
-};
+}
 
 #endif
 
@@ -408,12 +395,10 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last)
     if (__first == __last)
         return true;
 
-
     _ForwardIter __next = __first;
     for (++__next; __next != __last; __first = __next, ++__next) {
         if (*__next < *__first)
             return false;
-
     }
 
     return true;
@@ -426,13 +411,12 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last,
     if (__first == __last)
         return true;
 
-
     _ForwardIter __next = __first;
     for (++__next; __next != __last; __first = __next, ++__next) {
         if (__comp(*__next, *__first))
             return false;
-
     }
+
     return true;
 }
 
@@ -441,7 +425,6 @@ void swap_1D_arrays(T * a, T * b, unsigned_type size)
 {
     for (unsigned_type i = 0; i < size; ++i)
         std::swap(a[i], b[i]);
-
 }
 
 
