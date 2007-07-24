@@ -14,7 +14,7 @@ HANDLE wfs_file_base::get_file_des() const
 void wfs_file_base::lock()
 {
     if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
-        stxxl_win_lasterror_exit("LockFile ", io_error)
+        stxxl_win_lasterror_exit("LockFile ", io_error);
         }
 
         wfs_request_base::wfs_request_base (
@@ -205,7 +205,7 @@ void wfs_file_base::lock()
                                 dwCreationDisposition, dwFlagsAndAttributes, NULL);
 
         if (file_des == INVALID_HANDLE_VALUE)
-            stxxl_win_lasterror_exit("CreateFile  filename=" << filename, io_error)
+            stxxl_win_lasterror_exit("CreateFile  filename=" << filename, io_error);
 
 
             };
@@ -240,7 +240,7 @@ void wfs_file_base::lock()
 
                 if (!SetEndOfFile(file_des))
                     stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
-                                             " newsize=" << newsize << " ", io_error)
+                                             " newsize=" << newsize << " ", io_error);
 
                     };
 
