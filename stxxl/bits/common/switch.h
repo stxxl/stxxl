@@ -48,11 +48,11 @@ public:
 #ifndef STXXL_BOOST_THREADS
         int res = pthread_mutex_trylock (&mutex);
 
-        if (res == 0 || res == EBUSY)
+        if (res == 0 || res == EBUSY) {
             stxxl_nassert (pthread_mutex_unlock
-                           (&mutex), resource_error)
-            else
-                stxxl_function_error(resource_error)
+                           (&mutex), resource_error);
+        } else
+                stxxl_function_error(resource_error);
                 stxxl_nassert (pthread_mutex_destroy
                                (&mutex), resource_error);
 

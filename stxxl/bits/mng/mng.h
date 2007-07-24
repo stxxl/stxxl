@@ -418,7 +418,7 @@ class BIDArray: public std::vector< BID <BLK_SIZE> >
             {
                 stxxl_debug (std::cerr <<
                          "Warning: resizing nonempty BIDArray"
-                         << std::endl;)
+                         << std::endl);
                 BID < BLK_SIZE > *tmp = array;
                 array = new BID < BLK_SIZE >[newsize];
                 memcpy ((void*)array, (void*)tmp,
