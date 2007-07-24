@@ -29,14 +29,20 @@ struct my_type
     char filler[24];
 };
 
-typedef stxxl::btree::btree<int, my_type, comp_type,
-                            NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::SR> btree_type;
+std::ostream & operator << (std::ostream & o, const my_type & obj)
+{
+    o << " " << obj.data;
+    return o;
+}
 
 std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj)
 {
     o << obj.first << " " << obj.second;
     return o;
 }
+
+typedef stxxl::btree::btree<int, my_type, comp_type,
+                            NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE, stxxl::SR> btree_type;
 
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (6 * LEAF_BLOCK_SIZE)
