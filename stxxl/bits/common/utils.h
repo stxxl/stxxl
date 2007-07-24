@@ -531,9 +531,9 @@ bool operator!= (const new_alloc<T1> &,
 inline unsigned_type sort_memory_usage_factor()
 {
 #ifdef __MCSTL__
-    return (mcstl::HEURISTIC::sort_algorithm == mcstl::HEURISTIC::MWMS) ? 2 : 1;
+    return (mcstl::HEURISTIC::sort_algorithm == mcstl::HEURISTIC::MWMS && mcstl::HEURISTIC::num_threads > 1) ? 2 : 1;	//memory overhead for multiway mergesort
 #else
-    return 1;
+    return 1;	//no overhead
 #endif
 }
 
