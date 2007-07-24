@@ -73,7 +73,7 @@ int main()
                 STXXL_MSG("Printing...");
                 for(stxxl::int64 i=0; i < v.size(); i++)
                         STXXL_MSG(v[i].key());
-	*/
+         */
 
         STXXL_MSG("Checking order...");
         STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));

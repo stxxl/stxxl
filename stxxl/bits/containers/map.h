@@ -171,7 +171,7 @@ public:
     { }
 
     void swap(map  & obj) { std::swap(Impl, obj.Impl); }
-    std::pair<iterator, bool> insert(const value_type & x)
+    std::pair<iterator, bool> insert(const value_type &x)
     {
         return Impl.insert(x);
     }
@@ -228,11 +228,11 @@ public:
     {
         return Impl.upper_bound(k);
     }
-    std::pair<iterator, iterator> equal_range(const key_type & k)
+    std::pair<iterator, iterator> equal_range(const key_type &k)
     {
         return Impl.equal_range(k);
     }
-    std::pair<const_iterator, const_iterator> equal_range(const key_type & k) const
+    std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const
     {
         return Impl.equal_range(k);
     }

@@ -25,7 +25,7 @@ __STXXL_BEGIN_NAMESPACE
 
 class set_switch_handler
 {
-    onoff_switch & switch_;
+    onoff_switch &switch_;
 public:
     set_switch_handler(onoff_switch & switch__) : switch_(switch__) { }
     void operator()  (request * /*req*/) { switch_.on(); }
@@ -136,7 +136,8 @@ public:
     {
         int_type ibuffer = buffer - read_buffers;
         STXXL_VERBOSE1("block_prefetcher: buffer " << ibuffer << " consumed");
-        if (read_reqs[ibuffer].valid()) read_reqs[ibuffer]->wait();
+        if (read_reqs[ibuffer].valid())
+            read_reqs[ibuffer]->wait();
 
         read_reqs[ibuffer] = NULL;
 
@@ -168,7 +169,8 @@ public:
     ~block_prefetcher()
     {
         for (int_type i = 0; i < nreadblocks; ++i)
-            if (read_reqs[i].valid()) read_reqs[i]->wait();
+            if (read_reqs[i].valid())
+                read_reqs[i]->wait();
 
 
         delete [] read_reqs;

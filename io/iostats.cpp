@@ -1,4 +1,3 @@
-
 #include "stxxl/bits/io/iostats.h"
 #include "stxxl/bits/common/utils.h"
 
@@ -94,7 +93,7 @@ void stats::reset()
         STXXL_ERRMSG( "Warning: " << acc_reads <<
                       " read(s) not yet finished");
 
-        reads = 0;
+    reads = 0;
 
     volume_read = 0;
     t_reads = 0;
@@ -113,7 +112,7 @@ void stats::reset()
         STXXL_ERRMSG("Warning: " << acc_writes <<
                      " write(s) not yet finished");
 
-        writes = 0;
+    writes = 0;
 
     volume_written = 0;
     t_writes = 0.0;
@@ -138,7 +137,7 @@ void stats::reset()
         STXXL_ERRMSG( "Warning: " << acc_ios <<
                       " io(s) not yet finished" );
 
-        p_ios = 0.0;
+    p_ios = 0.0;
 
 
 #ifdef STXXL_BOOST_THREADS

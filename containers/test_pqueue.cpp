@@ -72,7 +72,7 @@ using namespace std;
 
 int main()
 {
-    /*
+/*
        unsigned BufferSize1_ = 32, // equalize procedure call overheads etc.
        unsigned N_ = 512, // bandwidth
        unsigned IntKMAX_ = 64, // maximal arity for internal mergers
@@ -80,7 +80,7 @@ int main()
        unsigned BlockSize_ = (2*1024*1024),
        unsigned ExtKMAX_ = 64, // maximal arity for external mergers
        unsigned ExtLevels_ = 2,
-     */
+ */
     //typedef priority_queue<priority_queue_config<my_type,my_cmp,
     //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
     const unsigned volume = 255 * 1024; // in KB
@@ -90,10 +90,10 @@ int main()
 
     STXXL_MSG("Block size: " << block_type::raw_size);
     //STXXL_MSG(settings::EConsumption);
-    /*
+/*
     STXXL_MSG(settings::AE);
     STXXL_MSG(settings::settings::B);
-    */
+ */
     STXXL_MSG("AI: " << gen::AI);
     STXXL_MSG("X : " << gen::X);
     STXXL_MSG("N : " << gen::N);
@@ -114,8 +114,7 @@ int main()
     {
         if ((i % (1024 * 1024)) == 0)
             STXXL_MSG("Inserting element " << i);
-            p.push(my_type(nelements - i));
-
+        p.push(my_type(nelements - i));
     }
     Timer.stop();
     STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec");
@@ -136,9 +135,9 @@ int main()
         p.pop();
         if ((i % (1024 * 1024)) == 0)
             STXXL_MSG("Element " << i << " popped");
-            }
-            Timer.stop();
-
-        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
-        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
     }
+    Timer.stop();
+
+    STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+}

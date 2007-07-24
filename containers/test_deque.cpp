@@ -66,7 +66,8 @@ int main()
                 *XXLI = value;
                 *STDI = value;
                 unsigned value1 = rand();
-                if (XXLI - XXLDeque.begin() == 0) break;
+                if (XXLI - XXLDeque.begin() == 0)
+                    break;
 
                 XXLI = XXLI - (value1 % (XXLI - XXLDeque.begin()));
                 STDI = STDI - (value1 % (STDI - STDDeque.begin()));

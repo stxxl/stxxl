@@ -1,4 +1,3 @@
-
 #ifdef STXXL_BOOST_CONFIG
 
 #include "stxxl/bits/io/boostfd_file.h"
@@ -89,7 +88,6 @@ void boostfd_request::check_aligning ()
                 << BLOCK_ALIGN << " = " <<
                       long (buffer) % BLOCK_ALIGN << " (" <<
                       std::hex << buffer << std::dec << ")");
-
 }
 
 boostfd_request::~boostfd_request ()

@@ -48,7 +48,8 @@ namespace random_shuffle_local
 
         value_type & operator * ()
         {
-            if (it.block_offset() == 0 ) it.touch();
+            if (it.block_offset() == 0 )
+                it.touch();
             // tells the vector that the block was modified
             return **outstream;
         }
@@ -78,8 +79,8 @@ namespace random_shuffle_local
 
         virtual ~write_vector()
         {
-            if (outstream) flush();
-
+            if (outstream)
+                flush();
         }
     };
 }
@@ -315,7 +316,7 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
     p_pool.resize(PageSize_);
 
     // Set prefetch aggr to PageSize_
-    for (j=0; j < k; j++) {
+    for (j = 0; j < k; j++) {
         buckets[j]->set_prefetch_aggr(PageSize_);
     }
 

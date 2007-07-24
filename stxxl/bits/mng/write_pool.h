@@ -46,7 +46,7 @@ public:
         bid_type bid;
 
         busy_entry() : block(NULL) { }
-        busy_entry(const busy_entry & a) : block(a.block), req(a.req), bid(a.bid) { }
+        busy_entry(const busy_entry &a) : block(a.block), req(a.req), bid(a.bid) { }
         busy_entry(block_type * &bl, request_ptr & r, bid_type & bi) :
             block(bl), req(r), bid(bi) { }
 
@@ -78,7 +78,6 @@ public:
         unsigned_type i = 0;
         for ( ; i < init_size; ++i)
             free_blocks.push_back(new block_type);
-
     }
 
     void swap(write_pool & obj)
@@ -138,7 +137,7 @@ public:
         if (free_blocks_size)
         {
             STXXL_VERBOSE1("write_pool::steal : " << free_blocks_size << " free blocks available");
-            -- free_blocks_size;
+            --free_blocks_size;
             block_type * p = free_blocks.back();
             free_blocks.pop_back();
             return p;
@@ -177,7 +176,6 @@ public:
 
         while (++diff <= 0)
             delete get();
-
     }
 
     request_ptr get_request(bid_type bid)
@@ -187,7 +185,6 @@ public:
         {
             if (i2->bid == bid)
                 return i2->req;
-
         }
         return request_ptr();
     }
@@ -233,8 +230,8 @@ protected:
                 ++cnt;
                 --busy_blocks_size;
                 ++free_blocks_size;
-                if (busy_blocks.empty()) break;
-
+                if (busy_blocks.empty())
+                    break;
             }
         }
         STXXL_VERBOSE1("write_pool::check_all_busy : " << cnt <<

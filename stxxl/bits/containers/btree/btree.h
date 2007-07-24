@@ -446,7 +446,7 @@ namespace btree
             return !size_;
         }
 
-        std::pair<iterator, bool> insert(const value_type & x)
+        std::pair<iterator, bool> insert(const value_type &x)
         {
             root_node_iterator_type it = root_node_.lower_bound(x.first);
             assert(!root_node_.empty());
@@ -458,7 +458,8 @@ namespace btree
                 assert(Leaf);
                 std::pair<key_type, leaf_bid_type> Splitter;
                 std::pair<iterator, bool> result = Leaf->insert(x, Splitter);
-                if (result.second) ++size_;
+                if (result.second)
+                    ++size_;
 
                 leaf_cache_.unfix_node((leaf_bid_type)it->second);
                 //if(key_compare::max_value() == Splitter.first)
@@ -482,7 +483,8 @@ namespace btree
             assert(Node);
             std::pair<key_type, node_bid_type> Splitter;
             std::pair<iterator, bool> result = Node->insert(x, height_ - 1, Splitter);
-            if (result.second) ++size_;
+            if (result.second)
+                ++size_;
 
             node_cache_.unfix_node((node_bid_type)it->second);
             //if(key_compare::max_value() == Splitter.first)
@@ -752,11 +754,11 @@ namespace btree
             return result;
         }
 
-        std::pair<iterator, iterator> equal_range(const key_type & k)
+        std::pair<iterator, iterator> equal_range(const key_type &k)
         {
             iterator l = lower_bound(k);             // l->first >= k
 
-            if (l == end() || key_compare_(k, l->first))           // if (k < l->first)
+            if (l == end() || key_compare_(k, l->first))  // if (k < l->first)
                 return std::pair<iterator, iterator>(l, l);
             // then upper_bound == lower_bound
 
@@ -769,11 +771,11 @@ namespace btree
             return std::pair<iterator, iterator>(l, u);           // then upper_bound == (lower_bound+1)
         }
 
-        std::pair<const_iterator, const_iterator> equal_range(const key_type & k) const
+        std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const
         {
             const_iterator l = lower_bound(k);             // l->first >= k
 
-            if (l == end() || key_compare_(k, l->first))           // if (k < l->first)
+            if (l == end() || key_compare_(k, l->first))  // if (k < l->first)
                 return std::pair<const_iterator, const_iterator>(l, l);
             // then upper_bound == lower_bound
 
@@ -984,7 +986,6 @@ namespace btree
             else
                 while (first != last)
                     erase(first++);
-
         }
 
         key_compare key_comp() const
@@ -1137,8 +1138,8 @@ namespace std
     void swap(stxxl::btree::btree < KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy > & a,
               stxxl::btree::btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & b)
     {
-        if (&a != &b) a.swap(b);
-
+        if (&a != &b)
+            a.swap(b);
     }
 }
 

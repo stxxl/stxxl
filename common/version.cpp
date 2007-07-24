@@ -16,21 +16,21 @@
 //        there are no details available on windows platform
 
 
-const char* stxxl::get_version_string()
+const char * stxxl::get_version_string()
 {
     return "STXXL v"
-    STXXL_VERSION_STRING_MA_MI_PL
+           STXXL_VERSION_STRING_MA_MI_PL
 #ifdef STXXL_VERSION_STRING_DATE
-    "-" STXXL_VERSION_STRING_DATE
+           "-" STXXL_VERSION_STRING_DATE
 #endif
 #ifdef STXXL_VERSION_STRING_SVN_REVISION
-    " (SVN r" STXXL_VERSION_STRING_SVN_REVISION ")"
+           " (SVN r" STXXL_VERSION_STRING_SVN_REVISION ")"
 #endif
 #ifdef STXXL_VERSION_STRING_PHASE
-    " (" STXXL_VERSION_STRING_PHASE ")"
+           " (" STXXL_VERSION_STRING_PHASE ")"
 #endif
 #ifdef STXXL_VERSION_STRING_COMMENT
-    " (" STXXL_VERSION_STRING_COMMENT ")"
+           " (" STXXL_VERSION_STRING_COMMENT ")"
 #endif
     ;
 }

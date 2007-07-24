@@ -86,7 +86,6 @@ public:
         unsigned_type i = 0;
         for ( ; i < init_size; ++i)
             free_blocks.push_back(new block_type);
-
     }
 
     void swap(prefetch_pool & obj)
@@ -138,7 +137,7 @@ public:
         {
             STXXL_VERBOSE2("prefetch_pool::hint bid= " << bid << " => prefetching");
 
-            -- free_blocks_size;
+            --free_blocks_size;
             block_type * block = free_blocks.back();
             free_blocks.pop_back();
             request_ptr req = block->read(bid);
@@ -159,7 +158,7 @@ public:
         if (free_blocks_size) //  only if we have a free block
         {
             STXXL_VERBOSE2("prefetch_pool::hint2 bid= " << bid << " => prefetching");
-            -- free_blocks_size;
+            --free_blocks_size;
             block_type * block = free_blocks.back();
             free_blocks.pop_back();
             request_ptr req = w_pool.get_request(bid);
@@ -203,7 +202,7 @@ public:
 
         // cached
         STXXL_VERBOSE2("prefetch_pool::read bid=" << bid << " => copy in cache exists");
-        ++ free_blocks_size;
+        ++free_blocks_size;
         free_blocks.push_back(block);
         block = cache_el->second.first;
         request_ptr result = cache_el->second.second;

@@ -1,4 +1,3 @@
-
 #include "stxxl/bits/io/ufs_file.h"
 
 #ifndef BOOST_MSVC
@@ -117,7 +116,6 @@ void ufs_request_base::check_aligning ()
                                               << BLOCK_ALIGN << " = " <<
                       long (buffer) % BLOCK_ALIGN << " (" <<
                       std::hex << buffer << std::dec << ")");
-
 }
 
 ufs_request_base::~ufs_request_base ()
@@ -220,7 +218,6 @@ ufs_file_base::~ufs_file_base ()
 
     else
         stxxl_function_error(io_error);
-
 }
 stxxl::int64 ufs_file_base::size ()
 {
@@ -235,7 +232,8 @@ void ufs_file_base::set_size (stxxl::int64 newsize)
 #ifdef BOOST_MSVC
     // FIXME: ADD TRUNCATION HERE, CURRENTLY NO SUITABLE FUNCTION FOUND
 #else
-    if (!(mode_ & RDONLY)) stxxl_ifcheck(::ftruncate(file_des, newsize), io_error);
+    if (!(mode_ & RDONLY))
+        stxxl_ifcheck(::ftruncate(file_des, newsize), io_error);
 
 #endif
 

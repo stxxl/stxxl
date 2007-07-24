@@ -37,7 +37,6 @@ int main()
         buf_ostream_type out(bids.begin(), 2);
         for (unsigned i = 0; i < nelements; i++)
             out << i;
-
     }
     {
         buf_istream_type in(bids.begin(), bids.end(), 2);

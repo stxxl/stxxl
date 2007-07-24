@@ -67,7 +67,6 @@ public:
     {
         for (unsigned_type i = 0; i < npages_; i++)
             history_entry[i] = history->insert(history->end(), static_cast<int_type>(i));
-
     }
     ~lru_pager() { }
     int_type kick()

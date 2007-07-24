@@ -629,7 +629,7 @@ public:
             unsigned_type first_page_to_evict = div_and_round_up(new_bids_size, page_size);
             std::fill(_page_status.begin() + first_page_to_evict,
                       _page_status.end(), 0); // clear dirty flag, so this pages
-                                             // will be never written
+                                              // will be never written
         }
 #endif
 
@@ -649,7 +649,6 @@ public:
 
         for (int_type i = 0; i < n_pages; ++i)
             _free_pages.push(i);
-
     }
     void push_back(const_reference obj)
     {
@@ -729,7 +728,7 @@ public:
         from->set_size(offset);
     }
 
-    vector(const vector & obj):
+    vector(const vector & obj) :
         _size (obj.size()),
         _bids (div_and_round_up (obj.size(), block_type::size)),
         _page_status(div_and_round_up (_bids.size(), page_size)),
@@ -758,12 +757,12 @@ public:
 
         const_iterator inbegin = obj.begin();
         const_iterator inend = obj.end();
-        std::copy(inbegin,inend,begin());
+        std::copy(inbegin, inend, begin());
     }
 
     vector & operator = (const vector & obj)
     {
-        if(&obj != this)
+        if (&obj != this)
         {
             vector tmp(obj);
             this->swap(tmp);
@@ -1029,10 +1028,10 @@ template <
           unsigned BlkSize_,
           typename AllocStr_,
           typename SzTp_ >
-inline bool operator == ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+inline bool operator == ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
                           AllocStr_, SzTp_ > & a,
-                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
-                          AllocStr_, SzTp_> & b )
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
+                                        AllocStr_, SzTp_> & b )
 {
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
 }
@@ -1044,12 +1043,12 @@ template <
           unsigned BlkSize_,
           typename AllocStr_,
           typename SzTp_ >
-inline bool operator != ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+inline bool operator != ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
                           AllocStr_, SzTp_ > & a,
-                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
-                          AllocStr_, SzTp_> & b )
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
+                                        AllocStr_, SzTp_> & b )
 {
-    return !(a==b);
+    return !(a == b);
 }
 
 template <
@@ -1059,10 +1058,10 @@ template <
           unsigned BlkSize_,
           typename AllocStr_,
           typename SzTp_ >
-inline bool operator < ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
-                          AllocStr_, SzTp_ > & a,
-                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
-                          AllocStr_, SzTp_> & b )
+inline bool operator < ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
+                         AllocStr_, SzTp_ > & a,
+                         stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
+                                       AllocStr_, SzTp_> & b )
 {
     return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
 }
@@ -1074,10 +1073,10 @@ template <
           unsigned BlkSize_,
           typename AllocStr_,
           typename SzTp_ >
-inline bool operator > ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
-                          AllocStr_, SzTp_ > & a,
-                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
-                          AllocStr_, SzTp_> & b )
+inline bool operator > ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
+                         AllocStr_, SzTp_ > & a,
+                         stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
+                                       AllocStr_, SzTp_> & b )
 {
     return b < a;
 }
@@ -1089,10 +1088,10 @@ template <
           unsigned BlkSize_,
           typename AllocStr_,
           typename SzTp_ >
-inline bool operator <= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+inline bool operator <= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
                           AllocStr_, SzTp_ > & a,
-                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
-                          AllocStr_, SzTp_> & b )
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
+                                        AllocStr_, SzTp_> & b )
 {
     return !(b < a);
 }
@@ -1104,10 +1103,10 @@ template <
           unsigned BlkSize_,
           typename AllocStr_,
           typename SzTp_ >
-inline bool operator >= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_, 
+inline bool operator >= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
                           AllocStr_, SzTp_ > & a,
-                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, 
-                          AllocStr_, SzTp_> & b )
+                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
+                                        AllocStr_, SzTp_> & b )
 {
     return !(a < b);
 }

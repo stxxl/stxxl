@@ -197,7 +197,6 @@ int main(int argc, char * argv[])
                                       offset + buffer_size * j / chunks,
                                       buffer_size / chunks,
                                       stxxl::default_completion_handler() );
-
         }
 
 
@@ -233,7 +232,6 @@ int main(int argc, char * argv[])
                                                           offset + buffer_size * j / chunks,
                                                           buffer_size / chunks,
                                                           stxxl::default_completion_handler() );
-
         }
 
  #ifdef WATCH_TIMES

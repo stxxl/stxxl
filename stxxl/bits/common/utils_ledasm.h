@@ -283,7 +283,6 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last)
     for (++__next; __next != __last; __first = __next, ++__next) {
         if (*__next < *__first)
             return false;
-
     }
 
     return true;
@@ -301,7 +300,6 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last,
     for (++__next; __next != __last; __first = __next, ++__next) {
         if (__comp(*__next, *__first))
             return false;
-
     }
     return true;
 }
@@ -311,7 +309,6 @@ void swap_1D_arrays(T * a, T * b, unsigned size)
 {
     for (unsigned i = 0; i < size; ++i)
         std::swap(a[i], b[i]);
-
 }
 
 

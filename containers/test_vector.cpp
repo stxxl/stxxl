@@ -48,7 +48,7 @@ int main()
         // test assignment const_iterator = iterator
         vector_type::const_iterator c_it = v.begin();
 
-        unsigned int big_size = 1024 * 1024 * 2 *16 *16;
+        unsigned int big_size = 1024 * 1024 * 2 * 16 * 16;
         typedef stxxl::vector<double> vec_big;
         vec_big my_vec(big_size);
 
@@ -116,7 +116,7 @@ int main()
         // test copy operator
         vector_of_stxxlvectors[0] = vector_of_stxxlvectors[1];
 
-	assert(vector_of_stxxlvectors[0]==vector_of_stxxlvectors[1]);
+        assert(vector_of_stxxlvectors[0] == vector_of_stxxlvectors[1]);
     }
     catch (const std::exception & ex)
     {

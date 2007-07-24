@@ -132,7 +132,8 @@ public:
                 int_type ibuffer = batch_write_blocks.top ().ibuffer;
                 batch_write_blocks.pop ();
 
-                if (write_reqs[ibuffer].valid()) write_reqs[ibuffer]->wait();
+                if (write_reqs[ibuffer].valid())
+                    write_reqs[ibuffer]->wait();
 
                 write_reqs[ibuffer] = write_buffers[ibuffer].write (write_bids[ibuffer]);
 
@@ -156,7 +157,8 @@ public:
             ibuffer = batch_write_blocks.top ().ibuffer;
             batch_write_blocks.pop();
 
-            if (write_reqs[ibuffer].valid()) write_reqs[ibuffer]->wait();
+            if (write_reqs[ibuffer].valid())
+                write_reqs[ibuffer]->wait();
 
             write_reqs[ibuffer] = write_buffers[ibuffer].write(write_bids[ibuffer]);
 
@@ -176,7 +178,6 @@ public:
 
         for (unsigned_type i = 0; i < nwriteblocks; i++)
             free_write_blocks.push_back (i);
-
     }
 
     //! \brief Flushes not yet written buffers and frees used memory
@@ -188,7 +189,8 @@ public:
             ibuffer = batch_write_blocks.top ().ibuffer;
             batch_write_blocks.pop();
 
-            if (write_reqs[ibuffer].valid()) write_reqs[ibuffer]->wait();
+            if (write_reqs[ibuffer].valid())
+                write_reqs[ibuffer]->wait();
 
             write_reqs[ibuffer] = write_buffers[ibuffer].write(write_bids[ibuffer]);
 

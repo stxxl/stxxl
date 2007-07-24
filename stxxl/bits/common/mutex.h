@@ -40,10 +40,9 @@ public:
         if (res == 0 || res == EBUSY) {
             stxxl_nassert(pthread_mutex_unlock(&_mutex), resource_error);
         } else
-                stxxl_function_error(resource_error);
+            stxxl_function_error(resource_error);
 
-                stxxl_nassert(pthread_mutex_destroy(&_mutex), resource_error);
-
+        stxxl_nassert(pthread_mutex_destroy(&_mutex), resource_error);
     };
     void lock ()
     {

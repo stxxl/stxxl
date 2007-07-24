@@ -413,7 +413,6 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                 nbucket_blocks = div_and_round_up(bucket_sizes[bucket2submit], block_type::size);
                 for (i = 0; i < nbucket_blocks; i++)
                     reqs1[i] = blocks1[i].read(bucket_bids[bucket2submit][i]);
-
             }
 
             std::swap (blocks1, blocks2);

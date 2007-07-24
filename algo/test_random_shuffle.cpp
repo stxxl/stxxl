@@ -35,20 +35,19 @@ int main()
     for ( i = 0; i < 10; i++)
         STXXL_MSG(STXXLVector[i]);
 
-        STXXL_MSG("End: ");
-        for ( i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
-            STXXL_MSG(STXXLVector[i]);
+    STXXL_MSG("End: ");
+    for ( i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
+        STXXL_MSG(STXXLVector[i]);
 
-            STXXL_MSG("Permute randomly...");
-            stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 1024 * 1024 * 128);
+    STXXL_MSG("Permute randomly...");
+    stxxl::random_shuffle(STXXLVector.begin(), STXXLVector.end(), 1024 * 1024 * 128);
 
 
     STXXL_MSG("Begin: ");
     for ( i = 0; i < 10; i++)
         STXXL_MSG(STXXLVector[i]);
 
-        STXXL_MSG("End: ");
-        for ( i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
-            STXXL_MSG(STXXLVector[i]);
-
-            }
+    STXXL_MSG("End: ");
+    for ( i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
+        STXXL_MSG(STXXLVector[i]);
+}

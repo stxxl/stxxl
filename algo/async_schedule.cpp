@@ -110,7 +110,8 @@ void compute_prefetch_schedule(
     int L = last - first;
     if (L <= D)
     {
-        for (int i = 0; i < L; ++i) out_first[i] = i;
+        for (int i = 0; i < L; ++i)
+            out_first[i] = i;
 
         return;
     }
@@ -123,7 +124,7 @@ void compute_prefetch_schedule(
     for (int i = 0; i < L; i++)
         STXXL_MSG(first[i] << " " << write_order[i].first << " " << write_order[i].second );
 
-        std::stable_sort(write_order, write_order + L, write_time_cmp());
+    std::stable_sort(write_order, write_order + L, write_time_cmp());
 
 
     for (int i = 0; i < L; i++)

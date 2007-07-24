@@ -152,7 +152,6 @@ namespace stream
                 // skip the beginning of the block
                 for ( ; cur != begin; ++cur)
                     ++ (*in);
-
             }
         }
 
@@ -175,7 +174,8 @@ namespace stream
             assert(end_ != current_);
             ++current_;
             ++ (*in);
-            if (empty()) delete_stream();
+            if (empty())
+                delete_stream();
 
             return *this;
         }
@@ -333,7 +333,6 @@ namespace stream
 
             else
                 delete vec_it_stream;
-
         }
     };
 
@@ -433,14 +432,16 @@ namespace stream
         while (outbegin.block_offset()) //  go to the beginning of the block
         //  of the external vector
         {
-            if (in.empty() || outbegin == outend) return outbegin;
+            if (in.empty() || outbegin == outend)
+                return outbegin;
 
             *outbegin = *in;
             ++outbegin;
             ++in;
         }
 
-        if (nbuffers == 0) nbuffers =  2 * config::get_instance()->disks_number();
+        if (nbuffers == 0)
+            nbuffers =  2 * config::get_instance()->disks_number();
 
 
         outbegin.flush(); // flush container
@@ -452,7 +453,8 @@ namespace stream
 
         while (!in.empty() && outend != outbegin )
         {
-            if (outbegin.block_offset() == 0 ) outbegin.touch();
+            if (outbegin.block_offset() == 0 )
+                outbegin.touch();
 
             *outstream  = *in;
             ++outbegin;
@@ -501,14 +503,16 @@ namespace stream
         while (out.block_offset()) //  go to the beginning of the block
         //  of the external vector
         {
-            if (in.empty()) return out;
+            if (in.empty())
+                return out;
 
             *out = *in;
             ++out;
             ++in;
         }
 
-        if (nbuffers == 0) nbuffers =  2 * config::get_instance()->disks_number();
+        if (nbuffers == 0)
+            nbuffers =  2 * config::get_instance()->disks_number();
 
 
         out.flush(); // flush container
@@ -520,7 +524,8 @@ namespace stream
 
         while (!in.empty())
         {
-            if (out.block_offset() == 0 ) out.touch();
+            if (out.block_offset() == 0 )
+                out.touch();
             // tells the vector that the block was modified
             *outstream  = *in;
             ++out;
@@ -622,12 +627,12 @@ namespace stream
     class transform
     {
         Operation_ op;
-        Input1_ & i1;
-        Input2_ & i2;
-        Input3_ & i3;
-        Input4_ & i4;
-        Input5_ & i5;
-        Input6_ & i6;
+        Input1_ &i1;
+        Input2_ &i2;
+        Input3_ &i3;
+        Input4_ &i4;
+        Input5_ &i5;
+        Input6_ &i6;
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
@@ -691,7 +696,7 @@ namespace stream
     class transform<Operation_, Input1_, Stopper, Stopper, Stopper, Stopper, Stopper>
     {
         Operation_ op;
-        Input1_ & i1;
+        Input1_ &i1;
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
@@ -748,8 +753,8 @@ namespace stream
     class transform<Operation_, Input1_, Input2_, Stopper, Stopper, Stopper, Stopper>
     {
         Operation_ op;
-        Input1_ & i1;
-        Input2_ & i2;
+        Input1_ &i1;
+        Input2_ &i2;
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
@@ -809,9 +814,9 @@ namespace stream
     class transform<Operation_, Input1_, Input2_, Input3_, Stopper, Stopper, Stopper>
     {
         Operation_ op;
-        Input1_ & i1;
-        Input2_ & i2;
-        Input3_ & i3;
+        Input1_ &i1;
+        Input2_ &i2;
+        Input3_ &i3;
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
@@ -875,10 +880,10 @@ namespace stream
     class transform<Operation_, Input1_, Input2_, Input3_, Input4_, Stopper, Stopper>
     {
         Operation_ op;
-        Input1_ & i1;
-        Input2_ & i2;
-        Input3_ & i3;
-        Input4_ & i4;
+        Input1_ &i1;
+        Input2_ &i2;
+        Input3_ &i3;
+        Input4_ &i4;
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
@@ -945,11 +950,11 @@ namespace stream
     class transform<Operation_, Input1_, Input2_, Input3_, Input4_, Input5_, Stopper>
     {
         Operation_ op;
-        Input1_ & i1;
-        Input2_ & i2;
-        Input3_ & i3;
-        Input4_ & i4;
-        Input5_ & i5;
+        Input1_ &i1;
+        Input2_ &i2;
+        Input3_ &i3;
+        Input4_ &i4;
+        Input5_ &i5;
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
@@ -1016,12 +1021,12 @@ namespace stream
     >
     class make_tuple
     {
-        Input1_ & i1;
-        Input2_ & i2;
-        Input3_ & i3;
-        Input4_ & i4;
-        Input5_ & i5;
-        Input6_ & i6;
+        Input1_ &i1;
+        Input2_ &i2;
+        Input3_ &i3;
+        Input4_ &i4;
+        Input5_ &i5;
+        Input6_ &i6;
 
     public:
         //! \brief Standard stream typedef
@@ -1098,8 +1103,8 @@ namespace stream
     >
     class make_tuple<Input1_, Input2_, Stopper, Stopper, Stopper, Stopper>
     {
-        Input1_ & i1;
-        Input2_ & i2;
+        Input1_ &i1;
+        Input2_ &i2;
 
     public:
         //! \brief Standard stream typedef
@@ -1169,9 +1174,9 @@ namespace stream
     >
     class make_tuple<Input1_, Input2_, Input3_, Stopper, Stopper, Stopper>
     {
-        Input1_ & i1;
-        Input2_ & i2;
-        Input3_ & i3;
+        Input1_ &i1;
+        Input2_ &i2;
+        Input3_ &i3;
 
     public:
         //! \brief Standard stream typedef
@@ -1241,10 +1246,10 @@ namespace stream
     >
     class make_tuple<Input1_, Input2_, Input3_, Input4_, Stopper, Stopper>
     {
-        Input1_ & i1;
-        Input2_ & i2;
-        Input3_ & i3;
-        Input4_ & i4;
+        Input1_ &i1;
+        Input2_ &i2;
+        Input3_ &i3;
+        Input4_ &i4;
 
     public:
         //! \brief Standard stream typedef
@@ -1321,11 +1326,11 @@ namespace stream
     >
     class make_tuple<Input1_, Input2_, Input3_, Input4_, Input5_, Stopper>
     {
-        Input1_ & i1;
-        Input2_ & i2;
-        Input3_ & i3;
-        Input4_ & i4;
-        Input5_ & i5;
+        Input1_ &i1;
+        Input2_ &i2;
+        Input3_ &i3;
+        Input4_ &i4;
+        Input5_ &i5;
 
     public:
         //! \brief Standard stream typedef
@@ -1401,7 +1406,7 @@ namespace stream
     template <class Input_>
     class choose < Input_, 1 >
     {
-        Input_ & in;
+        Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
     public:
@@ -1457,7 +1462,7 @@ namespace stream
     template <class Input_>
     class choose < Input_, 2 >
     {
-        Input_ & in;
+        Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
     public:
@@ -1513,7 +1518,7 @@ namespace stream
     template <class Input_>
     class choose < Input_, 3 >
     {
-        Input_ & in;
+        Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
     public:
@@ -1569,7 +1574,7 @@ namespace stream
     template <class Input_>
     class choose < Input_, 4 >
     {
-        Input_ & in;
+        Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
     public:
@@ -1625,7 +1630,7 @@ namespace stream
     template <class Input_>
     class choose < Input_, 5 >
     {
-        Input_ & in;
+        Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
     public:
@@ -1681,7 +1686,7 @@ namespace stream
     template <class Input_>
     class choose < Input_, 6 >
     {
-        Input_ & in;
+        Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
     public:
@@ -1735,7 +1740,7 @@ namespace stream
     template <class Input, class BinaryPredicate = Stopper>
     class unique
     {
-        Input & input;
+        Input &input;
         BinaryPredicate binary_pred;
         typename Input::value_type current;
         unique();
@@ -1743,8 +1748,8 @@ namespace stream
         typedef typename Input::value_type value_type;
         unique(Input & input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
         {
-            if (!input.empty()) current = *input;
-
+            if (!input.empty())
+                current = *input;
         }
 
         //! \brief Standard stream method
@@ -1754,7 +1759,6 @@ namespace stream
             ++input;
             while (!input.empty() && (binary_pred(current = *input, old_value)) )
                 ++input;
-
         }
         //! \brief Standard stream method
         const value_type operator * () const { return current; }
@@ -1774,15 +1778,15 @@ namespace stream
     template <class Input>
     class unique<Input, Stopper>
     {
-        Input & input;
+        Input &input;
         typename Input::value_type current;
         unique();
     public:
         typedef typename Input::value_type value_type;
         unique(Input & input_) : input(input_)
         {
-            if (!input.empty()) current = *input;
-
+            if (!input.empty())
+                current = *input;
         }
         //! \brief Standard stream method
         unique & operator ++ ()
@@ -1791,7 +1795,6 @@ namespace stream
             ++input;
             while (!input.empty() && ((current = *input) == old_value))
                 ++input;
-
         }
         //! \brief Standard stream method
         value_type operator * () const { return current; }

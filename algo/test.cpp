@@ -92,7 +92,6 @@ void some_algorithm(_Iter first, _Iter last)
 
     else
         _some_algorithm_without_use_of_keys(first, last);
-
 }
 
 int main()

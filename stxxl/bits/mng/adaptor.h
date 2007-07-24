@@ -118,8 +118,8 @@ struct TwoToOneDimArrayAdaptorBase : public r_a_iterator <
     TwoToOneDimArrayAdaptorBase (one_dim_array_type * a, pos_type p) : array (a),
                                                                        pos(p)
     { };
-    TwoToOneDimArrayAdaptorBase (const TwoToOneDimArrayAdaptorBase & a) : array (a.array),
-                                                                          pos (a.pos)
+    TwoToOneDimArrayAdaptorBase (const TwoToOneDimArrayAdaptorBase &a) : array (a.array),
+                                                                         pos (a.pos)
     { };
 
     STXXL_ADAPTOR_ARITHMETICS(pos)
@@ -166,7 +166,7 @@ struct TwoToOneDimArrayAdaptorBase : public r_a_iterator <
                                                                                         \
     template <unsigned _blk_sz, typename _run_type, class __pos_type>                                         \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & operator -= (          \
-        two_to_one_dim_array_adaptor_base < _blk_sz, _run_type, __pos_type > & a,                      \
+        two_to_one_dim_array_adaptor_base < _blk_sz, _run_type, __pos_type > & a, \
         typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off)          \
     {                                                                                       \
         a.pos -= off;                                                                           \
@@ -175,7 +175,7 @@ struct TwoToOneDimArrayAdaptorBase : public r_a_iterator <
                                                                                         \
     template <unsigned _blk_sz, typename _run_type, class __pos_type>                                         \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & operator += (          \
-        two_to_one_dim_array_adaptor_base < _blk_sz, _run_type, __pos_type > & a,                      \
+        two_to_one_dim_array_adaptor_base < _blk_sz, _run_type, __pos_type > & a, \
         typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off)          \
     {                                                                                       \
         a.pos += off;                                                                           \
@@ -184,7 +184,7 @@ struct TwoToOneDimArrayAdaptorBase : public r_a_iterator <
                                                                                         \
     template <unsigned _blk_sz, typename _run_type, class __pos_type>                                         \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator + (             \
-        const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a,                 \
+        const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a, \
         typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off)           \
     {                                                                                       \
         return two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>(a.array, a.pos + off);  \
@@ -192,7 +192,7 @@ struct TwoToOneDimArrayAdaptorBase : public r_a_iterator <
                                                                                         \
     template <unsigned _blk_sz, typename _run_type, class __pos_type>                                         \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator + (             \
-        typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off,          \
+        typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off, \
         const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a)                        \
     {                                                                                       \
         return two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>(a.array, a.pos + off);  \
@@ -200,7 +200,7 @@ struct TwoToOneDimArrayAdaptorBase : public r_a_iterator <
                                                                                         \
     template <unsigned _blk_sz, typename _run_type, class __pos_type>                                         \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator - (             \
-        const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a,                        \
+        const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a, \
         typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off)          \
     {                                                                                       \
         return two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>(a.array, a.pos - off);  \

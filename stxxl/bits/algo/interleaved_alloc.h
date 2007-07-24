@@ -8,7 +8,7 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
- 
+
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/common/rand.h"
 
@@ -35,8 +35,7 @@ struct interleaved_striping
     }
 
     virtual ~interleaved_striping()
-    {
-    }
+    { }
 };
 
 struct interleaved_FR : public interleaved_striping
@@ -64,7 +63,6 @@ struct interleaved_SR : public interleaved_striping
         random_number<random_uniform_fast> rnd;
         for (int_type i = 0; i < nruns; i++)
             offsets.push_back(rnd(diff));
-
     };
 
     int operator ()  (int_type i) const

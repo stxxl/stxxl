@@ -186,7 +186,6 @@ inline void rand_key(stxxl::int64 pos, my_key & Key)
 {
     for (int i = 0; i < KEY_SIZE; ++i)
         Key.keybuf[i] = letters[myrand() % 26];
-
 }
 #else // a longer pseudo random sequence
 long long unsigned ran32State = 0xdeadbeef;
@@ -235,7 +234,7 @@ void run_bdb_btree(stxxl::int64 ops)
 
 
         // here we start with the tests
-        Dbt key1(key1_storage.keybuf,  KEY_SIZE);
+        Dbt key1(key1_storage.keybuf, KEY_SIZE);
         Dbt data1(data1_storage.databuf, DATA_SIZE);
 
         stxxl::timer Timer;
@@ -282,7 +281,7 @@ void run_bdb_btree(stxxl::int64 ops)
         {
             //key1_storage.keybuf[KEYPOS] = letters[VALUE];
             rand_key(i, key1_storage);
-            Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+            Dbt keyx(key1_storage.keybuf, KEY_SIZE);
             Dbt datax(data1_storage.databuf, DATA_SIZE);
 
             cursorp->get(&keyx, &datax, DB_SET_RANGE);
@@ -312,7 +311,7 @@ void run_bdb_btree(stxxl::int64 ops)
                 std::swap(last_key, key1_storage);
 
 
-            Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+            Dbt keyx(key1_storage.keybuf, KEY_SIZE);
             Dbt datax(data1_storage.databuf, DATA_SIZE);
 
             if ( cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
@@ -324,7 +323,6 @@ void run_bdb_btree(stxxl::int64 ops)
                 ++n_scanned;
                 if (cursorp->get(&keyx, &datax, DB_NEXT) == DB_NOTFOUND)
                     break;
-
             }
 
             if (n_scanned >= 10 * n_range_queries)
@@ -337,7 +335,8 @@ void run_bdb_btree(stxxl::int64 ops)
         n_range_queries = i;
 
         Timer.stop();
-        if (cursorp != NULL) cursorp->close();
+        if (cursorp != NULL)
+            cursorp->close();
 
 
         STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
@@ -358,7 +357,7 @@ void run_bdb_btree(stxxl::int64 ops)
         {
             //key1_storage.keybuf[KEYPOS] = letters[VALUE];
             rand_key(i, key1_storage);
-            Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+            Dbt keyx(key1_storage.keybuf, KEY_SIZE);
             db.del(NULL, &keyx, 0);
         }
 
@@ -517,7 +516,7 @@ void run_stxxl_map(stxxl::int64 ops)
 class rand_key_gen
 {
     stxxl::int64 counter;
-    my_key & current;
+    my_key &current;
     stxxl::random_number32 myrand;
     rand_key_gen();
 public:
@@ -547,7 +546,7 @@ public:
 template <class InputType>
 class key2pair
 {
-    InputType & in;
+    InputType &in;
     std::pair<my_key, my_data>  current;
     key2pair();
 public:
@@ -555,8 +554,8 @@ public:
 
     key2pair(InputType & in_) : in(in_)
     {
-        if (!in.empty()) current.first = *in;
-
+        if (!in.empty())
+            current.first = *in;
     }
     const value_type & operator * () { return current; }
     const value_type * operator -> () { return &current; }
@@ -564,7 +563,8 @@ public:
     key2pair & operator ++ ()
     {
         ++in;
-        if (!empty()) current.first = *in;
+        if (!empty())
+            current.first = *in;
 
 
         return *this;
@@ -989,7 +989,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
     try {
         // here we start with the tests
-        Dbt key1(key1_storage.keybuf,  KEY_SIZE);
+        Dbt key1(key1_storage.keybuf, KEY_SIZE);
         Dbt data1(data1_storage.databuf, DATA_SIZE);
 
         stxxl::timer Timer;
@@ -1089,7 +1089,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         {
             //key1_storage.keybuf[KEYPOS] = letters[VALUE];
             rand_key(i, key1_storage);
-            Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+            Dbt keyx(key1_storage.keybuf, KEY_SIZE);
             Dbt datax(data1_storage.databuf, DATA_SIZE);
 
             cursorp->get(&keyx, &datax, DB_SET_RANGE);
@@ -1123,7 +1123,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
             //STXXL_MSG("Looking     "<<key1_storage<<" scanned: "<<n_scanned);
             //STXXL_MSG("Upper bound "<<last_key);
 
-            Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+            Dbt keyx(key1_storage.keybuf, KEY_SIZE);
 #ifdef BDB_BULK_SCAN
             Dbt datax(bulk_buffer, DATA_SIZE);
             datax.set_ulen(logbufsize);
@@ -1167,7 +1167,6 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
                 ++n_scanned;
                 if (cursorp->get(&keyx, &datax, DB_NEXT) == DB_NOTFOUND)
                     break;
-
             }
 #endif
 
@@ -1182,7 +1181,8 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         n_range_queries = i;
 
         Timer.stop();
-        if (cursorp != NULL) cursorp->close();
+        if (cursorp != NULL)
+            cursorp->close();
 
 
         STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
@@ -1204,7 +1204,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         {
             //key1_storage.keybuf[KEYPOS] = letters[VALUE];
             rand_key(i, key1_storage);
-            Dbt keyx(key1_storage.keybuf,  KEY_SIZE);
+            Dbt keyx(key1_storage.keybuf, KEY_SIZE);
             db.del(NULL, &keyx, 0);
         }
 

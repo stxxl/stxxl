@@ -52,9 +52,9 @@ public:
             stxxl_nassert (pthread_mutex_unlock
                            (&mutex), resource_error);
         } else
-                stxxl_function_error(resource_error);
-                stxxl_nassert (pthread_mutex_destroy
-                               (&mutex), resource_error);
+            stxxl_function_error(resource_error);
+        stxxl_nassert (pthread_mutex_destroy
+                       (&mutex), resource_error);
 
 
         stxxl_nassert (pthread_cond_destroy (&cond), resource_error);
@@ -92,7 +92,8 @@ public:
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
-        if (!_on) cond.wait(Lock);
+        if (!_on)
+            cond.wait(Lock);
 
 #else
         stxxl_nassert (pthread_mutex_lock (&mutex), resource_error);
@@ -107,7 +108,8 @@ public:
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
-        if (_on) cond.wait(Lock);
+        if (_on)
+            cond.wait(Lock);
 
 #else
         stxxl_nassert (pthread_mutex_lock (&mutex), resource_error);

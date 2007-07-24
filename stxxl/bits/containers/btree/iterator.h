@@ -82,8 +82,8 @@ namespace btree
             btree_ = obj.btree_;
             bid = obj.bid;
             pos = obj.pos;
-            if (btree_) btree_->iterator_map_.register_iterator(*this);
-
+            if (btree_)
+                btree_->iterator_map_.register_iterator(*this);
         }
 
         btree_iterator_base & operator = (const btree_iterator_base & obj)
@@ -91,13 +91,14 @@ namespace btree
             STXXL_VERBOSE3("btree_iterator_base copy from" << (&obj) << " to " << this);
             if (&obj != this)
             {
-                if (btree_) btree_->iterator_map_.unregister_iterator(*this);
+                if (btree_)
+                    btree_->iterator_map_.unregister_iterator(*this);
 
                 btree_ = obj.btree_;
                 bid = obj.bid;
                 pos = obj.pos;
-                if (btree_) btree_->iterator_map_.register_iterator(*this);
-
+                if (btree_)
+                    btree_->iterator_map_.register_iterator(*this);
             }
             return *this;
         }
@@ -155,8 +156,8 @@ namespace btree
         virtual ~btree_iterator_base()
         {
             STXXL_VERBOSE3("btree_iterator_base deconst " << this);
-            if (btree_) btree_->iterator_map_.unregister_iterator(*this);
-
+            if (btree_)
+                btree_->iterator_map_.unregister_iterator(*this);
         }
     };
 

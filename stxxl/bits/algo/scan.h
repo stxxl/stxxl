@@ -145,7 +145,8 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
     while (_begin.block_offset())    //  go to the beginning of the block
     //  of the external vector
     {
-        if (_begin == _end) return;
+        if (_begin == _end)
+            return;
 
         *_begin = _generator();
         ++_begin;
@@ -160,7 +161,8 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
 
     while (_end != _begin)
     {
-        if (_begin.block_offset() == 0) _begin.touch();
+        if (_begin.block_offset() == 0)
+            _begin.touch();
 
         *outstream  = _generator();
         ++_begin;
@@ -210,7 +212,6 @@ _ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityCompara
         in >> tmp;
         if (tmp == _value)
             return _cur;
-
     }
 
     return _cur;

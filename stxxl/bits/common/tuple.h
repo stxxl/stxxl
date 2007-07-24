@@ -37,7 +37,7 @@ struct tuple_base
     template <int I>
     struct item_type
     {/*
-      typedef typename SWITCH<I, CASE<1,first_type,
+        typedef typename SWITCH<I, CASE<1,first_type,
                                 CASE<2,second_type,
                                 CASE<3,third_type,
                                 CASE<4,fourth_type,
@@ -71,7 +71,7 @@ struct tuple
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I,  CASE < 1, first_type,
+        typedef typename SWITCH < I, CASE < 1, first_type,
         CASE < 2, second_type,
         CASE < 3, third_type,
         CASE < 4, fourth_type,
@@ -141,7 +141,7 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I,  CASE < 1, first_type,
+        typedef typename SWITCH < I, CASE < 1, first_type,
         CASE < 2, second_type,
         CASE<DEFAULT, void >
         > > > ::result result;
@@ -174,7 +174,7 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I,  CASE < 1, first_type,
+        typedef typename SWITCH < I, CASE < 1, first_type,
         CASE < 2, second_type,
         CASE < 3, second_type,
         CASE<DEFAULT, void >
@@ -213,7 +213,7 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I,  CASE < 1, first_type,
+        typedef typename SWITCH < I, CASE < 1, first_type,
         CASE < 2, second_type,
         CASE < 3, third_type,
         CASE < 4, fourth_type,
@@ -259,7 +259,7 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I,  CASE < 1, first_type,
+        typedef typename SWITCH < I, CASE < 1, first_type,
         CASE < 2, second_type,
         CASE < 3, third_type,
         CASE < 4, fourth_type,

@@ -42,7 +42,8 @@ int main(int argc, char * argv [])
     btree_type BTree1(node_cache_size, leaf_cache_size);
 
     unsigned nins = atoi(argv[1]);
-    if (nins < 100) nins = 100;
+    if (nins < 100)
+        nins = 100;
 
 
     stxxl::random_number32 rnd;

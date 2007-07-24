@@ -1,4 +1,4 @@
-/** 
+/**
  * @file settings.h
  * @brief Provides a static class to store runtime tuning parameters.
  */
@@ -14,7 +14,7 @@ template<typename must_be_int = int>
 class settings
 {
 public:
-	static bool native_merge;
+    static bool native_merge;
 };
 
 template<typename must_be_int>

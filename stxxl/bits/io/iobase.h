@@ -324,8 +324,8 @@ public:
     //! \brief Rises an exception if there were error with the I/O
     void check_errors() throw (stxxl::io_error)
     {
-        if (error.get()) throw * (error.get());
-
+        if (error.get())
+            throw * (error.get());
     }
 
 private:
@@ -567,7 +567,6 @@ int wait_any (request_ptr req_array[], int count)
         req_array[i]->delete_waiter (&sw);
         if (index < 0 && req_array[i]->poll ())
             index = i;
-
     }
 
     END_COUNT_WAIT_TIME
@@ -612,7 +611,6 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
         (request_ptr(*cur))->delete_waiter (&sw);
         if (result == reqs_end && (request_ptr(*cur))->poll ())
             result = cur;
-
     }
 
     END_COUNT_WAIT_TIME
@@ -694,7 +692,6 @@ public:
         for (std::map < DISKID, disk_queue * > ::iterator i =
                  queues.begin (); i != queues.end (); i++)
             delete (*i).second;
-
     };
     static disk_queues * get_instance ()
     {
@@ -714,7 +711,6 @@ public:
         for (std::map < DISKID, disk_queue * > ::iterator i =
                  queues.begin (); i != queues.end (); i++)
             i->second->set_priority_op (op);
-
     };
 private:
     static disk_queues * instance;

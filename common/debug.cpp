@@ -23,15 +23,15 @@ void debugmon::block_allocated(char * ptr, char * end, size_t size)
     mutex1.lock();
  #endif
 // checks are here
-STXXL_VERBOSE1("debugmon: block " << long (ptr) << " allocated");
-assert(tags.find(ptr) == tags.end());                 // not allocated
-tag t;
-t.ongoing = false;
-t.end = end;
-t.size = size;
-tags[ptr] = t;
+    STXXL_VERBOSE1("debugmon: block " << long (ptr) << " allocated");
+    assert(tags.find(ptr) == tags.end());             // not allocated
+    tag t;
+    t.ongoing = false;
+    t.end = end;
+    t.size = size;
+    tags[ptr] = t;
  #ifndef STXXL_BOOST_THREADS
-mutex1.unlock();
+    mutex1.unlock();
  #endif
 }
 void debugmon::block_deallocated(char * ptr)
@@ -81,7 +81,7 @@ void debugmon::io_started(char * ptr)
     //assert(t.ongoing == false); // not ongoing
     if (t.ongoing == true)
         STXXL_ERRMSG("debugmon: I/O on block " << long (ptr) << " started, but block is already busy");
-        t.ongoing = true;
+    t.ongoing = true;
 
     tags[ptr] = t;
 
@@ -103,7 +103,7 @@ void debugmon::io_finished(char * ptr)
     //assert(t.ongoing == true); // ongoing
     if (t.ongoing == false)
         STXXL_ERRMSG("debugmon: I/O on block " << long (ptr) << " finished, but block was not busy");
-        t.ongoing = false;
+    t.ongoing = false;
 
     tags[ptr] = t;
 

@@ -33,7 +33,8 @@ public:
 
     value_type & operator * ()
     {
-        if (it.block_offset() == 0 ) it.touch();
+        if (it.block_offset() == 0 )
+            it.touch();
         // tells the vector that the block was modified
         return **outstream;
     }
@@ -63,8 +64,8 @@ public:
 
     virtual ~write_vector()
     {
-        if (outstream) flush();
-
+        if (outstream)
+            flush();
     }
 };
 

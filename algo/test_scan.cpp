@@ -35,7 +35,7 @@ template <typename type>
 struct fill_value
 {
     type val;
-    fill_value(const type & v_) : val(v_) { }
+    fill_value(const type &v_) : val(v_) { }
 
     type operator ()  ()
     {
@@ -64,31 +64,34 @@ int main()
     STXXL_MSG("check");
     for (i = 0; i < v.size(); ++i)
     {
-        if (v[i] != int64(i * i) ) STXXL_MSG("Error at position " << i);
-            }
+        if (v[i] != int64(i * i) )
+            STXXL_MSG("Error at position " << i);
+    }
 
-            STXXL_MSG("Pos of value    1023: " << (stxxl::find(v.begin(), v.end(), 1023, 4) - v.begin()));
-            STXXL_MSG("Pos of value 1048576: " << (stxxl::find(v.begin(), v.end(), 1024 * 1024, 4) - v.begin()));
-            STXXL_MSG("Pos of value    1024: " << (stxxl::find(v.begin(), v.end(), 32 * 32, 4) - v.begin()));
+    STXXL_MSG("Pos of value    1023: " << (stxxl::find(v.begin(), v.end(), 1023, 4) - v.begin()));
+    STXXL_MSG("Pos of value 1048576: " << (stxxl::find(v.begin(), v.end(), 1024 * 1024, 4) - v.begin()));
+    STXXL_MSG("Pos of value    1024: " << (stxxl::find(v.begin(), v.end(), 32 * 32, 4) - v.begin()));
 
-            STXXL_MSG("generate ...");
-            b = stxxl_timestamp();
+    STXXL_MSG("generate ...");
+    b = stxxl_timestamp();
 
-        stxxl::generate(v.begin() + 1, v.end() - 1, fill_value<int64>(555), 4);
-        e = stxxl_timestamp();
-        STXXL_MSG("generate: " << (e - b));
-
-
-        STXXL_MSG("check");
-        if (v[0] != 0) STXXL_MSG("Error at position " << i);
-            if (v[v.size() - 1] != int64((v.size() - 1) * (v.size() - 1)) ) STXXL_MSG("Error at position " << i);
-
-                for (i = 1; i < v.size() - 1; ++i)
-                {
-                    if (v[i] != 555 ) STXXL_MSG("Error at position " << i);
-                        }
+    stxxl::generate(v.begin() + 1, v.end() - 1, fill_value<int64>(555), 4);
+    e = stxxl_timestamp();
+    STXXL_MSG("generate: " << (e - b));
 
 
-                        return 0;
+    STXXL_MSG("check");
+    if (v[0] != 0)
+        STXXL_MSG("Error at position " << i);
+    if (v[v.size() - 1] != int64((v.size() - 1) * (v.size() - 1)) )
+        STXXL_MSG("Error at position " << i);
 
-                }
+    for (i = 1; i < v.size() - 1; ++i)
+    {
+        if (v[i] != 555 )
+            STXXL_MSG("Error at position " << i);
+    }
+
+
+    return 0;
+}

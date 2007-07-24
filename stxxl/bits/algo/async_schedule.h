@@ -163,7 +163,8 @@ void compute_prefetch_schedule(
     const int_type L = input.size();
     if (L <= D)
     {
-        for (int_type i = 0; i < L; ++i) out_first[i] = i;
+        for (int_type i = 0; i < L; ++i)
+            out_first[i] = i;
 
         return;
     }
@@ -297,7 +298,8 @@ void compute_prefetch_schedule(
     STXXL_VERBOSE1("compute_prefetch_schedule: sequence length=" << L << " disks=" << D);
     if (L <= D)
     {
-        for (int_type i = 0; i < L; ++i) out_first[i] = i;
+        for (int_type i = 0; i < L; ++i)
+            out_first[i] = i;
 
         return;
     }

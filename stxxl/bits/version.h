@@ -6,7 +6,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-const char* get_version_string();
+const char * get_version_string();
 
 __STXXL_END_NAMESPACE
 
