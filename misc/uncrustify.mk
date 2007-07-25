@@ -15,6 +15,9 @@ uncrustify-diff: $(FILES:=.diff)
 
 uncrustify-apply: $(FILES:=.unc-apply)
 
+viewdiff:
+	view $(wildcard $(foreach d, $(SUBDIRS), $d/*.diff))
+
 clean:
 	$(RM) $(FILES:=.uncrustify) $(FILES:=.uncrustifyT) $(FILES:=.diff)
 
@@ -46,3 +49,5 @@ update-uncrustify-cfg:
 	cmp -s $(UNCRUSTIFY_CFG).tmp $(UNCRUSTIFY_CFG) || cp -p $(UNCRUSTIFY_CFG) $(UNCRUSTIFY_CFG).old
 	cmp -s $(UNCRUSTIFY_CFG).tmp $(UNCRUSTIFY_CFG) || cp $(UNCRUSTIFY_CFG).tmp $(UNCRUSTIFY_CFG)
 	$(RM) $(UNCRUSTIFY_CFG).tmp
+
+.PHONY: all clean viewdiff uncrustify-test uncrustify-diff uncrustify-apply update-uncrustify-cfg
