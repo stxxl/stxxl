@@ -73,7 +73,7 @@ public:
         stxxl_nassert (pthread_cond_signal (&cond), resource_error);
 #endif
         return res;
-    };
+    }
     // function decrements the semaphore and blocks if the semaphore is
     // <= 0 until another thread signals a change
     int operator -- (int)
@@ -94,7 +94,7 @@ public:
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
 #endif
         return res;
-    };
+    }
     // function does NOT block but simply decrements the semaphore
     // should not be used instead of down -- only for programs where
     // multiple threads must up on a semaphore before another thread
@@ -111,7 +111,7 @@ public:
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
         return res;
 #endif
-    };
+    }
     // function returns the value of the semaphore at the time the
     // critical section is accessed.  obviously the value is not guarenteed
     // after the function unlocks the critical section.

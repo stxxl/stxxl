@@ -62,7 +62,7 @@ class DiskGeometry
         inline bool operator  ()  (const Zone & a, const Zone & b) const
         {
             return a.first_sector < b.first_sector;
-        };
+        }
     };
 
 protected:
@@ -141,7 +141,7 @@ public:
     inline const char * io_type ()
     {
         return "simdisk";
-    };
+    }
 private:
     // Following methods are declared but not implemented
     // intentionnaly to forbid their usage

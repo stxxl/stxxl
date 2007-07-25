@@ -89,11 +89,11 @@ struct cmp : public std::less<key_type>
     static key_type min_value()
     {
         return (std::numeric_limits < key_type > ::min)();
-    };
+    }
     static key_type max_value()
     {
         return (std::numeric_limits < key_type > ::max)();
-    };
+    }
 };
 
 

@@ -18,7 +18,7 @@ struct with_key : public structure_has_key
     key_type key()
     {
         return _key;
-    };
+    }
 };
 
 struct without_key

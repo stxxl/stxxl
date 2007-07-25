@@ -83,7 +83,7 @@ int simulate_async_write(
             disk_queues[disk].pop();
             disk_busy[disk] = true;
         }
-    };
+    }
 
     assert(m == m_init );
     assert(i == -1);

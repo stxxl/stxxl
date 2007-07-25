@@ -47,11 +47,11 @@ public:
     void lock ()
     {
         stxxl_nassert(pthread_mutex_lock (&_mutex), resource_error);
-    };
+    }
     void unlock ()
     {
         stxxl_nassert(pthread_mutex_unlock (&_mutex), resource_error);
-    };
+    }
 };
 
 __STXXL_END_NAMESPACE

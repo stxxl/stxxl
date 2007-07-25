@@ -18,7 +18,7 @@ struct my_type
     key_type key() const
     {
         return _key;
-    };
+    }
 
     my_type() { };
     my_type(key_type __key) : _key(__key) { };
@@ -26,11 +26,11 @@ struct my_type
     static my_type min_value()
     {
         return my_type(0);
-    };
+    }
     static my_type max_value()
     {
         return my_type(0xffffffff);
-    };
+    }
 
     ~my_type() { }
 };
@@ -56,11 +56,11 @@ struct cmp : public std::less<my_type>
     my_type min_value() const
     {
         return my_type(0);
-    };
+    }
     my_type max_value() const
     {
         return my_type(0xffffffff);
-    };
+    }
 };
 
 

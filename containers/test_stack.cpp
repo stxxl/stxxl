@@ -42,7 +42,7 @@ int main(int argc, char * argv[])
             assert(my_stack.top() == i);
             my_stack.pop();
             assert(my_stack.size() == i);
-        };
+        }
 
         for (i = 0; i < test_size; i++)
         {
@@ -61,7 +61,7 @@ int main(int argc, char * argv[])
             assert(my_stack.top() == i);
             my_stack.pop();
             assert(my_stack.size() == i);
-        };
+        }
 
         std::stack<int> int_stack;
 
@@ -80,7 +80,7 @@ int main(int argc, char * argv[])
             assert(my_stack1.top() == i);
             my_stack1.pop();
             assert(my_stack1.size() == i);
-        };
+        }
         STXXL_MSG("Test 1 passed.");
     }
     {
@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
             assert(my_stack.top() == i);
             my_stack.pop();
             assert(my_stack.size() == i);
-        };
+        }
 
         for (i = 0; i < test_size; i++)
         {
@@ -123,7 +123,7 @@ int main(int argc, char * argv[])
             assert(my_stack.top() == i);
             my_stack.pop();
             assert(my_stack.size() == i);
-        };
+        }
 
 
         STXXL_MSG("Test 2 passed.");

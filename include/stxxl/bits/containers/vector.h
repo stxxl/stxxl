@@ -430,7 +430,7 @@ public:
 
     std::ostream & operator<< (std::ostream & o) const
     {
-        o << "vectorpointer: "  << ((void *)p_vector) << " offset: " << offset;
+        o << "vectorpointer: " << ((void *)p_vector) << " offset: " << offset;
         return o;
     }
 };
@@ -832,7 +832,7 @@ public:
                 _last_page[page_no] = on_disk;
                 _page_status[page_no] = 0;
             }
-        };
+        }
     }
     ~vector()
     {
@@ -955,7 +955,7 @@ private:
             pager.hit(last_page);
             return _cache[last_page * page_size + page_offset / block_type::size][page_offset % block_type::size];
         }
-    };
+    }
     void touch(size_type offset) const
     {
         // fails if offset is too large, out of bound access
@@ -1018,7 +1018,7 @@ private:
             pager.hit(last_page);
             return _cache[last_page * page_size + page_offset / block_type::size][page_offset % block_type::size];
         }
-    };
+    }
 };
 
 template <

@@ -118,7 +118,7 @@ public:
                 *(consume_seq_begin + prefetch_seq[i]),
                 set_switch_handler(*(completed + prefetch_seq[i])) );
             pref_buffer[prefetch_seq[i]] = i;
-        };
+        }
     }
     //! \brief Pulls next unconsumed block from the consumption sequence
     //! \return Pointer to the already prefetched block from the internal buffer pool

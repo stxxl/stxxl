@@ -29,7 +29,7 @@ struct random_number32
     inline value_type operator ()  () const
     {
         return (ran32State = 1664525 * ran32State + 1013904223);
-    };
+    }
 };
 
 //! \brief Fast uniform [0,1] pseudo-random generator
@@ -76,7 +76,7 @@ struct random_number
     inline value_type operator ()  (int N) const
     {
         return ((value_type)(uniform() * (N)));
-    };
+    }
 };
 
 struct random_number64

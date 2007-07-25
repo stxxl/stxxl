@@ -35,15 +35,15 @@ public:
     void rdlock ()
     {
         stxxl_nassert (pthread_rwlock_rdlock (&rwlock));
-    };
+    }
     void wrlock ()
     {
         stxxl_nassert (pthread_rwlock_rdlock (&wrlock));
-    };
+    }
     void unlock ()
     {
         stxxl_nassert (pthread_rwlock_unlock (&mutex));
-    };
+    }
 };
 
 __STXXL_END_NAMESPACE

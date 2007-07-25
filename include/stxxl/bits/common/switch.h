@@ -73,7 +73,7 @@ public:
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
         stxxl_nassert (pthread_cond_signal (&cond), resource_error);
 #endif
-    };
+    }
     void off ()
     {
 #ifdef STXXL_BOOST_THREADS
@@ -87,7 +87,7 @@ public:
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
         stxxl_nassert (pthread_cond_signal (&cond), resource_error);
 #endif
-    };
+    }
     void wait_for_on ()
     {
 #ifdef STXXL_BOOST_THREADS
@@ -103,7 +103,7 @@ public:
 
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
 #endif
-    };
+    }
     void wait_for_off ()
     {
 #ifdef STXXL_BOOST_THREADS
@@ -119,7 +119,7 @@ public:
 
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
 #endif
-    };
+    }
     bool is_on ()
     {
 #ifdef STXXL_BOOST_THREADS
@@ -132,7 +132,7 @@ public:
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
         return res;
 #endif
-    };
+    }
 };
 
 __STXXL_END_NAMESPACE

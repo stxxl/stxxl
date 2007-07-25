@@ -115,7 +115,7 @@ class request_ptr;
 struct default_completion_handler
 {
     //! \brief An operator that does nothing
-    void operator()  (request *) { };
+    void operator()  (request *) { }
 };
 
 //! \brief Defines interface of file
@@ -179,14 +179,14 @@ public:
     int get_disk_number ()
     {
         return id;
-    };
+    }
     //! \brief Returns file's identifier
     //! \remark might be used as disk's id in case disk to file mapping
     //! \return integer file identifier, passed as constructor parameter
     int get_id()
     {
         return id;
-    };
+    }
 
     //! \brief Locks file for reading and writing
     virtual void lock() { }
@@ -285,7 +285,7 @@ public:
     virtual const char * io_type ()
     {
         return "none";
-    };
+    }
     virtual ~request()
     {
         STXXL_VERBOSE3("request " << unsigned (this) << ": deletion, cnt: " << ref_cnt);
@@ -517,7 +517,7 @@ bool poll_any (request_ptr req_array[], int count, int &index)
             index = i;
             return true;
         }
-    };
+    }
     return false;
 }
 
@@ -530,7 +530,7 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
             return reqs_begin;
 
         ++reqs_begin;
-    };
+    }
     return reqs_end;
 }
 
@@ -654,7 +654,7 @@ public:
     void set_priority_op (priority_op op)
     {
         _priority_op = op;
-    };
+    }
     void add_readreq (request_ptr & req);
     void add_writereq (request_ptr & req);
     ~disk_queue ();
@@ -676,7 +676,7 @@ public:
             queues[disk] = new disk_queue ();
         }
         queues[disk]->add_readreq (req);
-    };
+    }
     void add_writereq (request_ptr & req, DISKID disk)
     {
         if (queues.find (disk) == queues.end ())
@@ -685,7 +685,7 @@ public:
             queues[disk] = new disk_queue ();
         }
         queues[disk]->add_writereq (req);
-    };
+    }
     ~disk_queues ()
     {
         // deallocate all queues
@@ -700,7 +700,7 @@ public:
 
 
         return instance;
-    };
+    }
     //! \brief Changes requests priorities
     //! \param op one of:
     //!                 - READ, read requests are served before write requests within a disk queue
@@ -711,7 +711,7 @@ public:
         for (std::map < DISKID, disk_queue * > ::iterator i =
                  queues.begin (); i != queues.end (); i++)
             i->second->set_priority_op (op);
-    };
+    }
 private:
     static disk_queues * instance;
 };

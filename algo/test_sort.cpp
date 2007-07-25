@@ -78,7 +78,7 @@ struct zero
     unsigned operator ()  ()
     {
         return 0;
-    };
+    }
 };
 
 template <typename alloc_strategy_type, unsigned block_size>
@@ -143,7 +143,7 @@ void test_all_strategies(
     default:
         STXXL_ERRMSG("Unknown allocation strategy: " << strategy << ", aborting");
         abort();
-    };
+    }
 }
 
 int main(int argc, char * argv[])
@@ -205,7 +205,7 @@ int main(int argc, char * argv[])
     default:
         STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");
         abort();
-    };
+    }
 
     return 0;
 }

@@ -69,7 +69,7 @@ public:
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
         stxxl_nassert (pthread_cond_broadcast (&cond), resource_error);
 #endif
-    };
+    }
     void wait_for (int needed_state)
     {
 #ifdef STXXL_BOOST_THREADS
@@ -85,7 +85,7 @@ public:
 
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
 #endif
-    };
+    }
     int operator ()  ()
     {
 #ifdef STXXL_BOOST_THREADS
@@ -98,7 +98,7 @@ public:
         stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
         return res;
 #endif
-    };
+    }
 };
 
 __STXXL_END_NAMESPACE

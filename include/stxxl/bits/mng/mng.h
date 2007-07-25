@@ -300,7 +300,7 @@ public:
                    bid.offset,
                    raw_size,
                    on_cmpl);
-    };
+    }
 
     /*!     \brief Reads block from the disk(s)
      \param bid block identifier, points the file(disk) and position
@@ -311,7 +311,7 @@ public:
                       completion_handler on_cmpl = default_completion_handler())
     {
         return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
-    };
+    }
 
     static void *operator new[] (size_t bytes)
     {
@@ -399,11 +399,11 @@ public:
     iterator begin ()
     {
         return array;
-    };
+    }
     iterator end ()
     {
         return array + _size;
-    };
+    }
 
     BIDArray (unsigned_type size) : _size (size)
     {
@@ -412,11 +412,11 @@ public:
     unsigned_type size ()
     {
         return _size;
-    };
+    }
     reference operator [](int_type i)
     {
         return array[i];
-    };
+    }
     void resize (unsigned_type newsize)
     {
         if (array)
@@ -436,7 +436,7 @@ public:
             array = new BID < BLK_SIZE >[newsize];
             _size = newsize;
         }
-    };
+    }
     ~BIDArray ()
     {
         if (array)
@@ -462,7 +462,7 @@ class DiskAllocator
         bool operator      () (const stxxl::int64 & off1, const stxxl::int64 & off2)
         {
             return off1 < off2;
-        };
+        }
     };
 
     DiskAllocator ()
@@ -813,20 +813,20 @@ public:
     inline const std::string & disk_path (int disk)
     {
         return disks_props[disk].path;
-    };
+    }
     //! \brief Returns disk size
     //! \param disk disk's identifier
     //! \return disk size in bytes
     inline stxxl::int64 disk_size (int disk)
     {
         return disks_props[disk].size;
-    };
+    }
     //! \brief Returns name of I/O implementation of particular disk
     //! \param disk disk's identifier
     inline const std::string & disk_io_impl (int disk)
     {
         return disks_props[disk].io_impl;
-    };
+    }
 
     //! \brief Returns instance of config
     //! \return pointer to the instance of config
@@ -888,7 +888,7 @@ public:
         throw std::runtime_error(msg.str());
 
         return NULL;
-    };
+    }
 
     virtual ~FileCreator() { }
 };
@@ -911,7 +911,7 @@ struct striping
     int operator     () (int i) const
     {
         return begin + i % diff;
-    };
+    }
     static const char * name()
     {
         return "striping";
@@ -1008,7 +1008,7 @@ struct single_disk
     int operator() (int /*i*/) const
     {
         return disk;
-    };
+    }
     static const char * name()
     {
         return "single disk";
@@ -1258,7 +1258,7 @@ void block_manager::delete_block (const BID < BLK_SIZE > &bid)
     // do not uncomment it
     //assert(bid.storage->get_disk_number () < config::get_instance ()->disks_number ());
     if (bid.storage->get_disk_number () == -1)
-        return;                                            // self managed disk
+        return; // self managed disk
     assert(bid.storage->get_disk_number () >= 0 );
     disk_allocators[bid.storage->get_disk_number ()]->delete_block (bid);
 }

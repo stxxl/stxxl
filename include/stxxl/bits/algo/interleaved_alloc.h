@@ -48,7 +48,7 @@ struct interleaved_FR : public interleaved_striping
     int operator ()  (int_type /*i*/) const
     {
         return begindisk + rnd(diff);
-    };
+    }
 };
 
 struct interleaved_SR : public interleaved_striping
@@ -68,7 +68,7 @@ struct interleaved_SR : public interleaved_striping
     int operator ()  (int_type i) const
     {
         return begindisk + (i / nruns + offsets[i % nruns]) % diff;
-    };
+    }
 };
 
 
@@ -93,12 +93,12 @@ struct interleaved_RC : public interleaved_striping
             std::random_shuffle (perms[i].begin (),
                                  perms[i].end (), rnd);
         }
-    };
+    }
 
     int operator ()  (int_type i) const
     {
         return begindisk + perms[i % nruns][(i / nruns) % diff];
-    };
+    }
 };
 
 template <typename scheme>

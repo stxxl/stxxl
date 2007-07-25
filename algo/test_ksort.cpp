@@ -32,7 +32,7 @@ struct my_type
     key_type key() const
     {
         return _key;
-    };
+    }
 
     my_type() { }
     my_type(key_type __key) : _key(__key) { }
@@ -40,11 +40,11 @@ struct my_type
     static my_type min_value()
     {
         return my_type(0);
-    };
+    }
     static my_type max_value()
     {
         return my_type(0xffffffff);
-    };
+    }
 };
 
 bool operator < (const my_type & a, const my_type & b)
@@ -67,7 +67,7 @@ struct zero
     unsigned operator ()  ()
     {
         return 0;
-    };
+    }
 };
 
 template <typename alloc_strategy_type, unsigned block_size>
@@ -133,7 +133,7 @@ void test_all_strategies(
     default:
         STXXL_ERRMSG("Unknown allocation strategy: " << strategy << ", aborting");
         abort();
-    };
+    }
 }
 
 int main(int argc, char * argv[])
@@ -195,7 +195,7 @@ int main(int argc, char * argv[])
     default:
         STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");
         abort();
-    };
+    }
 
     return 0;
 }

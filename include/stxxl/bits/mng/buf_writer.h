@@ -55,7 +55,7 @@ protected:
         bool operator ()  (const batch_entry & a, const batch_entry & b) const
         {
             return (a.offset > b.offset);
-        };
+        }
     };
 
     typedef std::priority_queue < batch_entry, std::vector < batch_entry >, batch_entry_cmp > batch_type;

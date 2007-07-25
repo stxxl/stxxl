@@ -18,7 +18,7 @@ struct counter
         int old_val = value;
         value++;
         return old_val;
-    };
+    }
 };
 
 template <class my_vec_type>

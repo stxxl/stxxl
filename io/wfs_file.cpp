@@ -61,7 +61,7 @@ bool wfs_request_base::add_waiter (onoff_switch * sw)
  #endif
 
     return false;
-};
+}
 
 void wfs_request_base::delete_waiter (onoff_switch * sw)
 {
@@ -220,7 +220,7 @@ stxxl::int64 wfs_file_base::size ()
         stxxl_win_lasterror_exit("GetFileSizeEx ", io_error)
 
         return result.QuadPart;
-};
+}
 void wfs_file_base::set_size (stxxl::int64 newsize)
 {
     stxxl::int64 cur_size = size();
@@ -235,7 +235,7 @@ void wfs_file_base::set_size (stxxl::int64 newsize)
         if (!SetEndOfFile(file_des))
             stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
                                      " newsize=" << newsize << " ", io_error);
-};
+}
 
 
 

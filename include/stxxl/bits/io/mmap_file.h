@@ -69,7 +69,7 @@ public:
     inline const char * io_type()
     {
         return "mmap";
-    };
+    }
 private:
     // Following methods are declared but not implemented
     // intentionnaly to forbid their usage

@@ -18,7 +18,7 @@ struct my_type
     key_type key() const
     {
         return _key;
-    };
+    }
 
     my_type() { };
     my_type(key_type __key) : _key(__key) { };
@@ -26,11 +26,11 @@ struct my_type
     static my_type min_value()
     {
         return my_type(0);
-    };
+    }
     static my_type max_value()
     {
         return my_type(0xffffffff);
-    };
+    }
 };
 
 bool operator < (const my_type & a, const my_type & b)

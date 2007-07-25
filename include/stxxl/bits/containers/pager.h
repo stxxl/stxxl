@@ -40,12 +40,12 @@ public:
     int_type kick()
     {
         return rnd(npages_);
-    };
+    }
     void hit(int_type ipage)
     {
         assert(ipage < int_type(npages_));
         assert(ipage >= 0);
-    };
+    }
 };
 
 //! \brief Pager with \b LRU replacement strategy

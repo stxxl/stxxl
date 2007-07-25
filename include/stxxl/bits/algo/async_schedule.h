@@ -145,7 +145,7 @@ void simulate_async_write(
             disk_queues[disk].pop();
             disk_busy[disk] = true;
         }
-    };
+    }
 
     delete [] disk_busy;
     delete [] disk_queues;
@@ -278,7 +278,7 @@ void simulate_async_write(
             disk_queues[disk].pop();
             disk_busy.insert(disk);
         }
-    };
+    }
 
     //delete [] disk_busy;
     //delete [] disk_queues;

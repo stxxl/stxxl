@@ -76,12 +76,12 @@ public:
     inline bool empty () const
     {
         return (pos >= block_type::size);
-    };
+    }
     inline void operator ++ (int);
     inline void make_inf ()
     {
         pos = block_type::size;
-    };
+    }
 };
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
