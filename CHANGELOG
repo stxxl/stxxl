@@ -12,7 +12,7 @@ Repository version (see the web page for the last modification date)
   - merged configuration files, simplified option tuning
   - support object files and binaries with and without mcstl support existing in parallel
   - the library build creates stxxl.mk which can be included in an applications makefile to set the correct compiler/linker switches for stxxl
-  - similarily mcstxxl.mk is created for a stxxl compiled with mcstl support
+  - similarly mcstxxl.mk is created for a stxxl compiled with mcstl support
   - add dependency tracking and improve parallelism during build
 * compiler support matrix:
   compiler      |  stxxl    stxxl + mcstl
@@ -42,7 +42,7 @@ Repository version (see the web page for the last modification date)
 ------------------------------------------
 Version 1.0e (4 June 2007)
 
-* Bugfix: for objects with the deconstructors, memory block were allocated in a non-aligned fashion
+* Bugfix: for objects with the destructors, memory block were allocated in a non-aligned fashion
 * Internal CPU efficiency of Stxxl priority queue is improved (loser trees in external mergers are integrated)
 * Fixed bug with conversion of const/non-const iterators, implemented comparison and difference operations on const/non-const iterators (for vector, map, and deque) 
 * Added operator[] to vector and deque iterators
