@@ -117,34 +117,45 @@ inline void UNUSED(const U &)
  #define STXXL_DEBUG_ON 1
 #endif
 
-#if STXXL_DEBUG_ON
-
 inline std::string perror_string()
 {
     return std::string(strerror(errno));
 }
 
+template<typename E>
+inline void stxxl_util_function_error(const char *func_name)
+{
+#if STXXL_DEBUG_ON
+    std::ostringstream str_;
+    str_ << "Error in function " << func_name << " " << perror_string();
+    throw E(str_.str());
+#else
+    UNUSED(func_name);
+#endif
+}
+
  #define stxxl_function_error(exception_type) \
-    { \
-        std::ostringstream str_; \
-        str_ << "Error in function " << \
-        STXXL_PRETTY_FUNCTION_NAME << \
-        " " << perror_string(); \
-        throw exception_type(str_.str()); \
+    stxxl::stxxl_util_function_error<exception_type>(STXXL_PRETTY_FUNCTION_NAME)
+
+template<typename E>
+inline void stxxl_util_nassert(int cond, const char *expr = "", const char *func_name = "")
+{
+    if (cond) {
+#if STXXL_DEBUG_ON
+        std::ostringstream str_;
+        str_ << "Error in function: " << func_name << " " << expr;
+        throw E(str_.str());
+#else
+        UNUSED(expr);
+        UNUSED(func_name);
+#endif
     }
+}
 
  #define stxxl_nassert(expr, exception_type) \
-    { \
-        int ass_res = expr; \
-        if (ass_res) \
-        { \
-            std::ostringstream str_; \
-            str_ << "Error in function: " << \
-            STXXL_PRETTY_FUNCTION_NAME << " " \
-                 << __STXXL_STRING(expr); \
-            throw exception_type(str_.str()); \
-        } \
-    }
+    stxxl::stxxl_util_nassert<exception_type>(expr, __STXXL_STRING(expr), STXXL_PRETTY_FUNCTION_NAME)
+
+#if STXXL_DEBUG_ON
 
  #define stxxl_ifcheck(expr, exception_type) \
     if ((expr) < 0) \
@@ -203,10 +214,6 @@ inline std::string perror_string()
  #endif
 
 #else
-
- #define stxxl_function_error(exception_type)
-
- #define stxxl_nassert(expr, exception_type) expr
 
  #define stxxl_ifcheck(expr, exception_type) expr; if (0) { }
 

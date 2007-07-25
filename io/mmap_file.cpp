@@ -77,7 +77,7 @@ void mmap_request::serve()
         else
         if (mem == 0)
         {
-            stxxl_function_error(io_error)
+            stxxl_function_error(io_error);
         }
         else
         {
