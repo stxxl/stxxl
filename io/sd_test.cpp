@@ -59,7 +59,7 @@ int main()
         random_number<> rnd;
         pos = rnd(disk_size / block_size) * block_size;
         double begin = stxxl_timestamp();
-        req = file1.awrite(buffer, pos, block_size,stxxl::default_completion_handler());
+        req = file1.awrite(buffer, pos, block_size, stxxl::default_completion_handler());
         req->wait();
         double diff = stxxl_timestamp() - begin;
 
@@ -67,7 +67,7 @@ int main()
         sum2 += diff * diff;
 
         STXXL_MSG("Pos: " << pos << " block_size:" << block_size << " time:" << (diff));
-    };
+    }
 
     sum = sum / double (times);
     sum2 = sum2 / double (times);

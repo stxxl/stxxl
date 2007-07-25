@@ -1,4 +1,3 @@
-
 #include "stxxl/bits/io/mmap_file.h"
 
 #ifdef BOOST_MSVC

@@ -81,9 +81,11 @@ public:
         alloc_counter(0),
         blocks2prefetch(blocks2prefetch_)
     {
-        if (w_pool_size < 2) w_pool_size = 2;
+        if (w_pool_size < 2)
+            w_pool_size = 2;
 
-        if (p_pool_size < 1) p_pool_size = 1;
+        if (p_pool_size < 1)
+            p_pool_size = 1;
 
         w_pool = new write_pool<block_type>(w_pool_size);
         front_block = back_block = w_pool->steal();
@@ -108,9 +110,11 @@ public:
         alloc_counter(0),
         blocks2prefetch(blocks2prefetch_)
     {
-        if (w_pool->size() < 2 ) w_pool->resize(2);
+        if (w_pool->size() < 2 )
+            w_pool->resize(2);
 
-        if (p_pool->size() < 2 ) p_pool->resize(1);
+        if (p_pool->size() < 2 )
+            p_pool->resize(1);
 
         front_block = back_block = w_pool->steal();
         back_element = back_block->elem - 1;
@@ -277,7 +281,6 @@ public:
 
         if (!bids.empty())
             bm->delete_blocks(bids.begin(), bids.end());
-
     }
 };
 

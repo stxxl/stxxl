@@ -165,7 +165,7 @@ int main(int argc, char * argv[])
 #ifdef BOOST_MSVC
  #ifdef RAW_ACCESS
         disks[i] = new wincall_file(disks_arr[i],
-                                    file::CREAT | file::RDWR  | file::DIRECT, i);
+                                    file::CREAT | file::RDWR | file::DIRECT, i);
  #else
         disks[i] = new wincall_file(disks_arr[i],
                                     file::CREAT | file::RDWR, i);
@@ -173,7 +173,7 @@ int main(int argc, char * argv[])
 #else
  #ifdef RAW_ACCESS
         disks[i] = new syscall_file(disks_arr[i],
-                                    file::CREAT | file::RDWR  | file::DIRECT, i);
+                                    file::CREAT | file::RDWR | file::DIRECT, i);
  #else
         disks[i] = new syscall_file(disks_arr[i],
                                     file::CREAT | file::RDWR, i);

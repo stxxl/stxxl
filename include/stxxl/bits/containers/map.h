@@ -170,7 +170,7 @@ public:
              range_sorted, node_fill_factor, leaf_fill_factor)
     { }
 
-    void swap(map  & obj) { std::swap(Impl, obj.Impl); }
+    void swap(map & obj) { std::swap(Impl, obj.Impl); }
     std::pair<iterator, bool> insert(const value_type &x)
     {
         return Impl.insert(x);

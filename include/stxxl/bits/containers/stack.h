@@ -54,8 +54,10 @@ public:
     typedef typename cfg::value_type value_type;
     typedef typename cfg::alloc_strategy alloc_strategy;
     typedef typename cfg::size_type size_type;
-    enum {  blocks_per_page = cfg::blocks_per_page,
-            block_size = cfg::block_size };
+    enum {
+        blocks_per_page = cfg::blocks_per_page,
+        block_size = cfg::block_size
+    };
 
     typedef typed_block<block_size, value_type> block_type;
     typedef BID<block_size> bid_type;
@@ -125,7 +127,6 @@ public:
         }
         for (i = 0; i < sz; ++i)
             this->push(tmp[i]);
-
     }
     virtual ~normal_stack()
     {
@@ -256,8 +257,10 @@ public:
     typedef typename cfg::value_type value_type;
     typedef typename cfg::alloc_strategy alloc_strategy;
     typedef typename cfg::size_type size_type;
-    enum {  blocks_per_page = cfg::blocks_per_page,
-            block_size = cfg::block_size,};
+    enum {
+        blocks_per_page = cfg::blocks_per_page,
+        block_size = cfg::block_size,
+    };
 
     typedef typed_block<block_size, value_type> block_type;
     typedef BID<block_size> bid_type;
@@ -331,15 +334,14 @@ public:
         }
         for (i = 0; i < sz; ++i)
             this->push(tmp[i]);
-
     }
     virtual ~grow_shrink_stack()
     {
         STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
         try
         {
-            if (requests[0].get()) wait_all(requests.begin(), blocks_per_page);
-
+            if (requests[0].get())
+                wait_all(requests.begin(), blocks_per_page);
         }
         catch (const io_error & ex)
         { }
@@ -379,7 +381,8 @@ public:
 
             for (int i = 0; i < blocks_per_page; ++i, ++cur_bid)
             {
-                if (requests[i].get()) requests[i]->wait();
+                if (requests[i].get())
+                    requests[i]->wait();
 
                 requests[i] = (cache_buffers + i)->write(*cur_bid);
             }
@@ -424,7 +427,6 @@ public:
                 typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page;
                 for (int i = blocks_per_page - 1; i >= 0; --i)
                     requests[i] = (overlap_buffers + i)->read(*(--cur_bid));
-
             }
 
             block_manager::get_instance()->delete_blocks(bids.end() - blocks_per_page, bids.end());
@@ -452,8 +454,10 @@ public:
     typedef typename cfg::value_type value_type;
     typedef typename cfg::alloc_strategy alloc_strategy;
     typedef typename cfg::size_type size_type;
-    enum {  blocks_per_page = cfg::blocks_per_page, // stack of this type has only one page
-            block_size = cfg::block_size,};
+    enum {
+        blocks_per_page = cfg::blocks_per_page,     // stack of this type has only one page
+        block_size = cfg::block_size,
+    };
 
     typedef typed_block<block_size, value_type> block_type;
     typedef BID<block_size> bid_type;
@@ -479,7 +483,7 @@ public:
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     grow_shrink_stack2(
         prefetch_pool < block_type > & p_pool_,
-        write_pool<block_type>    & w_pool_,
+        write_pool<block_type> & w_pool_,
         unsigned_type prefetch_aggressiveness = 0) :
         size_(0),
         cache_offset(0),
@@ -677,8 +681,10 @@ public:
     typedef typename cfg::value_type value_type;
     typedef typename cfg::alloc_strategy alloc_strategy;
     typedef typename cfg::size_type size_type;
-    enum {  blocks_per_page = cfg::blocks_per_page,
-            block_size = cfg::block_size };
+    enum {
+        blocks_per_page = cfg::blocks_per_page,
+        block_size = cfg::block_size
+    };
 
 
     typedef InternalStack int_stack_type;
@@ -774,7 +780,6 @@ public:
         }
         else
             ext_impl->push(val);
-
     }
     void pop()
     {
@@ -785,7 +790,6 @@ public:
 
         else
             ext_impl->pop();
-
     }
     virtual ~migrating_stack()
     {
@@ -796,7 +800,6 @@ public:
 
         else
             delete ext_impl;
-
     }
 };
 

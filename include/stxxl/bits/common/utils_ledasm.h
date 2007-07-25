@@ -120,7 +120,7 @@ stxxl_perror (const char * /*errmsg*/, int errcode)
  #define stxxl_function_error stxxl_error(STXXL_PRETTY_FUNCTION_NAME)
 
 
- #define stxxl_nassert(expr) { int ass_res = expr; if (ass_res) {  std::cerr << "Error in function: " << STXXL_PRETTY_FUNCTION_NAME << " ";  stxxl_perror(__STXXL_STRING(expr), ass_res); } }
+ #define stxxl_nassert(expr) { int ass_res = expr; if (ass_res) { std::cerr << "Error in function: " << STXXL_PRETTY_FUNCTION_NAME << " ";  stxxl_perror(__STXXL_STRING(expr), ass_res); } }
 
  #define stxxl_ifcheck(expr) if ((expr) < 0) { std::cerr << "Error in function " << STXXL_PRETTY_FUNCTION_NAME << " "; stxxl_error(__STXXL_STRING(expr)); }
  #define stxxl_ifcheck_win(expr) if ((expr) == 0) { std::cerr << "Error in function " << STXXL_PRETTY_FUNCTION_NAME << " "; stxxl_error(__STXXL_STRING(expr)); }
@@ -235,12 +235,12 @@ stxxl_timestamp ()
  #define START_COUNT_WAIT_TIME
  #define END_COUNT_WAIT_TIME
 inline void reset_io_wait_time()
-{ };
+{ }
 
 inline double io_wait_time()
 {
     return -1.0;
-};
+}
 
 #endif
 

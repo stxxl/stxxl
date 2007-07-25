@@ -200,99 +200,99 @@ void sim_disk_request::serve ()
                 memcpy(mem, buffer, bytes);
                 stxxl_check_ge_0(munmap((char *) mem, bytes), io_error);
             }
-                            }
+        }
 
-                            double delay =
-                                (static_cast <sim_disk_file * >(file_))->get_delay (offset, bytes);
-
-
-                        delay = delay - stxxl_timestamp() + op_start;
-
-                        assert( delay > 0.0 );
-
-                        int seconds_to_wait = static_cast < int >(floor (delay));
-                        if (seconds_to_wait)
-                            sleep (seconds_to_wait);
+        double delay =
+            (static_cast <sim_disk_file * >(file_))->get_delay (offset, bytes);
 
 
-                        usleep ((unsigned long) ((delay - seconds_to_wait) * 1000000.));
-                    }
-                catch (const io_error & ex)
-                {
-                    error_occured(ex.what());
-                }
+        delay = delay - stxxl_timestamp() + op_start;
 
-                if (type == READ)
-                {
+        assert( delay > 0.0 );
+
+        int seconds_to_wait = static_cast < int >(floor (delay));
+        if (seconds_to_wait)
+            sleep (seconds_to_wait);
+
+
+        usleep ((unsigned long) ((delay - seconds_to_wait) * 1000000.));
+    }
+    catch (const io_error & ex)
+    {
+        error_occured(ex.what());
+    }
+
+    if (type == READ)
+    {
  #ifdef STXXL_IO_STATS
-                    iostats->read_finished ();
+        iostats->read_finished ();
  #endif
-                }
-                else
-                {
+    }
+    else
+    {
  #ifdef STXXL_IO_STATS
-                    iostats->write_finished ();
+        iostats->write_finished ();
  #endif
-                }
+    }
 
 
-                _state.set_to (DONE);
+    _state.set_to (DONE);
 
  #ifdef STXXL_BOOST_THREADS
-                boost::mutex::scoped_lock Lock(waiters_mutex);
+    boost::mutex::scoped_lock Lock(waiters_mutex);
  #else
-                waiters_mutex.lock ();
+    waiters_mutex.lock ();
  #endif
 
-                // << notification >>
-                for (std::set < onoff_switch * > ::iterator i =
-                         waiters.begin (); i != waiters.end (); i++)
-                    (*i)->on ();
+    // << notification >>
+    for (std::set < onoff_switch * > ::iterator i =
+             waiters.begin (); i != waiters.end (); i++)
+        (*i)->on ();
 
 
  #ifdef STXXL_BOOST_THREADS
-                Lock.unlock();
+    Lock.unlock();
  #else
-                waiters_mutex.unlock ();
+    waiters_mutex.unlock ();
  #endif
 
-                completed ();
-                _state.set_to (READY2DIE);
-            }
+    completed ();
+    _state.set_to (READY2DIE);
+}
 
-            request_ptr sim_disk_file::aread (void * buffer, stxxl::int64 pos, size_t bytes,
-                                              completion_handler on_cmpl)
-            {
-                request_ptr req = new sim_disk_request (this, buffer, pos, bytes,
-                                                        request::READ, on_cmpl);
-                if (!req.get())
-                    stxxl_function_error(io_error);
+request_ptr sim_disk_file::aread (void * buffer, stxxl::int64 pos, size_t bytes,
+                                  completion_handler on_cmpl)
+{
+    request_ptr req = new sim_disk_request (this, buffer, pos, bytes,
+                                            request::READ, on_cmpl);
+    if (!req.get())
+        stxxl_function_error(io_error);
 
 
  #ifndef NO_OVERLAPPING
-                disk_queues::get_instance ()->add_readreq(req, get_id());
+    disk_queues::get_instance ()->add_readreq(req, get_id());
  #endif
 
-                return req;
-            }
-            request_ptr sim_disk_file::awrite (
-                void * buffer, stxxl::int64 pos, size_t bytes,
-                completion_handler on_cmpl)
-            {
-                request_ptr req = new sim_disk_request (this, buffer, pos, bytes,
-                                                        request::WRITE, on_cmpl);
+    return req;
+}
+request_ptr sim_disk_file::awrite (
+    void * buffer, stxxl::int64 pos, size_t bytes,
+    completion_handler on_cmpl)
+{
+    request_ptr req = new sim_disk_request (this, buffer, pos, bytes,
+                                            request::WRITE, on_cmpl);
 
-                if (!req.get())
-                    stxxl_function_error(io_error);
+    if (!req.get())
+        stxxl_function_error(io_error);
 
 
  #ifndef NO_OVERLAPPING
-                disk_queues::get_instance ()->add_writereq(req, get_id());
+    disk_queues::get_instance ()->add_writereq(req, get_id());
  #endif
-                return req;
-            }
+    return req;
+}
 
-            __STXXL_END_NAMESPACE
+__STXXL_END_NAMESPACE
 
 #endif
 

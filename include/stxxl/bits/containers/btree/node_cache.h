@@ -171,8 +171,8 @@ namespace btree
             unsigned_type cnt = 0;
             for ( ; i != end; ++i)
             {
-                if (fixed_[(*i).second]) ++cnt;
-
+                if (fixed_[(*i).second])
+                    ++cnt;
             }
             return cnt;
         }
@@ -185,14 +185,14 @@ namespace btree
             for ( ; i != end; ++i)
             {
                 const unsigned_type p = (*i).second;
-                if (reqs_[p].valid()) reqs_[p]->wait();
+                if (reqs_[p].valid())
+                    reqs_[p]->wait();
 
-                if (dirty_[p]) nodes_[p]->save();
-
+                if (dirty_[p])
+                    nodes_[p]->save();
             }
             for (unsigned_type i = 0; i < size(); ++i)
                 delete nodes_[i];
-
         }
 
         node_type * get_new_node(bid_type & new_bid)
@@ -220,7 +220,8 @@ namespace btree
                 } while (fixed_[node2kick]);
 
 
-                if (reqs_[node2kick].valid()) reqs_[node2kick]->wait();
+                if (reqs_[node2kick].valid())
+                    reqs_[node2kick]->wait();
 
 
                 node_type & Node = *(nodes_[node2kick]);
@@ -323,7 +324,8 @@ namespace btree
                     pager_.hit(node2kick);
                 } while (fixed_[node2kick]);
 
-                if (reqs_[node2kick].valid()) reqs_[node2kick]->wait();
+                if (reqs_[node2kick].valid())
+                    reqs_[node2kick]->wait();
 
 
                 node_type & Node = *(nodes_[node2kick]);
@@ -419,7 +421,8 @@ namespace btree
                     pager_.hit(node2kick);
                 } while (fixed_[node2kick]);
 
-                if (reqs_[node2kick].valid()) reqs_[node2kick]->wait();
+                if (reqs_[node2kick].valid())
+                    reqs_[node2kick]->wait();
 
 
                 node_type & Node = *(nodes_[node2kick]);
@@ -479,7 +482,8 @@ namespace btree
                     // the node is in the cach
                     const int_type nodeindex = it->second;
                     STXXL_VERBOSE1("btree::node_cache delete_node " << nodeindex << " from cache.");
-                    if (reqs_[nodeindex].valid()) reqs_[nodeindex]->wait();
+                    if (reqs_[nodeindex].valid())
+                        reqs_[nodeindex]->wait();
 
                     //reqs_[nodeindex] = request_ptr(); // reset request
                     free_nodes_.push_back(nodeindex);
@@ -498,7 +502,8 @@ namespace btree
 
         void prefetch_node(const bid_type & bid)
         {
-            if (BID2node_.find(bid) != BID2node_.end()) return;
+            if (BID2node_.find(bid) != BID2node_.end())
+                return;
 
 
             // the node is not in cache
@@ -522,7 +527,8 @@ namespace btree
                     pager_.hit(node2kick);
                 } while (fixed_[node2kick]);
 
-                if (reqs_[node2kick].valid()) reqs_[node2kick]->wait();
+                if (reqs_[node2kick].valid())
+                    reqs_[node2kick]->wait();
 
 
                 node_type & Node = *(nodes_[node2kick]);

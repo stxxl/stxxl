@@ -235,7 +235,7 @@ int main(int argc, char * argv[])
     if (pq_blocks <= 500)
     {
         std::cout << "Array heap must have > 500 blocks, current number of blocks " <<
-        pq_blocks  << std::endl;
+        pq_blocks << std::endl;
         return -1;
     }
 

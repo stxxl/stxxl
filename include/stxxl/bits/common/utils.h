@@ -153,7 +153,7 @@ inline void stxxl_util_nassert(int cond, const char *expr, const char *func_name
 }
 
  #define stxxl_nassert(expr, exception_type) \
-    stxxl::stxxl_util_nassert<exception_type>(expr, __STXXL_STRING(expr), STXXL_PRETTY_FUNCTION_NAME)
+    stxxl::stxxl_util_nassert<exception_type>(expr, __STXXL_STRING (expr), STXXL_PRETTY_FUNCTION_NAME)
 
 // returns true if cond succeeded
 template<typename E>
@@ -167,7 +167,7 @@ inline bool stxxl_util_try(int cond, const char *func_name)
 #else
         UNUSED(func_name);
 #endif
-	return false;
+        return false;
     }
     return true;
 }
@@ -177,14 +177,14 @@ inline bool helper_check_ge_0(INT res, const char *func_name)
 {
     if (res >= 0) {
         UNUSED(func_name);
-    	return true;
+        return true;
     } else {
 #if STXXL_DEBUG_ON
         std::ostringstream str_;
         str_ << "Error in function " << func_name << " " << perror_string();
         throw E(str_.str());
 #endif
-	return false;
+        return false;
     }
 }
 
@@ -196,14 +196,14 @@ inline bool helper_check_ne_0(INT res, const char *func_name)
 {
     if (res != 0) {
         UNUSED(func_name);
-    	return true;
+        return true;
     } else {
 #if STXXL_DEBUG_ON
         std::ostringstream str_;
         str_ << "Error in function " << func_name << " " << perror_string();
         throw E(str_.str());
 #endif
-	return false;
+        return false;
     }
 }
 
@@ -336,7 +336,7 @@ split (const std::string & str, const std::string & sep)
             result.push_back (sub);
 
         LastPos = CurPos + sep.size ();
-    };
+    }
 
     std::string sub = str.substr (LastPos);
     if (sub.size ())

@@ -68,7 +68,6 @@ sort2 (T & a, T & b)
 {
     if (b < a)
         std::swap (a, b);
-
 }
 
 template < class T > inline void

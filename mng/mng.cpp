@@ -29,7 +29,6 @@ config * config::get_instance ()
 
         else
             instance = new config ();
-
     }
 
     return instance;
@@ -45,11 +44,9 @@ config::config (const char * config_path)
         STXXL_ERRMSG("Warning: no config file found." );
         STXXL_ERRMSG("Using default disk configuration." );
 #ifndef BOOST_MSVC
-        DiskEntry entry1 = { "/var/tmp/stxxl", "syscall",
-                             1000 * 1024 * 1024 };
+        DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024 };
 #else
-        DiskEntry entry1 = { "", "wincall",
-                             1000 * 1024 * 1024 };
+        DiskEntry entry1 = { "", "wincall", 1000 * 1024 * 1024 };
         char * tmpstr = new char[255];
         stxxl_check_ne_0(GetTempPath(255, tmpstr), resource_error);
         entry1.path = tmpstr;
@@ -76,13 +73,13 @@ config::config (const char * config_path)
 
             if (tmp[0][0] == '#')
             { }
-            else
-            if (tmp[0] == "disk")
+            else if (tmp[0] == "disk")
             {
                 tmp = split (tmp[1], ",");
-                DiskEntry entry = { tmp[0], tmp[2],
-                                    stxxl::int64 (str2int (tmp[1])) *
-                                    stxxl::int64 (1024 * 1024) };
+                DiskEntry entry = {
+                    tmp[0], tmp[2],
+                    stxxl::int64 (str2int (tmp[1])) * stxxl::int64 (1024 * 1024)
+                };
                 disks_props.push_back (entry);
             }
             else
@@ -117,7 +114,6 @@ block_manager * block_manager::get_instance ()
     if (!instance)
         instance = new block_manager ();
 
-
     return instance;
 }
 
@@ -134,8 +130,7 @@ block_manager::block_manager ()
     {
         disk_files[i] = fc.create (cfg->disk_io_impl (i),
                                    cfg->disk_path (i),
-                                   stxxl::file::CREAT | stxxl::file::RDWR  | stxxl::file::DIRECT
-                                   , i);
+                                   stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT, i);
         disk_files[i]->set_size (cfg->disk_size (i));
         disk_allocators[i] = new DiskAllocator (cfg->disk_size (i));
     }

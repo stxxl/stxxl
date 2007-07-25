@@ -32,8 +32,8 @@ namespace btree
         typedef DataType_ data_type;
         typedef KeyCmp_ key_compare;
         typedef std::pair<key_type, data_type>  value_type;
-        typedef value_type  & reference;
-        typedef const value_type  & const_reference;
+        typedef value_type & reference;
+        typedef const value_type & const_reference;
 
         enum {
             raw_size = RawSize_
@@ -128,7 +128,7 @@ namespace btree
             {
                 btree_->iterator_map_.unregister_iterator(**it2fix);
 
-                if ((*it2fix)->pos < end_of_smaller_part)                        // belongs to the smaller part
+                if ((*it2fix)->pos < end_of_smaller_part)  // belongs to the smaller part
                     (*it2fix)->bid = NewBid;
 
                 else
@@ -298,7 +298,6 @@ namespace btree
             STXXL_VERBOSE2("Dump of leaf " << this);
             for (unsigned i = 0; i < size(); ++i)
                 STXXL_VERBOSE2((*this)[i].first << " " << (*this)[i].second);
-
         }
 
         std::pair<iterator, bool> insert(
@@ -315,8 +314,8 @@ namespace btree
             {
                 // already exists
                 return std::pair<iterator, bool>(
-                           iterator (btree_, my_bid(), it - block_->begin())
-                           , false);
+                           iterator (btree_, my_bid(), it - block_->begin()),
+                           false);
             }
 
             typename block_type::iterator cur = block_->begin() + size() - 1;
@@ -387,8 +386,8 @@ namespace btree
             } else if (it.pos == 1 && btree_->prefetching_enabled_)                    // increment of pos from 0 to 1
             {
                 // prefetch the succ leaf
-                if (succ().valid()) btree_->leaf_cache_.prefetch_node(succ());
-
+                if (succ().valid())
+                    btree_->leaf_cache_.prefetch_node(succ());
             }
             btree_->iterator_map_.register_iterator(it);
         }

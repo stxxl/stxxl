@@ -423,7 +423,7 @@ public:
 
     bool empty() const
     {
-        return size_  == 0;
+        return size_ == 0;
     }
 
     reference operator [] (size_type n)

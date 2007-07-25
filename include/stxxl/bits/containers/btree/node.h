@@ -38,8 +38,8 @@ namespace btree
         typedef bid_type node_bid_type;
         typedef SelfType node_type;
         typedef std::pair<key_type, bid_type>  value_type;
-        typedef value_type  & reference;
-        typedef const value_type  & const_reference;
+        typedef value_type & reference;
+        typedef const value_type & const_reference;
 
 
         struct InfoType

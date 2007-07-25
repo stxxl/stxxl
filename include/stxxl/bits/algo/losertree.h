@@ -125,11 +125,11 @@ private:
 
 #define TreeStep(L)                                                                                                                                                                                                                                                                         \
     if (LogK >= L ) \
-    {                                                                                                                                                                                                                                                                                                                     \
-        currentE = current +                                                            \
+    { \
+        currentE = current + \
                    regEntry[ (winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0) ]; \
         if ( cmp(*currentE, *winnerE) ) \
-        {                                                                                                                                                                                                                                                                                                                   \
+        { \
             std::swap(regEntry[(winnerIndex + (1 << LogK))                                         \
                                >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0) ], winnerIndex);                      \
             winnerE = currentE;                                                                                                                                                                                                                                 \
@@ -164,7 +164,7 @@ private:
             ++to;
             (*current)++;
         }
-    };
+    }
 
     void multi_merge_k (value_type * to)
     {
@@ -193,7 +193,7 @@ private:
         }
 
         entry[0] = winnerIndex;
-    };
+    }
 
 public:
     void multi_merge (value_type * to)

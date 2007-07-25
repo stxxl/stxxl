@@ -94,7 +94,7 @@ namespace stream
               class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
     class runs_creator
     {
-        Input_ & input;
+        Input_ &input;
         Cmp_ cmp;
     public:
         typedef Cmp_ cmp_type;
@@ -127,12 +127,11 @@ namespace stream
                                                block_type,
                                                value_type,
                                                block_type::size > (run,
-                                                                   elements )
-                    , cmp);
+                                                                   elements ),
+                    cmp);
 
             else
                 std::sort(run[0].elem, run[0].elem + elements, cmp);
-
         }
     public:
         //! \brief Creates the object
@@ -222,7 +221,7 @@ namespace stream
         // sort first run
         sort_run(Blocks1, pos);
         result_.elements = pos;
-        if (pos <  block_type::size && input.empty() ) // small input, do not flush it on the disk(s)
+        if (pos < block_type::size && input.empty() ) // small input, do not flush it on the disk(s)
         {
             STXXL_VERBOSE1("runs_creator: Small input optimization, input length: " << pos);
             result_.small_.resize(pos);
@@ -470,22 +469,22 @@ namespace stream
                                                block_type,
                                                value_type,
                                                block_type::size > (run,
-                                                                   elements )
-                    , cmp);
+                                                                   elements ),
+                    cmp);
 
             else
                 std::sort(run[0].elem, run[0].elem + elements, cmp);
-
         }
         void finish_result()
         {
-            if (cur_el == 0) return;
+            if (cur_el == 0)
+                return;
 
 
             unsigned_type cur_el_reg = cur_el;
             sort_run(Blocks1, cur_el_reg);
             result_.elements += cur_el_reg;
-            if (cur_el_reg <  unsigned_type(block_type::size) &&
+            if (cur_el_reg < unsigned_type(block_type::size) &&
                 unsigned_type(result_.elements) == cur_el_reg)         // small input, do not flush it on the disk(s)
             {
                 STXXL_VERBOSE1("runs_creator(use_push): Small input optimization, input length: " << cur_el_reg);
@@ -515,15 +514,16 @@ namespace stream
             for ( ; i < cur_run_size; ++i)
             {
                 run[i].value = Blocks1[i][0];
-                if (write_reqs[i].get()) write_reqs[i]->wait();
+                if (write_reqs[i].get())
+                    write_reqs[i]->wait();
 
                 write_reqs[i] = Blocks1[i].write(run[i].bid);
             }
             result_.runs.push_back(run);
 
             for (i = 0; i < m2; ++i)
-                if (write_reqs[i].get()) write_reqs[i]->wait();
-
+                if (write_reqs[i].get())
+                    write_reqs[i]->wait();
         }
         void cleanup()
         {
@@ -552,7 +552,6 @@ namespace stream
         {
             if (!output_requested)
                 cleanup();
-
         }
 
         //! \brief Adds new element to the sorter
@@ -590,7 +589,8 @@ namespace stream
             for (unsigned_type i = 0; i < cur_run_size; ++i)
             {
                 run[i].value = Blocks1[i][0];
-                if ( write_reqs[i].get() ) write_reqs[i]->wait();
+                if ( write_reqs[i].get() )
+                    write_reqs[i]->wait();
 
                 write_reqs[i] = Blocks1[i].write(run[i].bid);
             }
@@ -735,7 +735,7 @@ namespace stream
         //! \brief Finishes current run and begins new one
         void finish()
         {
-            if (offset == 0 && iblock == 0)    // current run is empty
+            if (offset == 0 && iblock == 0)  // current run is empty
                 return;
 
 
@@ -878,7 +878,6 @@ namespace stream
 
 
 
-
         sorted_runs_type sruns;
         unsigned_type m_; //  blocks to use - 1
         value_cmp cmp;
@@ -913,138 +912,137 @@ namespace stream
             // free blocks in runs , (or the user should do it?)
             sruns.deallocate_blocks();
         }
-        
+
         void initialize_current_block()
         {
 #if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
 
 // begin of STL-style merging
 
-                //taks: merge
+            //taks: merge
 
-                if (!stxxl::SETTINGS::native_merge && mcstl::HEURISTIC::num_threads >= 1)
+            if (!stxxl::SETTINGS::native_merge && mcstl::HEURISTIC::num_threads >= 1)
+            {
+                seqs = new std::vector<sequence>(nruns);
+                buffers = new std::vector<block_type *> (nruns);
+
+                for (int_type i = 0; i < nruns; i++)            //initialize sequences
                 {
-                    seqs = new std::vector<sequence>(nruns);
-                    buffers = new std::vector<block_type *> (nruns);
-
-                    for (int_type i = 0; i < nruns; i++)        //initialize sequences
-                    {
-                        (*buffers)[i] = prefetcher->pull_block();	//get first block of each run
-                        (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());	//this memory location stays the same, only the data is exchanged
-                    }
+                    (*buffers)[i] = prefetcher->pull_block();           //get first block of each run
+                    (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());          //this memory location stays the same, only the data is exchanged
+                }
 
 // end of STL-style merging
-                }
-                else
-                {
+            }
+            else
+            {
 #endif
 
 // begin of native merging procedure
 
-                     losers  =  new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
+            losers  =  new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
 // end of native merging procedure
 #if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
-		}
+        }
 #endif
         }
-        
+
         void fill_current_block()
         {
 #if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
 
 // begin of STL-style merging
 
-                //taks: merge
+            //taks: merge
 
-                if (!stxxl::SETTINGS::native_merge && mcstl::HEURISTIC::num_threads >= 1)
-                {
-
+            if (!stxxl::SETTINGS::native_merge && mcstl::HEURISTIC::num_threads >= 1)
+            {
  #ifdef STXXL_CHECK_ORDER_IN_SORTS
-                    value_type last_elem;
+                value_type last_elem;
  #endif
 
-                        diff_type rest = block_type::size;              //elements still to merge for this output block
+                diff_type rest = block_type::size;                      //elements still to merge for this output block
 
-                        do	//while rest > 0 and still elements available
+                do              //while rest > 0 and still elements available
+                {
+                    value_type * min_last_element = NULL;               //no element found yet
+                    diff_type total_size = 0;
+
+                    for (seqs_size_type i = 0; i < (*seqs).size(); i++)
+                    {
+                        if ((*seqs)[i].first == (*seqs)[i].second)
+                            continue; //run empty
+
+                        if (min_last_element == NULL)
+                            min_last_element = &(*((*seqs)[i].second - 1));
+                        else
+                            min_last_element = cmp(*min_last_element, *((*seqs)[i].second - 1)) ? min_last_element : &(*((*seqs)[i].second - 1));
+
+                        total_size += (*seqs)[i].second - (*seqs)[i].first;
+                        STXXL_VERBOSE1("last " << *((*seqs)[i].second - 1) << " block size " << ((*seqs)[i].second - (*seqs)[i].first));
+                    }
+
+                    assert(min_last_element != NULL);           //there must be some element
+
+                    STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (block_type::size - rest));
+
+                    diff_type less_equal_than_min_last = 0;
+                    //locate this element in all sequences
+                    for (seqs_size_type i = 0; i < (*seqs).size(); i++)
+                    {
+                        if ((*seqs)[i].first == (*seqs)[i].second)
+                            continue; //empty subsequence
+
+                        typename block_type::iterator position = std::upper_bound((*seqs)[i].first, (*seqs)[i].second, *min_last_element, cmp);
+                        STXXL_VERBOSE1("greater equal than " << position - (*seqs)[i].first);
+                        less_equal_than_min_last += position - (*seqs)[i].first;
+                    }
+
+                    STXXL_VERBOSE1("finished loop");
+
+                    ptrdiff_t output_size = (std::min)(less_equal_than_min_last, rest);                           //at most rest elements
+
+                    STXXL_VERBOSE1("before merge" << output_size);
+
+                    mcstl::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size, false);                         //sequence iterators are progressed appropriately
+
+                    STXXL_VERBOSE1("after merge");
+
+                    rest -= output_size;
+
+                    STXXL_VERBOSE1("so long");
+
+                    for (seqs_size_type i = 0; i < (*seqs).size(); i++)
+                    {
+                        if ((*seqs)[i].first == (*seqs)[i].second)                            //run empty
                         {
-                            value_type* min_last_element = NULL;	//no element found yet
-                            diff_type total_size = 0;
-
-                            for (seqs_size_type i = 0; i < (*seqs).size(); i++)
+                            if (prefetcher->block_consumed((*buffers)[i]))
                             {
-                                if ((*seqs)[i].first == (*seqs)[i].second)
-                                    continue;    //run empty
-
-                                if (min_last_element == NULL)
-                                    min_last_element = &(*((*seqs)[i].second - 1));
-                                else 
-                                    min_last_element = cmp(*min_last_element, *((*seqs)[i].second - 1)) ? min_last_element : &(*((*seqs)[i].second - 1));
-
-                                total_size += (*seqs)[i].second - (*seqs)[i].first;
-                                STXXL_VERBOSE1("last " << *((*seqs)[i].second - 1) << " block size " << ((*seqs)[i].second - (*seqs)[i].first));
+                                (*seqs)[i].first = (*buffers)[i]->begin();                                    //reset iterator
+                                (*seqs)[i].second = (*buffers)[i]->end();
+                                STXXL_VERBOSE1("block ran empty " << i);
                             }
-
-                            assert(min_last_element != NULL);	//there must be some element
-
-                            STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (block_type::size - rest));
-
-                            diff_type less_equal_than_min_last = 0;
-                            //locate this element in all sequences
-                            for (seqs_size_type i = 0; i < (*seqs).size(); i++)
+                            else
                             {
-                                if ((*seqs)[i].first == (*seqs)[i].second)
-                                    continue;    //empty subsequence
-
-                                typename block_type::iterator position = std::upper_bound((*seqs)[i].first, (*seqs)[i].second, *min_last_element, cmp);
-                                STXXL_VERBOSE1("greater equal than " << position - (*seqs)[i].first);
-                                less_equal_than_min_last += position - (*seqs)[i].first;
+                                (*seqs).erase((*seqs).begin() + i);                                   //remove this sequence
+                                (*buffers).erase((*buffers).begin() + i);
+                                STXXL_VERBOSE1("seq removed " << i);
                             }
-
-                            STXXL_VERBOSE1("finished loop");
-
-                            ptrdiff_t output_size = (std::min)(less_equal_than_min_last, rest);                   //at most rest elements
-
-                            STXXL_VERBOSE1("before merge" << output_size);
-
-                            mcstl::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size, false);                 //sequence iterators are progressed appropriately
-
-                            STXXL_VERBOSE1("after merge");
-
-                            rest -= output_size;
-
-                            STXXL_VERBOSE1("so long");
-
-                            for (seqs_size_type i = 0; i < (*seqs).size(); i++)
-                            {
-                                if ((*seqs)[i].first == (*seqs)[i].second)                    //run empty
-                                {
-                                    if (prefetcher->block_consumed((*buffers)[i]))
-                                    {
-                                        (*seqs)[i].first = (*buffers)[i]->begin();                            //reset iterator
-                                        (*seqs)[i].second = (*buffers)[i]->end();
-                                        STXXL_VERBOSE1("block ran empty " << i);
-                                    }
-                                    else
-                                    {
-                                        (*seqs).erase((*seqs).begin() + i);                           //remove this sequence
-                                        (*buffers).erase((*buffers).begin() + i);
-                                        STXXL_VERBOSE1("seq removed " << i);
-                                    }
-                                }
-                            }
-                        } while (rest > 0 && (*seqs).size() > 0);
+                        }
+                    }
+                } while (rest > 0 && (*seqs).size() > 0);
 
  #ifdef STXXL_CHECK_ORDER_IN_SORTS
-                        if (!stxxl::is_sorted(current_block->begin(), current_block->end(), cmp))
+                if (!stxxl::is_sorted(current_block->begin(), current_block->end(), cmp))
+                {
+                    for (value_type * i = current_block->begin() + 1; i != current_block->end(); i++)
+                        if (cmp(*i, *(i - 1)))
                         {
-                            for (value_type * i = current_block->begin() + 1; i != current_block->end(); i++)
-                                if (cmp(*i, *(i - 1)))
-                                {
-                                    STXXL_VERBOSE1("Error at position " << (i - current_block->begin()));
-                                }
-                            assert(false);
+                            STXXL_VERBOSE1("Error at position " << (i - current_block->begin()));
                         }
+                    assert(false);
+                }
 
 
 
@@ -1052,9 +1050,9 @@ namespace stream
 
 
 // end of STL-style merging
-                }
-                else
-                {
+            }
+            else
+            {
 #endif
 
 // begin of native merging procedure
@@ -1063,10 +1061,10 @@ namespace stream
 
 #if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
 // end of native merging procedure
-		}
+        }
 #endif
         }
-        
+
     public:
         //! \brief Standard stream typedef
         typedef typename sorted_runs_type::value_type value_type;
@@ -1084,7 +1082,8 @@ namespace stream
 #endif
             prefetcher(NULL)
         {
-            if (empty()) return;
+            if (empty())
+                return;
 
 
 
@@ -1192,8 +1191,8 @@ namespace stream
             current_value = current_block->elem[0];
             buffer_pos = 1;
 
-            if (elements_remaining <= block_type::size) deallocate_prefetcher();
-
+            if (elements_remaining <= block_type::size)
+                deallocate_prefetcher();
         }
 
         //! \brief Standard stream method
@@ -1228,7 +1227,6 @@ namespace stream
                 }
                 if (elements_remaining <= block_type::size)
                     deallocate_prefetcher();
-
             }
 
 
@@ -1263,7 +1261,8 @@ namespace stream
         {
             deallocate_prefetcher();
 
-            if (current_block) delete current_block;
+            if (current_block)
+                delete current_block;
 
             // free blocks in runs , (or the user should do it?)
             sruns.deallocate_blocks();

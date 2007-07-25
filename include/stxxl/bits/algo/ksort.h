@@ -54,7 +54,7 @@ struct trigger_entry
     operator bid_type()
     {
         return bid;
-    };
+    }
 };
 
 
@@ -312,7 +312,7 @@ struct run_cursor2_cmp
         //sentinel emulation
 
         return (keyobj(a.current()) < keyobj(b.current ()));
-    };
+    }
 private:
     run_cursor2_cmp() { };
 };
@@ -646,7 +646,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
             runs_left -= runs2merge;
         }
         // allocate blocks in the new runs
-        if ( cur_out_run == 1 &&  blocks_in_new_run == int_type(_n) && (input_bids->storage->get_id() == -1))
+        if ( cur_out_run == 1 && blocks_in_new_run == int_type(_n) && (input_bids->storage->get_id() == -1))
         {
             // if we sort a file we can reuse the input bids for the output
             input_bid_iterator cur = input_bids;

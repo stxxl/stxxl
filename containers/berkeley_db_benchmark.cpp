@@ -593,7 +593,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
     Timer.start();
 
     vector_type SortedSeq(n);
-    const vector_type  & CSortedSeq(SortedSeq);
+    const vector_type & CSortedSeq(SortedSeq);
     {
         rand_key_gen Gen(n, element.first);
         typedef stxxl::stream::sort<rand_key_gen, comp_type> sorter_type;
@@ -1002,7 +1002,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         Timer.start();
 
         vector_type SortedSeq(n);
-        const vector_type  & CSortedSeq(SortedSeq);
+        const vector_type & CSortedSeq(SortedSeq);
         {
             rand_key_gen Gen(n, key1_storage);
             typedef stxxl::stream::sort<rand_key_gen, comp_type> sorter_type;
@@ -1148,7 +1148,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
                     ++n_scanned;
                     //STXXL_MSG("Result      "<<*((my_key *)key1.get_data()));
                 }
-                if ( cursorp->get(&keyx, &datax, DB_NEXT | DB_MULTIPLE_KEY) ==                     DB_NOTFOUND)
+                if ( cursorp->get(&keyx, &datax, DB_NEXT | DB_MULTIPLE_KEY) == DB_NOTFOUND)
                     break;
 
 

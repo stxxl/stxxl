@@ -207,7 +207,7 @@ public:
         return NULL;
     }
 
-    void  add(block_type * block)
+    void add(block_type * block)
     {
         free_blocks.push_back(block);
         ++free_blocks_size;

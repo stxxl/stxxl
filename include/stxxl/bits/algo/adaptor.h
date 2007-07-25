@@ -32,12 +32,10 @@ struct RunsToBIDArrayAdaptor : public TwoToOneDimArrayAdaptorBase < _run_type *,
     using _Parent::pos;
 
     RunsToBIDArrayAdaptor (_run_type * *a, __pos_type p,
-                           unsigned_type d) : TwoToOneDimArrayAdaptorBase <
-                                                                           _run_type *, BID < _blk_sz >, __pos_type > (a, p), dim_size (d)
+                           unsigned_type d) : TwoToOneDimArrayAdaptorBase <_run_type *, BID < _blk_sz >, __pos_type > (a, p), dim_size (d)
     { };
-    RunsToBIDArrayAdaptor (const _Self & a) : TwoToOneDimArrayAdaptorBase <
-                                                                           _run_type *, BID < _blk_sz >, __pos_type > (a),
-                                              dim_size (a.dim_size)
+    RunsToBIDArrayAdaptor (const _Self &a) : TwoToOneDimArrayAdaptorBase <_run_type *, BID < _blk_sz >, __pos_type > (a),
+                                             dim_size (a.dim_size)
     { };
 
     const _Self & operator = (const _Self & a)
@@ -55,14 +53,14 @@ struct RunsToBIDArrayAdaptor : public TwoToOneDimArrayAdaptorBase < _run_type *,
                 &)((*(array[(pos) % dim_size]))[(pos) /
                                                 dim_size].
                    bid);
-    };
+    }
 
     const data_type * operator -> () const
     {
         CHECK_RUN_BOUNDS (pos)
         return
                &((*(array[(pos) % dim_size])[(pos) / dim_size].bid));
-    };
+    }
 
 
     data_type & operator [](__pos_type n) const
@@ -72,7 +70,7 @@ struct RunsToBIDArrayAdaptor : public TwoToOneDimArrayAdaptorBase < _run_type *,
         return (BID < _blk_sz >
                 &)((*(array[(n) % dim_size]))[(n) /
                                               dim_size].bid);
-    };
+    }
 };
 
 BLOCK_ADAPTOR_OPERATORS(RunsToBIDArrayAdaptor)
@@ -130,7 +128,7 @@ TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >,
         _w--;
         return (BID < _blk_sz >
                 &)((*(array[(i) % _w]))[h + (i / _w)].bid);
-    };
+    }
 
     const data_type * operator -> () const
     {
@@ -142,7 +140,7 @@ TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >,
         register __pos_type _w = w;
         _w--;
         return &((*(array[(i) % _w])[h + (i / _w)].bid));
-    };
+    }
 
 
     data_type & operator [](__pos_type n) const
@@ -158,7 +156,7 @@ TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >,
         _w--;
         return (BID < _blk_sz >
                 &)((*(array[(i) % _w]))[h + (i / _w)].bid);
-    };
+    }
 };
 
 BLOCK_ADAPTOR_OPERATORS (RunsToBIDArrayAdaptor2)
@@ -181,7 +179,7 @@ struct trigger_entry_iterator
 
     enum { block_size = _BlkSz };
 
-    trigger_entry_iterator(const _Self & a) : value(a.value) { };
+    trigger_entry_iterator(const _Self &a) : value(a.value) { };
     trigger_entry_iterator(trigger_iterator_type v) : value(v) { };
 
     bid_type & operator * ()

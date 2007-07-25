@@ -41,7 +41,7 @@ namespace priority_queue_local
     template <class Value_, class Cmp_>
     void merge(Value_ * * f0,
                Value_ * * f1,
-               Value_  * to, int_type sz, Cmp_ cmp)
+               Value_ * to, int_type sz, Cmp_ cmp)
     {
         Value_ * from0   = *f0;
         Value_ * from1   = *f1;
@@ -103,7 +103,7 @@ namespace priority_queue_local
         Value_ * * f0,
         Value_ * * f1,
         Value_ * * f2,
-        Value_  * to, int_type sz, Cmp_ cmp)
+        Value_ * to, int_type sz, Cmp_ cmp)
     {
         Value_ * from0   = *f0;
         Value_ * from1   = *f1;
@@ -111,32 +111,41 @@ namespace priority_queue_local
         Value_ * done    = to + sz;
 
         if (cmp(*from1, *from0)) {
-            if (cmp(*from2, *from1))   { goto s012;
+            if (cmp(*from2, *from1)) {
+                goto s012;
             }
             else {
-                if (cmp(*from0, *from2)) { goto s201;
+                if (cmp(*from0, *from2)) {
+                    goto s201;
                 }
-                else             { goto s021;
+                else {
+                    goto s021;
                 }
             }
         } else {
             if (cmp(*from2, *from1)) {
-                if (cmp(*from2, *from0)) { goto s102;
+                if (cmp(*from2, *from0)) {
+                    goto s102;
                 }
-                else             { goto s120;
+                else {
+                    goto s120;
                 }
-            } else             { goto s210;
+            } else {
+                goto s210;
             }
         }
 
 #define Merge3Case(a, b, c)\
     s ## a ## b ## c : \
-    if (to == done) goto finish;\
+    if (to == done) \
+        goto finish;\
     *to = *from ## a; \
     ++to; \
     ++from ## a; \
-    if (cmp(*from ## b, *from ## a )) goto s ## a ## b ## c;\
-    if (cmp(*from ## c, *from ## a )) goto s ## b ## a ## c;\
+    if (cmp(*from ## b, *from ## a )) \
+        goto s ## a ## b ## c;\
+    if (cmp(*from ## c, *from ## a )) \
+        goto s ## b ## a ## c;\
     goto s ## b ## c ## a;
 
         // the order is choosen in such a way that
@@ -167,7 +176,7 @@ finish:
         Value_ * * f1,
         Value_ * * f2,
         Value_ * * f3,
-        Value_  * to, int_type sz, Cmp_ cmp)
+        Value_ * to, int_type sz, Cmp_ cmp)
     {
         Value_ * from0   = *f0;
         Value_ * from1   = *f1;
@@ -216,7 +225,8 @@ finish:
 
 #define Merge4Case(a, b, c, d)\
     s ## a ## b ## c ## d : \
-    if (to == done) goto finish;\
+    if (to == done) \
+        goto finish;\
     *to = *from ## a; \
     ++to; \
     ++from ## a; \
@@ -326,7 +336,8 @@ finish:
 
 #define Merge4Case(a, b, c, d)\
     s ## a ## b ## c ## d : \
-    if (to == done) goto finish;\
+    if (to == done) \
+        goto finish;\
     *to = *from ## a; \
     ++to; \
     ++from ## a; \
@@ -836,29 +847,36 @@ finish:
 
 
                 entry[0].key = **current;
-                if (segmentIsEmpty(0)) deallocateSegment(0);
+                if (segmentIsEmpty(0))
+                    deallocateSegment(0);
 
                 break;
             case 1:
                 assert(k == 2);
                 merge_iterator(current[0], current[1], begin, l, cmp);
                 rebuildLooserTree();
-                if (segmentIsEmpty(0)) deallocateSegment(0);
+                if (segmentIsEmpty(0))
+                    deallocateSegment(0);
 
-                if (segmentIsEmpty(1)) deallocateSegment(1);
+                if (segmentIsEmpty(1))
+                    deallocateSegment(1);
 
                 break;
             case 2:
                 assert(k == 4);
                 merge4_iterator(current[0], current[1], current[2], current[3], begin, l, cmp);
                 rebuildLooserTree();
-                if (segmentIsEmpty(0)) deallocateSegment(0);
+                if (segmentIsEmpty(0))
+                    deallocateSegment(0);
 
-                if (segmentIsEmpty(1)) deallocateSegment(1);
+                if (segmentIsEmpty(1))
+                    deallocateSegment(1);
 
-                if (segmentIsEmpty(2)) deallocateSegment(2);
+                if (segmentIsEmpty(2))
+                    deallocateSegment(2);
 
-                if (segmentIsEmpty(3)) deallocateSegment(3);
+                if (segmentIsEmpty(3))
+                    deallocateSegment(3);
 
                 break;
             case  3: multi_merge_f < OutputIterator, 3 > (begin, end);
@@ -948,7 +966,7 @@ finish:
             OutputIterator done = end;
             OutputIterator to = begin;
             int_type winnerIndex = entry[0].index;
-            Entry    * regEntry   = entry;
+            Entry * regEntry   = entry;
             sequence_type * regCurrent = current;
             Element winnerKey   = entry[0].key;
 
@@ -975,7 +993,7 @@ finish:
                 // update loser tree
 #define TreeStep(L)\
     if (1 << LogK >= 1 << L) { \
-        Entry  * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
+        Entry * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
         Element key ## L = pos ## L->key; \
         if (cmp(winnerKey, key ## L)) { \
             int_type index ## L  = pos ## L->index; \
@@ -1002,7 +1020,7 @@ finish:
         }
 
 
-        bool  spaceIsAvailable() const // for new segment
+        bool spaceIsAvailable() const // for new segment
         {
             return k < arity || lastFree >= 0;
         }
@@ -1078,7 +1096,7 @@ finish:
             }
         }
 
-        size_type  size() const { return size_; }
+        size_type size() const { return size_; }
 
     protected:
         /*! \param first_size number of elements in the first block
@@ -1184,7 +1202,7 @@ finish:
             //Element currentKey;
             //int currentIndex; // leaf pointed to by current entry
             Element * done = to + l;
-            Entry    * regEntry   = entry;
+            Entry * regEntry   = entry;
             Element * * regCurrent = current;
             int_type winnerIndex = regEntry[0].index;
             Element winnerKey   = regEntry[0].key;
@@ -1214,7 +1232,7 @@ finish:
                 // update loser tree
 #define TreeStep(L)\
     if (1 << LogK >= 1 << L) { \
-        Entry  * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
+        Entry * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
         Element key ## L = pos ## L->key; \
         if (cmp(winnerKey, key ## L)) { \
             int_type index ## L  = pos ## L->index; \
@@ -1280,11 +1298,11 @@ finish:
         void multi_merge(Element *, unsigned_type l);
 
         unsigned_type mem_cons() const { return mem_cons_; }
-        bool  spaceIsAvailable() // for new segment
+        bool spaceIsAvailable() // for new segment
         { return k < KNKMAX || lastFree >= 0; }
 
         void insert_segment(Element * to, unsigned_type sz); // insert segment beginning at to
-        unsigned_type  size() { return size_; }
+        unsigned_type size() { return size_; }
     };
 
 ///////////////////////// LooserTree ///////////////////////////////////
@@ -1354,7 +1372,7 @@ finish:
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::updateOnInsert(
         int_type node,
-        const Element  & newKey,
+        const Element & newKey,
         int_type newIndex,
         Element * winnerKey,
         int_type * winnerIndex,       // old winner
@@ -1442,17 +1460,17 @@ finish:
                 segment[to] = segment[from];
                 to++;
             }/*
-        else
-        {
-        if(segment[from])
-        {
-        STXXL_VERBOSE2("loser_tree::compactTree() deleting segment "<<from<<
+                else
+                {
+                if(segment[from])
+                {
+                STXXL_VERBOSE2("loser_tree::compactTree() deleting segment "<<from<<
                                         " address: "<<segment[from]<<" size: "<<segment_size[from]);
-        delete [] segment[from];
-        segment[from] = 0;
-        mem_cons_ -= segment_size[from];
-        }
-        }*/
+                delete [] segment[from];
+                segment[from] = 0;
+                mem_cons_ -= segment_size[from];
+                }
+                }*/
         }
 
         // half degree as often as possible
@@ -1519,7 +1537,7 @@ finish:
 
 
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
-    loser_tree<ValTp_, Cmp_, KNKMAX>::~loser_tree()
+    loser_tree<ValTp_, Cmp_, KNKMAX>::~ loser_tree()
     {
         STXXL_VERBOSE2("loser_tree::~loser_tree()");
         for (unsigned_type i = 0; i < k; ++i)
@@ -1578,29 +1596,36 @@ finish:
             std::copy(current[0], current[0] + l, to);
             current[0] += l;
             entry[0].key = **current;
-            if (segmentIsEmpty(0)) deallocateSegment(0);
+            if (segmentIsEmpty(0))
+                deallocateSegment(0);
 
             break;
         case 1:
             assert(k == 2);
             merge(current + 0, current + 1, to, l, cmp);
             rebuildLooserTree();
-            if (segmentIsEmpty(0)) deallocateSegment(0);
+            if (segmentIsEmpty(0))
+                deallocateSegment(0);
 
-            if (segmentIsEmpty(1)) deallocateSegment(1);
+            if (segmentIsEmpty(1))
+                deallocateSegment(1);
 
             break;
         case 2:
             assert(k == 4);
             merge4(current + 0, current + 1, current + 2, current + 3, to, l, cmp);
             rebuildLooserTree();
-            if (segmentIsEmpty(0)) deallocateSegment(0);
+            if (segmentIsEmpty(0))
+                deallocateSegment(0);
 
-            if (segmentIsEmpty(1)) deallocateSegment(1);
+            if (segmentIsEmpty(1))
+                deallocateSegment(1);
 
-            if (segmentIsEmpty(2)) deallocateSegment(2);
+            if (segmentIsEmpty(2))
+                deallocateSegment(2);
 
-            if (segmentIsEmpty(3)) deallocateSegment(3);
+            if (segmentIsEmpty(3))
+                deallocateSegment(3);
 
             break;
         case  3: multi_merge_f < 3 > (to, l);
@@ -1640,7 +1665,7 @@ finish:
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     inline bool loser_tree<ValTp_, Cmp_, KNKMAX>::segmentIsEmpty(int_type i)
     {
-        return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
+        return (is_sentinel(*(current[i])) && (current[i] != &dummy));
     }
 
 // multi-merge for fixed K
@@ -1844,7 +1869,7 @@ protected:
 
     value_type getSupremum() const { return cmp.min_value(); } //{ return buffer2[0][KNN].key; }
     int_type getSize1( ) const { return ( buffer1 + BufferSize1) - minBuffer1; }
-    int_type getSize2(int_type i) const { return &(buffer2[i][N])     - minBuffer2[i]; }
+    int_type getSize2(int_type i) const { return &(buffer2[i][N]) - minBuffer2[i]; }
 
 
     // forbidden cals
@@ -1878,7 +1903,8 @@ public:
     void swap(priority_queue & obj)
     {
         //swap_1D_arrays(itree,obj.itree,IntLevels); // does not work in g++ 3.4.3 :( bug?
-        for (unsigned_type i = 0; i < IntLevels; ++i) std::swap(itree[i], obj.itree[i]);
+        for (unsigned_type i = 0; i < IntLevels; ++i)
+            std::swap(itree[i], obj.itree[i]);
 
         // std::swap(p_pool,obj.p_pool);
         // std::swap(w_pool,obj.w_pool);
@@ -1926,13 +1952,13 @@ public:
     //! is, the largest element in the \b priority_queue.
     //! Precondition: \c empty() is \b false.
     //! Postcondition: \c size() will be decremented by 1.
-    void  pop();
+    void pop();
 
     //! \brief Inserts x into the priority_queue.
     //!
     //! Inserts x into the priority_queue. Postcondition:
     //! \c size() will be incremented by 1.
-    void  push(const value_type & obj);
+    void push(const value_type & obj);
 
     //! \brief Returns number of bytes consumed by
     //! the \b priority_queue
@@ -1995,7 +2021,6 @@ inline void priority_queue<Config_>::pop()
         ++minBuffer1;
         if (minBuffer1 == buffer1 + BufferSize1)
             refillBuffer1();
-
     }
 }
 
@@ -2141,7 +2166,6 @@ void priority_queue<Config_>::refillBuffer1()
 
             else
                 totalSize += sz;
-
         }
         else
         {
@@ -2341,7 +2365,6 @@ void priority_queue<Config_>::emptyInsertHeap()
     // special case if the tree was empty before
     if (minBuffer1 == buffer1 + BufferSize1)
         refillBuffer1();
-
 }
 
 namespace priority_queue_local
@@ -2542,8 +2565,8 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class Config_>
-    void swap(stxxl::priority_queue < Config_ > & a,
-              stxxl::priority_queue<Config_> & b)
+    void swap(stxxl::priority_queue<Config_> &a,
+              stxxl::priority_queue<Config_> &b)
     {
         a.swap(b);
     }

@@ -44,8 +44,8 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
             typename block_type::value_type, block_type::size > (blocks.begin(), first.block_offset() ),
             TwoToOneDimArrayRowAdaptor < block_type,
             typename block_type::value_type, block_type::size > (blocks.begin(),
-                                                                 nblocks * block_type::size - last_block_correction)
-            , cmp);
+                                                                 nblocks * block_type::size - last_block_correction),
+            cmp);
 
     else
         std::sort(blocks[0].elem + first.block_offset(),

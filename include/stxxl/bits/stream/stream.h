@@ -1037,7 +1037,7 @@ namespace stream
         typename Input4_::value_type,
         typename Input5_::value_type,
         typename Input6_::value_type
-        >  value_type;
+        > value_type;
 
     private:
         value_type current;
@@ -1111,7 +1111,7 @@ namespace stream
         typedef typename stxxl::tuple <
         typename Input1_::value_type,
         typename Input2_::value_type
-        >  value_type;
+        > value_type;
 
     private:
         value_type current;
@@ -1184,7 +1184,7 @@ namespace stream
         typename Input1_::value_type,
         typename Input2_::value_type,
         typename Input3_::value_type
-        >  value_type;
+        > value_type;
 
     private:
         value_type current;
@@ -1258,7 +1258,7 @@ namespace stream
         typename Input2_::value_type,
         typename Input3_::value_type,
         typename Input4_::value_type
-        >  value_type;
+        > value_type;
 
     private:
         value_type current;
@@ -1340,7 +1340,7 @@ namespace stream
         typename Input3_::value_type,
         typename Input4_::value_type,
         typename Input5_::value_type
-        >  value_type;
+        > value_type;
 
     private:
         value_type current;

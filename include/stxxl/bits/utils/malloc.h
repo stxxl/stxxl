@@ -26,7 +26,7 @@ public:
     typedef int return_type;
 
     //! \brief Returns number of bytes allocated from system not including mmapped regions
-    return_type  from_system_nmmap() const
+    return_type from_system_nmmap() const
     {
         struct mallinfo info = mallinfo();
         return info.arena;
@@ -82,7 +82,7 @@ public:
     }
 
     //! \brief Returns number of bytes allocated from system using mmap
-    return_type  from_system_mmap() const
+    return_type from_system_mmap() const
     {
         struct mallinfo info = mallinfo();
         return info.hblkhd;
@@ -96,7 +96,7 @@ public:
     }
 
     //! \brief Returns \b total number of bytes allocated from system including mmapped regions
-    return_type  from_system_total() const
+    return_type from_system_total() const
     {
         return from_system_nmmap() + from_system_mmap();
     }

@@ -20,7 +20,7 @@
 template<typename MAPTYPE>
 bool there( MAPTYPE & map_, const typename MAPTYPE::key_type & key, typename MAPTYPE::mapped_type data )
 {
-    if ( !((*map_.find(key)).second  == data) )
+    if ( !((*map_.find(key)).second == data) )
     {
         typename MAPTYPE::iterator iter = map_.find(key);
         STXXL_VERBOSE2( "iter=(" << (*iter).first << ":" << (*iter).second << ")" );

@@ -18,11 +18,11 @@ struct cmp : public std::less<key_type>
     static key_type min_value()
     {
         return (std::numeric_limits < key_type > ::min)();
-    };
+    }
     static key_type max_value()
     {
         return (std::numeric_limits < key_type > ::max)();
-    };
+    }
 };
 
 #define BLOCK_SIZE (32 * 1024)
@@ -44,9 +44,9 @@ int main()
         const unsigned el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
                   (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " kb");
-        map_type  * DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
+        map_type * DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
         //map_type  Map(CACHE_SIZE*BLOCK_SIZE/2,CACHE_SIZE*BLOCK_SIZE/2);
-        map_type  & Map = *DMap;
+        map_type & Map = *DMap;
         for (unsigned i = 0; i < el; ++i)
         {
             Map[i] = i + 1;

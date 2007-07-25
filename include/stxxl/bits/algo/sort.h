@@ -59,7 +59,7 @@ namespace sort_local
         operator bid_type()
         {
             return bid;
-        };
+        }
     };
 
     template <typename BIDTp_, typename ValTp_, typename ValueCmp_>
@@ -72,7 +72,7 @@ namespace sort_local
         bool operator () (const trigger_entry_type & a, const trigger_entry_type & b) const
         {
             return cmp(a.value, b.value);
-        };
+        }
     };
 
     template <typename block_type,
@@ -83,7 +83,7 @@ namespace sort_local
         typedef run_cursor2<block_type, prefetcher_type> cursor_type;
         value_cmp cmp;
 
-        run_cursor2_cmp(value_cmp c) : cmp(c) {   }
+        run_cursor2_cmp(value_cmp c) : cmp(c) { }
         run_cursor2_cmp(const run_cursor2_cmp &a) : cmp(a.cmp) { }
         inline bool operator  ()  (const cursor_type & a, const cursor_type & b)
         {
@@ -95,7 +95,7 @@ namespace sort_local
             //sentinel emulation
 
             return (cmp(a.current (), b.current()));
-        };
+        }
     };
 
     template <typename block_type, typename bid_type>
@@ -195,8 +195,8 @@ namespace sort_local
                     block_type::size > (Blocks1, 0 ),
                     TwoToOneDimArrayRowAdaptor < block_type,
                     typename block_type::value_type, block_type::size > (Blocks1,
-                                                                         run_size * block_type::size )
-                    , cmp);
+                                                                         run_size * block_type::size ),
+                    cmp);
 
             else
                 std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
@@ -318,7 +318,7 @@ namespace sort_local
                 }
                 wait_all(reqs, reqs + nblocks);
 
-                if (off         && cmp(blocks[0][0], last) )
+                if (off && cmp(blocks[0][0], last) )
                 {
                     STXXL_MSG("check_sorted_runs  wrong first value in the run " << irun);
                     STXXL_MSG(" first value: " << blocks[0][0]);
@@ -494,7 +494,7 @@ namespace sort_local
                     for (seqs_size_type i = 0; i < seqs.size(); i++)
                     {
                         if (seqs[i].first == seqs[i].second)
-                            continue;            //run empty
+                            continue; //run empty
 
                         if (min_last_element == NULL)
                             min_last_element = &(*(seqs[i].second - 1));
@@ -514,7 +514,7 @@ namespace sort_local
                     for (seqs_size_type i = 0; i < seqs.size(); i++)
                     {
                         if (seqs[i].first == seqs[i].second)
-                            continue;            //empty subsequence
+                            continue; //empty subsequence
 
                         typename block_type::iterator position = std::upper_bound(seqs[i].first, seqs[i].second, *min_last_element, cmp);
                         STXXL_VERBOSE1("greater equal than " << position - seqs[i].first);
@@ -568,7 +568,7 @@ namespace sort_local
                     assert(false);
                 }
 
-                if (j > 0)                      //do not check in first iteration
+                if (j > 0)  //do not check in first iteration
                     assert(cmp((*out_buffer)[0], last_elem) == false);
 
 
@@ -602,8 +602,8 @@ namespace sort_local
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
             assert(stxxl::is_sorted(
                        out_buffer->begin(),
-                       out_buffer->end()
-                       , cmp));
+                       out_buffer->end(),
+                       cmp));
 
             if (i)
                 assert( cmp(*(out_buffer->elem), last_elem) == false);
@@ -739,7 +739,7 @@ namespace sort_local
                 runs_left -= runs2merge;
             }
             // allocate blocks for the new runs
-            if ( cur_out_run == 1 &&  blocks_in_new_run == int_type(_n) && (input_bids->storage->get_id() == -1))
+            if ( cur_out_run == 1 && blocks_in_new_run == int_type(_n) && (input_bids->storage->get_id() == -1))
             {
                 // if we sort a file we can reuse the input bids for the output
                 input_bid_iterator cur = input_bids;
@@ -1130,7 +1130,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                 n = last.bid() - first.bid();
 
                 run_type * out =
-                    sort_local::sort_blocks <        typename ExtIterator_::block_type,
+                    sort_local::sort_blocks < typename ExtIterator_::block_type,
                 typename ExtIterator_::vector_type::alloc_strategy,
                 typename ExtIterator_::bids_container_iterator >
                 (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
