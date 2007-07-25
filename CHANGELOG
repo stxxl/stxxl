@@ -1,6 +1,43 @@
 Repository version (see the web page for the last modification date)
+(will become) Version 1.1.0 (unreleased)
 
-* no changes so far
+* stxxl is now hosted on sourceforge: http://stxxl.sourceforge.net/
+* Restructured the source layout:
+  - includes moves to include/
+  - introduced some public headers:
+    stxxl.h, stxxl/algorithm, stxxl/bits, stxxl/deque, stxxl/io, stxxl/ksort, stxxl/mallocstats, stxxl/map, stxxl/mng, stxxl/priority_queue, stxxl/queue, stxxl/random, stxxl/scan, stxxl/sort, stxxl/stable_ksort, stxxl/stack, stxxl/stream, stxxl/timer, stxxl/vector
+  - the header "stxxl" is no longer available, please use "stxxl.h" instead
+  - the use of any other (internal) header is discouraged, additional public headers can be added as the need arises
+* Overhauled the build system:
+  - merged configuration files, simplified option tuning
+  - support object files and binaries with and without mcstl support existing in parallel
+  - the library build creates stxxl.mk which can be included in an applications makefile to set the correct compiler/linker switches for stxxl
+  - similarily mcstxxl.mk is created for a stxxl compiled with mcstl support
+  - add dependency tracking and improve parallelism during build
+* compiler support matrix:
+  compiler      |  stxxl    stxxl + mcstl
+  --------------+------------------------
+  GCC 4.3       |    x            x
+  GCC 4.2       |    x            x
+  GCC 4.1       |    x           n/a
+  GCC 4.0       |    x           n/a
+  GCC 3.4       |    x           n/a
+  GCC 3.3       |    o           n/a
+  GCC 2.95      |    -           n/a
+  ICPC x.y.z    |    ?            ?
+  MSVC x.y.z    |    ?            ?
+    x = full support   o = partial support   - = unsupported
+    n/a = compiler does not support OpenMP which is needed by MCSTL
+* obsolete files removed
+* fixed include dependencies
+* fixed lots of warnings
+* fixed lots of small bugs
+* add header compilation tests
+* stxxl::vector: implemented some more functions
+* const char* stxxl::get_version_string(): new function
+* comparators inherit from std::binary_function<>
+* cleanup, reformat the code to a consistent format (Thanks, uncrustify!)
+
 
 ------------------------------------------
 Version 1.0e (4 June 2007)
