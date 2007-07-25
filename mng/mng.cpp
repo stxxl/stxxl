@@ -51,7 +51,7 @@ config::config (const char * config_path)
         DiskEntry entry1 = { "", "wincall",
                              1000 * 1024 * 1024 };
         char * tmpstr = new char[255];
-        stxxl_ifcheck_win(GetTempPath(255, tmpstr), resource_error);
+        stxxl_check_ne_0(GetTempPath(255, tmpstr), resource_error);
         entry1.path = tmpstr;
         entry1.path += "stxxl";
         delete [] tmpstr;

@@ -152,9 +152,8 @@ void sim_disk_file::set_size (stxxl::int64 newsize)
 {
     if (newsize > size ())
     {
-        stxxl_ifcheck (::lseek (file_des, newsize - 1,
-                                SEEK_SET), io_error);
-        stxxl_ifcheck(::write(file_des, "", 1), io_error);
+        stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
+        stxxl_check_ge_0(::write(file_des, "", 1), io_error);
     }
 }
 
@@ -195,14 +194,12 @@ void sim_disk_request::serve ()
         {
             if (type == READ)
             {
-                stxxl_ifcheck (memcpy (buffer, mem, bytes), io_error)
-                else
-                    stxxl_ifcheck (munmap ((char *) mem, bytes), io_error) }
-                    else
-                    {
-                        stxxl_ifcheck (memcpy (mem, buffer, bytes), io_error)
-                        else
-                            stxxl_ifcheck (munmap ((char *) mem, bytes), io_error) }
+                memcpy(buffer, mem, bytes);
+                stxxl_check_ge_0(munmap((char *) mem, bytes), io_error);
+            } else {
+                memcpy(mem, buffer, bytes);
+                stxxl_check_ge_0(munmap((char *) mem, bytes), io_error);
+            }
                             }
 
                             double delay =

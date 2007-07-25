@@ -50,12 +50,14 @@ void mmap_request::serve()
         {
             if (type == READ)
             {
+                // FIXME: cleanup
                 //stxxl_ifcheck (memcpy (buffer, mem, bytes))
                 //else
                 //stxxl_ifcheck (munmap ((char *) mem, bytes))
             }
             else
             {
+                // FIXME: cleanup
                 //stxxl_ifcheck (memcpy (mem, buffer, bytes))
                 //else
                 //stxxl_ifcheck (munmap ((char *) mem, bytes))
@@ -74,8 +76,7 @@ void mmap_request::serve()
 
             error_occured(msg.str());
         }
-        else
-        if (mem == 0)
+        else if (mem == 0)
         {
             stxxl_function_error(io_error);
         }
@@ -83,17 +84,15 @@ void mmap_request::serve()
         {
             if (type == READ)
             {
-                stxxl_ifcheck (memcpy (buffer, mem, bytes), io_error)
-                else
-                    stxxl_ifcheck (munmap ((char *) mem, bytes), io_error)
-                    }
-                    else
-                    {
-                        stxxl_ifcheck (memcpy (mem, buffer, bytes), io_error)
-                        else
-                            stxxl_ifcheck (munmap ((char *) mem, bytes), io_error)
-                            }
-                            }
+                memcpy(buffer, mem, bytes);
+                stxxl_check_ge_0(munmap((char *) mem, bytes), io_error);
+            }
+            else
+            {
+                memcpy(mem, buffer, bytes);
+                stxxl_check_ge_0(munmap((char *) mem, bytes), io_error);
+            }
+        }
  #endif
     }
     catch (const io_error & ex)
