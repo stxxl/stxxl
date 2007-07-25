@@ -468,7 +468,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
         while (begin != beyond)
         {
-            my_data tmp =  begin->second;
+            my_data tmp = begin->second;
             ++n_scanned;
             ++begin;
         }

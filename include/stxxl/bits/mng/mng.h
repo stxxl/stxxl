@@ -239,7 +239,7 @@ class block_w_info<T_, RawSize_, NBids_, void> :
 {
 public:
     typedef void info_type;
-    enum {size  = ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_) / sizeof(T_)) };
+    enum {size = ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_) / sizeof(T_)) };
 public:
     block_w_info () { STXXL_VERBOSE2("block_w_info is allocated"); }
 };
@@ -624,7 +624,7 @@ stxxl::int64 DiskAllocator::new_blocks (BID < BLK_SIZE > * begin,
     assert(requested_size > BLK_SIZE);
     assert(end - begin > 1);
 
-    typename  BIDArray<BLK_SIZE>::iterator middle =  begin + ((end - begin) / 2);
+    typename  BIDArray<BLK_SIZE>::iterator middle = begin + ((end - begin) / 2);
     new_blocks(begin, middle);
     new_blocks(middle, end);
 
@@ -846,9 +846,9 @@ public:
     {
         if (io_impl == "syscall")
         {
-            stxxl::ufs_file_base * result =  new stxxl::syscall_file (filename,
-                                                                      options,
-                                                                      disk);
+            stxxl::ufs_file_base * result = new stxxl::syscall_file (filename,
+                                                                     options,
+                                                                     disk);
             result->lock();
             return result;
         }

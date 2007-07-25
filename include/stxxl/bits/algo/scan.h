@@ -164,7 +164,7 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
         if (_begin.block_offset() == 0)
             _begin.touch();
 
-        *outstream  = _generator();
+        *outstream = _generator();
         ++_begin;
         ++outstream;
     }
@@ -173,7 +173,7 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
 
     while (out.block_offset())    // filling the rest of the block
     {
-        *outstream =  *out;
+        *outstream = *out;
         ++out;
         ++outstream;
     }

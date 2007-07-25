@@ -112,7 +112,7 @@ int main(int argc, char * argv[])
     double * w_finish_times = new double[ndisks];
 #endif
 
-    int count  = (stxxl::int64(atoi(argv[1])) * MB) / buffer_size + 1;
+    int count = (stxxl::int64(atoi(argv[1])) * MB) / buffer_size + 1;
 
     for (i = 0; i < ndisks * buffer_size_int; i++)
         buffer[i] = i;

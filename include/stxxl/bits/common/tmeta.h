@@ -71,7 +71,7 @@ class SWITCH
     enum
     {
         caseTag = Case::tag,
-        found   = (caseTag == tag || caseTag == DEFAULT)
+        found = (caseTag == tag || caseTag == DEFAULT)
     };
 public:
     typedef typename IF < found,

@@ -154,7 +154,7 @@ int main(int argc, char * argv[])
     double * w_finish_times = new double[ndisks];
 #endif
 
-    int count  = (end_offset - offset) / buffer_size;
+    int count = (end_offset - offset) / buffer_size;
 
 
     for (i = 0; i < ndisks * buffer_size_int; i++)

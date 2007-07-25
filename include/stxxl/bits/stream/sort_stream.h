@@ -940,7 +940,7 @@ namespace stream
 
 // begin of native merging procedure
 
-            losers  =  new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
+            losers = new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
 // end of native merging procedure
 #if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)

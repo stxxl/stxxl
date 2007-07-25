@@ -67,7 +67,7 @@ namespace random_shuffle_local
 
             while (const_out.block_offset())
             {
-                **outstream =  *const_out; // might cause I/Os for loading the page that
+                **outstream = *const_out; // might cause I/Os for loading the page that
                 ++const_out;             // contains data beyond out
                 ++ (*outstream);
             }
@@ -217,7 +217,7 @@ void random_shuffle(   ExtIterator_ first,
             STXXL_VERBOSE1("random_shuffle: recursion");
 
             // copy bucket into temp. stxxl::vector
-            temp_vector  = new temp_vector_type(size);
+            temp_vector = new temp_vector_type(size);
 
             for (j = 0; j < size; j++) {
                 (*temp_vector)[j] = buckets[i]->top();
@@ -360,7 +360,7 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
         else {
             STXXL_VERBOSE1("random_shuffle: recursion");
             // copy bucket into temp. stxxl::vector
-            temp_vector  = new temp_vector_type(size);
+            temp_vector = new temp_vector_type(size);
 
             for (j = 0; j < size; j++) {
                 (*temp_vector)[j] = buckets[i]->top();

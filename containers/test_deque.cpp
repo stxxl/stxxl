@@ -61,8 +61,8 @@ int main()
         case 5:
             if (XXLDeque.size() > 0)
             {
-                stxxl::deque<int>::iterator XXLI =  XXLDeque.begin() + (value % XXLDeque.size());
-                std::deque<int>::iterator STDI =  STDDeque.begin() + (value % STDDeque.size());
+                stxxl::deque<int>::iterator XXLI = XXLDeque.begin() + (value % XXLDeque.size());
+                std::deque<int>::iterator STDI = STDDeque.begin() + (value % STDDeque.size());
                 *XXLI = value;
                 *STDI = value;
                 unsigned value1 = rand();

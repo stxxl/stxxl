@@ -25,7 +25,7 @@ int main(int argc, char * argv[])
 
 
     for (i = 0; i < D; i++)
-        count[i] =  0;
+        count[i] = 0;
 
 
     stxxl::random_number<> rnd;

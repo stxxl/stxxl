@@ -52,7 +52,7 @@ public:
 
         while (const_out.block_offset())
         {
-            **outstream =  *const_out;              // might cause I/Os for loading the page that
+            **outstream = *const_out;              // might cause I/Os for loading the page that
             ++const_out;                                 // contains data beyond out
             ++ (*outstream);
         }

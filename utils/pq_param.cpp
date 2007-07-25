@@ -36,7 +36,7 @@ int main(int /*argc*/, char * /*argv*/[])
                 cout << "B: " << B << endl;
                 cout << "c: " << c << endl;
                 cout << "k: " << k << endl;
-                int64 Ae  = m / 2;
+                int64 Ae = m / 2;
                 int64 Ae1 = Ae + sqrt(D(m, k, MaxS, E, B));
                 int64 Ae2 = Ae - sqrt(D(m, k, MaxS, E, B));
                 int64 x = c * B / E;

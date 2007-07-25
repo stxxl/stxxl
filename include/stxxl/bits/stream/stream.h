@@ -441,7 +441,7 @@ namespace stream
         }
 
         if (nbuffers == 0)
-            nbuffers =  2 * config::get_instance()->disks_number();
+            nbuffers = 2 * config::get_instance()->disks_number();
 
 
         outbegin.flush(); // flush container
@@ -456,7 +456,7 @@ namespace stream
             if (outbegin.block_offset() == 0 )
                 outbegin.touch();
 
-            *outstream  = *in;
+            *outstream = *in;
             ++outbegin;
             ++outstream;
             ++in;
@@ -466,7 +466,7 @@ namespace stream
 
         while (const_out.block_offset()) // filling the rest of the block
         {
-            *outstream =  *const_out;
+            *outstream = *const_out;
             ++const_out;
             ++outstream;
         }
@@ -512,7 +512,7 @@ namespace stream
         }
 
         if (nbuffers == 0)
-            nbuffers =  2 * config::get_instance()->disks_number();
+            nbuffers = 2 * config::get_instance()->disks_number();
 
 
         out.flush(); // flush container
@@ -527,7 +527,7 @@ namespace stream
             if (out.block_offset() == 0 )
                 out.touch();
             // tells the vector that the block was modified
-            *outstream  = *in;
+            *outstream = *in;
             ++out;
             ++outstream;
             ++in;
@@ -537,7 +537,7 @@ namespace stream
 
         while (const_out.block_offset())
         {
-            *outstream =  *const_out;      // might cause I/Os for loading the page that
+            *outstream = *const_out;      // might cause I/Os for loading the page that
             ++const_out;                         // contains data beyond out
             ++outstream;
         }

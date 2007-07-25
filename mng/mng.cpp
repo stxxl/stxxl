@@ -9,7 +9,7 @@ config * config::instance = NULL;
 void DiskAllocator::dump()
 {
     stxxl::int64 total = 0;
-    sortseq::const_iterator cur =   free_space.begin ();
+    sortseq::const_iterator cur = free_space.begin ();
     STXXL_ERRMSG("Free regions dump:");
     for ( ; cur != free_space.end(); ++cur)
     {
@@ -26,7 +26,6 @@ config * config::get_instance ()
         char * cfg_path = getenv ("STXXLCFG");
         if (cfg_path)
             instance = new config (cfg_path);
-
         else
             instance = new config ();
     }
