@@ -1003,7 +1003,7 @@ namespace stream
 
                             STXXL_VERBOSE1("finished loop");
 
-                            ptrdiff_t output_size = std::min(less_equal_than_min_last, rest);                   //at most rest elements
+                            ptrdiff_t output_size = (std::min)(less_equal_than_min_last, rest);                   //at most rest elements
 
                             STXXL_VERBOSE1("before merge" << output_size);
 

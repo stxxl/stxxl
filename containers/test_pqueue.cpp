@@ -61,12 +61,6 @@ struct my_cmp // greater
         return my_type((std::numeric_limits < int > ::max)());
     }
 };
-/*
-   struct my_cmp: public std::greater<my_type>
-   {
-   my_type min_value() const { return my_type(std::numeric_limits<my_type>::max()); }
-   my_type max_value() const { return my_type(std::numeric_limits<my_type>::min()); }
-   };*/
 
 using namespace std;
 

@@ -17,11 +17,11 @@ struct comp_type : public std::less<int>
 {
     static int max_value()
     {
-        return std::numeric_limits<int>::max();
+        return (std::numeric_limits<int>::max)();
     }
     static int min_value()
     {
-        return std::numeric_limits<int>::min();
+        return (std::numeric_limits<int>::min)();
     }
 };
 

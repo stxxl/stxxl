@@ -311,13 +311,13 @@ struct SortByCaller // comparison function
   static LogEntry min_value()
   { 
 	LogEntry dummy;
-	dummy.from = std::numeric_limits<long long int>::min();
+	dummy.from = (std::numeric_limits<long long int>::min)();
 	return dummy;
   }
   static LogEntry max_value()
   { 
 	LogEntry dummy;
-	dummy.from = std::numeric_limits<long long int>::max();
+	dummy.from = (std::numeric_limits<long long int>::max)();
 	return dummy;
   }
   
@@ -1503,7 +1503,7 @@ struct CmpIntGreater
   bool operator () (const int & a, const int & b)
   { return a<b; }
   int min_value() const  
-  { return std::numeric_limits<int>::max(); }
+  { return (std::numeric_limits<int>::max)(); }
 };
 \end{lstlisting}
 Example, a comparison object for priority queue where \texttt{top()}
@@ -1512,7 +1512,7 @@ returns the \emph{largest} contained integer:
 struct CmpIntLess: public std::less<int>
 {
    int min_value() const  
-   { return std::numeric_limits<int>::min(); }
+   { return (std::numeric_limits<int>::min)(); }
 };
 \end{lstlisting}
 Note that \texttt{Cmp\_} must define the Strict Weak Ordering.
@@ -1560,7 +1560,7 @@ struct Cmp
                     const int & b) const 
   { return a>b; }
   int min_value() const  
-  { return std::numeric_limits<int>::max(); }
+  { return (std::numeric_limits<int>::max)(); }
 };
 
 typedef stxxl::PRIORITY_QUEUE_GENERATOR<int,
@@ -1730,9 +1730,9 @@ and must provide min and max values for the elements in the input:
 struct CmpIntLess: public std::less<int>
 {
    static int min_value() const  
-   { return std::numeric_limits<int>::min(); }
+   { return (std::numeric_limits<int>::min)(); }
    static int max_value() const  
-   { return std::numeric_limits<int>::max(); }
+   { return (std::numeric_limits<int>::max)(); }
 };
  \end{lstlisting}
  {\bf Example:} 
@@ -1742,9 +1742,9 @@ struct CmpIntLess: public std::less<int>
 struct CmpIntGreater: public std::greater<int>
 {
    int min_value() const  
-   { return std::numeric_limits<int>::max(); }
+   { return (std::numeric_limits<int>::max)(); }
    int max_value() const  
-   { return std::numeric_limits<int>::min(); }
+   { return (std::numeric_limits<int>::min)(); }
 };
  \end{lstlisting}
 
@@ -1802,9 +1802,9 @@ memory to store the sorted runs during the sorting process
 struct MyCmp: public std::less<int> // ascending
 {                                   // order
    static int min_value() const  
-   { return std::numeric_limits<int>::min(); }
+   { return (std::numeric_limits<int>::min)(); }
    static int max_value() const  
-   { return std::numeric_limits<int>::max(); }
+   { return (std::numeric_limits<int>::max)(); }
 };
 typedef stxxl::VECTOR_GENERATOR<int>::result vec_type;
 
@@ -1918,10 +1918,10 @@ struct GetKey
    { return obj._key; }
    MyType min_value() const 
    { return MyType(
-        std::numeric_limits<key_type>::min()); }
+        (std::numeric_limits<key_type>::min)()); }
    MyType max_value() const 
    { return MyType(
-        std::numeric_limits<key_type>::max()); }
+        (std::numeric_limits<key_type>::max)()); }
 };
  \end{lstlisting}
 
@@ -1950,10 +1950,10 @@ struct MyType
    key_type key() { return _key; }
    MyType min_value() const 
    { return MyType(
-        std::numeric_limits<key_type>::min()); }
+        (std::numeric_limits<key_type>::min)()); }
    MyType max_value() const 
    { return MyType(
-        std::numeric_limits<key_type>::max()); }
+        (std::numeric_limits<key_type>::max)()); }
 };
 \end{lstlisting}
 
@@ -1983,10 +1983,10 @@ struct MyType
    key_type key() { return obj._key; }
    static MyType min_value() const 
    { return MyType(
-        std::numeric_limits<key_type>::min()); }
+        (std::numeric_limits<key_type>::min)()); }
    static MyType max_value() const 
    { return MyType(
-        std::numeric_limits<key_type>::max()); }
+        (std::numeric_limits<key_type>::max)()); }
 };
 
 typedef stxxl::VECTOR_GENERATOR<MyType>::result vec_type;

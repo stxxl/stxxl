@@ -93,12 +93,12 @@ struct SortByCaller
   // min sentinel = value which is strictly smaller that any input element
   static LogEntry min_value()
   {
-	LogEntry e; e.from = std::numeric_limits<long long int>::min(); return e;
+	LogEntry e; e.from = (std::numeric_limits<long long int>::min)(); return e;
   }
   // max sentinel = value which is strictly larger that any input element
   static LogEntry max_value()
   {
-	LogEntry e; e.from = std::numeric_limits<long long int>::max(); return e;
+	LogEntry e; e.from = (std::numeric_limits<long long int>::max)(); return e;
   }
 };
 

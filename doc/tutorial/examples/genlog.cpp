@@ -28,11 +28,11 @@ struct cmp
 	}
 	static LogEntry min_value()
 	{
-		LogEntry e; e.timestamp = std::numeric_limits<time_t>::min(); return e;
+		LogEntry e; e.timestamp = (std::numeric_limits<time_t>::min)(); return e;
 	}
 	static LogEntry max_value()
 	{
-		LogEntry e; e.timestamp = std::numeric_limits<time_t>::max(); return e;
+		LogEntry e; e.timestamp = (std::numeric_limits<time_t>::max)(); return e;
 	}
 };
 
@@ -77,7 +77,7 @@ int main(int argc, char * argv[])
 	  	number < nclients && calls_made < ncalls; 
   		++number )
   {
-    unsigned serv = std::min((long long int)rnd(av_calls*2),(ncalls - calls_made));
+    unsigned serv = (std::min)((long long int)rnd(av_calls*2),(ncalls - calls_made));
     LogEntry e;
     e.from = number;
 
