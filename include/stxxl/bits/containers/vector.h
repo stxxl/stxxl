@@ -1029,7 +1029,7 @@ template <
           typename AllocStr_,
           typename SzTp_ >
 inline bool operator == ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
-                          AllocStr_, SzTp_ > & a,
+                                         AllocStr_, SzTp_ > & a,
                           stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
                                         AllocStr_, SzTp_> & b )
 {
@@ -1044,7 +1044,7 @@ template <
           typename AllocStr_,
           typename SzTp_ >
 inline bool operator != ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
-                          AllocStr_, SzTp_ > & a,
+                                         AllocStr_, SzTp_ > & a,
                           stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
                                         AllocStr_, SzTp_> & b )
 {
@@ -1059,7 +1059,7 @@ template <
           typename AllocStr_,
           typename SzTp_ >
 inline bool operator < ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
-                         AllocStr_, SzTp_ > & a,
+                                        AllocStr_, SzTp_ > & a,
                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
                                        AllocStr_, SzTp_> & b )
 {
@@ -1074,7 +1074,7 @@ template <
           typename AllocStr_,
           typename SzTp_ >
 inline bool operator > ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
-                         AllocStr_, SzTp_ > & a,
+                                        AllocStr_, SzTp_ > & a,
                          stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
                                        AllocStr_, SzTp_> & b )
 {
@@ -1089,7 +1089,7 @@ template <
           typename AllocStr_,
           typename SzTp_ >
 inline bool operator <= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
-                          AllocStr_, SzTp_ > & a,
+                                         AllocStr_, SzTp_ > & a,
                           stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
                                         AllocStr_, SzTp_> & b )
 {
@@ -1104,7 +1104,7 @@ template <
           typename AllocStr_,
           typename SzTp_ >
 inline bool operator >= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
-                          AllocStr_, SzTp_ > & a,
+                                         AllocStr_, SzTp_ > & a,
                           stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
                                         AllocStr_, SzTp_> & b )
 {

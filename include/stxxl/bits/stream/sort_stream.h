@@ -120,9 +120,9 @@ namespace stream
             if (block_type::has_filler)
                 std::sort(
                     TwoToOneDimArrayRowAdaptor <
-                    block_type,
-                    value_type,
-                    block_type::size > (run, 0 ),
+                                                block_type,
+                                                value_type,
+                                                block_type::size > (run, 0 ),
                     TwoToOneDimArrayRowAdaptor<
                                                block_type,
                                                value_type,
@@ -462,9 +462,9 @@ namespace stream
             if (block_type::has_filler)
                 std::sort(
                     TwoToOneDimArrayRowAdaptor <
-                    block_type,
-                    value_type,
-                    block_type::size > (run, 0 ),
+                                                block_type,
+                                                value_type,
+                                                block_type::size > (run, 0 ),
                     TwoToOneDimArrayRowAdaptor<
                                                block_type,
                                                value_type,
@@ -819,9 +819,9 @@ namespace stream
             }
             if (!is_sorted(
                     TwoToOneDimArrayRowAdaptor <
-                    block_type,
-                    value_type,
-                    block_type::size > (blocks, 0 ),
+                                                block_type,
+                                                value_type,
+                                                block_type::size > (blocks, 0 ),
                     TwoToOneDimArrayRowAdaptor<
                                                block_type,
                                                value_type,

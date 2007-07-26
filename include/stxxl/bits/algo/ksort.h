@@ -397,9 +397,9 @@ bool check_ksorted_runs(              run_type * * runs,
             }
             if (!is_sorted(
                     TwoToOneDimArrayRowAdaptor <
-                    block_type,
-                    value_type,
-                    block_type::size > (blocks, 0 ),
+                                                block_type,
+                                                value_type,
+                                                block_type::size > (blocks, 0 ),
                     TwoToOneDimArrayRowAdaptor<
                                                block_type,
                                                value_type,
@@ -687,7 +687,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 #endif
             STXXL_VERBOSE("Merging " << runs2merge << " runs");
             merge_runs<block_type, run_type, key_extractor> (runs + nruns - runs_left,
-                                                             runs2merge, * (new_runs + (cur_out_run++)), _m, keyobj);
+                                                             runs2merge, *(new_runs + (cur_out_run++)), _m, keyobj);
             runs_left -= runs2merge;
         }
 

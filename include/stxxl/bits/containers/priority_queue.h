@@ -1537,7 +1537,7 @@ finish:
 
 
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
-    loser_tree<ValTp_, Cmp_, KNKMAX>::~ loser_tree()
+    loser_tree<ValTp_, Cmp_, KNKMAX>::~loser_tree()
     {
         STXXL_VERBOSE2("loser_tree::~loser_tree()");
         for (unsigned_type i = 0; i < k; ++i)

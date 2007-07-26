@@ -352,9 +352,9 @@ namespace sort_local
                 }
                 if (!is_sorted(
                         TwoToOneDimArrayRowAdaptor <
-                        block_type,
-                        value_type,
-                        block_type::size > (blocks, 0 ),
+                                                    block_type,
+                                                    value_type,
+                                                    block_type::size > (blocks, 0 ),
                         TwoToOneDimArrayRowAdaptor<
                                                    block_type,
                                                    value_type,
@@ -780,7 +780,7 @@ namespace sort_local
 #endif
                 STXXL_VERBOSE("Merging " << runs2merge << " runs");
                 merge_runs<block_type, run_type> (runs + nruns - runs_left,
-                                                  runs2merge, * (new_runs + (cur_out_run++)), _m, cmp
+                                                  runs2merge, *(new_runs + (cur_out_run++)), _m, cmp
                 );
                 runs_left -= runs2merge;
             }

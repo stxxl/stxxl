@@ -562,7 +562,7 @@ public:
             w_pool.write(cache, bids.back());
             cache = w_pool.steal();
             const int_type bids_size = bids.size();
-            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr) - 1, (int_type)0);
+            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr) - 1, (int_type) 0);
             for (int_type i = bids_size - 2; i >= last_pref; --i )
             {
                 if (p_pool.in_prefetching(bids[i]))
