@@ -17,7 +17,7 @@ NICE	?= nice
 
 default-all: lib tests header-compile-test
 
-doxy:
+doxy release:
 	$(MAKE) -f Makefile $@
 
 lib:

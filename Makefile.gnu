@@ -75,6 +75,23 @@ common/version_svn.defs:
 	$(RM) $@.tmp
 endif
 
+VERSION		?= $(shell grep 'define *STXXL_VERSION_STRING_MA_MI_PL' common/version.cpp | cut -d'"' -f2)
+PHASE		?= snapshot
+DATE		?= $(shell date "+%Y%m%d")
+REL_VERSION	:= $(VERSION)$(if $(strip $(DATE)),-$(DATE))
+release:
+	$(RM) -r reltmp stxxl-$(REL_VERSION).tar.gz
+	mkdir reltmp
+	svn export . reltmp/stxxl-$(REL_VERSION)
+	echo '#define STXXL_VERSION_STRING_PHASE "$(PHASE)"' > reltmp/stxxl-$(REL_VERSION)/common/version.defs
+	$(if $(strip $(DATE)),echo '#define STXXL_VERSION_STRING_DATE "$(DATE)"' >> reltmp/stxxl-$(REL_VERSION)/common/version.defs)
+	cd reltmp && tar cf - stxxl-$(REL_VERSION) | gzip -9 > ../stxxl-$(REL_VERSION).tar.gz
+	$(RM) -r reltmp
+	@echo
+	@echo "Your release has been created in stxxl-$(REL_VERSION).tar.gz"
+	@echo "The following files are modified and not commited:"
+	@svn status -q
+
 tests-in-%: lib/lib$(LIBNAME).$(LIBEXT)
 	$(MAKE) -C $* tests
 

@@ -69,3 +69,9 @@ doxy: Doxyfile
 clean_doxy:
 	$(RM) -r doc/doxy
 
+# optional parameters:
+# DATE=""     if you *don't* want a -YYYYMMDD in the version
+# PHASE=snapshot|alpha#|beta#|rc#|release    (defaults to snapshot)
+release:
+	$(MAKE) -f Makefile.gnu release
+
