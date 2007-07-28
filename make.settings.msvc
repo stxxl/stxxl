@@ -4,7 +4,7 @@
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = c:\stxxl#
-BOOST_ROOT = c:\boost#
+BOOST_ROOT = c:\Programme\boost\boost_1_34_0#
 
 MAKE = nmake
 COMPILER = cl

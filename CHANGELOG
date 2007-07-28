@@ -25,7 +25,7 @@ Repository version (see the web page for the last modification date)
   GCC 3.3       |    o           n/a
   GCC 2.95      |    -           n/a
   ICPC x.y.z    |    ?            ?
-  MSVC x.y.z    |    ?            ?
+  MSVC 2005 8.0 |    x           n/a
     x = full support   o = partial support   - = unsupported
     n/a = compiler does not support OpenMP which is needed by MCSTL
 * obsolete files removed
