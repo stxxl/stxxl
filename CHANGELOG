@@ -1,5 +1,4 @@
-Repository version (see the web page for the last modification date)
-(will become) Version 1.1.0 (unreleased)
+Version 1.1.0 (31 July 2007)
 
 * stxxl is now hosted on sourceforge: http://stxxl.sourceforge.net/
 * Restructured the source layout:
@@ -32,6 +31,7 @@ Repository version (see the web page for the last modification date)
 	¹ = does not work with STL GCC 4.2.0 (ICPC bug), workaround: 
 	    the first include in the program must be
 	    "stxxl/bits/common/intel_compatibility.h"
+* pipelined stream::sort, stream::runs_creator and stream::runs_merger are parallelized using MCSTL
 * obsolete files removed
 * fixed include dependencies
 * fixed lots of warnings
