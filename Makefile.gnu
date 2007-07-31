@@ -80,15 +80,15 @@ PHASE		?= snapshot
 DATE		?= $(shell date "+%Y%m%d")
 REL_VERSION	:= $(VERSION)$(if $(strip $(DATE)),-$(DATE))
 release:
-	$(RM) -r reltmp stxxl-$(REL_VERSION).tar.gz
+	$(RM) -r reltmp stxxl-$(REL_VERSION).tar.gz stxxl-$(REL_VERSION).zip
 	mkdir reltmp
 	svn export . reltmp/stxxl-$(REL_VERSION)
 	echo '#define STXXL_VERSION_STRING_PHASE "$(PHASE)"' > reltmp/stxxl-$(REL_VERSION)/common/version.defs
 	$(if $(strip $(DATE)),echo '#define STXXL_VERSION_STRING_DATE "$(DATE)"' >> reltmp/stxxl-$(REL_VERSION)/common/version.defs)
-	cd reltmp && tar cf - stxxl-$(REL_VERSION) | gzip -9 > ../stxxl-$(REL_VERSION).tar.gz
+	cd reltmp && tar cf - stxxl-$(REL_VERSION) | gzip -9 > ../stxxl-$(REL_VERSION).tar.gz && zip -r ../stxxl-$(REL_VERSION).zip stxxl-$(REL_VERSION)/* 
 	$(RM) -r reltmp
 	@echo
-	@echo "Your release has been created in stxxl-$(REL_VERSION).tar.gz"
+	@echo "Your release has been created in stxxl-$(REL_VERSION).tar.gz and stxxl-$(REL_VERSION).zip"
 	@echo "The following files are modified and not commited:"
 	@svn status -q
 
