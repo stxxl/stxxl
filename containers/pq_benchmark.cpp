@@ -91,14 +91,14 @@ inline long long unsigned myrand()
 #endif
 
 
-void run_stxxl_insert_all_delete_all(stxxl::int64 ops)
+void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 {
     stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE / BLOCK_SIZE);
     stxxl::write_pool<block_type>    w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
 
     pq_type PQ(p_pool, w_pool);
 
-    stxxl::int64 i;
+    stxxl::uint64 i;
 
     my_record cur;
 
@@ -154,14 +154,14 @@ void run_stxxl_insert_all_delete_all(stxxl::int64 ops)
 }
 
 
-void run_stxxl_intermixed(stxxl::int64 ops)
+void run_stxxl_intermixed(stxxl::uint64 ops)
 {
     stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE / BLOCK_SIZE);
     stxxl::write_pool<block_type>    w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
 
     pq_type PQ(p_pool, w_pool);
 
-    stxxl::int64 i;
+    stxxl::uint64 i;
 
     my_record cur;
 
@@ -240,7 +240,7 @@ int main(int argc, char * argv[])
     }
 
     int version = atoi(argv[1]);
-    stxxl::int64 ops = atoll(argv[2]);
+    stxxl::uint64 ops = atoll(argv[2]);
 
 
     STXXL_MSG("Running version      : " << version);

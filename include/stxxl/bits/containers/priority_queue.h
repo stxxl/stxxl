@@ -399,7 +399,7 @@ finish:
     class ext_merger
     {
     public:
-        typedef stxxl::int64 size_type;
+        typedef stxxl::uint64 size_type;
         typedef BlockType_ block_type;
         typedef typename block_type::bid_type bid_type;
         typedef typename block_type::value_type value_type;
@@ -1814,7 +1814,7 @@ public:
     typedef typename Config::comparator_type comparator_type;
     typedef typename Config::alloc_strategy_type alloc_strategy_type;
     //! \brief An unsigned integral type (64 bit)
-    typedef stxxl::int64 size_type;
+    typedef stxxl::uint64 size_type;
     typedef typed_block<BlockSize, value_type> block_type;
 
 
@@ -2183,7 +2183,7 @@ void priority_queue<Config_>::refillBuffer1()
     {
         minBuffer1 = buffer1 + BufferSize1 - totalSize;
         sz = totalSize;
-        assert(size_ == sz); // trees and buffer2 get empty
+        assert(size_ == size_type(sz)); // trees and buffer2 get empty
         size_ = 0;
     }
 
