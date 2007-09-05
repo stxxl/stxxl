@@ -35,7 +35,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 //! \weakgroup stllayer STL-user layer
-//! Layer which groups STL compatible algorithms and containters
+//! Layer which groups STL compatible algorithms and containers
 
 //! \weakgroup stlalgo Algorithms
 //! \ingroup stllayer
@@ -1059,7 +1059,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
             }
             else
             {
-                // first and last element resine in the beginning of blocks
+                // first and last element reside in the beginning of blocks
                 n = last_.bid() - first_.bid();
 
                 run_type * out =

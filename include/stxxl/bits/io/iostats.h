@@ -28,7 +28,7 @@ extern double wait_time_counter;
 
 class disk_queue;
 
-//! \brief Collects varoius I/O statistics
+//! \brief Collects various I/O statistics
 //! \remarks is a singleton
 class stats
 {

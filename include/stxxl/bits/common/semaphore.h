@@ -113,7 +113,7 @@ public:
 #endif
     }
     // function returns the value of the semaphore at the time the
-    // critical section is accessed.  obviously the value is not guarenteed
+    // critical section is accessed.  obviously the value is not guaranteed
     // after the function unlocks the critical section.
     //int operator()
     //{

@@ -83,7 +83,7 @@ protected:
     void serve ();
 
     // Following methods are declared but not implemented
-    // intentionnaly to forbid their usage
+    // intentionally to forbid their usage
     boostfd_request(const boostfd_request &);
     boostfd_request & operator=(const boostfd_request &);
     boostfd_request();

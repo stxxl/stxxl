@@ -49,7 +49,7 @@ namespace btree
 //!   static int max_value() { return std::numeric_limits<int>::max(); }
 //! };
 //! \endverbatim
-//! Anpother example:
+//! Another example:
 //! \verbatim
 //! struct CmpIntLess
 //! {

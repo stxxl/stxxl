@@ -25,7 +25,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \weakgroup fileimpl File implementations
 //! \ingroup iolayer
-//! Implemantations of \c stxxl::file and \c stxxl::request
+//! Implementations of \c stxxl::file and \c stxxl::request
 //! for various file access methods
 //! \{
 
@@ -72,7 +72,7 @@ public:
     }
 private:
     // Following methods are declared but not implemented
-    // intentionnaly to forbid their usage
+    // intentionally to forbid their usage
     mmap_request(const mmap_request &);
     mmap_request & operator=(const mmap_request &);
     mmap_request();

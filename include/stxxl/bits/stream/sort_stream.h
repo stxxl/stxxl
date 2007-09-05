@@ -84,7 +84,7 @@ namespace stream
     //!
     //! Template parameters:
     //! - \c Input_ type of the input stream
-    //! - \c Cmp_ type of omparison object used for sorting the runs
+    //! - \c Cmp_ type of comparison object used for sorting the runs
     //! - \c BlockSize_ size of blocks used to store the runs
     //! - \c AllocStr_ functor that defines allocation strategy for the runs
     template <
@@ -195,7 +195,7 @@ namespace stream
         block_type * Blocks1;
 
         if ( pos == block_type::size )
-        {      // ennlarge/reallocate Blocks1 array
+        {      // enlarge/reallocate Blocks1 array
             block_type * NewBlocks = new block_type[m2 * 2];
             std::copy(result_.small_.begin(), result_.small_.end(), NewBlocks[0].begin());
             result_.small_.clear();
@@ -742,7 +742,7 @@ namespace stream
             result_.runs_sizes.resize(irun + 1);
             result_.runs_sizes.back() = iblock * block_type::size + offset;
 
-            if (offset)    // if current block is parially filled
+            if (offset)    // if current block is partially filled
             {
                 while (offset != block_type::size)
                 {
@@ -788,7 +788,7 @@ namespace stream
 
     //! \brief Checker for the sorted runs object created by the \c runs_creator .
     //! \param sruns sorted runs object
-    //! \param cmp comparson object used for checking the order of elements in runs
+    //! \param cmp comparison object used for checking the order of elements in runs
     //! \return \c true if runs are sorted, \c false otherwise
     template <class RunsType_, class Cmp_>
     bool check_sorted_runs(RunsType_ & sruns, Cmp_ cmp)
@@ -1420,7 +1420,7 @@ namespace stream
     //!
     //! Template parameters:
     //! - \c Input_ type of the input stream
-    //! - \c Cmp_ type of omparison object used for sorting the runs
+    //! - \c Cmp_ type of comparison object used for sorting the runs
     //! - \c BlockSize_ size of blocks used to store the runs
     //! - \c AllocStr_ functor that defines allocation strategy for the runs
     //! \remark Implemented as the composition of \c runs_creator and \c runs_merger .

@@ -131,7 +131,7 @@ int main(int argc, char * argv [])
 
         //STXXL_MSG(*stxxl::stats::get_instance());
     }
-    STXXL_MSG("All tests passed successufully");
+    STXXL_MSG("All tests passed successfully");
 
     return 0;
 }

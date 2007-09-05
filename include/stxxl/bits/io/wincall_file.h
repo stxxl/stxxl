@@ -69,7 +69,7 @@ public:
     const char * io_type ();
 private:
     // Following methods are declared but not implemented
-    // intentionnaly to forbid their usage
+    // intentionally to forbid their usage
     wincall_request(const wincall_request &);
     wincall_request & operator=(const wincall_request &);
     wincall_request();

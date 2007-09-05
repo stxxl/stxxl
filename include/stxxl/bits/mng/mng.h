@@ -253,8 +253,8 @@ public:
 //! - \c InfoType_ type of per block information (default is no information - void)
 //!
 //! The data array of type T_ is contained in the parent class \c stxxl::element_block, see related information there.
-//! The BID array of references is contained in the parent class \c stxxl::block_w_bids, see relared information there.
-//! The "per block information" is contained in the parent class \c stxxl::block_w_info, see relared information there.
+//! The BID array of references is contained in the parent class \c stxxl::block_w_bids, see related information there.
+//! The "per block information" is contained in the parent class \c stxxl::block_w_info, see related information there.
 //!  \warning If \c RawSize_ > 2MB object(s) of this type can not be allocated on the stack (as a
 //! function variable for example), because Linux POSIX library limits the stack size for the
 //! main thread to (2MB - system page size)
@@ -362,7 +362,7 @@ public:
         aligned_dealloc < BLOCK_ALIGN > (ptr);
     }
 
-    // STRANGE: implementing deconstructor makes g++ allocate
+    // STRANGE: implementing destructor makes g++ allocate
     // additional 4 bytes in the beginning of every array
     // of this type !? makes aligning to 4K boundaries difficult
     //
@@ -602,7 +602,7 @@ stxxl::int64 DiskAllocator::new_blocks (BID < BLK_SIZE > * begin,
     }
 
     // no contiguous region found
-    STXXL_VERBOSE1("Warning, when allocation a external memory space, no contiguos region found");
+    STXXL_VERBOSE1("Warning, when allocation an external memory space, no contiguous region found");
     STXXL_VERBOSE1("It might harm the performance");
     if (requested_size == BLK_SIZE )
     {
@@ -894,7 +894,7 @@ public:
 };
 
 //! \weakgroup alloc Allocation functors
-//! Standard allocation strategies incapsulated in functors
+//! Standard allocation strategies encapsulated in functors
 //! \{
 
 //! \brief striping disk allocation scheme functor
@@ -1028,7 +1028,7 @@ struct offset_allocator
     //! \param offset_ offset
     offset_allocator(int_type offset_) : base(), offset(offset_) { }
     //! \brief Creates functor based on instance of \c BaseAllocator_ functor
-    //! with offset \c ofset_
+    //! with offset \c offset_
     //! \param offset_ offset
     //! \param base_ used to create a copy
     offset_allocator(int_type offset_, BaseAllocator_ & base_) : base(base_), offset(offset_) { }

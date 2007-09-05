@@ -137,7 +137,7 @@ block_manager::block_manager ()
 
 block_manager::~block_manager()
 {
-    STXXL_VERBOSE1("Block manager deconstructor");
+    STXXL_VERBOSE1("Block manager destructor");
     for (unsigned i = 0; i < ndisks; i++)
     {
         delete disk_allocators[i];

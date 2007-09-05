@@ -32,9 +32,9 @@ wfs_request_base::wfs_request_base (
     _state (OP)
 {
  #ifdef STXXL_CHECK_BLOCK_ALIGNING
-    // Direct I/O requires filsystem block size alighnment for file offsets,
-    // memory buffer adresses, and transfer(buffer) size must be multiple
-    // of the filesystem block size
+    // Direct I/O requires file system block size alignment for file offsets,
+    // memory buffer addresses, and transfer(buffer) size must be multiple
+    // of the file system block size
     check_aligning ();
  #endif
 }
@@ -111,7 +111,7 @@ wfs_request_base::~wfs_request_base ()
     assert(_state() == DONE || _state() == READY2DIE);
 
     // if(_state() != DONE && _state()!= READY2DIE )
-    //	STXXL_ERRMSG("WARNING: serious stxxl error requiest being deleted while I/O did not finish "<<
+    //	STXXL_ERRMSG("WARNING: serious stxxl error request being deleted while I/O did not finish "<<
     //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
 
     // _state.wait_for (READY2DIE); // does not make sense ?

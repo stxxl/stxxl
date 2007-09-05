@@ -57,7 +57,7 @@ namespace btree
 
         btree_iterator_base()
         {
-            STXXL_VERBOSE3("btree_iterator_base def contruct addr=" << this);
+            STXXL_VERBOSE3("btree_iterator_base def construct addr=" << this);
             make_invalid();
         }
 
@@ -67,7 +67,7 @@ namespace btree
             unsigned p
         ) : btree_(btree__), bid(b), pos(p)
         {
-            STXXL_VERBOSE3("btree_iterator_base parameter contruct addr=" << this);
+            STXXL_VERBOSE3("btree_iterator_base parameter construct addr=" << this);
             btree_->iterator_map_.register_iterator(*this);
         }
 

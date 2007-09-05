@@ -61,7 +61,7 @@ public:
     const char * io_type ();
 private:
     // Following methods are declared but not implemented
-    // intentionnaly to forbid their usage
+    // intentionally to forbid their usage
     syscall_request(const syscall_request &);
     syscall_request & operator=(const syscall_request &);
     syscall_request();

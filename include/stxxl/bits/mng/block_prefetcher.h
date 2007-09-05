@@ -77,7 +77,7 @@ protected:
 public:
     //! \brief Constructs an object and immediately starts prefetching
     //! \param _cons_begin \c bid_iterator pointing to the \c bid of the first block to be consumed
-    //! \param _cons_end \c bid_iterator pointing to the \c bid of the ( \b last + 1 ) block of consumtion sequence
+    //! \param _cons_end \c bid_iterator pointing to the \c bid of the ( \b last + 1 ) block of consumption sequence
     //! \param _pref_seq gives the prefetch order, is a pointer to the integer array that contains
     //!        the indices of the blocks in the consumption sequence
     //! \param _prefetch_buf_size amount of prefetch buffers to use

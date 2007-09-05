@@ -1036,7 +1036,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         Timer.start();
 
         // DBD does not have bulk construction
-        // however insering in sorted order might help
+        // however inserting in sorted order might help
         // to improve performance
         vector_type::const_iterator cit = SortedSeq.begin();
         for (i = 0; i < n; ++i, ++cit)

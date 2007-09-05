@@ -14,7 +14,7 @@
 // Get the AMI_stack definition.
 #include <ami_stack.h>
 
-// Utitlities for ascii output.
+// Utilities for ASCII output.
 #include <ami_scan_utils.h>
 
 #include "stxxl/bits/common/utils_ledasm.h"
@@ -118,12 +118,12 @@ int main(int argc, char * argv[])
 #ifdef BTE_STREAM_IMP_UFS
     cout << "BTE_STREAM_IMP_UFS is defined" << endl;
     cout << "BTE_STREAM_UFS_BLOCK_FACTOR is " << BTE_STREAM_UFS_BLOCK_FACTOR << endl;
-    cout << "Actual block size is " << (TPIE_OS_BLOCKSIZE() * BTE_STREAM_UFS_BLOCK_FACTOR / 1024) << " kb" << endl;
+    cout << "Actual block size is " << (TPIE_OS_BLOCKSIZE() * BTE_STREAM_UFS_BLOCK_FACTOR / 1024) << " KB" << endl;
 #endif
 #ifdef BTE_STREAM_IMP_MMAP
     cout << "BTE_STREAM_IMP_MMAP is defined" << endl;
     cout << "BTE_STREAM_MMAP_BLOCK_FACTOR is " << BTE_STREAM_MMAP_BLOCK_FACTOR << endl;
-    cout << "Actual block size is " << (TPIE_OS_BLOCKSIZE() * BTE_STREAM_MMAP_BLOCK_FACTOR / 1024) << " kb" << endl;
+    cout << "Actual block size is " << (TPIE_OS_BLOCKSIZE() * BTE_STREAM_MMAP_BLOCK_FACTOR / 1024) << " KB" << endl;
 #endif
 #ifdef BTE_STREAM_IMP_STDIO
     cout << "BTE_STREAM_IMP_STDIO is defined" << endl;

@@ -114,7 +114,7 @@ namespace btree
             assert(result.second == true);
             if (root_node_.size() > max_node_size)            // root overflow
             {
-                STXXL_VERBOSE1("btree::insert_into_root, overlow happened, splitting");
+                STXXL_VERBOSE1("btree::insert_into_root, overflow happened, splitting");
 
                 node_bid_type LeftBid;
                 node_type * LeftNode = node_cache_.get_new_node(LeftBid);
@@ -427,7 +427,7 @@ namespace btree
                 deallocate_children();
             } catch (...)
             {
-                // no exceptions in deconstructor
+                // no exceptions in destructor
             }
         }
 
@@ -510,7 +510,7 @@ namespace btree
 
             if (height_ == 2)            // 'it' points to a leaf
             {
-                STXXL_VERBOSE1("btree: retrieveing begin() from the first leaf");
+                STXXL_VERBOSE1("btree: retrieving begin() from the first leaf");
                 leaf_type * Leaf = leaf_cache_.get_node((leaf_bid_type)it->second);
                 assert(Leaf);
 
@@ -520,7 +520,7 @@ namespace btree
             }
 
             // 'it' points to a node
-            STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
+            STXXL_VERBOSE1("btree: retrieving begin() from the first node");
             node_type * Node = node_cache_.get_node((node_bid_type)it->second, true);
             assert(Node);
             iterator result = Node->begin(height_ - 1);
@@ -539,7 +539,7 @@ namespace btree
 
             if (height_ == 2)            // 'it' points to a leaf
             {
-                STXXL_VERBOSE1("btree: retrieveing begin() from the first leaf");
+                STXXL_VERBOSE1("btree: retrieving begin() from the first leaf");
                 leaf_type const * Leaf = leaf_cache_.get_const_node((leaf_bid_type)it->second);
                 assert(Leaf);
                 assert(leaf_cache_.nfixed() == 0);
@@ -548,7 +548,7 @@ namespace btree
             }
 
             // 'it' points to a node
-            STXXL_VERBOSE1("btree: retrieveing begin() from the first node");
+            STXXL_VERBOSE1("btree: retrieving begin() from the first node");
             node_type const * Node = node_cache_.get_const_node((node_bid_type)it->second, true);
             assert(Node);
             const_iterator result = Node->begin(height_ - 1);

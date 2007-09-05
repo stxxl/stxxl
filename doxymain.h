@@ -105,7 +105,7 @@
  * \c S<small>TXXL</small> program in a file named \c '.stxxl' that must reside
  * in the same directory where you execute the program.
  * You can change the default file name for the configuration
- * file by setting the enviroment variable \c STXXLCFG .
+ * file by setting the environment variable \c STXXLCFG .
  *
  *
  * Each line of the configuration file describes a disk.
@@ -114,7 +114,7 @@
  *
  * Description of the parameters:
  * - \c full_disk_filename : full disk filename. In order to access disks S<small>TXXL</small> uses file
- * access methods. Each disk is respresented as a file. If you have a disk that is mapped in unix
+ * access methods. Each disk is represented as a file. If you have a disk that is mapped in Unix
  * to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be
  * \c /mnt/disk0/some_file_name ,
  * - \c capacity : maximum capacity of the disk in megabytes
@@ -208,7 +208,7 @@
  * \c S<small>TXXL</small> program in a file named \c '.stxxl' that must reside
  * in the same directory where you execute the program.
  * You can change the default file name for the configuration
- * file by setting the enviroment variable \c STXXLCFG .
+ * file by setting the environment variable \c STXXLCFG .
  *
  *
  * Each line of the configuration file describes a disk.
@@ -217,7 +217,7 @@
  *
  * Description of the parameters:
  * - \c full_disk_filename : full disk filename. In order to access disks S<small>TXXL</small> uses file
- * access methods. Each disk is respresented as a file. If you have a disk called \c e:
+ * access methods. Each disk is represented as a file. If you have a disk called \c e:
  * then the correct value for the \c full_disk_filename would be
  * \c e:\\some_file_name ,
  * - \c capacity : maximum capacity of the disk in megabytes
@@ -304,7 +304,7 @@
  * \c S<small>TXXL</small> program in a file named \c '.stxxl' that must reside
  * in the same directory where you execute the program.
  * You can change the default file name for the configuration
- * file by setting the enviroment variable \c STXXLCFG .
+ * file by setting the environment variable \c STXXLCFG .
  *
  *
  * Each line of the configuration file describes a disk.
@@ -313,7 +313,7 @@
  *
  * Description of the parameters:
  * - \c full_disk_filename : full disk filename. In order to access disks S<small>TXXL</small> uses file
- * access methods. Each disk is respresented as a file. If you have a disk that is mapped in unix
+ * access methods. Each disk is represented as a file. If you have a disk that is mapped in Unix
  * to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be
  * \c /mnt/disk0/some_file_name ,
  * - \c capacity : maximum capacity of the disk in megabytes
@@ -394,7 +394,7 @@
  * \c S<small>TXXL</small> program in a file named \c '.stxxl' that must reside
  * in the same directory where you execute the program.
  * You can change the default file name for the configuration
- * file by setting the enviroment variable \c STXXLCFG .
+ * file by setting the environment variable \c STXXLCFG .
  *
  *
  * Each line of the configuration file describes a disk.
@@ -403,7 +403,7 @@
  *
  * Description of the parameters:
  * - \c full_disk_filename : full disk filename. In order to access disks S<small>TXXL</small> uses file
- * access methods. Each disk is respresented as a file. If you have a disk that is mapped in unix
+ * access methods. Each disk is represented as a file. If you have a disk that is mapped in Unix
  * to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be
  * \c /mnt/disk0/some_file_name ,
  * - \c capacity : maximum capacity of the disk in megabytes

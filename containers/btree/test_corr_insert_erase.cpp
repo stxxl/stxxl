@@ -89,7 +89,7 @@ int main(int argc, char * argv [])
         assert(f == 1);
         bIt = BTree.find(*vIt);         // checking it is not there
         assert(bIt == BTree.end());
-        f = BTree.erase(*vIt);         // trying to erasi it again
+        f = BTree.erase(*vIt);         // trying to erase it again
         assert(f == 0);
     }
 

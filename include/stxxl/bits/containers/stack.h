@@ -41,7 +41,7 @@ struct stack_config_generator
 
 //! \brief External stack container
 
-//! Conservative implementation. Fits best if you access pattern consists of irregulary mixed
+//! Conservative implementation. Fits best if your access pattern consists of irregularly mixed
 //! push'es and pop's.
 //! For semantics of the methods see documentation of the STL \c std::stack. <BR>
 //! To gain full bandwidth of disks \c Config_::BlocksPerPage must >= number of disks <BR>
@@ -246,7 +246,7 @@ private:
 
 //! \brief Efficient implementation that uses prefetching and overlapping using internal buffers
 
-//! Use it if your access patttern consists of many repeated push'es and pop's
+//! Use it if your access pattern consists of many repeated push'es and pop's
 //! For semantics of the methods see documentation of the STL \c std::stack.
 //! \warning The amortized complexity of operation is not O(1/DB), rather O(DB)
 template <class Config_>
@@ -829,7 +829,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!  - \c BlocksPerPage defines how many blocks has one page of internal cache of an
 //!       \b external implementation, default is four. All \b external implementations have
 //!       \b two pages.
-//!  - \c BlkSz external block size in bytes, default is 2 Mbytes
+//!  - \c BlkSz external block size in bytes, default is 2 MBytes
 //!  - \c IntStackTp type of internal stack used for some implementations
 //!  - \c MigrCritSize threshold value for number of elements when
 //!    \c stxxl::migrating_stack migrates to the external memory

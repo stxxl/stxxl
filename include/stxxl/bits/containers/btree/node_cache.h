@@ -179,7 +179,7 @@ namespace btree
 
         ~node_cache()
         {
-            STXXL_VERBOSE1("btree::node_cache deconstructor addr=" << this);
+            STXXL_VERBOSE1("btree::node_cache destructor addr=" << this);
             typename BID2node_type::const_iterator i = BID2node_.begin();
             typename BID2node_type::const_iterator end = BID2node_.end();
             for ( ; i != end; ++i)
@@ -479,7 +479,7 @@ namespace btree
             {
                 if (it != BID2node_.end())
                 {
-                    // the node is in the cach
+                    // the node is in the cache
                     const int_type nodeindex = it->second;
                     STXXL_VERBOSE1("btree::node_cache delete_node " << nodeindex << " from cache.");
                     if (reqs_[nodeindex].valid())

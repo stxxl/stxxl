@@ -34,7 +34,7 @@ class DiskGeometry
 {
     struct Zone
     {
-        // manufactuted data
+        // manufactured data
         //    int last_cyl;
         //    int sect_per_track;
         // derived data
@@ -144,7 +144,7 @@ public:
     }
 private:
     // Following methods are declared but not implemented
-    // intentionnaly to forbid their usage
+    // intentionally to forbid their usage
     sim_disk_request(const sim_disk_request &);
     sim_disk_request & operator=(const sim_disk_request &);
     sim_disk_request();

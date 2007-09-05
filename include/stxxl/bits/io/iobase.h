@@ -278,7 +278,7 @@ public:
     //! \brief Suspends calling thread until completion of the request
     virtual void wait () = 0;
     //! \brief Polls the status of the request
-    //! \return \c true if request is comleted, otherwise \c false
+    //! \return \c true if request is completed, otherwise \c false
     virtual bool poll () = 0;
     //! \brief Identifies the type of request I/O implementation
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
@@ -300,21 +300,21 @@ public:
     virtual std::ostream & print(std::ostream & out) const
     {
         out << "File object address: " << (void *)get_file();
-        out << " Bufffer address: " << (void *)get_buffer();
+        out << " Buffer address: " << (void *)get_buffer();
         out << " File offset: " << get_offset();
         out << " Transfer size: " << get_size() << " bytes";
         out << " Type of transfer: " << ((get_type() == READ) ? "READ" : "WRITE");
         return out;
     }
 
-    //! \brief Inform the request object that an error occured
+    //! \brief Inform the request object that an error occurred
     //! during the I/O execution
     void error_occured(const char * msg)
     {
         error.reset(new stxxl::io_error(msg));
     }
 
-    //! \brief Inform the request object that an error occured
+    //! \brief Inform the request object that an error occurred
     //! during the I/O execution
     void error_occured(const std::string & msg)
     {
@@ -330,7 +330,7 @@ public:
 
 private:
     // Following methods are declared but not implemented
-    // intentionnaly to forbid their usage
+    // intentionally to forbid their usage
     request(const request &);
     request & operator=(const request &);
     request();
@@ -404,13 +404,13 @@ class request_ptr
         }
     }
 public:
-    //! \brief Constucts an \c request_ptr from \c request pointer
+    //! \brief Constructs an \c request_ptr from \c request pointer
     request_ptr(request * ptr_ = NULL) : ptr(ptr_)
     {
         STXXL_VERBOSE3("create constructor (request =" << unsigned (ptr) << ") this=" << unsigned (this));
         add_ref();
     }
-    //! \brief Constucts an \c request_ptr from a \c request_ptr object
+    //! \brief Constructs an \c request_ptr from a \c request_ptr object
     request_ptr(const request_ptr & p) : ptr(p.ptr)
     {
         STXXL_VERBOSE3("copy constructor (copying " << unsigned (ptr) << ") this=" << unsigned (this));
@@ -457,7 +457,7 @@ public:
         assert(ptr);
         return ptr;
     }
-    //! \brief Access to owned \c request object (sinonym for \c operator->() )
+    //! \brief Access to owned \c request object (synonym for \c operator->() )
     //! \return reference to owned \c request object
     //! \warning Creation another \c request_ptr from the returned \c request or deletion
     //!  causes unpredictable behaviour. Do not do that!
@@ -649,7 +649,7 @@ private:
 
     static void * worker (void * arg);
 public:
-    disk_queue (int n = 1);             // max number of requests simultainenously submitted to disk
+    disk_queue (int n = 1);             // max number of requests simultaneously submitted to disk
 
     void set_priority_op (priority_op op)
     {

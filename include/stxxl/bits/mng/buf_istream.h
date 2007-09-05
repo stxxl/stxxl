@@ -21,7 +21,7 @@ __STXXL_BEGIN_NAMESPACE
 
 
 
-// a paranoic check
+// a paranoid check
 #define BUF_ISTREAM_CHECK_END
 
 
@@ -84,7 +84,7 @@ public:
     //! \brief Input stream operator, reads in \c record
     //! \param record reference to the block record type,
     //!        contains value of the next record in the stream after the call of the operator
-    //! \return reference to itself (stream onject)
+    //! \return reference to itself (stream object)
     _Self & operator >> (reference record)
     {
 #ifdef BUF_ISTREAM_CHECK_END

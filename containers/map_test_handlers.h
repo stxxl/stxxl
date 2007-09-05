@@ -8,7 +8,7 @@
 
 
 //! \file map_test_handlers.h
-//! \brief This file contains help functions for testimg of stxxl::map.
+//! \brief This file contains help functions for testing of stxxl::map.
 
 #ifndef _TEST_HANDLERS_H_
 #define _TEST_HANDLERS_H_

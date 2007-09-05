@@ -851,7 +851,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
         if (first.block_offset())
         {
             if (last.block_offset())              // first and last element are
-            // not the first elemetns of their block
+            // not the first elements of their block
             {
                 typename ExtIterator_::block_type * first_block = new typename ExtIterator_::block_type;
                 typename ExtIterator_::block_type * last_block = new typename ExtIterator_::block_type;

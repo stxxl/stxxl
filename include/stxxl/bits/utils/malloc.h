@@ -102,7 +102,7 @@ public:
     }
 };
 
-//! \brief Prints current malloc statistics in a convinient way
+//! \brief Prints current malloc statistics in a convenient way
 inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
 {
     s << "MALLOC statistics" << std::endl;

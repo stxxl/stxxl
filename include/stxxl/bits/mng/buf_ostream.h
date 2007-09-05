@@ -50,7 +50,7 @@ public:
 
     //! \brief Output stream operator, writes out \c record
     //! \param record const reference to block record type, containing a value of record to write to the stream
-    //! \return reference to itself (stream onject)
+    //! \return reference to itself (stream object)
     _Self & operator << (const_reference record)
     {
         current_blk->elem[current_elem++] = record;

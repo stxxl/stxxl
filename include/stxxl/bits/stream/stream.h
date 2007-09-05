@@ -47,7 +47,7 @@ namespace stream
     //! \{
 
     //! \brief A model of steam that retrieves the data from an input iterator
-    //! For convinience use \c streamify function instead of direct instantiation
+    //! For convenience use \c streamify function instead of direct instantiation
     //! of \c iterator2stream .
     template <class InputIterator_>
     class iterator2stream
@@ -92,7 +92,7 @@ namespace stream
     };
 
 
-    //! \brief Input iterator range to stream convertor
+    //! \brief Input iterator range to stream converter
     //! \param begin iterator, pointing to the first value
     //! \param end iterator, pointing to the last + 1 position, i.e. beyond the range
     //! \return an instance of a stream object
@@ -112,7 +112,7 @@ namespace stream
 
     //! \brief A model of steam that retrieves data from an external \c stxxl::vector iterator.
     //! It is more efficient than generic \c iterator2stream thanks to use of overlapping
-    //! For convinience use \c streamify function instead of direct instantiation
+    //! For convenience use \c streamify function instead of direct instantiation
     //! of \c vector_iterator2stream .
     template <class InputIterator_>
     class vector_iterator2stream
@@ -191,7 +191,7 @@ namespace stream
         }
     };
 
-    //! \brief Input external \c stxxl::vector iterator range to stream convertor
+    //! \brief Input external \c stxxl::vector iterator range to stream converter
     //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
     //! \param begin iterator, pointing to the first value
     //! \param end iterator, pointing to the last + 1 position, i.e. beyond the range
@@ -219,7 +219,7 @@ namespace stream
         typedef vector_iterator2stream<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >  stream_type;
     };
 
-    //! \brief Input external \c stxxl::vector const iterator range to stream convertor
+    //! \brief Input external \c stxxl::vector const iterator range to stream converter
     //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
     //! \param begin const iterator, pointing to the first value
     //! \param end const iterator, pointing to the last + 1 position, i.e. beyond the range
@@ -549,7 +549,7 @@ namespace stream
 
 
     //! \brief A model of steam that outputs data from an adaptable generator functor
-    //! For convinience use \c streamify function instead of direct instantiation
+    //! For convenience use \c streamify function instead of direct instantiation
     //! of \c generator2stream .
     template <class Generator_>
     class generator2stream
@@ -595,7 +595,7 @@ namespace stream
         }
     };
 
-    //! \brief Adaptable generator to stream convertor
+    //! \brief Adaptable generator to stream converter
     //! \param gen_ generator object
     //! \return an instance of a stream object
     template <class Generator_>
