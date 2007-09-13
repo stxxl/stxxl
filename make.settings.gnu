@@ -34,7 +34,7 @@ MCSTL_BRANCH	?= #branches/standalone
 #MCSTL_ORIGINALS	?= /where/you/put/the/original/symlink
 endif
 
-BOOST_INCLUDE	?= /usr/include/boost-1_33
+BOOST_INCLUDE	?= /usr/include/boost
 
 COMPILER	?= g++
 LINKER		?= $(COMPILER)
@@ -176,11 +176,13 @@ BOOST_COMPILER_OPTIONS	 = \
 	-I$(strip $(BOOST_INCLUDE)) \
 	-pthread
 
-BOOST_LINKER_OPTIONS	 = \
-	-lboost_thread-gcc-mt \
-	-lboost_date_time-gcc-mt \
-	-lboost_iostreams-gcc-mt \
-	-lboost_filesystem-gcc-mt
+BOOST_LIB_COMPILER_SUFFIX	?= 
+BOOST_LIB_MT_SUFFIX		?= -mt
+BOOST_LINKER_OPTIONS		 = \
+	-lboost_thread$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX) \
+	-lboost_date_time$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX) \
+	-lboost_iostreams$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX) \
+	-lboost_filesystem$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX)
 
 ##################################################################
 
