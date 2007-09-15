@@ -73,6 +73,22 @@ LIBNAME		?= stxxl
 
 #### STXXL OPTIONS ###############################################
 
+# check, whether stxxl has been configured
+ifeq (,$(strip $(wildcard $(STXXL_ROOT)/include/stxxl.h)))
+$(warning *** WARNING: STXXL hasn't been configured correctly)
+$(error ERROR: could not find a STXXL installation in STXXL_ROOT=$(STXXL_ROOT))
+endif
+
+# in the top dir, check whether STXXL_ROOT points to ourselves
+ifneq (,$(wildcard make.settings))
+stat1	 = $(shell stat -L -c '%d:%i' ./)
+stat2	 = $(shell stat -L -c '%d:%i' $(STXXL_ROOT)/)
+
+ifneq ($(stat1),$(stat2))
+$(error ERROR: STXXL_ROOT=$(STXXL_ROOT) points to a different STXXL installation)
+endif
+endif
+
 STXXL_SPECIFIC	+= \
 	$(CPPFLAGS_ARCH) \
 	-DSORT_OPTIMAL_PREFETCHING \
