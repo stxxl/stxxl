@@ -1,6 +1,16 @@
+Version 1.1.1 (UNRELEASED)
+
+* made the block management layer thread-safe
+* made all size_types unsigned
+* minor tweaks to the build system
+* check whether STXXL_ROOT has been set correctly
+* update install and usage instructions
+* spell checked sources and documentation
+
+------------------------------------------
 Version 1.1.0 (31 July 2007)
 
-* stxxl is now hosted on sourceforge: http://stxxl.sourceforge.net/
+* stxxl is now hosted on SourceForge: http://stxxl.sourceforge.net/
 * Restructured the source layout:
   - includes moves to include/
   - introduced some public headers:
@@ -10,7 +20,7 @@ Version 1.1.0 (31 July 2007)
 * Overhauled the build system:
   - merged configuration files, simplified option tuning
   - support object files and binaries with and without mcstl support existing in parallel
-  - the library build creates stxxl.mk which can be included in an applications makefile to set the correct compiler/linker switches for stxxl
+  - the library build creates stxxl.mk which can be included in an applications Makefile to set the correct compiler/linker switches for stxxl
   - similarly mcstxxl.mk is created for a stxxl compiled with mcstl support
   - add dependency tracking and improve parallelism during build
 * compiler support matrix:
@@ -42,7 +52,6 @@ Version 1.1.0 (31 July 2007)
 * comparators inherit from std::binary_function<>
 * cleanup, reformat the code to a consistent format (Thanks, uncrustify!)
 
-
 ------------------------------------------
 Version 1.0e (4 June 2007)
 
@@ -51,9 +60,8 @@ Version 1.0e (4 June 2007)
 * Fixed bug with conversion of const/non-const iterators, implemented comparison and difference operations on const/non-const iterators (for vector, map, and deque) 
 * Added operator[] to vector and deque iterators
 * stxxl::random_shuffle added
-* improved makefile structure (thanx to Andreas Beckmann)
+* improved Makefile structure (thanx to Andreas Beckmann)
 * Allow parallel build for g++
-
 
 ------------------------------------------
 Version 1.0d (16 January 2007)
