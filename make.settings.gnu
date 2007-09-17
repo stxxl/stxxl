@@ -34,7 +34,7 @@ MCSTL_BRANCH	?= #branches/standalone
 #MCSTL_ORIGINALS	?= /where/you/put/the/original/symlink
 endif
 
-BOOST_INCLUDE	?= /usr/include/boost
+#BOOST_ROOT	?= /usr/local/boost-1.34.1
 
 COMPILER	?= g++
 LINKER		?= $(COMPILER)
@@ -193,7 +193,7 @@ BOOST_COMPILER_OPTIONS	 = \
 	-DSTXXL_BOOST_FILESYSTEM \
 	-DSTXXL_BOOST_THREADS \
 	-DSTXXL_BOOST_RANDOM \
-	$(if $(strip $(BOOST_INCLUDE)),-I$(strip $(BOOST_INCLUDE)))
+	$(if $(strip $(BOOST_ROOT)),-I$(strip $(BOOST_ROOT)))
 
 BOOST_LIB_COMPILER_SUFFIX	?= 
 BOOST_LIB_MT_SUFFIX		?= -mt

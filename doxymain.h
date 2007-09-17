@@ -98,7 +98,7 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *   - if you want \c S<small>TXXL</small> to use <A href="http://www.boost.org">Boost</A> libraries
  *     (you should have the Boost libraries already installed)
  *     - change \c USE_BOOST variable to \c yes
- *     - change \c BOOST_INCLUDE variable according to the Boost include path
+ *     - change \c BOOST_ROOT variable according to the Boost root path
  *   - if you want \c S<small>TXXL</small> to use the <A href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">MCSTL</A>
  *     library (you should have the MCSTL library already installed)
  *     - change \c USE_MCSTL variable to \c yes
@@ -324,7 +324,7 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *   - if you want \c S<small>TXXL</small> to use <A href="http://www.boost.org">Boost</A> libraries
  *     (you should have the Boost libraries already installed)
  *     - change \c USE_BOOST variable to \c yes
- *     - change \c BOOST_INCLUDE variable according to the Boost include path
+ *     - change \c BOOST_ROOT variable according to the Boost root path
  *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
  *     if you want to produce a debug version of the Stxxl library or Stxxl examples
