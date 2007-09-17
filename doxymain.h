@@ -88,7 +88,7 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *
  * \section download Download and library compilation
  *
- * - Download the latest gzipped tar ball from
+ * - Download the latest gzipped tarball from
  *   <A href="https://sourceforge.net/project/showfiles.php?group_id=131632">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl-x.y.z.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z ,
@@ -335,7 +335,7 @@ my_example.bin: my_example.o
  *
  * \section download Download and library compilation
  *
- * - Download the latest gzipped tar ball from
+ * - Download the latest gzipped tarball from
  *   <A href="https://sourceforge.net/project/showfiles.php?group_id=131632">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl-x.y.z.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z ,
@@ -464,7 +464,7 @@ my_example.bin: my_example.o
  *
  * \section download Download
  *
- * - Download gzipped tar ball from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl_0.77.tgz">here</A>.
+ * - Download gzipped tarball from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl_0.77.tgz">here</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl_0.77.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl ,
  * - Change file \c compiler.make according to your system configuration

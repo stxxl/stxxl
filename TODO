@@ -1,6 +1,9 @@
+* parallel_pipeling (is currently being developed in it's own branch)
 
-* make release PHASE=snapshot,alpha#,beta#,rc#,release
-  - svn export ...
-  - needs to create common/version.defs:
-    #define STXXL_VERSION_STRING_DATE "YYYYMMDD"
-    #define STXXL_VERSION_STRING_PHASE "$(PHASE)"
+* FIXME: README refers to a Section "License Terms" in the manual which is
+  missing
+
+* FIXME: there are some FIXME in doxymain.h
+
+* There is currently no support for Boost libraries (not headers) in a user
+  specified location.
