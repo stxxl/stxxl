@@ -78,6 +78,8 @@ public:
     const char * io_type ();
 };
 
+//! \}
+
 __STXXL_END_NAMESPACE
 
 #endif
