@@ -10,7 +10,7 @@ usage:
 
 settings_gnu:
 	cmp -s make.settings.gnu make.settings || \
-		cp make.settings.gnu make.settings
+		cp --remove-destination make.settings.gnu make.settings
 
 settings_msvc:
 	copy make.settings.msvc make.settings
