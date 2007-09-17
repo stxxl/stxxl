@@ -75,7 +75,7 @@ LIBNAME		?= stxxl
 
 # check, whether stxxl has been configured
 ifeq (,$(strip $(wildcard $(STXXL_ROOT)/include/stxxl.h)))
-$(warning *** WARNING: STXXL hasn't been configured correctly)
+$(warning *** WARNING: STXXL hasn't been configured correctly) #'
 $(error ERROR: could not find a STXXL installation in STXXL_ROOT=$(STXXL_ROOT))
 endif
 
@@ -89,7 +89,10 @@ $(error ERROR: STXXL_ROOT=$(STXXL_ROOT) points to a different STXXL installation
 endif
 endif
 
+PTHREAD_FLAG	?= -pthread
+
 STXXL_SPECIFIC	+= \
+	$(PTHREAD_FLAG) \
 	$(CPPFLAGS_ARCH) \
 	-DSORT_OPTIMAL_PREFETCHING \
 	-DUSE_MALLOC_LOCK \
@@ -98,7 +101,8 @@ STXXL_SPECIFIC	+= \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
 	$(POSIX_MEMALIGN) $(XOPEN_SOURCE)
 
-STXXL_LDLIBS	+= -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME) -lpthread
+STXXL_LDFLAGS	+= $(PTHREAD_FLAG)
+STXXL_LDLIBS	+= -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME)
 
 STXXL_LIBDEPS	+= $(strip $(STXXL_ROOT))/lib/lib$(LIBNAME).$(LIBEXT)
 
@@ -189,8 +193,7 @@ BOOST_COMPILER_OPTIONS	 = \
 	-DSTXXL_BOOST_FILESYSTEM \
 	-DSTXXL_BOOST_THREADS \
 	-DSTXXL_BOOST_RANDOM \
-	-I$(strip $(BOOST_INCLUDE)) \
-	-pthread
+	$(if $(strip $(BOOST_INCLUDE)),-I$(strip $(BOOST_INCLUDE)))
 
 BOOST_LIB_COMPILER_SUFFIX	?= 
 BOOST_LIB_MT_SUFFIX		?= -mt
@@ -279,6 +282,7 @@ LINK_STXXL	 = $(LINKER) $1 $(STXXL_LINKER_OPTIONS) -o $@
 
 STXXL_COMPILER_OPTIONS	+= $(STXXL_SPECIFIC)
 STXXL_COMPILER_OPTIONS	+= $(OPT) $(DEBUG) $(WARNINGS)
+STXXL_LINKER_OPTIONS	+= $(STXXL_LDFLAGS)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS)
 
 ifeq ($(strip $(USE_MCSTL)),yes)
