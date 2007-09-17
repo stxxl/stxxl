@@ -27,7 +27,7 @@
  *
  * The following compilers have been tested in different
  * \c S<small>TXXL</small> configurations.
- * Other compilers might work, too, but we don't have the ressources
+ * Other compilers might work, too, but we don't have the resources
  * (systems, compilers or time) to test them.
  * Feedback is welcome.
  *
@@ -67,7 +67,7 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  * - \link installation_old Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
  *
  * Questions concerning use and development of the \c S<small>TXXL</small>
- * library and bug reports should be posted to the 
+ * library and bug reports should be posted to the
  * <b><a href="https://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>
  * or mailed to <A href="http://i10www.ira.uka.de/dementiev/">Roman Dementiev</A>.
  *
@@ -101,8 +101,9 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *     - change \c BOOST_ROOT variable according to the Boost root path
  *   - if you want \c S<small>TXXL</small> to use the <A href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">MCSTL</A>
  *     library (you should have the MCSTL library already installed)
- *     - change \c USE_MCSTL variable to \c yes
  *     - change \c MCSTL_BASE variable according to the MCSTL include path
+ *     - use the targets \c library_g++_mcstl and \c tests_g++_mcstl
+ *       instead of the ones listed below
  *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
  *     if you want to produce a debug version of the Stxxl library or Stxxl examples
@@ -112,16 +113,36 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *
  * \section compile_apps Application compilation
  *
- * Programs using Stxxl can be compiled using g++ command line options from \c compiler.options
- * file. The linking options you can find in \c linker.options file. Alternatively you can
- * include \c make.settings file in your make files and use \c STXXL_COMPILER_OPTIONS and
- * \c STXXL_LINKER_OPTIONS variables, defined therein.
- * See also a shorter \c stxxl.mk file that contains Stxxl settings and can be
- * included in your make files.
+ * After compiling the library, some Makefile variables are written to
+ * \c stxxl.mk (\c mcstxxl.mk if you built with MCSTL) in your
+ * \c STXXL_ROOT directory. This file should be included from your
+ * application's Makefile.
  *
- * For example: <BR>
- * \verbatim g++ -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <BR>
- * \verbatim g++ my_example.o -o my_example.bin $(STXXL_LINKER_OPTIONS) \endverbatim
+ * The following variables can be used:
+ * - \c STXXL_CXX - the compiler used to build the \c S<small>TXXL</small>
+ *      library, it's recommended to use the same to build your applications
+ * - \c STXXL_CPPFLAGS - add these flags to the compile commands
+ * - \c STXXL_LDLIBS - add these libraries to the link commands
+ *
+ * An example Makefile for an application using \c S<small>TXXL</small>:
+ * \verbatim
+STXXL_ROOT      ?= .../stxxl
+STXXL_CONFIG    ?= stxxl.mk
+include $(STXXL_ROOT)/$(STXXL_CONFIG)
+
+# use the variables from stxxl.mk
+CXX              = $(STXXL_CXX)
+CPPFLAGS        += $(STXXL_CPPFLAGS)
+
+# add your own optimization, warning, debug, ... flags
+# (these are *not* set in stxxl.mk)
+CPPFLAGS        += -O3 -Wall -g -DFOO=BAR
+
+# build your application
+# (my_example.o is generated from my_example.cpp automatically)
+my_example.bin: my_example.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) my_example.o -o $@ $(STXXL_LDLIBS)
+\endverbatim
  *
  * Before you try to run one of the \c S<small>TXXL</small> examples
  * (or your own \c S<small>TXXL</small> program) you must configure the disk
@@ -226,7 +247,7 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  * file (in the \c STXXL_ROOT directory). The linking options for the VC++
  * linker you can find in \c linker.options file. In order to accomplish this
  * do the following:
- * - Open project property pages (menu Progect->Properties)
+ * - Open project property pages (menu Project->Properties)
  * - Choose C/C++->Command Line page.
  * - In the 'Additional Options' field insert the contents of the \c compiler.options file.
  * Make sure that the Runtime libraries/debug options (/MDd or /MD or /MT or /MTd) of
@@ -334,16 +355,36 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *
  * \section compile_apps Application compilation
  *
- * Programs using Stxxl can be compiled using g++ command line options from \c compiler.options
- * file. The linking options you can find in \c linker.options file. Alternatively you can
- * include \c make.settings file in your make files and use \c STXXL_COMPILER_OPTIONS and
- * \c STXXL_LINKER_OPTIONS variables, defined therein.
- * See also a shorter \c stxxl.mk file that contains Stxxl settings and can be
- * included in your make files.
+ * After compiling the library, some Makefile variables are written to
+ * \c stxxl.mk (\c mcstxxl.mk if you built with MCSTL) in your
+ * \c STXXL_ROOT directory. This file should be included from your
+ * application's Makefile.
  *
- * For example: <BR>
- * \verbatim g++ -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <BR>
- * \verbatim g++ my_example.o -o my_example.bin $(STXXL_LINKER_OPTIONS) \endverbatim
+ * The following variables can be used:
+ * - \c STXXL_CXX - the compiler used to build the \c S<small>TXXL</small>
+ *      library, it's recommended to use the same to build your applications
+ * - \c STXXL_CPPFLAGS - add these flags to the compile commands
+ * - \c STXXL_LDLIBS - add these libraries to the link commands
+ *
+ * An example Makefile for an application using \c S<small>TXXL</small>:
+ * \verbatim
+STXXL_ROOT      ?= .../stxxl
+STXXL_CONFIG    ?= stxxl.mk
+include $(STXXL_ROOT)/$(STXXL_CONFIG)
+
+# use the variables from stxxl.mk
+CXX              = $(STXXL_CXX)
+CPPFLAGS        += $(STXXL_CPPFLAGS)
+
+# add your own optimization, warning, debug, ... flags
+# (these are *not* set in stxxl.mk)
+CPPFLAGS        += -O3 -Wall -g -DFOO=BAR
+
+# build your application
+# (my_example.o is generated from my_example.cpp automatically)
+my_example.bin: my_example.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) my_example.o -o $@ $(STXXL_LDLIBS)
+\endverbatim
  *
  * Before you try to run one of the \c S<small>TXXL</small> examples
  * (or your own \c S<small>TXXL</small> program) you must configure the disk

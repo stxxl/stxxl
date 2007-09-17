@@ -46,10 +46,6 @@ $(LIBNAME).mk: build-lib
 	echo 'STXXL_LDLIBS_BOOST	 = $(BOOST_LINKER_OPTIONS)'	>> $@
 
 library: $(LIBNAME).mk
-	@echo ""
-	@echo "Building library is completed."
-	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
-	@echo "Use the following linker options with programs using Stxxl: $(STXXL_LINKER_OPTIONS)"
 
 lib/lib$(LIBNAME).$(LIBEXT): make.settings
 	$(MAKE) -f $(THISMAKEFILE) library
@@ -96,10 +92,6 @@ tests-in-%: lib/lib$(LIBNAME).$(LIBEXT)
 	$(MAKE) -C $* tests
 
 tests: SUBDIRS-tests
-	@echo ""
-	@echo "Building tests is completed."
-	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
-	@echo "Use the following linker options with programs using Stxxl: $(STXXL_LINKER_OPTIONS)"
 
 clean-in-%:
 	$(MAKE) -C $* clean
@@ -107,7 +99,5 @@ clean-in-%:
 clean: SUBDIRS-clean
 	$(RM) common/version_svn.defs
 	$(RM) $(LIBNAME).mk
-	$(RM) compiler.options linker.options
-	@echo "Cleaning completed"
 
 .PHONY: main library tests clean
