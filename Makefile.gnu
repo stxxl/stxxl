@@ -34,7 +34,8 @@ build-lib: SUBDIRS-lib
 	$(MAKE) -C utils create
 
 $(LIBNAME).mk: build-lib
-	echo 'STXXL_CXX	 = $(COMPILER)'	> $@
+	$(RM) $@
+	echo 'STXXL_CXX	 = $(COMPILER)'	>> $@
 	echo 'STXXL_CPPFLAGS	 = $(stxxl_mk_cppflags)'	>> $@
 	echo 'STXXL_LDLIBS	 = $(stxxl_mk_ldlibs)'	>> $@
 	echo 'STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)'	>> $@
@@ -65,7 +66,8 @@ endif
 
 .PHONY: common/version_svn.defs
 common/version_svn.defs:
-	echo '#define STXXL_VERSION_STRING_DATE "$(VERSION_DATE)"' > $@.tmp
+	$(RM) $@.tmp
+	echo '#define STXXL_VERSION_STRING_DATE "$(VERSION_DATE)"' >> $@.tmp
 	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(VERSION_SVN_REV)"' >> $@.tmp
 	cmp -s $@ $@.tmp || mv $@.tmp $@
 	$(RM) $@.tmp
