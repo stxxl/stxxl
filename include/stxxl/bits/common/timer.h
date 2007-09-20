@@ -6,15 +6,17 @@
 
 #include "stxxl/bits/namespace.h"
 
-#include <time.h>
-
-#ifndef BOOST_MSVC
- #include <sys/time.h>
+#ifdef BOOST_MSVC
+ // no alternative to boost :-(
+ #define STXXL_NONMONOTONIC_BOOST_TIMESTAMP
 #endif
 
-#ifdef STXXL_BOOST_TIMESTAMP
+#ifdef STXXL_NONMONOTONIC_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>
  #include <cmath>
+#else
+ #include <time.h>
+ #include <sys/time.h>
 #endif
 
 
@@ -41,9 +43,10 @@ timer::timer() : running(false), accumulated(0.)
 
 double timer::timestamp()
 {
-#ifdef STXXL_BOOST_TIMESTAMP
+#ifdef STXXL_NONMONOTONIC_BOOST_TIMESTAMP
     boost::posix_time::ptime MyTime = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration Duration = MyTime.time_of_day();
+#warning FIXME: timer::timestamp() is non-monotonic, boost::posix_time::microsec_clock::local_time().time_of_day() resets on midnight
     double sec = double (Duration.hours()) * 3600. +
                  double (Duration.minutes()) * 60. +
                  double (Duration.seconds()) +
