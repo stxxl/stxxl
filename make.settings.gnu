@@ -268,7 +268,7 @@ bin	?= $(strip $(EXEEXT))
 
 #### COMPILE/LINK RULES ###########################################
 
-DEPS_MAKEFILES	:= $(wildcard ../Makefile.subdir.gnu ../make.settings ../make.settings.local)
+DEPS_MAKEFILES	:= $(wildcard ../Makefile.subdir.gnu ../make.settings ../make.settings.local GNUmakefile Makefile.local)
 %.$o: %.cpp $(DEPS_MAKEFILES)
 	@$(RM) $@ $*.$d
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $*.$dT -c $(OUTPUT_OPTION) $< && mv $*.$dT $*.$d
