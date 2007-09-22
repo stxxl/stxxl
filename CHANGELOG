@@ -1,5 +1,6 @@
 Version 1.1.1 (UNRELEASED)
 
+* fixed a rare assertion in stxxl::priority_queue
 * made the block management layer thread-safe
 * made all size_types unsigned
 * minor tweaks to the build system

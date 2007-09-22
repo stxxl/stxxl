@@ -436,6 +436,10 @@ finish:
             comparator_type cmp;
             ext_merger * merger;
 
+        private:
+            sequence_type & operator = (sequence_type & obj);
+
+        public:
             const value_type & operator * () const
             {
                 return (* block)[current];
@@ -471,16 +475,15 @@ finish:
                 return cmp(cmp.min_value(), a);
             }
 
-            sequence_type & operator = (sequence_type & obj)
+            void swap(sequence_type & obj)
             {
                 if (&obj != this)
                 {
-                    assert(is_sentinel((*block)[current]));
-                    current = obj.current;
+                    std::swap(current, obj.current);
                     std::swap(block, obj.block);
                     std::swap(bids, obj.bids);
+		    // FIXME: do we need to handle cmp, merger?
                 }
-                return *this;
             }
 
             sequence_type & operator ++ ()
@@ -775,7 +778,7 @@ finish:
             {
                 if (not_sentinel(*(current[from])))
                 {
-                    current[to] = current[from];
+                    current[to].swap(current[from]);
                     to++;
                 }
             }
