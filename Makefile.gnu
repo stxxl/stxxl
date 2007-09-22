@@ -56,19 +56,36 @@ lib-in-common: common/version_svn.defs
 
 ifeq (,$(strip $(shell svnversion . | tr -d 0-9)))
 # clean checkout - use svn info
-VERSION_DATE	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Date/{s/.*: //;s/ .*//;s/-//gp}')
-VERSION_SVN_REV	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Rev/s/.*: //p')
+STXXL_VERSION_DATE	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Date/{s/.*: //;s/ .*//;s/-//gp}')
+STXXL_VERSION_SVN_REV	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Rev/s/.*: //p')
 else
 # modified, mixed, ... checkout - use svnversion and today
-VERSION_DATE	:= $(shell date "+%Y%m%d")
-VERSION_SVN_REV	:= $(shell svnversion .)
+STXXL_VERSION_DATE	:= $(shell date "+%Y%m%d")
+STXXL_VERSION_SVN_REV	:= $(shell svnversion .)
+endif
+
+# get the svn revision of the MCSTL, if possible
+ifneq (,$(strip $(MCSTL_ROOT)))
+ifneq (,$(wildcard $(MCSTL_ROOT)/.svn))
+ifeq (,$(strip $(shell svnversion $(MCSTL_ROOT) | tr -d 0-9)))
+# clean checkout - use svn info
+MCSTL_VERSION_DATE	:= $(shell LC_ALL=POSIX svn info $(MCSTL_ROOT) | sed -ne '/Last Changed Date/{s/.*: //;s/ .*//;s/-//gp}')
+MCSTL_VERSION_SVN_REV	:= $(shell LC_ALL=POSIX svn info $(MCSTL_ROOT) | sed -ne '/Last Changed Rev/s/.*: //p')
+else
+# modified, mixed, ... checkout - use svnversion and today
+MCSTL_VERSION_DATE	:= $(shell date "+%Y%m%d")
+MCSTL_VERSION_SVN_REV	:= $(shell svnversion $(MCSTL_ROOT))
+endif
+endif
 endif
 
 .PHONY: common/version_svn.defs
 common/version_svn.defs:
 	$(RM) $@.$(LIBNAME).tmp
-	echo '#define STXXL_VERSION_STRING_DATE "$(VERSION_DATE)"' >> $@.$(LIBNAME).tmp
-	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp
+	echo '#define STXXL_VERSION_STRING_DATE "$(STXXL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp
+	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(STXXL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp
+	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_DATE "$(MCSTL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp)
+	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_SVN_REVISION "$(MCSTL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp)
 	cmp -s $@ $@.$(LIBNAME).tmp || mv $@.$(LIBNAME).tmp $@
 	$(RM) $@.$(LIBNAME).tmp
 endif
