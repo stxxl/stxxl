@@ -1,7 +1,7 @@
 
 include ../make.settings
 
-TEST_BINARIES	 = $(TESTS:=.$(bin))
+TEST_BINARIES	 = $(foreach t, $(TESTS), $t.$(bin))
 
 tests: $(TEST_BINARIES)
 
@@ -16,3 +16,4 @@ clean::
 
 .SECONDARY:
 
+.PHONY: tests lib clean
