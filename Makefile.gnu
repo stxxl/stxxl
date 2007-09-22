@@ -66,11 +66,11 @@ endif
 
 .PHONY: common/version_svn.defs
 common/version_svn.defs:
-	$(RM) $@.tmp
-	echo '#define STXXL_VERSION_STRING_DATE "$(VERSION_DATE)"' >> $@.tmp
-	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(VERSION_SVN_REV)"' >> $@.tmp
-	cmp -s $@ $@.tmp || mv $@.tmp $@
-	$(RM) $@.tmp
+	$(RM) $@.$(LIBNAME).tmp
+	echo '#define STXXL_VERSION_STRING_DATE "$(VERSION_DATE)"' >> $@.$(LIBNAME).tmp
+	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp
+	cmp -s $@ $@.$(LIBNAME).tmp || mv $@.$(LIBNAME).tmp $@
+	$(RM) $@.$(LIBNAME).tmp
 endif
 
 VERSION		?= $(shell grep 'define *STXXL_VERSION_STRING_MA_MI_PL' common/version.cpp | cut -d'"' -f2)
