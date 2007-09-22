@@ -16,7 +16,7 @@ QUICK INSTALLATION INSTRUCTIONS FOR POSIX COMPATIBLE SYSTEMS
 
   - STXXL_ROOT: the absolute path to the extracted STXXL sources
   - USE_BOOST and BOOST_ROOT: if you want to use the Boost libraries
-  - MCSTL_BASE: if you want to use the MCSTL library
+  - MCSTL_ROOT: if you want to use the MCSTL library
   - COMPILER: if you want to use a non-default compiler
 
 * Compile the library:

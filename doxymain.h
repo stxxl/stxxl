@@ -101,7 +101,7 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *     - change \c BOOST_ROOT variable according to the Boost root path
  *   - if you want \c S<small>TXXL</small> to use the <A href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">MCSTL</A>
  *     library (you should have the MCSTL library already installed)
- *     - change \c MCSTL_BASE variable according to the MCSTL include path
+ *     - change \c MCSTL_ROOT variable according to the MCSTL root path
  *     - use the targets \c library_g++_mcstl and \c tests_g++_mcstl
  *       instead of the ones listed below
  *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like

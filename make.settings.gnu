@@ -16,22 +16,14 @@ STXXL_ROOT	?= $(HOME)/work/stxxl
 
 ifeq ($(strip $(USE_ICPC)),yes)
 COMPILER	?= icpc
-OPENMPFLAG	?= -openmp
 ICPC_MCSTL_CPPFLAGS	?= -gcc-version=420 -cxxlib=$(FAKEGCC)
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
 COMPILER	?= g++-4.2
-OPENMPFLAG	?= -fopenmp
 LIBNAME		?= mcstxxl
-# the base directory of your MCSTL installation
-MCSTL_BASE	?= $(HOME)/work/mcstl
-# mcstl branch, leave empty for default branch (e.g. if installed from release tarball)
-MCSTL_BRANCH	?= #branches/standalone
-# only set the following variables if autodetection does not work:
-#MCSTL_ROOT		?= $(MCSTL_BASE)/$(MCSTL_BRANCH)
-#MCSTL_ORIGINAL_INC_CXX	?= /path/to/your/$(COMPILER)'s/include/c++
-#MCSTL_ORIGINALS	?= /where/you/put/the/original/symlink
+# the root directory of your MCSTL installation
+MCSTL_ROOT	?= $(HOME)/work/mcstl
 endif
 
 #BOOST_ROOT	?= /usr/local/boost-1.34.1
@@ -75,7 +67,7 @@ LIBNAME		?= stxxl
 
 # check, whether stxxl has been configured
 ifeq (,$(strip $(wildcard $(STXXL_ROOT)/include/stxxl.h)))
-$(warning *** WARNING: STXXL hasn't been configured correctly) #'
+$(warning *** WARNING: STXXL hasn't been configured correctly) #')
 $(error ERROR: could not find a STXXL installation in STXXL_ROOT=$(STXXL_ROOT))
 endif
 
@@ -117,6 +109,8 @@ CPPFLAGS_i686	?= -march=i686
 
 ifeq ($(strip $(USE_ICPC)),yes)
 
+OPENMPFLAG	?= -openmp
+
 endif
 
 ##################################################################
@@ -126,9 +120,9 @@ endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
 
-MCSTL_ROOT		?= $(strip $(MCSTL_BASE))$(if $(strip $(MCSTL_BRANCH)),/$(strip $(MCSTL_BRANCH)))
+OPENMPFLAG	?= -fopenmp
 
-ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/mcstl.h)))
+ifeq (,$(strip $(wildcard $(strip $(MCSTL_ROOT))/c++/mcstl.h)))
 $(error ERROR: could not find a MCSTL installation in MCSTL_ROOT=$(MCSTL_ROOT))
 endif
 
@@ -139,46 +133,7 @@ endif
 MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -D__MCSTL__ $(MCSTL_INCLUDES_PREPEND) -I$(MCSTL_ROOT)/c++
 MCSTL_LDFLAGS		+= $(OPENMPFLAG)
 
-ifeq (,$(strip $(wildcard $(MCSTL_ROOT)/c++/bits/stl_algo.h)))
-# not from libstdc++ branch, need to find the correct original symlink
-
-ifneq (,$(strip $(wildcard $(MCSTL_ROOT)/originals)))
-MCSTL_ORIG_BASE		?= $(MCSTL_ROOT)
-endif
-MCSTL_ORIG_BASE		?= $(MCSTL_BASE)
-
-# find a KEY=VALUE element in WORDS and return VALUE
-# usage: $(call get_value,KEY,WORDS)
-get_value		 = $(subst $(1)=,,$(filter $(1)=%,$(2)))
-empty			 =#
-space			 = $(empty) $(empty)
-gcc_version_result	:= $(shell $(COMPILER) -v 2>&1)
-gcc_version		 = $(call get_value,THE_GCC_VERSION,$(subst gcc$(space)version$(space),THE_GCC_VERSION=,$(gcc_version_result)))
-gcc_prefix		 = $(call get_value,--prefix,$(gcc_version_result))
-gcc_gxx_incdir		 = $(call get_value,--with-gxx-include-dir,$(gcc_version_result))
-MCSTL_ORIGINAL_INC_CXX	?= $(firstword $(wildcard $(gcc_gxx_incdir) $(gcc_prefix)/include/c++/$(gcc_version)) $(cxx_incdir_from_compile))
-ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
-# do a test compilation, generate dependencies and parse the header paths
-compile_test_vector_deps:= $(shell echo -e '\043include <vector>' > cxx-header-path-test.cpp; $(COMPILER) -M cxx-header-path-test.cpp 2>/dev/null; $(RM) cxx-header-path-test.cpp)
-cxx_incdir_from_compile	 = $(patsubst %/vector,%,$(firstword $(filter %/vector, $(compile_test_vector_deps))))
-export cxx_incdir_from_compile
-endif
-MCSTL_ORIGINALS		?= $(strip $(MCSTL_ORIG_BASE))/originals/$(subst /,_,$(MCSTL_ORIGINAL_INC_CXX))
-
-ifeq (,$(strip $(MCSTL_ORIGINAL_INC_CXX)))
-$(error ERROR: could not determine MCSTL_ORIGINAL_INC_CXX, please set this variable manually, it's your compilers ($(COMPILER)) include/c++ path)
-endif
-ifeq (,$(strip $(wildcard $(MCSTL_ORIGINALS)/original)))
-$(error ERROR: your mcstl in $(MCSTL_ORIG_BASE) is not configured properly: $(MCSTL_ORIGINALS)/original does not exist)
-endif
-
-MCSTL_CPPFLAGS		+= -I$(MCSTL_ORIGINALS)
-
-else # from libstdc++ branch
-
 MCSTL_INCLUDES_PREPEND	+= $(if $(findstring 4.3,$(COMPILER)),-I$(MCSTL_ROOT)/c++/mod_stl/gcc-4.3)
-
-endif # (not) from libstdc++ branch
 
 endif
 
@@ -283,6 +238,7 @@ LINK_STXXL	 = $(LINKER) $1 $(STXXL_LINKER_OPTIONS) -o $@
 
 STXXL_COMPILER_OPTIONS	+= $(STXXL_SPECIFIC)
 STXXL_COMPILER_OPTIONS	+= $(OPT) $(DEBUG) $(WARNINGS)
+STXXL_LINKER_OPTIONS	+= $(DEBUG)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDFLAGS)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS)
 
