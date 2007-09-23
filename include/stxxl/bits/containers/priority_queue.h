@@ -482,7 +482,7 @@ finish:
                     std::swap(current, obj.current);
                     std::swap(block, obj.block);
                     std::swap(bids, obj.bids);
-		    // FIXME: do we need to handle cmp, merger?
+                    assert(merger == obj.merger);
                 }
             }
 
