@@ -68,7 +68,7 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *
  * Questions concerning use and development of the \c S<small>TXXL</small>
  * library and bug reports should be posted to the
- * <b><a href="https://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>
+ * <b><a href="http://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>
  * or mailed to <A href="http://i10www.ira.uka.de/dementiev/">Roman Dementiev</A>.
  *
  */
@@ -89,7 +89,7 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  * \section download Download and library compilation
  *
  * - Download the latest gzipped tarball from
- *   <A href="https://sourceforge.net/project/showfiles.php?group_id=131632">SourceForge</A>.
+ *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl-x.y.z.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z ,
  * - Change \c make.settings.gnu or \c make.settings.local file according to your system configuration:
@@ -222,7 +222,7 @@ my_example.bin: my_example.o
  *
  * - Install the <a href="http://www.boost.org">Boost</a> libraries (required).
  * - Download the latest \c Stxxl zip file from
- *   <A href="https://sourceforge.net/project/showfiles.php?group_id=131632">SourceForge</A>.
+ *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407">SourceForge</A>.
  * - Unpack the zip file in some directory (e.g. \c 'c:\\' ),
  * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z ,
  * - Change \c make.settings.msvc file according to your system configuration:
@@ -336,7 +336,7 @@ my_example.bin: my_example.o
  * \section download Download and library compilation
  *
  * - Download the latest gzipped tarball from
- *   <A href="https://sourceforge.net/project/showfiles.php?group_id=131632">SourceForge</A>.
+ *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl-x.y.z.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z ,
  * - Change \c make.settings.gnu or \c make.settings.local file according to your system configuration:
@@ -464,7 +464,8 @@ my_example.bin: my_example.o
  *
  * \section download Download
  *
- * - Download gzipped tarball from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl_0.77.tgz">here</A>.
+ * - Download stxxl_0.77.tgz from
+ *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407&release_id=541515">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl_0.77.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl ,
  * - Change file \c compiler.make according to your system configuration
