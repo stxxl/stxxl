@@ -1,5 +1,5 @@
 /***************************************************************************
- *            leda_sm_stack_benchmark.cpp
+ *            tpie_stack_benchmark.cpp
  *
  *  Wed Jul 12 18:28:43 2006
  *  Copyright  2006  User Roman Dementiev

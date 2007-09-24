@@ -3,7 +3,7 @@
 #include "stxxl/ksort"
 #include "stxxl/vector"
 
-//! \example algo/test_stable_ksort1.cpp
+//! \example algo/test_stable_ksort.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
 using namespace stxxl;

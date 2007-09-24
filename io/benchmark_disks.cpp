@@ -1,5 +1,5 @@
 /***************************************************************************
- *            disktest.cpp
+ *            benchmark_disks.cpp
  *
  *  Sat Aug 24 23:52:15 2002
  *  Copyright  2002  Roman Dementiev

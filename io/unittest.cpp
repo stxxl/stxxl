@@ -1,5 +1,5 @@
 /***************************************************************************
- *            test.cpp
+ *            unittest.cpp
  *
  *  Copyright 2007  Roman Dementiev
  *  dementiev@ira.uka.de

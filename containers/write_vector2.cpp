@@ -1,5 +1,5 @@
 /***************************************************************************
- *            write_vector.cpp
+ *            write_vector2.cpp
  *
  *  Fri Mar  3 12:26:05 2006
  *  Copyright  2006  Roman Dementiev

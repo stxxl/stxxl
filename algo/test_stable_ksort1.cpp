@@ -1,5 +1,5 @@
 /***************************************************************************
- *            test_stable_ksort.cpp
+ *            test_stable_ksort1.cpp
  *
  *  Thu Feb  6 11:46:53 2003
  *  Copyright  2003  Roman Dementiev

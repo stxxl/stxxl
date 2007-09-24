@@ -1,5 +1,5 @@
 /***************************************************************************
- *            test_ksort.cpp
+ *            test_sort.cpp
  *
  *  Fri Oct  4 19:41:25 2002
  *  Copyright  2002  Roman Dementiev

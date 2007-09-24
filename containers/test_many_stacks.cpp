@@ -1,5 +1,5 @@
 /***************************************************************************
- *            test_stack.cpp
+ *            test_many_stacks.cpp
  *
  *  Thu May  1 22:02:00 2003
  *  Copyright  2003  Roman Dementiev

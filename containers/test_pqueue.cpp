@@ -1,5 +1,5 @@
 /***************************************************************************
- *            p_queue.cpp
+ *            test_pqueue.cpp
  *
  *  Fri Jul  4 11:31:34 2003
  *  Copyright  2003  Roman Dementiev

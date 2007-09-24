@@ -1,5 +1,5 @@
 /***************************************************************************
- *            push_sort.cpp
+ *            test_push_sort.cpp
  *
  *  Thu Mar 18 17:11:24 2004
  *  Copyright  2004  Roman Dementiev

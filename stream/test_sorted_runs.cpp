@@ -1,5 +1,5 @@
 /***************************************************************************
- *            sorted_runs.cpp
+ *            test_sorted_runs.cpp
  *
  *  Tue Nov 25 17:44:30 2003
  *  Copyright  2003  Roman Dementiev

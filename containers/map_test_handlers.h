@@ -1,5 +1,5 @@
 /***************************************************************************
-                          test_handlers.h  -  description
+                          map_test_handlers.h  -  description
                              -------------------
     begin                : Son Okt 24 2004
     copyright            : (C) 2004 by Thomas Nowak, Roman Dementiev

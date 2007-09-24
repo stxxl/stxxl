@@ -1,5 +1,5 @@
 /***************************************************************************
- *            testqueue.cpp
+ *            test_queue.cpp
  *
  *  Thu Mar 24 11:21:29 2005
  *  Copyright  2005 Roman Dementiev

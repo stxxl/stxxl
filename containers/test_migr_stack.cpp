@@ -1,5 +1,5 @@
 /***************************************************************************
- *            test_mstack.cpp
+ *            test_migr_stack.cpp
  *
  *  Fri May  2 13:34:25 2003
  *  Copyright  2003  Roman Dementiev

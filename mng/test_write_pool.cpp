@@ -1,5 +1,5 @@
 /***************************************************************************
- *            write_pool.cpp
+ *            test_write_pool.cpp
  *
  *  Wed Jul  2 15:32:34 2003
  *  Copyright  2003  Roman Dementiev
