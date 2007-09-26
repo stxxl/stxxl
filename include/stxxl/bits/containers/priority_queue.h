@@ -579,7 +579,7 @@ finish:
     public:
 
 
-        ext_merger() : lastFree(0), size_(0), logK(0), k(1)
+        ext_merger() : lastFree(-1), size_(0), logK(0), k(1)
         {
             sentinel_block[0] = cmp.min_value();
 
@@ -602,7 +602,7 @@ finish:
 
         ext_merger( prefetch_pool < block_type > * p_pool_,
                     write_pool<block_type> * w_pool_) :
-            lastFree(0), size_(0), logK(0), k(1),
+            lastFree(-1), size_(0), logK(0), k(1),
             p_pool(p_pool_),
             w_pool(w_pool_)
         {
@@ -825,7 +825,7 @@ finish:
             return (arity * block_type::raw_size);
         }
 
-        // delete the (begin-end) smallest elements and write them to "to"
+        // delete the (l = end-begin) smallest elements and write them to "begin..end"
         // empty segments are deallocated
         // require:
         // - there are at least l elements
@@ -837,12 +837,16 @@ finish:
             size_type l = end - begin;
             STXXL_VERBOSE2("ext_merger::multi_merge l = " << l);
 
+            if (l == 0)
+                return;
+
+	    // FIXME: I'm afraid, this may deallocate empty segments repeatedly -- AnBe
 
             switch (logK) {
             case 0:
                 assert(k == 1);
                 assert(entry[0].index == 0);
-                assert(lastFree == -1 || l == 0);
+                assert(lastFree == -1);
                 //memcpy(to, current[0], l * sizeof(Element));
                 //std::copy(current[0],current[0]+l,to);
                 for (size_type i = 0; i < l; ++i, ++ (current[0]), ++begin)
@@ -901,7 +905,6 @@ finish:
             default: multi_merge_k(begin, end);
                 break;
             }
-
 
 
             size_ -= l;
@@ -2129,6 +2132,9 @@ int_type priority_queue<Config_>::refillBuffer2(int_type j)
         deleteSize = treeSize;
     }
 
+    if (deleteSize > 0)
+    {
+
     // shift  rest to beginning
     // possible hack:
     // - use memcpy if no overlap
@@ -2142,6 +2148,8 @@ int_type priority_queue<Config_>::refillBuffer2(int_type j)
     else
         etree[j - IntLevels].multi_merge(oldTarget + bufferSize,
                                          oldTarget + bufferSize + deleteSize);
+
+    }
 
 
     //STXXL_MSG(deleteSize + bufferSize);
