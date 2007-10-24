@@ -75,75 +75,34 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 }
 #endif
 
+#define MB (1024 * 1024)
+#define GB (1024 * 1024 * 1024)
+
 int main(int argc, char * argv[])
 {
-    unsigned ndisks = 8;
-    unsigned buffer_size = 1024 * 1024 * 256;
+    if (argc < 3) {
+        std::cout << "Usage: " << argv[0] << " offset diskfile..." << std::endl;
+        std::cout << "    offset is in GB" << std::endl;
+        exit(0);
+    }
+
+    unsigned ndisks = 0;
+    unsigned buffer_size = 256 * MB;
     unsigned buffer_size_int = buffer_size / sizeof(int);
 
     unsigned i = 0, j = 0;
 
-#ifndef RAW_ACCESS
-/*
-   char * disk_names_dev[] =
-   {
-   "/dev/hde",
-   "/dev/hdg",
-   "/dev/hdi",
-   "/dev/hdk",
-   "/dev/hdm",
-   "/dev/hdo",
-   "/dev/hdq",
-   "/dev/hds"
-   };
- */
-
-
-#else
-/*
-   const char * disk_names_dev[] =
-   {
-   "/dev/raw/raw1",
-   "/dev/raw/raw2",
-   "/dev/raw/raw3",
-   "/dev/raw/raw4",
-   "/dev/raw/raw5",
-   "/dev/raw/raw6",
-   "/dev/raw/raw7",
-   "/dev/raw/raw8"
-   };
- */
-
-    const char * disk_names_dev[] =
-    {
-        "/data00/stxxl",
-        "/data01/stxxl",
-        "/data02/stxxl",
-        "/data03/stxxl",
-        "/data04/stxxl",
-        "/data05/stxxl",
-        "/data06/stxxl",
-        "/data07/stxxl",
-        "/data08/stxxl",
-        "/data09/stxxl",
-        "/data10/stxxl"
-    };
-#endif
-
-
-#define MB (1024 * 1024)
-#define GB (1024 * 1024 * 1024)
 
     stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
     std::vector<std::string> disks_arr;
 
-    for (i = 1; i < unsigned (argc - 1); i++)
+    for (int i = 2; i < argc; i++)
     {
-        std::cout << "Add disk: " << disk_names_dev[atoi(argv[i + 1])]
+        std::cout << "Add disk: " << argv[i]
                   << std::endl;
-        disks_arr.push_back(disk_names_dev[atoi(argv[i + 1])]);
+        disks_arr.push_back(argv[i]);
     }
-    ndisks = argc - 2;
+    ndisks = disks_arr.size();
 
     unsigned chunks = 32;
     request_ptr * reqs = new request_ptr [ndisks * chunks];
@@ -181,6 +140,7 @@ int main(int argc, char * argv[])
 #endif
     }
 
+    try {
     while (count--)
     {
         std::cout << "Disk offset " << std::setw(5) << offset / MB << " MB: ";
@@ -273,6 +233,12 @@ int main(int argc, char * argv[])
    } */
 
         offset += /* 4*stxxl::int64(GB); */ buffer_size;
+    }
+    }
+    catch(const std::exception & ex)
+    {
+        std::cout << std::endl;
+        STXXL_ERRMSG("Cought exception: " << ex.what());
     }
 
     delete [] reqs;
