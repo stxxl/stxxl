@@ -88,32 +88,40 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 int main(int argc, char * argv[])
 {
-    if (argc < 3) {
-        std::cout << "Usage: " << argv[0] << " offset diskfile..." << std::endl;
-        std::cout << "    offset is in GB" << std::endl;
+    if (argc < 4) {
+        std::cout << "Usage: " << argv[0] << " offset length diskfile..." << std::endl;
+        std::cout << "    starting 'offset' and 'length' are given in GB, length == 0 means End-of-Disk" << std::endl;
         exit(0);
     }
 
-    unsigned ndisks = 0;
+    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
+    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
+    stxxl::int64 end = offset + length;
+
+    std::vector<std::string> disks_arr;
+
+    for (int i = 3; i < argc; i++)
+    {
+        std::cout << "# Add disk: " << argv[i] << std::endl;
+        disks_arr.push_back(argv[i]);
+    }
+
+    const unsigned ndisks = disks_arr.size();
+    unsigned max_mem = 900 * MB;
+    unsigned min_chunk = 4 * MB;
     unsigned buffer_size = 256 * MB;
-    unsigned buffer_size_int = buffer_size / sizeof(int);
+    while (buffer_size * ndisks > max_mem)
+        buffer_size >>= 1;
+    const unsigned buffer_size_int = buffer_size / sizeof(int);
     double totaltimeread = 0, totaltimewrite = 0;
     stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
     unsigned i = 0, j = 0;
 
-
-    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
-    std::vector<std::string> disks_arr;
-
-    for (int i = 2; i < argc; i++)
-    {
-        std::cout << "# Add disk: " << argv[i] << std::endl;
-        disks_arr.push_back(argv[i]);
-    }
-    ndisks = disks_arr.size();
-
     unsigned chunks = 32;
+    while (buffer_size / chunks < min_chunk)
+        chunks >>= 1;
+
     request_ptr * reqs = new request_ptr [ndisks * chunks];
     file * * disks = new file *[ndisks];
     int * buffer = (int *)aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
@@ -121,8 +129,6 @@ int main(int argc, char * argv[])
     double * r_finish_times = new double[ndisks];
     double * w_finish_times = new double[ndisks];
 #endif
-
-    int count = (70 * stxxl::int64(GB) - offset) / buffer_size;
 
     for (i = 0; i < ndisks * buffer_size_int; i++)
         buffer[i] = i;
@@ -148,9 +154,12 @@ int main(int argc, char * argv[])
 #endif
     }
 
-    std::cout << "# Buffer size: " << buffer_size << " bytes per disk" << std::endl;
+    std::cout << "# Buffer size: "
+        << buffer_size << " bytes per disk ("
+        << chunks << " chunks of "
+        << (buffer_size / chunks) << " bytes)" << std::endl;
     try {
-    while (count--)
+    while (!length || offset < end)
     {
         std::cout << "Disk offset " << std::setw(7) << offset / MB << " MB: " << std::fixed;
 
@@ -247,7 +256,7 @@ int main(int argc, char * argv[])
         }
    } */
 
-        offset += /* 4*stxxl::int64(GB); */ buffer_size;
+        offset += buffer_size;
     }
     }
     catch(const std::exception & ex)
