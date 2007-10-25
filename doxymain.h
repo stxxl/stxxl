@@ -172,6 +172,10 @@ my_example.bin: my_example.o
  * Note that file creation speed of \c XFS is slow, so that disk
  * files should be precreated.
  *
+ * If the filesystems only use is to store one large \c S<small>TXXL</small> disk file,
+ * we also recommend to add the following options to the \c mkfs.xfs command to gain maximum performance:
+ * \verbatim -d agcount=1 -l size=512b \endverbatim
+ *
  *
  * \section configuration Disk configuration file
  *
