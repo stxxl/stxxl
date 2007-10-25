@@ -6,6 +6,14 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+/*
+ example gnuplot command for the output of this program:
+ (x-axis: disk offset in GB, y-axis: bandwidth in MB/s)
+
+ plot \
+        "disk.log" using ($3/1024):($16) w l title "read", \
+        "disk.log" using ($3/1024):($9)  w l title "write"
+ */
 
 #include "stxxl/io"
 #include <cstdio>
@@ -89,6 +97,8 @@ int main(int argc, char * argv[])
     unsigned ndisks = 0;
     unsigned buffer_size = 256 * MB;
     unsigned buffer_size_int = buffer_size / sizeof(int);
+    double totaltimeread = 0, totaltimewrite = 0;
+    stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
     unsigned i = 0, j = 0;
 
@@ -98,8 +108,7 @@ int main(int argc, char * argv[])
 
     for (int i = 2; i < argc; i++)
     {
-        std::cout << "Add disk: " << argv[i]
-                  << std::endl;
+        std::cout << "# Add disk: " << argv[i] << std::endl;
         disks_arr.push_back(argv[i]);
     }
     ndisks = disks_arr.size();
@@ -117,7 +126,6 @@ int main(int argc, char * argv[])
 
     for (i = 0; i < ndisks * buffer_size_int; i++)
         buffer[i] = i;
-
 
     for (i = 0; i < ndisks; i++)
     {
@@ -140,11 +148,11 @@ int main(int argc, char * argv[])
 #endif
     }
 
+    std::cout << "# Buffer size: " << buffer_size << " bytes per disk" << std::endl;
     try {
     while (count--)
     {
-        std::cout << "Disk offset " << std::setw(5) << offset / MB << " MB: ";
-
+        std::cout << "Disk offset " << std::setw(7) << offset / MB << " MB: " << std::fixed;
 
         double begin = stxxl_timestamp(), end;
 
@@ -167,6 +175,8 @@ int main(int argc, char * argv[])
  #endif
 
         end = stxxl_timestamp();
+        totalsizewrite += buffer_size;
+        totaltimewrite += end - begin;
 
 /*  std::cout << "WRITE\nDisks: " << ndisks
         <<" \nElapsed time: "<< end-begin
@@ -178,7 +188,9 @@ int main(int argc, char * argv[])
  #ifdef WATCH_TIMES
         out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
-        std::cout << std::setw(2) << ndisks << " * " << std::setw(3) << int (1e-6 * (buffer_size) / (end - begin)) << " = " << std::setw(3) << int (1e-6 * (buffer_size * ndisks) / (end - begin)) << " MB/s write,";
+        std::cout << std::setw(2) << ndisks << " * "
+            << std::setw(7) << std::setprecision(3) << (1e-6 * (buffer_size) / (end - begin)) << " = "
+            << std::setw(7) << std::setprecision(3) << (1e-6 * (buffer_size * ndisks) / (end - begin)) << " MB/s write,";
 #endif
 
 
@@ -201,6 +213,8 @@ int main(int argc, char * argv[])
  #endif
 
         end = stxxl_timestamp();
+        totalsizeread += buffer_size;
+        totaltimeread += end - begin;
 
 /*  std::cout << "READ\nDisks: " << ndisks
         <<" \nElapsed time: "<< end-begin
@@ -209,8 +223,9 @@ int main(int argc, char * argv[])
         << int(1e-6*(buffer_size)/(end-begin)) << " Mb/s"
             << std::endl;*/
 
-
-        std::cout << std::setw(2) << ndisks << " * " << std::setw(3) << int (1e-6 * (buffer_size) / (end - begin)) << " = " << std::setw(3) << int (1e-6 * (buffer_size * ndisks) / (end - begin)) << " MB/s read" << std::endl;
+        std::cout << std::setw(2) << ndisks << " * "
+            << std::setw(7) << std::setprecision(3) << (1e-6 * (buffer_size) / (end - begin)) << " = "
+            << std::setw(7) << std::setprecision(3) << (1e-6 * (buffer_size * ndisks) / (end - begin)) << " MB/s read" << std::endl;
 #else
         std::cout << std::endl;
 #endif
@@ -238,8 +253,16 @@ int main(int argc, char * argv[])
     catch(const std::exception & ex)
     {
         std::cout << std::endl;
-        STXXL_ERRMSG("Cought exception: " << ex.what());
+        STXXL_ERRMSG(ex.what());
     }
+
+    std::cout << "# Average over "<< std::setw(7) << totalsizewrite / MB << " MB: ";
+    std::cout << std::setw(2) << ndisks << " * "
+        << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizewrite) / totaltimewrite) << " = "
+        << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizewrite * ndisks) / totaltimewrite) << " MB/s write,";
+    std::cout << std::setw(2) << ndisks << " * "
+        << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizeread) / totaltimeread) << " = "
+        << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizeread * ndisks) / totaltimeread) << " MB/s read" << std::endl;
 
     delete [] reqs;
     delete [] disks;
