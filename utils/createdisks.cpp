@@ -75,33 +75,33 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 }
 #endif
 
+#define MB (1024 * 1024)
+#define GB (1024 * 1024 * 1024)
+
 int main(int argc, char * argv[])
 {
-    unsigned ndisks = 8;
-    unsigned buffer_size = 1024 * 1024 * 64;
-    unsigned buffer_size_int = buffer_size / sizeof(int);
-
-    unsigned i = 0, j = 0;
-
     if (argc < 3)
     {
         STXXL_MSG("Usage: " << argv[0] << " filesize_in_MB filename1 [filename2 [filename3 ...]]");
         return 0;
     }
 
-#define MB (1024 * 1024)
-#define GB (1024 * 1024 * 1024)
-
     stxxl::int64 offset = 0;
+    stxxl::int64 length = stxxl::int64(atoi(argv[1])) * MB;
+
     std::vector<std::string> disks_arr;
 
-    for (i = 1; i < unsigned (argc - 1); i++)
+    for (int i = 2; i < argc ; ++i)
     {
-        unlink(argv[i + 1]);
-        std::cout << "Add disk: " << argv[i + 1] << std::endl;
-        disks_arr.push_back(argv[i + 1]);
+        unlink(argv[i]);
+        std::cout << "Add disk: " << argv[i] << std::endl;
+        disks_arr.push_back(argv[i]);
     }
-    ndisks = argc - 2;
+    const unsigned ndisks = disks_arr.size();
+    unsigned buffer_size = 64 * MB;
+    unsigned buffer_size_int = buffer_size / sizeof(int);
+
+    unsigned i = 0, j = 0;
 
     unsigned chunks = 32;
     request_ptr * reqs = new request_ptr [ndisks * chunks];
@@ -111,8 +111,6 @@ int main(int argc, char * argv[])
     double * r_finish_times = new double[ndisks];
     double * w_finish_times = new double[ndisks];
 #endif
-
-    int count = (stxxl::int64(atoi(argv[1])) * MB) / buffer_size + 1;
 
     for (i = 0; i < ndisks * buffer_size_int; i++)
         buffer[i] = i;
@@ -139,21 +137,21 @@ int main(int argc, char * argv[])
 #endif
     }
 
-    while (count--)
+    while (offset < length)
     {
         std::cout << "Disk offset " << offset / MB << " MB ";
-
 
         double begin = stxxl_timestamp(), end;
 
 #ifndef DO_ONLY_READ
+	stxxl::int64 chunk_size = std::min<stxxl::int64>(buffer_size, length - offset) / chunks;
         for (i = 0; i < ndisks; i++)
         {
             for (j = 0; j < chunks; j++)
                 reqs[i * chunks + j] =
                     disks[i]->awrite( buffer + buffer_size_int * i + buffer_size_int * j / chunks,
-                                      offset + buffer_size * j / chunks,
-                                      buffer_size / chunks,
+                                      offset + chunk_size * j,
+                                      chunk_size,
                                       stxxl::default_completion_handler() );
         }
 
@@ -208,10 +206,9 @@ int main(int argc, char * argv[])
             << std::endl;
  */
 
-        std::cout << int (1e-6 * (buffer_size) / (end - begin)) << " MB/s" << std::endl;
-#else
-        std::cout << std::endl;
+        std::cout << int (1e-6 * (buffer_size) / (end - begin)) << " MB/s";
 #endif
+        std::cout << std::endl;
 
 #ifdef WATCH_TIMES
         out_stat(begin, end, r_finish_times, ndisks, disks_arr);
@@ -230,7 +227,7 @@ int main(int argc, char * argv[])
         }
    } */
 
-        offset += /* 4*stxxl::int64(GB); */ buffer_size;
+        offset += buffer_size;
     }
 
     delete [] reqs;
