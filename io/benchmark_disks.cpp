@@ -11,8 +11,8 @@
  (x-axis: disk offset in GB, y-axis: bandwidth in MB/s)
 
  plot \
-        "disk.log" using ($3/1024):($16) w l title "read", \
-        "disk.log" using ($3/1024):($9)  w l title "write"
+        "disk.log" using ($3/1024):($14) w l title "read", \
+        "disk.log" using ($3/1024):($7)  w l title "write"
  */
 
 #include "stxxl/io"
@@ -90,7 +90,8 @@ int main(int argc, char * argv[])
 {
     if (argc < 4) {
         std::cout << "Usage: " << argv[0] << " offset length diskfile..." << std::endl;
-        std::cout << "    starting 'offset' and 'length' are given in GB, length == 0 means End-of-Disk" << std::endl;
+        std::cout << "    starting 'offset' and 'length' are given in GB" << std::endl;
+        std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
         exit(0);
     }
 
