@@ -16,9 +16,10 @@
  */
 
 #include "stxxl/io"
+
 #include <cstdio>
-#include <vector>
 #include <iomanip>
+#include <vector>
 
 #ifndef BOOST_MSVC
  #include <unistd.h>
@@ -42,6 +43,8 @@ using namespace stxxl;
 #define RAW_ACCESS
 
 //#define WATCH_TIMES
+
+#define CHECK_AFTER_READ 1
 
 
 #ifdef WATCH_TIMES
@@ -122,6 +125,8 @@ int main(int argc, char * argv[])
     unsigned chunks = 32;
     while (buffer_size / chunks < min_chunk)
         chunks >>= 1;
+    const unsigned chunk_size = buffer_size / chunks;
+    const unsigned chunk_size_int = chunk_size / sizeof(int);
 
     request_ptr * reqs = new request_ptr [ndisks * chunks];
     file * * disks = new file *[ndisks];
@@ -171,9 +176,9 @@ int main(int argc, char * argv[])
         {
             for (j = 0; j < chunks; j++)
                 reqs[i * chunks + j] =
-                    disks[i]->awrite( buffer + buffer_size_int * i + buffer_size_int * j / chunks,
-                                      offset + buffer_size * j / chunks,
-                                      buffer_size / chunks,
+                    disks[i]->awrite( buffer + buffer_size_int * i + j * chunk_size_int,
+                                      offset + j * chunk_size,
+                                      chunk_size,
                                       stxxl::default_completion_handler() );
         }
 
@@ -210,9 +215,9 @@ int main(int argc, char * argv[])
         for (i = 0; i < ndisks; i++)
         {
             for (j = 0; j < chunks; j++)
-                reqs[i * chunks + j] = disks[i]->aread(   buffer + buffer_size_int * i + buffer_size_int * j / chunks,
-                                                          offset + buffer_size * j / chunks,
-                                                          buffer_size / chunks,
+                reqs[i * chunks + j] = disks[i]->aread(   buffer + buffer_size_int * i + j * chunk_size_int,
+                                                          offset + j * chunk_size,
+                                                          chunk_size,
                                                           stxxl::default_completion_handler() );
         }
 
@@ -243,19 +248,23 @@ int main(int argc, char * argv[])
 #ifdef WATCH_TIMES
         out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
-/*
-   std::cout << "Checking..." <<std::endl;
-   for(i=0;i<ndisks*buffer_size_int;i++)
-   {
-        if(buffer[i] != i)
-        {
-                int ibuf = i/buffer_size_int;
-                int pos = i%buffer_size_int;
-                i = (ibuf+1)*buffer_size_int; // jump to next
 
-                std::cout << "Error on disk "<<ibuf<< " position"<< pos * sizeof(int) << std::endl;
+       if (CHECK_AFTER_READ) {
+            for (int i=0; unsigned(i) < ndisks * buffer_size_int; i++)
+            {
+                if(buffer[i] != i)
+                {
+                    int ibuf = i / buffer_size_int;
+                    int pos = i % buffer_size_int;
+
+                    std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
+                            << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << i
+                            << std::dec << std::endl;
+
+                    i = (ibuf+1)*buffer_size_int; // jump to next
+                }
+            }
         }
-   } */
 
         offset += buffer_size;
     }
@@ -273,6 +282,9 @@ int main(int argc, char * argv[])
     std::cout << std::setw(2) << ndisks << " * "
         << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizeread) / totaltimeread) << " = "
         << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizeread * ndisks) / totaltimeread) << " MB/s read" << std::endl;
+
+    for (i = 0; i < ndisks; i++)
+        delete disks[i];
 
     delete [] reqs;
     delete [] disks;
