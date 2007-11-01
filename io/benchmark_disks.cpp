@@ -95,12 +95,12 @@ int main(int argc, char * argv[])
         std::cout << "Usage: " << argv[0] << " offset length diskfile..." << std::endl;
         std::cout << "    starting 'offset' and 'length' are given in GB" << std::endl;
         std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
-        exit(0);
+        return 0;
     }
 
     stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
     stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
-    stxxl::int64 end = offset + length;
+    stxxl::int64 endpos = offset + length;
 
     std::vector<std::string> disks_arr;
 
@@ -111,22 +111,20 @@ int main(int argc, char * argv[])
     }
 
     const unsigned ndisks = disks_arr.size();
-    unsigned max_mem = 900 * MB;
-    unsigned min_chunk = 8 * MB;
+    const unsigned max_mem = 900 * MB;
     unsigned buffer_size = 256 * MB;
     while (buffer_size * ndisks > max_mem)
         buffer_size >>= 1;
     const unsigned buffer_size_int = buffer_size / sizeof(int);
-    double totaltimeread = 0, totaltimewrite = 0;
-    stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
-    unsigned i = 0, j = 0;
-
+    const unsigned min_chunk = 8 * MB;
     unsigned chunks = 32;
     while (buffer_size / chunks < min_chunk)
         chunks >>= 1;
     const unsigned chunk_size = buffer_size / chunks;
     const unsigned chunk_size_int = chunk_size / sizeof(int);
+
+    unsigned i = 0, j = 0;
 
     request_ptr * reqs = new request_ptr [ndisks * chunks];
     file * * disks = new file *[ndisks];
@@ -135,6 +133,8 @@ int main(int argc, char * argv[])
     double * r_finish_times = new double[ndisks];
     double * w_finish_times = new double[ndisks];
 #endif
+    double totaltimeread = 0, totaltimewrite = 0;
+    stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
     for (i = 0; i < ndisks * buffer_size_int; i++)
         buffer[i] = i;
@@ -165,8 +165,11 @@ int main(int argc, char * argv[])
         << chunks << " chunks of "
         << (buffer_size / chunks) << " bytes)" << std::endl;
     try {
-    while (!length || offset < end)
+    while (!length || offset < endpos)
     {
+        const unsigned current_block_size = length ? std::min<stxxl::int64>(buffer_size, endpos - offset) : buffer_size;
+        const unsigned current_chunk_size = current_block_size / chunks;
+
         std::cout << "Disk offset " << std::setw(7) << offset / MB << " MB: " << std::fixed;
 
         double begin = stxxl_timestamp(), end;
@@ -177,11 +180,10 @@ int main(int argc, char * argv[])
             for (j = 0; j < chunks; j++)
                 reqs[i * chunks + j] =
                     disks[i]->awrite( buffer + buffer_size_int * i + j * chunk_size_int,
-                                      offset + j * chunk_size,
-                                      chunk_size,
+                                      offset + j * current_chunk_size,
+                                      current_chunk_size,
                                       stxxl::default_completion_handler() );
         }
-
 
  #ifdef WATCH_TIMES
         watch_times(reqs, ndisks, w_finish_times);
@@ -193,19 +195,21 @@ int main(int argc, char * argv[])
         totalsizewrite += buffer_size;
         totaltimewrite += end - begin;
 
-/*  std::cout << "WRITE\nDisks: " << ndisks
+/*
+   std::cout << "WRITE\nDisks: " << ndisks
         <<" \nElapsed time: "<< end-begin
         << " \nThroughput: "<< int(1e-6*(buffer_size*ndisks)/(end-begin))
         << " Mb/s \nPer one disk:"
         << int(1e-6*(buffer_size)/(end-begin)) << " Mb/s"
-        << std::endl;*/
+        << std::endl;
+*/
 
  #ifdef WATCH_TIMES
         out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
         std::cout << std::setw(2) << ndisks << " * "
-            << std::setw(7) << std::setprecision(3) << (1e-6 * (buffer_size) / (end - begin)) << " = "
-            << std::setw(7) << std::setprecision(3) << (1e-6 * (buffer_size * ndisks) / (end - begin)) << " MB/s write,";
+            << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size) / (end - begin)) << " = "
+            << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size * ndisks) / (end - begin)) << " MB/s write,";
 #endif
 
 
@@ -215,9 +219,9 @@ int main(int argc, char * argv[])
         for (i = 0; i < ndisks; i++)
         {
             for (j = 0; j < chunks; j++)
-                reqs[i * chunks + j] = disks[i]->aread(   buffer + buffer_size_int * i + j * chunk_size_int,
-                                                          offset + j * chunk_size,
-                                                          chunk_size,
+                reqs[i * chunks + j] = disks[i]->aread( buffer + buffer_size_int * i + j * chunk_size_int,
+                                                          offset + j * current_chunk_size,
+                                                          current_chunk_size,
                                                           stxxl::default_completion_handler() );
         }
 
@@ -231,25 +235,24 @@ int main(int argc, char * argv[])
         totalsizeread += buffer_size;
         totaltimeread += end - begin;
 
-/*  std::cout << "READ\nDisks: " << ndisks
+/*
+   std::cout << "READ\nDisks: " << ndisks
         <<" \nElapsed time: "<< end-begin
         << " \nThroughput: "<< int(1e-6*(buffer_size*ndisks)/(end-begin))
         << " Mb/s \nPer one disk:"
         << int(1e-6*(buffer_size)/(end-begin)) << " Mb/s"
-            << std::endl;*/
+            << std::endl;
+*/
 
         std::cout << std::setw(2) << ndisks << " * "
-            << std::setw(7) << std::setprecision(3) << (1e-6 * (buffer_size) / (end - begin)) << " = "
-            << std::setw(7) << std::setprecision(3) << (1e-6 * (buffer_size * ndisks) / (end - begin)) << " MB/s read" << std::endl;
-#else
-        std::cout << std::endl;
-#endif
+            << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size) / (end - begin)) << " = "
+            << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size * ndisks) / (end - begin)) << " MB/s read" << std::endl;
 
 #ifdef WATCH_TIMES
         out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
 
-       if (CHECK_AFTER_READ) {
+        if (CHECK_AFTER_READ) {
             for (int i=0; unsigned(i) < ndisks * buffer_size_int; i++)
             {
                 if(buffer[i] != i)
@@ -265,8 +268,11 @@ int main(int argc, char * argv[])
                 }
             }
         }
+#else
+        std::cout << std::endl;
+#endif
 
-        offset += buffer_size;
+        offset += current_block_size;
     }
     }
     catch(const std::exception & ex)
