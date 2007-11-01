@@ -112,7 +112,7 @@ int main(int argc, char * argv[])
 
     const unsigned ndisks = disks_arr.size();
     unsigned max_mem = 900 * MB;
-    unsigned min_chunk = 4 * MB;
+    unsigned min_chunk = 8 * MB;
     unsigned buffer_size = 256 * MB;
     while (buffer_size * ndisks > max_mem)
         buffer_size >>= 1;
