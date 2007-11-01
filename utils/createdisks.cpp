@@ -146,18 +146,19 @@ int main(int argc, char * argv[])
     while (offset < length)
     {
         std::cout << "Disk offset " << offset / MB << " MB ";
+        const unsigned current_block_size = std::min<stxxl::int64>(buffer_size, length - offset);
+        const unsigned current_chunk_size = current_block_size / chunks;
 
         double begin = stxxl_timestamp(), end;
 
 #ifndef DO_ONLY_READ
-        stxxl::int64 chunk_size_curr = std::min<stxxl::int64>(buffer_size, length - offset) / chunks;
         for (i = 0; i < ndisks; i++)
         {
             for (j = 0; j < chunks; j++)
                 reqs[i * chunks + j] =
                     disks[i]->awrite( buffer + buffer_size_int * i + j * chunk_size_int,
-                                      offset + j * chunk_size_curr,
-                                      chunk_size_curr,
+                                      offset + j * current_chunk_size,
+                                      current_chunk_size,
                                       stxxl::default_completion_handler() );
         }
 
@@ -180,7 +181,7 @@ int main(int argc, char * argv[])
  #ifdef WATCH_TIMES
         out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
-        std::cout << int (1e-6 * (buffer_size) / (end - begin)) << " MB/s,";
+        std::cout << int (1e-6 * (current_block_size) / (end - begin)) << " MB/s,";
 #endif
 
 
@@ -190,9 +191,9 @@ int main(int argc, char * argv[])
         for (i = 0; i < ndisks; i++)
         {
             for (j = 0; j < chunks; j++)
-                reqs[i * chunks + j] = disks[i]->aread(   buffer + buffer_size_int * i + j * chunk_size_int,
-                                                          offset + j * chunk_size,
-                                                          chunk_size,
+                reqs[i * chunks + j] = disks[i]->aread( buffer + buffer_size_int * i + j * chunk_size_int,
+                                                          offset + j * current_chunk_size,
+                                                          current_chunk_size,
                                                           stxxl::default_completion_handler() );
         }
 
@@ -212,15 +213,16 @@ int main(int argc, char * argv[])
             << std::endl;
  */
 
-        std::cout << int (1e-6 * (buffer_size) / (end - begin)) << " MB/s";
+        std::cout << int (1e-6 * (current_block_size) / (end - begin)) << " MB/s";
 #endif
         std::cout << std::endl;
 
+#ifndef NOREAD
 #ifdef WATCH_TIMES
         out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
 
-       if (CHECK_AFTER_READ) {
+        if (CHECK_AFTER_READ) {
             for (int i=0; unsigned(i) < ndisks * buffer_size_int; i++)
             {
                 if(buffer[i] != i)
@@ -236,8 +238,9 @@ int main(int argc, char * argv[])
                 }
             }
         }
+#endif
 
-        offset += buffer_size;
+        offset += current_block_size;
     }
 
     for (i = 0; i < ndisks; i++)
