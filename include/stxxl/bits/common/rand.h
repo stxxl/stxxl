@@ -23,27 +23,32 @@ __STXXL_BEGIN_NAMESPACE
 
 extern unsigned ran32State;
 
+//! \brief Fast uniform [0, 2^32) pseudo-random generator
 struct random_number32
 {
     typedef unsigned value_type;
-    inline value_type operator ()  () const
+
+    //! \brief Returns a random number from [0, 2^32)
+    inline value_type operator () () const
     {
         return (ran32State = 1664525 * ran32State + 1013904223);
     }
 };
 
-//! \brief Fast uniform [0,1] pseudo-random generator
+//! \brief Fast uniform [0.0, 1.0) pseudo-random generator
 struct random_uniform_fast
 {
     typedef double value_type;
     random_number32 rnd32;
-    inline value_type operator()  () const
+
+    //! \brief Returns a random number from [0.0, 1.0)
+    inline value_type operator () () const
     {
-        return ((double)rnd32() * (0.5 / 0x80000000));
+        return (double(rnd32()) * (0.5 / 0x80000000));
     }
 };
 
-//! \brief Slow and precise uniform [0,1] pseudo-random generator
+//! \brief Slow and precise uniform [0.0, 1.0) pseudo-random generator
 //!
 //! \warning Seed is not the same as in the fast generator \c random_uniform_fast
 struct random_uniform_slow
@@ -58,7 +63,8 @@ struct random_uniform_slow
     random_uniform_slow() : uni(generator, uni_dist) { }
 #endif
 
-    inline value_type operator()  () const
+    //! \brief Returns a random number from [0.0, 1.0)
+    inline value_type operator () () const
     {
 #ifdef STXXL_BOOST_RANDOM
         return uni();
@@ -68,22 +74,28 @@ struct random_uniform_slow
     }
 };
 
+//! \brief Uniform [0, N) pseudo-random generator
 template <class UniformRGen_ = random_uniform_fast>
 struct random_number
 {
     typedef unsigned value_type;
     UniformRGen_ uniform;
-    inline value_type operator ()  (int N) const
+
+    //! \brief Returns a random number from [0, N)
+    inline value_type operator () (value_type N) const
     {
-        return ((value_type)(uniform() * (N)));
+        return static_cast<value_type>(uniform() * double(N));
     }
 };
 
+//! \brief Slow and precise uniform [0, 2^64) pseudo-random generator
 struct random_number64
 {
     typedef stxxl::uint64 value_type;
     random_uniform_slow uniform;
-    inline value_type operator()  ()
+
+    //! \brief Returns a random number from [0, 2^64)
+    inline value_type operator () () const
     {
         return static_cast<value_type>(uniform() * (18446744073709551616.));
     }
