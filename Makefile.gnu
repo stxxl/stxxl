@@ -1,4 +1,11 @@
 # This -*- Makefile -*- is intended for processing with GNU make.
+
+# make 3.80 or newer is required to compile stxxl
+ifneq (,$(filter 3.75 3.76 3.76.1 3.7%, $(MAKE_VERSION)))
+$(error You need GNU make 3.80 or newer to compile stxxl. make $(MAKE_VERSION) is insufficient.)
+Old make versions that do not have $(error) die here
+endif
+
 THISMAKEFILE	:= $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)) 
 
 main: library
