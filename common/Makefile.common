@@ -1,3 +1,3 @@
-TESTS			 = stxxl_info
+TESTS			 = stxxl_info test_random
 
 LIB_SRC			 = log.cpp debug.cpp rand.cpp version.cpp
