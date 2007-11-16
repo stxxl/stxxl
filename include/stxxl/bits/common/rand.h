@@ -13,6 +13,7 @@
 #include <cstdlib>
 
 #include "stxxl/bits/common/types.h"
+#include "stxxl/bits/common/seed.h"
 
 #ifdef STXXL_BOOST_RANDOM
  #include <boost/random.hpp>
@@ -24,6 +25,8 @@ __STXXL_BEGIN_NAMESPACE
 extern unsigned ran32State;
 
 //! \brief Fast uniform [0, 2^32) pseudo-random generator
+//!        with period 2^32.
+//! \warning Uses a global state and is not reentrant or thread-safe!
 struct random_number32
 {
     typedef unsigned value_type;

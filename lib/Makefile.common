@@ -13,5 +13,6 @@ LIB_OBJECTS = \
 	../common/log.$(OBJEXT) \
 	../common/debug.$(OBJEXT) \
 	../common/rand.$(OBJEXT) \
+	../common/seed.$(OBJEXT) \
 	../common/version.$(OBJEXT)
 

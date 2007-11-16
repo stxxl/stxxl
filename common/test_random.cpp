@@ -3,6 +3,8 @@
 
 int main()
 {
+    //stxxl::set_seed(42);
+    std::cout << "seed = " << stxxl::get_next_seed() << std::endl;
     srand48(time(NULL));
     stxxl::random_number32 random_number32;
     stxxl::random_uniform_fast random_uniform_fast;

@@ -97,6 +97,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/tuple.h \
 	$(HEADER_PATH)/common/types.h \
 	$(HEADER_PATH)/common/settings.h \
+	$(HEADER_PATH)/common/seed.h \
 	../make.settings
 
 IO_LAYER_FILES	 = \
