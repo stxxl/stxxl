@@ -32,22 +32,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef BOOST_MSVC
-#else
- #include <sys/time.h>
- #include <unistd.h>
-#endif
-
-#ifdef STXXL_BOOST_TIMESTAMP
- #include <boost/date_time/posix_time/posix_time.hpp>
-#endif
-
 #ifdef STXXL_BOOST_FILESYSTEM
  #include <boost/filesystem/operations.hpp>
 #endif
 
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/common/log.h"
+#include "stxxl/bits/common/timer.h"
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -169,25 +160,11 @@ stxxl_perror (const char * /*errmsg*/, int errcode)
 
 #endif
 
-// returns number of seconds from ...
 inline double
 stxxl_timestamp ()
 {
-#ifdef STXXL_BOOST_TIMESTAMP
-    boost::posix_time::ptime MyTime = boost::posix_time::microsec_clock::local_time();
-    boost::posix_time::time_duration Duration = MyTime.time_of_day();
-    double sec = double (Duration.hours()) * 3600. +
-                 double (Duration.minutes()) * 60. +
-                 double (Duration.seconds()) +
-                 double (Duration.fractional_seconds()) / (pow(10., Duration.num_fractional_digits()));
-    return sec;
-#else
-    struct timeval tp;
-    gettimeofday (&tp, NULL);
-    return double (tp.tv_sec) + tp.tv_usec / 1000000.;
-#endif
+    return timestamp();
 }
-
 
 
 #ifndef BOOST_MSVC

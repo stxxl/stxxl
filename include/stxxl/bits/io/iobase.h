@@ -44,7 +44,6 @@
 #ifdef BOOST_MSVC
  #include <io.h>
 #else
- #include <sys/time.h>
  #include <unistd.h>
  #include <sys/resource.h>
  #include <sys/wait.h>
