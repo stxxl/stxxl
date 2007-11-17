@@ -103,7 +103,12 @@ struct random_uniform_slow
     boost::uniform_real<> uni_dist;
     mutable boost::variate_generator < base_generator_type &, boost::uniform_real<> > uni;
 
-    random_uniform_slow() : uni(generator, uni_dist) { }
+    random_uniform_slow(unsigned seed = 0) : uni(generator, uni_dist)
+    {
+        if (!seed)
+            seed = get_next_seed();
+        uni.engine().seed(seed);
+    }
 #else
     mutable unsigned short state48[3];
 
@@ -114,7 +119,7 @@ struct random_uniform_slow
         state48[0] = seed & 0xffff;
         state48[1] = seed >> 16;
         state48[2] = 42;
-	erand48(state48);
+        erand48(state48);
     }
 #endif
 
