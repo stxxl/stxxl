@@ -6,8 +6,6 @@ $(error You need GNU make 3.80 or newer to compile stxxl. make $(MAKE_VERSION) i
 Old make versions that do not have $(error) die here
 endif
 
-THISMAKEFILE	:= $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)) 
-
 main: library
 
 include make.settings
@@ -40,23 +38,29 @@ build-lib: SUBDIRS-lib
 	$(MAKE) -C lib
 	$(MAKE) -C utils create
 
-$(LIBNAME).mk: build-lib
-	$(RM) $@
-	echo 'STXXL_CXX	 = $(COMPILER)'	>> $@
-	echo 'STXXL_CPPFLAGS	 = $(stxxl_mk_cppflags)'	>> $@
-	echo 'STXXL_LDLIBS	 = $(stxxl_mk_ldlibs)'	>> $@
-	echo 'STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)'	>> $@
-	echo 'STXXL_LDLIBS_STXXL	 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $@
-	echo 'STXXL_LIBDEPS		 = $(STXXL_LIBDEPS)'	>> $@
-	echo 'STXXL_CPPFLAGS_MCSTL	 = $(MCSTL_CPPFLAGS)'	>> $@
-	echo 'STXXL_LDLIBS_MCSTL	 = $(MCSTL_LDFLAGS)'	>> $@
-	echo 'STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)'	>> $@
-	echo 'STXXL_LDLIBS_BOOST	 = $(BOOST_LINKER_OPTIONS)'	>> $@
+$(LIBNAME).stamp: build-lib
+	$(RM) $@ $(LIBNAME).mk.tmp
+	echo 'STXXL_CXX	 = $(COMPILER)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CPPFLAGS	 = $(stxxl_mk_cppflags)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LDLIBS	 = $(stxxl_mk_ldlibs)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LDLIBS_STXXL	 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LIBDEPS		 = $(STXXL_LIBDEPS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_MCSTL	 = $(MCSTL_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LDLIBS_MCSTL	 = $(MCSTL_LDFLAGS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LDLIBS_BOOST	 = $(BOOST_LINKER_OPTIONS)'	>> $(LIBNAME).mk.tmp
+	cmp -s $(LIBNAME).mk.tmp $(LIBNAME).mk || mv $(LIBNAME).mk.tmp $(LIBNAME).mk
+	$(RM) $(LIBNAME).mk.tmp
+	touch $@
 
-library: $(LIBNAME).mk
+library: $(LIBNAME).stamp
 
-lib/lib$(LIBNAME).$(LIBEXT): make.settings
-	$(MAKE) -f $(THISMAKEFILE) library
+# skip recompilation of existing library
+library-fast:
+ifeq (,$(wildcard lib/lib$(LIBNAME).$(LIBEXT)))
+library-fast: library
+endif
 
 ifneq (,$(wildcard .svn))
 lib-in-common: common/version_svn.defs
@@ -97,6 +101,22 @@ common/version_svn.defs:
 	$(RM) $@.$(LIBNAME).tmp
 endif
 
+
+tests-in-%: library-fast
+	$(MAKE) -C $* tests
+
+tests: SUBDIRS-tests
+
+
+clean-in-%:
+	$(MAKE) -C $* clean
+
+clean: SUBDIRS-clean
+	$(RM) common/version_svn.defs
+	$(RM) $(LIBNAME).stamp $(LIBNAME).mk $(LIBNAME).mk.tmp
+
+
+ifneq (,$(wildcard .svn))
 VERSION		?= $(shell grep 'define *STXXL_VERSION_STRING_MA_MI_PL' common/version.cpp | cut -d'"' -f2)
 PHASE		?= snapshot
 DATE		?= $(shell date "+%Y%m%d")
@@ -113,17 +133,7 @@ release:
 	@echo "Your release has been created in stxxl-$(REL_VERSION).tar.gz and stxxl-$(REL_VERSION).zip"
 	@echo "The following files are modified and not commited:"
 	@svn status -q
+endif
 
-tests-in-%: lib/lib$(LIBNAME).$(LIBEXT)
-	$(MAKE) -C $* tests
 
-tests: SUBDIRS-tests
-
-clean-in-%:
-	$(MAKE) -C $* clean
-
-clean: SUBDIRS-clean
-	$(RM) common/version_svn.defs
-	$(RM) $(LIBNAME).mk
-
-.PHONY: main library tests clean
+.PHONY: main library library-fast tests clean release

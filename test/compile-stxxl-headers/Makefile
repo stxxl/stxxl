@@ -39,13 +39,13 @@ all: compile-test
 preprocess-test: $(HEADERS_ESCAPED:%=test-header-%.$(INSTANCE).ii)
 compile-test: $(HEADERS_ESCAPED:%=test-header-%.$(INSTANCE).o)
 
-test-header-%.cpp::
+test-header-%.th.cpp::
 	echo '#include "$(subst ~,/,$*)"' > $@
 
-%.$(INSTANCE).ii: %.cpp
+%.$(INSTANCE).ii: %.th.cpp
 	$(CXX) $(CPPFLAGS) -E $< -o $@
 
-%.$(INSTANCE).o: %.cpp
+%.$(INSTANCE).o: %.th.cpp $(wildcard ../../$(INSTANCE).mk)
 	$(COMPILE.cc) $(OUTPUT_OPTION) $<
 
 clean:
