@@ -37,7 +37,7 @@ template <     class ValTp,
           unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE (ValTp),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
           class SzTp = stxxl::uint64>
-class queue
+class queue : private noncopyable
 {
 public:
 
@@ -66,8 +66,6 @@ private:
     block_manager * bm;
     unsigned_type blocks2prefetch;
 
-    queue(const queue & obj);     // forbidden
-    queue & operator = (const queue & obj);     // forbidden
 public:
 
     //! \brief Constructs empty queue with own write and prefetch block pool

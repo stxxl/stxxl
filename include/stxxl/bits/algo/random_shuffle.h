@@ -28,7 +28,6 @@ namespace random_shuffle_local
     template <class ExtIterator>
     class write_vector
     {
-        write_vector(); // forbidden
         typedef typename ExtIterator::size_type size_type;
         typedef typename ExtIterator::value_type value_type;
         typedef typename ExtIterator::block_type block_type;

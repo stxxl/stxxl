@@ -337,7 +337,7 @@ public:
 //! - \c VectorType the type of the underlying vector container,
 //! the default is \c stxxl::vector<T>
 template <class T, class VectorType = stxxl::vector<T> >
-class deque
+class deque : private noncopyable
 {
     typedef deque<T, VectorType>     Self_;
 public:
@@ -357,15 +357,6 @@ public:
 private:
     VectorType Vector;
     size_type begin_o, end_o, size_;
-
-    deque(const deque &)           // Copying external deques is discouraged
-    // (and not implemented)
-    {
-        STXXL_FORMAT_ERROR_MSG(msg, "deque::deque, stxxl::deque copy constructor is not implemented yet");
-        throw std::runtime_error(msg.str());
-    }
-
-    deque & operator=(const deque &);           // not implemented, and forbidden
 
     void double_array()
     {

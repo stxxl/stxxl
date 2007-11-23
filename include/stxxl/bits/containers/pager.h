@@ -9,7 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl/bits/namespace.h"
+#include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/rand.h"
 #include "stxxl/bits/common/simple_vector.h"
 
@@ -50,16 +50,13 @@ public:
 
 //! \brief Pager with \b LRU replacement strategy
 template <unsigned npages_>
-class lru_pager
+class lru_pager : private noncopyable
 {
     typedef std::list<int_type> list_type;
 
     std::auto_ptr<list_type> history;
     simple_vector<list_type::iterator> history_entry;
 
-private:
-    lru_pager(const lru_pager &);
-    lru_pager & operator = (const lru_pager &);     // forbidden
 public:
     enum { n_pages = npages_ };
 

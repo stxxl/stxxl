@@ -9,6 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/utils.h"
 
 #ifdef STXXL_BOOST_THREADS
@@ -23,7 +24,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //#define onoff_switch Switch
 
-class onoff_switch
+class onoff_switch : private noncopyable
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex mutex;
@@ -33,8 +34,6 @@ class onoff_switch
     pthread_cond_t cond;
 #endif
     bool _on;
-    onoff_switch(const onoff_switch & obj);
-    onoff_switch & operator = (const onoff_switch & obj);
 public:
     onoff_switch (bool flag = false) : _on (flag)
     {

@@ -8,6 +8,7 @@
  *  Email
  ****************************************************************************/
 
+#include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/containers/btree/btree.h"
 
 
@@ -70,15 +71,11 @@ template <      class KeyType,
           unsigned RawLeafSize = 128 * 1024,                             // 128 KBytes default
           class PDAllocStrategy = stxxl::SR
 >
-class map
+class map : private noncopyable
 {
     typedef btree::btree<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> impl_type;
 
     impl_type Impl;
-
-    map();     // forbidden
-    map(const map &);    // forbidden
-    map & operator=(const map &);   // forbidden
 
 public:
     typedef typename impl_type::node_block_type node_block_type;

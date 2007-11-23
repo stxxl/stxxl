@@ -16,12 +16,13 @@
  #include <pthread.h>
 #endif
 
+#include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/utils.h"
 
 
 __STXXL_BEGIN_NAMESPACE
 
-class semaphore
+class semaphore : private noncopyable
 {
     int v;
 #ifdef STXXL_BOOST_THREADS
@@ -31,8 +32,6 @@ class semaphore
     pthread_mutex_t mutex;
     pthread_cond_t cond;
 #endif
-    semaphore(const semaphore &);              // forbidden
-    semaphore & operator = (const semaphore &);              // forbidden
 public:
     semaphore (int init_value = 1) : v (init_value)
     {

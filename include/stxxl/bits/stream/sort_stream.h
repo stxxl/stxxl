@@ -92,7 +92,7 @@ namespace stream
               class Cmp_,
               unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE (typename Input_::value_type),
               class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
-    class runs_creator
+    class runs_creator : private noncopyable
     {
         Input_ &input;
         Cmp_ cmp;
@@ -108,11 +108,6 @@ namespace stream
         sorted_runs_type result_; // stores the result (sorted runs)
         unsigned_type m_; // memory for internal use in blocks
         bool result_computed; // true result is already computed (used in 'result' method)
-
-        runs_creator(); // default construction is forbidden
-        runs_creator(const runs_creator & ); // copy construction is forbidden
-        runs_creator & operator = (const runs_creator &); // copying is forbidden
-
 
         void compute_result();
         void sort_run(block_type * run, unsigned_type elements)
@@ -451,12 +446,6 @@ namespace stream
         request_ptr * write_reqs;
         run_type run;
 
-
-        runs_creator(); // default construction is forbidden
-        runs_creator(const runs_creator & ); // copy construction is forbidden
-        runs_creator & operator = (const runs_creator &); // copying is forbidden
-
-
         void sort_run(block_type * run, unsigned_type elements)
         {
             if (block_type::has_filler)
@@ -677,10 +666,6 @@ namespace stream
         unsigned_type irun;
         alloc_strategy_type alloc_strategy;
 
-        runs_creator(); // default construction is forbidden
-        runs_creator(const runs_creator & ); // copy construction is forbidden
-        runs_creator & operator = (const runs_creator &); // copying is forbidden
-
     public:
         //! \brief Creates the object
         //! \param c comparator object
@@ -856,7 +841,7 @@ namespace stream
     template <  class RunsType_,
               class Cmp_,
               class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY >
-    class runs_merger
+    class runs_merger : private noncopyable
     {
         typedef RunsType_ sorted_runs_type;
         typedef AllocStr_ alloc_strategy;
@@ -895,9 +880,6 @@ namespace stream
 
         void merge_recursively();
 
-        runs_merger(); // forbidden
-        runs_merger(const runs_merger &); // forbidden
-        runs_merger & operator = (const runs_merger &); // copying is forbidden
         void deallocate_prefetcher()
         {
             if (prefetcher)
@@ -1428,7 +1410,7 @@ namespace stream
               class Cmp_,
               unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE (typename Input_::value_type),
               class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
-    class sort
+    class sort : public noncopyable
     {
         typedef runs_creator<Input_, Cmp_, BlockSize_, AllocStr_> runs_creator_type;
         typedef typename runs_creator_type::sorted_runs_type sorted_runs_type;
@@ -1437,8 +1419,6 @@ namespace stream
         runs_creator_type creator;
         runs_merger_type merger;
 
-        sort(); // forbidden
-        sort(const sort &); // forbidden
     public:
         //! \brief Standard stream typedef
         typedef typename Input_::value_type value_type;

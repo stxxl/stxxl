@@ -10,6 +10,7 @@
  ****************************************************************************/
 
 #include "stxxl/io"
+#include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/rand.h"
 #include "stxxl/bits/common/aligned_alloc.h"
 #include "stxxl/bits/common/debug.h"

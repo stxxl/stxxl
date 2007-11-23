@@ -32,7 +32,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \brief Implements dynamically resizable prefetching pool
 template <class BlockType>
-class prefetch_pool
+class prefetch_pool : private noncopyable
 {
 public:
     typedef BlockType block_type;
@@ -74,9 +74,7 @@ protected:
     hash_map_type busy_blocks;
 
     unsigned_type free_blocks_size;
-private:
-    prefetch_pool(const prefetch_pool & pool);     // forbidden
-    prefetch_pool & operator =(const prefetch_pool & pool);     // forbidden
+
 public:
 
     //! \brief Constructs pool

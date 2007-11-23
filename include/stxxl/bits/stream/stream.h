@@ -54,8 +54,6 @@ namespace stream
     {
         InputIterator_ current_, end_;
 
-        //! \brief Default construction is forbidden
-        iterator2stream() { };
     public:
         //! \brief Standard stream typedef
         typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
@@ -122,9 +120,6 @@ namespace stream
         typename InputIterator_::bids_container_iterator > buf_istream_type;
 
         mutable std::auto_ptr<buf_istream_type> in;
-
-        //! \brief Default construction is forbidden
-        vector_iterator2stream() { };
 
         void delete_stream()
         {
@@ -259,9 +254,6 @@ namespace stream
     {
         vector_iterator2stream<InputIterator_> *vec_it_stream;
         iterator2stream<InputIterator_> *it_stream;
-
-        //! \brief Default construction is forbidden
-        vector_iterator2stream_sr();
 
         typedef typename InputIterator_::block_type block_type;
     public:
@@ -561,10 +553,7 @@ namespace stream
         Generator_ gen_;
         value_type current_;
 
-        //! \brief Default construction is forbidden
-        generator2stream() { };
     public:
-
         generator2stream(Generator_ g) :
             gen_(g), current_(gen_()) { }
 

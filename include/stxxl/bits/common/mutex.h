@@ -16,14 +16,21 @@
 
 #else
 
- #include "stxxl/bits/common/utils.h"
-
  #include <pthread.h>
+
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/common/utils.h>
+
+#endif
 
 
 __STXXL_BEGIN_NAMESPACE
 
-class mutex
+#ifdef STXXL_BOOST_THREADS
+
+#else
+
+class mutex : private noncopyable
 {
     pthread_mutex_t _mutex;
 public:
@@ -54,8 +61,8 @@ public:
     }
 };
 
-__STXXL_END_NAMESPACE
-
 #endif
+
+__STXXL_END_NAMESPACE
 
 #endif

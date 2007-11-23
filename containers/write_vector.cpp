@@ -13,7 +13,6 @@
 template <class VectorType>
 class write_vector
 {
-    write_vector();     // forbidden
     typedef VectorType vector_type;
     typedef typename vector_type::size_type size_type;
     typedef typename vector_type::value_type value_type;

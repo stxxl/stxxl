@@ -47,7 +47,7 @@ struct stack_config_generator
 //! To gain full bandwidth of disks \c Config_::BlocksPerPage must >= number of disks <BR>
 //! \internal
 template <class Config_>
-class normal_stack
+class normal_stack : private noncopyable
 {
 public:
     typedef Config_ cfg;
@@ -72,8 +72,6 @@ private:
     std::vector<bid_type> bids;
     alloc_strategy alloc_strategy_;
 
-    normal_stack(const normal_stack & obj); // forbidden
-    normal_stack & operator = (const normal_stack & obj); // forbidden
 public:
     normal_stack() :
         size_(0),
@@ -250,7 +248,7 @@ private:
 //! For semantics of the methods see documentation of the STL \c std::stack.
 //! \warning The amortized complexity of operation is not O(1/DB), rather O(DB)
 template <class Config_>
-class grow_shrink_stack
+class grow_shrink_stack : private noncopyable
 {
 public:
     typedef Config_ cfg;
@@ -276,8 +274,6 @@ private:
     std::vector<bid_type> bids;
     alloc_strategy alloc_strategy_;
 
-
-    grow_shrink_stack & operator = (const grow_shrink_stack & obj); // forbidden
 public:
     grow_shrink_stack() :
         size_(0),
@@ -447,7 +443,7 @@ public:
 
 //! \brief Efficient implementation that uses prefetching and overlapping using (shared) buffers pools
 template <class Config_>
-class grow_shrink_stack2
+class grow_shrink_stack2 : private noncopyable
 {
 public:
     typedef Config_ cfg;
@@ -472,10 +468,7 @@ private:
     unsigned_type pref_aggr;
     prefetch_pool<block_type> &p_pool;
     write_pool<block_type>    &w_pool;
-    // for a moment forbid default construction
-    grow_shrink_stack2();
-    grow_shrink_stack2(const grow_shrink_stack2 & obj); // forbidden
-    grow_shrink_stack2 & operator = (const grow_shrink_stack2 & obj); // forbidden
+
 public:
     //! \brief Constructs stack
     //! \param p_pool_ prefetch pool, that will be used for block prefetching
@@ -674,7 +667,7 @@ public:
 
 //! For semantics of the methods see documentation of the STL \c std::stack.
 template <unsigned_type CritSize, class ExternalStack, class InternalStack>
-class migrating_stack
+class migrating_stack : private noncopyable
 {
 public:
     typedef typename ExternalStack::cfg cfg;
@@ -700,7 +693,6 @@ private:
     template <class stack_type>
     migrating_stack(const stack_type & stack_);
 
-    migrating_stack & operator = (const migrating_stack &); // forbidden
 public:
     migrating_stack() : int_impl(new int_stack_type()), ext_impl(NULL) { }
 

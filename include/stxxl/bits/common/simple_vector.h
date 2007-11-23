@@ -1,13 +1,14 @@
 #ifndef SIMPLE_VECTOR_HEADER
 #define SIMPLE_VECTOR_HEADER
 
+#include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/utils.h"
 
 
 __STXXL_BEGIN_NAMESPACE
 
 template < class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */  >
-class simple_vector
+class simple_vector : private noncopyable
 {
     simple_vector ()
     { }
@@ -19,11 +20,7 @@ protected:
     size_type _size;
     value_type * _array;
 
-private:
-    simple_vector & operator = (const simple_vector &); // forbidden
-    simple_vector(const simple_vector &); // forbidden
 public:
-
     typedef value_type * iterator;
     typedef const value_type * const_iterator;
     typedef value_type & reference;

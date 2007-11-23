@@ -9,6 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/utils.h"
 
 #ifdef STXXL_BOOST_THREADS
@@ -21,7 +22,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-class state
+class state : private noncopyable
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex mutex;
@@ -31,8 +32,6 @@ class state
     pthread_cond_t cond;
 #endif
     int _state;
-    state(const state &);              // forbidden
-    state & operator = (const state &);              // forbidden
 public:
     state (int s = 0) : _state (s)
     {

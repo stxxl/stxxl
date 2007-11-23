@@ -32,7 +32,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \brief Implements dynamically resizable buffered writing pool
 template <class BlockType>
-class write_pool
+class write_pool : private noncopyable
 {
 public:
     typedef BlockType block_type;
@@ -67,9 +67,6 @@ protected:
 
     unsigned_type free_blocks_size, busy_blocks_size;
 
-private:
-    write_pool(const write_pool &);     // forbidden
-    write_pool & operator=(const write_pool &);    // forbidden
 public:
     //! \brief Constructs pool
     //! \param init_size initial number of blocks in the pool

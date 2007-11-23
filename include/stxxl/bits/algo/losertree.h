@@ -9,6 +9,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/utils.h"
 
 
@@ -17,12 +18,8 @@ __STXXL_BEGIN_NAMESPACE
 template <typename run_cursor_type,
           typename run_cursor_cmp_type,
           unsigned buffer_size>
-class loser_tree
+class loser_tree : private noncopyable
 {
-    loser_tree () { }    // forbidden
-    loser_tree (const loser_tree &);    // forbidden
-    loser_tree & operator = (const loser_tree &);    // forbidden
-
     int logK;
     int_type k;
     int_type * entry;
