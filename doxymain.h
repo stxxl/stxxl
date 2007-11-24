@@ -107,7 +107,6 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
  *     if you want to produce a debug version of the Stxxl library or Stxxl examples
- * - Verify that you have GNU make 3.80 (or later) installed
  * - Run: \verbatim make library_g++ \endverbatim
  * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
  *
@@ -354,7 +353,6 @@ my_example.bin: my_example.o
  *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
  *     if you want to produce a debug version of the Stxxl library or Stxxl examples
- * - Verify that you have GNU make 3.80 (or later) installed
  * - Run: \verbatim make library_g++ \endverbatim
  * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
  *

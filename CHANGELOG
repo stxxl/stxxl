@@ -5,6 +5,7 @@ Version 1.1.1 (UNRELEASED)
 * made all size_types unsigned
 * minor tweaks to the build system
 * check whether STXXL_ROOT has been set correctly
+* build system now only requires GNU make 3.78 or later
 * update install and usage instructions
 * spell checked sources and documentation
 

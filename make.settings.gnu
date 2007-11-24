@@ -1,10 +1,12 @@
 # This -*- Makefile -*- is intended for processing with GNU make.
 
+TOPDIR	?= $(error TOPDIR not defined) # DO NOT CHANGE! This is set elsewhere.
+
 # Change this file according to your paths.
 
 # Instead of modifying this file, you could also set your modified variables
 # in make.settings.local (needs to be created first).
--include $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))make.settings.local
+-include $(TOPDIR)/make.settings.local
 
 
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries

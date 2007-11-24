@@ -1,5 +1,5 @@
 
-include ../make.settings
+include $(TOPDIR)/make.settings
 
 TEST_BINARIES	 = $(foreach t, $(TESTS), $t.$(bin))
 

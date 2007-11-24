@@ -1,9 +1,10 @@
+TOPDIR	?= ..
 include Makefile.common
 
 #TESTS		+= $(TESTS_LONG_COMPILE)
 TESTS		+= $(TESTS_EXTRA)
 
-include ../Makefile.subdir.gnu
+include $(TOPDIR)/Makefile.subdir.gnu
 
 
 obj-test_manyunits	 = test_manyunits1.$o test_manyunits2.$o

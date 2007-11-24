@@ -1,10 +1,11 @@
+TOPDIR	?= ..
 include Makefile.common
 
 all: create
 
 TESTS		+= $(TESTS_EXTRA)
 
-include ../Makefile.subdir.gnu
+include $(TOPDIR)/Makefile.subdir.gnu
 
 
 create: $(UTIL_BINARIES:=.$(bin))

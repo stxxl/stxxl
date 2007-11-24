@@ -3,8 +3,9 @@
 INSTANCE	?= stxxl
 INSTANCE	?= mcstxxl
 
-include ../../make.settings
--include ../../$(INSTANCE).mk
+TOPDIR		?= ../..
+include $(TOPDIR)/make.settings
+-include $(TOPDIR)/$(INSTANCE).mk
 
 CXX		 = $(STXXL_CXX)
 OPT		 = -O3

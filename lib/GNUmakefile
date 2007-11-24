@@ -1,8 +1,9 @@
+TOPDIR	?= ..
 include Makefile.common
 
 all: lib
 
-include ../Makefile.subdir.gnu
+include $(TOPDIR)/Makefile.subdir.gnu
 
 lib: lib$(LIBNAME).$(LIBEXT)
 

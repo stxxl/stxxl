@@ -1,3 +1,4 @@
+TOPDIR	?= ..
 include Makefile.common
 
 #TESTS		+= $(TESTS_BDB)
@@ -6,7 +7,7 @@ include Makefile.common
 TESTS		+= $(TESTS_EXTRA)
 TESTS		+= $(TESTS_BTREE)
 
-include ../Makefile.subdir.gnu
+include $(TOPDIR)/Makefile.subdir.gnu
 
 
 stack_benchmark.$o:	CPPFLAGS += -DNDEBUG

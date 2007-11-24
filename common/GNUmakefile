@@ -1,8 +1,9 @@
+TOPDIR	?= ..
 include Makefile.common
 
 TESTS		+= $(TESTS_EXTRA)
 
-include ../Makefile.subdir.gnu
+include $(TOPDIR)/Makefile.subdir.gnu
 
 ifneq (,$(wildcard .svn))
 version.$o: STXXL_COMPILER_OPTIONS += -DHAVE_VERSION_SVN_DEFS

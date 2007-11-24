@@ -1,8 +1,9 @@
+TOPDIR	?= ..
 include Makefile.common
 
 TESTS		+= $(TESTS_EXTRA)
 
-include ../Makefile.subdir.gnu
+include $(TOPDIR)/Makefile.subdir.gnu
 
 
 test_stream1.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
