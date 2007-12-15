@@ -690,6 +690,7 @@ namespace sort_local
 
         for (i = 0; i < nruns; ++i)
         {
+            // FIXME: why has an alloc_strategy to take two arguments disk_index.begin(), disk_index.end() ???
             mng->new_blocks(        alloc_strategy(0, ndisks),
                                     trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (runs[i]->begin()),
                                     trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (runs[i]->end())        );

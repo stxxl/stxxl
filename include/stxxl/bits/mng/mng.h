@@ -938,6 +938,16 @@ public:
 //! Standard allocation strategies encapsulated in functors
 //! \{
 
+//! \brief example disk allocation scheme functor
+//! \remarks model of \b allocation_strategy concept
+struct basic_allocation_strategy
+{
+    basic_allocation_strategy(int disks_begin, int disks_end);
+    basic_allocation_strategy();
+    int operator() (int i) const;
+    static const char * name();
+};
+
 //! \brief striping disk allocation scheme functor
 //! \remarks model of \b allocation_strategy concept
 struct striping
@@ -957,6 +967,7 @@ struct striping
     {
         return "striping";
     }
+    // FIXME WHY?
     virtual ~striping()
     { }
 };
@@ -1047,7 +1058,7 @@ struct RC : public striping
 struct single_disk
 {
     const int disk;
-    single_disk(int d) : disk(d)
+    single_disk(int d, int = 0) : disk(d)
     { };
 
     single_disk() : disk(0)
