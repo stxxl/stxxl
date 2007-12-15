@@ -101,6 +101,18 @@ struct interleaved_RC : public interleaved_striping
     }
 };
 
+struct first_disk_only : public interleaved_striping
+{
+    first_disk_only(int_type _nruns, int _begindisk, int)
+    : interleaved_striping (_nruns, _begindisk, _begindisk + 1)
+    { }
+
+    int operator () (int_type) const
+    {
+        return begindisk;
+    }
+};
+
 template <typename scheme>
 struct interleaved_alloc_traits
 {};
@@ -127,6 +139,12 @@ template <>
 struct interleaved_alloc_traits<RC>
 {
     typedef interleaved_RC strategy;
+};
+
+template <>
+struct interleaved_alloc_traits<single_disk>
+{
+    typedef first_disk_only strategy;
 };
 
 __STXXL_END_NAMESPACE
