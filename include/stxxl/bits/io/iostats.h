@@ -32,7 +32,6 @@ class disk_queue;
 //! \remarks is a singleton
 class stats
 {
-    friend class disk_queue;
     unsigned reads, writes;             // number of operations
     int64 volume_read, volume_written;            // number of bytes read/written
     double t_reads, t_writes;                   //  seconds spent in operations
@@ -99,22 +98,6 @@ public:
     //! \brief Resets I/O time counters (including I/O wait counter)
     void reset();
 
-
-#ifdef COUNT_WAIT_TIME
-    //! \brief Resets I/O wait time counter
-    void _reset_io_wait_time();
-    // void reset_io_wait_time() { stxxl::wait_time_counter = 0.0; }
-    //! \brief Returns I/O wait time counter
-    //! \return number of seconds spent in I/O waiting functions
-    //!  \link request::wait request::wait \endlink,
-    //!  \c wait_any and
-    //!  \c wait_all
-    double get_io_wait_time() const;
-    //! \brief Increments I/O wait time counter
-    //! \param val increment value in seconds
-    //! \return new value of I/O wait time counter in seconds
-    double increment_io_wait_time(double val);
-#else
     //! \brief Resets I/O wait time counter
     void _reset_io_wait_time();
     //! \brief Returns I/O wait time counter
@@ -128,7 +111,6 @@ public:
     //! \param val increment value in seconds
     //! \return new value of I/O wait time counter in seconds
     double increment_io_wait_time(double val);
-#endif
 
     // for library use
     void write_started (unsigned size_);
@@ -137,11 +119,7 @@ public:
     void read_finished ();
 };
 
-#ifndef DISKQUEUE_HEADER
-
 std::ostream & operator << (std::ostream & o, const stats & s);
-
-#endif
 
 //! \}
 
