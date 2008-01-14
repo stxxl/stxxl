@@ -26,8 +26,6 @@ __STXXL_BEGIN_NAMESPACE
 extern double wait_time_counter;
 #endif
 
-class disk_queue;
-
 //! \brief Collects various I/O statistics
 //! \remarks is a singleton
 class stats
@@ -119,10 +117,149 @@ public:
     void read_finished ();
 };
 
-std::ostream & operator << (std::ostream & o, const stats & s);
+
+class stats_data
+{
+    unsigned reads, writes;                    // number of operations
+    int64 volume_read, volume_written;         // number of bytes read/written
+    double t_reads, t_writes;                  // seconds spent in operations
+    double p_reads, p_writes;                  // seconds spent in parallel operations
+    double p_ios;                              // seconds spent in all parallel I/O operations (read and write)
+    double t_wait;
+    double elapsed;
+
+public:
+    stats_data() :
+        reads (0),
+        writes (0),
+        volume_read(0),
+        volume_written(0),
+        t_reads (0.0),
+        t_writes (0.0),
+        p_reads (0.0),
+        p_writes (0.0),
+        p_ios (0.0),
+        t_wait(0.0),
+        elapsed(0.0)
+    { }
+
+    stats_data(const stats& s) :
+        reads(s.get_reads()),
+        writes(s.get_writes()),
+        volume_read(s.get_read_volume()),
+        volume_written(s.get_written_volume()),
+        t_reads(s.get_read_time()),
+        t_writes(s.get_write_time()),
+        p_reads(s.get_pread_time()),
+        p_writes(s.get_pwrite_time()),
+        p_ios(s.get_pio_time()),
+        t_wait(s.get_io_wait_time()),
+        elapsed(stxxl_timestamp() - s.get_last_reset_time())
+    { }
+
+    stats_data operator+(const stats_data& a) const
+    {
+        stats_data s;
+        s.reads = reads + a.reads;
+        s.writes = writes + a.writes;
+        s.volume_read = volume_read + a.volume_read;
+        s.volume_written = volume_written + a.volume_written;
+        s.t_reads = t_reads + a.t_reads;
+        s.t_writes = t_writes + a.t_writes;
+        s.p_reads = p_reads + a.p_reads;
+        s.p_writes = p_writes + a.p_writes;
+        s.p_ios = p_ios + a.p_ios;
+        s.t_wait = t_wait + a.t_wait;
+        s.elapsed = elapsed + a.elapsed;
+        return s;
+    }
+
+    stats_data operator-(const stats_data& a) const
+    {
+        stats_data s;
+        s.reads = reads - a.reads;
+        s.writes = writes - a.writes;
+        s.volume_read = volume_read - a.volume_read;
+        s.volume_written = volume_written - a.volume_written;
+        s.t_reads = t_reads - a.t_reads;
+        s.t_writes = t_writes - a.t_writes;
+        s.p_reads = p_reads - a.p_reads;
+        s.p_writes = p_writes - a.p_writes;
+        s.p_ios = p_ios - a.p_ios;
+        s.t_wait = t_wait - a.t_wait;
+        s.elapsed = elapsed - a.elapsed;
+        return s;
+    }
+
+    unsigned get_reads () const
+    {
+        return reads;
+    }
+
+    unsigned get_writes () const
+    {
+        return writes;
+    }
+
+    int64 get_read_volume () const
+    {
+        return volume_read;
+    }
+
+    int64 get_written_volume () const
+    {
+        return volume_written;
+    }
+
+    double get_read_time () const
+    {
+        return t_reads;
+    }
+
+    double get_write_time () const
+    {
+        return t_writes;
+    }
+
+    double get_pread_time() const
+    {
+        return p_reads;
+    }
+
+    double get_pwrite_time() const
+    {
+        return p_writes;
+    }
+
+    double get_pio_time() const
+    {
+        return p_ios;
+    }
+
+    double get_elapsed_time() const
+    {
+        return elapsed;
+    }
+
+    double get_io_wait_time() const
+    {
+        return t_wait;
+    }
+
+};
+
+std::ostream & operator << (std::ostream & o, const stats_data & s);
+
+inline std::ostream & operator << (std::ostream & o, const stats & s)
+{
+    o << stxxl::stats_data(s);
+    return o;
+}
+
 
 //! \}
 
 __STXXL_END_NAMESPACE
 
 #endif
+// vim: et:ts=4:sw=4

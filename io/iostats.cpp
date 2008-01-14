@@ -305,7 +305,7 @@ void stats::read_finished ()
 }
 
 
-std::ostream & operator << (std::ostream & o, const stats & s)
+std::ostream & operator << (std::ostream & o, const stats_data & s)
 {
     o << "STXXL I/O statistics" << std::endl;
     o << " total number of reads                      : " << s.get_reads() << std::endl;
@@ -328,7 +328,7 @@ std::ostream & operator << (std::ostream & o, const stats & s)
       << " @ " << ((s.get_read_volume() + s.get_written_volume()) / 1048576.0 / s.get_pio_time()) << " MB/sec."
       << std::endl;
     o << " I/O wait time                              : " << s.get_io_wait_time() << " sec." << std::endl;
-    o << " Time since the last reset                  : " << (stxxl_timestamp() - s.get_last_reset_time()) << " sec." << std::endl;
+    o << " Time since the last reset                  : " << s.get_elapsed_time() << " sec." << std::endl;
     return o;
 }
 
