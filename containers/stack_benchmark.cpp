@@ -25,6 +25,13 @@ struct my_record_
     my_record_() { }
 };
 
+template <unsigned RECORD_SIZE>
+inline std::ostream & operator << (std::ostream & o, const my_record_<RECORD_SIZE> &)
+{
+    o << ".";
+    return o;
+}
+
 template <class my_record>
 void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 {
