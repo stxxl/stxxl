@@ -113,6 +113,8 @@ ifeq ($(strip $(USE_ICPC)),yes)
 
 OPENMPFLAG	?= -openmp
 
+STXXL_SPECIFIC	+= -include stxxl/bits/common/intel_compatibility.h
+
 endif
 
 ##################################################################
