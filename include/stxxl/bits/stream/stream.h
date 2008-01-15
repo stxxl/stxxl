@@ -46,7 +46,7 @@ namespace stream
     //!
     //! \{
 
-    //! \brief A model of steam that retrieves the data from an input iterator
+    //! \brief A model of stream that retrieves the data from an input iterator
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c iterator2stream .
     template <class InputIterator_>
@@ -108,7 +108,7 @@ namespace stream
         typedef iterator2stream<InputIterator_> stream_type;
     };
 
-    //! \brief A model of steam that retrieves data from an external \c stxxl::vector iterator.
+    //! \brief A model of stream that retrieves data from an external \c stxxl::vector iterator.
     //! It is more efficient than generic \c iterator2stream thanks to use of overlapping
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c vector_iterator2stream .
@@ -540,7 +540,7 @@ namespace stream
 
 
 
-    //! \brief A model of steam that outputs data from an adaptable generator functor
+    //! \brief A model of stream that outputs data from an adaptable generator functor
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c generator2stream .
     template <class Generator_>
