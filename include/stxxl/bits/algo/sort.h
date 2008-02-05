@@ -835,6 +835,11 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;
 
+    // verify strict weak ordering of the sentinels
+    assert(!cmp(cmp.min_value(), cmp.min_value()));
+    assert(cmp(cmp.min_value(), cmp.max_value()));
+    assert(!cmp(cmp.max_value(), cmp.max_value()));
+
     unsigned_type n = 0;
 
     block_manager * mng = block_manager::get_instance ();
