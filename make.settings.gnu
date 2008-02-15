@@ -18,7 +18,7 @@ STXXL_ROOT	?= $(HOME)/work/stxxl
 
 ifeq ($(strip $(USE_ICPC)),yes)
 COMPILER	?= icpc
-ICPC_MCSTL_CPPFLAGS	?= -gcc-version=420 -cxxlib#=$(FAKEGCC)
+#ICPC_GCC	?= gcc-x.y    # override the gcc/g++ used to find headers and libraries
 WARNINGS	?= -Wall -w1 -openmp-report0 -vec-report0
 endif
 
@@ -114,6 +114,9 @@ ifeq ($(strip $(USE_ICPC)),yes)
 
 OPENMPFLAG	?= -openmp
 
+ICPC_CPPFLAGS	+= $(if $(ICPC_GCC),-gcc-name=$(strip $(ICPC_GCC)))
+ICPC_LDFLAGS	+= $(if $(ICPC_GCC),-gcc-name=$(strip $(ICPC_GCC)))
+
 STXXL_SPECIFIC	+= -include stxxl/bits/common/intel_compatibility.h
 
 endif
@@ -129,10 +132,6 @@ OPENMPFLAG	?= -fopenmp
 
 ifeq (,$(strip $(wildcard $(strip $(MCSTL_ROOT))/c++/mcstl.h)))
 $(error ERROR: could not find a MCSTL installation in MCSTL_ROOT=$(MCSTL_ROOT))
-endif
-
-ifeq ($(strip $(USE_ICPC)),yes)
-MCSTL_CPPFLAGS		+= $(ICPC_MCSTL_CPPFLAGS)
 endif
 
 MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -D__MCSTL__ $(MCSTL_INCLUDES_PREPEND) -I$(MCSTL_ROOT)/c++
@@ -241,8 +240,15 @@ LINK_STXXL	 = $(LINKER) $1 $(STXXL_LINKER_OPTIONS) -o $@
 ###################################################################
 
 
+ifeq ($(strip $(USE_ICPC)),yes)
+STXXL_CPPFLAGS_CXX	+= $(ICPC_CPPFLAGS)
+STXXL_LDLIBS_CXX	+= $(ICPC_LDFLAGS)
+endif
+
+STXXL_COMPILER_OPTIONS	+= $(STXXL_CPPFLAGS_CXX)
 STXXL_COMPILER_OPTIONS	+= $(STXXL_SPECIFIC)
 STXXL_COMPILER_OPTIONS	+= $(OPT) $(DEBUG) $(WARNINGS)
+STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS_CXX)
 STXXL_LINKER_OPTIONS	+= $(DEBUG)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDFLAGS)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS)

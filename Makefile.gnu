@@ -14,8 +14,10 @@ SUBDIRS-clean: $(SUBDIRS:%=clean-in-%)
 
 # compute STXXL_CPPFLAGS/STXXL_LDLIBS for stxxl.mk
 # don't include optimization, warning and debug flags
-stxxl_mk_cppflags	 = $$(STXXL_CPPFLAGS_STXXL)
-stxxl_mk_ldlibs		 = $$(STXXL_LDLIBS_STXXL)
+stxxl_mk_cppflags	+= $(STXXL_CPPFLAGS_CXX)
+stxxl_mk_ldlibs		+= $(STXXL_LDLIBS_CXX)
+stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_STXXL)
+stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_STXXL)
 ifeq ($(strip $(USE_MCSTL)),yes)
 stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_MCSTL)
 stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_MCSTL)
