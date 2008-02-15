@@ -43,8 +43,10 @@ GCC 4.0       |    x      n/a        ?        n/a
 GCC 3.4       |    x      n/a        ?        n/a
 GCC 3.3       |    o      n/a        ?        n/a
 GCC 2.95      |    -      n/a        -        n/a
-ICPC 9.1.051  |    x       x¹        ?         ?
-ICPC 10.0.025 |    x       x¹        ?         ?
+ICPC 10.1.012 |    x       x¹        ?         ?
+ICPC 10.0.026 |    x       x¹        ?         ?
+ICPC 9.1.052  |    x¹      -         ?         ?
+ICPC 9.0.032  |    x¹      -         ?         ?
 MSVC 2005 8.0 |    x      n/a        x        n/a
 
  x   = full support
@@ -52,9 +54,11 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  -   = unsupported
  ?   = untested
  n/a = compiler does not support OpenMP which is needed by MCSTL
- ¹   = does not work with STL GCC 4.2.0 (ICPC bug), workaround:
-       the first include in the program must be
-       "stxxl/bits/common/intel_compatibility.h"
+ ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
+       gcc does not come in the correct version:
+       icpc 9.0: use gcc 3.x
+       icpc 9.1: use gcc before 4.2
+       icpc 10.x with mcstl support: use gcc 4.2
  ²   = Boost currently does not support g++ 4.3
 \endverbatim
  *
