@@ -15,20 +15,23 @@ MODE	?= icpc
 
 NICE	?= nice
 
+MCSTL	?= mcstl # undefine to disable
+
+
 default-all: lib tests header-compile-test
 
 doxy release:
 	$(MAKE) -f Makefile $@
 
 lib:
-	$(MAKE) -f Makefile library_$(MODE) library_$(MODE)_mcstl
+	$(MAKE) -f Makefile library_$(MODE) $(if $(MCSTL),library_$(MODE)_mcstl)
 
 tests: lib
-	$(NICE) $(MAKE) -f Makefile tests_$(MODE) tests_$(MODE)_mcstl
+	$(NICE) $(MAKE) -f Makefile tests_$(MODE) $(if $(MCSTL),tests_$(MODE)_mcstl)
 
 header-compile-test: lib
 	$(NICE) $(MAKE) -C test/compile-stxxl-headers
-	$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl
+	$(if $(MCSTL),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl)
 
 clean:
 	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_mcstl clean_doxy
