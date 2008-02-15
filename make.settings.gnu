@@ -18,7 +18,8 @@ STXXL_ROOT	?= $(HOME)/work/stxxl
 
 ifeq ($(strip $(USE_ICPC)),yes)
 COMPILER	?= icpc
-ICPC_MCSTL_CPPFLAGS	?= -gcc-version=420 -cxxlib=$(FAKEGCC)
+ICPC_MCSTL_CPPFLAGS	?= -gcc-version=420 -cxxlib#=$(FAKEGCC)
+WARNINGS	?= -Wall -w1 -openmp-report0 -vec-report0
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
@@ -33,7 +34,7 @@ endif
 COMPILER	?= g++
 LINKER		?= $(COMPILER)
 OPT		?= -O3 # compiler optimization level
-WARNINGS	?= -Wall
+WARNINGS	?= -W -Wall
 DEBUG		?= # put here -g option to include the debug information into the binaries
 
 LIBNAME		?= stxxl
