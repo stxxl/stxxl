@@ -10,12 +10,6 @@
 
 #include <stxxl>
 
-#ifdef BOOST_MSVC
-  #include <hash_map>
-#else
-  #include <ext/hash_map>
-#endif
-
 
 __STXXL_BEGIN_NAMESPACE
 
