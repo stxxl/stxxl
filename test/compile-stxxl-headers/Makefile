@@ -17,7 +17,7 @@ CPPFLAGS	+= -MD
 
 STXXL_MAIN_HEADER	+= stxxl.h
 STXXL_HEADERS		+= all
-STXXL_HEADERS		+= vector stack queue priority_queue deque map
+STXXL_HEADERS		+= vector stack queue priority_queue deque map hash_map
 STXXL_HEADERS		+= algorithm scan sort ksort stable_ksort
 STXXL_HEADERS		+= io mng stream
 STXXL_HEADERS		+= random timer mallocstats
@@ -27,6 +27,7 @@ STXXL_BITS		+= $(HEADER_FILES_IO:%=io/%)
 STXXL_BITS		+= $(HEADER_FILES_MNG:%=mng/%)
 STXXL_BITS		+= $(HEADER_FILES_CONTAINER:%=containers/%)
 STXXL_BITS		+= $(HEADER_FILES_CONTAINERS_BTREE:%=containers/btree/%)
+STXXL_BITS		+= $(HEADER_FILES_CONTAINERS_HASH_MAP:%=containers/hash_map/%)
 STXXL_BITS		+= $(HEADER_FILES_ALGO:%=algo/%)
 STXXL_BITS		+= $(HEADER_FILES_STREAM:%=stream/%)
 STXXL_BITS		+= $(HEADER_FILES_UTILS:%=utils/%)

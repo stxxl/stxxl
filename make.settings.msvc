@@ -140,7 +140,13 @@ CONTAINER_FILES	 = \
 	$(HEADER_PATH)/containers/btree/root_node.h \
 	$(HEADER_PATH)/containers/btree/node.h \
 	$(HEADER_PATH)/containers/btree/btree_pager.h \
-	$(HEADER_PATH)/containers/btree/iterator.h
+	$(HEADER_PATH)/containers/btree/iterator.h \
+	$(HEADER_PATH)/containers/hash_map/hash_map.h \
+	$(HEADER_PATH)/containers/hash_map/block_cache.h \
+	$(HEADER_PATH)/containers/hash_map/iterator.h \
+	$(HEADER_PATH)/containers/hash_map/iterator_map.h \
+	$(HEADER_PATH)/containers/hash_map/tuning.h \
+	$(HEADER_PATH)/containers/hash_map/util.h
 
 ALGO_FILES	 = \
 	$(HEADER_PATH)/algo/adaptor.h \
