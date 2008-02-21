@@ -9,7 +9,7 @@ include $(TOPDIR)/make.settings
 
 CXX		 = $(STXXL_CXX)
 OPT		 = -O3
-WARNINGS	 = -W -Wall
+WARNINGS	 = $(STXXL_WARNFLAGS)
 
 CPPFLAGS	+= $(STXXL_CPPFLAGS)
 CPPFLAGS	+= $(OPT) $(WARNINGS)
