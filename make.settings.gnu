@@ -117,7 +117,7 @@ OPENMPFLAG	?= -openmp
 ICPC_CPPFLAGS	+= $(if $(ICPC_GCC),-gcc-name=$(strip $(ICPC_GCC)))
 ICPC_LDFLAGS	+= $(if $(ICPC_GCC),-gcc-name=$(strip $(ICPC_GCC)))
 
-STXXL_SPECIFIC	+= -include stxxl/bits/common/intel_compatibility.h
+STXXL_SPECIFIC	+= -include bits/intel_compatibility.h
 
 endif
 

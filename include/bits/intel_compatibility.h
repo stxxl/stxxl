@@ -1,12 +1,12 @@
-#ifndef STXXL_INTEL_COMPATIBILITY_HEADER_INCLUDED
-#define STXXL_INTEL_COMPATIBILITY_HEADER_INCLUDED
+#ifndef STXXL_MCSTL_INTEL_COMPATIBILITY_HEADER_INCLUDED
+#define STXXL_MCSTL_INTEL_COMPATIBILITY_HEADER_INCLUDED
 /***************************************************************************
  *   Copyright (C) 2007 by Johannes Singler  <singler@ira.uka.de>          *
  *   Copyright (C) 2008 by Andreas Beckmann  <beckmann@mpi-inf.mpg.de>     *
  *   Distributed under the Boost Software License, Version 1.0.            *
  *   (See accompanying file LICENSE_1_0.txt or copy at                     *
  *   http://www.boost.org/LICENSE_1_0.txt)                                 *
- *   Part of the STXXL                                                     *
+ *   Part of the STXXL and MCSTL.                                          *
  ***************************************************************************/
 
 /** @file intel_compatibility.h
@@ -21,7 +21,7 @@ T1 __in_icc_there_is_no__sync_fetch_and_add(T1 *, T2);
 #if 0
 // replacing the overloaded builtin function 'T __sync_fetch_and_add(T*, T)'
 // with 'int32 _InterlockedExchangeAdd(int32, int32)' is not a good idea
-#define __sync_fetch_and_add(ptr,addend) _InterlockedExchangeAdd(const_cast<void*>(reinterpret_cast<volatile void*>(ptr)), addend);
+#define __sync_fetch_and_add(ptr,addend) _InterlockedExchangeAdd(const_cast<void*>(reinterpret_cast<volatile void*>(ptr)), addend)
 #endif
 
 /** @brief Replacement of unknown atomic builtin function.
@@ -31,4 +31,4 @@ T1 __in_icc_there_is_no__sync_fetch_and_add(T1 *, T2);
 
 #endif
 
-#endif // !STXXL_INTEL_COMPATIBILITY_HEADER_INCLUDED
+#endif // !STXXL_MCSTL_INTEL_COMPATIBILITY_HEADER_INCLUDED
