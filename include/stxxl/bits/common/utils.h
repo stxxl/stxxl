@@ -60,7 +60,18 @@ inline void UNUSED(const U &)
 
 
 #ifndef STXXL_VERBOSE_LEVEL
-#define STXXL_VERBOSE_LEVEL 0
+#define STXXL_VERBOSE_LEVEL -1
+#endif
+
+//STXXL_VERBOSE0 should be used for debugging the initial code, and never get into a release.
+
+#if STXXL_VERBOSE_LEVEL > -1
+ #define STXXL_VERBOSE0(x) \
+    { std::cout << "[STXXL-VERBOSE0] " << x << std::endl << std::flush; \
+      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE0] " << x << std::endl << std::flush; \
+    }
+#else
+ #define STXXL_VERBOSE0(x)
 #endif
 
 #if STXXL_VERBOSE_LEVEL > 0
@@ -523,7 +534,7 @@ bool operator!= (const new_alloc<T1> &,
 
 inline unsigned_type sort_memory_usage_factor()
 {
-#ifdef __MCSTL__
+#if defined(__MCSTL__) && !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
     return (mcstl::HEURISTIC::sort_algorithm == mcstl::HEURISTIC::MWMS && mcstl::HEURISTIC::num_threads > 1) ? 2 : 1;   //memory overhead for multiway mergesort
 #else
     return 1;   //no overhead
