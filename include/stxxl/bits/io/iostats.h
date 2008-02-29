@@ -65,40 +65,30 @@ public:
     //! \brief Returns number of bytes written to the disks
     //! \return number of bytes written
     int64 get_written_volume () const;
-    //! \brief Returns time spent in serving all read requests
-    //! \remarks If there are \c n read requests that are served simultaneously
-    //! \remarks in 1 second then the counter corresponding to the function increments by \c n seconds
+    //! \brief Time that would be spent in read syscalls if all parallel reads were serialized.
     //! \return seconds spent in reading
     double get_read_time () const;
-    //! \brief Returns total time spent in serving all write requests
-    //! \remarks If there are \c n write requests that are served simultaneously
-    //! \remarks in 1 second then the counter corresponding to the function increments by \c n seconds
+    //! \brief Time that would be spent in write syscalls if all parallel writes were serialized.
     //! \return seconds spent in writing
     double get_write_time () const;
-    //! \brief Returns time spent in reading (parallel read time)
-    //! \remarks If there are \c n read requests that are served simultaneously
-    //! \remarks in 1 second then the counter corresponding to the function increments by 1 second
+    //! \brief Period of time when at least one I/O thread was executing a read.
     //! \return seconds spent in reading
     double get_pread_time() const;
-    //! \brief Returns time spent in writing (parallel write time)
-    //! \remarks If there are \c n write requests that are served simultaneously
-    //! \remarks in 1 second then the counter corresponding to the function increments by 1 second
+    //! \brief Period of time when at least one I/O thread was executing a write.
     //! \return seconds spent in writing
     double get_pwrite_time() const;
-    //! \brief Returns time spent in I/O (parallel I/O time)
-    //! \remarks If there are \c n \b any requests that are served simultaneously
-    //! \remarks in 1 second then the counter corresponding to the function increments by 1 second
+    //! \brief Period of time when at least one I/O thread was executing a read or a write.
     //! \return seconds spent in I/O
     double get_pio_time() const;
     //! \brief Return time of the last reset
-    //! \return The returned value is in seconds
+    //! \return seconds passed from the last reset()
     double get_last_reset_time() const;
     //! \brief Resets I/O time counters (including I/O wait counter)
     void reset();
 
     //! \brief Resets I/O wait time counter
     void _reset_io_wait_time();
-    //! \brief Returns I/O wait time counter
+    //! \brief I/O wait time counter
     //! \return number of seconds spent in I/O waiting functions
     //!  \link request::wait request::wait \endlink,
     //!  \c wait_any and
