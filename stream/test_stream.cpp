@@ -11,9 +11,9 @@
 #include <vector>
 
 //! \example stream/test_stream.cpp
-//! This is an example of how to use some basic algorithms from
-//! stream package. The example sorts characters of a string producing
-//! array of sorted tuples (character,index position).
+//! This is an example of how to use some basic algorithms from the
+//! stream package. The example sorts characters of a string producing an
+//! array of sorted tuples (character, index position).
 //!
 
 #define USE_FORMRUNS_N_MERGE // comment if you want to use one 'sort' algorithm
@@ -136,27 +136,27 @@ int main()
 #ifdef BOOST_MSVC
     typedef stxxl::stream::generator2stream<counter_type> counter_stream_type;
 #else
-    typedef __typeof (streamify(counter_type())) counter_stream_type;
+    typedef typeof(streamify(counter_type())) counter_stream_type;
 #endif
     counter_stream_type counter_stream = streamify(counter_type());
 
     // create tuple stream
-    typedef make_tuple<input_stream_type, counter_stream_type> tuple1_stream_type;
-    tuple1_stream_type tuples1_stream(input_stream, counter_stream);
+    typedef make_tuple<input_stream_type, counter_stream_type> tuple_stream_type;
+    tuple_stream_type tuple_stream(input_stream, counter_stream);
 
 #ifdef USE_FORMRUNS_N_MERGE
     // sort tuples by character
     // 1. form runs
-    typedef stream::runs_creator<tuple1_stream_type, cmp_type, block_size> run_creator_type;
-    run_creator_type runscreator(tuples1_stream, cmp_type(), 128 * 1024);
+    typedef stream::runs_creator<tuple_stream_type, cmp_type, block_size> runs_creator_stream_type;
+    runs_creator_stream_type runs_creator_stream(tuple_stream, cmp_type(), 128 * 1024);
     // 2. merge runs
-    typedef stream::runs_merger<run_creator_type::sorted_runs_type, cmp_type> runs_merger_type;
-    runs_merger_type sorted_stream(runscreator.result(), cmp_type(), 128 * 1024);
+    typedef stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type> runs_merger_stream_type;
+    runs_merger_stream_type sorted_stream(runs_creator_stream.result(), cmp_type(), 128 * 1024);
 #else
     // sort tuples by character
     // (combination of the previous two steps in one algorithm: form runs and merge)
-    typedef stream::sort<tuple1_stream_type, cmp_type, block_size> sorted_stream_type;
-    sorted_stream_type sorted_stream(tuples1_stream, cmp_type(), 128 * 1024);
+    typedef stream::sort<tuple_stream_type, cmp_type, block_size> sorted_stream_type;
+    sorted_stream_type sorted_stream(tuple_stream, cmp_type(), 128 * 1024);
 #endif
 
     // HERE streaming part ends (materializing)
@@ -180,9 +180,6 @@ int main()
 
     std::vector<int> InternalArray(1024 * 1024);
     std::sort(InternalArray.begin(), InternalArray.end(), cmp_int());
-    stxxl::sort < 1024 * 1024 > (                                       InternalArray.begin(),
-                                                                        InternalArray.end(),
-                                                                        cmp_int(),
-                                                                        1024 * 1024 * 10,
-                                                                        stxxl::RC());
+    stxxl::sort<1024 * 1024>(InternalArray.begin(), InternalArray.end(),
+                             cmp_int(), 1024 * 1024 * 10, stxxl::RC());
 }
