@@ -24,18 +24,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-/* deprecated
-   template < unsigned blk_sz,class Y,class X >
-   struct bid_iterator_traits<
-    __gnu_cxx::__normal_iterator<  sort_local::trigger_entry<BID<blk_sz>,Y> * ,  X> >
-        {
-                enum
-                {
-                        block_size = blk_sz
-                };
-        };
- */
-
 namespace stream
 {
     //! \addtogroup streampack Stream package
@@ -114,6 +102,18 @@ namespace stream
         {
             if (block_type::has_filler)
                 std::sort(
+#if 1
+                    ArrayOfSequencesIterator<
+                        block_type,
+                        typename block_type::value_type,
+                        block_type::size>
+                      (run, 0),
+                    ArrayOfSequencesIterator<
+                        block_type,
+                        typename block_type::value_type,
+                        block_type::size>
+                      (run, elements),
+#else
                     TwoToOneDimArrayRowAdaptor <
                                                 block_type,
                                                 value_type,
@@ -123,6 +123,7 @@ namespace stream
                                                value_type,
                                                block_type::size > (run,
                                                                    elements ),
+#endif
                     cmp);
 
             else
@@ -450,6 +451,18 @@ namespace stream
         {
             if (block_type::has_filler)
                 std::sort(
+#if 1
+                    ArrayOfSequencesIterator<
+                        block_type,
+                        typename block_type::value_type,
+                        block_type::size>
+                      (run, 0),
+                    ArrayOfSequencesIterator<
+                        block_type,
+                        typename block_type::value_type,
+                        block_type::size>
+                      (run, elements),
+#else
                     TwoToOneDimArrayRowAdaptor <
                                                 block_type,
                                                 value_type,
@@ -459,6 +472,7 @@ namespace stream
                                                value_type,
                                                block_type::size > (run,
                                                                    elements ),
+#endif
                     cmp);
 
             else
@@ -803,6 +817,18 @@ namespace stream
                 }
             }
             if (!is_sorted(
+#if 1
+                    ArrayOfSequencesIterator<
+                        block_type,
+                        typename block_type::value_type,
+                        block_type::size>
+                      (blocks, 0),
+                    ArrayOfSequencesIterator<
+                        block_type,
+                        typename block_type::value_type,
+                        block_type::size>
+                      (blocks, sruns.runs_sizes[irun]),
+#else
                     TwoToOneDimArrayRowAdaptor <
                                                 block_type,
                                                 value_type,
@@ -814,7 +840,9 @@ namespace stream
                                                                    //nblocks*block_type::size
                                                                    //(irun<nruns-1)?(nblocks*block_type::size): (sruns.elements%(nblocks*block_type::size))
                                                                    sruns.runs_sizes[irun]
-                    ), cmp) )
+                    ),
+#endif
+                    cmp) )
             {
                 STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
                 return false;

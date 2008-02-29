@@ -40,11 +40,24 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     unsigned_type last_block_correction = last.block_offset() ? (block_type::size - last.block_offset()) : 0;
     if (block_type::has_filler)
         std::sort(
+#if 1
+            ArrayOfSequencesIterator<
+                block_type,
+                typename block_type::value_type,
+                block_type::size>
+              (blocks.begin(), first.block_offset()),
+            ArrayOfSequencesIterator<
+                block_type,
+                typename block_type::value_type,
+                block_type::size>
+              (blocks.begin(), nblocks * block_type::size - last_block_correction),
+#else
             TwoToOneDimArrayRowAdaptor < block_type,
             typename block_type::value_type, block_type::size > (blocks.begin(), first.block_offset() ),
             TwoToOneDimArrayRowAdaptor < block_type,
             typename block_type::value_type, block_type::size > (blocks.begin(),
                                                                  nblocks * block_type::size - last_block_correction),
+#endif
             cmp);
 
     else

@@ -20,14 +20,115 @@ __STXXL_BEGIN_NAMESPACE
 //!
 //! \{
 
-template < class Tp_, class Distance_ > struct r_a_iterator
-{
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef Tp_ value_type;
-    typedef Distance_ difference_type;
-    typedef Tp_ * pointer;
-    typedef Tp_ & reference;
-};
+
+    template <unsigned_type modulo>
+    class blocked_index
+    {
+      unsigned_type pos;
+      unsigned_type block;
+      unsigned_type offset;
+
+      //! \invariant block * modulo + offset = pos
+
+      void set(unsigned_type pos)
+      {
+        this->pos = pos;
+        block = pos / modulo;
+        offset = pos % modulo;
+      }
+
+    public:
+      blocked_index()
+      {
+        set(0);
+      }
+
+      blocked_index(unsigned_type pos)
+      {
+        set(pos);
+      }
+
+      blocked_index(unsigned_type block, unsigned_type offset)
+      {
+        this->block = block;
+        this->offset = offset;
+        pos = block * modulo + offset;
+      }
+
+      void operator=(unsigned_type pos)
+      {
+        set(pos);
+      }
+
+      //pre-increment operator
+      blocked_index& operator++()
+      {
+        ++pos;
+        ++offset;
+        if(offset == modulo)
+        {
+          offset = 0;
+          ++block;
+        }
+        return *this;
+      }
+
+      //post-increment operator
+      blocked_index operator++(int)
+      {
+        blocked_index former(*this);
+        operator++();
+        return former;
+      }
+
+      //pre-increment operator
+      blocked_index& operator--()
+      {
+        --pos;
+        if(offset == 0)
+        {
+          offset = modulo;
+          --block;
+        }
+        --offset;
+        return *this;
+      }
+
+      //post-increment operator
+      blocked_index operator--(int)
+      {
+        blocked_index former(*this);
+        operator--();
+        return former;
+      }
+
+      blocked_index& operator+=(unsigned_type addend)
+      {
+        set(pos + addend);
+        return *this;
+      }
+
+      blocked_index& operator>>=(unsigned_type shift)
+      {
+        set(pos >> shift);
+        return *this;
+      }
+
+      operator unsigned_type() const
+      {
+        return pos;
+      }
+
+      const unsigned_type& get_block() const
+      {
+        return block;
+      }
+
+      const unsigned_type& get_offset() const
+      {
+        return offset;
+      }
+    };
 
 #define STXXL_ADAPTOR_ARITHMETICS(pos) \
     bool operator == (const _Self & a) const \
@@ -101,8 +202,8 @@ template < class Tp_, class Distance_ > struct r_a_iterator
 
 template < class one_dim_array_type, class data_type,
           class pos_type >
-struct TwoToOneDimArrayAdaptorBase : public r_a_iterator <
-                                                          data_type, pos_type >
+struct TwoToOneDimArrayAdaptorBase
+  : public std::iterator <std::random_access_iterator_tag, data_type, unsigned_type>
 {
     one_dim_array_type * array;
     pos_type pos;
@@ -207,10 +308,11 @@ struct TwoToOneDimArrayAdaptorBase : public r_a_iterator <
     }
 
 
+#if 0
 //////////////////////////
 template < class one_dim_array_type, class data_type,
           unsigned dim_size, class pos_type =
-              int_type >struct TwoToOneDimArrayRowAdaptor : public
+              blocked_index<dim_size> >struct TwoToOneDimArrayRowAdaptor : public
 TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
                              pos_type >
 {
@@ -236,15 +338,21 @@ TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
 
     data_type & operator * ()
     {
-        return array[(pos) / dim_size][(pos) % dim_size];
+        return array[(pos).get_block()][(pos).get_offset()];
     }
 
     data_type * operator -> () const
     {
-        return &(array[(pos) / dim_size][(pos) % dim_size]);
+        return &(array[(pos).get_block()][(pos).get_offset()]);
     }
 
     data_type & operator [](pos_type n)
+    {
+        n += pos;
+        return array[(n) / dim_size][(n) % dim_size];
+    }
+
+    const data_type & operator [](pos_type n) const
     {
         n += pos;
         return array[(n) / dim_size][(n) % dim_size];
@@ -254,7 +362,7 @@ TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
 
 template < class one_dim_array_type, class data_type,
           unsigned dim_size, class pos_type =
-              int_type >struct TwoToOneDimArrayColumnAdaptor : public
+              blocked_index<dim_size> >struct TwoToOneDimArrayColumnAdaptor : public
 TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
                              pos_type >
 {
@@ -276,12 +384,12 @@ TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
 
     data_type & operator * ()
     {
-        return array[(pos) % dim_size][(pos) / dim_size];
+        return array[(pos).get_offset()][(pos).get_block()];
     }
 
     data_type * operator -> () const
     {
-        return &(array[(pos) % dim_size][(pos) / dim_size]);
+        return &(array[(pos).get_offset()][(pos).get_block()]);
     }
 
     const data_type & operator [] (pos_type n) const
@@ -297,6 +405,184 @@ TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
     }
     STXXL_ADAPTOR_ARITHMETICS(pos)
 };
+#endif
+
+
+    template <typename array_type, typename value_type, unsigned_type modulo>
+    class ArrayOfSequencesIterator : public std::iterator<std::random_access_iterator_tag, value_type, unsigned_type>
+    {
+      unsigned_type pos;
+      unsigned_type offset;
+      array_type* arrays;
+      array_type* base;
+      value_type* base_element;
+
+      //! \invariant block * modulo + offset = pos
+
+      void set(unsigned_type pos)
+      {
+        this->pos = pos;
+        offset = pos % modulo;
+        base = arrays + pos / modulo;
+        base_element = base->elem;
+      }
+
+    public:
+      ArrayOfSequencesIterator()
+      {
+        this->arrays = NULL;
+        set(0);
+      }
+
+      ArrayOfSequencesIterator(array_type* arrays)
+      {
+        this->arrays = arrays;
+        set(0);
+      }
+
+      ArrayOfSequencesIterator(array_type* arrays, unsigned_type pos)
+      {
+        this->arrays = arrays;
+        set(pos);
+      }
+
+      void operator=(unsigned_type pos)
+      {
+        set(pos);
+      }
+
+      //pre-increment operator
+      ArrayOfSequencesIterator& operator++()
+      {
+        ++pos;
+        ++offset;
+        if(offset == modulo)
+        {
+          offset = 0;
+          ++base;
+          base_element = base->elem;
+        }
+        return *this;
+      }
+
+      //post-increment operator
+      ArrayOfSequencesIterator operator++(int)
+      {
+        ArrayOfSequencesIterator former(*this);
+        operator++();
+        return former;
+      }
+
+      //pre-increment operator
+      ArrayOfSequencesIterator& operator--()
+      {
+        --pos;
+        if(offset == 0)
+        {
+          offset = modulo;
+          --base;
+          base_element = base->elem;
+        }
+        --offset;
+        return *this;
+      }
+
+      //post-increment operator
+      ArrayOfSequencesIterator operator--(int)
+      {
+        ArrayOfSequencesIterator former(*this);
+        operator--();
+        return former;
+      }
+
+      ArrayOfSequencesIterator& operator+=(unsigned_type addend)
+      {
+        set(pos + addend);
+        return *this;
+      }
+
+      ArrayOfSequencesIterator& operator-=(unsigned_type addend)
+      {
+        set(pos - addend);
+        return *this;
+      }
+
+      ArrayOfSequencesIterator operator+(unsigned_type addend) const
+      {
+        return ArrayOfSequencesIterator(arrays, pos + addend);
+      }
+
+      ArrayOfSequencesIterator operator-(unsigned_type subtrahend) const
+      {
+        return ArrayOfSequencesIterator(arrays, pos - subtrahend);
+      }
+
+      unsigned_type operator-(const ArrayOfSequencesIterator& subtrahend) const
+      {
+        return pos - subtrahend.pos;
+      }
+
+      bool operator== (const ArrayOfSequencesIterator& aoai) const
+      {
+        return pos == aoai.pos;
+      }
+
+      bool operator!= (const ArrayOfSequencesIterator& aoai) const
+      {
+        return pos != aoai.pos;
+      }
+
+      bool operator< (const ArrayOfSequencesIterator& aoai) const
+      {
+        return pos < aoai.pos;
+      }
+
+      bool operator<= (const ArrayOfSequencesIterator& aoai) const
+      {
+        return pos <= aoai.pos;
+      }
+
+      bool operator> (const ArrayOfSequencesIterator& aoai) const
+      {
+        return pos > aoai.pos;
+      }
+
+      bool operator>= (const ArrayOfSequencesIterator& aoai) const
+      {
+        return pos >= aoai.pos;
+      }
+
+      const value_type& operator* () const
+      {
+        return base_element[offset];
+      }
+
+      value_type& operator* ()
+      {
+        return base_element[offset];
+      }
+
+      const value_type& operator-> () const
+      {
+        return &(base_element[offset]);
+      }
+
+      value_type& operator-> ()
+      {
+        return &(base_element[offset]);
+      }
+
+      const value_type& operator[] (unsigned_type index) const
+      {
+        return arrays[index / modulo][index % modulo];
+      }
+
+      value_type& operator[] (unsigned_type index)
+      {
+        return arrays[index / modulo][index % modulo];
+      }
+    };
+
 
 //! \}
 

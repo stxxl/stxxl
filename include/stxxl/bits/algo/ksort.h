@@ -396,6 +396,18 @@ bool check_ksorted_runs(              run_type * * runs,
                 }
             }
             if (!is_sorted(
+#if 1
+                    ArrayOfSequencesIterator<
+                        block_type,
+                        typename block_type::value_type,
+                        block_type::size>
+                      (blocks, 0),
+                    ArrayOfSequencesIterator<
+                        block_type,
+                        typename block_type::value_type,
+                        block_type::size>
+                      (blocks, nelements),
+#else
                     TwoToOneDimArrayRowAdaptor <
                                                 block_type,
                                                 value_type,
@@ -405,7 +417,9 @@ bool check_ksorted_runs(              run_type * * runs,
                                                value_type,
                                                block_type::size > (blocks,
                                                                    nelements
-                    ), key_comparison<value_type, key_ext_>()) )
+                    ),
+#endif
+                    key_comparison<value_type, key_ext_>()) )
             {
                 STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
                 STXXL_MSG("Data in blocks:");

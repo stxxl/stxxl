@@ -27,6 +27,155 @@ __STXXL_BEGIN_NAMESPACE
 //! \ingroup stlcont
 //! \{
 
+    template <unsigned_type modulo2, unsigned_type modulo1>
+    class double_blocked_index
+    {
+      static const unsigned_type modulo12 = modulo1 * modulo2;
+
+      unsigned_type pos;
+      unsigned_type block1, block2;
+      unsigned_type offset;
+
+      //! \invariant block2 * modulo12 + block1 * modulo1 + offset == pos && 0 <= block1 &lt; modulo2 && 0 <= offset &lt; modulo1
+
+      void set(unsigned_type pos)
+      {
+        this->pos = pos;
+        block2 = pos / modulo12;
+        pos -= block2 * modulo12;
+        block1 = pos / modulo1;
+        offset = (pos - block1 * modulo1);
+
+        assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
+        assert(/* 0 <= block1 && */ block1 < modulo2);
+        assert(/* 0 <= offset && */ offset < modulo1);
+      }
+
+    public:
+      double_blocked_index()
+      {
+        set(0);
+      }
+
+      double_blocked_index(unsigned_type pos)
+      {
+        set(pos);
+      }
+
+      double_blocked_index(unsigned_type block2, unsigned_type block1, unsigned_type)
+      {
+        this->block2 = block2;
+        this->block1 = block1;
+        this->offset = offset;
+        pos = block2 * modulo12 + block1 * modulo1 + offset;
+
+        assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
+        assert(/* 0 <= block1 && */ block1 < modulo2);
+        assert(/* 0 <= offset && */ offset < modulo1);
+      }
+
+      void operator=(unsigned_type pos)
+      {
+        set(pos);
+      }
+
+      //pre-increment operator
+      double_blocked_index& operator++()
+      {
+        ++pos;
+        ++offset;
+        if(offset == modulo1)
+        {
+          offset = 0;
+          ++block1;
+          if(block1 == modulo2)
+          {
+            block1 = 0;
+            ++block2;
+          }
+        }
+        
+        assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
+        assert(/* 0 <= block1 && */ block1 < modulo2);
+        assert(/* 0 <= offset && */ offset < modulo1);
+        
+        return *this;
+      }
+
+      //post-increment operator
+      double_blocked_index operator++(int)
+      {
+        double_blocked_index former(*this);
+        operator++();
+        return former;
+      }
+
+      //pre-increment operator
+      double_blocked_index& operator--()
+      {
+        --pos;
+        if(offset == 0)
+        {
+          offset = modulo1;
+          if(block1 == 0)
+          {
+            block1 = modulo2;
+            --block2;
+          }
+          --block1;
+        }
+        --offset;
+        
+        assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
+        assert(/*0 <= block1 &&*/ block1 < modulo2);
+        assert(/*0 <= offset &&*/ offset < modulo1);
+        
+        return *this;
+      }
+
+      //post-increment operator
+      double_blocked_index operator--(int)
+      {
+        double_blocked_index former(*this);
+        operator--();
+        return former;
+      }
+
+      double_blocked_index& operator+=(unsigned_type addend)
+      {
+        set(pos + addend);
+        return *this;
+      }
+
+      double_blocked_index& operator>>=(unsigned_type shift)
+      {
+        set(pos >> shift);
+        return *this;
+      }
+
+      operator unsigned_type() const
+      {
+        return pos;
+      }
+
+      const unsigned_type& get_block2() const
+      {
+        return block2;
+      }
+
+      const unsigned_type& get_block1() const
+      {
+        return block1;
+      }
+
+      const unsigned_type& get_offset() const
+      {
+        return offset;
+      }
+    };
+
+
+
 template < unsigned BlkSize_ >
 class bid_vector : public std::vector < BID < BlkSize_ > >
 {
@@ -92,7 +241,7 @@ public:
     enum { block_size = BlkSize_ };
 
 protected:
-    size_type offset;
+    double_blocked_index<PgSz_, block_type::size> offset;
     vector_type * p_vector;
 private:
     vector_iterator (vector_type * v, size_type o) : offset (o),
@@ -107,7 +256,7 @@ public:
     block_offset_type block_offset () const
     {
         return static_cast < block_offset_type >
-               (offset % block_type::size);
+               (offset.get_offset());
     }
     bids_container_iterator bid () const
     {
@@ -290,7 +439,7 @@ public:
     enum { block_size = BlkSize_ };
 
 protected:
-    size_type offset;
+    double_blocked_index<PgSz_, block_type::size> offset;
     const vector_type * p_vector;
 private:
     const_vector_iterator (const vector_type * v, size_type o) : offset (o),
@@ -310,7 +459,7 @@ public:
     block_offset_type block_offset () const
     {
         return static_cast < block_offset_type >
-               (offset % block_type::size);
+               (offset.get_offset());
     }
     bids_container_iterator bid () const
     {
@@ -862,11 +1011,23 @@ private:
                 static_cast < typename bids_container_type::size_type >
                 (offset / block_type::size));
     }
+    bids_container_iterator bid (const double_blocked_index<PgSz_, block_type::size> & offset)
+    {
+        return (_bids.begin () +
+                static_cast < typename bids_container_type::size_type >
+                (offset.get_block2() * PgSz_ + offset.get_block1()));
+    }
     const_bids_container_iterator bid (const size_type & offset) const
     {
         return (_bids.begin () +
                 static_cast < typename bids_container_type::size_type >
                 (offset / block_type::size));
+    }
+    const_bids_container_iterator bid (const double_blocked_index<PgSz_, block_type::size> & offset) const
+    {
+        return (_bids.begin () +
+                static_cast < typename bids_container_type::size_type >
+                (offset.get_block2() * PgSz_ + offset.get_block1()));
     }
     void read_page(int_type page_no, int_type cache_page) const
     {
@@ -900,8 +1061,12 @@ private:
     }
     reference element(size_type offset)
     {
-        int_type page_no = offset / (block_type::size * page_size);
-        int_type page_offset = offset % (block_type::size * page_size);
+      return element(double_blocked_index<PgSz_, block_type::size>(offset));
+    }
+
+    reference element(const double_blocked_index<PgSz_, block_type::size>& offset)
+    {
+        int_type page_no = offset.get_block2();
         assert(page_no < int_type(_last_page.size()) );                 // fails if offset is too large, out of bound access
         int_type last_page = _last_page[page_no];
         if (last_page < 0)                 // == on_disk
@@ -929,7 +1094,7 @@ private:
 
                 _page_status[page_no] = dirty;
 
-                return _cache[kicked_page * page_size + page_offset / block_type::size][page_offset % block_type::size];
+                return _cache[kicked_page * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
@@ -946,14 +1111,14 @@ private:
 
                 _page_status[page_no] = dirty;
 
-                return _cache[free_page * page_size + page_offset / block_type::size][page_offset % block_type::size];
+                return _cache[free_page * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
         {
             _page_status[page_no] = dirty;
             pager.hit(last_page);
-            return _cache[last_page * page_size + page_offset / block_type::size][page_offset % block_type::size];
+            return _cache[last_page * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
     void touch(size_type offset) const
@@ -962,10 +1127,15 @@ private:
         assert(offset / (block_type::size * page_size) < _page_status.size() );
         _page_status[offset / (block_type::size * page_size)] = 0;
     }
+    
     const_reference const_element(size_type offset) const
     {
-        int_type page_no = offset / (block_type::size * page_size);
-        int_type page_offset = offset % (block_type::size * page_size);
+      return const_element(double_blocked_index<PgSz_, block_type::size>(offset));
+    }
+
+    const_reference const_element(const double_blocked_index<PgSz_, block_type::size>& offset) const
+    {
+        int_type page_no = offset.get_block2();
         assert(page_no < int_type(_last_page.size()) );                 // fails if offset is too large, out of bound access
         int_type last_page = _last_page[page_no];
         if (last_page < 0)                 // == on_disk
@@ -993,7 +1163,7 @@ private:
 
                 _page_status[page_no] = 0;
 
-                return _cache[kicked_page * page_size + page_offset / block_type::size][page_offset % block_type::size];
+                return _cache[kicked_page * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
@@ -1010,13 +1180,13 @@ private:
 
                 _page_status[page_no] = 0;
 
-                return _cache[free_page * page_size + page_offset / block_type::size][page_offset % block_type::size];
+                return _cache[free_page * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
         {
             pager.hit(last_page);
-            return _cache[last_page * page_size + page_offset / block_type::size][page_offset % block_type::size];
+            return _cache[last_page * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
 };
