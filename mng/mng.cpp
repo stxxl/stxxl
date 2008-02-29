@@ -97,14 +97,26 @@ config::config (const char * config_path)
     }
     else
     {
+#ifdef STXXL_VERBOSE_DISKS
         for (std::vector < DiskEntry > ::const_iterator it =
                  disks_props.begin (); it != disks_props.end ();
-             it++)
+                 it++)
         {
             STXXL_MSG("Disk '" << (*it).path << "' is allocated, space: " <<
                       ((*it).size) / (1024 * 1024) <<
-                      " Mb, I/O implementation: " << (*it).io_impl );
+                      " MB, I/O implementation: " << (*it).io_impl );
         }
+#else
+        stxxl::int64 total_size = 0;
+        for (std::vector < DiskEntry > ::const_iterator it =
+                 disks_props.begin (); it != disks_props.end ();
+                 it++)
+             total_size += (*it).size;
+
+        STXXL_MSG("" << disks_props.size() << " disks are allocated, total space: " <<
+                  (total_size / (1024 * 1024)) <<
+                  " MB");
+#endif
     }
 }
 
