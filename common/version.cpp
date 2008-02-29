@@ -22,7 +22,11 @@
 
 const char * stxxl::get_version_string()
 {
-    return "STXXL v"
+    return "STXXL"
+#ifdef STXXL_VERSION_STRING_SVN_BRANCH
+           " (branch: " STXXL_VERSION_STRING_SVN_BRANCH ")"
+#endif
+           " v"
            STXXL_VERSION_STRING_MA_MI_PL
 #ifdef STXXL_VERSION_STRING_DATE
            "-" STXXL_VERSION_STRING_DATE

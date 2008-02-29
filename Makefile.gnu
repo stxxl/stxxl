@@ -64,6 +64,8 @@ endif
 ifneq (,$(wildcard .svn))
 lib-in-common: common/version_svn.defs
 
+STXXL_SVN_BRANCH	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/URL/{s/.*\/svnroot\/stxxl//;/branches/s/\/branches\///p}')
+
 ifeq (,$(strip $(shell svnversion . | tr -d 0-9)))
 # clean checkout - use svn info
 STXXL_VERSION_DATE	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Date/{s/.*: //;s/ .*//;s/-//gp}')
@@ -94,6 +96,7 @@ common/version_svn.defs:
 	$(RM) $@.$(LIBNAME).tmp
 	echo '#define STXXL_VERSION_STRING_DATE "$(STXXL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp
 	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(STXXL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp
+	$(if $(STXXL_SVN_BRANCH), echo '#define STXXL_VERSION_STRING_SVN_BRANCH "$(STXXL_SVN_BRANCH)"' >> $@.$(LIBNAME).tmp)
 	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_DATE "$(MCSTL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp)
 	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_SVN_REVISION "$(MCSTL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp)
 	cmp -s $@ $@.$(LIBNAME).tmp || mv $@.$(LIBNAME).tmp $@
