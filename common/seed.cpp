@@ -18,7 +18,10 @@ struct seed_generator_t {
     { }
 };
 
-seed_generator_t seed_generator(initial_seed());
+seed_generator_t & seed_generator() {
+	static seed_generator_t sg(initial_seed());
+	return sg;
+}
 
 //FIXME: Probably a different implementation of initial_seed() 
 //       is needed for Windows. But please use something with a finer
@@ -38,16 +41,16 @@ inline unsigned initial_seed()
 
 void set_seed(unsigned seed)
 {
-    seed_generator.mtx.lock();
-    seed_generator.seed = seed;
-    seed_generator.mtx.unlock();
+    seed_generator().mtx.lock();
+    seed_generator().seed = seed;
+    seed_generator().mtx.unlock();
 }
 
 unsigned get_next_seed()
 {
-    seed_generator.mtx.lock();
-    unsigned seed = seed_generator.seed++;
-    seed_generator.mtx.unlock();
+    seed_generator().mtx.lock();
+    unsigned seed = seed_generator().seed++;
+    seed_generator().mtx.unlock();
     return seed;
 }
 
