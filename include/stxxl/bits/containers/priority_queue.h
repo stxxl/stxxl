@@ -125,7 +125,7 @@ namespace priority_queue_local
         Merge3Case(2, 1, 0);
     }
 
-	
+
 // merge sz element from the four sentinel terminated input
 // sequences from0, from1, from2 and from3 to "to"
 // advance from0, from1, from2 and from3 accordingly.
@@ -232,7 +232,6 @@ namespace priority_queue_local
         Merge4Case(0, 3, 2, 1);
         Merge4Case(3, 2, 1, 0);
         Merge4Case(2, 1, 0, 3);
-
     }
 
 
@@ -257,7 +256,7 @@ namespace priority_queue_local
 
         block_type * convert_block_pointer(sentinel_block_type * arg)
         {
-            return (block_type *)arg;
+            return reinterpret_cast<block_type*>(arg);
         }
 
     protected:
@@ -273,7 +272,7 @@ namespace priority_queue_local
             return cmp(cmp.min_value(), a);
         }
 
-        struct sequence_type
+        struct sequence_state
         {
             unsigned_type current;
             block_type * block;
@@ -282,7 +281,7 @@ namespace priority_queue_local
             ext_merger * merger;
 
         private:
-            sequence_type & operator = (sequence_type & obj);
+            sequence_state & operator = (sequence_state & obj);
 
         public:
             const value_type & operator * () const
@@ -290,13 +289,13 @@ namespace priority_queue_local
                 return (*block)[current];
             }
 
-            sequence_type() : bids(NULL)
+            sequence_state() : bids(NULL)
             { }
 
 
-            ~sequence_type()
+            ~sequence_state()
             {
-                STXXL_VERBOSE1("ext_merger sequence_type::~sequence_type()");
+                STXXL_VERBOSE1("ext_merger sequence_state::~sequence_state()");
                 if (bids)
                 {
                     block_manager * bm = block_manager::get_instance();
@@ -320,7 +319,7 @@ namespace priority_queue_local
                 return cmp(cmp.min_value(), a);
             }
 
-            void swap(sequence_type & obj)
+            void swap(sequence_state & obj)
             {
                 if (&obj != this)
                 {
@@ -331,7 +330,7 @@ namespace priority_queue_local
                 }
             }
 
-            sequence_type & operator ++ ()
+            sequence_state & operator ++ ()
             {
                 assert(not_sentinel((*block)[current]));
                 assert(current < block->size);
@@ -340,24 +339,24 @@ namespace priority_queue_local
 
                 if (current == block->size )
                 {
-                    STXXL_VERBOSE2("ext_merger sequence_type operator++ crossing block border ");
+                    STXXL_VERBOSE2("ext_merger sequence_state operator++ crossing block border ");
                     // go to the next block
                     assert(bids);
                     if (bids->empty()) // if there is no next block
                     {
-                        STXXL_VERBOSE2("ext_merger sequence_type operator++ it was the last block in the sequence ");
+                        STXXL_VERBOSE2("ext_merger sequence_state operator++ it was the last block in the sequence ");
                         delete bids;
                         bids = NULL;
                         make_inf();
                     }
                     else
                     {
-                        STXXL_VERBOSE2("ext_merger sequence_type operator++ there is another block ");
+                        STXXL_VERBOSE2("ext_merger sequence_state operator++ there is another block ");
                         bid_type bid = bids->front();
                         bids->pop_front();
                         if (!(bids->empty()))
                         {
-                            STXXL_VERBOSE2("ext_merger sequence_type operator++ one more block exists in a sequence: " <<
+                            STXXL_VERBOSE2("ext_merger sequence_state operator++ one more block exists in a sequence: " <<
                                            "flushing this block in write cache (if not written yet) and giving hint to prefetcher");
                             bid_type next_bid = bids->front();
                             merger->p_pool->hint(next_bid, *(merger->w_pool));
@@ -376,7 +375,7 @@ namespace priority_queue_local
 
         struct Entry
         {
-            value_type key; // Key of Looser element (winner for 0)
+            value_type key; // Key of Loser element (winner for 0)
             int_type index; // the number of losing segment
         };
 
@@ -389,7 +388,7 @@ namespace priority_queue_local
         unsigned logK; // log of current tree size
         unsigned_type k; // invariant k = 1 << logK
 
-        //Element dummy; // target of empty segment pointers
+        //Element sentinel; // target of empty segment pointers
 
         // upper levels of loser trees
         // entry[0] contains the winner info
@@ -398,7 +397,7 @@ namespace priority_queue_local
         // leaf information
         // note that Knuth uses indices k..k-1
         // while we use 0..k-1
-        sequence_type current[KNKMAX]; // pointer to actual element
+        sequence_state states[KNKMAX]; // sequence including current position, dereference gives current element
 
         prefetch_pool<block_type> *p_pool;
         write_pool<block_type> *w_pool;
@@ -413,7 +412,7 @@ namespace priority_queue_local
            void deallocateSegment(int_type index);
            void doubleK();
            void compactTree();
-           void rebuildLooserTree();
+           void rebuildLoserTree();
            bool segmentIsEmpty(int_type i);
            void multi_merge_k(Element * to, int_type l);
          */
@@ -425,15 +424,15 @@ namespace priority_queue_local
 
             for (int_type i = 0; i < KNKMAX; ++i)
             {
-                current[i].merger = this;
+                states[i].merger = this;
                 if (i >= arity)
-                    current[i].block = convert_block_pointer(&(sentinel_block));
+                    states[i].block = convert_block_pointer(&(sentinel_block));
 
                 else
-                    current[i].block = new block_type;
+                    states[i].block = new block_type;
 
 
-                current[i].make_inf();
+                states[i].make_inf();
             }
 
             empty  [0] = 0;
@@ -452,15 +451,13 @@ namespace priority_queue_local
 
             for (int_type i = 0; i < KNKMAX; ++i)
             {
-                current[i].merger = this;
+                states[i].merger = this;
                 if (i >= arity)
-                    current[i].block = convert_block_pointer(&(sentinel_block));
-
+                    states[i].block = convert_block_pointer(&(sentinel_block));
                 else
-                    current[i].block = new block_type;
+                    states[i].block = new block_type;
 
-
-                current[i].make_inf();
+                states[i].make_inf();
             }
 
 
@@ -473,7 +470,7 @@ namespace priority_queue_local
             STXXL_VERBOSE1("ext_merger::~ext_merger()");
             for (int_type i = 0; i < arity; ++i)
             {
-                delete current[i].block;
+                delete states[i].block;
             }
         }
 
@@ -486,16 +483,16 @@ namespace priority_queue_local
 
         void init()
         {
-            rebuildLooserTree();
-            assert(is_sentinel(*current[entry[0].index]));
+            rebuildLoserTree();
+            assert(is_sentinel(*states[entry[0].index]));
         }
 
         // rebuild loser tree information from the values in current
-        void rebuildLooserTree()
+        void rebuildLoserTree()
         {
             int_type winner = initWinner(1);
             entry[0].index = winner;
-            entry[0].key   = *(current[winner]);
+            entry[0].key   = *(states[winner]);
         }
 
 
@@ -511,8 +508,8 @@ namespace priority_queue_local
             } else {
                 int_type left  = initWinner(2 * root    );
                 int_type right = initWinner(2 * root + 1);
-                Element lk    = *(current[left ]);
-                Element rk    = *(current[right]);
+                Element lk    = *(states[left ]);
+                Element rk    = *(states[right]);
                 if (!(cmp(lk, rk))) { // right subtree looses
                     entry[root].index = right;
                     entry[root].key   = rk;
@@ -587,7 +584,7 @@ namespace priority_queue_local
 
             for (int_type i = 2 * k - 1;  i >= int_type(k);  i--)
             {
-                current[i].make_inf();
+                states[i].make_inf();
                 if (i < arity)
                 {
                     lastFree++;
@@ -600,7 +597,7 @@ namespace priority_queue_local
             logK++;
 
             // recompute loser tree information
-            rebuildLooserTree();
+            rebuildLoserTree();
 
             STXXL_VERBOSE1("ext_merger::doubleK (after) k: " << k << " KNKMAX:" << KNKMAX);
         }
@@ -616,9 +613,9 @@ namespace priority_queue_local
             int_type to   = 0;
             for (int_type from = 0;  from < int_type(k);  from++)
             {
-                if (not_sentinel(*(current[from])))
+                if (not_sentinel(*(states[from])))
                 {
-                    current[to].swap(current[from]);
+                    states[to].swap(states[from]);
                     ++to;
                 }
             }
@@ -638,11 +635,11 @@ namespace priority_queue_local
                     lastFree++;
                     empty[lastFree] = to;
                 }
-                current[to].make_inf();
+                states[to].make_inf();
             }
 
             // recompute loser tree information
-            rebuildLooserTree();
+            rebuildLoserTree();
         }
 
 
@@ -655,7 +652,7 @@ namespace priority_queue_local
             std::swap(logK, obj.logK);
             std::swap(k, obj.k);
             swap_1D_arrays(entry, obj.entry, KNKMAX);
-            swap_1D_arrays(current, obj.current, KNKMAX);
+            swap_1D_arrays(states, obj.states, KNKMAX);
 
             // std::swap(p_pool,obj.p_pool);
             // std::swap(w_pool,obj.w_pool);
@@ -695,21 +692,21 @@ namespace priority_queue_local
                 assert(k == 1);
                 assert(entry[0].index == 0);
                 assert(lastFree == -1);
-                //memcpy(to, current[0], l * sizeof(Element));
-                //std::copy(current[0],current[0]+l,to);
-                for (size_type i = 0; i < l; ++i, ++ (current[0]), ++begin)
-                    *begin = *(current[0]);
+                //memcpy(to, states[0], l * sizeof(Element));
+                //std::copy(states[0],states[0]+l,to);
+                for (size_type i = 0; i < l; ++i, ++ (states[0]), ++begin)
+                    *begin = *(states[0]);
 
 
-                entry[0].key = **current;
+                entry[0].key = **states;
                 if (segmentIsEmpty(0))
                     deallocateSegment(0);
 
                 break;
             case 1:
                 assert(k == 2);
-                merge_iterator(current[0], current[1], begin, l, cmp);
-                rebuildLooserTree();
+                merge_iterator(states[0], states[1], begin, l, cmp);
+                rebuildLoserTree();
                 if (segmentIsEmpty(0))
                     deallocateSegment(0);
 
@@ -719,8 +716,8 @@ namespace priority_queue_local
                 break;
             case 2:
                 assert(k == 4);
-                merge4_iterator(current[0], current[1], current[2], current[3], begin, l, cmp);
-                rebuildLooserTree();
+                merge4_iterator(states[0], states[1], states[2], states[3], begin, l, cmp);
+                rebuildLoserTree();
                 if (segmentIsEmpty(0))
                     deallocateSegment(0);
 
@@ -781,12 +778,12 @@ namespace priority_queue_local
             while (to != done)
             {
                 // write result
-                *to   = *(current[winnerIndex]);
+                *to   = *(states[winnerIndex]);
 
                 // advance winner segment
-                ++ (current[winnerIndex]);
+                ++ (states[winnerIndex]);
 
-                winnerKey = *(current[winnerIndex]);
+                winnerKey = *(states[winnerIndex]);
 
                 // remove winner segment if empty now
                 if (is_sentinel(winnerKey))  //
@@ -821,7 +818,7 @@ namespace priority_queue_local
             OutputIterator to = begin;
             int_type winnerIndex = entry[0].index;
             Entry * regEntry   = entry;
-            sequence_type * regCurrent = current;
+            sequence_state * regStates = states;
             Element winnerKey   = entry[0].key;
 
 
@@ -829,12 +826,12 @@ namespace priority_queue_local
             while (to != done)
             {
                 // write result
-                *to   = *(regCurrent[winnerIndex]);
+                *to   = *(regStates[winnerIndex]);
 
                 // advance winner segment
-                ++ (regCurrent[winnerIndex]);
+                ++ (regStates[winnerIndex]);
 
-                winnerKey = *(regCurrent[winnerIndex]);
+                winnerKey = *(regStates[winnerIndex]);
 
 
                 // remove winner segment if empty now
@@ -942,7 +939,7 @@ namespace priority_queue_local
                 Element dummyKey;
                 int_type dummyIndex;
                 int_type dummyMask;
-                updateOnInsert((index + k) >> 1, *(current[index]), index,
+                updateOnInsert((index + k) >> 1, *(states[index]), index,
                                &dummyKey, &dummyIndex, &dummyMask);
             } else {
                 // deallocate memory ?
@@ -961,7 +958,7 @@ namespace priority_queue_local
             STXXL_VERBOSE1("ext_merger::insert_segment(segment_bids,...) " << this);
             assert(first_size);
 
-            sequence_type & new_sequence = current[index];
+            sequence_state & new_sequence = states[index];
             new_sequence.current = block_type::size - first_size;
             std::swap(new_sequence.block, first_block);
             delete first_block;
@@ -977,12 +974,12 @@ namespace priority_queue_local
         // free an empty segment .
         void deallocateSegment(int_type index)
         {
-            // reroute current pointer to some empty dummy segment
+            // reroute current pointer to some empty sentinel segment
             // with a sentinel key
             STXXL_VERBOSE2("loser_tree::deallocateSegment() deleting segment " <<
                            index);
 
-            current[index].make_inf();
+            states[index].make_inf();
 
             // push on the stack of free segment indices
             lastFree++;
@@ -992,8 +989,8 @@ namespace priority_queue_local
         // is this segment empty ?
         bool segmentIsEmpty(int_type i) const
         {
-            //return (is_sentinel(*(current[i])) &&  (current[i] != &dummy));
-            return is_sentinel(*(current[i]));
+            //return (is_sentinel(*(states[i])) &&  (&(*(states[i])) != &sentinel));
+            return is_sentinel(*(states[i]));
         }
     };
 
@@ -1011,7 +1008,7 @@ namespace priority_queue_local
     private:
         struct Entry
         {
-            value_type key; // Key of Looser element (winner for 0)
+            value_type key; // Key of Loser element (winner for 0)
             int_type index; // number of loosing segment
         };
 
@@ -1024,7 +1021,7 @@ namespace priority_queue_local
         unsigned logK; // log of current tree size
         unsigned_type k; // invariant k = 1 << logK
 
-        Element dummy; // target of empty segment pointers
+        Element sentinel; // target of empty segment pointers
 
         // upper levels of loser trees
         // entry[0] contains the winner info
@@ -1046,7 +1043,7 @@ namespace priority_queue_local
         void deallocateSegment(int_type index);
         void doubleK();
         void compactTree();
-        void rebuildLooserTree();
+        void rebuildLoserTree();
         bool segmentIsEmpty(int_type i);
         void multi_merge_k(Element * to, int_type l);
         template <unsigned LogK>
@@ -1057,23 +1054,23 @@ namespace priority_queue_local
             //int currentIndex; // leaf pointed to by current entry
             Element * done = to + l;
             Entry * regEntry   = entry;
-            Element * * regCurrent = current;
+            Element * * regStates = current;
             int_type winnerIndex = regEntry[0].index;
             Element winnerKey   = regEntry[0].key;
             Element * winnerPos;
-            //Element sup = dummy; // supremum
+            //Element sup = sentinel; // supremum
 
             assert(logK >= LogK);
             while (to != done)
             {
-                winnerPos = regCurrent[winnerIndex];
+                winnerPos = regStates[winnerIndex];
 
                 // write result
                 *to   = winnerKey;
 
                 // advance winner segment
                 ++winnerPos;
-                regCurrent[winnerIndex] = winnerPos;
+                regStates[winnerIndex] = winnerPos;
                 winnerKey = *winnerPos;
 
                 // remove winner segment if empty now
@@ -1135,7 +1132,7 @@ namespace priority_queue_local
             std::swap(size_, obj.size_);
             std::swap(logK, obj.logK);
             std::swap(k, obj.k);
-            std::swap(dummy, obj.dummy);
+            std::swap(sentinel, obj.sentinel);
             swap_1D_arrays(entry, obj.entry, KNKMAX);
             swap_1D_arrays(current, obj.current, KNKMAX);
             swap_1D_arrays(segment, obj.segment, KNKMAX);
@@ -1157,14 +1154,14 @@ namespace priority_queue_local
         unsigned_type size() { return size_; }
     };
 
-///////////////////////// LooserTree ///////////////////////////////////
+///////////////////////// LoserTree ///////////////////////////////////
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     loser_tree<ValTp_, Cmp_, KNKMAX>::loser_tree() : lastFree(0), size_(0), logK(0), k(1), mem_cons_(0)
     {
         empty  [0] = 0;
         segment[0] = 0;
-        current[0] = &dummy;
-        // entry and dummy are initialized by init
+        current[0] = &sentinel;
+        // entry and sentinel are initialized by init
         // since they need the value of supremum
         init();
     }
@@ -1172,15 +1169,15 @@ namespace priority_queue_local
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::init()
     {
-        dummy      = cmp.min_value();
-        rebuildLooserTree();
-        assert(current[entry[0].index] == &dummy);
+        sentinel      = cmp.min_value();
+        rebuildLoserTree();
+        assert(current[entry[0].index] == &sentinel);
     }
 
 
 // rebuild loser tree information from the values in current
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
-    void loser_tree<ValTp_, Cmp_, KNKMAX>::rebuildLooserTree()
+    void loser_tree<ValTp_, Cmp_, KNKMAX>::rebuildLoserTree()
     {
         int_type winner = initWinner(1);
         entry[0].index = winner;
@@ -1279,7 +1276,7 @@ namespace priority_queue_local
         assert(k < KNKMAX);
         for (int_type i = 2 * k - 1;  i >= int_type(k);  i--)
         {
-            current[i] = &dummy;
+            current[i] = &sentinel;
             segment[i] = NULL;
             lastFree++;
             empty[lastFree] = i;
@@ -1290,7 +1287,7 @@ namespace priority_queue_local
         logK++;
 
         // recompute loser tree information
-        rebuildLooserTree();
+        rebuildLoserTree();
     }
 
 
@@ -1338,11 +1335,11 @@ namespace priority_queue_local
             lastFree++;
             empty[lastFree] = to;
 
-            current[to] = &dummy;
+            current[to] = &sentinel;
         }
 
         // recompute loser tree information
-        rebuildLooserTree();
+        rebuildLoserTree();
     }
 
 
@@ -1409,11 +1406,11 @@ namespace priority_queue_local
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::deallocateSegment(int_type index)
     {
-        // reroute current pointer to some empty dummy segment
+        // reroute current pointer to some empty sentinel segment
         // with a sentinel key
         STXXL_VERBOSE2("loser_tree::deallocateSegment() deleting segment " <<
                        index << " address: " << segment[index] << " size: " << segment_size[index]);
-        current[index] = &dummy;
+        current[index] = &sentinel;
 
         // free memory
         delete [] segment[index];
@@ -1455,7 +1452,7 @@ namespace priority_queue_local
         case 1:
             assert(k == 2);
             merge_iterator(current[0], current[1], to, l, cmp);
-            rebuildLooserTree();
+            rebuildLoserTree();
             if (segmentIsEmpty(0))
                 deallocateSegment(0);
 
@@ -1467,7 +1464,7 @@ namespace priority_queue_local
             assert(k == 4);
             merge4_iterator(current[0], current[1], current[2], current[3], to, l, cmp);
 			
-            rebuildLooserTree();
+            rebuildLoserTree();
             if (segmentIsEmpty(0))
                 deallocateSegment(0);
 
@@ -1514,11 +1511,11 @@ namespace priority_queue_local
     }
 
 
-// is this segment empty and does not point to dummy yet?
+// is this segment empty and does not point to sentinel yet?
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     inline bool loser_tree<ValTp_, Cmp_, KNKMAX>::segmentIsEmpty(int_type i)
     {
-        return (is_sentinel(*(current[i])) && (current[i] != &dummy));
+        return (is_sentinel(*(current[i])) && (current[i] != &sentinel));
     }
 
 // multi-merge for fixed K
