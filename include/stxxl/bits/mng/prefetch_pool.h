@@ -162,10 +162,10 @@ public:
             request_ptr req = w_pool.get_request(bid);
             if (req.valid())
             {
-                STXXL_VERBOSE2("prefetch_pool::hint2 bid= " << bid << " was in write cache");
                 block_type * w_block = w_pool.steal(bid);
+                STXXL_VERBOSE0("prefetch_pool::hint2 bid= " << bid << " was in write cache at " << w_block);
                 assert(w_block != 0);
-                w_pool.add(block);
+                w_pool.add(block);  //in exchange
                 busy_blocks[bid] = busy_entry(w_block, req);
                 return true;
             }
@@ -194,12 +194,12 @@ public:
         if (cache_el == busy_blocks.end())
         {
             // not cached
-            STXXL_VERBOSE2("prefetch_pool::read bid=" << bid << " => no copy in cache, retrieving");
+            STXXL_VERBOSE0("prefetch_pool::read bid=" << bid << " => no copy in cache, retrieving to " << block);
             return block->read(bid);
         }
 
         // cached
-        STXXL_VERBOSE2("prefetch_pool::read bid=" << bid << " => copy in cache exists");
+        STXXL_VERBOSE0("prefetch_pool::read bid=" << bid << " => copy in cache exists");
         ++free_blocks_size;
         free_blocks.push_back(block);
         block = cache_el->second.first;

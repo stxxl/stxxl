@@ -362,9 +362,12 @@ namespace priority_queue_local
                             STXXL_VERBOSE2("ext_merger sequence_state operator++ one more block exists in a sequence: " <<
                                            "flushing this block in write cache (if not written yet) and giving hint to prefetcher");
                             bid_type next_bid = bids->front();
+                            //Hint next block of sequence.
+                            //This is mandatory to ensure proper synchronization between prefetch pool and write pool.
                             merger->p_pool->hint(next_bid, *(merger->w_pool));
                         }
                         merger->p_pool->read(block, bid)->wait();
+                        STXXL_VERBOSE1("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
                         block_manager::get_instance()->delete_block(bid);
                         current = 0;
                     }
@@ -596,7 +599,7 @@ namespace priority_queue_local
         // compact nonempty segments in the left half of the tree
         void compactTree()
         {
-            STXXL_VERBOSE0("Compacting");
+            STXXL_VERBOSE1("Compacting");
             assert(logK > 0);
 
             // compact all nonempty segments to the left
@@ -679,7 +682,15 @@ namespace priority_queue_local
             return;
 
         assert(k > 0);
-	
+
+            //Hint first non-internal (actually second) block of each sequence.
+            //This is mandatory to ensure proper synchronization between prefetch pool and write pool.
+            for(unsigned_type i = 0; i < k; ++i)
+            {
+              if(states[i].bids != NULL && !states[i].bids->empty())
+                p_pool->hint(states[i].bids->front(), *w_pool);
+            }
+
             switch (logK) {
             case 0:
                 assert(k == 1);
@@ -894,7 +905,7 @@ namespace priority_queue_local
                 assert(segment_size);
                 unsigned_type nblocks = segment_size / block_type::size;
                 //assert(nblocks); // at least one block
-                STXXL_VERBOSE0("ext_merger::insert_segment nblocks=" << nblocks);
+                STXXL_VERBOSE1("ext_merger::insert_segment nblocks=" << nblocks);
                 if (nblocks == 0)
                 {
                     STXXL_VERBOSE1("ext_merger::insert_segment(merger,...) WARNING: inserting a segment with " <<
@@ -915,7 +926,7 @@ namespace priority_queue_local
                     first_block->begin() + (block_type::size - first_size),
                     first_block->end());
 
-                STXXL_VERBOSE0("last element of first block " << *(first_block->end() - 1));
+                STXXL_VERBOSE1("last element of first block " << *(first_block->end() - 1));
 
                 assert(w_pool->size() > 0);
 
@@ -923,13 +934,11 @@ namespace priority_queue_local
                 {
                     block_type * b = w_pool->steal();
                     another_merger.multi_merge(b->begin(), b->end());
-                    STXXL_VERBOSE0("first element of following block " << *curbid << " " << *(b->begin()));
-                    STXXL_VERBOSE0("last element of following block " << *curbid << " " << *(b->end() - 1));
+                    STXXL_VERBOSE1("first element of following block " << *curbid << " " << *(b->begin()));
+                    STXXL_VERBOSE1("last element of following block " << *curbid << " " << *(b->end() - 1));
                     w_pool->write(b, *curbid); //->wait() does not help
-                    STXXL_VERBOSE0("written to block " << *curbid);
+                    STXXL_VERBOSE1("written to block " << *curbid << " cached in " << b);
                 }
-
-                STXXL_VERBOSE0("=============");
 
                 insert_segment(bids, first_block, first_size, free_slot);
 
@@ -1392,7 +1401,7 @@ namespace priority_queue_local
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     loser_tree<ValTp_, Cmp_, KNKMAX>::~loser_tree()
     {
-        STXXL_VERBOSE2("loser_tree::~loser_tree()");
+        STXXL_VERBOSE1("loser_tree::~loser_tree()");
         for (unsigned_type i = 0; i < k; ++i)
         {
             if (segment[i])
@@ -2016,7 +2025,6 @@ void priority_queue<Config_>::refillBuffer1()
         if ((buffer2[i] + N) - minBuffer2[i] < BufferSize1)
         {
             sz = refillBuffer2(i);
-            //STXXL_VERBOSE0("refilled buffer " << i);
             // max active level dry now?
             if (sz == 0 && i == activeLevels - 1)
                 --activeLevels;
@@ -2068,10 +2076,6 @@ void priority_queue<Config_>::refillBuffer1()
             minBuffer2[2], minBuffer1, sz, cmp);
         break;
     case 4:
-        STXXL_VERBOSE2("=1=" << minBuffer2[0][0]); //std::copy(minBuffer2[0],(&(buffer2[0][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-        STXXL_VERBOSE2("=2=" << minBuffer2[1][0]); //std::copy(minBuffer2[1],(&(buffer2[1][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-        STXXL_VERBOSE2("=3=" << minBuffer2[2][0]); //std::copy(minBuffer2[2],(&(buffer2[2][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
-        STXXL_VERBOSE2("=4=" << minBuffer2[3][0]); //std::copy(minBuffer2[3],(&(buffer2[3][0])) + N,std::ostream_iterator<value_type>(std::cout, ","));
 	priority_queue_local::merge4_iterator(
             minBuffer2[0],
             minBuffer2[1],

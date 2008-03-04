@@ -98,8 +98,7 @@ public:
 
         try
         {
-            busy_blocks_iterator i2 = busy_blocks.begin();
-            for ( ; i2 != busy_blocks.end(); ++i2)
+            for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
             {
                 i2->req->wait();
                 delete i2->block;
@@ -120,6 +119,12 @@ public:
     //! \return request object of the write operation
     request_ptr write(block_type * block, bid_type bid)
     {
+        for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
+        {
+            if (i2->bid == bid && i2->block != block) {
+                STXXL_VERBOSE0("WAW dependency");
+            }
+        }
         request_ptr result = block->write(bid);
         ++busy_blocks_size;
         busy_blocks.push_back(busy_entry(block, result, bid));
