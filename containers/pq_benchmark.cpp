@@ -23,7 +23,7 @@ struct my_record
 {
     int key;
     int data;
-    my_record() { }
+    my_record() : key(0), data(0) { }
     my_record(int k, int d) : key(k), data(d) { }
 };
 

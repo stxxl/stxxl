@@ -87,6 +87,7 @@ public:
     typedef NilCase result;
 };
 
+//rounding down
 template <unsigned Input>
 class LOG
 {
