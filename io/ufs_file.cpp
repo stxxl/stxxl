@@ -120,7 +120,7 @@ void ufs_request_base::check_aligning ()
 
 ufs_request_base::~ufs_request_base ()
 {
-    STXXL_VERBOSE3("ufs_request_base " << unsigned (this) << ": deletion, cnt: " << ref_cnt);
+    STXXL_VERBOSE3("ufs_request_base " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 
@@ -133,7 +133,7 @@ ufs_request_base::~ufs_request_base ()
 
 void ufs_request_base::wait ()
 {
-    STXXL_VERBOSE3("ufs_request_base : " << unsigned (this) << " wait ");
+    STXXL_VERBOSE3("ufs_request_base : " << static_cast<void *>(this) << " wait ");
 
     START_COUNT_WAIT_TIME
 
