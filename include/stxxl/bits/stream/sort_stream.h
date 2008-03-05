@@ -1087,10 +1087,10 @@ namespace stream
             sruns(r), m_(memory_to_use / block_type::raw_size / sort_memory_usage_factor() /* - 1 */), cmp(c),
             elements_remaining(r.elements),
             current_block(NULL),
-#ifdef STXXL_CHECK_ORDER_IN_SORTS
-            last_element(cmp.min_value()),
-#endif
             prefetcher(NULL)
+#ifdef STXXL_CHECK_ORDER_IN_SORTS
+            , last_element(cmp.min_value())
+#endif
         {
             if (empty())
                 return;
@@ -1111,7 +1111,7 @@ namespace stream
             }
 
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
-            assert(check_sorted_runs(r, c));
+            assert(check_sorted_runs(r, cmp));
 #endif
 
             current_block = new block_type;

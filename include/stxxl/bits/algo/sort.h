@@ -310,7 +310,7 @@ namespace sort_local
             unsigned_type blocks_left = nblocks_per_run;
             block_type * blocks = new block_type[m];
             request_ptr * reqs = new request_ptr[m];
-            value_type last;
+            value_type last = cmp.min_value();
 
             for (unsigned_type off = 0; off < nblocks_per_run; off += m)
             {
@@ -598,7 +598,7 @@ namespace sort_local
         losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
-        value_type last_elem;
+        value_type last_elem = cmp.min_value();
 #endif
 
         for (i = 0; i < out_run_size; ++i)

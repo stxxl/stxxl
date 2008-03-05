@@ -46,6 +46,11 @@ bool operator < (const my_type & a, const my_type & b)
     return a.key() < b.key();
 }
 
+bool operator == (const my_type & a, const my_type & b)
+{
+    return a.key() == b.key();
+}
+
 bool operator != (const my_type & a, const my_type & b)
 {
     return a.key() != b.key();
