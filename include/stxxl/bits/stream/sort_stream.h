@@ -810,7 +810,8 @@ namespace stream
             wait_all(reqs, reqs + nblocks);
             for (unsigned_type j = 0; j < nblocks; ++j)
             {
-                if (blocks[j][0] != sruns.runs[irun][j].value)
+                if (cmp(blocks[j][0], sruns.runs[irun][j].value) ||
+                    cmp(sruns.runs[irun][j].value, blocks[j][0])) //!=
                 {
                     STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run");
                     return false;
