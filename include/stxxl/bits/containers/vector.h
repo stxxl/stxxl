@@ -74,9 +74,10 @@ __STXXL_BEGIN_NAMESPACE
         assert(/* 0 <= offset && */ offset < modulo1);
       }
 
-      void operator=(unsigned_type pos)
+      double_blocked_index& operator=(unsigned_type pos)
       {
         set(pos);
+        return *this;
       }
 
       //pre-increment operator
@@ -94,11 +95,11 @@ __STXXL_BEGIN_NAMESPACE
             ++block2;
           }
         }
-        
+
         assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
         assert(/* 0 <= block1 && */ block1 < modulo2);
         assert(/* 0 <= offset && */ offset < modulo1);
-        
+
         return *this;
       }
 
@@ -141,10 +142,56 @@ __STXXL_BEGIN_NAMESPACE
         return former;
       }
 
+      double_blocked_index operator+(unsigned_type addend)
+      {
+        return double_blocked_index(pos + addend);
+      }
+
       double_blocked_index& operator+=(unsigned_type addend)
       {
         set(pos + addend);
         return *this;
+      }
+
+      double_blocked_index operator-(unsigned_type addend)
+      {
+        return double_blocked_index(pos - addend);
+      }
+
+      double_blocked_index& operator-=(unsigned_type subtrahend)
+      {
+        set(pos - subtrahend);
+        return *this;
+      }
+
+      bool operator==(const double_blocked_index& dbi2)
+      {
+        return pos == dbi2.pos;
+      }
+
+      bool operator!=(const double_blocked_index& dbi2)
+      {
+        return pos != dbi2.pos;
+      }
+
+      bool operator<(const double_blocked_index& dbi2)
+      {
+        return pos < dbi2.pos;
+      }
+
+      bool operator<=(const double_blocked_index& dbi2)
+      {
+        return pos <= dbi2.pos;
+      }
+
+      bool operator>(const double_blocked_index& dbi2)
+      {
+        return pos > dbi2.pos;
+      }
+
+      bool operator>=(const double_blocked_index& dbi2)
+      {
+        return pos >= dbi2.pos;
       }
 
       double_blocked_index& operator>>=(unsigned_type shift)
@@ -367,9 +414,20 @@ public:
         assert(p_vector == a.p_vector);
         return offset < a.offset;
     }
+    bool operator <= (const _Self &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset <= a.offset;
+    }
     bool operator > (const _Self &a) const
     {
-        return a < *this;
+        assert(p_vector == a.p_vector);
+        return a > *this;
+    }
+    bool operator >= (const _Self &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return a >= *this;
     }
 
     bool operator == (const const_iterator &a) const
@@ -387,9 +445,20 @@ public:
         assert(p_vector == a.p_vector);
         return offset < a.offset;
     }
+    bool operator <= (const const_iterator &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset <= a.offset;
+    }
     bool operator > (const const_iterator &a) const
     {
-        return a < *this;
+        assert(p_vector == a.p_vector);
+        return a > *this;
+    }
+    bool operator >= (const const_iterator &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return a >= *this;
     }
 
     void flush()
@@ -555,6 +624,21 @@ public:
         assert(p_vector == a.p_vector);
         return offset < a.offset;
     }
+    bool operator <= (const _Self &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset <= a.offset;
+    }
+    bool operator > (const _Self &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset > a.offset;
+    }
+    bool operator >= (const _Self &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset >= a.offset;
+    }
 
     bool operator == (const iterator &a) const
     {
@@ -570,6 +654,21 @@ public:
     {
         assert(p_vector == a.p_vector);
         return offset < a.offset;
+    }
+    bool operator <= (const iterator &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset <= a.offset;
+    }
+    bool operator > (const iterator &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset > a.offset;
+    }
+    bool operator >= (const iterator &a) const
+    {
+        assert(p_vector == a.p_vector);
+        return offset >= a.offset;
     }
 
     void flush()
