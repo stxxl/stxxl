@@ -12,7 +12,8 @@
 /** @file intel_compatibility.h
  *  @brief Intel compiler compatibility work-around. */
 
-#if defined(__ICC)
+#if defined(__ICC) && (__ICC < 1100)
+// according to Intel, this will be fixed in 11.0 but not before
 
 /** @brief Fake function that will cause linking failure if used. */
 template <typename T1, typename T2>
