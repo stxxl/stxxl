@@ -36,7 +36,7 @@ compiler      |  stxxl   stxxl     stxxl     stxxl
               |          + mcstl   + boost   + mcstl
               |                              + boost
 --------------+----------------------------------------
-GCC 4.3       |    x       x         -²        -²
+GCC 4.3       |    x       -³        -²        -²
 GCC 4.2       |    x       x         x         x
 GCC 4.1       |    x      n/a        ?        n/a
 GCC 4.0       |    x      n/a        ?        n/a
@@ -60,6 +60,8 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
        icpc 9.1: use gcc before 4.2
        icpc 10.x with mcstl support: use gcc 4.2
  ²   = Boost currently does not support g++ 4.3
+ ³   = MCSTL has been superseded by the libstdc++ parallel mode in GCC 4.3,
+       parallel mode is not yet supported in this stxxl release
 \endverbatim
  *
  *
@@ -70,20 +72,37 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  * - \link installation_msvc Installation (Windows/MS Visual C++ 7.1) \endlink
  * - \link installation_old Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
  *
- * Questions concerning use and development of the \c S<small>TXXL</small>
+ * - \link install-svn Installing from subversion \endlink
+ *
+ * \section questions Questions
+ *
+ * - Questions concerning use and development of the \c S<small>TXXL</small>
  * library and bug reports should be posted to the
  * <b><a href="http://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>
  * or mailed to <A href="http://i10www.ira.uka.de/dementiev/">Roman Dementiev</A>.
+ *
+ * - \link FAQ FAQ - Frequently Asked Questions \endlink
  *
  */
 
 
 /*!
- * \page installation Installation
+ * \page FAQ FAQ - Frequently Asked Questions
+ *
+ * Question 1:
+ * Answer 1:
+ *
+ */
+
+
+/*!
+ * \page install Installation
  * - \link installation_linux_gcc Installation (Linux/g++) \endlink
  * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
  * - \link installation_msvc Installation (Windows/MS Visual C++ 7.1) \endlink
  * - \link installation_old Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
+ *
+ * - \link install-svn Installing from subversion \endlink
  */
 
 
@@ -559,3 +578,14 @@ my_example.bin: my_example.o
  * \verbatim utils/createdisks.bin capacity full_disk_filename... \endverbatim
  *
  * */
+
+
+/*!
+ * \page install-svn Installing from subversion
+ *
+ * \section checkout Retrieving the source from subversion
+ *
+ * svn co ...
+ *
+ * */
+
