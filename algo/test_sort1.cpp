@@ -68,29 +68,73 @@ struct cmp : public std::less<my_type>
     }
 };
 
+#define BLOCK_COUNT 3
+typedef u_int64_t word_type;
+
+enum node_state {
+	ns_normal,
+	ns_min,
+	ns_max
+};
+
+struct trie {
+	trie() {
+		state = ns_normal;
+	};
+	trie(node_state state_):
+		state(state_), Id(0), ParentId(0), i(0), branch_pos(0) {};
+	node_state state;	
+	unsigned Id;
+	unsigned ParentId;
+	unsigned i;
+	unsigned branch_pos;
+	word_type branch[BLOCK_COUNT];
+	word_type cp1[BLOCK_COUNT];
+	word_type cp2[BLOCK_COUNT];
+};
+
+/* Sort based on (i, branch_pos) */
+struct trie_compare_first {
+	bool operator() (const trie & l, const trie & r) const
+	{
+		if ((l.state == ns_min) || (r.state == ns_max)) return true;
+		if ((r.state == ns_min) || (l.state == ns_max)) return false;
+		if (l.i < r.i) return true;
+		if (l.i == r.i)
+			return (l.branch_pos < r.branch_pos);
+		return false;
+	};
+	trie min_value() const {
+		return trie(ns_min);
+	};
+	trie max_value() const {
+		return trie(ns_max);
+	};
+};
+
 
 int main()
 {
-    unsigned memory_to_use = 128 * 1024 * 1024;
-    typedef stxxl::vector<my_type> vector_type;
+    unsigned memory_to_use = 16 * 1024 * 1024;
+    typedef stxxl::vector<trie> vector_type;
     const stxxl::int64 n_records =
-        stxxl::int64(384) * stxxl::int64(1024 * 1024) / sizeof(my_type);
+        stxxl::int64(64) * stxxl::int64(1024 * 1024) / sizeof(trie);
     vector_type v(n_records);
 
     random_number32 rnd;
     STXXL_MSG("Filling vector..., input size =" << v.size());
     for (vector_type::size_type i = 0; i < v.size(); i++)
-        v[i]._key = 1 + (rnd() % 0xfffffff);
+        v[i].i = 1 + (rnd() % 0xffff);
 
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
+    STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end(), trie_compare_first())) ? "OK" : "WRONG" ));
 
     STXXL_MSG("Sorting...");
-    stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
+    stxxl::sort(v.begin(), v.end(), trie_compare_first(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
+    STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end(), trie_compare_first())) ? "OK" : "WRONG" ));
 
 
     STXXL_MSG("Done, output size=" << v.size());
