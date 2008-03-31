@@ -1236,7 +1236,14 @@ private:
         assert(offset / (block_type::size * page_size) < _page_status.size() );
         _page_status[offset / (block_type::size * page_size)] = 0;
     }
-    
+
+    void touch(const double_blocked_index<PgSz_, block_type::size> & offset) const
+    {
+        // fails if offset is too large, out of bound access
+        assert(offset.get_block2() < _page_status.size() );
+        _page_status[offset.get_block2()] = 0;
+    }
+
     const_reference const_element(size_type offset) const
     {
       return const_element(double_blocked_index<PgSz_, block_type::size>(offset));
