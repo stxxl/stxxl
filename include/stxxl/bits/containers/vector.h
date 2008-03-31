@@ -126,11 +126,11 @@ __STXXL_BEGIN_NAMESPACE
           --block1;
         }
         --offset;
-        
+
         assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
         assert(/*0 <= block1 &&*/ block1 < modulo2);
         assert(/*0 <= offset &&*/ offset < modulo1);
-        
+
         return *this;
       }
 
@@ -142,7 +142,7 @@ __STXXL_BEGIN_NAMESPACE
         return former;
       }
 
-      double_blocked_index operator+(unsigned_type addend)
+      double_blocked_index operator+(unsigned_type addend) const
       {
         return double_blocked_index(pos + addend);
       }
@@ -153,9 +153,14 @@ __STXXL_BEGIN_NAMESPACE
         return *this;
       }
 
-      double_blocked_index operator-(unsigned_type addend)
+      double_blocked_index operator-(unsigned_type addend) const
       {
         return double_blocked_index(pos - addend);
+      }
+
+      unsigned_type operator-(const double_blocked_index& dbi2) const
+      {
+        return pos - dbi2.pos;
       }
 
       double_blocked_index& operator-=(unsigned_type subtrahend)
@@ -164,32 +169,32 @@ __STXXL_BEGIN_NAMESPACE
         return *this;
       }
 
-      bool operator==(const double_blocked_index& dbi2)
+      bool operator==(const double_blocked_index& dbi2) const
       {
         return pos == dbi2.pos;
       }
 
-      bool operator!=(const double_blocked_index& dbi2)
+      bool operator!=(const double_blocked_index& dbi2) const
       {
         return pos != dbi2.pos;
       }
 
-      bool operator<(const double_blocked_index& dbi2)
+      bool operator<(const double_blocked_index& dbi2) const
       {
         return pos < dbi2.pos;
       }
 
-      bool operator<=(const double_blocked_index& dbi2)
+      bool operator<=(const double_blocked_index& dbi2) const
       {
         return pos <= dbi2.pos;
       }
 
-      bool operator>(const double_blocked_index& dbi2)
+      bool operator>(const double_blocked_index& dbi2) const
       {
         return pos > dbi2.pos;
       }
 
-      bool operator>=(const double_blocked_index& dbi2)
+      bool operator>=(const double_blocked_index& dbi2) const
       {
         return pos >= dbi2.pos;
       }
@@ -201,6 +206,11 @@ __STXXL_BEGIN_NAMESPACE
       }
 
       operator unsigned_type() const
+      {
+        return pos;
+      }
+
+      unsigned_type get_pos() const
       {
         return pos;
       }
@@ -322,12 +332,12 @@ public:
 
     _Self operator - (size_type op) const
     {
-        return _Self(p_vector, offset - op);
+        return _Self(p_vector, offset.get_pos() - op);
     }
 
     _Self operator + (size_type op) const
     {
-        return _Self(p_vector, offset + op);
+        return _Self(p_vector, offset.get_pos() + op);
     }
 
     _Self & operator -= (size_type op)
@@ -364,12 +374,12 @@ public:
 
     reference operator [] (size_type op)
     {
-        return p_vector->element(offset + op);
+        return p_vector->element(offset.get_pos() + op);
     }
 
     const_reference operator [] (size_type op) const
     {
-        return p_vector->const_element(offset + op);
+        return p_vector->const_element(offset.get_pos() + op);
     }
 
     void touch()
@@ -547,12 +557,12 @@ public:
 
     _Self operator - (size_type op) const
     {
-        return _Self(p_vector, offset - op);
+        return _Self(p_vector, offset.get_pos() - op);
     }
 
     _Self operator + (size_type op) const
     {
-        return _Self(p_vector, offset + op);
+        return _Self(p_vector, offset.get_pos() + op);
     }
 
     _Self & operator -= (size_type op)
@@ -579,7 +589,7 @@ public:
 
     const_reference operator [] (size_type op) const
     {
-        return p_vector->const_element(offset + op);
+        return p_vector->const_element(offset.get_pos() + op);
     }
 
     void touch()
@@ -1447,7 +1457,5 @@ namespace std
         a.swap(b);
     }
 }
-
-
 
 #endif
