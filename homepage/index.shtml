@@ -406,20 +406,20 @@ new in the latest release </font> </td>
 	      &nbsp; &middot; Installation manual:
 	    </td>
 	    <td>
-	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/tags/1.1.0/doxy/html/installation.html">1.1.0</a>]
+	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/tags/1.1.0/installation.html">1.1.0</a>]
             </td>
 	    <td>
-	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/trunk/doxy/html/install-svn.html">trunk</a>]
+	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/trunk/install-svn.html">trunk</a>]
           </tr>
           <tr>
             <td align="left" valign="center">
 	      &nbsp; &middot; Programmer documentation:
 	    </td>
 	    <td>
-	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/tags/1.1.0/doxy/html/">1.1.0</a>]
+	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/tags/1.1.0/">1.1.0</a>]
 	    </td>
 	    <td>
-	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/trunk/doxy/html/">trunk</a>]
+	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/trunk/">trunk</a>]
 	    </td>
           </tr>
           <tr>
@@ -454,7 +454,7 @@ new in the latest release </font> </td>
 	  <tr>
             <td align="left" valign="center">
 	      &nbsp; &middot; <b>FAQ</b> - Frequently Asked Questions
-	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/trunk/doxy/html/FAQ.html">html</a>]
+	      [<a href="http://i10www.ira.uka.de/dementiev/stxxl/trunk/FAQ.html">html</a>]
             </td>
 	  </tr>
           <tr>
