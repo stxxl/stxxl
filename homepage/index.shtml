@@ -51,8 +51,7 @@ another design priority is high performance.
 
 
             </td>
-            <td valign="top"> <img src="http://algo2.iti.uni-karlsruhe.de/dementiev/pics/stxxl_layers.gif" alt="stxxl layers"
- border="0" ></td>
+            <td valign="top"> <img src="stxxl_layers.png" alt="stxxl layers" border="0" ></td>
           </tr>
         </tbody>
       </table>
