@@ -99,7 +99,11 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  * You should not pass or store references to elements in an external memory
  * data structure. When the reference is used, the block that contains the 
  * element may be no longer in internal memory.<br>
- * Use/pass an iterator (reference) instead.
+ * Use/pass an iterator (reference) instead.<br>
+ * For stxxl::vector with \c n pages and LRU replacement strategy it 
+ * can be guaranteed that the last \c n references 
+ * obtained using stxxl::vector operator [] or dereferencing
+ * an iterator are valid. <br>
  *
  *
  * \section q2 Thread-Safety

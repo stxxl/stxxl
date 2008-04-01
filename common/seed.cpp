@@ -1,6 +1,10 @@
 #include <cassert>
 #include <ctime>
-#include <unistd.h>
+#ifdef BOOST_MSVC
+ #include <io.h>
+#else
+ #include <unistd.h>
+#endif
 
 #include "stxxl/bits/common/seed.h"
 #include "stxxl/bits/common/mutex.h"

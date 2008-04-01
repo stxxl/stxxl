@@ -69,7 +69,7 @@ preferences.indent.closing=0
 module.include.name=.
 module.include.type=
 module.include.files=\
-	mng/adaptor.h\
+	include/stxxl/bits/mng/adaptor.h\
 	mng/mng.h\
 	common/mutex.h\
 	common/rand.h\

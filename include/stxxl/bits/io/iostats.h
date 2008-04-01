@@ -12,6 +12,7 @@
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/common/mutex.h"
 #include "stxxl/bits/common/types.h"
+#include "stxxl/bits/common/utils.h"
 
 #include <iostream>
 
