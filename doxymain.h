@@ -89,8 +89,26 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
 /*!
  * \page FAQ FAQ - Frequently Asked Questions
  *
- * Question 1:
- * Answer 1:
+ * \section FAQ-latest Latest version of this FAQ
+ * The most recent version of this FAQ can always be found
+ * <a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/trunk/FAQ.html">here</a>.
+ *
+ *
+ * \section q1 References to Elements in External Memory Data Structures
+ *
+ * You should not pass or store references to elements in an external memory
+ * data structure. When the reference is used, the block that contains the 
+ * element may be no longer in internal memory.<br>
+ * Use/pass an iterator (reference) instead.
+ *
+ *
+ * \section q2 Thread-Safety
+ *
+ * The I/O and block management layers are thread-safe (since release 1.1.1).
+ * The user layer data structures are not thread-safe.<br>
+ * I.e. you may access <b>different</b> \c S<small>TXXL</small> data structures from concurrent threads without problems,
+ * but you should not share a data structure between threads (without implementing proper locking yourself).<br>
+ * This is a design choice, having the data structures thread-safe would mean a significant performance loss.
  *
  */
 
@@ -585,7 +603,45 @@ my_example.bin: my_example.o
  *
  * \section checkout Retrieving the source from subversion
  *
- * svn co ...
+ * The \c S<small>TXXL</small> sourcecode is available in a subversion repository on sourceforge.net.<br>
+ * To learn more about subversion and (command line and graphical) subversion clients
+ * visit <a href="http://subversion.tigris.org/">http://subversion.tigris.org/</a>.
  *
+ * The main development line (in subversion called the "trunk") is located at 
+ * \c https://stxxl.svn.sourceforge.net/svnroot/stxxl/trunk
+ * <br>Alternatively you might use a branch where a new feature is being developed.
+ * Branches have URLs like
+ * \c https://stxxl.svn.sourceforge.net/svnroot/stxxl/branches/foobar
+ *
+ * For the following example let's assume you want to download the latest trunk version
+ * using the command line client and store it in a directory called \c stxxl-trunk
+ * (which should not exist, yet).
+ * Otherwise replace URL and path to your needs.
+ *
+ * Run: \verbatim svn checkout https://stxxl.svn.sourceforge.net/svnroot/stxxl/trunk stxxl-trunk \endverbatim
+ * Change to stxxl directory: \verbatim cd stxxl-trunk \endverbatim
+ *
+ * \section installation Continue Installation
+ *
+ * Now follow the regular installation and usage instructions,
+ * skipping over the tarball download and extraction parts.<br>
+ * For the \c STXXL_ROOT variable value choose something like
+ * \c \$(HOME)/path/to/stxxl-trunk
+ *
+ * - \link installation_linux_gcc Installation (Linux/g++) \endlink
+ * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
+ * - \link installation_msvc Installation (Windows/MS Visual C++ 7.1) \endlink
+ *
+ * \section update Updating an existing subversion checkout
+ *
+ * Once you have checked out the source code you can easily update it to the latest version later on.
+ *
+ * Change to stxxl directory:
+ * \verbatim cd ...path/to/stxxl-trunk \endverbatim
+ * Run
+ * \verbatim svn update \endverbatim
+ * Usually you don't have to reconfigure anything, so just rebuild:
+ * - \verbatim make library_g++ \endverbatim
+ * - \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
  * */
 
