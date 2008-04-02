@@ -71,7 +71,7 @@ namespace stream
 
         const value_type * operator -> () const
         {
-            return &current_;
+            return &(*current_);
         }
 
         //! \brief Standard stream method
