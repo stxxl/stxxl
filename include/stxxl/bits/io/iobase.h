@@ -121,7 +121,7 @@ struct default_completion_handler
 
 //! It is a base class for different implementations that might
 //! base on various file systems or even remote storage interfaces
-class file
+class file : private noncopyable
 {
     //! \brief private constructor
     //! \remark instantiation of file without id is forbidden
@@ -202,7 +202,7 @@ class disk_queues;
 //! Since all library I/O operations are asynchronous,
 //! one needs to keep track of their status: whether
 //! an I/O completed or not.
-class request
+class request : private noncopyable
 {
     friend int wait_any(request_ptr req_array[], int count);
     template <class request_iterator_> friend
@@ -616,7 +616,7 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
     return result;
 }
 
-class disk_queue
+class disk_queue : private noncopyable
 {
 public:
     enum priority_op { READ, WRITE, NONE };
@@ -661,7 +661,7 @@ public:
 
 //! \brief Encapsulates disk queues
 //! \remark is a singleton
-class disk_queues
+class disk_queues : private noncopyable
 {
 protected:
     std::map < DISKID, disk_queue * > queues;

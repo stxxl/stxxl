@@ -29,7 +29,7 @@ extern double wait_time_counter;
 
 //! \brief Collects various I/O statistics
 //! \remarks is a singleton
-class stats
+class stats : private noncopyable
 {
     unsigned reads, writes;             // number of operations
     int64 volume_read, volume_written;            // number of bytes read/written
