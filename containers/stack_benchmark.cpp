@@ -22,7 +22,10 @@ template <unsigned RECORD_SIZE>
 struct my_record_
 {
     char data[RECORD_SIZE];
-    my_record_() { }
+    my_record_()
+    {
+        bzero(data, sizeof(data));
+    }
 };
 
 template <unsigned RECORD_SIZE>
