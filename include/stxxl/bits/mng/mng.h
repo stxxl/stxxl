@@ -330,6 +330,7 @@ public:
         }
         return result;
     }
+
     static void *operator new (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
@@ -347,21 +348,25 @@ public:
         return result;
     }
 
-    static void *  operator new (size_t /*bytes*/, void * ptr)     // construct object in existing memory
+    static void * operator new (size_t /*bytes*/, void * ptr)     // construct object in existing memory
     {
         return ptr;
     }
 
-    static void operator delete (void *ptr)
+    static void operator delete[] (void * ptr)
     {
         debugmon::get_instance()->block_deallocated((char *)ptr);
         aligned_dealloc < BLOCK_ALIGN > (ptr);
     }
-    void operator delete[] (void *ptr)
+
+    static void operator delete (void * ptr)
     {
         debugmon::get_instance()->block_deallocated((char *)ptr);
         aligned_dealloc < BLOCK_ALIGN > (ptr);
     }
+
+    static void operator delete (void *, void *)
+    { }
 
     // STRANGE: implementing destructor makes g++ allocate
     // additional 4 bytes in the beginning of every array
