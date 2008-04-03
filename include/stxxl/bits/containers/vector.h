@@ -205,11 +205,6 @@ __STXXL_BEGIN_NAMESPACE
         return *this;
       }
 
-      operator unsigned_type() const
-      {
-        return pos;
-      }
-
       unsigned_type get_pos() const
       {
         return pos;
