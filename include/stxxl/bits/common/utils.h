@@ -47,6 +47,10 @@ inline void UNUSED(const U &)
 
 #define __STXXL_STRING(x) # x
 
+#ifndef STXXL_DEBUG_ON
+ #define STXXL_DEBUG_ON 1
+#endif
+
 
 #define STXXL_MSG(x) \
     { std::cout << "[STXXL-MSG] " << x << std::endl << std::flush; \
@@ -57,6 +61,15 @@ inline void UNUSED(const U &)
     { std::cerr << "[STXXL-ERRMSG] " << x << std::endl << std::flush; \
       stxxl::logger::get_instance()->errlog_stream() << "[STXXL-ERRMSG] " << x << std::endl << std::flush; \
     }
+
+#if STXXL_DEBUG_ON
+ #define STXXL_DEBUGMSG(x) \
+    { std::cout << "[STXXL-DEBUG] " << x << std::endl << std::flush; \
+      stxxl::logger::get_instance()->log_stream() << "[STXXL-DEBUG] " << x << std::endl << std::flush; \
+    }
+#else
+ #define STXXL_DEBUGMSG(x)
+#endif
 
 
 #ifndef STXXL_VERBOSE_LEVEL
@@ -113,10 +126,6 @@ inline void UNUSED(const U &)
 #define STXXL_FORMAT_ERROR_MSG(str_, errmsg_) \
     std::ostringstream str_; str_ << "Error in " << errmsg_;
 
-
-#ifndef STXXL_DEBUG_ON
- #define STXXL_DEBUG_ON 1
-#endif
 
 inline std::string perror_string()
 {
@@ -223,9 +232,6 @@ inline bool helper_check_ne_0(INT res, const char *func_name)
         throw exception_type(str_.str()); \
     }
 
- #define stxxl_debug(expr) expr
-
-
  #ifdef BOOST_MSVC
 
   #define stxxl_win_lasterror_exit(errmsg, exception_type)  \
@@ -253,8 +259,6 @@ inline bool helper_check_ne_0(INT res, const char *func_name)
 
  #define stxxl_ifcheck_i(expr, info, exception_type) expr; if (0) { }
 
- #define stxxl_debug(expr)
-
  #ifdef BOOST_MSVC
   #define stxxl_win_lasterror_exit(errmsg) stxxl::UNUSED(42)
  #endif
@@ -272,7 +276,7 @@ inline
 std::string
 stxxl_tmpfilename (std::string dir, std::string prefix)
 {
-    //stxxl_debug(cerr <<" TMP:"<< dir.c_str() <<":"<< prefix.c_str()<< endl);
+    //STXXL_DEBUGMSG(" TMP:"<< dir.c_str() <<":"<< prefix.c_str());
     int rnd;
     char buffer[1024];
     std::string result;

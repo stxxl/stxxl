@@ -427,9 +427,7 @@ public:
     {
         if (array)
         {
-            stxxl_debug (std::cerr <<
-                         "Warning: resizing nonempty BIDArray"
-                                   << std::endl);
+            STXXL_DEBUGMSG("Warning: resizing nonempty BIDArray");
             BID < BLK_SIZE > *tmp = array;
             array = new BID < BLK_SIZE >[newsize];
             memcpy ((void *)array, (void *)tmp,

@@ -55,6 +55,8 @@ __STXXL_BEGIN_NAMESPACE
     { std::cerr << "[STXXL-ERRMSG] " << x << std::endl; std::cerr.flush(); \
     };
 
+#define STXXL_DEBUGMSG(x) STXXL_MSG(x)
+
 
 #ifndef STXXL_VERBOSE_LEVEL
 #define STXXL_VERBOSE_LEVEL 0
@@ -118,8 +120,6 @@ stxxl_perror (const char * /*errmsg*/, int errcode)
 
  #define stxxl_ifcheck_i(expr, info) if ((expr) < 0) { std::cerr << "Error in function " << STXXL_PRETTY_FUNCTION_NAME << " Info: " << info << " "; stxxl_error(__STXXL_STRING(expr)); }
 
- #define stxxl_debug(expr) expr
-
  #ifdef BOOST_MSVC
 
   #define stxxl_win_lasterror_exit(errmsg)  \
@@ -151,8 +151,6 @@ stxxl_perror (const char * /*errmsg*/, int errcode)
  #define stxxl_nassert(expr) expr;
 
  #define stxxl_ifcheck(expr) expr; if (0) { }
-
- #define stxxl_debug(expr) ;
 
  #ifdef BOOST_MSVC
   #define stxxl_win_lasterror_exit(errmsg) ;
