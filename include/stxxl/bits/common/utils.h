@@ -148,6 +148,14 @@ inline void stxxl_util_function_error(const char *func_name)
     stxxl::stxxl_util_function_error<exception_type>(STXXL_PRETTY_FUNCTION_NAME)
 
 template<typename E>
+inline bool helper_check_success(bool success, const char *func_name)
+{
+    if (!success)
+        stxxl_util_function_error<E>(func_name);
+    return success;
+}
+
+template<typename E>
 inline void stxxl_util_nassert(int cond, const char *expr, const char *func_name)
 {
     if (cond) {
@@ -168,12 +176,7 @@ inline void stxxl_util_nassert(int cond, const char *expr, const char *func_name
 template<typename E, typename INT>
 inline bool helper_check_ge_0(INT res, const char *func_name)
 {
-    if (res >= 0) {
-        return true;
-    } else {
-        stxxl_util_function_error<E>(func_name);
-        return false;
-    }
+    return helper_check_success<E>(res >= 0, func_name);
 }
 
 #define stxxl_check_ge_0(expr, exception_type) \
@@ -182,12 +185,7 @@ inline bool helper_check_ge_0(INT res, const char *func_name)
 template<typename E, typename INT>
 inline bool helper_check_ne_0(INT res, const char *func_name)
 {
-    if (res != 0) {
-        return true;
-    } else {
-        stxxl_util_function_error<E>(func_name);
-        return false;
-    }
+    return helper_check_success<E>(res != 0, func_name);
 }
 
 #define stxxl_check_ne_0(expr, exception_type) \
