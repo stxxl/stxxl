@@ -126,11 +126,12 @@ inline void UNUSED(const U &)
 #define STXXL_FORMAT_ERROR_MSG(str_, errmsg_) \
     std::ostringstream str_; str_ << "Error in " << errmsg_
 
-
-inline std::string perror_string()
-{
-    return std::string(strerror(errno));
-}
+#define STXXL_THROW(exception_type, location, error_message) \
+    { \
+        std::ostringstream msg_; \
+        msg_ << "Error in " << location << ": " << error_message; \
+        throw exception_type(msg_.str()); \
+    }
 
 template<typename E>
 inline void stxxl_util_function_error(const char *func_name, const char* expr = 0)
@@ -190,7 +191,7 @@ inline bool helper_check_ne_0(INT res, const char *func_name)
         std::ostringstream str_; \
         str_ << "Error in function " << \
         STXXL_PRETTY_FUNCTION_NAME << " Info: " << \
-        info << " " << perror_string(); \
+        info << " " << strerror(errno); \
         throw exception_type(str_.str()); \
     }
 

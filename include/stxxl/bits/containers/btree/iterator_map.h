@@ -111,8 +111,7 @@ namespace btree
                 }
             }
 
-            STXXL_FORMAT_ERROR_MSG(msg, "unregister_iterator Panic in btree::iterator_map, can not find and unregister iterator");
-            throw std::runtime_error(msg.str());
+            STXXL_THROW(std::runtime_error, "unregister_iterator", "Panic in btree::iterator_map, can not find and unregister iterator");
         }
         template <class OutputContainer>
         void find(      const bid_type & bid,

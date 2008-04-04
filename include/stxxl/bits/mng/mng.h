@@ -495,18 +495,16 @@ protected:
         {
             if (pred->first <= region_pos && pred->first + pred->second > region_pos)
             {
-                STXXL_FORMAT_ERROR_MSG(msg, "DiskAllocator::check_corruption Error: double deallocation of external memory " <<
+                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory " <<
                                        "System info: P " << pred->first << " " << pred->second << " " << region_pos);
-                throw bad_ext_alloc(msg.str());
             }
         }
         if (succ != free_space.end ())
         {
             if (region_pos <= succ->first && region_pos + region_size > succ->first)
             {
-                STXXL_FORMAT_ERROR_MSG(msg, "DiskAllocator::check_corruption Error: double deallocation of external memory "
+                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory "
                      << "System info: S " << region_pos << " " << region_size << " " << succ->first);
-                throw bad_ext_alloc(msg.str());
             }
         }
     }
@@ -927,9 +925,8 @@ public:
                                             options, disk);
       #endif
 
-        STXXL_FORMAT_ERROR_MSG(msg, "FileCreator::create Unsupported disk I/O implementation " <<
+        STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
                                io_impl << " ." );
-        throw std::runtime_error(msg.str());
 
         return NULL;
     }
