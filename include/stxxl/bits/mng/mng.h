@@ -1022,11 +1022,6 @@ struct SR : public striping
 //! \remarks model of \b allocation_strategy concept
 struct RC : public striping
 {
-#ifdef __MCSTL__
-#define FORCE_SEQUENTIAL , mcstl::sequential_tag()
-#else
-#define FORCE_SEQUENTIAL
-#endif
     std::vector<int> perm;
 
     RC (int b, int e) : striping (b, e), perm (diff)
@@ -1035,7 +1030,7 @@ struct RC : public striping
             perm[i] = i;
 
         stxxl::random_number<random_uniform_fast> rnd;
-        std::random_shuffle (perm.begin (), perm.end (), rnd FORCE_SEQUENTIAL);
+        std::random_shuffle (perm.begin (), perm.end (), rnd __STXXL_FORCE_SEQUENTIAL);
     }
     RC () : striping (), perm (diff)
     {
@@ -1043,7 +1038,7 @@ struct RC : public striping
             perm[i] = i;
 
         random_number<random_uniform_fast> rnd;
-        std::random_shuffle (perm.begin (), perm.end (), rnd FORCE_SEQUENTIAL);
+        std::random_shuffle (perm.begin (), perm.end (), rnd __STXXL_FORCE_SEQUENTIAL);
     }
     int operator     () (int i) const
     {
@@ -1053,7 +1048,6 @@ struct RC : public striping
     {
         return "randomized cycling striping";
     }
-#undef FORCE_SEQUENTIAL
 };
 
 //! \brief 'single disk' disk allocation scheme functor

@@ -123,18 +123,11 @@ void mmap_request::serve()
  #endif
 
     // << notification >>
- #ifdef __MCSTL__
     std::for_each(
         waiters.begin(),
         waiters.end(),
-        std::mem_fun(&onoff_switch::on),
-        mcstl::sequential_tag());
- #else
-    std::for_each(
-        waiters.begin(),
-        waiters.end(),
-        std::mem_fun(&onoff_switch::on) );
- #endif
+        std::mem_fun(&onoff_switch::on)
+        __STXXL_FORCE_SEQUENTIAL);
 
  #ifdef STXXL_BOOST_THREADS
     Lock.unlock();
