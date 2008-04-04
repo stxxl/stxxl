@@ -92,7 +92,7 @@ config::config (const char * config_path)
 
     if (disks_props.empty ())
     {
-        STXXL_FORMAT_ERROR_MSG(msg, "config::config No disks found in '" << config_path << "' .")
+        STXXL_FORMAT_ERROR_MSG(msg, "config::config No disks found in '" << config_path << "' .");
         throw std::runtime_error(msg.str());
     }
     else

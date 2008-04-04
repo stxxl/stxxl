@@ -2083,7 +2083,7 @@ void priority_queue<Config_>::refillBuffer1()
             minBuffer2[3], minBuffer1, sz, cmp);	//side effect free
         break;
     default:
-        STXXL_FORMAT_ERROR_MSG(msg, "priority_queue<...>::refillBuffer1(): Overflow! The number of buffers on 2nd level in stxxl::priority_queue is currently limited to 4")
+        STXXL_FORMAT_ERROR_MSG(msg, "priority_queue<...>::refillBuffer1(): Overflow! The number of buffers on 2nd level in stxxl::priority_queue is currently limited to 4");
         throw std::runtime_error(msg.str());
     }
 

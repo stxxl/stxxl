@@ -139,7 +139,7 @@ namespace btree
             STXXL_VERBOSE1("btree::node_cache constructor nodes=" << nnodes);
             if (nnodes < 3)
             {
-                STXXL_FORMAT_ERROR_MSG(msg, "btree::node_cache::node_cache  Too few memory for a node cache (<3)")
+                STXXL_FORMAT_ERROR_MSG(msg, "btree::node_cache::node_cache  Too few memory for a node cache (<3)");
 
                 throw std::runtime_error(msg.str());
             }

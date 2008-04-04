@@ -102,7 +102,7 @@ inline void UNUSED(const U &)
  #define STXXL_VERBOSE2(x) \
     { std::cout << "[STXXL-VERBOSE2] " << x << std::endl << std::flush; \
       stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE2] " << x << std::endl << std::flush; \
-    };
+    }
 #else
  #define STXXL_VERBOSE2(x)
 #endif
@@ -111,7 +111,7 @@ inline void UNUSED(const U &)
  #define STXXL_VERBOSE3(x) \
     { std::cout << "[STXXL-VERBOSE3] " << x << std::endl << std::flush; \
       stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE3] " << x << std::endl << std::flush; \
-    };
+    }
 #else
  #define STXXL_VERBOSE3(x)
 #endif
@@ -124,7 +124,7 @@ inline void UNUSED(const U &)
 #endif
 
 #define STXXL_FORMAT_ERROR_MSG(str_, errmsg_) \
-    std::ostringstream str_; str_ << "Error in " << errmsg_;
+    std::ostringstream str_; str_ << "Error in " << errmsg_
 
 
 inline std::string perror_string()

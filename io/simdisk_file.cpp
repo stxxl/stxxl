@@ -182,7 +182,7 @@ void sim_disk_request::serve ()
         {
             STXXL_FORMAT_ERROR_MSG(msg, "Mapping failed. " <<
                                    "Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " <<
-                                   (offset % sysconf(_SC_PAGESIZE)))
+                                   (offset % sysconf(_SC_PAGESIZE)));
 
             error_occured(msg.str());
         }
