@@ -507,5 +507,11 @@ inline unsigned_type sort_memory_usage_factor()
 #endif
 }
 
+#ifdef __MCSTL__
+#define __STXXL_FORCE_SEQUENTIAL , mcstl::sequential_tag()
+#else
+#define __STXXL_FORCE_SEQUENTIAL
+#endif
+
 __STXXL_END_NAMESPACE
 #endif
