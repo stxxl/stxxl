@@ -36,8 +36,8 @@ public:
     semaphore (int init_value = 1) : v (init_value)
     {
 #ifndef STXXL_BOOST_THREADS
-        stxxl_nassert (pthread_mutex_init (&mutex, NULL), resource_error);
-        stxxl_nassert (pthread_cond_init (&cond, NULL), resource_error);
+        check_pthread_call(pthread_mutex_init(&mutex, NULL));
+        check_pthread_call(pthread_cond_init(&cond, NULL));
 #endif
     };
     ~semaphore ()
@@ -46,14 +46,11 @@ public:
         int res = pthread_mutex_trylock (&mutex);
 
         if (res == 0 || res == EBUSY) {
-            stxxl_nassert (pthread_mutex_unlock
-                           (&mutex), resource_error);
+            check_pthread_call(pthread_mutex_unlock(&mutex));
         } else
             stxxl_function_error(resource_error);
-        stxxl_nassert (pthread_mutex_destroy
-                       (&mutex), resource_error);
-
-        stxxl_nassert (pthread_cond_destroy (&cond), resource_error);
+        check_pthread_call(pthread_mutex_destroy(&mutex));
+        check_pthread_call(pthread_cond_destroy(&cond));
 #endif
     }
     // function increments the semaphore and signals any threads that
@@ -66,10 +63,10 @@ public:
         Lock.unlock();
         cond.notify_one();
 #else
-        stxxl_nassert (pthread_mutex_lock (&mutex), resource_error);
+        check_pthread_call(pthread_mutex_lock(&mutex));
         int res = ++v;
-        stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
-        stxxl_nassert (pthread_cond_signal (&cond), resource_error);
+        check_pthread_call(pthread_mutex_unlock(&mutex));
+        check_pthread_call(pthread_cond_signal(&cond));
 #endif
         return res;
     }
@@ -84,13 +81,12 @@ public:
 
         int res = --v;
 #else
-        stxxl_nassert (pthread_mutex_lock (&mutex), resource_error);
+        check_pthread_call(pthread_mutex_lock(&mutex));
         while (v <= 0)
-            stxxl_nassert (pthread_cond_wait
-                           (&cond, &mutex), resource_error);
+            check_pthread_call(pthread_cond_wait(&cond, &mutex));
 
         int res = --v;
-        stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
+        check_pthread_call(pthread_mutex_unlock(&mutex));
 #endif
         return res;
     }
@@ -105,9 +101,9 @@ public:
         boost::mutex::scoped_lock Lock(mutex);
         return (--v);
 #else
-        stxxl_nassert (pthread_mutex_lock (&mutex), resource_error);
+        check_pthread_call(pthread_mutex_lock(&mutex));
         int res = --v;
-        stxxl_nassert (pthread_mutex_unlock (&mutex), resource_error);
+        check_pthread_call(pthread_mutex_unlock(&mutex));
         return res;
 #endif
     }
@@ -116,9 +112,9 @@ public:
     // after the function unlocks the critical section.
     //int operator()
     //{
-    //      stxxl_nassert(pthread_mutex_lock(&mutex),resource_error);
+    //      check_pthread_call(pthread_mutex_lock(&mutex));
     //      int res = v;
-    //      stxxl_nassert(pthread_mutex_unlock(&mutex),resource_error);
+    //      check_pthread_call(pthread_mutex_unlock(&mutex));
     //      return res;
     //};
 };

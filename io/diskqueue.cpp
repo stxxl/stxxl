@@ -35,9 +35,8 @@ disk_queue::disk_queue (int /*n*/) : sem (0), _priority_op (WRITE)              
 #ifdef STXXL_BOOST_THREADS
     // nothing to do
 #else
-    stxxl_nassert(pthread_create(&thread, NULL,
-                                 (thread_function_t) worker, static_cast<void *>(this)),
-                  resource_error);
+    check_pthread_call(pthread_create(&thread, NULL,
+                                 (thread_function_t) worker, static_cast<void *>(this)));
 #endif
 }
 
@@ -75,7 +74,7 @@ disk_queue::~disk_queue ()
 #ifdef STXXL_BOOST_THREADS
     // Boost.Threads do not support cancellation ?
 #else
-    stxxl_nassert (pthread_cancel (thread), resource_error);
+    check_pthread_call(pthread_cancel(thread));
 #endif
 }
 
@@ -86,10 +85,8 @@ void * disk_queue::worker (void * arg)
 
 #ifdef STXXL_BOOST_THREADS
 #else
-    stxxl_nassert (pthread_setcancelstate
-                   (PTHREAD_CANCEL_ENABLE, NULL), resource_error);
-    stxxl_nassert (pthread_setcanceltype
-                   (PTHREAD_CANCEL_DEFERRED, NULL), resource_error);
+    check_pthread_call(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL));
+    check_pthread_call(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL));
     // Allow cancellation in semaphore operator-- call
 #endif
 
