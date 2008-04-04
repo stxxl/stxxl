@@ -676,7 +676,7 @@ namespace priority_queue_local
 	    // FIXME: I'm afraid, this may deallocate empty segments repeatedly -- AnBe
 
 
-        STXXL_VERBOSE1("\next multi_merge from " << k << " sequence(s).")
+        STXXL_VERBOSE1("\next multi_merge from " << k << " sequence(s).");
 
         if(begin == end)
             return;

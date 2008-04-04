@@ -23,8 +23,8 @@ void ufs_file_base::lock()
     lock_struct.l_whence = SEEK_SET;
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
-    stxxl_ifcheck_i ((::fcntl (file_des, F_SETLK, &lock_struct)),
-                     "Filedescriptor=" << file_des, io_error)
+    if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
+        STXXL_DIE(io_error, "Filedescriptor=" << file_des);
 #endif
 }
 
@@ -197,16 +197,14 @@ ufs_file_base::ufs_file_base (
     fmode |= O_BINARY;                     // the default in MS is TEXT mode
 #endif
 
-
 #ifdef BOOST_MSVC
-    stxxl_ifcheck_i ((file_des = ::open (filename.c_str(), fmode,
-                                         S_IREAD | S_IWRITE )),
-                     "Filedescriptor=" << file_des << " filename=" << filename << " fmode=" << fmode, io_error);
+    const int flags = S_IREAD | S_IWRITE;
 #else
-    stxxl_ifcheck_i ((file_des = ::open (filename.c_str(), fmode,
-                                         S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP)),
-                     "Filedescriptor=" << file_des << " filename=" << filename << " fmode=" << fmode, io_error)
+    const int flags = S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP;
 #endif
+
+    if ((file_des = ::open (filename.c_str(), fmode, flags)) < 0)
+        STXXL_DIE(io_error, "Filedescriptor=" << file_des << " filename=" << filename << " fmode=" << fmode);
 }
 ufs_file_base::~ufs_file_base ()
 {

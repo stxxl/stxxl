@@ -133,6 +133,14 @@ inline void UNUSED(const U &)
         throw exception_type(msg_.str()); \
     }
 
+#if STXXL_DEBUG_ON
+ #define STXXL_DIE(exception_type, error_message) \
+    STXXL_THROW(exception_type, "function " << STXXL_PRETTY_FUNCTION_NAME, \
+                "Info: " << error_message << " " << strerror(errno))
+#else
+ #define STXXL_DIE(exception_type, error_message)
+#endif
+
 template<typename E>
 inline void stxxl_util_function_error(const char *func_name, const char* expr = 0)
 {
@@ -183,19 +191,8 @@ inline bool helper_check_ne_0(INT res, const char *func_name)
 #define stxxl_check_ne_0(expr, exception_type) \
     stxxl::helper_check_ne_0<exception_type>(expr, STXXL_PRETTY_FUNCTION_NAME)
 
+#ifdef BOOST_MSVC
 #if STXXL_DEBUG_ON
-
- #define stxxl_ifcheck_i(expr, info, exception_type) \
-    if ((expr) < 0) \
-    { \
-        std::ostringstream str_; \
-        str_ << "Error in function " << \
-        STXXL_PRETTY_FUNCTION_NAME << " Info: " << \
-        info << " " << strerror(errno); \
-        throw exception_type(str_.str()); \
-    }
-
- #ifdef BOOST_MSVC
 
   #define stxxl_win_lasterror_exit(errmsg, exception_type)  \
     { \
@@ -216,16 +213,11 @@ inline bool helper_check_ne_0(INT res, const char *func_name)
         throw exception_type(str_.str());  \
     }
 
- #endif
-
 #else
 
- #define stxxl_ifcheck_i(expr, info, exception_type) expr; if (0) { }
-
- #ifdef BOOST_MSVC
   #define stxxl_win_lasterror_exit(errmsg) stxxl::UNUSED(42)
- #endif
 
+#endif
 #endif
 
 inline double
