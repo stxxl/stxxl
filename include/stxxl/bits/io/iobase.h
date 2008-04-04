@@ -87,7 +87,6 @@
 #include "stxxl/bits/io/iostats.h"
 #include "stxxl/bits/common/semaphore.h"
 #include "stxxl/bits/common/mutex.h"
-//#include "stxxl/bits/common/rwlock.h"
 #include "stxxl/bits/common/switch.h"
 #include "stxxl/bits/common/state.h"
 #include "stxxl/bits/common/exceptions.h"

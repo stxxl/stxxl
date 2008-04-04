@@ -440,10 +440,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\stxxl\bits\common\rwlock.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\stxxl\bits\common\seed.h"
 					>
 				</File>

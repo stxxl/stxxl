@@ -179,7 +179,7 @@ CPPUNIT_LINKER_OPTIONS		+= -lcppunit -ldl
 HEADER_FILES_BITS	+= namespace.h noncopyable.h version.h
 
 HEADER_FILES_COMMON	+= aligned_alloc.h mutex.h rand.h semaphore.h state.h
-HEADER_FILES_COMMON	+= timer.h utils.h gprof.h rwlock.h simple_vector.h
+HEADER_FILES_COMMON	+= timer.h utils.h gprof.h simple_vector.h
 HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h debug.h tuple.h
 HEADER_FILES_COMMON	+= types.h utils_ledasm.h settings.h seed.h
 
