@@ -120,7 +120,7 @@ inline void UNUSED(const U &)
         throw exception_type(msg_.str()); \
     }
 
- #define STXXL_DIE(exception_type, error_message) \
+#define STXXL_THROW2(exception_type, error_message) \
     STXXL_THROW(exception_type, "function " << STXXL_PRETTY_FUNCTION_NAME, \
                 "Info: " << error_message << " " << strerror(errno))
 

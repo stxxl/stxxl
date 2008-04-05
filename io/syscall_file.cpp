@@ -43,7 +43,7 @@ void syscall_request::serve ()
     {
         if(::lseek(static_cast<syscall_file *>(file_)->get_file_des (), offset, SEEK_SET) < 0)
         {
-            STXXL_DIE(io_error,
+            STXXL_THROW2(io_error,
                         " this=" << long (this) << " File descriptor=" <<
                         static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset << " buffer=" <<
                         buffer << " bytes=" << bytes
@@ -61,7 +61,7 @@ void syscall_request::serve ()
 
                 if (::read(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)
                 {
-                    STXXL_DIE(io_error,
+                    STXXL_THROW2(io_error,
                                 " this=" << long (this) << " File descriptor=" <<
                                 static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset <<
                                 " buffer=" << buffer << " bytes=" << bytes << " type=" <<
@@ -84,7 +84,7 @@ void syscall_request::serve ()
 
                 if (::write(static_cast<syscall_file *>(file_)->get_file_des (), buffer, bytes) < 0)
                 {
-                    STXXL_DIE(io_error,
+                    STXXL_THROW2(io_error,
                                 " this=" << long (this) << " File descriptor=" <<
                                 static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset << " buffer=" <<
                                 buffer << " bytes=" << bytes << " type=" <<

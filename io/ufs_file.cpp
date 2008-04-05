@@ -24,7 +24,7 @@ void ufs_file_base::lock()
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
     if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
-        STXXL_DIE(io_error, "Filedescriptor=" << file_des);
+        STXXL_THROW2(io_error, "Filedescriptor=" << file_des);
 #endif
 }
 
@@ -204,7 +204,7 @@ ufs_file_base::ufs_file_base (
 #endif
 
     if ((file_des = ::open (filename.c_str(), fmode, flags)) < 0)
-        STXXL_DIE(io_error, "Filedescriptor=" << file_des << " filename=" << filename << " fmode=" << fmode);
+        STXXL_THROW2(io_error, "Filedescriptor=" << file_des << " filename=" << filename << " fmode=" << fmode);
 }
 ufs_file_base::~ufs_file_base ()
 {
