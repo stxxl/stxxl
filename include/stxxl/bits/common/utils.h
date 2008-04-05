@@ -47,10 +47,6 @@ inline void UNUSED(const U &)
 
 #define __STXXL_STRING(x) # x
 
-#ifndef STXXL_DEBUG_ON
- #define STXXL_DEBUG_ON 1
-#endif
-
 
 #define STXXL_MSG(x) \
     { std::cout << "[STXXL-MSG] " << x << std::endl << std::flush; \
@@ -61,15 +57,6 @@ inline void UNUSED(const U &)
     { std::cerr << "[STXXL-ERRMSG] " << x << std::endl << std::flush; \
       stxxl::logger::get_instance()->errlog_stream() << "[STXXL-ERRMSG] " << x << std::endl << std::flush; \
     }
-
-#if STXXL_DEBUG_ON
- #define STXXL_DEBUGMSG(x) \
-    { std::cout << "[STXXL-DEBUG] " << x << std::endl << std::flush; \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-DEBUG] " << x << std::endl << std::flush; \
-    }
-#else
- #define STXXL_DEBUGMSG(x)
-#endif
 
 
 #ifndef STXXL_VERBOSE_LEVEL
@@ -133,24 +120,16 @@ inline void UNUSED(const U &)
         throw exception_type(msg_.str()); \
     }
 
-#if STXXL_DEBUG_ON
  #define STXXL_DIE(exception_type, error_message) \
     STXXL_THROW(exception_type, "function " << STXXL_PRETTY_FUNCTION_NAME, \
                 "Info: " << error_message << " " << strerror(errno))
-#else
- #define STXXL_DIE(exception_type, error_message)
-#endif
 
 template<typename E>
 inline void stxxl_util_function_error(const char *func_name, const char* expr = 0)
 {
-#if STXXL_DEBUG_ON
     std::ostringstream str_;
     str_ << "Error in function " << func_name << " " << (expr ? expr : strerror(errno));
     throw E(str_.str());
-#else
-    UNUSED(func_name);
-#endif
 }
 
  #define stxxl_function_error(exception_type) \
@@ -192,7 +171,6 @@ inline bool helper_check_ne_0(INT res, const char *func_name)
     stxxl::helper_check_ne_0<exception_type>(expr, STXXL_PRETTY_FUNCTION_NAME)
 
 #ifdef BOOST_MSVC
-#if STXXL_DEBUG_ON
 
   #define stxxl_win_lasterror_exit(errmsg, exception_type)  \
     { \
@@ -213,11 +191,6 @@ inline bool helper_check_ne_0(INT res, const char *func_name)
         throw exception_type(str_.str());  \
     }
 
-#else
-
-  #define stxxl_win_lasterror_exit(errmsg) stxxl::UNUSED(42)
-
-#endif
 #endif
 
 inline double
@@ -231,7 +204,7 @@ inline
 std::string
 stxxl_tmpfilename (std::string dir, std::string prefix)
 {
-    //STXXL_DEBUGMSG(" TMP:"<< dir.c_str() <<":"<< prefix.c_str());
+    //STXXL_VERBOSE0(" TMP:"<< dir.c_str() <<":"<< prefix.c_str());
     int rnd;
     char buffer[1024];
     std::string result;

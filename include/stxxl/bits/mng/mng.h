@@ -427,7 +427,7 @@ public:
     {
         if (array)
         {
-            STXXL_DEBUGMSG("Warning: resizing nonempty BIDArray");
+            STXXL_MSG("Warning: resizing nonempty BIDArray");
             BID < BLK_SIZE > *tmp = array;
             array = new BID < BLK_SIZE >[newsize];
             memcpy ((void *)array, (void *)tmp,
