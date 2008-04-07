@@ -392,7 +392,7 @@ namespace priority_queue_local
         unsigned_type size_; // total number of elements stored
         // previously size_type nelements;
         unsigned logK; // log of current tree size
-        unsigned_type k; // invariant k = 1 << logK
+        unsigned_type k; // invariant k = 1 << logK, always a power of two
 
         //Element sentinel; // target of empty segment pointers
 
@@ -1028,7 +1028,7 @@ namespace priority_queue_local
 
         unsigned_type size_; // total number of elements stored
         unsigned logK; // log of current tree size
-        unsigned_type k; // invariant k = 1 << logK
+        unsigned_type k; // invariant k = 1 << logK, is a power of two
 
         Element sentinel; // target of free segment pointers
 
