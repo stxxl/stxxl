@@ -11,6 +11,7 @@
  ****************************************************************************/
 
 #include "stxxl/bits/namespace.h"
+#include "stxxl/bits/common/types.h"
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -88,7 +89,7 @@ public:
 };
 
 //! \internal, use LOG2 instead
-template <unsigned Input>
+template <unsigned_type Input>
 class LOG2_floor
 {
 public:
@@ -118,7 +119,7 @@ public:
     };
 };
 
-template <unsigned Input>
+template <unsigned_type Input>
 class LOG2
 {
 public:

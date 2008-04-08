@@ -42,7 +42,7 @@ int main()
     log_ipm1<1 << 16>();
     log_ipm1<1 << 24>();
     log_ipm1<1 << 30>();
-    log_ipm1<1 << 31>();
+    log_ipm1<1L << 31>();
 #if __WORDSIZE == 64
     log_ipm1<1L << 32>();
     log_ipm1<1L << 33>();
