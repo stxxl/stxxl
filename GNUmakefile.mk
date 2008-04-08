@@ -20,9 +20,6 @@ MCSTL	?= mcstl # undefine to disable
 
 default-all: lib tests header-compile-test
 
-doxy release:
-	$(MAKE) -f Makefile $@
-
 lib:
 	$(MAKE) -f Makefile library_$(MODE) $(if $(MCSTL),library_$(MODE)_mcstl)
 
@@ -37,4 +34,7 @@ clean:
 	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_mcstl clean_doxy
 	$(MAKE) -C test/compile-stxxl-headers clean
 
-.PHONY: all default-all doxy lib tests header-compile-test clean
+%::
+	$(MAKE) -f Makefile $@
+
+.PHONY: all default-all lib tests header-compile-test clean
