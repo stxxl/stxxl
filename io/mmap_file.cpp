@@ -13,13 +13,13 @@ void mmap_request::serve()
     stats * iostats = stats::get_instance();
     if (type == READ)
     {
- #ifdef STXXL_IO_STATS
+ #if STXXL_IO_STATS
         iostats->read_started (size());
  #endif
     }
     else
     {
- #ifdef STXXL_IO_STATS
+ #if STXXL_IO_STATS
         iostats->write_started (size());
  #endif
     }
@@ -102,13 +102,13 @@ void mmap_request::serve()
 
     if (type == READ)
     {
- #ifdef STXXL_IO_STATS
+ #if STXXL_IO_STATS
         iostats->read_finished ();
  #endif
     }
     else
     {
- #ifdef STXXL_IO_STATS
+ #if STXXL_IO_STATS
         iostats->write_finished ();
  #endif
     }

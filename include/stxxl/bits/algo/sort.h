@@ -676,7 +676,7 @@ namespace sort_local
         //STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+"
         //	   << partial_runs);
 
-#ifdef STXXL_IO_STATS
+#if STXXL_IO_STATS
         stats * iostats = stats::get_instance();
         iostats += 0;
         // iostats->reset();
@@ -807,7 +807,7 @@ namespace sort_local
 
         STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Run creation time: " <<
                        after_runs_creation - begin << " s");
-#ifdef STXXL_IO_STATS
+#if STXXL_IO_STATS
         STXXL_VERBOSE ("reads               : " << iostats->get_reads ());
         STXXL_VERBOSE ("writes              : " << iostats->get_writes ());
         STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s");
