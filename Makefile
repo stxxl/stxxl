@@ -69,6 +69,9 @@ doxy: Doxyfile
 clean_doxy:
 	$(RM) -r doc/doxy
 
+count:
+	sloccount --addlang makefile .
+
 # optional parameters:
 # DATE=""     if you *don't* want a -YYYYMMDD in the version
 # PHASE=snapshot|alpha#|beta#|rc#|release    (defaults to snapshot)
