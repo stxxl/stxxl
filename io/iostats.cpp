@@ -23,64 +23,6 @@ stats::stats () :
     last_reset(stxxl_timestamp())
 { }
 
-stats * stats::get_instance ()
-{
-    if (!instance)
-        instance = new stats ();
-
-    return instance;
-}
-
-unsigned stats::get_reads () const
-{
-    return reads;
-}
-
-unsigned stats::get_writes () const
-{
-    return writes;
-}
-
-int64 stats::get_read_volume () const
-{
-    return volume_read;
-}
-
-int64 stats::get_written_volume () const
-{
-    return volume_written;
-}
-
-double stats::get_read_time () const
-{
-    return t_reads;
-}
-
-double stats::get_write_time () const
-{
-    return t_writes;
-}
-
-double stats::get_pread_time() const
-{
-    return p_reads;
-}
-
-double stats::get_pwrite_time() const
-{
-    return p_writes;
-}
-
-double stats::get_pio_time() const
-{
-    return p_ios;
-}
-
-double stats::get_last_reset_time() const
-{
-    return last_reset;
-}
-
 void stats::reset()
 {
 #ifdef STXXL_BOOST_THREADS

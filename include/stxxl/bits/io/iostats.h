@@ -53,37 +53,84 @@ class stats : private noncopyable
 public:
     //! \brief Call this function in order to access an instance of stats
     //! \return pointer to an instance of stats
-    static stats * get_instance ();
+    static stats * get_instance ()
+    {
+        if (!instance)
+            instance = new stats ();
+
+        return instance;
+    }
+
     //! \brief Returns total number of reads
     //! \return total number of reads
-    unsigned get_reads () const;
+    unsigned get_reads () const
+    {
+        return reads;
+    }
+
     //! \brief Returns total number of writes
     //! \return total number of writes
-    unsigned get_writes () const;
+    unsigned get_writes () const
+    {
+        return writes;
+    }
+
     //! \brief Returns number of bytes read from disks
     //! \return number of bytes read
-    int64 get_read_volume () const;
+    int64 get_read_volume () const
+    {
+        return volume_read;
+    }
+
     //! \brief Returns number of bytes written to the disks
     //! \return number of bytes written
-    int64 get_written_volume () const;
+    int64 get_written_volume () const
+    {
+        return volume_written;
+    }
+
     //! \brief Time that would be spent in read syscalls if all parallel reads were serialized.
     //! \return seconds spent in reading
-    double get_read_time () const;
+    double get_read_time () const
+    {
+        return t_reads;
+    }
+
     //! \brief Time that would be spent in write syscalls if all parallel writes were serialized.
     //! \return seconds spent in writing
-    double get_write_time () const;
+    double get_write_time () const
+    {
+        return t_writes;
+    }
+
     //! \brief Period of time when at least one I/O thread was executing a read.
     //! \return seconds spent in reading
-    double get_pread_time() const;
+    double get_pread_time() const
+    {
+        return p_reads;
+    }
+
     //! \brief Period of time when at least one I/O thread was executing a write.
     //! \return seconds spent in writing
-    double get_pwrite_time() const;
+    double get_pwrite_time() const
+    {
+        return p_writes;
+    }
+
     //! \brief Period of time when at least one I/O thread was executing a read or a write.
     //! \return seconds spent in I/O
-    double get_pio_time() const;
+    double get_pio_time() const
+    {
+        return p_ios;
+    }
+
     //! \brief Return time of the last reset
     //! \return seconds passed from the last reset()
-    double get_last_reset_time() const;
+    double get_last_reset_time() const
+    {
+        return last_reset;
+    }
+
     //! \brief Resets I/O time counters (including I/O wait counter)
     void reset();
 
