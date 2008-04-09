@@ -23,7 +23,8 @@ WARNINGS	?= -Wall -w1 -openmp-report0 -vec-report0
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
-COMPILER	?= g++-4.2
+COMPILER_GCC	?= g++-4.2.3
+COMPILER	?= $(COMPILER_GCC)
 LIBNAME		?= mcstxxl
 # the root directory of your MCSTL installation
 MCSTL_ROOT	?= $(HOME)/work/mcstl
@@ -31,7 +32,8 @@ endif
 
 #BOOST_ROOT	?= /usr/local/boost-1.34.1
 
-COMPILER	?= g++
+COMPILER_GCC	?= g++
+COMPILER	?= $(COMPILER_GCC)
 LINKER		?= $(COMPILER)
 OPT		?= -O3 # compiler optimization level
 WARNINGS	?= -W -Wall
