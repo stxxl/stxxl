@@ -17,14 +17,14 @@ USE_ICPC	?= no	# will be overriden from main Makefile
 STXXL_ROOT	?= $(HOME)/work/stxxl
 
 ifeq ($(strip $(USE_ICPC)),yes)
-COMPILER	?= icpc
+COMPILER_ICPC	?= icpc
+COMPILER	?= $(COMPILER_ICPC)
 #ICPC_GCC	?= gcc-x.y    # override the gcc/g++ used to find headers and libraries
 WARNINGS	?= -Wall -w1 -openmp-report0 -vec-report0
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
 COMPILER_GCC	?= g++-4.2.3
-COMPILER	?= $(COMPILER_GCC)
 LIBNAME		?= mcstxxl
 # the root directory of your MCSTL installation
 MCSTL_ROOT	?= $(HOME)/work/mcstl
