@@ -29,7 +29,6 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation of file based on Windows native I/O calls
 class wincall_file : public wfs_file_base
 {
-protected:
 public:
     //! \brief constructs file object
     //! \param filename path of file
@@ -67,12 +66,6 @@ protected:
     void serve ();
 public:
     const char * io_type ();
-private:
-    // Following methods are declared but not implemented
-    // intentionally to forbid their usage
-    wincall_request(const wincall_request &);
-    wincall_request & operator=(const wincall_request &);
-    wincall_request();
 };
 
 

@@ -9,6 +9,7 @@
 #ifndef STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 #define STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 
+#include "stxxl/bits/noncopyable.h"
 #include "stxxl/bits/containers/btree/iterator.h"
 
 #include <map>
@@ -19,7 +20,7 @@ __STXXL_BEGIN_NAMESPACE
 namespace btree
 {
     template <class BTreeType>
-    class iterator_map
+    class iterator_map : private noncopyable
     {
     public:
         typedef BTreeType btree_type;
@@ -59,10 +60,6 @@ namespace btree
         typedef typename multimap_type::value_type pair_type;
         typedef typename multimap_type::iterator mmiterator_type;
         typedef typename multimap_type::const_iterator mmconst_iterator_type;
-
-        iterator_map();         // forbidden
-        iterator_map(const iterator_map &);         // forbidden
-        iterator_map & operator = (const iterator_map &);         // forbidden
 
 
         // changes btree pointer in all contained iterators

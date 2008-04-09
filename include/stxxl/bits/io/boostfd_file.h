@@ -31,8 +31,6 @@ public:
 protected:
     fd_type file_des;
     int mode_;
-private:
-    boostfd_file();
 public:
     boostfd_file(const std::string & filename, int mode, int disk = -1);
     fd_type get_file_des() const;
@@ -81,12 +79,6 @@ protected:
     int nwaiters (); // returns the number of waiters
     void check_aligning ();
     void serve ();
-
-    // Following methods are declared but not implemented
-    // intentionally to forbid their usage
-    boostfd_request(const boostfd_request &);
-    boostfd_request & operator=(const boostfd_request &);
-    boostfd_request();
 
 public:
     virtual ~boostfd_request ();

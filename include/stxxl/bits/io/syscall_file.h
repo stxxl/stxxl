@@ -21,7 +21,6 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation of file based on UNIX syscalls
 class syscall_file : public ufs_file_base
 {
-protected:
 public:
     //! \brief constructs file object
     //! \param filename path of file
@@ -59,12 +58,6 @@ protected:
     void serve ();
 public:
     const char * io_type ();
-private:
-    // Following methods are declared but not implemented
-    // intentionally to forbid their usage
-    syscall_request(const syscall_request &);
-    syscall_request & operator=(const syscall_request &);
-    syscall_request();
 };
 
 

@@ -26,8 +26,6 @@ protected:
     int file_des;               // file descriptor
     int mode_;             // open mode
     ufs_file_base (const std::string & filename, int mode, int disk);
-private:
-    ufs_file_base ();
 public:
     int get_file_des() const;
     ~ufs_file_base();

@@ -30,7 +30,7 @@ namespace btree
               unsigned RawLeafSize,
               class PDAllocStrategy
     >
-    class btree
+    class btree : private noncopyable
     {
     public:
         typedef KeyType key_type;
@@ -101,10 +101,6 @@ namespace btree
         root_node_type root_node_;
         iterator end_iterator;
 
-
-        btree();         // forbidden
-        btree(const btree &);         // forbidden
-        btree & operator = (const btree &);         // forbidden
 
         template <class BIDType>
         void insert_into_root(const std::pair<key_type, BIDType> & splitter)

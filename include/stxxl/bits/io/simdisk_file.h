@@ -30,7 +30,7 @@ __STXXL_BEGIN_NAMESPACE
 
  #define AVERAGE_SPEED (15 * 1024 * 1024)
 
-class DiskGeometry
+class DiskGeometry : private noncopyable
 {
     struct Zone
     {
@@ -135,19 +135,13 @@ protected:
                           b,
                           t,
                           on_cmpl)
-    { };
+    { }
     void serve ();
 public:
     inline const char * io_type ()
     {
         return "simdisk";
     }
-private:
-    // Following methods are declared but not implemented
-    // intentionally to forbid their usage
-    sim_disk_request(const sim_disk_request &);
-    sim_disk_request & operator=(const sim_disk_request &);
-    sim_disk_request();
 };
 
 //! \}

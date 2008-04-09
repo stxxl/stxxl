@@ -32,8 +32,6 @@ protected:
     HANDLE file_des;             // file descriptor
     int mode_;             // open mode
     wfs_file_base (const std::string & filename, int mode, int disk);
-private:
-    wfs_file_base ();
 public:
     HANDLE get_file_des() const;
     ~wfs_file_base();

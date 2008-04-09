@@ -70,12 +70,6 @@ public:
     {
         return "mmap";
     }
-private:
-    // Following methods are declared but not implemented
-    // intentionally to forbid their usage
-    mmap_request(const mmap_request &);
-    mmap_request & operator=(const mmap_request &);
-    mmap_request();
 };
 
 //! \}

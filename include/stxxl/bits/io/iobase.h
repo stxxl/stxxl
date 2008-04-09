@@ -124,11 +124,6 @@ struct default_completion_handler
 //! base on various file systems or even remote storage interfaces
 class file : private noncopyable
 {
-    //! \brief private constructor
-    //! \remark instantiation of file without id is forbidden
-    file ()
-    { };
-
 protected:
     int id;
 
@@ -329,12 +324,6 @@ public:
     }
 
 private:
-    // Following methods are declared but not implemented
-    // intentionally to forbid their usage
-    request(const request &);
-    request & operator=(const request &);
-    request();
-
     void add_ref()
     {
 #ifdef STXXL_BOOST_THREADS
