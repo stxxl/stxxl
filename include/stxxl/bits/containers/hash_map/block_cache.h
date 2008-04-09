@@ -8,8 +8,11 @@
 #ifndef STXXL_CONTAINERS_HASHMAP__BLOCK_CACHE_H
 #define STXXL_CONTAINERS_HASHMAP__BLOCK_CACHE_H
 
-#include <stxxl>
+#include "stxxl/bits/io/iobase.h"
+#include "stxxl/bits/mng/mng.h"
 
+#include "stxxl/bits/containers/btree/btree_pager.h"
+#include <ext/hash_map>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -20,7 +23,7 @@ namespace hash_map
 	class block_cache
 	{		
 		public:
-			typedef BlockType_                      block_type;
+			typedef BlockType                       block_type;
 			typedef typename block_type::bid_type   bid_type;
 			typedef typename block_type::value_type subblock_type;
 			typedef typename subblock_type::bid_type subblock_bid_type;
@@ -241,7 +244,7 @@ namespace hash_map
 				n_read++;
 				
 				// block (partly) cached?
-				typename bid_map_type::const_iterator it = _bid_map.find(bid);
+				typename bid_map_type::const_iterator it = bid_map_.find(bid);
 				if (it != bid_map_.end())
 				{
 					i_block = (*it).second;
@@ -251,8 +254,11 @@ namespace hash_map
 					if (valid_subblock_[i_block] == valid_all || valid_subblock_[i_block] == i_subblock)
 					{
 						++n_found;
-						if (valid_subblock_[i_block] == valid_all && reqs_[i_block].valid()) 
-							reqs_[i_block]->poll() || reqs_[i_block]->wait();
+						if (valid_subblock_[i_block] == valid_all && reqs_[i_block].valid())
+						{
+							if (reqs_[i_block]->poll() == false)	// request not yet completed
+								reqs_[i_block]->wait();
+						}
 						
 						return &((*block)[i_subblock]);
 					}
@@ -308,7 +314,7 @@ namespace hash_map
 					i_block = (*it).second;
 					
 					// complete block cached; we can finish here
-					if (valid_subblock_[i_block] == valid_all)
+					if (valid_subblock_[i_block] == valid_all) {
 						pager_.hit(i_block);
 						return;
 					}
@@ -411,22 +417,22 @@ namespace hash_map
 //		private:
 			/* show currently cached blocks */
 			void __dump_cache() const {
-				for (unsigned i = 0; i < _blocks.size(); i++) {
-					bid_type bid = _bids[i];
-					if (_bid_map.count(bid) == 0) {
+				for (unsigned i = 0; i < blocks_.size(); i++) {
+					bid_type bid = bids_[i];
+					if (bid_map_.count(bid) == 0) {
 						std::cout << "Block " << i << ": empty\n";
 						continue;
 					}
 					
-					std::cout << "Block " << i << ": bid=" << _bids[i] << " dirty=" << _dirty[i] << " retain_count=" << _retain_count[i] << " valid_subblock=" << _valid_subblock[i] << "\n";
+					std::cout << "Block " << i << ": bid=" << bids_[i] << " dirty=" << dirty_[i] << " retain_count=" << retain_count_[i] << " valid_subblock=" << valid_subblock_[i] << "\n";
 					for (unsigned k = 0; k < block_type::size; k++) {
 						std::cout << "  Subbblock " << k << ": ";
-						if (_valid_subblock[i] != valid_all && _valid_subblock[i] != k) {
+						if (valid_subblock_[i] != valid_all && valid_subblock_[i] != k) {
 							std::cout << "not valid\n";
 							continue;
 						}
 						for (unsigned l = 0; l < block_type::value_type::size; l++) {
-							std::cout << "(" << (*_blocks[i])[k][l].first << ", " << (*_blocks[i])[k][l].second << ") ";
+							std::cout << "(" << (*blocks_[i])[k][l].first << ", " << (*blocks_[i])[k][l].second << ") ";
 						}
 						std::cout << std::endl;
 					}
