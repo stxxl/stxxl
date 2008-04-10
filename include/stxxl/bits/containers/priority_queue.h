@@ -2142,7 +2142,7 @@ int_type priority_queue<Config_>::makeSpaceAvailable(int_type level)
             else // from external to external tree
             {
                 const size_type segmentSize = etree[level - IntLevels].size();
-                STXXL_VERBOSE0("Inserting segment into second level external: " << level << " " << segmentSize);
+                STXXL_VERBOSE1("Inserting segment into second level external: " << level << " " << segmentSize);
                 etree[level - IntLevels + 1].insert_segment(etree[level - IntLevels], segmentSize);
             }
         }

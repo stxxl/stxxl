@@ -63,7 +63,9 @@ inline void UNUSED(const U &)
 #define STXXL_VERBOSE_LEVEL -1
 #endif
 
-//STXXL_VERBOSE0 should be used for debugging the initial code, and never get into a release.
+// STXXL_VERBOSE0 should be used for current debugging activity only,
+// and afterwards be replaced by STXXL_VERBOSE1 or higher.
+// Code that actively uses STXXL_VERBOSE0 should never get into a release.
 
 #if STXXL_VERBOSE_LEVEL > -1
  #define STXXL_VERBOSE0(x) \
