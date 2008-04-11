@@ -6,8 +6,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl.h"
 #include <limits>
+#include <stxxl/priority_queue>
 
 #define RECORD_SIZE 128
 

@@ -6,7 +6,9 @@
  *  Email
  ****************************************************************************/
 
-#include "stxxl.h"
+#include <stxxl/vector>
+#include <stxxl/map>
+#include <stxxl/timer>
 
 ///// BDB header ////////////
 #include <db_cxx.h>

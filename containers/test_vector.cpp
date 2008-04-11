@@ -1,13 +1,14 @@
-#include "stxxl.h"
 #include <iostream>
 #include <algorithm>
+#include <stxxl/vector>
+#include <stxxl/algorithm>
 
 //! \example containers/test_vector.cpp
 //! This is an example of use of \c stxxl::vector and
 //! \c stxxl::VECTOR_GENERATOR. Vector type is configured
 //! to store 64-bit integers and have 2 pages each of 1 block
 
-using namespace stxxl;
+typedef stxxl::int64 int64;
 
 struct counter
 {
@@ -42,7 +43,7 @@ int main()
     try
     {
         // use non-randomized striping to avoid side effects on random generator
-        typedef stxxl::VECTOR_GENERATOR < int64, 2, 2, (2 * 1024 * 1024), striping > ::result vector_type;
+        typedef stxxl::VECTOR_GENERATOR < int64, 2, 2, (2 * 1024 * 1024), stxxl::striping > ::result vector_type;
         vector_type v(int64 (64 * 1024 * 1024) / sizeof(int64));
 
         // test assignment const_iterator = iterator

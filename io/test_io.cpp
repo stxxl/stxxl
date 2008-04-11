@@ -6,7 +6,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl.h"
+#include <stxxl/io>
+#include "stxxl/bits/common/aligned_alloc.h"
 
 //! \example io/test_io.cpp
 //! This is an example of use of \c \<stxxl\> files, requests, and

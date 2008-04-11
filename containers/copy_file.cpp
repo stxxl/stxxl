@@ -1,4 +1,5 @@
-#include "stxxl.h"
+#include <stxxl/io>
+#include <stxxl/vector>
 
 typedef unsigned char my_type;
 

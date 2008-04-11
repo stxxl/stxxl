@@ -6,7 +6,7 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
-#include "stxxl.h"
+#include <stxxl/priority_queue>
 
 using namespace stxxl;
 

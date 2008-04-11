@@ -6,7 +6,7 @@
  *  Email
  ****************************************************************************/
 
-#include "stxxl.h"
+#include <stxxl/priority_queue>
 
 #define TOTAL_PQ_MEM_SIZE    (768 * 1024 * 1024)
 
