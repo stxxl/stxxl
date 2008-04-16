@@ -49,7 +49,8 @@
  *
  * \section download Download
  *
- * - Download gzipped tar ball from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl.tgz">here</A>.
+ * - Download the latest gzipped tarball from
+ *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl ,
  * - Change \c make.settings.g++ or \c make.settings.local file according to your system configuration
@@ -145,7 +146,8 @@
  * \section download Download
  *
  * - Install the <a href="http://www.boost.org">Boost</a> libraries (required).
- * - Download the \c Stxxl zip file from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl.zip">here</A>.
+ * - Download the latest \c Stxxl zip file from
+ *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407">SourceForge</A>.
  * - Unpack the zip file in some directory (e.g. \c 'c:\\'),
  * - Change to \c stxxl directory: \c cd \c stxxl ,
  * - Change \c make.settings.msvc file according to your system configuration
@@ -247,7 +249,8 @@
  *
  * \section download Download
  *
- * - Download gzipped tar ball from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl.tgz">here</A>.
+ * - Download the latest gzipped tarball from
+ *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl ,
  * - Change \c make.settings.g++ or \c make.settings.local file according to your system configuration
@@ -344,7 +347,8 @@
  *
  * \section download Download
  *
- * - Download gzipped tar ball from <A href="http://i10www.ira.uka.de/dementiev/files/stxxl_0.77.tgz">here</A>.
+ * - Download stxxl_0.77.tgz from
+ *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407&release_id=541515">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl_0.77.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl ,
  * - Change file \c compiler.make according to your system configuration
