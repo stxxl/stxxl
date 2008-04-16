@@ -3,6 +3,7 @@
 
 usage:
 	@echo "Choose one of the goals:"
+	@echo "    config_gnu"
 	@echo "    library_g++ library_g++_mcstl library_icpc library_icpc_mcstl library_msvc"
 	@echo "    tests_g++   tests_g++_mcstl   tests_icpc   tests_icpc_mcstl   tests_msvc"
 	@echo "    clean_g++   clean_g++_mcstl   clean_icpc   clean_icpc_mcstl   clean_msvc"
@@ -14,6 +15,10 @@ settings_gnu:
 
 settings_msvc:
 	copy make.settings.msvc make.settings
+
+
+config_gnu: settings_gnu
+	$(MAKE) -f Makefile.gnu config
 
 
 library_g++: settings_gnu

@@ -137,7 +137,9 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407">SourceForge</A>.
  * - Unpack in some directory executing: \c tar \c zfxv \c stxxl-x.y.z.tgz ,
  * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z ,
- * - Change \c make.settings.gnu or \c make.settings.local file according to your system configuration:
+ * - Run: \verbatim make config_gnu \endverbatim to create a template \c make.settings.local file.
+ *   Note: this will produce some warnings and abort with an error, which is intended.
+ * - Change the \c make.settings.local file according to your system configuration:
  *   - \c S<small>TXXL</small> root directory \c STXXL_ROOT variable
  *     ( \c directory_where_you_unpacked_the_tar_ball/stxxl-x.y.z )
  *   - if you want \c S<small>TXXL</small> to use <A href="http://www.boost.org">Boost</A> libraries
@@ -152,6 +154,8 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
  *     if you want to produce a debug version of the Stxxl library or Stxxl examples
+ *   - for more variables to tune take a look at \c make.settings.gnu ,
+ *     they are usually overridden by settings in \c make.settings.local
  * - Run: \verbatim make library_g++ \endverbatim
  * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
  *

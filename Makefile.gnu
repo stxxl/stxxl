@@ -27,6 +27,9 @@ stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_BOOST)
 stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_BOOST)
 endif
 
+# dummy target for initial creation of make.settings.local
+config:
+
 lib-in-lib:
 	@# nothing to compile
 lib-in-%:
@@ -139,4 +142,4 @@ release:
 endif
 
 
-.PHONY: main library library-fast tests clean release
+.PHONY: main config library library-fast tests clean release
