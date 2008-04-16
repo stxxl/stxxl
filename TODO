@@ -9,3 +9,7 @@
   specified location.
 
 * BUG: timer::timestamp() is non-monotonic, boost::posix_time::microsec_clock::local_time().time_of_day() resets on midnight
+
+* g++ 4.3 parallel_mode support
+
+* replace build system, something with '$LIBNAME-config --libs --cflags ...' would be nice
