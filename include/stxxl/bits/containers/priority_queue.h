@@ -5,6 +5,8 @@
  *            priority_queue.h
  *
  *  Thu Jul  3 15:22:50 2003
+ *  Copyright  1999  Peter Sanders
+ *  sanders@mpi-sb.mpg.de
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
