@@ -480,7 +480,7 @@ is not finished yet.}.
 
 \begin{figure}[hb]
 \begin{center}
-\includegraphics[width=8cm]{logo1.eps}
+\includegraphics[width=8cm]{logo1}
 \end{center}
 \vspace*{-0.3cm}
 \caption{\label{stxxlstructure}The \stxxl library structure}
@@ -608,7 +608,7 @@ cache.
 
 \begin{figure}[hb]
 \begin{center}
-\includegraphics[width=11cm]{vector.eps}
+\includegraphics[width=11cm]{vector}
 \end{center}
 \vspace*{-0.3cm}
 \caption{\label{xvectorschema} The schema of \xvector\ that consists
@@ -634,7 +634,7 @@ reference.
 If one needs only to sequentially write elements to the vector in
 $n/B$ I/Os the 
 currently fastest method is \texttt{stxxl::generate} (see section
-\ref{generate}). Sequential writing to an untouched before 
+\ref{stxxl::generate}). Sequential writing to an untouched before 
 vector\footnote{For example writing in the vector that has been
 created using 
 \texttt{vector(size\_type n)} constructor.} or alone 
@@ -2019,7 +2019,7 @@ This measures save constant factors both in I/O volume and internal
 work. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 \subsection{\texttt{stxxl::generate}}
-\label{generate}
+\label{stxxl::generate}
 The semantics of the algorithm is equivalent to the STL
 \texttt{std::generate}. 
 
@@ -2199,7 +2199,7 @@ int main()
 \end{lstlisting}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 \subsection{\texttt{stxxl::find}}
-\label{generate}
+\label{stxxl::find}
 The semantics of the algorithm is equivalent to the STL
 \texttt{std::find}.
 

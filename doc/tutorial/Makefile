@@ -15,4 +15,7 @@ spell:
 clean:
 	rm -rf *.bbl *.aux *~ *.dvi *.log *.toc *.blg *.idx
 
+distclean: clean
+	$(RM) tutorial.pdf
+
 .PHONY: all tutorial spell clean
