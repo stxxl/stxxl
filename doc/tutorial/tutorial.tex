@@ -419,7 +419,8 @@ int main(int argc, char * argv[])
   // open bill file for output
   std::fstream out(argv[3],std::ios::out);
   // scan the vector and output bills
-  // the last parameter tells
+  // the last parameter tells how many buffers 
+  // to use for overlapping I/O and computation
   @stxxl@::for_each(v.begin(),v.end(),ProduceBill(out)@,2@);
   return 0;
 }
