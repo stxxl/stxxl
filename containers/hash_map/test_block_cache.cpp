@@ -6,7 +6,7 @@
 
 bool test_block_cache() {
 	try {
-		const int subblock_size = 4;	// size in values
+/*		const int subblock_size = 4;	// size in values
 		const int block_size = 2;		// size in subblocks
 		const int num_blocks = 64;
 		
@@ -19,7 +19,25 @@ bool test_block_cache() {
 		typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
 		typedef stxxl::typed_block<block_size*sizeof(subblock_type), subblock_type> block_type;
 		typedef block_type::bid_type bid_type;
+		typedef std::vector<bid_type> bid_container_type;*/
+		
+		typedef std::pair<int, int> value_type;
+		
+		const int subblock_raw_size = 1024*8;	// 8KB subblocks
+		const int block_size = 128;				// 1MB blocks (=128 subblocks)
+		
+		const int num_blocks = 64;		// number of blocks to use for this test
+		const int cache_size = 8;		// size of cache in blocks
+
+		
+		typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
+		typedef stxxl::typed_block<block_size*sizeof(subblock_type), subblock_type> block_type;
+		
+		const int subblock_size = subblock_type::size;	// size in values
+		
+		typedef block_type::bid_type bid_type;
 		typedef std::vector<bid_type> bid_container_type;
+		
 
 		// prepare test: allocate blocks, fill them with values and write to disk
 		bid_container_type bids(num_blocks);
@@ -63,7 +81,6 @@ bool test_block_cache() {
 			
 			cache.prefetch_block(bids[i_block]);
 			subblock_type * subblock = cache.get_subblock(bids[i_block], i_subblock);
-//			std::cout << (*subblock)[1].first << std::endl;
 			int expected = i_block*block_size + i_subblock*subblock_size + 1;
 			assert((*subblock)[1].first == expected);
 		}
@@ -94,12 +111,18 @@ bool test_block_cache() {
 		cache.clear();
 		assert(cache.retain_block(bids[0]) == false); // not yet cached
 		cache.prefetch_block(bids[0]);
-		assert(cache.retain_block(bids[0]) == true);
-		assert(cache.release_block(bids[0]) == true);
-		assert(cache.release_block(bids[0]) == false);
+		assert(cache.retain_block(bids[0]) == true);   // cached, should be retained
+		assert(cache.release_block(bids[0]) == true);  // release again
+		assert(cache.release_block(bids[0]) == false); // retrain-count should be 0, release fails
+		
+		subblock_type * kicked_subblock = cache.get_subblock(bids[1], 0);	// cache new block
+		for (int i = 0; i < cache_size+5; i++) {	// load other blocks, so that kicked_subblock, well, gets kicked
+			cache.prefetch_block(bids[i+3]);
+		}
+		assert(cache.get_subblock(bids[1], 0) != kicked_subblock);	// load kicked subblock again, should be at a different location
 		
 		subblock_type * retained_subblock = cache.get_subblock(bids[1], 0);
-		assert(cache.retain_block(bids[1]) == true);
+		assert(cache.retain_block(bids[1]) == true);	// now retain subblock
 		for (int i = 0; i < cache_size+5; i++) {
 			cache.prefetch_block(bids[i+3]);
 		}
@@ -110,11 +133,9 @@ bool test_block_cache() {
 		subblock_type * a_subblock = cache.get_subblock(bids[6], 1);
 		cache_type cache2(cache_size/2);
 		std::swap(cache, cache2);
+		assert(cache.size() == cache_size/2);
+		assert(cache2.size() == cache_size);
 		assert(cache2.get_subblock(bids[6], 1) == a_subblock);
-		
-		
-		cache.__dump_cache();
-		
 	}
 	catch(...) {
 		STXXL_MSG("Cought unknown exception.")
