@@ -565,7 +565,7 @@ the I/O worst case complexity of the \xvector.
 \label{rtvector}
 \begin{tabular}{|l|c|c|}
 \hline
-                    & int. work & I/O \\
+                    & int. work & I/O (worst case) \\
 \hline\hline
 random access       & $\Oh{1}$ & $\Oh{1}$\\
 \hline
@@ -967,7 +967,7 @@ Table~\ref{rtstack}.
 \label{rtstack}
 \begin{tabular}{|l|c|c|}
 \hline
-                    & int. work & I/O \\
+                    & int. work & I/O (amortized)\\
 \hline\hline
 insertion at the end& $\Oh{1}$ & $\Oh{1/DB}$\\
 \hline
@@ -1368,12 +1368,12 @@ well in practice for multi-disk configuration.
 
 \begin{table}[h]
 \begin{center}
-\caption{Amortized running times of the basic operations of \xpqueue
+\caption{Amortized running times of the basic operations of \xpqueue{}
 in terms of $I =$ the number of performed operations.}
 \label{rtpqueue}
 \begin{tabular}{|l|c|c|}
 \hline
-                    & int. work & I/O \\
+                    & int. work & I/O (amortized)\\
 \hline\hline
 insertion           & $\Oh{\log I}$ & $\Oh{1/B}$\\
 \hline
