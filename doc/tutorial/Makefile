@@ -2,6 +2,12 @@ all: tutorial
 
 tutorial: tutorial.pdf
 
+# try to use rules from LaTeX.mk (from latex-utils package)
+-include LaTeX.mk
+
+ifeq (,$(LU_UTILS))
+# if LaTeX.mk is not available, fallback to our own rules
+
 tutorial.pdf: tutorial.tex tutorial.bib
 	latex tutorial
 	bibtex tutorial
@@ -9,13 +15,26 @@ tutorial.pdf: tutorial.tex tutorial.bib
 	latex tutorial
 	dvipdf tutorial
 
-spell:
-	ispell -d american tutorial.tex
-
 clean:
 	rm -rf *.bbl *.aux *~ *.dvi *.log *.toc *.blg *.idx
 
 distclean: clean
 	$(RM) tutorial.pdf
 
-.PHONY: all tutorial spell clean
+.PHONY: clean
+
+else
+# automatically generate .pdf versions of the figures, needed by pdflatex
+
+tutorial.pdf: logo1.pdf vector.pdf
+
+clean::
+	$(RM) logo1.pdf vector.pdf
+
+endif
+
+
+spell:
+	ispell -d american tutorial.tex
+
+.PHONY: all tutorial spell
