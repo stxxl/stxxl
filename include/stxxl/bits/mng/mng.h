@@ -1327,9 +1327,14 @@ void block_manager::delete_blocks (
     }
 }
 
+#ifndef STXXL_DEFAULT_ALLOC_STRATEGY
+    #define STXXL_DEFAULT_ALLOC_STRATEGY RC
+#endif
 
-  #define STXXL_DEFAULT_ALLOC_STRATEGY RC
-  #define STXXL_DEFAULT_BLOCK_SIZE(type) (2 * 1024 * 1024) // use traits
+// in bytes
+#ifndef STXXL_DEFAULT_BLOCK_SIZE
+    #define STXXL_DEFAULT_BLOCK_SIZE(type) (2 * 1024 * 1024) // use traits
+#endif
 
 //! \}
 
