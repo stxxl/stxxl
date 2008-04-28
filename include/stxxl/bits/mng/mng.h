@@ -415,7 +415,7 @@ public:
     {
         array = new BID < BLK_SIZE >[size];
     };
-    unsigned_type size ()
+    unsigned_type size () const
     {
         return _size;
     }
@@ -839,7 +839,7 @@ class config : private noncopyable
 public:
     //! \brief Returns number of disks available to user
     //! \return number of disks
-    inline unsigned disks_number()
+    inline unsigned disks_number() const
     {
         return disks_props.size ();
     }
@@ -847,20 +847,20 @@ public:
     //! \brief Returns path of disks
     //! \param disk disk's identifier
     //! \return string that contains the disk's path name
-    inline const std::string & disk_path (int disk)
+    inline const std::string & disk_path (int disk) const
     {
         return disks_props[disk].path;
     }
     //! \brief Returns disk size
     //! \param disk disk's identifier
     //! \return disk size in bytes
-    inline stxxl::int64 disk_size (int disk)
+    inline stxxl::int64 disk_size (int disk) const
     {
         return disks_props[disk].size;
     }
     //! \brief Returns name of I/O implementation of particular disk
     //! \param disk disk's identifier
-    inline const std::string & disk_io_impl (int disk)
+    inline const std::string & disk_io_impl (int disk) const
     {
         return disks_props[disk].io_impl;
     }
@@ -1079,7 +1079,7 @@ struct offset_allocator
     //! \param offset_ offset
     //! \param base_ used to create a copy
     offset_allocator(int_type offset_, BaseAllocator_ & base_) : base(base_), offset(offset_) { }
-    int operator() (int_type i)
+    int operator() (int_type i) const
     {
         return base(offset + i);
     }
