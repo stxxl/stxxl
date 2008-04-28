@@ -115,7 +115,7 @@ void random_shuffle(   ExtIterator_ first,
                        ExtIterator_ beyond,
                        RandomNumberGenerator_ & rand,
                        unsigned_type M,
-                       AllocStrategy_ AS = stxxl::RC())
+                       AllocStrategy_ AS = STXXL_DEFAULT_ALLOC_STRATEGY())
 {
     typedef typename ExtIterator_::value_type value_type;
     typedef typename stxxl::STACK_GENERATOR < value_type, stxxl::external,
