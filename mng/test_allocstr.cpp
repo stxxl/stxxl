@@ -31,5 +31,11 @@ int main ()
     test_strategy<stxxl::FR>();
     test_strategy<stxxl::SR>();
     test_strategy<stxxl::RC>();
+    STXXL_MSG("Regular disks: [" << cfg->regular_disk_range().first << "," << cfg->regular_disk_range().second << ")");
+    if (cfg->regular_disk_range().first != cfg->regular_disk_range().second)
+        test_strategy<stxxl::RC_disk>();
+    STXXL_MSG("Flash devices: [" << cfg->flash_range().first << "," << cfg->flash_range().second << ")");
+    if (cfg->flash_range().first != cfg->flash_range().second)
+        test_strategy<stxxl::RC_flash>();
     test_strategy<stxxl::single_disk>();
 }

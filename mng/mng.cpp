@@ -37,6 +37,7 @@ config * config::get_instance ()
 config::config (const char * config_path)
 {
     STXXL_MSG(stxxl::get_version_string());
+    std::vector<DiskEntry> flash_props;
     std::ifstream cfg_file (config_path);
     if (!cfg_file)
     {
@@ -69,17 +70,21 @@ config::config (const char * config_path)
         while (cfg_file >> line)
         {
             std::vector < std::string > tmp = split (line, "=");
+            bool is_disk;
 
             if (tmp[0][0] == '#')
             { }
-            else if (tmp[0] == "disk")
+            else if ((is_disk = (tmp[0] == "disk")) || tmp[0] == "flash")
             {
                 tmp = split (tmp[1], ",");
                 DiskEntry entry = {
                     tmp[0], tmp[2],
                     stxxl::int64 (str2int (tmp[1])) * stxxl::int64 (1024 * 1024)
                 };
-                disks_props.push_back (entry);
+                if (is_disk)
+                    disks_props.push_back (entry);
+                else
+                    flash_props.push_back (entry);
             }
             else
             {
@@ -89,6 +94,10 @@ config::config (const char * config_path)
         }
         cfg_file.close ();
     }
+
+    // put flash devices after regular disks
+    first_flash = disks_props.size();
+    disks_props.insert(disks_props.end(), flash_props.begin(), flash_props.end());
 
     if (disks_props.empty ())
     {

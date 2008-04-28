@@ -834,6 +834,9 @@ class config : private noncopyable
         stxxl::int64 size;
     };
     std::vector < DiskEntry > disks_props;
+    
+    // in disks_props, flash devices come after all regular disks
+    unsigned first_flash;
 
     config (const char *config_path = "./.stxxl");
 public:
@@ -842,6 +845,20 @@ public:
     inline unsigned disks_number() const
     {
         return disks_props.size ();
+    }
+
+    //! \brief Returns contiguous range of regular disks w/o flash devices in the array of all disks
+    //! \return range [begin, end) of regular disk indices
+    inline std::pair<unsigned, unsigned> regular_disk_range() const
+    {
+        return std::pair<unsigned, unsigned>(0, first_flash);
+    }
+
+    //! \brief Returns contiguous range of flash devices in the array of all disks
+    //! \return range [begin, end) of flash device indices
+    inline std::pair<unsigned, unsigned> flash_range() const
+    {
+        return std::pair<unsigned, unsigned>(first_flash, disks_props.size());
     }
 
     //! \brief Returns path of disks
@@ -1039,6 +1056,30 @@ struct RC : public striping
     static const char * name()
     {
         return "randomized cycling striping";
+    }
+};
+
+struct RC_disk : public RC 
+{
+    RC_disk (int b, int e) : RC (b, e)
+    { }
+    RC_disk () : RC(config::get_instance()->regular_disk_range().first, config::get_instance()->regular_disk_range().second)
+    { }
+    static const char * name()
+    {
+        return "Randomized cycling striping on regular disks";
+    }
+};
+
+struct RC_flash : public RC 
+{
+    RC_flash (int b, int e) : RC (b, e)
+    { }
+    RC_flash () : RC(config::get_instance()->flash_range().first, config::get_instance()->flash_range().second)
+    { }
+    static const char * name()
+    {
+        return "Randomized cycling striping on flash devices";
     }
 };
 
