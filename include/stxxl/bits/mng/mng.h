@@ -844,11 +844,6 @@ public:
         return disks_props.size ();
     }
 
-    inline unsigned ndisks()
-    {
-        return disks_props.size ();
-    }
-
     //! \brief Returns path of disks
     //! \param disk disk's identifier
     //! \return string that contains the disk's path name

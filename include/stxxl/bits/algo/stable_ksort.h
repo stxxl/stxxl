@@ -236,7 +236,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     assert(2 * block_type::raw_size <= M);
     const unsigned_type write_buffers_multiple = 2;
     const unsigned_type read_buffers_multiple = 2;
-    const unsigned_type ndisks = cfg->ndisks();
+    const unsigned_type ndisks = cfg->disks_number();
     const unsigned_type nmaxbuckets = m - (write_buffers_multiple + read_buffers_multiple) * ndisks;
     const unsigned_type lognbuckets = static_cast<unsigned_type>(log2(double (nmaxbuckets)));
     const unsigned_type nbuckets = 1 << lognbuckets;
