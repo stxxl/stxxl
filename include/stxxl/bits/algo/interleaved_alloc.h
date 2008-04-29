@@ -142,6 +142,20 @@ struct interleaved_alloc_traits<RC>
 };
 
 template <>
+struct interleaved_alloc_traits<RC_disk>
+{
+    // FIXME! HACK!
+    typedef interleaved_RC strategy;
+};
+
+template <>
+struct interleaved_alloc_traits<RC_flash>
+{
+    // FIXME! HACK!
+    typedef interleaved_RC strategy;
+};
+
+template <>
 struct interleaved_alloc_traits<single_disk>
 {
     typedef first_disk_only strategy;
