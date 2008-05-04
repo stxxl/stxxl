@@ -9,11 +9,15 @@
 #define _STXXL_HASH_MAP_H_
 
 
-#include <stxxl>
+#include "stxxl/bits/io/iobase.h"
+#include "stxxl/bits/mng/mng.h"
 
-#include "util.h"
-#include "block_cache.h"
-#include "iterator.h"
+#include "stxxl/bits/containers/hash_map/iterator.h"
+#include "stxxl/bits/containers/hash_map/iterator_map.h"
+#include "stxxl/bits/containers/hash_map/block_cache.h"
+#include "stxxl/bits/containers/hash_map/util.h"
+
+
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -85,25 +89,25 @@ public:
 	
 //private:
 #pragma mark members
-	size_type _num_total;					/* (estimated) number of values */
-	bool _oblivious;						/* false if the total-number of values is correct (false) or true if estimated (true); see *_oblivious-methods  */
+	mutable size_type num_total_;					/* (estimated) number of values */
+	mutable bool oblivious_;						/* false if the total-number of values is correct (false) or true if estimated (true); see *oblivious_-methods  */
 
-	float _opt_load_factor;					/* desired load factor after rehashing */
+	float opt_load_factor_;					/* desired load factor after rehashing */
 
-	node_allocator_type _node_allocator;	/* used to allocate new nodes for internal buffer */
+	node_allocator_type node_allocator_;	/* used to allocate new nodes for internal buffer */
 
-	hasher _hash;						/* user supplied mother hash-function */
-	keycmp _cmp;						/* user supplied strict-weak-ordering for keys */
+	hasher hash_;						/* user supplied mother hash-function */
+	keycmp cmp_;						/* user supplied strict-weak-ordering for keys */
   
-	buckets_container_type _buckets;	/* array of bucket */
-	bid_container_type     _bids;		/* blocks-ids of allocated blocks  */
+	buckets_container_type buckets_;	/* array of bucket */
+	bid_container_type     bids_;		/* blocks-ids of allocated blocks  */
   
-	size_type _buffer_size;				/* size of internal-memory buffer in number of entries */
-	size_type _max_buffer_size;			/* maximum size for internal-memory buffer */
+	size_type buffer_size_;				/* size of internal-memory buffer in number of entries */
+	size_type max_buffer_size_;			/* maximum size for internal-memory buffer */
 	
-	iterator_map_type _iterator_map;	/* keeps track of all active iterators */
+	iterator_map_type iterator_map_;	/* keeps track of all active iterators */
 	
-	block_cache_type _block_cache;		/* */
+	mutable block_cache_type block_cache_;		/* */
 
   
 public:
@@ -114,24 +118,24 @@ public:
 	//! \param cmp comparator-object
 	//! \param buffer_size size for internal-memory buffer in bytes
 	hash_map(size_type n = 10000, const hasher & hf = hasher(), const keycmp& cmp = keycmp(), size_type buffer_size = 100*1024*1024, const Alloc_& a = Alloc_()) :
-		_hash(hf),
-		_cmp(cmp),
-		_buckets(n),
-		_bids(0),
-		_buffer_size(0),
-		_iterator_map(this),
+		hash_(hf),
+		cmp_(cmp),
+		buckets_(n),
+		bids_(0),
+		buffer_size_(0),
+		iterator_map_(this),
 #ifdef PLAY_WITH_PREFETCHING
-		_block_cache(tuning::get_instance()->blockcache_size),
+		block_cache_(tuning::get_instance()->blockcache_size),
 #else
-		_block_cache(config::get_instance()->disks_number()*12),
+		block_cache_(config::get_instance()->disks_number()*12),
 #endif
 
-		_node_allocator(a),
-		_oblivious(false),
-		_num_total(0),
-		_opt_load_factor(0.875)
+		node_allocator_(a),
+		oblivious_(false),
+		num_total_(0),
+		opt_load_factor_(0.875)
 	{
-		_max_buffer_size = buffer_size / sizeof(node_type);
+		max_buffer_size_ = buffer_size / sizeof(node_type);
 	}
 	
 	
@@ -141,24 +145,24 @@ public:
 	//! \param mem_to_sort additional memory (in bytes) for bulk-insert
 	template <class InputIterator>
 	hash_map(InputIterator f, InputIterator l, size_type mem_to_sort = 256*1024*1024, size_type n = 10000, const hasher& hf = hasher(), const keycmp& cmp = keycmp(), size_type buffer_size = 100*1024*1024, const Alloc_& a = Alloc_()) :
-		_hash(hf),
-		_cmp(cmp),
-		_buckets(n),
-		_bids(0),
-		_buffer_size(0),
-		_iterator_map(this),
+		hash_(hf),
+		cmp_(cmp),
+		buckets_(n),
+		bids_(0),
+		buffer_size_(0),
+		iterator_map_(this),
 #ifdef PLAY_WITH_PREFETCHING
-		_block_cache(tuning::get_instance()->blockcache_size),
+		block_cache_(tuning::get_instance()->blockcache_size),
 #else
-		_block_cache(config::get_instance()->disks_number()*12),
+		block_cache_(config::get_instance()->disks_number()*12),
 #endif
-		_node_allocator(a),
-		_oblivious(false),
-		_num_total(0),
-		_opt_load_factor(0.875)
+		node_allocator_(a),
+		oblivious_(false),
+		num_total_(0),
+		opt_load_factor_(0.875)
 	{
-		 _max_buffer_size = buffer_size / sizeof(node_type);
-		 insert(f, l, mem_to_sort);
+		max_buffer_size_ = buffer_size / sizeof(node_type);
+		insert(f, l, mem_to_sort);
 	}
 	
 	
@@ -180,36 +184,36 @@ private:
 public:
 #pragma mark observers
 	//! \brief Hash-function used by this hash-map
-	hasher hash_function() const { return _hash; }
+	hasher hash_function() const { return hash_; }
 	
 	//! \brief Strict-weak-ordering used by this hash-map
-	keycmp key_cmp()       const { return _cmp; }
+	keycmp key_cmp()       const { return cmp_; }
 
 
 #pragma mark size & capacity
 	bool empty() const { return size() != 0; }
 
 private:
-	/* After using *_oblivious-methods only an estimate for the total number of elements can be given.
+	/* After using *oblivious_-methods only an estimate for the total number of elements can be given.
 	   This method accesses external memory to calculate the exact number.
 	*/
-	void __make_conscious()
+	void __make_conscious() /* const */ // todo: make const again
 	{
-		if (!_oblivious)
+		if (!oblivious_)
 			return;
 
 		typedef HashedValuesStream<self_type, reader_type> values_stream_type;
 
-		reader_type reader(_bids.begin(), _bids.end(), &_block_cache);	//will start prefetching automatically
-		values_stream_type values(_buckets.begin(), _buckets.end(), _bids.begin(), reader, this);
+		reader_type reader(bids_.begin(), bids_.end(), &block_cache_);	//will start prefetching automatically
+		values_stream_type values(buckets_.begin(), buckets_.end(), reader, bids_.begin(), (self_type *)this);
 		
-		_num_total = 0;
+		num_total_ = 0;
 		while (!values.empty())
 		{
-			++_num_total;
+			++num_total_;
 			++values;
 		}
-		_oblivious = false;
+		oblivious_ = false;
 	}
 	
 
@@ -217,14 +221,9 @@ public:
 	//! \brief Number of values currenlty stored. Note: If the correct number is currently unknown (because *_oblivous-methods were used), external memory will be scanned.
 	size_type size() const
 	{
-		if (_oblivious)
-		{
-			// this method is "conceptually" const in that it doesn't modify the stored values
-			// but __make_conscious will chance some members (_oblivious and _num_total), so const-ness must be "casted away"
-			self_type * non_const_this = (self_type *)this;
-			non_const_this->__make_conscious();
-		}
-		return _num_total;
+		if (oblivious_)
+			((self_type *)this)->__make_conscious();
+		return num_total_;
 	}
 	
 	//! \brief The hash-map may store up to this number of values
@@ -232,23 +231,23 @@ public:
 	
 
 #pragma mark modifiers
-	//! \brief Insert a new value; also check if already stored in external memory.
+	//! \brief Insert a new value if no value with the same key is already present; external memory must therefore be accessed
 	//! \param value what to insert 
-	//! \return a tuple: the second value is true iff the value was actually added (no value with the same key present); the first value is an iterator pointing to the newly inserted or already stored value
+	//! \return a tuple whose second part is true iff the value was actually added (no value with the same key present); the first part is an iterator pointing to the newly inserted or already stored value
 	std::pair<iterator, bool> insert(const value_type& value)
 	{
 		size_type i_bucket = __bkt_num(value.first);
-		bucket_type &bucket = _buckets[i_bucket];
+		bucket_type &bucket = buckets_[i_bucket];
 		node_type* node = __find_key_internal(bucket, value.first);
 
 		// found value in internal memory
-		if (node && __eq(node->_value.first, value.first))
+		if (node && __eq(node->value_.first, value.first))
 		{
 			if (node->deleted())
 			{
 				node->deleted(false);
-				node->_value = value;
-				_num_total++;
+				node->value_ = value;
+				num_total_++;
 				return std::pair<iterator, bool>(iterator(this, i_bucket, node, 0, src_internal, false, value.first), true);
 			}
 			else
@@ -265,22 +264,22 @@ public:
 			value_type ext_value  = result.second;
 			
 			// ... if found, return iterator pointing to external position ...
-			if (i_external < bucket._num_external && __eq(ext_value.first, value.first) )
+			if (i_external < bucket.n_external_ && __eq(ext_value.first, value.first) )
 			{
 				return std::pair<iterator, bool>(iterator(this, i_bucket, node, i_external, src_external, true, value.first), false);
 			}
 			// ... otherwise add value to internal list
 			else
 			{
-				_num_total++;
+				num_total_++;
 				node_type *new_node = (node) ? 
-										(node->next(__new_node(value, node->next(), false))) :						// remember: node->_value is the biggest value < new value
-										(bucket._internal_list = __new_node(value, bucket._internal_list, false));	// there aro no internal values < new value
+										(node->next(__new_node(value, node->next(), false))) :
+										(bucket.list_ = __new_node(value, bucket.list_, false));
 			
 				iterator it(this, i_bucket, new_node, 0, src_internal, false, value.first);
 
-				_buffer_size++;
-				if (_buffer_size >= _max_buffer_size)
+				buffer_size_++;
+				if (buffer_size_ >= max_buffer_size_)
 					__rebuild_buckets();	// will fix it as well
 				
 				return std::pair<iterator, bool>(it, true);
@@ -295,36 +294,36 @@ public:
 	iterator insert_oblivious(const value_type& value)
 	{
 		size_type i_bucket = __bkt_num(value.first);
-		bucket_type& bucket = _buckets[i_bucket];
+		bucket_type& bucket = buckets_[i_bucket];
 		node_type* node = __find_key_internal(bucket, value.first);
 		
 		// found value in internal memory
-		if (node && __eq(node->_value.first, value.first))
+		if (node && __eq(node->value_.first, value.first))
 		{
 			if (node->deleted())
-				_num_total++;
+				num_total_++;
 
 			node->deleted(false);
-			node->_value = value;
+			node->value_ = value;
 			return iterator(this, i_bucket, node, 0, src_internal, false, value.first);
 		}
 		// not found; ignore external memory and add a new node to the internal-memory buffer
 		else
 		{
-			_oblivious = true;
-			_num_total++;
+			oblivious_ = true;
+			num_total_++;
 			node_type *new_node = (node) ? 
 									(node->next(__new_node(value, node->next(), false))) :
-									(bucket._internal_list = __new_node(value, bucket._internal_list, false));
+									(bucket.list_ = __new_node(value, bucket.list_, false));
 
 			// there may be some iterators that reference the newly inserted value in external memory
-			// these need to fixed (make them point to new_node)
-			_iterator_map.fix_iterators_2int(i_bucket, value.first, new_node);
+			// these need to be fixed (make them point to new_node)
+			iterator_map_.fix_iterators_2int(i_bucket, value.first, new_node);
 			
 			iterator it(this, i_bucket, new_node, 0, src_internal, false, value.first);
 			
-			_buffer_size++;
-			if (_buffer_size >= _max_buffer_size)
+			buffer_size_++;
+			if (buffer_size_ >= max_buffer_size_)
 				__rebuild_buckets();
 			
 			return it;
@@ -336,26 +335,26 @@ public:
 	//! \param it iterator pointing to the value to erase
 	void erase(iterator & it)
 	{
-		_num_total--;
-		bucket_type & bucket = _buckets[it._i_bucket];
+		num_total_--;
+		bucket_type & bucket = buckets_[it.i_bucket_];
 
-		if (it._source == src_internal)
+		if (it.source_ == src_internal)
 		{
-			it._node->deleted(true);
-			_iterator_map.fix_iterators_2end(it._i_bucket, it._key);	// will fix it as well
+			it.node_->deleted(true);
+			iterator_map_.fix_iterators_2end(it.i_bucket_, it.key_);	// will fix it as well
 		}
 		else {
-			node_type *node = __find_key_internal(bucket, it._key);		// find biggest value < iterator's value
-			assert(!node || !__eq(node->_value.first, it._key));
+			node_type *node = __find_key_internal(bucket, it.key_);		// find biggest value < iterator's value
+			assert(!node || !__eq(node->value_.first, it.key_));
 			
 			// add delete-node to buffer
-			if (node) node->next(__new_node(value_type(it._key, mapped_type()), node->next(), true));
-			else      bucket._internal_list = __new_node(value_type(it._key, mapped_type()), bucket._internal_list, true);
+			if (node) node->next(__new_node(value_type(it.key_, mapped_type()), node->next(), true));
+			else      bucket.list_ = __new_node(value_type(it.key_, mapped_type()), bucket.list_, true);
 
-			_iterator_map.fix_iterators_2end(it._i_bucket, it._key);
+			iterator_map_.fix_iterators_2end(it.i_bucket_, it.key_);
 			
-			_buffer_size++;
-			if (_buffer_size >= _max_buffer_size)
+			buffer_size_++;
+			if (buffer_size_ >= max_buffer_size_)
 				__rebuild_buckets();
 		}
 	}
@@ -367,17 +366,17 @@ public:
 	size_type erase(const key_type& key)
 	{
 		size_type   i_bucket = __bkt_num(key);
-		bucket_type & bucket = _buckets[i_bucket];
+		bucket_type & bucket = buckets_[i_bucket];
 		node_type   * node   = __find_key_internal(bucket, key);
 	
 		// found in internal memory
-		if (node && __eq(node->_value.first, key))
+		if (node && __eq(node->value_.first, key))
 		{
 			if (!node->deleted())
 			{
 				node->deleted(true);
-				_num_total--;
-				_iterator_map.fix_iterators_2end(i_bucket, key);
+				num_total_--;
+				iterator_map_.fix_iterators_2end(i_bucket, key);
 				return 1;
 			}
 			else return 0;	// already deleted
@@ -387,25 +386,25 @@ public:
 		{
 			tuple<size_type, value_type> result = __find_key_external(bucket, key);
 			size_type  i_external = result.first;
-			value_type value      = result.second;
+			value_type ext_value  = result.second;
 			
 			// found in external memory; add delete-node
-			if (i_external < bucket._num_external && __eq(value.first, key))
+			if (i_external < bucket.n_external_ && __eq(ext_value.first, key))
 			{
-				_num_total--;
+				num_total_--;
 
 				if (node) node->next(__new_node(value_type(key, mapped_type()), node->next(), true));
-				else      bucket._internal_list = __new_node(value_type(key, mapped_type()), bucket._internal_list, true);
+				else      bucket.list_ = __new_node(value_type(key, mapped_type()), bucket.list_, true);
 				
-				_iterator_map.fix_iterators_2end(i_bucket, key);
+				iterator_map_.fix_iterators_2end(i_bucket, key);
 				
-				_buffer_size++;
-				if (_buffer_size >= _max_buffer_size)
+				buffer_size_++;
+				if (buffer_size_ >= max_buffer_size_)
 					__rebuild_buckets();
 				
 				return 1;
 			}
-			// no value for given key
+			// no value with given key
 			else return 0;
 		}
 	}
@@ -416,32 +415,32 @@ public:
 	void erase_oblivious(const key_type& key)
 	{
 		size_type i_bucket = __bkt_num(key);
-		bucket_type& bucket = _buckets[i_bucket];
+		bucket_type& bucket = buckets_[i_bucket];
 		node_type* node = __find_key_internal(bucket, key);
 		
 		// found value in internal-memory
-		if (node && __eq(node->_value.first , key))
+		if (node && __eq(node->value_.first, key))
 		{
 			if (!node->deleted())
 			{
-				_num_total--;
+				num_total_--;
 				node->deleted(true);
-				_iterator_map.fix_iterators_2end(i_bucket, key);
+				iterator_map_.fix_iterators_2end(i_bucket, key);
 			}
 		}
 		// not found; ignore external memory and add delete-node
 		else
 		{
-			_oblivious = true;
-			_num_total--;
+			oblivious_ = true;
+			num_total_--;
 		
 			if (node) node->next(__new_node(value_type(key, mapped_type()), node->next(), true));
-			else      bucket._internal_list = __new_node(value_type(key, mapped_type()), bucket._internal_list, true);
+			else      bucket.list_ = __new_node(value_type(key, mapped_type()), bucket.list_, true);
 			
-			_iterator_map.fix_iterators_2end(i_bucket, key);
+			iterator_map_.fix_iterators_2end(i_bucket, key);
 		
-			_buffer_size++;
-			if (_buffer_size >= _max_buffer_size)
+			buffer_size_++;
+			if (buffer_size_ >= max_buffer_size_)
 				__rebuild_buckets();
 		}
 	}
@@ -450,22 +449,22 @@ public:
 	//! \brief Reset hash-map: erase all values, invalidate all iterators
 	void clear()
 	{
-		_iterator_map.fix_iterators_all2end();
-		_block_cache.flush();
-		_block_cache.clear();
+		iterator_map_.fix_iterators_all2end();
+		block_cache_.flush();
+		block_cache_.clear();
 		
-		// reset buckets and clear internal memory
-		for (size_type i_bucket = 0; i_bucket < _buckets.size(); i_bucket++) {
-			__erase_nodes(_buckets[i_bucket]._internal_list, NULL);
-			_buckets[i_bucket] = bucket_type(NULL, 0, 0, false, 0, 0);
+		// reset buckets and release buffer-memory
+		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+			__erase_nodes(buckets_[i_bucket].list_, NULL);
+			buckets_[i_bucket] = bucket_type();
 		}
-		_oblivious = false;
-		_num_total = 0;
+		oblivious_ = false;
+		num_total_ = 0;
 		
 		// free external memory
-		block_manager *bm = block_manager::get_instance ();
-		bm->delete_blocks(_bids.begin(), _bids.end());
-		_bids.clear();
+		block_manager *bm = block_manager::get_instance();
+		bm->delete_blocks(bids_.begin(), bids_.end());
+		bids_.clear();
 	}
 	
 	
@@ -473,50 +472,55 @@ public:
 	//! \param obj hash-map to swap values with
 	void swap(self_type& obj)
 	{
-		std::swap(_buckets, obj._buckets);
-		std::swap(_bids, obj._bids);
+		std::swap(buckets_, obj.buckets_);
+		std::swap(bids_, obj.bids_);
 		
-		std::swap(_oblivious, obj._oblivious);
-		std::swap(_num_total, obj._num_total);
+		std::swap(oblivious_, obj.oblivious_);
+		std::swap(num_total_, obj.num_total_);
 		
-		std::swap(_node_allocator, obj._node_allocator);
+		std::swap(node_allocator_, obj.node_allocator_);
 		
-		std::swap(_hash, obj._hash);
-		std::swap(_cmp, obj._cmp);
+		std::swap(hash_, obj.hash_);
+		std::swap(cmp_, obj.cmp_);
 		
-		std::swap(_buffer_size, obj._buffer_size);
-		std::swap(_max_buffer_size, obj._max_buffer_size);
+		std::swap(buffer_size_, obj.buffer_size_);
+		std::swap(max_buffer_size_, obj.max_buffer_size_);
 		
-		std::swap(_opt_load_factor, obj._opt_load_factor);
+		std::swap(opt_load_factor_, obj.opt_load_factor_);
 		
-		std::swap(_iterator_map, obj._iterator_map);
+		std::swap(iterator_map_, obj.iterator_map_);
 		
-		std::swap(_block_cache, obj._block_cache);
+		std::swap(block_cache_, obj.block_cache_);
 	}
 	
 	
 #pragma mark lookup
 private:
 	// find statistics
-	size_type _stats_subblocks_loaded;
-	size_type _stats_found_internal;
-	size_type _stats_found_external;
-	size_type _stats_not_found;
+	mutable size_type n_subblocks_loaded;
+	mutable size_type n_found_internal;
+	mutable size_type n_found_external;
+	mutable size_type n_not_found;
 	
 
 public:
-	void reset_find_statistics()
+	void reset_statistics()
 	{
-		_stats_subblocks_loaded = _stats_found_external = _stats_found_internal = _stats_not_found = 0;
+		iterator_map_.reset_statistics();
+		block_cache_.reset_statistics();
+		n_subblocks_loaded = n_found_external = n_found_internal = n_not_found = 0;
 	}
 	
 
-	void print_find_statistics(std::ostream & o = std::cout) const
+	void print_statistics(std::ostream & o = std::cout) const
 	{
-		o << "Found internal    : " << _stats_found_internal << std::endl;
-		o << "Found external    : " << _stats_found_external << std::endl;
-		o << "Not found         : " << _stats_not_found << std::endl;
-		o << "Subblocks accessed: " << _stats_subblocks_loaded << std::endl;
+		o << "Found internal    : " << n_found_internal << std::endl;
+		o << "Found external    : " << n_found_external << std::endl;
+		o << "Not found         : " << n_not_found << std::endl;
+		o << "Subblocks accessed: " << n_subblocks_loaded << std::endl;
+		
+		iterator_map_.print_statistics();
+		block_cache_.print_statistics();
 	}
 	
 
@@ -524,12 +528,12 @@ public:
 	//! \param key key for value to look up
 	iterator find(const key_type& key) {
 		size_type i_bucket = __bkt_num(key);
-		bucket_type& bucket = _buckets[i_bucket];
+		bucket_type& bucket = buckets_[i_bucket];
 		node_type* node = __find_key_internal(bucket, key);
 	
 		// found in internal list
-		if (node && __eq(node->_value.first, key)) {
-			_stats_found_internal++;
+		if (node && __eq(node->value_.first, key)) {
+			n_found_internal++;
 			if (node->deleted())
 				return this->__end<iterator>();
 			else
@@ -542,22 +546,22 @@ public:
 			value_type value = result.second;
 		
 			// found in external memory
-			if (i_external < bucket._num_external && __eq(value.first, key)) {
-				_stats_found_external++;
+			if (i_external < bucket.n_external_ && __eq(value.first, key)) {
+				n_found_external++;
 				
 				// create new buffer-node (we expect the value to be changed and
 				// therefore return a reference to an in-memory node rather than to external-memory)
 				node_type *new_node = (node) ? 
 										(node->next(__new_node(value, node->next(), false))) :
-										(bucket._internal_list = __new_node(value, bucket._internal_list, false));
+										(bucket.list_ = __new_node(value, bucket.list_, false));
 										
-				_iterator_map.fix_iterators_2int(i_bucket, value.first, new_node);
+				iterator_map_.fix_iterators_2int(i_bucket, value.first, new_node);
 				
 				return iterator(this, i_bucket, new_node, i_external+1, src_internal, true, key);
 			}
 			// not found in external memory
 			else {
-				_stats_not_found++;
+				n_not_found++;
 				return this->__end<iterator>();
 			}
 		}
@@ -568,12 +572,12 @@ public:
 	//! \param key key for value to look up	
 	const_iterator find(const key_type& key) const {
 		size_type i_bucket = __bkt_num(key);
-		const bucket_type& bucket = _buckets[i_bucket];
+		const bucket_type& bucket = buckets_[i_bucket];
 		node_type* node = __find_key_internal(bucket, key);
 	
 		// found in internal list
-		if (node && __eq(node->_value.first, key)) {
-			((self_type *)this)->_stats_found_internal++;
+		if (node && __eq(node->value_.first, key)) {
+			n_found_internal++;
 			if (node->deleted())
 				return this->__end<const_iterator>();
 			else
@@ -586,13 +590,13 @@ public:
 			value_type value = result.second;
 		
 			// found in external memory
-			if (i_external < bucket._num_external && __eq(value.first, key)) {
-				((self_type *)this)->_stats_found_external++;
+			if (i_external < bucket.n_external_ && __eq(value.first, key)) {
+				n_found_external++;
 				return const_iterator((self_type *)this, i_bucket, node, i_external, src_external, true, key);
 			}
 			// not found in external memory
 			else {
-				((self_type *)this)->_stats_not_found++;
+				n_not_found++;
 				return this->__end<const_iterator>();
 			}
 		}
@@ -638,33 +642,29 @@ public:
 
 #pragma mark bucket-interface
 	//! \brief Number of buckets
-	size_type  bucket_count() const { return _buckets.size(); }
+	size_type  bucket_count() const { return buckets_.size(); }
 	
 	//! \brief Maximum number of buckets
 	size_type  max_bucket_count() const { return max_size() / subblock_size; }
 	
 	//! \brief Bucket-index for values with given key.
 	size_type  bucket(const key_type &k) const { return __bkt_num(k); }
-	
-	
-	//! \brief Minimum number of buckets
-	size_type  min_bucket_count() const { return 10000; }
 
 	
 #pragma mark hash policy
 public:
 	//! \brief Average number of (sub)blocks occupied by a bucket.
-	float load_factor() const { return (float)_num_total / ((float)subblock_size * (float)_buckets.size()); }
+	float load_factor() const { return (float)num_total_ / ((float)subblock_size * (float)buckets_.size()); }
 	
 	
 	//! \brief Set desired load-factor
-	float opt_load_factor() const { return _opt_load_factor; }
+	float opt_load_factor() const { return opt_load_factor_; }
 	
 	//! \brief Set desired load-factor 
 	void  opt_load_factor(float z)
 	{ 
-		_opt_load_factor = z;
-		if (load_factor() > _opt_load_factor)
+		opt_load_factor_ = z;
+		if (load_factor() > opt_load_factor_)
 			__rebuild_buckets();
 	}
 	
@@ -677,22 +677,22 @@ public:
 
 #pragma mark buffer policy	
 	//! \brief Number of bytes occupied by buffer
-	size_type buffer_size()
+	size_type buffer_size() const
 	{
-		return _buffer_size*sizeof(node_type);	// buffer-size internally stored as number of nodes
+		return buffer_size_*sizeof(node_type);	// buffer-size internally stored as number of nodes
 	}
 	
 	
 	//! \brief Maximum buffer size in byte
-	size_type max_buffer_size() { return _max_buffer_size*sizeof(node_type); }
+	size_type max_buffer_size() const { return max_buffer_size_*sizeof(node_type); }
 	
 	
 	//! \brief Set maximum buffer size
 	//! \param buffer_size new size in byte
 	void max_buffer_size(size_type buffer_size) 
 	{
-		_max_buffer_size = buffer_size / sizeof(node_type);
-		if (_buffer_size >= _max_buffer_size)
+		max_buffer_size_ = buffer_size / sizeof(node_type);
+		if (buffer_size_ >= max_buffer_size_)
 			__rebuild_buckets();
 	}
 	
@@ -700,11 +700,9 @@ public:
 #pragma mark Sequentially access to values
 private:
 	/* iterator pointing to the beginnning of the hash-map */
-	template <class _ItType>
-	_ItType __begin() const {
-		self_type *non_const_this = (self_type *)this;
-		
-		_ItType it(non_const_this, 0, _buckets[0]._internal_list, 0, src_unknown, true, key_type());	// correct key will be set by find_next()
+	template <class ItType>
+	ItType __begin() const {
+		ItType it((self_type *)this, 0, buckets_[0].list_, 0, src_unknown, true, key_type());	// correct key will be set by find_next()
 		it.find_next();
 		
 		return it;
@@ -712,10 +710,10 @@ private:
 	
 
 	/* iterator pointing to the end of the hash-map (iterator-type as template-parameter) */
-	template <class _ItType>
-	_ItType __end() const {
+	template <class ItType>
+	ItType __end() const {
 		self_type *non_const_this = (self_type *)this;
-		return _ItType(non_const_this);
+		return ItType(non_const_this);
 	}
 
 public:
@@ -737,14 +735,14 @@ private:
 	/* Allocate a new buffer-node */
 	node_type* __get_node()
 	{
-		return _node_allocator.allocate(1);
+		return node_allocator_.allocate(1);
 	}
 	
 
 	/* Free given node */
 	void __put_node(node_type* node)
 	{
-		_node_allocator.deallocate(node, 1);
+		node_allocator_.deallocate(node, 1);
 	}
 	
 
@@ -752,7 +750,7 @@ private:
 	node_type* __new_node(const value_type& value, node_type* nxt, bool del)
 	{
 		node_type* node = __get_node();
-		node->_value = value;
+		node->value_ = value;
 		node->next(nxt);
 		node->deleted(del);
 		return node;
@@ -776,16 +774,39 @@ private:
 	/* Bucket-index for values with given key */
 	size_type __bkt_num(const key_type& key) const
 	{
-		return __bkt_num(key, _buckets.size());
+		return __bkt_num(key, buckets_.size());
 	}
 	
 	
 	/* Bucket-index for values with given key. The total number of buckets has to be specified as well.
-	   TODO: find more clever way to calculate, let user supply max-hash-value?
+	   The bucket number is determined by
+	      bucket_num = (hash/max_hash)*n_buckets
+	   max_hash is in fact 2^63-1 (size_type=uint64) but we rather divide by 2^64, so we can use plain integer
+	   arithmetic easily (there should be only a small difference): this way we must only calculate the upper
+	   64 bits of the product hash*n_buckets and we're done. See http://www.cs.uaf.edu/~cs301/notes/Chapter5/node5.html
 	*/
 	size_type __bkt_num(const key_type &key, size_type n) const
 	{
-		return (size_type)((double)n * ((double)_hash(key)/(double)std::numeric_limits<size_type>::max()));
+		size_type a, b, c, d, x, y;
+		size_type low, high;
+		
+		const size_type hash = hash_(key);
+		a = (hash >> 32) & 0xffffffff;
+		b = hash & 0xffffffff;
+		c = (n >> 32) & 0xffffffff;
+		d = n & 0xffffffff;
+	
+		low = b * d;
+		x = a * d + c * b;
+		y = ((low >> 32) & 0xffffffff) + x;
+
+//		low = (low & 0xffffffff) | ((y & 0xffffffff) << 32);	// we actually do not need the lower part
+		high = (y >> 32) & 0xffffffff;
+		high += a * c;
+		
+		return high;
+
+//		return (size_type)((double)n * ((double)hash_(key)/(double)std::numeric_limits<size_type>::max()));
 	}
 
 
@@ -797,9 +818,9 @@ private:
 	*/
 	node_type* __find_key_internal(const bucket_type& bucket, const key_type& key) const
 	{
-		node_type *curr = bucket._internal_list;
+		node_type *curr = bucket.list_;
 		node_type *old = 0;
-		for (; curr && __leq(curr->_value.first, key); curr = curr->next()) {
+		for (; curr && __leq(curr->value_.first, key); curr = curr->next()) {
 			old = curr;
 		}
 		
@@ -815,22 +836,23 @@ private:
 		subblock_type *subblock;
 	
 		// number of subblocks occupied by bucket
-		size_type num_subblocks = bucket._num_external / subblock_size;
-		if (bucket._num_external % subblock_size != 0)
-			num_subblocks++;
+		size_type n_subblocks = bucket.n_external_ / subblock_size;
+		if (bucket.n_external_ % subblock_size != 0)
+			n_subblocks++;
 		
-		for (size_type i_subblock = 0; i_subblock < num_subblocks; i_subblock++)
+		for (size_type i_subblock = 0; i_subblock < n_subblocks; i_subblock++)
 		{
 			subblock = __load_subblock(bucket, i_subblock);
 			// number of values in i-th subblock
-			size_type num_values = (i_subblock+1 < num_subblocks) ? subblock_size : (bucket._num_external-i_subblock*subblock_size);
+			size_type n_values = (i_subblock+1 < n_subblocks) ? subblock_size : (bucket.n_external_-i_subblock*subblock_size);
+			// TODO: replace with bucket.n_external_ % subblock_size
 
 			// biggest key in current subblock still too small => next subblock
-			if (__lt((*subblock)[num_values-1].first, key))
+			if (__lt((*subblock)[n_values-1].first, key))
 				continue;
 			
 			// binary search in current subblock
-			size_type i_lower = 0, i_upper = num_values;
+			size_type i_lower = 0, i_upper = n_values;
 			while (i_lower + 1 != i_upper)
 			{
 				size_type i_middle = (i_lower + i_upper) / 2;
@@ -845,10 +867,10 @@ private:
 			if (__eq(value.first, key))
 				return tuple<size_type, value_type>(i_subblock*subblock_size+i_lower, value);
 			else
-				return tuple<size_type, value_type>(bucket._num_external, value_type());
+				return tuple<size_type, value_type>(bucket.n_external_, value_type());
 		}
 		
-		return tuple<size_type, value_type>(bucket._num_external, value_type());
+		return tuple<size_type, value_type>(bucket.n_external_, value_type());
 	}
 
 
@@ -857,18 +879,17 @@ private:
 	   1. determine in which block the requested subblock is located
 	   2. at which position within the obove-mentioned block the questioned subblock is located 
 	*/
-	subblock_type * __load_subblock(const bucket_type& bucket, size_type i_subblock) const
+	subblock_type * __load_subblock(const bucket_type& bucket, size_type which_subblock) const
 	{
-		((self_type *)this)->_stats_subblocks_loaded++;
+		n_subblocks_loaded++;
 	
 		// index of the requested subblock counted from the very beginning of the bucket's first block
-		size_type i_abs_subblock = bucket._i_first_subblock + i_subblock;
+		size_type i_abs_subblock = bucket.i_subblock_ + which_subblock;
 		
-		size_type i_block = i_abs_subblock / block_size + bucket._i_block;	/* 1. */
-		size_type i_subblock_within = i_abs_subblock % block_size;			/* 2. */
+		bid_type bid = bids_[bucket.i_block_ + (i_abs_subblock/block_size)]; /* 1. */
+		size_type i_subblock_within = i_abs_subblock % block_size;	/* 2. */
 	
-		bid_type bid = _bids[i_block];
-		return ((self_type *)this)->_block_cache.get_subblock(bid, i_subblock_within);
+		return block_cache_.get_subblock(bid, i_subblock_within);
 	}
 
 
@@ -878,54 +899,55 @@ private:
 	/* Functor to extracts the actual value from a HashedValue-struct */
 	struct HashedValueExtractor
 	{
-		value_type & operator() (hashed_value_type & hvalue) { return hvalue._value; }
+		value_type & operator() (hashed_value_type & hvalue) { return hvalue.value_; }
 	};
 
 
 	/* Will return from its input-stream all values that are to be stored in the given bucket.
 	   Those values must appear in consecutive order beginning with the input-stream's current value.
 	*/
-	template <class _InputStream, class _ValueExtractor>
+	template <class InputStream, class ValueExtractor>
 	struct HashingStream
 	{
-		typedef typename _InputStream::value_type value_type;
+		typedef typename InputStream::value_type value_type;
 		
-		self_type *_map;
-		_InputStream & _input;
-		size_type _i_bucket;
-		size_type _bucket_size;
-		value_type _value;
-		bool _empty;
-		_ValueExtractor _vextract;
+		self_type *map_;
+		InputStream & input_;
+		size_type i_bucket_;
+		size_type bucket_size_;
+		value_type value_;
+		bool empty_;
+		ValueExtractor vextract_;
 		
-		HashingStream (_InputStream & input, size_type i_bucket, _ValueExtractor vextract, self_type *map) :
-			_map(map),
-			_vextract(vextract),
-			_input(input),
-			_i_bucket(i_bucket),
-			_bucket_size(0),
-			_empty(find_next())
-		{ }
+		HashingStream (InputStream & input, size_type i_bucket, ValueExtractor vextract, self_type *map) :
+			map_(map),
+			vextract_(vextract),
+			input_(input),
+			i_bucket_(i_bucket),
+			bucket_size_(0)
+		{
+			empty_ = find_next();
+		}
 		
-		const value_type & operator *() { return _value; }
+		const value_type & operator *() { return value_; }
 
-		bool empty() const { return _empty; }
+		bool empty() const { return empty_; }
 			
 		void operator ++ ()
 		{
-			++_input;
-			_empty = find_next();
+			++input_;
+			empty_ = find_next();
 		}
 
 		bool find_next()
 		{
-			if (_input.empty())
+			if (input_.empty())
 				return true;
-			_value = *_input;
-			if (_map->__bkt_num(_vextract(_value).first) != _i_bucket)
+			value_ = *input_;
+			if (map_->__bkt_num(vextract_(value_).first) != i_bucket_)
 				return true;
 
-			_bucket_size++;
+			bucket_size_++;
 			return false;
 		}
 	};
@@ -934,7 +956,7 @@ private:
 	/*	Rebuild hash-map. The desired number of buckets may be supplied. */
 	void __rebuild_buckets(size_type n_desired = 0)
 	{
-		typedef my_buffered_writer<block_type, bid_container_type> writer_type;
+		typedef buffered_writer<block_type, bid_container_type> writer_type;
 		typedef HashedValuesStream<self_type, reader_type> values_stream_type;
 		typedef HashingStream<values_stream_type, HashedValueExtractor> hashing_stream_type;
 
@@ -942,7 +964,7 @@ private:
 
 		// determine new number of buckets from desired load_factor ...
 		size_type n_new;
-		n_new = (size_type)ceil((double)_num_total / ((double)subblock_size * (double)opt_load_factor()));
+		n_new = (size_type)ceil((double)num_total_ / ((double)subblock_size * (double)opt_load_factor()));
 		
 		// ... but give the user the chance to request even more buckets
 		if (n_desired > n_new)
@@ -950,44 +972,44 @@ private:
 
 		// allocate new buckets and bids
 		buckets_container_type *old_buckets = new buckets_container_type(n_new);
-		bid_container_type *old_bids = new bid_container_type();	// writer will allocate new blocks as necessary
-
-		std::swap(_buckets, *old_buckets);
-		std::swap(_bids, *old_bids);
+		std::swap(buckets_, *old_buckets);
+		bid_container_type *old_bids = new bid_container_type();
+		std::swap(bids_, *old_bids);
 
 		// read stored values in consecutive order
-		reader_type * reader = new reader_type(old_bids->begin(), old_bids->end(), &_block_cache);
-		values_stream_type values_stream(old_buckets->begin(), old_buckets->end(), old_bids->begin(), *reader, this);
+		reader_type * reader = new reader_type(old_bids->begin(), old_bids->end(), &block_cache_);	// use new to controll point of destruction (see below)
+		values_stream_type values_stream(old_buckets->begin(), old_buckets->end(), *reader, old_bids->begin(), this);
 		
-		writer_type writer(&_bids, write_buffer_size, write_buffer_size/2);
+		writer_type writer(&bids_, write_buffer_size, write_buffer_size/2);
 		
 		// re-distribute values among new buckets.
 		// this makes use of the fact that if value1 preceeds value2 before resizing, value1 will preceed value2 after resizing as well (uniform rehashing)
-		_num_total = 0;
-		for (size_type i_bucket = 0; i_bucket < _buckets.size(); i_bucket++)
+		num_total_ = 0;
+		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++)
 		{
-			_buckets[i_bucket] = bucket_type(NULL, 0, 0, false, writer.curr_i_block(), writer.curr_i_subblock());
+			buckets_[i_bucket] = bucket_type();
+			buckets_[i_bucket].i_block_ = writer.i_block();
+			buckets_[i_bucket].i_subblock_ = writer.i_subblock();
 			
-			hashing_stream_type hasher(values_stream, i_bucket, HashedValueExtractor(), this);	// gives all values for current bucket
+			hashing_stream_type hasher(values_stream, i_bucket, HashedValueExtractor(), this);
 			size_type i_ext = 0;
 			while (!hasher.empty())
 			{
 				const hashed_value_type & hvalue = *hasher;
-				_iterator_map.fix_iterators_2ext(hvalue._i_bucket, hvalue._value.first, i_bucket, i_ext);
+				iterator_map_.fix_iterators_2ext(hvalue.i_bucket_, hvalue.value_.first, i_bucket, i_ext);
 				
-				writer.append(hvalue._value);
+				writer.append(hvalue.value_);
 				++hasher;
 				++i_ext;
 			}
 			
 			writer.finish_subblock();
-			_buckets[i_bucket]._num_external = hasher._bucket_size;
-			_num_total += hasher._bucket_size;
+			buckets_[i_bucket].n_external_ = hasher.bucket_size_;
+			num_total_ += hasher.bucket_size_;
 		}
 		writer.flush();
-		_block_cache.clear();
-		
-		delete reader;	// reader must be deleted before deleting old_bids (its destructor will dereference the bid-iterator)
+		delete reader;	// reader must be deleted before deleting old_bids because its destructor will dereference the bid-iterator
+		block_cache_.clear();
 		
 		// get rid of old blocks and buckets
 		block_manager *bm = stxxl::block_manager::get_instance();
@@ -995,8 +1017,8 @@ private:
 		delete old_bids;
 		delete old_buckets;
 
-		_buffer_size = 0;
-		_oblivious = false;
+		buffer_size_ = 0;
+		oblivious_ = false;
 	}
 
 
@@ -1008,21 +1030,21 @@ private:
 	struct UniqueValueStream
 	{
 		typedef typename InputStream::value_type value_type;
-		self_type *_map;
-		InputStream  & _in;
+		self_type *map_;
+		InputStream  & in_;
 		
-		UniqueValueStream(InputStream & input, self_type *map) : _map(map), _in(input) { }
+		UniqueValueStream(InputStream & input, self_type *map) : map_(map), in_(input) { }
 		
-		bool empty() const { return _in.empty(); }
+		bool empty() const { return in_.empty(); }
 	
-		value_type operator * () { return *_in; }
+		value_type operator * () { return *in_; }
 		
 		void operator++ ()
 		{
-			value_type v_old = *_in;
-			++_in;
-			while (!_in.empty() && _map->__eq(v_old.first, (*_in).first))
-				++_in;
+			value_type v_old = *in_;
+			++in_;
+			while (!in_.empty() && map_->__eq(v_old.first, (*in_).first))
+				++in_;
 		}
 	};
 	
@@ -1030,14 +1052,14 @@ private:
 	struct AddHashStream
 	{
 		typedef std::pair<size_type, typename InputStream::value_type> value_type;
-		self_type *_map;
-		InputStream &_in;
+		self_type *map_;
+		InputStream &in_;
 		
-		AddHashStream(InputStream &input, self_type *map) : _map(map), _in(input) { }
+		AddHashStream(InputStream &input, self_type *map) : map_(map), in_(input) { }
 		
-		bool empty() const { return _in.empty(); }
-		value_type operator * () { return value_type(_map->_hash((*_in).first), *_in); }
-		void operator++() { ++_in; }
+		bool empty() const { return in_.empty(); }
+		value_type operator * () { return value_type(map_->hash_((*in_).first), *in_); }
+		void operator++() { ++in_; }
 	};
 
 
@@ -1053,16 +1075,16 @@ private:
 	*/
 	struct Cmp
 	{
-		self_type * _map;
-		Cmp(self_type *map) : _map(map) { }
+		self_type * map_;
+		Cmp(self_type *map) : map_(map) { }
 		
 		bool operator () (const std::pair<size_type, value_type> & a, const std::pair<size_type, value_type> & b) const
 		{
 			return (a.first < b.first) ||
-			       ((a.first == b.first) && _map->_cmp(a.second.first, b.second.first));
+			       ((a.first == b.first) && map_->cmp_(a.second.first, b.second.first));
 		}
-		std::pair<size_type, value_type> min_value() const { return std::pair<size_type, value_type>(std::numeric_limits<size_type>::min(), value_type(_map->_cmp.min_value(), mapped_type())); }
-		std::pair<size_type, value_type> max_value() const { return std::pair<size_type, value_type>(std::numeric_limits<size_type>::max(), value_type(_map->_cmp.max_value(), mapped_type())); }
+		std::pair<size_type, value_type> min_value() const { return std::pair<size_type, value_type>(std::numeric_limits<size_type>::min(), value_type(map_->cmp_.min_value(), mapped_type())); }
+		std::pair<size_type, value_type> max_value() const { return std::pair<size_type, value_type>(std::numeric_limits<size_type>::max(), value_type(map_->cmp_.max_value(), mapped_type())); }
 	};
 
 public:
@@ -1082,29 +1104,26 @@ public:
 		typedef UniqueValueStream<new_sorted_values_stream>        new_unique_values_stream;	// new values sorted by <hash-value, key> with duplicates eliminated
 		typedef HashingStream<new_unique_values_stream, StripHashFunctor> new_hashing_stream;		// new values, that are to be stored in a certain bucket
 
-		typedef my_buffered_writer<block_type, bid_container_type> writer_type;
+		typedef buffered_writer<block_type, bid_container_type> writer_type;
 
 		int_type write_buffer_size = config::get_instance()->disks_number()*2;
 		
 		
 		// calculate new number of buckets
-		size_type num_total_new = _num_total + (l-f);	// estimated number of elements
+		size_type num_total_new = num_total_ + (l-f);	// estimated number of elements
 		size_type n_new = (size_type)ceil((double)num_total_new / ((double)subblock_size * (double)opt_load_factor()));
 		if (n_new > max_bucket_count())
 			n_new = max_bucket_count();
-		else if (n_new < min_bucket_count())
-			n_new = min_bucket_count();
 		
 		// prepare new buckets and bids
 		buckets_container_type *old_buckets = new buckets_container_type(n_new);
+		std::swap(buckets_, *old_buckets);
 		bid_container_type *old_bids = new bid_container_type();	// writer will allocate new blocks as necessary
-
-		std::swap(_buckets, *old_buckets);
-		std::swap(_bids, *old_bids);
+		std::swap(bids_, *old_bids);
 
 		// already stored values ("old values")
-		reader_type       reader(old_bids->begin(), old_bids->end(), &_block_cache);
-		old_values_stream old_values(old_buckets->begin(), old_buckets->end(), old_bids->begin(), reader, this);
+		reader_type * reader = new reader_type(old_bids->begin(), old_bids->end(), &block_cache_);
+		old_values_stream old_values(old_buckets->begin(), old_buckets->end(), *reader, old_bids->begin(), this);
 		
 		// values to insert ("new values")
 		input_stream              input = stxxl::stream::streamify(f, l);
@@ -1112,12 +1131,14 @@ public:
 		new_sorted_values_stream  new_sorted_values(new_values, Cmp(this), mem);
 		new_unique_values_stream  new_unique_values(new_sorted_values, this);
 		
-		writer_type writer(&_bids, write_buffer_size, write_buffer_size/2);
+		writer_type writer(&bids_, write_buffer_size, write_buffer_size/2);
 		
-		_num_total = 0;
-		for (size_type i_bucket = 0; i_bucket < _buckets.size(); i_bucket++)
+		num_total_ = 0;
+		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++)
 		{
-			_buckets[i_bucket] = bucket_type(NULL, 0, 0, false, writer.curr_i_block(), writer.curr_i_subblock());
+			buckets_[i_bucket] = bucket_type();
+			buckets_[i_bucket].i_block_ = writer.i_block();
+			buckets_[i_bucket].i_subblock_ = writer.i_subblock();
 			
 			old_hashing_stream old_hasher(old_values, i_bucket, HashedValueExtractor(), this);
 			new_hashing_stream new_hasher(new_unique_values, i_bucket, StripHashFunctor(), this);
@@ -1126,17 +1147,17 @@ public:
 			// more old and new values for the current bucket => choose smallest
 			while (!old_hasher.empty() && !new_hasher.empty())
 			{
-				size_type old_hash = _hash((*old_hasher)._value.first);
+				size_type old_hash = hash_((*old_hasher).value_.first);
 				size_type new_hash = (*new_hasher).first;
-				key_type old_key = (*old_hasher)._value.first;
+				key_type old_key = (*old_hasher).value_.first;
 				key_type new_key = (*new_hasher).second.first;
 				
 				// old value wins
-				if ((old_hash < new_hash) ||(old_hash == new_hash && _cmp(old_key, new_key))) // (__lt((*old_hasher)._value.first, (*new_hasher).second.first))
+				if ((old_hash < new_hash) ||(old_hash == new_hash && cmp_(old_key, new_key))) // (__lt((*old_hasher)._value.first, (*new_hasher).second.first))
 				{
 					const hashed_value_type & hvalue = *old_hasher;
-					_iterator_map.fix_iterators_2ext(hvalue._i_bucket, hvalue._value.first, i_bucket, bucket_size);
-					writer.append(hvalue._value);
+					iterator_map_.fix_iterators_2ext(hvalue.i_bucket_, hvalue.value_.first, i_bucket, bucket_size);
+					writer.append(hvalue.value_);
 					++old_hasher;
 				}
 				// new value smaller or equal => new value wins
@@ -1145,7 +1166,7 @@ public:
 					if (__eq(old_key, new_key))
 					{
 						const hashed_value_type & hvalue = *old_hasher;
-						_iterator_map.fix_iterators_2ext(hvalue._i_bucket, hvalue._value.first, i_bucket, bucket_size);
+						iterator_map_.fix_iterators_2ext(hvalue.i_bucket_, hvalue.value_.first, i_bucket, bucket_size);
 						++old_hasher;
 					}
 					writer.append((*new_hasher).second);
@@ -1157,8 +1178,8 @@ public:
 			while (!old_hasher.empty())
 			{
 				const hashed_value_type & hvalue = *old_hasher;
-				_iterator_map.fix_iterators_2ext(hvalue._i_bucket, hvalue._value.first, i_bucket, bucket_size);
-				writer.append(hvalue._value);
+				iterator_map_.fix_iterators_2ext(hvalue.i_bucket_, hvalue.value_.first, i_bucket, bucket_size);
+				writer.append(hvalue.value_);
 				++old_hasher;
 				++bucket_size;
 			}
@@ -1171,18 +1192,20 @@ public:
 			}
 			
 			writer.finish_subblock();
-			_buckets[i_bucket]._num_external = bucket_size;
-			_num_total += bucket_size;
+			buckets_[i_bucket].n_external_ = bucket_size;
+			num_total_ += bucket_size;
 		}
 		writer.flush();
+		delete reader;
+		block_cache_.clear();
 		
 		block_manager *bm = stxxl::block_manager::get_instance();
 		bm->delete_blocks(old_bids->begin(), old_bids->end());
 		delete old_bids;
 		delete old_buckets;
 		
-		_buffer_size = 0;
-		_oblivious = false;
+		buffer_size_ = 0;
+		oblivious_ = false;
 	}
 
 
@@ -1193,11 +1216,11 @@ public:
 	*/
 	bool __lt (const key_type & a, const key_type & b) const
 	{
-		size_type hash_a = _hash(a);
-		size_type hash_b = _hash(b);
+		size_type hash_a = hash_(a);
+		size_type hash_b = hash_(b);
 
 		return  (hash_a < hash_b) ||
-		       ((hash_a == hash_b) && _cmp(a,b));
+		       ((hash_a == hash_b) && cmp_(a,b));
 	}
 	
 	bool __gt (const key_type & a, const key_type & b) const { return __lt(b,a);  }	/* 1 iff a >  b */		
@@ -1205,7 +1228,7 @@ public:
 	bool __geq(const key_type & a, const key_type & b) const { return !__lt(a,b); }	/* 1 iff a >= b */
 
 	/* 1 iff a == b. note: it is mandatory that equal keys yield equal hash-values => hashing not neccessary for equality-testing */
-	bool __eq (const key_type & a, const key_type & b) const { return !_cmp(a,b) && !_cmp(b,a); }
+	bool __eq (const key_type & a, const key_type & b) const { return !cmp_(a,b) && !cmp_(b,a); }
 
 	
 #pragma mark Friends & testing
@@ -1219,9 +1242,9 @@ public:
 
 #pragma statistics
 	void __dump_external() {
-		reader_type reader(_bids.begin(), _bids.end(), &_block_cache);
+		reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
 	
-		for (size_type i_block = 0; i_block < _bids.size(); i_block++) {
+		for (size_type i_block = 0; i_block < bids_.size(); i_block++) {
 			std::cout << "block " << i_block << ":\n";
 			
 			for (size_type i_subblock = 0; i_subblock < block_size; i_subblock++) {
@@ -1237,25 +1260,25 @@ public:
 	}
 	
 	void __dump_buckets() {
-		reader_type reader(_bids.begin(), _bids.end(), &_block_cache);
+		reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
 
-		std::cout << "number of buckets: " << _buckets.size() << std::endl;
-		for (size_type i_bucket = 0; i_bucket < _buckets.size(); i_bucket++) {
-			const bucket_type & bucket = _buckets[i_bucket];
-			reader.skip_to(_bids.begin()+bucket._i_block, bucket._i_first_subblock);
+		std::cout << "number of buckets: " << buckets_.size() << std::endl;
+		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+			const bucket_type & bucket = buckets_[i_bucket];
+			reader.skip_to(bids_.begin()+bucket.i_block_, bucket.i_subblock_);
 			
-			std::cout << "  bucket " << i_bucket << ": block=" << bucket._i_block << ", subblock=" << bucket._i_first_subblock << ", external=" << bucket._num_external << std::endl;
+			std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << std::endl;
 					  
-			node_type *node = bucket._internal_list;
+			node_type *node = bucket.list_;
 			std::cout << "     internal_list=";
 			while (node) {
-				std::cout << node->_value.first << " (del=" << node->deleted() <<"), ";
+				std::cout << node->value_.first << " (del=" << node->deleted() <<"), ";
 				node = node->next();
 			}
 			std::cout << std::endl;
 			
 			std::cout << "     external=";
-			for (size_type i_element = 0; i_element < bucket._num_external; i_element++) {
+			for (size_type i_element = 0; i_element < bucket.n_external_; i_element++) {
 				std::cout << reader.const_value().first << ", ";
 				++reader;
 			}
@@ -1264,10 +1287,10 @@ public:
 	}
 	
 	void __dump_bucket_statistics() {
-		std::cout << "number of buckets: " << _buckets.size() << std::endl;
-		for (size_type i_bucket = 0; i_bucket < _buckets.size(); i_bucket++) {
-			const bucket_type & bucket = _buckets[i_bucket];
-			std::cout << "  bucket " << i_bucket << ": block=" << bucket._i_block << ", subblock=" << bucket._i_first_subblock << ", external=" << bucket._num_external << std::endl;
+		std::cout << "number of buckets: " << buckets_.size() << std::endl;
+		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+			const bucket_type & bucket = buckets_[i_bucket];
+			std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << std::endl;
 		}
 	}
 
@@ -1279,28 +1302,28 @@ public:
 		size_type max_external = 0;
 
 		
-		for (size_type i_bucket = 0; i_bucket < _buckets.size(); i_bucket++) {
-			const bucket_type & b = _buckets[i_bucket];
+		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+			const bucket_type & b = buckets_[i_bucket];
 			
-			sum_external += b._num_external;
-			square_sum_external += b._num_external * b._num_external;
-			if (b._num_external > max_external)
-				max_external = b._num_external;
+			sum_external += b.n_external_;
+			square_sum_external += b.n_external_ * b.n_external_;
+			if (b.n_external_ > max_external)
+				max_external = b.n_external_;
 		}
 	
-		double avg_external = (double)sum_external / (double)_buckets.size();
-		double std_external = sqrt(((double)square_sum_external / (double)_buckets.size()) - (avg_external*avg_external));
+		double avg_external = (double)sum_external / (double)buckets_.size();
+		double std_external = sqrt(((double)square_sum_external / (double)buckets_.size()) - (avg_external*avg_external));
 
-		STXXL_MSG("Buckets count        : " << _buckets.size())
-		STXXL_MSG("Values total         : " << _num_total)
-		STXXL_MSG("Values buffered      : " << _buffer_size)
-		STXXL_MSG("Max Buffer-Size      : " << _max_buffer_size)
+		STXXL_MSG("Buckets count        : " << buckets_.size())
+		STXXL_MSG("Values total         : " << num_total_)
+		STXXL_MSG("Values buffered      : " << buffer_size_)
+		STXXL_MSG("Max Buffer-Size      : " << max_buffer_size_)
 		STXXL_MSG("Max external/bucket  : " << max_external)
 		STXXL_MSG("Avg external/bucket  : " << avg_external)
 		STXXL_MSG("Std external/bucket  : " << std_external)
 		STXXL_MSG("Load-factor          : " << load_factor())
-		STXXL_MSG("Blocks allocated     : " << _bids.size() << " => " << (_bids.size()*block_type::raw_size) << " bytes")
-		STXXL_MSG("Bytes per value      : " << ((double)(_bids.size()*block_type::raw_size) / (double)_num_total))
+		STXXL_MSG("Blocks allocated     : " << bids_.size() << " => " << (bids_.size()*block_type::raw_size) << " bytes")
+		STXXL_MSG("Bytes per value      : " << ((double)(bids_.size()*block_type::raw_size) / (double)num_total_))
 	}
 
 }; /* end of class hash_map */
