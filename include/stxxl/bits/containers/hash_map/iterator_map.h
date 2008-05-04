@@ -128,6 +128,7 @@ public:
 			(**it2fix).source_ = hash_map_type::src_external;
 			(**it2fix).ext_valid_ = true;	// external position is now known (i_ext) and therefore valid
 			(**it2fix).reset_reader();
+			(**it2fix).reader_ = NULL;
 		}
 	}
 
@@ -214,7 +215,7 @@ private:
 
 
 public:
-	void swap(iterator_map<HashMap_> & obj)
+	void swap(iterator_map<HashMap> & obj)
 	{
 		std::swap(it_map_, obj.it_map_);
 		std::swap(map_, obj.map_);
