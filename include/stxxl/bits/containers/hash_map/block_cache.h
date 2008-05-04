@@ -92,9 +92,9 @@ namespace hash_map
 					n_wrong_subblock(0)
 			{
 				blocks_.reserve(cache_size);
-				bids_.reserve(cache_size);
-				reqs_.resize(cache_size);
 				free_blocks_.reserve(cache_size);
+				bids_.resize(cache_size);
+				reqs_.resize(cache_size);
 				dirty_.resize(cache_size, false);
 				valid_subblock_.resize(cache_size);
 				retain_count_.resize(cache_size);
@@ -166,8 +166,12 @@ namespace hash_map
 					
 				if (dirty_[i_block2kick])
 				{
-					memcpy(wblock_, blocks_[i_block2kick], block_type::raw_size);
-					wblock_ = writer_.write(wblock_, bids_[i_block2kick]);
+//					memcpy(wblock_, blocks_[i_block2kick], block_type::raw_size);
+//					wblock_ = writer_.write(wblock_, bids_[i_block2kick]);
+
+					request_ptr req = blocks_[i_block2kick]->write(bids_[i_block2kick]);
+					req->wait();
+
 					++n_written;
 				}
 				else
@@ -224,8 +228,12 @@ namespace hash_map
 				if (valid_subblock_[i_block] != valid_all)
 				{
 					reqs_[i_block] = blocks_[i_block]->read(bid);
-					reqs_[i_block]->wait();
 					valid_subblock_[i_block] = valid_all;
+				}
+				
+				if (reqs_[i_block].valid()) {
+					if (reqs_[i_block]->poll() == false)
+						reqs_[i_block]->wait();
 				}
 				
 				dirty_[i_block] = true;
