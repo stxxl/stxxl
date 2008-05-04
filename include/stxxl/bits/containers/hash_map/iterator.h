@@ -8,6 +8,10 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP__ITERATOR_H
 #define STXXL_CONTAINERS_HASH_MAP__ITERATOR_H
 
+#include "stxxl/bits/io/iobase.h"
+#include "stxxl/bits/mng/mng.h"
+
+#include "stxxl/bits/containers/hash_map/util.h"
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -42,13 +46,13 @@ public:
 	typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
 	typedef typename hash_map_type::source_type       source_type;
 	
-	typedef bufferedreader_<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
+	typedef buffered_reader<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
 
 	typedef std::forward_iterator_tag                 iterator_category;
 
 
 protected:
-	HashMap     * map_
+	HashMap     * map_;
 	reader_type * reader_;
 	bool          prefetch_;	/* true if prefetching enabled; false by default, will be set to true when incrementing (see find_next()) */
 	node_type   * node_;		/* current (source=internal) or old (src=external) internal node */
@@ -72,7 +76,7 @@ private:
 
 public:
 	//! \brief Construct a new iterator
-	hash_map_iterator_base(hash_map_type * map, size_type i_bucket, node_type *node, size_type i_external, source_type source, bool ext_valid, key_type key) :
+	hash_map_iterator_base(HashMap * map, size_type i_bucket, node_type *node, size_type i_external, source_type source, bool ext_valid, key_type key) :
 		map_(map),
 		i_bucket_(i_bucket),
 		node_(node),
@@ -174,15 +178,15 @@ protected:
 	{
 		const bucket_type & bucket = map_->buckets_[i_bucket_];
 		
-		bid_iterator_type first = map_->bids_.begin() + bucket.i_block_;
-		bid_iterator_type last  = map_->bids_.end();
+		bid_iterator_type begin = map_->bids_.begin() + bucket.i_block_;
+		bid_iterator_type end   = map_->bids_.end();
 		
-		reader_ = new reader_type(first, last, &(map_->block_cache_), bucket.i_first_subblock_, prefetch_);
+		reader_ = new reader_type(begin, end, &(map_->block_cache_), bucket.i_subblock_, prefetch_);
 		
 		// external value's index already known
 		if (ext_valid_)
 		{
-			for (size_type i = 0; i < i_external_; i++)
+			for (size_type i = 0; i < i_external_; i++)		// TODO: speed this up (go directly to i_external_
 				++(*reader_);
 		}
 		// otw lookup external value.
@@ -196,7 +200,7 @@ protected:
 		else
 		{
 			i_external_ = 0;
-			while (i_external_ < bucket.num_external_)
+			while (i_external_ < bucket.n_external_)
 			{
 				if (map_->__gt(reader_->const_value().first, node_->value_.first))
 					break;
@@ -245,10 +249,10 @@ public:
 		// determine starting-points for comparision, which are given by:
 		// - tmp_node: smallest internal value > old value (tmp_node may be NULL)
 		// - reader_: smallest external value > old value (external value may not exists)
-		node_type *tmp_node = (node_) ? node_ : bucket.internal_list_;
+		node_type *tmp_node = (node_) ? node_ : bucket.list_;
 		if (source_ == hash_map_type::src_external)
 		{
-			while (tmp_node && map_->__leq(tmp_node->value_.first, key_)
+			while (tmp_node && map_->__leq(tmp_node->value_.first, key_))
 				tmp_node = tmp_node->next();
 			
 			++i_external_;
@@ -261,7 +265,7 @@ public:
 		
 		while (true) {
 			// internal and external values available
-			while (tmp_node && i_external_ < bucket.num_external_)
+			while (tmp_node && i_external_ < bucket.n_external_)
 			{
 				// internal value less or equal external value => internal wins
 				if (map_->__leq(tmp_node->value_.first, reader_->const_value().first))
@@ -291,7 +295,7 @@ public:
 				}
 			}
 			// only external values left
-			if (i_external_ < bucket.num_external_)
+			if (i_external_ < bucket.n_external_)
 			{
 				key_ = reader_->const_value().first;
 				source_ = hash_map_type::src_external;
@@ -303,7 +307,7 @@ public:
 				node_ = tmp_node;
 				if (!node_->deleted())
 				{
-					key_ = node_->_value.first;
+					key_ = node_->value_.first;
 					source_ = hash_map_type::src_internal;
 					goto end_search;
 				}
@@ -325,9 +329,9 @@ public:
 			{
 				bucket = map_->buckets_[i_bucket_];
 				i_external_ = 0;
-				tmp_node = bucket.internal_list_;
+				tmp_node = bucket.list_;
 				node_ = NULL;
-				reader_->skip_to(map_->bids_.begin()+bucket.i_block_, bucket.i_first_subblock_);
+				reader_->skip_to(map_->bids_.begin()+bucket.i_block_, bucket.i_subblock_);
 			}
 		}
 		
@@ -372,7 +376,7 @@ public:
 	typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
 	typedef typename hash_map_type::source_type       source_type;
 	
-	typedef bufferedreader_<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
+	typedef buffered_reader<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
 
 	typedef std::forward_iterator_tag                 iterator_category;
 	
@@ -462,7 +466,7 @@ public:
 	typedef typename hash_map_type::bid_iterator_type bid_iterator_type;
 	typedef typename hash_map_type::source_type       source_type;
 	
-	typedef bufferedreader_<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
+	typedef buffered_reader<typename hash_map_type::block_cache_type, bid_iterator_type> reader_type;
 
 	typedef std::forward_iterator_tag                 iterator_category;
 	
