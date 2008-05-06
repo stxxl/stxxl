@@ -514,13 +514,14 @@ public:
 
 	void print_statistics(std::ostream & o = std::cout) const
 	{
-		o << "Found internal    : " << n_found_internal << std::endl;
-		o << "Found external    : " << n_found_external << std::endl;
-		o << "Not found         : " << n_not_found << std::endl;
-		o << "Subblocks accessed: " << n_subblocks_loaded << std::endl;
+		o << "Find-statistics:" << std::endl;
+		o << "  Found internal     : " << n_found_internal << std::endl;
+		o << "  Found external     : " << n_found_external << std::endl;
+		o << "  Not found          : " << n_not_found << std::endl;
+		o << "  Subblocks searched : " << n_subblocks_loaded << std::endl;
 		
-		iterator_map_.print_statistics();
-		block_cache_.print_statistics();
+		iterator_map_.print_statistics(o);
+		block_cache_.print_statistics(o);
 	}
 	
 
@@ -1240,68 +1241,67 @@ public:
 	friend struct HashedValuesStream<self_type, reader_type>;
 
 
-#pragma statistics
-	void __dump_external() {
-		reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
-	
-		for (size_type i_block = 0; i_block < bids_.size(); i_block++) {
-			std::cout << "block " << i_block << ":\n";
-			
-			for (size_type i_subblock = 0; i_subblock < block_size; i_subblock++) {
-				std::cout << "  subblock " << i_subblock <<":\n    ";
-				
-				for (size_type i_element = 0; i_element < subblock_size; i_element++) {
-					std::cout << reader.const_value().first << ", ";
-					++reader;
-				}
-				std::cout << std::endl;
-			}
-		}
-	}
-	
-	void __dump_buckets() {
-		reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
-
-		std::cout << "number of buckets: " << buckets_.size() << std::endl;
-		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
-			const bucket_type & bucket = buckets_[i_bucket];
-			reader.skip_to(bids_.begin()+bucket.i_block_, bucket.i_subblock_);
-			
-			std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << std::endl;
-					  
-			node_type *node = bucket.list_;
-			std::cout << "     internal_list=";
-			while (node) {
-				std::cout << node->value_.first << " (del=" << node->deleted() <<"), ";
-				node = node->next();
-			}
-			std::cout << std::endl;
-			
-			std::cout << "     external=";
-			for (size_type i_element = 0; i_element < bucket.n_external_; i_element++) {
-				std::cout << reader.const_value().first << ", ";
-				++reader;
-			}
-			std::cout << std::endl;
-		}
-	}
-	
-	void __dump_bucket_statistics() {
-		std::cout << "number of buckets: " << buckets_.size() << std::endl;
-		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
-			const bucket_type & bucket = buckets_[i_bucket];
-			std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << std::endl;
-		}
-	}
+// #pragma statistics
+//	void __dump_external() {
+//		reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
+//	
+//		for (size_type i_block = 0; i_block < bids_.size(); i_block++) {
+//			std::cout << "block " << i_block << ":\n";
+//			
+//			for (size_type i_subblock = 0; i_subblock < block_size; i_subblock++) {
+//				std::cout << "  subblock " << i_subblock <<":\n    ";
+//				
+//				for (size_type i_element = 0; i_element < subblock_size; i_element++) {
+//					std::cout << reader.const_value().first << ", ";
+//					++reader;
+//				}
+//				std::cout << std::endl;
+//			}
+//		}
+//	}
+//	
+//	void __dump_buckets() {
+//		reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
+//
+//		std::cout << "number of buckets: " << buckets_.size() << std::endl;
+//		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+//			const bucket_type & bucket = buckets_[i_bucket];
+//			reader.skip_to(bids_.begin()+bucket.i_block_, bucket.i_subblock_);
+//			
+//			std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << std::endl;
+//					  
+//			node_type *node = bucket.list_;
+//			std::cout << "     internal_list=";
+//			while (node) {
+//				std::cout << node->value_.first << " (del=" << node->deleted() <<"), ";
+//				node = node->next();
+//			}
+//			std::cout << std::endl;
+//			
+//			std::cout << "     external=";
+//			for (size_type i_element = 0; i_element < bucket.n_external_; i_element++) {
+//				std::cout << reader.const_value().first << ", ";
+//				++reader;
+//			}
+//			std::cout << std::endl;
+//		}
+//	}
+//	
+//	void __dump_bucket_statistics() {
+//		std::cout << "number of buckets: " << buckets_.size() << std::endl;
+//		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
+//			const bucket_type & bucket = buckets_[i_bucket];
+//			std::cout << "  bucket " << i_bucket << ": block=" << bucket.i_block_ << ", subblock=" << bucket.i_subblock_ << ", external=" << bucket.n_external_ << std::endl;
+//		}
+//	}
 
 public:
-	//! \brief Print some statistics: Number of buckets, number of values, buffer-size, values per bucket
-	void print_load_statistics() {
+	//! \brief Even more statistics: Number of buckets, number of values, buffer-size, values per bucket
+	void print_load_statistics(std::ostream & o = std::cout) {
 		size_type sum_external = 0;
 		size_type square_sum_external = 0;
 		size_type max_external = 0;
 
-		
 		for (size_type i_bucket = 0; i_bucket < buckets_.size(); i_bucket++) {
 			const bucket_type & b = buckets_[i_bucket];
 			
@@ -1314,16 +1314,16 @@ public:
 		double avg_external = (double)sum_external / (double)buckets_.size();
 		double std_external = sqrt(((double)square_sum_external / (double)buckets_.size()) - (avg_external*avg_external));
 
-		STXXL_MSG("Buckets count        : " << buckets_.size())
-		STXXL_MSG("Values total         : " << num_total_)
-		STXXL_MSG("Values buffered      : " << buffer_size_)
-		STXXL_MSG("Max Buffer-Size      : " << max_buffer_size_)
-		STXXL_MSG("Max external/bucket  : " << max_external)
-		STXXL_MSG("Avg external/bucket  : " << avg_external)
-		STXXL_MSG("Std external/bucket  : " << std_external)
-		STXXL_MSG("Load-factor          : " << load_factor())
-		STXXL_MSG("Blocks allocated     : " << bids_.size() << " => " << (bids_.size()*block_type::raw_size) << " bytes")
-		STXXL_MSG("Bytes per value      : " << ((double)(bids_.size()*block_type::raw_size) / (double)num_total_))
+		o << "Bucket count         : " << buckets_.size() << std::endl;
+		o << "Values total         : " << num_total_ << std::endl;
+		o << "Values buffered      : " << buffer_size_ << std::endl;
+		o << "Max Buffer-Size      : " << max_buffer_size_ << std::endl;
+		o << "Max external/bucket  : " << max_external << std::endl;
+		o << "Avg external/bucket  : " << avg_external << std::endl;
+		o << "Std external/bucket  : " << std_external << std::endl;
+		o << "Load-factor          : " << load_factor() << std::endl;
+		o << "Blocks allocated     : " << bids_.size() << " => " << (bids_.size()*block_type::raw_size) << " bytes" << std::endl;
+		o << "Bytes per value      : " << ((double)(bids_.size()*block_type::raw_size) / (double)num_total_) << std::endl;
 	}
 
 }; /* end of class hash_map */
