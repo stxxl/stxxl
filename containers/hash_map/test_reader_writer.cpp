@@ -112,26 +112,26 @@ void reader_writer_test() {
 				++reader;
 			}
 
-/*			reader_type reader2(bids.begin(), bids.end(), &cache);
+			reader_type reader2(bids.begin(), bids.end(), &cache);
 			for	(unsigned i = 0; i < n_blocks*block_size*subblock_size; ++i) {
 				assert(reader2.const_value().second == reader2.const_value().first+1);
 				++reader2;
 			}
-*/
-			cache.flush();
-			block_type *block = new block_type;
-			unsigned i = 0;
-			for (unsigned i_block = 0; i_block < n_blocks; i_block++) {
-				stxxl::request_ptr req = block->read(bids[i_block]);
-				req->wait();		
-			
-				for (unsigned inner = 0; inner < block_size*subblock_size; ++inner) {
-					assert( (*block)[inner/subblock_size][inner%subblock_size].first == i);
-					assert( (*block)[inner/subblock_size][inner%subblock_size].second == i+1);
-					i++;
-				}
-			}
-			delete block;
+
+//			cache.flush();
+//			block_type *block = new block_type;
+//			unsigned i = 0;
+//			for (unsigned i_block = 0; i_block < n_blocks; i_block++) {
+//				stxxl::request_ptr req = block->read(bids[i_block]);
+//				req->wait();		
+//			
+//				for (unsigned inner = 0; inner < block_size*subblock_size; ++inner) {
+//					assert( (*block)[inner/subblock_size][inner%subblock_size].first == i);
+//					assert( (*block)[inner/subblock_size][inner%subblock_size].second == i+1);
+//					i++;
+//				}
+//			}
+//			delete block;
 		}
 		
 //		cache.__dump_cache();
