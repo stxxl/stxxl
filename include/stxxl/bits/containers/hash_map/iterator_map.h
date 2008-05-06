@@ -208,7 +208,7 @@ private:
 	
 	// changes hash_map pointer in all contained iterators
 	void change_hash_map_pointers(hash_map_type * map) {
-		for (const_mmiterator_type it = it_map_.begin(); it != it_map_.end(); ++it) {
+		for (mmiterator_type it = it_map_.begin(); it != it_map_.end(); ++it) {
 			((*it).second)->map_ = map;
 		}
 	}
@@ -225,12 +225,15 @@ public:
 	}
 
 
-	void print_registered_iterators()
+	void print_statistics(std::ostream & o = std::cout) const
 	{
-		for (mmiterator_type i = it_map_.begin(); i != it_map_.end(); ++i)
+		o << "Registered iterators: " << it_map_.size() << "\n";
+		const_mmiterator_type i = it_map_.begin();
+		for (; i != it_map_.end(); ++i)
 		{
-			std::cout << (*i).second << "  (bucket=" << (*i).second->i_bucket_
-			          << ", node=" << (*i).second->node_ << ", i_ext=" << (*i).second->i_external_ << ")" << std::endl;
+			o << "  Address=" << (*i).second << ", Bucket=" << (*i).second->i_bucket_
+			  << ", Node=" << (*i).second->node_ << ", i_ext=" << (*i).second->i_external_
+			  << ", " << ( ((*i).source_ == hash_map_type::src_external) ? "external" : "internal" ) << std::endl;
 		}
 	}
 };
