@@ -13,12 +13,90 @@
 
 #include "stxxl/bits/containers/btree/btree_pager.h"
 #include <ext/hash_map>
+#include <vector>
+#include <list>
 
 __STXXL_BEGIN_NAMESPACE
 
 
 namespace hash_map
 {
+
+	namespace cache_block_helper
+	{
+		template <class BlockType>
+		class write_buffer
+		{
+		public:
+			typedef BlockType block_type;
+			typedef typename block_type::bid_type bid_type;
+		
+		private:
+			std::vector<block_type *> blocks_;
+			std::vector<request_ptr> reqs_;
+			std::vector<unsigned> free_blocks_;
+			std::list<unsigned> busy_blocks_;	// make that a circular-buffer
+		
+		public:
+			write_buffer(unsigned size)
+			{
+				blocks_.reserve(size);
+				free_blocks_.reserve(size);
+				reqs_.resize(size);
+					
+				for (unsigned_type i=0; i<size; i++) {
+					blocks_.push_back(new block_type());
+					free_blocks_.push_back(i);
+				}			
+			}
+			
+			// Writes the given block back to disk;
+			// callers have to exchange the passed block with the returned one!
+			block_type * write(block_type *write_block, const bid_type & bid)
+			{
+				if (free_blocks_.empty()) {
+					unsigned i_buffer = busy_blocks_.front();
+					busy_blocks_.pop_front();
+					
+					if (reqs_[i_buffer].valid())
+						reqs_[i_buffer]->wait();
+					
+					free_blocks_.push_back(i_buffer);
+				}
+				
+				unsigned i_buffer = free_blocks_.back();
+				free_blocks_.pop_back();
+				block_type * buffer = blocks_[i_buffer];
+
+				blocks_[i_buffer] = write_block;
+				reqs_[i_buffer] = blocks_[i_buffer]->write(bid);
+				busy_blocks_.push_back(i_buffer);
+				
+				return buffer;
+			}
+
+			void flush() {
+				while (!busy_blocks_.empty()) {
+					unsigned i_buffer = busy_blocks_.front();
+					busy_blocks_.pop_front();
+					if (reqs_[i_buffer].valid())
+						reqs_[i_buffer]->wait();
+				}
+				busy_blocks_.clear();
+				free_blocks_.clear();
+				for (unsigned i = 0; i < blocks_.size(); i++)
+					free_blocks_.push_back(i);
+			}
+			
+			~write_buffer() {
+				flush();
+				for (unsigned i = 0; i < blocks_.size(); i++)
+					delete blocks_[i];
+			}
+		};
+	} // end namespace cache_block_helper
+
+
 	template <class BlockType>
 	class block_cache
 	{		
@@ -29,7 +107,6 @@ namespace hash_map
 			typedef typename subblock_type::bid_type subblock_bid_type;
 		
 		private:
-			/* Test BIDs for equality */
 			struct bid_eq
 			{
   				bool operator () (const bid_type & a, const bid_type & b) const
@@ -48,15 +125,14 @@ namespace hash_map
 			};
 			
 			typedef stxxl::btree::lru_pager pager_type;
-			typedef buffered_writer<block_type> writer_type;
-  			typedef __gnu_cxx::hash_map < bid_type, int_type , bid_hash , bid_eq > bid_map_type;
+			typedef cache_block_helper::write_buffer<block_type> write_buffer_type;
+			typedef __gnu_cxx::hash_map < bid_type, int_type , bid_hash , bid_eq > bid_map_type;
 
 			
 			enum { valid_all = block_type::size };
 			
 
-			writer_type	  writer_;		/* writes back dirty blocks  */
-			block_type *  wblock_;		/* used to pass dirty blocks to writer */
+			write_buffer_type         write_buffer_;
 					
 			std::vector<block_type *> blocks_;				/* cached blocks         */
 			std::vector<bid_type>     bids_;				/* bids of cached blocks */
@@ -81,8 +157,7 @@ namespace hash_map
 			//! \brief Construct a new block-cache.
 			//! \param cache_size cache-size in number of blocks
 			block_cache( unsigned_type cache_size ) : 
-					writer_(config::get_instance()->disks_number()*2, 1),
-					wblock_(writer_.get_free_block()),
+					write_buffer_(config::get_instance()->disks_number()*2),
 					pager_(cache_size),
 					n_found(0),
 					n_not_found(0),
@@ -127,16 +202,12 @@ namespace hash_map
 						reqs_[i_block]->wait();
 						
 					if (dirty_[i_block])
-					{
-						memcpy(wblock_, blocks_[i_block], block_type::raw_size);
-						wblock_ = writer_.write(wblock_, bids_[i_block]);
-					}
+						blocks_[i_block] = write_buffer_.write(blocks_[i_block], bids_[i_block]);
 				}
+				write_buffer_.flush();
 				
 				for (unsigned_type i=0; i<size(); ++i)
 					delete blocks_[i];
-					
-				writer_.flush();
 			}
 			
 
@@ -166,12 +237,7 @@ namespace hash_map
 					
 				if (dirty_[i_block2kick])
 				{
-//					memcpy(wblock_, blocks_[i_block2kick], block_type::raw_size);
-//					wblock_ = writer_.write(wblock_, bids_[i_block2kick]);
-
-					request_ptr req = blocks_[i_block2kick]->write(bids_[i_block2kick]);
-					req->wait();
-
+					blocks_[i_block2kick] = write_buffer_.write(blocks_[i_block2kick], bids_[i_block2kick]);
 					++n_written;
 				}
 				else
@@ -358,12 +424,11 @@ namespace hash_map
 					const unsigned_type i_block = (*i).second;
 					if (dirty_[i_block])
 					{
-						memcpy(wblock_, blocks_[i_block], block_type::raw_size);
-						wblock_ = writer_.write(wblock_, bids_[i_block]);
+						blocks_[i_block] = write_buffer_.write(blocks_[i_block], bids_[i_block]);
 						dirty_[i_block] = false;
 					}
 				}
-				writer_.flush();
+				write_buffer_.flush();
 			}
 			
 			//! \brief Empty cache; don't write back dirty blocks
@@ -381,10 +446,10 @@ namespace hash_map
 			//! \brief Print statistics: Number of hits/misses, blocks forced from cache or written back.
 			void print_statistics(std::ostream & o = std::cout) const
 			{
-				o << "Found blocks                      : " << n_found<<" ("<< 100.*double(n_found)/double(n_read)<<"%)"<<std::endl;
-				o << "Not found blocks                  : " << n_not_found<<std::endl;
-				o << "Read blocks                       : " << n_read<<std::endl;
-				o << "Written blocks                    : " << n_written<<std::endl;
+				o << "Blocks found                      : " << n_found<<" ("<< 100.*double(n_found)/double(n_read)<<"%)"<<std::endl;
+				o << "Blocks not found                  : " << n_not_found<<std::endl;
+				o << "Blocks read                       : " << n_read<<std::endl;
+				o << "Blocks written                    : " << n_written<<std::endl;
 				o << "Clean blocks forced from the cache: " << n_clean_forced<<std::endl;
 				o << "Wrong subblock cached             : " << n_wrong_subblock <<std::endl;
 			}
@@ -423,29 +488,29 @@ namespace hash_map
 			
 		
 //		private:
-			/* show currently cached blocks */
-			void __dump_cache() const {
-				for (unsigned i = 0; i < blocks_.size(); i++) {
-					bid_type bid = bids_[i];
-					if (bid_map_.count(bid) == 0) {
-						std::cout << "Block " << i << ": empty\n";
-						continue;
-					}
-					
-					std::cout << "Block " << i << ": bid=" << bids_[i] << " dirty=" << dirty_[i] << " retain_count=" << retain_count_[i] << " valid_subblock=" << valid_subblock_[i] << "\n";
-					for (unsigned k = 0; k < block_type::size; k++) {
-						std::cout << "  Subbblock " << k << ": ";
-						if (valid_subblock_[i] != valid_all && valid_subblock_[i] != k) {
-							std::cout << "not valid\n";
-							continue;
-						}
-						for (unsigned l = 0; l < block_type::value_type::size; l++) {
-							std::cout << "(" << (*blocks_[i])[k][l].first << ", " << (*blocks_[i])[k][l].second << ") ";
-						}
-						std::cout << std::endl;
-					}
-				}
-			}
+//			/* show currently cached blocks */
+//			void __dump_cache() const {
+//				for (unsigned i = 0; i < blocks_.size(); i++) {
+//					bid_type bid = bids_[i];
+//					if (bid_map_.count(bid) == 0) {
+//						std::cout << "Block " << i << ": empty\n";
+//						continue;
+//					}
+//					
+//					std::cout << "Block " << i << ": bid=" << bids_[i] << " dirty=" << dirty_[i] << " retain_count=" << retain_count_[i] << " valid_subblock=" << valid_subblock_[i] << "\n";
+//					for (unsigned k = 0; k < block_type::size; k++) {
+//						std::cout << "  Subbblock " << k << ": ";
+//						if (valid_subblock_[i] != valid_all && valid_subblock_[i] != k) {
+//							std::cout << "not valid\n";
+//							continue;
+//						}
+//						for (unsigned l = 0; l < block_type::value_type::size; l++) {
+//							std::cout << "(" << (*blocks_[i])[k][l].first << ", " << (*blocks_[i])[k][l].second << ") ";
+//						}
+//						std::cout << std::endl;
+//					}
+//				}
+//			}
 	};
 	
 } /* namespace hash_map */
