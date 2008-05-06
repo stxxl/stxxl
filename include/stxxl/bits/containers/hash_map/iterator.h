@@ -229,7 +229,7 @@ public:
 	//!	- if there are remaining internal or external values in the current bucket, choose the smallest among them, that is not marked as deleted
 	//!	- otherwise continue with the next bucket
 	//! 
-	void find_next() {
+	void find_next(bool start_prefetching = false) {
 		// invariant: current external value is always > current internal value
 		assert(!end_);
 	
@@ -240,7 +240,7 @@ public:
 			init_reader();
 
 		// when incremented once, more increments are likely to follow; therefore start prefetching
-		if (!prefetch_)
+		if (start_prefetching && !prefetch_)
 		{
 			reader_->enable_prefetching();
 			prefetch_ = true;
@@ -441,7 +441,7 @@ public:
 	//! \brief Increment iterator
 	hash_map_iterator<hash_map_type> & operator ++ ()
 	{
- 		base_type::find_next();
+ 		base_type::find_next(true);
 		return *this;
 	}
 };
@@ -533,7 +533,7 @@ public:
 	//! \brief Increment iterator
 	hash_map_const_iterator<hash_map_type> & operator ++ ()
 	{
-		base_type::find_next();
+		base_type::find_next(true);
 		return *this;
 	}
 
