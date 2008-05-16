@@ -29,7 +29,7 @@ std::ostream & operator << (std::ostream & o, const my_type & obj)
     return o;
 }
 
-struct my_cmp // greater
+struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 {
     bool operator ()  (const my_type & a, const my_type & b) const
     {

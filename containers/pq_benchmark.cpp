@@ -64,7 +64,7 @@ bool operator > (const my_record & a, const my_record & b)
 
 
 
-struct comp_type
+struct comp_type : std::binary_function<my_record, my_record, bool>
 {
     bool operator ()  (const my_record & a, const my_record & b) const
     {

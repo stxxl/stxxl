@@ -1,4 +1,4 @@
-TESTS			 = test_vector test_stack test_migr_stack test_many_stacks test_pqueue test_queue test_ext_merger bench_pqueue copy_file test_map test_map_random test_deque test_iterators
+TESTS			 = test_vector test_stack test_migr_stack test_many_stacks test_pqueue test_queue test_ext_merger test_ext_merger2 bench_pqueue copy_file test_map test_map_random test_deque test_iterators
 TESTS_BDB		 = berkeley_db_benchmark
 TESTS_LEDASM		 = leda_sm_pq_benchmark leda_sm_stack_benchmark
 TESTS_TPIE		 = tpie_stack_benchmark

@@ -46,6 +46,14 @@ struct my_cmp : public std::greater<my_type>
     }
 };
 
+my_type * make_sequence(dummy_merger & dummy, int l)
+{
+    my_type * seq = new my_type[l + 1]; // + sentinel
+    dummy.multi_merge(seq, seq + l);
+    seq[l] = my_cmp().min_value(); // sentinel
+    return seq;
+}
+
 int main()
 {
     prefetch_pool<block_type> p_pool(1);
@@ -65,20 +73,15 @@ int main()
     merger.insert_segment(dummy, 1024 * 4);
     merger.multi_merge(output.begin(), output.end());
 
-    //template <class ValTp_,class Cmp_,unsigned KNKMAX>
-    loser_tree < my_type, my_cmp, 10 > loser;
-    my_type * seq1 = new my_type[1024];
-    dummy.multi_merge(seq1, seq1 + 1024);
+    loser_tree < my_type, my_cmp, 8 > loser;
+    my_type * seq1 = make_sequence(dummy, 1024);
     cnt = 20;
-    my_type * seq2 = new my_type[1024];
-    dummy.multi_merge(seq2, seq2 + 1024);
+    my_type * seq2 = make_sequence(dummy, 1024);
     cnt = 10;
-    my_type * seq3 = new my_type[1024];
-    dummy.multi_merge(seq3, seq3 + 1024);
+    my_type * seq3 = make_sequence(dummy, 1024);
     cnt = -100;
-    my_type * seq4 = new my_type[1024];
+    my_type * seq4 = make_sequence(dummy, 1024);
     my_type * out = new my_type[4 * 1024];
-    dummy.multi_merge(seq4, seq4 + 1024);
     loser.init();
     loser.insert_segment(seq1, 1024);
     loser.insert_segment(seq2, 1024);
