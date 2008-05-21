@@ -11,7 +11,7 @@
 #include "stxxl/stack"
 #include "stxxl/priority_queue"
 #include "stxxl/map"
-#include "stxxl/hash_map"
+#include "stxxl/unordered_map"
 #include "stxxl/queue"
 #include "stxxl/deque"
 
