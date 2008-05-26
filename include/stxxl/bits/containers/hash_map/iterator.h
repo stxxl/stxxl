@@ -8,6 +8,7 @@
 #ifndef STXXL_CONTAINERS_HASH_MAP__ITERATOR_H
 #define STXXL_CONTAINERS_HASH_MAP__ITERATOR_H
 
+#include "stxxl/bits/namespace.h"
 #include "stxxl/bits/io/iobase.h"
 #include "stxxl/bits/mng/mng.h"
 
@@ -33,7 +34,7 @@ class hash_map_iterator_base
 public:
 
 	friend class iterator_map<HashMap>;
-	friend void HashMap::erase(hash_map_iterator<HashMap> & it);
+	friend void HashMap::erase(hash_map_const_iterator<HashMap> it);
 
 	typedef HashMap                                   hash_map_type;
 	typedef typename hash_map_type::size_type         size_type;
@@ -69,9 +70,7 @@ protected:
 
 private:
 	hash_map_iterator_base()
-	{
-		STXXL_VERBOSE3("hash_map_iterator_base def contruct addr="<<this);
-	}
+	{ }
 
 
 public:
@@ -133,13 +132,14 @@ public:
 		{
 			if(map_ && !end_) map_->iterator_map_.unregister_iterator(*this);
 			
+			reset_reader();
+			
 			map_        = obj.map_;
 			i_bucket_   = obj.i_bucket_;
 			node_       = obj.node_;
 			source_     = obj.source_;
 			i_external_ = obj.i_external_;
 			ext_valid_  = obj.ext_valid_;
-			reader_     = NULL;
 			prefetch_	= obj.prefetch_;
 			end_        = obj.end_;
 			key_        = obj.key_;
@@ -384,10 +384,11 @@ public:
 	typedef hash_map_const_iterator<hash_map_type>	  hash_map_const_iterator;
 
 
-public:
+private:
 	hash_map_iterator() :
 		base_type() {}
-	
+
+public:	
 	hash_map_iterator(hash_map_type *map, size_type i_bucket, node_type *node, size_type i_external, source_type source, bool ext_valid, key_type key) :
 		base_type(map, i_bucket, node, i_external, source, ext_valid, key) {}
 	
@@ -473,16 +474,21 @@ public:
 	typedef hash_map_iterator_base<hash_map_type>     base_type;
 	typedef hash_map_iterator<hash_map_type>		  hash_map_iterator;
 
-public:
+private:
 	hash_map_const_iterator() :
 		base_type() {}
 
+public:
 	hash_map_const_iterator(hash_map_type * map, size_type i_bucket, node_type *node, size_type i_external, source_type source, bool ext_valid, key_type key) :
 		base_type(map, i_bucket, node, i_external, source, ext_valid, key)
 	{ }
 	
 	hash_map_const_iterator(hash_map_type *map) :
 		base_type(map)
+	{ }
+	
+	hash_map_const_iterator(const hash_map_iterator & obj) :
+		base_type(obj)
 	{ }
 
 	hash_map_const_iterator(const hash_map_const_iterator & obj) :
