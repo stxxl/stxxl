@@ -8,9 +8,12 @@
 #ifndef _STXXL_HASH_MAP_H_
 #define _STXXL_HASH_MAP_H_
 
-
+#include "stxxl/bits/namespace.h"
 #include "stxxl/bits/io/iobase.h"
 #include "stxxl/bits/mng/mng.h"
+#include "stxxl/bits/common/tuple.h"
+#include "stxxl/bits/stream/stream.h"
+#include "stxxl/bits/stream/sort_stream.h"
 
 #include "stxxl/bits/containers/hash_map/iterator.h"
 #include "stxxl/bits/containers/hash_map/iterator_map.h"
@@ -243,17 +246,14 @@ public:
 		// found value in internal memory
 		if (node && __eq(node->value_.first, value.first))
 		{
-			if (node->deleted())
+			bool old_deleted = node->deleted();
+			if (old_deleted)
 			{
 				node->deleted(false);
 				node->value_ = value;
-				num_total_++;
-				return std::pair<iterator, bool>(iterator(this, i_bucket, node, 0, src_internal, false, value.first), true);
+				++num_total_;
 			}
-			else
-			{
-				return std::pair<iterator, bool>(iterator(this, i_bucket, node, 0, src_internal, false, value.first), false);
-			}
+			return std::pair<iterator, bool>(iterator(this, i_bucket, node, 0, src_internal, false, value.first), old_deleted);
 		}
 
 		// search external memory ...
@@ -268,17 +268,17 @@ public:
 			{
 				return std::pair<iterator, bool>(iterator(this, i_bucket, node, i_external, src_external, true, value.first), false);
 			}
-			// ... otherwise add value to internal list
+			// ... otherwise create a new buffer-node to add the value
 			else
 			{
-				num_total_++;
+				++num_total_;
 				node_type *new_node = (node) ? 
 										(node->next(__new_node(value, node->next(), false))) :
 										(bucket.list_ = __new_node(value, bucket.list_, false));
 			
 				iterator it(this, i_bucket, new_node, 0, src_internal, false, value.first);
 
-				buffer_size_++;
+				++buffer_size_;
 				if (buffer_size_ >= max_buffer_size_)
 					__rebuild_buckets();	// will fix it as well
 				
@@ -301,7 +301,7 @@ public:
 		if (node && __eq(node->value_.first, value.first))
 		{
 			if (node->deleted())
-				num_total_++;
+				++num_total_;
 
 			node->deleted(false);
 			node->value_ = value;
@@ -311,7 +311,7 @@ public:
 		else
 		{
 			oblivious_ = true;
-			num_total_++;
+			++num_total_;
 			node_type *new_node = (node) ? 
 									(node->next(__new_node(value, node->next(), false))) :
 									(bucket.list_ = __new_node(value, bucket.list_, false));
@@ -322,7 +322,7 @@ public:
 			
 			iterator it(this, i_bucket, new_node, 0, src_internal, false, value.first);
 			
-			buffer_size_++;
+			++buffer_size_;
 			if (buffer_size_ >= max_buffer_size_)
 				__rebuild_buckets();
 			
@@ -333,15 +333,15 @@ public:
 	
 	//! \brief Erase value by iterator
 	//! \param it iterator pointing to the value to erase
-	void erase(iterator & it)
+	void erase(const_iterator it)
 	{
-		num_total_--;
+		--num_total_;
 		bucket_type & bucket = buckets_[it.i_bucket_];
 
 		if (it.source_ == src_internal)
 		{
 			it.node_->deleted(true);
-			iterator_map_.fix_iterators_2end(it.i_bucket_, it.key_);	// will fix it as well
+			iterator_map_.fix_iterators_2end(it.i_bucket_, it.key_);
 		}
 		else {
 			node_type *node = __find_key_internal(bucket, it.key_);		// find biggest value < iterator's value
@@ -353,7 +353,7 @@ public:
 
 			iterator_map_.fix_iterators_2end(it.i_bucket_, it.key_);
 			
-			buffer_size_++;
+			++buffer_size_;
 			if (buffer_size_ >= max_buffer_size_)
 				__rebuild_buckets();
 		}
@@ -375,7 +375,7 @@ public:
 			if (!node->deleted())
 			{
 				node->deleted(true);
-				num_total_--;
+				--num_total_;
 				iterator_map_.fix_iterators_2end(i_bucket, key);
 				return 1;
 			}
@@ -391,14 +391,14 @@ public:
 			// found in external memory; add delete-node
 			if (i_external < bucket.n_external_ && __eq(ext_value.first, key))
 			{
-				num_total_--;
+				--num_total_;
 
 				if (node) node->next(__new_node(value_type(key, mapped_type()), node->next(), true));
 				else      bucket.list_ = __new_node(value_type(key, mapped_type()), bucket.list_, true);
 				
 				iterator_map_.fix_iterators_2end(i_bucket, key);
 				
-				buffer_size_++;
+				++buffer_size_;
 				if (buffer_size_ >= max_buffer_size_)
 					__rebuild_buckets();
 				
@@ -423,7 +423,7 @@ public:
 		{
 			if (!node->deleted())
 			{
-				num_total_--;
+				--num_total_;
 				node->deleted(true);
 				iterator_map_.fix_iterators_2end(i_bucket, key);
 			}
@@ -432,14 +432,14 @@ public:
 		else
 		{
 			oblivious_ = true;
-			num_total_--;
+			--num_total_;
 		
 			if (node) node->next(__new_node(value_type(key, mapped_type()), node->next(), true));
 			else      bucket.list_ = __new_node(value_type(key, mapped_type()), bucket.list_, true);
 			
 			iterator_map_.fix_iterators_2end(i_bucket, key);
 		
-			buffer_size_++;
+			++buffer_size_;
 			if (buffer_size_ >= max_buffer_size_)
 				__rebuild_buckets();
 		}
@@ -460,6 +460,7 @@ public:
 		}
 		oblivious_ = false;
 		num_total_ = 0;
+		buffer_size_ = 0;
 		
 		// free external memory
 		block_manager *bm = block_manager::get_instance();
@@ -528,11 +529,14 @@ public:
 	//! \brief Look up value by key. Non-const access.
 	//! \param key key for value to look up
 	iterator find(const key_type& key) {
+		if (buffer_size_+1 >= max_buffer_size_)	// (*)
+			__rebuild_buckets();
+	
 		size_type i_bucket = __bkt_num(key);
 		bucket_type& bucket = buckets_[i_bucket];
 		node_type* node = __find_key_internal(bucket, key);
 	
-		// found in internal list
+		// found in internal-memory buffer
 		if (node && __eq(node->value_.first, key)) {
 			n_found_internal++;
 			if (node->deleted())
@@ -550,12 +554,15 @@ public:
 			if (i_external < bucket.n_external_ && __eq(value.first, key)) {
 				n_found_external++;
 				
-				// create new buffer-node (we expect the value to be changed and
-				// therefore return a reference to an in-memory node rather than to external-memory)
+				// we ultimately expect the user to de-reference the returned iterator to change its value (non-const!).
+				// to prevent an additional disk-access, we create a new node in the internal-memory buffer overwriting the external value.
+				// note: by checking and rebuilding (if neccessary) in (*) we made sure that the new node will fit into the buffer and
+				// no rebuild is neccessary here.
 				node_type *new_node = (node) ? 
 										(node->next(__new_node(value, node->next(), false))) :
 										(bucket.list_ = __new_node(value, bucket.list_, false));
-										
+				++buffer_size_;
+				
 				iterator_map_.fix_iterators_2int(i_bucket, value.first, new_node);
 				
 				return iterator(this, i_bucket, new_node, i_external+1, src_internal, true, key);
@@ -576,7 +583,7 @@ public:
 		const bucket_type& bucket = buckets_[i_bucket];
 		node_type* node = __find_key_internal(bucket, key);
 	
-		// found in internal list
+		// found in internal-memory buffer
 		if (node && __eq(node->value_.first, key)) {
 			n_found_internal++;
 			if (node->deleted())
@@ -635,9 +642,43 @@ public:
 	
 	
 	//! \brief Convenience operator to quickly insert or find values. Use with caution since using this operator will check external-memory.
-	mapped_type & operator[] (const key_type& k) {
-		std::pair<iterator, bool> res = insert(value_type(k, mapped_type()));
-		return (*(res.first)).second;
+	mapped_type & operator[] (const key_type& key) {
+		if (buffer_size_+1 >= max_buffer_size_)	// (*)
+			__rebuild_buckets();
+	
+		size_type i_bucket = __bkt_num(key);
+		bucket_type& bucket = buckets_[i_bucket];
+		node_type* node = __find_key_internal(bucket, key);
+	
+		// found in internal-memory buffer
+		if (node && __eq(node->value_.first, key)) {
+			if (node->deleted()) {
+				node->deleted(false);
+				node->value_.second = mapped_type();
+				++num_total_;
+			}
+			return node->value_.second;
+		}
+		// search external elements
+		else {
+			tuple<size_type, value_type> result = __find_key_external(bucket, key);
+			size_type  i_external = result.first;
+			value_type found_value = result.second;
+
+			value_type buffer_value = (i_external < bucket.n_external_ && __eq(found_value.first, key)) ?
+										found_value :
+										value_type(key, mapped_type());
+
+			// add a new node to the buffer. this new node's value overwrites the external value if it was found and otherwise is set to
+			// (key, mapped_type()) 
+			node_type *new_node = (node) ? 
+									(node->next(__new_node(buffer_value, node->next(), false))) :
+									(bucket.list_ = __new_node(buffer_value, bucket.list_, false));
+			++buffer_size_;
+			// note that we already checked the buffer-size in (*)
+			
+			return new_node->value_.second;
+		}
 	}
 	
 
@@ -812,7 +853,7 @@ private:
 
 
 #pragma mark Searching keys
-	/* Locate the given key in the internal chained list.
+	/* Locate the given key in the internal-memory chained list.
 	   If the key is not present, the node with the biggest key smaller than the given key is returned.
 	   Note that the returned value may be zero: either because the chained list is empty or because
 	   the given key is smaller than all other keys in the chained list.
@@ -948,7 +989,7 @@ private:
 			if (map_->__bkt_num(vextract_(value_).first) != i_bucket_)
 				return true;
 
-			bucket_size_++;
+			++bucket_size_;
 			return false;
 		}
 	};
