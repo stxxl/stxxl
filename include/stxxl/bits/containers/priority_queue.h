@@ -16,9 +16,9 @@
 #include "stxxl/bits/mng/write_pool.h"
 #include "stxxl/bits/common/tmeta.h"
 
-#include <queue>
 #include <list>
 #include <iterator>
+#include <vector>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -31,6 +31,116 @@ __STXXL_BEGIN_NAMESPACE
  */
 namespace priority_queue_local
 {
+
+  /**
+   * @brief Similar to std::priority_queue, with the following differences:
+   * - Maximum size is fixed at construction time, so an array can be used.
+   * - Provides access to underlying heap, so (parallel) sorting in place is possible.
+   * - Can be cleared "at once", without reallocation.
+   */
+  template<typename _Tp, typename _Sequence = std::vector<_Tp>,
+     typename _Compare  = std::less<typename _Sequence::value_type> >
+    class internal_priority_queue
+    {
+      // concept requirements
+      typedef typename _Sequence::value_type _Sequence_value_type;
+
+    public:
+      typedef typename _Sequence::value_type                value_type;
+      typedef typename _Sequence::reference                 reference;
+      typedef typename _Sequence::const_reference           const_reference;
+      typedef typename _Sequence::size_type                 size_type;
+      typedef          _Sequence                            container_type;
+
+    protected:
+      //  See queue::c for notes on these names.
+      _Sequence  c;
+      _Compare   comp;
+      size_type N;
+
+    public:
+      /**
+       *  @brief  Default constructor creates no elements.
+       */
+      explicit
+      internal_priority_queue(size_type capacity)
+      : c(capacity), N(0)
+      {  }
+
+      /**
+       *  Returns true if the %queue is empty.
+       */
+      bool
+      empty() const
+      { return N == 0; }
+
+      /**  Returns the number of elements in the %queue.  */
+      size_type
+      size() const
+      { return N; }
+
+      /**
+       *  Returns a read-only (constant) reference to the data at the first
+       *  element of the %queue.
+       */
+      const_reference
+      top() const
+      {
+        return c.front();
+      }
+
+      /**
+       *  @brief  Add data to the %queue.
+       *  @param  x  Data to be added.
+       *
+       *  This is a typical %queue operation.
+       *  The time complexity of the operation depends on the underlying
+       *  sequence.
+       */
+      void
+      push(const value_type& __x)
+      {
+        c[N] = __x;
+        ++N;
+        std::push_heap(c.begin(), c.begin() + N, comp);
+      }
+
+      /**
+       *  @brief  Removes first element.
+       *
+       *  This is a typical %queue operation.  It shrinks the %queue
+       *  by one.  The time complexity of the operation depends on the
+       *  underlying sequence.
+       *
+       *  Note that no data is returned, and if the first element's
+       *  data is needed, it should be retrieved before pop() is
+       *  called.
+       */
+      void
+      pop()
+      {
+        std::pop_heap(c.begin(), c.begin() + N, comp);
+        --N;
+      }
+
+      /**
+       * @brief Sort all contained elements, write result to @c target.
+       */
+      void sort_to(value_type* target)
+      {
+        std::sort(c.begin(), c.begin() + N, comp);
+        std::reverse_copy(c.begin(), c.begin() + N, target);
+      }
+
+      /**
+       * @brief Remove all contained elements.
+       */
+      void clear()
+      {
+        N = 0;
+      }
+    };
+
 
 /////////////////////////////////////////////////////////////////////
 // auxiliary functions
@@ -1768,7 +1878,7 @@ public:
 
 protected:
 
-    typedef std::priority_queue<value_type, std::vector<value_type>, comparator_type>
+    typedef priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
     insert_heap_type;
 
     typedef priority_queue_local::loser_tree<
@@ -1941,8 +2051,9 @@ inline const typename priority_queue<Config_>::value_type & priority_queue<Confi
 {
     assert(!insertHeap.empty());
 
-    if ( /*(!insertHeap.empty()) && */ cmp(*minBuffer1, insertHeap.top()))
-        return insertHeap.top();
+    const typename priority_queue<Config_>::value_type & t = insertHeap.top();
+    if ( /*(!insertHeap.empty()) && */ cmp(*minBuffer1, t))
+        return t;
 
 
     return *minBuffer1;
@@ -1988,6 +2099,7 @@ inline void priority_queue<Config_>::push(const value_type & obj)
 template <class Config_>
 priority_queue<Config_>::priority_queue(prefetch_pool < block_type > &p_pool_, write_pool<block_type> &w_pool_) :
     p_pool(p_pool_), w_pool(w_pool_),
+    insertHeap(N + 2),
     activeLevels(0), size_(0),
     deallocate_pools(false)
 {
@@ -2013,6 +2125,7 @@ template <class Config_>
 priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem) :
     p_pool(*(new prefetch_pool<block_type>(p_pool_mem / BlockSize))),
     w_pool(*(new write_pool<block_type>(w_pool_mem / BlockSize))),
+    insertHeap(N + 2),
     activeLevels(0), size_(0),
     deallocate_pools(true)
 {
@@ -2255,14 +2368,12 @@ void priority_queue<Config_>::emptyInsertHeap()
     // put the new data there for now
     //insertHeap.sortTo(newSegment);
     value_type * SortTo = newSegment;
-    const value_type * SortEnd = newSegment + N;
-    while (SortTo != SortEnd)
-    {
-        assert(!insertHeap.empty());
-        *SortTo = insertHeap.top();
-        insertHeap.pop();
-        ++SortTo;
-    }
+
+    insertHeap.sort_to(SortTo);
+
+    SortTo = newSegment + N;
+    insertHeap.clear();
+    insertHeap.push(*SortTo);
 
     assert(insertHeap.size() == 1);
 
