@@ -228,6 +228,7 @@ HEADER_FILES_UTILS	+= malloc.h
 
 DEPEXT	 = $(LIBNAME).d # extension of dependency files
 OBJEXT	 = $(LIBNAME).o	# extension of object files
+IIEXT	 = $(LIBNAME).ii
 LIBEXT	 = a		# static library file extension
 EXEEXT	 = $(LIBNAME).bin # executable file extension
 RM	 = rm -f	# remove file command
@@ -236,6 +237,7 @@ OUT	 = -o		# output file option for the compiler and linker
 
 d	?= $(strip $(DEPEXT))
 o	?= $(strip $(OBJEXT))
+ii	?= $(strip $(IIEXT))
 bin	?= $(strip $(EXEEXT))
 
 ###################################################################
@@ -247,6 +249,9 @@ DEPS_MAKEFILES	:= $(wildcard ../Makefile.subdir.gnu ../make.settings ../make.set
 %.$o: %.cpp $(DEPS_MAKEFILES)
 	@$(RM) $@ $*.$d
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $*.$dT -c $(OUTPUT_OPTION) $< && mv $*.$dT $*.$d
+
+%.$(ii): %.cpp $(DEPS_MAKEFILES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -E $(OUTPUT_OPTION) $<
 
 LINK_STXXL	 = $(LINKER) $1 $(STXXL_LINKER_OPTIONS) -o $@
 
