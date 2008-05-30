@@ -9,6 +9,9 @@
  *  sanders@mpi-sb.mpg.de
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
+ *  Copyright  2008  Johannes Singler
+ *  singler@ira.uka.de
+ *  Copyright © 2007, 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  ****************************************************************************/
 
 #include "stxxl/bits/mng/mng.h"
@@ -458,6 +461,7 @@ namespace priority_queue_local
             ext_merger * merger;
             bool allocated;
 
+            //! \returns current element
             const value_type & operator * () const
             {
                 return (*block)[current];
@@ -468,7 +472,7 @@ namespace priority_queue_local
 
             ~sequence_state()
             {
-                STXXL_VERBOSE1("ext_merger sequence_state::~sequence_state()");
+                STXXL_VERBOSE2("ext_merger sequence_state::~sequence_state()");
                 if (bids != NULL)
                 {
                     block_manager * bm = block_manager::get_instance();
@@ -539,7 +543,7 @@ namespace priority_queue_local
                             merger->p_pool->hint(next_bid, *(merger->w_pool));
                         }
                         merger->p_pool->read(block, bid)->wait();
-                        STXXL_VERBOSE1("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
+                        STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
                         block_manager::get_instance()->delete_block(bid);
                         current = 0;
                     }
@@ -549,6 +553,7 @@ namespace priority_queue_local
         };
 
 
+        //a pair consisting a value
         struct Entry
         {
             value_type key; // Key of Loser element (winner for 0)
@@ -758,7 +763,7 @@ namespace priority_queue_local
             assert(logK > 0);
 
             // compact all nonempty segments to the left
-            
+
             unsigned_type to = 0;
             for (unsigned_type from = 0; from < k; from++)
             {
@@ -827,6 +832,7 @@ namespace priority_queue_local
         void multi_merge(OutputIterator begin, OutputIterator end)
         {
             size_type length = end - begin;
+
             STXXL_VERBOSE1("ext_merger::multi_merge from " << k << " sequence(s), length = " << length);
 
             if (length == 0)
@@ -1087,6 +1093,7 @@ namespace priority_queue_local
                 std::list<bid_type> *bids = new std::list<bid_type>(nblocks);
                 bm->new_blocks(alloc_strategy(), bids->begin(), bids->end());
                 block_type * first_block = new block_type;
+
                 another_merger.multi_merge(
                     first_block->begin() + (block_type::size - first_size),
                     first_block->end());
@@ -1214,7 +1221,7 @@ namespace priority_queue_local
         // leaf information
         // note that Knuth uses indices k..k-1
         // while we use 0..k-1
-        Element * current[KNKMAX]; // pointer to actual element
+        Element * current[KNKMAX]; // pointer to current element
         Element * segment[KNKMAX]; // start of Segments
         unsigned_type segment_size[KNKMAX]; // just to count the internal memory consumption
 
@@ -1230,6 +1237,7 @@ namespace priority_queue_local
         void rebuildLoserTree();
         bool is_segment_empty(unsigned_type slot);
         void multi_merge_k(Element * to, unsigned_type length);
+
         template <unsigned LogK>
         void multi_merge_f(Element * to, unsigned_type length)
         {
@@ -1547,6 +1555,8 @@ namespace priority_queue_local
         {
             assert( not_sentinel(to[0])   );
             assert( not_sentinel(to[sz - 1]));
+            assert( is_sentinel(to[sz]));
+
             // get a free slot
             if (free_segments.empty()) { // tree is too small
                 doubleK();
@@ -1663,7 +1673,7 @@ namespace priority_queue_local
                 merge3_iterator(current[0], current[1], current[2], to, length, cmp);
             else
                 merge4_iterator(current[0], current[1], current[2], current[3], to, length, cmp);
-			
+
             rebuildLoserTree();
             if (is_segment_empty(0))
                 deallocate_segment(0);
@@ -1821,7 +1831,8 @@ struct priority_queue_config
         IntLevels = IntLevels_,
         ExtLevels = ExtLevels_,
         BlockSize = BlockSize_,
-        ExtKMAX = ExtKMAX_
+        ExtKMAX = ExtKMAX_,
+        E = sizeof(Tp_)
     };
 };
 
@@ -2221,6 +2232,7 @@ void priority_queue<Config_>::refillBuffer1()
 
     size_type totalSize = 0;
     unsigned_type sz;
+    //activeLevels is <= 4
     for (int_type i = activeLevels - 1;  i >= 0;  i--)
     {
         if ((buffer2[i] + N) - minBuffer2[i] < BufferSize1)
@@ -2266,22 +2278,22 @@ void priority_queue<Config_>::refillBuffer1()
         minBuffer2[0] += sz;
         break;
     case 2:
-			priority_queue_local::merge_iterator(
+        priority_queue_local::merge_iterator(
             minBuffer2[0],
             minBuffer2[1], minBuffer1, sz, cmp);
         break;
     case 3:
-			priority_queue_local::merge3_iterator(
+        priority_queue_local::merge3_iterator(
             minBuffer2[0],
             minBuffer2[1],
             minBuffer2[2], minBuffer1, sz, cmp);
         break;
     case 4:
-	priority_queue_local::merge4_iterator(
+        priority_queue_local::merge4_iterator(
             minBuffer2[0],
             minBuffer2[1],
             minBuffer2[2],
-            minBuffer2[3], minBuffer1, sz, cmp);	//side effect free
+            minBuffer2[3], minBuffer1, sz, cmp); //side effect free
         break;
     default:
         STXXL_THROW(std::runtime_error, "priority_queue<...>::refillBuffer1()",
@@ -2453,10 +2465,10 @@ namespace priority_queue_local
         typedef find_B_m<E_, IntM_, MaxS_, B_, m_, stop> Self;
         enum {
             k = IntM_ / B_, // number of blocks that fit into M
-            E = E_,
+            E = E_, // element size
             IntM = IntM_,
             B = B_,  // block size
-            m = m_,  // ???
+            m = m_,  // number of blocks fitting into buffers
             c = k - m_,
             // memory occ. by block must be at least 10 times larger than size of ext sequence
             // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
@@ -2485,6 +2497,7 @@ namespace priority_queue_local
         typedef dummy result;
     };
 
+    // E_ size of element in bytes
     template <unsigned_type E_, unsigned_type IntM_, unsigned_type MaxS_>
     struct find_settings
     {
@@ -2506,7 +2519,7 @@ namespace priority_queue_local
         {
             X = X_,
             AI = AI_,
-            N = X / (AI * AI)
+            N = X / (AI * AI) //two stage internal
         };
         typedef typename IF < (N >= CriticalSize_), Self, typename compute_N < AI / 2, X, CriticalSize_ > ::result > ::result result;
     };
@@ -2592,19 +2605,19 @@ template <class Tp_, class Cmp_, unsigned_type IntM_, unsigned MaxS_, unsigned T
 class PRIORITY_QUEUE_GENERATOR
 {
 public:
-    typedef typename priority_queue_local::find_settings < sizeof(Tp_), IntM_, MaxS_ > ::result settings;
+    typedef typename priority_queue_local::find_settings < sizeof(Tp_), IntM_, MaxS_ > ::result settings; //actual calculation of B, m, k and E
     enum {
         B = settings::B,
         m = settings::m,
-        X = B * (settings::k - m) / settings::E,
-        Buffer1Size = 32
+        X = B * (settings::k - m) / settings::E,  //interpretation of result
+        Buffer1Size = 32  //fixed
     };
-    typedef typename priority_queue_local::compute_N < (1 << Tune_), X, 4 * Buffer1Size > ::result ComputeN;
+    typedef typename priority_queue_local::compute_N < (1 << Tune_), X, 4 * Buffer1Size > ::result ComputeN;  //derivation of N, AI, AE
     enum
     {
         N = ComputeN::N,
         AI = ComputeN::AI,
-        AE = (m / 2 < 2) ? 2 : (m / 2)
+        AE = (m / 2 < 2) ? 2 : (m / 2)  //at least 2
     };
 public:
     enum {

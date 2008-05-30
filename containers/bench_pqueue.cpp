@@ -54,7 +54,7 @@ int main()
  */
 // typedef priority_queue<priority_queue_config<my_type,my_cmp,
 //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-    const unsigned volume = 2 * 1024 * 1024; // in KB
+    const unsigned volume = 3 * 1024 * 1024; // in KB
     const unsigned mem_for_queue = 256 * 1024 * 1024;
     const unsigned mem_for_pools = 512 * 1024 * 1024;
     typedef PRIORITY_QUEUE_GENERATOR < my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) > gen;
