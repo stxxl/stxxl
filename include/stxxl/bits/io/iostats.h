@@ -13,6 +13,7 @@
 #include "stxxl/bits/common/mutex.h"
 #include "stxxl/bits/common/types.h"
 #include "stxxl/bits/common/utils.h"
+#include "stxxl/bits/noncopyable.h"
 
 #include <iostream>
 
