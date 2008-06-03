@@ -232,7 +232,7 @@ void boostfd_request::serve ()
         STXXL_FORMAT_ERROR_MSG(msg, "seek() in boostfd_request::serve() offset=" << offset
                                                                                  << " this=" << long (this) << " buffer=" <<
                                buffer << " bytes=" << bytes
-                                                                                 << " type=" << ((type == READ) ? "READ" : "WRITE") << " : " << ex.what() )
+                                                                                 << " type=" << ((type == READ) ? "READ" : "WRITE") << " : " << ex.what() );
 
         error_occured(msg.str());
     }
@@ -256,7 +256,7 @@ void boostfd_request::serve ()
                                                                                          << " this=" << long (this) << " buffer=" <<
                                        buffer << " bytes=" << bytes
                                                                                          << " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                                       " nref= " << nref() << " : " << ex.what() )
+                                       " nref= " << nref() << " : " << ex.what() );
 
                 error_occured(msg.str());
             }
@@ -285,7 +285,7 @@ void boostfd_request::serve ()
                                                                                           << " this=" << long (this) << " buffer=" <<
                                        buffer << " bytes=" << bytes
                                                                                           << " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                                       " nref= " << nref() << " : " << ex.what() )
+                                       " nref= " << nref() << " : " << ex.what() );
 
                 error_occured(msg.str());
             }
