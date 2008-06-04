@@ -95,12 +95,11 @@ int main(int argc, char * argv[])
 
     std::vector<std::string> disks_arr;
 
-	int i = 2;
-    for (; i < argc ; ++i)
+    for (int ii = 2; ii < argc ; ++ii)
     {
-        unlink(argv[i]);
-        std::cout << "# Add disk: " << argv[i] << std::endl;
-        disks_arr.push_back(argv[i]);
+        unlink(argv[ii]);
+        std::cout << "# Add disk: " << argv[ii] << std::endl;
+        disks_arr.push_back(argv[ii]);
     }
 
     const unsigned ndisks = disks_arr.size();
@@ -112,8 +111,7 @@ int main(int argc, char * argv[])
     const unsigned chunk_size = buffer_size / chunks;
     const unsigned chunk_size_int = chunk_size / sizeof(int);
 
-    unsigned j = 0;
-	i = 0;
+    unsigned i = 0, j = 0;
 
     request_ptr * reqs = new request_ptr [ndisks * chunks];
     file * * disks = new file *[ndisks];

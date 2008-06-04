@@ -104,10 +104,10 @@ int main(int argc, char * argv[])
 
     std::vector<std::string> disks_arr;
 
-    for (int i = 3; i < argc; i++)
+    for (int ii = 3; ii < argc; ii++)
     {
-        std::cout << "# Add disk: " << argv[i] << std::endl;
-        disks_arr.push_back(argv[i]);
+        std::cout << "# Add disk: " << argv[ii] << std::endl;
+        disks_arr.push_back(argv[ii]);
     }
 
     const unsigned ndisks = disks_arr.size();
@@ -124,7 +124,7 @@ int main(int argc, char * argv[])
     const unsigned chunk_size = buffer_size / chunks;
     const unsigned chunk_size_int = chunk_size / sizeof(int);
 
-    unsigned i = 0, j = 0;
+    unsigned j = 0;
 
     request_ptr * reqs = new request_ptr [ndisks * chunks];
     file * * disks = new file *[ndisks];
@@ -136,10 +136,10 @@ int main(int argc, char * argv[])
     double totaltimeread = 0, totaltimewrite = 0;
     stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
-    for (i = 0; i < ndisks * buffer_size_int; i++)
-        buffer[i] = i;
+    for (int ij = 0; ij < ndisks * buffer_size_int; ij++)
+        buffer[ij] = ij;
 
-    for (i = 0; i < ndisks; i++)
+    for (unsigned int i = 0; i < ndisks; i++)
     {
 #ifdef BOOST_MSVC
  #ifdef RAW_ACCESS

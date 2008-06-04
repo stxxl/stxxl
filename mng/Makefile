@@ -22,6 +22,10 @@ test_streams: test_streams.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_streams.cpp
 	$(LINKER) test_streams.$(OBJEXT) $(OUT)test_streams.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_allocstr: test_allocstr.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_allocstr.cpp
+	$(LINKER) test_allocstr.$(OBJEXT) $(OUT)test_allocstr.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 test_write_pool: test_write_pool.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_write_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
 	$(LINKER) test_write_pool.$(OBJEXT) $(OUT)test_write_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)

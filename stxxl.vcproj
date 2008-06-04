@@ -78,6 +78,10 @@
 				Name="io"
 				>
 				<File
+					RelativePath=".\io\benchmark_disks.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\io\boostfd_file.cpp"
 					>
 				</File>
