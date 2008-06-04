@@ -124,11 +124,11 @@ int main(int argc, char * argv[])
     const unsigned chunk_size = buffer_size / chunks;
     const unsigned chunk_size_int = chunk_size / sizeof(int);
 
-    unsigned j = 0;
+    unsigned i, j;
 
     request_ptr * reqs = new request_ptr [ndisks * chunks];
     file * * disks = new file *[ndisks];
-    int * buffer = (int *)aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
+    unsigned * buffer = (unsigned *)aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
 #ifdef WATCH_TIMES
     double * r_finish_times = new double[ndisks];
     double * w_finish_times = new double[ndisks];
@@ -136,10 +136,10 @@ int main(int argc, char * argv[])
     double totaltimeread = 0, totaltimewrite = 0;
     stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
-    for (int ij = 0; ij < ndisks * buffer_size_int; ij++)
-        buffer[ij] = ij;
+    for (i = 0; i < ndisks * buffer_size_int; i++)
+        buffer[i] = i;
 
-    for (unsigned int i = 0; i < ndisks; i++)
+    for (i = 0; i < ndisks; i++)
     {
 #ifdef BOOST_MSVC
  #ifdef RAW_ACCESS
@@ -253,7 +253,7 @@ int main(int argc, char * argv[])
 #endif
 
         if (CHECK_AFTER_READ) {
-            for (int i=0; unsigned(i) < ndisks * buffer_size_int; i++)
+            for (i = 0; i < ndisks * buffer_size_int; i++)
             {
                 if(buffer[i] != i)
                 {
