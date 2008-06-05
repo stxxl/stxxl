@@ -106,17 +106,17 @@ struct my_cmp /*: public std::binary_function<my_type, my_type, bool>*/ // great
 	my_type min_value() const
 	{
 #if LOAD
-    return my_type ( std::numeric_limits<my_type::key_type>::max(), MAGIC );
+    return my_type ( (std::numeric_limits<my_type::key_type>::max)(), MAGIC );
 #else
-    return my_type ( std::numeric_limits<my_type::key_type>::max());
+    return my_type ( (std::numeric_limits<my_type::key_type>::max)());
 #endif
   }
 	my_type max_value() const
 	{
 #if LOAD
-    return my_type ( std::numeric_limits<my_type::key_type>::min(), MAGIC );
+    return my_type ( (std::numeric_limits<my_type::key_type>::min)(), MAGIC );
 #else
-    return my_type ( std::numeric_limits<my_type::key_type>::min());
+    return my_type ( (std::numeric_limits<my_type::key_type>::min)());
 #endif
   }
 
@@ -133,35 +133,36 @@ int main ( int argc, char* argv[] )
   STXXL_MSG("----------------------------------------")
 
 	stxxl::config::get_instance();
-	STXXL_MSG("Flags:"
-#if STXXL_CHECK_ORDER_IN_SORTS
-		<< " STXXL_CHECK_ORDER_IN_SORTS"
-#endif
-#ifdef NDEBUG
-		<< " NDEBUG"
-#endif
-#if TINY_PQ
-		<< " TINY_PQ"
-#endif
-#if MANUAL_PQ
-		<< " MANUAL_PQ"
-#endif
-#if SIDE_PQ
-		<< " SIDE_PQ"
-#endif
-	);
+  std::string Flags = std::string("") 
+#if STXXL_CHECK_ORDER_IN_SORTS 
+		+ " STXXL_CHECK_ORDER_IN_SORTS" 
+#endif 
+#ifdef NDEBUG 
+		+ " NDEBUG" 
+#endif 
+#if TINY_PQ 
+		+ " TINY_PQ" 
+#endif 
+#if MANUAL_PQ 
+		+ " MANUAL_PQ" 
+#endif 
+#if SIDE_PQ 
+		+ " SIDE_PQ" 
+#endif 
+	;
 #ifdef __MCSTL__
-	STXXL_MSG("Flags:"
+    Flags = std::string("")
 #if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
-		<< " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL"
+		+ " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL"
 #endif
 #if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
-		<< " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL"
+		+ " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL"
 #endif
 #if STXXL_PARALLEL_PQ_STATS
-		<< " STXXL_PARALLEL_PQ_STATS"
+		+ " STXXL_PARALLEL_PQ_STATS"
 #endif
-	);
+	;
+	STXXL_MSG("Flags:"<< Flags );
 #endif
 
 	unsigned long megabytes = atoi ( argv[1] );
