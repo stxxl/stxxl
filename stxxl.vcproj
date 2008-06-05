@@ -182,6 +182,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\containers\monotonic_pq.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\containers\pq_benchmark.cpp"
 					>
 				</File>
@@ -199,6 +203,10 @@
 				</File>
 				<File
 					RelativePath=".\containers\test_ext_merger.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\containers\test_ext_merger2.cpp"
 					>
 				</File>
 				<File
