@@ -3,8 +3,10 @@
 #include <cstdlib>
 #include "stxxl/bits/common/utils.h"
 
-using namespace std;
-
+using std::cin;
+using std::cout;
+using std::cerr;
+using std::endl;
 
 
 void print_malloc_stats()

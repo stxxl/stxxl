@@ -5,8 +5,6 @@
 //! \example algo/test_ksort1.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
-using namespace stxxl;
-
 
 struct my_type
 {
@@ -63,7 +61,7 @@ int main()
     const stxxl::int64 n_records = 3 * 32 * stxxl::int64(1024 * 1024) / sizeof(my_type);
     vector_type v(n_records);
 
-    random_number64 rnd;
+    stxxl::random_number64 rnd;
     STXXL_MSG("Filling vector... ");
     for (vector_type::size_type i = 0; i < v.size(); i++)
     {
