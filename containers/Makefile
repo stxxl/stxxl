@@ -108,6 +108,10 @@ test_ext_merger: test_ext_merger.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ext_merger.cpp -DSTXXL_VERBOSE_LEVEL=2
 	$(LINKER)  test_ext_merger.$(OBJEXT) $(OUT)test_ext_merger.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_ext_merger2: test_ext_merger2.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ext_merger2.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(LINKER)  test_ext_merger2.$(OBJEXT) $(OUT)test_ext_merger2.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 bench_pqueue: bench_pqueue.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c bench_pqueue.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  bench_pqueue.$(OBJEXT) $(OUT)bench_pqueue.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
