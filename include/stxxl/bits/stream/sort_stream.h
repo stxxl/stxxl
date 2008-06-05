@@ -1546,7 +1546,7 @@ void sort(RandomAccessIterator begin,
 #ifdef BOOST_MSVC
     typedef typename streamify_traits<RandomAccessIterator>::stream_type InputType;
 #else
-    typedef typeof(stream::streamify(begin, end)) InputType;
+    typedef __typeof__(stream::streamify(begin, end)) InputType;
 #endif
     InputType Input(begin, end);
     typedef stream::sort<InputType, CmpType, BlockSize, AllocStr> sorter_type;
