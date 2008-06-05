@@ -116,6 +116,10 @@ bench_pqueue: bench_pqueue.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c bench_pqueue.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  bench_pqueue.$(OBJEXT) $(OUT)bench_pqueue.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
 
+monotonic_pq: monotonic_pq.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c monotonic_pq.cpp
+	$(LINKER)  monotonic_pq.$(OBJEXT) $(OUT)monotonic_pq.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT) test_map.$(EXEEXT) test_map_random.$(EXEEXT)
