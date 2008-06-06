@@ -41,21 +41,7 @@ class debugmon
         {
             return long (arg);
         }
-    };
-    struct eqt
-    {
-        inline bool operator ()  (char * arg1, char * arg2) const
-        {
-            return arg1 == arg2;
-        }
-    };
 #ifdef BOOST_MSVC
-    struct my_hash_comp
-    {
-        size_t operator() (char * arg) const
-        {
-            return long (arg);
-        }
         bool operator() (char * a, char * b) const
         {
             return (long (a) < long (b));
@@ -65,10 +51,12 @@ class debugmon
             bucket_size = 4,                    // 0 < bucket_size
             min_buckets = 8
         };              // min_buckets = 2 ^^ N, 0 < N
+#endif
     };
-    stdext::hash_map<char *, tag, my_hash_comp > tags;
+#ifdef BOOST_MSVC
+    stdext::hash_map<char *, tag, hash_fct> tags;
 #else
-    __gnu_cxx::hash_map<char *, tag, hash_fct, eqt > tags;
+    __gnu_cxx::hash_map<char *, tag, hash_fct> tags;
 #endif
 
 #ifdef STXXL_BOOST_THREADS
