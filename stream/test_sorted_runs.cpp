@@ -18,7 +18,6 @@
 
 typedef unsigned value_type;
 
-
 struct Cmp : public std::binary_function<value_type, value_type, bool>
 {
     typedef unsigned value_type;
@@ -36,13 +35,12 @@ struct Cmp : public std::binary_function<value_type, value_type, bool>
     }
 };
 
-using namespace stxxl;
 
 int main()
 {
     // special parameter type
-    typedef stream::from_sorted_sequences<value_type> InputType;
-    typedef stream::runs_creator < InputType, Cmp, 4096, RC > CreateRunsAlg;
+    typedef stxxl::stream::from_sorted_sequences<value_type> InputType;
+    typedef stxxl::stream::runs_creator < InputType, Cmp, 4096, stxxl::RC > CreateRunsAlg;
     typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 
     unsigned size = 30 * 1024 * 128 / (sizeof(value_type) * 2);
@@ -77,7 +75,7 @@ int main()
     SortedRunsType Runs = SortedRuns.result();     // get sorted_runs data structure
     assert(check_sorted_runs(Runs, Cmp()));
     // merge the runs
-    stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 1024 * 128 / 10);
+    stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 1024 * 128 / 10);
     stxxl::vector<value_type> array;
     STXXL_MSG(size << " " << Runs.elements);
     STXXL_MSG("CRC: " << oldcrc);
@@ -91,7 +89,6 @@ int main()
     STXXL_MSG("CRC: " << crc);
     assert(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
     assert(merger.empty());
-
 
     return 0;
 }
