@@ -12,8 +12,8 @@
 #include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/rand.h"
 #include "stxxl/bits/common/simple_vector.h"
+#include <stxxl/bits/compat_auto_ptr.h>
 
-#include <memory>
 #include <list>
 
 
@@ -54,7 +54,7 @@ class lru_pager : private noncopyable
 {
     typedef std::list<int_type> list_type;
 
-    std::auto_ptr<list_type> history;
+    compat_auto_ptr<list_type>::result history;
     simple_vector<list_type::iterator> history_entry;
 
 public:
@@ -80,7 +80,7 @@ public:
     {
         // workaround for buggy GCC 3.4 STL
         //std::swap(history,obj.history);
-        std::auto_ptr<list_type> tmp = obj.history;
+        compat_auto_ptr<list_type>::result tmp = obj.history;
         obj.history = history;
         history = tmp;
         std::swap(history_entry, obj.history_entry);
