@@ -13,11 +13,7 @@
  #include <boost/config.hpp>
 #endif
 
-#ifdef BOOST_MSVC
- #include <hash_map>
-#else
- #include <ext/hash_map>
-#endif
+#include <stxxl/bits/compat_hash_map.h>
 
 #include "stxxl/bits/io/iobase.h"
 #include "stxxl/bits/mng/mng.h"
@@ -53,6 +49,7 @@ namespace btree
         btree_type * btree_;
         key_compare comp_;
 
+/*
         struct bid_comp
         {
             bool operator ()  (const bid_type & a, const bid_type & b) const
@@ -60,6 +57,7 @@ namespace btree
                 return (a.storage < b.storage) || ( a.storage == b.storage && a.offset < b.offset);
             }
         };
+*/
 
         struct bid_hash
         {
@@ -87,11 +85,7 @@ namespace btree
         std::vector<bool> fixed_;
         std::vector<bool> dirty_;
         std::vector<int_type> free_nodes_;
-#ifdef BOOST_MSVC
-        typedef stdext::hash_map < bid_type, int_type, bid_hash > hash_map_type;
-#else
-        typedef __gnu_cxx::hash_map < bid_type, int_type, bid_hash > hash_map_type;
-#endif
+        typedef typename compat_hash_map< bid_type, int_type, bid_hash >::result hash_map_type;
 
         //typedef std::map<bid_type,int_type,bid_comp> BID2node_type;
         typedef hash_map_type BID2node_type;

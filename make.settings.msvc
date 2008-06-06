@@ -80,6 +80,8 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/namespace.h \
 	$(HEADER_PATH)/noncopyable.h \
 	$(HEADER_PATH)/version.h \
+	$(HEADER_PATH)/compat_hash_map.h \
+	$(HEADER_PATH)/compat_hash_set.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
 	$(HEADER_PATH)/common/mutex.h \
 	$(HEADER_PATH)/common/rand.h \

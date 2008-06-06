@@ -15,14 +15,7 @@
 
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/common/mutex.h"
-
-#include <map>
-
-#ifdef BOOST_MSVC
- #include <hash_map>
-#else
- #include <ext/hash_map>
-#endif
+#include <stxxl/bits/compat_hash_map.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -53,11 +46,8 @@ class debugmon
         };              // min_buckets = 2 ^^ N, 0 < N
 #endif
     };
-#ifdef BOOST_MSVC
-    stdext::hash_map<char *, tag, hash_fct> tags;
-#else
-    __gnu_cxx::hash_map<char *, tag, hash_fct> tags;
-#endif
+
+    compat_hash_map<char *, tag, hash_fct>::result tags;
 
 #ifdef STXXL_BOOST_THREADS
     boost::mutex mutex1;

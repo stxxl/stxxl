@@ -19,13 +19,8 @@
  #include <boost/config.hpp>
 #endif
 
-#ifdef BOOST_MSVC
- #include <hash_map>
- #include <hash_set>
-#else
- #include <ext/hash_map>
- #include <ext/hash_set>
-#endif
+#include <stxxl/bits/compat_hash_map.h>
+#include <stxxl/bits/compat_hash_set.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -194,11 +189,7 @@ void simulate_async_write(
     typedef std::queue<int_type> disk_queue_type;
 
     //disk_queue_type * disk_queues = new disk_queue_type[L];
-#ifndef BOOST_MSVC
-    typedef __gnu_cxx::hash_map<int, disk_queue_type> disk_queues_type;
-#else
-    typedef stdext::hash_map<int, disk_queue_type> disk_queues_type;
-#endif
+    typedef typename compat_hash_map<int, disk_queue_type>::result disk_queues_type;
     disk_queues_type disk_queues;
     event_queue_type event_queue;
 
@@ -206,11 +197,7 @@ void simulate_async_write(
     int_type i = L - 1;
     int_type oldtime = 0;
     //bool * disk_busy = new bool [D];
-#ifndef BOOST_MSVC
-    __gnu_cxx::hash_set<int> disk_busy;
-#else
-    stdext::hash_set<int> disk_busy;
-#endif
+    compat_hash_set<int>::result disk_busy;
 
     while (m && (i >= 0))
     {

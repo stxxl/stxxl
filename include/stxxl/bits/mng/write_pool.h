@@ -17,11 +17,7 @@
  #include <boost/config.hpp>
 #endif
 
-#ifdef BOOST_MSVC
- #include <hash_map>
-#else
- #include <ext/hash_map>
-#endif
+//#include <stxxl/bits/compat_hash_map.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -52,7 +48,7 @@ public:
 
         operator request_ptr () { return req; }
     };
-    //typedef __gnu_cxx::hash_map < bid_type, request_ptr , bid_hash > hash_map_type;
+    //typedef typename compat_hash_map < bid_type, request_ptr , bid_hash >::result hash_map_type;
     //typedef typename hash_map_type::iterator block_track_iterator;
     typedef typename std::list<block_type *>::iterator free_blocks_iterator;
     typedef typename std::list<busy_entry>::iterator busy_blocks_iterator;
