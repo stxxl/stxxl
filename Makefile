@@ -68,11 +68,31 @@ clean_icpc_mcstl: settings_gnu
 clean_msvc: settings_msvc
 	nmake /F Makefile.msvc clean
 
+clean: clean_g++ clean_g++_mcstl clean_icpc clean_icpc_mcstl
+	$(MAKE) -C test/compile-stxxl-headers clean
+
+distclean: clean_doxy clean_tutorial clean
+	$(RM) make.settings
+	$(RM) stxxl.log stxxl.errlog
+	$(RM) algo/stxxl.log algo/stxxl.errlog
+	$(RM) common/stxxl.log common/stxxl.errlog
+	$(RM) containers/stxxl.log containers/stxxl.errlog
+	$(RM) io/stxxl.log io/stxxl.errlog
+	$(RM) mng/stxxl.log mng/stxxl.errlog
+	$(RM) stream/stxxl.log stream/stxxl.errlog
+	$(RM) utils/stxxl.log utils/stxxl.errlog
+
+
 doxy: Doxyfile
 	doxygen
 
 clean_doxy:
 	$(RM) -r doc/doxy
+	$(RM) Doxyfile.bak
+
+clean_tutorial:
+	$(MAKE) -C doc/tutorial distclean
+	$(MAKE) -C doc/tutorial/examples clean
 
 count:
 	sloccount --addlang makefile .

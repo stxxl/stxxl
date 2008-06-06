@@ -1,6 +1,6 @@
 all: phonebills phonebills_stl genlog
 
-include ../../../stxxl.mk
+-include ../../../stxxl.mk
 
 CXX		 = $(STXXL_CXX)
 CPPFLAGS	+= -O3
