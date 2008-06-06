@@ -41,6 +41,9 @@ DEBUG		?= # put here -g option to include the debug information into the binarie
 
 LIBNAME		?= stxxl
 
+# Hint: for g++-4.3 with c++0x support, enable the following:
+#STXXL_SPECIFIC	+= -std=c++0x -DSTXXL_CXX0X
+
 
 #### TROUBLESHOOTING
 #
