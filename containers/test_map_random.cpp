@@ -178,8 +178,8 @@ int main( int argc, char * argv[] )
             stdmap.erase( key );
             xxlmap.erase( key );
 
-            assert( not_there( stdmap, key ));
-            assert( not_there( xxlmap, key ));
+            assert( stxxl::not_there( stdmap, key ));
+            assert( stxxl::not_there( xxlmap, key ));
         }
 
         // *********************************************************
@@ -192,7 +192,7 @@ int main( int argc, char * argv[] )
             std_map_type::iterator stditer = stdmap.find( key );
             xxl_map_type::iterator xxliter = xxlmap.find( key );
 
-            assert(is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
+            assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
 
             if ( stditer != stdmap.end() )
                 stdmap.erase( stditer );
@@ -201,8 +201,8 @@ int main( int argc, char * argv[] )
                 xxlmap.erase( xxliter );
 
 
-            assert( not_there( stdmap, key ));
-            assert( not_there( xxlmap, key ));
+            assert(stxxl::not_there( stdmap, key ));
+            assert(stxxl::not_there( xxlmap, key ));
         }
 
         // *********************************************************
@@ -214,8 +214,8 @@ int main( int argc, char * argv[] )
             stdmap.insert( std::pair < key_type, data_type > ( key, 2 * key ) );
             xxlmap.insert( std::pair < key_type, data_type > ( key, 2 * key ) );
 
-            assert( there( stdmap, key, 2 * key ));
-            assert( there( xxlmap, key, 2 * key ));
+            assert(stxxl::there( stdmap, key, 2 * key ));
+            assert(stxxl::there( xxlmap, key, 2 * key ));
         }
 
         // *********************************************************
@@ -240,10 +240,10 @@ int main( int argc, char * argv[] )
             xxlmap.insert( v2.begin(), v2.end() );
 
             for ( unsigned i = lower; i < upper; i++ )
-                assert( there( stdmap, i, 2 * i ));
+                assert(stxxl::there( stdmap, i, 2 * i ));
 
             for ( unsigned i = lower; i < upper; i++ )
-                assert( there( xxlmap, i, 2 * i ));
+                assert(stxxl::there( xxlmap, i, 2 * i ));
         }
 
         // *********************************************************
@@ -263,9 +263,9 @@ int main( int argc, char * argv[] )
                 std_map_type::iterator stditer = stdmap.lower_bound(key1);
                 xxl_map_type::iterator xxliter = xxlmap.lower_bound(key1);
 
-                assert(is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
-                if (!is_end(stdmap, stditer)) {
-                    assert(is_same( *(stditer), *(xxliter)));
+                assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
+                if (!stxxl::is_end(stdmap, stditer)) {
+                    assert(stxxl::is_same( *(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -289,9 +289,9 @@ int main( int argc, char * argv[] )
                 std_map_type::iterator stditer = stdmap.upper_bound(key1);
                 xxl_map_type::iterator xxliter = xxlmap.upper_bound(key1);
 
-                assert(is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
-                if (!is_end(stdmap, stditer)) {
-                    assert( is_same( *(stditer), *(xxliter)));
+                assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
+                if (!stxxl::is_end(stdmap, stditer)) {
+                    assert(stxxl::is_same( *(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -315,9 +315,9 @@ int main( int argc, char * argv[] )
                 std_map_type::iterator stditer = stdmap.find(key1);
                 xxl_map_type::iterator xxliter = xxlmap.find(key1);
 
-                assert(is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
-                if (!is_end(stdmap, stditer)) {
-                    assert( is_same( *(stditer), *(xxliter)));
+                assert(stxxl::is_end(stdmap, stditer) == stxxl::is_end(xxlmap, xxliter));
+                if (!stxxl::is_end(stdmap, stditer)) {
+                    assert(stxxl::is_same( *(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -338,12 +338,12 @@ int main( int argc, char * argv[] )
             while ( siter1 != stdmap.end() )
             {
                 assert( xiter1 != xxlmap.end() );
-                assert( is_same( *(siter1++), *(xiter1++) ) );
+                assert(stxxl::is_same( *(siter1++), *(xiter1++) ));
                 if (siter1 != stdmap.end()) {
-                    assert( !is_same( *siter1, *siter2 ) );
+                    assert(!stxxl::is_same( *siter1, *siter2 ));
                 }
                 if (xiter1 != xxlmap.end()) {
-                    assert( !is_same( *xiter1, *xiter2 ) );
+                    assert(!stxxl::is_same( *xiter1, *xiter2 ));
                 }
             }
             assert( xiter1 == xxlmap.end() );

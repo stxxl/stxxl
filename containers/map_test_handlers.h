@@ -10,8 +10,12 @@
 //! \file map_test_handlers.h
 //! \brief This file contains help functions for testing of stxxl::map.
 
-#ifndef _TEST_HANDLERS_H_
-#define _TEST_HANDLERS_H_
+#ifndef STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_
+#define STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_
+
+#include <stxxl/bits/namespace.h>
+
+__STXXL_BEGIN_NAMESPACE
 
 // ***********************************************
 // THERE
@@ -103,5 +107,7 @@ bool is_size( MAPTYPE & map_, const typename MAPTYPE::size_type & size )
     return map_.size() == size;
 }
 
+__STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_
+
