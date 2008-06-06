@@ -395,7 +395,7 @@ bool check_ksorted_runs(              run_type * * runs,
                     return false;
                 }
             }
-            if (!is_sorted(
+            if (!stxxl::is_sorted(
 #if 1
                     ArrayOfSequencesIterator<
                         block_type,

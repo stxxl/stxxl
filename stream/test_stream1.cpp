@@ -82,7 +82,7 @@ int main()
         ++merger;
     }
     STXXL_MSG("CRC: " << crc);
-    assert(is_sorted(array.begin(), array.end(), Cmp()));
+    assert(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
     assert(merger.empty());
 
     std::cout << *s;

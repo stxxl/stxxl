@@ -817,7 +817,7 @@ namespace stream
                     return false;
                 }
             }
-            if (!is_sorted(
+            if (!stxxl::is_sorted(
 #if 1
                     ArrayOfSequencesIterator<
                         block_type,
@@ -1230,7 +1230,7 @@ namespace stream
                     fill_current_block();
 
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
-                    assert(is_sorted(current_block->elem, current_block->elem + current_block->size, cmp));
+                    assert(stxxl::is_sorted(current_block->elem, current_block->elem + current_block->size, cmp));
                     assert(!cmp(current_block->elem[0], current_value));
 #endif
                     current_value = current_block->elem[0];

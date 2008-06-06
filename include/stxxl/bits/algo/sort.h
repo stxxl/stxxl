@@ -356,7 +356,7 @@ namespace sort_local
                         return false;
                     }
                 }
-                if (!is_sorted(
+                if (!stxxl::is_sorted(
                     ArrayOfSequencesIterator<
                         block_type,
                         typename block_type::value_type,
