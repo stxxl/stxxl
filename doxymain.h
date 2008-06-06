@@ -36,6 +36,7 @@ compiler      |  stxxl   stxxl     stxxl     stxxl
               |          + mcstl   + boost   + mcstl
               |                              + boost
 --------------+----------------------------------------
+GCC 4.3 c++0x |    x       -³        -²        -²
 GCC 4.3       |    x       -³        -²        -²
 GCC 4.2       |    x       x         x         x
 GCC 4.1       |    x      n/a        ?        n/a
