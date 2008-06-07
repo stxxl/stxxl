@@ -1,10 +1,14 @@
 #include <cassert>
 #include <ctime>
 #ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+#ifdef BOOST_MSVC
  #include <io.h>
  #include <windows.h> 
 #else
  #include <unistd.h>
+ #include <sys/time.h>
 #endif
 
 #include "stxxl/bits/common/seed.h"
@@ -38,7 +42,7 @@ inline unsigned initial_seed()
     assert(!initialized); // this should only be called once!
 
     initialized = true;
-	#ifdef STXXL_BOOST_CONFIG
+    #ifdef BOOST_MSVC
 	// GetTickCount():  ms since system start
 	return GetTickCount() ^ GetCurrentProcessId();
 	#else
