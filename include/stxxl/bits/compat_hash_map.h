@@ -20,7 +20,7 @@ struct compat_hash {
 #if defined(STXXL_CXX0X) && defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40300)
     typedef std::hash<_Tp> result;
 #elif defined(BOOST_MSVC)
-    typedef FIXME:: stdext::hash<_Tp> result;
+    typedef stdext::hash_compare<_Tp> result;
 #else
     typedef __gnu_cxx::hash<_Tp> result;
 #endif
