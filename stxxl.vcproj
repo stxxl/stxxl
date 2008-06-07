@@ -720,6 +720,34 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="bits"
+				>
+				<File
+					RelativePath=".\include\stxxl\bits\compat_auto_ptr.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\stxxl\bits\compat_hash_map.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\stxxl\bits\compat_hash_set.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\stxxl\bits\namespace.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\stxxl\bits\noncopyable.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\stxxl\bits\version.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
