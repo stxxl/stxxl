@@ -41,7 +41,7 @@ sort_file: sort_file.cpp $(DEPENDENCIES)
 	$(LINKER)  sort_file.$(OBJEXT) $(OUT)sort_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_ksort1: test_ksort1.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ksort1.cpp -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_CHECK_ORDER_IN_SORTS
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ksort1.cpp -DSTXXL_CHECK_ORDER_IN_SORTS
 	$(LINKER)  test_ksort1.$(OBJEXT) $(OUT)test_ksort1.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_stable_ksort: test_stable_ksort.cpp $(DEPENDENCIES)
