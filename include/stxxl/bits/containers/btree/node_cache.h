@@ -64,7 +64,7 @@ namespace btree
             size_t operator() (const bid_type & bid) const
             {
                 size_t result =
-                    longhash1(bid.offset + uint64(bid.storage));
+                    longhash1(bid.offset + uint64(unsigned_type(bid.storage)));
                 return result;
             }
 #ifdef BOOST_MSVC
