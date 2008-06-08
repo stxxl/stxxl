@@ -10,7 +10,10 @@
 #include "stxxl/vector"
 #include "stxxl/stack"
 #include "stxxl/priority_queue"
+#if ! defined(__GNUG__) || ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 30400)
+// map does not work with g++ 3.3
 #include "stxxl/map"
+#endif
 #include "stxxl/queue"
 #include "stxxl/deque"
 
