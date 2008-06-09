@@ -36,18 +36,18 @@ compiler      |  stxxl   stxxl     stxxl     stxxl
               |          + mcstl   + boost   + mcstl
               |                              + boost
 --------------+----------------------------------------
-GCC 4.3 c++0x |    x       -³        -²        -²
-GCC 4.3       |    x       -³        -²        -²
+GCC 4.3 c++0x |    x       -²        x         -²
+GCC 4.3       |    x       -²        x         -²
 GCC 4.2       |    x       x         x         x
-GCC 4.1       |    x      n/a        ?        n/a
-GCC 4.0       |    x      n/a        ?        n/a
-GCC 3.4       |    x      n/a        ?        n/a
-GCC 3.3       |    o      n/a        ?        n/a
+GCC 4.1       |    x      n/a        x        n/a
+GCC 4.0       |    x      n/a        x        n/a
+GCC 3.4       |    x      n/a        x        n/a
+GCC 3.3       |    o      n/a        o        n/a
 GCC 2.95      |    -      n/a        -        n/a
-ICPC 10.1.012 |    x       x¹        ?         ?
-ICPC 10.0.026 |    x       x¹        ?         ?
-ICPC 9.1.052  |    x¹      -         ?         ?
-ICPC 9.0.032  |    x¹      -         ?         ?
+ICPC 10.1.015 |    x       x¹        x         x¹
+ICPC 10.0.026 |    x       x¹        x         x¹
+ICPC 9.1.053  |    x¹      -         x¹        -
+ICPC 9.0.032  |    x¹      -         x¹        -
 MSVC 2005 8.0 |    x      n/a        x        n/a
 
  x   = full support
@@ -60,10 +60,17 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
        icpc 9.0: use gcc 3.x
        icpc 9.1: use gcc before 4.2
        icpc 10.x with mcstl support: use gcc 4.2
- ²   = Boost currently does not support g++ 4.3
- ³   = MCSTL has been superseded by the libstdc++ parallel mode in GCC 4.3,
+ ²   = MCSTL has been superseded by the libstdc++ parallel mode in GCC 4.3,
        parallel mode is not yet supported in this stxxl release
 \endverbatim
+ *
+ * \section boost Supported BOOST versions
+ *
+ * The <a href="http://www.boost.org">Boost</a> libraries are required on
+ * Windows platforms using MSVC compiler and optional on other platforms.
+ *
+ * \c S<small>TXXL</small> has been tested with Boost 1.34.1.
+ * Other versions may work, too, but older versions won't get support.
  *
  *
  * \section installation Installation and Usage Instructions
@@ -630,7 +637,7 @@ my_example.bin: my_example.o
  * Run: \verbatim svn checkout https://stxxl.svn.sourceforge.net/svnroot/stxxl/trunk stxxl-trunk \endverbatim
  * Change to stxxl directory: \verbatim cd stxxl-trunk \endverbatim
  *
- * \section installation Continue Installation
+ * \section svn_continue_installation Continue Installation
  *
  * Now follow the regular installation and usage instructions,
  * skipping over the tarball download and extraction parts.<br>
