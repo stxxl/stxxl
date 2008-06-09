@@ -94,7 +94,7 @@ namespace priority_queue_local
 
       /**
        *  @brief  Add data to the %queue.
-       *  @param  x  Data to be added.
+       *  @param  __x  Data to be added.
        *
        *  This is a typical %queue operation.
        *  The time complexity of the operation depends on the underlying
