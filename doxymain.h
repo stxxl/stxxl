@@ -48,7 +48,7 @@ ICPC 10.1.015 |    x       x¹        x         x¹
 ICPC 10.0.026 |    x       x¹        x         x¹
 ICPC 9.1.053  |    x¹      -         x¹        -
 ICPC 9.0.032  |    x¹      -         x¹        -
-MSVC 2005 8.0 |    x      n/a        x        n/a
+MSVC 2005 8.0 |    -        -         x        n/a
 
  x   = full support
  o   = partial support
