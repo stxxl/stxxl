@@ -2,7 +2,7 @@
 #define STXXL_HEADER__COMPAT_HASH_SET_H_
 
 
-#if defined(STXXL_CXX0X) && defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40300)
+#if defined(__GXX_EXPERIMENTAL_CXX0X__)
  #include <unordered_set>
 #elif defined(BOOST_MSVC)
  #include <hash_set>
@@ -16,7 +16,7 @@ __STXXL_BEGIN_NAMESPACE
 
 template<class _Key>
 struct compat_hash_set {
-#if defined(STXXL_CXX0X) && defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40300)
+#if defined(__GXX_EXPERIMENTAL_CXX0X__)
     typedef std::unordered_set<_Key> result;
 #elif defined(BOOST_MSVC)
     typedef stdext::hash_set<_Key> result;
