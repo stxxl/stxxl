@@ -1,9 +1,11 @@
 SUBDIRS		+= .
-SUBDIRS		+= include/stxxl include/stxxl/bits
+SUBDIRS		+= include include/stxxl include/stxxl/bits
 SUBDIRS		+= $(foreach d, algo common containers containers/btree io mng stream utils, include/stxxl/bits/$d)
 SUBDIRS		+= algo common containers containers/btree io mng stream utils
 
-FILES		:= $(wildcard $(foreach d, $(SUBDIRS), $d/*.h $d/*.cpp))
+FILES_IGNORE	:= ./doxymain.h
+FILES		:= $(filter-out $(FILES_IGNORE),$(wildcard $(foreach d, $(SUBDIRS), $d/*.h $d/*.cpp)))
+FILES		+= $(foreach h, algorithm all deque io ksort mallocstats map mng priority_queue queue random scan sort stable_ksort stack stream timer vector, include/stxxl/$h)
 
 
 all: uncrustify-test
@@ -25,7 +27,8 @@ clean:
 
 ############################################################################
 
-UNCRUSTIFY	?= ./uncrustify
+#UNCRUSTIFY	?= ./uncrustify
+UNCRUSTIFY	?= uncrustify
 UNCRUSTIFY_CFG	?= misc/uncrustify.cfg
 UNCRUSTIFY_FLAGS+= -c $(UNCRUSTIFY_CFG) -l CPP
 
@@ -35,9 +38,10 @@ UNCRUSTIFY_FLAGS+= -c $(UNCRUSTIFY_CFG) -l CPP
 	diff -u $^ > $@ || test $$? == 1
 	test -s $@ || $(RM) $@
 
-%.uncrustify: % $(UNCRUSTIFY_CFG) $(UNCRUSTIFY)
+%.uncrustify: % $(UNCRUSTIFY_CFG) #$(UNCRUSTIFY)
 	$(RM) $<.diff
 	$(UNCRUSTIFY) $(UNCRUSTIFY_FLAGS) -o $@T < $<
+	sed -i -e 's/defined (/defined(/g' $@T
 	mv $@T $@
 
 %.unc-apply: %.uncrustify
