@@ -70,6 +70,8 @@ MSVC 2005 8.0 |    x      n/a        x        n/a
  * Windows platforms using MSVC compiler and optional on other platforms.
  *
  * \c S<small>TXXL</small> has been tested with Boost 1.34.1.
+ * It also compiles using Boost 1.35.0 without problems,
+ * but hasn't been thoroughly tested in this setting.
  * Other versions may work, too, but older versions won't get support.
  *
  *
@@ -523,7 +525,7 @@ my_example.bin: my_example.o
 /*!
  * \page installation_old Installation (Linux/g++ - Stxxl versions earlier than 0.9)
  *
- * \section download Download
+ * \section download Download and library compilation
  *
  * - Download stxxl_0.77.tgz from
  *   <A href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407&release_id=541515">SourceForge</A>.
