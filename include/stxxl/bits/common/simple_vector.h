@@ -12,10 +12,12 @@ class simple_vector : private noncopyable
 {
     simple_vector ()
     { }
+
 public:
     typedef size_t size_type;
     typedef _Tp value_type;
 //  typedef simple_alloc<_Tp, _Alloc> _data_allocator;
+
 protected:
     size_type _size;
     value_type * _array;

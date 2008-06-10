@@ -47,6 +47,7 @@ public:
 class syscall_request : public ufs_request_base
 {
     friend class syscall_file;
+
 protected:
     syscall_request(
         syscall_file * f,
@@ -56,6 +57,7 @@ protected:
         request_type t,
         completion_handler on_cmpl);
     void serve ();
+
 public:
     const char * io_type ();
 };

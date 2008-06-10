@@ -41,13 +41,13 @@ void syscall_request::serve ()
 
     try
     {
-        if(::lseek(static_cast<syscall_file *>(file_)->get_file_des (), offset, SEEK_SET) < 0)
+        if (::lseek(static_cast<syscall_file *>(file_)->get_file_des (), offset, SEEK_SET) < 0)
         {
             STXXL_THROW2(io_error,
-                        " this=" << long (this) << " File descriptor=" <<
-                        static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset << " buffer=" <<
-                        buffer << " bytes=" << bytes
-                                 << " type=" << ((type == READ) ? "READ" : "WRITE"));
+                         " this=" << long (this) << " File descriptor=" <<
+                         static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset << " buffer=" <<
+                         buffer << " bytes=" << bytes
+                                  << " type=" << ((type == READ) ? "READ" : "WRITE"));
         }
         else
         {
@@ -62,10 +62,10 @@ void syscall_request::serve ()
                 if (::read(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)
                 {
                     STXXL_THROW2(io_error,
-                                " this=" << long (this) << " File descriptor=" <<
-                                static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset <<
-                                " buffer=" << buffer << " bytes=" << bytes << " type=" <<
-                                ((type == READ) ? "READ" : "WRITE") << " nref= " << nref());
+                                 " this=" << long (this) << " File descriptor=" <<
+                                 static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset <<
+                                 " buffer=" << buffer << " bytes=" << bytes << " type=" <<
+                                 ((type == READ) ? "READ" : "WRITE") << " nref= " << nref());
                 }
 
                 debugmon::get_instance()->io_finished((char *)buffer);
@@ -85,10 +85,10 @@ void syscall_request::serve ()
                 if (::write(static_cast<syscall_file *>(file_)->get_file_des (), buffer, bytes) < 0)
                 {
                     STXXL_THROW2(io_error,
-                                " this=" << long (this) << " File descriptor=" <<
-                                static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset << " buffer=" <<
-                                buffer << " bytes=" << bytes << " type=" <<
-                                ((type == READ) ? "READ" : "WRITE") << " nref= " << nref());
+                                 " this=" << long (this) << " File descriptor=" <<
+                                 static_cast<syscall_file *>(file_)->get_file_des() << " offset=" << offset << " buffer=" <<
+                                 buffer << " bytes=" << bytes << " type=" <<
+                                 ((type == READ) ? "READ" : "WRITE") << " nref= " << nref());
                 }
 
                 debugmon::get_instance()->io_finished((char *)buffer);

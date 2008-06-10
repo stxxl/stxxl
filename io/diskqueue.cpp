@@ -36,7 +36,7 @@ disk_queue::disk_queue (int /*n*/) : sem (0), _priority_op (WRITE)              
     // nothing to do
 #else
     check_pthread_call(pthread_create(&thread, NULL,
-                                 (thread_function_t) worker, static_cast<void *>(this)));
+                                      (thread_function_t) worker, static_cast<void *>(this)));
 #endif
 }
 
@@ -91,7 +91,7 @@ void * disk_queue::worker (void * arg)
 #endif
 
     bool write_phase = true;
-    for ( ; ;)
+    for ( ; ; )
     {
         pthis->sem--;
 

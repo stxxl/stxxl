@@ -34,6 +34,7 @@ class onoff_switch : private noncopyable
     pthread_cond_t cond;
 #endif
     bool _on;
+
 public:
     onoff_switch (bool flag = false) : _on (flag)
     {
@@ -41,7 +42,7 @@ public:
         check_pthread_call(pthread_mutex_init(&mutex, NULL));
         check_pthread_call(pthread_cond_init(&cond, NULL));
 #endif
-    };
+    }
     ~onoff_switch ()
     {
 #ifndef STXXL_BOOST_THREADS
@@ -56,7 +57,7 @@ public:
 
         check_pthread_call(pthread_cond_destroy(&cond));
 #endif
-    };
+    }
     void on ()
     {
 #ifdef STXXL_BOOST_THREADS

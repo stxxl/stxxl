@@ -20,8 +20,8 @@ struct my_type
         return _key;
     }
 
-    my_type() { };
-    my_type(key_type __key) : _key(__key) { };
+    my_type() { }
+    my_type(key_type __key) : _key(__key) { }
 
     static my_type min_value()
     {

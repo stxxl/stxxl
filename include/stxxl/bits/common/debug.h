@@ -35,7 +35,7 @@ class debugmon
             return long (arg);
         }
 #ifdef BOOST_MSVC
-        bool operator() (char * a, char * b) const
+        bool operator () (char * a, char * b) const
         {
             return (long (a) < long (b));
         }
@@ -58,8 +58,8 @@ class debugmon
     static debugmon * instance;
 
     inline debugmon() { }
-public:
 
+public:
     void block_allocated(char * ptr, char * end, size_t size);
     void block_deallocated(char * ptr);
     void io_started(char * ptr);

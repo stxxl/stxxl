@@ -21,7 +21,7 @@ int main()
 {
     const unsigned critical_size = 8 * 4096;
     typedef STACK_GENERATOR < int, \
-    migrating, normal, 4, 4096, std::stack<int>, critical_size > ::result migrating_stack_type;
+                             migrating, normal, 4, 4096, std::stack<int>, critical_size > ::result migrating_stack_type;
 
 
     STXXL_MSG("Starting test.");

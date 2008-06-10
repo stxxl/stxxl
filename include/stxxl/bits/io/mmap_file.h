@@ -56,6 +56,7 @@ public:
 class mmap_request : public ufs_request_base
 {
     friend class mmap_file;
+
 protected:
     inline mmap_request (mmap_file * f,
                          void * buf, stxxl::int64 off, size_t b,

@@ -229,6 +229,7 @@ public:
 
         current_element = element((--cache_offset) - 1);
     }
+
 private:
     value_type * element(unsigned_type offset)
     {
@@ -866,7 +867,6 @@ class STACK_GENERATOR
     migrating_stack<MigrCritSize, ExtStackTp, IntStackTp>, ExtStackTp > ::result MigrOrNotStackTp;
 
 public:
-
     typedef typename IF < Externality == internal, IntStackTp, MigrOrNotStackTp > ::result result;
 };
 

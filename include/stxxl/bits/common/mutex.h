@@ -36,12 +36,12 @@ __STXXL_BEGIN_NAMESPACE
 class mutex : private noncopyable
 {
     pthread_mutex_t _mutex;
-public:
 
+public:
     mutex ()
     {
         check_pthread_call(pthread_mutex_init(&_mutex, NULL));
-    };
+    }
 
     ~mutex ()
     {
@@ -53,7 +53,7 @@ public:
             stxxl_function_error(resource_error);
 
         check_pthread_call(pthread_mutex_destroy(&_mutex));
-    };
+    }
     void lock ()
     {
         check_pthread_call(pthread_mutex_lock (&_mutex));

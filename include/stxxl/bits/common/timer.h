@@ -7,7 +7,7 @@
 #include "stxxl/bits/namespace.h"
 
 #ifdef BOOST_MSVC
- // no alternative to boost :-(
+// no alternative to boost :-(
  #define STXXL_NONMONOTONIC_BOOST_TIMESTAMP
 #endif
 
@@ -53,6 +53,7 @@ class timer
     double accumulated;
     double last_clock;
     inline double timestamp();
+
 public:
     inline timer();
     inline void start();
@@ -68,7 +69,7 @@ timer::timer() : running(false), accumulated(0.)
 
 double timer::timestamp()
 {
-   return stxxl::timestamp();
+    return stxxl::timestamp();
 }
 
 void timer::start()

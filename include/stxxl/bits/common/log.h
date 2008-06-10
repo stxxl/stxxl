@@ -26,8 +26,8 @@ class logger
         log_stream_("stxxl.log"),
         errlog_stream_("stxxl.errlog")
     { }
-public:
 
+public:
     inline std::ofstream & log_stream()
     {
         return log_stream_;

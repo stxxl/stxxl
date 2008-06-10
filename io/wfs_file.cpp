@@ -204,7 +204,7 @@ wfs_file_base::wfs_file_base (
 
     if (file_des == INVALID_HANDLE_VALUE)
         stxxl_win_lasterror_exit("CreateFile  filename=" << filename, io_error);
-};
+}
 
 wfs_file_base::~wfs_file_base ()
 {
@@ -212,7 +212,7 @@ wfs_file_base::~wfs_file_base ()
         stxxl_win_lasterror_exit("closing file (call of ::CloseHandle) ", io_error)
 
         file_des = INVALID_HANDLE_VALUE;
-};
+}
 stxxl::int64 wfs_file_base::size ()
 {
     LARGE_INTEGER result;

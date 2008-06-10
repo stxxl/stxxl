@@ -43,7 +43,7 @@ class DiskGeometry : private noncopyable
         double sustained_data_rate;                     // in Mb/s
         inline Zone (int
                      _first_sector) : first_sector (_first_sector)
-        { };                    // constructor for zone search
+        { }                     // constructor for zone search
 
         inline Zone (                   //int _last_cyl,
                                         //int _sect_per_track,
@@ -55,11 +55,11 @@ class DiskGeometry : private noncopyable
             first_sector (_first_sector),
             sectors (_sectors),
             sustained_data_rate (_rate)
-        { };
+        { }
     };
     struct ZoneCmp
     {
-        inline bool operator  ()  (const Zone & a, const Zone & b) const
+        inline bool operator () (const Zone & a, const Zone & b) const
         {
             return a.first_sector < b.first_sector;
         }
@@ -79,13 +79,14 @@ protected:
 
     void add_zone (int &first_cyl, int last_cyl,
                    int sec_per_track, int &first_sect);
+
 public:
     inline DiskGeometry ()
     { }
     double get_delay (stxxl::int64 offset, size_t size);                // returns delay in s
 
     inline ~DiskGeometry ()
-    { };
+    { }
 };
 
 
@@ -112,7 +113,7 @@ public:
         std::cout << "Please, make sure that '" << filename <<
         "' is resided on swap memory partition!" <<
         std::endl;
-    };
+    }
     request_ptr aread(void * buffer, stxxl::int64 pos, size_t bytes,
                       completion_handler on_cmpl);
     request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
@@ -125,6 +126,7 @@ public:
 class sim_disk_request : public ufs_request_base
 {
     friend class sim_disk_file;
+
 protected:
     inline sim_disk_request (sim_disk_file * f, void * buf, stxxl::int64 off,
                              size_t b, request_type t,
@@ -137,6 +139,7 @@ protected:
                           on_cmpl)
     { }
     void serve ();
+
 public:
     inline const char * io_type ()
     {

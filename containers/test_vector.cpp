@@ -13,8 +13,8 @@ typedef stxxl::int64 int64;
 struct counter
 {
     int value;
-    counter(int v) : value(v) { };
-    int operator()  ()
+    counter(int v) : value(v) { }
+    int operator () ()
     {
         int old_val = value;
         value++;

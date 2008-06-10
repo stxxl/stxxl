@@ -31,8 +31,8 @@ struct my_type
     key_type _key;
     // char _data[RECORD_SIZE - sizeof(key_type)];
 
-    my_type() { };
-    my_type(key_type __key) : _key(__key) { };
+    my_type() { }
+    my_type(key_type __key) : _key(__key) { }
 };
 
 std::ostream & operator << (std::ostream & o, const my_type obj)

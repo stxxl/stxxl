@@ -102,7 +102,7 @@ struct modify < std::pair < const key_type, data_type > >
 {
     void operator ()  (std::pair < const key_type, data_type > & obj) const
     {
-        ++ (obj.second);
+        ++(obj.second);
     }
 };
 

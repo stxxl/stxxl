@@ -340,6 +340,7 @@ template <class T, class VectorType = stxxl::vector<T> >
 class deque : private noncopyable
 {
     typedef deque<T, VectorType>     Self_;
+
 public:
     typedef typename VectorType::size_type size_type;
     typedef typename VectorType::difference_type difference_type;
@@ -354,6 +355,7 @@ public:
 
     friend class deque_iterator<Self_>;
     friend class const_deque_iterator<Self_>;
+
 private:
     VectorType Vector;
     size_type begin_o, end_o, size_;
@@ -371,8 +373,8 @@ private:
             begin_o = new_begin_o;
         }
     }
-public:
 
+public:
     deque() : Vector((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(T)), begin_o(0), end_o(0), size_(0)
     { }
 
@@ -423,7 +425,7 @@ public:
         return Vector[(begin_o + n) % Vector.size()];
     }
 
-    const_reference operator[](size_type n) const
+    const_reference operator [] (size_type n) const
     {
         assert(n < size());
         return Vector[(begin_o + n) % Vector.size()];

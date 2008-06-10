@@ -36,7 +36,8 @@ struct tuple_base
 
     template <int I>
     struct item_type
-    {/*
+    {
+/*
         typedef typename SWITCH<I, CASE<1,first_type,
                                 CASE<2,second_type,
                                 CASE<3,third_type,
@@ -44,7 +45,8 @@ struct tuple_base
                                 CASE<5,fifth_type,
                                 CASE<6,sixth_type,
                                 CASE<DEFAULT,void
-                            > > > > > > > >::result result;*/
+                            > > > > > > > >::result result;
+*/
     };
 };
 
@@ -294,7 +296,8 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
    typename tuple_type::item_type<I>::result get(const tuple_type & t)
    {
    return NULL;
-   }*/
+   }
+*/
 
 
 __STXXL_END_NAMESPACE

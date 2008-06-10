@@ -5,7 +5,7 @@
 #endif
 #ifdef BOOST_MSVC
  #include <io.h>
- #include <windows.h> 
+ #include <windows.h>
 #else
  #include <unistd.h>
  #include <sys/time.h>
@@ -22,7 +22,7 @@ inline unsigned initial_seed();
 struct seed_generator_t {
     unsigned seed;
 #ifdef STXXL_BOOST_THREADS
-	boost::mutex mtx;
+    boost::mutex mtx;
 #else
     mutex mtx;
 #endif
@@ -31,9 +31,10 @@ struct seed_generator_t {
     { }
 };
 
-seed_generator_t & seed_generator() {
-	static seed_generator_t sg(initial_seed());
-	return sg;
+seed_generator_t & seed_generator()
+{
+    static seed_generator_t sg(initial_seed());
+    return sg;
 }
 
 inline unsigned initial_seed()
@@ -42,40 +43,40 @@ inline unsigned initial_seed()
     assert(!initialized); // this should only be called once!
 
     initialized = true;
-    #ifdef BOOST_MSVC
-	// GetTickCount():  ms since system start
-	return GetTickCount() ^ GetCurrentProcessId();
-	#else
+#ifdef BOOST_MSVC
+    // GetTickCount():  ms since system start
+    return GetTickCount() ^ GetCurrentProcessId();
+#else
     struct timeval tv;
     gettimeofday(&tv, 0);
 
     return tv.tv_sec ^ tv.tv_usec ^ (getpid() << 16);
-	#endif
+#endif
 }
 
 void set_seed(unsigned seed)
 {
-	#ifdef STXXL_BOOST_THREADS
-	boost::mutex::scoped_lock Lock(seed_generator().mtx);
-	seed_generator().seed = seed;
-	#else
+#ifdef STXXL_BOOST_THREADS
+    boost::mutex::scoped_lock Lock(seed_generator().mtx);
+    seed_generator().seed = seed;
+#else
     seed_generator().mtx.lock();
     seed_generator().seed = seed;
     seed_generator().mtx.unlock();
-	#endif
+#endif
 }
 
 unsigned get_next_seed()
 {
-	#ifdef STXXL_BOOST_THREADS
-	boost::mutex::scoped_lock Lock(seed_generator().mtx);
-	return ++(seed_generator().seed);
-	#else
+#ifdef STXXL_BOOST_THREADS
+    boost::mutex::scoped_lock Lock(seed_generator().mtx);
+    return ++(seed_generator().seed);
+#else
     seed_generator().mtx.lock();
     unsigned seed = seed_generator().seed++;
     seed_generator().mtx.unlock();
-	return seed;
-	#endif
+    return seed;
+#endif
 }
 
 __STXXL_END_NAMESPACE

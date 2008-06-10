@@ -28,9 +28,11 @@ class boostfd_file : public file
 {
 public:
     typedef boost::iostreams::file_descriptor fd_type;
+
 protected:
     fd_type file_des;
     int mode_;
+
 public:
     boostfd_file(const std::string & filename, int mode, int disk = -1);
     fd_type get_file_des() const;
@@ -53,6 +55,7 @@ public:
 class boostfd_request : public request
 {
     friend class boostfd_file;
+
 protected:
     // states of request
     enum { OP = 0, DONE = 1, READY2DIE = 2 }; // OP - operating, DONE - request served,

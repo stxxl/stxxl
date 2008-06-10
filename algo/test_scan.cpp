@@ -14,7 +14,7 @@ struct counter
 {
     type value;
     counter(type v = type(0)) : value(v) { }
-    type operator()  ()
+    type operator () ()
     {
         type old_val = value;
         value++;
@@ -25,7 +25,7 @@ struct counter
 template <typename type>
 struct square
 {
-    void operator() (type & arg)
+    void operator () (type & arg)
     {
         arg = arg * arg;
     }
@@ -37,7 +37,7 @@ struct fill_value
     type val;
     fill_value(const type &v_) : val(v_) { }
 
-    type operator ()  ()
+    type operator () ()
     {
         return val;
     }

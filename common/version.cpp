@@ -1,7 +1,7 @@
 #include <stxxl/bits/version.h>
 
 #ifdef STXXL_BOOST_CONFIG
-#include<boost/version.hpp>
+#include <boost/version.hpp>
 #endif
 
 #define STXXL_VERSION_STRING_MA_MI_PL "1.1.1"

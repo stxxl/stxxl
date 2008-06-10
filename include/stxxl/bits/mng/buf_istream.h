@@ -36,6 +36,7 @@ class buf_istream
     typedef BIDIteratorTp_ bid_iterator_type;
 
     buf_istream() { }
+
 protected:
     typedef block_prefetcher<block_type, bid_iterator_type> prefetcher_type;
     prefetcher_type * prefetcher;
@@ -46,6 +47,7 @@ protected:
 #ifdef BUF_ISTREAM_CHECK_END
     bool not_finished;
 #endif
+
 public:
     typedef typename block_type::reference reference;
     typedef buf_istream<block_type, bid_iterator_type> _Self;

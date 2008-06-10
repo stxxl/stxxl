@@ -29,7 +29,7 @@ struct sim_event // only one type of event: WRITE COMPLETED
 {
     int_type timestamp;
     int_type iblock;
-    inline sim_event(int_type t, int_type b) : timestamp(t), iblock(b) { };
+    inline sim_event(int_type t, int_type b) : timestamp(t), iblock(b) { }
 };
 
 struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>

@@ -55,6 +55,7 @@ public:
 class wincall_request : public wfs_request_base
 {
     friend class wincall_file;
+
 protected:
     wincall_request(
         wincall_file * f,
@@ -64,6 +65,7 @@ protected:
         request_type t,
         completion_handler on_cmpl);
     void serve ();
+
 public:
     const char * io_type ();
 };

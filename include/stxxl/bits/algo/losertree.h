@@ -48,6 +48,7 @@ class loser_tree : private noncopyable
             }
         }
     }
+
 public:
     typedef typename run_cursor_type::prefetcher_type prefetcher_type;
     typedef typename run_cursor_type::value_type value_type;
@@ -145,11 +146,9 @@ private:
             TreeStep (1);
 
 #undef TreeStep
-
         }
 
         regEntry[0] = winnerIndex;
-
     }
 
     void multi_merge_unrolled_0 (value_type * to)

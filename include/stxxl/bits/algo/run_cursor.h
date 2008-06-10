@@ -45,7 +45,7 @@ template <typename block_type,
           typename prefetcher_type_>
 struct run_cursor2 : public run_cursor<block_type>
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
-, public have_prefetcher
+                     , public have_prefetcher
 #endif
 {
     typedef prefetcher_type_ prefetcher_type;
@@ -68,6 +68,7 @@ struct run_cursor2 : public run_cursor<block_type>
     {
         return prefetcher_;
     }
+
 public:
     run_cursor2() { }
     run_cursor2(prefetcher_type * p) : prefetcher_(p) { }

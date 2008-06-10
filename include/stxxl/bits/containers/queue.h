@@ -40,7 +40,6 @@ template <     class ValTp,
 class queue : private noncopyable
 {
 public:
-
     typedef ValTp value_type;
     typedef AllocStr alloc_strategy;
     typedef SzTp size_type;
@@ -67,7 +66,6 @@ private:
     unsigned_type blocks2prefetch;
 
 public:
-
     //! \brief Constructs empty queue with own write and prefetch block pool
 
     //! \param w_pool_size  number of blocks in the write pool, must be at least 2

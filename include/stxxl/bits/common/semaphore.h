@@ -32,6 +32,7 @@ class semaphore : private noncopyable
     pthread_mutex_t mutex;
     pthread_cond_t cond;
 #endif
+
 public:
     semaphore (int init_value = 1) : v (init_value)
     {
@@ -39,7 +40,7 @@ public:
         check_pthread_call(pthread_mutex_init(&mutex, NULL));
         check_pthread_call(pthread_cond_init(&cond, NULL));
 #endif
-    };
+    }
     ~semaphore ()
     {
 #ifndef STXXL_BOOST_THREADS

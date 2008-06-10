@@ -2,5 +2,5 @@
 
 int main()
 {
-	stxxl::config::get_instance();
+    stxxl::config::get_instance();
 }

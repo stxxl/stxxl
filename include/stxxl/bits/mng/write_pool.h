@@ -52,8 +52,8 @@ public:
     //typedef typename hash_map_type::iterator block_track_iterator;
     typedef typename std::list<block_type *>::iterator free_blocks_iterator;
     typedef typename std::list<busy_entry>::iterator busy_blocks_iterator;
-protected:
 
+protected:
     // contains free write blocks
     std::list<block_type *> free_blocks;
     // blocks that are in writing
@@ -210,6 +210,7 @@ public:
         free_blocks.push_back(block);
         ++free_blocks_size;
     }
+
 protected:
     void check_all_busy()
     {

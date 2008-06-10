@@ -68,7 +68,6 @@ namespace btree
 
         typedef node_cache<normal_node, btree_type> node_cache_type;
 
-
     private:
         normal_node();
         normal_node(const normal_node &);
@@ -80,7 +79,7 @@ namespace btree
 
             value_compare(key_compare c) : comp(c) { }
 
-            bool operator() (const value_type & x, const value_type & y) const
+            bool operator () (const value_type & x, const value_type & y) const
             {
                 return comp(x.first, y.first);
             }
@@ -109,7 +108,7 @@ namespace btree
 
             *place2insert = splitter;                     // insert
 
-            ++ (block_->info.cur_size);
+            ++(block_->info.cur_size);
 
             if (size() > max_nelements())                    // overflow! need to split
             {
@@ -181,7 +180,7 @@ namespace btree
                 cache_.delete_node(LeftBid);                         // 'delete_node' unfixes LeftBid also
 
                 std::copy(leftIt + 1, block_->begin() + size(), leftIt );                        // delete left BID from the root
-                -- (block_->info.cur_size);
+                --(block_->info.cur_size);
             }
             else
             {
@@ -753,7 +752,7 @@ namespace btree
         void push_back(const value_type & x)
         {
             (*this)[size()] = x;
-            ++ (block_->info.cur_size);
+            ++(block_->info.cur_size);
         }
     };
 }

@@ -33,6 +33,7 @@ protected:
     bid_iterator_type current_bid;
     int_type current_elem;
     block_type * current_blk;
+
 public:
     typedef typename block_type::const_reference const_reference;
     typedef typename block_type::reference reference;

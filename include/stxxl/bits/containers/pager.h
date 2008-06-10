@@ -33,10 +33,11 @@ template <unsigned npages_>
 class random_pager
 {
     random_number<random_uniform_fast> rnd;
+
 public:
     enum { n_pages = npages_ };
-    random_pager() { };
-    ~random_pager() { };
+    random_pager() { }
+    ~random_pager() { }
     int_type kick()
     {
         return rnd(npages_);

@@ -11,7 +11,7 @@
 #include <stxxl/timer>
 
 //! \example containers/berkeley_db_benchmark.cpp
-//! This is a benchmark mentioned in the paper 
+//! This is a benchmark mentioned in the paper
 //! R. Dementiev, L. Kettner, P. Sanders "STXXL: standard template library for XXL data sets"
 //! Software: Practice and Experience
 //! Volume 38, Issue 6, Pages 589-637, May 2008
@@ -41,8 +41,8 @@
 #define TOTAL_CACHE_SIZE    (750 * 1024 * 1024)
 //#define TOTAL_CACHE_SIZE    (150*1024*1024)
 
-//#define NODE_CACHE_SIZE 	(1*(TOTAL_CACHE_SIZE/40))
-//#define LEAF_CACHE_SIZE 	(39*(TOTAL_CACHE_SIZE/40))
+//#define NODE_CACHE_SIZE       (1*(TOTAL_CACHE_SIZE/40))
+//#define LEAF_CACHE_SIZE       (39*(TOTAL_CACHE_SIZE/40))
 
 #define NODE_CACHE_SIZE         (64 * 1024 * 1024)
 #define LEAF_CACHE_SIZE         (TOTAL_CACHE_SIZE - NODE_CACHE_SIZE)
@@ -149,7 +149,7 @@ struct el_t {
     el_t() { }
 };
 struct key_from_el {
-    bkey_t operator() (const el_t & v) const
+    bkey_t operator () (const el_t & v) const
     {
         return v.key_;
     }
@@ -182,8 +182,8 @@ typedef stxxl::VECTOR_GENERATOR < std::pair<my_key, my_data>, 1, 1 > ::result ve
 //typedef stxxl::vector<std::pair<my_key,my_data>,1,stxxl::lru_pager<1>,512*1024>  vector_type;
 
 
-//#define KEYPOS 	(i % KEY_SIZE)
-//#define VALUE 		(myrand() % 26)
+//#define KEYPOS        (i % KEY_SIZE)
+//#define VALUE                 (myrand() % 26)
 
 
 #if 0
@@ -529,6 +529,7 @@ class rand_key_gen
     my_key &current;
     stxxl::random_number32 myrand;
     rand_key_gen();
+
 public:
     typedef my_key value_type;
 
@@ -559,6 +560,7 @@ class key2pair
     InputType &in;
     std::pair<my_key, my_data>  current;
     key2pair();
+
 public:
     typedef std::pair<my_key, my_data> value_type;
 
@@ -789,7 +791,7 @@ char dummy;
 
 class MyFilter {
 public:
-    bool operator() (const el_t & v) const
+    bool operator () (const el_t & v) const
     {
         dummy += v.key_.keybuf[0];         // touch element
         return true;

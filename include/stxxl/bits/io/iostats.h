@@ -51,6 +51,7 @@ class stats : private noncopyable
     static stats * instance;
 
     stats ();
+
 public:
     //! \brief Call this function in order to access an instance of stats
     //! \return pointer to an instance of stats
@@ -196,7 +197,7 @@ public:
         elapsed(stxxl_timestamp() - s.get_last_reset_time())
     { }
 
-    stats_data operator+(const stats_data& a) const
+    stats_data operator + (const stats_data& a) const
     {
         stats_data s;
         s.reads = reads + a.reads;
@@ -213,7 +214,7 @@ public:
         return s;
     }
 
-    stats_data operator-(const stats_data& a) const
+    stats_data operator - (const stats_data& a) const
     {
         stats_data s;
         s.reads = reads - a.reads;
@@ -284,7 +285,6 @@ public:
     {
         return t_wait;
     }
-
 };
 
 std::ostream & operator << (std::ostream & o, const stats_data & s);

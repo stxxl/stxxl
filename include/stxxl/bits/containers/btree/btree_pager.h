@@ -31,8 +31,8 @@ namespace btree
 
         lru_pager(const lru_pager & obj);
         lru_pager & operator = (const lru_pager & obj);
-    public:
 
+    public:
         lru_pager() : npages_(0)
         { }
 

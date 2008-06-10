@@ -5,7 +5,7 @@
     copyright            : (C) 2005 by Thomas Nowak
     email                : t.nowak@imail.de
 
-          fixed by 					 : Roman Dementiev (01.03.2006)
+          fixed by                                       : Roman Dementiev (01.03.2006)
 ***************************************************************************/
 
 //! \file containers/test_map_random.cpp

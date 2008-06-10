@@ -10,7 +10,7 @@ struct counter
 {
     type value;
     counter(type v = type(0)) : value(v) { }
-    type operator()  ()
+    type operator () ()
     {
         type old_val = value;
         value++;

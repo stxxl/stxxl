@@ -60,11 +60,11 @@ namespace btree
 
         typedef node_cache<normal_leaf, btree_type> leaf_cache_type;
 
-
     private:
         normal_leaf();
         normal_leaf(const normal_leaf &);
         normal_leaf & operator = (const normal_leaf &);
+
     public:
         struct value_compare : public std::binary_function<value_type, value_type, bool>
         {
@@ -72,11 +72,12 @@ namespace btree
 
             value_compare(key_compare c) : comp(c) { }
 
-            bool operator() (const value_type & x, const value_type & y) const
+            bool operator () (const value_type & x, const value_type & y) const
             {
                 return comp(x.first, y.first);
             }
         };
+
     private:
         block_type * block_;
         btree_type * btree_;
@@ -332,11 +333,11 @@ namespace btree
             for ( ; it2fix != Iterators2Fix.end(); ++it2fix)
             {
                 btree_->iterator_map_.unregister_iterator(**it2fix);
-                ++ ((*it2fix)->pos);                        // fixing iterators
+                ++((*it2fix)->pos);                        // fixing iterators
                 btree_->iterator_map_.register_iterator(**it2fix);
             }
 
-            ++ (block_->info.cur_size);
+            ++(block_->info.cur_size);
 
             std::pair<iterator, bool> result(iterator(btree_, my_bid(), it - block_->begin()), true);
 
@@ -376,7 +377,7 @@ namespace btree
 
             btree_->iterator_map_.unregister_iterator(it);
 
-            ++ (it.pos);
+            ++(it.pos);
             if (it.pos == size() && succ().valid())
             {
                 // run to the end of the leaf
@@ -526,11 +527,11 @@ namespace btree
             {
                 STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) << " (pos--)");
                 btree_->iterator_map_.unregister_iterator(**it2fix);
-                -- ((*it2fix)->pos);                        // fixing iterators
+                --((*it2fix)->pos);                        // fixing iterators
                 btree_->iterator_map_.register_iterator(**it2fix);
             }
 
-            -- (block_->info.cur_size);
+            --(block_->info.cur_size);
 
             return 1;
         }
@@ -694,7 +695,7 @@ namespace btree
         void push_back(const value_type & x)
         {
             (*this)[size()] = x;
-            ++ (block_->info.cur_size);
+            ++(block_->info.cur_size);
         }
     };
 }

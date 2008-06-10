@@ -62,7 +62,7 @@ struct counter
     value_type cnt;
     counter() : cnt(0) { }
 
-    value_type operator()  ()
+    value_type operator () ()
     {
         value_type ret = cnt;
         ++cnt;

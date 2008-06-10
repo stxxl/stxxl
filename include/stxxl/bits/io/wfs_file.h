@@ -32,6 +32,7 @@ protected:
     HANDLE file_des;             // file descriptor
     int mode_;             // open mode
     wfs_file_base (const std::string & filename, int mode, int disk);
+
 public:
     HANDLE get_file_des() const;
     ~wfs_file_base();
@@ -44,6 +45,7 @@ public:
 class wfs_request_base : public request
 {
     friend class wfs_file_base;
+
 protected:
     // states of request
     enum { OP = 0, DONE = 1, READY2DIE = 2 };                   // OP - operating, DONE - request served,
@@ -76,6 +78,7 @@ protected:
     void delete_waiter (onoff_switch * sw);
     int nwaiters ();             // returns number of waiters
     void check_aligning ();
+
 public:
     virtual ~wfs_request_base ();
     void wait ();
