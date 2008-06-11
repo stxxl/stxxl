@@ -1,4 +1,4 @@
-Version 1.1.1 (UNRELEASED)
+Version 1.2.0 (UNRELEASED)
 
 * fixed a rare assertion in stxxl::priority_queue
 * made the block management layer thread-safe
