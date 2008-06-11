@@ -10,12 +10,11 @@
 #include <limits>
 #include <iterator>
 
-using namespace stxxl;
-using priority_queue_local::ext_merger;
-using priority_queue_local::loser_tree;
+using stxxl::priority_queue_local::ext_merger;
+using stxxl::priority_queue_local::loser_tree;
 
 typedef int my_type;
-typedef typed_block < 4096, my_type > block_type;
+typedef stxxl::typed_block < 4096, my_type > block_type;
 
 
 struct dummy_merger
@@ -56,8 +55,8 @@ my_type * make_sequence(dummy_merger & dummy, int l)
 
 int main()
 {
-    prefetch_pool<block_type> p_pool(1);
-    write_pool<block_type> w_pool(2);
+    stxxl::prefetch_pool<block_type> p_pool(1);
+    stxxl::write_pool<block_type> w_pool(2);
     int cnt = 0;
     dummy_merger dummy(cnt);
     std::vector<my_type> output(1024 * 3);

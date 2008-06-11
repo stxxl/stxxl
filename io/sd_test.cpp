@@ -11,7 +11,9 @@
 #include "stxxl/random"
 #include <cmath>
 
-using namespace stxxl;
+using stxxl::file;
+using stxxl::stxxl_timestamp;
+
 
 // Tests sim_disk file implementation
 // must be run on in-memory swap partition !
@@ -24,17 +26,17 @@ int main()
     const int block_size = 4 * 1024 * 1024;
     char * buffer = new char[block_size];
     const char * paths[2] = { "/tmp/data1", "/tmp/data2" };
-    sim_disk_file file1(paths[0], file::CREAT | file::RDWR /* | file::DIRECT */, 0);
+    stxxl::sim_disk_file file1(paths[0], file::CREAT | file::RDWR /* | file::DIRECT */, 0);
     file1.set_size(disk_size);
 
-    sim_disk_file file2(paths[1], file::CREAT | file::RDWR /* | file::DIRECT */, 1);
+    stxxl::sim_disk_file file2(paths[1], file::CREAT | file::RDWR /* | file::DIRECT */, 1);
     file2.set_size(disk_size);
 
     unsigned i = 0;
 
     stxxl::int64 pos = 0;
 
-    request_ptr req;
+    stxxl::request_ptr req;
 
     STXXL_MSG("Estimated time:" << block_size / double (AVERAGE_SPEED));
     STXXL_MSG("Sequential write");
@@ -56,7 +58,7 @@ int main()
     const unsigned int times = 80;
     for (i = 0; i < times; i++)
     {
-        random_number<> rnd;
+        stxxl::random_number<> rnd;
         pos = rnd(disk_size / block_size) * block_size;
         double begin = stxxl_timestamp();
         req = file1.awrite(buffer, pos, block_size, stxxl::default_completion_handler());

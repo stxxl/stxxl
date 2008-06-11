@@ -2,8 +2,6 @@
 #include "stxxl/ksort"
 #include "stxxl/vector"
 
-using namespace stxxl;
-
 
 struct my_type
 {
@@ -41,9 +39,9 @@ int main()
     my_type::key_type max_key = 1 * 1024 * 1024;
     unsigned int block_size = 1 * 1024 * 1024;
     unsigned int records_in_block = block_size / sizeof(my_type);
-    my_type * array = (my_type *) aligned_alloc<BLOCK_ALIGN>(block_size);
-    syscall_file f("./in", file::CREAT | file::RDWR);
-    request_ptr req;
+    my_type * array = (my_type *) stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
+    stxxl::syscall_file f("./in", stxxl::file::CREAT | stxxl::file::RDWR);
+    stxxl::request_ptr req;
 
     my_type::key_type cur_key = max_key;
     for (unsigned i = 0; i < max_key / records_in_block; i++ )
@@ -56,7 +54,7 @@ int main()
         req->wait();
     }
 
-    aligned_dealloc<BLOCK_ALIGN>(array);
+    stxxl::aligned_dealloc<BLOCK_ALIGN>(array);
 
     return 0;
 }

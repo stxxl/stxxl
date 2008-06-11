@@ -15,24 +15,21 @@
 //! \example mng/test_streams.cpp
 //! This is an example of use of \c stxxl::buf_istream and \c stxxl::buf_ostream
 
+
 #define BLOCK_SIZE (1024 * 512)
 
-
-using namespace stxxl;
-
-
-typedef typed_block<BLOCK_SIZE, int> block_type;
-typedef buf_ostream<block_type, BIDArray<BLOCK_SIZE>::iterator> buf_ostream_type;
-typedef buf_istream<block_type, BIDArray<BLOCK_SIZE>::iterator> buf_istream_type;
+typedef stxxl::typed_block<BLOCK_SIZE, int> block_type;
+typedef stxxl::buf_ostream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_ostream_type;
+typedef stxxl::buf_istream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_istream_type;
 
 int main()
 {
     const unsigned nblocks = 64;
     const unsigned nelements = nblocks * block_type::size;
-    BIDArray<BLOCK_SIZE> bids(nblocks);
+    stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
 
-    block_manager * bm = block_manager::get_instance ();
-    bm->new_blocks (striping (), bids.begin (), bids.end ());
+    stxxl::block_manager * bm = stxxl::block_manager::get_instance ();
+    bm->new_blocks (stxxl::striping (), bids.begin (), bids.end ());
     {
         buf_ostream_type out(bids.begin(), 2);
         for (unsigned i = 0; i < nelements; i++)

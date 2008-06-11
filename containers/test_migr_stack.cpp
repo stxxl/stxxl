@@ -15,14 +15,12 @@
 //! external implementation \c normal_stack , \b four blocks per page,
 //! block size \b 4096 bytes, and internal implementation
 //! \c std::stack<int>
-using namespace stxxl;
+
 
 int main()
 {
     const unsigned critical_size = 8 * 4096;
-    typedef STACK_GENERATOR < int, \
-                             migrating, normal, 4, 4096, std::stack<int>, critical_size > ::result migrating_stack_type;
-
+    typedef stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<int>, critical_size>::result migrating_stack_type;
 
     STXXL_MSG("Starting test.");
 

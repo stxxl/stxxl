@@ -20,19 +20,16 @@ struct MyType
     char chars[5];
 };
 
-using namespace stxxl;
-
-
-typedef typed_block<BLOCK_SIZE, MyType> block_type;
+typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
 int main ()
 {
-    prefetch_pool<block_type> pool(2);
+    stxxl::prefetch_pool<block_type> pool(2);
     pool.resize(10);
     pool.resize(5);
     block_type * blk = new block_type;
     block_type::bid_type bid;
-    block_manager::get_instance()->new_blocks(single_disk(), &bid, (&bid) + 1);
+    stxxl::block_manager::get_instance()->new_blocks(stxxl::single_disk(), &bid, (&bid) + 1);
     pool.hint(bid);
     pool.read(blk, bid)->wait();
     delete blk;

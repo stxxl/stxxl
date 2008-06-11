@@ -14,11 +14,12 @@
 //! completion tracking mechanisms, i.e. \c stxxl::file , \c stxxl::request , and
 //! \c stxxl::mc
 
-using namespace stxxl;
+using stxxl::file;
+
 
 struct my_handler
 {
-    void operator ()  (request * ptr)
+    void operator ()  (stxxl::request * ptr)
     {
         STXXL_MSG("Request completed: " << ptr);
     }
@@ -33,13 +34,13 @@ int main()
     const char * paths[2] = { "data1", "data2" };
 #else
     const char * paths[2] = { "/var/tmp/data1", "/var/tmp/data2" };
-    mmap_file file1(paths[0], file::CREAT | file::RDWR /* | file::DIRECT */, 0);
+    stxxl::mmap_file file1(paths[0], file::CREAT | file::RDWR /* | file::DIRECT */, 0);
     file1.set_size(size * 1024);
 #endif
 
-    syscall_file file2(paths[1], file::CREAT | file::RDWR /* | file::DIRECT */, 1);
+    stxxl::syscall_file file2(paths[1], file::CREAT | file::RDWR /* | file::DIRECT */, 1);
 
-    request_ptr req[16];
+    stxxl::request_ptr req[16];
     unsigned i = 0;
     for ( ; i < 16; i++)
         req[i] = file2.awrite(buffer, i * size, size, my_handler());

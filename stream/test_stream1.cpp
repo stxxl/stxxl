@@ -49,13 +49,11 @@ struct Cmp : std::binary_function<unsigned, unsigned, bool>
     }
 };
 
-using namespace stxxl;
-
 #define MULT (1000)
 
 int main()
 {
-    typedef stream::runs_creator < Input, Cmp, 4096 * MULT, stxxl::RC > CreateRunsAlg;
+    typedef stxxl::stream::runs_creator < Input, Cmp, 4096 * MULT, stxxl::RC > CreateRunsAlg;
     typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 
     stxxl::stats * s = stxxl::stats::get_instance();
@@ -67,9 +65,9 @@ int main()
     Input in(size + 1);
     CreateRunsAlg SortedRuns(in, Cmp(), 1024 * 128 * MULT);
     SortedRunsType Runs = SortedRuns.result();
-    assert(check_sorted_runs(Runs, Cmp()));
+    assert(stxxl::stream::check_sorted_runs(Runs, Cmp()));
     // merge the runs
-    stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), MULT * 1024 * 128);
+    stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), MULT * 1024 * 128);
     stxxl::vector<Input::value_type> array;
     STXXL_MSG(size << " " << Runs.elements);
     STXXL_MSG("CRC: " << in.crc);

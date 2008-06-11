@@ -46,8 +46,6 @@ const unsigned long long block_size = 4 * mega;
 #define RECORD_SIZE 16
 #define LOAD 0
 
-using namespace stxxl;
-
 typedef unsigned long long my_key_type;
 
 #define MAGIC 123
@@ -193,7 +191,7 @@ int main ( int argc, char* argv[] )
 	const unsigned mem_for_pools = 2048 * mega;
 
 #if TINY_PQ
-  UNUSED(mem_for_queue);
+  stxxl::UNUSED(mem_for_queue);
   const unsigned BufferSize1 = 32; // equalize procedure call overheads etc.
   const unsigned N = (1 << 9) / sizeof(my_type); // minimal sequence length
   const unsigned IntKMAX = 8; // maximal arity for internal mergersq
@@ -201,8 +199,8 @@ int main ( int argc, char* argv[] )
   const unsigned BlockSize = ( 4 * mega );
   const unsigned ExtKMAX = 8; // maximal arity for external mergers
   const unsigned ExtLevels = 2; // number of external levels
-  typedef priority_queue<
-      priority_queue_config<
+  typedef stxxl::priority_queue<
+      stxxl::priority_queue_config<
           my_type,
           my_cmp,
           BufferSize1,
@@ -215,7 +213,7 @@ int main ( int argc, char* argv[] )
         >
     > pq_type;
 #elif MANUAL_PQ
-  UNUSED(mem_for_queue);
+  stxxl::UNUSED(mem_for_queue);
 	const unsigned BufferSize1 = 32; // equalize procedure call overheads etc.
 	const unsigned N = (1 << 20) / sizeof(my_type); // minimal sequence length
 	const unsigned IntKMAX = 16; // maximal arity for internal mergersq
@@ -223,8 +221,8 @@ int main ( int argc, char* argv[] )
 	const unsigned BlockSize = ( 4 * mega );
 	const unsigned ExtKMAX = 32; // maximal arity for external mergers
 	const unsigned ExtLevels = 2; // number of external levels
-	typedef priority_queue<
-      priority_queue_config<
+	typedef stxxl::priority_queue<
+      stxxl::priority_queue_config<
           my_type,
           my_cmp,
           BufferSize1,
@@ -238,7 +236,7 @@ int main ( int argc, char* argv[] )
     > pq_type;
 #else
 	const unsigned_type volume = 200000 * mega; // in bytes
-	typedef PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,mem_for_queue,volume/sizeof ( my_type )/1024 + 1> gen;
+	typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type,my_cmp,mem_for_queue,volume/sizeof ( my_type )/1024 + 1> gen;
 	typedef gen::result pq_type;
 //         BufferSize1 = Config::BufferSize1,
 //         N = Config::N,
@@ -270,11 +268,11 @@ int main ( int argc, char* argv[] )
 #endif
 
 	stxxl::stats_data sd_start(*stxxl::stats::get_instance());
-	timer Timer;
+	stxxl::timer Timer;
 	Timer.start();
 
-	prefetch_pool<block_type> p_pool ( ( mem_for_pools / 2 ) /block_type::raw_size );
-	write_pool<block_type>    w_pool ( ( mem_for_pools / 2 ) /block_type::raw_size );
+	stxxl::prefetch_pool<block_type> p_pool ( ( mem_for_pools / 2 ) /block_type::raw_size );
+	stxxl::write_pool<block_type>    w_pool ( ( mem_for_pools / 2 ) /block_type::raw_size );
 	pq_type p ( p_pool,w_pool );
 	stxxl::int64 nelements = stxxl::int64 ( megabytes * mega / sizeof ( my_type ) ),i;
 

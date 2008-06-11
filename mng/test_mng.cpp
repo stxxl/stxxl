@@ -23,29 +23,26 @@ struct MyType
     ~MyType() { }
 };
 
-using namespace stxxl;
-
-
 struct my_handler
 {
-    void operator ()  (request * req)
+    void operator ()  (stxxl::request * req)
     {
         STXXL_MSG( req << " done, type=" << req->io_type() );
     }
 };
 
-typedef typed_block<BLOCK_SIZE, MyType> block_type;
+typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
 int main ()
 {
     STXXL_MSG(sizeof(MyType) << " " << (BLOCK_SIZE % sizeof(MyType)));
     STXXL_MSG(sizeof(block_type) << " " << BLOCK_SIZE);
     const unsigned nblocks = 2;
-    BIDArray < BLOCK_SIZE > bids (nblocks);
+    stxxl::BIDArray < BLOCK_SIZE > bids (nblocks);
     std::vector < int >disks (nblocks, 2);
     stxxl::request_ptr * reqs = new stxxl::request_ptr[nblocks];
-    block_manager * bm = block_manager::get_instance ();
-    bm->new_blocks (striping (), bids.begin (), bids.end ());
+    stxxl::block_manager * bm = stxxl::block_manager::get_instance ();
+    bm->new_blocks (stxxl::striping (), bids.begin (), bids.end ());
 
     block_type * block = new block_type[2];
     STXXL_MSG(std::hex);

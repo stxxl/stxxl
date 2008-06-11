@@ -7,7 +7,9 @@
 //! \example algo/test_scan.cpp
 //! This is an example of how to use \c stxxl::for_each() and \c stxxl::find() algorithms
 
-using namespace stxxl;
+using stxxl::int64;
+using stxxl::stxxl_timestamp;
+
 
 template <typename type>
 struct counter
@@ -91,7 +93,6 @@ int main()
         if (v[i] != 555 )
             STXXL_MSG("Error at position " << i);
     }
-
 
     return 0;
 }

@@ -34,7 +34,6 @@ typedef std::vector<char> input_array_type;
 typedef std::vector<tuple_type> output_array_type;
 #endif
 
-using namespace stxxl;
 using stxxl::stream::streamify;
 using stxxl::stream::streamify_traits;
 using stxxl::stream::make_tuple;
@@ -147,20 +146,20 @@ int main()
 #ifdef USE_FORMRUNS_N_MERGE
     // sort tuples by character
     // 1. form runs
-    typedef stream::runs_creator<tuple_stream_type, cmp_type, block_size> runs_creator_stream_type;
+    typedef stxxl::stream::runs_creator<tuple_stream_type, cmp_type, block_size> runs_creator_stream_type;
     runs_creator_stream_type runs_creator_stream(tuple_stream, cmp_type(), 128 * 1024);
     // 2. merge runs
-    typedef stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type> runs_merger_stream_type;
+    typedef stxxl::stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type> runs_merger_stream_type;
     runs_merger_stream_type sorted_stream(runs_creator_stream.result(), cmp_type(), 128 * 1024);
 #else
     // sort tuples by character
     // (combination of the previous two steps in one algorithm: form runs and merge)
-    typedef stream::sort<tuple_stream_type, cmp_type, block_size> sorted_stream_type;
+    typedef stxxl::stream::sort<tuple_stream_type, cmp_type, block_size> sorted_stream_type;
     sorted_stream_type sorted_stream(tuple_stream, cmp_type(), 128 * 1024);
 #endif
 
     // HERE streaming part ends (materializing)
-    output_array_type::iterator o = materialize(sorted_stream, output.begin(), output.end());
+    output_array_type::iterator o = stxxl::stream::materialize(sorted_stream, output.begin(), output.end());
     // or materialize(sorted_stream,output.begin());
     assert(o == output.end() );
 

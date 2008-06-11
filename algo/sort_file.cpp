@@ -6,7 +6,6 @@
 //! \example algo/sort_file.cpp
 //! This is an example of how to create \c stxxl::vector from an external file
 
-using namespace stxxl;
 
 struct my_type
 {
@@ -62,7 +61,7 @@ std::ostream & operator << (std::ostream & o, const my_type & obj)
 
 int main()
 {
-    syscall_file f("./in", file::DIRECT | file::RDWR);
+    stxxl::syscall_file f("./in", stxxl::file::DIRECT | stxxl::file::RDWR);
 
     unsigned memory_to_use = 50 * 1024 * 1024;
     typedef stxxl::vector<my_type> vector_type;

@@ -5,7 +5,6 @@
 //! \example algo/test_sort1.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
 
-using namespace stxxl;
 
 #define RECORD_SIZE 8
 
@@ -77,7 +76,7 @@ int main()
         stxxl::int64(384) * stxxl::int64(1024 * 1024) / sizeof(my_type);
     vector_type v(n_records);
 
-    random_number32 rnd;
+    stxxl::random_number32 rnd;
     STXXL_MSG("Filling vector..., input size =" << v.size());
     for (vector_type::size_type i = 0; i < v.size(); i++)
         v[i]._key = 1 + (rnd() % 0xfffffff);

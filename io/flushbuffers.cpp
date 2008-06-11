@@ -17,7 +17,11 @@
 
 #include "stxxl/bits/common/aligned_alloc.h"
 
-using namespace stxxl;
+using stxxl::stxxl_timestamp;
+using stxxl::file;
+using stxxl::request_ptr;
+
+
 #ifdef BLOCK_ALIGN
  #undef BLOCK_ALIGN
 #endif
@@ -148,7 +152,7 @@ int main(int argc, char * argv[])
     unsigned chunks = 32;
     request_ptr * reqs = new request_ptr [ndisks * chunks];
     file * * disks = new file *[ndisks];
-    int * buffer = (int *)aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
+    int * buffer = (int *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
 #ifdef WATCH_TIMES
     double * r_finish_times = new double[ndisks];
     double * w_finish_times = new double[ndisks];
@@ -163,7 +167,7 @@ int main(int argc, char * argv[])
 
     for (i = 0; i < ndisks; i++)
     {
-        disks[i] = new syscall_file(disks_arr[i],
+        disks[i] = new stxxl::syscall_file(disks_arr[i],
                                     file::CREAT | file::RDWR | file::DIRECT, i);
     }
 
@@ -171,9 +175,7 @@ int main(int argc, char * argv[])
     {
         std::cout << "Disk offset " << offset / MB << " MB ";
 
-
-        double begin = stxxl_timestamp(), end;
-
+        double begin, end;
 
         begin = stxxl_timestamp();
 
@@ -206,7 +208,7 @@ int main(int argc, char * argv[])
 
     delete [] reqs;
     delete [] disks;
-    aligned_dealloc<BLOCK_ALIGN>(buffer);
+    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
 #ifdef WATCH_TIMES
     delete [] r_finish_times;

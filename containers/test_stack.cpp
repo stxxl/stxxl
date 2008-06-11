@@ -14,12 +14,11 @@
 //! with \c stxxl::grow_shrink_stack implementation, \b four blocks per page,
 //! block size \b 4096 bytes
 
-using namespace stxxl;
 
 int main(int argc, char * argv[])
 {
-    typedef STACK_GENERATOR < int, external, grow_shrink, 4, 4096 > ::result ext_stack_type;
-    typedef STACK_GENERATOR < int, external, grow_shrink2, 1, 4096 > ::result ext_stack_type2;
+    typedef stxxl::STACK_GENERATOR < int, stxxl::external, stxxl::grow_shrink, 4, 4096 > ::result ext_stack_type;
+    typedef stxxl::STACK_GENERATOR < int, stxxl::external, stxxl::grow_shrink2, 1, 4096 > ::result ext_stack_type2;
 
     if (argc < 2)
     {
@@ -72,7 +71,6 @@ int main(int argc, char * argv[])
             assert(int (int_stack.size()) == i + 1);
         }
 
-
         ext_stack_type my_stack1(int_stack);
 
         for (i = test_size - 1; i >= 0; i--)
@@ -81,13 +79,14 @@ int main(int argc, char * argv[])
             my_stack1.pop();
             assert(my_stack1.size() == i);
         }
+
         STXXL_MSG("Test 1 passed.");
     }
     {
         // prefetch pool with 10 blocks (> D is recommended)
-        prefetch_pool<ext_stack_type2::block_type> p_pool(10);
+        stxxl::prefetch_pool<ext_stack_type2::block_type> p_pool(10);
         // write pool with 10 blocks (> D is recommended)
-        write_pool<ext_stack_type2::block_type> w_pool(10);
+        stxxl::write_pool<ext_stack_type2::block_type> w_pool(10);
         // create a stack that does not prefetch (level of prefetch aggressiveness 0)
         ext_stack_type2 my_stack(p_pool, w_pool, 0);
         int test_size = atoi(argv[1]) * 4 * 4096 / sizeof(int), i;
@@ -124,7 +123,6 @@ int main(int argc, char * argv[])
             my_stack.pop();
             assert(my_stack.size() == i);
         }
-
 
         STXXL_MSG("Test 2 passed.");
     }

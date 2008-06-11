@@ -14,11 +14,10 @@
 //! with \c stxxl::grow_shrink_stack implementation, \b four blocks per page,
 //! block size \b 4096 bytes
 
-using namespace stxxl;
 
 int main(int argc, char * argv[])
 {
-    typedef STACK_GENERATOR < int, external, normal, 4, 4096 > ::result ext_stack_type;
+    typedef stxxl::STACK_GENERATOR < int, stxxl::external, stxxl::normal, 4, 4096 > ::result ext_stack_type;
 
     if (argc < 2)
     {
