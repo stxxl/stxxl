@@ -149,7 +149,7 @@ int main ( int argc, char* argv[] )
 #endif 
 	;
 #ifdef __MCSTL__
-    Flags = std::string("")
+    Flags += std::string("")
 #if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
 		+ " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL"
 #endif
