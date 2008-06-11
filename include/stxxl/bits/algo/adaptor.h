@@ -75,11 +75,9 @@ struct RunsToBIDArrayAdaptor : public TwoToOneDimArrayAdaptorBase < _run_type *,
 
 BLOCK_ADAPTOR_OPERATORS(RunsToBIDArrayAdaptor)
 
-template < unsigned
-          _blk_sz, typename _run_type, class __pos_type =
-              int_type >struct RunsToBIDArrayAdaptor2 : public
-TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >,
-                             __pos_type >
+template < unsigned _blk_sz, typename _run_type, class __pos_type = int_type >
+struct RunsToBIDArrayAdaptor2
+: public TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >, __pos_type >
 {
     typedef RunsToBIDArrayAdaptor2 < _blk_sz, _run_type, __pos_type > _Self;
     typedef BID < _blk_sz > data_type;

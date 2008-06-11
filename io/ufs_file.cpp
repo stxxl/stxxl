@@ -37,11 +37,13 @@ ufs_request_base::ufs_request_base (
     request_type t,
     completion_handler on_cmpl) :
     request (on_cmpl, f, buf, off, b, t),
-    /*		file (f),
+/*
+		    file (f),
                     buffer (buf),
                     offset (off),
                     bytes (b),
-                    type(t), */
+                    type(t),
+*/
     _state (OP)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING

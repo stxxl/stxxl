@@ -41,7 +41,6 @@ UNCRUSTIFY_FLAGS+= -c $(UNCRUSTIFY_CFG) -l CPP
 %.uncrustify: % $(UNCRUSTIFY_CFG) #$(UNCRUSTIFY)
 	$(RM) $<.diff
 	$(UNCRUSTIFY) $(UNCRUSTIFY_FLAGS) -o $@T < $<
-	sed -i -e 's/defined (/defined(/g' $@T
 	mv $@T $@
 
 %.unc-apply: %.uncrustify

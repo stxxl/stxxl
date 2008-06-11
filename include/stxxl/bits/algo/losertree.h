@@ -121,17 +121,17 @@ private:
             (*winnerE)++;
 
 
-#define TreeStep(L)                                                                                                                                                                                                                                                                         \
+#define TreeStep(L) \
     if (LogK >= L ) \
     { \
         currentE = current + \
                    regEntry[ (winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0) ]; \
         if ( cmp(*currentE, *winnerE) ) \
         { \
-            std::swap(regEntry[(winnerIndex + (1 << LogK))                                         \
-                               >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0) ], winnerIndex);                      \
-            winnerE = currentE;                                                                                                                                                                                                                                 \
-        }                                                                                                                                                                                                                                                                                                                   \
+            std::swap(regEntry[(winnerIndex + (1 << LogK)) \
+                               >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0) ], winnerIndex); \
+            winnerE = currentE; \
+        } \
     }
 
             TreeStep (10);

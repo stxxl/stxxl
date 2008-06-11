@@ -559,9 +559,7 @@ __STXXL_END_NAMESPACE
 
 namespace std
 {
-    template <
-              typename T,
-              typename VT >
+    template < typename T, typename VT >
     void swap(      stxxl::deque < T, VT > & a,
                     stxxl::deque<T, VT> & b )
     {
