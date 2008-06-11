@@ -38,7 +38,7 @@ int main()
 
     stxxl::request_ptr req;
 
-    STXXL_MSG("Estimated time:" << block_size / double (AVERAGE_SPEED));
+    STXXL_MSG("Estimated time:" << block_size / double(AVERAGE_SPEED));
     STXXL_MSG("Sequential write");
 
     for (i = 0; i < 40; i++)
@@ -71,15 +71,13 @@ int main()
         STXXL_MSG("Pos: " << pos << " block_size:" << block_size << " time:" << (diff));
     }
 
-    sum = sum / double (times);
-    sum2 = sum2 / double (times);
-    assert(sum2 - sum * sum >= 0.0 );
+    sum = sum / double(times);
+    sum2 = sum2 / double(times);
+    assert(sum2 - sum * sum >= 0.0);
     double err = sqrt(sum2 - sum * sum);
     STXXL_MSG("Error: " << err << " s, " << 100. * (err / sum) << " %");
 
-    delete [] buffer;
+    delete[] buffer;
 
     return 0;
 }
-
-

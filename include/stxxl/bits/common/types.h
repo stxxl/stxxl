@@ -31,7 +31,7 @@ enum { my_pointer_size = sizeof(void *) };
 
 template <int PtrSize>
 struct choose_int_types
-{};
+{ };
 
 template <>
 struct choose_int_types < 4 >  // for 32-bit processors/compilers

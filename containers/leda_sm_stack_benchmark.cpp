@@ -83,7 +83,7 @@ void run_stack(stxxl::int64 volume)
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
     ext_mem_mgr.print_statistics();
@@ -109,7 +109,7 @@ void run_stack(stxxl::int64 volume)
     }
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
     ext_mem_mgr.print_statistics();
@@ -154,5 +154,5 @@ int main(int argc, char * argv[])
         STXXL_MSG("Unsupported version " << version);
     }
 
-    delete [] array;
+    delete[] array;
 }

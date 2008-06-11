@@ -131,4 +131,3 @@ class malloc_setup
 __STXXL_END_NAMESPACE
 
 #endif
-

@@ -81,7 +81,6 @@ namespace btree
         };
 
     private:
-
         key_compare key_compare_;
         mutable node_cache_type node_cache_;
         mutable leaf_cache_type leaf_cache_;
@@ -158,8 +157,8 @@ namespace btree
                 if (node_cache_.size() < (height_ - 1))
                 {
                     STXXL_THROW(std::runtime_error, "btree::bulk_construction", "The height of the tree (" << height_ << ") has exceeded the required capacity ("
-                                                                                                    << (node_cache_.size() + 1) << ") of the node cache. " <<
-                                           "Increase the node cache size.");
+                                                                                                           << (node_cache_.size() + 1) << ") of the node cache. " <<
+                                "Increase the node cache size.");
                 }
             }
         }
@@ -260,13 +259,13 @@ namespace btree
 
             typedef std::pair<key_type, node_bid_type> key_bid_pair;
             typedef typename stxxl::VECTOR_GENERATOR < key_bid_pair, 1, 1,
-            node_block_type::raw_size > ::result key_bid_vector_type;
+                                                      node_block_type::raw_size > ::result key_bid_vector_type;
 
             key_bid_vector_type Bids;
 
             leaf_bid_type NewBid;
             leaf_type * Leaf = leaf_cache_.get_new_node(NewBid);
-            const unsigned_type max_leaf_elements = unsigned_type(double (Leaf->max_nelements()) * leaf_fill_factor);
+            const unsigned_type max_leaf_elements = unsigned_type(double(Leaf->max_nelements()) * leaf_fill_factor);
 
             while (b != e)
             {
@@ -311,13 +310,13 @@ namespace btree
 
             Bids.push_back(key_bid_pair(key_compare::max_value(), (node_bid_type)NewBid));
 
-            const unsigned_type max_node_elements = unsigned_type(double (max_node_size) * node_fill_factor);
+            const unsigned_type max_node_elements = unsigned_type(double(max_node_size) * node_fill_factor);
 
             while (Bids.size() > max_node_elements)
             {
                 key_bid_vector_type ParentBids;
 
-                stxxl::uint64 nparents = div_and_round_up( Bids.size(), stxxl::uint64(max_node_elements));
+                stxxl::uint64 nparents = div_and_round_up(Bids.size(), stxxl::uint64(max_node_elements));
                 assert(nparents >= 2);
                 STXXL_VERBOSE1("btree bulk constructBids.size() " << Bids.size() << " nparents: " << nparents << " max_ns: "
                                                                   << max_node_elements);
@@ -361,8 +360,8 @@ namespace btree
                 if (node_cache_.size() < (height_ - 1))
                 {
                     STXXL_THROW(std::runtime_error, "btree::bulk_construction", "The height of the tree (" << height_ << ") has exceeded the required capacity ("
-                                                                                                    << (node_cache_.size() + 1) << ") of the node cache. " <<
-                                           "Increase the node cache size.");
+                                                                                                           << (node_cache_.size() + 1) << ") of the node cache. " <<
+                                "Increase the node cache size.");
                 }
             }
 
@@ -370,9 +369,9 @@ namespace btree
         }
 
     public:
-        btree(  unsigned_type node_cache_size_in_bytes,
-                unsigned_type leaf_cache_size_in_bytes
-        ) :
+        btree(unsigned_type node_cache_size_in_bytes,
+              unsigned_type leaf_cache_size_in_bytes
+              ) :
             node_cache_(node_cache_size_in_bytes, this, key_compare_),
             leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
             iterator_map_(this),
@@ -393,10 +392,10 @@ namespace btree
             create_empty_leaf();
         }
 
-        btree(  const key_compare & c_,
-                unsigned_type node_cache_size_in_bytes,
-                unsigned_type leaf_cache_size_in_bytes
-        ) :
+        btree(const key_compare & c_,
+              unsigned_type node_cache_size_in_bytes,
+              unsigned_type leaf_cache_size_in_bytes
+              ) :
             key_compare_(c_),
             node_cache_(node_cache_size_in_bytes, this, key_compare_),
             leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
@@ -457,7 +456,7 @@ namespace btree
                 leaf_cache_.unfix_node((leaf_bid_type)it->second);
                 //if(key_compare::max_value() == Splitter.first)
                 if (!(key_compare_(key_compare::max_value(), Splitter.first) ||
-                      key_compare_(Splitter.first, key_compare::max_value()) ))
+                      key_compare_(Splitter.first, key_compare::max_value())))
                     return result;
                 // no overflow/splitting happened
 
@@ -482,7 +481,7 @@ namespace btree
             node_cache_.unfix_node((node_bid_type)it->second);
             //if(key_compare::max_value() == Splitter.first)
             if (!(key_compare_(key_compare::max_value(), Splitter.first) ||
-                  key_compare_(Splitter.first, key_compare::max_value()) ))
+                  key_compare_(Splitter.first, key_compare::max_value())))
                 return result;
             // no overflow/splitting happened
 
@@ -499,7 +498,7 @@ namespace btree
         iterator begin()
         {
             root_node_iterator_type it = root_node_.begin();
-            assert(it != root_node_.end() );
+            assert(it != root_node_.end());
 
             if (height_ == 2)            // 'it' points to a leaf
             {
@@ -528,7 +527,7 @@ namespace btree
         const_iterator begin() const
         {
             root_node_const_iterator_type it = root_node_.begin();
-            assert(it != root_node_.end() );
+            assert(it != root_node_.end());
 
             if (height_ == 2)            // 'it' points to a leaf
             {
@@ -836,8 +835,8 @@ namespace btree
                 assert(RootNode);
                 assert(RootNode->back().first == key_compare::max_value());
                 root_node_.clear();
-                root_node_.insert(      RootNode->block().begin(),
-                                        RootNode->block().begin() + RootNode->size());
+                root_node_.insert(RootNode->block().begin(),
+                                  RootNode->block().begin() + RootNode->size());
 
                 node_cache_.delete_node(RootBid);
                 --height_;
@@ -899,15 +898,15 @@ namespace btree
         }
 
         template <class InputIterator>
-        btree(  InputIterator b,
-                InputIterator e,
-                const key_compare & c_,
-                unsigned_type node_cache_size_in_bytes,
-                unsigned_type leaf_cache_size_in_bytes,
-                bool range_sorted = false,
-                double node_fill_factor = 0.75,
-                double leaf_fill_factor = 0.6
-        ) :
+        btree(InputIterator b,
+              InputIterator e,
+              const key_compare & c_,
+              unsigned_type node_cache_size_in_bytes,
+              unsigned_type leaf_cache_size_in_bytes,
+              bool range_sorted = false,
+              double node_fill_factor = 0.75,
+              double leaf_fill_factor = 0.6
+              ) :
             key_compare_(c_),
             node_cache_(node_cache_size_in_bytes, this, key_compare_),
             leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
@@ -937,14 +936,14 @@ namespace btree
 
 
         template <class InputIterator>
-        btree(  InputIterator b,
-                InputIterator e,
-                unsigned_type node_cache_size_in_bytes,
-                unsigned_type leaf_cache_size_in_bytes,
-                bool range_sorted = false,
-                double node_fill_factor = 0.75,
-                double leaf_fill_factor = 0.6
-        ) :
+        btree(InputIterator b,
+              InputIterator e,
+              unsigned_type node_cache_size_in_bytes,
+              unsigned_type leaf_cache_size_in_bytes,
+              bool range_sorted = false,
+              double node_fill_factor = 0.75,
+              double leaf_fill_factor = 0.6
+              ) :
             node_cache_(node_cache_size_in_bytes, this, key_compare_),
             leaf_cache_(leaf_cache_size_in_bytes, this, key_compare_),
             iterator_map_(this),

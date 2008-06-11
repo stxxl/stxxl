@@ -28,7 +28,7 @@ struct my_handler
 {
     void operator ()  (request * req)
     {
-        STXXL_MSG( req << " done, type=" << req->io_type() );
+        STXXL_MSG(req << " done, type=" << req->io_type());
     }
 };
 
@@ -36,16 +36,16 @@ typedef typed_block<BLOCK_SIZE, MyType> block_type;
 
 class BMLayerTest : public CppUnit::TestCase
 {
-    CPPUNIT_TEST_SUITE( BMLayerTest );
-    CPPUNIT_TEST( testIO );
-    CPPUNIT_TEST( testIO2 );
-    CPPUNIT_TEST( testPrefetchPool );
-    CPPUNIT_TEST( testWritePool );
-    CPPUNIT_TEST( testStreams );
+    CPPUNIT_TEST_SUITE(BMLayerTest);
+    CPPUNIT_TEST(testIO);
+    CPPUNIT_TEST(testIO2);
+    CPPUNIT_TEST(testPrefetchPool);
+    CPPUNIT_TEST(testWritePool);
+    CPPUNIT_TEST(testStreams);
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    BMLayerTest( std::string name ) : CppUnit::TestCase( name ) { }
+    BMLayerTest(std::string name) : CppUnit::TestCase(name) { }
     BMLayerTest() { }
 
     void testIO()
@@ -59,8 +59,8 @@ public:
 
         block_type * block = new block_type;
         STXXL_MSG(std::hex);
-        STXXL_MSG("Allocated block address    : " << long (block));
-        STXXL_MSG("Allocated block address + 1: " << long (block + 1));
+        STXXL_MSG("Allocated block address    : " << long(block));
+        STXXL_MSG("Allocated block address + 1: " << long(block + 1));
         STXXL_MSG(std::dec);
         unsigned i = 0;
         for (i = 0; i < block_type::size; ++i)
@@ -87,7 +87,7 @@ public:
 
         bm->delete_blocks (bids.begin(), bids.end ());
 
-        delete [] reqs;
+        delete[] reqs;
         delete block;
     }
 
@@ -160,20 +160,20 @@ public:
             {
                 int value;
                 in >> value;
-                CPPUNIT_ASSERT(value == int (i));
+                CPPUNIT_ASSERT(value == int(i));
             }
         }
         bm->delete_blocks (bids.begin (), bids.end ());
     }
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( BMLayerTest );
+CPPUNIT_TEST_SUITE_REGISTRATION(BMLayerTest);
 
 int main()
 {
     CppUnit::TextUi::TestRunner runner;
     CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
-    runner.addTest( registry.makeTest() );
-    bool wasSuccessful = runner.run( "", false );
+    runner.addTest(registry.makeTest());
+    bool wasSuccessful = runner.run("", false);
     return wasSuccessful;
 }

@@ -81,7 +81,7 @@ void simulate_async_write(
     int_type m = m_init;
     int_type i = L - 1;
     int_type oldtime = 0;
-    bool * disk_busy = new bool [D];
+    bool * disk_busy = new bool[D];
 
     while (m && (i >= 0))
     {
@@ -142,8 +142,8 @@ void simulate_async_write(
         }
     }
 
-    delete [] disk_busy;
-    delete [] disk_queues;
+    delete[] disk_busy;
+    delete[] disk_queues;
 }
 
 
@@ -173,7 +173,7 @@ void compute_prefetch_schedule(
         out_first[i] = write_order[i].first;
 
 
-    delete [] write_order;
+    delete[] write_order;
 }
 
 
@@ -304,7 +304,7 @@ void compute_prefetch_schedule(
         STXXL_VERBOSE1(write_order[i].first);
     }
 
-    delete [] write_order;
+    delete[] write_order;
 }
 
 

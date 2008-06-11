@@ -206,7 +206,7 @@ public:
     typedef typename DequeType::difference_type difference_type;
 
     const_deque_iterator() : Deque(NULL), Offset(0) { }
-    const_deque_iterator(const deque_iterator<DequeType> & it ) :
+    const_deque_iterator(const deque_iterator<DequeType> & it) :
         Deque(it.Deque), Offset(it.Offset)
     { }
 
@@ -367,9 +367,9 @@ private:
         if (begin_o > end_o)
         {                         // copy data to the new end of the vector
             const size_type new_begin_o = old_size + begin_o;
-            std::copy(      Vector.begin() + begin_o,
-                            Vector.begin() + old_size,
-                            Vector.begin() + new_begin_o);
+            std::copy(Vector.begin() + begin_o,
+                      Vector.begin() + old_size,
+                      Vector.begin() + new_begin_o);
             begin_o = new_begin_o;
         }
     }
@@ -529,9 +529,9 @@ public:
                 if (begin_o > end_o)
                 {                         // copy data to the new end of the vector
                     const size_type new_begin_o = Vector.size() - old_size + begin_o;
-                    std::copy(      Vector.begin() + begin_o,
-                                    Vector.begin() + old_size,
-                                    Vector.begin() + new_begin_o);
+                    std::copy(Vector.begin() + begin_o,
+                              Vector.begin() + old_size,
+                              Vector.begin() + new_begin_o);
                     begin_o = new_begin_o;
                 }
             }
@@ -560,8 +560,8 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template < typename T, typename VT >
-    void swap(      stxxl::deque < T, VT > & a,
-                    stxxl::deque<T, VT> & b )
+    void swap(stxxl::deque < T, VT > & a,
+              stxxl::deque<T, VT> & b)
     {
         a.swap(b);
     }

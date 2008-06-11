@@ -118,8 +118,8 @@ namespace btree
             std::copy(block_->begin(), block_->begin() + end_of_smaller_part, NewLeaf->block_->begin());
             NewLeaf->block_->info.cur_size = end_of_smaller_part;
             // copy the larger part
-            std::copy(      block_->begin() + end_of_smaller_part,
-                            block_->begin() + old_size, block_->begin());
+            std::copy(block_->begin() + end_of_smaller_part,
+                      block_->begin() + old_size, block_->begin());
             block_->info.cur_size = old_size - end_of_smaller_part;
             assert(size() + NewLeaf->size() == old_size);
 
@@ -165,8 +165,8 @@ namespace btree
             delete block_;
         }
 
-        normal_leaf(    btree_type * btree__,
-                        key_compare cmp) :
+        normal_leaf(btree_type * btree__,
+                    key_compare cmp) :
             block_(new block_type),
             btree_(btree__),
             cmp_(cmp),
@@ -175,7 +175,7 @@ namespace btree
             assert(min_nelements() >= 2);
             assert(2 * min_nelements() - 1 <= max_nelements());
             assert(max_nelements() <= nelements);
-            assert(unsigned (block_type::size) >= nelements + 1);                   // extra space for an overflow
+            assert(unsigned(block_type::size) >= nelements + 1);                   // extra space for an overflow
         }
 
         bool overflows () const { return block_->info.cur_size > max_nelements(); }
@@ -615,8 +615,8 @@ namespace btree
                 // move elements to make space for Src elements
 
                 // copy Left to *this leaf
-                std::copy(      Left.block_->begin() + newLeftSize,
-                                Left.block_->begin() + Left.size(), block_->begin());
+                std::copy(Left.block_->begin() + newLeftSize,
+                          Left.block_->begin() + Left.size(), block_->begin());
 
                 std::vector<iterator_base *> Iterators2Fix1;
                 std::vector<iterator_base *> Iterators2Fix2;
@@ -652,11 +652,11 @@ namespace btree
                 const unsigned nEl2Move = size() - newRightSize;                        // #elements to move from *this to Left
 
                 // copy *this to Left
-                std::copy(      block_->begin(),
-                                block_->begin() + nEl2Move, Left.block_->begin() + Left.size());
+                std::copy(block_->begin(),
+                          block_->begin() + nEl2Move, Left.block_->begin() + Left.size());
                 // move elements in *this
-                std::copy(      block_->begin() + nEl2Move,
-                                block_->begin() + size(), block_->begin() );
+                std::copy(block_->begin() + nEl2Move,
+                          block_->begin() + size(), block_->begin());
 
                 std::vector<iterator_base *> Iterators2Fix1;
                 std::vector<iterator_base *> Iterators2Fix2;

@@ -50,13 +50,13 @@ int main()
 
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
+    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
 
     STXXL_MSG("Sorting...");
     stxxl::stable_ksort(v.begin(), v.end(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
+    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
 
 
     return 0;

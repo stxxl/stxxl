@@ -162,7 +162,7 @@ public:
     void resize(unsigned_type new_size)
     {
         int_type diff = int_type(new_size) - int_type(size());
-        if (diff > 0 )
+        if (diff > 0)
         {
             free_blocks_size += diff;
             while (--diff >= 0)

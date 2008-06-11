@@ -97,16 +97,16 @@ void wfs_request_base::check_aligning ()
         STXXL_ERRMSG ("Size is not a multiple of " <<
                       BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
 
-    if (long (buffer) % BLOCK_ALIGN != 0)
+    if (long(buffer) % BLOCK_ALIGN != 0)
         STXXL_ERRMSG ("Buffer is not aligned: modulo "
                                               << BLOCK_ALIGN << " = " <<
-                      long (buffer) % BLOCK_ALIGN << " (" <<
+                      long(buffer) % BLOCK_ALIGN << " (" <<
                       std::hex << buffer << std::dec << ")");
 }
 
 wfs_request_base::~wfs_request_base ()
 {
-    STXXL_VERBOSE3("wfs_request_base " << unsigned (this) << ": deletion, cnt: " << ref_cnt);
+    STXXL_VERBOSE3("wfs_request_base " << unsigned(this) << ": deletion, cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 
@@ -119,7 +119,7 @@ wfs_request_base::~wfs_request_base ()
 
 void wfs_request_base::wait ()
 {
-    STXXL_VERBOSE3("wfs_request_base : " << unsigned (this) << " wait ");
+    STXXL_VERBOSE3("wfs_request_base : " << unsigned(this) << " wait ");
 
     START_COUNT_WAIT_TIME
 
@@ -242,4 +242,3 @@ void wfs_file_base::set_size (stxxl::int64 newsize)
 __STXXL_END_NAMESPACE
 
 #endif // BOOST_MSVC
-

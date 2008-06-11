@@ -84,7 +84,7 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
     std::cout << *Stats;
@@ -111,7 +111,7 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
     }
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
     std::cout << *Stats;
@@ -156,7 +156,7 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
     std::cout << *Stats;
@@ -182,7 +182,7 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
     }
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
     std::cout << *Stats;
@@ -239,5 +239,5 @@ int main(int argc, char * argv[])
         STXXL_MSG("Unsupported version " << version);
     }
 
-    delete [] array;
+    delete[] array;
 }

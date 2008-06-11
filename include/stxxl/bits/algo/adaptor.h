@@ -33,10 +33,10 @@ struct RunsToBIDArrayAdaptor : public TwoToOneDimArrayAdaptorBase < _run_type *,
 
     RunsToBIDArrayAdaptor (_run_type * *a, __pos_type p,
                            unsigned_type d) : TwoToOneDimArrayAdaptorBase <_run_type *, BID < _blk_sz >, __pos_type > (a, p), dim_size (d)
-    { };
+    { }
     RunsToBIDArrayAdaptor (const _Self &a) : TwoToOneDimArrayAdaptorBase <_run_type *, BID < _blk_sz >, __pos_type > (a),
                                              dim_size (a.dim_size)
-    { };
+    { }
 
     const _Self & operator = (const _Self & a)
     {
@@ -77,7 +77,7 @@ BLOCK_ADAPTOR_OPERATORS(RunsToBIDArrayAdaptor)
 
 template < unsigned _blk_sz, typename _run_type, class __pos_type = int_type >
 struct RunsToBIDArrayAdaptor2
-: public TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >, __pos_type >
+    : public TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >, __pos_type >
 {
     typedef RunsToBIDArrayAdaptor2 < _blk_sz, _run_type, __pos_type > _Self;
     typedef BID < _blk_sz > data_type;
@@ -96,13 +96,13 @@ struct RunsToBIDArrayAdaptor2
                             int_type _h) : TwoToOneDimArrayAdaptorBase <
                                                                         _run_type *, BID < _blk_sz >, __pos_type > (a, p), w (_w),
                                            h (_h), K (_w * _h)
-    { };
+    { }
 
     RunsToBIDArrayAdaptor2 (const _Self &
                             a) : TwoToOneDimArrayAdaptorBase < _run_type *,
                                                               BID < _blk_sz >, __pos_type > (a), w (a.w), h (a.h),
                                  K (a.K)
-    { };
+    { }
 
     const _Self & operator = (const _Self & a)
     {
@@ -177,8 +177,8 @@ struct trigger_entry_iterator
 
     enum { block_size = _BlkSz };
 
-    trigger_entry_iterator(const _Self &a) : value(a.value) { };
-    trigger_entry_iterator(trigger_iterator_type v) : value(v) { };
+    trigger_entry_iterator(const _Self &a) : value(a.value) { }
+    trigger_entry_iterator(trigger_iterator_type v) : value(v) { }
 
     bid_type & operator * ()
     {

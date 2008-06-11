@@ -19,11 +19,11 @@ struct my_type
         return _key;
     }
 
-    my_type() : _key(0), _key_copy(0) { };
-    my_type(key_type1 __key) : _key(__key) { };
+    my_type() : _key(0), _key_copy(0) { }
+    my_type(key_type1 __key) : _key(__key) { }
 
-    my_type min_value() const { return my_type((std::numeric_limits<key_type1>::min)()); };
-    my_type max_value() const { return my_type((std::numeric_limits<key_type1>::max)()); };
+    my_type min_value() const { return my_type((std::numeric_limits<key_type1>::min)()); }
+    my_type max_value() const { return my_type((std::numeric_limits<key_type1>::max)()); }
 };
 
 std::ostream & operator << (std::ostream & o, const my_type & obj)
@@ -36,7 +36,7 @@ struct get_key
 {
     typedef my_type::key_type1 key_type;
     my_type dummy;
-    key_type operator()  (const my_type & obj) const
+    key_type operator ()  (const my_type & obj) const
     {
         return obj._key;
     }
@@ -58,15 +58,15 @@ bool operator < (const my_type & a, const my_type & b)
 
 int main()
 {
-	STXXL_MSG("Check config...");
-	try {
-	stxxl::block_manager::get_instance();
-	}
-	catch (std::exception & e)
-	{
-		STXXL_MSG("Exception: "<< e.what());
-		abort();
-	}
+    STXXL_MSG("Check config...");
+    try {
+        stxxl::block_manager::get_instance();
+    }
+    catch (std::exception & e)
+    {
+        STXXL_MSG("Exception: " << e.what());
+        abort();
+    }
     unsigned memory_to_use = 32 * 1024 * 1024;
     typedef stxxl::VECTOR_GENERATOR < my_type, 4, 4 > ::result vector_type;
     const stxxl::int64 n_records = 3 * 32 * stxxl::int64(1024 * 1024) / sizeof(my_type);
@@ -81,7 +81,7 @@ int main()
     }
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG(((stxxl::is_sorted(v.begin(),v.end()))?"OK":"WRONG" ));
+    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
 
     STXXL_MSG("Sorting...");
     stxxl::ksort(v.begin(), v.end(), get_key(), memory_to_use);
@@ -89,19 +89,19 @@ int main()
 
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
+    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
     STXXL_MSG("Checking content...");
     my_type prev;
     for (vector_type::size_type i = 0; i < v.size(); i++)
     {
-        if ( v[i]._key != v[i]._key_copy)
+        if (v[i]._key != v[i]._key_copy)
         {
             STXXL_MSG("Bug at position " << i);
             abort();
         }
         if (i > 0 && prev._key == v[i]._key)
         {
-            STXXL_MSG("Duplicate at position " << i <<" key=" << v[i]._key);
+            STXXL_MSG("Duplicate at position " << i << " key=" << v[i]._key);
             //abort();
         }
         prev = v[i];

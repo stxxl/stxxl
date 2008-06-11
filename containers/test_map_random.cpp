@@ -59,7 +59,7 @@ typedef stxxl::map<key_type, data_type, cmp2,
 #define NODE_MELEMENTS xxl_map_type::node_block_type::size
 #define LEAF_MELEMENTS xxl_map_type::leaf_block_type::size
 
-int main( int argc, char * argv[] )
+int main(int argc, char * argv[])
 {
 #ifdef NDEBUG
     STXXL_MSG("Program is compiled with NDEBUG option, which makes the testing wrong.");
@@ -97,12 +97,12 @@ int main( int argc, char * argv[] )
         STXXL_MSG("Note, that STEP must be > 1000");
         return 0;
     }
-    stxxl::uint64 MAX_STEP = atoi( argv[1] );
+    stxxl::uint64 MAX_STEP = atoi(argv[1]);
     assert(MAX_STEP > 1000);
     std_map_type stdmap;
     xxl_map_type xxlmap(NODE_BLOCK_SIZE * 4, LEAF_BLOCK_SIZE * 3);
 
-    for ( stxxl::uint64 i = 0; i < MAX_STEP; i++ )
+    for (stxxl::uint64 i = 0; i < MAX_STEP; i++)
     {
         // ***************************************************
         // A random number is created to determine which kind
@@ -112,160 +112,160 @@ int main( int argc, char * argv[] )
         long step = rnd() % 1000;
         int percent = 0;
 
-        if (  i % (MAX_STEP / 1000) == 0 )
+        if (i % (MAX_STEP / 1000) == 0)
         {
-            STXXL_MSG( "*****************************************************" );
-            STXXL_MSG( "Step=" << i << " (" << (unsigned) stdmap.size() << ")" );
+            STXXL_MSG("*****************************************************");
+            STXXL_MSG("Step=" << i << " (" << (unsigned) stdmap.size() << ")");
         }
 
         // *********************************************************
         // The clear function will be called
         // *********************************************************
-        if ( step < (percent += PERCENT_CLEAR) )
+        if (step < (percent += PERCENT_CLEAR))
         {
-            if ( (unsigned) rand() % 1000 < stdmap.size() )
+            if ((unsigned) rand() % 1000 < stdmap.size())
             {
                 stdmap.clear();
                 xxlmap.clear();
 
-                assert( stdmap.empty() );
-                assert( xxlmap.empty() );
+                assert(stdmap.empty());
+                assert(xxlmap.empty());
             }
         }
 
         // *********************************************************
         // The size function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_SIZING) )
+        else if (step < (percent += PERCENT_SIZING))
         {
             std_map_type::size_type size1 = stdmap.size();
             xxl_map_type::size_type size2 = xxlmap.size();
 
-            assert( size1 == size2 );
+            assert(size1 == size2);
         }
 
         // *********************************************************
         // The erase range function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_ERASE_BULK) )
+        else if (step < (percent += PERCENT_ERASE_BULK))
         {
             key_type key1 = rand() % MAX_KEY;
             key_type key2 = rand() % MAX_KEY;
 
-            if ( key1 > key2 )
+            if (key1 > key2)
             {
                 std::swap(key1, key2);
             }
 
-            stdmap.erase( stdmap.lower_bound(key1), stdmap.upper_bound(key2) );
-            xxlmap.erase( xxlmap.lower_bound(key1), xxlmap.upper_bound(key2) );
+            stdmap.erase(stdmap.lower_bound(key1), stdmap.upper_bound(key2));
+            xxlmap.erase(xxlmap.lower_bound(key1), xxlmap.upper_bound(key2));
 
             assert(stdmap.size() == xxlmap.size());
 
-            assert( stdmap.lower_bound( key1 ) == stdmap.end() ||
-                    stdmap.lower_bound( key1 ) == stdmap.upper_bound(key2) );
-            assert( xxlmap.lower_bound( key1 ) == xxlmap.end() ||
-                    xxlmap.lower_bound( key1 ) == xxlmap.upper_bound(key2) );
+            assert(stdmap.lower_bound(key1) == stdmap.end() ||
+                   stdmap.lower_bound(key1) == stdmap.upper_bound(key2));
+            assert(xxlmap.lower_bound(key1) == xxlmap.end() ||
+                   xxlmap.lower_bound(key1) == xxlmap.upper_bound(key2));
         }
 
         // *********************************************************
         // The erase a key function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_ERASE_KEY) )
+        else if (step < (percent += PERCENT_ERASE_KEY))
         {
             key_type key = rnd() % MAX_KEY;
 
-            stdmap.erase( key );
-            xxlmap.erase( key );
+            stdmap.erase(key);
+            xxlmap.erase(key);
 
-            assert( stxxl::not_there( stdmap, key ));
-            assert( stxxl::not_there( xxlmap, key ));
+            assert(stxxl::not_there(stdmap, key));
+            assert(stxxl::not_there(xxlmap, key));
         }
 
         // *********************************************************
         // The erase function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_ERASE_ITERATOR) )
+        else if (step < (percent += PERCENT_ERASE_ITERATOR))
         {
             key_type key = rnd() % MAX_KEY;
 
-            std_map_type::iterator stditer = stdmap.find( key );
-            xxl_map_type::iterator xxliter = xxlmap.find( key );
+            std_map_type::iterator stditer = stdmap.find(key);
+            xxl_map_type::iterator xxliter = xxlmap.find(key);
 
             assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
 
-            if ( stditer != stdmap.end() )
-                stdmap.erase( stditer );
+            if (stditer != stdmap.end())
+                stdmap.erase(stditer);
 
-            if ( xxliter != xxlmap.end() )
-                xxlmap.erase( xxliter );
+            if (xxliter != xxlmap.end())
+                xxlmap.erase(xxliter);
 
 
-            assert(stxxl::not_there( stdmap, key ));
-            assert(stxxl::not_there( xxlmap, key ));
+            assert(stxxl::not_there(stdmap, key));
+            assert(stxxl::not_there(xxlmap, key));
         }
 
         // *********************************************************
         // The insert function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_INSERT_PAIR) )
+        else if (step < (percent += PERCENT_INSERT_PAIR))
         {
             key_type key = rnd() % MAX_KEY;
-            stdmap.insert( std::pair < key_type, data_type > ( key, 2 * key ) );
-            xxlmap.insert( std::pair < key_type, data_type > ( key, 2 * key ) );
+            stdmap.insert(std::pair < key_type, data_type > (key, 2 * key));
+            xxlmap.insert(std::pair < key_type, data_type > (key, 2 * key));
 
-            assert(stxxl::there( stdmap, key, 2 * key ));
-            assert(stxxl::there( xxlmap, key, 2 * key ));
+            assert(stxxl::there(stdmap, key, 2 * key));
+            assert(stxxl::there(xxlmap, key, 2 * key));
         }
 
         // *********************************************************
         // The bulk insert function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_INSERT_BULK) )
+        else if (step < (percent += PERCENT_INSERT_BULK))
         {
             unsigned lower = rnd() % MAX_KEY;
             unsigned upper = rnd() % MAX_KEY;
-            if ( lower > upper )
+            if (lower > upper)
                 std::swap(lower, upper);
 
 
-            vector_type v2( upper - lower );
-            for ( unsigned j = 0; j < (unsigned)(upper - lower); j++)
+            vector_type v2(upper - lower);
+            for (unsigned j = 0; j < (unsigned)(upper - lower); j++)
             {
                 v2[j].first = lower + j;
                 v2[j].second = 2 * v2[j].first;
             }
 
-            stdmap.insert( v2.begin(), v2.end() );
-            xxlmap.insert( v2.begin(), v2.end() );
+            stdmap.insert(v2.begin(), v2.end());
+            xxlmap.insert(v2.begin(), v2.end());
 
-            for ( unsigned i = lower; i < upper; i++ )
-                assert(stxxl::there( stdmap, i, 2 * i ));
+            for (unsigned i = lower; i < upper; i++)
+                assert(stxxl::there(stdmap, i, 2 * i));
 
-            for ( unsigned i = lower; i < upper; i++ )
-                assert(stxxl::there( xxlmap, i, 2 * i ));
+            for (unsigned i = lower; i < upper; i++)
+                assert(stxxl::there(xxlmap, i, 2 * i));
         }
 
         // *********************************************************
         // The lower_bound function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_LOWER) )
+        else if (step < (percent += PERCENT_LOWER))
         {
             key_type key1 = rand() % MAX_KEY;
             key_type key2 = rand() % MAX_KEY;
-            if ( key1 > key2 )
+            if (key1 > key2)
             {
                 std::swap(key1, key2);
             }
 
-            while ( key1 < key2 )
+            while (key1 < key2)
             {
                 std_map_type::iterator stditer = stdmap.lower_bound(key1);
                 xxl_map_type::iterator xxliter = xxlmap.lower_bound(key1);
 
                 assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
                 if (!stxxl::is_end(stdmap, stditer)) {
-                    assert(stxxl::is_same( *(stditer), *(xxliter)));
+                    assert(stxxl::is_same(*(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -275,23 +275,23 @@ int main( int argc, char * argv[] )
         // *********************************************************
         // The upper_bound function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_UPPER) )
+        else if (step < (percent += PERCENT_UPPER))
         {
             key_type key1 = rand() % MAX_KEY;
             key_type key2 = rand() % MAX_KEY;
-            if ( key1 > key2 )
+            if (key1 > key2)
             {
                 std::swap(key1, key2);
             }
 
-            while ( key1 < key2 )
+            while (key1 < key2)
             {
                 std_map_type::iterator stditer = stdmap.upper_bound(key1);
                 xxl_map_type::iterator xxliter = xxlmap.upper_bound(key1);
 
                 assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
                 if (!stxxl::is_end(stdmap, stditer)) {
-                    assert(stxxl::is_same( *(stditer), *(xxliter)));
+                    assert(stxxl::is_same(*(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -301,23 +301,23 @@ int main( int argc, char * argv[] )
         // *********************************************************
         // The find function will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_FIND) )
+        else if (step < (percent += PERCENT_FIND))
         {
             key_type key1 = rand() % MAX_KEY;
             key_type key2 = rand() % MAX_KEY;
-            if ( key1 > key2 )
+            if (key1 > key2)
             {
                 std::swap(key1, key2);
             }
 
-            while ( key1 < key2 )
+            while (key1 < key2)
             {
                 std_map_type::iterator stditer = stdmap.find(key1);
                 xxl_map_type::iterator xxliter = xxlmap.find(key1);
 
                 assert(stxxl::is_end(stdmap, stditer) == stxxl::is_end(xxlmap, xxliter));
                 if (!stxxl::is_end(stdmap, stditer)) {
-                    assert(stxxl::is_same( *(stditer), *(xxliter)));
+                    assert(stxxl::is_same(*(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -327,7 +327,7 @@ int main( int argc, char * argv[] )
         // *********************************************************
         // The iterate functions will be called
         // *********************************************************
-        else if ( step < (percent += PERCENT_ITERATOR) )
+        else if (step < (percent += PERCENT_ITERATOR))
         {
             std_map_type::const_iterator siter1 = stdmap.begin();
             xxl_map_type::const_iterator xiter1 = xxlmap.begin();
@@ -335,20 +335,20 @@ int main( int argc, char * argv[] )
             std_map_type::const_iterator siter2 = siter1;
             xxl_map_type::const_iterator xiter2 = xiter1;
 
-            while ( siter1 != stdmap.end() )
+            while (siter1 != stdmap.end())
             {
-                assert( xiter1 != xxlmap.end() );
-                assert(stxxl::is_same( *(siter1++), *(xiter1++) ));
+                assert(xiter1 != xxlmap.end());
+                assert(stxxl::is_same(*(siter1++), *(xiter1++)));
                 if (siter1 != stdmap.end()) {
-                    assert(!stxxl::is_same( *siter1, *siter2 ));
+                    assert(!stxxl::is_same(*siter1, *siter2));
                 }
                 if (xiter1 != xxlmap.end()) {
-                    assert(!stxxl::is_same( *xiter1, *xiter2 ));
+                    assert(!stxxl::is_same(*xiter1, *xiter2));
                 }
             }
-            assert( xiter1 == xxlmap.end() );
-            assert( siter2 == stdmap.begin() );
-            assert( xiter2 == xxlmap.begin() );
+            assert(xiter1 == xxlmap.end());
+            assert(siter2 == stdmap.begin());
+            assert(xiter2 == xxlmap.begin());
         }
     }
     return 0;

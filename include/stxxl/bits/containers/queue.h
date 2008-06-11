@@ -34,7 +34,7 @@ __STXXL_BEGIN_NAMESPACE
 //! - AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
 //! - SzTp size data type, default is \c stxxl::uint64
 template <     class ValTp,
-          unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE (ValTp),
+          unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
           class SzTp = stxxl::uint64>
 class queue : private noncopyable
@@ -106,10 +106,10 @@ public:
         alloc_counter(0),
         blocks2prefetch(blocks2prefetch_)
     {
-        if (w_pool->size() < 2 )
+        if (w_pool->size() < 2)
             w_pool->resize(2);
 
-        if (p_pool->size() < 2 )
+        if (p_pool->size() < 2)
             p_pool->resize(1);
 
         front_block = back_block = w_pool->steal();
@@ -204,7 +204,7 @@ public:
 
             assert(!bids.empty());
             request_ptr req = p_pool->read(front_block, bids.front());
-            for (unsigned_type i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i )
+            for (unsigned_type i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
             {             // give prefetching hints
                 STXXL_VERBOSE1("queue::pop Case Hints");
                 p_pool->hint(bids[i + 1], *w_pool);

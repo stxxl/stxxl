@@ -66,7 +66,7 @@ int main()
     STXXL_MSG("check");
     for (i = 0; i < v.size(); ++i)
     {
-        if (v[i] != int64(i * i) )
+        if (v[i] != int64(i * i))
             STXXL_MSG("Error at position " << i);
     }
 
@@ -85,12 +85,12 @@ int main()
     STXXL_MSG("check");
     if (v[0] != 0)
         STXXL_MSG("Error at position " << i);
-    if (v[v.size() - 1] != int64((v.size() - 1) * (v.size() - 1)) )
+    if (v[v.size() - 1] != int64((v.size() - 1) * (v.size() - 1)))
         STXXL_MSG("Error at position " << i);
 
     for (i = 1; i < v.size() - 1; ++i)
     {
-        if (v[i] != 555 )
+        if (v[i] != 555)
             STXXL_MSG("Error at position " << i);
     }
 

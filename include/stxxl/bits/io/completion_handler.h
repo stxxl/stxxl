@@ -22,7 +22,7 @@ class request;
 class completion_handler_impl
 {
 public:
-    virtual void operator () (request * ) = 0;
+    virtual void operator () (request *) = 0;
     virtual completion_handler_impl * clone() const = 0;
     virtual ~completion_handler_impl() { }
 };

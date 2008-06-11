@@ -5,4 +5,3 @@
 #define __STXXL_END_NAMESPACE }
 
 #endif
-

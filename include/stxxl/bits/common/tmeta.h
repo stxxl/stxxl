@@ -55,7 +55,7 @@ struct IF_N<false, Num1, Num2>
 
 const int DEFAULT = ~(~0u >> 1); // initialize with the smallest int
 
-struct NilCase {};
+struct NilCase { };
 
 template <int tag_, class Type_, class Next_ = NilCase>
 struct CASE

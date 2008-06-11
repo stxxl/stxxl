@@ -22,5 +22,3 @@ int main()
     bm->delete_blocks(bids.begin(), bids.end());
     return 1;
 }
-
-

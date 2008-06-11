@@ -19,7 +19,7 @@ int simulate_async_write(
     int m = m_init;
     int i = L - 1;
     int oldtime = 0;
-    bool * disk_busy = new bool [D];
+    bool * disk_busy = new bool[D];
 
     while (m && (i >= 0))
     {
@@ -85,14 +85,14 @@ int simulate_async_write(
         }
     }
 
-    assert(m == m_init );
+    assert(m == m_init);
     assert(i == -1);
     for (int i = 0; i < D; i++)
         assert(disk_queues[i].empty());
 
 
-    delete [] disk_busy;
-    delete [] disk_queues;
+    delete[] disk_busy;
+    delete[] disk_queues;
 
     return (oldtime - 1);
 }
@@ -119,10 +119,10 @@ void compute_prefetch_schedule(
 
     int w_steps = simulate_async_write(first, L, m, D, write_order);
 
-    STXXL_MSG("Write steps: " << w_steps );
+    STXXL_MSG("Write steps: " << w_steps);
 
     for (int i = 0; i < L; i++)
-        STXXL_MSG(first[i] << " " << write_order[i].first << " " << write_order[i].second );
+        STXXL_MSG(first[i] << " " << write_order[i].first << " " << write_order[i].second);
 
     std::stable_sort(write_order, write_order + L, write_time_cmp());
 
@@ -134,7 +134,7 @@ void compute_prefetch_schedule(
         STXXL_MSG(i << " " << out_first[i]);
     }
 
-    delete [] write_order;
+    delete[] write_order;
 }
 
 

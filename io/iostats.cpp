@@ -32,8 +32,8 @@ void stats::reset()
 #endif
     //      assert(acc_reads == 0);
     if (acc_reads)
-        STXXL_ERRMSG( "Warning: " << acc_reads <<
-                      " read(s) not yet finished");
+        STXXL_ERRMSG("Warning: " << acc_reads <<
+                     " read(s) not yet finished");
 
     reads = 0;
 
@@ -76,8 +76,8 @@ void stats::reset()
 
     //      assert(acc_ios == 0);
     if (acc_ios)
-        STXXL_ERRMSG( "Warning: " << acc_ios <<
-                      " io(s) not yet finished" );
+        STXXL_ERRMSG("Warning: " << acc_ios <<
+                     " io(s) not yet finished");
 
     p_ios = 0.0;
 
@@ -131,7 +131,7 @@ void stats::write_started (unsigned size_)
     ++writes;
     volume_written += size_;
     double diff = now - p_begin_write;
-    t_writes += double (acc_writes) * diff;
+    t_writes += double(acc_writes) * diff;
     p_begin_write = now;
     p_writes += (acc_writes++) ? diff : 0.0;
 
@@ -162,7 +162,7 @@ void stats::write_finished ()
 
     double now = stxxl_timestamp ();
     double diff = now - p_begin_write;
-    t_writes += double (acc_writes) * diff;
+    t_writes += double(acc_writes) * diff;
     p_begin_write = now;
     p_writes += (acc_writes--) ? diff : 0.0;
 
@@ -194,7 +194,7 @@ void stats::read_started (unsigned size_)
     ++reads;
     volume_read += size_;
     double diff = now - p_begin_read;
-    t_reads += double (acc_reads) * diff;
+    t_reads += double(acc_reads) * diff;
     p_begin_read = now;
     p_reads += (acc_reads++) ? diff : 0.0;
 
@@ -225,7 +225,7 @@ void stats::read_finished ()
 
     double now = stxxl_timestamp ();
     double diff = now - p_begin_read;
-    t_reads += double (acc_reads) * diff;
+    t_reads += double(acc_reads) * diff;
     p_begin_read = now;
     p_reads += (acc_reads--) ? diff : 0.0;
 

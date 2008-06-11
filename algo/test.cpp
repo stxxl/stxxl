@@ -2,11 +2,11 @@
 
 
 
-struct no_key_tag {};
+struct no_key_tag { };
 struct key_tag : public no_key_tag { };
 
 struct structure_has_key
-{};
+{ };
 
 
 struct with_key : public structure_has_key

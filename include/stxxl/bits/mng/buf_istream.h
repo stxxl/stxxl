@@ -148,7 +148,7 @@ public:
     virtual ~buf_istream()
     {
         delete prefetcher;
-        delete [] prefetch_seq;
+        delete[] prefetch_seq;
     }
 };
 

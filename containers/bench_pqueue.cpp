@@ -76,7 +76,7 @@ int main()
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
     STXXL_MSG("Max elements: " << nelements);
-    for (i = 0; i < nelements; i++ )
+    for (i = 0; i < nelements; i++)
     {
         if ((i % (1024 * 1024)) == 0)
             STXXL_MSG("Inserting element " << i);
@@ -88,9 +88,9 @@ int main()
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
     Timer.reset();
     Timer.start();
-    for (i = 0; i < (nelements); ++i )
+    for (i = 0; i < (nelements); ++i)
     {
-        assert( !p.empty() );
+        assert(!p.empty());
         //STXXL_MSG( p.top() );
         assert(p.top().key == i + 1);
         p.pop();

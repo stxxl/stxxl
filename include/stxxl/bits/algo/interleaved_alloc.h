@@ -53,7 +53,7 @@ struct interleaved_FR : public interleaved_striping
 
 struct interleaved_SR : public interleaved_striping
 {
-    std::vector < int >offsets;
+    std::vector < int > offsets;
 
     interleaved_SR (int_type _nruns, int _begindisk,
                     int _enddisk) : interleaved_striping (_nruns,
@@ -115,7 +115,7 @@ struct first_disk_only : public interleaved_striping
 
 template <typename scheme>
 struct interleaved_alloc_traits
-{};
+{ };
 
 template <>
 struct interleaved_alloc_traits<striping>
@@ -164,4 +164,3 @@ struct interleaved_alloc_traits<single_disk>
 __STXXL_END_NAMESPACE
 
 #endif
-

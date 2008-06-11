@@ -35,15 +35,15 @@ timestamp ()
 #else
 #warning FIXME: stxxl_timestamp() is non-monotonic, boost::posix_time::microsec_clock::local_time().time_of_day() resets on midnight
 #endif
-    double sec = double (Duration.hours()) * 3600. +
-                 double (Duration.minutes()) * 60. +
-                 double (Duration.seconds()) +
-                 double (Duration.fractional_seconds()) / (pow(10., Duration.num_fractional_digits()));
+    double sec = double(Duration.hours()) * 3600. +
+                 double(Duration.minutes()) * 60. +
+                 double(Duration.seconds()) +
+                 double(Duration.fractional_seconds()) / (pow(10., Duration.num_fractional_digits()));
     return sec;
 #else
     struct timeval tp;
     gettimeofday(&tp, NULL);
-    return double (tp.tv_sec) + tp.tv_usec / 1000000.;
+    return double(tp.tv_sec) + tp.tv_usec / 1000000.;
 #endif
 }
 

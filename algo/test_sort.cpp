@@ -90,20 +90,20 @@ void test(stxxl::int64 records_to_sort, unsigned memory_to_use, unsigned n_prefe
     vector_type v(records_to_sort);
 
     unsigned ndisks = stxxl::config::get_instance()->disks_number();
-    STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(my_type) );
+    STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(my_type));
     STXXL_MSG("Total volume " << (records_to_sort * sizeof(my_type)) / MB << " MB");
     STXXL_MSG("Using " << memory_to_use / MB << " MB");
     STXXL_MSG("Using " << ndisks << " disks");
     STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ");
     STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KB");
-    STXXL_MSG("Prefetch buffers " << n_prefetch_blocks << " = " << (double (n_prefetch_blocks) / ndisks) << "*D");
+    STXXL_MSG("Prefetch buffers " << n_prefetch_blocks << " = " << (double(n_prefetch_blocks) / ndisks) << "*D");
     n_prefetch_buffers = n_prefetch_blocks;
-    STXXL_MSG("OPT Prefetch buffers " << n_opt_prefetch_buffers << " = " << (double (n_opt_prefetch_buffers) / ndisks) << "*D");
-    const int n_write_blocks = STXXL_MAX( 2 * ndisks,
-                                          int (memory_to_use / vector_type::block_type::raw_size) -
-                                          int (2 * (records_to_sort * sizeof(my_type)) / memory_to_use) - n_prefetch_blocks );
-    STXXL_MSG("Write buffers " << (n_write_blocks) << " = " << (double (n_write_blocks) / ndisks) << "*D");
-    STXXL_MSG("Seed " << stxxl::ran32State );
+    STXXL_MSG("OPT Prefetch buffers " << n_opt_prefetch_buffers << " = " << (double(n_opt_prefetch_buffers) / ndisks) << "*D");
+    const int n_write_blocks = STXXL_MAX(2 * ndisks,
+                                         int(memory_to_use / vector_type::block_type::raw_size) -
+                                         int(2 * (records_to_sort * sizeof(my_type)) / memory_to_use) - n_prefetch_blocks);
+    STXXL_MSG("Write buffers " << (n_write_blocks) << " = " << (double(n_write_blocks) / ndisks) << "*D");
+    STXXL_MSG("Seed " << stxxl::ran32State);
     STXXL_MSG("Filling vector...");
 
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 32);
@@ -165,7 +165,7 @@ int main(int argc, char * argv[])
     int block_size = atoi(argv[4]);
     int n_prefetch_buffers = atoi(argv[5]);
     n_opt_prefetch_buffers = atoi(argv[6]);
-    stxxl::ran32State = strtoul(argv[7], NULL, 10     );
+    stxxl::ran32State = strtoul(argv[7], NULL, 10);
 
     switch (block_size)
     {

@@ -41,8 +41,8 @@ config::config (const char * config_path)
     std::ifstream cfg_file (config_path);
     if (!cfg_file)
     {
-        STXXL_ERRMSG("Warning: no config file found." );
-        STXXL_ERRMSG("Using default disk configuration." );
+        STXXL_ERRMSG("Warning: no config file found.");
+        STXXL_ERRMSG("Using default disk configuration.");
 #ifndef BOOST_MSVC
         DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024 };
 #else
@@ -51,7 +51,7 @@ config::config (const char * config_path)
         stxxl_check_ne_0(GetTempPath(255, tmpstr), resource_error);
         entry1.path = tmpstr;
         entry1.path += "stxxl";
-        delete [] tmpstr;
+        delete[] tmpstr;
 #endif
         /*
            DiskEntry entry2 =
@@ -112,7 +112,7 @@ config::config (const char * config_path)
         {
             STXXL_MSG("Disk '" << (*it).path << "' is allocated, space: " <<
                       ((*it).size) / (1024 * 1024) <<
-                      " MB, I/O implementation: " << (*it).io_impl );
+                      " MB, I/O implementation: " << (*it).io_impl);
         }
 #else
         stxxl::int64 total_size = 0;
@@ -168,4 +168,3 @@ block_manager::~block_manager()
 }
 
 __STXXL_END_NAMESPACE
-

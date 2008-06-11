@@ -68,7 +68,7 @@ void watch_times(request_ptr reqs[], unsigned n, double * out)
                 }
         }
     }
-    delete [] finished;
+    delete[] finished;
 }
 
 
@@ -99,7 +99,7 @@ int main(int argc, char * argv[])
 
     std::vector<std::string> disks_arr;
 
-    for (int ii = 2; ii < argc ; ++ii)
+    for (int ii = 2; ii < argc; ++ii)
     {
         unlink(argv[ii]);
         std::cout << "# Add disk: " << argv[ii] << std::endl;
@@ -117,7 +117,7 @@ int main(int argc, char * argv[])
 
     unsigned i = 0, j = 0;
 
-    request_ptr * reqs = new request_ptr [ndisks * chunks];
+    request_ptr * reqs = new request_ptr[ndisks * chunks];
     file * * disks = new file *[ndisks];
     int * buffer = (int *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
 #ifdef WATCH_TIMES
@@ -133,18 +133,18 @@ int main(int argc, char * argv[])
 #ifdef BOOST_MSVC
  #ifdef RAW_ACCESS
         disks[i] = new stxxl::wincall_file(disks_arr[i],
-                                    file::CREAT | file::RDWR | file::DIRECT, i);
+                                           file::CREAT | file::RDWR | file::DIRECT, i);
  #else
         disks[i] = new stxxl::wincall_file(disks_arr[i],
-                                    file::CREAT | file::RDWR, i);
+                                           file::CREAT | file::RDWR, i);
  #endif
 #else
  #ifdef RAW_ACCESS
         disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                    file::CREAT | file::RDWR | file::DIRECT, i);
+                                           file::CREAT | file::RDWR | file::DIRECT, i);
  #else
         disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                    file::CREAT | file::RDWR, i);
+                                           file::CREAT | file::RDWR, i);
  #endif
 #endif
     }
@@ -163,16 +163,16 @@ int main(int argc, char * argv[])
         {
             for (j = 0; j < chunks; j++)
                 reqs[i * chunks + j] =
-                    disks[i]->awrite( buffer + buffer_size_int * i + j * chunk_size_int,
-                                      offset + j * current_chunk_size,
-                                      current_chunk_size,
-                                      stxxl::default_completion_handler() );
+                    disks[i]->awrite(buffer + buffer_size_int * i + j * chunk_size_int,
+                                     offset + j * current_chunk_size,
+                                     current_chunk_size,
+                                     stxxl::default_completion_handler());
         }
 
  #ifdef WATCH_TIMES
         watch_times(reqs, ndisks, w_finish_times);
  #else
-        wait_all( reqs, ndisks * chunks );
+        wait_all(reqs, ndisks * chunks);
  #endif
 
         end = stxxl_timestamp();
@@ -189,7 +189,7 @@ int main(int argc, char * argv[])
  #ifdef WATCH_TIMES
         out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
-        std::cout << int (1e-6 * (current_block_size) / (end - begin)) << " MB/s,";
+        std::cout << int(1e-6 * (current_block_size) / (end - begin)) << " MB/s,";
 #endif
 
 
@@ -199,16 +199,16 @@ int main(int argc, char * argv[])
         for (i = 0; i < ndisks; i++)
         {
             for (j = 0; j < chunks; j++)
-                reqs[i * chunks + j] = disks[i]->aread( buffer + buffer_size_int * i + j * chunk_size_int,
-                                                          offset + j * current_chunk_size,
-                                                          current_chunk_size,
-                                                          stxxl::default_completion_handler() );
+                reqs[i * chunks + j] = disks[i]->aread(buffer + buffer_size_int * i + j * chunk_size_int,
+                                                       offset + j * current_chunk_size,
+                                                       current_chunk_size,
+                                                       stxxl::default_completion_handler());
         }
 
  #ifdef WATCH_TIMES
         watch_times(reqs, ndisks, r_finish_times);
  #else
-        wait_all( reqs, ndisks * chunks );
+        wait_all(reqs, ndisks * chunks);
  #endif
 
         end = stxxl_timestamp();
@@ -222,25 +222,25 @@ int main(int argc, char * argv[])
             << std::endl;
 */
 
-        std::cout << int (1e-6 * (current_block_size) / (end - begin)) << " MB/s" << std::endl;
+        std::cout << int(1e-6 * (current_block_size) / (end - begin)) << " MB/s" << std::endl;
 
 #ifdef WATCH_TIMES
         out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
 
         if (CHECK_AFTER_READ) {
-            for (int i=0; unsigned(i) < ndisks * buffer_size_int; i++)
+            for (int i = 0; unsigned(i) < ndisks * buffer_size_int; i++)
             {
-                if(buffer[i] != i)
+                if (buffer[i] != i)
                 {
                     int ibuf = i / buffer_size_int;
                     int pos = i % buffer_size_int;
 
                     std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
-                            << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << i
-                            << std::dec << std::endl;
+                              << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << i
+                              << std::dec << std::endl;
 
-                    i = (ibuf+1)*buffer_size_int; // jump to next
+                    i = (ibuf + 1) * buffer_size_int; // jump to next
                 }
             }
         }
@@ -254,13 +254,13 @@ int main(int argc, char * argv[])
     for (i = 0; i < ndisks; i++)
         delete disks[i];
 
-    delete [] reqs;
-    delete [] disks;
+    delete[] reqs;
+    delete[] disks;
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
 #ifdef WATCH_TIMES
-    delete [] r_finish_times;
-    delete [] w_finish_times;
+    delete[] r_finish_times;
+    delete[] w_finish_times;
 #endif
 
     return 0;

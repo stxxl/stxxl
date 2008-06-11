@@ -65,7 +65,7 @@ namespace btree
             btree_type * btree__,
             const bid_type & b,
             unsigned p
-        ) : btree_(btree__), bid(b), pos(p)
+            ) : btree_(btree__), bid(b), pos(p)
         {
             STXXL_VERBOSE3("btree_iterator_base parameter construct addr=" << this);
             btree_->iterator_map_.register_iterator(*this);
@@ -76,7 +76,7 @@ namespace btree
             btree_ = NULL;
         }
 
-        btree_iterator_base( const btree_iterator_base & obj)
+        btree_iterator_base(const btree_iterator_base & obj)
         {
             STXXL_VERBOSE3("btree_iterator_base constr from" << (&obj) << " to " << this);
             btree_ = obj.btree_;
@@ -151,7 +151,6 @@ namespace btree
             return *this;
         }
 
-
     public:
         virtual ~btree_iterator_base()
         {
@@ -165,7 +164,6 @@ namespace btree
     class btree_iterator : public btree_iterator_base<BTreeType>
     {
     public:
-
         typedef BTreeType btree_type;
         typedef typename btree_type::leaf_bid_type bid_type;
         typedef typename btree_type::value_type value_type;
@@ -225,7 +223,7 @@ namespace btree
             return *this;
         }
 
-        btree_iterator operator ++ (int )
+        btree_iterator operator ++ (int)
         {
             assert(*this != btree_iterator_base<btree_type>::btree_->end());
             btree_iterator result(*this);
@@ -233,7 +231,7 @@ namespace btree
             return result;
         }
 
-        btree_iterator operator -- (int )
+        btree_iterator operator -- (int)
         {
             btree_iterator result(*this);
             btree_iterator_base<btree_type>::decrement();
@@ -245,7 +243,7 @@ namespace btree
             btree_type * btree__,
             const bid_type & b,
             unsigned p
-        ) : btree_iterator_base<btree_type>(btree__, b, p)
+            ) : btree_iterator_base<btree_type>(btree__, b, p)
         { }
     };
 
@@ -328,7 +326,7 @@ namespace btree
             return *this;
         }
 
-        btree_const_iterator operator ++ (int )
+        btree_const_iterator operator ++ (int)
         {
             assert(*this != btree_iterator_base<btree_type>::btree_->end());
             btree_const_iterator result(*this);
@@ -336,7 +334,7 @@ namespace btree
             return result;
         }
 
-        btree_const_iterator operator -- (int )
+        btree_const_iterator operator -- (int)
         {
             btree_const_iterator result(*this);
             btree_iterator_base<btree_type>::decrement();
@@ -348,7 +346,7 @@ namespace btree
             btree_type * btree__,
             const bid_type & b,
             unsigned p
-        ) : btree_iterator_base<btree_type>(btree__, b, p)
+            ) : btree_iterator_base<btree_type>(btree__, b, p)
         { }
     };
 

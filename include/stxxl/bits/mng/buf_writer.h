@@ -108,7 +108,7 @@ public:
             }
             int_type completed = wait_any(reqs, size);
             int_type completed_global = busy_write_blocks[completed];
-            delete [] reqs;
+            delete[] reqs;
             busy_write_blocks.erase (busy_write_blocks.begin () + completed);
 
             return (write_buffers + completed_global);
@@ -205,9 +205,9 @@ public:
             write_reqs[ibuffer]->wait ();
         }
 
-        delete [] write_reqs;
-        delete [] write_buffers;
-        delete [] write_bids;
+        delete[] write_reqs;
+        delete[] write_buffers;
+        delete[] write_bids;
     }
 };
 

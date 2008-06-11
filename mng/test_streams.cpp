@@ -41,9 +41,9 @@ int main()
         {
             int value;
             in >> value;
-            if (value != int (i))
+            if (value != int(i))
             {
-                STXXL_ERRMSG("Error at position " << std::hex << i << " (" << value << ") block " << (i / block_type::size) );
+                STXXL_ERRMSG("Error at position " << std::hex << i << " (" << value << ") block " << (i / block_type::size));
             }
         }
     }

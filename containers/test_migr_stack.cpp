@@ -34,7 +34,7 @@ int main()
         my_stack.push(i);
         assert(my_stack.top() == i);
         assert(my_stack.size() == i + 1);
-        assert((my_stack.size() >= critical_size) == my_stack.external() );
+        assert((my_stack.size() >= critical_size) == my_stack.external());
     }
 
     STXXL_MSG("Testing swap.");
@@ -51,7 +51,7 @@ int main()
         assert(my_stack.size() == i + 1);
         my_stack.pop();
         assert(my_stack.size() == i);
-        assert(my_stack.external() == (test_size >= int (critical_size)));
+        assert(my_stack.external() == (test_size >= int(critical_size)));
     }
 
     STXXL_MSG("Test passed.");

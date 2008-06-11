@@ -153,10 +153,10 @@ void * disk_queue::worker (void * arg)
                 pthis->read_mutex.unlock ();
 #endif
 
-                STXXL_VERBOSE2( "queue: before serve request has " << req->nref() << " references ");
+                STXXL_VERBOSE2("queue: before serve request has " << req->nref() << " references ");
                 //assert(req->nref() > 1);
                 req->serve ();
-                STXXL_VERBOSE2( "queue: after serve request has " << req->nref() << " references ");
+                STXXL_VERBOSE2("queue: after serve request has " << req->nref() << " references ");
             }
             else
             {
@@ -182,4 +182,3 @@ void * disk_queue::worker (void * arg)
 }
 
 __STXXL_END_NAMESPACE
-

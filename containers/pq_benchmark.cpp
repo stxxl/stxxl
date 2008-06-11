@@ -95,7 +95,7 @@ inline int myrand()
 long long unsigned ran32State = 0xdeadbeef;
 inline long long unsigned myrand()
 {
-    return (ran32State = (ran32State * 0x5DEECE66DULL + 0xBULL) & 0xFFFFFFFFFFFFULL );
+    return (ran32State = (ran32State * 0x5DEECE66DULL + 0xBULL) & 0xFFFFFFFFFFFFULL);
 }
 #endif
 
@@ -133,7 +133,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
     Stats->reset();
@@ -157,7 +157,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     }
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
 }
@@ -196,7 +196,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
     }
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
     Stats->reset();
@@ -225,7 +225,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
     STXXL_MSG("Records in PQ: " << PQ.size());
 
     STXXL_MSG("Deletions/Insertion elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
 }

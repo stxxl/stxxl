@@ -39,7 +39,7 @@ int main()
 
     STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " kb");
     STXXL_MSG("Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " kb");
-    for (int mult = 1; mult < 256; mult *= 2 )
+    for (int mult = 1; mult < 256; mult *= 2)
     {
         const unsigned el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
@@ -52,9 +52,9 @@ int main()
             Map[i] = i + 1;
         }
 
-        double writes = double (bm->get_writes()) / double (el);
-        double logel = log(double (el)) / log(double (BLOCK_SIZE));
-        STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel) );
+        double writes = double(bm->get_writes()) / double(el);
+        double logel = log(double(el)) / log(double(BLOCK_SIZE));
+        STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel));
         STXXL_MSG(*bm);
         bm->reset();
         STXXL_MSG("Doing search");
@@ -67,8 +67,8 @@ int main()
             map_type::const_iterator result = ConstMap.find(key);
             assert((*result).second == key + 1);
         }
-        double reads = double (bm->get_reads()) / logel;
-        double readsperq = double (bm->get_reads()) / queries;
+        double reads = double(bm->get_reads()) / logel;
+        double readsperq = double(bm->get_reads()) / queries;
         STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);
         STXXL_MSG(*bm);
         bm->reset();

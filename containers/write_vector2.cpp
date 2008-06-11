@@ -23,17 +23,18 @@ class write_vector
     ExtIterator it;
     unsigned nbuffers;
     buf_ostream_type * outstream;
+
 public:
-    write_vector(   ExtIterator begin,
-                    unsigned nbuffers_                                     // buffers to use for overlapping (>=2 recommended)
-    ) : it(begin), nbuffers(nbuffers_)
+    write_vector(ExtIterator begin,
+                 unsigned nbuffers_                                        // buffers to use for overlapping (>=2 recommended)
+                 ) : it(begin), nbuffers(nbuffers_)
     {
         outstream = new buf_ostream_type(it.bid(), nbuffers);
     }
 
     value_type & operator * ()
     {
-        if (it.block_offset() == 0 )
+        if (it.block_offset() == 0)
             it.touch();
         // tells the vector that the block was modified
         return **outstream;
@@ -42,7 +43,7 @@ public:
     write_vector & operator ++()
     {
         ++it;
-        ++ (*outstream);
+        ++(*outstream);
         return *this;
     }
 
@@ -54,7 +55,7 @@ public:
         {
             **outstream = *const_out;              // might cause I/Os for loading the page that
             ++const_out;                                 // contains data beyond out
-            ++ (*outstream);
+            ++(*outstream);
         }
 
         it.flush();

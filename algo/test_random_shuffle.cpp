@@ -32,11 +32,11 @@ int main()
     stxxl::uint64 i;
 
     STXXL_MSG("Begin: ");
-    for ( i = 0; i < 10; i++)
+    for (i = 0; i < 10; i++)
         STXXL_MSG(STXXLVector[i]);
 
     STXXL_MSG("End: ");
-    for ( i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
+    for (i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
         STXXL_MSG(STXXLVector[i]);
 
     STXXL_MSG("Permute randomly...");
@@ -44,10 +44,10 @@ int main()
 
 
     STXXL_MSG("Begin: ");
-    for ( i = 0; i < 10; i++)
+    for (i = 0; i < 10; i++)
         STXXL_MSG(STXXLVector[i]);
 
     STXXL_MSG("End: ");
-    for ( i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
+    for (i = STXXLVector.size() - 10; i < STXXLVector.size(); i++)
         STXXL_MSG(STXXLVector[i]);
 }

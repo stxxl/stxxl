@@ -37,7 +37,7 @@ public:
 protected:
     struct bid_hash
     {
-        size_t operator() (const bid_type & bid) const
+        size_t operator () (const bid_type & bid) const
         {
             size_t result = size_t(bid.storage) +
                             size_t(bid.offset & 0xffffffff) + size_t(bid.offset >> 32);
@@ -46,7 +46,7 @@ protected:
 #ifdef BOOST_MSVC
         bool operator ()  (const bid_type & a, const bid_type & b) const
         {
-            return (a.storage < b.storage) || ( a.storage == b.storage && a.offset < b.offset);
+            return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);
         }
         enum
         {       // parameters for hash table
@@ -68,7 +68,6 @@ protected:
     unsigned_type free_blocks_size;
 
 public:
-
     //! \brief Constructs pool
     //! \param init_size initial number of blocks in the pool
     explicit prefetch_pool(unsigned_type init_size = 1) : free_blocks_size(init_size)
@@ -237,8 +236,8 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class BlockType>
-    void swap(      stxxl::prefetch_pool < BlockType > & a,
-                    stxxl::prefetch_pool<BlockType> & b)
+    void swap(stxxl::prefetch_pool < BlockType > & a,
+              stxxl::prefetch_pool<BlockType> & b)
     {
         a.swap(b);
     }

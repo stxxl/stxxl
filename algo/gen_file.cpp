@@ -44,7 +44,7 @@ int main()
     stxxl::request_ptr req;
 
     my_type::key_type cur_key = max_key;
-    for (unsigned i = 0; i < max_key / records_in_block; i++ )
+    for (unsigned i = 0; i < max_key / records_in_block; i++)
     {
         for (unsigned j = 0; j < records_in_block; j++)
             array[j]._key = cur_key--;

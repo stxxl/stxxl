@@ -23,13 +23,13 @@ struct my_handler
 
 class IOLayerTest : public CppUnit::TestCase
 {
-    CPPUNIT_TEST_SUITE( IOLayerTest );
-    CPPUNIT_TEST( testIO );
-    CPPUNIT_TEST_EXCEPTION( testIOException, stxxl::io_error );
+    CPPUNIT_TEST_SUITE(IOLayerTest);
+    CPPUNIT_TEST(testIO);
+    CPPUNIT_TEST_EXCEPTION(testIOException, stxxl::io_error);
     CPPUNIT_TEST_SUITE_END();
 
 public:
-    IOLayerTest( std::string name ) : CppUnit::TestCase( name ) { }
+    IOLayerTest(std::string name) : CppUnit::TestCase(name) { }
     IOLayerTest() { }
 
     void testIO()
@@ -54,7 +54,7 @@ public:
 
         wait_all(req, 16);
 
-        delete [] buffer;
+        delete[] buffer;
     }
 
     void testIOException()
@@ -69,16 +69,14 @@ public:
 };
 
 
-CPPUNIT_TEST_SUITE_REGISTRATION( IOLayerTest );
+CPPUNIT_TEST_SUITE_REGISTRATION(IOLayerTest);
 
 
 int main()
 {
     CppUnit::TextUi::TestRunner runner;
     CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
-    runner.addTest( registry.makeTest() );
-    bool wasSuccessful = runner.run( "", false );
+    runner.addTest(registry.makeTest());
+    bool wasSuccessful = runner.run("", false);
     return wasSuccessful;
 }
-
-

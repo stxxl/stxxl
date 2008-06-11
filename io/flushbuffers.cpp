@@ -64,7 +64,7 @@ void watch_times(request_ptr reqs[], unsigned n, double * out)
                 }
         }
     }
-    delete [] finished;
+    delete[] finished;
 }
 
 
@@ -141,7 +141,7 @@ int main(int argc, char * argv[])
     stxxl::int64 end_offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
     std::vector<std::string> disks_arr;
 
-    for (i = 1; i < unsigned (argc - 1); i++)
+    for (i = 1; i < unsigned(argc - 1); i++)
     {
         std::cout << "Add disk: " << disk_names_dev[atoi(argv[i + 1])]
                   << std::endl;
@@ -150,7 +150,7 @@ int main(int argc, char * argv[])
     ndisks = argc - 2;
 
     unsigned chunks = 32;
-    request_ptr * reqs = new request_ptr [ndisks * chunks];
+    request_ptr * reqs = new request_ptr[ndisks * chunks];
     file * * disks = new file *[ndisks];
     int * buffer = (int *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
 #ifdef WATCH_TIMES
@@ -168,7 +168,7 @@ int main(int argc, char * argv[])
     for (i = 0; i < ndisks; i++)
     {
         disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                    file::CREAT | file::RDWR | file::DIRECT, i);
+                                           file::CREAT | file::RDWR | file::DIRECT, i);
     }
 
     while (count--)
@@ -183,21 +183,21 @@ int main(int argc, char * argv[])
         {
             for (j = 0; j < chunks; j++)
                 reqs[i * chunks + j] =
-                    disks[i]->aread(        buffer + buffer_size_int * i + buffer_size_int * j / chunks,
-                                            offset + buffer_size * j / chunks,
-                                            buffer_size / chunks,
-                                            stxxl::default_completion_handler() );
+                    disks[i]->aread(buffer + buffer_size_int * i + buffer_size_int * j / chunks,
+                                    offset + buffer_size * j / chunks,
+                                    buffer_size / chunks,
+                                    stxxl::default_completion_handler());
         }
 
 #ifdef WATCH_TIMES
         watch_times(reqs, ndisks, r_finish_times);
 #else
-        wait_all( reqs, ndisks * chunks );
+        wait_all(reqs, ndisks * chunks);
 #endif
 
         end = stxxl_timestamp();
 
-        std::cout << int (1e-6 * (buffer_size) / (end - begin)) << " MB/s" << std::endl;
+        std::cout << int(1e-6 * (buffer_size) / (end - begin)) << " MB/s" << std::endl;
 
 #ifdef WATCH_TIMES
         out_stat(begin, end, r_finish_times, ndisks, disks_arr);
@@ -206,13 +206,13 @@ int main(int argc, char * argv[])
         offset += /* 4*stxxl::int64(GB); */ buffer_size;
     }
 
-    delete [] reqs;
-    delete [] disks;
+    delete[] reqs;
+    delete[] disks;
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
 #ifdef WATCH_TIMES
-    delete [] r_finish_times;
-    delete [] w_finish_times;
+    delete[] r_finish_times;
+    delete[] w_finish_times;
 #endif
 
     return 0;

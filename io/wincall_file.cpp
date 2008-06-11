@@ -31,12 +31,12 @@ void wincall_request::serve ()
     {
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
                                 << nref() << ") " <<
-                     " this=" << long (this) << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
-                                << " type=" << ((type == READ) ? "READ" : "WRITE") );
+                     " this=" << long(this) << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
+                                << " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
     STXXL_VERBOSE2("wincall_request::serve(): Buffer at " << ((void *)buffer)
                                                           << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE");
-    );
+                   );
 
     try {
         LARGE_INTEGER desired_pos;
@@ -44,7 +44,7 @@ void wincall_request::serve ()
         if (!SetFilePointerEx(static_cast<wincall_file *>(file_)->get_file_des(),
                               desired_pos, NULL, FILE_BEGIN))
             stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve() offset=" << offset
-                                                                                            << " this=" << long (this) << " buffer=" <<
+                                                                                            << " this=" << long(this) << " buffer=" <<
                                      buffer << " bytes=" << bytes
                                                                                             << " type=" << ((type == READ) ? "READ" : "WRITE"), io_error);
 
@@ -60,7 +60,7 @@ void wincall_request::serve ()
                 if (!ReadFile(static_cast<wincall_file *>(file_)->get_file_des(),
                               buffer, bytes, &NumberOfBytesRead, NULL))
                 {
-                    stxxl_win_lasterror_exit("ReadFile this=" << long (this) <<
+                    stxxl_win_lasterror_exit("ReadFile this=" << long(this) <<
                                              " offset=" << offset <<
                                              " buffer=" << buffer << " bytes=" << bytes << " type=" <<
                                              ((type == READ) ? "READ" : "WRITE") << " nref= " << nref() <<
@@ -85,7 +85,7 @@ void wincall_request::serve ()
                 if (!WriteFile(static_cast<wincall_file *>(file_)->get_file_des(), buffer, bytes,
                                &NumberOfBytesWritten, NULL))
                 {
-                    stxxl_win_lasterror_exit("WriteFile this=" << long (this) <<
+                    stxxl_win_lasterror_exit("WriteFile this=" << long(this) <<
                                              " offset=" << offset <<
                                              " buffer=" << buffer << " bytes=" << bytes << " type=" <<
                                              ((type == READ) ? "READ" : "WRITE") << " nref= " << nref() <<
@@ -108,7 +108,7 @@ void wincall_request::serve ()
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
-                     " this=" << long (this) <<
+                     " this=" << long(this) <<
                      " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes <<
                      " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
@@ -124,7 +124,7 @@ void wincall_request::serve ()
     std::for_each(
         waiters.begin(),
         waiters.end(),
-        std::mem_fun(&onoff_switch::on) );
+        std::mem_fun(&onoff_switch::on));
 
  #ifdef STXXL_BOOST_THREADS
     Lock.unlock();
@@ -177,4 +177,3 @@ request_ptr wincall_file::awrite (
 __STXXL_END_NAMESPACE
 
 #endif // BOOST_MSVC
-

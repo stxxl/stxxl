@@ -26,10 +26,11 @@ class write_vector
     size_type RealSize;
     unsigned nbuffers;
     buf_ostream_type * outstream;
+
 public:
-    write_vector(   vector_type & Vec_,
-                    unsigned nbuffers_                                     // buffers to use for overlapping (>=2 recommended)
-    ) : Vec(Vec_), RealSize(0), nbuffers(nbuffers_)
+    write_vector(vector_type & Vec_,
+                 unsigned nbuffers_                                        // buffers to use for overlapping (>=2 recommended)
+                 ) : Vec(Vec_), RealSize(0), nbuffers(nbuffers_)
     {
         assert(Vec.empty());         // precondition: Vec is empty
         Vec.resize(2 * block_type::size);
@@ -47,11 +48,11 @@ public:
             outstream = new buf_ostream_type((Vec.begin() + RealSize - 1).bid(), nbuffers);
         }
         ExtIterator it = Vec.begin() + RealSize - 1;
-        if (it.block_offset() == 0 )
+        if (it.block_offset() == 0)
             it.touch();
         // tells the vector that the block was modified)
         **outstream = val;
-        ++ (*outstream);
+        ++(*outstream);
     }
 
     void finish()
@@ -63,7 +64,7 @@ public:
         {
             **outstream = *const_out;              // might cause I/Os for loading the page that
             ++const_out;                                 // contains data beyond out
-            ++ (*outstream);
+            ++(*outstream);
         }
 
         out.flush();

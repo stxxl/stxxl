@@ -20,7 +20,7 @@ int main(int /*argc*/, char * /*argv*/[])
     //int64 Bstep = 128 * 1024;
     int64 MaxS = (int64(128) * int64(1024 * 1024 * 1024)) / E;
 
-    for ( ; B > 4096; B = B / 2 )
+    for ( ; B > 4096; B = B / 2)
     {
         int64 m = 1;
         int64 k = IntM / B;

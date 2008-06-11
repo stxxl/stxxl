@@ -75,7 +75,7 @@ void C(btree_type & BTree)
     STXXL_MSG("Scanning with const iterator: " << Timer1.mseconds() << " msec");
 }
 
-int main(int argc, char * argv [])
+int main(int argc, char * argv[])
 {
     if (argc < 2)
     {

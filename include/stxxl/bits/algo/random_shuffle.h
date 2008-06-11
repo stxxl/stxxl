@@ -37,17 +37,18 @@ namespace random_shuffle_local
         ExtIterator it;
         unsigned_type nbuffers;
         buf_ostream_type * outstream;
+
     public:
-        write_vector( ExtIterator begin,
-                      unsigned nbuffers_ = 2 // buffers to use for overlapping (>=2 recommended)
-        ) : it(begin), nbuffers(nbuffers_)
+        write_vector(ExtIterator begin,
+                     unsigned nbuffers_ = 2  // buffers to use for overlapping (>=2 recommended)
+                     ) : it(begin), nbuffers(nbuffers_)
         {
             outstream = new buf_ostream_type(it.bid(), nbuffers);
         }
 
         value_type & operator * ()
         {
-            if (it.block_offset() == 0 )
+            if (it.block_offset() == 0)
                 it.touch();
             // tells the vector that the block was modified
             return **outstream;
@@ -56,7 +57,7 @@ namespace random_shuffle_local
         write_vector & operator ++()
         {
             ++it;
-            ++ (*outstream);
+            ++(*outstream);
             return *this;
         }
 
@@ -68,7 +69,7 @@ namespace random_shuffle_local
             {
                 **outstream = *const_out; // might cause I/Os for loading the page that
                 ++const_out;             // contains data beyond out
-                ++ (*outstream);
+                ++(*outstream);
             }
 
             it.flush();
@@ -91,10 +92,10 @@ namespace random_shuffle_local
 
 template < typename Tp_, typename AllocStrategy_, typename SzTp_, typename DiffTp_,
           unsigned BlockSize_, typename PgTp_, unsigned PageSize_, typename RandomNumberGenerator_>
-void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_ > first,
-                        stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> beyond,
-                        RandomNumberGenerator_ & rand,
-                        unsigned_type M);
+void random_shuffle(stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_ > first,
+                    stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> beyond,
+                    RandomNumberGenerator_ & rand,
+                    unsigned_type M);
 
 
 //! \brief External equivalent of std::random_shuffle
@@ -111,16 +112,16 @@ template <  typename ExtIterator_,
           unsigned BlockSize_,
           unsigned PageSize_,
           typename AllocStrategy_>
-void random_shuffle(   ExtIterator_ first,
-                       ExtIterator_ beyond,
-                       RandomNumberGenerator_ & rand,
-                       unsigned_type M,
-                       AllocStrategy_ AS = STXXL_DEFAULT_ALLOC_STRATEGY())
+void random_shuffle(ExtIterator_ first,
+                    ExtIterator_ beyond,
+                    RandomNumberGenerator_ & rand,
+                    unsigned_type M,
+                    AllocStrategy_ AS = STXXL_DEFAULT_ALLOC_STRATEGY())
 {
     typedef typename ExtIterator_::value_type value_type;
     typedef typename stxxl::STACK_GENERATOR < value_type, stxxl::external,
-    stxxl::grow_shrink2, PageSize_,
-    BlockSize_, void, 0, AllocStrategy_ > ::result stack_type;
+                                             stxxl::grow_shrink2, PageSize_,
+                                             BlockSize_, void, 0, AllocStrategy_ > ::result stack_type;
     typedef typename stack_type::block_type block_type;
 
     STXXL_VERBOSE1("random_shuffle: Plain Version");
@@ -139,7 +140,7 @@ void random_shuffle(   ExtIterator_ first,
 
     value_type * temp_array;
     typedef typename stxxl::VECTOR_GENERATOR < value_type,
-    PageSize_, 4, BlockSize_, AllocStrategy_ > ::result temp_vector_type;
+                                              PageSize_, 4, BlockSize_, AllocStrategy_ > ::result temp_vector_type;
     temp_vector_type * temp_vector;
 
     stxxl::prefetch_pool<block_type> p_pool(0); // no read buffers
@@ -149,7 +150,7 @@ void random_shuffle(   ExtIterator_ first,
     stack_type * * buckets;
 
     // create and put buckets into container
-    buckets = new stack_type * [k];
+    buckets = new stack_type *[k];
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(p_pool, w_pool, 0);
 
@@ -248,7 +249,7 @@ void random_shuffle(   ExtIterator_ first,
     for (int j = 0; j < k; j++)
         delete buckets[j];
 
-    delete [] buckets;
+    delete[] buckets;
 }
 
 //! \brief External equivalent of std::random_shuffle (specialization for stxxl::vector)
@@ -258,10 +259,10 @@ void random_shuffle(   ExtIterator_ first,
 //! \param M number of bytes for internal use
 template < typename Tp_, typename AllocStrategy_, typename SzTp_, typename DiffTp_,
           unsigned BlockSize_, typename PgTp_, unsigned PageSize_, typename RandomNumberGenerator_>
-void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_ > first,
-                        stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> beyond,
-                        RandomNumberGenerator_ & rand,
-                        unsigned_type M)
+void random_shuffle(stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_ > first,
+                    stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> beyond,
+                    RandomNumberGenerator_ & rand,
+                    unsigned_type M)
 {
     typedef stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> ExtIterator_;
     typedef typename ExtIterator_::value_type value_type;
@@ -283,7 +284,7 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
 
     value_type * temp_array;
     typedef typename stxxl::VECTOR_GENERATOR < value_type,
-    PageSize_, 4, BlockSize_, AllocStrategy_ > ::result temp_vector_type;
+                                              PageSize_, 4, BlockSize_, AllocStrategy_ > ::result temp_vector_type;
     temp_vector_type * temp_vector;
 
     stxxl::prefetch_pool<block_type> p_pool(0); // no read buffers
@@ -292,7 +293,7 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
     stack_type * * buckets;
 
     // create and put buckets into container
-    buckets = new stack_type * [k];
+    buckets = new stack_type *[k];
     for (j = 0; j < k; j++)
         buckets[j] = new stack_type(p_pool, w_pool, 0);
 
@@ -392,7 +393,7 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
     for (int j = 0; j < k; j++)
         delete buckets[j];
 
-    delete [] buckets;
+    delete[] buckets;
 
     Writer.flush(); // flush buffers
 }
@@ -403,9 +404,9 @@ void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, Dif
 //! \param M number of bytes for internal use
 template < typename Tp_, typename AllocStrategy_, typename SzTp_, typename DiffTp_,
           unsigned BlockSize_, typename PgTp_, unsigned PageSize_>
-void random_shuffle(    stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_ > first,
-                        stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> beyond,
-                        unsigned_type M)
+void random_shuffle(stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_ > first,
+                    stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> beyond,
+                    unsigned_type M)
 {
     stxxl::random_number<> rand;
     stxxl::random_shuffle(first, beyond, rand, M);

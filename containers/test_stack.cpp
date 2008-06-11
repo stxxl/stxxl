@@ -68,7 +68,7 @@ int main(int argc, char * argv[])
         {
             int_stack.push(i);
             assert(int_stack.top() == i);
-            assert(int (int_stack.size()) == i + 1);
+            assert(int(int_stack.size()) == i + 1);
         }
 
         ext_stack_type my_stack1(int_stack);

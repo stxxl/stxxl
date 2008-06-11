@@ -27,12 +27,12 @@ typedef boost::noncopyable noncopyable;
 
 class noncopyable {
 protected:
-    noncopyable() {}
+    noncopyable() { }
 
 private:
     // copying and assignment is not allowed
-    noncopyable(const noncopyable&);
-    const noncopyable& operator = (const noncopyable&);
+    noncopyable(const noncopyable &);
+    const noncopyable & operator = (const noncopyable &);
 };
 
 #endif
@@ -40,4 +40,3 @@ private:
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_NONCOPYABLE_HEADER
-

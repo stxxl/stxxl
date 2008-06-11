@@ -97,7 +97,7 @@ void run_cursor2<block_type, prefetcher_type>::operator ++ (int)
     pos++;
     if (UNLIKELY(pos >= block_type::size))
     {
-        if ( prefetcher()->block_consumed(buffer) )
+        if (prefetcher()->block_consumed(buffer))
             pos = 0;
     }
 }

@@ -42,7 +42,7 @@ public:
     ~simple_vector ()
     {
         //    _data_allocator.deallocate(_array,_size);
-        delete [] _array;
+        delete[] _array;
     }
     iterator begin ()
     {
@@ -78,8 +78,8 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class Tp_>
-    void swap(      stxxl::simple_vector < Tp_ > & a,
-                    stxxl::simple_vector<Tp_> & b)
+    void swap(stxxl::simple_vector < Tp_ > & a,
+              stxxl::simple_vector<Tp_> & b)
     {
         a.swap(b);
     }

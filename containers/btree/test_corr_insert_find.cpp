@@ -49,7 +49,7 @@ bool operator == (const std::pair<int, double> & a, const std::pair<int, double>
     return a.first == b.first;
 }
 
-int main(int argc, char * argv [])
+int main(int argc, char * argv[])
 {
     if (argc < 2)
     {
@@ -71,7 +71,7 @@ int main(int argc, char * argv [])
     stxxl::vector<int>::const_iterator it = Values.begin();
     STXXL_MSG("Inserting " << nins << " random values into btree");
     for ( ; it != Values.end(); ++it)
-        BTree.insert(std::pair < int, double > (*it, double (*it) + 1.0));
+        BTree.insert(std::pair < int, double > (*it, double(*it) + 1.0));
 
 
     STXXL_MSG("Number of elements in btree: " << BTree.size());

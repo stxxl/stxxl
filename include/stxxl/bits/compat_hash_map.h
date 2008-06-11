@@ -40,4 +40,3 @@ struct compat_hash_map {
 __STXXL_END_NAMESPACE
 
 #endif // STXXL_HEADER__COMPAT_HASH_MAP_H_
-

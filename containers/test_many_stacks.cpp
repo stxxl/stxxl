@@ -34,7 +34,7 @@ int main(int argc, char * argv[])
     STXXL_MSG("Enter a symbol:");
     std::cin >> dum;
 
-    delete [] my_stacks;
+    delete[] my_stacks;
 
     STXXL_MSG("Enter a symbol:");
     std::cin >> dum;

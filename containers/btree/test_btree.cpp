@@ -31,7 +31,7 @@ std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (25 * 1024 * 1024)
 
-int main(int argc, char * argv [])
+int main(int argc, char * argv[])
 {
     if (argc < 2)
     {

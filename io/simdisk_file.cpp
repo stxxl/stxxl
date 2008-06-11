@@ -63,7 +63,7 @@ double DiskGeometry::get_delay (stxxl::int64 /*offset*/, size_t size)           
        return delay;
 
      */
-    return double (size) / double (AVERAGE_SPEED);
+    return double(size) / double(AVERAGE_SPEED);
 }
 
 
@@ -208,7 +208,7 @@ void sim_disk_request::serve ()
 
         delay = delay - stxxl_timestamp() + op_start;
 
-        assert( delay > 0.0 );
+        assert(delay > 0.0);
 
         int seconds_to_wait = static_cast < int >(floor (delay));
         if (seconds_to_wait)
@@ -295,5 +295,3 @@ request_ptr sim_disk_file::awrite (
 __STXXL_END_NAMESPACE
 
 #endif
-
-

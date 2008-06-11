@@ -19,9 +19,9 @@ int main(int argc, char * argv[])
     const int L = atoi(argv[2]);
     const int m = atoi(argv[3]);
     stxxl::ran32State = atoi(argv[4]);
-    int * disks = new int [L];
-    int * prefetch_order = new int [L];
-    int * count = new int [D];
+    int * disks = new int[L];
+    int * prefetch_order = new int[L];
+    int * count = new int[D];
 
 
     for (i = 0; i < D; i++)
@@ -41,7 +41,7 @@ int main(int argc, char * argv[])
 
     stxxl::compute_prefetch_schedule(disks, disks + L, prefetch_order, m, D);
 
-    delete [] count;
-    delete [] disks;
-    delete [] prefetch_order;
+    delete[] count;
+    delete[] disks;
+    delete[] prefetch_order;
 }

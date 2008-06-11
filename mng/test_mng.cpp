@@ -27,7 +27,7 @@ struct my_handler
 {
     void operator ()  (stxxl::request * req)
     {
-        STXXL_MSG( req << " done, type=" << req->io_type() );
+        STXXL_MSG(req << " done, type=" << req->io_type());
     }
 };
 
@@ -46,8 +46,8 @@ int main ()
 
     block_type * block = new block_type[2];
     STXXL_MSG(std::hex);
-    STXXL_MSG("Allocated block address    : " << long (block));
-    STXXL_MSG("Allocated block address + 1: " << long (block + 1));
+    STXXL_MSG("Allocated block address    : " << long(block));
+    STXXL_MSG("Allocated block address + 1: " << long(block + 1));
     STXXL_MSG(std::dec);
     unsigned i = 0;
     for (i = 0; i < block_type::size; ++i)
@@ -80,8 +80,8 @@ int main ()
 
     bm->delete_blocks (bids.begin(), bids.end ());
 
-    delete [] reqs;
-    delete [] block;
+    delete[] reqs;
+    delete[] block;
 
     // variable-size blocks, not supported currently
     /*

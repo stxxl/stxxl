@@ -59,7 +59,7 @@ public:
         run_cursor_cmp_type c) : cmp(c)
     {
         int_type i;
-        logK = static_cast < int >(ceil (log (double (nruns)) / log (2.)));             // replace with something smart
+        logK = static_cast < int >(ceil (log (double(nruns)) / log (2.)));             // replace with something smart
         int_type kReg = k = (1 << logK);
 
         STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
@@ -92,8 +92,8 @@ public:
     }
     ~loser_tree()
     {
-        delete [] current;
-        delete [] entry;
+        delete[] current;
+        delete[] entry;
     }
 
     void swap(loser_tree & obj)
@@ -122,14 +122,14 @@ private:
 
 
 #define TreeStep(L) \
-    if (LogK >= L ) \
+    if (LogK >= L) \
     { \
         currentE = current + \
-                   regEntry[ (winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0) ]; \
-        if ( cmp(*currentE, *winnerE) ) \
+                   regEntry[(winnerIndex + (1 << LogK)) >> (((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)]; \
+        if (cmp(*currentE, *winnerE)) \
         { \
             std::swap(regEntry[(winnerIndex + (1 << LogK)) \
-                               >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0) ], winnerIndex); \
+                               >> (((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)], winnerIndex); \
             winnerE = currentE; \
         } \
     }

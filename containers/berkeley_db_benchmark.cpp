@@ -201,7 +201,7 @@ inline void rand_key(stxxl::int64 pos, my_key & Key)
 long long unsigned ran32State = 0xdeadbeef;
 inline long long unsigned myrand()
 {
-    return (ran32State = (ran32State * 0x5DEECE66DULL + 0xBULL) & 0xFFFFFFFFFFFFULL );
+    return (ran32State = (ran32State * 0x5DEECE66DULL + 0xBULL) & 0xFFFFFFFFFFFFULL);
 }
 inline void rand_key(stxxl::int64 pos, my_key & Key)
 {
@@ -275,7 +275,7 @@ void run_bdb_btree(stxxl::int64 ops)
         db.stat(NULL, &dbstat, 0);
         STXXL_MSG("Records in map: " << dbstat->bt_ndata);
         STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+                  " seconds : " << (double(n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 
@@ -299,7 +299,7 @@ void run_bdb_btree(stxxl::int64 ops)
 
         Timer.stop();
         STXXL_MSG("Locates elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+                  " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 
@@ -324,7 +324,7 @@ void run_bdb_btree(stxxl::int64 ops)
             Dbt keyx(key1_storage.keybuf, KEY_SIZE);
             Dbt datax(data1_storage.databuf, DATA_SIZE);
 
-            if ( cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
+            if (cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
                 continue;
 
 
@@ -350,7 +350,7 @@ void run_bdb_btree(stxxl::int64 ops)
 
 
         STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (n_scanned) / (Timer.mseconds() / 1000.)) <<
+                  " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
                   " key/data pairs per sec, #queries " << n_range_queries << " #scanned elements: " << n_scanned);
 
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
@@ -375,7 +375,7 @@ void run_bdb_btree(stxxl::int64 ops)
         db.stat(NULL, &dbstat, 0);
         STXXL_MSG("Records in map: " << dbstat->bt_ndata);
         STXXL_MSG("Erase elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+                  " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
 
@@ -431,7 +431,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
     STXXL_MSG("Records in map: " << Map.size());
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
     Stats->reset();
@@ -452,7 +452,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
     Timer.stop();
     STXXL_MSG("Locates elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n_locates) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(n_locates) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
     Stats->reset();
@@ -493,7 +493,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
     Timer.stop();
     STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n_scanned) / (Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
               " key/data pairs per sec, #queries " << n_range_queries << " #scanned elements: " << n_scanned);
 
     std::cout << *Stats;
@@ -517,7 +517,7 @@ void run_stxxl_map(stxxl::int64 ops)
     Timer.stop();
     STXXL_MSG("Records in map: " << Map.size());
     STXXL_MSG("Erase elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n_deletes) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(n_deletes) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     std::cout << *Stats;
     Stats->reset();
@@ -558,7 +558,7 @@ template <class InputType>
 class key2pair
 {
     InputType &in;
-    std::pair<my_key, my_data>  current;
+    std::pair<my_key, my_data> current;
     key2pair();
 
 public:
@@ -635,7 +635,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     STXXL_MSG("Records in map: " << Map.size());
     STXXL_MSG("Construction elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     using std::cout;
     Map.print_statistics(cout);
@@ -661,7 +661,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     STXXL_MSG("Records in map: " << Map.size());
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     Map.print_statistics(cout);
     Map.reset_statistics();
@@ -689,7 +689,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     Timer.stop();
     STXXL_MSG("Locates elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     Map.print_statistics(cout);
     Map.reset_statistics();
@@ -746,7 +746,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     Timer.stop();
     STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n_scanned) / (Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
               " key/data pairs per sec, #queries " << n_range_queries << " #scanned elements: " << n_scanned);
 
     Map.print_statistics(cout);
@@ -775,7 +775,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
     Timer.stop();
     STXXL_MSG("Records in map: " << Map.size());
     STXXL_MSG("Erase elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
     Map.print_statistics(cout);
     Map.reset_statistics();
@@ -875,7 +875,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
     STXXL_MSG("Records in map: " << u_btree->size());
     STXXL_MSG("Construction elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
 
 
@@ -896,7 +896,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
     STXXL_MSG("Records in map: " << u_btree->size());
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
 
 
@@ -917,7 +917,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
     Timer.stop();
     STXXL_MSG("Locates elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
 
     ////////////////////////////////////
@@ -953,7 +953,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
     Timer.stop();
     STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (n_scanned) / (Timer.mseconds() / 1000.)) <<
+              " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
               " key/data pairs per sec, #queries " << n_range_queries << " #scanned elements: " << n_scanned);
 
 
@@ -977,7 +977,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     Timer.stop();
     STXXL_MSG("Records in map: " << u_btree->size());
     STXXL_MSG("Erase elapsed time: " << (Timer.mseconds() / 1000.) <<
-              " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+              " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 }
 
 void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
@@ -988,7 +988,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
     my_data data1_storage;
 
 #ifdef BDB_BULK_SCAN
-    int * bulk_buffer = new int [logbufsize / sizeof(int)];
+    int * bulk_buffer = new int[logbufsize / sizeof(int)];
 #endif
 
     unlink(filename);
@@ -1063,7 +1063,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         db.stat(NULL, &dbstat, 0);
         STXXL_MSG("Records in map: " << dbstat->bt_ndata);
         STXXL_MSG("Construction elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+                  " seconds : " << (double(n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
         db.stat_print(0);
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
@@ -1084,7 +1084,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         db.stat(NULL, &dbstat, 0);
         STXXL_MSG("Records in map: " << dbstat->bt_ndata);
         STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+                  " seconds : " << (double(n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
         db.stat_print(0);
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
@@ -1109,7 +1109,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
         Timer.stop();
         STXXL_MSG("Locates elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+                  " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
         db.stat_print(0);
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
@@ -1146,7 +1146,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
 
 #ifdef BDB_BULK_SCAN
-            if ( cursorp->get(&keyx, &datax, DB_SET_RANGE | DB_MULTIPLE_KEY) == DB_NOTFOUND)
+            if (cursorp->get(&keyx, &datax, DB_SET_RANGE | DB_MULTIPLE_KEY) == DB_NOTFOUND)
                 continue;
 
 
@@ -1160,7 +1160,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
                     ++n_scanned;
                     //STXXL_MSG("Result      "<<*((my_key *)key1.get_data()));
                 }
-                if ( cursorp->get(&keyx, &datax, DB_NEXT | DB_MULTIPLE_KEY) == DB_NOTFOUND)
+                if (cursorp->get(&keyx, &datax, DB_NEXT | DB_MULTIPLE_KEY) == DB_NOTFOUND)
                     break;
 
 
@@ -1171,7 +1171,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
             } while (1);
 
 #else
-            if ( cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
+            if (cursorp->get(&keyx, &datax, DB_SET_RANGE) == DB_NOTFOUND)
                 continue;
 
             while (*((my_key *)keyx.get_data()) <= last_key)
@@ -1198,7 +1198,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 
 
         STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (n_scanned) / (Timer.mseconds() / 1000.)) <<
+                  " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
                   " key/data pairs per sec, #queries " << n_range_queries << " #scanned elements: " << n_scanned);
 
         db.stat_print(0);
@@ -1224,7 +1224,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         db.stat(NULL, &dbstat, 0);
         STXXL_MSG("Records in map: " << dbstat->bt_ndata);
         STXXL_MSG("Erase elapsed time: " << (Timer.mseconds() / 1000.) <<
-                  " seconds : " << (double (ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+                  " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
         db.stat_print(0);
         db.get_env()->memp_stat_print(DB_STAT_CLEAR);
@@ -1243,7 +1243,7 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
     unlink(filename);
 
 #ifdef BDB_BULK_SCAN
-    delete []  bulk_buffer;
+    delete[]  bulk_buffer;
 #endif
 }
 

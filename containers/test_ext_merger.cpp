@@ -90,5 +90,5 @@ int main()
     loser.multi_merge(out, out + 1024);
     std::copy(out, out + 1024, std::ostream_iterator<my_type>(std::cout, "\n"));
 
-    delete [] out;
+    delete[] out;
 }

@@ -110,7 +110,7 @@ int main()
 
         for (i = 0; i < v.size(); i++)
         {
-            assert(v[i] == rnd() );
+            assert(v[i] == rnd());
         }
 
         std::vector<stxxl::vector<int> > vector_of_stxxlvectors(2);

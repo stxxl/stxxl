@@ -183,7 +183,7 @@ public:
         elapsed(0.0)
     { }
 
-    stats_data(const stats& s) :
+    stats_data(const stats & s) :
         reads(s.get_reads()),
         writes(s.get_writes()),
         volume_read(s.get_read_volume()),
@@ -197,7 +197,7 @@ public:
         elapsed(stxxl_timestamp() - s.get_last_reset_time())
     { }
 
-    stats_data operator + (const stats_data& a) const
+    stats_data operator + (const stats_data & a) const
     {
         stats_data s;
         s.reads = reads + a.reads;
@@ -214,7 +214,7 @@ public:
         return s;
     }
 
-    stats_data operator - (const stats_data& a) const
+    stats_data operator - (const stats_data & a) const
     {
         stats_data s;
         s.reads = reads - a.reads;

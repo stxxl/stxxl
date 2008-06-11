@@ -130,8 +130,8 @@ namespace btree
                 std::copy(block_->begin(), block_->begin() + end_of_smaller_part, NewNode->block_->begin());
                 NewNode->block_->info.cur_size = end_of_smaller_part;
                 // copy the larger part
-                std::copy(      block_->begin() + end_of_smaller_part,
-                                block_->begin() + old_size, block_->begin());
+                std::copy(block_->begin() + end_of_smaller_part,
+                          block_->begin() + old_size, block_->begin());
                 block_->info.cur_size = old_size - end_of_smaller_part;
                 assert(size() + NewNode->size() == old_size);
 
@@ -151,7 +151,7 @@ namespace btree
             typedef typename local_node_type::bid_type local_bid_type;
 
             block_iterator leftIt, rightIt;
-            if (UIt == (block_->begin() + size() - 1) )                  // UIt is the last entry in the root
+            if (UIt == (block_->begin() + size() - 1))                  // UIt is the last entry in the root
             {
                 assert(UIt != block_->begin());
                 rightIt = UIt;
@@ -179,7 +179,7 @@ namespace btree
                 cache_.unfix_node(RightBid);
                 cache_.delete_node(LeftBid);                         // 'delete_node' unfixes LeftBid also
 
-                std::copy(leftIt + 1, block_->begin() + size(), leftIt );                        // delete left BID from the root
+                std::copy(leftIt + 1, block_->begin() + size(), leftIt);                        // delete left BID from the root
                 --(block_->info.cur_size);
             }
             else
@@ -203,8 +203,8 @@ namespace btree
             delete block_;
         }
 
-        normal_node(    btree_type * btree__,
-                        key_compare cmp) :
+        normal_node(btree_type * btree__,
+                    key_compare cmp) :
             block_(new block_type),
             btree_(btree__),
             cmp_(cmp),
@@ -213,7 +213,7 @@ namespace btree
             assert(min_nelements() >= 2);
             assert(2 * min_nelements() - 1 <= max_nelements());
             assert(max_nelements() <= nelements);
-            assert(unsigned (block_type::size) >= nelements + 1);                   // extra space for an overflow
+            assert(unsigned(block_type::size) >= nelements + 1);                   // extra space for an overflow
         }
 
         block_type & block()
@@ -343,7 +343,7 @@ namespace btree
                 btree_->leaf_cache_.unfix_node((leaf_bid_type)it->second);
                 //if(key_compare::max_value() == BotSplitter.first)
                 if (!(cmp_(key_compare::max_value(), BotSplitter.first) ||
-                      cmp_(BotSplitter.first, key_compare::max_value()) ))
+                      cmp_(BotSplitter.first, key_compare::max_value())))
                     return result;
                 // no overflow/splitting happened
 
@@ -363,7 +363,7 @@ namespace btree
                 btree_->node_cache_.unfix_node((node_bid_type)it->second);
                 //if(key_compare::max_value() == BotSplitter.first)
                 if (!(cmp_(key_compare::max_value(), BotSplitter.first) ||
-                      cmp_(BotSplitter.first, key_compare::max_value()) ))
+                      cmp_(BotSplitter.first, key_compare::max_value())))
                     return result;
                 // no overflow/splitting happened
 
@@ -654,8 +654,8 @@ namespace btree
                 // move elements to make space for Src elements
 
                 // copy Left to *this leaf
-                std::copy(      Left.block_->begin() + newLeftSize,
-                                Left.block_->begin() + Left.size(), block_->begin());
+                std::copy(Left.block_->begin() + newLeftSize,
+                          Left.block_->begin() + Left.size(), block_->begin());
             }
             else
             {
@@ -664,11 +664,11 @@ namespace btree
                 const unsigned nEl2Move = size() - newRightSize;                        // #elements to move from *this to Left
 
                 // copy *this to Left
-                std::copy(      block_->begin(),
-                                block_->begin() + nEl2Move, Left.block_->begin() + Left.size());
+                std::copy(block_->begin(),
+                          block_->begin() + nEl2Move, Left.block_->begin() + Left.size());
                 // move elements in *this
-                std::copy(      block_->begin() + nEl2Move,
-                                block_->begin() + size(), block_->begin() );
+                std::copy(block_->begin() + nEl2Move,
+                          block_->begin() + size(), block_->begin());
             }
 
             block_->info.cur_size = newRightSize;                     // update size

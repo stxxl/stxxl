@@ -75,8 +75,8 @@ __STXXL_END_NAMESPACE
 
 namespace std
 {
-    inline void swap(      stxxl::btree::lru_pager & a,
-                           stxxl::btree::lru_pager & b)
+    inline void swap(stxxl::btree::lru_pager & a,
+                     stxxl::btree::lru_pager & b)
     {
         a.swap(b);
     }

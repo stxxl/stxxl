@@ -116,6 +116,7 @@ class filler_struct__
 {
     typedef unsigned char byte_type;
     byte_type filler_array_[bytes];
+
 public:
     filler_struct__ () { STXXL_VERBOSE2("filler_struct__ is allocated"); }
 };
@@ -124,6 +125,7 @@ template <>
 class filler_struct__ < 0 >
 {
     typedef unsigned char byte_type;
+
 public:
     filler_struct__ () { STXXL_VERBOSE2("filler_struct__ is allocated"); }
 };
@@ -229,7 +231,8 @@ public:
     //! \brief Per block information element
     info_type info;
 
-    enum { size = ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_ - sizeof(InfoType_) ) / sizeof(T_)) };
+    enum { size = ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_ - sizeof(InfoType_)) / sizeof(T_)) };
+
 public:
     block_w_info () { STXXL_VERBOSE2("block_w_info is allocated"); }
 };
@@ -240,7 +243,8 @@ class block_w_info<T_, RawSize_, NBids_, void> :
 {
 public:
     typedef void info_type;
-    enum {size = ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_) / sizeof(T_)) };
+    enum { size = ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_) / sizeof(T_)) };
+
 public:
     block_w_info () { STXXL_VERBOSE2("block_w_info is allocated"); }
 };
@@ -273,7 +277,7 @@ public:
     typedef pointer iterator;
     typedef type const * const_iterator;
 
-    enum { has_filler = (RawSize_ != sizeof(block_w_info < T_, RawSize_, NRef_, InfoType_ >) ) };
+    enum { has_filler = (RawSize_ != sizeof(block_w_info < T_, RawSize_, NRef_, InfoType_ >)) };
 
     typedef BID<RawSize_> bid_type;
 
@@ -289,9 +293,9 @@ public:
     };
 
     /*! \brief Writes block to the disk(s)
-     \param bid block identifier, points the file(disk) and position
-     \param on_cmpl completion handler
-     \return \c pointer_ptr object to track status I/O operation after the call
+     *! \param bid block identifier, points the file(disk) and position
+     *! \param on_cmpl completion handler
+     *! \return \c pointer_ptr object to track status I/O operation after the call
      */
     request_ptr write (const BID<raw_size> & bid,
                        completion_handler on_cmpl = default_completion_handler())
@@ -303,10 +307,10 @@ public:
                    on_cmpl);
     }
 
-    /*!     \brief Reads block from the disk(s)
-     \param bid block identifier, points the file(disk) and position
-     \param on_cmpl completion handler
-     \return \c pointer_ptr object to track status I/O operation after the call
+    /*! \brief Reads block from the disk(s)
+     *! \param bid block identifier, points the file(disk) and position
+     *! \param on_cmpl completion handler
+     *! \return \c pointer_ptr object to track status I/O operation after the call
      */
     request_ptr read (const BID < raw_size > &bid,
                       completion_handler on_cmpl = default_completion_handler())
@@ -396,12 +400,13 @@ class BIDArray : private noncopyable
 protected:
     unsigned_type _size;
     BID < BLK_SIZE > *array;
+
 public:
     typedef BID<BLK_SIZE> & reference;
     typedef BID<BLK_SIZE> * iterator;
     typedef const BID<BLK_SIZE> * const_iterator;
     BIDArray () : _size (0), array (NULL)
-    { };
+    { }
     iterator begin ()
     {
         return array;
@@ -414,7 +419,7 @@ public:
     BIDArray (unsigned_type size) : _size (size)
     {
         array = new BID < BLK_SIZE >[size];
-    };
+    }
     unsigned_type size () const
     {
         return _size;
@@ -432,7 +437,7 @@ public:
             array = new BID < BLK_SIZE >[newsize];
             memcpy ((void *)array, (void *)tmp,
                     sizeof(BID < BLK_SIZE >) * (STXXL_MIN (_size, newsize)));
-            delete [] tmp;
+            delete[] tmp;
             _size = newsize;
         }
         else
@@ -445,7 +450,7 @@ public:
     {
         if (array)
             delete[] array;
-    };
+    }
 };
 
 
@@ -460,7 +465,7 @@ class DiskAllocator : private noncopyable
     typedef std::pair < stxxl::int64, stxxl::int64 > place;
     struct FirstFit : public std::binary_function < place, stxxl::int64, bool >
     {
-        bool operator     () (
+        bool operator () (
             const place & entry,
             const stxxl::int64 size) const
         {
@@ -469,17 +474,16 @@ class DiskAllocator : private noncopyable
     };
     struct OffCmp
     {
-        bool operator      () (const stxxl::int64 & off1, const stxxl::int64 & off2)
+        bool operator () (const stxxl::int64 & off1, const stxxl::int64 & off2)
         {
             return off1 < off2;
         }
     };
 
     DiskAllocator ()
-    { };
+    { }
 
 protected:
-
     typedef std::map < stxxl::int64, stxxl::int64 > sortseq;
     sortseq free_space;
     //  sortseq used_space;
@@ -496,7 +500,7 @@ protected:
             if (pred->first <= region_pos && pred->first + pred->second > region_pos)
             {
                 STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory " <<
-                                       "System info: P " << pred->first << " " << pred->second << " " << region_pos);
+                            "System info: P " << pred->first << " " << pred->second << " " << region_pos);
             }
         }
         if (succ != free_space.end ())
@@ -571,15 +575,15 @@ stxxl::int64 DiskAllocator::new_blocks (BID < BLK_SIZE > * begin,
     typename BIDArray<BLK_SIZE>::iterator cur = begin;
     for ( ; cur != end; ++cur)
     {
-        STXXL_VERBOSE2("Asking for a block with size: " << (cur->size) );
+        STXXL_VERBOSE2("Asking for a block with size: " << (cur->size));
         requested_size += cur->size;
     }
 
     if (free_bytes < requested_size)
     {
-        STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
-                      " bytes requested, " << free_bytes <<
-                      " bytes free. Trying to extend the external memory space..." );
+        STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
+                     " bytes requested, " << free_bytes <<
+                     " bytes free. Trying to extend the external memory space...");
 
 
         begin->offset = disk_bytes; // allocate at the end
@@ -593,7 +597,7 @@ stxxl::int64 DiskAllocator::new_blocks (BID < BLK_SIZE > * begin,
         mutex.unlock();
 #endif
 
-         return disk_bytes;
+        return disk_bytes;
     }
 
     // dump();
@@ -628,16 +632,16 @@ stxxl::int64 DiskAllocator::new_blocks (BID < BLK_SIZE > * begin,
     // no contiguous region found
     STXXL_VERBOSE1("Warning, when allocation an external memory space, no contiguous region found");
     STXXL_VERBOSE1("It might harm the performance");
-    if (requested_size == BLK_SIZE )
+    if (requested_size == BLK_SIZE)
     {
         assert(end - begin == 1);
 
         STXXL_ERRMSG("Warning: Severe external memory space fragmentation!");
         dump();
 
-        STXXL_ERRMSG( "External memory block allocation error: " << requested_size <<
-                      " bytes requested, " << free_bytes <<
-                      " bytes free. Trying to extend the external memory space..." );
+        STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
+                     " bytes requested, " << free_bytes <<
+                     " bytes free. Trying to extend the external memory space...");
 
         begin->offset = disk_bytes; // allocate at the end
         disk_bytes += BLK_SIZE;
@@ -673,7 +677,7 @@ void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
 #else
     mutex.lock();
 #endif
-    
+
     STXXL_VERBOSE2("DiskAllocator::delete_block<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
                                                                          << ", free:" << free_bytes << " total:" << disk_bytes);
     STXXL_VERBOSE2("Deallocating a block with size: " << bid.size);
@@ -712,7 +716,7 @@ void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
         }
         else
         {
-            if (free_space.size() > 1 )
+            if (free_space.size() > 1)
             {
                 /*
                    if(pred == succ)
@@ -771,7 +775,7 @@ void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
     free_bytes += stxxl::int64 (bid.size);
 
     //dump();
-    
+
 #ifndef STXXL_BOOST_THREADS
     mutex.unlock();
 #endif
@@ -834,11 +838,12 @@ class config : private noncopyable
         stxxl::int64 size;
     };
     std::vector < DiskEntry > disks_props;
-    
+
     // in disks_props, flash devices come after all regular disks
     unsigned first_flash;
 
     config (const char *config_path = "./.stxxl");
+
 public:
     //! \brief Returns number of disks available to user
     //! \return number of disks
@@ -885,6 +890,7 @@ public:
     //! \brief Returns instance of config
     //! \return pointer to the instance of config
     static config * get_instance ();
+
 private:
     static config *instance;
 };
@@ -938,7 +944,7 @@ public:
       #endif
 
         STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
-                               io_impl << " ." );
+                    io_impl << " .");
 
         return NULL;
     }
@@ -956,7 +962,7 @@ struct basic_allocation_strategy
 {
     basic_allocation_strategy(int disks_begin, int disks_end);
     basic_allocation_strategy();
-    int operator() (int i) const;
+    int operator () (int i) const;
     static const char * name();
 };
 
@@ -966,12 +972,12 @@ struct striping
 {
     int begin, diff;
     striping (int b, int e) : begin (b), diff (e - b)
-    { };
+    { }
     striping () : begin (0)
     {
         diff = config::get_instance ()->disks_number ();
-    };
-    int operator     () (int i) const
+    }
+    int operator () (int i) const
     {
         return begin + i % diff;
     }
@@ -990,10 +996,10 @@ struct FR : public striping
 {
     random_number<random_uniform_fast> rnd;
     FR (int b, int e) : striping (b, e)
-    { };
+    { }
     FR () : striping ()
-    { };
-    int operator     () (int /*i*/) const
+    { }
+    int operator () (int /*i*/) const
     {
         return begin + rnd(diff);
     }
@@ -1012,12 +1018,12 @@ struct SR : public striping
     SR (int b, int e) : striping (b, e)
     {
         offset = rnd(diff);
-    };
+    }
     SR() : striping ()
     {
         offset = rnd(diff);
-    };
-    int operator     () (int i) const
+    }
+    int operator () (int i) const
     {
         return begin + (i + offset) % diff;
     }
@@ -1049,7 +1055,7 @@ struct RC : public striping
         random_number<random_uniform_fast> rnd;
         std::random_shuffle (perm.begin (), perm.end (), rnd __STXXL_FORCE_SEQUENTIAL);
     }
-    int operator     () (int i) const
+    int operator () (int i) const
     {
         return begin + perm[i % diff];
     }
@@ -1059,7 +1065,7 @@ struct RC : public striping
     }
 };
 
-struct RC_disk : public RC 
+struct RC_disk : public RC
 {
     RC_disk (int b, int e) : RC (b, e)
     { }
@@ -1071,7 +1077,7 @@ struct RC_disk : public RC
     }
 };
 
-struct RC_flash : public RC 
+struct RC_flash : public RC
 {
     RC_flash (int b, int e) : RC (b, e)
     { }
@@ -1089,11 +1095,11 @@ struct single_disk
 {
     const int disk;
     single_disk(int d, int = 0) : disk(d)
-    { };
+    { }
 
     single_disk() : disk(0)
-    { };
-    int operator() (int /*i*/) const
+    { }
+    int operator () (int /*i*/) const
     {
         return disk;
     }
@@ -1120,7 +1126,7 @@ struct offset_allocator
     //! \param offset_ offset
     //! \param base_ used to create a copy
     offset_allocator(int_type offset_, BaseAllocator_ & base_) : base(base_), offset(offset_) { }
-    int operator() (int_type i) const
+    int operator () (int_type i) const
     {
         return base(offset + i);
     }
@@ -1196,6 +1202,7 @@ protected:
         const unsigned_type nblocks,
         DiskAssgnFunctor functor,
         BIDIteratorClass out);
+
 public:
     //! \brief Returns instance of block_manager
     //! \return pointer to the only instance of block_manager
@@ -1244,6 +1251,7 @@ public:
     void delete_block (const BID < BLK_SIZE > &bid);
 
     ~block_manager ();
+
 private:
     static block_manager *instance;
 };
@@ -1261,7 +1269,7 @@ void block_manager::new_blocks_int (
     // bid_type tmpbid;
     int_type * bl = new int_type[ndisks];
     bid_array_type * disk_bids = new bid_array_type[ndisks];
-    file * * disk_ptrs = new file * [nblocks];
+    file * * disk_ptrs = new file *[nblocks];
 
     memset(bl, 0, ndisks * sizeof(int_type));
 
@@ -1303,9 +1311,9 @@ void block_manager::new_blocks_int (
         *it = bid_type(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
     }
 
-    delete [] bl;
-    delete [] disk_bids;
-    delete [] disk_ptrs;
+    delete[] bl;
+    delete[] disk_bids;
+    delete[] disk_ptrs;
 }
 
 template < class BlockType, class DiskAssgnFunctor, class OutputIterator >
@@ -1347,7 +1355,7 @@ void block_manager::delete_block (const BID < BLK_SIZE > &bid)
     //assert(bid.storage->get_disk_number () < config::get_instance ()->disks_number ());
     if (bid.storage->get_disk_number () == -1)
         return; // self managed disk
-    assert(bid.storage->get_disk_number () >= 0 );
+    assert(bid.storage->get_disk_number () >= 0);
     disk_allocators[bid.storage->get_disk_number ()]->delete_block (bid);
 }
 

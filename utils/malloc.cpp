@@ -43,7 +43,7 @@ int main(int argc, char * argv[])
     char * ptr = new char[bytes];
     cout << "Allocated " << bytes << " bytes" << endl;
     print_malloc_stats();
-    delete [] ptr;
+    delete[] ptr;
     cout << "Deallocated " << endl;
     print_malloc_stats();
 }

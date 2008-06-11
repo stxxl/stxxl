@@ -26,9 +26,10 @@ __STXXL_BEGIN_NAMESPACE
 class set_switch_handler
 {
     onoff_switch &switch_;
+
 public:
     set_switch_handler(onoff_switch & switch__) : switch_(switch__) { }
-    void operator()  (request * /*req*/) { switch_.on(); }
+    void operator ()  (request * /*req*/) { switch_.on(); }
 };
 
 //! \brief Encapsulates asynchronous prefetching engine
@@ -39,6 +40,7 @@ template <typename block_type, typename bid_iterator_type>
 class block_prefetcher
 {
     block_prefetcher() { }
+
 protected:
     bid_iterator_type consume_seq_begin;
     bid_iterator_type consume_seq_end;
@@ -71,9 +73,10 @@ protected:
         STXXL_VERBOSE1("block_prefetcher: finished waiting block " << iblock);
         int_type ibuffer = pref_buffer[iblock];
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);
-        assert(ibuffer >= 0 && ibuffer < nreadblocks );
+        assert(ibuffer >= 0 && ibuffer < nreadblocks);
         return (read_buffers + ibuffer);
     }
+
 public:
     //! \brief Constructs an object and immediately starts prefetching
     //! \param _cons_begin \c bid_iterator pointing to the \c bid of the first block to be consumed
@@ -86,7 +89,7 @@ public:
         bid_iterator_type _cons_end,
         int_type * _pref_seq,
         int_type _prefetch_buf_size
-    ) :
+        ) :
         consume_seq_begin(_cons_begin),
         consume_seq_end(_cons_end),
         seq_length(_cons_end - _cons_begin),
@@ -102,7 +105,7 @@ public:
         int_type i;
         read_buffers = new block_type[nreadblocks];
         read_reqs = new request_ptr[nreadblocks];
-        pref_buffer = new int_type [seq_length];
+        pref_buffer = new int_type[seq_length];
 
         std::fill(pref_buffer, pref_buffer + seq_length, -1);
 
@@ -112,11 +115,11 @@ public:
         {
             STXXL_VERBOSE1("block_prefetcher: reading block " << i
                                                               << " prefetch_seq[" << i << "]=" << prefetch_seq[i]);
-            assert( prefetch_seq[i] < int_type(seq_length));
-            assert( prefetch_seq[i] >= 0 );
+            assert(prefetch_seq[i] < int_type(seq_length));
+            assert(prefetch_seq[i] >= 0);
             read_reqs[i] = read_buffers[i].read (
                 *(consume_seq_begin + prefetch_seq[i]),
-                set_switch_handler(*(completed + prefetch_seq[i])) );
+                set_switch_handler(*(completed + prefetch_seq[i])));
             pref_buffer[prefetch_seq[i]] = i;
         }
     }
@@ -147,14 +150,14 @@ public:
             int_type next_2_prefetch = prefetch_seq[nextread++];
             STXXL_VERBOSE1("block_prefetcher: prefetching block " << next_2_prefetch);
 
-            assert(next_2_prefetch < int_type(seq_length) && next_2_prefetch >= 0 );
-            assert( !completed[next_2_prefetch].is_on() );
+            assert(next_2_prefetch < int_type(seq_length) && next_2_prefetch >= 0);
+            assert(!completed[next_2_prefetch].is_on());
 
             pref_buffer[next_2_prefetch] = ibuffer;
             read_reqs[ibuffer] = read_buffers[ibuffer].read(
                 *(consume_seq_begin + next_2_prefetch),
                 set_switch_handler(*(completed + next_2_prefetch))
-                                 );
+                );
         }
 
         if (nextconsume >= seq_length)
@@ -173,10 +176,10 @@ public:
                 read_reqs[i]->wait();
 
 
-        delete [] read_reqs;
-        delete [] completed;
-        delete [] pref_buffer;
-        delete [] read_buffers;
+        delete[] read_reqs;
+        delete[] completed;
+        delete[] pref_buffer;
+        delete[] read_buffers;
     }
 };
 

@@ -40,13 +40,13 @@ namespace btree
         {
             bool operator ()  (const bid_type & a, const bid_type & b) const
             {
-                return (a.storage < b.storage) || ( a.storage == b.storage && a.offset < b.offset);
+                return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);
             }
         };
         struct KeyCmp
         {
             bid_comp BIDComp;
-            bool operator() (const Key & a, const Key & b) const
+            bool operator () (const Key & a, const Key & b) const
             {
                 return BIDComp(a.bid, b.bid) || (a.bid == b.bid && a.pos < b.pos);
             }
@@ -73,7 +73,6 @@ namespace btree
         }
 
     public:
-
         iterator_map(btree_type * b) : btree_(b)
         { }
 
@@ -97,8 +96,8 @@ namespace btree
             mmiterator_type i = range.first;
             for ( ; i != range.second; ++i)
             {
-                assert(it.bid == (*i).first.bid );
-                assert(it.pos == (*i).first.pos );
+                assert(it.bid == (*i).first.bid);
+                assert(it.pos == (*i).first.pos);
 
                 if ((*i).second == &it)
                 {
@@ -111,11 +110,11 @@ namespace btree
             STXXL_THROW(std::runtime_error, "unregister_iterator", "Panic in btree::iterator_map, can not find and unregister iterator");
         }
         template <class OutputContainer>
-        void find(      const bid_type & bid,
-                        unsigned first_pos,
-                        unsigned last_pos,
-                        OutputContainer & out
-        )
+        void find(const bid_type & bid,
+                  unsigned first_pos,
+                  unsigned last_pos,
+                  OutputContainer & out
+                  )
         {
             Key firstkey(bid, first_pos);
             Key lastkey(bid, last_pos);
@@ -152,8 +151,8 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class BTreeType>
-    void swap( stxxl::btree::iterator_map < BTreeType > & a,
-               stxxl::btree::iterator_map<BTreeType> & b)
+    void swap(stxxl::btree::iterator_map < BTreeType > & a,
+              stxxl::btree::iterator_map<BTreeType> & b)
     {
         a.swap(b);
     }

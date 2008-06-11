@@ -127,6 +127,7 @@ namespace stream
         {
             in.reset();
         }
+
     public:
         typedef vector_iterator2stream<InputIterator_> Self_;
 
@@ -148,7 +149,7 @@ namespace stream
 
                 // skip the beginning of the block
                 for ( ; cur != begin; ++cur)
-                    ++ (*in);
+                    ++(*in);
             }
         }
 
@@ -170,7 +171,7 @@ namespace stream
         {
             assert(end_ != current_);
             ++current_;
-            ++ (*in);
+            ++(*in);
             if (empty())
                 delete_stream();
 
@@ -258,6 +259,7 @@ namespace stream
         iterator2stream<InputIterator_> *it_stream;
 
         typedef typename InputIterator_::block_type block_type;
+
     public:
         typedef vector_iterator2stream_sr<InputIterator_> Self_;
 
@@ -266,7 +268,7 @@ namespace stream
 
         vector_iterator2stream_sr(InputIterator_ begin, InputIterator_ end, unsigned_type nbuffers = 0)
         {
-            if (end - begin < block_type::size )
+            if (end - begin < block_type::size)
             {
                 STXXL_VERBOSE1("vector_iterator2stream_sr::vector_iterator2stream_sr: Choosing iterator2stream<InputIterator_>");
                 it_stream = new iterator2stream<InputIterator_>(begin, end);
@@ -303,10 +305,10 @@ namespace stream
         Self_ &  operator ++()
         {
             if (it_stream)
-                ++ (*it_stream);
+                ++(*it_stream);
 
             else
-                ++ (*vec_it_stream);
+                ++(*vec_it_stream);
 
 
             return *this;
@@ -445,9 +447,9 @@ namespace stream
 
         assert(outbegin.block_offset() == 0);
 
-        while (!in.empty() && outend != outbegin )
+        while (!in.empty() && outend != outbegin)
         {
-            if (outbegin.block_offset() == 0 )
+            if (outbegin.block_offset() == 0)
                 outbegin.touch();
 
             *outstream = *in;
@@ -514,11 +516,11 @@ namespace stream
         // create buffered write stream for blocks
         buf_ostream_type outstream(out.bid(), nbuffers);
 
-        assert( out.block_offset() == 0 );
+        assert(out.block_offset() == 0);
 
         while (!in.empty())
         {
-            if (out.block_offset() == 0 )
+            if (out.block_offset() == 0)
                 out.touch();
             // tells the vector that the block was modified
             *outstream = *in;
@@ -551,6 +553,7 @@ namespace stream
     public:
         //! \brief Standard stream typedef
         typedef typename Generator_::value_type value_type;
+
     private:
         Generator_ gen_;
         value_type current_;
@@ -595,7 +598,7 @@ namespace stream
         return generator2stream<Generator_>(gen_);
     }
 
-    struct Stopper {};
+    struct Stopper { };
 
     //! \brief Processes (up to) 6 input streams using given operation functor
     //!
@@ -624,14 +627,15 @@ namespace stream
         Input4_ &i4;
         Input5_ &i5;
         Input6_ &i6;
+
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_, Input5_ & i6_) :
@@ -688,14 +692,15 @@ namespace stream
     {
         Operation_ op;
         Input1_ &i1;
+
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         transform(Operation_ o, Input1_ & i1_) : op(o), i1(i1_),
                                                  current(op(*i1)) { }
@@ -746,14 +751,15 @@ namespace stream
         Operation_ op;
         Input1_ &i1;
         Input2_ &i2;
+
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         transform(Operation_ o, Input1_ & i1_, Input2_ & i2_) : op(o), i1(i1_), i2(i2_),
                                                                 current(op(*i1, *i2)) { }
@@ -808,14 +814,15 @@ namespace stream
         Input1_ &i1;
         Input2_ &i2;
         Input3_ &i3;
+
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_) :
             op(o), i1(i1_), i2(i2_), i3(i3_),
@@ -875,14 +882,15 @@ namespace stream
         Input2_ &i2;
         Input3_ &i3;
         Input4_ &i4;
+
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_) :
             op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_),
@@ -946,14 +954,15 @@ namespace stream
         Input3_ &i3;
         Input4_ &i4;
         Input5_ &i5;
+
     public:
         //! \brief Standard stream typedef
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_) :
@@ -1032,8 +1041,8 @@ namespace stream
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         make_tuple(
             Input1_ & i1_,
@@ -1042,7 +1051,7 @@ namespace stream
             Input4_ & i4_,
             Input5_ & i5_,
             Input6_ & i6_
-        ) :
+            ) :
             i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_),
             current(value_type(*i1, *i2, *i3, *i4, *i5, *i6)) { }
 
@@ -1106,13 +1115,13 @@ namespace stream
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         make_tuple(
             Input1_ & i1_,
             Input2_ & i2_
-        ) :
+            ) :
             i1(i1_), i2(i2_)
         {
             if (!empty())
@@ -1179,14 +1188,14 @@ namespace stream
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         make_tuple(
             Input1_ & i1_,
             Input2_ & i2_,
             Input3_ & i3_
-        ) :
+            ) :
             i1(i1_), i2(i2_), i3(i3_),
             current(value_type(*i1, *i2, *i3)) { }
 
@@ -1253,15 +1262,15 @@ namespace stream
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         make_tuple(
             Input1_ & i1_,
             Input2_ & i2_,
             Input3_ & i3_,
             Input4_ & i4_
-        ) :
+            ) :
             i1(i1_), i2(i2_), i3(i3_), i4(i4_),
             current(value_type(*i1, *i2, *i3, *i4)) { }
 
@@ -1335,8 +1344,8 @@ namespace stream
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
         make_tuple(
             Input1_ & i1_,
@@ -1344,7 +1353,7 @@ namespace stream
             Input3_ & i3_,
             Input4_ & i4_,
             Input5_ & i5_
-        ) :
+            ) :
             i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_),
             current(value_type(*i1, *i2, *i3, *i4, *i5)) { }
 
@@ -1400,17 +1409,17 @@ namespace stream
         Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
-    public:
 
+    public:
         //! \brief Standard stream typedef
         typedef typename tuple_type::first_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
-        choose( Input_ & in_) :
+        choose(Input_ & in_) :
             in(in_),
             current((*in_).first) { }
 
@@ -1456,17 +1465,17 @@ namespace stream
         Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
-    public:
 
+    public:
         //! \brief Standard stream typedef
         typedef typename tuple_type::second_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
-        choose( Input_ & in_) :
+        choose(Input_ & in_) :
             in(in_),
             current((*in_).second) { }
 
@@ -1512,17 +1521,17 @@ namespace stream
         Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
-    public:
 
+    public:
         //! \brief Standard stream typedef
         typedef typename tuple_type::third_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
-        choose( Input_ & in_) :
+        choose(Input_ & in_) :
             in(in_),
             current((*in_).third) { }
 
@@ -1568,17 +1577,17 @@ namespace stream
         Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
-    public:
 
+    public:
         //! \brief Standard stream typedef
         typedef typename tuple_type::fourth_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
-        choose( Input_ & in_) :
+        choose(Input_ & in_) :
             in(in_),
             current((*in_).fourth) { }
 
@@ -1624,17 +1633,17 @@ namespace stream
         Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
-    public:
 
+    public:
         //! \brief Standard stream typedef
         typedef typename tuple_type::fifth_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
-        choose( Input_ & in_) :
+        choose(Input_ & in_) :
             in(in_),
             current((*in_).fifth) { }
 
@@ -1680,17 +1689,17 @@ namespace stream
         Input_ &in;
 
         typedef typename Input_::value_type tuple_type;
-    public:
 
+    public:
         //! \brief Standard stream typedef
         typedef typename tuple_type::sixth_type value_type;
 
     private:
         value_type current;
-    public:
 
+    public:
         //! \brief Construction
-        choose( Input_ & in_) :
+        choose(Input_ & in_) :
             in(in_),
             current((*in_).sixth) { }
 
@@ -1734,6 +1743,7 @@ namespace stream
         Input &input;
         BinaryPredicate binary_pred;
         typename Input::value_type current;
+
     public:
         typedef typename Input::value_type value_type;
         unique(Input & input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
@@ -1747,7 +1757,7 @@ namespace stream
         {
             value_type old_value = current;
             ++input;
-            while (!input.empty() && (binary_pred(current = *input, old_value)) )
+            while (!input.empty() && (binary_pred(current = *input, old_value)))
                 ++input;
         }
         //! \brief Standard stream method
@@ -1770,6 +1780,7 @@ namespace stream
     {
         Input &input;
         typename Input::value_type current;
+
     public:
         typedef typename Input::value_type value_type;
         unique(Input & input_) : input(input_)

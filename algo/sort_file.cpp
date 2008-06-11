@@ -66,7 +66,7 @@ int main()
     unsigned memory_to_use = 50 * 1024 * 1024;
     typedef stxxl::vector<my_type> vector_type;
     {
-        vector_type v( &f);
+        vector_type v(&f);
 
         /*
                 STXXL_MSG("Printing...");
@@ -75,14 +75,14 @@ int main()
          */
 
         STXXL_MSG("Checking order...");
-        STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
+        STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
 
         STXXL_MSG("Sorting...");
         stxxl::ksort(v.begin(), v.end(), memory_to_use);
         //stxxl::sort(v.begin(),v.end()-101,Cmp(),memory_to_use);
 
         STXXL_MSG("Checking order...");
-        STXXL_MSG( ((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG" ));
+        STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
     }
     STXXL_MSG("OK");
 

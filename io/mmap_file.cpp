@@ -192,4 +192,3 @@ request_ptr mmap_file::awrite (
 __STXXL_END_NAMESPACE
 
 #endif
-
