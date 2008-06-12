@@ -8,6 +8,7 @@ Version 1.2.0 (UNRELEASED)
   - insert_queue: replaced std::priority_queue with a special
     implementation internal_priority_queue that allows for
     fast exporting of all elements
+  - even more bugs and inefficiencies fixed
   - significant speed improvements
 * random number generators are now all seedable,
   should allow redoing identical program runs for debugging purposes
@@ -22,12 +23,14 @@ Version 1.2.0 (UNRELEASED)
 * add compatibility wrappers for standard extensions
   hash_map, hash_set, auto_ptr
 * MCSTL is only supported with g++ 4.2 and icpc 10.x
+* lots of small bugfixes
 * general code cleanup
   - fixed most compiler warnings
   - elimination of duplicate and unused code
   - cleaned up and sanitized debugging macros
   - no more 'using namespace std' and 'using namespace stxxl'
   - fixed ambiguities noted by g++ 4.3
+  - add/unify/cleanup copyright headers
 * general code reformatting (uncrustify)
 * add support for new compiler releases
 * portability fixes for different platforms
