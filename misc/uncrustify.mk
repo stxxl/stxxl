@@ -22,6 +22,7 @@ viewdiff:
 
 clean:
 	$(RM) $(FILES:=.uncrustify) $(FILES:=.uncrustifyT) $(FILES:=.diff)
+	$(RM) $(UNCRUSTIFY_CFG)-file-header
 
 .SECONDARY:
 
@@ -52,5 +53,11 @@ update-uncrustify-cfg:
 	cmp -s $(UNCRUSTIFY_CFG).tmp $(UNCRUSTIFY_CFG) || cp -p $(UNCRUSTIFY_CFG) $(UNCRUSTIFY_CFG).old
 	cmp -s $(UNCRUSTIFY_CFG).tmp $(UNCRUSTIFY_CFG) || cp $(UNCRUSTIFY_CFG).tmp $(UNCRUSTIFY_CFG)
 	$(RM) $(UNCRUSTIFY_CFG).tmp
+
+uncrustify-file-header: $(UNCRUSTIFY_CFG)-file-header
+	$(MAKE) -f $(lastword $(MAKEFILE_LIST)) uncrustify-test uncrustify-diff UNCRUSTIFY_CFG=$(UNCRUSTIFY_CFG)-file-header
+
+$(UNCRUSTIFY_CFG)-file-header: $(UNCRUSTIFY_CFG)
+	sed -e '/cmt_insert_file_header/s/""/misc\/fileheader.txt/' $< > $@
 
 .PHONY: all clean viewdiff uncrustify-test uncrustify-diff uncrustify-apply update-uncrustify-cfg
