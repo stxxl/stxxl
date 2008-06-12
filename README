@@ -6,7 +6,9 @@ documentation: http://stxxl.sourceforge.net
 
 LICENSE TERMS
 
-Please read the file LICENSE or the section License Terms of the manual.
+STXXL is distributed under the Boost Software License, Version 1.0.
+(See accompanying file LICENSE_1_0.txt or copy at
+http://www.boost.org/LICENSE_1_0.txt)
 
 
 BUGS AND QUESTIONS

@@ -17,11 +17,13 @@
  * - prevention of OS file buffering overhead
  * - algorithm pipelining
  *
+ *
  * \section platforms Supported Operating Systems
  * - Linux (kernel >= 2.4.18)
  * - Solaris
  * - other POSIX compatible systems should work, but have not been tested
  * - Windows XP/2000
+ *
  *
  * \section compilers Supported Compilers
  *
@@ -64,6 +66,7 @@ MSVC 2005 8.0 |    -        -         x        n/a
        parallel mode is not yet supported in this stxxl release
 \endverbatim
  *
+ *
  * \section boost Supported BOOST versions
  *
  * The <a href="http://www.boost.org">Boost</a> libraries are required on
@@ -84,6 +87,7 @@ MSVC 2005 8.0 |    -        -         x        n/a
  *
  * - \link install-svn Installing from subversion \endlink
  *
+ *
  * \section questions Questions
  *
  * - Questions concerning use and development of the \c S<small>TXXL</small>
@@ -93,6 +97,12 @@ MSVC 2005 8.0 |    -        -         x        n/a
  *
  * - \link FAQ FAQ - Frequently Asked Questions \endlink
  *
+ *
+ * \section license License
+ *
+ * \c S<small>TXXL</small> is distributed under the Boost Software License, Version 1.0.<br>
+ * You can find a copy of the license in the accompanying file \c LICENSE_1_0.txt or online at
+ * <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
  */
 
 
