@@ -2,8 +2,10 @@
 
 * FIXME: README refers to a Section "License Terms" in the manual which is
   missing
+  => Milestone: ASAP
 
 * FIXME: there are some FIXME in doxymain.h
+  => Milestone: ASAP
 
 * There is currently no support for Boost libraries (not headers) in a user
   specified location.
@@ -11,6 +13,7 @@
 * BUG: timer::timestamp() is non-monotonic, boost::posix_time::microsec_clock::local_time().time_of_day() resets on midnight
 
 * g++ 4.3 parallel_mode support
+  => Milestone: 1.2.1
 
 * replace build system, something with '$LIBNAME-config --libs --cflags ...' would be nice
 
@@ -24,3 +27,10 @@
   use that file, too)
 
 * new types: stxxl::size_type_internal stxxl::size_type_external
+
+* stxxl_timestamp ==> stxxl::timestamp
+
+* Use #include <foo> instead of #include "foo"? At least use one format consistently.
+
+* integrate unordered_map branch
+  => Milestone: 1.3
