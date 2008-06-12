@@ -1,11 +1,42 @@
 Version 1.2.0 (UNRELEASED)
 
-* fixed a rare assertion in stxxl::priority_queue
 * made the block management layer thread-safe
 * made all size_types unsigned
-* minor tweaks to the build system
-* check whether STXXL_ROOT has been set correctly
-* build system now only requires GNU make 3.78 or later
+* stxxl::priority_queue
+  - fixed a rare assertion
+  - fixed a race condition by using proper block hinting
+  - insert_queue: replaced std::priority_queue with a special
+    implementation internal_priority_queue that allows for
+    fast exporting of all elements
+  - significant speed improvements
+* random number generators are now all seedable,
+  should allow redoing identical program runs for debugging purposes
+* stxxl::noncopyable, inspired by boost::noncopyable: inheriting from this
+  class forbids copying of objects when this is undesirable
+* stxxl::vector, all sorting functions: replaced TwoToOneDimArrayRowAdaptor
+  with ArrayOfSequencesIterator which is much faster, especially
+  if blocks have padding
+* if required, verify that the sentinels satisfy a strict weak ordering
+* fix existing alloation strategies and add experimental support for
+  distinguishing between regular disks and flash devices
+* add compatibility wrappers for standard extensions
+  hash_map, hash_set, auto_ptr
+* MCSTL is only supported with g++ 4.2 and icpc 10.x
+* general code cleanup
+  - fixed most compiler warnings
+  - elimination of duplicate and unused code
+  - cleaned up and sanitized debugging macros
+  - no more 'using namespace std' and 'using namespace stxxl'
+  - fixed ambiguities noted by g++ 4.3
+* general code reformatting (uncrustify)
+* add support for new compiler releases
+* portability fixes for different platforms
+* build system
+  - lots of small modifications
+  - now only requires GNU make 3.78 or later
+  - check whether STXXL_ROOT has been set correctly and if unset, try
+    autoconfiguration by creating make.settings.local with defaults
+  - improved and simplified boost support for posix systems
 * update install and usage instructions
 * spell checked sources and documentation
 
@@ -25,7 +56,7 @@ Version 1.1.0 (31 July 2007)
   - the library build creates stxxl.mk which can be included in an applications Makefile to set the correct compiler/linker switches for stxxl
   - similarly mcstxxl.mk is created for a stxxl compiled with mcstl support
   - add dependency tracking and improve parallelism during build
-* compiler support matrix:
+* compiler support matrix: (for an up-to-date list, please see the doxygen documentation)
   compiler      |  stxxl    stxxl + mcstl
   --------------+------------------------
   GCC 4.3       |    x            x
