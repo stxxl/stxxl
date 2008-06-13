@@ -50,5 +50,6 @@ int main()
 
     stxxl::aligned_dealloc < 4096 > (buffer);
 
+    std::cout << *(stxxl::stats::get_instance());
     return 0;
 }
