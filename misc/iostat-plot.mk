@@ -1,7 +1,27 @@
 
+#
+# to record the data, include this file from your Makefile
+# and use a target like
+#
+# my_results.txt:
+#	$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.out=) \
+#	my_program arg1 ... argn > $@
+#
+# and then run
+#
+# make my_results.out
+# make my_results.io.plot
+# make my_results.cpu.plot
+#
+
 empty	?=#
 space	?= $(empty) $(empty)
 comma	?= ,
+
+IOSTAT_PLOT_BINDIR		?= .
+IOSTAT_PLOT_RECORD_DATA		?= $(IOSTAT_PLOT_BINDIR)/record-load-iostat
+IOSTAT_PLOT_CONCAT_LINES	?= $(IOSTAT_PLOT_BINDIR)/concat-lines
+IOSTAT_PLOT_FLOATING_AVERAGE	?= $(IOSTAT_PLOT_BINDIR)/floating-average
 
 IOSTAT_PLOT_LINE_IDENTIFIER	?= ^sd
 IOSTAT_PLOT_CPU_LINE_IDENTIFIER	?= ^$(space)$(space)$(space)
@@ -69,14 +89,14 @@ endef
 
 %.io-$(IOSTAT_PLOT_AVERAGE.io).dat: %.iostat $(wildcard $(TOPDIR_RESULTS)/*.mk Makefile*)
 	$(pipefail) \
-	concat-lines.pl $< $(IOSTAT_PLOT_LINE_IDENTIFIER) | \
+	$(IOSTAT_PLOT_CONCAT_LINES) $< $(IOSTAT_PLOT_LINE_IDENTIFIER) | \
 	grep "$(IOSTAT_PLOT_LINE_IDENTIFIER)" | \
-	floating-average.pl $(IOSTAT_PLOT_AVERAGE.io) > $@
+	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.io) > $@
 
 %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).dat: %.iostat $(wildcard $(TOPDIR_RESULTS)/*.mk Makefile*)
 	$(pipefail) \
 	grep "$(IOSTAT_PLOT_CPU_LINE_IDENTIFIER)" $< | \
-	floating-average.pl $(IOSTAT_PLOT_AVERAGE.cpu) > $@
+	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.cpu) > $@
 
 %.io-$(IOSTAT_PLOT_AVERAGE.io).plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).dat
 	$(call template-iostat-gnuplot,io,$(IOSTAT_PLOT_DISKS),$(IOSTAT_PLOT_STRIDE))
