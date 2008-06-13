@@ -53,7 +53,7 @@ bool operator != (const my_type & a, const my_type & b)
     return a._key != b._key;
 }
 
-struct Cmp
+struct Cmp : public std::less<my_type>
 {
     bool operator ()  (const my_type & a, const my_type & b) const
     {
