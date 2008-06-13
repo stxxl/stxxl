@@ -50,7 +50,7 @@ ICPC 10.1.015 |    x       x¹        x         x¹
 ICPC 10.0.026 |    x       x¹        x         x¹
 ICPC 9.1.053  |    x¹      -         x¹        -
 ICPC 9.0.032  |    x¹      -         x¹        -
-MSVC 2005 8.0 |    -        -         x        n/a
+MSVC 2005 8.0 |    -       -         x        n/a
 
  x   = full support
  o   = partial support
@@ -82,7 +82,7 @@ MSVC 2005 8.0 |    -        -         x        n/a
  *
  * - \link installation_linux_gcc Installation (Linux/g++) \endlink
  * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
- * - \link installation_msvc Installation (Windows/MS Visual C++ 7.1) \endlink
+ * - \link installation_msvc Installation (Windows/MS Visual C++ 8.0) \endlink
  * - \link installation_old Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
@@ -141,7 +141,7 @@ MSVC 2005 8.0 |    -        -         x        n/a
  * \page install Installation
  * - \link installation_linux_gcc Installation (Linux/g++) \endlink
  * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
- * - \link installation_msvc Installation (Windows/MS Visual C++ 7.1) \endlink
+ * - \link installation_msvc Installation (Windows/MS Visual C++ 8.0) \endlink
  * - \link installation_old Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
@@ -289,7 +289,7 @@ my_example.bin: my_example.o
 
 
 /*!
- * \page installation_msvc Installation (Windows/MS Visual C++ 7.1 - Stxxl from version 0.9)
+ * \page installation_msvc Installation (Windows/MS Visual C++ 8.0 - Stxxl from version 0.9)
  *
  * \section download Download and library compilation
  *
@@ -645,7 +645,7 @@ my_example.bin: my_example.o
  *
  * - \link installation_linux_gcc Installation (Linux/g++) \endlink
  * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
- * - \link installation_msvc Installation (Windows/MS Visual C++ 7.1) \endlink
+ * - \link installation_msvc Installation (Windows/MS Visual C++ 8.0) \endlink
  *
  * \section update Updating an existing subversion checkout
  *
