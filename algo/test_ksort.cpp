@@ -1,22 +1,26 @@
 /***************************************************************************
- *            test_ksort.cpp
+ *  algo/test_ksort.cpp
  *
- *  Fri Oct  4 19:41:25 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
-
-
-// #define PLAY_WITH_OPT_PREF
-
-int n_prefetch_buffers;
-int n_opt_prefetch_buffers;
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #include "stxxl/mng"
 #include "stxxl/ksort"
 #include "stxxl/vector"
 #include "stxxl/random"
 #include "stxxl/scan"
+
+
+// #define PLAY_WITH_OPT_PREF
+
+int n_prefetch_buffers;
+int n_opt_prefetch_buffers;
 
 #ifndef RECORD_SIZE
  #define RECORD_SIZE 128

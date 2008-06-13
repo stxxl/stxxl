@@ -1,21 +1,24 @@
 /***************************************************************************
- *            test_stable_ksort1.cpp
+ *  algo/test_stable_ksort1.cpp
  *
- *  Thu Feb  6 11:46:53 2003
- *  Copyright  2003  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
-
-
-//#define COUNT_WAIT_TIME
-
-// #define PLAY_WITH_OPT_PREF
-
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #include "stxxl/mng"
 #include "stxxl/stable_ksort"
 #include "stxxl/vector"
 #include "stxxl/random"
+
+
+//#define COUNT_WAIT_TIME
+
+// #define PLAY_WITH_OPT_PREF
 
 
 #ifndef RECORD_SIZE
