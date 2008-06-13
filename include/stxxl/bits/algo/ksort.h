@@ -1,13 +1,17 @@
+/***************************************************************************
+ *  include/stxxl/bits/algo/ksort.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #ifndef KSORT_HEADER
 #define KSORT_HEADER
-
-/***************************************************************************
- *            ksort.h
- *
- *  Fri Oct  4 19:18:04 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
 
 #include <list>
 

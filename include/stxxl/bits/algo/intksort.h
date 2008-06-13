@@ -1,13 +1,17 @@
+/***************************************************************************
+ *  include/stxxl/bits/algo/intksort.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Peter Sanders <sanders@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #ifndef INTKSORT_HEADER
 #define INTKSORT_HEADER
-
-/***************************************************************************
- *            keysort.h
- *
- *  Thu Sep 26 18:07:14 2002
- *  Copyright  2002 Peter Sanders
- *  sanders@mpi-sb.mpg.de
- ****************************************************************************/
 
 #include "stxxl/bits/common/utils.h"
 

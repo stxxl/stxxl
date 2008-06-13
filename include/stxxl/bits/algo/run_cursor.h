@@ -1,13 +1,17 @@
+/***************************************************************************
+ *  include/stxxl/bits/algo/run_cursor.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #ifndef RUN_CURSOR_HEADER
 #define RUN_CURSOR_HEADER
-
-/***************************************************************************
- *            run_cursor.h
- *
- *  Mon Jan 20 10:38:01 2003
- *  Copyright  2003  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
 
 #include "stxxl/bits/common/utils.h"
 

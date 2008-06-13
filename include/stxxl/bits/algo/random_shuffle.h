@@ -1,14 +1,18 @@
+/***************************************************************************
+ *  include/stxxl/bits/algo/random_shuffle.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Manuel Krings
+ *  Copyright (C) 2007 Markus Westphal
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #ifndef STXXL_RANDOM_SHUFFLE_HEADER
 #define STXXL_RANDOM_SHUFFLE_HEADER
-
-/***************************************************************************
- *            random_shuffle.h
- *
- *  Tue May  29 14:48:04 2007
- *  Copyright  2007 Manuel Krings, Markus Westphal
- *
- *
- ****************************************************************************/
 
 // TODO: improve main memory consumption in recursion
 //        (free stacks buffers)

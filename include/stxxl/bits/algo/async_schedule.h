@@ -1,13 +1,17 @@
+/***************************************************************************
+ *  include/stxxl/bits/algo/async_schedule.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #ifndef ASYNC_SCHEDULE_HEADER
 #define ASYNC_SCHEDULE_HEADER
-
-/***************************************************************************
- *            async_schedule.h
- *
- *  Fri Oct 25 16:08:06 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
 
 #include "stxxl/io"
 

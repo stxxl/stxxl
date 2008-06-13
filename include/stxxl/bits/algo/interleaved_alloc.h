@@ -1,13 +1,17 @@
+/***************************************************************************
+ *  include/stxxl/bits/algo/interleaved_alloc.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #ifndef INTERLEAVED_ALLOC_HEADER
 #define INTERLEAVED_ALLOC_HEADER
-
-/***************************************************************************
- *            interleaved_alloc.h
- *
- *  Fri Oct  4 23:14:44 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/common/rand.h"
