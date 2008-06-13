@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,7 +16,8 @@
 #include "stxxl/vector"
 
 //! \example algo/sort_file.cpp
-//! This is an example of how to create \c stxxl::vector from an external file
+//! This example imports a file into an \c stxxl::vector without copying its
+//! content and then sorts it using stxxl::sort.
 
 
 struct my_type
