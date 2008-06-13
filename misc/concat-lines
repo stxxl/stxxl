@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+#Concatenate the lines of file $ARGV[0] which both satisfy regular expression $ARGV[1]
+
+open(INPUT, $ARGV[0]);
+$former = '';
+while($line = <INPUT>)
+{
+  if(!($line =~ /$ARGV[1]/) || !($former =~ /$ARGV[1]/))
+  {
+    print("\n");
+  }
+  else
+  {
+    print("\t");
+  }
+  chomp($line);
+  print($line);
+  $former = $line;
+}
+print("\n");
+close(INPUT);
