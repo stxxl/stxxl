@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/test_ksort1.cpp
+ *  algo/test_ksort.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -15,7 +15,7 @@
 #include "stxxl/vector"
 #include "limits"
 
-//! \example algo/test_ksort1.cpp
+//! \example algo/test_ksort.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
 
 

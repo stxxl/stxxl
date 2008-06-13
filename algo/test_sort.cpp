@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/test_sort1.cpp
+ *  algo/test_sort.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -14,7 +14,7 @@
 #include "stxxl/sort"
 #include "stxxl/vector"
 
-//! \example algo/test_sort1.cpp
+//! \example algo/test_sort.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
 
 

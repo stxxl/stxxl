@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/test_ksort.cpp
+ *  algo/test_ksort_all_parameters.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
