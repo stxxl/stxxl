@@ -477,19 +477,6 @@ my_example.bin: my_example.o
  * the running time will be halved. Adding more disks might also increase performance significantly.
  *
  *
- * \section filesystem Recommended file system
- *
- * FIXME: XFS on Solaris ???
- *
- * Our library take benefit of direct user memory - disk transfers (direct access) which avoids
- * superfluous copies.
- * We recommend to use the
- * \c XFS file system <A href="http://oss.sgi.com/projects/xfs/">link</A> that
- * gives good read and write performance for large files.
- * Note that file creation speed of \c XFS is slow, so that disk
- * files should be precreated.
- *
- *
  * \section configuration Disk configuration file
  *
  * You must define the disk configuration for an

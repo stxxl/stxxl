@@ -1,8 +1,5 @@
 * parallel_pipeling (is currently being developed in it's own branch)
 
-* FIXME: there are some FIXME in doxymain.h
-  => Milestone: ASAP
-
 * There is currently no support for Boost libraries (not headers) in a user
   specified location.
 
