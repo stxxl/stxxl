@@ -2,7 +2,7 @@
  *            diskqueue.cpp
  *
  *  Sat Aug 24 23:52:06 2002
- *  Copyright  2002  Roman Dementiev
+ *  Copyright  2002-2005  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
