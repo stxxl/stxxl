@@ -1,10 +1,16 @@
 /***************************************************************************
- *            boostfd_file.h
- *  File implementation based on boost::iostreams::file_decriptor
- *  Thu Oct 19 14:01:00 2006
- *  Copyright  2006  Roman Dementiev
+ *  include/stxxl/bits/io/boostfd_file.h
  *
- ****************************************************************************/
+ *  File implementation based on boost::iostreams::file_decriptor
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_BOOSTFD_FILE_H_
 #define STXXL_BOOSTFD_FILE_H_

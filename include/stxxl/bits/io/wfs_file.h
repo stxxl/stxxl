@@ -1,10 +1,16 @@
 /***************************************************************************
- *            wfs_file.h
+ *  include/stxxl/bits/io/wfs_file.h
+ *
  *  Windows file system file base
- *  Fri Jul 22 15:39:59 2005
- *  Copyright  2005  Roman Dementiev
- *  dementiev@ira.uka.de
- ****************************************************************************/
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2005 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_WFSFILEBASE_HEADER
 #define STXXL_WFSFILEBASE_HEADER
