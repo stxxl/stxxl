@@ -1,10 +1,14 @@
 /***************************************************************************
- *            buf_istream.h
+ *  include/stxxl/bits/mng/buf_istream.h
  *
- *  Tue Dec 31 17:50:47 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_BUF_ISTREAM_HEADER
 #define STXXL_BUF_ISTREAM_HEADER

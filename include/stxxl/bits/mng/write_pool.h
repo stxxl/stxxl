@@ -1,10 +1,14 @@
 /***************************************************************************
- *            write_pool.h
+ *  include/stxxl/bits/mng/write_pool.h
  *
- *  Wed Jul  2 11:55:44 2003
- *  Copyright  2003  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_WRITE_POOL_HEADER
 #define STXXL_WRITE_POOL_HEADER
