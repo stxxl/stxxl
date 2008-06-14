@@ -1,10 +1,14 @@
 /***************************************************************************
- *            debug.h
+ *  include/stxxl/bits/common/debug.h
  *
- *  Thu Dec 30 14:52:00 2004
- *  Copyright  2004  Roman Dementiev
- *  Email dementiev@ira.uka.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2004 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_DEBUG_HEADER
 #define STXXL_DEBUG_HEADER

@@ -1,10 +1,14 @@
 /***************************************************************************
- *            exceptions.h
+ *  include/stxxl/bits/common/exceptions.h
  *
- *  Thu Oct 26 18:16:00 2006
- *  Copyright  2006  Roman Dementiev
- *  Email dementiev@ira.uka.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_EXCEPTIONS_H_
 #define STXXL_EXCEPTIONS_H_
