@@ -25,7 +25,7 @@ struct comp_type : public std::less<int>
     }
 };
 
-typedef stxxl::btree::btree < int, double, comp_type, 4096, 4096, stxxl::SR > btree_type;
+typedef stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR> btree_type;
 //typedef stxxl::btree::btree<int,double,comp_type,10,11,stxxl::SR> btree_type;
 
 std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj)
@@ -49,7 +49,7 @@ bool operator == (const std::pair<int, double> & a, const std::pair<int, double>
     return a.first == b.first;
 }
 
-int main(int argc, char * argv [])
+int main(int argc, char * argv[])
 {
     if (argc < 2)
     {
@@ -70,7 +70,7 @@ int main(int argc, char * argv [])
     stxxl::vector<int>::const_iterator it = Values.begin();
     STXXL_MSG("Inserting " << nins << " random values into btree");
     for ( ; it != Values.end(); ++it)
-        BTree.insert(std::pair < int, double > (*it, double (*it) + 1.0));
+        BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
 
 
     STXXL_MSG("Sorting the random values");
@@ -91,7 +91,7 @@ int main(int argc, char * argv [])
     for ( ; vIt != Values.end(); ++vIt, ++bIt)
     {
         assert(*vIt == bIt->first);
-        assert(double (bIt->first) + 1.0 == bIt->second);
+        assert(double(bIt->first) + 1.0 == bIt->second);
         assert(bIt != BTree.end());
     }
 

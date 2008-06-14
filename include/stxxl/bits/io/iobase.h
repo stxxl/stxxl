@@ -115,7 +115,7 @@ class request_ptr;
 struct default_completion_handler
 {
     //! \brief An operator that does nothing
-    void operator()  (request *) { }
+    void operator ()  (request *) { }
 };
 
 //! \brief Defines interface of file
@@ -130,7 +130,7 @@ protected:
     //! \brief Initializes file object
     //! \param _id file identifier
     //! \remark Called in implementations of file
-    file (int _id) : id (_id) { };
+    file (int _id) : id (_id) { }
 
 public:
     //! \brief Definition of acceptable file open modes
@@ -154,7 +154,7 @@ public:
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr object, that can be used to track the status of the operation
     virtual request_ptr aread (void * buffer, stxxl::int64 pos, size_t bytes,
-                               completion_handler on_cmpl ) = 0;
+                               completion_handler on_cmpl) = 0;
     //! \brief Schedules asynchronous write request to the file
     //! \param buffer pointer to memory buffer to write from
     //! \param pos starting file position to write
@@ -162,7 +162,7 @@ public:
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr object, that can be used to track the status of the operation
     virtual request_ptr awrite (void * buffer, stxxl::int64 pos, size_t bytes,
-                                completion_handler on_cmpl ) = 0;
+                                completion_handler on_cmpl) = 0;
 
     //! \brief Changes the size of the file
     //! \param newsize value of the new file size
@@ -255,12 +255,12 @@ protected:
     }
 
 public:
-    request(        completion_handler on_compl,
-                    file * file__,
-                    void * buffer_,
-                    stxxl::int64 offset_,
-                    size_t bytes_,
-                    request_type type_) :
+    request(completion_handler on_compl,
+            file * file__,
+            void * buffer_,
+            stxxl::int64 offset_,
+            size_t bytes_,
+            request_type type_) :
         on_complete(on_compl), ref_cnt(0),
         file_(file__),
         buffer(buffer_),
@@ -392,6 +392,7 @@ class request_ptr
             }
         }
     }
+
 public:
     //! \brief Constructs an \c request_ptr from \c request pointer
     request_ptr(request * ptr_ = NULL) : ptr(ptr_)
@@ -413,14 +414,14 @@ public:
     }
     //! \brief Assignment operator from \c request_ptr object
     //! \return reference to itself
-    request_ptr & operator= (const request_ptr & p)
+    request_ptr & operator = (const request_ptr & p)
     {
         // assert(p.ptr);
         return (*this = p.ptr);
     }
     //! \brief Assignment operator from \c request pointer
     //! \return reference to itself
-    request_ptr & operator= (request * p)
+    request_ptr & operator = (request * p)
     {
         STXXL_VERBOSE3("assign operator begin (assigning " << static_cast<void *>(p) << ") this=" << static_cast<void *>(this));
         if (p != ptr)
@@ -475,7 +476,7 @@ inline void wait_all(request_ptr req_array[], int count);
 //! \param count size of req_array
 //! \param index contains index of the \b first completed request if any
 //! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
-inline bool poll_any (request_ptr req_array[], int count, int &index);
+inline bool poll_any (request_ptr req_array[], int count, int & index);
 
 
 void wait_all(request_ptr req_array[], int count)
@@ -610,6 +611,7 @@ class disk_queue : private noncopyable
 {
 public:
     enum priority_op { READ, WRITE, NONE };
+
 private:
 #ifdef STXXL_BOOST_THREADS
     boost::mutex write_mutex;
@@ -618,8 +620,8 @@ private:
     mutex write_mutex;
     mutex read_mutex;
 #endif
-    std::queue < request_ptr > write_queue;
-    std::queue < request_ptr > read_queue;
+    std::queue<request_ptr> write_queue;
+    std::queue<request_ptr> read_queue;
 
     semaphore sem;
 
@@ -637,6 +639,7 @@ private:
 #endif
 
     static void * worker (void * arg);
+
 public:
     disk_queue (int n = 1);             // max number of requests simultaneously submitted to disk
 
@@ -654,8 +657,9 @@ public:
 class disk_queues : private noncopyable
 {
 protected:
-    std::map < DISKID, disk_queue * > queues;
+    std::map<DISKID, disk_queue *> queues;
     disk_queues () { }
+
 public:
     void add_readreq (request_ptr & req, DISKID disk)
     {
@@ -678,10 +682,10 @@ public:
     ~disk_queues ()
     {
         // deallocate all queues
-        for (std::map < DISKID, disk_queue * > ::iterator i =
+        for (std::map<DISKID, disk_queue *>::iterator i =
                  queues.begin (); i != queues.end (); i++)
             delete (*i).second;
-    };
+    }
     static disk_queues * get_instance ()
     {
         if (!instance)
@@ -697,10 +701,11 @@ public:
     //!                 - NONE, read and write requests are served by turns, alternately
     void set_priority_op(disk_queue::priority_op op)
     {
-        for (std::map < DISKID, disk_queue * > ::iterator i =
+        for (std::map<DISKID, disk_queue *>::iterator i =
                  queues.begin (); i != queues.end (); i++)
             i->second->set_priority_op (op);
     }
+
 private:
     static disk_queues * instance;
 };

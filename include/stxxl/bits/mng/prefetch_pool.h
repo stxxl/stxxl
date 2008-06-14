@@ -56,7 +56,7 @@ protected:
 #endif
     };
     typedef std::pair<block_type *, request_ptr> busy_entry;
-    typedef typename compat_hash_map< bid_type, busy_entry, bid_hash >::result hash_map_type;
+    typedef typename compat_hash_map<bid_type, busy_entry, bid_hash>::result hash_map_type;
     typedef typename std::list<block_type *>::iterator free_blocks_iterator;
     typedef typename hash_map_type::iterator busy_blocks_iterator;
 
@@ -236,7 +236,7 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class BlockType>
-    void swap(stxxl::prefetch_pool < BlockType > & a,
+    void swap(stxxl::prefetch_pool<BlockType> & a,
               stxxl::prefetch_pool<BlockType> & b)
     {
         a.swap(b);

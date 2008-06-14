@@ -15,11 +15,11 @@ template <class q1type, class q2type>
 void check(const q1type & q1, const q2type & q2)
 {
     assert(q1.empty() == q2.empty());
-    assert(q1.size() == q2.size() );
+    assert(q1.size() == q2.size());
     if (!q1.empty())
     {
-        assert(q1.front() == q2.front() );
-        assert(q1.back() == q2.back() );
+        assert(q1.front() == q2.front());
+        assert(q1.back() == q2.back());
     }
 }
 
@@ -28,12 +28,12 @@ int main()
     unsigned cnt;
     STXXL_MSG("Elements in a block: " << stxxl::queue<my_type>::block_type::size);
 
-    stxxl::queue<my_type>  xqueue(2, 2, 2 );
-    std::queue<my_type>  squeue;
+    stxxl::queue<my_type> xqueue(2, 2, 2);
+    std::queue<my_type> squeue;
     check(xqueue, squeue);
 
     STXXL_MSG("Testing special case 4");
-    cnt = stxxl::queue < my_type > ::block_type::size;
+    cnt = stxxl::queue<my_type>::block_type::size;
     stxxl::random_number32 rnd;
     while (cnt--)
     {
@@ -42,7 +42,7 @@ int main()
         squeue.push(val);
         check(xqueue, squeue);
     }
-    cnt = stxxl::queue < my_type > ::block_type::size;
+    cnt = stxxl::queue<my_type>::block_type::size;
     while (cnt--)
     {
         xqueue.pop();
@@ -77,7 +77,7 @@ int main()
             STXXL_MSG("Operations: " << cnt << " queue size " << squeue.size());
 
         int rndtmp = rnd() % 4;
-        if (rndtmp >= 3 )
+        if (rndtmp >= 3)
         {
             my_type val = rnd();
             xqueue.push(val);
@@ -115,8 +115,8 @@ int main()
     typedef stxxl::queue<my_type>::block_type block_type;
     stxxl::write_pool<block_type> w_pool(5);
     stxxl::prefetch_pool<block_type> p_pool(5);
-    stxxl::queue<my_type>  xqueue1(w_pool, p_pool, 5);
-    std::queue<my_type>  squeue1;
+    stxxl::queue<my_type> xqueue1(w_pool, p_pool, 5);
+    std::queue<my_type> squeue1;
 
     cnt = 10 * stxxl::queue<my_type>::block_type::size;
     while (cnt--)

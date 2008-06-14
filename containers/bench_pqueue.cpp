@@ -36,7 +36,7 @@ struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
     }
     my_type min_value() const
     {
-        return my_type((std::numeric_limits < my_type::key_type > ::max)());
+        return my_type((std::numeric_limits<my_type::key_type>::max)());
     }
 };
 
@@ -56,7 +56,7 @@ int main()
     const unsigned volume = 3 * 1024 * 1024; // in KB
     const unsigned mem_for_queue = 256 * 1024 * 1024;
     const unsigned mem_for_pools = 512 * 1024 * 1024;
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR < my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) > gen;
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)> gen;
     typedef gen::result pq_type;
     typedef pq_type::block_type block_type;
 
@@ -70,7 +70,7 @@ int main()
     Timer.start();
 
     stxxl::prefetch_pool<block_type> p_pool((mem_for_pools / 2) / block_type::raw_size);
-    stxxl::write_pool<block_type>    w_pool((mem_for_pools / 2) / block_type::raw_size);
+    stxxl::write_pool<block_type> w_pool((mem_for_pools / 2) / block_type::raw_size);
     pq_type p(p_pool, w_pool);
     stxxl::int64 nelements = stxxl::int64(volume / sizeof(my_type)) * 1024, i;
 

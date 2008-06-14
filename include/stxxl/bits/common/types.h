@@ -33,14 +33,14 @@ struct choose_int_types
 { };
 
 template <>
-struct choose_int_types < 4 >  // for 32-bit processors/compilers
+struct choose_int_types<4>  // for 32-bit processors/compilers
 {
     typedef int int_type;
     typedef unsigned unsigned_type;
 };
 
 template <>
-struct choose_int_types < 8 > // for 64-bit processors/compilers
+struct choose_int_types<8> // for 64-bit processors/compilers
 {
     typedef long long int int_type;
     typedef long long unsigned unsigned_type;

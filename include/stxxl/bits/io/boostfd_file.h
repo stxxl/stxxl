@@ -67,7 +67,7 @@ protected:
  #else
     mutex waiters_mutex;
  #endif
-    std::set < onoff_switch * > waiters;
+    std::set<onoff_switch *> waiters;
 
     boostfd_request (
         boostfd_file * f,

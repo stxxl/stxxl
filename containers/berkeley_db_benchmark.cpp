@@ -159,16 +159,16 @@ struct key_from_el {
 // Temporary distinction btw UN*X and WIN, since there are some
 // problems with the MMAP collection implementation.
 #ifdef _WIN32
-typedef AMI_btree< bkey_t, el_t, less<bkey_t>, key_from_el, BTE_COLLECTION_UFS > u_btree_t;
+typedef AMI_btree<bkey_t, el_t, less<bkey_t>, key_from_el, BTE_COLLECTION_UFS> u_btree_t;
 #else
-typedef AMI_btree< bkey_t, el_t, less<bkey_t>, key_from_el > u_btree_t;
+typedef AMI_btree<bkey_t, el_t, less<bkey_t>, key_from_el> u_btree_t;
 #endif
 
 
 void init()
 {
-    memset(max_key.keybuf, (std::numeric_limits < char > ::max)(), KEY_SIZE);
-    memset(min_key.keybuf, (std::numeric_limits < char > ::min)(), KEY_SIZE);
+    memset(max_key.keybuf, (std::numeric_limits<char>::max)(), KEY_SIZE);
+    memset(min_key.keybuf, (std::numeric_limits<char>::min)(), KEY_SIZE);
 }
 
 typedef stxxl::map<my_key, my_data, comp_type, NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE> map_type;
@@ -178,7 +178,7 @@ typedef stxxl::map<my_key, my_data, comp_type, NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE>
 #define REAL_NODE_MELEMENTS map_type::node_block_type::size
 #define REAL_LEAF_MELEMENTS map_type::leaf_block_type::size
 
-typedef stxxl::VECTOR_GENERATOR < std::pair<my_key, my_data>, 1, 1 > ::result vector_type;
+typedef stxxl::VECTOR_GENERATOR<std::pair<my_key, my_data>, 1, 1>::result vector_type;
 //typedef stxxl::vector<std::pair<my_key,my_data>,1,stxxl::lru_pager<1>,512*1024>  vector_type;
 
 
@@ -785,7 +785,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
 /////////////////////////////////////////////////////////////////////////
 
-typedef AMI_STREAM< el_t > stream_t;
+typedef AMI_STREAM<el_t> stream_t;
 
 char dummy;
 

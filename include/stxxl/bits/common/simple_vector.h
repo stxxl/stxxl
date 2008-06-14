@@ -7,7 +7,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-template < class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */  >
+template <class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */>
 class simple_vector : private noncopyable
 {
     simple_vector ()
@@ -78,7 +78,7 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class Tp_>
-    void swap(stxxl::simple_vector < Tp_ > & a,
+    void swap(stxxl::simple_vector<Tp_> & a,
               stxxl::simple_vector<Tp_> & b)
     {
         a.swap(b);

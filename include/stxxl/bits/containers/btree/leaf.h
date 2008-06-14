@@ -31,7 +31,7 @@ namespace btree
         typedef KeyType_ key_type;
         typedef DataType_ data_type;
         typedef KeyCmp_ key_compare;
-        typedef std::pair<key_type, data_type>  value_type;
+        typedef std::pair<key_type, data_type> value_type;
         typedef value_type & reference;
         typedef const value_type & const_reference;
 
@@ -45,7 +45,7 @@ namespace btree
             unsigned cur_size;
         };
 
-        typedef typed_block < raw_size, value_type, 0, InfoType > block_type;
+        typedef typed_block<raw_size, value_type, 0, InfoType> block_type;
         enum {
             nelements = block_type::size - 1,
             max_size = nelements,
@@ -55,7 +55,7 @@ namespace btree
         typedef BTreeType btree_type;
         typedef typename btree_type::size_type size_type;
         typedef btree_iterator_base<btree_type> iterator_base;
-        typedef btree_iterator<btree_type>  iterator;
+        typedef btree_iterator<btree_type> iterator;
         typedef btree_const_iterator<btree_type> const_iterator;
 
         typedef node_cache<normal_leaf, btree_type> leaf_cache_type;
@@ -85,7 +85,7 @@ namespace btree
         key_compare cmp_;
         value_compare vcmp_;
 
-        void split(std::pair < key_type, bid_type > & splitter)
+        void split(std::pair<key_type, bid_type> & splitter)
         {
             bid_type NewBid;
             btree_->leaf_cache_.get_new_node(NewBid);                     // new (left) leaf

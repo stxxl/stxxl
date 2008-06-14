@@ -161,10 +161,10 @@ int main(int argc, char * argv[])
     switch (version)
     {
     case 1:
-        run_stack < my_record_ < 4 > > (volume);
+        run_stack<my_record_<4> >(volume);
         break;
     case 2:
-        run_stack < my_record_ < 32 > > (volume);
+        run_stack<my_record_<32> >(volume);
         break;
     default:
         STXXL_MSG("Unsupported version " << version);

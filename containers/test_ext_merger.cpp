@@ -14,7 +14,7 @@ using stxxl::priority_queue_local::ext_merger;
 using stxxl::priority_queue_local::loser_tree;
 
 typedef int my_type;
-typedef stxxl::typed_block < 4096, my_type > block_type;
+typedef stxxl::typed_block<4096, my_type> block_type;
 
 
 struct dummy_merger
@@ -37,11 +37,11 @@ struct my_cmp : public std::greater<my_type>
 {
     my_type min_value() const
     {
-        return (std::numeric_limits < my_type > ::max)();
+        return (std::numeric_limits<my_type>::max)();
     }
     my_type max_value() const
     {
-        return (std::numeric_limits < my_type > ::min)();
+        return (std::numeric_limits<my_type>::min)();
     }
 };
 
@@ -61,7 +61,7 @@ int main()
     dummy_merger dummy(cnt);
     std::vector<my_type> output(1024 * 3);
 
-    ext_merger < block_type, my_cmp, 5 > merger(&p_pool, &w_pool);
+    ext_merger<block_type, my_cmp, 5> merger(&p_pool, &w_pool);
     merger.insert_segment(dummy, 1024 * 3);
     cnt = 20;
     merger.insert_segment(dummy, 1024 * 4);
@@ -72,7 +72,7 @@ int main()
     merger.insert_segment(dummy, 1024 * 4);
     merger.multi_merge(output.begin(), output.end());
 
-    loser_tree < my_type, my_cmp, 8 > loser;
+    loser_tree<my_type, my_cmp, 8> loser;
     my_type * seq1 = make_sequence(dummy, 1024);
     cnt = 20;
     my_type * seq2 = make_sequence(dummy, 1024);

@@ -18,7 +18,7 @@ class write_vector
     typedef typename ExtIterator::value_type value_type;
     typedef typename ExtIterator::block_type block_type;
     typedef typename ExtIterator::const_iterator ConstExtIterator;
-    typedef stxxl::buf_ostream < block_type, typename ExtIterator::bids_container_iterator > buf_ostream_type;
+    typedef stxxl::buf_ostream<block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     ExtIterator it;
     unsigned nbuffers;

@@ -14,7 +14,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-template < size_t ALIGNMENT >
+template <size_t ALIGNMENT>
 inline void * aligned_alloc (size_t size, size_t meta_info_size = 0)
 {
     STXXL_VERBOSE1("stxxl::aligned_alloc<" << ALIGNMENT << ">(), size = " << size << ", meta info size = " << meta_info_size);
@@ -33,7 +33,7 @@ inline void * aligned_alloc (size_t size, size_t meta_info_size = 0)
     return result;
 }
 
-template < size_t ALIGNMENT > inline void
+template <size_t ALIGNMENT> inline void
 aligned_dealloc (void * ptr)
 {
     STXXL_VERBOSE2("stxxl::aligned_dealloc(<" << ALIGNMENT << ">), ptr = 0x" << std::hex << (unsigned long)(ptr) << std::dec);

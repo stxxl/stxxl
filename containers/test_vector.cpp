@@ -43,7 +43,7 @@ int main()
     try
     {
         // use non-randomized striping to avoid side effects on random generator
-        typedef stxxl::VECTOR_GENERATOR < int64, 2, 2, (2 * 1024 * 1024), stxxl::striping > ::result vector_type;
+        typedef stxxl::VECTOR_GENERATOR<int64, 2, 2, (2 * 1024 * 1024), stxxl::striping>::result vector_type;
         vector_type v(int64 (64 * 1024 * 1024) / sizeof(int64));
 
         // test assignment const_iterator = iterator

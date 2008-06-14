@@ -25,16 +25,16 @@ struct cmp2 : public std::less<int>
 {
     static int max_value()
     {
-        return (std::numeric_limits < int > ::max)();
+        return (std::numeric_limits<int>::max)();
     }
 };
 
 #define DATA_NODE_BLOCK_SIZE (4096)
 #define DATA_LEAF_BLOCK_SIZE (4096)
 
-typedef std::map<key_type, data_type, cmp2>                                       std_map_type;
+typedef std::map<key_type, data_type, cmp2> std_map_type;
 typedef stxxl::map<key_type, data_type, cmp2,
-                   DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE >     xxl_map_type;
+                   DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> xxl_map_type;
 
 #define PERCENT_CLEAR 1
 #define PERCENT_ERASE_BULK 9
@@ -211,8 +211,8 @@ int main(int argc, char * argv[])
         else if (step < (percent += PERCENT_INSERT_PAIR))
         {
             key_type key = rnd() % MAX_KEY;
-            stdmap.insert(std::pair < key_type, data_type > (key, 2 * key));
-            xxlmap.insert(std::pair < key_type, data_type > (key, 2 * key));
+            stdmap.insert(std::pair<key_type, data_type>(key, 2 * key));
+            xxlmap.insert(std::pair<key_type, data_type>(key, 2 * key));
 
             assert(stxxl::there(stdmap, key, 2 * key));
             assert(stxxl::there(xxlmap, key, 2 * key));

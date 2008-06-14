@@ -101,7 +101,7 @@ struct random_uniform_slow
     typedef boost::minstd_rand base_generator_type;
     base_generator_type generator;
     boost::uniform_real<> uni_dist;
-    mutable boost::variate_generator < base_generator_type &, boost::uniform_real<> > uni;
+    mutable boost::variate_generator<base_generator_type &, boost::uniform_real<> > uni;
 
     random_uniform_slow(unsigned seed = 0) : uni(generator, uni_dist)
     {

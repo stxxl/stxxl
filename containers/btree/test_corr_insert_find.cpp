@@ -25,7 +25,7 @@ struct comp_type : public std::less<int>
     }
 };
 
-typedef stxxl::btree::btree < int, double, comp_type, 4096, 4096, stxxl::SR > btree_type;
+typedef stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR> btree_type;
 
 
 std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj)
@@ -71,7 +71,7 @@ int main(int argc, char * argv[])
     stxxl::vector<int>::const_iterator it = Values.begin();
     STXXL_MSG("Inserting " << nins << " random values into btree");
     for ( ; it != Values.end(); ++it)
-        BTree.insert(std::pair < int, double > (*it, double(*it) + 1.0));
+        BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
 
 
     STXXL_MSG("Number of elements in btree: " << BTree.size());

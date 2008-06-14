@@ -80,7 +80,7 @@ int main()
         abort();
     }
     unsigned memory_to_use = 32 * 1024 * 1024;
-    typedef stxxl::VECTOR_GENERATOR < my_type, 4, 4 > ::result vector_type;
+    typedef stxxl::VECTOR_GENERATOR<my_type, 4, 4>::result vector_type;
     const stxxl::int64 n_records = 3 * 32 * stxxl::int64(1024 * 1024) / sizeof(my_type);
     vector_type v(n_records);
 

@@ -25,7 +25,7 @@ class deque_iterator
 {
     typedef typename DequeType::size_type size_type;
     typedef typename DequeType::vector_type vector_type;
-    typedef deque_iterator<DequeType>       _Self;
+    typedef deque_iterator<DequeType> _Self;
     DequeType * Deque;
     size_type Offset;
 
@@ -339,7 +339,7 @@ public:
 template <class T, class VectorType = stxxl::vector<T> >
 class deque : private noncopyable
 {
-    typedef deque<T, VectorType>     Self_;
+    typedef deque<T, VectorType> Self_;
 
 public:
     typedef typename VectorType::size_type size_type;
@@ -411,7 +411,7 @@ public:
 
     size_type max_size() const
     {
-        return (std::numeric_limits < size_type > ::max)() / 2 - 1;
+        return (std::numeric_limits<size_type>::max)() / 2 - 1;
     }
 
     bool empty() const
@@ -559,8 +559,8 @@ __STXXL_END_NAMESPACE
 
 namespace std
 {
-    template < typename T, typename VT >
-    void swap(stxxl::deque < T, VT > & a,
+    template <typename T, typename VT>
+    void swap(stxxl::deque<T, VT> & a,
               stxxl::deque<T, VT> & b)
     {
         a.swap(b);

@@ -29,7 +29,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-template<class _Tp>
+template <class _Tp>
 struct compat_hash {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
     typedef std::hash<_Tp> result;
@@ -40,7 +40,7 @@ struct compat_hash {
 #endif
 };
 
-template<class _Key, class _Tp, class _Hash = typename compat_hash<_Key>::result >
+template <class _Key, class _Tp, class _Hash = typename compat_hash<_Key>::result>
 struct compat_hash_map {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
     typedef std::unordered_map<_Key, _Tp, _Hash> result;

@@ -64,7 +64,7 @@ protected:
  #else
     mutex waiters_mutex;
  #endif
-    std::set < onoff_switch * > waiters;
+    std::set<onoff_switch *> waiters;
 
     wfs_request_base (
         wfs_file_base * f,

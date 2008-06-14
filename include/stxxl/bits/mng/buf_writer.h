@@ -59,7 +59,7 @@ protected:
         }
     };
 
-    typedef std::priority_queue < batch_entry, std::vector < batch_entry >, batch_entry_cmp > batch_type;
+    typedef std::priority_queue<batch_entry, std::vector<batch_entry>, batch_entry_cmp> batch_type;
     batch_type batch_write_blocks;      // sorted sequence of blocks to write
 
 public:
@@ -86,7 +86,7 @@ public:
     block_type * get_free_block ()
     {
         int_type ibuffer;
-        for (std::vector < int_type > ::iterator it = busy_write_blocks.begin ();
+        for (std::vector<int_type>::iterator it = busy_write_blocks.begin ();
              it != busy_write_blocks.end (); ++it)
         {
             if (write_reqs[ibuffer = (*it)]->poll())
@@ -165,7 +165,7 @@ public:
 
             busy_write_blocks.push_back (ibuffer);
         }
-        for (std::vector < int_type > ::const_iterator it =
+        for (std::vector<int_type>::const_iterator it =
                  busy_write_blocks.begin ();
              it != busy_write_blocks.end (); it++)
         {
@@ -197,7 +197,7 @@ public:
 
             busy_write_blocks.push_back (ibuffer);
         }
-        for (std::vector < int_type > ::const_iterator it =
+        for (std::vector<int_type>::const_iterator it =
                  busy_write_blocks.begin ();
              it != busy_write_blocks.end (); it++)
         {

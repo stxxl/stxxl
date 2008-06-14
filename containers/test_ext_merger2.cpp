@@ -10,14 +10,14 @@
 #include <iterator>
 
 typedef int my_type;
-typedef stxxl::typed_block < 4096, my_type > block_type;
+typedef stxxl::typed_block<4096, my_type> block_type;
 
 
 struct dummy_merger
 {
     int current, delta;
     dummy_merger() : current(0), delta(1) { }
-    void operator() (int current_, int delta_)
+    void operator () (int current_, int delta_)
     {
         current = current_;
         delta = delta_;
@@ -38,7 +38,7 @@ struct my_cmp : public std::greater<my_type>
 {
     my_type min_value() const
     {
-        return (std::numeric_limits < my_type > ::max)();
+        return (std::numeric_limits<my_type>::max)();
     }
 };
 
@@ -61,24 +61,30 @@ int main()
     if (1) {
         const unsigned volume = 3 * 1024 * 1024; // in KB
         const unsigned mem_for_queue = 256 * 1024 * 1024;
-        typedef stxxl::PRIORITY_QUEUE_GENERATOR < my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) >::result pq_type;
+        typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>::result pq_type;
         pq_type pq(mem_for_queue, mem_for_queue);
         pq.push(42);
         assert(pq.top() == 42);
         pq.pop();
-        pq.push(2); pq.push(0); pq.push(3); pq.push(1);
+        pq.push(2);
+        pq.push(0);
+        pq.push(3);
+        pq.push(1);
         my_type x0, x1, x2, x3;
-        x0 = pq.top(); pq.pop();
-        x1 = pq.top(); pq.pop();
-        x2 = pq.top(); pq.pop();
-        x3 = pq.top(); pq.pop();
+        x0 = pq.top();
+        pq.pop();
+        x1 = pq.top();
+        pq.pop();
+        x2 = pq.top();
+        pq.pop();
+        x3 = pq.top();
+        pq.pop();
         STXXL_MSG("Order: " << x0 << " " << x1 << " " << x2 << " " << x3);
         assert(pq.empty());
     }
 
     if (1) { // ext_merger test
-
-        stxxl::priority_queue_local::ext_merger < block_type, my_cmp, 5 > merger(&p_pool, &w_pool);
+        stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5> merger(&p_pool, &w_pool);
         dummy(1, 0);
         merger.insert_segment(dummy, B * 2);
         dummy(2, 0);
@@ -107,12 +113,10 @@ int main()
         merger.multi_merge(output.begin(), output.begin());
         merger.multi_merge(output.begin(), output.begin());
         merger.multi_merge(output.begin(), output.begin());
-
     } // ext_merger test
 
     if (1) { // loser_tree test
-
-        stxxl::priority_queue_local::loser_tree < my_type, my_cmp, 8 > loser;
+        stxxl::priority_queue_local::loser_tree<my_type, my_cmp, 8> loser;
         dummy(1, 0);
         my_type * seq0 = make_sequence(dummy, 2 * B);
         dummy(2, 0);
@@ -121,13 +125,13 @@ int main()
         my_type * seq2 = make_sequence(dummy, 4 * B);
         dummy(B, 2);
         my_type * seq3 = make_sequence(dummy, 4 * B);
-        dummy(2*B, 1);
+        dummy(2 * B, 1);
         my_type * seq4 = make_sequence(dummy, 4 * B);
         dummy(B, 4);
         my_type * seq5 = make_sequence(dummy, 4 * B);
         dummy(B, 8);
         my_type * seq6 = make_sequence(dummy, 4 * B);
-        dummy(2*B, 2);
+        dummy(2 * B, 2);
         my_type * seq7 = make_sequence(dummy, 4 * B);
 
         loser.init();
@@ -160,8 +164,7 @@ int main()
         loser.multi_merge(out, out);
         loser.multi_merge(out, out);
 
-        delete [] out;
-
+        delete[] out;
     } // loser_tree test
 }
 

@@ -20,7 +20,7 @@ class write_vector
     typedef typename vector_type::block_type block_type;
     typedef typename vector_type::iterator ExtIterator;
     typedef typename vector_type::const_iterator ConstExtIterator;
-    typedef stxxl::buf_ostream < block_type, typename ExtIterator::bids_container_iterator > buf_ostream_type;
+    typedef stxxl::buf_ostream<block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
 
     vector_type &Vec;
     size_type RealSize;

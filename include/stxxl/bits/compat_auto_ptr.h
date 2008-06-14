@@ -22,7 +22,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-template<class _Tp>
+template <class _Tp>
 struct compat_auto_ptr {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
     typedef std::shared_ptr<_Tp> result;

@@ -81,11 +81,11 @@ struct cmp_type : std::binary_function<tuple_type, tuple_type, bool>
 
     value_type min_value() const
     {
-        return value_type((std::numeric_limits < char > ::min)(), 0);
+        return value_type((std::numeric_limits<char>::min)(), 0);
     }
     value_type max_value() const
     {
-        return value_type((std::numeric_limits < char > ::max)(), 0);
+        return value_type((std::numeric_limits<char>::max)(), 0);
     }
 };
 
@@ -99,11 +99,11 @@ struct cmp_int : std::binary_function<int, int, bool>
 
     value_type max_value() const
     {
-        return ((std::numeric_limits < value_type > ::min)());
+        return ((std::numeric_limits<value_type>::min)());
     }
     value_type min_value() const
     {
-        return ((std::numeric_limits < value_type > ::max)());
+        return ((std::numeric_limits<value_type>::max)());
     }
 };
 

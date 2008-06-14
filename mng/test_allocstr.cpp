@@ -8,7 +8,7 @@
 
 #include <stxxl/mng>
 
-template<typename strategy>
+template <typename strategy>
 void test_strategy()
 {
     STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);

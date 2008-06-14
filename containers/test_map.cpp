@@ -17,11 +17,11 @@ struct cmp : public std::less<key_type>
 {
     static key_type min_value()
     {
-        return (std::numeric_limits < key_type > ::min)();
+        return (std::numeric_limits<key_type>::min)();
     }
     static key_type max_value()
     {
-        return (std::numeric_limits < key_type > ::max)();
+        return (std::numeric_limits<key_type>::max)();
     }
 };
 
@@ -30,7 +30,7 @@ struct cmp : public std::less<key_type>
 
 #define CACHE_ELEMENTS (BLOCK_SIZE * CACHE_SIZE / (sizeof(key_type) + sizeof(data_type)))
 
-typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE > map_type;
+typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
 
 int main()
 {

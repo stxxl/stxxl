@@ -57,7 +57,7 @@ struct interleaved_FR : public interleaved_striping
 
 struct interleaved_SR : public interleaved_striping
 {
-    std::vector < int > offsets;
+    std::vector<int> offsets;
 
     interleaved_SR (int_type _nruns, int _begindisk,
                     int _enddisk) : interleaved_striping (_nruns,
@@ -79,13 +79,13 @@ struct interleaved_SR : public interleaved_striping
 
 struct interleaved_RC : public interleaved_striping
 {
-    std::vector < std::vector < int > > perms;
+    std::vector<std::vector<int> > perms;
 
     interleaved_RC (int_type _nruns, int _begindisk,
                     int _enddisk) : interleaved_striping (_nruns,
                                                           _begindisk,
                                                           _enddisk),
-                                    perms (nruns, std::vector < int >(diff))
+                                    perms (nruns, std::vector<int>(diff))
     {
         for (int_type i = 0; i < nruns; i++)
         {

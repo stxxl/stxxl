@@ -8,17 +8,17 @@ template <unsigned_type i>
 void log_i()
 {
     std::cout << i << "\t" << (i < 1000000 ? "\t" : "")
-        << stxxl::LOG2_floor<i>::value << "\t"
-        << stxxl::LOG2<i>::floor << "\t"
-        << stxxl::LOG2<i>::ceil << std::endl;
+              << stxxl::LOG2_floor<i>::value << "\t"
+              << stxxl::LOG2<i>::floor << "\t"
+              << stxxl::LOG2<i>::ceil << std::endl;
 }
 
 template <unsigned_type i>
 void log_ipm1()
 {
-    log_i<i-1>();
+    log_i<i - 1>();
     log_i<i>();
-    log_i<i+1>();
+    log_i<i + 1>();
     std::cout << std::endl;
 }
 
@@ -50,4 +50,3 @@ int main()
     log_ipm1<1UL << 63>();
 #endif
 }
-

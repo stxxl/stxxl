@@ -69,7 +69,7 @@ config::config (const char * config_path)
 
         while (cfg_file >> line)
         {
-            std::vector < std::string > tmp = split (line, "=");
+            std::vector<std::string> tmp = split (line, "=");
             bool is_disk;
 
             if (tmp[0][0] == '#')
@@ -106,7 +106,7 @@ config::config (const char * config_path)
     else
     {
 #ifdef STXXL_VERBOSE_DISKS
-        for (std::vector < DiskEntry > ::const_iterator it =
+        for (std::vector<DiskEntry>::const_iterator it =
                  disks_props.begin (); it != disks_props.end ();
              it++)
         {
@@ -116,7 +116,7 @@ config::config (const char * config_path)
         }
 #else
         stxxl::int64 total_size = 0;
-        for (std::vector < DiskEntry > ::const_iterator it =
+        for (std::vector<DiskEntry>::const_iterator it =
                  disks_props.begin (); it != disks_props.end ();
              it++)
             total_size += (*it).size;

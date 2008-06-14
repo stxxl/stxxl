@@ -10,14 +10,14 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-template<typename must_be_int = int>
+template <typename must_be_int = int>
 class settings
 {
 public:
     static bool native_merge;
 };
 
-template<typename must_be_int>
+template <typename must_be_int>
 bool settings<must_be_int>::native_merge = true;
 
 typedef settings<> SETTINGS;

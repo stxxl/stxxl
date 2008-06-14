@@ -16,7 +16,7 @@ struct comp_type : public std::less<int>
 {
     static int max_value()
     {
-        return (std::numeric_limits < int > ::max)();
+        return (std::numeric_limits<int>::max)();
     }
 };
 
@@ -85,7 +85,7 @@ int main(int argc, char * argv[])
 
     const unsigned nins = atoi(argv[1]);
 
-    STXXL_MSG("Data set size  : " << nins * sizeof(std::pair < int, my_type >) << " bytes");
+    STXXL_MSG("Data set size  : " << nins * sizeof(std::pair<int, my_type>) << " bytes");
     STXXL_MSG("Node cache size: " << node_cache_size << " bytes");
     STXXL_MSG("Leaf cache size: " << leaf_cache_size << " bytes");
 

@@ -51,8 +51,8 @@ public:
     void testIO()
     {
         const unsigned nblocks = 2;
-        BIDArray < BLOCK_SIZE > bids (nblocks);
-        std::vector < int >disks (nblocks, 2);
+        BIDArray<BLOCK_SIZE> bids (nblocks);
+        std::vector<int> disks (nblocks, 2);
         stxxl::request_ptr * reqs = new stxxl::request_ptr[nblocks];
         block_manager * bm = block_manager::get_instance ();
         bm->new_blocks (striping (), bids.begin (), bids.end ());
@@ -93,7 +93,7 @@ public:
 
     void testIO2()
     {
-        typedef stxxl::typed_block < 128 * 1024, double > block_type;
+        typedef stxxl::typed_block<128 * 1024, double> block_type;
         std::vector<block_type::bid_type> bids;
         std::vector<stxxl::request_ptr> requests;
         stxxl::block_manager * bm = stxxl::block_manager::get_instance();

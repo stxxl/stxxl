@@ -38,7 +38,7 @@ ufs_request_base::ufs_request_base (
     completion_handler on_cmpl) :
     request (on_cmpl, f, buf, off, b, t),
 /*
-		    file (f),
+                    file (f),
                     buffer (buf),
                     offset (off),
                     bytes (b),
@@ -113,10 +113,10 @@ void ufs_request_base::check_aligning ()
         STXXL_ERRMSG ("Size is not a multiple of " <<
                       BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
 
-    if (long (buffer) % BLOCK_ALIGN != 0)
+    if (long(buffer) % BLOCK_ALIGN != 0)
         STXXL_ERRMSG ("Buffer is not aligned: modulo "
                                               << BLOCK_ALIGN << " = " <<
-                      long (buffer) % BLOCK_ALIGN << " (" <<
+                      long(buffer) % BLOCK_ALIGN << " (" <<
                       std::hex << buffer << std::dec << ")");
 }
 
@@ -243,5 +243,3 @@ void ufs_file_base::set_size (stxxl::int64 newsize)
 
 
 __STXXL_END_NAMESPACE
-
-

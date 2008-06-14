@@ -53,7 +53,7 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
     STXXL_MSG("Record size: " << sizeof(my_record) << " bytes");
 
     stxxl::prefetch_pool<block_type> p_pool(DISKS * 4);
-    stxxl::write_pool<block_type>    w_pool(DISKS * 4);
+    stxxl::write_pool<block_type> w_pool(DISKS * 4);
 
     stack_type Stack(p_pool, w_pool);
 
@@ -224,16 +224,16 @@ int main(int argc, char * argv[])
     switch (version)
     {
     case 1:
-        run_stxxl_growshrink2_stack < my_record_ < 4 > > (volume);
+        run_stxxl_growshrink2_stack<my_record_<4> >(volume);
         break;
     case 2:
-        run_stxxl_growshrink2_stack < my_record_ < 32 > > (volume);
+        run_stxxl_growshrink2_stack<my_record_<32> >(volume);
         break;
     case 3:
-        run_stxxl_normal_stack < my_record_ < 4 > > (volume);
+        run_stxxl_normal_stack<my_record_<4> >(volume);
         break;
     case 4:
-        run_stxxl_normal_stack < my_record_ < 32 > > (volume);
+        run_stxxl_normal_stack<my_record_<32> >(volume);
         break;
     default:
         STXXL_MSG("Unsupported version " << version);

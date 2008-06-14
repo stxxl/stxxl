@@ -39,7 +39,7 @@ struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 
     my_type min_value() const
     {
-        return my_type((std::numeric_limits < my_type::key_type > ::max)());
+        return my_type((std::numeric_limits<my_type::key_type>::max)());
     }
 };
 
@@ -57,7 +57,7 @@ int main()
     //typedef priority_queue<priority_queue_config<my_type,my_cmp,
     //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
     const unsigned volume = 1024 * 1024; // in KB
-    typedef stxxl::PRIORITY_QUEUE_GENERATOR < my_type, my_cmp, 32 * 1024 * 1024, volume / sizeof(my_type) > gen;
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, 32 * 1024 * 1024, volume / sizeof(my_type)> gen;
     typedef gen::result pq_type;
     typedef pq_type::block_type block_type;
 
@@ -72,7 +72,7 @@ int main()
 
     const unsigned mem_for_pools = 128 * 1024 * 1024;
     stxxl::prefetch_pool<block_type> p_pool((mem_for_pools / 2) / block_type::raw_size);
-    stxxl::write_pool<block_type>    w_pool((mem_for_pools / 2) / block_type::raw_size);
+    stxxl::write_pool<block_type> w_pool((mem_for_pools / 2) / block_type::raw_size);
     pq_type p(p_pool, w_pool);
 
     stxxl::int64 nelements = stxxl::int64(volume * 1024 / sizeof(my_type)), i;

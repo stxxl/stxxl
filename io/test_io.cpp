@@ -29,7 +29,7 @@ int main()
 {
     std::cout << sizeof(void *) << std::endl;
     const int size = 1024 * 384;
-    char * buffer = (char *)stxxl::aligned_alloc < 4096 > (size);
+    char * buffer = (char *)stxxl::aligned_alloc<4096>(size);
 #ifdef BOOST_MSVC
     const char * paths[2] = { "data1", "data2" };
 #else
@@ -48,7 +48,7 @@ int main()
 
     wait_all(req, 16);
 
-    stxxl::aligned_dealloc < 4096 > (buffer);
+    stxxl::aligned_dealloc<4096>(buffer);
 
     std::cout << *(stxxl::stats::get_instance());
     return 0;

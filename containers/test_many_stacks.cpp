@@ -17,7 +17,7 @@
 
 int main(int argc, char * argv[])
 {
-    typedef stxxl::STACK_GENERATOR < int, stxxl::external, stxxl::normal, 4, 4096 > ::result ext_stack_type;
+    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>::result ext_stack_type;
 
     if (argc < 2)
     {

@@ -72,13 +72,13 @@ struct comp_type : std::binary_function<my_record, my_record, bool>
     }
     static my_record min_value()
     {
-        return my_record((std::numeric_limits < int > ::max)(), 0);
+        return my_record((std::numeric_limits<int>::max)(), 0);
     }
 };
 
 
-typedef stxxl::PRIORITY_QUEUE_GENERATOR < my_record, comp_type,
-PQ_MEM_SIZE, MAX_ELEMENTS / (1024 / 8) > ::result pq_type;
+typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_record, comp_type,
+                                        PQ_MEM_SIZE, MAX_ELEMENTS / (1024 / 8)>::result pq_type;
 
 typedef pq_type::block_type block_type;
 
@@ -103,7 +103,7 @@ inline long long unsigned myrand()
 void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 {
     stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE / BLOCK_SIZE);
-    stxxl::write_pool<block_type>    w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
+    stxxl::write_pool<block_type> w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
 
     pq_type PQ(p_pool, w_pool);
 
@@ -166,7 +166,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 void run_stxxl_intermixed(stxxl::uint64 ops)
 {
     stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE / BLOCK_SIZE);
-    stxxl::write_pool<block_type>    w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
+    stxxl::write_pool<block_type> w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
 
     pq_type PQ(p_pool, w_pool);
 

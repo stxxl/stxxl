@@ -21,7 +21,7 @@ __STXXL_BEGIN_NAMESPACE
 // THERE
 // ***********************************************
 
-template<typename MAPTYPE>
+template <typename MAPTYPE>
 bool there(MAPTYPE & map_, const typename MAPTYPE::key_type & key, typename MAPTYPE::mapped_type data)
 {
     if (!((*map_.find(key)).second == data))
@@ -39,7 +39,7 @@ bool there(MAPTYPE & map_, const typename MAPTYPE::key_type & key, typename MAPT
 // IS EQUAL END
 // ***********************************************
 
-template<typename MAPTYPE>
+template <typename MAPTYPE>
 bool is_equal_end(MAPTYPE & map_, typename MAPTYPE::iterator & iter)
 {
     return iter == map_.end();
@@ -49,13 +49,13 @@ bool is_equal_end(MAPTYPE & map_, typename MAPTYPE::iterator & iter)
 // IS SAME
 // ***********************************************
 
-template<typename value_type>
+template <typename value_type>
 bool is_same(value_type & v1, value_type & v2)
 {
     return v1.first == v2.first && v1.second == v2.second;
 }
 
-template<typename value_type>
+template <typename value_type>
 bool is_same(const value_type & v1, const value_type & v2)
 {
     return v1.first == v2.first && v1.second == v2.second;
@@ -65,7 +65,7 @@ bool is_same(const value_type & v1, const value_type & v2)
 // NOT THERE
 // ***********************************************
 
-template<typename MAPTYPE>
+template <typename MAPTYPE>
 bool not_there(MAPTYPE & map_, const typename MAPTYPE::key_type & key)
 {
     return map_.find(key) == map_.end();
@@ -75,7 +75,7 @@ bool not_there(MAPTYPE & map_, const typename MAPTYPE::key_type & key)
 // IS EMPTY
 // ***********************************************
 
-template<typename MAPTYPE>
+template <typename MAPTYPE>
 bool is_empty(MAPTYPE & map_)
 {
     return map_.empty();
@@ -85,13 +85,13 @@ bool is_empty(MAPTYPE & map_)
 // IS END
 // ***********************************************
 
-template<typename MAPTYPE>
+template <typename MAPTYPE>
 bool is_end(MAPTYPE & map_, typename MAPTYPE::iterator & iter)
 {
     return iter == map_.end();
 }
 
-template<typename MAPTYPE>
+template <typename MAPTYPE>
 bool is_end(const MAPTYPE & map_, typename MAPTYPE::const_iterator & iter)
 {
     return iter == map_.end();
@@ -101,7 +101,7 @@ bool is_end(const MAPTYPE & map_, typename MAPTYPE::const_iterator & iter)
 // IS SIZE
 // ***********************************************
 
-template<typename MAPTYPE>
+template <typename MAPTYPE>
 bool is_size(MAPTYPE & map_, const typename MAPTYPE::size_type & size)
 {
     return map_.size() == size;

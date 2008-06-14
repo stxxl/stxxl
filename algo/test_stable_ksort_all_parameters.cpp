@@ -70,7 +70,7 @@ struct zero
 template <typename alloc_strategy_type, unsigned block_size>
 void test(stxxl::int64 records_to_sort, unsigned memory_to_use)
 {
-    typedef stxxl::vector < my_type, 2, stxxl::lru_pager < 8 >, block_size, alloc_strategy_type > vector_type;
+    typedef stxxl::vector<my_type, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
 
     memory_to_use = div_and_round_up(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
 
@@ -140,37 +140,37 @@ int main(int argc, char * argv[])
     switch (block_size)
     {
     case 0:
-        test_all_strategies < (128 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(128 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 1:
-        test_all_strategies < (256 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(256 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 2:
-        test_all_strategies < (512 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(512 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 3:
-        test_all_strategies < (1024 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(1024 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 4:
-        test_all_strategies < (2 * 1024 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(2 * 1024 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 5:
-        test_all_strategies < (4 * 1024 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(4 * 1024 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 6:
-        test_all_strategies < (8 * 1024 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(8 * 1024 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 7:
-        test_all_strategies < (16 * 1024 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(16 * 1024 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 8:
-        test_all_strategies < (640 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(640 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 9:
-        test_all_strategies < (768 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(768 * 1024)>(n_records, sort_mem, strategy);
         break;
     case 10:
-        test_all_strategies < (896 * 1024) > (n_records, sort_mem, strategy);
+        test_all_strategies<(896 * 1024)>(n_records, sort_mem, strategy);
         break;
     default:
         STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");

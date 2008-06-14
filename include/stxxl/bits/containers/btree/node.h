@@ -37,7 +37,7 @@ namespace btree
         typedef BID<raw_size> bid_type;
         typedef bid_type node_bid_type;
         typedef SelfType node_type;
-        typedef std::pair<key_type, bid_type>  value_type;
+        typedef std::pair<key_type, bid_type> value_type;
         typedef value_type & reference;
         typedef const value_type & const_reference;
 
@@ -47,7 +47,7 @@ namespace btree
             bid_type me;
             unsigned cur_size;
         };
-        typedef typed_block < raw_size, value_type, 0, InfoType > block_type;
+        typedef typed_block<raw_size, value_type, 0, InfoType> block_type;
 
         enum {
             nelements = block_type::size - 1,

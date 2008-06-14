@@ -28,7 +28,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-template<class _Key>
+template <class _Key>
 struct compat_hash_set {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
     typedef std::unordered_set<_Key> result;

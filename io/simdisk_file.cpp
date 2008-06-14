@@ -203,14 +203,14 @@ void sim_disk_request::serve ()
         }
 
         double delay =
-            (static_cast <sim_disk_file * >(file_))->get_delay (offset, bytes);
+            (static_cast<sim_disk_file *>(file_))->get_delay (offset, bytes);
 
 
         delay = delay - stxxl_timestamp() + op_start;
 
         assert(delay > 0.0);
 
-        int seconds_to_wait = static_cast < int >(floor (delay));
+        int seconds_to_wait = static_cast<int>(floor (delay));
         if (seconds_to_wait)
             sleep (seconds_to_wait);
 
@@ -245,7 +245,7 @@ void sim_disk_request::serve ()
  #endif
 
     // << notification >>
-    for (std::set < onoff_switch * > ::iterator i =
+    for (std::set<onoff_switch *>::iterator i =
              waiters.begin (); i != waiters.end (); i++)
         (*i)->on ();
 

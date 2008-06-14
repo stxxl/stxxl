@@ -75,7 +75,7 @@ protected:
     double cyl_switch_time;             // in s
     double revolution_time;             // in s
     double interface_speed;             // in byte/s
-    std::set < Zone, ZoneCmp > zones;
+    std::set<Zone, ZoneCmp> zones;
 
     void add_zone (int &first_cyl, int last_cyl,
                    int sec_per_track, int &first_sect);

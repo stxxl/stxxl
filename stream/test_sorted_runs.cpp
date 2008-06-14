@@ -40,7 +40,7 @@ int main()
 {
     // special parameter type
     typedef stxxl::stream::from_sorted_sequences<value_type> InputType;
-    typedef stxxl::stream::runs_creator < InputType, Cmp, 4096, stxxl::RC > CreateRunsAlg;
+    typedef stxxl::stream::runs_creator<InputType, Cmp, 4096, stxxl::RC> CreateRunsAlg;
     typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 
     unsigned size = 30 * 1024 * 128 / (sizeof(value_type) * 2);

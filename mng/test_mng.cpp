@@ -38,8 +38,8 @@ int main ()
     STXXL_MSG(sizeof(MyType) << " " << (BLOCK_SIZE % sizeof(MyType)));
     STXXL_MSG(sizeof(block_type) << " " << BLOCK_SIZE);
     const unsigned nblocks = 2;
-    stxxl::BIDArray < BLOCK_SIZE > bids (nblocks);
-    std::vector < int >disks (nblocks, 2);
+    stxxl::BIDArray<BLOCK_SIZE> bids (nblocks);
+    std::vector<int> disks (nblocks, 2);
     stxxl::request_ptr * reqs = new stxxl::request_ptr[nblocks];
     stxxl::block_manager * bm = stxxl::block_manager::get_instance ();
     bm->new_blocks (stxxl::striping (), bids.begin (), bids.end ());

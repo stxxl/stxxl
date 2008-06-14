@@ -151,7 +151,7 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class BTreeType>
-    void swap(stxxl::btree::iterator_map < BTreeType > & a,
+    void swap(stxxl::btree::iterator_map<BTreeType> & a,
               stxxl::btree::iterator_map<BTreeType> & b)
     {
         a.swap(b);

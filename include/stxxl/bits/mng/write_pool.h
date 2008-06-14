@@ -246,7 +246,7 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class BlockType>
-    void swap(stxxl::write_pool < BlockType > & a,
+    void swap(stxxl::write_pool<BlockType> & a,
               stxxl::write_pool<BlockType> & b)
     {
         a.swap(b);

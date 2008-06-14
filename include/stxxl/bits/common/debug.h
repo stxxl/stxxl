@@ -32,12 +32,12 @@ class debugmon
     {
         inline size_t operator ()  (char * arg) const
         {
-            return long (arg);
+            return long(arg);
         }
 #ifdef BOOST_MSVC
         bool operator () (char * a, char * b) const
         {
-            return (long (a) < long (b));
+            return (long(a) < long(b));
         }
         enum
         {               // parameters for hash table
