@@ -10,7 +10,7 @@ TOPDIR	?= $(error TOPDIR not defined) # DO NOT CHANGE! This is set elsewhere.
 
 
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
-USE_LINUX	?= yes	# set 'yes' if you run Linux, 'no' otherwise
+USE_MACOSX	?= no	# set 'yes' if you run Mac OS X, 'no' otherwise
 USE_MCSTL	?= no	# will be overriden from main Makefile
 USE_ICPC	?= no	# will be overriden from main Makefile
 
@@ -71,7 +71,7 @@ LIBNAME		?= stxxl
 #### You usually shouldn't need to change the sections below #####
 
 
-#### STXXL OPTIONS ###############################################
+#### STXXL CONFIGURATION #########################################
 
 # check, whether stxxl has been configured
 ifeq (,$(strip $(wildcard $(STXXL_ROOT)/include/stxxl.h)))
@@ -85,6 +85,7 @@ MCSTL_ROOT	?= $(HOME)/work/mcstl
 $(shell echo '#MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
 $(shell echo '#COMPILER_GCC	 = g++-4.2.3' >> $(CURDIR)/make.settings.local)
 $(shell echo '#COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
+$(shell echo '#USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
 $(error ERROR: Please check make.settings.local and try again)
 endif
 else
@@ -101,6 +102,15 @@ stat2	 = $(shell stat -L -c '%d:%i' $(STXXL_ROOT)/)
 ifneq ($(stat1),$(stat2))
 $(error ERROR: STXXL_ROOT=$(STXXL_ROOT) points to a different STXXL installation)
 endif
+endif
+
+##################################################################
+
+
+#### STXXL OPTIONS ###############################################
+
+ifeq ($(strip $(USE_MACOSX)),yes)
+PTHREAD_FLAG	?=
 endif
 
 PTHREAD_FLAG	?= -pthread
@@ -184,7 +194,7 @@ BOOST_LINKER_OPTIONS		 = \
 ##################################################################
 
 
-#### CPPUNIT OPTIONS ############################################
+#### CPPUNIT OPTIONS #############################################
 
 CPPUNIT_COMPILER_OPTIONS	+=
 
