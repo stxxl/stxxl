@@ -1,15 +1,17 @@
 /***************************************************************************
- *            priority_queue.h
+ *  include/stxxl/bits/containers/priority_queue.h
  *
- *  Thu Jul  3 15:22:50 2003
- *  Copyright  1999  Peter Sanders
- *  sanders@mpi-sb.mpg.de
- *  Copyright  2003  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- *  Copyright  2008  Johannes Singler
- *  singler@ira.uka.de
- *  Copyright © 2007, 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 1999 Peter Sanders <sanders@mpi-sb.mpg.de>
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2007, 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_PRIORITY_QUEUE_HEADER
 #define STXXL_PRIORITY_QUEUE_HEADER

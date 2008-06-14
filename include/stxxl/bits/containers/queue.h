@@ -1,10 +1,14 @@
 /***************************************************************************
- *            queue.h
+ *  include/stxxl/bits/containers/queue.h
  *
- *  Wed Mar 23 14:20:30 2005
- *  Copyright  2005  Roman Dementiev
- *  Email dementiev@ira.uka.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2005 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_QUEUE_HEADER
 #define STXXL_QUEUE_HEADER
