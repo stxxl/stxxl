@@ -1,6 +1,3 @@
-#ifndef ADAPTOR_HEADER
-#define ADAPTOR_HEADER
-
 /***************************************************************************
  *            adaptor.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_MNG_ADAPTOR_HEADER
+#define STXXL_MNG_ADAPTOR_HEADER
 
 #include <iterator>
 
@@ -588,4 +588,4 @@ TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_MNG_ADAPTOR_HEADER

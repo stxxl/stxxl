@@ -416,9 +416,8 @@ void random_shuffle(stxxl::vector_iterator < Tp_, AllocStrategy_, SzTp_, DiffTp_
     stxxl::random_shuffle(first, beyond, rand, M);
 }
 
-
 //! \}
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_RANDOM_SHUFFLE_HEADER

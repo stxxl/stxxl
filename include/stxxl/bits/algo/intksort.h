@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef INTKSORT_HEADER
-#define INTKSORT_HEADER
+#ifndef STXXL_INTKSORT_HEADER
+#define STXXL_INTKSORT_HEADER
 
 #include "stxxl/bits/common/utils.h"
 
@@ -345,7 +345,6 @@ void classify_block(type * begin, type * end, type_key * & out, int_type * bucke
     }
 }
 
-
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_INTKSORT_HEADER

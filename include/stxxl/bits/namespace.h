@@ -4,4 +4,4 @@
 #define __STXXL_BEGIN_NAMESPACE namespace stxxl {
 #define __STXXL_END_NAMESPACE }
 
-#endif
+#endif // !STXXL_NAMESPACE_HEADER

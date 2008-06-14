@@ -1,12 +1,12 @@
-#ifndef STXXL_SEED_HEADER
-#define STXXL_SEED_HEADER
-
 /***************************************************************************
  *            seed.h
  *
  *  Fri Nov 16 13:33:05 CET 2007
  *  Copyright (C) 2007  Andreas Beckmann <beckmann@mpi-inf.mpg.de>
  ****************************************************************************/
+
+#ifndef STXXL_SEED_HEADER
+#define STXXL_SEED_HEADER
 
 #include "stxxl/bits/namespace.h"
 
@@ -22,4 +22,4 @@ unsigned get_next_seed();
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_SEED_HEADER

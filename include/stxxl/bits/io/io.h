@@ -1,6 +1,3 @@
-#ifndef IO_HEADER
-#define IO_HEADER
-
 /***************************************************************************
  *            io.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_IO_HEADER
+#define STXXL_IO_HEADER
 
 #include "stxxl/bits/io/iobase.h"
 #include "stxxl/bits/io/syscall_file.h"
@@ -28,4 +28,4 @@ __STXXL_BEGIN_NAMESPACE
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_IO_HEADER

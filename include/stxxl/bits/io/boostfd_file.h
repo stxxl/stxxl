@@ -1,6 +1,3 @@
-#ifndef BOOSTFD_FILE_H_
-#define BOOSTFD_FILE_H_
-
 /***************************************************************************
  *            boostfd_file.h
  *  File implementation based on boost::iostreams::file_decriptor
@@ -8,6 +5,9 @@
  *  Copyright  2006  Roman Dementiev
  *
  ****************************************************************************/
+
+#ifndef STXXL_BOOSTFD_FILE_H_
+#define STXXL_BOOSTFD_FILE_H_
 
 #ifdef STXXL_BOOST_CONFIG // if boost is available
 
@@ -96,5 +96,4 @@ __STXXL_END_NAMESPACE
 
 #endif // BOOST_VERSION
 
-
-#endif /*BOOSTFD_FILE_H_*/
+#endif // !STXXL_BOOSTFD_FILE_H_

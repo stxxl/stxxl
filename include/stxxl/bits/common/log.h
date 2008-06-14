@@ -1,6 +1,3 @@
-#ifndef HEADER_STXXL_LOG
-#define HEADER_STXXL_LOG
-
 /***************************************************************************
  *            log.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2005  Roman Dementiev
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
+
+#ifndef STXXL_LOG_HEADER
+#define STXXL_LOG_HEADER
 
 #include "stxxl/bits/namespace.h"
 
@@ -49,4 +49,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_LOG_HEADER

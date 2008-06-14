@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef IN_MEMORY_SORT_HEADER
-#define IN_MEMORY_SORT_HEADER
+#ifndef STXXL_IN_MEMORY_SORT_HEADER
+#define STXXL_IN_MEMORY_SORT_HEADER
 
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/common/simple_vector.h"
@@ -79,4 +79,4 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_IN_MEMORY_SORT_HEADER

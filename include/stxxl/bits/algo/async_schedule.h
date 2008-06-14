@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef ASYNC_SCHEDULE_HEADER
-#define ASYNC_SCHEDULE_HEADER
+#ifndef STXXL_ASYNC_SCHEDULE_HEADER
+#define STXXL_ASYNC_SCHEDULE_HEADER
 
 #include "stxxl/io"
 
@@ -311,7 +311,6 @@ void compute_prefetch_schedule(
     delete[] write_order;
 }
 
-
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_ASYNC_SCHEDULE_HEADER

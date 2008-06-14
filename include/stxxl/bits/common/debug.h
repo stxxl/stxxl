@@ -1,6 +1,3 @@
-#ifndef HEADER_STXXL_DEBUG
-#define HEADER_STXXL_DEBUG
-
 /***************************************************************************
  *            debug.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2004  Roman Dementiev
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
+
+#ifndef STXXL_DEBUG_HEADER
+#define STXXL_DEBUG_HEADER
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
@@ -76,4 +76,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_DEBUG_HEADER

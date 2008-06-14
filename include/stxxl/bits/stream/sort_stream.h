@@ -1,7 +1,3 @@
-#ifndef SORT_STREAM_HEADER
-#define SORT_STREAM_HEADER
-
-
 /***************************************************************************
  *            sort_stream.h
  *
@@ -9,6 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_SORT_STREAM_HEADER
+#define STXXL_SORT_STREAM_HEADER
 
 #ifdef __MCSTL__
  #include <mcstl.h>
@@ -1558,4 +1557,4 @@ void sort(RandomAccessIterator begin,
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_SORT_STREAM_HEADER

@@ -1,6 +1,3 @@
-#ifndef MUTEX_HEADER
-#define MUTEX_HEADER
-
 /***************************************************************************
  *            mutex.h
  *
@@ -9,6 +6,8 @@
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
 
+#ifndef STXXL_MUTEX_HEADER
+#define STXXL_MUTEX_HEADER
 
 #include <stxxl/bits/namespace.h>
 
@@ -68,4 +67,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_MUTEX_HEADER

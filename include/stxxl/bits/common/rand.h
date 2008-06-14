@@ -1,6 +1,3 @@
-#ifndef STXXL_RAND_HEADER
-#define STXXL_RAND_HEADER
-
 /***************************************************************************
  *            rand.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_RAND_HEADER
+#define STXXL_RAND_HEADER
 
 #include <cstdlib>
 
@@ -169,4 +169,4 @@ struct random_number64
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_RAND_HEADER

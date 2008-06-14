@@ -1,6 +1,3 @@
-#ifndef IOSTATS_HEADER
-#define IOSTATS_HEADER
-
 /***************************************************************************
  *            iostats.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_IOSTATS_HEADER
+#define STXXL_IOSTATS_HEADER
 
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/common/mutex.h"
@@ -295,10 +295,9 @@ inline std::ostream & operator << (std::ostream & o, const stats & s)
     return o;
 }
 
-
 //! \}
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_IOSTATS_HEADER
 // vim: et:ts=4:sw=4

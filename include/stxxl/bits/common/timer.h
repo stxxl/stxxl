@@ -1,5 +1,5 @@
-#ifndef TIMER_HEADER
-#define TIMER_HEADER
+#ifndef STXXL_TIMER_HEADER
+#define STXXL_TIMER_HEADER
 
 /* Simple timer class by Roman Dementiev
  */
@@ -116,4 +116,4 @@ double timer::seconds()
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_TIMER_HEADER

@@ -1,6 +1,3 @@
-#ifndef MMAP_HEADER
-#define MMAP_HEADER
-
 /***************************************************************************
  *            mmap_file.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_MMAP_FILE_HEADER
+#define STXXL_MMAP_FILE_HEADER
 
 #include "stxxl/bits/io/ufs_file.h"
 
@@ -79,4 +79,4 @@ __STXXL_END_NAMESPACE
 
 #endif
 
-#endif
+#endif // !STXXL_MMAP_FILE_HEADER

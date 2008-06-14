@@ -1,6 +1,3 @@
-#ifndef ALIGNED_ALLOC
-#define ALIGNED_ALLOC
-
 /***************************************************************************
  *            aligned_alloc.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_ALIGNED_ALLOC
+#define STXXL_ALIGNED_ALLOC
 
 #include "stxxl/bits/common/utils.h"
 
@@ -40,7 +40,6 @@ aligned_dealloc (void * ptr)
     delete[] * (((char * *) ptr) - 1);
 }
 
-
-
 __STXXL_END_NAMESPACE
-#endif
+
+#endif // !STXXL_ALIGNED_ALLOC

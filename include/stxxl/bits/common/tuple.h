@@ -1,6 +1,3 @@
-#ifndef TUPLE_HEADER
-#define TUPLE_HEADER
-
 /***************************************************************************
  *            tuple.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_TUPLE_HEADER
+#define STXXL_TUPLE_HEADER
 
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/common/tmeta.h"
@@ -299,7 +299,6 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
    }
 */
 
-
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_TUPLE_HEADER

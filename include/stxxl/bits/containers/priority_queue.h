@@ -1,6 +1,3 @@
-#ifndef PRIORITY_QUEUE_HEADER
-#define PRIORITY_QUEUE_HEADER
-
 /***************************************************************************
  *            priority_queue.h
  *
@@ -13,6 +10,9 @@
  *  singler@ira.uka.de
  *  Copyright © 2007, 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  ****************************************************************************/
+
+#ifndef STXXL_PRIORITY_QUEUE_HEADER
+#define STXXL_PRIORITY_QUEUE_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/mng/prefetch_pool.h"
@@ -2651,5 +2651,5 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_PRIORITY_QUEUE_HEADER
 // vim: et:ts=4:sw=4

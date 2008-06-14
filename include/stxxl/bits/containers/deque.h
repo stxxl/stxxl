@@ -1,6 +1,3 @@
-#ifndef _STXXL_DEQUE_H
-#define _STXXL_DEQUE_H
-
 /***************************************************************************
  *            deque.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2006  Roman Dementiev
  *  Email
  ****************************************************************************/
+
+#ifndef _STXXL_DEQUE_H
+#define _STXXL_DEQUE_H
 
 #include "stxxl/vector"
 
@@ -566,7 +566,5 @@ namespace std
         a.swap(b);
     }
 }
-
-
 
 #endif /* _STXXL_DEQUE_H */

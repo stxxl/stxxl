@@ -1,6 +1,3 @@
-#ifndef COMPLETION_HANDLER_HEADER
-#define COMPLETION_HANDLER_HEADER
-
 /***************************************************************************
  *            completion_handler.h
  *
@@ -9,6 +6,9 @@
  *  dementiev@mpi-sb.mpg.de
  *  Loki-style completion handler (functors)
  ****************************************************************************/
+
+#ifndef STXXL_COMPLETION_HANDLER_HEADER
+#define STXXL_COMPLETION_HANDLER_HEADER
 
 #include "stxxl/bits/namespace.h"
 
@@ -86,4 +86,4 @@ completion_handler::completion_handler(const handler_type & handler__) :
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_COMPLETION_HANDLER_HEADER

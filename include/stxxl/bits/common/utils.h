@@ -1,6 +1,3 @@
-#ifndef MYUTILS_HEADER
-#define MYUTILS_HEADER
-
 /***************************************************************************
  *            utils.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_UTILS_HEADER
+#define STXXL_UTILS_HEADER
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
@@ -482,4 +482,5 @@ inline unsigned_type sort_memory_usage_factor()
 #endif
 
 __STXXL_END_NAMESPACE
-#endif
+
+#endif // !STXXL_UTILS_HEADER

@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef ALGO_ADAPTOR_HEADER
-#define ALGO_ADAPTOR_HEADER
+#ifndef STXXL_ALGO_ADAPTOR_HEADER
+#define STXXL_ALGO_ADAPTOR_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/mng/adaptor.h"
@@ -251,8 +251,6 @@ struct trigger_entry_iterator
     }
 };
 
-
-
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_ALGO_ADAPTOR_HEADER

@@ -1,6 +1,3 @@
-#ifndef BUF_ISTREAM_HEADER
-#define BUF_ISTREAM_HEADER
-
 /***************************************************************************
  *            buf_istream.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_BUF_ISTREAM_HEADER
+#define STXXL_BUF_ISTREAM_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/mng/block_prefetcher.h"
@@ -156,4 +156,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_BUF_ISTREAM_HEADER

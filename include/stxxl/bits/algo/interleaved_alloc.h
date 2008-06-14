@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef INTERLEAVED_ALLOC_HEADER
-#define INTERLEAVED_ALLOC_HEADER
+#ifndef STXXL_INTERLEAVED_ALLOC_HEADER
+#define STXXL_INTERLEAVED_ALLOC_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/common/rand.h"
@@ -167,4 +167,4 @@ struct interleaved_alloc_traits<single_disk>
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_INTERLEAVED_ALLOC_HEADER

@@ -1,6 +1,3 @@
-#ifndef STREAM_HEADER
-#define STREAM_HEADER
-
 /***************************************************************************
  *            stream.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_STREAM_HEADER
+#define STXXL_STREAM_HEADER
 
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/mng/buf_istream.h"
@@ -1815,4 +1815,4 @@ namespace stream
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_STREAM_HEADER

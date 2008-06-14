@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef SORT_HEADER
-#define SORT_HEADER
+#ifndef STXXL_SORT_HEADER
+#define STXXL_SORT_HEADER
 
 #include <list>
 #include <functional>
@@ -1175,5 +1175,4 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 
 __STXXL_END_NAMESPACE
 
-
-#endif
+#endif // !STXXL_SORT_HEADER

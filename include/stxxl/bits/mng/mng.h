@@ -1,6 +1,3 @@
-#ifndef MNG_HEADER
-#define MNG_HEADER
-
 /***************************************************************************
  *            mng.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_MNG_HEADER
+#define STXXL_MNG_HEADER
 
 #include "stxxl/io"
 #include <stxxl/bits/noncopyable.h>
@@ -1385,5 +1385,5 @@ void block_manager::delete_blocks (
 __STXXL_END_NAMESPACE
 
 
-#endif
+#endif // !STXXL_MNG_HEADER
 // vim: et:ts=4:sw=4

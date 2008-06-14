@@ -1,6 +1,3 @@
-#ifndef WFSFILEBASE_HEADER
-#define WFSFILEBASE_HEADER
-
 /***************************************************************************
  *            wfs_file.h
  *  Windows file system file base
@@ -8,6 +5,9 @@
  *  Copyright  2005  Roman Dementiev
  *  dementiev@ira.uka.de
  ****************************************************************************/
+
+#ifndef STXXL_WFSFILEBASE_HEADER
+#define STXXL_WFSFILEBASE_HEADER
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
@@ -92,4 +92,4 @@ __STXXL_END_NAMESPACE
 
 #endif // BOOST_MSVC
 
-#endif // WFSFILEBASE_HEADER
+#endif // !STXXL_WFSFILEBASE_HEADER

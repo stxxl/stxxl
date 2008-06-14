@@ -1,6 +1,3 @@
-#ifndef BUF_OSTREAM_HEADER
-#define BUF_OSTREAM_HEADER
-
 /***************************************************************************
  *            buf_ostream.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_BUF_OSTREAM_HEADER
+#define STXXL_BUF_OSTREAM_HEADER
 
 #include "stxxl/bits/mng/buf_writer.h"
 
@@ -102,4 +102,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_BUF_OSTREAM_HEADER

@@ -1,6 +1,3 @@
-#ifndef BLOCK_PREFETCHER_HEADER
-#define BLOCK_PREFETCHER_HEADER
-
 /***************************************************************************
  *            block_prefetcher.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_BLOCK_PREFETCHER_HEADER
+#define STXXL_BLOCK_PREFETCHER_HEADER
 
 #include <vector>
 #include <queue>
@@ -187,5 +187,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-
-#endif
+#endif // !STXXL_BLOCK_PREFETCHER_HEADER

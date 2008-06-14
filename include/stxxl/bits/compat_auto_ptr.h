@@ -33,4 +33,4 @@ struct compat_auto_ptr {
 
 __STXXL_END_NAMESPACE
 
-#endif // STXXL_HEADER__COMPAT_AUTO_PTR_H_
+#endif // !STXXL_HEADER__COMPAT_AUTO_PTR_H_

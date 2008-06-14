@@ -1,12 +1,12 @@
-#ifndef STXXL_MAP_INCLUDE
-#define STXXL_MAP_INCLUDE
-
 /***************************************************************************
  *            map.h
  *
  *  Copyright  2006  Roman Dementiev
  *  Email
  ****************************************************************************/
+
+#ifndef STXXL_MAP_HEADER
+#define STXXL_MAP_HEADER
 
 #include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/containers/btree/btree.h"
@@ -424,4 +424,4 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_MAP_HEADER

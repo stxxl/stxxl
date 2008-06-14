@@ -1,6 +1,3 @@
-#ifndef STXXL_VECTOR_HEADER
-#define STXXL_VECTOR_HEADER
-
 /***************************************************************************
  *            vector.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_VECTOR_HEADER
+#define STXXL_VECTOR_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/common/tmeta.h"
@@ -1460,4 +1460,4 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_VECTOR_HEADER

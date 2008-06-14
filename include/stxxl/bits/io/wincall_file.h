@@ -1,6 +1,3 @@
-#ifndef WINCALL_HEADER
-#define WINCALL_HEADER
-
 /***************************************************************************
  *            wincall_file.h
  *
@@ -9,6 +6,8 @@
  *  dementiev@ira.uka.de
  ****************************************************************************/
 
+#ifndef STXXL_WINCALL_FILE_HEADER
+#define STXXL_WINCALL_FILE_HEADER
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
@@ -70,11 +69,10 @@ public:
     const char * io_type ();
 };
 
-
 //! \}
 
 __STXXL_END_NAMESPACE
 
 #endif // BOOST_MSVC
 
-#endif // WINCALL_HEADER
+#endif // !STXXL_WINCALL_FILE_HEADER

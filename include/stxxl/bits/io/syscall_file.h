@@ -1,6 +1,3 @@
-#ifndef SYSCALL_HEADER
-#define SYSCALL_HEADER
-
 /***************************************************************************
  *            syscall_file.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_SYSCALL_FILE_HEADER
+#define STXXL_SYSCALL_FILE_HEADER
 
 #include "stxxl/bits/io/ufs_file.h"
 #include "stxxl/bits/common/debug.h"
@@ -62,10 +62,8 @@ public:
     const char * io_type ();
 };
 
-
 //! \}
 
 __STXXL_END_NAMESPACE
 
-
-#endif
+#endif // !STXXL_SYSCALL_FILE_HEADER

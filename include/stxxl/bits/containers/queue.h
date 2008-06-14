@@ -1,6 +1,3 @@
-#ifndef STXXL_QUEUE_HEADER
-#define STXXL_QUEUE_HEADER
-
 /***************************************************************************
  *            queue.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2005  Roman Dementiev
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
+
+#ifndef STXXL_QUEUE_HEADER
+#define STXXL_QUEUE_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/common/simple_vector.h"
@@ -280,9 +280,8 @@ public:
     }
 };
 
-
 //! \}
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_QUEUE_HEADER

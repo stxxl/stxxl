@@ -1,6 +1,3 @@
-#ifndef STXXL_EXCEPTIONS_H_
-#define STXXL_EXCEPTIONS_H_
-
 /***************************************************************************
  *            exceptions.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2006  Roman Dementiev
  *  Email dementiev@ira.uka.de
  ****************************************************************************/
+
+#ifndef STXXL_EXCEPTIONS_H_
+#define STXXL_EXCEPTIONS_H_
 
 #include <iostream>
 #include <string>
@@ -47,4 +47,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif /* STXXL_EXCEPTIONS_H_*/
+#endif // !STXXL_EXCEPTIONS_H_

@@ -1,6 +1,3 @@
-#ifndef BUFFERED_WRITER_HEADER
-#define BUFFERED_WRITER_HEADER
-
 /***************************************************************************
  *            buf_writer.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_BUFFERED_WRITER_HEADER
+#define STXXL_BUFFERED_WRITER_HEADER
 
 #include <vector>
 
@@ -215,4 +215,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_BUFFERED_WRITER_HEADER

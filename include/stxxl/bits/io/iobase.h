@@ -1,6 +1,3 @@
-#ifndef IOBASE_HEADER
-#define IOBASE_HEADER
-
 /***************************************************************************
  *            iobase.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_IOBASE_HEADER
+#define STXXL_IOBASE_HEADER
 
 #ifndef STXXL_IO_STATS
  #define STXXL_IO_STATS 1
@@ -709,5 +709,4 @@ private:
 
 __STXXL_END_NAMESPACE
 
-
-#endif
+#endif // !STXXL_IOBASE_HEADER

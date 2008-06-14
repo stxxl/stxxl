@@ -1,6 +1,3 @@
-#ifndef PAGER_HEADER
-#define PAGER_HEADER
-
 /***************************************************************************
  *            pager.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_PAGER_HEADER
+#define STXXL_PAGER_HEADER
 
 #include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/rand.h"
@@ -102,4 +102,4 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_PAGER_HEADER

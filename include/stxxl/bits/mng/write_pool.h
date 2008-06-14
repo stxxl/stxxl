@@ -1,6 +1,3 @@
-#ifndef WRITE_POOL_HEADER
-#define WRITE_POOL_HEADER
-
 /***************************************************************************
  *            write_pool.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_WRITE_POOL_HEADER
+#define STXXL_WRITE_POOL_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 
@@ -253,4 +253,4 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_WRITE_POOL_HEADER

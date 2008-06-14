@@ -5,6 +5,7 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
 #ifndef STXXL_MALLOC_H
 #define STXXL_MALLOC_H
 
@@ -124,10 +125,9 @@ inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
     return s;
 }
 
-
 class malloc_setup
 { };
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_MALLOC_H

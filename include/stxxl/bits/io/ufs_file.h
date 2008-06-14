@@ -1,6 +1,3 @@
-#ifndef UFSFILEBASE_HEADER
-#define UFSFILEBASE_HEADER
-
 /***************************************************************************
  *            ufs_file.h
  *  UNIX file system file base
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_UFSFILEBASE_HEADER
+#define STXXL_UFSFILEBASE_HEADER
 
 #include "stxxl/bits/io/iobase.h"
 
@@ -83,4 +83,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_UFSFILEBASE_HEADER

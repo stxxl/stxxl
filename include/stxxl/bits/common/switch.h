@@ -1,6 +1,3 @@
-#ifndef SWITCH_HEADER
-#define SWITCH_HEADER
-
 /***************************************************************************
  *            switch.h
  *	kind of semaphore
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_SWITCH_HEADER
+#define STXXL_SWITCH_HEADER
 
 #include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/utils.h"
@@ -133,4 +133,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_SWITCH_HEADER

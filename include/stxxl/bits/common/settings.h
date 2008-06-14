@@ -3,8 +3,8 @@
  * @brief Provides a static class to store runtime tuning parameters.
  */
 
-#ifndef SETTINGS_HEADER
-#define SETTINGS_HEADER
+#ifndef STXXL_SETTINGS_HEADER
+#define STXXL_SETTINGS_HEADER
 
 #include "stxxl/bits/namespace.h"
 
@@ -24,4 +24,4 @@ typedef settings<> SETTINGS;
 
 __STXXL_END_NAMESPACE
 
-#endif /* SETTINGS_HEADER */
+#endif // !STXXL_SETTINGS_HEADER

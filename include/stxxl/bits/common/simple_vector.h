@@ -1,5 +1,5 @@
-#ifndef SIMPLE_VECTOR_HEADER
-#define SIMPLE_VECTOR_HEADER
+#ifndef STXXL_SIMPLE_VECTOR_HEADER
+#define STXXL_SIMPLE_VECTOR_HEADER
 
 #include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/utils.h"
@@ -85,4 +85,4 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_SIMPLE_VECTOR_HEADER

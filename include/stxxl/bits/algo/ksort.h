@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef KSORT_HEADER
-#define KSORT_HEADER
+#ifndef STXXL_KSORT_HEADER
+#define STXXL_KSORT_HEADER
 
 #include <list>
 
@@ -1152,4 +1152,4 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, unsigned_type M__)
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_KSORT_HEADER

@@ -22,4 +22,4 @@ const char * get_version_string();
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_VERSION_HEADER

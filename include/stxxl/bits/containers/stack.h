@@ -1,6 +1,3 @@
-#ifndef STXXL_STACK_HEADER
-#define STXXL_STACK_HEADER
-
 /***************************************************************************
  *            stack.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_STACK_HEADER
+#define STXXL_STACK_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/common/simple_vector.h"
@@ -906,4 +906,4 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_STACK_HEADER

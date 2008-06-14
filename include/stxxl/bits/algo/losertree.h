@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef LOSERTREE_HEADER
-#define LOSERTREE_HEADER
+#ifndef STXXL_LOSERTREE_HEADER
+#define STXXL_LOSERTREE_HEADER
 
 #include <stxxl/bits/noncopyable.h>
 #include "stxxl/bits/common/utils.h"
@@ -255,4 +255,4 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_LOSERTREE_HEADER

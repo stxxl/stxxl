@@ -1,6 +1,3 @@
-#ifndef PREFETCH_POOL_HEADER
-#define PREFETCH_POOL_HEADER
-
 /***************************************************************************
  *            prefetch_pool.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2003  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_PREFETCH_POOL_HEADER
+#define STXXL_PREFETCH_POOL_HEADER
 
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/mng/write_pool.h"
@@ -243,4 +243,4 @@ namespace std
     }
 }
 
-#endif
+#endif // !STXXL_PREFETCH_POOL_HEADER

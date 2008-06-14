@@ -1,6 +1,3 @@
-#ifndef MYUTILS_HEADER
-#define MYUTILS_HEADER
-
 /***************************************************************************
  *            utils_ledasm.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_UTILS_HEADER
+#define STXXL_UTILS_HEADER
 
 /*
  * Abgespeckte Version von common/utils.h für LEDA-SM/TPIE Tests
@@ -365,4 +365,5 @@ bool operator!= (const new_alloc<T1> &,
 }
 
 __STXXL_END_NAMESPACE
-#endif
+
+#endif // !STXXL_UTILS_HEADER

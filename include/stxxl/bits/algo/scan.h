@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef SCAN_HEADER
-#define SCAN_HEADER
+#ifndef STXXL_SCAN_HEADER
+#define STXXL_SCAN_HEADER
 
 #include "stxxl/bits/namespace.h"
 #include "stxxl/bits/mng/buf_istream.h"
@@ -225,4 +225,4 @@ _ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityCompara
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_SCAN_HEADER

@@ -41,4 +41,4 @@ struct compat_hash_set {
 
 __STXXL_END_NAMESPACE
 
-#endif // STXXL_HEADER__COMPAT_HASH_SET_H_
+#endif // !STXXL_HEADER__COMPAT_HASH_SET_H_

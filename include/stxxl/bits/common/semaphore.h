@@ -1,6 +1,3 @@
-#ifndef SEMAPHORE_HEADER
-#define SEMAPHORE_HEADER
-
 /***************************************************************************
  *            semaphore.h
  *
@@ -8,6 +5,9 @@
  *  Copyright  2002  Roman Dementiev
  *  dementiev@mpi-sb.mpg.de
  ****************************************************************************/
+
+#ifndef STXXL_SEMAPHORE_HEADER
+#define STXXL_SEMAPHORE_HEADER
 
 #ifdef STXXL_BOOST_THREADS
  #include <boost/thread/mutex.hpp>
@@ -120,7 +120,6 @@ public:
     //};
 };
 
-
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // !STXXL_SEMAPHORE_HEADER

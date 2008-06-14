@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef RUN_CURSOR_HEADER
-#define RUN_CURSOR_HEADER
+#ifndef STXXL_RUN_CURSOR_HEADER
+#define STXXL_RUN_CURSOR_HEADER
 
 #include "stxxl/bits/common/utils.h"
 
@@ -121,4 +121,4 @@ struct run_cursor_cmp
 __STXXL_END_NAMESPACE
 
 
-#endif
+#endif // !STXXL_RUN_CURSOR_HEADER

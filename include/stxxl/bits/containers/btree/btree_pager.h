@@ -82,5 +82,4 @@ namespace std
     }
 }
 
-
 #endif /* STXXL_CONTAINERS_BTREE__BTREE_PAGER_H */
