@@ -1,5 +1,7 @@
 #include <iostream>
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 #include <cstdlib>
 #include "stxxl/bits/common/utils.h"
 
@@ -11,6 +13,7 @@ using std::endl;
 
 void print_malloc_stats()
 {
+#ifndef __APPLE__
     struct mallinfo info = mallinfo();
     STXXL_MSG("MALLOC statistics BEGIN");
     STXXL_MSG("===============================================================");
@@ -25,6 +28,9 @@ void print_malloc_stats()
     STXXL_MSG("number of bytes allocated but not in use       : " << info.fordblks);
     STXXL_MSG("top-most, releasable (via malloc_trim) space   : " << info.keepcost);
     STXXL_MSG("================================================================");
+#else
+    STXXL_MSG("MALLOC statistics are not supported on this platform");
+#endif
 }
 
 int main(int argc, char * argv[])
