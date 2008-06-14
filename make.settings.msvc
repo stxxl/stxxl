@@ -119,7 +119,6 @@ IO_LAYER_FILES	 = \
 
 MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/adaptor.h \
-	$(HEADER_PATH)/mng/async_schedule.h \
 	$(HEADER_PATH)/mng/block_prefetcher.h \
 	$(HEADER_PATH)/mng/buf_istream.h \
 	$(HEADER_PATH)/mng/buf_ostream.h \

@@ -310,10 +310,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\algo\asynch_schedule.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\algo\gen_file.cpp"
 					>
 				</File>
@@ -553,10 +549,6 @@
 				>
 				<File
 					RelativePath=".\include\stxxl\bits\mng\adaptor.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\stxxl\bits\mng\async_schedule.h"
 					>
 				</File>
 				<File

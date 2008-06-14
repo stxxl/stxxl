@@ -218,7 +218,7 @@ HEADER_FILES_IO		+= completion_handler.h io.h iobase.h iostats.h
 HEADER_FILES_IO		+= mmap_file.h simdisk_file.h syscall_file.h
 HEADER_FILES_IO		+= ufs_file.h wincall_file.h wfs_file.h boostfd_file.h
 
-HEADER_FILES_MNG	+= adaptor.h async_schedule.h block_prefetcher.h
+HEADER_FILES_MNG	+= adaptor.h block_prefetcher.h
 HEADER_FILES_MNG	+= buf_istream.h buf_ostream.h buf_writer.h mng.h
 HEADER_FILES_MNG	+= write_pool.h prefetch_pool.h
 
