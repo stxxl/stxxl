@@ -1,3 +1,15 @@
+/***************************************************************************
+ *  io/ufs_file.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #include "stxxl/bits/io/ufs_file.h"
 
 #ifndef BOOST_MSVC
@@ -240,6 +252,5 @@ void ufs_file_base::set_size (stxxl::int64 newsize)
     if (newsize > cur_size)
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
 }
-
 
 __STXXL_END_NAMESPACE

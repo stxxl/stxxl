@@ -1,3 +1,15 @@
+/***************************************************************************
+ *  io/wincall_file.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002-2006 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #include "stxxl/bits/io/wincall_file.h"
 
 #ifdef BOOST_MSVC
@@ -176,4 +188,4 @@ request_ptr wincall_file::awrite (
 
 __STXXL_END_NAMESPACE
 
-#endif // BOOST_MSVC
+#endif // #ifdef BOOST_MSVC

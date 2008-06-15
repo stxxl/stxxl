@@ -100,6 +100,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // BOOST_VERSION
+#endif // #ifdef STXXL_BOOST_CONFIG
 
 #endif // !STXXL_BOOSTFD_FILE_H_

@@ -96,6 +96,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // BOOST_MSVC
+#endif // #ifdef BOOST_MSVC
 
 #endif // !STXXL_WFSFILEBASE_HEADER

@@ -1,16 +1,21 @@
 /***************************************************************************
- *            benchmark_disks.cpp
+ *  io/benchmark_disks.cpp
  *
- *  Sat Aug 24 23:52:15 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2007 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 /*
- example gnuplot command for the output of this program:
- (x-axis: disk offset in GB, y-axis: bandwidth in MB/s)
+   example gnuplot command for the output of this program:
+   (x-axis: disk offset in GB, y-axis: bandwidth in MB/s)
 
- plot \
+   plot \
         "disk.log" using ($3/1024):($14) w l title "read", \
         "disk.log" using ($3/1024):($7)  w l title "write"
  */

@@ -1,3 +1,15 @@
+/***************************************************************************
+ *  io/syscall_file.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #include "stxxl/bits/io/syscall_file.h"
 
 __STXXL_BEGIN_NAMESPACE
@@ -174,12 +186,10 @@ request_ptr syscall_file::awrite (
     if (!req.get())
         stxxl_function_error(io_error);
 
-
 #ifndef NO_OVERLAPPING
     disk_queues::get_instance ()->add_writereq(req, get_id());
 #endif
     return req;
 }
-
 
 __STXXL_END_NAMESPACE

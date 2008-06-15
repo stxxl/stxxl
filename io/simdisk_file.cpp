@@ -1,8 +1,19 @@
+/***************************************************************************
+ *  io/simdisk_file.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #include "stxxl/bits/io/simdisk_file.h"
 
-#ifdef BOOST_MSVC
+#ifndef BOOST_MSVC
 // mmap call does not exist in Windows
-#else
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -294,4 +305,4 @@ request_ptr sim_disk_file::awrite (
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // #ifndef BOOST_MSVC

@@ -1,11 +1,17 @@
 /***************************************************************************
- *            sd_test.cpp
+ *  io/sd_test.cpp
  *
- *  Sat Aug 24 23:52:27 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
+// Tests sim_disk file implementation
+// must be run on in-memory swap partition !
 
 #include "stxxl/io"
 #include "stxxl/random"
@@ -13,10 +19,6 @@
 
 using stxxl::file;
 using stxxl::stxxl_timestamp;
-
-
-// Tests sim_disk file implementation
-// must be run on in-memory swap partition !
 
 
 int main()

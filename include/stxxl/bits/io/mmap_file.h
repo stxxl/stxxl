@@ -19,9 +19,8 @@
  #include <boost/config.hpp>
 #endif
 
-#ifdef BOOST_MSVC
+#ifndef BOOST_MSVC
 // mmap call does not exist in Windows
-#else
 
  #include <sys/mman.h>
 
@@ -81,6 +80,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif
+#endif // #ifndef BOOST_MSVC
 
 #endif // !STXXL_MMAP_FILE_HEADER
