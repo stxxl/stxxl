@@ -1,19 +1,22 @@
 /***************************************************************************
- *            test_sorted_runs.cpp
+ *  stream/test_sorted_runs.cpp
  *
- *  Tue Nov 25 17:44:30 2003
- *  Copyright  2003  Roman Dementiev
- *  Email dementiev@mpi-sb.mpg.de
- ****************************************************************************/
-
-#include "stxxl/stream"
-
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \example stream/test_sorted_runs.cpp
 //! This is an example of how to use some basic algorithms from
 //! stream package. This example shows how to create
 //! \c sorted_runs data structure from sorted sequences
 //! using \c stream::from_sorted_sequences specialization of \c stream::runs_creator class
+
+#include "stxxl/stream"
 
 
 typedef unsigned value_type;

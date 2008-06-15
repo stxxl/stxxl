@@ -1,20 +1,24 @@
 /***************************************************************************
- *            test_stream.cpp
+ *  stream/test_stream.cpp
  *
- *  Fri Oct 5  13:40:22 2003
- *  Copyright  2003  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
-
-#include "stxxl/stream"
-#include "stxxl/vector"
-#include <vector>
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \example stream/test_stream.cpp
 //! This is an example of how to use some basic algorithms from the
 //! stream package. The example sorts characters of a string producing an
 //! array of sorted tuples (character, index position).
-//!
+
+#include "stxxl/stream"
+#include "stxxl/vector"
+#include <vector>
+
 
 #define USE_FORMRUNS_N_MERGE // comment if you want to use one 'sort' algorithm
                              // without producing intermediate sorted runs.

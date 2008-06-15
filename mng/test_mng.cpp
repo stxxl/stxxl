@@ -1,18 +1,21 @@
 /***************************************************************************
- *            test_mng.cpp
+ *  mng/test_mng.cpp
  *
- *  Sat Aug 24 23:52:33 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
-
-
-#include <iostream>
-#include "stxxl/mng"
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \example mng/test_mng.cpp
 //! This is an example of use of completion handlers, \c stxxl::block_manager, and
 //! \c stxxl::typed_block
+
+#include <iostream>
+#include "stxxl/mng"
 
 #define BLOCK_SIZE (1024 * 512)
 
@@ -83,8 +86,9 @@ int main ()
     delete[] reqs;
     delete[] block;
 
+#if 0
     // variable-size blocks, not supported currently
-    /*
+
        BIDArray<0> vbids (nblocks);
        for(i=0;i<nblocks;i++)
        vbids[i].size = 1024 + i;
@@ -94,5 +98,6 @@ int main ()
        for(i=0;i<nblocks;i++)
        STXXL_MSG("Allocated block: offset="<<vbids[i].offset<<", size="<<vbids[i].size);
 
-       bm->delete_blocks(vbids.begin (), vbids.end ());  */
+       bm->delete_blocks(vbids.begin (), vbids.end ());
+#endif
 }

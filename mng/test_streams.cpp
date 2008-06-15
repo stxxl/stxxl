@@ -1,19 +1,22 @@
 /***************************************************************************
- *            test_streams.cpp
+ *  mng/test_streams.cpp
  *
- *  Sat Aug 24 23:52:33 2002
- *  Copyright  2002  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
+//! \example mng/test_streams.cpp
+//! This is an example of use of \c stxxl::buf_istream and \c stxxl::buf_ostream
 
 #include <iostream>
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/mng/buf_ostream.h"
 #include "stxxl/bits/mng/buf_istream.h"
-
-//! \example mng/test_streams.cpp
-//! This is an example of use of \c stxxl::buf_istream and \c stxxl::buf_ostream
 
 
 #define BLOCK_SIZE (1024 * 512)

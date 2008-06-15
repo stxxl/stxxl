@@ -1,3 +1,15 @@
+/***************************************************************************
+ *  utils/pq_param.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 #include <iostream>
 #include <cmath>
 #include "stxxl/bits/common/utils.h"
@@ -12,7 +24,7 @@ int64 D(int64 m, int64 k, int64 MaxS, int64 E, int64 B)
 using std::cout;
 using std::endl;
 
-int main(int /*argc*/, char * /*argv*/[])
+int main()
 {
     int64 IntM = 128 * 1024 * 1024;
     int64 E = 4;

@@ -1,19 +1,22 @@
 /***************************************************************************
- *            test_push_sort.cpp
+ *  stream/test_push_sort.cpp
  *
- *  Thu Mar 18 17:11:24 2004
- *  Copyright  2004  Roman Dementiev
- *  Email dementiev@mpi-sb.mpg.de
- ****************************************************************************/
-
-#include "stxxl/stream"
-
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \example stream/test_push_sort.cpp
 //! This is an example of how to use some basic algorithms from
 //! stream package. This example shows how to create
 //! \c sorted_runs data structure
 //! using \c stream::use_push specialization of \c stream::runs_creator class
+
+#include "stxxl/stream"
 
 
 typedef unsigned value_type;
@@ -80,7 +83,6 @@ int main()
     STXXL_MSG("CRC: " << crc);
     assert(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
     assert(merger.empty());
-
 
     return 0;
 }
