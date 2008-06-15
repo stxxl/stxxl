@@ -15,8 +15,7 @@
 
 //! \example io/test_io.cpp
 //! This is an example of use of \c \<stxxl\> files, requests, and
-//! completion tracking mechanisms, i.e. \c stxxl::file , \c stxxl::request , and
-//! \c stxxl::mc
+//! completion tracking mechanisms, i.e. \c stxxl::file , \c stxxl::request
 
 using stxxl::file;
 
