@@ -87,7 +87,7 @@ public:
         check_pthread_call(pthread_mutex_unlock(&mutex));
 #endif
     }
-    int operator ()  ()
+    int operator () ()
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);

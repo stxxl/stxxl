@@ -25,7 +25,7 @@ struct MyType
 
 struct my_handler
 {
-    void operator ()  (stxxl::request * req)
+    void operator () (stxxl::request * req)
     {
         STXXL_MSG(req << " done, type=" << req->io_type());
     }

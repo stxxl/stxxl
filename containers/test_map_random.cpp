@@ -115,7 +115,7 @@ int main(int argc, char * argv[])
         if (i % (MAX_STEP / 1000) == 0)
         {
             STXXL_MSG("*****************************************************");
-            STXXL_MSG("Step=" << i << " (" << (unsigned) stdmap.size() << ")");
+            STXXL_MSG("Step=" << i << " (" << (unsigned)stdmap.size() << ")");
         }
 
         // *********************************************************
@@ -123,7 +123,7 @@ int main(int argc, char * argv[])
         // *********************************************************
         if (step < (percent += PERCENT_CLEAR))
         {
-            if ((unsigned) rand() % 1000 < stdmap.size())
+            if ((unsigned)rand() % 1000 < stdmap.size())
             {
                 stdmap.clear();
                 xxlmap.clear();

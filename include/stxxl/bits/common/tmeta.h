@@ -82,10 +82,10 @@ class SWITCH
     };
 
 public:
-    typedef typename IF < found,
-    typename Case::Type,
-    typename SWITCH<tag, NextCase>::result
-    > ::result result;
+    typedef typename IF<found,
+                        typename Case::Type,
+                        typename SWITCH<tag, NextCase>::result
+                        >::result result;
 };
 
 template <int tag>
@@ -102,12 +102,12 @@ class LOG2_floor
 public:
     enum
     {
-        value = LOG2_floor < Input / 2 > ::value + 1
+        value = LOG2_floor<Input / 2>::value + 1
     };
 };
 
 template <>
-class LOG2_floor < 1 >
+class LOG2_floor<1>
 {
 public:
     enum
@@ -117,7 +117,7 @@ public:
 };
 
 template <>
-class LOG2_floor < 0 >
+class LOG2_floor<0>
 {
 public:
     enum
@@ -132,13 +132,13 @@ class LOG2
 public:
     enum
     {
-        floor = LOG2_floor < Input > ::value,
-        ceil = LOG2_floor < Input - 1 > ::value + 1
+        floor = LOG2_floor<Input>::value,
+        ceil = LOG2_floor<Input - 1>::value + 1
     };
 };
 
 template <>
-class LOG2 < 1 >
+class LOG2<1>
 {
 public:
     enum
@@ -149,7 +149,7 @@ public:
 };
 
 template <>
-class LOG2 < 0 >
+class LOG2<0>
 {
 public:
     enum

@@ -42,7 +42,7 @@ namespace btree
 
         struct bid_comp
         {
-            bool operator ()  (const bid_type & a, const bid_type & b) const
+            bool operator () (const bid_type & a, const bid_type & b) const
             {
                 return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);
             }

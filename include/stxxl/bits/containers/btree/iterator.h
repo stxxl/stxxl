@@ -190,7 +190,7 @@ namespace btree
 
         btree_iterator & operator = (const btree_iterator & obj)
         {
-            btree_iterator_base<btree_type>::operator =(obj);
+            btree_iterator_base<btree_type>::operator = (obj);
             return *this;
         }
 
@@ -206,12 +206,12 @@ namespace btree
 
         bool operator == (const btree_iterator & obj) const
         {
-            return btree_iterator_base<btree_type>::operator ==(obj);
+            return btree_iterator_base<btree_type>::operator == (obj);
         }
 
         bool operator != (const btree_iterator & obj) const
         {
-            return btree_iterator_base<btree_type>::operator !=(obj);
+            return btree_iterator_base<btree_type>::operator != (obj);
         }
 
         btree_iterator & operator ++ ()
@@ -282,7 +282,7 @@ namespace btree
 
         btree_const_iterator & operator = (const btree_const_iterator & obj)
         {
-            btree_iterator_base<btree_type>::operator =(obj);
+            btree_iterator_base<btree_type>::operator = (obj);
             return *this;
         }
 
@@ -299,22 +299,22 @@ namespace btree
 
         bool operator == (const iterator & obj) const
         {
-            return btree_iterator_base<btree_type>::operator ==(obj);
+            return btree_iterator_base<btree_type>::operator == (obj);
         }
 
         bool operator != (const iterator & obj) const
         {
-            return btree_iterator_base<btree_type>::operator !=(obj);
+            return btree_iterator_base<btree_type>::operator != (obj);
         }
 
         bool operator == (const btree_const_iterator & obj) const
         {
-            return btree_iterator_base<btree_type>::operator ==(obj);
+            return btree_iterator_base<btree_type>::operator == (obj);
         }
 
         bool operator != (const btree_const_iterator & obj) const
         {
-            return btree_iterator_base<btree_type>::operator !=(obj);
+            return btree_iterator_base<btree_type>::operator != (obj);
         }
 
         btree_const_iterator & operator ++ ()
@@ -358,14 +358,14 @@ namespace btree
     inline bool operator == (const btree_iterator<BTreeType> & a,
                              const btree_const_iterator<BTreeType> & b)
     {
-        return a.btree_iterator_base<BTreeType>::operator ==(b);
+        return a.btree_iterator_base<BTreeType>::operator == (b);
     }
 
     template <class BTreeType>
     inline bool operator != (const btree_iterator<BTreeType> & a,
                              const btree_const_iterator<BTreeType> & b)
     {
-        return a.btree_iterator_base<BTreeType>::operator !=(b);
+        return a.btree_iterator_base<BTreeType>::operator != (b);
     }
 }
 

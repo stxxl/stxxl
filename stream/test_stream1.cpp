@@ -17,7 +17,7 @@ struct Input
     {
         return value == 1;
     }
-    Input & operator ++()
+    Input & operator ++ ()
     {
         --value;
         rnd_value = rnd();
@@ -35,7 +35,7 @@ struct Input
 struct Cmp : std::binary_function<unsigned, unsigned, bool>
 {
     typedef unsigned value_type;
-    bool operator ()  (const value_type & a, const value_type & b) const
+    bool operator () (const value_type & a, const value_type & b) const
     {
         return a < b;
     }

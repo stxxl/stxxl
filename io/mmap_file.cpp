@@ -84,12 +84,12 @@ void mmap_request::serve()
             if (type == READ)
             {
                 memcpy(buffer, mem, bytes);
-                stxxl_check_ge_0(munmap((char *) mem, bytes), io_error);
+                stxxl_check_ge_0(munmap((char *)mem, bytes), io_error);
             }
             else
             {
                 memcpy(mem, buffer, bytes);
-                stxxl_check_ge_0(munmap((char *) mem, bytes), io_error);
+                stxxl_check_ge_0(munmap((char *)mem, bytes), io_error);
             }
         }
  #endif

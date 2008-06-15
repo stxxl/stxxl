@@ -53,7 +53,8 @@ exclusive_prefix_sum (int_type * bucket, int_type K)
 
 
 // distribute input a to output b using bucket for the starting indices
-template <typename type_key> static void
+template <typename type_key>
+static void
 classify (type_key * a, type_key * aEnd, type_key * b, int_type * bucket, typename type_key::key_type offset, unsigned shift)
 {
     for (type_key * p = a; p < aEnd; p++)
@@ -67,14 +68,16 @@ classify (type_key * a, type_key * aEnd, type_key * b, int_type * bucket, typena
 
 
 
-template < class T > inline void
+template <class T>
+inline void
 sort2 (T & a, T & b)
 {
     if (b < a)
         std::swap (a, b);
 }
 
-template < class T > inline void
+template <class T>
+inline void
 sort3 (T & a, T & b, T & c)
 {
     T temp;
@@ -120,7 +123,8 @@ sort3 (T & a, T & b, T & c)
 }
 
 
-template < class T > inline void
+template <class T>
+inline void
 sort4 (T & a, T & b, T & c, T & d)
 {
     sort2 (a, b);
@@ -172,7 +176,8 @@ sort4 (T & a, T & b, T & c, T & d)
 }
 
 
-template < class T > inline void
+template <class T>
+inline void
 sort5 (T & a, T & b, T & c, T & d, T & e)
 {
     sort2 (a, b);
@@ -218,7 +223,8 @@ sort5 (T & a, T & b, T & c, T & d, T & e)
 }
 
 
-template < class T > inline void
+template <class T>
+inline void
 insertion_sort (T * a, T * aEnd)
 {
     T * pp;
@@ -250,7 +256,8 @@ insertion_sort (T * a, T * aEnd)
 // sort each bucket
 // bucket[i] is an index one off to the right from
 // the end of the i-th bucket
-template < class T > static void
+template <class T>
+static void
 cleanup (T * b, int_type * bucket, int_type K)
 {
     T * c = b;

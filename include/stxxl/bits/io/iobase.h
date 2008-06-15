@@ -119,7 +119,7 @@ class request_ptr;
 struct default_completion_handler
 {
     //! \brief An operator that does nothing
-    void operator ()  (request *) { }
+    void operator () (request *) { }
 };
 
 //! \brief Defines interface of file
@@ -205,7 +205,8 @@ class disk_queues;
 class request : private noncopyable
 {
     friend int wait_any(request_ptr req_array[], int count);
-    template <class request_iterator_> friend
+    template <class request_iterator_>
+    friend
     request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end);
     friend class file;
     friend class disk_queue;

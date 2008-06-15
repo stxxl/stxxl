@@ -34,7 +34,7 @@ struct interleaved_striping
                                           begindisk (_begindisk), diff (_enddisk - _begindisk)
     { }
 
-    int operator ()  (int_type i) const
+    int operator () (int_type i) const
     {
         return begindisk + (i / nruns) % diff;
     }
@@ -50,7 +50,7 @@ struct interleaved_FR : public interleaved_striping
                                _enddisk)
     { }
     random_number<random_uniform_fast> rnd;
-    int operator ()  (int_type /*i*/) const
+    int operator () (int_type /*i*/) const
     {
         return begindisk + rnd(diff);
     }
@@ -70,7 +70,7 @@ struct interleaved_SR : public interleaved_striping
             offsets.push_back(rnd(diff));
     }
 
-    int operator ()  (int_type i) const
+    int operator () (int_type i) const
     {
         return begindisk + (i / nruns + offsets[i % nruns]) % diff;
     }
@@ -100,7 +100,7 @@ struct interleaved_RC : public interleaved_striping
         }
     }
 
-    int operator ()  (int_type i) const
+    int operator () (int_type i) const
     {
         return begindisk + perms[i % nruns][(i / nruns) % diff];
     }

@@ -40,7 +40,7 @@ public:
         return **outstream;
     }
 
-    write_vector & operator ++()
+    write_vector & operator ++ ()
     {
         ++it;
         ++(*outstream);

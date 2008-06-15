@@ -32,7 +32,7 @@ std::ostream & operator << (std::ostream & o, const my_type & obj)
 
 struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
 {
-    bool operator ()  (const my_type & a, const my_type & b) const
+    bool operator () (const my_type & a, const my_type & b) const
     {
         return a.key > b.key;
     }

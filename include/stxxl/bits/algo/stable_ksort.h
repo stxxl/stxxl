@@ -127,8 +127,8 @@ namespace stable_ksort_local
 
     template <typename ExtIterator_>
     void distribute(
-        bid_sequence < typename ExtIterator_::vector_type::block_type::bid_type,
-        typename ExtIterator_::vector_type::alloc_strategy > * bucket_bids,
+        bid_sequence<typename ExtIterator_::vector_type::block_type::bid_type,
+                     typename ExtIterator_::vector_type::alloc_strategy> * bucket_bids,
         int64 * bucket_sizes,
         const int_type nbuckets,
         const int_type lognbuckets,
@@ -141,8 +141,8 @@ namespace stable_ksort_local
         typedef typename value_type::key_type key_type;
         typedef typename ExtIterator_::block_type block_type;
         typedef typename block_type::bid_type bid_type;
-        typedef buf_istream < typename ExtIterator_::block_type,
-        typename ExtIterator_::bids_container_iterator > buf_istream_type;
+        typedef buf_istream<typename ExtIterator_::block_type,
+                            typename ExtIterator_::bids_container_iterator> buf_istream_type;
 
         int_type i = 0;
 
@@ -309,7 +309,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         const unsigned_type nwrite_buffers_bs = m - 2 * max_bucket_size_bl;
         STXXL_MSG("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
 
-        typedef buf_ostream < block_type, typename ExtIterator_::bids_container_iterator > buf_ostream_type;
+        typedef buf_ostream<block_type, typename ExtIterator_::bids_container_iterator> buf_ostream_type;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
 
         disk_queues::get_instance()->set_priority_op(disk_queue::READ);

@@ -95,22 +95,22 @@ public:
         return *this;
     }
 
-    reference operator *()
+    reference operator * ()
     {
         return Deque->Vector[Offset];
     }
 
-    pointer operator ->()
+    pointer operator -> ()
     {
         return &(Deque->Vector[Offset]);
     }
 
-    const_reference operator *() const
+    const_reference operator * () const
     {
         return Deque->Vector[Offset];
     }
 
-    const_pointer operator ->() const
+    const_pointer operator -> () const
     {
         return &(Deque->Vector[Offset]);
     }
@@ -125,23 +125,23 @@ public:
         return Deque->Vector[(Offset + op) % Deque->Vector.size()];
     }
 
-    _Self & operator ++()
+    _Self & operator ++ ()
     {
         Offset = (Offset + 1) % Deque->Vector.size();
         return *this;
     }
-    _Self operator ++(int)
+    _Self operator ++ (int)
     {
         _Self __tmp = *this;
         Offset = (Offset + 1) % Deque->Vector.size();
         return __tmp;
     }
-    _Self & operator --()
+    _Self & operator -- ()
     {
         Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
         return *this;
     }
-    _Self operator --(int)
+    _Self operator -- (int)
     {
         _Self __tmp = *this;
         Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
@@ -256,12 +256,12 @@ public:
         return *this;
     }
 
-    const_reference operator *() const
+    const_reference operator * () const
     {
         return Deque->Vector[Offset];
     }
 
-    const_pointer operator ->() const
+    const_pointer operator -> () const
     {
         return &(Deque->Vector[Offset]);
     }
@@ -271,23 +271,23 @@ public:
         return Deque->Vector[(Offset + op) % Deque->Vector.size()];
     }
 
-    _Self & operator ++()
+    _Self & operator ++ ()
     {
         Offset = (Offset + 1) % Deque->Vector.size();
         return *this;
     }
-    _Self operator ++(int)
+    _Self operator ++ (int)
     {
         _Self __tmp = *this;
         Offset = (Offset + 1) % Deque->Vector.size();
         return __tmp;
     }
-    _Self & operator --()
+    _Self & operator -- ()
     {
         Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
         return *this;
     }
-    _Self operator --(int)
+    _Self operator -- (int)
     {
         _Self __tmp = *this;
         Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();

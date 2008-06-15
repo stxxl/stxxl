@@ -38,7 +38,7 @@ struct sim_event // only one type of event: WRITE COMPLETED
 
 struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
 {
-    inline bool operator ()  (const sim_event & a, const sim_event & b) const
+    inline bool operator () (const sim_event & a, const sim_event & b) const
     {
         return a.timestamp > b.timestamp;
     }
@@ -54,7 +54,7 @@ int_type simulate_async_write(
 typedef std::pair<int_type, int_type> write_time_pair;
 struct write_time_cmp : public std::binary_function<write_time_pair, write_time_pair, bool>
 {
-    inline bool operator ()  (const write_time_pair & a, const write_time_pair & b) const
+    inline bool operator () (const write_time_pair & a, const write_time_pair & b) const
     {
         return a.second > b.second;
     }
@@ -116,7 +116,7 @@ void simulate_async_write(
 
             oldtime = cur.timestamp;
         }
-        o_time[cur.iblock] = std::pair < int_type, int_type > (cur.iblock, cur.timestamp + 1);
+        o_time[cur.iblock] = std::pair<int_type, int_type>(cur.iblock, cur.timestamp + 1);
 
         m++;
         if (i >= 0)
@@ -158,7 +158,7 @@ void compute_prefetch_schedule(
     int_type m,
     int_type D)
 {
-    typedef std::pair<int_type, int_type>  pair_type;
+    typedef std::pair<int_type, int_type> pair_type;
     const int_type L = input.size();
     if (L <= D)
     {
@@ -241,7 +241,7 @@ void simulate_async_write(
 
             oldtime = cur.timestamp;
         }
-        o_time[cur.iblock] = std::pair < int_type, int_type > (cur.iblock, cur.timestamp + 1);
+        o_time[cur.iblock] = std::pair<int_type, int_type>(cur.iblock, cur.timestamp + 1);
 
         m++;
         if (i >= 0)
@@ -284,7 +284,7 @@ void compute_prefetch_schedule(
     int_type m,
     int_type D)
 {
-    typedef std::pair<int_type, int_type>  pair_type;
+    typedef std::pair<int_type, int_type> pair_type;
     const int_type L = input_end - input_begin;
     STXXL_VERBOSE1("compute_prefetch_schedule: sequence length=" << L << " disks=" << D);
     if (L <= D)

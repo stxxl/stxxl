@@ -14,7 +14,7 @@ using namespace stxxl;
 
 struct my_handler
 {
-    void operator ()  (request * ptr)
+    void operator () (request * ptr)
     {
         STXXL_MSG("Request completed: " << ptr);
     }

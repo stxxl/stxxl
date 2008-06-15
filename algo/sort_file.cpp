@@ -52,7 +52,7 @@ bool operator < (const my_type & a, const my_type & b)
 
 struct Cmp
 {
-    bool operator ()  (const my_type & a, const my_type & b) const
+    bool operator () (const my_type & a, const my_type & b) const
     {
         return a < b;
     }

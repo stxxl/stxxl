@@ -48,7 +48,7 @@ struct get_key
 {
     typedef my_type::key_type1 key_type;
     my_type dummy;
-    key_type operator ()  (const my_type & obj) const
+    key_type operator () (const my_type & obj) const
     {
         return obj._key;
     }

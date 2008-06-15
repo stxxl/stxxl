@@ -22,7 +22,7 @@ typedef unsigned value_type;
 struct Cmp : public std::binary_function<value_type, value_type, bool>
 {
     typedef unsigned value_type;
-    bool operator ()  (const value_type & a, const value_type & b) const
+    bool operator () (const value_type & a, const value_type & b) const
     {
         return a < b;
     }

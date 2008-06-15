@@ -61,7 +61,7 @@ bool operator < (const my_type & a, const my_type & b)
 
 struct zero
 {
-    unsigned operator ()  ()
+    unsigned operator () ()
     {
         return 0;
     }

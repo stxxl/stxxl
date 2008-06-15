@@ -57,7 +57,7 @@ protected:
     };
     struct batch_entry_cmp
     {
-        bool operator ()  (const batch_entry & a, const batch_entry & b) const
+        bool operator () (const batch_entry & a, const batch_entry & b) const
         {
             return (a.offset > b.offset);
         }

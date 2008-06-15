@@ -65,7 +65,7 @@ int simulate_async_write(
 
 
         STXXL_MSG("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock]);
-        o_time[cur.iblock] = std::pair < int, int > (cur.iblock, cur.timestamp);
+        o_time[cur.iblock] = std::pair<int, int>(cur.iblock, cur.timestamp);
 
         m++;
         if (i >= 0)
@@ -118,7 +118,7 @@ void compute_prefetch_schedule(
     int m,
     int D)
 {
-    typedef std::pair<int, int>  pair_type;
+    typedef std::pair<int, int> pair_type;
     int L = last - first;
     if (L <= D)
     {

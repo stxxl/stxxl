@@ -26,7 +26,7 @@ using namespace stxxl;
 
 struct my_handler
 {
-    void operator ()  (request * req)
+    void operator () (request * req)
     {
         STXXL_MSG(req << " done, type=" << req->io_type());
     }

@@ -51,7 +51,7 @@ int main()
     my_type::key_type max_key = 1 * 1024 * 1024;
     unsigned int block_size = 1 * 1024 * 1024;
     unsigned int records_in_block = block_size / sizeof(my_type);
-    my_type * array = (my_type *) stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
+    my_type * array = (my_type *)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
     stxxl::syscall_file f("./in", stxxl::file::CREAT | stxxl::file::RDWR);
     stxxl::request_ptr req;
 

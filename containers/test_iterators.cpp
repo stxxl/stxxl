@@ -8,7 +8,7 @@
 template <typename T>
 struct modify
 {
-    void operator ()  (T & obj) const
+    void operator () (T & obj) const
     {
         ++obj;
     }
@@ -100,7 +100,7 @@ struct cmp : public std::less<key_type>
 template <>
 struct modify<std::pair<const key_type, data_type> >
 {
-    void operator ()  (std::pair<const key_type, data_type> & obj) const
+    void operator () (std::pair<const key_type, data_type> & obj) const
     {
         ++(obj.second);
     }

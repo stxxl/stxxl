@@ -76,7 +76,7 @@ public:
 
     //! \brief Returns reference to the current record
     //! \return reference to the current record
-    reference operator *()
+    reference operator * ()
     {
         return current_blk->elem[current_elem];
     }

@@ -37,7 +37,7 @@ __STXXL_BEGIN_NAMESPACE
 //! - BlkSz size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)
 //! - AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
 //! - SzTp size data type, default is \c stxxl::uint64
-template <     class ValTp,
+template <class ValTp,
           unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
           class SzTp = stxxl::uint64>
@@ -102,7 +102,7 @@ public:
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side) , default is 1
     //!  \warning Number of blocks in the write pool must be at least 2
     //!  \warning Number of blocks in the prefetch pool must be at least 1
-    queue(write_pool < block_type > &  w_pool_, prefetch_pool<block_type> & p_pool_, unsigned blocks2prefetch_ = 1) :
+    queue(write_pool<block_type> &  w_pool_, prefetch_pool<block_type> & p_pool_, unsigned blocks2prefetch_ = 1) :
         size_(0),
         delete_pools(false),
         w_pool(&w_pool_),
