@@ -71,6 +71,30 @@ LIBNAME		?= stxxl
 #### You usually shouldn't need to change the sections below #####
 
 
+#### MACOSX CONFIGURATION ########################################
+
+ifeq ($(strip $(USE_MACOSX)),yes)
+
+PTHREAD_FLAG	?=
+
+GET_FILE_ID	?= stat -L -f '%d:%i' $1
+
+endif
+
+##################################################################
+
+
+#### LINUX (DEFAULT) CONFIGURATION ###############################
+
+PTHREAD_FLAG	?= -pthread
+
+# get a unique identifier for a file or directory,
+# e.g. device number + inode number
+GET_FILE_ID	?= stat -L -c '%d:%i' $1
+
+##################################################################
+
+
 #### STXXL CONFIGURATION #########################################
 
 # check, whether stxxl has been configured
@@ -96,8 +120,8 @@ endif
 
 # in the top dir, check whether STXXL_ROOT points to ourselves
 ifneq (,$(wildcard make.settings))
-stat1	 = $(shell stat -L -c '%d:%i' ./)
-stat2	 = $(shell stat -L -c '%d:%i' $(STXXL_ROOT)/)
+stat1	 = $(shell $(call GET_FILE_ID, ./))
+stat2	 = $(shell $(call GET_FILE_ID, $(STXXL_ROOT)/))
 
 ifneq ($(stat1),$(stat2))
 $(error ERROR: STXXL_ROOT=$(STXXL_ROOT) points to a different STXXL installation)
@@ -108,12 +132,6 @@ endif
 
 
 #### STXXL OPTIONS ###############################################
-
-ifeq ($(strip $(USE_MACOSX)),yes)
-PTHREAD_FLAG	?=
-endif
-
-PTHREAD_FLAG	?= -pthread
 
 STXXL_SPECIFIC	+= \
 	$(PTHREAD_FLAG) \
