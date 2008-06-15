@@ -1,11 +1,14 @@
 /***************************************************************************
- *            leda_sm_stack_benchmark.cpp
+ *  containers/leda_sm_stack_benchmark.cpp
  *
- *  Wed Jul 12 18:28:43 2006
- *  Copyright  2006  User Roman Dementiev
- *  Email
- ****************************************************************************/
-
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \example containers/leda_sm_stack_benchmark.cpp
 //! This is a benchmark mentioned in the paper

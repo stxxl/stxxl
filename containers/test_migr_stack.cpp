@@ -1,13 +1,14 @@
 /***************************************************************************
- *            test_migr_stack.cpp
+ *  containers/test_migr_stack.cpp
  *
- *  Fri May  2 13:34:25 2003
- *  Copyright  2003  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
-
-
-#include "stxxl/stack"
 
 //! \example containers/test_migr_stack.cpp
 //! This is an example of how to use \c stxxl::STACK_GENERATOR class
@@ -15,6 +16,8 @@
 //! external implementation \c normal_stack , \b four blocks per page,
 //! block size \b 4096 bytes, and internal implementation
 //! \c std::stack<int>
+
+#include "stxxl/stack"
 
 
 int main()

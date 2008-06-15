@@ -1,11 +1,16 @@
 /***************************************************************************
-*            monotonic-pq.cpp
-*
-*  Copyright  2003  Roman Dementiev
-*  dementiev@mpi-sb.mpg.de
-*  Copyright  2007  Johannes Singler
-*  singler@ira.uka.de
-****************************************************************************/
+ *  containers/monotonic_pq.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #include <iomanip>
 

@@ -1,11 +1,15 @@
 /***************************************************************************
-                          map_test_handlers.h  -  description
-                             -------------------
-    begin                : Son Okt 24 2004
-    copyright            : (C) 2004 by Thomas Nowak, Roman Dementiev
-    email                : t.nowak@imail.de
-***************************************************************************/
-
+ *  containers/map_test_handlers.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2004 Thomas Nowak <t.nowak@imail.de>
+ *  Copyright (C) 2004 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \file map_test_handlers.h
 //! \brief This file contains help functions for testing of stxxl::map.

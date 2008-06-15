@@ -1,19 +1,23 @@
 /***************************************************************************
- *            test_pqueue.cpp
+ *  containers/test_pqueue.cpp
  *
- *  Fri Jul  4 11:31:34 2003
- *  Copyright  2003  Roman Dementiev
- *  dementiev@mpi-sb.mpg.de
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+//! \example containers/test_pqueue.cpp
+//! This is an example of how to use \c stxxl::PRIORITY_QUEUE_GENERATOR
+//! and \c stxxl::priority_queue
 
 #include <limits>
 #include <stxxl/priority_queue>
 
 #define RECORD_SIZE 128
-
-//! \example containers/test_pqueue.cpp
-//! This is an example of how to use \c stxxl::PRIORITY_QUEUE_GENERATOR
-//! and \c stxxl::priority_queue
 
 struct my_type
 {

@@ -1,14 +1,14 @@
 /***************************************************************************
- *            berkeley_db_benchmark.cpp
+ *  containers/berkeley_db_benchmark.cpp
  *
- *  Fri Mar  3 16:33:04 2006
- *  Copyright  2006  Roman Dementiev
- *  Email
- ****************************************************************************/
-
-#include <stxxl/vector>
-#include <stxxl/map>
-#include <stxxl/timer>
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \example containers/berkeley_db_benchmark.cpp
 //! This is a benchmark mentioned in the paper
@@ -16,6 +16,10 @@
 //! Software: Practice and Experience
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
+
+#include <stxxl/vector>
+#include <stxxl/map>
+#include <stxxl/timer>
 
 
 ///// BDB header ////////////

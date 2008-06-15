@@ -1,12 +1,24 @@
-#include <iostream>
-#include <algorithm>
-#include <stxxl/vector>
-#include <stxxl/algorithm>
+/***************************************************************************
+ *  containers/test_vector.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \example containers/test_vector.cpp
 //! This is an example of use of \c stxxl::vector and
 //! \c stxxl::VECTOR_GENERATOR. Vector type is configured
 //! to store 64-bit integers and have 2 pages each of 1 block
+
+#include <iostream>
+#include <algorithm>
+#include <stxxl/vector>
+#include <stxxl/algorithm>
 
 typedef stxxl::int64 int64;
 

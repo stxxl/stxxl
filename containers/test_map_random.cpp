@@ -1,22 +1,25 @@
 /***************************************************************************
-                          test_map_random.cpp  -  description
-                             -------------------
-    begin                : Mon Feb 14 2005
-    copyright            : (C) 2005 by Thomas Nowak
-    email                : t.nowak@imail.de
-
-          fixed by                                       : Roman Dementiev (01.03.2006)
-***************************************************************************/
+ *  containers/test_map_random.cpp
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2005 by Thomas Nowak <t.nowak@imail.de>
+ *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \file containers/test_map_random.cpp
 //! \brief File for testing functionality of stxxl::map.
 
+//! \example containers/test_map_random.cpp
+//! This is an example of use of \c stxxl::map container.
+
 #include <stxxl/map>
 #include "map_test_handlers.h"
 
-
-//! \example containers/test_map_random.cpp
-//! This is an example of use of \c stxxl::map container.
 
 typedef int key_type;
 typedef int data_type;

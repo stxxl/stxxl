@@ -1,11 +1,14 @@
 /***************************************************************************
+ *  containers/leda_sm_pq_benchmark.cpp
  *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Mon Jul 10 16:01:47 2006
- *  Copyright  2006  User Roman Dementiev
- *  Email
- ****************************************************************************/
-
+ *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 //! \example containers/leda_sm_pq_benchmark.cpp
 //! This is a benchmark mentioned in the paper
