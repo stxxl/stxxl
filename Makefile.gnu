@@ -67,12 +67,18 @@ endif
 ifneq (,$(wildcard .svn))
 lib-in-common: common/version_svn.defs
 
-STXXL_SVN_BRANCH	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/URL/{s/.*\/svnroot\/stxxl//;/branches/s/\/branches\///p}')
+GET_SVN_INFO		?= LC_ALL=POSIX svn info $1
+GET_SVN_INFO_SED	?= sed
+GET_SVN_INFO_DATE	?= $(call GET_SVN_INFO, $1) | $(GET_SVN_INFO_SED) -n -e '/Last Changed Date/{' -e 's/.*: //' -e 's/ .*//' -e 's/-//g' -e 'p' -e '}'
+GET_SVN_INFO_REV	?= $(call GET_SVN_INFO, $1) | $(GET_SVN_INFO_SED) -n -e '/Last Changed Rev/s/.*: //p'
+GET_SVN_INFO_BRANCH	?= $(call GET_SVN_INFO, $1) | $(GET_SVN_INFO_SED) -n -e '/URL/{' -e 's/.*\/svnroot\/stxxl//' -e '/branches/s/\/branches\///p' -e '}'
+
+STXXL_SVN_BRANCH	:= $(shell $(call GET_SVN_INFO_BRANCH, .))
 
 ifeq (,$(strip $(shell svnversion . | tr -d 0-9)))
 # clean checkout - use svn info
-STXXL_VERSION_DATE	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Date/{s/.*: //;s/ .*//;s/-//gp}')
-STXXL_VERSION_SVN_REV	:= $(shell LC_ALL=POSIX svn info . | sed -ne '/Last Changed Rev/s/.*: //p')
+STXXL_VERSION_DATE	:= $(shell $(call GET_SVN_INFO_DATE, .))
+STXXL_VERSION_SVN_REV	:= $(shell $(call GET_SVN_INFO_REV, .))
 else
 # modified, mixed, ... checkout - use svnversion and today
 STXXL_VERSION_DATE	:= $(shell date "+%Y%m%d")
@@ -84,8 +90,8 @@ ifneq (,$(strip $(MCSTL_ROOT)))
 ifneq (,$(wildcard $(MCSTL_ROOT)/.svn))
 ifeq (,$(strip $(shell svnversion $(MCSTL_ROOT) | tr -d 0-9)))
 # clean checkout - use svn info
-MCSTL_VERSION_DATE	:= $(shell LC_ALL=POSIX svn info $(MCSTL_ROOT) | sed -ne '/Last Changed Date/{s/.*: //;s/ .*//;s/-//gp}')
-MCSTL_VERSION_SVN_REV	:= $(shell LC_ALL=POSIX svn info $(MCSTL_ROOT) | sed -ne '/Last Changed Rev/s/.*: //p')
+MCSTL_VERSION_DATE	:= $(shell $(call GET_SVN_INFO_DATE, $(MCSTL_ROOT)))
+MCSTL_VERSION_SVN_REV	:= $(shell $(call GET_SVN_INFO_REV, $(MCSTL_ROOT)))
 else
 # modified, mixed, ... checkout - use svnversion and today
 MCSTL_VERSION_DATE	:= $(shell date "+%Y%m%d")
