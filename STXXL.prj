@@ -101,7 +101,6 @@ module.include.files=\
 	mng/buf_istream.h\
 	mng/buf_ostream.h\
 	algo/scan.h\
-	common/gprof.h\
 	algo/sort.h\
 	algo/stable_ksort.h\
 	algo/adaptor.h\

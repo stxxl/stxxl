@@ -432,10 +432,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\stxxl\bits\common\gprof.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\stxxl\bits\common\log.h"
 					>
 				</File>

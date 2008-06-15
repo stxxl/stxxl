@@ -91,7 +91,6 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/state.h \
 	$(HEADER_PATH)/common/timer.h \
 	$(HEADER_PATH)/common/utils.h \
-	$(HEADER_PATH)/common/gprof.h \
 	$(HEADER_PATH)/common/simple_vector.h \
 	$(HEADER_PATH)/common/switch.h \
 	$(HEADER_PATH)/common/tmeta.h \

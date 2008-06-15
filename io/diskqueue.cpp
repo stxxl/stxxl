@@ -11,7 +11,6 @@
  **************************************************************************/
 
 #include "stxxl/bits/io/iobase.h"
-#include "stxxl/bits/common/gprof.h"
 
 
 #ifndef STXXL_BOOST_THREADS
