@@ -20,11 +20,11 @@
 #include <vector>
 
 
-#define USE_FORMRUNS_N_MERGE // comment if you want to use one 'sort' algorithm
-                             // without producing intermediate sorted runs.
+#define USE_FORMRUNS_N_MERGE    // comment if you want to use one 'sort' algorithm
+                                // without producing intermediate sorted runs.
 
-#define USE_EXTERNAL_ARRAY // comment if you want to use internal vectors as
-                           // input/output of the algorithm
+#define USE_EXTERNAL_ARRAY      // comment if you want to use internal vectors as
+                                // input/output of the algorithm
 
 #define block_size (8 * 1024)
 

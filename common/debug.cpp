@@ -55,7 +55,7 @@ void debugmon::block_deallocated(char * ptr)
  #endif
 
     STXXL_VERBOSE1("debugmon: block_deallocated from " << long(ptr));
-    assert(tags.find(ptr) != tags.end());             // allocated
+    assert(tags.find(ptr) != tags.end());       // allocated
     tag t = tags[ptr];
     assert(t.ongoing == false);             // not ongoing
     tags.erase(ptr);
@@ -67,11 +67,11 @@ void debugmon::block_deallocated(char * ptr)
     while (ptr1 < endptr)
     {
         STXXL_VERBOSE1("debugmon: block_deallocated next " << long(ptr1));
-        assert(tags.find(ptr1) != tags.end());                 // allocated
+        assert(tags.find(ptr1) != tags.end());  // allocated
         tag t = tags[ptr1];
-        assert(t.ongoing == false);                 // not ongoing
+        assert(t.ongoing == false);             // not ongoing
         assert(t.size == size);                 // chunk size
-        assert(t.end == endptr);                 // array end address
+        assert(t.end == endptr);                // array end address
         tags.erase(ptr1);
         ptr1 += size;
     }
@@ -88,7 +88,7 @@ void debugmon::io_started(char * ptr)
  #endif
 
     STXXL_VERBOSE1("debugmon: I/O on block " << long(ptr) << " started");
-    assert(tags.find(ptr) != tags.end());             // allocated
+    assert(tags.find(ptr) != tags.end());       // allocated
     tag t = tags[ptr];
     //assert(t.ongoing == false); // not ongoing
     if (t.ongoing == true)
@@ -110,7 +110,7 @@ void debugmon::io_finished(char * ptr)
  #endif
 
     STXXL_VERBOSE1("debugmon: I/O on block " << long(ptr) << " finished");
-    assert(tags.find(ptr) != tags.end());             // allocated
+    assert(tags.find(ptr) != tags.end());       // allocated
     tag t = tags[ptr];
     //assert(t.ongoing == true); // ongoing
     if (t.ongoing == false)

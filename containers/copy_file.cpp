@@ -32,7 +32,7 @@ int main(int argc, char * argv[])
     unlink(argv[2]);             // delete output file
 
     syscall_file InputFile(argv[1], file::RDONLY);            // Input file object
-    syscall_file OutputFile(argv[2], file::RDWR | file::CREAT);          // Output file object
+    syscall_file OutputFile(argv[2], file::RDWR | file::CREAT); // Output file object
 
     typedef stxxl::vector<my_type> vector_type;
 
@@ -43,7 +43,7 @@ int main(int argc, char * argv[])
 
     std::cout << "File " << argv[1] << " has size " << InputVector.size() << " bytes." << std::endl;
 
-    vector_type::const_iterator it = InputVector.begin();             // creating const iterator
+    vector_type::const_iterator it = InputVector.begin();       // creating const iterator
 
 
     for ( ; it != InputVector.end(); ++it)       // iterate through InputVector

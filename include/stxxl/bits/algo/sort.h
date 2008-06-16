@@ -256,22 +256,22 @@ namespace sort_local
         wait_all(read_reqs1, run_size);
         STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1");
 
-        if (block_type::has_filler)
+        if (block_type::has_filler) {
             std::sort(
                 ArrayOfSequencesIterator<
                     block_type,
                     typename block_type::value_type,
-                    block_type::size>
-                  (Blocks1, 0),
+                    block_type::size
+                    > (Blocks1, 0),
                 ArrayOfSequencesIterator<
                     block_type,
                     typename block_type::value_type,
-                    block_type::size>
-                  (Blocks1, run_size * block_type::size),
+                    block_type::size
+                    > (Blocks1, run_size * block_type::size),
                 cmp);
-        else
+        } else {
             std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
-
+        }
 
         STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
         wait_all(write_reqs, m2);
@@ -486,7 +486,8 @@ namespace sort_local
             for (int_type i = 0; i < nruns; i++)                //initialize sequences
             {
                 buffers[i] = prefetcher.pull_block();           //get first block of each run
-                seqs[i] = std::make_pair(buffers[i]->begin(), buffers[i]->end());               //this memory location stays the same, only the data is exchanged
+                seqs[i] = std::make_pair(buffers[i]->begin(), buffers[i]->end());
+                                                                //this memory location stays the same, only the data is exchanged
             }
 
  #ifdef STXXL_CHECK_ORDER_IN_SORTS
@@ -498,8 +499,7 @@ namespace sort_local
                 diff_type rest = block_type::size;                      //elements still to merge for this output block
 
                 STXXL_VERBOSE1("output block " << j);
-                do
-                {
+                do {
                     value_type * min_last_element = NULL;               //no element found yet
                     diff_type total_size = 0;
 
@@ -535,11 +535,12 @@ namespace sort_local
 
                     STXXL_VERBOSE1("finished loop");
 
-                    ptrdiff_t output_size = (std::min)(less_equal_than_min_last, rest);                           //at most rest elements
+                    ptrdiff_t output_size = (std::min)(less_equal_than_min_last, rest);         //at most rest elements
 
                     STXXL_VERBOSE1("before merge" << output_size);
 
-                    mcstl::multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size, false);                         //sequence iterators are progressed appropriately
+                    mcstl::multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size, false);
+                                                                                                //sequence iterators are progressed appropriately
 
                     STXXL_VERBOSE1("after merge");
 
@@ -555,7 +556,7 @@ namespace sort_local
                         {
                             if (prefetcher.block_consumed(buffers[i]))
                             {
-                                seqs[i].first = buffers[i]->begin();                                    //reset iterator
+                                seqs[i].first = buffers[i]->begin();                            //reset iterator
                                 seqs[i].second = buffers[i]->end();
                                 STXXL_VERBOSE1("block ran empty " << i);
                             }
@@ -678,8 +679,7 @@ namespace sort_local
         block_manager * mng = block_manager::get_instance ();
         const unsigned_type ndisks = cfg->disks_number ();
 
-        //STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+"
-        //	   << partial_runs);
+        //STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
 
 #if STXXL_IO_STATS
         stats * iostats = stats::get_instance();

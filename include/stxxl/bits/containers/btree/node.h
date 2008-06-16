@@ -109,11 +109,11 @@ namespace btree
                 *(cur + 1) = *cur;
             // copy elements to make space for the new element
 
-            *place2insert = splitter;                     // insert
+            *place2insert = splitter;           // insert
 
             ++(block_->info.cur_size);
 
-            if (size() > max_nelements())                    // overflow! need to split
+            if (size() > max_nelements())       // overflow! need to split
             {
                 STXXL_VERBOSE1("btree::normal_node::insert overflow happened, splitting");
 
@@ -177,12 +177,12 @@ namespace btree
             if (TotalSize <= RightNode->max_nelements())
             {
                 // fuse
-                RightNode->fuse(*LeftNode);                         // add the content of LeftNode to RightNode
+                RightNode->fuse(*LeftNode);                                     // add the content of LeftNode to RightNode
 
                 cache_.unfix_node(RightBid);
-                cache_.delete_node(LeftBid);                         // 'delete_node' unfixes LeftBid also
+                cache_.delete_node(LeftBid);                                    // 'delete_node' unfixes LeftBid also
 
-                std::copy(leftIt + 1, block_->begin() + size(), leftIt);                        // delete left BID from the root
+                std::copy(leftIt + 1, block_->begin() + size(), leftIt);        // delete left BID from the root
                 --(block_->info.cur_size);
             }
             else

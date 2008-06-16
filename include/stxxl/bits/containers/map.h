@@ -72,8 +72,8 @@ namespace btree
 template <class KeyType,
           class DataType,
           class CompareType,
-          unsigned RawNodeSize = 16 * 1024,                             // 16 KBytes default
-          unsigned RawLeafSize = 128 * 1024,                             // 128 KBytes default
+          unsigned RawNodeSize = 16 * 1024,     // 16 KBytes default
+          unsigned RawLeafSize = 128 * 1024,    // 128 KBytes default
           class PDAllocStrategy = stxxl::SR
           >
 class map : private noncopyable

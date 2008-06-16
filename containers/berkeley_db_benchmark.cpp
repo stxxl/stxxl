@@ -42,8 +42,8 @@
 
 #define LEAF_BLOCK_SIZE         (32 * 1024)
 
-#define TOTAL_CACHE_SIZE    (750 * 1024 * 1024)
-//#define TOTAL_CACHE_SIZE    (150*1024*1024)
+#define TOTAL_CACHE_SIZE        (750 * 1024 * 1024)
+//#define TOTAL_CACHE_SIZE      (150*1024*1024)
 
 //#define NODE_CACHE_SIZE       (1*(TOTAL_CACHE_SIZE/40))
 //#define LEAF_CACHE_SIZE       (39*(TOTAL_CACHE_SIZE/40))
@@ -186,7 +186,7 @@ typedef stxxl::VECTOR_GENERATOR<std::pair<my_key, my_data>, 1, 1>::result vector
 
 
 //#define KEYPOS        (i % KEY_SIZE)
-//#define VALUE                 (myrand() % 26)
+//#define VALUE         (myrand() % 26)
 
 
 #if 0
@@ -230,7 +230,7 @@ void run_bdb_btree(stxxl::int64 ops)
     memset(data1_storage.databuf, 'b', DATA_SIZE);
 
 
-    Db db(NULL, 0);                   // Instantiate the Db object
+    Db db(NULL, 0);             // Instantiate the Db object
 
     try {
         db.set_errfile(stderr);
@@ -238,12 +238,12 @@ void run_bdb_btree(stxxl::int64 ops)
         db.set_cachesize(0, cachesize, 1);
 
         // Open the database
-        db.open(NULL,                // Transaction pointer
-                filename,      // Database file name
-                NULL,            // Optional logical database name
-                DB_BTREE,        // Database access method
-                DB_CREATE,          // Open flags
-                0);              // File mode (using defaults)
+        db.open(NULL,           // Transaction pointer
+                filename,       // Database file name
+                NULL,           // Optional logical database name
+                DB_BTREE,       // Database access method
+                DB_CREATE,      // Open flags
+                0);             // File mode (using defaults)
 
 
         // here we start with the tests
@@ -1034,12 +1034,12 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         STXXL_MSG("BDB cache size set.");
 
         // Open the database
-        db.open(NULL,                        // Transaction pointer
-                filename,                  // Database file name
-                NULL,                        // Optional logical database name
-                DB_BTREE,                    // Database access method
-                DB_CREATE,                      // Open flags
-                0);                          // File mode (using defaults)
+        db.open(NULL,           // Transaction pointer
+                filename,       // Database file name
+                NULL,           // Optional logical database name
+                DB_BTREE,       // Database access method
+                DB_CREATE,      // Open flags
+                0);             // File mode (using defaults)
 
         db.get_env()->memp_stat(NULL, NULL, DB_STAT_CLEAR);
 

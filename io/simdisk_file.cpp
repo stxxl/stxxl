@@ -88,10 +88,10 @@ IC35L080AVVA07::IC35L080AVVA07()
     cmd_ovh = 0.0002;                           // in s
     seek_time = 0.0082;                         // in s
     rot_latency = 0.00417;                      // in s
-    head_switch_time = 0.0015;                          // in s
-    cyl_switch_time = 0.002;                            // in s
-    revolution_time = 0.0083;                           // in s
-    interface_speed = 100000000;                        // in byte/s
+    head_switch_time = 0.0015;                  // in s
+    cyl_switch_time = 0.002;                    // in s
+    revolution_time = 0.0083;                   // in s
+    interface_speed = 100000000;                // in byte/s
 
     int first_sect = 0;
     int last_cyl = 0;

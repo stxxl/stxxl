@@ -30,7 +30,7 @@ class write_vector
 
 public:
     write_vector(ExtIterator begin,
-                 unsigned nbuffers_                                        // buffers to use for overlapping (>=2 recommended)
+                 unsigned nbuffers_             // buffers to use for overlapping (>=2 recommended)
                  ) : it(begin), nbuffers(nbuffers_)
     {
         outstream = new buf_ostream_type(it.bid(), nbuffers);
@@ -57,8 +57,8 @@ public:
 
         while (const_out.block_offset())
         {
-            **outstream = *const_out;              // might cause I/Os for loading the page that
-            ++const_out;                                 // contains data beyond out
+            **outstream = *const_out;           // might cause I/Os for loading the page that
+            ++const_out;                        // contains data beyond out
             ++(*outstream);
         }
 
@@ -92,7 +92,7 @@ int main(int argc, char * argv[])
     unlink(argv[2]);             // delete output file
 
     syscall_file InputFile(argv[1], file::RDONLY);            // Input file object
-    syscall_file OutputFile(argv[2], file::RDWR | file::CREAT);          // Output file object
+    syscall_file OutputFile(argv[2], file::RDWR | file::CREAT);     // Output file object
 
     typedef stxxl::vector<my_type> vector_type;
 
@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
 
     std::cout << "File " << argv[1] << " has size " << InputVector.size() << " bytes." << std::endl;
 
-    vector_type::const_iterator it = InputVector.begin();             // creating const iterator
+    vector_type::const_iterator it = InputVector.begin();           // creating const iterator
 
     write_vector<vector_type::iterator> Writer(OutputVector.begin(), 2);
 

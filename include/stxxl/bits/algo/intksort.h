@@ -29,11 +29,13 @@ count(type_key * a, type_key * aEnd, int_type * bucket, int_type K, typename typ
     for (type_key * p = a; p < aEnd; p++)
     {
         int_type i = (p->key - offset) >> shift;
-        /*if(!(i<K && i>=0))
-           {
-                STXXL_ERRMSG("i: "<<i);
-                abort();
-           }*/
+        /*
+        if (!(i < K && i >= 0))
+        {
+            STXXL_ERRMSG("i: " << i);
+            abort();
+        }
+        */
         bucket[i]++;
     }
 }
@@ -127,7 +129,7 @@ inline void
 sort4(T & a, T & b, T & c, T & d)
 {
     sort2(a, b);
-    sort2(c, d);               // a < b ; c < d
+    sort2(c, d);                // a < b ; c < d
     if (c < a)
     {                           // c minimal, a < b
         if (d < a)
@@ -188,7 +190,7 @@ sort5(T & a, T & b, T & c, T & d, T & e)
     }                           // a < d < e, a < b
     if (d < c)
     {
-        std::swap(c, d);               // a minimal, c < {de}
+        std::swap(c, d);        // a minimal, c < {de}
         sort2(d, e);
     }
     else
@@ -232,7 +234,7 @@ insertion_sort(T * a, T * aEnd)
         // Invariant a..p-1 is sorted;
         T t = *p;
         if (t < *a)
-        {                       // new minimum
+        {   // new minimum
             // move stuff to the right
             for (pp = p; pp != a; pp--)
             {
@@ -278,7 +280,8 @@ cleanup(T * b, int_type * bucket, int_type K)
         case 4:
             sort4(c[0], c[1], c[2], c[3]);
             break;
-        case 5:         //sort5(c[0], c[1], c[2], c[3], c[4]);  break;
+        case 5:
+            //sort5(c[0], c[1], c[2], c[3], c[4]);  break;
         case 6:
         case 7:
         case 8:
@@ -341,11 +344,13 @@ void classify_block(type * begin, type * end, type_key * & out, int_type * bucke
         out->ptr = p;
         typename type::key_type key = keyobj(*p);
         int_type ibucket = (key - offset) >> shift;
-        /*if(!(ibucket<K && ibucket>=0))
-           {
-                STXXL_ERRMSG("ibucket: "<<ibucket<<" K:"<<K);
-                abort();
-           }*/
+        /*
+        if (!(ibucket < K && ibucket >= 0))
+        {
+            STXXL_ERRMSG("ibucket: " << ibucket << " K:" << K);
+            abort();
+        }
+        */
         out->key = key;
         bucket[ibucket]++;
     }

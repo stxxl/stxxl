@@ -46,21 +46,18 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
         std::sort(
 #if 1
             ArrayOfSequencesIterator<
-                block_type,
-                typename block_type::value_type,
-                block_type::size>
-              (blocks.begin(), first.block_offset()),
+                block_type, typename block_type::value_type, block_type::size
+		> (blocks.begin(), first.block_offset()),
             ArrayOfSequencesIterator<
-                block_type,
-                typename block_type::value_type,
-                block_type::size>
-              (blocks.begin(), nblocks * block_type::size - last_block_correction),
+                block_type, typename block_type::value_type, block_type::size
+		> (blocks.begin(), nblocks * block_type::size - last_block_correction),
 #else
-            TwoToOneDimArrayRowAdaptor < block_type,
-            typename block_type::value_type, block_type::size > (blocks.begin(), first.block_offset() ),
-            TwoToOneDimArrayRowAdaptor < block_type,
-            typename block_type::value_type, block_type::size > (blocks.begin(),
-                                                                 nblocks * block_type::size - last_block_correction),
+            TwoToOneDimArrayRowAdaptor <
+	    block_type, typename block_type::value_type, block_type::size
+	    > (blocks.begin(), first.block_offset() ),
+            TwoToOneDimArrayRowAdaptor <
+	    block_type, typename block_type::value_type, block_type::size
+	    > (blocks.begin(), nblocks * block_type::size - last_block_correction),
 #endif
             cmp);
 

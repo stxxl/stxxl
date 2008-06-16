@@ -61,11 +61,11 @@ int main()
     {
         const value_type tmp = rnd();
         oldcrc += tmp;
-        SortedRuns.push(tmp);         // push into the sorter
+        SortedRuns.push(tmp);                   // push into the sorter
         --cnt;
     }
 
-    SortedRunsType Runs = SortedRuns.result();     // get sorted_runs data structure
+    SortedRunsType Runs = SortedRuns.result();  // get sorted_runs data structure
     assert(stxxl::stream::check_sorted_runs(Runs, Cmp()));
 
     // merge the runs

@@ -35,7 +35,7 @@ class wfs_request_base;
 class wfs_file_base : public file
 {
 protected:
-    HANDLE file_des;             // file descriptor
+    HANDLE file_des;       // file descriptor
     int mode_;             // open mode
     wfs_file_base(const std::string & filename, int mode, int disk);
 
@@ -54,7 +54,8 @@ class wfs_request_base : public request
 
 protected:
     // states of request
-    enum { OP = 0, DONE = 1, READY2DIE = 2 };                   // OP - operating, DONE - request served,
+    enum { OP = 0, DONE = 1, READY2DIE = 2 };
+    // OP - operating, DONE - request served,
     // READY2DIE - can be destroyed
     /*
        wfs_file_base *file;

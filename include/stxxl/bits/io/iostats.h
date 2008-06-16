@@ -38,10 +38,10 @@ extern double wait_time_counter;
 class stats : private noncopyable
 {
     unsigned reads, writes;             // number of operations
-    int64 volume_read, volume_written;            // number of bytes read/written
+    int64 volume_read, volume_written;          // number of bytes read/written
     double t_reads, t_writes;                   //  seconds spent in operations
     double p_reads, p_writes;                   // seconds spent in parallel operations
-    double p_begin_read, p_begin_write;                 // start time of parallel operation
+    double p_begin_read, p_begin_write;         // start time of parallel operation
     double p_ios;               // seconds spent in all parallel I/O operations (read and write)
     double p_begin_io;
     int acc_ios;

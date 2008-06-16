@@ -29,7 +29,7 @@ class ufs_request_base;
 class ufs_file_base : public file
 {
 protected:
-    int file_des;               // file descriptor
+    int file_des;          // file descriptor
     int mode_;             // open mode
     ufs_file_base(const std::string & filename, int mode, int disk);
 
@@ -48,7 +48,8 @@ class ufs_request_base : public request
 
 protected:
     // states of request
-    enum { OP = 0, DONE = 1, READY2DIE = 2 };                   // OP - operating, DONE - request served,
+    enum { OP = 0, DONE = 1, READY2DIE = 2 };
+    // OP - operating, DONE - request served,
     // READY2DIE - can be destroyed
     /*
        ufs_file_base *file;

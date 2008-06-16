@@ -111,7 +111,7 @@ namespace btree
             std::pair<root_node_iterator_type, bool> result =
                 root_node_.insert(splitter);
             assert(result.second == true);
-            if (root_node_.size() > max_node_size)            // root overflow
+            if (root_node_.size() > max_node_size)      // root overflow
             {
                 STXXL_VERBOSE1("btree::insert_into_root, overflow happened, splitting");
 
@@ -127,7 +127,7 @@ namespace btree
                 unsigned_type i = 0;
                 root_node_iterator_type it = root_node_.begin();
                 typename node_block_type::iterator block_it = LeftNode->block().begin();
-                while (i < half)              // copy smaller part
+                while (i < half)                // copy smaller part
                 {
                     *block_it = *it;
                     ++i;
@@ -138,7 +138,7 @@ namespace btree
                 key_type LeftKey = (LeftNode->block()[half - 1]).first;
 
                 block_it = RightNode->block().begin();
-                while (i < old_size)              // copy larger part
+                while (i < old_size)            // copy larger part
                 {
                     *block_it = *it;
                     ++i;
@@ -174,7 +174,7 @@ namespace btree
             typedef typename local_node_type::bid_type local_bid_type;
 
             root_node_iterator_type leftIt, rightIt;
-            if (UIt->first == key_compare::max_value())            // UIt is the last entry in the root
+            if (UIt->first == key_compare::max_value())         // UIt is the last entry in the root
             {
                 assert(UIt != root_node_.begin());
                 rightIt = UIt;
@@ -197,12 +197,12 @@ namespace btree
             if (TotalSize <= RightNode->max_nelements())
             {
                 // fuse
-                RightNode->fuse(*LeftNode);                 // add the content of LeftNode to RightNode
+                RightNode->fuse(*LeftNode);             // add the content of LeftNode to RightNode
 
                 cache_.unfix_node(RightBid);
-                cache_.delete_node(LeftBid);                 // 'delete_node' unfixes LeftBid also
+                cache_.delete_node(LeftBid);            // 'delete_node' unfixes LeftBid also
 
-                root_node_.erase(leftIt);                 // delete left BID from the root
+                root_node_.erase(leftIt);               // delete left BID from the root
             }
             else
             {
@@ -210,7 +210,7 @@ namespace btree
 
                 key_type NewSplitter = RightNode->balance(*LeftNode);
 
-                root_node_.erase(leftIt);                 // delete left BID from the root
+                root_node_.erase(leftIt);               // delete left BID from the root
                 // reinsert with the new key
                 root_node_.insert(root_node_pair_type(NewSplitter, (node_bid_type)LeftBid));
 
@@ -224,7 +224,7 @@ namespace btree
             leaf_bid_type NewBid;
             leaf_type * NewLeaf = leaf_cache_.get_new_node(NewBid);
             assert(NewLeaf);
-            end_iterator = NewLeaf->end();             // initialize end() iterator
+            end_iterator = NewLeaf->end();              // initialize end() iterator
             root_node_.insert(root_node_pair_type(key_compare::max_value(), (node_bid_type)NewBid));
         }
 
@@ -752,35 +752,35 @@ namespace btree
 
         std::pair<iterator, iterator> equal_range(const key_type & k)
         {
-            iterator l = lower_bound(k);             // l->first >= k
+            iterator l = lower_bound(k);                                // l->first >= k
 
-            if (l == end() || key_compare_(k, l->first))  // if (k < l->first)
+            if (l == end() || key_compare_(k, l->first))                // if (k < l->first)
                 return std::pair<iterator, iterator>(l, l);
             // then upper_bound == lower_bound
 
             iterator u = l;
-            ++u;             // only one element ==k can exist
+            ++u;                                                        // only one element ==k can exist
 
             assert(leaf_cache_.nfixed() == 0);
             assert(node_cache_.nfixed() == 0);
 
-            return std::pair<iterator, iterator>(l, u);           // then upper_bound == (lower_bound+1)
+            return std::pair<iterator, iterator>(l, u);                 // then upper_bound == (lower_bound+1)
         }
 
         std::pair<const_iterator, const_iterator> equal_range(const key_type & k) const
         {
-            const_iterator l = lower_bound(k);             // l->first >= k
+            const_iterator l = lower_bound(k);                          // l->first >= k
 
-            if (l == end() || key_compare_(k, l->first))  // if (k < l->first)
+            if (l == end() || key_compare_(k, l->first))                // if (k < l->first)
                 return std::pair<const_iterator, const_iterator>(l, l);
             // then upper_bound == lower_bound
 
             const_iterator u = l;
-            ++u;             // only one element ==k can exist
+            ++u;                                                        // only one element ==k can exist
 
             assert(leaf_cache_.nfixed() == 0);
             assert(node_cache_.nfixed() == 0);
-            return std::pair<const_iterator, const_iterator>(l, u);           // then upper_bound == (lower_bound+1)
+            return std::pair<const_iterator, const_iterator>(l, u);     // then upper_bound == (lower_bound+1)
         }
 
         size_type erase(const key_type & k)
@@ -995,13 +995,13 @@ namespace btree
 
         void swap(btree & obj)
         {
-            std::swap(key_compare_, obj.key_compare_);            // OK
+            std::swap(key_compare_, obj.key_compare_);          // OK
 
-            std::swap(node_cache_, obj.node_cache_);             // OK
-            std::swap(leaf_cache_, obj.leaf_cache_);             // OK
+            std::swap(node_cache_, obj.node_cache_);            // OK
+            std::swap(leaf_cache_, obj.leaf_cache_);            // OK
 
 
-            std::swap(iterator_map_, obj.iterator_map_);            // must update all iterators
+            std::swap(iterator_map_, obj.iterator_map_);        // must update all iterators
 
             std::swap(end_iterator, obj.end_iterator);
             std::swap(size_, obj.size_);

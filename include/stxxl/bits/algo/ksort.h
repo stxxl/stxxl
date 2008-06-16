@@ -402,26 +402,18 @@ bool check_ksorted_runs(              run_type * * runs,
             if (!stxxl::is_sorted(
 #if 1
                     ArrayOfSequencesIterator<
-                        block_type,
-                        typename block_type::value_type,
-                        block_type::size>
-                      (blocks, 0),
+                        block_type, typename block_type::value_type, block_type::size
+			> (blocks, 0),
                     ArrayOfSequencesIterator<
-                        block_type,
-                        typename block_type::value_type,
-                        block_type::size>
-                      (blocks, nelements),
+                        block_type, typename block_type::value_type, block_type::size
+			> (blocks, nelements),
 #else
                     TwoToOneDimArrayRowAdaptor <
-                                                block_type,
-                                                value_type,
-                                                block_type::size > (blocks, 0 ),
+                                                block_type, value_type, block_type::size
+						> (blocks, 0 ),
                     TwoToOneDimArrayRowAdaptor<
-                                               block_type,
-                                               value_type,
-                                               block_type::size > (blocks,
-                                                                   nelements
-                    ),
+                                               block_type, value_type, block_type::size
+					       > (blocks, nelements),
 #endif
                     key_comparison<value_type, key_ext_>()) )
             {

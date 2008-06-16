@@ -205,8 +205,7 @@ __STXXL_BEGIN_NAMESPACE
         return *this; \
     }
 
-template < class one_dim_array_type, class data_type,
-          class pos_type >
+template < class one_dim_array_type, class data_type, class pos_type >
 struct TwoToOneDimArrayAdaptorBase
   : public std::iterator <std::random_access_iterator_tag, data_type, unsigned_type>
 {
@@ -221,11 +220,11 @@ struct TwoToOneDimArrayAdaptorBase
     TwoToOneDimArrayAdaptorBase ()
     { };
 
-    TwoToOneDimArrayAdaptorBase (one_dim_array_type * a, pos_type p) : array (a),
-                                                                       pos(p)
+    TwoToOneDimArrayAdaptorBase (one_dim_array_type * a, pos_type p)
+        : array (a), pos(p)
     { };
-    TwoToOneDimArrayAdaptorBase (const TwoToOneDimArrayAdaptorBase &a) : array (a.array),
-                                                                         pos (a.pos)
+    TwoToOneDimArrayAdaptorBase (const TwoToOneDimArrayAdaptorBase &a)
+        : array (a.array), pos (a.pos)
     { };
 
     STXXL_ADAPTOR_ARITHMETICS(pos)
@@ -331,14 +330,11 @@ TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
 
     TwoToOneDimArrayRowAdaptor ()
     { };
-    TwoToOneDimArrayRowAdaptor (one_dim_array_type * a,
-                                pos_type
-                                p) : TwoToOneDimArrayAdaptorBase <
-                                                                  one_dim_array_type, data_type, pos_type > (a, p)
+    TwoToOneDimArrayRowAdaptor (one_dim_array_type * a, pos_type p)
+        : TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type > (a, p)
     { }
-    TwoToOneDimArrayRowAdaptor (const TwoToOneDimArrayRowAdaptor &
-                                a) : TwoToOneDimArrayAdaptorBase <
-                                                                  one_dim_array_type, data_type, pos_type > (a)
+    TwoToOneDimArrayRowAdaptor (const TwoToOneDimArrayRowAdaptor & a)
+        : TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type > (a)
     { }
 
     data_type & operator * ()
@@ -366,10 +362,9 @@ TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
 };
 
 template < class one_dim_array_type, class data_type,
-          unsigned dim_size, class pos_type =
-              blocked_index<dim_size> >struct TwoToOneDimArrayColumnAdaptor : public
-TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
-                             pos_type >
+          unsigned dim_size, class pos_type = blocked_index<dim_size> >
+struct TwoToOneDimArrayColumnAdaptor
+: public TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type >
 {
     typedef TwoToOneDimArrayColumnAdaptor < one_dim_array_type,
                                            data_type, dim_size, pos_type > _Self;
@@ -377,14 +372,11 @@ TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
     using TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type >::pos;
     using TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type >::array;
 
-    TwoToOneDimArrayColumnAdaptor (one_dim_array_type * a,
-                                   pos_type
-                                   p) : TwoToOneDimArrayAdaptorBase
-                                        < one_dim_array_type, data_type, pos_type > (a, p)
+    TwoToOneDimArrayColumnAdaptor (one_dim_array_type * a, pos_type p)
+        : TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type > (a, p)
     { }
-    TwoToOneDimArrayColumnAdaptor (const _Self &
-                                   a) : TwoToOneDimArrayAdaptorBase
-                                        < one_dim_array_type, data_type, pos_type > (a)
+    TwoToOneDimArrayColumnAdaptor (const _Self & a)
+        : TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type > (a)
     { }
 
     data_type & operator * ()
