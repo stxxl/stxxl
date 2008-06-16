@@ -37,7 +37,7 @@ namespace btree
             bid_type bid;
             unsigned pos;
             Key() { }
-            Key(const bid_type &b, unsigned p) : bid(b), pos(p) { }
+            Key(const bid_type & b, unsigned p) : bid(b), pos(p) { }
         };
 
         struct bid_comp

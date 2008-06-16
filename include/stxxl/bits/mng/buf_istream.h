@@ -24,7 +24,6 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-
 // a paranoid check
 #define BUF_ISTREAM_CHECK_END
 
@@ -79,7 +78,6 @@ public:
         nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
         compute_prefetch_schedule(_begin, _end, prefetch_seq,
                                   nbuffers, ndisks);
-
 
 
         prefetcher = new prefetcher_type(_begin, _end, prefetch_seq, nbuffers);

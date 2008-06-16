@@ -154,7 +154,7 @@ int main(int argc, char * argv[])
 
     unsigned chunks = 32;
     request_ptr * reqs = new request_ptr[ndisks * chunks];
-    file * * disks = new file *[ndisks];
+    file ** disks = new file *[ndisks];
     int * buffer = (int *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
 #ifdef WATCH_TIMES
     double * r_finish_times = new double[ndisks];

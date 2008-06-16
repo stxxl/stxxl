@@ -88,7 +88,6 @@ void test_random_access(svt & sv)
 }
 
 
-
 typedef unsigned int key_type;
 typedef unsigned int data_type;
 

@@ -133,7 +133,7 @@ namespace btree
             return bid != obj.bid || pos != obj.pos || btree_ != obj.btree_;
         }
 
-        btree_iterator_base & increment ()
+        btree_iterator_base & increment()
         {
             assert(btree_);
             bid_type cur_bid = bid;
@@ -144,7 +144,7 @@ namespace btree
             return *this;
         }
 
-        btree_iterator_base & decrement ()
+        btree_iterator_base & decrement()
         {
             assert(btree_);
             bid_type cur_bid = bid;

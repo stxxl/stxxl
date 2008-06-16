@@ -49,7 +49,7 @@ template <typename type>
 struct fill_value
 {
     type val;
-    fill_value(const type &v_) : val(v_) { }
+    fill_value(const type & v_) : val(v_) { }
 
     type operator () ()
     {

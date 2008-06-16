@@ -24,13 +24,13 @@ void mmap_request::serve()
     if (type == READ)
     {
  #if STXXL_IO_STATS
-        iostats->read_started (size());
+        iostats->read_started(size());
  #endif
     }
     else
     {
  #if STXXL_IO_STATS
-        iostats->write_started (size());
+        iostats->write_started(size());
  #endif
     }
     // static_cast<syscall_file*>(file_)->set_size(offset+bytes);
@@ -40,12 +40,12 @@ void mmap_request::serve()
  #ifdef STXXL_MMAP_EXPERIMENT1
         int prot = (type == READ) ? PROT_READ : PROT_WRITE;
 
-        void * mem = mmap (buffer, bytes, prot, MAP_SHARED | MAP_FIXED, static_cast<mmap_file *>(file_)->get_file_des (), offset);
+        void * mem = mmap(buffer, bytes, prot, MAP_SHARED | MAP_FIXED, static_cast<mmap_file *>(file_)->get_file_des(), offset);
         //STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
         if (mem == MAP_FAILED)
         {
             STXXL_FORMAT_ERROR_MSG(msg, "Mapping failed. " <<
-                                   "Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " <<
+                                   "Page size: " << sysconf(_SC_PAGESIZE) << " offset modulo page size " <<
                                    (offset % sysconf(_SC_PAGESIZE)))
 
             error_occured(msg.str());
@@ -74,13 +74,13 @@ void mmap_request::serve()
         }
  #else
         int prot = (type == READ) ? PROT_READ : PROT_WRITE;
-        void * mem = mmap (NULL, bytes, prot, MAP_SHARED, static_cast<mmap_file *>(file_)->get_file_des (), offset);
+        void * mem = mmap(NULL, bytes, prot, MAP_SHARED, static_cast<mmap_file *>(file_)->get_file_des(), offset);
         // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , static_cast<syscall_file*>(file_)->get_file_des (), offset);
         // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
         if (mem == MAP_FAILED)
         {
             STXXL_FORMAT_ERROR_MSG(msg, "Mapping failed. " <<
-                                   "Page size: " << sysconf (_SC_PAGESIZE) << " offset modulo page size " <<
+                                   "Page size: " << sysconf(_SC_PAGESIZE) << " offset modulo page size " <<
                                    (offset % sysconf(_SC_PAGESIZE)));
 
             error_occured(msg.str());
@@ -113,23 +113,23 @@ void mmap_request::serve()
     if (type == READ)
     {
  #if STXXL_IO_STATS
-        iostats->read_finished ();
+        iostats->read_finished();
  #endif
     }
     else
     {
  #if STXXL_IO_STATS
-        iostats->write_finished ();
+        iostats->write_finished();
  #endif
     }
 
 
-    _state.set_to (DONE);
+    _state.set_to(DONE);
 
  #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
  #else
-    waiters_mutex.lock ();
+    waiters_mutex.lock();
  #endif
 
     // << notification >>
@@ -142,7 +142,7 @@ void mmap_request::serve()
  #ifdef STXXL_BOOST_THREADS
     Lock.unlock();
  #else
-    waiters_mutex.unlock ();
+    waiters_mutex.unlock();
  #endif
 
     completed();
@@ -155,7 +155,7 @@ request_ptr mmap_file::aread(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new mmap_request (
+    request_ptr req = new mmap_request(
         this,
         buffer,
         pos,
@@ -168,12 +168,12 @@ request_ptr mmap_file::aread(
 
 
  #ifndef NO_OVERLAPPING
-    disk_queues::get_instance ()->add_readreq(req, get_id());
+    disk_queues::get_instance()->add_readreq(req, get_id());
  #endif
 
     return req;
 }
-request_ptr mmap_file::awrite (
+request_ptr mmap_file::awrite(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
@@ -192,7 +192,7 @@ request_ptr mmap_file::awrite (
 
 
  #ifndef NO_OVERLAPPING
-    disk_queues::get_instance ()->add_writereq(req, get_id());
+    disk_queues::get_instance()->add_writereq(req, get_id());
  #endif
 
     return req;

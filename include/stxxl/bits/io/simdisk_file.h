@@ -44,20 +44,20 @@ class DiskGeometry : private noncopyable
         int first_sector;
         int sectors;
         double sustained_data_rate;                     // in Mb/s
-        inline Zone (int
-                     _first_sector) : first_sector (_first_sector)
+        inline Zone(int
+                    _first_sector) : first_sector(_first_sector)
         { }                     // constructor for zone search
 
-        inline Zone (                   //int _last_cyl,
-                                        //int _sect_per_track,
+        inline Zone(                   //int _last_cyl,
+                                       //int _sect_per_track,
             int _first_sector,
             int _sectors, double _rate) :
             //last_cyl(_last_cyl),
             //       sect_per_track(_sect_per_track) ,
 
-            first_sector (_first_sector),
-            sectors (_sectors),
-            sustained_data_rate (_rate)
+            first_sector(_first_sector),
+            sectors(_sectors),
+            sustained_data_rate(_rate)
         { }
     };
     struct ZoneCmp
@@ -80,15 +80,15 @@ protected:
     double interface_speed;             // in byte/s
     std::set<Zone, ZoneCmp> zones;
 
-    void add_zone (int &first_cyl, int last_cyl,
-                   int sec_per_track, int &first_sect);
+    void add_zone(int & first_cyl, int last_cyl,
+                  int sec_per_track, int & first_sect);
 
 public:
-    inline DiskGeometry ()
+    inline DiskGeometry()
     { }
-    double get_delay (stxxl::int64 offset, size_t size);                // returns delay in s
+    double get_delay(stxxl::int64 offset, size_t size);                // returns delay in s
 
-    inline ~DiskGeometry ()
+    inline ~DiskGeometry()
     { }
 };
 
@@ -96,7 +96,7 @@ public:
 class IC35L080AVVA07 : public DiskGeometry              // IBM series 120GXP
 {
 public:
-    IC35L080AVVA07 ();
+    IC35L080AVVA07();
 };
 
 class sim_disk_request;
@@ -111,7 +111,7 @@ public:
     //! \attention filename must be resided at memory disk partition
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param disk disk(file) identifier
-    inline sim_disk_file (const std::string & filename, int mode, int disk) : ufs_file_base (filename, mode, disk)
+    inline sim_disk_file(const std::string & filename, int mode, int disk) : ufs_file_base(filename, mode, disk)
     {
         std::cout << "Please, make sure that '" << filename <<
         "' is resided on swap memory partition!" <<
@@ -121,7 +121,7 @@ public:
                       completion_handler on_cmpl);
     request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
                        completion_handler on_cmpl);
-    void set_size (stxxl::int64 newsize);
+    void set_size(stxxl::int64 newsize);
 };
 
 
@@ -131,20 +131,20 @@ class sim_disk_request : public ufs_request_base
     friend class sim_disk_file;
 
 protected:
-    inline sim_disk_request (sim_disk_file * f, void * buf, stxxl::int64 off,
-                             size_t b, request_type t,
-                             completion_handler on_cmpl) :
-        ufs_request_base (f,
-                          buf,
-                          off,
-                          b,
-                          t,
-                          on_cmpl)
+    inline sim_disk_request(sim_disk_file * f, void * buf, stxxl::int64 off,
+                            size_t b, request_type t,
+                            completion_handler on_cmpl) :
+        ufs_request_base(f,
+                         buf,
+                         off,
+                         b,
+                         t,
+                         on_cmpl)
     { }
-    void serve ();
+    void serve();
 
 public:
-    inline const char * io_type ()
+    inline const char * io_type()
     {
         return "simdisk";
     }

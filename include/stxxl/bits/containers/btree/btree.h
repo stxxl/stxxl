@@ -27,13 +27,13 @@ __STXXL_BEGIN_NAMESPACE
 
 namespace btree
 {
-    template <      class KeyType,
+    template <class KeyType,
               class DataType,
               class CompareType,
               unsigned RawNodeSize,
               unsigned RawLeafSize,
               class PDAllocStrategy
-    >
+              >
     class btree : private noncopyable
     {
     public:
@@ -47,7 +47,7 @@ namespace btree
 
         typedef stxxl::uint64 size_type;
         typedef stxxl::int64 difference_type;
-        typedef std::pair < const key_type, data_type > value_type;
+        typedef std::pair<const key_type, data_type> value_type;
         typedef value_type & reference;
         typedef const value_type & const_reference;
         typedef value_type * pointer;
@@ -188,8 +188,8 @@ namespace btree
             }
 
             // now fuse or balance nodes pointed by leftIt and rightIt
-            local_bid_type LeftBid = (local_bid_type) leftIt->second;
-            local_bid_type RightBid = (local_bid_type) rightIt->second;
+            local_bid_type LeftBid = (local_bid_type)leftIt->second;
+            local_bid_type RightBid = (local_bid_type)rightIt->second;
             local_node_type * LeftNode = cache_.get_node(LeftBid, true);
             local_node_type * RightNode = cache_.get_node(RightBid, true);
 
@@ -262,8 +262,8 @@ namespace btree
             key_type lastKey = key_compare::max_value();
 
             typedef std::pair<key_type, node_bid_type> key_bid_pair;
-            typedef typename stxxl::VECTOR_GENERATOR < key_bid_pair, 1, 1,
-                                                      node_block_type::raw_size > ::result key_bid_vector_type;
+            typedef typename stxxl::VECTOR_GENERATOR<key_bid_pair, 1, 1,
+                                                     node_block_type::raw_size>::result key_bid_vector_type;
 
             key_bid_vector_type Bids;
 
@@ -434,7 +434,7 @@ namespace btree
 
         size_type max_size() const
         {
-            return (std::numeric_limits < size_type > ::max)();
+            return (std::numeric_limits<size_type>::max)();
         }
 
         bool empty() const
@@ -442,7 +442,7 @@ namespace btree
             return !size_;
         }
 
-        std::pair<iterator, bool> insert(const value_type &x)
+        std::pair<iterator, bool> insert(const value_type & x)
         {
             root_node_iterator_type it = root_node_.lower_bound(x.first);
             assert(!root_node_.empty());
@@ -564,7 +564,7 @@ namespace btree
             return end_iterator;
         }
 
-        data_type & operator []  (const key_type & k)
+        data_type & operator [] (const key_type & k)
         {
             return (*((insert(value_type(k, data_type()))).first)).second;
         }
@@ -750,7 +750,7 @@ namespace btree
             return result;
         }
 
-        std::pair<iterator, iterator> equal_range(const key_type &k)
+        std::pair<iterator, iterator> equal_range(const key_type & k)
         {
             iterator l = lower_bound(k);             // l->first >= k
 
@@ -767,7 +767,7 @@ namespace btree
             return std::pair<iterator, iterator>(l, u);           // then upper_bound == (lower_bound+1)
         }
 
-        std::pair<const_iterator, const_iterator> equal_range(const key_type &k) const
+        std::pair<const_iterator, const_iterator> equal_range(const key_type & k) const
         {
             const_iterator l = lower_bound(k);             // l->first >= k
 
@@ -1037,26 +1037,26 @@ namespace btree
         }
     };
 
-    template <      class KeyType,
+    template <class KeyType,
               class DataType,
               class CompareType,
               unsigned LogNodeSize,
               unsigned LogLeafSize,
               class PDAllocStrategy
-    >
+              >
     inline bool operator == (const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & a,
                              const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & b)
     {
         return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
     }
 
-    template <      class KeyType,
+    template <class KeyType,
               class DataType,
               class CompareType,
               unsigned LogNodeSize,
               unsigned LogLeafSize,
               class PDAllocStrategy
-    >
+              >
     inline bool operator != (const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & a,
                              const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & b)
     {
@@ -1064,13 +1064,13 @@ namespace btree
     }
 
 
-    template <      class KeyType,
+    template <class KeyType,
               class DataType,
               class CompareType,
               unsigned LogNodeSize,
               unsigned LogLeafSize,
               class PDAllocStrategy
-    >
+              >
     inline bool operator < (const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & a,
                             const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & b)
     {
@@ -1078,13 +1078,13 @@ namespace btree
     }
 
 
-    template <      class KeyType,
+    template <class KeyType,
               class DataType,
               class CompareType,
               unsigned LogNodeSize,
               unsigned LogLeafSize,
               class PDAllocStrategy
-    >
+              >
     inline bool operator > (const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & a,
                             const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & b)
     {
@@ -1092,26 +1092,26 @@ namespace btree
     }
 
 
-    template <      class KeyType,
+    template <class KeyType,
               class DataType,
               class CompareType,
               unsigned LogNodeSize,
               unsigned LogLeafSize,
               class PDAllocStrategy
-    >
+              >
     inline bool operator <= (const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & a,
                              const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & b)
     {
         return !(b < a);
     }
 
-    template <      class KeyType,
+    template <class KeyType,
               class DataType,
               class CompareType,
               unsigned LogNodeSize,
               unsigned LogLeafSize,
               class PDAllocStrategy
-    >
+              >
     inline bool operator >= (const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & a,
                              const btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & b)
     {
@@ -1124,14 +1124,14 @@ __STXXL_END_NAMESPACE
 
 namespace std
 {
-    template <      class KeyType,
+    template <class KeyType,
               class DataType,
               class CompareType,
               unsigned LogNodeSize,
               unsigned LogLeafSize,
               class PDAllocStrategy
-    >
-    void swap(stxxl::btree::btree < KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy > & a,
+              >
+    void swap(stxxl::btree::btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & a,
               stxxl::btree::btree<KeyType, DataType, CompareType, LogNodeSize, LogLeafSize, PDAllocStrategy> & b)
     {
         if (&a != &b)

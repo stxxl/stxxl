@@ -38,7 +38,7 @@ std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj
 struct rnd_gen
 {
     stxxl::random_number32 rnd;
-    int operator ()  ()
+    int operator () ()
     {
         return (rnd() >> 2);
     }

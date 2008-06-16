@@ -110,7 +110,6 @@ int simulate_async_write(
 }
 
 
-
 void compute_prefetch_schedule(
     int * first,
     int * last,

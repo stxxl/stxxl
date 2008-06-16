@@ -144,7 +144,6 @@ namespace btree
             }
 
 
-
             STXXL_VERBOSE1("btree::normal_leaf split leaf " << this
                                                             << " splitter: " << splitter.first);
 
@@ -182,8 +181,8 @@ namespace btree
             assert(unsigned(block_type::size) >= nelements + 1);                   // extra space for an overflow
         }
 
-        bool overflows () const { return block_->info.cur_size > max_nelements(); }
-        bool underflows () const { return block_->info.cur_size < min_nelements(); }
+        bool overflows() const { return block_->info.cur_size > max_nelements(); }
+        bool underflows() const { return block_->info.cur_size < min_nelements(); }
 
         unsigned max_nelements() const { return max_size; }
         unsigned min_nelements() const { return min_size; }
@@ -307,7 +306,7 @@ namespace btree
 
         std::pair<iterator, bool> insert(
             const value_type & x,
-            std::pair<key_type, bid_type> &splitter)
+            std::pair<key_type, bid_type> & splitter)
         {
             assert(size() <= max_nelements());
             splitter.first = key_compare::max_value();
@@ -319,7 +318,7 @@ namespace btree
             {
                 // already exists
                 return std::pair<iterator, bool>(
-                           iterator (btree_, my_bid(), it - block_->begin()),
+                           iterator(btree_, my_bid(), it - block_->begin()),
                            false);
             }
 

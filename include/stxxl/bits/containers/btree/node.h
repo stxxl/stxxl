@@ -95,9 +95,8 @@ namespace btree
         value_compare vcmp_;
 
 
-
         template <class BIDType>
-        std::pair<key_type, bid_type> insert(const std::pair<key_type, BIDType> &splitter,
+        std::pair<key_type, bid_type> insert(const std::pair<key_type, BIDType> & splitter,
                                              const block_iterator & place2insert)
         {
             std::pair<key_type, bid_type> result(key_compare::max_value(), bid_type());
@@ -169,8 +168,8 @@ namespace btree
             }
 
             // now fuse or balance nodes pointed by leftIt and rightIt
-            local_bid_type LeftBid = (local_bid_type) leftIt->second;
-            local_bid_type RightBid = (local_bid_type) rightIt->second;
+            local_bid_type LeftBid = (local_bid_type)leftIt->second;
+            local_bid_type RightBid = (local_bid_type)rightIt->second;
             local_node_type * LeftNode = cache_.get_node(LeftBid, true);
             local_node_type * RightNode = cache_.get_node(RightBid, true);
 
@@ -225,8 +224,8 @@ namespace btree
             return *block_;
         }
 
-        bool overflows () const { return block_->info.cur_size > max_nelements(); }
-        bool underflows () const { return block_->info.cur_size < min_nelements(); }
+        bool overflows() const { return block_->info.cur_size > max_nelements(); }
+        bool underflows() const { return block_->info.cur_size < min_nelements(); }
 
         unsigned max_nelements() const { return max_size; }
         unsigned min_nelements() const { return min_size; }
@@ -324,7 +323,7 @@ namespace btree
         std::pair<iterator, bool> insert(
             const btree_value_type & x,
             unsigned height,
-            std::pair<key_type, bid_type> &splitter)
+            std::pair<key_type, bid_type> & splitter)
         {
             assert(size() <= max_nelements());
             splitter.first = key_compare::max_value();

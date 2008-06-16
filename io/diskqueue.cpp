@@ -25,14 +25,14 @@ __STXXL_BEGIN_NAMESPACE
 
 disk_queues * disk_queues::instance = NULL;
 
-disk_queue::disk_queue (int /*n*/) : sem (0), _priority_op (WRITE)              //  n is ignored
+disk_queue::disk_queue(int /*n*/) : sem(0), _priority_op(WRITE)              //  n is ignored
 #ifdef STXXL_BOOST_THREADS
-                                     , thread(boost::bind(worker, static_cast<void *>(this)))
+                                    , thread(boost::bind(worker, static_cast<void *>(this)))
 #endif
 {
     //  cout << "disk_queue created." << endl;
 #if STXXL_IO_STATS
-    iostats = stats::get_instance ();
+    iostats = stats::get_instance();
 #endif
 
 #ifdef STXXL_BOOST_THREADS
@@ -43,36 +43,36 @@ disk_queue::disk_queue (int /*n*/) : sem (0), _priority_op (WRITE)              
 #endif
 }
 
-void disk_queue::add_readreq (request_ptr & req)
+void disk_queue::add_readreq(request_ptr & req)
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(read_mutex);
-    read_queue.push (req);
+    read_queue.push(req);
     Lock.unlock();
 #else
-    read_mutex.lock ();
-    read_queue.push (req);
-    read_mutex.unlock ();
+    read_mutex.lock();
+    read_queue.push(req);
+    read_mutex.unlock();
 #endif
 
     sem++;
 }
 
-void disk_queue::add_writereq (request_ptr & req)
+void disk_queue::add_writereq(request_ptr & req)
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(write_mutex);
-    write_queue.push (req);
+    write_queue.push(req);
     Lock.unlock();
 #else
-    write_mutex.lock ();
-    write_queue.push (req);
-    write_mutex.unlock ();
+    write_mutex.lock();
+    write_queue.push(req);
+    write_mutex.unlock();
 #endif
     sem++;
 }
 
-disk_queue::~disk_queue ()
+disk_queue::~disk_queue()
 {
 #ifdef STXXL_BOOST_THREADS
     // Boost.Threads do not support cancellation ?
@@ -81,7 +81,7 @@ disk_queue::~disk_queue ()
 #endif
 }
 
-void * disk_queue::worker (void * arg)
+void * disk_queue::worker(void * arg)
 {
     disk_queue * pthis = static_cast<disk_queue *>(arg);
     request_ptr req;
@@ -103,28 +103,28 @@ void * disk_queue::worker (void * arg)
 #ifdef STXXL_BOOST_THREADS
             boost::mutex::scoped_lock WriteLock(pthis->write_mutex);
 #else
-            pthis->write_mutex.lock ();
+            pthis->write_mutex.lock();
 #endif
-            if (!pthis->write_queue.empty ())
+            if (!pthis->write_queue.empty())
             {
-                req = pthis->write_queue.front ();
-                pthis->write_queue.pop ();
+                req = pthis->write_queue.front();
+                pthis->write_queue.pop();
 
 #ifdef STXXL_BOOST_THREADS
                 WriteLock.unlock();
 #else
-                pthis->write_mutex.unlock ();
+                pthis->write_mutex.unlock();
 #endif
 
                 //assert(req->nref() > 1);
-                req->serve ();
+                req->serve();
             }
             else
             {
 #ifdef STXXL_BOOST_THREADS
                 WriteLock.unlock();
 #else
-                pthis->write_mutex.unlock ();
+                pthis->write_mutex.unlock();
 #endif
 
                 pthis->sem++;
@@ -142,23 +142,23 @@ void * disk_queue::worker (void * arg)
 #ifdef STXXL_BOOST_THREADS
             boost::mutex::scoped_lock ReadLock(pthis->read_mutex);
 #else
-            pthis->read_mutex.lock ();
+            pthis->read_mutex.lock();
 #endif
 
-            if (!pthis->read_queue.empty ())
+            if (!pthis->read_queue.empty())
             {
-                req = pthis->read_queue.front ();
-                pthis->read_queue.pop ();
+                req = pthis->read_queue.front();
+                pthis->read_queue.pop();
 
 #ifdef STXXL_BOOST_THREADS
                 ReadLock.unlock();
 #else
-                pthis->read_mutex.unlock ();
+                pthis->read_mutex.unlock();
 #endif
 
                 STXXL_VERBOSE2("queue: before serve request has " << req->nref() << " references ");
                 //assert(req->nref() > 1);
-                req->serve ();
+                req->serve();
                 STXXL_VERBOSE2("queue: after serve request has " << req->nref() << " references ");
             }
             else
@@ -166,7 +166,7 @@ void * disk_queue::worker (void * arg)
 #ifdef STXXL_BOOST_THREADS
                 ReadLock.unlock();
 #else
-                pthis->read_mutex.unlock ();
+                pthis->read_mutex.unlock();
 #endif
 
                 pthis->sem++;

@@ -36,16 +36,16 @@ struct my_handler
 
 typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
-int main ()
+int main()
 {
     STXXL_MSG(sizeof(MyType) << " " << (BLOCK_SIZE % sizeof(MyType)));
     STXXL_MSG(sizeof(block_type) << " " << BLOCK_SIZE);
     const unsigned nblocks = 2;
-    stxxl::BIDArray<BLOCK_SIZE> bids (nblocks);
-    std::vector<int> disks (nblocks, 2);
+    stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
+    std::vector<int> disks(nblocks, 2);
     stxxl::request_ptr * reqs = new stxxl::request_ptr[nblocks];
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance ();
-    bm->new_blocks (stxxl::striping (), bids.begin (), bids.end ());
+    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
 
     block_type * block = new block_type[2];
     STXXL_MSG(std::hex);
@@ -59,15 +59,15 @@ int main ()
         //memcpy (block->elem[i].chars, "STXXL", 4);
     }
     for (i = 0; i < nblocks; ++i)
-        reqs[i] = block->write (bids[i], my_handler());
+        reqs[i] = block->write(bids[i], my_handler());
 
 
     std::cout << "Waiting " << std::endl;
-    stxxl::wait_all (reqs, nblocks);
+    stxxl::wait_all(reqs, nblocks);
 
     for (i = 0; i < nblocks; ++i)
     {
-        reqs[i] = block->read (bids[i], my_handler());
+        reqs[i] = block->read(bids[i], my_handler());
         reqs[i]->wait();
         for (int j = 0; j < block_type::size; ++j)
         {
@@ -80,8 +80,7 @@ int main ()
     }
 
 
-
-    bm->delete_blocks (bids.begin(), bids.end ());
+    bm->delete_blocks(bids.begin(), bids.end());
 
     delete[] reqs;
     delete[] block;
@@ -89,15 +88,15 @@ int main ()
 #if 0
     // variable-size blocks, not supported currently
 
-       BIDArray<0> vbids (nblocks);
-       for(i=0;i<nblocks;i++)
-       vbids[i].size = 1024 + i;
+    BIDArray<0> vbids(nblocks);
+    for (i = 0; i < nblocks; i++)
+        vbids[i].size = 1024 + i;
 
-       bm->new_blocks (striping (), vbids.begin (), vbids.end ());
+    bm->new_blocks(striping(), vbids.begin(), vbids.end());
 
-       for(i=0;i<nblocks;i++)
-       STXXL_MSG("Allocated block: offset="<<vbids[i].offset<<", size="<<vbids[i].size);
+    for (i = 0; i < nblocks; i++)
+        STXXL_MSG("Allocated block: offset=" << vbids[i].offset << ", size=" << vbids[i].size);
 
-       bm->delete_blocks(vbids.begin (), vbids.end ());
+    bm->delete_blocks(vbids.begin(), vbids.end());
 #endif
 }

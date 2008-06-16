@@ -56,7 +56,7 @@ namespace stable_ksort_local
         type * ptr;
 
         type_key() { }
-        type_key(key_type k, type * p) : key (k), ptr (p)
+        type_key(key_type k, type * p) : key(k), ptr(p)
         { }
     };
 
@@ -84,7 +84,7 @@ namespace stable_ksort_local
         typedef typename simple_vector<bid_type>::iterator iterator;
 
     protected:
-        simple_vector<bid_type> *bids;
+        simple_vector<bid_type> * bids;
         alloc_strategy alloc_strategy_;
 
     public:
@@ -109,7 +109,7 @@ namespace stable_ksort_local
 
 
             block_manager * mng = block_manager::get_instance();
-            simple_vector<bid_type> *larger_bids = new simple_vector<bid_type>((i + 1) * 2);
+            simple_vector<bid_type> * larger_bids = new simple_vector<bid_type>((i + 1) * 2);
             std::copy(bids->begin(), bids->end(), larger_bids->begin());
             mng->new_blocks(alloc_strategy_, larger_bids->begin() + size_, larger_bids->end());
             delete bids;
@@ -155,7 +155,7 @@ namespace stable_ksort_local
 
         unsigned_type * bucket_block_offsets = new unsigned_type[nbuckets];
         unsigned_type * bucket_iblock = new unsigned_type[nbuckets];
-        block_type * * bucket_blocks = new block_type *[nbuckets];
+        block_type ** bucket_blocks = new block_type *[nbuckets];
 
         std::fill(bucket_sizes, bucket_sizes + nbuckets, 0);
         std::fill(bucket_iblock, bucket_iblock + nbuckets, 0);
@@ -222,7 +222,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     first.flush();     // flush container
 
 #if STXXL_IO_STATS
-    stats * iostats = stats::get_instance ();
+    stats * iostats = stats::get_instance();
     iostats += 0;
     // iostats->reset ();
 #endif
@@ -397,9 +397,9 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                 const unsigned shift2 = shift1 - log_k2;
 
                 // STXXL_MSG("Sorting bucket "<<k<<":"<<i);
-                l1sort (c, cEnd, d, bucket2, k2,
-                        offset1 + (key_type(1) << key_type(shift1)) * key_type(i),
-                        shift2);
+                l1sort(c, cEnd, d, bucket2, k2,
+                       offset1 + (key_type(1) << key_type(shift1)) * key_type(i),
+                       shift2);
 
                 // write out all
                 for (type_key_ * p = d; p < dEnd; p++)
@@ -419,8 +419,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                     reqs1[i] = blocks1[i].read(bucket_bids[bucket2submit][i]);
             }
 
-            std::swap (blocks1, blocks2);
-            std::swap (reqs1, reqs2);
+            std::swap(blocks1, blocks2);
+            std::swap(reqs1, reqs2);
         }
 
         delete[] bucket1;
@@ -450,20 +450,20 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         end = stxxl_timestamp();
     }
 
-    STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Distribution time: " <<
-                   dist_end - begin << " s");
+    STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Distribution time: " <<
+                  dist_end - begin << " s");
 #if STXXL_IO_STATS
-    STXXL_VERBOSE ("reads               : " << iostats->get_reads ());
-    STXXL_VERBOSE ("writes              : " << iostats->get_writes ());
-    STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s");
-    STXXL_VERBOSE ("write time          : " << iostats->get_write_time () << " s");
-    STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s");
-    STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s");
-    STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s");
+    STXXL_VERBOSE("reads               : " << iostats->get_reads());
+    STXXL_VERBOSE("writes              : " << iostats->get_writes());
+    STXXL_VERBOSE("read time           : " << iostats->get_read_time() << " s");
+    STXXL_VERBOSE("write time          : " << iostats->get_write_time() << " s");
+    STXXL_VERBOSE("parallel read time  : " << iostats->get_pread_time() << " s");
+    STXXL_VERBOSE("parallel write time : " << iostats->get_pwrite_time() << " s");
+    STXXL_VERBOSE("parallel io time    : " << iostats->get_pio_time() << " s");
 #endif
 #ifdef COUNT_WAIT_TIME
-    STXXL_VERBOSE ("Time in I/O wait(ds): " << io_wait_after_d << " s");
-    STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
+    STXXL_VERBOSE("Time in I/O wait(ds): " << io_wait_after_d << " s");
+    STXXL_VERBOSE("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
 #endif
 }
 

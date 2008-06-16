@@ -166,7 +166,6 @@ void run_ledasm_intermixed(stxxl::int64 ops)
     my_record cur;
 
 
-
     stxxl::timer Timer;
     Timer.start();
 

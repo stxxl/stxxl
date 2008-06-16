@@ -26,7 +26,7 @@ struct run_cursor
 
     run_cursor() : pos(0), buffer(NULL) { }
 
-    inline const typename block_type::type & current () const
+    inline const typename block_type::type & current() const
     {
         return (*buffer)[pos];
     }
@@ -65,7 +65,7 @@ struct run_cursor2 : public run_cursor<block_type>
     {
         return (prefetcher_type * &)untyped_prefetcher;
     }
-    run_cursor2 () { }
+    run_cursor2() { }
 #else
     prefetcher_type * prefetcher_;
     prefetcher_type * & prefetcher() // sorry, a hack
@@ -78,12 +78,12 @@ public:
     run_cursor2(prefetcher_type * p) : prefetcher_(p) { }
 #endif
 
-    inline bool empty () const
+    inline bool empty() const
     {
         return (pos >= block_type::size);
     }
     inline void operator ++ (int);
-    inline void make_inf ()
+    inline void make_inf()
     {
         pos = block_type::size;
     }

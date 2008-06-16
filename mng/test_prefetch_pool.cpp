@@ -26,7 +26,7 @@ struct MyType
 
 typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
-int main ()
+int main()
 {
     stxxl::prefetch_pool<block_type> pool(2);
     pool.resize(10);

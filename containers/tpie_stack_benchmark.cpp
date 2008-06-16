@@ -39,7 +39,6 @@
 #define    BLOCK_SIZE (2 * 1024 * 1024)
 
 
-
 #ifndef DISKS
  #define DISKS 1
 #endif
@@ -117,7 +116,6 @@ void run_stack(stxxl::int64 volume)
 }
 
 
-
 int main(int argc, char * argv[])
 {
     using namespace std;
@@ -156,7 +154,7 @@ int main(int argc, char * argv[])
     STXXL_MSG("Allocating array with size " << MEM_2_RESERVE
                                             << " bytes to prevent file buffering.");
     //int * array = new int[MEM_2_RESERVE/sizeof(int)];
-    int * array = (int *) malloc(MEM_2_RESERVE);
+    int * array = (int *)malloc(MEM_2_RESERVE);
     std::fill(array, array + (MEM_2_RESERVE / sizeof(int)), 0);
 
     STXXL_MSG("Running version: " << version);

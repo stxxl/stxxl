@@ -40,8 +40,8 @@ public:
     //! \param filename path of file
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param disk disk(file) identifier
-    inline mmap_file (const std::string & filename, int mode, int disk = -1) :
-        ufs_file_base (filename, mode, disk)
+    inline mmap_file(const std::string & filename, int mode, int disk = -1) :
+        ufs_file_base(filename, mode, disk)
     { }
     request_ptr aread(
         void * buffer,
@@ -61,11 +61,11 @@ class mmap_request : public ufs_request_base
     friend class mmap_file;
 
 protected:
-    inline mmap_request (mmap_file * f,
-                         void * buf, stxxl::int64 off, size_t b,
-                         request_type t,
-                         completion_handler on_cmpl) :
-        ufs_request_base (f, buf, off, b, t, on_cmpl)
+    inline mmap_request(mmap_file * f,
+                        void * buf, stxxl::int64 off, size_t b,
+                        request_type t,
+                        completion_handler on_cmpl) :
+        ufs_request_base(f, buf, off, b, t, on_cmpl)
     { }
     void serve();
 

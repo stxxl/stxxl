@@ -32,7 +32,6 @@ struct counter
 };
 
 
-
 int main()
 {
     typedef stxxl::vector<int> ext_vec_type;

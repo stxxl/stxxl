@@ -47,7 +47,6 @@ std::ostream & operator << (std::ostream & o, const my_type obj)
 }
 
 
-
 bool operator < (const my_type & a, const my_type & b)
 {
     return a._key < b._key;
@@ -60,7 +59,7 @@ bool operator != (const my_type & a, const my_type & b)
 
 struct Cmp : public std::less<my_type>
 {
-    bool operator ()  (const my_type & a, const my_type & b) const
+    bool operator () (const my_type & a, const my_type & b) const
     {
         return a._key < b._key;
     }
@@ -80,7 +79,7 @@ struct Cmp : public std::less<my_type>
 
 struct zero
 {
-    unsigned operator ()  ()
+    unsigned operator () ()
     {
         return 0;
     }

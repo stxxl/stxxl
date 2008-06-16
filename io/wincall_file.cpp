@@ -19,7 +19,7 @@ __STXXL_BEGIN_NAMESPACE
 wincall_file::wincall_file(
     const std::string & filename,
     int mode,
-    int disk) : wfs_file_base (filename, mode, disk)
+    int disk) : wfs_file_base(filename, mode, disk)
 { }
 
 wincall_request::wincall_request(
@@ -31,12 +31,12 @@ wincall_request::wincall_request(
     completion_handler on_cmpl) :
     wfs_request_base(f, buf, off, b, t, on_cmpl)
 { }
-const char * wincall_request::io_type ()
+const char * wincall_request::io_type()
 {
     return "syscall";
 }
 
-void wincall_request::serve ()
+void wincall_request::serve()
 {
     stats * iostats = stats::get_instance();
     if (nref() < 2)
@@ -64,7 +64,7 @@ void wincall_request::serve ()
             if (type == READ)
             {
  #if STXXL_IO_STATS
-                iostats->read_started (size());
+                iostats->read_started(size());
  #endif
 
                 debugmon::get_instance()->io_started((char *)buffer);
@@ -82,13 +82,13 @@ void wincall_request::serve ()
                 debugmon::get_instance()->io_finished((char *)buffer);
 
  #if STXXL_IO_STATS
-                iostats->read_finished ();
+                iostats->read_finished();
  #endif
             }
             else
             {
  #if STXXL_IO_STATS
-                iostats->write_started (size());
+                iostats->write_started(size());
  #endif
 
                 debugmon::get_instance()->io_started((char *)buffer);
@@ -107,7 +107,7 @@ void wincall_request::serve ()
                 debugmon::get_instance()->io_finished((char *)buffer);
 
  #if STXXL_IO_STATS
-                iostats->write_finished ();
+                iostats->write_finished();
  #endif
             }
         }
@@ -125,12 +125,12 @@ void wincall_request::serve ()
                      " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
 
-    _state.set_to (DONE);
+    _state.set_to(DONE);
 
  #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
  #else
-    waiters_mutex.lock ();
+    waiters_mutex.lock();
  #endif
     // << notification >>
     std::for_each(
@@ -141,14 +141,14 @@ void wincall_request::serve ()
  #ifdef STXXL_BOOST_THREADS
     Lock.unlock();
  #else
-    waiters_mutex.unlock ();
+    waiters_mutex.unlock();
  #endif
 
-    completed ();
-    _state.set_to (READY2DIE);
+    completed();
+    _state.set_to(READY2DIE);
 }
 
-request_ptr wincall_file::aread (
+request_ptr wincall_file::aread(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
@@ -163,11 +163,11 @@ request_ptr wincall_file::aread (
 
 
  #ifndef NO_OVERLAPPING
-    disk_queues::get_instance ()->add_readreq(req, get_id());
+    disk_queues::get_instance()->add_readreq(req, get_id());
  #endif
     return req;
 }
-request_ptr wincall_file::awrite (
+request_ptr wincall_file::awrite(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
@@ -181,7 +181,7 @@ request_ptr wincall_file::awrite (
 
 
  #ifndef NO_OVERLAPPING
-    disk_queues::get_instance ()->add_writereq(req, get_id());
+    disk_queues::get_instance()->add_writereq(req, get_id());
  #endif
     return req;
 }

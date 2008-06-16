@@ -38,17 +38,17 @@ class semaphore : private noncopyable
 #endif
 
 public:
-    semaphore (int init_value = 1) : v (init_value)
+    semaphore(int init_value = 1) : v(init_value)
     {
 #ifndef STXXL_BOOST_THREADS
         check_pthread_call(pthread_mutex_init(&mutex, NULL));
         check_pthread_call(pthread_cond_init(&cond, NULL));
 #endif
     }
-    ~semaphore ()
+    ~semaphore()
     {
 #ifndef STXXL_BOOST_THREADS
-        int res = pthread_mutex_trylock (&mutex);
+        int res = pthread_mutex_trylock(&mutex);
 
         if (res == 0 || res == EBUSY) {
             check_pthread_call(pthread_mutex_unlock(&mutex));
@@ -100,7 +100,7 @@ public:
     // multiple threads must up on a semaphore before another thread
     // can go down, i.e., allows programmer to set the semaphore to
     // a negative value prior to using it for synchronization.
-    int decrement ()
+    int decrement()
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);

@@ -19,8 +19,8 @@ __STXXL_BEGIN_NAMESPACE
 
 template <typename type_key>
 static void
-count (type_key * a, type_key * aEnd, int_type * bucket, int_type K, typename type_key::key_type offset,
-       unsigned shift)
+count(type_key * a, type_key * aEnd, int_type * bucket, int_type K, typename type_key::key_type offset,
+      unsigned shift)
 {
     // reset buckets
     std::fill(bucket, bucket + K, 0);
@@ -40,7 +40,7 @@ count (type_key * a, type_key * aEnd, int_type * bucket, int_type K, typename ty
 
 
 static void
-exclusive_prefix_sum (int_type * bucket, int_type K)
+exclusive_prefix_sum(int_type * bucket, int_type K)
 {
     int_type sum = 0;
     for (int_type i = 0; i < K; i++)
@@ -55,7 +55,7 @@ exclusive_prefix_sum (int_type * bucket, int_type K)
 // distribute input a to output b using bucket for the starting indices
 template <typename type_key>
 static void
-classify (type_key * a, type_key * aEnd, type_key * b, int_type * bucket, typename type_key::key_type offset, unsigned shift)
+classify(type_key * a, type_key * aEnd, type_key * b, int_type * bucket, typename type_key::key_type offset, unsigned shift)
 {
     for (type_key * p = a; p < aEnd; p++)
     {
@@ -67,18 +67,17 @@ classify (type_key * a, type_key * aEnd, type_key * b, int_type * bucket, typena
 }
 
 
-
 template <class T>
 inline void
-sort2 (T & a, T & b)
+sort2(T & a, T & b)
 {
     if (b < a)
-        std::swap (a, b);
+        std::swap(a, b);
 }
 
 template <class T>
 inline void
-sort3 (T & a, T & b, T & c)
+sort3(T & a, T & b, T & c)
 {
     T temp;
     if (b < a)
@@ -94,12 +93,12 @@ sort3 (T & a, T & b, T & c)
             }
             else
             {                   // c <=b < a
-                std::swap (c, a);
+                std::swap(c, a);
             }
         }
         else
         {                       // b < a <=c
-            std::swap (a, b);
+            std::swap(a, b);
         }
     }
     else
@@ -115,7 +114,7 @@ sort3 (T & a, T & b, T & c)
         {                       // a <=b , c
             if (c < b)
             {                   // a <=c < b
-                std::swap (b, c);
+                std::swap(b, c);
             }
         }
     }
@@ -125,16 +124,16 @@ sort3 (T & a, T & b, T & c)
 
 template <class T>
 inline void
-sort4 (T & a, T & b, T & c, T & d)
+sort4(T & a, T & b, T & c, T & d)
 {
-    sort2 (a, b);
-    sort2 (c, d);               // a < b ; c < d
+    sort2(a, b);
+    sort2(c, d);               // a < b ; c < d
     if (c < a)
     {                           // c minimal, a < b
         if (d < a)
         {                       // c < d < a < b
-            std::swap (a, c);
-            std::swap (b, d);
+            std::swap(a, c);
+            std::swap(b, d);
         }
         else
         {                       // c < a < {db}
@@ -168,7 +167,7 @@ sort4 (T & a, T & b, T & c, T & d)
             }
             else
             {                   // a < c < b < d
-                std::swap (b, c);
+                std::swap(b, c);
             }
         }                       // else sorted
     }
@@ -178,23 +177,23 @@ sort4 (T & a, T & b, T & c, T & d)
 
 template <class T>
 inline void
-sort5 (T & a, T & b, T & c, T & d, T & e)
+sort5(T & a, T & b, T & c, T & d, T & e)
 {
-    sort2 (a, b);
-    sort2 (d, e);
+    sort2(a, b);
+    sort2(d, e);
     if (d < a)
     {
-        std::swap (a, d);
-        std::swap (b, e);
+        std::swap(a, d);
+        std::swap(b, e);
     }                           // a < d < e, a < b
     if (d < c)
     {
-        std::swap (c, d);               // a minimal, c < {de}
-        sort2 (d, e);
+        std::swap(c, d);               // a minimal, c < {de}
+        sort2(d, e);
     }
     else
     {                           // a<b, a<d<e, c<d<e
-        sort2 (a, c);
+        sort2(a, c);
     }                           // a min, c < d < e
     // insert b int cde by binary search
     if (d < b)
@@ -217,7 +216,7 @@ sort5 (T & a, T & b, T & c, T & d, T & e)
     }
     else
     {                           // {cb} <=d < e
-        sort2 (b, c);
+        sort2(b, c);
     }
     //Assert1 (!(b < a) && !(c < b) & !(d < c) & !(e < d));
 }
@@ -225,7 +224,7 @@ sort5 (T & a, T & b, T & c, T & d, T & e)
 
 template <class T>
 inline void
-insertion_sort (T * a, T * aEnd)
+insertion_sort(T * a, T * aEnd)
 {
     T * pp;
     for (T * p = a + 1; p < aEnd; p++)
@@ -258,7 +257,7 @@ insertion_sort (T * a, T * aEnd)
 // the end of the i-th bucket
 template <class T>
 static void
-cleanup (T * b, int_type * bucket, int_type K)
+cleanup(T * b, int_type * bucket, int_type K)
 {
     T * c = b;
     for (int_type i = 0; i < K; i++)
@@ -271,13 +270,13 @@ cleanup (T * b, int_type * bucket, int_type K)
         case 1:
             break;
         case 2:
-            sort2 (c[0], c[1]);
+            sort2(c[0], c[1]);
             break;
         case 3:
-            sort3 (c[0], c[1], c[2]);
+            sort3(c[0], c[1], c[2]);
             break;
         case 4:
-            sort4 (c[0], c[1], c[2], c[3]);
+            sort4(c[0], c[1], c[2], c[3]);
             break;
         case 5:         //sort5(c[0], c[1], c[2], c[3], c[4]);  break;
         case 6:
@@ -291,10 +290,10 @@ cleanup (T * b, int_type * bucket, int_type K)
         case 14:
         case 15:
         case 16:
-            insertion_sort (c, cEnd);
+            insertion_sort(c, cEnd);
             break;
         default:
-            std::sort (c, cEnd);
+            std::sort(c, cEnd);
         }
         c = cEnd;
     }
@@ -308,14 +307,14 @@ cleanup (T * b, int_type * bucket, int_type K)
 // the output goes to b
 template <typename type_key>
 void
-l1sort (type_key * a,
-        type_key * aEnd,
-        type_key * b, int_type * bucket, int_type K, typename type_key::key_type offset, int shift)
+l1sort(type_key * a,
+       type_key * aEnd,
+       type_key * b, int_type * bucket, int_type K, typename type_key::key_type offset, int shift)
 {
     count(a, aEnd, bucket, K, offset, shift);
-    exclusive_prefix_sum (bucket, K);
-    classify (a, aEnd, b, bucket, offset, shift);
-    cleanup (b, bucket, K);
+    exclusive_prefix_sum(bucket, K);
+    classify(a, aEnd, b, bucket, offset, shift);
+    cleanup(b, bucket, K);
 }
 
 template <typename type, typename type_key, typename key_extractor>

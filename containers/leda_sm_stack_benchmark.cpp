@@ -33,7 +33,6 @@
 #include "stxxl/timer"
 
 
-
 #define MEM_2_RESERVE    (768 * 1024 * 1024)
 
 
@@ -117,7 +116,6 @@ void run_stack(stxxl::int64 volume)
 
     ext_mem_mgr.print_statistics();
 }
-
 
 
 int main(int argc, char * argv[])

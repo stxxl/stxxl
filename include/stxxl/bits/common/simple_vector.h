@@ -22,7 +22,7 @@ __STXXL_BEGIN_NAMESPACE
 template <class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */>
 class simple_vector : private noncopyable
 {
-    simple_vector ()
+    simple_vector()
     { }
 
 public:
@@ -40,7 +40,7 @@ public:
     typedef value_type & reference;
     typedef const value_type & const_reference;
 
-    simple_vector (size_type sz) : _size (sz)
+    simple_vector(size_type sz) : _size(sz)
     {
         //assert(sz);
         //    _array = _data_allocator.allocate(sz);
@@ -51,38 +51,38 @@ public:
         std::swap(_size, obj._size);
         std::swap(_array, obj._array);
     }
-    ~simple_vector ()
+    ~simple_vector()
     {
         //    _data_allocator.deallocate(_array,_size);
         delete[] _array;
     }
-    iterator begin ()
+    iterator begin()
     {
         return _array;
     }
-    const_iterator begin () const
+    const_iterator begin() const
     {
         return _array;
     }
-    iterator end ()
+    iterator end()
     {
         return _array + _size;
     }
-    const_iterator end () const
+    const_iterator end() const
     {
         return _array + _size;
     }
-    size_type size () const
+    size_type size() const
     {
         return _size;
     }
     reference operator [] (size_type i)
     {
-        return *(begin () + i);
+        return *(begin() + i);
     }
     const_reference operator [] (size_type i) const
     {
-        return *(begin () + i);
+        return *(begin() + i);
     }
 };
 __STXXL_END_NAMESPACE

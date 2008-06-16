@@ -27,89 +27,89 @@ boostfd_file::get_file_des() const
     return file_des;
 }
 
-boostfd_request::boostfd_request (
+boostfd_request::boostfd_request(
     boostfd_file * f,
     void * buf,
     stxxl::int64 off,
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    request (on_cmpl, f, buf, off, b, t),
-    _state (OP)
+    request(on_cmpl, f, buf, off, b, t),
+    _state(OP)
 { }
 
-bool boostfd_request::add_waiter (onoff_switch * sw)
+bool boostfd_request::add_waiter(onoff_switch * sw)
 {
  #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
  #else
-    waiters_mutex.lock ();
+    waiters_mutex.lock();
  #endif
 
-    if (poll ())   // request already finished
+    if (poll())   // request already finished
     {
  #ifndef STXXL_BOOST_THREADS
-        waiters_mutex.unlock ();
+        waiters_mutex.unlock();
  #endif
         return true;
     }
 
-    waiters.insert (sw);
+    waiters.insert(sw);
  #ifndef STXXL_BOOST_THREADS
-    waiters_mutex.unlock ();
+    waiters_mutex.unlock();
  #endif
 
     return false;
 }
-void boostfd_request::delete_waiter (onoff_switch * sw)
+void boostfd_request::delete_waiter(onoff_switch * sw)
 {
  #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
-    waiters.erase (sw);
+    waiters.erase(sw);
  #else
-    waiters_mutex.lock ();
-    waiters.erase (sw);
-    waiters_mutex.unlock ();
+    waiters_mutex.lock();
+    waiters.erase(sw);
+    waiters_mutex.unlock();
  #endif
 }
-int boostfd_request::nwaiters ()     // returns number of waiters
+int boostfd_request::nwaiters()     // returns number of waiters
 {
  #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
     return waiters.size();
  #else
-    waiters_mutex.lock ();
-    int size = waiters.size ();
-    waiters_mutex.unlock ();
+    waiters_mutex.lock();
+    int size = waiters.size();
+    waiters_mutex.unlock();
     return size;
  #endif
 }
-void boostfd_request::check_aligning ()
+void boostfd_request::check_aligning()
 {
     if (offset % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG ("Offset is not aligned: modulo "
+        STXXL_ERRMSG("Offset is not aligned: modulo "
                 << BLOCK_ALIGN << " = " <<
-                      offset % BLOCK_ALIGN);
+                     offset % BLOCK_ALIGN);
 
     if (bytes % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG ("Size is not a multiple of " <<
-                      BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
+        STXXL_ERRMSG("Size is not a multiple of " <<
+                     BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
 
     if (long(buffer) % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG ("Buffer is not aligned: modulo "
+        STXXL_ERRMSG("Buffer is not aligned: modulo "
                 << BLOCK_ALIGN << " = " <<
-                      long(buffer) % BLOCK_ALIGN << " (" <<
-                      std::hex << buffer << std::dec << ")");
+                     long(buffer) % BLOCK_ALIGN << " (" <<
+                     std::hex << buffer << std::dec << ")");
 }
 
-boostfd_request::~boostfd_request ()
+boostfd_request::~boostfd_request()
 {
     STXXL_VERBOSE3("boostfd_request " << unsigned(this) << ": deletion, cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 }
 
-void boostfd_request::wait ()
+void boostfd_request::wait()
 {
     STXXL_VERBOSE3("boostfd_request : " << unsigned(this) << " wait ");
 
@@ -119,7 +119,7 @@ void boostfd_request::wait ()
     enqueue();
  #endif
 
-    _state.wait_for (READY2DIE);
+    _state.wait_for(READY2DIE);
 
     END_COUNT_WAIT_TIME
 
@@ -137,15 +137,15 @@ bool boostfd_request::poll()
 
     return s;
 }
-const char * boostfd_request::io_type ()
+const char * boostfd_request::io_type()
 {
     return "boostfd";
 }
 
-boostfd_file::boostfd_file (
+boostfd_file::boostfd_file(
     const std::string & filename,
     int mode,
-    int disk) : file (disk), mode_(mode)
+    int disk) : file(disk), mode_(mode)
 {
     BOOST_IOS::openmode boostfd_mode;
 
@@ -202,16 +202,16 @@ boostfd_file::boostfd_file (
     file_des.open(filename, boostfd_mode, boostfd_mode);
 }
 
-boostfd_file::~boostfd_file ()
+boostfd_file::~boostfd_file()
 {
     file_des.close();
 }
-stxxl::int64 boostfd_file::size ()
+stxxl::int64 boostfd_file::size()
 {
     stxxl::int64 size_ = file_des.seek(0, BOOST_IOS::end);
     return size_;
 }
-void boostfd_file::set_size (stxxl::int64 newsize)
+void boostfd_file::set_size(stxxl::int64 newsize)
 {
     stxxl::int64 oldsize = size();
     file_des.seek(newsize, BOOST_IOS::beg);
@@ -219,7 +219,7 @@ void boostfd_file::set_size (stxxl::int64 newsize)
     assert(size() >= oldsize);
 }
 
-void boostfd_request::serve ()
+void boostfd_request::serve()
 {
     stats * iostats = stats::get_instance();
     if (nref() < 2)
@@ -253,7 +253,7 @@ void boostfd_request::serve ()
         if (type == READ)
         {
  #if STXXL_IO_STATS
-            iostats->read_started (size());
+            iostats->read_started(size());
  #endif
 
             debugmon::get_instance()->io_started((char *)buffer);
@@ -276,13 +276,13 @@ void boostfd_request::serve ()
             debugmon::get_instance()->io_finished((char *)buffer);
 
  #if STXXL_IO_STATS
-            iostats->read_finished ();
+            iostats->read_finished();
  #endif
         }
         else
         {
  #if STXXL_IO_STATS
-            iostats->write_started (size());
+            iostats->write_started(size());
  #endif
 
             debugmon::get_instance()->io_started((char *)buffer);
@@ -305,7 +305,7 @@ void boostfd_request::serve ()
             debugmon::get_instance()->io_finished((char *)buffer);
 
  #if STXXL_IO_STATS
-            iostats->write_finished ();
+            iostats->write_finished();
  #endif
         }
     }
@@ -318,12 +318,12 @@ void boostfd_request::serve ()
                      " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
 
-    _state.set_to (DONE);
+    _state.set_to(DONE);
 
  #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
  #else
-    waiters_mutex.lock ();
+    waiters_mutex.lock();
  #endif
     // << notification >>
     std::for_each(
@@ -334,14 +334,14 @@ void boostfd_request::serve ()
  #ifdef STXXL_BOOST_THREADS
     Lock.unlock();
  #else
-    waiters_mutex.unlock ();
+    waiters_mutex.unlock();
  #endif
 
-    completed ();
-    _state.set_to (READY2DIE);
+    completed();
+    _state.set_to(READY2DIE);
 }
 
-request_ptr boostfd_file::aread (
+request_ptr boostfd_file::aread(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
@@ -356,11 +356,11 @@ request_ptr boostfd_file::aread (
 
 
  #ifndef NO_OVERLAPPING
-    disk_queues::get_instance ()->add_readreq(req, get_id());
+    disk_queues::get_instance()->add_readreq(req, get_id());
  #endif
     return req;
 }
-request_ptr boostfd_file::awrite (
+request_ptr boostfd_file::awrite(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
@@ -374,7 +374,7 @@ request_ptr boostfd_file::awrite (
 
 
  #ifndef NO_OVERLAPPING
-    disk_queues::get_instance ()->add_writereq(req, get_id());
+    disk_queues::get_instance()->add_writereq(req, get_id());
  #endif
     return req;
 }

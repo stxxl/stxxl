@@ -34,7 +34,7 @@ class debugmon
     };
     struct hash_fct
     {
-        inline size_t operator ()  (char * arg) const
+        inline size_t operator () (char * arg) const
         {
             return long(arg);
         }
@@ -69,10 +69,10 @@ public:
     void io_started(char * ptr);
     void io_finished(char * ptr);
 
-    inline static debugmon * get_instance ()
+    inline static debugmon * get_instance()
     {
         if (!instance)
-            instance = new debugmon ();
+            instance = new debugmon();
 
         return instance;
     }

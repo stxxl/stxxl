@@ -45,7 +45,6 @@ bool operator < (const my_type & a, const my_type & b)
 }
 
 
-
 int main()
 {
     my_type::key_type max_key = 1 * 1024 * 1024;

@@ -35,7 +35,7 @@ struct counter
 };
 
 template <class my_vec_type>
-void test_const_iterator(const my_vec_type &x)
+void test_const_iterator(const my_vec_type & x)
 {
     typename my_vec_type::const_iterator i = x.begin();
     i = x.end() - 1;
@@ -49,14 +49,13 @@ void test_const_iterator(const my_vec_type &x)
 }
 
 
-
 int main()
 {
     try
     {
         // use non-randomized striping to avoid side effects on random generator
         typedef stxxl::VECTOR_GENERATOR<int64, 2, 2, (2 * 1024 * 1024), stxxl::striping>::result vector_type;
-        vector_type v(int64 (64 * 1024 * 1024) / sizeof(int64));
+        vector_type v(int64(64 * 1024 * 1024) / sizeof(int64));
 
         // test assignment const_iterator = iterator
         vector_type::const_iterator c_it = v.begin();

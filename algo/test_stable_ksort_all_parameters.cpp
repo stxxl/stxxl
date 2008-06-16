@@ -55,7 +55,6 @@ bool operator < (const my_type & a, const my_type & b)
 }
 
 
-
 #define MB (1024 * 1024)
 
 

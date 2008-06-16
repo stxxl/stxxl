@@ -60,10 +60,10 @@ protected:
         size_t b,
         request_type t,
         completion_handler on_cmpl);
-    void serve ();
+    void serve();
 
 public:
-    const char * io_type ();
+    const char * io_type();
 };
 
 //! \}

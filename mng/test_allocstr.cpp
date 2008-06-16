@@ -25,7 +25,7 @@ void test_strategy()
         STXXL_MSG(s0(i) << " " << s2(i) << " " << o(i));
 }
 
-int main ()
+int main()
 {
     stxxl::config * cfg = stxxl::config::get_instance();
 

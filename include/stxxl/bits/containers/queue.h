@@ -57,8 +57,8 @@ public:
 private:
     size_type size_;
     bool delete_pools;
-    write_pool<block_type> *w_pool;
-    prefetch_pool<block_type> *p_pool;
+    write_pool<block_type> * w_pool;
+    prefetch_pool<block_type> * p_pool;
     block_type * front_block;
     block_type * back_block;
     value_type * front_element;
@@ -102,7 +102,7 @@ public:
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side) , default is 1
     //!  \warning Number of blocks in the write pool must be at least 2
     //!  \warning Number of blocks in the prefetch pool must be at least 1
-    queue(write_pool<block_type> &  w_pool_, prefetch_pool<block_type> & p_pool_, unsigned blocks2prefetch_ = 1) :
+    queue(write_pool<block_type> & w_pool_, prefetch_pool<block_type> & p_pool_, unsigned blocks2prefetch_ = 1) :
         size_(0),
         delete_pools(false),
         w_pool(&w_pool_),

@@ -147,35 +147,35 @@ public:
         Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
         return __tmp;
     }
-    bool operator == (const _Self &a) const
+    bool operator == (const _Self & a) const
     {
         assert(Deque == a.Deque);
         return Offset == a.Offset;
     }
-    bool operator != (const _Self &a) const
+    bool operator != (const _Self & a) const
     {
         assert(Deque == a.Deque);
         return Offset != a.Offset;
     }
 
-    bool operator < (const _Self &a) const
+    bool operator < (const _Self & a) const
     {
         assert(Deque == a.Deque);
         return (a - (*this)) > 0;
     }
 
-    bool operator == (const const_iterator &a) const
+    bool operator == (const const_iterator & a) const
     {
         assert(Deque == a.Deque);
         return Offset == a.Offset;
     }
-    bool operator != (const const_iterator &a) const
+    bool operator != (const const_iterator & a) const
     {
         assert(Deque == a.Deque);
         return Offset != a.Offset;
     }
 
-    bool operator < (const const_iterator &a) const
+    bool operator < (const const_iterator & a) const
     {
         assert(Deque == a.Deque);
         return (a - (*this)) > 0;
@@ -293,35 +293,35 @@ public:
         Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
         return __tmp;
     }
-    bool operator == (const _Self &a) const
+    bool operator == (const _Self & a) const
     {
         assert(Deque == a.Deque);
         return Offset == a.Offset;
     }
-    bool operator != (const _Self &a) const
+    bool operator != (const _Self & a) const
     {
         assert(Deque == a.Deque);
         return Offset != a.Offset;
     }
 
-    bool operator < (const _Self &a) const
+    bool operator < (const _Self & a) const
     {
         assert(Deque == a.Deque);
         return (a - (*this)) > 0;
     }
 
-    bool operator == (const iterator &a) const
+    bool operator == (const iterator & a) const
     {
         assert(Deque == a.Deque);
         return Offset == a.Offset;
     }
-    bool operator != (const iterator &a) const
+    bool operator != (const iterator & a) const
     {
         assert(Deque == a.Deque);
         return Offset != a.Offset;
     }
 
-    bool operator < (const iterator &a) const
+    bool operator < (const iterator & a) const
     {
         assert(Deque == a.Deque);
         return (a - (*this)) > 0;

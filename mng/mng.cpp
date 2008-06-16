@@ -22,7 +22,7 @@ config * config::instance = NULL;
 void DiskAllocator::dump()
 {
     stxxl::int64 total = 0;
-    sortseq::const_iterator cur = free_space.begin ();
+    sortseq::const_iterator cur = free_space.begin();
     STXXL_ERRMSG("Free regions dump:");
     for ( ; cur != free_space.end(); ++cur)
     {
@@ -32,26 +32,26 @@ void DiskAllocator::dump()
     STXXL_ERRMSG("Total bytes: " << total);
 }
 
-config * config::get_instance ()
+config * config::get_instance()
 {
     if (!instance)
     {
-        char * cfg_path = getenv ("STXXLCFG");
+        char * cfg_path = getenv("STXXLCFG");
         if (cfg_path)
-            instance = new config (cfg_path);
+            instance = new config(cfg_path);
         else
-            instance = new config ();
+            instance = new config();
     }
 
     return instance;
 }
 
 
-config::config (const char * config_path)
+config::config(const char * config_path)
 {
     STXXL_MSG(stxxl::get_version_string());
     std::vector<DiskEntry> flash_props;
-    std::ifstream cfg_file (config_path);
+    std::ifstream cfg_file(config_path);
     if (!cfg_file)
     {
         STXXL_ERRMSG("Warning: no config file found.");
@@ -72,7 +72,7 @@ config::config (const char * config_path)
            DiskEntry entry3 = { "/tmp/stxxl2", "simdisk",
                 1000 * 1024 * 1024
            }; */
-        disks_props.push_back (entry1);
+        disks_props.push_back(entry1);
         //disks_props.push_back (entry2);
         //disks_props.push_back (entry3);
     }
@@ -82,22 +82,22 @@ config::config (const char * config_path)
 
         while (cfg_file >> line)
         {
-            std::vector<std::string> tmp = split (line, "=");
+            std::vector<std::string> tmp = split(line, "=");
             bool is_disk;
 
             if (tmp[0][0] == '#')
             { }
             else if ((is_disk = (tmp[0] == "disk")) || tmp[0] == "flash")
             {
-                tmp = split (tmp[1], ",");
+                tmp = split(tmp[1], ",");
                 DiskEntry entry = {
                     tmp[0], tmp[2],
-                    stxxl::int64 (str2int (tmp[1])) * stxxl::int64 (1024 * 1024)
+                    stxxl::int64(str2int(tmp[1])) * stxxl::int64(1024 * 1024)
                 };
                 if (is_disk)
-                    disks_props.push_back (entry);
+                    disks_props.push_back(entry);
                 else
-                    flash_props.push_back (entry);
+                    flash_props.push_back(entry);
             }
             else
             {
@@ -105,14 +105,14 @@ config::config (const char * config_path)
                 tmp[0] << std::endl;
             }
         }
-        cfg_file.close ();
+        cfg_file.close();
     }
 
     // put flash devices after regular disks
     first_flash = disks_props.size();
     disks_props.insert(disks_props.end(), flash_props.begin(), flash_props.end());
 
-    if (disks_props.empty ())
+    if (disks_props.empty())
     {
         STXXL_THROW(std::runtime_error, "config::config", "No disks found in '" << config_path << "' .");
     }
@@ -120,7 +120,7 @@ config::config (const char * config_path)
     {
 #ifdef STXXL_VERBOSE_DISKS
         for (std::vector<DiskEntry>::const_iterator it =
-                 disks_props.begin (); it != disks_props.end ();
+                 disks_props.begin(); it != disks_props.end();
              it++)
         {
             STXXL_MSG("Disk '" << (*it).path << "' is allocated, space: " <<
@@ -130,7 +130,7 @@ config::config (const char * config_path)
 #else
         stxxl::int64 total_size = 0;
         for (std::vector<DiskEntry>::const_iterator it =
-                 disks_props.begin (); it != disks_props.end ();
+                 disks_props.begin(); it != disks_props.end();
              it++)
             total_size += (*it).size;
 
@@ -141,30 +141,30 @@ config::config (const char * config_path)
     }
 }
 
-block_manager * block_manager::get_instance ()
+block_manager * block_manager::get_instance()
 {
     if (!instance)
-        instance = new block_manager ();
+        instance = new block_manager();
 
     return instance;
 }
 
-block_manager::block_manager ()
+block_manager::block_manager()
 {
     FileCreator fc;
-    config * cfg = config::get_instance ();
+    config * cfg = config::get_instance();
 
-    ndisks = cfg->disks_number ();
+    ndisks = cfg->disks_number();
     disk_allocators = new DiskAllocator *[ndisks];
     disk_files = new stxxl::file *[ndisks];
 
     for (unsigned i = 0; i < ndisks; i++)
     {
-        disk_files[i] = fc.create (cfg->disk_io_impl (i),
-                                   cfg->disk_path (i),
-                                   stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT, i);
-        disk_files[i]->set_size (cfg->disk_size (i));
-        disk_allocators[i] = new DiskAllocator (cfg->disk_size (i));
+        disk_files[i] = fc.create(cfg->disk_io_impl(i),
+                                  cfg->disk_path(i),
+                                  stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT, i);
+        disk_files[i]->set_size(cfg->disk_size(i));
+        disk_allocators[i] = new DiskAllocator(cfg->disk_size(i));
     }
 }
 

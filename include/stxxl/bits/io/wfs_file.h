@@ -37,12 +37,12 @@ class wfs_file_base : public file
 protected:
     HANDLE file_des;             // file descriptor
     int mode_;             // open mode
-    wfs_file_base (const std::string & filename, int mode, int disk);
+    wfs_file_base(const std::string & filename, int mode, int disk);
 
 public:
     HANDLE get_file_des() const;
     ~wfs_file_base();
-    stxxl::int64 size ();
+    stxxl::int64 size();
     void set_size(stxxl::int64 newsize);
     void lock();
 };
@@ -72,7 +72,7 @@ protected:
  #endif
     std::set<onoff_switch *> waiters;
 
-    wfs_request_base (
+    wfs_request_base(
         wfs_file_base * f,
         void * buf,
         stxxl::int64 off,
@@ -80,16 +80,16 @@ protected:
         request_type t,
         completion_handler on_cmpl);
 
-    bool add_waiter (onoff_switch * sw);
-    void delete_waiter (onoff_switch * sw);
-    int nwaiters ();             // returns number of waiters
-    void check_aligning ();
+    bool add_waiter(onoff_switch * sw);
+    void delete_waiter(onoff_switch * sw);
+    int nwaiters();             // returns number of waiters
+    void check_aligning();
 
 public:
-    virtual ~wfs_request_base ();
-    void wait ();
+    virtual ~wfs_request_base();
+    void wait();
     bool poll();
-    const char * io_type ();
+    const char * io_type();
 };
 
 //! \}

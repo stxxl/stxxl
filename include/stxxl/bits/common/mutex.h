@@ -41,14 +41,14 @@ class mutex : private noncopyable
     pthread_mutex_t _mutex;
 
 public:
-    mutex ()
+    mutex()
     {
         check_pthread_call(pthread_mutex_init(&_mutex, NULL));
     }
 
-    ~mutex ()
+    ~mutex()
     {
-        int res = pthread_mutex_trylock (&_mutex);
+        int res = pthread_mutex_trylock(&_mutex);
 
         if (res == 0 || res == EBUSY) {
             check_pthread_call(pthread_mutex_unlock(&_mutex));
@@ -57,13 +57,13 @@ public:
 
         check_pthread_call(pthread_mutex_destroy(&_mutex));
     }
-    void lock ()
+    void lock()
     {
-        check_pthread_call(pthread_mutex_lock (&_mutex));
+        check_pthread_call(pthread_mutex_lock(&_mutex));
     }
-    void unlock ()
+    void unlock()
     {
-        check_pthread_call(pthread_mutex_unlock (&_mutex));
+        check_pthread_call(pthread_mutex_unlock(&_mutex));
     }
 };
 

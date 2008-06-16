@@ -134,7 +134,7 @@ protected:
     //! \brief Initializes file object
     //! \param _id file identifier
     //! \remark Called in implementations of file
-    file (int _id) : id (_id) { }
+    file(int _id) : id(_id) { }
 
 public:
     //! \brief Definition of acceptable file open modes
@@ -157,25 +157,25 @@ public:
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr object, that can be used to track the status of the operation
-    virtual request_ptr aread (void * buffer, stxxl::int64 pos, size_t bytes,
-                               completion_handler on_cmpl) = 0;
+    virtual request_ptr aread(void * buffer, stxxl::int64 pos, size_t bytes,
+                              completion_handler on_cmpl) = 0;
     //! \brief Schedules asynchronous write request to the file
     //! \param buffer pointer to memory buffer to write from
     //! \param pos starting file position to write
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr object, that can be used to track the status of the operation
-    virtual request_ptr awrite (void * buffer, stxxl::int64 pos, size_t bytes,
-                                completion_handler on_cmpl) = 0;
+    virtual request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
+                               completion_handler on_cmpl) = 0;
 
     //! \brief Changes the size of the file
     //! \param newsize value of the new file size
-    virtual void set_size (stxxl::int64 newsize) = 0;
+    virtual void set_size(stxxl::int64 newsize) = 0;
     //! \brief Returns size of the file
     //! \return file size in bytes
-    virtual stxxl::int64 size () = 0;
+    virtual stxxl::int64 size() = 0;
     //! \brief deprecated, use \c stxxl::file::get_id() instead
-    int get_disk_number ()
+    int get_disk_number()
     {
         return id;
     }
@@ -190,7 +190,7 @@ public:
     //! \brief Locks file for reading and writing
     virtual void lock() { }
 
-    virtual ~file () { }
+    virtual ~file() { }
 };
 
 class mc;
@@ -214,10 +214,10 @@ class request : private noncopyable
     friend class request_ptr;
 
 protected:
-    virtual bool add_waiter (onoff_switch * sw) = 0;
-    virtual void delete_waiter (onoff_switch * sw) = 0;
+    virtual bool add_waiter(onoff_switch * sw) = 0;
+    virtual void delete_waiter(onoff_switch * sw) = 0;
     //virtual void enqueue () = 0;
-    virtual void serve () = 0;
+    virtual void serve() = 0;
     //virtual unsigned size() const;
 
     completion_handler on_complete;
@@ -240,7 +240,7 @@ protected:
     size_t bytes;
     request_type type;
 
-    void completed ()
+    void completed()
     {
         on_complete(this);
     }
@@ -276,13 +276,13 @@ public:
         STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": creation, cnt: " << ref_cnt);
     }
     //! \brief Suspends calling thread until completion of the request
-    virtual void wait () = 0;
+    virtual void wait() = 0;
     //! \brief Polls the status of the request
     //! \return \c true if request is completed, otherwise \c false
-    virtual bool poll () = 0;
+    virtual bool poll() = 0;
     //! \brief Identifies the type of request I/O implementation
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
-    virtual const char * io_type ()
+    virtual const char * io_type()
     {
         return "none";
     }
@@ -481,14 +481,14 @@ inline void wait_all(request_ptr req_array[], int count);
 //! \param count size of req_array
 //! \param index contains index of the \b first completed request if any
 //! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
-inline bool poll_any (request_ptr req_array[], int count, int & index);
+inline bool poll_any(request_ptr req_array[], int count, int & index);
 
 
 void wait_all(request_ptr req_array[], int count)
 {
     for (int i = 0; i < count; i++)
     {
-        req_array[i]->wait ();
+        req_array[i]->wait();
     }
 }
 
@@ -497,12 +497,12 @@ void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
     while (reqs_begin != reqs_end)
     {
-        (request_ptr(*reqs_begin))->wait ();
+        (request_ptr(*reqs_begin))->wait();
         ++reqs_begin;
     }
 }
 
-bool poll_any (request_ptr req_array[], int count, int &index)
+bool poll_any(request_ptr req_array[], int count, int & index)
 {
     index = -1;
     for (int i = 0; i < count; i++)
@@ -530,7 +530,7 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 }
 
 
-int wait_any (request_ptr req_array[], int count)
+int wait_any(request_ptr req_array[], int count)
 {
     START_COUNT_WAIT_TIME
     onoff_switch sw;
@@ -538,13 +538,13 @@ int wait_any (request_ptr req_array[], int count)
 
     for ( ; i < count; i++)
     {
-        if (req_array[i]->add_waiter (&sw))
+        if (req_array[i]->add_waiter(&sw))
         {
             // already done
             index = i;
 
             while (--i >= 0)
-                req_array[i]->delete_waiter (&sw);
+                req_array[i]->delete_waiter(&sw);
 
 
             END_COUNT_WAIT_TIME
@@ -555,12 +555,12 @@ int wait_any (request_ptr req_array[], int count)
         }
     }
 
-    sw.wait_for_on ();
+    sw.wait_for_on();
 
     for (i = 0; i < count; i++)
     {
-        req_array[i]->delete_waiter (&sw);
-        if (index < 0 && req_array[i]->poll ())
+        req_array[i]->delete_waiter(&sw);
+        if (index < 0 && req_array[i]->poll())
             index = i;
     }
 
@@ -578,7 +578,7 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 
     for ( ; cur != reqs_end; cur++)
     {
-        if ((request_ptr(*cur))->add_waiter (&sw))
+        if ((request_ptr(*cur))->add_waiter(&sw))
         {
             // already done
             result = cur;
@@ -586,9 +586,9 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
             if (cur != reqs_begin)
             {
                 while (--cur != reqs_begin)
-                    (request_ptr(*cur))->delete_waiter (&sw);
+                    (request_ptr(*cur))->delete_waiter(&sw);
 
-                (request_ptr(*cur))->delete_waiter (&sw);
+                (request_ptr(*cur))->delete_waiter(&sw);
             }
 
             END_COUNT_WAIT_TIME
@@ -599,12 +599,12 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
         }
     }
 
-    sw.wait_for_on ();
+    sw.wait_for_on();
 
     for (cur = reqs_begin; cur != reqs_end; cur++)
     {
-        (request_ptr(*cur))->delete_waiter (&sw);
-        if (result == reqs_end && (request_ptr(*cur))->poll ())
+        (request_ptr(*cur))->delete_waiter(&sw);
+        if (result == reqs_end && (request_ptr(*cur))->poll())
             result = cur;
     }
 
@@ -643,18 +643,18 @@ private:
     stats * iostats;
 #endif
 
-    static void * worker (void * arg);
+    static void * worker(void * arg);
 
 public:
-    disk_queue (int n = 1);             // max number of requests simultaneously submitted to disk
+    disk_queue(int n = 1);             // max number of requests simultaneously submitted to disk
 
-    void set_priority_op (priority_op op)
+    void set_priority_op(priority_op op)
     {
         _priority_op = op;
     }
-    void add_readreq (request_ptr & req);
-    void add_writereq (request_ptr & req);
-    ~disk_queue ();
+    void add_readreq(request_ptr & req);
+    void add_writereq(request_ptr & req);
+    ~disk_queue();
 };
 
 //! \brief Encapsulates disk queues
@@ -663,38 +663,38 @@ class disk_queues : private noncopyable
 {
 protected:
     std::map<DISKID, disk_queue *> queues;
-    disk_queues () { }
+    disk_queues() { }
 
 public:
-    void add_readreq (request_ptr & req, DISKID disk)
+    void add_readreq(request_ptr & req, DISKID disk)
     {
-        if (queues.find (disk) == queues.end ())
+        if (queues.find(disk) == queues.end())
         {
             // create new disk queue
-            queues[disk] = new disk_queue ();
+            queues[disk] = new disk_queue();
         }
-        queues[disk]->add_readreq (req);
+        queues[disk]->add_readreq(req);
     }
-    void add_writereq (request_ptr & req, DISKID disk)
+    void add_writereq(request_ptr & req, DISKID disk)
     {
-        if (queues.find (disk) == queues.end ())
+        if (queues.find(disk) == queues.end())
         {
             // create new disk queue
-            queues[disk] = new disk_queue ();
+            queues[disk] = new disk_queue();
         }
-        queues[disk]->add_writereq (req);
+        queues[disk]->add_writereq(req);
     }
-    ~disk_queues ()
+    ~disk_queues()
     {
         // deallocate all queues
         for (std::map<DISKID, disk_queue *>::iterator i =
-                 queues.begin (); i != queues.end (); i++)
+                 queues.begin(); i != queues.end(); i++)
             delete (*i).second;
     }
-    static disk_queues * get_instance ()
+    static disk_queues * get_instance()
     {
         if (!instance)
-            instance = new disk_queues ();
+            instance = new disk_queues();
 
 
         return instance;
@@ -707,8 +707,8 @@ public:
     void set_priority_op(disk_queue::priority_op op)
     {
         for (std::map<DISKID, disk_queue *>::iterator i =
-                 queues.begin (); i != queues.end (); i++)
-            i->second->set_priority_op (op);
+                 queues.begin(); i != queues.end(); i++)
+            i->second->set_priority_op(op);
     }
 
 private:

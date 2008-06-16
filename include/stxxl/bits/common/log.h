@@ -42,10 +42,10 @@ public:
         return errlog_stream_;
     }
 
-    inline static logger * get_instance ()
+    inline static logger * get_instance()
     {
         if (!instance)
-            instance = new logger ();
+            instance = new logger();
 
         return instance;
     }

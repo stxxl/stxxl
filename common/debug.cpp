@@ -61,8 +61,8 @@ void debugmon::block_deallocated(char * ptr)
     tags.erase(ptr);
     size_t size = t.size;
     STXXL_VERBOSE1("debugmon: block_deallocated to " << long(t.end));
-    char * endptr = (char *) t.end;
-    char * ptr1 = (char *) ptr;
+    char * endptr = (char *)t.end;
+    char * ptr1 = (char *)ptr;
     ptr1 += size;
     while (ptr1 < endptr)
     {

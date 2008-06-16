@@ -42,17 +42,17 @@ class onoff_switch : private noncopyable
     bool _on;
 
 public:
-    onoff_switch (bool flag = false) : _on (flag)
+    onoff_switch(bool flag = false) : _on(flag)
     {
 #ifndef STXXL_BOOST_THREADS
         check_pthread_call(pthread_mutex_init(&mutex, NULL));
         check_pthread_call(pthread_cond_init(&cond, NULL));
 #endif
     }
-    ~onoff_switch ()
+    ~onoff_switch()
     {
 #ifndef STXXL_BOOST_THREADS
-        int res = pthread_mutex_trylock (&mutex);
+        int res = pthread_mutex_trylock(&mutex);
 
         if (res == 0 || res == EBUSY) {
             check_pthread_call(pthread_mutex_unlock(&mutex));
@@ -64,7 +64,7 @@ public:
         check_pthread_call(pthread_cond_destroy(&cond));
 #endif
     }
-    void on ()
+    void on()
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
@@ -78,7 +78,7 @@ public:
         check_pthread_call(pthread_cond_signal(&cond));
 #endif
     }
-    void off ()
+    void off()
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
@@ -92,7 +92,7 @@ public:
         check_pthread_call(pthread_cond_signal(&cond));
 #endif
     }
-    void wait_for_on ()
+    void wait_for_on()
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
@@ -107,7 +107,7 @@ public:
         check_pthread_call(pthread_mutex_unlock(&mutex));
 #endif
     }
-    void wait_for_off ()
+    void wait_for_off()
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
@@ -122,7 +122,7 @@ public:
         check_pthread_call(pthread_mutex_unlock(&mutex));
 #endif
     }
-    bool is_on ()
+    bool is_on()
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);

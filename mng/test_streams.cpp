@@ -31,8 +31,8 @@ int main()
     const unsigned nelements = nblocks * block_type::size;
     stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
 
-    stxxl::block_manager * bm = stxxl::block_manager::get_instance ();
-    bm->new_blocks (stxxl::striping (), bids.begin (), bids.end ());
+    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+    bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
     {
         buf_ostream_type out(bids.begin(), 2);
         for (unsigned i = 0; i < nelements; i++)
@@ -50,5 +50,5 @@ int main()
             }
         }
     }
-    bm->delete_blocks (bids.begin (), bids.end ());
+    bm->delete_blocks(bids.begin(), bids.end());
 }

@@ -26,10 +26,9 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-
 class set_switch_handler
 {
-    onoff_switch &switch_;
+    onoff_switch & switch_;
 
 public:
     set_switch_handler(onoff_switch & switch__) : switch_(switch__) { }
@@ -121,7 +120,7 @@ public:
                                                               << " prefetch_seq[" << i << "]=" << prefetch_seq[i]);
             assert(prefetch_seq[i] < int_type(seq_length));
             assert(prefetch_seq[i] >= 0);
-            read_reqs[i] = read_buffers[i].read (
+            read_reqs[i] = read_buffers[i].read(
                 *(consume_seq_begin + prefetch_seq[i]),
                 set_switch_handler(*(completed + prefetch_seq[i])));
             pref_buffer[prefetch_seq[i]] = i;

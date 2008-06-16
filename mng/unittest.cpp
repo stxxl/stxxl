@@ -55,11 +55,11 @@ public:
     void testIO()
     {
         const unsigned nblocks = 2;
-        BIDArray<BLOCK_SIZE> bids (nblocks);
-        std::vector<int> disks (nblocks, 2);
+        BIDArray<BLOCK_SIZE> bids(nblocks);
+        std::vector<int> disks(nblocks, 2);
         stxxl::request_ptr * reqs = new stxxl::request_ptr[nblocks];
-        block_manager * bm = block_manager::get_instance ();
-        bm->new_blocks (striping (), bids.begin (), bids.end ());
+        block_manager * bm = block_manager::get_instance();
+        bm->new_blocks(striping(), bids.begin(), bids.end());
 
         block_type * block = new block_type;
         STXXL_MSG(std::hex);
@@ -73,15 +73,15 @@ public:
             //memcpy (block->elem[i].chars, "STXXL", 4);
         }
         for (i = 0; i < nblocks; ++i)
-            reqs[i] = block->write (bids[i], my_handler());
+            reqs[i] = block->write(bids[i], my_handler());
 
 
         std::cout << "Waiting " << std::endl;
-        stxxl::wait_all (reqs, nblocks);
+        stxxl::wait_all(reqs, nblocks);
 
         for (i = 0; i < nblocks; ++i)
         {
-            reqs[i] = block->read (bids[i], my_handler());
+            reqs[i] = block->read(bids[i], my_handler());
             reqs[i]->wait();
             for (int j = 0; j < block_type::size; ++j)
             {
@@ -89,7 +89,7 @@ public:
             }
         }
 
-        bm->delete_blocks (bids.begin(), bids.end ());
+        bm->delete_blocks(bids.begin(), bids.end());
 
         delete[] reqs;
         delete block;
@@ -151,8 +151,8 @@ public:
         const unsigned nelements = nblocks * block_type1::size;
         BIDArray<BLOCK_SIZE> bids(nblocks);
 
-        block_manager * bm = block_manager::get_instance ();
-        bm->new_blocks (striping (), bids.begin (), bids.end ());
+        block_manager * bm = block_manager::get_instance();
+        bm->new_blocks(striping(), bids.begin(), bids.end());
         {
             buf_ostream_type out(bids.begin(), 2);
             for (unsigned i = 0; i < nelements; i++)
@@ -167,7 +167,7 @@ public:
                 CPPUNIT_ASSERT(value == int(i));
             }
         }
-        bm->delete_blocks (bids.begin (), bids.end ());
+        bm->delete_blocks(bids.begin(), bids.end());
     }
 };
 
@@ -176,7 +176,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(BMLayerTest);
 int main()
 {
     CppUnit::TextUi::TestRunner runner;
-    CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
+    CppUnit::TestFactoryRegistry & registry = CppUnit::TestFactoryRegistry::getRegistry();
     runner.addTest(registry.makeTest());
     bool wasSuccessful = runner.run("", false);
     return wasSuccessful;

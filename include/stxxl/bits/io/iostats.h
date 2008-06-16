@@ -55,57 +55,57 @@ class stats : private noncopyable
 
     static stats * instance;
 
-    stats ();
+    stats();
 
 public:
     //! \brief Call this function in order to access an instance of stats
     //! \return pointer to an instance of stats
-    static stats * get_instance ()
+    static stats * get_instance()
     {
         if (!instance)
-            instance = new stats ();
+            instance = new stats();
 
         return instance;
     }
 
     //! \brief Returns total number of reads
     //! \return total number of reads
-    unsigned get_reads () const
+    unsigned get_reads() const
     {
         return reads;
     }
 
     //! \brief Returns total number of writes
     //! \return total number of writes
-    unsigned get_writes () const
+    unsigned get_writes() const
     {
         return writes;
     }
 
     //! \brief Returns number of bytes read from disks
     //! \return number of bytes read
-    int64 get_read_volume () const
+    int64 get_read_volume() const
     {
         return volume_read;
     }
 
     //! \brief Returns number of bytes written to the disks
     //! \return number of bytes written
-    int64 get_written_volume () const
+    int64 get_written_volume() const
     {
         return volume_written;
     }
 
     //! \brief Time that would be spent in read syscalls if all parallel reads were serialized.
     //! \return seconds spent in reading
-    double get_read_time () const
+    double get_read_time() const
     {
         return t_reads;
     }
 
     //! \brief Time that would be spent in write syscalls if all parallel writes were serialized.
     //! \return seconds spent in writing
-    double get_write_time () const
+    double get_write_time() const
     {
         return t_writes;
     }
@@ -156,10 +156,10 @@ public:
     double increment_io_wait_time(double val);
 
     // for library use
-    void write_started (unsigned size_);
-    void write_finished ();
-    void read_started (unsigned size_);
-    void read_finished ();
+    void write_started(unsigned size_);
+    void write_finished();
+    void read_started(unsigned size_);
+    void read_finished();
 };
 
 
@@ -175,15 +175,15 @@ class stats_data
 
 public:
     stats_data() :
-        reads (0),
-        writes (0),
+        reads(0),
+        writes(0),
         volume_read(0),
         volume_written(0),
-        t_reads (0.0),
-        t_writes (0.0),
-        p_reads (0.0),
-        p_writes (0.0),
-        p_ios (0.0),
+        t_reads(0.0),
+        t_writes(0.0),
+        p_reads(0.0),
+        p_writes(0.0),
+        p_ios(0.0),
         t_wait(0.0),
         elapsed(0.0)
     { }
@@ -236,32 +236,32 @@ public:
         return s;
     }
 
-    unsigned get_reads () const
+    unsigned get_reads() const
     {
         return reads;
     }
 
-    unsigned get_writes () const
+    unsigned get_writes() const
     {
         return writes;
     }
 
-    int64 get_read_volume () const
+    int64 get_read_volume() const
     {
         return volume_read;
     }
 
-    int64 get_written_volume () const
+    int64 get_written_volume() const
     {
         return volume_written;
     }
 
-    double get_read_time () const
+    double get_read_time() const
     {
         return t_reads;
     }
 
-    double get_write_time () const
+    double get_write_time() const
     {
         return t_writes;
     }

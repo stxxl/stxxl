@@ -151,7 +151,7 @@ void random_shuffle(ExtIterator_ first,
     STXXL_VERBOSE1("random_shuffle: " << M / BlockSize_ - k << " write buffers for " << k << " buckets");
     stxxl::write_pool<block_type> w_pool(M / BlockSize_ - k); // M/B-k write buffers
 
-    stack_type * * buckets;
+    stack_type ** buckets;
 
     // create and put buckets into container
     buckets = new stack_type *[k];
@@ -294,7 +294,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
     stxxl::prefetch_pool<block_type> p_pool(0); // no read buffers
     stxxl::write_pool<block_type> w_pool(M / BlockSize_ - k); // M/B-k write buffers
 
-    stack_type * * buckets;
+    stack_type ** buckets;
 
     // create and put buckets into container
     buckets = new stack_type *[k];

@@ -193,7 +193,6 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
 }
 
 
-
 int main(int argc, char * argv[])
 {
     STXXL_MSG("stxxl::pq block size: " << BLOCK_SIZE << " bytes");

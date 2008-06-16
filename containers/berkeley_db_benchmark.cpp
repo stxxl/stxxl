@@ -77,7 +77,6 @@ struct my_key
 };
 
 
-
 std::ostream & operator << (std::ostream & o, const my_key & obj)
 {
     for (int i = 0; i < KEY_SIZE; ++i)
@@ -126,7 +125,7 @@ my_key min_key, max_key;
 
 struct comp_type
 {
-    bool operator ()  (const my_key & a, const my_key & b) const
+    bool operator () (const my_key & a, const my_key & b) const
     {
         return strncmp(a.keybuf, b.keybuf, KEY_SIZE) < 0;
     }
@@ -530,7 +529,7 @@ void run_stxxl_map(stxxl::int64 ops)
 class rand_key_gen
 {
     stxxl::int64 counter;
-    my_key &current;
+    my_key & current;
     stxxl::random_number32 myrand;
     rand_key_gen();
 
@@ -561,7 +560,7 @@ public:
 template <class InputType>
 class key2pair
 {
-    InputType &in;
+    InputType & in;
     std::pair<my_key, my_data> current;
     key2pair();
 
@@ -882,7 +881,6 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
               " seconds : " << (double(n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
 
-
     ////////////////////////////////////////
     Timer.reset();
 
@@ -901,7 +899,6 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     STXXL_MSG("Records in map: " << u_btree->size());
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
-
 
 
     ////////////////////////////////////////////////
@@ -945,7 +942,6 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
             n_scanned += u_btree->range_query(begin_key, element.key_, NULL, filter);
 
 
-
         if (n_scanned >= SCAN_LIMIT(n))
         {
             ++i;
@@ -959,7 +955,6 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     STXXL_MSG("Range query elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
               " key/data pairs per sec, #queries " << n_range_queries << " #scanned elements: " << n_scanned);
-
 
 
     //////////////////////////////////////

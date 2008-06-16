@@ -46,11 +46,11 @@ public:
         bid_type bid;
 
         busy_entry() : block(NULL) { }
-        busy_entry(const busy_entry &a) : block(a.block), req(a.req), bid(a.bid) { }
-        busy_entry(block_type * &bl, request_ptr & r, bid_type & bi) :
+        busy_entry(const busy_entry & a) : block(a.block), req(a.req), bid(a.bid) { }
+        busy_entry(block_type * & bl, request_ptr & r, bid_type & bi) :
             block(bl), req(r), bid(bi) { }
 
-        operator request_ptr () { return req; }
+        operator request_ptr() { return req; }
     };
     //typedef typename compat_hash_map < bid_type, request_ptr , bid_hash >::result hash_map_type;
     //typedef typename hash_map_type::iterator block_track_iterator;

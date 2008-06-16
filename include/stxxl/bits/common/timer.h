@@ -34,7 +34,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \brief Returns number of seconds since the epoch (or midnight, if boost timer is used), high resolution.
 inline double
-timestamp ()
+timestamp()
 {
 #ifdef STXXL_NONMONOTONIC_BOOST_TIMESTAMP
     boost::posix_time::ptime MyTime = boost::posix_time::microsec_clock::local_time();

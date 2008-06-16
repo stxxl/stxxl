@@ -68,7 +68,7 @@ std::ostream & operator << (std::ostream & o, const my_type & a)
 
 struct zero
 {
-    unsigned operator ()  ()
+    unsigned operator () ()
     {
         return 0;
     }

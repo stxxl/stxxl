@@ -41,14 +41,14 @@ void ufs_file_base::lock()
 }
 
 
-ufs_request_base::ufs_request_base (
+ufs_request_base::ufs_request_base(
     ufs_file_base * f,
     void * buf,
     stxxl::int64 off,
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    request (on_cmpl, f, buf, off, b, t),
+    request(on_cmpl, f, buf, off, b, t),
 /*
                     file (f),
                     buffer (buf),
@@ -56,83 +56,83 @@ ufs_request_base::ufs_request_base (
                     bytes (b),
                     type(t),
 */
-    _state (OP)
+    _state(OP)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
     // Direct I/O requires file system block size alignment for file offsets,
     // memory buffer addresses, and transfer(buffer) size must be multiple
     // of the file system block size
-    check_aligning ();
+    check_aligning();
 #endif
 }
 
-bool ufs_request_base::add_waiter (onoff_switch * sw)
+bool ufs_request_base::add_waiter(onoff_switch * sw)
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
 #else
-    waiters_mutex.lock ();
+    waiters_mutex.lock();
 #endif
 
-    if (poll ())                     // request already finished
+    if (poll())                     // request already finished
     {
 #ifndef STXXL_BOOST_THREADS
-        waiters_mutex.unlock ();
+        waiters_mutex.unlock();
 #endif
         return true;
     }
 
-    waiters.insert (sw);
+    waiters.insert(sw);
 #ifndef STXXL_BOOST_THREADS
-    waiters_mutex.unlock ();
+    waiters_mutex.unlock();
 #endif
 
     return false;
 }
 
-void ufs_request_base::delete_waiter (onoff_switch * sw)
+void ufs_request_base::delete_waiter(onoff_switch * sw)
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
-    waiters.erase (sw);
+    waiters.erase(sw);
 #else
-    waiters_mutex.lock ();
-    waiters.erase (sw);
-    waiters_mutex.unlock ();
+    waiters_mutex.lock();
+    waiters.erase(sw);
+    waiters_mutex.unlock();
 #endif
 }
-int ufs_request_base::nwaiters ()                 // returns number of waiters
+int ufs_request_base::nwaiters()                 // returns number of waiters
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
     return waiters.size();
 #else
-    waiters_mutex.lock ();
-    int size = waiters.size ();
-    waiters_mutex.unlock ();
+    waiters_mutex.lock();
+    int size = waiters.size();
+    waiters_mutex.unlock();
     return size;
 #endif
 }
 
-void ufs_request_base::check_aligning ()
+void ufs_request_base::check_aligning()
 {
     if (offset % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG ("Offset is not aligned: modulo "
+        STXXL_ERRMSG("Offset is not aligned: modulo "
                                               << BLOCK_ALIGN << " = " <<
-                      offset % BLOCK_ALIGN);
+                     offset % BLOCK_ALIGN);
 
     if (bytes % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG ("Size is not a multiple of " <<
-                      BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
+        STXXL_ERRMSG("Size is not a multiple of " <<
+                     BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
 
     if (long(buffer) % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG ("Buffer is not aligned: modulo "
+        STXXL_ERRMSG("Buffer is not aligned: modulo "
                                               << BLOCK_ALIGN << " = " <<
-                      long(buffer) % BLOCK_ALIGN << " (" <<
-                      std::hex << buffer << std::dec << ")");
+                     long(buffer) % BLOCK_ALIGN << " (" <<
+                     std::hex << buffer << std::dec << ")");
 }
 
-ufs_request_base::~ufs_request_base ()
+ufs_request_base::~ufs_request_base()
 {
     STXXL_VERBOSE3("ufs_request_base " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
 
@@ -145,7 +145,7 @@ ufs_request_base::~ufs_request_base ()
     // _state.wait_for (READY2DIE); // does not make sense ?
 }
 
-void ufs_request_base::wait ()
+void ufs_request_base::wait()
 {
     STXXL_VERBOSE3("ufs_request_base : " << static_cast<void *>(this) << " wait ");
 
@@ -155,7 +155,7 @@ void ufs_request_base::wait ()
     enqueue();
 #endif
 
-    _state.wait_for (READY2DIE);
+    _state.wait_for(READY2DIE);
 
     END_COUNT_WAIT_TIME
 
@@ -173,15 +173,15 @@ bool ufs_request_base::poll()
 
     return s;
 }
-const char * ufs_request_base::io_type ()
+const char * ufs_request_base::io_type()
 {
     return "ufs_base";
 }
 
-ufs_file_base::ufs_file_base (
+ufs_file_base::ufs_file_base(
     const std::string & filename,
     int mode,
-    int disk) : file (disk), file_des (-1), mode_(mode)
+    int disk) : file(disk), file_des(-1), mode_(mode)
 {
     int fmode = 0;
 #ifndef STXXL_DIRECT_IO_OFF
@@ -217,12 +217,12 @@ ufs_file_base::ufs_file_base (
     const int flags = S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP;
 #endif
 
-    if ((file_des = ::open (filename.c_str(), fmode, flags)) < 0)
+    if ((file_des = ::open(filename.c_str(), fmode, flags)) < 0)
         STXXL_THROW2(io_error, "Filedescriptor=" << file_des << " filename=" << filename << " fmode=" << fmode);
 }
-ufs_file_base::~ufs_file_base ()
+ufs_file_base::~ufs_file_base()
 {
-    int res = ::close (file_des);
+    int res = ::close(file_des);
 
     // if successful, reset file descriptor
     if (res >= 0)
@@ -231,13 +231,13 @@ ufs_file_base::~ufs_file_base ()
     else
         stxxl_function_error(io_error);
 }
-stxxl::int64 ufs_file_base::size ()
+stxxl::int64 ufs_file_base::size()
 {
     struct stat st;
     stxxl_check_ge_0(fstat(file_des, &st), io_error);
     return st.st_size;
 }
-void ufs_file_base::set_size (stxxl::int64 newsize)
+void ufs_file_base::set_size(stxxl::int64 newsize)
 {
     stxxl::int64 cur_size = size();
 

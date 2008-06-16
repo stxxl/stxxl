@@ -25,8 +25,8 @@ __STXXL_BEGIN_NAMESPACE
 class io_error : public std::ios_base::failure
 {
 public:
-    io_error () throw () : std::ios_base::failure("") { }
-    io_error (const std::string & msg_) throw () :
+    io_error() throw () : std::ios_base::failure("") { }
+    io_error(const std::string & msg_) throw () :
         std::ios_base::failure(msg_)
     { }
 };
@@ -34,8 +34,8 @@ public:
 class resource_error : public std::runtime_error
 {
 public:
-    resource_error () throw () : std::runtime_error("") { }
-    resource_error (const std::string & msg_) throw () :
+    resource_error() throw () : std::runtime_error("") { }
+    resource_error(const std::string & msg_) throw () :
         std::runtime_error(msg_)
     { }
 };
@@ -43,8 +43,8 @@ public:
 class bad_ext_alloc : public std::runtime_error
 {
 public:
-    bad_ext_alloc () throw () : std::runtime_error("") { }
-    bad_ext_alloc (const std::string & msg_) throw () :
+    bad_ext_alloc() throw () : std::runtime_error("") { }
+    bad_ext_alloc(const std::string & msg_) throw () :
         std::runtime_error(msg_)
     { }
 };

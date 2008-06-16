@@ -17,7 +17,7 @@ __STXXL_BEGIN_NAMESPACE
 syscall_file::syscall_file(
     const std::string & filename,
     int mode,
-    int disk) : ufs_file_base (filename, mode, disk)
+    int disk) : ufs_file_base(filename, mode, disk)
 { }
 
 syscall_request::syscall_request(
@@ -29,13 +29,13 @@ syscall_request::syscall_request(
     completion_handler on_cmpl) :
     ufs_request_base(f, buf, off, b, t, on_cmpl)
 { }
-const char * syscall_request::io_type ()
+const char * syscall_request::io_type()
 {
     return "syscall";
 }
 
 
-void syscall_request::serve ()
+void syscall_request::serve()
 {
     stats * iostats = stats::get_instance();
     if (nref() < 2)
@@ -53,7 +53,7 @@ void syscall_request::serve ()
 
     try
     {
-        if (::lseek(static_cast<syscall_file *>(file_)->get_file_des (), offset, SEEK_SET) < 0)
+        if (::lseek(static_cast<syscall_file *>(file_)->get_file_des(), offset, SEEK_SET) < 0)
         {
             STXXL_THROW2(io_error,
                          " this=" << long(this) << " File descriptor=" <<
@@ -66,7 +66,7 @@ void syscall_request::serve ()
             if (type == READ)
             {
 #if STXXL_IO_STATS
-                iostats->read_started (size());
+                iostats->read_started(size());
 #endif
 
                 debugmon::get_instance()->io_started((char *)buffer);
@@ -83,18 +83,18 @@ void syscall_request::serve ()
                 debugmon::get_instance()->io_finished((char *)buffer);
 
 #if STXXL_IO_STATS
-                iostats->read_finished ();
+                iostats->read_finished();
 #endif
             }
             else
             {
 #if STXXL_IO_STATS
-                iostats->write_started (size());
+                iostats->write_started(size());
 #endif
 
                 debugmon::get_instance()->io_started((char *)buffer);
 
-                if (::write(static_cast<syscall_file *>(file_)->get_file_des (), buffer, bytes) < 0)
+                if (::write(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)
                 {
                     STXXL_THROW2(io_error,
                                  " this=" << long(this) << " File descriptor=" <<
@@ -106,7 +106,7 @@ void syscall_request::serve ()
                 debugmon::get_instance()->io_finished((char *)buffer);
 
 #if STXXL_IO_STATS
-                iostats->write_finished ();
+                iostats->write_finished();
 #endif
             }
         }
@@ -115,7 +115,6 @@ void syscall_request::serve ()
     {
         error_occured(ex.what());
     }
-
 
 
     if (nref() < 2)
@@ -127,15 +126,13 @@ void syscall_request::serve ()
     }
 
 
-
     _state.set_to(DONE);
-
 
 
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(waiters_mutex);
 #else
-    waiters_mutex.lock ();
+    waiters_mutex.lock();
 #endif
     // << notification >>
     std::for_each(
@@ -147,15 +144,15 @@ void syscall_request::serve ()
 #ifdef STXXL_BOOST_THREADS
     Lock.unlock();
 #else
-    waiters_mutex.unlock ();
+    waiters_mutex.unlock();
 #endif
 
-    completed ();
+    completed();
 
-    _state.set_to (READY2DIE);
+    _state.set_to(READY2DIE);
 }
 
-request_ptr syscall_file::aread (
+request_ptr syscall_file::aread(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
@@ -170,11 +167,11 @@ request_ptr syscall_file::aread (
 
 
 #ifndef NO_OVERLAPPING
-    disk_queues::get_instance ()->add_readreq(req, get_id());
+    disk_queues::get_instance()->add_readreq(req, get_id());
 #endif
     return req;
 }
-request_ptr syscall_file::awrite (
+request_ptr syscall_file::awrite(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
@@ -187,7 +184,7 @@ request_ptr syscall_file::awrite (
         stxxl_function_error(io_error);
 
 #ifndef NO_OVERLAPPING
-    disk_queues::get_instance ()->add_writereq(req, get_id());
+    disk_queues::get_instance()->add_writereq(req, get_id());
 #endif
     return req;
 }

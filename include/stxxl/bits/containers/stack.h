@@ -471,8 +471,8 @@ private:
     std::vector<bid_type> bids;
     alloc_strategy alloc_strategy_;
     unsigned_type pref_aggr;
-    prefetch_pool<block_type> &p_pool;
-    write_pool<block_type> &w_pool;
+    prefetch_pool<block_type> & p_pool;
+    write_pool<block_type> & w_pool;
 
 public:
     //! \brief Constructs stack
