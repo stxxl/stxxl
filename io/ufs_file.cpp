@@ -3,7 +3,8 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2002, 2005, 2008 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2008 Ilja Andronov <sni4ok@yandex.ru>>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -241,12 +242,25 @@ void ufs_file_base::set_size(stxxl::int64 newsize)
 {
     stxxl::int64 cur_size = size();
 
+	if (!(mode_ & RDONLY))
 #ifdef BOOST_MSVC
-    // FIXME: ADD TRUNCATION HERE, CURRENTLY NO SUITABLE FUNCTION FOUND
-#else
-    if (!(mode_ & RDONLY))
-        stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
+	{
+		HANDLE hfile;
+		stxxl_check_ge_0(hfile = (HANDLE)::_get_osfhandle(file_des), io_error);
 
+		LARGE_INTEGER desired_pos;
+		desired_pos.QuadPart = newsize;
+
+		if (!SetFilePointerEx(hfile, desired_pos, NULL, FILE_BEGIN))
+			stxxl_win_lasterror_exit("SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
+                                 " newsize=" << newsize << " ", io_error)
+
+		if (!SetEndOfFile(hfile))
+			stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
+                                 " newsize=" << newsize << " ", io_error);
+	}
+#else
+		stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
 #endif
 
     if (newsize > cur_size)
