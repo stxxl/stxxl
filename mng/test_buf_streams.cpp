@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/test_streams.cpp
+ *  mng/test_buf_streams.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

@@ -18,9 +18,9 @@ test_mng1: test_mng1.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_mng1.cpp -DSTXXL_VERBOSE_LEVEL=2
 	$(LINKER) test_mng1.$(OBJEXT) $(OUT)test_mng1.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test_streams: test_streams.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_streams.cpp
-	$(LINKER) test_streams.$(OBJEXT) $(OUT)test_streams.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_buf_streams: test_buf_streams.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_buf_streams.cpp
+	$(LINKER) test_buf_streams.$(OBJEXT) $(OUT)test_buf_streams.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_allocstr: test_allocstr.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_allocstr.cpp
