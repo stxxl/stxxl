@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002, 2005, 2008 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Ilja Andronov <sni4ok@yandex.ru>>
+ *  Copyright (C) 2008 Ilja Andronov <sni4ok@yandex.ru>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -102,6 +102,7 @@ void ufs_request_base::delete_waiter(onoff_switch * sw)
     waiters_mutex.unlock();
 #endif
 }
+
 int ufs_request_base::nwaiters()                 // returns number of waiters
 {
 #ifdef STXXL_BOOST_THREADS
@@ -162,6 +163,7 @@ void ufs_request_base::wait()
 
     check_errors();
 }
+
 bool ufs_request_base::poll()
 {
 #ifdef NO_OVERLAPPING
@@ -174,6 +176,7 @@ bool ufs_request_base::poll()
 
     return s;
 }
+
 const char * ufs_request_base::io_type()
 {
     return "ufs_base";
@@ -221,6 +224,7 @@ ufs_file_base::ufs_file_base(
     if ((file_des = ::open(filename.c_str(), fmode, flags)) < 0)
         STXXL_THROW2(io_error, "Filedescriptor=" << file_des << " filename=" << filename << " fmode=" << fmode);
 }
+
 ufs_file_base::~ufs_file_base()
 {
     int res = ::close(file_des);
@@ -232,19 +236,21 @@ ufs_file_base::~ufs_file_base()
     else
         stxxl_function_error(io_error);
 }
+
 stxxl::int64 ufs_file_base::size()
 {
     struct stat st;
     stxxl_check_ge_0(fstat(file_des, &st), io_error);
     return st.st_size;
 }
+
 void ufs_file_base::set_size(stxxl::int64 newsize)
 {
     stxxl::int64 cur_size = size();
 
-	if (!(mode_ & RDONLY))
+    if (!(mode_ & RDONLY))
+    {
 #ifdef BOOST_MSVC
-	{
 		HANDLE hfile;
 		stxxl_check_ge_0(hfile = (HANDLE)::_get_osfhandle(file_des), io_error);
 
@@ -258,10 +264,10 @@ void ufs_file_base::set_size(stxxl::int64 newsize)
 		if (!SetEndOfFile(hfile))
 			stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
                                  " newsize=" << newsize << " ", io_error);
-	}
 #else
 		stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
 #endif
+    }
 
     if (newsize > cur_size)
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
