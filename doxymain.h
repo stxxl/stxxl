@@ -309,9 +309,8 @@ my_example.bin: my_example.o
  *   The file is located in the \c STXXL_ROOT directory
  * - Press F7 to build the library.
  *   The library file (libstxxl.lib) should appear in \c STXXL_ROOT\\lib directory
- * - In the configuration manager ('Build' drop-down menu) choose 'Library and tests'
- *   as active solution configuration. Press OK.
- * - Press F7 to build \c stxxl test programs.
+ *   Or build the library and the \c stxxl test programs by pressing Ctrl-Alt-F7
+ *   (or choosing from 'Build' drop-down menu Rebuild Solution)
  *
  *
  * \section compile_apps Application compilation
