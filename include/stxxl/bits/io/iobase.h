@@ -48,7 +48,7 @@
 #include <set>
 
 #ifdef BOOST_MSVC
- // this is not stxxl/bits/io/io.h !
+// this is not stxxl/bits/io/io.h !
  #include <io.h>
 #else
  #include <unistd.h>

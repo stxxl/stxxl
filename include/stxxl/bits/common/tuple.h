@@ -19,16 +19,16 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-struct Plug {};
+struct Plug { };
 
 
-template <  class T1,
+template <class T1,
           class T2,
           class T3,
           class T4,
           class T5,
           class T6
->
+          >
 struct tuple_base
 {
     typedef T1 first_type;
@@ -58,13 +58,13 @@ struct tuple_base
 //! \brief k-Tuple data type
 //!
 //! (defined for k < 7)
-template <  class T1,
+template <class T1,
           class T2 = Plug,
           class T3 = Plug,
           class T4 = Plug,
           class T5 = Plug,
           class T6 = Plug
->
+          >
 struct tuple
 {
     typedef T1 first_type;
@@ -77,14 +77,14 @@ struct tuple
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I, CASE < 1, first_type,
-        CASE < 2, second_type,
-        CASE < 3, third_type,
-        CASE < 4, fourth_type,
-        CASE < 5, fifth_type,
-        CASE < 6, sixth_type,
-        CASE<DEFAULT, void
-        > > > > > > > > ::result result;
+        typedef typename SWITCH<I, CASE<1, first_type,
+                                        CASE<2, second_type,
+                                             CASE<3, third_type,
+                                                  CASE<4, fourth_type,
+                                                       CASE<5, fifth_type,
+                                                            CASE<6, sixth_type,
+                                                                 CASE<DEFAULT, void
+                                                                      > > > > > > > >::result result;
     };
 
     //! \brief First tuple component
@@ -101,13 +101,13 @@ struct tuple
     sixth_type sixth;
 
     tuple() { }
-    tuple(  first_type fir,
-            second_type sec,
-            third_type thi,
-            fourth_type fou,
-            fifth_type fif,
-            sixth_type six
-    ) :
+    tuple(first_type fir,
+          second_type sec,
+          third_type thi,
+          fourth_type fou,
+          fifth_type fif,
+          sixth_type six
+          ) :
         first(fir),
         second(sec),
         third(thi),
@@ -147,19 +147,19 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I, CASE < 1, first_type,
-        CASE < 2, second_type,
-        CASE<DEFAULT, void >
-        > > > ::result result;
+        typedef typename SWITCH<I, CASE<1, first_type,
+                                        CASE<2, second_type,
+                                             CASE<DEFAULT, void>
+                                             > > >::result result;
     };
 
     first_type first;
     second_type second;
 
     tuple() { }
-    tuple(  first_type fi,
-            second_type se
-    ) :
+    tuple(first_type fi,
+          second_type se
+          ) :
         first(fi),
         second(se)
     { }
@@ -167,10 +167,10 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
 
 
 //! \brief Partial specialization for 3- \c tuple (triple)
-template <  class T1,
+template <class T1,
           class T2,
           class T3
->
+          >
 struct tuple<T1, T2, T3, Plug, Plug, Plug>
 {
     typedef T1 first_type;
@@ -180,11 +180,11 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I, CASE < 1, first_type,
-        CASE < 2, second_type,
-        CASE < 3, second_type,
-        CASE<DEFAULT, void >
-        > > > > ::result result;
+        typedef typename SWITCH<I, CASE<1, first_type,
+                                        CASE<2, second_type,
+                                             CASE<3, second_type,
+                                                  CASE<DEFAULT, void>
+                                                  > > > >::result result;
     };
 
 
@@ -193,10 +193,10 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
     third_type third;
 
     tuple() { }
-    tuple(  first_type fir,
-            second_type sec,
-            third_type thi
-    ) :
+    tuple(first_type fir,
+          second_type sec,
+          third_type thi
+          ) :
         first(fir),
         second(sec),
         third(thi)
@@ -204,11 +204,11 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
 };
 
 //! \brief Partial specialization for 4- \c tuple
-template <  class T1,
+template <class T1,
           class T2,
           class T3,
           class T4
->
+          >
 struct tuple<T1, T2, T3, T4, Plug, Plug>
 {
     typedef T1 first_type;
@@ -219,12 +219,12 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I, CASE < 1, first_type,
-        CASE < 2, second_type,
-        CASE < 3, third_type,
-        CASE < 4, fourth_type,
-        CASE<DEFAULT, void
-        > > > > > > ::result result;
+        typedef typename SWITCH<I, CASE<1, first_type,
+                                        CASE<2, second_type,
+                                             CASE<3, third_type,
+                                                  CASE<4, fourth_type,
+                                                       CASE<DEFAULT, void
+                                                            > > > > > >::result result;
     };
 
 
@@ -234,11 +234,11 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     fourth_type fourth;
 
     tuple() { }
-    tuple(  first_type fir,
-            second_type sec,
-            third_type thi,
-            fourth_type fou
-    ) :
+    tuple(first_type fir,
+          second_type sec,
+          third_type thi,
+          fourth_type fou
+          ) :
         first(fir),
         second(sec),
         third(thi),
@@ -247,12 +247,12 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
 };
 
 //! \brief Partial specialization for 5- \c tuple
-template <  class T1,
+template <class T1,
           class T2,
           class T3,
           class T4,
           class T5
->
+          >
 struct tuple<T1, T2, T3, T4, T5, Plug>
 {
     typedef T1 first_type;
@@ -265,13 +265,13 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename SWITCH < I, CASE < 1, first_type,
-        CASE < 2, second_type,
-        CASE < 3, third_type,
-        CASE < 4, fourth_type,
-        CASE < 5, fifth_type,
-        CASE<DEFAULT, void
-        > > > > > > > ::result result;
+        typedef typename SWITCH<I, CASE<1, first_type,
+                                        CASE<2, second_type,
+                                             CASE<3, third_type,
+                                                  CASE<4, fourth_type,
+                                                       CASE<5, fifth_type,
+                                                            CASE<DEFAULT, void
+                                                                 > > > > > > >::result result;
     };
 
     first_type first;
@@ -281,12 +281,12 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     fifth_type fifth;
 
     tuple() { }
-    tuple(  first_type fir,
-            second_type sec,
-            third_type thi,
-            fourth_type fou,
-            fifth_type fif
-    ) :
+    tuple(first_type fir,
+          second_type sec,
+          third_type thi,
+          fourth_type fou,
+          fifth_type fif
+          ) :
         first(fir),
         second(sec),
         third(thi),
