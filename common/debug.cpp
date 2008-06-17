@@ -57,7 +57,7 @@ void debugmon::block_deallocated(char * ptr)
     STXXL_VERBOSE1("debugmon: block_deallocated from " << long(ptr));
     assert(tags.find(ptr) != tags.end());       // allocated
     tag t = tags[ptr];
-    assert(t.ongoing == false);             // not ongoing
+    assert(t.ongoing == false);                 // not ongoing
     tags.erase(ptr);
     size_t size = t.size;
     STXXL_VERBOSE1("debugmon: block_deallocated to " << long(t.end));

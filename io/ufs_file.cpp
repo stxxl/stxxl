@@ -251,21 +251,21 @@ void ufs_file_base::set_size(stxxl::int64 newsize)
     if (!(mode_ & RDONLY))
     {
 #ifdef BOOST_MSVC
-		HANDLE hfile;
-		stxxl_check_ge_0(hfile = (HANDLE)::_get_osfhandle(file_des), io_error);
+        HANDLE hfile;
+        stxxl_check_ge_0(hfile = (HANDLE) ::_get_osfhandle(file_des), io_error);
 
-		LARGE_INTEGER desired_pos;
-		desired_pos.QuadPart = newsize;
+        LARGE_INTEGER desired_pos;
+        desired_pos.QuadPart = newsize;
 
-		if (!SetFilePointerEx(hfile, desired_pos, NULL, FILE_BEGIN))
-			stxxl_win_lasterror_exit("SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
-                                 " newsize=" << newsize << " ", io_error)
+        if (!SetFilePointerEx(hfile, desired_pos, NULL, FILE_BEGIN))
+            stxxl_win_lasterror_exit("SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
+                                     " newsize=" << newsize << " ", io_error)
 
-		if (!SetEndOfFile(hfile))
-			stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
-                                 " newsize=" << newsize << " ", io_error);
+            if (!SetEndOfFile(hfile))
+                stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
+                                         " newsize=" << newsize << " ", io_error);
 #else
-		stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
+        stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
 #endif
     }
 

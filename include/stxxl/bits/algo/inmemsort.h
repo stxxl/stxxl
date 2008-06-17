@@ -29,7 +29,7 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;
 
-    STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first) );
+    STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first));
     unsigned_type nblocks = last.bid() - first.bid() + (last.block_offset() ? 1 : 0);
     simple_vector<block_type> blocks(nblocks);
     simple_vector<request_ptr> reqs(nblocks);
@@ -47,17 +47,17 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
 #if 1
             ArrayOfSequencesIterator<
                 block_type, typename block_type::value_type, block_type::size
-		> (blocks.begin(), first.block_offset()),
+                >(blocks.begin(), first.block_offset()),
             ArrayOfSequencesIterator<
                 block_type, typename block_type::value_type, block_type::size
-		> (blocks.begin(), nblocks * block_type::size - last_block_correction),
+                >(blocks.begin(), nblocks * block_type::size - last_block_correction),
 #else
-            TwoToOneDimArrayRowAdaptor <
-	    block_type, typename block_type::value_type, block_type::size
-	    > (blocks.begin(), first.block_offset() ),
-            TwoToOneDimArrayRowAdaptor <
-	    block_type, typename block_type::value_type, block_type::size
-	    > (blocks.begin(), nblocks * block_type::size - last_block_correction),
+            TwoToOneDimArrayRowAdaptor<
+                block_type, typename block_type::value_type, block_type::size
+                >(blocks.begin(), first.block_offset()),
+            TwoToOneDimArrayRowAdaptor<
+                block_type, typename block_type::value_type, block_type::size
+                >(blocks.begin(), nblocks * block_type::size - last_block_correction),
 #endif
             cmp);
 

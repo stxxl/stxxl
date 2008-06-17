@@ -44,7 +44,7 @@ class debugmon
             return (long(a) < long(b));
         }
         enum
-        {               // parameters for hash table
+        {                       // parameters for hash table
             bucket_size = 4,    // 0 < bucket_size
             min_buckets = 8     // min_buckets = 2 ^^ N, 0 < N
         };

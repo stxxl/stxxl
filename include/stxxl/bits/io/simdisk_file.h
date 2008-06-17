@@ -45,10 +45,10 @@ class DiskGeometry : private noncopyable
         int sectors;
         double sustained_data_rate;             // in Mb/s
         inline Zone(int _first_sector) : first_sector(_first_sector)
-        { }                     // constructor for zone search
+        { }                                     // constructor for zone search
 
         inline Zone(
-	    //int _last_cyl,
+            //int _last_cyl,
             //int _sect_per_track,
             int _first_sector,
             int _sectors, double _rate) :
@@ -70,7 +70,7 @@ class DiskGeometry : private noncopyable
 protected:
     int nsurfaces;
     int bytes_per_sector;
-    double cmd_ovh;             // in s
+    double cmd_ovh;                     // in s
     double seek_time;                   // in s
     double rot_latency;                 // in s
     double head_switch_time;            // in s

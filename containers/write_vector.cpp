@@ -36,7 +36,7 @@ public:
                  unsigned nbuffers_             // buffers to use for overlapping (>=2 recommended)
                  ) : Vec(Vec_), RealSize(0), nbuffers(nbuffers_)
     {
-        assert(Vec.empty());         // precondition: Vec is empty
+        assert(Vec.empty());                    // precondition: Vec is empty
         Vec.resize(2 * block_type::size);
         outstream = new buf_ostream_type(Vec.begin().bid(), nbuffers);
     }
@@ -99,17 +99,17 @@ int main(int argc, char * argv[])
         return 0;
     }
 
-    unlink(argv[2]);             // delete output file
+    unlink(argv[2]);                                                // delete output file
 
-    syscall_file InputFile(argv[1], file::RDONLY);            // Input file object
+    syscall_file InputFile(argv[1], file::RDONLY);                  // Input file object
     syscall_file OutputFile(argv[2], file::RDWR | file::CREAT);     // Output file object
 
     typedef stxxl::vector<my_type> vector_type;
 
     std::cout << "Copying file " << argv[1] << " to " << argv[2] << std::endl;
 
-    vector_type InputVector(&InputFile);               // InputVector is mapped to InputFile
-    vector_type OutputVector(&OutputFile);             // OutputVector is mapped to OutputFile
+    vector_type InputVector(&InputFile);                            // InputVector is mapped to InputFile
+    vector_type OutputVector(&OutputFile);                          // OutputVector is mapped to OutputFile
 
     std::cout << "File " << argv[1] << " has size " << InputVector.size() << " bytes." << std::endl;
 
@@ -117,11 +117,11 @@ int main(int argc, char * argv[])
 
     write_vector<vector_type> Writer(OutputVector, 6);
 
-    for ( ; it != InputVector.end(); ++it)       // iterate through InputVector
+    for ( ; it != InputVector.end(); ++it)                          // iterate through InputVector
     {
-        Writer.push_back(*it);                 // add the value pointed by 'it' to OutputVector
+        Writer.push_back(*it);                                      // add the value pointed by 'it' to OutputVector
     }
-    Writer.finish();                             // flush buffers
+    Writer.finish();                                                // flush buffers
 
 
     return 0;

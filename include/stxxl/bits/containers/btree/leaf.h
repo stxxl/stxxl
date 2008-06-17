@@ -643,7 +643,7 @@ namespace btree
                     STXXL_VERBOSE2("btree::normal_leaf updating iterator " << (*it2fix) <<
                                    " (pos-" << newLeftSize << " bid=" << my_bid() << ")");
                     btree_->iterator_map_.unregister_iterator(**it2fix);
-                    ((*it2fix)->bid) = my_bid();                             // fixing iterators
+                    ((*it2fix)->bid) = my_bid();                                 // fixing iterators
                     ((*it2fix)->pos) -= newLeftSize;                             // fixing iterators
                     btree_->iterator_map_.register_iterator(**it2fix);
                 }
@@ -684,12 +684,12 @@ namespace btree
                                    " (pos+" << Left.size() << " bid=" << Left.my_bid() << ")");
                     btree_->iterator_map_.unregister_iterator(**it2fix);
                     ((*it2fix)->bid) = Left.my_bid();                             // fixing iterators
-                    ((*it2fix)->pos) += Left.size();                             // fixing iterators
+                    ((*it2fix)->pos) += Left.size();                              // fixing iterators
                     btree_->iterator_map_.register_iterator(**it2fix);
                 }
             }
 
-            block_->info.cur_size = newRightSize;                     // update size
+            block_->info.cur_size = newRightSize;                         // update size
             Left.block_->info.cur_size = newLeftSize;                     // update size
 
             return Left.back().first;

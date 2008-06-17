@@ -53,10 +53,10 @@ protected:
             return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);
         }
         enum
-        {       // parameters for hash table
+        {                               // parameters for hash table
             bucket_size = 4,            // 0 < bucket_size
             min_buckets = 8             // min_buckets = 2 ^^ N, 0 < N
-        };      
+        };
 #endif
     };
     typedef std::pair<block_type *, request_ptr> busy_entry;

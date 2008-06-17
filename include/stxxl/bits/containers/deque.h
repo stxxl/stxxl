@@ -527,7 +527,7 @@ public:
         else
         {
             if (n + 1 > Vector.size())
-            {                     // need to resize
+            {                             // need to resize
                 const size_type old_size = Vector.size();
                 Vector.resize(2 * n);
                 if (begin_o > end_o)

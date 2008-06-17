@@ -674,7 +674,7 @@ namespace btree
                           block_->begin() + size(), block_->begin());
             }
 
-            block_->info.cur_size = newRightSize;                     // update size
+            block_->info.cur_size = newRightSize;                         // update size
             Left.block_->info.cur_size = newLeftSize;                     // update size
 
             return Left.back().first;

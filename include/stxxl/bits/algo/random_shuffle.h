@@ -72,7 +72,7 @@ namespace random_shuffle_local
             while (const_out.block_offset())
             {
                 **outstream = *const_out; // might cause I/Os for loading the page that
-                ++const_out;             // contains data beyond out
+                ++const_out;              // contains data beyond out
                 ++(*outstream);
             }
 
@@ -147,7 +147,7 @@ void random_shuffle(ExtIterator_ first,
                                              PageSize_, 4, BlockSize_, AllocStrategy_>::result temp_vector_type;
     temp_vector_type * temp_vector;
 
-    stxxl::prefetch_pool<block_type> p_pool(0); // no read buffers
+    stxxl::prefetch_pool<block_type> p_pool(0);               // no read buffers
     STXXL_VERBOSE1("random_shuffle: " << M / BlockSize_ - k << " write buffers for " << k << " buckets");
     stxxl::write_pool<block_type> w_pool(M / BlockSize_ - k); // M/B-k write buffers
 
@@ -168,7 +168,7 @@ void random_shuffle(ExtIterator_ first,
     for (i = 0; i < n; ++i) {
         random_bucket = rand(k);
         buckets[random_bucket]->push(*in); // reading the current input element
-        ++in; // go to the next input element
+        ++in;                              // go to the next input element
     }
 
     ///// Processing //////////////////////
@@ -281,7 +281,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
         M = 6 * BlockSize_ + PageSize_ * BlockSize_;
 
 
-    stxxl::int64 n = beyond - first; // the number of input elements
+    stxxl::int64 n = beyond - first;   // the number of input elements
     int_type k = M / (3 * BlockSize_); // number of buckets
 
     stxxl::int64 i, j, size = 0;
@@ -291,7 +291,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
                                              PageSize_, 4, BlockSize_, AllocStrategy_>::result temp_vector_type;
     temp_vector_type * temp_vector;
 
-    stxxl::prefetch_pool<block_type> p_pool(0); // no read buffers
+    stxxl::prefetch_pool<block_type> p_pool(0);               // no read buffers
     stxxl::write_pool<block_type> w_pool(M / BlockSize_ - k); // M/B-k write buffers
 
     stack_type ** buckets;
@@ -311,7 +311,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
     for (i = 0; i < n; ++i) {
         random_bucket = rand(k);
         buckets[random_bucket]->push(*in); // reading the current input element
-        ++in; // go to the next input element
+        ++in;                              // go to the next input element
     }
 
     ///// Processing //////////////////////

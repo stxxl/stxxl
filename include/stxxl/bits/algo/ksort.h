@@ -62,7 +62,6 @@ struct trigger_entry
 };
 
 
-
 template <typename _BIDTp, typename _KeyTp>
 inline bool operator < (const trigger_entry<_BIDTp, _KeyTp> & a,
                         const trigger_entry<_BIDTp, _KeyTp> & b)
@@ -84,23 +83,22 @@ struct type_key
     key_type key;
     type * ptr;
 
-    type_key() { };
-    type_key(key_type k, type * p) : key (k), ptr (p)
-    { };
+    type_key() { }
+    type_key(key_type k, type * p) : key(k), ptr(p)
+    { }
 };
 
 template <typename type, typename key1>
-bool operator  < (const type_key<type, key1> & a, const type_key<type, key1> & b)
+bool operator < (const type_key<type, key1> & a, const type_key<type, key1> & b)
 {
     return a.key < b.key;
 }
 
 template <typename type, typename key1>
-bool operator  > (const type_key<type, key1> & a, const type_key<type, key1> & b)
+bool operator > (const type_key<type, key1> & a, const type_key<type, key1> & b)
 {
     return a.key > b.key;
 }
-
 
 
 template <typename block_type, typename bid_type>
@@ -109,7 +107,7 @@ struct write_completion_handler
     block_type * block;
     bid_type bid;
     request_ptr * req;
-    void operator ()  (request * /*completed_req*/)
+    void operator () (request * /*completed_req*/)
     {
         * req = block->read(bid);
     }
@@ -128,7 +126,7 @@ inline void write_out(
     int_type & out_block,
     int_type & out_pos,
     run_type & run,
-    write_completion_handler < block_type, typename block_type::bid_type > * & next_read,
+    write_completion_handler<block_type, typename block_type::bid_type> * & next_read,
     request_ptr * write_reqs,
     request_ptr * read_reqs,
     input_bid_iterator & it,
@@ -137,7 +135,7 @@ inline void write_out(
     typedef typename block_type::bid_type bid_type;
     typedef typename block_type::type type;
 
-    block_manager * bm = block_manager::get_instance ();
+    block_manager * bm = block_manager::get_instance();
     type * elem = cur_blk->elem;
     for (type_key_ * p = begin; p < end; p++)
     {
@@ -152,16 +150,16 @@ inline void write_out(
                 next_read->block = cur_blk;
                 next_read->req = read_reqs + out_block;
                 read_reqs[out_block] = NULL;
-                bm->delete_block( next_read->bid = *(it++) );
+                bm->delete_block(next_read->bid = *(it++));
 
-                write_reqs[out_block] = cur_blk->write (
+                write_reqs[out_block] = cur_blk->write(
                     run[out_block].bid,
                     // postpone read of block from next run
                     *(next_read++));                                      // after write of block from this run
             }
             else
             {
-                write_reqs[out_block] = cur_blk->write (run[out_block].bid);
+                write_reqs[out_block] = cur_blk->write(run[out_block].bid);
             }
 
             cur_blk++;
@@ -173,14 +171,14 @@ inline void write_out(
 }
 
 template <
-          typename block_type,
-          typename run_type,
-          typename input_bid_iterator,
-          typename key_extractor>
+    typename block_type,
+    typename run_type,
+    typename input_bid_iterator,
+    typename key_extractor>
 void
 create_runs(
     input_bid_iterator it,
-    run_type * * runs,
+    run_type ** runs,
     const unsigned_type nruns,
     const unsigned_type m2,
     key_extractor keyobj)
@@ -190,24 +188,24 @@ create_runs(
     typedef typename key_extractor::key_type key_type;
     typedef type_key<type, key_type> type_key_;
 
-    block_manager * bm = block_manager::get_instance ();
+    block_manager * bm = block_manager::get_instance();
     block_type * Blocks1 = new block_type[m2];
     block_type * Blocks2 = new block_type[m2];
     type_key_ * refs1 = new type_key_[m2 * Blocks1->size];
     type_key_ * refs2 = new type_key_[m2 * Blocks1->size];
     request_ptr * read_reqs = new request_ptr[m2];
     request_ptr * write_reqs = new request_ptr[m2];
-    write_completion_handler<block_type, bid_type> *next_run_reads =
+    write_completion_handler<block_type, bid_type> * next_run_reads =
         new write_completion_handler<block_type, bid_type>[m2];
 
     run_type * run;
     run = *runs;
-    int_type run_size = (*runs)->size ();
+    int_type run_size = (*runs)->size();
     key_type offset = 0;
     const int log_k1 =
         static_cast<int>(ceil(log2((m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
-                                   (double (m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE)) : 2.)));
-    const int log_k2 = int (log2(double (m2 * Blocks1->size))) - log_k1 - 1;
+                                   (double(m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE)) : 2.)));
+    const int log_k2 = int(log2(double(m2 * Blocks1->size))) - log_k1 - 1;
     STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
     const int_type k1 = 1 << log_k1;
     const int_type k2 = 1 << log_k2;
@@ -215,7 +213,7 @@ create_runs(
     int_type * bucket2 = new int_type[k2];
     int_type i;
 
-    disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
+    disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
     for (i = 0; i < run_size; i++)
     {
@@ -232,7 +230,7 @@ create_runs(
     for ( ; k < nruns; k++)
     {
         run = runs[k];
-        run_size = run->size ();
+        run_size = run->size();
 
         std::fill(bucket1, bucket1 + k1, 0);
 
@@ -254,14 +252,14 @@ create_runs(
 
         int_type out_block = 0;
         int_type out_pos = 0;
-        unsigned_type next_run_size = (k < nruns - 1) ? (runs[k + 1]->size ()) : 0;
+        unsigned_type next_run_size = (k < nruns - 1) ? (runs[k + 1]->size()) : 0;
 
         // recurse on each bucket
         type_key_ * c = refs2;
         type_key_ * d = refs1;
         block_type * cur_blk = Blocks2;
         block_type * end_blk = Blocks2 + next_run_size;
-        write_completion_handler<block_type, bid_type> *next_read = next_run_reads;
+        write_completion_handler<block_type, bid_type> * next_read = next_run_reads;
 
         for (i = 0; i < k1; i++)
         {
@@ -280,20 +278,20 @@ create_runs(
             d = dEnd;
         }
 
-        std::swap (Blocks1, Blocks2);
+        std::swap(Blocks1, Blocks2);
     }
 
-    wait_all (write_reqs, m2);
+    wait_all(write_reqs, m2);
 
-    delete [] bucket1;
-    delete [] bucket2;
-    delete [] refs1;
-    delete [] refs2;
-    delete [] Blocks1;
-    delete [] Blocks2;
-    delete [] next_run_reads;
-    delete [] read_reqs;
-    delete [] write_reqs;
+    delete[] bucket1;
+    delete[] bucket2;
+    delete[] refs1;
+    delete[] refs2;
+    delete[] Blocks1;
+    delete[] Blocks2;
+    delete[] next_run_reads;
+    delete[] read_reqs;
+    delete[] write_reqs;
 }
 
 template <typename block_type,
@@ -303,45 +301,47 @@ struct run_cursor2_cmp
 {
     typedef run_cursor2<block_type, prefetcher_type> cursor_type;
     key_extractor keyobj;
-    run_cursor2_cmp(key_extractor keyobj_) {
+    run_cursor2_cmp(key_extractor keyobj_)
+    {
         keyobj = keyobj_;
     }
-    inline bool operator  ()  (const cursor_type & a, const cursor_type & b)
+    inline bool operator () (const cursor_type & a, const cursor_type & b)
     {
-        if (UNLIKELY (b.empty ()))
+        if (UNLIKELY(b.empty()))
             return true;
         // sentinel emulation
-        if (UNLIKELY (a.empty ()))
+        if (UNLIKELY(a.empty()))
             return false;
         //sentinel emulation
 
-        return (keyobj(a.current()) < keyobj(b.current ()));
+        return (keyobj(a.current()) < keyobj(b.current()));
     }
-private:
-    run_cursor2_cmp() { };
-};
 
+private:
+    run_cursor2_cmp() { }
+};
 
 
 template <typename record_type, typename key_extractor>
 class key_comparison : public std::binary_function<record_type, record_type, bool>
 {
     key_extractor ke;
+
 public:
     key_comparison() { }
     key_comparison(key_extractor ke_) : ke(ke_) { }
-    bool operator ()  (const record_type & a, const record_type & b) const
+    bool operator () (const record_type & a, const record_type & b) const
     {
         return ke(a) < ke(b);
     }
 };
 
 
-template < typename block_type, typename run_type, typename key_ext_>
-bool check_ksorted_runs(              run_type * * runs,
-                                      unsigned_type nruns,
-                                      unsigned_type m,
-                                      key_ext_ keyext)
+template <typename block_type, typename run_type, typename key_ext_>
+bool check_ksorted_runs(run_type ** runs,
+                        unsigned_type nruns,
+                        unsigned_type m,
+                        key_ext_ keyext)
 {
     typedef typename block_type::value_type value_type;
 
@@ -391,7 +391,7 @@ bool check_ksorted_runs(              run_type * * runs,
                     STXXL_MSG("BIDS:");
                     for (unsigned_type k = 0; k < nblocks; ++k)
                     {
-                        if ( k == j)
+                        if (k == j)
                             STXXL_MSG("Bad one comes next.");
                         STXXL_MSG("BID " << (off + k) << " is: " << ((*runs[irun])[off + k].bid));
                     }
@@ -403,19 +403,19 @@ bool check_ksorted_runs(              run_type * * runs,
 #if 1
                     ArrayOfSequencesIterator<
                         block_type, typename block_type::value_type, block_type::size
-			> (blocks, 0),
+                        >(blocks, 0),
                     ArrayOfSequencesIterator<
                         block_type, typename block_type::value_type, block_type::size
-			> (blocks, nelements),
+                        >(blocks, nelements),
 #else
-                    TwoToOneDimArrayRowAdaptor <
-                                                block_type, value_type, block_type::size
-						> (blocks, 0 ),
                     TwoToOneDimArrayRowAdaptor<
-                                               block_type, value_type, block_type::size
-					       > (blocks, nelements),
+                        block_type, value_type, block_type::size
+                        >(blocks, 0),
+                    TwoToOneDimArrayRowAdaptor<
+                        block_type, value_type, block_type::size
+                        >(blocks, nelements),
 #endif
-                    key_comparison<value_type, key_ext_>()) )
+                    key_comparison<value_type, key_ext_>()))
             {
                 STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
                 STXXL_MSG("Data in blocks:");
@@ -436,19 +436,18 @@ bool check_ksorted_runs(              run_type * * runs,
         }
 
         assert(blocks_left == 0);
-        delete [] reqs;
-        delete [] blocks;
+        delete[] reqs;
+        delete[] blocks;
     }
 
     return true;
 }
 
 
-
-template < typename block_type, typename run_type, typename key_extractor>
-void merge_runs(run_type * * in_runs, unsigned_type nruns, run_type * out_run, unsigned_type _m, key_extractor keyobj)
+template <typename block_type, typename run_type, typename key_extractor>
+void merge_runs(run_type ** in_runs, unsigned_type nruns, run_type * out_run, unsigned_type _m, key_extractor keyobj)
 {
-    typedef block_prefetcher < block_type, typename run_type::iterator > prefetcher_type;
+    typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
     typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
 
     unsigned_type i;
@@ -456,25 +455,25 @@ void merge_runs(run_type * * in_runs, unsigned_type nruns, run_type * out_run, u
 
     int_type * prefetch_seq = new int_type[out_run->size()];
 
-    typename run_type::iterator copy_start = consume_seq.begin ();
+    typename run_type::iterator copy_start = consume_seq.begin();
     for (i = 0; i < nruns; i++)
     {
         // TODO: try to avoid copy
         copy_start = std::copy(
-            in_runs[i]->begin (),
-            in_runs[i]->end (),
-            copy_start      );
+            in_runs[i]->begin(),
+            in_runs[i]->end(),
+            copy_start);
     }
-    std::stable_sort (consume_seq.begin (), consume_seq.end ());
+    std::stable_sort(consume_seq.begin(), consume_seq.end());
 
-    unsigned disks_number = config::get_instance()->disks_number ();
+    unsigned disks_number = config::get_instance()->disks_number();
 
 #ifdef PLAY_WITH_OPT_PREF
     const int_type n_write_buffers = 4 * disks_number;
 #else
-    const int_type n_prefetch_buffers = STXXL_MAX( int_type(2 * disks_number), (3 * (int_type(_m) - int_type(nruns)) / 4));
+    const int_type n_prefetch_buffers = STXXL_MAX(int_type(2 * disks_number), (3 * (int_type(_m) - int_type(nruns)) / 4));
     STXXL_VERBOSE("Prefetch buffers " << n_prefetch_buffers);
-    const int_type n_write_buffers = STXXL_MAX( int_type(2 * disks_number), int_type(_m) - int_type(nruns) - int_type(n_prefetch_buffers) );
+    const int_type n_write_buffers = STXXL_MAX(int_type(2 * disks_number), int_type(_m) - int_type(nruns) - int_type(n_prefetch_buffers));
     STXXL_VERBOSE("Write buffers " << n_write_buffers);
     // heuristic
     const int_type n_opt_prefetch_buffers = 2 * int_type(disks_number) + (3 * (int_type(n_prefetch_buffers) - int_type(2 * disks_number))) / 10;
@@ -486,7 +485,7 @@ void merge_runs(run_type * * in_runs, unsigned_type nruns, run_type * out_run, u
         consume_seq,
         prefetch_seq,
         n_opt_prefetch_buffers,
-        disks_number );
+        disks_number);
 #else
     for (i = 0; i < out_run->size(); i++)
         prefetch_seq[i] = i;
@@ -494,10 +493,10 @@ void merge_runs(run_type * * in_runs, unsigned_type nruns, run_type * out_run, u
 #endif
 
 
-    prefetcher_type prefetcher(     consume_seq.begin(),
-                                    consume_seq.end(),
-                                    prefetch_seq,
-                                    nruns + n_prefetch_buffers);
+    prefetcher_type prefetcher(consume_seq.begin(),
+                               consume_seq.end(),
+                               prefetch_seq,
+                               nruns + n_prefetch_buffers);
 
     buffered_writer<block_type> writer(n_write_buffers, n_write_buffers / 2);
 
@@ -505,26 +504,26 @@ void merge_runs(run_type * * in_runs, unsigned_type nruns, run_type * out_run, u
 
     run_cursor2_cmp<block_type, prefetcher_type, key_extractor> cmp(keyobj);
     loser_tree<
-               run_cursor_type,
-               run_cursor2_cmp<block_type, prefetcher_type, key_extractor>,
-               block_type::size> losers (&prefetcher, nruns, cmp);
+        run_cursor_type,
+        run_cursor2_cmp<block_type, prefetcher_type, key_extractor>,
+        block_type::size> losers(&prefetcher, nruns, cmp);
 
 
     block_type * out_buffer = writer.get_free_block();
 
     for (i = 0; i < out_run_size; i++)
     {
-        losers.multi_merge (out_buffer->elem);
+        losers.multi_merge(out_buffer->elem);
         (*out_run)[i].key = keyobj(out_buffer->elem[0]);
         out_buffer = writer.write(out_buffer, (*out_run)[i].bid);
     }
 
-    delete [] prefetch_seq;
+    delete[] prefetch_seq;
 
-    block_manager * bm = block_manager::get_instance ();
+    block_manager * bm = block_manager::get_instance();
     for (i = 0; i < nruns; i++)
     {
-        unsigned_type sz = in_runs[i]->size ();
+        unsigned_type sz = in_runs[i]->size();
         for (unsigned_type j = 0; j < sz; j++)
             bm->delete_block((*in_runs[i])[j].bid);
 
@@ -533,25 +532,24 @@ void merge_runs(run_type * * in_runs, unsigned_type nruns, run_type * out_run, u
 }
 
 
-
 template <typename block_type,
           typename alloc_strategy,
           typename input_bid_iterator,
           typename key_extractor>
 
-simple_vector < trigger_entry < typename block_type::bid_type, typename key_extractor::key_type > > *
+simple_vector<trigger_entry<typename block_type::bid_type, typename key_extractor::key_type> > *
 ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, key_extractor keyobj)
 {
     typedef typename block_type::value_type type;
     typedef typename key_extractor::key_type key_type;
     typedef typename block_type::bid_type bid_type;
-    typedef trigger_entry < bid_type, typename key_extractor::key_type > trigger_entry_type;
-    typedef simple_vector< trigger_entry_type > run_type;
+    typedef trigger_entry<bid_type, typename key_extractor::key_type> trigger_entry_type;
+    typedef simple_vector<trigger_entry_type> run_type;
     typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 
     unsigned_type m2 = div_and_round_up(_m, 2);
     const unsigned_type m2_rf = m2 * block_type::raw_size /
-                                (block_type::raw_size + block_type::size * sizeof(type_key < type, key_type >));
+                                (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
     STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
                   m2_rf << " due to key size: " << sizeof(typename key_extractor::key_type) << " bytes");
     m2 = m2_rf;
@@ -560,77 +558,77 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
     unsigned_type nruns = full_runs + partial_runs;
     unsigned_type i;
 
-    config * cfg = config::get_instance ();
-    block_manager * mng = block_manager::get_instance ();
-    int ndisks = cfg->disks_number ();
+    config * cfg = config::get_instance();
+    block_manager * mng = block_manager::get_instance();
+    int ndisks = cfg->disks_number();
 
-    STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
+    STXXL_VERBOSE("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
 
 #if STXXL_IO_STATS
-    stats * iostats = stats::get_instance ();
+    stats * iostats = stats::get_instance();
     iostats += 0;
     // iostats->reset ();
 #endif
 
-    double begin = stxxl_timestamp (), after_runs_creation, end;
+    double begin = stxxl_timestamp(), after_runs_creation, end;
     (void)(begin);
 
-    run_type * * runs = new run_type *[nruns];
+    run_type ** runs = new run_type *[nruns];
 
     for (i = 0; i < full_runs; i++)
-        runs[i] = new run_type (m2);
+        runs[i] = new run_type(m2);
 
 
 #ifdef INTERLEAVED_ALLOC
     if (partial_runs)
     {
         unsigned_type last_run_size = _n - full_runs * m2;
-        runs[i] = new run_type (last_run_size);
+        runs[i] = new run_type(last_run_size);
 
-        mng->new_blocks (interleaved_alloc_strategy (nruns, 0, ndisks),
-                         RunsToBIDArrayAdaptor2 < block_type::raw_size, run_type >
-                         (runs, 0, nruns, last_run_size),
-                         RunsToBIDArrayAdaptor2 < block_type::raw_size, run_type >
-                         (runs, _n, nruns, last_run_size));
+        mng->new_blocks(interleaved_alloc_strategy(nruns, 0, ndisks),
+                        RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>
+                        (runs, 0, nruns, last_run_size),
+                        RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>
+                        (runs, _n, nruns, last_run_size));
     }
     else
-        mng->new_blocks (interleaved_alloc_strategy (nruns, 0, ndisks),
-                         RunsToBIDArrayAdaptor < block_type::raw_size, run_type >
-                         (runs, 0, nruns),
-                         RunsToBIDArrayAdaptor < block_type::raw_size, run_type >
-                         (runs, _n, nruns));
+        mng->new_blocks(interleaved_alloc_strategy(nruns, 0, ndisks),
+                        RunsToBIDArrayAdaptor<block_type::raw_size, run_type>
+                        (runs, 0, nruns),
+                        RunsToBIDArrayAdaptor<block_type::raw_size, run_type>
+                        (runs, _n, nruns));
 
 #else
     if (partial_runs)
-        runs[i] = new run_type (_n - full_runs * m2);
+        runs[i] = new run_type(_n - full_runs * m2);
 
 
     for (i = 0; i < nruns; i++)
     {
-        mng->new_blocks(        alloc_strategy(0, ndisks),
-                                trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (runs[i]->begin()),
-                                trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (runs[i]->end())        );
+        mng->new_blocks(alloc_strategy(0, ndisks),
+                        trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i]->begin()),
+                        trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i]->end()));
     }
 #endif
 
-    create_runs< block_type,
+    create_runs<block_type,
                 run_type,
                 input_bid_iterator,
-                key_extractor> (input_bids, runs, nruns, m2, keyobj);
+                key_extractor>(input_bids, runs, nruns, m2, keyobj);
 
-    after_runs_creation = stxxl_timestamp ();
+    after_runs_creation = stxxl_timestamp();
 
 #ifdef COUNT_WAIT_TIME
     double io_wait_after_rf = stxxl::wait_time_counter;
     io_wait_after_rf += 0.0;         // to get rid of the 'unused variable warning'
 #endif
 
-    disk_queues::get_instance ()->set_priority_op (disk_queue::WRITE);
+    disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
     // Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) at once
 
-    const int_type merge_factor = static_cast<int_type>(ceil(pow(nruns, 1. / ceil(log(double (nruns)) / log(double (_m))))));
-    run_type * * new_runs;
+    const int_type merge_factor = static_cast<int_type>(ceil(pow(nruns, 1. / ceil(log(double(nruns)) / log(double(_m))))));
+    run_type ** new_runs;
 
     while (nruns > 1)
     {
@@ -656,7 +654,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
             runs_left -= runs2merge;
         }
         // allocate blocks in the new runs
-        if ( cur_out_run == 1 && blocks_in_new_run == int_type(_n) && (input_bids->storage->get_id() == -1))
+        if (cur_out_run == 1 && blocks_in_new_run == int_type(_n) && (input_bids->storage->get_id() == -1))
         {
             // if we sort a file we can reuse the input bids for the output
             input_bid_iterator cur = input_bids;
@@ -670,20 +668,20 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_blocks( FR(), &firstBID, (&firstBID) + 1);
+                mng->new_blocks(FR(), &firstBID, (&firstBID) + 1);
             }
             bid_type & lastBID = (*new_runs[0])[_n - 1].bid;
             if (lastBID.storage->get_id() != -1)
             {
                 // the first block does not belong to the file
                 // need to reallocate it
-                mng->new_blocks( FR(), &lastBID, (&lastBID) + 1);
+                mng->new_blocks(FR(), &lastBID, (&lastBID) + 1);
             }
         }
         else
-            mng->new_blocks( interleaved_alloc_strategy(new_nruns, 0, ndisks),
-                             RunsToBIDArrayAdaptor2<block_type::raw_size, run_type> (new_runs, 0, new_nruns, blocks_in_new_run),
-                             RunsToBIDArrayAdaptor2<block_type::raw_size, run_type> (new_runs, _n, new_nruns, blocks_in_new_run));
+            mng->new_blocks(interleaved_alloc_strategy(new_nruns, 0, ndisks),
+                            RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>(new_runs, 0, new_nruns, blocks_in_new_run),
+                            RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>(new_runs, _n, new_nruns, blocks_in_new_run));
 
 
         // merge all
@@ -693,46 +691,45 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
         {
             int_type runs2merge = STXXL_MIN(runs_left, merge_factor);
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
-            assert((check_ksorted_runs < block_type, run_type, key_extractor > (runs + nruns - runs_left, runs2merge, m2, keyobj) ));
+            assert((check_ksorted_runs<block_type, run_type, key_extractor>(runs + nruns - runs_left, runs2merge, m2, keyobj)));
 #endif
             STXXL_VERBOSE("Merging " << runs2merge << " runs");
-            merge_runs<block_type, run_type, key_extractor> (runs + nruns - runs_left,
-                                                             runs2merge, *(new_runs + (cur_out_run++)), _m, keyobj);
+            merge_runs<block_type, run_type, key_extractor>(runs + nruns - runs_left,
+                                                            runs2merge, *(new_runs + (cur_out_run++)), _m, keyobj);
             runs_left -= runs2merge;
         }
 
         nruns = new_nruns;
-        delete [] runs;
+        delete[] runs;
         runs = new_runs;
     }
 
 
     run_type * result = *runs;
-    delete [] runs;
+    delete[] runs;
 
-    end = stxxl_timestamp ();
+    end = stxxl_timestamp();
 
-    STXXL_VERBOSE ("Elapsed time        : " << end - begin << " s. Run creation time: " <<
-                   after_runs_creation - begin << " s");
+    STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
+                  after_runs_creation - begin << " s");
 #if STXXL_IO_STATS
-    STXXL_VERBOSE ("reads               : " << iostats->get_reads ());
-    STXXL_VERBOSE ("reads(volume)       : " << iostats->get_read_volume () << " bytes");
-    STXXL_VERBOSE ("writes              : " << iostats->get_writes () << " bytes");
-    STXXL_VERBOSE ("writes(volume)      : " << iostats->get_written_volume ());
-    STXXL_VERBOSE ("read time           : " << iostats->get_read_time () << " s");
-    STXXL_VERBOSE ("write time          : " << iostats->get_write_time () << " s");
-    STXXL_VERBOSE ("parallel read time  : " << iostats->get_pread_time () << " s");
-    STXXL_VERBOSE ("parallel write time : " << iostats->get_pwrite_time () << " s");
-    STXXL_VERBOSE ("parallel io time    : " << iostats->get_pio_time () << " s");
+    STXXL_VERBOSE("reads               : " << iostats->get_reads());
+    STXXL_VERBOSE("reads(volume)       : " << iostats->get_read_volume() << " bytes");
+    STXXL_VERBOSE("writes              : " << iostats->get_writes() << " bytes");
+    STXXL_VERBOSE("writes(volume)      : " << iostats->get_written_volume());
+    STXXL_VERBOSE("read time           : " << iostats->get_read_time() << " s");
+    STXXL_VERBOSE("write time          : " << iostats->get_write_time() << " s");
+    STXXL_VERBOSE("parallel read time  : " << iostats->get_pread_time() << " s");
+    STXXL_VERBOSE("parallel write time : " << iostats->get_pwrite_time() << " s");
+    STXXL_VERBOSE("parallel io time    : " << iostats->get_pio_time() << " s");
 #endif
 #ifdef COUNT_WAIT_TIME
-    STXXL_VERBOSE ("Time in I/O wait(rf): " << io_wait_after_rf << " s");
-    STXXL_VERBOSE ("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
+    STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
+    STXXL_VERBOSE("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
 #endif
 
     return result;
 }
-
 
 
 /*! \page key_extractor Key extractor concept
@@ -770,7 +767,6 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
  */
 
 
-
 //! \brief External sorting routine for records with keys
 //! \param first_ object of model of \c ext_random_access_iterator concept
 //! \param last_ object of model of \c ext_random_access_iterator concept
@@ -781,15 +777,14 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 template <typename ExtIterator_, typename KeyExtractor_>
 void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsigned_type M__)
 {
-    typedef simple_vector < trigger_entry < typename ExtIterator_::bid_type,
-    typename KeyExtractor_::key_type > > run_type;
+    typedef simple_vector<trigger_entry<typename ExtIterator_::bid_type,
+                                        typename KeyExtractor_::key_type> > run_type;
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;
 
 
-
     unsigned_type n = 0;
-    block_manager * mng = block_manager::get_instance ();
+    block_manager * mng = block_manager::get_instance();
 
     first_.flush();
 
@@ -812,8 +807,8 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 request_ptr req;
 
                 req = first_block->read(*first_.bid());
-                mng->new_blocks( FR(), &first_bid, (&first_bid) + 1);                // try to overlap
-                mng->new_blocks( FR(), &last_bid, (&last_bid) + 1);
+                mng->new_blocks(FR(), &first_bid, (&first_bid) + 1);                // try to overlap
+                mng->new_blocks(FR(), &last_bid, (&last_bid) + 1);
                 req->wait();
 
 
@@ -848,26 +843,26 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 delete last_block;
 
                 run_type * out =
-                    ksort_blocks <
-                    typename ExtIterator_::block_type,
-                typename ExtIterator_::vector_type::alloc_strategy,
-                typename ExtIterator_::bids_container_iterator,
-                           KeyExtractor_ >
-                (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                    ksort_blocks<
+                        typename ExtIterator_::block_type,
+                        typename ExtIterator_::vector_type::alloc_strategy,
+                        typename ExtIterator_::bids_container_iterator,
+                        KeyExtractor_>
+                    (first_.bid(), n, M__ / block_type::raw_size, keyobj);
 
 
                 first_block = new typename ExtIterator_::block_type;
                 last_block = new typename ExtIterator_::block_type;
                 typename ExtIterator_::block_type * sorted_first_block = new typename ExtIterator_::block_type;
                 typename ExtIterator_::block_type * sorted_last_block = new typename ExtIterator_::block_type;
-                request_ptr * reqs = new request_ptr [2];
+                request_ptr * reqs = new request_ptr[2];
 
                 reqs[0] = first_block->read(first_bid);
                 reqs[1] = sorted_first_block->read((*(out->begin())).bid);
                 wait_all(reqs, 2);
 
                 reqs[0] = last_block->read(last_bid);
-                reqs[1] = sorted_last_block->read( ((*out)[out->size() - 1]).bid);
+                reqs[1] = sorted_last_block->read(((*out)[out->size() - 1]).bid);
 
                 for (i = first_.block_offset(); i < block_type::size; i++)
                 {
@@ -906,7 +901,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 delete first_block;
                 delete sorted_first_block;
                 delete sorted_last_block;
-                delete [] reqs;
+                delete[] reqs;
                 delete out;
 
                 req->wait();
@@ -923,7 +918,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 request_ptr req;
 
                 req = first_block->read(*first_.bid());
-                mng->new_blocks( FR(), &first_bid, (&first_bid) + 1);                // try to overlap
+                mng->new_blocks(FR(), &first_bid, (&first_bid) + 1);                // try to overlap
                 req->wait();
 
 
@@ -944,19 +939,19 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 delete first_block;
 
                 run_type * out =
-                    ksort_blocks <
-                    typename ExtIterator_::block_type,
-                typename ExtIterator_::vector_type::alloc_strategy,
-                typename ExtIterator_::bids_container_iterator,
-                           KeyExtractor_ >
-                (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                    ksort_blocks<
+                        typename ExtIterator_::block_type,
+                        typename ExtIterator_::vector_type::alloc_strategy,
+                        typename ExtIterator_::bids_container_iterator,
+                        KeyExtractor_>
+                    (first_.bid(), n, M__ / block_type::raw_size, keyobj);
 
 
                 first_block = new typename ExtIterator_::block_type;
 
                 typename ExtIterator_::block_type * sorted_first_block = new typename ExtIterator_::block_type;
 
-                request_ptr * reqs = new request_ptr [2];
+                request_ptr * reqs = new request_ptr[2];
 
                 reqs[0] = first_block->read(first_bid);
                 reqs[1] = sorted_first_block->read((*(out->begin())).bid);
@@ -986,7 +981,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 *cur_bid = (*it).bid;
 
                 delete sorted_first_block;
-                delete [] reqs;
+                delete[] reqs;
                 delete out;
 
                 req->wait();
@@ -1005,7 +1000,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 unsigned_type i;
 
                 req = last_block->read(*last_.bid());
-                mng->new_blocks( FR(), &last_bid, (&last_bid) + 1);
+                mng->new_blocks(FR(), &last_bid, (&last_bid) + 1);
                 req->wait();
 
                 for (i = last_.block_offset(); i < block_type::size; i++)
@@ -1024,20 +1019,20 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 delete last_block;
 
                 run_type * out =
-                    ksort_blocks <
-                    typename ExtIterator_::block_type,
-                typename ExtIterator_::vector_type::alloc_strategy,
-                typename ExtIterator_::bids_container_iterator,
-                           KeyExtractor_ >
-                (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                    ksort_blocks<
+                        typename ExtIterator_::block_type,
+                        typename ExtIterator_::vector_type::alloc_strategy,
+                        typename ExtIterator_::bids_container_iterator,
+                        KeyExtractor_>
+                    (first_.bid(), n, M__ / block_type::raw_size, keyobj);
 
 
                 last_block = new typename ExtIterator_::block_type;
                 typename ExtIterator_::block_type * sorted_last_block = new typename ExtIterator_::block_type;
-                request_ptr * reqs = new request_ptr [2];
+                request_ptr * reqs = new request_ptr[2];
 
                 reqs[0] = last_block->read(last_bid);
-                reqs[1] = sorted_last_block->read( ((*out)[out->size() - 1]).bid);
+                reqs[1] = sorted_last_block->read(((*out)[out->size() - 1]).bid);
                 wait_all(reqs, 2);
 
                 for (i = 0; i < last_.block_offset(); i++)
@@ -1060,7 +1055,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 }
 
                 delete sorted_last_block;
-                delete [] reqs;
+                delete[] reqs;
                 delete out;
 
                 req->wait();
@@ -1073,12 +1068,12 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 n = last_.bid() - first_.bid();
 
                 run_type * out =
-                    ksort_blocks <
-                    typename ExtIterator_::block_type,
-                typename ExtIterator_::vector_type::alloc_strategy,
-                typename ExtIterator_::bids_container_iterator,
-                           KeyExtractor_ >
-                (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                    ksort_blocks<
+                        typename ExtIterator_::block_type,
+                        typename ExtIterator_::vector_type::alloc_strategy,
+                        typename ExtIterator_::bids_container_iterator,
+                        KeyExtractor_>
+                    (first_.bid(), n, M__ / block_type::raw_size, keyobj);
 
                 typename run_type::iterator it = out->begin();
                 typename ExtIterator_::bids_container_iterator cur_bid = first_.bid();
@@ -1098,11 +1093,11 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 #endif
 }
 
-template<typename record_type>
+template <typename record_type>
 struct ksort_defaultkey
 {
     typedef typename record_type::key_type key_type;
-    key_type operator()  (const record_type & obj) const
+    key_type operator () (const record_type & obj) const
     {
         return obj.key();
     }
@@ -1136,7 +1131,7 @@ template <typename ExtIterator_>
 void ksort(ExtIterator_ first_, ExtIterator_ last_, unsigned_type M__)
 {
     ksort(first_, last_,
-          ksort_defaultkey < typename ExtIterator_::vector_type::value_type > (), M__);
+          ksort_defaultkey<typename ExtIterator_::vector_type::value_type>(), M__);
 }
 
 

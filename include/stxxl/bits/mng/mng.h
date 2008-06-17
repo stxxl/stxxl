@@ -50,15 +50,15 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Block identifier class
 
 //! Stores block identity, given by file and offset within the file
-template < unsigned SIZE >
+template <unsigned SIZE>
 struct BID
 {
     enum
     {
-        size = SIZE,      //!< Block size
+        size = SIZE,         //!< Block size
         t_size = SIZE        //!< Blocks size, given by the parameter
     };
-    file * storage;     //!< pointer to the file of the block
+    file * storage;          //!< pointer to the file of the block
     stxxl::int64 offset;     //!< offset within the file of the block
     BID() : storage(NULL), offset(0) { }
     bool valid() const
@@ -66,25 +66,24 @@ struct BID
         return storage;
     }
     BID(file * s, stxxl::int64 o) : storage(s), offset(o) { }
-    BID(const BID &obj) : storage(obj.storage), offset(obj.offset) { }
+    BID(const BID & obj) : storage(obj.storage), offset(obj.offset) { }
     template <unsigned BlockSize>
     explicit BID(const BID<BlockSize> & obj) : storage(obj.storage), offset(obj.offset) { }
 };
-
 
 
 //! \brief Specialization of block identifier class (BID) for variable size block size
 
 //! Stores block identity, given by file, offset within the file, and size of the block
 template <>
-struct BID < 0 >
+struct BID<0>
 {
-    file * storage;     //!< pointer to the file of the block
+    file * storage;          //!< pointer to the file of the block
     stxxl::int64 offset;     //!< offset within the file of the block
-    unsigned size;  //!< size of the block in bytes
+    unsigned size;           //!< size of the block in bytes
     enum
     {
-        t_size = 0        //!< Blocks size, given by the parameter
+        t_size = 0           //!< Blocks size, given by the parameter
     };
     BID() : storage(NULL), offset(0), size(0) { }
     BID(file * f, stxxl::int64 o, unsigned s) : storage(f), offset(o), size(s) { }
@@ -124,16 +123,16 @@ class filler_struct__
     byte_type filler_array_[bytes];
 
 public:
-    filler_struct__ () { STXXL_VERBOSE2("filler_struct__ is allocated"); }
+    filler_struct__() { STXXL_VERBOSE2("filler_struct__ is allocated"); }
 };
 
 template <>
-class filler_struct__ < 0 >
+class filler_struct__<0>
 {
     typedef unsigned char byte_type;
 
 public:
-    filler_struct__ () { STXXL_VERBOSE2("filler_struct__ is allocated"); }
+    filler_struct__() { STXXL_VERBOSE2("filler_struct__ is allocated"); }
 };
 
 //! \brief Contains data elements for \c stxxl::typed_block , not intended for direct use
@@ -157,10 +156,10 @@ public:
     //! Array of elements of type T
     T elem[size];
 
-    element_block () { STXXL_VERBOSE2("element_block is allocated"); }
+    element_block() { STXXL_VERBOSE2("element_block is allocated"); }
 
     //! An operator to access elements in the block
-    reference operator [](int i)
+    reference operator [] (int i)
     {
         return elem[i];
     }
@@ -203,16 +202,16 @@ public:
     bid_type ref[nbids];
 
     //! An operator to access bid references
-    bid_type & operator ()(int i)
+    bid_type & operator () (int i)
     {
         return ref[i];
     }
 
-    block_w_bids () { STXXL_VERBOSE2("block_w_bids is allocated"); }
+    block_w_bids() { STXXL_VERBOSE2("block_w_bids is allocated"); }
 };
 
 template <class T, unsigned Size_, unsigned RawSize_>
-class block_w_bids < T, Size_, RawSize_, 0 > : public element_block<T, Size_>
+class block_w_bids<T, Size_, RawSize_, 0>: public element_block<T, Size_>
 {
 public:
     enum
@@ -222,13 +221,13 @@ public:
     };
     typedef BID<raw_size> bid_type;
 
-    block_w_bids () { STXXL_VERBOSE2("block_w_bids is allocated"); }
+    block_w_bids() { STXXL_VERBOSE2("block_w_bids is allocated"); }
 };
 
 //! \brief Contains per block information for \c stxxl::typed_block , not intended for direct use
 template <class T_, unsigned RawSize_, unsigned NBids_, class InfoType_ = void>
 class block_w_info :
-    public block_w_bids < T_, ((RawSize_ - sizeof(BID < RawSize_ > ) * NBids_ - sizeof(InfoType_)) / sizeof(T_)), RawSize_, NBids_ >
+    public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_)), RawSize_, NBids_>
 {
 public:
     //! \brief Type of per block information element
@@ -237,22 +236,22 @@ public:
     //! \brief Per block information element
     info_type info;
 
-    enum { size = ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_ - sizeof(InfoType_)) / sizeof(T_)) };
+    enum { size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_)) };
 
 public:
-    block_w_info () { STXXL_VERBOSE2("block_w_info is allocated"); }
+    block_w_info() { STXXL_VERBOSE2("block_w_info is allocated"); }
 };
 
 template <class T_, unsigned RawSize_, unsigned NBids_>
-class block_w_info<T_, RawSize_, NBids_, void> :
-    public block_w_bids < T_, ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_) / sizeof(T_)), RawSize_, NBids_ >
+class block_w_info<T_, RawSize_, NBids_, void>:
+    public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>) * NBids_) / sizeof(T_)), RawSize_, NBids_>
 {
 public:
     typedef void info_type;
-    enum { size = ((RawSize_ - sizeof(BID < RawSize_ >) * NBids_) / sizeof(T_)) };
+    enum { size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_) / sizeof(T_)) };
 
 public:
-    block_w_info () { STXXL_VERBOSE2("block_w_info is allocated"); }
+    block_w_info() { STXXL_VERBOSE2("block_w_info is allocated"); }
 };
 
 //! \brief Block containing elements of fixed length
@@ -272,7 +271,7 @@ public:
 template <unsigned RawSize_, class T_, unsigned NRef_ = 0, class InfoType_ = void>
 class typed_block :
     public block_w_info<T_, RawSize_, NRef_, InfoType_>,
-    public filler_struct__ < (RawSize_ - sizeof(block_w_info < T_, RawSize_, NRef_, InfoType_ >)) >
+    public filler_struct__<(RawSize_ - sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>))>
 {
 public:
     typedef T_ type;
@@ -283,7 +282,7 @@ public:
     typedef pointer iterator;
     typedef type const * const_iterator;
 
-    enum { has_filler = (RawSize_ != sizeof(block_w_info < T_, RawSize_, NRef_, InfoType_ >)) };
+    enum { has_filler = (RawSize_ != sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>)) };
 
     typedef BID<RawSize_> bid_type;
 
@@ -294,8 +293,8 @@ public:
 
     enum
     {
-        raw_size = RawSize_,     //!< size of block in bytes
-        size = block_w_info < T_, RawSize_, NRef_, InfoType_ > ::size //!< number of elements in block
+        raw_size = RawSize_,                                      //!< size of block in bytes
+        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size //!< number of elements in block
     };
 
     /*! \brief Writes block to the disk(s)
@@ -303,8 +302,8 @@ public:
      *! \param on_cmpl completion handler
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
-    request_ptr write (const BID<raw_size> & bid,
-                       completion_handler on_cmpl = default_completion_handler())
+    request_ptr write(const BID<raw_size> & bid,
+                      completion_handler on_cmpl = default_completion_handler())
     {
         return bid.storage->awrite(
                    this,
@@ -318,18 +317,18 @@ public:
      *! \param on_cmpl completion handler
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
-    request_ptr read (const BID < raw_size > &bid,
-                      completion_handler on_cmpl = default_completion_handler())
+    request_ptr read(const BID<raw_size> & bid,
+                     completion_handler on_cmpl = default_completion_handler())
     {
         return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
     }
 
-    static void *operator new[] (size_t bytes)
+    static void * operator new[] (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
         STXXL_VERBOSE1("typed::block operator new: Meta info size: " << meta_info_size);
 
-        void * result = aligned_alloc < BLOCK_ALIGN > (bytes, meta_info_size);
+        void * result = aligned_alloc<BLOCK_ALIGN>(bytes, meta_info_size);
         char * tmp = (char *)result;
         debugmon::get_instance()->block_allocated(tmp, tmp + bytes, RawSize_);
         tmp += RawSize_;
@@ -341,12 +340,12 @@ public:
         return result;
     }
 
-    static void *operator new (size_t bytes)
+    static void * operator new (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
         STXXL_VERBOSE1("typed::block operator new: Meta info size: " << meta_info_size);
 
-        void * result = aligned_alloc < BLOCK_ALIGN > (bytes, meta_info_size);
+        void * result = aligned_alloc<BLOCK_ALIGN>(bytes, meta_info_size);
         char * tmp = (char *)result;
         debugmon::get_instance()->block_allocated(tmp, tmp + bytes, RawSize_);
         tmp += RawSize_;
@@ -366,13 +365,13 @@ public:
     static void operator delete[] (void * ptr)
     {
         debugmon::get_instance()->block_deallocated((char *)ptr);
-        aligned_dealloc < BLOCK_ALIGN > (ptr);
+        aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
     static void operator delete (void * ptr)
     {
         debugmon::get_instance()->block_deallocated((char *)ptr);
-        aligned_dealloc < BLOCK_ALIGN > (ptr);
+        aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
     static void operator delete (void *, void *)
@@ -400,59 +399,59 @@ public:
    };
  */
 
-template<unsigned BLK_SIZE>
+template <unsigned BLK_SIZE>
 class BIDArray : private noncopyable
 {
 protected:
     unsigned_type _size;
-    BID < BLK_SIZE > *array;
+    BID<BLK_SIZE> * array;
 
 public:
     typedef BID<BLK_SIZE> & reference;
     typedef BID<BLK_SIZE> * iterator;
     typedef const BID<BLK_SIZE> * const_iterator;
-    BIDArray () : _size (0), array (NULL)
+    BIDArray() : _size(0), array(NULL)
     { }
-    iterator begin ()
+    iterator begin()
     {
         return array;
     }
-    iterator end ()
+    iterator end()
     {
         return array + _size;
     }
 
-    BIDArray (unsigned_type size) : _size (size)
+    BIDArray(unsigned_type size) : _size(size)
     {
-        array = new BID < BLK_SIZE >[size];
+        array = new BID<BLK_SIZE>[size];
     }
-    unsigned_type size () const
+    unsigned_type size() const
     {
         return _size;
     }
-    reference operator [](int_type i)
+    reference operator [] (int_type i)
     {
         return array[i];
     }
-    void resize (unsigned_type newsize)
+    void resize(unsigned_type newsize)
     {
         if (array)
         {
             STXXL_MSG("Warning: resizing nonempty BIDArray");
-            BID < BLK_SIZE > *tmp = array;
-            array = new BID < BLK_SIZE >[newsize];
-            memcpy ((void *)array, (void *)tmp,
-                    sizeof(BID < BLK_SIZE >) * (STXXL_MIN (_size, newsize)));
+            BID<BLK_SIZE> * tmp = array;
+            array = new BID<BLK_SIZE>[newsize];
+            memcpy((void *)array, (void *)tmp,
+                   sizeof(BID<BLK_SIZE>) * (STXXL_MIN(_size, newsize)));
             delete[] tmp;
             _size = newsize;
         }
         else
         {
-            array = new BID < BLK_SIZE >[newsize];
+            array = new BID<BLK_SIZE>[newsize];
             _size = newsize;
         }
     }
-    ~BIDArray ()
+    ~BIDArray()
     {
         if (array)
             delete[] array;
@@ -468,8 +467,8 @@ class DiskAllocator : private noncopyable
     stxxl::mutex mutex;
 #endif
 
-    typedef std::pair < stxxl::int64, stxxl::int64 > place;
-    struct FirstFit : public std::binary_function < place, stxxl::int64, bool >
+    typedef std::pair<stxxl::int64, stxxl::int64> place;
+    struct FirstFit : public std::binary_function<place, stxxl::int64, bool>
     {
         bool operator () (
             const place & entry,
@@ -486,11 +485,11 @@ class DiskAllocator : private noncopyable
         }
     };
 
-    DiskAllocator ()
+    DiskAllocator()
     { }
 
 protected:
-    typedef std::map < stxxl::int64, stxxl::int64 > sortseq;
+    typedef std::map<stxxl::int64, stxxl::int64> sortseq;
     sortseq free_space;
     //  sortseq used_space;
     stxxl::int64 free_bytes;
@@ -501,7 +500,7 @@ protected:
     void check_corruption(stxxl::int64 region_pos, stxxl::int64 region_size,
                           sortseq::iterator pred, sortseq::iterator succ)
     {
-        if (pred != free_space.end ())
+        if (pred != free_space.end())
         {
             if (pred->first <= region_pos && pred->first + pred->second > region_pos)
             {
@@ -509,7 +508,7 @@ protected:
                             "System info: P " << pred->first << " " << pred->second << " " << region_pos);
             }
         }
-        if (succ != free_space.end ())
+        if (succ != free_space.end())
         {
             if (region_pos <= succ->first && region_pos + region_size > succ->first)
             {
@@ -520,35 +519,35 @@ protected:
     }
 
 public:
-    inline DiskAllocator (stxxl::int64 disk_size);
+    inline DiskAllocator(stxxl::int64 disk_size);
 
-    inline stxxl::int64 get_free_bytes () const
+    inline stxxl::int64 get_free_bytes() const
     {
         return free_bytes;
     }
-    inline stxxl::int64 get_used_bytes () const
+    inline stxxl::int64 get_used_bytes() const
     {
         return disk_bytes - free_bytes;
     }
-    inline stxxl::int64 get_total_bytes () const
+    inline stxxl::int64 get_total_bytes() const
     {
         return disk_bytes;
     }
 
-    template < unsigned BLK_SIZE >
-    stxxl::int64 new_blocks (BIDArray < BLK_SIZE > &bids);
+    template <unsigned BLK_SIZE>
+    stxxl::int64 new_blocks(BIDArray<BLK_SIZE> & bids);
 
-    template < unsigned BLK_SIZE >
-    stxxl::int64 new_blocks (BID < BLK_SIZE > * begin,
-                             BID< BLK_SIZE > * end);
+    template <unsigned BLK_SIZE>
+    stxxl::int64 new_blocks(BID<BLK_SIZE> * begin,
+                            BID<BLK_SIZE> * end);
 /*
         template < unsigned BLK_SIZE >
         void delete_blocks (const BIDArray < BLK_SIZE > &bids); */
-    template < unsigned BLK_SIZE >
-    void delete_block (const BID <BLK_SIZE > & bid);
+    template <unsigned BLK_SIZE>
+    void delete_block(const BID<BLK_SIZE> & bid);
 };
 
-DiskAllocator::DiskAllocator (stxxl::int64 disk_size) :
+DiskAllocator::DiskAllocator(stxxl::int64 disk_size) :
     free_bytes(disk_size),
     disk_bytes(disk_size)
 {
@@ -556,15 +555,15 @@ DiskAllocator::DiskAllocator (stxxl::int64 disk_size) :
 }
 
 
-template < unsigned BLK_SIZE >
-stxxl::int64 DiskAllocator::new_blocks (BIDArray < BLK_SIZE > & bids)
+template <unsigned BLK_SIZE>
+stxxl::int64 DiskAllocator::new_blocks(BIDArray<BLK_SIZE> & bids)
 {
     return new_blocks(bids.begin(), bids.end());
 }
 
-template < unsigned BLK_SIZE >
-stxxl::int64 DiskAllocator::new_blocks (BID < BLK_SIZE > * begin,
-                                        BID<BLK_SIZE> * end)
+template <unsigned BLK_SIZE>
+stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
+                                       BID<BLK_SIZE> * end)
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock lock(mutex);
@@ -609,14 +608,14 @@ stxxl::int64 DiskAllocator::new_blocks (BID < BLK_SIZE > * begin,
     // dump();
 
     sortseq::iterator space =
-        std::find_if (free_space.begin (), free_space.end (),
-                      bind2nd(FirstFit (), requested_size));
+        std::find_if(free_space.begin(), free_space.end(),
+                     bind2nd(FirstFit(), requested_size));
 
-    if (space != free_space.end ())
+    if (space != free_space.end())
     {
         stxxl::int64 region_pos = (*space).first;
         stxxl::int64 region_size = (*space).second;
-        free_space.erase (space);
+        free_space.erase(space);
         if (region_size > requested_size)
             free_space[region_pos + requested_size] = region_size - requested_size;
 
@@ -674,9 +673,8 @@ stxxl::int64 DiskAllocator::new_blocks (BID < BLK_SIZE > * begin,
 }
 
 
-
-template < unsigned BLK_SIZE >
-void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
+template <unsigned BLK_SIZE>
+void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock lock(mutex);
@@ -695,29 +693,29 @@ void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
     STXXL_VERBOSE2("Deallocating a block with size: " << region_size << " position: " << region_pos);
     if (!free_space.empty())
     {
-        sortseq::iterator succ = free_space.upper_bound (region_pos);
+        sortseq::iterator succ = free_space.upper_bound(region_pos);
         sortseq::iterator pred = succ;
         pred--;
         check_corruption(region_pos, region_size, pred, succ);
-        if (succ == free_space.end ())
+        if (succ == free_space.end())
         {
-            if (pred == free_space.end ())
+            if (pred == free_space.end())
             {
                 STXXL_ERRMSG("Error deallocating block at " << bid.offset << " size " << bid.size);
                 STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
-                STXXL_ERRMSG(((pred == free_space.begin ()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
-                STXXL_ERRMSG(((pred == free_space.end ()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
-                STXXL_ERRMSG(((succ == free_space.begin ()) ? "succ==free_space.begin()" : "succ!=free_space.begin()"));
-                STXXL_ERRMSG(((succ == free_space.end ()) ? "succ==free_space.end()" : "succ!=free_space.end()"));
+                STXXL_ERRMSG(((pred == free_space.begin()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
+                STXXL_ERRMSG(((pred == free_space.end()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
+                STXXL_ERRMSG(((succ == free_space.begin()) ? "succ==free_space.begin()" : "succ!=free_space.begin()"));
+                STXXL_ERRMSG(((succ == free_space.end()) ? "succ==free_space.end()" : "succ!=free_space.end()"));
                 dump();
-                assert(pred != free_space.end ());
+                assert(pred != free_space.end());
             }
             if ((*pred).first + (*pred).second == region_pos)
             {
                 // coalesce with predecessor
                 region_size += (*pred).second;
                 region_pos = (*pred).first;
-                free_space.erase (pred);
+                free_space.erase(pred);
             }
         }
         else
@@ -741,27 +739,27 @@ void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
                 {
                     // coalesce with successor
                     region_size += (*succ).second;
-                    free_space.erase (succ);
+                    free_space.erase(succ);
                 }
                 if (succ_is_not_the_first)
                 {
-                    if (pred == free_space.end ())
+                    if (pred == free_space.end())
                     {
                         STXXL_ERRMSG("Error deallocating block at " << bid.offset << " size " << bid.size);
                         STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
-                        STXXL_ERRMSG(((pred == free_space.begin ()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
-                        STXXL_ERRMSG(((pred == free_space.end ()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
-                        STXXL_ERRMSG(((succ == free_space.begin ()) ? "succ==free_space.begin()" : "succ!=free_space.begin()"));
-                        STXXL_ERRMSG(((succ == free_space.end ()) ? "succ==free_space.end()" : "succ!=free_space.end()"));
+                        STXXL_ERRMSG(((pred == free_space.begin()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
+                        STXXL_ERRMSG(((pred == free_space.end()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
+                        STXXL_ERRMSG(((succ == free_space.begin()) ? "succ==free_space.begin()" : "succ!=free_space.begin()"));
+                        STXXL_ERRMSG(((succ == free_space.end()) ? "succ==free_space.end()" : "succ!=free_space.end()"));
                         dump();
-                        assert(pred != free_space.end ());
+                        assert(pred != free_space.end());
                     }
                     if ((*pred).first + (*pred).second == region_pos)
                     {
                         // coalesce with predecessor
                         region_size += (*pred).second;
                         region_pos = (*pred).first;
-                        free_space.erase (pred);
+                        free_space.erase(pred);
                     }
                 }
             }
@@ -771,14 +769,14 @@ void DiskAllocator::delete_block (const BID < BLK_SIZE > &bid)
                 {
                     // coalesce with successor
                     region_size += (*succ).second;
-                    free_space.erase (succ);
+                    free_space.erase(succ);
                 }
             }
         }
     }
 
     free_space[region_pos] = region_size;
-    free_bytes += stxxl::int64 (bid.size);
+    free_bytes += stxxl::int64(bid.size);
 
     //dump();
 
@@ -843,19 +841,19 @@ class config : private noncopyable
         std::string io_impl;
         stxxl::int64 size;
     };
-    std::vector < DiskEntry > disks_props;
+    std::vector<DiskEntry> disks_props;
 
     // in disks_props, flash devices come after all regular disks
     unsigned first_flash;
 
-    config (const char *config_path = "./.stxxl");
+    config(const char * config_path = "./.stxxl");
 
 public:
     //! \brief Returns number of disks available to user
     //! \return number of disks
     inline unsigned disks_number() const
     {
-        return disks_props.size ();
+        return disks_props.size();
     }
 
     //! \brief Returns contiguous range of regular disks w/o flash devices in the array of all disks
@@ -875,78 +873,77 @@ public:
     //! \brief Returns path of disks
     //! \param disk disk's identifier
     //! \return string that contains the disk's path name
-    inline const std::string & disk_path (int disk) const
+    inline const std::string & disk_path(int disk) const
     {
         return disks_props[disk].path;
     }
     //! \brief Returns disk size
     //! \param disk disk's identifier
     //! \return disk size in bytes
-    inline stxxl::int64 disk_size (int disk) const
+    inline stxxl::int64 disk_size(int disk) const
     {
         return disks_props[disk].size;
     }
     //! \brief Returns name of I/O implementation of particular disk
     //! \param disk disk's identifier
-    inline const std::string & disk_io_impl (int disk) const
+    inline const std::string & disk_io_impl(int disk) const
     {
         return disks_props[disk].io_impl;
     }
 
     //! \brief Returns instance of config
     //! \return pointer to the instance of config
-    static config * get_instance ();
+    static config * get_instance();
 
 private:
-    static config *instance;
+    static config * instance;
 };
-
 
 
 class FileCreator
 {
 public:
-    virtual stxxl::file * create (const std::string & io_impl,
-                                  const std::string & filename,
-                                  int options, int disk)
+    virtual stxxl::file * create(const std::string & io_impl,
+                                 const std::string & filename,
+                                 int options, int disk)
     {
         if (io_impl == "syscall")
         {
-            stxxl::ufs_file_base * result = new stxxl::syscall_file (filename,
-                                                                     options,
-                                                                     disk);
+            stxxl::ufs_file_base * result = new stxxl::syscall_file(filename,
+                                                                    options,
+                                                                    disk);
             result->lock();
             return result;
         }
             #ifndef BOOST_MSVC
         else if (io_impl == "mmap")
         {
-            stxxl::ufs_file_base * result = new stxxl::mmap_file (filename,
-                                                                  options, disk);
+            stxxl::ufs_file_base * result = new stxxl::mmap_file(filename,
+                                                                 options, disk);
             result->lock();
             return result;
         }
         else if (io_impl == "simdisk")
         {
-            stxxl::ufs_file_base * result = new stxxl::sim_disk_file (filename,
-                                                                      options,
-                                                                      disk);
+            stxxl::ufs_file_base * result = new stxxl::sim_disk_file(filename,
+                                                                     options,
+                                                                     disk);
             result->lock();
             return result;
         }
             #else
         else if (io_impl == "wincall")
         {
-            stxxl::wfs_file_base * result = new stxxl::wincall_file (filename,
-                                                                     options, disk);
+            stxxl::wfs_file_base * result = new stxxl::wincall_file(filename,
+                                                                    options, disk);
             result->lock();
             return result;
         }
             #endif
       #ifdef STXXL_BOOST_CONFIG
         else if (io_impl == "boostfd")
-            return new stxxl::boostfd_file (filename,
-                                            options, disk);
+            return new stxxl::boostfd_file(filename,
+                                           options, disk);
       #endif
 
         STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
@@ -977,11 +974,11 @@ struct basic_allocation_strategy
 struct striping
 {
     int begin, diff;
-    striping (int b, int e) : begin (b), diff (e - b)
+    striping(int b, int e) : begin(b), diff(e - b)
     { }
-    striping () : begin (0)
+    striping() : begin(0)
     {
-        diff = config::get_instance ()->disks_number ();
+        diff = config::get_instance()->disks_number();
     }
     int operator () (int i) const
     {
@@ -1001,9 +998,9 @@ struct striping
 struct FR : public striping
 {
     random_number<random_uniform_fast> rnd;
-    FR (int b, int e) : striping (b, e)
+    FR(int b, int e) : striping(b, e)
     { }
-    FR () : striping ()
+    FR() : striping()
     { }
     int operator () (int /*i*/) const
     {
@@ -1021,11 +1018,11 @@ struct SR : public striping
 {
     random_number<random_uniform_fast> rnd;
     int offset;
-    SR (int b, int e) : striping (b, e)
+    SR(int b, int e) : striping(b, e)
     {
         offset = rnd(diff);
     }
-    SR() : striping ()
+    SR() : striping()
     {
         offset = rnd(diff);
     }
@@ -1045,21 +1042,21 @@ struct RC : public striping
 {
     std::vector<int> perm;
 
-    RC (int b, int e) : striping (b, e), perm (diff)
+    RC(int b, int e) : striping(b, e), perm(diff)
     {
         for (int i = 0; i < diff; i++)
             perm[i] = i;
 
         stxxl::random_number<random_uniform_fast> rnd;
-        std::random_shuffle (perm.begin (), perm.end (), rnd __STXXL_FORCE_SEQUENTIAL);
+        std::random_shuffle(perm.begin(), perm.end(), rnd __STXXL_FORCE_SEQUENTIAL);
     }
-    RC () : striping (), perm (diff)
+    RC() : striping(), perm(diff)
     {
         for (int i = 0; i < diff; i++)
             perm[i] = i;
 
         random_number<random_uniform_fast> rnd;
-        std::random_shuffle (perm.begin (), perm.end (), rnd __STXXL_FORCE_SEQUENTIAL);
+        std::random_shuffle(perm.begin(), perm.end(), rnd __STXXL_FORCE_SEQUENTIAL);
     }
     int operator () (int i) const
     {
@@ -1073,9 +1070,9 @@ struct RC : public striping
 
 struct RC_disk : public RC
 {
-    RC_disk (int b, int e) : RC (b, e)
+    RC_disk(int b, int e) : RC(b, e)
     { }
-    RC_disk () : RC(config::get_instance()->regular_disk_range().first, config::get_instance()->regular_disk_range().second)
+    RC_disk() : RC(config::get_instance()->regular_disk_range().first, config::get_instance()->regular_disk_range().second)
     { }
     static const char * name()
     {
@@ -1085,9 +1082,9 @@ struct RC_disk : public RC
 
 struct RC_flash : public RC
 {
-    RC_flash (int b, int e) : RC (b, e)
+    RC_flash(int b, int e) : RC(b, e)
     { }
-    RC_flash () : RC(config::get_instance()->flash_range().first, config::get_instance()->flash_range().second)
+    RC_flash() : RC(config::get_instance()->flash_range().first, config::get_instance()->flash_range().second)
     { }
     static const char * name()
     {
@@ -1196,15 +1193,15 @@ struct offset_allocator
 //! \remarks is a singleton
 class block_manager : private noncopyable
 {
-    DiskAllocator * *disk_allocators;
-    file * * disk_files;
+    DiskAllocator ** disk_allocators;
+    file ** disk_files;
 
     unsigned ndisks;
-    block_manager ();
+    block_manager();
 
 protected:
-    template < class BIDType, class DiskAssgnFunctor, class BIDIteratorClass >
-    void new_blocks_int (
+    template <class BIDType, class DiskAssgnFunctor, class BIDIteratorClass>
+    void new_blocks_int(
         const unsigned_type nblocks,
         DiskAssgnFunctor functor,
         BIDIteratorClass out);
@@ -1212,7 +1209,7 @@ protected:
 public:
     //! \brief Returns instance of block_manager
     //! \return pointer to the only instance of block_manager
-    static block_manager * get_instance ();
+    static block_manager * get_instance();
 
     //! \brief Allocates new blocks
 
@@ -1222,8 +1219,8 @@ public:
     //! \param functor object of model of \b allocation_strategy concept
     //! \param bidbegin bidirectional BID iterator object
     //! \param bidend bidirectional BID iterator object
-    template < class DiskAssgnFunctor, class BIDIteratorClass >
-    void new_blocks (
+    template <class DiskAssgnFunctor, class BIDIteratorClass>
+    void new_blocks(
         DiskAssgnFunctor functor,
         BIDIteratorClass bidbegin,
         BIDIteratorClass bidend);
@@ -1236,8 +1233,8 @@ public:
     //! \param out iterator object of OutputIterator concept
     //!
     //! The \c BlockType template parameter defines the type of block to allocate
-    template < class BlockType, class DiskAssgnFunctor, class BIDIteratorClass >
-    void new_blocks (
+    template <class BlockType, class DiskAssgnFunctor, class BIDIteratorClass>
+    void new_blocks(
         const unsigned_type nblocks,
         DiskAssgnFunctor functor,
         BIDIteratorClass out);
@@ -1248,23 +1245,23 @@ public:
     //! Deallocates blocks in the range [ \b bidbegin, \b bidend)
     //! \param bidbegin iterator object of \b bid_iterator concept
     //! \param bidend iterator object of \b bid_iterator concept
-    template < class BIDIteratorClass >
-    void delete_blocks (const BIDIteratorClass & bidbegin, const BIDIteratorClass & bidend);
+    template <class BIDIteratorClass>
+    void delete_blocks(const BIDIteratorClass & bidbegin, const BIDIteratorClass & bidend);
 
     //! \brief Deallocates a block
     //! \param bid block identifier
-    template < unsigned BLK_SIZE >
-    void delete_block (const BID < BLK_SIZE > &bid);
+    template <unsigned BLK_SIZE>
+    void delete_block(const BID<BLK_SIZE> & bid);
 
-    ~block_manager ();
+    ~block_manager();
 
 private:
-    static block_manager *instance;
+    static block_manager * instance;
 };
 
 
-template < class BIDType, class DiskAssgnFunctor, class OutputIterator >
-void block_manager::new_blocks_int (
+template <class BIDType, class DiskAssgnFunctor, class OutputIterator>
+void block_manager::new_blocks_int(
     const unsigned_type nblocks,
     DiskAssgnFunctor functor,
     OutputIterator out)
@@ -1275,7 +1272,7 @@ void block_manager::new_blocks_int (
     // bid_type tmpbid;
     int_type * bl = new int_type[ndisks];
     bid_array_type * disk_bids = new bid_array_type[ndisks];
-    file * * disk_ptrs = new file *[nblocks];
+    file ** disk_ptrs = new file *[nblocks];
 
     memset(bl, 0, ndisks * sizeof(int_type));
 
@@ -1283,7 +1280,7 @@ void block_manager::new_blocks_int (
     //OutputIterator  it = out;
     for ( ; i < nblocks; ++i /* , ++it*/)
     {
-        const int disk = functor (i);
+        const int disk = functor(i);
         disk_ptrs[i] = disk_files[disk];
         //(*it).storage = disk_files[disk];
         bl[disk]++;
@@ -1293,11 +1290,11 @@ void block_manager::new_blocks_int (
     {
         if (bl[i])
         {
-            disk_bids[i].resize (bl[i]);
+            disk_bids[i].resize(bl[i]);
             const stxxl::int64 old_capacity =
                 disk_allocators[i]->get_total_bytes();
             const stxxl::int64 new_capacity =
-                disk_allocators[i]->new_blocks (disk_bids[i]);
+                disk_allocators[i]->new_blocks(disk_bids[i]);
             if (old_capacity != new_capacity)
             {
                 // resize the file
@@ -1306,7 +1303,7 @@ void block_manager::new_blocks_int (
         }
     }
 
-    memset (bl, 0, ndisks * sizeof(int_type));
+    memset(bl, 0, ndisks * sizeof(int_type));
 
     OutputIterator it = out;
     for (i = 0 /*,it = out */; i != nblocks; ++it, ++i)
@@ -1322,8 +1319,8 @@ void block_manager::new_blocks_int (
     delete[] disk_ptrs;
 }
 
-template < class BlockType, class DiskAssgnFunctor, class OutputIterator >
-void block_manager::new_blocks (
+template <class BlockType, class DiskAssgnFunctor, class OutputIterator>
+void block_manager::new_blocks(
     const unsigned_type nblocks,
     DiskAssgnFunctor functor,
     OutputIterator out)
@@ -1332,8 +1329,8 @@ void block_manager::new_blocks (
     new_blocks_int<bid_type>(nblocks, functor, out);
 }
 
-template < class DiskAssgnFunctor, class BIDIteratorClass >
-void block_manager::new_blocks (
+template <class DiskAssgnFunctor, class BIDIteratorClass>
+void block_manager::new_blocks(
     DiskAssgnFunctor functor,
     BIDIteratorClass bidbegin,
     BIDIteratorClass bidend)
@@ -1353,27 +1350,26 @@ void block_manager::new_blocks (
 }
 
 
-
-template < unsigned BLK_SIZE >
-void block_manager::delete_block (const BID < BLK_SIZE > &bid)
+template <unsigned BLK_SIZE>
+void block_manager::delete_block(const BID<BLK_SIZE> & bid)
 {
     // do not uncomment it
     //assert(bid.storage->get_disk_number () < config::get_instance ()->disks_number ());
-    if (bid.storage->get_disk_number () == -1)
+    if (bid.storage->get_disk_number() == -1)
         return; // self managed disk
-    assert(bid.storage->get_disk_number () >= 0);
-    disk_allocators[bid.storage->get_disk_number ()]->delete_block (bid);
+    assert(bid.storage->get_disk_number() >= 0);
+    disk_allocators[bid.storage->get_disk_number()]->delete_block(bid);
 }
 
 
-template < class BIDIteratorClass >
-void block_manager::delete_blocks (
+template <class BIDIteratorClass>
+void block_manager::delete_blocks(
     const BIDIteratorClass & bidbegin,
     const BIDIteratorClass & bidend)
 {
     for (BIDIteratorClass it = bidbegin; it != bidend; it++)
     {
-        delete_block (*it);
+        delete_block(*it);
     }
 }
 

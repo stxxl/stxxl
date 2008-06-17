@@ -59,23 +59,23 @@ int main()
     unsigned cnt = size;
     while (cnt > 0)
     {
-        unsigned run_size = rnd_max(cnt) + 1;         // random run length
+        unsigned run_size = rnd_max(cnt) + 1;           // random run length
         cnt -= run_size;
         STXXL_MSG("current run size:" << run_size);
 
-        std::vector<unsigned> tmp(run_size);         // create temp storage for current run
+        std::vector<unsigned> tmp(run_size);            // create temp storage for current run
         std::generate(tmp.begin(), tmp.end(), rnd);     // fill with random numbers
-        std::sort(tmp.begin(), tmp.end(), c);       // sort
+        std::sort(tmp.begin(), tmp.end(), c);           // sort
         for (unsigned j = 0; j < run_size; ++j)
         {
             oldcrc += tmp[j];
-            SortedRuns.push(tmp[j]);             // push sorted values to the current run
+            SortedRuns.push(tmp[j]);                    // push sorted values to the current run
         }
-        SortedRuns.finish();         // finish current run
+        SortedRuns.finish();                            // finish current run
     }
 
 
-    SortedRunsType Runs = SortedRuns.result();     // get sorted_runs data structure
+    SortedRunsType Runs = SortedRuns.result();          // get sorted_runs data structure
     assert(check_sorted_runs(Runs, Cmp()));
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 1024 * 128 / 10);

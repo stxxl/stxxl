@@ -53,7 +53,7 @@ my_type * make_sequence(dummy_merger & dummy, int l)
 {
     my_type * seq = new my_type[l + 1]; // + sentinel
     dummy.multi_merge(seq, seq + l);
-    seq[l] = my_cmp().min_value(); // sentinel
+    seq[l] = my_cmp().min_value();      // sentinel
     return seq;
 }
 

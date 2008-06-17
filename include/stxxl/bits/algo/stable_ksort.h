@@ -284,8 +284,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         // sort buckets
         unsigned_type write_buffers_multiple_bs = 2;
         unsigned_type max_bucket_size_bl = (m - write_buffers_multiple_bs * ndisks) / 2; // in number of blocks
-        int64 max_bucket_size_rec = int64(max_bucket_size_bl) * block_type::size; // in number of records
-        int64 max_bucket_size_act = 0; // actual max bucket size
+        int64 max_bucket_size_rec = int64(max_bucket_size_bl) * block_type::size;        // in number of records
+        int64 max_bucket_size_act = 0;                                                   // actual max bucket size
         // establish output stream
 
         for (i = 0; i < nbuckets; i++)

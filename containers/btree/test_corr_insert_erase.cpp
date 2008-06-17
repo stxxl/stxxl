@@ -85,11 +85,11 @@ int main(int argc, char * argv[])
         assert(bIt != BTree.end());
         bool f = BTree.erase((*vIt) + 1);       // erasing non-existent element
         assert(f == 0);
-        f = BTree.erase(*vIt);         // erasing existing element
+        f = BTree.erase(*vIt);                  // erasing existing element
         assert(f == 1);
-        bIt = BTree.find(*vIt);         // checking it is not there
+        bIt = BTree.find(*vIt);                 // checking it is not there
         assert(bIt == BTree.end());
-        f = BTree.erase(*vIt);         // trying to erase it again
+        f = BTree.erase(*vIt);                  // trying to erase it again
         assert(f == 0);
     }
 

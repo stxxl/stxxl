@@ -37,12 +37,12 @@ extern double wait_time_counter;
 //! \remarks is a singleton
 class stats : private noncopyable
 {
-    unsigned reads, writes;             // number of operations
+    unsigned reads, writes;                     // number of operations
     int64 volume_read, volume_written;          // number of bytes read/written
     double t_reads, t_writes;                   //  seconds spent in operations
     double p_reads, p_writes;                   // seconds spent in parallel operations
     double p_begin_read, p_begin_write;         // start time of parallel operation
-    double p_ios;               // seconds spent in all parallel I/O operations (read and write)
+    double p_ios;                               // seconds spent in all parallel I/O operations (read and write)
     double p_begin_io;
     int acc_ios;
     int acc_reads, acc_writes;                  // number of requests, participating in parallel operation

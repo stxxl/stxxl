@@ -89,9 +89,9 @@ int main(int argc, char * argv[])
         return 0;
     }
 
-    unlink(argv[2]);             // delete output file
+    unlink(argv[2]);                                                // delete output file
 
-    syscall_file InputFile(argv[1], file::RDONLY);            // Input file object
+    syscall_file InputFile(argv[1], file::RDONLY);                  // Input file object
     syscall_file OutputFile(argv[2], file::RDWR | file::CREAT);     // Output file object
 
     typedef stxxl::vector<my_type> vector_type;
@@ -108,11 +108,11 @@ int main(int argc, char * argv[])
 
     write_vector<vector_type::iterator> Writer(OutputVector.begin(), 2);
 
-    for ( ; it != InputVector.end(); ++it, ++Writer)      // iterate through InputVector
+    for ( ; it != InputVector.end(); ++it, ++Writer)                // iterate through InputVector
     {
         *Writer = *it;
     }
-    Writer.flush();                             // flush buffers
+    Writer.flush();                                                 // flush buffers
 
 
     return 0;
