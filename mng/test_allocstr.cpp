@@ -1,7 +1,7 @@
 /***************************************************************************
- *  mng/test_allocstr.cpp
+ *  mng/test_block_alloc_strategy.cpp
  *
- *  instantiate all allocation strategies
+ *  instantiate all block allocation strategies
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -13,6 +13,7 @@
  **************************************************************************/
 
 #include <stxxl/mng>
+#include <stxxl/bits/mng/block_alloc_interleaved.h>
 
 template <typename strategy>
 void test_strategy()
@@ -21,8 +22,10 @@ void test_strategy()
     strategy s0;
     strategy s2(1, 3);
     stxxl::offset_allocator<strategy> o(1, s0);
+    typedef typename stxxl::interleaved_alloc_traits<strategy>::strategy interleaved;
+    interleaved itl(23, 1, 3);
     for (int i = 0; i < 16; ++i)
-        STXXL_MSG(s0(i) << " " << s2(i) << " " << o(i));
+        STXXL_MSG(s0(i) << " " << s2(i) << " " << o(i) << " " << itl(i));
 }
 
 int main()
