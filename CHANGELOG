@@ -18,7 +18,8 @@ Version 1.2.0 (UNRELEASED)
   with ArrayOfSequencesIterator which is much faster, especially
   if blocks have padding
 * if required, verify that the sentinels satisfy a strict weak ordering
-* fix existing alloation strategies and add experimental support for
+* stxxl::vector: several operations sped up, several more implemented
+* fix existing allocation strategies and add experimental support for
   distinguishing between regular disks and flash devices
 * add compatibility wrappers for standard extensions
   hash_map, hash_set, auto_ptr
@@ -34,12 +35,14 @@ Version 1.2.0 (UNRELEASED)
 * general code reformatting (uncrustify)
 * add support for new compiler releases
 * portability fixes for different platforms
+* implemented file truncation on windows platforms
 * build system
   - lots of small modifications
   - now only requires GNU make 3.78 or later
   - check whether STXXL_ROOT has been set correctly and if unset, try
     autoconfiguration by creating make.settings.local with defaults
   - improved and simplified boost support for posix systems
+  - Mac OS X support
 * update install and usage instructions
 * spell checked sources and documentation
 
