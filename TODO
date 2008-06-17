@@ -3,7 +3,8 @@
 * There is currently no support for Boost libraries (not headers) in a user
   specified location.
 
-* BUG: timer::timestamp() is non-monotonic, boost::posix_time::microsec_clock::local_time().time_of_day() resets on midnight
+* BUG (Windows): timer::timestamp() is non-monotonic,
+  boost::posix_time::microsec_clock::local_time().time_of_day() resets on midnight
 
 * g++ 4.3 parallel_mode support
   => Milestone: 1.2.1
@@ -29,3 +30,7 @@
   => Milestone: 1.3
 
 * doxygen: do not link every occurrence of 'file' do stxxl::file
+
+* interleaved_allocators: provide a constructor that takes a base strategy
+  as parameter, not a disk range, and derive desired information from the
+  strategy
