@@ -315,10 +315,9 @@ struct TwoToOneDimArrayAdaptorBase
 #if 0
 //////////////////////////
 template < class one_dim_array_type, class data_type,
-          unsigned dim_size, class pos_type =
-              blocked_index<dim_size> >struct TwoToOneDimArrayRowAdaptor : public
-TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type,
-                             pos_type >
+          unsigned dim_size, class pos_type = blocked_index<dim_size> >
+struct TwoToOneDimArrayRowAdaptor : public
+TwoToOneDimArrayAdaptorBase < one_dim_array_type, data_type, pos_type >
 {
     typedef TwoToOneDimArrayRowAdaptor < one_dim_array_type,
                                         data_type, dim_size, pos_type > _Self;

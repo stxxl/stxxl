@@ -312,8 +312,7 @@ public:
 
     block_offset_type block_offset () const
     {
-        return static_cast < block_offset_type >
-               (offset.get_offset());
+        return static_cast < block_offset_type > (offset.get_offset());
     }
     bids_container_iterator bid () const
     {
@@ -529,16 +528,17 @@ public:
     { }
     const_vector_iterator (const _Self & a) :
         offset (a.offset),
-        p_vector (a.p_vector) { }
+        p_vector (a.p_vector)
+    { }
 
     const_vector_iterator (const iterator & a) :
         offset (a.offset),
-        p_vector (a.p_vector) { }
+        p_vector (a.p_vector)
+    { }
 
     block_offset_type block_offset () const
     {
-        return static_cast < block_offset_type >
-               (offset.get_offset());
+        return static_cast < block_offset_type > (offset.get_offset());
     }
     bids_container_iterator bid () const
     {
@@ -1252,7 +1252,7 @@ private:
     const_reference const_element(const double_blocked_index<PgSz_, block_type::size>& offset) const
     {
         int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_last_page.size()) );                 // fails if offset is too large, out of bound access
+        assert(page_no < int_type(_last_page.size()));  // fails if offset is too large, out of bound access
         int_type last_page = _last_page[page_no];
         if (last_page < 0)                 // == on_disk
         {
@@ -1426,8 +1426,7 @@ inline bool operator >= ( stxxl::vector < Tp_, PgSz_, PgTp_, BlkSize_,
 //!      and lru cache replacement strategy
 //! \warning Do not store references to the elements of an external vector. Such references
 //! might be invalidated during any following access to elements of the vector
-template
-<
+template <
  typename Tp_,
  unsigned PgSz_ = 4,
  unsigned Pages_ = 8,

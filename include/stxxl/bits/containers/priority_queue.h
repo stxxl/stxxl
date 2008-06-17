@@ -2521,7 +2521,7 @@ namespace priority_queue_local
         {
             X = X_,
             AI = AI_,
-            N = X / (AI * AI) //two stage internal
+            N = X / (AI * AI) // two stage internal
         };
         typedef typename IF < (N >= CriticalSize_), Self, typename compute_N < AI / 2, X, CriticalSize_ > ::result > ::result result;
     };
@@ -2607,32 +2607,33 @@ template <class Tp_, class Cmp_, unsigned_type IntM_, unsigned MaxS_, unsigned T
 class PRIORITY_QUEUE_GENERATOR
 {
 public:
-    typedef typename priority_queue_local::find_settings < sizeof(Tp_), IntM_, MaxS_ > ::result settings; //actual calculation of B, m, k and E
+    // actual calculation of B, m, k and E
+    typedef typename priority_queue_local::find_settings < sizeof(Tp_), IntM_, MaxS_ > ::result settings;
     enum {
         B = settings::B,
         m = settings::m,
-        X = B * (settings::k - m) / settings::E,  //interpretation of result
-        Buffer1Size = 32  //fixed
+        X = B * (settings::k - m) / settings::E,  // interpretation of result
+        Buffer1Size = 32                          // fixed
     };
-    typedef typename priority_queue_local::compute_N < (1 << Tune_), X, 4 * Buffer1Size > ::result ComputeN;  //derivation of N, AI, AE
+    // derivation of N, AI, AE
+    typedef typename priority_queue_local::compute_N < (1 << Tune_), X, 4 * Buffer1Size > ::result ComputeN;
     enum
     {
         N = ComputeN::N,
         AI = ComputeN::AI,
-        AE = (m / 2 < 2) ? 2 : (m / 2)  //at least 2
+        AE = (m / 2 < 2) ? 2 : (m / 2)            // at least 2
     };
-public:
     enum {
         // Estimation of maximum internal memory consumption (in bytes)
         EConsumption = X * settings::E + settings::B * AE + ((MaxS_ / X) / AE) * settings::B * 1024
     };
     /*
         unsigned BufferSize1_ = 32, // equalize procedure call overheads etc.
-        unsigned N_ = 512, // bandwidth
-        unsigned IntKMAX_ = 64, // maximal arity for internal mergers
+        unsigned N_ = 512,          // bandwidth
+        unsigned IntKMAX_ = 64,     // maximal arity for internal mergers
         unsigned IntLevels_ = 4,
         unsigned BlockSize_ = (2*1024*1024),
-        unsigned ExtKMAX_ = 64, // maximal arity for external mergers
+        unsigned ExtKMAX_ = 64,     // maximal arity for external mergers
         unsigned ExtLevels_ = 2,
      */
     typedef priority_queue < priority_queue_config < Tp_, Cmp_, Buffer1Size, N, AI, 2, B, AE, 2 > > result;

@@ -1102,9 +1102,7 @@ namespace stream
     //! - \c Input1_ type of the 1st input
     //! - \c Input2_ type of the 2nd input
     //! \remark A specialization of \c make_tuple .
-    template < class Input1_,
-              class Input2_
-    >
+    template <class Input1_, class Input2_>
     class make_tuple<Input1_, Input2_, Stopper, Stopper, Stopper, Stopper>
     {
         Input1_ &i1;
@@ -1172,10 +1170,7 @@ namespace stream
     //! - \c Input2_ type of the 2nd input
     //! - \c Input3_ type of the 3rd input
     //! \remark A specialization of \c make_tuple .
-    template < class Input1_,
-              class Input2_,
-              class Input3_
-    >
+    template <class Input1_, class Input2_, class Input3_>
     class make_tuple<Input1_, Input2_, Input3_, Stopper, Stopper, Stopper>
     {
         Input1_ &i1;

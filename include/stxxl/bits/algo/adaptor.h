@@ -51,11 +51,8 @@ struct RunsToBIDArrayAdaptor : public TwoToOneDimArrayAdaptorBase < _run_type *,
 
     data_type & operator * ()
     {
-        CHECK_RUN_BOUNDS (pos)
-        return (BID < _blk_sz >
-                &)((*(array[(pos) % dim_size]))[(pos) /
-                                                dim_size].
-                   bid);
+        CHECK_RUN_BOUNDS (pos);
+        return (BID < _blk_sz > &)((*(array[(pos) % dim_size]))[(pos) / dim_size].  bid);
     }
 
     const data_type * operator -> () const
@@ -92,8 +89,7 @@ struct RunsToBIDArrayAdaptor2
 
     __pos_type w, h, K;
 
-    RunsToBIDArrayAdaptor2 (_run_type * *a, __pos_type p, int_type _w,
-                            int_type _h)
+    RunsToBIDArrayAdaptor2 (_run_type * *a, __pos_type p, int_type _w, int_type _h)
         : TwoToOneDimArrayAdaptorBase < _run_type *, BID < _blk_sz >, __pos_type > (a, p),
           w (_w), h (_h), K (_w * _h)
     { }

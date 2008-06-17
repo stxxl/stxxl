@@ -108,25 +108,18 @@ namespace stream
                 std::sort(
 #if 1
                     ArrayOfSequencesIterator<
-                        block_type,
-                        typename block_type::value_type,
-                        block_type::size>
-                      (run, 0),
+                        block_type, typename block_type::value_type, block_type::size
+			> (run, 0),
                     ArrayOfSequencesIterator<
-                        block_type,
-                        typename block_type::value_type,
-                        block_type::size>
-                      (run, elements),
+                        block_type, typename block_type::value_type, block_type::size
+			> (run, elements),
 #else
                     TwoToOneDimArrayRowAdaptor <
-                                                block_type,
-                                                value_type,
-                                                block_type::size > (run, 0 ),
+                                                block_type, value_type, block_type::size
+						> (run, 0 ),
                     TwoToOneDimArrayRowAdaptor<
-                                               block_type,
-                                               value_type,
-                                               block_type::size > (run,
-                                                                   elements ),
+                                               block_type, value_type, block_type::size
+					       > (run, elements ),
 #endif
                     cmp);
 
@@ -457,25 +450,18 @@ namespace stream
                 std::sort(
 #if 1
                     ArrayOfSequencesIterator<
-                        block_type,
-                        typename block_type::value_type,
-                        block_type::size>
-                      (run, 0),
+                        block_type, typename block_type::value_type, block_type::size
+			> (run, 0),
                     ArrayOfSequencesIterator<
-                        block_type,
-                        typename block_type::value_type,
-                        block_type::size>
-                      (run, elements),
+                        block_type, typename block_type::value_type, block_type::size
+			> (run, elements),
 #else
                     TwoToOneDimArrayRowAdaptor <
-                                                block_type,
-                                                value_type,
-                                                block_type::size > (run, 0 ),
+                                                block_type, value_type, block_type::size
+						> (run, 0 ),
                     TwoToOneDimArrayRowAdaptor<
-                                               block_type,
-                                               value_type,
-                                               block_type::size > (run,
-                                                                   elements ),
+                                               block_type, value_type, block_type::size
+					       > (run, elements ),
 #endif
                     cmp);
 
@@ -720,9 +706,10 @@ namespace stream
                 result_.runs[irun].resize( iblock + 1 );
                 bm->new_blocks(
                     offset_allocator < alloc_strategy_type > (iblock, alloc_strategy),
-                    trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (result_.runs[irun].begin()
-                                                                                                  + iblock),
-                    trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (result_.runs[irun].end())
+                    trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (
+		    result_.runs[irun].begin() + iblock),
+                    trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (
+		    result_.runs[irun].end())
                 );
 
                 result_.runs[irun][iblock].value = (*cur_block)[0];         // init trigger
@@ -760,9 +747,10 @@ namespace stream
                 result_.runs[irun].resize( iblock + 1 );
                 bm->new_blocks(
                     offset_allocator < alloc_strategy_type > (iblock, alloc_strategy),
-                    trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (result_.runs[irun].begin()
-                                                                                                  + iblock),
-                    trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (result_.runs[irun].end())
+                    trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (
+		    result_.runs[irun].begin() + iblock),
+                    trigger_entry_iterator < typename run_type::iterator, block_type::raw_size > (
+		    result_.runs[irun].end())
                 );
 
                 result_.runs[irun][iblock].value = (*cur_block)[0];         // init trigger
@@ -824,24 +812,18 @@ namespace stream
             if (!stxxl::is_sorted(
 #if 1
                     ArrayOfSequencesIterator<
-                        block_type,
-                        typename block_type::value_type,
-                        block_type::size>
-                      (blocks, 0),
+                        block_type, typename block_type::value_type, block_type::size
+			> (blocks, 0),
                     ArrayOfSequencesIterator<
-                        block_type,
-                        typename block_type::value_type,
-                        block_type::size>
-                      (blocks, sruns.runs_sizes[irun]),
+                        block_type, typename block_type::value_type, block_type::size
+			> (blocks, sruns.runs_sizes[irun]),
 #else
                     TwoToOneDimArrayRowAdaptor <
-                                                block_type,
-                                                value_type,
-                                                block_type::size > (blocks, 0 ),
+                                                block_type, value_type, block_type::size
+						> (blocks, 0 ),
                     TwoToOneDimArrayRowAdaptor<
-                                               block_type,
-                                               value_type,
-                                               block_type::size > (blocks,
+                                               block_type, value_type, block_type::size
+					       > (blocks,
                                                                    //nblocks*block_type::size
                                                                    //(irun<nruns-1)?(nblocks*block_type::size): (sruns.elements%(nblocks*block_type::size))
                                                                    sruns.runs_sizes[irun]
@@ -944,7 +926,7 @@ namespace stream
                 for (int_type i = 0; i < nruns; i++)            //initialize sequences
                 {
                     (*buffers)[i] = prefetcher->pull_block();           //get first block of each run
-                    (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());          //this memory location stays the same, only the data is exchanged
+                    (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());  //this memory location stays the same, only the data is exchanged
                 }
 
 // end of STL-style merging
@@ -977,11 +959,11 @@ namespace stream
                 value_type last_elem;
  #endif
 
-                diff_type rest = block_type::size;                      //elements still to merge for this output block
+                diff_type rest = block_type::size;              // elements still to merge for this output block
 
-                do              //while rest > 0 and still elements available
+                do                                              // while rest > 0 and still elements available
                 {
-                    value_type * min_last_element = NULL;               //no element found yet
+                    value_type * min_last_element = NULL;       // no element found yet
                     diff_type total_size = 0;
 
                     for (seqs_size_type i = 0; i < (*seqs).size(); i++)
@@ -1016,11 +998,12 @@ namespace stream
 
                     STXXL_VERBOSE1("finished loop");
 
-                    ptrdiff_t output_size = (std::min)(less_equal_than_min_last, rest);                           //at most rest elements
+                    ptrdiff_t output_size = (std::min)(less_equal_than_min_last, rest);   // at most rest elements
 
                     STXXL_VERBOSE1("before merge" << output_size);
 
-                    mcstl::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size, false);                         //sequence iterators are progressed appropriately
+                    mcstl::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size, false);
+                                          //sequence iterators are progressed appropriately
 
                     STXXL_VERBOSE1("after merge");
 
@@ -1030,17 +1013,17 @@ namespace stream
 
                     for (seqs_size_type i = 0; i < (*seqs).size(); i++)
                     {
-                        if ((*seqs)[i].first == (*seqs)[i].second)                            //run empty
+                        if ((*seqs)[i].first == (*seqs)[i].second)                        // run empty
                         {
                             if (prefetcher->block_consumed((*buffers)[i]))
                             {
-                                (*seqs)[i].first = (*buffers)[i]->begin();                                    //reset iterator
+                                (*seqs)[i].first = (*buffers)[i]->begin();                // reset iterator
                                 (*seqs)[i].second = (*buffers)[i]->end();
                                 STXXL_VERBOSE1("block ran empty " << i);
                             }
                             else
                             {
-                                (*seqs).erase((*seqs).begin() + i);                                   //remove this sequence
+                                (*seqs).erase((*seqs).begin() + i);                       // remove this sequence
                                 (*buffers).erase((*buffers).begin() + i);
                                 STXXL_VERBOSE1("seq removed " << i);
                             }
@@ -1296,8 +1279,8 @@ namespace stream
         unsigned_type nwrite_buffers = 2 * ndisks;
 
         unsigned_type nruns = sruns.runs.size();
-        const unsigned_type merge_factor = static_cast<unsigned_type>(ceil(pow(nruns, 1. / ceil(
-                                                                                   log(double (nruns)) / log(double (m_))))));
+        const unsigned_type merge_factor =
+            static_cast<unsigned_type>(ceil(pow(nruns, 1. / ceil(log(double(nruns)) / log(double(m_))))));
         assert(merge_factor <= m_);
         while (nruns > m_)
         {
