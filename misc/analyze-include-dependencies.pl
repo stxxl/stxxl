@@ -2,7 +2,7 @@
 #
 # A tool to analyze #include dependencies and find unwanted cycles.
 #
-# Copyright (C) 2007 by Andreas Beckmann <beckmann@mpi-inf.mpg.de>
+# Copyright (C) 2007-2008 by Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,16 +11,25 @@
 
 use File::Basename;
 
-$mcstl = 1;
+$debug = 0;
+$fakeheaders = 'fakeinclude';
+
+$mcstl = 0;
 $mcstlpath = 'c++';
 
-$CXX = 'g++-4.2';
+$stxxl = 1;
+$stxxlpath = 'include';
+
+#$CXX = 'g++-4.2';
+$CXX = 'g++-4.3 -std=c++0x';
 $cxxtarget = 'foo-bar-gnu';
 $cxxheaderpath = undef;
 $gcctargetheaderpath = undef;
 
 @includepath = ();
+push @includepath, $fakeheaders if $fakeheaders;
 push @includepath, $mcstlpath if $mcstl;
+push @includepath, $stxxlpath if $stxxl;
 
 %breakloops = qw(
 	libio.h			_G_config.h
@@ -36,9 +45,21 @@ push @includepath, $mcstlpath if $mcstl;
 	bits/sstream.tcc	sstream
 	debug/hash_map		ext/hash_map
 	debug/hash_set		ext/hash_set
+	debug/unordered_map	unordered_map
+	debug/unordered_set	unordered_set
 	xmmintrin.h		emmintrin.h
 	ext/vstring.h		vstring.tcc
+	wctype.h		wchar.h
+	algorithm		parallel/algorithm
+	numeric			parallel/numeric
+	bits/stl_algobase.h	parallel/algobase.h
+	parallel/partition.h	parallel/sort.h
+	ext/pb_ds/detail/left_child_next_sibling_heap_/null_metadata.hpp	ext/pb_ds/detail/left_child_next_sibling_heap_/null_metadata.hpp
+	boost/type_traits/is_class.hpp	boost/type_traits/is_scalar.hpp
+	boost/preprocessor/list/fold_left.hpp	boost/preprocessor/control/while.hpp
+	boost/preprocessor/list/fold_right.hpp	boost/preprocessor/control/while.hpp
 	);
+#	stxxl/bits/io/iobase.h	stxxl/io
 
 %seen = ();
 @todo = ();
@@ -63,7 +84,7 @@ sub get_file_list($;@)
 			}
 		}
 	}
-	#print "GLOB $path @patterns: @l\n";
+	print "GLOB $path @patterns: @l\n" if $debug;
 	return @l;
 }
 
@@ -78,6 +99,7 @@ sub get_cxx_include_paths($)
 		$ok = 1 if /^#include .\.\.\.. search starts here:$/;
 		$ok = 0 if /^End of search list\.$/;
 		if ($ok && s/^ //) {
+			next if /backward/;
 			push @includepath, $_;
 			unless ($cxxheaderpath) {
 				$cxxheaderpath = $_ if m|/c\+\+|;
@@ -99,10 +121,10 @@ sub find_header($;$)
 	my $header = shift;
 	my $relpath = dirname(shift || '.');
 	foreach $_ (@includepath, $relpath) {
-		#print "FOUND: $header as $_/$header\n";
+		print "FOUND: $header as $_/$header\n" if -f "$_/$header" && $debug;
 		return [ $header, "$_/$header" ] if -f "$_/$header";
 	}
-	#print "NOT FOUND: $header\n";
+	print "NOT FOUND: $header\n";
 	return [$header, undef];
 }
 
@@ -119,7 +141,7 @@ sub parse_header($)
 		$out{$header} = [];
 		open HEADER,"<$file" or die $!;
 		while ($_ = <HEADER>) {
-			if (/^\s*#\s*include\s+["<]([^">]*)[">]/) {
+			if (/^\s*#\s*include\s*["<]([^">]*)[">]/) {
 				my $dep_header = $1;
 				print "DEP: $header \t$dep_header\n";
 				push @{$out{$header}}, $dep_header;
@@ -139,22 +161,33 @@ sub parse_header($)
 get_cxx_include_paths($CXX);
 
 @cxxheaders = get_file_list($cxxheaderpath);
-@cxxbwheaders = get_file_list("$cxxheaderpath/backward");
+#@cxxbwheaders = get_file_list("$cxxheaderpath/backward");
+push @cxxbwheaders, get_file_list($cxxheaderpath, "backward/*");
 @cxxextheaders = get_file_list($cxxheaderpath, 'ext/*');
 @cxxbitsheaders = get_file_list($cxxheaderpath, 'bits/*');
 @cxxtargetheaders = get_file_list("$cxxheaderpath/$cxxtarget", '*', 'bits/*');
 #@cxxtr1headers = get_file_list($cxxheaderpath, 'tr1/*', 'tr1_impl/*');
 @gcctargetheaders = get_file_list($gcctargetheaderpath, '*.h', 'bits/*.h');
 
+if ($mcstl) {
 @mcstlheaders = get_file_list($mcstlpath);
 @mcstlmetaheaders = get_file_list($mcstlpath, 'meta/*');
 @mcstlbitsheaders = get_file_list($mcstlpath, 'bits/*');
 
-if ($mcstl) {
 push @todo, find_header($_) foreach (
 	sort(@mcstlheaders),
 	sort(@mcstlmetaheaders),
 	sort(@mcstlbitsheaders),
+	);
+}
+
+if ($stxxl) {
+@stxxlheaders = get_file_list($stxxlpath, '*', 'stxxl/*');
+@stxxlbitsheaders = get_file_list($stxxlpath, 'bits/*', 'stxxl/bits/*', 'stxxl/bits/*/*');
+
+push @todo, find_header($_) foreach (
+	sort(@stxxlheaders),
+	sort(@stxxlbitsheaders),
 	);
 }
 
@@ -175,6 +208,20 @@ while (@todo) {
 %odgr = ();
 @zodgr = ();
 
+if ($debug) {
+foreach (sort keys %out) {
+	print "\t$_\n\t=> (".(scalar @{$out{$_}}).")\t";
+	foreach (@{$out{$_}}) {
+		print " $_";
+	}
+	print "\n\t<= (".(scalar @{$in{$_}}).")\t";
+	foreach (@{$in{$_}}) {
+		print " $_";
+	}
+	print "\n";
+}
+}
+
 foreach (sort keys %out) {
 	$odgr{$_} = scalar @{$out{$_}};
 	push @zodgr, $_ if $odgr{$_} == 0;
@@ -190,17 +237,24 @@ while (my ($h, $l) = each %breakloops) {
 			$_ .= ".UNLOOP";
 		}
 	}
+	foreach (@{$in{$l}}) {
+		if ($h eq $_) {
+			$_ .= ".UNLOOP";
+		}
+	}
 }
 
 print "TOPSORT:\n";
 while (@zodgr) {
 	$curr = shift @zodgr;
 	next unless exists $out{$curr};
-	print "\t$curr\n";
+	print "\t$curr";
 	foreach (@{$in{$curr}}) {
 		--$odgr{$_};
 		push @zodgr, $_ if $odgr{$_} == 0;
+		print " $_(".$odgr{$_}.")" if $debug;
 	}
+	print "\n";
 	delete $out{$curr};
 }
 
