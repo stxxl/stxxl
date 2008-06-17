@@ -90,7 +90,7 @@ module.include.files=\
 	containers/vector.h\
 	algo/ksort.h\
 	algo/losertree.h\
-	algo/interleaved_alloc.h\
+	mng/block_alloc_interleaved.h\
 	containers/pager.h\
 	common/simple_vector.h\
 	algo/async_schedule.h\

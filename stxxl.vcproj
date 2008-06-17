@@ -660,7 +660,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\stxxl\bits\algo\interleaved_alloc.h"
+					RelativePath=".\include\stxxl\bits\mng\block_alloc_interleaved.h"
 					>
 				</File>
 				<File

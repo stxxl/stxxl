@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/algo/interleaved_alloc.h
+ *  include/stxxl/bits/mng/block_alloc_interleaved.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

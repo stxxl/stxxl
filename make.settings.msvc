@@ -118,6 +118,7 @@ IO_LAYER_FILES	 = \
 
 MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/adaptor.h \
+	$(HEADER_PATH)/mng/block_alloc_interleaved.h \
 	$(HEADER_PATH)/mng/block_prefetcher.h \
 	$(HEADER_PATH)/mng/buf_istream.h \
 	$(HEADER_PATH)/mng/buf_ostream.h \
@@ -150,7 +151,6 @@ ALGO_FILES	 = \
 	$(HEADER_PATH)/algo/run_cursor.h \
 	$(HEADER_PATH)/algo/sort.h \
 	$(HEADER_PATH)/algo/async_schedule.h \
-	$(HEADER_PATH)/algo/interleaved_alloc.h \
 	$(HEADER_PATH)/algo/ksort.h \
 	$(HEADER_PATH)/algo/losertree.h \
 	$(HEADER_PATH)/algo/scan.h \

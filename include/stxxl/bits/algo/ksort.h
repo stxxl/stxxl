@@ -20,7 +20,7 @@
 #include "stxxl/bits/mng/adaptor.h"
 #include "stxxl/bits/common/simple_vector.h"
 #include "stxxl/bits/common/switch.h"
-#include "stxxl/bits/algo/interleaved_alloc.h"
+#include <stxxl/bits/mng/block_alloc_interleaved.h>
 #include "stxxl/bits/algo/intksort.h"
 #include "stxxl/bits/algo/adaptor.h"
 #include "stxxl/bits/algo/async_schedule.h"

@@ -243,6 +243,7 @@ HEADER_FILES_IO		+= ufs_file.h wincall_file.h wfs_file.h boostfd_file.h
 HEADER_FILES_MNG	+= adaptor.h block_prefetcher.h
 HEADER_FILES_MNG	+= buf_istream.h buf_ostream.h buf_writer.h mng.h
 HEADER_FILES_MNG	+= write_pool.h prefetch_pool.h
+HEADER_FILES_MNG	+= block_alloc_interleaved.h
 
 HEADER_FILES_CONTAINERS	+= pager.h stack.h vector.h priority_queue.h queue.h
 HEADER_FILES_CONTAINERS	+= map.h deque.h
@@ -251,7 +252,7 @@ HEADER_FILES_CONTAINERS_BTREE	+= btree.h iterator_map.h leaf.h node_cache.h
 HEADER_FILES_CONTAINERS_BTREE	+= root_node.h node.h btree_pager.h iterator.h
 
 HEADER_FILES_ALGO	+= adaptor.h inmemsort.h intksort.h run_cursor.h sort.h
-HEADER_FILES_ALGO	+= async_schedule.h interleaved_alloc.h ksort.h
+HEADER_FILES_ALGO	+= async_schedule.h ksort.h
 HEADER_FILES_ALGO	+= losertree.h scan.h stable_ksort.h random_shuffle.h
 
 HEADER_FILES_STREAM	+= stream.h sort_stream.h
