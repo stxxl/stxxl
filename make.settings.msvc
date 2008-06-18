@@ -11,8 +11,10 @@ COMPILER = cl
 LINKER = link
 OPT = /O2
 WARNINGS =
-DEBUG = /MD # debug is off
-# DEBUG = /MDd /Zi # debug is on
+DEBUG_COMPILER = /MD # debug is off
+# DEBUG_COMPILER  = /MDd /Zi # debug is on
+DEBUG_LINKER = # debug is off
+# DEBUG_LINKER = /Zi # debug is on
 
 LIBNAME = stxxl
 
@@ -178,13 +180,13 @@ OUT    = /out:# output file for linking and compilation
 
 STXXL_COMPILER_OPTIONS	 = \
 	$(STXXL_SPECIFIC) \
-	$(OPT) $(DEBUG) $(WARNINGS) \
+	$(OPT) $(DEBUG_COMPILER) $(WARNINGS) \
 	$(BOOST_COMPILER_OPTIONS) \
 	$(MSVC_COMPILER_OPTIONS)
 
 STXXL_LINKER_OPTIONS	 = \
 	$(MSVC_LINKER_OPTIONS) \
-	$(DEBUG)
+	$(DEBUG_LINKER)
 
 
 # vim: syn=make
