@@ -401,10 +401,18 @@ public:
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
-    // rebind allocator to type U
+    // rebind allocator to type U, use new_alloc only if U == T
+    template <class U>
+    struct rebind;
+
+    template <>
+    struct rebind<T> {
+        typedef new_alloc<T> other;
+    };
+
     template <class U>
     struct rebind {
-        typedef new_alloc<U> other;
+        typedef std::allocator<U> other;
     };
 
     // return address of values
@@ -422,6 +430,13 @@ public:
     template <class U>
     new_alloc (const new_alloc<U> &) throw () { }
     ~new_alloc() throw () { }
+
+    template<class U>
+    operator std::allocator<U>()
+    {
+        static std::allocator<U> helper_allocator;
+        return helper_allocator;
+    }
 
     // return maximum number of elements that can be allocated
     size_type max_size () const throw ()
