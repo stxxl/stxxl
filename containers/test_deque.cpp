@@ -33,6 +33,7 @@ int main()
     stxxl::deque<int> XXLDeque;
     std::deque<int> STDDeque;
 
+    STXXL_MSG("Press Ctrl-C to stop the test.");
     stxxl::int64 ops = 0;
     while (1)
     {
