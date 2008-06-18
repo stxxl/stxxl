@@ -15,13 +15,7 @@
 
 #include "stxxl/bits/namespace.h"
 
-#ifdef BOOST_MSVC
-// no alternative to boost :-(
- #define STXXL_NONMONOTONIC_BOOST_TIMESTAMP
-#endif
-
-#if defined(STXXL_BOOST_TIMESTAMP) && \
-    defined(STXXL_NONMONOTONIC_BOOST_TIMESTAMP)
+#ifdef STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>
  #include <cmath>
 #else
@@ -32,11 +26,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief Returns number of seconds since the epoch (or midnight, if boost timer is used), high resolution.
+//! \brief Returns number of seconds since the epoch, high resolution.
 inline double
 timestamp()
 {
-#ifdef STXXL_NONMONOTONIC_BOOST_TIMESTAMP
+#ifdef STXXL_BOOST_TIMESTAMP 
     boost::posix_time::ptime MyTime = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration Duration = 
         MyTime - boost::posix_time::time_from_string("1970-01-01 00:00:00.000");
