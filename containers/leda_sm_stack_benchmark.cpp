@@ -133,7 +133,11 @@ int main(int argc, char * argv[])
     }
 
     int version = atoi(argv[1]);
+#ifdef BOOST_MSVC
+    stxxl::int64 volume = _atoi64(argv[2]);
+#else
     stxxl::int64 volume = atoll(argv[2]);
+#endif
 
     STXXL_MSG("Allocating array with size " << MEM_2_RESERVE
                                             << " bytes to prevent file buffering.");

@@ -1273,7 +1273,11 @@ int main(int argc, char * argv[])
     init();
 
     int version = atoi(argv[1]);
+#ifdef BOOST_MSVC
+    stxxl::int64 ops = _atoi64(argv[2]);
+#else
     stxxl::int64 ops = atoll(argv[2]);
+#endif
 
     STXXL_MSG("Running version      : " << version);
     STXXL_MSG("Operations to perform: " << ops);

@@ -130,7 +130,7 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    stxxl::int64 n_records = (atoll(argv[1]) * MB) / sizeof(my_type);
+    stxxl::int64 n_records = (atol(argv[1]) * MB) / sizeof(my_type);
     int sort_mem = atoi(argv[2]) * MB;
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);
