@@ -16,10 +16,10 @@ __STXXL_BEGIN_NAMESPACE
 
 
 int simulate_async_write(
-    int * disks,
-    const int L,
-    const int m_init,
-    const int D,
+    int_type * disks,
+    const int_type L,
+    const int_type m_init,
+    const int_type D,
     std::pair<int, int> * o_time)
 {
     typedef std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp> event_queue_type;
@@ -111,11 +111,11 @@ int simulate_async_write(
 
 
 void compute_prefetch_schedule(
-    int * first,
-    int * last,
-    int * out_first,
-    int m,
-    int D)
+    int_type * first,
+    int_type * last,
+    int_type * out_first,
+    int_type m,
+    int_type D)
 {
     typedef std::pair<int, int> pair_type;
     int L = last - first;
