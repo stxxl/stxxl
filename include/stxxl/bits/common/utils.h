@@ -400,7 +400,7 @@ struct new_alloc_rebind<T, T> {
 };
 
 template <typename T, typename U>
-struct rebind {
+struct new_alloc_rebind {
     typedef std::allocator<U> other;
 };
 
