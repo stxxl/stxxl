@@ -387,6 +387,23 @@ void swap_1D_arrays(T * a, T * b, unsigned_type size)
         std::swap(a[i], b[i]);
 }
 
+template <class T>
+class new_alloc;
+
+
+template <typename T, typename U>
+struct new_alloc_rebind;
+
+template <typename T>
+struct new_alloc_rebind<T, T> {
+    typedef new_alloc<T> other;
+};
+
+template <typename T, typename U>
+struct rebind {
+    typedef std::allocator<U> other;
+};
+
 
 // designed for typed_block (to use with std::vector )
 template <class T>
@@ -403,16 +420,8 @@ public:
 
     // rebind allocator to type U, use new_alloc only if U == T
     template <class U>
-    struct rebind;
-
-    template <>
-    struct rebind<T> {
-        typedef new_alloc<T> other;
-    };
-
-    template <class U>
     struct rebind {
-        typedef std::allocator<U> other;
+        typedef typename new_alloc_rebind<T, U>::other other;
     };
 
     // return address of values
