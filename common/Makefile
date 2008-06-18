@@ -2,6 +2,7 @@ include Makefile.common
 include ../make.settings
 
 tests: $(TESTS)
+tests: $(TESTS_EXTRA)
 
 lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c log.cpp

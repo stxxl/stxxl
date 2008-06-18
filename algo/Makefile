@@ -3,7 +3,7 @@ include ../make.settings
 
 tests: $(TESTS)
 #tests: $(TESTS_LONG_COMPILE)
-#tests: $(TESTS_EXTRA)
+tests: $(TESTS_EXTRA)
 
 lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c async_schedule.cpp

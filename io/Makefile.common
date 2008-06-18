@@ -1,5 +1,5 @@
 TESTS			 = test_io benchmark_disks 
-TESTS_EXTRA		 = flushbuffers sd_test
+TESTS_EXTRA		 = sd_test
 TESTS_UNITTEST		 = unittest
 
-LIB_SRC			 = ufs_file.cpp syscall_file.cpp wincall_file.cpp wfs_file.cpp iostats.cpp diskqueue.cpp mmap_file.cpp simdisk_file.cpp boostfd_file.cpp
+LIB_SRC			 = ufs_file.cpp syscall_file.cpp wincall_file.cpp wfs_file.cpp iostats.cpp diskqueue.cpp mmap_file.cpp simdisk_file.cpp boostfd_file.cpp flushbuffers
