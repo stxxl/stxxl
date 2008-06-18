@@ -744,7 +744,7 @@
 			>
 		</Filter>
 		<File
-			RelativePath=".\readme"
+			RelativePath=".\README"
 			>
 		</File>
 	</Files>
