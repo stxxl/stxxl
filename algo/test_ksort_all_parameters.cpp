@@ -149,11 +149,7 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-#ifdef BOOST_MSVC
-    stxxl::int64 n_records = (_atoi64(argv[1]) * MB) / sizeof(my_type);
-#else
-    stxxl::int64 n_records = (atoll(argv[1]) * MB) / sizeof(my_type);
-#endif
+    stxxl::int64 n_records = (stxxl::atoint64(argv[1]) * MB) / sizeof(my_type);
     int sort_mem = atoi(argv[2]) * MB;
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);

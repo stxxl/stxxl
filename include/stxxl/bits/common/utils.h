@@ -510,6 +510,15 @@ inline unsigned_type sort_memory_usage_factor()
 #define __STXXL_FORCE_SEQUENTIAL
 #endif
 
+inline stxxl::int64 atoint64(const char * s)
+{
+#ifdef BOOST_MSVC
+    return _atoi64(s);
+#else
+    return atoll(s);
+#endif
+}
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_UTILS_HEADER

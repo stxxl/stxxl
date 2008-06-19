@@ -61,11 +61,7 @@ int main(int argc, char * argv[])
 	  return 0;
   }
   unsigned M = atol(argv[3])*1024*1024;
-#ifdef BOOST_MSVC
-  const long long int ncalls = _atoi64(argv[1]);
-#else
-  const long long int ncalls = atoll(argv[1]);
-#endif
+  const long long int ncalls = stxxl::atoint64(argv[1]);
   const int av_calls = atol(argv[2]);
   const long long int nclients = ncalls/av_calls;
   long long int calls_made = 0;
