@@ -73,6 +73,22 @@
 					RelativePath=".\utils\createdisks.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\utils\log2.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\malloc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\off_t_size.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\utils\pq_param.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="io"
@@ -90,15 +106,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\io\disktest.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\io\flushbuffers.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\io\iostats.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\io\sd_test.cpp"
 					>
 				</File>
 				<File
@@ -110,11 +126,15 @@
 					>
 				</File>
 				<File
-					RelativePath=".\io\test.cpp"
+					RelativePath=".\io\test_io.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\io\ufs_file.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\io\unittest.cpp"
 					>
 				</File>
 				<File
@@ -134,6 +154,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\mng\test_block_alloc_strategy.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\mng\test_buf_streams.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\mng\test_mng.cpp"
 					>
 				</File>
@@ -146,17 +174,21 @@
 					>
 				</File>
 				<File
-					RelativePath=".\mng\test_streams.cpp"
+					RelativePath=".\mng\test_write_pool.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\mng\test_write_pool.cpp"
+					RelativePath=".\mng\unittest.cpp"
 					>
 				</File>
 			</Filter>
 			<Filter
 				Name="containers"
 				>
+				<File
+					RelativePath=".\containers\app_config.h"
+					>
+				</File>
 				<File
 					RelativePath=".\containers\bench_pqueue.cpp"
 					>
@@ -170,10 +202,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\containers\ext_merger.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\containers\leda_sm_pq_benchmark.cpp"
 					>
 				</File>
@@ -182,15 +210,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\containers\map_test_handlers.h"
+					>
+				</File>
+				<File
 					RelativePath=".\containers\monotonic_pq.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\containers\pq_benchmark.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\containers\rnd_test.cpp"
 					>
 				</File>
 				<File
@@ -210,6 +238,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\containers\test_iterators.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\containers\test_many_stacks.cpp"
 					>
 				</File>
@@ -223,10 +255,6 @@
 				</File>
 				<File
 					RelativePath=".\containers\test_migr_stack.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\containers\test_mstack.cpp"
 					>
 				</File>
 				<File
@@ -258,46 +286,26 @@
 					>
 				</File>
 				<Filter
-					Name="map.impl"
+					Name="btree"
 					>
 					<File
-						RelativePath=".\containers\map.impl\speed_test_map_erase.cpp"
+						RelativePath=".\containers\btree\test_btree.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\speed_test_map_insert.cpp"
+						RelativePath=".\containers\btree\test_const_scan.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\speed_test_map_iterate.cpp"
+						RelativePath=".\containers\btree\test_corr_insert_erase.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\speed_test_map_search.cpp"
+						RelativePath=".\containers\btree\test_corr_insert_find.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\containers\map.impl\test.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\containers\map.impl\test_map_erase.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\containers\map.impl\test_map_insert.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\containers\map.impl\test_map_iterator.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\containers\map.impl\test_map_random.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\containers\map.impl\test_map_search.cpp"
+						RelativePath=".\containers\btree\test_corr_insert_scan.cpp"
 						>
 					</File>
 				</Filter>
@@ -322,10 +330,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\algo\test.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\algo\test_asch.cpp"
 					>
 				</File>
@@ -334,7 +338,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\algo\test_ksort1.cpp"
+					RelativePath=".\algo\test_ksort_all_parameters.cpp"
 					>
 				</File>
 				<File
@@ -346,6 +350,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\algo\test_random_shuffle.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\algo\test_scan.cpp"
 					>
 				</File>
@@ -354,7 +362,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\algo\test_sort1.cpp"
+					RelativePath=".\algo\test_sort_all_parameters.cpp"
 					>
 				</File>
 				<File
@@ -362,7 +370,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\algo\test_stable_ksort1.cpp"
+					RelativePath=".\algo\test_stable_ksort_all_parameters.cpp"
 					>
 				</File>
 			</Filter>
@@ -370,23 +378,19 @@
 				Name="stream"
 				>
 				<File
-					RelativePath=".\stream\push_sort.cpp"
+					RelativePath=".\stream\test_push_sort.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\stream\se_lcp.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\sorted_runs.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\stream\stream.cpp"
+					RelativePath=".\stream\test_sorted_runs.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\stream\test_stream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\stream\test_stream1.cpp"
 					>
 				</File>
 			</Filter>
@@ -407,6 +411,18 @@
 				</File>
 				<File
 					RelativePath=".\common\seed.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\common\stxxl_info.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\common\test_random.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\common\version.cpp"
 					>
 				</File>
 			</Filter>
@@ -656,11 +672,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\stxxl\bits\algo\inmemsort.h"
+					RelativePath=".\include\stxxl\bits\mng\block_alloc_interleaved.h"
 					>
 				</File>
 				<File
-					RelativePath=".\include\stxxl\bits\mng\block_alloc_interleaved.h"
+					RelativePath=".\include\stxxl\bits\algo\inmemsort.h"
 					>
 				</File>
 				<File
@@ -721,6 +737,10 @@
 				</File>
 				<File
 					RelativePath=".\include\stxxl\bits\compat_hash_set.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\bits\intel_compatibility.h"
 					>
 				</File>
 				<File
