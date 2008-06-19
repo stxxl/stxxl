@@ -2,6 +2,9 @@ include Makefile.common
 include ../make.settings
 
 tests: $(TESTS)
+	cd btree
+	$(MAKE) tests
+	cd ..
 #tests: $(TESTS_NON_MSVC)
 
 lib: $(LIB_SRC)
@@ -124,3 +127,6 @@ monotonic_pq: monotonic_pq.cpp $(DEPENDENCIES)
 
 clean:
 	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	cd btree
+	$(MAKE) clean
+	cd ..
