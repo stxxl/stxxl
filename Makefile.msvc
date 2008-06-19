@@ -32,19 +32,22 @@ library:
 
 tests: library
 	cd io
-	$(MAKE)
+	$(MAKE) tests
 	cd ..
 	cd mng
-	$(MAKE)
+	$(MAKE) tests
 	cd ..
 	cd containers
-	$(MAKE)
+	$(MAKE) tests
 	cd ..
 	cd algo
-	$(MAKE)
+	$(MAKE) tests
 	cd ..
 	cd stream
-	$(MAKE)
+	$(MAKE) tests
+	cd ..
+	cd utils
+	$(MAKE) tests
 	cd ..
 	@echo "Building tests is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"

@@ -1,5 +1,5 @@
-TESTS			 =
-TESTS_EXTRA		 = malloc off_t_size pq_param log2
+TESTS			 = off_t_size pq_param log2
+TESTS_NON_MSVC		 = malloc
 
 LIB_SRC			 =
 

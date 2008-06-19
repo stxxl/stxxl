@@ -4,7 +4,7 @@ include Makefile.common
 #TESTS		+= $(TESTS_BDB)
 #TESTS		+= $(TESTS_LEDASM)
 #TESTS		+= $(TESTS_TPIE)
-TESTS		+= $(TESTS_EXTRA)
+TESTS		+= $(TESTS_NON_MSVC)
 TESTS		+= $(TESTS_BTREE)
 
 include $(TOPDIR)/Makefile.subdir.gnu

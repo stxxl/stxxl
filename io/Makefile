@@ -2,7 +2,7 @@ include Makefile.common
 include ../make.settings
 
 tests: $(TESTS)
-#tests: $(TESTS_EXTRA)
+#tests: $(TESTS_NON_MSVC)
 
 lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c ufs_file.cpp
@@ -42,6 +42,4 @@ sd_test: sd_test.cpp
 
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(LIBEXT) benchmark_disks.$(EXEEXT)
-	$(RM) flushbuffers.$(EXEEXT) test_io.$(EXEEXT) unittest.$(EXEEXT)
-
+	$(RM) *.$(OBJEXT) *.$(EXEEXT)

@@ -2,6 +2,7 @@ include Makefile.common
 include ../make.settings
 
 tests: $(TESTS)
+#tests: $(TESTS_NON_MSVC)
 
 lib: $(LIB_SRC)
 

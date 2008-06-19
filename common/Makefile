@@ -2,7 +2,7 @@ include Makefile.common
 include ../make.settings
 
 tests: $(TESTS)
-tests: $(TESTS_EXTRA)
+#tests: $(TESTS_NON_MSVC)
 
 lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c log.cpp
@@ -13,4 +13,4 @@ lib: $(LIB_SRC)
 
 
 clean:
-	$(RM) *.$(OBJEXT)
+	$(RM) *.$(OBJEXT) *.$(EXEEXT)

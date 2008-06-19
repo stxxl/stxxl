@@ -2,6 +2,7 @@ include Makefile.common
 include ../make.settings
 
 tests: $(TESTS)
+#tests: $(TESTS_NON_MSVC)
 
 lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mng.cpp
@@ -40,8 +41,5 @@ unittest: unittest.cpp
 
 
 clean:
-	$(RM) *.$(OBJEXT)
-	$(RM) test_mng.$(EXEEXT) test_mng1.$(EXEEXT)
-	$(RM) test_prefetch_pool.$(EXEEXT) test_write_pool.$(EXEEXT)
-	$(RM) test_streams.$(EXEEXT) unittest.$(EXEEXT)
+	$(RM) *.$(OBJEXT) *.$(EXEEXT)
 	

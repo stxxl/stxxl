@@ -1,8 +1,8 @@
-TESTS			 = test_vector test_stack test_migr_stack test_many_stacks test_pqueue test_queue test_ext_merger test_ext_merger2 bench_pqueue copy_file test_map test_map_random test_deque test_iterators monotonic_pq
+TESTS			 = test_vector test_stack test_migr_stack test_many_stacks test_pqueue test_queue test_ext_merger test_ext_merger2 bench_pqueue copy_file test_map test_map_random test_deque test_iterators monotonic_pq pq_benchmark stack_benchmark write_vector write_vector2
 TESTS_BDB		 = berkeley_db_benchmark
 TESTS_LEDASM		 = leda_sm_pq_benchmark leda_sm_stack_benchmark
 TESTS_TPIE		 = tpie_stack_benchmark
-TESTS_EXTRA		 = pq_benchmark stack_benchmark write_vector write_vector2
+TESTS_NON_MSVC		 =
 TESTS_BTREE		 = btree/test_btree btree/test_const_scan btree/test_corr_insert_erase btree/test_corr_insert_find btree/test_corr_insert_scan
 
 LIB_SRC			 =

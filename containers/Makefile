@@ -2,7 +2,7 @@ include Makefile.common
 include ../make.settings
 
 tests: $(TESTS)
-tests: $(TESTS_EXTRA)
+#tests: $(TESTS_NON_MSVC)
 
 lib: $(LIB_SRC)
 
@@ -123,7 +123,4 @@ monotonic_pq: monotonic_pq.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT) bench_pqueue.$(EXEEXT) test_map.$(EXEEXT) test_map_random.$(EXEEXT)
-	$(RM) test_ext_merger.$(EXEEXT) test_pqueue.$(EXEEXT) test_many_stacks.$(EXEEXT)
-	$(RM) test_migr_stack.$(EXEEXT) test_stack.$(EXEEXT) test_vector.$(EXEEXT)
-	$(RM) test_queue.$(EXEEXT) copy_file.$(EXEEXT) test_deque.$(EXEEXT) test_iterators.$(EXEEXT)
+	$(RM) *.$(OBJEXT) *.$(EXEEXT)

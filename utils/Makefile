@@ -1,12 +1,10 @@
 include Makefile.common
 include ../make.settings
 
-all: create 
-
 create: $(UTIL_BINARIES)
 
 tests: $(TESTS)
-tests: $(TESTS_EXTRA)
+#tests: $(TESTS_NON_MSVC)
 
 lib: $(LIB_SRC)
 
@@ -36,4 +34,4 @@ log2: log2.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT) createdisks.$(EXEEXT)
+	$(RM) *.$(OBJEXT) *.$(EXEEXT)

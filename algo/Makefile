@@ -3,7 +3,7 @@ include ../make.settings
 
 tests: $(TESTS)
 #tests: $(TESTS_LONG_COMPILE)
-tests: $(TESTS_EXTRA)
+#tests: $(TESTS_NON_MSVC)
 
 lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c async_schedule.cpp
@@ -65,12 +65,4 @@ test_random_shuffle: test_random_shuffle.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT)
-	$(RM) test_sort.$(EXEEXT) test_sort_all_parameters.$(EXEEXT)
-	$(RM) test_ksort.$(EXEEXT) test_ksort_all_parameters.$(EXEEXT)
-	$(RM) test_stable_ksort.$(EXEEXT) test_stable_ksort_all_parameters.$(EXEEXT)
-	$(RM) sort_file.$(EXEEXT) gen_file.$(EXEEXT) 
-	$(RM) test_scan.$(EXEEXT) test_asch.$(EXEEXT)
-	$(RM) test_manyunits.$(EXEEXT)
-	$(RM) test_random_shuffle.$(EXEEXT)
-
+	$(RM) *.$(OBJEXT) *.$(EXEEXT)
