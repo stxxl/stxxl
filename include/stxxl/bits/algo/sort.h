@@ -61,7 +61,7 @@ namespace sort_local
         bid_type bid;
         value_type value;
 
-        operator bid_type()
+        operator bid_type ()
         {
             return bid;
         }
@@ -569,7 +569,7 @@ namespace sort_local
                     assert(false);
                 }
 
-                if (j > 0)  //do not check in first iteration
+                if (j > 0) //do not check in first iteration
                     assert(cmp((*out_buffer)[0], last_elem) == false);
 
 

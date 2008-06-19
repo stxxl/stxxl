@@ -731,7 +731,7 @@ namespace stream
         //! \brief Finishes current run and begins new one
         void finish()
         {
-            if (offset == 0 && iblock == 0)  // current run is empty
+            if (offset == 0 && iblock == 0) // current run is empty
                 return;
 
 
@@ -1372,7 +1372,7 @@ namespace stream
                         while (cnt != cnt_max)
                         {
                             *out = *merger;
-                            if ((cnt % block_type::size) == 0)  // have to write the trigger value
+                            if ((cnt % block_type::size) == 0) // have to write the trigger value
                                 new_runs.runs[cur_out_run][cnt / size_type(block_type::size)].value = *merger;
 
 
@@ -1471,7 +1471,7 @@ namespace stream
         const value_type * operator -> () const
         {
             assert(!empty());
-            return merger.operator -> ();
+            return merger.operator ->();
         }
 
         //! \brief Standard stream method

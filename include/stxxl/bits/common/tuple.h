@@ -128,7 +128,7 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     template <int I>
     struct item_type
     {
-        typedef typename IF < I == 1, first_type, void > ::result result;
+        typedef typename IF<I == 1, first_type, void>::result result;
     };
 
     tuple() { }

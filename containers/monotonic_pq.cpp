@@ -75,8 +75,11 @@ struct my_type
 
     void operator = (const key_type & __key) { key = __key; }
 #if LOAD
-    void operator = (const my_type & mt) { key = mt.key;
-                                           load = mt.load; }
+    void operator = (const my_type & mt)
+    {
+        key = mt.key;
+        load = mt.load;
+    }
     bool operator == (const my_type & mt) { return (key == mt.key) && (load = mt.load); }
 #else
     void operator = (const my_type & mt) { key = mt.key; }

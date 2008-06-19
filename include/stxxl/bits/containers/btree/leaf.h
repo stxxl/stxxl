@@ -133,7 +133,7 @@ namespace btree
             {
                 btree_->iterator_map_.unregister_iterator(**it2fix);
 
-                if ((*it2fix)->pos < end_of_smaller_part)  // belongs to the smaller part
+                if ((*it2fix)->pos < end_of_smaller_part) // belongs to the smaller part
                     (*it2fix)->bid = NewBid;
 
                 else

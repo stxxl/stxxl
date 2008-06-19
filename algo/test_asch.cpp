@@ -30,7 +30,7 @@ int main(int argc, char * argv[])
     const stxxl::int_type m = atoi(argv[3]);
     stxxl::ran32State = atoi(argv[4]);
     stxxl::int_type * disks = new stxxl::int_type[L];
-    stxxl::int_type  * prefetch_order = new stxxl::int_type [L];
+    stxxl::int_type * prefetch_order = new stxxl::int_type[L];
     int * count = new int[D];
 
 

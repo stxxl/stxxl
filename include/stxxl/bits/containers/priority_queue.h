@@ -36,114 +36,113 @@ __STXXL_BEGIN_NAMESPACE
  */
 namespace priority_queue_local
 {
-
-  /**
-   * @brief Similar to std::priority_queue, with the following differences:
-   * - Maximum size is fixed at construction time, so an array can be used.
-   * - Provides access to underlying heap, so (parallel) sorting in place is possible.
-   * - Can be cleared "at once", without reallocation.
-   */
-  template<typename _Tp, typename _Sequence = std::vector<_Tp>,
-     typename _Compare  = std::less<typename _Sequence::value_type> >
+    /**
+     * @brief Similar to std::priority_queue, with the following differences:
+     * - Maximum size is fixed at construction time, so an array can be used.
+     * - Provides access to underlying heap, so (parallel) sorting in place is possible.
+     * - Can be cleared "at once", without reallocation.
+     */
+    template <typename _Tp, typename _Sequence = std::vector<_Tp>,
+              typename _Compare = std::less<typename _Sequence::value_type> >
     class internal_priority_queue
     {
-      // concept requirements
-      typedef typename _Sequence::value_type _Sequence_value_type;
+        // concept requirements
+        typedef typename _Sequence::value_type _Sequence_value_type;
 
     public:
-      typedef typename _Sequence::value_type                value_type;
-      typedef typename _Sequence::reference                 reference;
-      typedef typename _Sequence::const_reference           const_reference;
-      typedef typename _Sequence::size_type                 size_type;
-      typedef          _Sequence                            container_type;
+        typedef typename _Sequence::value_type value_type;
+        typedef typename _Sequence::reference reference;
+        typedef typename _Sequence::const_reference const_reference;
+        typedef typename _Sequence::size_type size_type;
+        typedef          _Sequence container_type;
 
     protected:
-      //  See queue::c for notes on these names.
-      _Sequence  c;
-      _Compare   comp;
-      size_type N;
+        //  See queue::c for notes on these names.
+        _Sequence c;
+        _Compare comp;
+        size_type N;
 
     public:
-      /**
-       *  @brief  Default constructor creates no elements.
-       */
-      explicit
-      internal_priority_queue(size_type capacity)
-      : c(capacity), N(0)
-      {  }
+        /**
+         *  @brief  Default constructor creates no elements.
+         */
+        explicit
+        internal_priority_queue(size_type capacity)
+            : c(capacity), N(0)
+        { }
 
-      /**
-       *  Returns true if the %queue is empty.
-       */
-      bool
-      empty() const
-      { return N == 0; }
+        /**
+         *  Returns true if the %queue is empty.
+         */
+        bool
+        empty() const
+        { return N == 0; }
 
-      /**  Returns the number of elements in the %queue.  */
-      size_type
-      size() const
-      { return N; }
+        /**  Returns the number of elements in the %queue.  */
+        size_type
+        size() const
+        { return N; }
 
-      /**
-       *  Returns a read-only (constant) reference to the data at the first
-       *  element of the %queue.
-       */
-      const_reference
-      top() const
-      {
-        return c.front();
-      }
+        /**
+         *  Returns a read-only (constant) reference to the data at the first
+         *  element of the %queue.
+         */
+        const_reference
+        top() const
+        {
+            return c.front();
+        }
 
-      /**
-       *  @brief  Add data to the %queue.
-       *  @param  __x  Data to be added.
-       *
-       *  This is a typical %queue operation.
-       *  The time complexity of the operation depends on the underlying
-       *  sequence.
-       */
-      void
-      push(const value_type& __x)
-      {
-        c[N] = __x;
-        ++N;
-        std::push_heap(c.begin(), c.begin() + N, comp);
-      }
+        /**
+         *  @brief  Add data to the %queue.
+         *  @param  __x  Data to be added.
+         *
+         *  This is a typical %queue operation.
+         *  The time complexity of the operation depends on the underlying
+         *  sequence.
+         */
+        void
+        push(const value_type & __x)
+        {
+            c[N] = __x;
+            ++N;
+            std::push_heap(c.begin(), c.begin() + N, comp);
+        }
 
-      /**
-       *  @brief  Removes first element.
-       *
-       *  This is a typical %queue operation.  It shrinks the %queue
-       *  by one.  The time complexity of the operation depends on the
-       *  underlying sequence.
-       *
-       *  Note that no data is returned, and if the first element's
-       *  data is needed, it should be retrieved before pop() is
-       *  called.
-       */
-      void
-      pop()
-      {
-        std::pop_heap(c.begin(), c.begin() + N, comp);
-        --N;
-      }
+        /**
+         *  @brief  Removes first element.
+         *
+         *  This is a typical %queue operation.  It shrinks the %queue
+         *  by one.  The time complexity of the operation depends on the
+         *  underlying sequence.
+         *
+         *  Note that no data is returned, and if the first element's
+         *  data is needed, it should be retrieved before pop() is
+         *  called.
+         */
+        void
+        pop()
+        {
+            std::pop_heap(c.begin(), c.begin() + N, comp);
+            --N;
+        }
 
-      /**
-       * @brief Sort all contained elements, write result to @c target.
-       */
-      void sort_to(value_type* target)
-      {
-        std::sort(c.begin(), c.begin() + N, comp);
-        std::reverse_copy(c.begin(), c.begin() + N, target);
-      }
+        /**
+         * @brief Sort all contained elements, write result to @c target.
+         */
+        void sort_to(value_type * target)
+        {
+            std::sort(c.begin(), c.begin() + N, comp);
+            std::reverse_copy(c.begin(), c.begin() + N, target);
+        }
 
-      /**
-       * @brief Remove all contained elements.
-       */
-      void clear()
-      {
-        N = 0;
-      }
+        /**
+         * @brief Remove all contained elements.
+         */
+        void clear()
+        {
+            N = 0;
+        }
     };
 
 
@@ -220,16 +219,16 @@ namespace priority_queue_local
             }
         }
 
-#define Merge3Case(a, b, c)\
+#define Merge3Case(a, b, c) \
     s ## a ## b ## c : \
     if (to == done) \
         return;\
     *to = *from ## a; \
     ++to; \
     ++from ## a; \
-    if (cmp(*from ## b, *from ## a )) \
+    if (cmp(*from ## b, *from ## a)) \
         goto s ## a ## b ## c;\
-    if (cmp(*from ## c, *from ## a )) \
+    if (cmp(*from ## c, *from ## a)) \
         goto s ## b ## a ## c;\
     goto s ## b ## c ## a;
 
@@ -260,10 +259,10 @@ namespace priority_queue_local
         InputIterator & from3,
         OutputIterator to, unsigned_type sz, Cmp_ cmp)
     {
-        OutputIterator done    = to + sz;
+        OutputIterator done = to + sz;
 
-#define StartMerge4(a, b, c, d)\
-    if ( (!cmp(*from ## a, *from ## b )) && (!cmp(*from ## b, *from ## c )) && (!cmp(*from ## c, *from ## d )) ) \
+#define StartMerge4(a, b, c, d) \
+    if ((!cmp(*from ## a, *from ## b)) && (!cmp(*from ## b, *from ## c)) && (!cmp(*from ## c, *from ## d))) \
         goto s ## a ## b ## c ## d;
 
         // b>a c>b d>c
@@ -301,7 +300,7 @@ namespace priority_queue_local
         StartMerge4(3, 2, 1, 0);
         StartMerge4(2, 1, 0, 3);
 
-#define Merge4Case(a, b, c, d)\
+#define Merge4Case(a, b, c, d) \
     s ## a ## b ## c ## d : \
     if (to == done) \
         return;\
@@ -310,7 +309,7 @@ namespace priority_queue_local
     ++from ## a; \
     if (cmp(*from ## c, *from ## a)) \
     { \
-        if (cmp(*from ## b, *from ## a )) \
+        if (cmp(*from ## b, *from ## a)) \
             goto s ## a ## b ## c ## d;\
         else \
             goto s ## b ## a ## c ## d;\
@@ -373,7 +372,7 @@ namespace priority_queue_local
         size_type size_;
         value_type array[max_size];
 
-     public:
+    public:
         internal_bounded_stack() : size_(0) { }
 
         void push(const value_type & x)
@@ -408,7 +407,6 @@ namespace priority_queue_local
         {
             return size_ == 0;
         }
-
     };
 
 
@@ -416,7 +414,7 @@ namespace priority_queue_local
      *!  \brief  External merger, based on the loser tree data structure.
      *!  \param  Arity_  maximum arity of merger, does not need to be a power of two
      */
-    template <  class BlockType_,
+    template <class BlockType_,
               class Cmp_,
               unsigned Arity_,
               class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
@@ -430,18 +428,17 @@ namespace priority_queue_local
         typedef Cmp_ comparator_type;
         typedef AllocStr_ alloc_strategy;
         typedef value_type Element;
-        typedef typed_block < sizeof(value_type), value_type > sentinel_block_type;
+        typedef typed_block<sizeof(value_type), value_type> sentinel_block_type;
 
         // KNKMAX / 2  <  arity  <=  KNKMAX
-        enum { arity = Arity_, KNKMAX = 1UL << (LOG2 < Arity_ > ::ceil) };
+        enum { arity = Arity_, KNKMAX = 1UL << (LOG2<Arity_>::ceil) };
 
         block_type * convert_block_pointer(sentinel_block_type * arg)
         {
-            return reinterpret_cast<block_type*>(arg);
+            return reinterpret_cast<block_type *>(arg);
         }
 
     protected:
-
         comparator_type cmp;
 
         bool is_sentinel(const Element & a) const
@@ -456,8 +453,8 @@ namespace priority_queue_local
 
         struct sequence_state : private noncopyable
         {
-            unsigned_type current; //current index
-            block_type * block; //current block
+            unsigned_type current;      //current index
+            block_type * block;         //current block
             std::list<bid_type> * bids; //list of blocks forming this sequence
             comparator_type cmp;
             ext_merger * merger;
@@ -518,7 +515,7 @@ namespace priority_queue_local
 
                 ++current;
 
-                if (current == block->size )
+                if (current == block->size)
                 {
                     STXXL_VERBOSE2("ext_merger sequence_state operator++ crossing block border ");
                     // go to the next block
@@ -558,13 +555,13 @@ namespace priority_queue_local
         //a pair consisting a value
         struct Entry
         {
-            value_type key; // Key of Loser element (winner for 0)
+            value_type key;      // Key of Loser element (winner for 0)
             unsigned_type index; // the number of losing segment
         };
 
-        size_type size_; // total number of elements stored
-        unsigned_type logK; // log of current tree size
-        unsigned_type k; // invariant (k == 1 << logK), always a power of two
+        size_type size_;         // total number of elements stored
+        unsigned_type logK;      // log of current tree size
+        unsigned_type k;         // invariant (k == 1 << logK), always a power of two
         // only entries 0 .. arity-1 may hold actual sequences, the other
         // entries arity .. KNKMAX-1 are sentinels to make the size of the tree
         // a power of two always
@@ -581,8 +578,8 @@ namespace priority_queue_local
         // while we use 0..k-1
         sequence_state states[KNKMAX]; // sequence including current position, dereference gives current element
 
-        prefetch_pool<block_type> *p_pool;
-        write_pool<block_type> *w_pool;
+        prefetch_pool<block_type> * p_pool;
+        write_pool<block_type> * w_pool;
 
         sentinel_block_type sentinel_block;
 
@@ -593,8 +590,8 @@ namespace priority_queue_local
             init();
         }
 
-        ext_merger( prefetch_pool < block_type > * p_pool_,
-                    write_pool<block_type> * w_pool_) :
+        ext_merger(prefetch_pool<block_type> * p_pool_,
+                   write_pool<block_type> * w_pool_) :
             size_(0), logK(0), k(1),
             p_pool(p_pool_),
             w_pool(w_pool_)
@@ -611,7 +608,7 @@ namespace priority_queue_local
             }
         }
 
-        void set_pools(prefetch_pool < block_type > * p_pool_,
+        void set_pools(prefetch_pool<block_type> * p_pool_,
                        write_pool<block_type> * w_pool_)
         {
             p_pool = p_pool_;
@@ -649,7 +646,7 @@ namespace priority_queue_local
         {
             unsigned_type winner = initWinner(1);
             entry[0].index = winner;
-            entry[0].key   = *(states[winner]);
+            entry[0].key = *(states[winner]);
         }
 
 
@@ -663,17 +660,17 @@ namespace priority_queue_local
             if (root >= k) { // leaf reached
                 return root - k;
             } else {
-                unsigned_type left  = initWinner(2 * root    );
+                unsigned_type left = initWinner(2 * root);
                 unsigned_type right = initWinner(2 * root + 1);
-                Element lk    = *(states[left ]);
-                Element rk    = *(states[right]);
+                Element lk = *(states[left]);
+                Element rk = *(states[right]);
                 if (!(cmp(lk, rk))) { // right subtree looses
                     entry[root].index = right;
-                    entry[root].key   = rk;
+                    entry[root].key = rk;
                     return left;
                 } else {
                     entry[root].index = left;
-                    entry[root].key   = lk;
+                    entry[root].key = lk;
                     return right;
                 }
             }
@@ -690,32 +687,32 @@ namespace priority_queue_local
             unsigned_type newIndex,
             Element * winnerKey,
             unsigned_type * winnerIndex,        // old winner
-            unsigned_type * mask)        // 1 << (ceil(log KNK) - dist-from-root)
+            unsigned_type * mask)               // 1 << (ceil(log KNK) - dist-from-root)
         {
-            if (node == 0) { // winner part of root
+            if (node == 0) {                    // winner part of root
                 *mask = 1 << (logK - 1);
-                *winnerKey   = entry[0].key;
+                *winnerKey = entry[0].key;
                 *winnerIndex = entry[0].index;
                 if (cmp(entry[node].key, newKey))
                 {
-                    entry[node].key   = newKey;
+                    entry[node].key = newKey;
                     entry[node].index = newIndex;
                 }
             } else {
                 update_on_insert(node >> 1, newKey, newIndex, winnerKey, winnerIndex, mask);
-                Element loserKey   = entry[node].key;
+                Element loserKey = entry[node].key;
                 unsigned_type loserIndex = entry[node].index;
                 if ((*winnerIndex & *mask) != (newIndex & *mask)) { // different subtrees
-                    if (cmp(loserKey, newKey)) { // newKey will have influence here
-                        if (cmp(*winnerKey, newKey) ) { // old winner loses here
-                            entry[node].key   = *winnerKey;
+                    if (cmp(loserKey, newKey)) {                    // newKey will have influence here
+                        if (cmp(*winnerKey, newKey)) {              // old winner loses here
+                            entry[node].key = *winnerKey;
                             entry[node].index = *winnerIndex;
-                        } else { // new entry looses here
-                            entry[node].key   = newKey;
+                        } else {                                    // new entry looses here
+                            entry[node].key = newKey;
                             entry[node].index = newIndex;
                         }
                     }
-                    *winnerKey   = loserKey;
+                    *winnerKey = loserKey;
                     *winnerIndex = loserIndex;
                 }
                 // note that nothing needs to be done if
@@ -735,7 +732,7 @@ namespace priority_queue_local
             STXXL_VERBOSE1("ext_merger::doubleK (before) k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " arity=" << arity << " #free=" << free_segments.size());
             assert(k > 0);
             assert(k < arity);
-            assert(free_segments.empty()); // stack was free (probably not needed)
+            assert(free_segments.empty());                 // stack was free (probably not needed)
 
             // make all new entries free
             // and push them on the free stack
@@ -845,10 +842,10 @@ namespace priority_queue_local
 
             //Hint first non-internal (actually second) block of each sequence.
             //This is mandatory to ensure proper synchronization between prefetch pool and write pool.
-            for(unsigned_type i = 0; i < k; ++i)
+            for (unsigned_type i = 0; i < k; ++i)
             {
-              if(states[i].bids != NULL && !states[i].bids->empty())
-                p_pool->hint(states[i].bids->front(), *w_pool);
+                if (states[i].bids != NULL && !states[i].bids->empty())
+                    p_pool->hint(states[i].bids->front(), *w_pool);
             }
 
             switch (logK) {
@@ -858,7 +855,7 @@ namespace priority_queue_local
                 assert(free_segments.empty());
                 //memcpy(to, states[0], length * sizeof(Element));
                 //std::copy(states[0],states[0]+length,to);
-                for (size_type i = 0; i < length; ++i, ++ (states[0]), ++begin)
+                for (size_type i = 0; i < length; ++i, ++(states[0]), ++begin)
                     *begin = *(states[0]);
 
                 entry[0].key = **states;
@@ -897,21 +894,21 @@ namespace priority_queue_local
                     deallocate_segment(3);
 
                 break;
-            case  3: multi_merge_f < OutputIterator, 3 > (begin, end);
+            case  3: multi_merge_f<OutputIterator, 3>(begin, end);
                 break;
-            case  4: multi_merge_f < OutputIterator, 4 > (begin, end);
+            case  4: multi_merge_f<OutputIterator, 4>(begin, end);
                 break;
-            case  5: multi_merge_f < OutputIterator, 5 > (begin, end);
+            case  5: multi_merge_f<OutputIterator, 5>(begin, end);
                 break;
-            case  6: multi_merge_f < OutputIterator, 6 > (begin, end);
+            case  6: multi_merge_f<OutputIterator, 6>(begin, end);
                 break;
-            case  7: multi_merge_f < OutputIterator, 7 > (begin, end);
+            case  7: multi_merge_f<OutputIterator, 7>(begin, end);
                 break;
-            case  8: multi_merge_f < OutputIterator, 8 > (begin, end);
+            case  8: multi_merge_f<OutputIterator, 8>(begin, end);
                 break;
-            case  9: multi_merge_f < OutputIterator, 9 > (begin, end);
+            case  9: multi_merge_f<OutputIterator, 9>(begin, end);
                 break;
-            case 10: multi_merge_f < OutputIterator, 10 > (begin, end);
+            case 10: multi_merge_f<OutputIterator, 10>(begin, end);
                 break;
             default: multi_merge_k(begin, end);
                 break;
@@ -930,11 +927,11 @@ namespace priority_queue_local
                 // there is also a special 3-way-merger, that will be
                 // triggered if k == 4 && is_segment_empty(3)
                 STXXL_VERBOSE3("ext_merger  compact? k=" << k << " #used=" << num_segments_used
-                               << " <= #trigger=" << num_segments_trigger << " ==> "
-                               << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                               << " || "
-                               << ((k == 4 && !free_segments.empty() && !is_segment_empty(3)) ? "yes" : "no ")
-                               << " #free=" << free_segments.size());
+                                                         << " <= #trigger=" << num_segments_trigger << " ==> "
+                                                         << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                                                         << " || "
+                                                         << ((k == 4 && !free_segments.empty() && !is_segment_empty(3)) ? "yes" : "no ")
+                                                         << " #free=" << free_segments.size());
                 if (k > 1 && ((num_segments_used <= num_segments_trigger) ||
                               (k == 4 && !free_segments.empty() && !is_segment_empty(3))))
                 {
@@ -955,20 +952,20 @@ namespace priority_queue_local
             OutputIterator done = end;
             OutputIterator to = begin;
             unsigned_type winnerIndex = entry[0].index;
-            Element winnerKey   = entry[0].key;
+            Element winnerKey = entry[0].key;
 
             while (to != done)
             {
                 // write result
-                *to   = *(states[winnerIndex]);
+                *to = *(states[winnerIndex]);
 
                 // advance winner segment
-                ++ (states[winnerIndex]);
+                ++(states[winnerIndex]);
 
                 winnerKey = *(states[winnerIndex]);
 
                 // remove winner segment if empty now
-                if (is_sentinel(winnerKey))  //
+                if (is_sentinel(winnerKey)) //
                     deallocate_segment(winnerIndex);
 
 
@@ -977,18 +974,18 @@ namespace priority_queue_local
                     currentPos = entry + i;
                     currentKey = currentPos->key;
                     if (cmp(winnerKey, currentKey)) {
-                        currentIndex      = currentPos->index;
-                        currentPos->key   = winnerKey;
+                        currentIndex = currentPos->index;
+                        currentPos->key = winnerKey;
                         currentPos->index = winnerIndex;
-                        winnerKey         = currentKey;
-                        winnerIndex       = currentIndex;
+                        winnerKey = currentKey;
+                        winnerIndex = currentIndex;
                     }
                 }
 
                 ++to;
             }
             entry[0].index = winnerIndex;
-            entry[0].key   = winnerKey;
+            entry[0].key = winnerKey;
         }
 
         template <class OutputIterator, unsigned LogK>
@@ -997,18 +994,18 @@ namespace priority_queue_local
             OutputIterator done = end;
             OutputIterator to = begin;
             unsigned_type winnerIndex = entry[0].index;
-            Entry * regEntry   = entry;
+            Entry * regEntry = entry;
             sequence_state * regStates = states;
-            Element winnerKey   = entry[0].key;
+            Element winnerKey = entry[0].key;
 
             assert(logK >= LogK);
             while (to != done)
             {
                 // write result
-                *to   = *(regStates[winnerIndex]);
+                *to = *(regStates[winnerIndex]);
 
                 // advance winner segment
-                ++ (regStates[winnerIndex]);
+                ++(regStates[winnerIndex]);
 
                 winnerKey = *(regStates[winnerIndex]);
 
@@ -1021,16 +1018,16 @@ namespace priority_queue_local
                 ++to;
 
                 // update loser tree
-#define TreeStep(L)\
+#define TreeStep(L) \
     if (1 << LogK >= 1 << L) { \
-        Entry * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
+        Entry * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
         Element key ## L = pos ## L->key; \
         if (cmp(winnerKey, key ## L)) { \
-            unsigned_type index ## L  = pos ## L->index; \
-            pos ## L->key   = winnerKey; \
+            unsigned_type index ## L = pos ## L->index; \
+            pos ## L->key = winnerKey; \
             pos ## L->index = winnerIndex; \
-            winnerKey     = key ## L; \
-            winnerIndex   = index ## L; \
+            winnerKey = key ## L; \
+            winnerIndex = index ## L; \
         } \
     }
                 TreeStep(10);
@@ -1046,7 +1043,7 @@ namespace priority_queue_local
 #undef TreeStep
             }
             regEntry[0].index = winnerIndex;
-            regEntry[0].key   = winnerKey;
+            regEntry[0].key = winnerKey;
         }
 
     public:
@@ -1092,7 +1089,7 @@ namespace priority_queue_local
                     --nblocks;
                 }
                 block_manager * bm = block_manager::get_instance();
-                std::list<bid_type> *bids = new std::list<bid_type>(nblocks);
+                std::list<bid_type> * bids = new std::list<bid_type>(nblocks);
                 bm->new_blocks(alloc_strategy(), bids->begin(), bids->end());
                 block_type * first_block = new block_type;
 
@@ -1125,7 +1122,7 @@ namespace priority_queue_local
                 unsigned_type dummyIndex;
                 unsigned_type dummyMask;
                 update_on_insert((free_slot + k) >> 1, *(states[free_slot]), free_slot,
-                               &dummyKey, &dummyIndex, &dummyMask);
+                                 &dummyKey, &dummyIndex, &dummyMask);
             } else {
                 // deallocate memory ?
                 STXXL_VERBOSE1("Merged segment with zero size.");
@@ -1137,7 +1134,7 @@ namespace priority_queue_local
     protected:
         /*! \param first_size number of elements in the first block
          */
-        void insert_segment(std::list < bid_type > * bidlist, block_type * first_block,
+        void insert_segment(std::list<bid_type> * bidlist, block_type * first_block,
                             unsigned_type first_size, unsigned_type slot)
         {
             STXXL_VERBOSE1("ext_merger::insert_segment(bidlist,...) " << this << " " << bidlist->size() << " " << slot);
@@ -1202,7 +1199,7 @@ namespace priority_queue_local
     private:
         struct Entry
         {
-            value_type key; // Key of Loser element (winner for 0)
+            value_type key;      // Key of Loser element (winner for 0)
             unsigned_type index; // number of losing segment
         };
 
@@ -1211,10 +1208,10 @@ namespace priority_queue_local
         internal_bounded_stack<unsigned_type, KNKMAX> free_segments;
 
         unsigned_type size_; // total number of elements stored
-        unsigned_type logK; // log of current tree size
-        unsigned_type k; // invariant (k == 1 << logK), always a power of two
+        unsigned_type logK;  // log of current tree size
+        unsigned_type k;     // invariant (k == 1 << logK), always a power of two
 
-        Element sentinel; // target of free segment pointers
+        Element sentinel;    // target of free segment pointers
 
         // upper levels of loser trees
         // entry[0] contains the winner info
@@ -1223,8 +1220,8 @@ namespace priority_queue_local
         // leaf information
         // note that Knuth uses indices k..k-1
         // while we use 0..k-1
-        Element * current[KNKMAX]; // pointer to current element
-        Element * segment[KNKMAX]; // start of Segments
+        Element * current[KNKMAX];          // pointer to current element
+        Element * segment[KNKMAX];          // start of Segments
         unsigned_type segment_size[KNKMAX]; // just to count the internal memory consumption
 
         unsigned_type mem_cons_;
@@ -1232,7 +1229,7 @@ namespace priority_queue_local
         // private member functions
         unsigned_type initWinner(unsigned_type root);
         void update_on_insert(unsigned_type node, const Element & newKey, unsigned_type newIndex,
-                            Element * winnerKey, unsigned_type * winnerIndex, unsigned_type * mask);
+                              Element * winnerKey, unsigned_type * winnerIndex, unsigned_type * mask);
         void deallocate_segment(unsigned_type slot);
         void doubleK();
         void compactTree();
@@ -1247,10 +1244,10 @@ namespace priority_queue_local
             //Element currentKey;
             //int currentIndex; // leaf pointed to by current entry
             Element * done = to + length;
-            Entry * regEntry   = entry;
-            Element * * regStates = current;
+            Entry * regEntry = entry;
+            Element ** regStates = current;
             unsigned_type winnerIndex = regEntry[0].index;
-            Element winnerKey   = regEntry[0].key;
+            Element winnerKey = regEntry[0].key;
             Element * winnerPos;
             //Element sup = sentinel; // supremum
 
@@ -1260,7 +1257,7 @@ namespace priority_queue_local
                 winnerPos = regStates[winnerIndex];
 
                 // write result
-                *to   = winnerKey;
+                *to = winnerKey;
 
                 // advance winner segment
                 ++winnerPos;
@@ -1275,16 +1272,16 @@ namespace priority_queue_local
                 ++to;
 
                 // update loser tree
-#define TreeStep(L)\
+#define TreeStep(L) \
     if (1 << LogK >= 1 << L) { \
-        Entry * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int (LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
+        Entry * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
         Element key ## L = pos ## L->key; \
         if (cmp(winnerKey, key ## L)) { \
-            unsigned_type index ## L  = pos ## L->index; \
-            pos ## L->key   = winnerKey; \
+            unsigned_type index ## L = pos ## L->index; \
+            pos ## L->key = winnerKey; \
             pos ## L->index = winnerIndex; \
-            winnerKey     = key ## L; \
-            winnerIndex   = index ## L; \
+            winnerKey = key ## L; \
+            winnerIndex = index ## L; \
         } \
     }
                 TreeStep(10);
@@ -1300,7 +1297,7 @@ namespace priority_queue_local
 #undef TreeStep
             }
             regEntry[0].index = winnerIndex;
-            regEntry[0].key   = winnerKey;
+            regEntry[0].key = winnerKey;
         }
 
     public:
@@ -1366,7 +1363,7 @@ namespace priority_queue_local
     void loser_tree<ValTp_, Cmp_, KNKMAX>::init()
     {
         assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
-        sentinel      = cmp.min_value();
+        sentinel = cmp.min_value();
         rebuildLoserTree();
         assert(current[entry[0].index] == &sentinel);
     }
@@ -1379,7 +1376,7 @@ namespace priority_queue_local
         assert(LOG2<KNKMAX>::floor == LOG2<KNKMAX>::ceil); // KNKMAX needs to be a power of two
         unsigned_type winner = initWinner(1);
         entry[0].index = winner;
-        entry[0].key   = *(current[winner]);
+        entry[0].key = *(current[winner]);
     }
 
 
@@ -1394,17 +1391,17 @@ namespace priority_queue_local
         if (root >= k) { // leaf reached
             return root - k;
         } else {
-            unsigned_type left  = initWinner(2 * root    );
+            unsigned_type left = initWinner(2 * root);
             unsigned_type right = initWinner(2 * root + 1);
-            Element lk    = *(current[left ]);
-            Element rk    = *(current[right]);
+            Element lk = *(current[left]);
+            Element rk = *(current[right]);
             if (!(cmp(lk, rk))) { // right subtree looses
                 entry[root].index = right;
-                entry[root].key   = rk;
+                entry[root].key = rk;
                 return left;
             } else {
                 entry[root].index = left;
-                entry[root].key   = lk;
+                entry[root].key = lk;
                 return right;
             }
         }
@@ -1423,32 +1420,32 @@ namespace priority_queue_local
         unsigned_type newIndex,
         Element * winnerKey,
         unsigned_type * winnerIndex,       // old winner
-        unsigned_type * mask)       // 1 << (ceil(log KNK) - dist-from-root)
+        unsigned_type * mask)              // 1 << (ceil(log KNK) - dist-from-root)
     {
-        if (node == 0) { // winner part of root
+        if (node == 0) {                   // winner part of root
             *mask = 1 << (logK - 1);
-            *winnerKey   = entry[0].key;
+            *winnerKey = entry[0].key;
             *winnerIndex = entry[0].index;
             if (cmp(entry[node].key, newKey))
             {
-                entry[node].key   = newKey;
+                entry[node].key = newKey;
                 entry[node].index = newIndex;
             }
         } else {
             update_on_insert(node >> 1, newKey, newIndex, winnerKey, winnerIndex, mask);
-            Element loserKey   = entry[node].key;
+            Element loserKey = entry[node].key;
             unsigned_type loserIndex = entry[node].index;
             if ((*winnerIndex & *mask) != (newIndex & *mask)) { // different subtrees
-                if (cmp(loserKey, newKey)) { // newKey will have influence here
-                    if (cmp(*winnerKey, newKey) ) { // old winner loses here
-                        entry[node].key   = *winnerKey;
+                if (cmp(loserKey, newKey)) {                    // newKey will have influence here
+                    if (cmp(*winnerKey, newKey)) {              // old winner loses here
+                        entry[node].key = *winnerKey;
                         entry[node].index = *winnerIndex;
-                    } else { // new entry looses here
-                        entry[node].key   = newKey;
+                    } else {                                    // new entry looses here
+                        entry[node].key = newKey;
                         entry[node].index = newIndex;
                     }
                 }
-                *winnerKey   = loserKey;
+                *winnerKey = loserKey;
                 *winnerIndex = loserIndex;
             }
             // note that nothing needs to be done if
@@ -1470,7 +1467,7 @@ namespace priority_queue_local
         STXXL_VERBOSE3("loser_tree::doubleK (before) k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " #free=" << free_segments.size());
         assert(k > 0);
         assert(k < KNKMAX);
-        assert(free_segments.empty()); // stack was free (probably not needed)
+        assert(free_segments.empty());                   // stack was free (probably not needed)
 
         // make all new entries free
         // and push them on the free stack
@@ -1502,7 +1499,7 @@ namespace priority_queue_local
 
         // compact all nonempty segments to the left
         unsigned_type from = 0;
-        unsigned_type to   = 0;
+        unsigned_type to = 0;
         for ( ;  from < k;  from++)
         {
             if (not_sentinel(*(current[from])))
@@ -1555,9 +1552,9 @@ namespace priority_queue_local
 
         if (sz > 0)
         {
-            assert( not_sentinel(to[0])   );
-            assert( not_sentinel(to[sz - 1]));
-            assert( is_sentinel(to[sz]));
+            assert(not_sentinel(to[0]));
+            assert(not_sentinel(to[sz - 1]));
+            assert(is_sentinel(to[sz]));
 
             // get a free slot
             if (free_segments.empty()) { // tree is too small
@@ -1579,13 +1576,13 @@ namespace priority_queue_local
             unsigned_type dummyIndex;
             unsigned_type dummyMask;
             update_on_insert((index + k) >> 1, *to, index,
-                           &dummyKey, &dummyIndex, &dummyMask);
+                             &dummyKey, &dummyIndex, &dummyMask);
         } else {
             // immediately deallocate
             // this is not only an optimization
             // but also needed to keep free segments from
             // clogging up the tree
-            delete [] to;
+            delete[] to;
         }
     }
 
@@ -1599,7 +1596,7 @@ namespace priority_queue_local
             if (segment[i])
             {
                 STXXL_VERBOSE2("loser_tree::~loser_tree() deleting segment " << i);
-                delete [] segment[i];
+                delete[] segment[i];
                 mem_cons_ -= segment_size[i];
             }
         }
@@ -1618,7 +1615,7 @@ namespace priority_queue_local
         current[slot] = &sentinel;
 
         // free memory
-        delete [] segment[slot];
+        delete[] segment[slot];
         segment[slot] = NULL;
         mem_cons_ -= segment_size[slot];
 
@@ -1690,26 +1687,25 @@ namespace priority_queue_local
                 deallocate_segment(3);
 
             break;
-        case  3: multi_merge_f < 3 > (to, length);
+        case  3: multi_merge_f<3>(to, length);
             break;
-        case  4: multi_merge_f < 4 > (to, length);
+        case  4: multi_merge_f<4>(to, length);
             break;
-        case  5: multi_merge_f < 5 > (to, length);
+        case  5: multi_merge_f<5>(to, length);
             break;
-        case  6: multi_merge_f < 6 > (to, length);
+        case  6: multi_merge_f<6>(to, length);
             break;
-        case  7: multi_merge_f < 7 > (to, length);
+        case  7: multi_merge_f<7>(to, length);
             break;
-        case  8: multi_merge_f < 8 > (to, length);
+        case  8: multi_merge_f<8>(to, length);
             break;
-        case  9: multi_merge_f < 9 > (to, length);
+        case  9: multi_merge_f<9>(to, length);
             break;
-        case 10: multi_merge_f < 10 > (to, length);
+        case 10: multi_merge_f<10>(to, length);
             break;
         default: multi_merge_k(to, length);
             break;
         }
-
 
 
         size_ -= length;
@@ -1724,11 +1720,11 @@ namespace priority_queue_local
             // there is also a special 3-way-merger, that will be
             // triggered if k == 4 && is_segment_empty(3)
             STXXL_VERBOSE3("loser_tree  compact? k=" << k << " #used=" << num_segments_used
-                           << " <= #trigger=" << num_segments_trigger << " ==> "
-                           << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
-                           << " || "
-                           << ((k == 4 && !free_segments.empty() && !is_segment_empty(3)) ? "yes" : "no ")
-                           << " #free=" << free_segments.size());
+                                                     << " <= #trigger=" << num_segments_trigger << " ==> "
+                                                     << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
+                                                     << " || "
+                                                     << ((k == 4 && !free_segments.empty() && !is_segment_empty(3)) ? "yes" : "no ")
+                                                     << " #free=" << free_segments.size());
             if (k > 1 && ((num_segments_used <= num_segments_trigger) ||
                           (k == 4 && !free_segments.empty() && !is_segment_empty(3))))
             {
@@ -1757,7 +1753,7 @@ namespace priority_queue_local
         unsigned_type kReg = k;
         Element * done = to + length;
         unsigned_type winnerIndex = entry[0].index;
-        Element winnerKey   = entry[0].key;
+        Element winnerKey = entry[0].key;
         Element * winnerPos;
 
         while (to != done)
@@ -1765,7 +1761,7 @@ namespace priority_queue_local
             winnerPos = current[winnerIndex];
 
             // write result
-            *to   = winnerKey;
+            *to = winnerKey;
 
             // advance winner segment
             ++winnerPos;
@@ -1773,7 +1769,7 @@ namespace priority_queue_local
             winnerKey = *winnerPos;
 
             // remove winner segment if empty now
-            if (is_sentinel(winnerKey))  //
+            if (is_sentinel(winnerKey)) //
                 deallocate_segment(winnerIndex);
 
 
@@ -1782,18 +1778,18 @@ namespace priority_queue_local
                 currentPos = entry + i;
                 currentKey = currentPos->key;
                 if (cmp(winnerKey, currentKey)) {
-                    currentIndex      = currentPos->index;
-                    currentPos->key   = winnerKey;
+                    currentIndex = currentPos->index;
+                    currentPos->key = winnerKey;
                     currentPos->index = winnerIndex;
-                    winnerKey         = currentKey;
-                    winnerIndex       = currentIndex;
+                    winnerKey = currentKey;
+                    winnerIndex = currentIndex;
                 }
             }
 
             ++to;
         }
         entry[0].index = winnerIndex;
-        entry[0].key   = winnerKey;
+        entry[0].key = winnerKey;
     }
 }
 
@@ -1809,17 +1805,17 @@ namespace priority_queue_local
 // internal memory consumption >= N_*(KMAX_^Levels_) + ext
 
 template <
-          class Tp_,
-          class Cmp_,
-          unsigned BufferSize1_ = 32, // equalize procedure call overheads etc.
-          unsigned N_ = 512, // bandwidth
-          unsigned IntKMAX_ = 64, // maximal arity for internal mergers
-          unsigned IntLevels_ = 4,
-          unsigned BlockSize_ = (2 * 1024 * 1024),
-          unsigned ExtKMAX_ = 64, // maximal arity for external mergers
-          unsigned ExtLevels_ = 2,
-          class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
->
+    class Tp_,
+    class Cmp_,
+    unsigned BufferSize1_ = 32,       // equalize procedure call overheads etc.
+    unsigned N_ = 512,                // bandwidth
+    unsigned IntKMAX_ = 64,           // maximal arity for internal mergers
+    unsigned IntLevels_ = 4,
+    unsigned BlockSize_ = (2 * 1024 * 1024),
+    unsigned ExtKMAX_ = 64,           // maximal arity for external mergers
+    unsigned ExtLevels_ = 2,
+    class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
+    >
 struct priority_queue_config
 {
     typedef Tp_ value_type;
@@ -1842,18 +1838,18 @@ __STXXL_END_NAMESPACE
 
 namespace std
 {
-    template <  class BlockType_,
+    template <class BlockType_,
               class Cmp_,
               unsigned Arity_,
-              class AllocStr_ >
-    void swap(stxxl::priority_queue_local::ext_merger < BlockType_, Cmp_, Arity_, AllocStr_ > & a,
-              stxxl::priority_queue_local::ext_merger<BlockType_, Cmp_, Arity_, AllocStr_> & b )
+              class AllocStr_>
+    void swap(stxxl::priority_queue_local::ext_merger<BlockType_, Cmp_, Arity_, AllocStr_> & a,
+              stxxl::priority_queue_local::ext_merger<BlockType_, Cmp_, Arity_, AllocStr_> & b)
     {
         a.swap(b);
     }
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
-    void swap(      stxxl::priority_queue_local::loser_tree < ValTp_, Cmp_, KNKMAX > & a,
-                    stxxl::priority_queue_local::loser_tree<ValTp_, Cmp_, KNKMAX> & b)
+    void swap(stxxl::priority_queue_local::loser_tree<ValTp_, Cmp_, KNKMAX> & a,
+              stxxl::priority_queue_local::loser_tree<ValTp_, Cmp_, KNKMAX> & b)
     {
         a.swap(b);
     }
@@ -1888,36 +1884,34 @@ public:
     typedef stxxl::uint64 size_type;
     typedef typed_block<BlockSize, value_type> block_type;
 
-
 protected:
-
     typedef priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
     insert_heap_type;
 
     typedef priority_queue_local::loser_tree<
-                                             value_type,
-                                             comparator_type,
-                                             IntKMAX>  int_merger_type;
+        value_type,
+        comparator_type,
+        IntKMAX> int_merger_type;
 
     typedef priority_queue_local::ext_merger<
-                                             block_type,
-                                             comparator_type,
-                                             ExtKMAX,
-                                             alloc_strategy_type>   ext_merger_type;
+        block_type,
+        comparator_type,
+        ExtKMAX,
+        alloc_strategy_type> ext_merger_type;
 
 
     int_merger_type itree[IntLevels];
-    prefetch_pool<block_type> &p_pool;
-    write_pool<block_type>    &w_pool;
+    prefetch_pool<block_type> & p_pool;
+    write_pool<block_type> & w_pool;
     ext_merger_type * etree;
 
     // one delete buffer for each tree => group buffer
     value_type buffer2[Levels][N + 1]; // tree->buffer2->buffer1 (extra space for sentinel)
-    value_type * minBuffer2[Levels];  // minBuffer2[i] is current start of buffer2[i], end is buffer2[i] + N
+    value_type * minBuffer2[Levels];   // minBuffer2[i] is current start of buffer2[i], end is buffer2[i] + N
 
     // overall delete buffer
     value_type buffer1[BufferSize1 + 1];
-    value_type * minBuffer1;  // is current start of buffer1, end is buffer1 + BufferSize1
+    value_type * minBuffer1;           // is current start of buffer1, end is buffer1 + BufferSize1
 
     comparator_type cmp;
 
@@ -1939,11 +1933,10 @@ protected:
     void emptyInsertHeap();
 
     value_type getSupremum() const { return cmp.min_value(); } //{ return buffer2[0][KNN].key; }
-    unsigned_type getSize1( ) const { return ( buffer1 + BufferSize1) - minBuffer1; }
+    unsigned_type getSize1() const { return (buffer1 + BufferSize1) - minBuffer1; }
     unsigned_type getSize2(unsigned_type i) const { return &(buffer2[i][N]) - minBuffer2[i]; }
 
 public:
-
     //! \brief Constructs external priority queue object
     //! \param p_pool_ pool of blocks that will be used
     //! for data prefetching for the disk<->memory transfers
@@ -1953,7 +1946,7 @@ public:
     //! for writing data for the memory<->disk transfers
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
-    priority_queue(prefetch_pool < block_type > & p_pool_, write_pool<block_type> & w_pool_);
+    priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_);
 
     //! \brief Constructs external priority queue object
     //! \param p_pool_mem memory (in bytes) for prefetch pool that will be used
@@ -2042,9 +2035,9 @@ public:
             dynam_alloc_mem += etree[i].mem_cons();
 
 
-        return (  sizeof(*this) +
-                  sizeof(ext_merger_type) * ExtLevels +
-                  dynam_alloc_mem );
+        return (sizeof(*this) +
+                sizeof(ext_merger_type) * ExtLevels +
+                dynam_alloc_mem);
     }
 };
 
@@ -2106,11 +2099,10 @@ inline void priority_queue<Config_>::push(const value_type & obj)
 }
 
 
-
 ////////////////////////////////////////////////////////////////
 
 template <class Config_>
-priority_queue<Config_>::priority_queue(prefetch_pool < block_type > &p_pool_, write_pool<block_type> &w_pool_) :
+priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) :
     p_pool(p_pool_), w_pool(w_pool_),
     insertHeap(N + 2),
     activeLevels(0), size_(0),
@@ -2124,12 +2116,12 @@ priority_queue<Config_>::priority_queue(prefetch_pool < block_type > &p_pool_, w
         etree[j].set_pools(&p_pool, &w_pool);
 
     value_type sentinel = cmp.min_value();
-    buffer1[BufferSize1] = sentinel; // sentinel
-    insertHeap.push(sentinel); // always keep the sentinel
-    minBuffer1 = buffer1 + BufferSize1; // empty
+    buffer1[BufferSize1] = sentinel;      // sentinel
+    insertHeap.push(sentinel);            // always keep the sentinel
+    minBuffer1 = buffer1 + BufferSize1;   // empty
     for (unsigned_type i = 0;  i < Levels;  i++)
     {
-        buffer2[i][N] = sentinel; // sentinel
+        buffer2[i][N] = sentinel;         // sentinel
         minBuffer2[i] = &(buffer2[i][N]); // empty
     }
 }
@@ -2149,12 +2141,12 @@ priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type 
         etree[j].set_pools(&p_pool, &w_pool);
 
     value_type sentinel = cmp.min_value();
-    buffer1[BufferSize1] = sentinel; // sentinel
-    insertHeap.push(sentinel); // always keep the sentinel
-    minBuffer1 = buffer1 + BufferSize1; // empty
+    buffer1[BufferSize1] = sentinel;      // sentinel
+    insertHeap.push(sentinel);            // always keep the sentinel
+    minBuffer1 = buffer1 + BufferSize1;   // empty
     for (unsigned_type i = 0;  i < Levels;  i++)
     {
-        buffer2[i][N] = sentinel; // sentinel
+        buffer2[i][N] = sentinel;         // sentinel
         minBuffer2[i] = &(buffer2[i][N]); // empty
     }
 }
@@ -2165,11 +2157,11 @@ priority_queue<Config_>::~priority_queue()
     STXXL_VERBOSE2("priority_queue::~priority_queue()");
     if (deallocate_pools)
     {
-        delete & p_pool;
-        delete & w_pool;
+        delete &p_pool;
+        delete &w_pool;
     }
 
-    delete [] etree;
+    delete[] etree;
 }
 
 //--------------------- Buffer refilling -------------------------------
@@ -2182,10 +2174,10 @@ unsigned_type priority_queue<Config_>::refillBuffer2(unsigned_type j)
 
     value_type * oldTarget;
     unsigned_type deleteSize;
-    size_type treeSize = (j < IntLevels) ? itree[j].size() : etree[ j - IntLevels].size();  //elements left in segments
-    unsigned_type bufferSize = buffer2[j] + N - minBuffer2[j]; //elements left in target buffer
-    if (treeSize + bufferSize >= size_type(N) )
-    { // buffer will be filled completely
+    size_type treeSize = (j < IntLevels) ? itree[j].size() : etree[j - IntLevels].size();  //elements left in segments
+    unsigned_type bufferSize = buffer2[j] + N - minBuffer2[j];                             //elements left in target buffer
+    if (treeSize + bufferSize >= size_type(N))
+    {                                                                                      // buffer will be filled completely
         oldTarget = buffer2[j];
         deleteSize = N - bufferSize;
     }
@@ -2197,7 +2189,6 @@ unsigned_type priority_queue<Config_>::refillBuffer2(unsigned_type j)
 
     if (deleteSize > 0)
     {
-
         // shift  rest to beginning
         // possible hack:
         // - use memcpy if no overlap
@@ -2212,9 +2203,8 @@ unsigned_type priority_queue<Config_>::refillBuffer2(unsigned_type j)
         {
             //external
             etree[j - IntLevels].multi_merge(oldTarget + bufferSize,
-                                            oldTarget + bufferSize + deleteSize);
+                                             oldTarget + bufferSize + deleteSize);
         }
-
     }
 
 
@@ -2249,14 +2239,14 @@ void priority_queue<Config_>::refillBuffer1()
         }
         else
         {
-            totalSize += BufferSize1; // actually only a sufficient lower bound
+            totalSize += BufferSize1;    // actually only a sufficient lower bound
         }
     }
 
-    if (totalSize >= BufferSize1) // buffer can be filled completely
+    if (totalSize >= BufferSize1)        // buffer can be filled completely
     {
         minBuffer1 = buffer1;
-        sz = BufferSize1; // amount to be copied
+        sz = BufferSize1;                // amount to be copied
         size_ -= size_type(BufferSize1); // amount left in buffer2
     }
     else
@@ -2334,13 +2324,13 @@ unsigned_type priority_queue<Config_>::makeSpaceAvailable(unsigned_type level)
     {
         finalLevel = makeSpaceAvailable(level + 1);
 
-        if (level < IntLevels - 1) // from internal to internal tree
+        if (level < IntLevels - 1)                             // from internal to internal tree
         {
             unsigned_type segmentSize = itree[level].size();
             value_type * newSegment = new value_type[segmentSize + 1];
             itree[level].multi_merge(newSegment, segmentSize); // empty this level
 
-            newSegment[segmentSize] = buffer1[BufferSize1]; // sentinel
+            newSegment[segmentSize] = buffer1[BufferSize1];    // sentinel
             // for queues where size << #inserts
             // it might make sense to stay in this level if
             // segmentSize < alpha * KNN * k^level for some alpha < 1
@@ -2429,13 +2419,13 @@ void priority_queue<Config_>::emptyInsertHeap()
     if (freeLevel > 0)
     {
         for (int_type i = freeLevel;  i >= 0;  i--)
-        { // reverse order not needed
+        {                                                 // reverse order not needed
           // but would allow immediate refill
 
             newSegment = new value_type[getSize2(i) + 1]; // with sentinel
             std::copy(minBuffer2[i], minBuffer2[i] + getSize2(i) + 1, newSegment);
             itree[0].insert_segment(newSegment, getSize2(i));
-            minBuffer2[i] = buffer2[i] + N; // empty
+            minBuffer2[i] = buffer2[i] + N;               // empty
         }
     }
 
@@ -2467,10 +2457,10 @@ namespace priority_queue_local
         typedef find_B_m<E_, IntM_, MaxS_, B_, m_, stop> Self;
         enum {
             k = IntM_ / B_, // number of blocks that fit into M
-            E = E_, // element size
+            E = E_,         // element size
             IntM = IntM_,
-            B = B_,  // block size
-            m = m_,  // number of blocks fitting into buffers
+            B = B_,         // block size
+            m = m_,         // number of blocks fitting into buffers
             c = k - m_,
             // memory occ. by block must be at least 10 times larger than size of ext sequence
             // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
@@ -2478,14 +2468,14 @@ namespace priority_queue_local
             step = 1
         };
 
-        typedef typename find_B_m < E, IntM, MaxS_, B, m + step, fits || (m >= k - step) > ::result candidate1;
-        typedef typename find_B_m < E, IntM, MaxS_, B / 2, 1, fits || candidate1::fits > ::result candidate2;
-        typedef typename IF < fits, Self, typename IF<candidate1::fits, candidate1, candidate2>::result > ::result result;
+        typedef typename find_B_m<E, IntM, MaxS_, B, m + step, fits || (m >= k - step)>::result candidate1;
+        typedef typename find_B_m<E, IntM, MaxS_, B / 2, 1, fits || candidate1::fits>::result candidate2;
+        typedef typename IF<fits, Self, typename IF<candidate1::fits, candidate1, candidate2>::result>::result result;
     };
 
     // specialization for the case when no valid parameters are found
     template <unsigned_type E_, unsigned_type IntM_, unsigned_type MaxS_, bool stop>
-    struct find_B_m < E_, IntM_, MaxS_, 2048, 1, stop >
+    struct find_B_m<E_, IntM_, MaxS_, 2048, 1, stop>
     {
         enum { fits = false };
         typedef Parameters_for_priority_queue_not_found_Increase_IntM result;
@@ -2504,7 +2494,7 @@ namespace priority_queue_local
     struct find_settings
     {
         // start from block size (8*1024*1024) bytes
-        typedef typename find_B_m < E_, IntM_, MaxS_, (8 * 1024 * 1024), 1 > ::result result;
+        typedef typename find_B_m<E_, IntM_, MaxS_, (8 * 1024 * 1024), 1>::result result;
     };
 
     struct Parameters_not_found_Try_to_change_the_Tune_parameter
@@ -2523,11 +2513,11 @@ namespace priority_queue_local
             AI = AI_,
             N = X / (AI * AI) // two stage internal
         };
-        typedef typename IF < (N >= CriticalSize_), Self, typename compute_N < AI / 2, X, CriticalSize_ > ::result > ::result result;
+        typedef typename IF<(N >= CriticalSize_), Self, typename compute_N<AI / 2, X, CriticalSize_>::result>::result result;
     };
 
     template <unsigned_type X_, unsigned_type CriticalSize_>
-    struct compute_N < 1, X_, CriticalSize_ >
+    struct compute_N<1, X_, CriticalSize_>
     {
         typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
     };
@@ -2608,7 +2598,7 @@ class PRIORITY_QUEUE_GENERATOR
 {
 public:
     // actual calculation of B, m, k and E
-    typedef typename priority_queue_local::find_settings < sizeof(Tp_), IntM_, MaxS_ > ::result settings;
+    typedef typename priority_queue_local::find_settings<sizeof(Tp_), IntM_, MaxS_>::result settings;
     enum {
         B = settings::B,
         m = settings::m,
@@ -2616,7 +2606,7 @@ public:
         Buffer1Size = 32                          // fixed
     };
     // derivation of N, AI, AE
-    typedef typename priority_queue_local::compute_N < (1 << Tune_), X, 4 * Buffer1Size > ::result ComputeN;
+    typedef typename priority_queue_local::compute_N<(1 << Tune_), X, 4 * Buffer1Size>::result ComputeN;
     enum
     {
         N = ComputeN::N,
@@ -2636,7 +2626,7 @@ public:
         unsigned ExtKMAX_ = 64,     // maximal arity for external mergers
         unsigned ExtLevels_ = 2,
      */
-    typedef priority_queue < priority_queue_config < Tp_, Cmp_, Buffer1Size, N, AI, 2, B, AE, 2 > > result;
+    typedef priority_queue<priority_queue_config<Tp_, Cmp_, Buffer1Size, N, AI, 2, B, AE, 2> > result;
 };
 
 //! \}
@@ -2647,8 +2637,8 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class Config_>
-    void swap(stxxl::priority_queue<Config_> &a,
-              stxxl::priority_queue<Config_> &b)
+    void swap(stxxl::priority_queue<Config_> & a,
+              stxxl::priority_queue<Config_> & b)
     {
         a.swap(b);
     }

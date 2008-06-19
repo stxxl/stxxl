@@ -55,7 +55,7 @@ struct trigger_entry
     bid_type bid;
     key_type key;
 
-    operator bid_type()
+    operator bid_type ()
     {
         return bid;
     }

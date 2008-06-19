@@ -30,9 +30,9 @@ __STXXL_BEGIN_NAMESPACE
 inline double
 timestamp()
 {
-#ifdef STXXL_BOOST_TIMESTAMP 
+#ifdef STXXL_BOOST_TIMESTAMP
     boost::posix_time::ptime MyTime = boost::posix_time::microsec_clock::local_time();
-    boost::posix_time::time_duration Duration = 
+    boost::posix_time::time_duration Duration =
         MyTime - boost::posix_time::time_from_string("1970-01-01 00:00:00.000");
     double sec = double(Duration.hours()) * 3600. +
                  double(Duration.minutes()) * 60. +

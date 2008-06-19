@@ -863,15 +863,15 @@ class STACK_GENERATOR
 {
     typedef stack_config_generator<ValTp, BlocksPerPage, BlkSz, AllocStr, SzTp> cfg;
 
-    typedef typename IF < Behaviour == grow_shrink,
-    grow_shrink_stack<cfg>,
-    grow_shrink_stack2<cfg> > ::result GrShrTp;
-    typedef typename IF < Behaviour == normal, normal_stack<cfg>, GrShrTp > ::result ExtStackTp;
-    typedef typename IF < Externality == migrating,
-    migrating_stack<MigrCritSize, ExtStackTp, IntStackTp>, ExtStackTp > ::result MigrOrNotStackTp;
+    typedef typename IF<Behaviour == grow_shrink,
+                        grow_shrink_stack<cfg>,
+                        grow_shrink_stack2<cfg> >::result GrShrTp;
+    typedef typename IF<Behaviour == normal, normal_stack<cfg>, GrShrTp>::result ExtStackTp;
+    typedef typename IF<Externality == migrating,
+                        migrating_stack<MigrCritSize, ExtStackTp, IntStackTp>, ExtStackTp>::result MigrOrNotStackTp;
 
 public:
-    typedef typename IF < Externality == internal, IntStackTp, MigrOrNotStackTp > ::result result;
+    typedef typename IF<Externality == internal, IntStackTp, MigrOrNotStackTp>::result result;
 };
 
 //! \}

@@ -94,10 +94,10 @@ __STXXL_BEGIN_NAMESPACE
 
 
 inline void
-stxxl_perror (const char * /*errmsg*/, int errcode)
+stxxl_perror(const char * /*errmsg*/, int errcode)
 {
 //	STXXL_ERRMSG(errmsg << " error code " << errcode << " : " << strerror (errcode) );
-    exit (errcode);
+    exit(errcode);
 }
 
 #ifndef STXXL_DEBUG_ON
@@ -126,9 +126,9 @@ stxxl_perror (const char * /*errmsg*/, int errcode)
 
  #ifdef BOOST_MSVC
 
-  #define stxxl_win_lasterror_exit(errmsg)  \
+  #define stxxl_win_lasterror_exit(errmsg) \
     { \
-        TCHAR szBuf[80];  \
+        TCHAR szBuf[80]; \
         LPVOID lpMsgBuf; \
         DWORD dw = GetLastError(); \
         FormatMessage( \
@@ -137,11 +137,11 @@ stxxl_perror (const char * /*errmsg*/, int errcode)
             NULL, \
             dw, \
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), \
-            (LPTSTR) &lpMsgBuf, \
-            0, NULL ); \
+            (LPTSTR)&lpMsgBuf, \
+            0, NULL); \
         STXXL_ERRMSG("Error in " << errmsg << ", error code " << dw << ": " << ((char *)lpMsgBuf)); \
         LocalFree(lpMsgBuf); \
-        ExitProcess(dw);  \
+        ExitProcess(dw); \
     }
 
  #endif
@@ -163,23 +163,23 @@ stxxl_perror (const char * /*errmsg*/, int errcode)
 #endif
 
 inline double
-stxxl_timestamp ()
+stxxl_timestamp()
 {
     return timestamp();
 }
 
 
 #ifndef BOOST_MSVC
- #define STXXL_MIN(a, b) ( std::min(a, b) )
- #define STXXL_MAX(a, b) ( std::max(a, b) )
+ #define STXXL_MIN(a, b) (std::min(a, b))
+ #define STXXL_MAX(a, b) (std::max(a, b))
 #else
- #define STXXL_MIN(a, b) ( (std::min)(a, b) )
- #define STXXL_MAX(a, b) ( (std::max)(a, b) )
+ #define STXXL_MIN(a, b) ((std::min)(a, b))
+ #define STXXL_MAX(a, b) ((std::max)(a, b))
 #endif
 
 #define STXXL_L2_SIZE  (512 * 1024)
 
-#define div_and_round_up(a, b) ( (a) / (b) + !(!((a) % (b))))
+#define div_and_round_up(a, b) ((a) / (b) + !(!((a) % (b))))
 
 #define log2(x) (log(x) / log(2.))
 
@@ -297,9 +297,9 @@ class new_alloc {
 public:
     // type definitions
     typedef T value_type;
-    typedef T *       pointer;
+    typedef T * pointer;
     typedef const T * const_pointer;
-    typedef T &       reference;
+    typedef T & reference;
     typedef const T & const_reference;
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
@@ -311,11 +311,11 @@ public:
     };
 
     // return address of values
-    pointer address (reference value) const
+    pointer address(reference value) const
     {
         return &value;
     }
-    const_pointer address (const_reference value) const
+    const_pointer address(const_reference value) const
     {
         return &value;
     }
@@ -323,32 +323,32 @@ public:
     new_alloc() throw () { }
     new_alloc(const new_alloc &) throw () { }
     template <class U>
-    new_alloc (const new_alloc<U> &) throw () { }
+    new_alloc(const new_alloc<U> &) throw () { }
     ~new_alloc() throw () { }
 
     // allocate but don't initialize num elements of type T
-    pointer allocate (size_type num, const void * = 0)
+    pointer allocate(size_type num, const void * = 0)
     {
         pointer ret = (pointer)(T::operator new(num * sizeof(T)));
         return ret;
     }
 
     // initialize elements of allocated storage p with value value
-    void construct (pointer p, const T & value)
+    void construct(pointer p, const T & value)
     {
         // initialize memory with placement new
         new ((void *)p)T(value);
     }
 
     // destroy elements of initialized storage p
-    void destroy (pointer p)
+    void destroy(pointer p)
     {
         // destroy objects by calling their destructor
         p->~T();
     }
 
     // deallocate storage p of deleted elements
-    void deallocate (pointer p, size_type num)
+    void deallocate(pointer p, size_type num)
     {
         T::operator delete((void *)p);
     }
@@ -356,14 +356,14 @@ public:
 
 // return that all specializations of this allocator are interchangeable
 template <class T1, class T2>
-bool operator== (const new_alloc<T1> &,
-                 const new_alloc<T2> &) throw ()
+bool operator == (const new_alloc<T1> &,
+                  const new_alloc<T2> &) throw ()
 {
     return true;
 }
 template <class T1, class T2>
-bool operator!= (const new_alloc<T1> &,
-                 const new_alloc<T2> &) throw ()
+bool operator != (const new_alloc<T1> &,
+                  const new_alloc<T2> &) throw ()
 {
     return false;
 }

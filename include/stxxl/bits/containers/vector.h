@@ -1440,8 +1440,8 @@ template <
     >
 struct VECTOR_GENERATOR
 {
-    typedef typename IF < Pager_ == lru,
-    lru_pager<Pages_>, random_pager<Pages_> > ::result PagerType;
+    typedef typename IF<Pager_ == lru,
+                        lru_pager<Pages_>, random_pager<Pages_> >::result PagerType;
 
     typedef vector<Tp_, PgSz_, PagerType, BlkSize_, AllocStr_> result;
 };
