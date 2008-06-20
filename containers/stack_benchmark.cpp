@@ -36,7 +36,7 @@ struct my_record_
     char data[RECORD_SIZE];
     my_record_()
     {
-        memset(data, sizeof(data), 0);
+        memset(data, 0, sizeof(data));
     }
 };
 
