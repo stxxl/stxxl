@@ -10,4 +10,4 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/containers/queue.h"
+#include <stxxl/bits/containers/queue.h>

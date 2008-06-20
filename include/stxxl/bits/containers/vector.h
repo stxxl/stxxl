@@ -14,12 +14,13 @@
 #ifndef STXXL_VECTOR_HEADER
 #define STXXL_VECTOR_HEADER
 
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/common/tmeta.h"
-#include "stxxl/bits/containers/pager.h"
-
 #include <vector>
 #include <algorithm>
+
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/common/tmeta.h>
+#include <stxxl/bits/containers/pager.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

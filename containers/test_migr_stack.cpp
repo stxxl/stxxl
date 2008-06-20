@@ -17,7 +17,7 @@
 //! block size \b 4096 bytes, and internal implementation
 //! \c std::stack<int>
 
-#include "stxxl/stack"
+#include <stxxl/stack>
 
 
 int main()

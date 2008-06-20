@@ -13,8 +13,8 @@
 //! \example mng/test_write_pool.cpp
 
 #include <iostream>
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/mng/write_pool.h"
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/write_pool.h>
 
 #define BLOCK_SIZE (1024 * 512)
 

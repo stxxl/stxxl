@@ -16,7 +16,7 @@
 //! \c sorted_runs data structure from sorted sequences
 //! using \c stream::from_sorted_sequences specialization of \c stream::runs_creator class
 
-#include "stxxl/stream"
+#include <stxxl/stream>
 
 
 typedef unsigned value_type;

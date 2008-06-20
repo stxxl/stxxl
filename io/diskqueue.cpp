@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/io/iobase.h"
+#include <stxxl/bits/io/iobase.h>
 
 
 #ifndef STXXL_BOOST_THREADS

@@ -10,9 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/priority_queue"
 #include <limits>
 #include <iterator>
+#include <stxxl/priority_queue>
 
 typedef int my_type;
 typedef stxxl::typed_block<4096, my_type> block_type;

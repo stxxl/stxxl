@@ -20,7 +20,7 @@
         "disk.log" using ($3/1024):($7)  w l title "write"
  */
 
-#include "stxxl/io"
+#include <stxxl/io>
 
 #include <cstdio>
 #include <iomanip>
@@ -30,7 +30,7 @@
  #include <unistd.h>
 #endif
 
-#include "stxxl/bits/common/aligned_alloc.h"
+#include <stxxl/bits/common/aligned_alloc.h>
 
 using stxxl::request_ptr;
 using stxxl::file;

@@ -10,5 +10,5 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/stream/stream.h"
-#include "stxxl/bits/stream/sort_stream.h"
+#include <stxxl/bits/stream/stream.h>
+#include <stxxl/bits/stream/sort_stream.h>

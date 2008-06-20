@@ -13,11 +13,11 @@
 #ifndef STXXL_STREAM_HEADER
 #define STXXL_STREAM_HEADER
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/mng/buf_istream.h"
-#include "stxxl/bits/mng/buf_ostream.h"
-#include "stxxl/bits/common/tuple.h"
-#include "stxxl/vector"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/mng/buf_istream.h>
+#include <stxxl/bits/mng/buf_ostream.h>
+#include <stxxl/bits/common/tuple.h>
+#include <stxxl/vector>
 #include <stxxl/bits/compat_auto_ptr.h>
 
 

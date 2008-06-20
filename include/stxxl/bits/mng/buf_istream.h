@@ -13,9 +13,9 @@
 #ifndef STXXL_BUF_ISTREAM_HEADER
 #define STXXL_BUF_ISTREAM_HEADER
 
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/mng/block_prefetcher.h"
-#include "stxxl/bits/algo/async_schedule.h"
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/block_prefetcher.h>
+#include <stxxl/bits/algo/async_schedule.h>
 
 
 __STXXL_BEGIN_NAMESPACE

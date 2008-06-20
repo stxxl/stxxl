@@ -13,7 +13,7 @@
 #ifndef STXXL_SEED_HEADER
 #define STXXL_SEED_HEADER
 
-#include "stxxl/bits/namespace.h"
+#include <stxxl/bits/namespace.h>
 
 
 __STXXL_BEGIN_NAMESPACE

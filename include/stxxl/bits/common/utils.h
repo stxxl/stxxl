@@ -14,10 +14,6 @@
 #ifndef STXXL_UTILS_HEADER
 #define STXXL_UTILS_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -34,15 +30,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #ifdef STXXL_BOOST_FILESYSTEM
  #include <boost/filesystem/operations.hpp>
 #endif
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/common/log.h"
-#include "stxxl/bits/common/exceptions.h"
-#include "stxxl/bits/common/types.h"
-#include "stxxl/bits/common/timer.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/log.h>
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/timer.h>
 
 __STXXL_BEGIN_NAMESPACE
 

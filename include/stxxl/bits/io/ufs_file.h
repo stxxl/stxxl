@@ -15,7 +15,7 @@
 #ifndef STXXL_UFSFILEBASE_HEADER
 #define STXXL_UFSFILEBASE_HEADER
 
-#include "stxxl/bits/io/iobase.h"
+#include <stxxl/bits/io/iobase.h>
 
 
 __STXXL_BEGIN_NAMESPACE

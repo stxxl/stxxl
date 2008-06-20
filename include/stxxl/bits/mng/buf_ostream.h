@@ -13,7 +13,7 @@
 #ifndef STXXL_BUF_OSTREAM_HEADER
 #define STXXL_BUF_OSTREAM_HEADER
 
-#include "stxxl/bits/mng/buf_writer.h"
+#include <stxxl/bits/mng/buf_writer.h>
 
 
 __STXXL_BEGIN_NAMESPACE

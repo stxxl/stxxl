@@ -17,6 +17,7 @@
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
 
+
 #include <LEDA-SM/ext_memory_manager.h>
 #include <LEDA-SM/ext_memory_manager.h>
 #include <LEDA-SM/block.h>
@@ -28,8 +29,8 @@
 #include <LEDA/random.h>
 #include <algorithm>
 
-#include "stxxl/bits/common/utils_ledasm.h"
-#include "stxxl/timer"
+#include <stxxl/bits/common/utils_ledasm.h>
+#include <stxxl/timer>
 
 
 #define PQ_MEM_SIZE     (512 * 1024 * 1024)

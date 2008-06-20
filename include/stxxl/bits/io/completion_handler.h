@@ -15,9 +15,9 @@
 #ifndef STXXL_COMPLETION_HANDLER_HEADER
 #define STXXL_COMPLETION_HANDLER_HEADER
 
-#include "stxxl/bits/namespace.h"
-
 #include <memory>
+
+#include <stxxl/bits/namespace.h>
 
 
 __STXXL_BEGIN_NAMESPACE

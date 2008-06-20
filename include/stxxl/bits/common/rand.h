@@ -16,12 +16,12 @@
 
 #include <cstdlib>
 
-#include "stxxl/bits/common/types.h"
-#include "stxxl/bits/common/seed.h"
-
 #ifdef STXXL_BOOST_RANDOM
  #include <boost/random.hpp>
 #endif
+
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/seed.h>
 
 // Recommended seeding procedure:
 // by default, the global seed is initialized from a high resolution timer and the process id
@@ -29,6 +29,7 @@
 // 2. seed = stxxl::get_next_seed(); // store/print/... this value can be used for step 1 to replay the program with a specific seed
 // 3. stxxl::srandom_number32(); // seed the global state of stxxl::random_number32
 // 4. create all the other prngs used.
+
 
 __STXXL_BEGIN_NAMESPACE
 

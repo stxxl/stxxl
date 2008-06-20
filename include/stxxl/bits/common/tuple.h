@@ -13,8 +13,8 @@
 #ifndef STXXL_TUPLE_HEADER
 #define STXXL_TUPLE_HEADER
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/common/tmeta.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/tmeta.h>
 
 
 __STXXL_BEGIN_NAMESPACE

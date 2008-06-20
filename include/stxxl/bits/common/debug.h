@@ -17,8 +17,8 @@
  #include <boost/config.hpp>
 #endif
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/common/mutex.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/compat_hash_map.h>
 
 

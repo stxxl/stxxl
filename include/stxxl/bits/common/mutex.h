@@ -17,15 +17,14 @@
 
 #ifdef STXXL_BOOST_THREADS
 
-// stxxl::mutex is not needed since boost:mutex exists
  #include <boost/thread/mutex.hpp>
 
 #else
 
  #include <pthread.h>
 
-#include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/utils.h>
+ #include <stxxl/bits/noncopyable.h>
+ #include <stxxl/bits/common/utils.h>
 
 #endif
 
@@ -33,6 +32,8 @@
 __STXXL_BEGIN_NAMESPACE
 
 #ifdef STXXL_BOOST_THREADS
+
+// stxxl::mutex is not needed since boost:mutex exists
 
 #else
 

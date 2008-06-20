@@ -10,4 +10,4 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/algo/stable_ksort.h"
+#include <stxxl/bits/algo/stable_ksort.h>

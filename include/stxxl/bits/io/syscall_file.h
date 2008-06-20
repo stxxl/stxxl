@@ -13,8 +13,8 @@
 #ifndef STXXL_SYSCALL_FILE_HEADER
 #define STXXL_SYSCALL_FILE_HEADER
 
-#include "stxxl/bits/io/ufs_file.h"
-#include "stxxl/bits/common/debug.h"
+#include <stxxl/bits/io/ufs_file.h>
+#include <stxxl/bits/common/debug.h>
 
 
 __STXXL_BEGIN_NAMESPACE

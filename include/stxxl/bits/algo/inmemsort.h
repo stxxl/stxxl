@@ -13,10 +13,10 @@
 #ifndef STXXL_IN_MEMORY_SORT_HEADER
 #define STXXL_IN_MEMORY_SORT_HEADER
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/common/simple_vector.h"
-#include "stxxl/bits/algo/adaptor.h"
-#include "stxxl/bits/mng/adaptor.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/algo/adaptor.h>
+#include <stxxl/bits/mng/adaptor.h>
 
 #include <algorithm>
 

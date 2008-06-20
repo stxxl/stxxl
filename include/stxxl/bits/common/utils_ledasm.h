@@ -20,10 +20,6 @@
  * benutzen keine namespaces) und auch andere Probleme.
  */
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -36,13 +32,17 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
 #ifdef STXXL_BOOST_FILESYSTEM
  #include <boost/filesystem/operations.hpp>
 #endif
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/common/log.h"
-#include "stxxl/bits/common/timer.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/log.h>
+#include <stxxl/bits/common/timer.h>
 
 
 __STXXL_BEGIN_NAMESPACE

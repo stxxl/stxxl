@@ -10,9 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/priority_queue"
 #include <limits>
 #include <iterator>
+#include <stxxl/priority_queue>
 
 using stxxl::priority_queue_local::ext_merger;
 using stxxl::priority_queue_local::loser_tree;

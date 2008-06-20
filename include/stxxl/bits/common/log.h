@@ -13,10 +13,10 @@
 #ifndef STXXL_LOG_HEADER
 #define STXXL_LOG_HEADER
 
-#include "stxxl/bits/namespace.h"
-
 #include <iostream>
 #include <fstream>
+
+#include <stxxl/bits/namespace.h>
 
 
 __STXXL_BEGIN_NAMESPACE

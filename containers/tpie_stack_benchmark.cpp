@@ -29,14 +29,13 @@
 // Utilities for ASCII output.
 #include <ami_scan_utils.h>
 
-#include "stxxl/bits/common/utils_ledasm.h"
-#include "stxxl/timer"
+#include <stxxl/bits/common/utils_ledasm.h>
+#include <stxxl/timer>
 
 
 #define MEM_2_RESERVE    (768 * 1024 * 1024)
 
-
-#define    BLOCK_SIZE (2 * 1024 * 1024)
+#define BLOCK_SIZE       (2 * 1024 * 1024)
 
 
 #ifndef DISKS

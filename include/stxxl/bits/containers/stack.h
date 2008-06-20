@@ -13,14 +13,14 @@
 #ifndef STXXL_STACK_HEADER
 #define STXXL_STACK_HEADER
 
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/common/simple_vector.h"
-#include "stxxl/bits/common/tmeta.h"
-#include "stxxl/bits/mng/write_pool.h"
-#include "stxxl/bits/mng/prefetch_pool.h"
-
 #include <stack>
 #include <vector>
+
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/common/tmeta.h>
+#include <stxxl/bits/mng/write_pool.h>
+#include <stxxl/bits/mng/prefetch_pool.h>
 
 
 __STXXL_BEGIN_NAMESPACE

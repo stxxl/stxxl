@@ -13,8 +13,6 @@
 #ifndef STXXL_ASYNC_SCHEDULE_HEADER
 #define STXXL_ASYNC_SCHEDULE_HEADER
 
-#include "stxxl/io"
-
 #include <queue>
 #include <algorithm>
 #include <functional>
@@ -22,6 +20,7 @@
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
+#include <stxxl/io>
 
 #include <stxxl/bits/compat_hash_map.h>
 #include <stxxl/bits/compat_hash_set.h>

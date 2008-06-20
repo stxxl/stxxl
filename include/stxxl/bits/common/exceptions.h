@@ -17,7 +17,7 @@
 #include <string>
 #include <stdexcept>
 
-#include "stxxl/bits/namespace.h"
+#include <stxxl/bits/namespace.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -13,14 +13,13 @@
 #ifndef STXXL_WRITE_POOL_HEADER
 #define STXXL_WRITE_POOL_HEADER
 
-#include "stxxl/bits/mng/mng.h"
-
 #include <list>
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
 
+#include <stxxl/bits/mng/mng.h>
 //#include <stxxl/bits/compat_hash_map.h>
 
 

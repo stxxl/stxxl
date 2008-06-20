@@ -16,14 +16,14 @@
 #ifndef STXXL_PRIORITY_QUEUE_HEADER
 #define STXXL_PRIORITY_QUEUE_HEADER
 
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/mng/prefetch_pool.h"
-#include "stxxl/bits/mng/write_pool.h"
-#include "stxxl/bits/common/tmeta.h"
-
 #include <list>
 #include <iterator>
 #include <vector>
+
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/prefetch_pool.h>
+#include <stxxl/bits/mng/write_pool.h>
+#include <stxxl/bits/common/tmeta.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -13,15 +13,15 @@
 #ifndef STXXL_QUEUE_HEADER
 #define STXXL_QUEUE_HEADER
 
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/common/simple_vector.h"
-#include "stxxl/bits/common/tmeta.h"
-#include "stxxl/bits/mng/write_pool.h"
-#include "stxxl/bits/mng/prefetch_pool.h"
-
 #include <vector>
 #include <queue>
 #include <deque>
+
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/common/tmeta.h>
+#include <stxxl/bits/mng/write_pool.h>
+#include <stxxl/bits/mng/prefetch_pool.h>
 
 
 __STXXL_BEGIN_NAMESPACE

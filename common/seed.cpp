@@ -23,8 +23,8 @@
  #include <sys/time.h>
 #endif
 
-#include "stxxl/bits/common/seed.h"
-#include "stxxl/bits/common/mutex.h"
+#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/common/mutex.h>
 
 
 __STXXL_BEGIN_NAMESPACE

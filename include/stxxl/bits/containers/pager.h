@@ -13,12 +13,12 @@
 #ifndef STXXL_PAGER_HEADER
 #define STXXL_PAGER_HEADER
 
-#include <stxxl/bits/noncopyable.h>
-#include "stxxl/bits/common/rand.h"
-#include "stxxl/bits/common/simple_vector.h"
-#include <stxxl/bits/compat_auto_ptr.h>
-
 #include <list>
+
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/compat_auto_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE

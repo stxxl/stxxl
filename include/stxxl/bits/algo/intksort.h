@@ -13,7 +13,8 @@
 #ifndef STXXL_INTKSORT_HEADER
 #define STXXL_INTKSORT_HEADER
 
-#include "stxxl/bits/common/utils.h"
+#include <stxxl/bits/common/utils.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

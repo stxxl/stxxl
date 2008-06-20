@@ -14,13 +14,13 @@
 #ifndef STXXL_IOSTATS_HEADER
 #define STXXL_IOSTATS_HEADER
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/common/mutex.h"
-#include "stxxl/bits/common/types.h"
-#include "stxxl/bits/common/utils.h"
-#include "stxxl/bits/noncopyable.h"
-
 #include <iostream>
+
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/noncopyable.h>
 
 
 __STXXL_BEGIN_NAMESPACE

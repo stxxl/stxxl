@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/vector>
-#include "stxxl/bits/mng/buf_ostream.h"
+#include <stxxl/bits/mng/buf_ostream.h>
 
 // efficiently writes data into an stxxl::vector with overlapping of I/O and
 // computation

@@ -13,8 +13,6 @@
 #ifndef STXXL_TIMER_HEADER
 #define STXXL_TIMER_HEADER
 
-#include "stxxl/bits/namespace.h"
-
 #ifdef STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>
  #include <cmath>
@@ -22,6 +20,8 @@
  #include <ctime>
  #include <sys/time.h>
 #endif
+
+#include <stxxl/bits/namespace.h>
 
 
 __STXXL_BEGIN_NAMESPACE

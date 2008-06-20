@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/io/simdisk_file.h"
+#include <stxxl/bits/io/simdisk_file.h>
 
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows

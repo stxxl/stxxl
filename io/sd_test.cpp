@@ -13,9 +13,9 @@
 // Tests sim_disk file implementation
 // must be run on in-memory swap partition !
 
-#include "stxxl/io"
-#include "stxxl/random"
 #include <cmath>
+#include <stxxl/io>
+#include <stxxl/random>
 
 using stxxl::file;
 using stxxl::stxxl_timestamp;

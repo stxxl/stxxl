@@ -17,6 +17,7 @@
 //! Volume 38, Issue 6, Pages 589-637, May 2008
 //! DOI: 10.1002/spe.844
 
+
 #include <stxxl/vector>
 #include <stxxl/map>
 #include <stxxl/timer>
@@ -43,10 +44,10 @@
 #define LEAF_BLOCK_SIZE         (32 * 1024)
 
 #define TOTAL_CACHE_SIZE        (750 * 1024 * 1024)
-//#define TOTAL_CACHE_SIZE      (150*1024*1024)
+//#define TOTAL_CACHE_SIZE      (150 * 1024 * 1024)
 
-//#define NODE_CACHE_SIZE       (1*(TOTAL_CACHE_SIZE/40))
-//#define LEAF_CACHE_SIZE       (39*(TOTAL_CACHE_SIZE/40))
+//#define NODE_CACHE_SIZE       (1 * (TOTAL_CACHE_SIZE / 40))
+//#define LEAF_CACHE_SIZE       (39 * (TOTAL_CACHE_SIZE / 40))
 
 #define NODE_CACHE_SIZE         (64 * 1024 * 1024)
 #define LEAF_CACHE_SIZE         (TOTAL_CACHE_SIZE - NODE_CACHE_SIZE)
@@ -56,8 +57,8 @@
 
 #define SCAN_LIMIT(x)   (x)
 
-#define BDB_FILE "/data3/bdb_file"
-//#define BDB_FILE "/var/tmp/bdb_file"
+//#define BDB_FILE "/data3/bdb_file"
+#define BDB_FILE "/var/tmp/bdb_file"
 
 
 // BDB settings

@@ -13,11 +13,12 @@
 #ifndef STXXL_MALLOC_H
 #define STXXL_MALLOC_H
 
-#include "stxxl/bits/namespace.h"
-
 #include <ostream>
 #include <malloc.h>
 #include <cstdlib>
+
+#include <stxxl/bits/namespace.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

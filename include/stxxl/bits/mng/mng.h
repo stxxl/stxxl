@@ -15,12 +15,6 @@
 #ifndef STXXL_MNG_HEADER
 #define STXXL_MNG_HEADER
 
-#include "stxxl/io"
-#include <stxxl/bits/noncopyable.h>
-#include "stxxl/bits/common/rand.h"
-#include "stxxl/bits/common/aligned_alloc.h"
-#include "stxxl/bits/common/debug.h"
-
 #include <memory>
 #include <iostream>
 #include <fstream>
@@ -38,6 +32,12 @@
 #ifdef BOOST_MSVC
 #include <memory.h>
 #endif
+
+#include <stxxl/io>
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/common/aligned_alloc.h>
+#include <stxxl/bits/common/debug.h>
 
 
 __STXXL_BEGIN_NAMESPACE

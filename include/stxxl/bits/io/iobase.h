@@ -90,14 +90,14 @@
 #endif
 
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/io/iostats.h"
-#include "stxxl/bits/common/semaphore.h"
-#include "stxxl/bits/common/mutex.h"
-#include "stxxl/bits/common/switch.h"
-#include "stxxl/bits/common/state.h"
-#include "stxxl/bits/common/exceptions.h"
-#include "stxxl/bits/io/completion_handler.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/common/semaphore.h>
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/switch.h>
+#include <stxxl/bits/common/state.h>
+#include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/io/completion_handler.h>
 
 
 __STXXL_BEGIN_NAMESPACE

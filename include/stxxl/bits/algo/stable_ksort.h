@@ -19,11 +19,11 @@
 
 #include <cmath>
 
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/mng/buf_istream.h"
-#include "stxxl/bits/mng/buf_ostream.h"
-#include "stxxl/bits/common/simple_vector.h"
-#include "stxxl/bits/algo/intksort.h"
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/buf_istream.h>
+#include <stxxl/bits/mng/buf_ostream.h>
+#include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/algo/intksort.h>
 
 
 __STXXL_BEGIN_NAMESPACE

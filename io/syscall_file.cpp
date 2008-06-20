@@ -10,7 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/io/syscall_file.h"
+#include <stxxl/bits/io/syscall_file.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

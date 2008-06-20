@@ -13,7 +13,7 @@
 #ifndef STXXL_RUN_CURSOR_HEADER
 #define STXXL_RUN_CURSOR_HEADER
 
-#include "stxxl/bits/common/utils.h"
+#include <stxxl/bits/common/utils.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -11,8 +11,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/io/iostats.h"
-#include "stxxl/bits/common/utils.h"
+#include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/common/utils.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -16,7 +16,7 @@
 
 #include <iterator>
 
-#include "stxxl/bits/common/types.h"
+#include <stxxl/bits/common/types.h>
 
 
 __STXXL_BEGIN_NAMESPACE

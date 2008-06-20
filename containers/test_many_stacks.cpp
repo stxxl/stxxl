@@ -16,7 +16,8 @@
 //! with \c stxxl::grow_shrink_stack implementation, \b four blocks per page,
 //! block size \b 4096 bytes
 
-#include "stxxl/stack"
+
+#include <stxxl/stack>
 
 
 int main(int argc, char * argv[])

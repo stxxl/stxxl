@@ -13,8 +13,8 @@
 #ifndef STXXL_ALGO_ADAPTOR_HEADER
 #define STXXL_ALGO_ADAPTOR_HEADER
 
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/mng/adaptor.h"
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/adaptor.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -10,10 +10,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/scan"
+#include <stxxl/scan>
 
-#include "stxxl/sort"
-#include "stxxl/ksort"
-#include "stxxl/stable_ksort"
+#include <stxxl/sort>
+#include <stxxl/ksort>
+#include <stxxl/stable_ksort>
 
-#include "stxxl/bits/algo/random_shuffle.h"
+#include <stxxl/bits/algo/random_shuffle.h>

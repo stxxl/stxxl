@@ -13,15 +13,15 @@
 #ifndef STXXL_STATE_HEADER
 #define STXXL_STATE_HEADER
 
-#include <stxxl/bits/noncopyable.h>
-#include "stxxl/bits/common/utils.h"
-
 #ifdef STXXL_BOOST_THREADS
  #include <boost/thread/mutex.hpp>
  #include <boost/thread/condition.hpp>
 #else
  #include <pthread.h>
 #endif
+
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/common/utils.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -26,6 +26,7 @@
 
 #include <stxxl/bits/namespace.h>
 
+
 __STXXL_BEGIN_NAMESPACE
 
 template <class _Key>

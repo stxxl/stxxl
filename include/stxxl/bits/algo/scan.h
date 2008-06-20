@@ -13,9 +13,9 @@
 #ifndef STXXL_SCAN_HEADER
 #define STXXL_SCAN_HEADER
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/mng/buf_istream.h"
-#include "stxxl/bits/mng/buf_ostream.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/mng/buf_istream.h>
+#include <stxxl/bits/mng/buf_ostream.h>
 
 
 __STXXL_BEGIN_NAMESPACE

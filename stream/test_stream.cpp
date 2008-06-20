@@ -15,9 +15,9 @@
 //! stream package. The example sorts characters of a string producing an
 //! array of sorted tuples (character, index position).
 
-#include "stxxl/stream"
-#include "stxxl/vector"
 #include <vector>
+#include <stxxl/stream>
+#include <stxxl/vector>
 
 
 #define USE_FORMRUNS_N_MERGE    // comment if you want to use one 'sort' algorithm

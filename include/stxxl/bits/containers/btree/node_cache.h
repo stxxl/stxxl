@@ -19,10 +19,10 @@
 
 #include <stxxl/bits/compat_hash_map.h>
 
-#include "stxxl/bits/io/iobase.h"
-#include "stxxl/bits/mng/mng.h"
+#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/mng/mng.h>
 
-#include "stxxl/bits/containers/btree/btree_pager.h"
+#include <stxxl/bits/containers/btree/btree_pager.h>
 
 
 __STXXL_BEGIN_NAMESPACE

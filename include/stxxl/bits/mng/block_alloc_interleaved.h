@@ -14,10 +14,10 @@
 #ifndef STXXL_INTERLEAVED_ALLOC_HEADER
 #define STXXL_INTERLEAVED_ALLOC_HEADER
 
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/common/rand.h"
-
 #include <vector>
+
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/common/rand.h>
 
 
 __STXXL_BEGIN_NAMESPACE

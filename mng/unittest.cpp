@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <iostream>
-#include "stxxl.h"
+#include <stxxl.h>
 
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/extensions/HelperMacros.h>

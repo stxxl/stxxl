@@ -16,7 +16,7 @@
 #include <memory>
 #include <list>
 
-#include "stxxl/bits/common/utils.h"
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/compat_auto_ptr.h>
 
 

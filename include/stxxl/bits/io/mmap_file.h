@@ -13,8 +13,6 @@
 #ifndef STXXL_MMAP_FILE_HEADER
 #define STXXL_MMAP_FILE_HEADER
 
-#include "stxxl/bits/io/ufs_file.h"
-
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
@@ -22,7 +20,10 @@
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
 
- #include <sys/mman.h>
+#include <sys/mman.h>
+
+#include <stxxl/bits/io/ufs_file.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl.h"
+#include <stxxl.h>
 
 
 template <typename T>

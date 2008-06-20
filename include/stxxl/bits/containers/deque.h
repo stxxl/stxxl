@@ -13,7 +13,7 @@
 #ifndef _STXXL_DEQUE_H
 #define _STXXL_DEQUE_H
 
-#include "stxxl/vector"
+#include <stxxl/vector>
 
 
 __STXXL_BEGIN_NAMESPACE

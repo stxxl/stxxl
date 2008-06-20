@@ -18,7 +18,8 @@
 #ifndef STXXL_SETTINGS_HEADER
 #define STXXL_SETTINGS_HEADER
 
-#include "stxxl/bits/namespace.h"
+#include <stxxl/bits/namespace.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

@@ -14,7 +14,7 @@
 #define STXXL_MAP_HEADER
 
 #include <stxxl/bits/noncopyable.h>
-#include "stxxl/bits/containers/btree/btree.h"
+#include <stxxl/bits/containers/btree/btree.h>
 
 
 __STXXL_BEGIN_NAMESPACE

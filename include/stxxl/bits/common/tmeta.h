@@ -16,8 +16,8 @@
 #ifndef STXXL_META_TEMPLATE_PROGRAMMING
 #define STXXL_META_TEMPLATE_PROGRAMMING
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/common/types.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/types.h>
 
 
 __STXXL_BEGIN_NAMESPACE

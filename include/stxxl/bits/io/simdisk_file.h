@@ -13,10 +13,6 @@
 #ifndef STXXL_SIMDISK_FILE_HEADER
 #define STXXL_SIMDISK_FILE_HEADER
 
-#include "stxxl/bits/io/ufs_file.h"
-
-#include <cmath>
-
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
@@ -24,7 +20,11 @@
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
 
- #include <sys/mman.h>
+#include <cmath>
+#include <sys/mman.h>
+
+#include <stxxl/bits/io/ufs_file.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

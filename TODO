@@ -3,9 +3,6 @@
 * There is currently no support for Boost libraries (not headers) in a user
   specified location.
 
-* BUG (Windows): timer::timestamp() is non-monotonic,
-  boost::posix_time::microsec_clock::local_time().time_of_day() resets on midnight
-
 * g++ 4.3 parallel_mode support
   => Milestone: 1.2.1
 
@@ -23,8 +20,6 @@
 * new types: stxxl::size_type_internal stxxl::size_type_external
 
 * stxxl_timestamp ==> stxxl::timestamp
-
-* Use #include <foo> instead of #include "foo"? At least use one format consistently.
 
 * integrate unordered_map branch
   => Milestone: 1.3

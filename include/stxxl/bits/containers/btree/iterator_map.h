@@ -13,10 +13,10 @@
 #ifndef STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 #define STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
 
-#include "stxxl/bits/noncopyable.h"
-#include "stxxl/bits/containers/btree/iterator.h"
-
 #include <map>
+
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/containers/btree/iterator.h>
 
 
 __STXXL_BEGIN_NAMESPACE

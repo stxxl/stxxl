@@ -13,7 +13,7 @@
 #ifndef STXXL_CONTAINERS_BTREE__ROOT_NODE_H
 #define STXXL_CONTAINERS_BTREE__ROOT_NODE_H
 
-#include "stxxl/bits/namespace.h"
+#include <stxxl/bits/namespace.h>
 
 
 __STXXL_BEGIN_NAMESPACE

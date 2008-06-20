@@ -11,8 +11,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/mng"
-#include "stxxl/bits/version.h"
+#include <stxxl/mng>
+#include <stxxl/bits/version.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 

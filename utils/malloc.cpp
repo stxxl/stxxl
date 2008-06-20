@@ -15,7 +15,7 @@
 #include <malloc.h>
 #endif
 #include <cstdlib>
-#include "stxxl/bits/common/utils.h"
+#include <stxxl/bits/common/utils.h>
 
 using std::cin;
 using std::cout;
