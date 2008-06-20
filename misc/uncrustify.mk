@@ -2,6 +2,7 @@ SUBDIRS		+= .
 SUBDIRS		+= include include/stxxl include/stxxl/bits
 SUBDIRS		+= $(foreach d, algo common containers containers/btree io mng stream utils, include/stxxl/bits/$d)
 SUBDIRS		+= algo common containers containers/btree io mng stream utils
+SUBDIRS		+= doc/tutorial/examples
 
 FILES_IGNORE	:= ./doxymain.h
 FILES		:= $(filter-out $(FILES_IGNORE),$(wildcard $(foreach d, $(SUBDIRS), $d/*.h $d/*.cpp)))
