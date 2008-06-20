@@ -6,7 +6,7 @@ main: library
 
 include make.settings
 
-SUBDIRS	= algo common containers io lib mng stream utils
+SUBDIRS	= common io mng containers algo stream lib utils
 
 SUBDIRS-lib: $(SUBDIRS:%=lib-in-%)
 SUBDIRS-tests: $(SUBDIRS:%=tests-in-%)
