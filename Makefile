@@ -1,6 +1,21 @@
 # This -*- Makefile -*- gets processed with both GNU make and nmake.
 # So keep it simple and compatible.
 
+############################################################################
+#  Makefile
+#
+#  Part of the STXXL. See http://stxxl.sourceforge.net
+#
+#  Copyright (C) 2002-2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+#  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
+#  Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
+
+
 usage:
 	@echo "Choose one of the goals:"
 	@echo "    config_gnu"

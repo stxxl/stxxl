@@ -1,5 +1,20 @@
 # This -*- Makefile -*- is intended for processing with nmake.
 
+############################################################################
+#  make.settings.msvc
+#
+#  Part of the STXXL. See http://stxxl.sourceforge.net
+#
+#  Copyright (C) 2005-2008 Roman Dementiev <dementiev@ira.uka.de>
+#  Copyright (C) 2006-2008 Johannes Singler <singler@ira.uka.de>
+#  Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
+
+
 # Change this file according to your paths.
 
 # change this path, do not leave spaces at the end of the line 
