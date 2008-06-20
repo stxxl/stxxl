@@ -1,10 +1,14 @@
 /***************************************************************************
- *            test_corr_insert_scan.cpp
+ *  containers/btree/test_corr_insert_scan.cpp
  *
- *  Tue Feb 21 11:52:14 2006
- *  Copyright  2006  Roman Dementiev
- *  Email
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #include <iostream>
 
