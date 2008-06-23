@@ -72,13 +72,13 @@ clean_g++: settings_gnu
 	$(MAKE) -f Makefile.gnu clean USE_MCSTL=no
 
 clean_g++_mcstl: settings_gnu
-	$(MAKE) -f Makefile.gnu clean USE_MCSTL=yes
+	-$(MAKE) -f Makefile.gnu clean USE_MCSTL=yes
 
 clean_icpc: settings_gnu
 	$(MAKE) -f Makefile.gnu clean USE_MCSTL=no USE_ICPC=yes
 
 clean_icpc_mcstl: settings_gnu
-	$(MAKE) -f Makefile.gnu clean USE_MCSTL=yes USE_ICPC=yes
+	-$(MAKE) -f Makefile.gnu clean USE_MCSTL=yes USE_ICPC=yes
 
 clean_msvc: settings_msvc
 	nmake /F Makefile.msvc clean
