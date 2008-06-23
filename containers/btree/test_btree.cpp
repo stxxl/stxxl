@@ -264,7 +264,7 @@ int main(int argc, char * argv[])
     CBTree3.key_comp();
     CBTree3.value_comp();
 
-    double sum;
+    double sum = 0.0;
 
     STXXL_MSG(*stxxl::stats::get_instance());
 
