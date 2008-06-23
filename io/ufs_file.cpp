@@ -249,9 +249,9 @@ void ufs_file_base::set_size(stxxl::int64 newsize)
 {
     stxxl::int64 cur_size = size();
 
+#ifdef BOOST_MSVC
     if (!(mode_ & RDONLY))
     {
-#ifdef BOOST_MSVC
         HANDLE hfile;
         stxxl_check_ge_0(hfile = (HANDLE) ::_get_osfhandle(file_des), io_error);
 
@@ -265,13 +265,14 @@ void ufs_file_base::set_size(stxxl::int64 newsize)
             if (!SetEndOfFile(hfile))
                 stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
                                          " newsize=" << newsize << " ", io_error);
-#else
-        stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
-#endif
     }
+#else
+    if (!(mode_ & RDONLY))
+        stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
 
     if (newsize > cur_size)
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
+#endif
 }
 
 __STXXL_END_NAMESPACE
