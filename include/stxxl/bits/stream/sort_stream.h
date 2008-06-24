@@ -1361,7 +1361,7 @@ namespace stream
                 {
                     runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, m_ * block_type::raw_size);
 
-                    { // make sure everything is being destroyed in right time
+                    {   // make sure everything is being destroyed in right time
                         buf_ostream<block_type, typename run_type::iterator> out(
                             new_runs.runs[cur_out_run].begin(),
                             nwrite_buffers);

@@ -2058,7 +2058,7 @@ inline const typename priority_queue<Config_>::value_type & priority_queue<Confi
     assert(!insertHeap.empty());
 
     const typename priority_queue<Config_>::value_type & t = insertHeap.top();
-    if ( /*(!insertHeap.empty()) && */ cmp(*minBuffer1, t))
+    if (/*(!insertHeap.empty()) && */ cmp(*minBuffer1, t))
         return t;
 
 
@@ -2071,7 +2071,7 @@ inline void priority_queue<Config_>::pop()
     //STXXL_VERBOSE1("priority_queue::pop()");
     assert(!insertHeap.empty());
 
-    if ( /*(!insertHeap.empty()) && */ cmp(*minBuffer1, insertHeap.top()))
+    if (/*(!insertHeap.empty()) && */ cmp(*minBuffer1, insertHeap.top()))
     {
         insertHeap.pop();
     }
@@ -2419,9 +2419,9 @@ void priority_queue<Config_>::emptyInsertHeap()
     if (freeLevel > 0)
     {
         for (int_type i = freeLevel;  i >= 0;  i--)
-        {                                                 // reverse order not needed
-          // but would allow immediate refill
-
+        {
+            // reverse order not needed
+            // but would allow immediate refill
             newSegment = new value_type[getSize2(i) + 1]; // with sentinel
             std::copy(minBuffer2[i], minBuffer2[i] + getSize2(i) + 1, newSegment);
             itree[0].insert_segment(newSegment, getSize2(i));

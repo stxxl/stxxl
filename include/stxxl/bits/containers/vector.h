@@ -53,8 +53,8 @@ class double_blocked_index
         offset = (pos - block1 * modulo1);
 
         assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
-        assert( /* 0 <= block1 && */ block1 < modulo2);
-        assert( /* 0 <= offset && */ offset < modulo1);
+        assert(/* 0 <= block1 && */ block1 < modulo2);
+        assert(/* 0 <= offset && */ offset < modulo1);
     }
 
 public:
@@ -76,8 +76,8 @@ public:
         pos = block2 * modulo12 + block1 * modulo1 + offset;
 
         assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
-        assert( /* 0 <= block1 && */ block1 < modulo2);
-        assert( /* 0 <= offset && */ offset < modulo1);
+        assert(/* 0 <= block1 && */ block1 < modulo2);
+        assert(/* 0 <= offset && */ offset < modulo1);
     }
 
     double_blocked_index & operator = (unsigned_type pos)
@@ -103,8 +103,8 @@ public:
         }
 
         assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
-        assert( /* 0 <= block1 && */ block1 < modulo2);
-        assert( /* 0 <= offset && */ offset < modulo1);
+        assert(/* 0 <= block1 && */ block1 < modulo2);
+        assert(/* 0 <= offset && */ offset < modulo1);
 
         return *this;
     }
@@ -134,8 +134,8 @@ public:
         --offset;
 
         assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
-        assert( /*0 <= block1 &&*/ block1 < modulo2);
-        assert( /*0 <= offset &&*/ offset < modulo1);
+        assert(/*0 <= block1 &&*/ block1 < modulo2);
+        assert(/*0 <= offset &&*/ offset < modulo1);
 
         return *this;
     }

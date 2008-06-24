@@ -50,8 +50,7 @@ void mmap_request::serve()
 
             error_occured(msg.str());
         }
-        else
-        if (mem == 0)
+        else if (mem == 0)
         {
             stxxl_function_error(io_error)
         }

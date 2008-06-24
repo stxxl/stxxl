@@ -648,8 +648,7 @@ public:
                 //  clean prefetch buffers
             }
         }
-        else
-        if (pref_aggr < new_p)
+        else if (pref_aggr < new_p)
         {
             const int_type bids_size = bids.size();
             const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(new_p), (int_type)0);

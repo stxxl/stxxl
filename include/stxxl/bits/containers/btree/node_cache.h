@@ -36,7 +36,7 @@ namespace btree
     {
         node_cache();
         node_cache(const node_cache &);
-        node_cache & operator =(const node_cache &);
+        node_cache & operator = (const node_cache &);
 
     public:
         typedef BTreeType btree_type;
@@ -49,7 +49,6 @@ namespace btree
         typedef stxxl::btree::lru_pager pager_type;
 
     private:
-
         btree_type * btree_;
         key_compare comp_;
 
@@ -65,16 +64,16 @@ namespace btree
 
         struct bid_hash
         {
-            size_t operator() (const bid_type & bid) const
+            size_t operator () (const bid_type & bid) const
             {
                 size_t result =
                     longhash1(bid.offset + uint64(unsigned_type(bid.storage)));
                 return result;
             }
 #ifdef BOOST_MSVC
-            bool operator ()  (const bid_type & a, const bid_type & b) const
+            bool operator () (const bid_type & a, const bid_type & b) const
             {
-                return (a.storage < b.storage) || ( a.storage == b.storage && a.offset < b.offset);
+                return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);
             }
             enum
             {                                   // parameters for hash table
@@ -89,7 +88,7 @@ namespace btree
         std::vector<bool> fixed_;
         std::vector<bool> dirty_;
         std::vector<int_type> free_nodes_;
-        typedef typename compat_hash_map< bid_type, int_type, bid_hash >::result hash_map_type;
+        typedef typename compat_hash_map<bid_type, int_type, bid_hash>::result hash_map_type;
 
         //typedef std::map<bid_type,int_type,bid_comp> BID2node_type;
         typedef hash_map_type BID2node_type;
@@ -118,10 +117,10 @@ namespace btree
         }
 
     public:
-        node_cache(     unsigned_type cache_size_in_bytes,
-                        btree_type * btree__,
-                        key_compare comp__
-        ) :
+        node_cache(unsigned_type cache_size_in_bytes,
+                   btree_type * btree__,
+                   key_compare comp__
+                   ) :
             btree_(btree__),
             comp_(comp__),
             bm(block_manager::get_instance()),
@@ -205,7 +204,7 @@ namespace btree
                 {
                     ++i;
                     node2kick = pager_.kick();
-                    if (i == max_tries )
+                    if (i == max_tries)
                     {
                         STXXL_ERRMSG(
                             "The node cache is too small, no node can be kicked out (all nodes are fixed) !");
@@ -235,7 +234,7 @@ namespace btree
 
                 assert(BID2node_.find(Node.my_bid()) != BID2node_.end());
                 BID2node_.erase(Node.my_bid());
-                bm-> new_blocks<block_type>(1, alloc_strategy_, &new_bid);
+                bm->new_blocks<block_type>(1, alloc_strategy_, &new_bid);
 
                 BID2node_[new_bid] = node2kick;
 
@@ -272,7 +271,6 @@ namespace btree
 
             return &Node;
         }
-
 
 
         node_type * get_node(const bid_type & bid, bool fix = false)
@@ -333,7 +331,6 @@ namespace btree
                 }
                 else
                     ++n_clean_forced;
-
 
 
                 BID2node_.erase(Node.my_bid());
@@ -538,7 +535,6 @@ namespace btree
                     ++n_clean_forced;
 
 
-
                 BID2node_.erase(Node.my_bid());
 
                 reqs_[node2kick] = Node.prefetch(bid);
@@ -579,8 +575,8 @@ namespace btree
         void unfix_node(const bid_type & bid)
         {
             assert(BID2node_.find(bid) != BID2node_.end());
-            fixed_[BID2node_[bid] ] = false;
-            STXXL_VERBOSE1("btree::node_cache unfix_node,  node " << BID2node_[bid] );
+            fixed_[BID2node_[bid]] = false;
+            STXXL_VERBOSE1("btree::node_cache unfix_node,  node " << BID2node_[bid]);
         }
 
         void swap(node_cache & obj)
@@ -608,7 +604,7 @@ namespace btree
         {
             if (n_read)
                 o << "Found blocks                      : " << n_found << " (" <<
-                100. * double (n_found) / double (n_read) << "%)" << std::endl;
+                100. * double(n_found) / double(n_read) << "%)" << std::endl;
 
             else
                 o << "Found blocks                      : " << n_found << " (" <<
@@ -640,8 +636,8 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class NodeType, class BTreeType>
-    void swap(stxxl::btree::node_cache < NodeType, BTreeType > & a,
-              stxxl::btree::node_cache<NodeType, BTreeType> & b )
+    void swap(stxxl::btree::node_cache<NodeType, BTreeType> & a,
+              stxxl::btree::node_cache<NodeType, BTreeType> & b)
     {
         a.swap(b);
     }
