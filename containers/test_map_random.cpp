@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2004, 2005 by Thomas Nowak <t.nowak@imail.de>
+ *  Copyright (C) 2004, 2005 Thomas Nowak <t.nowak@imail.de>
  *  Copyright (C) 2005, 2006 Roman Dementiev <dementiev@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.

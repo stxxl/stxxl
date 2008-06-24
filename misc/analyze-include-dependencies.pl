@@ -2,7 +2,7 @@
 #
 # A tool to analyze #include dependencies and find unwanted cycles.
 #
-# Copyright (C) 2007-2008 by Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+# Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at
