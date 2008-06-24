@@ -121,13 +121,13 @@ $(warning *** WARNING: trying autoconfiguration for STXXL_ROOT=$(CURDIR:$(HOME)%
 $(warning *** WARNING: you did not have a make.settings.local file -- creating ...)
 $(shell echo 'STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
 MCSTL_ROOT	?= $(HOME)/work/mcstl
-$(shell echo '#MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
-$(shell echo '#COMPILER_GCC	 = g++-4.2.3' >> $(CURDIR)/make.settings.local)
-$(shell echo '#COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
+$(shell echo -e '\043MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
+$(shell echo -e '\043COMPILER_GCC	 = g++-4.2.3' >> $(CURDIR)/make.settings.local)
+$(shell echo -e '\043COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
 ifeq (Darwin,$(strip $(shell uname)))
-$(shell echo 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
+$(shell echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
 else
-$(shell echo '#USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
+$(shell echo -e '\043USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
 endif
 $(error ERROR: Please check make.settings.local and try again)
 endif
