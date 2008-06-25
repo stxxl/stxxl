@@ -1,9 +1,20 @@
+############################################################################
+#  misc/iostat-plot.mk
+#
+#  Part of the STXXL. See http://stxxl.sourceforge.net
+#
+#  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
 
 #
 # to record the data, include this file from your Makefile
 # and use a target like
 #
-# my_results.txt:
+# my_results.out:
 #	$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.out=) \
 #	my_program arg1 ... argn > $@
 #
