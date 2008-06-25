@@ -3,7 +3,7 @@ include Makefile.common
 
 all: create
 
-TESTS		+= $(TESTS_EXTRA)
+TESTS		+= $(TESTS_NON_MSVC)
 
 include $(TOPDIR)/Makefile.subdir.gnu
 
