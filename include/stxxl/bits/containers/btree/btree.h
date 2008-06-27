@@ -298,14 +298,25 @@ namespace btree
                 ++b;
             }
 
-            // balance the last leaf
+            // rebalance the last leaf
             if (Leaf->underflows() && !Bids.empty())
             {
                 leaf_type * LeftLeaf = leaf_cache_.get_node((leaf_bid_type)(Bids.back().second));
                 assert(LeftLeaf);
-                const key_type NewSplitter = Leaf->balance(*LeftLeaf);
-                Bids.back().first = NewSplitter;
-                assert(!LeftLeaf->overflows() && !LeftLeaf->underflows());
+                if(LeftLeaf->size() + Leaf->size() <= Leaf->max_nelements()) // can fuse
+                {
+                    Leaf->fuse(*LeftLeaf);
+                    leaf_cache_.delete_node((leaf_bid_type)(Bids.back().second));
+                    Bids.pop_back();
+                    assert(!Leaf->overflows() && !Leaf->underflows());
+                }
+                else
+                {
+                    // need to rebalance
+                    const key_type NewSplitter = Leaf->balance(*LeftLeaf);
+                    Bids.back().first = NewSplitter;
+                    assert(!LeftLeaf->overflows() && !LeftLeaf->underflows());
+                }
             }
 
             assert(!Leaf->overflows() && (!Leaf->underflows() || size_ <= max_leaf_size));
