@@ -145,7 +145,7 @@ int main(int argc, char * argv[])
     if (argc < 8)
     {
         STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MB to sort> <MB to use> <alloc_strategy> <blk_size> <prefetch_buffers> <opt_pref_b> <seed>");
+                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..10]> <prefetch_buffers> <opt_pref_b> <seed>");
         return -1;
     }
 

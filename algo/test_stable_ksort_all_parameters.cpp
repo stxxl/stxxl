@@ -126,7 +126,7 @@ int main(int argc, char * argv[])
     if (argc < 6)
     {
         STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MB to sort> <MB to use> <alloc_strategy> <blk_size> <seed>");
+                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..10]> <seed>");
         return -1;
     }
 
