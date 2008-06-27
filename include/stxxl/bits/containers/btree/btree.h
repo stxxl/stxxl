@@ -354,12 +354,21 @@ namespace btree
                     {
                         assert(it == Bids.end());                       // this can happen only at the end
                         assert(!ParentBids.empty());
-                        // TODO
+                        
                         node_type * LeftNode = node_cache_.get_node(ParentBids.back().second);
                         assert(LeftNode);
-                        const key_type NewSplitter = Node->balance(*LeftNode);
-                        ParentBids.back().first = NewSplitter;
-                        assert(!LeftNode->overflows() && !LeftNode->underflows());
+                        if(LeftNode->size() + Node->size() <= Node->max_nelements()) // can fuse
+                        {
+                            Node->fuse(*LeftNode);
+                            node_cache_.delete_node(ParentBids.back().second);
+                            ParentBids.pop_back();
+                        }
+                        else
+                        {   // need to rebalance
+                            const key_type NewSplitter = Node->balance(*LeftNode);
+                            ParentBids.back().first = NewSplitter;
+                            assert(!LeftNode->overflows() && !LeftNode->underflows());
+                        }
                     }
                     assert(!Node->overflows() && !Node->underflows());
 
