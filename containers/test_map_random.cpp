@@ -98,7 +98,7 @@ int main(int argc, char * argv[])
     {
         STXXL_MSG("Usage: " << argv[0] << " STEP ");
         STXXL_MSG("Note, that STEP must be > 1000");
-        return 0;
+        return 1;
     }
     stxxl::uint64 MAX_STEP = atoi(argv[1]);
     assert(MAX_STEP > 1000);

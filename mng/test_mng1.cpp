@@ -32,5 +32,5 @@ int main()
     }
     stxxl::wait_all(requests.begin(), requests.end());
     bm->delete_blocks(bids.begin(), bids.end());
-    return 1;
+    return 0;
 }
