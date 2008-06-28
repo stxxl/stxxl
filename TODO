@@ -29,3 +29,6 @@
 * interleaved_allocators: provide a constructor that takes a base strategy
   as parameter, not a disk range, and derive desired information from the
   strategy
+
+* implement recursion in stable_ksort and do not assume random key distribution, do sampling instead
+
