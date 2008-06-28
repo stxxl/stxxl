@@ -1118,6 +1118,12 @@ namespace stream
                 STXXL_ERRMSG("or increase the amount memory dedicated to the merger.");
                 STXXL_ERRMSG("m = " << m_ << " nruns=" << nruns);
 
+                // insufficient memory, can not merge at all
+                if (m_ < 2) {
+                    STXXL_ERRMSG("The merger requires memory to store at least two blocks internally. Aborting.");
+                    abort();
+                }
+
                 merge_recursively();
 
                 nruns = sruns.runs.size();
@@ -1549,3 +1555,4 @@ void sort(RandomAccessIterator begin,
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_SORT_STREAM_HEADER
+// vim: et:ts=4:sw=4
