@@ -14,8 +14,13 @@
 #include <stxxl/deque>
 
 
-int main()
+int main(int argc, char * argv[])
 {
+    if (argc != 2) {
+        STXXL_MSG("Usage: " << argv[0] << " #ops");
+        return -1;
+    }
+
     stxxl::deque<int> Deque;
 
     stxxl::deque<int>::const_iterator b = Deque.begin();
@@ -33,9 +38,8 @@ int main()
     stxxl::deque<int> XXLDeque;
     std::deque<int> STDDeque;
 
-    STXXL_MSG("Press Ctrl-C to stop the test.");
-    stxxl::int64 ops = 0;
-    while (1)
+    stxxl::int64 ops = stxxl::atoint64(argv[1]);
+    for (stxxl::int64 i = 0; i < ops; ++i)
     {
         unsigned curOP = rand() % 6;
         unsigned value = rand();
@@ -93,12 +97,11 @@ int main()
             assert(XXLDeque.front() == STDDeque.front());
         }
 
-        if (!(ops % 100000))
+        if (!(i % 100000))
         {
             assert(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin()));
-            STXXL_MSG("Operations done: " << ops << " size: " << STDDeque.size());
+            STXXL_MSG("Operations done: " << i << " size: " << STDDeque.size());
         }
-        ++ops;
     }
 
     return 0;
