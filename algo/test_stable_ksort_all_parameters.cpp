@@ -10,15 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//#define PLAY_WITH_OPT_PREF
+
 #include <stxxl/mng>
 #include <stxxl/stable_ksort>
 #include <stxxl/vector>
 #include <stxxl/random>
-
-
-//#define COUNT_WAIT_TIME
-
-// #define PLAY_WITH_OPT_PREF
 
 
 #ifndef RECORD_SIZE

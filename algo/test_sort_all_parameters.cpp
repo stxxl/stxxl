@@ -10,18 +10,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//#define PLAY_WITH_OPT_PREF
+
 #include <stxxl/mng>
 #include <stxxl/sort>
 #include <stxxl/scan>
 #include <stxxl/vector>
 #include <stxxl/random>
-
-
-//#define COUNT_WAIT_TIME
-
-//#define PLAY_WITH_OPT_PREF
-
-int n_prefetch_buffers;
 
 
 #ifndef RECORD_SIZE
@@ -100,7 +95,6 @@ void test(stxxl::int64 records_to_sort, unsigned memory_to_use, unsigned n_prefe
     STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ");
     STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KB");
     STXXL_MSG("Prefetch buffers " << n_prefetch_blocks << " = " << (double(n_prefetch_blocks) / ndisks) << "*D");
-    n_prefetch_buffers = n_prefetch_blocks;
     const int n_write_blocks = STXXL_MAX(2 * ndisks,
                                          int(memory_to_use / vector_type::block_type::raw_size) -
                                          int(2 * (records_to_sort * sizeof(my_type)) / memory_to_use) - n_prefetch_blocks);
