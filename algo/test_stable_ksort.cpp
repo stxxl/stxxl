@@ -21,7 +21,7 @@
 
 struct my_type
 {
-    typedef unsigned long key_type;
+    typedef unsigned key_type;
 
     key_type _key;
     char _data[128 - sizeof(key_type)];
@@ -58,7 +58,7 @@ int main()
     stxxl::random_number32 rnd;
     STXXL_MSG("Filling vector... " << rnd() << " " << rnd() << " " << rnd());
     for (vector_type::size_type i = 0; i < v.size(); i++)
-        v[i]._key = rnd();
+        v[i]._key = (rnd()/2)*2;
 
 
     STXXL_MSG("Checking order...");
