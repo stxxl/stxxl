@@ -94,7 +94,7 @@ int main(int argc, char * argv[])
     if (argc < 3)
     {
         STXXL_MSG("Usage: " << argv[0] << " filesize_in_MB filename1 [filename2 [filename3 ...]]");
-        return 0;
+        return -1;
     }
 
     stxxl::int64 offset = 0;

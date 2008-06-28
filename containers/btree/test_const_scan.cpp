@@ -84,7 +84,7 @@ int main(int argc, char * argv[])
     if (argc < 2)
     {
         STXXL_MSG("Usage: " << argv[0] << " #ins");
-        return 1;
+        return -1;
     }
 
     const unsigned nins = atoi(argv[1]);

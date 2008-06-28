@@ -104,7 +104,7 @@ int main(int argc, char * argv[])
         std::cout << "Usage: " << argv[0] << " offset length diskfile..." << std::endl;
         std::cout << "    starting 'offset' and 'length' are given in GB" << std::endl;
         std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
-        return 0;
+        return -1;
     }
 
     stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));

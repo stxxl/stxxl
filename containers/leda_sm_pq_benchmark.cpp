@@ -228,7 +228,7 @@ int main(int argc, char * argv[])
         STXXL_MSG("Usage: " << argv[0] << " version #ops");
         STXXL_MSG("\t version = 1: insert-all-delete-all leda-sm pqueue");
         STXXL_MSG("\t version = 2: insert-all-delete-all leda-sm pqueue");
-        return 0;
+        return -1;
     }
 
     int version = atoi(argv[1]);

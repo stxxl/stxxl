@@ -27,7 +27,7 @@ int main(int argc, char * argv[])
     if (argc < 2)
     {
         STXXL_MSG("Usage: " << argv[0] << " test_size_in_pages");
-        abort();
+        return -1;
     }
     {
         ext_stack_type my_stack;

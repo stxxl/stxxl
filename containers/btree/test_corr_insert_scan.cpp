@@ -57,7 +57,7 @@ int main(int argc, char * argv[])
     if (argc < 2)
     {
         STXXL_MSG("Usage: " << argv[0] << " #log_ins");
-        return 1;
+        return -1;
     }
 
     btree_type BTree(1024 * 128, 1024 * 128);

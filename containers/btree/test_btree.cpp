@@ -42,7 +42,7 @@ int main(int argc, char * argv[])
     if (argc < 2)
     {
         STXXL_MSG("Usage: " << argv[0] << " #ins");
-        return 1;
+        return -1;
     }
 
     btree_type BTree1(node_cache_size, leaf_cache_size);

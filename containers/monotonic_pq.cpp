@@ -133,7 +133,7 @@ int main(int argc, char * argv[])
     if (argc < 3)
     {
         std::cout << "Usage: " << argv[0] << " [n in megabytes] [p threads]" << std::endl;
-        exit(1);
+        return -1;
     }
 
     STXXL_MSG("----------------------------------------")

@@ -144,7 +144,7 @@ int main(int argc, char * argv[])
         STXXL_MSG("Usage: " << argv[0] << " version #volume");
         STXXL_MSG("\t version = 1: TPIE stack with 4 byte records");
         STXXL_MSG("\t version = 2: TPIE stack with 32 byte records");
-        return 0;
+        return -1;
     }
 
     int version = atoi(argv[1]);

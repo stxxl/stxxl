@@ -26,7 +26,7 @@ int main(int argc, char * argv[])
     if (argc < 3)
     {
         std::cout << "Usage: " << argv[0] << " input_file output_file " << std::endl;
-        return 0;
+        return -1;
     }
 
     unlink(argv[2]);                                            // delete output file

@@ -1268,7 +1268,7 @@ int main(int argc, char * argv[])
         STXXL_MSG("\t version = 3: big test stxxl map");
         STXXL_MSG("\t version = 4: big test Berkeley DB btree");
         STXXL_MSG("\t version = 5: big test TPIE btree");
-        return 0;
+        return -1;
     }
 
     init();
