@@ -22,7 +22,6 @@
 //#define PLAY_WITH_OPT_PREF
 
 int n_prefetch_buffers;
-int n_opt_prefetch_buffers;
 
 
 #ifndef RECORD_SIZE
@@ -102,7 +101,6 @@ void test(stxxl::int64 records_to_sort, unsigned memory_to_use, unsigned n_prefe
     STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KB");
     STXXL_MSG("Prefetch buffers " << n_prefetch_blocks << " = " << (double(n_prefetch_blocks) / ndisks) << "*D");
     n_prefetch_buffers = n_prefetch_blocks;
-    STXXL_MSG("OPT Prefetch buffers " << n_opt_prefetch_buffers << " = " << (double(n_opt_prefetch_buffers) / ndisks) << "*D");
     const int n_write_blocks = STXXL_MAX(2 * ndisks,
                                          int(memory_to_use / vector_type::block_type::raw_size) -
                                          int(2 * (records_to_sort * sizeof(my_type)) / memory_to_use) - n_prefetch_blocks);
@@ -152,10 +150,10 @@ void test_all_strategies(
 
 int main(int argc, char * argv[])
 {
-    if (argc < 8)
+    if (argc < 7)
     {
         STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..10]> <prefetch_buffers> <opt_pref_b> <seed>");
+                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..10]> <prefetch_buffers> <seed>");
         return -1;
     }
 
@@ -164,8 +162,7 @@ int main(int argc, char * argv[])
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);
     int n_prefetch_buffers = atoi(argv[5]);
-    n_opt_prefetch_buffers = atoi(argv[6]);
-    stxxl::ran32State = strtoul(argv[7], NULL, 10);
+    stxxl::ran32State = strtoul(argv[6], NULL, 10);
 
     switch (block_size)
     {
