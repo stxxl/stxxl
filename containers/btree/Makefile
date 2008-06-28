@@ -4,7 +4,7 @@ include ../../make.settings
 
 # DEPENDENCIES = $(DEPENDENCIES)  btree.h leaf.h iterator.h iterator_map.h node_cache.h
 
-STXXL_COMPILER_OPTIONS = $(STXXL_COMPILER_OPTIONS) -DSTXXL_VERBOSE_LEVEL=0  /O2 -DNDEBUG 
+STXXL_COMPILER_OPTIONS = $(STXXL_COMPILER_OPTIONS) -DSTXXL_VERBOSE_LEVEL=0
 
 test_const_scan: $(DEPENDENCIES) test_const_scan.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_const_scan.cpp
