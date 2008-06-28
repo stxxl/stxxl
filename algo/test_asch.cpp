@@ -10,9 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/algo/async_schedule.h"
-#include "stxxl/random"
 #include <cstdlib>
+#include <stxxl/bits/algo/async_schedule.h>
+#include <stxxl/random>
 
 // Test async schedule algorithm
 

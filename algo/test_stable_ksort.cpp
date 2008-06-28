@@ -10,13 +10,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/mng"
-#include "stxxl/stable_ksort"
-#include "stxxl/ksort"
-#include "stxxl/vector"
-
 //! \example algo/test_stable_ksort.cpp
 //! This is an example of how to use \c stxxl::ksort() algorithm
+
+#include <stxxl/mng>
+#include <stxxl/stable_ksort>
+#include <stxxl/ksort>
+#include <stxxl/vector>
 
 
 struct my_type

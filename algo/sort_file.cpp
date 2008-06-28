@@ -10,14 +10,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/mng"
-#include "stxxl/ksort"
-#include "stxxl/sort"
-#include "stxxl/vector"
-
 //! \example algo/sort_file.cpp
 //! This example imports a file into an \c stxxl::vector without copying its
 //! content and then sorts it using stxxl::sort.
+
+#include <stxxl/mng>
+#include <stxxl/ksort>
+#include <stxxl/sort>
+#include <stxxl/vector>
 
 
 struct my_type

@@ -10,11 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/mng"
-#include "stxxl/ksort"
-#include "stxxl/vector"
-#include "stxxl/random"
-#include "stxxl/scan"
+#include <stxxl/mng>
+#include <stxxl/ksort>
+#include <stxxl/vector>
+#include <stxxl/random>
+#include <stxxl/scan>
 
 
 // #define PLAY_WITH_OPT_PREF

@@ -10,12 +10,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/mng"
-#include "stxxl/sort"
-#include "stxxl/vector"
-
 //! \example algo/test_sort.cpp
 //! This is an example of how to use \c stxxl::sort() algorithm
+
+#include <stxxl/mng>
+#include <stxxl/sort>
+#include <stxxl/vector>
 
 
 #define RECORD_SIZE 8

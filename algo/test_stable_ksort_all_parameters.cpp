@@ -10,10 +10,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/mng"
-#include "stxxl/stable_ksort"
-#include "stxxl/vector"
-#include "stxxl/random"
+#include <stxxl/mng>
+#include <stxxl/stable_ksort>
+#include <stxxl/vector>
+#include <stxxl/random>
 
 
 //#define COUNT_WAIT_TIME

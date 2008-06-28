@@ -11,11 +11,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/bits/algo/random_shuffle.h"
-
-
 //! \example algo/test_random_shuffle.cpp
-//! Test \c stxxl_random_shuffle
+//! Test \c stxxl::random_shuffle()
+
+#include <stxxl/bits/algo/random_shuffle.h>
 
 
 template <typename type>

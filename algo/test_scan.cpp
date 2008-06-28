@@ -10,14 +10,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include "stxxl/vector"
-#include "stxxl/scan"
+//! \example algo/test_scan.cpp
+//! This is an example of how to use \c stxxl::for_each() and \c stxxl::find() algorithms
 
 #include <iostream>
 #include <algorithm>
 
-//! \example algo/test_scan.cpp
-//! This is an example of how to use \c stxxl::for_each() and \c stxxl::find() algorithms
+#include <stxxl/vector>
+#include <stxxl/scan>
 
 using stxxl::int64;
 using stxxl::stxxl_timestamp;
