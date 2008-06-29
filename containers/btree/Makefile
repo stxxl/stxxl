@@ -1,6 +1,7 @@
-tests: test_const_scan test_corr_insert_erase test_corr_insert_find test_corr_insert_scan test_btree
-
+include ../Makefile.common
 include ../../make.settings
+
+tests: $(TESTS_BTREE)
 
 # DEPENDENCIES = $(DEPENDENCIES)  btree.h leaf.h iterator.h iterator_map.h node_cache.h
 

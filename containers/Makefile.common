@@ -3,6 +3,6 @@ TESTS_BDB		 = berkeley_db_benchmark
 TESTS_LEDASM		 = leda_sm_pq_benchmark leda_sm_stack_benchmark
 TESTS_TPIE		 = tpie_stack_benchmark
 TESTS_NON_MSVC		 =
-TESTS_BTREE		 = btree/test_btree btree/test_const_scan btree/test_corr_insert_erase btree/test_corr_insert_find btree/test_corr_insert_scan
+TESTS_BTREE		 = test_btree test_const_scan test_corr_insert_erase test_corr_insert_find test_corr_insert_scan
 
 LIB_SRC			 =
