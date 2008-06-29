@@ -44,11 +44,14 @@
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/timer.h>
 
+
 __STXXL_BEGIN_NAMESPACE
 
 template <typename U>
 inline void UNUSED(const U &)
 { }
+
+////////////////////////////////////////////////////////////////////////////
 
 #define __STXXL_STRING(x) # x
 
@@ -110,6 +113,7 @@ inline void UNUSED(const U &)
  #define STXXL_VERBOSE3(x)
 #endif
 
+////////////////////////////////////////////////////////////////////////////
 
 #ifdef BOOST_MSVC
  #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
@@ -139,7 +143,7 @@ inline void stxxl_util_function_error(const char * func_name, const char * expr 
     throw E(str_.str());
 }
 
- #define stxxl_function_error(exception_type) \
+#define stxxl_function_error(exception_type) \
     stxxl::stxxl_util_function_error<exception_type>(STXXL_PRETTY_FUNCTION_NAME)
 
 template <typename E>
@@ -179,7 +183,7 @@ inline bool helper_check_ne_0(INT res, const char * func_name)
 
 #ifdef BOOST_MSVC
 
-  #define stxxl_win_lasterror_exit(errmsg, exception_type) \
+#define stxxl_win_lasterror_exit(errmsg, exception_type) \
     { \
         TCHAR szBuf[80]; \
         LPVOID lpMsgBuf; \
@@ -200,15 +204,17 @@ inline bool helper_check_ne_0(INT res, const char * func_name)
 
 #endif
 
+////////////////////////////////////////////////////////////////////////////
+
 inline double
 stxxl_timestamp()
 {
     return timestamp();
 }
 
+////////////////////////////////////////////////////////////////////////////
 
-inline
-std::string
+inline std::string
 stxxl_tmpfilename(std::string dir, std::string prefix)
 {
     //STXXL_VERBOSE0(" TMP:"<< dir.c_str() <<":"<< prefix.c_str());
@@ -240,8 +246,9 @@ stxxl_tmpfilename(std::string dir, std::string prefix)
 #endif
 }
 
-inline
-std::vector<std::string>
+////////////////////////////////////////////////////////////////////////////
+
+inline std::vector<std::string>
 split(const std::string & str, const std::string & sep)
 {
     std::vector<std::string> result;
@@ -272,16 +279,27 @@ split(const std::string & str, const std::string & sep)
     return result;
 }
 
+////////////////////////////////////////////////////////////////////////////
+
 #define str2int(str) atoi(str.c_str())
 
-inline
-std::string
-int2str(int i)
+inline std::string int2str(int i)
 {
     char buf[32];
     sprintf(buf, "%d", i);
     return std::string(buf);
 }
+
+inline stxxl::int64 atoint64(const char * s)
+{
+#ifdef BOOST_MSVC
+    return _atoi64(s);
+#else
+    return atoll(s);
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////
 
 #define STXXL_MIN(a, b) ((std::min)(a, b))
 #define STXXL_MAX(a, b) ((std::max)(a, b))
@@ -292,6 +310,7 @@ int2str(int i)
 
 #define log2(x) (log(x) / log(2.))
 
+////////////////////////////////////////////////////////////////////////////
 
 //#define HAVE_BUILTIN_EXPECT
 
@@ -307,6 +326,7 @@ int2str(int i)
  #define UNLIKELY(c)   c
 #endif
 
+////////////////////////////////////////////////////////////////////////////
 
 //#define COUNT_WAIT_TIME
 
@@ -334,6 +354,7 @@ inline double io_wait_time()
 
 #endif
 
+////////////////////////////////////////////////////////////////////////////
 
 inline uint64 longhash1(uint64 key_)
 {
@@ -348,6 +369,7 @@ inline uint64 longhash1(uint64 key_)
     return key_;
 }
 
+////////////////////////////////////////////////////////////////////////////
 
 template <class _ForwardIter>
 bool is_sorted(_ForwardIter __first, _ForwardIter __last)
@@ -380,16 +402,19 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last,
     return true;
 }
 
+////////////////////////////////////////////////////////////////////////////
+
 template <class T>
-void swap_1D_arrays(T * a, T * b, unsigned_type size)
+inline void swap_1D_arrays(T * a, T * b, unsigned_type size)
 {
     for (unsigned_type i = 0; i < size; ++i)
         std::swap(a[i], b[i]);
 }
 
+////////////////////////////////////////////////////////////////////////////
+
 template <class T>
 class new_alloc;
-
 
 template <typename T, typename U>
 struct new_alloc_rebind;
@@ -483,17 +508,20 @@ public:
 
 // return that all specializations of this allocator are interchangeable
 template <class T1, class T2>
-bool operator == (const new_alloc<T1> &,
+inline bool operator == (const new_alloc<T1> &,
                   const new_alloc<T2> &) throw ()
 {
     return true;
 }
+
 template <class T1, class T2>
-bool operator != (const new_alloc<T1> &,
+inline bool operator != (const new_alloc<T1> &,
                   const new_alloc<T2> &) throw ()
 {
     return false;
 }
+
+////////////////////////////////////////////////////////////////////////////
 
 inline unsigned_type sort_memory_usage_factor()
 {
@@ -504,20 +532,13 @@ inline unsigned_type sort_memory_usage_factor()
 #endif
 }
 
+////////////////////////////////////////////////////////////////////////////
+
 #ifdef __MCSTL__
 #define __STXXL_FORCE_SEQUENTIAL , mcstl::sequential_tag()
 #else
 #define __STXXL_FORCE_SEQUENTIAL
 #endif
-
-inline stxxl::int64 atoint64(const char * s)
-{
-#ifdef BOOST_MSVC
-    return _atoi64(s);
-#else
-    return atoll(s);
-#endif
-}
 
 __STXXL_END_NAMESPACE
 
