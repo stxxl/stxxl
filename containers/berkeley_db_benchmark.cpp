@@ -21,6 +21,7 @@
 #include <stxxl/vector>
 #include <stxxl/map>
 #include <stxxl/timer>
+#include <stxxl/stream>
 
 
 ///// BDB header ////////////
@@ -70,7 +71,7 @@ u_int datasize = DATA_SIZE;
 u_int keysize = KEY_SIZE;
 u_int numitems = 0;
 
-char * letters = "abcdefghijklmnopqrstuvwxuz";
+const char * letters = "abcdefghijklmnopqrstuvwxuz";
 
 struct my_key
 {
@@ -207,7 +208,7 @@ inline long long unsigned myrand()
 {
     return (ran32State = (ran32State * 0x5DEECE66DULL + 0xBULL) & 0xFFFFFFFFFFFFULL);
 }
-inline void rand_key(stxxl::int64 pos, my_key & Key)
+inline void rand_key(stxxl::int64 /*pos*/, my_key & Key)
 {
     long long unsigned r = myrand();
     for (int i = 0; i < KEY_SIZE; ++i)
@@ -220,7 +221,7 @@ inline void rand_key(stxxl::int64 pos, my_key & Key)
 
 void run_bdb_btree(stxxl::int64 ops)
 {
-    char * filename = BDB_FILE;
+    const char * filename = BDB_FILE;
 
     my_key key1_storage;
     my_data data1_storage;
@@ -254,7 +255,7 @@ void run_bdb_btree(stxxl::int64 ops)
         stxxl::timer Timer;
         stxxl::int64 n_inserts = ops, n_locates = ops, n_range_queries = ops, n_deletes = ops;
         stxxl::int64 i;
-        comp_type cmp_;
+        //comp_type cmp_;
 
         ran32State = 0xdeadbeef;
 
@@ -412,11 +413,11 @@ void run_stxxl_map(stxxl::int64 ops)
     stxxl::timer Timer;
     stxxl::int64 n_inserts = ops, n_locates = ops, n_range_queries = ops, n_deletes = ops;
     stxxl::int64 i;
-    comp_type cmp_;
+    //comp_type cmp_;
 
     ran32State = 0xdeadbeef;
 
-    stxxl::random_number32 myrand;
+    //stxxl::random_number32 myrand;
 
     STXXL_MSG("Records in map: " << Map.size());
 
@@ -466,7 +467,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
     Timer.start();
 
-    stxxl::int64 n_scanned = 0, skipped_qieries = 0;
+    stxxl::int64 n_scanned = 0; //, skipped_qieries = 0;
 
     for (i = 0; i < n_range_queries; ++i)
     {
@@ -600,11 +601,11 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
     stxxl::timer Timer;
     stxxl::int64 n_inserts = ops, n_locates = ops, n_range_queries = ops, n_deletes = ops;
     stxxl::int64 i;
-    comp_type cmp_;
+    //comp_type cmp_;
 
     ran32State = 0xdeadbeef;
 
-    stxxl::random_number32 myrand;
+    //stxxl::random_number32 myrand;
 
     Timer.start();
 
@@ -707,7 +708,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     Timer.start();
 
-    stxxl::int64 n_scanned = 0, skipped_qieries = 0;
+    stxxl::int64 n_scanned = 0; //, skipped_qieries = 0;
 
     for (i = 0; i < n_range_queries; ++i)
     {
@@ -820,11 +821,11 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     stxxl::timer Timer;
     stxxl::int64 n_inserts = ops, n_locates = ops, n_range_queries = ops, n_deletes = ops;
     stxxl::int64 i;
-    comp_type cmp_;
+    //comp_type cmp_;
 
     ran32State = 0xdeadbeef;
 
-    stxxl::random_number32 myrand;
+    //stxxl::random_number32 myrand;
 
     Timer.start();
 
@@ -928,7 +929,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
     Timer.start();
 
-    stxxl::int64 n_scanned = 0, skipped_qieries = 0;
+    stxxl::int64 n_scanned = 0; //, skipped_qieries = 0;
     MyFilter filter;
 
     for (i = 0; i < n_range_queries; ++i)
@@ -982,7 +983,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
 
 void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
 {
-    char * filename = BDB_FILE;
+    const char * filename = BDB_FILE;
 
     my_key key1_storage;
     my_data data1_storage;
@@ -1007,14 +1008,14 @@ void run_bdb_btree_big(stxxl::int64 n, unsigned ops)
         stxxl::timer Timer;
         stxxl::int64 n_inserts = ops, n_locates = ops, n_range_queries = ops, n_deletes = ops;
         stxxl::int64 i;
-        comp_type cmp_;
+        //comp_type cmp_;
 
         ran32State = 0xdeadbeef;
 
         Timer.start();
 
         vector_type SortedSeq(n);
-        const vector_type & CSortedSeq(SortedSeq);
+        //const vector_type & CSortedSeq(SortedSeq);
         {
             rand_key_gen Gen(n, key1_storage);
             typedef stxxl::stream::sort<rand_key_gen, comp_type> sorter_type;

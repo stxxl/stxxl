@@ -29,7 +29,7 @@
 // Utilities for ASCII output.
 #include <ami_scan_utils.h>
 
-#include <stxxl/bits/common/utils_ledasm.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/timer>
 
 

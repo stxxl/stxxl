@@ -15,15 +15,17 @@ NDEBUG		 = #-DNDEBUG
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
 
-BERKELEY_DB_COMPILE_OPTIONS = -I/usr/local/BerkeleyDB.4.4/include
-BERKELEY_DB_LINK_OPTIONS = -L/usr/local/BerkeleyDB.4.4/lib/ -ldb_cxx
-QUANTIFY = # quantify #-best-effort
+BDB_ROOT			 = /usr/local/BerkeleyDB.4.4
+BERKELEY_DB_COMPILE_OPTIONS	 = -I$(BDB_ROOT)/include
+BERKELEY_DB_LINK_OPTIONS	 = -L$(BDB_ROOT)/lib -ldb_cxx
 
-TPIE_COMPILER_OPTIONS = -I/home/dementiev/projects/tpie_091905/include -DHAVE_CONFIG_H 
-TPIE_LINKER_OPTIONS = -L/home/dementiev/projects/tpie_091905/lib -ltpie -lm
+TPIE_ROOT			 = $(HOME)/projects/tpie_091905
+TPIE_ROOT			 = $(HOME)/work/lib/tpie
+TPIE_COMPILER_OPTIONS		 = -I$(TPIE_ROOT)/include -DHAVE_CONFIG_H -Wno-error
+TPIE_LINKER_OPTIONS		 = -L$(TPIE_ROOT)/lib -ltpie -lm
 
 berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) $(TPIE_COMPILER_OPTIONS) -c berkeley_db_benchmark.cpp $(NDEBUG)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) $(TPIE_COMPILER_OPTIONS) -c -o berkeley_db_benchmark.$(OBJEXT) berkeley_db_benchmark.cpp $(NDEBUG)
 	$(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(BERKELEY_DB_LINK_OPTIONS) $(STXXL_LINKER_OPTIONS) $(TPIE_LINKER_OPTIONS) 
 
 
@@ -53,8 +55,8 @@ leda_sm_pq_benchmark: $(DEPENDENCIES) leda_sm_pq_benchmark.cpp
 
 
 tpie_stack_benchmark: $(DEPENDENCIES) tpie_stack_benchmark.cpp
-	$(COMPILER)  $(TPIE_COMPILER_OPTIONS) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3  -c -o tpie_stack_benchmark.o tpie_stack_benchmark.cpp $(NDEBUG)
-	$(LINKER) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3 tpie_stack_benchmark.o $(TPIE_LINKER_OPTIONS)  -o tpie_stack_benchmark.bin
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(TPIE_COMPILER_OPTIONS) -O3  -c -o tpie_stack_benchmark.$(OBJEXT) tpie_stack_benchmark.cpp $(NDEBUG)
+	$(LINKER) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3 tpie_stack_benchmark.$(OBJEXT) $(STXXL_LINKER_OPTIONS) $(TPIE_LINKER_OPTIONS) -o tpie_stack_benchmark.$(EXEEXT)
 
 leda_sm_stack_benchmark: $(DEPENDENCIES) leda_sm_stack_benchmark.cpp
 	/usr/local/bin/g++-2.95.3 -I/software/LEDA/4.2.1//incl -I/home/dementiev/projects/LEDA-SM-1.3/incl  -fpic -D_LINUX -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -O3 -c leda_sm_stack_benchmark.cpp
