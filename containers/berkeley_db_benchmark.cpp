@@ -125,7 +125,7 @@ struct my_data
 
 my_key min_key, max_key;
 
-struct comp_type
+struct comp_type : std::binary_function<my_key, my_key, bool>
 {
     bool operator () (const my_key & a, const my_key & b) const
     {
