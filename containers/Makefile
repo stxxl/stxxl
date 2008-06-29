@@ -10,6 +10,8 @@ tests: $(TESTS)
 lib: $(LIB_SRC)
 
 
+NDEBUG		 = #-DNDEBUG
+
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
 
@@ -21,12 +23,12 @@ TPIE_COMPILER_OPTIONS = -I/home/dementiev/projects/tpie_091905/include -DHAVE_CO
 TPIE_LINKER_OPTIONS = -L/home/dementiev/projects/tpie_091905/lib -ltpie -lm
 
 berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) $(TPIE_COMPILER_OPTIONS) -c berkeley_db_benchmark.cpp -DNDEBUG
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) $(TPIE_COMPILER_OPTIONS) -c berkeley_db_benchmark.cpp $(NDEBUG)
 	$(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(BERKELEY_DB_LINK_OPTIONS) $(STXXL_LINKER_OPTIONS) $(TPIE_LINKER_OPTIONS) 
 
 
 stack_benchmark: $(DEPENDENCIES) stack_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stack_benchmark.cpp -DNDEBUG
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stack_benchmark.cpp $(NDEBUG)
 	$(LINKER) stack_benchmark.$(OBJEXT) $(OUT)stack_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_iterators: test_iterators.cpp
@@ -38,7 +40,7 @@ test_deque: test_deque.cpp
 	$(LINKER) test_deque.$(OBJEXT) $(OUT)test_deque.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 pq_benchmark: $(DEPENDENCIES) pq_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c pq_benchmark.cpp -DNDEBUG
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c pq_benchmark.cpp $(NDEBUG)
 	$(LINKER) pq_benchmark.$(OBJEXT) $(OUT)pq_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 
@@ -51,7 +53,7 @@ leda_sm_pq_benchmark: $(DEPENDENCIES) leda_sm_pq_benchmark.cpp
 
 
 tpie_stack_benchmark: $(DEPENDENCIES) tpie_stack_benchmark.cpp
-	$(COMPILER)  $(TPIE_COMPILER_OPTIONS) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3  -c -o tpie_stack_benchmark.o tpie_stack_benchmark.cpp -DNDEBUG
+	$(COMPILER)  $(TPIE_COMPILER_OPTIONS) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3  -c -o tpie_stack_benchmark.o tpie_stack_benchmark.cpp $(NDEBUG)
 	$(LINKER) -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O3 tpie_stack_benchmark.o $(TPIE_LINKER_OPTIONS)  -o tpie_stack_benchmark.bin
 
 leda_sm_stack_benchmark: $(DEPENDENCIES) leda_sm_stack_benchmark.cpp
