@@ -1,8 +1,11 @@
 TOPDIR	?= ..
 include Makefile.common
+-include $(TOPDIR)/make.settings.local
 
-#TESTS		+= $(TESTS_LONG_COMPILE)
-TESTS		+= $(TESTS_NON_MSVC)
+ENABLE_LONG_COMPILE		?= no
+
+TESTS-yes			+= $(TESTS_NON_MSVC)
+TESTS-$(ENABLE_LONG_COMPILE)	+= $(TESTS_LONG_COMPILE)
 
 include $(TOPDIR)/Makefile.subdir.gnu
 

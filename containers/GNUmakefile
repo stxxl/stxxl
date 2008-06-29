@@ -1,11 +1,16 @@
 TOPDIR	?= ..
 include Makefile.common
+-include $(TOPDIR)/make.settings.local
 
-#TESTS		+= $(TESTS_BDB)
-#TESTS		+= $(TESTS_LEDASM)
-#TESTS		+= $(TESTS_TPIE)
-TESTS		+= $(TESTS_NON_MSVC)
-TESTS		+= $(TESTS_BTREE)
+ENABLE_BDB			?= no
+ENABLE_LEDASM			?= no
+ENABLE_TPIE			?= no
+
+TESTS-yes			+= $(TESTS_NON_MSVC)
+TESTS-yes			+= $(TESTS_BTREE)
+TESTS-$(ENABLE_BDB)$(ENABLE_TPIE)	+= $(TESTS_BDB)
+TESTS-$(ENABLE_LEDASM)		+= $(TESTS_LEDASM)
+TESTS-$(ENABLE_TPIE)		+= $(TESTS_TPIE)
 
 include $(TOPDIR)/Makefile.subdir.gnu
 
@@ -19,7 +24,7 @@ bench_pqueue.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
 
 
 $(TESTS_BDB:=.$(bin)) $(TESTS_LEDASM:=.$(bin)) $(TESTS_TPIE:=.$(bin)):
-	$(MAKE) -f Makefile $(@:.$(bin)=)
+	$(MAKE) -f Makefile $(@:.$(bin)=) TOPDIR=$(TOPDIR)
 
 
 clean::

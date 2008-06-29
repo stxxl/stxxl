@@ -1,8 +1,11 @@
 TOPDIR	?= ..
 include Makefile.common
+-include $(TOPDIR)/make.settings.local
 
-TESTS		+= $(TESTS_NON_MSVC)
-#TESTS		+= $(TESTS_UNITTEST)
+ENABLE_UNITTEST			?= no
+
+TESTS-yes			+= $(TESTS_NON_MSVC)
+TESTS-$(ENABLE_UNITTEST)	+= $(TESTS_UNITTEST)
 
 include $(TOPDIR)/Makefile.subdir.gnu
 

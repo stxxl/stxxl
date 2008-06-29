@@ -13,7 +13,7 @@
 
 include $(TOPDIR)/make.settings
 
-TEST_BINARIES	 = $(foreach t, $(TESTS), $t.$(bin))
+TEST_BINARIES	 = $(foreach t, $(TESTS) $(TESTS-yes) $(TESTS-yesyes), $t.$(bin))
 
 tests: $(TEST_BINARIES)
 

@@ -1,7 +1,7 @@
 TOPDIR	?= ..
 include Makefile.common
 
-TESTS		+= $(TESTS_NON_MSVC)
+TESTS-yes			+= $(TESTS_NON_MSVC)
 
 include $(TOPDIR)/Makefile.subdir.gnu
 
