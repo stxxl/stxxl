@@ -36,14 +36,17 @@ struct cmp : public std::less<key_type>
 
 typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
 
-int main()
+int main(int argc, char ** argv)
 {
     stxxl::stats * bm = stxxl::stats::get_instance();
     STXXL_MSG(*bm);
 
     STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " kb");
     STXXL_MSG("Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " kb");
-    for (int mult = 1; mult < 256; mult *= 2)
+    int max_mult = 256;
+    if (argc > 1)
+        max_mult = atoi(argv[1]);
+    for (int mult = 1; mult < max_mult; mult *= 2)
     {
         const unsigned el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
