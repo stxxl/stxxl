@@ -25,6 +25,10 @@
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/algo/intksort.h>
 
+#ifndef STXXL_VERBOSE_STABLE_KSORT
+#define STXXL_VERBOSE_STABLE_KSORT STXXL_VERBOSE1
+#endif
+
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -174,7 +178,7 @@ namespace stable_ksort_local
 
         const int_type shift = sizeof(key_type) * 8 - lognbuckets;
         // search in the the range [_begin,_end)
-	STXXL_VERBOSE1("Shift by: "<<shift<<" bits, lognbuckets: "<<lognbuckets)
+	STXXL_VERBOSE_STABLE_KSORT("Shift by: "<<shift<<" bits, lognbuckets: "<<lognbuckets);
         for ( ; cur != last; cur++)
         {
             key_type cur_key = in.current().key();
@@ -198,7 +202,7 @@ namespace stable_ksort_local
             }
             bucket_sizes[i] = int64(block_type::size) * bucket_iblock[i] +
                               bucket_block_offsets[i];
-            STXXL_VERBOSE1("Bucket " << i << " has size " << bucket_sizes[i] <<
+            STXXL_VERBOSE_STABLE_KSORT("Bucket " << i << " has size " << bucket_sizes[i] <<
                       ", estimated size: " << ((last - first) / int64(nbuckets)));
         }
 
@@ -249,15 +253,15 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type est_bucket_size = div_and_round_up((last - first) / int64(nbuckets),
                                                            int64(block_type::size)); //in blocks
 
-    STXXL_VERBOSE1("Elements to sort: " << (last - first));
-    STXXL_VERBOSE1("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets);
+    STXXL_VERBOSE_STABLE_KSORT("Elements to sort: " << (last - first));
+    STXXL_VERBOSE_STABLE_KSORT("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets);
     const unsigned_type nread_buffers = (m - nbuckets) * read_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
     UNUSED(nread_buffers);
     const unsigned_type nwrite_buffers = (m - nbuckets) * write_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
     UNUSED(nwrite_buffers);
 
-    STXXL_VERBOSE1("Read buffers in distribution phase: " << nread_buffers);
-    STXXL_VERBOSE1("Write buffers in distribution phase: " << nwrite_buffers);
+    STXXL_VERBOSE_STABLE_KSORT("Read buffers in distribution phase: " << nread_buffers);
+    STXXL_VERBOSE_STABLE_KSORT("Write buffers in distribution phase: " << nwrite_buffers);
 
     bucket_bids_type * bucket_bids = new bucket_bids_type[nbuckets];
     for (i = 0; i < nbuckets; ++i)
@@ -306,12 +310,12 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])
         // ... and decrease max_bucket_size_bl
         const int_type max_bucket_size_act_bl = div_and_round_up(max_bucket_size_act, block_type::size);
-        STXXL_VERBOSE1("Reducing required number of required blocks per bucket from " <<
+        STXXL_VERBOSE_STABLE_KSORT("Reducing required number of required blocks per bucket from " <<
                   max_bucket_size_bl << " to " << max_bucket_size_act_bl);
         max_bucket_size_rec = max_bucket_size_act;
         max_bucket_size_bl = max_bucket_size_act_bl;
         const unsigned_type nwrite_buffers_bs = m - 2 * max_bucket_size_bl;
-        STXXL_VERBOSE1("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
+        STXXL_VERBOSE_STABLE_KSORT("Write buffers in bucket sorting phase: " << nwrite_buffers_bs);
 
         typedef buf_ostream<block_type, typename ExtIterator_::bids_container_iterator> buf_ostream_type;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
@@ -367,7 +371,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
             k1 = 1 << log_k1;
             std::fill(bucket1, bucket1 + k1, 0);
 
-            STXXL_VERBOSE1("Classifying bucket " << k << " size:" << bucket_sizes[k] <<
+            STXXL_VERBOSE_STABLE_KSORT("Classifying bucket " << k << " size:" << bucket_sizes[k] <<
                       " blocks:" << nbucket_blocks << " log_k1:" << log_k1);
             // classify first nbucket_blocks-1 blocks, they are full
             type_key_ * ref_ptr = refs1;

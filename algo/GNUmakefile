@@ -15,3 +15,4 @@ test_manyunits.$(bin): $(obj-test_manyunits) $(STXXL_LIBDEPS)
 test_ksort.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_CHECK_ORDER_IN_SORTS
 test_sort.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=0
 test_random_shuffle.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=0
+test_stable_ksort_all_parameters.$o:	CPPFLAGS += -DSTXXL_VERBOSE_STABLE_KSORT=STXXL_VERBOSE0 -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_CHECK_ORDER_IN_SORTS
