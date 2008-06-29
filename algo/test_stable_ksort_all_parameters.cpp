@@ -78,9 +78,8 @@ void test(stxxl::int64 records_to_sort, unsigned memory_to_use)
     STXXL_MSG("Using " << ndisks << " disks");
     STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ");
     STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KB");
-    STXXL_MSG("Seed " << stxxl::ran32State);
-    STXXL_MSG("Filling vector...");
 
+    STXXL_MSG("Filling vector...");
     std::generate(v.begin(), v.end(), stxxl::random_number64());
     //std::generate(v.begin(),v.end(),zero());
 
@@ -131,7 +130,9 @@ int main(int argc, char * argv[])
     int sort_mem = atoi(argv[2]) * MB;
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);
-    stxxl::ran32State = strtoul(argv[5], NULL, 10);
+    stxxl::set_seed(strtoul(argv[5], NULL, 10));
+    STXXL_MSG("Seed " << stxxl::get_next_seed());
+    stxxl::srandom_number32();
 
     switch (block_size)
     {
