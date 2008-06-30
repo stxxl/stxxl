@@ -42,6 +42,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/log.h>
+#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/timer.h>
 
 
@@ -169,6 +170,16 @@ stxxl_timestamp()
 }
 
 
+inline stxxl::int64 atoint64(const char * s)
+{
+#ifdef BOOST_MSVC
+    return _atoi64(s);
+#else
+    return atoll(s);
+#endif
+}
+
+
 #ifndef BOOST_MSVC
  #define STXXL_MIN(a, b) (std::min(a, b))
  #define STXXL_MAX(a, b) (std::max(a, b))
@@ -221,19 +232,6 @@ inline double io_wait_time()
     return -1.0;
 }
 
-#endif
-
-#ifdef STXXL_BOOST_CONFIG
- #ifdef BOOST_MSVC
-typedef __int64 int64;
-typedef unsigned __int64 uint64;
- #else
-typedef long long int int64;
-typedef unsigned long long uint64;
- #endif
-#else
-typedef long long int int64;
-typedef unsigned long long uint64;
 #endif
 
 
