@@ -38,6 +38,7 @@ $(TESTS_BDB:=.$(bin)):	CPPFLAGS += $(CPPFLAGS_TPIE) $(CPPFLAGS_BDB)
 $(TESTS_BDB:=.$(bin)):	STXXL_LINKER_OPTIONS += $(LIBS_TPIE) $(LIBS_BDB)
 $(TESTS_TPIE:=.$(bin)):	CPPFLAGS += $(CPPFLAGS_TPIE)
 $(TESTS_TPIE:=.$(bin)):	STXXL_LINKER_OPTIONS += $(LIBS_TPIE)
+$(if $(findstring -O3,$(OPT)),$(if $(findstring 4.2,$(COMPILER)),berkeley_db_benchmark.mcstxxl.bin: OPT=-O2)) # ICE with g++-4.2 and -O3
 
 clean::
 	$(RM) btree/*.$o btree/*.$d btree/*.dT
