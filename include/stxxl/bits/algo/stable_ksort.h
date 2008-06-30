@@ -363,6 +363,9 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         const unsigned shift = sizeof(key_type) * 8 - lognbuckets;
         const unsigned shift1 = shift - log_k1;
 
+        STXXL_VERBOSE_STABLE_KSORT("Classifying buckets " << nbuckets << " max size: " << max_bucket_size_rec <<
+                       " block size:" << block_type::size << " log_k1:" << log_k1);
+
         for (unsigned_type k = 0; k < nbuckets; k++)
         {
             nbucket_blocks = div_and_round_up(bucket_sizes[k], block_type::size);
