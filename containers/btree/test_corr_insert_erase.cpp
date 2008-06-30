@@ -71,15 +71,25 @@ int main(int argc, char * argv[])
     STXXL_MSG("Generating " << nins << " random values");
     stxxl::generate(Values.begin(), Values.end(), rnd_gen(), 4);
 
+    STXXL_MSG("Sorting the random values");
+    stxxl::sort(Values.begin(), Values.end(), comp_type(), 128 * 1024 * 1024);
+
+    STXXL_MSG("Deleting unique values");
+    stxxl::vector<int>::iterator NewEnd = std::unique(Values.begin(), Values.end());
+    Values.resize(NewEnd - Values.begin());
+
+    STXXL_MSG("Randomly permute input values");
+    stxxl::random_shuffle(Values.begin(), Values.end(), 128 * 1024 * 1024);
+
     stxxl::vector<int>::const_iterator it = Values.begin();
-    STXXL_MSG("Inserting " << nins << " random values into btree");
+    STXXL_MSG("Inserting " << Values.size() << " random values into btree");
     for ( ; it != Values.end(); ++it)
         BTree.insert(std::pair<int, double>(*it, double(*it) + 1.0));
 
 
     STXXL_MSG("Number of elements in btree: " << BTree.size());
 
-    STXXL_MSG("Searching " << nins << " existing elements and erasing them");
+    STXXL_MSG("Searching " << Values.size() << " existing elements and erasing them");
     stxxl::vector<int>::const_iterator vIt = Values.begin();
 
     for ( ; vIt != Values.end(); ++vIt)
