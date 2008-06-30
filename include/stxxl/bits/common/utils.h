@@ -411,6 +411,19 @@ inline void swap_1D_arrays(T * a, T * b, unsigned_type size)
         std::swap(a[i], b[i]);
 }
 
+// sz in bytes, not elements
+template <typename T>
+inline void zero_dummy_array(T * A, unsigned_type sz)
+{
+#ifdef STXXL_INITIALIZE_ALL
+    for (unsigned i = 0; i < sz / sizeof(T); ++i)
+        A[i] = 0;
+#else
+    UNUSED(A);
+    UNUSED(sz);
+#endif
+}
+
 ////////////////////////////////////////////////////////////////////////////
 
 template <class T>
