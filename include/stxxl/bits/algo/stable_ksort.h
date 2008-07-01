@@ -355,27 +355,30 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
 
         key_type offset = 0;
-        unsigned_type log_k1 = static_cast<unsigned_type>(ceil(log2(double(max_bucket_size_rec *
-                                                                           sizeof(type_key_) / STXXL_L2_SIZE))));
+        const unsigned_type log_k1 =
+            (std::max)(static_cast<unsigned_type>(ceil(log2(double(
+                           max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE)))), 1U);
         unsigned_type k1 = 1 << log_k1;
         int_type * bucket1 = new int_type[k1];
 
         const unsigned shift = sizeof(key_type) * 8 - lognbuckets;
         const unsigned shift1 = shift - log_k1;
 
-        STXXL_VERBOSE_STABLE_KSORT("Classifying buckets " << nbuckets << " max size: " << max_bucket_size_rec <<
-                       " block size:" << block_type::size << " log_k1:" << log_k1);
+        STXXL_VERBOSE_STABLE_KSORT("Classifying " << nbuckets << " buckets, max size:" << max_bucket_size_rec <<
+                                   " block size:" << block_type::size << " log_k1:" << log_k1);
 
         for (unsigned_type k = 0; k < nbuckets; k++)
         {
             nbucket_blocks = div_and_round_up(bucket_sizes[k], block_type::size);
-            log_k1 = (std::max)(static_cast<unsigned>(ceil(log2(double(bucket_sizes[k] *
-                                                            sizeof(type_key_) / STXXL_L2_SIZE)))),1U);
-            k1 = 1 << log_k1;
+            const unsigned_type log_k1_k =
+                (std::max)(static_cast<unsigned>(ceil(log2(
+                               double(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE)))), 1U);
+            assert(log_k1_k <= log_k1);
+            k1 = 1 << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);
 
             STXXL_VERBOSE_STABLE_KSORT("Classifying bucket " << k << " size:" << bucket_sizes[k] <<
-                      " blocks:" << nbucket_blocks << " log_k1:" << log_k1);
+                      " blocks:" << nbucket_blocks << " log_k1:" << log_k1_k);
             // classify first nbucket_blocks-1 blocks, they are full
             type_key_ * ref_ptr = refs1;
             key_type offset1 = offset + (key_type(1) << key_type(shift)) * key_type(k);
