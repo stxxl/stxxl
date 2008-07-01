@@ -14,6 +14,6 @@
 
 #include <stxxl/sort>
 #include <stxxl/ksort>
-#include <stxxl/stable_ksort>
+//#include <stxxl/stable_ksort>
 
 #include <stxxl/bits/algo/random_shuffle.h>
