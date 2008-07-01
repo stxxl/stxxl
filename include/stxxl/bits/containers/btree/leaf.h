@@ -25,7 +25,7 @@ namespace btree
     class node_cache;
 
     template <class KeyType_, class DataType_, class KeyCmp_, unsigned RawSize_, class BTreeType>
-    class normal_leaf
+    class normal_leaf : private noncopyable
     {
     public:
         typedef normal_leaf<KeyType_, DataType_, KeyCmp_, RawSize_, BTreeType> SelfType;
@@ -63,11 +63,6 @@ namespace btree
         typedef btree_const_iterator<btree_type> const_iterator;
 
         typedef node_cache<normal_leaf, btree_type> leaf_cache_type;
-
-    private:
-        normal_leaf();
-        normal_leaf(const normal_leaf &);
-        normal_leaf & operator = (const normal_leaf &);
 
     public:
         struct value_compare : public std::binary_function<value_type, value_type, bool>

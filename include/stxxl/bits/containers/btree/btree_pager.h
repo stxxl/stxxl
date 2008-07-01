@@ -16,6 +16,7 @@
 #include <memory>
 #include <list>
 
+#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/compat_auto_ptr.h>
 
@@ -24,17 +25,13 @@ __STXXL_BEGIN_NAMESPACE
 
 namespace btree
 {
-    class lru_pager
+    class lru_pager : private noncopyable
     {
         unsigned_type npages_;
         typedef std::list<int_type> list_type;
 
         compat_auto_ptr<list_type>::result history;
         std::vector<list_type::iterator> history_entry;
-
-
-        lru_pager(const lru_pager & obj);
-        lru_pager & operator = (const lru_pager & obj);
 
     public:
         lru_pager() : npages_(0)

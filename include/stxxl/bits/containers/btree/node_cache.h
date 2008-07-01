@@ -32,12 +32,8 @@ __STXXL_BEGIN_NAMESPACE
 namespace btree
 {
     template <class NodeType, class BTreeType>
-    class node_cache
+    class node_cache : private noncopyable
     {
-        node_cache();
-        node_cache(const node_cache &);
-        node_cache & operator = (const node_cache &);
-
     public:
         typedef BTreeType btree_type;
         typedef NodeType node_type;
