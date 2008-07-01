@@ -30,7 +30,7 @@ STXXL_HEADERS		+= all
 STXXL_HEADERS		+= vector stack queue priority_queue deque map
 STXXL_HEADERS		+= algorithm scan sort ksort stable_ksort
 STXXL_HEADERS		+= io mng stream
-STXXL_HEADERS		+= random timer mallocstats
+STXXL_HEADERS		+= random timer mallocstats aligned_alloc types
 STXXL_BITS		+= $(HEADER_FILES_BITS)
 STXXL_BITS		+= $(HEADER_FILES_COMMON:%=common/%)
 STXXL_BITS		+= $(HEADER_FILES_IO:%=io/%)
