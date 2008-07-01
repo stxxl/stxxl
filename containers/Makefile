@@ -47,7 +47,7 @@ pq_benchmark: $(DEPENDENCIES) pq_benchmark.cpp
 
 
 LEDA_COMPILER		?= g++-2.95
-LEDA_FLAGS		?= -D_LINUX $(STXXL_COMPILER_OPTIONS)
+LEDA_FLAGS		?= -D_LINUX $(filter-out -openmp -fopenmp -D__MCSTL__,$(STXXL_COMPILER_OPTIONS))
 LEDA_ROOT		?= /usr/local/LEDA
 LEDA_SM_ROOT		?= /usr/local/LEDA-SM
 
@@ -58,7 +58,8 @@ LEDA_SM_ROOT		?= /home/dementiev/projects/LEDA-SM-1.3
 
 LEDA_SM_CPP_FLAGS	?= -I$(LEDA_ROOT)/incl -I$(LEDA_SM_ROOT)/incl $(LEDA_FLAGS)
 LEDA_SM_LDFLAGS		?= -L$(LEDA_ROOT) -Wl,-R$(LEDA_ROOT) -L$(LEDA_SM_ROOT) #-L/usr/X11R6/lib
-LEDA_SM_LDFLAGS		?= -L$(LEDA_ROOT) -L$(LEDA_SM_ROOT) -L/usr/X11R6/lib -Xlinker -rpath -Xlinker /software/LEDA/4.2.1/ -Xlinker -rpath -Xlinker /home/dementiev/projects/LEDA-SM-1.3 -Xlinker -rpath -Xlinker /usr/X11R6/lib
+LEDA_SM_LDFLAGS		?= -L$(LEDA_ROOT) -L$(LEDA_SM_ROOT) -L/usr/X11R6/lib -Xlinker -rpath -Xlinker $(LEDA_ROOT) #-Xlinker -rpath -Xlinker $(LEDA_SM_ROOT)
+LEDA_SM_LDLIBS		?= -lLEDA-SM -lL
 LEDA_SM_LDLIBS		?= -lW -lP -lG -lL -lX11 -lm -lLEDA-SM
 
 leda_sm_pq_benchmark: $(DEPENDENCIES) leda_sm_pq_benchmark.cpp

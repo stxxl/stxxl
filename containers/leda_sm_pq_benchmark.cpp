@@ -108,7 +108,7 @@ void run_ledasm_insert_all_delete_all(stxxl::int64 ops)
 
     stxxl::int64 i;
 
-    my_record cur;
+    //my_record cur;
 
 
     stxxl::timer Timer;
@@ -164,7 +164,7 @@ void run_ledasm_intermixed(stxxl::int64 ops)
 
     stxxl::int64 i;
 
-    my_record cur;
+    //my_record cur;
 
 
     stxxl::timer Timer;
