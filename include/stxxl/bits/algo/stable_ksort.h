@@ -355,8 +355,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
 
         key_type offset = 0;
-        const unsigned_type log_k1 =
-            (std::max)(static_cast<unsigned_type>(ceil(log2(double(
+        const unsigned log_k1 =
+            (std::max)(static_cast<unsigned>(ceil(log2(double(
                            max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE)))), 1U);
         unsigned_type k1 = 1 << log_k1;
         int_type * bucket1 = new int_type[k1];
@@ -370,7 +370,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         for (unsigned_type k = 0; k < nbuckets; k++)
         {
             nbucket_blocks = div_and_round_up(bucket_sizes[k], block_type::size);
-            const unsigned_type log_k1_k =
+            const unsigned log_k1_k =
                 (std::max)(static_cast<unsigned>(ceil(log2(
                                double(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE)))), 1U);
             assert(log_k1_k <= log_k1);
