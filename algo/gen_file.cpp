@@ -46,10 +46,11 @@ bool operator < (const my_type & a, const my_type & b)
 
 int main()
 {
-    my_type::key_type max_key = 1 * 1024 * 1024;
-    unsigned int block_size = 1 * 1024 * 1024;
-    unsigned int records_in_block = block_size / sizeof(my_type);
+    const my_type::key_type max_key = 1 * 1024 * 1024;
+    const unsigned int block_size = 1 * 1024 * 1024;
+    const unsigned int records_in_block = block_size / sizeof(my_type);
     my_type * array = (my_type *)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
+    memset(array, 0, block_size);
     stxxl::syscall_file f("./in", stxxl::file::CREAT | stxxl::file::RDWR);
     stxxl::request_ptr req;
 
@@ -58,7 +59,6 @@ int main()
     {
         for (unsigned j = 0; j < records_in_block; j++)
             array[j]._key = cur_key--;
-
 
         req = f.awrite((void *)array, stxxl::int64(i) * block_size, block_size, stxxl::default_completion_handler());
         req->wait();

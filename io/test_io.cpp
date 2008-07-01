@@ -33,6 +33,7 @@ int main()
     std::cout << sizeof(void *) << std::endl;
     const int size = 1024 * 384;
     char * buffer = (char *)stxxl::aligned_alloc<4096>(size);
+    memset(buffer, 0, size);
 #ifdef BOOST_MSVC
     const char * paths[2] = { "data1", "data2" };
 #else
