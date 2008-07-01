@@ -12,7 +12,8 @@
 
 #include <stxxl/mng>
 
-int main()
+int main(int argc, char **)
 {
     stxxl::config::get_instance();
+    return argc == 1 ? 0 : -1;
 }

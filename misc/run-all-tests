@@ -1,0 +1,171 @@
+#!/bin/bash
+
+############################################################################
+#  misc/run-all-tests
+#
+#  Part of the STXXL. See http://stxxl.sourceforge.net
+#
+#  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
+
+# Usage: $0 [stxxl|mcstxxl] [yes|no (valgrind)]
+
+
+ulimit -t 7200
+set -o pipefail
+
+stxxl=stxxl
+test -n "$1" && stxxl="$1"
+valgrind=yes
+test -n "$2" && valgrind="$2"
+
+testresults=testresults
+mkdir -p $testresults
+
+AMI_SINGLE_DEVICE=/tmp/TPIE/
+export AMI_SINGLE_DEVICE
+
+i=0
+run()
+{
+	echo "==================== $stxxl valgrind=$valgrind $i: $1 ===================="
+	cmd="$1.$stxxl.bin"
+	bn=`basename $1`
+	shift
+	i=$(($i + 1))
+	pfx="`printf '%s/test.%s.%05d.%04d.%s' $testresults $stxxl $$ $i $bn`"
+	rm -f stxxl.log stxxl.errlog
+	test -x "$cmd" || return -1
+	echo "+ $cmd $@" | tee "$pfx.log"
+	echo "[`date`]" | tee -a "$pfx.log"
+	if [ "$valgrind" = "yes" ]; then
+		valgrind --track-fds=no --log-file="$pfx.valgrind" --freelist-vol=2147483648 --max-stackframe=8388608 \
+		$cmd "$@" < /dev/null 2>&1 | tee -a "$pfx.log"
+		result=$?
+	else
+		$cmd "$@" < /dev/null 2>&1 | tee -a "$pfx.log"
+		result=$?
+	fi
+	echo "[`date`]" | tee -a "$pfx.log"
+	test "$result" = 0 || mv "$pfx.log" "$pfx.FAIL.$result"
+	test -s stxxl.errlog && mv stxxl.errlog "$pfx.ERR"
+}
+
+if false; then
+:
+fi
+
+run common/stxxl_info
+run common/stxxl_info foo # returns -1 intentionally
+run common/test_random
+
+run algo/gen_file
+run utils/createdisks 1024 testdiskx testdisky
+run utils/createdisks 1000 testdiskx testdisky
+run utils/log2
+run utils/malloc 1024
+run utils/malloc 1024000
+run utils/malloc 4000000000
+run utils/off_t_size
+run utils/pq_param
+
+run io/benchmark_disks 0 1 testdiskx testdisky
+run io/flushbuffers
+run io/sd_test
+run io/test_io
+
+run mng/test_block_alloc_strategy
+run mng/test_buf_streams
+run mng/test_mng
+run mng/test_mng1
+run mng/test_prefetch_pool
+run mng/test_write_pool
+
+run containers/bench_pqueue
+run containers/copy_file in out
+run containers/monotonic_pq 1000 1
+run containers/pq_benchmark 1 1000000
+run containers/pq_benchmark 2 1000000
+run containers/stack_benchmark 1 1073741824
+run containers/stack_benchmark 2 1073741824
+run containers/stack_benchmark 3 1073741824
+run containers/stack_benchmark 4 1073741824
+run containers/test_deque 33333333
+run containers/test_ext_merger
+run containers/test_ext_merger2
+run containers/test_iterators
+run containers/test_many_stacks 42
+run containers/test_migr_stack
+run containers/test_pqueue
+run containers/test_queue
+run containers/test_stack 1024
+run containers/test_vector
+run containers/write_vector in out
+run containers/write_vector2 in out
+run containers/test_map 32
+run containers/test_map_random 2000
+run containers/btree/test_btree 10000
+run containers/btree/test_const_scan 10000
+run containers/btree/test_corr_insert_erase 14
+run containers/btree/test_corr_insert_find 14
+run containers/btree/test_corr_insert_scan 14
+
+run algo/sort_file
+run algo/test_asch 3 100 1000 42
+run algo/test_ksort
+run algo/test_manyunits
+run algo/test_random_shuffle
+run algo/test_scan
+run algo/test_sort
+run algo/test_stable_ksort
+
+run stream/test_push_sort
+run stream/test_sorted_runs
+run stream/test_stream
+run stream/test_stream1
+
+run io/unittest
+run mng/unittest
+
+rm -rf $AMI_SINGLE_DEVICE
+mkdir $AMI_SINGLE_DEVICE
+
+# for the tpie and bdb tests valgrind reports lots of
+# new/delete mismatches and off-by-one errors
+# due to bad partial tpie new/delete replacements
+
+run containers/tpie_stack_benchmark 1 2147483648
+run containers/tpie_stack_benchmark 2 2147483648
+
+run containers/berkeley_db_benchmark 1 100
+run containers/berkeley_db_benchmark 2 10000000
+run containers/berkeley_db_benchmark 3 100
+run containers/berkeley_db_benchmark 4 100
+run containers/berkeley_db_benchmark 5 10000000
+
+#rm -rf $AMI_SINGLE_DEVICE
+
+run containers/leda_sm_pq_benchmark 1 1000000
+run containers/leda_sm_pq_benchmark 2 1000000
+run containers/leda_sm_stack_benchmark 1 1073741824
+run containers/leda_sm_stack_benchmark 2 1073741824
+
+#algo/test_sort_all_parameters		<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..10]> <seed>
+#algo/test_ksort_all_parameters		<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..10]> <seed>
+#algo/test_stable_ksort_all_parameters	<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..10]> <seed>
+for data in 768 ; do
+for ram in 128 ; do
+for strategy in 0 1 2 3 ; do
+for blk_size in 0 1 2 3 4 5 6 7 8 9 10 ; do
+run algo/test_sort_all_parameters		$data $ram $strategy $blk_size 42
+run algo/test_ksort_all_parameters		$data $ram $strategy $blk_size 42
+run algo/test_stable_ksort_all_parameters	$data $ram $strategy $blk_size 42
+done
+done
+done
+done
+
