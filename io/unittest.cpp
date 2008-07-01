@@ -40,7 +40,8 @@ public:
     void testIO()
     {
         const int size = 1024 * 384;
-        char * buffer = new char[size];
+        char * buffer = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(size));
+        memset(buffer, 0, size);
 #ifdef BOOST_MSVC
         const char * paths[2] = { "data1", "data2" };
 #else
@@ -59,7 +60,7 @@ public:
 
         wait_all(req, 16);
 
-        delete[] buffer;
+        stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
     }
 
     void testIOException()

@@ -16,6 +16,7 @@
 #include <cmath>
 #include <stxxl/io>
 #include <stxxl/random>
+#include <stxxl/aligned_alloc>
 
 using stxxl::file;
 using stxxl::stxxl_timestamp;
@@ -23,10 +24,11 @@ using stxxl::stxxl_timestamp;
 
 int main()
 {
-    stxxl::int64 disk_size = stxxl::int64(1024 * 1024) * 1024 * 40;
+    const stxxl::int64 disk_size = stxxl::int64(1024 * 1024) * 1024 * 40;
     std::cout << sizeof(void *) << std::endl;
     const int block_size = 4 * 1024 * 1024;
-    char * buffer = new char[block_size];
+    char * buffer = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(block_size));
+    memset(buffer, 0, block_size);
     const char * paths[2] = { "/tmp/data1", "/tmp/data2" };
     stxxl::sim_disk_file file1(paths[0], file::CREAT | file::RDWR /* | file::DIRECT */, 0);
     file1.set_size(disk_size);
@@ -79,7 +81,7 @@ int main()
     double err = sqrt(sum2 - sum * sum);
     STXXL_MSG("Error: " << err << " s, " << 100. * (err / sum) << " %");
 
-    delete[] buffer;
+    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
     return 0;
 }
