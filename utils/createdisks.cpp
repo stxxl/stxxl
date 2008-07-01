@@ -11,17 +11,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/io>
-
 #include <cstdio>
 #include <iomanip>
 #include <vector>
+
+#include <stxxl/io>
+#include <stxxl/aligned_alloc>
 
 #ifndef BOOST_MSVC
  #include <unistd.h>
 #endif
 
-#include <stxxl/bits/common/aligned_alloc.h>
 
 using stxxl::request_ptr;
 using stxxl::file;

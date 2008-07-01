@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include <cmath>
-#include <stxxl/bits/common/utils.h>
+#include <stxxl/types>
 
 typedef stxxl::int64 int64;
 

@@ -17,11 +17,6 @@
 #include <cstdlib>
 #include <stxxl/bits/common/utils.h>
 
-using std::cin;
-using std::cout;
-using std::cerr;
-using std::endl;
-
 
 void print_malloc_stats()
 {
@@ -47,6 +42,11 @@ void print_malloc_stats()
 
 int main(int argc, char * argv[])
 {
+    using std::cin;
+    using std::cout;
+    using std::cerr;
+    using std::endl;
+
     if (argc < 2)
     {
         cerr << "Usage: " << argv[0] << " bytes_to_allocate" << endl;

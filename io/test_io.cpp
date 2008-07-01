@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/io>
-#include <stxxl/bits/common/aligned_alloc.h>
+#include <stxxl/aligned_alloc>
 
 //! \example io/test_io.cpp
 //! This is an example of use of \c \<stxxl\> files, requests, and

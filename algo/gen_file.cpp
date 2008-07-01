@@ -10,9 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/mng>
-#include <stxxl/ksort>
-#include <stxxl/vector>
+#include <stxxl/io>
+#include <stxxl/aligned_alloc>
 
 
 struct my_type

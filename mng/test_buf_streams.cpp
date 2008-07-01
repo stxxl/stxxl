@@ -14,7 +14,7 @@
 //! This is an example of use of \c stxxl::buf_istream and \c stxxl::buf_ostream
 
 #include <iostream>
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/mng>
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/mng/buf_istream.h>
 
