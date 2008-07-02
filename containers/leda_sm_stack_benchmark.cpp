@@ -18,10 +18,12 @@
 //! DOI: 10.1002/spe.844
 
 
+#include <iostream>
+#include <algorithm>
+
 #include <LEDA-SM/ext_stack.h>
 #include <LEDA-SM/ext_memory_manager.h>
 #include <LEDA-SM/debug.h>
-#include <cassert>
 #include <LEDA/random_source.h>
 #include <LEDA/stack.h>
 #include <LEDA-SM/block.h>
@@ -29,15 +31,18 @@
 #define DEBUG 0
 #define DD 500
 
-#include <stxxl/bits/common/utils_ledasm.h>
+#include <stxxl/types>
 #include <stxxl/timer>
+
+#define STXXL_MSG(x) \
+    { std::cout << "[STXXL-MSG] " << x << std::endl << std::flush; \
+    }
 
 
 #define MEM_2_RESERVE    (768 * 1024 * 1024)
 
-
-#define    BLOCK_SIZE1 (EXT_BLK_SZ * 4)
-#define    BLOCK_SIZE2 (DISK_BLOCK_SIZE * 4)
+#define BLOCK_SIZE1 (EXT_BLK_SZ * 4)
+#define BLOCK_SIZE2 (DISK_BLOCK_SIZE * 4)
 
 
 #ifndef DISKS
@@ -133,7 +138,7 @@ int main(int argc, char * argv[])
     }
 
     int version = atoi(argv[1]);
-    stxxl::int64 volume = stxxl::atoint64(argv[2]);
+    stxxl::int64 volume = atoll(argv[2]);
 
     STXXL_MSG("Allocating array with size " << MEM_2_RESERVE
                                             << " bytes to prevent file buffering.");

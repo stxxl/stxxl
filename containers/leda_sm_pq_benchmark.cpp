@@ -18,6 +18,9 @@
 //! DOI: 10.1002/spe.844
 
 
+#include <iostream>
+#include <algorithm>
+
 #include <LEDA-SM/ext_memory_manager.h>
 #include <LEDA-SM/ext_memory_manager.h>
 #include <LEDA-SM/block.h>
@@ -27,16 +30,17 @@
 #include <LEDA-SM/ext_r_heap.h>
 #include <LEDA-SM/buffer_tree.h>
 #include <LEDA/random.h>
-#include <algorithm>
 
-#include <stxxl/bits/common/utils_ledasm.h>
+#include <stxxl/types>
 #include <stxxl/timer>
+
+#define STXXL_MSG(x) \
+    { std::cout << "[STXXL-MSG] " << x << std::endl << std::flush; \
+    }
 
 
 #define PQ_MEM_SIZE     (512 * 1024 * 1024)
-
-
-#define MAX_ELEMENTS (2000 * 1024 * 1024)
+#define MAX_ELEMENTS    (2000 * 1024 * 1024)
 
 
 struct my_record
@@ -232,7 +236,7 @@ int main(int argc, char * argv[])
     }
 
     int version = atoi(argv[1]);
-    stxxl::int64 ops = stxxl::atoint64(argv[2]);
+    stxxl::int64 ops = atoll(argv[2]);
 
     if (ops > MAX_ELEMENTS)
     {

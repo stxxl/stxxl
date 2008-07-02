@@ -503,10 +503,6 @@
 					RelativePath=".\include\stxxl\bits\common\utils.h"
 					>
 				</File>
-				<File
-					RelativePath=".\include\stxxl\bits\common\utils_ledasm.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="io"
