@@ -34,7 +34,13 @@ struct my_type
     }
 
     my_type() { }
-    my_type(key_type __key) : _key(__key) { }
+
+    my_type(key_type __key) : _key(__key)
+    {
+        #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
+        memset(_data, 0, sizeof(_data));
+        #endif
+    }
 
     static my_type min_value()
     {

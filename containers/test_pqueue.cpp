@@ -25,7 +25,12 @@ struct my_type
     key_type key;
     char data[RECORD_SIZE - sizeof(key_type)];
     my_type() { }
-    explicit my_type(key_type k) : key(k) { }
+    explicit my_type(key_type k) : key(k)
+    {
+        #ifdef STXXL_VALGRIND_AVOID_UNINITIALIZED_WRITE_ERRORS
+        memset(data, 0, sizeof(data));
+        #endif
+    }
 };
 
 std::ostream & operator << (std::ostream & o, const my_type & obj)
