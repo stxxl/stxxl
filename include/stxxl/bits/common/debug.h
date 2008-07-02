@@ -26,6 +26,8 @@ __STXXL_BEGIN_NAMESPACE
 
 class debugmon
 {
+#ifdef STXXL_DEBUGMON
+
     struct tag
     {
         bool ongoing;
@@ -59,6 +61,8 @@ class debugmon
     mutex mutex1;
 #endif
 
+#endif // #ifdef STXXL_DEBUGMON
+
     static debugmon * instance;
 
     inline debugmon() { }
@@ -76,7 +80,19 @@ public:
 
         return instance;
     }
+
 };
+
+#ifndef STXXL_DEBUGMON
+inline void debugmon::block_allocated(char * /*ptr*/, char * /*end*/, size_t /*size*/)
+{ }
+inline void debugmon::block_deallocated(char * /*ptr*/)
+{ }
+inline void debugmon::io_started(char * /*ptr*/)
+{ }
+inline void debugmon::io_finished(char * /*ptr*/)
+{ }
+#endif
 
 __STXXL_END_NAMESPACE
 
