@@ -24,11 +24,54 @@
 * integrate unordered_map branch
   => Milestone: 1.3
 
-* doxygen: do not link every occurrence of 'file' do stxxl::file
+* doxygen: do not link every occurrence of 'file' to stxxl::file
+
+* allocation strategies: provide a method get_num_disks()
+  and don't use stxxl::config::get_instance()->disks_number() inappropriately
 
 * interleaved_allocators: provide a constructor that takes a base strategy
   as parameter, not a disk range, and derive desired information from the
   strategy
 
-* implement recursion in stable_ksort and do not assume random key distribution, do sampling instead
+* implement recursion in stable_ksort and do not assume random key
+  distribution, do sampling instead
+  as a start, at least abort early if the expected size of a bucket is larger
+  than the memory avilable to sort it
+
+* debug stable_ksort in depth, there are still some crashing cases left
+
+* use numeric_limits<> to determine min_value/max_value in all test programs,
+  don't hardcode 0xffffffff
+
+* cleanup the COUNT_WAIT_TIME mess
+
+* iostats: print I/O volume not only in bytes, but [KMGT]B as well
+
+* put some stxxl/defines.h (config.h/...) header someewhere,
+  listing/describing all the #defines that my be used somewhere
+
+* implement a memfile that simulates an external memory file using heap,
+  eases working with valgrind because no data ever leaves valgrind's control
+
+* add a test for the mcstl parallel sorters, Johannes' extsort should do
+  needs to be able to test every combination of runs creator, merger, ...
+  Usage: extsort [n in megabytes] [p threads] [M in megabytes] 
+             [sorting algorithm: m | q | qb] [merging algorithm: p | s | n]
+
+* stxxl::debugmon: FIXME! is not working any more
+
+* replace tons of #ifdef with wrapper that behaves like boost's scoped_lock
+
+* install at_exit hooks that cleanup the singleton objects (memory leaks reported by valgrind)
+
+* split all static get_instance() methods into
+  - get_instance (must be inline to reduce overhead)
+  - create_instance (may be not inline if too complicated)
+      (use proper locking to avoid race conditions)
+  - destroy_instance (for the at_exit hook)
+      (this of course creates a race condition in improper programs that want to use 
+      the instance while/after it has been destroyed)
+
+* continue using the new approach for STXXL_VERBOSE:
+  $(CXX) -DSTXXL_VERBOSE_FOO=STXXL_VERBOSEx
 

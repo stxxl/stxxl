@@ -14,6 +14,7 @@ Version 1.2.0 (UNRELEASED)
   should allow redoing identical program runs for debugging purposes
 * stxxl::noncopyable, inspired by boost::noncopyable: inheriting from this
   class forbids copying of objects when this is undesirable
+  - used in all classes that had implemented their own variants previously
 * stxxl::vector, all sorting functions: replaced TwoToOneDimArrayRowAdaptor
   with ArrayOfSequencesIterator which is much faster, especially
   if blocks have padding
@@ -21,16 +22,25 @@ Version 1.2.0 (UNRELEASED)
 * stxxl::vector: several operations sped up, several more implemented
 * fix existing allocation strategies and add experimental support for
   distinguishing between regular disks and flash devices
+* stxxl::stable_ksort
+  - add experimental warning, some parts are not yet implemented
+  - fixed an off-by-one error in memory allocation vs. usage
+* btree: fuse last two nodes/leaves if possible, rebalancing can fail
+* btree tests: ensure uniqueness of test data if required
+* reduce function call overhead of stxxl::debugmon if it's not activated
+* add public interface headers: stxxl/types, stxxl/aligned_alloc
 * add compatibility wrappers for standard extensions
   hash_map, hash_set, auto_ptr
 * MCSTL is only supported with g++ 4.2 and icpc 10.x
 * lots of small bugfixes
+* made the TPIE, BDB and LEDA_SM tests compile again
 * general code cleanup
   - fixed most compiler warnings
   - elimination of duplicate and unused code
   - cleaned up and sanitized debugging macros
   - no more 'using namespace std' and 'using namespace stxxl'
   - fixed ambiguities noted by g++ 4.3
+  - unify the #include directives
   - add/unify/cleanup copyright headers
 * general code reformatting (uncrustify)
 * add support for new compiler releases
@@ -43,6 +53,16 @@ Version 1.2.0 (UNRELEASED)
     autoconfiguration by creating make.settings.local with defaults
   - improved and simplified boost support for posix systems
   - Mac OS X support
+* changed all tests so that they behave well in their default parameters,
+  system assumptions and return values and can be run from a script
+  - use aligned_alloc/aligned_dealloc appropriately
+* add misc/run_all_tests that runs all tests with sensible parameters,
+  optionally via valgrind
+* checked all tests with valgrind
+  - fixed use of uninitialized memory when writing to normal files
+  - (optionally) initialize typed_blocks and payload data in test structs
+    to suppress (most) uninitialized write errors when writing to disk files
+  - fix mismatched new/delete in mcstl
 * update install and usage instructions
 * spell checked sources and documentation
 
