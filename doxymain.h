@@ -47,8 +47,8 @@ GCC 4.0       |    x      n/a        x        n/a
 GCC 3.4       |    x      n/a        x        n/a
 GCC 3.3       |    o      n/a        o        n/a
 GCC 2.95      |    -      n/a        -        n/a
-ICPC 10.1.015 |    x       x¹        x         x¹
-ICPC 10.0.026 |    x       x¹        x         x¹
+ICPC 10.1.017 |    x¹      x¹        x¹        x¹
+ICPC 10.0.026 |    x¹      x¹        x¹        x¹
 ICPC 9.1.053  |    x¹      -         x¹        -
 ICPC 9.0.032  |    x¹      -         x¹        -
 MSVC 2008 9.0 |    -       -         x        n/a
