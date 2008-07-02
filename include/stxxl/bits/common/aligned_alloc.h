@@ -23,6 +23,9 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
 {
     STXXL_VERBOSE1("stxxl::aligned_alloc<" << ALIGNMENT << ">(), size = " << size << ", meta info size = " << meta_info_size);
     char * buffer = new char[size + ALIGNMENT + sizeof(char *) + meta_info_size];
+    #ifdef STXXL_ALIGNED_CALLOC
+    memset(buffer, 0, size + ALIGNMENT + sizeof(char *) + meta_info_size);
+    #endif
     char * reserve_buffer = buffer + sizeof(char *) + meta_info_size;
     char * result = reserve_buffer + ALIGNMENT -
                     (((unsigned long)reserve_buffer) % (ALIGNMENT)) - meta_info_size;
