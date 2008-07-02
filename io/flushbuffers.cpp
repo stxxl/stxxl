@@ -81,78 +81,30 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 }
 #endif
 
-int main(int argc, char * argv[])
-{
-    unsigned ndisks = 8;
-    unsigned buffer_size = 1024 * 1024 * 64;
-    unsigned buffer_size_int = buffer_size / sizeof(int);
-
-    unsigned i = 0, j = 0;
-
-#ifndef RAW_ACCESS
-/*
-   char * disk_names_dev[] =
-   {
-   "/dev/hde",
-   "/dev/hdg",
-   "/dev/hdi",
-   "/dev/hdk",
-   "/dev/hdm",
-   "/dev/hdo",
-   "/dev/hdq",
-   "/dev/hds"
-   };
- */
-
-
-#else
-/*
-   const char * disk_names_dev[] =
-   {
-   "/dev/raw/raw1",
-   "/dev/raw/raw2",
-   "/dev/raw/raw3",
-   "/dev/raw/raw4",
-   "/dev/raw/raw5",
-   "/dev/raw/raw6",
-   "/dev/raw/raw7",
-   "/dev/raw/raw8"
-   };
- */
-
-    const char * disk_names_dev[] =
-    {
-        "/mnt/hdc/stxxl",
-        "/mnt/hde/stxxl",
-        "/mnt/hdg/stxxl",
-        "/mnt/hdi/stxxl",
-        "/mnt/hdk/stxxl",
-        "/mnt/hdm/stxxl",
-        "/mnt/hdq/stxxl",
-        "/mnt/hds/stxxl",
-        "/mnt/hdu/stxxl",
-        "/mnt/hdw/stxxl",
-        "/mnt/raid/stxxl"
-    };
-#endif
-
-
 #define MB (1024 * 1024)
 #define GB (1024 * 1024 * 1024)
+
+int main(int argc, char * argv[])
+{
+    if (argc < 2) {
+        std::cout << "Usage: " << argv[0] << " length_in_GB diskfile..." << std::endl;
+        return -1;
+    }
 
     stxxl::int64 offset = 0;
     stxxl::int64 end_offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
     std::vector<std::string> disks_arr;
 
-    for (i = 1; i < unsigned(argc - 1); i++)
+    for (int ii = 2; ii < argc; ++ii)
     {
-        std::cout << "Add disk: " << disk_names_dev[atoi(argv[i + 1])]
-                  << std::endl;
-        disks_arr.push_back(disk_names_dev[atoi(argv[i + 1])]);
+        std::cout << "# Add disk: " << argv[ii] << std::endl;
+        disks_arr.push_back(argv[ii]);
     }
-    ndisks = argc - 2;
 
-    unsigned chunks = 32;
+    const unsigned ndisks = disks_arr.size();
+    const unsigned buffer_size = 1024 * 1024 * 64;
+    const unsigned buffer_size_int = buffer_size / sizeof(int);
+    const unsigned chunks = 32;
     request_ptr * reqs = new request_ptr[ndisks * chunks];
     file ** disks = new file *[ndisks];
     int * buffer = (int *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
@@ -163,10 +115,10 @@ int main(int argc, char * argv[])
 
     int count = (end_offset - offset) / buffer_size;
 
+    unsigned i = 0, j = 0;
 
     for (i = 0; i < ndisks * buffer_size_int; i++)
         buffer[i] = i;
-
 
     for (i = 0; i < ndisks; i++)
     {

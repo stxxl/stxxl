@@ -73,8 +73,8 @@ run utils/malloc 4000000000
 run utils/off_t_size
 run utils/pq_param
 
-run io/benchmark_disks 0 1 testdiskx testdisky
-run io/flushbuffers
+run io/benchmark_disks 0 2 testdiskx testdisky
+run io/flushbuffers 2 testdiskx testdisky
 run io/sd_test
 run io/test_io
 
