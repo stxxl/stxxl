@@ -80,7 +80,6 @@ public:
 
         return instance;
     }
-
 };
 
 #ifndef STXXL_DEBUGMON

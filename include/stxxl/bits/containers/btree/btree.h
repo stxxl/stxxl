@@ -303,7 +303,7 @@ namespace btree
             {
                 leaf_type * LeftLeaf = leaf_cache_.get_node((leaf_bid_type)(Bids.back().second));
                 assert(LeftLeaf);
-                if(LeftLeaf->size() + Leaf->size() <= Leaf->max_nelements()) // can fuse
+                if (LeftLeaf->size() + Leaf->size() <= Leaf->max_nelements()) // can fuse
                 {
                     Leaf->fuse(*LeftLeaf);
                     leaf_cache_.delete_node((leaf_bid_type)(Bids.back().second));
@@ -354,10 +354,10 @@ namespace btree
                     {
                         assert(it == Bids.end());                       // this can happen only at the end
                         assert(!ParentBids.empty());
-                        
+
                         node_type * LeftNode = node_cache_.get_node(ParentBids.back().second);
                         assert(LeftNode);
-                        if(LeftNode->size() + Node->size() <= Node->max_nelements()) // can fuse
+                        if (LeftNode->size() + Node->size() <= Node->max_nelements()) // can fuse
                         {
                             Node->fuse(*LeftNode);
                             node_cache_.delete_node(ParentBids.back().second);

@@ -170,16 +170,16 @@ namespace stream
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
         block_type * Blocks1 = new block_type[m2 * 2];
 #else
-        /*
-           block_type * Blocks1 = new block_type[1];       // allocate only one block first
-                                                                                // if needed reallocate
-           while(!input.empty() && pos != block_type::size)
-           {
-           Blocks1[pos/block_type::size][pos%block_type::size] = *input;
-         ++input;
-         ++pos;
-           }*/
-
+#if 0
+        block_type * Blocks1 = new block_type[1];          // allocate only one block first
+                                                           // if needed reallocate
+        while (!input.empty() && pos != block_type::size)
+        {
+            Blocks1[pos / block_type::size][pos % block_type::size] = *input;
+            ++input;
+            ++pos;
+        }
+#endif
 
         while (!input.empty() && pos != block_type::size)
         {
@@ -191,7 +191,7 @@ namespace stream
         block_type * Blocks1;
 
         if (pos == block_type::size)
-        {      // enlarge/reallocate Blocks1 array
+        {   // enlarge/reallocate Blocks1 array
             block_type * NewBlocks = new block_type[m2 * 2];
             std::copy(result_.small_.begin(), result_.small_.end(), NewBlocks[0].begin());
             result_.small_.clear();
@@ -926,7 +926,7 @@ namespace stream
                 seqs = new std::vector<sequence>(nruns);
                 buffers = new std::vector<block_type *>(nruns);
 
-                for (unsigned_type i = 0; i < nruns; i++)                                            //initialize sequences
+                for (unsigned_type i = 0; i < nruns; i++)                                       //initialize sequences
                 {
                     (*buffers)[i] = prefetcher->pull_block();                                   //get first block of each run
                     (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());  //this memory location stays the same, only the data is exchanged

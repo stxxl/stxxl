@@ -54,8 +54,11 @@ struct my_type
     my_type(key_type __key, key_type __load) : _key(__key), _load(__load) { }
 
     void operator = (const key_type & __key) { _key = __key; }
-    void operator = (const my_type & mt) { _key = mt._key;
-                                           _load = mt._load; }
+    void operator = (const my_type & mt)
+    {
+        _key = mt._key;
+        _load = mt._load;
+    }
 };
 
 bool operator < (const my_type & a, const my_type & b);

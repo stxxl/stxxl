@@ -58,7 +58,7 @@ int main()
     stxxl::random_number32 rnd;
     STXXL_MSG("Filling vector... " << rnd() << " " << rnd() << " " << rnd());
     for (vector_type::size_type i = 0; i < v.size(); i++)
-        v[i]._key = (rnd()/2)*2;
+        v[i]._key = (rnd() / 2) * 2;
 
 
     STXXL_MSG("Checking order...");

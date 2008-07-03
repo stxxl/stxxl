@@ -509,14 +509,14 @@ public:
 // return that all specializations of this allocator are interchangeable
 template <class T1, class T2>
 inline bool operator == (const new_alloc<T1> &,
-                  const new_alloc<T2> &) throw ()
+                         const new_alloc<T2> &) throw ()
 {
     return true;
 }
 
 template <class T1, class T2>
 inline bool operator != (const new_alloc<T1> &,
-                  const new_alloc<T2> &) throw ()
+                         const new_alloc<T2> &) throw ()
 {
     return false;
 }
