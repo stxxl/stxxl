@@ -1380,7 +1380,7 @@ void block_manager::delete_blocks(
 }
 
 #ifndef STXXL_DEFAULT_ALLOC_STRATEGY
-    #define STXXL_DEFAULT_ALLOC_STRATEGY RC
+    #define STXXL_DEFAULT_ALLOC_STRATEGY stxxl::RC
 #endif
 
 // in bytes
