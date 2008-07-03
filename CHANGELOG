@@ -56,6 +56,7 @@ Version 1.2.0 (UNRELEASED)
 * changed all tests so that they behave well in their default parameters,
   system assumptions and return values and can be run from a script
   - use aligned_alloc/aligned_dealloc appropriately
+* added some more test programs
 * add misc/run_all_tests that runs all tests with sensible parameters,
   optionally via valgrind
 * checked all tests with valgrind

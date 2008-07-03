@@ -53,11 +53,6 @@
 * implement a memfile that simulates an external memory file using heap,
   eases working with valgrind because no data ever leaves valgrind's control
 
-* add a test for the mcstl parallel sorters, Johannes' extsort should do
-  needs to be able to test every combination of runs creator, merger, ...
-  Usage: extsort [n in megabytes] [p threads] [M in megabytes] 
-             [sorting algorithm: m | q | qb] [merging algorithm: p | s | n]
-
 * stxxl::debugmon: FIXME! is not working any more
 
 * replace tons of #ifdef with wrapper that behaves like boost's scoped_lock

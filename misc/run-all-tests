@@ -169,3 +169,15 @@ done
 done
 done
 
+#algo/test_parallel_sort [n in megabytes] [p threads] [M in megabytes] [sorting algorithm: m | q | qb] [merging algorithm: p | s | n]
+for data in 768 ; do
+for ram in 128 ; do
+for threads in 1 2 3 4 ; do
+for sort in m q qb ; do
+for merge in p s n ; do
+run algo/test_parallel_sort $data $threads $ram $sort $merge
+done
+done
+done
+done
+done
