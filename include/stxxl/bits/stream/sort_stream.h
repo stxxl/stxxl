@@ -926,7 +926,7 @@ namespace stream
                 seqs = new std::vector<sequence>(nruns);
                 buffers = new std::vector<block_type *>(nruns);
 
-                for (int_type i = 0; i < nruns; i++)                                            //initialize sequences
+                for (unsigned_type i = 0; i < nruns; i++)                                            //initialize sequences
                 {
                     (*buffers)[i] = prefetcher->pull_block();                                   //get first block of each run
                     (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());  //this memory location stays the same, only the data is exchanged
