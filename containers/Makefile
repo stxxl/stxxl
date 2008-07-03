@@ -47,7 +47,7 @@ pq_benchmark: $(DEPENDENCIES) pq_benchmark.cpp
 
 
 LEDA_COMPILER		?= g++-2.95
-LEDA_FLAGS		?= -D_LINUX $(filter-out -openmp -fopenmp -D__MCSTL__,$(STXXL_COMPILER_OPTIONS))
+LEDA_FLAGS		?= -D_LINUX $(filter-out -openmp -fopenmp -D__MCSTL__,$(STXXL_COMPILER_OPTIONS)) -Wno-error
 LEDA_ROOT		?= /usr/local/LEDA
 LEDA_SM_ROOT		?= /usr/local/LEDA-SM
 
