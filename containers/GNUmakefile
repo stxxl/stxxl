@@ -41,7 +41,7 @@ $(TESTS_TPIE:=.$(bin)):	STXXL_LINKER_OPTIONS += $(LIBS_TPIE)
 
 # Work around PR33361: internal compiler error: in find_outermost_region_in_block, at tree-cfg.c:4803
 # when using g++-4.2 -fopenmp -O3. Fixed in g++-4.3, wontfix in g++-4.2.
-$(if $(findstring -O3,$(OPT)),$(if $(findstring 4.2,$(COMPILER)),berkeley_db_benchmark.mcstxxl.bin: OPT=-O2))
+$(if $(findstring -O3,$(OPT)),$(if $(findstring 4.2,$(COMPILER)),berkeley_db_benchmark.mcstxxl.bin: OPT=-O0))
 $(if $(findstring -O3,$(OPT)),$(if $(findstring 4.2,$(COMPILER)),btree/test_corr_insert_erase.mcstxxl.bin: OPT=-O2))
 
 clean::
