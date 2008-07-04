@@ -170,7 +170,9 @@ void sim_disk_request::serve()
 {
     //      static_cast<syscall_file*>(file_)->set_size(offset+bytes);
     double op_start = stxxl_timestamp();
+ #if STXXL_IO_STATS
     stats * iostats = stats::get_instance();
+ #endif
     if (type == READ)
     {
  #if STXXL_IO_STATS

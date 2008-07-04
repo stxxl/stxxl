@@ -20,7 +20,9 @@ __STXXL_BEGIN_NAMESPACE
 
 void mmap_request::serve()
 {
+ #if STXXL_IO_STATS
     stats * iostats = stats::get_instance();
+ #endif
     if (type == READ)
     {
  #if STXXL_IO_STATS

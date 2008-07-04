@@ -67,6 +67,11 @@ inline void UNUSED(const U &)
     }
 
 
+#ifdef STXXL_FORCE_VERBOSE_LEVEL
+#undef STXXL_VERBOSE_LEVEL
+#define STXXL_VERBOSE_LEVEL STXXL_FORCE_VERBOSE_LEVEL
+#endif
+
 #ifndef STXXL_VERBOSE_LEVEL
 #define STXXL_VERBOSE_LEVEL -1
 #endif

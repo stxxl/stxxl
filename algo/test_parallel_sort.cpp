@@ -68,6 +68,17 @@ inline bool operator < (const my_type & a, const my_type & b)
     return a.key() < b.key();
 }
 
+inline bool operator == (const my_type & a, const my_type & b)
+{
+    return a.key() == b.key();
+}
+
+inline std::ostream & operator << (std::ostream & o, const my_type & obj)
+{
+    o << obj._key << "/" << obj._load;
+    return o;
+}
+
 struct cmp_less_key : public std::less<my_type>
 {
     my_type min_value() const { return my_type(std::numeric_limits<my_type::key_type>::min(), MAGIC); }
@@ -112,7 +123,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
     stxxl::stats::get_instance()->reset();
     double start = stxxl::timestamp();
 
-    typedef typeof(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
+    typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
 
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 

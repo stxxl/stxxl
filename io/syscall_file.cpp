@@ -38,7 +38,9 @@ const char * syscall_request::io_type()
 
 void syscall_request::serve()
 {
+#if STXXL_IO_STATS
     stats * iostats = stats::get_instance();
+#endif
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="

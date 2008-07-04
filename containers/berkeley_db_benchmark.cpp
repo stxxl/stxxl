@@ -123,6 +123,13 @@ struct my_data
     char databuf[DATA_SIZE];
 };
 
+std::ostream & operator << (std::ostream & o, const my_data & obj)
+{
+    o << "DATA(size=" << sizeof(obj) << ") ";
+
+    return o;
+}
+
 my_key min_key, max_key;
 
 struct comp_type : std::binary_function<my_key, my_key, bool>

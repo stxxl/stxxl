@@ -36,7 +36,9 @@
 //#define MCSTL_QUICKSORT 1
 #endif
 
+#ifndef STXXL_CHECK_ORDER_IN_SORTS
 #define STXXL_CHECK_ORDER_IN_SORTS 0
+#endif
 #define STXXL_VERBOSE_LEVEL -1
 #define MCSTL_VERBOSE_LEVEL 0
 
