@@ -1,3 +1,6 @@
+Version 1.2.1 (unreleased)
+
+------------------------------------------
 Version 1.2.0 (05 July 2008)
 
 * made the block management layer thread-safe

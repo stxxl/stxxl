@@ -16,7 +16,7 @@
 #include <boost/version.hpp>
 #endif
 
-#define STXXL_VERSION_STRING_MA_MI_PL "1.2.0"
+#define STXXL_VERSION_STRING_MA_MI_PL "1.2.1"
 
 // version.defs gets created if a snapshot/beta/rc/release is done
 #ifdef HAVE_VERSION_DEFS
