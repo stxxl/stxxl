@@ -1,4 +1,4 @@
-Version 1.2.0 (UNRELEASED)
+Version 1.2.0 (05 July 2008)
 
 * made the block management layer thread-safe
 * made all size_types unsigned

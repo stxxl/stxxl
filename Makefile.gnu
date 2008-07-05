@@ -157,7 +157,7 @@ release:
 	$(RM) -r reltmp
 	@echo
 	@echo "Your release has been created in stxxl-$(REL_VERSION).tar.gz and stxxl-$(REL_VERSION).zip"
-	@echo "The following files are modified and not commited:"
+	@echo "The following files are modified and not committed:"
 	@svn status -q
 endif
 

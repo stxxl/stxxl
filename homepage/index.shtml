@@ -10,7 +10,6 @@ charset=ISO-8859-1">
   <link href="./dementiev.css" rel="STYLESHEET">
 </head>
 <body>
-<font face="sans-serif" size="10">
 <table border="0" cellpadding="0" cellspacing="2" width="100%">
   <tbody>
     <tr>
@@ -19,8 +18,7 @@ charset=ISO-8859-1">
         <tbody>
           <tr bgcolor="#354278">
             <td class="qh"> <font color="#ffffff" face="sans-serif">&nbsp;
-            <font face="Courier,Courier New"><b>S<small>TXXL</small></b></font>
-home page </font> </td>
+            <font face="Courier,Courier New"><b>S<small>TXXL</small></b></font></font> </td>
           </tr>
         </tbody>
       </table>
@@ -31,9 +29,9 @@ home page </font> </td>
       <table border="0" cellpadding="1" cellspacing="3" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="center">
+            <td align="left" valign="middle">
 			<H4>
-			<font="Courier,Courier New"><b>S<small>TXXL</small></b></font>
+			<font face="Courier,Courier New"><b>S<small>TXXL</small></b></font>
 			: Standard Template Library 
 			for <b>Extra Large</b> Data Sets. </H4>
 			The core of <font
@@ -65,7 +63,7 @@ another design priority is high performance.
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="center">
+            <td align="left" valign="middle">
 
 
 
@@ -123,7 +121,7 @@ The following are some key features of
 		  <td class="n" valign="top">
 		  <table border="0" cellpadding="2" cellspacing="5" width="100%">
 		  <tbody><tr>
-		   <td align="left" valign="center">
+		   <td align="left" valign="middle">
 			
 Questions concerning use and development of the <font
  face="Courier,Courier New"><b>S<small>TXXL</small></b></font> library
@@ -154,7 +152,7 @@ mail to <a href="http://algo2.iti.uni-karlsruhe.de/dementiev/">Roman Dementiev <
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="center"> <font
+            <td align="left" valign="middle"> <font
  face="Courier,Courier New"><b>S<small>TXXL</small></b></font> is free, open
 source, and available under the <a
  href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License 1.0</a></td>
@@ -177,36 +175,41 @@ supported </font> </td>
     </tr>
     <tr>
       <td class="n" valign="top">
-      <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">  &nbsp; &middot; <A href="http://www.linux.org/">Linux</A> (kernel &gt;=
-2.4.18) g++ (versions 3.3.x-4.2.x) </td>
-          </tr>
-        </tbody>
-      </table>
-       <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">  &nbsp; &middot; SunOS (g++ versions 3.3.x-4.2.x)</td>
-          </tr>
-        </tbody>
-      </table>
-      <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">  &nbsp; &middot; MacOS/Darwin (gcc)</td>
-          </tr>
-        </tbody>
-      </table>
-      <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">  &nbsp; &middot; 
-			Windows 2000/XP (Microsoft Visual C++ 7.1 and 8.0 (.NET))</td>
-          </tr>
-        </tbody>
-      </table>
+<table border="0" cellpadding="2" cellspacing="5">
+<tr>
+  <th>&nbsp;</th>
+  <th>Operating System</th>
+  <th>Compilers</th>
+  <th>Extras</th>
+</tr>
+<tbody>
+<tr>
+  <th>&nbsp;&middot;</th>
+  <td><A href="http://www.linux.org/">Linux</A> (kernel &gt;= 2.4.18)</td>
+  <td>g++ (3.3-4.3)<br>icpc (9.0-10.1)</td>
+  <td><a href="http://www.boost.org">Boost</a> (optional),<br>
+      <a href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">MCSTL</a> (optional, only with g++ 4.2 or icpc 10.x)</td>
+</tr>
+<tr>
+  <th>&nbsp;&middot;</th>
+  <td>Solaris</td>
+  <td>g++ (3.3-4.3)</td>
+  <td></td>
+</tr>
+<tr>
+  <th>&nbsp;&middot;</th>
+  <td>Mac OS X</td>
+  <td>g++</td>
+  <td></td>
+</tr>
+<tr>
+  <th>&nbsp;&middot;</th>
+  <td>Windows 2000/XP/Vista</td>
+  <td>Microsoft Visual C++ 8.0, 9.0</td>
+  <td><a href="http://www.boost.org">Boost</a> (required)</td>
+</tr>
+</tbody>
+</table>
       </td>
     </tr>
     <tr>
@@ -222,20 +225,18 @@ version </font> </td>
       </td>
     </tr>
     <tr>
-    </tr>
-    <tr>
       <td class="n" valign="top">
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="center"> Version 1.1.0 (31 July 2007)
+            <td align="left" valign="middle"> Version 1.2.0 (05 July 2008)
  contains an implementation of the lower layers (memory
 management, disk virtualization, prefetching,...). From the higher
 layers, (pipelined) sorting with 
-<A  href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">SMP and multicore procesor support</A>, (pipelined) scanning and containers
-(vectors, stacks, priority queues, maps (B+Tree) , queues, deques) are supported. 
+<A  href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">SMP and multi-core processor support</A>, (pipelined) scanning and containers
+(vectors, stacks, priority queues, maps (B+Tree), queues, deques) are supported. 
 Currently that
-sums to about 25 thousand lines of code (25 KSLOC). </td>
+sums to about 28 thousand lines of code (28 KSLOC). </td>
           </tr>
         </tbody>
       </table>
@@ -257,124 +258,51 @@ new in the latest release </font> </td>
       <td class="n" valign="top">
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
-          <tr>
-            <td align="left" valign="center">
-            <table border="0" cellpadding="1" cellspacing="3"
- width="100%">
-              <tbody>
-                <tr>
-                  <td align="left" valign="center"> &nbsp; &middot;
-			Pipelined stream::sort, stream::runs_creator and stream::runs_merger are parallelized using MCSTL</td>
-                </tr>
-              </tbody>
-            </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </td>
-    </tr>
-    <tr>
-      <td class="n" valign="top">
-      <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">
-            <table border="0" cellpadding="1" cellspacing="3"
- width="100%">
-              <tbody>
-                <tr>
-                  <td align="left" valign="center"> &nbsp; &middot;
-			Restructured the source layout </td>
-                </tr>
-              </tbody>
-            </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </td>
-    </tr>
-<tr>
-      <td class="n" valign="top">
-      <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">
-            <table border="0" cellpadding="1" cellspacing="3"
- width="100%">
-              <tbody>
-                <tr>
-                  <td align="left" valign="center"> &nbsp; &middot;
-			Overhauled the build system </td>
-                </tr>
-              </tbody>
-            </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </td>
-    </tr>
-<tr>
-      <td class="n" valign="top">
-      <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">
-            <table border="0" cellpadding="1" cellspacing="3"
- width="100%">
-              <tbody>
-                <tr>
-                  <td align="left" valign="center"> &nbsp; &middot;
-			More compilers tested (see CHANGELOG)</td>
-                </tr>
-              </tbody>
-            </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </td>
-    </tr>
-<tr>
-      <td class="n" valign="top">
-      <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">
-            <table border="0" cellpadding="1" cellspacing="3"
- width="100%">
-              <tbody>
-                <tr>
-                  <td align="left" valign="center"> &nbsp; &middot;
-			stxxl::vector: implemented some more functions</td>
-                </tr>
-              </tbody>
-            </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      </td>
-    </tr>
-<tr>
-      <td class="n" valign="top">
-      <table border="0" cellpadding="2" cellspacing="5" width="100%">
-        <tbody>
-          <tr>
-            <td align="left" valign="center">
-            <table border="0" cellpadding="1" cellspacing="3"
- width="100%">
-              <tbody>
-                <tr>
-                  <td align="left" valign="center"> &nbsp; &middot;
-			And many many more: cleanup, reformat the code to a consistent format (Thanks, uncrustify!), obsolete files removed, fixed include dependencies, fixed lots of warnings, fixed lots of small bugs, add header compilation tests, ...</td>
-                </tr>
-              </tbody>
-            </table>
-            </td>
-          </tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+The block management layer is now thread safe.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+stxxl::priority_queue - several bugs fixed, significant speed improvements.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+stxxl::vector, stxxl::sort, stxxl::stream::sort -
+significant speed improvements if blocks have padding.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+stxxl::map - fixed some cases where rebalancing could fail.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Added checks to detect comparison operators 
+and sentinels that don't fulfill the requirements.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Added new test programs and some helper scripts.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Unified behavior of the test programs, they can now be run in a semi-automatic test suite.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Checked all test programs with <a href="http://valgrind.org/">valgrind</a>'s memcheck tool
+and fixed all bugs found so far.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Improved build system further, e.g. now tries to autoconfigure the STXXL_ROOT path.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Support new compiler releases g++ 4.3, icpc 10.1 and MSVC 9.0.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Support Mac OS X and Windows Vista.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Renamed/relocated several files,
+unified source code formatting,
+added proper Copyright/License headers to all source files.
+</td></tr>
+<tr><td align="left" valign="middle"> &nbsp; &middot;
+Lots of small fixes and many more changes.
+For a detailed list, please read the the CHANGELOG file.
+</td></tr>
         </tbody>
       </table>
       </td>
@@ -395,16 +323,22 @@ new in the latest release </font> </td>
       <td class="n" valign="top">
       <table border="0" cellpadding="1" cellspacing="3" width="100%">
         <tbody>
+	  <tr>
+	  <td>
          <table border="0" cellpadding="1" cellspacing="3">
 	  <tr>
-	    <td/>
-	    <td>Current Stable Version&nbsp;&nbsp;</td>
-	    <td>Development Version (subversion)</td>
+	    <th>&nbsp;</th>
+	    <th>Current Stable Version&nbsp;&nbsp;</th>
+	    <th>Previous Stable Version&nbsp;&nbsp;</th>
+	    <th>Development Version (subversion)</th>
 	  </tr>
           <tr>
-            <td align="left" valign="center">
+            <td align="left" valign="middle">
 	      &nbsp; &middot; Installation manual:
 	    </td>
+	    <td>
+	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.2.0/installation.html">1.2.0</a>]
+            </td>
 	    <td>
 	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.1.0/installation.html">1.1.0</a>]
             </td>
@@ -412,8 +346,11 @@ new in the latest release </font> </td>
 	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/trunk/install-svn.html">trunk</a>]
           </tr>
           <tr>
-            <td align="left" valign="center">
+            <td align="left" valign="middle">
 	      &nbsp; &middot; Programmer documentation:
+	    </td>
+	    <td>
+	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.2.0/">1.2.0</a>]
 	    </td>
 	    <td>
 	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.1.0/">1.1.0</a>]
@@ -423,59 +360,69 @@ new in the latest release </font> </td>
 	    </td>
           </tr>
           <tr>
-            <td align="left" valign="center">
+            <td align="left" valign="middle">
 	      &nbsp; &middot; Download:
 [<a href="http://sourceforge.net/projects/stxxl">sf.net page</a>]
             </td>
 	    <td>
-	      [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632">1.1.0</a>] tgz,zip (sf.net)
+	      [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632">1.2.0</a>] tgz, zip (sf.net)
+	    </td>
+	    <td>
+	      [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632&amp;package_id=144407&amp;release_id=528923">1.1.0</a>] tgz, zip (sf.net)
 	    </td>
 	    <td>
 	      subversion checkout
 	    </td>
           </tr>
 	 <tr>
-            <td align="left" valign="center">
-	      &nbsp; &middot; Subversion repository:<br/>
+            <td align="left" valign="middle">
+	      &nbsp; &middot; Subversion repository:<br>
 	      &nbsp; &nbsp; https://stxxl.svn.sourceforge.net/...
             </td>
 	    <td>
+	      [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.2.0/">Browse</a>]
+	      [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.2.0/">Checkout</a>]
+              <br>.../svnroot/stxxl/tags/1.2.0/
+	    </td>
+	    <td>
 	      [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.1.0/">Browse</a>]
 	      [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.1.0/">Checkout</a>]
-              <br/>.../svnroot/stxxl/tags/1.1.0/
+              <br>.../svnroot/stxxl/tags/1.1.0/
 	    </td>
 	    <td>
 	      [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/trunk/">Browse</a>]
 	      [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/trunk/">Checkout</a>]
-              <br/>.../svnroot/stxxl/trunk/
+              <br>.../svnroot/stxxl/trunk/
 	    </td>
           </tr>
          </table>
+	  </td>
+	  </tr>
 	  <tr>
-            <td align="left" valign="center">
+            <td align="left" valign="middle">
 	      &nbsp; &middot; <b>FAQ</b> - Frequently Asked Questions
 	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/trunk/FAQ.html">html</a>]
             </td>
 	  </tr>
           <tr>
-            <td align="left" valign="center"> &nbsp; &middot; <b>Design paper - library overview </b> 
+            <td align="left" valign="middle"> &nbsp; &middot; <b>Design paper - library overview </b> 
                 [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/TRKA2005_18.pdf">pdf</a>] [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/report/">html</a>]
             </td>
           </tr>
           <tr>
-            <td align="left" valign="center"> &nbsp; &middot; <b>Tutorial
+            <td align="left" valign="middle"> &nbsp; &middot; <b>Tutorial
 (draft) </b>
 [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/stxxl_tutorial.pdf">pdf</a>]
             </td>
           </tr>
 	 <tr>
-            <td align="left" valign="center"> &nbsp; &middot; Older version (0.77 - Linux only):
-[<a href="http://sourceforge.net/project/showfiles.php?group_id=131632&package_id=144407&release_id=541515">tgz (sf.net)</a>]
+            <td align="left" valign="middle"> &nbsp; &middot; Older version (0.77 - Linux only):
+[<a href="http://sourceforge.net/project/showfiles.php?group_id=131632&amp;package_id=144407&amp;release_id=541515">tgz (sf.net)</a>]
 [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/stxxl_0.77.tgz">tgz</a>]
             </td>
           </tr>
 	<tr>
-            <td align="left" valign="center"> &nbsp; &middot;
+            <td align="left" valign="middle"> &nbsp; &middot;
 		MCSTL library homepage: [<A href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">link</A>] (optional)
 	  </td>
          </tr>
@@ -502,29 +449,29 @@ Ongoing and completed projects using <font
       <table border="0" cellpadding="1" cellspacing="3" width="100%">
         <tbody>
           <tr>
-          <tr>
-            <td align="left" valign="center"> &nbsp; &middot; External
+            <td align="left" valign="middle"> &nbsp; &middot; External
 Memory Breadth-First Search (BFS) 
 [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/ebfs.pdf">paper (pdf)</a>] 
 [<a href="http://www.mpi-inf.mpg.de/~ajwani/em_bfs/">project page</a>] 
 [<a href="http://www.mpi-inf.mpg.de/~ajwani/graph_gen/">graph generators</a>] 
 </td>
           </tr>
-            <td align="left" valign="center"> &nbsp; &middot; External
+          <tr>
+            <td align="left" valign="middle"> &nbsp; &middot; External
 Memory Minimum Spanning Trees [<a
  href="http://www.dominik-schultes.de/emmst/">project page</a>]
 [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/emst.ps">paper (ps)</a>]
 [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/emst.pdf">paper (pdf)</a>] </td>
           </tr>
           <tr>
-            <td align="left" valign="center"> &nbsp; &middot; External
+            <td align="left" valign="middle"> &nbsp; &middot; External
 Memory Spanning Forests and Connected Components [<a
  href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/cc.pdf">report</a>] 
 [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/cc.tgz">src tarball</a>]
             </td>
           </tr>
           <tr>
-            <td align="left" valign="center"> &nbsp; &middot; 
+            <td align="left" valign="middle"> &nbsp; &middot; 
 External Memory Suffix Array Construction and
 Suffix Array Checker [<a
  href="http://algo2.iti.uni-karlsruhe.de/dementiev/esuffix/docu/index.html">project
@@ -534,7 +481,7 @@ page</a>]
 instances</a>] </td>
           </tr>
           <tr>
-            <td align="left" valign="center"> &nbsp; &middot; External Memory Hash-Tables </td>
+            <td align="left" valign="middle"> &nbsp; &middot; External Memory Hash-Tables </td>
           </tr>
         </tbody>
       </table>
@@ -554,9 +501,9 @@ Publications </font> </td>
     </tr>
 	<tr>
 		<td valign=top class=n >
-			<table cellspacing=5 cellpadding=2 border=0 width=100% >
+			<table cellspacing=5 cellpadding=2 border=0 width="100%">
 				<tr>
-				    <td align=left valign=center>
+				    <td align=left valign="middle">
 	R. Dementiev, L. Kettner, P. Sanders:
 STXXL: standard template library for XXL data sets,
 		  <small>
@@ -573,9 +520,9 @@ STXXL: standard template library for XXL data sets,
 	</tr>
  <tr>
 		<td valign=top class=n >
-			<table cellspacing=5 cellpadding=2 border=0 width=100% >
+			<table cellspacing=5 cellpadding=2 border=0 width="100%">
 				<tr>
-					<td align=left valign=center>
+					<td align=left valign="middle">
 					D. Ajwani, R. Dementiev, U. Meyer:
 					A Computational Study of External-Memory BFS Algorithms.
 					<small>SODA2006: ACM-SIAM Symposium on Discrete Algorithms (January 2006, Miami, Florida, USA) [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/ebfs.pdf">pdf</a>] 
@@ -587,9 +534,9 @@ STXXL: standard template library for XXL data sets,
 	</tr>
      <tr>
 		<td valign=top class=n >
-			<table cellspacing=5 cellpadding=2 border=0 width=100% >
+			<table cellspacing=5 cellpadding=2 border=0 width="100%">
 				<tr>
-					<td align=left valign=center>
+					<td align=left valign="middle">
 					R. Dementiev, L. Kettner, P. Sanders:
 					Stxxl: Standard Template Library for XXL Data Sets.
 					<small>ESA2005: 13th Annual European Symposium on Algorithms (October 2005, Palma de Mallorca, Spain) 
@@ -602,9 +549,9 @@ STXXL: standard template library for XXL data sets,
 	</tr>
         <tr>
 		<td valign=top class=n >
-			<table cellspacing=5 cellpadding=2 border=0 width=100% >
+			<table cellspacing=5 cellpadding=2 border=0 width="100%">
 				<tr>
-					<td align=left valign=center>
+					<td align=left valign="middle">
 					R. Dementiev, L. Kettner, P. Sanders:
 					Stxxl: Standard Template Library for XXL Data Sets.
 					Technical Report 2005/18, Fakult&auml;t f&uuml;r Informatik, University of Karlsruhe
@@ -619,7 +566,7 @@ STXXL: standard template library for XXL data sets,
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="center"> R. Dementiev, J.
+            <td align="left" valign="middle"> R. Dementiev, J.
 K&auml;rkk&auml;inen, J. Mehnert, P. Sanders:
 Better External Memory Suffix Array Construction <small> ALENEX05:
 Algorithm Engineering and Experiments (January 2005, Vancouver ,
@@ -636,7 +583,7 @@ instances</a>] </td>
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="center"> R. Dementiev, P. Sanders,
+            <td align="left" valign="middle"> R. Dementiev, P. Sanders,
 D. Schultes, and J. Sibeyn: Engineering an External Memory Minimum
 Spanning Tree Algorithm. <small> TSC04: 3rd IFIP International
 Conference on Theoretical Computer Science (August 24-26, 2004,
@@ -652,7 +599,7 @@ Toulouse): </small> <small> [<a href="http://algo2.iti.uni-karlsruhe.de/dementie
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="center"> R. Dementiev, P. Sanders:
+            <td align="left" valign="middle"> R. Dementiev, P. Sanders:
 Asynchronous Parallel Disk Sorting. <small> In 15th ACM Symposium on
 Parallelism in Algorithms and Architectures (June 7-9, 2003, San Diego,
 California, USA): pages 138-148 </small> <small>[<a
@@ -670,7 +617,7 @@ California, USA): pages 138-148 </small> <small>[<a
             <td class="qh"> <font color="#ffffff" face="sans-serif">&nbsp;
 
 
- <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=131632&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+ <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=131632&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
 
 
 </font> 
@@ -684,6 +631,5 @@ California, USA): pages 138-148 </small> <small>[<a
     </tr>
   </tbody>
 </table>
-</font>
 </body>
 </html>
