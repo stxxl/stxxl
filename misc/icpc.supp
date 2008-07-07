@@ -1,0 +1,10 @@
+{
+   icpc/openmp/libguide/sched_setaffinity/null_ptr_arg
+   Memcheck:Param
+   sched_setaffinity(mask)
+   fun:syscall
+   fun:__kmp_affinity_determine_capable
+   fun:__kmp_env_initialize
+   fun:__kmp_serial_initialize
+   fun:omp_get_max_threads
+}

@@ -23,6 +23,12 @@ test -n "$1" && stxxl="$1"
 valgrind=yes
 test -n "$2" && valgrind="$2"
 
+suppressions=""
+for supp in `dirname $0`/*.supp
+do
+	suppressions="$suppressions --suppressions=$supp"
+done
+
 testresults=testresults
 mkdir -p $testresults
 
@@ -43,7 +49,7 @@ run()
 	echo "+ $cmd $@" | tee "$pfx.log"
 	echo "[`date`]" | tee -a "$pfx.log"
 	if [ "$valgrind" = "yes" ]; then
-		valgrind --track-fds=no --log-file="$pfx.valgrind" --freelist-vol=2147483648 --max-stackframe=8388608 \
+		valgrind --track-fds=no --log-file="$pfx.valgrind" --freelist-vol=2147483648 --max-stackframe=8388608 $suppressions \
 		$cmd "$@" < /dev/null 2>&1 | tee -a "$pfx.log"
 		result=$?
 	else
