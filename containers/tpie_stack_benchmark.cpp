@@ -117,7 +117,8 @@ void run_stack(stxxl::int64 volume)
 
 int main(int argc, char * argv[])
 {
-    using namespace std;
+    using std::cout;
+    using std::endl;
 #ifdef BTE_COLLECTION_IMP_MMAP
     cout << "BTE_COLLECTION_IMP_MMAP is defined" << endl;
 #endif

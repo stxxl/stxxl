@@ -17,6 +17,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/ui/text/TestRunner.h>
 
+
 #define BLOCK_SIZE (1024 * 512)
 
 struct MyType
@@ -25,18 +26,15 @@ struct MyType
     char chars[5];
 };
 
-using namespace stxxl;
-
-
 struct my_handler
 {
-    void operator () (request * req)
+    void operator () (stxxl::request * req)
     {
         STXXL_MSG(req << " done, type=" << req->io_type());
     }
 };
 
-typedef typed_block<BLOCK_SIZE, MyType> block_type;
+typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
 class BMLayerTest : public CppUnit::TestCase
 {
@@ -55,11 +53,11 @@ public:
     void testIO()
     {
         const unsigned nblocks = 2;
-        BIDArray<BLOCK_SIZE> bids(nblocks);
+        stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
         std::vector<int> disks(nblocks, 2);
         stxxl::request_ptr * reqs = new stxxl::request_ptr[nblocks];
-        block_manager * bm = block_manager::get_instance();
-        bm->new_blocks(striping(), bids.begin(), bids.end());
+        stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+        bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
 
         block_type * block = new block_type;
         STXXL_MSG(std::hex);
@@ -119,12 +117,12 @@ public:
 
     void testPrefetchPool()
     {
-        prefetch_pool<block_type> pool(2);
+        stxxl::prefetch_pool<block_type> pool(2);
         pool.resize(10);
         pool.resize(5);
         block_type * blk = new block_type;
         block_type::bid_type bid;
-        block_manager::get_instance()->new_blocks(single_disk(), &bid, (&bid) + 1);
+        stxxl::block_manager::get_instance()->new_blocks(stxxl::single_disk(), &bid, (&bid) + 1);
         pool.hint(bid);
         pool.read(blk, bid)->wait();
         delete blk;
@@ -132,27 +130,27 @@ public:
 
     void testWritePool()
     {
-        write_pool<block_type> pool(100);
+        stxxl::write_pool<block_type> pool(100);
         pool.resize(10);
         pool.resize(5);
         block_type * blk = new block_type;
         block_type::bid_type bid;
-        block_manager::get_instance()->new_blocks(single_disk(), &bid, (&bid) + 1);
+        stxxl::block_manager::get_instance()->new_blocks(stxxl::single_disk(), &bid, (&bid) + 1);
         pool.write(blk, bid);
     }
 
-    typedef typed_block<BLOCK_SIZE, int> block_type1;
-    typedef buf_ostream<block_type1, BIDArray<BLOCK_SIZE>::iterator> buf_ostream_type;
-    typedef buf_istream<block_type1, BIDArray<BLOCK_SIZE>::iterator> buf_istream_type;
+    typedef stxxl::typed_block<BLOCK_SIZE, int> block_type1;
+    typedef stxxl::buf_ostream<block_type1, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_ostream_type;
+    typedef stxxl::buf_istream<block_type1, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_istream_type;
 
     void testStreams()
     {
         const unsigned nblocks = 64;
         const unsigned nelements = nblocks * block_type1::size;
-        BIDArray<BLOCK_SIZE> bids(nblocks);
+        stxxl::BIDArray<BLOCK_SIZE> bids(nblocks);
 
-        block_manager * bm = block_manager::get_instance();
-        bm->new_blocks(striping(), bids.begin(), bids.end());
+        stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+        bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
         {
             buf_ostream_type out(bids.begin(), 2);
             for (unsigned i = 0; i < nelements; i++)

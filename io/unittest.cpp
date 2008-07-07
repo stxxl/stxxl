@@ -15,11 +15,10 @@
 #include <cppunit/ui/text/TestRunner.h>
 #include <stxxl.h>
 
-using namespace stxxl;
 
 struct my_handler
 {
-    void operator () (request * ptr)
+    void operator () (stxxl::request * ptr)
     {
         STXXL_MSG("Request completed: " << ptr);
     }
@@ -46,19 +45,18 @@ public:
         const char * paths[2] = { "data1", "data2" };
 #else
         const char * paths[2] = { "/var/tmp/data1", "/var/tmp/data2" };
-        mmap_file file1(paths[0], file::CREAT | file::RDWR, 0);
+        stxxl::mmap_file file1(paths[0], stxxl::file::CREAT | stxxl::file::RDWR, 0);
         file1.set_size(size * 1024);
 #endif
 
-        syscall_file file2(paths[1], file::CREAT | file::RDWR, 1);
+        stxxl::syscall_file file2(paths[1], stxxl::file::CREAT | stxxl::file::RDWR, 1);
 
-        request_ptr req[16];
+        stxxl::request_ptr req[16];
         unsigned i = 0;
         for ( ; i < 16; i++)
             req[i] = file2.awrite(buffer, i * size, size, my_handler());
 
-
-        wait_all(req, 16);
+        stxxl::wait_all(req, 16);
 
         stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
     }
@@ -67,9 +65,9 @@ public:
     {
         unlink("TestFile");
 #ifdef BOOST_MSVC
-        mmap_file file1("TestFile", file::RDWR, 0);
+        stxxl::mmap_file file1("TestFile", stxxl::file::RDWR, 0);
 #else
-        mmap_file file1("TestFile", file::RDWR, 0);
+        stxxl::mmap_file file1("TestFile", stxxl::file::RDWR, 0);
 #endif
     }
 };
