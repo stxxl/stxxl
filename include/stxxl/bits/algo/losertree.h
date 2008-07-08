@@ -71,7 +71,7 @@ public:
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
         current = new run_cursor_type[kReg];
-        run_cursor_type::prefetcher() = p;
+        run_cursor_type::set_prefetcher(p);
 #else
         current = new run_cursor_type[kReg];
         for (i = 0; i < kReg; ++i)

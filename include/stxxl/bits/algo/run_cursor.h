@@ -38,6 +38,7 @@ struct run_cursor
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
 
+template <typename must_be_void = void>
 struct have_prefetcher
 {
     static void * untyped_prefetcher;
@@ -49,7 +50,7 @@ template <typename block_type,
           typename prefetcher_type_>
 struct run_cursor2 : public run_cursor<block_type>
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
-                     , public have_prefetcher
+                     , public have_prefetcher<>
 #endif
 {
     typedef prefetcher_type_ prefetcher_type;
@@ -61,9 +62,13 @@ struct run_cursor2 : public run_cursor<block_type>
     using run_cursor<block_type>::buffer;
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
-    static prefetcher_type * & prefetcher()    // sorry, a hack
+    static prefetcher_type * const prefetcher()    // sorry, a hack
     {
-        return (prefetcher_type * &)untyped_prefetcher;
+        return reinterpret_cast<prefetcher_type *>(untyped_prefetcher);
+    }
+    static void set_prefetcher(prefetcher_type * pfptr)
+    {
+        untyped_prefetcher = pfptr;
     }
     run_cursor2() { }
 #else
@@ -73,7 +78,6 @@ struct run_cursor2 : public run_cursor<block_type>
         return prefetcher_;
     }
 
-public:
     run_cursor2() { }
     run_cursor2(prefetcher_type * p) : prefetcher_(p) { }
 #endif
@@ -90,7 +94,8 @@ public:
 };
 
 #ifdef STXXL_SORT_SINGLE_PREFETCHER
-void * have_prefetcher::untyped_prefetcher = NULL;
+template <typename must_be_void>
+void * have_prefetcher<must_be_void>::untyped_prefetcher = NULL;
 #endif
 
 template <typename block_type,
