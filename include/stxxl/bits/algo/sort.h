@@ -479,7 +479,7 @@ namespace sort_local
             }
 
  #ifdef STXXL_CHECK_ORDER_IN_SORTS
-            value_type last_elem;
+            value_type last_elem = cmp.min_value();
  #endif
 
             for (int_type j = 0; j < out_run_size; ++j)                 //for the whole output run, out_run_size is in blocks
@@ -571,7 +571,6 @@ namespace sort_local
 
                 if (j > 0) //do not check in first iteration
                     assert(cmp((*out_buffer)[0], last_elem) == false);
-
 
                 last_elem = (*out_buffer)[block_type::size - 1];
  #endif
