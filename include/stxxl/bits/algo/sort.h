@@ -17,10 +17,6 @@
 #include <list>
 #include <functional>
 
-#ifdef __MCSTL__
- #include <mcstl.h>
-#endif
-
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/adaptor.h>
@@ -36,6 +32,7 @@
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/inmemsort.h>
+#include <stxxl/bits/parallel.h>
 
 
 //#define SORT_OPTIMAL_PREFETCHING
@@ -457,14 +454,12 @@ namespace sort_local
 //If parallelism is activated, one can still fall back to the
 //native merge routine by setting stxxl::SETTINGS::native_merge= true, //otherwise, it is used anyway.
 
-#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
+        if (do_parallel_merge())
+        {
+#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
 
 // begin of STL-style merging
 
-        //taks: merge
-
-        if (!stxxl::SETTINGS::native_merge && mcstl::HEURISTIC::num_threads >= 1)
-        {
             typedef stxxl::int64 diff_type;
             typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
             typedef typename std::vector<sequence>::size_type seqs_size_type;
@@ -580,10 +575,13 @@ namespace sort_local
             }
 
 // end of STL-style merging
+
+#else
+            assert(false);
+#endif
         }
         else
         {
-#endif
 
 // begin of native merging procedure
 
@@ -608,20 +606,15 @@ namespace sort_local
             if (i)
                 assert(cmp(*(out_buffer->elem), last_elem) == false);
 
-
             last_elem = (*out_buffer).elem[block_type::size - 1];
 #endif
-
 
             out_buffer = writer.write(out_buffer, (*out_run)[i].bid);
         }
 
 // end of native merging procedure
 
-#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
-    }
-#endif
-
+        }
 
         delete[] prefetch_seq;
 

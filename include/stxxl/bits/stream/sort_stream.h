@@ -14,10 +14,6 @@
 #ifndef STXXL_SORT_STREAM_HEADER
 #define STXXL_SORT_STREAM_HEADER
 
-#ifdef __MCSTL__
- #include <mcstl.h>
-#endif
-
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
@@ -915,14 +911,10 @@ namespace stream
 
         void initialize_current_block()
         {
-#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
-
-// begin of STL-style merging
-
-            //taks: merge
-
-            if (!stxxl::SETTINGS::native_merge && mcstl::HEURISTIC::num_threads >= 1)
+            if (do_parallel_merge())
             {
+#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+// begin of STL-style merging
                 seqs = new std::vector<sequence>(nruns);
                 buffers = new std::vector<block_type *>(nruns);
 
@@ -933,31 +925,26 @@ namespace stream
                 }
 
 // end of STL-style merging
+#else
+                assert(false);
+#endif
             }
             else
             {
-#endif
-
 // begin of native merging procedure
 
             losers = new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
 // end of native merging procedure
-#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
-        }
-#endif
+            }
         }
 
         void fill_current_block()
         {
-#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
-
-// begin of STL-style merging
-
-            //taks: merge
-
-            if (!stxxl::SETTINGS::native_merge && mcstl::HEURISTIC::num_threads >= 1)
+            if (do_parallel_merge())
             {
+#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+// begin of STL-style merging
  #ifdef STXXL_CHECK_ORDER_IN_SORTS
                 value_type last_elem;
  #endif
@@ -1005,7 +992,7 @@ namespace stream
 
                     STXXL_VERBOSE1("before merge" << output_size);
 
-                    mcstl::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size, false);
+                    stxxl::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size, false);
                     //sequence iterators are progressed appropriately
 
                     STXXL_VERBOSE1("after merge");
@@ -1044,25 +1031,21 @@ namespace stream
                         }
                     assert(false);
                 }
-
-
  #endif
 
-
 // end of STL-style merging
+#else
+                assert(false);
+#endif
             }
             else
             {
-#endif
-
 // begin of native merging procedure
 
             losers->multi_merge(current_block->elem);
 
-#if defined (__MCSTL__) && defined (STXXL_PARALLEL_MULTIWAY_MERGE)
 // end of native merging procedure
-        }
-#endif
+            }
         }
 
     public:

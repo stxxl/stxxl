@@ -101,6 +101,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/compat_auto_ptr.h \
 	$(HEADER_PATH)/compat_hash_map.h \
 	$(HEADER_PATH)/compat_hash_set.h \
+	$(HEADER_PATH)/parallel.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
 	$(HEADER_PATH)/common/mutex.h \
 	$(HEADER_PATH)/common/rand.h \
