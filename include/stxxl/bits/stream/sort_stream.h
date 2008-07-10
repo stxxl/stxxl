@@ -913,7 +913,7 @@ namespace stream
         {
             if (do_parallel_merge())
             {
-#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+#if STXXL_PARALLEL_MULTIWAY_MERGE
 // begin of STL-style merging
                 seqs = new std::vector<sequence>(nruns);
                 buffers = new std::vector<block_type *>(nruns);
@@ -943,7 +943,7 @@ namespace stream
         {
             if (do_parallel_merge())
             {
-#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+#if STXXL_PARALLEL_MULTIWAY_MERGE
 // begin of STL-style merging
  #ifdef STXXL_CHECK_ORDER_IN_SORTS
                 value_type last_elem;

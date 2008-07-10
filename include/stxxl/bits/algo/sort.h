@@ -456,7 +456,7 @@ namespace sort_local
 
         if (do_parallel_merge())
         {
-#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+#if STXXL_PARALLEL_MULTIWAY_MERGE
 
 // begin of STL-style merging
 

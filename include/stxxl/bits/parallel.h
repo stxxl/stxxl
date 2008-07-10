@@ -43,6 +43,11 @@
 
 #if !STXXL_PARALLEL
 #undef STXXL_PARALLEL_MULTIWAY_MERGE
+#define STXXL_PARALLEL_MULTIWAY_MERGE 0
+#endif
+
+#if !defined(STXXL_PARALLEL_MULTIWAY_MERGE)
+#define STXXL_PARALLEL_MULTIWAY_MERGE 0
 #endif
 
 
@@ -50,9 +55,9 @@ __STXXL_BEGIN_NAMESPACE
 
 inline bool do_parallel_merge()
 {
-#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MULTIWAY_MERGE) && defined(_GLIBCXX_PARALLEL)
+#if STXXL_PARALLEL_MULTIWAY_MERGE && defined(_GLIBCXX_PARALLEL)
     return !stxxl::SETTINGS::native_merge && omp_get_max_threads() >= 1;
-#elif STXXL_PARALLEL && defined(STXXL_PARALLEL_MULTIWAY_MERGE) && defined(__MCSTL__)
+#elif STXXL_PARALLEL_MULTIWAY_MERGE && defined(__MCSTL__)
     return !stxxl::SETTINGS::native_merge && mcstl::SETTINGS::num_threads >= 1;
 #else
     return false;

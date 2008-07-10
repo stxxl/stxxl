@@ -13,8 +13,12 @@
 
 #define MCSTL_QUICKSORT_WORKAROUND 0
 
+#if !defined(STXXL_PARALLEL_MULTIWAY_MERGE)
 #define STXXL_PARALLEL_MULTIWAY_MERGE 1
+#endif
+#if !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
 #define STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD 0
+#endif
 
 #include <algorithm>
 #include <functional>
