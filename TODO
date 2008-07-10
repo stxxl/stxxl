@@ -3,9 +3,6 @@
 * There is currently no support for Boost libraries (not headers) in a user
   specified location.
 
-* g++ 4.3 parallel_mode support
-  => Milestone: 1.2.1
-
 * replace build system, something with '$LIBNAME-config --libs --cflags ...' would be nice
 
 * if the stxxl disk files have been enlarged because more external memory
