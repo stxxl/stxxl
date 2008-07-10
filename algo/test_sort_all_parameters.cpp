@@ -23,68 +23,75 @@
  #define RECORD_SIZE 4
 #endif
 
+
+template <unsigned SIZE>
 struct my_type
 {
     typedef unsigned key_type;
 
     key_type _key;
-    // char _data[RECORD_SIZE - sizeof(key_type)];
+    char _data[SIZE - sizeof(key_type)];
 
     my_type() { }
     my_type(key_type __key) : _key(__key) { }
 };
 
-std::ostream & operator << (std::ostream & o, const my_type obj)
+template <unsigned SIZE>
+std::ostream & operator << (std::ostream & o, const my_type<SIZE> obj)
 {
     o << obj._key;
     return o;
 }
 
-
-bool operator < (const my_type & a, const my_type & b)
+template <unsigned SIZE>
+bool operator < (const my_type<SIZE> & a, const my_type<SIZE> & b)
 {
     return a._key < b._key;
 }
 
-bool operator == (const my_type & a, const my_type & b)
+template <unsigned SIZE>
+bool operator == (const my_type<SIZE> & a, const my_type<SIZE> & b)
 {
     return a._key == b._key;
 }
 
-bool operator != (const my_type & a, const my_type & b)
+template <unsigned SIZE>
+bool operator != (const my_type<SIZE> & a, const my_type<SIZE> & b)
 {
     return a._key != b._key;
 }
 
-struct Cmp : public std::less<my_type>
+template <typename T>
+struct Cmp : public std::less<T>
 {
-    bool operator () (const my_type & a, const my_type & b) const
+    bool operator () (const T & a, const T & b) const
     {
         return a._key < b._key;
     }
 
-    static my_type min_value()
+    static T min_value()
     {
-        return my_type(0);
+        return T(0);
     }
-    static my_type max_value()
+    static T max_value()
     {
-        return my_type(0xffffffff);
+        return T(0xffffffff);
     }
 };
 
 #define MB (1024 * 1024)
 
 
-template <typename alloc_strategy_type, unsigned block_size>
-void test(stxxl::int64 records_to_sort, unsigned memory_to_use)
+template <typename T, typename alloc_strategy_type, unsigned block_size>
+void test(stxxl::uint64 data_mem, unsigned memory_to_use)
 {
-    typedef stxxl::vector<my_type, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
+    stxxl::uint64 records_to_sort = data_mem / sizeof(T);
+    typedef stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
     vector_type v(records_to_sort);
 
     unsigned ndisks = stxxl::config::get_instance()->disks_number();
-    STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(my_type));
-    STXXL_MSG("Total volume " << (records_to_sort * sizeof(my_type)) / MB << " MB");
+    STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(T));
+    STXXL_MSG("Total volume " << (records_to_sort * sizeof(T)) / MB << " MB");
     STXXL_MSG("Using " << memory_to_use / MB << " MB");
     STXXL_MSG("Using " << ndisks << " disks");
     STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ");
@@ -98,31 +105,31 @@ void test(stxxl::int64 records_to_sort, unsigned memory_to_use)
     STXXL_MSG("Sorting vector...");
     reset_io_wait_time();
 
-    stxxl::sort(v.begin(), v.end(), Cmp(), memory_to_use);
+    stxxl::sort(v.begin(), v.end(), Cmp<T>(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG((stxxl::is_sorted(v.begin(), v.end(), Cmp()) ? "OK" : "WRONG"));
+    STXXL_MSG((stxxl::is_sorted(v.begin(), v.end(), Cmp<T>()) ? "OK" : "WRONG"));
 }
 
-template <unsigned block_size>
+template <typename T, unsigned block_size>
 void test_all_strategies(
-    stxxl::int64 records_to_sort,
+    stxxl::uint64 data_mem,
     unsigned memory_to_use,
     int strategy)
 {
     switch (strategy)
     {
     case 0:
-        test<stxxl::striping, block_size>(records_to_sort, memory_to_use);
+        test<T, stxxl::striping, block_size>(data_mem, memory_to_use);
         break;
     case 1:
-        test<stxxl::SR, block_size>(records_to_sort, memory_to_use);
+        test<T, stxxl::SR, block_size>(data_mem, memory_to_use);
         break;
     case 2:
-        test<stxxl::FR, block_size>(records_to_sort, memory_to_use);
+        test<T, stxxl::FR, block_size>(data_mem, memory_to_use);
         break;
     case 3:
-        test<stxxl::RC, block_size>(records_to_sort, memory_to_use);
+        test<T, stxxl::RC, block_size>(data_mem, memory_to_use);
         break;
     default:
         STXXL_ERRMSG("Unknown allocation strategy: " << strategy << ", aborting");
@@ -135,11 +142,11 @@ int main(int argc, char * argv[])
     if (argc < 6)
     {
         STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..10]> <seed>");
+                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..11]> <seed>");
         return -1;
     }
 
-    stxxl::int64 n_records = (stxxl::atoint64(argv[1]) * MB) / sizeof(my_type);
+    stxxl::uint64 data_mem = stxxl::atoint64(argv[1]) * MB;
     int sort_mem = atoi(argv[2]) * MB;
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);
@@ -147,40 +154,45 @@ int main(int argc, char * argv[])
     STXXL_MSG("Seed " << stxxl::get_next_seed());
     stxxl::srandom_number32();
 
+    typedef my_type<RECORD_SIZE> my_default_type;
+
     switch (block_size)
     {
     case 0:
-        test_all_strategies<(128 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 128 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 1:
-        test_all_strategies<(256 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 256 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 2:
-        test_all_strategies<(512 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 512 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 3:
-        test_all_strategies<(1024 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 1024 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 4:
-        test_all_strategies<(2 * 1024 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 2 * 1024 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 5:
-        test_all_strategies<(4 * 1024 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 4 * 1024 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 6:
-        test_all_strategies<(8 * 1024 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 8 * 1024 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 7:
-        test_all_strategies<(16 * 1024 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 16 * 1024 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 8:
-        test_all_strategies<(640 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 640 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 9:
-        test_all_strategies<(768 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 768 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 10:
-        test_all_strategies<(896 * 1024)>(n_records, sort_mem, strategy);
+        test_all_strategies<my_default_type, 896 * 1024>(data_mem, sort_mem, strategy);
+        break;
+    case 11:
+        test_all_strategies<my_type<12>, 2 * MB>(data_mem, sort_mem, strategy);
         break;
     default:
         STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");

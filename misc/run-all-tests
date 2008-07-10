@@ -166,7 +166,7 @@ run containers/leda_sm_stack_benchmark 2 1073741824
 for data in 768 ; do
 for ram in 128 ; do
 for strategy in 0 1 2 3 ; do
-for blk_size in 0 1 2 3 4 5 6 7 8 9 10 ; do
+for blk_size in 0 1 2 3 4 5 6 7 8 9 10 11 ; do
 run algo/test_sort_all_parameters		$data $ram $strategy $blk_size 42
 run algo/test_ksort_all_parameters		$data $ram $strategy $blk_size 42
 run algo/test_stable_ksort_all_parameters	$data $ram $strategy $blk_size 42
