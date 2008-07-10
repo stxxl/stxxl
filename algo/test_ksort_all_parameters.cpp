@@ -151,6 +151,15 @@ int main(int argc, char * argv[])
     case 11:
         test_all_strategies<my_type<stxxl::uint64, 12>, 2 * MB>(data_mem, sort_mem, strategy);
         break;
+    case 12:
+        test_all_strategies<my_type<unsigned, 12>, 2 * MB + 4096>(data_mem, sort_mem, strategy);
+        break;
+    case 13:
+        test_all_strategies<my_type<unsigned, 20>, 2 * MB + 4096>(data_mem, sort_mem, strategy);
+        break;
+    case 14:
+        test_all_strategies<my_type<unsigned, 128>, 2 * MB>(data_mem, sort_mem, strategy);
+        break;
     default:
         STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");
         abort();
