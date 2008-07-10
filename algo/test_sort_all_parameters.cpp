@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,66 +19,12 @@
 #include <stxxl/vector>
 #include <stxxl/random>
 
+#include "test_sort_all_parameters.h"
+
 
 #ifndef RECORD_SIZE
  #define RECORD_SIZE 4
 #endif
-
-
-template <unsigned SIZE>
-struct my_type
-{
-    typedef unsigned key_type;
-
-    key_type _key;
-    char _data[SIZE - sizeof(key_type)];
-
-    my_type() { }
-    my_type(key_type __key) : _key(__key) { }
-};
-
-template <unsigned SIZE>
-std::ostream & operator << (std::ostream & o, const my_type<SIZE> obj)
-{
-    o << obj._key;
-    return o;
-}
-
-template <unsigned SIZE>
-bool operator < (const my_type<SIZE> & a, const my_type<SIZE> & b)
-{
-    return a._key < b._key;
-}
-
-template <unsigned SIZE>
-bool operator == (const my_type<SIZE> & a, const my_type<SIZE> & b)
-{
-    return a._key == b._key;
-}
-
-template <unsigned SIZE>
-bool operator != (const my_type<SIZE> & a, const my_type<SIZE> & b)
-{
-    return a._key != b._key;
-}
-
-template <typename T>
-struct Cmp : public std::less<T>
-{
-    bool operator () (const T & a, const T & b) const
-    {
-        return a._key < b._key;
-    }
-
-    static T min_value()
-    {
-        return T(0);
-    }
-    static T max_value()
-    {
-        return T(0xffffffff);
-    }
-};
 
 #define MB (1024 * 1024)
 
@@ -154,7 +101,7 @@ int main(int argc, char * argv[])
     STXXL_MSG("Seed " << stxxl::get_next_seed());
     stxxl::srandom_number32();
 
-    typedef my_type<RECORD_SIZE> my_default_type;
+    typedef my_type<unsigned, RECORD_SIZE> my_default_type;
 
     switch (block_size)
     {
@@ -192,7 +139,7 @@ int main(int argc, char * argv[])
         test_all_strategies<my_default_type, 896 * 1024>(data_mem, sort_mem, strategy);
         break;
     case 11:
-        test_all_strategies<my_type<12>, 2 * MB>(data_mem, sort_mem, strategy);
+        test_all_strategies<my_type<unsigned, 12>, 2 * MB>(data_mem, sort_mem, strategy);
         break;
     default:
         STXXL_ERRMSG("Unknown block size: " << block_size << ", aborting");
