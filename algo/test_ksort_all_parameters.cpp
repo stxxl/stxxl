@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,6 +19,7 @@
 #include <stxxl/random>
 #include <stxxl/scan>
 
+#define KEY_COMPARE
 #include "test_sort_all_parameters.h"
 
 
@@ -27,14 +29,6 @@
 
 #define MB (1024 * 1024)
 
-
-struct zero
-{
-    unsigned operator () ()
-    {
-        return 0;
-    }
-};
 
 template <typename T, typename alloc_strategy_type, unsigned block_size>
 void test(stxxl::uint64 data_mem, unsigned memory_to_use)
@@ -99,7 +93,7 @@ int main(int argc, char * argv[])
     if (argc < 6)
     {
         STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..11]> <seed>");
+                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>");
         return -1;
     }
 
