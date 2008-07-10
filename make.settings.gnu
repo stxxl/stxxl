@@ -26,6 +26,7 @@ TOPDIR	?= $(error TOPDIR not defined) # DO NOT CHANGE! This is set elsewhere.
 
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_MACOSX	?= no	# set 'yes' if you run Mac OS X, 'no' otherwise
+USE_PMODE	?= no	# will be overriden from main Makefile
 USE_MCSTL	?= no	# will be overriden from main Makefile
 USE_ICPC	?= no	# will be overriden from main Makefile
 
@@ -36,6 +37,11 @@ COMPILER_ICPC	?= icpc
 COMPILER	?= $(COMPILER_ICPC)
 #ICPC_GCC	?= gcc-x.y    # override the gcc/g++ used to find headers and libraries
 WARNINGS	?= -Wall -w1 -openmp-report0 -vec-report0
+endif
+
+ifeq ($(strip $(USE_PMODE)),yes)
+COMPILER_GCC	?= g++-trunk
+LIBNAME		?= pmstxxl
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
@@ -190,6 +196,20 @@ endif
 ##################################################################
 
 
+#### PARALLEL_MODE OPTIONS ###############################################
+
+ifeq ($(strip $(USE_PMODE)),yes)
+
+OPENMPFLAG			?= -fopenmp
+
+PARALLEL_MODE_CPPFLAGS          += $(OPENMPFLAG) -D_GLIBCXX_PARALLEL
+PARALLEL_MODE_LDFLAGS           += $(OPENMPFLAG)
+
+endif
+
+##################################################################
+
+
 #### MCSTL OPTIONS ###############################################
 
 ifeq ($(strip $(USE_MCSTL)),yes)
@@ -200,10 +220,8 @@ ifeq (,$(strip $(wildcard $(strip $(MCSTL_ROOT))/c++/mcstl.h)))
 $(error ERROR: could not find a MCSTL installation in MCSTL_ROOT=$(MCSTL_ROOT))
 endif
 
-MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -D__MCSTL__ $(MCSTL_INCLUDES_PREPEND) -I$(MCSTL_ROOT)/c++
+MCSTL_CPPFLAGS		+= $(OPENMPFLAG) -D__MCSTL__ -I$(MCSTL_ROOT)/c++
 MCSTL_LDFLAGS		+= $(OPENMPFLAG)
-
-MCSTL_INCLUDES_PREPEND	+= $(if $(findstring 4.3,$(COMPILER)),-I$(MCSTL_ROOT)/c++/mod_stl/gcc-4.3)
 
 endif
 
@@ -331,6 +349,11 @@ STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS_CXX)
 STXXL_LINKER_OPTIONS	+= $(DEBUG)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDFLAGS)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS)
+
+ifeq ($(strip $(USE_PMODE)),yes)
+STXXL_COMPILER_OPTIONS	+= $(PARALLEL_MODE_CPPFLAGS)
+STXXL_LINKER_OPTIONS    += $(PARALLEL_MODE_LDFLAGS)
+endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
 STXXL_COMPILER_OPTIONS	+= $(MCSTL_CPPFLAGS)

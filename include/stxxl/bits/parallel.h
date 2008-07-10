@@ -15,6 +15,9 @@
 
 
 #undef STXXL_PARALLEL
+#if defined(_GLIBCXX_PARALLEL) && defined (__MCSTL__)
+#error Both _GLIBCXX_PARALLEL and __MCSTL__ are defined
+#endif
 #if defined(_GLIBCXX_PARALLEL) || defined (__MCSTL__)
 #define STXXL_PARALLEL 1
 #else
@@ -41,6 +44,14 @@
 #include <stxxl/bits/common/settings.h>
 
 
+#if defined(_GLIBCXX_PARALLEL)
+#define __STXXL_FORCE_SEQUENTIAL , __gnu_parallel::sequential_tag()
+#elif defined(__MCSTL__)
+#define __STXXL_FORCE_SEQUENTIAL , mcstl::sequential_tag()
+#else
+#define __STXXL_FORCE_SEQUENTIAL
+#endif
+
 #if !STXXL_PARALLEL
 #undef STXXL_PARALLEL_MULTIWAY_MERGE
 #define STXXL_PARALLEL_MULTIWAY_MERGE 0
@@ -50,8 +61,23 @@
 #define STXXL_PARALLEL_MULTIWAY_MERGE 0
 #endif
 
+#if !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
+#define STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD 0
+#endif
+
 
 __STXXL_BEGIN_NAMESPACE
+
+inline unsigned sort_memory_usage_factor()
+{
+#if STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD && defined(_GLIBCXX_PARALLEL)
+    return (__gnu_parallel::_Settings::get().sort_algorithm == __gnu_parallel::MWMS && omp_get_max_threads() > 1) ? 2 : 1;   //memory overhead for multiway mergesort
+#elif STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD && defined(__MCSTL__)
+    return (mcstl::SETTINGS::sort_algorithm == mcstl::SETTINGS::MWMS && mcstl::SETTINGS::num_threads > 1) ? 2 : 1;   //memory overhead for multiway mergesort
+#else
+    return 1;                                                                                                           //no overhead
+#endif
+}
 
 inline bool do_parallel_merge()
 {

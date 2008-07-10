@@ -11,7 +11,7 @@
 ############################################################################
 
 INSTANCE	?= stxxl
-INSTANCE	?= mcstxxl
+INSTANCE	?= pmstxxl
 
 TOPDIR		?= ../..
 include $(TOPDIR)/make.settings

@@ -526,25 +526,6 @@ inline bool operator != (const new_alloc<T1> &,
     return false;
 }
 
-////////////////////////////////////////////////////////////////////////////
-
-inline unsigned_type sort_memory_usage_factor()
-{
-#if defined(__MCSTL__) && !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
-    return (mcstl::HEURISTIC::sort_algorithm == mcstl::HEURISTIC::MWMS && mcstl::HEURISTIC::num_threads > 1) ? 2 : 1;   //memory overhead for multiway mergesort
-#else
-    return 1;                                                                                                           //no overhead
-#endif
-}
-
-////////////////////////////////////////////////////////////////////////////
-
-#ifdef __MCSTL__
-#define __STXXL_FORCE_SEQUENTIAL , mcstl::sequential_tag()
-#else
-#define __STXXL_FORCE_SEQUENTIAL
-#endif
-
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_UTILS_HEADER
