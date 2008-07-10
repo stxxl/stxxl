@@ -167,7 +167,7 @@ void mem_request::serve()
 #if STXXL_IO_STATS
                 iostats->read_started(size());
 #endif
-                memcpy(buffer, static_cast<mem_file *>(file_)->get_ptr(), bytes);
+                memcpy(buffer, static_cast<mem_file *>(file_)->get_ptr() + offset, bytes);
 #if STXXL_IO_STATS
                 iostats->read_finished();
 #endif
@@ -177,7 +177,7 @@ void mem_request::serve()
 #if STXXL_IO_STATS
                 iostats->write_started(size());
 #endif
-                memcpy(static_cast<mem_file *>(file_)->get_ptr(), buffer, bytes);
+                memcpy(static_cast<mem_file *>(file_)->get_ptr() + offset, buffer, bytes);
 #if STXXL_IO_STATS
                 iostats->write_finished();
 #endif
@@ -237,7 +237,7 @@ mem_file::~mem_file()
     ptr = NULL;
 }
 
-void * mem_file::get_ptr() const
+char * mem_file::get_ptr() const
 {
     return ptr;
 }
