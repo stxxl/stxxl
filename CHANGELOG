@@ -1,5 +1,9 @@
 Version 1.2.1 (unreleased)
 
+* new stxxl file type stxxl::mem_file (for debugging purposes only),
+  helps debugging with valgrind because no memory cell ever
+  leaves valgrind's control
+
 ------------------------------------------
 Version 1.2.0 (05 July 2008)
 

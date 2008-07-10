@@ -952,6 +952,12 @@ public:
             return new stxxl::boostfd_file(filename,
                                            options, disk);
       #endif
+        else if (io_impl == "memory")
+        {
+            stxxl::mem_file * result = new stxxl::mem_file(disk);
+            result->lock();
+            return result;
+        }
 
         STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
                     io_impl << " .");

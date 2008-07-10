@@ -50,9 +50,6 @@
 * put some stxxl/defines.h (config.h/...) header someewhere,
   listing/describing all the #defines that my be used somewhere
 
-* implement a memfile that simulates an external memory file using heap,
-  eases working with valgrind because no data ever leaves valgrind's control
-
 * stxxl::debugmon: FIXME! is not working any more
 
 * replace tons of #ifdef with wrapper that behaves like boost's scoped_lock

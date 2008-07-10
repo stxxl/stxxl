@@ -253,6 +253,7 @@ HEADER_FILES_COMMON	+= types.h settings.h seed.h
 HEADER_FILES_IO		+= completion_handler.h io.h iobase.h iostats.h
 HEADER_FILES_IO		+= mmap_file.h simdisk_file.h syscall_file.h
 HEADER_FILES_IO		+= ufs_file.h wincall_file.h wfs_file.h boostfd_file.h
+HEADER_FILES_IO		+= mem_file.h
 
 HEADER_FILES_MNG	+= adaptor.h block_prefetcher.h
 HEADER_FILES_MNG	+= buf_istream.h buf_ostream.h buf_writer.h mng.h

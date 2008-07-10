@@ -19,6 +19,7 @@
 #include <stxxl/bits/io/simdisk_file.h>
 #include <stxxl/bits/io/wincall_file.h>
 #include <stxxl/bits/io/boostfd_file.h>
+#include <stxxl/bits/io/mem_file.h>
 #include <stxxl/bits/io/iostats.h>
 
 
