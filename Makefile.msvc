@@ -18,23 +18,35 @@ main: library
 include make.settings
 
 library:
+	cd common
+	$(MAKE) lib
+	cd ..
 	cd io
 	$(MAKE) lib
 	cd ..
 	cd mng
 	$(MAKE) lib
 	cd ..
+	cd containers
+	$(MAKE) lib
+	cd ..
 	cd algo
 	$(MAKE) lib
 	cd ..
-	cd common
+	cd stream
+	$(MAKE) lib
+	cd ..
+	cd utils
 	$(MAKE) lib
 	cd ..
 	cd lib
 	$(MAKE)
 	cd ..
+	cd common
+	$(MAKE) tools
+	cd ..
 	cd utils
-	$(MAKE) create
+	$(MAKE) tools
 	cd ..
 	@echo "Building library is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
@@ -44,6 +56,9 @@ library:
 
 
 tests: library
+	cd common
+	$(MAKE) tests
+	cd ..
 	cd io
 	$(MAKE) tests
 	cd ..
@@ -70,6 +85,9 @@ clean:
 	cd lib
 	$(MAKE) clean
 	cd ..
+	cd common
+	$(MAKE) clean
+	cd ..
 	cd io
 	$(MAKE) clean
 	cd ..
@@ -86,9 +104,6 @@ clean:
 	$(MAKE) clean
 	cd ..
 	cd utils
-	$(MAKE) clean
-	cd ..
-	cd common
 	$(MAKE) clean
 	cd ..
 	@echo "Cleaning completed"

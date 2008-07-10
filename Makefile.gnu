@@ -51,7 +51,8 @@ lib-in-%:
 
 build-lib: SUBDIRS-lib
 	$(MAKE) -C lib
-	$(MAKE) -C utils create
+	$(MAKE) -C common tools
+	$(MAKE) -C utils tools
 
 $(LIBNAME).stamp: build-lib
 	$(RM) $@ $(LIBNAME).mk.tmp

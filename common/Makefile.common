@@ -1,4 +1,6 @@
-TESTS			 = stxxl_info test_random
+TESTS			 = test_random
 TESTS_NON_MSVC		 =
 
 LIB_SRC			 = log.cpp debug.cpp rand.cpp seed.cpp version.cpp
+
+UTIL_BINARIES		 = stxxl_info
