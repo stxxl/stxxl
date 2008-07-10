@@ -522,7 +522,7 @@ namespace sort_local
 
                     STXXL_VERBOSE1("before merge" << output_size);
 
-                    mcstl::multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size, false);
+                    stxxl::parallel::multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size, false);
                     //sequence iterators are progressed appropriately
 
                     STXXL_VERBOSE1("after merge");

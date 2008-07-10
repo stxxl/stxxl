@@ -992,7 +992,7 @@ namespace stream
 
                     STXXL_VERBOSE1("before merge" << output_size);
 
-                    stxxl::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size, false);
+                    stxxl::parallel::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size, false);
                     //sequence iterators are progressed appropriately
 
                     STXXL_VERBOSE1("after merge");

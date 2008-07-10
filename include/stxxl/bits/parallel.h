@@ -38,13 +38,15 @@
 #endif
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/settings.h>
 
-
-__STXXL_BEGIN_NAMESPACE
 
 #if !STXXL_PARALLEL
 #undef STXXL_PARALLEL_MULTIWAY_MERGE
 #endif
+
+
+__STXXL_BEGIN_NAMESPACE
 
 inline bool do_parallel_merge()
 {
@@ -56,6 +58,12 @@ inline bool do_parallel_merge()
     return false;
 #endif
 }
+
+
+namespace parallel
+{
+
+#if STXXL_PARALLEL
 
 /** @brief Multi-way merging dispatcher.
  *  @param seqs_begin Begin iterator of iterator pair input sequence.
@@ -82,6 +90,10 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
 #else
     assert(0);
 #endif
+}
+
+#endif
+
 }
 
 __STXXL_END_NAMESPACE
