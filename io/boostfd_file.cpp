@@ -22,12 +22,6 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-boost::iostreams::file_descriptor
-boostfd_file::get_file_des() const
-{
-    return file_des;
-}
-
 boostfd_request::boostfd_request(
     boostfd_file * f,
     void * buf,
@@ -38,6 +32,13 @@ boostfd_request::boostfd_request(
     request(on_cmpl, f, buf, off, b, t),
     _state(OP)
 { }
+
+boostfd_request::~boostfd_request()
+{
+    STXXL_VERBOSE3("boostfd_request " << unsigned(this) << ": deletion, cnt: " << ref_cnt);
+
+    assert(_state() == DONE || _state() == READY2DIE);
+}
 
 bool boostfd_request::add_waiter(onoff_switch * sw)
 {
@@ -62,6 +63,7 @@ bool boostfd_request::add_waiter(onoff_switch * sw)
 
     return false;
 }
+
 void boostfd_request::delete_waiter(onoff_switch * sw)
 {
  #ifdef STXXL_BOOST_THREADS
@@ -73,6 +75,7 @@ void boostfd_request::delete_waiter(onoff_switch * sw)
     waiters_mutex.unlock();
  #endif
 }
+
 int boostfd_request::nwaiters()     // returns number of waiters
 {
  #ifdef STXXL_BOOST_THREADS
@@ -85,6 +88,7 @@ int boostfd_request::nwaiters()     // returns number of waiters
     return size;
  #endif
 }
+
 void boostfd_request::check_aligning()
 {
     if (offset % BLOCK_ALIGN != 0)
@@ -103,13 +107,6 @@ void boostfd_request::check_aligning()
                      std::hex << buffer << std::dec << ")");
 }
 
-boostfd_request::~boostfd_request()
-{
-    STXXL_VERBOSE3("boostfd_request " << unsigned(this) << ": deletion, cnt: " << ref_cnt);
-
-    assert(_state() == DONE || _state() == READY2DIE);
-}
-
 void boostfd_request::wait()
 {
     STXXL_VERBOSE3("boostfd_request : " << unsigned(this) << " wait ");
@@ -126,6 +123,7 @@ void boostfd_request::wait()
 
     check_errors();
 }
+
 bool boostfd_request::poll()
 {
  #ifdef NO_OVERLAPPING
@@ -137,87 +135,6 @@ bool boostfd_request::poll()
     check_errors();
 
     return s;
-}
-const char * boostfd_request::io_type()
-{
-    return "boostfd";
-}
-
-boostfd_file::boostfd_file(
-    const std::string & filename,
-    int mode,
-    int disk) : file(disk), mode_(mode)
-{
-    BOOST_IOS::openmode boostfd_mode;
-
-
- #ifndef STXXL_DIRECT_IO_OFF
-    if (mode & DIRECT)
-    {
-        // direct mode not supported in Boost
-    }
- #endif
-
-    if (mode & RDONLY)
-    {
-        boostfd_mode = BOOST_IOS::in;
-    }
-
-    if (mode & WRONLY)
-    {
-        boostfd_mode = BOOST_IOS::out;
-    }
-
-    if (mode & RDWR)
-    {
-        boostfd_mode = BOOST_IOS::out | BOOST_IOS::in;
-    }
-
-
-    const boost::filesystem::path fspath(filename,
-                                         boost::filesystem::native);
-
-    if (mode & TRUNC)
-    {
-        if (boost::filesystem::exists(fspath))
-        {
-            boost::filesystem::remove(fspath);
-            boost::filesystem::ofstream f(fspath);
-            f.close();
-            assert(boost::filesystem::exists(fspath));
-        }
-    }
-
-    if (mode & CREAT)
-    {
-        // need to be emulated:
-        if (!boost::filesystem::exists(fspath))
-        {
-            boost::filesystem::ofstream f(fspath);
-            f.close();
-            assert(boost::filesystem::exists(fspath));
-        }
-    }
-
-
-    file_des.open(filename, boostfd_mode, boostfd_mode);
-}
-
-boostfd_file::~boostfd_file()
-{
-    file_des.close();
-}
-stxxl::int64 boostfd_file::size()
-{
-    stxxl::int64 size_ = file_des.seek(0, BOOST_IOS::end);
-    return size_;
-}
-void boostfd_file::set_size(stxxl::int64 newsize)
-{
-    stxxl::int64 oldsize = size();
-    file_des.seek(newsize, BOOST_IOS::beg);
-    file_des.seek(0, BOOST_IOS::beg); // not important ?
-    assert(size() >= oldsize);
 }
 
 void boostfd_request::serve()
@@ -342,6 +259,95 @@ void boostfd_request::serve()
     _state.set_to(READY2DIE);
 }
 
+const char * boostfd_request::io_type()
+{
+    return "boostfd";
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+boostfd_file::boostfd_file(
+    const std::string & filename,
+    int mode,
+    int disk) : file(disk), mode_(mode)
+{
+    BOOST_IOS::openmode boostfd_mode;
+
+ #ifndef STXXL_DIRECT_IO_OFF
+    if (mode & DIRECT)
+    {
+        // direct mode not supported in Boost
+    }
+ #endif
+
+    if (mode & RDONLY)
+    {
+        boostfd_mode = BOOST_IOS::in;
+    }
+
+    if (mode & WRONLY)
+    {
+        boostfd_mode = BOOST_IOS::out;
+    }
+
+    if (mode & RDWR)
+    {
+        boostfd_mode = BOOST_IOS::out | BOOST_IOS::in;
+    }
+
+    const boost::filesystem::path fspath(filename,
+                                         boost::filesystem::native);
+
+    if (mode & TRUNC)
+    {
+        if (boost::filesystem::exists(fspath))
+        {
+            boost::filesystem::remove(fspath);
+            boost::filesystem::ofstream f(fspath);
+            f.close();
+            assert(boost::filesystem::exists(fspath));
+        }
+    }
+
+    if (mode & CREAT)
+    {
+        // need to be emulated:
+        if (!boost::filesystem::exists(fspath))
+        {
+            boost::filesystem::ofstream f(fspath);
+            f.close();
+            assert(boost::filesystem::exists(fspath));
+        }
+    }
+
+    file_des.open(filename, boostfd_mode, boostfd_mode);
+}
+
+boostfd_file::~boostfd_file()
+{
+    file_des.close();
+}
+
+boost::iostreams::file_descriptor
+boostfd_file::get_file_des() const
+{
+    return file_des;
+}
+
+stxxl::int64 boostfd_file::size()
+{
+    stxxl::int64 size_ = file_des.seek(0, BOOST_IOS::end);
+    return size_;
+}
+
+void boostfd_file::set_size(stxxl::int64 newsize)
+{
+    stxxl::int64 oldsize = size();
+    file_des.seek(newsize, BOOST_IOS::beg);
+    file_des.seek(0, BOOST_IOS::beg); // not important ?
+    assert(size() >= oldsize);
+}
+
 request_ptr boostfd_file::aread(
     void * buffer,
     stxxl::int64 pos,
@@ -361,6 +367,7 @@ request_ptr boostfd_file::aread(
  #endif
     return req;
 }
+
 request_ptr boostfd_file::awrite(
     void * buffer,
     stxxl::int64 pos,

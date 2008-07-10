@@ -15,6 +15,7 @@
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
 
+
 __STXXL_BEGIN_NAMESPACE
 
 
@@ -110,7 +111,6 @@ void mmap_request::serve()
         error_occured(ex.what());
     }
 
-
     if (type == READ)
     {
  #if STXXL_IO_STATS
@@ -123,7 +123,6 @@ void mmap_request::serve()
         iostats->write_finished();
  #endif
     }
-
 
     _state.set_to(DONE);
 
@@ -150,6 +149,8 @@ void mmap_request::serve()
     _state.set_to(READY2DIE);
 }
 
+////////////////////////////////////////////////////////////////////////////
+
 request_ptr mmap_file::aread(
     void * buffer,
     stxxl::int64 pos,
@@ -167,13 +168,13 @@ request_ptr mmap_file::aread(
     if (!req.get())
         stxxl_function_error(io_error);
 
-
  #ifndef NO_OVERLAPPING
     disk_queues::get_instance()->add_readreq(req, get_id());
  #endif
 
     return req;
 }
+
 request_ptr mmap_file::awrite(
     void * buffer,
     stxxl::int64 pos,

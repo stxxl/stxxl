@@ -17,17 +17,6 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-HANDLE wfs_file_base::get_file_des() const
-{
-    return file_des;
-}
-
-void wfs_file_base::lock()
-{
-    if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
-        stxxl_win_lasterror_exit("LockFile ", io_error);
-}
-
 wfs_request_base::wfs_request_base(
     wfs_file_base * f,
     void * buf,
@@ -49,6 +38,19 @@ wfs_request_base::wfs_request_base(
     // of the file system block size
     check_aligning();
  #endif
+}
+
+wfs_request_base::~wfs_request_base()
+{
+    STXXL_VERBOSE3("wfs_request_base " << unsigned(this) << ": deletion, cnt: " << ref_cnt);
+
+    assert(_state() == DONE || _state() == READY2DIE);
+
+    // if(_state() != DONE && _state()!= READY2DIE )
+    //	STXXL_ERRMSG("WARNING: serious stxxl error request being deleted while I/O did not finish "<<
+    //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
+
+    // _state.wait_for (READY2DIE); // does not make sense ?
 }
 
 bool wfs_request_base::add_waiter(onoff_switch * sw)
@@ -86,6 +88,7 @@ void wfs_request_base::delete_waiter(onoff_switch * sw)
     waiters_mutex.unlock();
  #endif
 }
+
 int wfs_request_base::nwaiters()                 // returns number of waiters
 {
  #ifdef STXXL_BOOST_THREADS
@@ -98,6 +101,7 @@ int wfs_request_base::nwaiters()                 // returns number of waiters
     return size;
  #endif
 }
+
 void wfs_request_base::check_aligning()
 {
     if (offset % BLOCK_ALIGN != 0)
@@ -116,19 +120,6 @@ void wfs_request_base::check_aligning()
                      std::hex << buffer << std::dec << ")");
 }
 
-wfs_request_base::~wfs_request_base()
-{
-    STXXL_VERBOSE3("wfs_request_base " << unsigned(this) << ": deletion, cnt: " << ref_cnt);
-
-    assert(_state() == DONE || _state() == READY2DIE);
-
-    // if(_state() != DONE && _state()!= READY2DIE )
-    //	STXXL_ERRMSG("WARNING: serious stxxl error request being deleted while I/O did not finish "<<
-    //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
-
-    // _state.wait_for (READY2DIE); // does not make sense ?
-}
-
 void wfs_request_base::wait()
 {
     STXXL_VERBOSE3("wfs_request_base : " << unsigned(this) << " wait ");
@@ -145,6 +136,7 @@ void wfs_request_base::wait()
 
     check_errors();
 }
+
 bool wfs_request_base::poll()
 {
  #ifdef NO_OVERLAPPING
@@ -157,10 +149,13 @@ bool wfs_request_base::poll()
 
     return s;
 }
+
 const char * wfs_request_base::io_type()
 {
     return "wfs_base";
 }
+
+////////////////////////////////////////////////////////////////////////////
 
 wfs_file_base::wfs_file_base(
     const std::string & filename,
@@ -225,6 +220,18 @@ wfs_file_base::~wfs_file_base()
 
         file_des = INVALID_HANDLE_VALUE;
 }
+
+HANDLE wfs_file_base::get_file_des() const
+{
+    return file_des;
+}
+
+void wfs_file_base::lock()
+{
+    if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
+        stxxl_win_lasterror_exit("LockFile ", io_error);
+}
+
 stxxl::int64 wfs_file_base::size()
 {
     LARGE_INTEGER result;
@@ -233,6 +240,7 @@ stxxl::int64 wfs_file_base::size()
 
         return result.QuadPart;
 }
+
 void wfs_file_base::set_size(stxxl::int64 newsize)
 {
     stxxl::int64 cur_size = size();

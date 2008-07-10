@@ -16,11 +16,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-wincall_file::wincall_file(
-    const std::string & filename,
-    int mode,
-    int disk) : wfs_file_base(filename, mode, disk)
-{ }
 
 wincall_request::wincall_request(
     wincall_file * f,
@@ -31,10 +26,6 @@ wincall_request::wincall_request(
     completion_handler on_cmpl) :
     wfs_request_base(f, buf, off, b, t, on_cmpl)
 { }
-const char * wincall_request::io_type()
-{
-    return "syscall";
-}
 
 void wincall_request::serve()
 {
@@ -148,6 +139,19 @@ void wincall_request::serve()
     _state.set_to(READY2DIE);
 }
 
+const char * wincall_request::io_type()
+{
+    return "syscall";
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+wincall_file::wincall_file(
+    const std::string & filename,
+    int mode,
+    int disk) : wfs_file_base(filename, mode, disk)
+{ }
+
 request_ptr wincall_file::aread(
     void * buffer,
     stxxl::int64 pos,
@@ -161,12 +165,12 @@ request_ptr wincall_file::aread(
     if (!req.get())
         stxxl_function_error(io_error);
 
-
  #ifndef NO_OVERLAPPING
     disk_queues::get_instance()->add_readreq(req, get_id());
  #endif
     return req;
 }
+
 request_ptr wincall_file::awrite(
     void * buffer,
     stxxl::int64 pos,
@@ -178,7 +182,6 @@ request_ptr wincall_file::awrite(
 
     if (!req.get())
         stxxl_function_error(io_error);
-
 
  #ifndef NO_OVERLAPPING
     disk_queues::get_instance()->add_writereq(req, get_id());

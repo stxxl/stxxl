@@ -15,6 +15,7 @@
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
 
+
 __STXXL_BEGIN_NAMESPACE
 
 
@@ -156,15 +157,7 @@ IC35L080AVVA07::IC35L080AVVA07()
               1024) << " s" << std::endl;
 }
 
-
-void sim_disk_file::set_size(stxxl::int64 newsize)
-{
-    if (newsize > size())
-    {
-        stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
-        stxxl_check_ge_0(::write(file_des, "", 1), io_error);
-    }
-}
+////////////////////////////////////////////////////////////////////////////
 
 void sim_disk_request::serve()
 {
@@ -271,6 +264,17 @@ void sim_disk_request::serve()
     _state.set_to(READY2DIE);
 }
 
+////////////////////////////////////////////////////////////////////////////
+
+void sim_disk_file::set_size(stxxl::int64 newsize)
+{
+    if (newsize > size())
+    {
+        stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
+        stxxl_check_ge_0(::write(file_des, "", 1), io_error);
+    }
+}
+
 request_ptr sim_disk_file::aread(void * buffer, stxxl::int64 pos, size_t bytes,
                                  completion_handler on_cmpl)
 {
@@ -286,6 +290,7 @@ request_ptr sim_disk_file::aread(void * buffer, stxxl::int64 pos, size_t bytes,
 
     return req;
 }
+
 request_ptr sim_disk_file::awrite(
     void * buffer, stxxl::int64 pos, size_t bytes,
     completion_handler on_cmpl)

@@ -15,11 +15,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-syscall_file::syscall_file(
-    const std::string & filename,
-    int mode,
-    int disk) : ufs_file_base(filename, mode, disk)
-{ }
 
 syscall_request::syscall_request(
     syscall_file * f,
@@ -30,11 +25,6 @@ syscall_request::syscall_request(
     completion_handler on_cmpl) :
     ufs_request_base(f, buf, off, b, t, on_cmpl)
 { }
-const char * syscall_request::io_type()
-{
-    return "syscall";
-}
-
 
 void syscall_request::serve()
 {
@@ -155,6 +145,19 @@ void syscall_request::serve()
     _state.set_to(READY2DIE);
 }
 
+const char * syscall_request::io_type()
+{
+    return "syscall";
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+syscall_file::syscall_file(
+    const std::string & filename,
+    int mode,
+    int disk) : ufs_file_base(filename, mode, disk)
+{ }
+
 request_ptr syscall_file::aread(
     void * buffer,
     stxxl::int64 pos,
@@ -168,12 +171,12 @@ request_ptr syscall_file::aread(
     if (!req.get())
         stxxl_function_error(io_error);
 
-
 #ifndef NO_OVERLAPPING
     disk_queues::get_instance()->add_readreq(req, get_id());
 #endif
     return req;
 }
+
 request_ptr syscall_file::awrite(
     void * buffer,
     stxxl::int64 pos,

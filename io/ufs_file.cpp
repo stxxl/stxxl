@@ -22,27 +22,6 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-int ufs_file_base::get_file_des() const
-{
-    return file_des;
-}
-
-void ufs_file_base::lock()
-{
-#ifdef BOOST_MSVC
-    // not yet implemented
-#else
-    struct flock lock_struct;
-    lock_struct.l_type = F_RDLCK | F_WRLCK;
-    lock_struct.l_whence = SEEK_SET;
-    lock_struct.l_start = 0;
-    lock_struct.l_len = 0; // lock all bytes
-    if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
-        STXXL_THROW2(io_error, "Filedescriptor=" << file_des);
-#endif
-}
-
-
 ufs_request_base::ufs_request_base(
     ufs_file_base * f,
     void * buf,
@@ -51,13 +30,6 @@ ufs_request_base::ufs_request_base(
     request_type t,
     completion_handler on_cmpl) :
     request(on_cmpl, f, buf, off, b, t),
-/*
-                    file (f),
-                    buffer (buf),
-                    offset (off),
-                    bytes (b),
-                    type(t),
-*/
     _state(OP)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
@@ -66,6 +38,19 @@ ufs_request_base::ufs_request_base(
     // of the file system block size
     check_aligning();
 #endif
+}
+
+ufs_request_base::~ufs_request_base()
+{
+    STXXL_VERBOSE3("ufs_request_base " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
+
+    assert(_state() == DONE || _state() == READY2DIE);
+
+    // if(_state() != DONE && _state()!= READY2DIE )
+    //	STXXL_ERRMSG("WARNING: serious stxxl error request being deleted while I/O did not finish "<<
+    //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
+
+    // _state.wait_for (READY2DIE); // does not make sense ?
 }
 
 bool ufs_request_base::add_waiter(onoff_switch * sw)
@@ -135,19 +120,6 @@ void ufs_request_base::check_aligning()
                      std::hex << buffer << std::dec << ")");
 }
 
-ufs_request_base::~ufs_request_base()
-{
-    STXXL_VERBOSE3("ufs_request_base " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
-
-    assert(_state() == DONE || _state() == READY2DIE);
-
-    // if(_state() != DONE && _state()!= READY2DIE )
-    //	STXXL_ERRMSG("WARNING: serious stxxl error request being deleted while I/O did not finish "<<
-    //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
-
-    // _state.wait_for (READY2DIE); // does not make sense ?
-}
-
 void ufs_request_base::wait()
 {
     STXXL_VERBOSE3("ufs_request_base : " << static_cast<void *>(this) << " wait ");
@@ -182,6 +154,8 @@ const char * ufs_request_base::io_type()
 {
     return "ufs_base";
 }
+
+////////////////////////////////////////////////////////////////////////////
 
 ufs_file_base::ufs_file_base(
     const std::string & filename,
@@ -236,6 +210,26 @@ ufs_file_base::~ufs_file_base()
 
     else
         stxxl_function_error(io_error);
+}
+
+int ufs_file_base::get_file_des() const
+{
+    return file_des;
+}
+
+void ufs_file_base::lock()
+{
+#ifdef BOOST_MSVC
+    // not yet implemented
+#else
+    struct flock lock_struct;
+    lock_struct.l_type = F_RDLCK | F_WRLCK;
+    lock_struct.l_whence = SEEK_SET;
+    lock_struct.l_start = 0;
+    lock_struct.l_len = 0; // lock all bytes
+    if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
+        STXXL_THROW2(io_error, "Filedescriptor=" << file_des);
+#endif
 }
 
 stxxl::int64 ufs_file_base::size()
