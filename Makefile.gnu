@@ -32,10 +32,6 @@ stxxl_mk_cppflags	+= $(STXXL_CPPFLAGS_CXX)
 stxxl_mk_ldlibs		+= $(STXXL_LDLIBS_CXX)
 stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_STXXL)
 stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_STXXL)
-ifeq ($(strip $(USE_PARALLEL_MODE)),yes)
-stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_PARALLEL_MODE)
-stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_PARALLEL_MODE)
-endif
 ifeq ($(strip $(USE_MCSTL)),yes)
 stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_MCSTL)
 stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_MCSTL)
@@ -65,8 +61,6 @@ $(LIBNAME).stamp: build-lib
 	echo 'STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_LDLIBS_STXXL	 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_LIBDEPS		 = $(STXXL_LIBDEPS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_PARALLEL_MODE	 = $(PARALLEL_MODE_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_PARALLEL_MODE	 = $(PARALLEL_MODE_LDFLAGS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_CPPFLAGS_MCSTL	 = $(MCSTL_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_LDLIBS_MCSTL	 = $(MCSTL_LDFLAGS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)'	>> $(LIBNAME).mk.tmp
