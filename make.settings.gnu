@@ -310,6 +310,9 @@ LINK_STXXL	 = $(LINKER) $1 $(STXXL_LINKER_OPTIONS) -o $@
 %.$(bin): %.$o $(STXXL_LIBDEPS)
 	$(call LINK_STXXL, $<)
 
+%.h::
+	@echo "MISSING HEADER: '$@' (ignored)"
+
 ###################################################################
 
 
