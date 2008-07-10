@@ -21,7 +21,7 @@
 
 #define BLOCK_SIZE (1024 * 512)
 
-typedef stxxl::typed_block<BLOCK_SIZE, int> block_type;
+typedef stxxl::typed_block<BLOCK_SIZE, unsigned> block_type;
 typedef stxxl::buf_ostream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_ostream_type;
 typedef stxxl::buf_istream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_istream_type;
 
@@ -42,9 +42,9 @@ int main()
         buf_istream_type in(bids.begin(), bids.end(), 2);
         for (unsigned i = 0; i < nelements; i++)
         {
-            int value;
+            unsigned value;
             in >> value;
-            if (value != int(i))
+            if (value != i)
             {
                 STXXL_ERRMSG("Error at position " << std::hex << i << " (" << value << ") block " << (i / block_type::size));
             }
