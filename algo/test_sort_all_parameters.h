@@ -23,8 +23,22 @@ struct my_type
     key_type _key;
     char _data[SIZE - sizeof(key_type)];
 
+    key_type key() const
+    {
+        return _key;
+    }
+
     my_type() { }
     my_type(key_type __key) : _key(__key) { }
+
+    static my_type<KEY, SIZE> min_value()
+    {
+        return my_type<KEY, SIZE>(0);
+    }
+    static my_type<KEY, SIZE> max_value()
+    {
+        return my_type<KEY, SIZE>(0xffffffff);
+    }
 };
 
 template <typename KEY, unsigned SIZE>
