@@ -17,7 +17,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-block_manager * block_manager::instance = NULL;
 config * config::instance = NULL;
 
 void DiskAllocator::dump()
@@ -50,6 +49,7 @@ config * config::get_instance()
 
 config::config(const char * config_path)
 {
+    stxxl::logger::get_instance();
     STXXL_MSG(stxxl::get_version_string());
     std::vector<DiskEntry> flash_props;
     std::ifstream cfg_file(config_path);
@@ -140,14 +140,6 @@ config::config(const char * config_path)
                   " MB");
 #endif
     }
-}
-
-block_manager * block_manager::get_instance()
-{
-    if (!instance)
-        instance = new block_manager();
-
-    return instance;
 }
 
 block_manager::block_manager()

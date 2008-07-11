@@ -39,6 +39,7 @@
 #include <stxxl/bits/common/aligned_alloc.h>
 #include <stxxl/bits/common/debug.h>
 #include <stxxl/bits/parallel.h>
+#include <stxxl/bits/singleton.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -1204,8 +1205,10 @@ struct offset_allocator
 
 //! Manages allocation and deallocation of blocks in multiple/single disk setting
 //! \remarks is a singleton
-class block_manager : private noncopyable
+class block_manager : public singleton<block_manager>
 {
+    friend class singleton<block_manager>;
+
     DiskAllocator ** disk_allocators;
     file ** disk_files;
 
@@ -1220,10 +1223,6 @@ protected:
         BIDIteratorClass out);
 
 public:
-    //! \brief Returns instance of block_manager
-    //! \return pointer to the only instance of block_manager
-    static block_manager * get_instance();
-
     //! \brief Allocates new blocks
 
     //! Allocates new blocks according to the strategy
@@ -1267,9 +1266,6 @@ public:
     void delete_block(const BID<BLK_SIZE> & bid);
 
     ~block_manager();
-
-private:
-    static block_manager * instance;
 };
 
 
