@@ -841,8 +841,10 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
 
 //! \brief Access point to disks properties
 //! \remarks is a singleton
-class config : private noncopyable
+class config : public singleton<config>
 {
+    friend class singleton<config>;
+
     struct DiskEntry
     {
         std::string path;
@@ -854,7 +856,16 @@ class config : private noncopyable
     // in disks_props, flash devices come after all regular disks
     unsigned first_flash;
 
-    config(const char * config_path = "./.stxxl");
+    config()
+    {
+        const char * cfg_path = getenv("STXXLCFG");
+        if (cfg_path)
+            init(cfg_path);
+        else
+            init();
+    }
+
+    void init(const char * config_path = "./.stxxl");
 
 public:
     //! \brief Returns number of disks available to user
@@ -898,13 +909,6 @@ public:
     {
         return disks_props[disk].io_impl;
     }
-
-    //! \brief Returns instance of config
-    //! \return pointer to the instance of config
-    static config * get_instance();
-
-private:
-    static config * instance;
 };
 
 

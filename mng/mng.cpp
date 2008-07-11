@@ -17,8 +17,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-config * config::instance = NULL;
-
 void DiskAllocator::dump()
 {
     stxxl::int64 total = 0;
@@ -32,22 +30,7 @@ void DiskAllocator::dump()
     STXXL_ERRMSG("Total bytes: " << total);
 }
 
-config * config::get_instance()
-{
-    if (!instance)
-    {
-        char * cfg_path = getenv("STXXLCFG");
-        if (cfg_path)
-            instance = new config(cfg_path);
-        else
-            instance = new config();
-    }
-
-    return instance;
-}
-
-
-config::config(const char * config_path)
+void config::init(const char * config_path)
 {
     stxxl::logger::get_instance();
     STXXL_MSG(stxxl::get_version_string());
