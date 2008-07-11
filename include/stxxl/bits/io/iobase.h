@@ -660,8 +660,10 @@ public:
 
 //! \brief Encapsulates disk queues
 //! \remark is a singleton
-class disk_queues : private noncopyable
+class disk_queues : public singleton<disk_queues>
 {
+    friend class singleton<disk_queues>;
+
 protected:
     std::map<DISKID, disk_queue *> queues;
     disk_queues() { }
@@ -692,14 +694,6 @@ public:
                  queues.begin(); i != queues.end(); i++)
             delete (*i).second;
     }
-    static disk_queues * get_instance()
-    {
-        if (!instance)
-            instance = new disk_queues();
-
-
-        return instance;
-    }
     //! \brief Changes requests priorities
     //! \param op one of:
     //!                 - READ, read requests are served before write requests within a disk queue
@@ -711,9 +705,6 @@ public:
                  queues.begin(); i != queues.end(); i++)
             i->second->set_priority_op(op);
     }
-
-private:
-    static disk_queues * instance;
 };
 
 //! \}
