@@ -247,12 +247,19 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type write_buffers_multiple = 2;
     const unsigned_type read_buffers_multiple = 2;
     const unsigned_type ndisks = cfg->disks_number();
-    const unsigned_type nmaxbuckets = m - (write_buffers_multiple + read_buffers_multiple) * ndisks;
+    const unsigned_type min_num_read_write_buffers = (write_buffers_multiple + read_buffers_multiple) * ndisks;
+    const unsigned_type nmaxbuckets = m - min_num_read_write_buffers;
     const unsigned_type lognbuckets = static_cast<unsigned_type>(log2(double(nmaxbuckets)));
     const unsigned_type nbuckets = 1 << lognbuckets;
     const unsigned_type est_bucket_size = div_and_round_up((last - first) / int64(nbuckets),
                                                            int64(block_type::size)); //in blocks
 
+    if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
+        STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
+                     ", required for r/w buffers: " << min_num_read_write_buffers <<
+                     ", required for buckets: 2, nbuckets: " << nbuckets);
+	abort();
+    }
     STXXL_VERBOSE_STABLE_KSORT("Elements to sort: " << (last - first));
     STXXL_VERBOSE_STABLE_KSORT("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets);
     const unsigned_type nread_buffers = (m - nbuckets) * read_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
