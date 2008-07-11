@@ -15,6 +15,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-logger * logger::instance = NULL;
+// FIXME: this file is scheduled for removal
 
 __STXXL_END_NAMESPACE
