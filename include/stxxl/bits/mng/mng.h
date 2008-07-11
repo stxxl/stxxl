@@ -398,14 +398,14 @@ public:
 };
 
 
-/*
+#if 0
    template <unsigned BLK_SIZE>
    class BIDArray: public std::vector< BID <BLK_SIZE> >
    {
    public:
    BIDArray(std::vector< BID <BLK_SIZE> >::size_type size = 0) : std::vector< BID <BLK_SIZE> >(size) {};
    };
- */
+#endif
 
 template <unsigned BLK_SIZE>
 class BIDArray : private noncopyable
@@ -548,9 +548,10 @@ public:
     template <unsigned BLK_SIZE>
     stxxl::int64 new_blocks(BID<BLK_SIZE> * begin,
                             BID<BLK_SIZE> * end);
-/*
+#if 0
         template < unsigned BLK_SIZE >
-        void delete_blocks (const BIDArray < BLK_SIZE > &bids); */
+        void delete_blocks (const BIDArray < BLK_SIZE > &bids);
+#endif
     template <unsigned BLK_SIZE>
     void delete_block(const BID<BLK_SIZE> & bid);
 };
@@ -579,8 +580,8 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
     mutex.lock();
 #endif
 
-    STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
-                                                                       << ", free:" << free_bytes << " total:" << disk_bytes <<
+    STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
+                   ", free:" << free_bytes << " total:" << disk_bytes <<
                    " begin: " << ((void *)(begin)) << " end: " << ((void *)(end)));
 
     stxxl::int64 requested_size = 0;
@@ -730,7 +731,7 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
         {
             if (free_space.size() > 1)
             {
-                /*
+#if 0
                    if(pred == succ)
                    {
                       STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size);
@@ -741,7 +742,8 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
                       STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"));
                       dump();
                       assert(pred != succ);
-                   } */
+                   }
+#endif
                 bool succ_is_not_the_first = (succ != free_space.begin());
                 if ((*succ).first == region_pos + region_size)
                 {
@@ -792,7 +794,8 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
     mutex.unlock();
 #endif
 }
-/*
+
+#if 0
     template < unsigned BLK_SIZE >
         void DiskAllocator::delete_blocks (const BIDArray < BLK_SIZE > &bids)
     {
@@ -837,7 +840,8 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
         }
         for(i=0;i<bids.size();++i)
                   free_bytes += stxxl::int64(bids[i].size);
-    } */
+    }
+#endif
 
 //! \brief Access point to disks properties
 //! \remarks is a singleton
@@ -1155,7 +1159,7 @@ struct offset_allocator
 
 //! \}
 
-/* deprecated
+#if 0 // deprecated
 
    //! \brief Traits for models of \b bid_iterator concept
    template < class bid_it >
@@ -1204,7 +1208,9 @@ struct offset_allocator
           block_size = blk_sz
       };
    };
- */
+
+#endif
+
 //! \brief Block manager class
 
 //! Manages allocation and deallocation of blocks in multiple/single disk setting
