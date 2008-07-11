@@ -17,7 +17,6 @@
 __STXXL_BEGIN_NAMESPACE
 
 double wait_time_counter = 0.0;
-stats * stats::instance = NULL;
 
 stats::stats() :
     reads(0),

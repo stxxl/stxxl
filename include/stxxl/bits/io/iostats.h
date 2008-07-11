@@ -20,7 +20,7 @@
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/singleton.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -35,8 +35,10 @@ extern double wait_time_counter;
 
 //! \brief Collects various I/O statistics
 //! \remarks is a singleton
-class stats : private noncopyable
+class stats : public singleton<stats>
 {
+    friend class singleton<stats>;
+
     unsigned reads, writes;                     // number of operations
     int64 volume_read, volume_written;          // number of bytes read/written
     double t_reads, t_writes;                   //  seconds spent in operations
@@ -53,21 +55,9 @@ class stats : private noncopyable
     mutex read_mutex, write_mutex, io_mutex;
 #endif
 
-    static stats * instance;
-
     stats();
 
 public:
-    //! \brief Call this function in order to access an instance of stats
-    //! \return pointer to an instance of stats
-    static stats * get_instance()
-    {
-        if (!instance)
-            instance = new stats();
-
-        return instance;
-    }
-
     //! \brief Returns total number of reads
     //! \return total number of reads
     unsigned get_reads() const

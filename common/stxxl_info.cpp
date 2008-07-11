@@ -16,5 +16,6 @@ int main(int argc, char **)
 {
     stxxl::config::get_instance();
     stxxl::block_manager::get_instance();
+    stxxl::stats::get_instance();
     return argc == 1 ? 0 : -1;
 }
