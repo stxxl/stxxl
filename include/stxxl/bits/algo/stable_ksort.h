@@ -111,7 +111,6 @@ namespace stable_ksort_local
             if (i < size_)
                 return *(bids->begin() + i);
 
-
             block_manager * mng = block_manager::get_instance();
             simple_vector<bid_type> * larger_bids = new simple_vector<bid_type>((i + 1) * 2);
             std::copy(bids->begin(), bids->end(), larger_bids->begin());
@@ -206,7 +205,6 @@ namespace stable_ksort_local
                                        ", estimated size: " << ((last - first) / int64(nbuckets)));
         }
 
-
         delete[] bucket_blocks;
         delete[] bucket_block_offsets;
         delete[] bucket_iblock;
@@ -263,9 +261,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     STXXL_VERBOSE_STABLE_KSORT("Elements to sort: " << (last - first));
     STXXL_VERBOSE_STABLE_KSORT("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets);
     const unsigned_type nread_buffers = (m - nbuckets) * read_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
-    UNUSED(nread_buffers);
     const unsigned_type nwrite_buffers = (m - nbuckets) * write_buffers_multiple / (read_buffers_multiple + write_buffers_multiple);
-    UNUSED(nwrite_buffers);
 
     STXXL_VERBOSE_STABLE_KSORT("Read buffers in distribution phase: " << nread_buffers);
     STXXL_VERBOSE_STABLE_KSORT("Write buffers in distribution phase: " << nwrite_buffers);
@@ -285,8 +281,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         lognbuckets,
         first,
         last,
-        write_buffers_multiple * ndisks,
-        read_buffers_multiple * ndisks);
+        nread_buffers,
+        nwrite_buffers);
 
     double dist_end = stxxl_timestamp(), end;
     (void)(dist_end);
