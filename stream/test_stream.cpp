@@ -30,6 +30,16 @@
 
 typedef stxxl::tuple<char, int> tuple_type;
 
+namespace std {
+
+std::ostream & operator << (std::ostream & os, const tuple_type & t)
+{
+    os << "<" << t.first << "," << t.second << ">";
+    return os;
+}
+
+}
+
 #ifdef USE_EXTERNAL_ARRAY
 typedef stxxl::VECTOR_GENERATOR<char>::result input_array_type;
 typedef stxxl::VECTOR_GENERATOR<tuple_type>::result output_array_type;
