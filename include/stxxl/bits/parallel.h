@@ -102,7 +102,6 @@ namespace parallel
  *  @param target Begin iterator out output sequence.
  *  @param comp Comparator.
  *  @param length Maximum length to merge.
- *  @param stable Stable merging incurs a performance penalty.
  *  @return End iterator of output sequence. */
 template <typename RandomAccessIteratorPairIterator,
           typename RandomAccessIterator3, typename DiffType, typename Comparator>
@@ -111,13 +110,12 @@ multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
         RandomAccessIteratorPairIterator seqs_end,
         RandomAccessIterator3 target,
         Comparator comp,
-        DiffType length,
-        bool stable)
+        DiffType length)
 {
 #if defined(_GLIBCXX_PARALLEL)
-    return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length, stable);
+    return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-    return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, length, stable);
+    return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, length, false);
 #else
     assert(0);
 #endif
