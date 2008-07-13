@@ -56,7 +56,8 @@ endif
 COMPILER_GCC	?= g++
 COMPILER	?= $(COMPILER_GCC)
 LINKER		?= $(COMPILER)
-OPT		?= -O3 # compiler optimization level
+OPT_LEVEL	?= 3
+OPT		?= -O$(OPT_LEVEL) # compiler optimization level
 WARNINGS	?= -W -Wall
 DEBUG		?= # put here -g option to include the debug information into the binaries
 
