@@ -141,10 +141,12 @@ inline void UNUSED(const U &)
                 "Info: " << error_message << " " << strerror(errno))
 
 template <typename E>
-inline void stxxl_util_function_error(const char * func_name, const char * expr = 0)
+inline void stxxl_util_function_error(const char * func_name, const char * expr = 0, const char * error = 0)
 {
     std::ostringstream str_;
     str_ << "Error in function " << func_name << " " << (expr ? expr : strerror(errno));
+    if (error)
+        str_ << " " << error;
     throw E(str_.str());
 }
 
@@ -152,21 +154,21 @@ inline void stxxl_util_function_error(const char * func_name, const char * expr 
     stxxl::stxxl_util_function_error<exception_type>(STXXL_PRETTY_FUNCTION_NAME)
 
 template <typename E>
-inline bool helper_check_success(bool success, const char * func_name, const char * expr = 0)
+inline bool helper_check_success(bool success, const char * func_name, const char * expr = 0, const char * error = 0)
 {
     if (!success)
-        stxxl_util_function_error<E>(func_name, expr);
+        stxxl_util_function_error<E>(func_name, expr, error);
     return success;
 }
 
 template <typename E, typename INT>
-inline bool helper_check_eq_0(INT res, const char * func_name, const char * expr)
+inline bool helper_check_eq_0(INT res, const char * func_name, const char * expr, bool res_2_strerror = false)
 {
-    return helper_check_success<E>(res == 0, func_name, expr);
+    return helper_check_success<E>(res == 0, func_name, expr, res_2_strerror ? strerror(res) : 0);
 }
 
 #define check_pthread_call(expr) \
-    stxxl::helper_check_eq_0<stxxl::resource_error>(expr, STXXL_PRETTY_FUNCTION_NAME, __STXXL_STRING(expr))
+    stxxl::helper_check_eq_0<stxxl::resource_error>(expr, STXXL_PRETTY_FUNCTION_NAME, __STXXL_STRING(expr), true)
 
 template <typename E, typename INT>
 inline bool helper_check_ge_0(INT res, const char * func_name)
