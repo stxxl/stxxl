@@ -76,6 +76,7 @@ disk_queue::~disk_queue()
     // Boost.Threads do not support cancellation ?
 #else
     check_pthread_call(pthread_cancel(thread));
+    check_pthread_call(pthread_join(thread, NULL));
 #endif
 }
 
