@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! \example mng/test_streams.cpp
+//! \example mng/test_buf_streams.cpp
 //! This is an example of use of \c stxxl::buf_istream and \c stxxl::buf_ostream
 
 #include <iostream>

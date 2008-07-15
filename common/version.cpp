@@ -28,11 +28,13 @@
 #include "version_svn.defs"
 #endif
 
+
+__STXXL_BEGIN_NAMESPACE
+
 // FIXME: this currently only works for GNU-like systems,
 //        there are no details available on windows platform
 
-
-const char * stxxl::get_version_string()
+const char * get_version_string()
 {
     return "STXXL"
 #ifdef STXXL_VERSION_STRING_SVN_BRANCH
@@ -71,5 +73,7 @@ const char * stxxl::get_version_string()
 #endif
     ;
 }
+
+__STXXL_END_NAMESPACE
 
 // vim: et:ts=4:sw=4
