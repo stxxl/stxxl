@@ -945,10 +945,6 @@ namespace stream
             {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
 // begin of STL-style merging
- #ifdef STXXL_CHECK_ORDER_IN_SORTS
-                value_type last_elem;
- #endif
-
                 diff_type rest = block_type::size;              // elements still to merge for this output block
 
                 do                                              // while rest > 0 and still elements available
