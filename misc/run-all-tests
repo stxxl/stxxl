@@ -12,7 +12,7 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 ############################################################################
 
-# Usage: $0 [stxxl|mcstxxl] [yes|no (valgrind)]
+# Usage: $0 [stxxl|mcstxxl] [yes|no (valgrind)] [yes|no (leakreport=full)]
 
 
 ulimit -t 7200
@@ -22,12 +22,17 @@ stxxl=stxxl
 test -n "$1" && stxxl="$1"
 valgrind=yes
 test -n "$2" && valgrind="$2"
+leakreport=""
+if [ "$3" = "yes" ]; then
+	leakreport="--leak-check=full --show-reachable=yes"
+fi
 
 suppressions=""
 for supp in `dirname $0`/*.supp
 do
 	suppressions="$suppressions --suppressions=$supp"
 done
+
 
 testresults=testresults
 mkdir -p $testresults
@@ -49,7 +54,7 @@ run()
 	echo "+ $cmd $@" | tee "$pfx.log"
 	echo "[`date`]" | tee -a "$pfx.log"
 	if [ "$valgrind" = "yes" ]; then
-		valgrind --track-fds=no --log-file="$pfx.valgrind" --freelist-vol=2147483648 --max-stackframe=8388608 $suppressions \
+		valgrind --track-fds=no --log-file="$pfx.valgrind" --freelist-vol=2147483648 --max-stackframe=8388608 $suppressions $leakreport \
 		$cmd "$@" < /dev/null 2>&1 | tee -a "$pfx.log"
 		result=$?
 	else
