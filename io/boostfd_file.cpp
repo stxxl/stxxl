@@ -35,7 +35,7 @@ boostfd_request::boostfd_request(
 
 boostfd_request::~boostfd_request()
 {
-    STXXL_VERBOSE3("boostfd_request " << unsigned(this) << ": deletion, cnt: " << ref_cnt);
+    STXXL_VERBOSE3("boostfd_request " << this << ": deletion, cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 }
@@ -109,7 +109,7 @@ void boostfd_request::check_aligning()
 
 void boostfd_request::wait()
 {
-    STXXL_VERBOSE3("boostfd_request : " << unsigned(this) << " wait ");
+    STXXL_VERBOSE3("boostfd_request : " << this << " wait ");
 
     START_COUNT_WAIT_TIME
 
