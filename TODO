@@ -51,16 +51,6 @@
 
 * replace tons of #ifdef with wrapper that behaves like boost's scoped_lock
 
-* install at_exit hooks that cleanup the singleton objects (memory leaks reported by valgrind)
-
-* split all static get_instance() methods into
-  - get_instance (must be inline to reduce overhead)
-  - create_instance (may be not inline if too complicated)
-      (use proper locking to avoid race conditions)
-  - destroy_instance (for the at_exit hook)
-      (this of course creates a race condition in improper programs that want to use 
-      the instance while/after it has been destroyed)
-
 * continue using the new approach for STXXL_VERBOSE:
   $(CXX) -DSTXXL_VERBOSE_FOO=STXXL_VERBOSEx
 

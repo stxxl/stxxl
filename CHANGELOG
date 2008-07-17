@@ -2,9 +2,12 @@ Version 1.2.1 (unreleased)
 
 * add support for the libstdc++ parallel_mode (successor of MCSTL),
   new make targets: library_g++_pmode, tests_g++_pmode, clean_g++_pmode
+  (requires g++ 4.3.2 or later)
 * new stxxl file type stxxl::mem_file (for debugging purposes only),
   helps debugging with valgrind because no memory cell ever
   leaves valgrind's control
+* properly destroy the singleton objects (block manager, disk queue threads,
+  logger, stats, config, ...) at program exit
 
 ------------------------------------------
 Version 1.2.0 (05 July 2008)

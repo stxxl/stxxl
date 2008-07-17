@@ -34,38 +34,42 @@
  * (systems, compilers or time) to test them.
  * Feedback is welcome.
  *
+ * The compilers marked with '*' are the developer's favorite choices
+ * and are most thoroughly tested.
+ *
  * \verbatim
-compiler      |  stxxl   stxxl     stxxl     stxxl
-              |          + mcstl   + boost   + mcstl
-              |                              + boost
---------------+----------------------------------------
-GCC 4.3 c++0x |    x       -²        x         -²
-GCC 4.3       |    x       -²        x         -²
-GCC 4.2       |    x       x         x         x
-GCC 4.1       |    x      n/a        x        n/a
-GCC 4.0       |    x      n/a        x        n/a
-GCC 3.4       |    x      n/a        x        n/a
-GCC 3.3       |    o      n/a        o        n/a
-GCC 2.95      |    -      n/a        -        n/a
-ICPC 10.1.017 |    x¹      x¹        x¹        x¹
-ICPC 10.0.026 |    x¹      x¹        x¹        x¹
-ICPC 9.1.053  |    x¹      -         x¹        -
-ICPC 9.0.032  |    x¹      -         x¹        -
-MSVC 2008 9.0 |    -       -         x        n/a
-MSVC 2005 8.0 |    -       -         x        n/a
+                |         parallel            parallel
+                |  stxxl   stxxl     stxxl     stxxl
+  compiler      |                   + boost   + boost
+----------------+----------------------------------------
+* GCC 4.3 c++0x |    x     PMODE²      x       PMODE²
+  GCC 4.3       |    x     PMODE²      x       PMODE²
+* GCC 4.2       |    x     MCSTL       x       MCSTL
+  GCC 4.1       |    x       -         x         -
+  GCC 4.0       |    x       -         x         -
+  GCC 3.4       |    x       -         x         -
+  GCC 3.3       |    o       -         o         -
+  GCC 2.95      |    -       -         -         -
+* ICPC 10.1.017 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 10.0.026 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 9.1.053  |    x¹      -         x¹        -
+  ICPC 9.0.032  |    x¹      -         x¹        -
+  MSVC 2008 9.0 |    -       -         x         -
+  MSVC 2005 8.0 |    -       -         x         -
 
  x   = full support
  o   = partial support
  -   = unsupported
  ?   = untested
- n/a = compiler does not support OpenMP which is needed by MCSTL
+ MCSTL = supports parallelization using the MCSTL library
+ PMODE = supports parallelization using libstdc++ parallel mode
  ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
        gcc does not come in the correct version:
        icpc 9.0: use gcc 3.x
        icpc 9.1: use gcc before 4.2
        icpc 10.x with mcstl support: use gcc 4.2
  ²   = MCSTL has been superseded by the libstdc++ parallel mode in GCC 4.3,
-       parallel mode is not yet supported in this stxxl release
+       requires g++ 4.3.2 (prerelease) or later
 \endverbatim
  *
  *
