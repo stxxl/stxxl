@@ -1,0 +1,15 @@
+{
+   pthread_cancel/dlopen/leak
+   Memcheck:Leak
+   fun:malloc
+   fun:_dl_map_object_deps
+   fun:dl_open_worker
+   fun:_dl_catch_error
+   fun:_dl_open
+   fun:do_dlopen
+   fun:_dl_catch_error
+   fun:dlerror_run
+   fun:__libc_dlopen_mode
+   fun:pthread_cancel_init
+   fun:pthread_cancel
+}
