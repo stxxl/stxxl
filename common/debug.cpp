@@ -16,8 +16,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-debugmon * debugmon::instance = NULL;
-
 #ifdef STXXL_DEBUGMON
 void debugmon::block_allocated(char * ptr, char * end, size_t size)
 {
@@ -38,6 +36,7 @@ void debugmon::block_allocated(char * ptr, char * end, size_t size)
     mutex1.unlock();
  #endif
 }
+
 void debugmon::block_deallocated(char * ptr)
 {
  #ifdef STXXL_BOOST_THREADS
@@ -71,6 +70,7 @@ void debugmon::block_deallocated(char * ptr)
     mutex1.unlock();
  #endif
 }
+
 void debugmon::io_started(char * ptr)
 {
  #ifdef STXXL_BOOST_THREADS
@@ -93,6 +93,7 @@ void debugmon::io_started(char * ptr)
     mutex1.unlock();
  #endif
 }
+
 void debugmon::io_finished(char * ptr)
 {
  #ifdef STXXL_BOOST_THREADS

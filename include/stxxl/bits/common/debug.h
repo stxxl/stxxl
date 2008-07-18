@@ -18,14 +18,17 @@
 #endif
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/singleton.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/compat_hash_map.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-class debugmon
+class debugmon : public singleton<debugmon>
 {
+    friend class singleton<debugmon>;
+
 #ifdef STXXL_DEBUGMON
 
     struct tag
@@ -63,23 +66,11 @@ class debugmon
 
 #endif // #ifdef STXXL_DEBUGMON
 
-    static debugmon * instance;
-
-    inline debugmon() { }
-
 public:
     void block_allocated(char * ptr, char * end, size_t size);
     void block_deallocated(char * ptr);
     void io_started(char * ptr);
     void io_finished(char * ptr);
-
-    inline static debugmon * get_instance()
-    {
-        if (!instance)
-            instance = new debugmon();
-
-        return instance;
-    }
 };
 
 #ifndef STXXL_DEBUGMON
