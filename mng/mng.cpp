@@ -128,6 +128,7 @@ void config::init(const char * config_path)
 block_manager::block_manager()
 {
     FileCreator fc;
+    debugmon::get_instance();
     config * cfg = config::get_instance();
 
     ndisks = cfg->disks_number();
