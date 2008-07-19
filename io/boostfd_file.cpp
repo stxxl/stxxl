@@ -174,7 +174,7 @@ void boostfd_request::serve()
             iostats->read_started(size());
  #endif
 
-            debugmon::get_instance()->io_started((char *)buffer);
+            STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
             try
             {
@@ -191,7 +191,7 @@ void boostfd_request::serve()
                 error_occured(msg.str());
             }
 
-            debugmon::get_instance()->io_finished((char *)buffer);
+            STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
  #if STXXL_IO_STATS
             iostats->read_finished();
@@ -203,7 +203,7 @@ void boostfd_request::serve()
             iostats->write_started(size());
  #endif
 
-            debugmon::get_instance()->io_started((char *)buffer);
+            STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
             try
             {
@@ -220,7 +220,7 @@ void boostfd_request::serve()
                 error_occured(msg.str());
             }
 
-            debugmon::get_instance()->io_finished((char *)buffer);
+            STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
  #if STXXL_IO_STATS
             iostats->write_finished();

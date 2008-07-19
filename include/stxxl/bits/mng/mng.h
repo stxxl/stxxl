@@ -335,11 +335,11 @@ public:
         memset(result, 0, bytes);
         #endif
         char * tmp = (char *)result;
-        debugmon::get_instance()->block_allocated(tmp, tmp + bytes, RawSize_);
+        STXXL_DEBUGMON_DO(block_allocated(tmp, tmp + bytes, RawSize_));
         tmp += RawSize_;
         while (tmp < ((char *)result) + bytes)
         {
-            debugmon::get_instance()->block_allocated(tmp, ((char *)result) + bytes, RawSize_);
+            STXXL_DEBUGMON_DO(block_allocated(tmp, ((char *)result) + bytes, RawSize_));
             tmp += RawSize_;
         }
         return result;
@@ -355,11 +355,11 @@ public:
         memset(result, 0, bytes);
         #endif
         char * tmp = (char *)result;
-        debugmon::get_instance()->block_allocated(tmp, tmp + bytes, RawSize_);
+        STXXL_DEBUGMON_DO(block_allocated(tmp, tmp + bytes, RawSize_));
         tmp += RawSize_;
         while (tmp < ((char *)result) + bytes)
         {
-            debugmon::get_instance()->block_allocated(tmp, ((char *)result) + bytes, RawSize_);
+            STXXL_DEBUGMON_DO(block_allocated(tmp, ((char *)result) + bytes, RawSize_));
             tmp += RawSize_;
         }
         return result;
@@ -372,13 +372,13 @@ public:
 
     static void operator delete[] (void * ptr)
     {
-        debugmon::get_instance()->block_deallocated((char *)ptr);
+        STXXL_DEBUGMON_DO(block_deallocated((char *)ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
     static void operator delete (void * ptr)
     {
-        debugmon::get_instance()->block_deallocated((char *)ptr);
+        STXXL_DEBUGMON_DO(block_deallocated((char *)ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 

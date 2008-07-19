@@ -25,6 +25,12 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+#ifdef STXXL_DEBUGMON
+ #define STXXL_DEBUGMON_DO(action) debugmon::get_instance()->action
+#else
+ #define STXXL_DEBUGMON_DO(action)
+#endif
+
 class debugmon : public singleton<debugmon>
 {
     friend class singleton<debugmon>;
@@ -72,17 +78,6 @@ public:
     void io_started(char * ptr);
     void io_finished(char * ptr);
 };
-
-#ifndef STXXL_DEBUGMON
-inline void debugmon::block_allocated(char * /*ptr*/, char * /*end*/, size_t /*size*/)
-{ }
-inline void debugmon::block_deallocated(char * /*ptr*/)
-{ }
-inline void debugmon::io_started(char * /*ptr*/)
-{ }
-inline void debugmon::io_finished(char * /*ptr*/)
-{ }
-#endif
 
 __STXXL_END_NAMESPACE
 

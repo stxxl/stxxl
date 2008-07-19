@@ -63,7 +63,7 @@ void syscall_request::serve()
                 iostats->read_started(size());
 #endif
 
-                debugmon::get_instance()->io_started((char *)buffer);
+                STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
                 if (::read(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)
                 {
@@ -74,7 +74,7 @@ void syscall_request::serve()
                                  ((type == READ) ? "READ" : "WRITE") << " nref= " << nref());
                 }
 
-                debugmon::get_instance()->io_finished((char *)buffer);
+                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
 #if STXXL_IO_STATS
                 iostats->read_finished();
@@ -86,7 +86,7 @@ void syscall_request::serve()
                 iostats->write_started(size());
 #endif
 
-                debugmon::get_instance()->io_started((char *)buffer);
+                STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
                 if (::write(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)
                 {
@@ -97,7 +97,7 @@ void syscall_request::serve()
                                  ((type == READ) ? "READ" : "WRITE") << " nref= " << nref());
                 }
 
-                debugmon::get_instance()->io_finished((char *)buffer);
+                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
 #if STXXL_IO_STATS
                 iostats->write_finished();

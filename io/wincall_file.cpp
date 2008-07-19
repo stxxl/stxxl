@@ -58,7 +58,7 @@ void wincall_request::serve()
                 iostats->read_started(size());
  #endif
 
-                debugmon::get_instance()->io_started((char *)buffer);
+                STXXL_DEBUGMON_DO(io_started((char *)buffer));
                 DWORD NumberOfBytesRead = 0;
                 if (!ReadFile(static_cast<wincall_file *>(file_)->get_file_des(),
                               buffer, bytes, &NumberOfBytesRead, NULL))
@@ -70,7 +70,7 @@ void wincall_request::serve()
                                              " NumberOfBytesRead= " << NumberOfBytesRead, io_error)
                 }
 
-                debugmon::get_instance()->io_finished((char *)buffer);
+                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
  #if STXXL_IO_STATS
                 iostats->read_finished();
@@ -82,7 +82,7 @@ void wincall_request::serve()
                 iostats->write_started(size());
  #endif
 
-                debugmon::get_instance()->io_started((char *)buffer);
+                STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
                 DWORD NumberOfBytesWritten = 0;
                 if (!WriteFile(static_cast<wincall_file *>(file_)->get_file_des(), buffer, bytes,
@@ -95,7 +95,7 @@ void wincall_request::serve()
                                              " NumberOfBytesWritten= " << NumberOfBytesWritten, io_error)
                 }
 
-                debugmon::get_instance()->io_finished((char *)buffer);
+                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
  #if STXXL_IO_STATS
                 iostats->write_finished();
