@@ -46,21 +46,21 @@ template <typename INSTANCE, bool destroy_on_exit>
 typename singleton<INSTANCE, destroy_on_exit>::instance_pointer
 singleton<INSTANCE, destroy_on_exit>::create_instance()
 {
-        if (!instance) {
-            instance = new instance_type();
-            if (destroy_on_exit)
-                atexit(destroy_instance);
-        }
-        return instance;
+    if (!instance) {
+        instance = new instance_type();
+        if (destroy_on_exit)
+            atexit(destroy_instance);
+    }
+    return instance;
 }
 
 template <typename INSTANCE, bool destroy_on_exit>
 void singleton<INSTANCE, destroy_on_exit>::destroy_instance()
 {
-        instance_pointer inst = instance;
-	//instance = NULL;
-        instance = reinterpret_cast<instance_pointer>(unsigned_type(-1)); // bomb if used again
-        delete inst;
+    instance_pointer inst = instance;
+    //instance = NULL;
+    instance = reinterpret_cast<instance_pointer>(unsigned_type(-1));     // bomb if used again
+    delete inst;
 }
 
 template <typename INSTANCE, bool destroy_on_exit>
@@ -69,4 +69,3 @@ INSTANCE * singleton<INSTANCE, destroy_on_exit>::instance = NULL;
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_SINGLETON_HEADER
-

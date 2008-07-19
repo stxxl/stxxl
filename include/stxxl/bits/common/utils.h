@@ -488,7 +488,7 @@ public:
     // allocate but don't initialize num elements of type T
     pointer allocate(size_type num, const void * = 0)
     {
-        pointer ret = (pointer)(T::operator new(num * sizeof(T)));
+        pointer ret = (pointer)(T::operator new (num * sizeof(T)));
         return ret;
     }
 
@@ -509,7 +509,7 @@ public:
     // deallocate storage p of deleted elements
     void deallocate(pointer p, size_type /*num*/)
     {
-        T::operator delete((void *)p);
+        T::operator delete ((void *)p);
     }
 };
 

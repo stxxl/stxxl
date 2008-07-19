@@ -73,9 +73,9 @@ inline unsigned sort_memory_usage_factor()
 #if STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD && defined(_GLIBCXX_PARALLEL)
     return (__gnu_parallel::_Settings::get().sort_algorithm == __gnu_parallel::MWMS && omp_get_max_threads() > 1) ? 2 : 1;   //memory overhead for multiway mergesort
 #elif STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD && defined(__MCSTL__)
-    return (mcstl::SETTINGS::sort_algorithm == mcstl::SETTINGS::MWMS && mcstl::SETTINGS::num_threads > 1) ? 2 : 1;   //memory overhead for multiway mergesort
+    return (mcstl::SETTINGS::sort_algorithm == mcstl::SETTINGS::MWMS && mcstl::SETTINGS::num_threads > 1) ? 2 : 1;           //memory overhead for multiway mergesort
 #else
-    return 1;                                                                                                           //no overhead
+    return 1;                                                                                                                //no overhead
 #endif
 }
 
@@ -93,7 +93,6 @@ inline bool do_parallel_merge()
 
 namespace parallel
 {
-
 #if STXXL_PARALLEL
 
 /** @brief Multi-way merging dispatcher.
@@ -103,29 +102,28 @@ namespace parallel
  *  @param comp Comparator.
  *  @param length Maximum length to merge.
  *  @return End iterator of output sequence. */
-template <typename RandomAccessIteratorPairIterator,
-          typename RandomAccessIterator3, typename DiffType, typename Comparator>
-RandomAccessIterator3
-multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
-        RandomAccessIteratorPairIterator seqs_end,
-        RandomAccessIterator3 target,
-        Comparator comp,
-        DiffType length)
-{
+    template <typename RandomAccessIteratorPairIterator,
+              typename RandomAccessIterator3, typename DiffType, typename Comparator>
+    RandomAccessIterator3
+    multiway_merge(RandomAccessIteratorPairIterator seqs_begin,
+                   RandomAccessIteratorPairIterator seqs_end,
+                   RandomAccessIterator3 target,
+                   Comparator comp,
+                   DiffType length)
+    {
 #if defined(_GLIBCXX_PARALLEL)
-    return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
+        return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-    return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, length, false);
+        return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, length, false);
 #else
-    assert(0);
+        assert(0);
+        abort();
 #endif
-}
+    }
 
 #endif
-
 }
 
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_PARALLEL_HEADER
-

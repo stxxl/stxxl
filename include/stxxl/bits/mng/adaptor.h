@@ -82,7 +82,7 @@ public:
     blocked_index operator ++ (int)
     {
         blocked_index former(*this);
-        operator ++();
+        operator ++ ();
         return former;
     }
 
@@ -103,7 +103,7 @@ public:
     blocked_index operator -- (int)
     {
         blocked_index former(*this);
-        operator --();
+        operator -- ();
         return former;
     }
 
@@ -119,7 +119,7 @@ public:
         return *this;
     }
 
-    operator unsigned_type() const
+    operator unsigned_type () const
     {
         return pos;
     }
@@ -464,7 +464,7 @@ public:
     ArrayOfSequencesIterator operator ++ (int)
     {
         ArrayOfSequencesIterator former(*this);
-        operator ++();
+        operator ++ ();
         return former;
     }
 
@@ -486,7 +486,7 @@ public:
     ArrayOfSequencesIterator operator -- (int)
     {
         ArrayOfSequencesIterator former(*this);
-        operator --();
+        operator -- ();
         return former;
     }
 

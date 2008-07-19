@@ -933,7 +933,7 @@ namespace stream
             {
 // begin of native merging procedure
 
-            losers = new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
+                losers = new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
 // end of native merging procedure
             }
@@ -1038,7 +1038,7 @@ namespace stream
             {
 // begin of native merging procedure
 
-            losers->multi_merge(current_block->elem);
+                losers->multi_merge(current_block->elem);
 
 // end of native merging procedure
             }
@@ -1456,7 +1456,7 @@ namespace stream
         const value_type * operator -> () const
         {
             assert(!empty());
-            return merger.operator ->();
+            return merger.operator -> ();
         }
 
         //! \brief Standard stream method

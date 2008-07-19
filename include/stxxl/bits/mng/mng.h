@@ -399,12 +399,12 @@ public:
 
 
 #if 0
-   template <unsigned BLK_SIZE>
-   class BIDArray: public std::vector< BID <BLK_SIZE> >
-   {
-   public:
-   BIDArray(std::vector< BID <BLK_SIZE> >::size_type size = 0) : std::vector< BID <BLK_SIZE> >(size) {};
-   };
+template <unsigned BLK_SIZE>
+class BIDArray : public std::vector<BID<BLK_SIZE> >
+{
+public:
+    BIDArray(std::vector<BID<BLK_SIZE> >::size_type size = 0) : std::vector<BID<BLK_SIZE> >(size) { }
+};
 #endif
 
 template <unsigned BLK_SIZE>
@@ -549,8 +549,8 @@ public:
     stxxl::int64 new_blocks(BID<BLK_SIZE> * begin,
                             BID<BLK_SIZE> * end);
 #if 0
-        template < unsigned BLK_SIZE >
-        void delete_blocks (const BIDArray < BLK_SIZE > &bids);
+    template <unsigned BLK_SIZE>
+    void delete_blocks(const BIDArray<BLK_SIZE> & bids);
 #endif
     template <unsigned BLK_SIZE>
     void delete_block(const BID<BLK_SIZE> & bid);
@@ -732,17 +732,17 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
             if (free_space.size() > 1)
             {
 #if 0
-                   if(pred == succ)
-                   {
-                      STXXL_ERRMSG("Error deallocating block at "<<bid.offset<<" size "<<bid.size);
-                      STXXL_ERRMSG(((pred==succ)?"pred==succ":"pred!=succ"));
-                      STXXL_ERRMSG(((pred==free_space.begin ())?"pred==free_space.begin()":"pred!=free_space.begin()"));
-                      STXXL_ERRMSG(((pred==free_space.end ())?"pred==free_space.end()":"pred!=free_space.end()"));
-                      STXXL_ERRMSG(((succ==free_space.begin ())?"succ==free_space.begin()":"succ!=free_space.begin()"));
-                      STXXL_ERRMSG(((succ==free_space.end ())?"succ==free_space.end()":"succ!=free_space.end()"));
-                      dump();
-                      assert(pred != succ);
-                   }
+                if (pred == succ)
+                {
+                    STXXL_ERRMSG("Error deallocating block at " << bid.offset << " size " << bid.size);
+                    STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
+                    STXXL_ERRMSG(((pred == free_space.begin()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
+                    STXXL_ERRMSG(((pred == free_space.end()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
+                    STXXL_ERRMSG(((succ == free_space.begin()) ? "succ==free_space.begin()" : "succ!=free_space.begin()"));
+                    STXXL_ERRMSG(((succ == free_space.end()) ? "succ==free_space.end()" : "succ!=free_space.end()"));
+                    dump();
+                    assert(pred != succ);
+                }
 #endif
                 bool succ_is_not_the_first = (succ != free_space.begin());
                 if ((*succ).first == region_pos + region_size)
@@ -796,51 +796,50 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
 }
 
 #if 0
-    template < unsigned BLK_SIZE >
-        void DiskAllocator::delete_blocks (const BIDArray < BLK_SIZE > &bids)
+template <unsigned BLK_SIZE>
+void DiskAllocator::delete_blocks(const BIDArray<BLK_SIZE> & bids)
+{
+    STXXL_VERBOSE2("DiskAllocator::delete_blocks<BLK_SIZE> BLK_SIZE=" << BLK_SIZE <<
+                   ", free:" << free_bytes << " total:" << disk_bytes);
+
+    unsigned i = 0;
+    for ( ; i < bids.size(); ++i)
     {
-        STXXL_VERBOSE2("DiskAllocator::delete_blocks<BLK_SIZE> BLK_SIZE="<< BLK_SIZE <<
-      ", free:" << free_bytes << " total:"<< disk_bytes );
+        stxxl::int64 region_pos = bids[i].offset;
+        stxxl::int64 region_size = bids[i].size;
+        STXXL_VERBOSE2("Deallocating a block with size: " << region_size);
+        assert(bids[i].size);
 
-        unsigned i=0;
-        for (; i < bids.size (); ++i)
+        if (!free_space.empty())
         {
-            stxxl::int64 region_pos = bids[i].offset;
-            stxxl::int64 region_size = bids[i].size;
-              STXXL_VERBOSE2("Deallocating a block with size: "<<region_size);
-              assert(bids[i].size);
+            sortseq::iterator succ =
+                free_space.upper_bound(region_pos);
+            sortseq::iterator pred = succ;
+            pred--;
 
-            if(!free_space.empty())
+            if (succ != free_space.end()
+                && (*succ).first == region_pos + region_size)
             {
-                sortseq::iterator succ =
-                    free_space.upper_bound (region_pos);
-                sortseq::iterator pred = succ;
-                pred--;
+                // coalesce with successor
 
-                if (succ != free_space.end ()
-                    && (*succ).first == region_pos + region_size)
-                {
-                    // coalesce with successor
-
-                    region_size += (*succ).second;
-                    free_space.erase (succ);
-                }
-                if (pred != free_space.end ()
-                    && (*pred).first + (*pred).second == region_pos)
-                {
-                    // coalesce with predecessor
-
-                    region_size += (*pred).second;
-                    region_pos = (*pred).first;
-                    free_space.erase (pred);
-                }
+                region_size += (*succ).second;
+                free_space.erase(succ);
             }
-            free_space[region_pos] = region_size;
+            if (pred != free_space.end()
+                && (*pred).first + (*pred).second == region_pos)
+            {
+                // coalesce with predecessor
 
+                region_size += (*pred).second;
+                region_pos = (*pred).first;
+                free_space.erase(pred);
+            }
         }
-        for(i=0;i<bids.size();++i)
-                  free_bytes += stxxl::int64(bids[i].size);
+        free_space[region_pos] = region_size;
     }
+    for (i = 0; i < bids.size(); ++i)
+        free_bytes += stxxl::int64(bids[i].size);
+}
 #endif
 
 //! \brief Access point to disks properties
@@ -1161,53 +1160,53 @@ struct offset_allocator
 
 #if 0 // deprecated
 
-   //! \brief Traits for models of \b bid_iterator concept
-   template < class bid_it >
-   struct bid_iterator_traits
-   {
-      bid_it *a;
-      enum
-      {
-          block_size = bid_it::block_size
-      };
-   };
+//! \brief Traits for models of \b bid_iterator concept
+template <class bid_it>
+struct bid_iterator_traits
+{
+    bid_it * a;
+    enum
+    {
+        block_size = bid_it::block_size
+    };
+};
 
-   template < unsigned blk_sz >
-   struct bid_iterator_traits <BID <blk_sz > *>
-   {
-      enum
-      {
-          block_size = blk_sz
-      };
-   };
+template <unsigned blk_sz>
+struct bid_iterator_traits<BID<blk_sz> *>
+{
+    enum
+    {
+        block_size = blk_sz
+    };
+};
 
 
-   template < unsigned blk_sz,class X >
-   struct bid_iterator_traits< __gnu_cxx::__normal_iterator< BID<blk_sz> *,  X> >
-   {
-      enum
-      {
-          block_size = blk_sz
-      };
-   };
+template <unsigned blk_sz, class X>
+struct bid_iterator_traits<__gnu_cxx::__normal_iterator<BID<blk_sz> *, X> >
+{
+    enum
+    {
+        block_size = blk_sz
+    };
+};
 
-   template < unsigned blk_sz,class X , class Y>
-   struct bid_iterator_traits< std::_List_iterator<BID<blk_sz>,X,Y > >
-   {
-      enum
-      {
-          block_size = blk_sz
-      };
-   };
+template <unsigned blk_sz, class X, class Y>
+struct bid_iterator_traits<std::_List_iterator<BID<blk_sz>, X, Y> >
+{
+    enum
+    {
+        block_size = blk_sz
+    };
+};
 
-   template < unsigned blk_sz, class X >
-   struct bid_iterator_traits< typename std::vector< BID<blk_sz> , X >::iterator >
-   {
-      enum
-      {
-          block_size = blk_sz
-      };
-   };
+template <unsigned blk_sz, class X>
+struct bid_iterator_traits<typename std::vector<BID<blk_sz>, X>::iterator>
+{
+    enum
+    {
+        block_size = blk_sz
+    };
+};
 
 #endif
 

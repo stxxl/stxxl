@@ -171,57 +171,57 @@ int main(int argc, const char ** argv)
     run_size = memory_to_use;
     buffer_size = memory_to_use / 16;
 #ifdef _GLIBCXX_PARALLEL
-	omp_set_num_threads(p);
+    omp_set_num_threads(p);
     __gnu_parallel::_Settings parallel_settings(__gnu_parallel::_Settings::get());
-	parallel_settings.algorithm_strategy = __gnu_parallel::force_sequential;
+    parallel_settings.algorithm_strategy = __gnu_parallel::force_sequential;
 
-	parallel_settings.merge_splitting = __gnu_parallel::EXACT;
-	parallel_settings.merge_minimal_n = 10000;
-	parallel_settings.merge_oversampling = 10;
+    parallel_settings.merge_splitting = __gnu_parallel::EXACT;
+    parallel_settings.merge_minimal_n = 10000;
+    parallel_settings.merge_oversampling = 10;
 
-	parallel_settings.multiway_merge_algorithm = __gnu_parallel::LOSER_TREE;
-	parallel_settings.multiway_merge_splitting = __gnu_parallel::EXACT;
-	parallel_settings.multiway_merge_oversampling = 10;
-	parallel_settings.multiway_merge_minimal_n = 10000;
-	parallel_settings.multiway_merge_minimal_k = 2;
-	if(!strcmp(argv[4], "q"))	//quicksort
-		parallel_settings.sort_algorithm = __gnu_parallel::QS;
-	else if(!strcmp(argv[4], "qb"))	//balanced quicksort
-		parallel_settings.sort_algorithm = __gnu_parallel::QS_BALANCED;
-	else if(!strcmp(argv[4], "m"))	//merge sort
-		parallel_settings.sort_algorithm = __gnu_parallel::MWMS;
-	else /*if(!strcmp(argv[4], "s"))*/	//sequential (default)
-	{
-		parallel_settings.sort_algorithm = __gnu_parallel::QS;
-		parallel_settings.sort_minimal_n = memory_to_use;
-	}
-	
-	if(!strcmp(argv[5], "p"))	//parallel
-	{
-		stxxl::SETTINGS::native_merge = false;
-		//parallel_settings.multiway_merge_minimal_n = 1024;	//leave as default
-	}
-	else if(!strcmp(argv[5], "s"))	//sequential
-	{
-		stxxl::SETTINGS::native_merge = false;
-		parallel_settings.multiway_merge_minimal_n = memory_to_use;	//too much to be called
-	}
-	else /*if(!strcmp(argv[5], "n"))*/	//native (default)
-		stxxl::SETTINGS::native_merge = true;
-	
-	parallel_settings.multiway_merge_minimal_k = 2;
+    parallel_settings.multiway_merge_algorithm = __gnu_parallel::LOSER_TREE;
+    parallel_settings.multiway_merge_splitting = __gnu_parallel::EXACT;
+    parallel_settings.multiway_merge_oversampling = 10;
+    parallel_settings.multiway_merge_minimal_n = 10000;
+    parallel_settings.multiway_merge_minimal_k = 2;
+    if (!strcmp(argv[4], "q"))                  //quicksort
+        parallel_settings.sort_algorithm = __gnu_parallel::QS;
+    else if (!strcmp(argv[4], "qb"))            //balanced quicksort
+        parallel_settings.sort_algorithm = __gnu_parallel::QS_BALANCED;
+    else if (!strcmp(argv[4], "m"))             //merge sort
+        parallel_settings.sort_algorithm = __gnu_parallel::MWMS;
+    else /*if(!strcmp(argv[4], "s"))*/          //sequential (default)
+    {
+        parallel_settings.sort_algorithm = __gnu_parallel::QS;
+        parallel_settings.sort_minimal_n = memory_to_use;
+    }
+
+    if (!strcmp(argv[5], "p"))          //parallel
+    {
+        stxxl::SETTINGS::native_merge = false;
+        //parallel_settings.multiway_merge_minimal_n = 1024;	//leave as default
+    }
+    else if (!strcmp(argv[5], "s"))                                             //sequential
+    {
+        stxxl::SETTINGS::native_merge = false;
+        parallel_settings.multiway_merge_minimal_n = memory_to_use;             //too much to be called
+    }
+    else /*if(!strcmp(argv[5], "n"))*/                                          //native (default)
+        stxxl::SETTINGS::native_merge = true;
+
+    parallel_settings.multiway_merge_minimal_k = 2;
 
     __gnu_parallel::_Settings::set(parallel_settings);
     assert(&__gnu_parallel::_Settings::get() != &parallel_settings);
 
     if (0)
-       printf("%d %p: mwms %d, q %d, qb %d",
-   		__gnu_parallel::_Settings::get().sort_algorithm,
-   		&__gnu_parallel::_Settings::get().sort_algorithm,
-   		__gnu_parallel::MWMS,
-   		__gnu_parallel::QS,
-   		__gnu_parallel::QS_BALANCED);
-#endif	
+        printf("%d %p: mwms %d, q %d, qb %d",
+               __gnu_parallel::_Settings::get().sort_algorithm,
+               &__gnu_parallel::_Settings::get().sort_algorithm,
+               __gnu_parallel::MWMS,
+               __gnu_parallel::QS,
+               __gnu_parallel::QS_BALANCED);
+#endif
 #ifdef __MCSTL__
     mcstl::HEURISTIC::num_threads = p;
     mcstl::HEURISTIC::force_sequential = false;

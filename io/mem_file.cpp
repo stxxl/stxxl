@@ -149,7 +149,7 @@ void mem_request::serve()
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
                      " (nref=" << nref() << ") " <<
                      " this=" << long(this) <<
-                     " mem address=" << static_cast<mem_file *>(file_)->get_ptr() << 
+                     " mem address=" << static_cast<mem_file *>(file_)->get_ptr() <<
                      " mem size=" << static_cast<mem_file *>(file_)->size() <<
                      " offset=" << offset <<
                      " buffer=" << buffer <<
@@ -162,33 +162,33 @@ void mem_request::serve()
                    ((type == READ) ? " READ" : " WRITE") <<
                    " mem: " << static_cast<mem_file *>(file_)->get_ptr());
 
-            if (type == READ)
-            {
+    if (type == READ)
+    {
 #if STXXL_IO_STATS
-                iostats->read_started(size());
+        iostats->read_started(size());
 #endif
-                memcpy(buffer, static_cast<mem_file *>(file_)->get_ptr() + offset, bytes);
+        memcpy(buffer, static_cast<mem_file *>(file_)->get_ptr() + offset, bytes);
 #if STXXL_IO_STATS
-                iostats->read_finished();
+        iostats->read_finished();
 #endif
-            }
-            else
-            {
+    }
+    else
+    {
 #if STXXL_IO_STATS
-                iostats->write_started(size());
+        iostats->write_started(size());
 #endif
-                memcpy(static_cast<mem_file *>(file_)->get_ptr() + offset, buffer, bytes);
+        memcpy(static_cast<mem_file *>(file_)->get_ptr() + offset, buffer, bytes);
 #if STXXL_IO_STATS
-                iostats->write_finished();
+        iostats->write_finished();
 #endif
-            }
+    }
 
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: reference to the request is lost after serve" <<
                      " (nref=" << nref() << ") " <<
                      " this=" << long(this) <<
-                     " mem address=" << static_cast<mem_file *>(file_)->get_ptr() << 
+                     " mem address=" << static_cast<mem_file *>(file_)->get_ptr() <<
                      " mem size=" << static_cast<mem_file *>(file_)->size() <<
                      " offset=" << offset <<
                      " buffer=" << buffer <<
@@ -266,8 +266,8 @@ request_ptr mem_file::aread(
     completion_handler on_cmpl)
 {
     request_ptr req = new mem_request(this,
-                                          buffer, pos, bytes,
-                                          request::READ, on_cmpl);
+                                      buffer, pos, bytes,
+                                      request::READ, on_cmpl);
 
     if (!req.get())
         stxxl_function_error(io_error);
@@ -285,7 +285,7 @@ request_ptr mem_file::awrite(
     completion_handler on_cmpl)
 {
     request_ptr req = new mem_request(this, buffer, pos, bytes,
-                                          request::WRITE, on_cmpl);
+                                      request::WRITE, on_cmpl);
 
     if (!req.get())
         stxxl_function_error(io_error);

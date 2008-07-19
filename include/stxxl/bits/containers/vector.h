@@ -113,7 +113,7 @@ public:
     double_blocked_index operator ++ (int)
     {
         double_blocked_index former(*this);
-        operator ++();
+        operator ++ ();
         return former;
     }
 
@@ -144,7 +144,7 @@ public:
     double_blocked_index operator -- (int)
     {
         double_blocked_index former(*this);
-        operator --();
+        operator -- ();
         return former;
     }
 

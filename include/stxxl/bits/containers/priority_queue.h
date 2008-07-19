@@ -2045,8 +2045,7 @@ public:
 template <class Config_>
 inline typename priority_queue<Config_>::size_type priority_queue<Config_>::size() const
 {
-    return
-           size_ +
+    return size_ +
            insertHeap.size() - 1 +
            ((buffer1 + BufferSize1) - minBuffer1);
 }

@@ -211,7 +211,7 @@ namespace stream
     {
         STXXL_VERBOSE1("streamify for vector_iterator range is called");
         return vector_iterator2stream<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
-               (begin, end, nbuffers);
+                         (begin, end, nbuffers);
     }
 
     template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
@@ -239,7 +239,7 @@ namespace stream
     {
         STXXL_VERBOSE1("streamify for const_vector_iterator range is called");
         return vector_iterator2stream<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
-               (begin, end, nbuffers);
+                         (begin, end, nbuffers);
     }
 
     template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
@@ -347,7 +347,7 @@ namespace stream
     {
         STXXL_VERBOSE1("streamify_sr for vector_iterator range is called");
         return vector_iterator2stream_sr<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
-               (begin, end, nbuffers);
+                         (begin, end, nbuffers);
     }
 
     //! \brief Version of  \c streamify. Switches from \c vector_iterator2stream to \c iterator2stream for small ranges.
@@ -361,7 +361,7 @@ namespace stream
     {
         STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called");
         return vector_iterator2stream_sr<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
-               (begin, end, nbuffers);
+                         (begin, end, nbuffers);
     }
 
     //! \brief Stores consecutively stream content to an output iterator

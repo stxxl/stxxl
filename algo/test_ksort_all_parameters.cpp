@@ -59,7 +59,7 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
     stxxl::ksort(v.begin(), v.end(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG((stxxl::is_sorted(v.begin(), v.end()) ? "OK"  : "WRONG"));
+    STXXL_MSG((stxxl::is_sorted(v.begin(), v.end()) ? "OK" : "WRONG"));
 }
 
 template <typename T, unsigned block_size>

@@ -30,14 +30,13 @@
 
 typedef stxxl::tuple<char, int> tuple_type;
 
-namespace std {
-
-std::ostream & operator << (std::ostream & os, const tuple_type & t)
+namespace std
 {
-    os << "<" << t.first << "," << t.second << ">";
-    return os;
-}
-
+    std::ostream & operator << (std::ostream & os, const tuple_type & t)
+    {
+        os << "<" << t.first << "," << t.second << ">";
+        return os;
+    }
 }
 
 #ifdef USE_EXTERNAL_ARRAY
