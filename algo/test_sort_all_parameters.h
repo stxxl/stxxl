@@ -34,11 +34,11 @@ struct my_type
 
     static my_type<KEY, SIZE> min_value()
     {
-        return my_type<KEY, SIZE>(0);
+        return my_type<KEY, SIZE>(std::numeric_limits<key_type>::min());
     }
     static my_type<KEY, SIZE> max_value()
     {
-        return my_type<KEY, SIZE>(0xffffffff);
+        return my_type<KEY, SIZE>(std::numeric_limits<key_type>::max());
     }
 #endif
 };
@@ -84,11 +84,11 @@ struct Cmp : public std::less<T>
 
     static T min_value()
     {
-        return T(0);
+        return T::min_value();
     }
     static T max_value()
     {
-        return T(0xffffffff);
+        return T::max_value();
     }
 };
 

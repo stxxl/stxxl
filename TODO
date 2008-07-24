@@ -37,9 +37,6 @@
 
 * debug stable_ksort in depth, there are still some crashing cases left
 
-* use numeric_limits<> to determine min_value/max_value in all test programs,
-  don't hardcode 0xffffffff
-
 * cleanup the COUNT_WAIT_TIME mess
 
 * iostats: print I/O volume not only in bytes, but [KMGT]B as well

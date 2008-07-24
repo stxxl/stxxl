@@ -28,13 +28,13 @@ struct Cmp : public std::binary_function<value_type, value_type, bool>
     {
         return a < b;
     }
-    value_type max_value()
-    {
-        return 0xffffffff;
-    }
     value_type min_value()
     {
-        return 0x0;
+        return std::numeric_limits<value_type>::min();
+    }
+    value_type max_value()
+    {
+        return std::numeric_limits<value_type>::max();
     }
 };
 
