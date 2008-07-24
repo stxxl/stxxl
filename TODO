@@ -37,8 +37,6 @@
 
 * cleanup the COUNT_WAIT_TIME mess
 
-* iostats: print I/O volume not only in bytes, but [KMGT]B as well
-
 * put some stxxl/defines.h (config.h/...) header someewhere,
   listing/describing all the #defines that my be used somewhere
 
