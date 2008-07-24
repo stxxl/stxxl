@@ -19,7 +19,7 @@
 #include <stxxl/aligned_alloc>
 
 using stxxl::file;
-using stxxl::stxxl_timestamp;
+using stxxl::timestamp;
 
 
 int main()
@@ -47,10 +47,10 @@ int main()
 
     for (i = 0; i < 40; i++)
     {
-        double begin = stxxl_timestamp();
+        double begin = timestamp();
         req = file1.awrite(buffer, pos, block_size, stxxl::default_completion_handler());
         req->wait();
-        double end = stxxl_timestamp();
+        double end = timestamp();
 
         STXXL_MSG("Pos: " << pos << " block_size:" << block_size << " time:" << (end - begin));
         pos += 1024 * 1024 * 1024;
@@ -64,10 +64,10 @@ int main()
     {
         stxxl::random_number<> rnd;
         pos = rnd(disk_size / block_size) * block_size;
-        double begin = stxxl_timestamp();
+        double begin = timestamp();
         req = file1.awrite(buffer, pos, block_size, stxxl::default_completion_handler());
         req->wait();
-        double diff = stxxl_timestamp() - begin;
+        double diff = timestamp() - begin;
 
         sum += diff;
         sum2 += diff * diff;

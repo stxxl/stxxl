@@ -664,7 +664,7 @@ namespace sort_local
         // iostats->reset();
 #endif
 
-        double begin = stxxl_timestamp(), after_runs_creation, end;
+        double begin = timestamp(), after_runs_creation, end;
 
         run_type ** runs = new run_type *[nruns];
 
@@ -689,7 +689,7 @@ namespace sort_local
                                 input_bid_iterator,
                                 value_cmp>(input_bids, runs, nruns, _m, cmp);
 
-        after_runs_creation = stxxl_timestamp();
+        after_runs_creation = timestamp();
 
 #ifdef COUNT_WAIT_TIME
         double io_wait_after_rf = stxxl::wait_time_counter;
@@ -783,7 +783,7 @@ namespace sort_local
         delete[] runs;
 
 
-        end = stxxl_timestamp();
+        end = timestamp();
         (void)(begin);
 
         STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<

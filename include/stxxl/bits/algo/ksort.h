@@ -571,7 +571,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
     // iostats->reset ();
 #endif
 
-    double begin = stxxl_timestamp(), after_runs_creation, end;
+    double begin = timestamp(), after_runs_creation, end;
     (void)(begin);
 
     run_type ** runs = new run_type *[nruns];
@@ -617,7 +617,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
                 input_bid_iterator,
                 key_extractor>(input_bids, runs, nruns, m2, keyobj);
 
-    after_runs_creation = stxxl_timestamp();
+    after_runs_creation = timestamp();
 
 #ifdef COUNT_WAIT_TIME
     double io_wait_after_rf = stxxl::wait_time_counter;
@@ -709,7 +709,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
     run_type * result = *runs;
     delete[] runs;
 
-    end = stxxl_timestamp();
+    end = timestamp();
 
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
                   after_runs_creation - begin << " s");

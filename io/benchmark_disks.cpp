@@ -33,7 +33,7 @@
 
 using stxxl::request_ptr;
 using stxxl::file;
-using stxxl::stxxl_timestamp;
+using stxxl::timestamp;
 
 
 #ifdef BLOCK_ALIGN
@@ -75,7 +75,7 @@ void watch_times(request_ptr reqs[], unsigned n, double * out)
                 if (reqs[i]->poll())
                 {
                     finished[i] = true;
-                    out[i] = stxxl_timestamp();
+                    out[i] = timestamp();
                     count++;
                 }
         }
@@ -180,7 +180,7 @@ int main(int argc, char * argv[])
 
             std::cout << "Disk offset " << std::setw(7) << offset / MB << " MB: " << std::fixed;
 
-            double begin = stxxl_timestamp(), end;
+            double begin = timestamp(), end;
 
 #ifndef DO_ONLY_READ
             for (i = 0; i < ndisks; i++)
@@ -199,7 +199,7 @@ int main(int argc, char * argv[])
             wait_all(reqs, ndisks * chunks);
  #endif
 
-            end = stxxl_timestamp();
+            end = timestamp();
             totalsizewrite += buffer_size;
             totaltimewrite += end - begin;
 
@@ -222,7 +222,7 @@ int main(int argc, char * argv[])
 
 
 #ifndef NOREAD
-            begin = stxxl_timestamp();
+            begin = timestamp();
 
             for (i = 0; i < ndisks; i++)
             {
@@ -239,7 +239,7 @@ int main(int argc, char * argv[])
             wait_all(reqs, ndisks * chunks);
  #endif
 
-            end = stxxl_timestamp();
+            end = timestamp();
             totalsizeread += buffer_size;
             totaltimeread += end - begin;
 

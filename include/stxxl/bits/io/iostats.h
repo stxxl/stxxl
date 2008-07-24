@@ -189,7 +189,7 @@ public:
         p_writes(s.get_pwrite_time()),
         p_ios(s.get_pio_time()),
         t_wait(s.get_io_wait_time()),
-        elapsed(stxxl_timestamp() - s.get_last_reset_time())
+        elapsed(timestamp() - s.get_last_reset_time())
     { }
 
     stats_data operator + (const stats_data & a) const

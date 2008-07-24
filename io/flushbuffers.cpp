@@ -20,7 +20,7 @@
 #endif
 
 
-using stxxl::stxxl_timestamp;
+using stxxl::timestamp;
 using stxxl::file;
 using stxxl::request_ptr;
 
@@ -62,7 +62,7 @@ void watch_times(request_ptr reqs[], unsigned n, double * out)
                 if (reqs[i]->poll())
                 {
                     finished[i] = true;
-                    out[i] = stxxl_timestamp();
+                    out[i] = timestamp();
                     count++;
                 }
         }
@@ -132,7 +132,7 @@ int main(int argc, char * argv[])
 
         double begin, end;
 
-        begin = stxxl_timestamp();
+        begin = timestamp();
 
         for (i = 0; i < ndisks; i++)
         {
@@ -150,7 +150,7 @@ int main(int argc, char * argv[])
         wait_all(reqs, ndisks * chunks);
 #endif
 
-        end = stxxl_timestamp();
+        end = timestamp();
 
         std::cout << int(1e-6 * (buffer_size) / (end - begin)) << " MB/s" << std::endl;
 

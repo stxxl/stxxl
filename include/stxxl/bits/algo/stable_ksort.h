@@ -234,7 +234,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     reset_io_wait_time();
 
 
-    double begin = stxxl_timestamp();
+    double begin = timestamp();
     (void)(begin);
 
 
@@ -284,7 +284,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         nread_buffers,
         nwrite_buffers);
 
-    double dist_end = stxxl_timestamp(), end;
+    double dist_end = timestamp(), end;
     (void)(dist_end);
 #ifdef COUNT_WAIT_TIME
     double io_wait_after_d = stxxl::wait_time_counter;
@@ -464,7 +464,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
             delete block;
         }
 
-        end = stxxl_timestamp();
+        end = timestamp();
     }
 
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Distribution time: " <<

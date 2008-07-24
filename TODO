@@ -16,8 +16,6 @@
 
 * new types: stxxl::size_type_internal stxxl::size_type_external
 
-* stxxl_timestamp ==> stxxl::timestamp
-
 * integrate unordered_map branch
   => Milestone: 1.3
 

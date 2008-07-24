@@ -213,14 +213,6 @@ inline bool helper_check_ne_0(INT res, const char * func_name)
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline double
-stxxl_timestamp()
-{
-    return timestamp();
-}
-
-////////////////////////////////////////////////////////////////////////////
-
 inline std::string
 stxxl_tmpfilename(std::string dir, std::string prefix)
 {
@@ -339,8 +331,8 @@ inline stxxl::int64 atoint64(const char * s)
 
 #ifdef COUNT_WAIT_TIME
 
- #define START_COUNT_WAIT_TIME  double count_wait_begin = stxxl_timestamp();
- #define END_COUNT_WAIT_TIME    stxxl::wait_time_counter += (stxxl_timestamp() - count_wait_begin);
+ #define START_COUNT_WAIT_TIME  double count_wait_begin = timestamp();
+ #define END_COUNT_WAIT_TIME    stxxl::wait_time_counter += (timestamp() - count_wait_begin);
 
  #define reset_io_wait_time() stxxl::wait_time_counter = 0.0;
 

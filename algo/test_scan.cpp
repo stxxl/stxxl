@@ -20,7 +20,7 @@
 #include <stxxl/scan>
 
 using stxxl::int64;
-using stxxl::stxxl_timestamp;
+using stxxl::timestamp;
 
 
 template <typename type>
@@ -69,9 +69,9 @@ int main()
 
 
     STXXL_MSG("for_each_m ...");
-    b = stxxl_timestamp();
+    b = timestamp();
     stxxl::for_each_m(v.begin(), v.end(), square<int64>(), 4);
-    e = stxxl_timestamp();
+    e = timestamp();
     STXXL_MSG("for_each_m time: " << (e - b));
 
 
@@ -87,10 +87,10 @@ int main()
     STXXL_MSG("Pos of value    1024: " << (stxxl::find(v.begin(), v.end(), 32 * 32, 4) - v.begin()));
 
     STXXL_MSG("generate ...");
-    b = stxxl_timestamp();
+    b = timestamp();
 
     stxxl::generate(v.begin() + 1, v.end() - 1, fill_value<int64>(555), 4);
-    e = stxxl_timestamp();
+    e = timestamp();
     STXXL_MSG("generate: " << (e - b));
 
 

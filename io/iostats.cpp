@@ -32,7 +32,7 @@ stats::stats() :
     p_ios(0.0),
     p_begin_io(0),
     acc_ios(0), acc_reads(0), acc_writes(0),
-    last_reset(stxxl_timestamp())
+    last_reset(timestamp())
 { }
 
 void stats::reset()
@@ -78,7 +78,7 @@ void stats::reset()
     write_mutex.unlock();
 #endif
 
-    last_reset = stxxl_timestamp();
+    last_reset = timestamp();
 
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock IOLock(io_mutex);
@@ -139,7 +139,7 @@ void stats::write_started(unsigned size_)
 #else
     write_mutex.lock();
 #endif
-    double now = stxxl_timestamp();
+    double now = timestamp();
     ++writes;
     volume_written += size_;
     double diff = now - p_begin_write;
@@ -172,7 +172,7 @@ void stats::write_finished()
     write_mutex.lock();
 #endif
 
-    double now = stxxl_timestamp();
+    double now = timestamp();
     double diff = now - p_begin_write;
     t_writes += double(acc_writes) * diff;
     p_begin_write = now;
@@ -202,7 +202,7 @@ void stats::read_started(unsigned size_)
 #else
     read_mutex.lock();
 #endif
-    double now = stxxl_timestamp();
+    double now = timestamp();
     ++reads;
     volume_read += size_;
     double diff = now - p_begin_read;
@@ -235,7 +235,7 @@ void stats::read_finished()
     read_mutex.lock();
 #endif
 
-    double now = stxxl_timestamp();
+    double now = timestamp();
     double diff = now - p_begin_read;
     t_reads += double(acc_reads) * diff;
     p_begin_read = now;

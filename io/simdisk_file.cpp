@@ -162,7 +162,7 @@ IC35L080AVVA07::IC35L080AVVA07()
 void sim_disk_request::serve()
 {
     //      static_cast<syscall_file*>(file_)->set_size(offset+bytes);
-    double op_start = stxxl_timestamp();
+    double op_start = timestamp();
  #if STXXL_IO_STATS
     stats * iostats = stats::get_instance();
  #endif
@@ -210,7 +210,7 @@ void sim_disk_request::serve()
             (static_cast<sim_disk_file *>(file_))->get_delay(offset, bytes);
 
 
-        delay = delay - stxxl_timestamp() + op_start;
+        delay = delay - timestamp() + op_start;
 
         assert(delay > 0.0);
 
