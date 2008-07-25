@@ -112,10 +112,10 @@ int main(int argc, char * argv[])
 
     const unsigned ndisks = disks_arr.size();
 
-    unsigned buffer_size = 64 * MB;
+    unsigned buffer_size = 256 * MB;
     const unsigned buffer_size_int = buffer_size / sizeof(int);
 
-    unsigned chunks = 32;
+    unsigned chunks = 2;
     const unsigned chunk_size = buffer_size / chunks;
     const unsigned chunk_size_int = chunk_size / sizeof(int);
 
@@ -193,7 +193,7 @@ int main(int argc, char * argv[])
  #ifdef WATCH_TIMES
         out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
-        std::cout << int(1e-6 * (current_block_size) / (end - begin)) << " MB/s,";
+        std::cout << std::setw(7) << int(1e-6 * (current_block_size) / (end - begin)) << " MB/s,";
 #endif
 
 
