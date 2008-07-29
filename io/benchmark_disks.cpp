@@ -119,11 +119,13 @@ int main(int argc, char * argv[])
     }
 
     const unsigned ndisks = disks_arr.size();
-    const unsigned max_mem = 900 * MB;
-    unsigned buffer_size = 256 * MB;
+    //const stxxl::int64 max_mem = 8LL * 1024 * MB;
+    const stxxl::int64 max_mem = 900 * MB;
+    //stxxl::int64 buffer_size = 1024 * MB;
+    stxxl::int64 buffer_size = 256 * MB;
     while (buffer_size * ndisks > max_mem)
         buffer_size >>= 1;
-    const unsigned buffer_size_int = buffer_size / sizeof(int);
+    const stxxl::int64 buffer_size_int = buffer_size / sizeof(int);
 
     const unsigned min_chunk = 8 * MB;
     unsigned chunks = 32;
@@ -175,7 +177,7 @@ int main(int argc, char * argv[])
     try {
         while (!length || offset < endpos)
         {
-            const unsigned current_block_size = length ? std::min<stxxl::int64>(buffer_size, endpos - offset) : buffer_size;
+            const stxxl::int64 current_block_size = length ? std::min<stxxl::int64>(buffer_size, endpos - offset) : buffer_size;
             const unsigned current_chunk_size = current_block_size / chunks;
 
             std::cout << "Disk offset " << std::setw(7) << offset / MB << " MB: " << std::fixed;
