@@ -1,3 +1,8 @@
+Version 1.2.0_bugfixes
+
+* fixed a bug (recursive locking) in recursive block allocation
+
+
 Version 1.2.0 (05 July 2008)
 
 * made the block management layer thread-safe
