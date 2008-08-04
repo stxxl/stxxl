@@ -15,20 +15,6 @@ NDEBUG		 = #-DNDEBUG
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES)
 
 
-BDB_ROOT			 = /usr/local/BerkeleyDB.4.4
-BERKELEY_DB_COMPILE_OPTIONS	 = -I$(BDB_ROOT)/include
-BERKELEY_DB_LINK_OPTIONS	 = -L$(BDB_ROOT)/lib -ldb_cxx
-
-TPIE_ROOT			 = $(HOME)/projects/tpie_091905
-TPIE_ROOT			 = $(HOME)/work/lib/tpie
-TPIE_COMPILER_OPTIONS		 = -I$(TPIE_ROOT)/include -DHAVE_CONFIG_H -Wno-error
-TPIE_LINKER_OPTIONS		 = -L$(TPIE_ROOT)/lib -ltpie -lm
-
-berkeley_db_benchmark: $(DEPENDENCIES) berkeley_db_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(BERKELEY_DB_COMPILE_OPTIONS) $(TPIE_COMPILER_OPTIONS) -c -o berkeley_db_benchmark.$(OBJEXT) berkeley_db_benchmark.cpp $(NDEBUG)
-	$(LINKER) berkeley_db_benchmark.$(OBJEXT) $(OUT)berkeley_db_benchmark.$(EXEEXT) $(BERKELEY_DB_LINK_OPTIONS) $(STXXL_LINKER_OPTIONS) $(TPIE_LINKER_OPTIONS) 
-
-
 stack_benchmark: $(DEPENDENCIES) stack_benchmark.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c stack_benchmark.cpp $(NDEBUG)
 	$(LINKER) stack_benchmark.$(OBJEXT) $(OUT)stack_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
@@ -44,36 +30,6 @@ test_deque: test_deque.cpp
 pq_benchmark: $(DEPENDENCIES) pq_benchmark.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c pq_benchmark.cpp $(NDEBUG)
 	$(LINKER) pq_benchmark.$(OBJEXT) $(OUT)pq_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-
-
-LEDA_COMPILER		?= g++-2.95
-LEDA_FLAGS		?= -D_LINUX $(filter-out -openmp -fopenmp -D__MCSTL__,$(STXXL_COMPILER_OPTIONS)) -Wno-error
-LEDA_ROOT		?= /usr/local/LEDA
-LEDA_SM_ROOT		?= /usr/local/LEDA-SM
-
-LEDA_COMPILER		?= /usr/local/bin/g++-2.95.3
-LEDA_FLAGS		?= -fpic -D_LINUX -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -O3
-LEDA_ROOT		?= /software/LEDA/4.2.1
-LEDA_SM_ROOT		?= /home/dementiev/projects/LEDA-SM-1.3
-
-LEDA_SM_CPP_FLAGS	?= -I$(LEDA_ROOT)/incl -I$(LEDA_SM_ROOT)/incl $(LEDA_FLAGS)
-LEDA_SM_LDFLAGS		?= -L$(LEDA_ROOT) -Wl,-R$(LEDA_ROOT) -L$(LEDA_SM_ROOT) #-L/usr/X11R6/lib
-LEDA_SM_LDFLAGS		?= -L$(LEDA_ROOT) -L$(LEDA_SM_ROOT) -L/usr/X11R6/lib -Xlinker -rpath -Xlinker $(LEDA_ROOT) #-Xlinker -rpath -Xlinker $(LEDA_SM_ROOT)
-LEDA_SM_LDLIBS		?= -lLEDA-SM -lL
-LEDA_SM_LDLIBS		?= -lW -lP -lG -lL -lX11 -lm -lLEDA-SM
-
-leda_sm_pq_benchmark: $(DEPENDENCIES) leda_sm_pq_benchmark.cpp
-	$(LEDA_COMPILER) $(LEDA_SM_CPP_FLAGS) -o leda_sm_pq_benchmark.$(OBJEXT) -c leda_sm_pq_benchmark.cpp
-	$(LEDA_COMPILER) -o leda_sm_pq_benchmark.$(EXEEXT) leda_sm_pq_benchmark.$(OBJEXT) $(LEDA_SM_LDFLAGS) $(LEDA_SM_LDLIBS)
-
-
-tpie_stack_benchmark: $(DEPENDENCIES) tpie_stack_benchmark.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(TPIE_COMPILER_OPTIONS) -O3  -c -o tpie_stack_benchmark.$(OBJEXT) tpie_stack_benchmark.cpp $(NDEBUG)
-	$(LINKER) tpie_stack_benchmark.$(OBJEXT) $(STXXL_LINKER_OPTIONS) $(TPIE_LINKER_OPTIONS) -o tpie_stack_benchmark.$(EXEEXT)
-
-leda_sm_stack_benchmark: $(DEPENDENCIES) leda_sm_stack_benchmark.cpp
-	$(LEDA_COMPILER) $(LEDA_SM_CPP_FLAGS) -o leda_sm_stack_benchmark.$(OBJEXT) -c leda_sm_stack_benchmark.cpp
-	$(LEDA_COMPILER) -o leda_sm_stack_benchmark.$(EXEEXT) leda_sm_stack_benchmark.$(OBJEXT) $(LEDA_SM_LDFLAGS) $(LEDA_SM_LDLIBS)
 
 write_vector: $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c write_vector.cpp
