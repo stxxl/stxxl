@@ -31,6 +31,7 @@ struct my_type
     {
         return _key;
     }
+#endif
 
     static my_type<KEY, SIZE> min_value()
     {
@@ -40,7 +41,6 @@ struct my_type
     {
         return my_type<KEY, SIZE>(std::numeric_limits<key_type>::max());
     }
-#endif
 };
 
 template <typename KEY, unsigned SIZE>
