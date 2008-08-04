@@ -644,7 +644,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
     }
 
     // no contiguous region found
-    STXXL_VERBOSE1("Warning, when allocation an external memory space, no contiguous region found");
+    STXXL_VERBOSE1("Warning, when allocating an external memory space, no contiguous region found");
     STXXL_VERBOSE1("It might harm the performance");
     if (requested_size == BLK_SIZE)
     {
@@ -670,13 +670,15 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
     assert(requested_size > BLK_SIZE);
     assert(end - begin > 1);
 
+#ifdef STXXL_BOOST_THREADS
+    lock.unlock();
+#else
+    mutex.unlock();
+#endif
+
     typename  BIDArray<BLK_SIZE>::iterator middle = begin + ((end - begin) / 2);
     new_blocks(begin, middle);
     new_blocks(middle, end);
-
-#ifndef STXXL_BOOST_THREADS
-    mutex.unlock();
-#endif
 
     return disk_bytes;
 }

@@ -8,6 +8,7 @@ Version 1.2.1 (unreleased)
   leaves valgrind's control
 * properly destroy the singleton objects (block manager, disk queue threads,
   logger, stats, config, ...) at program exit
+* fixed a bug (recursive locking) in recursive block allocation
 
 ------------------------------------------
 Version 1.2.0 (05 July 2008)
