@@ -21,5 +21,10 @@ stxxl_info: stxxl_info.cpp $(DEPENDENCIES)
 	$(LINKER) stxxl_info.$(OBJEXT) $(OUT)stxxl_info.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 
+test_random: test_random.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_random.cpp
+	$(LINKER) test_random.$(OBJEXT) $(OUT)test_random.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+
 clean:
 	$(RM) *.$(OBJEXT) *.$(EXEEXT)

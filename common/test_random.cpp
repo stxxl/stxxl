@@ -19,7 +19,9 @@ int main()
     std::cout << "seed = " << stxxl::get_next_seed() << std::endl;
 
     stxxl::srandom_number32(stxxl::get_next_seed());
+#ifndef BOOST_MSVC
     srand48(time(NULL));
+#endif
     stxxl::random_number32 random_number32;
     stxxl::random_number32_r random_number32_r;
     stxxl::random_uniform_fast random_uniform_fast;
@@ -29,7 +31,9 @@ int main()
     stxxl::random_number64 random_number64;
 
     for (int i = 0; i < 3; ++i) {
+#ifndef BOOST_MSVC
         std::cout << "d48 " << drand48() << std::endl;
+#endif
         std::cout << "r32 " << random_number32() << std::endl;
         std::cout << "r3r " << random_number32_r() << std::endl;
         std::cout << "ruf " << random_uniform_fast() << std::endl;
