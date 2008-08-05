@@ -14,6 +14,7 @@ lib: $(LIB_SRC)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mmap_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c simdisk_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c boostfd_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mem_file.cpp
 
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)
