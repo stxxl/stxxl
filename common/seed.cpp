@@ -82,7 +82,7 @@ unsigned get_next_seed()
 {
 #ifdef STXXL_BOOST_THREADS
     boost::mutex::scoped_lock Lock(seed_generator().mtx);
-    return ++(seed_generator().seed);
+    return seed_generator().seed++;
 #else
     seed_generator().mtx.lock();
     unsigned seed = seed_generator().seed++;
