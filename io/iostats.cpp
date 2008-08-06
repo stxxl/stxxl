@@ -40,11 +40,9 @@ stats::stats() :
 
 void stats::reset()
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock ReadLock(read_mutex);
-#else
-    read_mutex.lock();
-#endif
+    {
+        scoped_mutex_lock ReadLock(read_mutex);
+
     //      assert(acc_reads == 0);
     if (acc_reads)
         STXXL_ERRMSG("Warning: " << acc_reads <<
@@ -55,14 +53,9 @@ void stats::reset()
     volume_read = 0;
     t_reads = 0;
     p_reads = 0.0;
-
-#ifdef STXXL_BOOST_THREADS
-    ReadLock.unlock();
-    boost::mutex::scoped_lock WriteLock(write_mutex);
-#else
-    read_mutex.unlock();
-    write_mutex.lock();
-#endif
+    }
+    {
+        scoped_mutex_lock WriteLock(write_mutex);
 
     //      assert(acc_writes == 0);
     if (acc_writes)
@@ -74,20 +67,9 @@ void stats::reset()
     volume_written = 0;
     t_writes = 0.0;
     p_writes = 0.0;
-
-#ifdef STXXL_BOOST_THREADS
-    WriteLock.unlock();
-#else
-    write_mutex.unlock();
-#endif
-
-    last_reset = timestamp();
-
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock IOLock(io_mutex);
-#else
-    io_mutex.lock();
-#endif
+    }
+    {
+        scoped_mutex_lock IOLock(io_mutex);
 
     //      assert(acc_ios == 0);
     if (acc_ios)
@@ -95,17 +77,13 @@ void stats::reset()
                      " io(s) not yet finished");
 
     p_ios = 0.0;
-
-
-#ifdef STXXL_BOOST_THREADS
-    IOLock.unlock();
-#else
-    io_mutex.unlock();
-#endif
+    }
 
 #ifdef COUNT_WAIT_TIME
     stxxl::wait_time_counter = 0.0;
 #endif
+
+    last_reset = timestamp();
 }
 
 
@@ -137,128 +115,86 @@ double stats::increment_io_wait_time(double val)
 
 void stats::write_started(unsigned size_)
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock WriteLock(write_mutex);
-#else
-    write_mutex.lock();
-#endif
     double now = timestamp();
+    {
+        scoped_mutex_lock WriteLock(write_mutex);
+
     ++writes;
     volume_written += size_;
     double diff = now - p_begin_write;
     t_writes += double(acc_writes) * diff;
     p_begin_write = now;
     p_writes += (acc_writes++) ? diff : 0.0;
+    }
+    {
+        scoped_mutex_lock IOLock(io_mutex);
 
-#ifdef STXXL_BOOST_THREADS
-    WriteLock.unlock();
-    boost::mutex::scoped_lock IOLock(io_mutex);
-#else
-    write_mutex.unlock();
-    io_mutex.lock();
-#endif
-
-    diff = now - p_begin_io;
+        double diff = now - p_begin_io;
     p_ios += (acc_ios++) ? diff : 0.0;
     p_begin_io = now;
-
-#ifndef STXXL_BOOST_THREADS
-    io_mutex.unlock();
-#endif
+    }
 }
 
 void stats::write_finished()
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock WriteLock(write_mutex);
-#else
-    write_mutex.lock();
-#endif
-
     double now = timestamp();
+    {
+        scoped_mutex_lock WriteLock(write_mutex);
+
     double diff = now - p_begin_write;
     t_writes += double(acc_writes) * diff;
     p_begin_write = now;
     p_writes += (acc_writes--) ? diff : 0.0;
+    }
+    {
+        scoped_mutex_lock IOLock(io_mutex);
 
-#ifdef STXXL_BOOST_THREADS
-    WriteLock.unlock();
-    boost::mutex::scoped_lock IOLock(io_mutex);
-#else
-    write_mutex.unlock();
-    io_mutex.lock();
-#endif
-
-    diff = now - p_begin_io;
+        double diff = now - p_begin_io;
     p_ios += (acc_ios--) ? diff : 0.0;
     p_begin_io = now;
-
-#ifndef STXXL_BOOST_THREADS
-    io_mutex.unlock();
-#endif
+    }
 }
 
 void stats::read_started(unsigned size_)
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock ReadLock(read_mutex);
-#else
-    read_mutex.lock();
-#endif
     double now = timestamp();
+    {
+        scoped_mutex_lock ReadLock(read_mutex);
+
     ++reads;
     volume_read += size_;
     double diff = now - p_begin_read;
     t_reads += double(acc_reads) * diff;
     p_begin_read = now;
     p_reads += (acc_reads++) ? diff : 0.0;
+    }
+    {
+        scoped_mutex_lock IOLock(io_mutex);
 
-#ifdef STXXL_BOOST_THREADS
-    ReadLock.unlock();
-    boost::mutex::scoped_lock IOLock(io_mutex);
-#else
-    read_mutex.unlock();
-    io_mutex.lock();
-#endif
-
-    diff = now - p_begin_io;
+        double diff = now - p_begin_io;
     p_ios += (acc_ios++) ? diff : 0.0;
     p_begin_io = now;
-
-#ifndef STXXL_BOOST_THREADS
-    io_mutex.unlock();
-#endif
+    }
 }
 
 void stats::read_finished()
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock ReadLock(read_mutex);
-#else
-    read_mutex.lock();
-#endif
-
     double now = timestamp();
+    {
+        scoped_mutex_lock ReadLock(read_mutex);
+
     double diff = now - p_begin_read;
     t_reads += double(acc_reads) * diff;
     p_begin_read = now;
     p_reads += (acc_reads--) ? diff : 0.0;
+    }
+    {
+        scoped_mutex_lock IOLock(io_mutex);
 
-#ifdef STXXL_BOOST_THREADS
-    ReadLock.unlock();
-    boost::mutex::scoped_lock IOLock(io_mutex);
-#else
-    read_mutex.unlock();
-    io_mutex.lock();
-#endif
-
-    diff = now - p_begin_io;
+        double diff = now - p_begin_io;
     p_ios += (acc_ios--) ? diff : 0.0;
     p_begin_io = now;
-
-#ifndef STXXL_BOOST_THREADS
-    io_mutex.unlock();
-#endif
+    }
 }
 
 std::string hr(uint64 number, const char * unit = "")
