@@ -112,11 +112,11 @@ struct cmp_int : std::binary_function<int, int, bool>
 
     value_type max_value() const
     {
-        return ((std::numeric_limits<value_type>::min)());
+        return (((std::numeric_limits<value_type>::min))());
     }
     value_type min_value() const
     {
-        return ((std::numeric_limits<value_type>::max)());
+        return (((std::numeric_limits<value_type>::max))());
     }
 };
 
