@@ -4,8 +4,6 @@ include ../make.settings
 tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
-lib: $(LIB_SRC)
-
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) \
                $(CONTAINER_FILES) $(ALGO_FILES) $(STREAM_FILES)

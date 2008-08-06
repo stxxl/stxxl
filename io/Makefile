@@ -4,16 +4,38 @@ include ../make.settings
 tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
-lib: $(LIB_SRC)
+lib: ufs_file.$(OBJEXT) syscall_file.$(OBJEXT) wincall_file.$(OBJEXT) wfs_file.$(OBJEXT) iostats.$(OBJEXT) \
+diskqueue.$(OBJEXT) mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJEXT)
+
+
+ufs_file.$(OBJEXT): ufs_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c ufs_file.cpp
+
+syscall_file.$(OBJEXT): syscall_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c syscall_file.cpp
+
+wincall_file.$(OBJEXT): wincall_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wincall_file.cpp
+
+wfs_file.$(OBJEXT): wfs_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wfs_file.cpp
+
+iostats.$(OBJEXT): iostats.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c iostats.cpp
+
+diskqueue.$(OBJEXT): diskqueue.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c diskqueue.cpp
+
+mmap_file.$(OBJEXT): mmap_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mmap_file.cpp
+
+simdisk_file.$(OBJEXT): simdisk_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c simdisk_file.cpp
+
+boostfd_file.$(OBJEXT): boostfd_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c boostfd_file.cpp
+
+mem_file.$(OBJEXT): mem_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mem_file.cpp
 
 

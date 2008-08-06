@@ -4,7 +4,10 @@ include ../make.settings
 tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
-lib: $(LIB_SRC)
+lib: mng.$(OBJEXT)
+
+
+mng.$(OBJEXT): mng.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mng.cpp
 
 

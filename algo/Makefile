@@ -5,14 +5,17 @@ tests: $(TESTS)
 #tests: $(TESTS_LONG_COMPILE)
 #tests: $(TESTS_NON_MSVC)
 
-lib: $(LIB_SRC)
+lib: async_schedule.$(OBJEXT)
+
+
+async_schedule.$(OBJEXT): async_schedule.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c async_schedule.cpp
 
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 
 
-test_manyunits:
+test_manyunits: test_manyunits1.cpp test_manyunits2.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_manyunits1.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_manyunits2.cpp
 	$(LINKER) test_manyunits1.$(OBJEXT) test_manyunits2.$(OBJEXT) $(OUT)test_manyunits.$(EXEEXT) $(STXXL_LINKER_OPTIONS)

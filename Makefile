@@ -28,7 +28,9 @@ settings_gnu:
 	cmp -s make.settings.gnu make.settings || \
 		( $(RM) make.settings && cp make.settings.gnu make.settings )
 
-settings_msvc:
+settings_msvc: make.settings
+
+make.settings: make.settings.msvc
 	copy make.settings.msvc make.settings
 
 
@@ -52,7 +54,7 @@ library_icpc_mcstl: settings_gnu
 	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
 
 library_msvc: settings_msvc
-	nmake /F Makefile.msvc library
+	nmake /NOLOGO /F Makefile.msvc library
 
 
 tests_g++: settings_gnu
@@ -71,7 +73,7 @@ tests_icpc_mcstl: settings_gnu
 	$(MAKE) -f Makefile.gnu tests USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
 
 tests_msvc: settings_msvc
-	nmake /F Makefile.msvc tests
+	nmake /NOLOGO /F Makefile.msvc tests
 
 
 clean_g++: settings_gnu
@@ -90,7 +92,7 @@ clean_icpc_mcstl: settings_gnu
 	-$(MAKE) -f Makefile.gnu clean USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
 
 clean_msvc: settings_msvc
-	nmake /F Makefile.msvc clean
+	nmake /NOLOGO /F Makefile.msvc clean
 
 
 clean: clean_g++ clean_g++_mcstl clean_icpc clean_icpc_mcstl

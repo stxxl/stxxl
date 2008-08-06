@@ -27,16 +27,7 @@ library:
 	cd mng
 	$(MAKE) lib
 	cd ..
-	cd containers
-	$(MAKE) lib
-	cd ..
 	cd algo
-	$(MAKE) lib
-	cd ..
-	cd stream
-	$(MAKE) lib
-	cd ..
-	cd utils
 	$(MAKE) lib
 	cd ..
 	cd lib
