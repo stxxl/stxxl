@@ -118,22 +118,15 @@ void wincall_request::serve()
 
     _state.set_to(DONE);
 
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
- #else
-    waiters_mutex.lock();
- #endif
+    {
+        scoped_mutex_lock Lock(waiters_mutex);
+
     // << notification >>
     std::for_each(
         waiters.begin(),
         waiters.end(),
         std::mem_fun(&onoff_switch::on));
-
- #ifdef STXXL_BOOST_THREADS
-    Lock.unlock();
- #else
-    waiters_mutex.unlock();
- #endif
+    }
 
     completed();
     _state.set_to(READY2DIE);

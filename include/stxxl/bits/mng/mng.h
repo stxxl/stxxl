@@ -570,11 +570,7 @@ template <unsigned BLK_SIZE>
 stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
                                        BID<BLK_SIZE> * end)
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock lock(mutex);
-#else
-    mutex.lock();
-#endif
+    scoped_mutex_lock lock(mutex);
 
     STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<
@@ -603,10 +599,6 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
         }
         disk_bytes += requested_size;
 
-#ifndef STXXL_BOOST_THREADS
-        mutex.unlock();
-#endif
-
         return disk_bytes;
     }
 
@@ -632,10 +624,6 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
         free_bytes -= requested_size;
         //dump();
 
-#ifndef STXXL_BOOST_THREADS
-        mutex.unlock();
-#endif
-
         return disk_bytes;
     }
 
@@ -656,21 +644,13 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
         begin->offset = disk_bytes; // allocate at the end
         disk_bytes += BLK_SIZE;
 
-#ifndef STXXL_BOOST_THREADS
-        mutex.unlock();
-#endif
-
         return disk_bytes;
     }
 
     assert(requested_size > BLK_SIZE);
     assert(end - begin > 1);
 
-#ifdef STXXL_BOOST_THREADS
     lock.unlock();
-#else
-    mutex.unlock();
-#endif
 
     typename  BIDArray<BLK_SIZE>::iterator middle = begin + ((end - begin) / 2);
     new_blocks(begin, middle);
@@ -683,11 +663,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
 template <unsigned BLK_SIZE>
 void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock lock(mutex);
-#else
-    mutex.lock();
-#endif
+    scoped_mutex_lock lock(mutex);
 
     STXXL_VERBOSE2("DiskAllocator::delete_block<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
                                                                          << ", free:" << free_bytes << " total:" << disk_bytes);
@@ -787,10 +763,6 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
     free_bytes += stxxl::int64(bid.size);
 
     //dump();
-
-#ifndef STXXL_BOOST_THREADS
-    mutex.unlock();
-#endif
 }
 
 #if 0

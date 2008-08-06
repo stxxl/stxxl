@@ -245,15 +245,8 @@ protected:
     // returns number of references
     int nref()
     {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(ref_cnt_mutex);
+        scoped_mutex_lock Lock(ref_cnt_mutex);
         return ref_cnt;
-#else
-        ref_cnt_mutex.lock();
-        int ref_cnt_ = ref_cnt;
-        ref_cnt_mutex.unlock();
-        return ref_cnt_;
-#endif
     }
 
 public:
@@ -328,33 +321,19 @@ public:
 private:
     void add_ref()
     {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(ref_cnt_mutex);
+        scoped_mutex_lock Lock(ref_cnt_mutex);
         ref_cnt++;
         STXXL_VERBOSE3("request add_ref() " << static_cast<void *>(this) << ": adding reference, cnt: " << ref_cnt);
-
-#else
-        ref_cnt_mutex.lock();
-        ref_cnt++;
-        STXXL_VERBOSE3("request add_ref() " << static_cast<void *>(this) << ": adding reference, cnt: " << ref_cnt);
-        ref_cnt_mutex.unlock();
-#endif
     }
+
     bool sub_ref()
     {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(ref_cnt_mutex);
-        int val = --ref_cnt;
+        int val;
+        {
+            scoped_mutex_lock Lock(ref_cnt_mutex);
+            val = --ref_cnt;
         STXXL_VERBOSE3("request sub_ref() " << static_cast<void *>(this) << ": subtracting reference cnt: " << ref_cnt);
-        Lock.unlock();
-
-#else
-        ref_cnt_mutex.lock();
-        int val = --ref_cnt;
-        STXXL_VERBOSE3("request sub_ref() " << static_cast<void *>(this) << ": subtracting reference cnt: " << ref_cnt);
-
-        ref_cnt_mutex.unlock();
-#endif
+        }
         assert(val >= 0);
         return (val == 0);
     }

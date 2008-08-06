@@ -64,27 +64,14 @@ inline unsigned initial_seed()
 
 void set_seed(unsigned seed)
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(seed_generator().mtx);
+    scoped_mutex_lock Lock(seed_generator().mtx);
     seed_generator().seed = seed;
-#else
-    seed_generator().mtx.lock();
-    seed_generator().seed = seed;
-    seed_generator().mtx.unlock();
-#endif
 }
 
 unsigned get_next_seed()
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(seed_generator().mtx);
+    scoped_mutex_lock Lock(seed_generator().mtx);
     return seed_generator().seed++;
-#else
-    seed_generator().mtx.lock();
-    unsigned seed = seed_generator().seed++;
-    seed_generator().mtx.unlock();
-    return seed;
-#endif
 }
 
 __STXXL_END_NAMESPACE

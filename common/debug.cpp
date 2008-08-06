@@ -19,11 +19,8 @@ __STXXL_BEGIN_NAMESPACE
 #ifdef STXXL_DEBUGMON
 void debugmon::block_allocated(char * ptr, char * end, size_t size)
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(mutex1);
- #else
-    mutex1.lock();
- #endif
+    scoped_mutex_lock Lock(mutex1);
+
 // checks are here
     STXXL_VERBOSE1("debugmon: block " << long(ptr) << " allocated");
     assert(tags.find(ptr) == tags.end());             // not allocated
@@ -32,18 +29,11 @@ void debugmon::block_allocated(char * ptr, char * end, size_t size)
     t.end = end;
     t.size = size;
     tags[ptr] = t;
- #ifndef STXXL_BOOST_THREADS
-    mutex1.unlock();
- #endif
 }
 
 void debugmon::block_deallocated(char * ptr)
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(mutex1);
- #else
-    mutex1.lock();
- #endif
+    scoped_mutex_lock Lock(mutex1);
 
     STXXL_VERBOSE1("debugmon: block_deallocated from " << long(ptr));
     assert(tags.find(ptr) != tags.end());       // allocated
@@ -66,18 +56,11 @@ void debugmon::block_deallocated(char * ptr)
         tags.erase(ptr1);
         ptr1 += size;
     }
- #ifndef STXXL_BOOST_THREADS
-    mutex1.unlock();
- #endif
 }
 
 void debugmon::io_started(char * ptr)
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(mutex1);
- #else
-    mutex1.lock();
- #endif
+    scoped_mutex_lock Lock(mutex1);
 
     STXXL_VERBOSE1("debugmon: I/O on block " << long(ptr) << " started");
     assert(tags.find(ptr) != tags.end());       // allocated
@@ -88,19 +71,11 @@ void debugmon::io_started(char * ptr)
     t.ongoing = true;
 
     tags[ptr] = t;
-
- #ifndef STXXL_BOOST_THREADS
-    mutex1.unlock();
- #endif
 }
 
 void debugmon::io_finished(char * ptr)
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(mutex1);
- #else
-    mutex1.lock();
- #endif
+    scoped_mutex_lock Lock(mutex1);
 
     STXXL_VERBOSE1("debugmon: I/O on block " << long(ptr) << " finished");
     assert(tags.find(ptr) != tags.end());       // allocated
@@ -111,10 +86,6 @@ void debugmon::io_finished(char * ptr)
     t.ongoing = false;
 
     tags[ptr] = t;
-
- #ifndef STXXL_BOOST_THREADS
-    mutex1.unlock();
- #endif
 }
 #endif
 

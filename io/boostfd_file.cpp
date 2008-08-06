@@ -42,51 +42,28 @@ boostfd_request::~boostfd_request()
 
 bool boostfd_request::add_waiter(onoff_switch * sw)
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
- #else
-    waiters_mutex.lock();
- #endif
+    scoped_mutex_lock Lock(waiters_mutex);
 
     if (poll())   // request already finished
     {
- #ifndef STXXL_BOOST_THREADS
-        waiters_mutex.unlock();
- #endif
         return true;
     }
 
     waiters.insert(sw);
- #ifndef STXXL_BOOST_THREADS
-    waiters_mutex.unlock();
- #endif
 
     return false;
 }
 
 void boostfd_request::delete_waiter(onoff_switch * sw)
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
+    scoped_mutex_lock Lock(waiters_mutex);
     waiters.erase(sw);
- #else
-    waiters_mutex.lock();
-    waiters.erase(sw);
-    waiters_mutex.unlock();
- #endif
 }
 
 int boostfd_request::nwaiters()     // returns number of waiters
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
+    scoped_mutex_lock Lock(waiters_mutex);
     return waiters.size();
- #else
-    waiters_mutex.lock();
-    int size = waiters.size();
-    waiters_mutex.unlock();
-    return size;
- #endif
 }
 
 void boostfd_request::check_aligning()
@@ -238,22 +215,15 @@ void boostfd_request::serve()
 
     _state.set_to(DONE);
 
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
- #else
-    waiters_mutex.lock();
- #endif
+    {
+        scoped_mutex_lock Lock(waiters_mutex);
+
     // << notification >>
     std::for_each(
         waiters.begin(),
         waiters.end(),
         std::mem_fun(&onoff_switch::on));
-
- #ifdef STXXL_BOOST_THREADS
-    Lock.unlock();
- #else
-    waiters_mutex.unlock();
- #endif
+    }
 
     completed();
     _state.set_to(READY2DIE);

@@ -55,51 +55,28 @@ wfs_request_base::~wfs_request_base()
 
 bool wfs_request_base::add_waiter(onoff_switch * sw)
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
- #else
-    waiters_mutex.lock();
- #endif
+    scoped_mutex_lock Lock(waiters_mutex);
 
     if (poll())                     // request already finished
     {
- #ifndef STXXL_BOOST_THREADS
-        waiters_mutex.unlock();
- #endif
         return true;
     }
 
     waiters.insert(sw);
- #ifndef STXXL_BOOST_THREADS
-    waiters_mutex.unlock();
- #endif
 
     return false;
 }
 
 void wfs_request_base::delete_waiter(onoff_switch * sw)
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
+    scoped_mutex_lock Lock(waiters_mutex);
     waiters.erase(sw);
- #else
-    waiters_mutex.lock();
-    waiters.erase(sw);
-    waiters_mutex.unlock();
- #endif
 }
 
 int wfs_request_base::nwaiters()                 // returns number of waiters
 {
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
+    scoped_mutex_lock Lock(waiters_mutex);
     return waiters.size();
- #else
-    waiters_mutex.lock();
-    int size = waiters.size();
-    waiters_mutex.unlock();
-    return size;
- #endif
 }
 
 void wfs_request_base::check_aligning()

@@ -110,7 +110,6 @@ void syscall_request::serve()
         error_occured(ex.what());
     }
 
-
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
@@ -119,27 +118,18 @@ void syscall_request::serve()
                      " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
 
-
     _state.set_to(DONE);
 
+    {
+        scoped_mutex_lock Lock(waiters_mutex);
 
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex::scoped_lock Lock(waiters_mutex);
-#else
-    waiters_mutex.lock();
-#endif
     // << notification >>
     std::for_each(
         waiters.begin(),
         waiters.end(),
         std::mem_fun(&onoff_switch::on)
         __STXXL_FORCE_SEQUENTIAL);
-
-#ifdef STXXL_BOOST_THREADS
-    Lock.unlock();
-#else
-    waiters_mutex.unlock();
-#endif
+    }
 
     completed();
 
