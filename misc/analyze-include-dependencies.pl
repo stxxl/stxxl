@@ -54,7 +54,6 @@ push @includepath, $stxxlpath if $stxxl;
 	numeric			parallel/numeric
 	bits/stl_algobase.h	parallel/algobase.h
 	parallel/partition.h	parallel/sort.h
-	ext/pb_ds/detail/left_child_next_sibling_heap_/null_metadata.hpp	ext/pb_ds/detail/left_child_next_sibling_heap_/null_metadata.hpp
 	boost/type_traits/is_class.hpp	boost/type_traits/is_scalar.hpp
 	boost/preprocessor/list/fold_left.hpp	boost/preprocessor/control/while.hpp
 	boost/preprocessor/list/fold_right.hpp	boost/preprocessor/control/while.hpp
