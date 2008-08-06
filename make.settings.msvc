@@ -68,9 +68,9 @@ STXXL_SPECIFIC	 = \
 
 MSVC_COMPILER_OPTIONS = /EHsc /EHs /wd4820 /wd4217 /wd4668 /wd4619 \
  /wd4625 /wd4626 /wd4355 /wd4996 -D_SCL_SECURE_NO_DEPRECATE \
- /F 16777216
-MSVC_LINKER_OPTIONS = /LIBPATH:$(STXXL_ROOT)\lib\ \
- /LIBPATH:$(BOOST_ROOT)\lib\ /STACK:16777216
+ /F 16777216 /nologo
+MSVC_LINKER_OPTIONS = /LIBPATH:$(STXXL_ROOT)\lib\ libstxxl.lib \
+ /LIBPATH:$(BOOST_ROOT)\lib\ /STACK:16777216 /NOLOGO
 
 ##################################################################
 
