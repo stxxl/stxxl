@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <iostream>
+#include <cassert>
 #include <stxxl/random>
 
 int main()
@@ -43,4 +44,8 @@ int main()
         std::cout << "r64 " << random_number64() << std::endl;
         std::cout << std::endl;
     }
+
+    stxxl::set_seed(42);
+    assert(stxxl::get_next_seed() == 42);
+    assert(stxxl::get_next_seed() != 42);
 }
