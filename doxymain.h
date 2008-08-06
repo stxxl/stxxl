@@ -177,9 +177,9 @@
  *     - change \c MCSTL_ROOT variable according to the MCSTL root path
  *     - use the targets \c library_g++_mcstl and \c tests_g++_mcstl
  *       instead of the ones listed below
- *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like
+ *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like (default: \c -O3 )
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
- *     if you want to produce a debug version of the Stxxl library or Stxxl examples
+ *     if you want to produce a debug version of the Stxxl library or Stxxl examples (default: not set)
  *   - for more variables to tune take a look at \c make.settings.gnu ,
  *     they are usually overridden by settings in \c make.settings.local
  * - Run: \verbatim make library_g++ \endverbatim
@@ -424,9 +424,9 @@ my_example.bin: my_example.o
  *     (you should have the Boost libraries already installed)
  *     - change \c USE_BOOST variable to \c yes
  *     - change \c BOOST_ROOT variable according to the Boost root path
- *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like
+ *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like (default: \c -O3 )
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
- *     if you want to produce a debug version of the Stxxl library or Stxxl examples
+ *     if you want to produce a debug version of the Stxxl library or Stxxl examples (default: not set)
  * - Run: \verbatim make library_g++ \endverbatim
  * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
  *
