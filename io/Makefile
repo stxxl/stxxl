@@ -42,24 +42,28 @@ mem_file.$(OBJEXT): mem_file.cpp
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)
 
 
-test_io: test_io.cpp $(DEPENDENCIES)
+test_io: test_io.$(EXEEXT)
+test_io.$(EXEEXT): test_io.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_io.cpp
 	$(LINKER) test_io.$(OBJEXT) $(OUT)test_io.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-benchmark_disks: benchmark_disks.cpp $(DEPENDENCIES)
+benchmark_disks: benchmark_disks.$(EXEEXT)
+benchmark_disks.$(EXEEXT): benchmark_disks.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_disks.cpp  
 	$(LINKER) benchmark_disks.$(OBJEXT) $(OUT)benchmark_disks.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
 	
-
-flushbuffers: flushbuffers.cpp $(DEPENDENCIES)
+flushbuffers: flushbuffers.$(EXEEXT)
+flushbuffers.$(EXEEXT): flushbuffers.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c flushbuffers.cpp
 	$(LINKER) flushbuffers.$(OBJEXT) $(OUT)flushbuffers.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-unittest: unittest.cpp
+unittest: unittest.$(EXEEXT)
+unittest.$(EXEEXT): unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
 	$(LINKER) unittest.$(OBJEXT) $(OUT)unittest.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
 
-sd_test: sd_test.cpp
+sd_test: sd_test.$(EXEEXT)
+sd_test.$(EXEEXT): sd_test.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c sd_test.cpp
 	$(LINKER) sd_test.$(OBJEXT) $(OUT)sd_test.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
 

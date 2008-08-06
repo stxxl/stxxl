@@ -95,6 +95,7 @@ BOOST_COMPILER_OPTIONS	 = \
 HEADER_PATH	 = ../include/stxxl/bits
 
 COMMON_FILES	 = \
+    ../lib/lib$(LIBNAME).$(LIBEXT) \
 	$(HEADER_PATH)/namespace.h \
 	$(HEADER_PATH)/noncopyable.h \
 	$(HEADER_PATH)/version.h \
