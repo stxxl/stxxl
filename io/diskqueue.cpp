@@ -13,14 +13,6 @@
 #include <stxxl/bits/io/iobase.h>
 
 
-#ifndef STXXL_BOOST_THREADS
-
- #ifdef STXXL_THREAD_PROFILING
-  #define pthread_create gprof_pthread_create
- #endif
-
-#endif
-
 __STXXL_BEGIN_NAMESPACE
 
 disk_queue::disk_queue(int /*n*/) : sem(0), _priority_op(WRITE)              //  n is ignored
