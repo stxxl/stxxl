@@ -64,11 +64,7 @@ class debugmon : public singleton<debugmon>
 
     compat_hash_map<char *, tag, hash_fct>::result tags;
 
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex mutex1;
-#else
     mutex mutex1;
-#endif
 
 #endif // #ifdef STXXL_DEBUGMON
 

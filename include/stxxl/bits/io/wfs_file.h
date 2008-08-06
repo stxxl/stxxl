@@ -66,11 +66,7 @@ protected:
      */
 
     state _state;
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex waiters_mutex;
- #else
     mutex waiters_mutex;
- #endif
     std::set<onoff_switch *> waiters;
 
     wfs_request_base(

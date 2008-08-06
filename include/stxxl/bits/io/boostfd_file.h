@@ -68,11 +68,7 @@ protected:
                                               // READY2DIE - can be destroyed
 
     state _state;
- #ifdef STXXL_BOOST_THREADS
-    boost::mutex waiters_mutex;
- #else
     mutex waiters_mutex;
- #endif
     std::set<onoff_switch *> waiters;
 
     boostfd_request(

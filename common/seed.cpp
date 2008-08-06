@@ -33,11 +33,7 @@ inline unsigned initial_seed();
 
 struct seed_generator_t {
     unsigned seed;
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex mtx;
-#else
     mutex mtx;
-#endif
 
     seed_generator_t(unsigned s) : seed(s)
     { }

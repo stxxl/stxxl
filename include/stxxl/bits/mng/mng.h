@@ -469,11 +469,7 @@ public:
 
 class DiskAllocator : private noncopyable
 {
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex mutex;
-#else
     stxxl::mutex mutex;
-#endif
 
     typedef std::pair<stxxl::int64, stxxl::int64> place;
     struct FirstFit : public std::binary_function<place, stxxl::int64, bool>

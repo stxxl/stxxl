@@ -33,7 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 
 #ifdef STXXL_BOOST_THREADS
 
-// stxxl::mutex is not needed since boost:mutex exists
+typedef boost::mutex mutex;
 
 #else
 

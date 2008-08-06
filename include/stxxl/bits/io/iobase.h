@@ -225,11 +225,7 @@ protected:
     int ref_cnt;
     std::auto_ptr<stxxl::io_error> error;
 
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex ref_cnt_mutex;
-#else
     mutex ref_cnt_mutex;
-#endif
 
 public:
     enum request_type { READ, WRITE };
@@ -619,13 +615,8 @@ public:
     enum priority_op { READ, WRITE, NONE };
 
 private:
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex write_mutex;
-    boost::mutex read_mutex;
-#else
     mutex write_mutex;
     mutex read_mutex;
-#endif
     std::queue<request_ptr> write_queue;
     std::queue<request_ptr> read_queue;
 

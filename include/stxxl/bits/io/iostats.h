@@ -49,11 +49,7 @@ class stats : public singleton<stats>
     int acc_ios;
     int acc_reads, acc_writes;                  // number of requests, participating in parallel operation
     double last_reset;
-#ifdef STXXL_BOOST_THREADS
-    boost::mutex read_mutex, write_mutex, io_mutex;
-#else
     mutex read_mutex, write_mutex, io_mutex;
-#endif
 
     stats();
 
