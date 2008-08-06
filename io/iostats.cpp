@@ -261,8 +261,9 @@ void stats::read_finished()
 #endif
 }
 
-std::string hr(int_type number)
+std::string hr(uint64 number, const char * unit = "")
 {
+    // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
     static const char* endings[] = {" ", "K", "M", "G", "T", "P", "E" };
     std::ostringstream out;
     out << number << ' ';
@@ -274,7 +275,7 @@ std::string hr(int_type number)
         ++scale;
     }
     if (scale > 0)
-        out << '(' << std::fixed << std::setprecision(3) << number_d << ' ' << endings[scale] << ") ";
+        out << '(' << std::fixed << std::setprecision(3) << number_d << ' ' << endings[scale] << unit << ") ";
     return out.str();
 }
 
@@ -282,7 +283,7 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
 {
     o << "STXXL I/O statistics" << std::endl;
     o << " total number of reads                      : " << hr(s.get_reads()) << std::endl;
-    o << " number of bytes read from disks            : " << hr(s.get_read_volume()) << std::endl;
+    o << " number of bytes read from disks            : " << hr(s.get_read_volume(), "B") << std::endl;
     o << " time spent in serving all read requests    : " << s.get_read_time() << " sec."
       << " @ " << (s.get_read_volume() / 1048576.0 / s.get_read_time()) << " MB/sec."
       << std::endl;
@@ -290,7 +291,7 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
       << " @ " << (s.get_read_volume() / 1048576.0 / s.get_pread_time()) << " MB/sec."
       << std::endl;
     o << " total number of writes                     : " << hr(s.get_writes()) << std::endl;
-    o << " number of bytes written to disks           : " << hr(s.get_written_volume()) << std::endl;
+    o << " number of bytes written to disks           : " << hr(s.get_written_volume(), "B") << std::endl;
     o << " time spent in serving all write requests   : " << s.get_write_time() << " sec."
       << " @ " << (s.get_written_volume() / 1048576.0 / s.get_write_time()) << " MB/sec."
       << std::endl;

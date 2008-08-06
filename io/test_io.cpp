@@ -28,6 +28,10 @@ struct my_handler
     }
 };
 
+namespace stxxl {
+    std::string hr(uint64, const char*);
+}
+
 int main()
 {
     std::cout << sizeof(void *) << std::endl;
@@ -55,5 +59,11 @@ int main()
     stxxl::aligned_dealloc<4096>(buffer);
 
     std::cout << *(stxxl::stats::get_instance());
+
+    stxxl::uint64 sz = 123;
+    for (i = 0; i < 20; ++i, sz *= 10)
+        STXXL_MSG(stxxl::hr(sz, "B"));
+    STXXL_MSG(stxxl::hr((std::numeric_limits<stxxl::uint64>::max)(), "B"));
+
     return 0;
 }
