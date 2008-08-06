@@ -70,6 +70,48 @@ public:
 
 #endif
 
+#ifdef STXXL_BOOST_THREADS
+
+typedef boost::mutex::scoped_lock scoped_mutex_lock;
+
+#else
+
+//! \brief Aquire a lock that's valid until the end of scope
+class scoped_mutex_lock
+{
+    mutex &mtx;
+    bool is_locked;
+
+public:
+    scoped_mutex_lock(mutex& mtx_) : mtx(mtx_), is_locked(false)
+    {
+        lock();
+    }
+
+    ~scoped_mutex_lock()
+    {
+        unlock();
+    }
+
+    void lock()
+    {
+        if (!is_locked) {
+            mtx.lock();
+            is_locked = true;
+        }
+    }
+
+    void unlock()
+    {
+        if (is_locked) {
+            mtx.unlock();
+            is_locked = false;
+        }
+    }
+};
+
+#endif
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_MUTEX_HEADER
