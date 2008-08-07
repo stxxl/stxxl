@@ -65,14 +65,15 @@ protected:
     block_type * wait(int_type iblock)
     {
         STXXL_VERBOSE1("block_prefetcher: waiting block " << iblock);
-        START_COUNT_WAIT_TIME
+	{
+            stats::scoped_wait_timer wait_timer;
 
 #ifdef NO_OVERLAPPING
         read_reqs[pref_buffer[iblock]]->poll();
 #endif
 
         completed[iblock].wait_for_on();
-        END_COUNT_WAIT_TIME
+	}
         STXXL_VERBOSE1("block_prefetcher: finished waiting block " << iblock);
         int_type ibuffer = pref_buffer[iblock];
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);

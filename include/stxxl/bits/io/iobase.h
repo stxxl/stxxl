@@ -503,7 +503,8 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 
 int wait_any(request_ptr req_array[], int count)
 {
-    START_COUNT_WAIT_TIME
+    stats::scoped_wait_timer wait_timer;
+    
     onoff_switch sw;
     int i = 0, index = -1;
 
@@ -516,9 +517,6 @@ int wait_any(request_ptr req_array[], int count)
 
             while (--i >= 0)
                 req_array[i]->delete_waiter(&sw);
-
-
-            END_COUNT_WAIT_TIME
 
             req_array[index]->check_errors();
 
@@ -535,14 +533,14 @@ int wait_any(request_ptr req_array[], int count)
             index = i;
     }
 
-    END_COUNT_WAIT_TIME
     return index;
 }
 
 template <class request_iterator_>
 request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
-    START_COUNT_WAIT_TIME
+    stats::scoped_wait_timer wait_timer;
+
     onoff_switch sw;
 
     request_iterator_ cur = reqs_begin, result = reqs_end;
@@ -562,8 +560,6 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
                 (request_ptr(*cur))->delete_waiter(&sw);
             }
 
-            END_COUNT_WAIT_TIME
-
             (request_ptr(*result))->check_errors();
 
             return result;
@@ -579,7 +575,6 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
             result = cur;
     }
 
-    END_COUNT_WAIT_TIME
     return result;
 }
 

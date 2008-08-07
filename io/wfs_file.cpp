@@ -101,15 +101,13 @@ void wfs_request_base::wait()
 {
     STXXL_VERBOSE3("wfs_request_base : " << unsigned(this) << " wait ");
 
-    START_COUNT_WAIT_TIME
+    stats::scoped_wait_timer wait_timer;
 
  #ifdef NO_OVERLAPPING
     enqueue();
  #endif
 
     _state.wait_for(READY2DIE);
-
-    END_COUNT_WAIT_TIME
 
     check_errors();
 }
