@@ -9,6 +9,11 @@ Version 1.2.1 (unreleased)
 * properly destroy the singleton objects (block manager, disk queue threads,
   logger, stats, config, ...) at program exit
 * fixed a bug (recursive locking) in recursive block allocation
+* sensible dependencies for nmake (MSVC): only rebuild files as necessary
+* improve performance of createdisks
+* human-readable output for I/O stats
+* replace hard coded min/max values by std::numeric_limits<>::min/max in
+  examples
 
 ------------------------------------------
 Version 1.2.0 (05 July 2008)
