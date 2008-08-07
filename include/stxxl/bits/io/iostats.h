@@ -46,15 +46,18 @@ class stats : public singleton<stats>
 
     unsigned reads, writes;                     // number of operations
     int64 volume_read, volume_written;          // number of bytes read/written
-    double t_reads, t_writes;                   //  seconds spent in operations
+    double t_reads, t_writes;                   // seconds spent in operations
     double p_reads, p_writes;                   // seconds spent in parallel operations
     double p_begin_read, p_begin_write;         // start time of parallel operation
     double p_ios;                               // seconds spent in all parallel I/O operations (read and write)
     double p_begin_io;
-    int acc_ios;
+    double t_waits, p_waits;                    // seconds spent waiting for completion of I/O operations
+    double p_begin_wait;
     int acc_reads, acc_writes;                  // number of requests, participating in parallel operation
+    int acc_ios;
+    int acc_waits;
     double last_reset;
-    mutex read_mutex, write_mutex, io_mutex;
+    mutex read_mutex, write_mutex, io_mutex, wait_mutex;
 
     stats();
 
@@ -149,6 +152,47 @@ public:
         }
     };
 
+    class scoped_wait_timer
+    {
+#ifdef COUNT_WAIT_TIME
+        bool running;
+#endif
+
+    public:
+        scoped_wait_timer()
+#ifdef COUNT_WAIT_TIME
+            : running(false)
+#endif
+        {
+            start();
+        }
+
+        ~scoped_wait_timer()
+        {
+            stop();
+        }
+
+        void start()
+        {
+#ifdef COUNT_WAIT_TIME
+            if (!running) {
+                running = true;
+                stats::get_instance()->wait_started();
+            }
+#endif
+        }
+
+        void stop()
+        {
+#ifdef COUNT_WAIT_TIME
+            if (running) {
+                stats::get_instance()->wait_finished();
+                running = false;
+            }
+#endif
+        }
+    };
+
 public:
     //! \brief Returns total number of reads
     //! \return total number of reads
@@ -213,6 +257,16 @@ public:
         return p_ios;
     }
 
+    //! \brief I/O wait time counter
+    //! \return number of seconds spent in I/O waiting functions
+    //!  \link request::wait request::wait \endlink,
+    //!  \c wait_any and
+    //!  \c wait_all
+    double get_io_wait_time() const
+    {
+        return t_waits;
+    }
+
     //! \brief Return time of the last reset
     //! \return seconds passed from the last reset()
     double get_last_reset_time() const
@@ -223,25 +277,13 @@ public:
     //! \brief Resets I/O time counters (including I/O wait counter)
     void reset();
 
-    //! \brief Resets I/O wait time counter
-    void _reset_io_wait_time();
-    //! \brief I/O wait time counter
-    //! \return number of seconds spent in I/O waiting functions
-    //!  \link request::wait request::wait \endlink,
-    //!  \c wait_any and
-    //!  \c wait_all
-    //! \return number of seconds
-    double get_io_wait_time() const;
-    //! \brief Increments I/O wait time counter
-    //! \param val increment value in seconds
-    //! \return new value of I/O wait time counter in seconds
-    double increment_io_wait_time(double val);
-
     // for library use
     void write_started(unsigned size_);
     void write_finished();
     void read_started(unsigned size_);
     void read_finished();
+    void wait_started();
+    void wait_finished();
 };
 
 #if !STXXL_IO_STATS
@@ -249,6 +291,10 @@ inline void stats::write_started(unsigned size_) { UNUSED(size_); }
 inline void stats::write_finished() { }
 inline void stats::read_started(unsigned size_) { UNUSED(size_); }
 inline void stats::read_finished() { }
+#endif
+#ifndef COUNT_WAIT_TIME
+inline void stats::wait_started() { }
+inline void stats::wait_finished() { }
 #endif
 
 
@@ -259,7 +305,7 @@ class stats_data
     double t_reads, t_writes;                  // seconds spent in operations
     double p_reads, p_writes;                  // seconds spent in parallel operations
     double p_ios;                              // seconds spent in all parallel I/O operations (read and write)
-    double t_wait;
+    double t_wait;                             // seconds spent waiting for completion of I/O operations
     double elapsed;
 
 public:

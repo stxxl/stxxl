@@ -316,34 +316,6 @@ inline stxxl::int64 atoint64(const char * s)
 
 ////////////////////////////////////////////////////////////////////////////
 
-//#define COUNT_WAIT_TIME
-
-#ifdef COUNT_WAIT_TIME
-
- #define START_COUNT_WAIT_TIME  double count_wait_begin = timestamp();
- #define END_COUNT_WAIT_TIME    stxxl::wait_time_counter += (timestamp() - count_wait_begin);
-
- #define reset_io_wait_time() stxxl::wait_time_counter = 0.0;
-
- #define io_wait_time() (stxxl::wait_time_counter)
-
-#else
-
- #define START_COUNT_WAIT_TIME
- #define END_COUNT_WAIT_TIME
-
-inline void reset_io_wait_time()
-{ }
-
-inline double io_wait_time()
-{
-    return -1.0;
-}
-
-#endif
-
-////////////////////////////////////////////////////////////////////////////
-
 inline uint64 longhash1(uint64 key_)
 {
     key_ += ~(key_ << 32);

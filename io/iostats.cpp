@@ -19,8 +19,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-double wait_time_counter = 0.0;
-
 stats::stats() :
     reads(0),
     writes(0),
@@ -33,8 +31,13 @@ stats::stats() :
     p_begin_read(0.0),
     p_begin_write(0.0),
     p_ios(0.0),
-    p_begin_io(0),
-    acc_ios(0), acc_reads(0), acc_writes(0),
+    p_begin_io(0.0),
+    t_waits(0.0),
+    p_waits(0.0),
+    p_begin_wait(0.0),
+    acc_reads(0), acc_writes(0),
+    acc_ios(0),
+    acc_waits(0),
     last_reset(timestamp())
 { }
 
@@ -43,7 +46,7 @@ void stats::reset()
     {
         scoped_mutex_lock ReadLock(read_mutex);
 
-        //      assert(acc_reads == 0);
+        //assert(acc_reads == 0);
         if (acc_reads)
             STXXL_ERRMSG("Warning: " << acc_reads <<
                          " read(s) not yet finished");
@@ -57,7 +60,7 @@ void stats::reset()
     {
         scoped_mutex_lock WriteLock(write_mutex);
 
-        //      assert(acc_writes == 0);
+        //assert(acc_writes == 0);
         if (acc_writes)
             STXXL_ERRMSG("Warning: " << acc_writes <<
                          " write(s) not yet finished");
@@ -71,45 +74,26 @@ void stats::reset()
     {
         scoped_mutex_lock IOLock(io_mutex);
 
-        //      assert(acc_ios == 0);
+        //assert(acc_ios == 0);
         if (acc_ios)
             STXXL_ERRMSG("Warning: " << acc_ios <<
                          " io(s) not yet finished");
 
         p_ios = 0.0;
     }
+    {
+        scoped_mutex_lock WaitLock(wait_mutex);
 
-#ifdef COUNT_WAIT_TIME
-    stxxl::wait_time_counter = 0.0;
-#endif
+        //assert(acc_waits == 0);
+        if (acc_waits)
+            STXXL_ERRMSG("Warning: " << acc_waits <<
+                         " wait(s) not yet finished");
+
+        t_waits = 0.0;
+        p_waits = 0.0;
+    }
 
     last_reset = timestamp();
-}
-
-
-void stats::_reset_io_wait_time()
-{
-#ifdef COUNT_WAIT_TIME
-    stxxl::wait_time_counter = 0.0;
-#endif
-}
-
-double stats::get_io_wait_time() const
-{
-#ifdef COUNT_WAIT_TIME
-    return stxxl::wait_time_counter;
-#else
-    return -1.0;
-#endif
-}
-
-double stats::increment_io_wait_time(double val)
-{
-#ifdef COUNT_WAIT_TIME
-    return stxxl::wait_time_counter += val;
-#else
-    return -1.0;
-#endif
 }
 
 #if STXXL_IO_STATS
@@ -198,6 +182,34 @@ void stats::read_finished()
 }
 #endif
 
+#ifdef COUNT_WAIT_TIME
+void stats::wait_started()
+{
+    double now = timestamp();
+    {
+        scoped_mutex_lock WaitLock(wait_mutex);
+
+        double diff = now - p_begin_wait;
+        t_waits += double(acc_waits) * diff;
+        p_begin_wait = now;
+        p_waits += (acc_waits++) ? diff : 0.0;
+    }
+}
+
+void stats::wait_finished()
+{
+    double now = timestamp();
+    {
+        scoped_mutex_lock WaitLock(wait_mutex);
+
+        double diff = now - p_begin_wait;
+        t_waits += double(acc_waits) * diff;
+        p_begin_wait = now;
+        p_waits += (acc_waits--) ? diff : 0.0;
+    }
+}
+#endif
+
 std::string hr(uint64 number, const char * unit = "")
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
@@ -219,6 +231,7 @@ std::string hr(uint64 number, const char * unit = "")
 std::ostream & operator << (std::ostream & o, const stats_data & s)
 {
     o << "STXXL I/O statistics" << std::endl;
+#if STXXL_IO_STATS
     o << " total number of reads                      : " << hr(s.get_reads()) << std::endl;
     o << " number of bytes read from disks            : " << hr(s.get_read_volume(), "B") << std::endl;
     o << " time spent in serving all read requests    : " << s.get_read_time() << " sec."
@@ -238,7 +251,12 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
     o << " time spent in I/O (parallel I/O time)      : " << s.get_pio_time() << " sec."
       << " @ " << ((s.get_read_volume() + s.get_written_volume()) / 1048576.0 / s.get_pio_time()) << " MB/sec."
       << std::endl;
+#else
+    o << " n/a" << std::endl;
+#endif
+#ifdef COUNT_WAIT_TIME
     o << " I/O wait time                              : " << s.get_io_wait_time() << " sec." << std::endl;
+#endif
     o << " Time since the last reset                  : " << s.get_elapsed_time() << " sec." << std::endl;
     return o;
 }
