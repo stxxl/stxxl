@@ -116,7 +116,6 @@ bool boostfd_request::poll()
 
 void boostfd_request::serve()
 {
-    stats * iostats = stats::get_instance();
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
@@ -147,7 +146,7 @@ void boostfd_request::serve()
     {
         if (type == READ)
         {
-            iostats->read_started(size());
+            stats::scoped_read_timer read_timer(size());
 
             STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
@@ -167,12 +166,10 @@ void boostfd_request::serve()
             }
 
             STXXL_DEBUGMON_DO(io_finished((char *)buffer));
-
-            iostats->read_finished();
         }
         else
         {
-            iostats->write_started(size());
+            stats::scoped_write_timer write_timer(size());
 
             STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
@@ -192,8 +189,6 @@ void boostfd_request::serve()
             }
 
             STXXL_DEBUGMON_DO(io_finished((char *)buffer));
-
-            iostats->write_finished();
         }
     }
 

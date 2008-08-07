@@ -54,7 +54,7 @@ void wincall_request::serve()
         {
             if (type == READ)
             {
-                iostats->read_started(size());
+                stats::scoped_read_timer read_timer(size());
 
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
                 DWORD NumberOfBytesRead = 0;
@@ -69,12 +69,10 @@ void wincall_request::serve()
                 }
 
                 STXXL_DEBUGMON_DO(io_finished((char *)buffer));
-
-                iostats->read_finished();
             }
             else
             {
-                iostats->write_started(size());
+                stats::scoped_write_timer write_timer(size());
 
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
@@ -90,8 +88,6 @@ void wincall_request::serve()
                 }
 
                 STXXL_DEBUGMON_DO(io_finished((char *)buffer));
-
-                iostats->write_finished();
             }
         }
     }
