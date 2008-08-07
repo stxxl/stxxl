@@ -588,16 +588,16 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 
         mng->new_blocks(interleaved_alloc_strategy(nruns, 0, ndisks),
                         RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>
-                                  (runs, 0, nruns, last_run_size),
+                                            (runs, 0, nruns, last_run_size),
                         RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>
-                                  (runs, _n, nruns, last_run_size));
+                                            (runs, _n, nruns, last_run_size));
     }
     else
         mng->new_blocks(interleaved_alloc_strategy(nruns, 0, ndisks),
                         RunsToBIDArrayAdaptor<block_type::raw_size, run_type>
-                                  (runs, 0, nruns),
+                                            (runs, 0, nruns),
                         RunsToBIDArrayAdaptor<block_type::raw_size, run_type>
-                                  (runs, _n, nruns));
+                                            (runs, _n, nruns));
 
 #else
     if (partial_runs)
@@ -849,7 +849,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator,
                         KeyExtractor_>
-                              (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                                        (first_.bid(), n, M__ / block_type::raw_size, keyobj);
 
 
                 first_block = new typename ExtIterator_::block_type;
@@ -945,7 +945,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator,
                         KeyExtractor_>
-                              (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                                        (first_.bid(), n, M__ / block_type::raw_size, keyobj);
 
 
                 first_block = new typename ExtIterator_::block_type;
@@ -1025,7 +1025,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator,
                         KeyExtractor_>
-                              (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                                        (first_.bid(), n, M__ / block_type::raw_size, keyobj);
 
 
                 last_block = new typename ExtIterator_::block_type;
@@ -1074,7 +1074,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator,
                         KeyExtractor_>
-                              (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                                        (first_.bid(), n, M__ / block_type::raw_size, keyobj);
 
                 typename run_type::iterator it = out->begin();
                 typename ExtIterator_::bids_container_iterator cur_bid = first_.bid();

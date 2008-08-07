@@ -43,40 +43,40 @@ void stats::reset()
     {
         scoped_mutex_lock ReadLock(read_mutex);
 
-    //      assert(acc_reads == 0);
-    if (acc_reads)
-        STXXL_ERRMSG("Warning: " << acc_reads <<
-                     " read(s) not yet finished");
+        //      assert(acc_reads == 0);
+        if (acc_reads)
+            STXXL_ERRMSG("Warning: " << acc_reads <<
+                         " read(s) not yet finished");
 
-    reads = 0;
+        reads = 0;
 
-    volume_read = 0;
-    t_reads = 0;
-    p_reads = 0.0;
+        volume_read = 0;
+        t_reads = 0;
+        p_reads = 0.0;
     }
     {
         scoped_mutex_lock WriteLock(write_mutex);
 
-    //      assert(acc_writes == 0);
-    if (acc_writes)
-        STXXL_ERRMSG("Warning: " << acc_writes <<
-                     " write(s) not yet finished");
+        //      assert(acc_writes == 0);
+        if (acc_writes)
+            STXXL_ERRMSG("Warning: " << acc_writes <<
+                         " write(s) not yet finished");
 
-    writes = 0;
+        writes = 0;
 
-    volume_written = 0;
-    t_writes = 0.0;
-    p_writes = 0.0;
+        volume_written = 0;
+        t_writes = 0.0;
+        p_writes = 0.0;
     }
     {
         scoped_mutex_lock IOLock(io_mutex);
 
-    //      assert(acc_ios == 0);
-    if (acc_ios)
-        STXXL_ERRMSG("Warning: " << acc_ios <<
-                     " io(s) not yet finished");
+        //      assert(acc_ios == 0);
+        if (acc_ios)
+            STXXL_ERRMSG("Warning: " << acc_ios <<
+                         " io(s) not yet finished");
 
-    p_ios = 0.0;
+        p_ios = 0.0;
     }
 
 #ifdef COUNT_WAIT_TIME
@@ -119,19 +119,19 @@ void stats::write_started(unsigned size_)
     {
         scoped_mutex_lock WriteLock(write_mutex);
 
-    ++writes;
-    volume_written += size_;
-    double diff = now - p_begin_write;
-    t_writes += double(acc_writes) * diff;
-    p_begin_write = now;
-    p_writes += (acc_writes++) ? diff : 0.0;
+        ++writes;
+        volume_written += size_;
+        double diff = now - p_begin_write;
+        t_writes += double(acc_writes) * diff;
+        p_begin_write = now;
+        p_writes += (acc_writes++) ? diff : 0.0;
     }
     {
         scoped_mutex_lock IOLock(io_mutex);
 
         double diff = now - p_begin_io;
-    p_ios += (acc_ios++) ? diff : 0.0;
-    p_begin_io = now;
+        p_ios += (acc_ios++) ? diff : 0.0;
+        p_begin_io = now;
     }
 }
 
@@ -141,17 +141,17 @@ void stats::write_finished()
     {
         scoped_mutex_lock WriteLock(write_mutex);
 
-    double diff = now - p_begin_write;
-    t_writes += double(acc_writes) * diff;
-    p_begin_write = now;
-    p_writes += (acc_writes--) ? diff : 0.0;
+        double diff = now - p_begin_write;
+        t_writes += double(acc_writes) * diff;
+        p_begin_write = now;
+        p_writes += (acc_writes--) ? diff : 0.0;
     }
     {
         scoped_mutex_lock IOLock(io_mutex);
 
         double diff = now - p_begin_io;
-    p_ios += (acc_ios--) ? diff : 0.0;
-    p_begin_io = now;
+        p_ios += (acc_ios--) ? diff : 0.0;
+        p_begin_io = now;
     }
 }
 
@@ -161,19 +161,19 @@ void stats::read_started(unsigned size_)
     {
         scoped_mutex_lock ReadLock(read_mutex);
 
-    ++reads;
-    volume_read += size_;
-    double diff = now - p_begin_read;
-    t_reads += double(acc_reads) * diff;
-    p_begin_read = now;
-    p_reads += (acc_reads++) ? diff : 0.0;
+        ++reads;
+        volume_read += size_;
+        double diff = now - p_begin_read;
+        t_reads += double(acc_reads) * diff;
+        p_begin_read = now;
+        p_reads += (acc_reads++) ? diff : 0.0;
     }
     {
         scoped_mutex_lock IOLock(io_mutex);
 
         double diff = now - p_begin_io;
-    p_ios += (acc_ios++) ? diff : 0.0;
-    p_begin_io = now;
+        p_ios += (acc_ios++) ? diff : 0.0;
+        p_begin_io = now;
     }
 }
 
@@ -183,24 +183,24 @@ void stats::read_finished()
     {
         scoped_mutex_lock ReadLock(read_mutex);
 
-    double diff = now - p_begin_read;
-    t_reads += double(acc_reads) * diff;
-    p_begin_read = now;
-    p_reads += (acc_reads--) ? diff : 0.0;
+        double diff = now - p_begin_read;
+        t_reads += double(acc_reads) * diff;
+        p_begin_read = now;
+        p_reads += (acc_reads--) ? diff : 0.0;
     }
     {
         scoped_mutex_lock IOLock(io_mutex);
 
         double diff = now - p_begin_io;
-    p_ios += (acc_ios--) ? diff : 0.0;
-    p_begin_io = now;
+        p_ios += (acc_ios--) ? diff : 0.0;
+        p_begin_io = now;
     }
 }
 
 std::string hr(uint64 number, const char * unit = "")
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
-    static const char* endings[] = {" ", "K", "M", "G", "T", "P", "E" };
+    static const char * endings[] = { " ", "K", "M", "G", "T", "P", "E" };
     std::ostringstream out;
     out << number << ' ';
     int scale = 0;

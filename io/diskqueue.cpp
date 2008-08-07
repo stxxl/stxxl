@@ -37,7 +37,7 @@ void disk_queue::add_readreq(request_ptr & req)
 {
     {
         scoped_mutex_lock Lock(read_mutex);
-    read_queue.push(req);
+        read_queue.push(req);
     }
 
     sem++;
@@ -47,7 +47,7 @@ void disk_queue::add_writereq(request_ptr & req)
 {
     {
         scoped_mutex_lock Lock(write_mutex);
-    write_queue.push(req);
+        write_queue.push(req);
     }
 
     sem++;

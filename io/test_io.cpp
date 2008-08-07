@@ -28,8 +28,9 @@ struct my_handler
     }
 };
 
-namespace stxxl {
-    std::string hr(uint64, const char*);
+namespace stxxl
+{
+    std::string hr(uint64, const char *);
 }
 
 int main()

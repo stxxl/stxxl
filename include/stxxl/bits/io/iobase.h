@@ -332,7 +332,7 @@ private:
         {
             scoped_mutex_lock Lock(ref_cnt_mutex);
             val = --ref_cnt;
-        STXXL_VERBOSE3("request sub_ref() " << static_cast<void *>(this) << ": subtracting reference cnt: " << ref_cnt);
+            STXXL_VERBOSE3("request sub_ref() " << static_cast<void *>(this) << ": subtracting reference cnt: " << ref_cnt);
         }
         assert(val >= 0);
         return (val == 0);

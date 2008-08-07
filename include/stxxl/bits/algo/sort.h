@@ -896,7 +896,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                         typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator>
-                              (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
+                                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
                 first_block = new typename ExtIterator_::block_type;
@@ -995,7 +995,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                         typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator>
-                              (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
+                                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
                 first_block = new typename ExtIterator_::block_type;
@@ -1078,7 +1078,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                         typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator>
-                              (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
+                                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
                 last_block = new typename ExtIterator_::block_type;
@@ -1127,7 +1127,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                     sort_local::sort_blocks<typename ExtIterator_::block_type,
                                             typename ExtIterator_::vector_type::alloc_strategy,
                                             typename ExtIterator_::bids_container_iterator>
-                              (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
+                                        (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
                 typename run_type::iterator it = out->begin();
                 typename ExtIterator_::bids_container_iterator cur_bid = first.bid();

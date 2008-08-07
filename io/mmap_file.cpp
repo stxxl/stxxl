@@ -130,12 +130,12 @@ void mmap_request::serve()
     {
         scoped_mutex_lock Lock(waiters_mutex);
 
-    // << notification >>
-    std::for_each(
-        waiters.begin(),
-        waiters.end(),
-        std::mem_fun(&onoff_switch::on)
-        __STXXL_FORCE_SEQUENTIAL);
+        // << notification >>
+        std::for_each(
+            waiters.begin(),
+            waiters.end(),
+            std::mem_fun(&onoff_switch::on)
+            __STXXL_FORCE_SEQUENTIAL);
     }
 
     completed();

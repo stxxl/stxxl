@@ -79,11 +79,11 @@ typedef boost::mutex::scoped_lock scoped_mutex_lock;
 //! \brief Aquire a lock that's valid until the end of scope
 class scoped_mutex_lock
 {
-    mutex &mtx;
+    mutex & mtx;
     bool is_locked;
 
 public:
-    scoped_mutex_lock(mutex& mtx_) : mtx(mtx_), is_locked(false)
+    scoped_mutex_lock(mutex & mtx_) : mtx(mtx_), is_locked(false)
     {
         lock();
     }

@@ -218,11 +218,11 @@ void boostfd_request::serve()
     {
         scoped_mutex_lock Lock(waiters_mutex);
 
-    // << notification >>
-    std::for_each(
-        waiters.begin(),
-        waiters.end(),
-        std::mem_fun(&onoff_switch::on));
+        // << notification >>
+        std::for_each(
+            waiters.begin(),
+            waiters.end(),
+            std::mem_fun(&onoff_switch::on));
     }
 
     completed();
