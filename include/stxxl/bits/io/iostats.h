@@ -59,6 +59,97 @@ class stats : public singleton<stats>
     stats();
 
 public:
+    class scoped_write_timer
+    {
+        typedef unsigned_type size_type;
+
+#if STXXL_IO_STATS
+        bool running;
+#endif
+
+    public:
+        scoped_write_timer(size_type size)
+#if STXXL_IO_STATS
+            : running(false)
+#endif
+        {
+            start(size);
+        }
+
+        ~scoped_write_timer()
+        {
+            stop();
+        }
+
+        void start(size_type size)
+        {
+#if STXXL_IO_STATS
+            if (!running) {
+                running = true;
+                stats::get_instance()->write_started(size);
+            }
+#else
+            UNUSED(size);
+#endif
+        }
+
+        void stop()
+        {
+#if STXXL_IO_STATS
+            if (running) {
+                stats::get_instance()->write_finished();
+                running = false;
+            }
+#endif
+        }
+    };
+
+    class scoped_read_timer
+    {
+        typedef unsigned_type size_type;
+
+#if STXXL_IO_STATS
+        bool running;
+#endif
+
+    public:
+        scoped_read_timer(size_type size)
+#if STXXL_IO_STATS
+            : running(false)
+#endif
+        {
+            start(size);
+        }
+
+        ~scoped_read_timer()
+        {
+            stop();
+        }
+
+        void start(size_type size)
+        {
+#if STXXL_IO_STATS
+            if (!running) {
+                running = true;
+                stats::get_instance()->read_started(size);
+            }
+#else
+            UNUSED(size);
+#endif
+        }
+
+        void stop()
+        {
+#if STXXL_IO_STATS
+            if (running) {
+                stats::get_instance()->read_finished();
+                running = false;
+            }
+#endif
+        }
+    };
+
+public:
     //! \brief Returns total number of reads
     //! \return total number of reads
     unsigned get_reads() const
