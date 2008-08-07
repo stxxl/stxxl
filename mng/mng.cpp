@@ -41,24 +41,24 @@ void config::init(const char * config_path)
         STXXL_ERRMSG("Warning: no config file found.");
         STXXL_ERRMSG("Using default disk configuration.");
 #ifndef BOOST_MSVC
-        DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024 };
+        DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024, true };
 #else
-        DiskEntry entry1 = { "", "wincall", 1000 * 1024 * 1024 };
+        DiskEntry entry1 = { "", "wincall", 1000 * 1024 * 1024, true };
         char * tmpstr = new char[255];
         stxxl_check_ne_0(GetTempPath(255, tmpstr), resource_error);
         entry1.path = tmpstr;
         entry1.path += "stxxl";
         delete[] tmpstr;
 #endif
-        /*
-           DiskEntry entry2 =
-                { "/tmp/stxxl1", "mmap", 100 * 1024 * 1024 };
-           DiskEntry entry3 = { "/tmp/stxxl2", "simdisk",
-                1000 * 1024 * 1024
-           }; */
+#if 0
+        DiskEntry entry2 =
+            { "/tmp/stxxl1", "mmap", 100 * 1024 * 1024, true };
+        DiskEntry entry3 =
+            { "/tmp/stxxl2", "simdisk", 1000 * 1024 * 1024, false };
+#endif
         disks_props.push_back(entry1);
-        //disks_props.push_back (entry2);
-        //disks_props.push_back (entry3);
+        //disks_props.push_back(entry2);
+        //disks_props.push_back(entry3);
     }
     else
     {
@@ -76,7 +76,8 @@ void config::init(const char * config_path)
                 tmp = split(tmp[1], ",");
                 DiskEntry entry = {
                     tmp[0], tmp[2],
-                    stxxl::int64(str2int(tmp[1])) * stxxl::int64(1024 * 1024)
+                    stxxl::int64(str2int(tmp[1])) * stxxl::int64(1024 * 1024),
+		    false
                 };
                 if (is_disk)
                     disks_props.push_back(entry);

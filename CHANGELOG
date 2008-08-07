@@ -15,6 +15,7 @@ Version 1.2.1 (unreleased)
 * human-readable output for I/O stats
 * replace hard coded min/max values by std::numeric_limits<>::min/max in
   examples
+* remove stxxl disk files created from default configuration on program end
 
 ------------------------------------------
 Version 1.2.0 (05 July 2008)

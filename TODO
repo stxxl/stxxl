@@ -10,10 +10,6 @@
   max(size_at_program_start, configured_size)
   https://sourceforge.net/forum/message.php?msg_id=4925158
 
-* if no .stxxl file was found and /var/tmp/stxxl was used, remove this file
-  at program end (don't hog the disk and allow other users to create and
-  use that file, too)
-
 * new types: stxxl::size_type_internal stxxl::size_type_external
 
 * integrate unordered_map branch

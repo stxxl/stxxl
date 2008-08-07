@@ -824,6 +824,7 @@ class config : public singleton<config>
         std::string path;
         std::string io_impl;
         stxxl::int64 size;
+        bool delete_on_exit;
     };
     std::vector<DiskEntry> disks_props;
 
@@ -837,6 +838,16 @@ class config : public singleton<config>
             init(cfg_path);
         else
             init();
+    }
+
+    ~config()
+    {
+        for (unsigned i = 0; i < disks_props.size(); ++i) {
+            if (disks_props[i].delete_on_exit) {
+                STXXL_ERRMSG("Removing disk file created from default configuration: " << disks_props[i].path);
+                unlink(disks_props[i].path.c_str());
+            }
+        }
     }
 
     void init(const char * config_path = "./.stxxl");
