@@ -44,6 +44,11 @@ test_prefetch_pool.$(EXEEXT): test_prefetch_pool.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_prefetch_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
 	$(LINKER) test_prefetch_pool.$(OBJEXT) $(OUT)test_prefetch_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_mng_recursive_alloc: test_mng_recursive_alloc.$(EXEEXT)
+test_mng_recursive_alloc.$(EXEEXT): test_mng_recursive_alloc.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_mng_recursive_alloc.cpp -DSTXXL_VERBOSE_LEVEL=3
+	$(LINKER) test_mng_recursive_alloc.$(OBJEXT) $(OUT)test_mng_recursive_alloc.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 unittest: unittest.$(EXEEXT) $(DEPENDENCIES)
 unittest.$(EXEEXT): unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp

@@ -574,6 +574,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
 
     STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<
+                   ", blocks: " << (end - begin) <<
                    " begin: " << ((void *)(begin)) << " end: " << ((void *)(end)));
 
     stxxl::int64 requested_size = 0;

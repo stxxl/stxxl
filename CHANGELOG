@@ -9,6 +9,7 @@ Version 1.2.1 (unreleased)
 * properly destroy the singleton objects (block manager, disk queue threads,
   logger, stats, config, ...) at program exit
 * fixed a bug (recursive locking) in recursive block allocation
+* added a test program for recursive block allocation
 * sensible dependencies for nmake (MSVC): only rebuild files as necessary
 * improve performance of createdisks
 * human-readable output for I/O stats
