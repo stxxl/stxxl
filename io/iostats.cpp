@@ -112,7 +112,7 @@ double stats::increment_io_wait_time(double val)
 #endif
 }
 
-
+#if STXXL_IO_STATS
 void stats::write_started(unsigned size_)
 {
     double now = timestamp();
@@ -196,6 +196,7 @@ void stats::read_finished()
         p_begin_io = now;
     }
 }
+#endif
 
 std::string hr(uint64 number, const char * unit = "")
 {

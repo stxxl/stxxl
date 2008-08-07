@@ -14,6 +14,11 @@
 #ifndef STXXL_IOSTATS_HEADER
 #define STXXL_IOSTATS_HEADER
 
+#ifndef STXXL_IO_STATS
+ #define STXXL_IO_STATS 1
+#endif
+
+
 #include <iostream>
 
 #include <stxxl/bits/namespace.h>
@@ -147,6 +152,13 @@ public:
     void read_started(unsigned size_);
     void read_finished();
 };
+
+#if !STXXL_IO_STATS
+inline void stats::write_started(unsigned size_) { UNUSED(size_); }
+inline void stats::write_finished() { }
+inline void stats::read_started(unsigned size_) { UNUSED(size_); }
+inline void stats::read_finished() { }
+#endif
 
 
 class stats_data

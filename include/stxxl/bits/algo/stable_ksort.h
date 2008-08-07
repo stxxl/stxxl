@@ -225,18 +225,10 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
     first.flush();     // flush container
 
-#if STXXL_IO_STATS
-    stats * iostats = stats::get_instance();
-    iostats += 0;
-    // iostats->reset ();
-#endif
-
     reset_io_wait_time();
-
 
     double begin = timestamp();
     (void)(begin);
-
 
     unsigned_type i = 0;
     config * cfg = config::get_instance();
@@ -470,6 +462,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Distribution time: " <<
                   dist_end - begin << " s");
 #if STXXL_IO_STATS
+    stats * iostats = stats::get_instance();
+    UNUSED(iostats);
     STXXL_VERBOSE("reads               : " << iostats->get_reads());
     STXXL_VERBOSE("writes              : " << iostats->get_writes());
     STXXL_VERBOSE("read time           : " << iostats->get_read_time() << " s");

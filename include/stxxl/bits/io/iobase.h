@@ -13,11 +13,6 @@
 #ifndef STXXL_IOBASE_HEADER
 #define STXXL_IOBASE_HEADER
 
-#ifndef STXXL_IO_STATS
- #define STXXL_IO_STATS 1
-#endif
-
-
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
@@ -609,10 +604,6 @@ private:
     pthread_t thread;
 #endif
 
-
-#if STXXL_IO_STATS
-    stats * iostats;
-#endif
 
     static void * worker(void * arg);
 

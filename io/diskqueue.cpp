@@ -21,9 +21,6 @@ disk_queue::disk_queue(int /*n*/) : sem(0), _priority_op(WRITE)              // 
 #endif
 {
     //  cout << "disk_queue created." << endl;
-#if STXXL_IO_STATS
-    iostats = stats::get_instance();
-#endif
 
 #ifdef STXXL_BOOST_THREADS
     // nothing to do

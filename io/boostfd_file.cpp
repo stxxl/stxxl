@@ -147,9 +147,7 @@ void boostfd_request::serve()
     {
         if (type == READ)
         {
- #if STXXL_IO_STATS
             iostats->read_started(size());
- #endif
 
             STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
@@ -170,15 +168,11 @@ void boostfd_request::serve()
 
             STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
- #if STXXL_IO_STATS
             iostats->read_finished();
- #endif
         }
         else
         {
- #if STXXL_IO_STATS
             iostats->write_started(size());
- #endif
 
             STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
@@ -199,9 +193,7 @@ void boostfd_request::serve()
 
             STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
- #if STXXL_IO_STATS
             iostats->write_finished();
- #endif
         }
     }
 

@@ -29,9 +29,7 @@ syscall_request::syscall_request(
 
 void syscall_request::serve()
 {
-#if STXXL_IO_STATS
     stats * iostats = stats::get_instance();
-#endif
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
@@ -59,9 +57,7 @@ void syscall_request::serve()
         {
             if (type == READ)
             {
-#if STXXL_IO_STATS
                 iostats->read_started(size());
-#endif
 
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
@@ -76,15 +72,11 @@ void syscall_request::serve()
 
                 STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
-#if STXXL_IO_STATS
                 iostats->read_finished();
-#endif
             }
             else
             {
-#if STXXL_IO_STATS
                 iostats->write_started(size());
-#endif
 
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
@@ -99,9 +91,7 @@ void syscall_request::serve()
 
                 STXXL_DEBUGMON_DO(io_finished((char *)buffer));
 
-#if STXXL_IO_STATS
                 iostats->write_finished();
-#endif
             }
         }
     }

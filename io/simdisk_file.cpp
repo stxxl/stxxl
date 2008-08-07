@@ -163,20 +163,14 @@ void sim_disk_request::serve()
 {
     //      static_cast<syscall_file*>(file_)->set_size(offset+bytes);
     double op_start = timestamp();
- #if STXXL_IO_STATS
     stats * iostats = stats::get_instance();
- #endif
     if (type == READ)
     {
- #if STXXL_IO_STATS
         iostats->read_started(size());
- #endif
     }
     else
     {
- #if STXXL_IO_STATS
         iostats->write_started(size());
- #endif
     }
 
     try {
@@ -228,15 +222,11 @@ void sim_disk_request::serve()
 
     if (type == READ)
     {
- #if STXXL_IO_STATS
         iostats->read_finished();
- #endif
     }
     else
     {
- #if STXXL_IO_STATS
         iostats->write_finished();
- #endif
     }
 
     _state.set_to(DONE);

@@ -565,12 +565,6 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 
     STXXL_VERBOSE("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
 
-#if STXXL_IO_STATS
-    stats * iostats = stats::get_instance();
-    iostats += 0;
-    // iostats->reset ();
-#endif
-
     double begin = timestamp(), after_runs_creation, end;
     (void)(begin);
 
@@ -714,6 +708,8 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
                   after_runs_creation - begin << " s");
 #if STXXL_IO_STATS
+    stats * iostats = stats::get_instance();
+    UNUSED(iostats);
     STXXL_VERBOSE("reads               : " << iostats->get_reads());
     STXXL_VERBOSE("reads(volume)       : " << iostats->get_read_volume() << " bytes");
     STXXL_VERBOSE("writes              : " << iostats->get_writes() << " bytes");

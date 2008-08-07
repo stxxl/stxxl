@@ -118,9 +118,7 @@ bool mem_request::poll()
 
 void mem_request::serve()
 {
-#if STXXL_IO_STATS
     stats * iostats = stats::get_instance();
-#endif
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
@@ -141,23 +139,15 @@ void mem_request::serve()
 
     if (type == READ)
     {
-#if STXXL_IO_STATS
         iostats->read_started(size());
-#endif
         memcpy(buffer, static_cast<mem_file *>(file_)->get_ptr() + offset, bytes);
-#if STXXL_IO_STATS
         iostats->read_finished();
-#endif
     }
     else
     {
-#if STXXL_IO_STATS
         iostats->write_started(size());
-#endif
         memcpy(static_cast<mem_file *>(file_)->get_ptr() + offset, buffer, bytes);
-#if STXXL_IO_STATS
         iostats->write_finished();
-#endif
     }
 
     if (nref() < 2)
