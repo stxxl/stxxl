@@ -51,15 +51,19 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32_r(), 32);
     //std::generate(v.begin(),v.end(),zero());
 
-    stxxl::wait_time_counter = 0.0;
-
     STXXL_MSG("Sorting vector...");
-    reset_io_wait_time();
+
+    stxxl::stats_data before(*stxxl::stats::get_instance());
 
     stxxl::ksort(v.begin(), v.end(), memory_to_use);
 
+    stxxl::stats_data after(*stxxl::stats::get_instance());
+
     STXXL_MSG("Checking order...");
     STXXL_MSG((stxxl::is_sorted(v.begin(), v.end()) ? "OK" : "WRONG"));
+
+    STXXL_MSG("Sorting: " << (after - before));
+    STXXL_MSG("Total:   " << *stxxl::stats::get_instance());
 }
 
 template <typename T, unsigned block_size>

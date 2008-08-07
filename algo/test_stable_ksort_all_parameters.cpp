@@ -52,10 +52,17 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
 
     STXXL_MSG("Sorting vector...");
 
+    stxxl::stats_data before(*stxxl::stats::get_instance());
+
     stxxl::stable_ksort(v.begin(), v.end(), memory_to_use);
+
+    stxxl::stats_data after(*stxxl::stats::get_instance());
 
     STXXL_MSG("Checking order...");
     STXXL_MSG((stxxl::is_sorted(v.begin(), v.end()) ? "OK" : "WRONG"));
+
+    STXXL_MSG("Sorting: " << (after - before));
+    STXXL_MSG("Total:   " << *stxxl::stats::get_instance());
 }
 
 template <typename T, unsigned block_size>
