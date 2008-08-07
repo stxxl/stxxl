@@ -1344,7 +1344,7 @@ namespace stream
 
                 if (runs2merge > 1)
                 {
-                    runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, m_ * block_type::raw_size);
+                    runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, m_ * block_type::raw_size * sort_memory_usage_factor());
 
                     {   // make sure everything is being destroyed in right time
                         buf_ostream<block_type, typename run_type::iterator> out(
