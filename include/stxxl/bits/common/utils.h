@@ -56,15 +56,16 @@ inline void UNUSED(const U &)
 #define __STXXL_STRING(x) # x
 
 
-#define STXXL_MSG(x) \
-    { std::cout << "[STXXL-MSG] " << x << std::endl << std::flush; \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-MSG] " << x << std::endl << std::flush; \
+#define _STXXL_PRINT(label,outstream,log_stream,message) \
+    { std::ostringstream str_; \
+      str_ << "[" label "] " << message << std::endl; \
+      outstream << str_.str() << std::flush; \
+      stxxl::logger::get_instance()->log_stream() << str_.str() << std::flush; \
     }
 
-#define STXXL_ERRMSG(x) \
-    { std::cerr << "[STXXL-ERRMSG] " << x << std::endl << std::flush; \
-      stxxl::logger::get_instance()->errlog_stream() << "[STXXL-ERRMSG] " << x << std::endl << std::flush; \
-    }
+#define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", std::cout, log_stream, x)
+
+#define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", std::cerr, errlog_stream, x)
 
 
 #ifdef STXXL_FORCE_VERBOSE_LEVEL
@@ -81,19 +82,13 @@ inline void UNUSED(const U &)
 // Code that actively uses STXXL_VERBOSE0 should never get into a release.
 
 #if STXXL_VERBOSE_LEVEL > -1
- #define STXXL_VERBOSE0(x) \
-    { std::cout << "[STXXL-VERBOSE0] " << x << std::endl << std::flush; \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE0] " << x << std::endl << std::flush; \
-    }
+ #define STXXL_VERBOSE0(x) _STXXL_PRINT("STXXL-VERBOSE0", std::cout, log_stream, x)
 #else
  #define STXXL_VERBOSE0(x)
 #endif
 
 #if STXXL_VERBOSE_LEVEL > 0
- #define STXXL_VERBOSE1(x) \
-    { std::cout << "[STXXL-VERBOSE1] " << x << std::endl << std::flush; \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE1] " << x << std::endl << std::flush; \
-    }
+ #define STXXL_VERBOSE1(x) _STXXL_PRINT("STXXL-VERBOSE1", std::cout, log_stream, x)
 #else
  #define STXXL_VERBOSE1(x)
 #endif
@@ -101,19 +96,13 @@ inline void UNUSED(const U &)
 #define STXXL_VERBOSE(x) STXXL_VERBOSE1(x)
 
 #if STXXL_VERBOSE_LEVEL > 1
- #define STXXL_VERBOSE2(x) \
-    { std::cout << "[STXXL-VERBOSE2] " << x << std::endl << std::flush; \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE2] " << x << std::endl << std::flush; \
-    }
+ #define STXXL_VERBOSE2(x) _STXXL_PRINT("STXXL-VERBOSE2", std::cout, log_stream, x)
 #else
  #define STXXL_VERBOSE2(x)
 #endif
 
 #if STXXL_VERBOSE_LEVEL > 2
- #define STXXL_VERBOSE3(x) \
-    { std::cout << "[STXXL-VERBOSE3] " << x << std::endl << std::flush; \
-      stxxl::logger::get_instance()->log_stream() << "[STXXL-VERBOSE3] " << x << std::endl << std::flush; \
-    }
+ #define STXXL_VERBOSE3(x) _STXXL_PRINT("STXXL-VERBOSE3", std::cout, log_stream, x)
 #else
  #define STXXL_VERBOSE3(x)
 #endif
