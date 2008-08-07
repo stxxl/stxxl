@@ -225,10 +225,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
     first.flush();     // flush container
 
-    reset_io_wait_time();
-
     double begin = timestamp();
-    (void)(begin);
 
     unsigned_type i = 0;
     config * cfg = config::get_instance();
@@ -277,11 +274,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         nwrite_buffers);
 
     double dist_end = timestamp(), end;
-    (void)(dist_end);
-#ifdef COUNT_WAIT_TIME
-    double io_wait_after_d = stxxl::wait_time_counter;
-    (void)(io_wait_after_d);
-#endif
+    double io_wait_after_d = stats::get_instance()->get_io_wait_time();
 
     {
         // sort buckets
@@ -461,21 +454,9 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Distribution time: " <<
                   dist_end - begin << " s");
-#if STXXL_IO_STATS
-    stats * iostats = stats::get_instance();
-    UNUSED(iostats);
-    STXXL_VERBOSE("reads               : " << iostats->get_reads());
-    STXXL_VERBOSE("writes              : " << iostats->get_writes());
-    STXXL_VERBOSE("read time           : " << iostats->get_read_time() << " s");
-    STXXL_VERBOSE("write time          : " << iostats->get_write_time() << " s");
-    STXXL_VERBOSE("parallel read time  : " << iostats->get_pread_time() << " s");
-    STXXL_VERBOSE("parallel write time : " << iostats->get_pwrite_time() << " s");
-    STXXL_VERBOSE("parallel io time    : " << iostats->get_pio_time() << " s");
-#endif
-#ifdef COUNT_WAIT_TIME
     STXXL_VERBOSE("Time in I/O wait(ds): " << io_wait_after_d << " s");
-    STXXL_VERBOSE("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
-#endif
+    STXXL_VERBOSE(*stats::get_instance());
+    UNUSED(begin + dist_end + io_wait_after_d);
 }
 
 //! \}

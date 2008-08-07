@@ -685,10 +685,7 @@ namespace sort_local
 
         after_runs_creation = timestamp();
 
-#ifdef COUNT_WAIT_TIME
-        double io_wait_after_rf = stxxl::wait_time_counter;
-        io_wait_after_rf += 0.0;
-#endif
+        double io_wait_after_rf = stats::get_instance()->get_io_wait_time();
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
@@ -776,27 +773,13 @@ namespace sort_local
         run_type * result = *runs;
         delete[] runs;
 
-
         end = timestamp();
-        (void)(begin);
 
         STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
                       after_runs_creation - begin << " s");
-#if STXXL_IO_STATS
-        stats * iostats = stats::get_instance();
-        UNUSED(iostats);
-        STXXL_VERBOSE("reads               : " << iostats->get_reads());
-        STXXL_VERBOSE("writes              : " << iostats->get_writes());
-        STXXL_VERBOSE("read time           : " << iostats->get_read_time() << " s");
-        STXXL_VERBOSE("write time          : " << iostats->get_write_time() << " s");
-        STXXL_VERBOSE("parallel read time  : " << iostats->get_pread_time() << " s");
-        STXXL_VERBOSE("parallel write time : " << iostats->get_pwrite_time() << " s");
-        STXXL_VERBOSE("parallel io time    : " << iostats->get_pio_time() << " s");
-#endif
-#ifdef COUNT_WAIT_TIME
         STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
-        STXXL_VERBOSE("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
-#endif
+        STXXL_VERBOSE(*stats::get_instance());
+        UNUSED(begin + io_wait_after_rf);
 
         return result;
     }

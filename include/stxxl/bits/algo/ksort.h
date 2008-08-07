@@ -566,7 +566,6 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
     STXXL_VERBOSE("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
 
     double begin = timestamp(), after_runs_creation, end;
-    (void)(begin);
 
     run_type ** runs = new run_type *[nruns];
 
@@ -613,10 +612,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 
     after_runs_creation = timestamp();
 
-#ifdef COUNT_WAIT_TIME
-    double io_wait_after_rf = stxxl::wait_time_counter;
-    io_wait_after_rf += 0.0;         // to get rid of the 'unused variable warning'
-#endif
+    double io_wait_after_rf = stats::get_instance()->get_io_wait_time();
 
     disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
@@ -674,9 +670,11 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
             }
         }
         else
+        {
             mng->new_blocks(interleaved_alloc_strategy(new_nruns, 0, ndisks),
                             RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>(new_runs, 0, new_nruns, blocks_in_new_run),
                             RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>(new_runs, _n, new_nruns, blocks_in_new_run));
+        }
 
 
         // merge all
@@ -699,7 +697,6 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
         runs = new_runs;
     }
 
-
     run_type * result = *runs;
     delete[] runs;
 
@@ -707,23 +704,9 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 
     STXXL_VERBOSE("Elapsed time        : " << end - begin << " s. Run creation time: " <<
                   after_runs_creation - begin << " s");
-#if STXXL_IO_STATS
-    stats * iostats = stats::get_instance();
-    UNUSED(iostats);
-    STXXL_VERBOSE("reads               : " << iostats->get_reads());
-    STXXL_VERBOSE("reads(volume)       : " << iostats->get_read_volume() << " bytes");
-    STXXL_VERBOSE("writes              : " << iostats->get_writes() << " bytes");
-    STXXL_VERBOSE("writes(volume)      : " << iostats->get_written_volume());
-    STXXL_VERBOSE("read time           : " << iostats->get_read_time() << " s");
-    STXXL_VERBOSE("write time          : " << iostats->get_write_time() << " s");
-    STXXL_VERBOSE("parallel read time  : " << iostats->get_pread_time() << " s");
-    STXXL_VERBOSE("parallel write time : " << iostats->get_pwrite_time() << " s");
-    STXXL_VERBOSE("parallel io time    : " << iostats->get_pio_time() << " s");
-#endif
-#ifdef COUNT_WAIT_TIME
     STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
-    STXXL_VERBOSE("Time in I/O wait    : " << stxxl::wait_time_counter << " s");
-#endif
+    STXXL_VERBOSE(*stats::get_instance());
+    UNUSED(begin + io_wait_after_rf);
 
     return result;
 }

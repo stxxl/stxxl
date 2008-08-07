@@ -34,10 +34,6 @@ __STXXL_BEGIN_NAMESPACE
 //!
 //! \{
 
-#ifdef COUNT_WAIT_TIME
-extern double wait_time_counter;
-#endif
-
 //! \brief Collects various I/O statistics
 //! \remarks is a singleton
 class stats : public singleton<stats>
