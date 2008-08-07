@@ -50,7 +50,7 @@ bool operator < (const my_type & a, const my_type & b)
 
 int main()
 {
-    unsigned memory_to_use = 32 * 1024 * 1024;
+    unsigned memory_to_use = 40 * 1024 * 1024;
     typedef stxxl::vector<my_type> vector_type;
     const stxxl::int64 n_records = 2 * 32 * stxxl::int64(1024 * 1024) / sizeof(my_type);
     vector_type v(n_records);
