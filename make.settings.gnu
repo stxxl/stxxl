@@ -330,8 +330,13 @@ LINK_STXXL	 = $(LINKER) $1 $(STXXL_LINKER_OPTIONS) -o $@
 %.$(bin): %.$o $(STXXL_LIBDEPS)
 	$(call LINK_STXXL, $<)
 
+
+# last resort rules to ignore header files missing due to renames etc.
 %.h::
 	@echo "MISSING HEADER: '$@' (ignored)"
+
+/%::
+	@echo "MISSING FILE:   '$@' (ignored)"
 
 ###################################################################
 
