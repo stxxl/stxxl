@@ -57,19 +57,19 @@ library_msvc: settings_msvc
 	nmake /NOLOGO /F Makefile.msvc library
 
 
-tests_g++: settings_gnu
+tests_g++: library_g++
 	$(MAKE) -f Makefile.gnu tests USE_PMODE=no USE_MCSTL=no
 
-tests_g++_pmode: settings_gnu
+tests_g++_pmode: library_g++_pmode
 	$(MAKE) -f Makefile.gnu tests USE_PMODE=yes USE_MCSTL=no
 
-tests_g++_mcstl: settings_gnu
+tests_g++_mcstl: library_g++_mcstl
 	$(MAKE) -f Makefile.gnu tests USE_PMODE=no USE_MCSTL=yes
 
-tests_icpc: settings_gnu
+tests_icpc: library_icpc
 	$(MAKE) -f Makefile.gnu tests USE_PMODE=no USE_MCSTL=no USE_ICPC=yes
 
-tests_icpc_mcstl: settings_gnu
+tests_icpc_mcstl: library_icpc_mcstl
 	$(MAKE) -f Makefile.gnu tests USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
 
 tests_msvc: settings_msvc
