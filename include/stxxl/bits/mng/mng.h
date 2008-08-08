@@ -1299,6 +1299,8 @@ void block_manager::new_blocks_int(
             {
                 // resize the file
                 disk_files[i]->set_size(new_capacity);
+                if (new_capacity != disk_allocators[i]->get_total_bytes())
+                    STXXL_ERRMSG("File resizing failed: actual size " << disk_allocators[i]->get_total_bytes() << " != requested size " << new_capacity);
             }
         }
     }
