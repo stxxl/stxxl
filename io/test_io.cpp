@@ -66,5 +66,8 @@ int main()
         STXXL_MSG(stxxl::hr(sz, "B"));
     STXXL_MSG(stxxl::hr((std::numeric_limits<stxxl::uint64>::max)(), "B"));
 
+    unlink(paths[0]);
+    unlink(paths[1]);
+
     return 0;
 }

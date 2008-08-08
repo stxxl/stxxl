@@ -59,6 +59,9 @@ public:
         stxxl::wait_all(req, 16);
 
         stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
+
+        unlink(paths[0]);
+        unlink(paths[1]);
     }
 
     void testIOException()

@@ -83,5 +83,8 @@ int main()
 
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
+    unlink(paths[0]);
+    unlink(paths[1]);
+
     return 0;
 }
