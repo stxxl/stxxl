@@ -1359,6 +1359,7 @@ void block_manager::delete_block(const BID<BLK_SIZE> & bid)
         return; // self managed disk
     assert(bid.storage->get_id() >= 0);
     disk_allocators[bid.storage->get_id()]->delete_block(bid);
+    disk_files[bid.storage->get_id()]->delete_region(bid.offset, bid.size);
 }
 
 

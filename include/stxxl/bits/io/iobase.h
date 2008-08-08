@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -185,6 +186,13 @@ public:
 
     //! \brief Locks file for reading and writing
     virtual void lock() { }
+
+    //! \brief Some specialized file types may need to know freed regions
+    virtual void delete_region(int64 offset, unsigned_type size)
+    {
+        UNUSED(offset);
+        UNUSED(size);
+    }
 
     virtual ~file() { }
 };
