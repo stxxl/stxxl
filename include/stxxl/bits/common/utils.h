@@ -51,6 +51,12 @@ template <typename U>
 inline void UNUSED(const U &)
 { }
 
+#if 1
+ #define __STXXL_DEPRECATED __attribute__ ((__deprecated__))
+#else
+ #define __STXXL_DEPRECATED
+#endif
+
 ////////////////////////////////////////////////////////////////////////////
 
 #define __STXXL_STRING(x) # x

@@ -171,7 +171,7 @@ public:
     //! \return file size in bytes
     virtual stxxl::int64 size() = 0;
     //! \brief deprecated, use \c stxxl::file::get_id() instead
-    int get_disk_number()
+    int get_disk_number() __STXXL_DEPRECATED
     {
         return id;
     }
