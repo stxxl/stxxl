@@ -50,6 +50,9 @@ library_g++_mcstl: settings_gnu
 library_icpc: settings_gnu
 	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=no USE_ICPC=yes
 
+library_icpc_pmode: settings_gnu
+	$(MAKE) -f Makefile.gnu library USE_PMODE=yes USE_MCSTL=no USE_ICPC=yes
+
 library_icpc_mcstl: settings_gnu
 	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
 
@@ -69,6 +72,9 @@ tests_g++_mcstl: library_g++_mcstl
 tests_icpc: library_icpc
 	$(MAKE) -f Makefile.gnu tests USE_PMODE=no USE_MCSTL=no USE_ICPC=yes
 
+tests_icpc_pmode: library_icpc_pmode
+	$(MAKE) -f Makefile.gnu tests USE_PMODE=yes USE_MCSTL=no USE_ICPC=yes
+
 tests_icpc_mcstl: library_icpc_mcstl
 	$(MAKE) -f Makefile.gnu tests USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
 
@@ -87,6 +93,9 @@ clean_g++_mcstl: settings_gnu
 
 clean_icpc: settings_gnu
 	$(MAKE) -f Makefile.gnu clean USE_PMODE=no USE_MCSTL=no USE_ICPC=yes
+
+clean_icpc_pmode: settings_gnu
+	-$(MAKE) -f Makefile.gnu clean USE_PMODE=yes USE_MCSTL=no USE_ICPC=yes
 
 clean_icpc_mcstl: settings_gnu
 	-$(MAKE) -f Makefile.gnu clean USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
