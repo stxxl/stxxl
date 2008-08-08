@@ -1308,9 +1308,9 @@ void block_manager::new_blocks_int(
     OutputIterator it = out;
     for (i = 0 /*,it = out */; i != nblocks; ++it, ++i)
     {
-        //int disk = (*it).storage->get_disk_number ();
+        //int disk = (*it).storage->get_id();
         //(*it).offset = disk_bids[disk][bl[disk]++].offset;
-        const int disk = disk_ptrs[i]->get_disk_number();
+        const int disk = disk_ptrs[i]->get_id();
         *it = bid_type(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
     }
 
@@ -1354,11 +1354,11 @@ template <unsigned BLK_SIZE>
 void block_manager::delete_block(const BID<BLK_SIZE> & bid)
 {
     // do not uncomment it
-    //assert(bid.storage->get_disk_number () < config::get_instance ()->disks_number ());
-    if (bid.storage->get_disk_number() == -1)
+    //assert(bid.storage->get_id() < config::get_instance()->disks_number());
+    if (bid.storage->get_id() == -1)
         return; // self managed disk
-    assert(bid.storage->get_disk_number() >= 0);
-    disk_allocators[bid.storage->get_disk_number()]->delete_block(bid);
+    assert(bid.storage->get_id() >= 0);
+    disk_allocators[bid.storage->get_id()]->delete_block(bid);
 }
 
 

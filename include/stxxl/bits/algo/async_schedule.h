@@ -88,7 +88,7 @@ void simulate_async_write(
 
     while (m && (i >= 0))
     {
-        int_type disk = input[i].bid.storage->get_disk_number();
+        int_type disk = input[i].bid.storage->get_id();
         disk_queues[disk].push(i);
         i--;
         m--;
@@ -121,7 +121,7 @@ void simulate_async_write(
         if (i >= 0)
         {
             m--;
-            int_type disk = input[i].bid.storage->get_disk_number();
+            int_type disk = input[i].bid.storage->get_id();
             if (disk_busy[disk])
             {
                 disk_queues[disk].push(i);
@@ -136,7 +136,7 @@ void simulate_async_write(
         }
 
         // add next block to write
-        int_type disk = input[cur.iblock].bid.storage->get_disk_number();
+        int_type disk = input[cur.iblock].bid.storage->get_id();
         if (!disk_busy[disk] && !disk_queues[disk].empty())
         {
             event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
@@ -204,7 +204,7 @@ void simulate_async_write(
 
     while (m && (i >= 0))
     {
-        int_type disk = (*(input + i)).storage->get_disk_number();
+        int_type disk = (*(input + i)).storage->get_id();
         disk_queues[disk].push(i);
         i--;
         m--;
@@ -246,7 +246,7 @@ void simulate_async_write(
         if (i >= 0)
         {
             m--;
-            int_type disk = (*(input + i)).storage->get_disk_number();
+            int_type disk = (*(input + i)).storage->get_id();
             if (disk_busy.find(disk) != disk_busy.end())
             {
                 disk_queues[disk].push(i);
@@ -261,7 +261,7 @@ void simulate_async_write(
         }
 
         // add next block to write
-        int_type disk = (*(input + cur.iblock)).storage->get_disk_number();
+        int_type disk = (*(input + cur.iblock)).storage->get_id();
         if (disk_busy.find(disk) == disk_busy.end() && !disk_queues[disk].empty())
         {
             event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));

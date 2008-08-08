@@ -176,7 +176,7 @@ public:
         }
 
         while (++diff <= 0)
-            delete get();
+            delete steal();
     }
 
     request_ptr get_request(bid_type bid)

@@ -955,7 +955,7 @@ public:
         _from(from)
     {
         // initialize from file
-        assert(from->get_disk_number() == -1);
+        assert(from->get_id() == -1);
 
         if (block_type::has_filler)
         {
