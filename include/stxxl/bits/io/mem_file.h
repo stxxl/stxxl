@@ -47,6 +47,7 @@ public:
     stxxl::int64 size();
     void set_size(stxxl::int64 newsize);
     void lock();
+    void delete_region(int64 offset, unsigned_type size);
 };
 
 //! \brief Implementation of request based on memcpy()

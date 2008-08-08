@@ -251,5 +251,20 @@ request_ptr mem_file::awrite(
     return req;
 }
 
+void mem_file::delete_region(int64 offset, unsigned_type size)
+{
+    // overwrite the freed region with uninitialized memory
+    STXXL_VERBOSE("delete_region at " << offset << " len " << size);
+    void * uninitialized = malloc(BLOCK_ALIGN);
+    while (size >= BLOCK_ALIGN) {
+       memcpy(get_ptr() + offset, uninitialized, BLOCK_ALIGN);
+       offset += BLOCK_ALIGN;
+       size -= BLOCK_ALIGN;
+    }
+    if (size > 0)
+       memcpy(get_ptr() + offset, uninitialized, size);
+    free(uninitialized);
+}
+
 __STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4
