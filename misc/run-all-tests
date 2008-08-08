@@ -95,6 +95,7 @@ run mng/test_mng
 run mng/test_mng1
 run mng/test_prefetch_pool
 run mng/test_write_pool
+run mng/test_mng_recursive_alloc
 
 run containers/bench_pqueue
 run containers/copy_file in out
@@ -120,7 +121,11 @@ run containers/write_vector2 in out
 run containers/test_map 32
 run containers/test_map_random 2000
 run containers/btree/test_btree 10000
+run containers/btree/test_btree 100000
+run containers/btree/test_btree 1000000
 run containers/btree/test_const_scan 10000
+run containers/btree/test_const_scan 100000
+run containers/btree/test_const_scan 1000000
 run containers/btree/test_corr_insert_erase 14
 run containers/btree/test_corr_insert_find 14
 run containers/btree/test_corr_insert_scan 14
@@ -168,8 +173,8 @@ run containers/leda_sm_stack_benchmark 2 1073741824
 #algo/test_sort_all_parameters		<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
 #algo/test_ksort_all_parameters		<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
 #algo/test_stable_ksort_all_parameters	<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-for data in 768 ; do
-for ram in 128 ; do
+for data in 1024 ; do
+for ram in 384 ; do
 for strategy in 0 1 2 3 ; do
 for blk_size in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 ; do
 run algo/test_sort_all_parameters		$data $ram $strategy $blk_size 42
