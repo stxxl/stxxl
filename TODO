@@ -27,18 +27,14 @@
 * implement recursion in stable_ksort and do not assume random key
   distribution, do sampling instead
   as a start, at least abort early if the expected size of a bucket is larger
-  than the memory avilable to sort it
+  than the memory available to sort it
 
 * debug stable_ksort in depth, there are still some crashing cases left
 
-* cleanup the COUNT_WAIT_TIME mess
-
-* put some stxxl/defines.h (config.h/...) header someewhere,
-  listing/describing all the #defines that my be used somewhere
+* put some stxxl/defines.h (config.h/...) header somewhere,
+  listing/describing all the #defines that may be used somewhere
 
 * stxxl::debugmon: FIXME! is not working any more
-
-* replace tons of #ifdef with wrapper that behaves like boost's scoped_lock
 
 * continue using the new approach for STXXL_VERBOSE:
   $(CXX) -DSTXXL_VERBOSE_FOO=STXXL_VERBOSEx
