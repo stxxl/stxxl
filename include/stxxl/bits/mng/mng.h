@@ -902,58 +902,7 @@ class FileCreator
 public:
     virtual stxxl::file * create(const std::string & io_impl,
                                  const std::string & filename,
-                                 int options, int disk)
-    {
-        if (io_impl == "syscall")
-        {
-            stxxl::ufs_file_base * result = new stxxl::syscall_file(filename,
-                                                                    options,
-                                                                    disk);
-            result->lock();
-            return result;
-        }
-            #ifndef BOOST_MSVC
-        else if (io_impl == "mmap")
-        {
-            stxxl::ufs_file_base * result = new stxxl::mmap_file(filename,
-                                                                 options, disk);
-            result->lock();
-            return result;
-        }
-        else if (io_impl == "simdisk")
-        {
-            stxxl::ufs_file_base * result = new stxxl::sim_disk_file(filename,
-                                                                     options,
-                                                                     disk);
-            result->lock();
-            return result;
-        }
-            #else
-        else if (io_impl == "wincall")
-        {
-            stxxl::wfs_file_base * result = new stxxl::wincall_file(filename,
-                                                                    options, disk);
-            result->lock();
-            return result;
-        }
-            #endif
-      #ifdef STXXL_BOOST_CONFIG
-        else if (io_impl == "boostfd")
-            return new stxxl::boostfd_file(filename,
-                                           options, disk);
-      #endif
-        else if (io_impl == "memory")
-        {
-            stxxl::mem_file * result = new stxxl::mem_file(disk);
-            result->lock();
-            return result;
-        }
-
-        STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
-                    io_impl << " .");
-
-        return NULL;
-    }
+                                 int options, int disk);
 
     virtual ~FileCreator() { }
 };
