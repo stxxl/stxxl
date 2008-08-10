@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <vector>
 #include <list>
@@ -40,6 +41,11 @@
 #include <stxxl/bits/common/debug.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/singleton.h>
+
+#ifndef STXXL_VERBOSE_BLOCK_LIFE_CYCLE
+#define STXXL_VERBOSE_BLOCK_LIFE_CYCLE STXXL_VERBOSE2
+#endif
+#define FMT_BID(_bid_) "[" << (_bid_).storage->get_id() << "]0x" << std::hex << std::setfill('0') << std::setw(8) << (_bid_).offset << "/0x" << std::setw(8) << (_bid_).size
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -307,6 +313,7 @@ public:
     request_ptr write(const BID<raw_size> & bid,
                       completion_handler on_cmpl = default_completion_handler())
     {
+        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid) << " 0x" << raw_size);
         return bid.storage->awrite(
                    this,
                    bid.offset,
@@ -322,6 +329,7 @@ public:
     request_ptr read(const BID<raw_size> & bid,
                      completion_handler on_cmpl = default_completion_handler())
     {
+        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid) << " 0x" << raw_size);
         return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
     }
 
@@ -1262,7 +1270,9 @@ void block_manager::new_blocks_int(
         //int disk = (*it).storage->get_id();
         //(*it).offset = disk_bids[disk][bl[disk]++].offset;
         const int disk = disk_ptrs[i]->get_id();
-        *it = bid_type(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
+        bid_type bid(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
+        *it = bid;
+        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:new    " << FMT_BID(bid));
     }
 
     delete[] bl;
@@ -1304,6 +1314,7 @@ void block_manager::new_blocks(
 template <unsigned BLK_SIZE>
 void block_manager::delete_block(const BID<BLK_SIZE> & bid)
 {
+    STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:delete " << FMT_BID(bid));
     // do not uncomment it
     //assert(bid.storage->get_id() < config::get_instance()->disks_number());
     if (bid.storage->get_id() == -1)
