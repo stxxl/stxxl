@@ -18,12 +18,15 @@ Version 1.2.1 (unreleased)
 * fix a case where only half of the available memory was used during
   recursive merging
 * verify stxxl::set_seed() functionality in tests
-* remove stxxl disk files created from default configuration at program end
+* remove stxxl disk files created from default configuration (no .stxxl
+  file found) and other temporary files at program end
 * stop using deprecated functions, switch to the replacements instead
 * unify the mutex lock handling by introducing stxxl::scoped_mutex_lock
 * unify the I/O wait time counting to work like read/write time counting
 * simplify I/O time counting with scoped_{read,write,wait}_timer
 * more code cleanup
+* move some more code to the library
+* reduce some include dependencies
 * propagate region deletion (when blocks are freed) to the file level
 
 ------------------------------------------

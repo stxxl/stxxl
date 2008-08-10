@@ -14,6 +14,7 @@
 //! This example imports a file into an \c stxxl::vector without copying its
 //! content and then sorts it using stxxl::sort.
 
+#include <stxxl/io>
 #include <stxxl/mng>
 #include <stxxl/ksort>
 #include <stxxl/sort>

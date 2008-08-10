@@ -12,6 +12,7 @@
  **************************************************************************/
 
 #include <stxxl/mng>
+#include <stxxl/bits/io/io.h>
 #include <stxxl/bits/version.h>
 
 

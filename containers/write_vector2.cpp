@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/io>
 #include <stxxl/vector>
 #include <stxxl/bits/mng/buf_ostream.h>
 

@@ -20,7 +20,7 @@
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
-#include <stxxl/io>
+#include <stxxl/bits/io/iobase.h>
 
 #include <stxxl/bits/compat_hash_map.h>
 #include <stxxl/bits/compat_hash_set.h>
