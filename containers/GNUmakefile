@@ -77,7 +77,7 @@ reduce_optimization	?= $(if $(call needs_override,$4,$5,$1,$6),$3.$(bin): OPT_LE
 
 # PR33361: internal compiler error: in find_outermost_region_in_block, at tree-cfg.c:4803
 # when using g++-4.2 -fopenmp -O3. Fixed in g++-4.3, wontfix in g++-4.2.
-$(call reduce_optimization,3,1,test_map,gcc_version_4.2,32-bit,any)
+$(call reduce_optimization,3,0,test_map,gcc_version_4.2,32-bit,any)
 $(call reduce_optimization,3,0,test_map,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,2,btree/test_btree,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,0,btree/test_corr_insert_scan,gcc_version_4.2,64-bit,-g)
