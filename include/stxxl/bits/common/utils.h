@@ -43,6 +43,7 @@
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/timer.h>
+#include <stxxl/bits/common/is_sorted.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -343,24 +344,6 @@ inline uint64 longhash1(uint64 key_)
     key_ += ~(key_ << 27);
     key_ ^= (key_ >> 31);
     return key_;
-}
-
-////////////////////////////////////////////////////////////////////////////
-
-template <class _ForwardIter, class _StrictWeakOrdering>
-bool is_sorted(_ForwardIter __first, _ForwardIter __last,
-               _StrictWeakOrdering __comp)
-{
-    if (__first == __last)
-        return true;
-
-    _ForwardIter __next = __first;
-    for (++__next; __next != __last; __first = __next, ++__next) {
-        if (__comp(*__next, *__first))
-            return false;
-    }
-
-    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////

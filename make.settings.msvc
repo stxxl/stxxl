@@ -120,7 +120,8 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/tuple.h \
 	$(HEADER_PATH)/common/types.h \
 	$(HEADER_PATH)/common/settings.h \
-	$(HEADER_PATH)/common/seed.h 
+	$(HEADER_PATH)/common/seed.h  \
+	$(HEADER_PATH)/common/is_sorted.h 
 
 IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/completion_handler.h \

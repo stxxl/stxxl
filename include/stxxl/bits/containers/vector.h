@@ -20,6 +20,7 @@
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/containers/pager.h>
+#include <stxxl/bits/common/is_sorted.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -1405,27 +1406,6 @@ inline bool operator >= (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
 //! \}
 
 ////////////////////////////////////////////////////////////////////////////
-
-template <class _ForwardIter>
-bool is_sorted_helper(_ForwardIter __first, _ForwardIter __last)
-{
-    if (__first == __last)
-        return true;
-
-    _ForwardIter __next = __first;
-    for (++__next; __next != __last; __first = __next, ++__next) {
-        if (*__next < *__first)
-            return false;
-    }
-
-    return true;
-}
-
-template <class _ForwardIter>
-bool is_sorted(_ForwardIter __first, _ForwardIter __last)
-{
-    return is_sorted_helper(__first, __last);
-}
 
 // specialization for stxxl::vector, to use only const_iterators
 template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
