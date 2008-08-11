@@ -101,7 +101,7 @@ namespace sort_local
     };
 
     template <typename block_type, typename bid_type>
-    struct write_completion_handler1
+    struct read_next_after_write_completed
     {
         block_type * block;
         bid_type bid;
@@ -139,21 +139,19 @@ namespace sort_local
         request_ptr * read_reqs1 = new request_ptr[m2];
         request_ptr * read_reqs2 = new request_ptr[m2];
         request_ptr * write_reqs = new request_ptr[m2];
-        write_completion_handler1<block_type, bid_type> * next_run_reads =
-            new write_completion_handler1<block_type, bid_type>[m2];
-        run_type * run;
+        read_next_after_write_completed<block_type, bid_type> * next_run_reads =
+            new read_next_after_write_completed<block_type, bid_type>[m2];
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
         int_type i;
-        int_type k = 0;
         int_type run_size = 0, next_run_size = 0;
 
         assert(nruns >= 2);
 
-        run = runs[0];
-        run_size = run->size();
+        run_size = runs[0]->size();
         assert(run_size == m2);
+
         for (i = 0; i < run_size; ++i)
         {
             STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks1[i].elem));
@@ -170,9 +168,9 @@ namespace sort_local
             read_reqs2[i] = Blocks2[i].read(bids2[i]);
         }
 
-        for (k = 0; k < nruns - 1; ++k)
+        for (int_type k = 0; k < nruns - 1; ++k)
         {
-            run = runs[k];
+            run_type * run = runs[k];
             run_size = run->size();
             assert(run_size == m2);
             next_run_size = runs[k + 1]->size();
@@ -198,39 +196,24 @@ namespace sort_local
 
 
             STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
-            if (k)
+            if (k > 0)
                 wait_all(write_reqs, m2);
-
             STXXL_VERBOSE1("stxxl::create_runs finish waiting write_reqs");
 
-            if (k == nruns - 2)
+            int_type runplus2size = (k < nruns - 2) ? runs[k + 2]->size() : 0;
+            for (i = 0; i < m2; ++i)
             {
-                // do not need to post read of run k+1
-                for (i = 0; i < m2; ++i)
-                {
-                    STXXL_VERBOSE1("stxxl::create_runs posting write " << long(Blocks1[i].elem));
-                    (*run)[i].value = Blocks1[i][0];
+                STXXL_VERBOSE1("stxxl::create_runs posting write " << long(Blocks1[i].elem));
+                (*run)[i].value = Blocks1[i][0];
+                if (i >= runplus2size) {
                     write_reqs[i] = Blocks1[i].write((*run)[i].bid);
                 }
-            }
-            else
-            {
-                // do need to post read of run k+1
-                int_type runplus2size = runs[k + 2]->size();
-                for (i = 0; i < m2; ++i)
+                else
                 {
-                    STXXL_VERBOSE1("stxxl::create_runs posting write " << long(Blocks1[i].elem));
-                    (*run)[i].value = Blocks1[i][0];
-                    if (i >= runplus2size)
-                        write_reqs[i] = Blocks1[i].write((*run)[i].bid);
-
-                    else
-                    {
-                        next_run_reads[i].block = Blocks1 + i;
-                        next_run_reads[i].req = read_reqs1 + i;
-                        bids1[i] = next_run_reads[i].bid = *(it++);
-                        write_reqs[i] = Blocks1[i].write((*run)[i].bid, next_run_reads[i]);
-                    }
+                    next_run_reads[i].block = Blocks1 + i;
+                    next_run_reads[i].req = read_reqs1 + i;
+                    bids1[i] = next_run_reads[i].bid = *(it++);
+                    write_reqs[i] = Blocks1[i].write((*run)[i].bid, next_run_reads[i]);
                 }
             }
             std::swap(Blocks1, Blocks2);
@@ -238,7 +221,7 @@ namespace sort_local
             std::swap(read_reqs1, read_reqs2);
         }
 
-        run = runs[k];
+        run_type * run = runs[nruns - 1];
         run_size = run->size();
         STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
         wait_all(read_reqs1, run_size);
@@ -1129,3 +1112,4 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_SORT_HEADER
+// vim: et:ts=4:sw=4
