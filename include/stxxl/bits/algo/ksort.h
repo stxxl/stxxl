@@ -46,6 +46,11 @@ __STXXL_BEGIN_NAMESPACE
 //! Algorithms with STL-compatible interface
 //! \{
 
+/*! \internal
+ */
+namespace ksort_local
+{
+
 template <typename _BIDTp, typename _KeyTp>
 struct trigger_entry
 {
@@ -712,6 +717,8 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
     return result;
 }
 
+}
+
 
 /*! \page key_extractor Key extractor concept
 
@@ -758,7 +765,7 @@ ksort_blocks(input_bid_iterator input_bids, unsigned_type _n, unsigned_type _m, 
 template <typename ExtIterator_, typename KeyExtractor_>
 void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsigned_type M__)
 {
-    typedef simple_vector<trigger_entry<typename ExtIterator_::bid_type,
+    typedef simple_vector<ksort_local::trigger_entry<typename ExtIterator_::bid_type,
                                         typename KeyExtractor_::key_type> > run_type;
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;
@@ -771,7 +778,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
     if ((last_ - first_) * sizeof(value_type) < M__)
     {
-        stl_in_memory_sort(first_, last_, key_comparison<value_type, KeyExtractor_>(keyobj));
+        stl_in_memory_sort(first_, last_, ksort_local::key_comparison<value_type, KeyExtractor_>(keyobj));
     }
     else
     {
@@ -824,7 +831,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 delete last_block;
 
                 run_type * out =
-                    ksort_blocks<
+                    ksort_local::ksort_blocks<
                         typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator,
@@ -920,7 +927,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 delete first_block;
 
                 run_type * out =
-                    ksort_blocks<
+                    ksort_local::ksort_blocks<
                         typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator,
@@ -1000,7 +1007,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 delete last_block;
 
                 run_type * out =
-                    ksort_blocks<
+                    ksort_local::ksort_blocks<
                         typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator,
@@ -1049,7 +1056,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 n = last_.bid() - first_.bid();
 
                 run_type * out =
-                    ksort_blocks<
+                    ksort_local::ksort_blocks<
                         typename ExtIterator_::block_type,
                         typename ExtIterator_::vector_type::alloc_strategy,
                         typename ExtIterator_::bids_container_iterator,
@@ -1070,7 +1077,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
     }
 
 #ifdef STXXL_CHECK_ORDER_IN_SORTS
-    assert(stxxl::is_sorted(first_, last_, key_comparison<value_type, KeyExtractor_>()));
+    assert(stxxl::is_sorted(first_, last_, ksort_local::key_comparison<value_type, KeyExtractor_>()));
 #endif
 }
 
@@ -1121,3 +1128,4 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, unsigned_type M__)
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_KSORT_HEADER
+// vim: et:ts=4:sw=4
