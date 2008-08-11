@@ -13,7 +13,7 @@
 #include <iostream>
 
 #include <stxxl/bits/containers/btree/btree.h>
-#include <stxxl/algorithm>
+#include <stxxl/scan>
 
 
 struct comp_type : public std::less<int>

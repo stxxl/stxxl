@@ -18,7 +18,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stxxl/vector>
-#include <stxxl/algorithm>
+#include <stxxl/scan>
 
 typedef stxxl::int64 int64;
 

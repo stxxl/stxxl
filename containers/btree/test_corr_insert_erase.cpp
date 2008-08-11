@@ -13,7 +13,9 @@
 #include <iostream>
 
 #include <stxxl/bits/containers/btree/btree.h>
-#include <stxxl/algorithm>
+#include <stxxl/scan>
+#include <stxxl/sort>
+#include <stxxl/random_shuffle>
 
 
 struct comp_type : public std::less<int>

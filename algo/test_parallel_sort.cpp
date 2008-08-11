@@ -25,8 +25,8 @@
 #include <limits>
 
 #include <stxxl/vector>
-#include <stxxl/algorithm>
 #include <stxxl/stream>
+#include <stxxl/scan>
 
 #ifdef __MCSTL__
 #include <mcstl.h>

@@ -313,7 +313,7 @@ public:
     request_ptr write(const BID<raw_size> & bid,
                       completion_handler on_cmpl = default_completion_handler())
     {
-        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid) << " 0x" << raw_size);
+        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid));
         return bid.storage->awrite(
                    this,
                    bid.offset,
@@ -329,7 +329,7 @@ public:
     request_ptr read(const BID<raw_size> & bid,
                      completion_handler on_cmpl = default_completion_handler())
     {
-        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid) << " 0x" << raw_size);
+        STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid));
         return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
     }
 
