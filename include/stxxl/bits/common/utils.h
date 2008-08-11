@@ -347,21 +347,6 @@ inline uint64 longhash1(uint64 key_)
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <class _ForwardIter>
-bool is_sorted(_ForwardIter __first, _ForwardIter __last)
-{
-    if (__first == __last)
-        return true;
-
-    _ForwardIter __next = __first;
-    for (++__next; __next != __last; __first = __next, ++__next) {
-        if (*__next < *__first)
-            return false;
-    }
-
-    return true;
-}
-
 template <class _ForwardIter, class _StrictWeakOrdering>
 bool is_sorted(_ForwardIter __first, _ForwardIter __last,
                _StrictWeakOrdering __comp)

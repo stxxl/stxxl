@@ -1404,6 +1404,44 @@ inline bool operator >= (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
 
 //! \}
 
+////////////////////////////////////////////////////////////////////////////
+
+template <class _ForwardIter>
+bool is_sorted_helper(_ForwardIter __first, _ForwardIter __last)
+{
+    if (__first == __last)
+        return true;
+
+    _ForwardIter __next = __first;
+    for (++__next; __next != __last; __first = __next, ++__next) {
+        if (*__next < *__first)
+            return false;
+    }
+
+    return true;
+}
+
+template <class _ForwardIter>
+bool is_sorted(_ForwardIter __first, _ForwardIter __last)
+{
+    return is_sorted_helper(__first, __last);
+}
+
+// specialization for stxxl::vector, to use only const_iterators
+template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
+          unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
+bool is_sorted(
+        stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __first,
+        stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __last)
+{
+    // convert to const iterator
+    return is_sorted_helper(
+        stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__first),
+        stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__last));
+}
+
+////////////////////////////////////////////////////////////////////////////
+
 //! \addtogroup stlcont
 //! \{
 
