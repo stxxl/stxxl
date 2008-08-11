@@ -127,6 +127,7 @@ inline void write_out(
     int_type & out_pos,
     run_type & run,
     write_completion_handler<block_type, typename block_type::bid_type> * & next_read,
+    typename block_type::bid_type * & bids,
     request_ptr * write_reqs,
     request_ptr * read_reqs,
     input_bid_iterator & it,
@@ -135,7 +136,6 @@ inline void write_out(
     typedef typename block_type::bid_type bid_type;
     typedef typename block_type::type type;
 
-    block_manager * bm = block_manager::get_instance();
     type * elem = cur_blk->elem;
     for (type_key_ * p = begin; p < end; p++)
     {
@@ -150,7 +150,7 @@ inline void write_out(
                 next_read->block = cur_blk;
                 next_read->req = read_reqs + out_block;
                 read_reqs[out_block] = NULL;
-                bm->delete_block(next_read->bid = *(it++));
+                bids[out_block] = next_read->bid = *(it++);
 
                 write_reqs[out_block] = cur_blk->write(
                     run[out_block].bid,
@@ -192,6 +192,7 @@ create_runs(
     block_manager * bm = block_manager::get_instance();
     block_type * Blocks1 = new block_type[m2];
     block_type * Blocks2 = new block_type[m2];
+    bid_type * bids = new bid_type[m2];
     type_key_ * refs1 = new type_key_[m2 * Blocks1->size];
     type_key_ * refs2 = new type_key_[m2 * Blocks1->size];
     request_ptr * read_reqs = new request_ptr[m2];
@@ -218,9 +219,8 @@ create_runs(
 
     for (i = 0; i < run_size; i++)
     {
-        bid_type bid = *(it++);
-        read_reqs[i] = Blocks1[i].read(bid);
-        bm->delete_block(bid);
+        bids[i] = *(it++);
+        read_reqs[i] = Blocks1[i].read(bids[i]);
     }
 
     unsigned_type k = 0;
@@ -241,8 +241,8 @@ create_runs(
             if (k)
                 write_reqs[i]->wait();
 
-
             read_reqs[i]->wait();
+            bm->delete_block(bids[i]);
 
             classify_block(Blocks1[i].begin(), Blocks1[i].end(), ref_ptr, bucket1, offset, shift1, keyobj);
         }
@@ -272,7 +272,7 @@ create_runs(
 
             write_out(
                 d, dEnd, cur_blk, end_blk,
-                out_block, out_pos, *run, next_read,
+                out_block, out_pos, *run, next_read, bids,
                 write_reqs, read_reqs, it, keyobj);
 
             c = cEnd;
@@ -290,6 +290,7 @@ create_runs(
     delete[] refs2;
     delete[] Blocks1;
     delete[] Blocks2;
+    delete[] bids;
     delete[] next_run_reads;
     delete[] read_reqs;
     delete[] write_reqs;
