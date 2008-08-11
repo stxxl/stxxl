@@ -134,10 +134,11 @@ namespace sort_local
         block_manager * bm = block_manager::get_instance();
         block_type * Blocks1 = new block_type[m2];
         block_type * Blocks2 = new block_type[m2];
+        bid_type * bids1 = new bid_type[m2];
+        bid_type * bids2 = new bid_type[m2];
         request_ptr * read_reqs1 = new request_ptr[m2];
         request_ptr * read_reqs2 = new request_ptr[m2];
         request_ptr * write_reqs = new request_ptr[m2];
-        bid_type * bids = new bid_type[m2];
         write_completion_handler1<block_type, bid_type> * next_run_reads =
             new write_completion_handler1<block_type, bid_type>[m2];
         run_type * run;
@@ -156,26 +157,18 @@ namespace sort_local
         for (i = 0; i < run_size; ++i)
         {
             STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks1[i].elem));
-            bids[i] = *(it++);
-            read_reqs1[i] = Blocks1[i].read(bids[i]);
+            bids1[i] = *(it++);
+            read_reqs1[i] = Blocks1[i].read(bids1[i]);
         }
-
-        for (i = 0; i < run_size; ++i)
-            bm->delete_block(bids[i]);
-
 
         run_size = runs[1]->size();
 
         for (i = 0; i < run_size; ++i)
         {
             STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks2[i].elem));
-            bids[i] = *(it++);
-            read_reqs2[i] = Blocks2[i].read(bids[i]);
+            bids2[i] = *(it++);
+            read_reqs2[i] = Blocks2[i].read(bids2[i]);
         }
-
-        for (i = 0; i < run_size; ++i)
-            bm->delete_block(bids[i]);
-
 
         for (k = 0; k < nruns - 1; ++k)
         {
@@ -185,10 +178,11 @@ namespace sort_local
             next_run_size = runs[k + 1]->size();
             assert((next_run_size == m2) || (next_run_size <= m2 && k == nruns - 2));
 
-
             STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
             wait_all(read_reqs1, run_size);
             STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1");
+            for (i = 0; i < run_size; ++i)
+                bm->delete_block(bids1[i]);
 
             if (block_type::has_filler)
                 std::sort(
@@ -234,12 +228,13 @@ namespace sort_local
                     {
                         next_run_reads[i].block = Blocks1 + i;
                         next_run_reads[i].req = read_reqs1 + i;
-                        bm->delete_block(next_run_reads[i].bid = *(it++));
+                        bids1[i] = next_run_reads[i].bid = *(it++);
                         write_reqs[i] = Blocks1[i].write((*run)[i].bid, next_run_reads[i]);
                     }
                 }
             }
             std::swap(Blocks1, Blocks2);
+            std::swap(bids1, bids2);
             std::swap(read_reqs1, read_reqs2);
         }
 
@@ -248,6 +243,8 @@ namespace sort_local
         STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
         wait_all(read_reqs1, run_size);
         STXXL_VERBOSE1("stxxl::create_runs finish waiting read_reqs1");
+        for (i = 0; i < run_size; ++i)
+            bm->delete_block(bids1[i]);
 
         if (block_type::has_filler) {
             std::sort(
@@ -279,10 +276,11 @@ namespace sort_local
 
         delete[] Blocks1;
         delete[] Blocks2;
+        delete[] bids1;
+        delete[] bids2;
         delete[] read_reqs1;
         delete[] read_reqs2;
         delete[] write_reqs;
-        delete[] bids;
         delete[] next_run_reads;
     }
 
