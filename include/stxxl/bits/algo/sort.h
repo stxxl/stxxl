@@ -100,6 +100,19 @@ namespace sort_local
         }
     };
 
+	template <typename bid_type>
+    struct delete_on_read_completion
+	{
+		bid_type bid;
+		delete_on_read_completion() {}
+		delete_on_read_completion(bid_type bid_): bid(bid_) {}
+		void operator () (request * /*completed_req*/)
+        {
+			block_manager::get_instance()->delete_block(bid);
+			delete this;
+        }
+	};
+
     template <typename block_type, typename bid_type>
     struct write_completion_handler1
     {
@@ -108,7 +121,7 @@ namespace sort_local
         request_ptr * req;
         void operator () (request * /*completed_req*/)
         {
-            * req = block->read(bid);
+            * req = block->read(bid, *(new delete_on_read_completion<bid_type>(bid)));
         }
     };
 
@@ -157,12 +170,8 @@ namespace sort_local
         {
             STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks1[i].elem));
             bids[i] = *(it++);
-            read_reqs1[i] = Blocks1[i].read(bids[i]);
+            read_reqs1[i] = Blocks1[i].read(bids[i], *(new delete_on_read_completion<bid_type>(bids[i])));
         }
-
-        for (i = 0; i < run_size; ++i)
-            bm->delete_block(bids[i]);
-
 
         run_size = runs[1]->size();
 
@@ -170,12 +179,8 @@ namespace sort_local
         {
             STXXL_VERBOSE1("stxxl::create_runs posting read " << long(Blocks2[i].elem));
             bids[i] = *(it++);
-            read_reqs2[i] = Blocks2[i].read(bids[i]);
+            read_reqs2[i] = Blocks2[i].read(bids[i], *(new delete_on_read_completion<bid_type>(bids[i])));
         }
-
-        for (i = 0; i < run_size; ++i)
-            bm->delete_block(bids[i]);
-
 
         for (k = 0; k < nruns - 1; ++k)
         {
@@ -234,7 +239,7 @@ namespace sort_local
                     {
                         next_run_reads[i].block = Blocks1 + i;
                         next_run_reads[i].req = read_reqs1 + i;
-                        bm->delete_block(next_run_reads[i].bid = *(it++));
+                        next_run_reads[i].bid = *(it++);
                         write_reqs[i] = Blocks1[i].write((*run)[i].bid, next_run_reads[i]);
                     }
                 }
