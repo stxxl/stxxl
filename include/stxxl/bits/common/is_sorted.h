@@ -35,8 +35,8 @@ bool is_sorted_helper(_ForwardIter __first, _ForwardIter __last)
 }
 
 template <class _ForwardIter, class _StrictWeakOrdering>
-bool is_sorted(_ForwardIter __first, _ForwardIter __last,
-               _StrictWeakOrdering __comp)
+bool is_sorted_helper(_ForwardIter __first, _ForwardIter __last,
+                      _StrictWeakOrdering __comp)
 {
     if (__first == __last)
         return true;
@@ -54,6 +54,13 @@ template <class _ForwardIter>
 bool is_sorted(_ForwardIter __first, _ForwardIter __last)
 {
     return is_sorted_helper(__first, __last);
+}
+
+template <class _ForwardIter, class _StrictWeakOrdering>
+bool is_sorted(_ForwardIter __first, _ForwardIter __last,
+               _StrictWeakOrdering __comp)
+{
+    return is_sorted_helper(__first, __last, __comp);
 }
 
 __STXXL_END_NAMESPACE
