@@ -273,6 +273,9 @@ public:
     //! \brief Resets I/O time counters (including I/O wait counter)
     void reset();
 
+    //! \brief Resets I/O wait time counter
+    __STXXL_DEPRECATED(void _reset_io_wait_time());
+
     // for library use
     void write_started(unsigned size_);
     void write_finished();

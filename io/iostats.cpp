@@ -210,6 +210,23 @@ void stats::wait_finished()
 }
 #endif
 
+void stats::_reset_io_wait_time()
+{
+#ifdef COUNT_WAIT_TIME
+    {
+        scoped_mutex_lock WaitLock(wait_mutex);
+
+        //assert(acc_waits == 0);
+        if (acc_waits)
+            STXXL_ERRMSG("Warning: " << acc_waits <<
+                         " wait(s) not yet finished");
+
+        t_waits = 0.0;
+        p_waits = 0.0;
+    }
+#endif
+}
+
 std::string hr(uint64 number, const char * unit = "")
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
