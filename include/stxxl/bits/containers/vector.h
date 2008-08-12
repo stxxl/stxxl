@@ -1419,25 +1419,25 @@ inline bool operator >= (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
 template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
           unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
 bool is_sorted(
-        stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __first,
-        stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __last)
+    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __first,
+    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __last)
 {
     return is_sorted_helper(
-        stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__first),
-        stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__last));
+               stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__first),
+               stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__last));
 }
 
 template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
           unsigned BlkSize_, typename PgTp_, unsigned PgSz_, typename _StrictWeakOrdering>
 bool is_sorted(
-        stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __first,
-        stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __last,
-	_StrictWeakOrdering __comp)
+    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __first,
+    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __last,
+    _StrictWeakOrdering __comp)
 {
     return is_sorted_helper(
-        stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__first),
-        stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__last),
-	__comp);
+               stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__first),
+               stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__last),
+               __comp);
 }
 
 ////////////////////////////////////////////////////////////////////////////

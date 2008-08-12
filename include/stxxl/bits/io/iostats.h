@@ -283,9 +283,15 @@ public:
 };
 
 #if !STXXL_IO_STATS
-inline void stats::write_started(unsigned size_) { UNUSED(size_); }
+inline void stats::write_started(unsigned size_)
+{
+    UNUSED(size_);
+}
 inline void stats::write_finished() { }
-inline void stats::read_started(unsigned size_) { UNUSED(size_); }
+inline void stats::read_started(unsigned size_)
+{
+    UNUSED(size_);
+}
 inline void stats::read_finished() { }
 #endif
 #ifndef COUNT_WAIT_TIME

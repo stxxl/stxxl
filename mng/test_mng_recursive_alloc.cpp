@@ -37,19 +37,19 @@ int main()
 
     stxxl::block_manager * bm = stxxl::block_manager::get_instance();
 
-    STXXL_MSG("get 4 x " << totalblocks / 5); 
+    STXXL_MSG("get 4 x " << totalblocks / 5);
     bm->new_blocks(stxxl::striping(), b5a.begin(), b5a.end());
     bm->new_blocks(stxxl::striping(), b5b.begin(), b5b.end());
     bm->new_blocks(stxxl::striping(), b5c.begin(), b5c.end());
     bm->new_blocks(stxxl::striping(), b5d.begin(), b5d.end());
 
-    STXXL_MSG("free 2 x " << totalblocks / 5); 
+    STXXL_MSG("free 2 x " << totalblocks / 5);
     bm->delete_blocks(b5a.begin(), b5a.end());
     bm->delete_blocks(b5c.begin(), b5c.end());
 
     // the external memory should now be fragmented enough,
     // s.t. the following request needs to be split into smaller ones
-    STXXL_MSG("get 1 x " << totalblocks / 2); 
+    STXXL_MSG("get 1 x " << totalblocks / 2);
     bm->new_blocks(stxxl::striping(), b2.begin(), b2.end());
 
     bm->delete_blocks(b5b.begin(), b5b.end());

@@ -377,7 +377,7 @@ namespace btree
 
                 std::swap(ParentBids, Bids);
 
-                assert(nparents == Bids.size() || (nparents-1) == Bids.size());
+                assert(nparents == Bids.size() || (nparents - 1) == Bids.size());
 
                 ++height_;
                 STXXL_VERBOSE1("Increasing height to " << height_);

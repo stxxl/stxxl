@@ -53,9 +53,9 @@ void config::init(const char * config_path)
 #endif
 #if 0
         DiskEntry entry2 =
-            { "/tmp/stxxl1", "mmap", 100 * 1024 * 1024, true };
+        { "/tmp/stxxl1", "mmap", 100 * 1024 * 1024, true };
         DiskEntry entry3 =
-            { "/tmp/stxxl2", "simdisk", 1000 * 1024 * 1024, false };
+        { "/tmp/stxxl2", "simdisk", 1000 * 1024 * 1024, false };
 #endif
         disks_props.push_back(entry1);
         //disks_props.push_back(entry2);
@@ -78,7 +78,7 @@ void config::init(const char * config_path)
                 DiskEntry entry = {
                     tmp[0], tmp[2],
                     stxxl::int64(str2int(tmp[1])) * stxxl::int64(1024 * 1024),
-		    false
+                    false
                 };
                 if (is_disk)
                     disks_props.push_back(entry);

@@ -63,7 +63,7 @@ inline void UNUSED(const U &)
 #define __STXXL_STRING(x) # x
 
 
-#define _STXXL_PRINT(label,outstream,log_stream,message) \
+#define _STXXL_PRINT(label, outstream, log_stream, message) \
     { std::ostringstream str_; \
       str_ << "[" label "] " << message << std::endl; \
       outstream << str_.str() << std::flush; \

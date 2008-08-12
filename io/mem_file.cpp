@@ -257,12 +257,12 @@ void mem_file::delete_region(int64 offset, unsigned_type size)
     STXXL_VERBOSE("delete_region at " << offset << " len " << size);
     void * uninitialized = malloc(BLOCK_ALIGN);
     while (size >= BLOCK_ALIGN) {
-       memcpy(get_ptr() + offset, uninitialized, BLOCK_ALIGN);
-       offset += BLOCK_ALIGN;
-       size -= BLOCK_ALIGN;
+        memcpy(get_ptr() + offset, uninitialized, BLOCK_ALIGN);
+        offset += BLOCK_ALIGN;
+        size -= BLOCK_ALIGN;
     }
     if (size > 0)
-       memcpy(get_ptr() + offset, uninitialized, size);
+        memcpy(get_ptr() + offset, uninitialized, size);
     free(uninitialized);
 }
 

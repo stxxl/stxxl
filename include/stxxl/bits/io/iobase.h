@@ -512,7 +512,7 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 int wait_any(request_ptr req_array[], int count)
 {
     stats::scoped_wait_timer wait_timer;
-    
+
     onoff_switch sw;
     int i = 0, index = -1;
 
