@@ -182,6 +182,11 @@ public:
     {
         return elem;
     }
+    //! \brief Returns \c const_iterator pointing to the first element
+    const_iterator cbegin() const
+    {
+        return begin();
+    }
     //! \brief Returns \c iterator pointing to the end element
     iterator end()
     {
@@ -191,6 +196,11 @@ public:
     const_iterator end() const
     {
         return elem + size;
+    }
+    //! \brief Returns \c const_iterator pointing to the end element
+    const_iterator cend() const
+    {
+        return end();
     }
 };
 

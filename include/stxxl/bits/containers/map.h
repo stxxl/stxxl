@@ -104,6 +104,8 @@ public:
     iterator end() { return Impl.end(); }
     const_iterator begin() const { return Impl.begin(); }
     const_iterator end() const { return Impl.end(); }
+    const_iterator cbegin() const { return begin(); }
+    const_iterator cend() const { return end(); }
     size_type size() const { return Impl.size(); }
     size_type max_size() const { return Impl.max_size(); }
     bool empty() const { return Impl.empty(); }

@@ -64,6 +64,10 @@ public:
     {
         return _array;
     }
+    const_iterator cbegin() const
+    {
+        return begin();
+    }
     iterator end()
     {
         return _array + _size;
@@ -71,6 +75,10 @@ public:
     const_iterator end() const
     {
         return _array + _size;
+    }
+    const_iterator cend() const
+    {
+        return end();
     }
     size_type size() const
     {

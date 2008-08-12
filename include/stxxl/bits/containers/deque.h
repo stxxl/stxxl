@@ -403,9 +403,17 @@ public:
     {
         return const_iterator(this, begin_o);
     }
+    const_iterator cbegin() const
+    {
+        return begin();
+    }
     const_iterator end() const
     {
         return const_iterator(this, end_o);
+    }
+    const_iterator cend() const
+    {
+        return end();
     }
 
     size_type size() const

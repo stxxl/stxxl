@@ -1049,6 +1049,10 @@ public:
     {
         return const_iterator(this, 0);
     }
+    const_iterator cbegin() const
+    {
+        return begin();
+    }
     iterator end()
     {
         return iterator(this, _size);
@@ -1056,6 +1060,10 @@ public:
     const_iterator end() const
     {
         return const_iterator(this, _size);
+    }
+    const_iterator cend() const
+    {
+        return end();
     }
     reference operator [] (size_type offset)
     {
