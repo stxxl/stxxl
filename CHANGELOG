@@ -24,10 +24,15 @@ Version 1.2.1 (unreleased)
 * unify the mutex lock handling by introducing stxxl::scoped_mutex_lock
 * unify the I/O wait time counting to work like read/write time counting
 * simplify I/O time counting with scoped_{read,write,wait}_timer
-* more code cleanup
+* add some more tests
+* more code cleanup + reformatting
 * move some more code to the library
 * reduce some include dependencies
+* build system tuning
 * propagate region deletion (when blocks are freed) to the file level
+* fix problem in sorters where blocks were released too early
+* specialize is_sorted() to use const_vector_iterators, no extra writes
+* add c++0x style const_iterator cbegin()/cend() to all containers
 
 ------------------------------------------
 Version 1.2.0 (05 July 2008)

@@ -39,3 +39,8 @@
 * continue using the new approach for STXXL_VERBOSE:
   $(CXX) -DSTXXL_VERBOSE_FOO=STXXL_VERBOSEx
 
+* switch check_sorted_runs to use const_iterators (if neccessary),
+  check+fix all sorted_runs() calls to not cause write I/Os
+
+* on disk destruction, check whether all blocks had been deallocated before,
+  i.e. free_bytes == disk_size
