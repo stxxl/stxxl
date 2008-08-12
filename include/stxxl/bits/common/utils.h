@@ -52,14 +52,10 @@ template <typename U>
 inline void UNUSED(const U &)
 { }
 
-#if 1
- #ifdef BOOST_MSVC
+#ifdef BOOST_MSVC
   #define __STXXL_DEPRECATED(x) __declspec(deprecated) x
- #else
-  #define __STXXL_DEPRECATED(x) x __attribute__ ((__deprecated__))
- #endif
 #else
- #define __STXXL_DEPRECATED(x) 
+  #define __STXXL_DEPRECATED(x) x __attribute__ ((__deprecated__))
 #endif
 
 ////////////////////////////////////////////////////////////////////////////
