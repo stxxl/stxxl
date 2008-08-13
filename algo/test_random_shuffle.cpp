@@ -14,7 +14,7 @@
 //! \example algo/test_random_shuffle.cpp
 //! Test \c stxxl::random_shuffle()
 
-#include <stxxl/bits/algo/random_shuffle.h>
+#include <stxxl/random_shuffle>
 
 
 template <typename type>
