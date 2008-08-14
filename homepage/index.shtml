@@ -229,14 +229,14 @@ version </font> </td>
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="middle"> Version 1.2.0 (05 July 2008)
+            <td align="left" valign="middle"> Version 1.2.1 (14 August 2008)
  contains an implementation of the lower layers (memory
 management, disk virtualization, prefetching,...). From the higher
 layers, (pipelined) sorting with 
 <A  href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">SMP and multi-core processor support</A>, (pipelined) scanning and containers
 (vectors, stacks, priority queues, maps (B+Tree), queues, deques) are supported. 
 Currently that
-sums to about 28 thousand lines of code (28 KSLOC). </td>
+sums to about 29 thousand lines of code (29 KSLOC). </td>
           </tr>
         </tbody>
       </table>
@@ -259,45 +259,41 @@ new in the latest release </font> </td>
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-The block management layer is now thread safe.
+Added support for the <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode</a> (successor of MCSTL),
+requires g++ 4.3.2 or later.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-stxxl::priority_queue - several bugs fixed, significant speed improvements.
+Fixed locking problem in recursive block allocation.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-stxxl::vector, stxxl::sort, stxxl::stream::sort -
-significant speed improvements if blocks have padding.
+Fixed problem in sorters where blocks were released too early.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-stxxl::map - fixed some cases where rebalancing could fail.
+Properly destroy singleton objects and remove temporary files at program end.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Added checks to detect comparison operators 
-and sentinels that don't fulfill the requirements.
+Simplify and unify thread and mutex handling.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Added new test programs and some helper scripts.
+Print I/O statistics also in a human readable way.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Unified behavior of the test programs, they can now be run in a semi-automatic test suite.
+Add c++0x style const_iterator cbegin()/cend() to all containers.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Checked all test programs with <a href="http://valgrind.org/">valgrind</a>'s memcheck tool
-and fixed all bugs found so far.
+Add a special file mem_file type intended to ease debugging.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Improved build system further, e.g. now tries to autoconfigure the STXXL_ROOT path.
+Propagate block deletion to the I/O level, advanced file types can use this information.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Support new compiler releases g++ 4.3, icpc 10.1 and MSVC 9.0.
+Always use std::numeric_limits&lt;...&gt;::min/max().
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Support Mac OS X and Windows Vista.
+Build system: improved dependency handling.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Renamed/relocated several files,
-unified source code formatting,
-added proper Copyright/License headers to all source files.
+Added several new test programs.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
 Lots of small fixes and many more changes.
@@ -337,7 +333,7 @@ For a detailed list, please read the the CHANGELOG file.
 	      &nbsp; &middot; Installation manual:
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.2.0/install.html">1.2.0</a>]
+	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.2.1/install.html">1.2.1</a>]
             </td>
 	    <td>
 	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.1.0/installation.html">1.1.0</a>]
@@ -350,7 +346,7 @@ For a detailed list, please read the the CHANGELOG file.
 	      &nbsp; &middot; Programmer documentation:
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.2.0/">1.2.0</a>]
+	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.2.1/">1.2.1</a>]
 	    </td>
 	    <td>
 	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.1.0/">1.1.0</a>]
@@ -365,7 +361,7 @@ For a detailed list, please read the the CHANGELOG file.
 [<a href="http://sourceforge.net/projects/stxxl">sf.net page</a>]
             </td>
 	    <td>
-	      [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632">1.2.0</a>] tgz, zip (sf.net)
+	      [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632">1.2.1</a>] tgz, zip (sf.net)
 	    </td>
 	    <td>
 	      [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632&amp;package_id=144407&amp;release_id=528923">1.1.0</a>] tgz, zip (sf.net)
@@ -380,9 +376,9 @@ For a detailed list, please read the the CHANGELOG file.
 	      &nbsp; &nbsp; https://stxxl.svn.sourceforge.net/...
             </td>
 	    <td>
-	      [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.2.0/">Browse</a>]
-	      [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.2.0/">Checkout</a>]
-              <br>.../svnroot/stxxl/tags/1.2.0/
+	      [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.2.1/">Browse</a>]
+	      [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.2.1/">Checkout</a>]
+              <br>.../svnroot/stxxl/tags/1.2.1/
 	    </td>
 	    <td>
 	      [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.1.0/">Browse</a>]
