@@ -8,6 +8,7 @@ ENABLE_TPIE			?= no
 
 TESTS-yes			+= $(TESTS_NON_MSVC)
 TESTS-yes			+= $(TESTS_BTREE:%=btree/%)
+TESTS-yes			+= $(TESTS_HASH_MAP:%=hash_map/%)
 TESTS-$(ENABLE_BDB)$(ENABLE_TPIE)	+= $(TESTS_BDB)
 TESTS-$(ENABLE_LEDASM)		+= $(TESTS_LEDASM)
 TESTS-$(ENABLE_TPIE)		+= $(TESTS_TPIE)
@@ -96,5 +97,7 @@ endif
 
 clean::
 	$(RM) btree/*.$o btree/*.$d btree/*.dT
+	$(RM) hash_map/*.$o hash_map/*.$d hash_map/*.dT
 
 -include btree/*.d
+-include hash_map/*.d
