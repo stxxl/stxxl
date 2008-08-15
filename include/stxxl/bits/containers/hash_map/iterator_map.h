@@ -97,7 +97,7 @@ public:
 			}
 		}
   
-		STXXL_FORMAT_ERROR_MSG(msg,"unregister_iterator Panic in hash_map::iterator_map, can not find and unregister iterator")
+		STXXL_FORMAT_ERROR_MSG(msg,"unregister_iterator Panic in hash_map::iterator_map, can not find and unregister iterator");
 		throw std::runtime_error(msg.str());
 	}
 	

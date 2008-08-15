@@ -1,6 +1,8 @@
 #ifndef _STXXL_TUNING_H_
 #define _STXXL_TUNING_H_
 
+#include <stxxl/mng>
+
 __STXXL_BEGIN_NAMESPACE
 
 namespace hash_map

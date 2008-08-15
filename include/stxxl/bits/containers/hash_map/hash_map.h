@@ -1140,7 +1140,7 @@ public:
 		typedef HashedValuesStream<self_type, reader_type>             old_values_stream;		// values already stored in the hashtable ("old values")
 		typedef HashingStream<old_values_stream, HashedValueExtractor> old_hashing_stream;		// old values, that are to be stored in a certain (new) bucket
 		
-		typedef typeof(stxxl::stream::streamify(f,l))              input_stream;				// values to insert ("new values")
+		typedef __typeof__(stxxl::stream::streamify(f,l))              input_stream;			// values to insert ("new values")
 		typedef AddHashStream<input_stream>                        new_values_stream;			// new values with added hash: (hash, (key, mapped))
 		typedef stxxl::stream::sort<new_values_stream, Cmp>        new_sorted_values_stream;	// new values sorted by <hash-value, key>
 		typedef UniqueValueStream<new_sorted_values_stream>        new_unique_values_stream;	// new values sorted by <hash-value, key> with duplicates eliminated
