@@ -285,6 +285,9 @@ HEADER_FILES_CONTAINERS	+= map.h deque.h
 HEADER_FILES_CONTAINERS_BTREE	+= btree.h iterator_map.h leaf.h node_cache.h
 HEADER_FILES_CONTAINERS_BTREE	+= root_node.h node.h btree_pager.h iterator.h
 
+HEADER_FILES_CONTAINERS_HASH_MAP+= block_cache.h hash_map.h iterator.h
+HEADER_FILES_CONTAINERS_HASH_MAP+= iterator_map.h tuning.h util.h
+
 HEADER_FILES_ALGO	+= adaptor.h inmemsort.h intksort.h run_cursor.h sort.h
 HEADER_FILES_ALGO	+= async_schedule.h ksort.h
 HEADER_FILES_ALGO	+= losertree.h scan.h stable_ksort.h random_shuffle.h

@@ -26,6 +26,7 @@
 // map does not work with g++ 3.3
 #include <stxxl/map>
 #endif
+#include <stxxl/unordered_map>
 #include <stxxl/queue>
 #include <stxxl/deque>
 
