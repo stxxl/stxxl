@@ -13,8 +13,8 @@
 
 SUBDIRS		+= .
 SUBDIRS		+= include include/stxxl include/stxxl/bits
-SUBDIRS		+= $(foreach d, algo common containers containers/btree io mng stream utils, include/stxxl/bits/$d)
-SUBDIRS		+= algo common containers containers/btree io mng stream utils
+SUBDIRS		+= $(foreach d, algo common containers containers/btree containers/hash_map io mng stream utils, include/stxxl/bits/$d)
+SUBDIRS		+= algo common containers containers/btree containers/hash_map io mng stream utils
 SUBDIRS		+= doc/tutorial/examples
 
 FILES_IGNORE	:= ./doxymain.h
