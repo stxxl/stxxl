@@ -1,3 +1,8 @@
+Version 1.2.90 (unreleased)
+
+* stxxl::unordered_map
+
+------------------------------------------
 Version 1.2.1 (14 August 2008)
 
 * add support for the libstdc++ parallel_mode (successor of MCSTL),
