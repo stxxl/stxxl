@@ -123,6 +123,7 @@ namespace hash_map
             curr_bid_(seq_begin),
             end_bid_(seq_end),
             cache_(cache),
+            prefetch_(false),
 #ifdef PLAY_WITH_PREFETCHING
             page_size_(tuning::get_instance()->prefetch_page_size),
             prefetch_pages_(tuning::get_instance()->prefetch_pages),
@@ -130,7 +131,6 @@ namespace hash_map
             page_size_(config::get_instance()->disks_number() * 2),
             prefetch_pages_(2),
 #endif
-            prefetch_(false),
             dirty_(false)
         {
             if (seq_begin == seq_end)
@@ -311,9 +311,9 @@ namespace hash_map
         //! \param batch_size bulk buffered writing
         buffered_writer(BidContainer * c, int_type buffer_size, int_type batch_size) :
             bids_(c),
-            increase_(config::get_instance()->disks_number() * 3),
+            i_block_(0),
             i_value_(0),
-            i_block_(0)
+            increase_(config::get_instance()->disks_number() * 3)
         {
             writer_ = new writer_type(buffer_size, batch_size);
             block_ = writer_->get_free_block();

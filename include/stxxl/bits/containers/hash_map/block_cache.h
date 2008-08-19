@@ -127,7 +127,7 @@ namespace hash_map
 
         typedef stxxl::btree::lru_pager pager_type;
         typedef cache_block_helper::write_buffer<block_type> write_buffer_type;
-        typedef __gnu_cxx::hash_map<bid_type, int_type, bid_hash, bid_eq> bid_map_type;
+        typedef __gnu_cxx::hash_map<bid_type, unsigned_type, bid_hash, bid_eq> bid_map_type;
 
 
         enum { valid_all = block_type::size };
@@ -137,10 +137,10 @@ namespace hash_map
 
         std::vector<block_type *> blocks_;                                              /* cached blocks         */
         std::vector<bid_type> bids_;                                                    /* bids of cached blocks */
-        std::vector<int_type> retain_count_;                                            /* */
+        std::vector<unsigned_type> retain_count_;                                            /* */
         std::vector<bool> dirty_;                                                       /* true iff block has been altered while in cache */
-        std::vector<int_type> valid_subblock_;                                          /* valid_all or the actually loaded subblock's index */
-        std::vector<int_type> free_blocks_;                                             /* free blocks as indices to blocks_-vector */
+        std::vector<unsigned_type> valid_subblock_;                                     /* valid_all or the actually loaded subblock's index */
+        std::vector<unsigned_type> free_blocks_;                                             /* free blocks as indices to blocks_-vector */
         std::vector<request_ptr> reqs_;
 
         bid_map_type bid_map_;
@@ -215,7 +215,7 @@ namespace hash_map
         /* Force a block from the cache; write back to disk if dirty */
         void __kick_block()
         {
-            int_type i_block2kick;
+            unsigned_type i_block2kick;
 
             unsigned_type max_tries = size() + 1;
             unsigned_type i = 0;

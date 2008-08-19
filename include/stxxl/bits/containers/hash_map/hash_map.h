@@ -693,7 +693,7 @@ namespace hash_map
         size_type max_bucket_count() const { return max_size() / subblock_size; }
 
         //! \brief Bucket-index for values with given key.
-        size_type bucket(const key_type & k) const { return __bkt_num(k); }
+//        size_type bucket(const key_type & k) const { return __bkt_num(k); }
 
 
 #pragma mark hash policy

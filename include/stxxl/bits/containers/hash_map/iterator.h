@@ -382,8 +382,8 @@ end_search:
 
         typedef std::forward_iterator_tag iterator_category;
 
-        typedef hash_map_iterator_base<hash_map_type> base_type;
-        typedef hash_map_const_iterator<hash_map_type> hash_map_const_iterator;
+        typedef stxxl::hash_map::hash_map_iterator_base<hash_map_type> base_type;
+        typedef stxxl::hash_map::hash_map_const_iterator<hash_map_type> hash_map_const_iterator;
 
     private:
         hash_map_iterator() :
@@ -471,8 +471,8 @@ end_search:
 
         typedef std::forward_iterator_tag iterator_category;
 
-        typedef hash_map_iterator_base<hash_map_type> base_type;
-        typedef hash_map_iterator<hash_map_type> hash_map_iterator;
+        typedef stxxl::hash_map::hash_map_iterator_base<hash_map_type> base_type;
+        typedef stxxl::hash_map::hash_map_iterator<hash_map_type> hash_map_iterator;
 
     private:
         hash_map_const_iterator() :
