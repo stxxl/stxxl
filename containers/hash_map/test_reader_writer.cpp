@@ -15,21 +15,21 @@ void reader_writer_test()
                 const int subblock_raw_size = subblock_size*sizeof(value_type);
 */
 
-        typedef std::pair<int, int> value_type;
+        typedef std::pair<unsigned, unsigned> value_type;
 
-        const int subblock_raw_size = 1024 * 8;                         // 8KB subblocks
-        const int block_size = 128;                                     // 1MB blocks (=128 subblocks)
+        const unsigned subblock_raw_size = 1024 * 8;                         // 8KB subblocks
+        const unsigned block_size = 128;                                     // 1MB blocks (=128 subblocks)
 
-        const int n_blocks = 64;                                        // number of blocks to use for this test
-        const int cache_size = 8;                                       // size of cache in blocks
+        const unsigned n_blocks = 64;                                        // number of blocks to use for this test
+        const unsigned cache_size = 8;                                       // size of cache in blocks
 
-        const int buffer_size = 4;                                      // write buffer size in blocks
+        const unsigned buffer_size = 4;                                      // write buffer size in blocks
 
 
         typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
         typedef stxxl::typed_block<block_size * sizeof(subblock_type), subblock_type> block_type;
 
-        const int subblock_size = subblock_type::size;  // size in values
+        const unsigned subblock_size = subblock_type::size;  // size in values
 
         typedef block_type::bid_type bid_type;
         typedef std::vector<bid_type> bid_container_type;
@@ -162,6 +162,8 @@ void reader_writer_test()
                 reader.next_subblock();
             }
         }
+		
+		STXXL_MSG("Passed Reader-Writer Test")
     }
     catch (...) {
         STXXL_MSG("Cought unknown exception.")
