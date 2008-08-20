@@ -41,8 +41,8 @@ namespace hash_map
         typedef typename multimap_type::iterator mmiterator_type;
         typedef typename multimap_type::const_iterator const_mmiterator_type;
 
-        multimap_type it_map_;
         hash_map_type * map_;
+        multimap_type it_map_;
 
         // forbidden
         iterator_map();

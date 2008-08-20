@@ -88,25 +88,18 @@ namespace hash_map
 
 //private:
 #pragma mark members
-        mutable size_type num_total_;                                           /* (estimated) number of values */
-        mutable bool oblivious_;                                                /* false if the total-number of values is correct (false) or true if estimated (true); see *oblivious_-methods  */
-
-        float opt_load_factor_;                                                 /* desired load factor after rehashing */
-
-        node_allocator_type node_allocator_;                                    /* used to allocate new nodes for internal buffer */
-
         hasher hash_;                                                           /* user supplied mother hash-function */
         keycmp cmp_;                                                            /* user supplied strict-weak-ordering for keys */
-
         buckets_container_type buckets_;                                        /* array of bucket */
         bid_container_type bids_;                                               /* blocks-ids of allocated blocks  */
-
         size_type buffer_size_;                                                 /* size of internal-memory buffer in number of entries */
         size_type max_buffer_size_;                                             /* maximum size for internal-memory buffer */
-
         iterator_map_type iterator_map_;                                        /* keeps track of all active iterators */
-
         mutable block_cache_type block_cache_;                                  /* */
+        node_allocator_type node_allocator_;                                    /* used to allocate new nodes for internal buffer */
+        mutable bool oblivious_;                                                /* false if the total-number of values is correct (false) or true if estimated (true); see *oblivious_-methods  */
+        mutable size_type num_total_;                                           /* (estimated) number of values */
+        float opt_load_factor_;                                                 /* desired load factor after rehashing */
 
     public:
 #pragma mark construct/destroy/copy
@@ -145,7 +138,8 @@ namespace hash_map
         hash_map(InputIterator f, InputIterator l, size_type mem_to_sort = 256 *1024 *1024, size_type n = 10000, const hasher & hf = hasher(), const keycmp & cmp = keycmp(), size_type buffer_size = 100 *1024 *1024, const Alloc_ & a = Alloc_()) :
             hash_(hf),
             cmp_(cmp),
-            buckets_(n),
+          //  buckets_(n),
+			buckets_(0), // insert will determine a good size
             bids_(0),
             buffer_size_(0),
             iterator_map_(this),
@@ -971,10 +965,10 @@ namespace hash_map
 
             HashingStream(InputStream & input, size_type i_bucket, ValueExtractor vextract, self_type * map) :
                 map_(map),
-                vextract_(vextract),
                 input_(input),
                 i_bucket_(i_bucket),
-                bucket_size_(0)
+                bucket_size_(0),
+                vextract_(vextract)
             {
                 empty_ = find_next();
             }

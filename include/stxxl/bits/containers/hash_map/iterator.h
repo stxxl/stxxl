@@ -57,10 +57,10 @@ namespace hash_map
         HashMap * map_;
         reader_type * reader_;
         bool prefetch_;                         /* true if prefetching enabled; false by default, will be set to true when incrementing (see find_next()) */
-        node_type * node_;                      /* current (source=internal) or old (src=external) internal node */
         size_type i_bucket_;                    /* index of current bucket */
-        size_type i_external_;                  /* position of current (source=external) or next (source=internal) external value (see _ext_valid) */
         source_type source_;                    /* source of current value: external or internal */
+        node_type * node_;                      /* current (source=internal) or old (src=external) internal node */
+        size_type i_external_;                  /* position of current (source=external) or next (source=internal) external value (see _ext_valid) */
         key_type key_;                          /* key of current value */
         bool ext_valid_;                /* true if i_external points to the current or next external value
                                                                    example: iterator was created by hash_map::find() and the value was found in internal memory
@@ -76,15 +76,15 @@ namespace hash_map
         //! \brief Construct a new iterator
         hash_map_iterator_base(HashMap * map, size_type i_bucket, node_type * node, size_type i_external, source_type source, bool ext_valid, key_type key) :
             map_(map),
-            i_bucket_(i_bucket),
-            node_(node),
-            i_external_(i_external),
-            source_(source),
-            ext_valid_(ext_valid),
             reader_(NULL),
             prefetch_(false),
-            end_(false),
-            key_(key)
+            i_bucket_(i_bucket),
+            source_(source),
+            node_(node),
+            i_external_(i_external),
+            key_(key),
+            ext_valid_(ext_valid),
+            end_(false)
         {
             STXXL_VERBOSE3("hash_map_iterator_base parameter construct addr=" << this);
             map_->iterator_map_.register_iterator(*this);
@@ -94,12 +94,12 @@ namespace hash_map
         //! \brief Construct a new iterator pointing to the end of the given hash-map.
         hash_map_iterator_base(hash_map_type * map) :
             map_(map),
+            reader_(NULL),
+            prefetch_(false),
             i_bucket_(0),
             node_(NULL),
             i_external_(0),
             ext_valid_(false),
-            reader_(NULL),
-            prefetch_(false),
             end_(true)
         { }
 
@@ -107,15 +107,15 @@ namespace hash_map
         //! \brief Construct a new iterator from an existing one
         hash_map_iterator_base(const hash_map_iterator_base & obj) :
             map_(obj.map_),
+            reader_(NULL),
+            prefetch_(obj.prefetch_),			
             i_bucket_(obj.i_bucket_),
+			source_(obj.source_),
             node_(obj.node_),
             i_external_(obj.i_external_),
-            source_(obj.source_),
+            key_(obj.key_),   
             ext_valid_(obj.ext_valid_),
-            reader_(NULL),
-            prefetch_(obj.prefetch_),
-            end_(obj.end_),
-            key_(obj.key_)
+            end_(obj.end_)
         {
             STXXL_VERBOSE3("hash_map_iterator_base constr from" << (&obj) << " to " << this);
             if (!end_ && map_)

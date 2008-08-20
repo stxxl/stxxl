@@ -62,8 +62,8 @@ namespace hash_map
         bucket() :
             list_(NULL),
             n_external_(0),
-            i_subblock_(0),
-            i_block_(0)
+            i_block_(0),
+            i_subblock_(0)
         { }
 
         bucket(NodeType * list, size_t n_external, size_t i_block, size_t i_subblock) :
@@ -246,6 +246,9 @@ namespace hash_map
         //! \brief Continue reading at given block and subblock.
         void skip_to(BidIt bid, size_t i_subblock)
         {
+			if (curr_bid_ == end_bid_)
+				return;
+		
             if (bid != curr_bid_)
                 dirty_ = false;
 
@@ -420,9 +423,9 @@ namespace hash_map
 
         value_type value_;
         size_type i_bucket_;
-        size_type i_external_;
-        node_type * node_;
         source_type source_;
+        node_type * node_;
+        size_type i_external_;
 
         HashedValue() { }
 
@@ -453,12 +456,12 @@ namespace hash_map
 
         hash_map_type * map_;
         Reader & reader_;
-        bid_iterator begin_bid_;
         bucket_iterator curr_bucket_;
         bucket_iterator end_bucket_;
+        bid_iterator begin_bid_;
         size_type i_bucket_;
-        size_type i_external_;
         node_type * node_;
+        size_type i_external_;
         value_type value_;
 
 
