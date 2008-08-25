@@ -1,35 +1,37 @@
 /***************************************************************************
- *            hash_map.h
+ *  include/stxxl/bits/containers/hash_map/hash_map.h
  *
- *  April 2007, Markus Westphal
- ****************************************************************************/
-
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef _STXXL_HASH_MAP_H_
 #define _STXXL_HASH_MAP_H_
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/io/iobase.h"
-#include "stxxl/bits/mng/mng.h"
-#include "stxxl/bits/common/tuple.h"
-#include "stxxl/bits/stream/stream.h"
-#include "stxxl/bits/stream/sort_stream.h"
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/common/tuple.h>
+#include <stxxl/bits/stream/stream.h>
+#include <stxxl/bits/stream/sort_stream.h>
 
-#include "stxxl/bits/containers/hash_map/iterator.h"
-#include "stxxl/bits/containers/hash_map/iterator_map.h"
-#include "stxxl/bits/containers/hash_map/block_cache.h"
-#include "stxxl/bits/containers/hash_map/util.h"
+#include <stxxl/bits/containers/hash_map/iterator.h>
+#include <stxxl/bits/containers/hash_map/iterator_map.h>
+#include <stxxl/bits/containers/hash_map/block_cache.h>
+#include <stxxl/bits/containers/hash_map/util.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
 {
-#pragma mark -
-#pragma mark Class HashMap
-#pragma mark
-
-//! \brief External memory hash-map
+	//! \brief External memory hash-map
     template <class Key_,
               class T_,
               class Hash_,
@@ -38,12 +40,12 @@ namespace hash_map
               unsigned BlkSize_ = 256,
               class Alloc_ = std::allocator<std::pair<const Key_, T_> >
               >
-    class hash_map {
+    class hash_map : private noncopyable
+	{
     private:
         typedef hash_map<Key_, T_, Hash_, KeyCmp_, SubBlkSize_, BlkSize_> self_type;
 
     public:
-#pragma mark type declarations
         typedef Key_ key_type;                                                  /* type of the keys being used        */
         typedef T_ mapped_type;                                                 /* type of the data to be stored      */
         typedef std::pair<Key_, T_> value_type;                                 /* actually store (key-data)-pairs    */
@@ -87,7 +89,6 @@ namespace hash_map
         typedef typename Alloc_::template rebind<node_type>::other node_allocator_type;
 
 //private:
-#pragma mark members
         hasher hash_;                                                           /* user supplied mother hash-function */
         keycmp cmp_;                                                            /* user supplied strict-weak-ordering for keys */
         buckets_container_type buckets_;                                        /* array of bucket */
@@ -102,7 +103,6 @@ namespace hash_map
         float opt_load_factor_;                                                 /* desired load factor after rehashing */
 
     public:
-#pragma mark construct/destroy/copy
         //! \brief Construct a new hash-map
         //! \param n initial number of buckets
         //! \param hf hash-function
@@ -115,12 +115,7 @@ namespace hash_map
             bids_(0),
             buffer_size_(0),
             iterator_map_(this),
-#ifdef PLAY_WITH_PREFETCHING
             block_cache_(tuning::get_instance()->blockcache_size),
-#else
-            block_cache_(config::get_instance()->disks_number() * 12),
-#endif
-
             node_allocator_(a),
             oblivious_(false),
             num_total_(0),
@@ -143,11 +138,7 @@ namespace hash_map
             bids_(0),
             buffer_size_(0),
             iterator_map_(this),
-#ifdef PLAY_WITH_PREFETCHING
             block_cache_(tuning::get_instance()->blockcache_size),
-#else
-            block_cache_(config::get_instance()->disks_number() * 12),
-#endif
             node_allocator_(a),
             oblivious_(false),
             num_total_(0),
@@ -163,16 +154,7 @@ namespace hash_map
             clear();
         }
 
-    private:
-        // Copying external hash_maps is discouraged (and not implemented)
-        hash_map(const self_type & map)
-        {
-            STXXL_FORMAT_ERROR_MSG(msg, "stxxl::hash_map copy constructor is not implemented (for good reason)");
-            throw std::runtime_error(msg.str());
-        }
-
     public:
-#pragma mark observers
         //! \brief Hash-function used by this hash-map
         hasher hash_function() const { return hash_; }
 
@@ -180,7 +162,6 @@ namespace hash_map
         keycmp key_cmp()       const { return cmp_; }
 
 
-#pragma mark size & capacity
         bool empty() const { return size() != 0; }
 
     private:
@@ -219,7 +200,6 @@ namespace hash_map
         size_type max_size() const { return std::numeric_limits<size_type>::max(); }
 
 
-#pragma mark modifiers
         //! \brief Insert a new value if no value with the same key is already present; external memory must therefore be accessed
         //! \param value what to insert
         //! \return a tuple whose second part is true iff the value was actually added (no value with the same key present); the first part is an iterator pointing to the newly inserted or already stored value
@@ -489,8 +469,6 @@ namespace hash_map
         }
 
 
-#pragma mark lookup
-
     private:
         // find statistics
         mutable size_type n_subblocks_loaded;
@@ -679,7 +657,6 @@ namespace hash_map
         }
 
 
-#pragma mark bucket-interface
         //! \brief Number of buckets
         size_type bucket_count() const { return buckets_.size(); }
 
@@ -689,8 +666,6 @@ namespace hash_map
         //! \brief Bucket-index for values with given key.
 //        size_type bucket(const key_type & k) const { return __bkt_num(k); }
 
-
-#pragma mark hash policy
 
     public:
         //! \brief Average number of (sub)blocks occupied by a bucket.
@@ -715,7 +690,6 @@ namespace hash_map
         }
 
 
-#pragma mark buffer policy
         //! \brief Number of bytes occupied by buffer
         size_type buffer_size() const
         {
@@ -736,8 +710,6 @@ namespace hash_map
                 __rebuild_buckets();
         }
 
-
-#pragma mark Sequentially access to values
 
     private:
         /* iterator pointing to the beginnning of the hash-map */
@@ -772,8 +744,6 @@ namespace hash_map
         //! \brief Returns a const_iterator pointing to the end of the hash-map
         const_iterator end() const { return __end<const_iterator>(); }
 
-
-#pragma mark Node handling
 
     private:
         /* Allocate a new buffer-node */
@@ -814,7 +784,6 @@ namespace hash_map
         }
 
 
-#pragma mark Uniform hashing
         /* Bucket-index for values with given key */
         size_type __bkt_num(const key_type & key) const
         {
@@ -854,7 +823,6 @@ namespace hash_map
         }
 
 
-#pragma mark Searching keys
         /* Locate the given key in the internal-memory chained list.
            If the key is not present, the node with the biggest key smaller than the given key is returned.
            Note that the returned value may be zero: either because the chained list is empty or because
@@ -937,7 +905,6 @@ namespace hash_map
         }
 
 
-#pragma mark Rebuilding/Rehashing
         typedef HashedValue<self_type> hashed_value_type;
 
         /* Functor to extracts the actual value from a HashedValue-struct */
@@ -1066,7 +1033,6 @@ namespace hash_map
         }
 
 
-#pragma mark bulk insert
         /* Stream for filtering duplicates. Used to eliminate duplicated values when bulk-inserting
            Note: input has to be sorted, so that duplicates will occure in row
         */
@@ -1253,7 +1219,6 @@ namespace hash_map
         }
 
 
-#pragma mark key ordering
 //private:
         /* 1 iff a <  b
            The comparison is done lexicographically by (hash-value, key)
@@ -1275,7 +1240,6 @@ namespace hash_map
         bool __eq(const key_type & a, const key_type & b) const { return !cmp_(a, b) && !cmp_(b, a); }
 
 
-#pragma mark Friends & testing
         friend class hash_map_iterator_base<self_type>;
         friend class hash_map_iterator<self_type>;
         friend class hash_map_const_iterator<self_type>;
@@ -1284,7 +1248,6 @@ namespace hash_map
         friend struct HashedValuesStream<self_type, reader_type>;
 
 
-// #pragma statistics
 //	void __dump_external() {
 //		reader_type reader(bids_.begin(), bids_.end(), &block_cache_);
 //

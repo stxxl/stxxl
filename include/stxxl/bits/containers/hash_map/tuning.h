@@ -1,3 +1,16 @@
+/***************************************************************************
+ *  include/stxxl/bits/containers/hash_map/tuning.h
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+
 #ifndef _STXXL_TUNING_H_
 #define _STXXL_TUNING_H_
 

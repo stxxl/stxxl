@@ -1,18 +1,28 @@
 /***************************************************************************
- *            block_cache.h
+ *  include/stxxl/bits/containers/hash_map/block_cache.h
  *
- *  Jul 2007, Markus Westphal
- ****************************************************************************/
-
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_CONTAINERS_HASHMAP__BLOCK_CACHE_H
 #define STXXL_CONTAINERS_HASHMAP__BLOCK_CACHE_H
 
-#include "stxxl/bits/io/iobase.h"
-#include "stxxl/bits/mng/mng.h"
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
 
-#include "stxxl/bits/containers/btree/btree_pager.h"
-#include <ext/hash_map>
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/compat_hash_map.h>
+#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/containers/btree/btree_pager.h>
+
 #include <vector>
 #include <list>
 
@@ -34,7 +44,7 @@ namespace hash_map
             std::vector<block_type *> blocks_;
             std::vector<request_ptr> reqs_;
             std::vector<unsigned> free_blocks_;
-            std::list<unsigned> busy_blocks_;                   // make that a circular-buffer
+            std::list<unsigned> busy_blocks_;                   // TODO make that a circular-buffer
 
         public:
             write_buffer(unsigned size)
@@ -99,7 +109,7 @@ namespace hash_map
 
 
     template <class BlockType>
-    class block_cache
+    class block_cache : private noncopyable
     {
     public:
         typedef BlockType block_type;
@@ -108,26 +118,39 @@ namespace hash_map
         typedef typename subblock_type::bid_type subblock_bid_type;
 
     private:
-        struct bid_eq
-        {
+/*		struct bid_eq
+		{
             bool operator () (const bid_type & a, const bid_type & b) const
             {
                 return (a.storage == b.storage && a.offset == b.offset);
             }
         };
+*/
 
-        /* Hash-functor: Maps BIDs to integers */
         struct bid_hash
         {
             size_t operator () (const bid_type & bid) const
             {
                 return longhash1(bid.offset + uint64(bid.storage));
             }
+#ifdef BOOST_MSVC
+            bool operator () (const bid_type & a, const bid_type & b) const
+            {
+                return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);
+            }
+            enum
+            {                                   // parameters for hash table
+                bucket_size = 4,                // 0 < bucket_size
+                min_buckets = 8                 // min_buckets = 2 ^^ N, 0 < N
+            };
+#endif
         };
 
         typedef stxxl::btree::lru_pager pager_type;
         typedef cache_block_helper::write_buffer<block_type> write_buffer_type;
-        typedef __gnu_cxx::hash_map<bid_type, unsigned_type, bid_hash, bid_eq> bid_map_type;
+
+        typedef typename compat_hash_map<bid_type, unsigned_type, bid_hash>::result bid_map_type;
+//        typedef __gnu_cxx::hash_map<bid_type, unsigned_type, bid_hash, bid_eq> bid_map_type;
 
 
         enum { valid_all = block_type::size };

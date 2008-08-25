@@ -1,13 +1,25 @@
 /***************************************************************************
- *            iterator_map.h
+ *  include/stxxl/bits/containers/hash_map/iterator_map.h
  *
- *  Jan 2008, Markus Westphal
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 
 #ifndef STXXL_CONTAINERS_HASH_MAP__ITERATOR_MAP_H
 #define STXXL_CONTAINERS_HASH_MAP__ITERATOR_MAP_H
 
-#include "stxxl/bits/containers/hash_map/iterator.h"
+#include <map>
+
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/containers/hash_map/iterator.h>
+
+
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -15,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 namespace hash_map
 {
     template <class HashMap>
-    class iterator_map
+    class iterator_map : private noncopyable
     {
     public:
         typedef HashMap hash_map_type;
@@ -27,15 +39,15 @@ namespace hash_map
         typedef hash_map_iterator_base<hash_map_type> iterator_base;
 
     private:
-        struct hasher
-        {
-            size_t operator () (const key_type & key) const
-            {
-                return longhash1(key);
-            }
-        };
-
-        typedef __gnu_cxx::hash_multimap<size_type, iterator_base *, hasher> multimap_type;     // store iterators by bucket-index
+//        struct hasher
+//        {
+//            size_t operator () (const key_type & key) const
+//            {
+//                return longhash1(key);
+//            }
+//        };
+//        typedef __gnu_cxx::hash_multimap<size_type, iterator_base *, hasher> multimap_type;     // store iterators by bucket-index
+		typedef std::multimap<size_type, iterator_base *> multimap_type;
 
         typedef typename multimap_type::value_type pair_type;                                   /* bucket-index and pointer to iterator_base */
         typedef typename multimap_type::iterator mmiterator_type;
@@ -51,12 +63,14 @@ namespace hash_map
 
     public:
         iterator_map(hash_map_type * map) :
-            map_(map),
-            it_map_(10)                 // we don't expect too many iterators at the same time
+            map_(map)
         { }
 
 
-        ~iterator_map() { it_map_.clear(); }
+        ~iterator_map()
+		{
+			it_map_.clear();
+		}
 
 
         void register_iterator(iterator_base & it)

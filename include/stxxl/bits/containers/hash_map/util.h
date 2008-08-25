@@ -1,8 +1,14 @@
 /***************************************************************************
- *			  util.h
+ *  include/stxxl/bits/containers/hash_map/util.h
  *
- *	May 2007, Markus Westphal
- ****************************************************************************/
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 
 #ifndef STXXL_CONTAINERS_HASHMAP__UTIL_H
@@ -20,10 +26,6 @@ __STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
 {
-#pragma mark -
-#pragma mark Structs
-#pragma mark
-
 // For internal memory chaining
 // next-pointer and delete-flag share the same memory: the lowest bit is occupied by the del-flag.
     template <class ValueType>
@@ -75,9 +77,6 @@ namespace hash_map
     };
 
 
-#pragma mark -
-#pragma mark Class buffered_reader
-#pragma mark
 
 //! \brief Used to scan external memory with prefetching.
     template <class CacheType, class BidIt>
@@ -124,13 +123,8 @@ namespace hash_map
             end_bid_(seq_end),
             cache_(cache),
             prefetch_(false),
-#ifdef PLAY_WITH_PREFETCHING
             page_size_(tuning::get_instance()->prefetch_page_size),
             prefetch_pages_(tuning::get_instance()->prefetch_pages),
-#else
-            page_size_(config::get_instance()->disks_number() * 2),
-            prefetch_pages_(2),
-#endif
             dirty_(false)
         {
             if (seq_begin == seq_end)
@@ -280,10 +274,6 @@ namespace hash_map
     };
 
 
-#pragma mark -
-#pragma mark Class buffered_writer
-#pragma mark
-
 //! \brief Buffered writing of values. New Blocks are allocated as needed.
     template <class BlkType, class BidContainer>
     class buffered_writer
@@ -401,10 +391,6 @@ namespace hash_map
         size_t i_subblock() { return i_value_ / subblock_size; }
     };
 
-
-#pragma mark -
-#pragma mark Class	HashedValuesStream
-#pragma mark
 
 /** Additionial information about a stored value:
         - the bucket in which it can be found

@@ -1,18 +1,23 @@
 /***************************************************************************
- *            iterator.h
+ *  include/stxxl/bits/containers/hash_map/iterator.h
  *
- *  May 2007, Markus Westphal
- ****************************************************************************/
-
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Markus Westphal <marwes@users.sourceforge.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
 #ifndef STXXL_CONTAINERS_HASH_MAP__ITERATOR_H
 #define STXXL_CONTAINERS_HASH_MAP__ITERATOR_H
 
-#include "stxxl/bits/namespace.h"
-#include "stxxl/bits/io/iobase.h"
-#include "stxxl/bits/mng/mng.h"
+#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/mng/mng.h>
 
-#include "stxxl/bits/containers/hash_map/util.h"
+#include <stxxl/bits/containers/hash_map/util.h>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -28,9 +33,6 @@ namespace hash_map
     class block_cache;
 
 
-#pragma mark -
-#pragma mark Class iterator_base
-#pragma mark
     template <class HashMap>
     class hash_map_iterator_base
     {
@@ -360,9 +362,6 @@ end_search:
     };
 
 
-#pragma mark -
-#pragma mark Class iterator
-#pragma mark
     template <class HashMap>
     class hash_map_iterator : public hash_map_iterator_base<HashMap>
     {
@@ -449,9 +448,6 @@ end_search:
     };
 
 
-#pragma mark -
-#pragma mark Class const_iterator
-#pragma mark
     template <class HashMap>
     class hash_map_const_iterator : public hash_map_iterator_base<HashMap>
     {
