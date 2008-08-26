@@ -35,8 +35,8 @@ struct hash_int {
 };
 
 struct cmp : public std::less<int>{
-    int min_value() const { return std::numeric_limits<int>::min(); }
-    int max_value() const { return std::numeric_limits<int>::max(); }
+    int min_value() const { return (std::numeric_limits<int>::min)(); }
+    int max_value() const { return (std::numeric_limits<int>::max)(); }
 };
 
 
