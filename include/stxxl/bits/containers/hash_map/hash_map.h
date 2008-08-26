@@ -197,7 +197,7 @@ namespace hash_map
         }
 
         //! \brief The hash-map may store up to this number of values
-        size_type max_size() const { return std::numeric_limits<size_type>::max(); }
+        size_type max_size() const { return (std::numeric_limits<size_type>::max)(); }
 
 
         //! \brief Insert a new value if no value with the same key is already present; external memory must therefore be accessed
@@ -1093,8 +1093,8 @@ namespace hash_map
                 return (a.first < b.first) ||
                        ((a.first == b.first) && map_->cmp_(a.second.first, b.second.first));
             }
-            std::pair<size_type, value_type> min_value() const { return std::pair<size_type, value_type>(std::numeric_limits<size_type>::min(), value_type(map_->cmp_.min_value(), mapped_type())); }
-            std::pair<size_type, value_type> max_value() const { return std::pair<size_type, value_type>(std::numeric_limits<size_type>::max(), value_type(map_->cmp_.max_value(), mapped_type())); }
+            std::pair<size_type, value_type> min_value() const { return std::pair<size_type, value_type>((std::numeric_limits<size_type>::min)(), value_type(map_->cmp_.min_value(), mapped_type())); }
+            std::pair<size_type, value_type> max_value() const { return std::pair<size_type, value_type>((std::numeric_limits<size_type>::max)(), value_type(map_->cmp_.max_value(), mapped_type())); }
         };
 
     public:
