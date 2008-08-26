@@ -55,6 +55,7 @@ void reader_writer_test()
             assert(bids.size() >= n_blocks);
 
             block_type * block = new block_type;
+            i = 0;
             for (unsigned i_block = 0; i_block < n_blocks; i_block++) {
                 stxxl::request_ptr req = block->read(bids[i_block]);
                 req->wait();
