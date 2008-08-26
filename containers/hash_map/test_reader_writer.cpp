@@ -47,14 +47,14 @@ void reader_writer_test()
         // plain writing
         {
             writer_type writer(&bids, buffer_size, buffer_size / 2);
-            for (unsigned i = 0; i < n_blocks * block_size * subblock_size; ++i)
+            unsigned i = 0;
+            for (; i < n_blocks * block_size * subblock_size; ++i)
                 writer.append(value_type(i, i));
             writer.flush();
 
             assert(bids.size() >= n_blocks);
 
             block_type * block = new block_type;
-            unsigned i = 0;
             for (unsigned i_block = 0; i_block < n_blocks; i_block++) {
                 stxxl::request_ptr req = block->read(bids[i_block]);
                 req->wait();

@@ -4,7 +4,7 @@
 #include "stxxl/bits/common/seed.h"
 #include "stxxl/bits/common/rand.h"
 #include "stxxl/bits/containers/hash_map/hash_map.h"
-#include <ext/hash_map>
+#include "stxxl/bits/compat_hash_map.h"
 
 struct rand_pairs {
     stxxl::random_number32 & rand_;
@@ -36,8 +36,8 @@ struct hash_int {
 };
 
 struct cmp : public std::less<int>{
-    int min_value() const { return std::numeric_limits<int>::min(); }
-    int max_value() const { return std::numeric_limits<int>::max(); }
+    int min_value() const { return (std::numeric_limits<int>::min)(); }
+    int max_value() const { return (std::numeric_limits<int>::max)(); }
 };
 
 
@@ -60,7 +60,7 @@ void cmp_with_internal_map()
     typedef hash_map::iterator iterator;
     typedef hash_map::const_iterator const_iterator;
 
-    typedef __gnu_cxx::hash_map<int, int> int_hash_map;
+    typedef stxxl::compat_hash_map<int, int>::result int_hash_map;
 
     hash_map map;
     map.max_buffer_size(buffer_size);
@@ -82,14 +82,15 @@ void cmp_with_internal_map()
     // seems bind1st has problems with a member that takes a reference
 //	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&hash_map::insert_oblivious), &map ));
 //	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&int_hash_map::insert), &int_map ));
-    for (std::vector<value_type>::iterator val_it = values2.begin(); val_it != values2.end(); ++val_it) {
+    std::vector<value_type>::iterator val_it = values2.begin();
+    for (; val_it != values2.end(); ++val_it) {
         map.insert_oblivious(*val_it);
         int_map.insert(*val_it);
     }
 
     // --- erase and overwrite some external values
     std::random_shuffle(values1.begin(), values1.end());
-    std::vector<value_type>::iterator val_it = values1.begin();
+    val_it = values1.begin();
     for ( ; val_it != values1.begin() + n_tests; ++val_it) {
         map.erase_oblivious(val_it->first);
         int_map.erase(val_it->first);
@@ -164,7 +165,8 @@ void basic_iterator_test()
     map.insert(values1.begin(), values1.end(), mem_to_sort);
     // seems bind1st has problems with a member that takes a reference
 //	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&hash_map::insert_oblivious), &map ));
-    for (std::vector<value_type>::iterator val_it = values2.begin(); val_it != values2.end(); ++val_it)
+    std::vector<value_type>::iterator val_it = values2.begin();
+    for (; val_it != values2.end(); ++val_it)
         map.insert_oblivious(*val_it);
     assert(map.begin() != map.end());
     assert(map.size() == 2 * n_values);
@@ -322,7 +324,8 @@ void more_iterator_test()
 
     // --- initial import
     map.insert(values1.begin(), values1.end(), mem_to_sort);
-    for (std::vector<value_type>::iterator val_it = values2.begin(); val_it != values2.end(); ++val_it)
+    std::vector<value_type>::iterator val_it = values2.begin();
+    for (; val_it != values2.end(); ++val_it)
         map.insert_oblivious(*val_it);
 
     // --- store some iterators, rebuild and check

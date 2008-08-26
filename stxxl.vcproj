@@ -655,6 +655,34 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="hash_map"
+					>
+					<File
+						RelativePath=".\include\stxxl\bits\containers\hash_map\block_cache.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\stxxl\bits\containers\hash_map\hash_map.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\stxxl\bits\containers\hash_map\iterator.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\stxxl\bits\containers\hash_map\iterator_map.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\stxxl\bits\containers\hash_map\tuning.h"
+						>
+					</File>
+					<File
+						RelativePath=".\include\stxxl\bits\containers\hash_map\util.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="algo"

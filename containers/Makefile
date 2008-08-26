@@ -5,6 +5,9 @@ tests: $(TESTS)
 	cd btree
 	$(MAKE) tests
 	cd ..
+	cd hash_map
+	$(MAKE) tests
+	cd ..
 #tests: $(TESTS_NON_MSVC)
 
 NDEBUG		 = #-DNDEBUG
@@ -116,3 +119,7 @@ clean:
 	cd btree
 	$(MAKE) clean
 	cd ..
+	cd hash_map
+	$(MAKE) clean
+	cd ..
+
