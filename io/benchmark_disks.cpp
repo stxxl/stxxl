@@ -64,7 +64,6 @@ void watch_times(request_ptr reqs[], unsigned n, double * out)
     for (i = 0; i < n; i++)
         finished[i] = false;
 
-
     while (count != n)
     {
         usleep(POLL_DELAY);
@@ -97,22 +96,42 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 #define MB (1024 * 1024)
 #define GB (1024 * 1024 * 1024)
 
+void usage(const char * argv0)
+{
+    std::cout << "Usage: " << argv0 << " offset length [r|w] diskfile..." << std::endl;
+    std::cout << "    starting 'offset' and 'length' are given in GB" << std::endl;
+    std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
+    exit(-1);
+}
+
 int main(int argc, char * argv[])
 {
-    if (argc < 4) {
-        std::cout << "Usage: " << argv[0] << " offset length diskfile..." << std::endl;
-        std::cout << "    starting 'offset' and 'length' are given in GB" << std::endl;
-        std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
-        return -1;
-    }
+    if (argc < 4)
+        usage(argv[0]);
 
     stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
     stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
     stxxl::int64 endpos = offset + length;
 
+    bool do_read = true, do_write = true;
+    int first_disk_arg = 3;
+
+    if (strcasecmp("r", argv[3]) == 0) {
+        do_write = false;
+        ++first_disk_arg;
+    }
+
+    if (strcasecmp("w", argv[3]) == 0) {
+        do_read = false;
+        ++first_disk_arg;
+    }
+
     std::vector<std::string> disks_arr;
 
-    for (int ii = 3; ii < argc; ii++)
+    if (!(first_disk_arg < argc))
+        usage(argv[0]);
+
+    for (int ii = first_disk_arg; ii < argc; ii++)
     {
         std::cout << "# Add disk: " << argv[ii] << std::endl;
         disks_arr.push_back(argv[ii]);
@@ -182,9 +201,10 @@ int main(int argc, char * argv[])
 
             std::cout << "Disk offset " << std::setw(7) << offset / MB << " MB: " << std::fixed;
 
-            double begin = timestamp(), end;
+            double begin = timestamp(), end, elapsed;
 
 #ifndef DO_ONLY_READ
+            if (do_write) {
             for (i = 0; i < ndisks; i++)
             {
                 for (j = 0; j < chunks; j++)
@@ -202,8 +222,12 @@ int main(int argc, char * argv[])
  #endif
 
             end = timestamp();
+            elapsed = end - begin;
             totalsizewrite += buffer_size;
-            totaltimewrite += end - begin;
+            totaltimewrite += elapsed;
+            } else {
+                elapsed = 0.0;
+            }
 
 /*
    std::cout << "WRITE\nDisks: " << ndisks
@@ -218,14 +242,15 @@ int main(int argc, char * argv[])
             out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
             std::cout << std::setw(2) << ndisks << " * "
-                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size) / (end - begin)) << " = "
-                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size * ndisks) / (end - begin)) << " MB/s write,";
+                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size) / elapsed) << " = "
+                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size * ndisks) / elapsed) << " MB/s write,";
 #endif
 
 
 #ifndef NOREAD
             begin = timestamp();
 
+            if (do_read) {
             for (i = 0; i < ndisks; i++)
             {
                 for (j = 0; j < chunks; j++)
@@ -242,8 +267,12 @@ int main(int argc, char * argv[])
  #endif
 
             end = timestamp();
+            elapsed = end - begin;
             totalsizeread += buffer_size;
-            totaltimeread += end - begin;
+            totaltimeread += elapsed;
+            } else {
+                elapsed = 0.0;
+            }
 
 /*
    std::cout << "READ\nDisks: " << ndisks
@@ -255,8 +284,8 @@ int main(int argc, char * argv[])
 */
 
             std::cout << std::setw(2) << ndisks << " * "
-                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size) / (end - begin)) << " = "
-                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size * ndisks) / (end - begin)) << " MB/s read" << std::endl;
+                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size) / elapsed) << " = "
+                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_block_size * ndisks) / elapsed) << " MB/s read" << std::endl;
 
 #ifdef WATCH_TIMES
             out_stat(begin, end, r_finish_times, ndisks, disks_arr);
@@ -313,3 +342,5 @@ int main(int argc, char * argv[])
 
     return 0;
 }
+
+// vim: et:ts=4:sw=4
