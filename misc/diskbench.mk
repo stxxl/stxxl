@@ -20,14 +20,22 @@ DISKS_a		?= a
 DISKS_ab	?= a b
 DISKS_abcd	?= a b c d
 
-DISKS		?= abcd $(DISKS_1by1) ab
+DISKS_a_ro	?= a
+FLAGS_a_ro	?= R
 
-pipefail		?= set -o pipefail;
+DISKS		?= abcd $(DISKS_1by1) ab a_ro
+
+DISKBENCH_BINDIR?= .
+DISKBENCH	?= benchmark_disks.stxxl.bin
+
+pipefail	?= set -o pipefail;
+
+$(foreach d,$(DISKS_1by1),$(eval DISKS_$d ?= $d))
 
 define do-some-disks
 	-$(pipefail) \
-	$(RECORD_LOAD_IOSTAT) \
-	./benchmark_disks.stxxl.bin 0 $(SIZE) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
+	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(SIZE) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
 endef
 
 $(HOST)-%.cr.log:
@@ -37,10 +45,19 @@ $(HOST)-%.cr.log:
 $(HOST)-%.wr.log:
 	$(do-some-disks)
 
-all: cr wr
+$(HOST)-%.wrx.log: FLAGS_EX = W
+$(HOST)-%.wrx.log:
+	$(do-some-disks)
+
+$(HOST)-%.rdx.log: FLAGS_EX = R
+$(HOST)-%.rdx.log:
+	$(do-some-disks)
+
+all: cr wr ex
 
 cr: $(foreach d,$(DISKS_1by1),$(HOST)-$d.cr.log)
 wr: $(foreach d,$(DISKS),$(HOST)-$d.wr.log)
+ex: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 
 plot: $(HOST).gnuplot
 	gnuplot $<
@@ -49,8 +66,9 @@ plot: $(HOST).gnuplot
 extract_average	= $(if $(wildcard $1),$(shell tail -n 1 $1 | awk '{ print $$($2+1) }'),......)
 
 # $1 = logfile, $2 = disk, $3 = column, $4 = label
+# (does not plot if avg = nan)
 define plotline
-	echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@ ;
+	$(if $(filter nan,$(call extract_average,$1,$3)),,echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@ ;)
 endef
 
 # $1 = logfile, $2 = disk
@@ -65,6 +83,12 @@ define plotline-wr
 endef
 define plotline-rd
 	$(call plotline,$1,$2,14,rd)
+endef
+define plotline-wrx
+	$(call plotline,$1,$2,7,wrx)
+endef
+define plotline-rdx
+	$(call plotline,$1,$2,14,rdx)
 endef
 
 # $1 = disk letter
@@ -87,7 +111,10 @@ $(HOST).gnuplot: Makefile $(wildcard *.log)
 		$(call plotline-cr1,$(HOST)-$d.cr1.log,$(call disk2label,$d)) \
 		$(call plotline-cr,$(HOST)-$d.cr.log,$(call disk2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
-		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disk2label,$d)))
+		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
+		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
+		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
+	)
 	$(foreach d,$(filter-out $(DISKS_1by1),$(DISKS)),\
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disks2label,$d)))
