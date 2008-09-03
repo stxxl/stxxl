@@ -41,6 +41,7 @@ stats::stats() :
     last_reset(timestamp())
 { }
 
+#ifndef STXXL_IO_STATS_RESET_FORBIDDEN
 void stats::reset()
 {
     {
@@ -95,6 +96,7 @@ void stats::reset()
 
     last_reset = timestamp();
 }
+#endif
 
 #if STXXL_IO_STATS
 void stats::write_started(unsigned size_)

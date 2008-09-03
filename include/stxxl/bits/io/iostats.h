@@ -270,8 +270,10 @@ public:
         return last_reset;
     }
 
+#ifndef STXXL_IO_STATS_RESET_FORBIDDEN
     //! \brief Resets I/O time counters (including I/O wait counter)
     void reset();
+#endif
 
     //! \brief Resets I/O wait time counter
     __STXXL_DEPRECATED(void _reset_io_wait_time());
