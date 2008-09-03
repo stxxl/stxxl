@@ -116,12 +116,12 @@ int main(int argc, char * argv[])
     bool do_read = true, do_write = true;
     int first_disk_arg = 3;
 
-    if (strcasecmp("r", argv[3]) == 0) {
+    if (strcmp("r", argv[3]) == 0 || strcmp("R", argv[3]) == 0) {
         do_write = false;
         ++first_disk_arg;
     }
 
-    if (strcasecmp("w", argv[3]) == 0) {
+    if (strcmp("w", argv[3]) == 0 || strcmp("W", argv[3]) == 0) {
         do_read = false;
         ++first_disk_arg;
     }
