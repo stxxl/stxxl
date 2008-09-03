@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "stxxl.h"
+#include <stxxl.h>
 #include "stxxl/bits/common/seed.h"
 #include "stxxl/bits/common/rand.h"
-#include "stxxl/bits/containers/hash_map/hash_map.h"
+
 
 struct rand_pairs {
     stxxl::random_number32 & rand_;
@@ -56,14 +56,14 @@ void basic_test()
     const unsigned subblock_raw_size = 4 * 1024;
     const unsigned block_size = 4;
 
-    typedef stxxl::hash_map::hash_map<int, int, hash_int, cmp, subblock_raw_size, block_size> hash_map;
-    typedef hash_map::iterator iterator;
-    typedef hash_map::const_iterator const_iterator;
+    typedef stxxl::unordered_map<int, int, hash_int, cmp, subblock_raw_size, block_size> unordered_map;
+    typedef unordered_map::iterator iterator;
+    typedef unordered_map::const_iterator const_iterator;
 
 
-    hash_map map;
+    unordered_map map;
     map.max_buffer_size(buffer_size);
-    const hash_map & cmap = map;
+    const unordered_map & cmap = map;
 
 
     // generate random values
@@ -168,8 +168,56 @@ void basic_test()
     map.clear();
     assert(map.size() == 0);
 
-    std::cout << "\nAll tests passed" << std::endl;
 
+	// --- find and manipulate values by []-operator
+	// make sure there are some values in our unordered_map: externally [0..n/2) and internally [n/2..n) from values1
+	std::cout << "[ ]-operator...";
+	map.insert(values1.begin(), values1.begin()+n_values/2, mem_to_sort);
+	for (unsigned i = n_values/2; i < n_values; i++) {
+		map.insert_oblivious(values1[i]);
+	}
+	// lookup of exsisting values
+	assert(map[values1[5].first] == values1[5].second);	// external
+	assert(map[values1[n_values/2+5].first] == values1[n_values/2+5].second); // internal
+	// manipulate existing values
+	++(map[values1[7].first]);
+	++(map[values1[n_values/2+7].first]);
+	{
+		const_iterator cit1 = cmap.find(values1[7].first);
+		assert((*cit1).second == (*cit1).first+1);
+		const_iterator cit2 = cmap.find(values1[n_values/2+7].first);
+		assert((*cit2).second == (*cit2).first+1);
+	}
+	// lookup of non-existing values
+	assert(map[values2[5].first] == unordered_map::mapped_type());
+	// assignment of non-existing values
+	map[values2[7].first] = values2[7].second;
+	{
+		const_iterator cit = cmap.find(values2[7].first);
+		assert((*cit).first == values2[7].second);
+	}
+	assert(map.size() == n_values+2);
+	std::cout << "passed" << std::endl;
+
+
+	map.clear();
+    assert(map.size() == 0);
+	
+	
+	// --- additional bulk insert test
+	std::cout << "additional bulk-insert...";
+	map.insert(values1.begin(), values1.begin()+n_values/2, mem_to_sort);
+	map.insert(values1.begin()+n_values/2, values1.end(), mem_to_sort);
+	assert(map.size() == n_values);
+	// lookup some random values
+    std::random_shuffle(values1.begin(), values1.end());
+	for (unsigned i = 0; i < n_tests; i++)
+		assert(cmap.find(values1[i].first) != cmap.end());
+	std::cout << "passed" << std::endl;
+
+
+
+    std::cout << "\nAll tests passed" << std::endl;
 
     map.buffer_size();
 }
