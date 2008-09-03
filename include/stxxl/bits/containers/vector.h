@@ -1183,11 +1183,17 @@ private:
     }
     reference element(size_type offset)
     {
+        #ifdef STXXL_RANGE_CHECK
+        assert(offset < size());
+        #endif
         return element(double_blocked_index<PgSz_, block_type::size>(offset));
     }
 
     reference element(const double_blocked_index<PgSz_, block_type::size> & offset)
     {
+        #ifdef STXXL_RANGE_CHECK
+        assert(offset.get_pos() < size());
+        #endif
         int_type page_no = offset.get_block2();
         assert(page_no < int_type(_last_page.size()));                 // fails if offset is too large, out of bound access
         int_type last_page = _last_page[page_no];
