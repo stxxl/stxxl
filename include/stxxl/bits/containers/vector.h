@@ -69,16 +69,15 @@ public:
         set(pos);
     }
 
-    double_blocked_index(unsigned_type block2, unsigned_type block1, unsigned_type)
+    double_blocked_index(unsigned_type block2, unsigned_type block1, unsigned_type offset)
     {
+        assert(/* 0 <= block1 && */ block1 < modulo2);
+        assert(/* 0 <= offset && */ offset < modulo1);
+        
         this->block2 = block2;
         this->block1 = block1;
         this->offset = offset;
         pos = block2 * modulo12 + block1 * modulo1 + offset;
-
-        assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
-        assert(/* 0 <= block1 && */ block1 < modulo2);
-        assert(/* 0 <= offset && */ offset < modulo1);
     }
 
     double_blocked_index & operator = (unsigned_type pos)
