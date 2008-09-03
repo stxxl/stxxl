@@ -161,7 +161,7 @@ public:
     }
     size_type erase(const key_type & key)
     {
-        Impl.erase(key);
+        return Impl.erase(key);
     }
     void erase_oblivious(const key_type & key)
     {
