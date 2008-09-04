@@ -34,7 +34,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \ingroup stlcont
 //! \{
 
-template <unsigned_type modulo2, unsigned_type modulo1>
+template <typename size_type, size_type modulo2, size_type modulo1>
 class double_blocked_index
 {
     static const unsigned_type modulo12 = modulo1 * modulo2;
@@ -299,7 +299,7 @@ public:
     enum { block_size = BlkSize_ };
 
 protected:
-    double_blocked_index<PgSz_, block_type::size> offset;
+    double_blocked_index<SzTp_, PgSz_, block_type::size> offset;
     vector_type * p_vector;
 
 private:
@@ -521,7 +521,7 @@ public:
     enum { block_size = BlkSize_ };
 
 protected:
-    double_blocked_index<PgSz_, block_type::size> offset;
+    double_blocked_index<SzTp_, PgSz_, block_type::size> offset;
     const vector_type * p_vector;
 
 private:
@@ -1133,7 +1133,7 @@ private:
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
-    bids_container_iterator bid(const double_blocked_index<PgSz_, block_type::size> & offset)
+    bids_container_iterator bid(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset)
     {
         return (_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
@@ -1145,7 +1145,7 @@ private:
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
-    const_bids_container_iterator bid(const double_blocked_index<PgSz_, block_type::size> & offset) const
+    const_bids_container_iterator bid(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
     {
         return (_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
@@ -1186,10 +1186,10 @@ private:
         #ifdef STXXL_RANGE_CHECK
         assert(offset < size());
         #endif
-        return element(double_blocked_index<PgSz_, block_type::size>(offset));
+        return element(double_blocked_index<SzTp_, PgSz_, block_type::size>(offset));
     }
 
-    reference element(const double_blocked_index<PgSz_, block_type::size> & offset)
+    reference element(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset)
     {
         #ifdef STXXL_RANGE_CHECK
         assert(offset.get_pos() < size());
@@ -1256,7 +1256,7 @@ private:
         _page_status[offset / (block_type::size * page_size)] = 0;
     }
 
-    void touch(const double_blocked_index<PgSz_, block_type::size> & offset) const
+    void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
     {
         // fails if offset is too large, out of bound access
         assert(offset.get_block2() < _page_status.size());
@@ -1265,10 +1265,10 @@ private:
 
     const_reference const_element(size_type offset) const
     {
-        return const_element(double_blocked_index<PgSz_, block_type::size>(offset));
+        return const_element(double_blocked_index<SzTp_, PgSz_, block_type::size>(offset));
     }
 
-    const_reference const_element(const double_blocked_index<PgSz_, block_type::size> & offset) const
+    const_reference const_element(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
     {
         int_type page_no = offset.get_block2();
         assert(page_no < int_type(_last_page.size()));  // fails if offset is too large, out of bound access
