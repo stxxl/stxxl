@@ -37,15 +37,13 @@ __STXXL_BEGIN_NAMESPACE
 template <typename size_type, size_type modulo2, size_type modulo1>
 class double_blocked_index
 {
-    static const unsigned_type modulo12 = modulo1 * modulo2;
+    static const size_type modulo12 = modulo1 * modulo2;
 
-    unsigned_type pos;
-    unsigned_type block1, block2;
-    unsigned_type offset;
+    size_type pos, block1, block2, offset;
 
     //! \invariant block2 * modulo12 + block1 * modulo1 + offset == pos && 0 <= block1 &lt; modulo2 && 0 <= offset &lt; modulo1
 
-    void set(unsigned_type pos)
+    void set(size_type pos)
     {
         this->pos = pos;
         block2 = pos / modulo12;
@@ -64,12 +62,12 @@ public:
         set(0);
     }
 
-    double_blocked_index(unsigned_type pos)
+    double_blocked_index(size_type pos)
     {
         set(pos);
     }
 
-    double_blocked_index(unsigned_type block2, unsigned_type block1, unsigned_type offset)
+    double_blocked_index(size_type block2, size_type block1, size_type offset)
     {
         assert(/* 0 <= block1 && */ block1 < modulo2);
         assert(/* 0 <= offset && */ offset < modulo1);
@@ -80,7 +78,7 @@ public:
         pos = block2 * modulo12 + block1 * modulo1 + offset;
     }
 
-    double_blocked_index & operator = (unsigned_type pos)
+    double_blocked_index & operator = (size_type pos)
     {
         set(pos);
         return *this;
@@ -148,28 +146,28 @@ public:
         return former;
     }
 
-    double_blocked_index operator + (unsigned_type addend) const
+    double_blocked_index operator + (size_type addend) const
     {
         return double_blocked_index(pos + addend);
     }
 
-    double_blocked_index & operator += (unsigned_type addend)
+    double_blocked_index & operator += (size_type addend)
     {
         set(pos + addend);
         return *this;
     }
 
-    double_blocked_index operator - (unsigned_type addend) const
+    double_blocked_index operator - (size_type addend) const
     {
         return double_blocked_index(pos - addend);
     }
 
-    unsigned_type operator - (const double_blocked_index & dbi2) const
+    size_type operator - (const double_blocked_index & dbi2) const
     {
         return pos - dbi2.pos;
     }
 
-    double_blocked_index & operator -= (unsigned_type subtrahend)
+    double_blocked_index & operator -= (size_type subtrahend)
     {
         set(pos - subtrahend);
         return *this;
@@ -205,28 +203,28 @@ public:
         return pos >= dbi2.pos;
     }
 
-    double_blocked_index & operator >>= (unsigned_type shift)
+    double_blocked_index & operator >>= (size_type shift)
     {
         set(pos >> shift);
         return *this;
     }
 
-    unsigned_type get_pos() const
+    size_type get_pos() const
     {
         return pos;
     }
 
-    const unsigned_type & get_block2() const
+    const size_type & get_block2() const
     {
         return block2;
     }
 
-    const unsigned_type & get_block1() const
+    const size_type & get_block1() const
     {
         return block1;
     }
 
-    const unsigned_type & get_offset() const
+    const size_type & get_offset() const
     {
         return offset;
     }
