@@ -54,7 +54,7 @@ public:
         }
         ExtIterator it = Vec.begin() + RealSize - 1;
         if (it.block_offset() == 0)
-            it.touch();
+            it.block_externally_updated();
         // tells the vector that the block was modified)
         **outstream = val;
         ++(*outstream);

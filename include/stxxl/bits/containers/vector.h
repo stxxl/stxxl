@@ -382,9 +382,14 @@ public:
         return p_vector->const_element(offset.get_pos() + op);
     }
 
-    void touch()
+    void block_externally_updated()
     {
-        p_vector->touch(offset);
+        p_vector->block_externally_updated(offset);
+    }
+
+    __STXXL_DEPRECATED(void touch())
+    {
+        block_externally_updated();
     }
 
     _Self & operator ++ ()
@@ -596,9 +601,14 @@ public:
         return p_vector->const_element(offset.get_pos() + op);
     }
 
-    void touch()
+    void block_externally_updated()
     {
-        p_vector->touch(offset);
+        p_vector->block_externally_updated(offset);
+    }
+
+    __STXXL_DEPRECATED(void touch())
+    {
+        block_externally_updated();
     }
 
     _Self & operator ++ ()
@@ -1247,18 +1257,42 @@ private:
             return _cache[last_page * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
-    void touch(size_type offset) const
+
+private:
+    // don't forget to first flush() the vector's cache before updating pages externally
+    void _block_externally_updated(unsigned_type page_no) const
     {
         // fails if offset is too large, out of bound access
-        assert(offset / (block_type::size * page_size)< _page_status.size());
-        _page_status[offset / (block_type::size * page_size)] = 0;
+        assert(page_no < _page_status.size());
+        assert(!(_page_status[page_no] & dirty) &&
+               "A dirty page has been marked as newly initialized. The page content will be lost.");
+        if (_last_page[page_no] != on_disk) {
+		// remove page from cache
+		_free_pages.push(_last_page[page_no]);
+		_last_page[page_no] = on_disk;
+	}
+        _page_status[page_no] = 0; // valid content on disk
     }
 
-    void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
+public:
+    void block_externally_updated(size_type offset) const
     {
-        // fails if offset is too large, out of bound access
-        assert(offset.get_block2() < _page_status.size());
-        _page_status[offset.get_block2()] = 0;
+        _block_externally_updated(offset / (block_type::size * page_size));
+    }
+
+    void block_externally_updated(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
+    {
+        block_externally_updated(offset.get_block2());
+    }
+
+    __STXXL_DEPRECATED(void touch(size_type offset) const)
+    {
+        _block_externally_updated(offset / (block_type::size * page_size));
+    }
+
+    __STXXL_DEPRECATED(void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const)
+    {
+        _block_externally_updated(offset.get_block2());
     }
 
     const_reference const_element(size_type offset) const
