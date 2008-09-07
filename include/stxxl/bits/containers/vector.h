@@ -775,8 +775,8 @@ private:
 
     enum { valid_on_disk = 0, uninitialized = 1, dirty = 2 };
     mutable std::vector<unsigned char> _page_status;
-    mutable std::vector<int_type> _last_page;
-    mutable simple_vector<int_type> _page_no;
+    mutable std::vector<int_type> _page_to_slot;
+    mutable simple_vector<int_type> _slot_to_page;
     mutable std::queue<int_type> _free_slots;
     mutable simple_vector<block_type> _cache;
     file * _from;
@@ -807,8 +807,8 @@ public:
         _size(n),
         _bids(div_and_round_up(n, block_type::size)),
         _page_status(div_and_round_up(_bids.size(), page_size)),
-        _last_page(div_and_round_up(_bids.size(), page_size)),
-        _page_no(n_pages),
+        _page_to_slot(div_and_round_up(_bids.size(), page_size)),
+        _slot_to_page(n_pages),
         _cache(n_pages * page_size),
         _from(NULL)
     {
@@ -820,7 +820,7 @@ public:
         for ( ; i < all_pages; ++i)
         {
             _page_status[i] = uninitialized;
-            _last_page[i] = on_disk;
+            _page_to_slot[i] = on_disk;
         }
 
         for (i = 0; i < n_pages; ++i)
@@ -838,8 +838,8 @@ public:
         std::swap(_bids, obj._bids);
         std::swap(pager, obj.pager);
         std::swap(_page_status, obj._page_status);
-        std::swap(_last_page, obj._last_page);
-        std::swap(_page_no, obj._page_no);
+        std::swap(_page_to_slot, obj._page_to_slot);
+        std::swap(_slot_to_page, obj._slot_to_page);
         std::swap(_free_slots, obj._free_slots);
         std::swap(_cache, obj._cache);
         std::swap(_from, obj._from);
@@ -858,7 +858,7 @@ public:
         unsigned_type new_bids_size = div_and_round_up(n, block_type::size);
         unsigned_type new_pages = div_and_round_up(new_bids_size, page_size);
         _page_status.resize(new_pages, uninitialized);
-        _last_page.resize(new_pages, on_disk);
+        _page_to_slot.resize(new_pages, on_disk);
 
         _bids.resize(new_bids_size);
         if (_from == NULL)
@@ -913,7 +913,7 @@ public:
 
         _bids.clear();
         _page_status.clear();
-        _last_page.clear();
+        _page_to_slot.clear();
         while (!_free_slots.empty())
             _free_slots.pop();
 
@@ -957,8 +957,8 @@ public:
         _size(size_from_file_length(from->size())),
         _bids(div_and_round_up(_size, size_type(block_type::size))),
         _page_status(div_and_round_up(_bids.size(), page_size)),
-        _last_page(div_and_round_up(_bids.size(), page_size)),
-        _page_no(n_pages),
+        _page_to_slot(div_and_round_up(_bids.size(), page_size)),
+        _slot_to_page(n_pages),
         _cache(n_pages * page_size),
         _from(from)
     {
@@ -981,7 +981,7 @@ public:
         for ( ; i < all_pages; ++i)
         {
             _page_status[i] = valid_on_disk;
-            _last_page[i] = on_disk;
+            _page_to_slot[i] = on_disk;
         }
 
         for (i = 0; i < n_pages; ++i)
@@ -1002,8 +1002,8 @@ public:
         _size(obj.size()),
         _bids(div_and_round_up(obj.size(), block_type::size)),
         _page_status(div_and_round_up(_bids.size(), page_size)),
-        _last_page(div_and_round_up(_bids.size(), page_size)),
-        _page_no(n_pages),
+        _page_to_slot(div_and_round_up(_bids.size(), page_size)),
+        _slot_to_page(n_pages),
         _cache(n_pages * page_size),
         _from(NULL)
     {
@@ -1015,7 +1015,7 @@ public:
         for ( ; i < all_pages; ++i)
         {
             _page_status[i] = uninitialized;
-            _last_page[i] = on_disk;
+            _page_to_slot[i] = on_disk;
         }
 
         for (i = 0; i < n_pages; ++i)
@@ -1098,14 +1098,14 @@ public:
         for (i = 0; i < n_pages; i++)
         {
             _free_slots.push(i);
-            int_type page_no = _page_no[i];
+            int_type page_no = _slot_to_page[i];
             if (non_free_slots[i])
             {
                 STXXL_VERBOSE1("vector: flushing page " << i << " address: " << (int64(page_no) *
                                                                                  int64(block_type::size) * int64(page_size)));
                 write_page(page_no, i);
 
-                _last_page[page_no] = on_disk;
+                _page_to_slot[page_no] = on_disk;
             }
         }
     }
@@ -1205,18 +1205,18 @@ private:
         assert(offset.get_pos() < size());
         #endif
         int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_last_page.size()));                 // fails if offset is too large, out of bound access
-        int_type last_page = _last_page[page_no];
+        assert(page_no < int_type(_page_to_slot.size()));              // fails if offset is too large, out of bound access
+        int_type last_page = _page_to_slot[page_no];
         if (last_page < 0)                                             // == on_disk
         {
             if (_free_slots.empty())                                   // has to kick
             {
                 int_type kicked_slot = pager.kick();
                 pager.hit(kicked_slot);
-                int_type old_page_no = _page_no[kicked_slot];
-                _last_page[page_no] = kicked_slot;
-                _last_page[old_page_no] = on_disk;
-                _page_no[kicked_slot] = page_no;
+                int_type old_page_no = _slot_to_page[kicked_slot];
+                _page_to_slot[page_no] = kicked_slot;
+                _page_to_slot[old_page_no] = on_disk;
+                _slot_to_page[kicked_slot] = page_no;
 
                 write_page(old_page_no, kicked_slot);
                 read_page(page_no, kicked_slot);
@@ -1230,8 +1230,8 @@ private:
                 int_type free_slot = _free_slots.front();
                 _free_slots.pop();
                 pager.hit(free_slot);
-                _last_page[page_no] = free_slot;
-                _page_no[free_slot] = page_no;
+                _page_to_slot[page_no] = free_slot;
+                _slot_to_page[free_slot] = page_no;
 
                 read_page(page_no, free_slot);
 
@@ -1255,10 +1255,10 @@ private:
         assert(page_no < _page_status.size());
         assert(!(_page_status[page_no] & dirty) &&
                "A dirty page has been marked as newly initialized. The page content will be lost.");
-        if (_last_page[page_no] != on_disk) {
+        if (_page_to_slot[page_no] != on_disk) {
 		// remove page from cache
-		_free_slots.push(_last_page[page_no]);
-		_last_page[page_no] = on_disk;
+		_free_slots.push(_page_to_slot[page_no]);
+		_page_to_slot[page_no] = on_disk;
 	}
         _page_status[page_no] = valid_on_disk;
     }
@@ -1291,18 +1291,18 @@ private:
     const_reference const_element(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
     {
         int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_last_page.size()));  // fails if offset is too large, out of bound access
-        int_type last_page = _last_page[page_no];
+        assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
+        int_type last_page = _page_to_slot[page_no];
         if (last_page < 0)                              // == on_disk
         {
             if (_free_slots.empty())                    // has to kick
             {
                 int_type kicked_slot = pager.kick();
                 pager.hit(kicked_slot);
-                int_type old_page_no = _page_no[kicked_slot];
-                _last_page[page_no] = kicked_slot;
-                _last_page[old_page_no] = on_disk;
-                _page_no[kicked_slot] = page_no;
+                int_type old_page_no = _slot_to_page[kicked_slot];
+                _page_to_slot[page_no] = kicked_slot;
+                _page_to_slot[old_page_no] = on_disk;
+                _slot_to_page[kicked_slot] = page_no;
 
                 write_page(old_page_no, kicked_slot);
                 read_page(page_no, kicked_slot);
@@ -1314,8 +1314,8 @@ private:
                 int_type free_slot = _free_slots.front();
                 _free_slots.pop();
                 pager.hit(free_slot);
-                _last_page[page_no] = free_slot;
-                _page_no[free_slot] = page_no;
+                _page_to_slot[page_no] = free_slot;
+                _slot_to_page[free_slot] = page_no;
 
                 read_page(page_no, free_slot);
 
