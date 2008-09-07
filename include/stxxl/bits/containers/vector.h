@@ -1158,6 +1158,8 @@ private:
     }
     void read_page(int_type page_no, int_type cache_page) const
     {
+        if (_page_status[page_no] == uninitialized)
+            return;
         STXXL_VERBOSE1("vector " << this << ": reading page_no=" << page_no << " cache_page=" << cache_page);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
@@ -1217,11 +1219,7 @@ private:
                 _page_no[kicked_page] = page_no;
 
                 write_page(old_page_no, kicked_page);
-
-                if (_page_status[page_no] != uninitialized)
-                {
-                    read_page(page_no, kicked_page);
-                }
+                read_page(page_no, kicked_page);
 
                 _page_status[page_no] = dirty;
 
@@ -1235,10 +1233,7 @@ private:
                 _last_page[page_no] = free_page;
                 _page_no[free_page] = page_no;
 
-                if (_page_status[page_no] != uninitialized)
-                {
-                    read_page(page_no, free_page);
-                }
+                read_page(page_no, free_page);
 
                 _page_status[page_no] = dirty;
 
@@ -1310,11 +1305,7 @@ private:
                 _page_no[kicked_page] = page_no;
 
                 write_page(old_page_no, kicked_page);
-
-                if (_page_status[page_no] != uninitialized)
-                {
-                    read_page(page_no, kicked_page);
-                }
+                read_page(page_no, kicked_page);
 
                 return _cache[kicked_page * page_size + offset.get_block1()][offset.get_offset()];
             }
@@ -1326,10 +1317,7 @@ private:
                 _last_page[page_no] = free_page;
                 _page_no[free_page] = page_no;
 
-                if (_page_status[page_no] != uninitialized)
-                {
-                    read_page(page_no, free_page);
-                }
+                read_page(page_no, free_page);
 
                 return _cache[free_page * page_size + offset.get_block1()][offset.get_offset()];
             }
