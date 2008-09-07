@@ -773,7 +773,7 @@ private:
     //bids_container_iterator _bids_finish;
     mutable pager_type pager;
 
-    enum { uninitialized = 1, dirty = 2 };
+    enum { valid_on_disk = 0, uninitialized = 1, dirty = 2 };
     mutable std::vector<unsigned char> _page_status;
     mutable std::vector<int_type> _last_page;
     mutable simple_vector<int_type> _page_no;
@@ -899,7 +899,7 @@ public:
 
             unsigned_type first_page_to_evict = div_and_round_up(new_bids_size, page_size);
             std::fill(_page_status.begin() + first_page_to_evict,
-                      _page_status.end(), 0); // clear dirty flag, so this pages
+                      _page_status.end(), valid_on_disk); // clear dirty flag, so these pages
                                               // will be never written
         }
 #endif
@@ -980,7 +980,7 @@ public:
         int_type i = 0;
         for ( ; i < all_pages; ++i)
         {
-            _page_status[i] = 0;
+            _page_status[i] = valid_on_disk;
             _last_page[i] = on_disk;
         }
 
@@ -1106,9 +1106,8 @@ public:
                 if (_page_status[page_no] & dirty)
                     write_page(page_no, i);
 
-
                 _last_page[page_no] = on_disk;
-                _page_status[page_no] = 0;
+                _page_status[page_no] = valid_on_disk;
             }
         }
     }
@@ -1271,7 +1270,7 @@ private:
 		_free_pages.push(_last_page[page_no]);
 		_last_page[page_no] = on_disk;
 	}
-        _page_status[page_no] = 0; // valid content on disk
+        _page_status[page_no] = valid_on_disk;
     }
 
 public:
@@ -1328,7 +1327,7 @@ public:
                     read_page(page_no, kicked_page);
                 }
 
-                _page_status[page_no] = 0;
+                _page_status[page_no] = valid_on_disk;
 
                 return _cache[kicked_page * page_size + offset.get_block1()][offset.get_offset()];
             }
@@ -1345,7 +1344,7 @@ public:
                     read_page(page_no, free_page);
                 }
 
-                _page_status[page_no] = 0;
+                _page_status[page_no] = valid_on_disk;
 
                 return _cache[free_page * page_size + offset.get_block1()][offset.get_offset()];
             }
