@@ -1156,15 +1156,15 @@ private:
                 static_cast<typename bids_container_type::size_type>
                 (offset.get_block2() * PgSz_ + offset.get_block1()));
     }
-    void read_page(int_type page_no, int_type cache_page) const
+    void read_page(int_type page_no, int_type cache_slot) const
     {
         if (_page_status[page_no] == uninitialized)
             return;
-        STXXL_VERBOSE1("vector " << this << ": reading page_no=" << page_no << " cache_page=" << cache_page);
+        STXXL_VERBOSE1("vector " << this << ": reading page_no=" << page_no << " cache_slot=" << cache_slot);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
-        int_type i = cache_page * page_size, j = 0;
+        int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
             reqs[j] = _cache[i].read(_bids[block_no]);
@@ -1173,15 +1173,15 @@ private:
         wait_all(reqs, last_block - page_no * page_size);
         delete[] reqs;
     }
-    void write_page(int_type page_no, int_type cache_page) const
+    void write_page(int_type page_no, int_type cache_slot) const
     {
         if (!(_page_status[page_no] & dirty))
             return;
-        STXXL_VERBOSE1("vector " << this << ": writing page_no=" << page_no << " cache_page=" << cache_page);
+        STXXL_VERBOSE1("vector " << this << ": writing page_no=" << page_no << " cache_slot=" << cache_slot);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
-        int_type i = cache_page * page_size, j = 0;
+        int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
             reqs[j] = _cache[i].write(_bids[block_no]);
@@ -1211,19 +1211,19 @@ private:
         {
             if (_free_slots.empty())                                   // has to kick
             {
-                int_type kicked_page = pager.kick();
-                pager.hit(kicked_page);
-                int_type old_page_no = _page_no[kicked_page];
-                _last_page[page_no] = kicked_page;
+                int_type kicked_slot = pager.kick();
+                pager.hit(kicked_slot);
+                int_type old_page_no = _page_no[kicked_slot];
+                _last_page[page_no] = kicked_slot;
                 _last_page[old_page_no] = on_disk;
-                _page_no[kicked_page] = page_no;
+                _page_no[kicked_slot] = page_no;
 
-                write_page(old_page_no, kicked_page);
-                read_page(page_no, kicked_page);
+                write_page(old_page_no, kicked_slot);
+                read_page(page_no, kicked_slot);
 
                 _page_status[page_no] = dirty;
 
-                return _cache[kicked_page * page_size + offset.get_block1()][offset.get_offset()];
+                return _cache[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
@@ -1297,17 +1297,17 @@ private:
         {
             if (_free_slots.empty())                    // has to kick
             {
-                int_type kicked_page = pager.kick();
-                pager.hit(kicked_page);
-                int_type old_page_no = _page_no[kicked_page];
-                _last_page[page_no] = kicked_page;
+                int_type kicked_slot = pager.kick();
+                pager.hit(kicked_slot);
+                int_type old_page_no = _page_no[kicked_slot];
+                _last_page[page_no] = kicked_slot;
                 _last_page[old_page_no] = on_disk;
-                _page_no[kicked_page] = page_no;
+                _page_no[kicked_slot] = page_no;
 
-                write_page(old_page_no, kicked_page);
-                read_page(page_no, kicked_page);
+                write_page(old_page_no, kicked_slot);
+                read_page(page_no, kicked_slot);
 
-                return _cache[kicked_page * page_size + offset.get_block1()][offset.get_offset()];
+                return _cache[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
