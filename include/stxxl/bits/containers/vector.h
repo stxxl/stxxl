@@ -1205,11 +1205,11 @@ private:
         assert(offset.get_pos() < size());
         #endif
         int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_page_to_slot.size()));              // fails if offset is too large, out of bound access
-        int_type last_page = _page_to_slot[page_no];
-        if (last_page < 0)                                             // == on_disk
+        assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
+        int_type cache_slot = _page_to_slot[page_no];
+        if (cache_slot < 0)                                 // == on_disk
         {
-            if (_free_slots.empty())                                   // has to kick
+            if (_free_slots.empty())                        // has to kick
             {
                 int_type kicked_slot = pager.kick();
                 pager.hit(kicked_slot);
@@ -1243,8 +1243,8 @@ private:
         else
         {
             _page_status[page_no] = dirty;
-            pager.hit(last_page);
-            return _cache[last_page * page_size + offset.get_block1()][offset.get_offset()];
+            pager.hit(cache_slot);
+            return _cache[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
 
@@ -1292,8 +1292,8 @@ private:
     {
         int_type page_no = offset.get_block2();
         assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
-        int_type last_page = _page_to_slot[page_no];
-        if (last_page < 0)                              // == on_disk
+        int_type cache_slot = _page_to_slot[page_no];
+        if (cache_slot < 0)                                 // == on_disk
         {
             if (_free_slots.empty())                    // has to kick
             {
@@ -1324,8 +1324,8 @@ private:
         }
         else
         {
-            pager.hit(last_page);
-            return _cache[last_page * page_size + offset.get_block1()][offset.get_offset()];
+            pager.hit(cache_slot);
+            return _cache[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
 };
