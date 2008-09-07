@@ -777,7 +777,7 @@ private:
     mutable std::vector<unsigned char> _page_status;
     mutable std::vector<int_type> _last_page;
     mutable simple_vector<int_type> _page_no;
-    mutable std::queue<int_type> _free_pages;
+    mutable std::queue<int_type> _free_slots;
     mutable simple_vector<block_type> _cache;
     file * _from;
     block_manager * bm;
@@ -824,7 +824,7 @@ public:
         }
 
         for (i = 0; i < n_pages; ++i)
-            _free_pages.push(i);
+            _free_slots.push(i);
 
 
         bm->new_blocks(_alloc_strategy, _bids.begin(),
@@ -840,7 +840,7 @@ public:
         std::swap(_page_status, obj._page_status);
         std::swap(_last_page, obj._last_page);
         std::swap(_page_no, obj._page_no);
-        std::swap(_free_pages, obj._free_pages);
+        std::swap(_free_slots, obj._free_slots);
         std::swap(_cache, obj._cache);
         std::swap(_from, obj._from);
     }
@@ -914,12 +914,12 @@ public:
         _bids.clear();
         _page_status.clear();
         _last_page.clear();
-        while (!_free_pages.empty())
-            _free_pages.pop();
+        while (!_free_slots.empty())
+            _free_slots.pop();
 
 
         for (int_type i = 0; i < n_pages; ++i)
-            _free_pages.push(i);
+            _free_slots.push(i);
     }
     void push_back(const_reference obj)
     {
@@ -985,7 +985,7 @@ public:
         }
 
         for (i = 0; i < n_pages; ++i)
-            _free_pages.push(i);
+            _free_slots.push(i);
 
 
         size_type offset = 0;
@@ -1019,7 +1019,7 @@ public:
         }
 
         for (i = 0; i < n_pages; ++i)
-            _free_pages.push(i);
+            _free_slots.push(i);
 
 
         bm->new_blocks(_alloc_strategy, _bids.begin(),
@@ -1083,23 +1083,23 @@ public:
 
     void flush() const
     {
-        simple_vector<bool> non_free_pages(n_pages);
+        simple_vector<bool> non_free_slots(n_pages);
         int_type i = 0;
         for ( ; i < n_pages; i++)
-            non_free_pages[i] = true;
+            non_free_slots[i] = true;
 
 
-        while (!_free_pages.empty())
+        while (!_free_slots.empty())
         {
-            non_free_pages[_free_pages.front()] = false;
-            _free_pages.pop();
+            non_free_slots[_free_slots.front()] = false;
+            _free_slots.pop();
         }
 
         for (i = 0; i < n_pages; i++)
         {
-            _free_pages.push(i);
+            _free_slots.push(i);
             int_type page_no = _page_no[i];
-            if (non_free_pages[i])
+            if (non_free_slots[i])
             {
                 STXXL_VERBOSE1("vector: flushing page " << i << " address: " << (int64(page_no) *
                                                                                  int64(block_type::size) * int64(page_size)));
@@ -1209,7 +1209,7 @@ private:
         int_type last_page = _last_page[page_no];
         if (last_page < 0)                                             // == on_disk
         {
-            if (_free_pages.empty())                                   // has to kick
+            if (_free_slots.empty())                                   // has to kick
             {
                 int_type kicked_page = pager.kick();
                 pager.hit(kicked_page);
@@ -1227,17 +1227,17 @@ private:
             }
             else
             {
-                int_type free_page = _free_pages.front();
-                _free_pages.pop();
-                pager.hit(free_page);
-                _last_page[page_no] = free_page;
-                _page_no[free_page] = page_no;
+                int_type free_slot = _free_slots.front();
+                _free_slots.pop();
+                pager.hit(free_slot);
+                _last_page[page_no] = free_slot;
+                _page_no[free_slot] = page_no;
 
-                read_page(page_no, free_page);
+                read_page(page_no, free_slot);
 
                 _page_status[page_no] = dirty;
 
-                return _cache[free_page * page_size + offset.get_block1()][offset.get_offset()];
+                return _cache[free_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
@@ -1257,7 +1257,7 @@ private:
                "A dirty page has been marked as newly initialized. The page content will be lost.");
         if (_last_page[page_no] != on_disk) {
 		// remove page from cache
-		_free_pages.push(_last_page[page_no]);
+		_free_slots.push(_last_page[page_no]);
 		_last_page[page_no] = on_disk;
 	}
         _page_status[page_no] = valid_on_disk;
@@ -1295,7 +1295,7 @@ private:
         int_type last_page = _last_page[page_no];
         if (last_page < 0)                              // == on_disk
         {
-            if (_free_pages.empty())                    // has to kick
+            if (_free_slots.empty())                    // has to kick
             {
                 int_type kicked_page = pager.kick();
                 pager.hit(kicked_page);
@@ -1311,15 +1311,15 @@ private:
             }
             else
             {
-                int_type free_page = _free_pages.front();
-                _free_pages.pop();
-                pager.hit(free_page);
-                _last_page[page_no] = free_page;
-                _page_no[free_page] = page_no;
+                int_type free_slot = _free_slots.front();
+                _free_slots.pop();
+                pager.hit(free_slot);
+                _last_page[page_no] = free_slot;
+                _page_no[free_slot] = page_no;
 
-                read_page(page_no, free_page);
+                read_page(page_no, free_slot);
 
-                return _cache[free_page * page_size + offset.get_block1()][offset.get_offset()];
+                return _cache[free_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
