@@ -883,6 +883,17 @@ public:
     {
 #ifndef STXXL_FREE_EXTMEMORY_ON_VECTOR_RESIZE
         reserve(n);
+        if (n < _size) {
+            // mark excess pages as uninitialized and evict them from cache
+            unsigned_type first_page_to_evict = div_and_round_up(n, block_type::size * page_size);
+            for (unsigned_type i = first_page_to_evict; i < _page_status.size(); ++i) {
+                if (_page_to_slot[i] != on_disk) {
+                    _free_slots.push(_page_to_slot[i]);
+                    _page_to_slot[i] = on_disk;
+                }
+                _page_status[i] = uninitialized;
+            }
+        }
 #else
         unsigned_type old_bids_size = _bids.size();
         unsigned_type new_bids_size = div_and_round_up(n, block_type::size);
