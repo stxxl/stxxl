@@ -1260,7 +1260,7 @@ private:
     }
 
     // don't forget to first flush() the vector's cache before updating pages externally
-    void _block_externally_updated(unsigned_type page_no) const
+    void page_externally_updated(unsigned_type page_no) const
     {
         // fails if offset is too large, out of bound access
         assert(page_no < _page_status.size());
@@ -1276,22 +1276,22 @@ private:
 
     void block_externally_updated(size_type offset) const
     {
-        _block_externally_updated(offset / (block_type::size * page_size));
+        page_externally_updated(offset / (block_type::size * page_size));
     }
 
     void block_externally_updated(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
     {
-        block_externally_updated(offset.get_block2());
+        page_externally_updated(offset.get_block2());
     }
 
     __STXXL_DEPRECATED(void touch(size_type offset) const)
     {
-        _block_externally_updated(offset / (block_type::size * page_size));
+        page_externally_updated(offset / (block_type::size * page_size));
     }
 
     __STXXL_DEPRECATED(void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const)
     {
-        _block_externally_updated(offset.get_block2());
+        page_externally_updated(offset.get_block2());
     }
 
     const_reference const_element(size_type offset) const
