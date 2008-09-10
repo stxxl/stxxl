@@ -40,7 +40,7 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
     _begin.flush();     // flush container
 
     // create prefetching stream,
-    buf_istream_type in(_begin.bid(), _end.bid() + ((_end.block_offset()) ? 1 : 0), nbuffers / 2);
+    buf_istream_type in(_begin.bid(), _end.bid() + ((_end.block_offset()) ? 1 : 0), nbuffers);
 
     _ExtIterator _cur = _begin - _begin.block_offset();
 
