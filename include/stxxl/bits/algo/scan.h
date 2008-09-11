@@ -166,7 +166,7 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
     while (_end != _begin)
     {
         if (_begin.block_offset() == 0)
-            _begin.touch();
+            _begin.block_externally_updated();
 
         *outstream = _generator();
         ++_begin;

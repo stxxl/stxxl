@@ -454,7 +454,7 @@ namespace stream
         while (!in.empty() && outend != outbegin)
         {
             if (outbegin.block_offset() == 0)
-                outbegin.touch();
+                outbegin.block_externally_updated();
 
             *outstream = *in;
             ++outbegin;
@@ -525,7 +525,7 @@ namespace stream
         while (!in.empty())
         {
             if (out.block_offset() == 0)
-                out.touch();
+                out.page_externally_updated();
             // tells the vector that the block was modified
             *outstream = *in;
             ++out;
