@@ -77,7 +77,7 @@ void config::init(const char * config_path)
                 tmp = split(tmp[1], ",");
                 DiskEntry entry = {
                     tmp[0], tmp[2],
-                    stxxl::int64(str2int(tmp[1])) * stxxl::int64(1024 * 1024),
+                    stxxl::int64(atoi(tmp[1].c_str())) * stxxl::int64(1024 * 1024),
                     false
                 };
                 if (is_disk)

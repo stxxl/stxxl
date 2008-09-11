@@ -307,9 +307,12 @@ inline stxxl::int64 atoint64(const char * s)
 
 #define STXXL_L2_SIZE  (512 * 1024)
 
-#define div_and_round_up(a, b) ((a) / (b) + !(!((a) % (b))))
+#define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
 
-#define log2(x) (log(x) / log(2.))
+inline double log2(double x)
+{
+    return (log(x) / log(2.));
+}
 
 ////////////////////////////////////////////////////////////////////////////
 
