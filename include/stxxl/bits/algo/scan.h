@@ -163,10 +163,18 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
 
     assert(_begin.block_offset() == 0);
 
+    // delay calling block_externally_updated() until the block is
+    // completely filled (and written out) in outstream
+    typename _ExtIterator::const_iterator prev_block = _begin;
+
     while (_end != _begin)
     {
-        if (_begin.block_offset() == 0)
-            _begin.block_externally_updated();
+        if (_begin.block_offset() == 0) {
+            if (prev_block != _begin) {
+                prev_block.block_externally_updated();
+                prev_block = _begin;
+            }
+        }
 
         *outstream = _generator();
         ++_begin;
@@ -181,6 +189,10 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
         ++out;
         ++outstream;
     }
+
+    if (prev_block != out)
+        prev_block.block_externally_updated();
+
     _begin.flush();
 }
 
