@@ -437,12 +437,12 @@ public:
     bool operator > (const _Self & a) const
     {
         assert(p_vector == a.p_vector);
-        return a > *this;
+        return offset > a.offset;
     }
     bool operator >= (const _Self & a) const
     {
         assert(p_vector == a.p_vector);
-        return a >= *this;
+        return offset >= a.offset;
     }
 
     bool operator == (const const_iterator & a) const
@@ -468,12 +468,12 @@ public:
     bool operator > (const const_iterator & a) const
     {
         assert(p_vector == a.p_vector);
-        return a > *this;
+        return offset > a.offset;
     }
     bool operator >= (const const_iterator & a) const
     {
         assert(p_vector == a.p_vector);
-        return a >= *this;
+        return offset >= a.offset;
     }
 
     void flush()
