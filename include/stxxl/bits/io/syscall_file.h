@@ -22,10 +22,14 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
+class syscall_request;
+
 //! \brief Implementation of file based on UNIX syscalls
 class syscall_file : public ufs_file_base
 {
 public:
+    typedef syscall_request request;
+	
     //! \brief constructs file object
     //! \param filename path of file
     //! \attention filename must be resided at memory disk partition

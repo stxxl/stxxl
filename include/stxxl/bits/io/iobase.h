@@ -217,13 +217,14 @@ class request : private noncopyable
     friend class disk_queues;
     friend class request_ptr;
 
-protected:
+public:
     virtual bool add_waiter(onoff_switch * sw) = 0;
     virtual void delete_waiter(onoff_switch * sw) = 0;
     //virtual void enqueue () = 0;
     virtual void serve() = 0;
     //virtual unsigned size() const;
 
+protected:
     completion_handler on_complete;
     int ref_cnt;
     std::auto_ptr<stxxl::io_error> error;

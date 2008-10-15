@@ -20,7 +20,7 @@ __STXXL_BEGIN_NAMESPACE
 
 void DiskAllocator::dump()
 {
-    stxxl::int64 total = 0;
+    int64 total = 0;
     sortseq::const_iterator cur = free_space.begin();
     STXXL_ERRMSG("Free regions dump:");
     for ( ; cur != free_space.end(); ++cur)
@@ -33,8 +33,8 @@ void DiskAllocator::dump()
 
 void config::init(const char * config_path)
 {
-    stxxl::logger::get_instance();
-    STXXL_MSG(stxxl::get_version_string());
+    logger::get_instance();
+    STXXL_MSG(get_version_string());
     std::vector<DiskEntry> flash_props;
     std::ifstream cfg_file(config_path);
     if (!cfg_file)
@@ -77,7 +77,7 @@ void config::init(const char * config_path)
                 tmp = split(tmp[1], ",");
                 DiskEntry entry = {
                     tmp[0], tmp[2],
-                    stxxl::int64(atoi(tmp[1].c_str())) * stxxl::int64(1024 * 1024),
+                    int64(atoi(tmp[1].c_str())) * int64(1024 * 1024),
                     false
                 };
                 if (is_disk)
@@ -114,7 +114,7 @@ void config::init(const char * config_path)
                       " MB, I/O implementation: " << (*it).io_impl);
         }
 #else
-        stxxl::int64 total_size = 0;
+        int64 total_size = 0;
         for (std::vector<DiskEntry>::const_iterator it =
                  disks_props.begin(); it != disks_props.end();
              it++)
@@ -127,33 +127,33 @@ void config::init(const char * config_path)
     }
 }
 
-stxxl::file * FileCreator::create(const std::string & io_impl,
+file * FileCreator::create(const std::string & io_impl,
                                   const std::string & filename,
                                   int options, int disk)
 {
     if (io_impl == "syscall")
     {
-        stxxl::ufs_file_base * result = new stxxl::syscall_file(filename, options, disk);
+        ufs_file_base * result = new syscall_file(filename, options, disk);
         result->lock();
         return result;
     }
 #ifndef BOOST_MSVC
     else if (io_impl == "mmap")
     {
-        stxxl::ufs_file_base * result = new stxxl::mmap_file(filename, options, disk);
+        ufs_file_base * result = new mmap_file(filename, options, disk);
         result->lock();
         return result;
     }
     else if (io_impl == "simdisk")
     {
-        stxxl::ufs_file_base * result = new stxxl::sim_disk_file(filename, options, disk);
+        ufs_file_base * result = new sim_disk_file(filename, options, disk);
         result->lock();
         return result;
     }
 #else
     else if (io_impl == "wincall")
     {
-        stxxl::wfs_file_base * result = new stxxl::wincall_file(filename, options, disk);
+        wfs_file_base * result = new wincall_file(filename, options, disk);
         result->lock();
         return result;
     }
@@ -161,12 +161,18 @@ stxxl::file * FileCreator::create(const std::string & io_impl,
 #ifdef STXXL_BOOST_CONFIG
     else if (io_impl == "boostfd")
     {
-        return new stxxl::boostfd_file(filename, options, disk);
+        return new boostfd_file(filename, options, disk);
     }
 #endif
     else if (io_impl == "memory")
     {
-        stxxl::mem_file * result = new stxxl::mem_file(disk);
+        mem_file * result = new mem_file(disk);
+        result->lock();
+        return result;
+    }
+    else if (io_impl == "fileperblock")
+    {
+        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, 8 * 1048576, disk);
         result->lock();
         return result;
     }
@@ -185,13 +191,13 @@ block_manager::block_manager()
 
     ndisks = cfg->disks_number();
     disk_allocators = new DiskAllocator *[ndisks];
-    disk_files = new stxxl::file *[ndisks];
+    disk_files = new file *[ndisks];
 
     for (unsigned i = 0; i < ndisks; i++)
     {
         disk_files[i] = fc.create(cfg->disk_io_impl(i),
                                   cfg->disk_path(i),
-                                  stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT, i);
+                                  file::CREAT | file::RDWR | file::DIRECT, i);
         disk_files[i]->set_size(cfg->disk_size(i));
         disk_allocators[i] = new DiskAllocator(cfg->disk_size(i));
     }
