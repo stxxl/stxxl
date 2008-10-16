@@ -11,6 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <sstream>
 #include <stxxl/mng>
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/version.h>
@@ -170,9 +171,16 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
-    else if (io_impl == "fileperblock")
+    else if (io_impl.find_first_of("fileperblock(") == 0)
     {
-        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, 8 * 1048576, disk);
+        std::istringstream input(io_impl);
+        input.ignore(std::string("fileperblock(").size());
+        size_t block_size;
+        input >> block_size;
+        if(block_size <= 0)
+            STXXL_THROW(std::runtime_error, "FileCreator::create", "No/incorrect block size given for fileperblock.");
+
+        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, block_size, disk);
         result->lock();
         return result;
     }
