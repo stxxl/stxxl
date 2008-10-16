@@ -40,6 +40,8 @@ protected:
     int mode_;
 
 public:
+    typedef boostfd_request request;
+
     boostfd_file(const std::string & filename, int mode, int disk = -1);
     fd_type get_file_des() const;
     ~boostfd_file();

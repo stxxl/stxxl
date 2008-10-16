@@ -28,10 +28,14 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
+class wincall_request;
+
 //! \brief Implementation of file based on Windows native I/O calls
 class wincall_file : public wfs_file_base
 {
 public:
+    typedef wincall_request request;
+
     //! \brief constructs file object
     //! \param filename path of file
     //! \attention filename must be resided at memory disk partition

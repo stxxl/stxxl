@@ -33,10 +33,14 @@ __STXXL_BEGIN_NAMESPACE
 //! for various file access methods
 //! \{
 
+class mmap_request;
+
 //! \brief Implementation of memory mapped access file
 class mmap_file : public ufs_file_base
 {
 public:
+    typedef mmap_request request;
+
     //! \brief constructs file object
     //! \param filename path of file
     //! \param mode open mode, see \c stxxl::file::open_modes

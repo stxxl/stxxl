@@ -105,6 +105,8 @@ class sim_disk_request;
 class sim_disk_file : public ufs_file_base, public IC35L080AVVA07
 {
 public:
+    typedef sim_disk_request request;
+
     //! \brief constructs file object
     //! \param filename path of file
     //! \attention filename must be resided at memory disk partition

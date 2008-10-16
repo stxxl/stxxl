@@ -21,6 +21,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
+class mem_request;
+
 //! \brief Implementation of file based on new[] and memcpy
 class mem_file : public file
 {
@@ -28,6 +30,8 @@ class mem_file : public file
     unsigned_type sz;
 
 public:
+    typedef mem_request request;
+
     //! \brief constructs file object
     //! \param disk disk(file) identifier
     mem_file(
