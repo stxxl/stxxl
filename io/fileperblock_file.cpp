@@ -136,12 +136,19 @@ template<class base_file_type>
 void fileperblock_request<base_file_type>::wait()
 {
     base_request->wait();
+    delete base_file;
+    base_file = NULL;
 }
 
 template<class base_file_type>
 bool fileperblock_request<base_file_type>::poll()
 {
-    return base_request->poll();
+    bool finished = base_request->poll();
+    if(finished) {
+        delete base_file;
+        base_file = NULL;
+    }
+    return finished;
 }
 
 ////////////////////////////////////////////////////////////////////////////
