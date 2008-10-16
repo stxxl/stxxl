@@ -19,20 +19,20 @@ __STXXL_BEGIN_NAMESPACE
 
 template<class base_file_type>
 fileperblock_file<base_file_type>::fileperblock_file(
-    const std::string & filename,
+    const std::string & filename_prefix,
     int mode,
     unsigned_type block_size,
     int disk)
-        : file(disk), filename(filename), mode(mode), block_size(block_size), disk(disk)
+        : file(disk), filename_prefix(filename_prefix), mode(mode), block_size(block_size), disk(disk)
 {
 }
 
 template<class base_file_type>
-std::string fileperblock_file<base_file_type>::file_name_for_block(unsigned_type offset)
+std::string fileperblock_file<base_file_type>::filename_for_block(unsigned_type offset)
 {
     std::ostringstream name;
     //enough for 1 billion blocks
-    name << filename << "_fpb_" << std::setw(9) << std::setfill('0') << (offset / block_size);
+    name << filename_prefix << "_fpb_" << std::setw(9) << std::setfill('0') << (offset / block_size);
     return name.str();
 }
 
@@ -66,7 +66,7 @@ template<class base_file_type>
 void fileperblock_file<base_file_type>::delete_region(int64 offset, unsigned_type length)
 {
     if(length == block_size)
-        ::remove(file_name_for_block(offset).c_str());
+        ::remove(filename_for_block(offset).c_str());
     STXXL_VERBOSE0("delete_region " << offset << " + " << length)
 }
 
@@ -82,6 +82,15 @@ int64 fileperblock_file<base_file_type>::block_offset(int64 offset)
     return offset % block_size;
 }
 
+template<class base_file_type>
+void fileperblock_file<base_file_type>::export_files(stxxl::int64 offset, std::string filename)
+{
+    std::string original(filename_for_block(offset));
+    filename.insert(0, original.substr(0, original.find_last_of("/") + 1));
+    ::remove(filename.c_str());
+    ::rename(original.c_str(), filename.c_str());
+}
+
 ////////////////////////////////////////////////////////////////////////////
 
 template<class base_file_type>
@@ -94,7 +103,7 @@ fileperblock_request<base_file_type>::fileperblock_request(
     completion_handler on_completion)
    :
     request(on_completion, f, buffer, offset, length, read_or_write),
-    base_file (new base_file_type(f->file_name_for_block(offset), f->mode, f->disk)),
+    base_file (new base_file_type(f->filename_for_block(offset), f->mode, f->disk)),
     base_request(read_or_write == request::READ ?
         base_file->aread(buffer, f->block_offset(offset), length, on_completion) :
         base_file->awrite(buffer, f->block_offset(offset), length, on_completion))

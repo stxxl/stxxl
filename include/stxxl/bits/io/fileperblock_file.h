@@ -34,7 +34,7 @@ class fileperblock_file : public file
     friend class fileperblock_request<base_file_type>;
 
 private:
-    std::string filename;
+    std::string filename_prefix;
     int mode;
     unsigned_type block_size;
     int disk;
@@ -42,7 +42,7 @@ private:
 
 protected:
     //! \brief Constructs a file name for a given block.
-    std::string file_name_for_block(unsigned_type offset);
+    std::string filename_for_block(unsigned_type offset);
 
     //! \brief Check whether the addresses are feasible in for this configuration.
     bool feasible(int64 offset, size_t length);
@@ -52,11 +52,11 @@ protected:
 
 public:
     //! \brief constructs file object
-    //! \param filename base filename, numbering will be appended to it
+    //! \param filename_prefix  filename prefix, numbering will be appended to it
     //! \param mode open mode, see \c file::open_modes
     //! \param disk disk(file) identifier
     fileperblock_file(
-        const std::string & filename,
+        const std::string & filename_prefix,
         int mode,
         unsigned_type block_size,
         int disk = -1);
@@ -96,6 +96,9 @@ public:
     //! \brief Frees the specified region.
     //! Actually deletes the corresponding file if the whole thing is deleted.
     virtual void delete_region(int64 offset, unsigned_type length);
+
+    //! Rename the file corresponding to the offset such that it is out of reach for deleting.
+    virtual void export_files(stxxl::int64 offset, std::string filename);
 };
 
 //! \brief Request type associated with fileperblock_file.

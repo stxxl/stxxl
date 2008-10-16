@@ -1142,6 +1142,19 @@ public:
         }
     }
 
+    //! \brief Export data such that it is persistent on the file system.
+    //! Resulting files will be numbered ascending.
+    void export_files(std::string filename_prefix)
+    {
+        int64 no = 0;
+        for(bids_container_iterator i = _bids.begin(); i != _bids.end(); ++i) {
+            std::ostringstream number;
+            number << std::setw(9) << std::setfill('0') << no;
+            (*i).storage->export_files((*i).offset, filename_prefix + number.str());
+            ++no;
+        }
+    }
+
 private:
     bids_container_iterator bid(const size_type & offset)
     {

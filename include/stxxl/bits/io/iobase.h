@@ -195,6 +195,12 @@ public:
     }
 
     virtual ~file() { }
+
+    virtual void export_files(stxxl::int64 offset, std::string prefix)
+    {
+        UNUSED(offset);
+        UNUSED(prefix);
+    }
 };
 
 class mc;
