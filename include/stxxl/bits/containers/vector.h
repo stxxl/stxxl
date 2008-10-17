@@ -782,6 +782,7 @@ private:
     file * _from;
     block_manager * bm;
     config * cfg;
+    bool exported;
 
     size_type size_from_file_length(stxxl::uint64 file_length)
     {
@@ -810,7 +811,8 @@ public:
         _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
         _slot_to_page(n_pages),
         _cache(n_pages * page_size),
-        _from(NULL)
+        _from(NULL),
+        exported(false)
     {
         bm = block_manager::get_instance();
         cfg = config::get_instance();
@@ -971,7 +973,8 @@ public:
         _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
         _slot_to_page(n_pages),
         _cache(n_pages * page_size),
-        _from(from)
+        _from(from),
+        exported(false)
     {
         // initialize from file
         assert(from->get_id() == -1);
@@ -1018,6 +1021,7 @@ public:
         _cache(n_pages * page_size),
         _from(NULL)
     {
+        assert(!obj.exported);
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
@@ -1039,6 +1043,53 @@ public:
         const_iterator inbegin = obj.begin();
         const_iterator inend = obj.end();
         std::copy(inbegin, inend, begin());
+    }
+
+    //! \brief Construct vector from a number of disks
+    template<typename DiskIterator>
+    vector(DiskIterator begin_disks, DiskIterator end_disks, int64 length) :
+        _size(length),
+        _bids(STXXL_DIVRU(_size, size_type(block_type::size))),
+        _page_status(STXXL_DIVRU(_bids.size(), page_size)),
+        _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
+        _slot_to_page(n_pages),
+        _cache(n_pages * page_size),
+        exported(false)
+    {
+        if (block_type::has_filler)
+        {
+            std::ostringstream str_;
+            str_ << "The block size for the vector, mapped to a file must me a multiple of the element size (" <<
+            sizeof(value_type) << ") and the page size (4096).";
+            throw std::runtime_error(str_.str());
+        }
+
+        bm = block_manager::get_instance();
+        cfg = config::get_instance();
+
+        int_type all_pages = STXXL_DIVRU(_bids.size(), page_size);
+        int_type i = 0;
+        for ( ; i < all_pages; ++i)
+        {
+            _page_status[i] = valid_on_disk;
+            _page_to_slot[i] = on_disk;
+        }
+
+        for (i = 0; i < n_pages; ++i)
+            _free_slots.push(i);
+
+        size_type offset = 0;
+        bids_container_iterator it = _bids.begin();
+        for ( ; it != _bids.end(); offset += size_type(block_type::raw_size))
+        {
+            for(DiskIterator d = begin_disks; d != end_disks && it != _bids.end(); ++d)
+            {
+                (*it).storage = *d;
+                (*it).offset = offset;
+                (*d)->set_size(offset + block_type::raw_size);
+                ++it;
+            }
+        }
     }
 
     vector & operator = (const vector & obj)
@@ -1131,14 +1182,17 @@ public:
             STXXL_VERBOSE("An exception in the ~vector()");
         }
 
-        bm->delete_blocks(_bids.begin(), _bids.end());
-
-        if (_from)        // file must be truncated
+        if(!exported)
         {
-            STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
-                                                               << file_length());
-            STXXL_VERBOSE1("~vector(): size of the vector is " << size());
-            _from->set_size(file_length());
+            bm->delete_blocks(_bids.begin(), _bids.end());
+
+            if (_from)        // file must be truncated
+            {
+                STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
+                                                                << file_length());
+                STXXL_VERBOSE1("~vector(): size of the vector is " << size());
+                _from->set_size(file_length());
+            }
         }
     }
 
@@ -1153,6 +1207,7 @@ public:
             (*i).storage->export_files((*i).offset, filename_prefix + number.str());
             ++no;
         }
+        exported = true;
     }
 
 private:

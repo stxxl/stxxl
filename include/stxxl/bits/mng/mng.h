@@ -1223,6 +1223,9 @@ public:
     template <unsigned BLK_SIZE>
     void delete_block(const BID<BLK_SIZE> & bid);
 
+    unsigned get_num_diskfiles() const { return ndisks; }
+    file** get_diskfiles() { return disk_files; }
+
     ~block_manager();
 };
 
