@@ -1082,8 +1082,10 @@ public:
         bids_container_iterator it = _bids.begin();
         for ( ; it != _bids.end(); offset += size_type(block_type::raw_size))
         {
+            //round-robin
             for(DiskIterator d = begin_disks; d != end_disks && it != _bids.end(); ++d)
             {
+                //construct block ID
                 (*it).storage = *d;
                 (*it).offset = offset;
                 (*d)->set_size(offset + block_type::raw_size);
