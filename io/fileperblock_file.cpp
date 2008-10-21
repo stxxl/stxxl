@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/syscall_file.h>
+#include <stxxl/bits/io/mmap_file.h>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -164,5 +165,8 @@ bool fileperblock_request<base_file_type>::poll()
 
 template class fileperblock_file<syscall_file>;
 template class fileperblock_request<syscall_file>;
+
+template class fileperblock_file<mmap_file>;
+template class fileperblock_request<mmap_file>;
 
 __STXXL_END_NAMESPACE
