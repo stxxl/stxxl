@@ -1045,55 +1045,6 @@ public:
         std::copy(inbegin, inend, begin());
     }
 
-    //! \brief Construct vector from a number of disks
-    template<typename DiskIterator>
-    vector(DiskIterator begin_disks, DiskIterator end_disks, int64 length) :
-        _size(length),
-        _bids(STXXL_DIVRU(_size, size_type(block_type::size))),
-        _page_status(STXXL_DIVRU(_bids.size(), page_size)),
-        _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
-        _slot_to_page(n_pages),
-        _cache(n_pages * page_size),
-        exported(false)
-    {
-        if (block_type::has_filler)
-        {
-            std::ostringstream str_;
-            str_ << "The block size for the vector, mapped to a file must me a multiple of the element size (" <<
-            sizeof(value_type) << ") and the page size (4096).";
-            throw std::runtime_error(str_.str());
-        }
-
-        bm = block_manager::get_instance();
-        cfg = config::get_instance();
-
-        int_type all_pages = STXXL_DIVRU(_bids.size(), page_size);
-        int_type i = 0;
-        for ( ; i < all_pages; ++i)
-        {
-            _page_status[i] = valid_on_disk;
-            _page_to_slot[i] = on_disk;
-        }
-
-        for (i = 0; i < n_pages; ++i)
-            _free_slots.push(i);
-
-        size_type offset = 0;
-        bids_container_iterator it = _bids.begin();
-        for ( ; it != _bids.end(); offset += size_type(block_type::raw_size))
-        {
-            //round-robin
-            for(DiskIterator d = begin_disks; d != end_disks && it != _bids.end(); ++d)
-            {
-                //construct block ID
-                (*it).storage = *d;
-                (*it).offset = offset;
-                (*d)->set_size(offset + block_type::raw_size);
-                ++it;
-            }
-        }
-    }
-
     vector & operator = (const vector & obj)
     {
         if (&obj != this)
