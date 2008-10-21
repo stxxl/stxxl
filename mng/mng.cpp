@@ -171,7 +171,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
-    else if (io_impl.find_first_of("fileperblock_syscall(") == 0)
+    else if (io_impl.find("fileperblock_syscall(") == 0)
     {
         std::istringstream input(io_impl);
         input.ignore(std::string("fileperblock_syscall(").size());
@@ -184,7 +184,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
-    else if (io_impl.find_first_of("fileperblock_mmap(") == 0)
+    else if (io_impl.find("fileperblock_mmap(") == 0)
     {
         std::istringstream input(io_impl);
         input.ignore(std::string("fileperblock_mmap(").size());
