@@ -110,7 +110,7 @@ class fileperblock_request : public request
     typedef typename base_file_type::request base_request_type;
 
     base_file_type* base_file;
-    request_ptr base_request;
+    request_ptr* base_request;
 
 protected:
     //! Constructs the request.

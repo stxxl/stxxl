@@ -31,7 +31,6 @@ void mmap_request::serve()
     {
         iostats->write_started(size());
     }
-    file_->set_size(offset+bytes);
 
     try
     {

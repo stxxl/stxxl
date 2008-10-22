@@ -66,15 +66,16 @@ request_ptr fileperblock_file<base_file_type>::awrite(
 template<class base_file_type>
 void fileperblock_file<base_file_type>::delete_region(int64 offset, unsigned_type length)
 {
-    if(length == block_size)
-        ::remove(filename_for_block(offset).c_str());
+    assert(feasible(offset, length));
+    ::remove(filename_for_block(offset).c_str());
     STXXL_VERBOSE0("delete_region " << offset << " + " << length)
 }
 
 template<class base_file_type>
 bool fileperblock_file<base_file_type>::feasible(int64 offset, size_t length)
 {
-    return (offset % block_size + length) <= block_size;
+//    return (offset % block_size + length) <= block_size;
+    return (block_offset(offset) == 0) && (length == block_size);
 }
 
 template<class base_file_type>
@@ -104,24 +105,27 @@ fileperblock_request<base_file_type>::fileperblock_request(
     completion_handler on_completion)
    :
     request(on_completion, f, buffer, offset, length, read_or_write),
-    base_file (new base_file_type(f->filename_for_block(offset), f->mode, f->disk)),
-    base_request(read_or_write == request::READ ?
-        base_file->aread(buffer, f->block_offset(offset), length, on_completion) :
-        base_file->awrite(buffer, f->block_offset(offset), length, on_completion))
+    base_file (new base_file_type(f->filename_for_block(offset), f->mode, f->disk))
 {
     assert(f->feasible(offset, length));
+    base_file->set_size(f->block_size);
+    base_request = new request_ptr
+       (read_or_write == request::READ ?
+        base_file->aread(buffer, 0, length, on_completion) :
+        base_file->awrite(buffer, 0, length, on_completion));
 }
 
 template<class base_file_type>
 fileperblock_request<base_file_type>::~fileperblock_request()
 {
+    delete base_request;
     delete base_file;
 }
 
 template<class base_file_type>
 void fileperblock_request<base_file_type>::serve()
 {
-    base_request->serve();
+    (*base_request)->serve();
 }
 
 template<class base_file_type>
@@ -133,19 +137,19 @@ const char * fileperblock_request<base_file_type>::io_type()
 template<class base_file_type>
 bool fileperblock_request<base_file_type>::add_waiter(onoff_switch * sw)
 {
-    return base_request->add_waiter(sw);
+    return (*base_request)->add_waiter(sw);
 }
 
 template<class base_file_type>
 void fileperblock_request<base_file_type>::delete_waiter(onoff_switch * sw)
 {
-    return base_request->delete_waiter(sw);
+    (*base_request)->delete_waiter(sw);
 }
 
 template<class base_file_type>
 void fileperblock_request<base_file_type>::wait()
 {
-    base_request->wait();
+    (*base_request)->wait();
     delete base_file;
     base_file = NULL;
 }
@@ -153,7 +157,7 @@ void fileperblock_request<base_file_type>::wait()
 template<class base_file_type>
 bool fileperblock_request<base_file_type>::poll()
 {
-    bool finished = base_request->poll();
+    bool finished = (*base_request)->poll();
     if(finished) {
         delete base_file;
         base_file = NULL;
