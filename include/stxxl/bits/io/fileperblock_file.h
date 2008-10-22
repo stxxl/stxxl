@@ -98,7 +98,7 @@ public:
     virtual void delete_region(int64 offset, unsigned_type length);
 
     //! Rename the file corresponding to the offset such that it is out of reach for deleting.
-    virtual void export_files(stxxl::int64 offset, std::string filename);
+    virtual void export_files(int64 offset, int64 length, std::string filename);
 };
 
 //! \brief Request type associated with fileperblock_file.

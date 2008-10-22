@@ -85,12 +85,13 @@ int64 fileperblock_file<base_file_type>::block_offset(int64 offset)
 }
 
 template<class base_file_type>
-void fileperblock_file<base_file_type>::export_files(stxxl::int64 offset, std::string filename)
+void fileperblock_file<base_file_type>::export_files(int64 offset, int64 length, std::string filename)
 {
     std::string original(filename_for_block(offset));
     filename.insert(0, original.substr(0, original.find_last_of("/") + 1));
     ::remove(filename.c_str());
     ::rename(original.c_str(), filename.c_str());
+    ::truncate(filename.c_str(), length);
 }
 
 ////////////////////////////////////////////////////////////////////////////

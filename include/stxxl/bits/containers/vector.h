@@ -1157,7 +1157,10 @@ public:
         for(bids_container_iterator i = _bids.begin(); i != _bids.end(); ++i) {
             std::ostringstream number;
             number << std::setw(9) << std::setfill('0') << no;
-            (*i).storage->export_files((*i).offset, filename_prefix + number.str());
+            if((i + 1) == _bids.end() && _size % block_type::size != 0)
+                (*i).storage->export_files((*i).offset, _size % block_type::size, filename_prefix + number.str());
+            else
+                (*i).storage->export_files((*i).offset, block_type::size, filename_prefix + number.str());
             ++no;
         }
         exported = true;
