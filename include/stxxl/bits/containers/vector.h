@@ -1158,9 +1158,9 @@ public:
             std::ostringstream number;
             number << std::setw(9) << std::setfill('0') << no;
             if((i + 1) == _bids.end() && _size % block_type::size != 0)
-                (*i).storage->export_files((*i).offset, _size % block_type::size, filename_prefix + number.str());
+                (*i).storage->export_files((*i).offset, (_size % block_type::size) * sizeof(value_type), filename_prefix + number.str());
             else
-                (*i).storage->export_files((*i).offset, block_type::size, filename_prefix + number.str());
+                (*i).storage->export_files((*i).offset, block_type::size * sizeof(value_type), filename_prefix + number.str());
             ++no;
         }
         exported = true;
