@@ -53,10 +53,7 @@
 #endif
 
 #ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
-// Boost.Threads headers
  #include <boost/thread/thread.hpp>
- #include <boost/thread/mutex.hpp>
- #include <boost/bind.hpp>
 #else
  #include <pthread.h>
 #endif
@@ -75,6 +72,7 @@
 
 #if defined (__linux__)
 //#include <asm/fcntl.h>
+// FIXME: In which conditions is this not defined? Why only i386 and alpha? Why not amd64?
  #if !defined (O_DIRECT) && (defined (__alpha__) || defined (__i386__))
   #define O_DIRECT 040000       /* direct disk access */
  #endif
@@ -197,7 +195,6 @@ public:
     virtual ~file() { }
 };
 
-class mc;
 class disk_queue;
 class disk_queues;
 

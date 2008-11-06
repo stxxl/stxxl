@@ -12,6 +12,10 @@
 
 #include <stxxl/bits/io/iobase.h>
 
+#ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
+ #include <boost/bind.hpp>
+#endif
+
 
 __STXXL_BEGIN_NAMESPACE
 
