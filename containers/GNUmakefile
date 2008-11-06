@@ -9,7 +9,9 @@ ENABLE_TPIE			?= no
 TESTS-yes			+= $(TESTS_NON_MSVC)
 TESTS-yes			+= $(TESTS_BTREE:%=btree/%)
 TESTS-$(ENABLE_BDB)$(ENABLE_TPIE)	+= $(TESTS_BDB)
+ifneq ($(strip $(USE_BOOST)),yes)
 TESTS-$(ENABLE_LEDASM)		+= $(TESTS_LEDASM)
+endif
 TESTS-$(ENABLE_TPIE)		+= $(TESTS_TPIE)
 
 include $(TOPDIR)/Makefile.subdir.gnu
