@@ -42,22 +42,32 @@ $(HOST)-%.cr.log:
 	$(RM) $(foreach d,$(DISKS_$*),$(call disk2file,$d))
 	$(do-some-disks)
 
+$(HOST)-%.crx.log: FLAGS_EX = W
+$(HOST)-%.crx.log:
+	$(RM) $(foreach d,$(DISKS_$*),$(call disk2file,$d))
+	$(do-some-disks)
+
+# interleaved write-read-test
 $(HOST)-%.wr.log:
 	$(do-some-disks)
 
+# scanning write
 $(HOST)-%.wrx.log: FLAGS_EX = W
 $(HOST)-%.wrx.log:
 	$(do-some-disks)
 
+# scanning read
 $(HOST)-%.rdx.log: FLAGS_EX = R
 $(HOST)-%.rdx.log:
 	$(do-some-disks)
 
-all: cr wr ex
+all: crx wr ex
 
+crx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.crx.log)
 cr: $(foreach d,$(DISKS_1by1),$(HOST)-$d.cr.log)
 wr: $(foreach d,$(DISKS),$(HOST)-$d.wr.log)
 ex: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
+ex+: $(foreach d,$(DISKS),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 
 plot: $(HOST).gnuplot
 	gnuplot $<
@@ -77,6 +87,9 @@ define plotline-cr1
 endef
 define plotline-cr
 	$(call plotline,$1,$2,7,cr)
+endef
+define plotline-crx
+	$(call plotline,$1,$2,7,crx)
 endef
 define plotline-wr
 	$(call plotline,$1,$2,7,wr)
@@ -109,15 +122,19 @@ $(HOST).gnuplot: Makefile $(wildcard *.log)
 	echo 'plot [0:$(PLOTXMAX)] [0:$(PLOTYMAX)] \' >> $@
 	$(foreach d,$(DISKS_1by1),\
 		$(call plotline-cr1,$(HOST)-$d.cr1.log,$(call disk2label,$d)) \
+		$(call plotline-crx,$(HOST)-$d.crx.log,$(call disk2label,$d)) \
+		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
+		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
 		$(call plotline-cr,$(HOST)-$d.cr.log,$(call disk2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
-		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
-		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
 	)
 	$(foreach d,$(filter-out $(DISKS_1by1),$(DISKS)),\
+		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
+		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
-		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disks2label,$d)))
+		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
+	)
 	echo '        "nothing" notitle' >> $@
 
 	echo '' >> $@
