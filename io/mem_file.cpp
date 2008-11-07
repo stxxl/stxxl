@@ -92,10 +92,6 @@ void mem_request::wait()
 
     stats::scoped_wait_timer wait_timer;
 
-#ifdef NO_OVERLAPPING
-    enqueue();
-#endif
-
     _state.wait_for(READY2DIE);
 
     check_errors();
@@ -103,10 +99,6 @@ void mem_request::wait()
 
 bool mem_request::poll()
 {
-#ifdef NO_OVERLAPPING
-    /*if(_state () < DONE)*/ wait();
-#endif
-
     bool s = _state() >= DONE;
 
     check_errors();
@@ -227,9 +219,8 @@ request_ptr mem_file::aread(
     if (!req.get())
         stxxl_function_error(io_error);
 
-#ifndef NO_OVERLAPPING
     disk_queues::get_instance()->add_readreq(req, get_id());
-#endif
+
     return req;
 }
 
@@ -245,9 +236,8 @@ request_ptr mem_file::awrite(
     if (!req.get())
         stxxl_function_error(io_error);
 
-#ifndef NO_OVERLAPPING
     disk_queues::get_instance()->add_writereq(req, get_id());
-#endif
+
     return req;
 }
 

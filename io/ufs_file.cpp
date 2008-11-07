@@ -103,10 +103,6 @@ void ufs_request_base::wait()
 
     stats::scoped_wait_timer wait_timer;
 
-#ifdef NO_OVERLAPPING
-    enqueue();
-#endif
-
     _state.wait_for(READY2DIE);
 
     check_errors();
@@ -114,10 +110,6 @@ void ufs_request_base::wait()
 
 bool ufs_request_base::poll()
 {
-#ifdef NO_OVERLAPPING
-    /*if(_state () < DONE)*/ wait();
-#endif
-
     bool s = _state() >= DONE;
 
     check_errors();
