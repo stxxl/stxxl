@@ -53,10 +53,7 @@
 #endif
 
 #ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
-// Boost.Threads headers
  #include <boost/thread/thread.hpp>
- #include <boost/thread/mutex.hpp>
- #include <boost/bind.hpp>
 #else
  #include <pthread.h>
 #endif
@@ -75,6 +72,7 @@
 
 #if defined (__linux__)
 //#include <asm/fcntl.h>
+// FIXME: In which conditions is this not defined? Why only i386 and alpha? Why not amd64?
  #if !defined (O_DIRECT) && (defined (__alpha__) || defined (__i386__))
   #define O_DIRECT 040000       /* direct disk access */
  #endif
@@ -184,8 +182,8 @@ public:
         return id;
     }
 
-    //! \brief Locks file for reading and writing
-    virtual void lock() { }
+    //! \brief Locks file for reading and writing (aquires a lock in the file system)
+    virtual void lock() = 0;
 
     //! \brief Some specialized file types may need to know freed regions
     virtual void delete_region(int64 offset, unsigned_type size)
@@ -204,7 +202,6 @@ public:
     }
 };
 
-class mc;
 class disk_queue;
 class disk_queues;
 
@@ -229,7 +226,6 @@ public:
     virtual void delete_waiter(onoff_switch * sw) = 0;
     //virtual void enqueue () = 0;
     virtual void serve() = 0;
-    //virtual unsigned size() const;
 
 protected:
     completion_handler on_complete;

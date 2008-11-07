@@ -25,11 +25,6 @@ wfs_request_base::wfs_request_base(
     request_type t,
     completion_handler on_cmpl) :
     request(on_cmpl, f, buf, off, b, t),
-    /*		file (f),
-                    buffer (buf),
-                    offset (off),
-                    bytes (b),
-                    type(t), */
     _state(OP)
 {
  #ifdef STXXL_CHECK_BLOCK_ALIGNING
@@ -103,10 +98,6 @@ void wfs_request_base::wait()
 
     stats::scoped_wait_timer wait_timer;
 
- #ifdef NO_OVERLAPPING
-    enqueue();
- #endif
-
     _state.wait_for(READY2DIE);
 
     check_errors();
@@ -114,10 +105,6 @@ void wfs_request_base::wait()
 
 bool wfs_request_base::poll()
 {
- #ifdef NO_OVERLAPPING
-    /*if(_state () < DONE)*/ wait();
- #endif
-
     bool s = _state() >= DONE;
 
     check_errors();

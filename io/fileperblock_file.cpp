@@ -85,6 +85,12 @@ int64 fileperblock_file<base_file_type>::block_offset(int64 offset)
 }
 
 template<class base_file_type>
+void fileperblock_file<base_file_type>::lock()
+{
+    // not yet implemented, maybe not needed
+}
+
+template<class base_file_type>
 void fileperblock_file<base_file_type>::export_files(int64 offset, int64 length, std::string filename)
 {
     std::string original(filename_for_block(offset));

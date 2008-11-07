@@ -140,6 +140,13 @@
  * but you should not share a data structure between threads (without implementing proper locking yourself).<br>
  * This is a design choice, having the data structures thread-safe would mean a significant performance loss.
  *
+ *
+ * \section q3 I have configured several disks to use with \c S<small>TXXL</small>. Why \c S<small>TXXL</small> fails complaining about the lack of space, according to my calclulations the space on disks should be enough for my data sets.
+ *
+ * This may happen if the disks have different size. With the default parameters \c S<small>TXXL</small> containers use randomized block-to-disk allocation strategies
+ * that distribute data evenly between the disks but ignore the availability of free space on them. 
+ *
+ *
  */
 
 

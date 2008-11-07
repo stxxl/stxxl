@@ -1,5 +1,7 @@
 Version 1.2.2 (unreleased)
 
+* remove unused debug code fragments that were no longer working for years
+
 ------------------------------------------
 Version 1.2.1 (14 August 2008)
 

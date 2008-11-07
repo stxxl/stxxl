@@ -525,7 +525,7 @@ namespace stream
         while (!in.empty())
         {
             if (out.block_offset() == 0)
-                out.page_externally_updated();
+                out.block_externally_updated();
             // tells the vector that the block was modified
             *outstream = *in;
             ++out;

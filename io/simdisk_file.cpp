@@ -263,10 +263,7 @@ request_ptr sim_disk_file::aread(void * buffer, stxxl::int64 pos, size_t bytes,
     if (!req.get())
         stxxl_function_error(io_error);
 
-
- #ifndef NO_OVERLAPPING
     disk_queues::get_instance()->add_readreq(req, get_id());
- #endif
 
     return req;
 }
@@ -281,10 +278,8 @@ request_ptr sim_disk_file::awrite(
     if (!req.get())
         stxxl_function_error(io_error);
 
-
- #ifndef NO_OVERLAPPING
     disk_queues::get_instance()->add_writereq(req, get_id());
- #endif
+
     return req;
 }
 

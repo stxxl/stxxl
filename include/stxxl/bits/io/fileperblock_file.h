@@ -97,6 +97,8 @@ public:
     //! Actually deletes the corresponding file if the whole thing is deleted.
     virtual void delete_region(int64 offset, unsigned_type length);
 
+    virtual void lock();
+
     //! Rename the file corresponding to the offset such that it is out of reach for deleting.
     virtual void export_files(int64 offset, int64 length, std::string filename);
 };

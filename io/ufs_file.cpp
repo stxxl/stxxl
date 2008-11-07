@@ -103,10 +103,6 @@ void ufs_request_base::wait()
 
     stats::scoped_wait_timer wait_timer;
 
-#ifdef NO_OVERLAPPING
-    enqueue();
-#endif
-
     _state.wait_for(READY2DIE);
 
     check_errors();
@@ -114,10 +110,6 @@ void ufs_request_base::wait()
 
 bool ufs_request_base::poll()
 {
-#ifdef NO_OVERLAPPING
-    /*if(_state () < DONE)*/ wait();
-#endif
-
     bool s = _state() >= DONE;
 
     check_errors();
@@ -138,13 +130,14 @@ ufs_file_base::ufs_file_base(
     int disk) : file(disk), file_des(-1), mode_(mode)
 {
     int fmode = 0;
+
 #ifndef STXXL_DIRECT_IO_OFF
  #ifndef BOOST_MSVC
     if (mode & DIRECT)
         fmode |= O_SYNC | O_RSYNC | O_DSYNC | O_DIRECT;
-
  #endif
 #endif
+
     if (mode & RDONLY)
         fmode |= O_RDONLY;
 
@@ -159,7 +152,6 @@ ufs_file_base::ufs_file_base(
 
     if (mode & TRUNC)
         fmode |= O_TRUNC;
-
 
 #ifdef BOOST_MSVC
     fmode |= O_BINARY;                     // the default in MS is TEXT mode
@@ -182,7 +174,6 @@ ufs_file_base::~ufs_file_base()
     // if successful, reset file descriptor
     if (res >= 0)
         file_des = -1;
-
     else
         stxxl_function_error(io_error);
 }
@@ -210,7 +201,7 @@ void ufs_file_base::lock()
 stxxl::int64 ufs_file_base::size()
 {
     struct stat st;
-    stxxl_check_ge_0(fstat(file_des, &st), io_error);
+    stxxl_check_ge_0(::fstat(file_des, &st), io_error);
     return st.st_size;
 }
 
@@ -229,7 +220,7 @@ void ufs_file_base::set_size(stxxl::int64 newsize)
 
         if (!SetFilePointerEx(hfile, desired_pos, NULL, FILE_BEGIN))
             stxxl_win_lasterror_exit("SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
-                                     " newsize=" << newsize << " ", io_error)
+                                     " newsize=" << newsize << " ", io_error);
 
         if (!SetEndOfFile(hfile))
             stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<

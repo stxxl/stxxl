@@ -57,13 +57,6 @@ protected:
     enum { OP = 0, DONE = 1, READY2DIE = 2 };
     // OP - operating, DONE - request served,
     // READY2DIE - can be destroyed
-    /*
-       wfs_file_base *file;
-       void *buffer;
-       stxxl::int64 offset;
-       size_t bytes;
-       request_type type;
-     */
 
     state _state;
     mutex waiters_mutex;

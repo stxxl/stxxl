@@ -44,3 +44,5 @@
 
 * on disk destruction, check whether all blocks had been deallocated before,
   i.e. free_bytes == disk_size
+
+* Implement an allocator which looks at the available free space on disks when distributng blocks to disks

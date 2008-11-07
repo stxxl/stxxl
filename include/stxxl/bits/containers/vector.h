@@ -850,6 +850,11 @@ public:
     {
         return size_type(_bids.size()) * block_type::size;
     }
+    // \brief Returns the number of bytes that the vector has allocated on disks
+    size_type raw_capacity() const
+    {
+        return size_type(_bids.size()) * block_type::raw_size;
+    }
     void reserve(size_type n)
     {
         if (n <= capacity())
