@@ -182,8 +182,8 @@ public:
         return id;
     }
 
-    //! \brief Locks file for reading and writing
-    virtual void lock() { }
+    //! \brief Locks file for reading and writing (aquires a lock in the file system)
+    virtual void lock() = 0;
 
     //! \brief Some specialized file types may need to know freed regions
     virtual void delete_region(int64 offset, unsigned_type size)
@@ -219,7 +219,6 @@ protected:
     virtual void delete_waiter(onoff_switch * sw) = 0;
     //virtual void enqueue () = 0;
     virtual void serve() = 0;
-    //virtual unsigned size() const;
 
     completion_handler on_complete;
     int ref_cnt;

@@ -71,9 +71,9 @@ void * disk_queue::worker(void * arg)
 
 #ifdef STXXL_BOOST_THREADS
 #else
+    // Allow cancellation in semaphore operator--() call
     check_pthread_call(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL));
     check_pthread_call(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL));
-    // Allow cancellation in semaphore operator-- call
 #endif
 
     bool write_phase = true;
