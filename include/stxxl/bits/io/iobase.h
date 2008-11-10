@@ -103,11 +103,11 @@ __STXXL_BEGIN_NAMESPACE
 
 #define BLOCK_ALIGN 4096
 
-typedef void * (*thread_function_t)(void *);
 typedef stxxl::int64 DISKID;
 
 class request;
 class request_ptr;
+class disk_queue;
 
 //! \brief Default completion handler class
 
@@ -123,9 +123,9 @@ struct default_completion_handler
 //! base on various file systems or even remote storage interfaces
 class file : private noncopyable
 {
-protected:
     int id;
 
+protected:
     //! \brief Initializes file object
     //! \param _id file identifier
     //! \remark Called in implementations of file
@@ -170,14 +170,14 @@ public:
     //! \return file size in bytes
     virtual stxxl::int64 size() = 0;
     //! \brief deprecated, use \c stxxl::file::get_id() instead
-    __STXXL_DEPRECATED(int get_disk_number())
+    __STXXL_DEPRECATED(int get_disk_number() const)
     {
-        return id;
+        return get_id();
     }
     //! \brief Returns file's identifier
     //! \remark might be used as disk's id in case disk to file mapping
     //! \return integer file identifier, passed as constructor parameter
-    int get_id()
+    int get_id() const
     {
         return id;
     }
@@ -195,9 +195,6 @@ public:
     virtual ~file() { }
 };
 
-class disk_queue;
-class disk_queues;
-
 //! \brief Defines interface of request
 
 //! Since all library I/O operations are asynchronous,
@@ -209,15 +206,12 @@ class request : private noncopyable
     template <class request_iterator_>
     friend
     request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end);
-    friend class file;
     friend class disk_queue;
-    friend class disk_queues;
     friend class request_ptr;
 
 protected:
     virtual bool add_waiter(onoff_switch * sw) = 0;
     virtual void delete_waiter(onoff_switch * sw) = 0;
-    //virtual void enqueue () = 0;
     virtual void serve() = 0;
 
     completion_handler on_complete;

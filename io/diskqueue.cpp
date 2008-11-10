@@ -30,7 +30,7 @@ disk_queue::disk_queue(int /*n*/) : sem(0), _priority_op(WRITE)              // 
     // nothing to do
 #else
     check_pthread_call(pthread_create(&thread, NULL,
-                                      (thread_function_t)worker, static_cast<void *>(this)));
+                                      worker, static_cast<void *>(this)));
 #endif
 }
 

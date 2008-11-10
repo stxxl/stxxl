@@ -50,8 +50,6 @@ public:
 //! \brief Base for UNIX file system implementations
 class wfs_request_base : public request
 {
-    friend class wfs_file_base;
-
 protected:
     // states of request
     enum { OP = 0, DONE = 1, READY2DIE = 2 };
