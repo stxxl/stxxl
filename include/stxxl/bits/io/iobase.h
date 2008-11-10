@@ -224,6 +224,10 @@ public:
     enum request_type { READ, WRITE };
 
 protected:
+    //! states of request
+    //! OP - operating, DONE - request served, READY2DIE - can be destroyed
+    enum request_status { OP = 0, DONE = 1, READY2DIE = 2 };
+
     file * file_;
     void * buffer;
     stxxl::int64 offset;
