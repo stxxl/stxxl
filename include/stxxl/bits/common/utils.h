@@ -142,6 +142,11 @@ inline void UNUSED(const U &)
     STXXL_THROW(exception_type, "function " << STXXL_PRETTY_FUNCTION_NAME, \
                 "Info: " << error_message << " " << strerror(errno))
 
+#define STXXL_THROW_INVALID_ARGUMENT(error_message) \
+    STXXL_THROW(std::invalid_argument, \
+                "function " << STXXL_PRETTY_FUNCTION_NAME, \
+                error_message)
+
 template <typename E>
 inline void stxxl_util_function_error(const char * func_name, const char * expr = 0, const char * error = 0)
 {
