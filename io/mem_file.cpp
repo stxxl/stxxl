@@ -25,7 +25,8 @@ mem_request::mem_request(
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    request(on_cmpl, f, buf, off, b, t)
+    request(on_cmpl, f, buf, off, b, t),
+    _state(OP)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
     // Direct I/O requires file system block size alignment for file offsets,

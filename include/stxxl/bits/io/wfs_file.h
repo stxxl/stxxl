@@ -51,7 +51,7 @@ public:
 class wfs_request_base : public request
 {
 protected:
-    state _state;
+    state<request_status> _state;
     mutex waiters_mutex;
     std::set<onoff_switch *> waiters;
 

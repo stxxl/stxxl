@@ -64,7 +64,7 @@ class boostfd_request : public request
     friend class boostfd_file;
 
 protected:
-    state _state;
+    state<request_status> _state;
     mutex waiters_mutex;
     std::set<onoff_switch *> waiters;
 
