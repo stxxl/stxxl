@@ -29,12 +29,14 @@ syscall_request::syscall_request(
 
 void syscall_request::serve()
 {
+    int fd = static_cast<syscall_file *>(file_)->get_file_des();
+
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
                      " nref=" << nref() <<
                      " this=" << this <<
-                     " File descriptor=" << static_cast<syscall_file *>(file_)->get_file_des() <<
+                     " fd=" << fd <<
                      " offset=" << offset <<
                      " buffer=" << buffer <<
                      " bytes=" << bytes <<
@@ -45,16 +47,16 @@ void syscall_request::serve()
                    " offset: " << offset <<
                    " bytes: " << bytes <<
                    ((type == READ) ? " READ" : " WRITE") <<
-                   " file: " << static_cast<syscall_file *>(file_)->get_file_des());
+                   " file: " << fd);
 
     try
     {
-        if (::lseek(static_cast<syscall_file *>(file_)->get_file_des(), offset, SEEK_SET) < 0)
+        if (::lseek(fd, offset, SEEK_SET) < 0)
         {
             STXXL_THROW2(io_error,
                          " this=" << this <<
                          " call=::lseek(fd,offset,SEEK_SET)" <<
-                         " File descriptor=" << static_cast<syscall_file *>(file_)->get_file_des() <<
+                         " fd=" << fd <<
                          " offset=" << offset <<
                          " buffer=" << buffer <<
                          " bytes=" << bytes <<
@@ -68,12 +70,12 @@ void syscall_request::serve()
             {
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
-                if (::read(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)
+                if (::read(fd, buffer, bytes) < 0)
                 {
                     STXXL_THROW2(io_error,
                                  " this=" << this <<
                                  " call=::read(fd,buffer,bytes)" <<
-                                 " File descriptor=" << static_cast<syscall_file *>(file_)->get_file_des() <<
+                                 " fd=" << fd <<
                                  " offset=" << offset <<
                                  " buffer=" << buffer <<
                                  " bytes=" << bytes <<
@@ -87,12 +89,12 @@ void syscall_request::serve()
             {
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
-                if (::write(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)
+                if (::write(fd, buffer, bytes) < 0)
                 {
                     STXXL_THROW2(io_error,
                                  " this=" << this <<
                                  " call=::write(fd,buffer,bytes)" <<
-                                 " File descriptor=" << static_cast<syscall_file *>(file_)->get_file_des() <<
+                                 " fd=" << fd <<
                                  " offset=" << offset <<
                                  " buffer=" << buffer <<
                                  " bytes=" << bytes <<
@@ -114,7 +116,7 @@ void syscall_request::serve()
         STXXL_ERRMSG("WARNING: reference to the request is lost after serve" <<
                      " nref=" << nref() <<
                      " this=" << this <<
-                     " File descriptor=" << static_cast<syscall_file *>(file_)->get_file_des() <<
+                     " fd=" << fd <<
                      " offset=" << offset <<
                      " buffer=" << buffer <<
                      " bytes=" << bytes <<

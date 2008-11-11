@@ -29,7 +29,6 @@ wincall_request::wincall_request(
 
 void wincall_request::serve()
 {
-    stats * iostats = stats::get_instance();
     if (nref() < 2)
     {
         STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
@@ -47,10 +46,10 @@ void wincall_request::serve()
                    ((type == READ) ? " READ" : " WRITE"));
 
     try {
+        HANDLE handle = static_cast<wincall_file *>(file_)->get_file_des();
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = offset;
-        if (!SetFilePointerEx(static_cast<wincall_file *>(file_)->get_file_des(),
-                              desired_pos, NULL, FILE_BEGIN))
+        if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))
         {
             stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve()" <<
                                      " offset=" << offset <<
@@ -68,8 +67,7 @@ void wincall_request::serve()
             {
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
                 DWORD NumberOfBytesRead = 0;
-                if (!ReadFile(static_cast<wincall_file *>(file_)->get_file_des(),
-                              buffer, bytes, &NumberOfBytesRead, NULL))
+                if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
                 {
                     stxxl_win_lasterror_exit("ReadFile" <<
                                              " this=" << this <<
@@ -89,8 +87,7 @@ void wincall_request::serve()
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
                 DWORD NumberOfBytesWritten = 0;
-                if (!WriteFile(static_cast<wincall_file *>(file_)->get_file_des(), buffer, bytes,
-                               &NumberOfBytesWritten, NULL))
+                if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
                 {
                     stxxl_win_lasterror_exit("WriteFile" <<
                                              " this=" << this <<
