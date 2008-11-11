@@ -26,8 +26,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+template <typename Tp = int>
 class state : private noncopyable
 {
+    typedef Tp value_type;
+
 #ifdef STXXL_BOOST_THREADS
     boost::mutex mutex;
     boost::condition cond;
@@ -35,16 +38,17 @@ class state : private noncopyable
     pthread_mutex_t mutex;
     pthread_cond_t cond;
 #endif
-    int _state;
+    value_type _state;
 
 public:
-    state(int s = 0) : _state(s)
+    state(value_type s = 0) : _state(s)
     {
 #ifndef STXXL_BOOST_THREADS
         check_pthread_call(pthread_mutex_init(&mutex, NULL));
         check_pthread_call(pthread_cond_init(&cond, NULL));
 #endif
     }
+
     ~state()
     {
 #ifndef STXXL_BOOST_THREADS
@@ -58,7 +62,8 @@ public:
         check_pthread_call(pthread_cond_destroy(&cond));
 #endif
     }
-    void set_to(int new_state)
+
+    void set_to(value_type new_state)
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
@@ -72,7 +77,8 @@ public:
         check_pthread_call(pthread_cond_broadcast(&cond));
 #endif
     }
-    void wait_for(int needed_state)
+
+    void wait_for(value_type needed_state)
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
@@ -87,13 +93,14 @@ public:
         check_pthread_call(pthread_mutex_unlock(&mutex));
 #endif
     }
-    int operator () ()
+
+    value_type operator () ()
     {
 #ifdef STXXL_BOOST_THREADS
         boost::mutex::scoped_lock Lock(mutex);
         return _state;
 #else
-        int res;
+        value_type res;
         check_pthread_call(pthread_mutex_lock(&mutex));
         res = _state;
         check_pthread_call(pthread_mutex_unlock(&mutex));
