@@ -52,10 +52,10 @@ void wincall_request::serve()
                                                                                             << " type=" << ((type == READ) ? "READ" : "WRITE"), io_error);
 
         {
+            stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+
             if (type == READ)
             {
-                stats::scoped_read_timer read_timer(size());
-
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
                 DWORD NumberOfBytesRead = 0;
                 if (!ReadFile(static_cast<wincall_file *>(file_)->get_file_des(),
@@ -72,8 +72,6 @@ void wincall_request::serve()
             }
             else
             {
-                stats::scoped_write_timer write_timer(size());
-
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
                 DWORD NumberOfBytesWritten = 0;

@@ -58,10 +58,10 @@ void syscall_request::serve()
         }
         else
         {
+            stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+
             if (type == READ)
             {
-                stats::scoped_read_timer read_timer(bytes);
-
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
                 if (::read(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)
@@ -81,8 +81,6 @@ void syscall_request::serve()
             }
             else
             {
-                stats::scoped_write_timer write_timer(bytes);
-
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
                 if (::write(static_cast<syscall_file *>(file_)->get_file_des(), buffer, bytes) < 0)

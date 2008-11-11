@@ -163,17 +163,10 @@ void sim_disk_request::serve()
 {
     //      static_cast<syscall_file*>(file_)->set_size(offset+bytes);
     double op_start = timestamp();
-    stats * iostats = stats::get_instance();
-    if (type == READ)
-    {
-        iostats->read_started(bytes);
-    }
-    else
-    {
-        iostats->write_started(bytes);
-    }
 
     try {
+        stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+
         void * mem =
             mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, static_cast<sim_disk_file *>(file_)->get_file_des(), offset);
         if (mem == MAP_FAILED)
@@ -218,15 +211,6 @@ void sim_disk_request::serve()
     catch (const io_error & ex)
     {
         error_occured(ex.what());
-    }
-
-    if (type == READ)
-    {
-        iostats->read_finished();
-    }
-    else
-    {
-        iostats->write_finished();
     }
 
     _state.set_to(DONE);

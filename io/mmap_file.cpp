@@ -22,19 +22,12 @@ __STXXL_BEGIN_NAMESPACE
 
 void mmap_request::serve()
 {
-    stats * iostats = stats::get_instance();
-    if (type == READ)
-    {
-        iostats->read_started(bytes);
-    }
-    else
-    {
-        iostats->write_started(bytes);
-    }
     // static_cast<syscall_file*>(file_)->set_size(offset+bytes);
 
     try
     {
+        stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+
  #ifdef STXXL_MMAP_EXPERIMENT1
         int prot = (type == READ) ? PROT_READ : PROT_WRITE;
 
@@ -104,15 +97,6 @@ void mmap_request::serve()
     catch (const io_error & ex)
     {
         error_occured(ex.what());
-    }
-
-    if (type == READ)
-    {
-        iostats->read_finished();
-    }
-    else
-    {
-        iostats->write_finished();
     }
 
     _state.set_to(DONE);

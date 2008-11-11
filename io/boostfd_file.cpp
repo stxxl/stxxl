@@ -134,10 +134,10 @@ void boostfd_request::serve()
     }
 
     {
+        stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+
         if (type == READ)
         {
-            stats::scoped_read_timer read_timer(bytes);
-
             STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
             try
@@ -159,8 +159,6 @@ void boostfd_request::serve()
         }
         else
         {
-            stats::scoped_write_timer write_timer(bytes);
-
             STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
             try
