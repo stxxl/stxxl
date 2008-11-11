@@ -22,47 +22,10 @@ __STXXL_BEGIN_NAMESPACE
 
 void mmap_request::serve()
 {
-    // static_cast<syscall_file*>(file_)->set_size(offset+bytes);
-
     try
     {
         stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
 
- #ifdef STXXL_MMAP_EXPERIMENT1
-        int prot = (type == READ) ? PROT_READ : PROT_WRITE;
-
-        void * mem = mmap(buffer, bytes, prot, MAP_SHARED | MAP_FIXED, static_cast<mmap_file *>(file_)->get_file_des(), offset);
-        //STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
-        if (mem == MAP_FAILED)
-        {
-            STXXL_FORMAT_ERROR_MSG(msg, "Mapping failed. " <<
-                                   "Page size: " << sysconf(_SC_PAGESIZE) << " offset modulo page size " <<
-                                   (offset % sysconf(_SC_PAGESIZE)))
-
-            error_occured(msg.str());
-        }
-        else if (mem == 0)
-        {
-            stxxl_function_error(io_error)
-        }
-        else
-        {
-            if (type == READ)
-            {
-                // FIXME: cleanup
-                //stxxl_ifcheck (memcpy (buffer, mem, bytes))
-                //else
-                //stxxl_ifcheck (munmap ((char *) mem, bytes))
-            }
-            else
-            {
-                // FIXME: cleanup
-                //stxxl_ifcheck (memcpy (mem, buffer, bytes))
-                //else
-                //stxxl_ifcheck (munmap ((char *) mem, bytes))
-            }
-        }
- #else
         int prot = (type == READ) ? PROT_READ : PROT_WRITE;
         void * mem = mmap(NULL, bytes, prot, MAP_SHARED, static_cast<mmap_file *>(file_)->get_file_des(), offset);
         // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , static_cast<syscall_file*>(file_)->get_file_des (), offset);
@@ -90,7 +53,6 @@ void mmap_request::serve()
             }
             stxxl_check_ge_0(munmap(mem, bytes), io_error);
         }
- #endif
     }
     catch (const io_error & ex)
     {

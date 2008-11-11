@@ -161,7 +161,6 @@ IC35L080AVVA07::IC35L080AVVA07()
 
 void sim_disk_request::serve()
 {
-    //      static_cast<syscall_file*>(file_)->set_size(offset+bytes);
     double op_start = timestamp();
 
     try {
