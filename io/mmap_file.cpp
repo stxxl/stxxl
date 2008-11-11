@@ -69,11 +69,10 @@ void mmap_request::serve()
         // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
         if (mem == MAP_FAILED)
         {
-            STXXL_FORMAT_ERROR_MSG(msg, "Mapping failed. " <<
-                                   "Page size: " << sysconf(_SC_PAGESIZE) << " offset modulo page size " <<
-                                   (offset % sysconf(_SC_PAGESIZE)));
-
-            error_occured(msg.str());
+            STXXL_THROW2(io_error,
+                         " Mapping failed." <<
+                         " Page size: " << sysconf(_SC_PAGESIZE) <<
+                         " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
         }
         else if (mem == 0)
         {
@@ -84,13 +83,12 @@ void mmap_request::serve()
             if (type == READ)
             {
                 memcpy(buffer, mem, bytes);
-                stxxl_check_ge_0(munmap((char *)mem, bytes), io_error);
             }
             else
             {
                 memcpy(mem, buffer, bytes);
-                stxxl_check_ge_0(munmap((char *)mem, bytes), io_error);
             }
+            stxxl_check_ge_0(munmap(mem, bytes), io_error);
         }
  #endif
     }

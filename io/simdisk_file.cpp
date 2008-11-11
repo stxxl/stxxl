@@ -167,15 +167,13 @@ void sim_disk_request::serve()
     try {
         stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
 
-        void * mem =
-            mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, static_cast<sim_disk_file *>(file_)->get_file_des(), offset);
+        void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, static_cast<sim_disk_file *>(file_)->get_file_des(), offset);
         if (mem == MAP_FAILED)
         {
-            STXXL_FORMAT_ERROR_MSG(msg, "Mapping failed. " <<
-                                   "Page size: " << sysconf(_SC_PAGESIZE) << " offset modulo page size " <<
-                                   (offset % sysconf(_SC_PAGESIZE)));
-
-            error_occured(msg.str());
+            STXXL_THROW2(io_error,
+                         " Mapping failed." <<
+                         " Page size: " << sysconf(_SC_PAGESIZE) <<
+                         " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
         }
         else if (mem == 0)
         {
@@ -186,16 +184,14 @@ void sim_disk_request::serve()
             if (type == READ)
             {
                 memcpy(buffer, mem, bytes);
-                stxxl_check_ge_0(munmap((char *)mem, bytes), io_error);
             } else {
                 memcpy(mem, buffer, bytes);
-                stxxl_check_ge_0(munmap((char *)mem, bytes), io_error);
             }
+            stxxl_check_ge_0(munmap(mem, bytes), io_error);
         }
 
         double delay =
             (static_cast<sim_disk_file *>(file_))->get_delay(offset, bytes);
-
 
         delay = delay - timestamp() + op_start;
 
@@ -204,7 +200,6 @@ void sim_disk_request::serve()
         int seconds_to_wait = static_cast<int>(floor(delay));
         if (seconds_to_wait)
             sleep(seconds_to_wait);
-
 
         usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
     }
