@@ -97,11 +97,11 @@ void boostfd_request::wait()
 
 bool boostfd_request::poll()
 {
-    const bool s = _state() >= DONE;
+    const request_status s = _state();
 
     check_errors();
 
-    return s;
+    return s == DONE || s == READY2DIE;
 }
 
 void boostfd_request::serve()

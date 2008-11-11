@@ -100,11 +100,11 @@ void mem_request::wait()
 
 bool mem_request::poll()
 {
-    bool s = _state() >= DONE;
+    const request_status s = _state();
 
     check_errors();
 
-    return s;
+    return s == DONE || s == READY2DIE;
 }
 
 void mem_request::serve()
