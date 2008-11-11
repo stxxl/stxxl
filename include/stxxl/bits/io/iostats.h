@@ -58,6 +58,59 @@ class stats : public singleton<stats>
     stats();
 
 public:
+    class scoped_read_write_timer
+    {
+        typedef unsigned_type size_type;
+
+        bool is_write;
+#if STXXL_IO_STATS
+        bool running;
+#endif
+
+    public:
+        scoped_read_write_timer(size_type size, bool is_write = false)
+            : is_write(is_write)
+#if STXXL_IO_STATS
+            , running(false)
+#endif
+        {
+            start(size);
+        }
+
+        ~scoped_read_write_timer()
+        {
+            stop();
+        }
+
+        void start(size_type size)
+        {
+#if STXXL_IO_STATS
+            if (!running) {
+                running = true;
+                if (is_write)
+                    stats::get_instance()->write_started(size);
+                else
+                    stats::get_instance()->read_started(size);
+            }
+#else
+            UNUSED(size);
+#endif
+        }
+
+        void stop()
+        {
+#if STXXL_IO_STATS
+            if (running) {
+                if (is_write)
+                    stats::get_instance()->write_finished();
+                else
+                    stats::get_instance()->read_finished();
+                running = false;
+            }
+#endif
+        }
+    };
+
     class scoped_write_timer
     {
         typedef unsigned_type size_type;
