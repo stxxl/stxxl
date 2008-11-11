@@ -25,11 +25,11 @@ void mmap_request::serve()
     stats * iostats = stats::get_instance();
     if (type == READ)
     {
-        iostats->read_started(size());
+        iostats->read_started(bytes);
     }
     else
     {
-        iostats->write_started(size());
+        iostats->write_started(bytes);
     }
     // static_cast<syscall_file*>(file_)->set_size(offset+bytes);
 

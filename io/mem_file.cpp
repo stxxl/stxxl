@@ -128,12 +128,12 @@ void mem_request::serve()
 
     if (type == READ)
     {
-        stats::scoped_read_timer read_timer(size());
+        stats::scoped_read_timer read_timer(bytes);
         memcpy(buffer, static_cast<mem_file *>(file_)->get_ptr() + offset, bytes);
     }
     else
     {
-        stats::scoped_write_timer write_timer(size());
+        stats::scoped_write_timer write_timer(bytes);
         memcpy(static_cast<mem_file *>(file_)->get_ptr() + offset, buffer, bytes);
     }
 

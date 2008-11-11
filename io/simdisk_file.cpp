@@ -166,11 +166,11 @@ void sim_disk_request::serve()
     stats * iostats = stats::get_instance();
     if (type == READ)
     {
-        iostats->read_started(size());
+        iostats->read_started(bytes);
     }
     else
     {
-        iostats->write_started(size());
+        iostats->write_started(bytes);
     }
 
     try {

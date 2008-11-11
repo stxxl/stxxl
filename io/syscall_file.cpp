@@ -60,7 +60,7 @@ void syscall_request::serve()
         {
             if (type == READ)
             {
-                stats::scoped_read_timer read_timer(size());
+                stats::scoped_read_timer read_timer(bytes);
 
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
@@ -81,7 +81,7 @@ void syscall_request::serve()
             }
             else
             {
-                stats::scoped_write_timer write_timer(size());
+                stats::scoped_write_timer write_timer(bytes);
 
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 

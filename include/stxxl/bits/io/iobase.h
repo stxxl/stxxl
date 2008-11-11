@@ -281,7 +281,6 @@ public:
     void * get_buffer() const { return buffer; }
     stxxl::int64 get_offset() const { return offset; }
     size_t get_size() const { return bytes; }
-    size_t size() const { return bytes; }
     request_type get_type() const { return type; }
 
     virtual std::ostream & print(std::ostream & out) const
