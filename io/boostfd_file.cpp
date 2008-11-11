@@ -108,32 +108,40 @@ void boostfd_request::serve()
 {
     if (nref() < 2)
     {
-        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
-        << nref() << ") " <<
-                     " this=" << long(this) << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
-        << " type=" << ((type == READ) ? "READ" : "WRITE"));
+        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
+                     " nref=" << nref() <<
+                     " this=" << this <<
+                     " offset=" << offset <<
+                     " buffer=" << buffer <<
+                     " bytes=" << bytes <<
+                     " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
-    STXXL_VERBOSE2("boostfd_request::serve(): Buffer at " << ((void *)buffer)
-                                                          << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE")
-                   );
+    STXXL_VERBOSE2("boostfd_request::serve():" <<
+                   " Buffer at " << buffer <<
+                   " offset: " << offset <<
+                   " bytes: " << bytes <<
+                   ((type == READ) ? " READ" : " WRITE"));
 
     boostfd_file::fd_type fd = static_cast<boostfd_file *>(file_)->get_file_des();
 
+    try
+    {
     try
     {
         fd.seek(offset, BOOST_IOS::beg);
     }
     catch (const std::exception & ex)
     {
-        STXXL_FORMAT_ERROR_MSG(msg, "seek() in boostfd_request::serve() offset=" << offset
-                                                                                 << " this=" << long(this) << " buffer=" <<
-                               buffer << " bytes=" << bytes
-                                                                                 << " type=" << ((type == READ) ? "READ" : "WRITE") << " : " << ex.what());
-
-        error_occured(msg.str());
+            STXXL_THROW2(io_error,
+                         "Error doing seek() in boostfd_request::serve()" <<
+                         " offset=" << offset <<
+                         " this=" << this <<
+                         " buffer=" << buffer <<
+                         " bytes=" << bytes <<
+                         " type=" << ((type == READ) ? "READ" : "WRITE") <<
+                         " : " << ex.what());
     }
 
-    {
         stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
 
         if (type == READ)
@@ -146,13 +154,15 @@ void boostfd_request::serve()
             }
             catch (const std::exception & ex)
             {
-                STXXL_FORMAT_ERROR_MSG(msg, "read() in boostfd_request::serve() offset=" << offset
-                                                                                         << " this=" << long(this) << " buffer=" <<
-                                       buffer << " bytes=" << bytes
-                                                                                         << " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                                       " nref= " << nref() << " : " << ex.what());
-
-                error_occured(msg.str());
+                STXXL_THROW2(io_error,
+                             "Error doing read() in boostfd_request::serve()" <<
+                             " offset=" << offset <<
+                             " this=" << this <<
+                             " buffer=" << buffer <<
+                             " bytes=" << bytes <<
+                             " type=" << ((type == READ) ? "READ" : "WRITE") <<
+                             " nref= " << nref() <<
+                             " : " << ex.what());
             }
 
             STXXL_DEBUGMON_DO(io_finished((char *)buffer));
@@ -167,24 +177,33 @@ void boostfd_request::serve()
             }
             catch (const std::exception & ex)
             {
-                STXXL_FORMAT_ERROR_MSG(msg, "write() in boostfd_request::serve() offset=" << offset
-                                                                                          << " this=" << long(this) << " buffer=" <<
-                                       buffer << " bytes=" << bytes
-                                                                                          << " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                                       " nref= " << nref() << " : " << ex.what());
-
-                error_occured(msg.str());
+                STXXL_THROW2(io_error,
+                             "Error doing write() in boostfd_request::serve()" <<
+                             " offset=" << offset <<
+                             " this=" << this <<
+                             " buffer=" << buffer <<
+                             " bytes=" << bytes <<
+                             " type=" << ((type == READ) ? "READ" : "WRITE") <<
+                             " nref= " << nref() <<
+                             " : " << ex.what());
             }
 
             STXXL_DEBUGMON_DO(io_finished((char *)buffer));
         }
     }
+    catch (const io_error & ex)
+    {
+        error_occured(ex.what());
+    }
 
     if (nref() < 2)
     {
-        STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
-                     " this=" << long(this) <<
-                     " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes <<
+        STXXL_ERRMSG("WARNING: reference to the request is lost after serve" <<
+                     " nref=" << nref() <<
+                     " this=" << this <<
+                     " offset=" << offset <<
+                     " buffer=" << buffer <<
+                     " bytes=" << bytes <<
                      " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
 
@@ -336,3 +355,4 @@ void boostfd_file::lock()
 __STXXL_END_NAMESPACE
 
 #endif // #ifdef STXXL_BOOST_CONFIG
+// vim: et:ts=4:sw=4

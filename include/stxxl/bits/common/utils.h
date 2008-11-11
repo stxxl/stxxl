@@ -128,9 +128,6 @@ inline void UNUSED(const U &)
  #define STXXL_PRETTY_FUNCTION_NAME __PRETTY_FUNCTION__
 #endif
 
-#define STXXL_FORMAT_ERROR_MSG(str_, errmsg_) \
-    std::ostringstream str_; str_ << "Error in " << errmsg_
-
 #define STXXL_THROW(exception_type, location, error_message) \
     { \
         std::ostringstream msg_; \
