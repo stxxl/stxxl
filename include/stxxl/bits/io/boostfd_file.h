@@ -45,6 +45,7 @@ public:
     ~boostfd_file();
     stxxl::int64 size();
     void set_size(stxxl::int64 newsize);
+    void lock();
     request_ptr aread(
         void * buffer,
         stxxl::int64 pos,

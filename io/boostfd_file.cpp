@@ -328,6 +328,11 @@ request_ptr boostfd_file::awrite(
     return req;
 }
 
+void boostfd_file::lock()
+{
+    // FIXME: is there no locking possible/needed/... for boostfd?
+}
+
 __STXXL_END_NAMESPACE
 
 #endif // #ifdef STXXL_BOOST_CONFIG
