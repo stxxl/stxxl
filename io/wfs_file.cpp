@@ -212,7 +212,7 @@ void wfs_file_base::set_size(stxxl::int64 newsize)
 
     if (!SetFilePointerEx(file_des, desired_pos, NULL, FILE_BEGIN))
         stxxl_win_lasterror_exit("SetFilePointerEx in wfs_file_base::set_size(..) oldsize=" << cur_size <<
-                                 " newsize=" << newsize << " ", io_error)
+                                 " newsize=" << newsize << " ", io_error);
 
         if (!SetEndOfFile(file_des))
             stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
@@ -222,3 +222,4 @@ void wfs_file_base::set_size(stxxl::int64 newsize)
 __STXXL_END_NAMESPACE
 
 #endif // #ifdef BOOST_MSVC
+// vim: et:ts=4:sw=4

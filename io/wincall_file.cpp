@@ -32,25 +32,35 @@ void wincall_request::serve()
     stats * iostats = stats::get_instance();
     if (nref() < 2)
     {
-        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
-                                << nref() << ") " <<
-                     " this=" << long(this) << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
-                                << " type=" << ((type == READ) ? "READ" : "WRITE"));
+        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
+                     " nref=" << nref() <<
+                     " this=" << this <<
+                     " offset=" << offset <<
+                     " buffer=" << buffer <<
+                     " bytes=" << bytes <<
+                     " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
-    STXXL_VERBOSE2("wincall_request::serve(): Buffer at " << ((void *)buffer)
-                                                          << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE");
-                   );
+    STXXL_VERBOSE2("wincall_request::serve():" <<
+                   " Buffer at " << buffer <<
+                   " offset: " << offset <<
+                   " bytes: " << bytes <<
+                   ((type == READ) ? " READ" : " WRITE"));
 
     try {
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = offset;
         if (!SetFilePointerEx(static_cast<wincall_file *>(file_)->get_file_des(),
                               desired_pos, NULL, FILE_BEGIN))
-            stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve() offset=" << offset
-                                                                                            << " this=" << long(this) << " buffer=" <<
-                                     buffer << " bytes=" << bytes
-                                                                                            << " type=" << ((type == READ) ? "READ" : "WRITE"), io_error);
-
+        {
+            stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve()" <<
+                                     " offset=" << offset <<
+                                     " this=" << this <<
+                                     " buffer=" << buffer <<
+                                     " bytes=" << bytes <<
+                                     " type=" << ((type == READ) ? "READ" : "WRITE"),
+                                     io_error);
+        }
+        else
         {
             stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
 
@@ -61,11 +71,15 @@ void wincall_request::serve()
                 if (!ReadFile(static_cast<wincall_file *>(file_)->get_file_des(),
                               buffer, bytes, &NumberOfBytesRead, NULL))
                 {
-                    stxxl_win_lasterror_exit("ReadFile this=" << long(this) <<
+                    stxxl_win_lasterror_exit("ReadFile" <<
+                                             " this=" << this <<
                                              " offset=" << offset <<
-                                             " buffer=" << buffer << " bytes=" << bytes << " type=" <<
-                                             ((type == READ) ? "READ" : "WRITE") << " nref= " << nref() <<
-                                             " NumberOfBytesRead= " << NumberOfBytesRead, io_error)
+                                             " buffer=" << buffer <<
+                                             " bytes=" << bytes <<
+                                             " type=" << ((type == READ) ? "READ" : "WRITE") <<
+                                             " nref= " << nref() <<
+                                             " NumberOfBytesRead= " << NumberOfBytesRead,
+                                             io_error);
                 }
 
                 STXXL_DEBUGMON_DO(io_finished((char *)buffer));
@@ -78,11 +92,15 @@ void wincall_request::serve()
                 if (!WriteFile(static_cast<wincall_file *>(file_)->get_file_des(), buffer, bytes,
                                &NumberOfBytesWritten, NULL))
                 {
-                    stxxl_win_lasterror_exit("WriteFile this=" << long(this) <<
+                    stxxl_win_lasterror_exit("WriteFile" <<
+                                             " this=" << this <<
                                              " offset=" << offset <<
-                                             " buffer=" << buffer << " bytes=" << bytes << " type=" <<
-                                             ((type == READ) ? "READ" : "WRITE") << " nref= " << nref() <<
-                                             " NumberOfBytesWritten= " << NumberOfBytesWritten, io_error)
+                                             " buffer=" << buffer <<
+                                             " bytes=" << bytes <<
+                                             " type=" << ((type == READ) ? "READ" : "WRITE") <<
+                                             " nref= " << nref() <<
+                                             " NumberOfBytesWritten= " << NumberOfBytesWritten,
+                                             io_error);
                 }
 
                 STXXL_DEBUGMON_DO(io_finished((char *)buffer));
@@ -96,9 +114,12 @@ void wincall_request::serve()
 
     if (nref() < 2)
     {
-        STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
-                     " this=" << long(this) <<
-                     " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes <<
+        STXXL_ERRMSG("WARNING: reference to the request is lost after serve" <<
+                     " nref=" << nref() <<
+                     " this=" << this <<
+                     " offset=" << offset <<
+                     " buffer=" << buffer <<
+                     " bytes=" << bytes <<
                      " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
 
@@ -169,3 +190,4 @@ request_ptr wincall_file::awrite(
 __STXXL_END_NAMESPACE
 
 #endif // #ifdef BOOST_MSVC
+// vim: et:ts=4:sw=4

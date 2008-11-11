@@ -31,7 +31,8 @@ void syscall_request::serve()
 {
     if (nref() < 2)
     {
-        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref=" << nref() << ") " <<
+        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
+                     " nref=" << nref() <<
                      " this=" << this <<
                      " File descriptor=" << static_cast<syscall_file *>(file_)->get_file_des() <<
                      " offset=" << offset <<
@@ -39,9 +40,12 @@ void syscall_request::serve()
                      " bytes=" << bytes <<
                      " type=" << ((type == READ) ? "READ" : "WRITE"));
     }
-    STXXL_VERBOSE2("syscall_request::serve(): Buffer at " << ((void *)buffer)
-                                                          << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE")
-                                                          << " file: " << static_cast<syscall_file *>(file_)->get_file_des());
+    STXXL_VERBOSE2("syscall_request::serve():" <<
+                   " Buffer at " << buffer <<
+                   " offset: " << offset <<
+                   " bytes: " << bytes <<
+                   ((type == READ) ? " READ" : " WRITE") <<
+                   " file: " << static_cast<syscall_file *>(file_)->get_file_des());
 
     try
     {
@@ -107,7 +111,8 @@ void syscall_request::serve()
 
     if (nref() < 2)
     {
-        STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
+        STXXL_ERRMSG("WARNING: reference to the request is lost after serve" <<
+                     " nref=" << nref() <<
                      " this=" << this <<
                      " File descriptor=" << static_cast<syscall_file *>(file_)->get_file_des() <<
                      " offset=" << offset <<
@@ -183,3 +188,4 @@ request_ptr syscall_file::awrite(
 }
 
 __STXXL_END_NAMESPACE
+// vim: et:ts=4:sw=4
