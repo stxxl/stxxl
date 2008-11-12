@@ -45,13 +45,12 @@ mem_request::~mem_request()
 
 bool mem_request::add_waiter(onoff_switch * sw)
 {
-    scoped_mutex_lock Lock(waiters_mutex);
-
     if (poll())                     // request already finished
     {
         return true;
     }
 
+    scoped_mutex_lock Lock(waiters_mutex);
     waiters.insert(sw);
 
     return false;
