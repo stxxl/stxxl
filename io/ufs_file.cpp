@@ -12,6 +12,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/ufs_file.h>
+#include <stxxl/bits/parallel.h>
 
 #ifndef BOOST_MSVC
  #include <unistd.h>
@@ -72,7 +73,16 @@ void ufs_request_base::delete_waiter(onoff_switch * sw)
     waiters.erase(sw);
 }
 
-int ufs_request_base::nwaiters()                 // returns number of waiters
+void ufs_request_base::notify_waiters()
+{
+    scoped_mutex_lock lock(waiters_mutex);
+    std::for_each(waiters.begin(),
+                  waiters.end(),
+                  std::mem_fun(&onoff_switch::on)
+                  __STXXL_FORCE_SEQUENTIAL);
+}
+
+int ufs_request_base::nwaiters()
 {
     scoped_mutex_lock Lock(waiters_mutex);
     return waiters.size();
@@ -235,3 +245,4 @@ void ufs_file_base::set_size(stxxl::int64 newsize)
 }
 
 __STXXL_END_NAMESPACE
+// vim: et:ts=4:sw=4

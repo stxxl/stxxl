@@ -11,7 +11,6 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/syscall_file.h>
-#include <stxxl/bits/parallel.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -125,16 +124,7 @@ void syscall_request::serve()
 
     _state.set_to(DONE);
 
-    {
-        scoped_mutex_lock Lock(waiters_mutex);
-
-        // << notification >>
-        std::for_each(
-            waiters.begin(),
-            waiters.end(),
-            std::mem_fun(&onoff_switch::on)
-            __STXXL_FORCE_SEQUENTIAL);
-    }
+    notify_waiters();
 
     completed();
 

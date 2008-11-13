@@ -23,8 +23,6 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-class ufs_request_base;
-
 //! \brief Base for UNIX file system implementations
 class ufs_file_base : public file
 {
@@ -44,11 +42,13 @@ public:
 //! \brief Base for UNIX file system implementations
 class ufs_request_base : public request
 {
-protected:
-    state<request_status> _state;
     mutex waiters_mutex;
     std::set<onoff_switch *> waiters;
 
+protected:
+    state<request_status> _state;
+
+protected:
     ufs_request_base(
         ufs_file_base * f,
         void * buf,
@@ -58,6 +58,7 @@ protected:
         completion_handler on_cmpl);
     bool add_waiter(onoff_switch * sw);
     void delete_waiter(onoff_switch * sw);
+    void notify_waiters();
     int nwaiters();             // returns number of waiters
     void check_aligning();
 

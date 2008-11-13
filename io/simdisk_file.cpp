@@ -209,14 +209,7 @@ void sim_disk_request::serve()
 
     _state.set_to(DONE);
 
-    {
-        scoped_mutex_lock Lock(waiters_mutex);
-
-        // << notification >>
-        for (std::set<onoff_switch *>::iterator i =
-                 waiters.begin(); i != waiters.end(); i++)
-            (*i)->on();
-    }
+    notify_waiters();
 
     completed();
     _state.set_to(READY2DIE);
