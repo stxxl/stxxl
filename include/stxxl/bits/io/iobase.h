@@ -269,7 +269,7 @@ public:
     virtual bool poll() = 0;
     //! \brief Identifies the type of request I/O implementation
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
-    virtual const char * io_type()
+    virtual const char * io_type() const
     {
         return "none";
     }

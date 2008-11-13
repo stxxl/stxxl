@@ -86,7 +86,7 @@ public:
     virtual ~boostfd_request();
     void wait();
     bool poll();
-    const char * io_type();
+    const char * io_type() const;
 };
 
 //! \}

@@ -63,7 +63,7 @@ protected:
     void serve();
 
 public:
-    const char * io_type();
+    const char * io_type() const;
 };
 
 //! \}

@@ -111,7 +111,7 @@ bool wfs_request_base::poll()
     return s == DONE || s == READY2DIE;
 }
 
-const char * wfs_request_base::io_type()
+const char * wfs_request_base::io_type() const
 {
     return "wfs_base";
 }

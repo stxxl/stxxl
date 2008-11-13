@@ -71,10 +71,7 @@ protected:
     void serve();
 
 public:
-    inline const char * io_type()
-    {
-        return "mmap";
-    }
+    const char * io_type() const;
 };
 
 //! \}

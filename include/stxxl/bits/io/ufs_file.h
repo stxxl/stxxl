@@ -66,7 +66,7 @@ public:
     virtual ~ufs_request_base();
     void wait();
     bool poll();
-    const char * io_type();
+    const char * io_type() const;
 };
 
 //! \}

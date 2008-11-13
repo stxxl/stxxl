@@ -136,9 +136,9 @@ void wincall_request::serve()
     _state.set_to(READY2DIE);
 }
 
-const char * wincall_request::io_type()
+const char * wincall_request::io_type() const
 {
-    return "syscall";
+    return "wincall";
 }
 
 ////////////////////////////////////////////////////////////////////////////

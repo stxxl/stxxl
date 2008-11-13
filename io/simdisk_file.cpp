@@ -215,6 +215,11 @@ void sim_disk_request::serve()
     _state.set_to(READY2DIE);
 }
 
+const char * sim_disk_request::io_type() const
+{
+    return "simdisk";
+}
+
 ////////////////////////////////////////////////////////////////////////////
 
 void sim_disk_file::set_size(stxxl::int64 newsize)

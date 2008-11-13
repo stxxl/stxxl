@@ -168,7 +168,7 @@ void mem_request::serve()
     _state.set_to(READY2DIE);
 }
 
-const char * mem_request::io_type()
+const char * mem_request::io_type() const
 {
     return "memory";
 }

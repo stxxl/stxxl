@@ -66,6 +66,11 @@ void mmap_request::serve()
     _state.set_to(READY2DIE);
 }
 
+const char * mmap_request::io_type() const
+{
+    return "mmap";
+}
+
 ////////////////////////////////////////////////////////////////////////////
 
 request_ptr mmap_file::aread(

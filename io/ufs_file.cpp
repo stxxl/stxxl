@@ -126,7 +126,7 @@ bool ufs_request_base::poll()
     return s == DONE || s == READY2DIE;
 }
 
-const char * ufs_request_base::io_type()
+const char * ufs_request_base::io_type() const
 {
     return "ufs_base";
 }
