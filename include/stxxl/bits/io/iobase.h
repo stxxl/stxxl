@@ -335,6 +335,16 @@ private:
         assert(val >= 0);
         return (val == 0);
     }
+
+protected:
+    void check_nref(bool after = false)
+    {
+        if (nref() < 2)
+            check_nref_failed(after);
+    }
+
+private:
+    void check_nref_failed(bool after = false);
 };
 
 inline std::ostream & operator << (std::ostream & out, const request & req)
@@ -671,3 +681,4 @@ public:
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_IOBASE_HEADER
+// vim: et:ts=4:sw=4

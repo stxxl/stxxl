@@ -32,5 +32,17 @@ void request::check_alignment() const
                      " (" << buffer << ")");
 }
 
+void request::check_nref_failed(bool after)
+{
+    STXXL_ERRMSG("WARNING: serious error, reference to the request is lost " <<
+                 (after?"after":"before") << " serve" <<
+                 " nref=" << nref() <<
+                 " this=" << this <<
+                 " offset=" << offset <<
+                 " buffer=" << buffer <<
+                 " bytes=" << bytes <<
+                 " type=" << ((type == READ) ? "READ" : "WRITE"));
+}
+
 __STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4
