@@ -37,7 +37,7 @@ ufs_request_base::ufs_request_base(
     // Direct I/O requires file system block size alignment for file offsets,
     // memory buffer addresses, and transfer(buffer) size must be multiple
     // of the file system block size
-    check_aligning();
+    check_alignment();
 #endif
 }
 
@@ -86,24 +86,6 @@ int ufs_request_base::nwaiters()
 {
     scoped_mutex_lock Lock(waiters_mutex);
     return waiters.size();
-}
-
-void ufs_request_base::check_aligning()
-{
-    if (offset % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Offset is not aligned: modulo "
-                                              << BLOCK_ALIGN << " = " <<
-                     offset % BLOCK_ALIGN);
-
-    if (bytes % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Size is not a multiple of " <<
-                     BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
-
-    if (long(buffer) % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Buffer is not aligned: modulo "
-                                              << BLOCK_ALIGN << " = " <<
-                     long(buffer) % BLOCK_ALIGN << " (" <<
-                     std::hex << buffer << std::dec << ")");
 }
 
 void ufs_request_base::wait()

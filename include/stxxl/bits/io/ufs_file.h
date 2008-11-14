@@ -60,7 +60,6 @@ protected:
     void delete_waiter(onoff_switch * sw);
     void notify_waiters();
     int nwaiters();             // returns number of waiters
-    void check_aligning();
 
 public:
     virtual ~ufs_request_base();

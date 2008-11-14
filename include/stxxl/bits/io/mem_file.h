@@ -70,7 +70,6 @@ protected:
     bool add_waiter(onoff_switch * sw);
     void delete_waiter(onoff_switch * sw);
     int nwaiters();             // returns number of waiters
-    void check_aligning();
     void serve();
 
 public:

@@ -65,24 +65,6 @@ int boostfd_request::nwaiters()     // returns number of waiters
     return waiters.size();
 }
 
-void boostfd_request::check_aligning()
-{
-    if (offset % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Offset is not aligned: modulo "
-                << BLOCK_ALIGN << " = " <<
-                     offset % BLOCK_ALIGN);
-
-    if (bytes % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Size is not a multiple of " <<
-                     BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
-
-    if (long(buffer) % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Buffer is not aligned: modulo "
-                << BLOCK_ALIGN << " = " <<
-                     long(buffer) % BLOCK_ALIGN << " (" <<
-                     std::hex << buffer << std::dec << ")");
-}
-
 void boostfd_request::wait()
 {
     STXXL_VERBOSE3("boostfd_request : " << this << " wait ");
