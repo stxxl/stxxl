@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/wincall_file.h>
+#include <stxxl/bits/common/debug.h>
 
 #ifdef BOOST_MSVC
 

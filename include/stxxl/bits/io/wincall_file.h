@@ -20,7 +20,6 @@
 #ifdef BOOST_MSVC
 
 #include <stxxl/bits/io/wfs_file.h>
-#include <stxxl/bits/common/debug.h>
 
 
 __STXXL_BEGIN_NAMESPACE
