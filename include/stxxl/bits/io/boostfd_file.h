@@ -17,9 +17,10 @@
 
 #ifdef STXXL_BOOST_CONFIG // if boost is available
 
- #include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/basic_waiters_request.h>
 
- #include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/device/file_descriptor.hpp>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -59,14 +60,12 @@ public:
 };
 
 //! \brief Implementation based on boost::iostreams::file_decriptor
-class boostfd_request : public request
+class boostfd_request : public basic_waiters_request
 {
     friend class boostfd_file;
 
 protected:
     state<request_status> _state;
-    mutex waiters_mutex;
-    std::set<onoff_switch *> waiters;
 
     boostfd_request(
         boostfd_file * f,
@@ -76,9 +75,6 @@ protected:
         request_type t,
         completion_handler on_cmpl);
 
-    bool add_waiter(onoff_switch * sw);
-    void delete_waiter(onoff_switch * sw);
-    int nwaiters(); // returns the number of waiters
     void serve();
 
 public:

@@ -11,8 +11,6 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/mem_file.h>
-#include <stxxl/bits/common/debug.h>
-#include <stxxl/bits/parallel.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -25,7 +23,7 @@ mem_request::mem_request(
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    request(on_cmpl, f, buf, off, b, t),
+    basic_waiters_request(on_cmpl, f, buf, off, b, t),
     _state(OP)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
@@ -41,31 +39,6 @@ mem_request::~mem_request()
     STXXL_VERBOSE3("mem_request " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
-}
-
-bool mem_request::add_waiter(onoff_switch * sw)
-{
-    if (poll())                     // request already finished
-    {
-        return true;
-    }
-
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.insert(sw);
-
-    return false;
-}
-
-void mem_request::delete_waiter(onoff_switch * sw)
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.erase(sw);
-}
-
-int mem_request::nwaiters()                 // returns number of waiters
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    return waiters.size();
 }
 
 void mem_request::wait()
@@ -112,16 +85,7 @@ void mem_request::serve()
 
     _state.set_to(DONE);
 
-    {
-        scoped_mutex_lock Lock(waiters_mutex);
-
-        // << notification >>
-        std::for_each(
-            waiters.begin(),
-            waiters.end(),
-            std::mem_fun(&onoff_switch::on)
-            __STXXL_FORCE_SEQUENTIAL);
-    }
+    notify_waiters();
 
     completed();
 

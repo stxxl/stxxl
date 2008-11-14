@@ -29,7 +29,7 @@ boostfd_request::boostfd_request(
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    request(on_cmpl, f, buf, off, b, t),
+    basic_waiters_request(on_cmpl, f, buf, off, b, t),
     _state(OP)
 { }
 
@@ -38,31 +38,6 @@ boostfd_request::~boostfd_request()
     STXXL_VERBOSE3("boostfd_request " << this << ": deletion, cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
-}
-
-bool boostfd_request::add_waiter(onoff_switch * sw)
-{
-    if (poll())   // request already finished
-    {
-        return true;
-    }
-
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.insert(sw);
-
-    return false;
-}
-
-void boostfd_request::delete_waiter(onoff_switch * sw)
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.erase(sw);
-}
-
-int boostfd_request::nwaiters()     // returns number of waiters
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    return waiters.size();
 }
 
 void boostfd_request::wait()
@@ -172,15 +147,7 @@ void boostfd_request::serve()
 
     _state.set_to(DONE);
 
-    {
-        scoped_mutex_lock Lock(waiters_mutex);
-
-        // << notification >>
-        std::for_each(
-            waiters.begin(),
-            waiters.end(),
-            std::mem_fun(&onoff_switch::on));
-    }
+    notify_waiters();
 
     completed();
     _state.set_to(READY2DIE);

@@ -14,6 +14,7 @@
 #define STXXL_MEM_FILE_HEADER
 
 #include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/basic_waiters_request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -51,14 +52,12 @@ public:
 };
 
 //! \brief Implementation of request based on memcpy()
-class mem_request : public request
+class mem_request : public basic_waiters_request
 {
     friend class mem_file;
 
 protected:
     state<request_status> _state;
-    mutex waiters_mutex;
-    std::set<onoff_switch *> waiters;
 
     mem_request(
         mem_file * f,
@@ -67,9 +66,7 @@ protected:
         size_t b,
         request_type t,
         completion_handler on_cmpl);
-    bool add_waiter(onoff_switch * sw);
-    void delete_waiter(onoff_switch * sw);
-    int nwaiters();             // returns number of waiters
+
     void serve();
 
 public:

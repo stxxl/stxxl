@@ -105,15 +105,7 @@ void wincall_request::serve()
 
     _state.set_to(DONE);
 
-    {
-        scoped_mutex_lock Lock(waiters_mutex);
-
-        // << notification >>
-        std::for_each(
-            waiters.begin(),
-            waiters.end(),
-            std::mem_fun(&onoff_switch::on));
-    }
+    notify_waiters();
 
     completed();
     _state.set_to(READY2DIE);

@@ -24,7 +24,7 @@ wfs_request_base::wfs_request_base(
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    request(on_cmpl, f, buf, off, b, t),
+    basic_waiters_request(on_cmpl, f, buf, off, b, t),
     _state(OP)
 {
  #ifdef STXXL_CHECK_BLOCK_ALIGNING
@@ -46,31 +46,6 @@ wfs_request_base::~wfs_request_base()
     //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
 
     // _state.wait_for (READY2DIE); // does not make sense ?
-}
-
-bool wfs_request_base::add_waiter(onoff_switch * sw)
-{
-    if (poll())                     // request already finished
-    {
-        return true;
-    }
-
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.insert(sw);
-
-    return false;
-}
-
-void wfs_request_base::delete_waiter(onoff_switch * sw)
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.erase(sw);
-}
-
-int wfs_request_base::nwaiters()                 // returns number of waiters
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    return waiters.size();
 }
 
 void wfs_request_base::wait()
