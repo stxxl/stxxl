@@ -283,6 +283,8 @@ public:
     size_t get_size() const { return bytes; }
     request_type get_type() const { return type; }
 
+    void check_alignment() const;
+
     virtual std::ostream & print(std::ostream & out) const
     {
         out << "File object address: " << (void *)get_file();

@@ -1,4 +1,5 @@
 LIB_OBJECTS = \
+	../io/request.$(OBJEXT) \
 	../io/diskqueue.$(OBJEXT) \
 	../io/wfs_file.$(OBJEXT) \
 	../io/ufs_file.$(OBJEXT) \
