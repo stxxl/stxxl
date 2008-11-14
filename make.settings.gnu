@@ -271,6 +271,7 @@ HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h debug.h tuple.h
 HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h
 
 HEADER_FILES_IO		+= completion_handler.h io.h iobase.h iostats.h
+HEADER_FILES_IO		+= basic_waiters_request.h
 HEADER_FILES_IO		+= mmap_file.h simdisk_file.h syscall_file.h
 HEADER_FILES_IO		+= ufs_file.h wincall_file.h wfs_file.h boostfd_file.h
 HEADER_FILES_IO		+= mem_file.h
