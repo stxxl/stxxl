@@ -212,6 +212,8 @@ class request : private noncopyable
 protected:
     virtual bool add_waiter(onoff_switch * sw) = 0;
     virtual void delete_waiter(onoff_switch * sw) = 0;
+    virtual void notify_waiters() = 0;
+
     virtual void serve() = 0;
 
     completion_handler on_complete;

@@ -41,7 +41,9 @@ protected:
     bool add_waiter(onoff_switch * sw);
     void delete_waiter(onoff_switch * sw);
     void notify_waiters();
+    /*
     int nwaiters();             // returns number of waiters
+    */
 
 public:
     const char * io_type() const;

@@ -58,11 +58,13 @@ void basic_waiters_request::notify_waiters()
                   __STXXL_FORCE_SEQUENTIAL);
 }
 
+/*
 int basic_waiters_request::nwaiters()
 {
     scoped_mutex_lock lock(waiters_mutex);
     return waiters.size();
 }
+*/
 
 const char * basic_waiters_request::io_type() const
 {
