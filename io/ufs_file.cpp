@@ -12,7 +12,6 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/ufs_file.h>
-#include <stxxl/bits/parallel.h>
 
 #ifndef BOOST_MSVC
  #include <unistd.h>
@@ -30,7 +29,7 @@ ufs_request_base::ufs_request_base(
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    request(on_cmpl, f, buf, off, b, t),
+    basic_waiters_request(on_cmpl, f, buf, off, b, t),
     _state(OP)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
@@ -52,40 +51,6 @@ ufs_request_base::~ufs_request_base()
     //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
 
     // _state.wait_for (READY2DIE); // does not make sense ?
-}
-
-bool ufs_request_base::add_waiter(onoff_switch * sw)
-{
-    if (poll())                     // request already finished
-    {
-        return true;
-    }
-
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.insert(sw);
-
-    return false;
-}
-
-void ufs_request_base::delete_waiter(onoff_switch * sw)
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.erase(sw);
-}
-
-void ufs_request_base::notify_waiters()
-{
-    scoped_mutex_lock lock(waiters_mutex);
-    std::for_each(waiters.begin(),
-                  waiters.end(),
-                  std::mem_fun(&onoff_switch::on)
-                  __STXXL_FORCE_SEQUENTIAL);
-}
-
-int ufs_request_base::nwaiters()
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    return waiters.size();
 }
 
 void ufs_request_base::wait()

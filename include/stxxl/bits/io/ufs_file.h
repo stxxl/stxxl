@@ -16,6 +16,7 @@
 #define STXXL_UFSFILEBASE_HEADER
 
 #include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/basic_waiters_request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -40,11 +41,8 @@ public:
 };
 
 //! \brief Base for UNIX file system implementations
-class ufs_request_base : public request
+class ufs_request_base : public basic_waiters_request
 {
-    mutex waiters_mutex;
-    std::set<onoff_switch *> waiters;
-
 protected:
     state<request_status> _state;
 
@@ -56,10 +54,6 @@ protected:
         size_t b,
         request_type t,
         completion_handler on_cmpl);
-    bool add_waiter(onoff_switch * sw);
-    void delete_waiter(onoff_switch * sw);
-    void notify_waiters();
-    int nwaiters();             // returns number of waiters
 
 public:
     virtual ~ufs_request_base();
