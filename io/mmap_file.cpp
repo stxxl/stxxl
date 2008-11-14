@@ -59,9 +59,6 @@ void mmap_request::serve()
     }
 
     _state.set_to(DONE);
-
-    notify_waiters();
-
     completed();
     _state.set_to(READY2DIE);
 }

@@ -238,6 +238,7 @@ protected:
 
     void completed()
     {
+        notify_waiters();
         on_complete(this);
     }
 

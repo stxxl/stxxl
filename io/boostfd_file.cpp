@@ -146,9 +146,6 @@ void boostfd_request::serve()
     check_nref(true);
 
     _state.set_to(DONE);
-
-    notify_waiters();
-
     completed();
     _state.set_to(READY2DIE);
 }
