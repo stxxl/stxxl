@@ -90,18 +90,7 @@ bool mem_request::poll()
 
 void mem_request::serve()
 {
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
-                     " (nref=" << nref() << ") " <<
-                     " this=" << long(this) <<
-                     " mem address=" << static_cast<mem_file *>(file_)->get_ptr() <<
-                     " mem size=" << static_cast<mem_file *>(file_)->size() <<
-                     " offset=" << offset <<
-                     " buffer=" << buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
+    check_nref();
     STXXL_VERBOSE2("mem_request::serve(): Buffer at " << ((void *)buffer) <<
                    " offset: " << offset <<
                    " bytes: " << bytes <<
@@ -119,18 +108,7 @@ void mem_request::serve()
         memcpy(static_cast<mem_file *>(file_)->get_ptr() + offset, buffer, bytes);
     }
 
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: reference to the request is lost after serve" <<
-                     " (nref=" << nref() << ") " <<
-                     " this=" << long(this) <<
-                     " mem address=" << static_cast<mem_file *>(file_)->get_ptr() <<
-                     " mem size=" << static_cast<mem_file *>(file_)->size() <<
-                     " offset=" << offset <<
-                     " buffer=" << buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
+    check_nref(true);
 
     _state.set_to(DONE);
 

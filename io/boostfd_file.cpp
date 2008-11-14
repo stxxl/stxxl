@@ -87,16 +87,7 @@ bool boostfd_request::poll()
 
 void boostfd_request::serve()
 {
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
-                     " nref=" << nref() <<
-                     " this=" << this <<
-                     " offset=" << offset <<
-                     " buffer=" << buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
+    check_nref();
     STXXL_VERBOSE2("boostfd_request::serve():" <<
                    " Buffer at " << buffer <<
                    " offset: " << offset <<
@@ -177,16 +168,7 @@ void boostfd_request::serve()
         error_occured(ex.what());
     }
 
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: reference to the request is lost after serve" <<
-                     " nref=" << nref() <<
-                     " this=" << this <<
-                     " offset=" << offset <<
-                     " buffer=" << buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
+    check_nref(true);
 
     _state.set_to(DONE);
 

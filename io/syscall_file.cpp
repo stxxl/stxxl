@@ -30,17 +30,7 @@ void syscall_request::serve()
 {
     int fd = static_cast<syscall_file *>(file_)->get_file_des();
 
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve" <<
-                     " nref=" << nref() <<
-                     " this=" << this <<
-                     " fd=" << fd <<
-                     " offset=" << offset <<
-                     " buffer=" << buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
+    check_nref();
     STXXL_VERBOSE2("syscall_request::serve():" <<
                    " Buffer at " << buffer <<
                    " offset: " << offset <<
@@ -110,17 +100,7 @@ void syscall_request::serve()
         error_occured(ex.what());
     }
 
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: reference to the request is lost after serve" <<
-                     " nref=" << nref() <<
-                     " this=" << this <<
-                     " fd=" << fd <<
-                     " offset=" << offset <<
-                     " buffer=" << buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
+    check_nref(true);
 
     _state.set_to(DONE);
 
