@@ -1,6 +1,7 @@
 LIB_OBJECTS = \
 	../io/request.$(OBJEXT) \
 	../io/basic_waiters_request.$(OBJEXT) \
+	../io/basic_request_state.$(OBJEXT) \
 	../io/diskqueue.$(OBJEXT) \
 	../io/wfs_file.$(OBJEXT) \
 	../io/ufs_file.$(OBJEXT) \
