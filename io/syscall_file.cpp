@@ -27,50 +27,42 @@ syscall_request::syscall_request(
     ufs_request_base(f, buf, off, b, t, on_cmpl)
 { }
 
-void syscall_request::serve()
+void syscall_file::serve(const request * req)
 {
-    int fd = static_cast<syscall_file *>(file_)->get_file_des();
+    stxxl::int64 offset = req->get_offset();
+    void * buffer = req->get_buffer();
+    size_t bytes = req->get_size();
+    request::request_type type = req->get_type();
 
-    check_nref();
-    STXXL_VERBOSE2("syscall_request::serve():" <<
-                   " Buffer at " << buffer <<
-                   " offset: " << offset <<
-                   " bytes: " << bytes <<
-                   ((type == READ) ? " READ" : " WRITE") <<
-                   " file: " << fd);
-
-    try
-    {
-        if (::lseek(fd, offset, SEEK_SET) < 0)
+        if (::lseek(file_des, offset, SEEK_SET) < 0)
         {
             STXXL_THROW2(io_error,
                          " this=" << this <<
                          " call=::lseek(fd,offset,SEEK_SET)" <<
-                         " fd=" << fd <<
+                         " fd=" << file_des <<
                          " offset=" << offset <<
                          " buffer=" << buffer <<
                          " bytes=" << bytes <<
-                         " type=" << ((type == READ) ? "READ" : "WRITE"));
+                         " type=" << ((type == request::READ) ? "READ" : "WRITE"));
         }
         else
         {
-            stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+            stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-            if (type == READ)
+            if (type == request::READ)
             {
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
-                if (::read(fd, buffer, bytes) < 0)
+                if (::read(file_des, buffer, bytes) < 0)
                 {
                     STXXL_THROW2(io_error,
                                  " this=" << this <<
                                  " call=::read(fd,buffer,bytes)" <<
-                                 " fd=" << fd <<
+                                 " fd=" << file_des <<
                                  " offset=" << offset <<
                                  " buffer=" << buffer <<
                                  " bytes=" << bytes <<
-                                 " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                                 " nref=" << nref());
+                                 " type=" << ((type == request::READ) ? "READ" : "WRITE"));
                 }
 
                 STXXL_DEBUGMON_DO(io_finished((char *)buffer));
@@ -79,22 +71,35 @@ void syscall_request::serve()
             {
                 STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
-                if (::write(fd, buffer, bytes) < 0)
+                if (::write(file_des, buffer, bytes) < 0)
                 {
                     STXXL_THROW2(io_error,
                                  " this=" << this <<
                                  " call=::write(fd,buffer,bytes)" <<
-                                 " fd=" << fd <<
+                                 " fd=" << file_des <<
                                  " offset=" << offset <<
                                  " buffer=" << buffer <<
                                  " bytes=" << bytes <<
-                                 " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                                 " nref=" << nref());
+                                 " type=" << ((type == request::READ) ? "READ" : "WRITE"));
                 }
 
                 STXXL_DEBUGMON_DO(io_finished((char *)buffer));
             }
         }
+}
+
+void syscall_request::serve()
+{
+    check_nref();
+    STXXL_VERBOSE2("syscall_request::serve():" <<
+                   " Buffer at " << buffer <<
+                   " offset: " << offset <<
+                   " bytes: " << bytes <<
+                   ((type == READ) ? " READ" : " WRITE"));
+
+    try
+    {
+        static_cast<syscall_file *>(file_)->serve(this);
     }
     catch (const io_error & ex)
     {
