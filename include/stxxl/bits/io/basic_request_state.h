@@ -28,7 +28,11 @@ __STXXL_BEGIN_NAMESPACE
 class basic_request_state : public basic_waiters_request
 {
 protected:
-    state<request_status> _state;
+    //! states of request
+    //! OP - operating, DONE - request served, READY2DIE - can be destroyed
+    enum request_state { OP = 0, DONE = 1, READY2DIE = 2 };
+
+    state<request_state> _state;
 
 protected:
     basic_request_state(

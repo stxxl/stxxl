@@ -54,7 +54,7 @@ void basic_request_state::wait()
 
 bool basic_request_state::poll()
 {
-    const request_status s = _state();
+    const request_state s = _state();
 
     check_errors();
 
