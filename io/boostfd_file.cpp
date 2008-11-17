@@ -29,36 +29,8 @@ boostfd_request::boostfd_request(
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    basic_waiters_request(on_cmpl, f, buf, off, b, t),
-    _state(OP)
+    basic_request_state(on_cmpl, f, buf, off, b, t)
 { }
-
-boostfd_request::~boostfd_request()
-{
-    STXXL_VERBOSE3("boostfd_request " << this << ": deletion, cnt: " << ref_cnt);
-
-    assert(_state() == DONE || _state() == READY2DIE);
-}
-
-void boostfd_request::wait()
-{
-    STXXL_VERBOSE3("boostfd_request : " << this << " wait ");
-
-    stats::scoped_wait_timer wait_timer;
-
-    _state.wait_for(READY2DIE);
-
-    check_errors();
-}
-
-bool boostfd_request::poll()
-{
-    const request_status s = _state();
-
-    check_errors();
-
-    return s == DONE || s == READY2DIE;
-}
 
 void boostfd_request::serve()
 {

@@ -29,8 +29,7 @@ ufs_request_base::ufs_request_base(
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    basic_waiters_request(on_cmpl, f, buf, off, b, t),
-    _state(OP)
+    basic_request_state(on_cmpl, f, buf, off, b, t)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
     // Direct I/O requires file system block size alignment for file offsets,
@@ -38,39 +37,6 @@ ufs_request_base::ufs_request_base(
     // of the file system block size
     check_alignment();
 #endif
-}
-
-ufs_request_base::~ufs_request_base()
-{
-    STXXL_VERBOSE3("ufs_request_base " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
-
-    assert(_state() == DONE || _state() == READY2DIE);
-
-    // if(_state() != DONE && _state()!= READY2DIE )
-    //	STXXL_ERRMSG("WARNING: serious stxxl error request being deleted while I/O did not finish "<<
-    //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
-
-    // _state.wait_for (READY2DIE); // does not make sense ?
-}
-
-void ufs_request_base::wait()
-{
-    STXXL_VERBOSE3("ufs_request_base : " << static_cast<void *>(this) << " wait ");
-
-    stats::scoped_wait_timer wait_timer;
-
-    _state.wait_for(READY2DIE);
-
-    check_errors();
-}
-
-bool ufs_request_base::poll()
-{
-    const request_status s = _state();
-
-    check_errors();
-
-    return s == DONE || s == READY2DIE;
 }
 
 const char * ufs_request_base::io_type() const

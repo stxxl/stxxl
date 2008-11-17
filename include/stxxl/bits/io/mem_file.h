@@ -14,7 +14,7 @@
 #define STXXL_MEM_FILE_HEADER
 
 #include <stxxl/bits/io/iobase.h>
-#include <stxxl/bits/io/basic_waiters_request.h>
+#include <stxxl/bits/io/basic_request_state.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -52,13 +52,11 @@ public:
 };
 
 //! \brief Implementation of request based on memcpy()
-class mem_request : public basic_waiters_request
+class mem_request : public basic_request_state
 {
     friend class mem_file;
 
 protected:
-    state<request_status> _state;
-
     mem_request(
         mem_file * f,
         void * buf,
@@ -70,9 +68,6 @@ protected:
     void serve();
 
 public:
-    virtual ~mem_request();
-    void wait();
-    bool poll();
     const char * io_type() const;
 };
 

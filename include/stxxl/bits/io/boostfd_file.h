@@ -18,7 +18,7 @@
 #ifdef STXXL_BOOST_CONFIG // if boost is available
 
 #include <stxxl/bits/io/iobase.h>
-#include <stxxl/bits/io/basic_waiters_request.h>
+#include <stxxl/bits/io/basic_request_state.h>
 
 #include <boost/iostreams/device/file_descriptor.hpp>
 
@@ -27,8 +27,6 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
-
-class boostfd_request;
 
 //! \brief Implementation based on boost::iostreams::file_decriptor
 class boostfd_file : public file
@@ -60,13 +58,11 @@ public:
 };
 
 //! \brief Implementation based on boost::iostreams::file_decriptor
-class boostfd_request : public basic_waiters_request
+class boostfd_request : public basic_request_state
 {
     friend class boostfd_file;
 
 protected:
-    state<request_status> _state;
-
     boostfd_request(
         boostfd_file * f,
         void * buf,
@@ -78,9 +74,6 @@ protected:
     void serve();
 
 public:
-    virtual ~boostfd_request();
-    void wait();
-    bool poll();
     const char * io_type() const;
 };
 

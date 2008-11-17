@@ -23,8 +23,7 @@ mem_request::mem_request(
     size_t b,
     request_type t,
     completion_handler on_cmpl) :
-    basic_waiters_request(on_cmpl, f, buf, off, b, t),
-    _state(OP)
+    basic_request_state(on_cmpl, f, buf, off, b, t)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
     // Direct I/O requires file system block size alignment for file offsets,
@@ -32,33 +31,6 @@ mem_request::mem_request(
     // of the file system block size
     check_alignment();
 #endif
-}
-
-mem_request::~mem_request()
-{
-    STXXL_VERBOSE3("mem_request " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
-
-    assert(_state() == DONE || _state() == READY2DIE);
-}
-
-void mem_request::wait()
-{
-    STXXL_VERBOSE3("mem_request : " << static_cast<void *>(this) << " wait ");
-
-    stats::scoped_wait_timer wait_timer;
-
-    _state.wait_for(READY2DIE);
-
-    check_errors();
-}
-
-bool mem_request::poll()
-{
-    const request_status s = _state();
-
-    check_errors();
-
-    return s == DONE || s == READY2DIE;
 }
 
 void mem_request::serve()

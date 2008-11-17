@@ -16,7 +16,7 @@
 #define STXXL_UFSFILEBASE_HEADER
 
 #include <stxxl/bits/io/iobase.h>
-#include <stxxl/bits/io/basic_waiters_request.h>
+#include <stxxl/bits/io/basic_request_state.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -41,11 +41,8 @@ public:
 };
 
 //! \brief Base for UNIX file system implementations
-class ufs_request_base : public basic_waiters_request
+class ufs_request_base : public basic_request_state
 {
-protected:
-    state<request_status> _state;
-
 protected:
     ufs_request_base(
         ufs_file_base * f,
@@ -56,9 +53,6 @@ protected:
         completion_handler on_cmpl);
 
 public:
-    virtual ~ufs_request_base();
-    void wait();
-    bool poll();
     const char * io_type() const;
 };
 

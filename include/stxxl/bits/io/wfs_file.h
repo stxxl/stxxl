@@ -22,15 +22,13 @@
 #ifdef BOOST_MSVC
 
 #include <stxxl/bits/io/iobase.h>
-#include <stxxl/bits/io/basic_waiters_request.h>
+#include <stxxl/bits/io/basic_request_state.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup fileimpl
 //! \{
-
-class wfs_request_base;
 
 //! \brief Base for Windows file system implementations
 class wfs_file_base : public file
@@ -48,12 +46,10 @@ public:
     void lock();
 };
 
-//! \brief Base for UNIX file system implementations
-class wfs_request_base : public basic_waiters_request
+//! \brief Base for Windows file system implementations
+class wfs_request_base : public basic_request_state
 {
 protected:
-    state<request_status> _state;
-
     wfs_request_base(
         wfs_file_base * f,
         void * buf,
@@ -63,9 +59,6 @@ protected:
         completion_handler on_cmpl);
 
 public:
-    virtual ~wfs_request_base();
-    void wait();
-    bool poll();
     const char * io_type() const;
 };
 
