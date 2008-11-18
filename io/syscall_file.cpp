@@ -29,6 +29,7 @@ syscall_request::syscall_request(
 
 void syscall_file::serve(const request * req) throw(io_error)
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
     void * buffer = req->get_buffer();

@@ -91,6 +91,7 @@ ufs_file_base::ufs_file_base(
 
 ufs_file_base::~ufs_file_base()
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     int res = ::close(file_des);
 
     // if successful, reset file descriptor
@@ -105,6 +106,7 @@ void ufs_file_base::lock()
 #ifdef BOOST_MSVC
     // not yet implemented
 #else
+    scoped_mutex_lock fd_lock(fd_mutex);
     struct flock lock_struct;
     lock_struct.l_type = F_RDLCK | F_WRLCK;
     lock_struct.l_whence = SEEK_SET;
@@ -117,6 +119,7 @@ void ufs_file_base::lock()
 
 stxxl::int64 ufs_file_base::size()
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     struct stat st;
     stxxl_check_ge_0(::fstat(file_des, &st), io_error);
     return st.st_size;
@@ -124,6 +127,7 @@ stxxl::int64 ufs_file_base::size()
 
 void ufs_file_base::set_size(stxxl::int64 newsize)
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     stxxl::int64 cur_size = size();
 
 #ifdef BOOST_MSVC

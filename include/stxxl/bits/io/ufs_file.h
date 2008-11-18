@@ -28,6 +28,7 @@ __STXXL_BEGIN_NAMESPACE
 class ufs_file_base : public file
 {
 protected:
+    mutex fd_mutex;        // sequentialize function calls involving file_des
     int file_des;          // file descriptor
     int mode_;             // open mode
     ufs_file_base(const std::string & filename, int mode, int disk);
