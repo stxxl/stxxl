@@ -105,11 +105,6 @@ wfs_file_base::~wfs_file_base()
         file_des = INVALID_HANDLE_VALUE;
 }
 
-HANDLE wfs_file_base::get_file_des() const
-{
-    return file_des;
-}
-
 void wfs_file_base::lock()
 {
     if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)

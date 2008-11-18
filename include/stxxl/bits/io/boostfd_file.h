@@ -40,7 +40,6 @@ protected:
 
 public:
     boostfd_file(const std::string & filename, int mode, int disk = -1);
-    fd_type get_file_des() const;
     ~boostfd_file();
     stxxl::int64 size();
     void set_size(stxxl::int64 newsize);

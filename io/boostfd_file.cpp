@@ -112,8 +112,6 @@ void boostfd_request::serve()
                    " bytes: " << bytes <<
                    ((type == request::READ) ? " READ" : " WRITE"));
 
-    boostfd_file::fd_type fd = static_cast<boostfd_file *>(file_)->get_file_des();
-
     try
     {
         static_cast<boostfd_file *>(file_)->serve(this);
@@ -197,12 +195,6 @@ boostfd_file::boostfd_file(
 boostfd_file::~boostfd_file()
 {
     file_des.close();
-}
-
-boost::iostreams::file_descriptor
-boostfd_file::get_file_des() const
-{
-    return file_des;
 }
 
 stxxl::int64 boostfd_file::size()

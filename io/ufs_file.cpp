@@ -100,11 +100,6 @@ ufs_file_base::~ufs_file_base()
         stxxl_function_error(io_error);
 }
 
-int ufs_file_base::get_file_des() const
-{
-    return file_des;
-}
-
 void ufs_file_base::lock()
 {
 #ifdef BOOST_MSVC

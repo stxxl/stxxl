@@ -39,7 +39,6 @@ protected:
     wfs_file_base(const std::string & filename, int mode, int disk);
 
 public:
-    HANDLE get_file_des() const;
     ~wfs_file_base();
     stxxl::int64 size();
     void set_size(stxxl::int64 newsize);

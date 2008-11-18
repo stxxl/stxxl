@@ -33,7 +33,6 @@ protected:
     ufs_file_base(const std::string & filename, int mode, int disk);
 
 public:
-    int get_file_des() const;
     ~ufs_file_base();
     stxxl::int64 size();
     void set_size(stxxl::int64 newsize);
