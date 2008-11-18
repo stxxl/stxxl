@@ -54,6 +54,7 @@ public:
         stxxl::int64 pos,
         size_t bytes,
         completion_handler on_cmpl);
+    void serve(const request * req);
 };
 
 //! \brief Implementation of memory mapped access file request

@@ -32,22 +32,17 @@ boostfd_request::boostfd_request(
     basic_request_state(on_cmpl, f, buf, off, b, t)
 { }
 
-void boostfd_request::serve()
+void boostfd_file::serve(const request * req)
 {
-    check_nref();
-    STXXL_VERBOSE2("boostfd_request::serve():" <<
-                   " Buffer at " << buffer <<
-                   " offset: " << offset <<
-                   " bytes: " << bytes <<
-                   ((type == READ) ? " READ" : " WRITE"));
-
-    boostfd_file::fd_type fd = static_cast<boostfd_file *>(file_)->get_file_des();
+    assert(req->get_file() == this);
+    stxxl::int64 offset = req->get_offset();
+    void * buffer = req->get_buffer();
+    size_t bytes = req->get_size();
+    request::request_type type = req->get_type();
 
     try
     {
-    try
-    {
-        fd.seek(offset, BOOST_IOS::beg);
+        file_des.seek(offset, BOOST_IOS::beg);
     }
     catch (const std::exception & ex)
     {
@@ -57,19 +52,19 @@ void boostfd_request::serve()
                          " this=" << this <<
                          " buffer=" << buffer <<
                          " bytes=" << bytes <<
-                         " type=" << ((type == READ) ? "READ" : "WRITE") <<
+                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                          " : " << ex.what());
     }
 
-        stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-        if (type == READ)
+        if (type == request::READ)
         {
             STXXL_DEBUGMON_DO(io_started((char *)buffer));
 
             try
             {
-                fd.read((char *)buffer, bytes);
+                file_des.read((char *)buffer, bytes);
             }
             catch (const std::exception & ex)
             {
@@ -79,8 +74,7 @@ void boostfd_request::serve()
                              " this=" << this <<
                              " buffer=" << buffer <<
                              " bytes=" << bytes <<
-                             " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                             " nref= " << nref() <<
+                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                              " : " << ex.what());
             }
 
@@ -92,7 +86,7 @@ void boostfd_request::serve()
 
             try
             {
-                fd.write((char *)buffer, bytes);
+                file_des.write((char *)buffer, bytes);
             }
             catch (const std::exception & ex)
             {
@@ -102,13 +96,27 @@ void boostfd_request::serve()
                              " this=" << this <<
                              " buffer=" << buffer <<
                              " bytes=" << bytes <<
-                             " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                             " nref= " << nref() <<
+                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                              " : " << ex.what());
             }
 
             STXXL_DEBUGMON_DO(io_finished((char *)buffer));
         }
+}
+void boostfd_request::serve()
+{
+    check_nref();
+    STXXL_VERBOSE2("boostfd_request::serve():" <<
+                   " Buffer at " << buffer <<
+                   " offset: " << offset <<
+                   " bytes: " << bytes <<
+                   ((type == request::READ) ? " READ" : " WRITE"));
+
+    boostfd_file::fd_type fd = static_cast<boostfd_file *>(file_)->get_file_des();
+
+    try
+    {
+        static_cast<boostfd_file *>(file_)->serve(this);
     }
     catch (const io_error & ex)
     {

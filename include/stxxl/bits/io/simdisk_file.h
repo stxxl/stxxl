@@ -120,6 +120,7 @@ public:
                       completion_handler on_cmpl);
     request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
                        completion_handler on_cmpl);
+    void serve(const request * req);
     void set_size(stxxl::int64 newsize);
 };
 

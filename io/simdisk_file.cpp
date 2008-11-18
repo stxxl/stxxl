@@ -159,14 +159,18 @@ IC35L080AVVA07::IC35L080AVVA07()
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_request::serve()
+void sim_disk_file::serve(const request * req)
 {
+    assert(req->get_file() == this);
+    stxxl::int64 offset = req->get_offset();
+    void * buffer = req->get_buffer();
+    size_t bytes = req->get_size();
+    request::request_type type = req->get_type();
     double op_start = timestamp();
 
-    try {
-        stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-        void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, static_cast<sim_disk_file *>(file_)->get_file_des(), offset);
+        void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
         if (mem == MAP_FAILED)
         {
             STXXL_THROW2(io_error,
@@ -180,7 +184,7 @@ void sim_disk_request::serve()
         }
         else
         {
-            if (type == READ)
+            if (type == request::READ)
             {
                 memcpy(buffer, mem, bytes);
             } else {
@@ -189,8 +193,7 @@ void sim_disk_request::serve()
             stxxl_check_ge_0(munmap(mem, bytes), io_error);
         }
 
-        double delay =
-            (static_cast<sim_disk_file *>(file_))->get_delay(offset, bytes);
+        double delay = get_delay(offset, bytes);
 
         delay = delay - timestamp() + op_start;
 
@@ -201,6 +204,12 @@ void sim_disk_request::serve()
             sleep(seconds_to_wait);
 
         usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
+}
+
+void sim_disk_request::serve()
+{
+    try {
+        static_cast<sim_disk_file *>(file_)->serve(this);
     }
     catch (const io_error & ex)
     {
@@ -259,3 +268,4 @@ request_ptr sim_disk_file::awrite(
 __STXXL_END_NAMESPACE
 
 #endif // #ifndef BOOST_MSVC
+// vim: et:ts=4:sw=4

@@ -29,6 +29,7 @@ syscall_request::syscall_request(
 
 void syscall_file::serve(const request * req)
 {
+    assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
     void * buffer = req->get_buffer();
     size_t bytes = req->get_size();
@@ -95,7 +96,7 @@ void syscall_request::serve()
                    " Buffer at " << buffer <<
                    " offset: " << offset <<
                    " bytes: " << bytes <<
-                   ((type == READ) ? " READ" : " WRITE"));
+                   ((type == request::READ) ? " READ" : " WRITE"));
 
     try
     {

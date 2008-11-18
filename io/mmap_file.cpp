@@ -19,16 +19,20 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void mmap_request::serve()
+void mmap_file::serve(const request * req)
 {
-    try
-    {
-        stats::scoped_read_write_timer read_write_timer(bytes, type == WRITE);
+    assert(req->get_file() == this);
+    stxxl::int64 offset = req->get_offset();
+    void * buffer = req->get_buffer();
+    size_t bytes = req->get_size();
+    request::request_type type = req->get_type();
 
-        int prot = (type == READ) ? PROT_READ : PROT_WRITE;
-        void * mem = mmap(NULL, bytes, prot, MAP_SHARED, static_cast<mmap_file *>(file_)->get_file_des(), offset);
-        // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , static_cast<syscall_file*>(file_)->get_file_des (), offset);
-        // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<((void*)buffer));
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+
+        int prot = (type == request::READ) ? PROT_READ : PROT_WRITE;
+        void * mem = mmap(NULL, bytes, prot, MAP_SHARED, file_des, offset);
+        // void *mem = mmap (buffer, bytes, prot , MAP_SHARED|MAP_FIXED , file_des, offset);
+        // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<buffer);
         if (mem == MAP_FAILED)
         {
             STXXL_THROW2(io_error,
@@ -42,7 +46,7 @@ void mmap_request::serve()
         }
         else
         {
-            if (type == READ)
+            if (type == request::READ)
             {
                 memcpy(buffer, mem, bytes);
             }
@@ -52,6 +56,13 @@ void mmap_request::serve()
             }
             stxxl_check_ge_0(munmap(mem, bytes), io_error);
         }
+}
+
+void mmap_request::serve()
+{
+    try
+    {
+        static_cast<mmap_file *>(file_)->serve(this);
     }
     catch (const io_error & ex)
     {
@@ -117,3 +128,4 @@ request_ptr mmap_file::awrite(
 __STXXL_END_NAMESPACE
 
 #endif // #ifndef BOOST_MSVC
+// vim: et:ts=4:sw=4

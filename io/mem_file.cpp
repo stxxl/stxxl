@@ -33,25 +33,35 @@ mem_request::mem_request(
 #endif
 }
 
+void mem_file::serve(const request * req)
+{
+    assert(req->get_file() == this);
+    stxxl::int64 offset = req->get_offset();
+    void * buffer = req->get_buffer();
+    size_t bytes = req->get_size();
+    request::request_type type = req->get_type();
+
+    if (type == request::READ)
+    {
+        stats::scoped_read_timer read_timer(bytes);
+        memcpy(buffer, ptr + offset, bytes);
+    }
+    else
+    {
+        stats::scoped_write_timer write_timer(bytes);
+        memcpy(ptr + offset, buffer, bytes);
+    }
+}
+
 void mem_request::serve()
 {
     check_nref();
     STXXL_VERBOSE2("mem_request::serve(): Buffer at " << ((void *)buffer) <<
                    " offset: " << offset <<
                    " bytes: " << bytes <<
-                   ((type == READ) ? " READ" : " WRITE") <<
-                   " mem: " << static_cast<mem_file *>(file_)->get_ptr());
+                   ((type == request::READ) ? " READ" : " WRITE"));
 
-    if (type == READ)
-    {
-        stats::scoped_read_timer read_timer(bytes);
-        memcpy(buffer, static_cast<mem_file *>(file_)->get_ptr() + offset, bytes);
-    }
-    else
-    {
-        stats::scoped_write_timer write_timer(bytes);
-        memcpy(static_cast<mem_file *>(file_)->get_ptr() + offset, buffer, bytes);
-    }
+    static_cast<mem_file *>(file_)->serve(this);
 
     check_nref(true);
 
