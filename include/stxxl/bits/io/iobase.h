@@ -605,7 +605,7 @@ private:
 
     semaphore sem;
 
-    priority_op _priority_op;
+    static const priority_op _priority_op = WRITE;
 
 #ifdef STXXL_BOOST_THREADS
     boost::thread thread;
@@ -619,9 +619,14 @@ private:
 public:
     disk_queue(int n = 1);             // max number of requests simultaneously submitted to disk
 
+    // in a multi-threaded setup this does not work as intended
+    // also there were race conditions possible
+    // and actually an old value was never restored once a new one was set ...
+    // so just disable it and all it's nice implications
     void set_priority_op(priority_op op)
     {
-        _priority_op = op;
+        //_priority_op = op;
+        UNUSED(op);
     }
     void add_readreq(request_ptr & req);
     void add_writereq(request_ptr & req);

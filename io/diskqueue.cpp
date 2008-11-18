@@ -19,7 +19,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-disk_queue::disk_queue(int /*n*/) : sem(0), _priority_op(WRITE)              //  n is ignored
+disk_queue::disk_queue(int /*n*/) :              //  n is ignored
+    sem(0)
 #ifdef STXXL_BOOST_THREADS
                                     , thread(boost::bind(worker, static_cast<void *>(this)))
 #endif
@@ -144,3 +145,4 @@ void * disk_queue::worker(void * arg)
 }
 
 __STXXL_END_NAMESPACE
+// vim: et:ts=4:sw=4
