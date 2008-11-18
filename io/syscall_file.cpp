@@ -27,7 +27,7 @@ syscall_request::syscall_request(
     ufs_request_base(f, buf, off, b, t, on_cmpl)
 { }
 
-void syscall_file::serve(const request * req)
+void syscall_file::serve(const request * req) throw(io_error)
 {
     assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
@@ -100,7 +100,7 @@ void syscall_request::serve()
 
     try
     {
-        static_cast<syscall_file *>(file_)->serve(this);
+        file_->serve(this);
     }
     catch (const io_error & ex)
     {

@@ -33,7 +33,7 @@ mem_request::mem_request(
 #endif
 }
 
-void mem_file::serve(const request * req)
+void mem_file::serve(const request * req) throw(io_error)
 {
     assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
@@ -61,7 +61,7 @@ void mem_request::serve()
                    " bytes: " << bytes <<
                    ((type == request::READ) ? " READ" : " WRITE"));
 
-    static_cast<mem_file *>(file_)->serve(this);
+    file_->serve(this);
 
     check_nref(true);
 

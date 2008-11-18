@@ -163,6 +163,8 @@ public:
     virtual request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
                                completion_handler on_cmpl) = 0;
 
+    virtual void serve(const request * req) throw(io_error) = 0;
+
     //! \brief Changes the size of the file
     //! \param newsize value of the new file size
     virtual void set_size(stxxl::int64 newsize) = 0;

@@ -19,7 +19,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void mmap_file::serve(const request * req)
+void mmap_file::serve(const request * req) throw(io_error)
 {
     assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
@@ -62,7 +62,7 @@ void mmap_request::serve()
 {
     try
     {
-        static_cast<mmap_file *>(file_)->serve(this);
+        file_->serve(this);
     }
     catch (const io_error & ex)
     {

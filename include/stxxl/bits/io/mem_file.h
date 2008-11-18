@@ -43,7 +43,7 @@ public:
         stxxl::int64 pos,
         size_t bytes,
         completion_handler on_cmpl);
-    void serve(const request * req);
+    void serve(const request * req) throw(io_error);
     ~mem_file();
     stxxl::int64 size();
     void set_size(stxxl::int64 newsize);

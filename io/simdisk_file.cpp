@@ -159,7 +159,7 @@ IC35L080AVVA07::IC35L080AVVA07()
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_file::serve(const request * req)
+void sim_disk_file::serve(const request * req) throw(io_error)
 {
     assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
@@ -209,7 +209,7 @@ void sim_disk_file::serve(const request * req)
 void sim_disk_request::serve()
 {
     try {
-        static_cast<sim_disk_file *>(file_)->serve(this);
+        file_->serve(this);
     }
     catch (const io_error & ex)
     {

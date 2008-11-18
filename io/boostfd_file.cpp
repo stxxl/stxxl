@@ -32,7 +32,7 @@ boostfd_request::boostfd_request(
     basic_request_state(on_cmpl, f, buf, off, b, t)
 { }
 
-void boostfd_file::serve(const request * req)
+void boostfd_file::serve(const request * req) throw(io_error)
 {
     assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
@@ -114,7 +114,7 @@ void boostfd_request::serve()
 
     try
     {
-        static_cast<boostfd_file *>(file_)->serve(this);
+        file_->serve(this);
     }
     catch (const io_error & ex)
     {

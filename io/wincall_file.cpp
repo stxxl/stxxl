@@ -28,7 +28,7 @@ wincall_request::wincall_request(
     wfs_request_base(f, buf, off, b, t, on_cmpl)
 { }
 
-void wincall_file::serve(const request * req)
+void wincall_file::serve(const request * req) throw(io_error)
 {
     assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
@@ -103,7 +103,7 @@ void wincall_request::serve()
                    ((type == request::READ) ? " READ" : " WRITE"));
 
     try {
-        static_cast<wincall_file *>(file_)->serve(this);
+        file_->serve(this);
     }
     catch (const io_error & ex)
     {
