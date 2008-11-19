@@ -2,4 +2,17 @@ TESTS			 = test_io benchmark_disks flushbuffers
 TESTS_NON_MSVC		 = sd_test
 TESTS_UNITTEST		 = unittest
 
-LIB_SRC			 = request.cpp basic_waiters_request.cpp basic_request_state.cpp ufs_file.cpp syscall_file.cpp wincall_file.cpp wfs_file.cpp iostats.cpp diskqueue.cpp mmap_file.cpp simdisk_file.cpp boostfd_file.cpp mem_file.cpp
+LIB_SRC			 = \
+	iostats.cpp \
+	diskqueue.cpp \
+	request.cpp \
+	basic_waiters_request.cpp \
+	basic_request_state.cpp \
+	ufs_file.cpp \
+	syscall_file.cpp \
+	mmap_file.cpp \
+	simdisk_file.cpp \
+	wfs_file.cpp \
+	wincall_file.cpp \
+	boostfd_file.cpp \
+	mem_file.cpp
