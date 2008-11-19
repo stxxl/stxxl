@@ -32,12 +32,17 @@ basic_waiters_request::~basic_waiters_request()
 
 bool basic_waiters_request::add_waiter(onoff_switch * sw)
 {
+    // this lock needs to be obtained before poll(), otherwise a race
+    // condition might occur: the state might change and notify_waiters()
+    // could be called between poll() and insert() resulting in waiter sw
+    // never being notified
+    scoped_mutex_lock lock(waiters_mutex);
+
     if (poll())                     // request already finished
     {
         return true;
     }
 
-    scoped_mutex_lock lock(waiters_mutex);
     waiters.insert(sw);
 
     return false;
