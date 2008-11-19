@@ -55,7 +55,7 @@ void wincall_file::serve(const request * req) throw(io_error)
 
             if (type == request::READ)
             {
-                STXXL_DEBUGMON_DO(io_started((char *)buffer));
+                STXXL_DEBUGMON_DO(io_started(buffer));
                 DWORD NumberOfBytesRead = 0;
                 if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
                 {
@@ -69,11 +69,11 @@ void wincall_file::serve(const request * req) throw(io_error)
                                              io_error);
                 }
 
-                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+                STXXL_DEBUGMON_DO(io_finished(buffer));
             }
             else
             {
-                STXXL_DEBUGMON_DO(io_started((char *)buffer));
+                STXXL_DEBUGMON_DO(io_started(buffer));
 
                 DWORD NumberOfBytesWritten = 0;
                 if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
@@ -88,7 +88,7 @@ void wincall_file::serve(const request * req) throw(io_error)
                                              io_error);
                 }
 
-                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+                STXXL_DEBUGMON_DO(io_finished(buffer));
             }
         }
 }

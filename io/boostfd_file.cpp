@@ -60,7 +60,7 @@ void boostfd_file::serve(const request * req) throw(io_error)
 
         if (type == request::READ)
         {
-            STXXL_DEBUGMON_DO(io_started((char *)buffer));
+            STXXL_DEBUGMON_DO(io_started(buffer));
 
             try
             {
@@ -78,11 +78,11 @@ void boostfd_file::serve(const request * req) throw(io_error)
                              " : " << ex.what());
             }
 
-            STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
         else
         {
-            STXXL_DEBUGMON_DO(io_started((char *)buffer));
+            STXXL_DEBUGMON_DO(io_started(buffer));
 
             try
             {
@@ -100,7 +100,7 @@ void boostfd_file::serve(const request * req) throw(io_error)
                              " : " << ex.what());
             }
 
-            STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
 }
 void boostfd_request::serve()

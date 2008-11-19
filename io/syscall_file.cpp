@@ -53,7 +53,7 @@ void syscall_file::serve(const request * req) throw(io_error)
 
             if (type == request::READ)
             {
-                STXXL_DEBUGMON_DO(io_started((char *)buffer));
+                STXXL_DEBUGMON_DO(io_started(buffer));
 
                 if (::read(file_des, buffer, bytes) < 0)
                 {
@@ -67,11 +67,11 @@ void syscall_file::serve(const request * req) throw(io_error)
                                  " type=" << ((type == request::READ) ? "READ" : "WRITE"));
                 }
 
-                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+                STXXL_DEBUGMON_DO(io_finished(buffer));
             }
             else
             {
-                STXXL_DEBUGMON_DO(io_started((char *)buffer));
+                STXXL_DEBUGMON_DO(io_started(buffer));
 
                 if (::write(file_des, buffer, bytes) < 0)
                 {
@@ -85,7 +85,7 @@ void syscall_file::serve(const request * req) throw(io_error)
                                  " type=" << ((type == request::READ) ? "READ" : "WRITE"));
                 }
 
-                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+                STXXL_DEBUGMON_DO(io_finished(buffer));
             }
         }
 }

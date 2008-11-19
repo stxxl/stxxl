@@ -390,13 +390,13 @@ public:
 
     static void operator delete[] (void * ptr)
     {
-        STXXL_DEBUGMON_DO(block_deallocated((char *)ptr));
+        STXXL_DEBUGMON_DO(block_deallocated(ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
     static void operator delete (void * ptr)
     {
-        STXXL_DEBUGMON_DO(block_deallocated((char *)ptr));
+        STXXL_DEBUGMON_DO(block_deallocated(ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
