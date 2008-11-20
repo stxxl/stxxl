@@ -134,6 +134,7 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/iostats.h \
 	$(HEADER_PATH)/io/basic_waiters_request.h \
 	$(HEADER_PATH)/io/basic_request_state.h \
+	$(HEADER_PATH)/io/file.h \
 	$(HEADER_PATH)/io/mmap_file.h \
 	$(HEADER_PATH)/io/simdisk_file.h \
 	$(HEADER_PATH)/io/syscall_file.h \
