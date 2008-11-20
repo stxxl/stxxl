@@ -89,6 +89,14 @@ completion_handler::completion_handler(const handler_type & handler__) :
     sp_impl_(new completion_handler1<handler_type>(handler__))
 { }
 
+//! \brief Default completion handler class
+
+struct default_completion_handler
+{
+    //! \brief An operator that does nothing
+    void operator () (request *) { }
+};
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMPLETION_HANDLER_HEADER

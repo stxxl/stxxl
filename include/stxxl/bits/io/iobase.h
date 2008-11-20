@@ -30,14 +30,6 @@ __STXXL_BEGIN_NAMESPACE
 //! system-independent interfaces for asynchronous I/O.
 //! \{
 
-//! \brief Default completion handler class
-
-struct default_completion_handler
-{
-    //! \brief An operator that does nothing
-    void operator () (request *) { }
-};
-
 //! \}
 
 __STXXL_END_NAMESPACE
