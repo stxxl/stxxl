@@ -13,13 +13,15 @@
 #ifndef STXXL_IO_HEADER
 #define STXXL_IO_HEADER
 
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/mmap_file.h>
 #include <stxxl/bits/io/simdisk_file.h>
 #include <stxxl/bits/io/wincall_file.h>
 #include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/mem_file.h>
+#include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/io/iostats.h>
 
 

@@ -14,14 +14,9 @@
 #ifndef STXXL_IOBASE_HEADER
 #define STXXL_IOBASE_HEADER
 
-#include <set>
-
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/common/state.h>
-#include <stxxl/bits/io/request.h>
-#include <stxxl/bits/io/file.h>
-#include <stxxl/bits/io/disk_queues.h>
 
+#warning this is an obsolete header
 
 __STXXL_BEGIN_NAMESPACE
 

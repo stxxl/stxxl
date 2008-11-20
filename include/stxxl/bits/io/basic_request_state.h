@@ -15,7 +15,7 @@
 #ifndef STXXL_BASIC_REQUEST_STATE_HEADER
 #define STXXL_BASIC_REQUEST_STATE_HEADER
 
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/basic_waiters_request.h>
 
 

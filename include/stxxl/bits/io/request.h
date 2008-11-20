@@ -18,6 +18,7 @@
 #include <memory>
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/switch.h>
@@ -29,6 +30,8 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
+
+#define BLOCK_ALIGN 4096
 
 class file;
 class request_ptr;

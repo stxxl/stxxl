@@ -17,7 +17,7 @@
 #include <queue>
 
 #include <stxxl/bits/common/switch.h>
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE

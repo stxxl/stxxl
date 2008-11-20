@@ -30,13 +30,14 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/semaphore.h>
 #include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
+
+class request_ptr;
 
 class disk_queue : private noncopyable
 {

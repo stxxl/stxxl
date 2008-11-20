@@ -16,12 +16,14 @@
 #include <queue>
 #include <algorithm>
 #include <functional>
+#include <cassert>
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
-#include <stxxl/bits/io/iobase.h>
 
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/compat_hash_map.h>
 #include <stxxl/bits/compat_hash_set.h>
 

@@ -272,7 +272,7 @@ HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h
 
 HEADER_FILES_IO		+= request.h
 HEADER_FILES_IO		+= disk_queues.h disk_queue.h
-HEADER_FILES_IO		+= completion_handler.h io.h iobase.h iostats.h
+HEADER_FILES_IO		+= completion_handler.h io.h iostats.h
 HEADER_FILES_IO		+= basic_waiters_request.h basic_request_state.h
 HEADER_FILES_IO		+= file.h
 HEADER_FILES_IO		+= mmap_file.h simdisk_file.h syscall_file.h

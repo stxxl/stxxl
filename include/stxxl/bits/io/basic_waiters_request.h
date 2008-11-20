@@ -14,7 +14,11 @@
 #ifndef STXXL_BASIC_WAITERS_REQUEST_HEADER
 #define STXXL_BASIC_WAITERS_REQUEST_HEADER
 
-#include <stxxl/bits/io/iobase.h>
+#include <set>
+
+#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/switch.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE

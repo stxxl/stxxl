@@ -17,7 +17,7 @@
 
 #ifdef STXXL_BOOST_CONFIG // if boost is available
 
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/basic_request_state.h>
 
 #include <boost/iostreams/device/file_descriptor.hpp>

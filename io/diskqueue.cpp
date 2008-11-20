@@ -10,7 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/disk_queue.h>
+#include <stxxl/bits/io/request.h>
 
 #ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
  #include <boost/bind.hpp>

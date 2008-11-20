@@ -13,7 +13,7 @@
 #ifndef STXXL_MEM_FILE_HEADER
 #define STXXL_MEM_FILE_HEADER
 
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/basic_request_state.h>
 
 

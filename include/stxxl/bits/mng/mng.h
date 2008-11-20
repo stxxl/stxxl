@@ -34,7 +34,8 @@
 #include <memory.h>
 #endif
 
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/aligned_alloc.h>

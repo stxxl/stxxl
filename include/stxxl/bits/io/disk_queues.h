@@ -18,7 +18,6 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
-#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/disk_queue.h>
 
 
@@ -28,6 +27,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 typedef stxxl::int64 DISKID;
+
+class request_ptr;
 
 //! \brief Encapsulates disk queues
 //! \remark is a singleton
