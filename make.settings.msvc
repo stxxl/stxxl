@@ -126,6 +126,7 @@ COMMON_FILES	 = \
 
 IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/request.h \
+	$(HEADER_PATH)/io/disk_queues.h \
 	$(HEADER_PATH)/io/completion_handler.h \
 	$(HEADER_PATH)/io/io.h \
 	$(HEADER_PATH)/io/iobase.h \
