@@ -83,11 +83,7 @@ public:
     }
     void swap(lru_pager & obj)
     {
-        // workaround for buggy GCC 3.4 STL
-        //std::swap(history,obj.history);
-        compat_auto_ptr<list_type>::result tmp = obj.history;
-        obj.history = history;
-        history = tmp;
+        std::swap(history, obj.history);
         std::swap(history_entry, obj.history_entry);
     }
 };
