@@ -11,22 +11,13 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/wincall_file.h>
+#include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/common/debug.h>
 
 #ifdef BOOST_MSVC
 
 __STXXL_BEGIN_NAMESPACE
 
-
-wincall_request::wincall_request(
-    wincall_file * f,
-    void * buf,
-    stxxl::int64 off,
-    size_t b,
-    request_type t,
-    completion_handler on_cmpl) :
-    wfs_request_base(f, buf, off, b, t, on_cmpl)
-{ }
 
 void wincall_file::serve(const request * req) throw(io_error)
 {
@@ -93,36 +84,10 @@ void wincall_file::serve(const request * req) throw(io_error)
         }
 }
 
-void wincall_request::serve()
-{
-    check_nref();
-    STXXL_VERBOSE2("wincall_request::serve():" <<
-                   " Buffer at " << buffer <<
-                   " offset: " << offset <<
-                   " bytes: " << bytes <<
-                   ((type == request::READ) ? " READ" : " WRITE"));
-
-    try {
-        file_->serve(this);
-    }
-    catch (const io_error & ex)
-    {
-        error_occured(ex.what());
-    }
-
-    check_nref(true);
-
-    _state.set_to(DONE);
-    completed();
-    _state.set_to(READY2DIE);
-}
-
 const char * wincall_file::io_type() const
 {
     return "wincall";
 }
-
-////////////////////////////////////////////////////////////////////////////
 
 wincall_file::wincall_file(
     const std::string & filename,
@@ -136,9 +101,9 @@ request_ptr wincall_file::aread(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new wincall_request(this,
+    request_ptr req = new request_impl_basic(on_cmpl, this,
                                           buffer, pos, bytes,
-                                          request::READ, on_cmpl);
+                                          request::READ);
 
     if (!req.get())
         stxxl_function_error(io_error);
@@ -154,8 +119,8 @@ request_ptr wincall_file::awrite(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new wincall_request(this, buffer, pos, bytes,
-                                          request::WRITE, on_cmpl);
+    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
+                                          request::WRITE);
 
     if (!req.get())
         stxxl_function_error(io_error);

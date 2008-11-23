@@ -11,27 +11,11 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/mem_file.h>
+#include <stxxl/bits/io/request_impl_basic.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-
-mem_request::mem_request(
-    mem_file * f,
-    void * buf,
-    stxxl::int64 off,
-    size_t b,
-    request_type t,
-    completion_handler on_cmpl) :
-    basic_request_state(on_cmpl, f, buf, off, b, t)
-{
-#ifdef STXXL_CHECK_BLOCK_ALIGNING
-    // Direct I/O requires file system block size alignment for file offsets,
-    // memory buffer addresses, and transfer(buffer) size must be multiple
-    // of the file system block size
-    check_alignment();
-#endif
-}
 
 void mem_file::serve(const request * req) throw(io_error)
 {
@@ -53,29 +37,10 @@ void mem_file::serve(const request * req) throw(io_error)
     }
 }
 
-void mem_request::serve()
-{
-    check_nref();
-    STXXL_VERBOSE2("mem_request::serve(): Buffer at " << ((void *)buffer) <<
-                   " offset: " << offset <<
-                   " bytes: " << bytes <<
-                   ((type == request::READ) ? " READ" : " WRITE"));
-
-    file_->serve(this);
-
-    check_nref(true);
-
-    _state.set_to(DONE);
-    completed();
-    _state.set_to(READY2DIE);
-}
-
 const char * mem_file::io_type() const
 {
     return "memory";
 }
-
-////////////////////////////////////////////////////////////////////////////
 
 mem_file::mem_file(int disk) : file(disk), ptr(NULL), sz(0)
 { }
@@ -109,9 +74,9 @@ request_ptr mem_file::aread(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new mem_request(this,
+    request_ptr req = new request_impl_basic(on_cmpl, this,
                                       buffer, pos, bytes,
-                                      request::READ, on_cmpl);
+                                      request::READ);
 
     if (!req.get())
         stxxl_function_error(io_error);
@@ -127,8 +92,8 @@ request_ptr mem_file::awrite(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new mem_request(this, buffer, pos, bytes,
-                                      request::WRITE, on_cmpl);
+    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
+                                      request::WRITE);
 
     if (!req.get())
         stxxl_function_error(io_error);

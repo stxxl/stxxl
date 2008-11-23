@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/simdisk_file.h>
+#include <stxxl/bits/io/request_impl_basic.h>
 
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
@@ -207,21 +208,6 @@ void sim_disk_file::serve(const request * req) throw(io_error)
         usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
 }
 
-void sim_disk_request::serve()
-{
-    try {
-        file_->serve(this);
-    }
-    catch (const io_error & ex)
-    {
-        error_occured(ex.what());
-    }
-
-    _state.set_to(DONE);
-    completed();
-    _state.set_to(READY2DIE);
-}
-
 const char * sim_disk_file::io_type() const
 {
     return "simdisk";
@@ -241,8 +227,8 @@ void sim_disk_file::set_size(stxxl::int64 newsize)
 request_ptr sim_disk_file::aread(void * buffer, stxxl::int64 pos, size_t bytes,
                                  completion_handler on_cmpl)
 {
-    request_ptr req = new sim_disk_request(this, buffer, pos, bytes,
-                                           request::READ, on_cmpl);
+    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
+                                           request::READ);
     if (!req.get())
         stxxl_function_error(io_error);
 
@@ -255,8 +241,8 @@ request_ptr sim_disk_file::awrite(
     void * buffer, stxxl::int64 pos, size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new sim_disk_request(this, buffer, pos, bytes,
-                                           request::WRITE, on_cmpl);
+    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
+                                           request::WRITE);
 
     if (!req.get())
         stxxl_function_error(io_error);

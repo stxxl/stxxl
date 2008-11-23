@@ -22,7 +22,7 @@
 #ifdef BOOST_MSVC
 
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/io/basic_request_state.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -44,19 +44,6 @@ public:
     void set_size(stxxl::int64 newsize);
     void lock();
     const char * io_type() const;
-};
-
-//! \brief Base for Windows file system implementations
-class wfs_request_base : public basic_request_state
-{
-protected:
-    wfs_request_base(
-        wfs_file_base * f,
-        void * buf,
-        stxxl::int64 off,
-        size_t b,
-        request_type t,
-        completion_handler on_cmpl);
 };
 
 //! \}

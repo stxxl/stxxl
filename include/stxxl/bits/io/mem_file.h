@@ -14,7 +14,7 @@
 #define STXXL_MEM_FILE_HEADER
 
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/io/basic_request_state.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -50,23 +50,6 @@ public:
     void lock();
     void delete_region(int64 offset, unsigned_type size);
     const char * io_type() const;
-};
-
-//! \brief Implementation of request based on memcpy()
-class mem_request : public basic_request_state
-{
-    friend class mem_file;
-
-protected:
-    mem_request(
-        mem_file * f,
-        void * buf,
-        stxxl::int64 off,
-        size_t b,
-        request_type t,
-        completion_handler on_cmpl);
-
-    void serve();
 };
 
 //! \}

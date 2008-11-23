@@ -17,29 +17,10 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-wfs_request_base::wfs_request_base(
-    wfs_file_base * f,
-    void * buf,
-    stxxl::int64 off,
-    size_t b,
-    request_type t,
-    completion_handler on_cmpl) :
-    basic_request_state(on_cmpl, f, buf, off, b, t)
-{
- #ifdef STXXL_CHECK_BLOCK_ALIGNING
-    // Direct I/O requires file system block size alignment for file offsets,
-    // memory buffer addresses, and transfer(buffer) size must be multiple
-    // of the file system block size
-    check_alignment();
- #endif
-}
-
 const char * wfs_file_base::io_type() const
 {
     return "wfs_base";
 }
-
-////////////////////////////////////////////////////////////////////////////
 
 wfs_file_base::wfs_file_base(
     const std::string & filename,

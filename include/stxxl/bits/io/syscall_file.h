@@ -48,22 +48,6 @@ public:
     const char * io_type() const;
 };
 
-//! \brief Implementation of request based on UNIX syscalls
-class syscall_request : public ufs_request_base
-{
-    friend class syscall_file;
-
-protected:
-    syscall_request(
-        syscall_file * f,
-        void * buf,
-        stxxl::int64 off,
-        size_t b,
-        request_type t,
-        completion_handler on_cmpl);
-    void serve();
-};
-
 //! \}
 
 __STXXL_END_NAMESPACE

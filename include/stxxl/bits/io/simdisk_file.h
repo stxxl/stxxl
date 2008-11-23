@@ -20,6 +20,7 @@
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
 
+#include <set>
 #include <cmath>
 #include <sys/mman.h>
 
@@ -98,8 +99,6 @@ public:
     IC35L080AVVA07();
 };
 
-class sim_disk_request;
-
 //! \brief Implementation of disk emulation
 //! \remark It is emulation of IBM IC35L080AVVA07 disk's timings
 class sim_disk_file : public ufs_file_base, public IC35L080AVVA07
@@ -123,26 +122,6 @@ public:
     void serve(const request * req) throw(io_error);
     void set_size(stxxl::int64 newsize);
     const char * io_type() const;
-};
-
-
-//! \brief Implementation of disk emulation
-class sim_disk_request : public ufs_request_base
-{
-    friend class sim_disk_file;
-
-protected:
-    inline sim_disk_request(sim_disk_file * f, void * buf, stxxl::int64 off,
-                            size_t b, request_type t,
-                            completion_handler on_cmpl) :
-        ufs_request_base(f,
-                         buf,
-                         off,
-                         b,
-                         t,
-                         on_cmpl)
-    { }
-    void serve();
 };
 
 //! \}

@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/mmap_file.h>
+#include <stxxl/bits/io/request_impl_basic.h>
 
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
@@ -59,28 +60,10 @@ void mmap_file::serve(const request * req) throw(io_error)
         }
 }
 
-void mmap_request::serve()
-{
-    try
-    {
-        file_->serve(this);
-    }
-    catch (const io_error & ex)
-    {
-        error_occured(ex.what());
-    }
-
-    _state.set_to(DONE);
-    completed();
-    _state.set_to(READY2DIE);
-}
-
 const char * mmap_file::io_type() const
 {
     return "mmap";
 }
-
-////////////////////////////////////////////////////////////////////////////
 
 request_ptr mmap_file::aread(
     void * buffer,
@@ -88,13 +71,13 @@ request_ptr mmap_file::aread(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new mmap_request(
+    request_ptr req = new request_impl_basic(
+        on_cmpl,
         this,
         buffer,
         pos,
         bytes,
-        request::READ,
-        on_cmpl);
+        request::READ);
 
     if (!req.get())
         stxxl_function_error(io_error);
@@ -110,13 +93,13 @@ request_ptr mmap_file::awrite(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new mmap_request(
+    request_ptr req = new request_impl_basic(
+        on_cmpl,
         this,
         buffer,
         pos,
         bytes,
-        request::WRITE,
-        on_cmpl);
+        request::WRITE);
 
     if (!req.get())
         stxxl_function_error(io_error);

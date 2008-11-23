@@ -18,7 +18,7 @@
 #ifdef STXXL_BOOST_CONFIG // if boost is available
 
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/io/basic_request_state.h>
+#include <stxxl/bits/io/request.h>
 
 #include <boost/iostreams/device/file_descriptor.hpp>
 
@@ -56,23 +56,6 @@ public:
         completion_handler on_cmpl);
     void serve(const request * req) throw(io_error);
     const char * io_type() const;
-};
-
-//! \brief Implementation based on boost::iostreams::file_decriptor
-class boostfd_request : public basic_request_state
-{
-    friend class boostfd_file;
-
-protected:
-    boostfd_request(
-        boostfd_file * f,
-        void * buf,
-        stxxl::int64 off,
-        size_t b,
-        request_type t,
-        completion_handler on_cmpl);
-
-    void serve();
 };
 
 //! \}

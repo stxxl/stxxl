@@ -58,21 +58,6 @@ public:
     const char * io_type() const;
 };
 
-//! \brief Implementation of memory mapped access file request
-class mmap_request : public ufs_request_base
-{
-    friend class mmap_file;
-
-protected:
-    inline mmap_request(mmap_file * f,
-                        void * buf, stxxl::int64 off, size_t b,
-                        request_type t,
-                        completion_handler on_cmpl) :
-        ufs_request_base(f, buf, off, b, t, on_cmpl)
-    { }
-    void serve();
-};
-
 //! \}
 
 __STXXL_END_NAMESPACE

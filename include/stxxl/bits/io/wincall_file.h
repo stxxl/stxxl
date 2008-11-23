@@ -54,22 +54,6 @@ public:
     const char * io_type() const;
 };
 
-//! \brief Implementation of request based on UNIX syscalls
-class wincall_request : public wfs_request_base
-{
-    friend class wincall_file;
-
-protected:
-    wincall_request(
-        wincall_file * f,
-        void * buf,
-        stxxl::int64 off,
-        size_t b,
-        request_type t,
-        completion_handler on_cmpl);
-    void serve();
-};
-
 //! \}
 
 __STXXL_END_NAMESPACE

@@ -13,6 +13,7 @@
 #ifdef STXXL_BOOST_CONFIG
 
 #include <stxxl/bits/io/boostfd_file.h>
+#include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/common/debug.h>
 
 #include <boost/filesystem/operations.hpp>
@@ -21,16 +22,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-
-boostfd_request::boostfd_request(
-    boostfd_file * f,
-    void * buf,
-    stxxl::int64 off,
-    size_t b,
-    request_type t,
-    completion_handler on_cmpl) :
-    basic_request_state(on_cmpl, f, buf, off, b, t)
-{ }
 
 void boostfd_file::serve(const request * req) throw(io_error)
 {
@@ -103,37 +94,11 @@ void boostfd_file::serve(const request * req) throw(io_error)
             STXXL_DEBUGMON_DO(io_finished(buffer));
         }
 }
-void boostfd_request::serve()
-{
-    check_nref();
-    STXXL_VERBOSE2("boostfd_request::serve():" <<
-                   " Buffer at " << buffer <<
-                   " offset: " << offset <<
-                   " bytes: " << bytes <<
-                   ((type == request::READ) ? " READ" : " WRITE"));
-
-    try
-    {
-        file_->serve(this);
-    }
-    catch (const io_error & ex)
-    {
-        error_occured(ex.what());
-    }
-
-    check_nref(true);
-
-    _state.set_to(DONE);
-    completed();
-    _state.set_to(READY2DIE);
-}
 
 const char * boostfd_file::io_type() const
 {
     return "boostfd";
 }
-
-////////////////////////////////////////////////////////////////////////////
 
 boostfd_file::boostfd_file(
     const std::string & filename,
@@ -217,9 +182,9 @@ request_ptr boostfd_file::aread(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new boostfd_request(this,
+    request_ptr req = new request_impl_basic(on_cmpl, this,
                                           buffer, pos, bytes,
-                                          request::READ, on_cmpl);
+                                          request::READ);
 
     if (!req.get())
         stxxl_function_error(io_error);
@@ -235,8 +200,8 @@ request_ptr boostfd_file::awrite(
     size_t bytes,
     completion_handler on_cmpl)
 {
-    request_ptr req = new boostfd_request(this, buffer, pos, bytes,
-                                          request::WRITE, on_cmpl);
+    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
+                                          request::WRITE);
 
     if (!req.get())
         stxxl_function_error(io_error);
