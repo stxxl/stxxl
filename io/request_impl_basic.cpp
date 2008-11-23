@@ -25,7 +25,7 @@ request_impl_basic::request_impl_basic(
     stxxl::int64 off,
     size_t b,
     request_type t) :
-    basic_request_state(on_cmpl, f, buf, off, b, t)
+    request_state_impl_basic(on_cmpl, f, buf, off, b, t)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
     // Direct I/O requires file system block size alignment for file offsets,

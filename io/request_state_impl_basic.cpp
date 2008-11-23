@@ -17,7 +17,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-basic_request_state::basic_request_state(
+request_state_impl_basic::request_state_impl_basic(
     completion_handler on_cmpl,
     file * f,
     void * buf,
@@ -28,7 +28,7 @@ basic_request_state::basic_request_state(
     _state(OP)
 { }
 
-basic_request_state::~basic_request_state()
+request_state_impl_basic::~request_state_impl_basic()
 {
     STXXL_VERBOSE3("basic_request_state " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
 
@@ -41,7 +41,7 @@ basic_request_state::~basic_request_state()
     // _state.wait_for (READY2DIE); // does not make sense ?
 }
 
-void basic_request_state::wait()
+void request_state_impl_basic::wait()
 {
     STXXL_VERBOSE3("ufs_request_base : " << static_cast<void *>(this) << " wait ");
 
@@ -52,7 +52,7 @@ void basic_request_state::wait()
     check_errors();
 }
 
-bool basic_request_state::poll()
+bool request_state_impl_basic::poll()
 {
     const request_state s = _state();
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/basic_request_state.h
+ *  include/stxxl/bits/io/request_state_impl_basic.h
  *
  *  UNIX file system file base
  *
@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BASIC_REQUEST_STATE_HEADER
-#define STXXL_BASIC_REQUEST_STATE_HEADER
+#ifndef STXXL_HEADER_IO_REQUEST_STATE_IMPL_BASIC
+#define STXXL_HEADER_IO_REQUEST_STATE_IMPL_BASIC
 
 #include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/request.h>
@@ -26,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic state implemenatition for most request implementations
-class basic_request_state : public request, public request_waiters_impl_basic
+class request_state_impl_basic : public request, public request_waiters_impl_basic
 {
 protected:
     //! states of request
@@ -36,7 +36,7 @@ protected:
     state<request_state> _state;
 
 protected:
-    basic_request_state(
+    request_state_impl_basic(
         completion_handler on_cmpl,
         file * f,
         void * buf,
@@ -45,7 +45,7 @@ protected:
         request_type t);
 
 public:
-    virtual ~basic_request_state();
+    virtual ~request_state_impl_basic();
     void wait();
     bool poll();
 };
@@ -54,5 +54,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_BASIC_REQUEST_STATE_HEADER
+#endif // !STXXL_HEADER_IO_REQUEST_STATE_IMPL_BASIC
 // vim: et:ts=4:sw=4

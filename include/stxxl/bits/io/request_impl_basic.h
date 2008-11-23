@@ -23,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic implementation of request
-class request_impl_basic : public basic_request_state
+class request_impl_basic : public request_state_impl_basic
 {
     //friend class file;
 
