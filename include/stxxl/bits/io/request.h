@@ -59,7 +59,7 @@ protected:
 
     completion_handler on_complete;
     int ref_cnt;
-    std::auto_ptr<stxxl::io_error> error;
+    compat_auto_ptr<stxxl::io_error>::result error;
 
     mutex ref_cnt_mutex;
 
