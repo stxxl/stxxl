@@ -7,7 +7,7 @@ LIB_SRC			 = \
 	diskqueue.cpp \
 	request.cpp \
 	request_waiters_impl_basic.cpp \
-	basic_request_state.cpp \
+	request_state_impl_basic.cpp \
 	request_impl_basic.cpp \
 	ufs_file.cpp \
 	syscall_file.cpp \

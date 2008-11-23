@@ -14,7 +14,7 @@
 #ifndef STXXL_IO_REQUEST_IMPL_BASIC_HEADER
 #define STXXL_IO_REQUEST_IMPL_BASIC_HEADER
 
-#include <stxxl/bits/io/basic_request_state.h>
+#include <stxxl/bits/io/request_state_impl_basic.h>
 
 
 __STXXL_BEGIN_NAMESPACE

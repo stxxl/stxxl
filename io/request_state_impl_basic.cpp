@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/ufs_file.cpp
+ *  io/request_state_impl_basic.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,7 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/basic_request_state.h>
+#include <stxxl/bits/io/request_state_impl_basic.h>
 
 
 __STXXL_BEGIN_NAMESPACE
