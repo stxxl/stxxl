@@ -12,23 +12,11 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/basic_waiters_request.h>
+#include <algorithm>
 #include <stxxl/bits/parallel.h>
 
 
 __STXXL_BEGIN_NAMESPACE
-
-basic_waiters_request::basic_waiters_request(
-    completion_handler on_cmpl,
-    file * f,
-    void * buf,
-    stxxl::int64 off,
-    size_t b,
-    request_type t) :
-    request(on_cmpl, f, buf, off, b, t)
-{ }
-
-basic_waiters_request::~basic_waiters_request()
-{ }
 
 bool basic_waiters_request::add_waiter(onoff_switch * sw)
 {
@@ -70,11 +58,6 @@ int basic_waiters_request::nwaiters()
     return waiters.size();
 }
 */
-
-const char * basic_waiters_request::io_type() const
-{
-    return "basic_waiters";
-}
 
 __STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

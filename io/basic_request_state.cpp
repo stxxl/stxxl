@@ -24,7 +24,7 @@ basic_request_state::basic_request_state(
     stxxl::int64 off,
     size_t b,
     request_type t) :
-    basic_waiters_request(on_cmpl, f, buf, off, b, t),
+    request(on_cmpl, f, buf, off, b, t),
     _state(OP)
 { }
 

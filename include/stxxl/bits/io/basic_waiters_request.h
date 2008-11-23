@@ -27,30 +27,18 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implements basic waiters.
-class basic_waiters_request : public request
+class basic_waiters_request : virtual public request_base
 {
     mutex waiters_mutex;
     std::set<onoff_switch *> waiters;
 
 protected:
-    basic_waiters_request(
-        completion_handler on_cmpl,
-        file * f,
-        void * buf,
-        stxxl::int64 off,
-        size_t b,
-        request_type t);
-    virtual ~basic_waiters_request();
-
     bool add_waiter(onoff_switch * sw);
     void delete_waiter(onoff_switch * sw);
     void notify_waiters();
     /*
     int nwaiters();             // returns number of waiters
     */
-
-public:
-    const char * io_type() const;
 };
 
 //! \}

@@ -16,6 +16,7 @@
 #define STXXL_BASIC_REQUEST_STATE_HEADER
 
 #include <stxxl/bits/common/state.h>
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/basic_waiters_request.h>
 
 
@@ -25,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic state implemenatition for most request implementations
-class basic_request_state : public basic_waiters_request
+class basic_request_state : public request, public basic_waiters_request
 {
 protected:
     //! states of request
