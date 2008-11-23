@@ -25,9 +25,9 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Basic implementation of request
 class request_impl_basic : public basic_request_state
 {
-    friend class file;
+    //friend class file;
 
-protected:
+public:
     request_impl_basic(
         completion_handler on_cmpl,
         file * f,
@@ -36,6 +36,7 @@ protected:
         size_t b,
         request_type t);
 
+protected:
     void serve();
 
 public:
