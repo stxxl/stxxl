@@ -41,7 +41,31 @@ class request_ptr;
 //! Since all library I/O operations are asynchronous,
 //! one needs to keep track of their status: whether
 //! an I/O completed or not.
-class request : private noncopyable
+class request_base : private noncopyable
+{
+public:
+    enum request_type { READ, WRITE };
+
+protected:
+    virtual bool add_waiter(onoff_switch * sw) = 0;
+    virtual void delete_waiter(onoff_switch * sw) = 0;
+    virtual void notify_waiters() = 0;
+
+    virtual void serve() = 0;
+
+public:
+    //! \brief Suspends calling thread until completion of the request
+    virtual void wait() = 0;
+
+    //! \brief Polls the status of the request
+    //! \return \c true if request is completed, otherwise \c false
+    virtual bool poll() = 0;
+
+    virtual ~request_base()
+    { }
+};
+
+class request : virtual public request_base
 {
     friend int wait_any(request_ptr req_array[], int count);
     template <class request_iterator_>
@@ -51,20 +75,11 @@ class request : private noncopyable
     friend class request_ptr;
 
 protected:
-    virtual bool add_waiter(onoff_switch * sw) = 0;
-    virtual void delete_waiter(onoff_switch * sw) = 0;
-    virtual void notify_waiters() = 0;
-
-    virtual void serve() = 0;
-
     completion_handler on_complete;
     int ref_cnt;
     compat_auto_ptr<stxxl::io_error>::result error;
 
     mutex ref_cnt_mutex;
-
-public:
-    enum request_type { READ, WRITE };
 
 protected:
     file * file_;
@@ -102,13 +117,9 @@ public:
     {
         STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": creation, cnt: " << ref_cnt);
     }
-    //! \brief Suspends calling thread until completion of the request
-    virtual void wait() = 0;
-    //! \brief Polls the status of the request
-    //! \return \c true if request is completed, otherwise \c false
-    virtual bool poll() = 0;
     //! \brief Identifies the type of request I/O implementation
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
+    // FIXME: shouldn't this go to stxxl::file and the different implementations?
     virtual const char * io_type() const
     {
         return "none";
