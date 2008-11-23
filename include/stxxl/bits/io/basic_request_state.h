@@ -26,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic state implemenatition for most request implementations
-class basic_request_state : public request, public basic_waiters_request
+class basic_request_state : public request, public request_waiters_impl_basic
 {
 protected:
     //! states of request

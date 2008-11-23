@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BASIC_WAITERS_REQUEST_HEADER
-#define STXXL_BASIC_WAITERS_REQUEST_HEADER
+#ifndef STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER
+#define STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER
 
 #include <set>
 
@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implements basic waiters.
-class basic_waiters_request : virtual public request_base
+class request_waiters_impl_basic : virtual public request_base
 {
     mutex waiters_mutex;
     std::set<onoff_switch *> waiters;
@@ -45,4 +45,4 @@ protected:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_BASIC_WAITERS_REQUEST_HEADER
+#endif // !STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER

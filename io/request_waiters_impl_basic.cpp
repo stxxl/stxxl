@@ -18,7 +18,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-bool basic_waiters_request::add_waiter(onoff_switch * sw)
+bool request_waiters_impl_basic::add_waiter(onoff_switch * sw)
 {
     // this lock needs to be obtained before poll(), otherwise a race
     // condition might occur: the state might change and notify_waiters()
@@ -36,13 +36,13 @@ bool basic_waiters_request::add_waiter(onoff_switch * sw)
     return false;
 }
 
-void basic_waiters_request::delete_waiter(onoff_switch * sw)
+void request_waiters_impl_basic::delete_waiter(onoff_switch * sw)
 {
     scoped_mutex_lock lock(waiters_mutex);
     waiters.erase(sw);
 }
 
-void basic_waiters_request::notify_waiters()
+void request_waiters_impl_basic::notify_waiters()
 {
     scoped_mutex_lock lock(waiters_mutex);
     std::for_each(waiters.begin(),
@@ -52,7 +52,7 @@ void basic_waiters_request::notify_waiters()
 }
 
 /*
-int basic_waiters_request::nwaiters()
+int request_waiters_impl_basic::nwaiters()
 {
     scoped_mutex_lock lock(waiters_mutex);
     return waiters.size();
