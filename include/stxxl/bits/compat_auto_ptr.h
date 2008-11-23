@@ -25,7 +25,11 @@ __STXXL_BEGIN_NAMESPACE
 template <class _Tp>
 struct compat_auto_ptr {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#if ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
+    typedef std::unique_ptr<_Tp> result;
+#else
     typedef std::shared_ptr<_Tp> result;
+#endif
 #else
     typedef std::auto_ptr<_Tp> result;
 #endif
