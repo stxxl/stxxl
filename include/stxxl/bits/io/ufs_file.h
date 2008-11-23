@@ -38,6 +38,7 @@ public:
     stxxl::int64 size();
     void set_size(stxxl::int64 newsize);
     void lock();
+    const char * io_type() const;
 };
 
 //! \brief Base for UNIX file system implementations
@@ -51,9 +52,6 @@ protected:
         size_t b,
         request_type t,
         completion_handler on_cmpl);
-
-public:
-    const char * io_type() const;
 };
 
 //! \}

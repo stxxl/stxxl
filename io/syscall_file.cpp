@@ -115,7 +115,7 @@ void syscall_request::serve()
     _state.set_to(READY2DIE);
 }
 
-const char * syscall_request::io_type() const
+const char * syscall_file::io_type() const
 {
     return "syscall";
 }

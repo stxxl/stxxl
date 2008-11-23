@@ -122,6 +122,7 @@ public:
                        completion_handler on_cmpl);
     void serve(const request * req) throw(io_error);
     void set_size(stxxl::int64 newsize);
+    const char * io_type() const;
 };
 
 
@@ -142,9 +143,6 @@ protected:
                          on_cmpl)
     { }
     void serve();
-
-public:
-    const char * io_type() const;
 };
 
 //! \}

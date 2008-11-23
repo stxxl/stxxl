@@ -51,6 +51,7 @@ public:
         size_t bytes,
         completion_handler on_cmpl);
     void serve(const request * req) throw(io_error);
+    const char * io_type() const;
 };
 
 //! \brief Implementation of request based on UNIX syscalls
@@ -67,9 +68,6 @@ protected:
         request_type t,
         completion_handler on_cmpl);
     void serve();
-
-public:
-    const char * io_type() const;
 };
 
 //! \}

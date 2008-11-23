@@ -75,7 +75,7 @@ void mmap_request::serve()
     _state.set_to(READY2DIE);
 }
 
-const char * mmap_request::io_type() const
+const char * mmap_file::io_type() const
 {
     return "mmap";
 }

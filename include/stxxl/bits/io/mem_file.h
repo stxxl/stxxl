@@ -49,6 +49,7 @@ public:
     void set_size(stxxl::int64 newsize);
     void lock();
     void delete_region(int64 offset, unsigned_type size);
+    const char * io_type() const;
 };
 
 //! \brief Implementation of request based on memcpy()
@@ -66,9 +67,6 @@ protected:
         completion_handler on_cmpl);
 
     void serve();
-
-public:
-    const char * io_type() const;
 };
 
 //! \}

@@ -128,7 +128,7 @@ void boostfd_request::serve()
     _state.set_to(READY2DIE);
 }
 
-const char * boostfd_request::io_type() const
+const char * boostfd_file::io_type() const
 {
     return "boostfd";
 }

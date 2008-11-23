@@ -55,6 +55,7 @@ public:
         size_t bytes,
         completion_handler on_cmpl);
     void serve(const request * req) throw(io_error);
+    const char * io_type() const;
 };
 
 //! \brief Implementation based on boost::iostreams::file_decriptor
@@ -72,9 +73,6 @@ protected:
         completion_handler on_cmpl);
 
     void serve();
-
-public:
-    const char * io_type() const;
 };
 
 //! \}

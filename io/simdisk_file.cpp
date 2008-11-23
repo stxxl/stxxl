@@ -222,7 +222,7 @@ void sim_disk_request::serve()
     _state.set_to(READY2DIE);
 }
 
-const char * sim_disk_request::io_type() const
+const char * sim_disk_file::io_type() const
 {
     return "simdisk";
 }

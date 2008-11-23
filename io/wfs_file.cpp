@@ -34,7 +34,7 @@ wfs_request_base::wfs_request_base(
  #endif
 }
 
-const char * wfs_request_base::io_type() const
+const char * wfs_file_base::io_type() const
 {
     return "wfs_base";
 }

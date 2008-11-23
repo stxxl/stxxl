@@ -39,7 +39,7 @@ ufs_request_base::ufs_request_base(
 #endif
 }
 
-const char * ufs_request_base::io_type() const
+const char * ufs_file_base::io_type() const
 {
     return "ufs_base";
 }

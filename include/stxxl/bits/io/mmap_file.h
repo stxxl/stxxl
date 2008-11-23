@@ -55,6 +55,7 @@ public:
         size_t bytes,
         completion_handler on_cmpl);
     void serve(const request * req) throw(io_error);
+    const char * io_type() const;
 };
 
 //! \brief Implementation of memory mapped access file request
@@ -70,9 +71,6 @@ protected:
         ufs_request_base(f, buf, off, b, t, on_cmpl)
     { }
     void serve();
-
-public:
-    const char * io_type() const;
 };
 
 //! \}
