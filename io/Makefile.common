@@ -6,7 +6,7 @@ LIB_SRC			 = \
 	iostats.cpp \
 	diskqueue.cpp \
 	request.cpp \
-	basic_waiters_request.cpp \
+	request_waiters_impl_basic.cpp \
 	basic_request_state.cpp \
 	ufs_file.cpp \
 	syscall_file.cpp \

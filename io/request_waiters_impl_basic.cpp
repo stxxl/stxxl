@@ -11,7 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/basic_waiters_request.h>
+#include <stxxl/bits/io/request_waiters_impl_basic.h>
 #include <algorithm>
 #include <stxxl/bits/parallel.h>
 

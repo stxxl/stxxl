@@ -126,12 +126,12 @@ COMMON_FILES	 = \
 
 IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/request.h \
+	$(HEADER_PATH)/io/request_waiters_impl_basic.h \
 	$(HEADER_PATH)/io/disk_queues.h \
 	$(HEADER_PATH)/io/disk_queue.h \
 	$(HEADER_PATH)/io/completion_handler.h \
 	$(HEADER_PATH)/io/io.h \
 	$(HEADER_PATH)/io/iostats.h \
-	$(HEADER_PATH)/io/basic_waiters_request.h \
 	$(HEADER_PATH)/io/basic_request_state.h \
 	$(HEADER_PATH)/io/file.h \
 	$(HEADER_PATH)/io/mmap_file.h \
