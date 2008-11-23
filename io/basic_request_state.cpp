@@ -61,10 +61,5 @@ bool basic_request_state::poll()
     return s == DONE || s == READY2DIE;
 }
 
-const char * basic_request_state::io_type() const
-{
-    return "basic_request_state";
-}
-
 __STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

@@ -61,6 +61,10 @@ public:
     //! \return \c true if request is completed, otherwise \c false
     virtual bool poll() = 0;
 
+    //! \brief Identifies the type of I/O implementation
+    //! \return pointer to null terminated string of characters, containing the name of I/O implementation
+    virtual const char * io_type() const = 0;
+
     virtual ~request_base()
     { }
 };
@@ -117,13 +121,7 @@ public:
     {
         STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": creation, cnt: " << ref_cnt);
     }
-    //! \brief Identifies the type of request I/O implementation
-    //! \return pointer to null terminated string of characters, containing the name of I/O implementation
-    // FIXME: shouldn't this go to stxxl::file and the different implementations?
-    virtual const char * io_type() const
-    {
-        return "none";
-    }
+
     virtual ~request()
     {
         STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);

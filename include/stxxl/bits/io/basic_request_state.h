@@ -48,7 +48,6 @@ public:
     virtual ~basic_request_state();
     void wait();
     bool poll();
-    const char * io_type() const;
 };
 
 //! \}

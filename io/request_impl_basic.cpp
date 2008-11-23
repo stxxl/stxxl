@@ -62,7 +62,7 @@ void request_impl_basic::serve()
 
 const char * request_impl_basic::io_type() const
 {
-    return "request_impl_basic";
+    return file_->io_type();
 }
 
 __STXXL_END_NAMESPACE
