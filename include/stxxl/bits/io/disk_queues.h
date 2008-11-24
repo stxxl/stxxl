@@ -26,8 +26,6 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-typedef stxxl::int64 DISKID;
-
 class request_ptr;
 
 //! \brief Encapsulates disk queues
@@ -36,8 +34,13 @@ class disk_queues : public singleton<disk_queues>
 {
     friend class singleton<disk_queues>;
 
+    typedef disk_queue request_queue_type;
+
+    typedef stxxl::int64 DISKID;
+    typedef std::map<DISKID, request_queue_type *> request_queue_map;
+
 protected:
-    std::map<DISKID, disk_queue *> queues;
+    request_queue_map queues;
     disk_queues() { }
 
 public:
@@ -46,7 +49,7 @@ public:
         if (queues.find(disk) == queues.end())
         {
             // create new disk queue
-            queues[disk] = new disk_queue();
+            queues[disk] = new request_queue_type();
         }
         queues[disk]->add_readreq(req);
     }
@@ -55,15 +58,14 @@ public:
         if (queues.find(disk) == queues.end())
         {
             // create new disk queue
-            queues[disk] = new disk_queue();
+            queues[disk] = new request_queue_type();
         }
         queues[disk]->add_writereq(req);
     }
     ~disk_queues()
     {
         // deallocate all queues
-        for (std::map<DISKID, disk_queue *>::iterator i =
-                 queues.begin(); i != queues.end(); i++)
+        for (request_queue_map::iterator i = queues.begin(); i != queues.end(); i++)
             delete (*i).second;
     }
     //! \brief Changes requests priorities
@@ -73,8 +75,7 @@ public:
     //!                 - NONE, read and write requests are served by turns, alternately
     void set_priority_op(disk_queue::priority_op op)
     {
-        for (std::map<DISKID, disk_queue *>::iterator i =
-                 queues.begin(); i != queues.end(); i++)
+        for (request_queue_map::iterator i = queues.begin(); i != queues.end(); i++)
             i->second->set_priority_op(op);
     }
 };
