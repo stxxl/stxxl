@@ -74,8 +74,7 @@ public:
         //_priority_op = op;
         UNUSED(op);
     }
-    void add_readreq(request_ptr & req);
-    void add_writereq(request_ptr & req);
+    void add_request(request_ptr & req);
     ~disk_queue();
 };
 

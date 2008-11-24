@@ -51,7 +51,7 @@ public:
             // create new disk queue
             queues[disk] = new request_queue_type();
         }
-        queues[disk]->add_readreq(req);
+        queues[disk]->add_request(req);
     }
     void add_writereq(request_ptr & req, DISKID disk)
     {
@@ -60,7 +60,7 @@ public:
             // create new disk queue
             queues[disk] = new request_queue_type();
         }
-        queues[disk]->add_writereq(req);
+        queues[disk]->add_request(req);
     }
     ~disk_queues()
     {

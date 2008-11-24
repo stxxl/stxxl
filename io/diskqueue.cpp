@@ -36,18 +36,17 @@ disk_queue::disk_queue(int /*n*/) :              //  n is ignored
 #endif
 }
 
-void disk_queue::add_readreq(request_ptr & req)
+void disk_queue::add_request(request_ptr & req)
 {
+    if (req.empty())
+        STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
+
+    if (req.get()->get_type() == request::READ)
     {
         scoped_mutex_lock Lock(read_mutex);
         read_queue.push(req);
     }
-
-    sem++;
-}
-
-void disk_queue::add_writereq(request_ptr & req)
-{
+    else
     {
         scoped_mutex_lock Lock(write_mutex);
         write_queue.push(req);
