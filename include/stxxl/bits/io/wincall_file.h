@@ -39,7 +39,8 @@ public:
     wincall_file(
         const std::string & filename,
         int mode,
-        int disk = -1);
+        int disk = -1) : wfs_file_base(filename, mode, disk)
+    { }
     request_ptr aread(
         void * buffer,
         stxxl::int64 pos,

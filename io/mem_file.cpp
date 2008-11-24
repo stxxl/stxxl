@@ -42,9 +42,6 @@ const char * mem_file::io_type() const
     return "memory";
 }
 
-mem_file::mem_file(int disk) : file(disk), ptr(NULL), sz(0)
-{ }
-
 mem_file::~mem_file()
 {
     delete[] ptr;

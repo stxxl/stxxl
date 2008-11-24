@@ -17,17 +17,6 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-request_state_impl_basic::request_state_impl_basic(
-    completion_handler on_cmpl,
-    file * f,
-    void * buf,
-    stxxl::int64 off,
-    size_t b,
-    request_type t) :
-    request(on_cmpl, f, buf, off, b, t),
-    _state(OP)
-{ }
-
 request_state_impl_basic::~request_state_impl_basic()
 {
     STXXL_VERBOSE3("basic_request_state " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);

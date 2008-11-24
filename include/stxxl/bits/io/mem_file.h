@@ -32,7 +32,8 @@ public:
     //! \brief constructs file object
     //! \param disk disk(file) identifier
     mem_file(
-        int disk = -1);
+        int disk = -1) : file(disk), ptr(NULL), sz(0)
+    { }
     request_ptr aread(
         void * buffer,
         stxxl::int64 pos,

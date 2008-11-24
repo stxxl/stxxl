@@ -42,7 +42,10 @@ protected:
         void * buf,
         stxxl::int64 off,
         size_t b,
-        request_type t);
+        request_type t) :
+        request(on_cmpl, f, buf, off, b, t),
+        _state(OP)
+    { }
 
 public:
     virtual ~request_state_impl_basic();

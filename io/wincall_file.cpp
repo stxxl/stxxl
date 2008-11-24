@@ -89,12 +89,6 @@ const char * wincall_file::io_type() const
     return "wincall";
 }
 
-wincall_file::wincall_file(
-    const std::string & filename,
-    int mode,
-    int disk) : wfs_file_base(filename, mode, disk)
-{ }
-
 request_ptr wincall_file::aread(
     void * buffer,
     stxxl::int64 pos,

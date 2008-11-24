@@ -86,12 +86,6 @@ const char * syscall_file::io_type() const
     return "syscall";
 }
 
-syscall_file::syscall_file(
-    const std::string & filename,
-    int mode,
-    int disk) : ufs_file_base(filename, mode, disk)
-{ }
-
 request_ptr syscall_file::aread(
     void * buffer,
     stxxl::int64 pos,
