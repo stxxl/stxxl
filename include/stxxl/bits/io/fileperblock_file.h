@@ -36,7 +36,6 @@ class fileperblock_file : public file
 private:
     std::string filename_prefix;
     int mode;
-    unsigned_type block_size;
     int disk;
     unsigned_type current_size;
 
@@ -58,7 +57,6 @@ public:
     fileperblock_file(
         const std::string & filename_prefix,
         int mode,
-        unsigned_type block_size,
         int disk = -1);
 
     //! \brief Schedules asynchronous read request to the file

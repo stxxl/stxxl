@@ -171,29 +171,15 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
-    else if (io_impl.find("fileperblock_syscall(") == 0)
+    else if (io_impl == "fileperblock_syscall")
     {
-        std::istringstream input(io_impl);
-        input.ignore(std::string("fileperblock_syscall(").size());
-        size_t block_size;
-        input >> block_size;
-        if(block_size <= 0)
-            STXXL_THROW(std::runtime_error, "FileCreator::create", "No/incorrect block size given for fileperblock_syscall.");
-
-        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, block_size, disk);
+        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, disk);
         result->lock();
         return result;
     }
-    else if (io_impl.find("fileperblock_mmap(") == 0)
+    else if (io_impl == "fileperblock_mmap")
     {
-        std::istringstream input(io_impl);
-        input.ignore(std::string("fileperblock_mmap(").size());
-        size_t block_size;
-        input >> block_size;
-        if(block_size <= 0)
-            STXXL_THROW(std::runtime_error, "FileCreator::create", "No/incorrect block size given for fileperblock_mmap.");
-
-        fileperblock_file<mmap_file> * result = new fileperblock_file<mmap_file>(filename, options, block_size, disk);
+        fileperblock_file<mmap_file> * result = new fileperblock_file<mmap_file>(filename, options, disk);
         result->lock();
         return result;
     }

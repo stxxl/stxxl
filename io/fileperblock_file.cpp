@@ -22,9 +22,8 @@ template<class base_file_type>
 fileperblock_file<base_file_type>::fileperblock_file(
     const std::string & filename_prefix,
     int mode,
-    unsigned_type block_size,
     int disk)
-        : file(disk), filename_prefix(filename_prefix), mode(mode), block_size(block_size), disk(disk)
+        : file(disk), filename_prefix(filename_prefix), mode(mode), disk(disk)
 {
 }
 
@@ -33,7 +32,7 @@ std::string fileperblock_file<base_file_type>::filename_for_block(unsigned_type 
 {
     std::ostringstream name;
     //enough for 1 billion blocks
-    name << filename_prefix << "_fpb_" << std::setw(9) << std::setfill('0') << (offset / block_size);
+    name << filename_prefix << "_fpb_" << std::setw(20) << std::setfill('0') << offset;
     return name.str();
 }
 
@@ -66,22 +65,8 @@ request_ptr fileperblock_file<base_file_type>::awrite(
 template<class base_file_type>
 void fileperblock_file<base_file_type>::delete_region(int64 offset, unsigned_type length)
 {
-    assert(feasible(offset, length));
     ::remove(filename_for_block(offset).c_str());
     STXXL_VERBOSE0("delete_region " << offset << " + " << length)
-}
-
-template<class base_file_type>
-bool fileperblock_file<base_file_type>::feasible(int64 offset, size_t length)
-{
-//    return (offset % block_size + length) <= block_size;
-    return (block_offset(offset) == 0) && (length == block_size);
-}
-
-template<class base_file_type>
-int64 fileperblock_file<base_file_type>::block_offset(int64 offset)
-{
-    return offset % block_size;
 }
 
 template<class base_file_type>
@@ -114,8 +99,7 @@ fileperblock_request<base_file_type>::fileperblock_request(
     request(on_completion, f, buffer, offset, length, read_or_write),
     base_file (new base_file_type(f->filename_for_block(offset), f->mode, f->disk))
 {
-    assert(f->feasible(offset, length));
-    base_file->set_size(f->block_size);
+    base_file->set_size(length);
     base_request = new request_ptr
        (read_or_write == request::READ ?
         base_file->aread(buffer, 0, length, on_completion) :
