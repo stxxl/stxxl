@@ -37,7 +37,7 @@ protected:
 
 protected:
     request_state_impl_basic(
-        completion_handler on_cmpl,
+        const completion_handler & on_cmpl,
         file * f,
         void * buf,
         stxxl::int64 off,

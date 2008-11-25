@@ -19,7 +19,7 @@ __STXXL_BEGIN_NAMESPACE
 
 
 request_impl_basic::request_impl_basic(
-    completion_handler on_cmpl,
+    const completion_handler & on_cmpl,
     file * f,
     void * buf,
     stxxl::int64 off,

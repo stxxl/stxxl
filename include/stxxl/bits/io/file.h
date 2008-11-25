@@ -117,7 +117,7 @@ public:
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr object, that can be used to track the status of the operation
     virtual request_ptr aread(void * buffer, stxxl::int64 pos, size_t bytes,
-                              completion_handler on_cmpl) = 0;
+                              const completion_handler & on_cmpl) = 0;
     //! \brief Schedules asynchronous write request to the file
     //! \param buffer pointer to memory buffer to write from
     //! \param pos starting file position to write
@@ -125,7 +125,7 @@ public:
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr object, that can be used to track the status of the operation
     virtual request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
-                               completion_handler on_cmpl) = 0;
+                               const completion_handler & on_cmpl) = 0;
 
     virtual void serve(const request * req) throw(io_error) = 0;
 

@@ -106,7 +106,7 @@ protected:
     }
 
 public:
-    request(completion_handler on_compl,
+    request(const completion_handler & on_compl,
             file * file__,
             void * buffer_,
             stxxl::int64 offset_,

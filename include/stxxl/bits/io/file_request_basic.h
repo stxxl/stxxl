@@ -31,12 +31,12 @@ public:
         void * buffer,
         stxxl::int64 pos,
         size_t bytes,
-        completion_handler on_cmpl);
+        const completion_handler & on_cmpl);
     request_ptr awrite(
         void * buffer,
         stxxl::int64 pos,
         size_t bytes,
-        completion_handler on_cmpl);
+        const completion_handler & on_cmpl);
 };
 
 //! \}

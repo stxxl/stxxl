@@ -22,7 +22,7 @@ request_ptr file_request_basic::aread(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
-    completion_handler on_cmpl)
+    const completion_handler & on_cmpl)
 {
     request_ptr req = new request_impl_basic(on_cmpl, this,
                                           buffer, pos, bytes,
@@ -37,7 +37,7 @@ request_ptr file_request_basic::awrite(
     void * buffer,
     stxxl::int64 pos,
     size_t bytes,
-    completion_handler on_cmpl)
+    const completion_handler & on_cmpl)
 {
     request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
                                           request::WRITE);
