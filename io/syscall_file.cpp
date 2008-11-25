@@ -96,10 +96,7 @@ request_ptr syscall_file::aread(
                                           buffer, pos, bytes,
                                           request::READ);
 
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-    disk_queues::get_instance()->add_readreq(req, get_id());
+    disk_queues::get_instance()->add_request(req, get_id());
 
     return req;
 }
@@ -113,10 +110,7 @@ request_ptr syscall_file::awrite(
     request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
                                           request::WRITE);
 
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-    disk_queues::get_instance()->add_writereq(req, get_id());
+    disk_queues::get_instance()->add_request(req, get_id());
 
     return req;
 }
