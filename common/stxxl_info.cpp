@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/io>
 #include <stxxl/mng>
 
 int main(int argc, char **)

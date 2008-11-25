@@ -68,8 +68,8 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/exceptions.h>
-#include <stxxl/bits/io/disk_queues.h> // TO BE REMOVED
 
 
 __STXXL_BEGIN_NAMESPACE

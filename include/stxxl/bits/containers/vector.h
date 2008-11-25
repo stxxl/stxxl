@@ -15,6 +15,7 @@
 #define STXXL_VECTOR_HEADER
 
 #include <vector>
+#include <queue>
 #include <algorithm>
 
 #include <stxxl/bits/mng/mng.h>
