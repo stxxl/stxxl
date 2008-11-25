@@ -224,34 +224,6 @@ void sim_disk_file::set_size(stxxl::int64 newsize)
     }
 }
 
-request_ptr sim_disk_file::aread(void * buffer, stxxl::int64 pos, size_t bytes,
-                                 completion_handler on_cmpl)
-{
-    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
-                                           request::READ);
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-    disk_queues::get_instance()->add_readreq(req, get_id());
-
-    return req;
-}
-
-request_ptr sim_disk_file::awrite(
-    void * buffer, stxxl::int64 pos, size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
-                                           request::WRITE);
-
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-    disk_queues::get_instance()->add_writereq(req, get_id());
-
-    return req;
-}
-
 __STXXL_END_NAMESPACE
 
 #endif // #ifndef BOOST_MSVC

@@ -103,7 +103,7 @@ const char * boostfd_file::io_type() const
 boostfd_file::boostfd_file(
     const std::string & filename,
     int mode,
-    int disk) : file(disk), mode_(mode)
+    int disk) : file_request_basic(disk), mode_(mode)
 {
     BOOST_IOS::openmode boostfd_mode;
 
@@ -174,41 +174,6 @@ void boostfd_file::set_size(stxxl::int64 newsize)
     file_des.seek(newsize, BOOST_IOS::beg);
     file_des.seek(0, BOOST_IOS::beg); // not important ?
     assert(size() >= oldsize);
-}
-
-request_ptr boostfd_file::aread(
-    void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new request_impl_basic(on_cmpl, this,
-                                          buffer, pos, bytes,
-                                          request::READ);
-
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-    disk_queues::get_instance()->add_readreq(req, get_id());
-
-    return req;
-}
-
-request_ptr boostfd_file::awrite(
-    void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
-                                          request::WRITE);
-
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-    disk_queues::get_instance()->add_writereq(req, get_id());
-
-    return req;
 }
 
 void boostfd_file::lock()

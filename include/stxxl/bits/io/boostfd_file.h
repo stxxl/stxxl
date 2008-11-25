@@ -17,7 +17,7 @@
 
 #ifdef STXXL_BOOST_CONFIG // if boost is available
 
-#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/file_request_basic.h>
 #include <stxxl/bits/io/request.h>
 
 #include <boost/iostreams/device/file_descriptor.hpp>
@@ -29,7 +29,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation based on boost::iostreams::file_decriptor
-class boostfd_file : public file
+class boostfd_file : public file_request_basic
 {
 public:
     typedef boost::iostreams::file_descriptor fd_type;
@@ -44,16 +44,6 @@ public:
     stxxl::int64 size();
     void set_size(stxxl::int64 newsize);
     void lock();
-    request_ptr aread(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-    request_ptr awrite(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
     void serve(const request * req) throw(io_error);
     const char * io_type() const;
 };

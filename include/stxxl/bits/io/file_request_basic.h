@@ -25,6 +25,8 @@ __STXXL_BEGIN_NAMESPACE
 class file_request_basic : public file
 {
 public:
+    file_request_basic(int id) : file(id)
+    { }
     request_ptr aread(
         void * buffer,
         stxxl::int64 pos,

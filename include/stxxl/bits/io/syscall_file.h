@@ -35,16 +35,6 @@ public:
         int mode,
         int disk = -1) : ufs_file_base(filename, mode, disk)
     { }
-    request_ptr aread(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-    request_ptr awrite(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
     void serve(const request * req) throw(io_error);
     const char * io_type() const;
 };

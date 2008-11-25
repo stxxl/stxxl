@@ -13,7 +13,7 @@
 #ifndef STXXL_MEM_FILE_HEADER
 #define STXXL_MEM_FILE_HEADER
 
-#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/file_request_basic.h>
 #include <stxxl/bits/io/request.h>
 
 
@@ -23,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of file based on new[] and memcpy
-class mem_file : public file
+class mem_file : public file_request_basic
 {
     char * ptr;
     unsigned_type sz;
@@ -32,18 +32,8 @@ public:
     //! \brief constructs file object
     //! \param disk disk(file) identifier
     mem_file(
-        int disk = -1) : file(disk), ptr(NULL), sz(0)
+        int disk = -1) : file_request_basic(disk), ptr(NULL), sz(0)
     { }
-    request_ptr aread(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-    request_ptr awrite(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
     void serve(const request * req) throw(io_error);
     ~mem_file();
     stxxl::int64 size();

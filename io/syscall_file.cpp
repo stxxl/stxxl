@@ -86,34 +86,5 @@ const char * syscall_file::io_type() const
     return "syscall";
 }
 
-request_ptr syscall_file::aread(
-    void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new request_impl_basic(on_cmpl, this,
-                                          buffer, pos, bytes,
-                                          request::READ);
-
-    disk_queues::get_instance()->add_request(req, get_id());
-
-    return req;
-}
-
-request_ptr syscall_file::awrite(
-    void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
-                                          request::WRITE);
-
-    disk_queues::get_instance()->add_request(req, get_id());
-
-    return req;
-}
-
 __STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4
