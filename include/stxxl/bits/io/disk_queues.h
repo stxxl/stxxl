@@ -44,6 +44,16 @@ protected:
     disk_queues() { }
 
 public:
+    void add_request(request_ptr & req, DISKID disk)
+    {
+        if (queues.find(disk) == queues.end())
+        {
+            // create new request queue
+            queues[disk] = new request_queue_type();
+        }
+        queues[disk]->add_request(req);
+    }
+
     void add_readreq(request_ptr & req, DISKID disk)
     {
         if (queues.find(disk) == queues.end())
