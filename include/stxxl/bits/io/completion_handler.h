@@ -43,8 +43,7 @@ public:
 //! For an example of use see \link mng/test_mng.cpp mng/test_mng.cpp \endlink
 class completion_handler
 {
-    //compat_auto_ptr<completion_handler_impl>::result sp_impl_;
-    std::auto_ptr<completion_handler_impl> sp_impl_;
+    compat_auto_ptr<completion_handler_impl>::result sp_impl_;
 
 public:
     completion_handler() : sp_impl_(0) { }
