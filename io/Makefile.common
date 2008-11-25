@@ -9,6 +9,7 @@ LIB_SRC			 = \
 	request_waiters_impl_basic.cpp \
 	request_state_impl_basic.cpp \
 	request_impl_basic.cpp \
+	file_request_basic.cpp \
 	ufs_file.cpp \
 	syscall_file.cpp \
 	mmap_file.cpp \
