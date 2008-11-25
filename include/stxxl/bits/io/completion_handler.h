@@ -50,10 +50,7 @@ public:
     completion_handler(const completion_handler & obj) : sp_impl_(obj.sp_impl_.get()->clone()) { }
     completion_handler & operator = (const completion_handler & obj)
     {
-        completion_handler copy(obj);
-        completion_handler_impl * p = sp_impl_.release();
-        sp_impl_.reset(copy.sp_impl_.release());
-        copy.sp_impl_.reset(p);
+        sp_impl_.reset(obj.sp_impl_.get()->clone());
         return *this;
     }
     void operator () (request * req)
@@ -98,3 +95,4 @@ struct default_completion_handler
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_COMPLETION_HANDLER_HEADER
+// vim: et:ts=4:sw=4
