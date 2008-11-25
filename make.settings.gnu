@@ -270,14 +270,14 @@ HEADER_FILES_COMMON	+= timer.h utils.h simple_vector.h
 HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h debug.h tuple.h
 HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h
 
+HEADER_FILES_IO		+= io.h iostats.h completion_handler.h
 HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h
 HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h
 HEADER_FILES_IO		+= disk_queues.h disk_queue.h
-HEADER_FILES_IO		+= completion_handler.h io.h iostats.h
 HEADER_FILES_IO		+= file.h file_request_basic.h
-HEADER_FILES_IO		+= mmap_file.h simdisk_file.h syscall_file.h
-HEADER_FILES_IO		+= ufs_file.h wincall_file.h wfs_file.h boostfd_file.h
-HEADER_FILES_IO		+= mem_file.h
+HEADER_FILES_IO		+= ufs_file.h syscall_file.h mmap_file.h simdisk_file.h
+HEADER_FILES_IO		+= wfs_file.h wincall_file.h
+HEADER_FILES_IO		+= boostfd_file.h mem_file.h
 
 HEADER_FILES_MNG	+= adaptor.h block_prefetcher.h
 HEADER_FILES_MNG	+= buf_istream.h buf_ostream.h buf_writer.h mng.h
