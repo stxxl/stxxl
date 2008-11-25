@@ -68,6 +68,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/io/disk_queues.h> // TO BE REMOVED
 
@@ -81,11 +82,35 @@ class request;
 class request_ptr;
 class completion_handler;
 
+class file_base
+{
+public:
+    //! \brief Schedules asynchronous read request to the file
+    //! \param buffer pointer to memory buffer to read into
+    //! \param pos starting file position to read
+    //! \param bytes number of bytes to transfer
+    //! \param on_cmpl I/O completion handler
+    //! \return \c request_ptr object, that can be used to track the status of the operation
+    virtual request_ptr aread(void * buffer, stxxl::int64 pos, size_t bytes,
+                              completion_handler on_cmpl) = 0;
+
+    //! \brief Schedules asynchronous write request to the file
+    //! \param buffer pointer to memory buffer to write from
+    //! \param pos starting file position to write
+    //! \param bytes number of bytes to transfer
+    //! \param on_cmpl I/O completion handler
+    //! \return \c request_ptr object, that can be used to track the status of the operation
+    virtual request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
+                               completion_handler on_cmpl) = 0;
+
+    virtual void serve(const request * req) throw(io_error) = 0;
+};
+
 //! \brief Defines interface of file
 
 //! It is a base class for different implementations that might
 //! base on various file systems or even remote storage interfaces
-class file : private noncopyable
+class file : private noncopyable, virtual public file_base
 {
     int id;
 
@@ -109,25 +134,6 @@ public:
         DIRECT = 16,                        //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O
         TRUNC = 32                          //!< once file is opened its length becomes zero
     };
-
-    //! \brief Schedules asynchronous read request to the file
-    //! \param buffer pointer to memory buffer to read into
-    //! \param pos starting file position to read
-    //! \param bytes number of bytes to transfer
-    //! \param on_cmpl I/O completion handler
-    //! \return \c request_ptr object, that can be used to track the status of the operation
-    virtual request_ptr aread(void * buffer, stxxl::int64 pos, size_t bytes,
-                              completion_handler on_cmpl) = 0;
-    //! \brief Schedules asynchronous write request to the file
-    //! \param buffer pointer to memory buffer to write from
-    //! \param pos starting file position to write
-    //! \param bytes number of bytes to transfer
-    //! \param on_cmpl I/O completion handler
-    //! \return \c request_ptr object, that can be used to track the status of the operation
-    virtual request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
-                               completion_handler on_cmpl) = 0;
-
-    virtual void serve(const request * req) throw(io_error) = 0;
 
     //! \brief Changes the size of the file
     //! \param newsize value of the new file size
