@@ -65,6 +65,7 @@ request_ptr fileperblock_file<base_file_type>::awrite(
 template<class base_file_type>
 void fileperblock_file<base_file_type>::delete_region(int64 offset, unsigned_type length)
 {
+    UNUSED(length);
     ::remove(filename_for_block(offset).c_str());
     STXXL_VERBOSE0("delete_region " << offset << " + " << length)
 }
