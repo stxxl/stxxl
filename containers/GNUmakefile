@@ -27,7 +27,7 @@ CPPFLAGS_TPIE			?= -I$(TPIE_ROOT)/include -DHAVE_CONFIG_H -Wno-error
 LIBS_TPIE			?= -L$(TPIE_ROOT)/lib -ltpie
 
 LEDA_COMPILER			?= g++-2.95
-LEDA_FLAGS			?= -D_LINUX $(filter-out -openmp -fopenmp -D__MCSTL__,$(STXXL_COMPILER_OPTIONS)) -Wno-error
+LEDA_FLAGS			?= -D_LINUX $(filter-out -openmp -fopenmp -D__MCSTL__ -include stxxl/bits/defines.h,$(STXXL_COMPILER_OPTIONS)) -Wno-error
 LEDA_ROOT			?= /usr/local/LEDA
 LEDA_SM_ROOT			?= /usr/local/LEDA-SM
 
