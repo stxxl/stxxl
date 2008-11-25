@@ -54,30 +54,13 @@ public:
         queues[disk]->add_request(req);
     }
 
-    void add_readreq(request_ptr & req, DISKID disk)
-    {
-        if (queues.find(disk) == queues.end())
-        {
-            // create new disk queue
-            queues[disk] = new request_queue_type();
-        }
-        queues[disk]->add_request(req);
-    }
-    void add_writereq(request_ptr & req, DISKID disk)
-    {
-        if (queues.find(disk) == queues.end())
-        {
-            // create new disk queue
-            queues[disk] = new request_queue_type();
-        }
-        queues[disk]->add_request(req);
-    }
     ~disk_queues()
     {
         // deallocate all queues
         for (request_queue_map::iterator i = queues.begin(); i != queues.end(); i++)
             delete (*i).second;
     }
+
     //! \brief Changes requests priorities
     //! \param op one of:
     //!                 - READ, read requests are served before write requests within a disk queue
