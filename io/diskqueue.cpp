@@ -20,7 +20,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-disk_queue::disk_queue(int /*n*/) :              //  n is ignored
+request_queue_impl_qwqr::request_queue_impl_qwqr(int /*n*/) :              //  n is ignored
     sem(0)
 #ifdef STXXL_BOOST_THREADS
                                     , thread(boost::bind(worker, static_cast<void *>(this)))
@@ -36,7 +36,7 @@ disk_queue::disk_queue(int /*n*/) :              //  n is ignored
 #endif
 }
 
-void disk_queue::add_request(request_ptr & req)
+void request_queue_impl_qwqr::add_request(request_ptr & req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
@@ -55,7 +55,7 @@ void disk_queue::add_request(request_ptr & req)
     sem++;
 }
 
-disk_queue::~disk_queue()
+request_queue_impl_qwqr::~request_queue_impl_qwqr()
 {
 #ifdef STXXL_BOOST_THREADS
     // Boost.Threads do not support cancellation ?
@@ -65,9 +65,9 @@ disk_queue::~disk_queue()
 #endif
 }
 
-void * disk_queue::worker(void * arg)
+void * request_queue_impl_qwqr::worker(void * arg)
 {
-    disk_queue * pthis = static_cast<disk_queue *>(arg);
+    self * pthis = static_cast<self *>(arg);
     request_ptr req;
 
 #ifdef STXXL_BOOST_THREADS

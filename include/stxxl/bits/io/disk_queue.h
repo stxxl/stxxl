@@ -39,12 +39,16 @@ __STXXL_BEGIN_NAMESPACE
 
 class request_ptr;
 
-class disk_queue : private noncopyable
+class disk_queue
 {
 public:
     enum priority_op { READ, WRITE, NONE };
+};
 
-private:
+class request_queue_impl_qwqr : private noncopyable, public disk_queue
+{
+    typedef request_queue_impl_qwqr self;
+
     mutex write_mutex;
     mutex read_mutex;
     std::queue<request_ptr> write_queue;
@@ -63,7 +67,8 @@ private:
     static void * worker(void * arg);
 
 public:
-    disk_queue(int n = 1);             // max number of requests simultaneously submitted to disk
+    // \param n max number of requests simultaneously submitted to disk
+    request_queue_impl_qwqr(int n = 1);
 
     // in a multi-threaded setup this does not work as intended
     // also there were race conditions possible
@@ -75,7 +80,7 @@ public:
         UNUSED(op);
     }
     void add_request(request_ptr & req);
-    ~disk_queue();
+    ~request_queue_impl_qwqr();
 };
 
 //! \}
