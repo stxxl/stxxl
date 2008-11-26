@@ -43,6 +43,7 @@ void request::completed()
 {
     notify_waiters();
     on_complete(this);
+    file_->finished_request_ref();
 }
 
 void request::check_alignment() const
