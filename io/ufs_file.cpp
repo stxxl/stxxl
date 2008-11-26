@@ -98,18 +98,23 @@ void ufs_file_base::lock()
 #endif
 }
 
-stxxl::int64 ufs_file_base::size()
+inline stxxl::int64 ufs_file_base::_size()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
     struct stat st;
     stxxl_check_ge_0(::fstat(file_des, &st), io_error);
     return st.st_size;
 }
 
+stxxl::int64 ufs_file_base::size()
+{
+    scoped_mutex_lock fd_lock(fd_mutex);
+    return _size();
+}
+
 void ufs_file_base::set_size(stxxl::int64 newsize)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
-    stxxl::int64 cur_size = size();
+    stxxl::int64 cur_size = _size();
 
 #ifdef BOOST_MSVC
     if (!(mode_ & RDONLY))
