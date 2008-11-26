@@ -32,7 +32,7 @@ protected:
     int file_des;          // file descriptor
     int mode_;             // open mode
     ufs_file_base(const std::string & filename, int mode, int disk);
-    inline stxxl::int64 _size();
+    stxxl::int64 _size();
 
 public:
     ~ufs_file_base();

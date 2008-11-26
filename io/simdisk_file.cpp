@@ -217,7 +217,8 @@ const char * sim_disk_file::io_type() const
 
 void sim_disk_file::set_size(stxxl::int64 newsize)
 {
-    if (newsize > size())
+    scoped_mutex_lock fd_lock(fd_mutex);
+    if (newsize > _size())
     {
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
         stxxl_check_ge_0(::write(file_des, "", 1), io_error);
