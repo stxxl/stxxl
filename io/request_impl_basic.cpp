@@ -55,8 +55,13 @@ void request_impl_basic::serve()
 
     check_nref(true);
 
-    _state.set_to(DONE);
     completed();
+}
+
+void request_impl_basic::completed()
+{
+    _state.set_to(DONE);
+    request_state_impl_basic::completed();
     _state.set_to(READY2DIE);
 }
 

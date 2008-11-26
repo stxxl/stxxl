@@ -38,6 +38,7 @@ public:
 
 protected:
     void serve();
+    void completed();
 
 public:
     const char * io_type() const;
