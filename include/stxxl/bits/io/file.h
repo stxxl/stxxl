@@ -70,6 +70,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/common/mutex.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -89,11 +90,14 @@ class file : private noncopyable
 {
     int id;
 
+    mutex request_ref_cnt_mutex;
+    int request_ref_cnt;
+
 protected:
     //! \brief Initializes file object
     //! \param _id file identifier
     //! \remark Called in implementations of file
-    file(int _id) : id(_id) { }
+    file(int _id) : id(_id), request_ref_cnt(0) { }
 
 public:
     //! \brief Definition of acceptable file open modes
@@ -129,6 +133,25 @@ public:
 
     virtual void serve(const request * req) throw(io_error) = 0;
 
+    void add_request_ref()
+    {
+        scoped_mutex_lock Lock(request_ref_cnt_mutex);
+        ++request_ref_cnt;
+    }
+
+    void delete_request_ref()
+    {
+        scoped_mutex_lock Lock(request_ref_cnt_mutex);
+        assert(request_ref_cnt > 0);
+        --request_ref_cnt;
+    }
+
+    int get_request_nref()
+    {
+        scoped_mutex_lock Lock(request_ref_cnt_mutex);
+        return request_ref_cnt;
+    }
+
     //! \brief Changes the size of the file
     //! \param newsize value of the new file size
     virtual void set_size(stxxl::int64 newsize) = 0;
@@ -158,7 +181,12 @@ public:
         UNUSED(size);
     }
 
-    virtual ~file() { }
+    virtual ~file()
+    {
+        int nr = get_request_nref();
+        if (nr != 0)
+            STXXL_ERRMSG("stxxl::file is being deleted while there are still " << nr << " requests referencing it");
+    }
 
     //! \brief Identifies the type of I/O implementation
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation

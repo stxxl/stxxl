@@ -30,11 +30,13 @@ request::request(const completion_handler & on_compl,
         type(type_)
 {
     STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": creation, cnt: " << ref_cnt);
+    file_->add_request_ref();
 }
 
 request::~request()
 {
     STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
+    file_->delete_request_ref();
 }
 
 void request::check_alignment() const
