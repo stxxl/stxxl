@@ -45,8 +45,8 @@ class request_ptr;
 class request_base : private noncopyable
 {
 public:
-    typedef stxxl::int64 offset_type;
-    typedef size_t size_type;
+    typedef stxxl::uint64 offset_type;
+    typedef stxxl::unsigned_type size_type;
     enum request_type { READ, WRITE };
 
 protected:
