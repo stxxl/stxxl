@@ -20,9 +20,9 @@ __STXXL_BEGIN_NAMESPACE
 void mem_file::serve(const request * req) throw(io_error)
 {
     assert(req->get_file() == this);
-    stxxl::int64 offset = req->get_offset();
+    offset_type offset = req->get_offset();
     void * buffer = req->get_buffer();
-    size_t bytes = req->get_size();
+    size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
     if (type == request::READ)
@@ -53,19 +53,19 @@ void mem_file::lock()
     // nothing to do
 }
 
-stxxl::int64 mem_file::size()
+file::offset_type mem_file::size()
 {
     return sz;
 }
 
-void mem_file::set_size(stxxl::int64 newsize)
+void mem_file::set_size(offset_type newsize)
 {
     assert(ptr == NULL); // no resizing
     if (ptr == NULL)
         ptr = new char[sz = newsize];
 }
 
-void mem_file::delete_region(int64 offset, unsigned_type size)
+void mem_file::delete_region(offset_type offset, size_type size)
 {
     // overwrite the freed region with uninitialized memory
     STXXL_VERBOSE("delete_region at " << offset << " len " << size);

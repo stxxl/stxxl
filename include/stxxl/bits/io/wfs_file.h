@@ -38,12 +38,12 @@ protected:
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode
     wfs_file_base(const std::string & filename, int mode, int disk);
-    inline stxxl::int64 _size();
+    offset_type _size();
 
 public:
     ~wfs_file_base();
-    stxxl::int64 size();
-    void set_size(stxxl::int64 newsize);
+    offset_type size();
+    void set_size(offset_type newsize);
     void lock();
     const char * io_type() const;
 };

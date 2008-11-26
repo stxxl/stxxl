@@ -29,13 +29,13 @@ public:
     { }
     request_ptr aread(
         void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
+        offset_type pos,
+        size_type bytes,
         const completion_handler & on_cmpl);
     request_ptr awrite(
         void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
+        offset_type pos,
+        size_type bytes,
         const completion_handler & on_cmpl);
 };
 

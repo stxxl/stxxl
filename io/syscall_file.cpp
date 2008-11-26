@@ -22,9 +22,9 @@ void syscall_file::serve(const request * req) throw(io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
-    stxxl::int64 offset = req->get_offset();
+    offset_type offset = req->get_offset();
     void * buffer = req->get_buffer();
-    size_t bytes = req->get_size();
+    size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
         if (::lseek(file_des, offset, SEEK_SET) < 0)

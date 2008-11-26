@@ -86,7 +86,7 @@ protected:
 public:
     inline DiskGeometry()
     { }
-    double get_delay(stxxl::int64 offset, size_t size);                // returns delay in s
+    double get_delay(file::offset_type offset, file::size_type size);                // returns delay in s
 
     inline ~DiskGeometry()
     { }
@@ -116,7 +116,7 @@ public:
         std::endl;
     }
     void serve(const request * req) throw(io_error);
-    void set_size(stxxl::int64 newsize);
+    void set_size(offset_type newsize);
     const char * io_type() const;
 };
 

@@ -37,13 +37,13 @@ protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des
     fd_type file_des;
     int mode_;
-    inline stxxl::int64 _size();
+    offset_type _size();
 
 public:
     boostfd_file(const std::string & filename, int mode, int disk = -1);
     ~boostfd_file();
-    stxxl::int64 size();
-    void set_size(stxxl::int64 newsize);
+    offset_type size();
+    void set_size(offset_type newsize);
     void lock();
     void serve(const request * req) throw(io_error);
     const char * io_type() const;

@@ -36,7 +36,7 @@ void DiskGeometry::add_zone(int & first_cyl, int last_cyl,
     first_cyl = last_cyl + 1;
 }
 
-double DiskGeometry::get_delay(stxxl::int64 /*offset*/, size_t size)                   // returns delay in s
+double DiskGeometry::get_delay(file::offset_type /*offset*/, file::size_type size)                   // returns delay in s
 {
     /*
 
@@ -148,14 +148,9 @@ IC35L080AVVA07::IC35L080AVVA07()
      */
 
     std::cout << "Transfer 16 Mb from zone 0 : " <<
-    get_delay(0,
-              16 * 1024 *
-              1024) << " s" << std::endl;
+    get_delay(0, 16 * 1024 * 1024) << " s" << std::endl;
     std::cout << "Transfer 16 Mb from zone 30: " <<
-    get_delay(stxxl::int64(158204036) *
-              stxxl::int64(bytes_per_sector),
-              16 * 1024 *
-              1024) << " s" << std::endl;
+    get_delay(file::offset_type(158204036) * file::offset_type(bytes_per_sector), 16 * 1024 * 1024) << " s" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -164,9 +159,9 @@ void sim_disk_file::serve(const request * req) throw(io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
-    stxxl::int64 offset = req->get_offset();
+    offset_type offset = req->get_offset();
     void * buffer = req->get_buffer();
-    size_t bytes = req->get_size();
+    size_type bytes = req->get_size();
     request::request_type type = req->get_type();
     double op_start = timestamp();
 
@@ -215,7 +210,7 @@ const char * sim_disk_file::io_type() const
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_file::set_size(stxxl::int64 newsize)
+void sim_disk_file::set_size(offset_type newsize)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     if (newsize > _size())

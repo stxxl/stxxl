@@ -27,9 +27,9 @@ void boostfd_file::serve(const request * req) throw(io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
-    stxxl::int64 offset = req->get_offset();
+    offset_type offset = req->get_offset();
     void * buffer = req->get_buffer();
-    size_t bytes = req->get_size();
+    size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
     try
@@ -164,22 +164,21 @@ boostfd_file::~boostfd_file()
     file_des.close();
 }
 
-inline stxxl::int64 boostfd_file::_size()
+inline file::offset_type boostfd_file::_size()
 {
-    stxxl::int64 size_ = file_des.seek(0, BOOST_IOS::end);
-    return size_;
+    return file_des.seek(0, BOOST_IOS::end);
 }
 
-stxxl::int64 boostfd_file::size()
+file::offset_type boostfd_file::size()
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     return _size();
 }
 
-void boostfd_file::set_size(stxxl::int64 newsize)
+void boostfd_file::set_size(offset_type newsize)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
-    stxxl::int64 oldsize = _size();
+    offset_type oldsize = _size();
     file_des.seek(newsize, BOOST_IOS::beg);
     file_des.seek(0, BOOST_IOS::beg); // not important ?
     assert(_size() >= oldsize);

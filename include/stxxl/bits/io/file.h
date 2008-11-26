@@ -71,16 +71,13 @@
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
-
-class request;
-class request_ptr;
-class completion_handler;
 
 //! \brief Defines interface of file
 
@@ -100,6 +97,11 @@ protected:
     file(int _id) : id(_id), request_ref_cnt(0) { }
 
 public:
+    // the offset of a request, also the size of the file
+    typedef request::offset_type offset_type;
+    // the size of a request
+    typedef request::size_type size_type;
+
     //! \brief Definition of acceptable file open modes
 
     //! Various open modes in a file system must be
@@ -120,7 +122,7 @@ public:
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr object, that can be used to track the status of the operation
-    virtual request_ptr aread(void * buffer, stxxl::int64 pos, size_t bytes,
+    virtual request_ptr aread(void * buffer, offset_type pos, size_type bytes,
                               const completion_handler & on_cmpl) = 0;
     //! \brief Schedules asynchronous write request to the file
     //! \param buffer pointer to memory buffer to write from
@@ -128,7 +130,7 @@ public:
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
     //! \return \c request_ptr object, that can be used to track the status of the operation
-    virtual request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
+    virtual request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
                                const completion_handler & on_cmpl) = 0;
 
     virtual void serve(const request * req) throw(io_error) = 0;
@@ -154,10 +156,10 @@ public:
 
     //! \brief Changes the size of the file
     //! \param newsize value of the new file size
-    virtual void set_size(stxxl::int64 newsize) = 0;
+    virtual void set_size(offset_type newsize) = 0;
     //! \brief Returns size of the file
     //! \return file size in bytes
-    virtual stxxl::int64 size() = 0;
+    virtual offset_type size() = 0;
     //! \brief deprecated, use \c stxxl::file::get_id() instead
     __STXXL_DEPRECATED(int get_disk_number() const)
     {
@@ -175,7 +177,7 @@ public:
     virtual void lock() = 0;
 
     //! \brief Some specialized file types may need to know freed regions
-    virtual void delete_region(int64 offset, unsigned_type size)
+    virtual void delete_region(offset_type offset, size_type size)
     {
         UNUSED(offset);
         UNUSED(size);

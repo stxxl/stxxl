@@ -94,7 +94,7 @@ void wfs_file_base::lock()
         stxxl_win_lasterror_exit("LockFile ", io_error);
 }
 
-inline stxxl::int64 wfs_file_base::_size()
+file::offset_type wfs_file_base::_size()
 {
     LARGE_INTEGER result;
     if (!GetFileSizeEx(file_des, &result))
@@ -103,16 +103,16 @@ inline stxxl::int64 wfs_file_base::_size()
         return result.QuadPart;
 }
 
-stxxl::int64 wfs_file_base::size()
+file::offset_type wfs_file_base::size()
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     return _size();
 }
 
-void wfs_file_base::set_size(stxxl::int64 newsize)
+void wfs_file_base::set_size(offset_type newsize)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
-    stxxl::int64 cur_size = _size();
+    offset_type cur_size = _size();
 
     LARGE_INTEGER desired_pos;
     desired_pos.QuadPart = newsize;

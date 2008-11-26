@@ -22,8 +22,8 @@ request_impl_basic::request_impl_basic(
     const completion_handler & on_cmpl,
     file * f,
     void * buf,
-    stxxl::int64 off,
-    size_t b,
+    offset_type off,
+    size_type b,
     request_type t) :
     request_state_impl_basic(on_cmpl, f, buf, off, b, t)
 {

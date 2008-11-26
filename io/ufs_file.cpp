@@ -98,23 +98,23 @@ void ufs_file_base::lock()
 #endif
 }
 
-inline stxxl::int64 ufs_file_base::_size()
+file::offset_type ufs_file_base::_size()
 {
     struct stat st;
     stxxl_check_ge_0(::fstat(file_des, &st), io_error);
     return st.st_size;
 }
 
-stxxl::int64 ufs_file_base::size()
+file::offset_type ufs_file_base::size()
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     return _size();
 }
 
-void ufs_file_base::set_size(stxxl::int64 newsize)
+void ufs_file_base::set_size(offset_type newsize)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
-    stxxl::int64 cur_size = _size();
+    offset_type cur_size = _size();
 
     if (!(mode_ & RDONLY))
     {

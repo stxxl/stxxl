@@ -26,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 class mem_file : public file_request_basic
 {
     char * ptr;
-    unsigned_type sz;
+    offset_type sz;
 
 public:
     //! \brief constructs file object
@@ -36,10 +36,10 @@ public:
     { }
     void serve(const request * req) throw(io_error);
     ~mem_file();
-    stxxl::int64 size();
-    void set_size(stxxl::int64 newsize);
+    offset_type size();
+    void set_size(offset_type newsize);
     void lock();
-    void delete_region(int64 offset, unsigned_type size);
+    void delete_region(offset_type offset, size_type size);
     const char * io_type() const;
 };
 

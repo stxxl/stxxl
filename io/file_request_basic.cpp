@@ -20,8 +20,8 @@ __STXXL_BEGIN_NAMESPACE
 
 request_ptr file_request_basic::aread(
     void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
+    offset_type pos,
+    size_type bytes,
     const completion_handler & on_cmpl)
 {
     request_ptr req = new request_impl_basic(on_cmpl, this,
@@ -35,8 +35,8 @@ request_ptr file_request_basic::aread(
 
 request_ptr file_request_basic::awrite(
     void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
+    offset_type pos,
+    size_type bytes,
     const completion_handler & on_cmpl)
 {
     request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
