@@ -80,30 +80,39 @@ wfs_file_base::wfs_file_base(
 
 wfs_file_base::~wfs_file_base()
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     if (!CloseHandle(file_des))
-        stxxl_win_lasterror_exit("closing file (call of ::CloseHandle) ", io_error)
+        stxxl_win_lasterror_exit("closing file (call of ::CloseHandle) ", io_error);
 
         file_des = INVALID_HANDLE_VALUE;
 }
 
 void wfs_file_base::lock()
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
         stxxl_win_lasterror_exit("LockFile ", io_error);
 }
 
-stxxl::int64 wfs_file_base::size()
+inline stxxl::int64 wfs_file_base::_size()
 {
     LARGE_INTEGER result;
     if (!GetFileSizeEx(file_des, &result))
-        stxxl_win_lasterror_exit("GetFileSizeEx ", io_error)
+        stxxl_win_lasterror_exit("GetFileSizeEx ", io_error);
 
         return result.QuadPart;
 }
 
+stxxl::int64 wfs_file_base::size()
+{
+    scoped_mutex_lock fd_lock(fd_mutex);
+    return _size();
+}
+
 void wfs_file_base::set_size(stxxl::int64 newsize)
 {
-    stxxl::int64 cur_size = size();
+    scoped_mutex_lock fd_lock(fd_mutex);
+    stxxl::int64 cur_size = _size();
 
     LARGE_INTEGER desired_pos;
     desired_pos.QuadPart = newsize;

@@ -31,12 +31,13 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation based on boost::iostreams::file_decriptor
 class boostfd_file : public file_request_basic
 {
-public:
     typedef boost::iostreams::file_descriptor fd_type;
 
 protected:
+    mutex fd_mutex;        // sequentialize function calls involving file_des
     fd_type file_des;
     int mode_;
+    inline stxxl::int64 _size();
 
 public:
     boostfd_file(const std::string & filename, int mode, int disk = -1);

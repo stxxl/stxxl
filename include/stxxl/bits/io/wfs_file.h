@@ -34,9 +34,11 @@ __STXXL_BEGIN_NAMESPACE
 class wfs_file_base : public file_request_basic
 {
 protected:
+    mutex fd_mutex;        // sequentialize function calls involving file_des
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode
     wfs_file_base(const std::string & filename, int mode, int disk);
+    inline stxxl::int64 _size();
 
 public:
     ~wfs_file_base();

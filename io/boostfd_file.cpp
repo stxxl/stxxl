@@ -25,6 +25,7 @@ __STXXL_BEGIN_NAMESPACE
 
 void boostfd_file::serve(const request * req) throw(io_error)
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
     stxxl::int64 offset = req->get_offset();
     void * buffer = req->get_buffer();
@@ -159,21 +160,29 @@ boostfd_file::boostfd_file(
 
 boostfd_file::~boostfd_file()
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     file_des.close();
 }
 
-stxxl::int64 boostfd_file::size()
+inline stxxl::int64 boostfd_file::_size()
 {
     stxxl::int64 size_ = file_des.seek(0, BOOST_IOS::end);
     return size_;
 }
 
+stxxl::int64 boostfd_file::size()
+{
+    scoped_mutex_lock fd_lock(fd_mutex);
+    return _size();
+}
+
 void boostfd_file::set_size(stxxl::int64 newsize)
 {
-    stxxl::int64 oldsize = size();
+    scoped_mutex_lock fd_lock(fd_mutex);
+    stxxl::int64 oldsize = _size();
     file_des.seek(newsize, BOOST_IOS::beg);
     file_des.seek(0, BOOST_IOS::beg); // not important ?
-    assert(size() >= oldsize);
+    assert(_size() >= oldsize);
 }
 
 void boostfd_file::lock()
