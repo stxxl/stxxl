@@ -121,9 +121,9 @@ int main(int argc, char * argv[])
 
     unsigned i = 0, j = 0;
 
-    request_ptr * reqs = new request_ptr[ndisks * chunks];
-    file ** disks = new file *[ndisks];
     int * buffer = (int *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
+    file ** disks = new file *[ndisks];
+    request_ptr * reqs = new request_ptr[ndisks * chunks];
 #ifdef WATCH_TIMES
     double * r_finish_times = new double[ndisks];
     double * w_finish_times = new double[ndisks];
@@ -255,17 +255,15 @@ int main(int argc, char * argv[])
         offset += current_block_size;
     }
 
-    for (i = 0; i < ndisks; i++)
-        delete disks[i];
-
-    delete[] reqs;
-    delete[] disks;
-    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
-
 #ifdef WATCH_TIMES
     delete[] r_finish_times;
     delete[] w_finish_times;
 #endif
+    delete[] reqs;
+    for (i = 0; i < ndisks; i++)
+        delete disks[i];
+    delete[] disks;
+    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
     return 0;
 }

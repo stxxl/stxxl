@@ -155,9 +155,9 @@ int main(int argc, char * argv[])
 
     unsigned i, j;
 
-    request_ptr * reqs = new request_ptr[ndisks * chunks];
-    file ** disks = new file *[ndisks];
     unsigned * buffer = (unsigned *)stxxl::aligned_alloc<BLOCK_ALIGN>(buffer_size * ndisks);
+    file ** disks = new file *[ndisks];
+    request_ptr * reqs = new request_ptr[ndisks * chunks];
 #ifdef WATCH_TIMES
     double * r_finish_times = new double[ndisks];
     double * w_finish_times = new double[ndisks];
@@ -328,17 +328,15 @@ int main(int argc, char * argv[])
               << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizeread) / totaltimeread) << " = "
               << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizeread * ndisks) / totaltimeread) << " MB/s read" << std::endl;
 
-    for (i = 0; i < ndisks; i++)
-        delete disks[i];
-
-    delete[] reqs;
-    delete[] disks;
-    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
-
 #ifdef WATCH_TIMES
     delete[] r_finish_times;
     delete[] w_finish_times;
 #endif
+    delete[] reqs;
+    for (i = 0; i < ndisks; i++)
+        delete disks[i];
+    delete[] disks;
+    stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
     return 0;
 }
