@@ -55,6 +55,7 @@ protected:
     virtual void notify_waiters() = 0;
 
     virtual void serve() = 0;
+    virtual void completed() = 0;
 
 public:
     //! \brief Suspends calling thread until completion of the request
@@ -95,11 +96,7 @@ protected:
     size_type bytes;
     request_type type;
 
-    void completed()
-    {
-        notify_waiters();
-        on_complete(this);
-    }
+    void completed();
 
     // returns number of references
     int nref()

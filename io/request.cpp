@@ -39,6 +39,12 @@ request::~request()
     file_->delete_request_ref();
 }
 
+void request::completed()
+{
+    notify_waiters();
+    on_complete(this);
+}
+
 void request::check_alignment() const
 {
     if (offset % BLOCK_ALIGN != 0)
