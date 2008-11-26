@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
-#include <stxxl/bits/io/disk_queue.h>
+#include <stxxl/bits/io/request_queue_impl_qwqr.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -1,10 +1,10 @@
 LIB_OBJECTS = \
 	../io/iostats.$(OBJEXT) \
-	../io/diskqueue.$(OBJEXT) \
 	../io/request.$(OBJEXT) \
 	../io/request_waiters_impl_basic.$(OBJEXT) \
 	../io/request_state_impl_basic.$(OBJEXT) \
 	../io/request_impl_basic.$(OBJEXT) \
+	../io/request_queue_impl_qwqr.$(OBJEXT) \
 	../io/file_request_basic.$(OBJEXT) \
 	../io/ufs_file.$(OBJEXT) \
 	../io/syscall_file.$(OBJEXT) \

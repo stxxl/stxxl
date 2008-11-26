@@ -4,12 +4,12 @@ TESTS_UNITTEST		 = unittest
 
 LIB_SRC			 = \
 	iostats.cpp \
-	diskqueue.cpp \
 	request.cpp \
 	request_waiters_impl_basic.cpp \
 	request_state_impl_basic.cpp \
 	request_impl_basic.cpp \
 	file_request_basic.cpp \
+	request_queue_impl_qwqr.cpp \
 	ufs_file.cpp \
 	syscall_file.cpp \
 	mmap_file.cpp \
