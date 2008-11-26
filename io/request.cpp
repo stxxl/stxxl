@@ -11,10 +11,31 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
+request::request(const completion_handler & on_compl,
+            file * file__,
+            void * buffer_,
+            stxxl::int64 offset_,
+            size_t bytes_,
+            request_type type_) :
+        on_complete(on_compl), ref_cnt(0),
+        file_(file__),
+        buffer(buffer_),
+        offset(offset_),
+        bytes(bytes_),
+        type(type_)
+{
+    STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": creation, cnt: " << ref_cnt);
+}
+
+request::~request()
+{
+    STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
+}
 
 void request::check_alignment() const
 {
