@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/compat_auto_ptr.h>
+#include <stxxl/bits/compat_unique_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -30,7 +30,7 @@ namespace btree
         unsigned_type npages_;
         typedef std::list<int_type> list_type;
 
-        compat_auto_ptr<list_type>::result history;
+        compat_unique_ptr<list_type>::result history;
         std::vector<list_type::iterator> history_entry;
 
     public:

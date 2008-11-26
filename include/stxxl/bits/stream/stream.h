@@ -18,7 +18,7 @@
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/vector>
-#include <stxxl/bits/compat_auto_ptr.h>
+#include <stxxl/bits/compat_unique_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -124,8 +124,8 @@ namespace stream
         typedef buf_istream<typename InputIterator_::block_type,
                             typename InputIterator_::bids_container_iterator> buf_istream_type;
 
-        typedef typename stxxl::compat_auto_ptr<buf_istream_type>::result auto_ptr_type;
-        mutable auto_ptr_type in;
+        typedef typename stxxl::compat_unique_ptr<buf_istream_type>::result unique_ptr_type;
+        mutable unique_ptr_type in;
 
         void delete_stream()
         {

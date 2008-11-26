@@ -24,6 +24,7 @@
 #include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/io/completion_handler.h>
+#include <stxxl/bits/compat_unique_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -81,7 +82,7 @@ class request : virtual public request_base
 protected:
     completion_handler on_complete;
     int ref_cnt;
-    compat_auto_ptr<stxxl::io_error>::result error;
+    compat_unique_ptr<stxxl::io_error>::result error;
 
     mutex ref_cnt_mutex;
 

@@ -18,7 +18,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/compat_auto_ptr.h>
+#include <stxxl/bits/compat_unique_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -59,7 +59,7 @@ class lru_pager : private noncopyable
 {
     typedef std::list<int_type> list_type;
 
-    compat_auto_ptr<list_type>::result history;
+    compat_unique_ptr<list_type>::result history;
     simple_vector<list_type::iterator> history_entry;
 
 public:

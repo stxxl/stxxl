@@ -1,7 +1,7 @@
 /***************************************************************************
- *  include/stxxl/bits/compat_auto_ptr.h
+ *  include/stxxl/bits/compat_unique_ptr.h
  *
- *  compatibility interface to C++ standard extension auto_ptr
+ *  compatibility interface to unique_ptr (C++0x), previously auto_ptr
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER__COMPAT_AUTO_PTR_H_
-#define STXXL_HEADER__COMPAT_AUTO_PTR_H_
+#ifndef STXXL_HEADER__COMPAT_UNIQUE_PTR_H_
+#define STXXL_HEADER__COMPAT_UNIQUE_PTR_H_
 
 
 #include <memory>
@@ -23,10 +23,11 @@
 __STXXL_BEGIN_NAMESPACE
 
 template <class _Tp>
-struct compat_auto_ptr {
+struct compat_unique_ptr {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
     typedef std::unique_ptr<_Tp> result;
 #else
+    // auto_ptr is inherently broken and is deprecated by unique_ptr in c++0x
     typedef std::auto_ptr<_Tp> result;
 #endif
 };
@@ -64,4 +65,4 @@ namespace std {
 
 #endif
 
-#endif // !STXXL_HEADER__COMPAT_AUTO_PTR_H_
+#endif // !STXXL_HEADER__COMPAT_UNIQUE_PTR_H_
