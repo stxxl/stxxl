@@ -19,8 +19,8 @@ __STXXL_BEGIN_NAMESPACE
 request::request(const completion_handler & on_compl,
             file * file__,
             void * buffer_,
-            stxxl::int64 offset_,
-            size_t bytes_,
+            offset_type offset_,
+            size_type bytes_,
             request_type type_) :
         on_complete(on_compl), ref_cnt(0),
         file_(file__),

@@ -32,8 +32,8 @@ public:
         const completion_handler & on_cmpl,
         file * f,
         void * buf,
-        stxxl::int64 off,
-        size_t b,
+        offset_type off,
+        size_type b,
         request_type t);
 
 protected:

@@ -45,6 +45,8 @@ class request_ptr;
 class request_base : private noncopyable
 {
 public:
+    typedef stxxl::int64 offset_type;
+    typedef size_t size_type;
     enum request_type { READ, WRITE };
 
 protected:
@@ -89,8 +91,8 @@ protected:
 protected:
     file * file_;
     void * buffer;
-    stxxl::int64 offset;
-    size_t bytes;
+    offset_type offset;
+    size_type bytes;
     request_type type;
 
     void completed()
@@ -110,16 +112,16 @@ public:
     request(const completion_handler & on_compl,
             file * file__,
             void * buffer_,
-            stxxl::int64 offset_,
-            size_t bytes_,
+            offset_type offset_,
+            size_type bytes_,
             request_type type_);
 
     virtual ~request();
 
     file * get_file() const { return file_; }
     void * get_buffer() const { return buffer; }
-    stxxl::int64 get_offset() const { return offset; }
-    size_t get_size() const { return bytes; }
+    offset_type get_offset() const { return offset; }
+    size_type get_size() const { return bytes; }
     request_type get_type() const { return type; }
 
     void check_alignment() const;
