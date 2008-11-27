@@ -89,13 +89,12 @@ class file : private noncopyable
 
     mutex request_ref_cnt_mutex;
     int request_ref_cnt;
-    int unfinished_request_ref_cnt;
 
 protected:
     //! \brief Initializes file object
     //! \param _id file identifier
     //! \remark Called in implementations of file
-    file(int _id) : id(_id), request_ref_cnt(0), unfinished_request_ref_cnt(0) { }
+    file(int _id) : id(_id), request_ref_cnt(0) { }
 
 public:
     // the offset of a request, also the size of the file
@@ -140,14 +139,6 @@ public:
     {
         scoped_mutex_lock Lock(request_ref_cnt_mutex);
         ++request_ref_cnt;
-        ++unfinished_request_ref_cnt;
-    }
-
-    void finished_request_ref()
-    {
-        scoped_mutex_lock Lock(request_ref_cnt_mutex);
-        assert(request_ref_cnt > 0);
-        --unfinished_request_ref_cnt;
     }
 
     void delete_request_ref()
@@ -196,7 +187,7 @@ public:
     {
         int nr = get_request_nref();
         if (nr != 0)
-            STXXL_ERRMSG("stxxl::file is being deleted while there are still " << nr << " requests referencing it, " << unfinished_request_ref_cnt << " are not finished");
+            STXXL_ERRMSG("stxxl::file is being deleted while there are still " << nr << " (unfinished) requests referencing it");
     }
 
     //! \brief Identifies the type of I/O implementation

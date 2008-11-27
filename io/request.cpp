@@ -36,14 +36,14 @@ request::request(const completion_handler & on_compl,
 request::~request()
 {
     STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
-    file_->delete_request_ref();
 }
 
 void request::completed()
 {
     notify_waiters();
     on_complete(this);
-    file_->finished_request_ref();
+    file_->delete_request_ref();
+    file_ = 0;
 }
 
 void request::check_alignment() const
