@@ -6,11 +6,11 @@ LIB_OBJECTS = \
 	../io/request_impl_basic.$(OBJEXT) \
 	../io/request_queue_impl_qwqr.$(OBJEXT) \
 	../io/file_request_basic.$(OBJEXT) \
-	../io/ufs_file.$(OBJEXT) \
+	../io/ufs_file_base.$(OBJEXT) \
 	../io/syscall_file.$(OBJEXT) \
 	../io/mmap_file.$(OBJEXT) \
 	../io/simdisk_file.$(OBJEXT) \
-	../io/wfs_file.$(OBJEXT) \
+	../io/wfs_file_base.$(OBJEXT) \
 	../io/wincall_file.$(OBJEXT) \
 	../io/boostfd_file.$(OBJEXT) \
 	../io/mem_file.$(OBJEXT) \

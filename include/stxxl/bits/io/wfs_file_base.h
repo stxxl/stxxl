@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/wfs_file.h
+ *  include/stxxl/bits/io/wfs_file_base.h
  *
  *  Windows file system file base
  *

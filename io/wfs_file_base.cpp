@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/wfs_file.cpp
+ *  io/wfs_file_base.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/wfs_file.h>
+#include <stxxl/bits/io/wfs_file_base.h>
 
 #ifdef BOOST_MSVC
 

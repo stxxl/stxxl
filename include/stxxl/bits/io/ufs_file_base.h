@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/ufs_file.h
+ *  include/stxxl/bits/io/ufs_file_base.h
  *
  *  UNIX file system file base
  *

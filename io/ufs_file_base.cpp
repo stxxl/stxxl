@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/ufs_file.cpp
+ *  io/ufs_file_base.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,7 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/ufs_file.h>
+#include <stxxl/bits/io/ufs_file_base.h>
 
 #ifndef BOOST_MSVC
  #include <unistd.h>

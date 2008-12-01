@@ -22,7 +22,7 @@
 
 #include <sys/mman.h>
 
-#include <stxxl/bits/io/ufs_file.h>
+#include <stxxl/bits/io/ufs_file_base.h>
 
 
 __STXXL_BEGIN_NAMESPACE

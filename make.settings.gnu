@@ -275,8 +275,8 @@ HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h
 HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h
 HEADER_FILES_IO		+= disk_queues.h request_queue_impl_qwqr.h
 HEADER_FILES_IO		+= file.h file_request_basic.h
-HEADER_FILES_IO		+= ufs_file.h syscall_file.h mmap_file.h simdisk_file.h
-HEADER_FILES_IO		+= wfs_file.h wincall_file.h
+HEADER_FILES_IO		+= ufs_file_base.h syscall_file.h mmap_file.h simdisk_file.h
+HEADER_FILES_IO		+= wfs_file_base.h wincall_file.h
 HEADER_FILES_IO		+= boostfd_file.h mem_file.h
 
 HEADER_FILES_MNG	+= adaptor.h block_prefetcher.h
