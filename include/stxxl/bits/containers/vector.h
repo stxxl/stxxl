@@ -783,6 +783,7 @@ private:
     file * _from;
     block_manager * bm;
     config * cfg;
+    bool exported;
 
     size_type size_from_file_length(stxxl::uint64 file_length)
     {
@@ -811,7 +812,8 @@ public:
         _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
         _slot_to_page(n_pages),
         _cache(n_pages * page_size),
-        _from(NULL)
+        _from(NULL),
+        exported(false)
     {
         bm = block_manager::get_instance();
         cfg = config::get_instance();
@@ -844,12 +846,13 @@ public:
         std::swap(_free_slots, obj._free_slots);
         std::swap(_cache, obj._cache);
         std::swap(_from, obj._from);
+        std::swap(exported, obj.exported);
     }
     size_type capacity() const
     {
         return size_type(_bids.size()) * block_type::size;
     }
-    // \brief Returns the number of bytes that the vector has allocated on disks
+    //! \brief Returns the number of bytes that the vector has allocated on disks
     size_type raw_capacity() const
     {
         return size_type(_bids.size()) * block_type::raw_size;
@@ -977,7 +980,8 @@ public:
         _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
         _slot_to_page(n_pages),
         _cache(n_pages * page_size),
-        _from(from)
+        _from(from),
+        exported(false)
     {
         // initialize from file
         assert(from->get_id() == -1);
@@ -1022,8 +1026,10 @@ public:
         _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
         _slot_to_page(n_pages),
         _cache(n_pages * page_size),
-        _from(NULL)
+        _from(NULL),
+        exported(false)
     {
+        assert(!obj.exported);
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
@@ -1137,15 +1143,35 @@ public:
             STXXL_VERBOSE("An exception in the ~vector()");
         }
 
-        bm->delete_blocks(_bids.begin(), _bids.end());
-
-        if (_from)        // file must be truncated
+        if(!exported)
         {
-            STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
-                                                               << file_length());
-            STXXL_VERBOSE1("~vector(): size of the vector is " << size());
-            _from->set_size(file_length());
+            bm->delete_blocks(_bids.begin(), _bids.end());
+
+            if (_from)        // file must be truncated
+            {
+                STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
+                                                                << file_length());
+                STXXL_VERBOSE1("~vector(): size of the vector is " << size());
+                _from->set_size(file_length());
+            }
         }
+    }
+
+    //! \brief Export data such that it is persistent on the file system.
+    //! Resulting files will be numbered ascending.
+    void export_files(std::string filename_prefix)
+    {
+        int64 no = 0;
+        for(bids_container_iterator i = _bids.begin(); i != _bids.end(); ++i) {
+            std::ostringstream number;
+            number << std::setw(9) << std::setfill('0') << no;
+            if((i + 1) == _bids.end() && _size % block_type::size != 0)
+                (*i).storage->export_files((*i).offset, (_size % block_type::size) * sizeof(value_type), filename_prefix + number.str());
+            else
+                (*i).storage->export_files((*i).offset, block_type::size * sizeof(value_type), filename_prefix + number.str());
+            ++no;
+        }
+        exported = true;
     }
 
 private:

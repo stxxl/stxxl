@@ -5,7 +5,8 @@ tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
 lib: ufs_file.$(OBJEXT) syscall_file.$(OBJEXT) wincall_file.$(OBJEXT) wfs_file.$(OBJEXT) iostats.$(OBJEXT) \
-diskqueue.$(OBJEXT) mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJEXT)
+diskqueue.$(OBJEXT) mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJEXT) \
+fileperblock_file.$(OBJEXT)
 
 
 ufs_file.$(OBJEXT): ufs_file.cpp
@@ -37,6 +38,9 @@ boostfd_file.$(OBJEXT): boostfd_file.cpp
 
 mem_file.$(OBJEXT): mem_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mem_file.cpp
+
+fileperblock_file.$(OBJEXT): fileperblock_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c fileperblock_file.cpp
 
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)

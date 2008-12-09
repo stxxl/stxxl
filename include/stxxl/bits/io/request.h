@@ -115,6 +115,7 @@ public:
 
     virtual ~request();
 
+    const completion_handler& get_on_complete() const { return on_complete; }
     file * get_file() const { return file_; }
     void * get_buffer() const { return buffer; }
     offset_type get_offset() const { return offset; }

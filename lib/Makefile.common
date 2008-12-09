@@ -14,6 +14,7 @@ LIB_OBJECTS = \
 	../io/wincall_file.$(OBJEXT) \
 	../io/boostfd_file.$(OBJEXT) \
 	../io/mem_file.$(OBJEXT) \
+	../io/fileperblock_file.$(OBJEXT) \
 	../mng/mng.$(OBJEXT) \
 	../algo/async_schedule.$(OBJEXT) \
 	../common/debug.$(OBJEXT) \

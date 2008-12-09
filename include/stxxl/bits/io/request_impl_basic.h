@@ -25,7 +25,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Basic implementation of request
 class request_impl_basic : public request_state_impl_basic
 {
-    //friend class file;
+    template<class base_file_type>
+    friend class fileperblock_file;
 
 public:
     request_impl_basic(
