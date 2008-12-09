@@ -183,6 +183,13 @@ public:
         UNUSED(size);
     }
 
+    virtual void export_files(int64 offset, int64 length, std::string prefix)
+    {
+        UNUSED(offset);
+        UNUSED(length);
+        UNUSED(prefix);
+    }
+
     virtual ~file()
     {
         int nr = get_request_nref();
