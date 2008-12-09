@@ -16,6 +16,7 @@
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/mmap_file.h>
 #include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/common/aligned_alloc.h>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -24,8 +25,16 @@ fileperblock_file<base_file_type>::fileperblock_file(
     const std::string & filename_prefix,
     int mode,
     int disk)
-        : file_request_basic(disk), filename_prefix(filename_prefix), mode(mode), disk(disk)
+        : file_request_basic(disk), filename_prefix(filename_prefix), mode(mode), disk(disk),
+          lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, disk)
 {
+}
+
+template<class base_file_type>
+fileperblock_file<base_file_type>::~fileperblock_file()
+{
+    if(lock_file_created)
+        ::remove((filename_prefix + "_fpb_lock").c_str());
 }
 
 template<class base_file_type>
@@ -55,6 +64,18 @@ void fileperblock_file<base_file_type>::serve(const request * req) throw(io_erro
 template<class base_file_type>
 void fileperblock_file<base_file_type>::lock()
 {
+    if(!lock_file_created)
+    {
+        //create lock file and fill it with one page, an empty file cannot be locked
+        const int page_size = 4096;
+        void* one_page = aligned_alloc<4096>(page_size);
+        lock_file.set_size(page_size);
+        request_ptr r = lock_file.awrite(one_page, 0, page_size, default_completion_handler());
+        r->wait();
+        aligned_dealloc<4096>(one_page);
+        lock_file_created = true;
+    }
+    lock_file.lock();
 }
 
 template<class base_file_type>

@@ -33,6 +33,8 @@ private:
     int mode;
     int disk;
     unsigned_type current_size;
+    bool lock_file_created;
+    base_file_type lock_file;
 
 protected:
     //! \brief Constructs a file name for a given block.
@@ -47,6 +49,8 @@ public:
         const std::string & filename_prefix,
         int mode,
         int disk = -1);
+
+    virtual ~fileperblock_file();
 
     virtual void serve(const request * req) throw(io_error);
 
