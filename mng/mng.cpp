@@ -138,10 +138,22 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+    else if (io_impl == "fileperblock_syscall")
+    {
+        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, disk);
+        result->lock();
+        return result;
+    }
 #ifndef BOOST_MSVC
     else if (io_impl == "mmap")
     {
         ufs_file_base * result = new mmap_file(filename, options, disk);
+        result->lock();
+        return result;
+    }
+    else if (io_impl == "fileperblock_mmap")
+    {
+        fileperblock_file<mmap_file> * result = new fileperblock_file<mmap_file>(filename, options, disk);
         result->lock();
         return result;
     }
@@ -158,28 +170,30 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+    else if (io_impl == "fileperblock_wincall")
+    {
+        fileperblock_file<wincall_file> * result = new fileperblock_file<wincall_file>(filename, options, disk);
+        result->lock();
+        return result;
+    }
 #endif
 #ifdef STXXL_BOOST_CONFIG
     else if (io_impl == "boostfd")
     {
-        return new boostfd_file(filename, options, disk);
+        boostfd_file* result = new boostfd_file(filename, options, disk);
+        result->lock();
+        return result;
+    }
+    else if (io_impl == "fileperblock_boostfd")
+    {
+        fileperblock_file<boostfd_file> * result = new fileperblock_file<boostfd_file>(filename, options, disk);
+        result->lock();
+        return result;
     }
 #endif
     else if (io_impl == "memory")
     {
         mem_file * result = new mem_file(disk);
-        result->lock();
-        return result;
-    }
-    else if (io_impl == "fileperblock_syscall")
-    {
-        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, disk);
-        result->lock();
-        return result;
-    }
-    else if (io_impl == "fileperblock_mmap")
-    {
-        fileperblock_file<mmap_file> * result = new fileperblock_file<mmap_file>(filename, options, disk);
         result->lock();
         return result;
     }
