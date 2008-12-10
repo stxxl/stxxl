@@ -126,10 +126,14 @@
  * data structure. When the reference is used, the block that contains the
  * element may be no longer in internal memory.<br>
  * Use/pass an iterator (reference) instead.<br>
- * For stxxl::vector with \c n pages and LRU replacement strategy it
+ * For an \c stxxl::vector with \c n pages and LRU replacement strategy, it
  * can be guaranteed that the last \c n references
- * obtained using stxxl::vector operator [] or dereferencing
- * an iterator are valid. <br>
+ * obtained using \c stxxl::vector::operator[] or dereferencing
+ * an iterator are valid.
+ * However, if \c n is 1, even a single innocent-looking line like
+ * \verbatim std::cout << v[0] << " " << v[1000000] << std::endl; \endverbatim can lead to
+ * inconsistent results.
+ * <br>
  *
  *
  * \section q2 Thread-Safety
@@ -141,7 +145,7 @@
  * This is a design choice, having the data structures thread-safe would mean a significant performance loss.
  *
  *
- * \section q3 I have configured several disks to use with \c S<small>TXXL</small>. Why \c S<small>TXXL</small> fails complaining about the lack of space, according to my calclulations the space on disks should be enough for my data sets.
+ * \section q3 I have configured several disks to use with STXXL. Why does STXXL fail complaining about the lack of space? According to my calclulations, the space on the disks should be sufficient.
  *
  * This may happen if the disks have different size. With the default parameters \c S<small>TXXL</small> containers use randomized block-to-disk allocation strategies
  * that distribute data evenly between the disks but ignore the availability of free space on them. 
