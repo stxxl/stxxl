@@ -116,6 +116,7 @@ run containers/test_pqueue
 run containers/test_queue
 run containers/test_stack 1024
 run containers/test_vector
+run containers/test_vector_export
 run containers/write_vector in out
 run containers/write_vector2 in out
 run containers/test_map 32

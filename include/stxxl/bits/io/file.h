@@ -183,7 +183,7 @@ public:
         UNUSED(size);
     }
 
-    virtual void export_files(int64 offset, int64 length, std::string prefix)
+    virtual void export_files(offset_type offset, offset_type length, std::string prefix)
     {
         UNUSED(offset);
         UNUSED(length);
