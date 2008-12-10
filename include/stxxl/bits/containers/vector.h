@@ -969,8 +969,8 @@ public:
     }
     //! \brief Construct vector from a file
     //! \param from file to be constructed from
-    //! \warning Only one \c vector can be assigned to a file
-    //! (does not matter whether the files are different \c file objects).
+    //! \warning Only one \c vector can be assigned to a particular (physical) file
+    //! (even if there are multiple \c file objects referencing this (physical) file).
     //! The block size of the vector must me a multiple of the element size
     //! \c sizeof(Tp_) and the page size (4096).
     vector(file * from) :
