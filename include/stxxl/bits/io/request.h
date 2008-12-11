@@ -178,7 +178,7 @@ private:
 protected:
     void check_nref(bool after = false)
     {
-        if (nref() < 2)
+        if (nref() < 1)
             check_nref_failed(after);
     }
 
