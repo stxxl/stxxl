@@ -527,16 +527,14 @@ protected:
         {
             if (pred->first <= region_pos && pred->first + pred->second > region_pos)
             {
-                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory " <<
-                            "System info: P " << pred->first << " " << pred->second << " " << region_pos);
+                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  in empty space [" << pred->first << " + " << pred->second << "]");
             }
         }
         if (succ != free_space.end())
         {
             if (region_pos <= succ->first && region_pos + region_size > succ->first)
             {
-                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory "
-                     << "System info: S " << region_pos << " " << region_size << " " << succ->first);
+                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  which overlaps empty space [" << succ->first << " + " << succ->second << "]");
             }
         }
     }
@@ -693,7 +691,7 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
     //dump();
     stxxl::int64 region_pos = bid.offset;
     stxxl::int64 region_size = bid.size;
-    STXXL_VERBOSE2("Deallocating a block with size: " << region_size << " position: " << region_pos);
+    STXXL_VERBOSE0("Deallocating a block with size: " << region_size << " position: " << region_pos);
     if (!free_space.empty())
     {
         sortseq::iterator succ = free_space.upper_bound(region_pos);
