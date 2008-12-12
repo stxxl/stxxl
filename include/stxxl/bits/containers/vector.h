@@ -771,7 +771,6 @@ private:
     alloc_strategy _alloc_strategy;
     size_type _size;
     bids_container_type _bids;
-    //bids_container_iterator _bids_finish;
     mutable pager_type pager;
 
     enum { valid_on_disk = 0, uninitialized = 1, dirty = 2 };
@@ -914,13 +913,19 @@ public:
         }
         else if (new_bids_size < old_bids_size)
         {
-            bm->delete_blocks(_bids.begin() + new_bids_size, _bids.end());
+            if(_from != NULL)
+                _from->set_size(new_bids_size * block_type::raw_size);
+            else
+                bm->delete_blocks(_bids.begin() + old_bids_size, _bids.end());
+
             _bids.resize(new_bids_size);
+            unsigned_type new_pages = STXXL_DIVRU(new_bids_size, page_size);
+            _page_status.resize(new_pages);
 
             unsigned_type first_page_to_evict = STXXL_DIVRU(new_bids_size, page_size);
+            // clear dirty flag, so these pages will be never written
             std::fill(_page_status.begin() + first_page_to_evict,
-                      _page_status.end(), valid_on_disk); // clear dirty flag, so these pages
-                                              // will be never written
+                      _page_status.end(), (unsigned char)valid_on_disk);
         }
 #endif
 
@@ -972,8 +977,8 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must me a multiple of the element size
     //! \c sizeof(Tp_) and the page size (4096).
-    vector(file * from) :
-        _size(size_from_file_length(from->size())),
+    vector(file * from, size_type size = -1) :
+        _size((size == -1) ? size_from_file_length(from->size()) : size),
         _bids(STXXL_DIVRU(_size, size_type(block_type::size))),
         _page_status(STXXL_DIVRU(_bids.size(), page_size)),
         _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
@@ -1008,6 +1013,7 @@ public:
             _free_slots.push(i);
 
 
+        //allocate blocks equidistantly and in-order
         size_type offset = 0;
         bids_container_iterator it = _bids.begin();
         for ( ; it != _bids.end(); ++it, offset += size_type(block_type::raw_size))
@@ -1146,7 +1152,7 @@ public:
         {
             bm->delete_blocks(_bids.begin(), _bids.end());
 
-            if (_from)        // file must be truncated
+            if (_from != NULL)        // file must be truncated
             {
                 STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
                                                                 << file_length());
@@ -1173,6 +1179,22 @@ public:
         }
         exported = true;
     }
+
+    //! \brief Set the blocks and the size of this container explicitly.
+    //! The vector must be completely empty before.
+    template<typename ForwardIterator>
+    void set_content(const ForwardIterator& bid_begin, const ForwardIterator& bid_end, size_type n)
+    {
+        assert(_size == 0 && _bids.size() == 0);
+        unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
+        _bids.resize(new_bids_size);
+        std::copy(bid_begin, bid_end, _bids.begin());
+        unsigned_type new_pages = STXXL_DIVRU(new_bids_size, page_size);
+        _page_status.resize(new_pages, valid_on_disk);
+        _page_to_slot.resize(new_pages, on_disk);
+        _size = n;
+    }
+
 
 private:
     bids_container_iterator bid(const size_type & offset)
