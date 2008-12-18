@@ -616,6 +616,13 @@ my_example.bin: my_example.o
  * See also the example configuration file \c 'config_example' included in the tarball.
  *
  *
+ * \section logfiles Log files
+ *
+ * \c S<small>TXXL</small> produces two kinds of log files, a message and an error log.
+ * By setting the environment variables \c STXXLLOGFILE and \c STXXLERRLOGFILE, you can configure
+ * the location of these files.
+ * The default values are \c stxxl.log and \c stxxl.errlog, respectively.
+ *
  * \section excreation Precreating external memory files
  *
  * In order to get the maximum performance one should precreate disk files described in the configuration file,
