@@ -83,4 +83,3 @@ void mem_file::delete_region(offset_type offset, size_type size)
 }
 
 __STXXL_END_NAMESPACE
-// vim: et:ts=4:sw=4
