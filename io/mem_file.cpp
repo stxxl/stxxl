@@ -67,6 +67,7 @@ void mem_file::set_size(offset_type newsize)
 
 void mem_file::delete_region(offset_type offset, size_type size)
 {
+#ifdef STXXL_CLEAR_FREE_MEMFILE_MEM
     // overwrite the freed region with uninitialized memory
     STXXL_VERBOSE("delete_region at " << offset << " len " << size);
     void * uninitialized = malloc(BLOCK_ALIGN);
@@ -78,6 +79,7 @@ void mem_file::delete_region(offset_type offset, size_type size)
     if (size > 0)
         memcpy(ptr + offset, uninitialized, size);
     free(uninitialized);
+#endif
 }
 
 __STXXL_END_NAMESPACE
