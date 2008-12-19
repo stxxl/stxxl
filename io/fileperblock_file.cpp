@@ -56,11 +56,9 @@ void fileperblock_file<base_file_type>::serve(const request * req) throw(io_erro
     base_file_type base_file(filename_for_block(req->get_offset()), mode, disk);
     base_file.set_size(req->get_size());
 
-    request_impl_basic derived(req->get_on_complete(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type());
-
-    base_file.serve(&derived);
-
-    derived.completed();
+    request_ptr derived = new request_impl_basic(req->get_on_complete(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type());
+    request_ptr dummy = derived;
+    derived->serve();
 }
 
 template<class base_file_type>

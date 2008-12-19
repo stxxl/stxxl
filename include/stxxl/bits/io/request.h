@@ -54,7 +54,9 @@ protected:
     virtual void delete_waiter(onoff_switch * sw) = 0;
     virtual void notify_waiters() = 0;
 
+public: // HACK!
     virtual void serve() = 0;
+protected:
     virtual void completed() = 0;
 
 public:
