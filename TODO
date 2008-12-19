@@ -45,4 +45,10 @@
 * on disk destruction, check whether all blocks had been deallocated before,
   i.e. free_bytes == disk_size
 
-* Implement an allocator which looks at the available free space on disks when distributng blocks to disks
+* implement an allocator which looks at the available free space on disks
+  when distributing blocks to disks
+
+* engineer new disk queueing strategies that might benefit from NCQ which
+  is now widely available in HDDs/SSDs; will need use of libaio; probably
+  most interesting for smaller block sizes
+
