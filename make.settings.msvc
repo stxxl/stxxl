@@ -143,7 +143,7 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/wfs_file_base.h \
 	$(HEADER_PATH)/io/wincall_file.h \
 	$(HEADER_PATH)/io/boostfd_file.h \
-	$(HEADER_PATH)/io/mem_file.h
+	$(HEADER_PATH)/io/mem_file.h \
 	$(HEADER_PATH)/io/fileperblock_file.h \
 
 MNG_LAYER_FILES	 = \

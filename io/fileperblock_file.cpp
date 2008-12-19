@@ -15,6 +15,8 @@
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/mmap_file.h>
+#include <stxxl/bits/io/boostfd_file.h>
+#include <stxxl/bits/io/wincall_file.h>
 #include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/common/aligned_alloc.h>
 
@@ -93,7 +95,10 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
     filename.insert(0, original.substr(0, original.find_last_of("/") + 1));
     ::remove(filename.c_str());
     ::rename(original.c_str(), filename.c_str());
+#ifndef BOOST_MSVC
+    //TODO: implement on Windows
     ::truncate(filename.c_str(), length);
+#endif
 }
 
 template<class base_file_type>
@@ -106,6 +111,16 @@ const char * fileperblock_file<base_file_type>::io_type() const
 
 template class fileperblock_file<syscall_file>;
 
+#ifndef BOOST_MSVC
+
+// mmap call does not exist in Windows
 template class fileperblock_file<mmap_file>;
+
+#else
+
+template class fileperblock_file<boostfd_file>;
+template class fileperblock_file<wincall_file>;
+
+#endif
 
 __STXXL_END_NAMESPACE

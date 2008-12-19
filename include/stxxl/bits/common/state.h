@@ -41,7 +41,7 @@ class state : private noncopyable
     value_type _state;
 
 public:
-    state(value_type s = 0) : _state(s)
+    state(value_type s) : _state(s)
     {
 #ifndef STXXL_BOOST_THREADS
         check_pthread_call(pthread_mutex_init(&mutex, NULL));
