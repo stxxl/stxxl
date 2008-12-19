@@ -15,7 +15,7 @@
 
 #include <string>
 #include <stxxl/bits/io/file_request_basic.h>
-#include <stxxl/bits/common/debug.h>
+//#include <stxxl/bits/common/debug.h>
 
 
 __STXXL_BEGIN_NAMESPACE

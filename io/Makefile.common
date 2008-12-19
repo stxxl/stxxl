@@ -17,5 +17,6 @@ LIB_SRC			 = \
 	wfs_file_base.cpp \
 	wincall_file.cpp \
 	boostfd_file.cpp \
-    fileperblock_file.cpp \
-	mem_file.cpp
+	mem_file.cpp \
+	fileperblock_file.cpp \
+	wbtl_file.cpp

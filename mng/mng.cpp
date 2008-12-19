@@ -197,6 +197,12 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+    else if (io_impl == "wbtl")
+    {
+        stxxl::wbtl_file * result = new stxxl::wbtl_file(filename, options, disk);
+        result->lock();
+        return result;
+    }
 
     STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
                 io_impl << " .");
