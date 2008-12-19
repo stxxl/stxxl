@@ -118,9 +118,12 @@ template class fileperblock_file<mmap_file>;
 
 #else
 
-template class fileperblock_file<boostfd_file>;
 template class fileperblock_file<wincall_file>;
 
+#endif
+
+#ifdef STXXL_BOOST_CONFIG
+template class fileperblock_file<boostfd_file>;
 #endif
 
 __STXXL_END_NAMESPACE
