@@ -79,6 +79,9 @@ void mem_file::delete_region(offset_type offset, size_type size)
     if (size > 0)
         memcpy(ptr + offset, uninitialized, size);
     free(uninitialized);
+#else
+    UNUSED(offset);
+    UNUSED(size);
 #endif
 }
 

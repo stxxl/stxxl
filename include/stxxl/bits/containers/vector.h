@@ -977,8 +977,8 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must me a multiple of the element size
     //! \c sizeof(Tp_) and the page size (4096).
-    vector(file * from, size_type size = -1) :
-        _size((size == -1) ? size_from_file_length(from->size()) : size),
+    vector(file * from, size_type size = size_type(-1)) :
+        _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
         _bids(STXXL_DIVRU(_size, size_type(block_type::size))),
         _page_status(STXXL_DIVRU(_bids.size(), page_size)),
         _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
