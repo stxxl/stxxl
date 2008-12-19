@@ -15,7 +15,6 @@
 
 #include <string>
 #include <stxxl/bits/io/file_request_basic.h>
-#include <stxxl/bits/common/debug.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -31,7 +30,6 @@ class fileperblock_file : public file_request_basic
 private:
     std::string filename_prefix;
     int mode;
-    int disk;
     unsigned_type current_size;
     bool lock_file_created;
     base_file_type lock_file;

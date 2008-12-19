@@ -27,7 +27,7 @@ fileperblock_file<base_file_type>::fileperblock_file(
     const std::string & filename_prefix,
     int mode,
     int disk)
-        : file_request_basic(disk), filename_prefix(filename_prefix), mode(mode), disk(disk),
+        : file_request_basic(disk), filename_prefix(filename_prefix), mode(mode),
           lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, disk)
 {
 }
@@ -53,7 +53,7 @@ void fileperblock_file<base_file_type>::serve(const request * req) throw(io_erro
 {
     assert(req->get_file() == this);
 
-    base_file_type base_file(filename_for_block(req->get_offset()), mode, disk);
+    base_file_type base_file(filename_for_block(req->get_offset()), mode, get_id());
     base_file.set_size(req->get_size());
 
     request_ptr derived = new request_impl_basic(req->get_on_complete(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type());
