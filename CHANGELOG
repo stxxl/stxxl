@@ -1,5 +1,6 @@
 Version 1.2.2 (unreleased)
 
+* fix possible race condition while creating singleton instances
 * start documenting #defines in defines.h
 * remove unused debug code fragments that were no longer working for years
 
