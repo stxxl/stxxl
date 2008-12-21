@@ -23,9 +23,10 @@
 #else
 
  #include <pthread.h>
+ #include <cerrno>
 
  #include <stxxl/bits/noncopyable.h>
- #include <stxxl/bits/common/utils.h>
+ #include <stxxl/bits/common/error_handling.h>
 
 #endif
 
