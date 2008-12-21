@@ -65,13 +65,16 @@ void request::check_alignment() const
 void request::check_nref_failed(bool after)
 {
     STXXL_ERRMSG("WARNING: serious error, reference to the request is lost " <<
-                 (after?"after":"before") << " serve" <<
+                 (after?"after ":"before") << " serve" <<
                  " nref=" << nref() <<
                  " this=" << this <<
                  " offset=" << offset <<
                  " buffer=" << buffer <<
                  " bytes=" << bytes <<
-                 " type=" << ((type == READ) ? "READ" : "WRITE"));
+                 " type=" << ((type == READ) ? "READ" : "WRITE") <<
+                 " file=" << get_file() <<
+                 " iotype=" << get_file()->io_type()
+    );
 }
 
 __STXXL_END_NAMESPACE
