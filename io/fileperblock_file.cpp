@@ -56,7 +56,7 @@ void fileperblock_file<base_file_type>::serve(const request * req) throw(io_erro
     base_file_type base_file(filename_for_block(req->get_offset()), mode, get_id());
     base_file.set_size(req->get_size());
 
-    request_ptr derived = new request_impl_basic(req->get_on_complete(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type());
+    request_ptr derived = new request_impl_basic(default_completion_handler(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type());
     request_ptr dummy = derived;
     derived->serve();
 }
@@ -67,12 +67,12 @@ void fileperblock_file<base_file_type>::lock()
     if(!lock_file_created)
     {
         //create lock file and fill it with one page, an empty file cannot be locked
-        const int page_size = 4096;
-        void* one_page = aligned_alloc<4096>(page_size);
+        const int page_size = BLOCK_ALIGN;
+        void* one_page = aligned_alloc<BLOCK_ALIGN>(page_size);
         lock_file.set_size(page_size);
         request_ptr r = lock_file.awrite(one_page, 0, page_size, default_completion_handler());
         r->wait();
-        aligned_dealloc<4096>(one_page);
+        aligned_dealloc<BLOCK_ALIGN>(one_page);
         lock_file_created = true;
     }
     lock_file.lock();
