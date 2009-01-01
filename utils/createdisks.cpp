@@ -112,7 +112,12 @@ int main(int argc, char * argv[])
 
     const unsigned ndisks = disks_arr.size();
 
+
+#ifdef BOOST_MSVC
+    unsigned buffer_size = 64 * MB;
+#else
     unsigned buffer_size = 256 * MB;
+#endif
     const unsigned buffer_size_int = buffer_size / sizeof(int);
 
     unsigned chunks = 2;
