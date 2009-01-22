@@ -52,3 +52,6 @@
   is now widely available in HDDs/SSDs; will need use of libaio; probably
   most interesting for smaller block sizes
 
+* solve the problem with the VC++ 8 macro UNUSED definition in afx.h (MFC)
+  which clashes with stxxl::UNUSED template function in bits/common/utils.h
+  (test/WinGUI compilation)
