@@ -28,6 +28,10 @@ void wincall_file::serve(const request * req) throw(io_error)
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
+    if (bytes > 32 * 1024 * 1024) {
+        STXXL_ERRMSG("Using a block size larger than 32 MB may not work with the " << io_type() << " filetype");
+    }
+
         HANDLE handle = file_des;
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = offset;
