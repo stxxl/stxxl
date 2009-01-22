@@ -14,10 +14,15 @@
 #define STXXL_MALLOC_H
 
 #include <ostream>
-#include <malloc.h>
+#ifdef __FreeBSD__
+    #include <stdlib.h>
+#else
+    #include <malloc.h>
+#endif
 #include <cstdlib>
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/utils.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -28,6 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 //! malloc is default C++ allocator
 class malloc_stats
 {
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
 public:
     typedef int return_type;
 
@@ -106,11 +112,13 @@ public:
     {
         return from_system_nmmap() + from_system_mmap();
     }
+#endif
 };
 
 //! \brief Prints current malloc statistics in a convenient way
 inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
 {
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
     s << "MALLOC statistics" << std::endl;
     s << "=================================================================" << std::endl;
     s << "Space allocated from system not using mmap: " << st.from_system_nmmap() << " bytes" << std::endl;
@@ -127,6 +135,10 @@ inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
     s << "Total space allocated from system (mmap and not mmap): " <<
     st.from_system_total() << " bytes" << std::endl;
     s << "=================================================================" << std::endl;
+#else
+    s << "MALLOC statistics are not supported on this platform";
+    UNUSED(st);
+#endif
     return s;
 }
 
