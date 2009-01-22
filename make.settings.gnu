@@ -26,6 +26,7 @@ TOPDIR	?= $(error TOPDIR not defined) # DO NOT CHANGE! This is set elsewhere.
 
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_MACOSX	?= no	# set 'yes' if you run Mac OS X, 'no' otherwise
+USE_FREEBSD	?= no	# set 'yes' if you run FreeBSD, 'no' otherwise
 USE_PMODE	?= no	# will be overridden from main Makefile
 USE_MCSTL	?= no	# will be overridden from main Makefile
 USE_ICPC	?= no	# will be overridden from main Makefile
@@ -106,6 +107,19 @@ endif
 ##################################################################
 
 
+#### FREEBSD CONFIGURATION #######################################
+
+ifeq ($(strip $(USE_FREEBSD)),yes)
+
+PTHREAD_FLAG	?= -pthread
+
+GET_FILE_ID	?= stat -L -f '%d:%i' $1
+
+endif
+
+##################################################################
+
+
 #### LINUX (DEFAULT) CONFIGURATION ###############################
 
 PTHREAD_FLAG	?= -pthread
@@ -135,6 +149,11 @@ ifeq (Darwin,$(strip $(shell uname)))
 $(shell echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
 else
 $(shell echo -e '\043USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
+endif
+ifeq (FreeBSD,$(strip $(shell uname)))
+$(shell echo -e 'USE_FREEBSD	 = yes' >> $(CURDIR)/make.settings.local)
+else
+$(shell echo -e '\043USE_FREEBSD	 = no' >> $(CURDIR)/make.settings.local)
 endif
 $(error ERROR: Please check make.settings.local and try again)
 endif
