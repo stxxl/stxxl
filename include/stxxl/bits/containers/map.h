@@ -52,7 +52,7 @@ namespace btree
 //! struct CmpIntGreater
 //! {
 //!   bool operator () (const int & a, const int & b) const { return a>b; }
-//!   static int max_value() { return std::numeric_limits<int>::max(); }
+//!   static int max_value() { return std::numeric_limits<int>::min(); }
 //! };
 //! \endverbatim
 //! Another example:
@@ -60,7 +60,7 @@ namespace btree
 //! struct CmpIntLess
 //! {
 //!   bool operator () (const int & a, const int & b) const { return a<b; }
-//!   static int max_value() const  { return std::numeric_limits<int>::min(); }
+//!   static int max_value() const  { return std::numeric_limits<int>::max(); }
 //! };
 //! \endverbatim
 //! Note that CompareType must define a strict weak ordering.
