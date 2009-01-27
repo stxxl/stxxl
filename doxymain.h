@@ -22,6 +22,7 @@
  * - Linux (kernel >= 2.4.18)
  * - Solaris
  * - Mac OS X
+ * - FreeBSD
  * - other POSIX compatible systems should work, but have not been tested
  * - Windows 2000/XP/Vista
  *
