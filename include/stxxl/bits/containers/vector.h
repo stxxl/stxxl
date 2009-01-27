@@ -934,7 +934,8 @@ public:
     void clear()
     {
         _size = 0;
-        bm->delete_blocks(_bids.begin(), _bids.end());
+        if (_from == NULL)
+            bm->delete_blocks(_bids.begin(), _bids.end());
 
         _bids.clear();
         _page_status.clear();
@@ -988,8 +989,6 @@ public:
         exported(false)
     {
         // initialize from file
-        assert(from->get_id() == -1);
-
         if (block_type::has_filler)
         {
             std::ostringstream str_;
@@ -1150,9 +1149,9 @@ public:
 
         if(!exported)
         {
-            bm->delete_blocks(_bids.begin(), _bids.end());
-
-            if (_from != NULL)        // file must be truncated
+            if (_from == NULL)
+                bm->delete_blocks(_bids.begin(), _bids.end());
+            else        // file must be truncated
             {
                 STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
                                                                 << file_length());
