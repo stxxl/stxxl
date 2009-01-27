@@ -30,6 +30,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/semaphore.h>
 #include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/request.h>
 
 
@@ -42,6 +43,7 @@ class disk_queue
 {
 public:
     enum priority_op { READ, WRITE, NONE };
+    enum thread_state { RUNNING, TERMINATE };
 };
 
 class request_queue_impl_qwqr : private noncopyable, public disk_queue
@@ -52,6 +54,7 @@ class request_queue_impl_qwqr : private noncopyable, public disk_queue
     mutex read_mutex;
     std::queue<request_ptr> write_queue;
     std::queue<request_ptr> read_queue;
+    state<thread_state> _thread_state;
 
     semaphore sem;
 

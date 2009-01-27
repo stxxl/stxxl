@@ -21,7 +21,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 request_queue_impl_qwqr::request_queue_impl_qwqr(int /*n*/) :              //  n is ignored
-    sem(0)
+    _thread_state(RUNNING), sem(0)
 #ifdef STXXL_BOOST_THREADS
                                     , thread(boost::bind(worker, static_cast<void *>(this)))
 #endif
@@ -40,6 +40,8 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
+    if (_thread_state() != RUNNING)
+        STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
 
     if (req.get()->get_type() == request::READ)
     {
@@ -57,10 +59,11 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
 
 request_queue_impl_qwqr::~request_queue_impl_qwqr()
 {
+    _thread_state.set_to(TERMINATE);
+    sem++;
 #ifdef STXXL_BOOST_THREADS
-    // Boost.Threads do not support cancellation ?
+    // FIXME: how can boost wait for thread termination?
 #else
-    check_pthread_call(pthread_cancel(thread));
     check_pthread_call(pthread_join(thread, NULL));
 #endif
 }
@@ -69,13 +72,6 @@ void * request_queue_impl_qwqr::worker(void * arg)
 {
     self * pthis = static_cast<self *>(arg);
     request_ptr req;
-
-#ifdef STXXL_BOOST_THREADS
-#else
-    // Allow cancellation in semaphore operator--() call
-    check_pthread_call(pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL));
-    check_pthread_call(pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL));
-#endif
 
     bool write_phase = true;
     for ( ; ; )
@@ -138,6 +134,14 @@ void * request_queue_impl_qwqr::worker(void * arg)
             if (pthis->_priority_op == NONE
                 || pthis->_priority_op == WRITE)
                 write_phase = true;
+        }
+
+        // terminate if it has been requested and queues are empty
+        if (pthis->_thread_state() == TERMINATE) {
+            if ((pthis->sem--) == 0)
+                break;
+            else
+                pthis->sem++;
         }
     }
 
