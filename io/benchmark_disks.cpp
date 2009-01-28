@@ -97,30 +97,31 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " offset length [r|w] diskfile..." << std::endl;
-    std::cout << "    starting 'offset' and 'length' are given in GB" << std::endl;
+    std::cout << "Usage: " << argv0 << " offset length step [r|w] diskfile..." << std::endl;
+    std::cout << "    starting 'offset' and 'length' are given in GB, 'step' size in MB" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     exit(-1);
 }
 
 int main(int argc, char * argv[])
 {
-    if (argc < 4)
+    if (argc < 5)
         usage(argv[0]);
 
-    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
-    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
-    stxxl::int64 endpos = offset + length;
+    stxxl::int64 offset    = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
+    stxxl::int64 length    = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
+    stxxl::int64 step_size = stxxl::int64(MB) * stxxl::int64(atoi(argv[3]));
+    stxxl::int64 endpos    = offset + length;
 
     bool do_read = true, do_write = true;
-    int first_disk_arg = 3;
+    int first_disk_arg = 4;
 
-    if (strcmp("r", argv[3]) == 0 || strcmp("R", argv[3]) == 0) {
+    if (strcmp("r", argv[4]) == 0 || strcmp("R", argv[4]) == 0) {
         do_write = false;
         ++first_disk_arg;
     }
 
-    if (strcmp("w", argv[3]) == 0 || strcmp("W", argv[3]) == 0) {
+    if (strcmp("w", argv[4]) == 0 || strcmp("W", argv[4]) == 0) {
         do_read = false;
         ++first_disk_arg;
     }
@@ -137,13 +138,12 @@ int main(int argc, char * argv[])
     }
 
     const unsigned ndisks = disks_arr.size();
-    stxxl::int64 step_size = 136 * MB;
-    const stxxl::int64 step_size_int = step_size / sizeof(int);
 
     const unsigned block_size = 8 * MB;
     unsigned num_blocks = STXXL_DIVRU(step_size, block_size);
     step_size = num_blocks * block_size;
     const unsigned block_size_int = block_size / sizeof(int);
+    const stxxl::int64 step_size_int = step_size / sizeof(int);
 
     unsigned * buffer = (unsigned *)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * ndisks);
     file ** disks = new file *[ndisks];
