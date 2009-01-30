@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/disk_queues.h
+ *  include/stxxl/bits/io/request_queue_impl_qwqr.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO_DISK_QUEUE_HEADER
-#define STXXL_IO_DISK_QUEUE_HEADER
+#ifndef STXXL_IO_REQUEST_QUEUE_IMPL_QWQR_HEADER
+#define STXXL_IO_REQUEST_QUEUE_IMPL_QWQR_HEADER
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
@@ -26,12 +26,10 @@
  #include <pthread.h>
 #endif
 
-#include <stxxl/bits/namespace.h>
-#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/io/request_queue.h>
 #include <stxxl/bits/common/semaphore.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/state.h>
-#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -39,15 +37,12 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-class disk_queue
+class request_queue_impl_qwqr: public request_queue, public disk_queue
 {
 public:
-    enum priority_op { READ, WRITE, NONE };
     enum thread_state { RUNNING, TERMINATE };
-};
 
-class request_queue_impl_qwqr : private noncopyable, public disk_queue
-{
+private:
     typedef request_queue_impl_qwqr self;
 
     mutex write_mutex;
@@ -89,5 +84,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO_DISK_QUEUE_HEADER
+#endif // !STXXL_IO_REQUEST_QUEUE_IMPL_QWQR_HEADER
 // vim: et:ts=4:sw=4
