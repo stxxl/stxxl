@@ -13,27 +13,12 @@
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/request.h>
 
-#ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
- #include <boost/bind.hpp>
-#endif
-
 
 __STXXL_BEGIN_NAMESPACE
 
-request_queue_impl_qwqr::request_queue_impl_qwqr(int /*n*/) :              //  n is ignored
-    _thread_state(RUNNING), sem(0)
-#ifdef STXXL_BOOST_THREADS
-                                    , thread(boost::bind(worker, static_cast<void *>(this)))
-#endif
+request_queue_impl_qwqr::request_queue_impl_qwqr(int /*n*/)              //  n is ignored
 {
-    //  cout << "disk_queue created." << endl;
-
-#ifdef STXXL_BOOST_THREADS
-    // nothing to do
-#else
-    check_pthread_call(pthread_create(&thread, NULL,
-                                      worker, static_cast<void *>(this)));
-#endif
+    start_thread(worker, static_cast<void *>(this));
 }
 
 void request_queue_impl_qwqr::add_request(request_ptr & req)
@@ -59,13 +44,7 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
 
 request_queue_impl_qwqr::~request_queue_impl_qwqr()
 {
-    _thread_state.set_to(TERMINATE);
-    sem++;
-#ifdef STXXL_BOOST_THREADS
-    // FIXME: how can boost wait for thread termination?
-#else
-    check_pthread_call(pthread_join(thread, NULL));
-#endif
+    stop_thread();
 }
 
 void * request_queue_impl_qwqr::worker(void * arg)

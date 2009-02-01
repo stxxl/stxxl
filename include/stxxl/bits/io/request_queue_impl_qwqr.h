@@ -14,22 +14,10 @@
 #ifndef STXXL_IO_REQUEST_QUEUE_IMPL_QWQR_HEADER
 #define STXXL_IO_REQUEST_QUEUE_IMPL_QWQR_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
 #include <queue>
 
-#ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
- #include <boost/thread/thread.hpp>
-#else
- #include <pthread.h>
-#endif
-
-#include <stxxl/bits/io/request_queue.h>
-#include <stxxl/bits/common/semaphore.h>
+#include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/common/state.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -37,11 +25,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-class request_queue_impl_qwqr: public request_queue, public disk_queue
+class request_queue_impl_qwqr: public request_queue_impl_worker, public disk_queue
 {
-public:
-    enum thread_state { RUNNING, TERMINATE };
-
 private:
     typedef request_queue_impl_qwqr self;
 
@@ -49,17 +34,8 @@ private:
     mutex read_mutex;
     std::queue<request_ptr> write_queue;
     std::queue<request_ptr> read_queue;
-    state<thread_state> _thread_state;
-
-    semaphore sem;
 
     static const priority_op _priority_op = WRITE;
-
-#ifdef STXXL_BOOST_THREADS
-    boost::thread thread;
-#else
-    pthread_t thread;
-#endif
 
     static void * worker(void * arg);
 
