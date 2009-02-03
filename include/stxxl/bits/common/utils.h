@@ -73,12 +73,14 @@ inline void UNUSED(const U &)
 
 ////////////////////////////////////////////////////////////////////////////
 
+#define __STXXL_ENFORCE_SEMICOLON stxxl::UNUSED("expecting the next token to be a ';'")
+
 #define _STXXL_PRINT(label, outstream, log_stream, message) \
     { std::ostringstream str_; \
       str_ << "[" label "] " << message << std::endl; \
       outstream << str_.str() << std::flush; \
       stxxl::logger::get_instance()->log_stream() << str_.str() << std::flush; \
-    }
+    } __STXXL_ENFORCE_SEMICOLON
 
 #define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", std::cout, log_stream, x)
 
@@ -151,7 +153,7 @@ inline void UNUSED(const U &)
         str_ << "Error in " << errmsg << ", error code " << dw << ": " << ((char *)lpMsgBuf); \
         LocalFree(lpMsgBuf); \
         throw exception_type(str_.str()); \
-    }
+    } __STXXL_ENFORCE_SEMICOLON
 
 #endif
 

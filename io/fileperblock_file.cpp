@@ -83,7 +83,7 @@ void fileperblock_file<base_file_type>::delete_region(offset_type offset, unsign
 {
     UNUSED(length);
     ::remove(filename_for_block(offset).c_str());
-    STXXL_VERBOSE0("delete_region " << offset << " + " << length)
+    STXXL_VERBOSE0("delete_region " << offset << " + " << length);
 }
 
 template<class base_file_type>

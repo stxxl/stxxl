@@ -138,7 +138,7 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    STXXL_MSG("----------------------------------------")
+    STXXL_MSG("----------------------------------------");
 
     stxxl::config::get_instance();
     std::string Flags = std::string("")
@@ -270,11 +270,11 @@ int main(int argc, char * argv[])
     STXXL_MSG("Block size B: " << pq_type::BlockSize);
     //EConsumption = X * settings::E + settings::B * AE + ((MaxS_ / X) / AE) * settings::B * 1024
 
-    STXXL_MSG("Data type size: " << sizeof(my_type))
-    STXXL_MSG("")
+    STXXL_MSG("Data type size: " << sizeof(my_type));
+    STXXL_MSG("");
 #ifdef __MCSTL__
-    STXXL_MSG("multiway_merge_minimal_k: " << mcstl::SETTINGS::multiway_merge_minimal_k)
-    STXXL_MSG("multiway_merge_minimal_n: " << mcstl::SETTINGS::multiway_merge_minimal_n)
+    STXXL_MSG("multiway_merge_minimal_k: " << mcstl::SETTINGS::multiway_merge_minimal_k);
+    STXXL_MSG("multiway_merge_minimal_n: " << mcstl::SETTINGS::multiway_merge_minimal_n);
 #endif
 
     stxxl::stats_data sd_start(*stxxl::stats::get_instance());
@@ -287,9 +287,9 @@ int main(int argc, char * argv[])
     stxxl::int64 nelements = stxxl::int64(megabytes * mega / sizeof(my_type)), i;
 
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
-    STXXL_MSG("Peak number of elements: " << nelements)
-    STXXL_MSG("Max number of elements to contain: " << ((unsigned long long)pq_type::N * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX))
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Peak number of elements: " << nelements);
+    STXXL_MSG("Max number of elements to contain: " << ((unsigned long long)pq_type::N * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
     srand(5);
     my_cmp cmp;
     my_key_type r, sum_input = 0, sum_output = 0;
@@ -337,7 +337,7 @@ int main(int argc, char * argv[])
 #endif
 
         if (cmp(last_least, least))
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key)
+            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
 
             last_least = least;
 
@@ -349,9 +349,9 @@ int main(int argc, char * argv[])
 #endif
     }
     Timer.stop();
-    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec")
+    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec");
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
     stxxl::stats_data sd_middle(*stxxl::stats::get_instance());
     std::cout << sd_middle - sd_start;
     Timer.reset();
@@ -372,7 +372,7 @@ int main(int argc, char * argv[])
             STXXL_VERBOSE0("" << side_pq_least << " != " << least);
 #endif
         if (cmp(last_least, least))
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key)
+            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
             last_least = least;
 
         r = least.key + rand() % modulo;
@@ -392,7 +392,7 @@ int main(int argc, char * argv[])
             STXXL_VERBOSE0("" << side_pq_least << " != " << least);
 #endif
         if (cmp(last_least, least))
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key)
+            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
             last_least = least;
 
         if ((i % (10 * mega)) == 0)
@@ -410,10 +410,10 @@ int main(int argc, char * argv[])
 #endif
 
     if (sum_input != sum_output)
-        STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output))
+        STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output));
 
-        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec")
-        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
+        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
+        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
         std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - sd_middle;
     std::cout << *stxxl::stats::get_instance();
 
