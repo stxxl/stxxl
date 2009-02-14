@@ -32,7 +32,7 @@ stxxl_mk_cppflags	+= $(STXXL_CPPFLAGS_CXX)
 stxxl_mk_ldlibs		+= $(STXXL_LDLIBS_CXX)
 stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_STXXL)
 stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_STXXL)
-ifeq ($(strip $(USE_PARALLEL_MODE)),yes)
+ifeq ($(strip $(USE_PMODE)),yes)
 stxxl_mk_cppflags	+= $$(STXXL_CPPFLAGS_PARALLEL_MODE)
 stxxl_mk_ldlibs		+= $$(STXXL_LDLIBS_PARALLEL_MODE)
 endif
