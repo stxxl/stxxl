@@ -252,6 +252,8 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
     o << "STXXL I/O statistics" << std::endl;
 #if STXXL_IO_STATS
     o << " total number of reads                      : " << hr(s.get_reads()) << std::endl;
+    o << " average block size (read)                  : "
+      << hr(s.get_reads() ? s.get_read_volume() / s.get_reads() : 0, "B") << std::endl;
     o << " number of bytes read from disks            : " << hr(s.get_read_volume(), "B") << std::endl;
     o << " time spent in serving all read requests    : " << s.get_read_time() << " sec."
       << " @ " << (s.get_read_volume() / 1048576.0 / s.get_read_time()) << " MB/sec."
@@ -260,6 +262,8 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
       << " @ " << (s.get_read_volume() / 1048576.0 / s.get_pread_time()) << " MB/sec."
       << std::endl;
     o << " total number of writes                     : " << hr(s.get_writes()) << std::endl;
+    o << " average block size (write)                 : "
+      << hr(s.get_writes() ? s.get_written_volume() / s.get_writes() : 0, "B") << std::endl;
     o << " number of bytes written to disks           : " << hr(s.get_written_volume(), "B") << std::endl;
     o << " time spent in serving all write requests   : " << s.get_write_time() << " sec."
       << " @ " << (s.get_written_volume() / 1048576.0 / s.get_write_time()) << " MB/sec."
