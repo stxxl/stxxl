@@ -38,7 +38,7 @@ const unsigned long long megabyte = 1024 * 1024;
 //const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 const int block_size = 4 * megabyte;
 
-#define RECORD_SIZE 128
+#define RECORD_SIZE 16
 #define MAGIC 123
 
 stxxl::unsigned_type run_size;
@@ -173,7 +173,6 @@ int main(int argc, const char ** argv)
 #ifdef _GLIBCXX_PARALLEL
     omp_set_num_threads(p);
     __gnu_parallel::_Settings parallel_settings(__gnu_parallel::_Settings::get());
-    parallel_settings.algorithm_strategy = __gnu_parallel::force_sequential;
 
     parallel_settings.merge_splitting = __gnu_parallel::EXACT;
     parallel_settings.merge_minimal_n = 10000;
