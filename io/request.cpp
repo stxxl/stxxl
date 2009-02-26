@@ -40,8 +40,8 @@ request::~request()
 
 void request::completed()
 {
-    notify_waiters();
     on_complete(this);
+    notify_waiters();
     file_->delete_request_ref();
     file_ = 0;
 }
