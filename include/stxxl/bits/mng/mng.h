@@ -691,7 +691,7 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
     //dump();
     stxxl::int64 region_pos = bid.offset;
     stxxl::int64 region_size = bid.size;
-    STXXL_VERBOSE0("Deallocating a block with size: " << region_size << " position: " << region_pos);
+    STXXL_VERBOSE2("Deallocating a block with size: " << region_size << " position: " << region_pos);
     if (!free_space.empty())
     {
         sortseq::iterator succ = free_space.upper_bound(region_pos);
