@@ -19,5 +19,12 @@ int main(int argc, char **)
     stxxl::block_manager::get_instance();
     stxxl::stats::get_instance();
     stxxl::disk_queues::get_instance();
+#ifdef _GLIBCXX_PARALLEL
+    STXXL_MSG("_GLIBCXX_PARALLEL, max threads = " << omp_get_max_threads());
+#endif
+    STXXL_MSG("sizeof(unsigned int)   = " << sizeof(unsigned int));
+    STXXL_MSG("sizeof(unsigned_type)  = " << sizeof(stxxl::unsigned_type));
+    STXXL_MSG("sizeof(uint64)         = " << sizeof(stxxl::uint64));
+    STXXL_MSG("sizeof(void*)          = " << sizeof(void*));
     return argc == 1 ? 0 : -1;
 }
