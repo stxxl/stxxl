@@ -42,7 +42,7 @@ void request_state_impl_basic::wait()
     check_errors();
 }
 
-void request_state_impl_basic::cancel()
+bool request_state_impl_basic::cancel()
 {
     STXXL_VERBOSE3("ufs_request_base : " << this << " cancel " << file_ << " " << buffer << " " << offset);
 
@@ -56,8 +56,10 @@ void request_state_impl_basic::cancel()
             file_->delete_request_ref();
             file_ = 0;
             _state.set_to(READY2DIE);
+            return true;
         }
     }
+    return false;
 }
 
 bool request_state_impl_basic::poll()

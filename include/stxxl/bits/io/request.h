@@ -64,7 +64,7 @@ public:
     //! \brief Suspends calling thread until completion of the request
     virtual void wait() = 0;
 
-    virtual void cancel() = 0;
+    virtual bool cancel() = 0;
 
     //! \brief Polls the status of the request
     //! \return \c true if request is completed, otherwise \c false
@@ -337,13 +337,16 @@ void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 }
 
 template <class request_iterator_>
-void cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+typename request_iterator_::difference_type cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
+    typename request_iterator_::difference_type num_cancelled = 0;
     while (reqs_begin != reqs_end)
     {
-        (request_ptr(*reqs_begin))->cancel();
+        if((request_ptr(*reqs_begin))->cancel())
+            ++num_cancelled;
         ++reqs_begin;
     }
+    return num_cancelled;
 }
 
 bool poll_any(request_ptr req_array[], int count, int & index)
