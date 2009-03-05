@@ -15,7 +15,7 @@
 #ifndef STXXL_UFSFILEBASE_HEADER
 #define STXXL_UFSFILEBASE_HEADER
 
-#include <stxxl/bits/io/file_request_basic.h>
+#include <stxxl/bits/io/basic_file.h>
 #include <stxxl/bits/io/request.h>
 
 
@@ -25,7 +25,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Base for UNIX file system implementations
-class ufs_file_base : public file_request_basic
+class ufs_file_base : public basic_file
 {
 protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/file_request_basic.h
+ *  include/stxxl/bits/io/basic_file.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -22,10 +22,10 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of some file methods based on request_impl_basic
-class file_request_basic : public file
+class basic_file : public file
 {
 public:
-    file_request_basic(int id) : file(id)
+    basic_file(int id) : file(id)
     { }
     request_ptr aread(
         void * buffer,
