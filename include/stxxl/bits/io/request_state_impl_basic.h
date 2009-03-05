@@ -52,7 +52,6 @@ public:
     void wait();
     bool poll();
     void cancel();
-    void set_ready2die();
 };
 
 //! \}

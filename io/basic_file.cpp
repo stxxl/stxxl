@@ -48,10 +48,5 @@ request_ptr basic_file::awrite(
     return req;
 }
 
-void basic_file::cancel(request_ptr & req)
-{
-    disk_queues::get_instance()->cancel_request(req, get_id());
-}
-
 __STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

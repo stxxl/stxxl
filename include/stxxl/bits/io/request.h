@@ -250,7 +250,7 @@ public:
     request_ptr & operator = (const request_ptr & p)
     {
         // assert(p.ptr);
-        return (*this = p.ptr);
+        return (*this = p.ptr); //call the operator below;
     }
     //! \brief Assignment operator from \c request pointer
     //! \return reference to itself

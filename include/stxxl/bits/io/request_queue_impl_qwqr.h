@@ -53,7 +53,7 @@ public:
         UNUSED(op);
     }
     void add_request(request_ptr & req);
-    void cancel_request(request_ptr & req);
+    bool cancel_request(request_ptr & req);
     ~request_queue_impl_qwqr();
 };
 

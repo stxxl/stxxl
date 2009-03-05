@@ -43,30 +43,37 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
     sem++;
 }
 
-void request_queue_impl_qwqr::cancel_request(request_ptr & req)
+bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request cancelled disk_queue.");
     if (_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request cancelled to not running queue.");
 
+    bool was_still_in_queue = false;
     if (req.get()->get_type() == request::READ)
     {
         scoped_mutex_lock Lock(read_mutex);
         std::vector<request_ptr>::iterator pos;
         if((pos = std::find(read_queue.begin(), read_queue.end(), req)) != read_queue.end())
+        {
             read_queue.erase(pos);
+            was_still_in_queue = true;
+        }
     }
     else
     {
         scoped_mutex_lock Lock(write_mutex);
-        dynamic_cast<stxxl::request_state_impl_basic*>(req.get())->set_ready2die();
         std::vector<request_ptr>::iterator pos;
         if((pos = std::find(write_queue.begin(), write_queue.end(), req)) != write_queue.end())
+        {
             write_queue.erase(pos);
+            was_still_in_queue = true;
+        }
     }
 
     sem++;
+    return was_still_in_queue;
 }
 
 request_queue_impl_qwqr::~request_queue_impl_qwqr()
