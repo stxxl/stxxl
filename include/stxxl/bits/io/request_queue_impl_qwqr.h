@@ -14,7 +14,7 @@
 #ifndef STXXL_IO_REQUEST_QUEUE_IMPL_QWQR_HEADER
 #define STXXL_IO_REQUEST_QUEUE_IMPL_QWQR_HEADER
 
-#include <queue>
+#include <vector>
 
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/common/mutex.h>
@@ -32,8 +32,8 @@ private:
 
     mutex write_mutex;
     mutex read_mutex;
-    std::queue<request_ptr> write_queue;
-    std::queue<request_ptr> read_queue;
+    std::vector<request_ptr> write_queue;
+    std::vector<request_ptr> read_queue;
 
     static const priority_op _priority_op = WRITE;
 
@@ -53,6 +53,7 @@ public:
         UNUSED(op);
     }
     void add_request(request_ptr & req);
+    void cancel_request(request_ptr & req);
     ~request_queue_impl_qwqr();
 };
 

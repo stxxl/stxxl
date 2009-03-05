@@ -38,8 +38,8 @@ public:
         request_type t);
 
 protected:
-    void serve();
     void completed();
+    void serve();
 
 public:
     const char * io_type() const;

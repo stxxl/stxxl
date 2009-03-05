@@ -51,6 +51,8 @@ public:
     virtual ~request_state_impl_basic();
     void wait();
     bool poll();
+    void cancel();
+    void set_ready2die();
 };
 
 //! \}

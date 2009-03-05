@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/io/request_state_impl_basic.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/request.h>
 
@@ -31,12 +32,38 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
     if (req.get()->get_type() == request::READ)
     {
         scoped_mutex_lock Lock(read_mutex);
-        read_queue.push(req);
+        read_queue.push_back(req);
     }
     else
     {
         scoped_mutex_lock Lock(write_mutex);
-        write_queue.push(req);
+        write_queue.push_back(req);
+    }
+
+    sem++;
+}
+
+void request_queue_impl_qwqr::cancel_request(request_ptr & req)
+{
+    if (req.empty())
+        STXXL_THROW_INVALID_ARGUMENT("Empty request cancelled disk_queue.");
+    if (_thread_state() != RUNNING)
+        STXXL_THROW_INVALID_ARGUMENT("Request cancelled to not running queue.");
+
+    if (req.get()->get_type() == request::READ)
+    {
+        scoped_mutex_lock Lock(read_mutex);
+        std::vector<request_ptr>::iterator pos;
+        if((pos = std::find(read_queue.begin(), read_queue.end(), req)) != read_queue.end())
+            read_queue.erase(pos);
+    }
+    else
+    {
+        scoped_mutex_lock Lock(write_mutex);
+        dynamic_cast<stxxl::request_state_impl_basic*>(req.get())->set_ready2die();
+        std::vector<request_ptr>::iterator pos;
+        if((pos = std::find(write_queue.begin(), write_queue.end(), req)) != write_queue.end())
+            write_queue.erase(pos);
     }
 
     sem++;
@@ -63,7 +90,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
             if (!pthis->write_queue.empty())
             {
                 req = pthis->write_queue.front();
-                pthis->write_queue.pop();
+                pthis->write_queue.erase(pthis->write_queue.begin());
 
                 WriteLock.unlock();
 
@@ -91,7 +118,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
             if (!pthis->read_queue.empty())
             {
                 req = pthis->read_queue.front();
-                pthis->read_queue.pop();
+                pthis->read_queue.erase(pthis->read_queue.begin());
 
                 ReadLock.unlock();
 

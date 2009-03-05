@@ -55,6 +55,12 @@ public:
         queues[disk]->add_request(req);
     }
 
+    void cancel_request(request_ptr & req, DISKID disk)
+    {
+        if (queues.find(disk) != queues.end())
+            queues[disk]->cancel_request(req);
+    }
+
     ~disk_queues()
     {
         // deallocate all queues

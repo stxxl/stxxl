@@ -64,6 +64,8 @@ public:
     //! \brief Suspends calling thread until completion of the request
     virtual void wait() = 0;
 
+    virtual void cancel() = 0;
+
     //! \brief Polls the status of the request
     //! \return \c true if request is completed, otherwise \c false
     virtual bool poll() = 0;
@@ -76,6 +78,7 @@ public:
     { }
 };
 
+//! \brief Basic properties of a request.
 class request : virtual public request_base
 {
     friend int wait_any(request_ptr req_array[], int count);
@@ -277,6 +280,12 @@ public:
         assert(ptr);
         return ptr;
     }
+
+    bool operator==(const request_ptr& rp2)
+    {
+        return ptr == rp2.ptr;
+    }
+
     //! \brief Access to owned \c request object (synonym for \c operator->() )
     //! \return reference to owned \c request object
     //! \warning Creation another \c request_ptr from the returned \c request or deletion
@@ -323,6 +332,16 @@ void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
     while (reqs_begin != reqs_end)
     {
         (request_ptr(*reqs_begin))->wait();
+        ++reqs_begin;
+    }
+}
+
+template <class request_iterator_>
+void cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+{
+    while (reqs_begin != reqs_end)
+    {
+        (request_ptr(*reqs_begin))->cancel();
         ++reqs_begin;
     }
 }

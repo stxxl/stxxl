@@ -37,6 +37,7 @@ public:
         offset_type pos,
         size_type bytes,
         const completion_handler & on_cmpl);
+   void cancel(request_ptr & req);
 };
 
 //! \}

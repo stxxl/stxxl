@@ -14,6 +14,7 @@
 #define STXXL_BUFFERED_WRITER_HEADER
 
 #include <vector>
+#include <queue>
 
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/io/disk_queues.h>

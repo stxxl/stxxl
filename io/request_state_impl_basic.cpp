@@ -12,6 +12,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/request_state_impl_basic.h>
+#include <stxxl/bits/io/file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -41,6 +42,17 @@ void request_state_impl_basic::wait()
     check_errors();
 }
 
+void request_state_impl_basic::cancel()
+{
+    STXXL_VERBOSE3("ufs_request_base : " << this << " cancel " << file_ << " " << buffer << " " << offset);
+
+    if(file_)
+    {
+        request_ptr rp(this);
+        file_->cancel(rp);
+    }
+}
+
 bool request_state_impl_basic::poll()
 {
     const request_state s = _state();
@@ -48,6 +60,11 @@ bool request_state_impl_basic::poll()
     check_errors();
 
     return s == DONE || s == READY2DIE;
+}
+
+void request_state_impl_basic::set_ready2die()
+{
+    _state.set_to(READY2DIE);
 }
 
 __STXXL_END_NAMESPACE

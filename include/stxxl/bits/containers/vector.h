@@ -1179,6 +1179,12 @@ public:
         exported = true;
     }
 
+    //! \brief Get the file associated with this vector, or NULL.
+    file* get_file()
+    {
+        return _from;
+    }
+
     //! \brief Set the blocks and the size of this container explicitly.
     //! The vector must be completely empty before.
     template<typename ForwardIterator>
