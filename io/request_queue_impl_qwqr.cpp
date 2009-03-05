@@ -59,6 +59,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
         {
             read_queue.erase(pos);
             was_still_in_queue = true;
+            sem--;
         }
     }
     else
@@ -69,10 +70,10 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
         {
             write_queue.erase(pos);
             was_still_in_queue = true;
+            sem--;
         }
     }
 
-    sem++;
     return was_still_in_queue;
 }
 
