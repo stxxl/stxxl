@@ -8,7 +8,6 @@
 # --with-werror
 # --with-boost
 # TODO:
-# --with-bdb
 # --with-tpie
 # --with-leda
 # --with...
@@ -87,12 +86,19 @@ while true ; do
         esac
 done
 
+if [ "$MODE" = "false" ]; then
+	echo "Missing mandatory --gcc=... or --icpc=... parameter" 1>&2
+	exit 1
+fi
+
+
 cat > make.settings.local.tmp << EOF
 MODE		 = $MODE
 COMPILER_GCC	 = $GCC
 COMPILER_ICPC	 = $ICPC
 STXXL_ROOT	 = `pwd`
 #MCSTL_ROOT	 = \$(HOME)/work/mcstl
+NICE		 =
 
 PMODE		 =$PMODE
 MCSTL		 =$MCSTL
@@ -117,7 +123,7 @@ EOF
 
 
 if ! cmp -s make.settings.local.tmp make.settings.local ; then
-       mv make.settings.local make.settings.local.old
+       test  ! -f make.settings.local || mv make.settings.local make.settings.local.old
        mv make.settings.local.tmp make.settings.local
 else
 	rm -f make.settings.local.tmp
