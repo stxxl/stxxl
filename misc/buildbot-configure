@@ -7,10 +7,10 @@
 # --with-extraflags=...
 # --with-werror
 # --with-boost
-# TODO:
 # --with-tpie
 # --with-leda
-# --with...
+# --without-unittest
+# --with-debug=...
 
 
 MODE=false
@@ -27,9 +27,11 @@ USE_FREEBSD=no
 
 WITH_TPIE=no
 WITH_LEDASM=no
+WITH_UNITTEST=yes
 
 STXXL_WERROR=
 STXXL_EXTRA=
+STXXL_DEBUG=
 
 ###########################################################################
 
@@ -44,7 +46,7 @@ case "`uname -s`" in
 		;;
 esac
 
-TEMP=`getopt --longoptions gcc:,icpc:,with-mcstl,with-pmode,with-extraflags:,with-werror,with-boost -- --foo "$@"`
+TEMP=`getopt --longoptions gcc:,icpc:,with-mcstl,with-pmode,with-extraflags:,with-werror,with-boost,with-tpie,with-ledasm,without-unittest,with-debug: -- --foo "$@"`
 if [ $? != 0 ] ; then echo "getopt failed" >&2 ; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -81,6 +83,22 @@ while true ; do
 			USE_BOOST=yes
 			shift
 			;;
+		--with-tpie)
+			WITH_TPIE=yes
+			shift
+			;;
+		--with-ledasm)
+			WITH_LEDASM=yes
+			shift
+			;;
+		--without-unittest)
+			WITH_UNITTEST=no
+			shift
+			;;
+		--with-debug)
+			STXXL_DEBUG="$2"
+			shift 2
+			;;
                 --) shift ; break ;;
                 *) echo "Internal error!" ; exit 1 ;;
         esac
@@ -110,9 +128,10 @@ USE_FREEBSD	 = $USE_FREEBSD
 ENABLE_BDB		 = yes
 ENABLE_TPIE		 = $WITH_TPIE
 ENABLE_LEDASM		 = $WITH_LEDASM
-ENABLE_UNITTEST		 = yes
+ENABLE_UNITTEST		 = $WITH_UNITTEST
 ENABLE_LONG_COMPILE	 = yes
 
+DEBUG		 = $STXXL_DEBUG
 WARNINGS_EXTRA	 = $STXXL_WERROR
 STXXL_EXTRA	 =
 STXXL_EXTRA	+= -DSTXXL_PARALLEL_MULTIWAY_MERGE
