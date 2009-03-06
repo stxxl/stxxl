@@ -22,6 +22,9 @@ int main(int argc, char **)
 #ifdef _GLIBCXX_PARALLEL
     STXXL_MSG("_GLIBCXX_PARALLEL, max threads = " << omp_get_max_threads());
 #endif
+#ifdef __MCSTL__
+    STXXL_MSG("__MCSTL__, max threads = " << omp_get_max_threads());
+#endif
     STXXL_MSG("sizeof(unsigned int)   = " << sizeof(unsigned int));
     STXXL_MSG("sizeof(unsigned_type)  = " << sizeof(stxxl::unsigned_type));
     STXXL_MSG("sizeof(uint64)         = " << sizeof(stxxl::uint64));
