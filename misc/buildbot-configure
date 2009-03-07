@@ -9,6 +9,7 @@
 # --with-boost
 # --with-tpie
 # --with-leda
+# --without-btree
 # --without-unittest
 # --with-debug=...
 
@@ -25,6 +26,7 @@ USE_BOOST=no
 USE_MACOSX=no
 USE_FREEBSD=no
 
+WITH_BTREE=yes
 WITH_TPIE=no
 WITH_LEDASM=no
 WITH_UNITTEST=yes
@@ -46,7 +48,7 @@ case "`uname -s`" in
 		;;
 esac
 
-TEMP=`getopt --longoptions gcc:,icpc:,with-mcstl,with-pmode,with-extraflags:,with-werror,with-boost,with-tpie,with-ledasm,without-unittest,with-debug: -- --foo "$@"`
+TEMP=`getopt --longoptions gcc:,icpc:,with-mcstl,with-pmode,with-extraflags:,with-werror,with-boost,with-tpie,with-ledasm,without-btree,without-unittest,with-debug: -- --foo "$@"`
 if [ $? != 0 ] ; then echo "getopt failed" >&2 ; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -91,6 +93,10 @@ while true ; do
 			WITH_LEDASM=yes
 			shift
 			;;
+		--without-btree)
+			WITH_BTREE=no
+			shift
+			;;
 		--without-unittest)
 			WITH_UNITTEST=no
 			shift
@@ -125,6 +131,7 @@ USE_BOOST	 = $USE_BOOST
 USE_MACOSX	 = $USE_MACOSX
 USE_FREEBSD	 = $USE_FREEBSD
 
+ENABLE_BTREE		 = $WITH_BTREE
 ENABLE_BDB		 = yes
 ENABLE_TPIE		 = $WITH_TPIE
 ENABLE_LEDASM		 = $WITH_LEDASM

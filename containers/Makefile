@@ -1,7 +1,7 @@
 include Makefile.common
 include ../make.settings
 
-tests: $(TESTS)
+tests: $(TESTS) $(TESTS_MAP)
 	cd btree
 	$(MAKE) tests
 	cd ..

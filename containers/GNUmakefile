@@ -2,12 +2,14 @@ TOPDIR	?= ..
 include Makefile.common
 -include $(TOPDIR)/make.settings.local
 
+ENABLE_BTREE			?= yes
 ENABLE_BDB			?= no
 ENABLE_LEDASM			?= no
 ENABLE_TPIE			?= no
 
 TESTS-yes			+= $(TESTS_NON_MSVC)
-TESTS-yes			+= $(TESTS_BTREE:%=btree/%)
+TESTS-$(ENABLE_BTREE)		+= $(TESTS_MAP)
+TESTS-$(ENABLE_BTREE)		+= $(TESTS_BTREE:%=btree/%)
 TESTS-$(ENABLE_BDB)$(ENABLE_TPIE)	+= $(TESTS_BDB)
 ifneq ($(strip $(USE_BOOST)),yes)
 TESTS-$(ENABLE_LEDASM)		+= $(TESTS_LEDASM)
