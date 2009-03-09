@@ -119,9 +119,11 @@ int main()
     test(Vector);
     test_random_access(Vector);
 
+#if ! defined(__GNUG__) || ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 30400)
     typedef stxxl::map<key_type, data_type, cmp, 4096, 4096> map_type;
     map_type Map(4096 * 10, 4096 * 10);
     test(Map);
+#endif
 
     stxxl::deque<int> Deque(1);
     test(Deque);

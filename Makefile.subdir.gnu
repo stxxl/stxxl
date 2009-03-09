@@ -13,16 +13,18 @@
 
 include $(TOPDIR)/make.settings
 
-TEST_BINARIES	 = $(foreach t, $(TESTS) $(TESTS-yes) $(TESTS-yesyes), $t.$(bin))
+TEST_BINARIES		 = $(TESTS) $(TESTS-yes) $(TESTS-yesyes)
+SKIPPED_TEST_BINARIES	 = $(TESTS-) $(TESTS-no) $(TESTS-yesno) $(TESTS-noyes) $(TESTS-nono)
 
-tests: $(TEST_BINARIES)
+tests: $(TEST_BINARIES:=.$(bin))
 
 lib: $(LIB_SRC:.cpp=.$o)
 
 clean::
 	$(RM) *.$o
 	$(RM) *.$d *.dT
-	$(RM) $(TEST_BINARIES)
+	$(RM) $(TEST_BINARIES:=.$(bin))
+	$(RM) $(SKIPPED_TEST_BINARIES:=.$(bin))
 
 -include *.d
 

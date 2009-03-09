@@ -1,0 +1,24 @@
+#!/bin/sh
+
+ulimit -t 7200
+set -o pipefail
+
+run()
+{
+	cmd="$1.$stxxl.bin"
+	shift
+	test -x $cmd || return 0
+	echo "==================== $cmd $@ ===================="
+	echo "[`date`] Start"
+	$cmd "$@" < /dev/null
+	result=$?
+	echo "[`date`] Finish($result)"
+}
+
+
+for stxxl in stxxl mcstxxl pmstxxl
+do
+	run common/stxxl_info
+done
+
+echo "==================== finished ===================="

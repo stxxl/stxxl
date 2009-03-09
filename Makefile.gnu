@@ -73,6 +73,7 @@ $(LIBNAME).stamp: build-lib
 	echo 'STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_LDLIBS_BOOST	 = $(BOOST_LINKER_OPTIONS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_WARNFLAGS		 = $(WARNINGS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_DEBUGFLAGS		 = $(DEBUG)'	>> $(LIBNAME).mk.tmp
 	cmp -s $(LIBNAME).mk.tmp $(LIBNAME).mk || mv $(LIBNAME).mk.tmp $(LIBNAME).mk
 	$(RM) $(LIBNAME).mk.tmp
 	touch $@
