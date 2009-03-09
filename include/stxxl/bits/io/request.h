@@ -281,7 +281,7 @@ public:
         return ptr;
     }
 
-    bool operator==(const request_ptr& rp2)
+    bool operator==(const request_ptr& rp2) const
     {
         return ptr == rp2.ptr;
     }
