@@ -211,6 +211,13 @@ namespace stable_ksort_local
     }
 }
 
+//! \brief External sorting routine for records with integer keys
+//! \param first object of model of \c ext_random_access_iterator concept
+//! \param last object of model of \c ext_random_access_iterator concept
+//! \param M amount of memory for internal use (in bytes)
+//! \remark Elements must provide a method key() which returns the integer key.
+//! \remark Not yet fully implemented, it assumes that the keys are uniformly
+//! distributed between [0,(std::numeric_limits<key_type>::max)().
 template <typename ExtIterator_>
 void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 {
