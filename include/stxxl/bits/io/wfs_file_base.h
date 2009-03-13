@@ -21,7 +21,7 @@
 
 #ifdef BOOST_MSVC
 
-#include <stxxl/bits/io/basic_file.h>
+#include <stxxl/bits/io/file_request_basic.h>
 #include <stxxl/bits/io/request.h>
 
 
@@ -31,7 +31,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Base for Windows file system implementations
-class wfs_file_base : public basic_file
+class wfs_file_base : public file_request_basic
 {
 protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des

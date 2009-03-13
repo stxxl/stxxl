@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/basic_file.cpp
+ *  io/file_request_basic.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/basic_file.h>
+#include <stxxl/bits/io/file_request_basic.h>
 #include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/io/file.h>
@@ -19,7 +19,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-request_ptr basic_file::aread(
+request_ptr file_request_basic::aread(
     void * buffer,
     offset_type pos,
     size_type bytes,
@@ -34,7 +34,7 @@ request_ptr basic_file::aread(
     return req;
 }
 
-request_ptr basic_file::awrite(
+request_ptr file_request_basic::awrite(
     void * buffer,
     offset_type pos,
     size_type bytes,
