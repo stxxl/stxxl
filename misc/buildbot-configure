@@ -121,7 +121,7 @@ MODE		 = $MODE
 COMPILER_GCC	 = $GCC
 COMPILER_ICPC	 = $ICPC
 STXXL_ROOT	 = `pwd`
-#MCSTL_ROOT	 = \$(HOME)/work/mcstl
+MCSTL_ROOT	 = \$(HOME)/work/mcstl
 NICE		 =
 
 PMODE		 =$PMODE
