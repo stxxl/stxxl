@@ -121,7 +121,7 @@ MODE		 = $MODE
 COMPILER_GCC	 = $GCC
 COMPILER_ICPC	 = $ICPC
 STXXL_ROOT	 = `pwd`
-#MCSTL_ROOT	 = \$(HOME)/work/mcstl
+MCSTL_ROOT	 = \$(HOME)/work/mcstl
 NICE		 =
 
 PMODE		 =$PMODE
@@ -159,4 +159,7 @@ $MAKE -f GNUmakefile.mk GNUmakefile
 
 echo "#####################################################################"
 cat make.settings.local
+echo "#####################################################################"
+$GCC -v || true
+$ICPC -V || true
 echo "#####################################################################"

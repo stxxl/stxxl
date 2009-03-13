@@ -19,3 +19,9 @@ test_mng1.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
 test_write_pool.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
 test_prefetch_pool.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
 test_mng_recursive_alloc.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=3
+
+
+ifeq ($(strip $(USE_MCSTL)),yes)
+# ICPC 11.0: internal error: 0_1374 (issue 539748)
+$(call reduce_optimization,3,0,test_block_alloc_strategy,Version_11.0,any,any)
+endif
