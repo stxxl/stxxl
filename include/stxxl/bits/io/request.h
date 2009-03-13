@@ -64,6 +64,12 @@ public:
     //! \brief Suspends calling thread until completion of the request
     virtual void wait() = 0;
 
+    //! \brief Cancel request
+    //! The request is cancelled unless already being processed.
+    //! However, cancellation cannot be guaranteed.
+    //! Cancelled requests must still be waited for in order to ensure correct
+    //! operation.
+    //! \return \c true iff the request was cancelled successfully
     virtual bool cancel() = 0;
 
     //! \brief Polls the status of the request
@@ -336,6 +342,14 @@ void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
     }
 }
 
+//! \brief Cancel requests
+//! The specified requests are cancelled unless already being processed.
+//! However, cancellation cannot be guaranteed.
+//! Cancelled requests must still be waited for in order to ensure correct
+//! operation.
+//! \param reqs_begin begin of request sequence
+//! \param reqs_end end of request sequence
+//! \return number of request cancelled
 template <class request_iterator_>
 typename request_iterator_::difference_type cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
