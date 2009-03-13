@@ -68,17 +68,6 @@ leda_sm_stack_benchmark.$(bin): leda_sm_stack_benchmark.cpp GNUmakefile
 
 
 ifeq ($(strip $(USE_MCSTL)),yes)
-# Work around compiler bugs:
-compiler_version	:= $(shell $(COMPILER) -v 2>&1 | tr ' ' '_')
-bitness			:= $(shell file ../common/stxxl_info.$(bin) 2>/dev/null)
-# usage: e.g. $(call needs_override,gcc_version_4.2,32-bit,3,[-g|any|none])
-needs_override		?= $(and $(findstring $1,$(compiler_version)),\
-				$(or $(filter any,$2),$(filter $2,$(bitness))),\
-				$(filter $3,$(OPT_LEVEL)),\
-				$(or $(filter any,$4),$(if $(filter none,$4),$(if $(DEBUG),,empty)),$(filter $4,$(DEBUG))))
-# usage: $(call reduce_optimization,from,to,target,compiler,bits,debug)
-reduce_optimization	?= $(if $(call needs_override,$4,$5,$1,$6),$3.$(bin): OPT_LEVEL=$2)
-
 # PR33361: internal compiler error: in find_outermost_region_in_block, at tree-cfg.c:4803
 # when using g++-4.2 -fopenmp -O3. Fixed in g++-4.3, wontfix in g++-4.2.
 ifneq ($(strip $(USE_BOOST)),yes)
