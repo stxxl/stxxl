@@ -87,6 +87,10 @@ $(call reduce_optimization,3,1,btree/test_btree,Version_11.0,any,any)
 $(call reduce_optimization,3,1,btree/test_const_scan,Version_11.0,any,any)
 $(call reduce_optimization,3,0,btree/test_corr_insert_erase,Version_11.0,any,any)
 $(call reduce_optimization,3,0,btree/test_corr_insert_scan,Version_11.0,any,any)
+
+# ICPC 10.0: internal error: backend signals (issue 466173)
+$(call reduce_optimization,3,1,btree/test_corr_insert_erase,Version_10.0,32-bit,any)
+$(call reduce_optimization,3,1,btree/test_corr_insert_scan,Version_10.0,32-bit,any)
 endif
 
 clean::

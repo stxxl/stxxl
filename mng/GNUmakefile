@@ -24,4 +24,8 @@ test_mng_recursive_alloc.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=3
 ifeq ($(strip $(USE_MCSTL)),yes)
 # ICPC 11.0: internal error: 0_1374 (issue 539748)
 $(call reduce_optimization,3,0,test_block_alloc_strategy,Version_11.0,any,any)
+
+# ICPC 10.0: internal error: backend signals (issue 466173)
+$(call reduce_optimization,3,1,test_buf_streams,Version_10.0,32-bit,any)
+$(call reduce_optimization,3,1,unittest,Version_10.0,32-bit,any)
 endif
