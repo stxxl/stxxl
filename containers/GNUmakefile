@@ -81,6 +81,12 @@ $(call reduce_optimization,3,0,btree/test_const_scan,gcc_version_4.2,any,any)
 else
 $(call reduce_optimization,3,2,btree/test_btree,gcc_version_4.2,64-bit,any)
 endif
+
+# ICPC 11.0: internal error: 0_1374 (issue 539748)
+$(call reduce_optimization,3,1,btree/test_btree,Version_11.0,any,any)
+$(call reduce_optimization,3,1,btree/test_const_scan,Version_11.0,any,any)
+$(call reduce_optimization,3,0,btree/test_corr_insert_erase,Version_11.0,any,any)
+$(call reduce_optimization,3,0,btree/test_corr_insert_scan,Version_11.0,any,any)
 endif
 
 clean::
