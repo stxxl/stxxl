@@ -47,6 +47,7 @@ wbtl_file::~wbtl_file()
     stxxl::aligned_dealloc<BLOCK_ALIGN>(write_buffer[1]);
     stxxl::aligned_dealloc<BLOCK_ALIGN>(write_buffer[0]);
     delete storage;
+    storage = 0;
 }
 
 void wbtl_file::serve(const stxxl::request* req) throw(io_error)
@@ -81,6 +82,7 @@ wbtl_file::offset_type wbtl_file::size()
 
 void wbtl_file::set_size(offset_type newsize)
 {
+    scoped_mutex_lock mapping_lock(mapping_mutex);
     assert(sz <= newsize); // may not shrink
     if (sz < newsize) {
         _add_free_region(sz, newsize - sz);
@@ -92,10 +94,11 @@ void wbtl_file::set_size(offset_type newsize)
 
 request_ptr wbtl_file::aread(
     void * buffer,
-    stxxl::int64 pos,
+    offset_type pos,
     size_t bytes,
     completion_handler on_cmpl)
 {
+    scoped_mutex_lock mapping_lock(mapping_mutex);
     if (address_mapping.find(pos) == address_mapping.end()) {
         STXXL_THROW2(io_error, "wbtl_aread of unmapped memory");
     }
@@ -110,6 +113,7 @@ request_ptr wbtl_file::aread(
 // logical address
 void wbtl_file::delete_region(offset_type offset, size_type size)
 {
+    scoped_mutex_lock mapping_lock(mapping_mutex);
     sortseq::iterator physical = address_mapping.find(offset);
     STXXL_VERBOSE_WBTL("wbtl:delreg  l" << FMT_A_S(offset, size) << " @    p" << FMT_A(physical != address_mapping.end() ? physical->second : 0xffffffff));
     if (physical == address_mapping.end()) {
@@ -133,6 +137,7 @@ void wbtl_file::delete_region(offset_type offset, size_type size)
 // physical address
 void wbtl_file::_add_free_region(offset_type offset, offset_type size)
 {
+    // mapping_lock has to be aquired by caller
     STXXL_VERBOSE_WBTL("wbtl:addfre  p" << FMT_A_S(offset, size) << " F <= f" << FMT_A_C(free_bytes, free_space.size()));
     size_type region_pos = offset;
     size_type region_size = size;
@@ -203,14 +208,21 @@ void wbtl_file::_add_free_region(offset_type offset, offset_type size)
 
 void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
 {
+    scoped_mutex_lock buffer_lock(buffer_mutex);
     int cached = -1;
+    offset_type physical_offset;
     // map logical to physical address
+    {
+        scoped_mutex_lock mapping_lock(mapping_mutex);
     sortseq::iterator physical = address_mapping.find(offset);
     if (physical == address_mapping.end()) {
         STXXL_ERRMSG("wbtl_read: mapping not found: " << FMT_A_S(offset, bytes) << " ==> " << "???");
         //STXXL_THROW2(io_error, "wbtl_read of unmapped memory");
+            physical_offset = 0xffffffff;
+        } else {
+            physical_offset = physical->second;
+        }
     }
-    size_type physical_offset = physical->second;
 
     if (buffer_address[curbuf] <= physical_offset &&
         physical_offset < buffer_address[curbuf] + write_block_size)
@@ -234,18 +246,23 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
         request_ptr req = storage->aread(buffer, physical_offset, bytes, default_completion_handler());
         req->wait();
     }
-    STXXL_VERBOSE_WBTL("wbtl:sread   l" << FMT_A_S(offset, bytes) << " @    p" << FMT_A(physical != address_mapping.end() ? physical_offset : 0xffffffff) << " " << std::dec << cached);
+    STXXL_VERBOSE_WBTL("wbtl:sread   l" << FMT_A_S(offset, bytes) << " @    p" << FMT_A(physical_offset) << " " << std::dec << cached);
 }
 
 void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
 {
+    scoped_mutex_lock buffer_lock(buffer_mutex);
     // is the block already mapped?
+    {
+        scoped_mutex_lock mapping_lock(mapping_mutex);
     sortseq::iterator physical = address_mapping.find(offset);
     STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ <= p" <<
                        FMT_A_C(physical != address_mapping.end() ? physical->second : 0xffffffff, address_mapping.size()));
     if (physical != address_mapping.end()) {
+            mapping_lock.unlock();
         // FIXME: special case if we can replace it in the current writing block
         delete_region(offset, bytes);
+        }
     }
 
     if (bytes > write_block_size - curpos)
@@ -276,6 +293,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
     // write block into buffer
     memcpy(write_buffer[curbuf] + curpos, buffer, bytes);
     
+    scoped_mutex_lock mapping_lock(mapping_mutex);
     address_mapping[offset] = buffer_address[curbuf] + curpos;
     reverse_mapping[buffer_address[curbuf] + curpos] = place(offset, bytes);
     STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ => p" << FMT_A_C(buffer_address[curbuf] + curpos, address_mapping.size()));
@@ -284,14 +302,15 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
 
 wbtl_file::offset_type wbtl_file::get_next_write_block()
 {
+    // mapping_lock has to be aquired by caller
     sortseq::iterator space =
         std::find_if(free_space.begin(), free_space.end(),
                      bind2nd(FirstFit(), write_block_size));
 
     if (space != free_space.end())
     {
-        stxxl::int64 region_pos = (*space).first;
-        stxxl::int64 region_size = (*space).second;
+        offset_type region_pos = (*space).first;
+        offset_type region_size = (*space).second;
         free_space.erase(space);
         if (region_size > write_block_size)
             free_space[region_pos + write_block_size] = region_size - write_block_size;
@@ -302,7 +321,7 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
         return region_pos;
     }
 
-    STXXL_ERRMSG("OutOfSpace, probably fragmented");
+    STXXL_THROW2(io_error, "OutOfSpace, probably fragmented");
 
     return -1;
 }

@@ -38,6 +38,7 @@ class wbtl_file : public file_request_basic
     offset_type sz;
     size_type write_block_size;
 
+    mutex mapping_mutex;
     // logical to physical address translation
     sortseq address_mapping;
     // physical to (logical address, size) translation
@@ -51,6 +52,7 @@ class wbtl_file : public file_request_basic
     // write_buffer[1-curbuf] is the previous write buffer
     // buffer_address if the start offset on the backend file
     // curpos is the next writing position in write_buffer[curbuf]
+    mutex buffer_mutex;
     char * write_buffer[2];
     offset_type buffer_address[2];
     int curbuf;
@@ -80,7 +82,7 @@ public:
     ~wbtl_file();
     request_ptr aread(
         void * buffer,
-        stxxl::int64 pos,
+        offset_type pos,
         size_t bytes,
         completion_handler on_cmpl);
     offset_type size();
