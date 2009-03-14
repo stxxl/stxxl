@@ -5,7 +5,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -29,7 +29,9 @@ __STXXL_BEGIN_NAMESPACE
 //!        block remapping via a translation layer.
 class wbtl_file : public file_request_basic
 {
+    typedef std::pair<offset_type, offset_type> place;
     typedef std::map<offset_type, offset_type> sortseq;
+    typedef std::map<offset_type, place> place_map;
 
     // thy physical disk use as backend
     file * storage;
@@ -38,6 +40,8 @@ class wbtl_file : public file_request_basic
 
     // logical to physical address translation
     sortseq address_mapping;
+    // physical to (logical address, size) translation
+    place_map reverse_mapping;
     // list of free (physical) regions
     sortseq free_space;
     offset_type free_bytes;
@@ -53,7 +57,6 @@ class wbtl_file : public file_request_basic
     size_type curpos;
     request_ptr backend_request;
 
-    typedef std::pair<offset_type, offset_type> place;
     struct FirstFit : public std::binary_function<place, offset_type, bool>
     {
         bool operator () (

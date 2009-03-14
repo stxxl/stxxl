@@ -5,7 +5,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -116,9 +116,17 @@ void wbtl_file::delete_region(offset_type offset, size_type size)
         // could be OK if the block was never written ...
         STXXL_ERRMSG("delete_region: mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
     } else {
-        size_type physical_offset = physical->second;
+        offset_type physical_offset = physical->second;
         address_mapping.erase(physical);
         _add_free_region(physical_offset, size);
+        place_map::iterator reverse = reverse_mapping.find(physical_offset);
+        if (reverse == reverse_mapping.end()) {
+            STXXL_ERRMSG("delete_region: reverse mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
+        } else {
+            assert(offset == (reverse->second).first);
+            reverse_mapping.erase(reverse);
+        }
+        storage->delete_region(physical_offset, size);
     }
 }
 
@@ -269,6 +277,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
     memcpy(write_buffer[curbuf] + curpos, buffer, bytes);
     
     address_mapping[offset] = buffer_address[curbuf] + curpos;
+    reverse_mapping[buffer_address[curbuf] + curpos] = place(offset, bytes);
     STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ => p" << FMT_A_C(buffer_address[curbuf] + curpos, address_mapping.size()));
     curpos += bytes;
 }
