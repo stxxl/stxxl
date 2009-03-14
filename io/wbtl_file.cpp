@@ -27,15 +27,15 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-// FIXME: make configurable: storage file type, write_block_size
 wbtl_file::wbtl_file(
-    const std::string & filename,
-    int mode,
+    file * backend_file,
+    size_type write_buffer_size,
+    int write_buffers,
     int disk) :
-        file_request_basic(disk), sz(0), write_block_size(32 * 1024 * 1024),
+        file_request_basic(disk), storage(backend_file), sz(0), write_block_size(write_buffer_size),
         free_bytes(0), curbuf(1), curpos(write_block_size)
 {
-    storage = new syscall_file(filename, mode);
+    assert(write_buffers == 2); // currently hardcoded
     write_buffer[0] = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
     write_buffer[1] = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
     buffer_address[0] = offset_type(-1);

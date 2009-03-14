@@ -33,7 +33,7 @@ class wbtl_file : public file_request_basic
     typedef std::map<offset_type, offset_type> sortseq;
     typedef std::map<offset_type, place> place_map;
 
-    // thy physical disk use as backend
+    // the physical disk used as backend
     file * storage;
     offset_type sz;
     size_type write_block_size;
@@ -71,13 +71,12 @@ class wbtl_file : public file_request_basic
 
 public:
     //! \brief constructs file object
-    //! \param filename path of file
-    //! \attention filename must be resided at memory disk partition
-    //! \param mode open mode, see \c stxxl::file::open_modes
+    //! \param backend_file file object used as storage backend, will be deleted in ~wbtl_file()
     //! \param disk disk(file) identifier
     wbtl_file(
-        const std::string & filename,
-        int mode,
+        file * backend_file,
+        size_type write_buffer_size,
+        int write_buffers = 2,
         int disk = -1);
     ~wbtl_file();
     request_ptr aread(
