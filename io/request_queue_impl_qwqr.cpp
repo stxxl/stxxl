@@ -54,7 +54,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
     if (req.get()->get_type() == request::READ)
     {
         scoped_mutex_lock Lock(read_mutex);
-        std::vector<request_ptr>::iterator pos;
+        std::list<request_ptr>::iterator pos;
         if((pos = std::find(read_queue.begin(), read_queue.end(), req)) != read_queue.end())
         {
             read_queue.erase(pos);
@@ -65,7 +65,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
     else
     {
         scoped_mutex_lock Lock(write_mutex);
-        std::vector<request_ptr>::iterator pos;
+        std::list<request_ptr>::iterator pos;
         if((pos = std::find(write_queue.begin(), write_queue.end(), req)) != write_queue.end())
         {
             write_queue.erase(pos);
@@ -98,7 +98,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
             if (!pthis->write_queue.empty())
             {
                 req = pthis->write_queue.front();
-                pthis->write_queue.erase(pthis->write_queue.begin());
+                pthis->write_queue.pop_front();
 
                 WriteLock.unlock();
 
@@ -126,7 +126,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
             if (!pthis->read_queue.empty())
             {
                 req = pthis->read_queue.front();
-                pthis->read_queue.erase(pthis->read_queue.begin());
+                pthis->read_queue.pop_front();
 
                 ReadLock.unlock();
 
