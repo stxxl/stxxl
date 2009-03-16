@@ -1,0 +1,165 @@
+#!/bin/sh
+
+# --gcc=...
+# --icpc=...
+# --with-mcstl
+# --with-pmode
+# --with-extraflags=...
+# --with-werror
+# --with-boost
+# --with-tpie
+# --with-leda
+# --without-btree
+# --without-unittest
+# --with-debug=...
+
+
+MODE=false
+GCC=false
+ICPC=false
+MAKE=make
+
+MCSTL=
+PMODE=
+
+USE_BOOST=no
+USE_MACOSX=no
+USE_FREEBSD=no
+
+WITH_BTREE=yes
+WITH_TPIE=no
+WITH_LEDASM=no
+WITH_UNITTEST=yes
+
+STXXL_WERROR=
+STXXL_EXTRA=
+STXXL_DEBUG=
+
+###########################################################################
+
+case "`uname -s`" in
+	Darwin)
+		USE_MACOSX=yes
+		MAKE=gmake
+		;;
+	FreeBSD)
+		USE_FREEBSD=yes
+		MAKE=gmake
+		;;
+esac
+
+TEMP=`getopt --longoptions gcc:,icpc:,with-mcstl,with-pmode,with-extraflags:,with-werror,with-boost,with-tpie,with-ledasm,without-btree,without-unittest,with-debug: -- --foo "$@"`
+if [ $? != 0 ] ; then echo "getopt failed" >&2 ; exit 1 ; fi
+
+eval set -- "$TEMP"
+
+while true ; do
+        case "$1" in
+                --gcc)
+			MODE=g++
+			GCC="$2"
+			shift 2
+		       	;;
+		--icpc)
+			MODE=icpc
+			ICPC="$2"
+			shift 2
+			;;
+		--with-mcstl)
+			MCSTL=mcstl
+			shift
+			;;
+		--with-pmode)
+			PMODE=pmode
+			shift
+			;;
+		--with-extraflags)
+			STXXL_EXTRA="$2"
+			shift 2
+			;;
+		--with-werror)
+			#STXXL_WERROR=-Werror
+			shift
+			;;
+		--with-boost)
+			USE_BOOST=yes
+			shift
+			;;
+		--with-tpie)
+			WITH_TPIE=yes
+			shift
+			;;
+		--with-ledasm)
+			WITH_LEDASM=yes
+			shift
+			;;
+		--without-btree)
+			WITH_BTREE=no
+			shift
+			;;
+		--without-unittest)
+			WITH_UNITTEST=no
+			shift
+			;;
+		--with-debug)
+			STXXL_DEBUG="$2"
+			shift 2
+			;;
+                --) shift ; break ;;
+                *) echo "Internal error!" ; exit 1 ;;
+        esac
+done
+
+if [ "$MODE" = "false" ]; then
+	echo "Missing mandatory --gcc=... or --icpc=... parameter" 1>&2
+	exit 1
+fi
+
+
+cat > make.settings.local.tmp << EOF
+MODE		 = $MODE
+COMPILER_GCC	 = $GCC
+COMPILER_ICPC	 = $ICPC
+STXXL_ROOT	 = `pwd`
+MCSTL_ROOT	 = \$(HOME)/work/mcstl
+NICE		 =
+
+PMODE		 =$PMODE
+MCSTL		 =$MCSTL
+
+USE_BOOST	 = $USE_BOOST
+USE_MACOSX	 = $USE_MACOSX
+USE_FREEBSD	 = $USE_FREEBSD
+
+ENABLE_BTREE		 = $WITH_BTREE
+ENABLE_BDB		 = yes
+ENABLE_TPIE		 = $WITH_TPIE
+ENABLE_LEDASM		 = $WITH_LEDASM
+ENABLE_UNITTEST		 = $WITH_UNITTEST
+ENABLE_LONG_COMPILE	 = yes
+
+DEBUG		 = $STXXL_DEBUG
+WARNINGS_EXTRA	 = $STXXL_WERROR
+STXXL_EXTRA	 =
+STXXL_EXTRA	+= -DSTXXL_PARALLEL_MULTIWAY_MERGE
+STXXL_EXTRA	+= -DSTXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL=1
+STXXL_EXTRA	+= -DSTXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL=1
+STXXL_EXTRA	+= $STXXL_EXTRA
+EOF
+
+
+if ! cmp -s make.settings.local.tmp make.settings.local ; then
+       test  ! -f make.settings.local || mv make.settings.local make.settings.local.old
+       mv make.settings.local.tmp make.settings.local
+else
+	rm -f make.settings.local.tmp
+fi
+
+$MAKE -f GNUmakefile.mk GNUmakefile
+
+echo "#####################################################################"
+cat make.settings.local
+echo "#####################################################################"
+$GCC -v || true
+$ICPC -V || true
+echo "#####################################################################"
