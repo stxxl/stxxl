@@ -230,6 +230,7 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
         // block is in current write buffer
         assert(physical_offset + bytes <= buffer_address[curbuf] + write_block_size);
         memcpy(buffer, write_buffer[curbuf] + (physical_offset - buffer_address[curbuf]), bytes);
+        stats::get_instance()->read_cached(bytes);
         cached = curbuf;
     }
     else if (buffer_address[1 - curbuf] <= physical_offset &&
@@ -238,13 +239,14 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
         // block is in previous write buffer
         assert(physical_offset + bytes <= buffer_address[1 - curbuf] + write_block_size);
         memcpy(buffer, write_buffer[1 - curbuf] + (physical_offset - buffer_address[1 - curbuf]), bytes);
+        stats::get_instance()->read_cached(bytes);
         cached = curbuf;
     }
     else
     {
         // block is not cached
         request_ptr req = storage->aread(buffer, physical_offset, bytes, default_completion_handler());
-        req->wait();
+        req->wait(false);
     }
     STXXL_VERBOSE_WBTL("wbtl:sread   l" << FMT_A_S(offset, bytes) << " @    p" << FMT_A(physical_offset) << " " << std::dec << cached);
 }
@@ -277,7 +279,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
                 _add_free_region(buffer_address[curbuf] + curpos, write_block_size - curpos);
             
             if (backend_request.get()) {
-                backend_request->wait();
+                backend_request->wait(false);
             }
 
             backend_request = storage->awrite(write_buffer[curbuf], buffer_address[curbuf], write_block_size, default_completion_handler());
@@ -292,6 +294,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
 
     // write block into buffer
     memcpy(write_buffer[curbuf] + curpos, buffer, bytes);
+    stats::get_instance()->write_cached(bytes);
     
     scoped_mutex_lock mapping_lock(mapping_mutex);
     address_mapping[offset] = buffer_address[curbuf] + curpos;
