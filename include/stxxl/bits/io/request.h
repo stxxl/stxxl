@@ -292,55 +292,30 @@ public:
 
 //! \brief Collection of functions to track statuses of a number of requests
 
-//! \brief Suspends calling thread until \b any of requests is completed
-//! \param req_array array of \c request_ptr objects
-//! \param count size of req_array
-//! \return index in req_array pointing to the \b first completed request
-inline int wait_any(request_ptr req_array[], int count);
-//! \brief Suspends calling thread until \b all requests are completed
-//! \param req_array array of request_ptr objects
-//! \param count size of req_array
-inline void wait_all(request_ptr req_array[], int count);
-//! \brief Polls requests
-//! \param req_array array of request_ptr objects
-//! \param count size of req_array
-//! \param index contains index of the \b first completed request if any
-//! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
-inline bool poll_any(request_ptr req_array[], int count, int & index);
 
-
-void wait_all(request_ptr req_array[], int count)
-{
-    for (int i = 0; i < count; i++)
-    {
-        req_array[i]->wait();
-    }
-}
-
+//! \brief Suspends calling thread until \b all given requests are completed
+//! \param reqs_begin begin of request sequence to wait for
+//! \param reqs_end end of request sequence to wait for
 template <class request_iterator_>
 void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
-    while (reqs_begin != reqs_end)
-    {
+    for (; reqs_begin != reqs_end; ++reqs_begin)
         (request_ptr(*reqs_begin))->wait();
-        ++reqs_begin;
-    }
 }
 
-bool poll_any(request_ptr req_array[], int count, int & index)
+//! \brief Suspends calling thread until \b all given requests are completed
+//! \param req_array array of request_ptr objects
+//! \param count size of req_array
+inline void wait_all(request_ptr req_array[], int count)
 {
-    index = -1;
-    for (int i = 0; i < count; i++)
-    {
-        if (req_array[i]->poll())
-        {
-            index = i;
-            return true;
-        }
-    }
-    return false;
+    wait_all(req_array, req_array + count);
 }
 
+//! \brief Polls requests
+//! \param reqs_begin begin of request sequence to poll
+//! \param reqs_end end of request sequence to poll
+//! \param index contains index of the \b first completed request if any
+//! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
 template <class request_iterator_>
 request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
@@ -355,41 +330,23 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 }
 
 
-int wait_any(request_ptr req_array[], int count)
+//! \brief Polls requests
+//! \param req_array array of request_ptr objects
+//! \param count size of req_array
+//! \param index contains index of the \b first completed request if any
+//! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
+inline bool poll_any(request_ptr req_array[], int count, int & index)
 {
-    stats::scoped_wait_timer wait_timer;
-
-    onoff_switch sw;
-    int i = 0, index = -1;
-
-    for ( ; i < count; i++)
-    {
-        if (req_array[i]->add_waiter(&sw))
-        {
-            // already done
-            index = i;
-
-            while (--i >= 0)
-                req_array[i]->delete_waiter(&sw);
-
-            req_array[index]->check_errors();
-
-            return index;
-        }
-    }
-
-    sw.wait_for_on();
-
-    for (i = 0; i < count; i++)
-    {
-        req_array[i]->delete_waiter(&sw);
-        if (index < 0 && req_array[i]->poll())
-            index = i;
-    }
-
-    return index;
+    request_ptr* res = poll_any(req_array, req_array + count);
+    index = res - req_array;
+    return res != (req_array + count);
 }
 
+
+//! \brief Suspends calling thread until \b any of requests is completed
+//! \param reqs_begin begin of request sequence to wait for
+//! \param reqs_end end of request sequence to wait for
+//! \return index in req_array pointing to the \b first completed request
 template <class request_iterator_>
 request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
@@ -430,6 +387,16 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
     }
 
     return result;
+}
+
+
+//! \brief Suspends calling thread until \b any of requests is completed
+//! \param req_array array of \c request_ptr objects
+//! \param count size of req_array
+//! \return index in req_array pointing to the \b first completed request
+inline int wait_any(request_ptr req_array[], int count)
+{
+    return wait_any(req_array, req_array + count) - req_array;
 }
 
 //! \}
