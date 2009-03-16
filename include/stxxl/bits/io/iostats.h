@@ -42,6 +42,8 @@ class stats : public singleton<stats>
 
     unsigned reads, writes;                     // number of operations
     int64 volume_read, volume_written;          // number of bytes read/written
+    unsigned c_reads, c_writes;                 // number of cached operations
+    int64 c_volume_read, c_volume_written;      // number of bytes read/written from/to cache
     double t_reads, t_writes;                   // seconds spent in operations
     double p_reads, p_writes;                   // seconds spent in parallel operations
     double p_begin_read, p_begin_write;         // start time of parallel operation
@@ -272,6 +274,34 @@ public:
         return volume_written;
     }
 
+    //! \brief Returns total number of reads served from cache
+    //! \return total number of cached reads
+    unsigned get_cached_reads() const
+    {
+        return c_reads;
+    }
+
+    //! \brief Returns total number of cached writes
+    //! \return total number of cached writes
+    unsigned get_cached_writes() const
+    {
+        return c_writes;
+    }
+
+    //! \brief Returns number of bytes read from cache
+    //! \return number of bytes read from cache
+    int64 get_cached_read_volume() const
+    {
+        return c_volume_read;
+    }
+
+    //! \brief Returns number of bytes written to the cache
+    //! \return number of bytes written to cache
+    int64 get_cached_written_volume() const
+    {
+        return c_volume_written;
+    }
+
     //! \brief Time that would be spent in read syscalls if all parallel reads were serialized.
     //! \return seconds spent in reading
     double get_read_time() const
@@ -335,8 +365,10 @@ public:
     // for library use
     void write_started(unsigned size_);
     void write_finished();
+    void write_cached(unsigned size_);
     void read_started(unsigned size_);
     void read_finished();
+    void read_cached(unsigned size_);
     void wait_started();
     void wait_finished();
 };
@@ -363,6 +395,8 @@ class stats_data
 {
     unsigned reads, writes;                    // number of operations
     int64 volume_read, volume_written;         // number of bytes read/written
+    unsigned c_reads, c_writes;                // number of cached operations
+    int64 c_volume_read, c_volume_written;     // number of bytes read/written from/to cache
     double t_reads, t_writes;                  // seconds spent in operations
     double p_reads, p_writes;                  // seconds spent in parallel operations
     double p_ios;                              // seconds spent in all parallel I/O operations (read and write)
@@ -375,6 +409,10 @@ public:
         writes(0),
         volume_read(0),
         volume_written(0),
+        c_reads(0),
+        c_writes(0),
+        c_volume_read(0),
+        c_volume_written(0),
         t_reads(0.0),
         t_writes(0.0),
         p_reads(0.0),
@@ -389,6 +427,10 @@ public:
         writes(s.get_writes()),
         volume_read(s.get_read_volume()),
         volume_written(s.get_written_volume()),
+        c_reads(s.get_cached_reads()),
+        c_writes(s.get_cached_writes()),
+        c_volume_read(s.get_cached_read_volume()),
+        c_volume_written(s.get_cached_written_volume()),
         t_reads(s.get_read_time()),
         t_writes(s.get_write_time()),
         p_reads(s.get_pread_time()),
@@ -405,6 +447,10 @@ public:
         s.writes = writes + a.writes;
         s.volume_read = volume_read + a.volume_read;
         s.volume_written = volume_written + a.volume_written;
+        s.c_reads = c_reads + a.c_reads;
+        s.c_writes = c_writes + a.c_writes;
+        s.c_volume_read = c_volume_read + a.c_volume_read;
+        s.c_volume_written = c_volume_written + a.c_volume_written;
         s.t_reads = t_reads + a.t_reads;
         s.t_writes = t_writes + a.t_writes;
         s.p_reads = p_reads + a.p_reads;
@@ -422,6 +468,10 @@ public:
         s.writes = writes - a.writes;
         s.volume_read = volume_read - a.volume_read;
         s.volume_written = volume_written - a.volume_written;
+        s.c_reads = c_reads - a.c_reads;
+        s.c_writes = c_writes - a.c_writes;
+        s.c_volume_read = c_volume_read - a.c_volume_read;
+        s.c_volume_written = c_volume_written - a.c_volume_written;
         s.t_reads = t_reads - a.t_reads;
         s.t_writes = t_writes - a.t_writes;
         s.p_reads = p_reads - a.p_reads;
@@ -450,6 +500,26 @@ public:
     int64 get_written_volume() const
     {
         return volume_written;
+    }
+
+    unsigned get_cached_reads() const
+    {
+        return c_reads;
+    }
+
+    unsigned get_cached_writes() const
+    {
+        return c_writes;
+    }
+
+    int64 get_cached_read_volume() const
+    {
+        return c_volume_read;
+    }
+
+    int64 get_cached_written_volume() const
+    {
+        return c_volume_written;
     }
 
     double get_read_time() const
