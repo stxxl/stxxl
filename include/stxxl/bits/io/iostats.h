@@ -208,12 +208,13 @@ public:
 #endif
 
     public:
-        scoped_wait_timer()
+        scoped_wait_timer(bool measure_time = true)
 #ifdef COUNT_WAIT_TIME
             : running(false)
 #endif
         {
-            start();
+            if (measure_time)
+                start();
         }
 
         ~scoped_wait_timer()

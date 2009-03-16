@@ -49,7 +49,7 @@ protected:
 
 public:
     virtual ~request_state_impl_basic();
-    void wait();
+    void wait(bool measure_time = true);
     bool poll();
 };
 
