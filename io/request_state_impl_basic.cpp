@@ -30,11 +30,11 @@ request_state_impl_basic::~request_state_impl_basic()
     // _state.wait_for (READY2DIE); // does not make sense ?
 }
 
-void request_state_impl_basic::wait()
+void request_state_impl_basic::wait(bool measure_time)
 {
     STXXL_VERBOSE3("ufs_request_base : " << static_cast<void *>(this) << " wait ");
 
-    stats::scoped_wait_timer wait_timer;
+    stats::scoped_wait_timer wait_timer(measure_time);
 
     _state.wait_for(READY2DIE);
 

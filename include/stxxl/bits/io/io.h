@@ -22,6 +22,7 @@
 #include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/mem_file.h>
 #include <stxxl/bits/io/fileperblock_file.h>
+#include <stxxl/bits/io/wbtl_file.h>
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/io/iostats.h>
 

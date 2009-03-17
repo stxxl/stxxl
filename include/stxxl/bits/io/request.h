@@ -62,7 +62,7 @@ protected:
 
 public:
     //! \brief Suspends calling thread until completion of the request
-    virtual void wait() = 0;
+    virtual void wait(bool measure_time = true) = 0;
 
     //! \brief Polls the status of the request
     //! \return \c true if request is completed, otherwise \c false
