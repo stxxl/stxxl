@@ -57,8 +57,9 @@ void stats::reset()
                          " read(s) not yet finished");
 
         reads = 0;
-
         volume_read = 0;
+        c_reads = 0;
+        c_volume_read = 0;
         t_reads = 0;
         p_reads = 0.0;
     }
@@ -71,8 +72,9 @@ void stats::reset()
                          " write(s) not yet finished");
 
         writes = 0;
-
         volume_written = 0;
+        c_writes = 0;
+        c_volume_written = 0;
         t_writes = 0.0;
         p_writes = 0.0;
     }
