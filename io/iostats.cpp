@@ -279,10 +279,12 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
       << std::endl;
    if (s.get_cached_reads()) {
     o << " total number of cached reads               : " << hr(s.get_cached_reads()) << std::endl;
+    o << " average block size (cached read)           : " << hr(s.get_cached_read_volume() / s.get_cached_reads(), "B") << std::endl;
     o << " number of bytes read from cache            : " << hr(s.get_cached_read_volume(), "B") << std::endl;
    }
    if (s.get_cached_writes()) {
     o << " total number of cached writes              : " << hr(s.get_cached_writes()) << std::endl;
+    o << " average block size (cached write)          : " << hr(s.get_cached_written_volume() / s.get_cached_writes(), "B") << std::endl;
     o << " number of bytes written to cache           : " << hr(s.get_cached_written_volume(), "B") << std::endl;
    }
     o << " total number of writes                     : " << hr(s.get_writes()) << std::endl;
