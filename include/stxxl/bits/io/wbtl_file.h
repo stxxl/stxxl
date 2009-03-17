@@ -83,7 +83,7 @@ public:
         void * buffer,
         offset_type pos,
         size_type bytes,
-        completion_handler on_cmpl);
+        const completion_handler & on_cmpl);
     offset_type size();
     void set_size(offset_type newsize);
     void lock();

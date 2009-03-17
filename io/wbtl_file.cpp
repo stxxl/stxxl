@@ -96,7 +96,7 @@ request_ptr wbtl_file::aread(
     void * buffer,
     offset_type pos,
     size_type bytes,
-    completion_handler on_cmpl)
+    const completion_handler & on_cmpl)
 {
     scoped_mutex_lock mapping_lock(mapping_mutex);
     if (address_mapping.find(pos) == address_mapping.end()) {
