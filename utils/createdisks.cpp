@@ -181,7 +181,7 @@ int main(int argc, char * argv[])
  #ifdef WATCH_TIMES
         watch_times(reqs, ndisks, w_finish_times);
  #else
-        wait_all(reqs, reqs + ndisks * chunks);
+        wait_all(reqs, ndisks * chunks);
  #endif
 
         end = timestamp();
