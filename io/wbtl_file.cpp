@@ -95,7 +95,7 @@ void wbtl_file::set_size(offset_type newsize)
 request_ptr wbtl_file::aread(
     void * buffer,
     offset_type pos,
-    size_t bytes,
+    size_type bytes,
     completion_handler on_cmpl)
 {
     scoped_mutex_lock mapping_lock(mapping_mutex);
