@@ -92,20 +92,6 @@ void wbtl_file::set_size(offset_type newsize)
     }
 }
 
-request_ptr wbtl_file::aread(
-    void * buffer,
-    offset_type pos,
-    size_type bytes,
-    const completion_handler & on_cmpl)
-{
-    scoped_mutex_lock mapping_lock(mapping_mutex);
-    if (address_mapping.find(pos) == address_mapping.end()) {
-        STXXL_THROW2(io_error, "wbtl_aread of unmapped memory");
-    }
-
-    return file_request_basic::aread(buffer, pos, bytes, on_cmpl);
-}
-
 #define FMT_A_S(_addr_,_size_) "0x" << std::hex << std::setfill('0') << std::setw(8) << (_addr_) << "/0x" << std::setw(8) << (_size_)
 #define FMT_A_C(_addr_,_size_) "0x" << std::setw(8) << (_addr_) << "(" << std::dec << (_size_) << ")"
 #define FMT_A(_addr_) "0x" << std::setw(8) << (_addr_)
@@ -118,7 +104,7 @@ void wbtl_file::delete_region(offset_type offset, size_type size)
     STXXL_VERBOSE_WBTL("wbtl:delreg  l" << FMT_A_S(offset, size) << " @    p" << FMT_A(physical != address_mapping.end() ? physical->second : 0xffffffff));
     if (physical == address_mapping.end()) {
         // could be OK if the block was never written ...
-        STXXL_ERRMSG("delete_region: mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
+        //STXXL_ERRMSG("delete_region: mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
     } else {
         offset_type physical_offset = physical->second;
         address_mapping.erase(physical);
@@ -326,7 +312,7 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
 
     STXXL_THROW2(io_error, "OutOfSpace, probably fragmented");
 
-    return -1;
+    return offset_type(-1);
 }
 
 void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size,

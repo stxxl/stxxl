@@ -79,11 +79,6 @@ public:
         int write_buffers = 2,
         int disk = -1);
     ~wbtl_file();
-    request_ptr aread(
-        void * buffer,
-        offset_type pos,
-        size_type bytes,
-        const completion_handler & on_cmpl);
     offset_type size();
     void set_size(offset_type newsize);
     void lock();
