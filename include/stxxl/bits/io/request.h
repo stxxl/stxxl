@@ -351,9 +351,9 @@ void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 //! \param reqs_end end of request sequence
 //! \return number of request cancelled
 template <class request_iterator_>
-typename request_iterator_::difference_type cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
+typename std::iterator_traits<request_iterator_>::difference_type cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
-    typename request_iterator_::difference_type num_cancelled = 0;
+    typename std::iterator_traits<request_iterator_>::difference_type num_cancelled = 0;
     while (reqs_begin != reqs_end)
     {
         if((request_ptr(*reqs_begin))->cancel())
