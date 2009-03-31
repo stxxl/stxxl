@@ -75,8 +75,8 @@ run common/stxxl_info foo # returns -1 intentionally
 run common/test_random
 
 run algo/gen_file
-run utils/createdisks 1024 testdiskx testdisky
-run utils/createdisks 1000 testdiskx testdisky
+run utils/createdisks 1024 /tmp/testdiskx /tmp/testdisky
+run utils/createdisks 1000 /tmp/testdiskx /tmp/testdisky
 run utils/log2
 run utils/malloc 1024
 run utils/malloc 1024000
@@ -84,8 +84,8 @@ run utils/malloc 4000000000
 run utils/off_t_size
 run utils/pq_param
 
-run io/benchmark_disks 0 2 testdiskx testdisky
-run io/flushbuffers 2 testdiskx testdisky
+run io/benchmark_disks 0 2 256 /tmp/testdiskx /tmp/testdisky
+run io/flushbuffers 2 /tmp/testdiskx /tmp/testdisky
 run io/sd_test
 run io/test_io
 run io/cancel_io
