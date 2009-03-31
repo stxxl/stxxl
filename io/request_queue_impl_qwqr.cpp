@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/io/request_state_impl_basic.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/request.h>
 
@@ -31,15 +32,49 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
     if (req.get()->get_type() == request::READ)
     {
         scoped_mutex_lock Lock(read_mutex);
-        read_queue.push(req);
+        read_queue.push_back(req);
     }
     else
     {
         scoped_mutex_lock Lock(write_mutex);
-        write_queue.push(req);
+        write_queue.push_back(req);
     }
 
     sem++;
+}
+
+bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
+{
+    if (req.empty())
+        STXXL_THROW_INVALID_ARGUMENT("Empty request cancelled disk_queue.");
+    if (_thread_state() != RUNNING)
+        STXXL_THROW_INVALID_ARGUMENT("Request cancelled to not running queue.");
+
+    bool was_still_in_queue = false;
+    if (req.get()->get_type() == request::READ)
+    {
+        scoped_mutex_lock Lock(read_mutex);
+        std::list<request_ptr>::iterator pos;
+        if((pos = std::find(read_queue.begin(), read_queue.end(), req)) != read_queue.end())
+        {
+            read_queue.erase(pos);
+            was_still_in_queue = true;
+            sem--;
+        }
+    }
+    else
+    {
+        scoped_mutex_lock Lock(write_mutex);
+        std::list<request_ptr>::iterator pos;
+        if((pos = std::find(write_queue.begin(), write_queue.end(), req)) != write_queue.end())
+        {
+            write_queue.erase(pos);
+            was_still_in_queue = true;
+            sem--;
+        }
+    }
+
+    return was_still_in_queue;
 }
 
 request_queue_impl_qwqr::~request_queue_impl_qwqr()
@@ -63,7 +98,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
             if (!pthis->write_queue.empty())
             {
                 req = pthis->write_queue.front();
-                pthis->write_queue.pop();
+                pthis->write_queue.pop_front();
 
                 WriteLock.unlock();
 
@@ -91,7 +126,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
             if (!pthis->read_queue.empty())
             {
                 req = pthis->read_queue.front();
-                pthis->read_queue.pop();
+                pthis->read_queue.pop_front();
 
                 ReadLock.unlock();
 

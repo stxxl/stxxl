@@ -51,6 +51,7 @@ public:
     virtual ~request_state_impl_basic();
     void wait(bool measure_time = true);
     bool poll();
+    bool cancel();
 };
 
 //! \}

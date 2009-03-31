@@ -12,7 +12,8 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/request_state_impl_basic.h>
-
+#include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/disk_queues.h>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -39,6 +40,26 @@ void request_state_impl_basic::wait(bool measure_time)
     _state.wait_for(READY2DIE);
 
     check_errors();
+}
+
+bool request_state_impl_basic::cancel()
+{
+    STXXL_VERBOSE3("ufs_request_base : " << this << " cancel " << file_ << " " << buffer << " " << offset);
+
+    if(file_)
+    {
+        request_ptr rp(this);
+        if(disk_queues::get_instance()->cancel_request(rp, file_->get_id()))
+        {
+            _state.set_to(DONE);
+            notify_waiters();
+            file_->delete_request_ref();
+            file_ = 0;
+            _state.set_to(READY2DIE);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool request_state_impl_basic::poll()
