@@ -88,7 +88,7 @@ run io/benchmark_disks 0 2 256 /tmp/testdiskx /tmp/testdisky
 run io/flushbuffers 2 /tmp/testdiskx /tmp/testdisky
 run io/sd_test
 run io/test_io
-run io/cancel_io
+run io/test_cancel
 
 run mng/test_block_alloc_strategy
 run mng/test_buf_streams

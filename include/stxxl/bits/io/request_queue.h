@@ -32,6 +32,7 @@ class request_queue : private noncopyable
 {
 public:
     virtual void add_request(request_ptr & req) = 0;
+    virtual bool cancel_request(request_ptr & req) = 0;
     virtual ~request_queue() { }
 };
 
