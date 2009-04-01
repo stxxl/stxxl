@@ -16,7 +16,7 @@ include $(TOPDIR)/make.settings
 TEST_BINARIES		 = $(TESTS) $(TESTS-yes) $(TESTS-yesyes)
 SKIPPED_TEST_BINARIES	 = $(TESTS-) $(TESTS-no) $(TESTS-yesno) $(TESTS-noyes) $(TESTS-nono)
 
-tests: $(TEST_BINARIES:=.$(bin))
+tests: $(TEST_BINARIES:%=%.$(bin))
 
 lib: $(LIB_SRC:.cpp=.$o)
 
