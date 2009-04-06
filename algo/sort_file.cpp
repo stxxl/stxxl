@@ -60,6 +60,9 @@ inline bool operator == (const my_type & a, const my_type & b)
 
 struct Cmp
 {
+    typedef my_type first_argument_type;
+    typedef my_type second_argument_type;
+    typedef bool result_type;
     bool operator () (const my_type & a, const my_type & b) const
     {
         return a < b;
