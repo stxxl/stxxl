@@ -80,7 +80,7 @@ run common/stxxl_info
 run common/stxxl_info foo # returns -1 intentionally
 run common/test_random
 
-run algo/gen_file "$STXXL_TMPDIR/in"
+run io/gen_file "$STXXL_TMPDIR/in"
 run utils/createdisks 1024 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run utils/createdisks 1000 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run utils/log2
@@ -138,7 +138,14 @@ run containers/btree/test_corr_insert_erase 14
 run containers/btree/test_corr_insert_find 14
 run containers/btree/test_corr_insert_scan 14
 
-run algo/sort_file "$STXXL_TMPDIR/in"
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file sort "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file ksort "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file stable_sort "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file stable_ksort "$STXXL_TMPDIR/sort_file.dat"
 run algo/test_asch 3 100 1000 42
 run algo/test_ksort
 run algo/test_manyunits
