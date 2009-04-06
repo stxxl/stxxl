@@ -228,6 +228,12 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
         stats::get_instance()->read_cached(bytes);
         cached = curbuf;
     }
+    else if (physical_offset == 0xffffffff) {
+        // block was deleted or never written before
+        char * uninitialized = (char *)malloc(sizeof(char));
+        memset(buffer, *uninitialized, bytes);
+        free(uninitialized);
+    }
     else
     {
         // block is not cached
