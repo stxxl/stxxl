@@ -254,7 +254,7 @@ void stats::_reset_io_wait_time()
 std::string hr(uint64 number, const char * unit = "")
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
-    static const char * endings[] = { " ", "K", "M", "G", "T", "P", "E" };
+    static const char endings[] = " KMGTPE";
     std::ostringstream out;
     out << number << ' ';
     int scale = 0;
@@ -265,7 +265,9 @@ std::string hr(uint64 number, const char * unit = "")
         ++scale;
     }
     if (scale > 0)
-        out << '(' << std::fixed << std::setprecision(3) << number_d << ' ' << endings[scale] << unit << ") ";
+        out << '(' << std::fixed << std::setprecision(3) << number_d << ' ' << endings[scale] << (unit ? unit : "") << ") ";
+    else if (unit && *unit)
+        out << unit << ' ';
     return out.str();
 }
 
