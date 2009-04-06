@@ -27,18 +27,20 @@ struct my_handler
     }
 };
 
-int main()
+int main(int argc, char ** argv)
 {
+    if (argc < 2)
+    {
+        std::cout << "Usage: " << argv[0] << " tempdir" << std::endl;
+        return -1;
+    }
+
     const int size = 64 * 1024 * 1024;
     char * buffer = (char *)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
-#ifdef BOOST_MSVC
-    const char * path = "data1";
-#else
-    const char * path = "/var/tmp/data1";
-#endif
 
-    stxxl::syscall_file file(path, file::CREAT | file::RDWR | file::DIRECT, 1);
+    std::string tempfilename = std::string(argv[1]) + "/test_cancel.dat";
+    stxxl::syscall_file file(tempfilename, file::CREAT | file::RDWR | file::DIRECT, 1);
     stxxl::request_ptr req[16];
 
     //without cancellation
@@ -67,7 +69,7 @@ int main()
 
     stxxl::aligned_dealloc<4096>(buffer);
 
-    unlink(path);
+    unlink(tempfilename.c_str());
 
     return 0;
 }

@@ -80,7 +80,7 @@ run common/stxxl_info
 run common/stxxl_info foo # returns -1 intentionally
 run common/test_random
 
-run algo/gen_file
+run algo/gen_file "$STXXL_TMPDIR/in"
 run utils/createdisks 1024 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run utils/createdisks 1000 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run utils/log2
@@ -93,8 +93,8 @@ run utils/pq_param
 run io/benchmark_disks 0 2 256 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run io/flushbuffers 2 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run io/sd_test
-run io/test_io
-run io/test_cancel
+run io/test_io "$STXXL_TMPDIR"
+run io/test_cancel "$STXXL_TMPDIR"
 
 run mng/test_block_alloc_strategy
 run mng/test_buf_streams
@@ -138,7 +138,7 @@ run containers/btree/test_corr_insert_erase 14
 run containers/btree/test_corr_insert_find 14
 run containers/btree/test_corr_insert_scan 14
 
-run algo/sort_file
+run algo/sort_file "$STXXL_TMPDIR/in"
 run algo/test_asch 3 100 1000 42
 run algo/test_ksort
 run algo/test_manyunits

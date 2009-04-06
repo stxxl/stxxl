@@ -73,9 +73,15 @@ std::ostream & operator << (std::ostream & o, const my_type & obj)
     return o;
 }
 
-int main()
+int main(int argc, char ** argv)
 {
-    stxxl::syscall_file f("./in", stxxl::file::DIRECT | stxxl::file::RDWR);
+    if (argc < 2)
+    {
+        std::cout << "Usage: " << argv[0] << " file" << std::endl;
+        return -1;
+    }
+
+    stxxl::syscall_file f(argv[1], stxxl::file::DIRECT | stxxl::file::RDWR);
 
     unsigned memory_to_use = 50 * 1024 * 1024;
     typedef stxxl::vector<my_type> vector_type;
