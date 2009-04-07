@@ -92,7 +92,7 @@ int main(int argc, char ** argv)
         return -1;
     }
 
-    if (strcasecmp(argv[1], "generate") == 0) {
+    if (strcmp(argv[1], "generate") == 0) {
         const my_type::key_type max_key = 1 * 1024 * 1024;
         const unsigned int block_size = 1 * 1024 * 1024;
         const unsigned int records_in_block = block_size / sizeof(my_type);
@@ -126,15 +126,15 @@ int main(int argc, char ** argv)
         STXXL_MSG((stxxl::is_sorted(v.begin(), v.end()) ? "OK" : "WRONG"));
 
         STXXL_MSG("Sorting...");
-        if (strcasecmp(argv[1], "sort") == 0) {
+        if (strcmp(argv[1], "sort") == 0) {
             stxxl::sort(v.begin(), v.end(), Cmp(), memory_to_use);
         /* stable_sort is not yet implemented
-        } else if (strcasecmp(argv[1], "stable_sort") == 0) {
+        } else if (strcmp(argv[1], "stable_sort") == 0) {
             stxxl::stable_sort(v.begin(), v.end(), memory_to_use);
         */
-        } else if (strcasecmp(argv[1], "ksort") == 0) {
+        } else if (strcmp(argv[1], "ksort") == 0) {
             stxxl::ksort(v.begin(), v.end(), memory_to_use);
-        } else if (strcasecmp(argv[1], "stable_ksort") == 0) {
+        } else if (strcmp(argv[1], "stable_ksort") == 0) {
             stxxl::stable_ksort(v.begin(), v.end(), memory_to_use);
         } else {
             STXXL_MSG("Not implemented: " << argv[1]);

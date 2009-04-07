@@ -10,6 +10,7 @@ mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJ
 fileperblock_file.$(OBJEXT) request.$(OBJEXT) request_waiters_impl_basic.$(OBJEXT) \
 request_state_impl_basic.$(OBJEXT) request_impl_basic.$(OBJEXT) \
 file_request_basic.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) \
+request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT)
 
 
 
@@ -18,6 +19,9 @@ ufs_file_base.$(OBJEXT): ufs_file_base.cpp
 
 syscall_file.$(OBJEXT): syscall_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c syscall_file.cpp
+
+wbtl_file.$(OBJEXT): wbtl_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wbtl_file.cpp
 
 wincall_file.$(OBJEXT): wincall_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wincall_file.cpp
@@ -64,6 +68,9 @@ file_request_basic.$(OBJEXT): file_request_basic.cpp
 request_queue_impl_qwqr.$(OBJEXT): request_queue_impl_qwqr.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_qwqr.cpp
 
+request_queue_impl_worker.$(OBJEXT): request_queue_impl_worker.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_worker.cpp
+
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)
 
@@ -97,6 +104,16 @@ sd_test: sd_test.$(EXEEXT)
 sd_test.$(EXEEXT): sd_test.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c sd_test.cpp
 	$(LINKER) sd_test.$(OBJEXT) $(OUT)sd_test.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
+
+gen_file: gen_file.$(EXEEXT)
+gen_file.$(EXEEXT): gen_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c gen_file.cpp
+	$(LINKER) gen_file.$(OBJEXT) $(OUT)gen_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
+
+benchmark_disk_and_flash: benchmark_disk_and_flash.$(EXEEXT)
+benchmark_disk_and_flash.$(EXEEXT): benchmark_disk_and_flash.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_disk_and_flash.cpp
+	$(LINKER) benchmark_disk_and_flash.$(OBJEXT) $(OUT)benchmark_disk_and_flash.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
 
 
 clean:
