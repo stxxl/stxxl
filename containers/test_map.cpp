@@ -79,6 +79,7 @@ int main(int argc, char ** argv)
         STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);
         STXXL_MSG(*bm);
         bm->reset();
+        delete DMap;
     }
 
     return 0;
