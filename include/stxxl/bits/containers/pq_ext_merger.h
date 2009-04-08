@@ -663,14 +663,14 @@ namespace priority_queue_local
         }
 
     public:
-        bool spaceIsAvailable() const // for new segment
+        bool is_space_available() const // for new segment
         {
             return k < arity || !free_segments.empty();
         }
 
 
         // insert segment beginning at target
-        // require: spaceIsAvailable() == 1
+        // require: is_space_available() == 1
         template <class Merger>
         void insert_segment(Merger & another_merger, size_type segment_size)
         {

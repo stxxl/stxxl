@@ -547,8 +547,8 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
 
 
     const bool spaceIsAvailable_ =
-        (level < num_int_groups) ? int_mergers[level].spaceIsAvailable()
-        : ((level == total_num_groups - 1) ? true : (ext_mergers[level - num_int_groups].spaceIsAvailable()));
+        (level < num_int_groups) ? int_mergers[level].is_space_available()
+        : ((level == total_num_groups - 1) ? true : (ext_mergers[level - num_int_groups].is_space_available()));
 
     if (spaceIsAvailable_)
     {

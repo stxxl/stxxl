@@ -49,7 +49,7 @@ namespace priority_queue_local
 
         comparator_type cmp;
         // stack of free segment indices
-        internal_bounded_stack<unsigned_type, KNKMAX> free_segments;
+        internal_bounded_stack<unsigned_type, KNKMAX> free_slots;
 
         unsigned_type size_; // total number of elements stored
         unsigned_type logK;  // log of current tree size
@@ -162,7 +162,7 @@ namespace priority_queue_local
         void swap(loser_tree & obj)
         {
             std::swap(cmp, obj.cmp);
-            std::swap(free_segments, obj.free_segments);
+            std::swap(free_slots, obj.free_slots);
             std::swap(size_, obj.size_);
             std::swap(logK, obj.logK);
             std::swap(k, obj.k);
@@ -182,9 +182,9 @@ namespace priority_queue_local
 
         unsigned_type mem_cons() const { return mem_cons_; }
 
-        bool spaceIsAvailable() const // for new segment
+        bool is_space_available() const // for new segment
         {
-            return k < KNKMAX || !free_segments.empty();
+            return k < KNKMAX || !free_slots.empty();
         }
 
         void insert_segment(Element * target, unsigned_type length); // insert segment beginning at target
@@ -195,8 +195,8 @@ namespace priority_queue_local
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     loser_tree<ValTp_, Cmp_, KNKMAX>::loser_tree() : size_(0), logK(0), k(1), mem_cons_(0)
     {
-        free_segments.push(0);
-        segment[0] = 0;
+        free_slots.push(0);
+        segment[0] = NULL;
         current[0] = &sentinel;
         // entry and sentinel are initialized by init
         // since they need the value of supremum
@@ -239,7 +239,7 @@ namespace priority_queue_local
             unsigned_type right = initWinner(2 * root + 1);
             Element lk = *(current[left]);
             Element rk = *(current[right]);
-            if (!(cmp(lk, rk))) { // right subtree looses
+            if (!(cmp(lk, rk))) { // right subtree loses
                 entry[root].index = right;
                 entry[root].key = rk;
                 return left;
@@ -284,7 +284,7 @@ namespace priority_queue_local
                     if (cmp(*winnerKey, newKey)) {              // old winner loses here
                         entry[node].key = *winnerKey;
                         entry[node].index = *winnerIndex;
-                    } else {                                    // new entry looses here
+                    } else {                                    // new entry loses here
                         entry[node].key = newKey;
                         entry[node].index = newIndex;
                     }
@@ -308,10 +308,10 @@ namespace priority_queue_local
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::doubleK()
     {
-        STXXL_VERBOSE3("loser_tree::doubleK (before) k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " #free=" << free_segments.size());
+        STXXL_VERBOSE3("loser_tree::doubleK (before) k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < KNKMAX);
-        assert(free_segments.empty());                   // stack was free (probably not needed)
+        assert(free_slots.empty());                   // stack was free (probably not needed)
 
         // make all new entries free
         // and push them on the free stack
@@ -319,15 +319,15 @@ namespace priority_queue_local
         {
             current[i] = &sentinel;
             segment[i] = NULL;
-            free_segments.push(i);
+            free_slots.push(i);
         }
 
         // double the size
         k *= 2;
         logK++;
 
-        STXXL_VERBOSE3("loser_tree::doubleK (after)  k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " #free=" << free_segments.size());
-        assert(!free_segments.empty());
+        STXXL_VERBOSE3("loser_tree::doubleK (after)  k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " #free=" << free_slots.size());
+        assert(!free_slots.empty());
 
         // recompute loser tree information
         rebuildLoserTree();
@@ -338,48 +338,49 @@ namespace priority_queue_local
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::compactTree()
     {
-        STXXL_VERBOSE3("loser_tree::compactTree (before) k=" << k << " logK=" << logK << " #free=" << free_segments.size());
+        STXXL_VERBOSE3("loser_tree::compactTree (before) k=" << k << " logK=" << logK << " #free=" << free_slots.size());
         assert(logK > 0);
 
         // compact all nonempty segments to the left
-        unsigned_type from = 0;
-        unsigned_type target = 0;
-        for ( ;  from < k;  from++)
+        unsigned_type pos = 0;
+        unsigned_type last_empty = 0;
+        for ( ;  pos < k;  pos++)
         {
-            if (not_sentinel(*(current[from])))
+            if (not_sentinel(*(current[pos])))
             {
-                segment_size[target] = segment_size[from];
-                current[target] = current[from];
-                segment[target] = segment[from];
-                target++;
+                segment_size[last_empty] = segment_size[pos];
+                current[last_empty] = current[pos];
+                segment[last_empty] = segment[pos];
+                last_empty++;
             }/*
                 else
                 {
-                if(segment[from])
+                if(segment[pos])
                 {
-                STXXL_VERBOSE2("loser_tree::compactTree() deleting segment "<<from<<
-                                        " address: "<<segment[from]<<" size: "<<segment_size[from]);
-                delete [] segment[from];
-                segment[from] = 0;
-                mem_cons_ -= segment_size[from];
+                STXXL_VERBOSE2("loser_tree::compactTree() deleting segment "<<pos<<
+                                        " address: "<<segment[pos]<<" size: "<<segment_size[pos]);
+                delete [] segment[pos];
+                segment[pos] = 0;
+                mem_cons_ -= segment_size[pos];
                 }
                 }*/
         }
 
         // half degree as often as possible
-        while (k > 1 && target <= (k / 2)) {
+        while ((k > 1) && ((k/2) >= last_empty))
+        {
             k /= 2;
             logK--;
         }
 
         // overwrite garbage and compact the stack of free segment indices
-        free_segments.clear(); // none free
-        for ( ;  target < k;  target++) {
-            current[target] = &sentinel;
-            free_segments.push(target);
+        free_slots.clear(); // none free
+        for ( ;  last_empty < k;  last_empty++) {
+            current[last_empty] = &sentinel;
+            free_slots.push(last_empty);
         }
 
-        STXXL_VERBOSE3("loser_tree::compactTree (after)  k=" << k << " logK=" << logK << " #free=" << free_segments.size());
+        STXXL_VERBOSE3("loser_tree::compactTree (after)  k=" << k << " logK=" << logK << " #free=" << free_slots.size());
 
         // recompute loser tree information
         rebuildLoserTree();
@@ -387,7 +388,7 @@ namespace priority_queue_local
 
 
 // insert segment beginning at target
-// require: spaceIsAvailable() == 1
+// require: is_space_available() == 1
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::insert_segment(Element * target, unsigned_type length)
     {
@@ -401,12 +402,13 @@ namespace priority_queue_local
             assert(is_sentinel(target[length]));
 
             // get a free slot
-            if (free_segments.empty()) { // tree is too small
+            if (free_slots.empty())
+            { // tree is too small
                 doubleK();
             }
-            assert(!free_segments.empty());
-            unsigned_type index = free_segments.top();
-            free_segments.pop();
+            assert(!free_slots.empty());
+            unsigned_type index = free_slots.top();
+            free_slots.pop();
 
 
             // link new segment
@@ -444,7 +446,7 @@ namespace priority_queue_local
                 mem_cons_ -= segment_size[i];
             }
         }
-        // check whether we did not loose memory
+        // check whether we have not lost any memory
         assert(mem_cons_ == 0);
     }
 
@@ -464,7 +466,7 @@ namespace priority_queue_local
         mem_cons_ -= segment_size[slot];
 
         // push on the stack of free segment indices
-        free_segments.push(slot);
+        free_slots.push(slot);
     }
 
 
@@ -490,7 +492,7 @@ namespace priority_queue_local
         case 0:
             assert(k == 1);
             assert(entry[0].index == 0);
-            assert(free_segments.empty());
+            assert(free_slots.empty());
             //memcpy(target, current[0], length * sizeof(Element));
             std::copy(current[0], current[0] + length, target);
             current[0] += length;
@@ -556,7 +558,7 @@ namespace priority_queue_local
 
         // compact tree if it got considerably smaller
         {
-            const unsigned_type num_segments_used = k - free_segments.size();
+            const unsigned_type num_segments_used = k - free_slots.size();
             const unsigned_type num_segments_trigger = k - (3 * k / 5);
             // using k/2 would be worst case inefficient (for large k)
             // for k \in {2, 4, 8} the trigger is k/2 which is good
@@ -567,10 +569,10 @@ namespace priority_queue_local
                                                      << " <= #trigger=" << num_segments_trigger << " ==> "
                                                      << ((k > 1 && num_segments_used <= num_segments_trigger) ? "yes" : "no ")
                                                      << " || "
-                                                     << ((k == 4 && !free_segments.empty() && !is_segment_empty(3)) ? "yes" : "no ")
-                                                     << " #free=" << free_segments.size());
+                                                     << ((k == 4 && !free_slots.empty() && !is_segment_empty(3)) ? "yes" : "no ")
+                                                     << " #free=" << free_slots.size());
             if (k > 1 && ((num_segments_used <= num_segments_trigger) ||
-                          (k == 4 && !free_segments.empty() && !is_segment_empty(3))))
+                          (k == 4 && !free_slots.empty() && !is_segment_empty(3))))
             {
                 compactTree();
             }
