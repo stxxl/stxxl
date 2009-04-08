@@ -311,7 +311,7 @@ namespace priority_queue_local
         STXXL_VERBOSE3("loser_tree::doubleK (before) k=" << k << " logK=" << logK << " KNKMAX=" << KNKMAX << " #free=" << free_slots.size());
         assert(k > 0);
         assert(k < KNKMAX);
-        assert(free_slots.empty());                   // stack was free (probably not needed)
+        assert(free_slots.empty());                      // stack was free (probably not needed)
 
         // make all new entries free
         // and push them on the free stack
@@ -367,7 +367,7 @@ namespace priority_queue_local
         }
 
         // half degree as often as possible
-        while ((k > 1) && ((k/2) >= last_empty))
+        while ((k > 1) && ((k / 2) >= last_empty))
         {
             k /= 2;
             logK--;
@@ -403,7 +403,7 @@ namespace priority_queue_local
 
             // get a free slot
             if (free_slots.empty())
-            { // tree is too small
+            {   // tree is too small
                 doubleK();
             }
             assert(!free_slots.empty());
