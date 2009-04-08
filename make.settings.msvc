@@ -166,6 +166,10 @@ CONTAINER_FILES	 = \
 	$(HEADER_PATH)/containers/stack.h \
 	$(HEADER_PATH)/containers/vector.h \
 	$(HEADER_PATH)/containers/priority_queue.h \
+	$(HEADER_PATH)/containers/pq_helpers.h \
+	$(HEADER_PATH)/containers/pq_mergers.h \
+	$(HEADER_PATH)/containers/pq_ext_merger.h \
+	$(HEADER_PATH)/containers/pq_losertree.h \
 	$(HEADER_PATH)/containers/queue.h \
 	$(HEADER_PATH)/containers/map.h \
 	$(HEADER_PATH)/containers/deque.h \
