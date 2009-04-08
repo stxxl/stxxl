@@ -12,35 +12,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iomanip>
+#include <queue>
 
-#if GOOGLE_PROFILER
-#include <google/profiler.h>
-#endif
-
-#define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL 1
-#define STXXL_PARALLEL_PQ_STATS 0
-
-//#define _GLIBCXX_ASSERTIONS 0
+#define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1
+#define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER 1
 
 #define TINY_PQ 0
-#define MANUAL_PQ 1
+#define MANUAL_PQ 0
 
-#define SIDE_PQ 0
-
-#if MANUAL_PQ || TINY_PQ
-//#define MCSTL_QUICKSORT_WORKAROUND 1
-#else
-//#define MCSTL_MERGESORT 0
-//#define MCSTL_QUICKSORT 1
-#endif
-
-#ifndef STXXL_CHECK_ORDER_IN_SORTS
-#define STXXL_CHECK_ORDER_IN_SORTS 0
-#endif
-#define STXXL_VERBOSE_LEVEL -1
-#define MCSTL_VERBOSE_LEVEL 0
+#define SIDE_PQ 1
 
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
@@ -134,7 +115,11 @@ int main(int argc, char * argv[])
 {
     if (argc < 3)
     {
-        std::cout << "Usage: " << argv[0] << " [n in megabytes] [p threads]" << std::endl;
+        std::cout << "Usage: " << argv[0] << " [n in megabytes]"
+#if defined(__MCSTL__) || defined(_GLIBCXX_PARALLEL)
+                << " [p threads]"
+#endif
+                << std::endl;
         return -1;
     }
 
@@ -157,21 +142,17 @@ int main(int argc, char * argv[])
 #if SIDE_PQ
                         + " SIDE_PQ"
 #endif
-    ;
-#ifdef __MCSTL__
-    Flags += std::string("")
 #if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
-             + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL"
+                        + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL"
 #endif
 #if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
-             + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL"
+                        + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL"
 #endif
-#if STXXL_PARALLEL_PQ_STATS
-             + " STXXL_PARALLEL_PQ_STATS"
+#if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
+                        + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER"
 #endif
     ;
     STXXL_MSG("Flags:" << Flags);
-#endif
 
     unsigned long megabytes = atoi(argv[1]);
 #ifdef __MCSTL__
@@ -195,6 +176,27 @@ int main(int argc, char * argv[])
     mcstl::SETTINGS::multiway_merge_oversampling = 10;
     mcstl::SETTINGS::multiway_merge_minimal_n = 1000;
     mcstl::SETTINGS::multiway_merge_minimal_k = 2;
+#elif defined(_GLIBCXX_PARALLEL)
+/*    int num_threads = atoi(argv[2]);
+    STXXL_MSG("Threads: " << num_threads);
+
+    omp_set_num_threads(num_threads);
+    __gnu_parallel::_Settings parallel_settings(__gnu_parallel::_Settings::get());
+    parallel_settings.sort_algorithm = __gnu_parallel::QS_BALANCED;
+    parallel_settings.sort_splitting = __gnu_parallel::SAMPLING;
+    parallel_settings.sort_minimal_n = 1000;
+    parallel_settings.sort_mwms_oversampling = 10;
+
+    parallel_settings.merge_splitting = __gnu_parallel::SAMPLING;
+    parallel_settings.merge_minimal_n = 1000;
+    parallel_settings.merge_oversampling = 10;
+
+    parallel_settings.multiway_merge_algorithm = __gnu_parallel::LOSER_TREE;
+    parallel_settings.multiway_merge_splitting = __gnu_parallel::EXACT;
+    parallel_settings.multiway_merge_oversampling = 10;
+    parallel_settings.multiway_merge_minimal_n = 1000;
+    parallel_settings.multiway_merge_minimal_k = 2;
+  __gnu_parallel::_Settings::set(parallel_settings);*/
 #endif
 
     const unsigned mem_for_queue = 2048 * mega;
@@ -245,7 +247,7 @@ int main(int argc, char * argv[])
             >
         > pq_type;
 #else
-    const unsigned_type volume = 200000 * mega;     // in bytes
+    const stxxl::unsigned_type volume = 200000 * mega;     // in bytes
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) / 1024 + 1> gen;
     typedef gen::result pq_type;
 //         BufferSize1 = Config::BufferSize1,
@@ -297,10 +299,6 @@ int main(int argc, char * argv[])
 
     const unsigned long long modulo = 0x10000000;
 
-#if GOOGLE_PROFILER
-    ProfilerStart("extpq_profile");
-#endif
-
 #if SIDE_PQ
     std::priority_queue<my_type, std::vector<my_type>, my_cmp> side_pq;
 #endif
@@ -333,12 +331,14 @@ int main(int argc, char * argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
-            STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+            STXXL_MSG ( "Wrong result at  " << i << "  " << side_pq_least.key << " != " << least.key );
 #endif
 
         if (cmp(last_least, least))
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
-
+        {
+            STXXL_MSG ( "Wrong order at  " << i << "  " << last_least.key << " > " << least.key );
+        }
+        else
             last_least = least;
 
         r = least.key + rand() % modulo;
@@ -369,10 +369,15 @@ int main(int argc, char * argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
+        {
             STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+        }
 #endif
         if (cmp(last_least, least))
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
+        {
+            STXXL_MSG ( "Wrong result at " << i << "  " << last_least.key << " > " << least.key );
+        }
+        else
             last_least = least;
 
         r = least.key + rand() % modulo;
@@ -389,10 +394,15 @@ int main(int argc, char * argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
+        {
             STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+        }
 #endif
         if (cmp(last_least, least))
+        {
             STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
+        }
+        else
             last_least = least;
 
         if ((i % (10 * mega)) == 0)
@@ -404,10 +414,6 @@ int main(int argc, char * argv[])
     }
     STXXL_MSG("Last element " << i << " popped");
     Timer.stop();
-
-#if GOOGLE_PROFILER
-    ProfilerStop();
-#endif
 
     if (sum_input != sum_output)
         STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output));
