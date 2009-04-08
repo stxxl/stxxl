@@ -513,7 +513,7 @@ namespace priority_queue_local
 
         //This is the place to make statistics about internal multi_merge calls.
 
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
         priority_queue_local::invert_order<Cmp_, value_type, value_type> inv_cmp(cmp);
 #endif
         switch (logK) {
@@ -535,7 +535,7 @@ namespace priority_queue_local
             break;
         case 1:
             assert(k == 2);
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
             {
                 std::pair<Element *, Element *> seqs[2] =
                 {
@@ -559,7 +559,7 @@ namespace priority_queue_local
             break;
         case 2:
             assert(k == 4);
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
             {
                 std::pair<Element *, Element *> seqs[4] =
                 {
@@ -595,7 +595,7 @@ namespace priority_queue_local
                 deallocate_segment(3);
 
             break;
-#if !((defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
+#if !(STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
         case  3: multi_merge_f<3>(target, length);
             break;
         case  4: multi_merge_f<4>(target, length);
@@ -614,7 +614,7 @@ namespace priority_queue_local
             break;
 #endif
         default:
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
             {
                 std::vector<std::pair<Element *, Element *> > seqs;
                 std::vector<int_type> orig_seq_index;

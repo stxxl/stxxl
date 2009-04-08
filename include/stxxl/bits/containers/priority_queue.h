@@ -38,13 +38,13 @@
 #endif
 #endif
 
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
 #define STXXL_PQ_EXTERNAL_LOSER_TREE 0 // no loser tree for the external sequences
 #else
 #define STXXL_PQ_EXTERNAL_LOSER_TREE 1
 #endif
 
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
 #define STXXL_PQ_INTERNAL_LOSER_TREE 0 // no loser tree for the internal sequences
 #else
 #define STXXL_PQ_INTERNAL_LOSER_TREE 1
@@ -543,7 +543,7 @@ void priority_queue<Config_>::refill_delete_buffer()
         group_buffer_current_mins[0] += length;
         break;
     case 2:
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
         {
             std::pair<value_type *, value_type *> seqs[2] =
             {
@@ -562,7 +562,7 @@ void priority_queue<Config_>::refill_delete_buffer()
 #endif
         break;
     case 3:
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
         {
             std::pair<value_type *, value_type *> seqs[3] =
             {
@@ -584,7 +584,7 @@ void priority_queue<Config_>::refill_delete_buffer()
 #endif
         break;
     case 4:
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
         {
             std::pair<value_type *, value_type *> seqs[4] =
             {

@@ -472,7 +472,7 @@ namespace priority_queue_local
 
             //This is the place target make statistics about external multi_merge calls.
 
-#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+#if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
             typedef stxxl::int64 diff_type;
             typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
 
@@ -679,7 +679,7 @@ namespace priority_queue_local
                     compactTree();
             }
 
-#else       // (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
+#else       // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
 
             //Hint first non-internal (actually second) block of each sequence.
             //This is mandatory to ensure proper synchronization between prefetch pool and write pool.
