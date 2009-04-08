@@ -136,7 +136,27 @@ namespace priority_queue_local
     };
 
     /**
-     * \brief Similar to std::stack, with the following differences:
+ * @brief Inverts the order of a comparison functor by swapping its arguments.
+ */
+    template <class Predicate, typename first_argument_type, typename second_argument_type>
+    class invert_order
+    {
+    protected:
+        Predicate pred;
+
+    public:
+        explicit
+        invert_order(const Predicate & _pred) : pred(_pred) { }
+
+        bool operator () (const first_argument_type & x, const second_argument_type & y) const
+        {
+            return pred(y, x);
+        }
+    };
+
+
+/**
+ * \brief Similar target std::stack, with the following differences:
      * - Maximum size is fixed at compilation time, so an array can be used.
      * - Can be cleared "at once", without reallocation.
      */

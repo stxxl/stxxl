@@ -41,11 +41,13 @@ namespace priority_queue_local
         typedef value_type Element;
 
     private:
+#if STXXL_PQ_INTERNAL_LOSER_TREE
         struct Entry
         {
             value_type key;      // Key of Loser element (winner for 0)
             unsigned_type index; // number of losing segment
         };
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
         comparator_type cmp;
         // stack of free segment indices
@@ -57,16 +59,19 @@ namespace priority_queue_local
 
         Element sentinel;    // target of free segment pointers
 
+#if STXXL_PQ_INTERNAL_LOSER_TREE
         // upper levels of loser trees
         // entry[0] contains the winner info
         Entry entry[KNKMAX];
+#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 
         // leaf information
         // note that Knuth uses indices k..k-1
         // while we use 0..k-1
         Element * current[KNKMAX];          // pointer to current element
+        Element * current_end[KNKMAX];      // pointer to end of block for current element
         Element * segment[KNKMAX];          // start of Segments
-        unsigned_type segment_size[KNKMAX]; // just to count the internal memory consumption
+        unsigned_type segment_size[KNKMAX]; // just to count the internal memory consumption, in bytes
 
         unsigned_type mem_cons_;
 
@@ -81,6 +86,7 @@ namespace priority_queue_local
         bool is_segment_empty(unsigned_type slot);
         void multi_merge_k(Element * target, unsigned_type length);
 
+#if STXXL_PQ_INTERNAL_LOSER_TREE
         template <unsigned LogK>
         void multi_merge_f(Element * target, unsigned_type length)
         {
@@ -143,6 +149,7 @@ namespace priority_queue_local
             regEntry[0].index = winnerIndex;
             regEntry[0].key = winnerKey;
         }
+#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
 
     public:
         bool is_sentinel(const Element & a)
@@ -167,8 +174,11 @@ namespace priority_queue_local
             std::swap(logK, obj.logK);
             std::swap(k, obj.k);
             std::swap(sentinel, obj.sentinel);
+#if STXXL_PQ_INTERNAL_LOSER_TREE
             swap_1D_arrays(entry, obj.entry, KNKMAX);
+#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
             swap_1D_arrays(current, obj.current, KNKMAX);
+            swap_1D_arrays(current_end, obj.current_end, KNKMAX);
             swap_1D_arrays(segment, obj.segment, KNKMAX);
             swap_1D_arrays(segment_size, obj.segment_size, KNKMAX);
             std::swap(mem_cons_, obj.mem_cons_);
@@ -184,7 +194,7 @@ namespace priority_queue_local
 
         bool is_space_available() const // for new segment
         {
-            return k < KNKMAX || !free_slots.empty();
+            return (k < KNKMAX) || !free_slots.empty();
         }
 
         void insert_segment(Element * target, unsigned_type length); // insert segment beginning at target
@@ -198,6 +208,7 @@ namespace priority_queue_local
         free_slots.push(0);
         segment[0] = NULL;
         current[0] = &sentinel;
+        current_end[0] = &sentinel;
         // entry and sentinel are initialized by init
         // since they need the value of supremum
         init();
@@ -209,7 +220,9 @@ namespace priority_queue_local
         assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
         sentinel = cmp.min_value();
         rebuildLoserTree();
+#if STXXL_PQ_INTERNAL_LOSER_TREE
         assert(current[entry[0].index] == &sentinel);
+#endif  //STXXL_PQ_INTERNAL_LOSER_TREE
     }
 
 
@@ -217,13 +230,16 @@ namespace priority_queue_local
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::rebuildLoserTree()
     {
+#if STXXL_PQ_INTERNAL_LOSER_TREE
         assert(LOG2<KNKMAX>::floor == LOG2<KNKMAX>::ceil); // KNKMAX needs to be a power of two
         unsigned_type winner = initWinner(1);
         entry[0].index = winner;
         entry[0].key = *(current[winner]);
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
     }
 
 
+#if STXXL_PQ_INTERNAL_LOSER_TREE
 // given any values in the leaves this
 // routing recomputes upper levels of the tree
 // from scratch in linear time
@@ -302,6 +318,7 @@ namespace priority_queue_local
             *mask >>= 1; // next level
         }
     }
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
 
 
 // make the tree two times as wide
@@ -318,6 +335,7 @@ namespace priority_queue_local
         for (unsigned_type i = 2 * k - 1;  i >= k;  i--) // backwards
         {
             current[i] = &sentinel;
+            current_end[i] = &sentinel;
             segment[i] = NULL;
             free_slots.push(i);
         }
@@ -350,6 +368,7 @@ namespace priority_queue_local
             {
                 segment_size[last_empty] = segment_size[pos];
                 current[last_empty] = current[pos];
+                current_end[last_empty] = current_end[pos];
                 segment[last_empty] = segment[pos];
                 last_empty++;
             }/*
@@ -375,8 +394,10 @@ namespace priority_queue_local
 
         // overwrite garbage and compact the stack of free segment indices
         free_slots.clear(); // none free
-        for ( ;  last_empty < k;  last_empty++) {
+        for ( ; last_empty < k; last_empty++)
+        {
             current[last_empty] = &sentinel;
+            current_end[last_empty] = &sentinel;
             free_slots.push(last_empty);
         }
 
@@ -413,16 +434,19 @@ namespace priority_queue_local
 
             // link new segment
             current[index] = segment[index] = target;
+            current_end[index] = target + length;
             segment_size[index] = (length + 1) * sizeof(value_type);
             mem_cons_ += (length + 1) * sizeof(value_type);
             size_ += length;
 
+#if STXXL_PQ_INTERNAL_LOSER_TREE
             // propagate new information up the tree
             Element dummyKey;
             unsigned_type dummyIndex;
             unsigned_type dummyMask;
             update_on_insert((index + k) >> 1, *target, index,
                              &dummyKey, &dummyIndex, &dummyMask);
+#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
         } else {
             // immediately deallocate
             // this is not only an optimization
@@ -457,8 +481,9 @@ namespace priority_queue_local
         // reroute current pointer to some empty sentinel segment
         // with a sentinel key
         STXXL_VERBOSE2("loser_tree::deallocate_segment() deleting segment " <<
-                       slot << " address: " << segment[slot] << " size: " << segment_size[slot]);
+                       slot << " address: " << segment[slot] << " size: " << (segment_size[slot] / sizeof(value_type)) - 1);
         current[slot] = &sentinel;
+        current_end[slot] = &sentinel;
 
         // free memory
         delete[] segment[slot];
@@ -488,23 +513,43 @@ namespace priority_queue_local
 
         //This is the place to make statistics about internal multi_merge calls.
 
+#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+        priority_queue_local::invert_order<Cmp_, value_type, value_type> inv_cmp(cmp);
+#endif
         switch (logK) {
         case 0:
             assert(k == 1);
+#if STXXL_PQ_INTERNAL_LOSER_TREE
             assert(entry[0].index == 0);
+#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
             assert(free_slots.empty());
-            //memcpy(target, current[0], length * sizeof(Element));
-            std::copy(current[0], current[0] + length, target);
+            memcpy(target, current[0], length * sizeof(Element));
+            //std::copy(current[0], current[0] + length, target);
             current[0] += length;
+#if STXXL_PQ_INTERNAL_LOSER_TREE
             entry[0].key = **current;
+#endif      //STXXL_PQ_INTERNAL_LOSER_TREE
             if (is_segment_empty(0))
                 deallocate_segment(0);
 
             break;
         case 1:
             assert(k == 2);
+#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+            {
+                std::pair<Element *, Element *> seqs[2] =
+                {
+                    std::make_pair(current[0], current_end[0]),
+                    std::make_pair(current[1], current_end[1])
+                };
+                __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
+                current[0] = seqs[0].first;
+                current[1] = seqs[1].first;
+            }
+#else
             merge_iterator(current[0], current[1], target, length, cmp);
             rebuildLoserTree();
+#endif
             if (is_segment_empty(0))
                 deallocate_segment(0);
 
@@ -514,12 +559,29 @@ namespace priority_queue_local
             break;
         case 2:
             assert(k == 4);
+#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+            {
+                std::pair<Element *, Element *> seqs[4] =
+                {
+                    std::make_pair(current[0], current_end[0]),
+                    std::make_pair(current[1], current_end[1]),
+                    std::make_pair(current[2], current_end[2]),
+                    std::make_pair(current[3], current_end[3])
+                };
+                __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
+                current[0] = seqs[0].first;
+                current[1] = seqs[1].first;
+                current[2] = seqs[2].first;
+                current[3] = seqs[3].first;
+            }
+#else
             if (is_segment_empty(3))
                 merge3_iterator(current[0], current[1], current[2], target, length, cmp);
             else
                 merge4_iterator(current[0], current[1], current[2], current[3], target, length, cmp);
 
             rebuildLoserTree();
+#endif
             if (is_segment_empty(0))
                 deallocate_segment(0);
 
@@ -533,6 +595,7 @@ namespace priority_queue_local
                 deallocate_segment(3);
 
             break;
+#if !((defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL)
         case  3: multi_merge_f<3>(target, length);
             break;
         case  4: multi_merge_f<4>(target, length);
@@ -549,7 +612,39 @@ namespace priority_queue_local
             break;
         case 10: multi_merge_f<10>(target, length);
             break;
-        default: multi_merge_k(target, length);
+#endif
+        default:
+#if (defined(_GLIBCXX_PARALLEL) || defined(__MCSTL__)) && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
+            {
+                std::vector<std::pair<Element *, Element *> > seqs;
+                std::vector<int_type> orig_seq_index;
+                for (unsigned int i = 0; i < k; ++i)
+                {
+                    if (current[i] != current_end[i] && !is_sentinel(*current[i]))
+                    {
+                        seqs.push_back(std::make_pair(current[i], current_end[i]));
+                        orig_seq_index.push_back(i);
+                    }
+                }
+
+                __STXXL_PQ_multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
+
+                for (unsigned int i = 0; i < seqs.size(); ++i)
+                {
+                    int_type seg = orig_seq_index[i];
+                    current[seg] = seqs[i].first;
+                }
+
+                for (unsigned int i = 0; i < k; ++i)
+                    if (is_segment_empty(i))
+                    {
+                        STXXL_VERBOSE3("deallocated " << i);
+                        deallocate_segment(i);
+                    }
+            }
+#else
+            multi_merge_k(target, length);
+#endif
             break;
         }
 
@@ -588,6 +683,7 @@ namespace priority_queue_local
         return (is_sentinel(*(current[slot])) && (current[slot] != &sentinel));
     }
 
+#if STXXL_PQ_INTERNAL_LOSER_TREE
 // multi-merge for arbitrary K
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     void loser_tree<ValTp_, Cmp_, KNKMAX>::
@@ -637,6 +733,7 @@ namespace priority_queue_local
         entry[0].index = winnerIndex;
         entry[0].key = winnerKey;
     }
+#endif //STXXL_PQ_INTERNAL_LOSER_TREE
 } //priority_queue_local
 
 //! \}

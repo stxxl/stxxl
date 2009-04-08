@@ -39,7 +39,9 @@ namespace priority_queue_local
     void merge_iterator(
         InputIterator & source0,
         InputIterator & source1,
-        OutputIterator target, unsigned_type length, Cmp_ cmp)
+        OutputIterator target,
+        unsigned_type length,
+        Cmp_ cmp)
     {
         OutputIterator done = target + length;
 
@@ -70,7 +72,9 @@ namespace priority_queue_local
         InputIterator & source0,
         InputIterator & source1,
         InputIterator & source2,
-        OutputIterator target, unsigned_type length, Cmp_ cmp)
+        OutputIterator target,
+        unsigned_type length,
+        Cmp_ cmp)
     {
         OutputIterator done = target + length;
 
