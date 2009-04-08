@@ -33,28 +33,27 @@
 __STXXL_BEGIN_NAMESPACE
 
 /*
-
    KNBufferSize1 = 32;
-   KNN = 512; // bandwidth
+   KNN = 512; // length of group 1 sequences
    KNKMAX = 64;  // maximal arity
+   LogKNKMAX = 6;  // ceil(log KNKMAX)
    KNLevels = 4; // overall capacity >= KNN*KNKMAX^KNLevels
-   LogKNKMAX = 6;  // ceil(log KNK)
  */
 
-// internal memory consumption >= N_*(KMAX_^Levels_) + ext
+// internal memory consumption >= N_*(KMAX_^IntLevels_) + ext
 
 template <
-    class Tp_,
-    class Cmp_,
-    unsigned BufferSize1_ = 32,       // equalize procedure call overheads etc.
-    unsigned N_ = 512,                // bandwidth
-    unsigned IntKMAX_ = 64,           // maximal arity for internal mergers
-    unsigned IntLevels_ = 4,
-    unsigned BlockSize_ = (2 * 1024 * 1024),
-    unsigned ExtKMAX_ = 64,           // maximal arity for external mergers
-    unsigned ExtLevels_ = 2,
-    class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
-    >
+          class Tp_,
+          class Cmp_,
+          unsigned BufferSize1_ = 32, // equalize procedure call overheads etc.
+          unsigned N_ = 512, // length of group 1 sequences
+          unsigned IntKMAX_ = 64, // maximal arity for internal mergers
+          unsigned IntLevels_ = 4, // number of internal groups
+          unsigned BlockSize_ = (2 * 1024 * 1024), // external block size
+          unsigned ExtKMAX_ = 64, // maximal arity for external mergers
+          unsigned ExtLevels_ = 2, // number of external groups
+          class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY
+>
 struct priority_queue_config
 {
     typedef Tp_ value_type;
@@ -65,8 +64,8 @@ struct priority_queue_config
         delete_buffer_size = BufferSize1_,
         N = N_,
         IntKMAX = IntKMAX_,
-        num_int_levels = IntLevels_,
-        num_ext_levels = ExtLevels_,
+        num_int_groups = IntLevels_,
+        num_ext_groups = ExtLevels_,
         BlockSize = BlockSize_,
         ExtKMAX = ExtKMAX_,
         element_size = sizeof(Tp_)
@@ -107,9 +106,9 @@ public:
         delete_buffer_size = Config::delete_buffer_size,
         N = Config::N,
         IntKMAX = Config::IntKMAX,
-        num_int_levels = Config::num_int_levels,
-        num_ext_levels = Config::num_ext_levels,
-        max_levels = Config::num_int_levels + Config::num_ext_levels,
+        num_int_groups = Config::num_int_groups,
+        num_ext_groups = Config::num_ext_groups,
+        total_num_groups = Config::num_int_groups + Config::num_ext_groups,
         BlockSize = Config::BlockSize,
         ExtKMAX = Config::ExtKMAX
     };
@@ -139,14 +138,14 @@ protected:
         alloc_strategy_type> ext_merger_type;
 
 
-    int_merger_type int_mergers[num_int_levels];
+    int_merger_type int_mergers[num_int_groups];
     prefetch_pool<block_type> & p_pool;
     write_pool<block_type> & w_pool;
     ext_merger_type * ext_mergers;
 
     // one delete buffer for each tree => group buffer
-    value_type group_buffers[max_levels][N + 1]; // tree->group_buffers->delete_buffer (extra space for sentinel)
-    value_type * group_buffer_current_mins[max_levels];   // group_buffer_current_mins[i] is current start of group_buffers[i], end is group_buffers[i] + N
+    value_type group_buffers[total_num_groups][N + 1]; // tree->group_buffers->delete_buffer (extra space for sentinel)
+    value_type * group_buffer_current_mins[total_num_groups];   // group_buffer_current_mins[i] is current start of group_buffers[i], end is group_buffers[i] + N
 
     // overall delete buffer
     value_type delete_buffer[delete_buffer_size + 1];
@@ -157,8 +156,8 @@ protected:
     // insert buffer
     insert_heap_type insert_heap;
 
-    // how many levels are active
-    unsigned_type active_levels;
+    // how many groups are active
+    unsigned_type num_active_groups;
 
     // total size not counting insert_heap and delete_buffer
     size_type size_;
@@ -200,23 +199,23 @@ public:
 
     void swap(priority_queue & obj)
     {
-        //swap_1D_arrays(int_mergers,obj.int_mergers,num_int_levels); // does not work in g++ 3.4.3 :( bug?
-        for (unsigned_type i = 0; i < num_int_levels; ++i)
+        //swap_1D_arrays(int_mergers,obj.int_mergers,num_int_groups); // does not work in g++ 3.4.3 :( bug?
+        for (unsigned_type i = 0; i < num_int_groups; ++i)
             std::swap(int_mergers[i], obj.int_mergers[i]);
 
         // std::swap(p_pool,obj.p_pool);
         // std::swap(w_pool,obj.w_pool);
         std::swap(ext_mergers, obj.ext_mergers);
-        for (unsigned_type i1 = 0; i1 < max_levels; ++i1)
+        for (unsigned_type i1 = 0; i1 < total_num_groups; ++i1)
             for (unsigned_type i2 = 0; i2 < (N + 1); ++i2)
                 std::swap(group_buffers[i1][i2], obj.group_buffers[i1][i2]);
 
-        swap_1D_arrays(group_buffer_current_mins, obj.group_buffer_current_mins, max_levels);
+        swap_1D_arrays(group_buffer_current_mins, obj.group_buffer_current_mins, total_num_groups);
         swap_1D_arrays(delete_buffer, obj.delete_buffer, delete_buffer_size + 1);
         std::swap(delete_buffer_current_min, obj.delete_buffer_current_min);
         std::swap(cmp, obj.cmp);
         std::swap(insert_heap, obj.insert_heap);
-        std::swap(active_levels, obj.active_levels);
+        std::swap(num_active_groups, obj.num_active_groups);
         std::swap(size_, obj.size_);
         //std::swap(deallocate_pools,obj.deallocate_pools);
     }
@@ -264,18 +263,18 @@ public:
     //! the internal memory not including pools (see the constructor)
     unsigned_type mem_cons() const
     {
-        unsigned_type dynam_alloc_mem(0), i(0);
+        unsigned_type dynam_alloc_mem(0);
         //dynam_alloc_mem += w_pool.mem_cons();
         //dynam_alloc_mem += p_pool.mem_cons();
-        for ( ; i < num_int_levels; ++i)
+        for (int i = 0; i < num_int_groups; ++i)
             dynam_alloc_mem += int_mergers[i].mem_cons();
 
-        for (i = 0; i < num_ext_levels; ++i)
+        for (int i = 0; i < num_ext_groups; ++i)
             dynam_alloc_mem += ext_mergers[i].mem_cons();
 
 
         return (sizeof(*this) +
-                sizeof(ext_merger_type) * num_ext_levels +
+                sizeof(ext_merger_type) * num_ext_groups +
                 dynam_alloc_mem);
     }
 };
@@ -298,9 +297,8 @@ inline const typename priority_queue<Config_>::value_type & priority_queue<Confi
     const typename priority_queue<Config_>::value_type & t = insert_heap.top();
     if (/*(!insert_heap.empty()) && */ cmp(*delete_buffer_current_min, t))
         return t;
-
-
-    return *delete_buffer_current_min;
+    else
+        return *delete_buffer_current_min;
 }
 
 template <class Config_>
@@ -343,21 +341,21 @@ template <class Config_>
 priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) :
     p_pool(p_pool_), w_pool(w_pool_),
     insert_heap(N + 2),
-    active_levels(0), size_(0),
+    num_active_groups(0), size_(0),
     deallocate_pools(false)
 {
     STXXL_VERBOSE2("priority_queue::priority_queue()");
     assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
-    //ext_mergers = new ext_merger_type[num_ext_levels](p_pool,w_pool);
-    ext_mergers = new ext_merger_type[num_ext_levels];
-    for (unsigned_type j = 0; j < num_ext_levels; ++j)
+    //ext_mergers = new ext_merger_type[num_ext_groups](p_pool,w_pool);
+    ext_mergers = new ext_merger_type[num_ext_groups];
+    for (unsigned_type j = 0; j < num_ext_groups; ++j)
         ext_mergers[j].set_pools(&p_pool, &w_pool);
 
     value_type sentinel = cmp.min_value();
     delete_buffer[delete_buffer_size] = sentinel;      // sentinel
     insert_heap.push(sentinel);            // always keep the sentinel
     delete_buffer_current_min = delete_buffer + delete_buffer_size;   // empty
-    for (unsigned_type i = 0;  i < max_levels;  i++)
+    for (unsigned_type i = 0;  i < total_num_groups;  i++)
     {
         group_buffers[i][N] = sentinel;         // sentinel
         group_buffer_current_mins[i] = &(group_buffers[i][N]); // empty
@@ -369,20 +367,20 @@ priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type 
     p_pool(*(new prefetch_pool<block_type>(p_pool_mem / BlockSize))),
     w_pool(*(new write_pool<block_type>(w_pool_mem / BlockSize))),
     insert_heap(N + 2),
-    active_levels(0), size_(0),
+    num_active_groups(0), size_(0),
     deallocate_pools(true)
 {
     STXXL_VERBOSE2("priority_queue::priority_queue()");
     assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
-    ext_mergers = new ext_merger_type[num_ext_levels];
-    for (unsigned_type j = 0; j < num_ext_levels; ++j)
+    ext_mergers = new ext_merger_type[num_ext_groups];
+    for (unsigned_type j = 0; j < num_ext_groups; ++j)
         ext_mergers[j].set_pools(&p_pool, &w_pool);
 
     value_type sentinel = cmp.min_value();
     delete_buffer[delete_buffer_size] = sentinel;      // sentinel
     insert_heap.push(sentinel);            // always keep the sentinel
     delete_buffer_current_min = delete_buffer + delete_buffer_size;   // empty
-    for (unsigned_type i = 0;  i < max_levels;  i++)
+    for (unsigned_type i = 0;  i < total_num_groups;  i++)
     {
         group_buffers[i][N] = sentinel;         // sentinel
         group_buffer_current_mins[i] = &(group_buffers[i][N]); // empty
@@ -406,50 +404,47 @@ priority_queue<Config_>::~priority_queue()
 
 // refill group_buffers[j] and return number of elements found
 template <class Config_>
-unsigned_type priority_queue<Config_>::refill_group_buffer(unsigned_type j)
+unsigned_type priority_queue<Config_>::refill_group_buffer(unsigned_type group)
 {
-    STXXL_VERBOSE2("priority_queue::refill_group_buffer(" << j << ")");
+    STXXL_VERBOSE2("priority_queue::refill_group_buffer(" << group << ")");
 
-    value_type * oldTarget;
-    unsigned_type deleteSize;
-    size_type treeSize = (j < num_int_levels) ? int_mergers[j].size() : ext_mergers[j - num_int_levels].size();  //elements left in segments
-    unsigned_type bufferSize = group_buffers[j] + N - group_buffer_current_mins[j];                             //elements left in target buffer
-    if (treeSize + bufferSize >= size_type(N))
+    value_type * target;
+    unsigned_type length;
+    size_type group_size = (group < num_int_groups) ? int_mergers[group].size() : ext_mergers[group - num_int_groups].size();  //elements left in segments
+    unsigned_type left_elements = group_buffers[group] + N - group_buffer_current_mins[group];                             //elements left in target buffer
+    if (group_size + left_elements >= size_type(N))
     {                                                                                      // buffer will be filled completely
-        oldTarget = group_buffers[j];
-        deleteSize = N - bufferSize;
+        target = group_buffers[group];
+        length = N - left_elements;
     }
     else
     {
-        oldTarget = group_buffers[j] + N - treeSize - bufferSize;
-        deleteSize = treeSize;
+        target = group_buffers[group] + N - group_size - left_elements;
+        length = group_size;
     }
 
-    if (deleteSize > 0)
+    if (length > 0)
     {
         // shift  rest to beginning
         // possible hack:
         // - use memcpy if no overlap
-        memmove(oldTarget, group_buffer_current_mins[j], bufferSize * sizeof(value_type));
-        group_buffer_current_mins[j] = oldTarget;
+        memmove(target, group_buffer_current_mins[group], left_elements * sizeof(value_type));
+        group_buffer_current_mins[group] = target;
 
         // fill remaining space from tree
-        if (j < num_int_levels)
-            int_mergers[j].multi_merge(oldTarget + bufferSize, deleteSize);
-
+        if (group < num_int_groups)
+            int_mergers[group].multi_merge(target + left_elements, length);
         else
-        {
             //external
-            ext_mergers[j - num_int_levels].multi_merge(oldTarget + bufferSize,
-                                             oldTarget + bufferSize + deleteSize);
-        }
+            ext_mergers[group - num_int_groups].multi_merge(target + left_elements,
+                                             target + left_elements + length);
     }
 
 
-    //STXXL_MSG(deleteSize + bufferSize);
-    //std::copy(oldTarget,oldTarget + deleteSize + bufferSize,std::ostream_iterator<value_type>(std::cout, "\n"));
+    //STXXL_MSG(length + left_elements);
+    //std::copy(target,target + length + left_elements,std::ostream_iterator<value_type>(std::cout, "\n"));
 
-    return deleteSize + bufferSize;
+    return length + left_elements;
 }
 
 
@@ -460,28 +455,28 @@ void priority_queue<Config_>::refill_delete_buffer()
 {
     STXXL_VERBOSE2("priority_queue::refill_delete_buffer()");
 
-    size_type totalSize = 0;
+    size_type group_size = 0;
     unsigned_type length;
-    //active_levels is <= 4
-    for (int_type i = active_levels - 1;  i >= 0;  i--)
+    //num_active_groups is <= 4
+    for (int_type i = num_active_groups - 1;  i >= 0;  i--)
     {
         if ((group_buffers[i] + N) - group_buffer_current_mins[i] < delete_buffer_size)
         {
             length = refill_group_buffer(i);
             // max active level dry now?
-            if (length == 0 && unsigned_type(i) == active_levels - 1)
-                --active_levels;
+            if (length == 0 && unsigned_type(i) == num_active_groups - 1)
+                --num_active_groups;
 
             else
-                totalSize += length;
+                group_size += length;
         }
         else
         {
-            totalSize += delete_buffer_size;    // actually only a sufficient lower bound
+            group_size += delete_buffer_size;    // actually only a sufficient lower bound
         }
     }
 
-    if (totalSize >= delete_buffer_size)        // buffer can be filled completely
+    if (group_size >= delete_buffer_size)        // buffer can be filled completely
     {
         delete_buffer_current_min = delete_buffer;
         length = delete_buffer_size;                // amount to be copied
@@ -489,8 +484,8 @@ void priority_queue<Config_>::refill_delete_buffer()
     }
     else
     {
-        delete_buffer_current_min = delete_buffer + delete_buffer_size - totalSize;
-        length = totalSize;
+        delete_buffer_current_min = delete_buffer + delete_buffer_size - group_size;
+        length = group_size;
         assert(size_ == size_type(length)); // trees and group_buffers get empty
         size_ = 0;
     }
@@ -499,10 +494,11 @@ void priority_queue<Config_>::refill_delete_buffer()
     // which can make the assumption that
     // they find all they are asked to find in the buffers
     delete_buffer_current_min = delete_buffer + delete_buffer_size - length;
-    STXXL_VERBOSE2("Active levels = " << active_levels);
-    switch (active_levels)
+    STXXL_VERBOSE2("Active groups = " << num_active_groups);
+    switch (num_active_groups)
     {
-    case 0: break;
+    case 0:
+        break;
     case 1:
         std::copy(group_buffer_current_mins[0], group_buffer_current_mins[0] + length, delete_buffer_current_min);
         group_buffer_current_mins[0] += length;
@@ -543,16 +539,16 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
 {
     STXXL_VERBOSE2("priority_queue::make_space_available(" << level << ")");
     unsigned_type finalLevel;
-    assert(level < max_levels);
-    assert(level <= active_levels);
+    assert(level < total_num_groups);
+    assert(level <= num_active_groups);
 
-    if (level == active_levels)
-        active_levels++;
+    if (level == num_active_groups)
+        num_active_groups++;
 
 
     const bool spaceIsAvailable_ =
-        (level < num_int_levels) ? int_mergers[level].spaceIsAvailable()
-        : ((level == max_levels - 1) ? true : (ext_mergers[level - num_int_levels].spaceIsAvailable()));
+        (level < num_int_groups) ? int_mergers[level].spaceIsAvailable()
+        : ((level == total_num_groups - 1) ? true : (ext_mergers[level - num_int_groups].spaceIsAvailable()));
 
     if (spaceIsAvailable_)
     {
@@ -562,7 +558,7 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
     {
         finalLevel = make_space_available(level + 1);
 
-        if (level < num_int_levels - 1)                             // from internal to internal tree
+        if (level < num_int_groups - 1)                             // from internal to internal tree
         {
             unsigned_type segmentSize = int_mergers[level].size();
             value_type * newSegment = new value_type[segmentSize + 1];
@@ -576,17 +572,17 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
         }
         else
         {
-            if (level == num_int_levels - 1) // from internal to external tree
+            if (level == num_int_groups - 1) // from internal to external tree
             {
-                const unsigned_type segmentSize = int_mergers[num_int_levels - 1].size();
+                const unsigned_type segmentSize = int_mergers[num_int_groups - 1].size();
                 STXXL_VERBOSE1("Inserting segment into first level external: " << level << " " << segmentSize);
-                ext_mergers[0].insert_segment(int_mergers[num_int_levels - 1], segmentSize);
+                ext_mergers[0].insert_segment(int_mergers[num_int_groups - 1], segmentSize);
             }
             else // from external to external tree
             {
-                const size_type segmentSize = ext_mergers[level - num_int_levels].size();
+                const size_type segmentSize = ext_mergers[level - num_int_groups].size();
                 STXXL_VERBOSE1("Inserting segment into second level external: " << level << " " << segmentSize);
-                ext_mergers[level - num_int_levels + 1].insert_segment(ext_mergers[level - num_int_levels], segmentSize);
+                ext_mergers[level - num_int_groups + 1].insert_segment(ext_mergers[level - num_int_groups], segmentSize);
             }
         }
     }
