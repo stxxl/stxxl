@@ -3,6 +3,8 @@ include Makefile.common
 
 all: lib
 
+LIB_OBJECTS	+= $(LIB_OBJECTS_NON_MSVC)
+
 include $(TOPDIR)/Makefile.subdir.gnu
 
 lib: lib$(LIBNAME).$(LIBEXT)

@@ -9,8 +9,6 @@ LIB_OBJECTS = \
 	../io/file_request_basic.$(OBJEXT) \
 	../io/ufs_file_base.$(OBJEXT) \
 	../io/syscall_file.$(OBJEXT) \
-	../io/mmap_file.$(OBJEXT) \
-	../io/simdisk_file.$(OBJEXT) \
 	../io/wfs_file_base.$(OBJEXT) \
 	../io/wincall_file.$(OBJEXT) \
 	../io/boostfd_file.$(OBJEXT) \
@@ -23,4 +21,8 @@ LIB_OBJECTS = \
 	../common/rand.$(OBJEXT) \
 	../common/seed.$(OBJEXT) \
 	../common/version.$(OBJEXT)
+
+LIB_OBJECTS_NON_MSVC = \
+	../io/mmap_file.$(OBJEXT) \
+	../io/simdisk_file.$(OBJEXT)
 
