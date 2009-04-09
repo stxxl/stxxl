@@ -18,6 +18,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
+#include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 
 
@@ -42,7 +43,9 @@ class disk_queues : public singleton<disk_queues>
 
 protected:
     request_queue_map queues;
-    disk_queues() { }
+    disk_queues() {
+        stxxl::stats::get_instance(); // initialize stats before ourselves
+    }
 
 public:
     void add_request(request_ptr & req, DISKID disk)
