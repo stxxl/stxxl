@@ -19,25 +19,25 @@ include make.settings
 
 library:
 	cd common
-	$(MAKE) lib
+	$(MAKE) TOPDIR="$(MAKEDIR)" lib
 	cd ..
 	cd io
-	$(MAKE) lib
+	$(MAKE) TOPDIR="$(MAKEDIR)" lib
 	cd ..
 	cd mng
-	$(MAKE) lib
+	$(MAKE) TOPDIR="$(MAKEDIR)" lib
 	cd ..
 	cd algo
-	$(MAKE) lib
+	$(MAKE) TOPDIR="$(MAKEDIR)" lib
 	cd ..
 	cd lib
-	$(MAKE)
+	$(MAKE) TOPDIR="$(MAKEDIR)"
 	cd ..
 	cd common
-	$(MAKE) tools
+	$(MAKE) TOPDIR="$(MAKEDIR)" tools
 	cd ..
 	cd utils
-	$(MAKE) tools
+	$(MAKE) TOPDIR="$(MAKEDIR)" tools
 	cd ..
 	@echo "Building library is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
@@ -48,25 +48,25 @@ library:
 
 tests: library
 	cd common
-	$(MAKE) tests
+	$(MAKE) TOPDIR="$(MAKEDIR)" tests
 	cd ..
 	cd io
-	$(MAKE) tests
+	$(MAKE) TOPDIR="$(MAKEDIR)" tests
 	cd ..
 	cd mng
-	$(MAKE) tests
+	$(MAKE) TOPDIR="$(MAKEDIR)" tests
 	cd ..
 	cd containers
-	$(MAKE) tests
+	$(MAKE) TOPDIR="$(MAKEDIR)" tests
 	cd ..
 	cd algo
-	$(MAKE) tests
+	$(MAKE) TOPDIR="$(MAKEDIR)" tests
 	cd ..
 	cd stream
-	$(MAKE) tests
+	$(MAKE) TOPDIR="$(MAKEDIR)" tests
 	cd ..
 	cd utils
-	$(MAKE) tests
+	$(MAKE) TOPDIR="$(MAKEDIR)" tests
 	cd ..
 	@echo "Building tests is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
@@ -74,28 +74,28 @@ tests: library
 
 clean:
 	cd lib
-	$(MAKE) clean
+	$(MAKE) TOPDIR="$(MAKEDIR)" clean
 	cd ..
 	cd common
-	$(MAKE) clean
+	$(MAKE) TOPDIR="$(MAKEDIR)" clean
 	cd ..
 	cd io
-	$(MAKE) clean
+	$(MAKE) TOPDIR="$(MAKEDIR)" clean
 	cd ..
 	cd mng
-	$(MAKE) clean
+	$(MAKE) TOPDIR="$(MAKEDIR)" clean
 	cd ..
 	cd containers
-	$(MAKE) clean
+	$(MAKE) TOPDIR="$(MAKEDIR)" clean
 	cd ..
 	cd algo
-	$(MAKE) clean
+	$(MAKE) TOPDIR="$(MAKEDIR)" clean
 	cd ..
 	cd stream
-	$(MAKE) clean
+	$(MAKE) TOPDIR="$(MAKEDIR)" clean
 	cd ..
 	cd utils
-	$(MAKE) clean
+	$(MAKE) TOPDIR="$(MAKEDIR)" clean
 	cd ..
 	@echo "Cleaning completed"
 

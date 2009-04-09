@@ -18,7 +18,7 @@
 # Change this file according to your paths.
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = "C:\Users\Johannes Singler\Code\STXXL Trunk"#
+STXXL_ROOT = "$(TOPDIR)"#
 BOOST_ROOT = "C:\Program Files (x86)\boost\boost_1_35_0"#
 
 MAKE = nmake /NOLOGO
