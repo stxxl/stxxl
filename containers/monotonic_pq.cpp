@@ -26,15 +26,15 @@
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
 
-const unsigned long long mega = 1024 * 1024;    //1 * 1024 does not work here
+const stxxl::unsigned_type mega = 1024 * 1024;    //1 * 1024 does not work here
 
 //const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
-const unsigned long long block_size = 4 * mega;
+const stxxl::unsigned_type block_size = 4 * mega;
 
 #define RECORD_SIZE 16
 #define LOAD 0
 
-typedef unsigned long long my_key_type;
+typedef stxxl::uint64 my_key_type;
 
 #define MAGIC 123
 
@@ -247,7 +247,7 @@ int main(int argc, char * argv[])
             >
         > pq_type;
 #else
-    const stxxl::unsigned_type volume = 200000 * mega;     // in bytes
+    const stxxl::uint64 volume = stxxl::uint64(200000) * mega;     // in bytes
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) / 1024 + 1> gen;
     typedef gen::result pq_type;
 //         BufferSize1 = Config::BufferSize1,
@@ -291,13 +291,13 @@ int main(int argc, char * argv[])
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
     STXXL_MSG("Peak number of elements: " << nelements);
-    STXXL_MSG("Max number of elements to contain: " << ((unsigned long long)pq_type::N * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
+    STXXL_MSG("Max number of elements to contain: " << (stxxl::uint64(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
     srand(5);
     my_cmp cmp;
     my_key_type r, sum_input = 0, sum_output = 0;
     my_type least(0), last_least(0);
 
-    const unsigned long long modulo = 0x10000000;
+    const my_key_type modulo = 0x10000000;
 
 #if SIDE_PQ
     std::priority_queue<my_type, std::vector<my_type>, my_cmp> side_pq;
