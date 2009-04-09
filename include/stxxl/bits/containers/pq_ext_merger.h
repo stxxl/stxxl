@@ -498,16 +498,16 @@ namespace priority_queue_local
     #if STXXL_CHECK_ORDER_IN_SORTS
                 if (!is_sentinel(*seqs.back().first) && !stxxl::is_sorted(seqs.back().first, seqs.back().second, inv_cmp))
                 {
-                    STXXL_VERBOSE0("length " << i << " " << (seqs.back().second - seqs.back().first))
+                    STXXL_VERBOSE0("length " << i << " " << (seqs.back().second - seqs.back().first));
                     for (value_type * v = seqs.back().first + 1; v < seqs.back().second; ++v)
                     {
                         if (inv_cmp(*v, *(v - 1)))
                         {
-                            STXXL_VERBOSE0("Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v)
+                            STXXL_VERBOSE0("Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v);
                         }
                         if (is_sentinel(*v))
                         {
-                            STXXL_VERBOSE0("Wrong sentinel at position " << (v - seqs.back().first))
+                            STXXL_VERBOSE0("Wrong sentinel at position " << (v - seqs.back().first));
                         }
                     }
                     assert(false);
@@ -540,9 +540,9 @@ namespace priority_queue_local
                 total_size += (seqs[0].second - seqs[0].first);
 
 
-                STXXL_VERBOSE1("first " << *(seqs[0].first))
-                STXXL_VERBOSE1(" last " << *(last[0]))
-                STXXL_VERBOSE1(" block size " << (seqs[0].second - seqs[0].first))
+                STXXL_VERBOSE1("first " << *(seqs[0].first));
+                STXXL_VERBOSE1(" last " << *(last[0]));
+                STXXL_VERBOSE1(" block size " << (seqs[0].second - seqs[0].first));
 
                 for (unsigned_type i = 1; i < seqs.size(); ++i)
                 {
@@ -576,7 +576,7 @@ namespace priority_queue_local
 
                 ptrdiff_t output_size = std::min(less_equal_than_min_last, rest); //at most rest elements
 
-                STXXL_VERBOSE1("output_size " << output_size << " <= " << less_equal_than_min_last << ", <= " << rest)
+                STXXL_VERBOSE1("output_size " << output_size << " <= " << less_equal_than_min_last << ", <= " << rest);
 
                 assert(output_size > 0);
 
