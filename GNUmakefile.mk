@@ -26,6 +26,7 @@ lib:
 
 tests: lib
 	$(NICE) $(MAKE) -f Makefile tests_$(MODE) $(if $(PMODE),tests_$(MODE)_pmode) $(if $(MCSTL),tests_$(MODE)_mcstl)
+	find . -name \*.d -exec grep -H : {} + | grep '\.\.' ; test $$? = 1
 
 header-compile-test: lib
 	$(NICE) $(MAKE) -C test/compile-stxxl-headers
