@@ -379,13 +379,12 @@ namespace sort_local
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
         typedef run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
 
-        int_type i;
         run_type consume_seq(out_run->size());
 
         int_type * prefetch_seq = new int_type[out_run->size()];
 
         typename run_type::iterator copy_start = consume_seq.begin();
-        for (i = 0; i < nruns; i++)
+        for (int_type i = 0; i < nruns; i++)
         {
             // TODO: try to avoid copy
             copy_start = std::copy(
@@ -417,7 +416,7 @@ namespace sort_local
             n_opt_prefetch_buffers,
             disks_number);
 #else
-        for (i = 0; i < out_run->size(); i++)
+        for (unsigned_type i = 0; i < out_run->size(); i++)
             prefetch_seq[i] = i;
 
 #endif
@@ -573,7 +572,7 @@ namespace sort_local
             value_type last_elem = cmp.min_value();
 #endif
 
-            for (i = 0; i < out_run_size; ++i)
+            for (int_type i = 0; i < out_run_size; ++i)
             {
                 losers.multi_merge(out_buffer->elem);
                 (*out_run)[i].value = *(out_buffer->elem);
@@ -599,7 +598,7 @@ namespace sort_local
         delete[] prefetch_seq;
 
         block_manager * bm = block_manager::get_instance();
-        for (i = 0; i < nruns; ++i)
+        for (int_type i = 0; i < nruns; ++i)
         {
             unsigned_type sz = in_runs[i]->size();
             for (unsigned_type j = 0; j < sz; ++j)
