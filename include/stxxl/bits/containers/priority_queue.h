@@ -481,7 +481,7 @@ unsigned_type priority_queue<Config_>::refill_group_buffer(unsigned_type group)
         {
             if (inv_cmp(*v, *(v - 1)))
             {
-                STXXL_MSG("Error in buffer " << group << " at position " << (v - group_buffer_current_mins[group] - 1) << "/" << (v - group_buffer_current_mins[group]) << "   " << *(v - 2) << " " << *(v - 1) << " " << *v << " " << *(v + 1))
+                STXXL_MSG("Error in buffer " << group << " at position " << (v - group_buffer_current_mins[group] - 1) << "/" << (v - group_buffer_current_mins[group]) << "   " << *(v - 2) << " " << *(v - 1) << " " << *v << " " << *(v + 1));
             }
         }
         assert(false);
@@ -620,7 +620,7 @@ void priority_queue<Config_>::refill_delete_buffer()
         {
             if (inv_cmp(*v, *(v - 1)))
             {
-                STXXL_MSG("Error at position " << (v - delete_buffer_current_min - 1) << "/" << (v - delete_buffer_current_min) << "   " << *(v - 1) << " " << *v)
+                STXXL_MSG("Error at position " << (v - delete_buffer_current_min - 1) << "/" << (v - delete_buffer_current_min) << "   " << *(v - 1) << " " << *v);
             }
         }
         assert(false);
