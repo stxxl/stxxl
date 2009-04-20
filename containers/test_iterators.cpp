@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -89,6 +90,9 @@ void test(svt & sv)
     test_inc_dec(xsvi);
     test_inc_dec(xsvci);
 
+    // test forward iteration
+    for (typename svt::iterator i = sv.begin(); i != sv.end(); ++i) ;
+
 ///////////////////////////////////////////////////////////////////////////
 
     csvt & csv = sv;
@@ -109,6 +113,73 @@ void test(svt & sv)
     // test increment/decrement
     test_inc_dec(csvci);
     test_inc_dec(xsvci);
+
+    // test forward iteration
+    for (typename svt::const_iterator ci = sv.begin(); ci != sv.end(); ++ci) ;
+}
+
+template <typename svt>
+void test_reverse(svt & sv)
+{
+    typedef const svt csvt;
+    typedef typename svt::value_type value_type;
+
+    sv[0] = 108;
+
+    typename svt::reverse_iterator svi = sv.rbegin();
+    modify<value_type>() (*svi);
+
+    typename svt::const_reverse_iterator svci = sv.crbegin();
+    //modify<value_type>()(*svci);      // read-only
+
+    typename csvt::reverse_iterator xsvi = sv.rbegin();
+    modify<value_type>() (*xsvi);
+
+    // test assignment
+    svci = xsvi;
+    //xsvi = svci; // not allowed
+
+    typename csvt::const_reverse_iterator xsvci = sv.crbegin();
+    //modify<value_type>()(*xsvci);     // read-only
+
+    // test comparison between const and non-const iterators
+    svci == xsvi;
+    xsvi == svci;
+    svci != xsvi;
+    xsvi != svci;
+
+    // test increment/decrement
+    test_inc_dec(svi);
+    test_inc_dec(svci);
+    test_inc_dec(xsvi);
+    test_inc_dec(xsvci);
+
+    // test forward iteration
+    for (typename svt::reverse_iterator i = sv.rbegin(); i != sv.rend(); ++i) ;
+
+///////////////////////////////////////////////////////////////////////////
+
+    csvt & csv = sv;
+    //csv[0] = 108; // read-only
+
+    //typename csvt::reverse_iterator csvi = csv.rbegin();    // read-only
+    //modify<value_type>()(*csvi);      // read-only
+
+    typename csvt::const_reverse_iterator csvci = csv.crbegin();
+    //modify<value_type>()(*csvci);     // read-only
+
+    //typename svt::reverse_iterator xcsvi = csv.rbegin();    // read-only
+    //modify<value_type>()(*xcsvi);     // read-only
+
+    typename svt::const_reverse_iterator xcsvci = csv.crbegin();
+    //modify<value_type>()(*csvci);     // read-only
+
+    // test increment/decrement
+    test_inc_dec(csvci);
+    test_inc_dec(xsvci);
+
+    // test forward iteration
+    for (typename svt::const_reverse_iterator ci = sv.crbegin(); ci != sv.crend(); ++ci) ;
 }
 
 template <typename svt>
@@ -130,6 +201,27 @@ void test_random_access(svt & sv)
     // test +, -, +=, -=
     test_inc_dec_random(svci);
     test_inc_dec_random(xsvi);
+}
+
+template <typename svt>
+void test_random_access_reverse(svt & sv)
+{
+    typename svt::const_reverse_iterator svcri = sv.crbegin();
+    typename svt::reverse_iterator xsvri = sv.rbegin();
+
+    // test subtraction of const and non-const iterators
+    svcri - xsvri;
+    xsvri - svcri;
+
+    // bracket operators
+    svcri[0];
+    xsvri[0];
+    //svcri[0] = 1; // read-only
+    xsvri[0] = 1;
+
+    // test +, -, +=, -=
+    test_inc_dec_random(svcri);
+    test_inc_dec_random(xsvri);
 }
 
 
@@ -162,11 +254,15 @@ int main()
 {
     std::vector<int> V(8);
     test(V);
+    test_reverse(V);
     test_random_access(V);
+    test_random_access_reverse(V);
 
     stxxl::vector<int> Vector(8);
     test(Vector);
+    //test_reverse(Vector);
     test_random_access(Vector);
+    //test_random_access_reverse(Vector);
 
 #if ! defined(__GNUG__) || ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 30400)
     typedef stxxl::map<key_type, data_type, cmp, 4096, 4096> map_type;
