@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <vector>
 #include <stxxl.h>
 
 
@@ -21,6 +22,36 @@ struct modify
         ++obj;
     }
 };
+
+template <typename Iterator>
+bool test_inc_dec(Iterator it)
+{
+    Iterator i = it;
+
+    ++i;
+    i++;
+    --i;
+    i--;
+
+    return it == i;
+}
+
+template <typename Iterator>
+bool test_inc_dec_random(Iterator it)
+{
+    Iterator i = it;
+
+    ++i;
+    i = i + 2;
+    i++;
+    i += 3;
+    --i;
+    i = i - 3;
+    i--;
+    i -= 2;
+
+    return it == i;
+}
 
 template <typename svt>
 void test(svt & sv)
@@ -52,6 +83,12 @@ void test(svt & sv)
     svci != xsvi;
     xsvi != svci;
 
+    // test increment/decrement
+    test_inc_dec(svi);
+    test_inc_dec(svci);
+    test_inc_dec(xsvi);
+    test_inc_dec(xsvci);
+
 ///////////////////////////////////////////////////////////////////////////
 
     csvt & csv = sv;
@@ -68,6 +105,10 @@ void test(svt & sv)
 
     typename svt::const_iterator xcsvci = csv.begin();
     //modify<value_type>()(*csvci);     // read-only
+
+    // test increment/decrement
+    test_inc_dec(csvci);
+    test_inc_dec(xsvci);
 }
 
 template <typename svt>
@@ -85,6 +126,10 @@ void test_random_access(svt & sv)
     xsvi[0];
     //svci[0] = 1; // read-only
     xsvi[0] = 1;
+
+    // test +, -, +=, -=
+    test_inc_dec_random(svci);
+    test_inc_dec_random(xsvi);
 }
 
 
@@ -115,6 +160,10 @@ struct modify<std::pair<const key_type, data_type> >
 
 int main()
 {
+    std::vector<int> V(8);
+    test(V);
+    test_random_access(V);
+
     stxxl::vector<int> Vector(8);
     test(Vector);
     test_random_access(Vector);
@@ -122,6 +171,9 @@ int main()
 #if ! defined(__GNUG__) || ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 30400)
     typedef stxxl::map<key_type, data_type, cmp, 4096, 4096> map_type;
     map_type Map(4096 * 10, 4096 * 10);
+    Map[4] = 8;
+    Map[15] = 16;
+    Map[23] = 42;
     test(Map);
 #endif
 
@@ -131,3 +183,5 @@ int main()
 
     return 0;
 }
+
+// vim: et:ts=4:sw=4
