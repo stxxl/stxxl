@@ -120,7 +120,7 @@ cat > make.settings.local.tmp << EOF
 MODE		 = $MODE
 COMPILER_GCC	 = $GCC
 COMPILER_ICPC	 = $ICPC
-STXXL_ROOT	 = `pwd`
+#STXXL_ROOT	 = `pwd`
 MCSTL_ROOT	 = \$(HOME)/work/mcstl
 NICE		 =
 
