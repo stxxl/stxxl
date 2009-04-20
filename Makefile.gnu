@@ -60,19 +60,19 @@ build-lib: SUBDIRS-lib
 
 $(LIBNAME).stamp: build-lib
 	$(RM) $@ $(LIBNAME).mk.tmp
-	echo 'STXXL_CXX	 = $(COMPILER)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS	 = $(stxxl_mk_cppflags)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS	 = $(stxxl_mk_ldlibs)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_STXXL	 = $(STXXL_SPECIFIC)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_STXXL	 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LIBDEPS		 = $(STXXL_LIBDEPS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CXX			 = $(COMPILER)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CPPFLAGS			 = $(stxxl_mk_cppflags)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LDLIBS			 = $(stxxl_mk_ldlibs)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_STXXL		 = $(STXXL_SPECIFIC)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LDLIBS_STXXL		 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LIBDEPS			 = $(STXXL_LIBDEPS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_CPPFLAGS_PARALLEL_MODE	 = $(PARALLEL_MODE_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_LDLIBS_PARALLEL_MODE	 = $(PARALLEL_MODE_LDFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_MCSTL	 = $(MCSTL_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_MCSTL	 = $(MCSTL_LDFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_BOOST	 = $(BOOST_COMPILER_OPTIONS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_BOOST	 = $(BOOST_LINKER_OPTIONS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_WARNFLAGS		 = $(WARNINGS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_MCSTL		 = $(MCSTL_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LDLIBS_MCSTL		 = $(MCSTL_LDFLAGS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_BOOST		 = $(BOOST_COMPILER_OPTIONS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_LDLIBS_BOOST		 = $(BOOST_LINKER_OPTIONS)'	>> $(LIBNAME).mk.tmp
+	echo 'STXXL_WARNFLAGS			 = $(WARNINGS)'	>> $(LIBNAME).mk.tmp
 	echo 'STXXL_DEBUGFLAGS		 = $(DEBUG)'	>> $(LIBNAME).mk.tmp
 	cmp -s $(LIBNAME).mk.tmp $(LIBNAME).mk || mv $(LIBNAME).mk.tmp $(LIBNAME).mk
 	$(RM) $(LIBNAME).mk.tmp
