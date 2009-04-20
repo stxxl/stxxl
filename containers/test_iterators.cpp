@@ -129,7 +129,7 @@ void test_reverse(svt & sv)
     typename svt::reverse_iterator svi = sv.rbegin();
     modify<value_type>() (*svi);
 
-    typename svt::const_reverse_iterator svci = sv.crbegin();
+    typename svt::const_reverse_iterator svci = sv.rbegin();
     //modify<value_type>()(*svci);      // read-only
 
     typename csvt::reverse_iterator xsvi = sv.rbegin();
@@ -139,7 +139,7 @@ void test_reverse(svt & sv)
     svci = xsvi;
     //xsvi = svci; // not allowed
 
-    typename csvt::const_reverse_iterator xsvci = sv.crbegin();
+    typename csvt::const_reverse_iterator xsvci = sv.rbegin();
     //modify<value_type>()(*xsvci);     // read-only
 
     // test comparison between const and non-const iterators
@@ -165,13 +165,13 @@ void test_reverse(svt & sv)
     //typename csvt::reverse_iterator csvi = csv.rbegin();    // read-only
     //modify<value_type>()(*csvi);      // read-only
 
-    typename csvt::const_reverse_iterator csvci = csv.crbegin();
+    typename csvt::const_reverse_iterator csvci = csv.rbegin();
     //modify<value_type>()(*csvci);     // read-only
 
     //typename svt::reverse_iterator xcsvi = csv.rbegin();    // read-only
     //modify<value_type>()(*xcsvi);     // read-only
 
-    typename svt::const_reverse_iterator xcsvci = csv.crbegin();
+    typename svt::const_reverse_iterator xcsvci = csv.rbegin();
     //modify<value_type>()(*csvci);     // read-only
 
     // test increment/decrement
@@ -179,7 +179,7 @@ void test_reverse(svt & sv)
     test_inc_dec(xsvci);
 
     // test forward iteration
-    for (typename svt::const_reverse_iterator ci = sv.crbegin(); ci != sv.crend(); ++ci) ;
+    for (typename svt::const_reverse_iterator ci = sv.rbegin(); ci != sv.rend(); ++ci) ;
 }
 
 template <typename svt>
@@ -206,7 +206,7 @@ void test_random_access(svt & sv)
 template <typename svt>
 void test_random_access_reverse(svt & sv)
 {
-    typename svt::const_reverse_iterator svcri = sv.crbegin();
+    typename svt::const_reverse_iterator svcri = sv.rbegin();
     typename svt::reverse_iterator xsvri = sv.rbegin();
 
     // test subtraction of const and non-const iterators
