@@ -93,6 +93,7 @@ public:
     typedef typename impl_type::key_compare key_compare;
     typedef typename impl_type::value_compare value_compare;
     typedef typename impl_type::pointer pointer;
+    typedef typename impl_type::const_pointer const_pointer;
     typedef typename impl_type::reference reference;
     typedef typename impl_type::const_reference const_reference;
     typedef typename impl_type::size_type size_type;
