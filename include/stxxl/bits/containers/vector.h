@@ -758,6 +758,8 @@ public:
     typedef const_vector_iterator<value_type, alloc_strategy,
                                   size_type, difference_type, block_size, pager_type, page_size> const_iterator;
     friend class const_vector_iterator<value_type, alloc_strategy, size_type, difference_type, block_size, pager_type, page_size>;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     typedef bid_vector<block_size> bids_container_type;
     typedef typename bids_container_type::
@@ -1099,6 +1101,32 @@ public:
     {
         return end();
     }
+
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(end());
+    }
+    const_reverse_iterator rbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    const_reverse_iterator crbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    reverse_iterator rend()
+    {
+        return reverse_iterator(begin());
+    }
+    const_reverse_iterator rend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+    const_reverse_iterator crend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+
     reference operator [] (size_type offset)
     {
         return element(offset);

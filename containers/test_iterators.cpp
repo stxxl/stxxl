@@ -376,9 +376,9 @@ int main()
 
     stxxl::vector<double> Vector(8);
     test(Vector);
-    //test_reverse(Vector);
+    test_reverse(Vector);
     test_random_access(Vector);
-    //test_random_access_reverse(Vector);
+    test_random_access_reverse(Vector);
 
     std::map<key_type, data_type, cmp> M;
     M[4] = 8;
