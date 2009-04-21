@@ -59,6 +59,24 @@ bool test_inc_dec_random(Iterator it)
     return it == i;
 }
 
+template <typename IteratorA, typename IteratorB>
+void test_comparison(IteratorA a, IteratorB b)
+{
+    a == b;
+    a != b;
+
+    b == a;
+    b != a;
+}
+
+template <typename Iterator>
+void test_operators(Iterator it)
+{
+    *it;
+    it.operator->();
+    test_comparison(it, it);
+}
+
 template <typename svt>
 void test(svt & sv)
 {
@@ -84,10 +102,7 @@ void test(svt & sv)
     //modify<value_type>()(*xsvci);     // read-only
 
     // test comparison between const and non-const iterators
-    svci == xsvi;
-    xsvi == svci;
-    svci != xsvi;
-    xsvi != svci;
+    test_comparison(svci, xsvi);
 
     // test increment/decrement
     test_inc_dec(svi);
@@ -95,18 +110,14 @@ void test(svt & sv)
     test_inc_dec(xsvi);
     test_inc_dec(xsvci);
 
+    // test operators
+    test_operators(svi);
+    test_operators(svci);
+    test_operators(xsvi);
+    test_operators(xsvci);
+
     // test forward iteration
     for (typename svt::iterator i = sv.begin(); i != sv.end(); ++i) ;
-
-    *svi;
-    *svci;
-    *xsvi;
-    *xsvci;
-
-    svi.operator->();
-    svci.operator->();
-    xsvi.operator->();
-    xsvci.operator->();
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -127,16 +138,14 @@ void test(svt & sv)
 
     // test increment/decrement
     test_inc_dec(csvci);
-    test_inc_dec(xsvci);
+    test_inc_dec(xcsvci);
+
+    // test operators
+    test_operators(csvci);
+    test_operators(xcsvci);
 
     // test forward iteration
     for (typename svt::const_iterator ci = sv.begin(); ci != sv.end(); ++ci) ;
-
-    *csvci;
-    *xcsvci;
-
-    csvci.operator->();
-    xcsvci.operator->();
 }
 
 template <typename svt>
@@ -165,10 +174,7 @@ void test_reverse(svt & sv)
 
 #if !defined(__GNUG__) || (GCC_VERSION >= 40000)
     // test comparison between const and non-const iterators
-    svci == xsvi;
-    xsvi == svci;
-    svci != xsvi;
-    xsvi != svci;
+    test_comparison(svci, xsvi);
 #endif
 
     // test increment/decrement
@@ -177,18 +183,14 @@ void test_reverse(svt & sv)
     test_inc_dec(xsvi);
     test_inc_dec(xsvci);
 
+    // test operators
+    test_operators(svi);
+    test_operators(svci);
+    test_operators(xsvi);
+    test_operators(xsvci);
+
     // test forward iteration
     for (typename svt::reverse_iterator i = sv.rbegin(); i != sv.rend(); ++i) ;
-
-    *svi;
-    *svci;
-    *xsvi;
-    *xsvci;
-
-    svi.operator->();
-    svci.operator->();
-    xsvi.operator->();
-    xsvci.operator->();
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -209,7 +211,11 @@ void test_reverse(svt & sv)
 
     // test increment/decrement
     test_inc_dec(csvci);
-    test_inc_dec(xsvci);
+    test_inc_dec(xcsvci);
+
+    // test operators
+    test_operators(csvci);
+    test_operators(xcsvci);
 
     // test forward iteration
 #if !defined(__GNUG__) || (GCC_VERSION >= 40000)
@@ -217,12 +223,6 @@ void test_reverse(svt & sv)
 #else
     for (typename svt::const_reverse_iterator ci = sv.rbegin(); ci != typename svt::const_reverse_iterator(sv.rend()); ++ci) ;
 #endif
-
-    *csvci;
-    *xcsvci;
-
-    csvci.operator->();
-    xcsvci.operator->();
 }
 
 template <typename svt>
