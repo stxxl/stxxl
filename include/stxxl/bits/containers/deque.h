@@ -227,9 +227,9 @@ class const_deque_iterator
 
 public:
     typedef typename DequeType::value_type value_type;
-    typedef typename DequeType::pointer pointer;
+    typedef typename DequeType::const_pointer pointer;
     typedef typename DequeType::const_pointer const_pointer;
-    typedef typename DequeType::reference reference;
+    typedef typename DequeType::const_reference reference;
     typedef typename DequeType::const_reference const_reference;
     typedef deque_iterator<DequeType> iterator;
     typedef const_deque_iterator<DequeType> const_iterator;

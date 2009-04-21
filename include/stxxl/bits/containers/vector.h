@@ -517,9 +517,9 @@ public:
 
     typedef std::random_access_iterator_tag iterator_category;
     typedef typename vector_type::value_type value_type;
-    typedef typename vector_type::reference reference;
+    typedef typename vector_type::const_reference reference;
     typedef typename vector_type::const_reference const_reference;
-    typedef typename vector_type::pointer pointer;
+    typedef typename vector_type::const_pointer pointer;
     typedef typename vector_type::const_pointer const_pointer;
 
     enum { block_size = BlkSize_ };
