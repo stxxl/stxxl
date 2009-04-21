@@ -12,6 +12,7 @@
  **************************************************************************/
 
 #include <cassert>
+#include <deque>
 #include <vector>
 #include <stxxl.h>
 
@@ -59,6 +60,32 @@ bool test_inc_dec_random(Iterator it)
     return it == i;
 }
 
+template <typename IteratorA, typename IteratorB, typename Category>
+struct test_comparison_lt_gt
+{
+    void operator() (IteratorA, IteratorB)
+    {
+        // operators <, <=, >=, > are not available in all iterator categories
+    }
+};
+
+template <typename IteratorA, typename IteratorB>
+struct test_comparison_lt_gt<IteratorA, IteratorB, std::random_access_iterator_tag>
+{
+    void operator() (IteratorA a, IteratorB b)
+    {
+        a < b;
+        a <= b;
+        a > b;
+        a >= b;
+
+        b < a;
+        b <= a;
+        b > a;
+        b >= a;
+    }
+};
+
 template <typename IteratorA, typename IteratorB>
 void test_comparison(IteratorA a, IteratorB b)
 {
@@ -67,6 +94,8 @@ void test_comparison(IteratorA a, IteratorB b)
 
     b == a;
     b != a;
+
+    test_comparison_lt_gt<IteratorA, IteratorB, typename std::iterator_traits<IteratorA>::iterator_category>() (a, b);
 }
 
 template <typename Iterator>
@@ -317,6 +346,10 @@ int main()
     Map[23] = 42;
     test(Map);
 #endif
+
+    std::deque<int> D(1);
+    test(D);
+    test_random_access(D);
 
     stxxl::deque<int> Deque(1);
     test(Deque);
