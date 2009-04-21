@@ -100,6 +100,8 @@ public:
     typedef typename impl_type::difference_type difference_type;
     typedef typename impl_type::iterator iterator;
     typedef typename impl_type::const_iterator const_iterator;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     iterator begin() { return Impl.begin(); }
     iterator end() { return Impl.end(); }
@@ -107,6 +109,32 @@ public:
     const_iterator end() const { return Impl.end(); }
     const_iterator cbegin() const { return begin(); }
     const_iterator cend() const { return end(); }
+
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(end());
+    }
+    const_reverse_iterator rbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    const_reverse_iterator crbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    reverse_iterator rend()
+    {
+        return reverse_iterator(begin());
+    }
+    const_reverse_iterator rend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+    const_reverse_iterator crend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+
     size_type size() const { return Impl.size(); }
     size_type max_size() const { return Impl.max_size(); }
     bool empty() const { return Impl.empty(); }

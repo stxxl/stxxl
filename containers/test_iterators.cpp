@@ -385,6 +385,7 @@ int main()
     M[15] = 16;
     M[23] = 42;
     test(M);
+    test_reverse(M);
 
 #if !defined(__GNUG__) || (GCC_VERSION >= 30400)
     typedef stxxl::map<key_type, data_type, cmp, 4096, 4096> map_type;
@@ -393,6 +394,7 @@ int main()
     Map[15] = 16;
     Map[23] = 42;
     test(Map);
+    test_reverse(Map);
 #endif
 
     std::deque<double> D(1);
