@@ -14,6 +14,7 @@
 #include <cassert>
 #include <cstring>
 #include <deque>
+#include <map>
 #include <vector>
 #include <stxxl.h>
 
@@ -27,7 +28,7 @@ const char * _()
 }
 
 template <typename I>
-void dump_iterator_info(I)
+void dump_iterator_info(I&)
 {
     STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
     STXXL_MSG("  category:        " << _<typename std::iterator_traits<I>::iterator_category>());
@@ -35,6 +36,21 @@ void dump_iterator_info(I)
     STXXL_MSG("  difference_type: " << _<typename std::iterator_traits<I>::difference_type>());
     STXXL_MSG("  pointer:         " << _<typename std::iterator_traits<I>::pointer>());
     STXXL_MSG("  reference:       " << _<typename std::iterator_traits<I>::reference>());
+}
+
+template <typename C>
+void dump_container_info(C&)
+{
+    STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
+    STXXL_MSG("  value_type:      " << _<typename C::value_type>());
+    STXXL_MSG("  size_type:       " << _<typename C::size_type>());
+    STXXL_MSG("  difference_type: " << _<typename C::difference_type>());
+    STXXL_MSG("  pointer:         " << _<typename C::pointer>());
+    STXXL_MSG("  const_pointer:   " << _<typename C::const_pointer>());
+    STXXL_MSG("  reference:       " << _<typename C::reference>());
+    STXXL_MSG("  const_reference: " << _<typename C::const_reference>());
+    STXXL_MSG("  iterator:        " << _<typename C::iterator>());
+    STXXL_MSG("  const_iterator:  " << _<typename C::const_iterator>());
 }
 
 template <typename T>
@@ -127,6 +143,8 @@ void test_operators(Iterator it)
 template <typename svt>
 void test(svt & sv)
 {
+    dump_container_info(sv);
+
     typedef const svt csvt;
     typedef typename svt::value_type value_type;
 
@@ -200,6 +218,8 @@ void test(svt & sv)
 template <typename svt>
 void test_reverse(svt & sv)
 {
+    dump_container_info(sv);
+
     typedef const svt csvt;
     typedef typename svt::value_type value_type;
 
@@ -359,6 +379,12 @@ int main()
     //test_reverse(Vector);
     test_random_access(Vector);
     //test_random_access_reverse(Vector);
+
+    std::map<key_type, data_type, cmp> M;
+    M[4] = 8;
+    M[15] = 16;
+    M[23] = 42;
+    test(M);
 
 #if !defined(__GNUG__) || (GCC_VERSION >= 30400)
     typedef stxxl::map<key_type, data_type, cmp, 4096, 4096> map_type;
