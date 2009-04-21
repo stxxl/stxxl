@@ -164,6 +164,21 @@ public:
         return (a - (*this)) > 0;
     }
 
+    bool operator > (const _Self & a) const
+    {
+        return a < (*this);
+    }
+
+    bool operator <= (const _Self & a) const
+    {
+        return !((*this) > a);
+    }
+
+    bool operator >= (const _Self & a) const
+    {
+        return !((*this) < a);
+    }
+
     bool operator == (const const_iterator & a) const
     {
         assert(Deque == a.Deque);
@@ -179,6 +194,21 @@ public:
     {
         assert(Deque == a.Deque);
         return (a - (*this)) > 0;
+    }
+
+    bool operator > (const const_iterator & a) const
+    {
+        return a < (*this);
+    }
+
+    bool operator <= (const const_iterator & a) const
+    {
+        return !((*this) > a);
+    }
+
+    bool operator >= (const const_iterator & a) const
+    {
+        return !((*this) < a);
     }
 };
 
@@ -310,6 +340,21 @@ public:
         return (a - (*this)) > 0;
     }
 
+    bool operator > (const _Self & a) const
+    {
+        return a < (*this);
+    }
+
+    bool operator <= (const _Self & a) const
+    {
+        return !((*this) > a);
+    }
+
+    bool operator >= (const _Self & a) const
+    {
+        return !((*this) < a);
+    }
+
     bool operator == (const iterator & a) const
     {
         assert(Deque == a.Deque);
@@ -325,6 +370,21 @@ public:
     {
         assert(Deque == a.Deque);
         return (a - (*this)) > 0;
+    }
+
+    bool operator > (const iterator & a) const
+    {
+        return a < (*this);
+    }
+
+    bool operator <= (const iterator & a) const
+    {
+        return !((*this) > a);
+    }
+
+    bool operator >= (const iterator & a) const
+    {
+        return !((*this) < a);
     }
 };
 
