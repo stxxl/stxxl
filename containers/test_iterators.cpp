@@ -16,6 +16,8 @@
 #include <stxxl.h>
 
 
+#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
+
 template <typename T>
 struct modify
 {
@@ -161,11 +163,13 @@ void test_reverse(svt & sv)
     typename csvt::const_reverse_iterator xsvci = sv.rbegin();
     //modify<value_type>()(*xsvci);     // read-only
 
+#if !defined(__GNUG__) || (GCC_VERSION >= 40000)
     // test comparison between const and non-const iterators
     svci == xsvi;
     xsvi == svci;
     svci != xsvi;
     xsvi != svci;
+#endif
 
     // test increment/decrement
     test_inc_dec(svi);
@@ -208,7 +212,11 @@ void test_reverse(svt & sv)
     test_inc_dec(xsvci);
 
     // test forward iteration
+#if !defined(__GNUG__) || (GCC_VERSION >= 40000)
     for (typename svt::const_reverse_iterator ci = sv.rbegin(); ci != sv.rend(); ++ci) ;
+#else
+    for (typename svt::const_reverse_iterator ci = sv.rbegin(); ci != typename svt::const_reverse_iterator(sv.rend()); ++ci) ;
+#endif
 
     *csvci;
     *xcsvci;
@@ -244,9 +252,11 @@ void test_random_access_reverse(svt & sv)
     typename svt::const_reverse_iterator svcri = sv.rbegin();
     typename svt::reverse_iterator xsvri = sv.rbegin();
 
+#if !defined(__GNUG__) || (GCC_VERSION >= 40000)
     // test subtraction of const and non-const iterators
     svcri - xsvri;
     xsvri - svcri;
+#endif
 
     // bracket operators
     svcri[0];
@@ -299,7 +309,7 @@ int main()
     test_random_access(Vector);
     //test_random_access_reverse(Vector);
 
-#if ! defined(__GNUG__) || ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 30400)
+#if !defined(__GNUG__) || (GCC_VERSION >= 30400)
     typedef stxxl::map<key_type, data_type, cmp, 4096, 4096> map_type;
     map_type Map(4096 * 10, 4096 * 10);
     Map[4] = 8;
