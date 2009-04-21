@@ -12,12 +12,30 @@
  **************************************************************************/
 
 #include <cassert>
+#include <cstring>
 #include <deque>
 #include <vector>
 #include <stxxl.h>
 
 
 #define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)
+
+template <typename T>
+const char * _()
+{
+    return strchr(STXXL_PRETTY_FUNCTION_NAME, '[');
+}
+
+template <typename I>
+void dump_iterator_info(I)
+{
+    STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
+    STXXL_MSG("  category:        " << _<typename std::iterator_traits<I>::iterator_category>());
+    STXXL_MSG("  value_type:      " << _<typename std::iterator_traits<I>::value_type>());
+    STXXL_MSG("  difference_type: " << _<typename std::iterator_traits<I>::difference_type>());
+    STXXL_MSG("  pointer:         " << _<typename std::iterator_traits<I>::pointer>());
+    STXXL_MSG("  reference:       " << _<typename std::iterator_traits<I>::reference>());
+}
 
 template <typename T>
 struct modify
@@ -115,9 +133,11 @@ void test(svt & sv)
     sv[0] = 108;
 
     typename svt::iterator svi = sv.begin();
+    dump_iterator_info(svi);
     modify<value_type>() (*svi);
 
     typename svt::const_iterator svci = sv.begin();
+    dump_iterator_info(svci);
     //modify<value_type>()(*svci);      // read-only
 
     typename csvt::iterator xsvi = sv.begin();
@@ -186,9 +206,11 @@ void test_reverse(svt & sv)
     sv[0] = 108;
 
     typename svt::reverse_iterator svi = sv.rbegin();
+    dump_iterator_info(svi);
     modify<value_type>() (*svi);
 
     typename svt::const_reverse_iterator svci = sv.rbegin();
+    dump_iterator_info(svci);
     //modify<value_type>()(*svci);      // read-only
 
     typename csvt::reverse_iterator xsvi = sv.rbegin();
@@ -299,8 +321,8 @@ void test_random_access_reverse(svt & sv)
 }
 
 
-typedef unsigned int key_type;
-typedef unsigned int data_type;
+typedef float key_type;
+typedef double data_type;
 
 struct cmp : public std::less<key_type>
 {
@@ -326,13 +348,13 @@ struct modify<std::pair<const key_type, data_type> >
 
 int main()
 {
-    std::vector<int> V(8);
+    std::vector<double> V(8);
     test(V);
     test_reverse(V);
     test_random_access(V);
     test_random_access_reverse(V);
 
-    stxxl::vector<int> Vector(8);
+    stxxl::vector<double> Vector(8);
     test(Vector);
     //test_reverse(Vector);
     test_random_access(Vector);
@@ -347,13 +369,17 @@ int main()
     test(Map);
 #endif
 
-    std::deque<int> D(1);
+    std::deque<double> D(1);
     test(D);
+    test_reverse(D);
     test_random_access(D);
+    test_random_access_reverse(D);
 
-    stxxl::deque<int> Deque(1);
+    stxxl::deque<double> Deque(1);
     test(Deque);
+    //test_reverse(Deque);
     test_random_access(Deque);
+    //test_random_access_reverse(Deque);
 
     return 0;
 }
