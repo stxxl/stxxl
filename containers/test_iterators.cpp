@@ -403,9 +403,9 @@ int main()
 
     stxxl::deque<double> Deque(1);
     test(Deque);
-    //test_reverse(Deque);
+    test_reverse(Deque);
     test_random_access(Deque);
-    //test_random_access_reverse(Deque);
+    test_random_access_reverse(Deque);
 
     return 0;
 }

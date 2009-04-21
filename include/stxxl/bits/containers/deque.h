@@ -416,6 +416,8 @@ public:
     typedef const T & const_reference;
     typedef deque_iterator<Self_> iterator;
     typedef const_deque_iterator<Self_> const_iterator;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     friend class deque_iterator<Self_>;
     friend class const_deque_iterator<Self_>;
@@ -474,6 +476,31 @@ public:
     const_iterator cend() const
     {
         return end();
+    }
+
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(end());
+    }
+    const_reverse_iterator rbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    const_reverse_iterator crbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    reverse_iterator rend()
+    {
+        return reverse_iterator(begin());
+    }
+    const_reverse_iterator rend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+    const_reverse_iterator crend() const
+    {
+        return const_reverse_iterator(begin());
     }
 
     size_type size() const
