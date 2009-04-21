@@ -11,6 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <cassert>
 #include <vector>
 #include <stxxl.h>
 
@@ -34,6 +35,7 @@ bool test_inc_dec(Iterator it)
     --i;
     i--;
 
+    assert(it == i);
     return it == i;
 }
 
@@ -51,6 +53,7 @@ bool test_inc_dec_random(Iterator it)
     i--;
     i -= 2;
 
+    assert(it == i);
     return it == i;
 }
 
@@ -93,6 +96,16 @@ void test(svt & sv)
     // test forward iteration
     for (typename svt::iterator i = sv.begin(); i != sv.end(); ++i) ;
 
+    *svi;
+    *svci;
+    *xsvi;
+    *xsvci;
+
+    svi.operator->();
+    svci.operator->();
+    xsvi.operator->();
+    xsvci.operator->();
+
 ///////////////////////////////////////////////////////////////////////////
 
     csvt & csv = sv;
@@ -116,6 +129,12 @@ void test(svt & sv)
 
     // test forward iteration
     for (typename svt::const_iterator ci = sv.begin(); ci != sv.end(); ++ci) ;
+
+    *csvci;
+    *xcsvci;
+
+    csvci.operator->();
+    xcsvci.operator->();
 }
 
 template <typename svt>
@@ -157,6 +176,16 @@ void test_reverse(svt & sv)
     // test forward iteration
     for (typename svt::reverse_iterator i = sv.rbegin(); i != sv.rend(); ++i) ;
 
+    *svi;
+    *svci;
+    *xsvi;
+    *xsvci;
+
+    svi.operator->();
+    svci.operator->();
+    xsvi.operator->();
+    xsvci.operator->();
+
 ///////////////////////////////////////////////////////////////////////////
 
     csvt & csv = sv;
@@ -180,6 +209,12 @@ void test_reverse(svt & sv)
 
     // test forward iteration
     for (typename svt::const_reverse_iterator ci = sv.rbegin(); ci != sv.rend(); ++ci) ;
+
+    *csvci;
+    *xcsvci;
+
+    csvci.operator->();
+    xcsvci.operator->();
 }
 
 template <typename svt>
