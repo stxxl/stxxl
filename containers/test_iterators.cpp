@@ -243,7 +243,7 @@ void test_reverse(svt & sv)
     typename csvt::const_reverse_iterator xsvci = sv.rbegin();
     //modify<value_type>()(*xsvci);     // read-only
 
-#if !defined(__GNUG__) || (GCC_VERSION >= 40000)
+#if !defined(__GNUG__) || (GCC_VERSION >= 40100)
     // test comparison between const and non-const iterators
     test_comparison(svci, xsvi);
 #endif
@@ -289,7 +289,7 @@ void test_reverse(svt & sv)
     test_operators(xcsvci);
 
     // test forward iteration
-#if !defined(__GNUG__) || (GCC_VERSION >= 40000)
+#if !defined(__GNUG__) || (GCC_VERSION >= 40100)
     for (typename svt::const_reverse_iterator ci = sv.rbegin(); ci != sv.rend(); ++ci) ;
 #else
     for (typename svt::const_reverse_iterator ci = sv.rbegin(); ci != typename svt::const_reverse_iterator(sv.rend()); ++ci) ;
@@ -323,7 +323,7 @@ void test_random_access_reverse(svt & sv)
     typename svt::const_reverse_iterator svcri = sv.rbegin();
     typename svt::reverse_iterator xsvri = sv.rbegin();
 
-#if !defined(__GNUG__) || (GCC_VERSION >= 40000)
+#if !defined(__GNUG__) || (GCC_VERSION >= 40100)
     // test subtraction of const and non-const iterators
     svcri - xsvri;
     xsvri - svcri;
