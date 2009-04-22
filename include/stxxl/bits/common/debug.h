@@ -40,17 +40,17 @@ class debugmon : public singleton<debugmon>
     struct tag
     {
         bool ongoing;
-        char * end;
+        void * end;
         size_t size;
     };
     struct hash_fct
     {
-        inline size_t operator () (char * arg) const
+        inline size_t operator () (void * arg) const
         {
             return long(arg);
         }
 #ifdef BOOST_MSVC
-        bool operator () (char * a, char * b) const
+        bool operator () (void * a, void * b) const
         {
             return (long(a) < long(b));
         }
@@ -62,17 +62,17 @@ class debugmon : public singleton<debugmon>
 #endif
     };
 
-    compat_hash_map<char *, tag, hash_fct>::result tags;
+    compat_hash_map<void *, tag, hash_fct>::result tags;
 
     mutex mutex1;
 
 #endif // #ifdef STXXL_DEBUGMON
 
 public:
-    void block_allocated(char * ptr, char * end, size_t size);
-    void block_deallocated(char * ptr);
-    void io_started(char * ptr);
-    void io_finished(char * ptr);
+    void block_allocated(void * ptr, void * end, size_t size);
+    void block_deallocated(void * ptr);
+    void io_started(void * ptr);
+    void io_finished(void * ptr);
 };
 
 __STXXL_END_NAMESPACE

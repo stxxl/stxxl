@@ -111,7 +111,9 @@ namespace parallel
                    Comparator comp,
                    DiffType length)
     {
-#if defined(_GLIBCXX_PARALLEL)
+#if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
+        return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, length, comp);
+#elif defined(_GLIBCXX_PARALLEL)
         return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
         return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, length, false);

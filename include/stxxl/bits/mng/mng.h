@@ -34,7 +34,8 @@
 #include <memory.h>
 #endif
 
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/common/aligned_alloc.h>
@@ -390,13 +391,13 @@ public:
 
     static void operator delete[] (void * ptr)
     {
-        STXXL_DEBUGMON_DO(block_deallocated((char *)ptr));
+        STXXL_DEBUGMON_DO(block_deallocated(ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
     static void operator delete (void * ptr)
     {
-        STXXL_DEBUGMON_DO(block_deallocated((char *)ptr));
+        STXXL_DEBUGMON_DO(block_deallocated(ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
@@ -526,16 +527,14 @@ protected:
         {
             if (pred->first <= region_pos && pred->first + pred->second > region_pos)
             {
-                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory " <<
-                            "System info: P " << pred->first << " " << pred->second << " " << region_pos);
+                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  in empty space [" << pred->first << " + " << pred->second << "]");
             }
         }
         if (succ != free_space.end())
         {
             if (region_pos <= succ->first && region_pos + region_size > succ->first)
             {
-                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory "
-                     << "System info: S " << region_pos << " " << region_size << " " << succ->first);
+                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  which overlaps empty space [" << succ->first << " + " << succ->second << "]");
             }
         }
     }
@@ -1174,10 +1173,10 @@ class block_manager : public singleton<block_manager>
     block_manager();
 
 protected:
-    template <class BIDType, class DiskAssgnFunctor, class BIDIteratorClass>
+    template <class BIDType, class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks_int(
         const unsigned_type nblocks,
-        DiskAssgnFunctor functor,
+        DiskAssignFunctor functor,
         BIDIteratorClass out);
 
 public:
@@ -1189,9 +1188,9 @@ public:
     //! \param functor object of model of \b allocation_strategy concept
     //! \param bidbegin bidirectional BID iterator object
     //! \param bidend bidirectional BID iterator object
-    template <class DiskAssgnFunctor, class BIDIteratorClass>
+    template <class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks(
-        DiskAssgnFunctor functor,
+        DiskAssignFunctor functor,
         BIDIteratorClass bidbegin,
         BIDIteratorClass bidend);
 
@@ -1203,10 +1202,10 @@ public:
     //! \param out iterator object of OutputIterator concept
     //!
     //! The \c BlockType template parameter defines the type of block to allocate
-    template <class BlockType, class DiskAssgnFunctor, class BIDIteratorClass>
+    template <class BlockType, class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks(
         const unsigned_type nblocks,
-        DiskAssgnFunctor functor,
+        DiskAssignFunctor functor,
         BIDIteratorClass out);
 
 
@@ -1227,29 +1226,26 @@ public:
 };
 
 
-template <class BIDType, class DiskAssgnFunctor, class OutputIterator>
+template <class BIDType, class DiskAssignFunctor, class OutputIterator>
 void block_manager::new_blocks_int(
     const unsigned_type nblocks,
-    DiskAssgnFunctor functor,
+    DiskAssignFunctor functor,
     OutputIterator out)
 {
     typedef BIDType bid_type;
-    typedef  BIDArray<bid_type::t_size> bid_array_type;
+    typedef BIDArray<bid_type::t_size> bid_array_type;
 
-    // bid_type tmpbid;
     int_type * bl = new int_type[ndisks];
     bid_array_type * disk_bids = new bid_array_type[ndisks];
     file ** disk_ptrs = new file *[nblocks];
 
     memset(bl, 0, ndisks * sizeof(int_type));
 
-    unsigned_type i = 0;
-    //OutputIterator  it = out;
-    for ( ; i < nblocks; ++i /* , ++it*/)
+    unsigned_type i;
+    for (i = 0; i < nblocks; ++i)
     {
         const int disk = functor(i);
         disk_ptrs[i] = disk_files[disk];
-        //(*it).storage = disk_files[disk];
         bl[disk]++;
     }
 
@@ -1275,10 +1271,8 @@ void block_manager::new_blocks_int(
     memset(bl, 0, ndisks * sizeof(int_type));
 
     OutputIterator it = out;
-    for (i = 0 /*,it = out */; i != nblocks; ++it, ++i)
+    for (i = 0; i != nblocks; ++it, ++i)
     {
-        //int disk = (*it).storage->get_id();
-        //(*it).offset = disk_bids[disk][bl[disk]++].offset;
         const int disk = disk_ptrs[i]->get_id();
         bid_type bid(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
         *it = bid;
@@ -1290,19 +1284,19 @@ void block_manager::new_blocks_int(
     delete[] disk_ptrs;
 }
 
-template <class BlockType, class DiskAssgnFunctor, class OutputIterator>
+template <class BlockType, class DiskAssignFunctor, class OutputIterator>
 void block_manager::new_blocks(
     const unsigned_type nblocks,
-    DiskAssgnFunctor functor,
+    DiskAssignFunctor functor,
     OutputIterator out)
 {
     typedef typename BlockType::bid_type bid_type;
     new_blocks_int<bid_type>(nblocks, functor, out);
 }
 
-template <class DiskAssgnFunctor, class BIDIteratorClass>
+template <class DiskAssignFunctor, class BIDIteratorClass>
 void block_manager::new_blocks(
-    DiskAssgnFunctor functor,
+    DiskAssignFunctor functor,
     BIDIteratorClass bidbegin,
     BIDIteratorClass bidend)
 {
@@ -1324,11 +1318,11 @@ void block_manager::new_blocks(
 template <unsigned BLK_SIZE>
 void block_manager::delete_block(const BID<BLK_SIZE> & bid)
 {
-    STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:delete " << FMT_BID(bid));
     // do not uncomment it
     //assert(bid.storage->get_id() < config::get_instance()->disks_number());
     if (bid.storage->get_id() == -1)
         return; // self managed disk
+    STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:delete " << FMT_BID(bid));
     assert(bid.storage->get_id() >= 0);
     disk_allocators[bid.storage->get_id()]->delete_block(bid);
     disk_files[bid.storage->get_id()]->delete_region(bid.offset, bid.size);

@@ -20,10 +20,11 @@
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
 
+#include <set>
 #include <cmath>
 #include <sys/mman.h>
 
-#include <stxxl/bits/io/ufs_file.h>
+#include <stxxl/bits/io/ufs_file_base.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -85,7 +86,7 @@ protected:
 public:
     inline DiskGeometry()
     { }
-    double get_delay(stxxl::int64 offset, size_t size);                // returns delay in s
+    double get_delay(file::offset_type offset, file::size_type size);                // returns delay in s
 
     inline ~DiskGeometry()
     { }
@@ -97,8 +98,6 @@ class IC35L080AVVA07 : public DiskGeometry              // IBM series 120GXP
 public:
     IC35L080AVVA07();
 };
-
-class sim_disk_request;
 
 //! \brief Implementation of disk emulation
 //! \remark It is emulation of IBM IC35L080AVVA07 disk's timings
@@ -116,37 +115,9 @@ public:
         "' is resided on swap memory partition!" <<
         std::endl;
     }
-    request_ptr aread(void * buffer, stxxl::int64 pos, size_t bytes,
-                      completion_handler on_cmpl);
-    request_ptr awrite(void * buffer, stxxl::int64 pos, size_t bytes,
-                       completion_handler on_cmpl);
-    void set_size(stxxl::int64 newsize);
-};
-
-
-//! \brief Implementation of disk emulation
-class sim_disk_request : public ufs_request_base
-{
-    friend class sim_disk_file;
-
-protected:
-    inline sim_disk_request(sim_disk_file * f, void * buf, stxxl::int64 off,
-                            size_t b, request_type t,
-                            completion_handler on_cmpl) :
-        ufs_request_base(f,
-                         buf,
-                         off,
-                         b,
-                         t,
-                         on_cmpl)
-    { }
-    void serve();
-
-public:
-    inline const char * io_type()
-    {
-        return "simdisk";
-    }
+    void serve(const request * req) throw(io_error);
+    void set_size(offset_type newsize);
+    const char * io_type() const;
 };
 
 //! \}

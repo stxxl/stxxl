@@ -14,7 +14,6 @@
 #ifndef STXXL_CONTAINERS_HASHMAP__UTIL_H
 #define STXXL_CONTAINERS_HASHMAP__UTIL_H
 
-#include "stxxl/bits/io/iobase.h"
 #include "stxxl/bits/mng/mng.h"
 #include "stxxl/bits/mng/buf_writer.h"
 

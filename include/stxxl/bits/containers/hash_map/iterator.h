@@ -14,7 +14,6 @@
 #define STXXL_CONTAINERS_HASH_MAP__ITERATOR_H
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/io/iobase.h>
 #include <stxxl/bits/mng/mng.h>
 
 #include <stxxl/bits/containers/hash_map/util.h>

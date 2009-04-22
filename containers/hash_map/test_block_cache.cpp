@@ -138,11 +138,11 @@ bool test_block_cache()
         assert(cache.size() == cache_size / 2);
         assert(cache2.size() == cache_size);
         assert(cache2.get_subblock(bids[6], 1) == a_subblock);
-		
-		STXXL_MSG("Passed Block-Cache Test")
+
+        STXXL_MSG("Passed Block-Cache Test");
     }
     catch (...) {
-        STXXL_MSG("Cought unknown exception.")
+        STXXL_MSG("Cought unknown exception.");
         return false;
     }
     return true;

@@ -15,7 +15,6 @@
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/io/iobase.h>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/stream/stream.h>
@@ -856,7 +855,7 @@ namespace hash_map
             {
                 subblock = __load_subblock(bucket, i_subblock);
                 // number of values in i-th subblock
-                size_type n_values = (i_subblock + 1 < n_subblocks) ? subblock_size : (bucket.n_external_ - i_subblock * subblock_size);
+                size_type n_values = (i_subblock + 1 < n_subblocks) ? static_cast<size_type>(subblock_size) : (bucket.n_external_ - i_subblock * subblock_size);
                 // TODO: replace with bucket.n_external_ % subblock_size
 
                 // biggest key in current subblock still too small => next subblock

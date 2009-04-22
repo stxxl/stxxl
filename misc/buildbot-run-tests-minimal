@@ -1,0 +1,40 @@
+#!/bin/sh
+
+variants="stxxl mcstxxl pmstxxl"
+
+ulimit -t 7200
+set -o pipefail
+
+run_ldd()
+{
+	cmd="$1.$stxxl.bin"
+	shift
+	test -x $cmd || return 0
+	echo "==================== ldd $cmd ===================="
+	ldd $cmd
+}
+
+run()
+{
+	cmd="$1.$stxxl.bin"
+	shift
+	test -x $cmd || return 0
+	echo "==================== $cmd $@ ===================="
+	echo "[`date`] Start"
+	$cmd "$@" < /dev/null
+	result=$?
+	echo "[`date`] Finish($result)"
+}
+
+
+for stxxl in $variants
+do
+	run_ldd common/stxxl_info
+done
+
+for stxxl in $variants
+do
+	run common/stxxl_info
+done
+
+echo "==================== finished ===================="

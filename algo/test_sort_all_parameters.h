@@ -14,6 +14,16 @@
 #include <limits>
 #include <stxxl/types>
 
+template <unsigned n>
+struct bulk
+{
+    char _data[n];
+};
+
+template <>
+struct bulk<0>
+{
+};
 
 template <typename KEY, unsigned SIZE>
 struct my_type
@@ -21,7 +31,7 @@ struct my_type
     typedef KEY key_type;
 
     key_type _key;
-    char _data[SIZE - sizeof(key_type)];
+    bulk<SIZE - sizeof(key_type)> _data;
 
     my_type() { }
     my_type(key_type __key) : _key(__key) { }

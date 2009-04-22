@@ -22,7 +22,7 @@
 
 #include <sys/mman.h>
 
-#include <stxxl/bits/io/ufs_file.h>
+#include <stxxl/bits/io/ufs_file_base.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -44,37 +44,8 @@ public:
     inline mmap_file(const std::string & filename, int mode, int disk = -1) :
         ufs_file_base(filename, mode, disk)
     { }
-    request_ptr aread(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-    request_ptr awrite(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-};
-
-//! \brief Implementation of memory mapped access file request
-class mmap_request : public ufs_request_base
-{
-    friend class mmap_file;
-
-protected:
-    inline mmap_request(mmap_file * f,
-                        void * buf, stxxl::int64 off, size_t b,
-                        request_type t,
-                        completion_handler on_cmpl) :
-        ufs_request_base(f, buf, off, b, t, on_cmpl)
-    { }
-    void serve();
-
-public:
-    inline const char * io_type()
-    {
-        return "mmap";
-    }
+    void serve(const request * req) throw(io_error);
+    const char * io_type() const;
 };
 
 //! \}

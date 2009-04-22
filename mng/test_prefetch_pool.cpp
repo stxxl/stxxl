@@ -31,10 +31,17 @@ int main()
     stxxl::prefetch_pool<block_type> pool(2);
     pool.resize(10);
     pool.resize(5);
+
     block_type * blk = new block_type;
-    block_type::bid_type bid;
-    stxxl::block_manager::get_instance()->new_blocks(stxxl::single_disk(), &bid, (&bid) + 1);
-    pool.hint(bid);
-    pool.read(blk, bid)->wait();
+    (*blk)[0].integer = 42;
+    block_type::bid_type bids[2];
+    stxxl::block_manager::get_instance()->new_blocks(stxxl::single_disk(), bids, bids + 2);
+    blk->write(bids[0])->wait();
+    blk->write(bids[1])->wait();
+
+    pool.hint(bids[0]);
+    pool.read(blk, bids[0])->wait();
+    pool.read(blk, bids[1])->wait();
+
     delete blk;
 }

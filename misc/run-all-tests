@@ -12,7 +12,8 @@
 #  http://www.boost.org/LICENSE_1_0.txt)
 ############################################################################
 
-# Usage: $0 [stxxl|mcstxxl] [yes|no (valgrind)] [yes|no (leakreport=full)]
+# Usage: $0 [stxxl|mcstxxl|pmstxxl] [yes|no (valgrind)] [yes|no (leakreport=full)]
+# Environment: STXXL_TMPDIR (default: .) for location of generated input/output files
 
 
 ulimit -t 7200
@@ -39,6 +40,11 @@ mkdir -p $testresults
 
 AMI_SINGLE_DEVICE=/tmp/TPIE/
 export AMI_SINGLE_DEVICE
+
+if ! [ -n "$STXXL_TMPDIR" -a -d "$STXXL_TMPDIR" -a -w "$STXXL_TMPDIR" ]; then
+	STXXL_TMPDIR="."
+fi
+echo "Using STXXL_TMPDIR='$STXXL_TMPDIR'"
 
 i=0
 run()
@@ -74,9 +80,9 @@ run common/stxxl_info
 run common/stxxl_info foo # returns -1 intentionally
 run common/test_random
 
-run algo/gen_file
-run utils/createdisks 1024 testdiskx testdisky
-run utils/createdisks 1000 testdiskx testdisky
+run io/gen_file "$STXXL_TMPDIR/in"
+run utils/createdisks 1024 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
+run utils/createdisks 1000 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run utils/log2
 run utils/malloc 1024
 run utils/malloc 1024000
@@ -84,10 +90,11 @@ run utils/malloc 4000000000
 run utils/off_t_size
 run utils/pq_param
 
-run io/benchmark_disks 0 2 testdiskx testdisky
-run io/flushbuffers 2 testdiskx testdisky
+run io/benchmark_disks 0 2 256 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
+run io/flushbuffers 2 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run io/sd_test
-run io/test_io
+run io/test_io "$STXXL_TMPDIR"
+run io/test_cancel "$STXXL_TMPDIR"
 
 run mng/test_block_alloc_strategy
 run mng/test_buf_streams
@@ -98,7 +105,7 @@ run mng/test_write_pool
 run mng/test_mng_recursive_alloc
 
 run containers/bench_pqueue
-run containers/copy_file in out
+run containers/copy_file "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
 run containers/monotonic_pq 1000 1
 run containers/pq_benchmark 1 1000000
 run containers/pq_benchmark 2 1000000
@@ -116,8 +123,9 @@ run containers/test_pqueue
 run containers/test_queue
 run containers/test_stack 1024
 run containers/test_vector
-run containers/write_vector in out
-run containers/write_vector2 in out
+run containers/test_vector_export
+run containers/write_vector "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
+run containers/write_vector2 "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
 run containers/test_map 32
 run containers/test_map_random 2000
 run containers/btree/test_btree 10000
@@ -130,7 +138,14 @@ run containers/btree/test_corr_insert_erase 14
 run containers/btree/test_corr_insert_find 14
 run containers/btree/test_corr_insert_scan 14
 
-run algo/sort_file
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file sort "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file ksort "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file stable_sort "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file stable_ksort "$STXXL_TMPDIR/sort_file.dat"
 run algo/test_asch 3 100 1000 42
 run algo/test_ksort
 run algo/test_manyunits

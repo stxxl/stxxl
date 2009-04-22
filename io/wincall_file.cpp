@@ -11,165 +11,90 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/wincall_file.h>
+#include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/common/debug.h>
 
 #ifdef BOOST_MSVC
 
 __STXXL_BEGIN_NAMESPACE
 
 
-wincall_request::wincall_request(
-    wincall_file * f,
-    void * buf,
-    stxxl::int64 off,
-    size_t b,
-    request_type t,
-    completion_handler on_cmpl) :
-    wfs_request_base(f, buf, off, b, t, on_cmpl)
-{ }
-
-void wincall_request::serve()
+void wincall_file::serve(const request * req) throw(io_error)
 {
-    stats * iostats = stats::get_instance();
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
-                                << nref() << ") " <<
-                     " this=" << long(this) << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
-                                << " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
-    STXXL_VERBOSE2("wincall_request::serve(): Buffer at " << ((void *)buffer)
-                                                          << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE");
-                   );
+    scoped_mutex_lock fd_lock(fd_mutex);
+    assert(req->get_file() == this);
+    offset_type offset = req->get_offset();
+    void * buffer = req->get_buffer();
+    size_type bytes = req->get_size();
+    request::request_type type = req->get_type();
 
-    try {
+    if (bytes > 32 * 1024 * 1024) {
+        STXXL_ERRMSG("Using a block size larger than 32 MB may not work with the " << io_type() << " filetype");
+    }
+
+        HANDLE handle = file_des;
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = offset;
-        if (!SetFilePointerEx(static_cast<wincall_file *>(file_)->get_file_des(),
-                              desired_pos, NULL, FILE_BEGIN))
-            stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve() offset=" << offset
-                                                                                            << " this=" << long(this) << " buffer=" <<
-                                     buffer << " bytes=" << bytes
-                                                                                            << " type=" << ((type == READ) ? "READ" : "WRITE"), io_error);
-
+        if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))
         {
-            if (type == READ)
-            {
-                stats::scoped_read_timer read_timer(size());
+            stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve()" <<
+                                     " offset=" << offset <<
+                                     " this=" << this <<
+                                     " buffer=" << buffer <<
+                                     " bytes=" << bytes <<
+                                     " type=" << ((type == request::READ) ? "READ" : "WRITE"),
+                                     io_error);
+        }
+        else
+        {
+            stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-                STXXL_DEBUGMON_DO(io_started((char *)buffer));
+            if (type == request::READ)
+            {
+                STXXL_DEBUGMON_DO(io_started(buffer));
                 DWORD NumberOfBytesRead = 0;
-                if (!ReadFile(static_cast<wincall_file *>(file_)->get_file_des(),
-                              buffer, bytes, &NumberOfBytesRead, NULL))
+                if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
                 {
-                    stxxl_win_lasterror_exit("ReadFile this=" << long(this) <<
+                    stxxl_win_lasterror_exit("ReadFile" <<
+                                             " this=" << this <<
                                              " offset=" << offset <<
-                                             " buffer=" << buffer << " bytes=" << bytes << " type=" <<
-                                             ((type == READ) ? "READ" : "WRITE") << " nref= " << nref() <<
-                                             " NumberOfBytesRead= " << NumberOfBytesRead, io_error)
+                                             " buffer=" << buffer <<
+                                             " bytes=" << bytes <<
+                                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                             " NumberOfBytesRead= " << NumberOfBytesRead,
+                                             io_error);
                 }
 
-                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+                STXXL_DEBUGMON_DO(io_finished(buffer));
             }
             else
             {
-                stats::scoped_write_timer write_timer(size());
-
-                STXXL_DEBUGMON_DO(io_started((char *)buffer));
+                STXXL_DEBUGMON_DO(io_started(buffer));
 
                 DWORD NumberOfBytesWritten = 0;
-                if (!WriteFile(static_cast<wincall_file *>(file_)->get_file_des(), buffer, bytes,
-                               &NumberOfBytesWritten, NULL))
+                if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
                 {
-                    stxxl_win_lasterror_exit("WriteFile this=" << long(this) <<
+                    stxxl_win_lasterror_exit("WriteFile" <<
+                                             " this=" << this <<
                                              " offset=" << offset <<
-                                             " buffer=" << buffer << " bytes=" << bytes << " type=" <<
-                                             ((type == READ) ? "READ" : "WRITE") << " nref= " << nref() <<
-                                             " NumberOfBytesWritten= " << NumberOfBytesWritten, io_error)
+                                             " buffer=" << buffer <<
+                                             " bytes=" << bytes <<
+                                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                             " NumberOfBytesWritten= " << NumberOfBytesWritten,
+                                             io_error);
                 }
 
-                STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+                STXXL_DEBUGMON_DO(io_finished(buffer));
             }
         }
-    }
-    catch (const io_error & ex)
-    {
-        error_occured(ex.what());
-    }
-
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
-                     " this=" << long(this) <<
-                     " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
-
-    _state.set_to(DONE);
-
-    {
-        scoped_mutex_lock Lock(waiters_mutex);
-
-        // << notification >>
-        std::for_each(
-            waiters.begin(),
-            waiters.end(),
-            std::mem_fun(&onoff_switch::on));
-    }
-
-    completed();
-    _state.set_to(READY2DIE);
 }
 
-const char * wincall_request::io_type()
+const char * wincall_file::io_type() const
 {
-    return "syscall";
-}
-
-////////////////////////////////////////////////////////////////////////////
-
-wincall_file::wincall_file(
-    const std::string & filename,
-    int mode,
-    int disk) : wfs_file_base(filename, mode, disk)
-{ }
-
-request_ptr wincall_file::aread(
-    void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new wincall_request(this,
-                                          buffer, pos, bytes,
-                                          request::READ, on_cmpl);
-
-    if (!req.get())
-        stxxl_function_error(io_error);
-
- #ifndef NO_OVERLAPPING
-    disk_queues::get_instance()->add_readreq(req, get_id());
- #endif
-    return req;
-}
-
-request_ptr wincall_file::awrite(
-    void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new wincall_request(this, buffer, pos, bytes,
-                                          request::WRITE, on_cmpl);
-
-    if (!req.get())
-        stxxl_function_error(io_error);
-
- #ifndef NO_OVERLAPPING
-    disk_queues::get_instance()->add_writereq(req, get_id());
- #endif
-    return req;
+    return "wincall";
 }
 
 __STXXL_END_NAMESPACE
 
 #endif // #ifdef BOOST_MSVC
+// vim: et:ts=4:sw=4

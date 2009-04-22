@@ -18,17 +18,17 @@
 # Change this file according to your paths.
 
 # change this path, do not leave spaces at the end of the line 
-STXXL_ROOT = "C:\unordered_map"#
-BOOST_ROOT = "C:\Program Files\boost\boost_1_34_1"#
+STXXL_ROOT = "$(TOPDIR)"#
+include make.settings.local
 
 MAKE = nmake /NOLOGO
 COMPILER = cl
 LINKER = link
-OPT = /O2
+OPT = /O2 /Ob2
 WARNINGS =
-DEBUG_COMPILER = /MD # debug is off
+DEBUG_COMPILER = /MD /DNDEBUG # debug is off
 # DEBUG_COMPILER  = /MDd /Zi # debug is on
-DEBUG_LINKER = # debug is off
+DEBUG_LINKER = /OPT:REF # debug is off
 # DEBUG_LINKER = /Zi # debug is on
 
 LIBNAME = stxxl
@@ -99,11 +99,12 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/namespace.h \
 	$(HEADER_PATH)/noncopyable.h \
 	$(HEADER_PATH)/version.h \
-	$(HEADER_PATH)/compat_auto_ptr.h \
+	$(HEADER_PATH)/compat_unique_ptr.h \
 	$(HEADER_PATH)/compat_hash_map.h \
 	$(HEADER_PATH)/compat_hash_set.h \
 	$(HEADER_PATH)/parallel.h \
 	$(HEADER_PATH)/singleton.h \
+	$(HEADER_PATH)/defines.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
 	$(HEADER_PATH)/common/mutex.h \
 	$(HEADER_PATH)/common/rand.h \
@@ -111,6 +112,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/state.h \
 	$(HEADER_PATH)/common/timer.h \
 	$(HEADER_PATH)/common/utils.h \
+	$(HEADER_PATH)/common/error_handling.h \
 	$(HEADER_PATH)/common/simple_vector.h \
 	$(HEADER_PATH)/common/switch.h \
 	$(HEADER_PATH)/common/tmeta.h \
@@ -124,18 +126,29 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/is_sorted.h 
 
 IO_LAYER_FILES	 = \
-	$(HEADER_PATH)/io/completion_handler.h \
 	$(HEADER_PATH)/io/io.h \
-	$(HEADER_PATH)/io/iobase.h \
 	$(HEADER_PATH)/io/iostats.h \
+	$(HEADER_PATH)/io/completion_handler.h \
+	$(HEADER_PATH)/io/request.h \
+	$(HEADER_PATH)/io/request_waiters_impl_basic.h \
+	$(HEADER_PATH)/io/request_state_impl_basic.h \
+	$(HEADER_PATH)/io/request_impl_basic.h \
+	$(HEADER_PATH)/io/disk_queues.h \
+	$(HEADER_PATH)/io/request_queue.h \
+	$(HEADER_PATH)/io/request_queue_impl_worker.h \
+	$(HEADER_PATH)/io/request_queue_impl_qwqr.h \
+	$(HEADER_PATH)/io/file.h \
+	$(HEADER_PATH)/io/file_request_basic.h \
+	$(HEADER_PATH)/io/ufs_file_base.h \
+	$(HEADER_PATH)/io/syscall_file.h \
 	$(HEADER_PATH)/io/mmap_file.h \
 	$(HEADER_PATH)/io/simdisk_file.h \
-	$(HEADER_PATH)/io/syscall_file.h \
-	$(HEADER_PATH)/io/ufs_file.h \
+	$(HEADER_PATH)/io/wfs_file_base.h \
 	$(HEADER_PATH)/io/wincall_file.h \
-	$(HEADER_PATH)/io/wfs_file.h \
 	$(HEADER_PATH)/io/boostfd_file.h \
-	$(HEADER_PATH)/io/mem_file.h
+	$(HEADER_PATH)/io/mem_file.h \
+	$(HEADER_PATH)/io/fileperblock_file.h \
+	$(HEADER_PATH)/io/wbtl_file.h
 
 MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/adaptor.h \
@@ -153,6 +166,10 @@ CONTAINER_FILES	 = \
 	$(HEADER_PATH)/containers/stack.h \
 	$(HEADER_PATH)/containers/vector.h \
 	$(HEADER_PATH)/containers/priority_queue.h \
+	$(HEADER_PATH)/containers/pq_helpers.h \
+	$(HEADER_PATH)/containers/pq_mergers.h \
+	$(HEADER_PATH)/containers/pq_ext_merger.h \
+	$(HEADER_PATH)/containers/pq_losertree.h \
 	$(HEADER_PATH)/containers/queue.h \
 	$(HEADER_PATH)/containers/map.h \
 	$(HEADER_PATH)/containers/deque.h \

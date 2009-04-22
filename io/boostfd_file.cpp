@@ -13,6 +13,7 @@
 #ifdef STXXL_BOOST_CONFIG
 
 #include <stxxl/bits/io/boostfd_file.h>
+#include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/common/debug.h>
 
 #include <boost/filesystem/operations.hpp>
@@ -22,209 +23,88 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-boostfd_request::boostfd_request(
-    boostfd_file * f,
-    void * buf,
-    stxxl::int64 off,
-    size_t b,
-    request_type t,
-    completion_handler on_cmpl) :
-    request(on_cmpl, f, buf, off, b, t),
-    _state(OP)
-{ }
-
-boostfd_request::~boostfd_request()
+void boostfd_file::serve(const request * req) throw(io_error)
 {
-    STXXL_VERBOSE3("boostfd_request " << this << ": deletion, cnt: " << ref_cnt);
-
-    assert(_state() == DONE || _state() == READY2DIE);
-}
-
-bool boostfd_request::add_waiter(onoff_switch * sw)
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-
-    if (poll())   // request already finished
-    {
-        return true;
-    }
-
-    waiters.insert(sw);
-
-    return false;
-}
-
-void boostfd_request::delete_waiter(onoff_switch * sw)
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    waiters.erase(sw);
-}
-
-int boostfd_request::nwaiters()     // returns number of waiters
-{
-    scoped_mutex_lock Lock(waiters_mutex);
-    return waiters.size();
-}
-
-void boostfd_request::check_aligning()
-{
-    if (offset % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Offset is not aligned: modulo "
-                << BLOCK_ALIGN << " = " <<
-                     offset % BLOCK_ALIGN);
-
-    if (bytes % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Size is not a multiple of " <<
-                     BLOCK_ALIGN << ", = " << bytes % BLOCK_ALIGN);
-
-    if (long(buffer) % BLOCK_ALIGN != 0)
-        STXXL_ERRMSG("Buffer is not aligned: modulo "
-                << BLOCK_ALIGN << " = " <<
-                     long(buffer) % BLOCK_ALIGN << " (" <<
-                     std::hex << buffer << std::dec << ")");
-}
-
-void boostfd_request::wait()
-{
-    STXXL_VERBOSE3("boostfd_request : " << this << " wait ");
-
-    stats::scoped_wait_timer wait_timer;
-
- #ifdef NO_OVERLAPPING
-    enqueue();
- #endif
-
-    _state.wait_for(READY2DIE);
-
-    check_errors();
-}
-
-bool boostfd_request::poll()
-{
- #ifdef NO_OVERLAPPING
-    /*if(_state () < DONE)*/ wait();
- #endif
-
-    const bool s = _state() >= DONE;
-
-    check_errors();
-
-    return s;
-}
-
-void boostfd_request::serve()
-{
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: serious error, reference to the request is lost before serve (nref="
-        << nref() << ") " <<
-                     " this=" << long(this) << " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes
-        << " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
-    STXXL_VERBOSE2("boostfd_request::serve(): Buffer at " << ((void *)buffer)
-                                                          << " offset: " << offset << " bytes: " << bytes << ((type == READ) ? " READ" : " WRITE")
-                   );
-
-    boostfd_file::fd_type fd = static_cast<boostfd_file *>(file_)->get_file_des();
+    scoped_mutex_lock fd_lock(fd_mutex);
+    assert(req->get_file() == this);
+    offset_type offset = req->get_offset();
+    void * buffer = req->get_buffer();
+    size_type bytes = req->get_size();
+    request::request_type type = req->get_type();
 
     try
     {
-        fd.seek(offset, BOOST_IOS::beg);
+        file_des.seek(offset, BOOST_IOS::beg);
     }
     catch (const std::exception & ex)
     {
-        STXXL_FORMAT_ERROR_MSG(msg, "seek() in boostfd_request::serve() offset=" << offset
-                                                                                 << " this=" << long(this) << " buffer=" <<
-                               buffer << " bytes=" << bytes
-                                                                                 << " type=" << ((type == READ) ? "READ" : "WRITE") << " : " << ex.what());
-
-        error_occured(msg.str());
+            STXXL_THROW2(io_error,
+                         "Error doing seek() in boostfd_request::serve()" <<
+                         " offset=" << offset <<
+                         " this=" << this <<
+                         " buffer=" << buffer <<
+                         " bytes=" << bytes <<
+                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                         " : " << ex.what());
     }
 
-    {
-        if (type == READ)
-        {
-            stats::scoped_read_timer read_timer(size());
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-            STXXL_DEBUGMON_DO(io_started((char *)buffer));
+        if (type == request::READ)
+        {
+            STXXL_DEBUGMON_DO(io_started(buffer));
 
             try
             {
-                fd.read((char *)buffer, bytes);
+                file_des.read((char *)buffer, bytes);
             }
             catch (const std::exception & ex)
             {
-                STXXL_FORMAT_ERROR_MSG(msg, "read() in boostfd_request::serve() offset=" << offset
-                                                                                         << " this=" << long(this) << " buffer=" <<
-                                       buffer << " bytes=" << bytes
-                                                                                         << " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                                       " nref= " << nref() << " : " << ex.what());
-
-                error_occured(msg.str());
+                STXXL_THROW2(io_error,
+                             "Error doing read() in boostfd_request::serve()" <<
+                             " offset=" << offset <<
+                             " this=" << this <<
+                             " buffer=" << buffer <<
+                             " bytes=" << bytes <<
+                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                             " : " << ex.what());
             }
 
-            STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
         else
         {
-            stats::scoped_write_timer write_timer(size());
-
-            STXXL_DEBUGMON_DO(io_started((char *)buffer));
+            STXXL_DEBUGMON_DO(io_started(buffer));
 
             try
             {
-                fd.write((char *)buffer, bytes);
+                file_des.write((char *)buffer, bytes);
             }
             catch (const std::exception & ex)
             {
-                STXXL_FORMAT_ERROR_MSG(msg, "write() in boostfd_request::serve() offset=" << offset
-                                                                                          << " this=" << long(this) << " buffer=" <<
-                                       buffer << " bytes=" << bytes
-                                                                                          << " type=" << ((type == READ) ? "READ" : "WRITE") <<
-                                       " nref= " << nref() << " : " << ex.what());
-
-                error_occured(msg.str());
+                STXXL_THROW2(io_error,
+                             "Error doing write() in boostfd_request::serve()" <<
+                             " offset=" << offset <<
+                             " this=" << this <<
+                             " buffer=" << buffer <<
+                             " bytes=" << bytes <<
+                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                             " : " << ex.what());
             }
 
-            STXXL_DEBUGMON_DO(io_finished((char *)buffer));
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
-    }
-
-    if (nref() < 2)
-    {
-        STXXL_ERRMSG("WARNING: reference to the request is lost after serve (nref=" << nref() << ") " <<
-                     " this=" << long(this) <<
-                     " offset=" << offset << " buffer=" << buffer << " bytes=" << bytes <<
-                     " type=" << ((type == READ) ? "READ" : "WRITE"));
-    }
-
-    _state.set_to(DONE);
-
-    {
-        scoped_mutex_lock Lock(waiters_mutex);
-
-        // << notification >>
-        std::for_each(
-            waiters.begin(),
-            waiters.end(),
-            std::mem_fun(&onoff_switch::on));
-    }
-
-    completed();
-    _state.set_to(READY2DIE);
 }
 
-const char * boostfd_request::io_type()
+const char * boostfd_file::io_type() const
 {
     return "boostfd";
 }
 
-////////////////////////////////////////////////////////////////////////////
-
 boostfd_file::boostfd_file(
     const std::string & filename,
     int mode,
-    int disk) : file(disk), mode_(mode)
+    int disk) : file_request_basic(disk), mode_(mode)
 {
     BOOST_IOS::openmode boostfd_mode;
 
@@ -280,68 +160,36 @@ boostfd_file::boostfd_file(
 
 boostfd_file::~boostfd_file()
 {
+    scoped_mutex_lock fd_lock(fd_mutex);
     file_des.close();
 }
 
-boost::iostreams::file_descriptor
-boostfd_file::get_file_des() const
+inline file::offset_type boostfd_file::_size()
 {
-    return file_des;
+    return file_des.seek(0, BOOST_IOS::end);
 }
 
-stxxl::int64 boostfd_file::size()
+file::offset_type boostfd_file::size()
 {
-    stxxl::int64 size_ = file_des.seek(0, BOOST_IOS::end);
-    return size_;
+    scoped_mutex_lock fd_lock(fd_mutex);
+    return _size();
 }
 
-void boostfd_file::set_size(stxxl::int64 newsize)
+void boostfd_file::set_size(offset_type newsize)
 {
-    stxxl::int64 oldsize = size();
+    scoped_mutex_lock fd_lock(fd_mutex);
+    offset_type oldsize = _size();
     file_des.seek(newsize, BOOST_IOS::beg);
     file_des.seek(0, BOOST_IOS::beg); // not important ?
-    assert(size() >= oldsize);
+    assert(_size() >= oldsize);
 }
 
-request_ptr boostfd_file::aread(
-    void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
-    completion_handler on_cmpl)
+void boostfd_file::lock()
 {
-    request_ptr req = new boostfd_request(this,
-                                          buffer, pos, bytes,
-                                          request::READ, on_cmpl);
-
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-
- #ifndef NO_OVERLAPPING
-    disk_queues::get_instance()->add_readreq(req, get_id());
- #endif
-    return req;
-}
-
-request_ptr boostfd_file::awrite(
-    void * buffer,
-    stxxl::int64 pos,
-    size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new boostfd_request(this, buffer, pos, bytes,
-                                          request::WRITE, on_cmpl);
-
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-
- #ifndef NO_OVERLAPPING
-    disk_queues::get_instance()->add_writereq(req, get_id());
- #endif
-    return req;
+    // FIXME: is there no locking possible/needed/... for boostfd?
 }
 
 __STXXL_END_NAMESPACE
 
 #endif // #ifdef STXXL_BOOST_CONFIG
+// vim: et:ts=4:sw=4

@@ -22,6 +22,7 @@
  * - Linux (kernel >= 2.4.18)
  * - Solaris
  * - Mac OS X
+ * - FreeBSD
  * - other POSIX compatible systems should work, but have not been tested
  * - Windows 2000/XP/Vista
  *
@@ -126,10 +127,14 @@
  * data structure. When the reference is used, the block that contains the
  * element may be no longer in internal memory.<br>
  * Use/pass an iterator (reference) instead.<br>
- * For stxxl::vector with \c n pages and LRU replacement strategy it
+ * For an \c stxxl::vector with \c n pages and LRU replacement strategy, it
  * can be guaranteed that the last \c n references
- * obtained using stxxl::vector operator [] or dereferencing
- * an iterator are valid. <br>
+ * obtained using \c stxxl::vector::operator[] or dereferencing
+ * an iterator are valid.
+ * However, if \c n is 1, even a single innocent-looking line like
+ * \verbatim std::cout << v[0] << " " << v[1000000] << std::endl; \endverbatim can lead to
+ * inconsistent results.
+ * <br>
  *
  *
  * \section q2 Thread-Safety
@@ -139,6 +144,13 @@
  * I.e. you may access <b>different</b> \c S<small>TXXL</small> data structures from concurrent threads without problems,
  * but you should not share a data structure between threads (without implementing proper locking yourself).<br>
  * This is a design choice, having the data structures thread-safe would mean a significant performance loss.
+ *
+ *
+ * \section q3 I have configured several disks to use with STXXL. Why does STXXL fail complaining about the lack of space? According to my calclulations, the space on the disks should be sufficient.
+ *
+ * This may happen if the disks have different size. With the default parameters \c S<small>TXXL</small> containers use randomized block-to-disk allocation strategies
+ * that distribute data evenly between the disks but ignore the availability of free space on them. 
+ *
  *
  */
 
@@ -279,6 +291,14 @@ my_example.bin: my_example.o
  *     to a file on a RAM disk partition with sufficient space
  *
  * See also the example configuration file \c 'config_example' included in the tarball.
+ *
+ *
+ * \section logfiles Log files
+ *
+ * \c S<small>TXXL</small> produces two kinds of log files, a message and an error log.
+ * By setting the environment variables \c STXXLLOGFILE and \c STXXLERRLOGFILE, you can configure
+ * the location of these files.
+ * The default values are \c stxxl.log and \c stxxl.errlog, respectively.
  *
  *
  * \section excreation Precreating external memory files

@@ -1,7 +1,7 @@
 include Makefile.common
 include ../make.settings
 
-tests: $(TESTS)
+tests: $(TESTS) $(TESTS_MAP)
 	cd btree
 	$(MAKE) tests
 	cd ..
@@ -71,6 +71,11 @@ test_vector: test_vector.$(EXEEXT)
 test_vector.$(EXEEXT): test_vector.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_vector.cpp
 	$(LINKER)  test_vector.$(OBJEXT) $(OUT)test_vector.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+test_vector_export: test_vector_export.$(EXEEXT)
+test_vector_export.$(EXEEXT): test_vector_export.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_vector_export.cpp
+	$(LINKER)  test_vector_export.$(OBJEXT) $(OUT)test_vector_export.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_stack: test_stack.$(EXEEXT)
 test_stack.$(EXEEXT): test_stack.cpp $(DEPENDENCIES)

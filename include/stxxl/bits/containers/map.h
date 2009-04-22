@@ -52,7 +52,7 @@ namespace btree
 //! struct CmpIntGreater
 //! {
 //!   bool operator () (const int & a, const int & b) const { return a>b; }
-//!   static int max_value() { return std::numeric_limits<int>::max(); }
+//!   static int max_value() { return std::numeric_limits<int>::min(); }
 //! };
 //! \endverbatim
 //! Another example:
@@ -60,7 +60,7 @@ namespace btree
 //! struct CmpIntLess
 //! {
 //!   bool operator () (const int & a, const int & b) const { return a<b; }
-//!   static int max_value() const  { return std::numeric_limits<int>::min(); }
+//!   static int max_value() const  { return std::numeric_limits<int>::max(); }
 //! };
 //! \endverbatim
 //! Note that CompareType must define a strict weak ordering.
@@ -93,12 +93,15 @@ public:
     typedef typename impl_type::key_compare key_compare;
     typedef typename impl_type::value_compare value_compare;
     typedef typename impl_type::pointer pointer;
+    typedef typename impl_type::const_pointer const_pointer;
     typedef typename impl_type::reference reference;
     typedef typename impl_type::const_reference const_reference;
     typedef typename impl_type::size_type size_type;
     typedef typename impl_type::difference_type difference_type;
     typedef typename impl_type::iterator iterator;
     typedef typename impl_type::const_iterator const_iterator;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     iterator begin() { return Impl.begin(); }
     iterator end() { return Impl.end(); }
@@ -106,6 +109,32 @@ public:
     const_iterator end() const { return Impl.end(); }
     const_iterator cbegin() const { return begin(); }
     const_iterator cend() const { return end(); }
+
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(end());
+    }
+    const_reverse_iterator rbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    const_reverse_iterator crbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    reverse_iterator rend()
+    {
+        return reverse_iterator(begin());
+    }
+    const_reverse_iterator rend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+    const_reverse_iterator crend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+
     size_type size() const { return Impl.size(); }
     size_type max_size() const { return Impl.max_size(); }
     bool empty() const { return Impl.empty(); }

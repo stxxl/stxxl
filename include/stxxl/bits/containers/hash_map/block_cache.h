@@ -19,7 +19,6 @@
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/compat_hash_map.h>
-#include <stxxl/bits/io/iobase.h>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/containers/btree/btree_pager.h>
 
@@ -248,8 +247,7 @@ namespace hash_map
                 i_block2kick = pager_.kick();
                 if (i == max_tries)
                 {
-                    STXXL_FORMAT_ERROR_MSG(msg, "The block cache is too small, no block can be kicked out (all blocks are retained)!");
-                    throw std::runtime_error(msg.str());
+                    throw std::runtime_error("The block cache is too small, no block can be kicked out (all blocks are retained)!");
                 }
                 pager_.hit(i_block2kick);
             } while (retain_count_[i_block2kick] > 0);

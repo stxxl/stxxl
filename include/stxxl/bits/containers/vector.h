@@ -15,6 +15,7 @@
 #define STXXL_VECTOR_HEADER
 
 #include <vector>
+#include <queue>
 #include <algorithm>
 
 #include <stxxl/bits/mng/mng.h>
@@ -34,18 +35,16 @@ __STXXL_BEGIN_NAMESPACE
 //! \ingroup stlcont
 //! \{
 
-template <unsigned_type modulo2, unsigned_type modulo1>
+template <typename size_type, size_type modulo2, size_type modulo1>
 class double_blocked_index
 {
-    static const unsigned_type modulo12 = modulo1 * modulo2;
+    static const size_type modulo12 = modulo1 * modulo2;
 
-    unsigned_type pos;
-    unsigned_type block1, block2;
-    unsigned_type offset;
+    size_type pos, block1, block2, offset;
 
     //! \invariant block2 * modulo12 + block1 * modulo1 + offset == pos && 0 <= block1 &lt; modulo2 && 0 <= offset &lt; modulo1
 
-    void set(unsigned_type pos)
+    void set(size_type pos)
     {
         this->pos = pos;
         block2 = pos / modulo12;
@@ -64,24 +63,23 @@ public:
         set(0);
     }
 
-    double_blocked_index(unsigned_type pos)
+    double_blocked_index(size_type pos)
     {
         set(pos);
     }
 
-    double_blocked_index(unsigned_type block2, unsigned_type block1, unsigned_type)
+    double_blocked_index(size_type block2, size_type block1, size_type offset)
     {
+        assert(/* 0 <= block1 && */ block1 < modulo2);
+        assert(/* 0 <= offset && */ offset < modulo1);
+        
         this->block2 = block2;
         this->block1 = block1;
         this->offset = offset;
         pos = block2 * modulo12 + block1 * modulo1 + offset;
-
-        assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
-        assert(/* 0 <= block1 && */ block1 < modulo2);
-        assert(/* 0 <= offset && */ offset < modulo1);
     }
 
-    double_blocked_index & operator = (unsigned_type pos)
+    double_blocked_index & operator = (size_type pos)
     {
         set(pos);
         return *this;
@@ -149,28 +147,28 @@ public:
         return former;
     }
 
-    double_blocked_index operator + (unsigned_type addend) const
+    double_blocked_index operator + (size_type addend) const
     {
         return double_blocked_index(pos + addend);
     }
 
-    double_blocked_index & operator += (unsigned_type addend)
+    double_blocked_index & operator += (size_type addend)
     {
         set(pos + addend);
         return *this;
     }
 
-    double_blocked_index operator - (unsigned_type addend) const
+    double_blocked_index operator - (size_type addend) const
     {
         return double_blocked_index(pos - addend);
     }
 
-    unsigned_type operator - (const double_blocked_index & dbi2) const
+    size_type operator - (const double_blocked_index & dbi2) const
     {
         return pos - dbi2.pos;
     }
 
-    double_blocked_index & operator -= (unsigned_type subtrahend)
+    double_blocked_index & operator -= (size_type subtrahend)
     {
         set(pos - subtrahend);
         return *this;
@@ -206,28 +204,28 @@ public:
         return pos >= dbi2.pos;
     }
 
-    double_blocked_index & operator >>= (unsigned_type shift)
+    double_blocked_index & operator >>= (size_type shift)
     {
         set(pos >> shift);
         return *this;
     }
 
-    unsigned_type get_pos() const
+    size_type get_pos() const
     {
         return pos;
     }
 
-    const unsigned_type & get_block2() const
+    const size_type & get_block2() const
     {
         return block2;
     }
 
-    const unsigned_type & get_block1() const
+    const size_type & get_block1() const
     {
         return block1;
     }
 
-    const unsigned_type & get_offset() const
+    const size_type & get_offset() const
     {
         return offset;
     }
@@ -300,7 +298,7 @@ public:
     enum { block_size = BlkSize_ };
 
 protected:
-    double_blocked_index<PgSz_, block_type::size> offset;
+    double_blocked_index<SzTp_, PgSz_, block_type::size> offset;
     vector_type * p_vector;
 
 private:
@@ -385,9 +383,14 @@ public:
         return p_vector->const_element(offset.get_pos() + op);
     }
 
-    void touch()
+    void block_externally_updated()
     {
-        p_vector->touch(offset);
+        p_vector->block_externally_updated(offset);
+    }
+
+    __STXXL_DEPRECATED(void touch())
+    {
+        block_externally_updated();
     }
 
     _Self & operator ++ ()
@@ -435,12 +438,12 @@ public:
     bool operator > (const _Self & a) const
     {
         assert(p_vector == a.p_vector);
-        return a > *this;
+        return offset > a.offset;
     }
     bool operator >= (const _Self & a) const
     {
         assert(p_vector == a.p_vector);
-        return a >= *this;
+        return offset >= a.offset;
     }
 
     bool operator == (const const_iterator & a) const
@@ -466,12 +469,12 @@ public:
     bool operator > (const const_iterator & a) const
     {
         assert(p_vector == a.p_vector);
-        return a > *this;
+        return offset > a.offset;
     }
     bool operator >= (const const_iterator & a) const
     {
         assert(p_vector == a.p_vector);
-        return a >= *this;
+        return offset >= a.offset;
     }
 
     void flush()
@@ -514,15 +517,15 @@ public:
 
     typedef std::random_access_iterator_tag iterator_category;
     typedef typename vector_type::value_type value_type;
-    typedef typename vector_type::reference reference;
+    typedef typename vector_type::const_reference reference;
     typedef typename vector_type::const_reference const_reference;
-    typedef typename vector_type::pointer pointer;
+    typedef typename vector_type::const_pointer pointer;
     typedef typename vector_type::const_pointer const_pointer;
 
     enum { block_size = BlkSize_ };
 
 protected:
-    double_blocked_index<PgSz_, block_type::size> offset;
+    double_blocked_index<SzTp_, PgSz_, block_type::size> offset;
     const vector_type * p_vector;
 
 private:
@@ -599,9 +602,14 @@ public:
         return p_vector->const_element(offset.get_pos() + op);
     }
 
-    void touch()
+    void block_externally_updated()
     {
-        p_vector->touch(offset);
+        p_vector->block_externally_updated(offset);
+    }
+
+    __STXXL_DEPRECATED(void touch())
+    {
+        block_externally_updated();
     }
 
     _Self & operator ++ ()
@@ -750,6 +758,8 @@ public:
     typedef const_vector_iterator<value_type, alloc_strategy,
                                   size_type, difference_type, block_size, pager_type, page_size> const_iterator;
     friend class const_vector_iterator<value_type, alloc_strategy, size_type, difference_type, block_size, pager_type, page_size>;
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     typedef bid_vector<block_size> bids_container_type;
     typedef typename bids_container_type::
@@ -763,18 +773,18 @@ private:
     alloc_strategy _alloc_strategy;
     size_type _size;
     bids_container_type _bids;
-    //bids_container_iterator _bids_finish;
     mutable pager_type pager;
 
-    enum { uninitialized = 1, dirty = 2 };
+    enum { valid_on_disk = 0, uninitialized = 1, dirty = 2 };
     mutable std::vector<unsigned char> _page_status;
-    mutable std::vector<int_type> _last_page;
-    mutable simple_vector<int_type> _page_no;
-    mutable std::queue<int_type> _free_pages;
+    mutable std::vector<int_type> _page_to_slot;
+    mutable simple_vector<int_type> _slot_to_page;
+    mutable std::queue<int_type> _free_slots;
     mutable simple_vector<block_type> _cache;
     file * _from;
     block_manager * bm;
     config * cfg;
+    bool exported;
 
     size_type size_from_file_length(stxxl::uint64 file_length)
     {
@@ -798,26 +808,27 @@ private:
 public:
     vector(size_type n = 0) :
         _size(n),
-        _bids(div_and_round_up(n, block_type::size)),
-        _page_status(div_and_round_up(_bids.size(), page_size)),
-        _last_page(div_and_round_up(_bids.size(), page_size)),
-        _page_no(n_pages),
+        _bids(STXXL_DIVRU(n, block_type::size)),
+        _page_status(STXXL_DIVRU(_bids.size(), page_size)),
+        _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
+        _slot_to_page(n_pages),
         _cache(n_pages * page_size),
-        _from(NULL)
+        _from(NULL),
+        exported(false)
     {
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
-        int_type all_pages = div_and_round_up(_bids.size(), page_size);
+        int_type all_pages = STXXL_DIVRU(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
         {
             _page_status[i] = uninitialized;
-            _last_page[i] = on_disk;
+            _page_to_slot[i] = on_disk;
         }
 
         for (i = 0; i < n_pages; ++i)
-            _free_pages.push(i);
+            _free_slots.push(i);
 
 
         bm->new_blocks(_alloc_strategy, _bids.begin(),
@@ -831,15 +842,21 @@ public:
         std::swap(_bids, obj._bids);
         std::swap(pager, obj.pager);
         std::swap(_page_status, obj._page_status);
-        std::swap(_last_page, obj._last_page);
-        std::swap(_page_no, obj._page_no);
-        std::swap(_free_pages, obj._free_pages);
+        std::swap(_page_to_slot, obj._page_to_slot);
+        std::swap(_slot_to_page, obj._slot_to_page);
+        std::swap(_free_slots, obj._free_slots);
         std::swap(_cache, obj._cache);
         std::swap(_from, obj._from);
+        std::swap(exported, obj.exported);
     }
     size_type capacity() const
     {
         return size_type(_bids.size()) * block_type::size;
+    }
+    //! \brief Returns the number of bytes that the vector has allocated on disks
+    size_type raw_capacity() const
+    {
+        return size_type(_bids.size()) * block_type::raw_size;
     }
     void reserve(size_type n)
     {
@@ -848,10 +865,10 @@ public:
 
 
         unsigned_type old_bids_size = _bids.size();
-        unsigned_type new_bids_size = div_and_round_up(n, block_type::size);
-        unsigned_type new_pages = div_and_round_up(new_bids_size, page_size);
+        unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
+        unsigned_type new_pages = STXXL_DIVRU(new_bids_size, page_size);
         _page_status.resize(new_pages, uninitialized);
-        _last_page.resize(new_pages, on_disk);
+        _page_to_slot.resize(new_pages, on_disk);
 
         _bids.resize(new_bids_size);
         if (_from == NULL)
@@ -876,9 +893,20 @@ public:
     {
 #ifndef STXXL_FREE_EXTMEMORY_ON_VECTOR_RESIZE
         reserve(n);
+        if (n < _size) {
+            // mark excess pages as uninitialized and evict them from cache
+            unsigned_type first_page_to_evict = STXXL_DIVRU(n, block_type::size * page_size);
+            for (unsigned_type i = first_page_to_evict; i < _page_status.size(); ++i) {
+                if (_page_to_slot[i] != on_disk) {
+                    _free_slots.push(_page_to_slot[i]);
+                    _page_to_slot[i] = on_disk;
+                }
+                _page_status[i] = uninitialized;
+            }
+        }
 #else
         unsigned_type old_bids_size = _bids.size();
-        unsigned_type new_bids_size = div_and_round_up(n, block_type::size);
+        unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
 
 
         if (new_bids_size > old_bids_size)
@@ -887,13 +915,19 @@ public:
         }
         else if (new_bids_size < old_bids_size)
         {
-            bm->delete_blocks(_bids.begin() + new_bids_size, _bids.end());
-            _bids.resize(new_bids_size);
+            if(_from != NULL)
+                _from->set_size(new_bids_size * block_type::raw_size);
+            else
+                bm->delete_blocks(_bids.begin() + old_bids_size, _bids.end());
 
-            unsigned_type first_page_to_evict = div_and_round_up(new_bids_size, page_size);
+            _bids.resize(new_bids_size);
+            unsigned_type new_pages = STXXL_DIVRU(new_bids_size, page_size);
+            _page_status.resize(new_pages);
+
+            unsigned_type first_page_to_evict = STXXL_DIVRU(new_bids_size, page_size);
+            // clear dirty flag, so these pages will be never written
             std::fill(_page_status.begin() + first_page_to_evict,
-                      _page_status.end(), 0); // clear dirty flag, so this pages
-                                              // will be never written
+                      _page_status.end(), (unsigned char)valid_on_disk);
         }
 #endif
 
@@ -902,17 +936,18 @@ public:
     void clear()
     {
         _size = 0;
-        bm->delete_blocks(_bids.begin(), _bids.end());
+        if (_from == NULL)
+            bm->delete_blocks(_bids.begin(), _bids.end());
 
         _bids.clear();
         _page_status.clear();
-        _last_page.clear();
-        while (!_free_pages.empty())
-            _free_pages.pop();
+        _page_to_slot.clear();
+        while (!_free_slots.empty())
+            _free_slots.pop();
 
 
         for (int_type i = 0; i < n_pages; ++i)
-            _free_pages.push(i);
+            _free_slots.push(i);
     }
     void push_back(const_reference obj)
     {
@@ -942,22 +977,20 @@ public:
     }
     //! \brief Construct vector from a file
     //! \param from file to be constructed from
-    //! \warning Only one \c vector can be assigned to a file
-    //! (does not matter whether the files are different \c file objects).
+    //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must me a multiple of the element size
     //! \c sizeof(Tp_) and the page size (4096).
-    vector(file * from) :
-        _size(size_from_file_length(from->size())),
-        _bids(div_and_round_up(_size, size_type(block_type::size))),
-        _page_status(div_and_round_up(_bids.size(), page_size)),
-        _last_page(div_and_round_up(_bids.size(), page_size)),
-        _page_no(n_pages),
+    vector(file * from, size_type size = size_type(-1)) :
+        _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
+        _bids(STXXL_DIVRU(_size, size_type(block_type::size))),
+        _page_status(STXXL_DIVRU(_bids.size(), page_size)),
+        _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
+        _slot_to_page(n_pages),
         _cache(n_pages * page_size),
-        _from(from)
+        _from(from),
+        exported(false)
     {
         // initialize from file
-        assert(from->get_id() == -1);
-
         if (block_type::has_filler)
         {
             std::ostringstream str_;
@@ -969,18 +1002,19 @@ public:
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
-        int_type all_pages = div_and_round_up(_bids.size(), page_size);
+        int_type all_pages = STXXL_DIVRU(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
         {
-            _page_status[i] = 0;
-            _last_page[i] = on_disk;
+            _page_status[i] = valid_on_disk;
+            _page_to_slot[i] = on_disk;
         }
 
         for (i = 0; i < n_pages; ++i)
-            _free_pages.push(i);
+            _free_slots.push(i);
 
 
+        //allocate blocks equidistantly and in-order
         size_type offset = 0;
         bids_container_iterator it = _bids.begin();
         for ( ; it != _bids.end(); ++it, offset += size_type(block_type::raw_size))
@@ -993,26 +1027,28 @@ public:
 
     vector(const vector & obj) :
         _size(obj.size()),
-        _bids(div_and_round_up(obj.size(), block_type::size)),
-        _page_status(div_and_round_up(_bids.size(), page_size)),
-        _last_page(div_and_round_up(_bids.size(), page_size)),
-        _page_no(n_pages),
+        _bids(STXXL_DIVRU(obj.size(), block_type::size)),
+        _page_status(STXXL_DIVRU(_bids.size(), page_size)),
+        _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
+        _slot_to_page(n_pages),
         _cache(n_pages * page_size),
-        _from(NULL)
+        _from(NULL),
+        exported(false)
     {
+        assert(!obj.exported);
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
-        int_type all_pages = div_and_round_up(_bids.size(), page_size);
+        int_type all_pages = STXXL_DIVRU(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
         {
             _page_status[i] = uninitialized;
-            _last_page[i] = on_disk;
+            _page_to_slot[i] = on_disk;
         }
 
         for (i = 0; i < n_pages; ++i)
-            _free_pages.push(i);
+            _free_slots.push(i);
 
 
         bm->new_blocks(_alloc_strategy, _bids.begin(),
@@ -1065,6 +1101,32 @@ public:
     {
         return end();
     }
+
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(end());
+    }
+    const_reverse_iterator rbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    const_reverse_iterator crbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+    reverse_iterator rend()
+    {
+        return reverse_iterator(begin());
+    }
+    const_reverse_iterator rend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+    const_reverse_iterator crend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+
     reference operator [] (size_type offset)
     {
         return element(offset);
@@ -1076,32 +1138,29 @@ public:
 
     void flush() const
     {
-        simple_vector<bool> non_free_pages(n_pages);
+        simple_vector<bool> non_free_slots(n_pages);
         int_type i = 0;
         for ( ; i < n_pages; i++)
-            non_free_pages[i] = true;
+            non_free_slots[i] = true;
 
 
-        while (!_free_pages.empty())
+        while (!_free_slots.empty())
         {
-            non_free_pages[_free_pages.front()] = false;
-            _free_pages.pop();
+            non_free_slots[_free_slots.front()] = false;
+            _free_slots.pop();
         }
 
         for (i = 0; i < n_pages; i++)
         {
-            _free_pages.push(i);
-            int_type page_no = _page_no[i];
-            if (non_free_pages[i])
+            _free_slots.push(i);
+            int_type page_no = _slot_to_page[i];
+            if (non_free_slots[i])
             {
                 STXXL_VERBOSE1("vector: flushing page " << i << " address: " << (int64(page_no) *
                                                                                  int64(block_type::size) * int64(page_size)));
-                if (_page_status[page_no] & dirty)
-                    write_page(page_no, i);
+                write_page(page_no, i);
 
-
-                _last_page[page_no] = on_disk;
-                _page_status[page_no] = 0;
+                _page_to_slot[page_no] = on_disk;
             }
         }
     }
@@ -1116,16 +1175,59 @@ public:
             STXXL_VERBOSE("An exception in the ~vector()");
         }
 
-        bm->delete_blocks(_bids.begin(), _bids.end());
-
-        if (_from)        // file must be truncated
+        if(!exported)
         {
-            STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
-                                                               << file_length());
-            STXXL_VERBOSE1("~vector(): size of the vector is " << size());
-            _from->set_size(file_length());
+            if (_from == NULL)
+                bm->delete_blocks(_bids.begin(), _bids.end());
+            else        // file must be truncated
+            {
+                STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
+                                                                << file_length());
+                STXXL_VERBOSE1("~vector(): size of the vector is " << size());
+                _from->set_size(file_length());
+            }
         }
     }
+
+    //! \brief Export data such that it is persistent on the file system.
+    //! Resulting files will be numbered ascending.
+    void export_files(std::string filename_prefix)
+    {
+        int64 no = 0;
+        for(bids_container_iterator i = _bids.begin(); i != _bids.end(); ++i) {
+            std::ostringstream number;
+            number << std::setw(9) << std::setfill('0') << no;
+            size_type current_block_size =
+                ((i + 1) == _bids.end() && _size % block_type::size > 0) ?
+                   (_size % block_type::size) * sizeof(value_type) :
+                   block_type::size * sizeof(value_type);
+            (*i).storage->export_files((*i).offset, current_block_size, filename_prefix + number.str());
+            ++no;
+        }
+        exported = true;
+    }
+
+    //! \brief Get the file associated with this vector, or NULL.
+    file* get_file()
+    {
+        return _from;
+    }
+
+    //! \brief Set the blocks and the size of this container explicitly.
+    //! The vector must be completely empty before.
+    template<typename ForwardIterator>
+    void set_content(const ForwardIterator& bid_begin, const ForwardIterator& bid_end, size_type n)
+    {
+        assert(_size == 0 && _bids.size() == 0);
+        unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
+        _bids.resize(new_bids_size);
+        std::copy(bid_begin, bid_end, _bids.begin());
+        unsigned_type new_pages = STXXL_DIVRU(new_bids_size, page_size);
+        _page_status.resize(new_pages, valid_on_disk);
+        _page_to_slot.resize(new_pages, on_disk);
+        _size = n;
+    }
+
 
 private:
     bids_container_iterator bid(const size_type & offset)
@@ -1134,7 +1236,7 @@ private:
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
-    bids_container_iterator bid(const double_blocked_index<PgSz_, block_type::size> & offset)
+    bids_container_iterator bid(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset)
     {
         return (_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
@@ -1146,19 +1248,21 @@ private:
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
-    const_bids_container_iterator bid(const double_blocked_index<PgSz_, block_type::size> & offset) const
+    const_bids_container_iterator bid(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
     {
         return (_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
                 (offset.get_block2() * PgSz_ + offset.get_block1()));
     }
-    void read_page(int_type page_no, int_type cache_page) const
+    void read_page(int_type page_no, int_type cache_slot) const
     {
-        STXXL_VERBOSE1("vector " << this << ": reading page_no=" << page_no << " cache_page=" << cache_page);
+        if (_page_status[page_no] == uninitialized)
+            return;
+        STXXL_VERBOSE1("vector " << this << ": reading page_no=" << page_no << " cache_slot=" << cache_slot);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
-        int_type i = cache_page * page_size, j = 0;
+        int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
             reqs[j] = _cache[i].read(_bids[block_no]);
@@ -1167,156 +1271,159 @@ private:
         wait_all(reqs, last_block - page_no * page_size);
         delete[] reqs;
     }
-    void write_page(int_type page_no, int_type cache_page) const
+    void write_page(int_type page_no, int_type cache_slot) const
     {
-        STXXL_VERBOSE1("vector " << this << ": writing page_no=" << page_no << " cache_page=" << cache_page);
+        if (!(_page_status[page_no] & dirty))
+            return;
+        STXXL_VERBOSE1("vector " << this << ": writing page_no=" << page_no << " cache_slot=" << cache_slot);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
-        int_type i = cache_page * page_size, j = 0;
+        int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
             reqs[j] = _cache[i].write(_bids[block_no]);
         }
+        _page_status[page_no] = valid_on_disk;
         assert(last_block - page_no * page_size > 0);
         wait_all(reqs, last_block - page_no * page_size);
         delete[] reqs;
     }
     reference element(size_type offset)
     {
-        return element(double_blocked_index<PgSz_, block_type::size>(offset));
+        #ifdef STXXL_RANGE_CHECK
+        assert(offset < size());
+        #endif
+        return element(double_blocked_index<SzTp_, PgSz_, block_type::size>(offset));
     }
 
-    reference element(const double_blocked_index<PgSz_, block_type::size> & offset)
+    reference element(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset)
     {
+        #ifdef STXXL_RANGE_CHECK
+        assert(offset.get_pos() < size());
+        #endif
         int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_last_page.size()));                 // fails if offset is too large, out of bound access
-        int_type last_page = _last_page[page_no];
-        if (last_page < 0)                                             // == on_disk
+        assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
+        int_type cache_slot = _page_to_slot[page_no];
+        if (cache_slot < 0)                                 // == on_disk
         {
-            if (_free_pages.empty())                                   // has to kick
+            if (_free_slots.empty())                        // has to kick
             {
-                int_type kicked_page = pager.kick();
-                pager.hit(kicked_page);
-                int_type old_page_no = _page_no[kicked_page];
-                _last_page[page_no] = kicked_page;
-                _last_page[old_page_no] = on_disk;
-                _page_no[kicked_page] = page_no;
+                int_type kicked_slot = pager.kick();
+                pager.hit(kicked_slot);
+                int_type old_page_no = _slot_to_page[kicked_slot];
+                _page_to_slot[page_no] = kicked_slot;
+                _page_to_slot[old_page_no] = on_disk;
+                _slot_to_page[kicked_slot] = page_no;
 
-                // what to do with the old page ?
-                if (_page_status[old_page_no] & dirty)
-                {
-                    // has to store changes
-                    write_page(old_page_no, kicked_page);
-                }
-
-                if (_page_status[page_no] != uninitialized)
-                {
-                    read_page(page_no, kicked_page);
-                }
+                write_page(old_page_no, kicked_slot);
+                read_page(page_no, kicked_slot);
 
                 _page_status[page_no] = dirty;
 
-                return _cache[kicked_page * page_size + offset.get_block1()][offset.get_offset()];
+                return _cache[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
-                int_type free_page = _free_pages.front();
-                _free_pages.pop();
-                pager.hit(free_page);
-                _last_page[page_no] = free_page;
-                _page_no[free_page] = page_no;
+                int_type free_slot = _free_slots.front();
+                _free_slots.pop();
+                pager.hit(free_slot);
+                _page_to_slot[page_no] = free_slot;
+                _slot_to_page[free_slot] = page_no;
 
-                if (_page_status[page_no] != uninitialized)
-                {
-                    read_page(page_no, free_page);
-                }
+                read_page(page_no, free_slot);
 
                 _page_status[page_no] = dirty;
 
-                return _cache[free_page * page_size + offset.get_block1()][offset.get_offset()];
+                return _cache[free_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
         {
             _page_status[page_no] = dirty;
-            pager.hit(last_page);
-            return _cache[last_page * page_size + offset.get_block1()][offset.get_offset()];
+            pager.hit(cache_slot);
+            return _cache[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
-    void touch(size_type offset) const
+
+    // don't forget to first flush() the vector's cache before updating pages externally
+    void page_externally_updated(unsigned_type page_no) const
     {
         // fails if offset is too large, out of bound access
-        assert(offset / (block_type::size * page_size)< _page_status.size());
-        _page_status[offset / (block_type::size * page_size)] = 0;
+        assert(page_no < _page_status.size());
+        assert(!(_page_status[page_no] & dirty) &&
+               "A dirty page has been marked as newly initialized. The page content will be lost.");
+        if (_page_to_slot[page_no] != on_disk) {
+		// remove page from cache
+		_free_slots.push(_page_to_slot[page_no]);
+		_page_to_slot[page_no] = on_disk;
+	}
+        _page_status[page_no] = valid_on_disk;
     }
 
-    void touch(const double_blocked_index<PgSz_, block_type::size> & offset) const
+    void block_externally_updated(size_type offset) const
     {
-        // fails if offset is too large, out of bound access
-        assert(offset.get_block2() < _page_status.size());
-        _page_status[offset.get_block2()] = 0;
+        page_externally_updated(offset / (block_type::size * page_size));
+    }
+
+    void block_externally_updated(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
+    {
+        page_externally_updated(offset.get_block2());
+    }
+
+    __STXXL_DEPRECATED(void touch(size_type offset) const)
+    {
+        page_externally_updated(offset / (block_type::size * page_size));
+    }
+
+    __STXXL_DEPRECATED(void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const)
+    {
+        page_externally_updated(offset.get_block2());
     }
 
     const_reference const_element(size_type offset) const
     {
-        return const_element(double_blocked_index<PgSz_, block_type::size>(offset));
+        return const_element(double_blocked_index<SzTp_, PgSz_, block_type::size>(offset));
     }
 
-    const_reference const_element(const double_blocked_index<PgSz_, block_type::size> & offset) const
+    const_reference const_element(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
     {
         int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_last_page.size()));  // fails if offset is too large, out of bound access
-        int_type last_page = _last_page[page_no];
-        if (last_page < 0)                              // == on_disk
+        assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
+        int_type cache_slot = _page_to_slot[page_no];
+        if (cache_slot < 0)                                 // == on_disk
         {
-            if (_free_pages.empty())                    // has to kick
+            if (_free_slots.empty())                    // has to kick
             {
-                int_type kicked_page = pager.kick();
-                pager.hit(kicked_page);
-                int_type old_page_no = _page_no[kicked_page];
-                _last_page[page_no] = kicked_page;
-                _last_page[old_page_no] = on_disk;
-                _page_no[kicked_page] = page_no;
+                int_type kicked_slot = pager.kick();
+                pager.hit(kicked_slot);
+                int_type old_page_no = _slot_to_page[kicked_slot];
+                _page_to_slot[page_no] = kicked_slot;
+                _page_to_slot[old_page_no] = on_disk;
+                _slot_to_page[kicked_slot] = page_no;
 
-                // what to do with the old page ?
-                if (_page_status[old_page_no] & dirty)
-                {
-                    // has to store changes
-                    write_page(old_page_no, kicked_page);
-                }
+                write_page(old_page_no, kicked_slot);
+                read_page(page_no, kicked_slot);
 
-                if (_page_status[page_no] != uninitialized)
-                {
-                    read_page(page_no, kicked_page);
-                }
-
-                _page_status[page_no] = 0;
-
-                return _cache[kicked_page * page_size + offset.get_block1()][offset.get_offset()];
+                return _cache[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
-                int_type free_page = _free_pages.front();
-                _free_pages.pop();
-                pager.hit(free_page);
-                _last_page[page_no] = free_page;
-                _page_no[free_page] = page_no;
+                int_type free_slot = _free_slots.front();
+                _free_slots.pop();
+                pager.hit(free_slot);
+                _page_to_slot[page_no] = free_slot;
+                _slot_to_page[free_slot] = page_no;
 
-                if (_page_status[page_no] != uninitialized)
-                {
-                    read_page(page_no, free_page);
-                }
+                read_page(page_no, free_slot);
 
-                _page_status[page_no] = 0;
-
-                return _cache[free_page * page_size + offset.get_block1()][offset.get_offset()];
+                return _cache[free_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
         {
-            pager.hit(last_page);
-            return _cache[last_page * page_size + offset.get_block1()][offset.get_offset()];
+            pager.hit(cache_slot);
+            return _cache[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
 };

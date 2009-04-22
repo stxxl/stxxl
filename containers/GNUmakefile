@@ -2,15 +2,19 @@ TOPDIR	?= ..
 include Makefile.common
 -include $(TOPDIR)/make.settings.local
 
+ENABLE_BTREE			?= yes
 ENABLE_BDB			?= no
 ENABLE_LEDASM			?= no
 ENABLE_TPIE			?= no
 
 TESTS-yes			+= $(TESTS_NON_MSVC)
-TESTS-yes			+= $(TESTS_BTREE:%=btree/%)
+TESTS-$(ENABLE_BTREE)		+= $(TESTS_MAP)
+TESTS-$(ENABLE_BTREE)		+= $(TESTS_BTREE:%=btree/%)
 TESTS-yes			+= $(TESTS_HASH_MAP:%=hash_map/%)
 TESTS-$(ENABLE_BDB)$(ENABLE_TPIE)	+= $(TESTS_BDB)
+ifneq ($(strip $(USE_BOOST)),yes)
 TESTS-$(ENABLE_LEDASM)		+= $(TESTS_LEDASM)
+endif
 TESTS-$(ENABLE_TPIE)		+= $(TESTS_TPIE)
 
 include $(TOPDIR)/Makefile.subdir.gnu
@@ -26,7 +30,7 @@ CPPFLAGS_TPIE			?= -I$(TPIE_ROOT)/include -DHAVE_CONFIG_H -Wno-error
 LIBS_TPIE			?= -L$(TPIE_ROOT)/lib -ltpie
 
 LEDA_COMPILER			?= g++-2.95
-LEDA_FLAGS			?= -D_LINUX $(filter-out -openmp -fopenmp -D__MCSTL__,$(STXXL_COMPILER_OPTIONS)) -Wno-error
+LEDA_FLAGS			?= -D_LINUX $(filter-out -openmp -fopenmp -D__MCSTL__ -include stxxl/bits/defines.h,$(STXXL_COMPILER_OPTIONS)) -Wno-error
 LEDA_ROOT			?= /usr/local/LEDA
 LEDA_SM_ROOT			?= /usr/local/LEDA-SM
 
@@ -65,34 +69,31 @@ leda_sm_stack_benchmark.$(bin): leda_sm_stack_benchmark.cpp GNUmakefile
 
 
 ifeq ($(strip $(USE_MCSTL)),yes)
-# Work around compiler bugs:
-compiler_version	:= $(shell $(COMPILER) -v 2>&1 | tr ' ' '_')
-bitness			:= $(shell file ../common/stxxl_info.$(bin) 2>/dev/null)
-# usage: e.g. $(call needs_override,gcc_version_4.2,32-bit,3,[-g|any|none])
-needs_override		?= $(and $(findstring $1,$(compiler_version)),\
-				$(filter $2,$(bitness)),\
-				$(filter $3,$(OPT_LEVEL)),\
-				$(or $(filter any,$4),$(if $(filter none,$4),$(if $(DEBUG),,empty)),$(filter $4,$(DEBUG))))
-# usage: $(call reduce_optimization,from,to,target,compiler,bits,debug)
-reduce_optimization	?= $(if $(call needs_override,$4,$5,$1,$6),$3.$(bin): OPT_LEVEL=$2)
-
 # PR33361: internal compiler error: in find_outermost_region_in_block, at tree-cfg.c:4803
 # when using g++-4.2 -fopenmp -O3. Fixed in g++-4.3, wontfix in g++-4.2.
-$(call reduce_optimization,3,2,test_iterators,gcc_version_4.2,64-bit,none)
+ifneq ($(strip $(USE_BOOST)),yes)
+$(call reduce_optimization,3,0,test_iterators,gcc_version_4.2,64-bit,any)
+$(call reduce_optimization,3,2,test_map,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,0,test_map,gcc_version_4.2,32-bit,any)
-$(call reduce_optimization,3,0,test_map,gcc_version_4.2,64-bit,any)
-$(call reduce_optimization,3,2,btree/test_btree,gcc_version_4.2,32-bit,any)
+$(call reduce_optimization,3,0,test_map_random,gcc_version_4.2,32-bit,any)
 $(call reduce_optimization,3,0,btree/test_btree,gcc_version_4.2,64-bit,any)
-$(call reduce_optimization,3,2,btree/test_corr_insert_scan,gcc_version_4.2,32-bit,any)
-$(call reduce_optimization,3,0,btree/test_corr_insert_scan,gcc_version_4.2,64-bit,-g)
-$(call reduce_optimization,3,2,btree/test_corr_insert_scan,gcc_version_4.2,64-bit,none)
-$(call reduce_optimization,3,2,btree/test_corr_insert_erase,gcc_version_4.2,32-bit,any)
-$(call reduce_optimization,3,1,btree/test_corr_insert_erase,gcc_version_4.2,64-bit,none)
-$(call reduce_optimization,3,2,btree/test_corr_insert_find,gcc_version_4.2,32-bit,any)
-ifeq ($(strip $(USE_BOOST)),yes)
-$(call reduce_optimization,3,2,test_map_random,gcc_version_4.2,64-bit,any)
-$(call reduce_optimization,3,0,btree/test_corr_insert_scan,gcc_version_4.2,64-bit,none)
+$(call reduce_optimization,3,0,btree/test_btree,gcc_version_4.2,32-bit,any)
+$(call reduce_optimization,3,0,btree/test_const_scan,gcc_version_4.2,any,any)
+else
+$(call reduce_optimization,3,2,btree/test_btree,gcc_version_4.2,64-bit,any)
+$(call reduce_optimization,3,2,btree/test_corr_insert_scan,gcc_version_4.2,64-bit,any)
+$(call reduce_optimization,3,2,btree/test_corr_insert_erase,gcc_version_4.2,64-bit,any)
 endif
+
+# ICPC 11.0: internal error: 0_1374 (issue 539748)
+$(call reduce_optimization,3,1,btree/test_btree,Version_11.0,any,any)
+$(call reduce_optimization,3,1,btree/test_const_scan,Version_11.0,any,any)
+$(call reduce_optimization,3,0,btree/test_corr_insert_erase,Version_11.0,any,any)
+$(call reduce_optimization,3,0,btree/test_corr_insert_scan,Version_11.0,any,any)
+
+# ICPC 10.0: internal error: backend signals (issue 466173)
+$(call reduce_optimization,3,1,btree/test_corr_insert_erase,Version_10.0,32-bit,any)
+$(call reduce_optimization,3,1,btree/test_corr_insert_scan,Version_10.0,32-bit,any)
 endif
 
 clean::

@@ -40,7 +40,7 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
     _begin.flush();     // flush container
 
     // create prefetching stream,
-    buf_istream_type in(_begin.bid(), _end.bid() + ((_end.block_offset()) ? 1 : 0), nbuffers / 2);
+    buf_istream_type in(_begin.bid(), _end.bid() + ((_end.block_offset()) ? 1 : 0), nbuffers);
 
     _ExtIterator _cur = _begin - _begin.block_offset();
 
@@ -163,10 +163,18 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
 
     assert(_begin.block_offset() == 0);
 
+    // delay calling block_externally_updated() until the block is
+    // completely filled (and written out) in outstream
+    typename _ExtIterator::const_iterator prev_block = _begin;
+
     while (_end != _begin)
     {
-        if (_begin.block_offset() == 0)
-            _begin.touch();
+        if (_begin.block_offset() == 0) {
+            if (prev_block != _begin) {
+                prev_block.block_externally_updated();
+                prev_block = _begin;
+            }
+        }
 
         *outstream = _generator();
         ++_begin;
@@ -181,6 +189,10 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
         ++out;
         ++outstream;
     }
+
+    if (prev_block != out)
+        prev_block.block_externally_updated();
+
     _begin.flush();
 }
 

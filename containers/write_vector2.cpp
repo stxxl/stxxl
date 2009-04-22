@@ -40,7 +40,7 @@ public:
     value_type & operator * ()
     {
         if (it.block_offset() == 0)
-            it.touch();
+            it.block_externally_updated();
         // tells the vector that the block was modified
         return **outstream;
     }

@@ -229,7 +229,7 @@ namespace stream
         run_type run;
 
 
-        unsigned_type cur_run_size = div_and_round_up(pos, block_type::size); // in blocks
+        unsigned_type cur_run_size = STXXL_DIVRU(pos, block_type::size); // in blocks
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(),
                        trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
@@ -281,7 +281,7 @@ namespace stream
             bm->delete_blocks(trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
                               trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end()));
 
-            cur_run_size = div_and_round_up(pos, block_type::size);
+            cur_run_size = STXXL_DIVRU(pos, block_type::size);
             run.resize(cur_run_size);
             bm->new_blocks(AllocStr_(),
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
@@ -325,7 +325,7 @@ namespace stream
 
         sort_run(Blocks2, pos);
 
-        cur_run_size = div_and_round_up(pos, block_type::size); // in blocks
+        cur_run_size = STXXL_DIVRU(pos, block_type::size); // in blocks
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(),
                        trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
@@ -354,7 +354,7 @@ namespace stream
             }
             result_.elements += pos;
             sort_run(Blocks1, pos);
-            cur_run_size = div_and_round_up(pos, block_type::size); // in blocks
+            cur_run_size = STXXL_DIVRU(pos, block_type::size); // in blocks
             run.resize(cur_run_size);
             bm->new_blocks(AllocStr_(),
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
@@ -487,7 +487,7 @@ namespace stream
                 return;
             }
 
-            const unsigned_type cur_run_size = div_and_round_up(cur_el_reg, block_type::size);     // in blocks
+            const unsigned_type cur_run_size = STXXL_DIVRU(cur_el_reg, block_type::size);     // in blocks
             run.resize(cur_run_size);
             block_manager * bm = block_manager::get_instance();
             bm->new_blocks(AllocStr_(),
@@ -569,7 +569,7 @@ namespace stream
             sort_run(Blocks1, el_in_run);
             result_.elements += el_in_run;
 
-            const unsigned_type cur_run_size = div_and_round_up(el_in_run, block_type::size);    // in blocks
+            const unsigned_type cur_run_size = STXXL_DIVRU(el_in_run, block_type::size);    // in blocks
             run.resize(cur_run_size);
             block_manager * bm = block_manager::get_instance();
             bm->new_blocks(AllocStr_(),
@@ -1113,7 +1113,7 @@ namespace stream
             unsigned_type i;
             /*
                const unsigned_type out_run_size =
-                  div_and_round_up(elements_remaining,size_type(block_type::size));
+                  STXXL_DIVRU(elements_remaining,size_type(block_type::size));
              */
             unsigned_type prefetch_seq_size = 0;
             for (i = 0; i < nruns; i++)
@@ -1271,7 +1271,7 @@ namespace stream
         assert(merge_factor <= m_);
         while (nruns > m_)
         {
-            unsigned_type new_nruns = div_and_round_up(nruns, merge_factor);
+            unsigned_type new_nruns = STXXL_DIVRU(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                           " opt_merge_factor: " << merge_factor << " m:" << m_ << " new_nruns: " << new_nruns);
 
@@ -1296,7 +1296,7 @@ namespace stream
                     elements_in_new_run += sruns.runs_sizes[i];
                     //blocks_in_new_run += sruns.runs[i].size();
                 }
-                const unsigned_type blocks_in_new_run1 = div_and_round_up(elements_in_new_run, block_type::size);
+                const unsigned_type blocks_in_new_run1 = STXXL_DIVRU(elements_in_new_run, block_type::size);
                 //assert(blocks_in_new_run1 == blocks_in_new_run);
 
                 new_runs.runs_sizes[cur_out_run] = elements_in_new_run;

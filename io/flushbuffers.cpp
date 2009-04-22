@@ -161,6 +161,9 @@ int main(int argc, char * argv[])
         offset += /* 4*stxxl::int64(GB); */ buffer_size;
     }
 
+    for (i = 0; i < ndisks; i++)
+        delete disks[i];
+
     delete[] reqs;
     delete[] disks;
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);

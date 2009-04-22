@@ -40,7 +40,6 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/log.h>
-#include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/is_sorted.h>
@@ -48,27 +47,40 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+#ifdef UNUSED
+#error Somebody has defined a macro UNUSED which clashes with a helper function of STXXL
+// possible solutions:
+//
+// 1) #undef UNUSED
+//
+// 2) #undef UNUSED
+//    #define UNUSED(unused) (stxxl::UNUSED)(unused)
+//
+// 3) don't declare stxxl::UNUSED
+#endif
 template <typename U>
 inline void UNUSED(const U &)
 { }
 
 #ifdef BOOST_MSVC
   #define __STXXL_DEPRECATED(x) __declspec(deprecated) x
+#elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 30400)
+  // no __attribute__ ((__deprecated__)) in GCC 3.3
+  #define __STXXL_DEPRECATED(x) x
 #else
   #define __STXXL_DEPRECATED(x) x __attribute__ ((__deprecated__))
 #endif
 
 ////////////////////////////////////////////////////////////////////////////
 
-#define __STXXL_STRING(x) # x
-
+#define __STXXL_ENFORCE_SEMICOLON stxxl::UNUSED("expecting the next token to be a ';'")
 
 #define _STXXL_PRINT(label, outstream, log_stream, message) \
     { std::ostringstream str_; \
       str_ << "[" label "] " << message << std::endl; \
       outstream << str_.str() << std::flush; \
       stxxl::logger::get_instance()->log_stream() << str_.str() << std::flush; \
-    }
+    } __STXXL_ENFORCE_SEMICOLON
 
 #define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", std::cout, log_stream, x)
 
@@ -123,74 +135,6 @@ inline void UNUSED(const U &)
 ////////////////////////////////////////////////////////////////////////////
 
 #ifdef BOOST_MSVC
- #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
-#else
- #define STXXL_PRETTY_FUNCTION_NAME __PRETTY_FUNCTION__
-#endif
-
-#define STXXL_FORMAT_ERROR_MSG(str_, errmsg_) \
-    std::ostringstream str_; str_ << "Error in " << errmsg_
-
-#define STXXL_THROW(exception_type, location, error_message) \
-    { \
-        std::ostringstream msg_; \
-        msg_ << "Error in " << location << ": " << error_message; \
-        throw exception_type(msg_.str()); \
-    }
-
-#define STXXL_THROW2(exception_type, error_message) \
-    STXXL_THROW(exception_type, "function " << STXXL_PRETTY_FUNCTION_NAME, \
-                "Info: " << error_message << " " << strerror(errno))
-
-template <typename E>
-inline void stxxl_util_function_error(const char * func_name, const char * expr = 0, const char * error = 0)
-{
-    std::ostringstream str_;
-    str_ << "Error in function " << func_name << " " << (expr ? expr : strerror(errno));
-    if (error)
-        str_ << " " << error;
-    throw E(str_.str());
-}
-
-#define stxxl_function_error(exception_type) \
-    stxxl::stxxl_util_function_error<exception_type>(STXXL_PRETTY_FUNCTION_NAME)
-
-template <typename E>
-inline bool helper_check_success(bool success, const char * func_name, const char * expr = 0, const char * error = 0)
-{
-    if (!success)
-        stxxl_util_function_error<E>(func_name, expr, error);
-    return success;
-}
-
-template <typename E, typename INT>
-inline bool helper_check_eq_0(INT res, const char * func_name, const char * expr, bool res_2_strerror = false)
-{
-    return helper_check_success<E>(res == 0, func_name, expr, res_2_strerror ? strerror(res) : 0);
-}
-
-#define check_pthread_call(expr) \
-    stxxl::helper_check_eq_0<stxxl::resource_error>(expr, STXXL_PRETTY_FUNCTION_NAME, __STXXL_STRING(expr), true)
-
-template <typename E, typename INT>
-inline bool helper_check_ge_0(INT res, const char * func_name)
-{
-    return helper_check_success<E>(res >= 0, func_name);
-}
-
-#define stxxl_check_ge_0(expr, exception_type) \
-    stxxl::helper_check_ge_0<exception_type>(expr, STXXL_PRETTY_FUNCTION_NAME)
-
-template <typename E, typename INT>
-inline bool helper_check_ne_0(INT res, const char * func_name)
-{
-    return helper_check_success<E>(res != 0, func_name);
-}
-
-#define stxxl_check_ne_0(expr, exception_type) \
-    stxxl::helper_check_ne_0<exception_type>(expr, STXXL_PRETTY_FUNCTION_NAME)
-
-#ifdef BOOST_MSVC
 
 #define stxxl_win_lasterror_exit(errmsg, exception_type) \
     { \
@@ -209,7 +153,7 @@ inline bool helper_check_ne_0(INT res, const char * func_name)
         str_ << "Error in " << errmsg << ", error code " << dw << ": " << ((char *)lpMsgBuf); \
         LocalFree(lpMsgBuf); \
         throw exception_type(str_.str()); \
-    }
+    } __STXXL_ENFORCE_SEMICOLON
 
 #endif
 
@@ -307,9 +251,12 @@ inline stxxl::int64 atoint64(const char * s)
 
 #define STXXL_L2_SIZE  (512 * 1024)
 
-#define div_and_round_up(a, b) ((a) / (b) + !(!((a) % (b))))
+#define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
 
-#define log2(x) (log(x) / log(2.))
+inline double log2(double x)
+{
+    return (log(x) / log(2.));
+}
 
 ////////////////////////////////////////////////////////////////////////////
 

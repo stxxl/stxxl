@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/simdisk_file.h>
+#include <stxxl/bits/io/request_impl_basic.h>
 
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
@@ -35,7 +36,7 @@ void DiskGeometry::add_zone(int & first_cyl, int last_cyl,
     first_cyl = last_cyl + 1;
 }
 
-double DiskGeometry::get_delay(stxxl::int64 /*offset*/, size_t size)                   // returns delay in s
+double DiskGeometry::get_delay(file::offset_type /*offset*/, file::size_type size)                   // returns delay in s
 {
     /*
 
@@ -147,42 +148,32 @@ IC35L080AVVA07::IC35L080AVVA07()
      */
 
     std::cout << "Transfer 16 Mb from zone 0 : " <<
-    get_delay(0,
-              16 * 1024 *
-              1024) << " s" << std::endl;
+    get_delay(0, 16 * 1024 * 1024) << " s" << std::endl;
     std::cout << "Transfer 16 Mb from zone 30: " <<
-    get_delay(stxxl::int64(158204036) *
-              stxxl::int64(bytes_per_sector),
-              16 * 1024 *
-              1024) << " s" << std::endl;
+    get_delay(file::offset_type(158204036) * file::offset_type(bytes_per_sector), 16 * 1024 * 1024) << " s" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_request::serve()
+void sim_disk_file::serve(const request * req) throw(io_error)
 {
-    //      static_cast<syscall_file*>(file_)->set_size(offset+bytes);
+    scoped_mutex_lock fd_lock(fd_mutex);
+    assert(req->get_file() == this);
+    offset_type offset = req->get_offset();
+    void * buffer = req->get_buffer();
+    size_type bytes = req->get_size();
+    request::request_type type = req->get_type();
     double op_start = timestamp();
-    stats * iostats = stats::get_instance();
-    if (type == READ)
-    {
-        iostats->read_started(size());
-    }
-    else
-    {
-        iostats->write_started(size());
-    }
 
-    try {
-        void * mem =
-            mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, static_cast<sim_disk_file *>(file_)->get_file_des(), offset);
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+
+        void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
         if (mem == MAP_FAILED)
         {
-            STXXL_FORMAT_ERROR_MSG(msg, "Mapping failed. " <<
-                                   "Page size: " << sysconf(_SC_PAGESIZE) << " offset modulo page size " <<
-                                   (offset % sysconf(_SC_PAGESIZE)));
-
-            error_occured(msg.str());
+            STXXL_THROW2(io_error,
+                         " Mapping failed." <<
+                         " Page size: " << sysconf(_SC_PAGESIZE) <<
+                         " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
         }
         else if (mem == 0)
         {
@@ -190,19 +181,16 @@ void sim_disk_request::serve()
         }
         else
         {
-            if (type == READ)
+            if (type == request::READ)
             {
                 memcpy(buffer, mem, bytes);
-                stxxl_check_ge_0(munmap((char *)mem, bytes), io_error);
             } else {
                 memcpy(mem, buffer, bytes);
-                stxxl_check_ge_0(munmap((char *)mem, bytes), io_error);
             }
+            stxxl_check_ge_0(munmap(mem, bytes), io_error);
         }
 
-        double delay =
-            (static_cast<sim_disk_file *>(file_))->get_delay(offset, bytes);
-
+        double delay = get_delay(offset, bytes);
 
         delay = delay - timestamp() + op_start;
 
@@ -212,82 +200,27 @@ void sim_disk_request::serve()
         if (seconds_to_wait)
             sleep(seconds_to_wait);
 
-
         usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
-    }
-    catch (const io_error & ex)
-    {
-        error_occured(ex.what());
-    }
+}
 
-    if (type == READ)
-    {
-        iostats->read_finished();
-    }
-    else
-    {
-        iostats->write_finished();
-    }
-
-    _state.set_to(DONE);
-
-    {
-        scoped_mutex_lock Lock(waiters_mutex);
-
-        // << notification >>
-        for (std::set<onoff_switch *>::iterator i =
-                 waiters.begin(); i != waiters.end(); i++)
-            (*i)->on();
-    }
-
-    completed();
-    _state.set_to(READY2DIE);
+const char * sim_disk_file::io_type() const
+{
+    return "simdisk";
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_file::set_size(stxxl::int64 newsize)
+void sim_disk_file::set_size(offset_type newsize)
 {
-    if (newsize > size())
+    scoped_mutex_lock fd_lock(fd_mutex);
+    if (newsize > _size())
     {
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
         stxxl_check_ge_0(::write(file_des, "", 1), io_error);
     }
 }
 
-request_ptr sim_disk_file::aread(void * buffer, stxxl::int64 pos, size_t bytes,
-                                 completion_handler on_cmpl)
-{
-    request_ptr req = new sim_disk_request(this, buffer, pos, bytes,
-                                           request::READ, on_cmpl);
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-
- #ifndef NO_OVERLAPPING
-    disk_queues::get_instance()->add_readreq(req, get_id());
- #endif
-
-    return req;
-}
-
-request_ptr sim_disk_file::awrite(
-    void * buffer, stxxl::int64 pos, size_t bytes,
-    completion_handler on_cmpl)
-{
-    request_ptr req = new sim_disk_request(this, buffer, pos, bytes,
-                                           request::WRITE, on_cmpl);
-
-    if (!req.get())
-        stxxl_function_error(io_error);
-
-
- #ifndef NO_OVERLAPPING
-    disk_queues::get_instance()->add_writereq(req, get_id());
- #endif
-    return req;
-}
-
 __STXXL_END_NAMESPACE
 
 #endif // #ifndef BOOST_MSVC
+// vim: et:ts=4:sw=4

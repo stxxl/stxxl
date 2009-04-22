@@ -14,8 +14,10 @@
 #define STXXL_BUFFERED_WRITER_HEADER
 
 #include <vector>
+#include <queue>
 
 #include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/io/disk_queues.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -81,7 +83,6 @@ public:
 
         for (unsigned_type i = 0; i < nwriteblocks; i++)
             free_write_blocks.push_back(i);
-
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
     }

@@ -13,7 +13,8 @@
 #ifndef STXXL_MEM_FILE_HEADER
 #define STXXL_MEM_FILE_HEADER
 
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/file_request_basic.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -22,67 +23,24 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of file based on new[] and memcpy
-class mem_file : public file
+class mem_file : public file_request_basic
 {
     char * ptr;
-    unsigned_type sz;
+    offset_type sz;
 
 public:
     //! \brief constructs file object
     //! \param disk disk(file) identifier
     mem_file(
-        int disk = -1);
-    request_ptr aread(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-    request_ptr awrite(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-    char * get_ptr() const;
+        int disk = -1) : file_request_basic(disk), ptr(NULL), sz(0)
+    { }
+    void serve(const request * req) throw(io_error);
     ~mem_file();
-    stxxl::int64 size();
-    void set_size(stxxl::int64 newsize);
+    offset_type size();
+    void set_size(offset_type newsize);
     void lock();
-    void delete_region(int64 offset, unsigned_type size);
-};
-
-//! \brief Implementation of request based on memcpy()
-class mem_request : public request
-{
-    friend class mem_file;
-
-protected:
-    // states of request
-    enum { OP = 0, DONE = 1, READY2DIE = 2 };
-    // OP - operating, DONE - request served,
-    // READY2DIE - can be destroyed
-
-    state _state;
-    mutex waiters_mutex;
-    std::set<onoff_switch *> waiters;
-
-    mem_request(
-        mem_file * f,
-        void * buf,
-        stxxl::int64 off,
-        size_t b,
-        request_type t,
-        completion_handler on_cmpl);
-    bool add_waiter(onoff_switch * sw);
-    void delete_waiter(onoff_switch * sw);
-    int nwaiters();             // returns number of waiters
-    void check_aligning();
-    void serve();
-
-public:
-    virtual ~mem_request();
-    void wait();
-    bool poll();
-    const char * io_type();
+    void delete_region(offset_type offset, size_type size);
+    const char * io_type() const;
 };
 
 //! \}

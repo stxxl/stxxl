@@ -17,6 +17,7 @@
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/btree/iterator.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE

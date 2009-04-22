@@ -17,7 +17,7 @@
 #include <queue>
 
 #include <stxxl/bits/common/switch.h>
-#include <stxxl/bits/io/iobase.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -67,10 +67,6 @@ protected:
         STXXL_VERBOSE1("block_prefetcher: waiting block " << iblock);
         {
             stats::scoped_wait_timer wait_timer;
-
-#ifdef NO_OVERLAPPING
-            read_reqs[pref_buffer[iblock]]->poll();
-#endif
 
             completed[iblock].wait_for_on();
         }

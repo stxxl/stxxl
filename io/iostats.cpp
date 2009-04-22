@@ -24,6 +24,10 @@ stats::stats() :
     writes(0),
     volume_read(0),
     volume_written(0),
+    c_reads(0),
+    c_writes(0),
+    c_volume_read(0),
+    c_volume_written(0),
     t_reads(0.0),
     t_writes(0.0),
     p_reads(0.0),
@@ -41,6 +45,7 @@ stats::stats() :
     last_reset(timestamp())
 { }
 
+#ifndef STXXL_IO_STATS_RESET_FORBIDDEN
 void stats::reset()
 {
     {
@@ -52,8 +57,9 @@ void stats::reset()
                          " read(s) not yet finished");
 
         reads = 0;
-
         volume_read = 0;
+        c_reads = 0;
+        c_volume_read = 0;
         t_reads = 0;
         p_reads = 0.0;
     }
@@ -66,8 +72,9 @@ void stats::reset()
                          " write(s) not yet finished");
 
         writes = 0;
-
         volume_written = 0;
+        c_writes = 0;
+        c_volume_written = 0;
         t_writes = 0.0;
         p_writes = 0.0;
     }
@@ -95,6 +102,7 @@ void stats::reset()
 
     last_reset = timestamp();
 }
+#endif
 
 #if STXXL_IO_STATS
 void stats::write_started(unsigned size_)
@@ -139,6 +147,14 @@ void stats::write_finished()
     }
 }
 
+void stats::write_cached(unsigned size_)
+{
+    scoped_mutex_lock WriteLock(write_mutex);
+
+    ++c_writes;
+    c_volume_written += size_;
+}
+
 void stats::read_started(unsigned size_)
 {
     double now = timestamp();
@@ -179,6 +195,14 @@ void stats::read_finished()
         p_ios += (acc_ios--) ? diff : 0.0;
         p_begin_io = now;
     }
+}
+
+void stats::read_cached(unsigned size_)
+{
+    scoped_mutex_lock WriteLock(read_mutex);
+
+    ++c_reads;
+    c_volume_read += size_;
 }
 #endif
 
@@ -230,7 +254,7 @@ void stats::_reset_io_wait_time()
 std::string hr(uint64 number, const char * unit = "")
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
-    static const char * endings[] = { " ", "K", "M", "G", "T", "P", "E" };
+    static const char endings[] = " KMGTPE";
     std::ostringstream out;
     out << number << ' ';
     int scale = 0;
@@ -241,7 +265,9 @@ std::string hr(uint64 number, const char * unit = "")
         ++scale;
     }
     if (scale > 0)
-        out << '(' << std::fixed << std::setprecision(3) << number_d << ' ' << endings[scale] << unit << ") ";
+        out << '(' << std::fixed << std::setprecision(3) << number_d << ' ' << endings[scale] << (unit ? unit : "") << ") ";
+    else if (unit && *unit)
+        out << unit << ' ';
     return out.str();
 }
 
@@ -250,6 +276,8 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
     o << "STXXL I/O statistics" << std::endl;
 #if STXXL_IO_STATS
     o << " total number of reads                      : " << hr(s.get_reads()) << std::endl;
+    o << " average block size (read)                  : "
+      << hr(s.get_reads() ? s.get_read_volume() / s.get_reads() : 0, "B") << std::endl;
     o << " number of bytes read from disks            : " << hr(s.get_read_volume(), "B") << std::endl;
     o << " time spent in serving all read requests    : " << s.get_read_time() << " sec."
       << " @ " << (s.get_read_volume() / 1048576.0 / s.get_read_time()) << " MB/sec."
@@ -257,7 +285,19 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
     o << " time spent in reading (parallel read time) : " << s.get_pread_time() << " sec."
       << " @ " << (s.get_read_volume() / 1048576.0 / s.get_pread_time()) << " MB/sec."
       << std::endl;
+   if (s.get_cached_reads()) {
+    o << " total number of cached reads               : " << hr(s.get_cached_reads()) << std::endl;
+    o << " average block size (cached read)           : " << hr(s.get_cached_read_volume() / s.get_cached_reads(), "B") << std::endl;
+    o << " number of bytes read from cache            : " << hr(s.get_cached_read_volume(), "B") << std::endl;
+   }
+   if (s.get_cached_writes()) {
+    o << " total number of cached writes              : " << hr(s.get_cached_writes()) << std::endl;
+    o << " average block size (cached write)          : " << hr(s.get_cached_written_volume() / s.get_cached_writes(), "B") << std::endl;
+    o << " number of bytes written to cache           : " << hr(s.get_cached_written_volume(), "B") << std::endl;
+   }
     o << " total number of writes                     : " << hr(s.get_writes()) << std::endl;
+    o << " average block size (write)                 : "
+      << hr(s.get_writes() ? s.get_written_volume() / s.get_writes() : 0, "B") << std::endl;
     o << " number of bytes written to disks           : " << hr(s.get_written_volume(), "B") << std::endl;
     o << " time spent in serving all write requests   : " << s.get_write_time() << " sec."
       << " @ " << (s.get_written_volume() / 1048576.0 / s.get_write_time()) << " MB/sec."

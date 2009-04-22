@@ -163,11 +163,11 @@ void reader_writer_test()
                 reader.next_subblock();
             }
         }
-		
-		STXXL_MSG("Passed Reader-Writer Test")
+
+        STXXL_MSG("Passed Reader-Writer Test");
     }
     catch (...) {
-        STXXL_MSG("Cought unknown exception.")
+        STXXL_MSG("Cought unknown exception.");
     }
 }
 

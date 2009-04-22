@@ -12,48 +12,29 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iomanip>
+#include <queue>
 
-#if GOOGLE_PROFILER
-#include <google/profiler.h>
-#endif
-
-#define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL 1
-#define STXXL_PARALLEL_PQ_STATS 0
-
-//#define _GLIBCXX_ASSERTIONS 0
+#define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1
+#define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER 1
 
 #define TINY_PQ 0
-#define MANUAL_PQ 1
+#define MANUAL_PQ 0
 
-#define SIDE_PQ 0
-
-#if MANUAL_PQ || TINY_PQ
-//#define MCSTL_QUICKSORT_WORKAROUND 1
-#else
-//#define MCSTL_MERGESORT 0
-//#define MCSTL_QUICKSORT 1
-#endif
-
-#ifndef STXXL_CHECK_ORDER_IN_SORTS
-#define STXXL_CHECK_ORDER_IN_SORTS 0
-#endif
-#define STXXL_VERBOSE_LEVEL -1
-#define MCSTL_VERBOSE_LEVEL 0
+#define SIDE_PQ 1
 
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
 
-const unsigned long long mega = 1024 * 1024;    //1 * 1024 does not work here
+const stxxl::unsigned_type mega = 1024 * 1024;    //1 * 1024 does not work here
 
 //const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
-const unsigned long long block_size = 4 * mega;
+const stxxl::unsigned_type block_size = 4 * mega;
 
 #define RECORD_SIZE 16
 #define LOAD 0
 
-typedef unsigned long long my_key_type;
+typedef stxxl::uint64 my_key_type;
 
 #define MAGIC 123
 
@@ -134,11 +115,15 @@ int main(int argc, char * argv[])
 {
     if (argc < 3)
     {
-        std::cout << "Usage: " << argv[0] << " [n in megabytes] [p threads]" << std::endl;
+        std::cout << "Usage: " << argv[0] << " [n in megabytes]"
+#if defined(__MCSTL__) || defined(_GLIBCXX_PARALLEL)
+                << " [p threads]"
+#endif
+                << std::endl;
         return -1;
     }
 
-    STXXL_MSG("----------------------------------------")
+    STXXL_MSG("----------------------------------------");
 
     stxxl::config::get_instance();
     std::string Flags = std::string("")
@@ -157,21 +142,17 @@ int main(int argc, char * argv[])
 #if SIDE_PQ
                         + " SIDE_PQ"
 #endif
-    ;
-#ifdef __MCSTL__
-    Flags += std::string("")
 #if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
-             + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL"
+                        + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL"
 #endif
 #if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
-             + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL"
+                        + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL"
 #endif
-#if STXXL_PARALLEL_PQ_STATS
-             + " STXXL_PARALLEL_PQ_STATS"
+#if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
+                        + " STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER"
 #endif
     ;
     STXXL_MSG("Flags:" << Flags);
-#endif
 
     unsigned long megabytes = atoi(argv[1]);
 #ifdef __MCSTL__
@@ -195,10 +176,31 @@ int main(int argc, char * argv[])
     mcstl::SETTINGS::multiway_merge_oversampling = 10;
     mcstl::SETTINGS::multiway_merge_minimal_n = 1000;
     mcstl::SETTINGS::multiway_merge_minimal_k = 2;
+#elif defined(_GLIBCXX_PARALLEL)
+/*    int num_threads = atoi(argv[2]);
+    STXXL_MSG("Threads: " << num_threads);
+
+    omp_set_num_threads(num_threads);
+    __gnu_parallel::_Settings parallel_settings(__gnu_parallel::_Settings::get());
+    parallel_settings.sort_algorithm = __gnu_parallel::QS_BALANCED;
+    parallel_settings.sort_splitting = __gnu_parallel::SAMPLING;
+    parallel_settings.sort_minimal_n = 1000;
+    parallel_settings.sort_mwms_oversampling = 10;
+
+    parallel_settings.merge_splitting = __gnu_parallel::SAMPLING;
+    parallel_settings.merge_minimal_n = 1000;
+    parallel_settings.merge_oversampling = 10;
+
+    parallel_settings.multiway_merge_algorithm = __gnu_parallel::LOSER_TREE;
+    parallel_settings.multiway_merge_splitting = __gnu_parallel::EXACT;
+    parallel_settings.multiway_merge_oversampling = 10;
+    parallel_settings.multiway_merge_minimal_n = 1000;
+    parallel_settings.multiway_merge_minimal_k = 2;
+  __gnu_parallel::_Settings::set(parallel_settings);*/
 #endif
 
-    const unsigned mem_for_queue = 2048 * mega;
-    const unsigned mem_for_pools = 2048 * mega;
+    const stxxl::unsigned_type mem_for_queue = 2047 * mega;
+    const stxxl::unsigned_type mem_for_pools = 2047 * mega;
 
 #if TINY_PQ
     stxxl::UNUSED(mem_for_queue);
@@ -245,7 +247,7 @@ int main(int argc, char * argv[])
             >
         > pq_type;
 #else
-    const unsigned_type volume = 200000 * mega;     // in bytes
+    const stxxl::uint64 volume = stxxl::uint64(200000) * mega;     // in bytes
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type) / 1024 + 1> gen;
     typedef gen::result pq_type;
 //         BufferSize1 = Config::BufferSize1,
@@ -270,11 +272,11 @@ int main(int argc, char * argv[])
     STXXL_MSG("Block size B: " << pq_type::BlockSize);
     //EConsumption = X * settings::E + settings::B * AE + ((MaxS_ / X) / AE) * settings::B * 1024
 
-    STXXL_MSG("Data type size: " << sizeof(my_type))
-    STXXL_MSG("")
+    STXXL_MSG("Data type size: " << sizeof(my_type));
+    STXXL_MSG("");
 #ifdef __MCSTL__
-    STXXL_MSG("multiway_merge_minimal_k: " << mcstl::SETTINGS::multiway_merge_minimal_k)
-    STXXL_MSG("multiway_merge_minimal_n: " << mcstl::SETTINGS::multiway_merge_minimal_n)
+    STXXL_MSG("multiway_merge_minimal_k: " << mcstl::SETTINGS::multiway_merge_minimal_k);
+    STXXL_MSG("multiway_merge_minimal_n: " << mcstl::SETTINGS::multiway_merge_minimal_n);
 #endif
 
     stxxl::stats_data sd_start(*stxxl::stats::get_instance());
@@ -287,19 +289,15 @@ int main(int argc, char * argv[])
     stxxl::int64 nelements = stxxl::int64(megabytes * mega / sizeof(my_type)), i;
 
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
-    STXXL_MSG("Peak number of elements: " << nelements)
-    STXXL_MSG("Max number of elements to contain: " << ((unsigned long long)pq_type::N * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX))
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Peak number of elements: " << nelements);
+    STXXL_MSG("Max number of elements to contain: " << (stxxl::uint64(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
     srand(5);
     my_cmp cmp;
     my_key_type r, sum_input = 0, sum_output = 0;
     my_type least(0), last_least(0);
 
-    const unsigned long long modulo = 0x10000000;
-
-#if GOOGLE_PROFILER
-    ProfilerStart("extpq_profile");
-#endif
+    const my_key_type modulo = 0x10000000;
 
 #if SIDE_PQ
     std::priority_queue<my_type, std::vector<my_type>, my_cmp> side_pq;
@@ -333,12 +331,14 @@ int main(int argc, char * argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
-            STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+            STXXL_MSG ( "Wrong result at  " << i << "  " << side_pq_least.key << " != " << least.key );
 #endif
 
         if (cmp(last_least, least))
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key)
-
+        {
+            STXXL_MSG ( "Wrong order at  " << i << "  " << last_least.key << " > " << least.key );
+        }
+        else
             last_least = least;
 
         r = least.key + rand() % modulo;
@@ -349,9 +349,9 @@ int main(int argc, char * argv[])
 #endif
     }
     Timer.stop();
-    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec")
+    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec");
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
     stxxl::stats_data sd_middle(*stxxl::stats::get_instance());
     std::cout << sd_middle - sd_start;
     Timer.reset();
@@ -369,10 +369,15 @@ int main(int argc, char * argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
+        {
             STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+        }
 #endif
         if (cmp(last_least, least))
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key)
+        {
+            STXXL_MSG ( "Wrong result at " << i << "  " << last_least.key << " > " << least.key );
+        }
+        else
             last_least = least;
 
         r = least.key + rand() % modulo;
@@ -389,10 +394,15 @@ int main(int argc, char * argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
+        {
             STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+        }
 #endif
         if (cmp(last_least, least))
-            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key)
+        {
+            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
+        }
+        else
             last_least = least;
 
         if ((i % (10 * mega)) == 0)
@@ -405,15 +415,11 @@ int main(int argc, char * argv[])
     STXXL_MSG("Last element " << i << " popped");
     Timer.stop();
 
-#if GOOGLE_PROFILER
-    ProfilerStop();
-#endif
-
     if (sum_input != sum_output)
-        STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output))
+        STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output));
 
-        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec")
-        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes")
+        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
+        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
         std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - sd_middle;
     std::cout << *stxxl::stats::get_instance();
 

@@ -26,11 +26,12 @@ TOPDIR	?= $(error TOPDIR not defined) # DO NOT CHANGE! This is set elsewhere.
 
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_MACOSX	?= no	# set 'yes' if you run Mac OS X, 'no' otherwise
+USE_FREEBSD	?= no	# set 'yes' if you run FreeBSD, 'no' otherwise
 USE_PMODE	?= no	# will be overridden from main Makefile
 USE_MCSTL	?= no	# will be overridden from main Makefile
 USE_ICPC	?= no	# will be overridden from main Makefile
 
-STXXL_ROOT	?= $(HOME)/work/stxxl
+STXXL_ROOT	?= $(TOPDIR)
 
 ifeq ($(strip $(USE_ICPC)),yes)
 COMPILER_ICPC	?= icpc
@@ -58,7 +59,7 @@ COMPILER	?= $(COMPILER_GCC)
 LINKER		?= $(COMPILER)
 OPT_LEVEL	?= 3
 OPT		?= -O$(OPT_LEVEL) # compiler optimization level
-WARNINGS	?= -W -Wall
+WARNINGS	?= -W -Wall -Woverloaded-virtual
 DEBUG		?= # put here -g option to include the debug information into the binaries
 
 LIBNAME		?= stxxl
@@ -106,6 +107,19 @@ endif
 ##################################################################
 
 
+#### FREEBSD CONFIGURATION #######################################
+
+ifeq ($(strip $(USE_FREEBSD)),yes)
+
+PTHREAD_FLAG	?= -pthread
+
+GET_FILE_ID	?= stat -L -f '%d:%i' $1
+
+endif
+
+##################################################################
+
+
 #### LINUX (DEFAULT) CONFIGURATION ###############################
 
 PTHREAD_FLAG	?= -pthread
@@ -126,7 +140,7 @@ ifeq (,$(strip $(wildcard $(CURDIR)/make.settings.local)))
 ifneq (,$(strip $(wildcard $(CURDIR)/include/stxxl.h)))
 $(warning *** WARNING: trying autoconfiguration for STXXL_ROOT=$(CURDIR:$(HOME)%=$$(HOME)%))
 $(warning *** WARNING: you did not have a make.settings.local file -- creating ...)
-$(shell echo 'STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
+$(shell echo -e '\043STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
 MCSTL_ROOT	?= $(HOME)/work/mcstl
 $(shell echo -e '\043MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
 $(shell echo -e '\043COMPILER_GCC	 = g++-4.2.3' >> $(CURDIR)/make.settings.local)
@@ -135,6 +149,11 @@ ifeq (Darwin,$(strip $(shell uname)))
 $(shell echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
 else
 $(shell echo -e '\043USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
+endif
+ifeq (FreeBSD,$(strip $(shell uname)))
+$(shell echo -e 'USE_FREEBSD	 = yes' >> $(CURDIR)/make.settings.local)
+else
+$(shell echo -e '\043USE_FREEBSD	 = no' >> $(CURDIR)/make.settings.local)
 endif
 $(error ERROR: Please check make.settings.local and try again)
 endif
@@ -166,6 +185,7 @@ STXXL_SPECIFIC	+= \
 	-DUSE_MALLOC_LOCK \
 	-DCOUNT_WAIT_TIME \
 	-I$(strip $(STXXL_ROOT))/include \
+	-include stxxl/bits/defines.h \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \
 	$(POSIX_MEMALIGN) $(XOPEN_SOURCE)
 
@@ -262,25 +282,33 @@ CPPUNIT_LINKER_OPTIONS		+= -lcppunit -ldl
 
 HEADER_FILES_BITS	+= namespace.h noncopyable.h version.h
 HEADER_FILES_BITS	+= compat_hash_map.h compat_hash_set.h
-HEADER_FILES_BITS	+= compat_auto_ptr.h parallel.h singleton.h
+HEADER_FILES_BITS	+= compat_unique_ptr.h parallel.h singleton.h defines.h
 
 HEADER_FILES_COMMON	+= aligned_alloc.h mutex.h rand.h semaphore.h state.h
-HEADER_FILES_COMMON	+= timer.h utils.h simple_vector.h
+HEADER_FILES_COMMON	+= timer.h utils.h error_handling.h simple_vector.h
 HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h debug.h tuple.h
 HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h
 
-HEADER_FILES_IO		+= completion_handler.h io.h iobase.h iostats.h
-HEADER_FILES_IO		+= mmap_file.h simdisk_file.h syscall_file.h
-HEADER_FILES_IO		+= ufs_file.h wincall_file.h wfs_file.h boostfd_file.h
-HEADER_FILES_IO		+= mem_file.h
+HEADER_FILES_IO		+= io.h iostats.h completion_handler.h
+HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h
+HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h
+HEADER_FILES_IO		+= disk_queues.h
+HEADER_FILES_IO		+= request_queue.h request_queue_impl_worker.h
+HEADER_FILES_IO		+= request_queue_impl_qwqr.h
+HEADER_FILES_IO		+= file.h file_request_basic.h
+HEADER_FILES_IO		+= ufs_file_base.h syscall_file.h mmap_file.h simdisk_file.h
+HEADER_FILES_IO		+= wfs_file_base.h wincall_file.h
+HEADER_FILES_IO		+= boostfd_file.h mem_file.h fileperblock_file.h
+HEADER_FILES_IO		+= wbtl_file.h
 
 HEADER_FILES_MNG	+= adaptor.h block_prefetcher.h
 HEADER_FILES_MNG	+= buf_istream.h buf_ostream.h buf_writer.h mng.h
 HEADER_FILES_MNG	+= write_pool.h prefetch_pool.h
 HEADER_FILES_MNG	+= block_alloc_interleaved.h
 
-HEADER_FILES_CONTAINERS	+= pager.h stack.h vector.h priority_queue.h queue.h
-HEADER_FILES_CONTAINERS	+= map.h deque.h
+HEADER_FILES_CONTAINERS	+= pager.h stack.h vector.h priority_queue.h
+HEADER_FILES_CONTAINERS	+= pq_helpers.h pq_mergers.h pq_ext_merger.h
+HEADER_FILES_CONTAINERS	+= pq_losertree.h queue.h map.h deque.h
 
 HEADER_FILES_CONTAINERS_BTREE	+= btree.h iterator_map.h leaf.h node_cache.h
 HEADER_FILES_CONTAINERS_BTREE	+= root_node.h node.h btree_pager.h iterator.h
@@ -320,7 +348,7 @@ bin	?= $(strip $(EXEEXT))
 
 #### COMPILE/LINK RULES ###########################################
 
-DEPS_MAKEFILES	:= $(wildcard ../Makefile.subdir.gnu ../make.settings ../make.settings.local GNUmakefile Makefile.local)
+DEPS_MAKEFILES	:= $(wildcard $(TOPDIR)/Makefile.subdir.gnu $(TOPDIR)/make.settings $(TOPDIR)/make.settings.local GNUmakefile Makefile Makefile.common Makefile.local)
 %.$o: %.cpp $(DEPS_MAKEFILES)
 	@$(RM) $@ $*.$d
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $*.$dT -c $(OUTPUT_OPTION) $< && mv $*.$dT $*.$d
@@ -335,6 +363,9 @@ LINK_STXXL	 = $(LINKER) $1 $(STXXL_LINKER_OPTIONS) -o $@
 
 
 # last resort rules to ignore header files missing due to renames etc.
+$(STXXL_ROOT)/include/%::
+	@echo "MISSING HEADER: '$@' (ignored)"
+
 %.h::
 	@echo "MISSING HEADER: '$@' (ignored)"
 

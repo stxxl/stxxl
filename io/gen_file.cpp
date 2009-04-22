@@ -44,14 +44,20 @@ bool operator < (const my_type & a, const my_type & b)
 }
 
 
-int main()
+int main(int argc, char ** argv)
 {
+    if (argc < 2)
+    {
+        std::cout << "Usage: " << argv[0] << " output_file" << std::endl;
+        return -1;
+    }
+
     const my_type::key_type max_key = 1 * 1024 * 1024;
     const unsigned int block_size = 1 * 1024 * 1024;
     const unsigned int records_in_block = block_size / sizeof(my_type);
     my_type * array = (my_type *)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
     memset(array, 0, block_size);
-    stxxl::syscall_file f("./in", stxxl::file::CREAT | stxxl::file::RDWR);
+    stxxl::syscall_file f(argv[1], stxxl::file::CREAT | stxxl::file::RDWR);
     stxxl::request_ptr req;
 
     my_type::key_type cur_key = max_key;

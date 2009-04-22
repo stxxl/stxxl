@@ -18,7 +18,7 @@
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/vector>
-#include <stxxl/bits/compat_auto_ptr.h>
+#include <stxxl/bits/compat_unique_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -124,8 +124,8 @@ namespace stream
         typedef buf_istream<typename InputIterator_::block_type,
                             typename InputIterator_::bids_container_iterator> buf_istream_type;
 
-        typedef typename stxxl::compat_auto_ptr<buf_istream_type>::result auto_ptr_type;
-        mutable auto_ptr_type in;
+        typedef typename stxxl::compat_unique_ptr<buf_istream_type>::result unique_ptr_type;
+        mutable unique_ptr_type in;
 
         void delete_stream()
         {
@@ -157,7 +157,8 @@ namespace stream
             }
         }
 
-        vector_iterator2stream(const Self_ & a) : current_(a.current_), end_(a.end_), in(a.in) { }
+        vector_iterator2stream(const Self_ & a) :
+            current_(a.current_), end_(a.end_), in(a.in.release()) { }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -211,7 +212,7 @@ namespace stream
     {
         STXXL_VERBOSE1("streamify for vector_iterator range is called");
         return vector_iterator2stream<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
-                                   (begin, end, nbuffers);
+                                             (begin, end, nbuffers);
     }
 
     template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
@@ -239,7 +240,7 @@ namespace stream
     {
         STXXL_VERBOSE1("streamify for const_vector_iterator range is called");
         return vector_iterator2stream<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
-                                   (begin, end, nbuffers);
+                                             (begin, end, nbuffers);
     }
 
     template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
@@ -347,7 +348,7 @@ namespace stream
     {
         STXXL_VERBOSE1("streamify_sr for vector_iterator range is called");
         return vector_iterator2stream_sr<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
-                                   (begin, end, nbuffers);
+                                             (begin, end, nbuffers);
     }
 
     //! \brief Version of  \c streamify. Switches from \c vector_iterator2stream to \c iterator2stream for small ranges.
@@ -361,7 +362,7 @@ namespace stream
     {
         STXXL_VERBOSE1("streamify_sr for const_vector_iterator range is called");
         return vector_iterator2stream_sr<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
-                                   (begin, end, nbuffers);
+                                             (begin, end, nbuffers);
     }
 
     //! \brief Stores consecutively stream content to an output iterator
@@ -454,7 +455,7 @@ namespace stream
         while (!in.empty() && outend != outbegin)
         {
             if (outbegin.block_offset() == 0)
-                outbegin.touch();
+                outbegin.block_externally_updated();
 
             *outstream = *in;
             ++outbegin;
@@ -525,7 +526,7 @@ namespace stream
         while (!in.empty())
         {
             if (out.block_offset() == 0)
-                out.touch();
+                out.block_externally_updated();
             // tells the vector that the block was modified
             *outstream = *in;
             ++out;

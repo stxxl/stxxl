@@ -19,8 +19,7 @@
 
 #ifdef BOOST_MSVC
 
-#include <stxxl/bits/io/wfs_file.h>
-#include <stxxl/bits/common/debug.h>
+#include <stxxl/bits/io/wfs_file_base.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -40,36 +39,10 @@ public:
     wincall_file(
         const std::string & filename,
         int mode,
-        int disk = -1);
-    request_ptr aread(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-    request_ptr awrite(
-        void * buffer,
-        stxxl::int64 pos,
-        size_t bytes,
-        completion_handler on_cmpl);
-};
-
-//! \brief Implementation of request based on UNIX syscalls
-class wincall_request : public wfs_request_base
-{
-    friend class wincall_file;
-
-protected:
-    wincall_request(
-        wincall_file * f,
-        void * buf,
-        stxxl::int64 off,
-        size_t b,
-        request_type t,
-        completion_handler on_cmpl);
-    void serve();
-
-public:
-    const char * io_type();
+        int disk = -1) : wfs_file_base(filename, mode, disk)
+    { }
+    void serve(const request * req) throw(io_error);
+    const char * io_type() const;
 };
 
 //! \}

@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <iostream>
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
 #include <malloc.h>
 #endif
 #include <cstdlib>
@@ -20,7 +20,7 @@
 
 void print_malloc_stats()
 {
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
     struct mallinfo info = mallinfo();
     STXXL_MSG("MALLOC statistics BEGIN");
     STXXL_MSG("===============================================================");
