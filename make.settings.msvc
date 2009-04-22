@@ -19,7 +19,7 @@
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = "$(TOPDIR)"#
-BOOST_ROOT = "C:\Program Files (x86)\boost\boost_1_35_0"#
+include make.settings.local
 
 MAKE = nmake /NOLOGO
 COMPILER = cl
