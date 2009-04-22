@@ -199,8 +199,8 @@ int main(int argc, char * argv[])
   __gnu_parallel::_Settings::set(parallel_settings);*/
 #endif
 
-    const unsigned mem_for_queue = 2048 * mega;
-    const unsigned mem_for_pools = 2048 * mega;
+    const stxxl::unsigned_type mem_for_queue = 2047 * mega;
+    const stxxl::unsigned_type mem_for_pools = 2047 * mega;
 
 #if TINY_PQ
     stxxl::UNUSED(mem_for_queue);
