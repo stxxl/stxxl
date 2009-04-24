@@ -35,7 +35,7 @@ make.settings: make.settings.msvc
 
 
 config_gnu: settings_gnu
-	$(MAKE) -f Makefile.gnu config
+	$(MAKE) -f Makefile.gnu config STXXL_AUTOCONFIG=true
 
 
 library_g++: settings_gnu
