@@ -133,7 +133,8 @@ GET_FILE_ID	?= stat -L -c '%d:%i' $1
 
 #### STXXL CONFIGURATION #########################################
 
-# create make.settings.local
+# create make.settings.local in the root directory
+ifneq (,$(strip $(wildcard $(CURDIR)/include/stxxl.h)))
 ifeq (,$(strip $(wildcard $(CURDIR)/make.settings.local)))
 ifeq (,$(STXXL_AUTOCONFIG))
 $(warning *** WARNING: you did not have a make.settings.local file -- creating ...)
@@ -155,6 +156,7 @@ else
 $(shell echo -e '\043USE_FREEBSD	 = no' >> $(CURDIR)/make.settings.local)
 endif
 include make.settings.local
+endif
 endif
 
 # check, whether stxxl is configured correctly
