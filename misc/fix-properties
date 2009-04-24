@@ -1,0 +1,32 @@
+#!/bin/sh
+
+svn ps svn:eol-style native [A-Z]*[A-Z]
+svn ps svn:eol-style native misc/*
+
+find . -name .svn -prune -o \( -type f -a \( \
+		-name "*.h" -o -name "*.cpp" -o -name "Makefile*" -o -name "GNUmakefile*" -o -name "*.tex" -o -name "*.bib" -o -name "*.fig" -o -name "*html" -o -name "*.css" \
+	\) -exec svn ps svn:eol-style native {} \; \)
+
+find include -name .svn -prune -o \( -type f \
+	-exec svn ps svn:eol-style native {} \; \)
+
+find . -name .svn -prune -o \( -type f -a \( \
+		-name "*.gif" \
+	\) -exec svn ps svn:mime-type image/gif {} \; \)
+
+find . -name .svn -prune -o \( -type f -a \( \
+		-name "*.jpg" -o -name "*.jpeg" \
+	\) -exec svn ps svn:mime-type image/jpeg {} \; \)
+
+find . -name .svn -prune -o \( -type f -a \( \
+		-name "*.png" \
+	\) -exec svn ps svn:mime-type image/png {} \; \)
+
+find . -name .svn -prune -o \( -type f -a \( \
+		-name "*.pdf" \
+	\) -exec svn ps svn:mime-type application/pdf {} \; \)
+
+find . -name .svn -prune -o \( -type f -a \( \
+		-name "*.ps" -o -name "*.eps" \
+	\) -exec svn ps svn:mime-type application/postscript {} \; \)
+
