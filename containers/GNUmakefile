@@ -79,6 +79,7 @@ $(call reduce_optimization,3,0,btree/test_btree,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,0,btree/test_btree,gcc_version_4.2,32-bit,any)
 $(call reduce_optimization,3,0,btree/test_const_scan,gcc_version_4.2,any,any)
 else
+$(call reduce_optimization,3,2,test_map,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,2,btree/test_btree,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,2,btree/test_corr_insert_scan,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,2,btree/test_corr_insert_erase,gcc_version_4.2,64-bit,any)
