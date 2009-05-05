@@ -248,8 +248,27 @@ inline stxxl::int64 atoint64(const char * s)
 
 ////////////////////////////////////////////////////////////////////////////
 
-#define STXXL_MIN(a, b) ((std::min)(a, b))
-#define STXXL_MAX(a, b) ((std::max)(a, b))
+template <typename Tp>
+inline const Tp&
+STXXL_MIN(const Tp& a, const Tp& b)
+{
+#ifdef min
+	return (std::min<Tp>)(a, b);
+#else
+	return std::min<Tp>(a, b);
+#endif
+}
+
+template <typename Tp>
+inline const Tp&
+STXXL_MAX(const Tp& a, const Tp& b)
+{
+#ifdef max
+	return (std::max<Tp>)(a, b);
+#else
+	return std::max<Tp>(a, b);
+#endif
+}
 
 #define STXXL_L2_SIZE  (512 * 1024)
 
