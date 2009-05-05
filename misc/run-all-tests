@@ -68,7 +68,15 @@ run()
 		result=$?
 	fi
 	echo "[`date`]" | tee -a "$pfx.log"
-	test "$result" = 0 || mv "$pfx.log" "$pfx.FAIL.$result"
+	if [ -n "$XFAIL" ]; then
+		if [ "$result" = 0 ]; then
+			mv "$pfx.log" "$pfx.FAIL.xfail.$result"
+		else
+			mv "$pfx.log" "$pfx.xfail.$result"
+		fi
+	else
+		test "$result" = 0 || mv "$pfx.log" "$pfx.FAIL.$result"
+	fi
 	test -s stxxl.errlog && mv stxxl.errlog "$pfx.ERR"
 }
 
@@ -77,7 +85,8 @@ if false; then
 fi
 
 run common/stxxl_info
-run common/stxxl_info foo # returns -1 intentionally
+XFAIL=1 run common/stxxl_info foo # returns -1 intentionally
+XFAIL=1 run common/stxxl_info foo bar # returns !0 if assertions are enabled
 run common/test_random
 
 run io/gen_file "$STXXL_TMPDIR/in"
