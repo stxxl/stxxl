@@ -252,22 +252,14 @@ template <typename Tp>
 inline const Tp&
 STXXL_MIN(const Tp& a, const Tp& b)
 {
-#ifdef min_MSVC_TEST
-	return (std::min<Tp>)(a, b);
-#else
 	return std::min<Tp>(a, b);
-#endif
 }
 
 template <typename Tp>
 inline const Tp&
 STXXL_MAX(const Tp& a, const Tp& b)
 {
-#ifdef max_MSVC_TEST
-	return (std::max<Tp>)(a, b);
-#else
 	return std::max<Tp>(a, b);
-#endif
 }
 
 #define STXXL_L2_SIZE  (512 * 1024)
