@@ -185,7 +185,6 @@ STXXL_SPECIFIC	+= \
 	$(PTHREAD_FLAG) \
 	$(CPPFLAGS_ARCH) \
 	-DSORT_OPTIMAL_PREFETCHING \
-	-DUSE_MALLOC_LOCK \
 	-DCOUNT_WAIT_TIME \
 	-I$(strip $(STXXL_ROOT))/include \
 	-include stxxl/bits/defines.h \
