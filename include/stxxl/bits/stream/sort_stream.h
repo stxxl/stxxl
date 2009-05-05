@@ -14,6 +14,11 @@
 #ifndef STXXL_SORT_STREAM_HEADER
 #define STXXL_SORT_STREAM_HEADER
 
+#ifndef STXXL_SORT_OPTIMAL_PREFETCHING
+#define STXXL_SORT_OPTIMAL_PREFETCHING 1
+#endif
+
+
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
@@ -1142,7 +1147,7 @@ namespace stream
             const int_type n_prefetch_buffers = STXXL_MAX(2 * disks_number, (int_type(m_) - int_type(nruns)));
 
 
-#ifdef SORT_OPTIMAL_PREFETCHING
+#if STXXL_SORT_OPTIMAL_PREFETCHING
             // heuristic
             const int_type n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
 
@@ -1154,7 +1159,6 @@ namespace stream
 #else
             for (i = 0; i < prefetch_seq_size; ++i)
                 prefetch_seq[i] = i;
-
 #endif
 
 

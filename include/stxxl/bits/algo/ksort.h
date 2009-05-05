@@ -14,6 +14,11 @@
 #ifndef STXXL_KSORT_HEADER
 #define STXXL_KSORT_HEADER
 
+#ifndef STXXL_SORT_OPTIMAL_PREFETCHING
+#define STXXL_SORT_OPTIMAL_PREFETCHING 1
+#endif
+
+
 #include <list>
 
 #include <stxxl/bits/mng/mng.h>
@@ -32,7 +37,6 @@
 #include <stxxl/bits/algo/inmemsort.h>
 
 
-//#define SORT_OPTIMAL_PREFETCHING
 //#define INTERLEAVED_ALLOC
 
 #define OPT_MERGING
@@ -487,7 +491,7 @@ namespace ksort_local
         STXXL_VERBOSE("Prefetch buffers " << n_opt_prefetch_buffers);
 #endif
 
-#ifdef SORT_OPTIMAL_PREFETCHING
+#if STXXL_SORT_OPTIMAL_PREFETCHING
         compute_prefetch_schedule(
             consume_seq,
             prefetch_seq,

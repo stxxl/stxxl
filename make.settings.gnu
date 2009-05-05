@@ -184,7 +184,6 @@ endif
 STXXL_SPECIFIC	+= \
 	$(PTHREAD_FLAG) \
 	$(CPPFLAGS_ARCH) \
-	-DSORT_OPTIMAL_PREFETCHING \
 	-I$(strip $(STXXL_ROOT))/include \
 	-include stxxl/bits/defines.h \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE \

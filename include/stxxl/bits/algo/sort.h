@@ -15,6 +15,11 @@
 #ifndef STXXL_SORT_HEADER
 #define STXXL_SORT_HEADER
 
+#ifndef STXXL_SORT_OPTIMAL_PREFETCHING
+#define STXXL_SORT_OPTIMAL_PREFETCHING 1
+#endif
+
+
 #include <list>
 #include <functional>
 
@@ -36,8 +41,6 @@
 #include <stxxl/bits/parallel.h>
 
 
-//#define SORT_OPTIMAL_PREFETCHING
-//#define INTERLEAVED_ALLOC
 //#define STXXL_CHECK_ORDER_IN_SORTS
 
 __STXXL_BEGIN_NAMESPACE
@@ -403,13 +406,13 @@ namespace sort_local
 #else
         const int_type n_prefetch_buffers = STXXL_MAX(2 * disks_number, (3 * (int_type(_m) - nruns) / 4));
         const int_type n_write_buffers = STXXL_MAX(2 * disks_number, int_type(_m) - nruns - n_prefetch_buffers);
- #ifdef SORT_OPTIMAL_PREFETCHING
+ #if STXXL_SORT_OPTIMAL_PREFETCHING
         // heuristic
         const int_type n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
  #endif
 #endif
 
-#ifdef SORT_OPTIMAL_PREFETCHING
+#if STXXL_SORT_OPTIMAL_PREFETCHING
         compute_prefetch_schedule(
             consume_seq,
             prefetch_seq,
