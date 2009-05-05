@@ -41,7 +41,7 @@ void run(char * buffer, file ** disks, stxxl::int64 offset, stxxl::int64 length,
 {
     unsigned i, j;
     double begin = timestamp(), end, elapsed;
-    request_ptr * reqs = new request_ptr[STXXL_MAX(hdd_blocks + ssd_blocks, 1U)];
+    request_ptr * reqs = new request_ptr[stxxl::STXXL_MAX(hdd_blocks + ssd_blocks, 1U)];
 
     struct diskinfo {
         unsigned id;
@@ -145,7 +145,7 @@ int main(int argc, char * argv[])
         for (unsigned hdd_bytes = 4 * KB; hdd_bytes < 256 * MB; hdd_bytes <<= 1) {
             for (unsigned ssd_bytes = 128 * KB; ssd_bytes == 128 * KB; ssd_bytes <<= 1) {
                 for (unsigned hdd_blocks = 1; hdd_blocks == 1; ++hdd_blocks) {
-                    for (unsigned ssd_blocks = 0; ssd_blocks <= (STXXL_MAX(16U, 2 * hdd_bytes * hdd_blocks / ssd_bytes)); ++ssd_blocks) {
+                    for (unsigned ssd_blocks = 0; ssd_blocks <= (stxxl::STXXL_MAX(16U, 2 * hdd_bytes * hdd_blocks / ssd_bytes)); ++ssd_blocks) {
                         run((char *)buffer, disks, offset, length, hdd_blocks, hdd_bytes, ssd_blocks, ssd_bytes, 100);
                     }
                 }
