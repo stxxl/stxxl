@@ -252,7 +252,7 @@ template <typename Tp>
 inline const Tp&
 STXXL_MIN(const Tp& a, const Tp& b)
 {
-#ifdef min
+#ifdef min_MSVC_TEST
 	return (std::min<Tp>)(a, b);
 #else
 	return std::min<Tp>(a, b);
@@ -263,7 +263,7 @@ template <typename Tp>
 inline const Tp&
 STXXL_MAX(const Tp& a, const Tp& b)
 {
-#ifdef max
+#ifdef max_MSVC_TEST
 	return (std::max<Tp>)(a, b);
 #else
 	return std::max<Tp>(a, b);
