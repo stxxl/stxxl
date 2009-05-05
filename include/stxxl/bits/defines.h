@@ -20,4 +20,9 @@
 // used in: io/*_file.cpp
 // effect:  call request::check_alignment() from request::request(...)
 
+//#define STXXL_DO_NOT_COUNT_WAIT_TIME
+// default: not defined
+// used in: io/iostats.{h,cpp}
+// effect:  makes calls to wait time counting functions no-ops
+
 #endif // !STXXL_DEFINES_HEADER

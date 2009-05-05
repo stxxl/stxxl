@@ -206,7 +206,7 @@ void stats::read_cached(unsigned size_)
 }
 #endif
 
-#ifdef COUNT_WAIT_TIME
+#ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
 void stats::wait_started()
 {
     double now = timestamp();
@@ -236,7 +236,7 @@ void stats::wait_finished()
 
 void stats::_reset_io_wait_time()
 {
-#ifdef COUNT_WAIT_TIME
+#ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
     {
         scoped_mutex_lock WaitLock(wait_mutex);
 
@@ -311,7 +311,7 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
 #else
     o << " n/a" << std::endl;
 #endif
-#ifdef COUNT_WAIT_TIME
+#ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
     o << " I/O wait time                              : " << s.get_io_wait_time() << " sec." << std::endl;
 #endif
     o << " Time since the last reset                  : " << s.get_elapsed_time() << " sec." << std::endl;
