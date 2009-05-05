@@ -100,13 +100,13 @@ void linear_sort_normal(vector_type & input)
 {
     stxxl::unsigned_type sum1 = checksum(input);
 
-    stxxl::stats::get_instance()->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
 
     stxxl::sort(input.begin(), input.end(), cmp_less_key(), run_size);
 
     double stop = stxxl::timestamp();
-    std::cout << *(stxxl::stats::get_instance()) << std::endl;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     stxxl::unsigned_type sum2 = checksum(input);
 
@@ -121,7 +121,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
 {
     stxxl::unsigned_type sum1 = checksum(input);
 
-    stxxl::stats::get_instance()->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
 
     typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
@@ -139,7 +139,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
 
     double stop = stxxl::timestamp();
-    std::cout << *(stxxl::stats::get_instance()) << std::endl;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     stxxl::unsigned_type sum2 = checksum(output);
 
@@ -269,13 +269,13 @@ int main(int argc, const char ** argv)
         stxxl::int64(megabytes_to_process) * stxxl::int64(megabyte) / sizeof(my_type);
     vector_type input(n_records);
 
-    stxxl::stats::get_instance()->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double generate_start = stxxl::timestamp();
 
     stxxl::generate(input.begin(), input.end(), stxxl::random_number64(), memory_to_use / STXXL_DEFAULT_BLOCK_SIZE(my_type));
 
     double generate_stop = stxxl::timestamp();
-    std::cout << *(stxxl::stats::get_instance()) << std::endl;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
 

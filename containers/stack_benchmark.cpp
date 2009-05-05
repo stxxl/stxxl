@@ -67,8 +67,7 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
 
     my_record cur;
 
-    stxxl::stats * Stats = stxxl::stats::get_instance();
-    Stats->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
     stxxl::timer Timer;
     Timer.start();
@@ -91,12 +90,13 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     Stack.set_prefetch_aggr(DISKS * 8);
 
     ////////////////////////////////////////////////
+
+    stats_begin = *stxxl::stats::get_instance();
     Timer.reset();
     Timer.start();
 
@@ -118,7 +118,7 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
-    std::cout << *Stats;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
 
 
@@ -139,8 +139,7 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
 
     my_record cur;
 
-    stxxl::stats * Stats = stxxl::stats::get_instance();
-    Stats->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
     stxxl::timer Timer;
     Timer.start();
@@ -163,11 +162,11 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
-    std::cout << *Stats;
-    Stats->reset();
-
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     ////////////////////////////////////////////////
+
+    stats_begin = *stxxl::stats::get_instance();
     Timer.reset();
     Timer.start();
 
@@ -189,7 +188,7 @@ void run_stxxl_normal_stack(stxxl::int64 volume)
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
               " MB/s");
 
-    std::cout << *Stats;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
 
 

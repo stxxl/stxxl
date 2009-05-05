@@ -38,8 +38,9 @@ typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
 
 int main(int argc, char ** argv)
 {
-    stxxl::stats * bm = stxxl::stats::get_instance();
-    STXXL_MSG(*bm);
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
+    stxxl::stats_data stats_elapsed;
+    STXXL_MSG(stats_begin);
 
     STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " kb");
     STXXL_MSG("Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " kb");
@@ -48,22 +49,25 @@ int main(int argc, char ** argv)
         max_mult = atoi(argv[1]);
     for (int mult = 1; mult < max_mult; mult *= 2)
     {
+        stats_begin = *stxxl::stats::get_instance();
         const unsigned el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
                   (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " kb");
         map_type * DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
         //map_type  Map(CACHE_SIZE*BLOCK_SIZE/2,CACHE_SIZE*BLOCK_SIZE/2);
         map_type & Map = *DMap;
+
         for (unsigned i = 0; i < el; ++i)
         {
             Map[i] = i + 1;
         }
-
-        double writes = double(bm->get_writes()) / double(el);
+        stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+        double writes = double(stats_elapsed.get_writes()) / double(el);
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
         STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel));
-        STXXL_MSG(*bm);
-        bm->reset();
+        STXXL_MSG(stats_elapsed);
+
+        stats_begin = *stxxl::stats::get_instance();
         STXXL_MSG("Doing search");
         unsigned queries = el;
         const map_type & ConstMap = Map;
@@ -74,11 +78,12 @@ int main(int argc, char ** argv)
             map_type::const_iterator result = ConstMap.find(key);
             assert((*result).second == key + 1);
         }
-        double reads = double(bm->get_reads()) / logel;
-        double readsperq = double(bm->get_reads()) / queries;
+        stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
+        double reads = double(stats_elapsed.get_reads()) / logel;
+        double readsperq = double(stats_elapsed.get_reads()) / queries;
         STXXL_MSG("reads/logel " << reads << " readsperq " << readsperq);
-        STXXL_MSG(*bm);
-        bm->reset();
+        STXXL_MSG(stats_elapsed);
+
         delete DMap;
     }
 
