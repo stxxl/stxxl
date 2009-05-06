@@ -162,6 +162,9 @@ int main(int argc, const char ** argv)
 
     stxxl::config::get_instance();
 
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+#endif
     unsigned long megabytes_to_process = atoi(argv[1]);
     int p = atoi(argv[2]);
     stxxl::unsigned_type memory_to_use = (stxxl::unsigned_type)atoi(argv[3]) * megabyte;

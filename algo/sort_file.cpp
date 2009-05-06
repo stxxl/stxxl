@@ -111,6 +111,9 @@ int main(int argc, char ** argv)
         }
         stxxl::aligned_dealloc<BLOCK_ALIGN>(array);
     } else {
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+        STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+#endif
         stxxl::syscall_file f(argv[2], stxxl::file::DIRECT | stxxl::file::RDWR);
         unsigned memory_to_use = 50 * 1024 * 1024;
         typedef stxxl::vector<my_type> vector_type;

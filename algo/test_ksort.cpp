@@ -78,6 +78,9 @@ int main()
         STXXL_MSG("Exception: " << e.what());
         abort();
     }
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+#endif
     unsigned memory_to_use = 32 * 1024 * 1024;
     typedef stxxl::VECTOR_GENERATOR<my_type, 4, 4>::result vector_type;
     const stxxl::int64 n_records = 3 * 32 * stxxl::int64(1024 * 1024) / sizeof(my_type);
@@ -97,7 +100,6 @@ int main()
     STXXL_MSG("Sorting...");
     stxxl::ksort(v.begin(), v.end(), get_key(), memory_to_use);
     //stxxl::ksort(v.begin(),v.end(),memory_to_use);
-
 
     STXXL_MSG("Checking order...");
     STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));

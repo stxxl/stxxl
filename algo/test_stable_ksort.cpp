@@ -50,6 +50,9 @@ bool operator < (const my_type & a, const my_type & b)
 
 int main()
 {
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+#endif
     unsigned memory_to_use = 44 * 1024 * 1024;
     typedef stxxl::vector<my_type> vector_type;
     const stxxl::int64 n_records = 2 * 32 * stxxl::int64(1024 * 1024) / sizeof(my_type);
@@ -59,7 +62,6 @@ int main()
     STXXL_MSG("Filling vector... " << rnd() << " " << rnd() << " " << rnd());
     for (vector_type::size_type i = 0; i < v.size(); i++)
         v[i]._key = (rnd() / 2) * 2;
-
 
     STXXL_MSG("Checking order...");
     STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
