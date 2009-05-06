@@ -153,8 +153,8 @@ run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
 run algo/sort_file ksort "$STXXL_TMPDIR/sort_file.dat"
 run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
 run algo/sort_file stable_sort "$STXXL_TMPDIR/sort_file.dat"
-run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
-run algo/sort_file stable_ksort "$STXXL_TMPDIR/sort_file.dat"
+test -n "$WITH_STABLE_KSORT" && run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+test -n "$WITH_STABLE_KSORT" && run algo/sort_file stable_ksort "$STXXL_TMPDIR/sort_file.dat"
 run algo/test_asch 3 100 1000 42
 run algo/test_ksort
 run algo/test_manyunits
@@ -203,7 +203,7 @@ for strategy in 0 1 2 3 ; do
 for blk_size in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 ; do
 run algo/test_sort_all_parameters		$data $ram $strategy $blk_size 42
 run algo/test_ksort_all_parameters		$data $ram $strategy $blk_size 42
-run algo/test_stable_ksort_all_parameters	$data $ram $strategy $blk_size 42
+test -n "$WITH_STABLE_KSORT" && run algo/test_stable_ksort_all_parameters	$data $ram $strategy $blk_size 42
 done
 done
 done
