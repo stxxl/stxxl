@@ -59,7 +59,7 @@ COMPILER	?= $(COMPILER_GCC)
 LINKER		?= $(COMPILER)
 OPT_LEVEL	?= 3
 OPT		?= -O$(OPT_LEVEL) # compiler optimization level
-WARNINGS	?= -W -Wall -Woverloaded-virtual
+WARNINGS	?= -W -Wall -Woverloaded-virtual -Wundef
 DEBUG		?= # put here -g option to include the debug information into the binaries
 
 LIBNAME		?= stxxl
