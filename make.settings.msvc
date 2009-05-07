@@ -187,6 +187,7 @@ ALGO_FILES	 = \
 	$(HEADER_PATH)/algo/sort.h \
 	$(HEADER_PATH)/algo/async_schedule.h \
 	$(HEADER_PATH)/algo/ksort.h \
+	$(HEADER_PATH)/algo/sort_base.h \
 	$(HEADER_PATH)/algo/losertree.h \
 	$(HEADER_PATH)/algo/scan.h \
 	$(HEADER_PATH)/algo/stable_ksort.h \

@@ -24,6 +24,7 @@
 #include <stxxl/bits/mng/prefetch_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/common/tmeta.h>
+#include <stxxl/bits/algo/sort_base.h>
 
 #if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 40400)
 #undef STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL

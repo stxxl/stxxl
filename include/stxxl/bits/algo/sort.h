@@ -15,11 +15,6 @@
 #ifndef STXXL_SORT_HEADER
 #define STXXL_SORT_HEADER
 
-#ifndef STXXL_SORT_OPTIMAL_PREFETCHING
-#define STXXL_SORT_OPTIMAL_PREFETCHING 1
-#endif
-
-
 #include <list>
 #include <functional>
 
@@ -39,9 +34,8 @@
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/parallel.h>
+#include <stxxl/bits/algo/sort_base.h>
 
-
-//#define STXXL_CHECK_ORDER_IN_SORTS
 
 __STXXL_BEGIN_NAMESPACE
 

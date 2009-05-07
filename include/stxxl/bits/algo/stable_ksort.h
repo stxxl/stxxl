@@ -24,6 +24,8 @@
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/algo/intksort.h>
+#include <stxxl/bits/algo/sort_base.h>
+
 
 #ifndef STXXL_VERBOSE_STABLE_KSORT
 #define STXXL_VERBOSE_STABLE_KSORT STXXL_VERBOSE1

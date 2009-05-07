@@ -14,11 +14,6 @@
 #ifndef STXXL_KSORT_HEADER
 #define STXXL_KSORT_HEADER
 
-#ifndef STXXL_SORT_OPTIMAL_PREFETCHING
-#define STXXL_SORT_OPTIMAL_PREFETCHING 1
-#endif
-
-
 #include <list>
 
 #include <stxxl/bits/mng/mng.h>
@@ -35,6 +30,7 @@
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/inmemsort.h>
+#include <stxxl/bits/algo/sort_base.h>
 
 
 //#define INTERLEAVED_ALLOC

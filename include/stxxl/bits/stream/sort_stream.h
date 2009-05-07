@@ -14,11 +14,6 @@
 #ifndef STXXL_SORT_STREAM_HEADER
 #define STXXL_SORT_STREAM_HEADER
 
-#ifndef STXXL_SORT_OPTIMAL_PREFETCHING
-#define STXXL_SORT_OPTIMAL_PREFETCHING 1
-#endif
-
-
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
