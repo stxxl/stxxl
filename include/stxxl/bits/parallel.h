@@ -128,9 +128,39 @@ namespace parallel
 #endif
     }
 
+/** @brief Multi-way merging front-end.
+ *  @param seqs_begin Begin iterator of iterator pair input sequence.
+ *  @param seqs_end End iterator of iterator pair input sequence.
+ *  @param target Begin iterator out output sequence.
+ *  @param comp Comparator.
+ *  @param length Maximum length to merge.
+ *  @return End iterator of output sequence. 
+ *  @pre For each @c i, @c seqs_begin[i].second must be the end marker of the sequence, but also reference the one more sentinel element. */
+    template <typename RandomAccessIteratorPairIterator,
+              typename RandomAccessIterator3, typename DiffType, typename Comparator>
+    RandomAccessIterator3
+    multiway_merge_sentinel(RandomAccessIteratorPairIterator seqs_begin,
+                            RandomAccessIteratorPairIterator seqs_end,
+                            RandomAccessIterator3 target,
+                            Comparator comp,
+                            DiffType length)
+    {
+#if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
+        return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);
+#elif defined(_GLIBCXX_PARALLEL)
+        return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
+#elif defined(__MCSTL__)
+        return mcstl::multiway_merge_sentinel(seqs_begin, seqs_end, target, comp, length, false);
+#else
+        assert(0);
+        abort();
+#endif
+    }
+
 #endif
 }
 
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_PARALLEL_HEADER
+// vim: et:ts=4:sw=4

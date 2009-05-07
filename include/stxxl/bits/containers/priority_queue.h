@@ -25,6 +25,7 @@
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/parallel.h>
 
 #if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 40400)
 #undef STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
@@ -43,19 +44,6 @@
 #endif
 #ifndef STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER 1
-#endif
-
-#if STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL || STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER || STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
-#if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
-#include <parallel/multiway_merge.h>
-#define __STXXL_PQ_multiway_merge_sentinel(__inpb, __inpe, __outb, __cmp, __len) __gnu_parallel::multiway_merge_sentinels(__inpb, __inpe, __outb, __len, __cmp)
-#elif defined(_GLIBCXX_PARALLEL)
-#include <parallel/multiway_merge.h>
-#define __STXXL_PQ_multiway_merge_sentinel(__inpb, __inpe, __outb, __cmp, __len) __gnu_parallel::multiway_merge_sentinels(__inpb, __inpe, __outb, __cmp, __len)
-#elif defined(__MCSTL__)
-#include <bits/mcstl_multiway_merge.h>
-#define __STXXL_PQ_multiway_merge_sentinel(__inpb, __inpe, __outb, __cmp, __len) mcstl::multiway_merge_sentinel(__inpb, __inpe, __outb, __cmp, __len, false)
-#endif
 #endif
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
@@ -570,7 +558,7 @@ void priority_queue<Config_>::refill_delete_buffer()
                 std::make_pair(group_buffer_current_mins[0], group_buffers[0] + N),
                 std::make_pair(group_buffer_current_mins[1], group_buffers[1] + N)
             };
-            __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 2, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
+            parallel::multiway_merge_sentinel(seqs, seqs + 2, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
 
             group_buffer_current_mins[0] = seqs[0].first;
             group_buffer_current_mins[1] = seqs[1].first;
@@ -590,7 +578,7 @@ void priority_queue<Config_>::refill_delete_buffer()
                 std::make_pair(group_buffer_current_mins[1], group_buffers[1] + N),
                 std::make_pair(group_buffer_current_mins[2], group_buffers[2] + N)
             };
-            __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 3, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
+            parallel::multiway_merge_sentinel(seqs, seqs + 3, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
 
             group_buffer_current_mins[0] = seqs[0].first;
             group_buffer_current_mins[1] = seqs[1].first;
@@ -613,7 +601,7 @@ void priority_queue<Config_>::refill_delete_buffer()
                 std::make_pair(group_buffer_current_mins[2], group_buffers[2] + N),
                 std::make_pair(group_buffer_current_mins[3], group_buffers[3] + N)
             };
-            __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 4, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
+            parallel::multiway_merge_sentinel(seqs, seqs + 4, delete_buffer_current_min, inv_cmp, length); //sequence iterators are progressed appropriately
 
             group_buffer_current_mins[0] = seqs[0].first;
             group_buffer_current_mins[1] = seqs[1].first;

@@ -542,7 +542,7 @@ namespace priority_queue_local
                     std::make_pair(current[0], current_end[0]),
                     std::make_pair(current[1], current_end[1])
                 };
-                __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
+                parallel::multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
                 current[0] = seqs[0].first;
                 current[1] = seqs[1].first;
             }
@@ -568,7 +568,7 @@ namespace priority_queue_local
                     std::make_pair(current[2], current_end[2]),
                     std::make_pair(current[3], current_end[3])
                 };
-                __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
+                parallel::multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
                 current[0] = seqs[0].first;
                 current[1] = seqs[1].first;
                 current[2] = seqs[2].first;
@@ -627,7 +627,7 @@ namespace priority_queue_local
                     }
                 }
 
-                __STXXL_PQ_multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
+                parallel::multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
 
                 for (unsigned int i = 0; i < seqs.size(); ++i)
                 {

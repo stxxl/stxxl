@@ -582,7 +582,7 @@ namespace priority_queue_local
 
                 //main call
 
-                begin = __STXXL_PQ_multiway_merge_sentinel(seqs.begin(), seqs.end(), begin, inv_cmp, output_size); //sequence iterators are progressed appropriately
+                begin = parallel::multiway_merge_sentinel(seqs.begin(), seqs.end(), begin, inv_cmp, output_size); //sequence iterators are progressed appropriately
 
                 rest -= output_size;
                 size_ -= output_size;
