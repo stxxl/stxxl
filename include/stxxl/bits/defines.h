@@ -30,4 +30,9 @@
 // used in: algo/*sort.h, stream/sort_stream.h
 // effect if defined to 0: unknown
 
+//#define STXXL_CHECK_ORDER_IN_SORTS 0/1
+// default: 0
+// used in: algo/*sort.h, stream/sort_stream.h, containers/priority_queue.h
+// effect if set to 1: perform additional checking of sorted results
+
 #endif // !STXXL_DEFINES_HEADER
