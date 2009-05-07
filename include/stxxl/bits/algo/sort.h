@@ -451,7 +451,7 @@ namespace sort_local
                 //this memory location stays the same, only the data is exchanged
             }
 
- #ifdef STXXL_CHECK_ORDER_IN_SORTS
+ #if STXXL_CHECK_ORDER_IN_SORTS
             value_type last_elem = cmp.min_value();
  #endif
 
@@ -531,7 +531,7 @@ namespace sort_local
                     }
                 } while (rest > 0 && seqs.size() > 0);
 
- #ifdef STXXL_CHECK_ORDER_IN_SORTS
+ #if STXXL_CHECK_ORDER_IN_SORTS
                 if (!stxxl::is_sorted(out_buffer->begin(), out_buffer->end(), cmp))
                 {
                     for (value_type * i = out_buffer->begin() + 1; i != out_buffer->end(); i++)
@@ -565,7 +565,7 @@ namespace sort_local
             loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size>
             losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
-#ifdef STXXL_CHECK_ORDER_IN_SORTS
+#if STXXL_CHECK_ORDER_IN_SORTS
             value_type last_elem = cmp.min_value();
 #endif
 
@@ -574,7 +574,7 @@ namespace sort_local
                 losers.multi_merge(out_buffer->elem);
                 (*out_run)[i].value = *(out_buffer->elem);
 
-#ifdef STXXL_CHECK_ORDER_IN_SORTS
+#if STXXL_CHECK_ORDER_IN_SORTS
                 assert(stxxl::is_sorted(
                            out_buffer->begin(),
                            out_buffer->end(),
@@ -733,7 +733,7 @@ namespace sort_local
             while (runs_left > 0)
             {
                 int_type runs2merge = STXXL_MIN(runs_left, merge_factor);
-#ifdef STXXL_CHECK_ORDER_IN_SORTS
+#if STXXL_CHECK_ORDER_IN_SORTS
                 assert((check_sorted_runs<block_type, run_type, value_cmp>(runs + nruns - runs_left, runs2merge, m2, cmp)));
 #endif
                 STXXL_VERBOSE("Merging " << runs2merge << " runs");
@@ -1099,7 +1099,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
         }
     }
 
-#ifdef STXXL_CHECK_ORDER_IN_SORTS
+#if STXXL_CHECK_ORDER_IN_SORTS
     assert(stxxl::is_sorted(first, last, cmp));
 #endif
 }
