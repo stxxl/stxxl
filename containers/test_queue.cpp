@@ -31,10 +31,16 @@ void check(const q1type & q1, const q2type & q2)
 
 int main()
 {
+#if 1
     //stxxl::set_seed(424648671);  // works fine with a single disk, fails with two disks
     STXXL_MSG("SEED=" << stxxl::get_next_seed());
     stxxl::srandom_number32(stxxl::get_next_seed());
     stxxl::random_number32_r rnd;
+#else
+    //stxxl::ran32State = 1028675152; // fails with two disks
+    STXXL_MSG("ran32State=" << stxxl::ran32State);
+    stxxl::random_number32 rnd;
+#endif
 
     unsigned cnt;
     STXXL_MSG("Elements in a block: " << stxxl::queue<my_type>::block_type::size);
