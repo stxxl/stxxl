@@ -22,6 +22,8 @@ void check(const q1type & q1, const q2type & q2)
     assert(q1.size() == q2.size());
     if (!q1.empty())
     {
+	if (q1.front() != q2.front() || q1.back() != q2.back())
+            STXXL_MSG(q1.size() << ": (" << q1.front() << ", " << q1.back() << ") (" << q2.front() << ", " << q2.back() << ")" << (q1.front() == q2.front() ? "" : " FRONT"));
         assert(q1.front() == q2.front());
         assert(q1.back() == q2.back());
     }
@@ -29,6 +31,11 @@ void check(const q1type & q1, const q2type & q2)
 
 int main()
 {
+    //stxxl::set_seed(424648671);  // works fine with a single disk, fails with two disks
+    STXXL_MSG("SEED=" << stxxl::get_next_seed());
+    stxxl::srandom_number32(stxxl::get_next_seed());
+    stxxl::random_number32_r rnd;
+
     unsigned cnt;
     STXXL_MSG("Elements in a block: " << stxxl::queue<my_type>::block_type::size);
 
@@ -38,7 +45,6 @@ int main()
 
     STXXL_MSG("Testing special case 4");
     cnt = stxxl::queue<my_type>::block_type::size;
-    stxxl::random_number32 rnd;
     while (cnt--)
     {
         my_type val = rnd();
