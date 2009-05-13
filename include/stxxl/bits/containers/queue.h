@@ -26,6 +26,10 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+#ifndef STXXL_VERBOSE_QUEUE
+#define STXXL_VERBOSE_QUEUE STXXL_VERBOSE2
+#endif
+
 //! \addtogroup stlcont
 //! \{
 
@@ -81,6 +85,7 @@ public:
         alloc_counter(0),
         blocks2prefetch(blocks2prefetch_)
     {
+        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(sizes)");
         if (w_pool_size < 2)
             w_pool_size = 2;
 
@@ -110,6 +115,7 @@ public:
         alloc_counter(0),
         blocks2prefetch(blocks2prefetch_)
     {
+        STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pools)");
         if (w_pool->size() < 2)
             w_pool->resize(2);
 
@@ -157,6 +163,7 @@ public:
                 //bm->new_blocks<block_type>(1, alloc_str, &newbid);
                 bm->new_blocks(alloc_str, &newbid, (&newbid) + 1);
 
+                STXXL_VERBOSE_QUEUE("queue[" << this << "]: push block " << back_block << " @ " << FMT_BID(newbid));
                 bids.push_back(newbid);
                 w_pool->write(back_block, newbid);
             }
@@ -208,6 +215,7 @@ public:
 
             assert(!bids.empty());
             request_ptr req = p_pool->read(front_block, bids.front());
+            STXXL_VERBOSE_QUEUE("queue[" << this << "]: pop block  " << front_block << " @ " << FMT_BID(bids.front()));
             for (unsigned_type i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
             {             // give prefetching hints
                 STXXL_VERBOSE1("queue::pop Case Hints");
