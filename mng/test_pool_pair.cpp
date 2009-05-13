@@ -33,6 +33,45 @@ int main()
     STXXL_DEFAULT_ALLOC_STRATEGY alloc;
 
     {
+        STXXL_MSG("Write-After-Write coherence test");
+        stxxl::prefetch_pool<block_type> p_pool(2);
+        stxxl::write_pool<block_type> w_pool(10);
+        block_type * blk;
+        block_type::bid_type bid;
+
+        bm->new_blocks(alloc, &bid, &bid + 1);
+
+        // write the block for the first time
+        blk = w_pool.steal();
+        (*blk)[0].integer = 42;
+        w_pool.write(blk, bid);
+
+        // read the block
+        blk = w_pool.steal();
+        p_pool.read(blk, bid)->wait();
+        delete blk;
+
+        // write the block for the second time
+        blk = w_pool.steal();
+        (*blk)[0].integer = 23;
+        w_pool.write(blk, bid);
+
+        // hint the block
+        p_pool.hint(bid, w_pool); // flush w_pool
+
+        // get the hinted block
+        blk = w_pool.steal();
+        p_pool.read(blk, bid)->wait();
+
+        if ((*blk)[0].integer != 23) {
+            STXXL_ERRMSG("WRITE-AFTER-WRITE COHERENCE FAILURE");
+        }
+
+        w_pool.add(blk);
+        bm->delete_block(bid);
+    }
+
+    {
         STXXL_MSG("Write-After-Hint coherence test #1");
         stxxl::prefetch_pool<block_type> p_pool(1);
         stxxl::write_pool<block_type> w_pool(1);
