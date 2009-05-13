@@ -15,6 +15,7 @@
 #include <iostream>
 #include <stxxl/mng>
 #include <stxxl/bits/mng/prefetch_pool.h>
+#include <stxxl/bits/mng/write_pool.h>
 
 #define BLOCK_SIZE (1024 * 512)
 
@@ -28,20 +29,71 @@ typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
 int main()
 {
-    stxxl::prefetch_pool<block_type> pool(2);
-    pool.resize(10);
-    pool.resize(5);
+    stxxl::block_manager *bm = stxxl::block_manager::get_instance();
+    STXXL_DEFAULT_ALLOC_STRATEGY alloc;
 
-    block_type * blk = new block_type;
-    (*blk)[0].integer = 42;
-    block_type::bid_type bids[2];
-    stxxl::block_manager::get_instance()->new_blocks(stxxl::single_disk(), bids, bids + 2);
-    blk->write(bids[0])->wait();
-    blk->write(bids[1])->wait();
+    {
+        STXXL_MSG("Write-After-Hint coherence test #1");
+        stxxl::prefetch_pool<block_type> p_pool(1);
+        stxxl::write_pool<block_type> w_pool(1);
+        block_type * blk;
+        block_type::bid_type bids[2];
 
-    pool.hint(bids[0]);
-    pool.read(blk, bids[0])->wait();
-    pool.read(blk, bids[1])->wait();
+        bm->new_blocks(alloc, bids, bids + 2);
+        blk = w_pool.steal();
+        (*blk)[0].integer = 42;
+        w_pool.write(blk, bids[0]);
+        blk = w_pool.steal(); // flush w_pool
 
-    delete blk;
+        // hint the block
+        p_pool.hint(bids[0]);
+
+        // update the hinted block
+        (*blk)[0].integer = 23;
+        w_pool.write(blk, bids[0]);
+        blk = w_pool.steal(); // flush w_pool
+
+        // get the hinted block
+        p_pool.read(blk, bids[0])->wait();
+
+        if ((*blk)[0].integer != 23) {
+            STXXL_ERRMSG("WRITE-AFTER-HINT COHERENCE FAILURE");
+        }
+
+        w_pool.add(blk);
+        bm->delete_blocks(&bids[0], &bids[2]);
+    }
+
+    {
+        STXXL_MSG("Write-After-Hint coherence test #2");
+        stxxl::prefetch_pool<block_type> p_pool(1);
+        stxxl::write_pool<block_type> w_pool(1);
+        block_type * blk;
+        block_type::bid_type bids[2];
+
+        bm->new_blocks(alloc, bids, bids + 2);
+        blk = w_pool.steal();
+        (*blk)[0].integer = 42;
+        w_pool.write(blk, bids[0]);
+
+        // hint the block
+        p_pool.hint(bids[0], w_pool); // flush w_pool
+
+        // update the hinted block
+        blk = w_pool.steal();
+        (*blk)[0].integer = 23;
+        w_pool.write(blk, bids[0]);
+        blk = w_pool.steal(); // flush w_pool
+
+        // get the hinted block
+        p_pool.read(blk, bids[0])->wait();
+
+        if ((*blk)[0].integer != 23) {
+            STXXL_ERRMSG("WRITE-AFTER-HINT COHERENCE FAILURE");
+        }
+
+        w_pool.add(blk);
+        bm->delete_blocks(&bids[0], &bids[2]);
+    }
 }
+// vim: et:ts=4:sw=4

@@ -112,6 +112,7 @@ run mng/test_mng1
 run mng/test_prefetch_pool
 run mng/test_write_pool
 run mng/test_mng_recursive_alloc
+run mng/test_pool_pair
 
 run containers/bench_pqueue
 run containers/copy_file "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
