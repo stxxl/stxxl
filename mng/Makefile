@@ -49,6 +49,11 @@ test_mng_recursive_alloc.$(EXEEXT): test_mng_recursive_alloc.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_mng_recursive_alloc.cpp -DSTXXL_VERBOSE_LEVEL=3
 	$(LINKER) test_mng_recursive_alloc.$(OBJEXT) $(OUT)test_mng_recursive_alloc.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_pool_pair: test_pool_pair.$(EXEEXT)
+test_pool_pair.$(EXEEXT): test_pool_pair.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_pool_pair.cpp
+	$(LINKER) test_pool_pair.$(OBJEXT) $(OUT)test_pool_pair.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 unittest: unittest.$(EXEEXT) $(DEPENDENCIES)
 unittest.$(EXEEXT): unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
