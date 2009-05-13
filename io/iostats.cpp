@@ -251,21 +251,25 @@ void stats::_reset_io_wait_time()
 #endif
 }
 
-std::string hr(uint64 number, const char * unit = "")
+std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char * unit, int multiplier)
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
-    static const char endings[] = " KMGTPE";
+    static const char* endings[] = { "", "k", "M", "G", "T", "P", "E" };
+    static const char* binary_endings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
     std::ostringstream out;
     out << number << ' ';
     int scale = 0;
     double number_d = number;
-    while (number_d >= 1024.0)
+    double multiplier_d = multiplier;
+    while (number_d >= multiplier_d)
     {
-        number_d /= 1024.0;
+        number_d /= multiplier_d;
         ++scale;
     }
     if (scale > 0)
-        out << '(' << std::fixed << std::setprecision(3) << number_d << ' ' << endings[scale] << (unit ? unit : "") << ") ";
+        out << '(' << std::fixed << std::setprecision(3) << number_d << ' '
+            << (multiplier == 1024 ? binary_endings[scale] : endings[scale])
+            << (unit ? unit : "") << ") ";
     else if (unit && *unit)
         out << unit << ' ';
     return out.str();
@@ -273,6 +277,7 @@ std::string hr(uint64 number, const char * unit = "")
 
 std::ostream & operator << (std::ostream & o, const stats_data & s)
 {
+#define hr add_IEC_binary_multiplier
     o << "STXXL I/O statistics" << std::endl;
 #if STXXL_IO_STATS
     o << " total number of reads                      : " << hr(s.get_reads()) << std::endl;
@@ -316,6 +321,7 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
 #endif
     o << " Time since the last reset                  : " << s.get_elapsed_time() << " sec." << std::endl;
     return o;
+#undef hr
 }
 
 __STXXL_END_NAMESPACE
