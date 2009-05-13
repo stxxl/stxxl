@@ -20,7 +20,6 @@
 #endif
 
 #include <stxxl/bits/mng/mng.h>
-//#include <stxxl/bits/compat_hash_map.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -51,8 +50,6 @@ public:
 
         operator request_ptr () { return req; }
     };
-    //typedef typename compat_hash_map < bid_type, request_ptr , bid_hash >::result hash_map_type;
-    //typedef typename hash_map_type::iterator block_track_iterator;
     typedef typename std::list<block_type *>::iterator free_blocks_iterator;
     typedef typename std::list<busy_entry>::iterator busy_blocks_iterator;
 
@@ -61,8 +58,6 @@ protected:
     std::list<block_type *> free_blocks;
     // blocks that are in writing
     std::list<busy_entry> busy_blocks;
-
-    //hash_map_type block_track;
 
     unsigned_type free_blocks_size, busy_blocks_size;
 
@@ -175,7 +170,6 @@ public:
             while (--diff >= 0)
                 free_blocks.push_back(new block_type);
 
-
             return;
         }
 
@@ -223,9 +217,6 @@ protected:
     {
         busy_blocks_iterator cur = busy_blocks.begin();
         int_type cnt = 0;
-#if STXXL_VERBOSE_LEVEL > 0
-        int_type busy_blocks_size_old = busy_blocks_size;
-#endif
         while (cur != busy_blocks.end())
         {
             if (cur->req->poll())
@@ -240,7 +231,7 @@ protected:
             ++cur;
         }
         STXXL_VERBOSE1("write_pool::check_all_busy : " << cnt <<
-                       " are completed out of " << busy_blocks_size_old << " busy blocks");
+                       " are completed out of " << busy_blocks_size + cnt << " busy blocks");
     }
 };
 
