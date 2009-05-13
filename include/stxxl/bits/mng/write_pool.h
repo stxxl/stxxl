@@ -120,8 +120,12 @@ public:
     {
         for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
         {
-            if (i2->bid == bid && i2->block != block) {
+            if (i2->bid == bid) {
+                assert(i2->block != block);
                 STXXL_VERBOSE1("WAW dependency");
+                // invalidate the bid of the stale write request,
+                // prevents prefetch_pool from stealing a stale block
+                i2->bid.storage = 0;
             }
         }
         request_ptr result = block->write(bid);
@@ -257,3 +261,4 @@ namespace std
 }
 
 #endif // !STXXL_WRITE_POOL_HEADER
+// vim: et:ts=4:sw=4
