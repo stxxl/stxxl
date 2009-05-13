@@ -245,7 +245,7 @@ my_example.bin: my_example.o
  * external memory application will increase if you use more than one disk.
  * But from how many disks your application can benefit depends on how "I/O bound" it is.
  * With modern disk bandwidths
- * of about 50-75 MB/s most of applications are I/O bound for one disk. This means that if you add another disk
+ * of about 50-75 MiB/s most of applications are I/O bound for one disk. This means that if you add another disk
  * the running time will be halved. Adding more disks might also increase performance significantly.
  *
  *
@@ -383,7 +383,7 @@ my_example.bin: my_example.o
  * external memory application will increase if you use more than one disk.
  * But from how many disks your application can benefit depends on how "I/O bound" it is.
  * With modern disk bandwidths
- * of about 50-75 MB/s most of applications are I/O bound for one disk. This means that if you add another disk
+ * of about 50-75 MiB/s most of applications are I/O bound for one disk. This means that if you add another disk
  * the running time will be halved. Adding more disks might also increase performance significantly.
  *
  *
@@ -498,7 +498,7 @@ my_example.bin: my_example.o
  * external memory application will increase if you use more than one disk.
  * But from how many disks your application can benefit depends on how "I/O bound" it is.
  * With modern disk bandwidths
- * of about 50-75 MB/s most of applications are I/O bound for one disk. This means that if you add another disk
+ * of about 50-75 MiB/s most of applications are I/O bound for one disk. This means that if you add another disk
  * the running time will be halved. Adding more disks might also increase performance significantly.
  *
  *
@@ -581,7 +581,7 @@ my_example.bin: my_example.o
  * external memory application will increase if you use more than one disk.
  * But from how many disks your application can benefit depends on how "I/O bound" it is.
  * With modern disk bandwidths
- * of about 50-75 MB/s most of applications are I/O bound for one disk. This means that if you add another disk
+ * of about 50-75 MiB/s most of applications are I/O bound for one disk. This means that if you add another disk
  * the running time will be halved. Adding more disks might also increase performance significantly.
  *
  *

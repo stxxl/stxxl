@@ -48,7 +48,7 @@ IOSTAT_PLOT_OFFSET_write_12	?= 7
 IOSTAT_PLOT_OFFSET_read_14	?= 8
 IOSTAT_PLOT_OFFSET_write_14	?= 9
 
-IOSTAT_PLOT_Y_LABEL.io		?= Bandwidth [MB/s]
+IOSTAT_PLOT_Y_LABEL.io		?= Bandwidth [MiB/s]
 IOSTAT_PLOT_Y_LABEL.cpu		?= CPU Usage [%]
 
 # $1 = first, $2 = increment, $3 = last

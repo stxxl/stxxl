@@ -134,7 +134,7 @@ Vitter and Shriver \cite{VitShr94both} came up with a model for designing I/O
 efficient algorithms. In order to amortize the high cost of a random
 disk access\footnote{Modern disks after locating the position of the
 data on the surface can deliver the contiguous data blocks at speed
-50-60 MB/s. For example with the seek time 10~ms, 1~MB can be read or
+50-60 MiB/s. For example with the seek time 10~ms, 1~MiB can be read or
 written in $10~+~1000~\times~1/50~=~30$~ms, 1~byte -- in 10.02~ms.},
 external data loaded in contiguous chunks of size $B$. To increase
 bandwidth external memory algorithms use multiple parallel disks. The
@@ -376,7 +376,7 @@ void print_usage(const char * program)
                 " logfile main billfile" << std::endl;
           std::cout <<" logfile  - file name of the input"
                 << std::endl;
-          std::cout <<" main     - memory to use (in MB)"
+          std::cout <<" main     - memory to use (in MiB)"
                 << std::endl;
           std::cout <<" billfile - file name of the output"
                 << std::endl;
@@ -754,14 +754,14 @@ of the parameters, it is not necessary to specify them all.
 {\bf Examples:}
 \begin{itemize}
 \item \texttt{VECTOR\_GENERATOR<double>::result} -- external vector of
-{\bf double}'s with four blocks per page, the cache with eight pages, 2~MB
+{\bf double}'s with four blocks per page, the cache with eight pages, 2~MiB
 blocks, Random  Allocation and lru cache replacement strategy 
 \item \texttt{VECTOR\_GENERATOR<double,8>::result} -- external vector
-of {\bf double}'s , with {\bf eight} blocks per page, the cache with eight pages, 2~MB
+of {\bf double}'s , with {\bf eight} blocks per page, the cache with eight pages, 2~MiB
 blocks, Random  Allocation and lru cache replacement strategy 
 \item \texttt{VECTOR\_GENERATOR<double,8,2,524288,SR>::result} --
 external vector of {\bf double}'s, with {\bf eight} blocks per page, the cache
-with {\bf two} pages, {\bf 512~KB} 
+with {\bf two} pages, {\bf 512~KiB} 
 blocks, {\bf Simple Randomized} allocation and lru cache replacement strategy 
 \end{itemize}
 
@@ -1566,7 +1566,7 @@ struct Cmp
 
 typedef stxxl::PRIORITY_QUEUE_GENERATOR<int,
                                         Cmp,
-/* use 64 MB on main memory */          64*1024*1024,
+/* use 64 MiB on main memory */         64*1024*1024,
 /* 1 billion items at most  */          1024*1024
                                         >::result pq_type;
 typedef pq_type::block_type block_type;
@@ -1814,7 +1814,7 @@ vec_type V;
 
 /*
    Sort in ascending order
-   use 512 MB of main memory
+   use 512 MiB of main memory
 */
 stxxl::sort(V.begin(),V.end(),MyCmp(),512*1024*1024);
 // sorted
@@ -1997,7 +1997,7 @@ vec_type V;
 
 /*
    Sort in ascending order
-   use 512 MB of main memory
+   use 512 MiB of main memory
 */
 stxxl::ksort(V.begin(),V.end(),512*1024*1024);
 // sorted

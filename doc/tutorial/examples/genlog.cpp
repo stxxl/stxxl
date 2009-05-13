@@ -63,7 +63,7 @@ int main(int argc, char * argv[])
         STXXL_MSG("Usage: " << argv[0] << " ncalls avcalls main logfile")
         STXXL_MSG(" ncalls  - number of calls")
         STXXL_MSG(" avcalls - average number of calls per client")
-        STXXL_MSG(" main    - memory to use (in MB)")
+        STXXL_MSG(" main    - memory to use (in MiB)")
         STXXL_MSG(" logfile - file name of the output")
 
         return 0;

@@ -87,13 +87,12 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 #endif
 
 #define MB (1024 * 1024)
-#define GB (1024 * 1024 * 1024)
 
 int main(int argc, char * argv[])
 {
     if (argc < 3)
     {
-        STXXL_MSG("Usage: " << argv[0] << " filesize_in_MB filename1 [filename2 [filename3 ...]]");
+        STXXL_MSG("Usage: " << argv[0] << " filesize_in_MiB filename1 [filename2 [filename3 ...]]");
         return -1;
     }
 
@@ -163,7 +162,7 @@ int main(int argc, char * argv[])
         const unsigned current_block_size = length ? std::min<stxxl::int64>(buffer_size, endpos - offset) : buffer_size;
         const unsigned current_chunk_size = current_block_size / chunks;
 
-        std::cout << "Disk offset " << std::setw(7) << offset / MB << " MB: " << std::fixed;
+        std::cout << "Disk offset " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
 
         double begin = timestamp(), end;
 
@@ -186,19 +185,19 @@ int main(int argc, char * argv[])
 
         end = timestamp();
 
-/*
+#if 0
    std::cout << "WRITE\nDisks: " << ndisks
         <<" \nElapsed time: "<< end-begin
-        << " \nThroughput: "<< int(1e-6*(buffer_size*ndisks)/(end-begin))
-        << " Mb/s \nPer one disk:"
-        << int(1e-6*(buffer_size)/(end-begin)) << " Mb/s"
+        << " \nThroughput: "<< int(double(buffer_size*ndisks)/MB/(end-begin))
+        << " MiB/s \nPer one disk:"
+        << int((buffer_size)/MB/(end-begin)) << " MiB/s"
         << std::endl;
-*/
+#endif
 
  #ifdef WATCH_TIMES
         out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
-        std::cout << std::setw(7) << int(1e-6 * (current_block_size) / (end - begin)) << " MB/s,";
+        std::cout << std::setw(7) << int(double(current_block_size) / MB / (end - begin)) << " MiB/s,";
 #endif
 
 
@@ -222,16 +221,16 @@ int main(int argc, char * argv[])
 
         end = timestamp();
 
-/*
+#if 0
    std::cout << "READ\nDisks: " << ndisks
         <<" \nElapsed time: "<< end-begin
-        << " \nThroughput: "<< int(1e-6*(buffer_size*ndisks)/(end-begin))
-        << " Mb/s \nPer one disk:"
-        << int(1e-6*(buffer_size)/(end-begin)) << " Mb/s"
+        << " \nThroughput: "<< int(double(buffer_size*ndisks)/MB/(end-begin))
+        << " MiB/s \nPer one disk:"
+        << int(double(buffer_size)/MB/(end-begin)) << " MiB/s"
             << std::endl;
-*/
+#endif
 
-        std::cout << int(1e-6 * (current_block_size) / (end - begin)) << " MB/s" << std::endl;
+        std::cout << int(double(current_block_size) / MB / (end - begin)) << " MiB/s" << std::endl;
 
 #ifdef WATCH_TIMES
         out_stat(begin, end, r_finish_times, ndisks, disks_arr);

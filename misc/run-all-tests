@@ -194,9 +194,9 @@ run containers/leda_sm_pq_benchmark 2 1000000
 run containers/leda_sm_stack_benchmark 1 1073741824
 run containers/leda_sm_stack_benchmark 2 1073741824
 
-#algo/test_sort_all_parameters		<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-#algo/test_ksort_all_parameters		<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-#algo/test_stable_ksort_all_parameters	<MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+#algo/test_sort_all_parameters		<MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+#algo/test_ksort_all_parameters		<MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+#algo/test_stable_ksort_all_parameters	<MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
 for data in 1024 ; do
 for ram in 384 ; do
 for strategy in 0 1 2 3 ; do
@@ -209,7 +209,7 @@ done
 done
 done
 
-#algo/test_parallel_sort [n in megabytes] [p threads] [M in megabytes] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]
+#algo/test_parallel_sort [n in MiB] [p threads] [M in MiB] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]
 for data in 768 ; do
 for ram in 128 ; do
 for threads in 1 2 3 4 ; do

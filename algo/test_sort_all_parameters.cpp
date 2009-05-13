@@ -38,11 +38,11 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
 
     unsigned ndisks = stxxl::config::get_instance()->disks_number();
     STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(T));
-    STXXL_MSG("Total volume " << (records_to_sort * sizeof(T)) / MB << " MB");
-    STXXL_MSG("Using " << memory_to_use / MB << " MB");
+    STXXL_MSG("Total volume " << (records_to_sort * sizeof(T)) / MB << " MiB");
+    STXXL_MSG("Using " << memory_to_use / MB << " MiB");
     STXXL_MSG("Using " << ndisks << " disks");
     STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ");
-    STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KB");
+    STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KiB");
 
     STXXL_MSG("Filling vector...");
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32_r(), 32);
@@ -93,7 +93,7 @@ int main(int argc, char * argv[])
     if (argc < 6)
     {
         STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>");
+                     " <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>");
         return -1;
     }
 

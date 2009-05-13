@@ -86,7 +86,7 @@ void run_stack(stxxl::int64 volume)
 
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MB/s");
+              " MiB/s");
 
 
     ////////////////////////////////////////////////
@@ -111,7 +111,7 @@ void run_stack(stxxl::int64 volume)
 
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(volume) / (1024. * 1024. * Timer.mseconds() / 1000.)) <<
-              " MB/s");
+              " MiB/s");
 }
 
 
@@ -128,12 +128,12 @@ int main(int argc, char * argv[])
 #ifdef BTE_STREAM_IMP_UFS
     cout << "BTE_STREAM_IMP_UFS is defined" << endl;
     cout << "BTE_STREAM_UFS_BLOCK_FACTOR is " << BTE_STREAM_UFS_BLOCK_FACTOR << endl;
-    cout << "Actual block size is " << (TPIE_OS_BLOCKSIZE() * BTE_STREAM_UFS_BLOCK_FACTOR / 1024) << " KB" << endl;
+    cout << "Actual block size is " << (TPIE_OS_BLOCKSIZE() * BTE_STREAM_UFS_BLOCK_FACTOR / 1024) << " KiB" << endl;
 #endif
 #ifdef BTE_STREAM_IMP_MMAP
     cout << "BTE_STREAM_IMP_MMAP is defined" << endl;
     cout << "BTE_STREAM_MMAP_BLOCK_FACTOR is " << BTE_STREAM_MMAP_BLOCK_FACTOR << endl;
-    cout << "Actual block size is " << (TPIE_OS_BLOCKSIZE() * BTE_STREAM_MMAP_BLOCK_FACTOR / 1024) << " KB" << endl;
+    cout << "Actual block size is " << (TPIE_OS_BLOCKSIZE() * BTE_STREAM_MMAP_BLOCK_FACTOR / 1024) << " KiB" << endl;
 #endif
 #ifdef BTE_STREAM_IMP_STDIO
     cout << "BTE_STREAM_IMP_STDIO is defined" << endl;

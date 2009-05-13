@@ -64,7 +64,7 @@ int main()
     dummy_merger dummy;
 
     if (1) {
-        const unsigned volume = 3 * 1024 * 1024; // in KB
+        const unsigned volume = 3 * 1024 * 1024; // in KiB
         const unsigned mem_for_queue = 256 * 1024 * 1024;
         typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>::result pq_type;
         pq_type pq(mem_for_queue, mem_for_queue);

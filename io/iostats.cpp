@@ -284,11 +284,11 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
     o << " average block size (read)                  : "
       << hr(s.get_reads() ? s.get_read_volume() / s.get_reads() : 0, "B") << std::endl;
     o << " number of bytes read from disks            : " << hr(s.get_read_volume(), "B") << std::endl;
-    o << " time spent in serving all read requests    : " << s.get_read_time() << " sec."
-      << " @ " << (s.get_read_volume() / 1048576.0 / s.get_read_time()) << " MB/sec."
+    o << " time spent in serving all read requests    : " << s.get_read_time() << " s"
+      << " @ " << (s.get_read_volume() / 1048576.0 / s.get_read_time()) << " MiB/s"
       << std::endl;
-    o << " time spent in reading (parallel read time) : " << s.get_pread_time() << " sec."
-      << " @ " << (s.get_read_volume() / 1048576.0 / s.get_pread_time()) << " MB/sec."
+    o << " time spent in reading (parallel read time) : " << s.get_pread_time() << " s"
+      << " @ " << (s.get_read_volume() / 1048576.0 / s.get_pread_time()) << " MiB/s"
       << std::endl;
    if (s.get_cached_reads()) {
     o << " total number of cached reads               : " << hr(s.get_cached_reads()) << std::endl;
@@ -304,22 +304,22 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
     o << " average block size (write)                 : "
       << hr(s.get_writes() ? s.get_written_volume() / s.get_writes() : 0, "B") << std::endl;
     o << " number of bytes written to disks           : " << hr(s.get_written_volume(), "B") << std::endl;
-    o << " time spent in serving all write requests   : " << s.get_write_time() << " sec."
-      << " @ " << (s.get_written_volume() / 1048576.0 / s.get_write_time()) << " MB/sec."
+    o << " time spent in serving all write requests   : " << s.get_write_time() << " s"
+      << " @ " << (s.get_written_volume() / 1048576.0 / s.get_write_time()) << " MiB/s"
       << std::endl;
-    o << " time spent in writing (parallel write time): " << s.get_pwrite_time() << " sec."
-      << " @ " << (s.get_written_volume() / 1048576.0 / s.get_pwrite_time()) << " MB/sec."
+    o << " time spent in writing (parallel write time): " << s.get_pwrite_time() << " s"
+      << " @ " << (s.get_written_volume() / 1048576.0 / s.get_pwrite_time()) << " MiB/s"
       << std::endl;
-    o << " time spent in I/O (parallel I/O time)      : " << s.get_pio_time() << " sec."
-      << " @ " << ((s.get_read_volume() + s.get_written_volume()) / 1048576.0 / s.get_pio_time()) << " MB/sec."
+    o << " time spent in I/O (parallel I/O time)      : " << s.get_pio_time() << " s"
+      << " @ " << ((s.get_read_volume() + s.get_written_volume()) / 1048576.0 / s.get_pio_time()) << " MiB/s"
       << std::endl;
 #else
     o << " n/a" << std::endl;
 #endif
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-    o << " I/O wait time                              : " << s.get_io_wait_time() << " sec." << std::endl;
+    o << " I/O wait time                              : " << s.get_io_wait_time() << " s" << std::endl;
 #endif
-    o << " Time since the last reset                  : " << s.get_elapsed_time() << " sec." << std::endl;
+    o << " Time since the last reset                  : " << s.get_elapsed_time() << " s" << std::endl;
     return o;
 #undef hr
 }

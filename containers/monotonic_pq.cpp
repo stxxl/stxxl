@@ -115,7 +115,7 @@ int main(int argc, char * argv[])
 {
     if (argc < 3)
     {
-        std::cout << "Usage: " << argv[0] << " [n in megabytes]"
+        std::cout << "Usage: " << argv[0] << " [n in MiB]"
 #if defined(__MCSTL__) || defined(_GLIBCXX_PARALLEL)
                 << " [p threads]"
 #endif
@@ -262,7 +262,7 @@ int main(int argc, char * argv[])
 
 /*  STXXL_MSG ( "Blocks fitting into internal memory m: "<<gen::m );
   STXXL_MSG ( "X : "<<gen::X );  //maximum number of internal elements //X = B * (settings::k - m) / settings::E,
-  STXXL_MSG ( "Expected internal memory consumption: "<< (gen::EConsumption / 1048576) << " MB");*/
+  STXXL_MSG ( "Expected internal memory consumption: "<< (gen::EConsumption / 1048576) << " MiB");*/
 #endif
     typedef pq_type::block_type block_type;
 
@@ -289,7 +289,7 @@ int main(int argc, char * argv[])
     stxxl::int64 nelements = stxxl::int64(megabytes * mega / sizeof(my_type)), i;
 
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     STXXL_MSG("Peak number of elements: " << nelements);
     STXXL_MSG("Max number of elements to contain: " << (stxxl::uint64(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
     srand(5);
@@ -312,7 +312,7 @@ int main(int argc, char * argv[])
             STXXL_MSG(
                 std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
                            << "Inserting element " << i << " top() == " << least.key << " @ "
-                           << std::setprecision(3) << Timer.seconds() << " sec"
+                           << std::setprecision(3) << Timer.seconds() << " s"
                            << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
 
 
@@ -349,9 +349,9 @@ int main(int argc, char * argv[])
 #endif
     }
     Timer.stop();
-    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec");
+    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     stxxl::stats_data sd_middle(*stxxl::stats::get_instance());
     std::cout << sd_middle - sd_start;
     Timer.reset();
@@ -409,7 +409,7 @@ int main(int argc, char * argv[])
             STXXL_MSG(
                 std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
                            << "Popped element " << i << " == " << least.key << " @ "
-                           << std::setprecision(3) << Timer.seconds() << " sec"
+                           << std::setprecision(3) << Timer.seconds() << " s"
                            << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
     }
     STXXL_MSG("Last element " << i << " popped");
@@ -418,8 +418,8 @@ int main(int argc, char * argv[])
     if (sum_input != sum_output)
         STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output));
 
-        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
-        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
+        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
         std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - sd_middle;
     std::cout << *stxxl::stats::get_instance();
 

@@ -112,7 +112,7 @@ void config::init(const char * config_path)
         {
             STXXL_MSG("Disk '" << (*it).path << "' is allocated, space: " <<
                       ((*it).size) / (1024 * 1024) <<
-                      " MB, I/O implementation: " << (*it).io_impl);
+                      " MiB, I/O implementation: " << (*it).io_impl);
         }
 #else
         int64 total_size = 0;
@@ -123,7 +123,7 @@ void config::init(const char * config_path)
 
         STXXL_MSG("" << disks_props.size() << " disks are allocated, total space: " <<
                   (total_size / (1024 * 1024)) <<
-                  " MB");
+                  " MiB");
 #endif
     }
 }

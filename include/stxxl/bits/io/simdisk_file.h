@@ -44,7 +44,7 @@ class DiskGeometry : private noncopyable
         // derived data
         int first_sector;
         int sectors;
-        double sustained_data_rate;             // in Mb/s
+        double sustained_data_rate;             // in MiB/s
         inline Zone(int _first_sector) : first_sector(_first_sector)
         { }                                     // constructor for zone search
 

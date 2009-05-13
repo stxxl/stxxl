@@ -717,7 +717,7 @@ public:
 //!  - \c PgSz_ number of blocks in a page
 //!  - \c PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages,
 //!  default is \c lru_pager<8>
-//!  - \c BlkSize_ external block size in bytes, default is 2 Mbytes
+//!  - \c BlkSize_ external block size in bytes, default is 2 MiB
 //!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
 //!  default is RC <BR>
 //! Memory consumption: BlkSize_*x*PgSz_ bytes
@@ -1558,7 +1558,7 @@ bool is_sorted(
 //!  - \c Tp_ type of contained objects
 //!  - \c PgSz_ number of blocks in a page
 //!  - \c Pages_ number of pages
-//!  - \c BlkSize_ external block size in bytes, default is 2 Mbytes
+//!  - \c BlkSize_ external block size in bytes, default is 2 MiB
 //!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
 //!  default is RC
 //!  - \c Pager_ pager type:
@@ -1572,7 +1572,7 @@ bool is_sorted(
 //!    - \c VECTOR_GENERATOR<double,8>::result external vector of \c double's ,
 //!      with 8 blocks per page,
 //!    - \c VECTOR_GENERATOR<double,8,2,512*1024,RC,lru>::result external vector of \c double's ,
-//!      with 8 blocks per page, 2 pages, 512 KB blocks, Random Cyclic allocation
+//!      with 8 blocks per page, 2 pages, 512 KiB blocks, Random Cyclic allocation
 //!      and lru cache replacement strategy
 //! \warning Do not store references to the elements of an external vector. Such references
 //! might be invalidated during any following access to elements of the vector

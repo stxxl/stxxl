@@ -11,7 +11,7 @@
 ############################################################################
 
 HOST		?= unknown
-SIZE		?= 100	# GB
+SIZE		?= 100	# GiB
 
 disk2file	?= /stxxl/sd$1/stxxl
 
@@ -115,8 +115,8 @@ PLOTYMAX	?= 120
 $(HOST).gnuplot: Makefile $(wildcard *.log)
 	$(RM) $@
 	echo 'set title "STXXL Disk Benchmark $(DISKNAME) @ $(HOST)"' >> $@
-	echo 'set xlabel "Disk offset [GB]"' >> $@
-	echo 'set ylabel "Bandwidth per disk [MB/s]"' >> $@
+	echo 'set xlabel "Disk offset [GiB]"' >> $@
+	echo 'set ylabel "Bandwidth per disk [MiB/s]"' >> $@
 	echo '' >> $@
 
 	echo 'plot [0:$(PLOTXMAX)] [0:$(PLOTYMAX)] \' >> $@

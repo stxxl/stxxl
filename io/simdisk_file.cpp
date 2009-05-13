@@ -138,18 +138,18 @@ IC35L080AVVA07::IC35L080AVVA07()
      *
      * cout << "Zone " << i << " first sector: " << (*it).first_sector;
      * cout << " sectors: " << (*it).sectors << " sustained rate: " ;
-     * cout << (*it).sustained_data_rate/1000000 << " Mb/s"  << endl;
+     * cout << (*it).sustained_data_rate/1024/1024 << " MiB/s"  << endl;
      *
      * }
      *
      *
      * cout << "Last sector     : " << first_sect <<endl;
-     * cout << "Approx. capacity: " << (first_sect/1000000)*bytes_per_sector << " Mb" << endl;
+     * cout << "Approx. capacity: " << (first_sect/1024/1024)*bytes_per_sector << " MiB" << endl;
      */
 
-    std::cout << "Transfer 16 Mb from zone 0 : " <<
+    std::cout << "Transfer 16 MiB from zone 0 : " <<
     get_delay(0, 16 * 1024 * 1024) << " s" << std::endl;
-    std::cout << "Transfer 16 Mb from zone 30: " <<
+    std::cout << "Transfer 16 MiB from zone 30: " <<
     get_delay(file::offset_type(158204036) * file::offset_type(bytes_per_sector), 16 * 1024 * 1024) << " s" << std::endl;
 }
 

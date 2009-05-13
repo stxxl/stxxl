@@ -13,7 +13,7 @@
 
 /*
    example gnuplot command for the output of this program:
-   (x-axis: disk offset in GB, y-axis: bandwidth in MB/s)
+   (x-axis: disk offset in GiB, y-axis: bandwidth in MiB/s)
 
    plot \
         "disk.log" using ($3/1024):($14) w l title "read", \
@@ -98,7 +98,7 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 void usage(const char * argv0)
 {
     std::cout << "Usage: " << argv0 << " offset length step [r|w] diskfile..." << std::endl;
-    std::cout << "    starting 'offset' and 'length' are given in GB, 'step' size in MB" << std::endl;
+    std::cout << "    starting 'offset' and 'length' are given in GiB, 'step' size in MiB" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     exit(-1);
 }
@@ -190,7 +190,7 @@ int main(int argc, char * argv[])
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
             const unsigned current_num_blocks = STXXL_DIVRU(current_step_size, block_size);
 
-            std::cout << "Disk offset    " << std::setw(7) << offset / MB << " MB: " << std::fixed;
+            std::cout << "Disk offset    " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
 
             double begin = timestamp(), end, elapsed;
 
@@ -220,21 +220,21 @@ int main(int argc, char * argv[])
                 elapsed = 0.0;
             }
 
-/*
+#if 0
    std::cout << "WRITE\nDisks: " << ndisks
         <<" \nElapsed time: "<< end-begin
-        << " \nThroughput: "<< int(1e-6*(current_step_size*ndisks)/(end-begin))
-        << " Mb/s \nPer one disk:"
-        << int(1e-6*(current_step_size)/(end-begin)) << " Mb/s"
+        << " \nThroughput: "<< int(double(current_step_size*ndisks)/MB/(end-begin))
+        << " MiB/s \nPer one disk:"
+        << int(double(current_step_size)/MB/(end-begin)) << " MiB/s"
         << std::endl;
-*/
+#endif
 
  #ifdef WATCH_TIMES
             out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
             std::cout << std::setw(2) << ndisks << " * "
-                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_step_size) / elapsed) << " = "
-                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_step_size * ndisks) / elapsed) << " MB/s write,";
+                      << std::setw(7) << std::setprecision(3) << (double(current_step_size) / MB / elapsed) << " = "
+                      << std::setw(7) << std::setprecision(3) << (double(current_step_size * ndisks) / MB / elapsed) << " MiB/s write,";
 #endif
 
 
@@ -265,18 +265,18 @@ int main(int argc, char * argv[])
                 elapsed = 0.0;
             }
 
-/*
+#if 0
    std::cout << "READ\nDisks: " << ndisks
         <<" \nElapsed time: "<< end-begin
-        << " \nThroughput: "<< int(1e-6*(current_step_size*ndisks)/(end-begin))
-        << " Mb/s \nPer one disk:"
-        << int(1e-6*(current_step_size)/(end-begin)) << " Mb/s"
+        << " \nThroughput: "<< int(double(current_step_size*ndisks)/MB/(end-begin))
+        << " MiB/s \nPer one disk:"
+        << int(double(current_step_size)/MB/(end-begin)) << " MiB/s"
             << std::endl;
-*/
+#endif
 
             std::cout << std::setw(2) << ndisks << " * "
-                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_step_size) / elapsed) << " = "
-                      << std::setw(7) << std::setprecision(3) << (1e-6 * (current_step_size * ndisks) / elapsed) << " MB/s read" << std::endl;
+                      << std::setw(7) << std::setprecision(3) << (double(current_step_size) / MB / elapsed) << " = "
+                      << std::setw(7) << std::setprecision(3) << (double(current_step_size * ndisks) / MB / elapsed) << " MiB/s read" << std::endl;
 
 #ifdef WATCH_TIMES
             out_stat(begin, end, r_finish_times, ndisks, disks_arr);
@@ -312,13 +312,13 @@ int main(int argc, char * argv[])
     }
 
     std::cout << "=============================================================================================" << std::endl;
-    std::cout << "# Average over " << std::setw(7) << totalsizewrite / MB << " MB: ";
+    std::cout << "# Average over " << std::setw(7) << totalsizewrite / MB << " MiB: ";
     std::cout << std::setw(2) << ndisks << " * "
-              << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizewrite) / totaltimewrite) << " = "
-              << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizewrite * ndisks) / totaltimewrite) << " MB/s write,";
+              << std::setw(7) << std::setprecision(3) << (double(totalsizewrite) / MB / totaltimewrite) << " = "
+              << std::setw(7) << std::setprecision(3) << (double(totalsizewrite * ndisks) / MB / totaltimewrite) << " MiB/s write,";
     std::cout << std::setw(2) << ndisks << " * "
-              << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizeread) / totaltimeread) << " = "
-              << std::setw(7) << std::setprecision(3) << (1e-6 * (totalsizeread * ndisks) / totaltimeread) << " MB/s read" << std::endl;
+              << std::setw(7) << std::setprecision(3) << (double(totalsizeread) / MB / totaltimeread) << " = "
+              << std::setw(7) << std::setprecision(3) << (double(totalsizeread * ndisks) / MB / totaltimeread) << " MiB/s read" << std::endl;
 
 #ifdef WATCH_TIMES
     delete[] r_finish_times;

@@ -156,7 +156,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
 int main(int argc, const char ** argv)
 {
     if (argc < 6) {
-        std::cout << "Usage: " << argv[0] << " [n in megabytes] [p threads] [M in megabytes] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]" << std::endl;
+        std::cout << "Usage: " << argv[0] << " [n in MiB] [p threads] [M in MiB] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]" << std::endl;
         return -1;
     }
 
@@ -262,9 +262,9 @@ int main(int argc, const char ** argv)
     mcstl::HEURISTIC::multiway_merge_minimal_k = 2;
 #endif
 
-    std::cout << "Sorting " << megabytes_to_process << " MB of data ("
+    std::cout << "Sorting " << megabytes_to_process << " MiB of data ("
               << (megabytes_to_process * megabyte / sizeof(my_type)) << " elements) using "
-              << (memory_to_use / megabyte) << " MB of internal memory and "
+              << (memory_to_use / megabyte) << " MiB of internal memory and "
               << p << " thread(s), block size "
               << block_size << ", element size " << sizeof(my_type) << std::endl;
 

@@ -65,7 +65,7 @@ int main()
  */
     //typedef priority_queue<priority_queue_config<my_type,my_cmp,
     //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-    const unsigned volume = 1024 * 1024; // in KB
+    const unsigned volume = 1024 * 1024; // in KiB
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, 32 * 1024 * 1024, volume / sizeof(my_type)> gen;
     typedef gen::result pq_type;
     typedef pq_type::block_type block_type;
@@ -85,7 +85,7 @@ int main()
     pq_type p(p_pool, w_pool);
 
     stxxl::int64 nelements = stxxl::int64(volume * 1024 / sizeof(my_type)), i;
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     STXXL_MSG("Max elements: " << nelements);
     for (i = 0; i < nelements; i++)
     {
@@ -94,14 +94,14 @@ int main()
         p.push(my_type(nelements - i));
     }
     Timer.stop();
-    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec");
+    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");
 
     // test swap
     pq_type p1(p_pool, w_pool);
     std::swap(p, p1);
     std::swap(p, p1);
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     Timer.reset();
     Timer.start();
     for (i = 0; i < (nelements); ++i)
@@ -115,6 +115,6 @@ int main()
     }
     Timer.stop();
 
-    STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
 }

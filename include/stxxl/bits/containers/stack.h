@@ -825,7 +825,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!  - \c BlocksPerPage defines how many blocks has one page of internal cache of an
 //!       \b external implementation, default is four. All \b external implementations have
 //!       \b two pages.
-//!  - \c BlkSz external block size in bytes, default is 2 MBytes
+//!  - \c BlkSz external block size in bytes, default is 2 MiB
 //!  - \c IntStackTp type of internal stack used for some implementations
 //!  - \c MigrCritSize threshold value for number of elements when
 //!    \c stxxl::migrating_stack migrates to the external memory
@@ -842,8 +842,8 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!    - \c STACK_GENERATOR<double,migrating,grow_shrink>::result migrating
 //!      grow-shrink stack of \c double's, internal implementation is \c std::stack<double> ,
 //!    - \c STACK_GENERATOR<double,migrating,grow_shrink,1,512*1024>::result migrating
-//!      grow-shrink stack of \c double's with 1 block per page and block size 512 KB
-//!      (total memory occupied = 1 MB).
+//!      grow-shrink stack of \c double's with 1 block per page and block size 512 KiB
+//!      (total memory occupied = 1 MiB).
 //! For configured stack method semantics see documentation of the STL \c std::stack.
 template <
     class ValTp,

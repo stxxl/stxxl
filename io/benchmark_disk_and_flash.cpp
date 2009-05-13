@@ -88,14 +88,14 @@ void run(char * buffer, file ** disks, stxxl::int64 offset, stxxl::int64 length,
     elapsed = end - begin;
 
     std::cout << "B_d = " << info[0].bytes << "  B_f = " << info[1].bytes << "  n_d = " << info[0].n << "  n_f = " << info[1].n ;//<< std::endl;
-    std::cout << " Transferred " << (volume / MB) << " MB in " << elapsed << " seconds @ " << (volume / MB / elapsed) << " MB/s" << std::endl;
+    std::cout << " Transferred " << (volume / MB) << " MiB in " << elapsed << " seconds @ " << (volume / MB / elapsed) << " MiB/s" << std::endl;
     delete[] reqs;
 }
 
 void usage(const char * argv0)
 {
     std::cout << "Usage: " << argv0 << " offset length diskfile flashfile" << std::endl;
-    std::cout << "    starting 'offset' and 'length' are given in GB" << std::endl;
+    std::cout << "    starting 'offset' and 'length' are given in GiB" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     exit(-1);
 }

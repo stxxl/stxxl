@@ -87,7 +87,7 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 int main(int argc, char * argv[])
 {
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " length_in_GB diskfile..." << std::endl;
+        std::cout << "Usage: " << argv[0] << " length_in_GiB diskfile..." << std::endl;
         return -1;
     }
 
@@ -128,7 +128,7 @@ int main(int argc, char * argv[])
 
     while (count--)
     {
-        std::cout << "Disk offset " << offset / MB << " MB ";
+        std::cout << "Disk offset " << offset / MB << " MiB ";
 
         double begin, end;
 
@@ -152,7 +152,7 @@ int main(int argc, char * argv[])
 
         end = timestamp();
 
-        std::cout << int(1e-6 * (buffer_size) / (end - begin)) << " MB/s" << std::endl;
+        std::cout << int(double(buffer_size) / MB / (end - begin)) << " MiB/s" << std::endl;
 
 #ifdef WATCH_TIMES
         out_stat(begin, end, r_finish_times, ndisks, disks_arr);
