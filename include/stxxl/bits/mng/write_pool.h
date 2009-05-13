@@ -226,19 +226,18 @@ protected:
 #if STXXL_VERBOSE_LEVEL > 0
         int_type busy_blocks_size_old = busy_blocks_size;
 #endif
-        for ( ; cur != busy_blocks.end(); ++cur)
+        while (cur != busy_blocks.end())
         {
             if (cur->req->poll())
             {
                 free_blocks.push_back(cur->block);
-                busy_blocks.erase(cur);
-                cur = busy_blocks.begin();
+                cur = busy_blocks.erase(cur);
                 ++cnt;
                 --busy_blocks_size;
                 ++free_blocks_size;
-                if (busy_blocks.empty())
-                    break;
+                continue;
             }
+            ++cur;
         }
         STXXL_VERBOSE1("write_pool::check_all_busy : " << cnt <<
                        " are completed out of " << busy_blocks_size_old << " busy blocks");
