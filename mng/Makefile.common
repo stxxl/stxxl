@@ -1,4 +1,4 @@
-TESTS			 = test_mng test_mng1 test_buf_streams test_write_pool test_prefetch_pool test_block_alloc_strategy test_mng_recursive_alloc
+TESTS			 = test_mng test_mng1 test_buf_streams test_write_pool test_prefetch_pool test_block_alloc_strategy test_mng_recursive_alloc test_pool_pair
 TESTS_NON_MSVC		 =
 TESTS_UNITTEST		 = unittest
 
