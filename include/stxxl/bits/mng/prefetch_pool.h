@@ -200,6 +200,38 @@ public:
         return result;
     }
 
+    request_ptr read(block_type * & block, bid_type bid, write_pool<block_type> & w_pool)
+    {
+        // try cache
+        busy_blocks_iterator cache_el = busy_blocks.find(bid);
+        if (cache_el != busy_blocks.end())
+        {
+            // cached
+            STXXL_VERBOSE1("prefetch_pool::read bid=" << bid << " => copy in cache exists");
+            ++free_blocks_size;
+            free_blocks.push_back(block);
+            block = cache_el->second.first;
+            request_ptr result = cache_el->second.second;
+            busy_blocks.erase(cache_el);
+            return result;
+        }
+
+        // try w_pool cache
+        if (w_pool.has_request(bid))
+        {
+            busy_entry wp_request = w_pool.steal_request(bid);
+            STXXL_VERBOSE1("prefetch_pool::read bid= " << bid << " was in write cache at " << wp_request.first);
+            assert(wp_request.first != 0);
+            w_pool.add(block);  //in exchange
+            block = wp_request.first;
+            return wp_request.second;
+        }
+
+        // not cached
+        STXXL_VERBOSE1("prefetch_pool::read bid=" << bid << " => no copy in cache, retrieving to " << block);
+        return block->read(bid);
+    }
+
     //! \brief Resizes size of the pool
     //! \param new_size desired size of the pool. If some
     //! blocks are used for prefetching, these blocks can't be freed.
