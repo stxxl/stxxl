@@ -214,7 +214,7 @@ public:
             STXXL_VERBOSE1("queue::pop Case 5");
 
             assert(!bids.empty());
-            request_ptr req = p_pool->read(front_block, bids.front());
+            request_ptr req = p_pool->read(front_block, bids.front(), *w_pool);
             STXXL_VERBOSE_QUEUE("queue[" << this << "]: pop block  " << front_block << " @ " << FMT_BID(bids.front()));
             for (unsigned_type i = 0; i < blocks2prefetch && i < bids.size() - 1; ++i)
             {             // give prefetching hints
