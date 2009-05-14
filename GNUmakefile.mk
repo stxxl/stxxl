@@ -47,8 +47,8 @@ run-all-tests-valgrind: WITH_VALGRIND=yes
 run-all-tests-valgrind: do-run-all-tests ;
 
 dep-check-sanity:
-	find . -name '*.o' -exec misc/remove-unless {} .o .d \; 
-	find . -name '*.bin' -exec misc/remove-unless {} .bin .o \; 
+	$(SKIP_SANITY_CHECK)find . -name '*.o' -exec misc/remove-unless {} .o .d \; 
+	$(SKIP_SANITY_CHECK)find . -name '*.bin' -exec misc/remove-unless {} .bin .o \; 
 
 clean:
 	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_pmode clean_$(MODE)_mcstl clean_doxy
