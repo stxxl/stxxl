@@ -300,7 +300,7 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
     // mapping_lock has to be aquired by caller
     sortseq::iterator space =
         std::find_if(free_space.begin(), free_space.end(),
-                     bind2nd(FirstFit(), write_block_size));
+                     bind2nd(FirstFit(), write_block_size) __STXXL_FORCE_SEQUENTIAL);
 
     if (space != free_space.end())
     {
