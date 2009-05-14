@@ -21,7 +21,7 @@ MCSTL	?= mcstl # undefine to disable
 
 default-all: lib tests header-compile-test
 
-lib:
+lib: dep-check-sanity
 	$(MAKE) -f Makefile library_$(MODE) $(if $(PMODE),library_$(MODE)_pmode) $(if $(MCSTL),library_$(MODE)_mcstl)
 
 tests: lib
@@ -45,6 +45,10 @@ run-all-tests: do-run-all-tests ;
 
 run-all-tests-valgrind: WITH_VALGRIND=yes
 run-all-tests-valgrind: do-run-all-tests ;
+
+dep-check-sanity:
+	find . -name '*.o' -exec misc/remove-unless {} .o .d \; 
+	find . -name '*.bin' -exec misc/remove-unless {} .bin .o \; 
 
 clean:
 	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_pmode clean_$(MODE)_mcstl clean_doxy
