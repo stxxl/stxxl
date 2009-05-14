@@ -59,6 +59,14 @@ int main(int argc, char ** argv)
 
     wait_all(req, 16);
 
+    // check behaviour of having requests to the same location at the same time
+    for (i = 2; i < 16; i++)
+        req[i] = file2.awrite(buffer, 0, size, my_handler());
+    req[0] = file2.aread(buffer, 0, size, my_handler());
+    req[1] = file2.awrite(buffer, 0, size, my_handler());
+
+    wait_all(req, 16);
+
     stxxl::aligned_dealloc<4096>(buffer);
 
     std::cout << *(stxxl::stats::get_instance());
