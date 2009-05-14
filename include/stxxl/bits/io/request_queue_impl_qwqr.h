@@ -29,11 +29,12 @@ class request_queue_impl_qwqr: public request_queue_impl_worker, public disk_que
 {
 private:
     typedef request_queue_impl_qwqr self;
+    typedef std::list<request_ptr> queue_type;
 
     mutex write_mutex;
     mutex read_mutex;
-    std::list<request_ptr> write_queue;
-    std::list<request_ptr> read_queue;
+    queue_type write_queue;
+    queue_type read_queue;
 
     static const priority_op _priority_op = WRITE;
 
