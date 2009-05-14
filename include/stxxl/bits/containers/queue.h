@@ -166,6 +166,10 @@ public:
                 STXXL_VERBOSE_QUEUE("queue[" << this << "]: push block " << back_block << " @ " << FMT_BID(newbid));
                 bids.push_back(newbid);
                 w_pool->write(back_block, newbid);
+                if (bids.size() <= blocks2prefetch) {
+                    STXXL_VERBOSE1("queue::push Case Hints");
+                    p_pool->hint(newbid, *w_pool);
+                }
             }
             back_block = w_pool->steal();
 
@@ -297,3 +301,4 @@ public:
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_QUEUE_HEADER
+// vim: et:ts=4:sw=4
