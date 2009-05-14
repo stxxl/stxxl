@@ -111,7 +111,7 @@ public:
     //! \param bid location, where to write
     //! \warning \c block must be allocated dynamically with using \c new .
     //! \return request object of the write operation
-    request_ptr write(block_type * block, bid_type bid)
+    request_ptr write(block_type * & block, bid_type bid)
     {
         for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
         {
@@ -126,6 +126,7 @@ public:
         request_ptr result = block->write(bid);
         ++busy_blocks_size;
         busy_blocks.push_back(busy_entry(block, result, bid));
+        block = NULL; // prevent caller from using the block any further
         return result;
     }
 
