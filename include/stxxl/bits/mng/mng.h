@@ -113,13 +113,18 @@ bool operator != (const BID<blk_sz> & a, const BID<blk_sz> & b)
     return (a.storage != b.storage) || (a.offset != b.offset) || (a.size != b.size);
 }
 
-
 template <unsigned blk_sz>
 std::ostream & operator << (std::ostream & s, const BID<blk_sz> & bid)
 {
-    s << " storage file addr: " << bid.storage;
-    s << " offset: " << bid.offset;
-    s << " size: " << bid.size;
+    // [0x12345678|0]0x00100000/0x00010000
+    // [file ptr|file id]offset/size
+
+    s << "[" << bid.storage << "|";
+    if (bid.storage)
+        s << bid.storage->get_id();
+    else
+        s << "?";
+    s << "]0x" << std::hex << std::setfill('0') << std::setw(8) << bid.offset << "/0x" << std::setw(8) << bid.size;
     return s;
 }
 
