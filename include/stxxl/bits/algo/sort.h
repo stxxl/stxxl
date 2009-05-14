@@ -15,7 +15,6 @@
 #ifndef STXXL_SORT_HEADER
 #define STXXL_SORT_HEADER
 
-#include <list>
 #include <functional>
 
 #include <stxxl/bits/mng/mng.h>

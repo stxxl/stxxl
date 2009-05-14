@@ -20,7 +20,6 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
-#include <list>
 #include <map>
 #include <algorithm>
 #include <string>

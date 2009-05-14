@@ -14,8 +14,6 @@
 #ifndef STXXL_KSORT_HEADER
 #define STXXL_KSORT_HEADER
 
-#include <list>
-
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/adaptor.h>

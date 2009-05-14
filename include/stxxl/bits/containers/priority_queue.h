@@ -16,8 +16,6 @@
 #ifndef STXXL_PRIORITY_QUEUE_HEADER
 #define STXXL_PRIORITY_QUEUE_HEADER
 
-#include <list>
-#include <iterator>
 #include <vector>
 
 #include <stxxl/bits/mng/mng.h>
