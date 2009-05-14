@@ -242,10 +242,11 @@ public:
         return std::pair<block_type *, request_ptr>((block_type *)NULL, request_ptr());
     }
 
-    void add(block_type * block)
+    void add(block_type * & block)
     {
         free_blocks.push_back(block);
         ++free_blocks_size;
+        block = NULL; // prevent caller from using the block any further
     }
 
 protected:
