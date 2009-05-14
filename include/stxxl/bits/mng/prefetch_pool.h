@@ -146,24 +146,22 @@ public:
         if (busy_blocks.find(bid) != busy_blocks.end())
             return true;
 
-
         if (free_blocks_size) //  only if we have a free block
         {
             STXXL_VERBOSE2("prefetch_pool::hint2 bid= " << bid << " => prefetching");
             --free_blocks_size;
             block_type * block = free_blocks.back();
             free_blocks.pop_back();
-            request_ptr req = w_pool.get_request(bid);
-            if (req.valid())
+            if (w_pool.has_request(bid))
             {
-                block_type * w_block = w_pool.steal(bid);
-                STXXL_VERBOSE1("prefetch_pool::hint2 bid= " << bid << " was in write cache at " << w_block);
-                assert(w_block != 0);
+                busy_entry wp_request = w_pool.steal_request(bid);
+                STXXL_VERBOSE1("prefetch_pool::hint2 bid= " << bid << " was in write cache at " << wp_request.first);
+                assert(wp_request.first != 0);
                 w_pool.add(block);  //in exchange
-                busy_blocks[bid] = busy_entry(w_block, req);
+                busy_blocks[bid] = wp_request;
                 return true;
             }
-            req = block->read(bid);
+            request_ptr req = block->read(bid);
             busy_blocks[bid] = busy_entry(block, req);
             return true;
         }
@@ -247,3 +245,4 @@ namespace std
 }
 
 #endif // !STXXL_PREFETCH_POOL_HEADER
+// vim: et:ts=4:sw=4
