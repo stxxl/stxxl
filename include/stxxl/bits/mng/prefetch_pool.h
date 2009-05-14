@@ -171,15 +171,16 @@ public:
         return false;
     }
 
-    // TODO: cancel *READ* request
-    // be careful with cancelling requests, there might be write requests
-    // we retrieved from a write_pool that must not be cancelled
     bool invalidate(bid_type bid)
     {
         busy_blocks_iterator cache_el = busy_blocks.find(bid);
         if (cache_el == busy_blocks.end())
             return false;
 
+        // cancel request if it is a read request, there might be
+        // write requests 'stolen' from a write_pool that may not be cancelled
+        if (cache_el->second.second->get_type() == request::READ)
+            cache_el->second.second->cancel();
         // finish the request
         cache_el->second.second->wait();
         ++free_blocks_size;

@@ -119,6 +119,8 @@ public:
             if (i2->bid == bid) {
                 assert(i2->block != block);
                 STXXL_VERBOSE1("WAW dependency");
+                // try to cancel the obsolete request
+                i2->req->cancel();
                 // invalidate the bid of the stale write request,
                 // prevents prefetch_pool from stealing a stale block
                 i2->bid.storage = 0;
