@@ -303,7 +303,7 @@ HEADER_FILES_IO		+= wbtl_file.h
 
 HEADER_FILES_MNG	+= adaptor.h block_prefetcher.h
 HEADER_FILES_MNG	+= buf_istream.h buf_ostream.h buf_writer.h mng.h
-HEADER_FILES_MNG	+= write_pool.h prefetch_pool.h
+HEADER_FILES_MNG	+= write_pool.h prefetch_pool.h block_pool.h
 HEADER_FILES_MNG	+= block_alloc_interleaved.h
 
 HEADER_FILES_CONTAINERS	+= pager.h stack.h vector.h priority_queue.h
