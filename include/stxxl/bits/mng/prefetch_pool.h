@@ -171,6 +171,23 @@ public:
         return false;
     }
 
+    // TODO: cancel *READ* request
+    // be careful with cancelling requests, there might be write requests
+    // we retrieved from a write_pool that must not be cancelled
+    bool invalidate(bid_type bid)
+    {
+        busy_blocks_iterator cache_el = busy_blocks.find(bid);
+        if (cache_el == busy_blocks.end())
+            return false;
+
+        // finish the request
+        cache_el->second.second->wait();
+        ++free_blocks_size;
+        free_blocks.push_back(cache_el->second.first);
+        busy_blocks.erase(cache_el);
+        return true;
+    }
+
     bool in_prefetching(bid_type bid)
     {
         return (busy_blocks.find(bid) != busy_blocks.end());

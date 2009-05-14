@@ -90,6 +90,7 @@ int main()
         // update the hinted block
         (*blk)[0].integer = 23;
         w_pool.write(blk, bid);
+        p_pool.invalidate(bid);
         blk = w_pool.steal(); // flush w_pool
 
         // get the hinted block
@@ -122,6 +123,7 @@ int main()
         blk = w_pool.steal();
         (*blk)[0].integer = 23;
         w_pool.write(blk, bid);
+        p_pool.invalidate(bid);
         blk = w_pool.steal(); // flush w_pool
 
         // get the hinted block
