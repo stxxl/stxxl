@@ -113,6 +113,7 @@ public:
     //! \return request object of the write operation
     request_ptr write(block_type * & block, bid_type bid)
     {
+        STXXL_VERBOSE1("write_pool::write: " << block << " @ " << bid);
         for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
         {
             if (i2->bid == bid) {
