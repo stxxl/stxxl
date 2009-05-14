@@ -177,6 +177,7 @@ public:
             delete steal();
     }
 
+    // FIXME: TO BE DEPRECATED
     request_ptr get_request(bid_type bid)
     {
         busy_blocks_iterator i2 = busy_blocks.begin();
@@ -188,7 +189,17 @@ public:
         return request_ptr();
     }
 
+    bool has_request(bid_type bid)
+    {
+        for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
+        {
+            if (i2->bid == bid)
+                return true;
+        }
+        return false;
+    }
 
+    // FIXME: TO BE DEPRECATED
     block_type * steal(bid_type bid)
     {
         busy_blocks_iterator i2 = busy_blocks.begin();
@@ -204,6 +215,27 @@ public:
             }
         }
         return NULL;
+    }
+
+    // returns a block and a (potentially unfinished) I/O request associated with it
+    std::pair<block_type *, request_ptr> steal_request(bid_type bid)
+    {
+        for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
+        {
+            if (i2->bid == bid)
+            {
+                // remove busy block from list, request has not yet been waited for!
+                block_type * blk = i2->block;
+                request_ptr req = i2->req;
+                busy_blocks.erase(i2);
+                --busy_blocks_size;
+
+                // hand over block and (unfinished) request to caller
+                return std::pair<block_type *, request_ptr>(blk, req);
+            }
+        }
+        // not matching request found, return a dummy
+        return std::pair<block_type *, request_ptr>((block_type *)NULL, request_ptr());
     }
 
     void add(block_type * block)
