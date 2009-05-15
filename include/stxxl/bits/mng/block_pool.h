@@ -88,7 +88,7 @@ public:
     //! \param new_size new size of the pool after the call
     void resize_prefetch(size_type new_size)
     {
-        w_pool->prefetch(new_size);
+        p_pool->resize(new_size);
     }
 
     // WRITE POOL METHODS
