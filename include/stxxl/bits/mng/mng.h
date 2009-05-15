@@ -1212,6 +1212,16 @@ public:
         DiskAssignFunctor functor,
         BIDIteratorClass out);
 
+    //! Allocates a new block according to the strategy
+    //! given by \b functor and stores the block identifier
+    //! to bid.
+    //! \param functor object of model of \b allocation_strategy concept
+    //! \param bid BID to store the block identifier
+    template <typename DiskAssignFunctor, unsigned BLK_SIZE>
+    void new_block(DiskAssignFunctor functor, BID<BLK_SIZE> & bid)
+    {
+        new_blocks_int<BID<BLK_SIZE> >(1, functor, &bid);
+    }
 
     //! \brief Deallocates blocks
 
