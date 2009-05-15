@@ -129,9 +129,8 @@ int main()
         }
     }
     typedef stxxl::queue<my_type>::block_type block_type;
-    stxxl::write_pool<block_type> w_pool(5);
-    stxxl::prefetch_pool<block_type> p_pool(5);
-    stxxl::queue<my_type> xqueue1(w_pool, p_pool, 5);
+    stxxl::block_pool<block_type> pool(5, 5);
+    stxxl::queue<my_type> xqueue1(pool, 5);
     std::queue<my_type> squeue1;
 
     cnt = 10 * stxxl::queue<my_type>::block_type::size;
