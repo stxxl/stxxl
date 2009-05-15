@@ -54,6 +54,11 @@ test_pool_pair.$(EXEEXT): test_pool_pair.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_pool_pair.cpp
 	$(LINKER) test_pool_pair.$(OBJEXT) $(OUT)test_pool_pair.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_block_pool: test_block_pool.$(EXEEXT)
+test_block_pool.$(EXEEXT): test_block_pool.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_block_pool.cpp
+	$(LINKER) test_block_pool.$(OBJEXT) $(OUT)test_block_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 unittest: unittest.$(EXEEXT) $(DEPENDENCIES)
 unittest.$(EXEEXT): unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
