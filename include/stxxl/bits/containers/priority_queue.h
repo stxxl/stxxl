@@ -195,7 +195,9 @@ protected:
     size_type size_;
     bool deallocate_pools;
 
-    // private member functions
+private:
+    void init();
+
     void refill_delete_buffer();
     unsigned_type refill_group_buffer(unsigned_type k);
 
@@ -378,22 +380,8 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
     num_active_groups(0), size_(0),
     deallocate_pools(false)
 {
-    STXXL_VERBOSE2("priority_queue::priority_queue()");
-    assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
-
-    ext_mergers = new ext_merger_type[num_ext_groups];
-    for (unsigned_type j = 0; j < num_ext_groups; ++j)
-        ext_mergers[j].set_pools(&p_pool, &w_pool);
-
-    value_type sentinel = cmp.min_value();
-    insert_heap.push(sentinel);                                // always keep the sentinel
-    delete_buffer[delete_buffer_size] = sentinel;              // sentinel
-    delete_buffer_current_min = delete_buffer_end;             // empty
-    for (unsigned_type i = 0;  i < total_num_groups;  i++)
-    {
-        group_buffers[i][N] = sentinel;                        // sentinel
-        group_buffer_current_mins[i] = &(group_buffers[i][N]); // empty
-    }
+    STXXL_VERBOSE2("priority_queue::priority_queue(p_pool, w_pool)");
+    init();
 }
 
 template <class Config_>
@@ -405,7 +393,13 @@ priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type 
     num_active_groups(0), size_(0),
     deallocate_pools(true)
 {
-    STXXL_VERBOSE2("priority_queue::priority_queue()");
+    STXXL_VERBOSE2("priority_queue::priority_queue(pool sizes)");
+    init();
+}
+
+template <class Config_>
+void priority_queue<Config_>::init()
+{
     assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
 
     ext_mergers = new ext_merger_type[num_ext_groups];
