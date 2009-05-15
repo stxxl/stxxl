@@ -1,16 +1,16 @@
 /***************************************************************************
- *  mng/test_prefetch_pool.cpp
+ *  mng/test_pool_pair.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! \example mng/test_prefetch_pool.cpp
+//! \example mng/test_pool_pair.cpp
 
 #include <iostream>
 #include <stxxl/mng>
@@ -39,7 +39,7 @@ int main()
         block_type * blk;
         block_type::bid_type bid;
 
-        bm->new_blocks(alloc, &bid, &bid + 1);
+        bm->new_block(alloc, bid);
 
         // write the block for the first time
         blk = w_pool.steal();
@@ -78,7 +78,7 @@ int main()
         block_type * blk;
         block_type::bid_type bid;
 
-        bm->new_blocks(alloc, &bid, &bid + 1);
+        bm->new_block(alloc, bid);
         blk = w_pool.steal();
         (*blk)[0].integer = 42;
         w_pool.write(blk, bid);
@@ -111,7 +111,7 @@ int main()
         block_type * blk;
         block_type::bid_type bid;
 
-        bm->new_blocks(alloc, &bid, &bid + 1);
+        bm->new_block(alloc, bid);
         blk = w_pool.steal();
         (*blk)[0].integer = 42;
         w_pool.write(blk, bid);

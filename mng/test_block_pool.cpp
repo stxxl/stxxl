@@ -37,7 +37,7 @@ int main()
         block_type * blk;
         block_type::bid_type bid;
 
-        bm->new_blocks(alloc, &bid, &bid + 1);
+        bm->new_block(alloc, bid);
 
         // write the block for the first time
         blk = pool.steal();
@@ -75,7 +75,7 @@ int main()
         block_type * blk;
         block_type::bid_type bid;
 
-        bm->new_blocks(alloc, &bid, &bid + 1);
+        bm->new_block(alloc, bid);
         blk = pool.steal();
         (*blk)[0].integer = 42;
         pool.write(blk, bid);
@@ -106,7 +106,7 @@ int main()
         block_type * blk;
         block_type::bid_type bid;
 
-        bm->new_blocks(alloc, &bid, &bid + 1);
+        bm->new_block(alloc, bid);
         blk = pool.steal();
         (*blk)[0].integer = 42;
         pool.write(blk, bid);
