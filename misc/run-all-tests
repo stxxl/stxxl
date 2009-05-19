@@ -163,7 +163,7 @@ run algo/test_manyunits
 run algo/test_random_shuffle
 run algo/test_scan
 run algo/test_sort
-run algo/test_stable_ksort
+test -n "$WITH_STABLE_KSORT" && run algo/test_stable_ksort
 
 run stream/test_push_sort
 run stream/test_sorted_runs
