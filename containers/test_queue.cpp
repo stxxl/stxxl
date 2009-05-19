@@ -45,7 +45,8 @@ int main()
     unsigned cnt;
     STXXL_MSG("Elements in a block: " << stxxl::queue<my_type>::block_type::size);
 
-    stxxl::queue<my_type> xqueue(2, 2, 2);
+    // FIXME: can this be raised to recommended (3, 2) without breaking "Testing special case 4" or any other tests?
+    stxxl::queue<my_type> xqueue(2, 2, -1);
     std::queue<my_type> squeue;
     check(xqueue, squeue);
 
@@ -130,7 +131,7 @@ int main()
     }
     typedef stxxl::queue<my_type>::block_type block_type;
     stxxl::read_write_pool<block_type> pool(5, 5);
-    stxxl::queue<my_type> xqueue1(pool, 5);
+    stxxl::queue<my_type> xqueue1(pool, -1);
     std::queue<my_type> squeue1;
 
     cnt = 10 * stxxl::queue<my_type>::block_type::size;
