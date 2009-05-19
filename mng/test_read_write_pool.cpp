@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/test_block_pool.cpp
+ *  mng/test_read_write_pool.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,11 +10,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! \example mng/test_block_pool.cpp
+//! \example mng/test_read_write_pool.cpp
 
 #include <iostream>
 #include <stxxl/mng>
-#include <stxxl/bits/mng/block_pool.h>
+#include <stxxl/bits/mng/read_write_pool.h>
 
 #define BLOCK_SIZE (1024 * 512)
 
@@ -33,7 +33,7 @@ int main()
 
     {
         STXXL_MSG("Write-After-Write coherence test");
-        stxxl::block_pool<block_type> pool(10, 2);
+        stxxl::read_write_pool<block_type> pool(10, 2);
         block_type * blk;
         block_type::bid_type bid;
 
@@ -71,7 +71,7 @@ int main()
 
     {
         STXXL_MSG("Write-After-Hint coherence test #1");
-        stxxl::block_pool<block_type> pool(1, 1);
+        stxxl::read_write_pool<block_type> pool(1, 1);
         block_type * blk;
         block_type::bid_type bid;
 
@@ -102,7 +102,7 @@ int main()
 
     {
         STXXL_MSG("Write-After-Hint coherence test #2");
-        stxxl::block_pool<block_type> pool(1, 1);
+        stxxl::read_write_pool<block_type> pool(1, 1);
         block_type * blk;
         block_type::bid_type bid;
 
