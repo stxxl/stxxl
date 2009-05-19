@@ -20,7 +20,7 @@
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/tmeta.h>
-#include <stxxl/bits/mng/block_pool.h>
+#include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 
@@ -60,7 +60,7 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
-    typedef block_pool<block_type> pool_type;
+    typedef read_write_pool<block_type> pool_type;
 
     size_type size_;
     bool delete_pool;

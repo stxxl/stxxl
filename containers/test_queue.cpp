@@ -129,7 +129,7 @@ int main()
         }
     }
     typedef stxxl::queue<my_type>::block_type block_type;
-    stxxl::block_pool<block_type> pool(5, 5);
+    stxxl::read_write_pool<block_type> pool(5, 5);
     stxxl::queue<my_type> xqueue1(pool, 5);
     std::queue<my_type> squeue1;
 
