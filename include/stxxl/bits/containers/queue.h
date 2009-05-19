@@ -89,16 +89,8 @@ public:
         blocks2prefetch(blocks2prefetch_)
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(sizes)");
-        if (w_pool_size < 2)
-            w_pool_size = 2;
-
-        if (p_pool_size < 1)
-            p_pool_size = 1;
-
         pool = new pool_type(w_pool_size, p_pool_size);
-        front_block = back_block = pool->steal();
-        back_element = back_block->elem - 1;
-        front_element = back_block->elem;
+        init();
     }
 
     //! \brief Constructs empty queue
@@ -118,15 +110,7 @@ public:
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pools)");
         pool = new pool_type(w_pool, p_pool);
-        if (pool->size_write() < 2)
-            pool->resize_write(2);
-
-        if (pool->size_prefetch() < 1)
-            pool->resize_prefetch(1);
-
-        front_block = back_block = pool->steal();
-        back_element = back_block->elem - 1;
-        front_element = back_block->elem;
+        init();
     }
 
     //! \brief Constructs empty queue
@@ -144,6 +128,12 @@ public:
         blocks2prefetch(blocks2prefetch_)
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pool)");
+        init();
+    }
+
+private:
+    void init()
+    {
         if (pool->size_write() < 2)
             pool->resize_write(2);
 
@@ -155,6 +145,7 @@ public:
         front_element = back_block->elem;
     }
 
+public:
     //! \brief Defines the number of blocks to prefetch (\c front side)
     void set_prefetch_aggr(unsigned_type blocks2prefetch_)
     {
