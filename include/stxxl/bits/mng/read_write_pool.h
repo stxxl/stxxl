@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/mng/block_pool.h
+ *  include/stxxl/bits/mng/read_write_pool.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG_BLOCK_POOL_H
-#define STXXL_MNG_BLOCK_POOL_H
+#ifndef STXXL_MNG_READ_WRITE_POOL_H
+#define STXXL_MNG_READ_WRITE_POOL_H
 
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
@@ -23,9 +23,9 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! \brief Implements dynamically resizable buffered writing and prefetching pool
+//! \brief Implements dynamically resizable buffered writing and prefetched reading pool
 template <typename BlockType>
-class block_pool : private noncopyable
+class read_write_pool : private noncopyable
 {
 public:
     typedef BlockType block_type;
@@ -44,18 +44,18 @@ public:
     //! \brief Constructs pool
     //! \param init_size_write initial number of blocks in the write pool
     //! \param init_size_prefetch initial number of blocks in the prefetch pool
-    explicit block_pool(size_type init_size_write = 1, size_type init_size_prefetch = 1) :
+    explicit read_write_pool(size_type init_size_write = 1, size_type init_size_prefetch = 1) :
         delete_pools(true)
     {
         w_pool = new write_pool_type(init_size_write);
         p_pool = new prefetch_pool_type(init_size_prefetch);
     }
 
-    block_pool(write_pool_type & w_pool, prefetch_pool_type & p_pool) :
+    read_write_pool(write_pool_type & w_pool, prefetch_pool_type & p_pool) :
         w_pool(&w_pool), p_pool(&p_pool), delete_pools(false)
     { }
 
-    void swap(block_pool & obj)
+    void swap(read_write_pool & obj)
     {
         std::swap(w_pool, obj.w_pool);
         std::swap(p_pool, obj.p_pool);
@@ -63,7 +63,7 @@ public:
     }
 
     //! \brief Waits for completion of all ongoing requests and frees memory
-    virtual ~block_pool()
+    virtual ~read_write_pool()
     {
         if (delete_pools) {
             delete w_pool;
@@ -163,12 +163,12 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <class BlockType>
-    void swap(stxxl::block_pool<BlockType> & a,
-              stxxl::block_pool<BlockType> & b)
+    void swap(stxxl::read_write_pool<BlockType> & a,
+              stxxl::read_write_pool<BlockType> & b)
     {
         a.swap(b);
     }
 }
 
-#endif // !STXXL_MNG_BLOCK_POOL_H
+#endif // !STXXL_MNG_READ_WRITE_POOL_H
 // vim: et:ts=4:sw=4
