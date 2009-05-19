@@ -72,6 +72,7 @@ ifeq ($(strip $(USE_MCSTL)),yes)
 # when using g++-4.2 -fopenmp -O3. Fixed in g++-4.3, wontfix in g++-4.2.
 ifneq ($(strip $(USE_BOOST)),yes)
 $(call reduce_optimization,3,0,test_iterators,gcc_version_4.2,64-bit,any)
+$(call reduce_optimization,3,2,test_iterators,gcc_version_4.2,32-bit,any)
 $(call reduce_optimization,3,1,test_map,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,0,test_map,gcc_version_4.2,32-bit,any)
 $(call reduce_optimization,3,0,test_map_random,gcc_version_4.2,64-bit,any)
