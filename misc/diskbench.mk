@@ -12,6 +12,7 @@
 
 HOST		?= unknown
 SIZE		?= 100	# GiB
+STEP		?= 256  # MiB
 
 disk2file	?= /stxxl/sd$1/stxxl
 
@@ -35,7 +36,7 @@ $(foreach d,$(DISKS_1by1),$(eval DISKS_$d ?= $d))
 define do-some-disks
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
-	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(SIZE) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(SIZE) $(STEP) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
 endef
 
 $(HOST)-%.cr.log:
@@ -142,7 +143,7 @@ $(HOST).gnuplot: Makefile $(wildcard *.log)
 	echo '' >> $@
 	echo 'pause mouse' >> $@
 	echo '' >> $@
-	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(HOST)"' >> $@
+	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(subst _,\\_,$(HOST))"' >> $@
 	echo 'set term postscript enhanced color solid' >> $@
 	echo 'set output "$(HOST).ps"' >> $@
 	echo 'replot' >> $@
