@@ -78,12 +78,12 @@ extract_average	= $(if $(wildcard $1),$(shell tail -n 1 $1 | awk '{ print $$($2+
 # $1 = logfile, $2 = disk, $3 = column, $4 = label
 # (does not plot if avg = nan)
 define plotline
-	$(if $(filter nan,$(call extract_average,$1,$3)),,echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@ ;)
+	$(if $(wildcard $1),$(if $(filter nan,$(call extract_average,$1,$3)),,echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@ ;))
 endef
 
 # $1 = logfile, $2 = disk
 define plotline-cr1
-	$(if $(wildcard $1),$(call plotline,$1,$2,7,cr1))
+	$(call plotline,$1,$2,7,cr1)
 endef
 define plotline-cr
 	$(call plotline,$1,$2,7,cr)
@@ -126,12 +126,14 @@ $(HOST).gnuplot: Makefile $(wildcard *.log)
 		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
 		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
 		$(call plotline-cr,$(HOST)-$d.cr.log,$(call disk2label,$d)) \
+		$(call plotline-wr,$(HOST)-$d.wr1.log,$(call disk2label,$d)) \
+		$(call plotline-rd,$(HOST)-$d.wr1.log,$(call disk2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
 	)
 	$(foreach d,$(filter-out $(DISKS_1by1),$(DISKS)),\
-		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
-		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
+		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disks2label,$d)) \
+		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disks2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
 	)
@@ -141,7 +143,7 @@ $(HOST).gnuplot: Makefile $(wildcard *.log)
 	echo 'pause mouse' >> $@
 	echo '' >> $@
 	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(HOST)"' >> $@
-	echo 'set term postscript enhanced color' >> $@
+	echo 'set term postscript enhanced color solid' >> $@
 	echo 'set output "$(HOST).ps"' >> $@
 	echo 'replot' >> $@
 
