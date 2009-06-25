@@ -41,55 +41,10 @@ using stxxl::timestamp;
 
 #define BLOCK_ALIGN  4096
 
-//#define NOREAD
-
-//#define DO_ONLY_READ
-
 #define POLL_DELAY 1000
 
-#define RAW_ACCESS
+#define CHECK_AFTER_READ 0
 
-//#define WATCH_TIMES
-
-// #define CHECK_AFTER_READ 1
-
-
-#ifdef WATCH_TIMES
-void watch_times(request_ptr reqs[], unsigned n, double * out)
-{
-    bool * finished = new bool[n];
-    unsigned count = 0;
-    for (unsigned i = 0; i < n; i++)
-        finished[i] = false;
-
-    while (count != n)
-    {
-        usleep(POLL_DELAY);
-        unsigned i = 0;
-        for (i = 0; i < n; i++)
-        {
-            if (!finished[i])
-                if (reqs[i]->poll())
-                {
-                    finished[i] = true;
-                    out[i] = timestamp();
-                    count++;
-                }
-        }
-    }
-    delete[] finished;
-}
-
-
-void out_stat(double start, double end, double * times, unsigned n, const std::vector<std::string> & names)
-{
-    for (unsigned i = 0; i < n; i++)
-    {
-        std::cout << i << " " << names[i] << " took " <<
-        100. * (times[i] - start) / (end - start) << " %" << std::endl;
-    }
-}
-#endif
 
 #define MB (1024 * 1024)
 #define GB (1024 * 1024 * 1024)
@@ -120,36 +75,43 @@ int main(int argc, char * argv[])
     if (argc == 4 && (strcmp("w", argv[3]) == 0 || strcmp("W", argv[3]) == 0))
         do_read = false;
 
-    const unsigned block_size = 8 * MB;
+    const unsigned raw_block_size = 8 * MB;
+#if CHECK_AFTER_READ
+    const unsigned block_size = raw_block_size / sizeof(int);
+#endif
 
-    typedef stxxl::typed_block<block_size, int> block_type;
-    typedef stxxl::BID<block_size> BID_type;
+    typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
+    typedef stxxl::BID<raw_block_size> BID_type;
 
-    unsigned num_blocks_per_step = STXXL_DIVRU(step_size, block_size);
-    step_size = num_blocks_per_step * block_size;
-//     const unsigned block_size_int = block_size / sizeof(int);
+    unsigned num_blocks_per_step = STXXL_DIVRU(step_size, raw_block_size);
+    step_size = num_blocks_per_step * raw_block_size;
 
     block_type* buffer = new block_type[num_blocks_per_step];
     request_ptr * reqs = new request_ptr[num_blocks_per_step];
     std::vector<BID_type> blocks;
-#ifdef WATCH_TIMES
-    double * r_finish_times = new double[num_blocks_per_step];
-    double * w_finish_times = new double[num_blocks_per_step];
-#endif
     double totaltimeread = 0, totaltimewrite = 0;
     stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
     std::cout << "# Step size: "
               << step_size << " bytes ("
               << num_blocks_per_step << " blocks of "
-              << block_size << " bytes)" << std::endl;
+              << raw_block_size << " bytes)" << std::endl;
+
+#if CHECK_AFTER_READ
+    for (unsigned j = 0; j < num_blocks_per_step; ++j)
+        for (unsigned i = 0; i < block_size; ++i)
+            buffer[j][i] = j * block_size + i;
+#endif
+
     try {
         STXXL_DEFAULT_ALLOC_STRATEGY alloc;
         while (offset < endpos)
         {
             const stxxl::int64 current_step_size = std::min<stxxl::int64>(step_size, endpos - offset);
-//             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
-            const unsigned current_num_blocks_per_step = STXXL_DIVRU(current_step_size, block_size);
+#if CHECK_AFTER_READ
+            const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
+#endif
+            const unsigned current_num_blocks_per_step = STXXL_DIVRU(current_step_size, raw_block_size);
 
             std::cout << "Offset    " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
 
@@ -164,12 +126,7 @@ int main(int argc, char * argv[])
                 for (unsigned j = 0; j < current_num_blocks_per_step; j++)
                     reqs[j] = buffer[j].write(blocks[num_total_blocks + j]);
 
-
-#ifdef WATCH_TIMES
-                watch_times(reqs, current_num_blocks_per_step, w_finish_times);
-#else
                 wait_all(reqs, current_num_blocks_per_step);
-#endif
 
                 end = timestamp();
                 elapsed = end - begin;
@@ -179,13 +136,9 @@ int main(int argc, char * argv[])
             else
                 elapsed = 0.0;
 
-#ifdef WATCH_TIMES
-            out_stat(begin, end, w_finish_times, current_num_blocks_per_step);
-#endif
             std::cout << std::setw(7) << std::setprecision(3) << (double(current_step_size) / MB / elapsed) << " MiB/s write, ";
 
 
-#ifndef NOREAD
             begin = timestamp();
 
             if (do_read)
@@ -193,11 +146,7 @@ int main(int argc, char * argv[])
                 for (unsigned j = 0; j < current_num_blocks_per_step; j++)
                     reqs[j] = buffer[j].read(blocks[num_total_blocks + j]);
 
-#ifdef WATCH_TIMES
-                watch_times(reqs, current_num_blocks_per_step, r_finish_times);
-#else
                 wait_all(reqs, current_num_blocks_per_step);
-#endif
 
                 end = timestamp();
                 elapsed = end - begin;
@@ -209,32 +158,24 @@ int main(int argc, char * argv[])
 
             std::cout << std::setw(7) << std::setprecision(3) << (double(current_step_size) / MB / elapsed) << " MiB/s read" << std::endl;
 
-#ifdef WATCH_TIMES
-            out_stat(begin, end, r_finish_times, current_num_blocks_per_step);
-#endif
-
-/*            if (CHECK_AFTER_READ)
+#if CHECK_AFTER_READ
+            for (unsigned j = 0; j < current_num_blocks_per_step; j++)
             {
-                for (unsigned j = 0; j < current_num_blocks_per_step; j++)
+                for (unsigned i = 0; i < block_size; i++)
                 {
-                    for (unsigned i = 0; i < block_size; i++)
+                    if (buffer[j][i] != j * block_size + i)
                     {
-                        if (buffer[j][i] != i)
-                        {
-                            int ibuf = i / current_step_size_int;
-                            int pos = i % current_step_size_int;
+                        int ibuf = i / current_step_size_int;
+                        int pos = i % current_step_size_int;
 
-                            std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
-                                    << "  got: " << std::hex << std::setw(8) << buffer[j][i] << " wanted: " << std::hex << std::setw(8) << i
-                                    << std::dec << std::endl;
+                        std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
+                                << "  got: " << std::hex << std::setw(8) << buffer[j][i] << " wanted: " << std::hex << std::setw(8) << (j * block_size + i)
+                                << std::dec << std::endl;
 
-                            i = (ibuf + 1) * current_step_size_int; // jump to next
-                        }
+                        i = (ibuf + 1) * current_step_size_int; // jump to next
                     }
                 }
-            }*/
-#else
-            std::cout << std::endl;
+            }
 #endif
 
             offset += current_step_size;
@@ -251,10 +192,6 @@ int main(int argc, char * argv[])
     std::cout << std::setw(7) << std::setprecision(3) << (double(totalsizewrite) / MB / totaltimewrite) << " MiB/s write, ";
     std::cout << std::setw(7) << std::setprecision(3) << (double(totalsizeread) / MB / totaltimeread) << " MiB/s read" << std::endl;
 
-#ifdef WATCH_TIMES
-    delete[] r_finish_times;
-    delete[] w_finish_times;
-#endif
     delete[] reqs;
     delete[] buffer;
 
