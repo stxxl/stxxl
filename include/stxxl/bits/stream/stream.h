@@ -21,6 +21,11 @@
 #include <stxxl/bits/compat_unique_ptr.h>
 
 
+#ifndef STXXL_VERBOSE_MATERIALIZE
+#define STXXL_VERBOSE_MATERIALIZE STXXL_VERBOSE3
+#endif
+
+
 __STXXL_BEGIN_NAMESPACE
 
 //! \brief Stream package subnamespace
@@ -374,6 +379,7 @@ namespace stream
     template <class OutputIterator_, class StreamAlgorithm_>
     OutputIterator_ materialize(StreamAlgorithm_ & in, OutputIterator_ out)
     {
+        STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
         while (!in.empty())
         {
             *out = *in;
@@ -396,6 +402,7 @@ namespace stream
     template <class OutputIterator_, class StreamAlgorithm_>
     OutputIterator_ materialize(StreamAlgorithm_ & in, OutputIterator_ outbegin, OutputIterator_ outend)
     {
+        STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
         while ((!in.empty()) && outend != outbegin)
         {
             *outbegin = *in;
@@ -425,6 +432,7 @@ namespace stream
                 stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> outend,
                 unsigned_type nbuffers = 0)
     {
+        STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
         typedef stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> ExtIterator;
         typedef stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> ConstExtIterator;
         typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;
@@ -492,6 +500,7 @@ namespace stream
                 stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> out,
                 unsigned_type nbuffers = 0)
     {
+        STXXL_VERBOSE_MATERIALIZE(STXXL_PRETTY_FUNCTION_NAME);
         typedef stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> ExtIterator;
         typedef stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> ConstExtIterator;
         typedef buf_ostream<typename ExtIterator::block_type, typename ExtIterator::bids_container_iterator> buf_ostream_type;

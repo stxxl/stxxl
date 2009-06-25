@@ -66,6 +66,7 @@ struct forty_two {
 
 int main()
 {
+    stxxl::config::get_instance();
     forty_two _42;
     std::vector<int> v(1000);
     stxxl::stream::materialize(_42.reset(), v.begin());
