@@ -76,9 +76,7 @@ int main(int argc, char * argv[])
         do_read = false;
 
     const unsigned raw_block_size = 8 * MB;
-#if CHECK_AFTER_READ
     const unsigned block_size = raw_block_size / sizeof(int);
-#endif
 
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
@@ -97,11 +95,10 @@ int main(int argc, char * argv[])
               << num_blocks_per_step << " blocks of "
               << raw_block_size << " bytes)" << std::endl;
 
-#if CHECK_AFTER_READ
+    //touch data, so it is actually allcoated
     for (unsigned j = 0; j < num_blocks_per_step; ++j)
         for (unsigned i = 0; i < block_size; ++i)
             buffer[j][i] = j * block_size + i;
-#endif
 
     try {
         STXXL_DEFAULT_ALLOC_STRATEGY alloc;
