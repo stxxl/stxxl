@@ -91,9 +91,9 @@ int main(int argc, char * argv[])
     stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
     std::cout << "# Step size: "
-              << step_size << " bytes ("
+              << stxxl::add_IEC_binary_multiplier(step_size, "B") << " ("
               << num_blocks_per_step << " blocks of "
-              << raw_block_size << " bytes)" << std::endl;
+              << stxxl::add_IEC_binary_multiplier(raw_block_size, "B") << ")" << std::endl;
 
     //touch data, so it is actually allcoated
     for (unsigned j = 0; j < num_blocks_per_step; ++j)
@@ -133,7 +133,7 @@ int main(int argc, char * argv[])
             else
                 elapsed = 0.0;
 
-            std::cout << std::setw(7) << std::setprecision(3) << (double(current_step_size) / MB / elapsed) << " MiB/s write, ";
+            std::cout << std::setw(5) << std::setprecision(1) << (double(current_step_size) / MB / elapsed) << " MiB/s write, ";
 
 
             begin = timestamp();
@@ -153,7 +153,7 @@ int main(int argc, char * argv[])
             else
                 elapsed = 0.0;
 
-            std::cout << std::setw(7) << std::setprecision(3) << (double(current_step_size) / MB / elapsed) << " MiB/s read" << std::endl;
+            std::cout << std::setw(5) << std::setprecision(1) << (double(current_step_size) / MB / elapsed) << " MiB/s read" << std::endl;
 
 #if CHECK_AFTER_READ
             for (unsigned j = 0; j < current_num_blocks_per_step; j++)
@@ -186,8 +186,8 @@ int main(int argc, char * argv[])
 
     std::cout << "=============================================================================================" << std::endl;
     std::cout << "# Average over " << std::setw(7) << totalsizewrite / MB << " MiB: ";
-    std::cout << std::setw(7) << std::setprecision(3) << (double(totalsizewrite) / MB / totaltimewrite) << " MiB/s write, ";
-    std::cout << std::setw(7) << std::setprecision(3) << (double(totalsizeread) / MB / totaltimeread) << " MiB/s read" << std::endl;
+    std::cout << std::setw(5) << std::setprecision(1) << (double(totalsizewrite) / MB / totaltimewrite) << " MiB/s write, ";
+    std::cout << std::setw(5) << std::setprecision(1) << (double(totalsizeread) / MB / totaltimeread) << " MiB/s read" << std::endl;
 
     delete[] reqs;
     delete[] buffer;
