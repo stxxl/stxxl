@@ -1,4 +1,4 @@
-TESTS			 = test_io gen_file test_cancel benchmark_disks flushbuffers benchmark_disk_and_flash benchmark_configured_disks
+TESTS			 = test_io gen_file test_cancel benchmark_disks flushbuffers benchmark_disk_and_flash benchmark_configured_disks benchmark_random_block_access
 TESTS_NON_MSVC		 = sd_test
 TESTS_UNITTEST		 = unittest
 
