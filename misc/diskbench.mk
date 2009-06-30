@@ -113,7 +113,7 @@ DISKNAME	?= unknown disk
 PLOTXMAX	?= 475
 PLOTYMAX	?= 120
 
-$(HOST).gnuplot: Makefile $(wildcard *.log)
+$(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	$(RM) $@
 	echo 'set title "STXXL Disk Benchmark $(DISKNAME) @ $(HOST)"' >> $@
 	echo 'set xlabel "Disk offset [GiB]"' >> $@
@@ -141,7 +141,7 @@ $(HOST).gnuplot: Makefile $(wildcard *.log)
 	echo '        "nothing" notitle' >> $@
 
 	echo '' >> $@
-	echo 'pause mouse' >> $@
+	echo 'pause -1' >> $@
 	echo '' >> $@
 	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(subst _,\\_,$(HOST))"' >> $@
 	echo 'set term postscript enhanced color solid' >> $@
