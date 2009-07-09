@@ -73,6 +73,9 @@ ex+: $(foreach d,$(DISKS),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 plot: $(HOST).gnuplot
 	gnuplot $<
 
+dotplot: $(HOST).d.gnuplot
+	gnuplot $<
+
 # $1 = logfile, $2 = column
 extract_average	= $(if $(wildcard $1),$(shell tail -n 1 $1 | awk '{ print $$($2+1) }'),......)
 
@@ -124,13 +127,13 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	$(foreach d,$(DISKS_1by1),\
 		$(call plotline-cr1,$(HOST)-$d.cr1.log,$(call disk2label,$d)) \
 		$(call plotline-crx,$(HOST)-$d.crx.log,$(call disk2label,$d)) \
-		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
-		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
 		$(call plotline-cr,$(HOST)-$d.cr.log,$(call disk2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr1.log,$(call disk2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr1.log,$(call disk2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
+		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
+		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
 	)
 	$(foreach d,$(filter-out $(DISKS_1by1),$(DISKS)),\
 		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disks2label,$d)) \
@@ -147,6 +150,9 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	echo 'set term postscript enhanced color solid' >> $@
 	echo 'set output "$(HOST).ps"' >> $@
 	echo 'replot' >> $@
+
+$(HOST).d.gnuplot: $(HOST).gnuplot
+	sed -e 's/ w l / w d lw 2 /' $< > $@
 
 -include iostat-plot.mk
 
