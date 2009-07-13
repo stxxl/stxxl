@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
     typedef stxxl::BID<raw_block_size> BID_type;
 
     stxxl::int64 num_blocks_in_span = STXXL_DIVRU(span, raw_block_size);
-    num_blocks = std::min(num_blocks, num_blocks_in_span);
+    num_blocks = stxxl::STXXL_MIN(num_blocks, num_blocks_in_span);
 
     block_type* buffer = new block_type;
     request_ptr * reqs = new request_ptr[num_blocks_in_span];
