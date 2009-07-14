@@ -11,8 +11,9 @@
 ############################################################################
 
 HOST		?= unknown
-SIZE		?= 100	# GiB
-STEP		?= 256  # MiB
+FILE_SIZE	?= $(or $(SIZE),100)	# GiB
+BLOCK_SIZE	?= $(or $(STEP),256)	# MiB
+BATCH_SIZE	?= 1	# blocks
 
 disk2file	?= /stxxl/sd$1/stxxl
 
@@ -36,7 +37,7 @@ $(foreach d,$(DISKS_1by1),$(eval DISKS_$d ?= $d))
 define do-some-disks
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
-	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(SIZE) $(STEP) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(FILE_SIZE) $(BLOCK_SIZE) $(BATCH_SIZE) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
 endef
 
 $(HOST)-%.cr.log:
@@ -66,6 +67,7 @@ all: crx wr ex
 
 crx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.crx.log)
 cr: $(foreach d,$(DISKS_1by1),$(HOST)-$d.cr.log)
+cr+: $(foreach d,$(DISKS),$(HOST)-$d.crx.log)
 wr: $(foreach d,$(DISKS),$(HOST)-$d.wr.log)
 ex: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 ex+: $(foreach d,$(DISKS),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
