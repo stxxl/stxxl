@@ -97,10 +97,11 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " offset length block_size [batch_size] [r|w] [--] diskfile..." << std::endl;
-    std::cout << "    starting 'offset' and 'length' are given in GiB, 'block_size' in MiB, " << std::endl;
-    std::cout << "    'batch_size' (default 1) increase to submit several I/Os at once and report" << std::endl;
-    std::cout << "    average rate; ops: write and reread (default), (r)ead only, (w)rite only" << std::endl;
+    std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [r|w] [--] diskfile..." << std::endl;
+    std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
+    std::cout << "    'block_size' (default 8) in MiB, increase 'batch_size' (default 1)" << std::endl;
+    std::cout << "    to submit several I/Os at once and report average rate" << std::endl;
+    std::cout << "    ops: write and reread (default), (r)ead only, (w)rite only" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     std::cout << "    Memory consumption: block_size * batch_size * num_disks" << std::endl;
     exit(-1);
@@ -108,33 +109,44 @@ void usage(const char * argv0)
 
 int main(int argc, char * argv[])
 {
-    if (argc < 5)
+    if (argc < 4)
         usage(argv[0]);
 
     stxxl::int64 offset    = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
     stxxl::int64 length    = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
-    stxxl::int64 block_size= stxxl::int64(MB) * stxxl::int64(atoi(argv[3]));
     stxxl::int64 endpos    = offset + length;
+    stxxl::int64 block_size = 0;
+    stxxl::int64 batch_size = 0;
 
     bool do_read = true, do_write = true;
-    int first_disk_arg = 4;
+    int first_disk_arg = 3;
 
-    stxxl::int64 batch_size = atoi(argv[first_disk_arg]);
+    if (first_disk_arg < argc)
+        block_size = atoi(argv[first_disk_arg]);
+    if (block_size > 0) {
+        ++first_disk_arg;
+    } else {
+        block_size = 8;
+    }
+    block_size *= MB;
+
+    if (first_disk_arg < argc)
+        batch_size = atoi(argv[first_disk_arg]);
     if (batch_size > 0) {
         ++first_disk_arg;
     } else {
         batch_size = 1;
     }
 
-    if (strcmp("r", argv[first_disk_arg]) == 0 || strcmp("R", argv[first_disk_arg]) == 0) {
+    if (first_disk_arg < argc && (strcmp("r", argv[first_disk_arg]) == 0 || strcmp("R", argv[first_disk_arg]) == 0)) {
         do_write = false;
         ++first_disk_arg;
-    } else if (strcmp("w", argv[first_disk_arg]) == 0 || strcmp("W", argv[first_disk_arg]) == 0) {
+    } else if (first_disk_arg < argc && (strcmp("w", argv[first_disk_arg]) == 0 || strcmp("W", argv[first_disk_arg]) == 0)) {
         do_read = false;
         ++first_disk_arg;
     }
 
-    if (strcmp("--", argv[first_disk_arg]) == 0) {
+    if (first_disk_arg < argc && strcmp("--", argv[first_disk_arg]) == 0) {
         ++first_disk_arg;
     }
 
