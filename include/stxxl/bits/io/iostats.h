@@ -51,15 +51,26 @@ class stats : public singleton<stats>
     double p_begin_io;
     double t_waits, p_waits;                    // seconds spent waiting for completion of I/O operations
     double p_begin_wait;
+    double t_wait_read, p_wait_read;
+    double p_begin_wait_read;
+    double t_wait_write, p_wait_write;
+    double p_begin_wait_write;
     int acc_reads, acc_writes;                  // number of requests, participating in parallel operation
     int acc_ios;
     int acc_waits;
+    int acc_wait_read, acc_wait_write;
     double last_reset;
     mutex read_mutex, write_mutex, io_mutex, wait_mutex;
 
     stats();
 
 public:
+    enum wait_op_type {
+        WAIT_OP_ANY,
+        WAIT_OP_READ,
+        WAIT_OP_WRITE
+    };
+
     class scoped_read_write_timer
     {
         typedef unsigned_type size_type;
@@ -207,12 +218,13 @@ public:
     {
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
         bool running;
+        wait_op_type wait_op;
 #endif
 
     public:
-        scoped_wait_timer(bool measure_time = true)
+        scoped_wait_timer(wait_op_type wait_op, bool measure_time = true)
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-            : running(false)
+            : running(false), wait_op(wait_op)
 #endif
         {
             if (measure_time)
@@ -229,7 +241,7 @@ public:
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
             if (!running) {
                 running = true;
-                stats::get_instance()->wait_started();
+                stats::get_instance()->wait_started(wait_op);
             }
 #endif
         }
@@ -238,7 +250,7 @@ public:
         {
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
             if (running) {
-                stats::get_instance()->wait_finished();
+                stats::get_instance()->wait_finished(wait_op);
                 running = false;
             }
 #endif
@@ -347,6 +359,16 @@ public:
         return t_waits;
     }
 
+    double get_wait_read_time() const
+    {
+        return t_wait_read;
+    }
+
+    double get_wait_write_time() const
+    {
+        return t_wait_write;
+    }
+
     //! \brief Return time of the last reset
     //! \return seconds passed from the last reset()
     double get_last_reset_time() const
@@ -369,8 +391,8 @@ public:
     void read_started(unsigned size_);
     void read_finished();
     void read_cached(unsigned size_);
-    void wait_started();
-    void wait_finished();
+    void wait_started(wait_op_type wait_op);
+    void wait_finished(wait_op_type wait_op);
 };
 
 #if !STXXL_IO_STATS
@@ -386,8 +408,8 @@ inline void stats::read_started(unsigned size_)
 inline void stats::read_finished() { }
 #endif
 #ifdef STXXL_DO_NOT_COUNT_WAIT_TIME
-inline void stats::wait_started() { }
-inline void stats::wait_finished() { }
+inline void stats::wait_started(wait_op_type) { }
+inline void stats::wait_finished(wait_op_type) { }
 #endif
 
 
@@ -401,6 +423,7 @@ class stats_data
     double p_reads, p_writes;                  // seconds spent in parallel operations
     double p_ios;                              // seconds spent in all parallel I/O operations (read and write)
     double t_wait;                             // seconds spent waiting for completion of I/O operations
+    double t_wait_read, t_wait_write;          //
     double elapsed;
 
 public:
@@ -419,6 +442,8 @@ public:
         p_writes(0.0),
         p_ios(0.0),
         t_wait(0.0),
+        t_wait_read(0.0),
+        t_wait_write(0.0),
         elapsed(0.0)
     { }
 
@@ -437,6 +462,8 @@ public:
         p_writes(s.get_pwrite_time()),
         p_ios(s.get_pio_time()),
         t_wait(s.get_io_wait_time()),
+        t_wait_read(s.get_wait_read_time()),
+        t_wait_write(s.get_wait_write_time()),
         elapsed(timestamp() - s.get_last_reset_time())
     { }
 
@@ -457,6 +484,8 @@ public:
         s.p_writes = p_writes + a.p_writes;
         s.p_ios = p_ios + a.p_ios;
         s.t_wait = t_wait + a.t_wait;
+        s.t_wait_read = t_wait_read + a.t_wait_read;
+        s.t_wait_write = t_wait_write + a.t_wait_write;
         s.elapsed = elapsed + a.elapsed;
         return s;
     }
@@ -478,6 +507,8 @@ public:
         s.p_writes = p_writes - a.p_writes;
         s.p_ios = p_ios - a.p_ios;
         s.t_wait = t_wait - a.t_wait;
+        s.t_wait_read = t_wait_read - a.t_wait_read;
+        s.t_wait_write = t_wait_write - a.t_wait_write;
         s.elapsed = elapsed - a.elapsed;
         return s;
     }
@@ -555,6 +586,16 @@ public:
     double get_io_wait_time() const
     {
         return t_wait;
+    }
+
+    double get_wait_read_time() const
+    {
+        return t_wait_read;
+    }
+
+    double get_wait_write_time() const
+    {
+        return t_wait_write;
     }
 };
 

@@ -66,7 +66,7 @@ protected:
     {
         STXXL_VERBOSE1("block_prefetcher: waiting block " << iblock);
         {
-            stats::scoped_wait_timer wait_timer;
+            stats::scoped_wait_timer wait_timer(stats::WAIT_OP_READ);
 
             completed[iblock].wait_for_on();
         }

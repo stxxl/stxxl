@@ -386,7 +386,7 @@ inline bool poll_any(request_ptr req_array[], int count, int & index)
 template <class request_iterator_>
 request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
-    stats::scoped_wait_timer wait_timer;
+    stats::scoped_wait_timer wait_timer(stats::WAIT_OP_ANY);
 
     onoff_switch sw;
 

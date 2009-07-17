@@ -35,7 +35,7 @@ void request_state_impl_basic::wait(bool measure_time)
 {
     STXXL_VERBOSE3("ufs_request_base : " << static_cast<void *>(this) << " wait ");
 
-    stats::scoped_wait_timer wait_timer(measure_time);
+    stats::scoped_wait_timer wait_timer(get_type() == READ ? stats::WAIT_OP_READ : stats::WAIT_OP_WRITE, measure_time);
 
     _state.wait_for(READY2DIE);
 

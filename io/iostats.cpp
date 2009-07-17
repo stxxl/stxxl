@@ -39,9 +39,16 @@ stats::stats() :
     t_waits(0.0),
     p_waits(0.0),
     p_begin_wait(0.0),
+    t_wait_read(0.0),
+    p_wait_read(0.0),
+    p_begin_wait_read(0.0),
+    t_wait_write(0.0),
+    p_wait_write(0.0),
+    p_begin_wait_write(0.0),
     acc_reads(0), acc_writes(0),
     acc_ios(0),
     acc_waits(0),
+    acc_wait_read(0), acc_wait_write(0),
     last_reset(timestamp())
 { }
 
@@ -98,6 +105,10 @@ void stats::reset()
 
         t_waits = 0.0;
         p_waits = 0.0;
+        t_wait_read = 0.0;
+        p_wait_read = 0.0;
+        t_wait_write = 0.0;
+        p_wait_write = 0.0;
     }
 
     last_reset = timestamp();
@@ -207,7 +218,7 @@ void stats::read_cached(unsigned size_)
 #endif
 
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
-void stats::wait_started()
+void stats::wait_started(wait_op_type wait_op)
 {
     double now = timestamp();
     {
@@ -217,10 +228,23 @@ void stats::wait_started()
         t_waits += double(acc_waits) * diff;
         p_begin_wait = now;
         p_waits += (acc_waits++) ? diff : 0.0;
+
+        if (wait_op == WAIT_OP_READ) {
+            diff = now - p_begin_wait_read;
+            t_wait_read += double(acc_wait_read) * diff;
+            p_begin_wait_read = now;
+            p_wait_read += (acc_wait_read++) ? diff : 0.0;
+        } else /* if (wait_op == WAIT_OP_WRITE) */ {
+            // wait_any() is only used from write_pool and buffered_writer, so account WAIT_OP_ANY for WAIT_OP_WRITE, too
+            diff = now - p_begin_wait_write;
+            t_wait_write += double(acc_wait_write) * diff;
+            p_begin_wait_write = now;
+            p_wait_write += (acc_wait_write++) ? diff : 0.0;
+        }
     }
 }
 
-void stats::wait_finished()
+void stats::wait_finished(wait_op_type wait_op)
 {
     double now = timestamp();
     {
@@ -230,6 +254,18 @@ void stats::wait_finished()
         t_waits += double(acc_waits) * diff;
         p_begin_wait = now;
         p_waits += (acc_waits--) ? diff : 0.0;
+
+        if (wait_op == WAIT_OP_READ) {
+            double diff = now - p_begin_wait_read;
+            t_wait_read += double(acc_wait_read) * diff;
+            p_begin_wait_read = now;
+            p_wait_read += (acc_wait_read--) ? diff : 0.0;
+        } else /* if (wait_op == WAIT_OP_WRITE) */ {
+            double diff = now - p_begin_wait_write;
+            t_wait_write += double(acc_wait_write) * diff;
+            p_begin_wait_write = now;
+            p_wait_write += (acc_wait_write--) ? diff : 0.0;
+        }
     }
 }
 #endif
@@ -318,6 +354,10 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
 #endif
 #ifndef STXXL_DO_NOT_COUNT_WAIT_TIME
     o << " I/O wait time                              : " << s.get_io_wait_time() << " s" << std::endl;
+   if (s.get_wait_read_time() != 0.0)
+    o << " I/O wait4read time                         : " << s.get_wait_read_time() << " s" << std::endl;
+   if (s.get_wait_write_time() != 0.0)
+    o << " I/O wait4write time                        : " << s.get_wait_write_time() << " s" << std::endl;
 #endif
     o << " Time since the last reset                  : " << s.get_elapsed_time() << " s" << std::endl;
     return o;
@@ -325,3 +365,4 @@ std::ostream & operator << (std::ostream & o, const stats_data & s)
 }
 
 __STXXL_END_NAMESPACE
+// vim: et:ts=4:sw=4
