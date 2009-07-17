@@ -37,7 +37,7 @@ $(foreach d,$(DISKS_1by1),$(eval DISKS_$d ?= $d))
 define do-some-disks
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
-	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(FILE_SIZE) $(BLOCK_SIZE) $(BATCH_SIZE) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
 endef
 
 $(HOST)-%.cr.log:
@@ -138,10 +138,11 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
 	)
 	$(foreach d,$(filter-out $(DISKS_1by1),$(DISKS)),\
-		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disks2label,$d)) \
-		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disks2label,$d)) \
+		$(call plotline-crx,$(HOST)-$d.crx.log,$(call disks2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
+		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disks2label,$d)) \
+		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disks2label,$d)) \
 	)
 	echo '        "nothing" notitle' >> $@
 
