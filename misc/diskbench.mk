@@ -28,6 +28,7 @@ FLAGS_a_ro	?= R
 DISKS		?= abcd $(DISKS_1by1) ab a_ro
 
 DISKBENCH_BINDIR?= .
+MISC_BINDIR	?= $(DISKBENCH_BINDIR)/../misc
 DISKBENCH	?= benchmark_disks.stxxl.bin
 
 pipefail	?= set -o pipefail;
@@ -78,6 +79,9 @@ plot: $(HOST).gnuplot
 dotplot: $(HOST).d.gnuplot
 	gnuplot $<
 
+avgplot: $(HOST)-avg.gnuplot
+	gnuplot $<
+
 # $1 = logfile, $2 = column
 extract_average	= $(if $(wildcard $1),$(shell tail -n 1 $1 | awk '{ print $$($2+1) }'),......)
 
@@ -120,7 +124,7 @@ PLOTYMAX	?= 120
 
 $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	$(RM) $@
-	echo 'set title "STXXL Disk Benchmark $(DISKNAME) @ $(HOST)"' >> $@
+	echo 'set title "STXXL Disk Benchmark $(DISKNAME) B=$(strip $(BATCH_SIZE))x$(strip $(BLOCK_SIZE))MiB @ $(HOST)"' >> $@
 	echo 'set xlabel "Disk offset [GiB]"' >> $@
 	echo 'set ylabel "Bandwidth per disk [MiB/s]"' >> $@
 	echo '' >> $@
@@ -149,13 +153,40 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	echo '' >> $@
 	echo 'pause -1' >> $@
 	echo '' >> $@
-	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(subst _,\\_,$(HOST))"' >> $@
+	echo 'set title "STXXL Disk Benchmark $(DISKNAME) B=$(strip $(BATCH_SIZE))x$(strip $(BLOCK_SIZE))MiB \\@ $(subst _,\\_,$(HOST))"' >> $@
 	echo 'set term postscript enhanced color solid' >> $@
 	echo 'set output "$(HOST).ps"' >> $@
 	echo 'replot' >> $@
 
 $(HOST).d.gnuplot: $(HOST).gnuplot
 	sed -e 's/ w l / w d lw 2 /' $< > $@
+
+$(HOST)-avg.dat: $(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *MB/*.log)
+	$(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *MB) > $@
+
+$(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
+	$(RM) $@
+	echo 'set title "STXXL Disk Benchmark $(DISKNAME) @ $(HOST)"' >> $@
+	echo 'set xlabel "Block Size"' >> $@
+	echo 'set ylabel "Average Sequential Bandwidth [MiB/s]"' >> $@
+	echo 'set key bottom' >> $@
+	echo '' >> $@
+
+	echo 'plot [] [0:]\' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:2:xtic(1) w lp title "crx", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:3:xtic(1) w lp title "wr", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:4:xtic(1) w lp title "rd", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:5:xtic(1) w lp title "wrx", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:6:xtic(1) w lp title "rdx", \' >> $@
+	echo '        "nothing" notitle' >> $@
+
+	echo '' >> $@
+	echo 'pause -1' >> $@
+	echo '' >> $@
+	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(subst _,\\_,$(HOST))"' >> $@
+	echo 'set term postscript enhanced color solid' >> $@
+	echo 'set output "$(HOST)-avg.ps"' >> $@
+	echo 'replot' >> $@
 
 -include iostat-plot.mk
 
