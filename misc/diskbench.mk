@@ -3,7 +3,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -121,6 +121,7 @@ disks2label	?= sd[$1]
 DISKNAME	?= unknown disk
 PLOTXMAX	?= 475
 PLOTYMAX	?= 120
+AVGPLOTYMAX	?= $(PLOTYMAX)
 
 $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	$(RM) $@
@@ -172,7 +173,7 @@ $(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
 	echo 'set key bottom' >> $@
 	echo '' >> $@
 
-	echo 'plot [] [0:]\' >> $@
+	echo 'plot [] [0:$(AVGPLOTYMAX)] \' >> $@
 	echo '        "$(HOST)-avg.dat" using 0:2:xtic(1) w lp title "crx", \' >> $@
 	echo '        "$(HOST)-avg.dat" using 0:3:xtic(1) w lp title "wr", \' >> $@
 	echo '        "$(HOST)-avg.dat" using 0:4:xtic(1) w lp title "rd", \' >> $@
