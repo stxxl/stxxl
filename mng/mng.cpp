@@ -199,7 +199,7 @@ file * FileCreator::create(const std::string & io_impl,
     }
     else if (io_impl == "wbtl")
     {
-        ufs_file_base * backend = new syscall_file(filename, options); // FIXME: ID
+        ufs_file_base * backend = new syscall_file(filename, options, disk + 1000); // FIXME: ID
         wbtl_file * result = new stxxl::wbtl_file(backend, 16 * 1024 * 1024, 2, disk);
         result->lock();
         return result;
