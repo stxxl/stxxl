@@ -97,10 +97,13 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [r|w] [--] diskfile..." << std::endl;
+    std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [nd] [r|w] [--] diskfile..." << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB, increase 'batch_size' (default 1)" << std::endl;
     std::cout << "    to submit several I/Os at once and report average rate" << std::endl;
+#ifdef RAW_ACCESS
+    std::cout << "    open mode: includes O_DIRECT unless the 'nd' flag is given" << std::endl;
+#endif
     std::cout << "    ops: write and reread (default), (r)ead only, (w)rite only" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     std::cout << "    Memory consumption: block_size * batch_size * num_disks" << std::endl;
@@ -119,6 +122,7 @@ int main(int argc, char * argv[])
     stxxl::int64 batch_size = 0;
 
     bool do_read = true, do_write = true;
+    bool direct_io = true;
     int first_disk_arg = 3;
 
     if (first_disk_arg < argc)
@@ -136,6 +140,11 @@ int main(int argc, char * argv[])
         ++first_disk_arg;
     } else {
         batch_size = 1;
+    }
+
+    if (first_disk_arg < argc && (strcmp("nd", argv[first_disk_arg]) == 0 || strcmp("ND", argv[first_disk_arg]) == 0)) {
+        direct_io = false;
+        ++first_disk_arg;
     }
 
     if (first_disk_arg < argc && (strcmp("r", argv[first_disk_arg]) == 0 || strcmp("R", argv[first_disk_arg]) == 0)) {
@@ -182,22 +191,17 @@ int main(int argc, char * argv[])
 
     for (unsigned i = 0; i < ndisks; i++)
     {
+        int openmode = file::CREAT | file::RDWR;
+        if (direct_io) {
+#ifdef RAW_ACCESS
+            openmode |= file::DIRECT;
+#endif
+        }
+
 #ifdef BOOST_MSVC
- #ifdef RAW_ACCESS
-        disks[i] = new stxxl::wincall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR | file::DIRECT, i);
- #else
-        disks[i] = new stxxl::wincall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR, i);
- #endif
+        disks[i] = new stxxl::wincall_file(disks_arr[i], openmode, i);
 #else
- #ifdef RAW_ACCESS
-        disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR | file::DIRECT, i);
- #else
-        disks[i] = new stxxl::syscall_file(disks_arr[i],
-                                           file::CREAT | file::RDWR, i);
- #endif
+        disks[i] = new stxxl::syscall_file(disks_arr[i], openmode, i);
 #endif
     }
 

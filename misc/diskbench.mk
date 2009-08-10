@@ -14,6 +14,7 @@ HOST		?= unknown
 FILE_SIZE	?= $(or $(SIZE),100)	# GiB
 BLOCK_SIZE	?= $(or $(STEP),256)	# MiB
 BATCH_SIZE	?= 1	# blocks
+DIRECT_IO	?= yes	# unset to disable O_DIRECT
 
 disk2file	?= /stxxl/sd$1/stxxl
 
@@ -38,7 +39,7 @@ $(foreach d,$(DISKS_1by1),$(eval DISKS_$d ?= $d))
 define do-some-disks
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
-	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(if $(filter y yes Y YES,$(DIRECT_IO)),,ND) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
 endef
 
 $(HOST)-%.cr.log:
