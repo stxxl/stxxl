@@ -83,6 +83,9 @@ dotplot: $(HOST).d.gnuplot
 avgplot: $(HOST)-avg.gnuplot
 	gnuplot $<
 
+avg3plot: $(HOST)-avg3.gnuplot
+	gnuplot $<
+
 # $1 = logfile, $2 = column
 extract_average	= $(if $(wildcard $1),$(shell tail -n 1 $1 | awk '{ print $$($2+1) }'),......)
 
@@ -169,26 +172,33 @@ $(HOST)-avg.dat: $(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *MB/*.log)
 $(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
 	$(RM) $@
 	echo 'set title "STXXL Disk Benchmark $(DISKNAME) @ $(HOST)"' >> $@
-	echo 'set xlabel "Block Size"' >> $@
+	echo 'set xlabel "Block Size [MiB]"' >> $@
 	echo 'set ylabel "Average Sequential Bandwidth [MiB/s]"' >> $@
 	echo 'set key bottom' >> $@
 	echo '' >> $@
 
 	echo 'plot [] [0:$(AVGPLOTYMAX)] \' >> $@
-	echo '        "$(HOST)-avg.dat" using 0:2:xtic(1) w lp title "crx", \' >> $@
-	echo '        "$(HOST)-avg.dat" using 0:3:xtic(1) w lp title "wr", \' >> $@
-	echo '        "$(HOST)-avg.dat" using 0:4:xtic(1) w lp title "rd", \' >> $@
-	echo '        "$(HOST)-avg.dat" using 0:5:xtic(1) w lp title "wrx", \' >> $@
-	echo '        "$(HOST)-avg.dat" using 0:6:xtic(1) w lp title "rdx", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:2:xtic(1) w lp lt 1 pt 1 title "crx", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:3:xtic(1) w lp lt 2 pt 2 title "wr", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:4:xtic(1) w lp lt 3 pt 3 title "rd", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:5:xtic(1) w lp lt 4 pt 4 title "wrx", \' >> $@
+	echo '        "$(HOST)-avg.dat" using 0:6:xtic(1) w lp lt 5 pt 5 title "rdx", \' >> $@
 	echo '        "nothing" notitle' >> $@
 
 	echo '' >> $@
 	echo 'pause -1' >> $@
 	echo '' >> $@
+	echo 'set term png size 800,600' >> $@
+	echo 'set output "$(HOST)-avg.png"' >> $@
+	echo 'replot' >> $@
+	echo '' >> $@
 	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(subst _,\\_,$(HOST))"' >> $@
 	echo 'set term postscript enhanced color solid' >> $@
 	echo 'set output "$(HOST)-avg.ps"' >> $@
 	echo 'replot' >> $@
+
+$(HOST)-avg3.gnuplot: $(HOST)-avg.gnuplot
+	grep -v -E '0:[34]:xtic' $< | sed -e 's/"crx"/"create"/g;s/"wrx"/"write"/g;s/"rdx"/"read"/g;/set output/s/-avg\./-avg3./g' > $@
 
 -include iostat-plot.mk
 

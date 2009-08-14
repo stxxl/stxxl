@@ -19,7 +19,7 @@ get_read()
 echo "# bs	crx	wr	rd	wrx	rdx"
 for mb in "$@"
 do
-	size=`echo $mb | sed -e 's/^0*//'`
+	size=`echo $mb | sed -e 's/^0*//;s/\([kKMGT]\)B/\1iB/;s/MiB$//'`
 	crx=`get_write $mb/*.crx.log`
 	wr=`get_write $mb/*.wr.log`
 	rd=`get_read $mb/*.wr.log`
