@@ -986,6 +986,7 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     STXXL_MSG("Records in map: " << u_btree->size());
     STXXL_MSG("Erase elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+    delete u_btree;
 }
 
 void run_bdb_btree_big(stxxl::int64 n, unsigned ops)

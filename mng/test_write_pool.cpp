@@ -34,5 +34,6 @@ int main()
     block_type * blk = new block_type;
     block_type::bid_type bid;
     stxxl::block_manager::get_instance()->new_blocks(stxxl::single_disk(), &bid, (&bid) + 1);
-    pool.write(blk, bid);
+    pool.write(blk, bid)->wait();
+    delete blk;
 }
