@@ -90,7 +90,7 @@ $(if $(filter cpu,$1),
 	echo '	"not.existing.dummy" using 08:15 notitle' >> $@ 
 )
 	echo '' >> $@
-	echo 'pause mouse' >> $@
+	echo 'pause -1' >> $@
 	echo '' >> $@
 	echo 'set terminal postscript enhanced $(GPLT_COLOR_PS) 10' >> $@
 	echo 'set output "$*.$(strip $1).eps"' >> $@
