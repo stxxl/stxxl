@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 variants="stxxl mcstxxl pmstxxl"
 
