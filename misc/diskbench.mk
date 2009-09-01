@@ -71,6 +71,8 @@ crx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.crx.log)
 cr: $(foreach d,$(DISKS_1by1),$(HOST)-$d.cr.log)
 cr+: $(foreach d,$(DISKS),$(HOST)-$d.crx.log)
 wr: $(foreach d,$(DISKS),$(HOST)-$d.wr.log)
+wrx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log)
+rdx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.rdx.log)
 ex: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 ex+: $(foreach d,$(DISKS),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 
