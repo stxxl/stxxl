@@ -66,6 +66,12 @@ namespace stream
 
             runs.clear();
         }
+
+        // returns number of elements in all runs together
+        size_type size() const
+        {
+            return elements;
+        }
     };
 
     //! \brief Forms sorted runs of data from a stream
