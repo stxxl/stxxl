@@ -80,4 +80,4 @@ test_random_shuffle.$(EXEEXT): test_random_shuffle.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)

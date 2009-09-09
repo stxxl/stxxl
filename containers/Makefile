@@ -117,7 +117,7 @@ monotonic_pq.$(EXEEXT): monotonic_pq.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)
 	cd btree
 	$(MAKE) clean
 	cd ..

@@ -36,4 +36,4 @@ log2.$(EXEEXT): log2.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)

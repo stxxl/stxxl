@@ -36,5 +36,4 @@ test_materialize.$(EXEEXT): test_materialize.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT) test_stream.$(EXEEXT) test_sorted_runs.$(EXEEXT)
-	$(RM) test_push_sort.$(EXEEXT) test_stream1.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)

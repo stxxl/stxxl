@@ -66,5 +66,5 @@ unittest.$(EXEEXT): unittest.cpp
 
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)
 	

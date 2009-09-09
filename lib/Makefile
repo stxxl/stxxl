@@ -10,5 +10,5 @@ lib$(LIBNAME).$(LIBEXT): $(LIB_OBJECTS)
 	$(LIBGEN)lib$(LIBNAME).$(LIBEXT) $(LIB_OBJECTS)
 
 clean:
-	$(RM) lib$(LIBNAME).$(LIBEXT)
+	$(RM) $(CLEAN_TARGETS)
 

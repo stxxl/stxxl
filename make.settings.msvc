@@ -209,6 +209,7 @@ EXEEXT = exe # executable file extension
 RM =     del # remove file command
 LIBGEN = lib /nologo /out:# library generation
 OUT    = /out:# output file for linking and compilation
+CLEAN_TARGETS = *.$(OBJEXT) *.$(EXEEXT) *.$(LIBEXT) *.exe.manifest *.pdb *.exp
 
 ###################################################################
 

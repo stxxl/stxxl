@@ -127,4 +127,4 @@ benchmark_random_block_access.$(EXEEXT): benchmark_random_block_access.cpp $(DEP
 	
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)

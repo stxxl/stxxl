@@ -33,6 +33,6 @@ test_btree.$(EXEEXT): $(DEPENDENCIES) test_btree.cpp
 	$(LINKER) test_btree.$(OBJEXT) $(OUT)test_btree.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 clean:
-	$(RM) *.$(OBJEXT)
+	$(RM) $(CLEAN_TARGETS)
 
 	

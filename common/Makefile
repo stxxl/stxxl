@@ -37,4 +37,4 @@ test_random.$(EXEEXT): test_random.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)
