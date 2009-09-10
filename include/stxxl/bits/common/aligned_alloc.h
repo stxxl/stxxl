@@ -30,6 +30,10 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+template <size_t ALIGNMENT>
+inline void * aligned_alloc(size_t size)
+;
+
 //                       meta_info
 //                          aligned begin of data
 //                       v  v
