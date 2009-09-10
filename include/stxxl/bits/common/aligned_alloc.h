@@ -20,6 +20,14 @@
 #define STXXL_VERBOSE_ALIGNED_ALLOC STXXL_VERBOSE1
 #endif
 
+#ifndef STXXL_USE_MEMALIGN
+#define STXXL_USE_MEMALIGN 0
+#endif
+
+#if STXXL_USE_MEMALIGN
+#include <cstdlib>
+#endif
+
 __STXXL_BEGIN_NAMESPACE
 
 //                       meta_info
@@ -32,6 +40,13 @@ __STXXL_BEGIN_NAMESPACE
 template <size_t ALIGNMENT>
 inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
 {
+#if STXXL_USE_MEMALIGN
+    if (meta_info_size != 0)
+        throw "aligned_alloc: meta_info_size != 0";
+    void * result;
+    if (posix_memalign(&result, ALIGNMENT, size) != 0)
+        throw "aligned_alloc: posix_memalign()";
+#else
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">(), size = " << size << ", meta info size = " << meta_info_size);
     char * buffer = new char[size + ALIGNMENT + sizeof(char *) + meta_info_size];
     #ifdef STXXL_ALIGNED_CALLOC
@@ -47,6 +62,7 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_alloc<" << ALIGNMENT
             << ">(size = " << size << ", meta info size = " << meta_info_size
             << ") => buffer = " << (void *)buffer << ", ptr = " << (void *)result);
+#endif
 
     return result;
 }
@@ -55,9 +71,13 @@ template <size_t ALIGNMENT>
 inline void
 aligned_dealloc(void * ptr)
 {
+#if STXXL_USE_MEMALIGN
+    std::free(ptr);
+#else
     char * buffer = * (((char **)ptr) - 1);
     STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_dealloc<" << ALIGNMENT << ">(), ptr = " << ptr << ", buffer = " << (void *)buffer);
     delete[] buffer;
+#endif
 }
 
 __STXXL_END_NAMESPACE
