@@ -48,7 +48,7 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
         throw "aligned_alloc: posix_memalign()";
 #else
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">(), size = " << size << ", meta info size = " << meta_info_size);
-    size_t alloc_size = size + ALIGNMENT + sizeof(char *) + meta_info_size;
+    size_t alloc_size = ALIGNMENT + sizeof(char *) + meta_info_size + size;
     char * buffer = (char *)std::malloc(alloc_size);
     if (buffer == NULL)
         throw std::bad_alloc();
@@ -60,6 +60,14 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
                     (((unsigned long)reserve_buffer) % (ALIGNMENT)) - meta_info_size;
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">() address " << (void *)result << " lost " << (result - buffer) << " bytes");
     assert(int(result - buffer) >= int(sizeof(char *)));
+
+    // free unused memory behind the data area
+    // so access behind the requested size can be recognized
+    size_t realloc_size = (result - buffer) + meta_info_size + size;
+    char * realloced = (char *)std::realloc(buffer, realloc_size);
+    if (buffer != realloced)
+        throw std::bad_alloc();
+
     *(((char **)result) - 1) = buffer;
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">(), allocated at " << (void *)buffer << " returning " << (void *)result);
     STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_alloc<" << ALIGNMENT
