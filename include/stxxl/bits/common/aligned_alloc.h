@@ -48,9 +48,12 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
         throw "aligned_alloc: posix_memalign()";
 #else
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">(), size = " << size << ", meta info size = " << meta_info_size);
-    char * buffer = new char[size + ALIGNMENT + sizeof(char *) + meta_info_size];
+    size_t alloc_size = size + ALIGNMENT + sizeof(char *) + meta_info_size;
+    char * buffer = (char *)std::malloc(alloc_size);
+    if (buffer == NULL)
+        throw std::bad_alloc();
     #ifdef STXXL_ALIGNED_CALLOC
-    memset(buffer, 0, size + ALIGNMENT + sizeof(char *) + meta_info_size);
+    memset(buffer, 0, alloc_size);
     #endif
     char * reserve_buffer = buffer + sizeof(char *) + meta_info_size;
     char * result = reserve_buffer + ALIGNMENT -
@@ -76,7 +79,7 @@ aligned_dealloc(void * ptr)
 #else
     char * buffer = * (((char **)ptr) - 1);
     STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_dealloc<" << ALIGNMENT << ">(), ptr = " << ptr << ", buffer = " << (void *)buffer);
-    delete[] buffer;
+    std::free(buffer);
 #endif
 }
 
