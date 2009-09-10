@@ -23,6 +23,7 @@
 
 #include <stxxl/bits/io/file_request_basic.h>
 #include <stxxl/bits/io/request.h>
+#include <windows.h>
 
 
 __STXXL_BEGIN_NAMESPACE

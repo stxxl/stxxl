@@ -13,7 +13,9 @@
 
 #include <stxxl/bits/io/ufs_file_base.h>
 
-#ifndef BOOST_MSVC
+#ifdef BOOST_MSVC
+ #include <windows.h>
+#else
  #include <unistd.h>
  #include <fcntl.h>
 #endif

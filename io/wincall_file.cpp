@@ -16,6 +16,8 @@
 
 #ifdef BOOST_MSVC
 
+#include <windows.h>
+
 __STXXL_BEGIN_NAMESPACE
 
 
