@@ -24,7 +24,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \brief Implementation of file based on other files, dynamically allocate one file per block.
 //! Allows for dynamic disk space consumption.
-template<class base_file_type>
+template <class base_file_type>
 class fileperblock_file : public file_request_basic
 {
 private:
@@ -58,7 +58,7 @@ public:
 
     //! \brief Returns size of the file
     //! \return file size in length
-    virtual offset_type size() { return current_size;}
+    virtual offset_type size() { return current_size; }
 
     virtual void lock();
 

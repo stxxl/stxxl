@@ -84,7 +84,7 @@ public:
         scoped_read_write_timer(size_type size, bool is_write = false)
             : is_write(is_write)
 #if STXXL_IO_STATS
-            , running(false)
+              , running(false)
 #endif
         {
             start(size);

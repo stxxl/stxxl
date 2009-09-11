@@ -52,12 +52,12 @@ void usage(const char * argv0)
     exit(-1);
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char * argv[])
 {
     if (argc < 3)
         usage(argv[0]);
 
-    stxxl::int64 span       = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
+    stxxl::int64 span = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
     stxxl::int64 num_blocks = stxxl::int64(atoi(argv[2]));
 
     bool do_read = true, do_write = true;
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     stxxl::int64 num_blocks_in_span = STXXL_DIVRU(span, raw_block_size);
     num_blocks = stxxl::STXXL_MIN(num_blocks, num_blocks_in_span);
 
-    block_type* buffer = new block_type;
+    block_type * buffer = new block_type;
     request_ptr * reqs = new request_ptr[num_blocks_in_span];
     std::vector<BID_type> blocks;
 

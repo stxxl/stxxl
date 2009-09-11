@@ -410,7 +410,7 @@ void priority_queue<Config_>::init()
     insert_heap.push(sentinel);                                // always keep the sentinel
     delete_buffer[delete_buffer_size] = sentinel;              // sentinel
     delete_buffer_current_min = delete_buffer_end;             // empty
-    for (unsigned_type i = 0;  i < total_num_groups;  i++)
+    for (unsigned_type i = 0; i < total_num_groups; i++)
     {
         group_buffers[i][N] = sentinel;                        // sentinel
         group_buffer_current_mins[i] = &(group_buffers[i][N]); // empty
@@ -499,7 +499,7 @@ void priority_queue<Config_>::refill_delete_buffer()
 
     size_type total_group_size = 0;
     //num_active_groups is <= 4
-    for (int i = num_active_groups - 1;  i >= 0;  i--)
+    for (int i = num_active_groups - 1; i >= 0; i--)
     {
         if ((group_buffers[i] + N) - group_buffer_current_mins[i] < delete_buffer_size)
         {
@@ -511,14 +511,14 @@ void priority_queue<Config_>::refill_delete_buffer()
             total_group_size += length;
         }
         else
-            total_group_size += delete_buffer_size; // actually only a sufficient lower bound
+            total_group_size += delete_buffer_size;  // actually only a sufficient lower bound
     }
 
     unsigned_type length;
-    if (total_group_size >= delete_buffer_size)     // buffer can be filled completely
+    if (total_group_size >= delete_buffer_size)      // buffer can be filled completely
     {
-        length = delete_buffer_size;                // amount to be copied
-        size_ -= size_type(delete_buffer_size);     // amount left in group_buffers
+        length = delete_buffer_size;                 // amount to be copied
+        size_ -= size_type(delete_buffer_size);      // amount left in group_buffers
     }
     else
     {
@@ -751,7 +751,7 @@ void priority_queue<Config_>::empty_insert_heap()
     // by inserting them into tree 0 (which is almost empty in this case)
     if (freeLevel > 0)
     {
-        for (int_type i = freeLevel;  i >= 0;  i--)
+        for (int_type i = freeLevel; i >= 0; i--)
         {
             // reverse order not needed
             // but would allow immediate refill

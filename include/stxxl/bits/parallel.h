@@ -134,7 +134,7 @@ namespace parallel
  *  @param target Begin iterator out output sequence.
  *  @param comp Comparator.
  *  @param length Maximum length to merge.
- *  @return End iterator of output sequence. 
+ *  @return End iterator of output sequence.
  *  @pre For each @c i, @c seqs_begin[i].second must be the end marker of the sequence, but also reference the one more sentinel element. */
     template <typename RandomAccessIteratorPairIterator,
               typename RandomAccessIterator3, typename DiffType, typename Comparator>

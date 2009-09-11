@@ -131,9 +131,9 @@ void ufs_file_base::set_size(offset_type newsize)
             stxxl_win_lasterror_exit("SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
                                      " newsize=" << newsize << " ", io_error);
 
-            if (!SetEndOfFile(hfile))
-                stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
-                                         " newsize=" << newsize << " ", io_error);
+        if (!SetEndOfFile(hfile))
+            stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
+                                     " newsize=" << newsize << " ", io_error);
 #else
         stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
 #endif

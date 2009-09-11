@@ -34,6 +34,7 @@ __STXXL_BEGIN_NAMESPACE
 class malloc_stats
 {
 #if !defined(__APPLE__) && !defined(__FreeBSD__)
+
 public:
     typedef int return_type;
 

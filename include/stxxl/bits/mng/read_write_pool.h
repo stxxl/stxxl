@@ -152,7 +152,6 @@ public:
     {
         return p_pool->read(block, bid, *w_pool);
     }
-
 };
 
 //! \}

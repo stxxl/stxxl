@@ -46,10 +46,10 @@ bool request_state_impl_basic::cancel()
 {
     STXXL_VERBOSE3("ufs_request_base : " << this << " cancel " << file_ << " " << buffer << " " << offset);
 
-    if(file_)
+    if (file_)
     {
         request_ptr rp(this);
-        if(disk_queues::get_instance()->cancel_request(rp, file_->get_id()))
+        if (disk_queues::get_instance()->cancel_request(rp, file_->get_id()))
         {
             _state.set_to(DONE);
             notify_waiters();

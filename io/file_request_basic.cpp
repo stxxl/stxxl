@@ -25,8 +25,8 @@ request_ptr file_request_basic::aread(
     const completion_handler & on_cmpl)
 {
     request_ptr req = new request_impl_basic(on_cmpl, this,
-                                          buffer, pos, bytes,
-                                          request::READ);
+                                             buffer, pos, bytes,
+                                             request::READ);
 
     disk_queues::get_instance()->add_request(req, get_id());
 
@@ -40,7 +40,7 @@ request_ptr file_request_basic::awrite(
     const completion_handler & on_cmpl)
 {
     request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
-                                          request::WRITE);
+                                             request::WRITE);
 
     disk_queues::get_instance()->add_request(req, get_id());
 

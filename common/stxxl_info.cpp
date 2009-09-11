@@ -28,8 +28,8 @@ int main(int argc, char **)
     STXXL_MSG("sizeof(unsigned int)   = " << sizeof(unsigned int));
     STXXL_MSG("sizeof(unsigned_type)  = " << sizeof(stxxl::unsigned_type));
     STXXL_MSG("sizeof(uint64)         = " << sizeof(stxxl::uint64));
-    STXXL_MSG("sizeof(void*)          = " << sizeof(void*));
+    STXXL_MSG("sizeof(void*)          = " << sizeof(void *));
 
-    assert(argc < 3); // give two extra arguments to check whether assertions are enabled
+    assert(argc < 3);          // give two extra arguments to check whether assertions are enabled
     return argc != 2 ? 0 : -1; // give one extra argument to get exit code -1
 }

@@ -30,10 +30,10 @@ class logger : public singleton<logger>
     std::ofstream errlog_stream_;
 
     inline logger()
-    { 
-        const char* log_filename = getenv("STXXLLOGFILE");
+    {
+        const char * log_filename = getenv("STXXLLOGFILE");
         log_stream_.open(log_filename == NULL ? "stxxl.log" : log_filename);
-        const char* errlog_filename = getenv("STXXLERRLOGFILE");
+        const char * errlog_filename = getenv("STXXLERRLOGFILE");
         errlog_stream_.open(errlog_filename == NULL ? "stxxl.errlog" : errlog_filename);
     }
 

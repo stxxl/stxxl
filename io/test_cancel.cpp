@@ -53,15 +53,15 @@ int main(int argc, char ** argv)
 
     //with cancellation
     stxxl::stats_data stats2(*stxxl::stats::get_instance());
-    for (unsigned i = 0 ; i < 16; i++)
+    for (unsigned i = 0; i < 16; i++)
         req[i] = file.awrite(buffer, i * size, size, my_handler());
     //cancel first half
     unsigned num_cancelled = cancel_all(req, req + 8);
     STXXL_MSG("Cancelled " << num_cancelled << " requests.");
     //cancel every second in second half
-    for (unsigned i = 8 ; i < 16; i += 2)
+    for (unsigned i = 8; i < 16; i += 2)
     {
-        if(req[i]->cancel())
+        if (req[i]->cancel())
             STXXL_MSG("Cancelled request " << &(*(req[i])));
     }
     wait_all(req, 16);

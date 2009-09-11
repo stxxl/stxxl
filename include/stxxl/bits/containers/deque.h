@@ -449,9 +449,8 @@ public:
           begin_o(0), end_o(n), size_(n)
     { }
 
-    ~deque()
-    {             // empty so far
-    }
+    ~deque()      // empty so far
+    { }
 
     iterator begin()
     {

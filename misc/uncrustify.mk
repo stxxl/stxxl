@@ -50,7 +50,7 @@ UNCRUSTIFY_FLAGS+= -c $(UNCRUSTIFY_CFG) -l CPP
 %.diff: % %.uncrustify
 	@test -f $*
 	@test -f $*.uncrustify
-	diff -u $^ > $@ || test $$? == 1
+	diff -u $^ > $@ || test $$? = 1
 	test -s $@ || $(RM) $@
 
 %.uncrustify: % $(UNCRUSTIFY_CFG) #$(UNCRUSTIFY)

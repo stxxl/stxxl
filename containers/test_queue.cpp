@@ -22,7 +22,7 @@ void check(const q1type & q1, const q2type & q2)
     assert(q1.size() == q2.size());
     if (!q1.empty())
     {
-	if (q1.front() != q2.front() || q1.back() != q2.back())
+        if (q1.front() != q2.front() || q1.back() != q2.back())
             STXXL_MSG(q1.size() << ": (" << q1.front() << ", " << q1.back() << ") (" << q2.front() << ", " << q2.back() << ")" << (q1.front() == q2.front() ? "" : " FRONT"));
         assert(q1.front() == q2.front());
         assert(q1.back() == q2.back());

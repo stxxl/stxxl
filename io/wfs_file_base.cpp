@@ -84,7 +84,7 @@ wfs_file_base::~wfs_file_base()
     if (!CloseHandle(file_des))
         stxxl_win_lasterror_exit("closing file (call of ::CloseHandle) ", io_error);
 
-        file_des = INVALID_HANDLE_VALUE;
+    file_des = INVALID_HANDLE_VALUE;
 }
 
 void wfs_file_base::lock()
@@ -100,7 +100,7 @@ file::offset_type wfs_file_base::_size()
     if (!GetFileSizeEx(file_des, &result))
         stxxl_win_lasterror_exit("GetFileSizeEx ", io_error);
 
-        return result.QuadPart;
+    return result.QuadPart;
 }
 
 file::offset_type wfs_file_base::size()
@@ -121,9 +121,9 @@ void wfs_file_base::set_size(offset_type newsize)
         stxxl_win_lasterror_exit("SetFilePointerEx in wfs_file_base::set_size(..) oldsize=" << cur_size <<
                                  " newsize=" << newsize << " ", io_error);
 
-        if (!SetEndOfFile(file_des))
-            stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
-                                     " newsize=" << newsize << " ", io_error);
+    if (!SetEndOfFile(file_des))
+        stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
+                                 " newsize=" << newsize << " ", io_error);
 }
 
 __STXXL_END_NAMESPACE

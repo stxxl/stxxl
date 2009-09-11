@@ -34,7 +34,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-class request_queue_impl_worker: public request_queue
+class request_queue_impl_worker : public request_queue
 {
 protected:
     enum thread_state { NOT_RUNNING, RUNNING, TERMINATING, TERMINATE = TERMINATING };

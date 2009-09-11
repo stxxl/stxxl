@@ -43,7 +43,8 @@ class disk_queues : public singleton<disk_queues>
 
 protected:
     request_queue_map queues;
-    disk_queues() {
+    disk_queues()
+    {
         stxxl::stats::get_instance(); // initialize stats before ourselves
     }
 

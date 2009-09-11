@@ -248,7 +248,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type lognbuckets = static_cast<unsigned_type>(log2(double(nmaxbuckets)));
     const unsigned_type nbuckets = 1 << lognbuckets;
     const unsigned_type est_bucket_size = STXXL_DIVRU((last - first) / int64(nbuckets),
-                                                           int64(block_type::size)); //in blocks
+                                                      int64(block_type::size));      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
         STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<

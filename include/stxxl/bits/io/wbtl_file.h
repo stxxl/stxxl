@@ -88,6 +88,7 @@ public:
 
 private:
     void _add_free_region(offset_type offset, offset_type size);
+
 protected:
     void sread(void * buffer, offset_type offset, size_type bytes);
     void swrite(void * buffer, offset_type offset, size_type bytes);

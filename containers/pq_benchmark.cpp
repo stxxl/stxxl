@@ -139,7 +139,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     ////////////////////////////////////////////////
- 
+
     stats_begin = *stxxl::stats::get_instance();
     Timer.reset();
     Timer.start();
