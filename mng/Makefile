@@ -59,6 +59,11 @@ test_read_write_pool.$(EXEEXT): test_read_write_pool.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_read_write_pool.cpp
 	$(LINKER) test_read_write_pool.$(OBJEXT) $(OUT)test_read_write_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_aligned: test_aligned.$(EXEEXT)
+test_aligned.$(EXEEXT): test_aligned.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_aligned.cpp -O0
+	$(LINKER) test_aligned.$(OBJEXT) $(OUT)test_aligned.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 unittest: unittest.$(EXEEXT) $(DEPENDENCIES)
 unittest.$(EXEEXT): unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp

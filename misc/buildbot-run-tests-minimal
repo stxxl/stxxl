@@ -35,6 +35,7 @@ done
 for stxxl in $variants
 do
 	run common/stxxl_info
+	run mng/test_aligned
 done
 
 echo "==================== finished ===================="

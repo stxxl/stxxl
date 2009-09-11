@@ -19,6 +19,7 @@ test_mng1.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
 test_write_pool.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
 test_prefetch_pool.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
 test_mng_recursive_alloc.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=3
+test_aligned.$o:	OPT_LEVEL = 0
 
 
 ifeq ($(strip $(USE_MCSTL)),yes)
