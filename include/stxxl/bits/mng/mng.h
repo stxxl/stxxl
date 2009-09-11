@@ -348,15 +348,16 @@ public:
         return bid.storage->aread(this, bid.offset, raw_size, on_cmpl);
     }
 
-    static void * operator new[] (size_t bytes)
+    static void * operator new (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
-        STXXL_VERBOSE1("typed::block operator new[]: Meta info size: " << meta_info_size);
+        STXXL_VERBOSE1("typed::block operator new: Meta info size: " << meta_info_size);
 
         void * result = aligned_alloc<BLOCK_ALIGN>(bytes - meta_info_size, meta_info_size);
         #ifdef STXXL_VALGRIND_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
         #endif
+        // FIXME: these STXXL_DEBUGMON_DO calls do not look sane w.r.t. meta_info_size != 0
         char * tmp = (char *)result;
         STXXL_DEBUGMON_DO(block_allocated(tmp, tmp + bytes, RawSize_));
         tmp += RawSize_;
@@ -368,15 +369,16 @@ public:
         return result;
     }
 
-    static void * operator new (size_t bytes)
+    static void * operator new[] (size_t bytes)
     {
         unsigned_type meta_info_size = bytes % raw_size;
-        STXXL_VERBOSE1("typed::block operator new: Meta info size: " << meta_info_size);
+        STXXL_VERBOSE1("typed::block operator new[]: Meta info size: " << meta_info_size);
 
         void * result = aligned_alloc<BLOCK_ALIGN>(bytes - meta_info_size, meta_info_size);
         #ifdef STXXL_VALGRIND_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
         #endif
+        // FIXME: these STXXL_DEBUGMON_DO calls do not look sane w.r.t. meta_info_size != 0
         char * tmp = (char *)result;
         STXXL_DEBUGMON_DO(block_allocated(tmp, tmp + bytes, RawSize_));
         tmp += RawSize_;
@@ -393,13 +395,13 @@ public:
         return ptr;
     }
 
-    static void operator delete[] (void * ptr)
+    static void operator delete (void * ptr)
     {
         STXXL_DEBUGMON_DO(block_deallocated(ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
-    static void operator delete (void * ptr)
+    static void operator delete[] (void * ptr)
     {
         STXXL_DEBUGMON_DO(block_deallocated(ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
