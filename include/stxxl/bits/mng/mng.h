@@ -42,6 +42,10 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/singleton.h>
 
+#ifndef STXXL_VERBOSE_TYPED_BLOCK
+#define STXXL_VERBOSE_TYPED_BLOCK STXXL_VERBOSE2
+#endif
+
 #ifndef STXXL_VERBOSE_BLOCK_LIFE_CYCLE
 #define STXXL_VERBOSE_BLOCK_LIFE_CYCLE STXXL_VERBOSE2
 #endif
@@ -136,7 +140,7 @@ class filler_struct__
     byte_type filler_array_[bytes];
 
 public:
-    filler_struct__() { STXXL_VERBOSE2("filler_struct__ is allocated"); }
+    filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct__ is constructed"); }
 };
 
 template <>
@@ -145,7 +149,7 @@ class filler_struct__<0>
     typedef unsigned char byte_type;
 
 public:
-    filler_struct__() { STXXL_VERBOSE2("filler_struct__ is allocated"); }
+    filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] filler_struct__<> is constructed"); }
 };
 
 //! \brief Contains data elements for \c stxxl::typed_block , not intended for direct use
@@ -169,7 +173,7 @@ public:
     //! Array of elements of type T
     T elem[size];
 
-    element_block() { STXXL_VERBOSE2("element_block is allocated"); }
+    element_block() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] element_block is constructed"); }
 
     //! An operator to access elements in the block
     reference operator [] (int i)
@@ -230,7 +234,7 @@ public:
         return ref[i];
     }
 
-    block_w_bids() { STXXL_VERBOSE2("block_w_bids is allocated"); }
+    block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_bids is constructed"); }
 };
 
 template <class T, unsigned Size_, unsigned RawSize_>
@@ -244,7 +248,7 @@ public:
     };
     typedef BID<raw_size> bid_type;
 
-    block_w_bids() { STXXL_VERBOSE2("block_w_bids is allocated"); }
+    block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_bids<> is constructed"); }
 };
 
 //! \brief Contains per block information for \c stxxl::typed_block , not intended for direct use
@@ -262,7 +266,7 @@ public:
     enum { size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_)) };
 
 public:
-    block_w_info() { STXXL_VERBOSE2("block_w_info is allocated"); }
+    block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_info is constructed"); }
 };
 
 template <class T_, unsigned RawSize_, unsigned NBids_>
@@ -274,7 +278,7 @@ public:
     enum { size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_) / sizeof(T_)) };
 
 public:
-    block_w_info() { STXXL_VERBOSE2("block_w_info is allocated"); }
+    block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] block_w_info<> is constructed"); }
 };
 
 //! \brief Block containing elements of fixed length
@@ -311,7 +315,7 @@ public:
 
     typed_block()
     {
-        STXXL_VERBOSE2("typed_block is allocated");
+        STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] typed_block is constructed");
         STXXL_STATIC_ASSERT(sizeof(typed_block<RawSize_, T_, NRef_, InfoType_>) == RawSize_);
     }
 
@@ -411,6 +415,7 @@ public:
     static void operator delete (void *, void *)
     { }
 
+#if 1
     // STRANGE: implementing destructor makes g++ allocate
     // additional 4 bytes in the beginning of every array
     // of this type !? makes aligning to 4K boundaries difficult
@@ -420,7 +425,10 @@ public:
     //  than the array size multiplied by the size of an element, by a
     //  difference of delta for metadata a compiler needs. It happens to
     //  be 8 bytes long in g++."
-    // ~typed_block() { }
+    ~typed_block() { 
+        STXXL_VERBOSE_TYPED_BLOCK("[" << (void*)this << "] typed_block is destructed");
+    }
+#endif
 };
 
 
