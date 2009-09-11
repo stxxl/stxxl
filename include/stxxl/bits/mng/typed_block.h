@@ -15,10 +15,11 @@
 #ifndef STXXL_TYPED_BLOCK_HEADER
 #define STXXL_TYPED_BLOCK_HEADER
 
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/common/aligned_alloc.h>
 #include <stxxl/bits/common/debug.h>
 #include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/bid.h>
 
 #ifndef STXXL_VERBOSE_TYPED_BLOCK
 #define STXXL_VERBOSE_TYPED_BLOCK STXXL_VERBOSE2
@@ -328,7 +329,6 @@ public:
     }
 #endif
 };
-
 
 //! \}
 
