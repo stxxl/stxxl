@@ -20,6 +20,7 @@
 
 #include <stxxl/bits/stream/stream.h>
 #include <stxxl/sort>
+#include <stxxl/bits/mng/typed_block.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -19,6 +19,7 @@
 #include <algorithm>
 
 #include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/common/is_sorted.h>

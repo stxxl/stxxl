@@ -18,6 +18,7 @@
 #include <deque>
 
 #include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/mng/read_write_pool.h>
