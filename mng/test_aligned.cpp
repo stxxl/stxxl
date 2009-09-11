@@ -34,7 +34,8 @@ void test_typed_block_alloc()
     block_type * b = new block_type;
     block_type * A = new block_type[4];
     block_type * B = new block_type[1];
-    block_type * C = new block_type[0];
+    block_type * C = NULL;
+    //C = new block_type[0];
     delete a;
     a = b;
     b = 0;
