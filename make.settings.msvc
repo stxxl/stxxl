@@ -157,6 +157,7 @@ MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/mng.h \
 	$(HEADER_PATH)/mng/bid.h \
 	$(HEADER_PATH)/mng/typed_block.h \
+	$(HEADER_PATH)/mng/diskallocator.h \
 	$(HEADER_PATH)/mng/write_pool.h \
 	$(HEADER_PATH)/mng/prefetch_pool.h \
 	$(HEADER_PATH)/mng/read_write_pool.h
