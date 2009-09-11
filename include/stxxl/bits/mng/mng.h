@@ -312,6 +312,7 @@ public:
     typed_block()
     {
         STXXL_VERBOSE2("typed_block is allocated");
+        STXXL_STATIC_ASSERT(sizeof(typed_block<RawSize_, T_, NRef_, InfoType_>) == RawSize_);
     }
 
     enum
