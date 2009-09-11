@@ -71,6 +71,12 @@ inline void UNUSED(const U &)
   #define __STXXL_DEPRECATED(x) x __attribute__ ((__deprecated__))
 #endif
 
+#if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#define STXXL_STATIC_ASSERT(x) static_assert(x, #x)
+#else
+#define STXXL_STATIC_ASSERT(x) { typedef int static_assert_dummy_type[(x) ? 1 : -1]; }
+#endif
+
 ////////////////////////////////////////////////////////////////////////////
 
 #define __STXXL_ENFORCE_SEMICOLON stxxl::UNUSED("expecting the next token to be a ';'")
