@@ -23,14 +23,17 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-// meta_info is > 0 for array allocations due to additional overhead
-//                       meta_info
-//                          aligned begin of data
-//                       v  v
-//  ----+--------------#+---*-------------------------
-//      ^              ^^
-//      buffer          result
+// meta_info_size > 0 is needed for array allocations that have overhead
+//
+//                      meta_info
+//                          aligned begin of data   unallocated behind data
+//                      v   v                       v
+//  ----===============#MMMM========================------
+//      ^              ^^                           ^
+//      buffer          result                      result+m_i_size+size
 //                     pointer to buffer
+// (---) unallocated, (===) allocated memory
+
 template <size_t ALIGNMENT>
 inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
 {
