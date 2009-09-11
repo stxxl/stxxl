@@ -130,6 +130,8 @@ template <size_t ALIGNMENT>
 inline void
 aligned_dealloc(void * ptr)
 {
+    if (!ptr)
+        return;
 #if STXXL_USE_MEMALIGN
     std::free(ptr);
 #else
