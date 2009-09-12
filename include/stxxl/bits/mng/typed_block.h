@@ -207,13 +207,18 @@ public:
     typedef pointer iterator;
     typedef type const * const_iterator;
 
-    enum { has_filler = (RawSize_ != sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>)) };
+    enum
+    {
+        raw_size = RawSize_,                                      //!< size of block in bytes
+        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size, //!< number of elements in block
+        has_filler = (RawSize_ != sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>)) //!< indicator for non-empty filler at the end
+    };
 
-    typedef BID<RawSize_> bid_type;
+    typedef BID<raw_size> bid_type;
 
     typed_block()
     {
-        STXXL_STATIC_ASSERT(sizeof(typed_block) == RawSize_);
+        STXXL_STATIC_ASSERT(sizeof(typed_block) == raw_size);
         STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] typed_block is constructed");
 #if 0
         assert(((long)this) % BLOCK_ALIGN == 0);
@@ -223,32 +228,22 @@ public:
 #if 0
     typed_block(const typed_block & tb)
     {
-        STXXL_STATIC_ASSERT(sizeof(typed_block) == RawSize_);
+        STXXL_STATIC_ASSERT(sizeof(typed_block) == raw_size);
         STXXL_MSG("[" << (void *)this << "] typed_block is copy constructed from [" << (void *)&tb << "]");
         UNUSED(tb);
     }
 #endif
-
-    enum
-    {
-        raw_size = RawSize_,                                      //!< size of block in bytes
-        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size //!< number of elements in block
-    };
 
     /*! \brief Writes block to the disk(s)
      *! \param bid block identifier, points the file(disk) and position
      *! \param on_cmpl completion handler
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
-    request_ptr write(const BID<raw_size> & bid,
+    request_ptr write(const bid_type & bid,
                       completion_handler on_cmpl = default_completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:write  " << FMT_BID(bid));
-        return bid.storage->awrite(
-                   this,
-                   bid.offset,
-                   raw_size,
-                   on_cmpl);
+        return bid.storage->awrite(this, bid.offset, raw_size, on_cmpl);
     }
 
     /*! \brief Reads block from the disk(s)
@@ -256,7 +251,7 @@ public:
      *! \param on_cmpl completion handler
      *! \return \c pointer_ptr object to track status I/O operation after the call
      */
-    request_ptr read(const BID<raw_size> & bid,
+    request_ptr read(const bid_type & bid,
                      completion_handler on_cmpl = default_completion_handler())
     {
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:read   " << FMT_BID(bid));
