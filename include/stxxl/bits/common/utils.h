@@ -381,21 +381,22 @@ public:
     // return maximum number of elements that can be allocated
     size_type max_size() const throw ()
     {
-        return (std::numeric_limits<std::size_t>::max) () / sizeof(T);
+        return (std::numeric_limits<size_type>::max)() / sizeof(T);
     }
 
     // allocate but don't initialize num elements of type T
     pointer allocate(size_type num, const void * = 0)
     {
-        pointer ret = (pointer)(T::operator new (num * sizeof(T)));
-        return ret;
+        return static_cast<T*>(T::operator new (num * sizeof(T)));
     }
 
+    // _GLIBCXX_RESOLVE_LIB_DEFECTS
+    // 402. wrong new expression in [some_] allocator::construct
     // initialize elements of allocated storage p with value value
     void construct(pointer p, const T & value)
     {
         // initialize memory with placement new
-        new ((void *)p)T(value);
+        ::new((void *)p)T(value);
     }
 
     // destroy elements of initialized storage p
@@ -408,7 +409,7 @@ public:
     // deallocate storage p of deleted elements
     void deallocate(pointer p, size_type /*num*/)
     {
-        T::operator delete ((void *)p);
+        T::operator delete (p);
     }
 };
 
