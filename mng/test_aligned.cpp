@@ -15,6 +15,7 @@
 #define STXXL_VERBOSE_TYPED_BLOCK STXXL_VERBOSE0
 
 #include <iostream>
+#include <vector>
 #include <stxxl/mng>
 
 #define BLOCK_SIZE (1024 * 1024)
@@ -27,8 +28,7 @@ struct type
 
 typedef stxxl::typed_block<BLOCK_SIZE, type> block_type;
 
-//void test_typed_block_alloc() __attribute__((optimize("0")));
-void test_typed_block_alloc()
+void test_typed_block()
 {
     block_type * a = new block_type;
     block_type * b = new block_type;
@@ -56,11 +56,18 @@ void test_aligned_alloc()
     stxxl::aligned_dealloc<1024>(r);
 }
 
+void test_typed_block_vector()
+{
+    std::vector<block_type> v1(2);
+    std::vector<block_type, stxxl::new_alloc<block_type> > v2(2);
+}
+
 int main()
 {
     try {
-        test_typed_block_alloc();
+        test_typed_block();
         test_aligned_alloc();
+        test_typed_block_vector();
     } catch (std::exception e) {
         STXXL_MSG("OOPS: " << e.what());
         return 1;
