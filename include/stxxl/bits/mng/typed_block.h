@@ -213,9 +213,21 @@ public:
 
     typed_block()
     {
+        STXXL_STATIC_ASSERT(sizeof(typed_block) == RawSize_);
         STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] typed_block is constructed");
-        STXXL_STATIC_ASSERT(sizeof(typed_block<RawSize_, T_, NRef_, InfoType_>) == RawSize_);
+#if 0
+        assert(((long)this) % BLOCK_ALIGN == 0);
+#endif
     }
+
+#if 0
+    typed_block(const typed_block & tb)
+    {
+        STXXL_STATIC_ASSERT(sizeof(typed_block) == RawSize_);
+        STXXL_MSG("[" << (void *)this << "] typed_block is copy constructed from [" << (void *)&tb << "]");
+        UNUSED(tb);
+    }
+#endif
 
     enum
     {
