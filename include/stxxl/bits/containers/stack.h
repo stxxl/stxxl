@@ -448,6 +448,7 @@ public:
 };
 
 //! \brief Efficient implementation that uses prefetching and overlapping using (shared) buffers pools
+//! \warning This is a single buffer stack! Each direction change (push() followed by pop() or vice versa) may cause one I/O.
 template <class Config_>
 class grow_shrink_stack2 : private noncopyable
 {
