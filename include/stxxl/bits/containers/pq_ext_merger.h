@@ -6,7 +6,7 @@
  *  Copyright (C) 1999 Peter Sanders <sanders@mpi-sb.mpg.de>
  *  Copyright (C) 2003, 2004, 2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007, 2009 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2007, 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -45,6 +45,7 @@ namespace priority_queue_local
         typedef AllocStr_ alloc_strategy;
         typedef value_type Element;
         typedef block_type sentinel_block_type;
+        typedef read_write_pool<block_type> pool_type;
 
         // KNKMAX / 2  <  arity  <=  KNKMAX
         enum { arity = Arity_, KNKMAX = 1UL << (LOG2<Arity_>::ceil) };
@@ -154,10 +155,9 @@ namespace priority_queue_local
                                            "flushing this block in write cache (if not written yet) and giving hint to prefetcher");
                             bid_type next_bid = bids->front();
                             //Hint next block of sequence.
-                            //This is mandatory to ensure proper synchronization between prefetch pool and write pool.
-                            merger->p_pool->hint(next_bid, *(merger->w_pool));
+                            merger->pool->hint(next_bid);
                         }
-                        merger->p_pool->read(block, bid)->wait();
+                        merger->pool->read(block, bid)->wait();
                         STXXL_VERBOSE2("first element of read block " << bid << " " << *(block->begin()) << " cached in " << block);
                         block_manager::get_instance()->delete_block(bid);
                         current = 0;
@@ -197,23 +197,20 @@ namespace priority_queue_local
         // while we use 0..k-1
         sequence_state states[KNKMAX]; // sequence including current position, dereference gives current element
 
-        prefetch_pool<block_type> * p_pool;
-        write_pool<block_type> * w_pool;
+        pool_type * pool;
 
         sentinel_block_type sentinel_block;
 
     public:
         ext_merger() :
-            size_(0), logK(0), k(1), p_pool(0), w_pool(0)
+            size_(0), logK(0), k(1), pool(0)
         {
             init();
         }
 
-        ext_merger(prefetch_pool<block_type> * p_pool_,
-                   write_pool<block_type> * w_pool_) :
+        ext_merger(pool_type * pool_) :
             size_(0), logK(0), k(1),
-            p_pool(p_pool_),
-            w_pool(w_pool_)
+            pool(pool_)
         {
             init();
         }
@@ -227,11 +224,9 @@ namespace priority_queue_local
             }
         }
 
-        void set_pools(prefetch_pool<block_type> * p_pool_,
-                       write_pool<block_type> * w_pool_)
+        void set_pool(pool_type * pool_)
         {
-            p_pool = p_pool_;
-            w_pool = w_pool_;
+            pool = pool_;
         }
 
     private:
@@ -441,8 +436,7 @@ namespace priority_queue_local
             swap_1D_arrays(entry, obj.entry, KNKMAX);
             swap_1D_arrays(states, obj.states, KNKMAX);
 
-            // std::swap(p_pool,obj.p_pool);
-            // std::swap(w_pool,obj.w_pool);
+            // std::swap(pool,obj.pool);
         }
 #endif
 
@@ -470,7 +464,7 @@ namespace priority_queue_local
             assert(k > 0);
             assert(length <= size_);
 
-            //This is the place target make statistics about external multi_merge calls.
+            //This is the place to make statistics about external multi_merge calls.
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
             typedef stxxl::int64 diff_type;
@@ -478,7 +472,7 @@ namespace priority_queue_local
 
             std::vector<sequence> seqs;
             std::vector<unsigned_type> orig_seq_index;
-            std::vector<value_type *> last; // points target last element in sequence, possibly a sentinel
+            std::vector<value_type *> last; // points to last element in sequence, possibly a sentinel
 
             Cmp_ cmp;
             priority_queue_local::invert_order<Cmp_, value_type, value_type> inv_cmp(cmp);
@@ -517,9 +511,8 @@ namespace priority_queue_local
                 *(seqs.back().second) = cmp.min_value(); //set sentinel
 
                 //Hint first non-internal (actually second) block of this sequence.
-                //This is mandatory target ensure proper synchronization between prefetch pool and write pool.
                 if (states[i].bids != NULL && !states[i].bids->empty())
-                    p_pool->hint(states[i].bids->front(), *w_pool);
+                    pool->hint(states[i].bids->front());
             }
 
             assert(seqs.size() > 0);
@@ -528,7 +521,7 @@ namespace priority_queue_local
             value_type last_elem;
 #endif
 
-            diff_type rest = length;   //elements still target merge for this output block
+            diff_type rest = length;   //elements still to merge for this output block
 
             while (rest > 0)
             {
@@ -618,13 +611,12 @@ namespace priority_queue_local
                             if (!(state.bids->empty()))
                             {
                                 STXXL_VERBOSE2("ext_merger::multi_merge(...) one more block exists in a sequence: " <<
-                                               "flushing this block in write cache (if not written yet) and giving hint target prefetcher");
+                                               "flushing this block in write cache (if not written yet) and giving hint to prefetcher");
                                 bid_type next_bid = state.bids->front();
                                 //Hint next block of sequence.
-                                //This is mandatory target ensure proper synchronization between prefetch pool and write pool.
-                                p_pool->hint(next_bid, *w_pool);
+                                pool->hint(next_bid);
                             }
-                            p_pool->read(state.block, bid)->wait();
+                            pool->read(state.block, bid)->wait();
                             STXXL_VERBOSE1("first element of read block " << bid << " " << *(state.block->begin()) << " cached in " << state.block);
                             state.current = 0;
                             seqs[i] = std::make_pair(state.block->begin() + state.current, state.block->end());
@@ -682,11 +674,10 @@ namespace priority_queue_local
 #else       // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
 
             //Hint first non-internal (actually second) block of each sequence.
-            //This is mandatory to ensure proper synchronization between prefetch pool and write pool.
             for (unsigned_type i = 0; i < k; ++i)
             {
                 if (states[i].bids != NULL && !states[i].bids->empty())
-                    p_pool->hint(states[i].bids->front(), *w_pool);
+                    pool->hint(states[i].bids->front());
             }
 
             switch (logK) {
@@ -944,16 +935,16 @@ namespace priority_queue_local
                 STXXL_VERBOSE1("last element of first block " << *(first_block->end() - 1));
                 assert(!cmp(*(first_block->begin() + (block_type::size - first_size)), *(first_block->end() - 1)));
 
-                assert(w_pool->size() > 0);
+                assert(pool->size_write() > 0);
 
                 for (typename std::list<bid_type>::iterator curbid = bids->begin(); curbid != bids->end(); ++curbid)
                 {
-                    block_type * b = w_pool->steal();
+                    block_type * b = pool->steal();
                     another_merger.multi_merge(b->begin(), b->end());
                     STXXL_VERBOSE1("first element of following block " << *curbid << " " << *(b->begin()));
                     STXXL_VERBOSE1("last element of following block " << *curbid << " " << *(b->end() - 1));
                     assert(!cmp(*(b->begin()), *(b->end() - 1)));
-                    w_pool->write(b, *curbid); //->wait() does not help
+                    pool->write(b, *curbid);
                     STXXL_VERBOSE1("written to block " << *curbid << " cached in " << b);
                 }
 

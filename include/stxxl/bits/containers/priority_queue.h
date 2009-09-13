@@ -6,7 +6,7 @@
  *  Copyright (C) 1999 Peter Sanders <sanders@mpi-sb.mpg.de>
  *  Copyright (C) 2003, 2004, 2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007, 2009 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2007, 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -19,6 +19,7 @@
 #include <vector>
 
 #include <stxxl/bits/mng/typed_block.h>
+#include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/common/tmeta.h>
@@ -152,6 +153,7 @@ public:
     //! \brief An unsigned integral type (64 bit)
     typedef stxxl::uint64 size_type;
     typedef typed_block<BlockSize, value_type> block_type;
+    typedef read_write_pool<block_type> pool_type;
 
 protected:
     typedef priority_queue_local::internal_priority_queue<value_type, std::vector<value_type>, comparator_type>
@@ -170,8 +172,8 @@ protected:
 
 
     int_merger_type int_mergers[num_int_groups];
-    prefetch_pool<block_type> & p_pool;
-    write_pool<block_type> & w_pool;
+    pool_type * pool;
+    bool pool_owned;
     ext_merger_type * ext_mergers;
 
     // one delete buffer for each tree => group buffer
@@ -193,7 +195,6 @@ protected:
 
     // total size not counting insert_heap and delete_buffer
     size_type size_;
-    bool deallocate_pools;
 
 private:
     void init();
@@ -210,6 +211,13 @@ private:
 
 public:
     //! \brief Constructs external priority queue object
+    //! \param pool_ pool of blocks that will be used
+    //! for data writing and prefetching for the disk<->memory transfers
+    //! happening in the priority queue. Larger pool size
+    //! helps to speed up operations.
+    priority_queue(pool_type & pool_);
+
+    //! \brief Constructs external priority queue object
     //! \param p_pool_ pool of blocks that will be used
     //! for data prefetching for the disk<->memory transfers
     //! happening in the priority queue. Larger pool size
@@ -218,7 +226,7 @@ public:
     //! for writing data for the memory<->disk transfers
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
-    priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_);
+    __STXXL_DEPRECATED(priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_));
 
     //! \brief Constructs external priority queue object
     //! \param p_pool_mem memory (in bytes) for prefetch pool that will be used
@@ -239,8 +247,8 @@ public:
         for (unsigned_type i = 0; i < num_int_groups; ++i)
             std::swap(int_mergers[i], obj.int_mergers[i]);
 
-        // std::swap(p_pool,obj.p_pool);
-        // std::swap(w_pool,obj.w_pool);
+        //std::swap(pool,obj.pool);
+        //std::swap(pool_owned, obj.pool_owned);
         std::swap(ext_mergers, obj.ext_mergers);
         for (unsigned_type i1 = 0; i1 < total_num_groups; ++i1)
             for (unsigned_type i2 = 0; i2 < (N + 1); ++i2)
@@ -254,7 +262,6 @@ public:
         std::swap(insert_heap, obj.insert_heap);
         std::swap(num_active_groups, obj.num_active_groups);
         std::swap(size_, obj.size_);
-        //std::swap(deallocate_pools,obj.deallocate_pools);
     }
 
     virtual ~priority_queue();
@@ -373,12 +380,24 @@ inline void priority_queue<Config_>::push(const value_type & obj)
 ////////////////////////////////////////////////////////////////
 
 template <class Config_>
-priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) :
-    p_pool(p_pool_), w_pool(w_pool_),
+priority_queue<Config_>::priority_queue(pool_type & pool_) :
+    pool(&pool_),
+    pool_owned(false),
     delete_buffer_end(delete_buffer + delete_buffer_size),
     insert_heap(N + 2),
-    num_active_groups(0), size_(0),
-    deallocate_pools(false)
+    num_active_groups(0), size_(0)
+{
+    STXXL_VERBOSE2("priority_queue::priority_queue(pool)");
+    init();
+}
+
+template <class Config_>
+priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) :
+    pool(new pool_type(w_pool_, p_pool_)),
+    pool_owned(true),
+    delete_buffer_end(delete_buffer + delete_buffer_size),
+    insert_heap(N + 2),
+    num_active_groups(0), size_(0)
 {
     STXXL_VERBOSE2("priority_queue::priority_queue(p_pool, w_pool)");
     init();
@@ -386,12 +405,11 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
 
 template <class Config_>
 priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem) :
-    p_pool(*(new prefetch_pool<block_type>(p_pool_mem / BlockSize))),
-    w_pool(*(new write_pool<block_type>(w_pool_mem / BlockSize))),
+    pool(new pool_type(w_pool_mem / BlockSize, p_pool_mem / BlockSize)),
+    pool_owned(true),
     delete_buffer_end(delete_buffer + delete_buffer_size),
     insert_heap(N + 2),
-    num_active_groups(0), size_(0),
-    deallocate_pools(true)
+    num_active_groups(0), size_(0)
 {
     STXXL_VERBOSE2("priority_queue::priority_queue(pool sizes)");
     init();
@@ -404,7 +422,7 @@ void priority_queue<Config_>::init()
 
     ext_mergers = new ext_merger_type[num_ext_groups];
     for (unsigned_type j = 0; j < num_ext_groups; ++j)
-        ext_mergers[j].set_pools(&p_pool, &w_pool);
+        ext_mergers[j].set_pool(pool);
 
     value_type sentinel = cmp.min_value();
     insert_heap.push(sentinel);                                // always keep the sentinel
@@ -421,11 +439,8 @@ template <class Config_>
 priority_queue<Config_>::~priority_queue()
 {
     STXXL_VERBOSE2("priority_queue::~priority_queue()");
-    if (deallocate_pools)
-    {
-        delete &p_pool;
-        delete &w_pool;
-    }
+    if (pool_owned)
+        delete pool;
 
     delete[] ext_mergers;
 }
