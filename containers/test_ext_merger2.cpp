@@ -59,8 +59,6 @@ int main()
 {
     stxxl::config::get_instance();
     const int B = block_type::size;
-    stxxl::prefetch_pool<block_type> p_pool(1);
-    stxxl::write_pool<block_type> w_pool(2);
     dummy_merger dummy;
 
     if (1) {
@@ -89,7 +87,8 @@ int main()
     }
 
     if (1) { // ext_merger test
-        stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5> merger(&p_pool, &w_pool);
+        stxxl::read_write_pool<block_type> pool(2, 1);
+        stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5> merger(&pool);
         dummy(1, 0);
         merger.insert_segment(dummy, B * 2);
         dummy(2, 0);

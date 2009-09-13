@@ -59,13 +59,12 @@ my_type * make_sequence(dummy_merger & dummy, int l)
 
 int main()
 {
-    stxxl::prefetch_pool<block_type> p_pool(1);
-    stxxl::write_pool<block_type> w_pool(2);
+    stxxl::read_write_pool<block_type> pool(2, 1);
     int cnt = 0;
     dummy_merger dummy(cnt);
     std::vector<my_type> output(1024 * 3);
 
-    ext_merger<block_type, my_cmp, 5> merger(&p_pool, &w_pool);
+    ext_merger<block_type, my_cmp, 5> merger(&pool);
     merger.insert_segment(dummy, 1024 * 3);
     cnt = 20;
     merger.insert_segment(dummy, 1024 * 4);
