@@ -538,7 +538,11 @@ public:
         { }
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
-    size_type size() const { return size_; }
+
+    size_type size() const
+    {
+        return size_;
+    }
 
     bool empty() const
     {
@@ -578,6 +582,7 @@ public:
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
     }
+
     value_type & top()
     {
         assert(size_ > 0);
@@ -585,6 +590,7 @@ public:
         assert(cache_offset <= block_type::size);
         return current;
     }
+
     const value_type & top() const
     {
         assert(size_ > 0);
@@ -592,6 +598,7 @@ public:
         assert(cache_offset <= block_type::size);
         return current;
     }
+
     void pop()
     {
         STXXL_VERBOSE3("grow_shrink_stack2::pop()");
@@ -618,12 +625,7 @@ public:
                 p_pool.read(cache, last_block)->wait();
             }
             block_manager::get_instance()->delete_block(last_block);
-            const int_type bids_size = bids.size();
-            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
-            for (int_type i = bids_size - 1; i >= last_pref; --i)
-            {
-                p_pool.hint(bids[i]); // prefetch
-            }
+            rehint();
             cache_offset = block_type::size + 1;
         }
 
@@ -633,6 +635,7 @@ public:
 
         --size_;
     }
+
     //! \brief Sets level of prefetch aggressiveness (number
     //! of blocks from the prefetch pool used for prefetching)
     //! \param new_p new value for the prefetch aggressiveness
@@ -649,21 +652,26 @@ public:
                 //  clean prefetch buffers
             }
         }
-        else if (pref_aggr < new_p)
-        {
-            const int_type bids_size = bids.size();
-            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(new_p), (int_type)0);
-            for (int_type i = bids_size - 1; i >= last_pref; --i)
-            {
-                p_pool.hint(bids[i]); // prefetch
-            }
-        }
         pref_aggr = new_p;
+        rehint();
     }
+
     //! \brief Returns number of blocks used for prefetching
     unsigned_type get_prefetch_aggr() const
     {
         return pref_aggr;
+    }
+
+private:
+    //! \brief hint the last pref_aggr external blocks
+    void rehint()
+    {
+        const int_type bids_size = bids.size();
+        const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
+        for (int_type i = bids_size - 1; i >= last_pref; --i)
+        {
+            p_pool.hint(bids[i]); // prefetch
+        }
     }
 };
 
@@ -911,3 +919,4 @@ namespace std
 }
 
 #endif // !STXXL_STACK_HEADER
+// vim: et:ts=4:sw=4
