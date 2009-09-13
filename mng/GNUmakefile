@@ -12,6 +12,7 @@ include $(TOPDIR)/Makefile.subdir.gnu
 
 # requires libcppunit-dev to be installed
 unittest.$o:		CPPFLAGS += $(CPPUNIT_COMPILER_OPTIONS)
+unittest.$o:		CPPFLAGS += -Wno-error # std::vector<typed_buffer, stxxl::new_alloc<typed_block> >::resize() calls typed_block(const typed_block& uninitialized)
 unittest.$(bin):	STXXL_LINKER_OPTIONS += $(CPPUNIT_LINKER_OPTIONS)
 
 test_mng.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
