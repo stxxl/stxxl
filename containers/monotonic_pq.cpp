@@ -283,9 +283,7 @@ int main(int argc, char * argv[])
     stxxl::timer Timer;
     Timer.start();
 
-    stxxl::prefetch_pool<block_type> p_pool((mem_for_pools / 2) / block_type::raw_size);
-    stxxl::write_pool<block_type> w_pool((mem_for_pools / 2) / block_type::raw_size);
-    pq_type p(p_pool, w_pool);
+    pq_type p(mem_for_pools / 2, mem_for_pools / 2);
     stxxl::int64 nelements = stxxl::int64(megabytes * mega / sizeof(my_type)), i;
 
 

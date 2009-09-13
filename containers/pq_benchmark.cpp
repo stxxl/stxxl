@@ -104,10 +104,7 @@ inline long long unsigned myrand()
 
 void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 {
-    stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE / BLOCK_SIZE);
-    stxxl::write_pool<block_type> w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
-
-    pq_type PQ(p_pool, w_pool);
+    pq_type PQ(PREFETCH_POOL_SIZE, WRITE_POOL_SIZE);
 
     stxxl::uint64 i;
 
@@ -167,10 +164,7 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 
 void run_stxxl_intermixed(stxxl::uint64 ops)
 {
-    stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE / BLOCK_SIZE);
-    stxxl::write_pool<block_type> w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
-
-    pq_type PQ(p_pool, w_pool);
+    pq_type PQ(PREFETCH_POOL_SIZE, WRITE_POOL_SIZE);
 
     stxxl::uint64 i;
 
