@@ -43,19 +43,23 @@
                 |  stxxl   stxxl     stxxl     stxxl
   compiler      |                   + boost   + boost
 ----------------+----------------------------------------
-* GCC 4.3 c++0x |    x     PMODE²      x       PMODE²
+* GCC 4.4 c++0x |    x     PMODE²      x       PMODE²
+  GCC 4.4       |    x     PMODE²      x       PMODE²
+  GCC 4.3 c++0x |    x     PMODE²      x       PMODE²
   GCC 4.3       |    x     PMODE²      x       PMODE²
-* GCC 4.2       |    x     MCSTL       x       MCSTL
+  GCC 4.2       |    x     MCSTL       x       MCSTL
   GCC 4.1       |    x       -         x         -
   GCC 4.0       |    x       -         x         -
   GCC 3.4       |    x       -         x         -
   GCC 3.3       |    o       -         o         -
   GCC 2.95      |    -       -         -         -
-* ICPC 10.1.017 |    x¹    MCSTL¹      x¹      MCSTL¹
+* ICPC 11.1.038 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 11.0.081 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 10.1.017 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 10.0.026 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 9.1.053  |    x¹      -         x¹        -
   ICPC 9.0.032  |    x¹      -         x¹        -
-  MSVC 2008 9.0 |    -       -         x         -
+* MSVC 2008 9.0 |    -       -         x         -
   MSVC 2005 8.0 |    -       -         x         -
 
  x   = full support
@@ -70,7 +74,7 @@
        icpc 9.1: use gcc before 4.2
        icpc 10.x with mcstl support: use gcc 4.2
  ²   = MCSTL has been superseded by the libstdc++ parallel mode in GCC 4.3,
-       requires g++ 4.3.2 (prerelease) or later
+       full support requires g++ 4.4 or later, only partial support in g++ 4.3
 \endverbatim
  *
  *
@@ -79,9 +83,7 @@
  * The <a href="http://www.boost.org">Boost</a> libraries are required on
  * Windows platforms using MSVC compiler and optional on other platforms.
  *
- * \c S<small>TXXL</small> has been tested with Boost 1.34.1.
- * It also compiles using Boost 1.35.0 without problems,
- * but hasn't been thoroughly tested in this setting.
+ * \c S<small>TXXL</small> has been tested with Boost 1.40.0.
  * Other versions may work, too, but older versions won't get support.
  *
  *
