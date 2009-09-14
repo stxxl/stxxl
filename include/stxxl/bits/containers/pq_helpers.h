@@ -156,7 +156,7 @@ namespace priority_queue_local
 
 
 /**
- * \brief Similar target std::stack, with the following differences:
+ * \brief Similar to std::stack, with the following differences:
      * - Maximum size is fixed at compilation time, so an array can be used.
      * - Can be cleared "at once", without reallocation.
      */
