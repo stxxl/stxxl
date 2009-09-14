@@ -42,16 +42,16 @@ protected:
 
 public:
     //! \brief Constructs pool
-    //! \param init_size_write initial number of blocks in the write pool
     //! \param init_size_prefetch initial number of blocks in the prefetch pool
-    explicit read_write_pool(size_type init_size_write = 1, size_type init_size_prefetch = 1) :
+    //! \param init_size_write initial number of blocks in the write pool
+    explicit read_write_pool(size_type init_size_prefetch = 1, size_type init_size_write = 1) :
         delete_pools(true)
     {
         w_pool = new write_pool_type(init_size_write);
         p_pool = new prefetch_pool_type(init_size_prefetch);
     }
 
-    read_write_pool(write_pool_type & w_pool, prefetch_pool_type & p_pool) :
+    read_write_pool(prefetch_pool_type & p_pool, write_pool_type & w_pool) :
         w_pool(&w_pool), p_pool(&p_pool), delete_pools(false)
     { }
 

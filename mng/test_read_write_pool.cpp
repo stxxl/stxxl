@@ -33,7 +33,7 @@ int main()
 
     {
         STXXL_MSG("Write-After-Write coherence test");
-        stxxl::read_write_pool<block_type> pool(10, 2);
+        stxxl::read_write_pool<block_type> pool(2, 10);
         block_type * blk;
         block_type::bid_type bid;
 

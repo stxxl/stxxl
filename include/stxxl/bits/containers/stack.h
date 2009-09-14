@@ -489,7 +489,7 @@ public:
         cache_offset(0),
         cache(new block_type),
         pref_aggr(prefetch_aggressiveness),
-        pool(w_pool_, p_pool_)
+        pool(p_pool_, w_pool_)
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }

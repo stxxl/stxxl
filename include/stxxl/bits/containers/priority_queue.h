@@ -405,7 +405,7 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
 
 template <class Config_>
 priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem) :
-    pool(new pool_type(w_pool_mem / BlockSize, p_pool_mem / BlockSize)),
+    pool(new pool_type(p_pool_mem / BlockSize, w_pool_mem / BlockSize)),
     pool_owned(true),
     delete_buffer_end(delete_buffer + delete_buffer_size),
     insert_heap(N + 2),

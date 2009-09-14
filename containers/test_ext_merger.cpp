@@ -59,7 +59,7 @@ my_type * make_sequence(dummy_merger & dummy, int l)
 
 int main()
 {
-    stxxl::read_write_pool<block_type> pool(2, 1);
+    stxxl::read_write_pool<block_type> pool(1, 2);
     int cnt = 0;
     dummy_merger dummy(cnt);
     std::vector<my_type> output(1024 * 3);
