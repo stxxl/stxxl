@@ -931,7 +931,7 @@ namespace stream
                     for (seqs_size_type i = 0; i < (*seqs).size(); i++)
                     {
                         if ((*seqs)[i].first == (*seqs)[i].second)
-                            continue; //run empty
+                            continue;  // run empty
 
                         if (min_last_element == NULL)
                             min_last_element = &(*((*seqs)[i].second - 1));
@@ -942,16 +942,16 @@ namespace stream
                         STXXL_VERBOSE1("last " << *((*seqs)[i].second - 1) << " block size " << ((*seqs)[i].second - (*seqs)[i].first));
                     }
 
-                    assert(min_last_element != NULL);           //there must be some element
+                    assert(min_last_element != NULL);           // there must be some element
 
                     STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (block_type::size - rest));
 
                     diff_type less_equal_than_min_last = 0;
-                    //locate this element in all sequences
+                    // locate this element in all sequences
                     for (seqs_size_type i = 0; i < (*seqs).size(); i++)
                     {
                         if ((*seqs)[i].first == (*seqs)[i].second)
-                            continue; //empty subsequence
+                            continue;  // empty subsequence
 
                         typename block_type::iterator position = std::upper_bound((*seqs)[i].first, (*seqs)[i].second, *min_last_element, cmp);
                         STXXL_VERBOSE1("greater equal than " << position - (*seqs)[i].first);
@@ -965,7 +965,7 @@ namespace stream
                     STXXL_VERBOSE1("before merge" << output_size);
 
                     stxxl::parallel::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size);
-                    //sequence iterators are progressed appropriately
+                    // sequence iterators are progressed appropriately
 
                     STXXL_VERBOSE1("after merge");
 

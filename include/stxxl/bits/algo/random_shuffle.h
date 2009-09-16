@@ -219,7 +219,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
         STXXL_ERRMSG("random_shuffle: increasing to " << M << " bytes (6 blocks + 1 page)");
     }
 
-    stxxl::int64 n = last - first;   // the number of input elements
+    stxxl::int64 n = last - first;     // the number of input elements
     int_type k = M / (3 * BlockSize_); // number of buckets
 
     stxxl::int64 i, j, size = 0;
@@ -266,7 +266,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
     int_type random_bucket = 0;
     for (i = 0; i < n; ++i, ++_cur) {
         random_bucket = rand(k);
-	typename ExtIterator_::value_type tmp;
+        typename ExtIterator_::value_type tmp;
         in >> tmp;
         buckets[random_bucket]->push(tmp); // reading the current input element
     }

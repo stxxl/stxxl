@@ -131,10 +131,10 @@ int main(int argc, char ** argv)
         STXXL_MSG("Sorting...");
         if (strcmp(argv[1], "sort") == 0) {
             stxxl::sort(v.begin(), v.end(), Cmp(), memory_to_use);
-        /* stable_sort is not yet implemented
+#if 0       // stable_sort is not yet implemented
         } else if (strcmp(argv[1], "stable_sort") == 0) {
             stxxl::stable_sort(v.begin(), v.end(), memory_to_use);
-        */
+#endif
         } else if (strcmp(argv[1], "ksort") == 0) {
             stxxl::ksort(v.begin(), v.end(), memory_to_use);
         } else if (strcmp(argv[1], "stable_ksort") == 0) {

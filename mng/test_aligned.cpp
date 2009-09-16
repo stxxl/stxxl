@@ -48,9 +48,9 @@ void test_typed_block()
 
 void test_aligned_alloc()
 {
-    void *p = stxxl::aligned_alloc<1024>(4096);
-    void *q = NULL;
-    void *r = stxxl::aligned_alloc<1024>(4096, 42);
+    void * p = stxxl::aligned_alloc<1024>(4096);
+    void * q = NULL;
+    void * r = stxxl::aligned_alloc<1024>(4096, 42);
     stxxl::aligned_dealloc<1024>(p);
     stxxl::aligned_dealloc<1024>(q);
     stxxl::aligned_dealloc<1024>(r);
@@ -71,7 +71,7 @@ int main()
     } catch (std::exception e) {
         STXXL_MSG("OOPS: " << e.what());
         return 1;
-    } catch (char const *c) {
+    } catch (char const * c) {
         STXXL_MSG("OOPS: " << c);
         return 1;
     }

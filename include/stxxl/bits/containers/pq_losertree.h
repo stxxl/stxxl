@@ -332,7 +332,7 @@ namespace priority_queue_local
 
         // make all new entries free
         // and push them on the free stack
-        for (unsigned_type i = 2 * k - 1;  i >= k;  i--) // backwards
+        for (unsigned_type i = 2 * k - 1; i >= k; i--)   // backwards
         {
             current[i] = &sentinel;
             current_end[i] = &sentinel;
@@ -362,7 +362,7 @@ namespace priority_queue_local
         // compact all nonempty segments to the left
         unsigned_type pos = 0;
         unsigned_type last_empty = 0;
-        for ( ;  pos < k;  pos++)
+        for ( ; pos < k; pos++)
         {
             if (not_sentinel(*(current[pos])))
             {
@@ -716,7 +716,7 @@ namespace priority_queue_local
 
 
             // go up the entry-tree
-            for (unsigned_type i = (winnerIndex + kReg) >> 1;  i > 0;  i >>= 1) {
+            for (unsigned_type i = (winnerIndex + kReg) >> 1; i > 0; i >>= 1) {
                 currentPos = entry + i;
                 currentKey = currentPos->key;
                 if (cmp(winnerKey, currentKey)) {

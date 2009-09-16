@@ -28,7 +28,7 @@ typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
 int main()
 {
-    stxxl::block_manager *bm = stxxl::block_manager::get_instance();
+    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
     STXXL_DEFAULT_ALLOC_STRATEGY alloc;
 
     {

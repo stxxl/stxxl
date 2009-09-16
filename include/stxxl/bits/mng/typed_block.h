@@ -209,8 +209,8 @@ public:
 
     enum
     {
-        raw_size = RawSize_,                                      //!< size of block in bytes
-        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size, //!< number of elements in block
+        raw_size = RawSize_,                                                            //!< size of block in bytes
+        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size,                      //!< number of elements in block
         has_filler = (RawSize_ != sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>)) //!< indicator for non-empty filler at the end
     };
 

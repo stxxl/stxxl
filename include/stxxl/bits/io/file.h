@@ -134,7 +134,7 @@ public:
     virtual request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
                                const completion_handler & on_cmpl) = 0;
 
-    virtual void serve(const request * req) throw(io_error) = 0;
+    virtual void serve(const request * req) throw (io_error) = 0;
 
     void add_request_ref()
     {

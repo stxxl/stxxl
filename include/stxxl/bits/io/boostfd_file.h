@@ -45,7 +45,7 @@ public:
     offset_type size();
     void set_size(offset_type newsize);
     void lock();
-    void serve(const request * req) throw(io_error);
+    void serve(const request * req) throw (io_error);
     const char * io_type() const;
 };
 

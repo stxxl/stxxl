@@ -114,7 +114,7 @@ public:
         for (i = 0; i < nreadblocks; ++i)
         {
             STXXL_VERBOSE1("block_prefetcher: reading block " << i
-                                                              << " prefetch_seq[" << i << "]=" << prefetch_seq[i]);
+                           << " prefetch_seq[" << i << "]=" << prefetch_seq[i]);
             assert(prefetch_seq[i] < int_type(seq_length));
             assert(prefetch_seq[i] >= 0);
             read_reqs[i] = read_buffers[i].read(

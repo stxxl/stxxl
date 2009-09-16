@@ -111,7 +111,7 @@ aligned_dealloc(void * ptr)
 {
     if (!ptr)
         return;
-    char * buffer = * (((char **)ptr) - 1);
+    char * buffer = *(((char **)ptr) - 1);
     STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_dealloc<" << ALIGNMENT << ">(), ptr = " << ptr << ", buffer = " << (void *)buffer);
     std::free(buffer);
 }

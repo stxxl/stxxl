@@ -252,14 +252,14 @@ namespace priority_queue_local
 #if STXXL_PQ_EXTERNAL_LOSER_TREE
         struct Entry
         {
-            value_type key;      // key of loser element (winner for 0)
-            unsigned_type index; // the number of the losing segment
+            value_type key;       // key of loser element (winner for 0)
+            unsigned_type index;  // the number of the losing segment
         };
 #endif //STXXL_PQ_EXTERNAL_LOSER_TREE
 
-        size_type size_;         // total number of elements stored
+        size_type size_;          // total number of elements stored
         unsigned_type log_k;      // log of current tree size
-        unsigned_type k;         // invariant (k == 1 << log_k), always a power of 2
+        unsigned_type k;          // invariant (k == 1 << log_k), always a power of 2
         // only entries 0 .. arity-1 may hold actual sequences, the other
         // entries arity .. arity_bound-1 are sentinels to make the size of the tree
         // a power of 2 always
@@ -369,7 +369,7 @@ namespace priority_queue_local
         unsigned_type init_winner(unsigned_type root)
         {
             if (root >= k)
-            { // leaf reached
+            {   // leaf reached
                 return root - k;
             }
             else
@@ -379,7 +379,7 @@ namespace priority_queue_local
                 value_type lk = *(states[left]);
                 value_type rk = *(states[right]);
                 if (!(cmp(lk, rk)))
-                { // right subtree looses
+                {   // right subtree looses
                     entry[root].index = right;
                     entry[root].key = rk;
                     return left;
@@ -404,10 +404,10 @@ namespace priority_queue_local
             unsigned_type new_index,
             value_type * winner_key,
             unsigned_type * winner_index,        // old winner
-            unsigned_type * mask)               // 1 << (ceil(log KNK) - dist-from-root)
+            unsigned_type * mask)                // 1 << (ceil(log KNK) - dist-from-root)
         {
             if (node == 0)
-            {                    // winner part of root
+            {                                    // winner part of root
                 *mask = 1 << (log_k - 1);
                 *winner_key = entry[0].key;
                 *winner_index = entry[0].index;
@@ -423,11 +423,11 @@ namespace priority_queue_local
                 value_type loserKey = entry[node].key;
                 unsigned_type loserIndex = entry[node].index;
                 if ((*winner_index & *mask) != (new_index & *mask))
-                { // different subtrees
+                {                        // different subtrees
                     if (cmp(loserKey, new_key))
                     {                    // new_key will have influence here
                         if (cmp(*winner_key, new_key))
-                        {              // old winner loses here
+                        {                // old winner loses here
                             entry[node].key = *winner_key;
                             entry[node].index = *winner_index;
                         }
@@ -513,7 +513,7 @@ namespace priority_queue_local
 
             // overwrite garbage and compact the stack of free segment indices
             free_segments.clear(); // none free
-            for ( ;  target < k;  target++)
+            for ( ; target < k; target++)
             {
                 assert(!is_segment_allocated(target));
                 states[target].make_inf();
@@ -618,7 +618,7 @@ namespace priority_queue_local
             value_type last_elem;
 #endif
 
-            diff_type rest = length;   //elements still to merge for this output block
+            diff_type rest = length;                     //elements still to merge for this output block
 
             while (rest > 0)
             {
@@ -886,7 +886,7 @@ namespace priority_queue_local
 
 
                 // go up the entry-tree
-                for (unsigned_type i = (winner_index + kReg) >> 1;  i > 0;  i >>= 1)
+                for (unsigned_type i = (winner_index + kReg) >> 1; i > 0; i >>= 1)
                 {
                     current_pos = entry + i;
                     current_key = current_pos->key;
@@ -983,7 +983,7 @@ namespace priority_queue_local
             {
                 // get a free slot
                 if (free_segments.empty())
-                { // tree is too small
+                {   // tree is too small
                     double_k();
                 }
                 assert(!free_segments.empty());
@@ -1106,8 +1106,8 @@ namespace priority_queue_local
         {
             return states[slot].allocated;
         }
-    }; //ext_merger
-} //priority_queue_local
+    }; // ext_merger
+} // priority_queue_local
 
 //! \}
 

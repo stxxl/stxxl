@@ -84,7 +84,7 @@ int main(int argc, char * argv[])
     unsigned num_blocks_per_step = STXXL_DIVRU(step_size, raw_block_size);
     step_size = num_blocks_per_step * raw_block_size;
 
-    block_type* buffer = new block_type[num_blocks_per_step];
+    block_type * buffer = new block_type[num_blocks_per_step];
     request_ptr * reqs = new request_ptr[num_blocks_per_step];
     std::vector<BID_type> blocks;
     double totaltimeread = 0, totaltimewrite = 0;

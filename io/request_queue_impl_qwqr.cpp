@@ -29,7 +29,7 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
         const request_ptr & b) const
     {
         // matching file and offset are enough to cause problems
-        return (a->get_offset() == b->get_offset()) && 
+        return (a->get_offset() == b->get_offset()) &&
                (a->get_file() == b->get_file());
     }
 };
@@ -51,9 +51,9 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
         {
             scoped_mutex_lock Lock(write_mutex);
-            if (std::find_if(write_queue.begin(), write_queue.end(), 
+            if (std::find_if(write_queue.begin(), write_queue.end(),
                              bind2nd(file_offset_match(), req) __STXXL_FORCE_SEQUENTIAL)
-                    != write_queue.end())
+                != write_queue.end())
             {
                 STXXL_ERRMSG("READ request submitted for a BID with a pending WRITE request");
             }
@@ -67,9 +67,9 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
         {
             scoped_mutex_lock Lock(read_mutex);
-            if (std::find_if(read_queue.begin(), read_queue.end(), 
+            if (std::find_if(read_queue.begin(), read_queue.end(),
                              bind2nd(file_offset_match(), req) __STXXL_FORCE_SEQUENTIAL)
-                    != read_queue.end())
+                != read_queue.end())
             {
                 STXXL_ERRMSG("WRITE request submitted for a BID with a pending READ request");
             }
@@ -94,7 +94,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
     {
         scoped_mutex_lock Lock(read_mutex);
         queue_type::iterator pos;
-        if((pos = std::find(read_queue.begin(), read_queue.end(), req __STXXL_FORCE_SEQUENTIAL)) != read_queue.end())
+        if ((pos = std::find(read_queue.begin(), read_queue.end(), req __STXXL_FORCE_SEQUENTIAL)) != read_queue.end())
         {
             read_queue.erase(pos);
             was_still_in_queue = true;
@@ -105,7 +105,7 @@ bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
     {
         scoped_mutex_lock Lock(write_mutex);
         queue_type::iterator pos;
-        if((pos = std::find(write_queue.begin(), write_queue.end(), req __STXXL_FORCE_SEQUENTIAL)) != write_queue.end())
+        if ((pos = std::find(write_queue.begin(), write_queue.end(), req __STXXL_FORCE_SEQUENTIAL)) != write_queue.end())
         {
             write_queue.erase(pos);
             was_still_in_queue = true;

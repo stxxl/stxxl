@@ -41,7 +41,7 @@ public:
         int mode,
         int disk = -1) : wfs_file_base(filename, mode, disk)
     { }
-    void serve(const request * req) throw(io_error);
+    void serve(const request * req) throw (io_error);
     const char * io_type() const;
 };
 

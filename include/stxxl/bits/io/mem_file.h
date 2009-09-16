@@ -34,7 +34,7 @@ public:
     mem_file(
         int disk = -1) : file_request_basic(disk), ptr(NULL), sz(0)
     { }
-    void serve(const request * req) throw(io_error);
+    void serve(const request * req) throw (io_error);
     ~mem_file();
     offset_type size();
     void set_size(offset_type newsize);

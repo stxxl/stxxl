@@ -17,7 +17,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void mem_file::serve(const request * req) throw(io_error)
+void mem_file::serve(const request * req) throw (io_error)
 {
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();

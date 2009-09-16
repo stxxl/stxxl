@@ -527,7 +527,7 @@ public:
                 block_type * b = NULL; // w_pool.steal(*cur);
                 if (b)
                 {
-                    pool.add(cache); // return buffer
+                    pool.add(cache);   // return buffer
                     cache = b;
                 }
             }

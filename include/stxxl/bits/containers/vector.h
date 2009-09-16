@@ -73,7 +73,7 @@ public:
     {
         assert(/* 0 <= block1 && */ block1 < modulo2);
         assert(/* 0 <= offset && */ offset < modulo1);
-        
+
         this->block2 = block2;
         this->block1 = block1;
         this->offset = offset;
@@ -916,7 +916,7 @@ public:
         }
         else if (new_bids_size < old_bids_size)
         {
-            if(_from != NULL)
+            if (_from != NULL)
                 _from->set_size(new_bids_size * block_type::raw_size);
             else
                 bm->delete_blocks(_bids.begin() + old_bids_size, _bids.end());
@@ -1176,14 +1176,14 @@ public:
             STXXL_VERBOSE("An exception in the ~vector()");
         }
 
-        if(!exported)
+        if (!exported)
         {
             if (_from == NULL)
                 bm->delete_blocks(_bids.begin(), _bids.end());
             else        // file must be truncated
             {
                 STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
-                                                                << file_length());
+                                                                   << file_length());
                 STXXL_VERBOSE1("~vector(): size of the vector is " << size());
                 _from->set_size(file_length());
             }
@@ -1195,13 +1195,13 @@ public:
     void export_files(std::string filename_prefix)
     {
         int64 no = 0;
-        for(bids_container_iterator i = _bids.begin(); i != _bids.end(); ++i) {
+        for (bids_container_iterator i = _bids.begin(); i != _bids.end(); ++i) {
             std::ostringstream number;
             number << std::setw(9) << std::setfill('0') << no;
             size_type current_block_size =
                 ((i + 1) == _bids.end() && _size % block_type::size > 0) ?
-                   (_size % block_type::size) * sizeof(value_type) :
-                   block_type::size * sizeof(value_type);
+                (_size % block_type::size) * sizeof(value_type) :
+                block_type::size * sizeof(value_type);
             (*i).storage->export_files((*i).offset, current_block_size, filename_prefix + number.str());
             ++no;
         }
@@ -1209,15 +1209,15 @@ public:
     }
 
     //! \brief Get the file associated with this vector, or NULL.
-    file* get_file()
+    file * get_file()
     {
         return _from;
     }
 
     //! \brief Set the blocks and the size of this container explicitly.
     //! The vector must be completely empty before.
-    template<typename ForwardIterator>
-    void set_content(const ForwardIterator& bid_begin, const ForwardIterator& bid_end, size_type n)
+    template <typename ForwardIterator>
+    void set_content(const ForwardIterator & bid_begin, const ForwardIterator & bid_end, size_type n)
     {
         assert(_size == 0 && _bids.size() == 0);
         unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
@@ -1228,7 +1228,6 @@ public:
         _page_to_slot.resize(new_pages, on_disk);
         _size = n;
     }
-
 
 private:
     bids_container_iterator bid(const size_type & offset)
@@ -1355,10 +1354,10 @@ private:
         assert(!(_page_status[page_no] & dirty) &&
                "A dirty page has been marked as newly initialized. The page content will be lost.");
         if (_page_to_slot[page_no] != on_disk) {
-		// remove page from cache
-		_free_slots.push(_page_to_slot[page_no]);
-		_page_to_slot[page_no] = on_disk;
-	}
+            // remove page from cache
+            _free_slots.push(_page_to_slot[page_no]);
+            _page_to_slot[page_no] = on_disk;
+        }
         _page_status[page_no] = valid_on_disk;
     }
 
@@ -1394,7 +1393,7 @@ private:
         int_type cache_slot = _page_to_slot[page_no];
         if (cache_slot < 0)                                 // == on_disk
         {
-            if (_free_slots.empty())                    // has to kick
+            if (_free_slots.empty())                        // has to kick
             {
                 int_type kicked_slot = pager.kick();
                 pager.hit(kicked_slot);

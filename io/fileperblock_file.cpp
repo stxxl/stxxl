@@ -22,24 +22,23 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-template<class base_file_type>
+template <class base_file_type>
 fileperblock_file<base_file_type>::fileperblock_file(
     const std::string & filename_prefix,
     int mode,
     int disk)
-        : file_request_basic(disk), filename_prefix(filename_prefix), mode(mode),
-          lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, disk)
-{
-}
+    : file_request_basic(disk), filename_prefix(filename_prefix), mode(mode),
+      lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, disk)
+{ }
 
-template<class base_file_type>
+template <class base_file_type>
 fileperblock_file<base_file_type>::~fileperblock_file()
 {
-    if(lock_file_created)
+    if (lock_file_created)
         ::remove((filename_prefix + "_fpb_lock").c_str());
 }
 
-template<class base_file_type>
+template <class base_file_type>
 std::string fileperblock_file<base_file_type>::filename_for_block(unsigned_type offset)
 {
     std::ostringstream name;
@@ -48,8 +47,8 @@ std::string fileperblock_file<base_file_type>::filename_for_block(unsigned_type 
     return name.str();
 }
 
-template<class base_file_type>
-void fileperblock_file<base_file_type>::serve(const request * req) throw(io_error)
+template <class base_file_type>
+void fileperblock_file<base_file_type>::serve(const request * req) throw (io_error)
 {
     assert(req->get_file() == this);
 
@@ -61,14 +60,14 @@ void fileperblock_file<base_file_type>::serve(const request * req) throw(io_erro
     derived->serve();
 }
 
-template<class base_file_type>
+template <class base_file_type>
 void fileperblock_file<base_file_type>::lock()
 {
-    if(!lock_file_created)
+    if (!lock_file_created)
     {
         //create lock file and fill it with one page, an empty file cannot be locked
         const int page_size = BLOCK_ALIGN;
-        void* one_page = aligned_alloc<BLOCK_ALIGN>(page_size);
+        void * one_page = aligned_alloc<BLOCK_ALIGN>(page_size);
         lock_file.set_size(page_size);
         request_ptr r = lock_file.awrite(one_page, 0, page_size, default_completion_handler());
         r->wait();
@@ -78,7 +77,7 @@ void fileperblock_file<base_file_type>::lock()
     lock_file.lock();
 }
 
-template<class base_file_type>
+template <class base_file_type>
 void fileperblock_file<base_file_type>::delete_region(offset_type offset, unsigned_type length)
 {
     UNUSED(length);
@@ -86,7 +85,7 @@ void fileperblock_file<base_file_type>::delete_region(offset_type offset, unsign
     STXXL_VERBOSE0("delete_region " << offset << " + " << length);
 }
 
-template<class base_file_type>
+template <class base_file_type>
 void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_type length, std::string filename)
 {
     std::string original(filename_for_block(offset));
@@ -99,7 +98,7 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
 #endif
 }
 
-template<class base_file_type>
+template <class base_file_type>
 const char * fileperblock_file<base_file_type>::io_type() const
 {
     return "fileperblock";
