@@ -25,7 +25,8 @@ LIBS_BDB			?= -ldb_cxx
 TPIE_ROOT			?= /usr/local/tpie
 TPIE_ROOT			?= $(HOME)/projects/tpie_091905
 TPIE_ROOT			?= $(HOME)/work/lib/tpie
-CPPFLAGS_TPIE			?= -I$(TPIE_ROOT)/include -DHAVE_CONFIG_H -Wno-error
+TPIE_ROOT			?= $(HOME)/work/lib/$(UNAME_M)/tpie
+CPPFLAGS_TPIE			?= -I$(TPIE_ROOT)/include -DHAVE_CONFIG_H
 LIBS_TPIE			?= -L$(TPIE_ROOT)/lib -ltpie
 
 LEDA_COMPILER			?= g++-2.95

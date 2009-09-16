@@ -122,6 +122,7 @@ COMPILER_GCC	 = $GCC
 COMPILER_ICPC	 = $ICPC
 #STXXL_ROOT	 = `pwd`
 MCSTL_ROOT	 = \$(HOME)/work/mcstl
+TPIE_ROOT	 = \$(HOME)/work/lib/\$(UNAME_M)/tpie
 NICE		 =
 
 PMODE		 =$PMODE
