@@ -23,6 +23,14 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+template <typename must_be_int>
+struct aligned_alloc_settings {
+    static bool may_use_realloc;
+};
+
+template <typename must_be_int>
+bool aligned_alloc_settings<must_be_int>::may_use_realloc = true;
+
 // meta_info_size > 0 is needed for array allocations that have overhead
 //
 //                      meta_info
@@ -51,13 +59,21 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">() address " << (void *)result << " lost " << (result - buffer) << " bytes");
     assert(long(result - buffer) >= long(sizeof(char *)));
 
-    // free unused memory behind the data area
-    // so access behind the requested size can be recognized
-    size_t realloc_size = (result - buffer) + meta_info_size + size;
-    char * realloced = (char *)std::realloc(buffer, realloc_size);
-    if (buffer != realloced)
-        throw std::bad_alloc();
-    assert(result + size <= buffer + realloc_size);
+    if (aligned_alloc_settings<int>::may_use_realloc) {
+        // free unused memory behind the data area
+        // so access behind the requested size can be recognized
+        size_t realloc_size = (result - buffer) + meta_info_size + size;
+        char * realloced = (char *)std::realloc(buffer, realloc_size);
+        if (buffer != realloced) {
+            // hmm, realloc does move the memory block around while shrinking,
+            // might run under valgrind, so disable realloc and retry
+            STXXL_ERRMSG("stxxl::aligned_alloc: disabling realloc()");
+            std::free(realloced);
+            aligned_alloc_settings<int>::may_use_realloc = false;
+            return aligned_alloc<ALIGNMENT>(size, meta_info_size);
+        }
+        assert(result + size <= buffer + realloc_size);
+    }
 
     *(((char **)result) - 1) = buffer;
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">(), allocated at " << (void *)buffer << " returning " << (void *)result);
