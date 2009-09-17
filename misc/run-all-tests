@@ -56,7 +56,7 @@ run()
 	i=$(($i + 1))
 	pfx="`printf '%s/test.%s.%05d.%04d.%s' $testresults $stxxl $$ $i $bn`"
 	rm -f stxxl.log stxxl.errlog
-	test -x "$cmd" || return -1
+	test -x "$cmd" || return 255
 	echo "+ $cmd $@" | tee "$pfx.log"
 	echo "[`date`]" | tee -a "$pfx.log"
 	if [ "$valgrind" = "yes" ]; then
@@ -206,7 +206,8 @@ for strategy in 0 1 2 3 ; do
 for blk_size in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 ; do
 run algo/test_sort_all_parameters		$data $ram $strategy $blk_size 42
 run algo/test_ksort_all_parameters		$data $ram $strategy $blk_size 42
-test -n "$WITH_STABLE_KSORT" && run algo/test_stable_ksort_all_parameters	$data $ram $strategy $blk_size 42
+test -n "$WITH_STABLE_KSORT" && \
+    run algo/test_stable_ksort_all_parameters	$data $ram $strategy $blk_size 42
 done
 done
 done
