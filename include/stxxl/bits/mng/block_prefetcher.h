@@ -18,6 +18,7 @@
 
 #include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/io/request.h>
+#include <stxxl/bits/mng/mng.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -43,6 +44,7 @@ template <typename block_type, typename bid_iterator_type>
 class block_prefetcher
 {
     block_prefetcher() { }
+    typedef typename block_type::bid_type bid_type;
 
 protected:
     bid_iterator_type consume_seq_begin;
@@ -58,9 +60,12 @@ protected:
 
     block_type * read_buffers;
     request_ptr * read_reqs;
+    bid_type* read_bids;
 
     onoff_switch * completed;
     int_type * pref_buffer;
+
+    bool delete_block_after_fetch;
 
     block_type * wait(int_type iblock)
     {
@@ -74,6 +79,11 @@ protected:
         int_type ibuffer = pref_buffer[iblock];
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);
         assert(ibuffer >= 0 && ibuffer < nreadblocks);
+        if(delete_block_after_fetch)
+        {
+            STXXL_VERBOSE1("block_prefetcher: deleting block " << read_bids[ibuffer]);
+			block_manager::get_instance()->delete_block(read_bids[ibuffer]);
+        }
         return (read_buffers + ibuffer);
     }
 
@@ -88,7 +98,8 @@ public:
         bid_iterator_type _cons_begin,
         bid_iterator_type _cons_end,
         int_type * _pref_seq,
-        int_type _prefetch_buf_size
+        int_type _prefetch_buf_size,
+        bool delete_block_after_fetch = false
         ) :
         consume_seq_begin(_cons_begin),
         consume_seq_end(_cons_end),
@@ -96,7 +107,8 @@ public:
         prefetch_seq(_pref_seq),
         nextread(STXXL_MIN(unsigned_type(_prefetch_buf_size), seq_length)),
         nextconsume(0),
-        nreadblocks(nextread)
+        nreadblocks(nextread),
+        delete_block_after_fetch(delete_block_after_fetch)
     {
         STXXL_VERBOSE1("block_prefetcher: seq_length=" << seq_length);
         STXXL_VERBOSE1("block_prefetcher: _prefetch_buf_size=" << _prefetch_buf_size);
@@ -105,6 +117,7 @@ public:
         int_type i;
         read_buffers = new block_type[nreadblocks];
         read_reqs = new request_ptr[nreadblocks];
+        read_bids = new bid_type[nreadblocks];
         pref_buffer = new int_type[seq_length];
 
         std::fill(pref_buffer, pref_buffer + seq_length, -1);
@@ -120,6 +133,7 @@ public:
             read_reqs[i] = read_buffers[i].read(
                 *(consume_seq_begin + prefetch_seq[i]),
                 set_switch_handler(*(completed + prefetch_seq[i])));
+            read_bids[i] = *(consume_seq_begin + prefetch_seq[i]);
             pref_buffer[prefetch_seq[i]] = i;
         }
     }
@@ -158,6 +172,7 @@ public:
                 *(consume_seq_begin + next_2_prefetch),
                 set_switch_handler(*(completed + next_2_prefetch))
                 );
+            read_bids[ibuffer] = *(consume_seq_begin + next_2_prefetch);
         }
 
         if (nextconsume >= seq_length)
@@ -177,6 +192,7 @@ public:
 
 
         delete[] read_reqs;
+        delete[] read_bids;
         delete[] completed;
         delete[] pref_buffer;
         delete[] read_buffers;
