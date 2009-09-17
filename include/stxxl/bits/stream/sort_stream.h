@@ -109,7 +109,9 @@ namespace stream
         void compute_result();
         void sort_run(block_type * run, unsigned_type elements)
         {
-            if (block_type::has_filler)
+            if (block_type::has_only_data) {
+                std::sort(run[0].elem, run[0].elem + elements, cmp);
+            } else {
                 std::sort(
                     ArrayOfSequencesIterator<
                         block_type, typename block_type::value_type, block_type::size
@@ -118,9 +120,7 @@ namespace stream
                         block_type, typename block_type::value_type, block_type::size
                         >(run, elements),
                     cmp);
-
-            else
-                std::sort(run[0].elem, run[0].elem + elements, cmp);
+            }
         }
 
     public:
@@ -445,7 +445,9 @@ namespace stream
 
         void sort_run(block_type * run, unsigned_type elements)
         {
-            if (block_type::has_filler)
+            if (block_type::has_only_data) {
+                std::sort(run[0].elem, run[0].elem + elements, cmp);
+            } else {
                 std::sort(
                     ArrayOfSequencesIterator<
                         block_type, typename block_type::value_type, block_type::size
@@ -454,15 +456,13 @@ namespace stream
                         block_type, typename block_type::value_type, block_type::size
                         >(run, elements),
                     cmp);
-
-            else
-                std::sort(run[0].elem, run[0].elem + elements, cmp);
+            }
         }
+
         void finish_result()
         {
             if (cur_el == 0)
                 return;
-
 
             unsigned_type cur_el_reg = cur_el;
             sort_run(Blocks1, cur_el_reg);
@@ -508,6 +508,7 @@ namespace stream
                 if (write_reqs[i].get())
                     write_reqs[i]->wait();
         }
+
         void cleanup()
         {
             delete[] write_reqs;

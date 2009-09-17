@@ -179,7 +179,9 @@ namespace sort_local
             for (i = 0; i < run_size; ++i)
                 bm->delete_block(bids1[i]);
 
-            if (block_type::has_filler)
+            if (block_type::has_only_data) {
+                std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
+            } else {
                 std::sort(
                     ArrayOfSequencesIterator<
                         block_type, typename block_type::value_type, block_type::size
@@ -188,9 +190,7 @@ namespace sort_local
                         block_type, typename block_type::value_type, block_type::size
                         >(Blocks1, run_size * block_type::size),
                     cmp);
-            else
-                std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
-
+            }
 
             STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
             if (k > 0)
@@ -226,7 +226,9 @@ namespace sort_local
         for (i = 0; i < run_size; ++i)
             bm->delete_block(bids1[i]);
 
-        if (block_type::has_filler) {
+        if (block_type::has_only_data) {
+            std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
+        } else {
             std::sort(
                 ArrayOfSequencesIterator<
                     block_type, typename block_type::value_type, block_type::size
@@ -235,8 +237,6 @@ namespace sort_local
                     block_type, typename block_type::value_type, block_type::size
                     >(Blocks1, run_size * block_type::size),
                 cmp);
-        } else {
-            std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
         }
 
         STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");

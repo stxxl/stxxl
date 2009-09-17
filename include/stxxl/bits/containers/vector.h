@@ -992,7 +992,7 @@ public:
         exported(false)
     {
         // initialize from file
-        if (block_type::has_filler)
+        if (!block_type::has_only_data)
         {
             std::ostringstream str_;
             str_ << "The block size for the vector, mapped to a file must me a multiple of the element size (" <<

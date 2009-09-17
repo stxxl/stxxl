@@ -209,9 +209,9 @@ public:
 
     enum
     {
-        raw_size = RawSize_,                                                            //!< size of block in bytes
-        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size,                      //!< number of elements in block
-        has_filler = (RawSize_ != sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>)) //!< indicator for non-empty filler at the end
+        raw_size = RawSize_,                                        //!< size of block in bytes
+        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size,  //!< number of elements in block
+        has_only_data = (raw_size == (size * sizeof(value_type)))   //!< no meta info, bids or (non-empty) fillers included in the block, allows value_type array addressing across block boundaries
     };
 
     typedef BID<raw_size> bid_type;
