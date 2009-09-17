@@ -397,13 +397,13 @@ int main()
     test_reverse(Map);
 #endif
 
-    std::deque<double> D(1);
+    std::deque<double> D(8);
     test(D);
     test_reverse(D);
     test_random_access(D);
     test_random_access_reverse(D);
 
-    stxxl::deque<double> Deque(1);
+    stxxl::deque<double> Deque(8);
     test(Deque);
     test_reverse(Deque);
     test_random_access(Deque);
