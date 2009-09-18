@@ -194,4 +194,6 @@ int main()
     std::sort(InternalArray.begin(), InternalArray.end(), cmp_int());
     stxxl::sort<1024 * 1024>(InternalArray.begin(), InternalArray.end(),
                              cmp_int(), 1024 * 1024 * 10, stxxl::RC());
+
+    return 0;
 }
