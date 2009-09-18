@@ -250,19 +250,23 @@ endif
 
 #### BOOST OPTIONS ###############################################
 
-BOOST_COMPILER_OPTIONS		+= $(if $(strip $(BOOST_ROOT)),-I$(strip $(BOOST_ROOT)))
+BOOST_INCLUDE			?= $(if $(strip $(BOOST_ROOT)),$(strip $(BOOST_ROOT))/include)
+BOOST_COMPILER_OPTIONS		+= $(foreach inc,$(BOOST_INCLUDE),-I$(inc))
 BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_CONFIG
 BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_FILESYSTEM
 BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_RANDOM
 BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_THREADS
 #BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_TIMESTAMP   # probably less efficient than gettimeofday()
 
+BOOST_LIB_PATH			?= $(if $(strip $(BOOST_ROOT)),$(strip $(BOOST_ROOT))/lib)
 BOOST_LIB_COMPILER_SUFFIX	?= 
 BOOST_LIB_MT_SUFFIX		?= -mt
 BOOST_LINKER_OPTIONS		 = \
+	$(foreach lib,$(BOOST_LIB_PATH),-L$(lib)) \
 	-lboost_thread$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX) \
 	-lboost_date_time$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX) \
 	-lboost_iostreams$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX) \
+	-lboost_system$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX) \
 	-lboost_filesystem$(BOOST_LIB_COMPILER_SUFFIX)$(BOOST_LIB_MT_SUFFIX)
 
 ##################################################################
