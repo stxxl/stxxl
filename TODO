@@ -1,8 +1,5 @@
 * parallel_pipeling (is currently being developed in it's own branch)
 
-* There is currently no support for Boost libraries (not headers) in a user
-  specified location.
-
 * replace build system, something with '$LIBNAME-config --libs --cflags ...' would be nice
 
 * if the stxxl disk files have been enlarged because more external memory
