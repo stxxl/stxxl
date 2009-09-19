@@ -32,14 +32,6 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-template <typename Tp_, typename AllocStrategy_, typename SzTp_, typename DiffTp_,
-          unsigned BlockSize_, typename PgTp_, unsigned PageSize_, typename RandomNumberGenerator_>
-void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> first,
-                    stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, BlockSize_, PgTp_, PageSize_> last,
-                    RandomNumberGenerator_ & rand,
-                    unsigned_type M);
-
-
 //! \brief External equivalent of std::random_shuffle
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
@@ -67,6 +59,7 @@ void random_shuffle(ExtIterator_ first,
     typedef typename stack_type::block_type block_type;
 
     STXXL_VERBOSE1("random_shuffle: Plain Version");
+    STXXL_STATIC_ASSERT(BlockSize_ < 0 && "This implementation was never tested. Please report to the stxxl developers if you have an ExtIterator_ that works with this implementation.");
 
     stxxl::int64 n = last - first; // the number of input elements
 
