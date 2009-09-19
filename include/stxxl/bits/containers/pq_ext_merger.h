@@ -688,6 +688,7 @@ namespace priority_queue_local
                         if (state.bids == NULL || state.bids->empty()) // if there is no next block
                         {
                             STXXL_VERBOSE1("seq " << i << ": ext_merger::multi_merge(...) it was the last block in the sequence ");
+                            state.make_inf();
                         }
                         else
                         {
