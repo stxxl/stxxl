@@ -746,14 +746,6 @@ namespace priority_queue_local
                 }
             }
 
-            // compact tree if it got considerably smaller
-            {
-                const unsigned_type num_segments_used = std::min<unsigned_type>(arity, k) - free_segments.size();
-                const unsigned_type num_segments_trigger = k - (3 * k / 5);
-                if (k > 1 && num_segments_used <= num_segments_trigger)
-                    compact_tree();
-            }
-
 #else       // STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
 
             //Hint first non-internal (actually second) block of each sequence.
@@ -829,8 +821,8 @@ namespace priority_queue_local
                 break;
             }
 
-
             size_ -= length;
+#endif
 
             // compact tree if it got considerably smaller
             {
@@ -853,7 +845,6 @@ namespace priority_queue_local
                     compact_tree();
                 }
             }
-#endif
         }
 
     private:
