@@ -70,7 +70,6 @@ namespace stream
                     trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i].begin()),
                     trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i].end()));
 
-
             runs.clear();
         }
 
@@ -91,7 +90,7 @@ namespace stream
     //! Template parameters:
     //! - \c Input_ type of the input stream
     //! - \c Cmp_ type of comparison object used for sorting the runs
-    //! - \c BlockSize_ size of blocks used to store the runs
+    //! - \c BlockSize_ size of blocks used to store the runs (in bytes)
     //! - \c AllocStr_ functor that defines allocation strategy for the runs
     template <
         class Input_,
@@ -115,9 +114,9 @@ namespace stream
         typedef typename sorted_runs_type::run_type run_type;
         sorted_runs_type result_; // stores the result (sorted runs)
         unsigned_type m_;         // memory for internal use in blocks
-        bool result_computed;     // true result is already computed (used in 'result' method)
+        bool result_computed;     // true iff result is already computed (used in 'result' method)
 
-        void compute_result();
+        //! \brief Sort a specific run, contained in a sequences of blocks.
         void sort_run(block_type * run, unsigned_type elements)
         {
             if (block_type::has_only_data) {
@@ -135,7 +134,7 @@ namespace stream
         }
 
     public:
-        //! \brief Creates the object
+        //! \brief Create the object
         //! \param i input stream
         //! \param c comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
@@ -144,6 +143,8 @@ namespace stream
         {
             assert(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
         }
+
+        void compute_result();
 
         //! \brief Returns the sorted runs object
         //! \return Sorted runs object. The result is computed lazily, i.e. on the first call
@@ -156,13 +157,15 @@ namespace stream
                 result_computed = true;
 #ifdef STXXL_PRINT_STAT_AFTER_RF
                 STXXL_MSG(*stats::get_instance());
-#endif
+#endif //STXXL_PRINT_STAT_AFTER_RF
             }
             return result_;
         }
     };
 
-
+    //! \brief Finish the results, i. e. create all runs.
+    //!
+    //! This is the main routine of this class.
     template <class Input_, class Cmp_, unsigned BlockSize_, class AllocStr_>
     void runs_creator<Input_, Cmp_, BlockSize_, AllocStr_>::compute_result()
     {
@@ -210,7 +213,7 @@ namespace stream
             std::sort(result_.small_.begin(), result_.small_.end(), cmp);
             return;
         }
-#endif
+#endif //STXXL_SMALL_INPUT_PSORT_OPT
 
         while (!input.empty() && pos != el_in_run)
         {
@@ -428,6 +431,7 @@ namespace stream
         Cmp_,
         BlockSize_,
         AllocStr_>
+        : private noncopyable
     {
         Cmp_ cmp;
 
@@ -444,7 +448,7 @@ namespace stream
         sorted_runs_type result_; // stores the result (sorted runs)
         unsigned_type m_;         // memory for internal use in blocks
 
-        bool output_requested;    // true after the result() method was called for the first time
+        bool result_finished;     // true after the result() method was called for the first time
 
         const unsigned_type m2;
         const unsigned_type el_in_run;
@@ -533,7 +537,7 @@ namespace stream
         //! \param c comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
         runs_creator(Cmp_ c, unsigned_type memory_to_use) :
-            cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), output_requested(false),
+            cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), result_finished(false),
             m2(m_ / 2),
             el_in_run(m2 * block_type::size),
             cur_el(0),
@@ -546,7 +550,7 @@ namespace stream
 
         ~runs_creator()
         {
-            if (!output_requested)
+            if (!result_finished)
                 cleanup();
         }
 
@@ -554,7 +558,7 @@ namespace stream
         //! \param val value to be added
         void push(const value_type & val)
         {
-            assert(output_requested == false);
+            assert(result_finished == false);
             unsigned_type cur_el_reg = cur_el;
             if (cur_el_reg < el_in_run)
             {
@@ -603,14 +607,17 @@ namespace stream
         //! \remark Returned object is intended to be used by \c runs_merger object as input
         const sorted_runs_type & result()
         {
-            if (!output_requested)
+            if (1)
+            {
+            if (!result_finished)
             {
                 finish_result();
-                output_requested = true;
+                result_finished = true;
                 cleanup();
 #ifdef STXXL_PRINT_STAT_AFTER_RF
                 STXXL_MSG(*stats::get_instance());
 #endif
+            }
             }
             return result_;
         }
@@ -650,6 +657,7 @@ namespace stream
         Cmp_,
         BlockSize_,
         AllocStr_>
+        : private noncopyable
     {
         typedef ValueType_ value_type;
         typedef BID<BlockSize_> bid_type;
@@ -687,6 +695,7 @@ namespace stream
             iblock(0),
             irun(0)
         {
+            assert(m_ > 0);
             assert(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
         }
 
@@ -882,7 +891,7 @@ namespace stream
         unsigned_type nruns;
 #if STXXL_CHECK_ORDER_IN_SORTS
         typename block_type::value_type last_element;
-#endif
+#endif //STXXL_CHECK_ORDER_IN_SORTS
 
         void merge_recursively();
 
@@ -910,7 +919,7 @@ namespace stream
                 seqs = new std::vector<sequence>(nruns);
                 buffers = new std::vector<block_type *>(nruns);
 
-                for (unsigned_type i = 0; i < nruns; i++)                                       //initialize sequences
+                for (unsigned_type i = 0; i < nruns; ++i)                                       //initialize sequences
                 {
                     (*buffers)[i] = prefetcher->pull_block();                                   //get first block of each run
                     (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());  //this memory location stays the same, only the data is exchanged
@@ -919,7 +928,7 @@ namespace stream
 // end of STL-style merging
 #else
                 assert(false);
-#endif
+#endif //STXXL_PARALLEL_MULTIWAY_MERGE
             }
             else
             {
@@ -944,7 +953,7 @@ namespace stream
                     value_type * min_last_element = NULL;       // no element found yet
                     diff_type total_size = 0;
 
-                    for (seqs_size_type i = 0; i < (*seqs).size(); i++)
+                    for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
                     {
                         if ((*seqs)[i].first == (*seqs)[i].second)
                             continue;  // run empty
@@ -964,7 +973,7 @@ namespace stream
 
                     diff_type less_equal_than_min_last = 0;
                     // locate this element in all sequences
-                    for (seqs_size_type i = 0; i < (*seqs).size(); i++)
+                    for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
                     {
                         if ((*seqs)[i].first == (*seqs)[i].second)
                             continue;  // empty subsequence
@@ -989,7 +998,7 @@ namespace stream
 
                     STXXL_VERBOSE1("so long");
 
-                    for (seqs_size_type i = 0; i < (*seqs).size(); i++)
+                    for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
                     {
                         if ((*seqs)[i].first == (*seqs)[i].second)                        // run empty
                         {
@@ -1009,22 +1018,22 @@ namespace stream
                     }
                 } while (rest > 0 && (*seqs).size() > 0);
 
- #if STXXL_CHECK_ORDER_IN_SORTS
+#if STXXL_CHECK_ORDER_IN_SORTS
                 if (!stxxl::is_sorted(current_block->begin(), current_block->end(), cmp))
                 {
-                    for (value_type * i = current_block->begin() + 1; i != current_block->end(); i++)
+                    for (value_type * i = current_block->begin() + 1; i != current_block->end(); ++i)
                         if (cmp(*i, *(i - 1)))
                         {
                             STXXL_VERBOSE1("Error at position " << (i - current_block->begin()));
                         }
                     assert(false);
                 }
- #endif
+#endif //STXXL_CHECK_ORDER_IN_SORTS
 
 // end of STL-style merging
 #else
                 assert(false);
-#endif
+#endif //STXXL_PARALLEL_MULTIWAY_MERGE
             }
             else
             {
@@ -1051,7 +1060,7 @@ namespace stream
             prefetcher(NULL)
 #if STXXL_CHECK_ORDER_IN_SORTS
             , last_element(cmp.min_value())
-#endif
+#endif //STXXL_CHECK_ORDER_IN_SORTS
         {
             if (empty())
                 return;
@@ -1072,7 +1081,7 @@ namespace stream
 
 #if STXXL_CHECK_ORDER_IN_SORTS
             assert(check_sorted_runs(r, cmp));
-#endif
+#endif //STXXL_CHECK_ORDER_IN_SORTS
 
             current_block = new block_type;
 
@@ -1108,7 +1117,7 @@ namespace stream
                   STXXL_DIVRU(elements_remaining,size_type(block_type::size));
              */
             unsigned_type prefetch_seq_size = 0;
-            for (i = 0; i < nruns; i++)
+            for (i = 0; i < nruns; ++i)
             {
                 prefetch_seq_size += sruns.runs[i].size();
             }
@@ -1118,7 +1127,7 @@ namespace stream
             prefetch_seq = new int_type[prefetch_seq_size];
 
             typename run_type::iterator copy_start = consume_seq.begin();
-            for (i = 0; i < nruns; i++)
+            for (i = 0; i < nruns; ++i)
             {
                 copy_start = std::copy(
                     sruns.runs[i].begin(),
@@ -1146,8 +1155,7 @@ namespace stream
 #else
             for (i = 0; i < prefetch_seq_size; ++i)
                 prefetch_seq[i] = i;
-#endif
-
+#endif //STXXL_SORT_OPTIMAL_PREFETCHING
 
             prefetcher = new prefetcher_type(
                 consume_seq.begin(),
@@ -1196,7 +1204,7 @@ namespace stream
 #if STXXL_CHECK_ORDER_IN_SORTS
                     assert(stxxl::is_sorted(current_block->elem, current_block->elem + current_block->size, cmp));
                     assert(!cmp(current_block->elem[0], current_value));
-#endif
+#endif //STXXL_CHECK_ORDER_IN_SORTS
                     current_value = current_block->elem[0];
                     buffer_pos = 1;
                 }
@@ -1211,7 +1219,7 @@ namespace stream
                 assert(!cmp(current_value, last_element));
                 last_element = current_value;
             }
-#endif
+#endif //STXXL_CHECK_ORDER_IN_SORTS
 
             return *this;
         }
@@ -1517,7 +1525,7 @@ void sort(RandomAccessIterator begin,
     typedef typename streamify_traits<RandomAccessIterator>::stream_type InputType;
 #else
     typedef __typeof__(stream::streamify(begin, end)) InputType;
-#endif
+#endif //BOOST_MSVC
     InputType Input(begin, end);
     typedef stream::sort<InputType, CmpType, BlockSize, AllocStr> sorter_type;
     sorter_type Sort(Input, cmp, MemSize);

@@ -134,12 +134,12 @@ namespace stream
         typedef buf_istream<typename InputIterator_::block_type,
                             typename InputIterator_::bids_container_iterator> buf_istream_type;
 
-        typedef typename stxxl::compat_unique_ptr<buf_istream_type>::result unique_ptr_type;
-        mutable unique_ptr_type in;
+        typedef typename stxxl::compat_unique_ptr<buf_istream_type>::result buf_istream_unique_ptr_type;
+        mutable buf_istream_unique_ptr_type in;
 
         void delete_stream()
         {
-            in.reset();
+            in.reset();  // delete object
         }
 
     public:
@@ -149,7 +149,7 @@ namespace stream
         typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
 
         vector_iterator2stream(InputIterator_ begin, InputIterator_ end, unsigned_type nbuffers = 0) :
-            current_(begin), end_(end)
+            current_(begin), end_(end), in(NULL)
         {
             begin.flush();     // flush container
             typename InputIterator_::bids_container_iterator end_iter = end.bid() + ((end.block_offset()) ? 1 : 0);
@@ -574,12 +574,12 @@ namespace stream
     //! \brief A model of stream that outputs data from an adaptable generator functor
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c generator2stream .
-    template <class Generator_>
+    template <class Generator_, typename T = typename Generator_::value_type>
     class generator2stream
     {
     public:
         //! \brief Standard stream typedef
-        typedef typename Generator_::value_type value_type;
+        typedef T value_type;
 
     private:
         Generator_ gen_;
@@ -1155,7 +1155,9 @@ namespace stream
     //! - \c Input1_ type of the 1st input
     //! - \c Input2_ type of the 2nd input
     //! \remark A specialization of \c make_tuple .
-    template <class Input1_, class Input2_>
+    template <class Input1_,
+              class Input2_
+              >
     class make_tuple<Input1_, Input2_, Stopper, Stopper, Stopper, Stopper>
     {
         Input1_ & i1;
@@ -1223,7 +1225,10 @@ namespace stream
     //! - \c Input2_ type of the 2nd input
     //! - \c Input3_ type of the 3rd input
     //! \remark A specialization of \c make_tuple .
-    template <class Input1_, class Input2_, class Input3_>
+    template <class Input1_,
+              class Input2_,
+              class Input3_
+              >
     class make_tuple<Input1_, Input2_, Input3_, Stopper, Stopper, Stopper>
     {
         Input1_ & i1;
@@ -1822,7 +1827,11 @@ namespace stream
                 ++input;
         }
         //! \brief Standard stream method
-        const value_type operator * () const { return current; }
+        const value_type & operator * () const
+        {
+            return current;
+        }
+
         //! \brief Standard stream method
         const value_type * operator -> () const
         {
@@ -1858,7 +1867,10 @@ namespace stream
                 ++input;
         }
         //! \brief Standard stream method
-        value_type operator * () const { return current; }
+        value_type & operator * () const
+        {
+            return current;
+        }
 
         //! \brief Standard stream method
         const value_type * operator -> () const
