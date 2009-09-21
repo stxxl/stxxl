@@ -56,6 +56,11 @@ namespace stream
     //!
     //! \{
 
+
+    ////////////////////////////////////////////////////////////////////////
+    //     STREAMIFY                                                      //
+    ////////////////////////////////////////////////////////////////////////
+
     //! \brief A model of stream that retrieves the data from an input iterator
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c iterator2stream .
@@ -370,6 +375,11 @@ namespace stream
                    (begin, end, nbuffers);
     }
 
+
+    ////////////////////////////////////////////////////////////////////////
+    //     MATERIALIZE                                                    //
+    ////////////////////////////////////////////////////////////////////////
+
     //! \brief Stores consecutively stream content to an output iterator
     //! \param in stream to be stored used as source
     //! \param out output iterator used as destination
@@ -557,6 +567,10 @@ namespace stream
     }
 
 
+    ////////////////////////////////////////////////////////////////////////
+    //     GENERATE                                                       //
+    ////////////////////////////////////////////////////////////////////////
+
     //! \brief A model of stream that outputs data from an adaptable generator functor
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c generator2stream .
@@ -610,6 +624,11 @@ namespace stream
     {
         return generator2stream<Generator_>(gen_);
     }
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //     TRANSFORM                                                      //
+    ////////////////////////////////////////////////////////////////////////
 
     struct Stopper { };
 
@@ -693,6 +712,10 @@ namespace stream
 
     // Specializations
 
+    ////////////////////////////////////////////////////////////////////////
+    //     TRANSFORM (1 input stream)                                     //
+    ////////////////////////////////////////////////////////////////////////
+
     //! \brief Processes an input stream using given operation functor
     //!
     //! Template parameters:
@@ -747,6 +770,10 @@ namespace stream
         }
     };
 
+
+    ////////////////////////////////////////////////////////////////////////
+    //     TRANSFORM (2 input streams)                                    //
+    ////////////////////////////////////////////////////////////////////////
 
     //! \brief Processes 2 input streams using given operation functor
     //!
@@ -807,6 +834,10 @@ namespace stream
         }
     };
 
+
+    ////////////////////////////////////////////////////////////////////////
+    //     TRANSFORM (3 input streams)                                    //
+    ////////////////////////////////////////////////////////////////////////
 
     //! \brief Processes 3 input streams using given operation functor
     //!
@@ -872,6 +903,10 @@ namespace stream
         }
     };
 
+
+    ////////////////////////////////////////////////////////////////////////
+    //     TRANSFORM (4 input streams)                                    //
+    ////////////////////////////////////////////////////////////////////////
 
     //! \brief Processes 4 input streams using given operation functor
     //!
@@ -941,6 +976,10 @@ namespace stream
         }
     };
 
+
+    ////////////////////////////////////////////////////////////////////////
+    //     TRANSFORM (5 input streams)                                    //
+    ////////////////////////////////////////////////////////////////////////
 
     //! \brief Processes 5 input streams using given operation functor
     //!
@@ -1015,6 +1054,11 @@ namespace stream
         }
     };
 
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //     MAKE TUPLE                                                     //
+    ////////////////////////////////////////////////////////////////////////
 
     //! \brief Creates stream of 6-tuples from 6 input streams
     //!
@@ -1401,6 +1445,10 @@ namespace stream
     };
 
 
+    ////////////////////////////////////////////////////////////////////////
+    //     CHOOSE                                                         //
+    ////////////////////////////////////////////////////////////////////////
+
     template <class Input_, int Which>
     class choose
     { };
@@ -1740,6 +1788,11 @@ namespace stream
             return in.empty();
         }
     };
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //     UNIQUE                                                         //
+    ////////////////////////////////////////////////////////////////////////
 
     //! \brief Equivalent to std::unique algorithms
     //!

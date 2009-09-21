@@ -30,6 +30,12 @@ namespace stream
     //! \addtogroup streampack Stream package
     //! \{
 
+
+    ////////////////////////////////////////////////////////////////////////
+    //     SORTED RUNS                                                    //
+    ////////////////////////////////////////////////////////////////////////
+
+    //! \brief All sorted runs of a sort operation.
     template <class ValueType, class TriggerEntryType>
     struct sorted_runs
     {
@@ -74,6 +80,11 @@ namespace stream
             return elements;
         }
     };
+
+
+    ////////////////////////////////////////////////////////////////////////
+    //     CREATE RUNS                                                    //
+    ////////////////////////////////////////////////////////////////////////
 
     //! \brief Forms sorted runs of data from a stream
     //!
@@ -823,6 +834,10 @@ namespace stream
     }
 
 
+    ////////////////////////////////////////////////////////////////////////
+    //     MERGE RUNS                                                     //
+    ////////////////////////////////////////////////////////////////////////
+
     //! \brief Merges sorted runs
     //!
     //! Template parameters:
@@ -1376,6 +1391,10 @@ namespace stream
         }
     }
 
+
+    ////////////////////////////////////////////////////////////////////////
+    //     SORT                                                           //
+    ////////////////////////////////////////////////////////////////////////
 
     //! \brief Produces sorted stream from input stream
     //!
