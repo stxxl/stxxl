@@ -133,6 +133,8 @@ namespace stream
             }
         }
 
+        void compute_result();
+
     public:
         //! \brief Create the object
         //! \param i input stream
@@ -143,8 +145,6 @@ namespace stream
         {
             assert(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
         }
-
-        void compute_result();
 
         //! \brief Returns the sorted runs object
         //! \return Sorted runs object. The result is computed lazily, i.e. on the first call
@@ -448,7 +448,7 @@ namespace stream
         sorted_runs_type result_; // stores the result (sorted runs)
         unsigned_type m_;         // memory for internal use in blocks
 
-        bool result_finished;     // true after the result() method was called for the first time
+        bool result_computed;     // true after the result() method was called for the first time
 
         const unsigned_type m2;
         const unsigned_type el_in_run;
@@ -474,7 +474,7 @@ namespace stream
             }
         }
 
-        void finish_result()
+        void compute_result()
         {
             if (cur_el == 0)
                 return;
@@ -537,7 +537,7 @@ namespace stream
         //! \param c comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
         runs_creator(Cmp_ c, unsigned_type memory_to_use) :
-            cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), result_finished(false),
+            cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), result_computed(false),
             m2(m_ / 2),
             el_in_run(m2 * block_type::size),
             cur_el(0),
@@ -550,7 +550,7 @@ namespace stream
 
         ~runs_creator()
         {
-            if (!result_finished)
+            if (!result_computed)
                 cleanup();
         }
 
@@ -558,7 +558,7 @@ namespace stream
         //! \param val value to be added
         void push(const value_type & val)
         {
-            assert(result_finished == false);
+            assert(result_computed == false);
             unsigned_type cur_el_reg = cur_el;
             if (cur_el_reg < el_in_run)
             {
@@ -609,10 +609,10 @@ namespace stream
         {
             if (1)
             {
-            if (!result_finished)
+            if (!result_computed)
             {
-                finish_result();
-                result_finished = true;
+                compute_result();
+                result_computed = true;
                 cleanup();
 #ifdef STXXL_PRINT_STAT_AFTER_RF
                 STXXL_MSG(*stats::get_instance());
