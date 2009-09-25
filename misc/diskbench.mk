@@ -36,6 +36,10 @@ pipefail	?= set -o pipefail;
 
 $(foreach d,$(DISKS_1by1),$(eval DISKS_$d ?= $d))
 
+ifeq ($(SHELL),/bin/sh)
+SHELL		 = bash
+endif
+
 define do-some-disks
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
