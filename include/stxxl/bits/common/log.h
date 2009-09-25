@@ -38,9 +38,10 @@ class logger : public singleton<logger>
         errlog_stream_.open(errlog_filename == NULL ? "stxxl.errlog" : errlog_filename);
 #ifdef STXXL_WAIT_LOG_ENABLED
         const char * waitlog_filename = getenv("STXXLWAITLOGFILE");
-        waitlog_stream_ = new std::ofstream();
-        waitlog_stream_->open(waitlog_filename == NULL ? "stxxl.waitlog" : waitlog_filename);
-        *waitlog_stream_ << "# time\trd_incr\twr_incr\tw_read\tw_write" << std::endl;
+        if (waitlog_filename) {
+            waitlog_stream_ = new std::ofstream(waitlog_filename);
+            *waitlog_stream_ << "# time\trd_incr\twr_incr\tw_read\tw_write" << std::endl;
+        }
 #endif
     }
     
@@ -60,9 +61,9 @@ public:
         return errlog_stream_;
     }
 
-    inline std::ofstream & waitlog_stream()
+    inline std::ofstream * waitlog_stream()
     {
-        return *waitlog_stream_;
+        return waitlog_stream_;
     }
 };
 

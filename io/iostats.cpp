@@ -267,7 +267,9 @@ void stats::wait_finished(wait_op_type wait_op)
             p_wait_write += (acc_wait_write--) ? diff : 0.0;
         }
 #ifdef STXXL_WAIT_LOG_ENABLED
-        stxxl::logger::get_instance()->waitlog_stream() << (now - last_reset) << "\t"
+        std::ofstream * waitlog = stxxl::logger::get_instance()->waitlog_stream();
+        if (waitlog)
+            *waitlog << (now - last_reset) << "\t"
             << ((wait_op == WAIT_OP_READ) ? diff : 0.0) << "\t"
             << ((wait_op != WAIT_OP_READ) ? diff : 0.0) << "\t"
             << t_wait_read << "\t" << t_wait_write << std::endl << std::flush;

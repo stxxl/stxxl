@@ -28,7 +28,8 @@
 //#define STXXL_WAIT_LOG_ENABLED
 // default: not defined
 // used in: io/iostats.{h,cpp}
-// effect:  writes wait timing information to stxxl.waitlog
+// effect:  writes wait timing information to the file given via environment
+//          variable STXXLWAITLOGFILE, does nothing if this is not defined
 
 //#define STXXL_SORT_OPTIMAL_PREFETCHING 0/1
 // default: 1
