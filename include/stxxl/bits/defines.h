@@ -25,6 +25,11 @@
 // used in: io/iostats.{h,cpp}
 // effect:  makes calls to wait time counting functions no-ops
 
+//#define STXXL_WAIT_LOG_ENABLED
+// default: not defined
+// used in: io/iostats.{h,cpp}
+// effect:  writes wait timing information to stxxl.waitlog
+
 //#define STXXL_SORT_OPTIMAL_PREFETCHING 0/1
 // default: 1
 // used in: algo/*sort.h, stream/sort_stream.h
