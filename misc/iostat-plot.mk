@@ -47,6 +47,7 @@ IOSTAT_PLOT_OFFSET_read_12	?= 6
 IOSTAT_PLOT_OFFSET_write_12	?= 7
 IOSTAT_PLOT_OFFSET_read_14	?= 8
 IOSTAT_PLOT_OFFSET_write_14	?= 9
+IOSTAT_PLOT_DISK_LIST		?= sda sdb sdc sdd sde sdf sdg sdh sdi sdj
 
 IOSTAT_PLOT_Y_LABEL.io		?= Bandwidth [MiB/s]
 IOSTAT_PLOT_Y_LABEL.cpu		?= CPU Usage [%]
@@ -60,7 +61,7 @@ endef
 define template-iostat-gnuplot
 	$(RM) $@
 	echo 'set title "$(subst _, ,$*) (avg=$(IOSTAT_PLOT_AVERAGE.$(strip $1)))"' >> $@
-	echo 'set xlabel "Time"' >> $@
+	echo 'set xlabel "Time [s]"' >> $@
 	echo 'set ylabel "$(IOSTAT_PLOT_Y_LABEL.$(strip $1))"' >> $@
 #	echo 'set data style linespoints' >> $@
 	echo 'set data style lines' >> $@
@@ -104,18 +105,30 @@ endef
 	grep "$(IOSTAT_PLOT_LINE_IDENTIFIER)" | \
 	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.io) > $@
 
+define per-disk-plot-template
+%.$(disk).io-$$(IOSTAT_PLOT_AVERAGE.io).dat: IOSTAT_PLOT_LINE_IDENTIFIER=^$(disk)
+%.$(disk).io-$$(IOSTAT_PLOT_AVERAGE.io).plot: IOSTAT_PLOT_DISKS=1
+
+%.$(disk).io-$$(IOSTAT_PLOT_AVERAGE.io).dat: %.iostat $$(wildcard $$(TOPDIR_RESULTS)/*.mk Makefile*)
+	$$(pipefail) \
+	$$(IOSTAT_PLOT_CONCAT_LINES) $$< $$(IOSTAT_PLOT_LINE_IDENTIFIER) | \
+	grep "$$(IOSTAT_PLOT_LINE_IDENTIFIER)" | \
+	$$(IOSTAT_PLOT_FLOATING_AVERAGE) $$(IOSTAT_PLOT_AVERAGE.io) > $$@
+endef
+$(foreach disk, $(IOSTAT_PLOT_DISK_LIST),$(eval $(per-disk-plot-template)))
+
 %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).dat: %.iostat $(wildcard $(TOPDIR_RESULTS)/*.mk Makefile*)
 	$(pipefail) \
 	grep "$(IOSTAT_PLOT_CPU_LINE_IDENTIFIER)" $< | \
 	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.cpu) > $@
 
-%.io-$(IOSTAT_PLOT_AVERAGE.io).plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).dat
+%.io-$(IOSTAT_PLOT_AVERAGE.io).plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).dat $(wildcard $(TOPDIR_RESULTS)/*.mk Makefile*)
 	$(call template-iostat-gnuplot,io,$(IOSTAT_PLOT_DISKS),$(IOSTAT_PLOT_STRIDE))
 
 %.io.plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).plot
 	@echo Your plot file is: $<
 
-%.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).plot: %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).dat %.loadavg
+%.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).plot: %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).dat %.loadavg $(wildcard $(TOPDIR_RESULTS)/*.mk Makefile*)
 	$(call template-iostat-gnuplot,cpu,$(IOSTAT_PLOT_CPUS),$(IOSTAT_PLOT_STRIDE))
 
 %.cpu.plot: %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).plot
