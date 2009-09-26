@@ -70,7 +70,11 @@ $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
 	echo 'set y2label "Utilization [%]"' >> $@
 	echo 'set ytics nomirror' >> $@
 	echo 'set y2tics' >> $@
-)
+,$(if $(wildcard $*.waitlog),
+	echo 'set y2label "Wait Time [s]"' >> $@
+	echo 'set ytics nomirror' >> $@
+	echo 'set y2tics' >> $@
+))
 #	echo 'set data style linespoints' >> $@
 	echo 'set data style lines' >> $@
 	echo 'set macros' >> $@
@@ -90,7 +94,10 @@ $(if $(filter io,$1),
 	echo '	"$<" using 0:(@write) title "Write" ls 1$(comma) \' >> $@
 $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
 	echo '	"$<" using 0:(@utilize) title "Utilization" ls 5 axes x1y2$(comma) \' >> $@
-)
+,$(if $(wildcard $*.waitlog),
+	echo '	"$*.waitlog" using 1:4 title "Wait Read" ls 5 axes x1y2$(comma) \' >> $@
+	echo '	"$*.waitlog" using 1:5 title "Wait Write" ls 4 axes x1y2$(comma) \' >> $@
+))
 	echo '	"not.existing.dummy" using 08:15 notitle' >> $@
 )
 $(if $(filter cpu,$1),
