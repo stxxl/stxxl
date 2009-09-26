@@ -1,6 +1,6 @@
 TESTS			 = test_random
 TESTS_NON_MSVC		 =
 
-LIB_SRC			 = debug.cpp rand.cpp seed.cpp version.cpp
+LIB_SRC			 = debug.cpp rand.cpp seed.cpp version.cpp exithandler.cpp
 
 UTIL_BINARIES		 = stxxl_info

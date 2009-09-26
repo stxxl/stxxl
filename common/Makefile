@@ -21,6 +21,9 @@ version.$(OBJEXT): version.cpp
 seed.$(OBJEXT): seed.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c seed.cpp
 
+exithandler.$(OBJEXT): exithandler.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c exithandler.cpp
+
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 

@@ -120,7 +120,8 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/types.h \
 	$(HEADER_PATH)/common/settings.h \
 	$(HEADER_PATH)/common/seed.h  \
-	$(HEADER_PATH)/common/is_sorted.h 
+	$(HEADER_PATH)/common/is_sorted.h \
+	$(HEADER_PATH)/common/exithandler.h 
 
 IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/io.h \
