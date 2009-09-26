@@ -102,6 +102,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/parallel.h \
 	$(HEADER_PATH)/singleton.h \
 	$(HEADER_PATH)/defines.h \
+	$(HEADER_PATH)/verbose.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
 	$(HEADER_PATH)/common/mutex.h \
 	$(HEADER_PATH)/common/rand.h \
@@ -121,7 +122,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/settings.h \
 	$(HEADER_PATH)/common/seed.h  \
 	$(HEADER_PATH)/common/is_sorted.h \
-	$(HEADER_PATH)/common/exithandler.h 
+	$(HEADER_PATH)/common/exithandler.h
 
 IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/io.h \
