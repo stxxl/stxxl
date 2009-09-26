@@ -15,6 +15,7 @@
 #include <sstream>
 #include <iomanip>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/common/log.h>
 
 
 __STXXL_BEGIN_NAMESPACE

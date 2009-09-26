@@ -16,6 +16,7 @@
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/version.h>
 #include <stxxl/bits/common/debug.h>
+#include <stxxl/bits/common/log.h>
 
 
 __STXXL_BEGIN_NAMESPACE

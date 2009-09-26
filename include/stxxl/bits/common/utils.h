@@ -41,8 +41,8 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE
