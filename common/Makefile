@@ -6,7 +6,7 @@ tools: $(UTIL_BINARIES)
 tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
-lib: debug.$(OBJEXT) rand.$(OBJEXT) version.$(OBJEXT) seed.$(OBJEXT)
+lib: debug.$(OBJEXT) rand.$(OBJEXT) version.$(OBJEXT) seed.$(OBJEXT) exithandler.$(OBJEXT)
 
 
 debug.$(OBJEXT): debug.cpp
