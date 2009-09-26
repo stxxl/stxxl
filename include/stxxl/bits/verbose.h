@@ -14,12 +14,26 @@
 #define STXXL_VERBOSE_HEADER
 
 #include <iostream>
+#include <string>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/log.h>
 
 
+#define _STXXL_PRNT_COUT        (1 << 0)
+#define _STXXL_PRNT_CERR        (1 << 1)
+#define _STXXL_PRNT_LOG         (1 << 2)
+#define _STXXL_PRNT_ERRLOG      (1 << 3)
+#define _STXXL_PRNT_ADDNEWLINE  (1 << 16)
+#define _STXXL_PRNT_TIMESTAMP   (1 << 17)
+
+#define _STXXL_PRINT_FLAGS_DEFAULT  (_STXXL_PRNT_COUT | _STXXL_PRNT_LOG)
+#define _STXXL_PRINT_FLAGS_ERROR    (_STXXL_PRNT_CERR | _STXXL_PRNT_ERRLOG)
+#define _STXXL_PRINT_FLAGS_VERBOSE  (_STXXL_PRINT_FLAGS_DEFAULT | _STXXL_PRNT_TIMESTAMP)
+
+
 __STXXL_BEGIN_NAMESPACE
 
+void print_msg(const char * label, const std::string & msg, unsigned_type flags);
 
 __STXXL_END_NAMESPACE
 
@@ -33,9 +47,15 @@ __STXXL_END_NAMESPACE
       stxxl::logger::get_instance()->log_stream() << str_.str() << std::flush; \
     } __STXXL_ENFORCE_SEMICOLON
 
+#define _STXXL_PRINT3(label, message, flags) \
+    { std::ostringstream str_; \
+      str_ << message << std::endl; \
+      stxxl::print_msg(label, str_.str(), flags); \
+    } __STXXL_ENFORCE_SEMICOLON
+
 #define _STXXL_NOT_VERBOSE { } __STXXL_ENFORCE_SEMICOLON
 
-#define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", std::cout, log_stream, x)
+#define STXXL_MSG(x) _STXXL_PRINT3("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
 
 #define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", std::cerr, errlog_stream, x)
 

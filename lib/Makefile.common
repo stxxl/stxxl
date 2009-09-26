@@ -21,6 +21,7 @@ LIB_OBJECTS = \
 	../common/rand.$(OBJEXT) \
 	../common/seed.$(OBJEXT) \
 	../common/exithandler.$(OBJEXT) \
+	../common/verbose.$(OBJEXT) \
 	../common/version.$(OBJEXT)
 
 LIB_OBJECTS_NON_MSVC = \
