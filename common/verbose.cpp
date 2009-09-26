@@ -17,6 +17,14 @@
 #include <stxxl/bits/common/log.h>
 #include <stxxl/bits/common/timer.h>
 
+#ifdef STXXL_BOOST_CONFIG
+#include <boost/config.hpp>
+#endif
+
+#ifdef BOOST_MSVC
+#define snprintf _snprintf
+#endif
+
 
 __STXXL_BEGIN_NAMESPACE
 
