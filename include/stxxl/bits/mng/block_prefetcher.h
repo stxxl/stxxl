@@ -130,10 +130,10 @@ public:
                            << " prefetch_seq[" << i << "]=" << prefetch_seq[i]);
             assert(prefetch_seq[i] < int_type(seq_length));
             assert(prefetch_seq[i] >= 0);
-            read_reqs[i] = read_buffers[i].read(
-                *(consume_seq_begin + prefetch_seq[i]),
-                set_switch_handler(*(completed + prefetch_seq[i])));
             read_bids[i] = *(consume_seq_begin + prefetch_seq[i]);
+            read_reqs[i] = read_buffers[i].read(
+                read_bids[i],
+                set_switch_handler(*(completed + prefetch_seq[i])));
             pref_buffer[prefetch_seq[i]] = i;
         }
     }
@@ -168,11 +168,11 @@ public:
             assert(!completed[next_2_prefetch].is_on());
 
             pref_buffer[next_2_prefetch] = ibuffer;
+            read_bids[ibuffer] = *(consume_seq_begin + next_2_prefetch);
             read_reqs[ibuffer] = read_buffers[ibuffer].read(
-                *(consume_seq_begin + next_2_prefetch),
+                read_bids[ibuffer],
                 set_switch_handler(*(completed + next_2_prefetch))
                 );
-            read_bids[ibuffer] = *(consume_seq_begin + next_2_prefetch);
         }
 
         if (nextconsume >= seq_length)
