@@ -40,7 +40,7 @@ void print_msg(const char * label, const std::string & msg, unsigned flags)
                 int(t / (24 * 60 * 60)),
                 int(t / (60 * 60)) % 24,
                 int(t / 60) % 60, int(t) % 60,
-                int((t - floor(t)) * 10000));
+                int((t - floor(t)) * 1000000));
         s += tstr;
     }
     if (label) {
