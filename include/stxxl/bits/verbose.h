@@ -3,6 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
+ *  Copyright (C) 2005-2006 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
@@ -16,7 +17,6 @@
 #include <iostream>
 #include <string>
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/common/log.h>
 
 
 #define _STXXL_PRNT_COUT        (1 << 0)
@@ -33,21 +33,14 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-void print_msg(const char * label, const std::string & msg, unsigned_type flags);
+void print_msg(const char * label, const std::string & msg, unsigned flags);
 
 __STXXL_END_NAMESPACE
 
 
 #define __STXXL_ENFORCE_SEMICOLON stxxl::UNUSED("expecting the next token to be a ';'")
 
-#define _STXXL_PRINT(label, outstream, log_stream, message) \
-    { std::ostringstream str_; \
-      str_ << "[" label "] " << message << std::endl; \
-      outstream << str_.str() << std::flush; \
-      stxxl::logger::get_instance()->log_stream() << str_.str() << std::flush; \
-    } __STXXL_ENFORCE_SEMICOLON
-
-#define _STXXL_PRINT3(label, message, flags) \
+#define _STXXL_PRINT(label, message, flags) \
     { std::ostringstream str_; \
       str_ << message << std::endl; \
       stxxl::print_msg(label, str_.str(), flags); \
@@ -55,9 +48,9 @@ __STXXL_END_NAMESPACE
 
 #define _STXXL_NOT_VERBOSE { } __STXXL_ENFORCE_SEMICOLON
 
-#define STXXL_MSG(x) _STXXL_PRINT3("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
+#define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
 
-#define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", std::cerr, errlog_stream, x)
+#define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", x, _STXXL_PRINT_FLAGS_ERROR)
 
 
 #ifdef STXXL_FORCE_VERBOSE_LEVEL
@@ -80,13 +73,13 @@ __STXXL_END_NAMESPACE
 // Code that actively uses STXXL_VERBOSE0 should never get into a release.
 
 #if STXXL_VERBOSE_LEVEL > -1
- #define STXXL_VERBOSE0(x) _STXXL_PRINT("STXXL-VERBOSE0", std::cout, log_stream, x)
+ #define STXXL_VERBOSE0(x) _STXXL_PRINT("STXXL-VERBOSE0", x, _STXXL_PRINT_FLAGS_VERBOSE)
 #else
  #define STXXL_VERBOSE0(x) _STXXL_NOT_VERBOSE
 #endif
 
 #if STXXL_VERBOSE_LEVEL > 0
- #define STXXL_VERBOSE1(x) _STXXL_PRINT("STXXL-VERBOSE1", std::cout, log_stream, x)
+ #define STXXL_VERBOSE1(x) _STXXL_PRINT("STXXL-VERBOSE1", x, _STXXL_PRINT_FLAGS_VERBOSE)
 #else
  #define STXXL_VERBOSE1(x) _STXXL_NOT_VERBOSE
 #endif
@@ -94,13 +87,13 @@ __STXXL_END_NAMESPACE
 #define STXXL_VERBOSE(x) STXXL_VERBOSE1(x)
 
 #if STXXL_VERBOSE_LEVEL > 1
- #define STXXL_VERBOSE2(x) _STXXL_PRINT("STXXL-VERBOSE2", std::cout, log_stream, x)
+ #define STXXL_VERBOSE2(x) _STXXL_PRINT("STXXL-VERBOSE2", x, _STXXL_PRINT_FLAGS_VERBOSE)
 #else
  #define STXXL_VERBOSE2(x) _STXXL_NOT_VERBOSE
 #endif
 
 #if STXXL_VERBOSE_LEVEL > 2
- #define STXXL_VERBOSE3(x) _STXXL_PRINT("STXXL-VERBOSE3", std::cout, log_stream, x)
+ #define STXXL_VERBOSE3(x) _STXXL_PRINT("STXXL-VERBOSE3", x, _STXXL_PRINT_FLAGS_VERBOSE)
 #else
  #define STXXL_VERBOSE3(x) _STXXL_NOT_VERBOSE
 #endif

@@ -11,21 +11,34 @@
  **************************************************************************/
 
 #include <iostream>
+#include <cstdio>
+#include <cmath>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/log.h>
+#include <stxxl/bits/common/timer.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-void print_msg(const char * label, const std::string & msg, unsigned_type flags)
+static const double program_start_time_stamp = timestamp();
+
+void print_msg(const char * label, const std::string & msg, unsigned flags)
 {
     std::string s;
+    if (flags & _STXXL_PRNT_TIMESTAMP) {
+        double t = timestamp() - program_start_time_stamp;
+        char tstr[23]; /* "[364:23:59:59.999999] " */
+        snprintf(tstr, sizeof(tstr), "[%d.%02d:%02d:%02d.%06d] ",
+                int(t / (24 * 60 * 60)),
+                int(t / (60 * 60)) % 24,
+                int(t / 60) % 60, int(t) % 60,
+                int((t - floor(t)) * 10000));
+        s += tstr;
+    }
     if (label) {
         s += '[';
         s += label;
         s += "] ";
-    }
-    if (flags & _STXXL_PRNT_TIMESTAMP) {
     }
     s += msg;
     if (flags & _STXXL_PRNT_ADDNEWLINE)
