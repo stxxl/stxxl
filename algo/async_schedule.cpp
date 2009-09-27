@@ -114,8 +114,8 @@ int_type simulate_async_write(
 
 
 void compute_prefetch_schedule(
-    int_type * first,
-    int_type * last,
+    const int_type * first,
+    const int_type * last,
     int_type * out_first,
     int_type m,
     int_type D)
@@ -136,7 +136,7 @@ void compute_prefetch_schedule(
     STXXL_VERBOSE1("Write steps: " << w_steps);
 
     for (int_type i = 0; i < L; i++)
-        STXXL_MSG(first[i] << " " << write_order[i].first << " " << write_order[i].second);
+        STXXL_VERBOSE1(first[i] << " " << write_order[i].first << " " << write_order[i].second);
 
     std::stable_sort(write_order, write_order + L, write_time_cmp());
 

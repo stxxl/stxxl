@@ -63,11 +63,21 @@ struct write_time_cmp : public std::binary_function<write_time_pair, write_time_
 };
 
 void compute_prefetch_schedule(
+    const int_type * first,
+    const int_type * last,
+    int_type * out_first,
+    int_type m,
+    int_type D);
+
+inline void compute_prefetch_schedule(
     int_type * first,
     int_type * last,
     int_type * out_first,
     int_type m,
-    int_type D);
+    int_type D)
+{
+    compute_prefetch_schedule(static_cast<const int_type *>(first), last, out_first, m, D);
+}
 
 template <typename run_type>
 void simulate_async_write(
