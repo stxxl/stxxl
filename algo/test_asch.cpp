@@ -48,8 +48,13 @@ int main(int argc, char * argv[])
     for (i = 0; i < D; i++)
         std::cout << "Disk " << i << " has " << count[i] << " blocks" << std::endl;
 
-
     stxxl::compute_prefetch_schedule(disks, disks + L, prefetch_order, m, D);
+
+    for (i = 0; i < L; ++i) {
+        int j;
+        for (j = 0; prefetch_order[j] != i; ++j) ;
+        STXXL_MSG("request " << i << "  on disk " << disks[i] << "  scheduled as " << j);
+    }
 
     delete[] count;
     delete[] disks;
