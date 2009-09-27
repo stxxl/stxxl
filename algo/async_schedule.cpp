@@ -14,9 +14,10 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+namespace async_schedule_local {
 
 int_type simulate_async_write(
-    int_type * disks,
+    const int_type * disks,
     const int_type L,
     const int_type m_init,
     const int_type D,
@@ -64,7 +65,7 @@ int_type simulate_async_write(
         }
 
 
-        STXXL_MSG("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock]);
+        STXXL_VERBOSE1("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock]);
         o_time[cur.iblock] = std::pair<int_type, int_type>(cur.iblock, cur.timestamp);
 
         m++;
@@ -109,6 +110,8 @@ int_type simulate_async_write(
     return (oldtime - 1);
 }
 
+}  // namespace async_schedule_local
+
 
 void compute_prefetch_schedule(
     int_type * first,
@@ -128,9 +131,9 @@ void compute_prefetch_schedule(
     }
     pair_type * write_order = new pair_type[L];
 
-    int_type w_steps = simulate_async_write(first, L, m, D, write_order);
+    int_type w_steps = async_schedule_local::simulate_async_write(first, L, m, D, write_order);
 
-    STXXL_MSG("Write steps: " << w_steps);
+    STXXL_VERBOSE1("Write steps: " << w_steps);
 
     for (int_type i = 0; i < L; i++)
         STXXL_MSG(first[i] << " " << write_order[i].first << " " << write_order[i].second);
@@ -142,10 +145,11 @@ void compute_prefetch_schedule(
     {
         out_first[i] = write_order[i].first;
         //if(out_first[i] != i)
-        STXXL_MSG(i << " " << out_first[i]);
+        STXXL_VERBOSE1(i << " " << out_first[i]);
     }
 
     delete[] write_order;
+    UNUSED(w_steps);
 }
 
 
