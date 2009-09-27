@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -161,6 +162,7 @@ void compute_prefetch_schedule(
 {
     typedef std::pair<int_type, int_type> pair_type;
     const int_type L = input.size();
+#if 1
     if (L <= D)
     {
         for (int_type i = 0; i < L; ++i)
@@ -179,6 +181,13 @@ void compute_prefetch_schedule(
 
 
     delete[] write_order;
+#else
+    int_type * disks = new int_type[L];
+    for (int_type i = 0; i < L; ++i)
+        disks[i] = input[i].bid.storage->get_id();
+    compute_prefetch_schedule(disks, disks + L, out_first, m, D);
+    delete[] disks;
+#endif
 }
 
 
@@ -287,6 +296,7 @@ void compute_prefetch_schedule(
 {
     typedef std::pair<int_type, int_type> pair_type;
     const int_type L = input_end - input_begin;
+#if 1
     STXXL_VERBOSE1("compute_prefetch_schedule: sequence length=" << L << " disks=" << D);
     if (L <= D)
     {
@@ -310,6 +320,14 @@ void compute_prefetch_schedule(
     }
 
     delete[] write_order;
+#else
+    int_type * disks = new int_type[L];
+    int_type i = 0;
+    for (bid_iterator_type it = input_begin; it != input_end; ++it, ++i)
+        disks[i] = it->storage->get_id();
+    compute_prefetch_schedule(disks, disks + L, out_first, m, D);
+    delete[] disks;
+#endif
 }
 
 __STXXL_END_NAMESPACE
