@@ -11,8 +11,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <iomanip>
 #include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/io/file.h>
+
+#ifndef STXXL_THREAD_ID
+#define STXXL_THREAD_ID pthread_self()
+#endif
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -38,11 +43,14 @@ request_impl_basic::request_impl_basic(
 void request_impl_basic::serve()
 {
     check_nref();
-    STXXL_VERBOSE2("request_impl_basic::serve():" <<
-                   " Buffer at " << buffer <<
-                   " offset: " << offset <<
-                   " bytes: " << bytes <<
-                   ((type == request::READ) ? " READ" : " WRITE"));
+    STXXL_VERBOSE2(
+            "[" << STXXL_THREAD_ID << "] " <<
+            "request_impl_basic[" << this << "]::serve(): " <<
+            buffer << " @ [" <<
+            file_ << "|" << file_->get_id() << "]0x" <<
+            std::hex << std::setfill('0') << std::setw(8) <<
+            offset << "/0x" << bytes <<
+            ((type == request::READ) ? " READ" : " WRITE"));
 
     try
     {
@@ -60,6 +68,9 @@ void request_impl_basic::serve()
 
 void request_impl_basic::completed()
 {
+    STXXL_VERBOSE2(
+            "[" << STXXL_THREAD_ID << "] " <<
+            "request_impl_basic[" << this << "]::completed()");
     _state.set_to(DONE);
     request_state_impl_basic::completed();
     _state.set_to(READY2DIE);

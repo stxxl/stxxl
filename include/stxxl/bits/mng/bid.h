@@ -98,7 +98,7 @@ std::ostream & operator << (std::ostream & s, const BID<blk_sz> & bid)
         s << bid.storage->get_id();
     else
         s << "?";
-    s << "]0x" << std::hex << std::setfill('0') << std::setw(8) << bid.offset << "/0x" << std::setw(8) << bid.size;
+    s << "]0x" << std::hex << std::setfill('0') << std::setw(8) << bid.offset << "/0x" << std::setw(8) << bid.size << std::dec;
     return s;
 }
 

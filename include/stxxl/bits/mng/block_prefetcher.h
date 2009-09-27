@@ -126,11 +126,13 @@ public:
 
         for (i = 0; i < nreadblocks; ++i)
         {
-            STXXL_VERBOSE1("block_prefetcher: reading block " << i
-                           << " prefetch_seq[" << i << "]=" << prefetch_seq[i]);
             assert(prefetch_seq[i] < int_type(seq_length));
             assert(prefetch_seq[i] >= 0);
             read_bids[i] = *(consume_seq_begin + prefetch_seq[i]);
+            STXXL_VERBOSE1("block_prefetcher: reading block " << i
+                           << " prefetch_seq[" << i << "]=" << prefetch_seq[i]
+                           << " @ " << &read_buffers[i]
+                           << " @ " << read_bids[i]);
             read_reqs[i] = read_buffers[i].read(
                 read_bids[i],
                 set_switch_handler(*(completed + prefetch_seq[i])));
