@@ -46,7 +46,7 @@ struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
 };
 
 int_type simulate_async_write(
-    int * disks,
+    int_type * disks,
     const int_type L,
     const int_type m_init,
     const int_type D,
