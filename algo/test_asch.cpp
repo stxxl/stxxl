@@ -50,17 +50,20 @@ int main(int argc, char * argv[])
 
     stxxl::compute_prefetch_schedule(disks, disks + L, prefetch_order, m, D);
 
+    STXXL_MSG("Prefetch order:");
+    for (i = 0; i < L; ++i) {
+        STXXL_MSG("request " << prefetch_order[i] << "  on disk " << disks[prefetch_order[i]]);
+    }
+    STXXL_MSG("Request order:");
     for (i = 0; i < L; ++i) {
         int j;
         for (j = 0; prefetch_order[j] != i; ++j) ;
         STXXL_MSG("request " << i << "  on disk " << disks[i] << "  scheduled as " << j);
     }
-	STXXL_MSG("Prefetch order:");
-	for (i = 0; i < L; ++i) {
-		STXXL_MSG("request "<<prefetch_order[i]);
-	}
 
     delete[] count;
     delete[] disks;
     delete[] prefetch_order;
 }
+
+// vim: et:ts=4:sw=4
