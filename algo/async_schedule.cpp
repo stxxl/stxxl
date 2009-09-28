@@ -149,7 +149,7 @@ void compute_prefetch_schedule(
     }
 
     delete[] write_order;
-    UNUSED(w_steps);
+    STXXL_UNUSED(w_steps);
 }
 
 

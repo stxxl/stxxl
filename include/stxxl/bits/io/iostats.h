@@ -107,7 +107,7 @@ public:
                     stats::get_instance()->read_started(size);
             }
 #else
-            UNUSED(size);
+            STXXL_UNUSED(size);
 #endif
         }
 
@@ -155,7 +155,7 @@ public:
                 stats::get_instance()->write_started(size);
             }
 #else
-            UNUSED(size);
+            STXXL_UNUSED(size);
 #endif
         }
 
@@ -200,7 +200,7 @@ public:
                 stats::get_instance()->read_started(size);
             }
 #else
-            UNUSED(size);
+            STXXL_UNUSED(size);
 #endif
         }
 
@@ -399,12 +399,12 @@ public:
 #if !STXXL_IO_STATS
 inline void stats::write_started(unsigned size_)
 {
-    UNUSED(size_);
+    STXXL_UNUSED(size_);
 }
 inline void stats::write_finished() { }
 inline void stats::read_started(unsigned size_)
 {
-    UNUSED(size_);
+    STXXL_UNUSED(size_);
 }
 inline void stats::read_finished() { }
 #endif

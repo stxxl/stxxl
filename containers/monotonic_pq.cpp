@@ -203,7 +203,7 @@ int main(int argc, char * argv[])
     const stxxl::unsigned_type mem_for_pools = 2047 * mega;
 
 #if TINY_PQ
-    stxxl::UNUSED(mem_for_queue);
+    stxxl::STXXL_UNUSED(mem_for_queue);
     const unsigned BufferSize1 = 32;               // equalize procedure call overheads etc.
     const unsigned N = (1 << 9) / sizeof(my_type); // minimal sequence length
     const unsigned IntKMAX = 8;                    // maximal arity for internal mergersq
@@ -225,7 +225,7 @@ int main(int argc, char * argv[])
             >
         > pq_type;
 #elif MANUAL_PQ
-    stxxl::UNUSED(mem_for_queue);
+    stxxl::STXXL_UNUSED(mem_for_queue);
     const unsigned BufferSize1 = 32;                    // equalize procedure call overheads etc.
     const unsigned N = (1 << 20) / sizeof(my_type);     // minimal sequence length
     const unsigned IntKMAX = 16;                        // maximal arity for internal mergersq

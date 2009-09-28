@@ -138,7 +138,7 @@ inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
     s << "=================================================================" << std::endl;
 #else
     s << "MALLOC statistics are not supported on this platform";
-    UNUSED(st);
+    STXXL_UNUSED(st);
 #endif
     return s;
 }

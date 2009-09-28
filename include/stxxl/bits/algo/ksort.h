@@ -701,7 +701,7 @@ namespace ksort_local
                       after_runs_creation - begin << " s");
         STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
         STXXL_VERBOSE(*stats::get_instance());
-        UNUSED(begin + io_wait_after_rf);
+        STXXL_UNUSED(begin + io_wait_after_rf);
 
         return result;
     }

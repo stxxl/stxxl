@@ -230,7 +230,7 @@ public:
     {
         STXXL_STATIC_ASSERT(sizeof(typed_block) == raw_size);
         STXXL_MSG("[" << (void *)this << "] typed_block is copy constructed from [" << (void *)&tb << "]");
-        UNUSED(tb);
+        STXXL_UNUSED(tb);
     }
 #endif
 

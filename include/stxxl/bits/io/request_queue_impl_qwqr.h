@@ -51,7 +51,7 @@ public:
     void set_priority_op(priority_op op)
     {
         //_priority_op = op;
-        UNUSED(op);
+        STXXL_UNUSED(op);
     }
     void add_request(request_ptr & req);
     bool cancel_request(request_ptr & req);

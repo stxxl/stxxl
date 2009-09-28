@@ -38,7 +38,7 @@ void print_msg(const char * label, const std::string & msg, unsigned flags);
 __STXXL_END_NAMESPACE
 
 
-#define __STXXL_ENFORCE_SEMICOLON stxxl::UNUSED("expecting the next token to be a ';'")
+#define __STXXL_ENFORCE_SEMICOLON stxxl::STXXL_UNUSED("expecting the next token to be a ';'")
 
 #define _STXXL_PRINT(label, message, flags) \
     { std::ostringstream str_; \

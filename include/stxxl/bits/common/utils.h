@@ -47,19 +47,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-#ifdef UNUSED
-#error Somebody has defined a macro UNUSED which clashes with a helper function of STXXL
-// possible solutions:
-//
-// 1) #undef UNUSED
-//
-// 2) #undef UNUSED
-//    #define UNUSED(unused) (stxxl::UNUSED)(unused)
-//
-// 3) don't declare stxxl::UNUSED
-#endif
 template <typename U>
-inline void UNUSED(const U &)
+inline void STXXL_UNUSED(const U &)
 { }
 
 #ifdef BOOST_MSVC

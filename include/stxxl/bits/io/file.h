@@ -180,15 +180,15 @@ public:
     //! \brief Some specialized file types may need to know freed regions
     virtual void delete_region(offset_type offset, size_type size)
     {
-        UNUSED(offset);
-        UNUSED(size);
+        STXXL_UNUSED(offset);
+        STXXL_UNUSED(size);
     }
 
     virtual void export_files(offset_type offset, offset_type length, std::string prefix)
     {
-        UNUSED(offset);
-        UNUSED(length);
-        UNUSED(prefix);
+        STXXL_UNUSED(offset);
+        STXXL_UNUSED(length);
+        STXXL_UNUSED(prefix);
     }
 
     virtual ~file()
