@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 1999 Peter Sanders <sanders@mpi-sb.mpg.de>
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -112,17 +113,16 @@ public:
 
 private:
     template <unsigned LogK>
-    void multi_merge_unrolled(value_type * to)
+    void multi_merge_unrolled(value_type * out_first, value_type * out_last)
     {
         run_cursor_type * currentE, * winnerE;
         int_type * regEntry = entry;
-        value_type * done = to + buffer_size;
         int_type winnerIndex = regEntry[0];
 
-        while (LIKELY(to < done))
+        while (LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
-            *(to++) = winnerE->current();
+            *(out_first++) = winnerE->current();
 
             (*winnerE)++;
 
@@ -157,28 +157,26 @@ private:
         regEntry[0] = winnerIndex;
     }
 
-    void multi_merge_unrolled_0(value_type * to)
+    void multi_merge_unrolled_0(value_type * out_first, value_type * out_last)
     {
-        const value_type * done = to + buffer_size;
-        while (to < done)
+        while (LIKELY(out_first != out_last))
         {
-            *to = current->current();
-            ++to;
+            *out_first = current->current();
+            ++out_first;
             (*current)++;
         }
     }
 
-    void multi_merge_k(value_type * to)
+    void multi_merge_k(value_type * out_first, value_type * out_last)
     {
         run_cursor_type * currentE, * winnerE;
         int_type kReg = k;
-        value_type * done = to + buffer_size;
         int_type winnerIndex = entry[0];
 
-        while (LIKELY(to < done))
+        while (LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
-            *(to++) = winnerE->current();
+            *(out_first++) = winnerE->current();
 
             (*winnerE)++;
 
@@ -198,45 +196,46 @@ private:
     }
 
 public:
-    void multi_merge(value_type * to)
+    void multi_merge(value_type * out_first)
     {
+	value_type * out_last = out_first + buffer_size;
         switch (logK)
         {
         case 0:
-            multi_merge_unrolled_0(to);
+            multi_merge_unrolled_0(out_first, out_last);
             break;
         case 1:
-            multi_merge_unrolled<1>(to);
+            multi_merge_unrolled<1>(out_first, out_last);
             break;
         case 2:
-            multi_merge_unrolled<2>(to);
+            multi_merge_unrolled<2>(out_first, out_last);
             break;
         case 3:
-            multi_merge_unrolled<3>(to);
+            multi_merge_unrolled<3>(out_first, out_last);
             break;
         case 4:
-            multi_merge_unrolled<4>(to);
+            multi_merge_unrolled<4>(out_first, out_last);
             break;
         case 5:
-            multi_merge_unrolled<5>(to);
+            multi_merge_unrolled<5>(out_first, out_last);
             break;
         case 6:
-            multi_merge_unrolled<6>(to);
+            multi_merge_unrolled<6>(out_first, out_last);
             break;
         case 7:
-            multi_merge_unrolled<7>(to);
+            multi_merge_unrolled<7>(out_first, out_last);
             break;
         case 8:
-            multi_merge_unrolled<8>(to);
+            multi_merge_unrolled<8>(out_first, out_last);
             break;
         case 9:
-            multi_merge_unrolled<9>(to);
+            multi_merge_unrolled<9>(out_first, out_last);
             break;
         case 10:
-            multi_merge_unrolled<10>(to);
+            multi_merge_unrolled<10>(out_first, out_last);
             break;
         default:
-            multi_merge_k(to);
+            multi_merge_k(out_first, out_last);
             break;
         }
     }
