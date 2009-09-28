@@ -5,7 +5,7 @@
 ## # override MODE, NICE if you want
 ##
 ## # select your favorite subset of targets
-## all: lib tests header-compile-test doxy
+## all: lib tests header-compile-test doxy tutorial examples
 ##
 ## include GNUmakefile.mk
 
@@ -27,6 +27,9 @@ lib: dep-check-sanity
 tests: lib
 	$(NICE) $(MAKE) -f Makefile tests_$(MODE) $(if $(PMODE),tests_$(MODE)_pmode) $(if $(MCSTL),tests_$(MODE)_mcstl)
 	find . -name \*.d -exec grep -H '\.\..*:' {} + ; test $$? = 1
+
+examples: lib
+	$(MAKE) -C doc/tutorial/examples clean all
 
 header-compile-test: lib
 	$(NICE) $(MAKE) -C test/compile-stxxl-headers
@@ -51,7 +54,7 @@ dep-check-sanity:
 	$(SKIP_SANITY_CHECK)find . -name '*.bin' -exec misc/remove-unless {} .bin .o \; 
 
 clean:
-	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_pmode clean_$(MODE)_mcstl clean_doxy
+	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_pmode clean_$(MODE)_mcstl clean_doxy clean_examples
 	$(MAKE) -C test/compile-stxxl-headers clean
 
 GNUmakefile:

@@ -107,7 +107,7 @@ clean_msvc: settings_msvc
 clean: clean_g++ clean_g++_mcstl clean_icpc clean_icpc_mcstl
 	$(MAKE) -C test/compile-stxxl-headers clean
 
-distclean: clean_doxy clean_tutorial clean
+distclean: clean_doxy clean_tutorial clean_examples clean
 	$(RM) make.settings
 	$(RM) stxxl.log stxxl.errlog
 	$(RM) algo/stxxl.log algo/stxxl.errlog
@@ -126,8 +126,16 @@ clean_doxy:
 	$(RM) -r doc/doxy
 	$(RM) Doxyfile.bak
 
+tutorial:
+	$(MAKE) -C doc/tutorial
+
 clean_tutorial:
 	$(MAKE) -C doc/tutorial distclean
+
+examples:
+	$(MAKE) -C doc/tutorial/examples
+
+clean_examples:
 	$(MAKE) -C doc/tutorial/examples clean
 
 count:
