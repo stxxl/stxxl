@@ -55,6 +55,10 @@ int main(int argc, char * argv[])
         for (j = 0; prefetch_order[j] != i; ++j) ;
         STXXL_MSG("request " << i << "  on disk " << disks[i] << "  scheduled as " << j);
     }
+	STXXL_MSG("Prefetch order:");
+	for (i = 0; i < L; ++i) {
+		STXXL_MSG("request "<<prefetch_order[i]);
+	}
 
     delete[] count;
     delete[] disks;

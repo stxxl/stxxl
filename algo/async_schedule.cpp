@@ -68,37 +68,40 @@ int_type simulate_async_write(
         STXXL_VERBOSE1("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock]);
         o_time[cur.iblock] = std::pair<int_type, int_type>(cur.iblock, cur.timestamp);
 
-        m++;
         if (i >= 0)
         {
-            m--;
             int_type disk = disks[i];
             if (disk_busy[disk])
             {
-                disk_queues[disk].push(i);
+                disk_queues[disk].push(i--);
             }
             else
             {
-                //STXXL_MSG("Block "<<i<<" scheduled for time "<< cur.timestamp + 1);
-                event_queue.push(sim_event(cur.timestamp + 1, i));
+				if(!disk_queues[disk].empty())
+				{
+					STXXL_VERBOSE1("c Block "<<disk_queues[disk].front()<<" scheduled for time "<< cur.timestamp + 1);
+					event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
+					disk_queues[disk].pop();
+				} else
+				{
+                	STXXL_VERBOSE1("a Block "<<i<<" scheduled for time "<< cur.timestamp + 1);
+                	event_queue.push(sim_event(cur.timestamp + 1, i--));
+				}
                 disk_busy[disk] = true;
             }
-
-            i--;
         }
 
         // add next block to write
         int_type disk = disks[cur.iblock];
         if (!disk_busy[disk] && !disk_queues[disk].empty())
         {
-            //STXXL_MSG("Block "<<disk_queues[disk].front()<<" scheduled for time "<< cur.timestamp + 1);
+            STXXL_VERBOSE1("b Block "<<disk_queues[disk].front()<<" scheduled for time "<< cur.timestamp + 1);
             event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
             disk_queues[disk].pop();
             disk_busy[disk] = true;
         }
     }
 
-    assert(m == m_init);
     assert(i == -1);
     for (int_type i = 0; i < D; i++)
         assert(disk_queues[i].empty());
