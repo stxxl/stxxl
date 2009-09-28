@@ -29,7 +29,8 @@ tests: lib
 	find . -name \*.d -exec grep -H '\.\..*:' {} + ; test $$? = 1
 
 examples: lib
-	$(MAKE) -C doc/tutorial/examples clean all
+	$(MAKE) -C doc/tutorial/examples clean
+	$(MAKE) -C doc/tutorial/examples all
 
 header-compile-test: lib
 	$(NICE) $(MAKE) -C test/compile-stxxl-headers
