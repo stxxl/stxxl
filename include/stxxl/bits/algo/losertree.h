@@ -77,7 +77,6 @@ public:
         current = new run_cursor_type[kReg];
         for (i = 0; i < kReg; ++i)
             current[i].prefetcher() = p;
-
 #endif
         entry = new int_type[(kReg << 1)];
         // init cursors
@@ -122,9 +121,10 @@ private:
         while (LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
-            *(out_first++) = winnerE->current();
+            *(out_first) = winnerE->current();
+            ++out_first;
 
-            (*winnerE)++;
+            ++(*winnerE);
 
 
 #define TreeStep(L) \
@@ -163,7 +163,7 @@ private:
         {
             *out_first = current->current();
             ++out_first;
-            (*current)++;
+            ++(*current);
         }
     }
 
@@ -176,9 +176,10 @@ private:
         while (LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
-            *(out_first++) = winnerE->current();
+            *(out_first) = winnerE->current();
+            ++out_first;
 
-            (*winnerE)++;
+            ++(*winnerE);
 
             for (int_type i = (winnerIndex + kReg) >> 1; i > 0; i >>= 1)
             {
@@ -256,3 +257,4 @@ namespace std
 }
 
 #endif // !STXXL_LOSERTREE_HEADER
+// vim: et:ts=4:sw=4
