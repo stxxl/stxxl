@@ -561,7 +561,7 @@ namespace sort_local
         {
 // begin of native merging procedure
 
-            loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size>
+            loser_tree<run_cursor_type, run_cursor2_cmp_type>
             losers(&prefetcher, nruns, run_cursor2_cmp_type(cmp));
 
 #if STXXL_CHECK_ORDER_IN_SORTS
@@ -570,7 +570,7 @@ namespace sort_local
 
             for (int_type i = 0; i < out_run_size; ++i)
             {
-                losers.multi_merge(out_buffer->elem);
+                losers.multi_merge(out_buffer->elem, out_buffer->elem + block_type::size);
                 (*out_run)[i].value = *(out_buffer->elem);
 
 #if STXXL_CHECK_ORDER_IN_SORTS

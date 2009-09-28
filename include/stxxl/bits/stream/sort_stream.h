@@ -875,7 +875,7 @@ namespace stream
         typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
         typedef sort_local::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
-        typedef loser_tree<run_cursor_type, run_cursor2_cmp_type, block_type::size> loser_tree_type;
+        typedef loser_tree<run_cursor_type, run_cursor2_cmp_type> loser_tree_type;
 
         typedef stxxl::int64 diff_type;
         typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
@@ -1045,7 +1045,7 @@ namespace stream
             {
 // begin of native merging procedure
 
-                losers->multi_merge(current_block->elem);
+                losers->multi_merge(current_block->elem, current_block->elem + block_type::size);
 
 // end of native merging procedure
             }

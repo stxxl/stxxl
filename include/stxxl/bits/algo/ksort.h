@@ -501,15 +501,14 @@ namespace ksort_local
         run_cursor2_cmp<block_type, prefetcher_type, key_extractor> cmp(keyobj);
         loser_tree<
             run_cursor_type,
-            run_cursor2_cmp<block_type, prefetcher_type, key_extractor>,
-            block_type::size> losers(&prefetcher, nruns, cmp);
-
+            run_cursor2_cmp<block_type, prefetcher_type, key_extractor> >
+                losers(&prefetcher, nruns, cmp);
 
         block_type * out_buffer = writer.get_free_block();
 
         for (i = 0; i < out_run_size; i++)
         {
-            losers.multi_merge(out_buffer->elem);
+            losers.multi_merge(out_buffer->elem, out_buffer->elem + block_type::size);
             (*out_run)[i].key = keyobj(out_buffer->elem[0]);
             out_buffer = writer.write(out_buffer, (*out_run)[i].bid);
         }
