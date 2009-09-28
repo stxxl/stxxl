@@ -21,7 +21,7 @@ __STXXL_BEGIN_NAMESPACE
 template <typename block_type>
 struct run_cursor
 {
-    unsigned pos;
+    unsigned_type pos;
     block_type * buffer;
 
     run_cursor() : pos(0), buffer(NULL) { }
@@ -30,9 +30,9 @@ struct run_cursor
     {
         return (*buffer)[pos];
     }
-    inline void operator ++ (int)
+    inline void operator ++ ()
     {
-        pos++;
+        ++pos;
     }
 };
 
@@ -86,7 +86,7 @@ struct run_cursor2 : public run_cursor<block_type>
     {
         return (pos >= block_type::size);
     }
-    inline void operator ++ (int);
+    inline void operator ++ ();
     inline void make_inf()
     {
         pos = block_type::size;
@@ -100,10 +100,10 @@ void * have_prefetcher<must_be_void>::untyped_prefetcher = NULL;
 
 template <typename block_type,
           typename prefetcher_type>
-void run_cursor2<block_type, prefetcher_type>::operator ++ (int)
+void run_cursor2<block_type, prefetcher_type>::operator ++ ()
 {
     assert(!empty());
-    pos++;
+    ++pos;
     if (UNLIKELY(pos >= block_type::size))
     {
         if (prefetcher()->block_consumed(buffer))
@@ -112,18 +112,21 @@ void run_cursor2<block_type, prefetcher_type>::operator ++ (int)
 }
 
 
+#if 0
 template <typename block_type>
 struct run_cursor_cmp
 {
     typedef run_cursor<block_type> cursor_type;
-    /*
+
        inline bool operator  () (const cursor_type & a, const cursor_type & b)	// greater or equal
        {
             return !((*a.buffer)[a.pos] < (*b.buffer)[b.pos]);
-       }*/
+    }
 };
+#endif
 
 __STXXL_END_NAMESPACE
 
 
 #endif // !STXXL_RUN_CURSOR_HEADER
+// vim: et:ts=4:sw=4
