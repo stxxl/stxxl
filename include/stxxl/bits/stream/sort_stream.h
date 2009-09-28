@@ -143,7 +143,9 @@ namespace stream
         runs_creator(Input_ & i, Cmp_ c, unsigned_type memory_to_use) :
             input(i), cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), result_computed(false)
         {
-            assert(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
+            if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
+                throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
+            }
         }
 
         //! \brief Returns the sorted runs object
@@ -545,7 +547,9 @@ namespace stream
             Blocks2(Blocks1 + m2),
             write_reqs(new request_ptr[m2])
         {
-            assert(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
+            if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
+                throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
+            }
         }
 
         ~runs_creator()
@@ -696,7 +700,9 @@ namespace stream
             irun(0)
         {
             assert(m_ > 0);
-            assert(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use);
+            if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
+                throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
+            }
         }
 
         //! \brief Adds new element to the current run

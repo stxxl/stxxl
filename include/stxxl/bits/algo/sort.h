@@ -796,7 +796,9 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
     }
     else
     {
-        assert(2 * block_type::raw_size * sort_memory_usage_factor() <= M);
+        if (!(2 * block_type::raw_size * sort_memory_usage_factor() <= M)) {
+            throw bad_parameter("stxxl::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
+        }
 
         if (first.block_offset())
         {
