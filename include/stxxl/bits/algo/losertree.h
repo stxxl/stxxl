@@ -22,8 +22,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 template <typename run_cursor_type,
-          typename run_cursor_cmp_type,
-          unsigned buffer_size>
+          typename run_cursor_cmp_type>
 class loser_tree : private noncopyable
 {
     int logK;
@@ -197,9 +196,8 @@ private:
     }
 
 public:
-    void multi_merge(value_type * out_first)
+    void multi_merge(value_type * out_first, value_type * out_last)
     {
-	value_type * out_last = out_first + buffer_size;
         switch (logK)
         {
         case 0:
@@ -247,10 +245,9 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <typename run_cursor_type,
-              typename run_cursor_cmp_type,
-              unsigned buffer_size>
-    void swap(stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type, buffer_size> & a,
-              stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type, buffer_size> & b)
+              typename run_cursor_cmp_type>
+    void swap(stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type> & a,
+              stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type> & b)
     {
         a.swap(b);
     }
