@@ -49,6 +49,15 @@ public:
     { }
 };
 
+class bad_parameter : public std::runtime_error
+{
+public:
+    bad_parameter() throw () : std::runtime_error("") { }
+    bad_parameter(const std::string & msg_) throw () :
+        std::runtime_error(msg_)
+    { }
+};
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_EXCEPTIONS_H_
