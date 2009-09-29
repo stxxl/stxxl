@@ -1,124 +1,191 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.10"
+	Version="9.00"
 	Name="WinGUI"
 	ProjectGUID="{D3DE8D18-0A0A-4884-869A-B8C3AF838CF8}"
-	Keyword="MFCProj">
+	RootNamespace="WinGUI"
+	Keyword="MFCProj"
+	TargetFrameworkVersion="131072"
+	>
 	<Platforms>
 		<Platform
-			Name="Win32"/>
+			Name="Win32"
+		/>
 	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
 			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="-I../../ -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_RTLDLL -DBOOST_LIB_DIAGNOSTIC -DBOOST_ALL_DYN_LINK -DSTXXL_BOOST_TIMESTAMP -DSTXXL_BOOST_CONFIG -DSTXXL_BOOST_FILESYSTEM -DSTXXL_BOOST_THREADS -DSTXXL_BOOST_RANDOM -Ic:\boost /EHsc /EHs /wd4820 /wd4217 /wd4668 /wd4619 /wd4625 /wd4626 /wd4355 /wd4244 /wd4267 /wd4311 /wd4800 /wd4101 /wd4307 /wd4003 -DSTXXL_VERBOSE_LEVEL=1"
-				Optimization="0"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG"
-				MinimalRebuild="TRUE"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				TreatWChar_tAsBuiltInType="TRUE"
-				UsePrecompiledHeader="3"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				Name="VCPreBuildEventTool"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
+				Name="VCCustomBuildTool"
+			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/LIBPATH:..\..\lib\ /LIBPATH:c:\boost\lib\ "
-				LinkIncremental="2"
-				GenerateDebugInformation="TRUE"
-				SubSystem="2"
-				TargetMachine="1"/>
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
 			<Tool
 				Name="VCMIDLTool"
 				PreprocessorDefinitions="_DEBUG"
-				MkTypLibCompatible="FALSE"/>
+				MkTypLibCompatible="false"
+			/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCCLCompilerTool"
+				AdditionalOptions="-I../../ -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_RTLDLL -DBOOST_LIB_DIAGNOSTIC -DBOOST_ALL_DYN_LINK -DSTXXL_BOOST_TIMESTAMP -DSTXXL_BOOST_CONFIG -DSTXXL_BOOST_FILESYSTEM -DSTXXL_BOOST_THREADS -DSTXXL_BOOST_RANDOM  -D_SCL_SECURE_NO_DEPRECATE -DSTXXL_VERBOSE_LEVEL=1 -Ic:\boost /EHsc /EHs /wd4820 /wd4217 /wd4668 /wd4619 /wd4625 /wd4626 /wd4355 /wd4244 /wd4267 /wd4311 /wd4800 /wd4101 /wd4307 /wd4003 /wd4996 /wd4290"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;C:\Users\Johannes Singler\Code\STXXL Trunk\include&quot;;&quot;C:\Program Files (x86)\boost\boost_1_40_0\include\boost-1_40&quot;"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="4"
+			/>
 			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLinkerTool"
+				AdditionalOptions="/LIBPATH:..\..\lib\ /NODEFAULTLIB:library"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\boost\boost_1_40_0\lib&quot;"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="0"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
 			UseOfMFC="2"
-			CharacterSet="2">
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				PreprocessorDefinitions="NDEBUG"
+				MkTypLibCompatible="false"
+			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="-I../../ -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE /MD /O2 -D_RTLDLL -DBOOST_LIB_DIAGNOSTIC -DBOOST_ALL_DYN_LINK -DSTXXL_BOOST_TIMESTAMP -DSTXXL_BOOST_CONFIG -DSTXXL_BOOST_FILESYSTEM -DSTXXL_BOOST_THREADS -DSTXXL_BOOST_RANDOM -Ic:\boost /EHsc /EHs /wd4820 /wd4217 /wd4668 /wd4619 /wd4625 /wd4626 /wd4355 /wd4244 /wd4267 /wd4311 /wd4800 /wd4101 /wd4003 /wd4307"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
-				MinimalRebuild="FALSE"
+				MinimalRebuild="false"
 				RuntimeLibrary="2"
-				TreatWChar_tAsBuiltInType="TRUE"
-				UsePrecompiledHeader="3"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="2"
 				WarningLevel="3"
-				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
 			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/LIBPATH:..\..\lib\ /LIBPATH:c:\boost\lib\ "
-				LinkIncremental="1"
-				GenerateDebugInformation="TRUE"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
-			<Tool
-				Name="VCMIDLTool"
-				PreprocessorDefinitions="NDEBUG"
-				MkTypLibCompatible="FALSE"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
+				Name="VCManagedResourceCompilerTool"
+			/>
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				AdditionalIncludeDirectories="$(IntDir)"/>
+				AdditionalIncludeDirectories="$(IntDir)"
+			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
+				Name="VCPreLinkEventTool"
+			/>
 			<Tool
-				Name="VCXMLDataGeneratorTool"/>
+				Name="VCLinkerTool"
+				AdditionalOptions="/LIBPATH:..\..\lib\ /LIBPATH:c:\boost\lib\ "
+				LinkIncremental="1"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+			/>
 			<Tool
-				Name="VCWebDeploymentTool"/>
+				Name="VCALinkTool"
+			/>
 			<Tool
-				Name="VCManagedWrapperGeneratorTool"/>
+				Name="VCManifestTool"
+			/>
 			<Tool
-				Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -127,88 +194,114 @@
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
+			>
 			<File
-				RelativePath=".\stdafx.cpp">
+				RelativePath=".\stdafx.cpp"
+				>
 				<FileConfiguration
-					Name="Debug|Win32">
+					Name="Debug|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32">
+					Name="Release|Win32"
+					>
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\StxxlWorkThread.cpp">
+				RelativePath=".\StxxlWorkThread.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\WinGUI.cpp">
+				RelativePath=".\WinGUI.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\WinGUIDlg.cpp">
+				RelativePath=".\WinGUIDlg.cpp"
+				>
 			</File>
 			<File
-				RelativePath=".\WorkDialog.cpp">
+				RelativePath=".\WorkDialog.cpp"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
 			<File
-				RelativePath=".\Resource.h">
+				RelativePath=".\Resource.h"
+				>
 			</File>
 			<File
-				RelativePath=".\resource.hm">
+				RelativePath=".\resource.hm"
+				>
 			</File>
 			<File
-				RelativePath=".\stdafx.h">
+				RelativePath=".\stdafx.h"
+				>
 			</File>
 			<File
-				RelativePath=".\StxxlWorkThread.h">
+				RelativePath=".\StxxlWorkThread.h"
+				>
 			</File>
 			<File
-				RelativePath=".\UserTypes.h">
+				RelativePath=".\UserTypes.h"
+				>
 			</File>
 			<File
-				RelativePath=".\WinGUI.h">
+				RelativePath=".\WinGUI.h"
+				>
 			</File>
 			<File
-				RelativePath=".\WinGUIDlg.h">
+				RelativePath=".\WinGUIDlg.h"
+				>
 			</File>
 			<File
-				RelativePath=".\WorkDialog.h">
+				RelativePath=".\WorkDialog.h"
+				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
 			<File
-				RelativePath=".\res\WinGUI.ico">
+				RelativePath=".\res\WinGUI.ico"
+				>
 			</File>
 			<File
-				RelativePath=".\WinGUI.rc">
+				RelativePath=".\WinGUI.rc"
+				>
 			</File>
 			<File
-				RelativePath=".\res\WinGUI.rc2">
+				RelativePath=".\res\WinGUI.rc2"
+				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\ReadMe.txt">
+			RelativePath=".\ReadMe.txt"
+			>
 		</File>
 		<File
-			RelativePath=".\res\WinGUI.manifest">
+			RelativePath=".\res\WinGUI.manifest"
+			>
 		</File>
 	</Files>
 	<Globals>
 		<Global
 			Name="RESOURCE_FILE"
-			Value="WinGUI.rc"/>
+			Value="WinGUI.rc"
+		/>
 	</Globals>
 </VisualStudioProject>
