@@ -99,7 +99,8 @@ void usage(const char * argv0)
 {
     std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [nd] [r|w] [--] diskfile..." << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
-    std::cout << "    'block_size' (default 8) in MiB, increase 'batch_size' (default 1)" << std::endl;
+    std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
+    std::cout << "     increase 'batch_size' (default 1)" << std::endl;
     std::cout << "    to submit several I/Os at once and report average rate" << std::endl;
 #ifdef RAW_ACCESS
     std::cout << "    open mode: includes O_DIRECT unless the 'nd' flag is given" << std::endl;
@@ -128,11 +129,16 @@ int main(int argc, char * argv[])
     if (first_disk_arg < argc)
         block_size = atoi(argv[first_disk_arg]);
     if (block_size > 0) {
+        int l = strlen(argv[first_disk_arg]);
+        if (argv[first_disk_arg][l - 1] == 'B' || argv[first_disk_arg][l - 1] == 'b') {
+            // suffix B means exact size
+        } else {
+            block_size *= MB;
+        }
         ++first_disk_arg;
     } else {
-        block_size = 8;
+        block_size = 8 * MB;
     }
-    block_size *= MB;
 
     if (first_disk_arg < argc)
         batch_size = atoi(argv[first_disk_arg]);
