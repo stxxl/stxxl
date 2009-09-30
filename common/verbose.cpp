@@ -42,10 +42,10 @@ void print_msg(const char * label, const std::string & msg, unsigned flags)
         double t = timestamp() - program_start_time_stamp;
         char tstr[23]; /* "[364:23:59:59.999999] " */
         snprintf(tstr, sizeof(tstr), "[%d.%02d:%02d:%02d.%06d] ",
-                int(t / (24 * 60 * 60)),
-                int(t / (60 * 60)) % 24,
-                int(t / 60) % 60, int(t) % 60,
-                int((t - floor(t)) * 1000000));
+                 int(t / (24 * 60 * 60)),
+                 int(t / (60 * 60)) % 24,
+                 int(t / 60) % 60, int(t) % 60,
+                 int((t - floor(t)) * 1000000));
         s += tstr;
     }
     if (label) {

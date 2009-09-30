@@ -118,9 +118,9 @@ struct run_cursor_cmp
 {
     typedef run_cursor<block_type> cursor_type;
 
-       inline bool operator  () (const cursor_type & a, const cursor_type & b)	// greater or equal
-       {
-            return !((*a.buffer)[a.pos] < (*b.buffer)[b.pos]);
+    inline bool operator () (const cursor_type & a, const cursor_type & b)      // greater or equal
+    {
+        return !((* a.buffer)[a.pos] < (* b.buffer)[b.pos]);
     }
 };
 #endif

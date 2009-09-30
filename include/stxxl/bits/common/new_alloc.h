@@ -89,7 +89,7 @@ public:
     // allocate but don't initialize num elements of type T
     pointer allocate(size_type num, const void * = 0)
     {
-        return static_cast<T*>(T::operator new (num * sizeof(T)));
+        return static_cast<T *>(T::operator new (num * sizeof(T)));
     }
 
     // _GLIBCXX_RESOLVE_LIB_DEFECTS
@@ -98,7 +98,7 @@ public:
     void construct(pointer p, const T & value)
     {
         // initialize memory with placement new
-        ::new((void *)p)T(value);
+        ::new ((void *)p)T(value);
     }
 
     // destroy elements of initialized storage p

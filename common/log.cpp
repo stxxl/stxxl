@@ -15,24 +15,24 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-    logger::logger() : waitlog_stream_(NULL)
-    {
-        const char * log_filename = getenv("STXXLLOGFILE");
-        log_stream_.open(log_filename == NULL ? "stxxl.log" : log_filename);
-        const char * errlog_filename = getenv("STXXLERRLOGFILE");
-        errlog_stream_.open(errlog_filename == NULL ? "stxxl.errlog" : errlog_filename);
+logger::logger() : waitlog_stream_(NULL)
+{
+    const char * log_filename = getenv("STXXLLOGFILE");
+    log_stream_.open(log_filename == NULL ? "stxxl.log" : log_filename);
+    const char * errlog_filename = getenv("STXXLERRLOGFILE");
+    errlog_stream_.open(errlog_filename == NULL ? "stxxl.errlog" : errlog_filename);
 #ifdef STXXL_WAIT_LOG_ENABLED
-        const char * waitlog_filename = getenv("STXXLWAITLOGFILE");
-        if (waitlog_filename) {
-            waitlog_stream_ = new std::ofstream(waitlog_filename);
-            *waitlog_stream_ << "# time\trd_incr\twr_incr\tw_read\tw_write" << std::endl;
-        }
+    const char * waitlog_filename = getenv("STXXLWAITLOGFILE");
+    if (waitlog_filename) {
+        waitlog_stream_ = new std::ofstream(waitlog_filename);
+        *waitlog_stream_ << "# time\trd_incr\twr_incr\tw_read\tw_write" << std::endl;
+    }
 #endif
-    }
-    
-    logger::~logger()
-    {
-        delete waitlog_stream_;
-    }
+}
+
+logger::~logger()
+{
+    delete waitlog_stream_;
+}
 
 __STXXL_END_NAMESPACE

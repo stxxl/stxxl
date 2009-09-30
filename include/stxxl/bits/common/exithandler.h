@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 // To provide your own exit handler implementation, #define STXXL_EXTERNAL_EXIT_HANDLER and implement
 // stxxl::register_exit_handler(void (*)(void)) and stxxl::run_exit_handlers() in your application.
 
-int register_exit_handler(void (*function)(void));
+int register_exit_handler(void (* function)(void));
 void run_exit_handlers();
 
 __STXXL_END_NAMESPACE

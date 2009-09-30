@@ -113,17 +113,17 @@ inline stxxl::int64 atoint64(const char * s)
 ////////////////////////////////////////////////////////////////////////////
 
 template <typename Tp>
-inline const Tp&
-STXXL_MIN(const Tp& a, const Tp& b)
+inline const Tp &
+STXXL_MIN(const Tp & a, const Tp & b)
 {
-	return std::min<Tp>(a, b);
+    return std::min<Tp>(a, b);
 }
 
 template <typename Tp>
-inline const Tp&
-STXXL_MAX(const Tp& a, const Tp& b)
+inline const Tp &
+STXXL_MAX(const Tp & a, const Tp & b)
 {
-	return std::max<Tp>(a, b);
+    return std::max<Tp>(a, b);
 }
 
 #define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))

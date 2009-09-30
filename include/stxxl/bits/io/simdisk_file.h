@@ -115,7 +115,7 @@ public:
         "' is resided on swap memory partition!" <<
         std::endl;
     }
-    void serve(const request * req) throw(io_error);
+    void serve(const request * req) throw (io_error);
     void set_size(offset_type newsize);
     const char * io_type() const;
 };

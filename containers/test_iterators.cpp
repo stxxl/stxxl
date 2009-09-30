@@ -28,7 +28,7 @@ const char * _()
 }
 
 template <typename I>
-void dump_iterator_info(I&)
+void dump_iterator_info(I &)
 {
     STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
     STXXL_MSG("  category:        " << _<typename std::iterator_traits<I>::iterator_category>());
@@ -39,7 +39,7 @@ void dump_iterator_info(I&)
 }
 
 template <typename C>
-void dump_container_info(C&)
+void dump_container_info(C &)
 {
     STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
     STXXL_MSG("  value_type:      " << _<typename C::value_type>());

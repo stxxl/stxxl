@@ -60,7 +60,7 @@ protected:
 
     block_type * read_buffers;
     request_ptr * read_reqs;
-    bid_type* read_bids;
+    bid_type * read_bids;
 
     onoff_switch * completed;
     int_type * pref_buffer;
@@ -79,10 +79,10 @@ protected:
         int_type ibuffer = pref_buffer[iblock];
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);
         assert(ibuffer >= 0 && ibuffer < nreadblocks);
-        if(delete_block_after_fetch)
+        if (delete_block_after_fetch)
         {
             STXXL_VERBOSE1("block_prefetcher: deleting block " << read_bids[ibuffer]);
-			block_manager::get_instance()->delete_block(read_bids[ibuffer]);
+            block_manager::get_instance()->delete_block(read_bids[ibuffer]);
         }
         return (read_buffers + ibuffer);
     }
