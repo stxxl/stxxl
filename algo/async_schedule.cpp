@@ -26,7 +26,7 @@ int_type simulate_async_write(
     typedef std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp> event_queue_type;
     typedef std::queue<int_type> disk_queue_type;
     assert(L >= D);
-    disk_queue_type * disk_queues = new disk_queue_type[L];
+    disk_queue_type * disk_queues = new disk_queue_type[D];
     event_queue_type event_queue;
 
     int_type m = m_init;
@@ -37,6 +37,7 @@ int_type simulate_async_write(
     while (m && (i >= 0))
     {
         int_type disk = disks[i];
+        assert(0 <= disk && disk < D);
         disk_queues[disk].push(i);
         i--;
         m--;
@@ -71,6 +72,7 @@ int_type simulate_async_write(
         if (i >= 0)
         {
             int_type disk = disks[i];
+            assert(0 <= disk && disk < D);
             if (disk_busy[disk])
             {
                 disk_queues[disk].push(i--);
@@ -93,6 +95,7 @@ int_type simulate_async_write(
 
         // add next block to write
         int_type disk = disks[cur.iblock];
+        assert(0 <= disk && disk < D);
         if (!disk_busy[disk] && !disk_queues[disk].empty())
         {
             STXXL_VERBOSE1("b Block "<<disk_queues[disk].front()<<" scheduled for time "<< cur.timestamp + 1);
