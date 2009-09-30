@@ -104,6 +104,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/defines.h \
 	$(HEADER_PATH)/verbose.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
+	$(HEADER_PATH)/common/new_alloc.h \
 	$(HEADER_PATH)/common/mutex.h \
 	$(HEADER_PATH)/common/rand.h \
 	$(HEADER_PATH)/common/semaphore.h \

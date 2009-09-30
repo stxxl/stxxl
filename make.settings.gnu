@@ -288,7 +288,8 @@ HEADER_FILES_BITS	+= compat_hash_map.h compat_hash_set.h
 HEADER_FILES_BITS	+= compat_unique_ptr.h parallel.h singleton.h defines.h
 HEADER_FILES_BITS	+= verbose.h
 
-HEADER_FILES_COMMON	+= aligned_alloc.h mutex.h rand.h semaphore.h state.h
+HEADER_FILES_COMMON	+= aligned_alloc.h new_alloc.h
+HEADER_FILES_COMMON	+= mutex.h rand.h semaphore.h state.h
 HEADER_FILES_COMMON	+= timer.h utils.h error_handling.h simple_vector.h
 HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h debug.h tuple.h
 HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h exithandler.h
