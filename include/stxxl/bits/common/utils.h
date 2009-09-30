@@ -68,40 +68,6 @@ inline void STXXL_UNUSED(const U &)
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline std::string
-stxxl_tmpfilename(std::string dir, std::string prefix)
-{
-    //STXXL_VERBOSE0(" TMP:"<< dir.c_str() <<":"<< prefix.c_str());
-    int rnd;
-    char buffer[1024];
-    std::string result;
-
-#ifndef STXXL_BOOST_FILESYSTEM
-    struct stat st;
-#endif
-
-    do
-    {
-        rnd = rand();
-        sprintf(buffer, "%d", rnd);
-        result = dir + prefix + buffer;
-    }
-#ifdef STXXL_BOOST_FILESYSTEM
-    while (boost::filesystem::exists(result));
-
-    return result;
-#else
-    while (!lstat(result.c_str(), &st));
-
-    if (errno != ENOENT)
-        stxxl_function_error(io_error);
-
-    return result;
-#endif
-}
-
-////////////////////////////////////////////////////////////////////////////
-
 inline std::vector<std::string>
 split(const std::string & str, const std::string & sep)
 {
@@ -134,15 +100,6 @@ split(const std::string & str, const std::string & sep)
 }
 
 ////////////////////////////////////////////////////////////////////////////
-
-#define str2int(str) atoi(str.c_str())
-
-inline std::string int2str(int i)
-{
-    char buf[32];
-    sprintf(buf, "%d", i);
-    return std::string(buf);
-}
 
 inline stxxl::int64 atoint64(const char * s)
 {
