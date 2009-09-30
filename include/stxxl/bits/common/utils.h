@@ -135,7 +135,9 @@ inline double log2(double x)
 
 ////////////////////////////////////////////////////////////////////////////
 
-//#define HAVE_BUILTIN_EXPECT
+#ifdef __GNUC__
+#define HAVE_BUILTIN_EXPECT
+#endif
 
 #ifdef HAVE_BUILTIN_EXPECT
  #define LIKELY(c)   __builtin_expect((c), 1)
