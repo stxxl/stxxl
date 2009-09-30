@@ -1219,7 +1219,6 @@ public:
     template <typename ForwardIterator>
     void set_content(const ForwardIterator & bid_begin, const ForwardIterator & bid_end, size_type n)
     {
-        assert(_size == 0 && _bids.size() == 0);
         unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
         _bids.resize(new_bids_size);
         std::copy(bid_begin, bid_end, _bids.begin());
