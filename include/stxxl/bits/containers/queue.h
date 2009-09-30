@@ -70,7 +70,7 @@ private:
     block_type * back_block;
     value_type * front_element;
     value_type * back_element;
-    //alloc_strategy alloc_strategy_;
+    alloc_strategy alloc_strategy_;
     unsigned_type alloc_counter;
     std::deque<bid_type> bids;
     block_manager * bm;
@@ -192,7 +192,7 @@ public:
                 // need to allocate new block
                 bid_type newbid;
 
-                offset_allocator<alloc_strategy> alloc_str(alloc_counter++);
+                offset_allocator<alloc_strategy> alloc_str(alloc_counter++, alloc_strategy_);
 
                 bm->new_block(alloc_str, newbid);
 
