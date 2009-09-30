@@ -56,9 +56,11 @@ struct striping
     {
         return "striping";
     }
+/*
     // FIXME WHY?
     virtual ~striping()
     { }
+*/
 };
 
 //! \brief fully randomized disk allocation scheme functor

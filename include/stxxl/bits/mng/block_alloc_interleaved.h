@@ -38,9 +38,10 @@ struct interleaved_striping
     {
         return begindisk + (i / nruns) % diff;
     }
-
+/*
     virtual ~interleaved_striping()
     { }
+*/
 };
 
 struct interleaved_FR : public interleaved_striping
