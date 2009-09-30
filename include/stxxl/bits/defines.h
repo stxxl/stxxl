@@ -40,7 +40,9 @@
 //#define STXXL_SORT_OPTIMAL_PREFETCHING 0/1
 // default: 1
 // used in: algo/*sort.h, stream/sort_stream.h
-// effect if defined to 0: unknown
+// effect if defined to 0: does not reorder prefetch requests to a disk
+//          optimal schedule (Hutchinson, Sanders, Vitter: Duality between
+//          prefetching and queued writing on parallel disks, 2005)
 
 //#define STXXL_CHECK_ORDER_IN_SORTS 0/1
 // default: 0

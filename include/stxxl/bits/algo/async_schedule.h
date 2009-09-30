@@ -11,6 +11,12 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+// Implements the "prudent prefetching" as described in
+// D. Hutchinson, P. Sanders, J. S. Vitter: Duality between prefetching
+// and queued writing on parallel disks, 2005
+// DOI: 10.1137/S0097539703431573
+
+
 #ifndef STXXL_ASYNC_SCHEDULE_HEADER
 #define STXXL_ASYNC_SCHEDULE_HEADER
 
