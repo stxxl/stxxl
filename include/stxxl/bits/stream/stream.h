@@ -462,7 +462,6 @@ namespace stream
         if (nbuffers == 0)
             nbuffers = 2 * config::get_instance()->disks_number();
 
-
         outbegin.flush(); // flush container
 
         // create buffered write stream for blocks
@@ -470,10 +469,18 @@ namespace stream
 
         assert(outbegin.block_offset() == 0);
 
+        // delay calling block_externally_updated() until the block is
+        // completely filled (and written out) in outstream
+        ConstExtIterator prev_block = outbegin;
+
         while (!in.empty() && outend != outbegin)
         {
-            if (outbegin.block_offset() == 0)
-                outbegin.block_externally_updated();
+            if (outbegin.block_offset() == 0) {
+                if (prev_block != outbegin) {
+                    prev_block.block_externally_updated();
+                    prev_block = outbegin;
+                }
+            }
 
             *outstream = *in;
             ++outbegin;
@@ -489,6 +496,10 @@ namespace stream
             ++const_out;
             ++outstream;
         }
+
+        if (prev_block != outbegin)
+            prev_block.block_externally_updated();
+
         outbegin.flush();
 
         return outbegin;
@@ -1889,3 +1900,4 @@ namespace stream
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_STREAM_HEADER
+// vim: et:ts=4:sw=4
