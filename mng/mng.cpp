@@ -34,6 +34,7 @@ void DiskAllocator::dump()
     STXXL_ERRMSG("Total bytes: " << total);
 }
 
+
 void config::init(const char * config_path)
 {
     logger::get_instance();
@@ -130,6 +131,17 @@ void config::init(const char * config_path)
     }
 }
 
+
+class FileCreator
+{
+public:
+    virtual stxxl::file * create(const std::string & io_impl,
+                                 const std::string & filename,
+                                 int options, int disk);
+
+    virtual ~FileCreator() { }
+};
+
 file * FileCreator::create(const std::string & io_impl,
                            const std::string & filename,
                            int options, int disk)
@@ -212,6 +224,7 @@ file * FileCreator::create(const std::string & io_impl,
 
     return NULL;
 }
+
 
 block_manager::block_manager()
 {

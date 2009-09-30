@@ -50,18 +50,6 @@ __STXXL_BEGIN_NAMESPACE
 //! managing disks, and allocating and deallocating blocks of external storage
 //! \{
 
-
-class FileCreator
-{
-public:
-    virtual stxxl::file * create(const std::string & io_impl,
-                                 const std::string & filename,
-                                 int options, int disk);
-
-    virtual ~FileCreator() { }
-};
-
-
 //! \brief Block manager class
 
 //! Manages allocation and deallocation of blocks in multiple/single disk setting
