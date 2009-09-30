@@ -31,6 +31,12 @@
 // effect:  writes wait timing information to the file given via environment
 //          variable STXXLWAITLOGFILE, does nothing if this is not defined
 
+//#define STXXL_PRINT_TIMESTAMP_ALWAYS
+// default: not defined
+// used in: common/verbose.cpp
+// affects: library
+// effect:  prefix all MSG/ERRMSG/VERBOSE with elapsed time since program start
+
 //#define STXXL_SORT_OPTIMAL_PREFETCHING 0/1
 // default: 1
 // used in: algo/*sort.h, stream/sort_stream.h
