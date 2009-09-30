@@ -128,11 +128,6 @@ STXXL_MAX(const Tp& a, const Tp& b)
 
 #define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
 
-inline double log2(double x)
-{
-    return (log(x) / log(2.));
-}
-
 ////////////////////////////////////////////////////////////////////////////
 
 #ifdef __GNUC__
