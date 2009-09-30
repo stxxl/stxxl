@@ -151,6 +151,7 @@ IO_LAYER_FILES	 = \
 
 MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/adaptor.h \
+	$(HEADER_PATH)/mng/block_alloc.h \
 	$(HEADER_PATH)/mng/block_alloc_interleaved.h \
 	$(HEADER_PATH)/mng/block_prefetcher.h \
 	$(HEADER_PATH)/mng/buf_istream.h \
@@ -160,6 +161,7 @@ MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/bid.h \
 	$(HEADER_PATH)/mng/typed_block.h \
 	$(HEADER_PATH)/mng/diskallocator.h \
+	$(HEADER_PATH)/mng/config.h \
 	$(HEADER_PATH)/mng/write_pool.h \
 	$(HEADER_PATH)/mng/prefetch_pool.h \
 	$(HEADER_PATH)/mng/read_write_pool.h

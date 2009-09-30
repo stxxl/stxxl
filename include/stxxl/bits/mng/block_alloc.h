@@ -16,6 +16,7 @@
 
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/rand.h>
+#include <stxxl/bits/mng/config.h>
 
 
 __STXXL_BEGIN_NAMESPACE
