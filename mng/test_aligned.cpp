@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#define STXXL_DEFAULT_VERBOSE_LEVEL 0
+#define STXXL_VERBOSE_LEVEL 0
 #define STXXL_VERBOSE_ALIGNED_ALLOC STXXL_VERBOSE0
 #define STXXL_VERBOSE_TYPED_BLOCK STXXL_VERBOSE0
 
