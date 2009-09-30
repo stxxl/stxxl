@@ -948,6 +948,7 @@ namespace stream
 
         void fill_current_block()
         {
+            STXXL_VERBOSE1("fill_current_block");
             if (do_parallel_merge())
             {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
@@ -1049,6 +1050,7 @@ namespace stream
 
 // end of native merging procedure
             }
+            STXXL_VERBOSE1("current block filled");
         }
 
     public:
