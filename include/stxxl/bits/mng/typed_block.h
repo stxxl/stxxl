@@ -84,26 +84,31 @@ public:
     {
         return elem;
     }
+
     //! \brief Returns \c const_iterator pointing to the first element
     const_iterator begin() const
     {
         return elem;
     }
+
     //! \brief Returns \c const_iterator pointing to the first element
     const_iterator cbegin() const
     {
         return begin();
     }
+
     //! \brief Returns \c iterator pointing to the end element
     iterator end()
     {
         return elem + size;
     }
+
     //! \brief Returns \c const_iterator pointing to the end element
     const_iterator end() const
     {
         return elem + size;
     }
+
     //! \brief Returns \c const_iterator pointing to the end element
     const_iterator cend() const
     {
@@ -121,6 +126,7 @@ public:
         raw_size = RawSize_,
         nbids = NBids_
     };
+
     typedef BID<raw_size> bid_type;
 
     //! Array of BID references
@@ -144,6 +150,7 @@ public:
         raw_size = RawSize_,
         nbids = 0
     };
+
     typedef BID<raw_size> bid_type;
 
     block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_bids<> is constructed"); }
@@ -161,7 +168,10 @@ public:
     //! \brief Per block information element
     info_type info;
 
-    enum { size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_)) };
+    enum
+    {
+        size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_))
+    };
 
 public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info is constructed"); }
@@ -173,7 +183,10 @@ class block_w_info<T_, RawSize_, NBids_, void>:
 {
 public:
     typedef void info_type;
-    enum { size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_) / sizeof(T_)) };
+    enum
+    {
+        size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_) / sizeof(T_))
+    };
 
 public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info<> is constructed"); }
@@ -340,7 +353,6 @@ public:
 //! \}
 
 __STXXL_END_NAMESPACE
-
 
 #endif // !STXXL_TYPED_BLOCK_HEADER
 // vim: et:ts=4:sw=4

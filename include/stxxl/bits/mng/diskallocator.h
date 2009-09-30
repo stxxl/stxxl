@@ -32,6 +32,7 @@ class DiskAllocator : private noncopyable
     stxxl::mutex mutex;
 
     typedef std::pair<stxxl::int64, stxxl::int64> place;
+
     struct FirstFit : public std::binary_function<place, stxxl::int64, bool>
     {
         bool operator () (
@@ -41,6 +42,7 @@ class DiskAllocator : private noncopyable
             return (entry.second >= size);
         }
     };
+
     struct OffCmp
     {
         bool operator () (const stxxl::int64 & off1, const stxxl::int64 & off2)
@@ -87,10 +89,12 @@ public:
     {
         return free_bytes;
     }
+
     inline stxxl::int64 get_used_bytes() const
     {
         return disk_bytes - free_bytes;
     }
+
     inline stxxl::int64 get_total_bytes() const
     {
         return disk_bytes;
@@ -374,7 +378,6 @@ void DiskAllocator::delete_blocks(const BIDArray<BLK_SIZE> & bids)
 //! \}
 
 __STXXL_END_NAMESPACE
-
 
 #endif // !STXXL_DISKALLOCATOR_HEADER
 // vim: et:ts=4:sw=4

@@ -40,6 +40,7 @@ class config : public singleton<config>
         stxxl::int64 size;
         bool delete_on_exit;
     };
+
     std::vector<DiskEntry> disks_props;
 
     // in disks_props, flash devices come after all regular disks
@@ -95,6 +96,7 @@ public:
     {
         return disks_props[disk].path;
     }
+
     //! \brief Returns disk size
     //! \param disk disk's identifier
     //! \return disk size in bytes
@@ -102,6 +104,7 @@ public:
     {
         return disks_props[disk].size;
     }
+
     //! \brief Returns name of I/O implementation of particular disk
     //! \param disk disk's identifier
     inline const std::string & disk_io_impl(int disk) const
@@ -111,7 +114,6 @@ public:
 };
 
 __STXXL_END_NAMESPACE
-
 
 #endif // !STXXL_MNG__CONFIG_H
 // vim: et:ts=4:sw=4

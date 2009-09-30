@@ -42,16 +42,20 @@ struct basic_allocation_strategy
 struct striping
 {
     int begin, diff;
+
     striping(int b, int e) : begin(b), diff(e - b)
     { }
+
     striping() : begin(0)
     {
         diff = config::get_instance()->disks_number();
     }
+
     int operator () (int i) const
     {
         return begin + i % diff;
     }
+
     static const char * name()
     {
         return "striping";
@@ -68,14 +72,18 @@ struct striping
 struct FR : public striping
 {
     random_number<random_uniform_fast> rnd;
+
     FR(int b, int e) : striping(b, e)
     { }
+
     FR() : striping()
     { }
+
     int operator () (int /*i*/) const
     {
         return begin + rnd(diff);
     }
+
     static const char * name()
     {
         return "fully randomized striping";
@@ -87,19 +95,24 @@ struct FR : public striping
 struct SR : public striping
 {
     random_number<random_uniform_fast> rnd;
+
     int offset;
+
     SR(int b, int e) : striping(b, e)
     {
         offset = rnd(diff);
     }
+
     SR() : striping()
     {
         offset = rnd(diff);
     }
+
     int operator () (int i) const
     {
         return begin + (i + offset) % diff;
     }
+
     static const char * name()
     {
         return "simple randomized striping";
@@ -120,6 +133,7 @@ struct RC : public striping
         stxxl::random_number<random_uniform_fast> rnd;
         std::random_shuffle(perm.begin(), perm.end(), rnd __STXXL_FORCE_SEQUENTIAL);
     }
+
     RC() : striping(), perm(diff)
     {
         for (int i = 0; i < diff; i++)
@@ -128,10 +142,12 @@ struct RC : public striping
         random_number<random_uniform_fast> rnd;
         std::random_shuffle(perm.begin(), perm.end(), rnd __STXXL_FORCE_SEQUENTIAL);
     }
+
     int operator () (int i) const
     {
         return begin + perm[i % diff];
     }
+
     static const char * name()
     {
         return "randomized cycling striping";
@@ -142,8 +158,10 @@ struct RC_disk : public RC
 {
     RC_disk(int b, int e) : RC(b, e)
     { }
+
     RC_disk() : RC(config::get_instance()->regular_disk_range().first, config::get_instance()->regular_disk_range().second)
     { }
+
     static const char * name()
     {
         return "Randomized cycling striping on regular disks";
@@ -154,8 +172,10 @@ struct RC_flash : public RC
 {
     RC_flash(int b, int e) : RC(b, e)
     { }
+
     RC_flash() : RC(config::get_instance()->flash_range().first, config::get_instance()->flash_range().second)
     { }
+
     static const char * name()
     {
         return "Randomized cycling striping on flash devices";
@@ -172,10 +192,12 @@ struct single_disk
 
     single_disk() : disk(0)
     { }
+
     int operator () (int /*i*/) const
     {
         return disk;
     }
+
     static const char * name()
     {
         return "single disk";
@@ -209,7 +231,6 @@ struct offset_allocator
 //! \}
 
 __STXXL_END_NAMESPACE
-
 
 #endif // !STXXL_MNG__BLOCK_ALLOC_H
 // vim: et:ts=4:sw=4

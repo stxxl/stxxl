@@ -263,6 +263,5 @@ void block_manager::delete_blocks(
 
 __STXXL_END_NAMESPACE
 
-
 #endif // !STXXL_MNG_HEADER
 // vim: et:ts=4:sw=4

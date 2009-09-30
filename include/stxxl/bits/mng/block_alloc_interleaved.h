@@ -46,11 +46,13 @@ struct interleaved_striping
 
 struct interleaved_FR : public interleaved_striping
 {
+    random_number<random_uniform_fast> rnd;
+
     interleaved_FR(int_type _nruns, int _begindisk,
                    int _enddisk) : interleaved_striping(_nruns, _begindisk,
                                                         _enddisk)
     { }
-    random_number<random_uniform_fast> rnd;
+
     int operator () (int_type /*i*/) const
     {
         return begindisk + rnd(diff);
@@ -169,3 +171,4 @@ struct interleaved_alloc_traits<single_disk>
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_INTERLEAVED_ALLOC_HEADER
+// vim: et:ts=4:sw=4
