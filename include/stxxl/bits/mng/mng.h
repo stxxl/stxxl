@@ -323,57 +323,6 @@ struct offset_allocator
 
 //! \}
 
-#if 0 // deprecated
-
-//! \brief Traits for models of \b bid_iterator concept
-template <class bid_it>
-struct bid_iterator_traits
-{
-    bid_it * a;
-    enum
-    {
-        block_size = bid_it::block_size
-    };
-};
-
-template <unsigned blk_sz>
-struct bid_iterator_traits<BID<blk_sz> *>
-{
-    enum
-    {
-        block_size = blk_sz
-    };
-};
-
-
-template <unsigned blk_sz, class X>
-struct bid_iterator_traits<__gnu_cxx::__normal_iterator<BID<blk_sz> *, X> >
-{
-    enum
-    {
-        block_size = blk_sz
-    };
-};
-
-template <unsigned blk_sz, class X, class Y>
-struct bid_iterator_traits<std::_List_iterator<BID<blk_sz>, X, Y> >
-{
-    enum
-    {
-        block_size = blk_sz
-    };
-};
-
-template <unsigned blk_sz, class X>
-struct bid_iterator_traits<typename std::vector<BID<blk_sz>, X>::iterator>
-{
-    enum
-    {
-        block_size = blk_sz
-    };
-};
-
-#endif
 
 //! \brief Block manager class
 
