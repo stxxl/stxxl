@@ -21,5 +21,9 @@
 #define STXXL_CHECK_ORDER_IN_SORTS 0
 #endif
 
+#ifndef STXXL_L2_SIZE
+#define STXXL_L2_SIZE  (512 * 1024)
+#endif
+
 #endif // !STXXL_SORT_BASE_HEADER
 // vim: et:ts=4:sw=4

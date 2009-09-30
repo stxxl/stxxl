@@ -126,8 +126,6 @@ STXXL_MAX(const Tp& a, const Tp& b)
 	return std::max<Tp>(a, b);
 }
 
-#define STXXL_L2_SIZE  (512 * 1024)
-
 #define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
 
 inline double log2(double x)
