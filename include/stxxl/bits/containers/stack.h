@@ -58,7 +58,8 @@ class normal_stack : private noncopyable
 public:
     typedef Config_ cfg;
     typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy;
+    typedef typename cfg::alloc_strategy base_alloc_strategy_type;
+    typedef offset_allocator<base_alloc_strategy_type> alloc_strategy_type;
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
@@ -76,7 +77,7 @@ private:
     typename simple_vector<block_type>::iterator front_page;
     typename simple_vector<block_type>::iterator back_page;
     std::vector<bid_type> bids;
-    alloc_strategy alloc_strategy_;
+    alloc_strategy_type alloc_strategy;
 
 public:
     normal_stack() :
@@ -100,7 +101,7 @@ public:
         std::swap(front_page, obj.front_page);
         std::swap(back_page, obj.back_page);
         std::swap(bids, obj.bids);
-        std::swap(alloc_strategy_, obj.alloc_strategy_);
+        std::swap(alloc_strategy, obj.alloc_strategy);
     }
 
     //! \brief Construction from a stack
@@ -166,8 +167,8 @@ public:
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-            block_manager::get_instance()->new_blocks(
-                offset_allocator<alloc_strategy>(cur_bid - bids.begin(), alloc_strategy_), cur_bid, bids.end());
+            alloc_strategy.set_offset(cur_bid - bids.begin());
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end());
 
             simple_vector<request_ptr> requests(blocks_per_page);
 
@@ -260,7 +261,8 @@ class grow_shrink_stack : private noncopyable
 public:
     typedef Config_ cfg;
     typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy;
+    typedef typename cfg::alloc_strategy base_alloc_strategy_type;
+    typedef offset_allocator<base_alloc_strategy_type> alloc_strategy_type;
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
@@ -279,7 +281,7 @@ private:
     typename simple_vector<block_type>::iterator overlap_buffers;
     simple_vector<request_ptr> requests;
     std::vector<bid_type> bids;
-    alloc_strategy alloc_strategy_;
+    alloc_strategy_type alloc_strategy;
 
 public:
     grow_shrink_stack() :
@@ -305,7 +307,7 @@ public:
         std::swap(overlap_buffers, obj.overlap_buffers);
         std::swap(requests, obj.requests);
         std::swap(bids, obj.bids);
-        std::swap(alloc_strategy_, obj.alloc_strategy_);
+        std::swap(alloc_strategy, obj.alloc_strategy);
     }
 
     //! \brief Construction from a stack
@@ -379,8 +381,8 @@ public:
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-            block_manager::get_instance()->new_blocks(
-                offset_allocator<alloc_strategy>(cur_bid - bids.begin(), alloc_strategy_), cur_bid, bids.end());
+            alloc_strategy.set_offset(cur_bid - bids.begin());
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end());
 
             for (int i = 0; i < blocks_per_page; ++i, ++cur_bid)
             {
@@ -456,7 +458,8 @@ class grow_shrink_stack2 : private noncopyable
 public:
     typedef Config_ cfg;
     typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy;
+    typedef typename cfg::alloc_strategy base_alloc_strategy_type;
+    typedef offset_allocator<base_alloc_strategy_type> alloc_strategy_type;
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,     // stack of this type has only one page
@@ -472,7 +475,7 @@ private:
     block_type * cache;
     value_type current;
     std::vector<bid_type> bids;
-    alloc_strategy alloc_strategy_;
+    alloc_strategy_type alloc_strategy;
     unsigned_type pref_aggr;
     read_write_pool<block_type> pool;
 
@@ -501,7 +504,7 @@ public:
         std::swap(cache, obj.cache);
         std::swap(current, obj.current);
         std::swap(bids, obj.bids);
-        std::swap(alloc_strategy_, obj.alloc_strategy_);
+        std::swap(alloc_strategy, obj.alloc_strategy);
         std::swap(pref_aggr, obj.pref_aggr);
         //std::swap(pool,obj.pool);
     }
@@ -559,8 +562,8 @@ public:
 
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
-            block_manager::get_instance()->new_blocks(
-                offset_allocator<alloc_strategy>(cur_bid - bids.begin(), alloc_strategy_), cur_bid, bids.end());
+            alloc_strategy.set_offset(cur_bid - bids.begin());
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end());
             pool.write(cache, bids.back());
             cache = pool.steal();
             const int_type bids_size = bids.size();
@@ -670,7 +673,8 @@ class migrating_stack : private noncopyable
 public:
     typedef typename ExternalStack::cfg cfg;
     typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy;
+    typedef typename cfg::alloc_strategy base_alloc_strategy_type;
+    typedef offset_allocator<base_alloc_strategy_type> alloc_strategy_type;
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
