@@ -51,7 +51,8 @@ class queue : private noncopyable
 {
 public:
     typedef ValTp value_type;
-    typedef AllocStr alloc_strategy;
+    typedef AllocStr base_alloc_strategy_type;
+    typedef offset_allocator<base_alloc_strategy_type> alloc_strategy_type;
     typedef SzTp size_type;
     enum {
         block_size = BlkSz
@@ -70,8 +71,7 @@ private:
     block_type * back_block;
     value_type * front_element;
     value_type * back_element;
-    alloc_strategy alloc_strategy_;
-    unsigned_type alloc_counter;
+    alloc_strategy_type alloc_strategy;
     std::deque<bid_type> bids;
     block_manager * bm;
     unsigned_type blocks2prefetch;
@@ -86,7 +86,6 @@ public:
     explicit queue(unsigned_type w_pool_size = 3, unsigned_type p_pool_size = 1, int blocks2prefetch_ = -1) :
         size_(0),
         delete_pool(true),
-        alloc_counter(0),
         bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(sizes)");
@@ -106,7 +105,6 @@ public:
     queue(write_pool<block_type> & w_pool, prefetch_pool<block_type> & p_pool, int blocks2prefetch_ = -1)) :
         size_(0),
         delete_pool(true),
-        alloc_counter(0),
         bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pools)");
@@ -125,7 +123,6 @@ public:
         size_(0),
         delete_pool(false),
         pool(&pool_),
-        alloc_counter(0),
         bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pool)");
@@ -192,9 +189,8 @@ public:
                 // need to allocate new block
                 bid_type newbid;
 
-                offset_allocator<alloc_strategy> alloc_str(alloc_counter++, alloc_strategy_);
-
-                bm->new_block(alloc_str, newbid);
+                bm->new_block(alloc_strategy, newbid);
+                alloc_strategy.set_offset(alloc_strategy.get_offset() + 1);
 
                 STXXL_VERBOSE_QUEUE("queue[" << this << "]: push block " << back_block << " @ " << FMT_BID(newbid));
                 bids.push_back(newbid);
