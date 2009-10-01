@@ -43,6 +43,7 @@
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/msvc_compatibility.h>
 
 
 __STXXL_BEGIN_NAMESPACE

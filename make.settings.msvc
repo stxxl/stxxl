@@ -103,6 +103,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/singleton.h \
 	$(HEADER_PATH)/defines.h \
 	$(HEADER_PATH)/verbose.h \
+	$(HEADER_PATH)/msvc_compatibility.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
 	$(HEADER_PATH)/common/new_alloc.h \
 	$(HEADER_PATH)/common/mutex.h \
