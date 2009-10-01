@@ -61,6 +61,11 @@ struct BID
     template <unsigned BlockSize>
     explicit BID(const BID<BlockSize> & obj) : storage(obj.storage), offset(obj.offset)
     { }
+
+    bool is_managed() const
+    {
+        return storage->get_id() != -1;
+    }
 };
 
 
