@@ -41,7 +41,7 @@ WARNINGS	?= -Wall -w1 -openmp-report0 -vec-report0
 endif
 
 ifeq ($(strip $(USE_PMODE)),yes)
-COMPILER_GCC	?= g++-4.3.x
+COMPILER_GCC	?= g++-4.4.x
 LIBNAME		?= pmstxxl
 endif
 
