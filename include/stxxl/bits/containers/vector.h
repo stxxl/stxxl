@@ -771,7 +771,9 @@ public:
     typedef typed_block<BlkSize_, Tp_> block_type;
 
 private:
-    alloc_strategy_type _alloc_strategy;
+    typedef offset_allocator<alloc_strategy_type> offset_alloc_strategy_type;
+
+    offset_alloc_strategy_type alloc_strategy;
     size_type _size;
     bids_container_type _bids;
     mutable pager_type pager;
@@ -831,14 +833,13 @@ public:
         for (i = 0; i < n_pages; ++i)
             _free_slots.push(i);
 
-
-        bm->new_blocks(_alloc_strategy, _bids.begin(),
-                       _bids.end());
+        alloc_strategy.set_offset(0);
+        bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end());
     }
 
     void swap(vector & obj)
     {
-        std::swap(_alloc_strategy, obj._alloc_strategy);
+        std::swap(alloc_strategy, obj.alloc_strategy);
         std::swap(_size, obj._size);
         std::swap(_bids, obj._bids);
         std::swap(pager, obj.pager);
@@ -873,9 +874,10 @@ public:
 
         _bids.resize(new_bids_size);
         if (_from == NULL)
-            bm->new_blocks(offset_allocator<alloc_strategy_type>(old_bids_size, _alloc_strategy),
-                           _bids.begin() + old_bids_size, _bids.end());
-
+        {
+            alloc_strategy.set_offset(old_bids_size);
+            bm->new_blocks(alloc_strategy, _bids.begin() + old_bids_size, _bids.end());
+        }
         else
         {
             size_type offset = size_type(old_bids_size) * size_type(block_type::raw_size);
@@ -1051,9 +1053,8 @@ public:
         for (i = 0; i < n_pages; ++i)
             _free_slots.push(i);
 
-
-        bm->new_blocks(_alloc_strategy, _bids.begin(),
-                       _bids.end());
+        alloc_strategy.set_offset(0);
+        bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end());
 
         const_iterator inbegin = obj.begin();
         const_iterator inend = obj.end();
@@ -1614,3 +1615,4 @@ namespace std
 }
 
 #endif // !STXXL_VECTOR_HEADER
+// vim: et:ts=4:sw=4
