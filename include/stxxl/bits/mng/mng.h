@@ -68,7 +68,7 @@ protected:
     template <class BIDType, class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks_int(
         const unsigned_type nblocks,
-        DiskAssignFunctor functor,
+        const DiskAssignFunctor & functor,
         BIDIteratorClass out);
 
 public:
@@ -82,7 +82,7 @@ public:
     //! \param bidend bidirectional BID iterator object
     template <class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks(
-        DiskAssignFunctor functor,
+        const DiskAssignFunctor & functor,
         BIDIteratorClass bidbegin,
         BIDIteratorClass bidend);
 
@@ -97,7 +97,7 @@ public:
     template <class BlockType, class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks(
         const unsigned_type nblocks,
-        DiskAssignFunctor functor,
+        const DiskAssignFunctor & functor,
         BIDIteratorClass out);
 
     //! Allocates a new block according to the strategy
@@ -106,7 +106,7 @@ public:
     //! \param functor object of model of \b allocation_strategy concept
     //! \param bid BID to store the block identifier
     template <typename DiskAssignFunctor, unsigned BLK_SIZE>
-    void new_block(DiskAssignFunctor functor, BID<BLK_SIZE> & bid)
+    void new_block(const DiskAssignFunctor & functor, BID<BLK_SIZE> & bid)
     {
         new_blocks_int<BID<BLK_SIZE> >(1, functor, &bid);
     }
@@ -131,7 +131,7 @@ public:
 template <class BIDType, class DiskAssignFunctor, class OutputIterator>
 void block_manager::new_blocks_int(
     const unsigned_type nblocks,
-    DiskAssignFunctor functor,
+    const DiskAssignFunctor & functor,
     OutputIterator out)
 {
     typedef BIDType bid_type;
@@ -189,7 +189,7 @@ void block_manager::new_blocks_int(
 template <class BlockType, class DiskAssignFunctor, class OutputIterator>
 void block_manager::new_blocks(
     const unsigned_type nblocks,
-    DiskAssignFunctor functor,
+    const DiskAssignFunctor & functor,
     OutputIterator out)
 {
     typedef typename BlockType::bid_type bid_type;
@@ -198,7 +198,7 @@ void block_manager::new_blocks(
 
 template <class DiskAssignFunctor, class BIDIteratorClass>
 void block_manager::new_blocks(
-    DiskAssignFunctor functor,
+    const DiskAssignFunctor & functor,
     BIDIteratorClass bidbegin,
     BIDIteratorClass bidend)
 {
