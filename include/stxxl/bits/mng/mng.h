@@ -84,7 +84,11 @@ public:
     void new_blocks(
         const DiskAssignFunctor & functor,
         BIDIteratorClass bidbegin,
-        BIDIteratorClass bidend);
+        BIDIteratorClass bidend)
+    {
+        typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
+        new_blocks_int<bid_type>(std::distance(bidbegin, bidend), functor, bidbegin);
+    }
 
     //! Allocates new blocks according to the strategy
     //! given by \b functor and stores block identifiers
@@ -98,7 +102,11 @@ public:
     void new_blocks(
         const unsigned_type nblocks,
         const DiskAssignFunctor & functor,
-        BIDIteratorClass out);
+        BIDIteratorClass out)
+    {
+        typedef typename BlockType::bid_type bid_type;
+        new_blocks_int<bid_type>(nblocks, functor, out);
+    }
 
     //! Allocates a new block according to the strategy
     //! given by \b functor and stores the block identifier
@@ -184,26 +192,6 @@ void block_manager::new_blocks_int(
     delete[] bl;
     delete[] disk_bids;
     delete[] disk_ptrs;
-}
-
-template <class BlockType, class DiskAssignFunctor, class OutputIterator>
-void block_manager::new_blocks(
-    const unsigned_type nblocks,
-    const DiskAssignFunctor & functor,
-    OutputIterator out)
-{
-    typedef typename BlockType::bid_type bid_type;
-    new_blocks_int<bid_type>(nblocks, functor, out);
-}
-
-template <class DiskAssignFunctor, class BIDIteratorClass>
-void block_manager::new_blocks(
-    const DiskAssignFunctor & functor,
-    BIDIteratorClass bidbegin,
-    BIDIteratorClass bidend)
-{
-    typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
-    new_blocks_int<bid_type>(std::distance(bidbegin, bidend), functor, bidbegin);
 }
 
 
