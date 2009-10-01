@@ -203,17 +203,7 @@ void block_manager::new_blocks(
     BIDIteratorClass bidend)
 {
     typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
-
-    unsigned_type nblocks = 0;
-
-    BIDIteratorClass bidbegin_copy(bidbegin);
-    while (bidbegin_copy != bidend)
-    {
-        ++bidbegin_copy;
-        ++nblocks;
-    }
-
-    new_blocks_int<bid_type>(nblocks, functor, bidbegin);
+    new_blocks_int<bid_type>(std::distance(bidbegin, bidend), functor, bidbegin);
 }
 
 
