@@ -676,6 +676,8 @@ namespace stream
 
     private:
         typedef typename sorted_runs_type::run_type run_type;
+        typedef offset_allocator<alloc_strategy_type> offset_alloc_strategy_type;
+
         sorted_runs_type result_; // stores the result (sorted runs)
         unsigned_type m_;         // memory for internal use in blocks
         buffered_writer<block_type> writer;
@@ -683,7 +685,7 @@ namespace stream
         unsigned_type offset;
         unsigned_type iblock;
         unsigned_type irun;
-        alloc_strategy_type alloc_strategy;
+        offset_alloc_strategy_type alloc_strategy;  // needs to be reset after each run
 
     public:
         //! \brief Creates the object
@@ -722,8 +724,9 @@ namespace stream
                 // allocate space for the block
                 result_.runs.resize(irun + 1);
                 result_.runs[irun].resize(iblock + 1);
+                alloc_strategy.set_offset(iblock);
                 bm->new_blocks(
-                    offset_allocator<alloc_strategy_type>(iblock, alloc_strategy),
+                    alloc_strategy,
                     trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
                         result_.runs[irun].begin() + iblock),
                     trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
@@ -763,8 +766,9 @@ namespace stream
                 // allocate space for the block
                 result_.runs.resize(irun + 1);
                 result_.runs[irun].resize(iblock + 1);
+                alloc_strategy.set_offset(iblock);
                 bm->new_blocks(
-                    offset_allocator<alloc_strategy_type>(iblock, alloc_strategy),
+                    alloc_strategy,
                     trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
                         result_.runs[irun].begin() + iblock),
                     trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
@@ -777,6 +781,7 @@ namespace stream
             else
             { }
 
+            alloc_strategy = offset_alloc_strategy_type();  // reinitialize block allocator for the next run
             iblock = 0;
             ++irun;
         }
