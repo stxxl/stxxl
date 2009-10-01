@@ -51,8 +51,7 @@ class queue : private noncopyable
 {
 public:
     typedef ValTp value_type;
-    typedef AllocStr base_alloc_strategy_type;
-    typedef offset_allocator<base_alloc_strategy_type> alloc_strategy_type;
+    typedef AllocStr alloc_strategy_type;
     typedef SzTp size_type;
     enum {
         block_size = BlkSz
@@ -62,6 +61,7 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
+    typedef offset_allocator<alloc_strategy_type> offset_alloc_strategy_type;
     typedef read_write_pool<block_type> pool_type;
 
     size_type size_;
@@ -71,7 +71,7 @@ private:
     block_type * back_block;
     value_type * front_element;
     value_type * back_element;
-    alloc_strategy_type alloc_strategy;
+    offset_alloc_strategy_type alloc_strategy;
     std::deque<bid_type> bids;
     block_manager * bm;
     unsigned_type blocks2prefetch;
