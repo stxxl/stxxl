@@ -639,7 +639,7 @@ namespace ksort_local
                 runs_left -= runs2merge;
             }
             // allocate blocks in the new runs
-            if (cur_out_run == 1 && blocks_in_new_run == int_type(_n) && (input_bids->storage->get_id() == -1))
+            if (cur_out_run == 1 && blocks_in_new_run == int_type(_n) && !input_bids->is_managed())
             {
                 // if we sort a file we can reuse the input bids for the output
                 input_bid_iterator cur = input_bids;
@@ -649,14 +649,14 @@ namespace ksort_local
                 }
 
                 bid_type & firstBID = (*new_runs[0])[0].bid;
-                if (firstBID.storage->get_id() != -1)
+                if (firstBID.is_managed())
                 {
                     // the first block does not belong to the file
                     // need to reallocate it
                     mng->new_block(FR(), firstBID);
                 }
                 bid_type & lastBID = (*new_runs[0])[_n - 1].bid;
-                if (lastBID.storage->get_id() != -1)
+                if (lastBID.is_managed())
                 {
                     // the first block does not belong to the file
                     // need to reallocate it

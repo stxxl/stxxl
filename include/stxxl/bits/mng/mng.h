@@ -200,7 +200,7 @@ void block_manager::delete_block(const BID<BLK_SIZE> & bid)
 {
     // do not uncomment it
     //assert(bid.storage->get_id() < config::get_instance()->disks_number());
-    if (bid.storage->get_id() == -1)
+    if (!bid.is_managed())
         return;  // self managed disk
     STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:delete " << FMT_BID(bid));
     assert(bid.storage->get_id() >= 0);
