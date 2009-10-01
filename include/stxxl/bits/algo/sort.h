@@ -710,14 +710,14 @@ namespace sort_local
                 {
                     // the first block does not belong to the file
                     // need to reallocate it
-                    mng->new_blocks(FR(), &firstBID, (&firstBID) + 1);
+                    mng->new_block(FR(), firstBID);
                 }
                 bid_type & lastBID = (*new_runs[0])[_n - 1].bid;
                 if (lastBID.storage->get_id() != -1)
                 {
                     // the first block does not belong to the file
                     // need to reallocate it
-                    mng->new_blocks(FR(), &lastBID, (&lastBID) + 1);
+                    mng->new_block(FR(), lastBID);
                 }
             }
             else
@@ -811,8 +811,8 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_blocks(FR(), &first_bid, (&first_bid) + 1);                // try to overlap
-                mng->new_blocks(FR(), &last_bid, (&last_bid) + 1);
+                mng->new_block(FR(), first_bid);                // try to overlap
+                mng->new_block(FR(), last_bid);
                 req->wait();
 
 
@@ -927,7 +927,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
-                mng->new_blocks(FR(), &first_bid, (&first_bid) + 1);                // try to overlap
+                mng->new_block(FR(), first_bid);                // try to overlap
                 req->wait();
 
 
@@ -1011,7 +1011,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                 unsigned_type i;
 
                 req = last_block->read(*last.bid());
-                mng->new_blocks(FR(), &last_bid, (&last_bid) + 1);
+                mng->new_block(FR(), last_bid);
                 req->wait();
 
 

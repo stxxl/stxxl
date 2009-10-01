@@ -653,14 +653,14 @@ namespace ksort_local
                 {
                     // the first block does not belong to the file
                     // need to reallocate it
-                    mng->new_blocks(FR(), &firstBID, (&firstBID) + 1);
+                    mng->new_block(FR(), firstBID);
                 }
                 bid_type & lastBID = (*new_runs[0])[_n - 1].bid;
                 if (lastBID.storage->get_id() != -1)
                 {
                     // the first block does not belong to the file
                     // need to reallocate it
-                    mng->new_blocks(FR(), &lastBID, (&lastBID) + 1);
+                    mng->new_block(FR(), lastBID);
                 }
             }
             else
@@ -782,8 +782,8 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 request_ptr req;
 
                 req = first_block->read(*first_.bid());
-                mng->new_blocks(FR(), &first_bid, (&first_bid) + 1);                // try to overlap
-                mng->new_blocks(FR(), &last_bid, (&last_bid) + 1);
+                mng->new_block(FR(), first_bid);                // try to overlap
+                mng->new_block(FR(), last_bid);
                 req->wait();
 
 
@@ -893,7 +893,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 request_ptr req;
 
                 req = first_block->read(*first_.bid());
-                mng->new_blocks(FR(), &first_bid, (&first_bid) + 1);                // try to overlap
+                mng->new_block(FR(), first_bid);                // try to overlap
                 req->wait();
 
 
@@ -975,7 +975,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 unsigned_type i;
 
                 req = last_block->read(*last_.bid());
-                mng->new_blocks(FR(), &last_bid, (&last_bid) + 1);
+                mng->new_block(FR(), last_bid);
                 req->wait();
 
                 for (i = last_.block_offset(); i < block_type::size; i++)
