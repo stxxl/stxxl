@@ -133,7 +133,7 @@ namespace stable_ksort_local
     template <typename ExtIterator_>
     void distribute(
         bid_sequence<typename ExtIterator_::vector_type::block_type::bid_type,
-                     typename ExtIterator_::vector_type::alloc_strategy> * bucket_bids,
+                     typename ExtIterator_::vector_type::alloc_strategy_type> * bucket_bids,
         int64 * bucket_sizes,
         const int_type nbuckets,
         const int_type lognbuckets,
@@ -228,7 +228,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     typedef typename value_type::key_type key_type;
     typedef typename ExtIterator_::block_type block_type;
     typedef typename block_type::bid_type bid_type;
-    typedef typename ExtIterator_::vector_type::alloc_strategy alloc_strategy;
+    typedef typename ExtIterator_::vector_type::alloc_strategy_type alloc_strategy;
     typedef stable_ksort_local::bid_sequence<bid_type, alloc_strategy> bucket_bids_type;
     typedef stable_ksort_local::type_key<value_type> type_key_;
 

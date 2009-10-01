@@ -820,7 +820,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 run_type * out =
                     ksort_local::ksort_blocks<
                         typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy,
+                        typename ExtIterator_::vector_type::alloc_strategy_type,
                         typename ExtIterator_::bids_container_iterator,
                         KeyExtractor_>
                         (first_.bid(), n, M__ / block_type::raw_size, keyobj);
@@ -916,7 +916,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 run_type * out =
                     ksort_local::ksort_blocks<
                         typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy,
+                        typename ExtIterator_::vector_type::alloc_strategy_type,
                         typename ExtIterator_::bids_container_iterator,
                         KeyExtractor_>
                         (first_.bid(), n, M__ / block_type::raw_size, keyobj);
@@ -996,7 +996,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 run_type * out =
                     ksort_local::ksort_blocks<
                         typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy,
+                        typename ExtIterator_::vector_type::alloc_strategy_type,
                         typename ExtIterator_::bids_container_iterator,
                         KeyExtractor_>
                         (first_.bid(), n, M__ / block_type::raw_size, keyobj);
@@ -1045,7 +1045,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 run_type * out =
                     ksort_local::ksort_blocks<
                         typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy,
+                        typename ExtIterator_::vector_type::alloc_strategy_type,
                         typename ExtIterator_::bids_container_iterator,
                         KeyExtractor_>
                         (first_.bid(), n, M__ / block_type::raw_size, keyobj);
