@@ -553,10 +553,19 @@ namespace stream
 
         assert(out.block_offset() == 0);
 
+        // delay calling block_externally_updated() until the block is
+        // completely filled (and written out) in outstream
+        ConstExtIterator prev_block = out;
+
         while (!in.empty())
         {
-            if (out.block_offset() == 0)
-                out.block_externally_updated();
+            if (out.block_offset() == 0) {
+                if (prev_block != out) {
+                    prev_block.block_externally_updated();
+                    prev_block = out;
+                }
+            }
+
             // tells the vector that the block was modified
             *outstream = *in;
             ++out;
@@ -572,6 +581,10 @@ namespace stream
             ++const_out;                         // contains data beyond out
             ++outstream;
         }
+
+        if (prev_block != out)
+            prev_block.block_externally_updated();
+
         out.flush();
 
         return out;
