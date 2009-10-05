@@ -139,7 +139,7 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/request_queue_impl_worker.h \
 	$(HEADER_PATH)/io/request_queue_impl_qwqr.h \
 	$(HEADER_PATH)/io/file.h \
-	$(HEADER_PATH)/io/file_request_basic.h \
+	$(HEADER_PATH)/io/async_file.h \
 	$(HEADER_PATH)/io/ufs_file_base.h \
 	$(HEADER_PATH)/io/syscall_file.h \
 	$(HEADER_PATH)/io/mmap_file.h \

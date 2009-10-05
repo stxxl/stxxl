@@ -104,7 +104,7 @@ const char * boostfd_file::io_type() const
 boostfd_file::boostfd_file(
     const std::string & filename,
     int mode,
-    int disk) : file_request_basic(disk), mode_(mode)
+    int disk) : async_file(disk), mode_(mode)
 {
     BOOST_IOS::openmode boostfd_mode;
 
