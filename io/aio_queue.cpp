@@ -12,7 +12,7 @@
 
 #include <stxxl/bits/io/request_state_impl_basic.h>
 #include <stxxl/bits/io/aio_queue.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/aio_request.h>
 #include <stxxl/bits/parallel.h>
 
 
@@ -34,7 +34,7 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
     }
 };
 
-aio_queue::aio_queue(int /*n*/)              //  n is ignored
+aio_queue::aio_queue(int max_sim_requests) : max_sim_requests(max_sim_requests), num_sim_requests(0)
 {
     start_thread(worker, static_cast<void *>(this));
 }
@@ -46,72 +46,28 @@ void aio_queue::add_request(request_ptr & req)
     if (_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
 
-    if (req.get()->get_type() == request::READ)
-    {
-#if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
-        {
-            scoped_mutex_lock Lock(write_mutex);
-            if (std::find_if(write_queue.begin(), write_queue.end(),
-                             bind2nd(file_offset_match(), req) __STXXL_FORCE_SEQUENTIAL)
-                != write_queue.end())
-            {
-                STXXL_ERRMSG("READ request submitted for a BID with a pending WRITE request");
-            }
-        }
-#endif
-        scoped_mutex_lock Lock(read_mutex);
-        read_queue.push_back(req);
-    }
-    else
-    {
-#if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
-        {
-            scoped_mutex_lock Lock(read_mutex);
-            if (std::find_if(read_queue.begin(), read_queue.end(),
-                             bind2nd(file_offset_match(), req) __STXXL_FORCE_SEQUENTIAL)
-                != read_queue.end())
-            {
-                STXXL_ERRMSG("WRITE request submitted for a BID with a pending READ request");
-            }
-        }
-#endif
-        scoped_mutex_lock Lock(write_mutex);
-        write_queue.push_back(req);
-    }
+	scoped_mutex_lock lock(mtx);
+   	waiting_requests.push_back(req);
 
     sem++;
 }
 
-bool aio_queue::cancel_request(request_ptr & req)
+bool aio_queue::cancel_request(request_ptr& req)
 {
     if (req.empty())
-        STXXL_THROW_INVALID_ARGUMENT("Empty request cancelled disk_queue.");
+        STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
     if (_thread_state() != RUNNING)
-        STXXL_THROW_INVALID_ARGUMENT("Request cancelled to not running queue.");
+        STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
 
     bool was_still_in_queue = false;
-    if (req.get()->get_type() == request::READ)
-    {
-        scoped_mutex_lock Lock(read_mutex);
-        queue_type::iterator pos;
-        if ((pos = std::find(read_queue.begin(), read_queue.end(), req __STXXL_FORCE_SEQUENTIAL)) != read_queue.end())
-        {
-            read_queue.erase(pos);
-            was_still_in_queue = true;
-            sem--;
-        }
-    }
-    else
-    {
-        scoped_mutex_lock Lock(write_mutex);
-        queue_type::iterator pos;
-        if ((pos = std::find(write_queue.begin(), write_queue.end(), req __STXXL_FORCE_SEQUENTIAL)) != write_queue.end())
-        {
-            write_queue.erase(pos);
-            was_still_in_queue = true;
-            sem--;
-        }
-    }
+	scoped_mutex_lock lock(mtx);
+	queue_type::iterator pos;
+	if ((pos = std::find(waiting_requests.begin(), waiting_requests.end(), req __STXXL_FORCE_SEQUENTIAL)) != waiting_requests.end())
+	{
+		waiting_requests.erase(pos);
+		was_still_in_queue = true;
+		sem--;
+	}
 
     return was_still_in_queue;
 }
@@ -121,83 +77,61 @@ aio_queue::~aio_queue()
     stop_thread();
 }
 
-void * aio_queue::worker(void * arg)
+void aio_queue::suspend()
 {
-    self * pthis = static_cast<self *>(arg);
-    request_ptr req;
+	aiocb64** prs = new aiocb64*[posted_requests.size()];
 
-    bool write_phase = true;
+	int i = 0;
+	for (queue_type::const_iterator pr = posted_requests.begin(); pr != posted_requests.end(); ++pr)
+		prs[i++] = (static_cast<aio_request*>((*pr).get()))->get_cb();
+
+	aio_suspend(NULL, 0, NULL);
+	aio_suspend64(prs, posted_requests.size(), NULL);
+}
+
+void aio_queue::handle_requests()
+{
+    aio_request* req;
+
     for ( ; ; )
     {
-        pthis->sem--;
+        sem--;
 
-        if (write_phase)
-        {
-            scoped_mutex_lock WriteLock(pthis->write_mutex);
-            if (!pthis->write_queue.empty())
-            {
-                req = pthis->write_queue.front();
-                pthis->write_queue.pop_front();
+		scoped_mutex_lock lock(mtx);
+		if (!waiting_requests.empty())
+		{
+			req = static_cast<aio_request*>(waiting_requests.front().get());
 
-                WriteLock.unlock();
+			lock.unlock();
 
-                //assert(req->nref() > 1);
-                req->serve();
-            }
-            else
-            {
-                WriteLock.unlock();
+			if(!req->post())
+				suspend();
+			else
+			{
+				waiting_requests.pop_front();
+				posted_requests.push_back(req);
+			}
+		}
+		else
+		{
+			lock.unlock();
 
-                pthis->sem++;
+			sem++;
+		}
 
-                if (pthis->_priority_op == WRITE)
-                    write_phase = false;
-            }
-
-            if (pthis->_priority_op == NONE
-                || pthis->_priority_op == READ)
-                write_phase = false;
-        }
-        else
-        {
-            scoped_mutex_lock ReadLock(pthis->read_mutex);
-
-            if (!pthis->read_queue.empty())
-            {
-                req = pthis->read_queue.front();
-                pthis->read_queue.pop_front();
-
-                ReadLock.unlock();
-
-                STXXL_VERBOSE2("queue: before serve request has " << req->nref() << " references ");
-                //assert(req->nref() > 1);
-                req->serve();
-                STXXL_VERBOSE2("queue: after serve request has " << req->nref() << " references ");
-            }
-            else
-            {
-                ReadLock.unlock();
-
-                pthis->sem++;
-
-                if (pthis->_priority_op == READ)
-                    write_phase = true;
-            }
-
-            if (pthis->_priority_op == NONE
-                || pthis->_priority_op == WRITE)
-                write_phase = true;
-        }
-
-        // terminate if it has been requested and queues are empty
-        if (pthis->_thread_state() == TERMINATE) {
-            if ((pthis->sem--) == 0)
+        // terminate if termination has been requested and queues are empty
+        if (_thread_state() == TERMINATE) {
+            if ((sem--) == 0)
                 break;
             else
-                pthis->sem++;
+                sem++;
         }
     }
+}
 
+void* aio_queue::worker(void * arg)
+{
+    (static_cast<aio_queue*>(arg))->handle_requests();
     return NULL;
 }
 

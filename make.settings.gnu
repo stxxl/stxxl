@@ -297,7 +297,7 @@ HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h exithandler.h
 
 HEADER_FILES_IO		+= io.h iostats.h completion_handler.h
 HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h
-HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h
+HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h aio_request.h
 HEADER_FILES_IO		+= disk_queues.h
 HEADER_FILES_IO		+= request_queue.h request_queue_impl_worker.h
 HEADER_FILES_IO		+= request_queue_impl_qwqr.h aio_queue.h
@@ -406,6 +406,7 @@ STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS_CXX)
 STXXL_LINKER_OPTIONS	+= $(DEBUG)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDFLAGS)
 STXXL_LINKER_OPTIONS	+= $(STXXL_LDLIBS)
+STXXL_LINKER_OPTIONS	+= -lrt
 
 ifeq ($(strip $(USE_PMODE)),yes)
 STXXL_COMPILER_OPTIONS	+= $(PARALLEL_MODE_CPPFLAGS)

@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/aio_file.h>
-#include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/aio_request.h>
 
 #ifndef BOOST_MSVC
 // libaio does not exist on Windows
@@ -38,7 +38,7 @@ request_ptr aio_file::aread(
     size_type bytes,
     const completion_handler & on_cmpl)
 {
-    request_ptr req = new request_impl_basic(on_cmpl, this,
+    request_ptr req = new aio_request(on_cmpl, this,
                                              buffer, pos, bytes,
                                              request::READ);
 
@@ -53,7 +53,7 @@ request_ptr aio_file::awrite(
     size_type bytes,
     const completion_handler & on_cmpl)
 {
-    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
+    request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes,
                                              request::WRITE);
 
     q.add_request(req);

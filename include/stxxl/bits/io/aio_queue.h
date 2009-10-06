@@ -28,31 +28,22 @@ __STXXL_BEGIN_NAMESPACE
 class aio_queue : public request_queue_impl_worker, public disk_queue, public singleton<aio_queue>
 {
 private:
-    typedef aio_queue self;
     typedef std::list<request_ptr> queue_type;
 
-    mutex write_mutex;
-    mutex read_mutex;
-    queue_type write_queue;
-    queue_type read_queue;
+    mutex mtx;
+    queue_type waiting_requests, posted_requests;
+    int max_sim_requests, num_sim_requests;
 
     static const priority_op _priority_op = WRITE;
 
-    static void * worker(void * arg);
+    static void* worker(void * arg);
+    void handle_requests();
+    void suspend();
 
 public:
-    // \param n max number of requests simultaneously submitted to disk
-    aio_queue(int n = 1);
+    // \param max_sim_requests max number of requests simultaneously submitted to disk, 0 means as many as possible
+    aio_queue(int max_sim_requests = 0);
 
-    // in a multi-threaded setup this does not work as intended
-    // also there were race conditions possible
-    // and actually an old value was never restored once a new one was set ...
-    // so just disable it and all it's nice implications
-    void set_priority_op(priority_op op)
-    {
-        //_priority_op = op;
-        STXXL_UNUSED(op);
-    }
     void add_request(request_ptr & req);
     bool cancel_request(request_ptr & req);
     ~aio_queue();

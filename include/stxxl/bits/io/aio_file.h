@@ -55,6 +55,11 @@ public:
 
     const char * io_type() const;
     int get_id() const { return -2; }
+    int get_file_des()
+    {
+    	return file_des;
+    }
+
 };
 
 //! \}
