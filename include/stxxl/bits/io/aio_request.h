@@ -31,6 +31,8 @@ class aio_request : public request_impl_basic
 
     aiocb64 cb;
 
+    static void completed_callback(sigval_t ptr);
+
 public:
     aio_request(
         const completion_handler & on_cmpl,
@@ -40,28 +42,9 @@ public:
         size_type b,
         request_type t) :
         	request_impl_basic(on_cmpl, f, buf, off, b, t)
-        	{
+      	{ }
 
-        	}
-
-    bool post()
-    {
-    	aio_file* af = dynamic_cast<aio_file*>(file_);
-    	cb.aio_fildes = af->get_file_des();
-    	cb.aio_offset = offset;
-    	cb.aio_buf = buffer;
-    	cb.aio_nbytes = bytes;
-    	cb.aio_reqprio = 0;
-    	//cb.aio_sigevent = SIGEV_NONE;
-
-    	int success;
-    	if (type == READ)
-    		success = aio_read64(&cb);
-    	else
-    		success = aio_write64(&cb);
-
-    	return success != EAGAIN;
-    }
+    bool post();
 
     aiocb64* get_cb()
     {

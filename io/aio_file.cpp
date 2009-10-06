@@ -24,6 +24,7 @@ aio_queue aio_file::q;
 
 void aio_file::serve(const request * req) throw(io_error)
 {
+	STXXL_UNUSED(req);
 	assert(false);
 }
 

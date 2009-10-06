@@ -173,7 +173,7 @@ file * FileCreator::create(const std::string & io_impl,
     }
     else if (io_impl == "aio")
     {
-        ufs_file_base * result = new aio_file(filename, options);
+        ufs_file_base * result = new aio_file(filename, options, disk);
         result->lock();
         return result;
     }

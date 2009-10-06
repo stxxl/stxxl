@@ -52,6 +52,11 @@ void aio_queue::add_request(request_ptr & req)
     sem++;
 }
 
+void aio_queue::complete_request(request_ptr & req)
+{
+	std::remove(posted_requests.begin(), posted_requests.end(), req __STXXL_FORCE_SEQUENTIAL);
+}
+
 bool aio_queue::cancel_request(request_ptr& req)
 {
     if (req.empty())
@@ -68,7 +73,13 @@ bool aio_queue::cancel_request(request_ptr& req)
 		was_still_in_queue = true;
 		sem--;
 	}
-
+	if ((pos = std::find(posted_requests.begin(), posted_requests.end(), req __STXXL_FORCE_SEQUENTIAL)) != posted_requests.end())
+	{
+		aio_cancel64(dynamic_cast<aio_file*>(static_cast<aio_request*>((*pos).get())->get_file())->get_file_des(), static_cast<aio_request*>((*pos).get())->get_cb());
+		posted_requests.erase(pos);
+		was_still_in_queue = true;
+		sem--;
+	}
     return was_still_in_queue;
 }
 
@@ -85,13 +96,14 @@ void aio_queue::suspend()
 	for (queue_type::const_iterator pr = posted_requests.begin(); pr != posted_requests.end(); ++pr)
 		prs[i++] = (static_cast<aio_request*>((*pr).get()))->get_cb();
 
-	aio_suspend(NULL, 0, NULL);
 	aio_suspend64(prs, posted_requests.size(), NULL);
+
+	delete[] prs;
 }
 
 void aio_queue::handle_requests()
 {
-    aio_request* req;
+    request_ptr req;
 
     for ( ; ; )
     {
@@ -100,17 +112,15 @@ void aio_queue::handle_requests()
 		scoped_mutex_lock lock(mtx);
 		if (!waiting_requests.empty())
 		{
-			req = static_cast<aio_request*>(waiting_requests.front().get());
+			req = waiting_requests.front();
+			waiting_requests.pop_front();
 
 			lock.unlock();
 
-			if(!req->post())
+			while (!static_cast<aio_request*>(req.get())->post())
 				suspend();
-			else
-			{
-				waiting_requests.pop_front();
-				posted_requests.push_back(req);
-			}
+
+			posted_requests.push_back(req);
 		}
 		else
 		{
@@ -119,7 +129,7 @@ void aio_queue::handle_requests()
 			sem++;
 		}
 
-        // terminate if termination has been requested and queues are empty
+        // terminate if termination has been requested
         if (_thread_state() == TERMINATE) {
             if ((sem--) == 0)
                 break;

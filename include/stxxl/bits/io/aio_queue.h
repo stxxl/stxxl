@@ -46,6 +46,7 @@ public:
 
     void add_request(request_ptr & req);
     bool cancel_request(request_ptr & req);
+    void complete_request(request_ptr & req);
     ~aio_queue();
 };
 

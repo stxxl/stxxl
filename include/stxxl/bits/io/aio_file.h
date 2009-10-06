@@ -32,7 +32,10 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation of file based on the POSIX interface for asynchronous I/O
 class aio_file : public ufs_file_base
 {
+	friend class aio_request;
+
 private:
+	int id;
 	static aio_queue q;
 
 public:
@@ -43,22 +46,17 @@ public:
     //! \param disk disk(file) identifier
     aio_file(
         const std::string & filename,
-        int mode, int disk = -2) : ufs_file_base(filename, mode)
+        int mode, int disk = -1) : ufs_file_base(filename, mode), id(disk)
     {
-        STXXL_UNUSED(disk);
     }
-    void serve(const request * req) throw (io_error);
-    request_ptr aread(void * buffer, offset_type pos, size_type bytes,
+    void serve(const request* req) throw (io_error);
+    request_ptr aread(void* buffer, offset_type pos, size_type bytes,
                               const completion_handler & on_cmpl);
-    request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
+    request_ptr awrite(void* buffer, offset_type pos, size_type bytes,
                                const completion_handler & on_cmpl);
 
     const char * io_type() const;
-    int get_id() const { return -2; }
-    int get_file_des()
-    {
-    	return file_des;
-    }
+    int get_id() const { return id; }
 
 };
 
