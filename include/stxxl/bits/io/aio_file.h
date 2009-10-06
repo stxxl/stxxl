@@ -21,7 +21,7 @@
 // libaio does not exist on Windows
 
 #include <stxxl/bits/io/ufs_file_base.h>
-#include <stxxl/bits/io/disk_queued_file.h>
+#include <stxxl/bits/io/aio_queue.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -32,6 +32,9 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation of file based on the POSIX interface for asynchronous I/O
 class aio_file : public ufs_file_base
 {
+private:
+	static aio_queue q;
+
 public:
     //! \brief constructs file object
     //! \param filename path of file

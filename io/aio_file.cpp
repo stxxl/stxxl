@@ -20,6 +20,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+aio_queue aio_file::q;
 
 void aio_file::serve(const request * req) throw(io_error)
 {
@@ -37,14 +38,13 @@ request_ptr aio_file::aread(
     size_type bytes,
     const completion_handler & on_cmpl)
 {
-//    request_ptr req = new request_impl_basic(on_cmpl, this,
-//                                             buffer, pos, bytes,
-//                                             request::READ);
-//
-//    disk_queues::get_instance()->add_request(req, get_id());
-//
-//    return req;
-	return request_ptr(NULL);
+    request_ptr req = new request_impl_basic(on_cmpl, this,
+                                             buffer, pos, bytes,
+                                             request::READ);
+
+    q.add_request(req);
+
+    return req;
 }
 
 request_ptr aio_file::awrite(
@@ -53,13 +53,12 @@ request_ptr aio_file::awrite(
     size_type bytes,
     const completion_handler & on_cmpl)
 {
-//    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
-//                                             request::WRITE);
-//
-//    disk_queues::get_instance()->add_request(req, get_id());
-//
-//    return req;
-	return request_ptr(NULL);
+    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
+                                             request::WRITE);
+
+    q.add_request(req);
+
+    return req;
 }
 
 __STXXL_END_NAMESPACE
