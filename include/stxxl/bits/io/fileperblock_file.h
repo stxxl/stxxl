@@ -14,7 +14,7 @@
 #define STXXL_FILEPERBLOCK_FILE_HEADER
 
 #include <string>
-#include <stxxl/bits/io/file_request_basic.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -25,7 +25,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation of file based on other files, dynamically allocate one file per block.
 //! Allows for dynamic disk space consumption.
 template <class base_file_type>
-class fileperblock_file : public file_request_basic
+class fileperblock_file : public disk_queued_file
 {
 private:
     std::string filename_prefix;

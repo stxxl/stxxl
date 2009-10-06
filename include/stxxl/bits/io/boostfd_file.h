@@ -17,7 +17,7 @@
 
 #ifdef STXXL_BOOST_CONFIG // if boost is available
 
-#include <stxxl/bits/io/file_request_basic.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/request.h>
 
 #include <boost/iostreams/device/file_descriptor.hpp>
@@ -29,7 +29,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation based on boost::iostreams::file_decriptor
-class boostfd_file : public file_request_basic
+class boostfd_file : public disk_queued_file
 {
     typedef boost::iostreams::file_descriptor fd_type;
 

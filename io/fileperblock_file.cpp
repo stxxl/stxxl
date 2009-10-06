@@ -27,7 +27,7 @@ fileperblock_file<base_file_type>::fileperblock_file(
     const std::string & filename_prefix,
     int mode,
     int disk)
-    : file_request_basic(disk), filename_prefix(filename_prefix), mode(mode),
+    : disk_queued_file(disk), filename_prefix(filename_prefix), mode(mode),
       lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, disk)
 { }
 
