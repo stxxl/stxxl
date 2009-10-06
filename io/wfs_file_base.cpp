@@ -25,7 +25,7 @@ const char * wfs_file_base::io_type() const
 wfs_file_base::wfs_file_base(
     const std::string & filename,
     int mode,
-    int disk) : async_file(disk), file_des(INVALID_HANDLE_VALUE), mode_(mode)
+    int disk) : file_request_basic(disk), file_des(INVALID_HANDLE_VALUE), mode_(mode)
 {
     DWORD dwDesiredAccess = 0;
     DWORD dwShareMode = 0;

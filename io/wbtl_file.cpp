@@ -32,7 +32,7 @@ wbtl_file::wbtl_file(
     size_type write_buffer_size,
     int write_buffers,
     int disk) :
-        async_file(disk), storage(backend_file), sz(0), write_block_size(write_buffer_size),
+        file_request_basic(disk), storage(backend_file), sz(0), write_block_size(write_buffer_size),
         free_bytes(0), curbuf(1), curpos(write_block_size)
 {
     assert(write_buffers == 2); // currently hardcoded

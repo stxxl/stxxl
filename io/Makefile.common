@@ -8,7 +8,7 @@ LIB_SRC			 = \
 	request_waiters_impl_basic.cpp \
 	request_state_impl_basic.cpp \
 	request_impl_basic.cpp \
-	async_file.cpp \
+	file_request_basic.cpp \
 	request_queue_impl_worker.cpp \
 	request_queue_impl_qwqr.cpp \
 	ufs_file_base.cpp \
