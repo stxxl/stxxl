@@ -171,6 +171,18 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+    else if (io_impl == "aio")
+    {
+        ufs_file_base * result = new aio_file(filename, options, disk);
+        result->lock();
+        return result;
+    }
+//    else if (io_impl == "fileperblock_aio")
+//    {
+//        fileperblock_file<aio_file> * result = new fileperblock_file<aio_file>(filename, options, disk);
+//        result->lock();
+//        return result;
+//    }
     else if (io_impl == "simdisk")
     {
         ufs_file_base * result = new sim_disk_file(filename, options, disk);

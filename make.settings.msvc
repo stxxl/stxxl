@@ -144,6 +144,7 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/syscall_file.h \
 	$(HEADER_PATH)/io/mmap_file.h \
 	$(HEADER_PATH)/io/simdisk_file.h \
+	$(HEADER_PATH)/io/aio_file.h \
 	$(HEADER_PATH)/io/wfs_file_base.h \
 	$(HEADER_PATH)/io/wincall_file.h \
 	$(HEADER_PATH)/io/boostfd_file.h \

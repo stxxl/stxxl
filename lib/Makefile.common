@@ -9,6 +9,7 @@ LIB_OBJECTS = \
 	../io/disk_queued_file.$(OBJEXT) \
 	../io/ufs_file_base.$(OBJEXT) \
 	../io/syscall_file.$(OBJEXT) \
+	../io/aio_file.$(OBJEXT) \
 	../io/wfs_file_base.$(OBJEXT) \
 	../io/wincall_file.$(OBJEXT) \
 	../io/boostfd_file.$(OBJEXT) \

@@ -15,6 +15,7 @@ LIB_SRC			 = \
 	syscall_file.cpp \
 	mmap_file.cpp \
 	simdisk_file.cpp \
+	aio_file.cpp \
 	wfs_file_base.cpp \
 	wincall_file.cpp \
 	boostfd_file.cpp \
