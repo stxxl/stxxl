@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/syscall_file.h>
+#include <stxxl/bits/io/aio_file.h>
 #include <stxxl/bits/io/mmap_file.h>
 #include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/wincall_file.h>
@@ -112,6 +113,7 @@ template class fileperblock_file<syscall_file>;
 
 // mmap call does not exist in Windows
 template class fileperblock_file<mmap_file>;
+template class fileperblock_file<aio_file>;
 
 #else
 
