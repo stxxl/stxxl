@@ -31,8 +31,7 @@ const char * ufs_file_base::io_type() const
 
 ufs_file_base::ufs_file_base(
     const std::string & filename,
-    int mode,
-    int disk) : disk_queued_file(disk), file_des(-1), mode_(mode)
+    int mode) : file_des(-1), mode_(mode)
 {
     int fmode = 0;
 

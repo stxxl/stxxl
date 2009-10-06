@@ -22,10 +22,11 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of some file methods based on request_impl_basic
-class disk_queued_file : public file
+class disk_queued_file : public virtual file
 {
+	int physical_disk;
 public:
-    disk_queued_file(int id) : file(id)
+    disk_queued_file(int physical_disk) : physical_disk(physical_disk)
     { }
     request_ptr aread(
         void * buffer,
@@ -37,6 +38,11 @@ public:
         offset_type pos,
         size_type bytes,
         const completion_handler & on_cmpl);
+
+    virtual int get_id() const
+    {
+        return physical_disk;
+    }
 };
 
 //! \}
