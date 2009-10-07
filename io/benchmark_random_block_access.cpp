@@ -47,28 +47,28 @@ using stxxl::timestamp;
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " span num_blocks [r|w]" << std::endl;
-    std::cout << "    'span' is given in GiB, num_blocks is the number of blocks to read" << std::endl;
+    std::cout << "Usage: " << argv0 << " span [r|w]" << std::endl;
+    std::cout << "    'span' is given in GiB" << std::endl;
     exit(-1);
 }
 
 int main(int argc, char * argv[])
 {
-    if (argc < 3)
+    const unsigned raw_block_size = 1 * MB;
+
+    if (argc < 2)
         usage(argv[0]);
 
     stxxl::int64 span = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
-    stxxl::int64 num_blocks = stxxl::int64(atoi(argv[2]));
+    stxxl::int64 num_blocks = span / raw_block_size;
 
     bool do_read = true, do_write = true;
 
-    if (argc == 4 && (strcmp("r", argv[3]) == 0 || strcmp("R", argv[3]) == 0))
+    if (argc == 3 && (strcmp("r", argv[2]) == 0 || strcmp("R", argv[2]) == 0))
         do_write = false;
 
-    if (argc == 4 && (strcmp("w", argv[3]) == 0 || strcmp("W", argv[3]) == 0))
+    if (argc == 3 && (strcmp("w", argv[2]) == 0 || strcmp("W", argv[2]) == 0))
         do_read = false;
-
-    const unsigned raw_block_size = 8 * MB;
 
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
@@ -80,12 +80,7 @@ int main(int argc, char * argv[])
     request_ptr * reqs = new request_ptr[num_blocks_in_span];
     std::vector<BID_type> blocks;
 
-    std::cout << "# Span size: "
-              << stxxl::add_IEC_binary_multiplier(span, "B") << " ("
-              << num_blocks_in_span << " blocks of "
-              << stxxl::add_IEC_binary_multiplier(raw_block_size, "B") << ")" << std::endl;
-
-    //touch data, so it is actually allcoated
+    //touch data, so it is actually allocated
 
     try {
         STXXL_DEFAULT_ALLOC_STRATEGY alloc;
@@ -93,15 +88,27 @@ int main(int argc, char * argv[])
         blocks.resize(num_blocks_in_span);
         stxxl::block_manager::get_instance()->new_blocks(alloc, blocks.begin(), blocks.end());
 
+        std::cout << "# Span size: "
+                  << stxxl::add_IEC_binary_multiplier(span, "B") << " ("
+                  << num_blocks_in_span << " blocks of "
+                  << stxxl::add_IEC_binary_multiplier(raw_block_size, "B") << ")" << std::endl;
+
+        double begin, end, elapsed;
+
+        begin = timestamp();
         std::cout << "First fill up space by writing sequentially..." << std::endl;
         for (unsigned j = 0; j < num_blocks_in_span; j++)
             reqs[j] = buffer->write(blocks[j]);
         wait_all(reqs, num_blocks_in_span);
+        end = timestamp();
+        elapsed = end - begin;
+        std::cout << "Written " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
+                  << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
+                  << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
 
         std::cout << "Random block access..." << std::endl;
         std::random_shuffle(blocks.begin(), blocks.end());
-
-        double begin = timestamp(), end, elapsed;
+        begin = timestamp();
         if (do_write)
         {
             for (unsigned j = 0; j < num_blocks; j++)
@@ -113,8 +120,8 @@ int main(int argc, char * argv[])
         }
         else
             elapsed = 0.0;
-
         std::cout << "Written " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
+                  << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
                   << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
 
         begin = timestamp();
@@ -129,8 +136,8 @@ int main(int argc, char * argv[])
         }
         else
             elapsed = 0.0;
-
         std::cout << "Read    " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
+                  << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
                   << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s read" << std::endl;
     }
     catch (const std::exception & ex)
