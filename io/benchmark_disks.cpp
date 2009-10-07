@@ -215,6 +215,7 @@ int main(int argc, char * argv[])
               << step_size << " bytes per disk ("
               << batch_size << " blocks of "
               << block_size << " bytes)" << std::endl;
+    double t_start = timestamp();
     try {
         while (offset < endpos)
         {
@@ -342,8 +343,10 @@ int main(int argc, char * argv[])
         std::cout << std::endl;
         STXXL_ERRMSG(ex.what());
     }
+    double t_total = timestamp() - t_start;
 
     std::cout << "=============================================================================================" << std::endl;
+    // the following line of output is parsed by misc/diskbench-avgplot.sh
     std::cout << "# Average over " << std::setw(7) << totalsizewrite / MB << " MiB: ";
     std::cout << std::setw(2) << ndisks << " * "
               << std::setw(7) << std::setprecision(3) << (double(totalsizewrite) / MB / totaltimewrite) << " = "
@@ -351,6 +354,8 @@ int main(int argc, char * argv[])
     std::cout << std::setw(2) << ndisks << " * "
               << std::setw(7) << std::setprecision(3) << (double(totalsizeread) / MB / totaltimeread) << " = "
               << std::setw(7) << std::setprecision(3) << (double(totalsizeread * ndisks) / MB / totaltimeread) << " MiB/s read" << std::endl;
+    std::cout << "# Elapsed time " << std::setw(7) << t_total << " s, average throughput "
+              << std::setw(7) << std::setprecision(3) << (double(totalsizewrite + totalsizeread) * ndisks / MB / t_total) << " MiB/s" << std::endl;
 
 #ifdef WATCH_TIMES
     delete[] r_finish_times;
