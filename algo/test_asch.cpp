@@ -12,6 +12,7 @@
 
 #include <cstdlib>
 #include <stxxl/bits/algo/async_schedule.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/random>
 
 // Test async schedule algorithm
