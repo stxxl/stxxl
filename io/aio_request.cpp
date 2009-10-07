@@ -26,7 +26,7 @@ void aio_request::completed_callback(sigval_t sigval)
 {
 	static_cast<aio_request*>(sigval.sival_ptr)->completed();
 	request_ptr r(static_cast<aio_request*>(sigval.sival_ptr));
-	aio_file::q.complete_request(r);
+	aio_queue::get_instance()->complete_request(r);
 }
 
 void aio_request::fill_control_block()

@@ -36,7 +36,6 @@ class aio_file : public ufs_file_base
 
 private:
 	int id;
-	static aio_queue q;
 
 public:
     //! \brief constructs file object

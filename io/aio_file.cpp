@@ -20,8 +20,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-aio_queue aio_file::q;
-
 void aio_file::serve(const request* req) throw(io_error)
 {
 	STXXL_UNUSED(req);
@@ -41,7 +39,7 @@ request_ptr aio_file::aread(
 {
     request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes, request::READ);
 
-    q.add_request(req);
+    aio_queue::get_instance()->add_request(req);
 
     return req;
 }
@@ -54,7 +52,7 @@ request_ptr aio_file::awrite(
 {
     request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes, request::WRITE);
 
-    q.add_request(req);
+    aio_queue::get_instance()->add_request(req);
 
     return req;
 }
