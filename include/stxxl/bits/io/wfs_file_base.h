@@ -32,13 +32,13 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Base for Windows file system implementations
-class wfs_file_base : public disk_queued_file
+class wfs_file_base : public virtual file
 {
 protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode
-    wfs_file_base(const std::string & filename, int mode, int disk);
+    wfs_file_base(const std::string & filename, int mode);
     offset_type _size();
 
 public:

@@ -32,7 +32,7 @@ public:
     //! \brief constructs file object
     //! \param disk disk(file) identifier
     mem_file(
-        int disk = -1) : disk_queued_file(disk), ptr(NULL), sz(0)
+        int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : disk_queued_file(queue_id, allocator_id), ptr(NULL), sz(0)
     { }
     void serve(const request * req) throw (io_error);
     ~mem_file();

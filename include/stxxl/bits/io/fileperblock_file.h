@@ -46,7 +46,8 @@ public:
     fileperblock_file(
         const std::string & filename_prefix,
         int mode,
-        int disk = -1);
+        int queue_id = DEFAULT_QUEUE,
+        int allocator_id = NO_ALLOCATOR);
 
     virtual ~fileperblock_file();
 

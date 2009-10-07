@@ -24,9 +24,9 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation of some file methods based on request_impl_basic
 class disk_queued_file : public virtual file
 {
-	int physical_disk;
+	int queue_id, allocator_id;
 public:
-    disk_queued_file(int physical_disk) : physical_disk(physical_disk)
+    disk_queued_file(int queue_id, int allocator_id) : queue_id(queue_id), allocator_id(allocator_id)
     { }
     request_ptr aread(
         void * buffer,
@@ -39,9 +39,14 @@ public:
         size_type bytes,
         const completion_handler & on_cmpl);
 
-    virtual int get_id() const
+    virtual int get_queue_id() const
     {
-        return physical_disk;
+        return queue_id;
+    }
+
+    virtual int get_allocator_id() const
+    {
+        return allocator_id;
     }
 };
 

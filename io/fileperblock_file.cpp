@@ -27,9 +27,10 @@ template <class base_file_type>
 fileperblock_file<base_file_type>::fileperblock_file(
     const std::string & filename_prefix,
     int mode,
-    int disk)
-    : disk_queued_file(disk), filename_prefix(filename_prefix), mode(mode),
-      lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, disk)
+    int queue_id,
+    int allocator_id)
+    : disk_queued_file(queue_id, allocator_id), filename_prefix(filename_prefix), mode(mode),
+      lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, queue_id)
 { }
 
 template <class base_file_type>
@@ -53,7 +54,7 @@ void fileperblock_file<base_file_type>::serve(const request * req) throw (io_err
 {
     assert(req->get_file() == this);
 
-    base_file_type base_file(filename_for_block(req->get_offset()), mode, get_id());
+    base_file_type base_file(filename_for_block(req->get_offset()), mode, get_queue_id());
     base_file.set_size(req->get_size());
 
     request_ptr derived = new request_impl_basic(default_completion_handler(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type());
