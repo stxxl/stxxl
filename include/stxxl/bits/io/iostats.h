@@ -387,9 +387,11 @@ public:
 
     // for library use
     void write_started(unsigned size_);
+    void write_canceled(unsigned size_);
     void write_finished();
     void write_cached(unsigned size_);
     void read_started(unsigned size_);
+    void read_canceled(unsigned size_);
     void read_finished();
     void read_cached(unsigned size_);
     void wait_started(wait_op_type wait_op);

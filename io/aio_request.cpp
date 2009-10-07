@@ -24,7 +24,22 @@ const char* aio_request::io_type() const
 
 void aio_request::completed_callback(sigval_t sigval)
 {
-	static_cast<aio_request*>(sigval.sival_ptr)->completed();
+	aio_request* req = static_cast<aio_request*>(sigval.sival_ptr);
+	if (aio_error64(req->get_cb()) != ECANCELED)
+	{
+		if (req->type == READ)
+			stats::get_instance()->read_finished();
+		else
+			stats::get_instance()->write_finished();
+	}
+	else
+	{
+		if (req->type == READ)
+			stats::get_instance()->read_canceled(req->bytes);
+		else
+			stats::get_instance()->write_canceled(req->bytes);
+	}
+	req->completed();
 	request_ptr r(static_cast<aio_request*>(sigval.sival_ptr));
 	aio_queue::get_instance()->complete_request(r);
 }
@@ -48,9 +63,17 @@ bool aio_request::post()
 	fill_control_block();
 	int success;
 	if (type == READ)
+	{
 		success = aio_read64(&cb);
+		if (success != EAGAIN)
+			stats::get_instance()->read_started(bytes);
+	}
 	else
+	{
 		success = aio_write64(&cb);
+		if (success != EAGAIN)
+			stats::get_instance()->write_started(bytes);
+	}
 
 	return success != EAGAIN;
 }
