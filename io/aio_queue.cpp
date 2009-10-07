@@ -24,7 +24,7 @@ __STXXL_BEGIN_NAMESPACE
 
 aio_queue::aio_queue(int max_sim_requests) : max_sim_requests(max_sim_requests), posted_sem(max_sim_requests)
 {
-    start_thread(worker, static_cast<void*>(this));
+    start_thread(post_async, static_cast<void*>(this));
 }
 
 void aio_queue::add_request(request_ptr& req)
@@ -76,7 +76,7 @@ aio_queue::~aio_queue()
     stop_thread();
 }
 
-void aio_queue::handle_requests()
+void aio_queue::post_requests()
 {
     request_ptr req;
 
@@ -119,9 +119,9 @@ void aio_queue::handle_requests()
     }
 }
 
-void* aio_queue::worker(void* arg)
+void* aio_queue::post_async(void* arg)
 {
-    (static_cast<aio_queue*>(arg))->handle_requests();
+    (static_cast<aio_queue*>(arg))->post_requests();
     return NULL;
 }
 

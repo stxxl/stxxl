@@ -37,13 +37,13 @@ private:
 
     static const priority_op _priority_op = WRITE;
 
-    static void* worker(void* arg);	//thread start callback
-    void handle_requests();
+    static void* post_async(void* arg);	//thread start callback
+    void post_requests();
     void suspend();
 
 public:
     // \param max_sim_requests max number of requests simultaneously submitted to disk, 0 means as many as possible
-    aio_queue(int max_sim_requests = 32);
+    aio_queue(int max_sim_requests = 1024);
 
     void add_request(request_ptr& req);
     bool cancel_request(request_ptr& req);
