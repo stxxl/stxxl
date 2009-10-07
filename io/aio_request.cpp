@@ -22,26 +22,23 @@ const char* aio_request::io_type() const
     return file_->io_type();
 }
 
-void aio_request::completed_callback(sigval_t sigval)
+void aio_request::completed()
 {
-	aio_request* req = static_cast<aio_request*>(sigval.sival_ptr);
-	if (aio_error64(req->get_cb()) != ECANCELED)
+	if (aio_error64(&cb) != ECANCELED)
 	{
-		if (req->type == READ)
+		if (type == READ)
 			stats::get_instance()->read_finished();
 		else
 			stats::get_instance()->write_finished();
 	}
 	else
 	{
-		if (req->type == READ)
-			stats::get_instance()->read_canceled(req->bytes);
+		if (type == READ)
+			stats::get_instance()->read_canceled(bytes);
 		else
-			stats::get_instance()->write_canceled(req->bytes);
+			stats::get_instance()->write_canceled(bytes);
 	}
-	req->completed();
-	request_ptr r(static_cast<aio_request*>(sigval.sival_ptr));
-	aio_queue::get_instance()->complete_request(r);
+	request_impl_basic::completed();
 }
 
 void aio_request::fill_control_block()
@@ -52,10 +49,7 @@ void aio_request::fill_control_block()
 	cb.aio_buf = buffer;
 	cb.aio_nbytes = bytes;
 	cb.aio_reqprio = 0;
-	cb.aio_sigevent.sigev_notify = SIGEV_THREAD;
-	cb.aio_sigevent.sigev_notify_function = completed_callback;
-	cb.aio_sigevent.sigev_notify_attributes = NULL;
-	cb.aio_sigevent.sigev_value.sival_ptr = this;
+	cb.aio_sigevent.sigev_notify = SIGEV_NONE;
 }
 
 bool aio_request::post()

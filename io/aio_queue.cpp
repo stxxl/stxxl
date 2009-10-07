@@ -22,9 +22,16 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-aio_queue::aio_queue(int max_sim_requests) : max_sim_requests(max_sim_requests), posted_sem(max_sim_requests)
+aio_queue::aio_queue(int max_sim_requests) : max_sim_requests(max_sim_requests), posted_free_sem(max_sim_requests), posted_sem(0)
 {
     start_thread(post_async, static_cast<void*>(this));
+    check_pthread_call(pthread_create(&wait_thread, NULL, wait_async, static_cast<void*>(this)));
+}
+
+aio_queue::~aio_queue()
+{
+    stop_thread();
+    check_pthread_call(pthread_join(wait_thread, NULL));
 }
 
 void aio_queue::add_request(request_ptr& req)
@@ -38,14 +45,6 @@ void aio_queue::add_request(request_ptr& req)
    	waiting_requests.push_back(req);
 
     sem++;
-}
-
-void aio_queue::complete_request(request_ptr& req)
-{
-	scoped_mutex_lock lock(posted_mtx);
-	std::remove(posted_requests.begin(), posted_requests.end(), req __STXXL_FORCE_SEQUENTIAL);
-	if (max_sim_requests != 0)
-		posted_sem++;
 }
 
 bool aio_queue::cancel_request(request_ptr& req)
@@ -71,11 +70,6 @@ bool aio_queue::cancel_request(request_ptr& req)
     return was_still_in_queue;
 }
 
-aio_queue::~aio_queue()
-{
-    stop_thread();
-}
-
 void aio_queue::post_requests()
 {
     request_ptr req;
@@ -92,7 +86,7 @@ void aio_queue::post_requests()
 			lock.unlock();
 
 			if (max_sim_requests != 0)
-				posted_sem--;
+				posted_free_sem--;
 
 			while (!static_cast<aio_request*>(req.get())->post())
 				;	//FIXME: busy waiting
@@ -100,6 +94,7 @@ void aio_queue::post_requests()
 			{
 				scoped_mutex_lock lock(posted_mtx);
 				posted_requests.push_back(req);
+				posted_sem++;
 			}
 		}
 		else
@@ -119,9 +114,60 @@ void aio_queue::post_requests()
     }
 }
 
+void aio_queue::wait_requests()
+{
+    request_ptr req;
+
+    for ( ; ; )
+    {
+        posted_sem--;
+
+		scoped_mutex_lock lock(posted_mtx);
+		//grab requests
+		aiocb64** prs;
+		int pc;
+		prs = new aiocb64*[posted_requests.size()];
+
+		pc = 0;
+		for (queue_type::const_iterator pr = posted_requests.begin(); pr != posted_requests.end(); ++pr)
+			prs[pc++] = (static_cast<aio_request*>((*pr).get()))->get_cb();
+
+		lock.unlock();
+
+		//wait for at least one of them to finish
+		aio_suspend64(prs, pc, NULL);
+		delete[] prs;
+
+		lock.lock();
+
+		posted_sem++;	//compensate for the one eaten too early above
+
+		//complete finished requests
+		for (queue_type::iterator pr = posted_requests.begin(); pr != posted_requests.end(); )
+			if (aio_error64((static_cast<aio_request*>((*pr).get()))->get_cb()) != EINPROGRESS)
+			{
+				(*pr)->completed();
+				queue_type::iterator current = pr;
+				++pr;
+				posted_requests.erase(current);
+				if (max_sim_requests != 0)
+					posted_free_sem++;
+				posted_sem--;
+			}
+
+		lock.unlock();
+    }
+}
+
 void* aio_queue::post_async(void* arg)
 {
     (static_cast<aio_queue*>(arg))->post_requests();
+    return NULL;
+}
+
+void* aio_queue::wait_async(void* arg)
+{
+    (static_cast<aio_queue*>(arg))->wait_requests();
     return NULL;
 }
 

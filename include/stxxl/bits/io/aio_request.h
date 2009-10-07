@@ -31,7 +31,6 @@ class aio_request : public request_impl_basic
 
     aiocb64 cb;	//control block
 
-    static void completed_callback(sigval_t ptr);
     void fill_control_block();
 
 public:
@@ -49,6 +48,7 @@ public:
 
     bool post();
     bool cancel();
+    void completed();
 
     aiocb64* get_cb() { return &cb; }	//must be initialized by post
 

@@ -95,6 +95,7 @@ class request : virtual public request_base
     request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end);
     friend class request_queue_impl_qwqr;
     friend class request_ptr;
+    friend class aio_queue;
 
 protected:
     completion_handler on_complete;

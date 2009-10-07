@@ -33,12 +33,15 @@ private:
     mutex waiting_mtx, posted_mtx;
     queue_type waiting_requests, posted_requests;
     int max_sim_requests;
-    semaphore posted_sem;
+    semaphore posted_free_sem, posted_sem;
+    pthread_t wait_thread;
 
     static const priority_op _priority_op = WRITE;
 
     static void* post_async(void* arg);	//thread start callback
+    static void* wait_async(void* arg);	//thread start callback
     void post_requests();
+    void wait_requests();
     void suspend();
 
 public:
