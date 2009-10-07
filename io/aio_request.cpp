@@ -39,6 +39,7 @@ bool aio_request::post()
 	cb.aio_reqprio = 0;
 	cb.aio_sigevent.sigev_notify = SIGEV_THREAD;
 	cb.aio_sigevent.sigev_notify_function = completed_callback;
+	cb.aio_sigevent.sigev_notify_attributes = NULL;
 	cb.aio_sigevent.sigev_value.sival_ptr = this;
 
 	int success;
