@@ -22,23 +22,26 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-aio_queue::aio_queue(int max_sim_requests) : max_sim_requests(max_sim_requests), posted_free_sem(max_sim_requests), posted_sem(0)
+aio_queue::aio_queue(int max_sim_requests) :
+	max_sim_requests(max_sim_requests),
+	sem(0), posted_free_sem(max_sim_requests), posted_sem(0),
+	post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
 {
-    start_thread(post_async, static_cast<void*>(this));
-    check_pthread_call(pthread_create(&wait_thread, NULL, wait_async, static_cast<void*>(this)));
+    start_thread(post_async, static_cast<void*>(this), post_thread, post_thread_state);
+    start_thread(wait_async, static_cast<void*>(this), wait_thread, wait_thread_state);
 }
 
 aio_queue::~aio_queue()
 {
-    stop_thread();
-    check_pthread_call(pthread_join(wait_thread, NULL));
+    stop_thread(post_thread, post_thread_state, sem);
+    stop_thread(wait_thread, wait_thread_state, posted_sem);
 }
 
 void aio_queue::add_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
-    if (_thread_state() != RUNNING)
+    if (post_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
 
 	scoped_mutex_lock lock(waiting_mtx);
@@ -51,7 +54,7 @@ bool aio_queue::cancel_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
-    if (_thread_state() != RUNNING)
+    if (post_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
 
     bool was_still_in_queue = false;
@@ -105,7 +108,7 @@ void aio_queue::post_requests()
 		}
 
         // terminate if termination has been requested
-        if (_thread_state() == TERMINATE) {
+        if (post_thread_state() == TERMINATE) {
             if ((sem--) == 0)
                 break;
             else
@@ -156,6 +159,14 @@ void aio_queue::wait_requests()
 			}
 
 		lock.unlock();
+
+        // terminate if termination has been requested
+        if (wait_thread_state() == TERMINATE) {
+            if ((posted_sem--) == 0)
+                break;
+            else
+                posted_sem++;
+        }
     }
 }
 
