@@ -87,13 +87,19 @@ aio_queue::~aio_queue()
 
 void aio_queue::suspend()
 {
-	aiocb64** prs = new aiocb64*[posted_requests.size()];
+	aiocb64** prs;
+	int pc = 0;
+	{
+		scoped_mutex_lock lock(waiting_mtx);
+		assert(posted_requests.size() > 0);
 
-	int i = 0;
-	for (queue_type::const_iterator pr = posted_requests.begin(); pr != posted_requests.end(); ++pr)
-		prs[i++] = (static_cast<aio_request*>((*pr).get()))->get_cb();
+		prs = new aiocb64*[posted_requests.size()];
 
-	aio_suspend64(prs, posted_requests.size(), NULL);
+		for (queue_type::const_iterator pr = posted_requests.begin(); pr != posted_requests.end(); ++pr)
+			prs[pc++] = (static_cast<aio_request*>((*pr).get()))->get_cb();
+	}
+
+	aio_suspend64(prs, pc, NULL);
 
 	delete[] prs;
 }
