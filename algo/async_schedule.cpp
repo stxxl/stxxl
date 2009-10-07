@@ -11,10 +11,43 @@
  **************************************************************************/
 
 #include <stxxl/bits/algo/async_schedule.h>
+#include <stxxl/bits/verbose.h>
+#include <stxxl/bits/common/utils.h>
+
+#include <algorithm>
+#include <functional>
+#include <queue>
+#include <cassert>
+
 
 __STXXL_BEGIN_NAMESPACE
 
 namespace async_schedule_local {
+
+struct sim_event // only one type of event: WRITE COMPLETED
+{
+    int_type timestamp;
+    int_type iblock;
+    inline sim_event(int_type t, int_type b) : timestamp(t), iblock(b) { }
+};
+
+struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
+{
+    inline bool operator () (const sim_event & a, const sim_event & b) const
+    {
+        return a.timestamp > b.timestamp;
+    }
+};
+
+typedef std::pair<int_type, int_type> write_time_pair;
+struct write_time_cmp : public std::binary_function<write_time_pair, write_time_pair, bool>
+{
+    inline bool operator () (const write_time_pair & a, const write_time_pair & b) const
+    {
+        return a.second > b.second;
+    }
+};
+
 
 int_type simulate_async_write(
     const int_type * disks,
@@ -144,7 +177,7 @@ void compute_prefetch_schedule(
     for (int_type i = 0; i < L; i++)
         STXXL_VERBOSE1(first[i] << " " << write_order[i].first << " " << write_order[i].second);
 
-    std::stable_sort(write_order, write_order + L, write_time_cmp());
+    std::stable_sort(write_order, write_order + L, async_schedule_local::write_time_cmp());
 
 
     for (int_type i = 0; i < L; i++)
