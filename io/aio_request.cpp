@@ -29,7 +29,7 @@ void aio_request::completed_callback(sigval_t sigval)
 	aio_file::q.complete_request(r);
 }
 
-bool aio_request::post()
+void aio_request::fill_control_block()
 {
 	aio_file* af = dynamic_cast<aio_file*>(file_);
 	cb.aio_fildes = af->file_des;
@@ -41,7 +41,11 @@ bool aio_request::post()
 	cb.aio_sigevent.sigev_notify_function = completed_callback;
 	cb.aio_sigevent.sigev_notify_attributes = NULL;
 	cb.aio_sigevent.sigev_value.sival_ptr = this;
+}
 
+bool aio_request::post()
+{
+	fill_control_block();
 	int success;
 	if (type == READ)
 		success = aio_read64(&cb);

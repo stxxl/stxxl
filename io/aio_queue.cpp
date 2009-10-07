@@ -22,18 +22,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-struct file_offset_match : public std::binary_function<request_ptr, request_ptr, bool>
-{
-    bool operator () (
-        const request_ptr& a,
-        const request_ptr& b) const
-    {
-        return (a->get_offset() == b->get_offset()) &&
-               (a->get_file() == b->get_file());
-    }
-};
-
-aio_queue::aio_queue(int max_sim_requests) : max_sim_requests(max_sim_requests), num_sim_requests(0)
+aio_queue::aio_queue(int max_sim_requests) : max_sim_requests(max_sim_requests), posted_sem(max_sim_requests)
 {
     start_thread(worker, static_cast<void*>(this));
 }
@@ -55,6 +44,8 @@ void aio_queue::complete_request(request_ptr& req)
 {
 	scoped_mutex_lock lock(posted_mtx);
 	std::remove(posted_requests.begin(), posted_requests.end(), req __STXXL_FORCE_SEQUENTIAL);
+	if (max_sim_requests != 0)
+		posted_sem++;
 }
 
 bool aio_queue::cancel_request(request_ptr& req)
@@ -85,25 +76,6 @@ aio_queue::~aio_queue()
     stop_thread();
 }
 
-void aio_queue::suspend()
-{
-	aiocb64** prs;
-	int pc = 0;
-	{
-		scoped_mutex_lock lock(waiting_mtx);
-		assert(posted_requests.size() > 0);
-
-		prs = new aiocb64*[posted_requests.size()];
-
-		for (queue_type::const_iterator pr = posted_requests.begin(); pr != posted_requests.end(); ++pr)
-			prs[pc++] = (static_cast<aio_request*>((*pr).get()))->get_cb();
-	}
-
-	aio_suspend64(prs, pc, NULL);
-
-	delete[] prs;
-}
-
 void aio_queue::handle_requests()
 {
     request_ptr req;
@@ -117,11 +89,13 @@ void aio_queue::handle_requests()
 		{
 			req = waiting_requests.front();
 			waiting_requests.pop_front();
-
 			lock.unlock();
 
+			if (max_sim_requests != 0)
+				posted_sem--;
+
 			while (!static_cast<aio_request*>(req.get())->post())
-				suspend();
+				;	//FIXME: busy waiting
 
 			{
 				scoped_mutex_lock lock(posted_mtx);

@@ -42,6 +42,7 @@ using stxxl::timestamp;
 #define BLOCK_ALIGN  4096
 
 
+#define KB (1024)
 #define MB (1024 * 1024)
 #define GB (1024 * 1024 * 1024)
 
@@ -54,12 +55,12 @@ void usage(const char * argv0)
 
 int main(int argc, char * argv[])
 {
-    const unsigned raw_block_size = 1 * MB;
+    const unsigned raw_block_size = 128 * KB;
 
     if (argc < 2)
         usage(argv[0]);
 
-    stxxl::int64 span = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
+    stxxl::int64 span = stxxl::int64(MB) * stxxl::int64(atoi(argv[1]));
     stxxl::int64 num_blocks = span / raw_block_size;
 
     bool do_read = true, do_write = true;

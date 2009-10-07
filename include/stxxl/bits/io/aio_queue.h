@@ -32,7 +32,8 @@ private:
 
     mutex waiting_mtx, posted_mtx;
     queue_type waiting_requests, posted_requests;
-    int max_sim_requests, num_sim_requests;
+    int max_sim_requests;
+    semaphore posted_sem;
 
     static const priority_op _priority_op = WRITE;
 
@@ -42,7 +43,7 @@ private:
 
 public:
     // \param max_sim_requests max number of requests simultaneously submitted to disk, 0 means as many as possible
-    aio_queue(int max_sim_requests = 0);
+    aio_queue(int max_sim_requests = 32);
 
     void add_request(request_ptr& req);
     bool cancel_request(request_ptr& req);

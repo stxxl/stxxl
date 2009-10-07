@@ -32,6 +32,7 @@ class aio_request : public request_impl_basic
     aiocb64 cb;	//control block
 
     static void completed_callback(sigval_t ptr);
+    void fill_control_block();
 
 public:
     aio_request(
@@ -43,7 +44,7 @@ public:
         request_type t) :
         	request_impl_basic(on_cmpl, f, buf, off, b, t)
     {
-       	assert(!strncmp(file_->io_type(), "aio", 3));
+       	assert(dynamic_cast<aio_file*>(file_));
     }
 
     bool post();
