@@ -3,12 +3,18 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2002, 2009 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
+
+// Implements the "prudent prefetching" as described in
+// D. Hutchinson, P. Sanders, J. S. Vitter: Duality between prefetching
+// and queued writing on parallel disks, 2005
+// DOI: 10.1137/S0097539703431573
+
 
 #include <stxxl/bits/algo/async_schedule.h>
 #include <stxxl/bits/verbose.h>
@@ -191,5 +197,6 @@ void compute_prefetch_schedule(
     STXXL_UNUSED(w_steps);
 }
 
-
 __STXXL_END_NAMESPACE
+
+// vim: et:ts=4:sw=4

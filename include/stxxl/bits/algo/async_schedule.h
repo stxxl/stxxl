@@ -77,3 +77,4 @@ void compute_prefetch_schedule(
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_ASYNC_SCHEDULE_HEADER
+// vim: et:ts=4:sw=4
