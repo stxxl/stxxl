@@ -1,10 +1,9 @@
 /***************************************************************************
- *  include/stxxl/bits/io/request_queue_impl_qwqr.h
+ *  include/stxxl/bits/io/aio_queue.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -25,18 +24,19 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
+//! \brief Queue for aio_file(s)
 class aio_queue : public request_queue_impl_worker, public disk_queue, public singleton<aio_queue>
 {
 private:
     typedef std::list<request_ptr> queue_type;
 
-    mutex mtx;
+    mutex waiting_mtx, posted_mtx;
     queue_type waiting_requests, posted_requests;
     int max_sim_requests, num_sim_requests;
 
     static const priority_op _priority_op = WRITE;
 
-    static void* worker(void * arg);
+    static void* worker(void* arg);	//thread start callback
     void handle_requests();
     void suspend();
 
@@ -44,9 +44,9 @@ public:
     // \param max_sim_requests max number of requests simultaneously submitted to disk, 0 means as many as possible
     aio_queue(int max_sim_requests = 0);
 
-    void add_request(request_ptr & req);
-    bool cancel_request(request_ptr & req);
-    void complete_request(request_ptr & req);
+    void add_request(request_ptr& req);
+    bool cancel_request(request_ptr& req);
+    void complete_request(request_ptr& req);
     ~aio_queue();
 };
 

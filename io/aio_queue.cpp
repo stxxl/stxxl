@@ -25,10 +25,9 @@ __STXXL_BEGIN_NAMESPACE
 struct file_offset_match : public std::binary_function<request_ptr, request_ptr, bool>
 {
     bool operator () (
-        const request_ptr & a,
-        const request_ptr & b) const
+        const request_ptr& a,
+        const request_ptr& b) const
     {
-        // matching file and offset are enough to cause problems
         return (a->get_offset() == b->get_offset()) &&
                (a->get_file() == b->get_file());
     }
@@ -36,24 +35,25 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
 
 aio_queue::aio_queue(int max_sim_requests) : max_sim_requests(max_sim_requests), num_sim_requests(0)
 {
-    start_thread(worker, static_cast<void *>(this));
+    start_thread(worker, static_cast<void*>(this));
 }
 
-void aio_queue::add_request(request_ptr & req)
+void aio_queue::add_request(request_ptr& req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
     if (_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
 
-	scoped_mutex_lock lock(mtx);
+	scoped_mutex_lock lock(waiting_mtx);
    	waiting_requests.push_back(req);
 
     sem++;
 }
 
-void aio_queue::complete_request(request_ptr & req)
+void aio_queue::complete_request(request_ptr& req)
 {
+	scoped_mutex_lock lock(posted_mtx);
 	std::remove(posted_requests.begin(), posted_requests.end(), req __STXXL_FORCE_SEQUENTIAL);
 }
 
@@ -65,21 +65,18 @@ bool aio_queue::cancel_request(request_ptr& req)
         STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
 
     bool was_still_in_queue = false;
-	scoped_mutex_lock lock(mtx);
 	queue_type::iterator pos;
-	if ((pos = std::find(waiting_requests.begin(), waiting_requests.end(), req __STXXL_FORCE_SEQUENTIAL)) != waiting_requests.end())
 	{
-		waiting_requests.erase(pos);
-		was_still_in_queue = true;
-		sem--;
+		scoped_mutex_lock lock(waiting_mtx);
+		if ((pos = std::find(waiting_requests.begin(), waiting_requests.end(), req __STXXL_FORCE_SEQUENTIAL)) != waiting_requests.end())
+		{
+			waiting_requests.erase(pos);
+			was_still_in_queue = true;
+			sem--;
+		}
 	}
-	if ((pos = std::find(posted_requests.begin(), posted_requests.end(), req __STXXL_FORCE_SEQUENTIAL)) != posted_requests.end())
-	{
-		aio_cancel64(dynamic_cast<aio_file*>(static_cast<aio_request*>((*pos).get())->get_file())->get_file_des(), static_cast<aio_request*>((*pos).get())->get_cb());
-		posted_requests.erase(pos);
-		was_still_in_queue = true;
-		sem--;
-	}
+	if (!was_still_in_queue)
+		return req->cancel();
     return was_still_in_queue;
 }
 
@@ -109,7 +106,7 @@ void aio_queue::handle_requests()
     {
         sem--;
 
-		scoped_mutex_lock lock(mtx);
+		scoped_mutex_lock lock(waiting_mtx);
 		if (!waiting_requests.empty())
 		{
 			req = waiting_requests.front();
@@ -120,7 +117,10 @@ void aio_queue::handle_requests()
 			while (!static_cast<aio_request*>(req.get())->post())
 				suspend();
 
-			posted_requests.push_back(req);
+			{
+				scoped_mutex_lock lock(posted_mtx);
+				posted_requests.push_back(req);
+			}
 		}
 		else
 		{
@@ -139,7 +139,7 @@ void aio_queue::handle_requests()
     }
 }
 
-void* aio_queue::worker(void * arg)
+void* aio_queue::worker(void* arg)
 {
     (static_cast<aio_queue*>(arg))->handle_requests();
     return NULL;

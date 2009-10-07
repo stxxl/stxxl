@@ -14,10 +14,6 @@
 #include <stxxl/bits/io/aio_request.h>
 #include <stxxl/bits/io/file.h>
 
-#ifndef STXXL_THREAD_ID
-#define STXXL_THREAD_ID pthread_self()
-#endif
-
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -52,6 +48,11 @@ bool aio_request::post()
 		success = aio_write64(&cb);
 
 	return success != EAGAIN;
+}
+
+bool aio_request::cancel()
+{
+    return aio_cancel64(cb.aio_fildes, &cb) == AIO_CANCELED;
 }
 
 __STXXL_END_NAMESPACE

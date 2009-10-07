@@ -29,27 +29,27 @@ class aio_request : public request_impl_basic
     template <class base_file_type>
     friend class fileperblock_file;
 
-    aiocb64 cb;
+    aiocb64 cb;	//control block
 
     static void completed_callback(sigval_t ptr);
 
 public:
     aio_request(
-        const completion_handler & on_cmpl,
-        file * f,
-        void * buf,
+        const completion_handler& on_cmpl,
+        file* f,
+        void* buf,
         offset_type off,
         size_type b,
         request_type t) :
         	request_impl_basic(on_cmpl, f, buf, off, b, t)
-      	{ }
+    {
+       	assert(!strncmp(file_->io_type(), "aio", 3));
+    }
 
     bool post();
+    bool cancel();
 
-    aiocb64* get_cb()
-    {
-    	return &cb;
-    }
+    aiocb64* get_cb() { return &cb; }	//must be initialized by post
 
 public:
     const char * io_type() const;

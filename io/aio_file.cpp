@@ -22,26 +22,24 @@ __STXXL_BEGIN_NAMESPACE
 
 aio_queue aio_file::q;
 
-void aio_file::serve(const request * req) throw(io_error)
+void aio_file::serve(const request* req) throw(io_error)
 {
 	STXXL_UNUSED(req);
 	assert(false);
 }
 
-const char * aio_file::io_type() const
+const char* aio_file::io_type() const
 {
     return "aio";
 }
 
 request_ptr aio_file::aread(
-    void * buffer,
+    void* buffer,
     offset_type pos,
     size_type bytes,
-    const completion_handler & on_cmpl)
+    const completion_handler& on_cmpl)
 {
-    request_ptr req = new aio_request(on_cmpl, this,
-                                             buffer, pos, bytes,
-                                             request::READ);
+    request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes, request::READ);
 
     q.add_request(req);
 
@@ -49,13 +47,12 @@ request_ptr aio_file::aread(
 }
 
 request_ptr aio_file::awrite(
-    void * buffer,
+    void* buffer,
     offset_type pos,
     size_type bytes,
-    const completion_handler & on_cmpl)
+    const completion_handler& on_cmpl)
 {
-    request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes,
-                                             request::WRITE);
+    request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes, request::WRITE);
 
     q.add_request(req);
 

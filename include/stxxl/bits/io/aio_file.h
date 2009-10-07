@@ -45,17 +45,16 @@ public:
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param disk disk(file) identifier
     aio_file(
-        const std::string & filename,
+        const std::string& filename,
         int mode, int disk = -1) : ufs_file_base(filename, mode), id(disk)
     {
     }
     void serve(const request* req) throw (io_error);
     request_ptr aread(void* buffer, offset_type pos, size_type bytes,
-                              const completion_handler & on_cmpl);
+                              const completion_handler& on_cmpl);
     request_ptr awrite(void* buffer, offset_type pos, size_type bytes,
-                               const completion_handler & on_cmpl);
-
-    const char * io_type() const;
+                               const completion_handler& on_cmpl);
+    const char* io_type() const;
     int get_id() const { return id; }
 
 };
