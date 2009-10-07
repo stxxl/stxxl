@@ -28,133 +28,132 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-namespace async_schedule_local {
-
-struct sim_event // only one type of event: WRITE COMPLETED
+namespace async_schedule_local
 {
-    int_type timestamp;
-    int_type iblock;
-    inline sim_event(int_type t, int_type b) : timestamp(t), iblock(b) { }
-};
-
-struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
-{
-    inline bool operator () (const sim_event & a, const sim_event & b) const
+    struct sim_event  // only one type of event: WRITE COMPLETED
     {
-        return a.timestamp > b.timestamp;
-    }
-};
+        int_type timestamp;
+        int_type iblock;
+        inline sim_event(int_type t, int_type b) : timestamp(t), iblock(b) { }
+    };
 
-typedef std::pair<int_type, int_type> write_time_pair;
-struct write_time_cmp : public std::binary_function<write_time_pair, write_time_pair, bool>
-{
-    inline bool operator () (const write_time_pair & a, const write_time_pair & b) const
+    struct sim_event_cmp : public std::binary_function<sim_event, sim_event, bool>
     {
-        return a.second > b.second;
-    }
-};
-
-
-int_type simulate_async_write(
-    const int_type * disks,
-    const int_type L,
-    const int_type m_init,
-    const int_type D,
-    std::pair<int_type, int_type> * o_time)
-{
-    typedef std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp> event_queue_type;
-    typedef std::queue<int_type> disk_queue_type;
-    assert(L >= D);
-    disk_queue_type * disk_queues = new disk_queue_type[D];
-    event_queue_type event_queue;
-
-    int_type m = m_init;
-    int_type i = L - 1;
-    int_type oldtime = 0;
-    bool * disk_busy = new bool[D];
-
-    while (m && (i >= 0))
-    {
-        int_type disk = disks[i];
-        assert(0 <= disk && disk < D);
-        disk_queues[disk].push(i);
-        i--;
-        m--;
-    }
-
-    for (int_type ii = 0; ii < D; ii++)
-        if (!disk_queues[ii].empty())
+        inline bool operator () (const sim_event & a, const sim_event & b) const
         {
-            int_type j = disk_queues[ii].front();
-            disk_queues[ii].pop();
-            event_queue.push(sim_event(1, j));
-            //STXXL_MSG("Block "<<j<<" scheduled");
+            return a.timestamp > b.timestamp;
         }
+    };
 
-    while (!event_queue.empty())
+    typedef std::pair<int_type, int_type> write_time_pair;
+    struct write_time_cmp : public std::binary_function<write_time_pair, write_time_pair, bool>
     {
-        sim_event cur = event_queue.top();
-        event_queue.pop();
-        if (oldtime != cur.timestamp)
+        inline bool operator () (const write_time_pair & a, const write_time_pair & b) const
         {
-            // clear disk_busy
-            for (int_type i = 0; i < D; i++)
-                disk_busy[i] = false;
-
-            oldtime = cur.timestamp;
+            return a.second > b.second;
         }
+    };
 
 
-        STXXL_VERBOSE1("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock]);
-        o_time[cur.iblock] = std::pair<int_type, int_type>(cur.iblock, cur.timestamp);
+    int_type simulate_async_write(
+        const int_type * disks,
+        const int_type L,
+        const int_type m_init,
+        const int_type D,
+        std::pair<int_type, int_type> * o_time)
+    {
+        typedef std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp> event_queue_type;
+        typedef std::queue<int_type> disk_queue_type;
+        assert(L >= D);
+        disk_queue_type * disk_queues = new disk_queue_type[D];
+        event_queue_type event_queue;
 
-        if (i >= 0)
+        int_type m = m_init;
+        int_type i = L - 1;
+        int_type oldtime = 0;
+        bool * disk_busy = new bool[D];
+
+        while (m && (i >= 0))
         {
             int_type disk = disks[i];
             assert(0 <= disk && disk < D);
-            if (disk_busy[disk])
+            disk_queues[disk].push(i);
+            i--;
+            m--;
+        }
+
+        for (int_type ii = 0; ii < D; ii++)
+            if (!disk_queues[ii].empty())
             {
-                disk_queues[disk].push(i--);
+                int_type j = disk_queues[ii].front();
+                disk_queues[ii].pop();
+                event_queue.push(sim_event(1, j));
+                //STXXL_MSG("Block "<<j<<" scheduled");
             }
-            else
+
+        while (!event_queue.empty())
+        {
+            sim_event cur = event_queue.top();
+            event_queue.pop();
+            if (oldtime != cur.timestamp)
             {
-				if(!disk_queues[disk].empty())
-				{
-					STXXL_VERBOSE1("c Block "<<disk_queues[disk].front()<<" scheduled for time "<< cur.timestamp + 1);
-					event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
-					disk_queues[disk].pop();
-				} else
-				{
-                	STXXL_VERBOSE1("a Block "<<i<<" scheduled for time "<< cur.timestamp + 1);
-                	event_queue.push(sim_event(cur.timestamp + 1, i--));
-				}
+                // clear disk_busy
+                for (int_type i = 0; i < D; i++)
+                    disk_busy[i] = false;
+
+                oldtime = cur.timestamp;
+            }
+
+
+            STXXL_VERBOSE1("Block " << cur.iblock << " put out, time " << cur.timestamp << " disk: " << disks[cur.iblock]);
+            o_time[cur.iblock] = std::pair<int_type, int_type>(cur.iblock, cur.timestamp);
+
+            if (i >= 0)
+            {
+                int_type disk = disks[i];
+                assert(0 <= disk && disk < D);
+                if (disk_busy[disk])
+                {
+                    disk_queues[disk].push(i--);
+                }
+                else
+                {
+                    if (!disk_queues[disk].empty())
+                    {
+                        STXXL_VERBOSE1("c Block " << disk_queues[disk].front() << " scheduled for time " << cur.timestamp + 1);
+                        event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
+                        disk_queues[disk].pop();
+                    } else
+                    {
+                        STXXL_VERBOSE1("a Block " << i << " scheduled for time " << cur.timestamp + 1);
+                        event_queue.push(sim_event(cur.timestamp + 1, i--));
+                    }
+                    disk_busy[disk] = true;
+                }
+            }
+
+            // add next block to write
+            int_type disk = disks[cur.iblock];
+            assert(0 <= disk && disk < D);
+            if (!disk_busy[disk] && !disk_queues[disk].empty())
+            {
+                STXXL_VERBOSE1("b Block " << disk_queues[disk].front() << " scheduled for time " << cur.timestamp + 1);
+                event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
+                disk_queues[disk].pop();
                 disk_busy[disk] = true;
             }
         }
 
-        // add next block to write
-        int_type disk = disks[cur.iblock];
-        assert(0 <= disk && disk < D);
-        if (!disk_busy[disk] && !disk_queues[disk].empty())
-        {
-            STXXL_VERBOSE1("b Block "<<disk_queues[disk].front()<<" scheduled for time "<< cur.timestamp + 1);
-            event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
-            disk_queues[disk].pop();
-            disk_busy[disk] = true;
-        }
+        assert(i == -1);
+        for (int_type i = 0; i < D; i++)
+            assert(disk_queues[i].empty());
+
+
+        delete[] disk_busy;
+        delete[] disk_queues;
+
+        return (oldtime - 1);
     }
-
-    assert(i == -1);
-    for (int_type i = 0; i < D; i++)
-        assert(disk_queues[i].empty());
-
-
-    delete[] disk_busy;
-    delete[] disk_queues;
-
-    return (oldtime - 1);
-}
-
 }  // namespace async_schedule_local
 
 
