@@ -10,11 +10,15 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/aio_file.h>
-#include <stxxl/bits/io/aio_request.h>
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
 
 #ifndef BOOST_MSVC
 // libaio does not exist on Windows
+
+#include <stxxl/bits/io/aio_file.h>
+#include <stxxl/bits/io/aio_request.h>
 
 #include <aio.h>
 
@@ -58,5 +62,6 @@ request_ptr aio_file::awrite(
 }
 
 __STXXL_END_NAMESPACE
+
 #endif // #ifndef BOOST_MSVC
 // vim: et:ts=4:sw=4

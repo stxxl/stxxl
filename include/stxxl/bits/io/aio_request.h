@@ -13,6 +13,13 @@
 #ifndef STXXL_IO_AIO_REQUEST_HEADER
 #define STXXL_IO_AIO_REQUEST_HEADER
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
+#ifndef BOOST_MSVC
+// libaio does not exist on Windows
+
 #include <aio.h>
 #include <stxxl/bits/io/aio_file.h>
 #include <stxxl/bits/io/request_impl_basic.h>
@@ -59,5 +66,7 @@ public:
 //! \}
 
 __STXXL_END_NAMESPACE
+
+#endif // #ifndef BOOST_MSVC
 
 #endif // !STXXL_IO_AIO_REQUEST_HEADER

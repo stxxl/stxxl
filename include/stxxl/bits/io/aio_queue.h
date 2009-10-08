@@ -13,6 +13,13 @@
 #ifndef STXXL_IO_AIO_QUEUE_HEADER
 #define STXXL_IO_AIO_QUEUE_HEADER
 
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
+
+#ifndef BOOST_MSVC
+// libaio does not exist on Windows
+
 #include <list>
 
 #include <stxxl/bits/io/request_queue_impl_worker.h>
@@ -58,6 +65,8 @@ public:
 //! \}
 
 __STXXL_END_NAMESPACE
+
+#endif // #ifndef BOOST_MSVC
 
 #endif // !STXXL_IO_AIO_QUEUE_HEADER
 // vim: et:ts=4:sw=4
