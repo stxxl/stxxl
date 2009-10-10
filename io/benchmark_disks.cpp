@@ -362,7 +362,14 @@ int main(int argc, char * argv[])
               << std::setw(7) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread)) << " = "
               << std::setw(7) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread) * ndisks) << " MiB/s read"
               << std::endl;
-    std::cout << "# Elapsed time " << std::setw(7) << t_total << " s, average throughput "
+    if (totaltimewrite != 0.0)
+        std::cout << "# Write time   " << std::setw(7) << std::setprecision(3) << totaltimewrite << " s" << std::endl;
+    if (totaltimeread != 0.0)
+        std::cout << "# Read time    " << std::setw(7) << std::setprecision(3) << totaltimeread << " s" << std::endl;
+    std::cout << "# Non-I/O time " << std::setw(7) << std::setprecision(3) << (t_total - totaltimewrite - totaltimeread) << " s, average throughput "
+              << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total - totaltimewrite - totaltimeread) * ndisks) << " MiB/s"
+              << std::endl;
+    std::cout << "# Total time   " << std::setw(7) << std::setprecision(3) << t_total << " s, average throughput "
               << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total) * ndisks) << " MiB/s"
               << std::endl;
 
