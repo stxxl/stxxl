@@ -178,7 +178,7 @@ public:
     virtual void lock() = 0;
 
     //! \brief Some specialized file types may need to know freed regions
-    virtual void delete_region(offset_type offset, size_type size)
+    virtual void discard(offset_type offset, offset_type size)
     {
         STXXL_UNUSED(offset);
         STXXL_UNUSED(size);

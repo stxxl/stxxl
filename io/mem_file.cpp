@@ -65,11 +65,11 @@ void mem_file::set_size(offset_type newsize)
         ptr = new char[sz = newsize];
 }
 
-void mem_file::delete_region(offset_type offset, size_type size)
+void mem_file::discard(offset_type offset, offset_type size)
 {
 #ifndef STXXL_MEMFILE_DONT_CLEAR_FREED_MEMORY
     // overwrite the freed region with uninitialized memory
-    STXXL_VERBOSE("delete_region at " << offset << " len " << size);
+    STXXL_VERBOSE("discard at " << offset << " len " << size);
     void * uninitialized = malloc(BLOCK_ALIGN);
     while (size >= BLOCK_ALIGN) {
         memcpy(ptr + offset, uninitialized, BLOCK_ALIGN);

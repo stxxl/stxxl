@@ -97,26 +97,26 @@ void wbtl_file::set_size(offset_type newsize)
 #define FMT_A(_addr_) "0x" << std::setw(8) << (_addr_)
 
 // logical address
-void wbtl_file::delete_region(offset_type offset, size_type size)
+void wbtl_file::discard(offset_type offset, offset_type size)
 {
     scoped_mutex_lock mapping_lock(mapping_mutex);
     sortseq::iterator physical = address_mapping.find(offset);
-    STXXL_VERBOSE_WBTL("wbtl:delreg  l" << FMT_A_S(offset, size) << " @    p" << FMT_A(physical != address_mapping.end() ? physical->second : 0xffffffff));
+    STXXL_VERBOSE_WBTL("wbtl:discard l" << FMT_A_S(offset, size) << " @    p" << FMT_A(physical != address_mapping.end() ? physical->second : 0xffffffff));
     if (physical == address_mapping.end()) {
         // could be OK if the block was never written ...
-        //STXXL_ERRMSG("delete_region: mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
+        //STXXL_ERRMSG("discard: mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
     } else {
         offset_type physical_offset = physical->second;
         address_mapping.erase(physical);
         _add_free_region(physical_offset, size);
         place_map::iterator reverse = reverse_mapping.find(physical_offset);
         if (reverse == reverse_mapping.end()) {
-            STXXL_ERRMSG("delete_region: reverse mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
+            STXXL_ERRMSG("discard: reverse mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
         } else {
             assert(offset == (reverse->second).first);
             reverse_mapping.erase(reverse);
         }
-        storage->delete_region(physical_offset, size);
+        storage->discard(physical_offset, size);
     }
 }
 
@@ -255,7 +255,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
     if (physical != address_mapping.end()) {
             mapping_lock.unlock();
         // FIXME: special case if we can replace it in the current writing block
-        delete_region(offset, bytes);
+        discard(offset, bytes);
         }
     }
 

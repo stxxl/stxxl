@@ -64,7 +64,7 @@ public:
 
     //! \brief Frees the specified region.
     //! Actually deletes the corresponding file if the whole thing is deleted.
-    virtual void delete_region(offset_type offset, unsigned_type length);
+    virtual void discard(offset_type offset, offset_type length);
 
     //! Rename the file corresponding to the offset such that it is out of reach for deleting.
     virtual void export_files(offset_type offset, offset_type length, std::string filename);
