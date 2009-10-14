@@ -15,6 +15,12 @@
 #ifndef STXXL_WBTL_FILE_HEADER
 #define STXXL_WBTL_FILE_HEADER
 
+#ifndef STXXL_HAVE_WBTL_FILE
+#define STXXL_HAVE_WBTL_FILE 1
+#endif
+
+#if STXXL_HAVE_WBTL_FILE
+
 #include <map>
 
 #include <stxxl/bits/io/file_request_basic.h>
@@ -100,5 +106,7 @@ protected:
 //! \}
 
 __STXXL_END_NAMESPACE
+
+#endif  // #if STXXL_HAVE_WBTL_FILE
 
 #endif // !STXXL_WBTL_FILE_HEADER

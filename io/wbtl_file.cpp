@@ -12,8 +12,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iomanip>
 #include <stxxl/bits/io/wbtl_file.h>
+
+#if STXXL_HAVE_WBTL_FILE
+
+#include <iomanip>
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/common/debug.h>
 #include <stxxl/bits/parallel.h>
@@ -348,4 +351,6 @@ const char * wbtl_file::io_type() const
 }
 
 __STXXL_END_NAMESPACE
+
+#endif  // #if STXXL_HAVE_WBTL_FILE
 // vim: et:ts=4:sw=4

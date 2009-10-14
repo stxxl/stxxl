@@ -214,6 +214,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+#if STXXL_HAVE_WBTL_FILE
     else if (io_impl == "wbtl")
     {
         ufs_file_base * backend = new syscall_file(filename, options, disk + 1000); // FIXME: ID
@@ -221,6 +222,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+#endif
 
     STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
                 io_impl << " .");
