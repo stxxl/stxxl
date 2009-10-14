@@ -13,11 +13,19 @@
 #ifndef STXXL_WINCALL_FILE_HEADER
 #define STXXL_WINCALL_FILE_HEADER
 
+#ifndef STXXL_HAVE_WINCALL_FILE
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
 
 #ifdef BOOST_MSVC
+ #define STXXL_HAVE_WINCALL_FILE 1
+#else
+ #define STXXL_HAVE_WINCALL_FILE 0
+#endif
+#endif
+
+#if STXXL_HAVE_WINCALL_FILE
 
 #include <stxxl/bits/io/wfs_file_base.h>
 
@@ -49,6 +57,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef BOOST_MSVC
+#endif  // #if STXXL_HAVE_WINCALL_FILE
 
 #endif // !STXXL_WINCALL_FILE_HEADER

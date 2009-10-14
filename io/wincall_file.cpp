@@ -11,10 +11,11 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/wincall_file.h>
+
+#if STXXL_HAVE_WINCALL_FILE
+
 #include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/common/debug.h>
-
-#ifdef BOOST_MSVC
 
 #include <windows.h>
 
@@ -98,5 +99,5 @@ const char * wincall_file::io_type() const
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef BOOST_MSVC
+#endif  // #if STXXL_HAVE_WINCALL_FILE
 // vim: et:ts=4:sw=4

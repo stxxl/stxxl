@@ -13,12 +13,20 @@
 #ifndef STXXL_SIMDISK_FILE_HEADER
 #define STXXL_SIMDISK_FILE_HEADER
 
+#ifndef STXXL_HAVE_SIMDISK_FILE
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
 
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
+ #define STXXL_HAVE_SIMDISK_FILE 1
+#else
+ #define STXXL_HAVE_SIMDISK_FILE 0
+#endif
+#endif
+
+#if STXXL_HAVE_SIMDISK_FILE
 
 #include <set>
 #include <cmath>
@@ -124,6 +132,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif  // #if STXXL_HAVE_SIMDISK_FILE
 
 #endif // !STXXL_SIMDISK_FILE_HEADER

@@ -15,7 +15,15 @@
 #ifndef STXXL_BOOSTFD_FILE_H_
 #define STXXL_BOOSTFD_FILE_H_
 
+#ifndef STXXL_HAVE_BOOSTFD_FILE
 #ifdef STXXL_BOOST_CONFIG // if boost is available
+ #define STXXL_HAVE_BOOSTFD_FILE 1
+#else
+ #define STXXL_HAVE_BOOSTFD_FILE 0
+#endif
+#endif
+
+#if STXXL_HAVE_BOOSTFD_FILE
 
 #include <stxxl/bits/io/file_request_basic.h>
 #include <stxxl/bits/io/request.h>
@@ -53,6 +61,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef STXXL_BOOST_CONFIG
+#endif  // #if STXXL_HAVE_BOOSTFD_FILE
 
 #endif // !STXXL_BOOSTFD_FILE_H_

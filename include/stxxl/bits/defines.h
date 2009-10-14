@@ -5,7 +5,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -14,6 +14,15 @@
 
 #ifndef STXXL_DEFINES_HEADER
 #define STXXL_DEFINES_HEADER
+
+//#define STXXL_HAVE_MMAP_FILE 0/1
+//#define STXXL_HAVE_SIMDISK_FILE 0/1
+//#define STXXL_HAVE_BOOSTFD_FILE 0/1
+//#define STXXL_HAVE_WINCALL_FILE 0/1
+// default: 0/1 (platform and type dependent)
+// used in: io/*_file.h, io/*_file.cpp, mng/mng.cpp
+// affects: library
+// effect:  enables/disables some file implementations
 
 //#define STXXL_CHECK_BLOCK_ALIGNING
 // default: not defined
