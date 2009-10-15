@@ -41,7 +41,7 @@ private:
     queue_type waiting_requests, posted_requests;
     int max_sim_requests;
     semaphore sem, posted_free_sem, posted_sem;
-    pthread_t post_thread, wait_thread;
+    thread_type post_thread, wait_thread;
     state<thread_state> post_thread_state, wait_thread_state;
 
     static const priority_op _priority_op = WRITE;
