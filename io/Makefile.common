@@ -12,6 +12,7 @@ LIB_SRC			 = \
 	disk_queued_file.cpp \
 	request_queue_impl_worker.cpp \
 	request_queue_impl_qwqr.cpp \
+	aio_queue.cpp \
 	ufs_file_base.cpp \
 	syscall_file.cpp \
 	mmap_file.cpp \
