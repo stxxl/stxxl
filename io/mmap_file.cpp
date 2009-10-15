@@ -11,10 +11,10 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/mmap_file.h>
-#include <stxxl/bits/io/request_impl_basic.h>
 
-#ifndef BOOST_MSVC
-// mmap call does not exist in Windows
+#if STXXL_HAVE_MMAP_FILE
+
+#include <stxxl/bits/io/request_impl_basic.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -67,5 +67,5 @@ const char * mmap_file::io_type() const
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif  // #if STXXL_HAVE_MMAP_FILE
 // vim: et:ts=4:sw=4

@@ -11,10 +11,10 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/simdisk_file.h>
-#include <stxxl/bits/io/request_impl_basic.h>
 
-#ifndef BOOST_MSVC
-// mmap call does not exist in Windows
+#if STXXL_HAVE_SIMDISK_FILE
+
+#include <stxxl/bits/io/request_impl_basic.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -222,5 +222,5 @@ void sim_disk_file::set_size(offset_type newsize)
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif  // #if STXXL_HAVE_SIMDISK_FILE
 // vim: et:ts=4:sw=4

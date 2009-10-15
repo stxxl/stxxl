@@ -10,9 +10,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifdef STXXL_BOOST_CONFIG
-
 #include <stxxl/bits/io/boostfd_file.h>
+
+#if STXXL_HAVE_BOOSTFD_FILE
+
 #include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/common/debug.h>
 
@@ -191,5 +192,5 @@ void boostfd_file::lock()
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef STXXL_BOOST_CONFIG
+#endif  // #if STXXL_HAVE_BOOSTFD_FILE
 // vim: et:ts=4:sw=4

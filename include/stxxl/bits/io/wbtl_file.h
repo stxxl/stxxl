@@ -15,6 +15,12 @@
 #ifndef STXXL_WBTL_FILE_HEADER
 #define STXXL_WBTL_FILE_HEADER
 
+#ifndef STXXL_HAVE_WBTL_FILE
+#define STXXL_HAVE_WBTL_FILE 1
+#endif
+
+#if STXXL_HAVE_WBTL_FILE
+
 #include <map>
 
 #include <stxxl/bits/io/disk_queued_file.h>
@@ -84,7 +90,7 @@ public:
     void set_size(offset_type newsize);
     void lock();
     void serve(const request * req) throw (io_error);
-    void delete_region(offset_type offset, size_type size);
+    void discard(offset_type offset, offset_type size);
     const char * io_type() const;
 
 private:
@@ -101,5 +107,7 @@ protected:
 //! \}
 
 __STXXL_END_NAMESPACE
+
+#endif  // #if STXXL_HAVE_WBTL_FILE
 
 #endif // !STXXL_WBTL_FILE_HEADER

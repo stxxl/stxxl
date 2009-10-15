@@ -5,6 +5,7 @@ get_write()
 	x=`grep "# Average" $1 2>/dev/null | awk '{ print $8 }'`
 	test -n "$x" || x=U
 	test "$x" = "nan" && x=U
+	test "$x" = "0.000" && x=U
 	echo "$x"
 }
 
@@ -13,6 +14,7 @@ get_read()
 	x=`grep "# Average" $1 2>/dev/null | awk '{ print $15 }'`
 	test -n "$x" || x=U
 	test "$x" = "nan" && x=U
+	test "$x" = "0.000" && x=U
 	echo "$x"
 }
 
