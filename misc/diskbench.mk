@@ -93,7 +93,7 @@ avg3plot: $(HOST)-avg3.gnuplot
 	gnuplot $<
 
 # $1 = logfile, $2 = column
-extract_average	= $(if $(wildcard $1),$(shell tail -n 1 $1 | awk '{ print $$($2+1) }'),......)
+extract_average	= $(if $(wildcard $1),$(shell grep ' Average over ' $1 | awk '{ print $$($2+1) }'),......)
 
 # $1 = logfile, $2 = disk, $3 = column, $4 = label
 # (does not plot if avg = nan)
@@ -174,8 +174,8 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 $(HOST).d.gnuplot: $(HOST).gnuplot
 	sed -e 's/ w l / w d lw 2 /' $< > $@
 
-$(HOST)-avg.dat: $(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *MB/*.log)
-	$(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *MB) > $@
+$(HOST)-avg.dat: $(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *KB/*.log *MB/*.log)
+	$(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *KB *MB) > $@
 
 $(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
 	$(RM) $@
