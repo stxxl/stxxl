@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -54,6 +55,18 @@ class bad_parameter : public std::runtime_error
 public:
     bad_parameter() throw () : std::runtime_error("") { }
     bad_parameter(const std::string & msg_) throw () :
+        std::runtime_error(msg_)
+    { }
+};
+
+class unreachable : public std::runtime_error
+{
+public:
+    unreachable() throw () :
+        std::runtime_error("")
+    { }
+
+    unreachable(const std::string & msg_) throw () :
         std::runtime_error(msg_)
     { }
 };
