@@ -98,7 +98,8 @@ extract_average	= $(if $(wildcard $1),$(shell grep ' Average over ' $1 | awk '{ 
 # $1 = logfile, $2 = disk, $3 = column, $4 = label
 # (does not plot if avg = nan)
 define plotline
-	$(if $(wildcard $1),$(if $(filter nan,$(call extract_average,$1,$3)),,echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@ ;))
+	$(if $(wildcard $1),$(if $(filter nan,$(call extract_average,$1,$3)),,echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@))
+
 endef
 
 # $1 = logfile, $2 = disk
