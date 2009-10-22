@@ -185,6 +185,14 @@ public:
 
         return true;
     }
+
+    // no more consumable blocks available, but can't delete the prefetcher,
+    // because not all blocks may have been returned, yet
+    bool empty() const
+    {
+        return nextconsume >= seq_length;
+    }
+
     //! \brief Frees used memory
     ~block_prefetcher()
     {
