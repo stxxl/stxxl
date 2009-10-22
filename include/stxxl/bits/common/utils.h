@@ -48,10 +48,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-template <typename U>
-inline void STXXL_UNUSED(const U &)
-{ }
-
 #ifdef BOOST_MSVC
   #define __STXXL_DEPRECATED(x) __declspec(deprecated) x
 #elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 30400)
