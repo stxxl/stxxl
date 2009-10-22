@@ -13,6 +13,7 @@
 #ifndef STXXL_CONTAINERS_BTREE__BTREE_H
 #define STXXL_CONTAINERS_BTREE__BTREE_H
 
+#include <limits>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/iterator_map.h>

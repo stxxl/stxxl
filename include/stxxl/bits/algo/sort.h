@@ -34,6 +34,7 @@
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/common/is_sorted.h>
 
 
 __STXXL_BEGIN_NAMESPACE

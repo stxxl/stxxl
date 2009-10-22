@@ -18,6 +18,7 @@
 //! DOI: 10.1002/spe.844
 
 
+#include <limits>
 #include <stxxl/priority_queue>
 
 #define TOTAL_PQ_MEM_SIZE    (768 * 1024 * 1024)

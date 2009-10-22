@@ -15,8 +15,9 @@
 #define STXXL_VERBOSE_HEADER
 
 #include <iostream>
+#include <sstream>
 #include <string>
-#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/unused.h>
 
 
 #define _STXXL_PRNT_COUT        (1 << 0)

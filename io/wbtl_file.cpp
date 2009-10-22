@@ -16,6 +16,7 @@
 
 #if STXXL_HAVE_WBTL_FILE
 
+#include <algorithm>
 #include <iomanip>
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/common/debug.h>

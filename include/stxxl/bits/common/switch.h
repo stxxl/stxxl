@@ -23,7 +23,7 @@
 #endif
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE

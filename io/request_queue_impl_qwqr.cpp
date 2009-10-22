@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/diskqueue.cpp
+ *  io/request_queue_impl_qwqr.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <algorithm>
 #include <stxxl/bits/io/request_state_impl_basic.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/request.h>

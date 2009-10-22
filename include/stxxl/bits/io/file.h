@@ -66,9 +66,10 @@
 #endif
 
 
+#include <cassert>
+
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/io/request.h>

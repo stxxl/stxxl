@@ -13,6 +13,7 @@
 #ifndef _STXXL_DEQUE_H
 #define _STXXL_DEQUE_H
 
+#include <limits>
 #include <stxxl/vector>
 
 

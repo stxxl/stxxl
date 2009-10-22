@@ -16,10 +16,12 @@
 
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/mng/bid.h>
+#include <stxxl/bits/verbose.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -13,6 +13,7 @@
  **************************************************************************/
 
 #include <queue>
+#include <limits>
 
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL 1
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1

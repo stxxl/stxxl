@@ -14,36 +14,15 @@
 #ifndef STXXL_UTILS_HEADER
 #define STXXL_UTILS_HEADER
 
-#include <iostream>
-#include <sstream>
-#include <algorithm>
 #include <vector>
 #include <string>
-#include <limits>
-
-#include <cassert>
-#include <cstdio>
-#include <cerrno>
-#include <cstring>
-#include <cstdlib>
-#include <cmath>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
 
-#ifdef STXXL_BOOST_FILESYSTEM
- #include <boost/filesystem/operations.hpp>
-#endif
-
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/msvc_compatibility.h>
 
 
 __STXXL_BEGIN_NAMESPACE

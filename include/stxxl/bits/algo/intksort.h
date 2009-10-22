@@ -13,7 +13,9 @@
 #ifndef STXXL_INTKSORT_HEADER
 #define STXXL_INTKSORT_HEADER
 
-#include <stxxl/bits/common/utils.h>
+#include <algorithm>
+#include <cassert>
+#include <stxxl/bits/common/types.h>
 
 
 __STXXL_BEGIN_NAMESPACE

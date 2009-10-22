@@ -14,6 +14,8 @@
 #ifndef STXXL_KSORT_HEADER
 #define STXXL_KSORT_HEADER
 
+#include <cmath>
+
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/adaptor.h>
@@ -29,6 +31,7 @@
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/common/is_sorted.h>
 
 
 //#define INTERLEAVED_ALLOC
