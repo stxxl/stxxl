@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <cstdlib>
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
