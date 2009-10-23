@@ -43,8 +43,8 @@ __STXXL_END_NAMESPACE
 
 #define _STXXL_PRINT(label, message, flags) \
     { std::ostringstream str_; \
-      str_ << message << std::endl; \
-      stxxl::print_msg(label, str_.str(), flags); \
+      str_ << message; \
+      stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
     } __STXXL_ENFORCE_SEMICOLON
 
 #define _STXXL_NOT_VERBOSE { } __STXXL_ENFORCE_SEMICOLON
