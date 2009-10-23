@@ -367,8 +367,7 @@ namespace sort_local
 
 
     template <typename block_type, typename run_type, typename value_cmp>
-    void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run, unsigned_type _m, value_cmp cmp
-                    )
+    void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run, unsigned_type _m, value_cmp cmp)
     {
         typedef typename block_type::bid_type bid_type;
         typedef typename block_type::value_type value_type;
@@ -555,7 +554,7 @@ namespace sort_local
 // end of STL-style merging
 
 #else
-            assert(false);
+            STXXL_THROW_UNREACHABLE();
 #endif
         }
         else

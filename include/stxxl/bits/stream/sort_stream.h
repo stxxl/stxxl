@@ -938,7 +938,7 @@ namespace stream
 
 // end of STL-style merging
 #else
-                assert(false);
+                STXXL_THROW_UNREACHABLE();
 #endif //STXXL_PARALLEL_MULTIWAY_MERGE
             }
             else
@@ -1044,7 +1044,7 @@ namespace stream
 
 // end of STL-style merging
 #else
-                assert(false);
+                STXXL_THROW_UNREACHABLE();
 #endif //STXXL_PARALLEL_MULTIWAY_MERGE
             }
             else
