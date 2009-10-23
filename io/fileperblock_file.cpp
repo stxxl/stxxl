@@ -12,6 +12,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <cstdio>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/mmap_file.h>
