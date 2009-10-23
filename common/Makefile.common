@@ -1,4 +1,4 @@
-TESTS			 = test_random
+TESTS			 = test_random test_manyunits
 TESTS_NON_MSVC		 =
 
 LIB_SRC			 = debug.cpp rand.cpp seed.cpp version.cpp exithandler.cpp verbose.cpp log.cpp
