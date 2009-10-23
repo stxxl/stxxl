@@ -1278,8 +1278,7 @@ namespace stream
         unsigned_type nwrite_buffers = 2 * ndisks;
 
         unsigned_type nruns = sruns.runs.size();
-        const unsigned_type merge_factor =
-            static_cast<unsigned_type>(ceil(pow(nruns, 1. / ceil(log(double(nruns)) / log(double(m_))))));
+        const unsigned_type merge_factor = optimal_merge_factor(nruns, m_);
         assert(merge_factor <= m_);
         while (nruns > m_)
         {

@@ -667,10 +667,7 @@ namespace sort_local
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-        // Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) runs at once
-
-        const int_type merge_factor = static_cast<int_type>(ceil(pow(nruns, 1. / ceil(log(double(nruns)) /
-                                                                                      log(double(_m))))));
+        const int_type merge_factor = optimal_merge_factor(nruns, _m);
         run_type ** new_runs;
 
         while (nruns > 1)
