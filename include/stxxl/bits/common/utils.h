@@ -112,13 +112,13 @@ STXXL_MAX(const Tp & a, const Tp & b)
 template <typename Integer>
 inline Integer log2_ceil(Integer i)
 {
-    return ceil(log2(i));
+    return Integer(ceil(log2(i)));
 }
 
 template <typename Integer>
 inline Integer log2_floor(Integer i)
 {
-    return log2(i);
+    return Integer(log2(i));
 }
 
 ////////////////////////////////////////////////////////////////////////////
