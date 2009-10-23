@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <string>
+#include <cmath>
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
@@ -23,6 +24,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/msvc_compatibility.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -35,6 +37,8 @@ __STXXL_BEGIN_NAMESPACE
 #else
   #define __STXXL_DEPRECATED(x) x __attribute__ ((__deprecated__))
 #endif
+
+////////////////////////////////////////////////////////////////////////////
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 #define STXXL_STATIC_ASSERT(x) static_assert(x, #x)
@@ -101,6 +105,22 @@ STXXL_MAX(const Tp & a, const Tp & b)
 {
     return std::max<Tp>(a, b);
 }
+
+////////////////////////////////////////////////////////////////////////////
+
+template <typename Integer>
+inline Integer log2_ceil(Integer i)
+{
+    return ceil(log2(i));
+}
+
+template <typename Integer>
+inline Integer log2_floor(Integer i)
+{
+    return log2(i);
+}
+
+////////////////////////////////////////////////////////////////////////////
 
 #define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
 
