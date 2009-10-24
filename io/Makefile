@@ -119,12 +119,17 @@ benchmark_configured_disks: benchmark_configured_disks.$(EXEEXT)
 benchmark_configured_disks.$(EXEEXT): benchmark_configured_disks.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_configured_disks.cpp
 	$(LINKER) benchmark_configured_disks.$(OBJEXT) $(OUT)benchmark_configured_disks.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-	
+
 benchmark_random_block_access: benchmark_random_block_access.$(EXEEXT)
 benchmark_random_block_access.$(EXEEXT): benchmark_random_block_access.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_random_block_access.cpp
 	$(LINKER) benchmark_random_block_access.$(OBJEXT) $(OUT)benchmark_random_block_access.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-	
+
+iobench_scatter_in_place: iobench_scatter_in_place.$(EXEEXT)
+iobench_scatter_in_place.$(EXEEXT): iobench_scatter_in_place.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c iobench_scatter_in_place.cpp
+	$(LINKER) iobench_scatter_in_place.$(OBJEXT) $(OUT)iobench_scatter_in_place.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) $(CLEAN_TARGETS)
