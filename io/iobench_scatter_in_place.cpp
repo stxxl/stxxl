@@ -17,8 +17,6 @@
 #include <stxxl/aligned_alloc>
 #include <stxxl/bits/common/utils.h>
 
-#include <unistd.h>
-
 
 using stxxl::request_ptr;
 using stxxl::file;
