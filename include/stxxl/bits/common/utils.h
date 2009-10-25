@@ -123,7 +123,19 @@ inline Integer log2_floor(Integer i)
 
 ////////////////////////////////////////////////////////////////////////////
 
-#define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
+template <typename Integer>
+inline Integer div_ceil(Integer __n, Integer __d)
+{
+#if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
+    typedef __typeof__(std::div(__n, __d)) div_type;
+    div_type result = std::div(__n, __d);
+    return result.quot + (result.rem != 0);
+#else
+    return __n / __d + ((__n % __d) != 0);
+#endif
+}
+
+#define STXXL_DIVRU(a, b) stxxl::div_ceil<__typeof__(a)>((a), (b))
 
 ////////////////////////////////////////////////////////////////////////////
 
