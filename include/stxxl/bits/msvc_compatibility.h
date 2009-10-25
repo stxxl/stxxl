@@ -26,6 +26,8 @@ inline double log2(double x)
     return (log(x) / log(2.));
 }
 
+#define snprintf _snprintf
+
 #endif
 
 #endif // !STXXL_MSVC_COMPATIBILITY_H
