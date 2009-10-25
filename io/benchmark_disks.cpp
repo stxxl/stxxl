@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2007 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
+ *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -25,14 +25,12 @@
 
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
-
-#ifndef BOOST_MSVC
- #include <unistd.h>
-#endif
+#include <stxxl/timer>
 
 
 using stxxl::request_ptr;
 using stxxl::file;
+using stxxl::timer;
 using stxxl::timestamp;
 
 
@@ -223,7 +221,7 @@ int main(int argc, char * argv[])
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
               << block_size << " bytes)" << std::endl;
-    double t_start = timestamp();
+    timer t_total(true);
     try {
         while (offset < endpos)
         {
@@ -231,7 +229,7 @@ int main(int argc, char * argv[])
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
             const unsigned current_num_blocks = STXXL_DIVRU(current_step_size, block_size);
 
-            std::cout << "Disk offset    " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
+            std::cout << "Disk offset    " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
 
             double begin = timestamp(), end, elapsed;
 
@@ -274,8 +272,8 @@ int main(int argc, char * argv[])
             out_stat(begin, end, w_finish_times, ndisks, disks_arr);
  #endif
             std::cout << std::setw(2) << ndisks << " * "
-                      << std::setw(7) << std::setprecision(3) << (throughput(current_step_size, elapsed)) << " = "
-                      << std::setw(7) << std::setprecision(3) << (throughput(current_step_size, elapsed) * ndisks) << " MiB/s write,";
+                      << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed)) << " = "
+                      << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed) * ndisks) << " MiB/s write,";
 #endif  // !DO_ONLY_READ
 
 
@@ -316,8 +314,8 @@ int main(int argc, char * argv[])
 #endif
 
             std::cout << std::setw(2) << ndisks << " * "
-                      << std::setw(7) << std::setprecision(3) << (throughput(current_step_size, elapsed)) << " = "
-                      << std::setw(7) << std::setprecision(3) << (throughput(current_step_size, elapsed) * ndisks) << " MiB/s read";
+                      << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed)) << " = "
+                      << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed) * ndisks) << " MiB/s read";
 
 #ifdef WATCH_TIMES
             out_stat(begin, end, r_finish_times, ndisks, disks_arr);
@@ -350,27 +348,27 @@ int main(int argc, char * argv[])
         std::cout << std::endl;
         STXXL_ERRMSG(ex.what());
     }
-    double t_total = timestamp() - t_start;
+    t_total.stop();
 
     std::cout << "=============================================================================================" << std::endl;
     // the following line of output is parsed by misc/diskbench-avgplot.sh
-    std::cout << "# Average over " << std::setw(7) << stxxl::STXXL_MAX(totalsizewrite, totalsizeread) / MB << " MiB: ";
+    std::cout << "# Average over " << std::setw(8) << stxxl::STXXL_MAX(totalsizewrite, totalsizeread) / MB << " MiB: ";
     std::cout << std::setw(2) << ndisks << " * "
-              << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite)) << " = "
-              << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite) * ndisks) << " MiB/s write,";
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite)) << " = "
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite) * ndisks) << " MiB/s write,";
     std::cout << std::setw(2) << ndisks << " * "
-              << std::setw(7) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread)) << " = "
-              << std::setw(7) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread) * ndisks) << " MiB/s read"
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread)) << " = "
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread) * ndisks) << " MiB/s read"
               << std::endl;
     if (totaltimewrite != 0.0)
-        std::cout << "# Write time   " << std::setw(7) << std::setprecision(3) << totaltimewrite << " s" << std::endl;
+        std::cout << "# Write time   " << std::setw(8) << std::setprecision(3) << totaltimewrite << " s" << std::endl;
     if (totaltimeread != 0.0)
-        std::cout << "# Read time    " << std::setw(7) << std::setprecision(3) << totaltimeread << " s" << std::endl;
-    std::cout << "# Non-I/O time " << std::setw(7) << std::setprecision(3) << (t_total - totaltimewrite - totaltimeread) << " s, average throughput "
-              << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total - totaltimewrite - totaltimeread) * ndisks) << " MiB/s"
+        std::cout << "# Read time    " << std::setw(8) << std::setprecision(3) << totaltimeread << " s" << std::endl;
+    std::cout << "# Non-I/O time " << std::setw(8) << std::setprecision(3) << (t_total.seconds() - totaltimewrite - totaltimeread) << " s, average throughput "
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total.seconds() - totaltimewrite - totaltimeread) * ndisks) << " MiB/s"
               << std::endl;
-    std::cout << "# Total time   " << std::setw(7) << std::setprecision(3) << t_total << " s, average throughput "
-              << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total) * ndisks) << " MiB/s"
+    std::cout << "# Total time   " << std::setw(8) << std::setprecision(3) << t_total.seconds() << " s, average throughput "
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total.seconds()) * ndisks) << " MiB/s"
               << std::endl;
 
 #ifdef WATCH_TIMES
