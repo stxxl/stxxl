@@ -77,7 +77,7 @@ int main(int argc, char * argv[])
         {
             double begin, end, elapsed;
             const uint64 offset = i * block_size;
-            std::cout << "Input offset   " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
+            std::cout << "Input offset   " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
 
             // read the block
             begin = timestamp();
@@ -89,7 +89,7 @@ int main(int argc, char * argv[])
             totalsizeread += block_size;
             totaltimeread += elapsed;
             
-            std::cout << std::setw(7) << std::setprecision(3) << throughput(block_size, elapsed) << " MiB/s read,";
+            std::cout << std::setw(8) << std::setprecision(3) << throughput(block_size, elapsed) << " MiB/s read, ";
 
             input_file.set_size(offset);
 
@@ -106,7 +106,7 @@ int main(int argc, char * argv[])
             totalsizewrite += block_size;
             totaltimewrite += elapsed;
 
-            std::cout << std::setw(7) << std::setprecision(3) << throughput(block_size, elapsed) << " MiB/s write";
+            std::cout << std::setw(8) << std::setprecision(3) << throughput(block_size, elapsed) << " MiB/s write";
 
             std::cout << std::endl;
         }
@@ -122,18 +122,18 @@ int main(int argc, char * argv[])
     const int ndisks = 1;
 
     std::cout << "=============================================================================================" << std::endl;
-    std::cout << "# Average over " << std::setw(7) << stxxl::STXXL_MAX(totalsizewrite, totalsizeread) / MB << " MiB: ";
-    std::cout << std::setw(7) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread)) << " MiB/s read,";
-    std::cout << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite)) << " MiB/s write" << std::endl;
+    std::cout << "# Average over " << std::setw(8) << stxxl::STXXL_MAX(totalsizewrite, totalsizeread) / MB << " MiB: ";
+    std::cout << std::setw(8) << std::setprecision(3) << (throughput(totalsizeread, totaltimeread)) << " MiB/s read, ";
+    std::cout << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite, totaltimewrite)) << " MiB/s write" << std::endl;
     if (totaltimeread != 0.0)
-        std::cout << "# Read time    " << std::setw(7) << std::setprecision(3) << totaltimeread << " s" << std::endl;
+        std::cout << "# Read time    " << std::setw(8) << std::setprecision(3) << totaltimeread << " s" << std::endl;
     if (totaltimewrite != 0.0)
-        std::cout << "# Write time   " << std::setw(7) << std::setprecision(3) << totaltimewrite << " s" << std::endl;
-    std::cout << "# Non-I/O time " << std::setw(7) << std::setprecision(3) << (t_total - totaltimewrite - totaltimeread) << " s, average throughput "
-              << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total - totaltimewrite - totaltimeread) * ndisks) << " MiB/s"
+        std::cout << "# Write time   " << std::setw(8) << std::setprecision(3) << totaltimewrite << " s" << std::endl;
+    std::cout << "# Non-I/O time " << std::setw(8) << std::setprecision(3) << (t_total - totaltimewrite - totaltimeread) << " s, average throughput "
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total - totaltimewrite - totaltimeread) * ndisks) << " MiB/s"
               << std::endl;
-    std::cout << "# Total time   " << std::setw(7) << std::setprecision(3) << t_total << " s, average throughput "
-              << std::setw(7) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total) * ndisks) << " MiB/s"
+    std::cout << "# Total time   " << std::setw(8) << std::setprecision(3) << t_total << " s, average throughput "
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total) * ndisks) << " MiB/s"
               << std::endl;
 
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
