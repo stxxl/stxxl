@@ -135,7 +135,11 @@ inline Integer div_ceil(Integer __n, Integer __d)
 #endif
 }
 
+#ifdef BOOST_MSVC
+#define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
+#else
 #define STXXL_DIVRU(a, b) stxxl::div_ceil<__typeof__(a)>((a), (b))
+#endif
 
 ////////////////////////////////////////////////////////////////////////////
 
