@@ -124,7 +124,9 @@ inline Integer log2_floor(Integer i)
 ////////////////////////////////////////////////////////////////////////////
 
 template <typename Integer>
-inline Integer div_ceil(Integer __n, Integer __d)
+inline
+typename std::remove_const<Integer>::type
+div_ceil(Integer __n, Integer __d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
     typedef __typeof__(std::div(__n, __d)) div_type;
