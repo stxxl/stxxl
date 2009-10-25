@@ -24,7 +24,6 @@
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timer;
-using stxxl::timestamp;
 using stxxl::uint64;
 
 
@@ -82,7 +81,7 @@ int main(int argc, char * argv[])
 
     file_type input_file(filebase, file::RDWR | file::DIRECT, 0);
 
-    double t_start = timestamp();
+    timer t_total(true);
     try {
         for (stxxl::unsigned_type r = num_rounds; r-- > 0; )
         {
@@ -152,7 +151,7 @@ int main(int argc, char * argv[])
         std::cout << std::endl;
         STXXL_ERRMSG(ex.what());
     }
-    double t_total = timestamp() - t_start;
+    t_total.stop();
 
     const int ndisks = 1;
 
@@ -168,11 +167,11 @@ int main(int argc, char * argv[])
         std::cout << "# Write time   " << std::setw(8) << std::setprecision(3) << totaltimewrite << " s" << std::endl;
     if (totaltimewritechunk != 0.0)
         std::cout << "# ChWrite time " << std::setw(8) << std::setprecision(3) << totaltimewritechunk << " s" << std::endl;
-    std::cout << "# Non-I/O time " << std::setw(8) << std::setprecision(3) << (t_total - totaltimewrite - totaltimeread) << " s, average throughput "
-              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total - totaltimewrite - totaltimeread) * ndisks) << " MiB/s"
+    std::cout << "# Non-I/O time " << std::setw(8) << std::setprecision(3) << (t_total.seconds() - totaltimewrite - totaltimeread) << " s, average throughput "
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total.seconds() - totaltimewrite - totaltimeread) * ndisks) << " MiB/s"
               << std::endl;
-    std::cout << "# Total time   " << std::setw(8) << std::setprecision(3) << t_total << " s, average throughput "
-              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total) * ndisks) << " MiB/s"
+    std::cout << "# Total time   " << std::setw(8) << std::setprecision(3) << t_total.seconds() << " s, average throughput "
+              << std::setw(8) << std::setprecision(3) << (throughput(totalsizewrite + totalsizeread, t_total.seconds()) * ndisks) << " MiB/s"
               << std::endl;
 
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
