@@ -192,6 +192,8 @@ public:
         STXXL_UNUSED(prefix);
     }
 
+    virtual void remove() { }
+
     virtual ~file()
     {
         int nr = get_request_nref();

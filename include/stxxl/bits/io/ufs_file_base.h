@@ -31,8 +31,10 @@ protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des
     int file_des;          // file descriptor
     int mode_;             // open mode
+    const std::string filename;
     ufs_file_base(const std::string & filename, int mode, int disk);
     offset_type _size();
+    void close();
 
 public:
     ~ufs_file_base();
@@ -40,6 +42,7 @@ public:
     void set_size(offset_type newsize);
     void lock();
     const char * io_type() const;
+    void remove();
 };
 
 //! \}

@@ -46,6 +46,9 @@ class block_prefetcher
     block_prefetcher() { }
     typedef typename block_type::bid_type bid_type;
 
+public:
+    typedef void(*callback_type)(const bid_type&);
+
 protected:
     bid_iterator_type consume_seq_begin;
     bid_iterator_type consume_seq_end;
@@ -65,7 +68,7 @@ protected:
     onoff_switch * completed;
     int_type * pref_buffer;
 
-    bool delete_block_after_fetch;
+    callback_type do_after_fetch;
 
     block_type * wait(int_type iblock)
     {
@@ -79,11 +82,8 @@ protected:
         int_type ibuffer = pref_buffer[iblock];
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);
         assert(ibuffer >= 0 && ibuffer < nreadblocks);
-        if (delete_block_after_fetch)
-        {
-            STXXL_VERBOSE1("block_prefetcher: deleting block " << read_bids[ibuffer]);
-            block_manager::get_instance()->delete_block(read_bids[ibuffer]);
-        }
+        if (do_after_fetch)
+        	do_after_fetch(read_bids[ibuffer]);
         return (read_buffers + ibuffer);
     }
 
@@ -99,7 +99,7 @@ public:
         bid_iterator_type _cons_end,
         int_type * _pref_seq,
         int_type _prefetch_buf_size,
-        bool delete_block_after_fetch = false
+        callback_type do_after_fetch = NULL
         ) :
         consume_seq_begin(_cons_begin),
         consume_seq_end(_cons_end),
@@ -108,7 +108,7 @@ public:
         nextread(STXXL_MIN(unsigned_type(_prefetch_buf_size), seq_length)),
         nextconsume(0),
         nreadblocks(nextread),
-        delete_block_after_fetch(delete_block_after_fetch)
+        do_after_fetch(do_after_fetch)
     {
         STXXL_VERBOSE1("block_prefetcher: seq_length=" << seq_length);
         STXXL_VERBOSE1("block_prefetcher: _prefetch_buf_size=" << _prefetch_buf_size);

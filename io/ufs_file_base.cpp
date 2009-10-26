@@ -32,7 +32,7 @@ const char * ufs_file_base::io_type() const
 ufs_file_base::ufs_file_base(
     const std::string & filename,
     int mode,
-    int disk) : file_request_basic(disk), file_des(-1), mode_(mode)
+    int disk) : file_request_basic(disk), file_des(-1), mode_(mode), filename(filename)
 {
     int fmode = 0;
 
@@ -74,14 +74,22 @@ ufs_file_base::ufs_file_base(
 
 ufs_file_base::~ufs_file_base()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
-    int res = ::close(file_des);
+	close();
+}
 
-    // if successful, reset file descriptor
-    if (res >= 0)
-        file_des = -1;
-    else
-        stxxl_function_error(io_error);
+void ufs_file_base::close()
+{
+	if (file_des != -1)
+	{
+		scoped_mutex_lock fd_lock(fd_mutex);
+		int res = ::close(file_des);
+
+		// if successful, reset file descriptor
+		if (res >= 0)
+			file_des = -1;
+		else
+			stxxl_function_error(io_error);
+	}
 }
 
 void ufs_file_base::lock()
@@ -141,6 +149,12 @@ void ufs_file_base::set_size(offset_type newsize)
 
     if (newsize > cur_size)
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
+}
+
+void ufs_file_base::remove()
+{
+	close();
+	::remove(filename.c_str());
 }
 
 __STXXL_END_NAMESPACE
