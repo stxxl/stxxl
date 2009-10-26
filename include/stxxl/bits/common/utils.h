@@ -109,24 +109,24 @@ STXXL_MAX(const Tp & a, const Tp & b)
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <typename Integer>
-inline Integer log2_ceil(Integer i)
+template <typename Integral>
+inline Integral log2_ceil(Integral i)
 {
-    return Integer(ceil(log2(i)));
+    return Integral(ceil(log2(i)));
 }
 
-template <typename Integer>
-inline Integer log2_floor(Integer i)
+template <typename Integral>
+inline Integral log2_floor(Integral i)
 {
-    return Integer(log2(i));
+    return Integral(log2(i));
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <typename Integer>
+template <typename Integral>
 inline
-typename std::remove_const<Integer>::type
-div_ceil(Integer __n, Integer __d)
+typename std::remove_const<Integral>::type
+div_ceil(Integral __n, Integral __d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
     typedef __typeof__(std::div(__n, __d)) div_type;
