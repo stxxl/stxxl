@@ -33,7 +33,6 @@ using std::tr1::remove_const;
 #elif defined(STXXL_BOOST_CONFIG)
 using boost::remove_const;
 #else
-#error remove_const
 template<typename _Tp>
 struct remove_const
 {
