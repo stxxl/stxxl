@@ -286,7 +286,7 @@ CPPUNIT_LINKER_OPTIONS		+= -lcppunit -ldl
 HEADER_FILES_BITS	+= namespace.h noncopyable.h version.h
 HEADER_FILES_BITS	+= compat_hash_map.h compat_hash_set.h
 HEADER_FILES_BITS	+= compat_unique_ptr.h parallel.h singleton.h defines.h
-HEADER_FILES_BITS	+= verbose.h unused.h
+HEADER_FILES_BITS	+= verbose.h unused.h compat_type_traits.h
 HEADER_FILES_BITS	+= msvc_compatibility.h
 
 HEADER_FILES_COMMON	+= aligned_alloc.h new_alloc.h

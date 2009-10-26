@@ -99,6 +99,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/compat_unique_ptr.h \
 	$(HEADER_PATH)/compat_hash_map.h \
 	$(HEADER_PATH)/compat_hash_set.h \
+	$(HEADER_PATH)/compat_type_traits.h \
 	$(HEADER_PATH)/parallel.h \
 	$(HEADER_PATH)/singleton.h \
 	$(HEADER_PATH)/defines.h \
