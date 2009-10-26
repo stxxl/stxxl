@@ -114,18 +114,15 @@ const char * fileperblock_file<base_file_type>::io_type() const
 
 template class fileperblock_file<syscall_file>;
 
-#ifndef BOOST_MSVC
-
-// mmap call does not exist in Windows
+#if STXXL_HAVE_MMAP_FILE
 template class fileperblock_file<mmap_file>;
-
-#else
-
-template class fileperblock_file<wincall_file>;
-
 #endif
 
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_HAVE_WINCALL_FILE
+template class fileperblock_file<wincall_file>;
+#endif
+
+#if STXXL_HAVE_BOOSTFD_FILE
 template class fileperblock_file<boostfd_file>;
 #endif
 
