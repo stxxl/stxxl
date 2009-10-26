@@ -671,7 +671,7 @@ namespace sort_local
 
         while (nruns > 1)
         {
-            int_type new_nruns = STXXL_DIVRU(nruns, merge_factor);
+            int_type new_nruns = div_ceil(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                           " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 

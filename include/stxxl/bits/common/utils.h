@@ -123,10 +123,14 @@ inline Integral log2_floor(Integral i)
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <typename Integral>
+template <typename Integral, typename Integral2>
 inline
+#ifdef BOOST_MSVC
+typename boost::remove_const<Integral>::type
+#else
 typename std::remove_const<Integral>::type
-div_ceil(Integral __n, Integral __d)
+#endif
+div_ceil(Integral __n, Integral2 __d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
     typedef __typeof__(std::div(__n, __d)) div_type;
@@ -136,12 +140,6 @@ div_ceil(Integral __n, Integral __d)
     return __n / __d + ((__n % __d) != 0);
 #endif
 }
-
-#ifdef BOOST_MSVC
-#define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
-#else
-#define STXXL_DIVRU(a, b) stxxl::div_ceil<__typeof__(a)>((a), (b))
-#endif
 
 ////////////////////////////////////////////////////////////////////////////
 

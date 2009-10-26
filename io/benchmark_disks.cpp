@@ -227,7 +227,7 @@ int main(int argc, char * argv[])
         {
             const stxxl::int64 current_step_size = std::min<stxxl::int64>(step_size, endpos - offset);
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
-            const unsigned current_num_blocks = STXXL_DIVRU(current_step_size, block_size);
+            const unsigned current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
 
             std::cout << "Disk offset    " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
 

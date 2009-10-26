@@ -543,7 +543,7 @@ namespace ksort_local
         typedef simple_vector<trigger_entry_type> run_type;
         typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 
-        unsigned_type m2 = STXXL_DIVRU(_m, 2);
+        unsigned_type m2 = div_ceil(_m, 2);
         const unsigned_type m2_rf = m2 * block_type::raw_size /
                                     (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
         STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
@@ -616,7 +616,7 @@ namespace ksort_local
 
         while (nruns > 1)
         {
-            int_type new_nruns = STXXL_DIVRU(nruns, merge_factor);
+            int_type new_nruns = div_ceil(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                           " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 

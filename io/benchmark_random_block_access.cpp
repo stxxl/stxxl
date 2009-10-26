@@ -73,7 +73,7 @@ int main(int argc, char * argv[])
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
 
-    stxxl::int64 num_blocks_in_span = STXXL_DIVRU(span, raw_block_size);
+    stxxl::int64 num_blocks_in_span = stxxl::div_ceil(span, raw_block_size);
     num_blocks = stxxl::STXXL_MIN(num_blocks, num_blocks_in_span);
 
     block_type * buffer = new block_type;

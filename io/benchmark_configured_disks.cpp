@@ -81,7 +81,7 @@ int main(int argc, char * argv[])
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
 
-    unsigned num_blocks_per_step = STXXL_DIVRU(step_size, raw_block_size);
+    unsigned num_blocks_per_step = stxxl::div_ceil(step_size, raw_block_size);
     step_size = num_blocks_per_step * raw_block_size;
 
     block_type * buffer = new block_type[num_blocks_per_step];
@@ -108,7 +108,7 @@ int main(int argc, char * argv[])
 #if CHECK_AFTER_READ
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
 #endif
-            const unsigned current_num_blocks_per_step = STXXL_DIVRU(current_step_size, raw_block_size);
+            const unsigned current_num_blocks_per_step = stxxl::div_ceil(current_step_size, raw_block_size);
 
             std::cout << "Offset    " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
 

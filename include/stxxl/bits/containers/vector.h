@@ -811,9 +811,9 @@ private:
 public:
     vector(size_type n = 0) :
         _size(n),
-        _bids(STXXL_DIVRU(n, block_type::size)),
-        _page_status(STXXL_DIVRU(_bids.size(), page_size)),
-        _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
+        _bids(div_ceil(n, block_type::size)),
+        _page_status(div_ceil(_bids.size(), page_size)),
+        _page_to_slot(div_ceil(_bids.size(), page_size)),
         _slot_to_page(n_pages),
         _cache(n_pages * page_size),
         _from(NULL),
@@ -822,7 +822,7 @@ public:
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
-        int_type all_pages = STXXL_DIVRU(_bids.size(), page_size);
+        int_type all_pages = div_ceil(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
         {
@@ -867,8 +867,8 @@ public:
 
 
         unsigned_type old_bids_size = _bids.size();
-        unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
-        unsigned_type new_pages = STXXL_DIVRU(new_bids_size, page_size);
+        unsigned_type new_bids_size = div_ceil(n, block_type::size);
+        unsigned_type new_pages = div_ceil(new_bids_size, page_size);
         _page_status.resize(new_pages, uninitialized);
         _page_to_slot.resize(new_pages, on_disk);
 
@@ -898,7 +898,7 @@ public:
         reserve(n);
         if (n < _size) {
             // mark excess pages as uninitialized and evict them from cache
-            unsigned_type first_page_to_evict = STXXL_DIVRU(n, block_type::size * page_size);
+            unsigned_type first_page_to_evict = div_ceil(n, block_type::size * page_size);
             for (unsigned_type i = first_page_to_evict; i < _page_status.size(); ++i) {
                 if (_page_to_slot[i] != on_disk) {
                     _free_slots.push(_page_to_slot[i]);
@@ -909,7 +909,7 @@ public:
         }
 #else
         unsigned_type old_bids_size = _bids.size();
-        unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
+        unsigned_type new_bids_size = div_ceil(n, block_type::size);
 
 
         if (new_bids_size > old_bids_size)
@@ -924,10 +924,10 @@ public:
                 bm->delete_blocks(_bids.begin() + old_bids_size, _bids.end());
 
             _bids.resize(new_bids_size);
-            unsigned_type new_pages = STXXL_DIVRU(new_bids_size, page_size);
+            unsigned_type new_pages = div_ceil(new_bids_size, page_size);
             _page_status.resize(new_pages);
 
-            unsigned_type first_page_to_evict = STXXL_DIVRU(new_bids_size, page_size);
+            unsigned_type first_page_to_evict = div_ceil(new_bids_size, page_size);
             // clear dirty flag, so these pages will be never written
             std::fill(_page_status.begin() + first_page_to_evict,
                       _page_status.end(), (unsigned char)valid_on_disk);
@@ -985,9 +985,9 @@ public:
     //! \c sizeof(Tp_) and the page size (4096).
     vector(file * from, size_type size = size_type(-1)) :
         _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
-        _bids(STXXL_DIVRU(_size, size_type(block_type::size))),
-        _page_status(STXXL_DIVRU(_bids.size(), page_size)),
-        _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
+        _bids(div_ceil(_size, size_type(block_type::size))),
+        _page_status(div_ceil(_bids.size(), page_size)),
+        _page_to_slot(div_ceil(_bids.size(), page_size)),
         _slot_to_page(n_pages),
         _cache(n_pages * page_size),
         _from(from),
@@ -1005,7 +1005,7 @@ public:
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
-        int_type all_pages = STXXL_DIVRU(_bids.size(), page_size);
+        int_type all_pages = div_ceil(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
         {
@@ -1030,9 +1030,9 @@ public:
 
     vector(const vector & obj) :
         _size(obj.size()),
-        _bids(STXXL_DIVRU(obj.size(), block_type::size)),
-        _page_status(STXXL_DIVRU(_bids.size(), page_size)),
-        _page_to_slot(STXXL_DIVRU(_bids.size(), page_size)),
+        _bids(div_ceil(obj.size(), block_type::size)),
+        _page_status(div_ceil(_bids.size(), page_size)),
+        _page_to_slot(div_ceil(_bids.size(), page_size)),
         _slot_to_page(n_pages),
         _cache(n_pages * page_size),
         _from(NULL),
@@ -1042,7 +1042,7 @@ public:
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
-        int_type all_pages = STXXL_DIVRU(_bids.size(), page_size);
+        int_type all_pages = div_ceil(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
         {
@@ -1220,10 +1220,10 @@ public:
     template <typename ForwardIterator>
     void set_content(const ForwardIterator & bid_begin, const ForwardIterator & bid_end, size_type n)
     {
-        unsigned_type new_bids_size = STXXL_DIVRU(n, block_type::size);
+        unsigned_type new_bids_size = div_ceil(n, block_type::size);
         _bids.resize(new_bids_size);
         std::copy(bid_begin, bid_end, _bids.begin());
-        unsigned_type new_pages = STXXL_DIVRU(new_bids_size, page_size);
+        unsigned_type new_pages = div_ceil(new_bids_size, page_size);
         _page_status.resize(new_pages, valid_on_disk);
         _page_to_slot.resize(new_pages, on_disk);
         _size = n;

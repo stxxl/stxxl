@@ -65,7 +65,7 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     // valgrind. Usually produces an extra memory fragment of about
     // ALIGNMENT bytes.
     // Overhead: about 2 * ALIGNMENT bytes.
-    size_t alloc_size = ALIGNMENT * STXXL_DIVRU(sizeof(char *) + meta_info_size, ALIGNMENT) + size;
+    size_t alloc_size = ALIGNMENT * div_ceil(sizeof(char *) + meta_info_size, ALIGNMENT) + size;
     char * buffer;
     if (posix_memalign((void **)&buffer, ALIGNMENT, alloc_size) != 0)
         throw std::bad_alloc();
