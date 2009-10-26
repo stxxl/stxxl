@@ -19,6 +19,7 @@
  #include <unistd.h>
  #include <fcntl.h>
 #endif
+#include <cstdio>
 
 
 __STXXL_BEGIN_NAMESPACE
