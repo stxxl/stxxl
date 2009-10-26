@@ -25,6 +25,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/compat_type_traits.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
 
@@ -125,11 +126,7 @@ inline Integral log2_floor(Integral i)
 
 template <typename Integral, typename Integral2>
 inline
-#ifdef BOOST_MSVC
-typename boost::remove_const<Integral>::type
-#else
-typename std::remove_const<Integral>::type
-#endif
+typename remove_const<Integral>::type
 div_ceil(Integral __n, Integral2 __d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
