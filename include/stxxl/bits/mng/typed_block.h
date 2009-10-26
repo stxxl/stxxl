@@ -219,7 +219,7 @@ public:
     typedef pointer iterator;
     typedef type const * const_iterator;
 
-    enum
+    enum constants
     {
         raw_size = RawSize_,                                        //!< size of block in bytes
         size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size,  //!< number of elements in block

@@ -746,7 +746,7 @@ public:
     typedef PgTp_ pager_type;
     typedef AllocStr_ alloc_strategy_type;
 
-    enum {
+    enum constants {
         block_size = BlkSize_,
         page_size = PgSz_,
         n_pages = pager_type::n_pages,
