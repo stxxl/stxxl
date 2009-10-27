@@ -75,22 +75,22 @@ ufs_file_base::ufs_file_base(
 
 ufs_file_base::~ufs_file_base()
 {
-	close();
+    close();
 }
 
 void ufs_file_base::close()
 {
-	if (file_des != -1)
-	{
-		scoped_mutex_lock fd_lock(fd_mutex);
-		int res = ::close(file_des);
+    if (file_des != -1)
+    {
+        scoped_mutex_lock fd_lock(fd_mutex);
+        int res = ::close(file_des);
 
-		// if successful, reset file descriptor
-		if (res >= 0)
-			file_des = -1;
-		else
-			stxxl_function_error(io_error);
-	}
+        // if successful, reset file descriptor
+        if (res >= 0)
+            file_des = -1;
+        else
+            stxxl_function_error(io_error);
+    }
 }
 
 void ufs_file_base::lock()
@@ -154,8 +154,8 @@ void ufs_file_base::set_size(offset_type newsize)
 
 void ufs_file_base::remove()
 {
-	close();
-	::remove(filename.c_str());
+    close();
+    ::remove(filename.c_str());
 }
 
 __STXXL_END_NAMESPACE

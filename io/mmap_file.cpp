@@ -20,7 +20,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void mmap_file::serve(const request * req) throw(io_error)
+void mmap_file::serve(const request * req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);

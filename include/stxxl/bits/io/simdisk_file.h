@@ -47,22 +47,29 @@ class DiskGeometry : private noncopyable
     struct Zone
     {
         // manufactured data
-        //    int last_cyl;
-        //    int sect_per_track;
+#if 0
+        int last_cyl;
+        int sect_per_track;
+#endif
         // derived data
         int first_sector;
         int sectors;
-        double sustained_data_rate;             // in MiB/s
+        double sustained_data_rate;  // in MiB/s
         inline Zone(int _first_sector) : first_sector(_first_sector)
-        { }                                     // constructor for zone search
+        { }                          // constructor for zone search
 
         inline Zone(
-            //int _last_cyl,
-            //int _sect_per_track,
+#if 0
+            int _last_cyl,
+            int _sect_per_track,
+#endif
             int _first_sector,
-            int _sectors, double _rate) :
-            //last_cyl(_last_cyl),
-            //sect_per_track(_sect_per_track) ,
+            int _sectors,
+            double _rate) :
+#if 0
+            last_cyl(_last_cyl),
+            sect_per_track(_sect_per_track),
+#endif
             first_sector(_first_sector),
             sectors(_sectors),
             sustained_data_rate(_rate)
@@ -134,4 +141,4 @@ __STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_SIMDISK_FILE
 
-#endif // !STXXL_SIMDISK_FILE_HEADER
+#endif  // !STXXL_SIMDISK_FILE_HEADER

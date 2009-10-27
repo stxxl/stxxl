@@ -47,7 +47,7 @@ class block_prefetcher
     typedef typename block_type::bid_type bid_type;
 
 public:
-    typedef void(*callback_type)(const bid_type&);
+    typedef void (*callback_type)(const bid_type &);
 
 protected:
     bid_iterator_type consume_seq_begin;
@@ -83,7 +83,7 @@ protected:
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);
         assert(ibuffer >= 0 && ibuffer < nreadblocks);
         if (do_after_fetch)
-        	do_after_fetch(read_bids[ibuffer]);
+            do_after_fetch(read_bids[ibuffer]);
         return (read_buffers + ibuffer);
     }
 
