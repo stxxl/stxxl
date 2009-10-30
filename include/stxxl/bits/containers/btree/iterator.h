@@ -13,7 +13,9 @@
 #ifndef STXXL_CONTAINERS_BTREE__ITERATOR_H
 #define STXXL_CONTAINERS_BTREE__ITERATOR_H
 
-#include <stxxl/bits/common/utils.h>
+#include <iterator>
+#include <cassert>
+#include <stxxl/bits/verbose.h>
 
 
 __STXXL_BEGIN_NAMESPACE

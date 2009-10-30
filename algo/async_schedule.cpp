@@ -18,7 +18,6 @@
 
 #include <stxxl/bits/algo/async_schedule.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/common/utils.h>
 
 #include <algorithm>
 #include <functional>

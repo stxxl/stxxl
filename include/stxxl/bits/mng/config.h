@@ -20,7 +20,6 @@
 
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/verbose.h>
-#include <stxxl/bits/common/utils.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -28,9 +28,14 @@ FLAGS_a_ro	?= R
 
 DISKS		?= abcd $(DISKS_1by1) ab a_ro
 
+SIP_NUM_BLOCKS	?= 0
+SIP_CHUNK_BLOCKS?= 1
+SIP_BLOCK_SIZE	?= 0
+
 DISKBENCH_BINDIR?= .
 MISC_BINDIR	?= $(DISKBENCH_BINDIR)/../misc
 DISKBENCH	?= benchmark_disks.stxxl.bin
+SCATTERINPLACE	?= iobench_scatter_in_place.stxxl.bin
 
 pipefail	?= set -o pipefail;
 
@@ -44,6 +49,14 @@ define do-some-disks
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
 	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(if $(filter y yes Y YES,$(DIRECT_IO)),,ND) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+
+endef
+
+define do-some-disks-sip
+	-$(pipefail) \
+	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
+	$(DISKBENCH_BINDIR)/$(SCATTERINPLACE) $(strip $(SIP_NUM_BLOCKS)) $(strip $(SIP_CHUNK_BLOCKS)) $(strip $(SIP_BLOCK_SIZE)) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+
 endef
 
 $(HOST)-%.cr.log:
@@ -69,6 +82,10 @@ $(HOST)-%.rdx.log: FLAGS_EX = R
 $(HOST)-%.rdx.log:
 	$(do-some-disks)
 
+# scatter-in-place
+$(HOST)-%.sip.log:
+	$(do-some-disks-sip)
+
 all: crx wr ex
 
 crx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.crx.log)
@@ -79,6 +96,7 @@ wrx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log)
 rdx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.rdx.log)
 ex: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 ex+: $(foreach d,$(DISKS),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
+sip: $(foreach d,$(DISKS_1by1),$(HOST)-$d.sip.log)
 
 plot: $(HOST).gnuplot
 	gnuplot $<
@@ -93,12 +111,13 @@ avg3plot: $(HOST)-avg3.gnuplot
 	gnuplot $<
 
 # $1 = logfile, $2 = column
-extract_average	= $(if $(wildcard $1),$(shell tail -n 1 $1 | awk '{ print $$($2+1) }'),......)
+extract_average	= $(if $(wildcard $1),$(shell grep ' Average over ' $1 | awk '{ print $$($2+1) }'),......)
 
 # $1 = logfile, $2 = disk, $3 = column, $4 = label
 # (does not plot if avg = nan)
 define plotline
-	$(if $(wildcard $1),$(if $(filter nan,$(call extract_average,$1,$3)),,echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@ ;))
+	$(if $(wildcard $1),$(if $(filter nan,$(call extract_average,$1,$3)),,echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@))
+
 endef
 
 # $1 = logfile, $2 = disk
@@ -174,8 +193,8 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 $(HOST).d.gnuplot: $(HOST).gnuplot
 	sed -e 's/ w l / w d lw 2 /' $< > $@
 
-$(HOST)-avg.dat: $(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *MB/*.log)
-	$(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *MB) > $@
+$(HOST)-avg.dat: $(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *KB/*.log *MB/*.log)
+	$(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *KB *MB) > $@
 
 $(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
 	$(RM) $@

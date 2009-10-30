@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -25,7 +26,10 @@ __STXXL_BEGIN_NAMESPACE
 class io_error : public std::ios_base::failure
 {
 public:
-    io_error() throw () : std::ios_base::failure("") { }
+    io_error() throw () :
+        std::ios_base::failure("")
+    { }
+
     io_error(const std::string & msg_) throw () :
         std::ios_base::failure(msg_)
     { }
@@ -34,7 +38,10 @@ public:
 class resource_error : public std::runtime_error
 {
 public:
-    resource_error() throw () : std::runtime_error("") { }
+    resource_error() throw () :
+        std::runtime_error("")
+    { }
+
     resource_error(const std::string & msg_) throw () :
         std::runtime_error(msg_)
     { }
@@ -43,7 +50,10 @@ public:
 class bad_ext_alloc : public std::runtime_error
 {
 public:
-    bad_ext_alloc() throw () : std::runtime_error("") { }
+    bad_ext_alloc() throw () :
+        std::runtime_error("")
+    { }
+
     bad_ext_alloc(const std::string & msg_) throw () :
         std::runtime_error(msg_)
     { }
@@ -52,8 +62,23 @@ public:
 class bad_parameter : public std::runtime_error
 {
 public:
-    bad_parameter() throw () : std::runtime_error("") { }
+    bad_parameter() throw () :
+        std::runtime_error("")
+    { }
+
     bad_parameter(const std::string & msg_) throw () :
+        std::runtime_error(msg_)
+    { }
+};
+
+class unreachable : public std::runtime_error
+{
+public:
+    unreachable() throw () :
+        std::runtime_error("")
+    { }
+
+    unreachable(const std::string & msg_) throw () :
         std::runtime_error(msg_)
     { }
 };
@@ -61,3 +86,4 @@ public:
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_EXCEPTIONS_H_
+// vim: et:ts=4:sw=4

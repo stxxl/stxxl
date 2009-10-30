@@ -16,6 +16,7 @@
 //! \c sorted_runs data structure
 //! using \c stream::use_push specialization of \c stream::runs_creator class
 
+#include <limits>
 #include <stxxl/stream>
 
 const unsigned long long megabyte = 1024 * 1024;

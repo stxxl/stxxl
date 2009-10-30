@@ -17,14 +17,13 @@
 // I rework the stable_ksort when I would have a time
 
 
-#include <cmath>
-
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/common/utils.h>
 
 
 #ifndef STXXL_VERBOSE_STABLE_KSORT
@@ -245,10 +244,9 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type ndisks = cfg->disks_number();
     const unsigned_type min_num_read_write_buffers = (write_buffers_multiple + read_buffers_multiple) * ndisks;
     const unsigned_type nmaxbuckets = m - min_num_read_write_buffers;
-    const unsigned_type lognbuckets = static_cast<unsigned_type>(log2(double(nmaxbuckets)));
+    const unsigned_type lognbuckets = log2_floor(nmaxbuckets);
     const unsigned_type nbuckets = 1 << lognbuckets;
-    const unsigned_type est_bucket_size = STXXL_DIVRU((last - first) / int64(nbuckets),
-                                                      int64(block_type::size));      //in blocks
+    const unsigned_type est_bucket_size = div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
         STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
@@ -306,7 +304,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         }
         // here we can increase write_buffers_multiple_b knowing max(bucket_sizes[i])
         // ... and decrease max_bucket_size_bl
-        const int_type max_bucket_size_act_bl = STXXL_DIVRU(max_bucket_size_act, block_type::size);
+        const int_type max_bucket_size_act_bl = div_ceil(max_bucket_size_act, block_type::size);
         STXXL_VERBOSE_STABLE_KSORT("Reducing required number of required blocks per bucket from " <<
                                    max_bucket_size_bl << " to " << max_bucket_size_act_bl);
         max_bucket_size_rec = max_bucket_size_act;
@@ -341,20 +339,18 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         type_key_ * refs2 = new type_key_[max_bucket_size_rec];
 
         // submit reading first 2 buckets (Peter's scheme)
-        unsigned_type nbucket_blocks = STXXL_DIVRU(bucket_sizes[0], block_type::size);
+        unsigned_type nbucket_blocks = div_ceil(bucket_sizes[0], block_type::size);
         for (i = 0; i < nbucket_blocks; i++)
             reqs1[i] = blocks1[i].read(bucket_bids[0][i]);
 
 
-        nbucket_blocks = STXXL_DIVRU(bucket_sizes[1], block_type::size);
+        nbucket_blocks = div_ceil(bucket_sizes[1], block_type::size);
         for (i = 0; i < nbucket_blocks; i++)
             reqs2[i] = blocks2[i].read(bucket_bids[1][i]);
 
 
         key_type offset = 0;
-        const unsigned log_k1 =
-            (std::max)(static_cast<unsigned>(ceil(log2(double(
-                                                           max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE)))), 1U);
+        const unsigned log_k1 = STXXL_MAX<unsigned>(log2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
         unsigned_type k1 = 1 << log_k1;
         int_type * bucket1 = new int_type[k1];
 
@@ -366,10 +362,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
         for (unsigned_type k = 0; k < nbuckets; k++)
         {
-            nbucket_blocks = STXXL_DIVRU(bucket_sizes[k], block_type::size);
-            const unsigned log_k1_k =
-                (std::max)(static_cast<unsigned>(ceil(log2(
-                                                          double(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE)))), 1U);
+            nbucket_blocks = div_ceil(bucket_sizes[k], block_type::size);
+            const unsigned log_k1_k = STXXL_MAX<unsigned>(log2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
             assert(log_k1_k <= log_k1);
             k1 = 1 << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);
@@ -402,7 +396,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                 type_key_ * cEnd = refs2 + bucket1[i];
                 type_key_ * dEnd = refs1 + bucket1[i];
 
-                const unsigned log_k2 = static_cast<unsigned>(log2(double(bucket1[i]))) - 1;        // adaptive bucket size
+                const unsigned log_k2 = log2_floor(bucket1[i]) - 1;        // adaptive bucket size
                 const unsigned_type k2 = 1 << log_k2;
                 int_type * bucket2 = new int_type[k2];
                 const unsigned shift2 = shift1 - log_k2;
@@ -425,7 +419,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
             const unsigned_type bucket2submit = k + 2;
             if (bucket2submit < nbuckets)
             {
-                nbucket_blocks = STXXL_DIVRU(bucket_sizes[bucket2submit], block_type::size);
+                nbucket_blocks = div_ceil(bucket_sizes[bucket2submit], block_type::size);
                 for (i = 0; i < nbucket_blocks; i++)
                     reqs1[i] = blocks1[i].read(bucket_bids[bucket2submit][i]);
             }

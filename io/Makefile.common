@@ -1,4 +1,4 @@
-TESTS			 = test_io gen_file test_cancel benchmark_disks flushbuffers benchmark_disk_and_flash benchmark_configured_disks benchmark_random_block_access
+TESTS			 = test_io gen_file test_cancel benchmark_disks flushbuffers benchmark_disk_and_flash benchmark_configured_disks benchmark_random_block_access iobench_scatter_in_place
 TESTS_NON_MSVC		 = sd_test
 TESTS_UNITTEST		 = unittest
 
@@ -12,6 +12,7 @@ LIB_SRC			 = \
 	disk_queued_file.cpp \
 	request_queue_impl_worker.cpp \
 	request_queue_impl_qwqr.cpp \
+	request_queue_impl_1q.cpp \
 	aio_queue.cpp \
 	ufs_file_base.cpp \
 	syscall_file.cpp \

@@ -15,8 +15,10 @@
 #ifndef STXXL_LOSERTREE_HEADER
 #define STXXL_LOSERTREE_HEADER
 
+#include <algorithm>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/verbose.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -64,7 +66,7 @@ public:
         run_cursor_cmp_type c) : cmp(c)
     {
         int_type i;
-        logK = static_cast<int>(ceil(log(double(nruns)) / log(2.)));             // replace with something smart
+        logK = log2_ceil(nruns);
         int_type kReg = k = (1 << logK);
 
         STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);

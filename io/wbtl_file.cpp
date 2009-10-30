@@ -16,6 +16,7 @@
 
 #if STXXL_HAVE_WBTL_FILE
 
+#include <algorithm>
 #include <iomanip>
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/common/debug.h>
@@ -53,7 +54,7 @@ wbtl_file::~wbtl_file()
     storage = 0;
 }
 
-void wbtl_file::serve(const request * req) throw(io_error)
+void wbtl_file::serve(const request * req) throw (io_error)
 {
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();

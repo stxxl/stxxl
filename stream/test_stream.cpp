@@ -15,6 +15,7 @@
 //! stream package. The example sorts characters of a string producing an
 //! array of sorted tuples (character, index position).
 
+#include <limits>
 #include <vector>
 #include <stxxl/stream>
 #include <stxxl/vector>

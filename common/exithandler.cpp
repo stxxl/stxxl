@@ -46,7 +46,7 @@ __STXXL_END_NAMESPACE
 __STXXL_BEGIN_NAMESPACE
 
 mutex exit_handler_mutex;
-std::vector<void(*) (void)> exit_handlers;
+std::vector<void (*)(void)> exit_handlers;
 
 int register_exit_handler(void (* function)(void))
 {

@@ -13,7 +13,9 @@
 #ifndef STXXL_INTKSORT_HEADER
 #define STXXL_INTKSORT_HEADER
 
-#include <stxxl/bits/common/utils.h>
+#include <algorithm>
+#include <cassert>
+#include <stxxl/bits/common/types.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -282,7 +284,10 @@ cleanup(T * b, int_type * bucket, int_type K)
             sort4(c[0], c[1], c[2], c[3]);
             break;
         case 5:
-            //sort5(c[0], c[1], c[2], c[3], c[4]);  break;
+#if 0
+            sort5(c[0], c[1], c[2], c[3], c[4]);
+            break;
+#endif
         case 6:
         case 7:
         case 8:

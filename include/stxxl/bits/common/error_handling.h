@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -48,6 +48,11 @@ __STXXL_BEGIN_NAMESPACE
     STXXL_THROW(std::invalid_argument, \
                 "function " << STXXL_PRETTY_FUNCTION_NAME, \
                 error_message)
+
+#define STXXL_THROW_UNREACHABLE() \
+    STXXL_THROW(stxxl::unreachable, \
+                "file: " << __FILE__ << ", line: " << __LINE__, \
+                "must be unreachable code")
 
 ////////////////////////////////////////////////////////////////////////////
 

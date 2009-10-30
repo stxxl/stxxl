@@ -34,6 +34,7 @@
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/common/is_sorted.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -366,8 +367,7 @@ namespace sort_local
 
 
     template <typename block_type, typename run_type, typename value_cmp>
-    void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run, unsigned_type _m, value_cmp cmp
-                    )
+    void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run, unsigned_type _m, value_cmp cmp)
     {
         typedef typename block_type::bid_type bid_type;
         typedef typename block_type::value_type value_type;
@@ -554,7 +554,7 @@ namespace sort_local
 // end of STL-style merging
 
 #else
-            assert(false);
+            STXXL_THROW_UNREACHABLE();
 #endif
         }
         else
@@ -666,15 +666,12 @@ namespace sort_local
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-        // Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) runs at once
-
-        const int_type merge_factor = static_cast<int_type>(ceil(pow(nruns, 1. / ceil(log(double(nruns)) /
-                                                                                      log(double(_m))))));
+        const int_type merge_factor = optimal_merge_factor(nruns, _m);
         run_type ** new_runs;
 
         while (nruns > 1)
         {
-            int_type new_nruns = STXXL_DIVRU(nruns, merge_factor);
+            int_type new_nruns = div_ceil(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                           " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 

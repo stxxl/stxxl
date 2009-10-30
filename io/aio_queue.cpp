@@ -22,6 +22,8 @@
 #include <stxxl/bits/io/aio_request.h>
 #include <stxxl/bits/parallel.h>
 
+#include <algorithm>
+
 
 #ifndef STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
 #define STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION 1

@@ -29,6 +29,8 @@
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/common/utils.h>
 
 
 //#define INTERLEAVED_ALLOC
@@ -207,10 +209,9 @@ namespace ksort_local
         run = *runs;
         int_type run_size = (*runs)->size();
         key_type offset = 0;
-        const int log_k1 =
-            static_cast<int>(ceil(log2((m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
-                                       (double(m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE)) : 2.)));
-        const int log_k2 = int(log2(double(m2 * Blocks1->size))) - log_k1 - 1;
+        const int log_k1 = log2_ceil((m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
+                                     (m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
+        const int log_k2 = log2_floor(m2 * Blocks1->size) - log_k1 - 1;
         STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
         const int_type k1 = 1 << log_k1;
         const int_type k2 = 1 << log_k2;
@@ -542,7 +543,7 @@ namespace ksort_local
         typedef simple_vector<trigger_entry_type> run_type;
         typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 
-        unsigned_type m2 = STXXL_DIVRU(_m, 2);
+        unsigned_type m2 = div_ceil(_m, 2);
         const unsigned_type m2_rf = m2 * block_type::raw_size /
                                     (block_type::raw_size + block_type::size * sizeof(type_key<type, key_type>));
         STXXL_VERBOSE("Reducing number of blocks in a run from " << m2 << " to " <<
@@ -610,14 +611,12 @@ namespace ksort_local
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-        // Optimal merging: merge r = pow(nruns,1/ceil(log(nruns)/log(m))) at once
-
-        const int_type merge_factor = static_cast<int_type>(ceil(pow(nruns, 1. / ceil(log(double(nruns)) / log(double(_m))))));
+        const int_type merge_factor = optimal_merge_factor(nruns, _m);
         run_type ** new_runs;
 
         while (nruns > 1)
         {
-            int_type new_nruns = STXXL_DIVRU(nruns, merge_factor);
+            int_type new_nruns = div_ceil(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
                           " opt_merge_factor: " << merge_factor << " m:" << _m << " new_nruns: " << new_nruns);
 

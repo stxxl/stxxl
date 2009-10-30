@@ -30,6 +30,7 @@
 #include <ami_scan_utils.h>
 
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/verbose.h>
 #include <stxxl/timer>
 
 

@@ -13,8 +13,9 @@
 #ifndef STXXL_SIMPLE_VECTOR_HEADER
 #define STXXL_SIMPLE_VECTOR_HEADER
 
+#include <algorithm>
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/common/types.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -26,7 +27,7 @@ class simple_vector : private noncopyable
     { }
 
 public:
-    typedef size_t size_type;
+    typedef unsigned_type size_type;
     typedef _Tp value_type;
 //  typedef simple_alloc<_Tp, _Alloc> _data_allocator;
 

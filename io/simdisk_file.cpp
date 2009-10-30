@@ -155,7 +155,7 @@ IC35L080AVVA07::IC35L080AVVA07()
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_file::serve(const request * req) throw(io_error)
+void sim_disk_file::serve(const request * req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);

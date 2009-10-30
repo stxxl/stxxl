@@ -36,7 +36,7 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
     stxxl::uint64 records_to_sort = data_mem / sizeof(T);
     typedef stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
 
-    memory_to_use = STXXL_DIVRU(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
+    memory_to_use = stxxl::div_ceil(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
 
     vector_type v(records_to_sort);
     unsigned ndisks = stxxl::config::get_instance()->disks_number();

@@ -54,7 +54,7 @@ class timer
     inline double timestamp();
 
 public:
-    inline timer();
+    inline timer(bool start_immediately = false);
     inline void start();
     inline void stop();
     inline void reset();
@@ -63,8 +63,11 @@ public:
     inline double useconds();
 };
 
-timer::timer() : running(false), accumulated(0.)
-{ }
+timer::timer(bool start_immediately) : running(false), accumulated(0.)
+{
+    if (start_immediately)
+        start();
+}
 
 double timer::timestamp()
 {
@@ -116,3 +119,4 @@ double timer::seconds()
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_TIMER_HEADER
+// vim: et:ts=4:sw=4

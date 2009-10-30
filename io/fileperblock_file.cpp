@@ -12,6 +12,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <cstdio>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/aio_file.h>
@@ -83,7 +84,12 @@ template <class base_file_type>
 void fileperblock_file<base_file_type>::discard(offset_type offset, offset_type length)
 {
     STXXL_UNUSED(length);
+#ifdef STXXL_FILEPERBLOCK_NO_DELETE
+    ::truncate(filename_for_block(offset).c_str(), 0);
+#else
     ::remove(filename_for_block(offset).c_str());
+#endif
+
     STXXL_VERBOSE0("discard " << offset << " + " << length);
 }
 
@@ -110,19 +116,19 @@ const char * fileperblock_file<base_file_type>::io_type() const
 
 template class fileperblock_file<syscall_file>;
 
-#ifndef BOOST_MSVC
-
-// mmap call does not exist in Windows
+#if STXXL_HAVE_MMAP_FILE
 template class fileperblock_file<mmap_file>;
-template class fileperblock_file<aio_file>;
-
-#else
-
-template class fileperblock_file<wincall_file>;
-
 #endif
 
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_HAVE_AIO_FILE
+template class fileperblock_file<aio_file>;
+#endif
+
+#if STXXL_HAVE_WINCALL_FILE
+template class fileperblock_file<wincall_file>;
+#endif
+
+#if STXXL_HAVE_BOOSTFD_FILE
 template class fileperblock_file<boostfd_file>;
 #endif
 

@@ -99,10 +99,12 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/compat_unique_ptr.h \
 	$(HEADER_PATH)/compat_hash_map.h \
 	$(HEADER_PATH)/compat_hash_set.h \
+	$(HEADER_PATH)/compat_type_traits.h \
 	$(HEADER_PATH)/parallel.h \
 	$(HEADER_PATH)/singleton.h \
 	$(HEADER_PATH)/defines.h \
 	$(HEADER_PATH)/verbose.h \
+	$(HEADER_PATH)/unused.h \
 	$(HEADER_PATH)/msvc_compatibility.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
 	$(HEADER_PATH)/common/new_alloc.h \
@@ -139,6 +141,7 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/request_queue.h \
 	$(HEADER_PATH)/io/request_queue_impl_worker.h \
 	$(HEADER_PATH)/io/request_queue_impl_qwqr.h \
+	$(HEADER_PATH)/io/request_queue_impl_1q.h \
 	$(HEADER_PATH)/io/file.h \
 	$(HEADER_PATH)/io/disk_queued_file.h \
 	$(HEADER_PATH)/io/ufs_file_base.h \

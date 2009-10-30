@@ -9,6 +9,7 @@ LIB_OBJECTS = \
 	../io/request_queue_impl_qwqr.$(OBJEXT) \
 	../io/aio_queue.$(OBJEXT) \
 	../io/disk_queued_file.$(OBJEXT) \
+	../io/request_queue_impl_1q.$(OBJEXT) \
 	../io/ufs_file_base.$(OBJEXT) \
 	../io/syscall_file.$(OBJEXT) \
 	../io/aio_file.$(OBJEXT) \

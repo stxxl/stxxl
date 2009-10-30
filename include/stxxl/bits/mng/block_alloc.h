@@ -14,6 +14,7 @@
 #ifndef STXXL_MNG__BLOCK_ALLOC_H
 #define STXXL_MNG__BLOCK_ALLOC_H
 
+#include <algorithm>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/config.h>

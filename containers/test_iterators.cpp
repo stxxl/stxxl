@@ -97,7 +97,7 @@ bool test_inc_dec_random(Iterator it)
 template <typename IteratorA, typename IteratorB, typename Category>
 struct test_comparison_lt_gt
 {
-    void operator() (IteratorA, IteratorB)
+    void operator () (IteratorA, IteratorB)
     {
         // operators <, <=, >=, > are not available in all iterator categories
     }
@@ -106,7 +106,7 @@ struct test_comparison_lt_gt
 template <typename IteratorA, typename IteratorB>
 struct test_comparison_lt_gt<IteratorA, IteratorB, std::random_access_iterator_tag>
 {
-    void operator() (IteratorA a, IteratorB b)
+    void operator () (IteratorA a, IteratorB b)
     {
         a < b;
         a <= b;
@@ -136,7 +136,7 @@ template <typename Iterator>
 void test_operators(Iterator it)
 {
     *it;
-    it.operator->();
+    it.operator -> ();
     test_comparison(it, it);
 }
 

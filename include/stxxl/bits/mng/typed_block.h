@@ -17,7 +17,6 @@
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/common/aligned_alloc.h>
 #include <stxxl/bits/common/debug.h>
-#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/mng/bid.h>
 
 #ifndef STXXL_VERBOSE_TYPED_BLOCK
@@ -220,7 +219,7 @@ public:
     typedef pointer iterator;
     typedef type const * const_iterator;
 
-    enum
+    enum constants
     {
         raw_size = RawSize_,                                        //!< size of block in bytes
         size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size,  //!< number of elements in block

@@ -14,6 +14,7 @@
 #define STXXL_PAGER_HEADER
 
 #include <list>
+#include <cassert>
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/rand.h>

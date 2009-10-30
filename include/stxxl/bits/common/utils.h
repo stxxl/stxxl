@@ -14,52 +14,33 @@
 #ifndef STXXL_UTILS_HEADER
 #define STXXL_UTILS_HEADER
 
-#include <iostream>
-#include <sstream>
-#include <algorithm>
 #include <vector>
 #include <string>
-#include <limits>
-
-#include <cassert>
-#include <cstdio>
-#include <cerrno>
-#include <cstring>
-#include <cstdlib>
 #include <cmath>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <cstdlib>
 
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
 
-#ifdef STXXL_BOOST_FILESYSTEM
- #include <boost/filesystem/operations.hpp>
-#endif
-
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/common/is_sorted.h>
-#include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/compat_type_traits.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-template <typename U>
-inline void STXXL_UNUSED(const U &)
-{ }
-
 #ifdef BOOST_MSVC
   #define __STXXL_DEPRECATED(x) __declspec(deprecated) x
 #elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 30400)
-  // no __attribute__ ((__deprecated__)) in GCC 3.3
+// no __attribute__ ((__deprecated__)) in GCC 3.3
   #define __STXXL_DEPRECATED(x) x
 #else
   #define __STXXL_DEPRECATED(x) x __attribute__ ((__deprecated__))
 #endif
+
+////////////////////////////////////////////////////////////////////////////
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 #define STXXL_STATIC_ASSERT(x) static_assert(x, #x)
@@ -127,7 +108,35 @@ STXXL_MAX(const Tp & a, const Tp & b)
     return std::max<Tp>(a, b);
 }
 
-#define STXXL_DIVRU(a, b) ((a) / (b) + !(!((a) % (b))))
+////////////////////////////////////////////////////////////////////////////
+
+template <typename Integral>
+inline Integral log2_ceil(Integral i)
+{
+    return Integral(ceil(log2(i)));
+}
+
+template <typename Integral>
+inline Integral log2_floor(Integral i)
+{
+    return Integral(log2(i));
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+template <typename Integral, typename Integral2>
+inline
+typename remove_const<Integral>::type
+div_ceil(Integral __n, Integral2 __d)
+{
+#if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)
+    typedef __typeof__(std::div(__n, __d)) div_type;
+    div_type result = std::div(__n, __d);
+    return result.quot + (result.rem != 0);
+#else
+    return __n / __d + ((__n % __d) != 0);
+#endif
+}
 
 ////////////////////////////////////////////////////////////////////////////
 

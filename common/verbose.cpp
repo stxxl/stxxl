@@ -16,14 +16,7 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/log.h>
 #include <stxxl/bits/common/timer.h>
-
-#ifdef STXXL_BOOST_CONFIG
-#include <boost/config.hpp>
-#endif
-
-#ifdef BOOST_MSVC
-#define snprintf _snprintf
-#endif
+#include <stxxl/bits/msvc_compatibility.h>
 
 
 __STXXL_BEGIN_NAMESPACE

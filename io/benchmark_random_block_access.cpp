@@ -53,9 +53,21 @@ void usage(const char * argv0)
     exit(-1);
 }
 
+struct print_number
+{
+	int n;
+
+	print_number(int n) : n(n) { }
+
+	void operator()(stxxl::request_ptr)
+	{
+		std::cout << n << " " << std::flush;
+	}
+};
+
 int main(int argc, char * argv[])
 {
-    const unsigned raw_block_size = 16384 * KB;
+    const unsigned raw_block_size = 4 * KB;
 
     if (argc < 2)
         usage(argv[0]);
@@ -74,7 +86,7 @@ int main(int argc, char * argv[])
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
 
-    stxxl::int64 num_blocks_in_span = STXXL_DIVRU(span, raw_block_size);
+    stxxl::int64 num_blocks_in_span = stxxl::div_ceil(span, raw_block_size);
     num_blocks = stxxl::STXXL_MIN(num_blocks, num_blocks_in_span);
 
     block_type * buffer = new block_type;
@@ -110,13 +122,14 @@ int main(int argc, char * argv[])
 					  << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
         }
 
-        std::cout << "Random block access..." << std::endl;
         std::random_shuffle(blocks.begin(), blocks.end());
+
+        std::cout << "Random block access..." << std::endl;
         begin = timestamp();
         if (do_write)
         {
             for (unsigned j = 0; j < num_blocks; j++)
-                reqs[j] = buffer->write(blocks[j]);
+                reqs[j] = buffer->write(blocks[j], print_number(j));
             wait_all(reqs, num_blocks);
 
             end = timestamp();
@@ -130,7 +143,7 @@ int main(int argc, char * argv[])
         if (do_read)
         {
             for (unsigned j = 0; j < num_blocks; j++)
-                reqs[j] = buffer->read(blocks[j]);
+                reqs[j] = buffer->read(blocks[j], print_number(j));
             wait_all(reqs, num_blocks);
 
             end = timestamp();
@@ -146,7 +159,7 @@ int main(int argc, char * argv[])
         STXXL_ERRMSG(ex.what());
     }
 
-    stxxl::block_manager::get_instance()->delete_blocks(blocks.begin(), blocks.end());
+    //stxxl::block_manager::get_instance()->delete_blocks(blocks.begin(), blocks.end());
 
     delete[] reqs;
     delete buffer;

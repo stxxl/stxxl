@@ -19,6 +19,13 @@
 
 #ifndef BOOST_MSVC
 // libaio does not exist on Windows
+ #define STXXL_HAVE_AIO_FILE 1
+#else
+ #define STXXL_HAVE_AIO_FILE 0
+#endif
+
+
+#if STXXL_HAVE_AIO_FILE
 
 #include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/io/aio_queue.h>

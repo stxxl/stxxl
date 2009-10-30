@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/test_manyunits1.cpp
+ *  common/test_manyunits2.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,3 +11,8 @@
  **************************************************************************/
 
 #include <stxxl.h>
+
+int main()
+{
+    return 0;
+}

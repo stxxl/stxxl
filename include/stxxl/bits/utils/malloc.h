@@ -22,7 +22,6 @@
 #include <cstdlib>
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/common/utils.h>
 
 
 __STXXL_BEGIN_NAMESPACE
