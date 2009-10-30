@@ -9,7 +9,7 @@ iostats.$(OBJEXT) \
 mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJEXT) \
 fileperblock_file.$(OBJEXT) request.$(OBJEXT) request_waiters_impl_basic.$(OBJEXT) \
 request_state_impl_basic.$(OBJEXT) request_impl_basic.$(OBJEXT) \
-file_request_basic.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) \
+file_request_basic.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) request_queue_impl_1q.$(OBJEXT) \
 request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT)
 
 
@@ -67,6 +67,9 @@ file_request_basic.$(OBJEXT): file_request_basic.cpp
 
 request_queue_impl_qwqr.$(OBJEXT): request_queue_impl_qwqr.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_qwqr.cpp
+
+request_queue_impl_1q.$(OBJEXT): request_queue_impl_1q.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_1q.cpp
 
 request_queue_impl_worker.$(OBJEXT): request_queue_impl_worker.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_worker.cpp
