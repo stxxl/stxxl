@@ -796,16 +796,18 @@ private:
         stxxl::uint64 rest = file_length - blocks_fit * stxxl::uint64(block_type::raw_size);
         return (cur_size + rest / stxxl::uint64(sizeof(value_type)));
     }
+
     stxxl::uint64 file_length()
     {
+        typedef stxxl::uint64 file_size_type;
         size_type cur_size = size();
-        if (cur_size % size_type(block_type::size))
+        size_type num_full_blocks = cur_size / block_type::size;
+        if (cur_size % block_type::size != 0)
         {
-            stxxl::uint64 full_blocks_length = size_type(_bids.size() - 1) * size_type(block_type::raw_size);
-            size_type rest = cur_size - size_type(_bids.size() - 1) * size_type(block_type::size);
-            return full_blocks_length + rest * size_type(sizeof(value_type));
+            size_type rest = cur_size - num_full_blocks * block_type::size;
+            return file_size_type(num_full_blocks) * block_type::raw_size + rest * sizeof(value_type);
         }
-        return size_type(_bids.size()) * size_type(block_type::raw_size);
+        return file_size_type(num_full_blocks) * block_type::raw_size;
     }
 
 public:
