@@ -894,9 +894,23 @@ public:
             _from->set_size(offset);
         }
     }
+
     void resize(size_type n)
     {
-#ifndef STXXL_FREE_EXTMEMORY_ON_VECTOR_RESIZE
+        _resize(n);
+    }
+
+    void resize(size_type n, bool shrink_capacity)
+    {
+        if (shrink_capacity)
+            _resize_shrink_capacity(n);
+        else
+            _resize(n);
+    }
+
+private:
+    void _resize(size_type n)
+    {
         reserve(n);
         if (n < _size) {
             // mark excess pages as uninitialized and evict them from cache
@@ -909,10 +923,13 @@ public:
                 _page_status[i] = uninitialized;
             }
         }
-#else
+        _size = n;
+    }
+
+    void _resize_shrink_capacity(size_type n)
+    {
         unsigned_type old_bids_size = _bids.size();
         unsigned_type new_bids_size = div_ceil(n, block_type::size);
-
 
         if (new_bids_size > old_bids_size)
         {
@@ -934,10 +951,11 @@ public:
             std::fill(_page_status.begin() + first_page_to_evict,
                       _page_status.end(), (unsigned char)valid_on_disk);
         }
-#endif
 
         _size = n;
     }
+
+public:
     void clear()
     {
         _size = 0;
