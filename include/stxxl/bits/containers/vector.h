@@ -1212,7 +1212,7 @@ public:
     }
 
     //! \brief Export data such that it is persistent on the file system.
-    //! Resulting block files will be numbered ascending.
+    //! Resulting files will be numbered ascending.
     void export_files(std::string filename_prefix)
     {
         int64 no = 0;
@@ -1227,16 +1227,6 @@ public:
             ++no;
         }
         exported = true;
-    }
-
-    //! \brief Export data such that it remains as the associated file.
-    void truncate_export(int_type size)
-    {
-    	if (_from != NULL)
-    	{
-			_from->set_size(size);
-			exported = true;
-    	}
     }
 
     //! \brief Get the file associated with this vector, or NULL.
