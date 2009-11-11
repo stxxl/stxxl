@@ -62,6 +62,7 @@ protected:
     //  sortseq used_space;
     stxxl::int64 free_bytes;
     stxxl::int64 disk_bytes;
+    bool autogrow;
 
     void dump();
 
@@ -118,7 +119,8 @@ public:
 
 DiskAllocator::DiskAllocator(stxxl::int64 disk_size) :
     free_bytes(disk_size),
-    disk_bytes(disk_size)
+    disk_bytes(disk_size),
+    autogrow(disk_size == 0)
 {
     free_space[0] = disk_size;
 }
@@ -152,10 +154,11 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
 
     if (free_bytes < requested_size)
     {
+        if (!autogrow) {
         STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
                      " bytes requested, " << free_bytes <<
                      " bytes free. Trying to extend the external memory space...");
-
+        }
 
         begin->offset = disk_bytes; // allocate at the end
         for (++begin; begin != end; ++begin)
