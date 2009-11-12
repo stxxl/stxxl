@@ -18,7 +18,6 @@ LIB_OBJECTS = \
  	../io/wbtl_file.$(OBJEXT) \
 	../mng/mng.$(OBJEXT) \
 	../algo/async_schedule.$(OBJEXT) \
-	../common/debug.$(OBJEXT) \
 	../common/rand.$(OBJEXT) \
 	../common/seed.$(OBJEXT) \
 	../common/exithandler.$(OBJEXT) \
@@ -28,5 +27,5 @@ LIB_OBJECTS = \
 
 LIB_OBJECTS_NON_MSVC = \
 	../io/mmap_file.$(OBJEXT) \
-	../io/simdisk_file.$(OBJEXT)
-
+	../io/simdisk_file.$(OBJEXT) \
+	../common/debug.$(OBJEXT)
