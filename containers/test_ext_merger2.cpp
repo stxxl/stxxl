@@ -108,7 +108,7 @@ int main()
         merger.multi_merge(output.begin(), output.begin());
 
         while (merger.size() > 0) {
-            int l = (std::min)(merger.size(), stxxl::uint64(output.size()));
+            int l = std::min<stxxl::uint64>(merger.size(), output.size());
             merger.multi_merge(output.begin(), output.begin() + l);
             STXXL_MSG("merged " << l << " elements: (" << *output.begin() << ", ..., " << *(output.begin() + l - 1) << ")");
         }
@@ -162,7 +162,7 @@ int main()
         loser.multi_merge(out, out);
 
         while (loser.size() > 0) {
-            int l = (std::min<stxxl::uint64>)(loser.size(), B + B / 2 + 1);
+            int l = std::min<stxxl::uint64>(loser.size(), B + B / 2 + 1);
             loser.multi_merge(out, out + l);
             STXXL_MSG("merged " << l << " elements: (" << out[0] << ", ..., " << out[l - 1] << ")");
         }
