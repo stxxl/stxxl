@@ -796,16 +796,18 @@ private:
         stxxl::uint64 rest = file_length - blocks_fit * stxxl::uint64(block_type::raw_size);
         return (cur_size + rest / stxxl::uint64(sizeof(value_type)));
     }
+
     stxxl::uint64 file_length()
     {
+        typedef stxxl::uint64 file_size_type;
         size_type cur_size = size();
-        if (cur_size % size_type(block_type::size))
+        size_type num_full_blocks = cur_size / block_type::size;
+        if (cur_size % block_type::size != 0)
         {
-            stxxl::uint64 full_blocks_length = size_type(_bids.size() - 1) * size_type(block_type::raw_size);
-            size_type rest = cur_size - size_type(_bids.size() - 1) * size_type(block_type::size);
-            return full_blocks_length + rest * size_type(sizeof(value_type));
+            size_type rest = cur_size - num_full_blocks * block_type::size;
+            return file_size_type(num_full_blocks) * block_type::raw_size + rest * sizeof(value_type);
         }
-        return size_type(_bids.size()) * size_type(block_type::raw_size);
+        return file_size_type(num_full_blocks) * block_type::raw_size;
     }
 
 public:
@@ -892,9 +894,23 @@ public:
             _from->set_size(offset);
         }
     }
+
     void resize(size_type n)
     {
-#ifndef STXXL_FREE_EXTMEMORY_ON_VECTOR_RESIZE
+        _resize(n);
+    }
+
+    void resize(size_type n, bool shrink_capacity)
+    {
+        if (shrink_capacity)
+            _resize_shrink_capacity(n);
+        else
+            _resize(n);
+    }
+
+private:
+    void _resize(size_type n)
+    {
         reserve(n);
         if (n < _size) {
             // mark excess pages as uninitialized and evict them from cache
@@ -907,10 +923,13 @@ public:
                 _page_status[i] = uninitialized;
             }
         }
-#else
+        _size = n;
+    }
+
+    void _resize_shrink_capacity(size_type n)
+    {
         unsigned_type old_bids_size = _bids.size();
         unsigned_type new_bids_size = div_ceil(n, block_type::size);
-
 
         if (new_bids_size > old_bids_size)
         {
@@ -932,10 +951,11 @@ public:
             std::fill(_page_status.begin() + first_page_to_evict,
                       _page_status.end(), (unsigned char)valid_on_disk);
         }
-#endif
 
         _size = n;
     }
+
+public:
     void clear()
     {
         _size = 0;

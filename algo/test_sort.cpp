@@ -92,14 +92,14 @@ int main()
     vector_type v(n_records);
 
     stxxl::random_number32 rnd;
-    STXXL_MSG("Filling vector..., input size =" << v.size());
+    STXXL_MSG("Filling vector..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
     for (vector_type::size_type i = 0; i < v.size(); i++)
         v[i]._key = 1 + (rnd() % 0xfffffff);
 
     STXXL_MSG("Checking order...");
     STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
 
-    STXXL_MSG("Sorting...");
+    STXXL_MSG("Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...");
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
     STXXL_MSG("Checking order...");

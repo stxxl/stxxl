@@ -46,9 +46,9 @@ void config::init(const char * config_path)
         STXXL_ERRMSG("Warning: no config file found.");
         STXXL_ERRMSG("Using default disk configuration.");
 #ifndef BOOST_MSVC
-        DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024, true };
+        DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024, true, false };
 #else
-        DiskEntry entry1 = { "", "wincall", 1000 * 1024 * 1024, true };
+        DiskEntry entry1 = { "", "wincall", 1000 * 1024 * 1024, true, false };
         char * tmpstr = new char[255];
         stxxl_check_ne_0(GetTempPath(255, tmpstr), resource_error);
         entry1.path = tmpstr;
@@ -82,8 +82,11 @@ void config::init(const char * config_path)
                 DiskEntry entry = {
                     tmp[0], tmp[2],
                     int64(atoi(tmp[1].c_str())) * int64(1024 * 1024),
+                    false,
                     false
                 };
+                if (entry.size == 0)
+                    entry.autogrow = true;
                 if (is_disk)
                     disks_props.push_back(entry);
                 else

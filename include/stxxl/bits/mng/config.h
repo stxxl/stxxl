@@ -38,6 +38,7 @@ class config : public singleton<config>
         std::string io_impl;
         stxxl::int64 size;
         bool delete_on_exit;
+        bool autogrow;
     };
 
     std::vector<DiskEntry> disks_props;
@@ -57,8 +58,10 @@ class config : public singleton<config>
     ~config()
     {
         for (unsigned i = 0; i < disks_props.size(); ++i) {
-            if (disks_props[i].delete_on_exit) {
-                STXXL_ERRMSG("Removing disk file created from default configuration: " << disks_props[i].path);
+            if (disks_props[i].delete_on_exit || disks_props[i].autogrow) {
+                if (!disks_props[i].autogrow) {
+                    STXXL_ERRMSG("Removing disk file created from default configuration: " << disks_props[i].path);
+                }
                 unlink(disks_props[i].path.c_str());
             }
         }
