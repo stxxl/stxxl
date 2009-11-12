@@ -497,7 +497,7 @@ namespace sort_local
 
                     ptrdiff_t output_size = STXXL_MIN(less_equal_than_min_last, rest);   // at most rest elements
 
-                    STXXL_VERBOSE1("before merge" << output_size);
+                    STXXL_VERBOSE1("before merge " << output_size);
 
                     stxxl::parallel::multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size);
                     // sequence iterators are progressed appropriately
@@ -525,6 +525,7 @@ namespace sort_local
                                 seqs.erase(seqs.begin() + i);                            // remove this sequence
                                 buffers.erase(buffers.begin() + i);
                                 STXXL_VERBOSE1("seq removed " << i);
+                                --i;                                                     // don't skip the next sequence
                             }
                         }
                     }

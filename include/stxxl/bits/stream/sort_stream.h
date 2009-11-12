@@ -1025,6 +1025,7 @@ namespace stream
                                 (*seqs).erase((*seqs).begin() + i);                       // remove this sequence
                                 (*buffers).erase((*buffers).begin() + i);
                                 STXXL_VERBOSE1("seq removed " << i);
+                                --i;                                                      // don't skip the next sequence
                             }
                         }
                     }
