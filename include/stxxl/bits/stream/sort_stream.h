@@ -1269,15 +1269,22 @@ namespace stream
         block_manager * bm = block_manager::get_instance();
         unsigned_type ndisks = config::get_instance()->disks_number();
         unsigned_type nwrite_buffers = 2 * ndisks;
+        unsigned_type memory_for_write_buffers = nwrite_buffers * sizeof(block_type);
+
+        // maximum fan-in in the recursive merger
+        // note: recursion uses block_type as out_block_type, so we have to
+        //       deduct one more block_type here
+        //       (this is current_block in the recursive merger)
+        unsigned_type max_fan_in = (memory_to_use - memory_for_write_buffers - sizeof(block_type)) / block_type::raw_size;
 
         unsigned_type nruns = sruns.runs.size();
-        const unsigned_type merge_factor = optimal_merge_factor(nruns, m_);
-        assert(merge_factor <= m_);
-        while (nruns > m_)
+        const unsigned_type merge_factor = optimal_merge_factor(nruns, max_fan_in);
+        assert(merge_factor <= max_fan_in);
+        while (nruns > max_fan_in)
         {
             unsigned_type new_nruns = div_ceil(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
-                          " opt_merge_factor: " << merge_factor << " m:" << m_ << " new_nruns: " << new_nruns);
+                          " opt_merge_factor: " << merge_factor << " m:" << max_fan_in << " new_nruns: " << new_nruns);
 
             sorted_runs_type new_runs;
             new_runs.runs.resize(new_nruns);
@@ -1348,7 +1355,7 @@ namespace stream
 
                 if (runs2merge > 1)
                 {
-                    runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, m_ * block_type::raw_size);
+                    runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, memory_to_use - memory_for_write_buffers);
 
                     {   // make sure everything is being destroyed in right time
                         buf_ostream<block_type, typename run_type::iterator> out(
