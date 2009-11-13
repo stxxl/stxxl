@@ -359,17 +359,18 @@ define COMPILE_STXXL
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $(@:.$o=).$dT -c $(OUTPUT_OPTION) $< && mv $(@:.$o=).$dT $(@:.$o=).$d
 endef
 
-DEPS_MAKEFILES	:= $(wildcard $(TOPDIR)/Makefile.subdir.gnu $(TOPDIR)/make.settings $(TOPDIR)/make.settings.local GNUmakefile Makefile Makefile.common Makefile.local)
-%.$o: %.cpp $(DEPS_MAKEFILES)
+DEPS_MAKEFILES		:= $(wildcard $(TOPDIR)/Makefile.subdir.gnu $(TOPDIR)/make.settings $(TOPDIR)/make.settings.local GNUmakefile Makefile Makefile.common Makefile.local)
+EXTRA_DEPS_COMPILE	?= $(DEPS_MAKEFILES)
+%.$o: %.cpp $(EXTRA_DEPS_COMPILE)
 	$(COMPILE_STXXL)
 
-%.$(ii): %.cpp $(DEPS_MAKEFILES)
+%.$(ii): %.cpp $(EXTRA_DEPS_COMPILE)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -E $(OUTPUT_OPTION) $<
 
 # $1=infix $2=additional CPPFLAGS
 define COMPILE_VARIANT
 %.$1.$$o: CPPFLAGS += $2
-%.$1.$$o: %.cpp $$(DEPS_MAKEFILES)
+%.$1.$$o: %.cpp $$(EXTRA_DEPS_COMPILE)
 	$$(COMPILE_STXXL)
 endef
 
