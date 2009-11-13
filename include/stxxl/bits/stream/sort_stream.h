@@ -921,36 +921,6 @@ namespace stream
             sruns.deallocate_blocks();
         }
 
-        void initialize_current_block()
-        {
-            if (do_parallel_merge())
-            {
-#if STXXL_PARALLEL_MULTIWAY_MERGE
-// begin of STL-style merging
-                seqs = new std::vector<sequence>(nruns);
-                buffers = new std::vector<block_type *>(nruns);
-
-                for (unsigned_type i = 0; i < nruns; ++i)                                       //initialize sequences
-                {
-                    (*buffers)[i] = prefetcher->pull_block();                                   //get first block of each run
-                    (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());  //this memory location stays the same, only the data is exchanged
-                }
-
-// end of STL-style merging
-#else
-                STXXL_THROW_UNREACHABLE();
-#endif //STXXL_PARALLEL_MULTIWAY_MERGE
-            }
-            else
-            {
-// begin of native merging procedure
-
-                losers = new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
-
-// end of native merging procedure
-            }
-        }
-
         void fill_current_block()
         {
             STXXL_VERBOSE1("fill_current_block");
@@ -999,7 +969,7 @@ namespace stream
 
                     ptrdiff_t output_size = STXXL_MIN(less_equal_than_min_last, rest);   // at most rest elements
 
-                    STXXL_VERBOSE1("before merge" << output_size);
+                    STXXL_VERBOSE1("before merge " << output_size);
 
                     stxxl::parallel::multiway_merge((*seqs).begin(), (*seqs).end(), current_block->end() - rest, cmp, output_size);
                     // sequence iterators are progressed appropriately
@@ -1184,7 +1154,31 @@ namespace stream
             seqs = NULL;
             buffers = NULL;
 
-            initialize_current_block();
+            if (do_parallel_merge())
+            {
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+// begin of STL-style merging
+                seqs = new std::vector<sequence>(nruns);
+                buffers = new std::vector<block_type *>(nruns);
+
+                for (unsigned_type i = 0; i < nruns; ++i)                                       //initialize sequences
+                {
+                    (*buffers)[i] = prefetcher->pull_block();                                   //get first block of each run
+                    (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());  //this memory location stays the same, only the data is exchanged
+                }
+
+// end of STL-style merging
+#else
+                STXXL_THROW_UNREACHABLE();
+#endif //STXXL_PARALLEL_MULTIWAY_MERGE
+            }
+            else
+            {
+// begin of native merging procedure
+
+                losers = new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
+// end of native merging procedure
+            }
             fill_current_block();
 
             current_value = current_block->elem[0];
