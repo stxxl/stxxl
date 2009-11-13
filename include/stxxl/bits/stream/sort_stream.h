@@ -893,7 +893,6 @@ namespace stream
     private:
         sorted_runs_type sruns;
         value_cmp cmp;
-        unsigned_type nruns;
         size_type elements_remaining;
 
         out_block_type * current_block;
@@ -1049,7 +1048,6 @@ namespace stream
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             sruns(r),
             cmp(c),
-            nruns(sruns.runs.size()),
             elements_remaining(sruns.elements),
             current_block(NULL),
             buffer_pos(0),
@@ -1085,6 +1083,7 @@ namespace stream
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
             unsigned_type max_fan_in = (memory_to_use - sizeof(out_block_type)) / block_type::raw_size;
+            unsigned_type nruns = sruns.runs.size();
 
             if (max_fan_in < nruns)
             {
