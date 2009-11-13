@@ -881,28 +881,37 @@ namespace stream
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
         typedef sort_local::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
         typedef loser_tree<run_cursor_type, run_cursor2_cmp_type> loser_tree_type;
-
         typedef stxxl::int64 diff_type;
         typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
         typedef typename std::vector<sequence>::size_type seqs_size_type;
-        std::vector<sequence> * seqs;
-        std::vector<block_type *> * buffers;
 
+    public:
+        //! \brief Standard stream typedef
+        typedef typename sorted_runs_type::value_type value_type;
 
+    private:
         sorted_runs_type sruns;
         unsigned_type m_; //  blocks to use - 1
         value_cmp cmp;
+        unsigned_type nruns;
         size_type elements_remaining;
-        unsigned_type buffer_pos;
+
         block_type * current_block;
+        unsigned_type buffer_pos;
+        value_type current_value;               // cache for the current value
+
         run_type consume_seq;
+        int_type * prefetch_seq;
         prefetcher_type * prefetcher;
         loser_tree_type * losers;
-        int_type * prefetch_seq;
-        unsigned_type nruns;
+        std::vector<sequence> * seqs;
+        std::vector<block_type *> * buffers;
+
 #if STXXL_CHECK_ORDER_IN_SORTS
-        typename block_type::value_type last_element;
+        value_type last_element;
 #endif //STXXL_CHECK_ORDER_IN_SORTS
+        
+        ////////////////////////////////////////////////////////////////////
 
         void merge_recursively();
 
@@ -1033,26 +1042,23 @@ namespace stream
         }
 
     public:
-        //! \brief Standard stream typedef
-        typedef typename sorted_runs_type::value_type value_type;
-
         //! \brief Creates a runs merger object
         //! \param r input sorted runs object
         //! \param c comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
-            seqs(NULL),
-            buffers(NULL),
             sruns(r),
             m_(memory_to_use / block_type::raw_size / sort_memory_usage_factor() /* - 1 */),
             cmp(c),
-            elements_remaining(r.elements),
-            buffer_pos(0),
+            nruns(sruns.runs.size()),
+            elements_remaining(sruns.elements),
             current_block(NULL),
+            buffer_pos(0),
+            prefetch_seq(NULL),
             prefetcher(NULL),
             losers(NULL),
-            prefetch_seq(NULL),
-            nruns(sruns.runs.size())
+            seqs(NULL),
+            buffers(NULL)
 #if STXXL_CHECK_ORDER_IN_SORTS
             , last_element(cmp.min_value())
 #endif //STXXL_CHECK_ORDER_IN_SORTS
@@ -1253,10 +1259,6 @@ namespace stream
             if (current_block)
                 delete current_block;
         }
-
-    private:
-        // cache for the current value
-        value_type current_value;
     };
 
 
