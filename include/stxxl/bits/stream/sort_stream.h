@@ -914,7 +914,7 @@ namespace stream
         
         ////////////////////////////////////////////////////////////////////
 
-        void merge_recursively();
+        void merge_recursively(unsigned_type memory_to_use);
 
         void deallocate_prefetcher()
         {
@@ -1084,8 +1084,6 @@ namespace stream
             assert(check_sorted_runs(r, cmp));
 #endif //STXXL_CHECK_ORDER_IN_SORTS
 
-            current_block = new out_block_type;
-
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
             if (m_ < nruns)
@@ -1103,7 +1101,7 @@ namespace stream
                     abort();
                 }
 
-                merge_recursively();
+                merge_recursively(memory_to_use);
 
                 nruns = sruns.runs.size();
             }
@@ -1187,6 +1185,8 @@ namespace stream
                 losers = new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
 // end of native merging procedure
             }
+
+            current_block = new out_block_type;
             fill_current_block();
 
             current_value = current_block->elem[0];
@@ -1264,7 +1264,7 @@ namespace stream
 
 
     template <class RunsType_, class Cmp_, class AllocStr_>
-    void runs_merger<RunsType_, Cmp_, AllocStr_>::merge_recursively()
+    void runs_merger<RunsType_, Cmp_, AllocStr_>::merge_recursively(unsigned_type memory_to_use)
     {
         block_manager * bm = block_manager::get_instance();
         unsigned_type ndisks = config::get_instance()->disks_number();
