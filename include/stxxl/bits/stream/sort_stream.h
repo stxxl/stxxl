@@ -876,6 +876,7 @@ namespace stream
         typedef Cmp_ value_cmp;
         typedef typename sorted_runs_type::run_type run_type;
         typedef typename sorted_runs_type::block_type block_type;
+        typedef block_type out_block_type;
         typedef typename block_type::bid_type bid_type;
         typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
@@ -896,7 +897,7 @@ namespace stream
         unsigned_type nruns;
         size_type elements_remaining;
 
-        block_type * current_block;
+        out_block_type * current_block;
         unsigned_type buffer_pos;
         value_type current_value;               // cache for the current value
 
@@ -937,7 +938,7 @@ namespace stream
             {
 #if STXXL_PARALLEL_MULTIWAY_MERGE
 // begin of STL-style merging
-                diff_type rest = block_type::size;              // elements still to merge for this output block
+                diff_type rest = out_block_type::size;          // elements still to merge for this output block
 
                 do                                              // while rest > 0 and still elements available
                 {
@@ -960,7 +961,7 @@ namespace stream
 
                     assert(min_last_element != NULL);           // there must be some element
 
-                    STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (block_type::size - rest));
+                    STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (out_block_type::size - rest));
 
                     diff_type less_equal_than_min_last = 0;
                     // locate this element in all sequences
@@ -1031,13 +1032,13 @@ namespace stream
             {
 // begin of native merging procedure
 
-                losers->multi_merge(current_block->elem, current_block->elem + block_type::size);
+                losers->multi_merge(current_block->elem, current_block->elem + STXXL_MIN<size_type>(out_block_type::size, elements_remaining));
 
 // end of native merging procedure
             }
             STXXL_VERBOSE1("current block filled");
 
-            if (elements_remaining <= block_type::size)
+            if (elements_remaining <= out_block_type::size)
                 deallocate_prefetcher();
         }
 
@@ -1071,7 +1072,7 @@ namespace stream
             {
                 STXXL_VERBOSE1("runs_merger: small input optimization, input length: " << elements_remaining);
                 assert(elements_remaining == size_type(sruns.small_.size()));
-                current_block = new block_type;
+                current_block = new out_block_type;
                 std::copy(sruns.small_.begin(), sruns.small_.end(), current_block->begin());
                 current_value = current_block->elem[0];
                 buffer_pos = 1;
@@ -1083,7 +1084,7 @@ namespace stream
             assert(check_sorted_runs(r, cmp));
 #endif //STXXL_CHECK_ORDER_IN_SORTS
 
-            current_block = new block_type;
+            current_block = new out_block_type;
 
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
@@ -1204,7 +1205,7 @@ namespace stream
 
             --elements_remaining;
 
-            if (buffer_pos != block_type::size)
+            if (buffer_pos != out_block_type::size)
             {
                 current_value = current_block->elem[buffer_pos];
                 ++buffer_pos;
