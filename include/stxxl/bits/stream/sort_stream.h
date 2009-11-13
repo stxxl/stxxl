@@ -1048,7 +1048,7 @@ namespace stream
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             sruns(r),
-            m_(memory_to_use / block_type::raw_size / sort_memory_usage_factor() /* - 1 */),
+            m_(memory_to_use / block_type::raw_size /* - 1 */),
             cmp(c),
             nruns(sruns.runs.size()),
             elements_remaining(sruns.elements),
@@ -1347,7 +1347,7 @@ namespace stream
 
                 if (runs2merge > 1)
                 {
-                    runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, m_ * block_type::raw_size * sort_memory_usage_factor());
+                    runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, m_ * block_type::raw_size);
 
                     {   // make sure everything is being destroyed in right time
                         buf_ostream<block_type, typename run_type::iterator> out(
