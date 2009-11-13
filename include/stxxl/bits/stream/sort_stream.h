@@ -1041,17 +1041,24 @@ namespace stream
         //! \param c comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
-            sruns(r), m_(memory_to_use / block_type::raw_size / sort_memory_usage_factor() /* - 1 */), cmp(c),
+            seqs(NULL),
+            buffers(NULL),
+            sruns(r),
+            m_(memory_to_use / block_type::raw_size / sort_memory_usage_factor() /* - 1 */),
+            cmp(c),
             elements_remaining(r.elements),
+            buffer_pos(0),
             current_block(NULL),
-            prefetcher(NULL)
+            prefetcher(NULL),
+            losers(NULL),
+            prefetch_seq(NULL),
+            nruns(sruns.runs.size())
 #if STXXL_CHECK_ORDER_IN_SORTS
             , last_element(cmp.min_value())
 #endif //STXXL_CHECK_ORDER_IN_SORTS
         {
             if (empty())
                 return;
-
 
             if (!sruns.small_.empty()) // we have a small input < B,
             // that is kept in the main memory
@@ -1073,8 +1080,6 @@ namespace stream
             current_block = new block_type;
 
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
-
-            nruns = sruns.runs.size();
 
             if (m_ < nruns)
             {
@@ -1149,10 +1154,6 @@ namespace stream
                 consume_seq.end(),
                 prefetch_seq,
                 nruns + n_prefetch_buffers);
-
-            losers = NULL;
-            seqs = NULL;
-            buffers = NULL;
 
             if (do_parallel_merge())
             {
