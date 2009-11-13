@@ -892,7 +892,6 @@ namespace stream
 
     private:
         sorted_runs_type sruns;
-        unsigned_type m_; //  blocks to use - 1
         value_cmp cmp;
         unsigned_type nruns;
         size_type elements_remaining;
@@ -1049,7 +1048,6 @@ namespace stream
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             sruns(r),
-            m_(memory_to_use / block_type::raw_size /* - 1 */),
             cmp(c),
             nruns(sruns.runs.size()),
             elements_remaining(sruns.elements),
@@ -1086,17 +1084,19 @@ namespace stream
 
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-            if (m_ < nruns)
+            unsigned_type max_fan_in = (memory_to_use - sizeof(out_block_type)) / block_type::raw_size;
+
+            if (max_fan_in < nruns)
             {
                 // can not merge runs in one pass
                 // merge recursively:
                 STXXL_ERRMSG("The implementation of sort requires more than one merge pass, therefore for a better");
                 STXXL_ERRMSG("efficiency decrease block size of run storage (a parameter of the run_creator)");
                 STXXL_ERRMSG("or increase the amount memory dedicated to the merger.");
-                STXXL_ERRMSG("m = " << m_ << " nruns=" << nruns);
+                STXXL_ERRMSG("m = " << max_fan_in << " nruns=" << nruns);
 
                 // insufficient memory, can not merge at all
-                if (m_ < 2) {
+                if (max_fan_in < 2) {
                     STXXL_ERRMSG("The merger requires memory to store at least two blocks internally. Aborting.");
                     abort();
                 }
@@ -1106,7 +1106,7 @@ namespace stream
                 nruns = sruns.runs.size();
             }
 
-            assert(nruns <= m_);
+            assert(nruns <= max_fan_in);
 
             unsigned_type i;
             /*
@@ -1137,7 +1137,7 @@ namespace stream
 
             int_type disks_number = config::get_instance()->disks_number();
 
-            const int_type n_prefetch_buffers = STXXL_MAX(2 * disks_number, (int_type(m_) - int_type(nruns)));
+            const int_type n_prefetch_buffers = STXXL_MAX<int_type>(2 * disks_number, max_fan_in - nruns);
 
 
 #if STXXL_SORT_OPTIMAL_PREFETCHING
