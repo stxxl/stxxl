@@ -61,7 +61,6 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
-    typedef offset_allocator<alloc_strategy_type> offset_alloc_strategy_type;
     typedef read_write_pool<block_type> pool_type;
 
     size_type size_;
@@ -71,7 +70,8 @@ private:
     block_type * back_block;
     value_type * front_element;
     value_type * back_element;
-    offset_alloc_strategy_type alloc_strategy;
+    alloc_strategy_type alloc_strategy;
+    unsigned_type alloc_count;
     std::deque<bid_type> bids;
     block_manager * bm;
     unsigned_type blocks2prefetch;
@@ -105,6 +105,7 @@ public:
     queue(write_pool<block_type> & w_pool, prefetch_pool<block_type> & p_pool, int blocks2prefetch_ = -1)) :
         size_(0),
         delete_pool(true),
+        alloc_count(0),
         bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pools)");
@@ -189,8 +190,7 @@ public:
                 // need to allocate new block
                 bid_type newbid;
 
-                bm->new_block(alloc_strategy, newbid);
-                alloc_strategy.set_offset(alloc_strategy.get_offset() + 1);
+                bm->new_block(alloc_strategy, newbid, alloc_count++);
 
                 STXXL_VERBOSE_QUEUE("queue[" << this << "]: push block " << back_block << " @ " << FMT_BID(newbid));
                 bids.push_back(newbid);
