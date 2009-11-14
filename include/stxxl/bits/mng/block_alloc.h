@@ -42,8 +42,10 @@ struct basic_allocation_strategy
 //! \remarks model of \b allocation_strategy concept
 struct striping
 {
+protected:
     int begin, diff;
 
+public:
     striping(int b, int e) : begin(b), diff(e - b)
     { }
 
@@ -61,19 +63,16 @@ struct striping
     {
         return "striping";
     }
-/*
-    // FIXME WHY?
-    virtual ~striping()
-    { }
-*/
 };
 
 //! \brief fully randomized disk allocation scheme functor
 //! \remarks model of \b allocation_strategy concept
 struct FR : public striping
 {
+private:
     random_number<random_uniform_fast> rnd;
 
+public:
     FR(int b, int e) : striping(b, e)
     { }
 
@@ -95,18 +94,24 @@ struct FR : public striping
 //! \remarks model of \b allocation_strategy concept
 struct SR : public striping
 {
-    random_number<random_uniform_fast> rnd;
-
+private:
     int offset;
 
+    void init()
+    {
+        random_number<random_uniform_fast> rnd;
+        offset = rnd(diff);
+    }
+
+public:
     SR(int b, int e) : striping(b, e)
     {
-        offset = rnd(diff);
+        init();
     }
 
     SR() : striping()
     {
-        offset = rnd(diff);
+        init();
     }
 
     int operator () (int i) const
@@ -124,9 +129,10 @@ struct SR : public striping
 //! \remarks model of \b allocation_strategy concept
 struct RC : public striping
 {
+private:
     std::vector<int> perm;
 
-    RC(int b, int e) : striping(b, e), perm(diff)
+    void init()
     {
         for (int i = 0; i < diff; i++)
             perm[i] = i;
@@ -135,13 +141,15 @@ struct RC : public striping
         std::random_shuffle(perm.begin(), perm.end(), rnd __STXXL_FORCE_SEQUENTIAL);
     }
 
+public:
+    RC(int b, int e) : striping(b, e), perm(diff)
+    {
+        init();
+    }
+
     RC() : striping(), perm(diff)
     {
-        for (int i = 0; i < diff; i++)
-            perm[i] = i;
-
-        random_number<random_uniform_fast> rnd;
-        std::random_shuffle(perm.begin(), perm.end(), rnd __STXXL_FORCE_SEQUENTIAL);
+        init();
     }
 
     int operator () (int i) const
