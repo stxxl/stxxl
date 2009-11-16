@@ -1151,7 +1151,7 @@ namespace stream
                 consume_seq.begin(),
                 consume_seq.end(),
                 prefetch_seq,
-                nruns + n_prefetch_buffers);
+                STXXL_MIN(nruns + n_prefetch_buffers, prefetch_seq_size));
 
             if (do_parallel_merge())
             {
