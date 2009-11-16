@@ -42,7 +42,6 @@ struct basic_allocation_strategy
 //! \remarks model of \b allocation_strategy concept
 struct striping
 {
-protected:
     int begin, diff;
 
 public:
