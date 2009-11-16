@@ -1081,20 +1081,22 @@ namespace stream
 
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-            unsigned_type max_fan_in = (memory_to_use - sizeof(out_block_type)) / block_type::raw_size;
+            int_type disks_number = config::get_instance()->disks_number();
+            unsigned_type min_prefetch_buffers = 2 * disks_number;
+            unsigned_type input_buffers = (memory_to_use - sizeof(out_block_type)) / block_type::raw_size;
             unsigned_type nruns = sruns.runs.size();
 
-            if (max_fan_in < nruns)
+            if (input_buffers < nruns + min_prefetch_buffers)
             {
                 // can not merge runs in one pass
                 // merge recursively:
                 STXXL_ERRMSG("The implementation of sort requires more than one merge pass, therefore for a better");
                 STXXL_ERRMSG("efficiency decrease block size of run storage (a parameter of the run_creator)");
                 STXXL_ERRMSG("or increase the amount memory dedicated to the merger.");
-                STXXL_ERRMSG("m = " << max_fan_in << " nruns=" << nruns);
+                STXXL_ERRMSG("m = " << input_buffers << " nruns=" << nruns << " prefetch_blocks=" << min_prefetch_buffers);
 
                 // insufficient memory, can not merge at all
-                if (max_fan_in < 2) {
+                if (input_buffers < min_prefetch_buffers + 2) {
                     STXXL_ERRMSG("The merger requires memory to store at least two blocks internally. Aborting.");
                     abort();
                 }
@@ -1104,13 +1106,9 @@ namespace stream
                 nruns = sruns.runs.size();
             }
 
-            assert(nruns <= max_fan_in);
+            assert(nruns + min_prefetch_buffers <= input_buffers);
 
             unsigned_type i;
-            /*
-               const unsigned_type out_run_size =
-                  div_ceil(elements_remaining, block_type::size);
-             */
             unsigned_type prefetch_seq_size = 0;
             for (i = 0; i < nruns; ++i)
             {
@@ -1118,7 +1116,6 @@ namespace stream
             }
 
             consume_seq.resize(prefetch_seq_size);
-
             prefetch_seq = new int_type[prefetch_seq_size];
 
             typename run_type::iterator copy_start = consume_seq.begin();
@@ -1133,14 +1130,12 @@ namespace stream
             std::stable_sort(consume_seq.begin(), consume_seq.end(),
                              sort_local::trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp));
 
-            int_type disks_number = config::get_instance()->disks_number();
-
-            const int_type n_prefetch_buffers = STXXL_MAX<int_type>(2 * disks_number, max_fan_in - nruns);
+            const unsigned_type n_prefetch_buffers = STXXL_MAX(min_prefetch_buffers, input_buffers - nruns);
 
 
 #if STXXL_SORT_OPTIMAL_PREFETCHING
             // heuristic
-            const int_type n_opt_prefetch_buffers = 2 * disks_number + (3 * (n_prefetch_buffers - 2 * disks_number)) / 10;
+            const int_type n_opt_prefetch_buffers = min_prefetch_buffers + (3 * (n_prefetch_buffers - min_prefetch_buffers)) / 10;
 
             compute_prefetch_schedule(
                 consume_seq,
