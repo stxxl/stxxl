@@ -902,8 +902,10 @@ namespace stream
         int_type * prefetch_seq;
         prefetcher_type * prefetcher;
         loser_tree_type * losers;
+#if STXXL_PARALLEL_MULTIWAY_MERGE
         std::vector<sequence> * seqs;
         std::vector<block_type *> * buffers;
+#endif
 
 #if STXXL_CHECK_ORDER_IN_SORTS
         value_type last_element;
@@ -918,8 +920,10 @@ namespace stream
             if (prefetcher)
             {
                 delete losers;
+#if STXXL_PARALLEL_MULTIWAY_MERGE
                 delete seqs;
                 delete buffers;
+#endif
                 delete prefetcher;
                 delete[] prefetch_seq;
                 prefetcher = NULL;
@@ -1052,9 +1056,11 @@ namespace stream
             buffer_pos(0),
             prefetch_seq(NULL),
             prefetcher(NULL),
-            losers(NULL),
-            seqs(NULL),
-            buffers(NULL)
+            losers(NULL)
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+            , seqs(NULL)
+            , buffers(NULL)
+#endif
 #if STXXL_CHECK_ORDER_IN_SORTS
             , last_element(cmp.min_value())
 #endif //STXXL_CHECK_ORDER_IN_SORTS
