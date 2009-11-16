@@ -29,28 +29,23 @@ struct interleaved_striping
     int_type nruns;
     int begindisk;
     int diff;
-    interleaved_striping(int_type _nruns, int _begindisk,
-                         int _enddisk) : nruns(_nruns),
-                                         begindisk(_begindisk), diff(_enddisk - _begindisk)
+
+    interleaved_striping(int_type _nruns, int _begindisk, int _enddisk)
+        : nruns(_nruns), begindisk(_begindisk), diff(_enddisk - _begindisk)
     { }
 
     int operator () (int_type i) const
     {
         return begindisk + (i / nruns) % diff;
     }
-/*
-    virtual ~interleaved_striping()
-    { }
-*/
 };
 
 struct interleaved_FR : public interleaved_striping
 {
     random_number<random_uniform_fast> rnd;
 
-    interleaved_FR(int_type _nruns, int _begindisk,
-                   int _enddisk) : interleaved_striping(_nruns, _begindisk,
-                                                        _enddisk)
+    interleaved_FR(int_type _nruns, int _begindisk, int _enddisk)
+        : interleaved_striping(_nruns, _begindisk, _enddisk)
     { }
 
     int operator () (int_type /*i*/) const
@@ -63,10 +58,8 @@ struct interleaved_SR : public interleaved_striping
 {
     std::vector<int> offsets;
 
-    interleaved_SR(int_type _nruns, int _begindisk,
-                   int _enddisk) : interleaved_striping(_nruns,
-                                                        _begindisk,
-                                                        _enddisk)
+    interleaved_SR(int_type _nruns, int _begindisk, int _enddisk)
+        : interleaved_striping(_nruns, _begindisk, _enddisk)
     {
         random_number<random_uniform_fast> rnd;
         for (int_type i = 0; i < nruns; i++)
@@ -84,21 +77,17 @@ struct interleaved_RC : public interleaved_striping
 {
     std::vector<std::vector<int> > perms;
 
-    interleaved_RC(int_type _nruns, int _begindisk,
-                   int _enddisk) : interleaved_striping(_nruns,
-                                                        _begindisk,
-                                                        _enddisk),
-                                   perms(nruns, std::vector<int>(diff))
+    interleaved_RC(int_type _nruns, int _begindisk, int _enddisk)
+        : interleaved_striping(_nruns, _begindisk, _enddisk),
+          perms(nruns, std::vector<int>(diff))
     {
         for (int_type i = 0; i < nruns; i++)
         {
             for (int j = 0; j < diff; j++)
                 perms[i][j] = j;
 
-
             random_number<random_uniform_fast> rnd;
-            std::random_shuffle(perms[i].begin(),
-                                perms[i].end(), rnd);
+            std::random_shuffle(perms[i].begin(), perms[i].end(), rnd);
         }
     }
 
