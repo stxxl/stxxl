@@ -1264,11 +1264,14 @@ namespace stream
         unsigned_type nwrite_buffers = 2 * ndisks;
         unsigned_type memory_for_write_buffers = nwrite_buffers * sizeof(block_type);
 
+        // memory consumption of the recursive merger (uses block_type as out_block_type)
+        unsigned_type recursive_merger_memory_prefetch_buffers = 2 * ndisks * sizeof(block_type);
+        unsigned_type recursive_merger_memory_out_block = sizeof(block_type);
         // maximum fan-in in the recursive merger
-        // note: recursion uses block_type as out_block_type, so we have to
-        //       deduct one more block_type here
-        //       (this is current_block in the recursive merger)
-        unsigned_type max_fan_in = (memory_to_use - memory_for_write_buffers - sizeof(block_type)) / block_type::raw_size;
+        unsigned_type max_fan_in = (memory_to_use
+                                    - memory_for_write_buffers
+                                    - recursive_merger_memory_prefetch_buffers
+                                    - recursive_merger_memory_out_block) / block_type::raw_size;
 
         unsigned_type nruns = sruns.runs.size();
         const unsigned_type merge_factor = optimal_merge_factor(nruns, max_fan_in);
@@ -1287,21 +1290,16 @@ namespace stream
             unsigned_type runs_left = nruns;
             unsigned_type cur_out_run = 0;
             unsigned_type elements_in_new_run = 0;
-            //unsigned_type blocks_in_new_run = 0;
-
 
             while (runs_left > 0)
             {
                 int_type runs2merge = STXXL_MIN(runs_left, merge_factor);
-                //blocks_in_new_run = 0 ;
                 elements_in_new_run = 0;
                 for (unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge); ++i)
                 {
                     elements_in_new_run += sruns.runs_sizes[i];
-                    //blocks_in_new_run += sruns.runs[i].size();
                 }
                 const unsigned_type blocks_in_new_run1 = div_ceil(elements_in_new_run, block_type::size);
-                //assert(blocks_in_new_run1 == blocks_in_new_run);
 
                 new_runs.runs_sizes[cur_out_run] = elements_in_new_run;
                 // allocate run
@@ -1363,7 +1361,6 @@ namespace stream
                             *out = *merger;
                             if ((cnt % block_type::size) == 0) // have to write the trigger value
                                 new_runs.runs[cur_out_run][cnt / size_type(block_type::size)].value = *merger;
-
 
                             ++cnt;
                             ++out;
