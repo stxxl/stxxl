@@ -946,6 +946,13 @@ namespace stream
                 {
                     if (currently_mergeable == 0)
                     {
+                        if (!prefetcher || prefetcher->empty())
+                        {
+                            // anything remaining is already in memory
+                            currently_mergeable = elements_remaining;
+                        }
+                        else
+                        {
                     value_type * min_last_element = NULL;       // no element found yet
                     diff_type total_size = 0;
 
@@ -979,6 +986,7 @@ namespace stream
                     }
 
                     STXXL_VERBOSE1("finished loop");
+                        }
                     }
 
                     diff_type output_size = STXXL_MIN(currently_mergeable, rest);         // at most rest elements
