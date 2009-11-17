@@ -193,6 +193,12 @@ public:
         return nextconsume >= seq_length;
     }
 
+    // index of the next element in the consume sequence
+    unsigned_type pos() const
+    {
+        return nextconsume;
+    }
+
     //! \brief Frees used memory
     ~block_prefetcher()
     {
