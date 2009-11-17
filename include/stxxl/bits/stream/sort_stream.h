@@ -953,26 +953,9 @@ namespace stream
                         }
                         else
                         {
-                    value_type * min_last_element = NULL;       // no element found yet
-                    diff_type total_size = 0;
+                            value_type * first_external_element = &(consume_seq[prefetcher->pos()].value);
 
-                    for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
-                    {
-                        if ((*seqs)[i].first == (*seqs)[i].second)
-                            continue;  // run empty
-
-                        if (min_last_element == NULL)
-                            min_last_element = &(*((*seqs)[i].second - 1));
-                        else
-                            min_last_element = cmp(*min_last_element, *((*seqs)[i].second - 1)) ? min_last_element : &(*((*seqs)[i].second - 1));
-
-                        total_size += (*seqs)[i].second - (*seqs)[i].first;
-                        STXXL_VERBOSE1("last " << *((*seqs)[i].second - 1) << " block size " << ((*seqs)[i].second - (*seqs)[i].first));
-                    }
-
-                    assert(min_last_element != NULL);           // there must be some element
-
-                    STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (out_block_type::size - rest));
+                            STXXL_VERBOSE1("first_external_element " << first_external_element);
 
                     // locate this element in all sequences
                     for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
@@ -980,7 +963,7 @@ namespace stream
                         if ((*seqs)[i].first == (*seqs)[i].second)
                             continue;  // empty subsequence
 
-                        typename block_type::iterator position = std::upper_bound((*seqs)[i].first, (*seqs)[i].second, *min_last_element, cmp);
+                                typename block_type::iterator position = std::upper_bound((*seqs)[i].first, (*seqs)[i].second, *first_external_element, cmp);
                         STXXL_VERBOSE1("greater equal than " << position - (*seqs)[i].first);
                         currently_mergeable += position - (*seqs)[i].first;
                     }
