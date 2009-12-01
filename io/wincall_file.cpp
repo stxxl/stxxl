@@ -35,61 +35,61 @@ void wincall_file::serve(const request * req) throw (io_error)
         STXXL_ERRMSG("Using a block size larger than 32 MiB may not work with the " << io_type() << " filetype");
     }
 
-        HANDLE handle = file_des;
-        LARGE_INTEGER desired_pos;
-        desired_pos.QuadPart = offset;
-        if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))
+    HANDLE handle = file_des;
+    LARGE_INTEGER desired_pos;
+    desired_pos.QuadPart = offset;
+    if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))
+    {
+        stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve()" <<
+                                 " offset=" << offset <<
+                                 " this=" << this <<
+                                 " buffer=" << buffer <<
+                                 " bytes=" << bytes <<
+                                 " type=" << ((type == request::READ) ? "READ" : "WRITE"),
+                                 io_error);
+    }
+    else
+    {
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+
+        if (type == request::READ)
         {
-            stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve()" <<
-                                     " offset=" << offset <<
-                                     " this=" << this <<
-                                     " buffer=" << buffer <<
-                                     " bytes=" << bytes <<
-                                     " type=" << ((type == request::READ) ? "READ" : "WRITE"),
-                                     io_error);
+            STXXL_DEBUGMON_DO(io_started(buffer));
+            DWORD NumberOfBytesRead = 0;
+            if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
+            {
+                stxxl_win_lasterror_exit("ReadFile" <<
+                                         " this=" << this <<
+                                         " offset=" << offset <<
+                                         " buffer=" << buffer <<
+                                         " bytes=" << bytes <<
+                                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                         " NumberOfBytesRead= " << NumberOfBytesRead,
+                                         io_error);
+            }
+
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
         else
         {
-            stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+            STXXL_DEBUGMON_DO(io_started(buffer));
 
-            if (type == request::READ)
+            DWORD NumberOfBytesWritten = 0;
+            if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
             {
-                STXXL_DEBUGMON_DO(io_started(buffer));
-                DWORD NumberOfBytesRead = 0;
-                if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
-                {
-                    stxxl_win_lasterror_exit("ReadFile" <<
-                                             " this=" << this <<
-                                             " offset=" << offset <<
-                                             " buffer=" << buffer <<
-                                             " bytes=" << bytes <<
-                                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                                             " NumberOfBytesRead= " << NumberOfBytesRead,
-                                             io_error);
-                }
-
-                STXXL_DEBUGMON_DO(io_finished(buffer));
+                stxxl_win_lasterror_exit("WriteFile" <<
+                                         " this=" << this <<
+                                         " offset=" << offset <<
+                                         " buffer=" << buffer <<
+                                         " bytes=" << bytes <<
+                                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                         " NumberOfBytesWritten= " << NumberOfBytesWritten,
+                                         io_error);
             }
-            else
-            {
-                STXXL_DEBUGMON_DO(io_started(buffer));
 
-                DWORD NumberOfBytesWritten = 0;
-                if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
-                {
-                    stxxl_win_lasterror_exit("WriteFile" <<
-                                             " this=" << this <<
-                                             " offset=" << offset <<
-                                             " buffer=" << buffer <<
-                                             " bytes=" << bytes <<
-                                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                                             " NumberOfBytesWritten= " << NumberOfBytesWritten,
-                                             io_error);
-                }
-
-                STXXL_DEBUGMON_DO(io_finished(buffer));
-            }
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
+    }
 }
 
 const char * wincall_file::io_type() const

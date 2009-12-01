@@ -36,8 +36,8 @@ wbtl_file::wbtl_file(
     size_type write_buffer_size,
     int write_buffers,
     int disk) :
-        file_request_basic(disk), storage(backend_file), sz(0), write_block_size(write_buffer_size),
-        free_bytes(0), curbuf(1), curpos(write_block_size)
+    file_request_basic(disk), storage(backend_file), sz(0), write_block_size(write_buffer_size),
+    free_bytes(0), curbuf(1), curpos(write_block_size)
 {
     assert(write_buffers == 2); // currently hardcoded
     write_buffer[0] = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
@@ -96,8 +96,8 @@ void wbtl_file::set_size(offset_type newsize)
     }
 }
 
-#define FMT_A_S(_addr_,_size_) "0x" << std::hex << std::setfill('0') << std::setw(8) << (_addr_) << "/0x" << std::setw(8) << (_size_)
-#define FMT_A_C(_addr_,_size_) "0x" << std::setw(8) << (_addr_) << "(" << std::dec << (_size_) << ")"
+#define FMT_A_S(_addr_, _size_) "0x" << std::hex << std::setfill('0') << std::setw(8) << (_addr_) << "/0x" << std::setw(8) << (_size_)
+#define FMT_A_C(_addr_, _size_) "0x" << std::setw(8) << (_addr_) << "(" << std::dec << (_size_) << ")"
 #define FMT_A(_addr_) "0x" << std::setw(8) << (_addr_)
 
 // logical address
@@ -204,10 +204,10 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
     // map logical to physical address
     {
         scoped_mutex_lock mapping_lock(mapping_mutex);
-    sortseq::iterator physical = address_mapping.find(offset);
-    if (physical == address_mapping.end()) {
-        STXXL_ERRMSG("wbtl_read: mapping not found: " << FMT_A_S(offset, bytes) << " ==> " << "???");
-        //STXXL_THROW2(io_error, "wbtl_read of unmapped memory");
+        sortseq::iterator physical = address_mapping.find(offset);
+        if (physical == address_mapping.end()) {
+            STXXL_ERRMSG("wbtl_read: mapping not found: " << FMT_A_S(offset, bytes) << " ==> " << "???");
+            //STXXL_THROW2(io_error, "wbtl_read of unmapped memory");
             physical_offset = 0xffffffff;
         } else {
             physical_offset = physical->second;
@@ -253,13 +253,13 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
     // is the block already mapped?
     {
         scoped_mutex_lock mapping_lock(mapping_mutex);
-    sortseq::iterator physical = address_mapping.find(offset);
-    STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ <= p" <<
-                       FMT_A_C(physical != address_mapping.end() ? physical->second : 0xffffffff, address_mapping.size()));
-    if (physical != address_mapping.end()) {
+        sortseq::iterator physical = address_mapping.find(offset);
+        STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ <= p" <<
+                           FMT_A_C(physical != address_mapping.end() ? physical->second : 0xffffffff, address_mapping.size()));
+        if (physical != address_mapping.end()) {
             mapping_lock.unlock();
-        // FIXME: special case if we can replace it in the current writing block
-        discard(offset, bytes);
+            // FIXME: special case if we can replace it in the current writing block
+            discard(offset, bytes);
         }
     }
 
@@ -273,7 +273,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
             // mark remaining part as free
             if (curpos < write_block_size)
                 _add_free_region(buffer_address[curbuf] + curpos, write_block_size - curpos);
-            
+
             if (backend_request.get()) {
                 backend_request->wait(false);
             }
@@ -291,7 +291,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
     // write block into buffer
     memcpy(write_buffer[curbuf] + curpos, buffer, bytes);
     stats::get_instance()->write_cached(bytes);
-    
+
     scoped_mutex_lock mapping_lock(mapping_mutex);
     address_mapping[offset] = buffer_address[curbuf] + curpos;
     reverse_mapping[buffer_address[curbuf] + curpos] = place(offset, bytes);
@@ -326,7 +326,7 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
 }
 
 void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size,
-                      sortseq::iterator pred, sortseq::iterator succ)
+                                 sortseq::iterator pred, sortseq::iterator succ)
 {
     if (pred != free_space.end())
     {
@@ -341,7 +341,7 @@ void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size
         if (region_pos <= succ->first && region_pos + region_size > succ->first)
         {
             STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory "
-                 << "System info: S " << region_pos << " " << region_size << " " << succ->first);
+                        << "System info: S " << region_pos << " " << region_size << " " << succ->first);
         }
     }
 }
