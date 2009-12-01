@@ -186,12 +186,12 @@ int main(int argc, char * argv[])
         end = timestamp();
 
 #if 0
-   std::cout << "WRITE\nDisks: " << ndisks
-        <<" \nElapsed time: "<< end-begin
-        << " \nThroughput: "<< int(double(buffer_size*ndisks)/MB/(end-begin))
-        << " MiB/s \nPer one disk:"
-        << int((buffer_size)/MB/(end-begin)) << " MiB/s"
-        << std::endl;
+        std::cout << "WRITE\nDisks: " << ndisks
+                  << " \nElapsed time: " << end - begin
+                  << " \nThroughput: " << int(double(buffer_size * ndisks) / MB / (end - begin))
+                  << " MiB/s \nPer one disk:"
+                  << int((buffer_size) / MB / (end - begin)) << " MiB/s"
+                  << std::endl;
 #endif
 
  #ifdef WATCH_TIMES
@@ -222,12 +222,12 @@ int main(int argc, char * argv[])
         end = timestamp();
 
 #if 0
-   std::cout << "READ\nDisks: " << ndisks
-        <<" \nElapsed time: "<< end-begin
-        << " \nThroughput: "<< int(double(buffer_size*ndisks)/MB/(end-begin))
-        << " MiB/s \nPer one disk:"
-        << int(double(buffer_size)/MB/(end-begin)) << " MiB/s"
-            << std::endl;
+        std::cout << "READ\nDisks: " << ndisks
+                  << " \nElapsed time: " << end - begin
+                  << " \nThroughput: " << int(double(buffer_size * ndisks) / MB / (end - begin))
+                  << " MiB/s \nPer one disk:"
+                  << int(double(buffer_size) / MB / (end - begin)) << " MiB/s"
+                  << std::endl;
 #endif
 
         std::cout << int(double(current_block_size) / MB / (end - begin)) << " MiB/s" << std::endl;

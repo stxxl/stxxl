@@ -122,9 +122,9 @@ int main(int argc, char * argv[])
     if (argc < 4)
         usage(argv[0]);
 
-    stxxl::int64 offset    = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
-    stxxl::int64 length    = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
-    stxxl::int64 endpos    = offset + length;
+    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
+    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
+    stxxl::int64 endpos = offset + length;
     stxxl::int64 block_size = 0;
     stxxl::int64 batch_size = 0;
 
@@ -235,37 +235,37 @@ int main(int argc, char * argv[])
 
 #ifndef DO_ONLY_READ
             if (do_write) {
-            for (unsigned i = 0; i < ndisks; i++)
-            {
-                for (unsigned j = 0; j < current_num_blocks; j++)
-                    reqs[i * current_num_blocks + j] =
-                        disks[i]->awrite(buffer + current_step_size_int * i + j * block_size_int,
-                                         offset + j * block_size,
-                                         block_size,
-                                         stxxl::default_completion_handler());
-            }
+                for (unsigned i = 0; i < ndisks; i++)
+                {
+                    for (unsigned j = 0; j < current_num_blocks; j++)
+                        reqs[i * current_num_blocks + j] =
+                            disks[i]->awrite(buffer + current_step_size_int * i + j * block_size_int,
+                                             offset + j * block_size,
+                                             block_size,
+                                             stxxl::default_completion_handler());
+                }
 
  #ifdef WATCH_TIMES
-            watch_times(reqs, ndisks, w_finish_times);
+                watch_times(reqs, ndisks, w_finish_times);
  #else
-            wait_all(reqs, ndisks * current_num_blocks);
+                wait_all(reqs, ndisks * current_num_blocks);
  #endif
 
-            end = timestamp();
-            elapsed = end - begin;
-            totalsizewrite += current_step_size;
-            totaltimewrite += elapsed;
+                end = timestamp();
+                elapsed = end - begin;
+                totalsizewrite += current_step_size;
+                totaltimewrite += elapsed;
             } else {
                 elapsed = 0.0;
             }
 
 #if 0
-   std::cout << "WRITE\nDisks: " << ndisks
-        <<" \nElapsed time: "<< end-begin
-        << " \nThroughput: "<< int(double(current_step_size*ndisks)/MB/(end-begin))
-        << " MiB/s \nPer one disk:"
-        << int(double(current_step_size)/MB/(end-begin)) << " MiB/s"
-        << std::endl;
+            std::cout << "WRITE\nDisks: " << ndisks
+                      << " \nElapsed time: " << end - begin
+                      << " \nThroughput: " << int(double(current_step_size * ndisks) / MB / (end - begin))
+                      << " MiB/s \nPer one disk:"
+                      << int(double(current_step_size) / MB / (end - begin)) << " MiB/s"
+                      << std::endl;
 #endif
 
  #ifdef WATCH_TIMES
@@ -285,9 +285,9 @@ int main(int argc, char * argv[])
                 {
                     for (unsigned j = 0; j < current_num_blocks; j++)
                         reqs[i * current_num_blocks + j] = disks[i]->aread(buffer + current_step_size_int * i + j * block_size_int,
-                                                            offset + j * block_size,
-                                                            block_size,
-                                                            stxxl::default_completion_handler());
+                                                                           offset + j * block_size,
+                                                                           block_size,
+                                                                           stxxl::default_completion_handler());
                 }
 
  #ifdef WATCH_TIMES
@@ -305,12 +305,12 @@ int main(int argc, char * argv[])
             }
 
 #if 0
-   std::cout << "READ\nDisks: " << ndisks
-        <<" \nElapsed time: "<< end-begin
-        << " \nThroughput: "<< int(double(current_step_size*ndisks)/MB/(end-begin))
-        << " MiB/s \nPer one disk:"
-        << int(double(current_step_size)/MB/(end-begin)) << " MiB/s"
-            << std::endl;
+            std::cout << "READ\nDisks: " << ndisks
+                      << " \nElapsed time: " << end - begin
+                      << " \nThroughput: " << int(double(current_step_size * ndisks) / MB / (end - begin))
+                      << " MiB/s \nPer one disk:"
+                      << int(double(current_step_size) / MB / (end - begin)) << " MiB/s"
+                      << std::endl;
 #endif
 
             std::cout << std::setw(2) << ndisks << " * "

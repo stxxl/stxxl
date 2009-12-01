@@ -62,10 +62,10 @@ int main(int argc, char * argv[])
     if (argc < 3)
         usage(argv[0]);
 
-    stxxl::int64 offset    = 0;
-    stxxl::int64 length    = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
+    stxxl::int64 offset = 0;
+    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
     stxxl::int64 step_size = stxxl::int64(MB) * stxxl::int64(atoi(argv[2]));
-    stxxl::int64 endpos    = offset + length;
+    stxxl::int64 endpos = offset + length;
 
     bool do_read = true, do_write = true;
 
@@ -166,8 +166,8 @@ int main(int argc, char * argv[])
                         int pos = i % current_step_size_int;
 
                         std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
-                                << "  got: " << std::hex << std::setw(8) << buffer[j][i] << " wanted: " << std::hex << std::setw(8) << (j * block_size + i)
-                                << std::dec << std::endl;
+                                  << "  got: " << std::hex << std::setw(8) << buffer[j][i] << " wanted: " << std::hex << std::setw(8) << (j * block_size + i)
+                                  << std::dec << std::endl;
 
                         i = (ibuf + 1) * current_step_size_int; // jump to next
                     }
