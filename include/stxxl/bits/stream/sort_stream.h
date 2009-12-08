@@ -906,6 +906,7 @@ namespace stream
         std::vector<sequence> * seqs;
         std::vector<block_type *> * buffers;
         diff_type num_currently_mergeable;
+        bool recompute_currently_mergeable;
 #endif
 
 #if STXXL_CHECK_ORDER_IN_SORTS
@@ -944,8 +945,11 @@ namespace stream
 
                 do                                              // while rest > 0 and still elements available
                 {
-                    if (num_currently_mergeable == 0)
+                    if ((num_currently_mergeable == 0) || (num_currently_mergeable < rest && recompute_currently_mergeable))
                     {
+                        num_currently_mergeable = 0;
+                        recompute_currently_mergeable = false;
+
                         if (!prefetcher || prefetcher->empty())
                         {
                             // anything remaining is already in memory
@@ -990,7 +994,7 @@ namespace stream
                                 (*seqs)[i].first = (*buffers)[i]->begin();                // reset iterator
                                 (*seqs)[i].second = (*buffers)[i]->end();
                                 STXXL_VERBOSE1("block ran empty " << i);
-                                num_currently_mergeable = 0;                              // recompute
+                                recompute_currently_mergeable = true;                     // trigger recompute
                             }
                             else
                             {
@@ -1051,7 +1055,8 @@ namespace stream
 #if STXXL_PARALLEL_MULTIWAY_MERGE
             , seqs(NULL),
             buffers(NULL),
-            num_currently_mergeable(0)
+            num_currently_mergeable(0),
+            recompute_currently_mergeable(false)
 #endif
 #if STXXL_CHECK_ORDER_IN_SORTS
             , last_element(cmp.min_value())
