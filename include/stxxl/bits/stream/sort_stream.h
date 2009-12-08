@@ -1086,7 +1086,7 @@ namespace stream
 
             int_type disks_number = config::get_instance()->disks_number();
             unsigned_type min_prefetch_buffers = 2 * disks_number;
-            unsigned_type input_buffers = (memory_to_use - sizeof(out_block_type)) / block_type::raw_size;
+            unsigned_type input_buffers = (memory_to_use > sizeof(out_block_type) ? memory_to_use - sizeof(out_block_type) : 0) / block_type::raw_size;
             unsigned_type nruns = sruns.runs.size();
 
             if (input_buffers < nruns + min_prefetch_buffers)
@@ -1270,11 +1270,11 @@ namespace stream
         // memory consumption of the recursive merger (uses block_type as out_block_type)
         unsigned_type recursive_merger_memory_prefetch_buffers = 2 * ndisks * sizeof(block_type);
         unsigned_type recursive_merger_memory_out_block = sizeof(block_type);
+        unsigned_type memory_for_buffers = memory_for_write_buffers
+                                           + recursive_merger_memory_prefetch_buffers
+                                           + recursive_merger_memory_out_block;
         // maximum arity in the recursive merger
-        unsigned_type max_arity = (memory_to_use
-                                    - memory_for_write_buffers
-                                    - recursive_merger_memory_prefetch_buffers
-                                    - recursive_merger_memory_out_block) / block_type::raw_size;
+        unsigned_type max_arity = (memory_to_use > memory_for_buffers ? memory_to_use - memory_for_buffers : 0) / block_type::raw_size;
 
         unsigned_type nruns = sruns.runs.size();
         const unsigned_type merge_factor = optimal_merge_factor(nruns, max_arity);
@@ -1393,7 +1393,7 @@ namespace stream
                     std::copy(cur_runs.runs.front().begin(),
                               cur_runs.runs.front().end(),
                               new_runs.runs.back().begin());
-                    new_runs.runs_sizes.back() = cur_runs.runs_sizes.back();
+                    new_runs.runs_sizes.back() = cur_runs.runs_sizes.front();
                 }
 
                 ++cur_out_run;
