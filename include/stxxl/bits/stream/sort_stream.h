@@ -1270,20 +1270,21 @@ namespace stream
         // memory consumption of the recursive merger (uses block_type as out_block_type)
         unsigned_type recursive_merger_memory_prefetch_buffers = 2 * ndisks * sizeof(block_type);
         unsigned_type recursive_merger_memory_out_block = sizeof(block_type);
-        // maximum fan-in in the recursive merger
-        unsigned_type max_fan_in = (memory_to_use
+        // maximum arity in the recursive merger
+        unsigned_type max_arity = (memory_to_use
                                     - memory_for_write_buffers
                                     - recursive_merger_memory_prefetch_buffers
                                     - recursive_merger_memory_out_block) / block_type::raw_size;
 
         unsigned_type nruns = sruns.runs.size();
-        const unsigned_type merge_factor = optimal_merge_factor(nruns, max_fan_in);
-        assert(merge_factor <= max_fan_in);
-        while (nruns > max_fan_in)
+        const unsigned_type merge_factor = optimal_merge_factor(nruns, max_arity);
+        assert(merge_factor > 1);
+        assert(merge_factor <= max_arity);
+        while (nruns > max_arity)
         {
             unsigned_type new_nruns = div_ceil(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
-                          " opt_merge_factor: " << merge_factor << " m:" << max_fan_in << " new_nruns: " << new_nruns);
+                          " opt_merge_factor: " << merge_factor << " max_arity:" << max_arity << " new_nruns: " << new_nruns);
 
             sorted_runs_type new_runs;
             new_runs.runs.resize(new_nruns);
