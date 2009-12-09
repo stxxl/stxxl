@@ -137,7 +137,7 @@ private:
             perm[i] = i;
 
         stxxl::random_number<random_uniform_fast> rnd;
-        std::random_shuffle(perm.begin(), perm.end(), rnd __STXXL_FORCE_SEQUENTIAL);
+        std::random_shuffle(perm.begin(), perm.end(), rnd _STXXL_FORCE_SEQUENTIAL);
     }
 
 public:

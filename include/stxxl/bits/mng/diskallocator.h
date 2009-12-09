@@ -174,7 +174,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
 
     sortseq::iterator space =
         std::find_if(free_space.begin(), free_space.end(),
-                     bind2nd(FirstFit(), requested_size) __STXXL_FORCE_SEQUENTIAL);
+                     bind2nd(FirstFit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
 
     if (space != free_space.end())
     {

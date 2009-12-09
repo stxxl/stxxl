@@ -52,7 +52,7 @@ void request_queue_impl_1q::add_request(request_ptr & req)
     {
         scoped_mutex_lock Lock(queue_mutex);
         if (std::find_if(queue.begin(), queue.end(),
-                         bind2nd(file_offset_match(), req) __STXXL_FORCE_SEQUENTIAL)
+                         bind2nd(file_offset_match(), req) _STXXL_FORCE_SEQUENTIAL)
             != queue.end())
         {
             STXXL_ERRMSG("request submitted for a BID with a pending request");
@@ -76,7 +76,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr & req)
     {
         scoped_mutex_lock Lock(queue_mutex);
         queue_type::iterator pos;
-        if ((pos = std::find(queue.begin(), queue.end(), req __STXXL_FORCE_SEQUENTIAL)) != queue.end())
+        if ((pos = std::find(queue.begin(), queue.end(), req _STXXL_FORCE_SEQUENTIAL)) != queue.end())
         {
             queue.erase(pos);
             was_still_in_queue = true;

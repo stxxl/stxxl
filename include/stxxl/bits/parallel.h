@@ -45,11 +45,11 @@
 
 
 #if defined(_GLIBCXX_PARALLEL)
-#define __STXXL_FORCE_SEQUENTIAL , __gnu_parallel::sequential_tag()
+#define _STXXL_FORCE_SEQUENTIAL , __gnu_parallel::sequential_tag()
 #elif defined(__MCSTL__)
-#define __STXXL_FORCE_SEQUENTIAL , mcstl::sequential_tag()
+#define _STXXL_FORCE_SEQUENTIAL , mcstl::sequential_tag()
 #else
-#define __STXXL_FORCE_SEQUENTIAL
+#define _STXXL_FORCE_SEQUENTIAL
 #endif
 
 #if !STXXL_PARALLEL
