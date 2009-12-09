@@ -158,7 +158,7 @@ public:
     }
 
     // deprecated name for the steal()
-    __STXXL_DEPRECATED(block_type * get())
+    _STXXL_DEPRECATED(block_type * get())
     {
         return steal();
     }

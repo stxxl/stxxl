@@ -389,7 +389,7 @@ public:
         p_vector->block_externally_updated(offset);
     }
 
-    __STXXL_DEPRECATED(void touch())
+    _STXXL_DEPRECATED(void touch())
     {
         block_externally_updated();
     }
@@ -608,7 +608,7 @@ public:
         p_vector->block_externally_updated(offset);
     }
 
-    __STXXL_DEPRECATED(void touch())
+    _STXXL_DEPRECATED(void touch())
     {
         block_externally_updated();
     }
@@ -1386,12 +1386,12 @@ private:
         page_externally_updated(offset.get_block2());
     }
 
-    __STXXL_DEPRECATED(void touch(size_type offset) const)
+    _STXXL_DEPRECATED(void touch(size_type offset) const)
     {
         page_externally_updated(offset / (block_type::size * page_size));
     }
 
-    __STXXL_DEPRECATED(void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const)
+    _STXXL_DEPRECATED(void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const)
     {
         page_externally_updated(offset.get_block2());
     }

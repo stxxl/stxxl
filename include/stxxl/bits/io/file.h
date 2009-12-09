@@ -163,7 +163,7 @@ public:
     //! \return file size in bytes
     virtual offset_type size() = 0;
     //! \brief deprecated, use \c stxxl::file::get_id() instead
-    __STXXL_DEPRECATED(int get_disk_number() const)
+    _STXXL_DEPRECATED(int get_disk_number() const)
     {
         return get_id();
     }
