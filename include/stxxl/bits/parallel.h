@@ -52,6 +52,14 @@
 #define _STXXL_FORCE_SEQUENTIAL
 #endif
 
+#if 0
+// sorting triggers is done sequentially
+#define _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL _STXXL_FORCE_SEQUENTIAL
+#else
+// sorting triggers may be parallelized
+#define _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL
+#endif
+
 #if !STXXL_PARALLEL
 #undef STXXL_PARALLEL_MULTIWAY_MERGE
 #define STXXL_PARALLEL_MULTIWAY_MERGE 0

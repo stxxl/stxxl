@@ -461,7 +461,7 @@ namespace ksort_local
                 in_runs[i]->end(),
                 copy_start);
         }
-        std::stable_sort(consume_seq.begin(), consume_seq.end());
+        std::stable_sort(consume_seq.begin(), consume_seq.end() _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
         unsigned disks_number = config::get_instance()->disks_number();
 

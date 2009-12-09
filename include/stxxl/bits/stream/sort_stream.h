@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -1131,7 +1132,7 @@ namespace stream
             }
 
             std::stable_sort(consume_seq.begin(), consume_seq.end(),
-                             sort_local::trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp));
+                             sort_local::trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
             const unsigned_type n_prefetch_buffers = STXXL_MAX(min_prefetch_buffers, input_buffers - nruns);
 
@@ -1284,7 +1285,7 @@ namespace stream
         {
             unsigned_type new_nruns = div_ceil(nruns, merge_factor);
             STXXL_VERBOSE("Starting new merge phase: nruns: " << nruns <<
-                          " opt_merge_factor: " << merge_factor << " max_arity:" << max_arity << " new_nruns: " << new_nruns);
+                          " opt_merge_factor: " << merge_factor << " max_arity: " << max_arity << " new_nruns: " << new_nruns);
 
             sorted_runs_type new_runs;
             new_runs.runs.resize(new_nruns);

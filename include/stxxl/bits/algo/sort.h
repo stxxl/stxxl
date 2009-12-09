@@ -390,7 +390,7 @@ namespace sort_local
         }
 
         std::stable_sort(consume_seq.begin(), consume_seq.end(),
-                         trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp));
+                         trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
         int_type disks_number = config::get_instance()->disks_number();
 
