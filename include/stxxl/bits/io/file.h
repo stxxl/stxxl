@@ -86,8 +86,6 @@ __STXXL_BEGIN_NAMESPACE
 //! base on various file systems or even remote storage interfaces
 class file : private noncopyable
 {
-    int id;
-
     mutex request_ref_cnt_mutex;
     int request_ref_cnt;
 
@@ -95,7 +93,7 @@ protected:
     //! \brief Initializes file object
     //! \param _id file identifier
     //! \remark Called in implementations of file
-    file(int _id) : id(_id), request_ref_cnt(0) { }
+    file() : request_ref_cnt(0) { }
 
 public:
     // the offset of a request, also the size of the file
@@ -170,10 +168,7 @@ public:
     //! \brief Returns file's identifier
     //! \remark might be used as disk's id in case disk to file mapping
     //! \return integer file identifier, passed as constructor parameter
-    int get_id() const
-    {
-        return id;
-    }
+    virtual int get_id() const = 0;
 
     //! \brief Locks file for reading and writing (aquires a lock in the file system)
     virtual void lock() = 0;

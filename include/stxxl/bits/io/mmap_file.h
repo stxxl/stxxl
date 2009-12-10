@@ -42,7 +42,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of memory mapped access file
-class mmap_file : public ufs_file_base
+class mmap_file : public ufs_file_base, public disk_queued_file
 {
 public:
     //! \brief constructs file object
@@ -50,7 +50,7 @@ public:
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param disk disk(file) identifier
     inline mmap_file(const std::string & filename, int mode, int disk = -1) :
-        ufs_file_base(filename, mode, disk)
+        ufs_file_base(filename, mode), disk_queued_file(disk)
     { }
     void serve(const request * req) throw (io_error);
     const char * io_type() const;

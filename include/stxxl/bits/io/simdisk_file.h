@@ -116,7 +116,7 @@ public:
 
 //! \brief Implementation of disk emulation
 //! \remark It is emulation of IBM IC35L080AVVA07 disk's timings
-class sim_disk_file : public ufs_file_base, public IC35L080AVVA07
+class sim_disk_file : public ufs_file_base, public disk_queued_file, public IC35L080AVVA07
 {
 public:
     //! \brief constructs file object
@@ -124,7 +124,7 @@ public:
     //! \attention filename must be resided at memory disk partition
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param disk disk(file) identifier
-    inline sim_disk_file(const std::string & filename, int mode, int disk) : ufs_file_base(filename, mode, disk)
+    inline sim_disk_file(const std::string & filename, int mode, int disk) : ufs_file_base(filename, mode), disk_queued_file(disk)
     {
         std::cout << "Please, make sure that '" << filename <<
         "' is resided on swap memory partition!" <<
