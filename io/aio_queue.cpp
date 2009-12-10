@@ -70,7 +70,7 @@ bool aio_queue::cancel_request(request_ptr& req)
 	queue_type::iterator pos;
 	{
 		scoped_mutex_lock lock(waiting_mtx);
-		if ((pos = std::find(waiting_requests.begin(), waiting_requests.end(), req __STXXL_FORCE_SEQUENTIAL)) != waiting_requests.end())
+		if ((pos = std::find(waiting_requests.begin(), waiting_requests.end(), req _STXXL_FORCE_SEQUENTIAL)) != waiting_requests.end())
 		{
 			waiting_requests.erase(pos);
 			was_still_in_queue = true;
