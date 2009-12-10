@@ -18,6 +18,7 @@
 
 #include <stxxl/bits/algo/async_schedule.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/parallel.h>
 
 #include <algorithm>
 #include <functional>
@@ -181,8 +182,7 @@ void compute_prefetch_schedule(
     for (int_type i = 0; i < L; i++)
         STXXL_VERBOSE1(first[i] << " " << write_order[i].first << " " << write_order[i].second);
 
-    std::stable_sort(write_order, write_order + L, async_schedule_local::write_time_cmp());
-
+    std::stable_sort(write_order, write_order + L, async_schedule_local::write_time_cmp() _STXXL_FORCE_SEQUENTIAL);
 
     for (int_type i = 0; i < L; i++)
     {

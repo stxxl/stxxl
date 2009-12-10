@@ -90,7 +90,7 @@ int main(int argc, char * argv[])
         assert(XXLDeque.empty() == STDDeque.empty());
         assert(XXLDeque.size() == STDDeque.size());
         assert(XXLDeque.end() - XXLDeque.begin() == STDDeque.end() - STDDeque.begin());
-        //assert(std::equal(XXLDeque.begin(),XXLDeque.end(),STDDeque.begin() __STXXL_FORCE_SEQUENTIAL));
+        //assert(std::equal(XXLDeque.begin(),XXLDeque.end(),STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
         if (XXLDeque.size() > 0)
         {
             assert(XXLDeque.back() == STDDeque.back());
@@ -99,7 +99,7 @@ int main(int argc, char * argv[])
 
         if (!(i % 100000))
         {
-            assert(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin() __STXXL_FORCE_SEQUENTIAL));
+            assert(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
             STXXL_MSG("Operations done: " << i << " size: " << STDDeque.size());
         }
     }

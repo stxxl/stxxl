@@ -39,15 +39,15 @@ void print_msg(const char * label, const std::string & msg, unsigned flags);
 __STXXL_END_NAMESPACE
 
 
-#define __STXXL_ENFORCE_SEMICOLON stxxl::STXXL_UNUSED("expecting the next token to be a ';'")
+#define _STXXL_ENFORCE_SEMICOLON stxxl::STXXL_UNUSED("expecting the next token to be a ';'")
 
 #define _STXXL_PRINT(label, message, flags) \
     { std::ostringstream str_; \
       str_ << message; \
       stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
-    } __STXXL_ENFORCE_SEMICOLON
+    } _STXXL_ENFORCE_SEMICOLON
 
-#define _STXXL_NOT_VERBOSE { } __STXXL_ENFORCE_SEMICOLON
+#define _STXXL_NOT_VERBOSE { } _STXXL_ENFORCE_SEMICOLON
 
 #define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
 
@@ -120,7 +120,7 @@ __STXXL_END_NAMESPACE
         str_ << "Error in " << errmsg << ", error code " << dw << ": " << ((char *)lpMsgBuf); \
         LocalFree(lpMsgBuf); \
         throw exception_type(str_.str()); \
-    } __STXXL_ENFORCE_SEMICOLON
+    } _STXXL_ENFORCE_SEMICOLON
 
 #endif
 

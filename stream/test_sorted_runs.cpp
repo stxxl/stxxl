@@ -84,7 +84,7 @@ int main()
     SortedRunsType Runs = SortedRuns.result();          // get sorted_runs data structure
     assert(check_sorted_runs(Runs, Cmp()));
     // merge the runs
-    stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 1024 * 512 / 10 * stxxl::sort_memory_usage_factor());
+    stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 1024 * 512 / 10);
     stxxl::vector<value_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY> array;
     STXXL_MSG(size << " " << Runs.elements);
     STXXL_MSG("CRC: " << oldcrc);

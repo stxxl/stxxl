@@ -129,10 +129,10 @@ public:
             assert(prefetch_seq[i] < int_type(seq_length));
             assert(prefetch_seq[i] >= 0);
             read_bids[i] = *(consume_seq_begin + prefetch_seq[i]);
-            STXXL_VERBOSE1("block_prefetcher: reading block " << i
-                           << " prefetch_seq[" << i << "]=" << prefetch_seq[i]
-                           << " @ " << &read_buffers[i]
-                           << " @ " << read_bids[i]);
+            STXXL_VERBOSE1("block_prefetcher: reading block " << i <<
+                           " prefetch_seq[" << i << "]=" << prefetch_seq[i] <<
+                           " @ " << &read_buffers[i] <<
+                           " @ " << read_bids[i]);
             read_reqs[i] = read_buffers[i].read(
                 read_bids[i],
                 set_switch_handler(*(completed + prefetch_seq[i])));
@@ -191,6 +191,12 @@ public:
     bool empty() const
     {
         return nextconsume >= seq_length;
+    }
+
+    // index of the next element in the consume sequence
+    unsigned_type pos() const
+    {
+        return nextconsume;
     }
 
     //! \brief Frees used memory

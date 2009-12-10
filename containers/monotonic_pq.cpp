@@ -314,7 +314,6 @@ int main(int argc, char * argv[])
                            << std::setprecision(3) << Timer.seconds() << " s"
                            << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
 
-
         //monotone priority queue
         r = least.key + rand() % modulo;
         sum_input += r;
@@ -330,12 +329,12 @@ int main(int argc, char * argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
-            STXXL_MSG ( "Wrong result at  " << i << "  " << side_pq_least.key << " != " << least.key );
+            STXXL_MSG("Wrong result at  " << i << "  " << side_pq_least.key << " != " << least.key);
 #endif
 
         if (cmp(last_least, least))
         {
-            STXXL_MSG ( "Wrong order at  " << i << "  " << last_least.key << " > " << least.key );
+            STXXL_MSG("Wrong order at  " << i << "  " << last_least.key << " > " << least.key);
         }
         else
             last_least = least;
@@ -374,7 +373,7 @@ int main(int argc, char * argv[])
 #endif
         if (cmp(last_least, least))
         {
-            STXXL_MSG ( "Wrong result at " << i << "  " << last_least.key << " > " << least.key );
+            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
         }
         else
             last_least = least;
@@ -417,9 +416,9 @@ int main(int argc, char * argv[])
     if (sum_input != sum_output)
         STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output));
 
-        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
-        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
-        std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - sd_middle;
+    STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - sd_middle;
     std::cout << *stxxl::stats::get_instance();
 
     assert(sum_input == sum_output);

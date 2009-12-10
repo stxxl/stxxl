@@ -390,7 +390,7 @@ namespace sort_local
         }
 
         std::stable_sort(consume_seq.begin(), consume_seq.end(),
-                         trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp));
+                         trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
         int_type disks_number = config::get_instance()->disks_number();
 
@@ -495,9 +495,9 @@ namespace sort_local
 
                     STXXL_VERBOSE1("finished loop");
 
-                    ptrdiff_t output_size = (std::min)(less_equal_than_min_last, rest);  // at most rest elements
+                    ptrdiff_t output_size = STXXL_MIN(less_equal_than_min_last, rest);   // at most rest elements
 
-                    STXXL_VERBOSE1("before merge" << output_size);
+                    STXXL_VERBOSE1("before merge " << output_size);
 
                     stxxl::parallel::multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size);
                     // sequence iterators are progressed appropriately
@@ -525,6 +525,7 @@ namespace sort_local
                                 seqs.erase(seqs.begin() + i);                            // remove this sequence
                                 buffers.erase(buffers.begin() + i);
                                 STXXL_VERBOSE1("seq removed " << i);
+                                --i;                                                     // don't skip the next sequence
                             }
                         }
                     }
@@ -629,9 +630,7 @@ namespace sort_local
         unsigned_type nruns = full_runs + partial_runs;
         unsigned_type i;
 
-        config * cfg = config::get_instance();
         block_manager * mng = block_manager::get_instance();
-        const unsigned_type ndisks = cfg->disks_number();
 
         //STXXL_VERBOSE ("n=" << _n << " nruns=" << nruns << "=" << full_runs << "+" << partial_runs);
 
@@ -649,8 +648,7 @@ namespace sort_local
 
         for (i = 0; i < nruns; ++i)
         {
-            // FIXME: why has an alloc_strategy to take two arguments disk_index.begin(), disk_index.end() ???
-            mng->new_blocks(alloc_strategy(0, ndisks),
+            mng->new_blocks(alloc_strategy(),
                             trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i]->begin()),
                             trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i]->end()));
         }
@@ -719,7 +717,7 @@ namespace sort_local
             }
             else
             {
-                mng->new_blocks(interleaved_alloc_strategy(new_nruns, 0, ndisks),
+                mng->new_blocks(interleaved_alloc_strategy(new_nruns, alloc_strategy()),
                                 RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>(new_runs, 0, new_nruns, blocks_in_new_run),
                                 RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>(new_runs, _n, new_nruns, blocks_in_new_run));
             }

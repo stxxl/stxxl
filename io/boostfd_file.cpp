@@ -39,62 +39,62 @@ void boostfd_file::serve(const request * req) throw (io_error)
     }
     catch (const std::exception & ex)
     {
+        STXXL_THROW2(io_error,
+                     "Error doing seek() in boostfd_request::serve()" <<
+                     " offset=" << offset <<
+                     " this=" << this <<
+                     " buffer=" << buffer <<
+                     " bytes=" << bytes <<
+                     " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                     " : " << ex.what());
+    }
+
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+
+    if (type == request::READ)
+    {
+        STXXL_DEBUGMON_DO(io_started(buffer));
+
+        try
+        {
+            file_des.read((char *)buffer, bytes);
+        }
+        catch (const std::exception & ex)
+        {
             STXXL_THROW2(io_error,
-                         "Error doing seek() in boostfd_request::serve()" <<
+                         "Error doing read() in boostfd_request::serve()" <<
                          " offset=" << offset <<
                          " this=" << this <<
                          " buffer=" << buffer <<
                          " bytes=" << bytes <<
                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                          " : " << ex.what());
+        }
+
+        STXXL_DEBUGMON_DO(io_finished(buffer));
     }
+    else
+    {
+        STXXL_DEBUGMON_DO(io_started(buffer));
 
-        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
-
-        if (type == request::READ)
+        try
         {
-            STXXL_DEBUGMON_DO(io_started(buffer));
-
-            try
-            {
-                file_des.read((char *)buffer, bytes);
-            }
-            catch (const std::exception & ex)
-            {
-                STXXL_THROW2(io_error,
-                             "Error doing read() in boostfd_request::serve()" <<
-                             " offset=" << offset <<
-                             " this=" << this <<
-                             " buffer=" << buffer <<
-                             " bytes=" << bytes <<
-                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                             " : " << ex.what());
-            }
-
-            STXXL_DEBUGMON_DO(io_finished(buffer));
+            file_des.write((char *)buffer, bytes);
         }
-        else
+        catch (const std::exception & ex)
         {
-            STXXL_DEBUGMON_DO(io_started(buffer));
-
-            try
-            {
-                file_des.write((char *)buffer, bytes);
-            }
-            catch (const std::exception & ex)
-            {
-                STXXL_THROW2(io_error,
-                             "Error doing write() in boostfd_request::serve()" <<
-                             " offset=" << offset <<
-                             " this=" << this <<
-                             " buffer=" << buffer <<
-                             " bytes=" << bytes <<
-                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                             " : " << ex.what());
-            }
-
-            STXXL_DEBUGMON_DO(io_finished(buffer));
+            STXXL_THROW2(io_error,
+                         "Error doing write() in boostfd_request::serve()" <<
+                         " offset=" << offset <<
+                         " this=" << this <<
+                         " buffer=" << buffer <<
+                         " bytes=" << bytes <<
+                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                         " : " << ex.what());
         }
+
+        STXXL_DEBUGMON_DO(io_finished(buffer));
+    }
 }
 
 const char * boostfd_file::io_type() const

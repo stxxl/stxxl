@@ -389,7 +389,7 @@ public:
         p_vector->block_externally_updated(offset);
     }
 
-    __STXXL_DEPRECATED(void touch())
+    _STXXL_DEPRECATED(void touch())
     {
         block_externally_updated();
     }
@@ -608,7 +608,7 @@ public:
         p_vector->block_externally_updated(offset);
     }
 
-    __STXXL_DEPRECATED(void touch())
+    _STXXL_DEPRECATED(void touch())
     {
         block_externally_updated();
     }
@@ -771,9 +771,7 @@ public:
     typedef typed_block<BlkSize_, Tp_> block_type;
 
 private:
-    typedef offset_allocator<alloc_strategy_type> offset_alloc_strategy_type;
-
-    offset_alloc_strategy_type alloc_strategy;
+    alloc_strategy_type alloc_strategy;
     size_type _size;
     bids_container_type _bids;
     mutable pager_type pager;
@@ -835,8 +833,7 @@ public:
         for (i = 0; i < n_pages; ++i)
             _free_slots.push(i);
 
-        alloc_strategy.set_offset(0);
-        bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end());
+        bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
     }
 
     void swap(vector & obj)
@@ -877,8 +874,7 @@ public:
         _bids.resize(new_bids_size);
         if (_from == NULL)
         {
-            alloc_strategy.set_offset(old_bids_size);
-            bm->new_blocks(alloc_strategy, _bids.begin() + old_bids_size, _bids.end());
+            bm->new_blocks(alloc_strategy, _bids.begin() + old_bids_size, _bids.end(), old_bids_size);
         }
         else
         {
@@ -1073,8 +1069,7 @@ public:
         for (i = 0; i < n_pages; ++i)
             _free_slots.push(i);
 
-        alloc_strategy.set_offset(0);
-        bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end());
+        bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
 
         const_iterator inbegin = obj.begin();
         const_iterator inend = obj.end();
@@ -1391,12 +1386,12 @@ private:
         page_externally_updated(offset.get_block2());
     }
 
-    __STXXL_DEPRECATED(void touch(size_type offset) const)
+    _STXXL_DEPRECATED(void touch(size_type offset) const)
     {
         page_externally_updated(offset / (block_type::size * page_size));
     }
 
-    __STXXL_DEPRECATED(void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const)
+    _STXXL_DEPRECATED(void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const)
     {
         page_externally_updated(offset.get_block2());
     }

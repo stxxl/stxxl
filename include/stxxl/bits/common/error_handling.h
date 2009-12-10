@@ -23,7 +23,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-#define __STXXL_STRING(x) # x
+#define _STXXL_STRING(x) # x
 
 #ifdef BOOST_MSVC
  #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
@@ -84,7 +84,7 @@ inline bool helper_check_eq_0(INT res, const char * func_name, const char * expr
 }
 
 #define check_pthread_call(expr) \
-    stxxl::helper_check_eq_0<stxxl::resource_error>(expr, STXXL_PRETTY_FUNCTION_NAME, __STXXL_STRING(expr), true)
+    stxxl::helper_check_eq_0<stxxl::resource_error>(expr, STXXL_PRETTY_FUNCTION_NAME, _STXXL_STRING(expr), true)
 
 template <typename E, typename INT>
 inline bool helper_check_ge_0(INT res, const char * func_name)

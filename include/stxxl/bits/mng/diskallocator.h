@@ -155,9 +155,9 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
     if (free_bytes < requested_size)
     {
         if (!autogrow) {
-        STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
-                     " bytes requested, " << free_bytes <<
-                     " bytes free. Trying to extend the external memory space...");
+            STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
+                         " bytes requested, " << free_bytes <<
+                         " bytes free. Trying to extend the external memory space...");
         }
 
         begin->offset = disk_bytes; // allocate at the end
@@ -174,7 +174,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
 
     sortseq::iterator space =
         std::find_if(free_space.begin(), free_space.end(),
-                     bind2nd(FirstFit(), requested_size) __STXXL_FORCE_SEQUENTIAL);
+                     bind2nd(FirstFit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
 
     if (space != free_space.end())
     {

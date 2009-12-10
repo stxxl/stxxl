@@ -5,6 +5,9 @@ all: lib
 
 LIB_OBJECTS	+= $(LIB_OBJECTS_NON_MSVC)
 
+# this is set to empty to prevent triggering recompilation while building in libs/
+EXTRA_DEPS_COMPILE	?=
+
 include $(TOPDIR)/Makefile.subdir.gnu
 
 lib: lib$(LIBNAME).$(LIBEXT)

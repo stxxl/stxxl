@@ -85,7 +85,7 @@ int main(int argc, char * argv[])
          number < nclients && calls_made < ncalls;
          ++number)
     {
-        unsigned serv = (std::min)((long long int)rnd(av_calls * 2), (ncalls - calls_made));
+        unsigned serv = std::min<long long int>(rnd(av_calls * 2), (ncalls - calls_made));
         LogEntry e;
         e.from = number;
 

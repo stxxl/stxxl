@@ -69,8 +69,6 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
-    typedef offset_allocator<alloc_strategy_type> offset_alloc_strategy_type;
-
     size_type size_;
     unsigned_type cache_offset;
     value_type * current_element;
@@ -78,7 +76,7 @@ private:
     typename simple_vector<block_type>::iterator front_page;
     typename simple_vector<block_type>::iterator back_page;
     std::vector<bid_type> bids;
-    offset_alloc_strategy_type alloc_strategy;
+    alloc_strategy_type alloc_strategy;
 
 public:
     normal_stack() :
@@ -168,8 +166,7 @@ public:
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-            alloc_strategy.set_offset(cur_bid - bids.begin());
-            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end());
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
 
             simple_vector<request_ptr> requests(blocks_per_page);
 
@@ -273,8 +270,6 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
-    typedef offset_allocator<alloc_strategy_type> offset_alloc_strategy_type;
-
     size_type size_;
     unsigned_type cache_offset;
     value_type * current_element;
@@ -283,7 +278,7 @@ private:
     typename simple_vector<block_type>::iterator overlap_buffers;
     simple_vector<request_ptr> requests;
     std::vector<bid_type> bids;
-    offset_alloc_strategy_type alloc_strategy;
+    alloc_strategy_type alloc_strategy;
 
 public:
     grow_shrink_stack() :
@@ -383,8 +378,7 @@ public:
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-            alloc_strategy.set_offset(cur_bid - bids.begin());
-            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end());
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
 
             for (int i = 0; i < blocks_per_page; ++i, ++cur_bid)
             {
@@ -471,14 +465,12 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
-    typedef offset_allocator<alloc_strategy_type> offset_alloc_strategy_type;
-
     size_type size_;
     unsigned_type cache_offset;
     block_type * cache;
     value_type current;
     std::vector<bid_type> bids;
-    offset_alloc_strategy_type alloc_strategy;
+    alloc_strategy_type alloc_strategy;
     unsigned_type pref_aggr;
     read_write_pool<block_type> pool;
 
@@ -565,8 +557,7 @@ public:
 
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
-            alloc_strategy.set_offset(cur_bid - bids.begin());
-            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end());
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
             pool.write(cache, bids.back());
             cache = pool.steal();
             const int_type bids_size = bids.size();

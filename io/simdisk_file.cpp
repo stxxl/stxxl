@@ -165,42 +165,42 @@ void sim_disk_file::serve(const request * req) throw (io_error)
     request::request_type type = req->get_type();
     double op_start = timestamp();
 
-        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-        void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
-        if (mem == MAP_FAILED)
+    void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
+    if (mem == MAP_FAILED)
+    {
+        STXXL_THROW2(io_error,
+                     " Mapping failed." <<
+                     " Page size: " << sysconf(_SC_PAGESIZE) <<
+                     " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
+    }
+    else if (mem == 0)
+    {
+        stxxl_function_error(io_error);
+    }
+    else
+    {
+        if (type == request::READ)
         {
-            STXXL_THROW2(io_error,
-                         " Mapping failed." <<
-                         " Page size: " << sysconf(_SC_PAGESIZE) <<
-                         " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
+            memcpy(buffer, mem, bytes);
+        } else {
+            memcpy(mem, buffer, bytes);
         }
-        else if (mem == 0)
-        {
-            stxxl_function_error(io_error);
-        }
-        else
-        {
-            if (type == request::READ)
-            {
-                memcpy(buffer, mem, bytes);
-            } else {
-                memcpy(mem, buffer, bytes);
-            }
-            stxxl_check_ge_0(munmap(mem, bytes), io_error);
-        }
+        stxxl_check_ge_0(munmap(mem, bytes), io_error);
+    }
 
-        double delay = get_delay(offset, bytes);
+    double delay = get_delay(offset, bytes);
 
-        delay = delay - timestamp() + op_start;
+    delay = delay - timestamp() + op_start;
 
-        assert(delay > 0.0);
+    assert(delay > 0.0);
 
-        int seconds_to_wait = static_cast<int>(floor(delay));
-        if (seconds_to_wait)
-            sleep(seconds_to_wait);
+    int seconds_to_wait = static_cast<int>(floor(delay));
+    if (seconds_to_wait)
+        sleep(seconds_to_wait);
 
-        usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
+    usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
 }
 
 const char * sim_disk_file::io_type() const

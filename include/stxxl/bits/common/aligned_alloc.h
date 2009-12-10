@@ -99,9 +99,9 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
 
     *(((char **)result) - 1) = buffer;
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">(), allocated at " << (void *)buffer << " returning " << (void *)result);
-    STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_alloc<" << ALIGNMENT
-            << ">(size = " << size << ", meta info size = " << meta_info_size
-            << ") => buffer = " << (void *)buffer << ", ptr = " << (void *)result);
+    STXXL_VERBOSE_ALIGNED_ALLOC("stxxl::aligned_alloc<" << ALIGNMENT <<
+                                ">(size = " << size << ", meta info size = " << meta_info_size <<
+                                ") => buffer = " << (void *)buffer << ", ptr = " << (void *)result);
 
     return result;
 }

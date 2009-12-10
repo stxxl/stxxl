@@ -69,6 +69,7 @@ protected:
     void new_blocks_int(
         const unsigned_type nblocks,
         const DiskAssignFunctor & functor,
+        unsigned_type offset,
         BIDIteratorClass out);
 
 public:
@@ -77,46 +78,57 @@ public:
     //! Allocates new blocks according to the strategy
     //! given by \b functor and stores block identifiers
     //! to the range [ \b bidbegin, \b bidend)
+    //! Allocation will be lined up with previous partial allocations
+    //! of \b offset blocks.
     //! \param functor object of model of \b allocation_strategy concept
     //! \param bidbegin bidirectional BID iterator object
     //! \param bidend bidirectional BID iterator object
+    //! \param offset advance for \b functor to line up partial allocations
     template <class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks(
         const DiskAssignFunctor & functor,
         BIDIteratorClass bidbegin,
-        BIDIteratorClass bidend)
+        BIDIteratorClass bidend,
+        unsigned_type offset = 0)
     {
         typedef typename std::iterator_traits<BIDIteratorClass>::value_type bid_type;
-        new_blocks_int<bid_type>(std::distance(bidbegin, bidend), functor, bidbegin);
+        new_blocks_int<bid_type>(std::distance(bidbegin, bidend), functor, offset, bidbegin);
     }
 
     //! Allocates new blocks according to the strategy
     //! given by \b functor and stores block identifiers
     //! to the output iterator \b out
+    //! Allocation will be lined up with previous partial allocations
+    //! of \b offset blocks.
     //! \param nblocks the number of blocks to allocate
     //! \param functor object of model of \b allocation_strategy concept
     //! \param out iterator object of OutputIterator concept
+    //! \param offset advance for \b functor to line up partial allocations
     //!
     //! The \c BlockType template parameter defines the type of block to allocate
     template <class BlockType, class DiskAssignFunctor, class BIDIteratorClass>
     void new_blocks(
         const unsigned_type nblocks,
         const DiskAssignFunctor & functor,
-        BIDIteratorClass out)
+        BIDIteratorClass out,
+        unsigned_type offset = 0)
     {
         typedef typename BlockType::bid_type bid_type;
-        new_blocks_int<bid_type>(nblocks, functor, out);
+        new_blocks_int<bid_type>(nblocks, functor, offset, out);
     }
 
     //! Allocates a new block according to the strategy
     //! given by \b functor and stores the block identifier
     //! to bid.
+    //! Allocation will be lined up with previous partial allocations
+    //! of \b offset blocks.
     //! \param functor object of model of \b allocation_strategy concept
     //! \param bid BID to store the block identifier
+    //! \param offset advance for \b functor to line up partial allocations
     template <typename DiskAssignFunctor, unsigned BLK_SIZE>
-    void new_block(const DiskAssignFunctor & functor, BID<BLK_SIZE> & bid)
+    void new_block(const DiskAssignFunctor & functor, BID<BLK_SIZE> & bid, unsigned_type offset = 0)
     {
-        new_blocks_int<BID<BLK_SIZE> >(1, functor, &bid);
+        new_blocks_int<BID<BLK_SIZE> >(1, functor, offset, &bid);
     }
 
     //! \brief Deallocates blocks
@@ -140,6 +152,7 @@ template <class BIDType, class DiskAssignFunctor, class OutputIterator>
 void block_manager::new_blocks_int(
     const unsigned_type nblocks,
     const DiskAssignFunctor & functor,
+    unsigned_type offset,
     OutputIterator out)
 {
     typedef BIDType bid_type;
@@ -154,7 +167,7 @@ void block_manager::new_blocks_int(
     unsigned_type i;
     for (i = 0; i < nblocks; ++i)
     {
-        const int disk = functor(i);
+        const int disk = functor(offset + i);
         disk_ptrs[i] = disk_files[disk];
         bl[disk]++;
     }

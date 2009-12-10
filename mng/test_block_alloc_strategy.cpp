@@ -23,9 +23,22 @@ void test_strategy()
     strategy s2(1, 3);
     stxxl::offset_allocator<strategy> o(1, s0);
     typedef typename stxxl::interleaved_alloc_traits<strategy>::strategy interleaved;
-    interleaved itl(23, 1, 3);
+    interleaved itl(23, strategy(1, 3));
     for (int i = 0; i < 16; ++i)
         STXXL_MSG(s0(i) << " " << s2(i) << " " << o(i) << " " << itl(i));
+
+    int firstdisk = 0;
+    int ndisks = 4;
+    int nruns = 10;
+    int runsize = 15;
+    std::cout << "firstdisk=" << firstdisk << "  ndisks=" << ndisks << "  nruns=" << nruns << "  runsize=" << runsize;
+    interleaved itl2(nruns, strategy(firstdisk, firstdisk + ndisks));
+    for (int i = 0; i < nruns * runsize; ++i) {
+        if (i % nruns == 0)
+            std::cout << std::endl;
+        std::cout << itl2(i) << " ";
+    }
+    std::cout << std::endl;
 }
 
 int main()

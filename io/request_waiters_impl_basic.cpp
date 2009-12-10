@@ -48,7 +48,7 @@ void request_waiters_impl_basic::notify_waiters()
     std::for_each(waiters.begin(),
                   waiters.end(),
                   std::mem_fun(&onoff_switch::on)
-                  __STXXL_FORCE_SEQUENTIAL);
+                  _STXXL_FORCE_SEQUENTIAL);
 }
 
 /*

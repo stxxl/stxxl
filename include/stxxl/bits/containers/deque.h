@@ -446,7 +446,7 @@ public:
     { }
 
     deque(size_type n)
-        : Vector((std::max)((size_type)(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(T), 2 * n)),
+        : Vector(STXXL_MAX<size_type>(STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(T), 2 * n)),
           begin_o(0), end_o(n), size_(n)
     { }
 
