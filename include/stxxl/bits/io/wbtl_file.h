@@ -23,7 +23,7 @@
 
 #include <map>
 
-#include <stxxl/bits/io/file_request_basic.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -33,7 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \brief Implementation of file based on buffered writes and
 //!        block remapping via a translation layer.
-class wbtl_file : public file_request_basic
+class wbtl_file : public disk_queued_file
 {
     typedef std::pair<offset_type, offset_type> place;
     typedef std::map<offset_type, offset_type> sortseq;
