@@ -15,7 +15,7 @@
 #ifndef STXXL_UFSFILEBASE_HEADER
 #define STXXL_UFSFILEBASE_HEADER
 
-#include <stxxl/bits/io/disk_queued_file.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
 
 

@@ -33,6 +33,7 @@
 #include <sys/mman.h>
 
 #include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
