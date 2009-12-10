@@ -115,6 +115,10 @@ public:
         TRUNC = 32                          //!< once file is opened its length becomes zero
     };
 
+    static const int DEFAULT_QUEUE = -1;
+    static const int NO_QUEUE = -2;
+    static const int NO_ALLOCATOR = -1;
+
     //! \brief Schedules asynchronous read request to the file
     //! \param buffer pointer to memory buffer to read into
     //! \param pos starting file position to read
@@ -160,17 +164,21 @@ public:
     //! \brief Returns size of the file
     //! \return file size in bytes
     virtual offset_type size() = 0;
-    //! \brief deprecated, use \c stxxl::file::get_id() instead
-    _STXXL_DEPRECATED(int get_disk_number() const)
-    {
-        return get_id();
-    }
-    //! \brief Returns file's identifier
-    //! \remark might be used as disk's id in case disk to file mapping
-    //! \return integer file identifier, passed as constructor parameter
-    virtual int get_id() const = 0;
+    //! \brief Returns the identifier of the file's queue
+    //! \remark Files allocated on the same physical device usually share the same queue
+    //! \return integer identifier
+    virtual int get_queue_id() const = 0;
+    //! \brief Returns the file's allocator
+    //! \remark Files allocated on the same physical device usually share the same queue
+    //! \return integer identifier
+    virtual int get_allocator_id() const = 0;
 
-    //! \brief Locks file for reading and writing (aquires a lock in the file system)
+    virtual int get_physical_device_id() const
+    {
+    	return get_queue_id();
+    }
+
+    //! \brief Locks file for reading and writing (acquires a lock in the file system)
     virtual void lock() = 0;
 
     //! \brief Some specialized file types may need to know freed regions

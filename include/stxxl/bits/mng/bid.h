@@ -21,7 +21,7 @@
 #ifndef STXXL_VERBOSE_BLOCK_LIFE_CYCLE
 #define STXXL_VERBOSE_BLOCK_LIFE_CYCLE STXXL_VERBOSE2
 #endif
-#define FMT_BID(_bid_) "[" << (_bid_).storage->get_id() << "]0x" << std::hex << std::setfill('0') << std::setw(8) << (_bid_).offset << "/0x" << std::setw(8) << (_bid_).size
+#define FMT_BID(_bid_) "[" << (_bid_).storage->get_allocator_id() << "]0x" << std::hex << std::setfill('0') << std::setw(8) << (_bid_).offset << "/0x" << std::setw(8) << (_bid_).size
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -64,7 +64,7 @@ struct BID
 
     bool is_managed() const
     {
-        return storage->get_id() != -1;
+        return storage->get_allocator_id() != file::NO_ALLOCATOR;
     }
 };
 
@@ -116,7 +116,7 @@ std::ostream & operator << (std::ostream & s, const BID<blk_sz> & bid)
 
     s << "[" << bid.storage << "|";
     if (bid.storage)
-        s << bid.storage->get_id();
+        s << bid.storage->get_allocator_id();
     else
         s << "?";
     s << "]0x" << std::hex << std::setfill('0') << std::setw(8) << bid.offset << "/0x" << std::setw(8) << bid.size << std::dec;

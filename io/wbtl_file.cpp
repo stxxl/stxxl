@@ -35,8 +35,8 @@ wbtl_file::wbtl_file(
     file * backend_file,
     size_type write_buffer_size,
     int write_buffers,
-    int disk) :
-    disk_queued_file(disk), storage(backend_file), sz(0), write_block_size(write_buffer_size),
+    int queue_id, int allocator_id) :
+    disk_queued_file(queue_id, allocator_id), storage(backend_file), sz(0), write_block_size(write_buffer_size),
     free_bytes(0), curbuf(1), curpos(write_block_size)
 {
     assert(write_buffers == 2); // currently hardcoded

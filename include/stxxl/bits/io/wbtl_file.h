@@ -83,7 +83,8 @@ public:
         file * backend_file,
         size_type write_buffer_size,
         int write_buffers = 2,
-        int disk = -1);
+        int queue_id = DEFAULT_QUEUE,
+        int allocator_id = NO_ALLOCATOR);
     ~wbtl_file();
     offset_type size();
     void set_size(offset_type newsize);

@@ -28,7 +28,7 @@ request_ptr disk_queued_file::aread(
                                              buffer, pos, bytes,
                                              request::READ);
 
-    disk_queues::get_instance()->add_request(req, get_id());
+    disk_queues::get_instance()->add_request(req, get_queue_id());
 
     return req;
 }
@@ -42,7 +42,7 @@ request_ptr disk_queued_file::awrite(
     request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
                                              request::WRITE);
 
-    disk_queues::get_instance()->add_request(req, get_id());
+    disk_queues::get_instance()->add_request(req, get_queue_id());
 
     return req;
 }

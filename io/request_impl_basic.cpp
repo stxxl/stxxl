@@ -47,7 +47,7 @@ void request_impl_basic::serve()
         "[" << STXXL_THREAD_ID << "] " <<
         "request_impl_basic[" << this << "]::serve(): " <<
         buffer << " @ [" <<
-        file_ << "|" << file_->get_id() << "]0x" <<
+        file_ << "|" << file_->get_allocator_id() << "]0x" <<
         std::hex << std::setfill('0') << std::setw(8) <<
         offset << "/0x" << bytes <<
         ((type == request::READ) ? " READ" : " WRITE"));
