@@ -48,7 +48,7 @@ protected:
     offset_type _size();
 
 public:
-    boostfd_file(const std::string & filename, int mode, int disk = -1);
+    boostfd_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR);
     ~boostfd_file();
     offset_type size();
     void set_size(offset_type newsize);
