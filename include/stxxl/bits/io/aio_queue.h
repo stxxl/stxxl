@@ -20,6 +20,7 @@
 #ifndef BOOST_MSVC
 // libaio does not exist on Windows
 
+#include <libaio.h>
 #include <list>
 
 #include <stxxl/bits/io/request_queue_impl_worker.h>
@@ -34,7 +35,11 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Queue for aio_file(s)
 class aio_queue : public request_queue_impl_worker, public disk_queue, public singleton<aio_queue>
 {
+	friend class aio_request;
+
 private:
+	io_context_t context;
+	io_event* events;
     typedef std::list<request_ptr> queue_type;
 
     mutex waiting_mtx, posted_mtx;
@@ -49,6 +54,7 @@ private:
     static void* post_async(void* arg);	//thread start callback
     static void* wait_async(void* arg);	//thread start callback
     void post_requests();
+    void handle_events(io_event* events, int num_events, bool canceled);
     void wait_requests();
     void suspend();
 
@@ -60,6 +66,11 @@ public:
     bool cancel_request(request_ptr& req);
     void complete_request(request_ptr& req);
     ~aio_queue();
+
+    io_context_t get_io_context()
+    {
+    	return context;
+    }
 };
 
 //! \}

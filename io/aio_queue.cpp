@@ -36,6 +36,9 @@ aio_queue::aio_queue(int max_sim_requests) :
 	sem(0), posted_free_sem(max_sim_requests), posted_sem(0),
 	post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
 {
+	context = 0;
+	io_setup(max_sim_requests, &context);
+    events = new io_event[max_sim_requests];
     start_thread(post_async, static_cast<void*>(this), post_thread, post_thread_state);
     start_thread(wait_async, static_cast<void*>(this), wait_thread, wait_thread_state);
 }
@@ -44,6 +47,8 @@ aio_queue::~aio_queue()
 {
     stop_thread(post_thread, post_thread_state, sem);
     stop_thread(wait_thread, wait_thread_state, posted_sem);
+    io_destroy(context);
+    delete[] events;
 }
 
 void aio_queue::add_request(request_ptr& req)
@@ -126,56 +131,35 @@ void aio_queue::post_requests()
     }
 }
 
+void aio_queue::handle_events(io_event* events, int num_events, bool canceled)
+{
+	for (int e = 0; e < num_events; ++e)
+	{
+		static_cast<aio_request*>(events[e].data)->completed(canceled);
+		if (max_sim_requests != 0)
+			posted_free_sem++;
+		posted_sem--;
+	}
+}
+
 void aio_queue::wait_requests()
 {
     request_ptr req;
 
     for ( ; ; )
     {
-        posted_sem--;
+        int num_posted = posted_sem--;
 
-		scoped_mutex_lock lock(posted_mtx);
-		//grab requests
-		aiocb64** prs;
-		int pc;
-		prs = new aiocb64*[posted_requests.size()];
-
-		pc = 0;
-		for (queue_type::const_iterator pr = posted_requests.begin(); pr != posted_requests.end(); ++pr)
-			prs[pc++] = (static_cast<aio_request*>((*pr).get()))->get_cb();
-
-		lock.unlock();
+        // terminate if termination has been requested
+        if (wait_thread_state() == TERMINATE && num_posted == 0)
+        	break;
 
 		//wait for at least one of them to finish
-		aio_suspend64(prs, pc, NULL);
-		delete[] prs;
-
-		lock.lock();
+		int num_events = io_getevents(context, 1, max_sim_requests, events, NULL);
 
 		posted_sem++;	//compensate for the one eaten too early above
 
-		//complete finished requests
-		for (queue_type::iterator pr = posted_requests.begin(); pr != posted_requests.end(); )
-			if (aio_error64((static_cast<aio_request*>((*pr).get()))->get_cb()) != EINPROGRESS)
-			{
-				(*pr)->completed();
-				queue_type::iterator current = pr;
-				++pr;
-				posted_requests.erase(current);
-				if (max_sim_requests != 0)
-					posted_free_sem++;
-				posted_sem--;
-			}
-
-		lock.unlock();
-
-        // terminate if termination has been requested
-        if (wait_thread_state() == TERMINATE) {
-            if ((posted_sem--) == 0)
-                break;
-            else
-                posted_sem++;
-        }
+		handle_events(events, num_events, false);
     }
 }
 

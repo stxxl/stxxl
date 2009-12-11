@@ -28,9 +28,9 @@ const char* aio_request::io_type() const
     return file_->io_type();
 }
 
-void aio_request::completed()
+void aio_request::completed(bool canceled)
 {
-	if (aio_error64(&cb) != ECANCELED)
+	if (!canceled)
 	{
 		if (type == READ)
 			stats::get_instance()->read_finished();
@@ -50,37 +50,36 @@ void aio_request::completed()
 void aio_request::fill_control_block()
 {
 	aio_file* af = dynamic_cast<aio_file*>(file_);
+
+	memset(&cb, 0, sizeof(cb));
+	cb.data = this;
 	cb.aio_fildes = af->file_des;
-	cb.aio_offset = offset;
-	cb.aio_buf = buffer;
-	cb.aio_nbytes = bytes;
+	cb.aio_lio_opcode = (type == READ) ? IO_CMD_PREAD : IO_CMD_PWRITE;
 	cb.aio_reqprio = 0;
-	cb.aio_sigevent.sigev_notify = SIGEV_NONE;
+	cb.u.c.buf = buffer;
+	cb.u.c.nbytes = bytes;
+	cb.u.c.offset = offset;
 }
 
 bool aio_request::post()
 {
 	fill_control_block();
-	int success;
-	if (type == READ)
-	{
-		success = aio_read64(&cb);
-		if (success != EAGAIN)
-			stats::get_instance()->read_started(bytes);
-	}
-	else
-	{
-		success = aio_write64(&cb);
-		if (success != EAGAIN)
-			stats::get_instance()->write_started(bytes);
-	}
+	iocb* cb_pointer = &cb;
+	int success = io_submit(aio_queue::get_instance()->get_io_context(), 1, &cb_pointer);
+	if (success == 1)
+		stats::get_instance()->read_started(bytes);
 
-	return success != EAGAIN;
+	return success == 1;
 }
 
 bool aio_request::cancel()
 {
-    return aio_cancel64(cb.aio_fildes, &cb) == AIO_CANCELED;
+	io_event event;
+    int result = io_cancel(aio_queue::get_instance()->get_io_context(), &cb, &event);
+    if (result == 0)
+    	aio_queue::get_instance()->handle_events(&event, 1, true);
+    std::cout << result << " " << EAGAIN << " " << ENOSYS << " " << EFAULT << " " << EINVAL << std::endl;
+    return result == 0;
 }
 
 __STXXL_END_NAMESPACE

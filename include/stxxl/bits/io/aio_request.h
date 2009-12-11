@@ -20,7 +20,7 @@
 #ifndef BOOST_MSVC
 // libaio does not exist on Windows
 
-#include <aio.h>
+#include <libaio.h>
 #include <stxxl/bits/io/aio_file.h>
 #include <stxxl/bits/io/request_impl_basic.h>
 
@@ -36,7 +36,7 @@ class aio_request : public request_impl_basic
     template <class base_file_type>
     friend class fileperblock_file;
 
-    aiocb64 cb;	//control block
+    iocb cb;	//control block
 
     void fill_control_block();
 
@@ -55,9 +55,10 @@ public:
 
     bool post();
     bool cancel();
-    void completed();
+    void completed(bool canceled);
+    void completed() { completed(false); }
 
-    aiocb64* get_cb() { return &cb; }	//must be initialized by post
+    iocb* get_cb() { return &cb; }	//must be initialized by post
 
 public:
     const char * io_type() const;
