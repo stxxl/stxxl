@@ -48,7 +48,7 @@ using stxxl::timestamp;
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " span num_accesses [r|w]" << std::endl;
+    std::cout << "Usage: " << argv0 << " span num_accesses [i][r][w]" << std::endl;
     std::cout << "    'span' is given in GiB" << std::endl;
     exit(-1);
 }
@@ -61,7 +61,7 @@ struct print_number
 
 	void operator()(stxxl::request_ptr)
 	{
-		std::cout << n << " " << std::flush;
+//		std::cout << n << " " << std::flush;
 	}
 };
 
@@ -75,13 +75,16 @@ int main(int argc, char * argv[])
     stxxl::int64 span = stxxl::int64(MB) * stxxl::int64(atoi(argv[1]));
     stxxl::int64 num_blocks = stxxl::int64(atoi(argv[2]));
 
-    bool do_read = true, do_write = true;
+    bool do_init = false, do_read = false, do_write = false;
 
-    if (argc == 4 && (strcmp("r", argv[3]) == 0 || strcmp("R", argv[3]) == 0))
-        do_write = false;
+    if (argc == 4 && (strstr(argv[3], "i") != NULL))
+        do_init = true;
 
-    if (argc == 4 && (strcmp("w", argv[3]) == 0 || strcmp("W", argv[3]) == 0))
-        do_read = false;
+    if (argc == 4 && (strstr(argv[3], "r") != NULL))
+        do_read = true;
+
+    if (argc == 4 && (strstr(argv[3], "w") != NULL))
+        do_write = true;
 
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
@@ -108,7 +111,7 @@ int main(int argc, char * argv[])
 
         double begin, end, elapsed;
 
-        if (do_write)
+        if (do_init)
         {
 			begin = timestamp();
 			std::cout << "First fill up space by writing sequentially..." << std::endl;
@@ -122,22 +125,10 @@ int main(int argc, char * argv[])
 					  << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
         }
 
-        std::random_shuffle(blocks.begin(), blocks.end());
-
         std::cout << "Random block access..." << std::endl;
-        begin = timestamp();
-        if (do_write)
-        {
-            for (unsigned j = 0; j < num_blocks; j++)
-                reqs[j] = buffer->write(blocks[j], print_number(j));
-            wait_all(reqs, num_blocks);
 
-            end = timestamp();
-            elapsed = end - begin;
-            std::cout << "Written " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
-                      << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
-                      << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
-        }
+        srand(time(NULL));
+        std::random_shuffle(blocks.begin(), blocks.end());
 
         begin = timestamp();
         if (do_read)
@@ -151,6 +142,22 @@ int main(int argc, char * argv[])
             std::cout << "Read    " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
                       << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
                       << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s read" << std::endl;
+        }
+
+        std::random_shuffle(blocks.begin(), blocks.end());
+
+        begin = timestamp();
+        if (do_write)
+        {
+            for (unsigned j = 0; j < num_blocks; j++)
+                reqs[j] = buffer->write(blocks[j], print_number(j));
+            wait_all(reqs, num_blocks);
+
+            end = timestamp();
+            elapsed = end - begin;
+            std::cout << "Written " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
+                      << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
+                      << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
         }
     }
     catch (const std::exception & ex)
