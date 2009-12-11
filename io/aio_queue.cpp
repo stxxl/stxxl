@@ -106,7 +106,10 @@ void aio_queue::post_requests()
 				posted_free_sem--;
 
 			while (!static_cast<aio_request*>(req.get())->post())
-				;	//FIXME: busy waiting
+			{
+				int num_events = io_getevents(context, 1, max_sim_requests, events, NULL);
+				handle_events(events, num_events, false);
+			}
 
 			{
 				scoped_mutex_lock lock(posted_mtx);
