@@ -161,7 +161,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
-#ifndef BOOST_MSVC
+#if STXXL_HAVE_MMAP_FILE
     else if (io_impl == "mmap")
     {
         ufs_file_base * result = new mmap_file(filename, options, physical_device_id, allocator_id);
@@ -174,6 +174,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+#endif
     else if (io_impl == "aio")
     {
         ufs_file_base * result = new aio_file(filename, options, physical_device_id, allocator_id);
@@ -186,13 +187,15 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+#if STXXL_HAVE_SIMDISK_FILE
     else if (io_impl == "simdisk")
     {
         ufs_file_base * result = new sim_disk_file(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
-#else
+#endif
+#if STXXL_HAVE_WINCALL_FILE
     else if (io_impl == "wincall")
     {
         wfs_file_base * result = new wincall_file(filename, options, physical_device_id, allocator_id);
@@ -206,7 +209,7 @@ file * FileCreator::create(const std::string & io_impl,
         return result;
     }
 #endif
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_HAVE_BOOSTFD_FILE
     else if (io_impl == "boostfd")
     {
         boostfd_file * result = new boostfd_file(filename, options, physical_device_id, allocator_id);
@@ -226,6 +229,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+#if STXXL_HAVE_WBTL_FILE
     else if (io_impl == "wbtl")
     {
         ufs_file_base * backend = new syscall_file(filename, options, -1, -1); // FIXME: ID
@@ -233,6 +237,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+#endif
 
     STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
                 io_impl << " .");
