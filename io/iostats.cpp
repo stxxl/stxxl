@@ -140,6 +140,12 @@ void stats::write_started(unsigned size_)
     }
 }
 
+void stats::write_canceled(unsigned size_)
+{
+	volume_written -= size_;
+    write_finished();
+}
+
 void stats::write_finished()
 {
     double now = timestamp();
@@ -188,6 +194,12 @@ void stats::read_started(unsigned size_)
         p_ios += (acc_ios++) ? diff : 0.0;
         p_begin_io = now;
     }
+}
+
+void stats::read_canceled(unsigned size_)
+{
+    volume_read -= size_;
+    read_finished();
 }
 
 void stats::read_finished()
