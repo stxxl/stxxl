@@ -36,7 +36,6 @@ class aio_queue : public request_queue_impl_worker, public disk_queue, public si
 
 private:
 	io_context_t context;
-	io_event* events;
     typedef std::list<request_ptr> queue_type;
 
     mutex waiting_mtx, posted_mtx;

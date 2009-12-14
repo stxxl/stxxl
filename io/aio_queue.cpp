@@ -46,7 +46,7 @@ aio_queue::aio_queue(int max_sim_requests) :
 		STXXL_THROW2(io_error, "io_setup() nr_events=" << max_events);
 
 	//STXXL_MSG("Set up an aio queue with " << max_events << " entries.");
-    events = new io_event[max_events];
+
     start_thread(post_async, static_cast<void*>(this), post_thread, post_thread_state);
     start_thread(wait_async, static_cast<void*>(this), wait_thread, wait_thread_state);
 }
@@ -56,7 +56,6 @@ aio_queue::~aio_queue()
     stop_thread(post_thread, post_thread_state, sem);
     stop_thread(wait_thread, wait_thread_state, posted_sem);
     io_destroy(context);
-    delete[] events;
 }
 
 void aio_queue::add_request(request_ptr& req)
@@ -98,6 +97,7 @@ bool aio_queue::cancel_request(request_ptr& req)
 void aio_queue::post_requests()
 {
     request_ptr req;
+	io_event* events = new io_event[max_events];
 
     for ( ; ; )
     {
@@ -139,6 +139,8 @@ void aio_queue::post_requests()
 			sem++;
 		}
     }
+
+    delete[] events;
 }
 
 void aio_queue::handle_events(io_event* events, int num_events, bool canceled)
@@ -156,6 +158,7 @@ void aio_queue::handle_events(io_event* events, int num_events, bool canceled)
 void aio_queue::wait_requests()
 {
     request_ptr req;
+	io_event* events = new io_event[max_events];
 
     for ( ; ; )
     {
@@ -174,6 +177,8 @@ void aio_queue::wait_requests()
 
 		handle_events(events, num_events, false);
     }
+
+    delete[] events;
 }
 
 void* aio_queue::post_async(void* arg)
