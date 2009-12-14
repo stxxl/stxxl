@@ -15,6 +15,7 @@
 #if STXXL_HAVE_AIO_FILE
 
 #include <iomanip>
+#include <sys/syscall.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -48,23 +49,23 @@ void aio_request::fill_control_block()
 	aio_file* af = dynamic_cast<aio_file*>(file_);
 
 	memset(&cb, 0, sizeof(cb));
-	cb.data = new request_ptr(this);	//indirection, so the I/O system retains an auto_ptr reference
+	cb.aio_data = reinterpret_cast<__u64>(new request_ptr(this));	//indirection, so the I/O system retains an auto_ptr reference
 	cb.aio_fildes = af->file_des;
-	cb.aio_lio_opcode = (type == READ) ? IO_CMD_PREAD : IO_CMD_PWRITE;
+	cb.aio_lio_opcode = (type == READ) ? IOCB_CMD_PREAD : IOCB_CMD_PWRITE;
 	cb.aio_reqprio = 0;
-	cb.u.c.buf = buffer;
-	cb.u.c.nbytes = bytes;
-	cb.u.c.offset = offset;
+	cb.aio_buf = reinterpret_cast<__u64>(buffer);
+	cb.aio_nbytes = bytes;
+	cb.aio_offset = offset;
 }
 
 bool aio_request::post()
 {
 	fill_control_block();
 	iocb* cb_pointer = &cb;
-	int success = io_submit(aio_queue::get_instance()->get_io_context(), 1, &cb_pointer);
+	int success = syscall(SYS_io_submit, aio_queue::get_instance()->get_io_context(), 1, &cb_pointer);
 	if (success == 1)
 		stats::get_instance()->read_started(bytes);
-	else if (success != -EAGAIN)
+	else if (success == -1 && errno != EAGAIN)
 		STXXL_THROW2(io_error, "io_submit()");
 
 	return success == 1;
@@ -73,7 +74,7 @@ bool aio_request::post()
 bool aio_request::cancel()
 {
 	io_event event;
-    int result = io_cancel(aio_queue::get_instance()->get_io_context(), &cb, &event);
+    int result = syscall(SYS_io_cancel, aio_queue::get_instance()->get_io_context(), &cb, &event);
     if (result == 0)
     	aio_queue::get_instance()->handle_events(&event, 1, true);
     return result == 0;

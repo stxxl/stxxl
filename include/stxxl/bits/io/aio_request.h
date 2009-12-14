@@ -17,7 +17,7 @@
 
 #if STXXL_HAVE_AIO_FILE
 
-#include <libaio.h>
+#include <linux/aio_abi.h>
 #include <stxxl/bits/io/request_impl_basic.h>
 
 

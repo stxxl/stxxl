@@ -17,7 +17,7 @@
 
 #if STXXL_HAVE_AIO_FILE
 
-#include <libaio.h>
+#include <linux/aio_abi.h>
 #include <list>
 
 #include <stxxl/bits/io/request_queue_impl_worker.h>
@@ -35,7 +35,7 @@ class aio_queue : public request_queue_impl_worker, public disk_queue, public si
 	friend class aio_request;
 
 private:
-	io_context_t context;
+	aio_context_t context;
     typedef std::list<request_ptr> queue_type;
 
     mutex waiting_mtx, posted_mtx;
@@ -63,7 +63,7 @@ public:
     void complete_request(request_ptr& req);
     ~aio_queue();
 
-    io_context_t get_io_context()
+    aio_context_t get_io_context()
     {
     	return context;
     }

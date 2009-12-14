@@ -15,6 +15,8 @@
 
 #if STXXL_HAVE_AIO_FILE
 
+#include <sys/syscall.h>
+
 #include <stxxl/bits/io/aio_request.h>
 #include <stxxl/bits/parallel.h>
 
@@ -40,7 +42,7 @@ aio_queue::aio_queue(int max_sim_requests) :
 		max_events = max_sim_requests;
 
 	int result;
-	while ((result = io_setup(max_events, &context)) == EAGAIN && max_events > 1)
+	while ((result = syscall(SYS_io_setup, max_events, &context)) == -1 && errno == EAGAIN && max_events > 1)
 		max_events <<= 1;	//try with half as many events
 	if (result != 0)
 		STXXL_THROW2(io_error, "io_setup() nr_events=" << max_events);
@@ -55,7 +57,7 @@ aio_queue::~aio_queue()
 {
     stop_thread(post_thread, post_thread_state, sem);
     stop_thread(wait_thread, wait_thread_state, posted_sem);
-    io_destroy(context);
+    syscall(SYS_io_destroy, context);
 }
 
 void aio_queue::add_request(request_ptr& req)
@@ -119,7 +121,7 @@ void aio_queue::post_requests()
 
 			while (!static_cast<aio_request*>(req.get())->post())
 			{
-				int num_events = io_getevents(context, 1, max_events, events, NULL);
+				int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
 				if (num_events < 0)
 					STXXL_THROW2(io_error, "io_getevents() nr_events=" << max_events);
 
@@ -147,8 +149,8 @@ void aio_queue::handle_events(io_event* events, int num_events, bool canceled)
 {
 	for (int e = 0; e < num_events; ++e)
 	{
-		static_cast<aio_request*>(static_cast<request_ptr*>(events[e].data)->get())->completed(canceled);
-		delete static_cast<request_ptr*>(events[e].data);	//release auto_ptr reference
+		static_cast<aio_request*>(reinterpret_cast<request_ptr*>(events[e].data)->get())->completed(canceled);
+		delete reinterpret_cast<request_ptr*>(events[e].data);	//release auto_ptr reference
 		if (max_sim_requests != 0)
 			posted_free_sem++;
 		posted_sem--;
@@ -169,7 +171,7 @@ void aio_queue::wait_requests()
         	break;
 
 		//wait for at least one of them to finish
-		int num_events = io_getevents(context, 1, max_events, events, NULL);
+		int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
 		if (num_events < 0)
 			STXXL_THROW2(io_error, "io_getevents() nr_events=" << max_events);
 
