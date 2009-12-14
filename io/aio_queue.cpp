@@ -101,7 +101,11 @@ void aio_queue::post_requests()
 
     for ( ; ; )
     {
-        sem--;
+        int num_waiting = sem--;
+
+        // terminate if termination has been requested
+        if (post_thread_state() == TERMINATE && num_waiting == 0)
+        	break;
 
 		scoped_mutex_lock lock(waiting_mtx);
 		if (!waiting_requests.empty())
@@ -134,14 +138,6 @@ void aio_queue::post_requests()
 
 			sem++;
 		}
-
-        // terminate if termination has been requested
-        if (post_thread_state() == TERMINATE) {
-            if ((sem--) == 0)
-                break;
-            else
-                sem++;
-        }
     }
 }
 
