@@ -298,17 +298,17 @@ HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h exithandler.h
 
 HEADER_FILES_IO		+= io.h iostats.h completion_handler.h
 HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h
-HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h aio_request.h
+HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h
 HEADER_FILES_IO		+= disk_queues.h
 HEADER_FILES_IO		+= request_queue.h request_queue_impl_worker.h
 HEADER_FILES_IO		+= request_queue_impl_qwqr.h
 HEADER_FILES_IO		+= request_queue_impl_1q.h
-HEADER_FILES_IO		+= aio_queue.h
 HEADER_FILES_IO		+= file.h disk_queued_file.h
-HEADER_FILES_IO		+= ufs_file_base.h syscall_file.h mmap_file.h simdisk_file.h aio_file.h
+HEADER_FILES_IO		+= ufs_file_base.h syscall_file.h mmap_file.h simdisk_file.h
 HEADER_FILES_IO		+= wfs_file_base.h wincall_file.h
 HEADER_FILES_IO		+= boostfd_file.h mem_file.h fileperblock_file.h
 HEADER_FILES_IO		+= wbtl_file.h
+HEADER_FILES_IO		+= aio_request.h aio_queue.h aio_file.h
 
 HEADER_FILES_MNG	+= adaptor.h block_prefetcher.h
 HEADER_FILES_MNG	+= buf_istream.h buf_ostream.h buf_writer.h mng.h

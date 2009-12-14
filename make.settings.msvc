@@ -136,7 +136,6 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/request_waiters_impl_basic.h \
 	$(HEADER_PATH)/io/request_state_impl_basic.h \
 	$(HEADER_PATH)/io/request_impl_basic.h \
-	$(HEADER_PATH)/io/aio_request.h \
 	$(HEADER_PATH)/io/disk_queues.h \
 	$(HEADER_PATH)/io/request_queue.h \
 	$(HEADER_PATH)/io/request_queue_impl_worker.h \
@@ -148,13 +147,15 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/syscall_file.h \
 	$(HEADER_PATH)/io/mmap_file.h \
 	$(HEADER_PATH)/io/simdisk_file.h \
-	$(HEADER_PATH)/io/aio_file.h \
 	$(HEADER_PATH)/io/wfs_file_base.h \
 	$(HEADER_PATH)/io/wincall_file.h \
 	$(HEADER_PATH)/io/boostfd_file.h \
 	$(HEADER_PATH)/io/mem_file.h \
 	$(HEADER_PATH)/io/fileperblock_file.h \
-	$(HEADER_PATH)/io/wbtl_file.h
+	$(HEADER_PATH)/io/wbtl_file.h \
+	$(HEADER_PATH)/io/aio_request.h \
+	$(HEADER_PATH)/io/aio_queue.h \
+	$(HEADER_PATH)/io/aio_file.h
 
 MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/adaptor.h \
