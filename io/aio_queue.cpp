@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/io/aio_queue.h>
 
 #if STXXL_HAVE_AIO_FILE
@@ -32,8 +33,20 @@ aio_queue::aio_queue(int max_sim_requests) :
 	post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
 {
 	context = 0;
-	io_setup(max_sim_requests, &context);
-    events = new io_event[max_sim_requests];
+
+	if (max_sim_requests == 0)
+		max_events = std::max(config::get_instance()->disks_number(), 4u) * 64;
+	else
+		max_events = max_sim_requests;
+
+	int result;
+	while ((result = io_setup(max_events, &context)) == EAGAIN && max_events > 1)
+		max_events <<= 1;	//try with half as many events
+	if (result != 0)
+		STXXL_THROW2(io_error, "io_setup() nr_events=" << max_events);
+
+	//STXXL_MSG("Set up an aio queue with " << max_events << " entries.");
+    events = new io_event[max_events];
     start_thread(post_async, static_cast<void*>(this), post_thread, post_thread_state);
     start_thread(wait_async, static_cast<void*>(this), wait_thread, wait_thread_state);
 }
@@ -54,8 +67,8 @@ void aio_queue::add_request(request_ptr& req)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
 
 	scoped_mutex_lock lock(waiting_mtx);
-   	waiting_requests.push_back(req);
 
+   	waiting_requests.push_back(req);
     sem++;
 }
 
@@ -102,7 +115,10 @@ void aio_queue::post_requests()
 
 			while (!static_cast<aio_request*>(req.get())->post())
 			{
-				int num_events = io_getevents(context, 1, max_sim_requests, events, NULL);
+				int num_events = io_getevents(context, 1, max_events, events, NULL);
+				if (num_events < 0)
+					STXXL_THROW2(io_error, "io_getevents() nr_events=" << max_events);
+
 				handle_events(events, num_events, false);
 			}
 
@@ -153,7 +169,9 @@ void aio_queue::wait_requests()
         	break;
 
 		//wait for at least one of them to finish
-		int num_events = io_getevents(context, 1, max_sim_requests, events, NULL);
+		int num_events = io_getevents(context, 1, max_events, events, NULL);
+		if (num_events < 0)
+			STXXL_THROW2(io_error, "io_getevents() nr_events=" << max_events);
 
 		posted_sem++;	//compensate for the one eaten too early above
 
