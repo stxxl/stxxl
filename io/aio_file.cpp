@@ -61,5 +61,5 @@ request_ptr aio_file::awrite(
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif // #if STXXL_HAVE_AIO_FILE
 // vim: et:ts=4:sw=4
