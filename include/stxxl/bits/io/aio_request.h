@@ -33,6 +33,7 @@ class aio_request : public request_impl_basic
     friend class fileperblock_file;
 
     iocb cb;	//control block
+    iocb* get_cb() { return &cb; }	//must be initialized by post
 
     void fill_control_block();
 
@@ -54,9 +55,6 @@ public:
     void completed(bool canceled);
     void completed() { completed(false); }
 
-    iocb* get_cb() { return &cb; }	//must be initialized by post
-
-public:
     const char * io_type() const;
 };
 
