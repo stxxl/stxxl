@@ -175,6 +175,7 @@ file * FileCreator::create(const std::string & io_impl,
         return result;
     }
 #endif
+#if STXXL_HAVE_AIO_FILE
     else if (io_impl == "aio")
     {
         ufs_file_base * result = new aio_file(filename, options, physical_device_id, allocator_id);
@@ -187,6 +188,7 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
+#endif
 #if STXXL_HAVE_SIMDISK_FILE
     else if (io_impl == "simdisk")
     {
