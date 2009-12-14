@@ -145,7 +145,8 @@ void aio_queue::handle_events(io_event* events, int num_events, bool canceled)
 {
 	for (int e = 0; e < num_events; ++e)
 	{
-		static_cast<aio_request*>(events[e].data)->completed(canceled);
+		static_cast<aio_request*>(static_cast<request_ptr*>(events[e].data)->get())->completed(canceled);
+		delete static_cast<request_ptr*>(events[e].data);	//release auto_ptr reference
 		if (max_sim_requests != 0)
 			posted_free_sem++;
 		posted_sem--;

@@ -48,7 +48,7 @@ void aio_request::fill_control_block()
 	aio_file* af = dynamic_cast<aio_file*>(file_);
 
 	memset(&cb, 0, sizeof(cb));
-	cb.data = this;
+	cb.data = new request_ptr(this);	//indirection, so the I/O system retains an auto_ptr reference
 	cb.aio_fildes = af->file_des;
 	cb.aio_lio_opcode = (type == READ) ? IO_CMD_PREAD : IO_CMD_PWRITE;
 	cb.aio_reqprio = 0;
