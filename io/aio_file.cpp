@@ -10,10 +10,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
 #include <stxxl/bits/io/aio_file.h>
 
 #if STXXL_HAVE_AIO_FILE
@@ -22,12 +18,14 @@
 
 #include <aio.h>
 
+
 __STXXL_BEGIN_NAMESPACE
+
 
 void aio_file::serve(const request* req) throw(io_error)
 {
 	STXXL_UNUSED(req);
-	assert(false);
+    STXXL_THROW_UNREACHABLE();
 }
 
 const char* aio_file::io_type() const
@@ -63,5 +61,5 @@ request_ptr aio_file::awrite(
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif // #if STXXL_HAVE_AIO_FILE
 // vim: et:ts=4:sw=4

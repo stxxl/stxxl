@@ -55,14 +55,14 @@ void usage(const char * argv0)
 
 struct print_number
 {
-	int n;
+    int n;
 
-	print_number(int n) : n(n) { }
+    print_number(int n) : n(n) { }
 
-	void operator()(stxxl::request_ptr)
-	{
-//		std::cout << n << " " << std::flush;
-	}
+    void operator () (stxxl::request_ptr)
+    {
+        //std::cout << n << " " << std::flush;
+    }
 };
 
 int main(int argc, char * argv[])
@@ -113,16 +113,16 @@ int main(int argc, char * argv[])
 
         if (do_init)
         {
-			begin = timestamp();
-			std::cout << "First fill up space by writing sequentially..." << std::endl;
-			for (unsigned j = 0; j < num_blocks_in_span; j++)
-				reqs[j] = buffer->write(blocks[j]);
-			wait_all(reqs, num_blocks_in_span);
-			end = timestamp();
-			elapsed = end - begin;
-			std::cout << "Written " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
-					  << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
-					  << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
+            begin = timestamp();
+            std::cout << "First fill up space by writing sequentially..." << std::endl;
+            for (unsigned j = 0; j < num_blocks_in_span; j++)
+                reqs[j] = buffer->write(blocks[j]);
+            wait_all(reqs, num_blocks_in_span);
+            end = timestamp();
+            elapsed = end - begin;
+            std::cout << "Written " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
+                      << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
+                      << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
         }
 
         std::cout << "Random block access..." << std::endl;
@@ -173,3 +173,4 @@ int main(int argc, char * argv[])
 
     return 0;
 }
+// vim: et:ts=4:sw=4

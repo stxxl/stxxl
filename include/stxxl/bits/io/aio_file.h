@@ -52,18 +52,29 @@ public:
     //! \param disk disk(file) queue_identifier
     aio_file(
         const std::string& filename,
-        int mode, int physical_device_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), physical_device_id(physical_device_id), allocator_id(allocator_id)
-    {
-    }
+        int mode, int physical_device_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
+        ufs_file_base(filename, mode), physical_device_id(physical_device_id), allocator_id(allocator_id)
+    { }
+
     void serve(const request* req) throw (io_error);
     request_ptr aread(void* buffer, offset_type pos, size_type bytes,
                               const completion_handler& on_cmpl);
     request_ptr awrite(void* buffer, offset_type pos, size_type bytes,
                                const completion_handler& on_cmpl);
     const char* io_type() const;
-    int get_queue_id() const { assert(false); return NO_QUEUE; }
-    int get_allocator_id() const { return allocator_id; }
-    virtual int get_physical_device_id() const
+
+    int get_queue_id() const
+    {
+        STXXL_THROW_UNREACHABLE();
+        return NO_QUEUE;
+    }
+
+    int get_allocator_id() const
+    {
+        return allocator_id;
+    }
+
+    int get_physical_device_id() const
     {
     	return physical_device_id;
     }
@@ -73,6 +84,7 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif // #if STXXL_HAVE_AIO_FILE
 
 #endif // !STXXL_AIO_FILE_HEADER
+// vim: et:ts=4:sw=4

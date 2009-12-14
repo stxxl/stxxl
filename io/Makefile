@@ -5,12 +5,13 @@ tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
 lib: ufs_file_base.$(OBJEXT) syscall_file.$(OBJEXT) wincall_file.$(OBJEXT) wfs_file_base.$(OBJEXT) \
-iostats.$(OBJEXT) aio_file.$(OBJEXT) \
+iostats.$(OBJEXT) \
 mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJEXT) \
 fileperblock_file.$(OBJEXT) request.$(OBJEXT) request_waiters_impl_basic.$(OBJEXT) \
-request_state_impl_basic.$(OBJEXT) request_impl_basic.$(OBJEXT) aio_request.$(OBJEXT) \
-disk_queued_file.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) request_queue_impl_1q.$(OBJEXT) aio_queue.$(OBJEXT) \
-request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT)
+request_state_impl_basic.$(OBJEXT) request_impl_basic.$(OBJEXT) \
+disk_queued_file.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) request_queue_impl_1q.$(OBJEXT) \
+request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT) \
+aio_request.$(OBJEXT) aio_queue.$(OBJEXT) aio_file.$(OBJEXT)
 
 
 
@@ -22,9 +23,6 @@ syscall_file.$(OBJEXT): syscall_file.cpp
 
 wbtl_file.$(OBJEXT): wbtl_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wbtl_file.cpp
-
-aio_file.$(OBJEXT): aio_file.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c aio_file.cpp
 
 wincall_file.$(OBJEXT): wincall_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c wincall_file.cpp
@@ -65,26 +63,26 @@ request_impl_basic.$(OBJEXT): request_impl_basic.cpp
 request_impl_qwqr.$(OBJEXT): request_impl_qwqr.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_impl_qwqr.cpp
 
-aio_request.$(OBJEXT): aio_request.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c aio_request.cpp
-
-request_impl_qwqr.$(OBJEXT): request_impl_qwqr.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_impl_qwqr.cpp
-
 disk_queued_file.$(OBJEXT): disk_queued_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c disk_queued_file.cpp
 
 request_queue_impl_qwqr.$(OBJEXT): request_queue_impl_qwqr.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_qwqr.cpp
 
-aio_queue.$(OBJEXT): aio_queue.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c aio_queue.cpp
-
 request_queue_impl_1q.$(OBJEXT): request_queue_impl_1q.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_1q.cpp
 
 request_queue_impl_worker.$(OBJEXT): request_queue_impl_worker.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_worker.cpp
+
+aio_request.$(OBJEXT): aio_request.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c aio_request.cpp
+
+aio_queue.$(OBJEXT): aio_queue.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c aio_queue.cpp
+
+aio_file.$(OBJEXT): aio_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c aio_file.cpp
 
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)
