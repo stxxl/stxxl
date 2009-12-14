@@ -30,6 +30,14 @@
 // used in: io/*_file.cpp
 // effect:  call request::check_alignment() from request::request(...)
 
+//#define STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION 0/1
+// default: 1
+// used in: io/*_queue*.cpp
+// affects: library
+// effect:  check (and warn) for multiple concurrently pending I/O requests
+//          for the same block, usually causing coherency problems on
+//          out-of-order execution
+
 //#define STXXL_DO_NOT_COUNT_WAIT_TIME
 // default: not defined
 // used in: io/iostats.{h,cpp}
