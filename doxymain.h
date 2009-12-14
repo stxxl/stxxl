@@ -265,6 +265,10 @@ my_example.bin: my_example.o
  * we also recommend to add the following options to the \c mkfs.xfs command to gain maximum performance:
  * \verbatim -d agcount=1 -l size=512b \endverbatim
  *
+ * The following filesystems have been reported not to support Direct I/O: \c tmpfs , \c glusterfs .
+ * Since Direct I/O is enabled by default, you may recompile \c S<small>TXXL</small>
+ * with \c STXXL_DIRECT_IO_OFF defined to access files on these file systems.
+ *
  *
  * \section configuration Disk configuration file
  *
