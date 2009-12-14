@@ -64,6 +64,8 @@ bool aio_request::post()
 	int success = io_submit(aio_queue::get_instance()->get_io_context(), 1, &cb_pointer);
 	if (success == 1)
 		stats::get_instance()->read_started(bytes);
+	else if (success != -EAGAIN)
+		STXXL_THROW2(io_error, "io_submit()");
 
 	return success == 1;
 }
@@ -74,7 +76,6 @@ bool aio_request::cancel()
     int result = io_cancel(aio_queue::get_instance()->get_io_context(), &cb, &event);
     if (result == 0)
     	aio_queue::get_instance()->handle_events(&event, 1, true);
-    std::cout << result << " " << EAGAIN << " " << ENOSYS << " " << EFAULT << " " << EINVAL << std::endl;
     return result == 0;
 }
 
