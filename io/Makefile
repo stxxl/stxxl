@@ -59,9 +59,6 @@ request_state_impl_basic.$(OBJEXT): request_state_impl_basic.cpp
 request_impl_basic.$(OBJEXT): request_impl_basic.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_impl_basic.cpp
 
-request_impl_qwqr.$(OBJEXT): request_impl_qwqr.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_impl_qwqr.cpp
-
 disk_queued_file.$(OBJEXT): disk_queued_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c disk_queued_file.cpp
 
