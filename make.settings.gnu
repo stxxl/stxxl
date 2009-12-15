@@ -323,7 +323,7 @@ HEADER_FILES_CONTAINERS_BTREE	+= btree.h iterator_map.h leaf.h node_cache.h
 HEADER_FILES_CONTAINERS_BTREE	+= root_node.h node.h btree_pager.h iterator.h
 
 HEADER_FILES_ALGO	+= adaptor.h inmemsort.h intksort.h run_cursor.h sort.h
-HEADER_FILES_ALGO	+= async_schedule.h ksort.h sort_base.h
+HEADER_FILES_ALGO	+= async_schedule.h ksort.h sort_base.h sort_helper.h
 HEADER_FILES_ALGO	+= losertree.h scan.h stable_ksort.h random_shuffle.h
 
 HEADER_FILES_STREAM	+= stream.h sort_stream.h
