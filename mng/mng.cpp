@@ -249,8 +249,8 @@ block_manager::block_manager()
         disk_files[i] = fc.create(cfg->disk_io_impl(i),
                                   cfg->disk_path(i),
                                   file::CREAT | file::RDWR | file::DIRECT,
-                                  i,	//physical_device_id
-                                  i);	//allocator_id
+                                  i,    // physical_device_id
+                                  i);   // allocator_id
         disk_files[i]->set_size(cfg->disk_size(i));
         disk_allocators[i] = new DiskAllocator(cfg->disk_size(i));
     }
