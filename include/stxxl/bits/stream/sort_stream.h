@@ -614,15 +614,15 @@ namespace stream
         {
             if (1)
             {
-            if (!result_computed)
-            {
-                compute_result();
-                result_computed = true;
-                cleanup();
+                if (!result_computed)
+                {
+                    compute_result();
+                    result_computed = true;
+                    cleanup();
 #ifdef STXXL_PRINT_STAT_AFTER_RF
-                STXXL_MSG(*stats::get_instance());
+                    STXXL_MSG(*stats::get_instance());
 #endif
-            }
+                }
             }
             return result_;
         }
