@@ -16,8 +16,6 @@
 
 #include <stxxl/bits/io/aio_request.h>
 
-#include <aio.h>
-
 
 __STXXL_BEGIN_NAMESPACE
 

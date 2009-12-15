@@ -15,7 +15,6 @@
 #include <cstdio>
 #include <stxxl/bits/io/fileperblock_file.h>
 #include <stxxl/bits/io/syscall_file.h>
-#include <stxxl/bits/io/aio_file.h>
 #include <stxxl/bits/io/mmap_file.h>
 #include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/wincall_file.h>
