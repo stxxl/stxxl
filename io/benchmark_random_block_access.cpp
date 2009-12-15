@@ -48,8 +48,10 @@ using stxxl::timestamp;
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " span num_accesses [i][r][w]" << std::endl;
-    std::cout << "    'span' is given in GiB" << std::endl;
+    std::cout << "Usage: " << argv0 << " span block_size num_accesses [i][r][w]" << std::endl;
+    std::cout << "    'span' is given in MiB" << std::endl;
+    std::cout << "    'block_size' is given in KiB, must be a multiple of 4" << std::endl;
+    std::cout << "        (only a few block sizes are compiled in)" << std::endl;
     exit(-1);
 }
 
@@ -65,26 +67,10 @@ struct print_number
     }
 };
 
-int main(int argc, char * argv[])
+template <unsigned BlockSize>
+void run_test(stxxl::int64 span, stxxl::int64 num_blocks, bool do_init, bool do_read, bool do_write)
 {
-    const unsigned raw_block_size = 4 * KB;
-
-    if (argc < 2)
-        usage(argv[0]);
-
-    stxxl::int64 span = stxxl::int64(MB) * stxxl::int64(atoi(argv[1]));
-    stxxl::int64 num_blocks = stxxl::int64(atoi(argv[2]));
-
-    bool do_init = false, do_read = false, do_write = false;
-
-    if (argc == 4 && (strstr(argv[3], "i") != NULL))
-        do_init = true;
-
-    if (argc == 4 && (strstr(argv[3], "r") != NULL))
-        do_read = true;
-
-    if (argc == 4 && (strstr(argv[3], "w") != NULL))
-        do_write = true;
+    const unsigned raw_block_size = BlockSize;
 
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
@@ -170,7 +156,70 @@ int main(int argc, char * argv[])
 
     delete[] reqs;
     delete buffer;
+}
+
+int main(int argc, char * argv[])
+{
+    if (argc < 4)
+        usage(argv[0]);
+
+    stxxl::int64 span = stxxl::int64(MB) * stxxl::int64(atoi(argv[1]));
+    unsigned block_size = atoi(argv[2]);
+    stxxl::int64 num_blocks = stxxl::int64(atoi(argv[3]));
+
+    bool do_init = false, do_read = false, do_write = false;
+
+    if (argc == 5 && (strstr(argv[3], "i") != NULL))
+        do_init = true;
+
+    if (argc == 5 && (strstr(argv[3], "r") != NULL))
+        do_read = true;
+
+    if (argc == 5 && (strstr(argv[3], "w") != NULL))
+        do_write = true;
+
+    switch(block_size)
+    {
+#define run(bs) run_test<bs>(span, num_blocks, do_init, do_read, do_write)
+        case 4:
+            run(4 * KB);
+            break;
+        case 8:
+            run(8 * KB);
+            break;
+        case 16:
+            run(16 * KB);
+            break;
+        case 32:
+            run(32 * KB);
+            break;
+        case 64:
+            run(64 * KB);
+            break;
+        case 128:
+            run(128 * KB);
+            break;
+        case 256:
+            run(256 * KB);
+            break;
+        case 512:
+            run(512 * KB);
+            break;
+        case 1024:
+            run(1024 * KB);
+            break;
+        case 2048:
+            run(2048 * KB);
+            break;
+        case 4096:
+            run(4096 * KB);
+            break;
+        default:
+            std::cerr << "unsupported block_size " << block_size << std::endl;
+#undef run
+    }
 
     return 0;
 }
+
 // vim: et:ts=4:sw=4
