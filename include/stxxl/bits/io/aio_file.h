@@ -39,10 +39,10 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation of file based on the POSIX interface for asynchronous I/O
 class aio_file : public ufs_file_base
 {
-	friend class aio_request;
+    friend class aio_request;
 
 private:
-	int physical_device_id, allocator_id;
+    int physical_device_id, allocator_id;
 
 public:
     //! \brief constructs file object
@@ -51,17 +51,17 @@ public:
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param disk disk(file) queue_identifier
     aio_file(
-        const std::string& filename,
+        const std::string & filename,
         int mode, int physical_device_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
         ufs_file_base(filename, mode), physical_device_id(physical_device_id), allocator_id(allocator_id)
     { }
 
-    void serve(const request* req) throw (io_error);
-    request_ptr aread(void* buffer, offset_type pos, size_type bytes,
-                              const completion_handler& on_cmpl);
-    request_ptr awrite(void* buffer, offset_type pos, size_type bytes,
-                               const completion_handler& on_cmpl);
-    const char* io_type() const;
+    void serve(const request * req) throw (io_error);
+    request_ptr aread(void * buffer, offset_type pos, size_type bytes,
+                      const completion_handler & on_cmpl);
+    request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
+                       const completion_handler & on_cmpl);
+    const char * io_type() const;
 
     int get_queue_id() const
     {
@@ -76,7 +76,7 @@ public:
 
     int get_physical_device_id() const
     {
-    	return physical_device_id;
+        return physical_device_id;
     }
 };
 

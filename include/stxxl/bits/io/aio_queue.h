@@ -32,10 +32,10 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Queue for aio_file(s)
 class aio_queue : public request_queue_impl_worker, public disk_queue, public singleton<aio_queue>
 {
-	friend class aio_request;
+    friend class aio_request;
 
 private:
-	aio_context_t context;
+    aio_context_t context;
     typedef std::list<request_ptr> queue_type;
 
     mutex waiting_mtx, posted_mtx;
@@ -47,10 +47,10 @@ private:
 
     static const priority_op _priority_op = WRITE;
 
-    static void* post_async(void* arg);	//thread start callback
-    static void* wait_async(void* arg);	//thread start callback
+    static void * post_async(void * arg);  // thread start callback
+    static void * wait_async(void * arg);  // thread start callback
     void post_requests();
-    void handle_events(io_event* events, int num_events, bool canceled);
+    void handle_events(io_event * events, int num_events, bool canceled);
     void wait_requests();
     void suspend();
 
@@ -58,14 +58,14 @@ public:
     // \param max_sim_requests max number of requests simultaneously submitted to disk, 0 means as many as possible
     aio_queue(int max_sim_requests = 0);
 
-    void add_request(request_ptr& req);
-    bool cancel_request(request_ptr& req);
-    void complete_request(request_ptr& req);
+    void add_request(request_ptr & req);
+    bool cancel_request(request_ptr & req);
+    void complete_request(request_ptr & req);
     ~aio_queue();
 
     aio_context_t get_io_context()
     {
-    	return context;
+        return context;
     }
 };
 
