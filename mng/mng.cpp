@@ -184,7 +184,7 @@ file * FileCreator::create(const std::string & io_impl,
     }
     else if (io_impl == "fileperblock_aio")
     {
-        fileperblock_file<aio_file> * result = new fileperblock_file<aio_file>(filename, options, allocator_id);
+        fileperblock_file<aio_file> * result = new fileperblock_file<aio_file>(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
