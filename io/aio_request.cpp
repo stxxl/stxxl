@@ -14,7 +14,6 @@
 
 #if STXXL_HAVE_AIO_FILE
 
-#include <iomanip>
 #include <sys/syscall.h>
 
 
