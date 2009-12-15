@@ -1,3 +1,15 @@
+Version x.y.z (unreleased)
+
+* I/O subsystem
+  - separate the disk number of a file (which queue to put requests in)
+    from the fact that blocks for this file are allocated via the block
+    manager (disk number -1 otherwise).
+  - support kernel based asynchronous I/O on Linux (new file type "aio"),
+    which exploits Native Command Queuing (NCQ) if available
+    canceling requests apparently not yet supported by the kernel
+    disable/enable with the define USE_LIBAIO 0/1
+
+------------------------------------------
 Version 1.2.2 (unreleased)
 
 * fix possible race condition while creating singleton instances

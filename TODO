@@ -44,7 +44,3 @@
 
 * implement an allocator which looks at the available free space on disks
   when distributing blocks to disks
-
-* engineer new disk queueing strategies that might benefit from NCQ which
-  is now widely available in HDDs/SSDs; will need use of libaio; probably
-  most interesting for smaller block sizes
