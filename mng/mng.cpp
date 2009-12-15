@@ -182,12 +182,6 @@ file * FileCreator::create(const std::string & io_impl,
         result->lock();
         return result;
     }
-    else if (io_impl == "fileperblock_aio")
-    {
-        fileperblock_file<aio_file> * result = new fileperblock_file<aio_file>(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
 #endif
 #if STXXL_HAVE_SIMDISK_FILE
     else if (io_impl == "simdisk")
