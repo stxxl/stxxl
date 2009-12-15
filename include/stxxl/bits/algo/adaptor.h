@@ -13,7 +13,7 @@
 #ifndef STXXL_ALGO_ADAPTOR_HEADER
 #define STXXL_ALGO_ADAPTOR_HEADER
 
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/adaptor.h>
 
 

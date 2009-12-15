@@ -20,8 +20,12 @@
 #endif
 
 #include <stxxl/bits/stream/stream.h>
-#include <stxxl/sort>
-#include <stxxl/bits/mng/typed_block.h>
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/algo/sort_helper.h>
+#include <stxxl/bits/algo/adaptor.h>
+#include <stxxl/bits/algo/run_cursor.h>
+#include <stxxl/bits/algo/losertree.h>
 
 
 __STXXL_BEGIN_NAMESPACE

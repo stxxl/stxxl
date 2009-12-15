@@ -19,7 +19,8 @@
  #include <boost/config.hpp>
 #endif
 
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE

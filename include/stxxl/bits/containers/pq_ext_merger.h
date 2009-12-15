@@ -16,6 +16,8 @@
 #ifndef STXXL_PQ_EXT_MERGER_HEADER
 #define STXXL_PQ_EXT_MERGER_HEADER
 
+#include <stxxl/bits/mng/mng.h>
+
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcontinternals

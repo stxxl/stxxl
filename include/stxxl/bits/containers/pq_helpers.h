@@ -16,6 +16,8 @@
 #ifndef STXXL_PQ_HELPERS_HEADER
 #define STXXL_PQ_HELPERS_HEADER
 
+#include <bits/stl_heap.h>
+
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcontinternals
