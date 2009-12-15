@@ -134,8 +134,8 @@ private:
     void init(int blocks2prefetch_)
     {
         if (pool->size_write() < 2) {
-            STXXL_ERRMSG("queue: invalid configuration, not enough blocks (" << pool->size_write() 
-                         << ") in write pool, at least 2 are needed, resizing to 3");
+            STXXL_ERRMSG("queue: invalid configuration, not enough blocks (" << pool->size_write() <<
+                         ") in write pool, at least 2 are needed, resizing to 3");
             pool->resize_write(3);
         }
 

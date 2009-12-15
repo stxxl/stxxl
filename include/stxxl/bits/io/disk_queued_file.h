@@ -24,7 +24,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Implementation of some file methods based on request_impl_basic
 class disk_queued_file : public virtual file
 {
-	int queue_id, allocator_id;
+    int queue_id, allocator_id;
+
 public:
     disk_queued_file(int queue_id, int allocator_id) : queue_id(queue_id), allocator_id(allocator_id)
     { }

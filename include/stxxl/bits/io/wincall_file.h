@@ -36,7 +36,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of file based on Windows native I/O calls
-class wincall_file :  public wfs_file_base, public disk_queued_file
+class wincall_file : public wfs_file_base, public disk_queued_file
 {
 public:
     //! \brief constructs file object
@@ -48,7 +48,7 @@ public:
         const std::string & filename,
         int mode,
         int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR)
-          : wfs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
+        : wfs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }
     void serve(const request * req) throw (io_error);
     const char * io_type() const;
