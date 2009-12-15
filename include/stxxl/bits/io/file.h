@@ -175,7 +175,7 @@ public:
 
     virtual int get_physical_device_id() const
     {
-    	return get_queue_id();
+        return get_queue_id();
     }
 
     //! \brief Locks file for reading and writing (acquires a lock in the file system)
