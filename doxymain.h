@@ -154,6 +154,49 @@
  * that distribute data evenly between the disks but ignore the availability of free space on them. 
  *
  *
+ * \section q4 STXXL in a Microsoft CLR Library
+ *
+ * From STXXL user Christian, posted in the <a href="https://sourceforge.net/projects/stxxl/forums/forum/446474/topic/3407329">forum</a>:
+ *
+ * Precondition: I use STXXL in a Microsoft CLR Library (a special DLL). That means that managed code and native code (e.g. STXXL) have to co-exist in your library.
+ *
+ * Symptom: Application crashes at process exit, when the DLL is unloaded.
+ *
+ * Cause: STXXL's singleton classes use the \c atexit() function to destruct themselves at process exit. The exit handling will cause the process to crash at exit (still unclear if it's a bug or a feature of the MS runtime).
+ *
+ * Solution:
+ *
+ * 1.) Compiled STXXL static library with \c STXXL_NON_DEFAULT_EXIT_HANDLER defined.
+ *
+ * 2.) For cleanup, \c stxxl::run_exit_handlers() has now to be called manually. To get this done automatically:
+ *
+ * Defined a CLI singleton class "Controller":
+ *
+ * \verbatim
+public ref class Controller {
+private: 
+    static Controller^ instance = gcnew Controller;
+    Controller();
+};
+\endverbatim
+ *
+ *     Registered my own cleanup function in Controller's constructor which will manage to call \c stxxl::run_exit_handlers():
+ *
+ * \verbatim
+#pragma managed(push, off)
+static int myexitfn()
+{
+    stxxl::run_exit_handlers();
+    return 0;
+}
+#pragma managed(pop)
+
+Controller::Controller()
+{
+    onexit(myexitfn);
+}
+\endverbatim
+ *
  */
 
 
@@ -264,6 +307,10 @@ my_example.bin: my_example.o
  * If the filesystems only use is to store one large \c S<small>TXXL</small> disk file,
  * we also recommend to add the following options to the \c mkfs.xfs command to gain maximum performance:
  * \verbatim -d agcount=1 -l size=512b \endverbatim
+ *
+ * The following filesystems have been reported not to support Direct I/O: \c tmpfs , \c glusterfs .
+ * Since Direct I/O is enabled by default, you may recompile \c S<small>TXXL</small>
+ * with \c STXXL_DIRECT_IO_OFF defined to access files on these file systems.
  *
  *
  * \section configuration Disk configuration file
