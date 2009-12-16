@@ -21,7 +21,7 @@ $stxxl = 1;
 $stxxlpath = 'include';
 
 #$CXX = 'g++-4.2';
-$CXX = 'g++-4.3 -std=c++0x';
+$CXX = 'g++-4.4 -std=c++0x';
 $cxxtarget = 'foo-bar-gnu';
 $cxxheaderpath = undef;
 $gcctargetheaderpath = undef;
@@ -50,15 +50,16 @@ push @includepath, $stxxlpath if $stxxl;
 	xmmintrin.h		emmintrin.h
 	ext/vstring.h		vstring.tcc
 	wctype.h		wchar.h
+	stdatomic.h		cstdatomic
 	algorithm		parallel/algorithm
 	numeric			parallel/numeric
 	bits/stl_algobase.h	parallel/algobase.h
 	parallel/partition.h	parallel/sort.h
 	boost/type_traits/is_class.hpp	boost/type_traits/is_scalar.hpp
+	boost/type_traits/msvc/remove_cv.hpp	boost/type_traits/is_pointer.hpp
 	boost/preprocessor/list/fold_left.hpp	boost/preprocessor/control/while.hpp
 	boost/preprocessor/list/fold_right.hpp	boost/preprocessor/control/while.hpp
 	);
-#	stxxl/bits/io/iobase.h	stxxl/io
 
 %seen = ();
 @todo = ();
