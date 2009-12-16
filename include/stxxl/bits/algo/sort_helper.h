@@ -21,7 +21,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 //! \internal
-namespace sort_local
+namespace sort_helper
 {
     template <typename BIDTp_, typename ValTp_>
     struct trigger_entry

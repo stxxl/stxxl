@@ -323,7 +323,7 @@ namespace sort_local
         typedef typename block_type::value_type value_type;
         typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
-        typedef run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
+        typedef sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
 
         run_type consume_seq(out_run->size());
 
@@ -340,7 +340,7 @@ namespace sort_local
         }
 
         std::stable_sort(consume_seq.begin(), consume_seq.end(),
-                         trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
+                         sort_helper::trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
         int_type disks_number = config::get_instance()->disks_number();
 
@@ -561,7 +561,7 @@ namespace sort_local
               typename alloc_strategy,
               typename input_bid_iterator,
               typename value_cmp>
-    simple_vector<trigger_entry<typename block_type::bid_type, typename block_type::value_type> > *
+    simple_vector<sort_helper::trigger_entry<typename block_type::bid_type, typename block_type::value_type> > *
     sort_blocks(input_bid_iterator input_bids,
                 unsigned_type _n,
                 unsigned_type _m,
@@ -570,7 +570,7 @@ namespace sort_local
     {
         typedef typename block_type::value_type type;
         typedef typename block_type::bid_type bid_type;
-        typedef trigger_entry<bid_type, type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<bid_type, type> trigger_entry_type;
         typedef simple_vector<trigger_entry_type> run_type;
         typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 
@@ -718,7 +718,7 @@ namespace sort_local
 template <typename ExtIterator_, typename StrictWeakOrdering_>
 void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsigned_type M)
 {
-    typedef simple_vector<sort_local::trigger_entry<typename ExtIterator_::bid_type,
+    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::bid_type,
                                                     typename ExtIterator_::vector_type::value_type> > run_type;
 
     typedef typename ExtIterator_::vector_type::value_type value_type;
