@@ -990,25 +990,10 @@ namespace stream
 
                     STXXL_VERBOSE1("after merge");
 
-                    for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
+                    if (sort_helper::refill_or_remove_empty_sequences(
+                                *seqs, *buffers, *prefetcher))
                     {
-                        if ((*seqs)[i].first == (*seqs)[i].second)                        // run empty
-                        {
-                            if (prefetcher->block_consumed((*buffers)[i]))
-                            {
-                                (*seqs)[i].first = (*buffers)[i]->begin();                // reset iterator
-                                (*seqs)[i].second = (*buffers)[i]->end();
-                                STXXL_VERBOSE1("block ran empty " << i);
-                                recompute_currently_mergeable = true;                     // trigger recompute
-                            }
-                            else
-                            {
-                                (*seqs).erase((*seqs).begin() + i);                       // remove this sequence
-                                (*buffers).erase((*buffers).begin() + i);
-                                STXXL_VERBOSE1("seq removed " << i);
-                                --i;                                                      // don't skip the next sequence
-                            }
-                        }
+                        recompute_currently_mergeable = true;   // trigger recompute
                     }
                 } while (rest > 0 && (*seqs).size() > 0);
 
