@@ -73,6 +73,40 @@ namespace sort_helper
             return (cmp(a.current(), b.current()));
         }
     };
+
+    // this function is used by parallel mergers
+    // returns true if new data was loaded
+    template <typename SequenceVector, typename BufferPtrVector, typename Prefetcher>
+    inline
+    bool refill_or_remove_empty_sequences(SequenceVector & seqs,
+                                          BufferPtrVector & buffers,
+                                          Prefetcher & prefetcher)
+    {
+        typedef typename SequenceVector::size_type seqs_size_type;
+        bool did_load = false;
+
+        for (seqs_size_type i = 0; i < seqs.size(); ++i)
+        {
+            if (seqs[i].first == seqs[i].second)                // run empty
+            {
+                if (prefetcher.block_consumed(buffers[i]))
+                {
+                    seqs[i].first = buffers[i]->begin();        // reset iterator
+                    seqs[i].second = buffers[i]->end();
+                    STXXL_VERBOSE1("block ran empty " << i);
+                    did_load = true;
+                }
+                else
+                {
+                    seqs.erase(seqs.begin() + i);               // remove this sequence
+                    buffers.erase(buffers.begin() + i);
+                    STXXL_VERBOSE1("seq removed " << i);
+                    --i;                                        // don't skip the next sequence
+                }
+            }
+        }
+        return did_load;
+    }
 }
 
 __STXXL_END_NAMESPACE
