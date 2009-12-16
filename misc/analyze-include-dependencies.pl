@@ -13,6 +13,13 @@ use File::Basename;
 
 $debug = 0;
 $fakeheaders = 'fakeinclude';
+# fake headers currently needed to prevent canonical name errors:
+# backward_warning.h -> backward/backward_warning.h
+# io.h -> #nothing
+# platform.hpp -> boost/thread/detail/platform.hpp
+# thread_data.hpp -> boost/thread/pthread/thread_data.hpp
+# thread_heap_alloc.hpp -> boost/thread/detail/thread_heap_alloc.hpp
+# vstring.tcc -> ext/vstring.tcc
 
 $mcstl = 0;
 $mcstlpath = 'c++';
