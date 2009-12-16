@@ -460,25 +460,7 @@ namespace sort_local
 
                     STXXL_VERBOSE1("so long");
 
-                    for (seqs_size_type i = 0; i < seqs.size(); i++)
-                    {
-                        if (seqs[i].first == seqs[i].second)                             // run empty
-                        {
-                            if (prefetcher.block_consumed(buffers[i]))
-                            {
-                                seqs[i].first = buffers[i]->begin();                     // reset iterator
-                                seqs[i].second = buffers[i]->end();
-                                STXXL_VERBOSE1("block ran empty " << i);
-                            }
-                            else
-                            {
-                                seqs.erase(seqs.begin() + i);                            // remove this sequence
-                                buffers.erase(buffers.begin() + i);
-                                STXXL_VERBOSE1("seq removed " << i);
-                                --i;                                                     // don't skip the next sequence
-                            }
-                        }
-                    }
+                    sort_helper::refill_or_remove_empty_sequences(seqs, buffers, prefetcher);
                 } while (rest > 0 && seqs.size() > 0);
 
  #if STXXL_CHECK_ORDER_IN_SORTS
