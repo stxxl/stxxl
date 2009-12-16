@@ -66,6 +66,7 @@ push @includepath, $stxxlpath if $stxxl;
 %in = ();
 %out = ();
 $out{'MISSING'} = [];
+%canonical = ();
 
 sub get_file_list($;@)
 {
@@ -121,8 +122,15 @@ sub find_header($;$)
 	my $header = shift;
 	my $relpath = dirname(shift || '.');
 	foreach $_ (@includepath, $relpath) {
-		print "FOUND: $header as $_/$header\n" if -f "$_/$header" && $debug;
-		return [ $header, "$_/$header" ] if -f "$_/$header";
+		my $file = "$_/$header";
+		if (-f $file) {
+			if (exists $canonical{$file} && $canonical{$file} ne $header) {
+				print "CANONICAL MISMATCH: $file $header $canonical{$file}\n";
+			}
+			$canonical{$file} = $header;
+			print "FOUND: $header as $file\n" if $debug;
+			return [ $header, "$file" ];
+		}
 	}
 	print "NOT FOUND: $header\n";
 	return [$header, undef];
