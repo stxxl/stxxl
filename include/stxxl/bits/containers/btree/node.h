@@ -73,7 +73,7 @@ namespace btree
         typedef node_cache<normal_node, btree_type> node_cache_type;
 
     private:
-        struct value_compare : public std::binary_function<value_type, bid_type, bool>
+        struct value_compare : public std::binary_function<value_type, value_type, bool>
         {
             key_compare comp;
 

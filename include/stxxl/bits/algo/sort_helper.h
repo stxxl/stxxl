@@ -54,14 +54,14 @@ namespace sort_helper
     template <typename block_type,
               typename prefetcher_type,
               typename value_cmp>
-    struct run_cursor2_cmp
+    struct run_cursor2_cmp : public std::binary_function<run_cursor2<block_type, prefetcher_type>, run_cursor2<block_type, prefetcher_type>, bool>
     {
         typedef run_cursor2<block_type, prefetcher_type> cursor_type;
         value_cmp cmp;
 
         run_cursor2_cmp(value_cmp c) : cmp(c) { }
         run_cursor2_cmp(const run_cursor2_cmp & a) : cmp(a.cmp) { }
-        inline bool operator () (const cursor_type & a, const cursor_type & b)
+        inline bool operator () (const cursor_type & a, const cursor_type & b) const
         {
             if (UNLIKELY(b.empty()))
                 return true;

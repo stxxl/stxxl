@@ -52,11 +52,11 @@ struct Cmp : std::binary_function<unsigned, unsigned, bool>
     {
         return a < b;
     }
-    value_type min_value()
+    value_type min_value() const
     {
         return (std::numeric_limits<value_type>::min)();
     }
-    value_type max_value()
+    value_type max_value() const
     {
         return (std::numeric_limits<value_type>::max)();
     }
