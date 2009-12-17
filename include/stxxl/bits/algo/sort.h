@@ -411,32 +411,24 @@ namespace sort_local
 
                 STXXL_VERBOSE1("output block " << j);
                 do {
-                    value_type * min_last_element = NULL;               // no element found yet
-                    diff_type total_size = 0;
-
                     if (num_currently_mergeable < rest)
                     {
-                    for (seqs_size_type i = 0; i < seqs.size(); i++)
-                    {
-                        if (seqs[i].first == seqs[i].second)
-                            continue;  // run empty
-
-                        if (min_last_element == NULL)
-                            min_last_element = &(*(seqs[i].second - 1));
+                        if (prefetcher.empty())
+                        {
+                            // anything remaining is already in memory
+                            num_currently_mergeable = (out_run_size - j) * block_type::size
+                                                      - (block_type::size - rest);
+                        }
                         else
-                            min_last_element = cmp(*min_last_element, *(seqs[i].second - 1)) ? min_last_element : &(*(seqs[i].second - 1));
+                        {
+                            value_type * first_external_element = &(consume_seq[prefetcher.pos()].value);
 
-                        total_size += seqs[i].second - seqs[i].first;
-                        STXXL_VERBOSE1("last " << *(seqs[i].second - 1) << " block size " << (seqs[i].second - seqs[i].first));
-                    }
-
-                    assert(min_last_element != NULL);           // there must be some element
-
-                    STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (block_type::size - rest));
+                            STXXL_VERBOSE1("first_external_element " << first_external_element);
 
                     // locate this element in all sequences
                             num_currently_mergeable = sort_helper::count_elements_less_equal(
-                                    seqs, *min_last_element, cmp);
+                                    seqs, *first_external_element, cmp);
+                        }
                     }
 
                     diff_type output_size = STXXL_MIN(num_currently_mergeable, rest);   // at most rest elements
