@@ -403,6 +403,8 @@ namespace sort_local
  #if STXXL_CHECK_ORDER_IN_SORTS
             value_type last_elem = cmp.min_value();
  #endif
+            diff_type num_currently_mergeable = 0;
+            bool recompute_currently_mergeable = false;
 
             for (int_type j = 0; j < out_run_size; ++j)                 // for the whole output run, out_run_size is in blocks
             {
@@ -412,6 +414,10 @@ namespace sort_local
                 do {
                     value_type * min_last_element = NULL;               // no element found yet
                     diff_type total_size = 0;
+
+                    if ((num_currently_mergeable == 0) || (num_currently_mergeable < rest && recompute_currently_mergeable))
+                    {
+                        recompute_currently_mergeable = false;
 
                     for (seqs_size_type i = 0; i < seqs.size(); i++)
                     {
@@ -431,13 +437,12 @@ namespace sort_local
 
                     STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (block_type::size - rest));
 
-                    diff_type less_equal_than_min_last = 0;
                     // locate this element in all sequences
-                    less_equal_than_min_last = sort_helper::count_elements_less_equal(seqs, *min_last_element, cmp);
+                            num_currently_mergeable = sort_helper::count_elements_less_equal(
+                                    seqs, *min_last_element, cmp);
+                    }
 
-                    STXXL_VERBOSE1("finished loop");
-
-                    diff_type output_size = STXXL_MIN(less_equal_than_min_last, rest);   // at most rest elements
+                    diff_type output_size = STXXL_MIN(num_currently_mergeable, rest);   // at most rest elements
 
                     STXXL_VERBOSE1("before merge " << output_size);
 
@@ -445,10 +450,15 @@ namespace sort_local
                     // sequence iterators are progressed appropriately
 
                     rest -= output_size;
+                    num_currently_mergeable -= output_size;
 
                     STXXL_VERBOSE1("after merge");
 
-                    sort_helper::refill_or_remove_empty_sequences(seqs, buffers, prefetcher);
+                    if (sort_helper::refill_or_remove_empty_sequences(
+                                seqs, buffers, prefetcher))
+                    {
+                        recompute_currently_mergeable = true;   // trigger recompute
+                    }
                 } while (rest > 0 && seqs.size() > 0);
 
  #if STXXL_CHECK_ORDER_IN_SORTS
