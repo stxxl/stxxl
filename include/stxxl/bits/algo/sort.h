@@ -404,7 +404,6 @@ namespace sort_local
             value_type last_elem = cmp.min_value();
  #endif
             diff_type num_currently_mergeable = 0;
-            bool recompute_currently_mergeable = false;
 
             for (int_type j = 0; j < out_run_size; ++j)                 // for the whole output run, out_run_size is in blocks
             {
@@ -415,10 +414,8 @@ namespace sort_local
                     value_type * min_last_element = NULL;               // no element found yet
                     diff_type total_size = 0;
 
-                    if ((num_currently_mergeable == 0) || (num_currently_mergeable < rest && recompute_currently_mergeable))
+                    if (num_currently_mergeable < rest)
                     {
-                        recompute_currently_mergeable = false;
-
                     for (seqs_size_type i = 0; i < seqs.size(); i++)
                     {
                         if (seqs[i].first == seqs[i].second)
@@ -454,11 +451,7 @@ namespace sort_local
 
                     STXXL_VERBOSE1("after merge");
 
-                    if (sort_helper::refill_or_remove_empty_sequences(
-                                seqs, buffers, prefetcher))
-                    {
-                        recompute_currently_mergeable = true;   // trigger recompute
-                    }
+                    sort_helper::refill_or_remove_empty_sequences(seqs, buffers, prefetcher);
                 } while (rest > 0 && seqs.size() > 0);
 
  #if STXXL_CHECK_ORDER_IN_SORTS
