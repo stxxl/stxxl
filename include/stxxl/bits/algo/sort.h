@@ -24,6 +24,8 @@
 #include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/mng/block_alloc_interleaved.h>
+#include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/intksort.h>
 #include <stxxl/bits/algo/adaptor.h>
 #include <stxxl/bits/algo/async_schedule.h>
@@ -33,7 +35,6 @@
 #include <stxxl/bits/algo/losertree.h>
 #include <stxxl/bits/algo/inmemsort.h>
 #include <stxxl/bits/parallel.h>
-#include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/common/is_sorted.h>
 
 
@@ -47,57 +48,6 @@ __STXXL_BEGIN_NAMESPACE
  */
 namespace sort_local
 {
-    template <typename BIDTp_, typename ValTp_>
-    struct trigger_entry
-    {
-        typedef BIDTp_ bid_type;
-        typedef ValTp_ value_type;
-
-        bid_type bid;
-        value_type value;
-
-        operator bid_type ()
-        {
-            return bid;
-        }
-    };
-
-    template <typename BIDTp_, typename ValTp_, typename ValueCmp_>
-    struct trigger_entry_cmp : public std::binary_function<trigger_entry<BIDTp_, ValTp_>, trigger_entry<BIDTp_, ValTp_>, bool>
-    {
-        typedef trigger_entry<BIDTp_, ValTp_> trigger_entry_type;
-        ValueCmp_ cmp;
-        trigger_entry_cmp(ValueCmp_ c) : cmp(c) { }
-        trigger_entry_cmp(const trigger_entry_cmp & a) : cmp(a.cmp) { }
-        bool operator () (const trigger_entry_type & a, const trigger_entry_type & b) const
-        {
-            return cmp(a.value, b.value);
-        }
-    };
-
-    template <typename block_type,
-              typename prefetcher_type,
-              typename value_cmp>
-    struct run_cursor2_cmp
-    {
-        typedef run_cursor2<block_type, prefetcher_type> cursor_type;
-        value_cmp cmp;
-
-        run_cursor2_cmp(value_cmp c) : cmp(c) { }
-        run_cursor2_cmp(const run_cursor2_cmp & a) : cmp(a.cmp) { }
-        inline bool operator () (const cursor_type & a, const cursor_type & b)
-        {
-            if (UNLIKELY(b.empty()))
-                return true;
-            // sentinel emulation
-            if (UNLIKELY(a.empty()))
-                return false;
-            // sentinel emulation
-
-            return (cmp(a.current(), b.current()));
-        }
-    };
-
     template <typename block_type, typename bid_type>
     struct read_next_after_write_completed
     {
@@ -106,7 +56,7 @@ namespace sort_local
         request_ptr * req;
         void operator () (request * /*completed_req*/)
         {
-            * req = block->read(bid);
+            *req = block->read(bid);
         }
     };
 
@@ -373,7 +323,7 @@ namespace sort_local
         typedef typename block_type::value_type value_type;
         typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
-        typedef run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
+        typedef sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
 
         run_type consume_seq(out_run->size());
 
@@ -390,7 +340,7 @@ namespace sort_local
         }
 
         std::stable_sort(consume_seq.begin(), consume_seq.end(),
-                         trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
+                         sort_helper::trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
         int_type disks_number = config::get_instance()->disks_number();
 
@@ -453,6 +403,7 @@ namespace sort_local
  #if STXXL_CHECK_ORDER_IN_SORTS
             value_type last_elem = cmp.min_value();
  #endif
+            diff_type num_currently_mergeable = 0;
 
             for (int_type j = 0; j < out_run_size; ++j)                 // for the whole output run, out_run_size is in blocks
             {
@@ -460,75 +411,34 @@ namespace sort_local
 
                 STXXL_VERBOSE1("output block " << j);
                 do {
-                    value_type * min_last_element = NULL;               // no element found yet
-                    diff_type total_size = 0;
-
-                    for (seqs_size_type i = 0; i < seqs.size(); i++)
+                    if (num_currently_mergeable < rest)
                     {
-                        if (seqs[i].first == seqs[i].second)
-                            continue;  // run empty
-
-                        if (min_last_element == NULL)
-                            min_last_element = &(*(seqs[i].second - 1));
+                        if (prefetcher.empty())
+                        {
+                            // anything remaining is already in memory
+                            num_currently_mergeable = (out_run_size - j) * block_type::size
+                                                      - (block_type::size - rest);
+                        }
                         else
-                            min_last_element = cmp(*min_last_element, *(seqs[i].second - 1)) ? min_last_element : &(*(seqs[i].second - 1));
-
-                        total_size += seqs[i].second - seqs[i].first;
-                        STXXL_VERBOSE1("last " << *(seqs[i].second - 1) << " block size " << (seqs[i].second - seqs[i].first));
+                        {
+                            num_currently_mergeable = sort_helper::count_elements_less_equal(
+                                    seqs, consume_seq[prefetcher.pos()].value, cmp);
+                        }
                     }
 
-                    assert(min_last_element != NULL);           // there must be some element
-
-                    STXXL_VERBOSE1("min_last_element " << min_last_element << " total size " << total_size + (block_type::size - rest));
-
-                    diff_type less_equal_than_min_last = 0;
-                    // locate this element in all sequences
-                    for (seqs_size_type i = 0; i < seqs.size(); i++)
-                    {
-                        if (seqs[i].first == seqs[i].second)
-                            continue;  // empty subsequence
-
-                        typename block_type::iterator position = std::upper_bound(seqs[i].first, seqs[i].second, *min_last_element, cmp);
-                        STXXL_VERBOSE1("greater equal than " << position - seqs[i].first);
-                        less_equal_than_min_last += position - seqs[i].first;
-                    }
-
-                    STXXL_VERBOSE1("finished loop");
-
-                    ptrdiff_t output_size = STXXL_MIN(less_equal_than_min_last, rest);   // at most rest elements
+                    diff_type output_size = STXXL_MIN(num_currently_mergeable, rest);   // at most rest elements
 
                     STXXL_VERBOSE1("before merge " << output_size);
 
                     stxxl::parallel::multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size);
                     // sequence iterators are progressed appropriately
 
+                    rest -= output_size;
+                    num_currently_mergeable -= output_size;
+
                     STXXL_VERBOSE1("after merge");
 
-                    (*out_run)[j].value = (*out_buffer)[0];                              // save smallest value
-
-                    rest -= output_size;
-
-                    STXXL_VERBOSE1("so long");
-
-                    for (seqs_size_type i = 0; i < seqs.size(); i++)
-                    {
-                        if (seqs[i].first == seqs[i].second)                             // run empty
-                        {
-                            if (prefetcher.block_consumed(buffers[i]))
-                            {
-                                seqs[i].first = buffers[i]->begin();                     // reset iterator
-                                seqs[i].second = buffers[i]->end();
-                                STXXL_VERBOSE1("block ran empty " << i);
-                            }
-                            else
-                            {
-                                seqs.erase(seqs.begin() + i);                            // remove this sequence
-                                buffers.erase(buffers.begin() + i);
-                                STXXL_VERBOSE1("seq removed " << i);
-                                --i;                                                     // don't skip the next sequence
-                            }
-                        }
-                    }
+                    sort_helper::refill_or_remove_empty_sequences(seqs, buffers, prefetcher);
                 } while (rest > 0 && seqs.size() > 0);
 
  #if STXXL_CHECK_ORDER_IN_SORTS
@@ -548,6 +458,7 @@ namespace sort_local
                 last_elem = (*out_buffer)[block_type::size - 1];
  #endif
 
+                (*out_run)[j].value = (*out_buffer)[0];                              // save smallest value
 
                 out_buffer = writer.write(out_buffer, (*out_run)[j].bid);
             }
@@ -611,7 +522,7 @@ namespace sort_local
               typename alloc_strategy,
               typename input_bid_iterator,
               typename value_cmp>
-    simple_vector<trigger_entry<typename block_type::bid_type, typename block_type::value_type> > *
+    simple_vector<sort_helper::trigger_entry<typename block_type::bid_type, typename block_type::value_type> > *
     sort_blocks(input_bid_iterator input_bids,
                 unsigned_type _n,
                 unsigned_type _m,
@@ -620,7 +531,7 @@ namespace sort_local
     {
         typedef typename block_type::value_type type;
         typedef typename block_type::bid_type bid_type;
-        typedef trigger_entry<bid_type, type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<bid_type, type> trigger_entry_type;
         typedef simple_vector<trigger_entry_type> run_type;
         typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 
@@ -768,7 +679,7 @@ namespace sort_local
 template <typename ExtIterator_, typename StrictWeakOrdering_>
 void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsigned_type M)
 {
-    typedef simple_vector<sort_local::trigger_entry<typename ExtIterator_::bid_type,
+    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::bid_type,
                                                     typename ExtIterator_::vector_type::value_type> > run_type;
 
     typedef typename ExtIterator_::vector_type::value_type value_type;

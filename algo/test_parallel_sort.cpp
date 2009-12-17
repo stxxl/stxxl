@@ -24,6 +24,7 @@
 #include <stxxl/vector>
 #include <stxxl/stream>
 #include <stxxl/scan>
+#include <stxxl/sort>
 
 #ifdef __MCSTL__
 #include <mcstl.h>

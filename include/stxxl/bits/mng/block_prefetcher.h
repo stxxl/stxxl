@@ -18,7 +18,6 @@
 
 #include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/io/request.h>
-#include <stxxl/bits/mng/mng.h>
 
 
 __STXXL_BEGIN_NAMESPACE

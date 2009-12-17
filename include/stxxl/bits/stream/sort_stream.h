@@ -20,8 +20,12 @@
 #endif
 
 #include <stxxl/bits/stream/stream.h>
-#include <stxxl/sort>
-#include <stxxl/bits/mng/typed_block.h>
+#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/algo/sort_base.h>
+#include <stxxl/bits/algo/sort_helper.h>
+#include <stxxl/bits/algo/adaptor.h>
+#include <stxxl/bits/algo/run_cursor.h>
+#include <stxxl/bits/algo/losertree.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -108,7 +112,7 @@ namespace stream
         typedef typename Input_::value_type value_type;
         typedef BID<BlockSize_> bid_type;
         typedef typed_block<BlockSize_, value_type> block_type;
-        typedef sort_local::trigger_entry<bid_type, value_type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
         typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
 
     private:
@@ -443,7 +447,7 @@ namespace stream
         typedef ValueType_ value_type;
         typedef BID<BlockSize_> bid_type;
         typedef typed_block<BlockSize_, value_type> block_type;
-        typedef sort_local::trigger_entry<bid_type, value_type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
         typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
 
     private:
@@ -667,7 +671,7 @@ namespace stream
         typedef ValueType_ value_type;
         typedef BID<BlockSize_> bid_type;
         typedef typed_block<BlockSize_, value_type> block_type;
-        typedef sort_local::trigger_entry<bid_type, value_type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
         typedef AllocStr_ alloc_strategy_type;
         Cmp_ cmp;
 
@@ -880,7 +884,7 @@ namespace stream
         typedef typename block_type::bid_type bid_type;
         typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
-        typedef sort_local::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
+        typedef sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
         typedef loser_tree<run_cursor_type, run_cursor2_cmp_type> loser_tree_type;
         typedef stxxl::int64 diff_type;
         typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
@@ -907,7 +911,6 @@ namespace stream
         std::vector<sequence> * seqs;
         std::vector<block_type *> * buffers;
         diff_type num_currently_mergeable;
-        bool recompute_currently_mergeable;
 #endif
 
 #if STXXL_CHECK_ORDER_IN_SORTS
@@ -946,11 +949,8 @@ namespace stream
 
                 do                                              // while rest > 0 and still elements available
                 {
-                    if ((num_currently_mergeable == 0) || (num_currently_mergeable < rest && recompute_currently_mergeable))
+                    if (num_currently_mergeable < rest)
                     {
-                        num_currently_mergeable = 0;
-                        recompute_currently_mergeable = false;
-
                         if (!prefetcher || prefetcher->empty())
                         {
                             // anything remaining is already in memory
@@ -958,19 +958,8 @@ namespace stream
                         }
                         else
                         {
-                            value_type * first_external_element = &(consume_seq[prefetcher->pos()].value);
-
-                            STXXL_VERBOSE1("first_external_element " << first_external_element);
-
-                            // locate this element in all sequences
-                            for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
-                            {
-                                typename block_type::iterator position = std::upper_bound((*seqs)[i].first, (*seqs)[i].second, *first_external_element, cmp);
-                                STXXL_VERBOSE1("less equal than " << position - (*seqs)[i].first);
-                                num_currently_mergeable += position - (*seqs)[i].first;
-                            }
-
-                            STXXL_VERBOSE1("finished loop");
+                            num_currently_mergeable = sort_helper::count_elements_less_equal(
+                                    *seqs, consume_seq[prefetcher->pos()].value, cmp);
                         }
                     }
 
@@ -986,26 +975,7 @@ namespace stream
 
                     STXXL_VERBOSE1("after merge");
 
-                    for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
-                    {
-                        if ((*seqs)[i].first == (*seqs)[i].second)                        // run empty
-                        {
-                            if (prefetcher->block_consumed((*buffers)[i]))
-                            {
-                                (*seqs)[i].first = (*buffers)[i]->begin();                // reset iterator
-                                (*seqs)[i].second = (*buffers)[i]->end();
-                                STXXL_VERBOSE1("block ran empty " << i);
-                                recompute_currently_mergeable = true;                     // trigger recompute
-                            }
-                            else
-                            {
-                                (*seqs).erase((*seqs).begin() + i);                       // remove this sequence
-                                (*buffers).erase((*buffers).begin() + i);
-                                STXXL_VERBOSE1("seq removed " << i);
-                                --i;                                                      // don't skip the next sequence
-                            }
-                        }
-                    }
+                    sort_helper::refill_or_remove_empty_sequences(*seqs, *buffers, *prefetcher);
                 } while (rest > 0 && (*seqs).size() > 0);
 
 #if STXXL_CHECK_ORDER_IN_SORTS
@@ -1056,8 +1026,7 @@ namespace stream
 #if STXXL_PARALLEL_MULTIWAY_MERGE
             , seqs(NULL),
             buffers(NULL),
-            num_currently_mergeable(0),
-            recompute_currently_mergeable(false)
+            num_currently_mergeable(0)
 #endif
 #if STXXL_CHECK_ORDER_IN_SORTS
             , last_element(cmp.min_value())
@@ -1132,7 +1101,7 @@ namespace stream
             }
 
             std::stable_sort(consume_seq.begin(), consume_seq.end(),
-                             sort_local::trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
+                             sort_helper::trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
             const unsigned_type n_prefetch_buffers = STXXL_MAX(min_prefetch_buffers, input_buffers - nruns);
 
@@ -1495,7 +1464,7 @@ namespace stream
     {
         typedef ValueType_ value_type;
         typedef BID<BlockSize_> bid_type;
-        typedef sort_local::trigger_entry<bid_type, value_type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
 
     public:
         typedef sorted_runs<value_type, trigger_entry_type> result;

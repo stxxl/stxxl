@@ -13,6 +13,13 @@ use File::Basename;
 
 $debug = 0;
 $fakeheaders = 'fakeinclude';
+# fake headers currently needed to prevent canonical name errors:
+# backward_warning.h -> backward/backward_warning.h
+# io.h -> #nothing
+# platform.hpp -> boost/thread/detail/platform.hpp
+# thread_data.hpp -> boost/thread/pthread/thread_data.hpp
+# thread_heap_alloc.hpp -> boost/thread/detail/thread_heap_alloc.hpp
+# vstring.tcc -> ext/vstring.tcc
 
 $mcstl = 0;
 $mcstlpath = 'c++';
@@ -21,7 +28,7 @@ $stxxl = 1;
 $stxxlpath = 'include';
 
 #$CXX = 'g++-4.2';
-$CXX = 'g++-4.3 -std=c++0x';
+$CXX = 'g++-4.4 -std=c++0x';
 $cxxtarget = 'foo-bar-gnu';
 $cxxheaderpath = undef;
 $gcctargetheaderpath = undef;
@@ -50,21 +57,23 @@ push @includepath, $stxxlpath if $stxxl;
 	xmmintrin.h		emmintrin.h
 	ext/vstring.h		vstring.tcc
 	wctype.h		wchar.h
+	stdatomic.h		cstdatomic
 	algorithm		parallel/algorithm
 	numeric			parallel/numeric
 	bits/stl_algobase.h	parallel/algobase.h
 	parallel/partition.h	parallel/sort.h
 	boost/type_traits/is_class.hpp	boost/type_traits/is_scalar.hpp
+	boost/type_traits/msvc/remove_cv.hpp	boost/type_traits/is_pointer.hpp
 	boost/preprocessor/list/fold_left.hpp	boost/preprocessor/control/while.hpp
 	boost/preprocessor/list/fold_right.hpp	boost/preprocessor/control/while.hpp
 	);
-#	stxxl/bits/io/iobase.h	stxxl/io
 
 %seen = ();
 @todo = ();
 %in = ();
 %out = ();
 $out{'MISSING'} = [];
+%canonical = ();
 
 sub get_file_list($;@)
 {
@@ -120,8 +129,15 @@ sub find_header($;$)
 	my $header = shift;
 	my $relpath = dirname(shift || '.');
 	foreach $_ (@includepath, $relpath) {
-		print "FOUND: $header as $_/$header\n" if -f "$_/$header" && $debug;
-		return [ $header, "$_/$header" ] if -f "$_/$header";
+		my $file = "$_/$header";
+		if (-f $file) {
+			if (exists $canonical{$file} && $canonical{$file} ne $header) {
+				print "CANONICAL MISMATCH: $file $header $canonical{$file}\n";
+			}
+			$canonical{$file} = $header;
+			print "FOUND: $header as $file\n" if $debug;
+			return [ $header, "$file" ];
+		}
 	}
 	print "NOT FOUND: $header\n";
 	return [$header, undef];

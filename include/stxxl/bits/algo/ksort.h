@@ -303,7 +303,7 @@ namespace ksort_local
     template <typename block_type,
               typename prefetcher_type,
               typename key_extractor>
-    struct run_cursor2_cmp
+    struct run_cursor2_cmp : public std::binary_function<run_cursor2<block_type, prefetcher_type>, run_cursor2<block_type, prefetcher_type>, bool>
     {
         typedef run_cursor2<block_type, prefetcher_type> cursor_type;
         key_extractor keyobj;
@@ -311,7 +311,7 @@ namespace ksort_local
         {
             keyobj = keyobj_;
         }
-        inline bool operator () (const cursor_type & a, const cursor_type & b)
+        inline bool operator () (const cursor_type & a, const cursor_type & b) const
         {
             if (UNLIKELY(b.empty()))
                 return true;
