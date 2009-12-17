@@ -14,8 +14,10 @@
 #ifndef STXXL_SORT_HELPER_HEADER
 #define STXXL_SORT_HELPER_HEADER
 
+#include <algorithm>
 #include <functional>
 #include <stxxl/bits/algo/run_cursor.h>
+#include <stxxl/bits/verbose.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -73,6 +75,25 @@ namespace sort_helper
             return (cmp(a.current(), b.current()));
         }
     };
+
+    // this function is used by parallel mergers
+    template <typename SequenceVector, typename ValueType, typename Comparator>
+    inline
+    unsigned_type count_elements_less_equal(const SequenceVector & seqs, const ValueType & bound, Comparator cmp)
+    {
+        typedef typename SequenceVector::size_type seqs_size_type;
+        typedef typename SequenceVector::value_type::first_type iterator;
+        unsigned_type count = 0;
+
+        for (seqs_size_type i = 0; i < seqs.size(); ++i)
+        {
+            iterator position = std::upper_bound(seqs[i].first, seqs[i].second, bound, cmp);
+            STXXL_VERBOSE1("less equal than " << position - seqs[i].first);
+            count += position - seqs[i].first;
+        }
+        STXXL_VERBOSE1("finished loop");
+        return count;
+    }
 
     // this function is used by parallel mergers
     // returns true if new data was loaded
