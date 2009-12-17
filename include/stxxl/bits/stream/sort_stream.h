@@ -967,14 +967,7 @@ namespace stream
                             STXXL_VERBOSE1("first_external_element " << first_external_element);
 
                             // locate this element in all sequences
-                            for (seqs_size_type i = 0; i < (*seqs).size(); ++i)
-                            {
-                                typename block_type::iterator position = std::upper_bound((*seqs)[i].first, (*seqs)[i].second, *first_external_element, cmp);
-                                STXXL_VERBOSE1("less equal than " << position - (*seqs)[i].first);
-                                num_currently_mergeable += position - (*seqs)[i].first;
-                            }
-
-                            STXXL_VERBOSE1("finished loop");
+                            num_currently_mergeable = sort_helper::count_elements_less_equal(*seqs, *first_external_element, cmp);
                         }
                     }
 
