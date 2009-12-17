@@ -435,30 +435,23 @@ namespace sort_local
                     // locate this element in all sequences
                     for (seqs_size_type i = 0; i < seqs.size(); i++)
                     {
-                        if (seqs[i].first == seqs[i].second)
-                            continue;  // empty subsequence
-
                         typename block_type::iterator position = std::upper_bound(seqs[i].first, seqs[i].second, *min_last_element, cmp);
-                        STXXL_VERBOSE1("greater equal than " << position - seqs[i].first);
+                        STXXL_VERBOSE1("less equal than " << position - seqs[i].first);
                         less_equal_than_min_last += position - seqs[i].first;
                     }
 
                     STXXL_VERBOSE1("finished loop");
 
-                    ptrdiff_t output_size = STXXL_MIN(less_equal_than_min_last, rest);   // at most rest elements
+                    diff_type output_size = STXXL_MIN(less_equal_than_min_last, rest);   // at most rest elements
 
                     STXXL_VERBOSE1("before merge " << output_size);
 
                     stxxl::parallel::multiway_merge(seqs.begin(), seqs.end(), out_buffer->end() - rest, cmp, output_size);
                     // sequence iterators are progressed appropriately
 
-                    STXXL_VERBOSE1("after merge");
-
-                    (*out_run)[j].value = (*out_buffer)[0];                              // save smallest value
-
                     rest -= output_size;
 
-                    STXXL_VERBOSE1("so long");
+                    STXXL_VERBOSE1("after merge");
 
                     sort_helper::refill_or_remove_empty_sequences(seqs, buffers, prefetcher);
                 } while (rest > 0 && seqs.size() > 0);
@@ -480,6 +473,7 @@ namespace sort_local
                 last_elem = (*out_buffer)[block_type::size - 1];
  #endif
 
+                (*out_run)[j].value = (*out_buffer)[0];                              // save smallest value
 
                 out_buffer = writer.write(out_buffer, (*out_run)[j].bid);
             }
