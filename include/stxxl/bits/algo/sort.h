@@ -433,12 +433,7 @@ namespace sort_local
 
                     diff_type less_equal_than_min_last = 0;
                     // locate this element in all sequences
-                    for (seqs_size_type i = 0; i < seqs.size(); i++)
-                    {
-                        typename block_type::iterator position = std::upper_bound(seqs[i].first, seqs[i].second, *min_last_element, cmp);
-                        STXXL_VERBOSE1("less equal than " << position - seqs[i].first);
-                        less_equal_than_min_last += position - seqs[i].first;
-                    }
+                    less_equal_than_min_last = sort_helper::count_elements_less_equal(seqs, *min_last_element, cmp);
 
                     STXXL_VERBOSE1("finished loop");
 
