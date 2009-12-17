@@ -952,7 +952,6 @@ namespace stream
                 {
                     if ((num_currently_mergeable == 0) || (num_currently_mergeable < rest && recompute_currently_mergeable))
                     {
-                        num_currently_mergeable = 0;
                         recompute_currently_mergeable = false;
 
                         if (!prefetcher || prefetcher->empty())
@@ -962,12 +961,8 @@ namespace stream
                         }
                         else
                         {
-                            value_type * first_external_element = &(consume_seq[prefetcher->pos()].value);
-
-                            STXXL_VERBOSE1("first_external_element " << first_external_element);
-
-                            // locate this element in all sequences
-                            num_currently_mergeable = sort_helper::count_elements_less_equal(*seqs, *first_external_element, cmp);
+                            num_currently_mergeable = sort_helper::count_elements_less_equal(
+                                    *seqs, consume_seq[prefetcher->pos()].value, cmp);
                         }
                     }
 
