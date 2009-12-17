@@ -421,13 +421,8 @@ namespace sort_local
                         }
                         else
                         {
-                            value_type * first_external_element = &(consume_seq[prefetcher.pos()].value);
-
-                            STXXL_VERBOSE1("first_external_element " << first_external_element);
-
-                    // locate this element in all sequences
                             num_currently_mergeable = sort_helper::count_elements_less_equal(
-                                    seqs, *first_external_element, cmp);
+                                    seqs, consume_seq[prefetcher.pos()].value, cmp);
                         }
                     }
 
