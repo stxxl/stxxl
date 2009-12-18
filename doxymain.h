@@ -101,8 +101,7 @@
  *
  * - Questions concerning use and development of the \c S<small>TXXL</small>
  * library and bug reports should be posted to the
- * <b><a href="http://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>
- * or mailed to <A href="http://i10www.ira.uka.de/dementiev/">Roman Dementiev</A>.
+ * <b><a href="http://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>.
  *
  * - \link FAQ FAQ - Frequently Asked Questions \endlink
  *

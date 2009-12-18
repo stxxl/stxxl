@@ -45,7 +45,7 @@ implements containers and algorithms that can process <b>huge volumes of
 data</b> that only fit on disks. While the compatibility to the STL
 supports ease of use and compatibility with existing applications,
 another design priority is high performance. 
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/report/">more info</a>]
+[<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">more info</a>]
 
 
             </td>
@@ -95,7 +95,7 @@ The following are some key features of
 			<font face="Courier,Courier New"><b>S<small>TXXL</small></b></font> containers;
 			moreover the I/O complexity of the algorithms
 			remains optimal in most of the cases.<br>
-			[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/report/">more info</a>]<br>
+			[<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">more info</a>]<br>
             <br><br>
 
 	<b>Current contributors</b>: Andreas Beckmann, Johannes Singler<BR>
@@ -124,9 +124,9 @@ The following are some key features of
 		  <tbody><tr>
 		   <td align="left" valign="middle">
 			
-Questions concerning use and development of the <font
- face="Courier,Courier New"><b>S<small>TXXL</small></b></font> library
-mail to <a href="http://algo2.iti.uni-karlsruhe.de/dementiev/">Roman Dementiev </a> or consult the <a href="https://sourceforge.net/forum/?group_id=131632">forum</a>.
+Questions concerning use and development of the \c S<small>TXXL</small>
+library and bug reports should be posted to the
+<b><a href="http://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>.
             <br>
 </td>
           </tr>
@@ -189,7 +189,7 @@ supported </font> </td>
   <td><A href="http://www.linux.org/">Linux</A> (kernel &gt;= 2.4.18)</td>
   <td>g++ (3.3-4.3)<br>icpc (9.0-10.1)</td>
   <td><a href="http://www.boost.org">Boost</a> (optional),<br>
-      <a href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">MCSTL</a> (optional, only with g++ 4.2 or icpc 10.x)</td>
+      <a href="http://algo2.iti.kit.edu/singler/mcstl/">MCSTL</a> (optional, only with g++ 4.2 or icpc 10.x)</td>
 </tr>
 <tr>
   <th>&nbsp;&middot;</th>
@@ -234,7 +234,7 @@ version </font> </td>
  contains an implementation of the lower layers (memory
 management, disk virtualization, prefetching,...). From the higher
 layers, (pipelined) sorting with 
-<A  href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">SMP and multi-core processor support</A>, (pipelined) scanning and containers
+<A  href="http://algo2.iti.kit.edu/singler/mcstl/">SMP and multi-core processor support</A>, (pipelined) scanning and containers
 (vectors, stacks, priority queues, maps (B+Tree), queues, deques) are supported. 
 Currently that
 sums to about 29 thousand lines of code (29 KSLOC). </td>
@@ -334,26 +334,26 @@ For a detailed list, please read the the CHANGELOG file.
 	      &nbsp; &middot; Installation manual:
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.2.1/install.html">1.2.1</a>]
+	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/tags/1.2.1/install.html">1.2.1</a>]
             </td>
 	    <td>
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.1.0/installation.html">1.1.0</a>]
+	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/tags/1.1.0/installation.html">1.1.0</a>]
             </td>
 	    <td>
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/trunk/install-svn.html">trunk</a>]
+	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/trunk/install-svn.html">trunk</a>]
           </tr>
           <tr>
             <td align="left" valign="middle">
 	      &nbsp; &middot; Programmer documentation:
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.2.1/">1.2.1</a>]
+	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/tags/1.2.1/">1.2.1</a>]
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/tags/1.1.0/">1.1.0</a>]
+	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/tags/1.1.0/">1.1.0</a>]
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/trunk/">trunk</a>]
+	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/trunk/">trunk</a>]
 	    </td>
           </tr>
           <tr>
@@ -398,29 +398,29 @@ For a detailed list, please read the the CHANGELOG file.
 	  <tr>
             <td align="left" valign="middle">
 	      &nbsp; &middot; <b>FAQ</b> - Frequently Asked Questions
-	      [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/trunk/FAQ.html">html</a>]
+	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/trunk/FAQ.html">html</a>]
             </td>
 	  </tr>
           <tr>
             <td align="left" valign="middle"> &nbsp; &middot; <b>Design paper - library overview </b> 
-                [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/TRKA2005_18.pdf">pdf</a>] [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/report/">html</a>]
+                [<a href="http://algo2.iti.kit.edu/dementiev/files/TRKA2005_18.pdf">pdf</a>] [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">html</a>]
             </td>
           </tr>
           <tr>
             <td align="left" valign="middle"> &nbsp; &middot; <b>Tutorial
 (draft) </b>
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/stxxl_tutorial.pdf">pdf</a>]
+[<a href="http://algo2.iti.kit.edu/dementiev/files/stxxl_tutorial.pdf">pdf</a>]
             </td>
           </tr>
 	 <tr>
             <td align="left" valign="middle"> &nbsp; &middot; Older version (0.77 - Linux only):
 [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632&amp;package_id=144407&amp;release_id=541515">tgz (sf.net)</a>]
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/stxxl_0.77.tgz">tgz</a>]
+[<a href="http://algo2.iti.kit.edu/dementiev/files/stxxl_0.77.tgz">tgz</a>]
             </td>
           </tr>
 	<tr>
             <td align="left" valign="middle"> &nbsp; &middot;
-		MCSTL library homepage: [<A href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">link</A>] (optional)
+		MCSTL library homepage: [<A href="http://algo2.iti.kit.edu/singler/mcstl/">link</A>] (optional)
 	  </td>
          </tr>
         </tbody>
@@ -448,7 +448,7 @@ Ongoing and completed projects using <font
           <tr>
             <td align="left" valign="middle"> &nbsp; &middot; External
 Memory Breadth-First Search (BFS) 
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/ebfs.pdf">paper (pdf)</a>] 
+[<a href="http://algo2.iti.kit.edu/dementiev/files/ebfs.pdf">paper (pdf)</a>]
 [<a href="http://www.mpi-inf.mpg.de/~ajwani/em_bfs/">project page</a>] 
 [<a href="http://www.mpi-inf.mpg.de/~ajwani/graph_gen/">graph generators</a>] 
 </td>
@@ -457,24 +457,24 @@ Memory Breadth-First Search (BFS)
             <td align="left" valign="middle"> &nbsp; &middot; External
 Memory Minimum Spanning Trees [<a
  href="http://www.dominik-schultes.de/emmst/">project page</a>]
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/emst.ps">paper (ps)</a>]
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/emst.pdf">paper (pdf)</a>] </td>
+[<a href="http://algo2.iti.kit.edu/dementiev/files/emst.ps">paper (ps)</a>]
+[<a href="http://algo2.iti.kit.edu/dementiev/files/emst.pdf">paper (pdf)</a>] </td>
           </tr>
           <tr>
             <td align="left" valign="middle"> &nbsp; &middot; External
 Memory Spanning Forests and Connected Components [<a
- href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/cc.pdf">report</a>] 
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/cc.tgz">src tarball</a>]
+ href="http://algo2.iti.kit.edu/dementiev/files/cc.pdf">report</a>]
+[<a href="http://algo2.iti.kit.edu/dementiev/files/cc.tgz">src tarball</a>]
             </td>
           </tr>
           <tr>
             <td align="left" valign="middle"> &nbsp; &middot; 
 External Memory Suffix Array Construction and
 Suffix Array Checker [<a
- href="http://algo2.iti.uni-karlsruhe.de/dementiev/esuffix/docu/index.html">project
+ href="http://algo2.iti.kit.edu/dementiev/esuffix/docu/index.html">project
 page</a>]
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/DKMS05.pdf">paper(pdf)</a>]
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/esuffix/instances.shtml">input
+[<a href="http://algo2.iti.kit.edu/dementiev/files/DKMS05.pdf">paper(pdf)</a>]
+[<a href="http://algo2.iti.kit.edu/dementiev/esuffix/instances.shtml">input
 instances</a>] </td>
           </tr>
           <tr>
@@ -501,6 +501,22 @@ Publications </font> </td>
 			<table cellspacing=5 cellpadding=2 border=0 width="100%">
 				<tr>
 				    <td align=left valign="middle">
+	A. Beckmann, R. Dementiev, J. Singler:
+Building A Parallel Pipelined External Memory Algorithm Library
+		  <small>
+		  IPDPS 2009
+		  </small>
+[<A href="http://algo2.iti.kit.edu/singler/publications/parallelstxxl-ipdps2009.pdf">full text</A>]
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td valign=top class=n >
+			<table cellspacing=5 cellpadding=2 border=0 width="100%">
+				<tr>
+				    <td align=left valign="middle">
 	R. Dementiev, L. Kettner, P. Sanders:
 STXXL: standard template library for XXL data sets,
 		  <small>
@@ -509,7 +525,7 @@ STXXL: standard template library for XXL data sets,
 		  <small>
 		  	[<a href="http://www3.interscience.wiley.com/cgi-bin/abstract/114300511/ABSTRACT">link</a>]
 		  </small>
-[<A href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/stxxl_spe.pdf">preprint</A>]
+[<A href="http://algo2.iti.kit.edu/dementiev/files/stxxl_spe.pdf">preprint</A>]
 					</td>
 				</tr>
 			</table>
@@ -522,7 +538,7 @@ STXXL: standard template library for XXL data sets,
 					<td align=left valign="middle">
 					D. Ajwani, R. Dementiev, U. Meyer:
 					A Computational Study of External-Memory BFS Algorithms.
-					<small>SODA2006: ACM-SIAM Symposium on Discrete Algorithms (January 2006, Miami, Florida, USA) [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/ebfs.pdf">pdf</a>] 
+					<small>SODA2006: ACM-SIAM Symposium on Discrete Algorithms (January 2006, Miami, Florida, USA) [<a href="http://algo2.iti.kit.edu/dementiev/files/ebfs.pdf">pdf</a>]
 		</small>
 					</td>
 				</tr>
@@ -537,7 +553,7 @@ STXXL: standard template library for XXL data sets,
 					R. Dementiev, L. Kettner, P. Sanders:
 					Stxxl: Standard Template Library for XXL Data Sets.
 					<small>ESA2005: 13th Annual European Symposium on Algorithms (October 2005, Palma de Mallorca, Spain) 
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/DKS05.pdf">pdf</a>] (see also <A href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/TRKA2005_18.pdf">the extended version</A>)
+[<a href="http://algo2.iti.kit.edu/dementiev/files/DKS05.pdf">pdf</a>] (see also <A href="http://algo2.iti.kit.edu/dementiev/files/TRKA2005_18.pdf">the extended version</A>)
 		</small>
 					</td>
 				</tr>
@@ -552,7 +568,7 @@ STXXL: standard template library for XXL data sets,
 					R. Dementiev, L. Kettner, P. Sanders:
 					Stxxl: Standard Template Library for XXL Data Sets.
 					Technical Report 2005/18, Fakult&auml;t f&uuml;r Informatik, University of Karlsruhe
-                                        <small>[<A href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/TRKA2005_18.pdf">pdf</A>] [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/report/">html</a>]</small>
+                                        <small>[<A href="http://algo2.iti.kit.edu/dementiev/files/TRKA2005_18.pdf">pdf</A>] [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">html</a>]</small>
 					</td>
 				</tr>
 			</table>
@@ -567,8 +583,8 @@ STXXL: standard template library for XXL data sets,
 K&auml;rkk&auml;inen, J. Mehnert, P. Sanders:
 Better External Memory Suffix Array Construction <small> ALENEX05:
 Algorithm Engineering and Experiments (January 2005, Vancouver ,
-Canada): </small> <small> [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/DKMS05.pdf">pdf</a>] </small>
-[<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/esuffix/instances.shtml">input
+Canada): </small> <small> [<a href="http://algo2.iti.kit.edu/dementiev/files/DKMS05.pdf">pdf</a>] </small>
+[<a href="http://algo2.iti.kit.edu/dementiev/esuffix/instances.shtml">input
 instances</a>] </td>
           </tr>
         </tbody>
@@ -584,8 +600,8 @@ instances</a>] </td>
 D. Schultes, and J. Sibeyn: Engineering an External Memory Minimum
 Spanning Tree Algorithm. <small> TSC04: 3rd IFIP International
 Conference on Theoretical Computer Science (August 24-26, 2004,
-Toulouse): </small> <small> [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/emst.ps">ps</a>] </small>
-            <small> [<a href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/emst.pdf">pdf</a>] </small> </td>
+Toulouse): </small> <small> [<a href="http://algo2.iti.kit.edu/dementiev/files/emst.ps">ps</a>] </small>
+            <small> [<a href="http://algo2.iti.kit.edu/dementiev/files/emst.pdf">pdf</a>] </small> </td>
           </tr>
         </tbody>
       </table>
@@ -600,7 +616,7 @@ Toulouse): </small> <small> [<a href="http://algo2.iti.uni-karlsruhe.de/dementie
 Asynchronous Parallel Disk Sorting. <small> In 15th ACM Symposium on
 Parallelism in Algorithms and Architectures (June 7-9, 2003, San Diego,
 California, USA): pages 138-148 </small> <small>[<a
- href="http://algo2.iti.uni-karlsruhe.de/dementiev/files/DS03.pdf">pdf</a>]</small> </td>
+ href="http://algo2.iti.kit.edu/dementiev/files/DS03.pdf">pdf</a>]</small> </td>
           </tr>
         </tbody>
       </table>
