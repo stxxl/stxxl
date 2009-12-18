@@ -1,9 +1,53 @@
-Version 1.2.2 (unreleased)
+Version 1.3
 
-* fix possible race condition while creating singleton instances
-* start documenting #defines in defines.h
-* remove unused debug code fragments that were no longer working for years
-* add FreeBSD support
+* New file types
+  - fileperblock_syscall/fileperblock_mmap/fileperblock_boostfd/fileperblock_wincall:
+    Use a separate file for each block, which is accessed by means of the
+    underlying file type.  The "filename" given is used as a prefix of the
+    block file names.  The advantage of these file types is that unneeded
+    disk space is freed earlier on the file system level.
+  - wbtl_file:  Do library-based write-combining (good for writing small blocks onto SSDs)
+* Other new functionality 
+  - file requests can now be canceled (success not guaranteed), completion handlers are called anyway.
+  - log file locations are now configurable by the environment variables
+    STXXLLOGFILE and STXXLERRLOGFILE.
+  - single queue I/O scheduling ???
+  - autogrow files (specified in .stxxl by a size of 0), will be deleted on normal program termination
+  - add infrastructure to build multiple binaries with different CXXFLAGS from a single source ???
+* Many, many bug fixes, in particular concerning
+  - priority queue
+  - optimal prefetch schedule
+  - possible race condition while creating singleton instances
+* Platform Support 
+  - add Boost 1.40
+  - add FreeBSD
+  - drop Solaris
+* New benchmarks 
+  - measure hard-disk and flash-disk combined performance and
+    determine best block size pairs (io/benchmark_disk_and_flash)
+  - benchmark using regular STXXL configuration (benchmark_configured_disks)
+  - iobench_scatter_in_place.cpp ???
+* Possibly breaking changes
+  - API name changes
+    vector::touch -> vector::block_externally_updated ???
+  - Priority of write changes ???
+  - Other name changes (considered internal)
+    typed_block<>::has_filler -> !typed_block<>::has_only_data
+    file::delete_region -> file::discard
+    vector::alloc_strategy -> vector::alloc_strategy_type
+  - Overwriting deleted memfile regions with uninitialized data is now optional
+    (STXXL_CLEAR_FREE_MEMFILE_MEM).
+  - Execute completion handler before notifying waiters, so far after. 
+* Under-the-hood improvements
+  - I/O layer cleanup
+  - write_pool additional functionality ???
+  - aligned_alloc ???
+* Doxy now also lists undocumented members (to be changed?) ???
+* stop requiring STXXL_ROOT to be a hard coded absolute path set in make.settings.local, 
+  a default of CURDIR works fine
+* document #defines in defines.h
+  - switch on/off file types with STXXL_HAVE_xxx_FILE (to avoid platform compatibility problems)
+* parallel PQ in before?  now in? ???
 
 ------------------------------------------
 Version 1.2.1 (14 August 2008)
