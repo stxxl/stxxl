@@ -149,8 +149,10 @@ void aio_queue::handle_events(io_event * events, int num_events, bool canceled)
 {
     for (int e = 0; e < num_events; ++e)
     {
-        static_cast<aio_request *>(reinterpret_cast<request_ptr *>(events[e].data)->get())->completed(canceled);
-        delete reinterpret_cast<request_ptr *>(events[e].data);         // release auto_ptr reference
+        //unsigned_type is as long as a pointer, and like this, we avoid an icpc warning
+        request_ptr * r = reinterpret_cast<request_ptr *>(static_cast<unsigned_type>(events[e].data));
+        static_cast<aio_request *>(r->get())->completed(canceled);
+        delete r;         // release auto_ptr reference
         if (max_sim_requests != 0)
             posted_free_sem++;
         posted_sem--;
