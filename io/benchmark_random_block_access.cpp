@@ -169,13 +169,13 @@ int main(int argc, char * argv[])
 
     bool do_init = false, do_read = false, do_write = false;
 
-    if (argc == 5 && (strstr(argv[3], "i") != NULL))
+    if (argc == 5 && (strstr(argv[4], "i") != NULL))
         do_init = true;
 
-    if (argc == 5 && (strstr(argv[3], "r") != NULL))
+    if (argc == 5 && (strstr(argv[4], "r") != NULL))
         do_read = true;
 
-    if (argc == 5 && (strstr(argv[3], "w") != NULL))
+    if (argc == 5 && (strstr(argv[4], "w") != NULL))
         do_write = true;
 
     switch(block_size)
