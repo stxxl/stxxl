@@ -732,10 +732,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\stxxl\bits\compat_hash_set.h"
-					>
-				</File>
-				<File
 					RelativePath=".\include\bits\intel_compatibility.h"
 					>
 				</File>
