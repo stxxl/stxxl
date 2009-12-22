@@ -578,9 +578,62 @@ public:
     }
 };
 
+namespace detail
+{
+
+    template <typename BlockType, bool can_use_trivial_pointer>
+    class element_iterator_generator
+    {
+    };
+
+    // default case for blocks with fillers or other data: use ArrayOfSequenceIterator
+    template <typename BlockType>
+    class element_iterator_generator<BlockType, false>
+    {
+        typedef BlockType block_type;
+        typedef typename block_type::value_type value_type;
+        typedef ArrayOfSequencesIterator<block_type, value_type, block_type::size> AOSIterator;
+
+    public:
+        typedef AOSIterator iterator;
+
+        iterator operator () (block_type * blocks, unsigned_type offset) const
+        {
+            return iterator(blocks, offset);
+        }
+    };
+
+    // special case for completely filled blocks: use trivial pointers
+    template <typename BlockType>
+    class element_iterator_generator<BlockType, true>
+    {
+        typedef BlockType block_type;
+        typedef typename block_type::value_type value_type;
+        typedef ArrayOfSequencesIterator<block_type, value_type, block_type::size> AOSIterator;
+
+    public:
+        typedef value_type * iterator;
+
+        iterator operator () (block_type * blocks, unsigned_type offset) const
+        {
+            return blocks[0].elem + offset;
+        }
+    };
+
+}
+
+template <typename BlockType>
+inline
+typename detail::element_iterator_generator<BlockType, BlockType::has_only_data>::iterator
+make_element_iterator(BlockType * blocks, unsigned_type offset)
+{
+    detail::element_iterator_generator<BlockType, BlockType::has_only_data> iter_gen;
+    return iter_gen(blocks, offset);
+}
 
 //! \}
 
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_ADAPTOR_HEADER
+// vim: et:ts=6:sw=4
