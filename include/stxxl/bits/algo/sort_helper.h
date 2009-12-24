@@ -96,15 +96,13 @@ namespace sort_helper
     }
 
     // this function is used by parallel mergers
-    // returns true if new data was loaded
     template <typename SequenceVector, typename BufferPtrVector, typename Prefetcher>
     inline
-    bool refill_or_remove_empty_sequences(SequenceVector & seqs,
+    void refill_or_remove_empty_sequences(SequenceVector & seqs,
                                           BufferPtrVector & buffers,
                                           Prefetcher & prefetcher)
     {
         typedef typename SequenceVector::size_type seqs_size_type;
-        bool did_load = false;
 
         for (seqs_size_type i = 0; i < seqs.size(); ++i)
         {
@@ -115,7 +113,6 @@ namespace sort_helper
                     seqs[i].first = buffers[i]->begin();        // reset iterator
                     seqs[i].second = buffers[i]->end();
                     STXXL_VERBOSE1("block ran empty " << i);
-                    did_load = true;
                 }
                 else
                 {
@@ -126,7 +123,6 @@ namespace sort_helper
                 }
             }
         }
-        return did_load;
     }
 }
 
