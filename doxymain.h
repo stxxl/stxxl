@@ -196,6 +196,15 @@ Controller::Controller()
 }
 \endverbatim
  *
+ *
+ * \section q5 How can I credit STXXL, and thus foster its development?
+ *
+ * - For all users:  Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
+ *
+ * - For scientific work:  Cite the papers mentioned here: http://stxxl.sourceforge.net/
+ *
+ * - For industrial users:  Tell us the name of your company, so we can use it as a reference.
+ *
  */
 
 
