@@ -7,7 +7,7 @@ charset=ISO-8859-1">
  <META NAME="Description" CONTENT="Stxxl: C++ library for extra large data sets">
  <meta name="keywords" content="large huge big data sets volumes C++ library parallel external memory hard disk STL Standard Template algorithms structures generic programming pipelining graph out-of-core">
   <title>STXXL: C++ Standard Template Library for Extra Large Data Sets</title>
-  <link href="./dementiev.css" rel="STYLESHEET">
+  <link href="./stxxl.css" rel="STYLESHEET">
 </head>
 <body>
 <table border="0" cellpadding="0" cellspacing="2" width="100%">
@@ -124,7 +124,7 @@ The following are some key features of
 		  <tbody><tr>
 		   <td align="left" valign="middle">
 			
-Questions concerning use and development of the \c S<small>TXXL</small>
+Questions concerning use and development of the <font face="Courier,Courier New"><b>S<small>TXXL</small></b></font>
 library and bug reports should be posted to the
 <b><a href="http://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>.
             <br>
@@ -504,7 +504,7 @@ Publications </font> </td>
 	A. Beckmann, R. Dementiev, J. Singler:
 Building A Parallel Pipelined External Memory Algorithm Library
 		  <small>
-		  IPDPS 2009
+		  IPDPS 2009: International Parallel and Distributed Processing Symposium (May 2009, Rome, Italy)
 		  </small>
 [<A href="http://algo2.iti.kit.edu/singler/publications/parallelstxxl-ipdps2009.pdf">full text</A>]
 					</td>
