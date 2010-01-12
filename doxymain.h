@@ -53,9 +53,9 @@
   GCC 3.4       |    x       -         x         -
   GCC 3.3       |    o       -         o         -
   GCC 2.95      |    -       -         -         -
-* ICPC 11.1.038 |    x¹    MCSTL¹      x¹      MCSTL¹
-  ICPC 11.0.081 |    x¹    MCSTL¹      x¹      MCSTL¹
-  ICPC 10.1.017 |    x¹    MCSTL¹      x¹      MCSTL¹
+* ICPC 11.1.064 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 11.0.084 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 10.1.025 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 10.0.026 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 9.1.053  |    x¹      -         x¹        -
   ICPC 9.0.032  |    x¹      -         x¹        -
@@ -195,6 +195,15 @@ Controller::Controller()
     onexit(myexitfn);
 }
 \endverbatim
+ *
+ *
+ * \section q5 How can I credit STXXL, and thus foster its development?
+ *
+ * - For all users:  Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
+ *
+ * - For scientific work:  Cite the papers mentioned here: http://stxxl.sourceforge.net/
+ *
+ * - For industrial users:  Tell us the name of your company, so we can use it as a reference.
  *
  */
 
