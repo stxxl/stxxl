@@ -314,8 +314,8 @@ void stats::_reset_io_wait_time()
 std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char * unit, int multiplier)
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
-    static const char* endings[] = { "", "k", "M", "G", "T", "P", "E" };
-    static const char* binary_endings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
+    static const char * endings[] = { "", "k", "M", "G", "T", "P", "E" };
+    static const char * binary_endings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
     std::ostringstream out;
     out << number << ' ';
     int scale = 0;

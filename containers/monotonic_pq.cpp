@@ -118,9 +118,9 @@ int main(int argc, char * argv[])
     {
         std::cout << "Usage: " << argv[0] << " [n in MiB]"
 #if defined(__MCSTL__) || defined(_GLIBCXX_PARALLEL)
-                << " [p threads]"
+                  << " [p threads]"
 #endif
-                << std::endl;
+                  << std::endl;
         return -1;
     }
 

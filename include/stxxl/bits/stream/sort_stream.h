@@ -819,7 +819,7 @@ namespace stream
             }
             if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
                                   make_element_iterator(blocks, sruns.runs_sizes[irun]),
-                    cmp))
+                                  cmp))
             {
                 STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
                 return false;
@@ -936,7 +936,7 @@ namespace stream
                         else
                         {
                             num_currently_mergeable = sort_helper::count_elements_less_equal(
-                                    *seqs, consume_seq[prefetcher->pos()].value, cmp);
+                                *seqs, consume_seq[prefetcher->pos()].value, cmp);
                         }
                     }
 

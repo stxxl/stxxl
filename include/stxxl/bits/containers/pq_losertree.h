@@ -371,7 +371,7 @@ namespace priority_queue_local
                 current_end[last_empty] = current_end[pos];
                 segment[last_empty] = segment[pos];
                 last_empty++;
-            }/*
+            } /*
                 else
                 {
                 if(segment[pos])

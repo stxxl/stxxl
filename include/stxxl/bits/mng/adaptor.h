@@ -315,8 +315,8 @@ struct TwoToOneDimArrayAdaptorBase
 //////////////////////////
 template <class one_dim_array_type, class data_type,
           unsigned dim_size, class pos_type = blocked_index<dim_size> >
-struct TwoToOneDimArrayRowAdaptor : public
-                                    TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>
+struct TwoToOneDimArrayRowAdaptor :
+    public TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>
 {
     typedef TwoToOneDimArrayRowAdaptor<one_dim_array_type,
                                        data_type, dim_size, pos_type> _Self;
@@ -580,11 +580,9 @@ public:
 
 namespace helper
 {
-
     template <typename BlockType, bool can_use_trivial_pointer>
     class element_iterator_generator
-    {
-    };
+    { };
 
     // default case for blocks with fillers or other data: use ArrayOfSequenceIterator
     template <typename BlockType>
@@ -617,7 +615,6 @@ namespace helper
             return blocks[0].elem + offset;
         }
     };
-
 }
 
 template <typename BlockType>
