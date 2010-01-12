@@ -631,4 +631,4 @@ make_element_iterator(BlockType * blocks, unsigned_type offset)
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_ADAPTOR_HEADER
-// vim: et:ts=6:sw=4
+// vim: et:ts=4:sw=4
