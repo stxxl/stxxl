@@ -42,19 +42,9 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     wait_all(reqs.begin(), nblocks);
 
     unsigned_type last_block_correction = last.block_offset() ? (block_type::size - last.block_offset()) : 0;
-    if (block_type::has_only_data) {
-        std::sort(blocks[0].elem + first.block_offset(),
-                  blocks[nblocks].elem - last_block_correction, cmp);
-    } else {
-        std::sort(
-            ArrayOfSequencesIterator<
-                block_type, typename block_type::value_type, block_type::size
-                >(blocks.begin(), first.block_offset()),
-            ArrayOfSequencesIterator<
-                block_type, typename block_type::value_type, block_type::size
-                >(blocks.begin(), nblocks * block_type::size - last_block_correction),
-            cmp);
-    }
+    std::sort(make_element_iterator(blocks.begin(), first.block_offset()),
+              make_element_iterator(blocks.begin(), nblocks * block_type::size - last_block_correction),
+              cmp);
 
     for (i = 0; i < nblocks; ++i)
         reqs[i] = blocks[i].write(*(first.bid() + i));
