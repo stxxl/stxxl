@@ -63,7 +63,12 @@ bool aio_request::post()
     iocb * cb_pointer = &cb;
     int success = syscall(SYS_io_submit, aio_queue::get_instance()->get_io_context(), 1, &cb_pointer);
     if (success == 1)
-        stats::get_instance()->read_started(bytes);
+    {
+    	if (type == READ)
+    		stats::get_instance()->read_started(bytes);
+    	else
+    		stats::get_instance()->write_started(bytes);
+    }
     else if (success == -1 && errno != EAGAIN)
         STXXL_THROW2(io_error, "io_submit()");
 
