@@ -61,13 +61,14 @@ bool aio_request::post()
 {
     fill_control_block();
     iocb * cb_pointer = &cb;
+    double now = timestamp();	//io_submit might take a while, so we have to remember the current time before
     int success = syscall(SYS_io_submit, aio_queue::get_instance()->get_io_context(), 1, &cb_pointer);
     if (success == 1)
     {
     	if (type == READ)
-    		stats::get_instance()->read_started(bytes);
+    		stats::get_instance()->read_started(bytes, now);
     	else
-    		stats::get_instance()->write_started(bytes);
+    		stats::get_instance()->write_started(bytes, now);
     }
     else if (success == -1 && errno != EAGAIN)
         STXXL_THROW2(io_error, "io_submit()");
