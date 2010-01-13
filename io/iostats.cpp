@@ -142,8 +142,12 @@ void stats::write_started(unsigned size_)
 
 void stats::write_canceled(unsigned size_)
 {
-    --writes;
-    volume_written -= size_;
+    {
+        scoped_mutex_lock WriteLock(write_mutex);
+
+        --writes;
+        volume_written -= size_;
+    }
     write_finished();
 }
 
@@ -199,8 +203,12 @@ void stats::read_started(unsigned size_)
 
 void stats::read_canceled(unsigned size_)
 {
-    --reads;
-    volume_read -= size_;
+    {
+        scoped_mutex_lock ReadLock(read_mutex);
+
+        --reads;
+        volume_read -= size_;
+    }
     read_finished();
 }
 
@@ -226,7 +234,7 @@ void stats::read_finished()
 
 void stats::read_cached(unsigned size_)
 {
-    scoped_mutex_lock WriteLock(read_mutex);
+    scoped_mutex_lock ReadLock(read_mutex);
 
     ++c_reads;
     c_volume_read += size_;
@@ -314,8 +322,8 @@ void stats::_reset_io_wait_time()
 std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char * unit, int multiplier)
 {
     // may not overflow, std::numeric_limits<uint64>::max() == 16 EB
-    static const char* endings[] = { "", "k", "M", "G", "T", "P", "E" };
-    static const char* binary_endings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
+    static const char * endings[] = { "", "k", "M", "G", "T", "P", "E" };
+    static const char * binary_endings[] = { "", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei" };
     std::ostringstream out;
     out << number << ' ';
     int scale = 0;

@@ -315,8 +315,8 @@ struct TwoToOneDimArrayAdaptorBase
 //////////////////////////
 template <class one_dim_array_type, class data_type,
           unsigned dim_size, class pos_type = blocked_index<dim_size> >
-struct TwoToOneDimArrayRowAdaptor : public
-                                    TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>
+struct TwoToOneDimArrayRowAdaptor :
+    public TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>
 {
     typedef TwoToOneDimArrayRowAdaptor<one_dim_array_type,
                                        data_type, dim_size, pos_type> _Self;
@@ -578,13 +578,11 @@ public:
     }
 };
 
-namespace detail
+namespace helper
 {
-
     template <typename BlockType, bool can_use_trivial_pointer>
     class element_iterator_generator
-    {
-    };
+    { };
 
     // default case for blocks with fillers or other data: use ArrayOfSequenceIterator
     template <typename BlockType>
@@ -592,10 +590,9 @@ namespace detail
     {
         typedef BlockType block_type;
         typedef typename block_type::value_type value_type;
-        typedef ArrayOfSequencesIterator<block_type, value_type, block_type::size> AOSIterator;
 
     public:
-        typedef AOSIterator iterator;
+        typedef ArrayOfSequencesIterator<block_type, value_type, block_type::size> iterator;
 
         iterator operator () (block_type * blocks, unsigned_type offset) const
         {
@@ -609,7 +606,6 @@ namespace detail
     {
         typedef BlockType block_type;
         typedef typename block_type::value_type value_type;
-        typedef ArrayOfSequencesIterator<block_type, value_type, block_type::size> AOSIterator;
 
     public:
         typedef value_type * iterator;
@@ -619,15 +615,14 @@ namespace detail
             return blocks[0].elem + offset;
         }
     };
-
 }
 
 template <typename BlockType>
 inline
-typename detail::element_iterator_generator<BlockType, BlockType::has_only_data>::iterator
+typename helper::element_iterator_generator<BlockType, BlockType::has_only_data>::iterator
 make_element_iterator(BlockType * blocks, unsigned_type offset)
 {
-    detail::element_iterator_generator<BlockType, BlockType::has_only_data> iter_gen;
+    helper::element_iterator_generator<BlockType, BlockType::has_only_data> iter_gen;
     return iter_gen(blocks, offset);
 }
 
@@ -636,4 +631,4 @@ make_element_iterator(BlockType * blocks, unsigned_type offset)
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_ADAPTOR_HEADER
-// vim: et:ts=6:sw=4
+// vim: et:ts=4:sw=4

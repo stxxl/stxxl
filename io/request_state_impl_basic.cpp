@@ -25,8 +25,8 @@ request_state_impl_basic::~request_state_impl_basic()
     assert(_state() == DONE || _state() == READY2DIE);
 
     // if(_state() != DONE && _state()!= READY2DIE )
-    //	STXXL_ERRMSG("WARNING: serious stxxl error request being deleted while I/O did not finish "<<
-    //		"! Please report it to the stxxl author(s) <dementiev@mpi-sb.mpg.de>");
+    // STXXL_ERRMSG("WARNING: serious stxxl inconsistency: Request is being deleted while I/O not finished. "<<
+    //              "Please submit a bug report.");
 
     // _state.wait_for (READY2DIE); // does not make sense ?
 }

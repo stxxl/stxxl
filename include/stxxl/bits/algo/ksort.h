@@ -405,14 +405,9 @@ namespace ksort_local
                         return false;
                     }
                 }
-                if (!stxxl::is_sorted(
-                        ArrayOfSequencesIterator<
-                            block_type, typename block_type::value_type, block_type::size
-                            >(blocks, 0),
-                        ArrayOfSequencesIterator<
-                            block_type, typename block_type::value_type, block_type::size
-                            >(blocks, nelements),
-                        key_comparison<value_type, key_ext_>()))
+                if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
+                                      make_element_iterator(blocks, nelements),
+                                      key_comparison<value_type, key_ext_>()))
                 {
                     STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
                     STXXL_MSG("Data in blocks:");

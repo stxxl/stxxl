@@ -124,18 +124,9 @@ namespace stream
         //! \brief Sort a specific run, contained in a sequences of blocks.
         void sort_run(block_type * run, unsigned_type elements)
         {
-            if (block_type::has_only_data) {
-                std::sort(run[0].elem, run[0].elem + elements, cmp);
-            } else {
-                std::sort(
-                    ArrayOfSequencesIterator<
-                        block_type, typename block_type::value_type, block_type::size
-                        >(run, 0),
-                    ArrayOfSequencesIterator<
-                        block_type, typename block_type::value_type, block_type::size
-                        >(run, elements),
-                    cmp);
-            }
+            std::sort(make_element_iterator(run, 0),
+                      make_element_iterator(run, elements),
+                      cmp);
         }
 
         void compute_result();
@@ -467,18 +458,9 @@ namespace stream
 
         void sort_run(block_type * run, unsigned_type elements)
         {
-            if (block_type::has_only_data) {
-                std::sort(run[0].elem, run[0].elem + elements, cmp);
-            } else {
-                std::sort(
-                    ArrayOfSequencesIterator<
-                        block_type, typename block_type::value_type, block_type::size
-                        >(run, 0),
-                    ArrayOfSequencesIterator<
-                        block_type, typename block_type::value_type, block_type::size
-                        >(run, elements),
-                    cmp);
-            }
+            std::sort(make_element_iterator(run, 0),
+                      make_element_iterator(run, elements),
+                      cmp);
         }
 
         void compute_result()
@@ -835,14 +817,9 @@ namespace stream
                     return false;
                 }
             }
-            if (!stxxl::is_sorted(
-                    ArrayOfSequencesIterator<
-                        block_type, typename block_type::value_type, block_type::size
-                        >(blocks, 0),
-                    ArrayOfSequencesIterator<
-                        block_type, typename block_type::value_type, block_type::size
-                        >(blocks, sruns.runs_sizes[irun]),
-                    cmp))
+            if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
+                                  make_element_iterator(blocks, sruns.runs_sizes[irun]),
+                                  cmp))
             {
                 STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
                 return false;
@@ -959,7 +936,7 @@ namespace stream
                         else
                         {
                             num_currently_mergeable = sort_helper::count_elements_less_equal(
-                                    *seqs, consume_seq[prefetcher->pos()].value, cmp);
+                                *seqs, consume_seq[prefetcher->pos()].value, cmp);
                         }
                     }
 

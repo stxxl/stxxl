@@ -178,7 +178,7 @@ int main(int argc, char * argv[])
     if (argc == 5 && (strstr(argv[4], "w") != NULL))
         do_write = true;
 
-    switch(block_size)
+    switch (block_size)
     {
 #define run(bs) run_test<bs>(span, num_blocks, do_init, do_read, do_write)
         case 4:

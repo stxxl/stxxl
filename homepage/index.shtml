@@ -126,7 +126,7 @@ The following are some key features of
 			
 Questions concerning use and development of the <font face="Courier,Courier New"><b>S<small>TXXL</small></b></font>
 library and bug reports should be posted to the
-<b><a href="http://sourceforge.net/forum/?group_id=131632">FORUMS</a></b>.
+<b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>.
             <br>
 </td>
           </tr>
@@ -362,10 +362,10 @@ For a detailed list, please read the the CHANGELOG file.
 [<a href="http://sourceforge.net/projects/stxxl">sf.net page</a>]
             </td>
 	    <td>
-	      [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632">1.2.1</a>] tgz, zip (sf.net)
+	      [<a href="http://sourceforge.net/projects/stxxl/files/">1.2.1</a>] tgz, zip (sf.net)
 	    </td>
 	    <td>
-	      [<a href="http://sourceforge.net/project/showfiles.php?group_id=131632&amp;package_id=144407&amp;release_id=528923">1.1.0</a>] tgz, zip (sf.net)
+	      [<a href="http://sourceforge.net/projects/stxxl/files/stxxl/1.1.0/">1.1.0</a>] tgz, zip (sf.net)
 	    </td>
 	    <td>
 	      subversion checkout
@@ -414,7 +414,7 @@ For a detailed list, please read the the CHANGELOG file.
           </tr>
 	 <tr>
             <td align="left" valign="middle"> &nbsp; &middot; Older version (0.77 - Linux only):
-[<a href="http://sourceforge.net/project/showfiles.php?group_id=131632&amp;package_id=144407&amp;release_id=541515">tgz (sf.net)</a>]
+[<a href="http://sourceforge.net/projects/stxxl/files/stxxl/0.77/">tgz (sf.net)</a>]
 [<a href="http://algo2.iti.kit.edu/dementiev/files/stxxl_0.77.tgz">tgz</a>]
             </td>
           </tr>

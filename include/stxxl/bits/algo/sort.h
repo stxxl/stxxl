@@ -130,18 +130,9 @@ namespace sort_local
             for (i = 0; i < run_size; ++i)
                 bm->delete_block(bids1[i]);
 
-            if (block_type::has_only_data) {
-                std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
-            } else {
-                std::sort(
-                    ArrayOfSequencesIterator<
-                        block_type, typename block_type::value_type, block_type::size
-                        >(Blocks1, 0),
-                    ArrayOfSequencesIterator<
-                        block_type, typename block_type::value_type, block_type::size
-                        >(Blocks1, run_size * block_type::size),
-                    cmp);
-            }
+            std::sort(make_element_iterator(Blocks1, 0),
+                      make_element_iterator(Blocks1, run_size * block_type::size),
+                      cmp);
 
             STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
             if (k > 0)
@@ -177,18 +168,9 @@ namespace sort_local
         for (i = 0; i < run_size; ++i)
             bm->delete_block(bids1[i]);
 
-        if (block_type::has_only_data) {
-            std::sort(Blocks1[0].elem, Blocks1[run_size].elem, cmp);
-        } else {
-            std::sort(
-                ArrayOfSequencesIterator<
-                    block_type, typename block_type::value_type, block_type::size
-                    >(Blocks1, 0),
-                ArrayOfSequencesIterator<
-                    block_type, typename block_type::value_type, block_type::size
-                    >(Blocks1, run_size * block_type::size),
-                cmp);
-        }
+        std::sort(make_element_iterator(Blocks1, 0),
+                  make_element_iterator(Blocks1, run_size * block_type::size),
+                  cmp);
 
         STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
         wait_all(write_reqs, m2);
@@ -279,14 +261,9 @@ namespace sort_local
                         return false;
                     }
                 }
-                if (!stxxl::is_sorted(
-                        ArrayOfSequencesIterator<
-                            block_type, typename block_type::value_type, block_type::size
-                            >(blocks, 0),
-                        ArrayOfSequencesIterator<
-                            block_type, typename block_type::value_type, block_type::size
-                            >(blocks, nelements),
-                        cmp))
+                if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
+                                      make_element_iterator(blocks, nelements),
+                                      cmp))
                 {
                     STXXL_MSG("check_sorted_runs  wrong order in the run " << irun);
                     STXXL_MSG("Data in blocks:");
@@ -422,7 +399,7 @@ namespace sort_local
                         else
                         {
                             num_currently_mergeable = sort_helper::count_elements_less_equal(
-                                    seqs, consume_seq[prefetcher.pos()].value, cmp);
+                                seqs, consume_seq[prefetcher.pos()].value, cmp);
                         }
                     }
 
@@ -680,7 +657,7 @@ template <typename ExtIterator_, typename StrictWeakOrdering_>
 void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsigned_type M)
 {
     typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::bid_type,
-                                                    typename ExtIterator_::vector_type::value_type> > run_type;
+                                                     typename ExtIterator_::vector_type::value_type> > run_type;
 
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;
