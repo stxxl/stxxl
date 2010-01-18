@@ -1,4 +1,4 @@
-* asynchronous pipelining (currently being developed in its own branch)
+* asynchronous pipelining (currently being developed in branch parallel_pipelining_integration)
 
 * replace build system, something with '$LIBNAME-config --libs --cflags ...' would be nice
 
@@ -47,4 +47,8 @@
 
 * engineer new disk queueing strategies that might benefit from NCQ which
   is now widely available in HDDs/SSDs; will need use of libaio; probably
-  most interesting for smaller block sizes
+  most interesting for smaller block sizes 
+  (currently begin developed in branch kernelaio)
+
+* allow configuration of the block-managed disks using API calls, 
+  not only through the configuration file.
