@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2009 Johannes Singler <singler@kit.edu>
+ *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,7 +18,7 @@
 #endif
 
 #ifndef BOOST_MSVC
-// libaio does not exist on Windows
+// kernel aio interface does not exist on Windows
  #define STXXL_HAVE_AIO_FILE 1
 #else
  #define STXXL_HAVE_AIO_FILE 0
@@ -36,7 +36,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of file based on the POSIX interface for asynchronous I/O
+//! \brief Implementation of file based on the Linux kernel interface for asynchronous I/O
 class aio_file : public ufs_file_base
 {
     friend class aio_request;
