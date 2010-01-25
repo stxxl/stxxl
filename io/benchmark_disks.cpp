@@ -217,6 +217,13 @@ int main(int argc, char * argv[])
 #endif
     }
 
+#ifdef DO_ONLY_READ
+    do_write = false;
+#endif
+#ifdef NOREAD
+    do_read = false;
+#endif
+
     std::cout << "# Step size: "
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
@@ -233,7 +240,6 @@ int main(int argc, char * argv[])
 
             double begin = timestamp(), end, elapsed;
 
-#ifndef DO_ONLY_READ
             if (do_write) {
                 for (unsigned i = 0; i < ndisks; i++)
                 {
@@ -274,10 +280,8 @@ int main(int argc, char * argv[])
             std::cout << std::setw(2) << ndisks << " * "
                       << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed)) << " = "
                       << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed) * ndisks) << " MiB/s write,";
-#endif  // !DO_ONLY_READ
 
 
-#ifndef NOREAD
             begin = timestamp();
 
             if (do_read) {
@@ -321,7 +325,7 @@ int main(int argc, char * argv[])
             out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
 
-            if (CHECK_AFTER_READ) {
+            if (CHECK_AFTER_READ && do_read) {
                 for (unsigned i = 0; i < ndisks * current_step_size_int; i++)
                 {
                     if (buffer[i] != i)
@@ -337,7 +341,6 @@ int main(int argc, char * argv[])
                     }
                 }
             }
-#endif  // !NOREAD
             std::cout << std::endl;
 
             offset += current_step_size;
