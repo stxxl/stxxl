@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -95,7 +95,8 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [nd] [r|w] [--] diskfile..." << std::endl;
+    std::cout << "Usage: " << argv0 << " pattern offset length [block_size [batch_size]] [nd] [r|w] [--] diskfile..." << std::endl;
+    std::cout << "    'pattern' is a 32bit unsigned value like '0', '0xffffffff', ..." << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
     std::cout << "     increase 'batch_size' (default 1)" << std::endl;
@@ -119,18 +120,19 @@ inline double throughput(double bytes, double seconds)
 
 int main(int argc, char * argv[])
 {
-    if (argc < 4)
+    if (argc < 5)
         usage(argv[0]);
 
-    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
-    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
+    unsigned pattern = strtol(argv[1], NULL, 0);
+    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
+    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[3]));
     stxxl::int64 endpos = offset + length;
     stxxl::int64 block_size = 0;
     stxxl::int64 batch_size = 0;
 
     bool do_read = true, do_write = true;
     bool direct_io = true;
-    int first_disk_arg = 3;
+    int first_disk_arg = 4;
 
     if (first_disk_arg < argc)
         block_size = atoi(argv[first_disk_arg]);
@@ -199,7 +201,7 @@ int main(int argc, char * argv[])
     stxxl::int64 totalsizeread = 0, totalsizewrite = 0;
 
     for (unsigned i = 0; i < ndisks * step_size_int; i++)
-        buffer[i] = i;
+        buffer[i] = pattern;
 
     for (unsigned i = 0; i < ndisks; i++)
     {
@@ -232,7 +234,8 @@ int main(int argc, char * argv[])
     std::cout << "# Step size: "
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
-              << block_size << " bytes)" << std::endl;
+              << block_size << " bytes)  pattern=0x"
+              << std::hex << pattern << std::dec << std::endl;
     timer t_total(true);
     try {
         while (offset < endpos)
@@ -246,6 +249,12 @@ int main(int argc, char * argv[])
             double begin = timestamp(), end, elapsed;
 
             if (do_write) {
+                // write block number (512 byte blocks) into each block at position 42 * sizeof(unsigned)
+                for (unsigned j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(unsigned), ++b)
+                {
+                    for (unsigned i = 0; i < ndisks; i++)
+                        buffer[current_step_size_int * i + j] = b;
+                }
                 for (unsigned i = 0; i < ndisks; i++)
                 {
                     for (unsigned j = 0; j < current_num_blocks; j++)
@@ -330,16 +339,29 @@ int main(int argc, char * argv[])
             out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
 
-            if (CHECK_AFTER_READ && do_read) {
+            for (unsigned d = 0; d < ndisks; ++d) {
+                for (unsigned s = 0; s < current_step_size >> 9; ++s) {
+                    unsigned i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
+                    unsigned b = (offset >> 9) + s;
+                    if (buffer[i] != b) {
+                        std::cout << "Error on disk " << d << " sector " << std::hex << std::setw(8) << b
+                                  << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << b
+                                  << std::dec << std::endl;
+                    }
+                    buffer[i] = pattern;
+                }
+            }
+
+            if (do_read) {
                 for (unsigned i = 0; i < ndisks * current_step_size_int; i++)
                 {
-                    if (buffer[i] != i)
+                    if (buffer[i] != pattern)
                     {
                         int ibuf = i / current_step_size_int;
                         int pos = i % current_step_size_int;
 
                         std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
-                                  << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << i
+                                  << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << pattern
                                   << std::dec << std::endl;
 
                         i = (ibuf + 1) * current_step_size_int; // jump to next
