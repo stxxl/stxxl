@@ -89,7 +89,7 @@ benchmark_disks: benchmark_disks.$(EXEEXT)
 benchmark_disks.$(EXEEXT): benchmark_disks.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_disks.cpp  
 	$(LINKER) benchmark_disks.$(OBJEXT) $(OUT)benchmark_disks.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
-	
+
 flushbuffers: flushbuffers.$(EXEEXT)
 flushbuffers.$(EXEEXT): flushbuffers.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c flushbuffers.cpp
@@ -129,6 +129,11 @@ iobench_scatter_in_place: iobench_scatter_in_place.$(EXEEXT)
 iobench_scatter_in_place.$(EXEEXT): iobench_scatter_in_place.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c iobench_scatter_in_place.cpp
 	$(LINKER) iobench_scatter_in_place.$(OBJEXT) $(OUT)iobench_scatter_in_place.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+verify_disks: verify_disks.$(EXEEXT)
+verify_disks.$(EXEEXT): verify_disks.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c verify_disks.cpp  
+	$(LINKER) verify_disks.$(OBJEXT) $(OUT)verify_disks.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
 
 
 clean:
