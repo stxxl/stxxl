@@ -224,6 +224,11 @@ int main(int argc, char * argv[])
     do_read = false;
 #endif
 
+    const char * myrev = "$Revision$";
+    const char * myself = strrchr(argv[0], '/');
+    if (!myself || !*(++myself))
+        myself = argv[0];
+    std::cout << "# " << myself << " " << myrev << std::endl;
     std::cout << "# Step size: "
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
