@@ -50,8 +50,6 @@ using stxxl::timestamp;
 
 //#define WATCH_TIMES
 
-#define CHECK_AFTER_READ 1
-
 
 #ifdef WATCH_TIMES
 void watch_times(request_ptr reqs[], unsigned n, double * out)
@@ -339,6 +337,7 @@ int main(int argc, char * argv[])
             out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
 
+            if (do_read) {
             for (unsigned d = 0; d < ndisks; ++d) {
                 for (unsigned s = 0; s < current_step_size >> 9; ++s) {
                     unsigned i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
@@ -351,8 +350,6 @@ int main(int argc, char * argv[])
                     buffer[i] = pattern;
                 }
             }
-
-            if (do_read) {
                 for (unsigned i = 0; i < ndisks * current_step_size_int; i++)
                 {
                     if (buffer[i] != pattern)
