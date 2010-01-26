@@ -128,6 +128,7 @@ int main(int argc, char * argv[])
     stxxl::int64 block_size = 0;
     stxxl::int64 batch_size = 0;
 
+    bool verify_failed = false;
     bool do_read = true, do_write = true;
     bool direct_io = true;
     int first_disk_arg = 4;
@@ -343,6 +344,7 @@ int main(int argc, char * argv[])
                     unsigned i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
                     unsigned b = (offset >> 9) + s;
                     if (buffer[i] != b) {
+                            verify_failed = true;
                         std::cout << "Error on disk " << d << " sector " << std::hex << std::setw(8) << b
                                   << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << b
                                   << std::dec << std::endl;
@@ -354,6 +356,7 @@ int main(int argc, char * argv[])
                 {
                     if (buffer[i] != pattern)
                     {
+                        verify_failed = true;
                         int ibuf = i / current_step_size_int;
                         int pos = i % current_step_size_int;
 
@@ -408,7 +411,7 @@ int main(int argc, char * argv[])
     delete[] disks;
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 
-    return 0;
+    return verify_failed ? 1 : 0;
 }
 
 // vim: et:ts=4:sw=4
