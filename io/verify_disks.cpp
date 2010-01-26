@@ -339,19 +339,19 @@ int main(int argc, char * argv[])
 #endif
 
             if (do_read) {
-            for (unsigned d = 0; d < ndisks; ++d) {
-                for (unsigned s = 0; s < current_step_size >> 9; ++s) {
-                    unsigned i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
-                    unsigned b = (offset >> 9) + s;
-                    if (buffer[i] != b) {
+                for (unsigned d = 0; d < ndisks; ++d) {
+                    for (unsigned s = 0; s < current_step_size >> 9; ++s) {
+                        unsigned i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
+                        unsigned b = (offset >> 9) + s;
+                        if (buffer[i] != b) {
                             verify_failed = true;
-                        std::cout << "Error on disk " << d << " sector " << std::hex << std::setw(8) << b
-                                  << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << b
-                                  << std::dec << std::endl;
+                            std::cout << "Error on disk " << d << " sector " << std::hex << std::setw(8) << b
+                                      << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << b
+                                      << std::dec << std::endl;
+                        }
+                        buffer[i] = pattern;
                     }
-                    buffer[i] = pattern;
                 }
-            }
                 for (unsigned i = 0; i < ndisks * current_step_size_int; i++)
                 {
                     if (buffer[i] != pattern)
