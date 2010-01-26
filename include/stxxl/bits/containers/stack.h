@@ -801,7 +801,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //! \brief Stack type generator
 
 //! Template parameters:
-//!  - \c ValTp type of contained objects
+//!  - \c ValTp type of contained objects (POD with no references to internal memory)
 //!  - \c Externality one of
 //!    - \c external , \b external container, implementation is chosen according
 //!      to \c Behaviour parameter, is default

@@ -714,7 +714,7 @@ public:
 
 //! For semantics of the methods see documentation of the STL std::vector
 //! Template parameters:
-//!  - \c Tp_ type of contained objects
+//!  - \c Tp_ type of contained objects (POD with no references to internal memory)
 //!  - \c PgSz_ number of blocks in a page
 //!  - \c PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages,
 //!  default is \c lru_pager<8>
@@ -1570,7 +1570,7 @@ bool is_sorted(
 //! \brief External vector type generator
 
 //! Parameters:
-//!  - \c Tp_ type of contained objects
+//!  - \c Tp_ type of contained objects (POD with no references to internal memory)
 //!  - \c PgSz_ number of blocks in a page
 //!  - \c Pages_ number of pages
 //!  - \c BlkSize_ external block size in bytes, default is 2 MiB
