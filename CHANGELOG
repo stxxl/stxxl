@@ -4,7 +4,7 @@ Version 1.3
   - fileperblock_syscall/fileperblock_mmap/fileperblock_boostfd/fileperblock_wincall:
     Use a separate file for each block, which is accessed by means of the
     underlying file type.  The "filename" given is used as a prefix of the
-    block file names.  The advantage of these file types is that unneeded
+    block file names.  The advantage of these file types is that unused
     disk space is freed earlier on the file system level.
   - wbtl_file:  Do library-based write-combining (good for writing small blocks onto SSDs)
 * Other new functionality 
