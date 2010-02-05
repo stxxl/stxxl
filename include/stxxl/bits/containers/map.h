@@ -37,8 +37,8 @@ namespace btree
 //! \brief Priority queue type generator
 
 //! Template parameters:
-//! - KeyType key type
-//! - DataType data type
+//! - KeyType key type (POD with no references to internal memory)
+//! - DataType data type (POD with no references to internal memory)
 //! - CompareType comparison type used to determine
 //! whether a key is smaller than another one.
 //! If CompareType()(x,y) is true, then x is smaller than y.

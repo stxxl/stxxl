@@ -152,7 +152,10 @@ PLOTXMAX	?= 475
 PLOTYMAX	?= 120
 AVGPLOTYMAX	?= $(PLOTYMAX)
 
-format_block_size = $(or $(if $(filter 2560000B,$1),2.5),$(if $(filter 12800000B,$1),12.5),$(strip $1))MiB
+fmt_block_size_2560000B		?= 2.5
+fmt_block_size_12800000B	?= 12.5
+fmt_block_size_51200000B	?= 50
+format_block_size = $(or $(fmt_block_size_$(strip $1)),$(strip $1))MiB
 
 $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	$(RM) $@

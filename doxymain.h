@@ -102,6 +102,8 @@
  * - Questions concerning use and development of the \c S<small>TXXL</small>
  * library and bug reports should be posted to the
  * <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>.
+ * Please search the forum before posting,
+ * your question may have been answered before.
  *
  * - \link FAQ FAQ - Frequently Asked Questions \endlink
  *
@@ -138,7 +140,20 @@
  * <br>
  *
  *
- * \section q2 Thread-Safety
+ * \section q2 Parameterizing STXXL Containers
+ *
+ * STXXL container types like stxxl::vector can be parameterized only with a value type that is a
+ * <a href="http://en.wikipedia.org/wiki/Plain_old_data_structures">POD</a>
+ * (i. e. no virtual functions, no user-defined copy assignment/destructor, etc.)
+ * and does not contain references (including pointers) to internal memory.
+ * Usually, "complex" data types do not satisfy this requirements.
+ *
+ * This is why stxxl::vector<std::vector<T> > and stxxl::vector<stxxl::vector<T> > are invalid.
+ * If appropriate, use std::vector<stxxl::vector<T> >, or emulate a two-dimensional array by
+ * doing index calculation.
+ *
+ *
+ * \section q3 Thread-Safety
  *
  * The I/O and block management layers are thread-safe (since release 1.1.1).
  * The user layer data structures are not thread-safe.<br>
@@ -147,13 +162,13 @@
  * This is a design choice, having the data structures thread-safe would mean a significant performance loss.
  *
  *
- * \section q3 I have configured several disks to use with STXXL. Why does STXXL fail complaining about the lack of space? According to my calclulations, the space on the disks should be sufficient.
+ * \section q4 I have configured several disks to use with STXXL. Why does STXXL fail complaining about the lack of space? According to my calclulations, the space on the disks should be sufficient.
  *
  * This may happen if the disks have different size. With the default parameters \c S<small>TXXL</small> containers use randomized block-to-disk allocation strategies
  * that distribute data evenly between the disks but ignore the availability of free space on them. 
  *
  *
- * \section q4 STXXL in a Microsoft CLR Library
+ * \section q5 STXXL in a Microsoft CLR Library
  *
  * From STXXL user Christian, posted in the <a href="https://sourceforge.net/projects/stxxl/forums/forum/446474/topic/3407329">forum</a>:
  *
@@ -197,7 +212,7 @@ Controller::Controller()
 \endverbatim
  *
  *
- * \section q5 How can I credit STXXL, and thus foster its development?
+ * \section q6 How can I credit STXXL, and thus foster its development?
  *
  * - For all users:  Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
  *

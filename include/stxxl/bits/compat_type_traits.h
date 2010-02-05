@@ -15,7 +15,7 @@
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 #include <type_traits>
-#elif defined(__GNUG__) && (__GNUC__ >= 4)
+#elif defined(__GNUG__) && (__GNUC__ >= 4) && !defined(__ICC)
 #include <tr1/type_traits>
 #elif defined(STXXL_BOOST_CONFIG)
 #include <boost/type_traits/remove_const.hpp>
@@ -28,7 +28,7 @@ __STXXL_BEGIN_NAMESPACE
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 using std::remove_const;
-#elif defined(__GNUG__) && (__GNUC__ >= 4)
+#elif defined(__GNUG__) && (__GNUC__ >= 4) && !defined(__ICC)
 using std::tr1::remove_const;
 #elif defined(STXXL_BOOST_CONFIG)
 using boost::remove_const;

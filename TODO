@@ -1,4 +1,4 @@
-* asynchronous pipelining (currently being developed in its own branch)
+* asynchronous pipelining (currently being developed in branch parallel_pipelining_integration)
 
 * replace build system, something with '$LIBNAME-config --libs --cflags ...' would be nice
 

@@ -398,7 +398,7 @@ public:
 //! The implementation wraps the elements around
 //! the end of the \c VectorType circularly.
 //! Template parameters:
-//! - \c T the element type
+//! - \c T type of the contained objects (POD with no references to internal memory)
 //! - \c VectorType the type of the underlying vector container,
 //! the default is \c stxxl::vector<T>
 template <class T, class VectorType = stxxl::vector<T> >
