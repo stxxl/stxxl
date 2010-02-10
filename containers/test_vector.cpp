@@ -20,7 +20,18 @@
 #include <stxxl/vector>
 #include <stxxl/scan>
 
-typedef stxxl::int64 int64;
+struct element	//24 bytes, not a power of 2 intentionally
+{
+	stxxl::int64 key;
+	stxxl::int64 load0;
+	stxxl::int64 load1;
+
+	element& operator=(stxxl::int64 i)
+	{
+		key = i;
+		return *this;
+	}
+};
 
 struct counter
 {
@@ -54,8 +65,8 @@ int main()
     try
     {
         // use non-randomized striping to avoid side effects on random generator
-        typedef stxxl::VECTOR_GENERATOR<int64, 2, 2, (2 * 1024 * 1024), stxxl::striping>::result vector_type;
-        vector_type v(int64(64 * 1024 * 1024) / sizeof(int64));
+        typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (2 * 1024 * 1024), stxxl::striping>::result vector_type;
+        vector_type v(64 * 1024 * 1024 / sizeof(element));
 
         // test assignment const_iterator = iterator
         vector_type::const_iterator c_it = v.begin();
@@ -80,8 +91,8 @@ int main()
         // fill the vector with increasing sequence of integer numbers
         for (i = 0; i < v.size(); ++i)
         {
-            v[i] = i + offset;
-            assert(v[i] == int64(i + offset));
+            v[i].key = i + offset;
+            assert(v[i].key == stxxl::int64(i + offset));
         }
 
 
@@ -100,7 +111,7 @@ int main()
 
         for (i = 0; i < v.size(); i++)
         {
-            assert(v[i] == rnd());
+            assert(v[i].key == rnd());
         }
 
         // check again
@@ -110,7 +121,7 @@ int main()
 
         stxxl::ran32State = 0xdeadbeef + 10;
 
-        v.resize(int64(64 * 1024 * 1024) / sizeof(int64));
+        v.resize(64 * 1024 * 1024 / sizeof(element));
 
         STXXL_MSG("write " << v.size() << " elements");
         stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
@@ -121,7 +132,7 @@ int main()
 
         for (i = 0; i < v.size(); i++)
         {
-            assert(v[i] == rnd());
+            assert(v[i].key == rnd());
         }
 
         std::vector<stxxl::vector<int> > vector_of_stxxlvectors(2);
