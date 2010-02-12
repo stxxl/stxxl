@@ -246,7 +246,8 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
     {
         sortseq::iterator succ = free_space.upper_bound(region_pos);
         sortseq::iterator pred = succ;
-        pred--;
+        if (pred != free_space.begin())
+            pred--;
         check_corruption(region_pos, region_size, pred, succ);
         if (succ == free_space.end())
         {
