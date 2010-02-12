@@ -2,7 +2,7 @@
  *
  *  \image html logo1.png
  *
- * <BR><BR>
+ * <br><br>
  * The core of \c S<small>TXXL</small> is an implementation of the C++
  * standard template library STL for external memory (out-of-core)
  * computations, i.e., \c S<small>TXXL</small> implements containers and algorithms
@@ -345,7 +345,7 @@ my_example.bin: my_example.o
  * file by setting the environment variable \c STXXLCFG .
  *
  * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<BR>
+ * A disk description uses the following format:<br>
  * \c disk=full_disk_filename,capacity,access_method
  *
  * Description of the parameters:
@@ -429,16 +429,16 @@ my_example.bin: my_example.o
  * - Choose Linker->Command Line page.
  * - In the 'Additional Options' field insert the contents of the \c linker.options file.
  *
- * <BR>
+ * <br>
  * If you use make files you can
  * include the \c make.settings file in your make files and use \c STXXL_COMPILER_OPTIONS and
  * \c STXXL_LINKER_OPTIONS variables, defined therein.
  *
- * For example: <BR>
- * \verbatim cl -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <BR>
+ * For example: <br>
+ * \verbatim cl -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <br>
  * \verbatim link my_example.obj /out:my_example.exe $(STXXL_LINKER_OPTIONS) \endverbatim
  *
- * <BR>
+ * <br>
  * The \c STXXL_ROOT\\test\\WinGUI directory contains an example MFC GUI project
  * that uses \c Stxxl. In order to compile it open the WinGUI.vcproj file in
  * Visual Studio .NET. Change if needed the Compiler and Linker Options of the project
@@ -471,7 +471,7 @@ my_example.bin: my_example.o
  * file by setting the environment variable \c STXXLCFG .
  *
  * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<BR>
+ * A disk description uses the following format:<br>
  * \c disk=full_disk_filename,capacity,access_method
  *
  * Description of the parameters:
@@ -586,7 +586,7 @@ my_example.bin: my_example.o
  * file by setting the environment variable \c STXXLCFG .
  *
  * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<BR>
+ * A disk description uses the following format:<br>
  * \c disk=full_disk_filename,capacity,access_method
  *
  * Description of the parameters:
@@ -641,7 +641,7 @@ my_example.bin: my_example.o
  * that includes all compiler definitions and library paths that you need to compile an
  * \c S<small>TXXL</small> program.
  *
- * For example: <BR> \verbatim g++  my_example.cpp -o my_example -g $(STXXL_VARS) \endverbatim
+ * For example: <br> \verbatim g++  my_example.cpp -o my_example -g $(STXXL_VARS) \endverbatim
  *
  * Before you try to run one of the \c S<small>TXXL</small> examples
  * (or your \c S<small>TXXL</small> program) you must configure the disk
@@ -680,7 +680,7 @@ my_example.bin: my_example.o
  * file by setting the environment variable \c STXXLCFG .
  *
  * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<BR>
+ * A disk description uses the following format:<br>
  * \c disk=full_disk_filename,capacity,access_method
  *
  * Description of the parameters:
