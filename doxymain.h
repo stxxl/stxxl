@@ -70,11 +70,11 @@
  PMODE = supports parallelization using libstdc++ parallel mode
  ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
        gcc does not come in the correct version:
-       icpc 9.0: use gcc 3.x
-       icpc 9.1: use gcc before 4.2
-       icpc 10.x with mcstl support: use gcc 4.2
- ²   = MCSTL has been superseded by the libstdc++ parallel mode in GCC 4.3,
-       full support requires g++ 4.4 or later, only partial support in g++ 4.3
+       icpc 9.0: use with gcc 3.x
+       icpc 9.1: use with gcc before 4.2
+       icpc 10.x, 11.x with mcstl support: use with gcc 4.2
+ ²   = MCSTL has been superseded by the libstdc++ parallel mode in gcc 4.3,
+       full support requires gcc 4.4 or later, only partial support in gcc 4.3
 \endverbatim
  *
  *
