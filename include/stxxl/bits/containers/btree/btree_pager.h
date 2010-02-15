@@ -41,7 +41,7 @@ namespace btree
         lru_pager(unsigned_type npages) :
             npages_(npages),
             history(new list_type),
-            history_entry(npages_)
+            history_entry(npages_, history->begin())
         {
             for (unsigned_type i = 0; i < npages_; i++)
             {
