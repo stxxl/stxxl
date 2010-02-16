@@ -200,8 +200,8 @@ int main(int argc, char * argv[])
   __gnu_parallel::_Settings::set(parallel_settings);*/
 #endif
 
-    const stxxl::unsigned_type mem_for_queue = 2047 * mega;
-    const stxxl::unsigned_type mem_for_pools = 2047 * mega;
+    const stxxl::unsigned_type mem_for_queue = 1024 * mega;
+    const stxxl::unsigned_type mem_for_pools = 1024 * mega;
 
 #if TINY_PQ
     stxxl::STXXL_UNUSED(mem_for_queue);
@@ -289,7 +289,7 @@ int main(int argc, char * argv[])
 
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
-    STXXL_MSG("Peak number of elements: " << nelements);
+    STXXL_MSG("Peak number of elements (n): " << nelements);
     STXXL_MSG("Max number of elements to contain: " << (stxxl::uint64(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
     srand(5);
     my_cmp cmp;
@@ -403,7 +403,7 @@ int main(int argc, char * argv[])
         else
             last_least = least;
 
-        if ((i % (10 * mega)) == 0)
+        if ((i % mega) == 0)
             STXXL_MSG(
                 std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
                            << "Popped element " << i << " == " << least.key << " @ "
