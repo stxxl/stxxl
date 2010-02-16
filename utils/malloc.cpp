@@ -55,9 +55,6 @@ int main(int argc, char * argv[])
     sbrk(128 * 1024 * 1024);
     cout << "Nothing allocated" << endl;
     print_malloc_stats();
-    cout << "Press any non-whitespace key followed by <Return> to continue or Ctrl-C to abort" << endl;
-    char tmp;
-    cin >> tmp;
     const unsigned bytes = atoi(argv[1]);
     char * ptr = new char[bytes];
     cout << "Allocated " << bytes << " bytes" << endl;
