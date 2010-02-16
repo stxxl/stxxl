@@ -79,7 +79,7 @@ int main()
     sum2 = sum2 / double(times);
     assert(sum2 - sum * sum >= 0.0);
     double err = sqrt(sum2 - sum * sum);
-    STXXL_MSG("Error: " << err << " s, " << 100. * (err / sum) << " %");
+    STXXL_MSG("Standard Deviation: " << err << " s, " << 100. * (err / sum) << " %");
 
     stxxl::aligned_dealloc<BLOCK_ALIGN>(buffer);
 

@@ -704,7 +704,7 @@ public:
 
     std::ostream & operator << (std::ostream & o) const
     {
-        o << "vectorpointer: " << ((void *)p_vector) << " offset: " << offset;
+        o << "vector pointer: " << ((void *)p_vector) << " offset: " << offset;
         return o;
     }
 };
@@ -1013,7 +1013,7 @@ public:
         if (!block_type::has_only_data)
         {
             std::ostringstream str_;
-            str_ << "The block size for the vector, mapped to a file must me a multiple of the element size (" <<
+            str_ << "The block size for a vector that is mapped to a file must me a multiple of the element size (" <<
             sizeof(value_type) << ") and the page size (4096).";
             throw std::runtime_error(str_.str());
         }
@@ -1173,7 +1173,7 @@ public:
             int_type page_no = _slot_to_page[i];
             if (non_free_slots[i])
             {
-                STXXL_VERBOSE1("vector: flushing page " << i << " address: " << (int64(page_no) *
+                STXXL_VERBOSE1("vector: flushing page " << i << " at address " << (int64(page_no) *
                                                                                  int64(block_type::size) * int64(page_size)));
                 write_page(page_no, i);
 
@@ -1189,7 +1189,7 @@ public:
         }
         catch (...)
         {
-            STXXL_VERBOSE("An exception in the ~vector()");
+            STXXL_VERBOSE("Exception thrown in ~vector()");
         }
 
         if (!exported)
