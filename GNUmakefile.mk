@@ -51,7 +51,7 @@ run-all-tests-valgrind: WITH_VALGRIND=yes
 run-all-tests-valgrind: do-run-all-tests ;
 
 dep-check-sanity:
-	$(SKIP_SANITY_CHECK)find . -name '*.o' -exec misc/remove-unless {} .o .d \; 
+	$(SKIP_SANITY_CHECK)find . -name '*.o' -exec misc/remove-unless {} .o .o.d \; 
 	$(SKIP_SANITY_CHECK)find . -name '*.bin' -exec misc/remove-unless {} .bin .o \; 
 
 clean:
