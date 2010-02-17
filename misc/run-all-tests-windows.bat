@@ -90,6 +90,3 @@ stream\test_push_sort
 stream\test_sorted_runs
 stream\test_stream
 stream\test_stream1
-
-io\unittest
-mng\unittest
