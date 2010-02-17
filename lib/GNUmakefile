@@ -10,6 +10,10 @@ EXTRA_DEPS_COMPILE	?=
 
 include $(TOPDIR)/Makefile.subdir.gnu
 
+# do not recompile missing object files here
+COMPILE_STXXL	= false "can't build $@ from lib/"
+
+
 lib: lib$(LIBNAME).$(LIBEXT)
 
 lib$(LIBNAME).$(LIBEXT): $(LIB_OBJECTS) $(DEPS_MAKEFILES)
