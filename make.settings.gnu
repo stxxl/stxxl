@@ -42,12 +42,12 @@ endif
 
 ifeq ($(strip $(USE_PMODE)),yes)
 COMPILER_GCC	?= g++-4.4.x
-LIBNAME		?= pmstxxl
+MODEBASE	?= pmstxxl
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
 COMPILER_GCC	?= g++-4.2.3
-LIBNAME		?= mcstxxl
+MODEBASE	?= mcstxxl
 # the root directory of your MCSTL installation
 MCSTL_ROOT	?= $(HOME)/work/mcstl
 endif
@@ -62,7 +62,12 @@ OPT		?= -O$(OPT_LEVEL) # compiler optimization level
 WARNINGS	?= -W -Wall -Woverloaded-virtual -Wundef
 DEBUG		?= # put here -g option to include the debug information into the binaries
 
-LIBNAME		?= stxxl
+LIBBASE		?= $(MODEBASE)
+LIBEXTRA	?=
+MODEBASE	?= stxxl
+
+LIBNAME		?= $(LIBBASE)$(LIBEXTRA)
+MODENAME	?= $(MODEBASE)$(LIBEXTRA)
 
 # Hint: for g++-4.4 with c++0x support, enable the following:
 #STXXL_SPECIFIC	+= -std=c++0x
@@ -335,10 +340,10 @@ HEADER_FILES_UTILS	+= malloc.h
 
 #### MISC #########################################################
 
-OBJEXT	 = $(LIBNAME).o	# extension of object files
-IIEXT	 = $(LIBNAME).ii
+OBJEXT	 = $(MODENAME).o # extension of object files
+IIEXT	 = $(MODENAME).ii
 LIBEXT	 = a		# static library file extension
-EXEEXT	 = $(LIBNAME).bin # executable file extension
+EXEEXT	 = $(MODENAME).bin # executable file extension
 RM	 = rm -f	# remove file command
 LIBGEN	 = ar cr	# library generation
 OUT	 = -o		# output file option for the compiler and linker

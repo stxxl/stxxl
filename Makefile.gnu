@@ -6,7 +6,7 @@
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
 #  Copyright (C) 2002-2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
-#  Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -58,27 +58,27 @@ build-lib: SUBDIRS-lib
 	$(MAKE) -C common tools
 	$(MAKE) -C utils tools
 
-$(LIBNAME).stamp: build-lib
-	$(RM) $@ $(LIBNAME).mk.tmp
-	echo 'STXXL_CXX			 = $(COMPILER)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS			 = $(stxxl_mk_cppflags)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS			 = $(stxxl_mk_ldlibs)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_STXXL		 = $(STXXL_SPECIFIC)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_STXXL		 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LIBDEPS			 = $(STXXL_LIBDEPS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_PARALLEL_MODE	 = $(PARALLEL_MODE_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_PARALLEL_MODE	 = $(PARALLEL_MODE_LDFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_MCSTL		 = $(MCSTL_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_MCSTL		 = $(MCSTL_LDFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_BOOST		 = $(BOOST_COMPILER_OPTIONS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_BOOST		 = $(BOOST_LINKER_OPTIONS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_WARNFLAGS			 = $(WARNINGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_DEBUGFLAGS		 = $(DEBUG)'	>> $(LIBNAME).mk.tmp
-	cmp -s $(LIBNAME).mk.tmp $(LIBNAME).mk || mv $(LIBNAME).mk.tmp $(LIBNAME).mk
-	$(RM) $(LIBNAME).mk.tmp
+$(MODENAME).stamp: build-lib
+	$(RM) $@ $(MODENAME).mk.tmp
+	echo 'STXXL_CXX			 = $(COMPILER)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS			 = $(stxxl_mk_cppflags)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS			 = $(stxxl_mk_ldlibs)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_STXXL		 = $(STXXL_SPECIFIC)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS_STXXL		 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LIBDEPS			 = $(STXXL_LIBDEPS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_PARALLEL_MODE	 = $(PARALLEL_MODE_CPPFLAGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS_PARALLEL_MODE	 = $(PARALLEL_MODE_LDFLAGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_MCSTL		 = $(MCSTL_CPPFLAGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS_MCSTL		 = $(MCSTL_LDFLAGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_BOOST		 = $(BOOST_COMPILER_OPTIONS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS_BOOST		 = $(BOOST_LINKER_OPTIONS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_WARNFLAGS			 = $(WARNINGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_DEBUGFLAGS		 = $(DEBUG)'	>> $(MODENAME).mk.tmp
+	cmp -s $(MODENAME).mk.tmp $(MODENAME).mk || mv $(MODENAME).mk.tmp $(MODENAME).mk
+	$(RM) $(MODENAME).mk.tmp
 	touch $@
 
-library: $(LIBNAME).stamp
+library: $(MODENAME).stamp
 
 # skip recompilation of existing library
 library-fast:
@@ -125,14 +125,14 @@ endif
 
 .PHONY: common/version_svn.defs
 common/version_svn.defs:
-	$(RM) $@.$(LIBNAME).tmp
-	echo '#define STXXL_VERSION_STRING_DATE "$(STXXL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp
-	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(STXXL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp
-	$(if $(STXXL_SVN_BRANCH), echo '#define STXXL_VERSION_STRING_SVN_BRANCH "$(STXXL_SVN_BRANCH)"' >> $@.$(LIBNAME).tmp)
-	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_DATE "$(MCSTL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp)
-	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_SVN_REVISION "$(MCSTL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp)
-	cmp -s $@ $@.$(LIBNAME).tmp || mv $@.$(LIBNAME).tmp $@
-	$(RM) $@.$(LIBNAME).tmp
+	$(RM) $@.$(MODENAME).tmp
+	echo '#define STXXL_VERSION_STRING_DATE "$(STXXL_VERSION_DATE)"' >> $@.$(MODENAME).tmp
+	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(STXXL_VERSION_SVN_REV)"' >> $@.$(MODENAME).tmp
+	$(if $(STXXL_SVN_BRANCH), echo '#define STXXL_VERSION_STRING_SVN_BRANCH "$(STXXL_SVN_BRANCH)"' >> $@.$(MODENAME).tmp)
+	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_DATE "$(MCSTL_VERSION_DATE)"' >> $@.$(MODENAME).tmp)
+	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_SVN_REVISION "$(MCSTL_VERSION_SVN_REV)"' >> $@.$(MODENAME).tmp)
+	cmp -s $@ $@.$(MODENAME).tmp || mv $@.$(MODENAME).tmp $@
+	$(RM) $@.$(MODENAME).tmp
 endif
 
 
@@ -147,7 +147,7 @@ clean-in-%:
 
 clean: SUBDIRS-clean
 	$(RM) common/version_svn.defs
-	$(RM) $(LIBNAME).stamp $(LIBNAME).mk $(LIBNAME).mk.tmp
+	$(RM) $(MODENAME).stamp $(MODENAME).mk $(MODENAME).mk.tmp
 
 
 ifneq (,$(wildcard .svn))
