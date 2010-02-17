@@ -13,7 +13,6 @@ include $(TOPDIR)/Makefile.subdir.gnu
 lib: lib$(LIBNAME).$(LIBEXT)
 
 lib$(LIBNAME).$(LIBEXT): $(LIB_OBJECTS) $(DEPS_MAKEFILES)
-	$(RM) $@
 	$(LIBGEN)lib$(LIBNAME).$(LIBEXT) $(LIB_OBJECTS)
 
 clean::

@@ -7,7 +7,7 @@
 #
 #  Copyright (C) 2002-2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
 #  Copyright (C) 2006-2008 Johannes Singler <singler@ira.uka.de>
-#  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -335,6 +335,7 @@ HEADER_FILES_UTILS	+= malloc.h
 
 #### MISC #########################################################
 
+DEPEXT	 = $(LIBNAME).d # extension of dependency files
 OBJEXT	 = $(LIBNAME).o	# extension of object files
 IIEXT	 = $(LIBNAME).ii
 LIBEXT	 = a		# static library file extension
@@ -343,6 +344,7 @@ RM	 = rm -f	# remove file command
 LIBGEN	 = ar cr	# library generation
 OUT	 = -o		# output file option for the compiler and linker
 
+d	?= $(strip $(DEPEXT))
 o	?= $(strip $(OBJEXT))
 ii	?= $(strip $(IIEXT))
 bin	?= $(strip $(EXEEXT))
@@ -353,9 +355,8 @@ bin	?= $(strip $(EXEEXT))
 #### COMPILE/LINK RULES ###########################################
 
 define COMPILE_STXXL
-	@$(RM) $@ $@.d
-	@$(RM) $(@:.o=.d)  # TRANSITIONAL
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $@.dT -c $(OUTPUT_OPTION) $< && mv $@.dT $@.d
+	@$(RM) $@ $(@:.$o=).$d
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $(@:.$o=).$dT -c $(OUTPUT_OPTION) $< && mv $(@:.$o=).$dT $(@:.$o=).$d
 endef
 
 DEPS_MAKEFILES		:= $(wildcard $(TOPDIR)/Makefile.subdir.gnu $(TOPDIR)/make.settings $(TOPDIR)/make.settings.local GNUmakefile Makefile Makefile.common Makefile.local)

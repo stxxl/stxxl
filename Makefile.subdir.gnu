@@ -22,8 +22,7 @@ lib: $(LIB_SRC:.cpp=.$o)
 
 clean::
 	$(RM) *.$o
-	$(RM) *.$o.d *.dT
-	$(RM) *.$(o:.o=.d) # TRANSITIONAL
+	$(RM) *.$d *.dT
 	$(RM) $(TEST_BINARIES:=.$(bin))
 	$(RM) $(SKIPPED_TEST_BINARIES:=.$(bin))
 
