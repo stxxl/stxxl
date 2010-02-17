@@ -1,13 +1,10 @@
 #
-# HowTo use GNUmakefile.mk: create GNUMAKEfile containing:
+# HowTo use GNUmakefile.mk: create a sample GNUmakefile using the command
 #
-
-## # override MODE, NICE if you want
-##
-## # select your favorite subset of targets
-## all: lib tests header-compile-test doxy tutorial examples
-##
-## include GNUmakefile.mk
+#     make -f GNUmakefile.mk GNUmakefile
+#
+# then edit it to override MODE, NICE (if you want)
+# and select your favorite subset of targets
 
 
 MODE	?= g++
