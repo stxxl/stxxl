@@ -15,6 +15,8 @@ NICE	?= nice
 PMODE	?= parallel_mode # undefine to disable
 MCSTL	?= mcstl # undefine to disable
 
+MODESUFFIX	:= $(shell $(MAKE) -f Makefile.gnu getmodesuffix)
+
 
 default-all: lib tests header-compile-test
 
@@ -30,11 +32,9 @@ examples: lib
 	$(MAKE) -C doc/tutorial/examples all
 
 header-compile-test: lib
-	$(NICE) $(MAKE) -C test/compile-stxxl-headers
-	$(if $(PMODE),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=pmstxxl)
-	$(if $(MCSTL),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl)
-
-MODESUFFIX	:= $(shell $(MAKE) -f Makefile.gnu getmodesuffix)
+	$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=stxxl$(MODESUFFIX)
+	$(if $(PMODE),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=pmstxxl$(MODESUFFIX))
+	$(if $(MCSTL),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl$(MODESUFFIX))
 
 do-run-all-tests:
 	@test -n "$(STXXL_TMPDIR)" || ( echo "STXXL_TMPDIR is not set"; exit 1 )
