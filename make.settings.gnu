@@ -52,7 +52,10 @@ MODEBASE	?= mcstxxl
 MCSTL_ROOT	?= $(HOME)/work/mcstl
 endif
 
+ifeq ($(strip $(USE_BOOST)),yes)
 #BOOST_ROOT	?= /usr/local/boost-1.34.1
+LIBEXTRA	?= _boost
+endif
 
 COMPILER_GCC	?= g++
 COMPILER	?= $(COMPILER_GCC)

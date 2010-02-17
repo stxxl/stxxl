@@ -150,6 +150,10 @@ clean: SUBDIRS-clean
 	$(RM) $(MODENAME).stamp $(MODENAME).mk $(MODENAME).mk.tmp
 
 
+getmodesuffix:
+	@echo "$(LIBEXTRA)"
+
+
 ifneq (,$(wildcard .svn))
 VERSION		?= $(shell grep 'define *STXXL_VERSION_STRING_MA_MI_PL' common/version.cpp | cut -d'"' -f2)
 PHASE		?= snapshot

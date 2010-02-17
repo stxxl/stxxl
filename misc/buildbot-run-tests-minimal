@@ -1,6 +1,6 @@
 #!/bin/bash
 
-variants="stxxl mcstxxl pmstxxl"
+variants="stxxl mcstxxl pmstxxl stxxl_boost mcstxxl_boost pmstxxl_boost"
 
 ulimit -t 7200
 set -o pipefail

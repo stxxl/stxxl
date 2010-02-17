@@ -34,12 +34,14 @@ header-compile-test: lib
 	$(if $(PMODE),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=pmstxxl)
 	$(if $(MCSTL),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl)
 
+MODESUFFIX	:= $(shell $(MAKE) -f Makefile.gnu getmodesuffix)
+
 do-run-all-tests:
 	@test -n "$(STXXL_TMPDIR)" || ( echo "STXXL_TMPDIR is not set"; exit 1 )
 	@test -z "$(LD_PRELOAD)" || ( echo "LD_PRELOAD is set"; exit 1 )
-	./misc/run-all-tests stxxl $(WITH_VALGRIND) $(WITH_VALGRIND)
-	$(if $(MCSTL),./misc/run-all-tests mcstxxl $(WITH_VALGRIND) $(WITH_VALGRIND))
-	$(if $(PMODE),./misc/run-all-tests pmstxxl $(WITH_VALGRIND) $(WITH_VALGRIND))
+	./misc/run-all-tests stxxl$(MODESUFFIX) $(WITH_VALGRIND) $(WITH_VALGRIND)
+	$(if $(MCSTL),./misc/run-all-tests mcstxxl$(MODESUFFIX) $(WITH_VALGRIND) $(WITH_VALGRIND))
+	$(if $(PMODE),./misc/run-all-tests pmstxxl$(MODESUFFIX) $(WITH_VALGRIND) $(WITH_VALGRIND))
 
 run-all-tests: WITH_VALGRIND=no
 run-all-tests: do-run-all-tests ;
