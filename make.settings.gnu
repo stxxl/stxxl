@@ -64,7 +64,7 @@ DEBUG		?= # put here -g option to include the debug information into the binarie
 
 LIBNAME		?= stxxl
 
-# Hint: for g++-4.3 with c++0x support, enable the following:
+# Hint: for g++-4.4 with c++0x support, enable the following:
 #STXXL_SPECIFIC	+= -std=c++0x
 
 
@@ -143,7 +143,7 @@ $(shell echo -e '\043STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/ma
 MCSTL_ROOT	?= $(HOME)/work/mcstl
 $(shell echo -e '\043MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
 $(shell echo -e '\043COMPILER_GCC	 = g++-4.2' >> $(CURDIR)/make.settings.local)
-$(shell echo -e '\043COMPILER_GCC	 = g++-4.3 -std=c++0x' >> $(CURDIR)/make.settings.local)
+$(shell echo -e '\043COMPILER_GCC	 = g++-4.4 -std=c++0x' >> $(CURDIR)/make.settings.local)
 $(shell echo -e '\043COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
 ifeq (Darwin,$(strip $(shell uname)))
 $(shell echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
