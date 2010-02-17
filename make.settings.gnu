@@ -27,6 +27,7 @@ TOPDIR	?= $(error TOPDIR not defined) # DO NOT CHANGE! This is set elsewhere.
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_MACOSX	?= no	# set 'yes' if you run Mac OS X, 'no' otherwise
 USE_FREEBSD	?= no	# set 'yes' if you run FreeBSD, 'no' otherwise
+ENABLE_SHARED	?= no   # set 'yes' to build a shared library instead of a static library (EXPERIMENTAL)
 USE_PMODE	?= no	# will be overridden from main Makefile
 USE_MCSTL	?= no	# will be overridden from main Makefile
 USE_ICPC	?= no	# will be overridden from main Makefile
@@ -137,6 +138,19 @@ PTHREAD_FLAG	?= -pthread
 GET_FILE_ID	?= stat -L -c '%d:%i' $1
 
 ##################################################################
+
+
+#### SHARED LIBRARY ###############################################
+
+ifeq ($(strip $(ENABLE_SHARED)),yes)
+
+LIBEXT	?= so
+LIBGEN	?= false  # see lib/GNUmakefile
+STXXL_LIBRARY_SPECIFIC	+= -fPIC
+
+endif
+
+###################################################################
 
 
 #### STXXL CONFIGURATION #########################################
@@ -348,10 +362,10 @@ HEADER_FILES_UTILS	+= malloc.h
 OBJEXT	 = $(MODENAME).o # extension of object files
 LIBOBJEXT= lib$(LIBNAME).o # extension of object files for the library
 IIEXT	 = $(MODENAME).ii
-LIBEXT	 = a		# static library file extension
+LIBEXT	?= a		# static library file extension
 EXEEXT	 = $(MODENAME).bin # executable file extension
 RM	 = rm -f	# remove file command
-LIBGEN	 = ar cr	# library generation
+LIBGEN	?= ar cr	# library generation
 OUT	 = -o		# output file option for the compiler and linker
 
 o	?= $(strip $(OBJEXT))

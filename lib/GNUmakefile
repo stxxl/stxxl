@@ -18,8 +18,18 @@ lib: lib$(LIBNAME).$(LIBEXT)
 
 lib$(LIBNAME).$(LIBEXT): $(LIB_OBJECTS) $(DEPS_MAKEFILES)
 	$(RM) $@
+ifeq ($(strip $(ENABLE_SHARED)),yes)
+	$(RM) $@.*
+	# build shared library
+	$(LINKER) -shared -Wl,-soname=lib$(LIBNAME).so.$(SOVERSION) -lpthread -o lib$(LIBNAME).so.$(LIBVERSION) $(LIB_OBJECTS)
+	ln -sf lib$(LIBNAME).so.$(LIBVERSION) lib$(LIBNAME).so.$(SOVERSION)
+	ln -sf lib$(LIBNAME).so.$(SOVERSION) lib$(LIBNAME).so
+else
+	# build static library
 	$(LIBGEN)lib$(LIBNAME).$(LIBEXT) $(LIB_OBJECTS)
+endif
 
 clean::
 	$(RM) lib$(LIBNAME).$(LIBEXT)
+	$(RM) lib$(LIBNAME).$(LIBEXT).*
 
