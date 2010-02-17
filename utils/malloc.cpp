@@ -42,7 +42,6 @@ void print_malloc_stats()
 
 int main(int argc, char * argv[])
 {
-    using std::cin;
     using std::cout;
     using std::cerr;
     using std::endl;

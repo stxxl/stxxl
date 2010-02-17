@@ -30,19 +30,9 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    char dum;
-    STXXL_MSG("Enter a symbol:");
-    std::cin >> dum;
-
     ext_stack_type * my_stacks = new ext_stack_type[atoi(argv[1])];
 
-    STXXL_MSG("Enter a symbol:");
-    std::cin >> dum;
-
     delete[] my_stacks;
-
-    STXXL_MSG("Enter a symbol:");
-    std::cin >> dum;
 
     return 0;
 }
