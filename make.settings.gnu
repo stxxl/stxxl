@@ -147,21 +147,21 @@ ifeq (,$(strip $(wildcard $(CURDIR)/make.settings.local)))
 ifeq (,$(STXXL_AUTOCONFIG))
 $(warning *** WARNING: you did not have a make.settings.local file -- creating ...)
 endif
-$(shell echo -e '\043STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
 MCSTL_ROOT	?= $(HOME)/work/mcstl
-$(shell echo -e '\043MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
-$(shell echo -e '\043COMPILER_GCC	 = g++-4.2' >> $(CURDIR)/make.settings.local)
-$(shell echo -e '\043COMPILER_GCC	 = g++-4.4 -std=c++0x' >> $(CURDIR)/make.settings.local)
-$(shell echo -e '\043COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043COMPILER_GCC	 = g++-4.2' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043COMPILER_GCC	 = g++-4.4 -std=c++0x' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
 ifeq (Darwin,$(strip $(shell uname)))
-$(shell echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
 else
-$(shell echo -e '\043USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
 endif
 ifeq (FreeBSD,$(strip $(shell uname)))
-$(shell echo -e 'USE_FREEBSD	 = yes' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e 'USE_FREEBSD	 = yes' >> $(CURDIR)/make.settings.local)
 else
-$(shell echo -e '\043USE_FREEBSD	 = no' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043USE_FREEBSD	 = no' >> $(CURDIR)/make.settings.local)
 endif
 include make.settings.local
 endif
