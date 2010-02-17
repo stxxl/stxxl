@@ -1,32 +1,32 @@
 LIB_OBJECTS = \
-	../io/iostats.$(OBJEXT) \
-	../io/request.$(OBJEXT) \
-	../io/request_waiters_impl_basic.$(OBJEXT) \
-	../io/request_state_impl_basic.$(OBJEXT) \
-	../io/request_impl_basic.$(OBJEXT) \
-	../io/request_queue_impl_worker.$(OBJEXT) \
-	../io/request_queue_impl_qwqr.$(OBJEXT) \
-	../io/request_queue_impl_1q.$(OBJEXT) \
-	../io/disk_queued_file.$(OBJEXT) \
-	../io/ufs_file_base.$(OBJEXT) \
-	../io/syscall_file.$(OBJEXT) \
-	../io/wfs_file_base.$(OBJEXT) \
-	../io/wincall_file.$(OBJEXT) \
-	../io/boostfd_file.$(OBJEXT) \
-	../io/mem_file.$(OBJEXT) \
-	../io/fileperblock_file.$(OBJEXT) \
- 	../io/wbtl_file.$(OBJEXT) \
-	../mng/mng.$(OBJEXT) \
-	../algo/async_schedule.$(OBJEXT) \
-	../common/debug.$(OBJEXT) \
-	../common/rand.$(OBJEXT) \
-	../common/seed.$(OBJEXT) \
-	../common/exithandler.$(OBJEXT) \
-	../common/verbose.$(OBJEXT) \
-	../common/log.$(OBJEXT) \
-	../common/version.$(OBJEXT)
+	../io/iostats.$(LIBOBJEXT) \
+	../io/request.$(LIBOBJEXT) \
+	../io/request_waiters_impl_basic.$(LIBOBJEXT) \
+	../io/request_state_impl_basic.$(LIBOBJEXT) \
+	../io/request_impl_basic.$(LIBOBJEXT) \
+	../io/request_queue_impl_worker.$(LIBOBJEXT) \
+	../io/request_queue_impl_qwqr.$(LIBOBJEXT) \
+	../io/request_queue_impl_1q.$(LIBOBJEXT) \
+	../io/disk_queued_file.$(LIBOBJEXT) \
+	../io/ufs_file_base.$(LIBOBJEXT) \
+	../io/syscall_file.$(LIBOBJEXT) \
+	../io/wfs_file_base.$(LIBOBJEXT) \
+	../io/wincall_file.$(LIBOBJEXT) \
+	../io/boostfd_file.$(LIBOBJEXT) \
+	../io/mem_file.$(LIBOBJEXT) \
+	../io/fileperblock_file.$(LIBOBJEXT) \
+ 	../io/wbtl_file.$(LIBOBJEXT) \
+	../mng/mng.$(LIBOBJEXT) \
+	../algo/async_schedule.$(LIBOBJEXT) \
+	../common/debug.$(LIBOBJEXT) \
+	../common/rand.$(LIBOBJEXT) \
+	../common/seed.$(LIBOBJEXT) \
+	../common/exithandler.$(LIBOBJEXT) \
+	../common/verbose.$(LIBOBJEXT) \
+	../common/log.$(LIBOBJEXT) \
+	../common/version.$(LIBOBJEXT)
 
 LIB_OBJECTS_NON_MSVC = \
-	../io/mmap_file.$(OBJEXT) \
-	../io/simdisk_file.$(OBJEXT)
+	../io/mmap_file.$(LIBOBJEXT) \
+	../io/simdisk_file.$(LIBOBJEXT)
 

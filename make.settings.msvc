@@ -217,6 +217,7 @@ STREAM_FILES	 = \
 #### MISC #########################################################
 
 OBJEXT = obj # extension of object file
+LIBOBJEXT = obj # extension of object files for the library
 LIBEXT = lib # static library file extension
 EXEEXT = exe # executable file extension
 RM =     del # remove file command

@@ -18,7 +18,7 @@ SKIPPED_TEST_BINARIES	 = $(TESTS-) $(TESTS-no) $(TESTS-yesno) $(TESTS-noyes) $(T
 
 tests: $(TEST_BINARIES:%=%.$(bin))
 
-lib: $(LIB_SRC:.cpp=.$o)
+lib: $(LIB_SRC:.cpp=.$(lo))
 
 clean::
 	$(RM) *.$o

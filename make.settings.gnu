@@ -65,7 +65,7 @@ OPT		?= -O$(OPT_LEVEL) # compiler optimization level
 WARNINGS	?= -W -Wall -Woverloaded-virtual -Wundef
 DEBUG		?= # put here -g option to include the debug information into the binaries
 
-LIBBASE		?= $(MODEBASE)
+LIBBASE		?= stxxl
 LIBEXTRA	?=
 MODEBASE	?= stxxl
 
@@ -195,6 +195,8 @@ STXXL_SPECIFIC	+= \
 	-I$(strip $(STXXL_ROOT))/include \
 	-include stxxl/bits/defines.h \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+
+STXXL_LIBRARY_SPECIFIC	+= -D_IN_LIBSTXXL
 
 STXXL_LDFLAGS	+= $(PTHREAD_FLAG)
 STXXL_LDLIBS	+= -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME)
@@ -344,6 +346,7 @@ HEADER_FILES_UTILS	+= malloc.h
 #### MISC #########################################################
 
 OBJEXT	 = $(MODENAME).o # extension of object files
+LIBOBJEXT= lib$(LIBNAME).o # extension of object files for the library
 IIEXT	 = $(MODENAME).ii
 LIBEXT	 = a		# static library file extension
 EXEEXT	 = $(MODENAME).bin # executable file extension
@@ -352,6 +355,7 @@ LIBGEN	 = ar cr	# library generation
 OUT	 = -o		# output file option for the compiler and linker
 
 o	?= $(strip $(OBJEXT))
+lo	?= $(strip $(LIBOBJEXT))
 ii	?= $(strip $(IIEXT))
 bin	?= $(strip $(EXEEXT))
 
@@ -368,6 +372,13 @@ endef
 DEPS_MAKEFILES		:= $(wildcard $(TOPDIR)/Makefile.subdir.gnu $(TOPDIR)/make.settings $(TOPDIR)/make.settings.local GNUmakefile Makefile Makefile.common Makefile.local)
 EXTRA_DEPS_COMPILE	?= $(DEPS_MAKEFILES)
 %.$o: %.cpp $(EXTRA_DEPS_COMPILE)
+	$(COMPILE_STXXL)
+
+%.$(lo): PARALLEL_MODE_CPPFLAGS=
+%.$(lo): MCSTL_CPPFLAGS=
+%.$(lo): STXXL_COMPILER_OPTIONS += $(STXXL_LIBRARY_SPECIFIC)
+%.$(lo): o=$(lo)
+%.$(lo): %.cpp $(EXTRA_DEPS_COMPILE)
 	$(COMPILE_STXXL)
 
 %.$(ii): %.cpp $(EXTRA_DEPS_COMPILE)
