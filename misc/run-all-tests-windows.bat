@@ -41,7 +41,7 @@ mng\test_aligned
 
 containers\bench_pqueue
 containers\copy_file "%STXXL_TMPDIR%\in" "%STXXL_TMPDIR%\out"
-containers\monotonic_pq 1000 1
+containers\monotonic_pq 800 1
 containers\pq_benchmark 1 1000000
 containers\pq_benchmark 2 1000000
 containers\stack_benchmark 1 1073741824

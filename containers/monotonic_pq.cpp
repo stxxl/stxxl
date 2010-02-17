@@ -22,7 +22,7 @@
 #define TINY_PQ 0
 #define MANUAL_PQ 0
 
-#define SIDE_PQ 1
+#define SIDE_PQ 1	//compare with second, in-memory PQ (needs a lot of memory)
 
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
@@ -200,8 +200,8 @@ int main(int argc, char * argv[])
   __gnu_parallel::_Settings::set(parallel_settings);*/
 #endif
 
-    const stxxl::unsigned_type mem_for_queue = 1024 * mega;
-    const stxxl::unsigned_type mem_for_pools = 1024 * mega;
+    const stxxl::unsigned_type mem_for_queue = 512 * mega;
+    const stxxl::unsigned_type mem_for_pools = 512 * mega;
 
 #if TINY_PQ
     stxxl::STXXL_UNUSED(mem_for_queue);
@@ -307,7 +307,7 @@ int main(int argc, char * argv[])
     STXXL_MSG("op-sequence(monotonic pq): ( push, pop, push ) * n");
     for (i = 0; i < nelements; ++i)
     {
-        if ((i % (10 * mega)) == 0)
+        if ((i % mega) == 0)
             STXXL_MSG(
                 std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
                            << "Inserting element " << i << " top() == " << least.key << " @ "
