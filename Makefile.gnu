@@ -54,13 +54,22 @@ lib-in-%:
 	$(MAKE) -C $* lib
 
 build-lib: SUBDIRS-lib
+	$(RM) $(LIBNAME).stamp
 	$(MAKE) -C lib
+	touch $(LIBNAME).stamp
 
-build-lib-utils: build-lib
+ifeq (,$(wildcard lib/lib$(LIBNAME).$(LIBEXT)))
+$(LIBNAME).stamp: build-lib
+else
+$(LIBNAME).stamp:
+	$(MAKE) -f Makefile.gnu build-lib
+endif
+
+build-lib-utils: $(LIBNAME).stamp
 	$(MAKE) -C common tools
 	$(MAKE) -C utils tools
 
-$(MODENAME).stamp:
+$(MODENAME).mk:
 	$(RM) $@ $(MODENAME).mk.tmp
 	echo 'STXXL_CXX			 = $(COMPILER)'	>> $(MODENAME).mk.tmp
 	echo 'STXXL_CPPFLAGS			 = $(stxxl_mk_cppflags)'	>> $(MODENAME).mk.tmp
@@ -78,10 +87,11 @@ $(MODENAME).stamp:
 	echo 'STXXL_DEBUGFLAGS		 = $(DEBUG)'	>> $(MODENAME).mk.tmp
 	cmp -s $(MODENAME).mk.tmp $(MODENAME).mk || mv $(MODENAME).mk.tmp $(MODENAME).mk
 	$(RM) $(MODENAME).mk.tmp
-	touch $@
+
+.PHONY: $(MODENAME).mk
 
 library: build-lib
-library_utils: library build-lib-utils $(MODENAME).stamp
+library_utils: $(LIBNAME).stamp build-lib-utils $(MODENAME).mk
 
 # skip recompilation of existing library
 library-fast:
@@ -128,14 +138,14 @@ endif
 
 .PHONY: common/version_svn.defs
 common/version_svn.defs:
-	$(RM) $@.$(MODENAME).tmp
-	echo '#define STXXL_VERSION_STRING_DATE "$(STXXL_VERSION_DATE)"' >> $@.$(MODENAME).tmp
-	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(STXXL_VERSION_SVN_REV)"' >> $@.$(MODENAME).tmp
-	$(if $(STXXL_SVN_BRANCH), echo '#define STXXL_VERSION_STRING_SVN_BRANCH "$(STXXL_SVN_BRANCH)"' >> $@.$(MODENAME).tmp)
-	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_DATE "$(MCSTL_VERSION_DATE)"' >> $@.$(MODENAME).tmp)
-	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_SVN_REVISION "$(MCSTL_VERSION_SVN_REV)"' >> $@.$(MODENAME).tmp)
-	cmp -s $@ $@.$(MODENAME).tmp || mv $@.$(MODENAME).tmp $@
-	$(RM) $@.$(MODENAME).tmp
+	$(RM) $@.$(LIBNAME).tmp
+	echo '#define STXXL_VERSION_STRING_DATE "$(STXXL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp
+	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(STXXL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp
+	$(if $(STXXL_SVN_BRANCH), echo '#define STXXL_VERSION_STRING_SVN_BRANCH "$(STXXL_SVN_BRANCH)"' >> $@.$(LIBNAME).tmp)
+	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_DATE "$(MCSTL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp)
+	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_SVN_REVISION "$(MCSTL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp)
+	cmp -s $@ $@.$(LIBNAME).tmp || mv $@.$(LIBNAME).tmp $@
+	$(RM) $@.$(LIBNAME).tmp
 endif
 
 
@@ -150,7 +160,7 @@ clean-in-%:
 
 clean: SUBDIRS-clean
 	$(RM) common/version_svn.defs
-	$(RM) $(MODENAME).stamp $(MODENAME).mk $(MODENAME).mk.tmp
+	$(RM) $(LIBNAME).stamp $(MODENAME).stamp $(MODENAME).mk $(MODENAME).mk.tmp
 
 
 getmodesuffix:

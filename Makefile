@@ -22,7 +22,7 @@ usage:
 	@echo "    library_g++ library_g++_pmode library_g++_mcstl library_icpc library_icpc_mcstl library_msvc"
 	@echo "    tests_g++   tests_g++_pmode   tests_g++_mcstl   tests_icpc   tests_icpc_mcstl   tests_msvc"
 	@echo "    clean_g++   clean_g++_pmode   clean_g++_mcstl   clean_icpc   clean_icpc_mcstl   clean_msvc"
-	@echo "    doxy clean_doxy"
+	@echo "    doxy clean_doxy  tutorial clean_tutorial  examples clean_examples"
 
 settings_gnu:
 	cmp -s make.settings.gnu make.settings || \
