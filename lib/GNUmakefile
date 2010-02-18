@@ -26,10 +26,10 @@ ifeq ($(strip $(ENABLE_SHARED)),yes)
 	ln -sf lib$(LIBNAME).so.$(SOVERSION) lib$(LIBNAME).so
 else
 	# build static library
-	$(LIBGEN)lib$(LIBNAME).$(LIBEXT) $(LIB_OBJECTS)
+	$(LIBGEN) lib$(LIBNAME).$(LIBEXT) $(LIB_OBJECTS)
 endif
 
 clean::
 	$(RM) lib$(LIBNAME).$(LIBEXT)
-	$(RM) lib$(LIBNAME).$(LIBEXT).*
+	$(RM) lib$(LIBNAME).$(strip $(LIBEXT)).*
 

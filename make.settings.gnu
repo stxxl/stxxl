@@ -283,7 +283,7 @@ BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_THREADS
 #BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_TIMESTAMP   # probably less efficient than gettimeofday()
 
 BOOST_LIB_PATH			?= $(if $(strip $(BOOST_ROOT)),$(strip $(BOOST_ROOT))/lib)
-BOOST_LIB_COMPILER_SUFFIX	?= 
+BOOST_LIB_COMPILER_SUFFIX	?=
 BOOST_LIB_MT_SUFFIX		?= -mt
 BOOST_LINKER_OPTIONS		 = \
 	$(foreach lib,$(BOOST_LIB_PATH),-L$(lib)) \
@@ -359,14 +359,19 @@ HEADER_FILES_UTILS	+= malloc.h
 
 #### MISC #########################################################
 
-OBJEXT	 = $(MODENAME).o # extension of object files
-LIBOBJEXT= lib$(LIBNAME).o # extension of object files for the library
-IIEXT	 = $(MODENAME).ii
-LIBEXT	?= a		# static library file extension
-EXEEXT	 = $(MODENAME).bin # executable file extension
-RM	 = rm -f	# remove file command
-LIBGEN	?= ar cr	# library generation
-OUT	 = -o		# output file option for the compiler and linker
+# extension of object files
+OBJEXT		?= $(MODENAME).o
+# extension of object files for the library
+LIBOBJEXT	?= lib$(LIBNAME).o
+IIEXT		?= $(MODENAME).ii
+# static library file extension
+LIBEXT		?= a
+# executable file extension
+EXEEXT		?= $(MODENAME).bin
+# static library generation
+LIBGEN		?= ar cr
+# output file option for the compiler and linker
+OUT		?= -o
 
 o	?= $(strip $(OBJEXT))
 lo	?= $(strip $(LIBOBJEXT))
