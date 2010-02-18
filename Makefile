@@ -38,23 +38,29 @@ config_gnu: settings_gnu
 	$(MAKE) -f Makefile.gnu config STXXL_AUTOCONFIG=true
 
 
-library_g++: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=no
+_library_g++: settings_gnu
+	$(MAKE) -f Makefile.gnu library
 
-library_g++_pmode: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=yes USE_MCSTL=no
+library_g++: _library_g++
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=no USE_MCSTL=no
 
-library_g++_mcstl: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=yes
+library_g++_pmode: _library_g++
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=yes USE_MCSTL=no
 
-library_icpc: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=no USE_ICPC=yes
+library_g++_mcstl: _library_g++
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=no USE_MCSTL=yes
 
-library_icpc_pmode: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=yes USE_MCSTL=no USE_ICPC=yes
+_library_icpc: settings_gnu
+	$(MAKE) -f Makefile.gnu library USE_ICPC=yes
 
-library_icpc_mcstl: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
+library_icpc: _library_icpc
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=no USE_MCSTL=no USE_ICPC=yes
+
+library_icpc_pmode: _library_icpc
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=yes USE_MCSTL=no USE_ICPC=yes
+
+library_icpc_mcstl: _library_icpc
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
 
 library_msvc: settings_msvc
 	nmake /NOLOGO /F Makefile.msvc library

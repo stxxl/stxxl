@@ -55,10 +55,12 @@ lib-in-%:
 
 build-lib: SUBDIRS-lib
 	$(MAKE) -C lib
+
+build-lib-utils: build-lib
 	$(MAKE) -C common tools
 	$(MAKE) -C utils tools
 
-$(MODENAME).stamp: build-lib
+$(MODENAME).stamp:
 	$(RM) $@ $(MODENAME).mk.tmp
 	echo 'STXXL_CXX			 = $(COMPILER)'	>> $(MODENAME).mk.tmp
 	echo 'STXXL_CPPFLAGS			 = $(stxxl_mk_cppflags)'	>> $(MODENAME).mk.tmp
@@ -78,12 +80,13 @@ $(MODENAME).stamp: build-lib
 	$(RM) $(MODENAME).mk.tmp
 	touch $@
 
-library: $(MODENAME).stamp
+library: build-lib
+library_utils: library build-lib-utils $(MODENAME).stamp
 
 # skip recompilation of existing library
 library-fast:
 ifeq (,$(wildcard lib/lib$(LIBNAME).$(LIBEXT)))
-library-fast: library
+library-fast: library_utils
 endif
 
 ifneq (,$(wildcard .svn))
