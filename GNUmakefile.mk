@@ -15,7 +15,7 @@ NICE	?= nice
 PMODE	?= parallel_mode # undefine to disable
 MCSTL	?= mcstl # undefine to disable
 
-MODESUFFIX	:= $(shell $(MAKE) -f Makefile.gnu getmodesuffix 2>/dev/null || true)
+MODESUFFIX	 = $(shell $(MAKE) -f Makefile.gnu getmodesuffix 2>/dev/null || true)
 
 
 default-all: lib tests header-compile-test
