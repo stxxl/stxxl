@@ -52,7 +52,6 @@ run-all-tests-valgrind: do-run-all-tests ;
 dep-check-sanity:
 	$(SKIP_SANITY_CHECK)find . -name '*.o' -exec misc/remove-unless {} .o .d \; 
 	$(SKIP_SANITY_CHECK)find . -name '*.bin' -exec misc/remove-unless {} .bin .o \; 
-	$(SKIP_SANITY_CHECK)find . -name '*.o.d' -exec misc/remove-unless {} .o.d .foobar \;  # TRANSITIONAL
 
 clean:
 	$(MAKE) -f Makefile clean_$(MODE) clean_$(MODE)_pmode clean_$(MODE)_mcstl clean_doxy clean_examples
