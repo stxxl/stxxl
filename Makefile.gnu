@@ -70,7 +70,7 @@ build-lib-utils: $(LIBNAME).stamp
 	$(MAKE) -C utils tools
 
 $(MODENAME).mk:
-	$(RM) $@ $(MODENAME).mk.tmp
+	$(RM) $(MODENAME).mk.tmp
 	echo 'STXXL_CXX			 = $(COMPILER)'	>> $(MODENAME).mk.tmp
 	echo 'STXXL_CPPFLAGS			 = $(stxxl_mk_cppflags)'	>> $(MODENAME).mk.tmp
 	echo 'STXXL_LDLIBS			 = $(stxxl_mk_ldlibs)'	>> $(MODENAME).mk.tmp
