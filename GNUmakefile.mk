@@ -29,7 +29,7 @@ tests: lib
 
 examples: lib
 	$(MAKE) -C doc/tutorial/examples clean
-	$(MAKE) -C doc/tutorial/examples all
+	$(MAKE) -C doc/tutorial/examples all STXXL_MK=stxxl$(MODESUFFIX).mk
 
 header-compile-test: lib
 	$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=stxxl$(MODESUFFIX)
