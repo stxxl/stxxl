@@ -21,8 +21,8 @@ tests: $(TEST_BINARIES:%=%.$(bin))
 lib: $(LIB_SRC:.cpp=.$(lo))
 
 clean::
-	$(RM) *.$o
-	$(RM) *.$(o:.o=).d *.dT
+	$(RM) *.$(lo) *.$o
+	$(RM) *.$(lo:.o=).d *.$(o:.o=).d *.dT
 	$(RM) $(TEST_BINARIES:=.$(bin))
 	$(RM) $(SKIPPED_TEST_BINARIES:=.$(bin))
 
