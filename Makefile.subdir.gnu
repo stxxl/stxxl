@@ -42,7 +42,7 @@ needs_override		?= $(call debug_override_opt,$1%$(compiler_version);$2%$(bitness
 				$(or $(filter any,$4),$(if $(filter none,$4),$(if $(DEBUG),,empty)),$(filter $4,$(DEBUG))))
 # usage: $(call apply_override yes|$(EMPTY),to,target)
 apply_override		?= $(call debug_override_opt,enable=$1;to=$2;target=$3)\
-			   $(if $1,$3: OPT_LEVEL=$2,)
+			   $(if $(strip $1),$3: OPT_LEVEL=$2,)
 # usage: $(call reduce_optimization,from,to,target,compiler,bits,debug[,type])
 reduce_optimization	?= $(call apply_override,$(call needs_override,$4,$5,$1,$6),$2,$3.$($(or $(strip $7),bin)))
 
