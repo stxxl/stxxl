@@ -31,14 +31,20 @@ clean::
 
 # Work around compiler bugs:
 compiler_version	:= $(shell $(COMPILER) -v 2>&1 | tr ' ' '_')
-bitness			:= $(shell file ../common/version.$(o) 2>/dev/null)
+bitness			:= $(shell file ../common/version.$(lo) 2>/dev/null)
+#debug_override_opt	?= $(warning "DBGOO: $1")
+debug_override_opt	?=
 # usage: e.g. $(call needs_override,gcc_version_4.2,32-bit,3,[-g|any|none])
-needs_override		?= $(and $(findstring $1,$(compiler_version)),\
+needs_override		?= $(call debug_override_opt,$1%$(compiler_version);$2%$(bitness);$3%$(OPT_LEVEL);$4%$(DEBUG))\
+			   $(and $(findstring $1,$(compiler_version)),\
 				$(or $(filter any,$2),$(filter $2,$(bitness))),\
 				$(filter $3,$(OPT_LEVEL)),\
 				$(or $(filter any,$4),$(if $(filter none,$4),$(if $(DEBUG),,empty)),$(filter $4,$(DEBUG))))
+# usage: $(call apply_override yes|$(EMPTY),to,target)
+apply_override		?= $(call debug_override_opt,enable=$1;to=$2;target=$3)\
+			   $(if $1,$3: OPT_LEVEL=$2,)
 # usage: $(call reduce_optimization,from,to,target,compiler,bits,debug[,type])
-reduce_optimization	?= $(if $(call needs_override,$4,$5,$1,$6),$3.$($(or $(strip $7),bin)): OPT_LEVEL=$2)
+reduce_optimization	?= $(call apply_override,$(call needs_override,$4,$5,$1,$6),$2,$3.$($(or $(strip $7),bin)))
 
 
 .SECONDARY:
