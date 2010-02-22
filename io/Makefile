@@ -1,6 +1,8 @@
 include Makefile.common
 include ../make.settings
 
+tools: $(UTIL_BINARIES)
+
 tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 

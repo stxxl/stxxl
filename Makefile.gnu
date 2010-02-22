@@ -68,6 +68,7 @@ endif
 build-lib-utils: $(LIBNAME).stamp
 	$(MAKE) -C common tools
 	$(MAKE) -C utils tools
+	$(MAKE) -C io tools
 
 $(MODENAME).mk:
 	$(RM) $(MODENAME).mk.tmp
