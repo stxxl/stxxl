@@ -151,6 +151,7 @@ DISKNAME	?= unknown disk
 PLOTXMAX	?= 475
 PLOTYMAX	?= 120
 AVGPLOTYMAX	?= $(PLOTYMAX)
+GNUPLOTFILEINFO	?= set label "$(HOST):$(patsubst $(HOME)/%,\\~/%,$(CURDIR))/" at character 0,-1 font ",6"
 
 fmt_block_size_2560000B		?= 2.5
 fmt_block_size_12800000B	?= 12.5
@@ -191,6 +192,7 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	echo 'set title "STXXL Disk Benchmark $(DISKNAME) B=$(strip $(BATCH_SIZE))x$(call format_block_size,$(BLOCK_SIZE)) \\@ $(subst _,\\_,$(HOST))"' >> $@
 	echo 'set term postscript enhanced color solid 10' >> $@
 	echo 'set output "$(HOST).ps"' >> $@
+	echo '$(GNUPLOTFILEINFO)' >> $@
 	echo 'replot' >> $@
 
 $(HOST).d.gnuplot: $(HOST).gnuplot
@@ -225,6 +227,7 @@ $(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
 	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(subst _,\\_,$(HOST))"' >> $@
 	echo 'set term postscript enhanced color solid' >> $@
 	echo 'set output "$(HOST)-avg.ps"' >> $@
+	echo '$(GNUPLOTFILEINFO)' >> $@
 	echo 'replot' >> $@
 
 $(HOST)-avg3.gnuplot: $(HOST)-avg.gnuplot
