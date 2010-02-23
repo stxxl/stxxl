@@ -55,6 +55,8 @@ IOSTAT_PLOT_IO_WITH_UTILIZATION	?= no
 IOSTAT_PLOT_Y_LABEL.io		?= Bandwidth [MiB/s]
 IOSTAT_PLOT_Y_LABEL.cpu		?= CPU Usage [%]
 
+ECHO				?= /bin/echo
+
 # $1 = first, $2 = increment, $3 = last
 define gnuplot-column-sequence-sum
 $(subst $(space),+,$(patsubst %,$$%,$(shell seq $1 $2 $3)))
@@ -63,59 +65,59 @@ endef
 # $1 = io | cpu, $2 = numdisks (io) | numcpus (cpu), $3 = stride
 define template-iostat-gnuplot
 	$(RM) $@
-	echo 'set title "$(subst _, ,$*) (avg=$(IOSTAT_PLOT_AVERAGE.$(strip $1)))"' >> $@
-	echo 'set xlabel "Time [s]"' >> $@
-	echo 'set ylabel "$(IOSTAT_PLOT_Y_LABEL.$(strip $1))"' >> $@
+	$(ECHO) 'set title "$(subst _, ,$*) (avg=$(IOSTAT_PLOT_AVERAGE.$(strip $1)))"' >> $@
+	$(ECHO) 'set xlabel "Time [s]"' >> $@
+	$(ECHO) 'set ylabel "$(IOSTAT_PLOT_Y_LABEL.$(strip $1))"' >> $@
 $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
-	echo 'set y2label "Utilization [%]"' >> $@
-	echo 'set ytics nomirror' >> $@
-	echo 'set y2tics' >> $@
+	$(ECHO) 'set y2label "Utilization [%]"' >> $@
+	$(ECHO) 'set ytics nomirror' >> $@
+	$(ECHO) 'set y2tics' >> $@
 ,$(if $(wildcard $*.waitlog),
-	echo 'set y2label "Wait Time [s]"' >> $@
-	echo 'set ytics nomirror' >> $@
-	echo 'set y2tics' >> $@
+	$(ECHO) 'set y2label "Wait Time [s]"' >> $@
+	$(ECHO) 'set ytics nomirror' >> $@
+	$(ECHO) 'set y2tics' >> $@
 ))
-#	echo 'set data style linespoints' >> $@
-	echo 'set data style lines' >> $@
-	echo 'set macros' >> $@
-	echo 'set pointsize 0.4' >> $@
-#	echo 'set samples 1000' >> $@
-	echo 'set key top left' >> $@
-	echo 'set yrange [0:]' >> $@
-	echo '' >> $@
+#	$(ECHO) 'set data style linespoints' >> $@
+	$(ECHO) 'set data style lines' >> $@
+	$(ECHO) 'set macros' >> $@
+	$(ECHO) 'set pointsize 0.4' >> $@
+#	$(ECHO) 'set samples 1000' >> $@
+	$(ECHO) 'set key top left' >> $@
+	$(ECHO) 'set yrange [0:]' >> $@
+	$(ECHO) '' >> $@
 $(if $(filter io,$1),
-	echo 'read = "$(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_read_$3), $3, $(shell expr $2 '*' $3))"' >> $@
-	echo 'write = "$(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_write_$3), $3, $(shell expr $2 '*' $3))"' >> $@
-	echo 'utilize = "($(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_utilize_$3), $3, $(shell expr $2 '*' $3))) / $2"' >> $@
-	echo '' >> $@
-	echo 'plot \' >> $@
-	echo '	"$<" using 0:(@read + @write) title "Read + Write" ls 3$(comma) \' >> $@
-	echo '	"$<" using 0:(@read) title "Read" ls 2$(comma) \' >> $@
-	echo '	"$<" using 0:(@write) title "Write" ls 1$(comma) \' >> $@
+	$(ECHO) 'read = "$(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_read_$3), $3, $(shell expr $2 '*' $3))"' >> $@
+	$(ECHO) 'write = "$(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_write_$3), $3, $(shell expr $2 '*' $3))"' >> $@
+	$(ECHO) 'utilize = "($(call gnuplot-column-sequence-sum, $(IOSTAT_PLOT_OFFSET_utilize_$3), $3, $(shell expr $2 '*' $3))) / $2"' >> $@
+	$(ECHO) '' >> $@
+	$(ECHO) 'plot \' >> $@
+	$(ECHO) '	"$<" using 0:(@read + @write) title "Read + Write" ls 3$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:(@read) title "Read" ls 2$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:(@write) title "Write" ls 1$(comma) \' >> $@
 $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
-	echo '	"$<" using 0:(@utilize) title "Utilization" ls 5 axes x1y2$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:(@utilize) title "Utilization" ls 5 axes x1y2$(comma) \' >> $@
 ,$(if $(wildcard $*.waitlog),
-	echo '	"$*.waitlog" using 1:4 title "Wait Read" ls 5 axes x1y2$(comma) \' >> $@
-	echo '	"$*.waitlog" using 1:5 title "Wait Write" ls 4 axes x1y2$(comma) \' >> $@
+	$(ECHO) '	"$*.waitlog" using 1:4 title "Wait Read" ls 5 axes x1y2$(comma) \' >> $@
+	$(ECHO) '	"$*.waitlog" using 1:5 title "Wait Write" ls 4 axes x1y2$(comma) \' >> $@
 ))
-	echo '	"not.existing.dummy" using 08:15 notitle' >> $@
+	$(ECHO) '	"not.existing.dummy" using 08:15 notitle' >> $@
 )
 $(if $(filter cpu,$1),
-	echo 'plot \' >> $@
-	echo '	"$(word 2,$^)" using 0:(100*($$1-$(IOSTAT_PLOT_LOAD_REDUCE))/$(strip $2)) title "Load (100% = $2)" ls 5$(comma) \' >> $@
-	echo '	"$<" using 0:($$1+$$3+$$4) title "Total" ls 4$(comma) \' >> $@
-	echo '	"$<" using 0:4 title "Wait" ls 2$(comma) \' >> $@
-	echo '	"$<" using 0:1 title "User" ls 1$(comma) \' >> $@
-	echo '	"$<" using 0:3 title "System" ls 3$(comma) \' >> $@
-	echo '	"not.existing.dummy" using 08:15 notitle' >> $@ 
+	$(ECHO) 'plot \' >> $@
+	$(ECHO) '	"$(word 2,$^)" using 0:(100*($$1-$(IOSTAT_PLOT_LOAD_REDUCE))/$(strip $2)) title "Load (100% = $2)" ls 5$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:($$1+$$3+$$4) title "Total" ls 4$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:4 title "Wait" ls 2$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:1 title "User" ls 1$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:3 title "System" ls 3$(comma) \' >> $@
+	$(ECHO) '	"not.existing.dummy" using 08:15 notitle' >> $@ 
 )
-	echo '' >> $@
-	echo 'pause -1' >> $@
-	echo '' >> $@
-	echo 'set terminal postscript enhanced $(GPLT_COLOR_PS) 10' >> $@
-	echo 'set output "$*.$(strip $1).eps"' >> $@
-	echo 'replot' >> $@
-	echo '' >> $@
+	$(ECHO) '' >> $@
+	$(ECHO) 'pause -1' >> $@
+	$(ECHO) '' >> $@
+	$(ECHO) 'set terminal postscript enhanced $(GPLT_COLOR_PS) 10' >> $@
+	$(ECHO) 'set output "$*.$(strip $1).eps"' >> $@
+	$(ECHO) 'replot' >> $@
+	$(ECHO) '' >> $@
 endef
 
 %.io-$(IOSTAT_PLOT_AVERAGE.io).dat: %.iostat $(MAKEFILE_LIST)
@@ -146,13 +148,13 @@ $(foreach disk, $(IOSTAT_PLOT_DISK_LIST),$(eval $(per-disk-plot-template)))
 	$(call template-iostat-gnuplot,io,$(IOSTAT_PLOT_DISKS),$(IOSTAT_PLOT_STRIDE))
 
 %.io.plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).plot
-	@echo Your plot file is: $<
+	@$(ECHO) Your plot file is: $<
 
 %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).plot: %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).dat %.loadavg $(MAKEFILE_LIST)
 	$(call template-iostat-gnuplot,cpu,$(IOSTAT_PLOT_CPUS),$(IOSTAT_PLOT_STRIDE))
 
 %.cpu.plot: %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).plot
-	@echo Your plot file is: $<
+	@$(ECHO) Your plot file is: $<
 
 %.io.xplot: %.io-$(IOSTAT_PLOT_AVERAGE.io).plot
 	gnuplot $<
