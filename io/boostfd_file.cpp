@@ -19,6 +19,7 @@
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/version.hpp>
 
 
 __STXXL_BEGIN_NAMESPACE
