@@ -7,6 +7,10 @@ Version 1.3
     block file names.  The advantage of these file types is that unused
     disk space is freed earlier on the file system level.
   - wbtl_file:  Do library-based write-combining (good for writing small blocks onto SSDs)
+* I/O subsystem
+  - separate the disk number of a file (which queue to put requests in)
+    from the fact that blocks for this file are allocated via the block
+    manager (disk number -1 otherwise).
 * Other new functionality 
   - file requests can now be canceled (success not guaranteed), completion handlers are called anyway.
   - log file locations are now configurable by the environment variables
