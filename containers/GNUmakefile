@@ -109,6 +109,6 @@ $(call reduce_optimization,3,1,btree/test_corr_insert_scan,Version_10.0,32-bit,a
 endif
 
 clean::
-	$(RM) btree/*.$o btree/*.$d btree/*.dT
+	$(RM) btree/*.$o btree/*.$(o:.o=).d btree/*.dT
 
 -include btree/*.d

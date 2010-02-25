@@ -44,3 +44,11 @@
 
 * implement an allocator which looks at the available free space on disks
   when distributing blocks to disks
+
+* allow configuration of the block-managed disks using API calls, 
+  not only through the configuration file.
+
+* separate library sources and tests/benchmarks
+  (e. g. to top level directories src/ and tests/)
+
+* abstract away block manager so every container can attach to a file.

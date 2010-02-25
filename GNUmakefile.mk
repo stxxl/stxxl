@@ -1,13 +1,10 @@
 #
-# HowTo use GNUmakefile.mk: create GNUMAKEfile containing:
+# HowTo use GNUmakefile.mk: create a sample GNUmakefile using the command
 #
-
-## # override MODE, NICE if you want
-##
-## # select your favorite subset of targets
-## all: lib tests header-compile-test doxy tutorial examples
-##
-## include GNUmakefile.mk
+#     make -f GNUmakefile.mk GNUmakefile
+#
+# then edit it to override MODE, NICE (if you want)
+# and select your favorite subset of targets
 
 
 MODE	?= g++
@@ -17,6 +14,8 @@ NICE	?= nice
 
 PMODE	?= parallel_mode # undefine to disable
 MCSTL	?= mcstl # undefine to disable
+
+MODESUFFIX	 = $(shell $(MAKE) -f Makefile.gnu getmodesuffix 2>/dev/null || true)
 
 
 default-all: lib tests header-compile-test
@@ -30,19 +29,19 @@ tests: lib
 
 examples: lib
 	$(MAKE) -C doc/tutorial/examples clean
-	$(MAKE) -C doc/tutorial/examples all
+	$(MAKE) -C doc/tutorial/examples all STXXL_MK=stxxl$(MODESUFFIX).mk
 
 header-compile-test: lib
-	$(NICE) $(MAKE) -C test/compile-stxxl-headers
-	$(if $(PMODE),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=pmstxxl)
-	$(if $(MCSTL),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl)
+	$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=stxxl$(MODESUFFIX)
+	$(if $(PMODE),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=pmstxxl$(MODESUFFIX))
+	$(if $(MCSTL),$(NICE) $(MAKE) -C test/compile-stxxl-headers INSTANCE=mcstxxl$(MODESUFFIX))
 
 do-run-all-tests:
 	@test -n "$(STXXL_TMPDIR)" || ( echo "STXXL_TMPDIR is not set"; exit 1 )
 	@test -z "$(LD_PRELOAD)" || ( echo "LD_PRELOAD is set"; exit 1 )
-	./misc/run-all-tests stxxl $(WITH_VALGRIND) $(WITH_VALGRIND)
-	$(if $(MCSTL),./misc/run-all-tests mcstxxl $(WITH_VALGRIND) $(WITH_VALGRIND))
-	$(if $(PMODE),./misc/run-all-tests pmstxxl $(WITH_VALGRIND) $(WITH_VALGRIND))
+	./misc/run-all-tests stxxl$(MODESUFFIX) $(WITH_VALGRIND) $(WITH_VALGRIND)
+	$(if $(MCSTL),./misc/run-all-tests mcstxxl$(MODESUFFIX) $(WITH_VALGRIND) $(WITH_VALGRIND))
+	$(if $(PMODE),./misc/run-all-tests pmstxxl$(MODESUFFIX) $(WITH_VALGRIND) $(WITH_VALGRIND))
 
 run-all-tests: WITH_VALGRIND=no
 run-all-tests: do-run-all-tests ;

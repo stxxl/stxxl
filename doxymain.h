@@ -2,7 +2,7 @@
  *
  *  \image html logo1.png
  *
- * <BR><BR>
+ * <br><br>
  * The core of \c S<small>TXXL</small> is an implementation of the C++
  * standard template library STL for external memory (out-of-core)
  * computations, i.e., \c S<small>TXXL</small> implements containers and algorithms
@@ -70,11 +70,11 @@
  PMODE = supports parallelization using libstdc++ parallel mode
  ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
        gcc does not come in the correct version:
-       icpc 9.0: use gcc 3.x
-       icpc 9.1: use gcc before 4.2
-       icpc 10.x with mcstl support: use gcc 4.2
- ²   = MCSTL has been superseded by the libstdc++ parallel mode in GCC 4.3,
-       full support requires g++ 4.4 or later, only partial support in g++ 4.3
+       icpc 9.0: use with gcc 3.x
+       icpc 9.1: use with gcc before 4.2
+       icpc 10.x, 11.x with mcstl support: use with gcc 4.2
+ ²   = MCSTL has been superseded by the libstdc++ parallel mode in gcc 4.3,
+       full support requires gcc 4.4 or later, only partial support in gcc 4.3
 \endverbatim
  *
  *
@@ -92,7 +92,6 @@
  * - \link installation_linux_gcc Installation (Linux/g++) \endlink
  * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
  * - \link installation_msvc Installation (Windows/MS Visual C++ 8.0) \endlink
- * - \link installation_old Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
  *
@@ -228,7 +227,6 @@ Controller::Controller()
  * - \link installation_linux_gcc Installation (Linux/g++) \endlink
  * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
  * - \link installation_msvc Installation (Windows/MS Visual C++ 8.0) \endlink
- * - \link installation_old Installation of the older Stxxl versions (earlier than 0.9) (Linux/g++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
  */
@@ -345,7 +343,7 @@ my_example.bin: my_example.o
  * file by setting the environment variable \c STXXLCFG .
  *
  * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<BR>
+ * A disk description uses the following format:<br>
  * \c disk=full_disk_filename,capacity,access_method
  *
  * Description of the parameters:
@@ -429,16 +427,16 @@ my_example.bin: my_example.o
  * - Choose Linker->Command Line page.
  * - In the 'Additional Options' field insert the contents of the \c linker.options file.
  *
- * <BR>
+ * <br>
  * If you use make files you can
  * include the \c make.settings file in your make files and use \c STXXL_COMPILER_OPTIONS and
  * \c STXXL_LINKER_OPTIONS variables, defined therein.
  *
- * For example: <BR>
- * \verbatim cl -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <BR>
+ * For example: <br>
+ * \verbatim cl -c my_example.cpp $(STXXL_COMPILER_OPTIONS) \endverbatim <br>
  * \verbatim link my_example.obj /out:my_example.exe $(STXXL_LINKER_OPTIONS) \endverbatim
  *
- * <BR>
+ * <br>
  * The \c STXXL_ROOT\\test\\WinGUI directory contains an example MFC GUI project
  * that uses \c Stxxl. In order to compile it open the WinGUI.vcproj file in
  * Visual Studio .NET. Change if needed the Compiler and Linker Options of the project
@@ -471,7 +469,7 @@ my_example.bin: my_example.o
  * file by setting the environment variable \c STXXLCFG .
  *
  * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<BR>
+ * A disk description uses the following format:<br>
  * \c disk=full_disk_filename,capacity,access_method
  *
  * Description of the parameters:
@@ -586,101 +584,7 @@ my_example.bin: my_example.o
  * file by setting the environment variable \c STXXLCFG .
  *
  * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<BR>
- * \c disk=full_disk_filename,capacity,access_method
- *
- * Description of the parameters:
- * - \c full_disk_filename : full disk filename. In order to access disks S<small>TXXL</small> uses file
- *   access methods. Each disk is represented as a file. If you have a disk that is mounted in Unix
- *   to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be
- *   \c /mnt/disk0/some_file_name ,
- * - \c capacity : maximum capacity of the disk in megabytes
- * - \c access_method : \c S<small>TXXL</small> has a number of different
- *   file access implementations for POSIX systems, choose one of them:
- *   - \c syscall uses \c read and \c write system calls which perform disk transfers directly
- *     on user memory pages without superfluous copying (currently the fastest method)
- *   - \c mmap : performs disks transfers using \c mmap and \c munmap system calls
- *   - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point
- *     to a file on a RAM disk partition with sufficient space
- *
- * See also the example configuration file \c 'config_example' included in the tarball.
- *
- *
- * \section excreation Precreating external memory files
- *
- * In order to get the maximum performance one should precreate disk files described in the configuration file,
- * before running \c S<small>TXXL</small> applications.
- *
- * The precreation utility is included in the set of \c S<small>TXXL</small>
- * utilities ( \c utils/createdisks.bin ). Run this utility
- * for each disk you have defined in the disk configuration file:
- * \verbatim utils/createdisks.bin capacity full_disk_filename... \endverbatim
- *
- * */
-
-
-/*!
- * \page installation_old Installation (Linux/g++ - Stxxl versions earlier than 0.9)
- *
- * \section download Download and library compilation
- *
- * - Download stxxl_0.77.tgz from
- *   <a href="http://sourceforge.net/projects/stxxl/files/stxxl/0.77/">SourceForge</a>.
- * - Unpack in some directory executing: \c tar \c zfxv \c stxxl_0.77.tgz ,
- * - Change to \c stxxl directory: \c cd \c stxxl ,
- * - Change file \c compiler.make according to your system configuration
- *   - name of your make program
- *   - name of your compiler
- *   - \c S<small>TXXL</small> root directory ( \c directory_where_you_unpacked_the_tar_ball/stxxl )
- * - Run: \verbatim make lib \endverbatim
- * - Run: \verbatim make tests \endverbatim (optional, if you want to run some test programs)
- *
- * In your makefiles of programs that will use \c S<small>TXXL</small> you should include
- * the file \c compiler.make
- * file (add the line 'include ../compiler.make') because it contains a useful variable (STXXL_VARS)
- * that includes all compiler definitions and library paths that you need to compile an
- * \c S<small>TXXL</small> program.
- *
- * For example: <BR> \verbatim g++  my_example.cpp -o my_example -g $(STXXL_VARS) \endverbatim
- *
- * Before you try to run one of the \c S<small>TXXL</small> examples
- * (or your \c S<small>TXXL</small> program) you must configure the disk
- * space that will be used as external memory for the library. See the next section.
- *
- *
- * \section space Disk space
- *
- * To get best performance with \c S<small>TXXL</small> you should assign separate disks to it.
- * These disks should be used by the library only.
- * Since \c S<small>TXXL</small> is developed to exploit disk parallelism, the performance of your
- * external memory application will increase if you use more than one disk.
- * But from how many disks your application can benefit depends on how "I/O bound" it is.
- * With modern disk bandwidths
- * of about 50-75 MiB/s most of applications are I/O bound for one disk. This means that if you add another disk
- * the running time will be halved. Adding more disks might also increase performance significantly.
- *
- *
- * \section filesystem Recommended file system
- *
- * Our library take benefit of direct user memory - disk transfers (direct access) which avoids
- * superfluous copies. This method has some disadvantages when accessing files on \c ext2 partitions.
- * Namely one requires one byte of internal memory per each accessed kilobyte of file space. For external
- * memory applications with large inputs this could be not proper. Therefore we recommend to use the
- * \c XFS file system <a href="http://oss.sgi.com/projects/xfs/">link</a> which does not have this overhead but
- * gives the same read and write performance. Note that file creation speed of \c XFS is slow, so that disk
- * files must be precreated.
- *
- *
- * \section configuration Disk configuration file
- *
- * You must define the disk configuration for an
- * \c S<small>TXXL</small> program in a file named \c '.stxxl' that must reside
- * in the same directory where you execute the program.
- * You can change the default file name for the configuration
- * file by setting the environment variable \c STXXLCFG .
- *
- * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<BR>
+ * A disk description uses the following format:<br>
  * \c disk=full_disk_filename,capacity,access_method
  *
  * Description of the parameters:

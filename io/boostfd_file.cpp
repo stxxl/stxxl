@@ -19,6 +19,7 @@
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/version.hpp>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -156,7 +157,11 @@ boostfd_file::boostfd_file(
         }
     }
 
+#if (BOOST_VERSION >= 104100)
+    file_des.open(filename, boostfd_mode);	//also compiles with earlier Boost versions, but differs semantically
+#else
     file_des.open(filename, boostfd_mode, boostfd_mode);
+#endif
 }
 
 boostfd_file::~boostfd_file()

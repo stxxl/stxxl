@@ -24,12 +24,13 @@ include make.settings.local
 MAKE = nmake /NOLOGO
 COMPILER = cl
 LINKER = link
-OPT = /O2 /Ob2
 WARNINGS =
+OPT = /O2 /Ob2 # debug is off
+# OPT = /Od # debug is on
 DEBUG_COMPILER = /MD /DNDEBUG # debug is off
 # DEBUG_COMPILER  = /MDd /Zi # debug is on
 DEBUG_LINKER = /OPT:REF # debug is off
-# DEBUG_LINKER = /Zi # debug is on
+# DEBUG_LINKER = /DEBUG # debug is on
 
 LIBNAME = stxxl
 
@@ -219,6 +220,7 @@ STREAM_FILES	 = \
 #### MISC #########################################################
 
 OBJEXT = obj # extension of object file
+LIBOBJEXT = obj # extension of object files for the library
 LIBEXT = lib # static library file extension
 EXEEXT = exe # executable file extension
 RM =     del # remove file command

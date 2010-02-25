@@ -7,7 +7,7 @@
 #
 #  Copyright (C) 2002-2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
 #  Copyright (C) 2006-2008 Johannes Singler <singler@ira.uka.de>
-#  Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -27,6 +27,7 @@ TOPDIR	?= $(error TOPDIR not defined) # DO NOT CHANGE! This is set elsewhere.
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_MACOSX	?= no	# set 'yes' if you run Mac OS X, 'no' otherwise
 USE_FREEBSD	?= no	# set 'yes' if you run FreeBSD, 'no' otherwise
+ENABLE_SHARED	?= no   # set 'yes' to build a shared library instead of a static library (EXPERIMENTAL)
 USE_PMODE	?= no	# will be overridden from main Makefile
 USE_MCSTL	?= no	# will be overridden from main Makefile
 USE_ICPC	?= no	# will be overridden from main Makefile
@@ -42,17 +43,20 @@ endif
 
 ifeq ($(strip $(USE_PMODE)),yes)
 COMPILER_GCC	?= g++-4.4.x
-LIBNAME		?= pmstxxl
+MODEBASE	?= pmstxxl
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
 COMPILER_GCC	?= g++-4.2.3
-LIBNAME		?= mcstxxl
+MODEBASE	?= mcstxxl
 # the root directory of your MCSTL installation
 MCSTL_ROOT	?= $(HOME)/work/mcstl
 endif
 
+ifeq ($(strip $(USE_BOOST)),yes)
 #BOOST_ROOT	?= /usr/local/boost-1.34.1
+LIBEXTRA	?= _boost
+endif
 
 COMPILER_GCC	?= g++
 COMPILER	?= $(COMPILER_GCC)
@@ -62,9 +66,14 @@ OPT		?= -O$(OPT_LEVEL) # compiler optimization level
 WARNINGS	?= -W -Wall -Woverloaded-virtual -Wundef
 DEBUG		?= # put here -g option to include the debug information into the binaries
 
-LIBNAME		?= stxxl
+LIBBASE		?= stxxl
+LIBEXTRA	?=
+MODEBASE	?= stxxl
 
-# Hint: for g++-4.3 with c++0x support, enable the following:
+LIBNAME		?= $(LIBBASE)$(LIBEXTRA)
+MODENAME	?= $(MODEBASE)$(LIBEXTRA)
+
+# Hint: for g++-4.4 with c++0x support, enable the following:
 #STXXL_SPECIFIC	+= -std=c++0x
 
 
@@ -131,6 +140,19 @@ GET_FILE_ID	?= stat -L -c '%d:%i' $1
 ##################################################################
 
 
+#### SHARED LIBRARY ###############################################
+
+ifeq ($(strip $(ENABLE_SHARED)),yes)
+
+LIBEXT	?= so
+LIBGEN	?= false  # see lib/GNUmakefile
+STXXL_LIBRARY_SPECIFIC	+= -fPIC
+
+endif
+
+###################################################################
+
+
 #### STXXL CONFIGURATION #########################################
 
 # create make.settings.local in the root directory
@@ -139,21 +161,21 @@ ifeq (,$(strip $(wildcard $(CURDIR)/make.settings.local)))
 ifeq (,$(STXXL_AUTOCONFIG))
 $(warning *** WARNING: you did not have a make.settings.local file -- creating ...)
 endif
-$(shell echo -e '\043STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
 MCSTL_ROOT	?= $(HOME)/work/mcstl
-$(shell echo -e '\043MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
-$(shell echo -e '\043COMPILER_GCC	 = g++-4.2' >> $(CURDIR)/make.settings.local)
-$(shell echo -e '\043COMPILER_GCC	 = g++-4.3 -std=c++0x' >> $(CURDIR)/make.settings.local)
-$(shell echo -e '\043COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043COMPILER_GCC	 = g++-4.2' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043COMPILER_GCC	 = g++-4.4 -std=c++0x' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
 ifeq (Darwin,$(strip $(shell uname)))
-$(shell echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
 else
-$(shell echo -e '\043USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043USE_MACOSX	 = no' >> $(CURDIR)/make.settings.local)
 endif
 ifeq (FreeBSD,$(strip $(shell uname)))
-$(shell echo -e 'USE_FREEBSD	 = yes' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e 'USE_FREEBSD	 = yes' >> $(CURDIR)/make.settings.local)
 else
-$(shell echo -e '\043USE_FREEBSD	 = no' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043USE_FREEBSD	 = no' >> $(CURDIR)/make.settings.local)
 endif
 include make.settings.local
 endif
@@ -187,6 +209,8 @@ STXXL_SPECIFIC	+= \
 	-I$(strip $(STXXL_ROOT))/include \
 	-include stxxl/bits/defines.h \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+
+STXXL_LIBRARY_SPECIFIC	+= -D_IN_LIBSTXXL
 
 STXXL_LDFLAGS	+= $(PTHREAD_FLAG)
 STXXL_LDLIBS	+= -L$(strip $(STXXL_ROOT))/lib -l$(LIBNAME)
@@ -259,7 +283,7 @@ BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_THREADS
 #BOOST_COMPILER_OPTIONS		+= -DSTXXL_BOOST_TIMESTAMP   # probably less efficient than gettimeofday()
 
 BOOST_LIB_PATH			?= $(if $(strip $(BOOST_ROOT)),$(strip $(BOOST_ROOT))/lib)
-BOOST_LIB_COMPILER_SUFFIX	?= 
+BOOST_LIB_COMPILER_SUFFIX	?=
 BOOST_LIB_MT_SUFFIX		?= -mt
 BOOST_LINKER_OPTIONS		 = \
 	$(foreach lib,$(BOOST_LIB_PATH),-L$(lib)) \
@@ -336,17 +360,22 @@ HEADER_FILES_UTILS	+= malloc.h
 
 #### MISC #########################################################
 
-DEPEXT	 = $(LIBNAME).d # extension of dependency files
-OBJEXT	 = $(LIBNAME).o	# extension of object files
-IIEXT	 = $(LIBNAME).ii
-LIBEXT	 = a		# static library file extension
-EXEEXT	 = $(LIBNAME).bin # executable file extension
-RM	 = rm -f	# remove file command
-LIBGEN	 = ar cr	# library generation
-OUT	 = -o		# output file option for the compiler and linker
+# extension of object files
+OBJEXT		?= $(MODENAME).o
+# extension of object files for the library
+LIBOBJEXT	?= lib$(LIBNAME).o
+IIEXT		?= $(MODENAME).ii
+# static library file extension
+LIBEXT		?= a
+# executable file extension
+EXEEXT		?= $(MODENAME).bin
+# static library generation
+LIBGEN		?= ar cr
+# output file option for the compiler and linker
+OUT		?= -o
 
-d	?= $(strip $(DEPEXT))
 o	?= $(strip $(OBJEXT))
+lo	?= $(strip $(LIBOBJEXT))
 ii	?= $(strip $(IIEXT))
 bin	?= $(strip $(EXEEXT))
 
@@ -356,13 +385,20 @@ bin	?= $(strip $(EXEEXT))
 #### COMPILE/LINK RULES ###########################################
 
 define COMPILE_STXXL
-	@$(RM) $@ $(@:.$o=).$d
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $(@:.$o=).$dT -c $(OUTPUT_OPTION) $< && mv $(@:.$o=).$dT $(@:.$o=).$d
+	@$(RM) $@ $(@:.o=).d
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -MD -MF $(@:.o=).dT -c $(OUTPUT_OPTION) $< && mv $(@:.o=).dT $(@:.o=).d
 endef
 
 DEPS_MAKEFILES		:= $(wildcard $(TOPDIR)/Makefile.subdir.gnu $(TOPDIR)/make.settings $(TOPDIR)/make.settings.local GNUmakefile Makefile Makefile.common Makefile.local)
 EXTRA_DEPS_COMPILE	?= $(DEPS_MAKEFILES)
 %.$o: %.cpp $(EXTRA_DEPS_COMPILE)
+	$(COMPILE_STXXL)
+
+%.$(lo): PARALLEL_MODE_CPPFLAGS=
+%.$(lo): MCSTL_CPPFLAGS=
+%.$(lo): STXXL_COMPILER_OPTIONS += $(STXXL_LIBRARY_SPECIFIC)
+%.$(lo): o=$(lo)
+%.$(lo): %.cpp $(EXTRA_DEPS_COMPILE)
 	$(COMPILE_STXXL)
 
 %.$(ii): %.cpp $(EXTRA_DEPS_COMPILE)

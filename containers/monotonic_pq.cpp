@@ -22,7 +22,7 @@
 #define TINY_PQ 0
 #define MANUAL_PQ 0
 
-#define SIDE_PQ 1
+#define SIDE_PQ 1	//compare with second, in-memory PQ (needs a lot of memory)
 
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
@@ -200,8 +200,8 @@ int main(int argc, char * argv[])
   __gnu_parallel::_Settings::set(parallel_settings);*/
 #endif
 
-    const stxxl::unsigned_type mem_for_queue = 2047 * mega;
-    const stxxl::unsigned_type mem_for_pools = 2047 * mega;
+    const stxxl::unsigned_type mem_for_queue = 512 * mega;
+    const stxxl::unsigned_type mem_for_pools = 512 * mega;
 
 #if TINY_PQ
     stxxl::STXXL_UNUSED(mem_for_queue);
@@ -289,7 +289,7 @@ int main(int argc, char * argv[])
 
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
-    STXXL_MSG("Peak number of elements: " << nelements);
+    STXXL_MSG("Peak number of elements (n): " << nelements);
     STXXL_MSG("Max number of elements to contain: " << (stxxl::uint64(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
     srand(5);
     my_cmp cmp;
@@ -307,7 +307,7 @@ int main(int argc, char * argv[])
     STXXL_MSG("op-sequence(monotonic pq): ( push, pop, push ) * n");
     for (i = 0; i < nelements; ++i)
     {
-        if ((i % (10 * mega)) == 0)
+        if ((i % mega) == 0)
             STXXL_MSG(
                 std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
                            << "Inserting element " << i << " top() == " << least.key << " @ "
@@ -403,7 +403,7 @@ int main(int argc, char * argv[])
         else
             last_least = least;
 
-        if ((i % (10 * mega)) == 0)
+        if ((i % mega) == 0)
             STXXL_MSG(
                 std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
                            << "Popped element " << i << " == " << least.key << " @ "

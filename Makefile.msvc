@@ -39,6 +39,9 @@ library:
 	cd utils
 	$(MAKE) TOPDIR="$(MAKEDIR)" tools
 	cd ..
+	cd io
+	$(MAKE) TOPDIR="$(MAKEDIR)" tools
+	cd ..
 	@echo "Building library is completed."
 	@echo "Use the following compiler options with programs using Stxxl: $(STXXL_COMPILER_OPTIONS)"
 	@echo "Use the following linker options with programs using Stxxl: $(STXXL_LINKER_OPTIONS)"
