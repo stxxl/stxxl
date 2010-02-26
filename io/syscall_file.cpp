@@ -41,12 +41,13 @@ void syscall_file::serve(const request * req) throw (io_error)
     else
     {
         stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+        ssize_t rc;
 
         if (type == request::READ)
         {
             STXXL_DEBUGMON_DO(io_started(buffer));
 
-            if (::read(file_des, buffer, bytes) < 0)
+            if ((rc = ::read(file_des, buffer, bytes)) < 0)
             {
                 STXXL_THROW2(io_error,
                              " this=" << this <<
@@ -56,6 +57,8 @@ void syscall_file::serve(const request * req) throw (io_error)
                              " buffer=" << buffer <<
                              " bytes=" << bytes <<
                              " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+            } else if (rc != ssize_t(bytes)) {
+                STXXL_THROW2(io_error, " partial read: missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
 
             STXXL_DEBUGMON_DO(io_finished(buffer));
@@ -64,7 +67,7 @@ void syscall_file::serve(const request * req) throw (io_error)
         {
             STXXL_DEBUGMON_DO(io_started(buffer));
 
-            if (::write(file_des, buffer, bytes) < 0)
+            if ((rc = ::write(file_des, buffer, bytes)) < 0)
             {
                 STXXL_THROW2(io_error,
                              " this=" << this <<
@@ -74,6 +77,8 @@ void syscall_file::serve(const request * req) throw (io_error)
                              " buffer=" << buffer <<
                              " bytes=" << bytes <<
                              " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+            } else if (rc != ssize_t(bytes)) {
+                STXXL_THROW2(io_error, " partial write: missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
 
             STXXL_DEBUGMON_DO(io_finished(buffer));

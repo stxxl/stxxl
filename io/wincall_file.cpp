@@ -66,6 +66,8 @@ void wincall_file::serve(const request * req) throw (io_error)
                                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                                          " NumberOfBytesRead= " << NumberOfBytesRead,
                                          io_error);
+            } else if (NumberOfBytesRead != bytes) {
+                stxxl_win_lasterror_exit(" partial read: missing " << (bytes - NumberOfBytesRead) << " out of " << bytes << " bytes");
             }
 
             STXXL_DEBUGMON_DO(io_finished(buffer));
@@ -85,6 +87,8 @@ void wincall_file::serve(const request * req) throw (io_error)
                                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                                          " NumberOfBytesWritten= " << NumberOfBytesWritten,
                                          io_error);
+            } else if (NumberOfBytesRead != bytes) {
+                stxxl_win_lasterror_exit(" partial write: missing " << (bytes - NumberOfBytesRead) << " out of " << bytes << " bytes");
             }
 
             STXXL_DEBUGMON_DO(io_finished(buffer));

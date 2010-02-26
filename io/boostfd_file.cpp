@@ -58,7 +58,10 @@ void boostfd_file::serve(const request * req) throw (io_error)
 
         try
         {
-            file_des.read((char *)buffer, bytes);
+            std::streamsize rc = file_des.read((char *)buffer, bytes);
+            if (rc != std::streamsize(bytes)) {
+                STXXL_THROW2(io_error, " partial read: missing " << (bytes - rc) << " out of " << bytes << " bytes");
+            }
         }
         catch (const std::exception & ex)
         {
@@ -80,7 +83,10 @@ void boostfd_file::serve(const request * req) throw (io_error)
 
         try
         {
-            file_des.write((char *)buffer, bytes);
+            std::streamsize rc = file_des.write((char *)buffer, bytes);
+            if (rc != std::streamsize(bytes)) {
+                STXXL_THROW2(io_error, " partial read: missing " << (bytes - rc) << " out of " << bytes << " bytes");
+            }
         }
         catch (const std::exception & ex)
         {
