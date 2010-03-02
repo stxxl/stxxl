@@ -41,7 +41,7 @@ void syscall_file::serve(const request * req) throw (io_error)
     else
     {
         stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
-        ssize_t rc;
+        int_type rc;
 
         if (type == request::READ)
         {
@@ -57,7 +57,7 @@ void syscall_file::serve(const request * req) throw (io_error)
                              " buffer=" << buffer <<
                              " bytes=" << bytes <<
                              " type=" << ((type == request::READ) ? "READ" : "WRITE"));
-            } else if (rc != ssize_t(bytes)) {
+            } else if (size_type(rc) != bytes) {
                 STXXL_THROW2(io_error, " partial read: missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
 
@@ -77,7 +77,7 @@ void syscall_file::serve(const request * req) throw (io_error)
                              " buffer=" << buffer <<
                              " bytes=" << bytes <<
                              " type=" << ((type == request::READ) ? "READ" : "WRITE"));
-            } else if (rc != ssize_t(bytes)) {
+            } else if (size_type(rc) != bytes) {
                 STXXL_THROW2(io_error, " partial write: missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
 
