@@ -88,7 +88,7 @@ void wincall_file::serve(const request * req) throw (io_error)
                                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                                          " NumberOfBytesWritten= " << NumberOfBytesWritten,
                                          io_error);
-            } else if (NumberOfBytesRead != bytes) {
+            } else if (NumberOfBytesWritten != bytes) {
                 stxxl_win_lasterror_exit(" partial write: missing " << (bytes - NumberOfBytesWritten) << " out of " << bytes << " bytes",
                                          io_error);
             }
