@@ -61,9 +61,15 @@ int main(int argc, char * argv[])
         return -1;
     }
 
+    const int log_nins = atoi(argv[1]);
+    if (log_nins > 31) {
+        STXXL_ERRMSG("This test can't to more than 2^31 operations, you requested 2^" << log_nins);
+	return -1;
+    }
+
     btree_type BTree(1024 * 128, 1024 * 128);
 
-    const stxxl::uint64 nins = (1ULL << (unsigned long long)atoi(argv[1]));
+    const stxxl::uint64 nins = 1ULL << log_nins;
 
     stxxl::ran32State = time(NULL);
 
