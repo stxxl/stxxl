@@ -83,8 +83,8 @@
  * The <a href="http://www.boost.org">Boost</a> libraries are required on
  * Windows platforms using MSVC compiler and optional on other platforms.
  *
- * \c S<small>TXXL</small> has been tested with Boost 1.40.0.
- * Other versions may work, too, but older versions won't get support.
+ * \c S<small>TXXL</small> has been tested with Boost 1.40.0 and 1.42.0.
+ * Other versions may work, too, but older versions will not get support.
  *
  *
  * \section installation Installation and Usage Instructions
