@@ -392,9 +392,10 @@ priority_queue<Config_>::priority_queue(pool_type & pool_) :
     init();
 }
 
+// DEPRECATED
 template <class Config_>
 priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) :
-    pool(new pool_type(w_pool_, p_pool_)),
+    pool(new pool_type(p_pool_, w_pool_)),
     pool_owned(true),
     delete_buffer_end(delete_buffer + delete_buffer_size),
     insert_heap(N + 2),
