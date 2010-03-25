@@ -722,9 +722,9 @@ namespace ksort_local
    struct GetWeight
    {
     typedef unsigned key_type;
-    key_type operator() (const Edge & e)
+    key_type operator() (const Edge & e) const
     {
-                  return e.weight;
+        return e.weight;
     }
     Edge min_value() const { return Edge(0,0,(std::numeric_limits<key_type>::min)()); };
     Edge max_value() const { return Edge(0,0,(std::numeric_limits<key_type>::max)()); };

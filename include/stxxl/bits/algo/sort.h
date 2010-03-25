@@ -660,7 +660,7 @@ namespace sort_local
  \verbatim
    struct my_less_int
    {
-    bool operator() (int a, int b)
+    bool operator() (int a, int b) const
     {
         return a < b;
     }
@@ -676,7 +676,7 @@ namespace sort_local
    struct my_less
    {
     typedef Tp value_type;
-    bool operator() (const value_type & a, const value_type & b)
+    bool operator() (const value_type & a, const value_type & b) const
     {
         return a < b;
     }
