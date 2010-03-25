@@ -646,6 +646,48 @@ namespace sort_local
 }
 
 
+/*! \page comparison Comparison concept
+
+   Model of \b Comparison concept must:
+   - provide \b operator(a,b) that returns comparison result of two user types,
+     must define strict weak ordering
+   - provide \b max_value method that returns a value that is \b greater than all
+   other objects of user type,
+   - provide \b min_value method that returns a value that is \b less than all
+   other objects of user type,
+
+   Example: comparator class \b my_less_int
+ \verbatim
+   struct my_less_int
+   {
+    bool operator() (int a, int b)
+    {
+        return a < b;
+    }
+    int min_value() const { return std::numeric_limits<int>::min(); };
+    int max_value() const { return std::numeric_limits<int>::max(); };
+   };
+ \endverbatim
+
+   Example: comparator class \b my_less, could be instantiated as e.g. 
+      \b my_less<int> , \b my_less<unsigned long> , ...
+ \verbatim
+   template <typename Tp>
+   struct my_less
+   {
+    typedef Tp value_type;
+    bool operator() (const value_type & a, const value_type & b)
+    {
+        return a < b;
+    }
+    value_type min_value() const { return std::numeric_limits<value_type>::min(); };
+    value_type max_value() const { return std::numeric_limits<value_type>::max(); };
+   };
+ \endverbatim
+
+ */
+
+
 //! \brief Sort records comparison-based
 //! \param first object of model of \c ext_random_access_iterator concept
 //! \param last object of model of \c ext_random_access_iterator concept
