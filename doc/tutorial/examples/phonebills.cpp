@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/all>     // Stxxl header
+#include <stxxl.h>       // Stxxl header
 #include <algorithm>     // for STL sort
 #include <vector>        // for STL vector
 
