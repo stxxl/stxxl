@@ -352,13 +352,22 @@ my_example.bin: my_example.o
  *   to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be
  *   \c /mnt/disk0/some_file_name ,
  * - \c capacity : maximum capacity of the disk in megabytes
+ *   (0 means autogrow, file will be deleted afterwards)
  * - \c access_method : \c S<small>TXXL</small> has a number of different
  *   file access implementations for POSIX systems, choose one of them:
- *   - \c syscall uses \c read and \c write system calls which perform disk transfers directly
+ *   - \c syscall : use \c read and \c write system calls which perform disk transfers directly
  *     on user memory pages without superfluous copying (currently the fastest method)
- *   - \c mmap : performs disks transfers using \c mmap and \c munmap system calls
+ *   - \c mmap : \c use \c mmap and \c munmap system calls
+ *   - \c boostfd : access the file using a Boost file descriptor
+ *   - \c fileperblock_syscall, \c fileperblock_mmap, \c fileperblock_boostfd :
+ *     same as above, but take a single file per block, using full_disk_filename as file name prefix.
+ *     Usually provide worse performance than the standard variants,
+ *     but release freed blocks to the file system immediately.
  *   - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point
  *     to a file on a RAM disk partition with sufficient space
+ *   - \c memory : keeps all data in RAM, for quicker testing
+ *   - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs),
+ *     based on \c syscall
  *
  * See also the example configuration file \c 'config_example' included in the tarball.
  *
@@ -480,10 +489,18 @@ my_example.bin: my_example.o
  * - \c capacity : maximum capacity of the disk in megabytes
  * - \c access_method : \c S<small>TXXL</small> has a number of different
  *   file access implementations for WINDOWS, choose one of them:
- *   - \c syscall: uses \c read and \c write POSIX system calls (slow)
+ *   - \c syscall : use \c read and \c write POSIX system calls (slow)
  *   - \c wincall: performs disks transfers using \c ReadFile and \c WriteFile WinAPI calls
  *     This method supports direct I/O that avoids superfluous copying of data pages
  *     in the Windows kernel. This is the best (and default) method in Stxxl for Windows.
+ *   - \c boostfd : access the file using a Boost file descriptor
+ *   - \c fileperblock_syscall, \c fileperblock_wincall, \c fileperblock_boostfd :
+ *     same as above, but take a single file per block, using full_disk_filename as file name prefix.
+ *     Usually provide worse performance than the standard variants,
+ *     but release freed blocks to the file system immediately.
+ *   - \c memory : keeps all data in RAM, for quicker testing
+ *   - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs),
+ *     based on \c syscall
  *
  * See also the example configuration file \c 'config_example_win' included in the archive.
  *
@@ -595,11 +612,19 @@ my_example.bin: my_example.o
  * - \c capacity : maximum capacity of the disk in megabytes
  * - \c access_method : \c S<small>TXXL</small> has a number of different
  *   file access implementations for POSIX systems, choose one of them:
- *   - \c syscall uses \c read and \c write system calls which perform disk transfers directly
+ *   - \c syscall : use \c read and \c write system calls which perform disk transfers directly
  *     on user memory pages without superfluous copying (currently the fastest method)
- *   - \c mmap : performs disks transfers using \c mmap and \c munmap system calls
+ *   - \c mmap : \c use \c mmap and \c munmap system calls
+ *   - \c boostfd : access the file using a Boost file descriptor
+ *   - \c fileperblock_syscall, \c fileperblock_mmap, \c fileperblock_boostfd :
+ *     same as above, but take a single file per block, using full_disk_filename as file name prefix.
+ *     Usually provide worse performance than the standard variants,
+ *     but release freed blocks to the file system immediately.
  *   - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point
  *     to a file on a RAM disk partition with sufficient space
+ *   - \c memory : keeps all data in RAM, for quicker testing
+ *   - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs),
+ *     based on \c syscall
  *
  * See also the example configuration file \c 'config_example' included in the tarball.
  *
