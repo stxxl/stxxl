@@ -15,6 +15,7 @@
 
 main: library
 
+TOPDIR=$(MAKEDIR)
 include make.settings
 
 library:
