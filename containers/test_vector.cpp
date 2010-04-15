@@ -31,6 +31,11 @@ struct element	//24 bytes, not a power of 2 intentionally
 		key = i;
 		return *this;
 	}
+
+	bool operator==(const element& e2)
+	{
+		return key == e2.key && load0 == e2.load0 && load1 == e2.load1;
+	}
 };
 
 struct counter
@@ -110,9 +115,7 @@ int main()
         std::swap(v, a);
 
         for (i = 0; i < v.size(); i++)
-        {
             assert(v[i].key == rnd());
-        }
 
         // check again
         STXXL_MSG("clear");
@@ -131,15 +134,16 @@ int main()
         STXXL_MSG("seq read of " << v.size() << " elements");
 
         for (i = 0; i < v.size(); i++)
-        {
             assert(v[i].key == rnd());
-        }
 
-        std::vector<stxxl::vector<int> > vector_of_stxxlvectors(2);
-        // test copy operator
-        vector_of_stxxlvectors[0] = vector_of_stxxlvectors[1];
+        STXXL_MSG("copy vector of " << v.size() << " elements");
 
-        assert(vector_of_stxxlvectors[0] == vector_of_stxxlvectors[1]);
+        vector_type v_copy0(v);
+        assert(v == v_copy0);
+
+        vector_type v_copy1;
+        v_copy1 = v;
+        assert(v == v_copy1);
     }
     catch (const std::exception & ex)
     {
