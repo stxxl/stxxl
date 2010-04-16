@@ -32,7 +32,7 @@ struct element	//24 bytes, not a power of 2 intentionally
 		return *this;
 	}
 
-	bool operator==(const element& e2)
+	bool operator==(const element& e2) const
 	{
 		return key == e2.key && load0 == e2.load0 && load1 == e2.load1;
 	}
