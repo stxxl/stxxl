@@ -122,7 +122,7 @@
  *
  * \section FAQ-latest Latest version of this FAQ
  * The most recent version of this FAQ can always be found
- * <a href="http://algo2.iti.uni-karlsruhe.de/dementiev/stxxl/trunk/FAQ.html">here</a>.
+ * <a href="http://algo2.iti.kit.edu/stxxl/trunk/FAQ.html">here</a>.
  *
  *
  * \section q1 References to Elements in External Memory Data Structures
@@ -252,7 +252,7 @@ Controller::Controller()
  *     (you should have the Boost libraries already installed)
  *     - change \c USE_BOOST variable to \c yes
  *     - change \c BOOST_ROOT variable according to the Boost root path
- *   - if you want \c S<small>TXXL</small> to use the <a href="http://algo2.iti.uni-karlsruhe.de/singler/mcstl/">MCSTL</a>
+ *   - if you want \c S<small>TXXL</small> to use the <a href="http://algo2.iti.kit.edu/singler/mcstl/">MCSTL</a>
  *     library (you should have the MCSTL library already installed)
  *     - change \c MCSTL_ROOT variable according to the MCSTL root path
  *     - use the targets \c library_g++_mcstl and \c tests_g++_mcstl
