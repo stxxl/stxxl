@@ -334,26 +334,26 @@ For a detailed list, please read the the CHANGELOG file.
 	      &nbsp; &middot; Installation manual:
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/tags/1.2.1/install.html">1.2.1</a>]
+	      [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.2.1/install.html">1.2.1</a>]
             </td>
 	    <td>
-	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/tags/1.1.0/installation.html">1.1.0</a>]
+	      [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.1.0/installation.html">1.1.0</a>]
             </td>
 	    <td>
-	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/trunk/install-svn.html">trunk</a>]
+	      [<a href="http://algo2.iti.kit.edu/stxxl/trunk/install-svn.html">trunk</a>]
           </tr>
           <tr>
             <td align="left" valign="middle">
 	      &nbsp; &middot; Programmer documentation:
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/tags/1.2.1/">1.2.1</a>]
+	      [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.2.1/">1.2.1</a>]
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/tags/1.1.0/">1.1.0</a>]
+	      [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.1.0/">1.1.0</a>]
 	    </td>
 	    <td>
-	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/trunk/">trunk</a>]
+	      [<a href="http://algo2.iti.kit.edu/stxxl/trunk/">trunk</a>]
 	    </td>
           </tr>
           <tr>
@@ -398,7 +398,7 @@ For a detailed list, please read the the CHANGELOG file.
 	  <tr>
             <td align="left" valign="middle">
 	      &nbsp; &middot; <b>FAQ</b> - Frequently Asked Questions
-	      [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/trunk/FAQ.html">html</a>]
+	      [<a href="http://algo2.iti.kit.edu/stxxl/trunk/FAQ.html">html</a>]
             </td>
 	  </tr>
           <tr>
