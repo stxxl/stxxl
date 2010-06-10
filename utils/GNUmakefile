@@ -4,6 +4,7 @@ include Makefile.common
 all: tools
 
 TESTS-yes			+= $(TESTS_NON_MSVC)
+UTIL_BINARIES			+= $(UTIL_BINARIES_NON_MSVC)
 
 include $(TOPDIR)/Makefile.subdir.gnu
 
