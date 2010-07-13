@@ -20,22 +20,22 @@
 #include <stxxl/vector>
 #include <stxxl/scan>
 
-struct element	//24 bytes, not a power of 2 intentionally
+struct element  // 24 bytes, not a power of 2 intentionally
 {
-	stxxl::int64 key;
-	stxxl::int64 load0;
-	stxxl::int64 load1;
+    stxxl::int64 key;
+    stxxl::int64 load0;
+    stxxl::int64 load1;
 
-	element& operator=(stxxl::int64 i)
-	{
-		key = i;
-		return *this;
-	}
+    element & operator = (stxxl::int64 i)
+    {
+        key = i;
+        return *this;
+    }
 
-	bool operator==(const element& e2) const
-	{
-		return key == e2.key && load0 == e2.load0 && load1 == e2.load1;
-	}
+    bool operator == (const element & e2) const
+    {
+        return key == e2.key && load0 == e2.load0 && load1 == e2.load1;
+    }
 };
 
 struct counter

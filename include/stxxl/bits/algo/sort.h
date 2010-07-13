@@ -669,7 +669,7 @@ namespace sort_local
    };
  \endverbatim
 
-   Example: comparator class \b my_less, could be instantiated as e.g. 
+   Example: comparator class \b my_less, could be instantiated as e.g.
       \b my_less<int> , \b my_less<unsigned long> , ...
  \verbatim
    template <typename Tp>

@@ -1173,8 +1173,8 @@ public:
             int_type page_no = _slot_to_page[i];
             if (non_free_slots[i])
             {
-                STXXL_VERBOSE1("vector: flushing page " << i << " at address " << (int64(page_no) *
-                                                                                 int64(block_type::size) * int64(page_size)));
+                STXXL_VERBOSE1("vector: flushing page " << i << " at address "
+                                                        << (int64(page_no) * int64(block_type::size) * int64(page_size)));
                 write_page(page_no, i);
 
                 _page_to_slot[page_no] = on_disk;

@@ -22,7 +22,7 @@
 #define TINY_PQ 0
 #define MANUAL_PQ 0
 
-#define SIDE_PQ 1	//compare with second, in-memory PQ (needs a lot of memory)
+#define SIDE_PQ 1       // compare with second, in-memory PQ (needs a lot of memory)
 
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
