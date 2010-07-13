@@ -167,6 +167,8 @@ $(shell /bin/echo -e '\043MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(C
 $(shell /bin/echo -e '\043COMPILER_GCC	 = g++-4.2' >> $(CURDIR)/make.settings.local)
 $(shell /bin/echo -e '\043COMPILER_GCC	 = g++-4.4 -std=c++0x' >> $(CURDIR)/make.settings.local)
 $(shell /bin/echo -e '\043COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043USE_BOOST	 = no' >> $(CURDIR)/make.settings.local)
+$(shell /bin/echo -e '\043BOOST_ROOT	 = ' >> $(CURDIR)/make.settings.local)
 ifeq (Darwin,$(strip $(shell uname)))
 $(shell /bin/echo -e 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
 else
