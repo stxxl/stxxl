@@ -1,4 +1,4 @@
-TESTS			 = test_scan test_sort test_ksort test_stable_ksort sort_file test_random_shuffle test_asch test_matrix
+TESTS			 = test_scan test_sort test_ksort test_stable_ksort sort_file test_random_shuffle test_asch
 TESTS_LONG_COMPILE	 = test_sort_all_parameters test_ksort_all_parameters test_stable_ksort_all_parameters
 TESTS_NON_MSVC		 = test_parallel_sort
 

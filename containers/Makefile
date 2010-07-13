@@ -84,7 +84,6 @@ test_migr_stack.$(EXEEXT): test_migr_stack.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_migr_stack.cpp
 	$(LINKER)  test_migr_stack.$(OBJEXT) $(OUT)test_migr_stack.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-
 test_many_stacks: test_many_stacks.$(EXEEXT)
 test_many_stacks.$(EXEEXT): test_many_stacks.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_many_stacks.cpp -DSTXXL_VERBOSE_LEVEL=1
@@ -114,6 +113,11 @@ monotonic_pq: monotonic_pq.$(EXEEXT)
 monotonic_pq.$(EXEEXT): monotonic_pq.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c monotonic_pq.cpp
 	$(LINKER)  monotonic_pq.$(OBJEXT) $(OUT)monotonic_pq.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
+
+test_matrix: test_matrix.$(EXEEXT)
+test_matrix.$(EXEEXT): test_matrix.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_matrix.cpp -DSTXXL_VERBOSE_LEVEL=0
+	$(LINKER)  test_matrix.$(OBJEXT) $(OUT)test_matrix.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 
 clean:
