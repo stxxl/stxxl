@@ -93,7 +93,7 @@ namespace sort_local
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
         int_type i;
-        int_type run_size = 0, next_run_size = 0;
+        int_type run_size = 0;
 
         assert(nruns >= 2);
 
@@ -121,7 +121,9 @@ namespace sort_local
             run_type * run = runs[k];
             run_size = run->size();
             assert(run_size == m2);
-            next_run_size = runs[k + 1]->size();
+            #ifndef NDEBUG
+            int_type next_run_size = runs[k + 1]->size();
+            #endif
             assert((next_run_size == m2) || (next_run_size <= m2 && k == nruns - 2));
 
             STXXL_VERBOSE1("stxxl::create_runs start waiting read_reqs1");
@@ -639,7 +641,7 @@ namespace sort_local
                       after_runs_creation - begin << " s");
         STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
         STXXL_VERBOSE(*stats::get_instance());
-        STXXL_UNUSED(begin + io_wait_after_rf);
+        STXXL_UNUSED(begin + after_runs_creation + end + io_wait_after_rf);
 
         return result;
     }
