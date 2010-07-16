@@ -245,6 +245,7 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
         req->wait(false);
     }
     STXXL_VERBOSE_WBTL("wbtl:sread   l" << FMT_A_S(offset, bytes) << " @    p" << FMT_A(physical_offset) << " " << std::dec << cached);
+    STXXL_UNUSED(cached);
 }
 
 void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)

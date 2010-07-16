@@ -459,7 +459,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                   dist_end - begin << " s");
     STXXL_VERBOSE("Time in I/O wait(ds): " << io_wait_after_d << " s");
     STXXL_VERBOSE(*stats::get_instance());
-    STXXL_UNUSED(begin + dist_end + io_wait_after_d);
+    STXXL_UNUSED(begin + dist_end + end + io_wait_after_d);
 }
 
 //! \}
