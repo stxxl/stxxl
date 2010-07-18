@@ -165,7 +165,7 @@ public:
             int_type next_2_prefetch = prefetch_seq[nextread++];
             STXXL_VERBOSE1("block_prefetcher: prefetching block " << next_2_prefetch);
 
-            assert(next_2_prefetch < int_type(seq_length) && next_2_prefetch >= 0);
+            assert((next_2_prefetch < int_type(seq_length)) && (next_2_prefetch >= 0));
             assert(!completed[next_2_prefetch].is_on());
 
             pref_buffer[next_2_prefetch] = ibuffer;

@@ -815,7 +815,8 @@ namespace priority_queue_local
             c = k - m_,
             // memory occ. by block must be at least 10 times larger than size of ext sequence
             // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
-            fits = c > 10 && ((k - m) * (m) * (m * B / (element_size * 4 * 1024))) >= MaxS_ && (MaxS_ < ((k - m) * m / (2 * element_size)) * 1024 || m >= 128),
+            fits = c > 10 && ((k - m) * (m) * (m * B / (element_size * 4 * 1024))) >= MaxS_
+                   && ((MaxS_ < ((k - m) * m / (2 * element_size)) * 1024) || m >= 128),
             step = 1
         };
 
