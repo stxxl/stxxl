@@ -59,6 +59,10 @@ void benchmark_insert(stack_type & Stack, stxxl::int64 volume)
 
     value_type cur;
 
+    Stack.push(cur);
+    Stack.top() = cur;
+    Stack.pop();
+
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
     stxxl::timer Timer;
