@@ -19,6 +19,31 @@
 #include <stxxl/stack>
 
 
+template <typename stack_type>
+void test_lvalue_correctness(stack_type & stack, int a, int b)
+{
+    int i;
+    assert(stack.empty());
+    for (i = 0; i < a; ++i)
+        stack.push(i);
+    for (i = 0; i < b; ++i)
+        stack.push(i);
+    for (i = 0; i < b; ++i)
+        stack.pop();
+    stack.top() = 0xbeeff00d;
+    for (i = 0; i < b; ++i)
+        stack.push(i);
+    for (i = 0; i < b; ++i)
+        stack.pop();
+    if ((stack.top() != int(0xbeeff00d))) {
+        STXXL_ERRMSG("STACK MISMATCH AFTER top() LVALUE MODIFICATION (0x" << std::hex << stack.top() << " != 0xbeeff00d)");
+        assert(stack.top() == int(0xbeeff00d));
+    }
+    for (i = 0; i < a; ++i)
+        stack.pop();
+}
+
+
 int main(int argc, char * argv[])
 {
     typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink, 4, 4096>::result ext_stack_type;
@@ -85,6 +110,8 @@ int main(int argc, char * argv[])
         }
 
         STXXL_MSG("Test 1 passed.");
+
+        test_lvalue_correctness(my_stack, 4 * 4096 / 4 * 2, 4 * 4096 / 4 * 2 * 20);
     }
     {
         // prefetch pool with 10 blocks (> D is recommended)
@@ -129,7 +156,11 @@ int main(int argc, char * argv[])
         }
 
         STXXL_MSG("Test 2 passed.");
+
+        test_lvalue_correctness(my_stack, 4 * 4096 / 4 * 2, 4 * 4096 / 4 * 2 * 20);
     }
 
     return 0;
 }
+
+// vim: et:ts=4:sw=4

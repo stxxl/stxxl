@@ -59,6 +59,7 @@ void benchmark_insert(stack_type & Stack, stxxl::int64 volume)
 
     value_type cur;
 
+    // test whether top() returns an lvalue
     Stack.push(cur);
     Stack.top() = cur;
     Stack.pop();
