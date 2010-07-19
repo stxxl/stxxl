@@ -490,6 +490,7 @@ void run_stxxl_map(stxxl::int64 ops)
         while (begin != beyond)
         {
             my_data tmp = begin->second;
+            stxxl::STXXL_UNUSED(tmp);
             ++n_scanned;
             ++begin;
         }
