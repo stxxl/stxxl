@@ -696,8 +696,11 @@ namespace stream
         //! \brief Construction
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_, Input5_ & i6_) :
-            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_),
-            current(op(*i1, *i2, *i3, *i4, *i5, *i6)) { }
+            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
+        {
+            if (!empty())
+                current = op(*i1, *i2, *i3, *i4, *i5, *i6);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -719,7 +722,6 @@ namespace stream
             ++i4;
             ++i5;
             ++i6;
-
             if (!empty())
                 current = op(*i1, *i2, *i3, *i4, *i5, *i6);
 
@@ -764,8 +766,11 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ & o, Input1_ & i1_) : op(o), i1(i1_),
-                                                 current(op(*i1)) { }
+        transform(Operation_ & o, Input1_ & i1_) : op(o), i1(i1_)
+        {
+            if (!empty())
+                current = op(*i1);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -827,8 +832,11 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_) : op(o), i1(i1_), i2(i2_),
-                                                                current(op(*i1, *i2)) { }
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_) : op(o), i1(i1_), i2(i2_)
+        {
+            if (!empty())
+                current = op(*i1, *i2);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -895,8 +903,11 @@ namespace stream
     public:
         //! \brief Construction
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_) :
-            op(o), i1(i1_), i2(i2_), i3(i3_),
-            current(op(*i1, *i2, *i3)) { }
+            op(o), i1(i1_), i2(i2_), i3(i3_)
+        {
+            if (!empty())
+                current = op(*i1, *i2, *i3);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -967,8 +978,11 @@ namespace stream
     public:
         //! \brief Construction
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_) :
-            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_),
-            current(op(*i1, *i2, *i3, *i4)) { }
+            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_)
+        {
+            if (!empty())
+                current = op(*i1, *i2, *i3, *i4);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -1044,8 +1058,11 @@ namespace stream
         //! \brief Construction
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_) :
-            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_),
-            current(op(*i1, *i2, *i3, *i4, *i5)) { }
+            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
+        {
+            if (!empty())
+                current = op(*i1, *i2, *i3, *i4, *i5);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
