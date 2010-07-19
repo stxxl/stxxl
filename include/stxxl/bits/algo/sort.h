@@ -700,16 +700,13 @@ namespace sort_local
 template <typename ExtIterator_, typename StrictWeakOrdering_>
 void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsigned_type M)
 {
+    sort_helper::verify_sentinel_strict_weak_ordering(cmp);
+
     typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::bid_type,
                                                      typename ExtIterator_::vector_type::value_type> > run_type;
 
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;
-
-    // verify strict weak ordering of the sentinels
-    assert(!cmp(cmp.min_value(), cmp.min_value()));
-    assert(cmp(cmp.min_value(), cmp.max_value()));
-    assert(!cmp(cmp.max_value(), cmp.max_value()));
 
     unsigned_type n = 0;
 

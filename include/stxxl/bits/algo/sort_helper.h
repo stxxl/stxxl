@@ -25,6 +25,15 @@ __STXXL_BEGIN_NAMESPACE
 //! \internal
 namespace sort_helper
 {
+    template <typename StrictWeakOrdering>
+    inline void verify_sentinel_strict_weak_ordering(StrictWeakOrdering cmp)
+    {
+        assert(!cmp(cmp.min_value(), cmp.min_value()));
+        assert(cmp(cmp.min_value(), cmp.max_value()));
+        assert(!cmp(cmp.max_value(), cmp.min_value()));
+        assert(!cmp(cmp.max_value(), cmp.max_value()));
+    }
+
     template <typename BIDTp_, typename ValTp_>
     struct trigger_entry
     {
