@@ -465,13 +465,16 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
+    typedef read_write_pool<block_type> pool_type;
+
     size_type size_;
     unsigned_type cache_offset;
     block_type * cache;
     std::vector<bid_type> bids;
     alloc_strategy_type alloc_strategy;
     unsigned_type pref_aggr;
-    read_write_pool<block_type> pool;
+    pool_type * owned_pool;
+    pool_type & pool;
 
 public:
     //! \brief Constructs stack
@@ -486,7 +489,8 @@ public:
         cache_offset(0),
         cache(new block_type),
         pref_aggr(prefetch_aggressiveness),
-        pool(p_pool_, w_pool_)
+        owned_pool(new pool_type(p_pool_, w_pool_)),
+        pool(*owned_pool)
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
@@ -499,7 +503,9 @@ public:
         std::swap(bids, obj.bids);
         std::swap(alloc_strategy, obj.alloc_strategy);
         std::swap(pref_aggr, obj.pref_aggr);
-        //std::swap(pool,obj.pool);
+        std::swap(owned_pool, obj.owned_pool);
+        //std::swap(pool, obj.pool);  // FIXME!!! why was this disabled?
+        assert(&pool == &obj.pool);   // FIXME!!! HACK!!!
     }
 
     virtual ~grow_shrink_stack2()
@@ -532,6 +538,7 @@ public:
         catch (const io_error & ex)
         { }
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
+        delete owned_pool;
     }
 
     size_type size() const
