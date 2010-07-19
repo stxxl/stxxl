@@ -468,7 +468,6 @@ private:
     size_type size_;
     unsigned_type cache_offset;
     block_type * cache;
-    value_type current;
     std::vector<bid_type> bids;
     alloc_strategy_type alloc_strategy;
     unsigned_type pref_aggr;
@@ -497,7 +496,6 @@ public:
         std::swap(size_, obj.size_);
         std::swap(cache_offset, obj.cache_offset);
         std::swap(cache, obj.cache);
-        std::swap(current, obj.current);
         std::swap(bids, obj.bids);
         std::swap(alloc_strategy, obj.alloc_strategy);
         std::swap(pref_aggr, obj.pref_aggr);
@@ -569,7 +567,6 @@ public:
             }
             cache_offset = 0;
         }
-        current = val;
         (*cache)[cache_offset] = val;
         ++size_;
         ++cache_offset;
@@ -583,7 +580,7 @@ public:
         assert(size_ > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
-        return current;
+        return (*cache)[cache_offset - 1];
     }
 
     const value_type & top() const
@@ -591,7 +588,7 @@ public:
         assert(size_ > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
-        return current;
+        return (*cache)[cache_offset - 1];
     }
 
     void pop()
@@ -613,9 +610,6 @@ public:
         }
 
         --cache_offset;
-        if (cache_offset > 0)
-            current = (*cache)[cache_offset - 1];
-
         --size_;
     }
 
