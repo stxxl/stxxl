@@ -139,6 +139,7 @@ namespace stream
         runs_creator(Input_ & i, Cmp_ c, unsigned_type memory_to_use) :
             input(i), cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), result_computed(false)
         {
+            sort_helper::verify_sentinel_strict_weak_ordering(cmp);
             if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
                 throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
             }
@@ -534,6 +535,7 @@ namespace stream
             Blocks2(Blocks1 + m2),
             write_reqs(new request_ptr[m2])
         {
+            sort_helper::verify_sentinel_strict_weak_ordering(cmp);
             if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
                 throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
             }
@@ -687,6 +689,7 @@ namespace stream
             iblock(0),
             irun(0)
         {
+            sort_helper::verify_sentinel_strict_weak_ordering(cmp);
             assert(m_ > 0);
             if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
                 throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
@@ -792,6 +795,7 @@ namespace stream
     template <class RunsType_, class Cmp_>
     bool check_sorted_runs(RunsType_ & sruns, Cmp_ cmp)
     {
+        sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         typedef typename RunsType_::block_type block_type;
         typedef typename block_type::value_type value_type;
         STXXL_VERBOSE2("Elements: " << sruns.elements);
@@ -1009,6 +1013,8 @@ namespace stream
             , last_element(cmp.min_value())
 #endif //STXXL_CHECK_ORDER_IN_SORTS
         {
+            sort_helper::verify_sentinel_strict_weak_ordering(cmp);
+
             if (empty())
                 return;
 
@@ -1389,7 +1395,9 @@ namespace stream
         sort(Input_ & in, Cmp_ c, unsigned_type memory_to_use) :
             creator(in, c, memory_to_use),
             merger(creator.result(), c, memory_to_use)
-        { }
+        {
+            sort_helper::verify_sentinel_strict_weak_ordering(c);
+        }
 
         //! \brief Creates the object
         //! \param in input stream
@@ -1399,7 +1407,9 @@ namespace stream
         sort(Input_ & in, Cmp_ c, unsigned_type memory_to_use_rc, unsigned_type memory_to_use_m) :
             creator(in, c, memory_to_use_rc),
             merger(creator.result(), c, memory_to_use_m)
-        { }
+        {
+            sort_helper::verify_sentinel_strict_weak_ordering(c);
+        }
 
 
         //! \brief Standard stream method
