@@ -354,7 +354,7 @@ HEADER_FILES_ALGO	+= async_schedule.h ksort.h sort_base.h sort_helper.h
 HEADER_FILES_ALGO	+= losertree.h scan.h stable_ksort.h random_shuffle.h
 
 HEADER_FILES_STREAM	+= stream.h sort_stream.h
-HEADER_FILES_STREAM	+= unique.h
+HEADER_FILES_STREAM	+= choose.h unique.h
 
 HEADER_FILES_UTILS	+= malloc.h
 
