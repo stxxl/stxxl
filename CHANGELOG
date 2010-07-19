@@ -15,7 +15,7 @@ Version 1.3
   - wait times can be logged to a separate log file
     (compile with -DSTXXL_WAIT_LOG_ENABLED and set STXXLWAITLOGFILE in the environment)
 * Parallel PQ
-  - priority_queue now supports parallelized operations utilizing the libstdg++ parallel mode
+  - priority_queue now supports parallelized operations utilizing the libstdc++ parallel mode
 * Other new functionality 
   - file requests can now be canceled (success not guaranteed), completion handlers are called anyway.
   - log file locations are now configurable by the environment variables
@@ -27,7 +27,7 @@ Version 1.3
   - overwriting deleted memfile regions with uninitialized data is now optional
     (STXXL_CLEAR_FREE_MEMFILE_MEM)
   - read_write_pool that combines prefetch_pool with write_pool and ensures cache coherency
-  - add a replacable exit handler implementation, can be overwritten e.g. for library inclusion
+  - add a replaceable exit handler implementation, can be overwritten e.g. for library inclusion
 * Many, many bug fixes, in particular concerning
   - priority queue
   - optimal prefetch schedule
