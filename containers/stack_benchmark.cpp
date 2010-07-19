@@ -133,9 +133,8 @@ void run_stxxl_growshrink2_stack(stxxl::int64 volume)
                                             stxxl::grow_shrink2, DISKS, BLOCK_SIZE>::result stack_type;
     typedef typename stack_type::block_type block_type;
 
-    stxxl::prefetch_pool<block_type> p_pool(DISKS * 4);
-    stxxl::write_pool<block_type> w_pool(DISKS * 4);
-    stack_type Stack(p_pool, w_pool);
+    stxxl::read_write_pool<block_type> pool(DISKS * 4, DISKS * 4);
+    stack_type Stack(pool);
 
     benchmark_insert(Stack, volume);
 

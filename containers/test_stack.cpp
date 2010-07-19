@@ -130,12 +130,10 @@ int main(int argc, char * argv[])
         simple_test(my_stack, atoi(argv[1]) * 4 * 4096 / sizeof(int));
     }
     {
-        // prefetch pool with 10 blocks (> D is recommended)
-        stxxl::prefetch_pool<ext_stack_type2::block_type> p_pool(10);
-        // write pool with 10 blocks (> D is recommended)
-        stxxl::write_pool<ext_stack_type2::block_type> w_pool(10);
+        // prefetch/write pool with 10 blocks prefetching and 10 block write cache (> D is recommended)
+        stxxl::read_write_pool<ext_stack_type2::block_type> pool(10, 10);
         // create a stack that does not prefetch (level of prefetch aggressiveness 0)
-        ext_stack_type2 my_stack(p_pool, w_pool, 0);
+        ext_stack_type2 my_stack(pool, 0);
         int test_size = atoi(argv[1]) * 4 * 4096 / sizeof(int), i;
 
         for (i = 0; i < test_size; i++)
@@ -160,7 +158,7 @@ int main(int argc, char * argv[])
         }
 
         // test swap
-        ext_stack_type2 s2(p_pool, w_pool, 0);
+        ext_stack_type2 s2(pool, 0);
         std::swap(s2, my_stack);
         std::swap(s2, my_stack);
 
