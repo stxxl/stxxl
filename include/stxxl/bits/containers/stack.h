@@ -474,7 +474,7 @@ private:
     alloc_strategy_type alloc_strategy;
     unsigned_type pref_aggr;
     pool_type * owned_pool;
-    pool_type & pool;
+    pool_type * pool;
 
 public:
     //! \brief Constructs stack
@@ -490,7 +490,7 @@ public:
         cache(new block_type),
         pref_aggr(prefetch_aggressiveness),
         owned_pool(new pool_type(p_pool_, w_pool_)),
-        pool(*owned_pool)
+        pool(owned_pool)
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
@@ -504,8 +504,7 @@ public:
         std::swap(alloc_strategy, obj.alloc_strategy);
         std::swap(pref_aggr, obj.pref_aggr);
         std::swap(owned_pool, obj.owned_pool);
-        //std::swap(pool, obj.pool);  // FIXME!!! why was this disabled?
-        assert(&pool == &obj.pool);   // FIXME!!! HACK!!!
+        std::swap(pool, obj.pool);
     }
 
     virtual ~grow_shrink_stack2()
@@ -519,17 +518,17 @@ public:
             for (i = bids_size - 1; i >= last_pref; --i)
             {
                 // clean the prefetch buffer
-                pool.invalidate(bids[i]);
+                pool->invalidate(bids[i]);
             }
             typename std::vector<bid_type>::iterator cur = bids.begin();
             typename std::vector<bid_type>::const_iterator end = bids.end();
             for ( ; cur != end; ++cur)
             {
                 // FIXME: read_write_pool needs something like cancel_write(bid)
-                block_type * b = NULL; // w_pool.steal(*cur);
+                block_type * b = NULL;  // w_pool.steal(*cur);
                 if (b)
                 {
-                    pool.add(cache);   // return buffer
+                    pool->add(cache);   // return buffer
                     cache = b;
                 }
             }
@@ -563,14 +562,14 @@ public:
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
             block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
-            pool.write(cache, bids.back());
-            cache = pool.steal();
+            pool->write(cache, bids.back());
+            cache = pool->steal();
             const int_type bids_size = bids.size();
             const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr) - 1, (int_type)0);
             for (int_type i = bids_size - 2; i >= last_pref; --i)
             {
-                //  clean prefetch buffers
-                pool.invalidate(bids[i]);
+                // clean prefetch buffers
+                pool->invalidate(bids[i]);
             }
             cache_offset = 0;
         }
@@ -610,7 +609,7 @@ public:
 
             bid_type last_block = bids.back();
             bids.pop_back();
-            pool.read(cache, last_block)->wait();
+            pool->read(cache, last_block)->wait();
             block_manager::get_instance()->delete_block(last_block);
             rehint();
             cache_offset = block_type::size + 1;
@@ -631,8 +630,8 @@ public:
             const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
             for (int_type i = bids_size - new_p - 1; i >= last_pref; --i)
             {
-                //  clean prefetch buffers
-                pool.invalidate(bids[i]);
+                // clean prefetch buffers
+                pool->invalidate(bids[i]);
             }
         }
         pref_aggr = new_p;
@@ -653,7 +652,7 @@ private:
         const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
         for (int_type i = bids_size - 1; i >= last_pref; --i)
         {
-            pool.hint(bids[i]); // prefetch
+            pool->hint(bids[i]);  // prefetch
         }
     }
 };
