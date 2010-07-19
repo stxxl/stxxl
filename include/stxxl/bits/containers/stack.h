@@ -478,13 +478,29 @@ private:
 
 public:
     //! \brief Constructs stack
+    //! \param pool_ block write/prefetch pool
+    //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
+    grow_shrink_stack2(
+        pool_type & pool_,
+        unsigned_type prefetch_aggressiveness = 0) :
+        size_(0),
+        cache_offset(0),
+        cache(new block_type),
+        pref_aggr(prefetch_aggressiveness),
+        owned_pool(NULL),
+        pool(&pool_)
+    {
+        STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
+    }
+
+    //! \brief Constructs stack
     //! \param p_pool_ prefetch pool, that will be used for block prefetching
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
-    grow_shrink_stack2(
+    _STXXL_DEPRECATED(grow_shrink_stack2(
         prefetch_pool<block_type> & p_pool_,
         write_pool<block_type> & w_pool_,
-        unsigned_type prefetch_aggressiveness = 0) :
+        unsigned_type prefetch_aggressiveness = 0)) :
         size_(0),
         cache_offset(0),
         cache(new block_type),
