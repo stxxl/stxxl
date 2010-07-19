@@ -677,7 +677,7 @@ namespace stream
               >
     class transform
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
         Input3_ & i3;
@@ -694,7 +694,7 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_, Input5_ & i6_) :
             op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_),
             current(op(*i1, *i2, *i3, *i4, *i5, *i6)) { }
@@ -752,7 +752,7 @@ namespace stream
               >
     class transform<Operation_, Input1_, Stopper, Stopper, Stopper, Stopper, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
 
     public:
@@ -764,7 +764,7 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_) : op(o), i1(i1_),
+        transform(Operation_ & o, Input1_ & i1_) : op(o), i1(i1_),
                                                  current(op(*i1)) { }
 
         //! \brief Standard stream method
@@ -814,7 +814,7 @@ namespace stream
               >
     class transform<Operation_, Input1_, Input2_, Stopper, Stopper, Stopper, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
 
@@ -827,7 +827,7 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_) : op(o), i1(i1_), i2(i2_),
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_) : op(o), i1(i1_), i2(i2_),
                                                                 current(op(*i1, *i2)) { }
 
         //! \brief Standard stream method
@@ -880,7 +880,7 @@ namespace stream
               >
     class transform<Operation_, Input1_, Input2_, Input3_, Stopper, Stopper, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
         Input3_ & i3;
@@ -894,7 +894,7 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_) :
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_) :
             op(o), i1(i1_), i2(i2_), i3(i3_),
             current(op(*i1, *i2, *i3)) { }
 
@@ -951,7 +951,7 @@ namespace stream
               >
     class transform<Operation_, Input1_, Input2_, Input3_, Input4_, Stopper, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
         Input3_ & i3;
@@ -966,7 +966,7 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_) :
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_) :
             op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_),
             current(op(*i1, *i2, *i3, *i4)) { }
 
@@ -1026,7 +1026,7 @@ namespace stream
               >
     class transform<Operation_, Input1_, Input2_, Input3_, Input4_, Input5_, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
         Input3_ & i3;
@@ -1042,7 +1042,7 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_) :
             op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_),
             current(op(*i1, *i2, *i3, *i4, *i5)) { }
