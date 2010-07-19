@@ -46,34 +46,25 @@ namespace stream
         //! \brief Standard stream typedef
         typedef typename tuple_type::first_type value_type;
 
-    private:
-        value_type current;
-
-    public:
         //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).first) { }
+        choose(Input_ & in_) : in(in_)
+        { }
 
         //! \brief Standard stream method
         const value_type & operator * () const
         {
-            return current;
+            return (*in).first;
         }
 
         const value_type * operator -> () const
         {
-            return &current;
+            return &(*in).first;
         }
 
         //! \brief Standard stream method
         choose & operator ++ ()
         {
             ++in;
-
-            if (!empty())
-                current = (*in).first;
-
             return *this;
         }
 
@@ -101,34 +92,25 @@ namespace stream
         //! \brief Standard stream typedef
         typedef typename tuple_type::second_type value_type;
 
-    private:
-        value_type current;
-
-    public:
         //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).second) { }
+        choose(Input_ & in_) : in(in_)
+        { }
 
         //! \brief Standard stream method
         const value_type & operator * () const
         {
-            return current;
+            return (*in).second;
         }
 
         const value_type * operator -> () const
         {
-            return &current;
+            return &(*in).second;
         }
 
         //! \brief Standard stream method
         choose & operator ++ ()
         {
             ++in;
-
-            if (!empty())
-                current = (*in).second;
-
             return *this;
         }
 
@@ -156,34 +138,25 @@ namespace stream
         //! \brief Standard stream typedef
         typedef typename tuple_type::third_type value_type;
 
-    private:
-        value_type current;
-
-    public:
         //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).third) { }
+        choose(Input_ & in_) : in(in_)
+        { }
 
         //! \brief Standard stream method
         const value_type & operator * () const
         {
-            return current;
+            return (*in).third;
         }
 
         const value_type * operator -> () const
         {
-            return &current;
+            return &(*in).third;
         }
 
         //! \brief Standard stream method
         choose & operator ++ ()
         {
             ++in;
-
-            if (!empty())
-                current = (*in).third;
-
             return *this;
         }
 
@@ -211,34 +184,25 @@ namespace stream
         //! \brief Standard stream typedef
         typedef typename tuple_type::fourth_type value_type;
 
-    private:
-        value_type current;
-
-    public:
         //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).fourth) { }
+        choose(Input_ & in_) : in(in_)
+        { }
 
         //! \brief Standard stream method
         const value_type & operator * () const
         {
-            return current;
+            return (*in).fourth;
         }
 
         const value_type * operator -> () const
         {
-            return &current;
+            return &(*in).fourth;
         }
 
         //! \brief Standard stream method
         choose & operator ++ ()
         {
             ++in;
-
-            if (!empty())
-                current = (*in).fourth;
-
             return *this;
         }
 
@@ -266,34 +230,25 @@ namespace stream
         //! \brief Standard stream typedef
         typedef typename tuple_type::fifth_type value_type;
 
-    private:
-        value_type current;
-
-    public:
         //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).fifth) { }
+        choose(Input_ & in_) : in(in_)
+        { }
 
         //! \brief Standard stream method
         const value_type & operator * () const
         {
-            return current;
+            return (*in).fifth;
         }
 
         const value_type * operator -> () const
         {
-            return &current;
+            return &(*in).fifth;
         }
 
         //! \brief Standard stream method
         choose & operator ++ ()
         {
             ++in;
-
-            if (!empty())
-                current = (*in).fifth;
-
             return *this;
         }
 
@@ -321,34 +276,25 @@ namespace stream
         //! \brief Standard stream typedef
         typedef typename tuple_type::sixth_type value_type;
 
-    private:
-        value_type current;
-
-    public:
         //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).sixth) { }
+        choose(Input_ & in_) : in(in_)
+        { }
 
         //! \brief Standard stream method
         const value_type & operator * () const
         {
-            return current;
+            return (*in).sixth;
         }
 
         const value_type * operator -> () const
         {
-            return &current;
+            return &(*in).sixth;
         }
 
         //! \brief Standard stream method
         choose & operator ++ ()
         {
             ++in;
-
-            if (!empty())
-                current = (*in).sixth;
-
             return *this;
         }
 
