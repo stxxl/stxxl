@@ -44,6 +44,67 @@ void test_lvalue_correctness(stack_type & stack, int a, int b)
 }
 
 
+template <typename stack_type>
+void simple_test(stack_type & my_stack, int test_size)
+{
+    int i;
+
+    for (i = 0; i < test_size; i++)
+    {
+        my_stack.push(i);
+        assert(my_stack.top() == i);
+        assert(my_stack.size() == i + 1);
+    }
+
+    for (i = test_size - 1; i >= 0; i--)
+    {
+        assert(my_stack.top() == i);
+        my_stack.pop();
+        assert(my_stack.size() == i);
+    }
+
+    for (i = 0; i < test_size; i++)
+    {
+        my_stack.push(i);
+        assert(my_stack.top() == i);
+        assert(my_stack.size() == i + 1);
+    }
+
+    // test swap
+    stack_type s2;
+    std::swap(s2, my_stack);
+    std::swap(s2, my_stack);
+
+    for (i = test_size - 1; i >= 0; i--)
+    {
+        assert(my_stack.top() == i);
+        my_stack.pop();
+        assert(my_stack.size() == i);
+    }
+
+    std::stack<int> int_stack;
+
+    for (i = 0; i < test_size; i++)
+    {
+        int_stack.push(i);
+        assert(int_stack.top() == i);
+        assert(int(int_stack.size()) == i + 1);
+    }
+
+    stack_type my_stack1(int_stack);
+
+    for (i = test_size - 1; i >= 0; i--)
+    {
+        assert(my_stack1.top() == i);
+        my_stack1.pop();
+        assert(my_stack1.size() == i);
+    }
+
+    STXXL_MSG("Test 1 passed.");
+
+    test_lvalue_correctness(my_stack, 4 * 4096 / 4 * 2, 4 * 4096 / 4 * 2 * 20);
+}
+
 int main(int argc, char * argv[])
 {
     typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink, 4, 4096>::result ext_stack_type;
@@ -56,62 +117,7 @@ int main(int argc, char * argv[])
     }
     {
         ext_stack_type my_stack;
-        int test_size = atoi(argv[1]) * 4 * 4096 / sizeof(int), i;
-
-        for (i = 0; i < test_size; i++)
-        {
-            my_stack.push(i);
-            assert(my_stack.top() == i);
-            assert(my_stack.size() == i + 1);
-        }
-
-        for (i = test_size - 1; i >= 0; i--)
-        {
-            assert(my_stack.top() == i);
-            my_stack.pop();
-            assert(my_stack.size() == i);
-        }
-
-        for (i = 0; i < test_size; i++)
-        {
-            my_stack.push(i);
-            assert(my_stack.top() == i);
-            assert(my_stack.size() == i + 1);
-        }
-
-        // test swap
-        ext_stack_type s2;
-        std::swap(s2, my_stack);
-        std::swap(s2, my_stack);
-
-        for (i = test_size - 1; i >= 0; i--)
-        {
-            assert(my_stack.top() == i);
-            my_stack.pop();
-            assert(my_stack.size() == i);
-        }
-
-        std::stack<int> int_stack;
-
-        for (i = 0; i < test_size; i++)
-        {
-            int_stack.push(i);
-            assert(int_stack.top() == i);
-            assert(int(int_stack.size()) == i + 1);
-        }
-
-        ext_stack_type my_stack1(int_stack);
-
-        for (i = test_size - 1; i >= 0; i--)
-        {
-            assert(my_stack1.top() == i);
-            my_stack1.pop();
-            assert(my_stack1.size() == i);
-        }
-
-        STXXL_MSG("Test 1 passed.");
-
-        test_lvalue_correctness(my_stack, 4 * 4096 / 4 * 2, 4 * 4096 / 4 * 2 * 20);
+        simple_test(my_stack, atoi(argv[1]) * 4 * 4096 / sizeof(int));
     }
     {
         // prefetch pool with 10 blocks (> D is recommended)
