@@ -367,7 +367,7 @@ int main(int argc, char * argv[])
         side_pq.pop();
         if (!(side_pq_least == least))
         {
-            STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+            STXXL_VERBOSE1("" << side_pq_least << " != " << least);
         }
 #endif
         if (cmp(last_least, least))
@@ -392,7 +392,7 @@ int main(int argc, char * argv[])
         side_pq.pop();
         if (!(side_pq_least == least))
         {
-            STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+            STXXL_VERBOSE1("" << side_pq_least << " != " << least);
         }
 #endif
         if (cmp(last_least, least))

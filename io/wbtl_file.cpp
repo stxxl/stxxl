@@ -24,7 +24,7 @@
 #include <stxxl/aligned_alloc>
 
 #ifndef STXXL_VERBOSE_WBTL
-#define STXXL_VERBOSE_WBTL STXXL_VERBOSE0
+#define STXXL_VERBOSE_WBTL STXXL_VERBOSE2
 #endif
 
 

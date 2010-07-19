@@ -89,7 +89,7 @@ void fileperblock_file<base_file_type>::discard(offset_type offset, offset_type 
     ::remove(filename_for_block(offset).c_str());
 #endif
 
-    STXXL_VERBOSE0("discard " << offset << " + " << length);
+    STXXL_VERBOSE2("discard " << offset << " + " << length);
 }
 
 template <class base_file_type>
