@@ -80,16 +80,15 @@ void random_shuffle(ExtIterator_ first,
                                              PageSize_, 4, BlockSize_, AllocStrategy_>::result temp_vector_type;
     temp_vector_type * temp_vector;
 
-    stxxl::prefetch_pool<block_type> p_pool(0);               // no read buffers
     STXXL_VERBOSE1("random_shuffle: " << M / BlockSize_ - k << " write buffers for " << k << " buckets");
-    stxxl::write_pool<block_type> w_pool(M / BlockSize_ - k); // M/B-k write buffers
+    stxxl::read_write_pool<block_type> pool(0, M / BlockSize_ - k);  // no read buffers and M/B-k write buffers
 
     stack_type ** buckets;
 
     // create and put buckets into container
     buckets = new stack_type *[k];
     for (j = 0; j < k; j++)
-        buckets[j] = new stack_type(p_pool, w_pool, 0);
+        buckets[j] = new stack_type(pool, 0);
 
 
     ///// Reading input /////////////////////
@@ -106,8 +105,8 @@ void random_shuffle(ExtIterator_ first,
 
     ///// Processing //////////////////////
     // resize buffers
-    w_pool.resize(0);
-    p_pool.resize(PageSize_);
+    pool.resize_write(0);
+    pool.resize_prefetch(PageSize_);
 
     unsigned_type space_left = M - k * BlockSize_ -
                                PageSize_ * BlockSize_; // remaining int space
@@ -157,7 +156,7 @@ void random_shuffle(ExtIterator_ first,
                 buckets[i]->pop();
             }
 
-            p_pool.resize(0);
+            pool.resize_prefetch(0);
             space_left += PageSize_ * BlockSize_;
             STXXL_VERBOSE1("random_shuffle: Space left: " << space_left);
 
@@ -165,7 +164,7 @@ void random_shuffle(ExtIterator_ first,
             stxxl::random_shuffle(temp_vector->begin(),
                                   temp_vector->end(), rand, space_left);
 
-            p_pool.resize(PageSize_);
+            pool.resize_prefetch(PageSize_);
 
             // write back
             for (j = 0; j < size; j++) {
@@ -222,15 +221,14 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
                                              PageSize_, 4, BlockSize_, AllocStrategy_>::result temp_vector_type;
     temp_vector_type * temp_vector;
 
-    stxxl::prefetch_pool<block_type> p_pool(0);               // no read buffers
-    stxxl::write_pool<block_type> w_pool(M / BlockSize_ - k); // M/B-k write buffers
+    stxxl::read_write_pool<block_type> pool(0, M / BlockSize_ - k);  // no read buffers and M/B-k write buffers
 
     stack_type ** buckets;
 
     // create and put buckets into container
     buckets = new stack_type *[k];
     for (j = 0; j < k; j++)
-        buckets[j] = new stack_type(p_pool, w_pool, 0);
+        buckets[j] = new stack_type(pool, 0);
 
 
     typedef buf_istream<block_type, typename ExtIterator_::bids_container_iterator> buf_istream_type;
@@ -266,8 +264,8 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
 
     ///// Processing //////////////////////
     // resize buffers
-    w_pool.resize(0);
-    p_pool.resize(PageSize_);
+    pool.resize_write(0);
+    pool.resize_prefetch(PageSize_);
 
     unsigned_type space_left = M - k * BlockSize_ -
                                PageSize_ * BlockSize_; // remaining int space
@@ -314,7 +312,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
                 buckets[i]->pop();
             }
 
-            p_pool.resize(0);
+            pool.resize_prefetch(0);
             space_left += PageSize_ * BlockSize_;
 
             STXXL_VERBOSE1("random_shuffle: Space left: " << space_left);
@@ -323,7 +321,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
             stxxl::random_shuffle(temp_vector->begin(),
                                   temp_vector->end(), rand, space_left);
 
-            p_pool.resize(PageSize_);
+            pool.resize_prefetch(PageSize_);
 
             // write back
             for (j = 0; j < size; j++) {
