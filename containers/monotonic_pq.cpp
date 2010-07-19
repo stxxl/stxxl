@@ -73,11 +73,10 @@ struct my_type
 
 std::ostream & operator << (std::ostream & o, const my_type & obj)
 {
-    o << obj.key
+    o << obj.key;
 #if LOAD
-                        << "/" << obj.load
+    o << "/" << obj.load;
 #endif
-    ;
     return o;
 }
 

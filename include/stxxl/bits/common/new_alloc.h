@@ -102,10 +102,10 @@ public:
     }
 
 #ifdef __GXX_EXPERIMENTAL_CXX0X__
-    template <typename... Args>
-    void construct(pointer p, Args &&... args)
+    template <typename ... Args>
+    void construct(pointer p, Args && ... args)
     {
-        ::new ((void *)p)T(std::forward<Args>(args)...);
+        ::new ((void *)p)T(std::forward<Args>(args) ...);
     }
 #endif
 
