@@ -106,7 +106,7 @@ test_ext_merger2.$(EXEEXT): test_ext_merger2.cpp $(DEPENDENCIES)
 
 bench_pqueue: bench_pqueue.$(EXEEXT)
 bench_pqueue.$(EXEEXT): bench_pqueue.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c bench_pqueue.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c bench_pqueue.cpp -DSTXXL_VERBOSE_LEVEL=0
 	$(LINKER)  bench_pqueue.$(OBJEXT) $(OUT)bench_pqueue.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
 
 monotonic_pq: monotonic_pq.$(EXEEXT)
