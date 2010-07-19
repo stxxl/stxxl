@@ -667,7 +667,8 @@ namespace stream
     //! - \c Input4_ type of the 4th input
     //! - \c Input5_ type of the 5th input
     //! - \c Input6_ type of the 6th input
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_ = Stopper,
               class Input3_ = Stopper,
               class Input4_ = Stopper,
@@ -722,7 +723,6 @@ namespace stream
             if (!empty())
                 current = op(*i1, *i2, *i3, *i4, *i5, *i6);
 
-
             return *this;
         }
 
@@ -747,7 +747,9 @@ namespace stream
     //! adaptable functor that takes 1 parameter)
     //! - \c Input1_ type of the input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_>
+    template <class Operation_,
+              class Input1_
+              >
     class transform<Operation_, Input1_, Stopper, Stopper, Stopper, Stopper, Stopper>
     {
         Operation_ op;
@@ -783,7 +785,6 @@ namespace stream
             if (!empty())
                 current = op(*i1);
 
-
             return *this;
         }
 
@@ -807,7 +808,8 @@ namespace stream
     //! - \c Input1_ type of the 1st input
     //! - \c Input2_ type of the 2nd input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_
               >
     class transform<Operation_, Input1_, Input2_, Stopper, Stopper, Stopper, Stopper>
@@ -847,7 +849,6 @@ namespace stream
             if (!empty())
                 current = op(*i1, *i2);
 
-
             return *this;
         }
 
@@ -872,7 +873,8 @@ namespace stream
     //! - \c Input2_ type of the 2nd input
     //! - \c Input3_ type of the 3rd input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_,
               class Input3_
               >
@@ -916,7 +918,6 @@ namespace stream
             if (!empty())
                 current = op(*i1, *i2, *i3);
 
-
             return *this;
         }
 
@@ -942,7 +943,8 @@ namespace stream
     //! - \c Input3_ type of the 3rd input
     //! - \c Input4_ type of the 4th input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_,
               class Input3_,
               class Input4_
@@ -989,7 +991,6 @@ namespace stream
             if (!empty())
                 current = op(*i1, *i2, *i3, *i4);
 
-
             return *this;
         }
 
@@ -1016,7 +1017,8 @@ namespace stream
     //! - \c Input4_ type of the 4th input
     //! - \c Input5_ type of the 5th input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_,
               class Input3_,
               class Input4_,
@@ -1066,7 +1068,6 @@ namespace stream
             ++i5;
             if (!empty())
                 current = op(*i1, *i2, *i3, *i4, *i5);
-
 
             return *this;
         }
@@ -1159,7 +1160,6 @@ namespace stream
             if (!empty())
                 current = value_type(*i1, *i2, *i3, *i4, *i5, *i6);
 
-
             return *this;
         }
 
@@ -1230,7 +1230,6 @@ namespace stream
             if (!empty())
                 current = value_type(*i1, *i2);
 
-
             return *this;
         }
 
@@ -1299,7 +1298,6 @@ namespace stream
 
             if (!empty())
                 current = value_type(*i1, *i2, *i3);
-
 
             return *this;
         }
@@ -1375,7 +1373,6 @@ namespace stream
 
             if (!empty())
                 current = value_type(*i1, *i2, *i3, *i4);
-
 
             return *this;
         }
@@ -1460,7 +1457,6 @@ namespace stream
             if (!empty())
                 current = value_type(*i1, *i2, *i3, *i4, *i5);
 
-
             return *this;
         }
 
@@ -1526,7 +1522,6 @@ namespace stream
             if (!empty())
                 current = (*in).first;
 
-
             return *this;
         }
 
@@ -1581,7 +1576,6 @@ namespace stream
 
             if (!empty())
                 current = (*in).second;
-
 
             return *this;
         }
@@ -1638,7 +1632,6 @@ namespace stream
             if (!empty())
                 current = (*in).third;
 
-
             return *this;
         }
 
@@ -1693,7 +1686,6 @@ namespace stream
 
             if (!empty())
                 current = (*in).fourth;
-
 
             return *this;
         }
@@ -1750,7 +1742,6 @@ namespace stream
             if (!empty())
                 current = (*in).fifth;
 
-
             return *this;
         }
 
@@ -1806,7 +1797,6 @@ namespace stream
             if (!empty())
                 current = (*in).sixth;
 
-
             return *this;
         }
 
@@ -1834,7 +1824,9 @@ namespace stream
         typename Input::value_type current;
 
     public:
+        //! \brief Standard stream typedef
         typedef typename Input::value_type value_type;
+
         unique(Input & input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
         {
             if (!input.empty())
@@ -1849,6 +1841,7 @@ namespace stream
             while (!input.empty() && (binary_pred(current = *input, old_value)))
                 ++input;
         }
+
         //! \brief Standard stream method
         const value_type & operator * () const
         {
@@ -1862,7 +1855,10 @@ namespace stream
         }
 
         //! \brief Standard stream method
-        bool empty() const { return input.empty(); }
+        bool empty() const
+        {
+            return input.empty();
+        }
     };
 
     //! \brief Equivalent to std::unique algorithms
@@ -1875,12 +1871,15 @@ namespace stream
         typename Input::value_type current;
 
     public:
+        //! \brief Standard stream typedef
         typedef typename Input::value_type value_type;
+
         unique(Input & input_) : input(input_)
         {
             if (!input.empty())
                 current = *input;
         }
+
         //! \brief Standard stream method
         unique & operator ++ ()
         {
@@ -1889,6 +1888,7 @@ namespace stream
             while (!input.empty() && ((current = *input) == old_value))
                 ++input;
         }
+
         //! \brief Standard stream method
         value_type & operator * () const
         {
@@ -1902,7 +1902,10 @@ namespace stream
         }
 
         //! \brief Standard stream method
-        bool empty() const { return input.empty(); }
+        bool empty() const
+        {
+            return input.empty();
+        }
     };
 
 
