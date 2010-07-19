@@ -107,6 +107,8 @@ void simple_test(stack_type & my_stack, int test_size)
 
 int main(int argc, char * argv[])
 {
+    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>::result ext_normal_stack_type;
+    typedef stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096>::result ext_migrating_stack_type;
     typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink, 4, 4096>::result ext_stack_type;
     typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink2, 1, 4096>::result ext_stack_type2;
 
@@ -114,6 +116,14 @@ int main(int argc, char * argv[])
     {
         STXXL_MSG("Usage: " << argv[0] << " test_size_in_pages");
         return -1;
+    }
+    {
+        ext_normal_stack_type my_stack;
+        simple_test(my_stack, atoi(argv[1]) * 4 * 4096 / sizeof(int));
+    }
+    {
+        ext_migrating_stack_type my_stack;
+        //simple_test(my_stack, atoi(argv[1]) * 4 * 4096 / sizeof(int));
     }
     {
         ext_stack_type my_stack;
