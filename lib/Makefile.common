@@ -1,5 +1,5 @@
 SOVERSION	= 1
-LIBVERSION	= 1.2.90
+LIBVERSION	= 1.3.0
 
 LIB_OBJECTS = \
 	../io/iostats.$(LIBOBJEXT) \

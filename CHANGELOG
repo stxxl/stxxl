@@ -11,47 +11,61 @@ Version 1.3
   - separate the disk number of a file (which queue to put requests in)
     from the fact that blocks for this file are allocated via the block
     manager (disk number -1 otherwise).
+  - separate wait time counting for read and write I/Os
+  - wait times can be logged to a separate log file
+    (compile with -DSTXXL_WAIT_LOG_ENABLED and set STXXLWAITLOGFILE in the environment)
+* Parallel PQ
+  - priority_queue now supports parallelized operations utilizing the libstdg++ parallel mode
 * Other new functionality 
   - file requests can now be canceled (success not guaranteed), completion handlers are called anyway.
   - log file locations are now configurable by the environment variables
-    STXXLLOGFILE and STXXLERRLOGFILE.
-  - single queue I/O scheduling ???
+    STXXLLOGFILE and STXXLERRLOGFILE
+  - single queue I/O scheduling
+  - reverse_iterator added to containers types vector, deque and map
   - autogrow files (specified in .stxxl by a size of 0), will be deleted on normal program termination
-  - add infrastructure to build multiple binaries with different CXXFLAGS from a single source ???
+  - add infrastructure to build multiple binaries with different CXXFLAGS from a single source
+  - overwriting deleted memfile regions with uninitialized data is now optional
+    (STXXL_CLEAR_FREE_MEMFILE_MEM)
+  - read_write_pool that combines prefetch_pool with write_pool and ensures cache coherency
+  - add a replacable exit handler implementation, can be overwritten e.g. for library inclusion
 * Many, many bug fixes, in particular concerning
   - priority queue
   - optimal prefetch schedule
   - possible race condition while creating singleton instances
+  - random_shuffle()
 * Platform Support 
-  - add Boost 1.40
+  - add GCC 4.4 (parallel mode features not working in GCC 4.3 can now be used)
+  - add GCC 4.5
+  - initial support for GCC 4.6
+  - add ICPC 11.x
+  - add Boost 1.42
   - add FreeBSD
   - drop Solaris
 * New benchmarks 
+  - io/benchmark_disks: more command line paramaters for finer testing granularity
   - measure hard-disk and flash-disk combined performance and
     determine best block size pairs (io/benchmark_disk_and_flash)
   - benchmark using regular STXXL configuration (benchmark_configured_disks)
-  - iobench_scatter_in_place.cpp ???
 * Possibly breaking changes
   - API name changes
-    vector::touch -> vector::block_externally_updated ???
-  - Priority of write changes ???
+    vector::touch -> vector::block_externally_updated
+  - Priority of write changes
   - Other name changes (considered internal)
     typed_block<>::has_filler -> !typed_block<>::has_only_data
     file::delete_region -> file::discard
     vector::alloc_strategy -> vector::alloc_strategy_type
-  - Overwriting deleted memfile regions with uninitialized data is now optional
-    (STXXL_CLEAR_FREE_MEMFILE_MEM).
   - Execute completion handler before notifying waiters, so far after. 
+* Deprecated methods:
+  - stxxl::stats::reset(), stxxl:.stats::_reset_io_wait_time():
+    use stxxl::stats_data instead to store snapshots of the counters and compute differences
 * Under-the-hood improvements
   - I/O layer cleanup
-  - write_pool additional functionality ???
-  - aligned_alloc ???
-* Doxy now also lists undocumented members (to be changed?) ???
+  - aligned_alloc
+* Doxy now also lists undocumented members
 * stop requiring STXXL_ROOT to be a hard coded absolute path set in make.settings.local, 
   a default of CURDIR works fine
 * document #defines in defines.h
   - switch on/off file types with STXXL_HAVE_xxx_FILE (to avoid platform compatibility problems)
-* parallel PQ in before?  now in? ???
 
 ------------------------------------------
 Version 1.2.1 (14 August 2008)
