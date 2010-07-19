@@ -706,42 +706,22 @@ public:
     bool empty() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            return int_impl->empty();
-
-
-        return ext_impl->empty();
+        return (int_impl) ? int_impl->empty() : ext_impl->empty();
     }
     size_type size() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            return int_impl->size();
-
-
-        return ext_impl->size();
+        return (int_impl) ? int_impl->size() : ext_impl->size();
     }
     value_type & top()
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            return int_impl->top();
-
-
-        return ext_impl->top();
+        return (int_impl) ? int_impl->top() : ext_impl->top();
     }
     const value_type & top() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            return int_impl->top();
-
-
-        return ext_impl->top();
+        return (int_impl) ? int_impl->top() : ext_impl->top();
     }
     void push(const value_type & val)
     {
@@ -767,19 +747,13 @@ public:
 
         if (int_impl)
             int_impl->pop();
-
         else
             ext_impl->pop();
     }
     virtual ~migrating_stack()
     {
-        assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            delete int_impl;
-
-        else
-            delete ext_impl;
+        delete int_impl;
+        delete ext_impl;
     }
 };
 
