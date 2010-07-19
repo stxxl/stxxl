@@ -49,8 +49,8 @@ LEDA_SM_LDLIBS			?= -lW -lP -lG -lL -lX11 -lm -lLEDA-SM
 #stack_benchmark.$o:	CPPFLAGS += -DNDEBUG
 #pq_benchmark.$o:	CPPFLAGS += -DNDEBUG
 test_many_stacks.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
-test_ext_merger.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
-test_ext_merger2.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=3
+test_ext_merger.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
+test_ext_merger2.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
 
 
 $(TESTS_BDB:=.$(bin)):	CPPFLAGS += $(CPPFLAGS_TPIE) $(CPPFLAGS_BDB)

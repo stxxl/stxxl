@@ -7,8 +7,7 @@ include $(TOPDIR)/Makefile.subdir.gnu
 
 
 test_stream1.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
-test_sorted_runs.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
-test_push_sort.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
+test_push_sort.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=0
 test_stream.$o:			CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
 test_materialize.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_VERBOSE_MATERIALIZE=STXXL_VERBOSE0
 

@@ -36,7 +36,7 @@ test_block_alloc_strategy.$(EXEEXT): test_block_alloc_strategy.cpp $(DEPENDENCIE
 
 test_write_pool: test_write_pool.$(EXEEXT)
 test_write_pool.$(EXEEXT): test_write_pool.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_write_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_write_pool.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER) test_write_pool.$(OBJEXT) $(OUT)test_write_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_prefetch_pool: test_prefetch_pool.$(EXEEXT)
