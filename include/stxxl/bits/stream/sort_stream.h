@@ -217,12 +217,7 @@ namespace stream
         }
 #endif //STXXL_SMALL_INPUT_PSORT_OPT
 
-        while (!input.empty() && pos != el_in_run)
-        {
-            Blocks1[pos / block_type::size][pos % block_type::size] = *input;
-            ++input;
-            ++pos;
-        }
+        pos = fetch(Blocks1, pos, el_in_run);
 
         // sort first run
         sort_run(Blocks1, pos);
@@ -277,13 +272,7 @@ namespace stream
         }
 
         STXXL_VERBOSE1("Filling the second part of the allocated blocks");
-        pos = 0;
-        while (!input.empty() && pos != el_in_run)
-        {
-            Blocks2[pos / block_type::size][pos % block_type::size] = *input;
-            ++input;
-            ++pos;
-        }
+        pos = fetch(Blocks2, 0, el_in_run);
         result_.elements += pos;
 
         if (input.empty())
@@ -359,13 +348,7 @@ namespace stream
 
         while (!input.empty())
         {
-            pos = 0;
-            while (!input.empty() && pos != el_in_run)
-            {
-                Blocks1[pos / block_type::size][pos % block_type::size] = *input;
-                ++input;
-                ++pos;
-            }
+            pos = fetch(Blocks1, 0, el_in_run);
             result_.elements += pos;
             sort_run(Blocks1, pos);
             cur_run_size = div_ceil(pos, block_type::size); // in blocks
