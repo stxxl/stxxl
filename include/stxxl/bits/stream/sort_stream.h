@@ -102,8 +102,9 @@ namespace stream
         class Cmp_,
         unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE(typename Input_::value_type),
         class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
-    class runs_creator : private noncopyable
+    class basic_runs_creator : private noncopyable
     {
+    protected:
         Input_ & input;
         Cmp_ cmp;
 
@@ -136,13 +137,14 @@ namespace stream
         //! \param i input stream
         //! \param c comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
-        runs_creator(Input_ & i, Cmp_ c, unsigned_type memory_to_use) :
+        basic_runs_creator(Input_ & i, Cmp_ c, unsigned_type memory_to_use) :
             input(i), cmp(c), m_(memory_to_use / BlockSize_ / sort_memory_usage_factor()), result_computed(false)
         {
             sort_helper::verify_sentinel_strict_weak_ordering(cmp);
             if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
                 throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
             }
+            assert(m_ > 0);
         }
 
         //! \brief Returns the sorted runs object
@@ -166,7 +168,7 @@ namespace stream
     //!
     //! This is the main routine of this class.
     template <class Input_, class Cmp_, unsigned BlockSize_, class AllocStr_>
-    void runs_creator<Input_, Cmp_, BlockSize_, AllocStr_>::compute_result()
+    void basic_runs_creator<Input_, Cmp_, BlockSize_, AllocStr_>::compute_result()
     {
         unsigned_type i = 0;
         unsigned_type m2 = m_ / 2;
@@ -395,6 +397,38 @@ namespace stream
         delete[] ((Blocks1 < Blocks2) ? Blocks1 : Blocks2);
     }
 
+    //! \brief Forms sorted runs of data from a stream
+    //!
+    //! Template parameters:
+    //! - \c Input_ type of the input stream
+    //! - \c Cmp_ type of omparison object used for sorting the runs
+    //! - \c BlockSize_ size of blocks used to store the runs
+    //! - \c AllocStr_ functor that defines allocation strategy for the runs
+    template <
+        class Input_,
+        class Cmp_,
+        unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE(typename Input_::value_type),
+        class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
+    class runs_creator : public basic_runs_creator<Input_, Cmp_, BlockSize_, AllocStr_>
+    {
+    private:
+        typedef basic_runs_creator<Input_, Cmp_, BlockSize_, AllocStr_> base;
+
+    public:
+        typedef typename base::block_type block_type;
+
+    private:
+        using base::input;
+
+    public:
+        //! \brief Creates the object
+        //! \param i input stream
+        //! \param c comparator object
+        //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
+        runs_creator(Input_ & i, Cmp_ c, unsigned_type memory_to_use) : base(i, c, memory_to_use)
+        { }
+    };
+
 
     //! \brief Input strategy for \c runs_creator class
     //!
@@ -441,6 +475,7 @@ namespace stream
         typedef typed_block<BlockSize_, value_type> block_type;
         typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
         typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
+        typedef sorted_runs_type result_type;
 
     private:
         typedef typename sorted_runs_type::run_type run_type;
@@ -539,6 +574,7 @@ namespace stream
             if (!(2 * BlockSize_ * sort_memory_usage_factor() <= memory_to_use)) {
                 throw bad_parameter("stxxl::runs_creator<>:runs_creator(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
             }
+            assert(m2 > 0);
         }
 
         ~runs_creator()
@@ -609,7 +645,7 @@ namespace stream
                     cleanup();
 #ifdef STXXL_PRINT_STAT_AFTER_RF
                     STXXL_MSG(*stats::get_instance());
-#endif
+#endif //STXXL_PRINT_STAT_AFTER_RF
                 }
             }
             return result_;
@@ -662,6 +698,7 @@ namespace stream
     public:
         typedef Cmp_ cmp_type;
         typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
+        typedef sorted_runs_type result_type;
 
     private:
         typedef typename sorted_runs_type::run_type run_type;
