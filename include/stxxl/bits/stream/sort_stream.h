@@ -137,6 +137,20 @@ namespace stream
             return curr_idx;
         }
 
+        void fill_with_max_value(block_type * blocks, unsigned_type num_blocks, unsigned_type first_idx)
+        {
+            unsigned_type last_idx = num_blocks * block_type::size;
+            if (first_idx < last_idx) {
+                typename element_iterator_traits<block_type>::element_iterator curr =
+                    make_element_iterator(blocks, first_idx);
+                while (first_idx != last_idx) {
+                    *curr = cmp.max_value();
+                    ++curr;
+                    ++first_idx;
+                }
+            }
+        }
+
         //! \brief Sort a specific run, contained in a sequences of blocks.
         void sort_run(block_type * run, unsigned_type elements)
         {
@@ -250,8 +264,7 @@ namespace stream
         result_.runs_sizes.push_back(blocks1_length);
 
         // fill the rest of the last block with max values
-        for ( ; blocks1_length != el_in_run; ++blocks1_length)
-            Blocks1[blocks1_length / block_type::size][blocks1_length % block_type::size] = cmp.max_value();
+        fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
 
         for (i = 0; i < cur_run_size; ++i)
         {
@@ -293,8 +306,7 @@ namespace stream
 
             result_.runs_sizes[0] = blocks2_length;
             // fill the rest of the last block with max values
-            for ( ; blocks2_length != 2 * el_in_run; ++blocks2_length)
-                Blocks1[blocks2_length / block_type::size][blocks2_length % block_type::size] = cmp.max_value();
+            fill_with_max_value(Blocks1, cur_run_size, blocks2_length);
 
             assert(cur_run_size > m2);
 
@@ -362,9 +374,7 @@ namespace stream
             result_.runs_sizes.push_back(blocks1_length);
 
             // fill the rest of the last block with max values (occurs only on the last run)
-            for ( ; blocks1_length != el_in_run; ++blocks1_length)
-                Blocks1[blocks1_length / block_type::size][blocks1_length % block_type::size] = cmp.max_value();
-
+            fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
 
             for (i = 0; i < cur_run_size; ++i)
             {
@@ -375,6 +385,7 @@ namespace stream
             result_.runs.push_back(run); // #
 
             std::swap(Blocks1, Blocks2);
+            std::swap(blocks1_length, blocks2_length);
         }
 
         wait_all(write_reqs, write_reqs + m2);
