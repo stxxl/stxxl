@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <cassert>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/common/utils.h>
 
 
 #ifndef STXXL_VERBOSE_ALIGNED_ALLOC
