@@ -268,7 +268,6 @@ namespace stream
         {
             run[i].value = Blocks1[i][0];
             write_reqs[i] = Blocks1[i].write(run[i].bid);
-            //STXXL_MSG("BID: "<<run[i].bid<<" val: "<<run[i].value);
         }
         result_.runs.push_back(run);
         result_.runs_sizes.push_back(blocks1_length);
@@ -1013,9 +1012,7 @@ namespace stream
             else
             {
 // begin of native merging procedure
-
                 losers->multi_merge(current_block->elem, current_block->elem + STXXL_MIN<size_type>(out_block_type::size, elements_remaining));
-
 // end of native merging procedure
             }
             STXXL_VERBOSE1("current block filled");
@@ -1131,7 +1128,6 @@ namespace stream
 
             const unsigned_type n_prefetch_buffers = STXXL_MAX(min_prefetch_buffers, input_buffers - nruns);
 
-
 #if STXXL_SORT_OPTIMAL_PREFETCHING
             // heuristic
             const int_type n_opt_prefetch_buffers = min_prefetch_buffers + (3 * (n_prefetch_buffers - min_prefetch_buffers)) / 10;
@@ -1164,7 +1160,6 @@ namespace stream
                     (*buffers)[i] = prefetcher->pull_block();                                   //get first block of each run
                     (*seqs)[i] = std::make_pair((*buffers)[i]->begin(), (*buffers)[i]->end());  //this memory location stays the same, only the data is exchanged
                 }
-
 // end of STL-style merging
 #else
                 STXXL_THROW_UNREACHABLE();
@@ -1173,7 +1168,6 @@ namespace stream
             else
             {
 // begin of native merging procedure
-
                 losers = new loser_tree_type(prefetcher, nruns, run_cursor2_cmp_type(cmp));
 // end of native merging procedure
             }
@@ -1191,6 +1185,20 @@ namespace stream
         {
             return elements_remaining == 0;
         }
+
+        //! \brief Standard stream method
+        const value_type & operator * () const
+        {
+            assert(!empty());
+            return current_value;
+        }
+
+        //! \brief Standard stream method
+        const value_type * operator -> () const
+        {
+            return &(operator * ());
+        }
+
         //! \brief Standard stream method
         basic_runs_merger & operator ++ ()  // preincrement operator
         {
@@ -1218,7 +1226,6 @@ namespace stream
                 }
             }
 
-
 #if STXXL_CHECK_ORDER_IN_SORTS
             if (!empty())
             {
@@ -1229,29 +1236,13 @@ namespace stream
 
             return *this;
         }
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            assert(!empty());
-            return current_value;
-        }
-
-        //! \brief Standard stream method
-        const value_type * operator -> () const
-        {
-            assert(!empty());
-            return &current_value;
-        }
-
 
         //! \brief Destructor
         //! \remark Deallocates blocks of the input sorted runs object
         virtual ~basic_runs_merger()
         {
             deallocate_prefetcher();
-
-            if (current_block)
-                delete current_block;
+            delete current_block;
         }
     };
 
@@ -1313,7 +1304,6 @@ namespace stream
                 bm->new_blocks(alloc_strategy(),
                                trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(new_runs.runs[i].begin()),
                                trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(new_runs.runs[i].end()));
-
 
             // merge all
             runs_left = nruns;
@@ -1487,6 +1477,12 @@ namespace stream
 
 
         //! \brief Standard stream method
+        bool empty() const
+        {
+            return merger.empty();
+        }
+
+        //! \brief Standard stream method
         const value_type & operator * () const
         {
             assert(!empty());
@@ -1504,12 +1500,6 @@ namespace stream
         {
             ++merger;
             return *this;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return merger.empty();
         }
     };
 
