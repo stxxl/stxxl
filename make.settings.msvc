@@ -19,7 +19,6 @@
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = "$(TOPDIR)"#
-include make.settings.local
 
 MAKE = nmake /NOLOGO
 COMPILER = cl
@@ -34,6 +33,7 @@ DEBUG_LINKER = /OPT:REF # debug is off
 
 LIBNAME = stxxl
 
+include make.settings.local
 
 #### TROUBLESHOOTING
 #
