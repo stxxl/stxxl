@@ -890,8 +890,9 @@ namespace stream
     template <class RunsType_,
               class Cmp_,
               class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
-    class runs_merger : private noncopyable
+    class basic_runs_merger : private noncopyable
     {
+    protected:
         typedef RunsType_ sorted_runs_type;
         typedef AllocStr_ alloc_strategy;
         typedef typename sorted_runs_type::size_type size_type;
@@ -1032,7 +1033,7 @@ namespace stream
         //! \param r input sorted runs object
         //! \param c comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
-        runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
+        basic_runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             sruns(r),
             cmp(c),
             elements_remaining(sruns.elements),
@@ -1050,7 +1051,16 @@ namespace stream
             , last_element(cmp.min_value())
 #endif //STXXL_CHECK_ORDER_IN_SORTS
         {
+            initialize(r, memory_to_use);
+        }
+
+    protected:
+        void initialize(const sorted_runs_type & r, unsigned_type memory_to_use)
+        {
             sort_helper::verify_sentinel_strict_weak_ordering(cmp);
+
+            sruns = r;
+            elements_remaining = r.elements;
 
             if (empty())
                 return;
@@ -1058,7 +1068,7 @@ namespace stream
             if (!sruns.small_.empty()) // we have a small input < B,
             // that is kept in the main memory
             {
-                STXXL_VERBOSE1("runs_merger: small input optimization, input length: " << elements_remaining);
+                STXXL_VERBOSE1("basic_runs_merger: small input optimization, input length: " << elements_remaining);
                 assert(elements_remaining == size_type(sruns.small_.size()));
                 current_block = new out_block_type;
                 std::copy(sruns.small_.begin(), sruns.small_.end(), current_block->begin());
@@ -1179,13 +1189,14 @@ namespace stream
             buffer_pos = 1;
         }
 
+    public:
         //! \brief Standard stream method
         bool empty() const
         {
             return elements_remaining == 0;
         }
         //! \brief Standard stream method
-        runs_merger & operator ++ () // preincrement operator
+        basic_runs_merger & operator ++ ()  // preincrement operator
         {
             assert(!empty());
 
@@ -1239,7 +1250,7 @@ namespace stream
 
         //! \brief Destructor
         //! \remark Deallocates blocks of the input sorted runs object
-        virtual ~runs_merger()
+        virtual ~basic_runs_merger()
         {
             deallocate_prefetcher();
 
@@ -1250,7 +1261,7 @@ namespace stream
 
 
     template <class RunsType_, class Cmp_, class AllocStr_>
-    void runs_merger<RunsType_, Cmp_, AllocStr_>::merge_recursively(unsigned_type memory_to_use)
+    void basic_runs_merger<RunsType_, Cmp_, AllocStr_>::merge_recursively(unsigned_type memory_to_use)
     {
         block_manager * bm = block_manager::get_instance();
         unsigned_type ndisks = config::get_instance()->disks_number();
@@ -1340,7 +1351,7 @@ namespace stream
 
                 if (runs2merge > 1)
                 {
-                    runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, memory_to_use - memory_for_write_buffers);
+                    basic_runs_merger<RunsType_, Cmp_, AllocStr_> merger(cur_runs, cmp, memory_to_use - memory_for_write_buffers);
 
                     {   // make sure everything is being destroyed in right time
                         buf_ostream<block_type, typename run_type::iterator> out(
@@ -1394,6 +1405,36 @@ namespace stream
             sruns = new_runs;
         }
     }
+
+
+    //! \brief Merges sorted runs
+    //!
+    //! Template parameters:
+    //! - \c RunsType_ type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
+    //! - \c Cmp_ type of comparison object used for merging
+    //! - \c AllocStr_ allocation strategy used to allocate the blocks for
+    //! storing intermediate results if several merge passes are required
+    template <class RunsType_,
+              class Cmp_,
+              class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
+    class runs_merger : public basic_runs_merger<RunsType_, Cmp_, AllocStr_>
+    {
+    private:
+        typedef RunsType_ sorted_runs_type;
+        typedef basic_runs_merger<RunsType_, Cmp_, AllocStr_> base;
+        typedef typename base::value_cmp value_cmp;
+        typedef typename base::block_type block_type;
+
+    public:
+        //! \brief Creates a runs merger object
+        //! \param r input sorted runs object
+        //! \param c comparison object
+        //! \param memory_to_use amount of memory available for the merger in bytes
+        runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
+            base(r, c, memory_to_use)
+        {
+        }
+    };
 
 
     ////////////////////////////////////////////////////////////////////////
