@@ -236,13 +236,13 @@ namespace stream
 
         // sort first run
         sort_run(Blocks1, blocks1_length);
-        result_.elements = blocks1_length;
         if (blocks1_length <= block_type::size && input.empty())
         {
             // small input, do not flush it on the disk(s)
             STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
             assert(result_.small_.empty());
             result_.small_.insert(result_.small_.end(), Blocks1[0].begin(), Blocks1[0].begin() + blocks1_length);
+            result_.elements = blocks1_length;
             delete[] Blocks1;
             return;
         }
@@ -261,8 +261,6 @@ namespace stream
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-        result_.runs_sizes.push_back(blocks1_length);
-
         // fill the rest of the last block with max values
         fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
 
@@ -272,7 +270,9 @@ namespace stream
             write_reqs[i] = Blocks1[i].write(run[i].bid);
             //STXXL_MSG("BID: "<<run[i].bid<<" val: "<<run[i].value);
         }
-        result_.runs.push_back(run); // #
+        result_.runs.push_back(run);
+        result_.runs_sizes.push_back(blocks1_length);
+        result_.elements += blocks1_length;
 
         if (input.empty())
         {
@@ -285,7 +285,6 @@ namespace stream
 
         STXXL_VERBOSE1("Filling the second part of the allocated blocks");
         blocks2_length = fetch(Blocks2, 0, el_in_run);
-        result_.elements += blocks2_length;
 
         if (input.empty())
         {
@@ -304,7 +303,6 @@ namespace stream
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
                            );
 
-            result_.runs_sizes[0] = blocks2_length;
             // fill the rest of the last block with max values
             fill_with_max_value(Blocks1, cur_run_size, blocks2_length);
 
@@ -326,6 +324,8 @@ namespace stream
             }
 
             result_.runs[0] = run;
+            result_.runs_sizes[0] = blocks2_length;
+            result_.elements = blocks2_length;
 
             wait_all(write_reqs, write_reqs + m2);
             delete[] write_reqs;
@@ -358,11 +358,11 @@ namespace stream
 
         result_.runs.push_back(run);
         result_.runs_sizes.push_back(blocks2_length);
+        result_.elements += blocks2_length;
 
         while (!input.empty())
         {
             blocks1_length = fetch(Blocks1, 0, el_in_run);
-            result_.elements += blocks1_length;
             sort_run(Blocks1, blocks1_length);
             cur_run_size = div_ceil(blocks1_length, block_type::size);  // in blocks
             run.resize(cur_run_size);
@@ -370,8 +370,6 @@ namespace stream
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
                            );
-
-            result_.runs_sizes.push_back(blocks1_length);
 
             // fill the rest of the last block with max values (occurs only on the last run)
             fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
@@ -382,7 +380,9 @@ namespace stream
                 write_reqs[i]->wait();
                 write_reqs[i] = Blocks1[i].write(run[i].bid);
             }
-            result_.runs.push_back(run); // #
+            result_.runs.push_back(run);
+            result_.runs_sizes.push_back(blocks1_length);
+            result_.elements += blocks1_length;
 
             std::swap(Blocks1, Blocks2);
             std::swap(blocks1_length, blocks2_length);
