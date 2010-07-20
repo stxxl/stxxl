@@ -179,8 +179,8 @@ typedef AMI_btree<bkey_t, el_t, less<bkey_t>, key_from_el> u_btree_t;
 
 void init()
 {
-    memset(max_key.keybuf, (std::numeric_limits<char>::max)(), KEY_SIZE);
-    memset(min_key.keybuf, (std::numeric_limits<char>::min)(), KEY_SIZE);
+    memset(max_key.keybuf, (std::numeric_limits<unsigned char>::max)(), KEY_SIZE);
+    memset(min_key.keybuf, (std::numeric_limits<unsigned char>::min)(), KEY_SIZE);
 }
 
 typedef stxxl::map<my_key, my_data, comp_type, NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE> map_type;
