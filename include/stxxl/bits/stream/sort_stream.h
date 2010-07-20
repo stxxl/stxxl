@@ -122,6 +122,21 @@ namespace stream
         unsigned_type m_;         // memory for internal use in blocks
         bool result_computed;     // true iff result is already computed (used in 'result' method)
 
+        //! \brief Fetch data from input into blocks[first_idx,last_idx).
+        unsigned_type fetch(block_type * blocks, unsigned_type first_idx, unsigned_type last_idx)
+        {
+            typename element_iterator_traits<block_type>::element_iterator output =
+                make_element_iterator(blocks, first_idx);
+            unsigned_type curr_idx = first_idx;
+            while (!input.empty() && curr_idx != last_idx) {
+                *output = *input;
+                ++input;
+                ++output;
+                ++curr_idx;
+            }
+            return curr_idx;
+        }
+
         //! \brief Sort a specific run, contained in a sequences of blocks.
         void sort_run(block_type * run, unsigned_type elements)
         {
