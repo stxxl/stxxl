@@ -32,6 +32,7 @@ namespace sort_helper
         assert(cmp(cmp.min_value(), cmp.max_value()));
         assert(!cmp(cmp.max_value(), cmp.min_value()));
         assert(!cmp(cmp.max_value(), cmp.max_value()));
+        STXXL_UNUSED(cmp);
     }
 
     template <typename BIDTp_, typename ValTp_>
