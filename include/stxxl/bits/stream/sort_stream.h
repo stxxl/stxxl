@@ -1411,10 +1411,10 @@ namespace stream
     template <class Input_,
               class Cmp_,
               unsigned BlockSize_ = STXXL_DEFAULT_BLOCK_SIZE(typename Input_::value_type),
-              class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY>
+              class AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
+              class runs_creator_type = runs_creator<Input_, Cmp_, BlockSize_, AllocStr_> >
     class sort : public noncopyable
     {
-        typedef runs_creator<Input_, Cmp_, BlockSize_, AllocStr_> runs_creator_type;
         typedef typename runs_creator_type::sorted_runs_type sorted_runs_type;
         typedef runs_merger<sorted_runs_type, Cmp_, AllocStr_> runs_merger_type;
 
