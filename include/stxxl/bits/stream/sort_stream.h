@@ -175,21 +175,11 @@ namespace stream
         const unsigned_type el_in_run = m2 * block_type::size; // # el in a run
         STXXL_VERBOSE1("runs_creator::compute_result m2=" << m2);
         unsigned_type pos = 0;
+        block_type * Blocks1 = NULL;
 
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
-        block_type * Blocks1 = new block_type[m2 * 2];
+        Blocks1 = new block_type[m2 * 2];
 #else
-#if 0
-        block_type * Blocks1 = new block_type[1];          // allocate only one block first
-                                                           // if needed reallocate
-        while (!input.empty() && pos != block_type::size)
-        {
-            Blocks1[pos / block_type::size][pos % block_type::size] = *input;
-            ++input;
-            ++pos;
-        }
-#endif
-
         while (!input.empty() && pos != block_type::size)
         {
             result_.small_.push_back(*input);
@@ -197,15 +187,11 @@ namespace stream
             ++pos;
         }
 
-        block_type * Blocks1;
-
         if (pos == block_type::size)
-        {   // enlarge/reallocate Blocks1 array
-            block_type * NewBlocks = new block_type[m2 * 2];
-            std::copy(result_.small_.begin(), result_.small_.end(), NewBlocks[0].begin());
+        {
+            Blocks1 = new block_type[m2 * 2];
+            std::copy(result_.small_.begin(), result_.small_.end(), Blocks1[0].begin());
             result_.small_.clear();
-            //delete [] Blocks1;
-            Blocks1 = NewBlocks;
         }
         else
         {
