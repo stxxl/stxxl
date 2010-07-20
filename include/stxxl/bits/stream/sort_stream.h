@@ -188,21 +188,21 @@ namespace stream
         unsigned_type i = 0;
         unsigned_type m2 = m_ / 2;
         const unsigned_type el_in_run = m2 * block_type::size; // # el in a run
-        STXXL_VERBOSE1("runs_creator::compute_result m2=" << m2);
-        unsigned_type pos = 0;
+        STXXL_VERBOSE1("basic_runs_creator::compute_result m2=" << m2);
+        unsigned_type blocks1_length = 0, blocks2_length = 0;
         block_type * Blocks1 = NULL;
 
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
         Blocks1 = new block_type[m2 * 2];
 #else
-        while (!input.empty() && pos != block_type::size)
+        while (!input.empty() && blocks1_length != block_type::size)
         {
             result_.small_.push_back(*input);
             ++input;
-            ++pos;
+            ++blocks1_length;
         }
 
-        if (pos == block_type::size)
+        if (blocks1_length == block_type::size && !input.empty())
         {
             Blocks1 = new block_type[m2 * 2];
             std::copy(result_.small_.begin(), result_.small_.end(), Blocks1[0].begin());
@@ -210,35 +210,35 @@ namespace stream
         }
         else
         {
-            STXXL_VERBOSE1("runs_creator: Small input optimization, input length: " << pos);
-            result_.elements = pos;
+            STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
+            result_.elements = blocks1_length;
             std::sort(result_.small_.begin(), result_.small_.end(), cmp);
             return;
         }
 #endif //STXXL_SMALL_INPUT_PSORT_OPT
 
-        pos = fetch(Blocks1, pos, el_in_run);
+        // the first block may be there already
+        blocks1_length = fetch(Blocks1, blocks1_length, el_in_run);
 
         // sort first run
-        sort_run(Blocks1, pos);
-        result_.elements = pos;
-        if (pos < block_type::size && input.empty()) // small input, do not flush it on the disk(s)
+        sort_run(Blocks1, blocks1_length);
+        result_.elements = blocks1_length;
+        if (blocks1_length <= block_type::size && input.empty())
         {
-            STXXL_VERBOSE1("runs_creator: Small input optimization, input length: " << pos);
+            // small input, do not flush it on the disk(s)
+            STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
             assert(result_.small_.empty());
-            result_.small_.insert(result_.small_.end(), Blocks1[0].begin(), Blocks1[0].begin() + pos);
+            result_.small_.insert(result_.small_.end(), Blocks1[0].begin(), Blocks1[0].begin() + blocks1_length);
             delete[] Blocks1;
             return;
         }
-
 
         block_type * Blocks2 = Blocks1 + m2;
         block_manager * bm = block_manager::get_instance();
         request_ptr * write_reqs = new request_ptr[m2];
         run_type run;
 
-
-        unsigned_type cur_run_size = div_ceil(pos, block_type::size); // in blocks
+        unsigned_type cur_run_size = div_ceil(blocks1_length, block_type::size);  // in blocks
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(),
                        trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
@@ -247,12 +247,11 @@ namespace stream
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-        result_.runs_sizes.push_back(pos);
+        result_.runs_sizes.push_back(blocks1_length);
 
         // fill the rest of the last block with max values
-        for ( ; pos != el_in_run; ++pos)
-            Blocks1[pos / block_type::size][pos % block_type::size] = cmp.max_value();
-
+        for ( ; blocks1_length != el_in_run; ++blocks1_length)
+            Blocks1[blocks1_length / block_type::size][blocks1_length % block_type::size] = cmp.max_value();
 
         for (i = 0; i < cur_run_size; ++i)
         {
@@ -272,30 +271,30 @@ namespace stream
         }
 
         STXXL_VERBOSE1("Filling the second part of the allocated blocks");
-        pos = fetch(Blocks2, 0, el_in_run);
-        result_.elements += pos;
+        blocks2_length = fetch(Blocks2, 0, el_in_run);
+        result_.elements += blocks2_length;
 
         if (input.empty())
         {
+            // optimization if the whole set fits into both halves
             // (re)sort internally and return
-            pos += el_in_run;
-            sort_run(Blocks1, pos); // sort first an second run together
+            blocks2_length += el_in_run;
+            sort_run(Blocks1, blocks2_length);  // sort first an second run together
             wait_all(write_reqs, write_reqs + cur_run_size);
             bm->delete_blocks(trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
                               trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end()));
 
-            cur_run_size = div_ceil(pos, block_type::size);
+            cur_run_size = div_ceil(blocks2_length, block_type::size);
             run.resize(cur_run_size);
             bm->new_blocks(AllocStr_(),
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
                            );
 
-            result_.runs_sizes[0] = pos;
+            result_.runs_sizes[0] = blocks2_length;
             // fill the rest of the last block with max values
-            for ( ; pos != 2 * el_in_run; ++pos)
-                Blocks1[pos / block_type::size][pos % block_type::size] = cmp.max_value();
-
+            for ( ; blocks2_length != 2 * el_in_run; ++blocks2_length)
+                Blocks1[blocks2_length / block_type::size][blocks2_length % block_type::size] = cmp.max_value();
 
             assert(cur_run_size > m2);
 
@@ -326,9 +325,11 @@ namespace stream
             return;
         }
 
-        sort_run(Blocks2, pos);
+        // more than 2 runs can be filled, i. e. the general case
 
-        cur_run_size = div_ceil(pos, block_type::size); // in blocks
+        sort_run(Blocks2, blocks2_length);
+
+        cur_run_size = div_ceil(blocks2_length, block_type::size);  // in blocks
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(),
                        trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
@@ -341,28 +342,28 @@ namespace stream
             write_reqs[i]->wait();
             write_reqs[i] = Blocks2[i].write(run[i].bid);
         }
-        assert((pos % el_in_run) == 0);
+        assert((blocks2_length % el_in_run) == 0);
 
         result_.runs.push_back(run);
-        result_.runs_sizes.push_back(pos);
+        result_.runs_sizes.push_back(blocks2_length);
 
         while (!input.empty())
         {
-            pos = fetch(Blocks1, 0, el_in_run);
-            result_.elements += pos;
-            sort_run(Blocks1, pos);
-            cur_run_size = div_ceil(pos, block_type::size); // in blocks
+            blocks1_length = fetch(Blocks1, 0, el_in_run);
+            result_.elements += blocks1_length;
+            sort_run(Blocks1, blocks1_length);
+            cur_run_size = div_ceil(blocks1_length, block_type::size);  // in blocks
             run.resize(cur_run_size);
             bm->new_blocks(AllocStr_(),
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
                            );
 
-            result_.runs_sizes.push_back(pos);
+            result_.runs_sizes.push_back(blocks1_length);
 
             // fill the rest of the last block with max values (occurs only on the last run)
-            for ( ; pos != el_in_run; ++pos)
-                Blocks1[pos / block_type::size][pos % block_type::size] = cmp.max_value();
+            for ( ; blocks1_length != el_in_run; ++blocks1_length)
+                Blocks1[blocks1_length / block_type::size][blocks1_length % block_type::size] = cmp.max_value();
 
 
             for (i = 0; i < cur_run_size; ++i)
