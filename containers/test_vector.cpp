@@ -29,6 +29,8 @@ struct element  // 24 bytes, not a power of 2 intentionally
     element & operator = (stxxl::int64 i)
     {
         key = i;
+        load0 = i + 42;
+        load1 = i ^ 42;
         return *this;
     }
 
