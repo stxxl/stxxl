@@ -252,7 +252,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
                      ", required for r/w buffers: " << min_num_read_write_buffers <<
                      ", required for buckets: 2, nbuckets: " << nbuckets);
-        abort();
+        throw bad_parameter("stxxl::stable_ksort(): INSUFFICIENT MEMORY provided, please increase parameter 'M'");
     }
     STXXL_VERBOSE_STABLE_KSORT("Elements to sort: " << (last - first));
     STXXL_VERBOSE_STABLE_KSORT("Number of buckets has to be reduced from " << nmaxbuckets << " to " << nbuckets);

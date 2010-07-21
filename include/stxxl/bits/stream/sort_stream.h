@@ -1094,7 +1094,7 @@ namespace stream
                 // insufficient memory, can not merge at all
                 if (input_buffers < min_prefetch_buffers + 2) {
                     STXXL_ERRMSG("The merger requires memory to store at least two blocks internally. Aborting.");
-                    abort();
+                    throw bad_parameter("basic_runs_merger::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
                 }
 
                 merge_recursively(memory_to_use);

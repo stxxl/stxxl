@@ -131,8 +131,7 @@ namespace parallel
 #elif defined(__MCSTL__)
         return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, length, false);
 #else
-        assert(0);
-        abort();
+#error "no implementation found for multiway_merge()"
 #endif
     }
 
@@ -160,8 +159,7 @@ namespace parallel
 #elif defined(__MCSTL__)
         return mcstl::multiway_merge_sentinel(seqs_begin, seqs_end, target, comp, length, false);
 #else
-        assert(0);
-        abort();
+#error "no implementation found for multiway_merge_sentinel()"
 #endif
     }
 
