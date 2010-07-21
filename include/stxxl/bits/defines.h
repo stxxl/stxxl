@@ -67,4 +67,11 @@
 // used in: algo/*sort.h, stream/sort_stream.h, containers/priority_queue.h
 // effect if set to 1: perform additional checking of sorted results
 
+//#define STXXL_NO_WARN_RECURSIVE_SORT
+// default: not defined
+// used in: algo/sort_base.h
+// affects: programs
+// effect if defined: does not print error messages about possibly inefficient
+//          recursive merging
+
 #endif // !STXXL_DEFINES_HEADER
