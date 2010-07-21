@@ -1058,11 +1058,12 @@ namespace stream
             if (empty())
                 return;
 
-            if (!sruns.small_.empty()) // we have a small input < B,
+            if (!sruns.small_.empty())  // we have a small input <= B,
             // that is kept in the main memory
             {
                 STXXL_VERBOSE1("basic_runs_merger: small input optimization, input length: " << elements_remaining);
                 assert(elements_remaining == size_type(sruns.small_.size()));
+                assert(sruns.small_.size() <= out_block_type::size);
                 current_block = new out_block_type;
                 std::copy(sruns.small_.begin(), sruns.small_.end(), current_block->begin());
                 current_value = current_block->elem[0];
@@ -1089,11 +1090,16 @@ namespace stream
                 STXXL_WARNMSG_RECURSIVE_SORT("The implementation of sort requires more than one merge pass, therefore for a better");
                 STXXL_WARNMSG_RECURSIVE_SORT("efficiency decrease block size of run storage (a parameter of the run_creator)");
                 STXXL_WARNMSG_RECURSIVE_SORT("or increase the amount memory dedicated to the merger.");
-                STXXL_WARNMSG_RECURSIVE_SORT("m = " << input_buffers << " nruns=" << nruns << " prefetch_blocks=" << min_prefetch_buffers);
+                STXXL_WARNMSG_RECURSIVE_SORT("m=" << input_buffers << " nruns=" << nruns << " prefetch_blocks=" << min_prefetch_buffers);
 
-                // insufficient memory, can not merge at all
-                if (input_buffers < min_prefetch_buffers + 2) {
-                    STXXL_ERRMSG("The merger requires memory to store at least two blocks internally. Aborting.");
+                // check whether we have enough memory to merge recursively
+                unsigned_type recursive_merge_buffers = memory_to_use / block_type::raw_size;
+                if (recursive_merge_buffers < 2 * min_prefetch_buffers + 1 + 2) {
+                    // recursive merge uses min_prefetch_buffers for input buffering and min_prefetch_buffers output buffering
+                    // as well as 1 current output block and at least 2 input blocks
+                    STXXL_ERRMSG("There are only m=" << recursive_merge_buffers << " blocks available for recursive merging, but "
+                                 << min_prefetch_buffers << "+" << min_prefetch_buffers << "+1 are needed read-ahead/write-back/output, and");
+                    STXXL_ERRMSG("the merger requires memory to store at least two input blocks internally. Aborting.");
                     throw bad_parameter("basic_runs_merger::sort(): INSUFFICIENT MEMORY provided, please increase parameter 'memory_to_use'");
                 }
 

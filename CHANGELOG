@@ -54,6 +54,8 @@ Version 1.3
     typed_block<>::has_filler -> !typed_block<>::has_only_data
     file::delete_region -> file::discard
     vector::alloc_strategy -> vector::alloc_strategy_type
+  - stxxl::sort(..., M) and stxxl::stream::sort(..., M) now adhere to to the memory limit M
+    more strictly and throw errors instead of overallocating
   - Execute completion handler before notifying waiters, so far after. 
 * Deprecated methods:
   - stxxl::stats::reset(), stxxl:.stats::_reset_io_wait_time():
