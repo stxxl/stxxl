@@ -351,8 +351,7 @@ namespace ksort_local
     {
         typedef typename block_type::value_type value_type;
 
-        //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns);
-        STXXL_MSG("check_sorted_runs  Runs: " << nruns);
+        STXXL_MSG("check_ksorted_runs  Runs: " << nruns);
         unsigned_type irun = 0;
         for (irun = 0; irun < nruns; ++irun)
         {

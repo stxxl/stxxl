@@ -825,7 +825,7 @@ namespace stream
     //! \param cmp comparison object used for checking the order of elements in runs
     //! \return \c true if runs are sorted, \c false otherwise
     template <class RunsType_, class Cmp_>
-    bool check_sorted_runs(RunsType_ & sruns, Cmp_ cmp)
+    bool check_sorted_runs(const RunsType_ & sruns, Cmp_ cmp)
     {
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         typedef typename RunsType_::block_type block_type;
