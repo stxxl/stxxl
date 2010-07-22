@@ -27,6 +27,12 @@ tests: lib
 	$(NICE) $(MAKE) -f Makefile tests_$(MODE) $(if $(PMODE),tests_$(MODE)_pmode) $(if $(MCSTL),tests_$(MODE)_mcstl)
 	find . -name \*.d -exec grep -H '\.\..*:' {} + ; test $$? = 1
 
+localtests: lib
+	$(NICE) $(MAKE) -f Makefile tests_$(MODE) $(if $(PMODE),tests_$(MODE)_pmode) $(if $(MCSTL),tests_$(MODE)_mcstl) SUBDIRS=local
+
+localclean:
+	$(MAKE) -C local clean
+
 examples: lib
 	$(MAKE) -C doc/tutorial/examples clean
 	$(MAKE) -C doc/tutorial/examples all STXXL_MK=stxxl$(MODESUFFIX).mk
