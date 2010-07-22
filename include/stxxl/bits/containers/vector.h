@@ -858,6 +858,14 @@ public:
             _cache = new simple_vector<block_type>(n_pages * page_size);
     }
 
+    // allows to free the cache, but you may not access any element until call allocate_pacge_cache() again
+    void deallocate_page_cache() const
+    {
+        flush();
+        delete _cache;
+        _cache = NULL;
+    }
+
     size_type capacity() const
     {
         return size_type(_bids.size()) * block_type::size;
