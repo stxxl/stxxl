@@ -15,6 +15,8 @@
 
 #include <vector>
 #include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/typed_block.h>
+#include <stxxl/bits/algo/adaptor.h>
 
 
 __STXXL_BEGIN_NAMESPACE
