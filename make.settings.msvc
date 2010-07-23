@@ -211,7 +211,8 @@ STREAM_FILES	 = \
 	$(HEADER_PATH)/stream/stream.h \
 	$(HEADER_PATH)/stream/sort_stream.h \
 	$(HEADER_PATH)/stream/choose.h \
-	$(HEADER_PATH)/stream/unique.h
+	$(HEADER_PATH)/stream/unique.h \
+	$(HEADER_PATH)/stream/sorted_runs.h
 
 ###################################################################
 

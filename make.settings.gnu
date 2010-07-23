@@ -355,6 +355,7 @@ HEADER_FILES_ALGO	+= losertree.h scan.h stable_ksort.h random_shuffle.h
 
 HEADER_FILES_STREAM	+= stream.h sort_stream.h
 HEADER_FILES_STREAM	+= choose.h unique.h
+HEADER_FILES_STREAM	+= sorted_runs.h
 
 HEADER_FILES_UTILS	+= malloc.h
 
