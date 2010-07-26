@@ -40,7 +40,7 @@ MISC_BINDIR	?= $(DISKBENCH_BINDIR)/../misc
 DISKBENCH	?= benchmark_disks.stxxl.bin
 SCATTERINPLACE	?= iobench_scatter_in_place.stxxl.bin
 
-ECHO		?= /bin/echo
+ECHO		?= echo
 pipefail	?= set -o pipefail;
 
 $(foreach d,$(DISKS_1by1),$(eval DISKS_$d ?= $d))

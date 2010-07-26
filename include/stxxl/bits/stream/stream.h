@@ -149,7 +149,7 @@ namespace stream
         typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
 
         vector_iterator2stream(InputIterator_ begin, InputIterator_ end, unsigned_type nbuffers = 0) :
-            current_(begin), end_(end), in(NULL)
+            current_(begin), end_(end), in(static_cast<buf_istream_type *>(NULL))
         {
             begin.flush();     // flush container
             typename InputIterator_::bids_container_iterator end_iter = end.bid() + ((end.block_offset()) ? 1 : 0);
@@ -667,7 +667,8 @@ namespace stream
     //! - \c Input4_ type of the 4th input
     //! - \c Input5_ type of the 5th input
     //! - \c Input6_ type of the 6th input
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_ = Stopper,
               class Input3_ = Stopper,
               class Input4_ = Stopper,
@@ -676,7 +677,7 @@ namespace stream
               >
     class transform
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
         Input3_ & i3;
@@ -693,10 +694,13 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_, Input5_ & i6_) :
-            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_),
-            current(op(*i1, *i2, *i3, *i4, *i5, *i6)) { }
+            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
+        {
+            if (!empty())
+                current = op(*i1, *i2, *i3, *i4, *i5, *i6);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -718,10 +722,8 @@ namespace stream
             ++i4;
             ++i5;
             ++i6;
-
             if (!empty())
                 current = op(*i1, *i2, *i3, *i4, *i5, *i6);
-
 
             return *this;
         }
@@ -747,10 +749,12 @@ namespace stream
     //! adaptable functor that takes 1 parameter)
     //! - \c Input1_ type of the input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_>
+    template <class Operation_,
+              class Input1_
+              >
     class transform<Operation_, Input1_, Stopper, Stopper, Stopper, Stopper, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
 
     public:
@@ -762,8 +766,11 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_) : op(o), i1(i1_),
-                                                 current(op(*i1)) { }
+        transform(Operation_ & o, Input1_ & i1_) : op(o), i1(i1_)
+        {
+            if (!empty())
+                current = op(*i1);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -782,7 +789,6 @@ namespace stream
             ++i1;
             if (!empty())
                 current = op(*i1);
-
 
             return *this;
         }
@@ -807,12 +813,13 @@ namespace stream
     //! - \c Input1_ type of the 1st input
     //! - \c Input2_ type of the 2nd input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_
               >
     class transform<Operation_, Input1_, Input2_, Stopper, Stopper, Stopper, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
 
@@ -825,8 +832,11 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_) : op(o), i1(i1_), i2(i2_),
-                                                                current(op(*i1, *i2)) { }
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_) : op(o), i1(i1_), i2(i2_)
+        {
+            if (!empty())
+                current = op(*i1, *i2);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -846,7 +856,6 @@ namespace stream
             ++i2;
             if (!empty())
                 current = op(*i1, *i2);
-
 
             return *this;
         }
@@ -872,13 +881,14 @@ namespace stream
     //! - \c Input2_ type of the 2nd input
     //! - \c Input3_ type of the 3rd input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_,
               class Input3_
               >
     class transform<Operation_, Input1_, Input2_, Input3_, Stopper, Stopper, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
         Input3_ & i3;
@@ -892,9 +902,12 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_) :
-            op(o), i1(i1_), i2(i2_), i3(i3_),
-            current(op(*i1, *i2, *i3)) { }
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_) :
+            op(o), i1(i1_), i2(i2_), i3(i3_)
+        {
+            if (!empty())
+                current = op(*i1, *i2, *i3);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -915,7 +928,6 @@ namespace stream
             ++i3;
             if (!empty())
                 current = op(*i1, *i2, *i3);
-
 
             return *this;
         }
@@ -942,14 +954,15 @@ namespace stream
     //! - \c Input3_ type of the 3rd input
     //! - \c Input4_ type of the 4th input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_,
               class Input3_,
               class Input4_
               >
     class transform<Operation_, Input1_, Input2_, Input3_, Input4_, Stopper, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
         Input3_ & i3;
@@ -964,9 +977,12 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_) :
-            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_),
-            current(op(*i1, *i2, *i3, *i4)) { }
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_) :
+            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_)
+        {
+            if (!empty())
+                current = op(*i1, *i2, *i3, *i4);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -988,7 +1004,6 @@ namespace stream
             ++i4;
             if (!empty())
                 current = op(*i1, *i2, *i3, *i4);
-
 
             return *this;
         }
@@ -1016,7 +1031,8 @@ namespace stream
     //! - \c Input4_ type of the 4th input
     //! - \c Input5_ type of the 5th input
     //! \remark This is a specialization of \c transform .
-    template <class Operation_, class Input1_,
+    template <class Operation_,
+              class Input1_,
               class Input2_,
               class Input3_,
               class Input4_,
@@ -1024,7 +1040,7 @@ namespace stream
               >
     class transform<Operation_, Input1_, Input2_, Input3_, Input4_, Input5_, Stopper>
     {
-        Operation_ op;
+        Operation_ & op;
         Input1_ & i1;
         Input2_ & i2;
         Input3_ & i3;
@@ -1040,10 +1056,13 @@ namespace stream
 
     public:
         //! \brief Construction
-        transform(Operation_ o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
+        transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_) :
-            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_),
-            current(op(*i1, *i2, *i3, *i4, *i5)) { }
+            op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
+        {
+            if (!empty())
+                current = op(*i1, *i2, *i3, *i4, *i5);
+        }
 
         //! \brief Standard stream method
         const value_type & operator * () const
@@ -1066,7 +1085,6 @@ namespace stream
             ++i5;
             if (!empty())
                 current = op(*i1, *i2, *i3, *i4, *i5);
-
 
             return *this;
         }
@@ -1159,7 +1177,6 @@ namespace stream
             if (!empty())
                 current = value_type(*i1, *i2, *i3, *i4, *i5, *i6);
 
-
             return *this;
         }
 
@@ -1230,7 +1247,6 @@ namespace stream
             if (!empty())
                 current = value_type(*i1, *i2);
 
-
             return *this;
         }
 
@@ -1299,7 +1315,6 @@ namespace stream
 
             if (!empty())
                 current = value_type(*i1, *i2, *i3);
-
 
             return *this;
         }
@@ -1375,7 +1390,6 @@ namespace stream
 
             if (!empty())
                 current = value_type(*i1, *i2, *i3, *i4);
-
 
             return *this;
         }
@@ -1460,7 +1474,6 @@ namespace stream
             if (!empty())
                 current = value_type(*i1, *i2, *i3, *i4, *i5);
 
-
             return *this;
         }
 
@@ -1473,443 +1486,15 @@ namespace stream
     };
 
 
-    ////////////////////////////////////////////////////////////////////////
-    //     CHOOSE                                                         //
-    ////////////////////////////////////////////////////////////////////////
-
-    template <class Input_, int Which>
-    class choose
-    { };
-
-    //! \brief Creates stream from a tuple stream taking the first component of each tuple
-    //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
-    //!
-    //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-    template <class Input_>
-    class choose<Input_, 1>
-    {
-        Input_ & in;
-
-        typedef typename Input_::value_type tuple_type;
-
-    public:
-        //! \brief Standard stream typedef
-        typedef typename tuple_type::first_type value_type;
-
-    private:
-        value_type current;
-
-    public:
-        //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).first) { }
-
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        choose & operator ++ ()
-        {
-            ++in;
-
-            if (!empty())
-                current = (*in).first;
-
-
-            return *this;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return in.empty();
-        }
-    };
-
-    //! \brief Creates stream from a tuple stream taking the second component of each tuple
-    //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
-    //!
-    //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-    template <class Input_>
-    class choose<Input_, 2>
-    {
-        Input_ & in;
-
-        typedef typename Input_::value_type tuple_type;
-
-    public:
-        //! \brief Standard stream typedef
-        typedef typename tuple_type::second_type value_type;
-
-    private:
-        value_type current;
-
-    public:
-        //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).second) { }
-
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        choose & operator ++ ()
-        {
-            ++in;
-
-            if (!empty())
-                current = (*in).second;
-
-
-            return *this;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return in.empty();
-        }
-    };
-
-    //! \brief Creates stream from a tuple stream taking the third component of each tuple
-    //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
-    //!
-    //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-    template <class Input_>
-    class choose<Input_, 3>
-    {
-        Input_ & in;
-
-        typedef typename Input_::value_type tuple_type;
-
-    public:
-        //! \brief Standard stream typedef
-        typedef typename tuple_type::third_type value_type;
-
-    private:
-        value_type current;
-
-    public:
-        //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).third) { }
-
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        choose & operator ++ ()
-        {
-            ++in;
-
-            if (!empty())
-                current = (*in).third;
-
-
-            return *this;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return in.empty();
-        }
-    };
-
-    //! \brief Creates stream from a tuple stream taking the fourth component of each tuple
-    //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
-    //!
-    //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-    template <class Input_>
-    class choose<Input_, 4>
-    {
-        Input_ & in;
-
-        typedef typename Input_::value_type tuple_type;
-
-    public:
-        //! \brief Standard stream typedef
-        typedef typename tuple_type::fourth_type value_type;
-
-    private:
-        value_type current;
-
-    public:
-        //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).fourth) { }
-
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        choose & operator ++ ()
-        {
-            ++in;
-
-            if (!empty())
-                current = (*in).fourth;
-
-
-            return *this;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return in.empty();
-        }
-    };
-
-    //! \brief Creates stream from a tuple stream taking the fifth component of each tuple
-    //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
-    //!
-    //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-    template <class Input_>
-    class choose<Input_, 5>
-    {
-        Input_ & in;
-
-        typedef typename Input_::value_type tuple_type;
-
-    public:
-        //! \brief Standard stream typedef
-        typedef typename tuple_type::fifth_type value_type;
-
-    private:
-        value_type current;
-
-    public:
-        //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).fifth) { }
-
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        choose & operator ++ ()
-        {
-            ++in;
-
-            if (!empty())
-                current = (*in).fifth;
-
-
-            return *this;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return in.empty();
-        }
-    };
-
-    //! \brief Creates stream from a tuple stream taking the sixth component of each tuple
-    //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
-    //!
-    //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
-    template <class Input_>
-    class choose<Input_, 6>
-    {
-        Input_ & in;
-
-        typedef typename Input_::value_type tuple_type;
-
-    public:
-        //! \brief Standard stream typedef
-        typedef typename tuple_type::sixth_type value_type;
-
-    private:
-        value_type current;
-
-    public:
-        //! \brief Construction
-        choose(Input_ & in_) :
-            in(in_),
-            current((*in_).sixth) { }
-
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        choose & operator ++ ()
-        {
-            ++in;
-
-            if (!empty())
-                current = (*in).sixth;
-
-
-            return *this;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const
-        {
-            return in.empty();
-        }
-    };
-
-
-    ////////////////////////////////////////////////////////////////////////
-    //     UNIQUE                                                         //
-    ////////////////////////////////////////////////////////////////////////
-
-    //! \brief Equivalent to std::unique algorithms
-    //!
-    //! Removes consecutive duplicates from the stream.
-    //! Uses BinaryPredicate to compare elements of the stream
-    template <class Input, class BinaryPredicate = Stopper>
-    class unique
-    {
-        Input & input;
-        BinaryPredicate binary_pred;
-        typename Input::value_type current;
-
-    public:
-        typedef typename Input::value_type value_type;
-        unique(Input & input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
-        {
-            if (!input.empty())
-                current = *input;
-        }
-
-        //! \brief Standard stream method
-        unique & operator ++ ()
-        {
-            value_type old_value = current;
-            ++input;
-            while (!input.empty() && (binary_pred(current = *input, old_value)))
-                ++input;
-        }
-        //! \brief Standard stream method
-        const value_type & operator * () const
-        {
-            return current;
-        }
-
-        //! \brief Standard stream method
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const { return input.empty(); }
-    };
-
-    //! \brief Equivalent to std::unique algorithms
-    //!
-    //! Removes consecutive duplicates from the stream.
-    template <class Input>
-    class unique<Input, Stopper>
-    {
-        Input & input;
-        typename Input::value_type current;
-
-    public:
-        typedef typename Input::value_type value_type;
-        unique(Input & input_) : input(input_)
-        {
-            if (!input.empty())
-                current = *input;
-        }
-        //! \brief Standard stream method
-        unique & operator ++ ()
-        {
-            value_type old_value = current;
-            ++input;
-            while (!input.empty() && ((current = *input) == old_value))
-                ++input;
-        }
-        //! \brief Standard stream method
-        value_type & operator * () const
-        {
-            return current;
-        }
-
-        //! \brief Standard stream method
-        const value_type * operator -> () const
-        {
-            return &current;
-        }
-
-        //! \brief Standard stream method
-        bool empty() const { return input.empty(); }
-    };
-
-
 //! \}
 }
 
 __STXXL_END_NAMESPACE
+
+
+#include <stxxl/bits/stream/choose.h>
+#include <stxxl/bits/stream/unique.h>
+
 
 #endif // !STXXL_STREAM_HEADER
 // vim: et:ts=4:sw=4

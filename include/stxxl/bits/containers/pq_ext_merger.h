@@ -593,16 +593,16 @@ namespace priority_queue_local
 #if STXXL_CHECK_ORDER_IN_SORTS
                 if (!is_sentinel(*seqs.back().first) && !stxxl::is_sorted(seqs.back().first, seqs.back().second, inv_cmp))
                 {
-                    STXXL_VERBOSE0("length " << i << " " << (seqs.back().second - seqs.back().first));
+                    STXXL_VERBOSE1("length " << i << " " << (seqs.back().second - seqs.back().first));
                     for (value_type * v = seqs.back().first + 1; v < seqs.back().second; ++v)
                     {
                         if (inv_cmp(*v, *(v - 1)))
                         {
-                            STXXL_VERBOSE0("Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v);
+                            STXXL_VERBOSE1("Error at position " << i << "/" << (v - seqs.back().first - 1) << "/" << (v - seqs.back().first) << "   " << *(v - 1) << " " << *v);
                         }
                         if (is_sentinel(*v))
                         {
-                            STXXL_VERBOSE0("Wrong sentinel at position " << (v - seqs.back().first));
+                            STXXL_VERBOSE1("Wrong sentinel at position " << (v - seqs.back().first));
                         }
                     }
                     assert(false);
@@ -718,16 +718,16 @@ namespace priority_queue_local
                             STXXL_VERBOSE1("before " << last_elem << " after " << *seqs[i].first << " newly loaded block " << bid);
                             if (!stxxl::is_sorted(seqs[i].first, seqs[i].second, inv_cmp))
                             {
-                                STXXL_VERBOSE0("length " << i << " " << (seqs[i].second - seqs[i].first));
+                                STXXL_VERBOSE1("length " << i << " " << (seqs[i].second - seqs[i].first));
                                 for (value_type * v = seqs[i].first + 1; v < seqs[i].second; ++v)
                                 {
                                     if (inv_cmp(*v, *(v - 1)))
                                     {
-                                        STXXL_VERBOSE0("Error at position " << i << "/" << (v - seqs[i].first - 1) << "/" << (v - seqs[i].first) << "   " << *(v - 1) << " " << *v);
+                                        STXXL_VERBOSE1("Error at position " << i << "/" << (v - seqs[i].first - 1) << "/" << (v - seqs[i].first) << "   " << *(v - 1) << " " << *v);
                                     }
                                     if (is_sentinel(*v))
                                     {
-                                        STXXL_VERBOSE0("Wrong sentinel at position " << (v - seqs[i].first));
+                                        STXXL_VERBOSE1("Wrong sentinel at position " << (v - seqs[i].first));
                                     }
                                 }
                                 assert(false);

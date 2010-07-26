@@ -781,7 +781,7 @@ private:
     mutable std::vector<int_type> _page_to_slot;
     mutable simple_vector<int_type> _slot_to_page;
     mutable std::queue<int_type> _free_slots;
-    mutable simple_vector<block_type> _cache;
+    mutable simple_vector<block_type> * _cache;
     file * _from;
     block_manager * bm;
     config * cfg;
@@ -815,13 +815,14 @@ public:
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
         _slot_to_page(n_pages),
-        _cache(n_pages * page_size),
+        _cache(NULL),
         _from(NULL),
         exported(false)
     {
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
+        allocate_page_cache();
         int_type all_pages = div_ceil(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
@@ -850,6 +851,21 @@ public:
         std::swap(_from, obj._from);
         std::swap(exported, obj.exported);
     }
+
+    void allocate_page_cache() const
+    {
+        if (!_cache)
+            _cache = new simple_vector<block_type>(n_pages * page_size);
+    }
+
+    // allows to free the cache, but you may not access any element until call allocate_pacge_cache() again
+    void deallocate_page_cache() const
+    {
+        flush();
+        delete _cache;
+        _cache = NULL;
+    }
+
     size_type capacity() const
     {
         return size_type(_bids.size()) * block_type::size;
@@ -1005,7 +1021,7 @@ public:
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
         _slot_to_page(n_pages),
-        _cache(n_pages * page_size),
+        _cache(NULL),
         _from(from),
         exported(false)
     {
@@ -1021,6 +1037,7 @@ public:
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
+        allocate_page_cache();
         int_type all_pages = div_ceil(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
@@ -1050,7 +1067,7 @@ public:
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
         _slot_to_page(n_pages),
-        _cache(n_pages * page_size),
+        _cache(NULL),
         _from(NULL),
         exported(false)
     {
@@ -1058,6 +1075,7 @@ public:
         bm = block_manager::get_instance();
         cfg = config::get_instance();
 
+        allocate_page_cache();
         int_type all_pages = div_ceil(_bids.size(), page_size);
         int_type i = 0;
         for ( ; i < all_pages; ++i)
@@ -1173,8 +1191,8 @@ public:
             int_type page_no = _slot_to_page[i];
             if (non_free_slots[i])
             {
-                STXXL_VERBOSE1("vector: flushing page " << i << " at address " << (int64(page_no) *
-                                                                                 int64(block_type::size) * int64(page_size)));
+                STXXL_VERBOSE1("vector: flushing page " << i << " at address "
+                                                        << (int64(page_no) * int64(block_type::size) * int64(page_size)));
                 write_page(page_no, i);
 
                 _page_to_slot[page_no] = on_disk;
@@ -1204,6 +1222,7 @@ public:
                 _from->set_size(file_length());
             }
         }
+        delete _cache;
     }
 
     //! \brief Export data such that it is persistent on the file system.
@@ -1280,7 +1299,7 @@ private:
         int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
-            reqs[j] = _cache[i].read(_bids[block_no]);
+            reqs[j] = (*_cache)[i].read(_bids[block_no]);
         }
         assert(last_block - page_no * page_size > 0);
         wait_all(reqs, last_block - page_no * page_size);
@@ -1297,7 +1316,7 @@ private:
         int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
-            reqs[j] = _cache[i].write(_bids[block_no]);
+            reqs[j] = (*_cache)[i].write(_bids[block_no]);
         }
         _page_status[page_no] = valid_on_disk;
         assert(last_block - page_no * page_size > 0);
@@ -1336,7 +1355,7 @@ private:
 
                 _page_status[page_no] = dirty;
 
-                return _cache[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
+                return (*_cache)[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
@@ -1350,14 +1369,14 @@ private:
 
                 _page_status[page_no] = dirty;
 
-                return _cache[free_slot * page_size + offset.get_block1()][offset.get_offset()];
+                return (*_cache)[free_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
         {
             _page_status[page_no] = dirty;
             pager.hit(cache_slot);
-            return _cache[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
+            return (*_cache)[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
 
@@ -1420,7 +1439,7 @@ private:
                 write_page(old_page_no, kicked_slot);
                 read_page(page_no, kicked_slot);
 
-                return _cache[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
+                return (*_cache)[kicked_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
             else
             {
@@ -1432,13 +1451,13 @@ private:
 
                 read_page(page_no, free_slot);
 
-                return _cache[free_slot * page_size + offset.get_block1()][offset.get_offset()];
+                return (*_cache)[free_slot * page_size + offset.get_block1()][offset.get_offset()];
             }
         }
         else
         {
             pager.hit(cache_slot);
-            return _cache[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
+            return (*_cache)[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
     }
 };

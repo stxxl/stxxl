@@ -49,9 +49,8 @@ LEDA_SM_LDLIBS			?= -lW -lP -lG -lL -lX11 -lm -lLEDA-SM
 #stack_benchmark.$o:	CPPFLAGS += -DNDEBUG
 #pq_benchmark.$o:	CPPFLAGS += -DNDEBUG
 test_many_stacks.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
-test_ext_merger.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=2
-test_ext_merger2.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=3
-bench_pqueue.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
+test_ext_merger.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
+test_ext_merger2.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1
 
 
 $(TESTS_BDB:=.$(bin)):	CPPFLAGS += $(CPPFLAGS_TPIE) $(CPPFLAGS_BDB)
@@ -72,8 +71,10 @@ ifeq ($(strip $(USE_MCSTL)),yes)
 # PR33361: internal compiler error: in find_outermost_region_in_block, at tree-cfg.c:4803
 # when using g++-4.2 -fopenmp -O3. Fixed in g++-4.3, wontfix in g++-4.2.
 ifneq ($(strip $(USE_BOOST)),yes)
+$(call reduce_optimization,3,2,berkeley_db_benchmark,gcc_version_4.2,32-bit,any)
 $(call reduce_optimization,3,2,test_map,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,2,test_map,gcc_version_4.2,32-bit,any)
+$(call reduce_optimization,3,0,test_map_random,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,0,test_map_random,gcc_version_4.2,32-bit,any)
 $(call reduce_optimization,3,0,btree/test_btree,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,0,btree/test_btree,gcc_version_4.2,32-bit,any)

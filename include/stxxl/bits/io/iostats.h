@@ -379,7 +379,7 @@ public:
 
 #ifndef STXXL_IO_STATS_RESET_FORBIDDEN
     //! \brief Resets I/O time counters (including I/O wait counter)
-    void reset();
+    _STXXL_DEPRECATED(void reset());
 #endif
 
     //! \brief Resets I/O wait time counter

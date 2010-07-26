@@ -138,6 +138,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
     sort_stream_type sort_stream(input_stream, cl, run_size);
 
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
+    assert(o == output.end());
 
     double stop = stxxl::timestamp();
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;

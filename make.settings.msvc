@@ -19,7 +19,6 @@
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = "$(TOPDIR)"#
-include make.settings.local
 
 MAKE = nmake /NOLOGO
 COMPILER = cl
@@ -34,6 +33,7 @@ DEBUG_LINKER = /OPT:REF # debug is off
 
 LIBNAME = stxxl
 
+include make.settings.local
 
 #### TROUBLESHOOTING
 #
@@ -212,7 +212,10 @@ ALGO_FILES	 = \
 
 STREAM_FILES	 = \
 	$(HEADER_PATH)/stream/stream.h \
-	$(HEADER_PATH)/stream/sort_stream.h
+	$(HEADER_PATH)/stream/sort_stream.h \
+	$(HEADER_PATH)/stream/choose.h \
+	$(HEADER_PATH)/stream/unique.h \
+	$(HEADER_PATH)/stream/sorted_runs.h
 
 ###################################################################
 

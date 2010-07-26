@@ -30,6 +30,7 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     typedef typename ExtIterator_::block_type block_type;
 
     STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first));
+    first.flush();
     unsigned_type nblocks = last.bid() - first.bid() + (last.block_offset() ? 1 : 0);
     simple_vector<block_type> blocks(nblocks);
     simple_vector<request_ptr> reqs(nblocks);

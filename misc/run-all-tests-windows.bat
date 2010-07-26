@@ -22,7 +22,7 @@ utils\log2
 utils\off_t_size
 utils\pq_param
 
-io\benchmark_disks 0 2 256 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
+io\benchmark_disks 0 2 32 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 io\flushbuffers 2 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 io\sd_test
 io\test_io "%STXXL_TMPDIR%"
@@ -61,6 +61,7 @@ containers\test_vector
 containers\test_vector_export
 containers\write_vector "%STXXL_TMPDIR%\in" "%STXXL_TMPDIR%\out"
 containers\write_vector2 "%STXXL_TMPDIR%\in" "%STXXL_TMPDIR%\out"
+containers\test_matrix
 containers\test_map 32
 containers\test_map_random 2000
 containers\btree\test_btree 10000

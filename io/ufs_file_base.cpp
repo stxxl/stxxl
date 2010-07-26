@@ -147,8 +147,10 @@ void ufs_file_base::set_size(offset_type newsize)
 #endif
     }
 
+#ifndef BOOST_MSVC
     if (newsize > cur_size)
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
+#endif
 }
 
 void ufs_file_base::remove()

@@ -22,7 +22,7 @@
 #define TINY_PQ 0
 #define MANUAL_PQ 0
 
-#define SIDE_PQ 1	//compare with second, in-memory PQ (needs a lot of memory)
+#define SIDE_PQ 1       // compare with second, in-memory PQ (needs a lot of memory)
 
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
@@ -73,11 +73,10 @@ struct my_type
 
 std::ostream & operator << (std::ostream & o, const my_type & obj)
 {
-    o << obj.key
+    o << obj.key;
 #if LOAD
-                        << "/" << obj.load
+    o << "/" << obj.load;
 #endif
-    ;
     return o;
 }
 
@@ -368,7 +367,7 @@ int main(int argc, char * argv[])
         side_pq.pop();
         if (!(side_pq_least == least))
         {
-            STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+            STXXL_VERBOSE1("" << side_pq_least << " != " << least);
         }
 #endif
         if (cmp(last_least, least))
@@ -393,7 +392,7 @@ int main(int argc, char * argv[])
         side_pq.pop();
         if (!(side_pq_least == least))
         {
-            STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+            STXXL_VERBOSE1("" << side_pq_least << " != " << least);
         }
 #endif
         if (cmp(last_least, least))

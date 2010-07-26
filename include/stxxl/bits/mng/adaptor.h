@@ -618,8 +618,14 @@ namespace helper
 }
 
 template <typename BlockType>
+struct element_iterator_traits
+{
+    typedef typename helper::element_iterator_generator<BlockType, BlockType::has_only_data>::iterator element_iterator;
+};
+
+template <typename BlockType>
 inline
-typename helper::element_iterator_generator<BlockType, BlockType::has_only_data>::iterator
+typename element_iterator_traits<BlockType>::element_iterator
 make_element_iterator(BlockType * blocks, unsigned_type offset)
 {
     helper::element_iterator_generator<BlockType, BlockType::has_only_data> iter_gen;

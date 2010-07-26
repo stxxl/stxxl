@@ -351,8 +351,7 @@ namespace ksort_local
     {
         typedef typename block_type::value_type value_type;
 
-        //STXXL_VERBOSE1("check_sorted_runs  Runs: "<<nruns);
-        STXXL_MSG("check_sorted_runs  Runs: " << nruns);
+        STXXL_MSG("check_ksorted_runs  Runs: " << nruns);
         unsigned_type irun = 0;
         for (irun = 0; irun < nruns; ++irun)
         {
@@ -692,7 +691,7 @@ namespace ksort_local
                       after_runs_creation - begin << " s");
         STXXL_VERBOSE("Time in I/O wait(rf): " << io_wait_after_rf << " s");
         STXXL_VERBOSE(*stats::get_instance());
-        STXXL_UNUSED(begin + io_wait_after_rf);
+        STXXL_UNUSED(begin + after_runs_creation + end + io_wait_after_rf);
 
         return result;
     }

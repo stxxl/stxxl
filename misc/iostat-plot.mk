@@ -55,7 +55,7 @@ IOSTAT_PLOT_IO_WITH_UTILIZATION	?= no
 IOSTAT_PLOT_Y_LABEL.io		?= Bandwidth [MiB/s]
 IOSTAT_PLOT_Y_LABEL.cpu		?= CPU Usage [%]
 
-ECHO				?= /bin/echo
+ECHO				?= echo
 
 # $1 = first, $2 = increment, $3 = last
 define gnuplot-column-sequence-sum

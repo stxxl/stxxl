@@ -49,10 +49,6 @@ __STXXL_END_NAMESPACE
 
 #define _STXXL_NOT_VERBOSE { } _STXXL_ENFORCE_SEMICOLON
 
-#define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
-
-#define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", x, _STXXL_PRINT_FLAGS_ERROR)
-
 
 #ifdef STXXL_FORCE_VERBOSE_LEVEL
 #undef STXXL_VERBOSE_LEVEL
@@ -68,6 +64,22 @@ __STXXL_END_NAMESPACE
 #ifndef STXXL_VERBOSE_LEVEL
 #define STXXL_VERBOSE_LEVEL -1
 #endif
+
+
+#if STXXL_VERBOSE_LEVEL > -10
+ #define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
+#else
+ // Please do not report STXXL problems with STXXL_MSG disabled!
+ #define STXXL_MSG(x) _STXXL_NOT_VERBOSE
+#endif
+
+#if STXXL_VERBOSE_LEVEL > -100
+ #define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", x, _STXXL_PRINT_FLAGS_ERROR)
+#else
+ // Please do not report STXXL problems with STXXL_ERRMSG disabled!
+ #define STXXL_ERRMSG(x) _STXXL_NOT_VERBOSE
+#endif
+
 
 // STXXL_VERBOSE0 should be used for current debugging activity only,
 // and afterwards be replaced by STXXL_VERBOSE1 or higher.

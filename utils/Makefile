@@ -19,11 +19,6 @@ malloc.$(EXEEXT): malloc.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c malloc.cpp $(NDEBUG)
 	$(LINKER) malloc.$(OBJEXT) $(OUT)malloc.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-off_t_size: off_t_size.$(EXEEXT)
-off_t_size.$(EXEEXT): off_t_size.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c off_t_size.cpp $(NDEBUG)
-	$(LINKER) off_t_size.$(OBJEXT) $(OUT)off_t_size.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-
 pq_param: pq_param.$(EXEEXT)
 pq_param.$(EXEEXT): pq_param.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c pq_param.cpp $(NDEBUG)

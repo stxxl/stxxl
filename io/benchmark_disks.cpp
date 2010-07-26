@@ -235,9 +235,9 @@ int main(int argc, char * argv[])
               << block_size << " bytes)" << std::endl;
     timer t_total(true);
     try {
-        while (offset + stxxl::int64(step_size) <= endpos)
+        while (offset + stxxl::int64(step_size) <= endpos || length == 0)
         {
-            const stxxl::int64 current_step_size = std::min<stxxl::int64>(step_size, endpos - offset);
+            const stxxl::int64 current_step_size = (length == 0) ? step_size : std::min<stxxl::int64>(step_size, endpos - offset);
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
             const unsigned current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
 

@@ -64,8 +64,8 @@ int main(int argc, char * argv[])
 
     const int log_nins = atoi(argv[1]);
     if (log_nins > 31) {
-        STXXL_ERRMSG("This test can't to more than 2^31 operations, you requested 2^" << log_nins);
-	return -1;
+        STXXL_ERRMSG("This test can't do more than 2^31 operations, you requested 2^" << log_nins);
+        return -1;
     }
 
     btree_type BTree(1024 * 128, 1024 * 128);

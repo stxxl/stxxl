@@ -62,6 +62,14 @@ struct BID
     explicit BID(const BID<BlockSize> & obj) : storage(obj.storage), offset(obj.offset)
     { }
 
+    template <unsigned BlockSize>
+    BID & operator = (const BID<BlockSize> & obj)
+    {
+        storage = obj.storage;
+        offset = obj.offset;
+        return *this;
+    }
+
     bool is_managed() const
     {
         return storage->get_allocator_id() != file::NO_ALLOCATOR;
