@@ -386,25 +386,25 @@ public:
     _STXXL_DEPRECATED(void _reset_io_wait_time());
 
     // for library use
-    void write_started(unsigned size_, double now = 0.0);
-    void write_canceled(unsigned size_);
+    void write_started(unsigned_type size_, double now = 0.0);
+    void write_canceled(unsigned_type size_);
     void write_finished();
-    void write_cached(unsigned size_);
-    void read_started(unsigned size_, double now = 0.0);
-    void read_canceled(unsigned size_);
+    void write_cached(unsigned_type size_);
+    void read_started(unsigned_type size_, double now = 0.0);
+    void read_canceled(unsigned_type size_);
     void read_finished();
-    void read_cached(unsigned size_);
+    void read_cached(unsigned_type size_);
     void wait_started(wait_op_type wait_op);
     void wait_finished(wait_op_type wait_op);
 };
 
 #if !STXXL_IO_STATS
-inline void stats::write_started(unsigned size_)
+inline void stats::write_started(unsigned_type size_)
 {
     STXXL_UNUSED(size_);
 }
 inline void stats::write_finished() { }
-inline void stats::read_started(unsigned size_)
+inline void stats::read_started(unsigned_type size_)
 {
     STXXL_UNUSED(size_);
 }
