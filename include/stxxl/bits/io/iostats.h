@@ -386,11 +386,11 @@ public:
     _STXXL_DEPRECATED(void _reset_io_wait_time());
 
     // for library use
-    void write_started(unsigned size_);
+    void write_started(unsigned size_, double now = 0.0);
     void write_canceled(unsigned size_);
     void write_finished();
     void write_cached(unsigned size_);
-    void read_started(unsigned size_);
+    void read_started(unsigned size_, double now = 0.0);
     void read_canceled(unsigned size_);
     void read_finished();
     void read_cached(unsigned size_);

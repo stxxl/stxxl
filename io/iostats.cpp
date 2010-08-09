@@ -118,9 +118,10 @@ void stats::reset()
 #endif
 
 #if STXXL_IO_STATS
-void stats::write_started(unsigned size_)
+void stats::write_started(unsigned size_, double now)
 {
-    double now = timestamp();
+    if (now == 0.0)
+    	now = timestamp();
     {
         scoped_mutex_lock WriteLock(write_mutex);
 
@@ -179,9 +180,10 @@ void stats::write_cached(unsigned size_)
     c_volume_written += size_;
 }
 
-void stats::read_started(unsigned size_)
+void stats::read_started(unsigned size_, double now)
 {
-    double now = timestamp();
+    if (now == 0.0)
+    	now = timestamp();
     {
         scoped_mutex_lock ReadLock(read_mutex);
 
