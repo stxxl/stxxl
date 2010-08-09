@@ -121,7 +121,7 @@ void stats::reset()
 void stats::write_started(unsigned_type size_, double now)
 {
     if (now == 0.0)
-    	now = timestamp();
+        now = timestamp();
     {
         scoped_mutex_lock WriteLock(write_mutex);
 
@@ -183,7 +183,7 @@ void stats::write_cached(unsigned_type size_)
 void stats::read_started(unsigned_type size_, double now)
 {
     if (now == 0.0)
-    	now = timestamp();
+        now = timestamp();
     {
         scoped_mutex_lock ReadLock(read_mutex);
 

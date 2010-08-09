@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/benchmark_disks.cpp
+ *  io/verify_disks.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

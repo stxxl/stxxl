@@ -121,7 +121,7 @@ struct run_cursor_cmp
 
     inline bool operator () (const cursor_type & a, const cursor_type & b)      // greater or equal
     {
-        return !((* a.buffer)[a.pos] < (* b.buffer)[b.pos]);
+        return !((*a.buffer)[a.pos] < (*b.buffer)[b.pos]);
     }
 };
 #endif
