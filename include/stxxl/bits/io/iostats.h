@@ -399,14 +399,16 @@ public:
 };
 
 #if !STXXL_IO_STATS
-inline void stats::write_started(unsigned_type size_)
+inline void stats::write_started(unsigned_type size_, double now)
 {
     STXXL_UNUSED(size_);
+    STXXL_UNUSED(now);
 }
 inline void stats::write_finished() { }
-inline void stats::read_started(unsigned_type size_)
+inline void stats::read_started(unsigned_type size_, double now)
 {
     STXXL_UNUSED(size_);
+    STXXL_UNUSED(now);
 }
 inline void stats::read_finished() { }
 #endif
