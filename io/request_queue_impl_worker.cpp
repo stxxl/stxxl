@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/diskqueue.cpp
+ *  io/request_queue_impl_worker.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

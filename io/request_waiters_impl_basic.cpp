@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/basic_waiters_request.cpp
+ *  io/request_waiters_impl_basic.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
