@@ -34,6 +34,10 @@ private:
     mutex queue_mutex;
     queue_type queue;
 
+    state<thread_state> _thread_state;
+    thread_type thread;
+    semaphore sem;
+
     static const priority_op _priority_op = WRITE;
 
     static void * worker(void * arg);

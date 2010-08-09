@@ -36,9 +36,9 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
     }
 };
 
-request_queue_impl_1q::request_queue_impl_1q(int /*n*/)              //  n is ignored
+request_queue_impl_1q::request_queue_impl_1q(int /*n*/) : _thread_state(NOT_RUNNING), sem(0)              //  n is ignored
 {
-    start_thread(worker, static_cast<void *>(this));
+    start_thread(worker, static_cast<void *>(this), thread, _thread_state);
 }
 
 void request_queue_impl_1q::add_request(request_ptr & req)
@@ -89,7 +89,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr & req)
 
 request_queue_impl_1q::~request_queue_impl_1q()
 {
-    stop_thread();
+    stop_thread(thread, _thread_state, sem);
 }
 
 void * request_queue_impl_1q::worker(void * arg)

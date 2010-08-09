@@ -36,6 +36,10 @@ private:
     queue_type write_queue;
     queue_type read_queue;
 
+    state<thread_state> _thread_state;
+    thread_type thread;
+    semaphore sem;
+
     static const priority_op _priority_op = WRITE;
 
     static void * worker(void * arg);
