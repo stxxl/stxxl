@@ -36,8 +36,9 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
     }
 };
 
-request_queue_impl_1q::request_queue_impl_1q(int /*n*/) : _thread_state(NOT_RUNNING), sem(0)              //  n is ignored
+request_queue_impl_1q::request_queue_impl_1q(int n) : _thread_state(NOT_RUNNING), sem(0)
 {
+    STXXL_UNUSED(n);
     start_thread(worker, static_cast<void *>(this), thread, _thread_state);
 }
 
