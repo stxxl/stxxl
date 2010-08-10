@@ -29,11 +29,11 @@ typedef __int64 int64;
 typedef unsigned __int64 uint64;
  #else
 typedef long long int int64;
-typedef unsigned long long uint64;
+typedef unsigned long long int uint64;
  #endif
 #else
 typedef long long int int64;
-typedef unsigned long long uint64;
+typedef unsigned long long int uint64;
 #endif
 
 
@@ -52,17 +52,17 @@ struct choose_int_types<4>  // for 32-bit processors/compilers
 };
 
 template <>
-struct choose_int_types<8> // for 64-bit processors/compilers
+struct choose_int_types<8>  // for 64-bit processors/compilers
 {
-    typedef long long int int_type;
-    typedef long long unsigned unsigned_type;
+    typedef int64 int_type;
+    typedef uint64 unsigned_type;
 };
 
 typedef choose_int_types<my_pointer_size>::int_type int_type;
 typedef choose_int_types<my_pointer_size>::unsigned_type unsigned_type;
 
 typedef unsigned_type internal_size_type;  // fits in internal memory
-typedef uint64 external_size_type;         // may exceed internal memory
+typedef uint64 external_size_type;         // may require external memory
 
 __STXXL_END_NAMESPACE
 
