@@ -663,7 +663,7 @@ namespace priority_queue_local
                     less_equal_than_min_last += (position - seqs[i].first);
                 }
 
-                ptrdiff_t output_size = STXXL_MIN(less_equal_than_min_last, rest); //at most rest elements
+                diff_type output_size = STXXL_MIN(less_equal_than_min_last, rest);  // at most rest elements
 
                 STXXL_VERBOSE1("output_size=" << output_size << " = min(leq_t_ml=" << less_equal_than_min_last << ", rest=" << rest << ")");
 
