@@ -500,7 +500,7 @@ namespace sort_local
               typename alloc_strategy,
               typename input_bid_iterator,
               typename value_cmp>
-    simple_vector<sort_helper::trigger_entry<typename block_type::bid_type, typename block_type::value_type> > *
+    simple_vector<sort_helper::trigger_entry<block_type> > *
     sort_blocks(input_bid_iterator input_bids,
                 unsigned_type _n,
                 unsigned_type _m,
@@ -509,7 +509,7 @@ namespace sort_local
     {
         typedef typename block_type::value_type type;
         typedef typename block_type::bid_type bid_type;
-        typedef sort_helper::trigger_entry<bid_type, type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
         typedef simple_vector<trigger_entry_type> run_type;
         typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 
@@ -701,8 +701,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 
-    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::bid_type,
-                                                     typename ExtIterator_::vector_type::value_type> > run_type;
+    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::block_type> > run_type;
 
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;

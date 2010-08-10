@@ -62,9 +62,8 @@ namespace stream
     public:
         typedef Cmp_ cmp_type;
         typedef typename Input_::value_type value_type;
-        typedef BID<BlockSize_> bid_type;
         typedef typed_block<BlockSize_, value_type> block_type;
-        typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
         typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
 
     private:
@@ -417,9 +416,8 @@ namespace stream
     public:
         typedef Cmp_ cmp_type;
         typedef ValueType_ value_type;
-        typedef BID<BlockSize_> bid_type;
         typedef typed_block<BlockSize_, value_type> block_type;
-        typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
         typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
         typedef sorted_runs_type result_type;
 
@@ -635,9 +633,8 @@ namespace stream
         : private noncopyable
     {
         typedef ValueType_ value_type;
-        typedef BID<BlockSize_> bid_type;
         typedef typed_block<BlockSize_, value_type> block_type;
-        typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
         typedef AllocStr_ alloc_strategy_type;
         Cmp_ cmp;
 

@@ -35,10 +35,11 @@ namespace sort_helper
         STXXL_UNUSED(cmp);
     }
 
-    template <typename BIDTp_, typename ValTp_>
+    template <typename BlockTp_, typename ValTp_ = typename BlockTp_::value_type>
     struct trigger_entry
     {
-        typedef BIDTp_ bid_type;
+        typedef BlockTp_ block_type;
+        typedef typename block_type::bid_type bid_type;
         typedef ValTp_ value_type;
 
         bid_type bid;

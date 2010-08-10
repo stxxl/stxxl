@@ -38,7 +38,7 @@ namespace stream
     {
         typedef ValueType value_type;  // may differ from trigger_entry_type::value_type
         typedef TriggerEntryType trigger_entry_type;
-        typedef typed_block<trigger_entry_type::bid_type::size, value_type> block_type;
+        typedef typename trigger_entry_type::block_type block_type;
         typedef std::vector<trigger_entry_type> run_type;
         typedef stxxl::external_size_type size_type;
 
