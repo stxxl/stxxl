@@ -63,9 +63,7 @@ namespace stream
         {
             block_manager * bm = block_manager::get_instance();
             for (unsigned_type i = 0; i < runs.size(); ++i)
-                bm->delete_blocks(
-                    trigger_entry_iterator<typename run_type::iterator>(runs[i].begin()),
-                    trigger_entry_iterator<typename run_type::iterator>(runs[i].end()));
+                bm->delete_blocks(make_bid_iterator(runs[i].begin()), make_bid_iterator(runs[i].end()));
 
             runs.clear();
         }

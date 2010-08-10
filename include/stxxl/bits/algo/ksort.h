@@ -583,12 +583,9 @@ namespace ksort_local
         if (partial_runs)
             runs[i] = new run_type(_n - full_runs * m2);
 
-
         for (i = 0; i < nruns; i++)
         {
-            mng->new_blocks(alloc_strategy(),
-                            trigger_entry_iterator<typename run_type::iterator>(runs[i]->begin()),
-                            trigger_entry_iterator<typename run_type::iterator>(runs[i]->end()));
+            mng->new_blocks(alloc_strategy(), make_bid_iterator(runs[i]->begin()), make_bid_iterator(runs[i]->end()));
         }
 #endif
 

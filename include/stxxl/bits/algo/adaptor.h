@@ -234,6 +234,14 @@ struct trigger_entry_iterator
     }
 };
 
+template <typename Iterator>
+inline
+trigger_entry_iterator<Iterator>
+make_bid_iterator(Iterator iter)
+{
+    return trigger_entry_iterator<Iterator>(iter);
+}
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_ALGO_ADAPTOR_HEADER
