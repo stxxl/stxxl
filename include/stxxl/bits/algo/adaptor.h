@@ -153,9 +153,7 @@ template <typename trigger_iterator_type, unsigned _BlkSz>
 struct trigger_entry_iterator
 {
     typedef trigger_entry_iterator<trigger_iterator_type, _BlkSz> _Self;
-
-    typedef BID<_BlkSz> bid_type;
-    trigger_iterator_type value;
+    typedef typename std::iterator_traits<trigger_iterator_type>::value_type::bid_type bid_type;
 
     // STL typedefs
     typedef bid_type value_type;
@@ -164,7 +162,7 @@ struct trigger_entry_iterator
     typedef value_type * pointer;
     typedef value_type & reference;
 
-    enum { block_size = _BlkSz };
+    trigger_iterator_type value;
 
     trigger_entry_iterator(const _Self & a) : value(a.value) { }
     trigger_entry_iterator(trigger_iterator_type v) : value(v) { }
