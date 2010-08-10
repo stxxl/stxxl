@@ -50,10 +50,10 @@ namespace sort_helper
         }
     };
 
-    template <typename BIDTp_, typename ValTp_, typename ValueCmp_>
-    struct trigger_entry_cmp : public std::binary_function<trigger_entry<BIDTp_, ValTp_>, trigger_entry<BIDTp_, ValTp_>, bool>
+    template <typename TriggerEntryTp_, typename ValueCmp_>
+    struct trigger_entry_cmp : public std::binary_function<TriggerEntryTp_, TriggerEntryTp_, bool>
     {
-        typedef trigger_entry<BIDTp_, ValTp_> trigger_entry_type;
+        typedef TriggerEntryTp_ trigger_entry_type;
         ValueCmp_ cmp;
         trigger_entry_cmp(ValueCmp_ c) : cmp(c) { }
         trigger_entry_cmp(const trigger_entry_cmp & a) : cmp(a.cmp) { }
