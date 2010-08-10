@@ -7,8 +7,6 @@
   max(size_at_program_start, configured_size)
   https://sourceforge.net/forum/message.php?msg_id=4925158
 
-* new types: stxxl::size_type_internal stxxl::size_type_external
-
 * integrate unordered_map branch
   => Milestone: 1.3
 

@@ -61,6 +61,9 @@ struct choose_int_types<8> // for 64-bit processors/compilers
 typedef choose_int_types<my_pointer_size>::int_type int_type;
 typedef choose_int_types<my_pointer_size>::unsigned_type unsigned_type;
 
+typedef unsigned_type internal_size_type;  // fits in internal memory
+typedef uint64 external_size_type;         // may exceed internal memory
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_TYPES_HEADER
