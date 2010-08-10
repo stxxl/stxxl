@@ -205,8 +205,8 @@ namespace stream
         unsigned_type cur_run_size = div_ceil(blocks1_length, block_type::size);  // in blocks
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(),
-                       trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
-                       trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
+                       trigger_entry_iterator<typename run_type::iterator>(run.begin()),
+                       trigger_entry_iterator<typename run_type::iterator>(run.end())
                        );
 
         disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
@@ -242,14 +242,14 @@ namespace stream
             blocks2_length += el_in_run;
             sort_run(Blocks1, blocks2_length);  // sort first an second run together
             wait_all(write_reqs, write_reqs + cur_run_size);
-            bm->delete_blocks(trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
-                              trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end()));
+            bm->delete_blocks(trigger_entry_iterator<typename run_type::iterator>(run.begin()),
+                              trigger_entry_iterator<typename run_type::iterator>(run.end()));
 
             cur_run_size = div_ceil(blocks2_length, block_type::size);
             run.resize(cur_run_size);
             bm->new_blocks(AllocStr_(),
-                           trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
-                           trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
+                           trigger_entry_iterator<typename run_type::iterator>(run.begin()),
+                           trigger_entry_iterator<typename run_type::iterator>(run.end())
                            );
 
             // fill the rest of the last block with max values
@@ -293,8 +293,8 @@ namespace stream
         cur_run_size = div_ceil(blocks2_length, block_type::size);  // in blocks
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(),
-                       trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
-                       trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
+                       trigger_entry_iterator<typename run_type::iterator>(run.begin()),
+                       trigger_entry_iterator<typename run_type::iterator>(run.end())
                        );
 
         for (i = 0; i < cur_run_size; ++i)
@@ -316,8 +316,8 @@ namespace stream
             cur_run_size = div_ceil(blocks1_length, block_type::size);  // in blocks
             run.resize(cur_run_size);
             bm->new_blocks(AllocStr_(),
-                           trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
-                           trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
+                           trigger_entry_iterator<typename run_type::iterator>(run.begin()),
+                           trigger_entry_iterator<typename run_type::iterator>(run.end())
                            );
 
             // fill the rest of the last block with max values (occurs only on the last run)
@@ -464,8 +464,8 @@ namespace stream
             run.resize(cur_run_size);
             block_manager * bm = block_manager::get_instance();
             bm->new_blocks(AllocStr_(),
-                           trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
-                           trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
+                           trigger_entry_iterator<typename run_type::iterator>(run.begin()),
+                           trigger_entry_iterator<typename run_type::iterator>(run.end())
                            );
 
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
@@ -551,8 +551,8 @@ namespace stream
             run.resize(cur_run_size);
             block_manager * bm = block_manager::get_instance();
             bm->new_blocks(AllocStr_(),
-                           trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.begin()),
-                           trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(run.end())
+                           trigger_entry_iterator<typename run_type::iterator>(run.begin()),
+                           trigger_entry_iterator<typename run_type::iterator>(run.end())
                            );
 
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
@@ -695,9 +695,9 @@ namespace stream
                 result_.runs[irun].resize(iblock + 1);
                 bm->new_blocks(
                     alloc_strategy,
-                    trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
+                    trigger_entry_iterator<typename run_type::iterator>(
                         result_.runs[irun].begin() + iblock),
-                    trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
+                    trigger_entry_iterator<typename run_type::iterator>(
                         result_.runs[irun].end()),
                     iblock
                     );
@@ -737,9 +737,9 @@ namespace stream
                 result_.runs[irun].resize(iblock + 1);
                 bm->new_blocks(
                     alloc_strategy,
-                    trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
+                    trigger_entry_iterator<typename run_type::iterator>(
                         result_.runs[irun].begin() + iblock),
-                    trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
+                    trigger_entry_iterator<typename run_type::iterator>(
                         result_.runs[irun].end()),
                     iblock
                     );
@@ -1256,8 +1256,8 @@ namespace stream
             // allocate blocks for the new runs
             for (unsigned_type i = 0; i < new_runs.runs.size(); ++i)
                 bm->new_blocks(alloc_strategy(),
-                               trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(new_runs.runs[i].begin()),
-                               trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(new_runs.runs[i].end()));
+                               trigger_entry_iterator<typename run_type::iterator>(new_runs.runs[i].begin()),
+                               trigger_entry_iterator<typename run_type::iterator>(new_runs.runs[i].end()));
 
             // merge all
             runs_left = nruns;
@@ -1324,9 +1324,9 @@ namespace stream
                 else
                 {
                     bm->delete_blocks(
-                        trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
+                        trigger_entry_iterator<typename run_type::iterator>(
                             new_runs.runs.back().begin()),
-                        trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(
+                        trigger_entry_iterator<typename run_type::iterator>(
                             new_runs.runs.back().end()));
 
                     assert(cur_runs.runs.size() == 1);

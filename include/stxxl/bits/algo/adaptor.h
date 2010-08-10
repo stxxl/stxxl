@@ -149,10 +149,10 @@ struct RunsToBIDArrayAdaptor2
 BLOCK_ADAPTOR_OPERATORS(RunsToBIDArrayAdaptor2)
 
 
-template <typename trigger_iterator_type, unsigned _BlkSz>
+template <typename trigger_iterator_type>
 struct trigger_entry_iterator
 {
-    typedef trigger_entry_iterator<trigger_iterator_type, _BlkSz> _Self;
+    typedef trigger_entry_iterator<trigger_iterator_type> _Self;
     typedef typename std::iterator_traits<trigger_iterator_type>::value_type::bid_type bid_type;
 
     // STL typedefs

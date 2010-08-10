@@ -587,8 +587,8 @@ namespace ksort_local
         for (i = 0; i < nruns; i++)
         {
             mng->new_blocks(alloc_strategy(),
-                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i]->begin()),
-                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i]->end()));
+                            trigger_entry_iterator<typename run_type::iterator>(runs[i]->begin()),
+                            trigger_entry_iterator<typename run_type::iterator>(runs[i]->end()));
         }
 #endif
 
