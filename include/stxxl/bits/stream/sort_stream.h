@@ -190,9 +190,7 @@ namespace stream
         {
             // small input, do not flush it on the disk(s)
             STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
-            assert(result_.small_.empty());
-            result_.small_.insert(result_.small_.end(), Blocks1[0].begin(), Blocks1[0].begin() + blocks1_length);
-            result_.elements = blocks1_length;
+            result_.add_small_run(Blocks1[0].begin(), Blocks1[0].begin() + blocks1_length);
             delete[] Blocks1;
             return;
         }
@@ -446,12 +444,12 @@ namespace stream
 
             unsigned_type cur_el_reg = cur_el;
             sort_run(Blocks1, cur_el_reg);
-            if (cur_el_reg < unsigned_type(block_type::size) &&
+            if (cur_el_reg <= unsigned_type(block_type::size) &&
                 unsigned_type(result_.elements) == cur_el_reg)         // small input, do not flush it on the disk(s)
             {
                 STXXL_VERBOSE1("runs_creator(use_push): Small input optimization, input length: " << cur_el_reg);
-                result_.small_.resize(cur_el_reg);
-                std::copy(Blocks1[0].begin(), Blocks1[0].begin() + cur_el_reg, result_.small_.begin());
+                result_.elements = 0;
+                result_.add_small_run(Blocks1[0].begin(), Blocks1[0].begin() + cur_el_reg);
                 return;
             }
 

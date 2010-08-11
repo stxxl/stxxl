@@ -57,6 +57,18 @@ namespace stream
 
         sorted_runs() : elements(0) { }
 
+        //! \brief Adds a small (at most B elements) sorted run.
+        //!
+        //! \param first, last: input iterator pair of value_type
+        template <typename InputIterator>
+        void add_small_run(const InputIterator & first, const InputIterator & last)
+        {
+            assert(runs.empty());
+            assert(small_.empty());
+            small_.insert(small_.end(), first, last);
+            elements += small_.size();
+        }
+
         //! \brief Adds a sorted run.
         //!
         //! \param first, last: input iterator pair of trigger_entry_type
@@ -66,7 +78,7 @@ namespace stream
         {
             assert(small_.empty());
             runs.push_back(run_type());
-            runs.back().insert(this->runs.back().end(), first, last);
+            runs.back().insert(runs.back().end(), first, last);
             runs_sizes.push_back(length);
             elements += length;
         }
