@@ -311,7 +311,9 @@ namespace stream
                 write_reqs[i]->wait();
                 write_reqs[i] = Blocks1[i].write(run[i].bid);
             }
-            result_.add_run(run.begin(), run.end(), blocks1_length);
+            result_.runs.push_back(run);
+            result_.runs_sizes.push_back(blocks1_length);
+            result_.elements += blocks1_length;
 
             std::swap(Blocks1, Blocks2);
             std::swap(blocks1_length, blocks2_length);
