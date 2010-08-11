@@ -36,22 +36,24 @@ namespace stream
     template <class ValueType, class TriggerEntryType>
     struct sorted_runs
     {
-        typedef ValueType value_type;  // may differ from trigger_entry_type::value_type
         typedef TriggerEntryType trigger_entry_type;
         typedef typename trigger_entry_type::block_type block_type;
+        typedef typename block_type::value_type value_type;  // may differ from trigger_entry_type::value_type
         typedef std::vector<trigger_entry_type> run_type;
+        typedef std::vector<value_type> small_run_type;
         typedef stxxl::external_size_type size_type;
+        typedef typename std::vector<run_type>::size_type run_index_type;
 
         size_type elements;
         std::vector<run_type> runs;
-        std::vector<unsigned_type> runs_sizes;
+        std::vector<size_type> runs_sizes;
 
         // Optimization:
         // if the input is small such that its total size is
-        // less than B (block_type::size)
+        // at most B (block_type::size)
         // then input is sorted internally
         // and kept in the array "small"
-        std::vector<ValueType> small_;
+        small_run_type small_;
 
         sorted_runs() : elements(0) { }
 
