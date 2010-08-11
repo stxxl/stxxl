@@ -64,7 +64,7 @@ namespace stream
         typedef typename Input_::value_type value_type;
         typedef typed_block<BlockSize_, value_type> block_type;
         typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
-        typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
+        typedef sorted_runs<trigger_entry_type> sorted_runs_type;
 
     private:
         typedef typename sorted_runs_type::run_type run_type;
@@ -402,7 +402,7 @@ namespace stream
         typedef ValueType_ value_type;
         typedef typed_block<BlockSize_, value_type> block_type;
         typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
-        typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
+        typedef sorted_runs<trigger_entry_type> sorted_runs_type;
         typedef sorted_runs_type result_type;
 
     private:
@@ -626,7 +626,7 @@ namespace stream
 
     public:
         typedef Cmp_ cmp_type;
-        typedef sorted_runs<value_type, trigger_entry_type> sorted_runs_type;
+        typedef sorted_runs<trigger_entry_type> sorted_runs_type;
         typedef sorted_runs_type result_type;
 
     private:
@@ -1444,7 +1444,7 @@ namespace stream
         typedef sort_helper::trigger_entry<bid_type, value_type> trigger_entry_type;
 
     public:
-        typedef sorted_runs<value_type, trigger_entry_type> result;
+        typedef sorted_runs<trigger_entry_type> result;
     };
 
 //! \}

@@ -33,7 +33,7 @@ namespace stream
     ////////////////////////////////////////////////////////////////////////
 
     //! \brief All sorted runs of a sort operation.
-    template <class ValueType, class TriggerEntryType>
+    template <typename TriggerEntryType>
     struct sorted_runs
     {
         typedef TriggerEntryType trigger_entry_type;
