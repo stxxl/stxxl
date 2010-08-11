@@ -149,7 +149,6 @@ namespace stream
     template <class Input_, class Cmp_, unsigned BlockSize_, class AllocStr_>
     void basic_runs_creator<Input_, Cmp_, BlockSize_, AllocStr_>::compute_result()
     {
-        unsigned_type i = 0;
         unsigned_type m2 = m_ / 2;
         const unsigned_type el_in_run = m2 * block_type::size; // # el in a run
         STXXL_VERBOSE1("basic_runs_creator::compute_result m2=" << m2);
@@ -210,12 +209,7 @@ namespace stream
 
         // fill the rest of the last block with max values
         fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
-
-        for (i = 0; i < cur_run_size; ++i)
-        {
-            run[i].value = Blocks1[i][0];
-            write_reqs[i] = Blocks1[i].write(run[i].bid);
-        }
+        sort_helper::write_run(run.begin(), Blocks1, write_reqs, cur_run_size);
 
         if (input.empty())
         {
@@ -235,6 +229,7 @@ namespace stream
         {
             // optimization if the whole set fits into both halves
             // (re)sort internally and return
+            cancel_all(write_reqs, write_reqs + cur_run_size);  // discard previously written first run
             blocks2_length += el_in_run;
             sort_run(Blocks1, blocks2_length);  // sort first an second run together
             wait_all(write_reqs, write_reqs + cur_run_size);
@@ -249,21 +244,11 @@ namespace stream
 
             assert(cur_run_size > m2);
 
-            for (i = 0; i < m2; ++i)
-            {
-                run[i].value = Blocks1[i][0];
-                write_reqs[i]->wait();
-                write_reqs[i] = Blocks1[i].write(run[i].bid);
-            }
+            sort_helper::write_run(run.begin(), Blocks1, write_reqs, m2);
 
             request_ptr * write_reqs1 = new request_ptr[cur_run_size - m2];
 
-            for ( ; i < cur_run_size; ++i)
-            {
-                run[i].value = Blocks1[i][0];
-                write_reqs1[i - m2] = Blocks1[i].write(run[i].bid);
-            }
-
+            sort_helper::write_run(run.begin() + m2, Blocks1 + m2, write_reqs1, cur_run_size - m2);
             result_.add_run(run.begin(), run.end(), blocks2_length);
 
             wait_all(write_reqs, write_reqs + m2);
@@ -286,14 +271,8 @@ namespace stream
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-        for (i = 0; i < cur_run_size; ++i)
-        {
-            run[i].value = Blocks2[i][0];
-            write_reqs[i]->wait();
-            write_reqs[i] = Blocks2[i].write(run[i].bid);
-        }
         assert((blocks2_length % el_in_run) == 0);
-
+        sort_helper::write_run(run.begin(), Blocks2, write_reqs, cur_run_size);
         result_.add_run(run.begin(), run.end(), blocks2_length);
 
         while (!input.empty())
@@ -306,13 +285,7 @@ namespace stream
 
             // fill the rest of the last block with max values (occurs only on the last run)
             fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
-
-            for (i = 0; i < cur_run_size; ++i)
-            {
-                run[i].value = Blocks1[i][0];
-                write_reqs[i]->wait();
-                write_reqs[i] = Blocks1[i].write(run[i].bid);
-            }
+            sort_helper::write_run(run.begin(), Blocks1, write_reqs, cur_run_size);
             result_.runs.push_back(run);
             result_.runs_sizes.push_back(blocks1_length);
             result_.elements += blocks1_length;
@@ -467,22 +440,10 @@ namespace stream
 
             // fill the rest of the last block with max values
             fill_with_max_value(Blocks1, cur_run_size, cur_el_reg);
-
-            unsigned_type i = 0;
-            for ( ; i < cur_run_size; ++i)
-            {
-                run[i].value = Blocks1[i][0];
-                if (write_reqs[i].get())
-                    write_reqs[i]->wait();
-
-                write_reqs[i] = Blocks1[i].write(run[i].bid);
-            }
-
+            sort_helper::write_run(run.begin(), Blocks1, write_reqs, cur_run_size);
             result_.add_run(run.begin(), run.end(), cur_el_reg);
 
-            for (i = 0; i < m2; ++i)
-                if (write_reqs[i].get())
-                    write_reqs[i]->wait();
+            wait_all(write_reqs, write_reqs + m2);
         }
 
         void cleanup()
@@ -545,15 +506,7 @@ namespace stream
 
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-            for (unsigned_type i = 0; i < cur_run_size; ++i)
-            {
-                run[i].value = Blocks1[i][0];
-                if (write_reqs[i].get())
-                    write_reqs[i]->wait();
-
-                write_reqs[i] = Blocks1[i].write(run[i].bid);
-            }
-
+            sort_helper::write_run(run.begin(), Blocks1, write_reqs, cur_run_size);
             result_.add_run(run.begin(), run.end(), el_in_run);
 
             std::swap(Blocks1, Blocks2);

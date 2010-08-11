@@ -18,6 +18,7 @@
 #include <functional>
 #include <stxxl/bits/algo/run_cursor.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -135,6 +136,20 @@ namespace sort_helper
             }
         }
     }
+
+    template <typename TriggerEntryIterator, typename BlockType>
+    inline
+    void write_run(TriggerEntryIterator run, BlockType * blocks, request_ptr * write_reqs, unsigned_type n)
+    {
+        for (unsigned_type i = 0; i < n ; ++i)
+        {
+            (run + i)->value = blocks[i][0];
+            if (write_reqs[i].get())
+                write_reqs[i]->wait();
+            write_reqs[i] = blocks[i].write((run + i)->bid);
+        }
+    }
+
 }
 
 __STXXL_END_NAMESPACE
