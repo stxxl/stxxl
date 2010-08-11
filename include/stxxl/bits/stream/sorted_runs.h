@@ -69,6 +69,11 @@ namespace stream
             elements += small_.size();
         }
 
+        const small_run_type & small() const
+        {
+            return small_;
+        }
+
         //! \brief Adds a sorted run.
         //!
         //! \param first, last: input iterator pair of trigger_entry_type
