@@ -159,9 +159,11 @@ namespace stream
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
         Blocks1 = new block_type[m2 * 2];
 #else
+        typename sorted_runs_type::small_run_type & small = result_.get_small_run();
+        small.reserve(block_type::size);
         while (!input.empty() && blocks1_length != block_type::size)
         {
-            result_.small_.push_back(*input);
+            small.push_back(*input);
             ++input;
             ++blocks1_length;
         }
@@ -169,14 +171,14 @@ namespace stream
         if (blocks1_length == block_type::size && !input.empty())
         {
             Blocks1 = new block_type[m2 * 2];
-            std::copy(result_.small_.begin(), result_.small_.end(), Blocks1[0].begin());
-            result_.small_.clear();
+            std::copy(small.begin(), small.end(), Blocks1[0].begin());
+            small.clear();
         }
         else
         {
             STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
             result_.elements = blocks1_length;
-            std::sort(result_.small_.begin(), result_.small_.end(), cmp);
+            std::sort(small.begin(), small.end(), cmp);
             return;
         }
 #endif //STXXL_SMALL_INPUT_PSORT_OPT

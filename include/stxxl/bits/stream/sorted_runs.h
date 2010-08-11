@@ -74,6 +74,11 @@ namespace stream
             return small_;
         }
 
+        small_run_type & get_small_run()
+        {
+            return small_;
+        }
+
         //! \brief Adds a sorted run.
         //!
         //! \param first, last: input iterator pair of trigger_entry_type
