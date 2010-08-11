@@ -447,8 +447,9 @@ namespace stream
             unsigned_type cur_el_reg = cur_el;
             sort_run(Blocks1, cur_el_reg);
             if (cur_el_reg <= unsigned_type(block_type::size) &&
-                unsigned_type(result_.elements) == cur_el_reg)         // small input, do not flush it on the disk(s)
+                unsigned_type(result_.elements) == cur_el_reg)
             {
+                // small input, do not flush it on the disk(s)
                 STXXL_VERBOSE1("runs_creator(use_push): Small input optimization, input length: " << cur_el_reg);
                 result_.elements = 0;
                 result_.add_small_run(Blocks1[0].begin(), Blocks1[0].begin() + cur_el_reg);
@@ -985,14 +986,14 @@ namespace stream
             if (empty())
                 return;
 
-            if (!sruns.small().empty())
+            if (!sruns.small_run().empty())
             {
                 // we have a small input <= B, that is kept in the main memory
                 STXXL_VERBOSE1("basic_runs_merger: small input optimization, input length: " << elements_remaining);
-                assert(elements_remaining == size_type(sruns.small().size()));
-                assert(sruns.small().size() <= out_block_type::size);
+                assert(elements_remaining == size_type(sruns.small_run().size()));
+                assert(sruns.small_run().size() <= out_block_type::size);
                 current_block = new out_block_type;
-                std::copy(sruns.small().begin(), sruns.small().end(), current_block->begin());
+                std::copy(sruns.small_run().begin(), sruns.small_run().end(), current_block->begin());
                 current_value = current_block->elem[0];
                 buffer_pos = 1;
 

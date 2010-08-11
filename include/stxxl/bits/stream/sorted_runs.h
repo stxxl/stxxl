@@ -69,7 +69,7 @@ namespace stream
             elements += small_.size();
         }
 
-        const small_run_type & small() const
+        const small_run_type & small_run() const
         {
             return small_;
         }
