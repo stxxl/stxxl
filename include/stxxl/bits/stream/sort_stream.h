@@ -760,7 +760,7 @@ namespace stream
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         typedef typename RunsType_::block_type block_type;
         typedef typename block_type::value_type value_type;
-        STXXL_VERBOSE2("Elements: " << sruns.elements);
+        STXXL_VERBOSE2("Elements: " << sruns.size());
         unsigned_type nruns = sruns.runs.size();
         STXXL_VERBOSE2("Runs: " << nruns);
         unsigned_type irun = 0;
@@ -959,7 +959,7 @@ namespace stream
         basic_runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             sruns(r),
             cmp(c),
-            elements_remaining(sruns.elements),
+            elements_remaining(sruns.size()),
             current_block(NULL),
             buffer_pos(0),
             prefetch_seq(NULL),
@@ -983,7 +983,7 @@ namespace stream
             sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 
             sruns = r;
-            elements_remaining = r.elements;
+            elements_remaining = r.size();
 
             if (empty())
                 return;
@@ -1213,7 +1213,7 @@ namespace stream
             sorted_runs_type new_runs;
             new_runs.runs.resize(new_nruns);
             new_runs.runs_sizes.resize(new_nruns);
-            new_runs.elements = sruns.elements;
+            new_runs.elements = sruns.size();
 
             unsigned_type runs_left = nruns;
             unsigned_type cur_out_run = 0;
@@ -1242,7 +1242,7 @@ namespace stream
             // merge all
             runs_left = nruns;
             cur_out_run = 0;
-            size_type elements_left = sruns.elements;
+            size_type elements_left = sruns.size();
 
             while (runs_left > 0)
             {
@@ -1261,13 +1261,8 @@ namespace stream
                           cur_runs.runs_sizes.begin());
 
                 runs_left -= runs2merge;
-                /*
-                   cur_runs.elements = (runs_left)?
-                   (new_runs.runs[cur_out_run].size()*block_type::size):
-                   (elements_left);
-                 */
                 cur_runs.elements = new_runs.runs_sizes[cur_out_run];
-                elements_left -= cur_runs.elements;
+                elements_left -= cur_runs.size();
 
                 if (runs2merge > 1)
                 {
@@ -1279,7 +1274,7 @@ namespace stream
                             nwrite_buffers);
 
                         size_type cnt = 0;
-                        const size_type cnt_max = cur_runs.elements;
+                        const size_type cnt_max = cur_runs.size();
 
                         while (cnt != cnt_max)
                         {
