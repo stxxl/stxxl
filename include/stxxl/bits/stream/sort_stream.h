@@ -702,7 +702,6 @@ namespace stream
             if (offset == 0 && iblock == 0) // current run is empty
                 return;
 
-
             result_.runs_sizes.resize(irun + 1);
             result_.runs_sizes.back() = iblock * block_type::size + offset;
 
@@ -761,7 +760,7 @@ namespace stream
         typedef typename RunsType_::block_type block_type;
         typedef typename block_type::value_type value_type;
         STXXL_VERBOSE2("Elements: " << sruns.size());
-        unsigned_type nruns = sruns.runs.size();
+        unsigned_type nruns = sruns.get_num_runs();
         STXXL_VERBOSE2("Runs: " << nruns);
         unsigned_type irun = 0;
         for (irun = 0; irun < nruns; ++irun)
@@ -784,7 +783,7 @@ namespace stream
                 }
             }
             if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
-                                  make_element_iterator(blocks, sruns.runs_sizes[irun]),
+                                  make_element_iterator(blocks, sruns.get_run_size(irun)),
                                   cmp))
             {
                 STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
@@ -1011,7 +1010,7 @@ namespace stream
             int_type disks_number = config::get_instance()->disks_number();
             unsigned_type min_prefetch_buffers = 2 * disks_number;
             unsigned_type input_buffers = (memory_to_use > sizeof(out_block_type) ? memory_to_use - sizeof(out_block_type) : 0) / block_type::raw_size;
-            unsigned_type nruns = sruns.runs.size();
+            unsigned_type nruns = sruns.get_num_runs();
 
             if (input_buffers < nruns + min_prefetch_buffers)
             {
@@ -1035,7 +1034,7 @@ namespace stream
 
                 merge_recursively(memory_to_use);
 
-                nruns = sruns.runs.size();
+                nruns = sruns.get_num_runs();
             }
 
             assert(nruns + min_prefetch_buffers <= input_buffers);
@@ -1200,7 +1199,7 @@ namespace stream
         // maximum arity in the recursive merger
         unsigned_type max_arity = (memory_to_use > memory_for_buffers ? memory_to_use - memory_for_buffers : 0) / block_type::raw_size;
 
-        unsigned_type nruns = sruns.runs.size();
+        unsigned_type nruns = sruns.get_num_runs();
         const unsigned_type merge_factor = optimal_merge_factor(nruns, max_arity);
         assert(merge_factor > 1);
         assert(merge_factor <= max_arity);
@@ -1225,7 +1224,7 @@ namespace stream
                 elements_in_new_run = 0;
                 for (unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge); ++i)
                 {
-                    elements_in_new_run += sruns.runs_sizes[i];
+                    elements_in_new_run += sruns.get_run_size(i);
                 }
                 const unsigned_type blocks_in_new_run1 = div_ceil(elements_in_new_run, block_type::size);
 
@@ -1302,7 +1301,7 @@ namespace stream
                         make_bid_iterator(new_runs.runs.back().begin()),
                         make_bid_iterator(new_runs.runs.back().end()));
 
-                    assert(cur_runs.runs.size() == 1);
+                    assert(cur_runs.get_num_runs() == 1);
 
                     std::copy(cur_runs.runs.front().begin(),
                               cur_runs.runs.front().end(),

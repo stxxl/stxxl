@@ -113,6 +113,17 @@ namespace stream
         {
             return elements;
         }
+
+        // returns number of runs
+        run_index_type get_num_runs() const
+        {
+            return runs.size();
+        }
+
+        size_type get_run_size(run_index_type i) const
+        {
+            return runs_sizes[i];
+        }
     };
 
 
