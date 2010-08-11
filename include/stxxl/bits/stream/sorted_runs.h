@@ -48,13 +48,15 @@ namespace stream
         std::vector<run_type> runs;
         std::vector<size_type> runs_sizes;
 
+    protected:
         // Optimization:
         // if the input is small such that its total size is
         // at most B (block_type::size)
         // then input is sorted internally
         // and kept in the array "small"
-        small_run_type small_;
+        small_run_type m_small;
 
+    public:
         sorted_runs() : elements(0) { }
 
         //! \brief Adds a small (at most B elements) sorted run.
@@ -64,19 +66,19 @@ namespace stream
         void add_small_run(const InputIterator & first, const InputIterator & last)
         {
             assert(runs.empty());
-            assert(small_.empty());
-            small_.insert(small_.end(), first, last);
-            elements += small_.size();
+            assert(m_small.empty());
+            m_small.insert(m_small.end(), first, last);
+            elements += m_small.size();
         }
 
         const small_run_type & small_run() const
         {
-            return small_;
+            return m_small;
         }
 
         small_run_type & get_small_run()
         {
-            return small_;
+            return m_small;
         }
 
         //! \brief Adds a sorted run.
@@ -86,7 +88,7 @@ namespace stream
         template <typename InputIterator>
         void add_run(const InputIterator & first, const InputIterator & last, size_type length)
         {
-            assert(small_.empty());
+            assert(m_small.empty());
             runs.push_back(run_type());
             runs.back().insert(runs.back().end(), first, last);
             runs_sizes.push_back(length);
