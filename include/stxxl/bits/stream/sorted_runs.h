@@ -57,6 +57,20 @@ namespace stream
 
         sorted_runs() : elements(0) { }
 
+        //! \brief Adds a sorted run.
+        //!
+        //! \param first, last: input iterator pair of trigger_entry_type
+        //! \param length: number of elements (the last block is not neccessarily full)
+        template <typename InputIterator>
+        void add_run(const InputIterator & first, const InputIterator & last, size_type length)
+        {
+            assert(small_.empty());
+            runs.push_back(run_type());
+            runs.back().insert(this->runs.back().end(), first, last);
+            runs_sizes.push_back(length);
+            elements += length;
+        }
+
         //! \brief Deallocates the blocks which the runs occupy
         //!
         //! \remark Usually there is no need in calling this method,
