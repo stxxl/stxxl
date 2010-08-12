@@ -421,8 +421,7 @@ namespace stream
 
             unsigned_type cur_el_reg = cur_el;
             sort_run(Blocks1, cur_el_reg);
-            if (cur_el_reg <= unsigned_type(block_type::size) &&
-                unsigned_type(result_.elements) == cur_el_reg)
+            if (cur_el_reg <= block_type::size && result_.elements == cur_el_reg)
             {
                 // small input, do not flush it on the disk(s)
                 STXXL_VERBOSE1("runs_creator(use_push): Small input optimization, input length: " << cur_el_reg);
