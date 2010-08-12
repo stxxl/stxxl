@@ -190,7 +190,6 @@ supported </font> </td>
   <td>g++ (3.3-4.5)<br>icpc (9.0-11.1)</td>
   <td><a href="http://www.boost.org">Boost</a> (optional),<br>
       <a href="http://algo2.iti.kit.edu/singler/mcstl/">MCSTL</a> (optional, only with g++ 4.2 or icpc 10.x)</td>
-      <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode</a> (optional, comes with GCC)</td>
 </tr>
 <tr>
   <th>&nbsp;&middot;</th>
@@ -404,6 +403,12 @@ For a detailed list, please read the the CHANGELOG file.
 	<tr>
             <td align="left" valign="middle"> &nbsp; &middot;
 		MCSTL library homepage: [<A href="http://algo2.iti.kit.edu/singler/mcstl/">link</A>] (optional)
+		</td>
+		</tr>
+		<tr>
+            <td align="left" valign="middle"> &nbsp; &middot;
+        libstdc++ parallel mode homepage: [<a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">link</a>] (optional, comes with GCC)</td>
+		
 	  </td>
          </tr>
         </tbody>
