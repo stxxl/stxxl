@@ -1,4 +1,5 @@
-* asynchronous pipelining (currently being developed in branch parallel_pipelining_integration)
+* asynchronous pipelining 
+  (currently being developed in branch parallel_pipelining_integration)
 
 * replace build system, something with '$LIBNAME-config --libs --cflags ...' would be nice
 
@@ -8,7 +9,6 @@
   https://sourceforge.net/forum/message.php?msg_id=4925158
 
 * integrate unordered_map branch
-  => Milestone: 1.3
 
 * doxygen: do not link every occurrence of 'file' to stxxl::file
 
@@ -27,7 +27,7 @@
     allocated memory is expected to fail
   - does not take into account array allocations with metadata overhead
     (either register addresses that are recognized by delete[] or register
-    block adresses that are used for I/Os - you can't have both)
+    block addresses that are used for I/Os - you can't have both)
 
 * continue using the new approach for STXXL_VERBOSE:
   $(CXX) -DSTXXL_VERBOSE_FOO=STXXL_VERBOSEx
@@ -38,11 +38,12 @@
   i.e. free_bytes == disk_size
 
 * implement an allocator which looks at the available free space on disks
-  when distributing blocks to disks
+  when distributing blocks to disks, or does load-balancing depending
+  on the given speed of the disks
 
-* engineer new disk queueing strategies that might benefit from NCQ which
-  is now widely available in HDDs/SSDs; will need use of libaio; probably
-  most interesting for smaller block sizes 
+* implement new disk queuing strategy that supports NCQ,
+  which is now widely available in HDDs/SSDs; 
+  probably most interesting for rather small block sizes 
   (currently begin developed in branch kernelaio)
 
 * allow configuration of the block-managed disks using API calls, 
