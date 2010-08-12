@@ -53,3 +53,8 @@
   (e. g. to top level directories src/ and tests/)
 
 * abstract away block manager so every container can attach to a file.
+
+* overhead: stream::sorted_runs (which may be rather big) is copied into stream_runs_merger
+
+* overhead: stream::sorted_runs is copy-initialized from locally created runs
+

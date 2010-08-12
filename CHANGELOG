@@ -49,6 +49,8 @@ Version 1.3
 * Possibly breaking changes
   - API name changes
     vector::touch -> vector::block_externally_updated
+  - Template parameter changes
+    stream::sorted_runs, trigger_entry, trigger_entry_cmp, trigger_entry_iterator
   - Priority of write changes
   - Other name changes (considered internal)
     typed_block<>::has_filler -> !typed_block<>::has_only_data
