@@ -190,6 +190,7 @@ supported </font> </td>
   <td>g++ (3.3-4.5)<br>icpc (9.0-11.1)</td>
   <td><a href="http://www.boost.org">Boost</a> (optional),<br>
       <a href="http://algo2.iti.kit.edu/singler/mcstl/">MCSTL</a> (optional, only with g++ 4.2 or icpc 10.x)</td>
+      <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode</a> (optional, comes with GCC)</td>
 </tr>
 <tr>
   <th>&nbsp;&middot;</th>
@@ -230,7 +231,7 @@ version </font> </td>
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
           <tr>
-            <td align="left" valign="middle"> Version 1.2.2 (12 August 2010)
+            <td align="left" valign="middle"> Version 1.3.0 (12 August 2010)
  contains an implementation of the lower layers (memory
 management, disk virtualization, prefetching,...). From the higher
 layers, (pipelined) sorting with 
@@ -248,7 +249,7 @@ sums to about 33 thousand lines of code (33 KSLOC). </td>
       <table border="0" cellpadding="2" cellspacing="2" width="100%">
         <tbody>
           <tr bgcolor="#354278">
-            <td class="qh"> <font color="#ffffff" face="sans-serif">&nbsp;What's new in the latest release </font> </td>
+            <td class="qh"> <font color="#ffffff" face="sans-serif">Major improvements in the latest release</font> </td>
           </tr>
         </tbody>
       </table>
@@ -259,35 +260,31 @@ sums to about 33 thousand lines of code (33 KSLOC). </td>
       <table border="0" cellpadding="2" cellspacing="5" width="100%">
         <tbody>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Improved support for the <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode</a> (successor of MCSTL),
+Improved support (e.&nbsp;g. priority queue) for the <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode</a> (successor of MCSTL),
 requires g++ 4.4 or later.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Add support for FreeBSD and Mac OS X.
+support for latest compiler versions
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
+support for FreeBSD
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
+new file types: fileperblock (save space through early deallocation), wbtl (library-based write-combining for flash)
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
+Files can be made auto-growing (specified in .stxxl by a size of 0), they will be deleted on normal program termination.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
+many, many bug fixes
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-</td></tr>
-<tr><td align="left" valign="middle"> &nbsp; &middot;
-</td></tr>
-<tr><td align="left" valign="middle"> &nbsp; &middot;
-</td></tr>
-<tr><td align="left" valign="middle"> &nbsp; &middot;
-</td></tr>
-<tr><td align="left" valign="middle"> &nbsp; &middot;
+many under-the-hood improvements
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
 Added several new test programs.
 </td></tr>
 <tr><td align="left" valign="middle"> &nbsp; &middot;
-Lots of small fixes and many more changes.
 For a detailed list, please read the the CHANGELOG file.
 </td></tr>
         </tbody>
@@ -403,10 +400,6 @@ For a detailed list, please read the the CHANGELOG file.
             </td>
           </tr>
 	 <tr>
-            <td align="left" valign="middle"> &nbsp; &middot; Older version (0.77 - Linux only):
-[<a href="http://sourceforge.net/projects/stxxl/files/stxxl/0.77/">tgz (sf.net)</a>]
-[<a href="http://algo2.iti.kit.edu/dementiev/files/stxxl_0.77.tgz">tgz</a>]
-            </td>
           </tr>
 	<tr>
             <td align="left" valign="middle"> &nbsp; &middot;
