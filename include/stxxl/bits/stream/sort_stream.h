@@ -149,6 +149,7 @@ namespace stream
     template <class Input_, class Cmp_, unsigned BlockSize_, class AllocStr_>
     void basic_runs_creator<Input_, Cmp_, BlockSize_, AllocStr_>::compute_result()
     {
+        unsigned_type i = 0;
         unsigned_type m2 = m_ / 2;
         const unsigned_type el_in_run = m2 * block_type::size; // # el in a run
         STXXL_VERBOSE1("basic_runs_creator::compute_result m2=" << m2);
@@ -158,11 +159,9 @@ namespace stream
 #ifndef STXXL_SMALL_INPUT_PSORT_OPT
         Blocks1 = new block_type[m2 * 2];
 #else
-        typename sorted_runs_type::small_run_type & small = result_.get_small_run();
-        small.reserve(block_type::size);
         while (!input.empty() && blocks1_length != block_type::size)
         {
-            small.push_back(*input);
+            result_.small_.push_back(*input);
             ++input;
             ++blocks1_length;
         }
@@ -170,14 +169,14 @@ namespace stream
         if (blocks1_length == block_type::size && !input.empty())
         {
             Blocks1 = new block_type[m2 * 2];
-            std::copy(small.begin(), small.end(), Blocks1[0].begin());
-            small.clear();
+            std::copy(result_.small_.begin(), result_.small_.end(), Blocks1[0].begin());
+            result_.small_.clear();
         }
         else
         {
             STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
             result_.elements = blocks1_length;
-            std::sort(small.begin(), small.end(), cmp);
+            std::sort(result_.small_.begin(), result_.small_.end(), cmp);
             return;
         }
 #endif //STXXL_SMALL_INPUT_PSORT_OPT
@@ -209,7 +208,12 @@ namespace stream
 
         // fill the rest of the last block with max values
         fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
-        sort_helper::write_run(run.begin(), Blocks1, write_reqs, cur_run_size);
+
+        for (i = 0; i < cur_run_size; ++i)
+        {
+            run[i].value = Blocks1[i][0];
+            write_reqs[i] = Blocks1[i].write(run[i].bid);
+        }
 
         if (input.empty())
         {
@@ -229,7 +233,6 @@ namespace stream
         {
             // optimization if the whole set fits into both halves
             // (re)sort internally and return
-            cancel_all(write_reqs, write_reqs + cur_run_size);  // discard previously written first run
             blocks2_length += el_in_run;
             sort_run(Blocks1, blocks2_length);  // sort first an second run together
             wait_all(write_reqs, write_reqs + cur_run_size);
@@ -244,11 +247,21 @@ namespace stream
 
             assert(cur_run_size > m2);
 
-            sort_helper::write_run(run.begin(), Blocks1, write_reqs, m2);
+            for (i = 0; i < m2; ++i)
+            {
+                run[i].value = Blocks1[i][0];
+                write_reqs[i]->wait();
+                write_reqs[i] = Blocks1[i].write(run[i].bid);
+            }
 
             request_ptr * write_reqs1 = new request_ptr[cur_run_size - m2];
 
-            sort_helper::write_run(run.begin() + m2, Blocks1 + m2, write_reqs1, cur_run_size - m2);
+            for ( ; i < cur_run_size; ++i)
+            {
+                run[i].value = Blocks1[i][0];
+                write_reqs1[i - m2] = Blocks1[i].write(run[i].bid);
+            }
+
             result_.add_run(run.begin(), run.end(), blocks2_length);
 
             wait_all(write_reqs, write_reqs + m2);
@@ -271,8 +284,14 @@ namespace stream
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
+        for (i = 0; i < cur_run_size; ++i)
+        {
+            run[i].value = Blocks2[i][0];
+            write_reqs[i]->wait();
+            write_reqs[i] = Blocks2[i].write(run[i].bid);
+        }
         assert((blocks2_length % el_in_run) == 0);
-        sort_helper::write_run(run.begin(), Blocks2, write_reqs, cur_run_size);
+
         result_.add_run(run.begin(), run.end(), blocks2_length);
 
         while (!input.empty())
@@ -285,10 +304,14 @@ namespace stream
 
             // fill the rest of the last block with max values (occurs only on the last run)
             fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
-            sort_helper::write_run(run.begin(), Blocks1, write_reqs, cur_run_size);
-            result_.runs.push_back(run);
-            result_.runs_sizes.push_back(blocks1_length);
-            result_.elements += blocks1_length;
+
+            for (i = 0; i < cur_run_size; ++i)
+            {
+                run[i].value = Blocks1[i][0];
+                write_reqs[i]->wait();
+                write_reqs[i] = Blocks1[i].write(run[i].bid);
+            }
+            result_.add_run(run.begin(), run.end(), blocks1_length);
 
             std::swap(Blocks1, Blocks2);
             std::swap(blocks1_length, blocks2_length);
@@ -439,10 +462,22 @@ namespace stream
 
             // fill the rest of the last block with max values
             fill_with_max_value(Blocks1, cur_run_size, cur_el_reg);
-            sort_helper::write_run(run.begin(), Blocks1, write_reqs, cur_run_size);
+
+            unsigned_type i = 0;
+            for ( ; i < cur_run_size; ++i)
+            {
+                run[i].value = Blocks1[i][0];
+                if (write_reqs[i].get())
+                    write_reqs[i]->wait();
+
+                write_reqs[i] = Blocks1[i].write(run[i].bid);
+            }
+
             result_.add_run(run.begin(), run.end(), cur_el_reg);
 
-            wait_all(write_reqs, write_reqs + m2);
+            for (i = 0; i < m2; ++i)
+                if (write_reqs[i].get())
+                    write_reqs[i]->wait();
         }
 
         void cleanup()
@@ -505,7 +540,15 @@ namespace stream
 
             disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
 
-            sort_helper::write_run(run.begin(), Blocks1, write_reqs, cur_run_size);
+            for (unsigned_type i = 0; i < cur_run_size; ++i)
+            {
+                run[i].value = Blocks1[i][0];
+                if (write_reqs[i].get())
+                    write_reqs[i]->wait();
+
+                write_reqs[i] = Blocks1[i].write(run[i].bid);
+            }
+
             result_.add_run(run.begin(), run.end(), el_in_run);
 
             std::swap(Blocks1, Blocks2);
@@ -654,6 +697,7 @@ namespace stream
             if (offset == 0 && iblock == 0) // current run is empty
                 return;
 
+
             result_.runs_sizes.resize(irun + 1);
             result_.runs_sizes.back() = iblock * block_type::size + offset;
 
@@ -711,8 +755,8 @@ namespace stream
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         typedef typename RunsType_::block_type block_type;
         typedef typename block_type::value_type value_type;
-        STXXL_VERBOSE2("Elements: " << sruns.size());
-        unsigned_type nruns = sruns.get_num_runs();
+        STXXL_VERBOSE2("Elements: " << sruns.elements);
+        unsigned_type nruns = sruns.runs.size();
         STXXL_VERBOSE2("Runs: " << nruns);
         unsigned_type irun = 0;
         for (irun = 0; irun < nruns; ++irun)
@@ -735,7 +779,7 @@ namespace stream
                 }
             }
             if (!stxxl::is_sorted(make_element_iterator(blocks, 0),
-                                  make_element_iterator(blocks, sruns.get_run_size(irun)),
+                                  make_element_iterator(blocks, sruns.runs_sizes[irun]),
                                   cmp))
             {
                 STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
@@ -910,7 +954,7 @@ namespace stream
         basic_runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             sruns(r),
             cmp(c),
-            elements_remaining(sruns.size()),
+            elements_remaining(sruns.elements),
             current_block(NULL),
             buffer_pos(0),
             prefetch_seq(NULL),
@@ -934,7 +978,7 @@ namespace stream
             sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 
             sruns = r;
-            elements_remaining = r.size();
+            elements_remaining = r.elements;
 
             if (empty())
                 return;
@@ -962,7 +1006,7 @@ namespace stream
             int_type disks_number = config::get_instance()->disks_number();
             unsigned_type min_prefetch_buffers = 2 * disks_number;
             unsigned_type input_buffers = (memory_to_use > sizeof(out_block_type) ? memory_to_use - sizeof(out_block_type) : 0) / block_type::raw_size;
-            unsigned_type nruns = sruns.get_num_runs();
+            unsigned_type nruns = sruns.runs.size();
 
             if (input_buffers < nruns + min_prefetch_buffers)
             {
@@ -986,7 +1030,7 @@ namespace stream
 
                 merge_recursively(memory_to_use);
 
-                nruns = sruns.get_num_runs();
+                nruns = sruns.runs.size();
             }
 
             assert(nruns + min_prefetch_buffers <= input_buffers);
@@ -1151,7 +1195,7 @@ namespace stream
         // maximum arity in the recursive merger
         unsigned_type max_arity = (memory_to_use > memory_for_buffers ? memory_to_use - memory_for_buffers : 0) / block_type::raw_size;
 
-        unsigned_type nruns = sruns.get_num_runs();
+        unsigned_type nruns = sruns.runs.size();
         const unsigned_type merge_factor = optimal_merge_factor(nruns, max_arity);
         assert(merge_factor > 1);
         assert(merge_factor <= max_arity);
@@ -1164,7 +1208,7 @@ namespace stream
             sorted_runs_type new_runs;
             new_runs.runs.resize(new_nruns);
             new_runs.runs_sizes.resize(new_nruns);
-            new_runs.elements = sruns.size();
+            new_runs.elements = sruns.elements;
 
             unsigned_type runs_left = nruns;
             unsigned_type cur_out_run = 0;
@@ -1176,7 +1220,7 @@ namespace stream
                 elements_in_new_run = 0;
                 for (unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge); ++i)
                 {
-                    elements_in_new_run += sruns.get_run_size(i);
+                    elements_in_new_run += sruns.runs_sizes[i];
                 }
                 const unsigned_type blocks_in_new_run1 = div_ceil(elements_in_new_run, block_type::size);
 
@@ -1193,7 +1237,7 @@ namespace stream
             // merge all
             runs_left = nruns;
             cur_out_run = 0;
-            size_type elements_left = sruns.size();
+            size_type elements_left = sruns.elements;
 
             while (runs_left > 0)
             {
@@ -1212,8 +1256,13 @@ namespace stream
                           cur_runs.runs_sizes.begin());
 
                 runs_left -= runs2merge;
+                /*
+                   cur_runs.elements = (runs_left)?
+                   (new_runs.runs[cur_out_run].size()*block_type::size):
+                   (elements_left);
+                 */
                 cur_runs.elements = new_runs.runs_sizes[cur_out_run];
-                elements_left -= cur_runs.size();
+                elements_left -= cur_runs.elements;
 
                 if (runs2merge > 1)
                 {
@@ -1225,7 +1274,7 @@ namespace stream
                             nwrite_buffers);
 
                         size_type cnt = 0;
-                        const size_type cnt_max = cur_runs.size();
+                        const size_type cnt_max = cur_runs.elements;
 
                         while (cnt != cnt_max)
                         {
@@ -1253,7 +1302,7 @@ namespace stream
                         make_bid_iterator(new_runs.runs.back().begin()),
                         make_bid_iterator(new_runs.runs.back().end()));
 
-                    assert(cur_runs.get_num_runs() == 1);
+                    assert(cur_runs.runs.size() == 1);
 
                     std::copy(cur_runs.runs.front().begin(),
                               cur_runs.runs.front().end(),
