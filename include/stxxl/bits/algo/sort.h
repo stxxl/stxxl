@@ -297,8 +297,8 @@ namespace sort_local
     template <typename block_type, typename run_type, typename value_cmp>
     void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run, unsigned_type _m, value_cmp cmp)
     {
-        typedef typename block_type::bid_type bid_type;
         typedef typename block_type::value_type value_type;
+        typedef typename run_type::value_type trigger_entry_type;
         typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
         typedef sort_helper::run_cursor2_cmp<block_type, prefetcher_type, value_cmp> run_cursor2_cmp_type;
@@ -318,7 +318,7 @@ namespace sort_local
         }
 
         std::stable_sort(consume_seq.begin(), consume_seq.end(),
-                         sort_helper::trigger_entry_cmp<bid_type, value_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
+                         sort_helper::trigger_entry_cmp<trigger_entry_type, value_cmp>(cmp) _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
         int_type disks_number = config::get_instance()->disks_number();
 
@@ -500,7 +500,7 @@ namespace sort_local
               typename alloc_strategy,
               typename input_bid_iterator,
               typename value_cmp>
-    simple_vector<sort_helper::trigger_entry<typename block_type::bid_type, typename block_type::value_type> > *
+    simple_vector<sort_helper::trigger_entry<block_type> > *
     sort_blocks(input_bid_iterator input_bids,
                 unsigned_type _n,
                 unsigned_type _m,
@@ -509,7 +509,7 @@ namespace sort_local
     {
         typedef typename block_type::value_type type;
         typedef typename block_type::bid_type bid_type;
-        typedef sort_helper::trigger_entry<bid_type, type> trigger_entry_type;
+        typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
         typedef simple_vector<trigger_entry_type> run_type;
         typedef typename interleaved_alloc_traits<alloc_strategy>::strategy interleaved_alloc_strategy;
 
@@ -534,13 +534,8 @@ namespace sort_local
         if (partial_runs)
             runs[i] = new run_type(_n - full_runs * m2);
 
-
         for (i = 0; i < nruns; ++i)
-        {
-            mng->new_blocks(alloc_strategy(),
-                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i]->begin()),
-                            trigger_entry_iterator<typename run_type::iterator, block_type::raw_size>(runs[i]->end()));
-        }
+            mng->new_blocks(alloc_strategy(), make_bid_iterator(runs[i]->begin()), make_bid_iterator(runs[i]->end()));
 
         sort_local::create_runs<block_type,
                                 run_type,
@@ -701,8 +696,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 
-    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::bid_type,
-                                                     typename ExtIterator_::vector_type::value_type> > run_type;
+    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::block_type> > run_type;
 
     typedef typename ExtIterator_::vector_type::value_type value_type;
     typedef typename ExtIterator_::block_type block_type;

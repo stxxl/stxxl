@@ -409,9 +409,9 @@ my_example.bin: my_example.o
  *   - set \c BOOST_ROOT variable according to the Boost root path, e.&nbsp;g.
  *     BOOST_ROOT = "C:\Program Files (x86)\boost\boost_1_40_0"#
  *   - (optionally) set \c STXXL_ROOT variable to \c S<small>TXXL</small> root directory
- *   - (optionally) set \c OPT variable to \c /O2 or other VC++ optimization level you like
- *   - (optionally) set \c DEBUG variable to \c /MDd for debug version of the \c Stxxl library
- *     or to \c /MD for the version without debugging information in object files
+ *   - (optionally) set \c OPT variable to \c /O2 or any other VC++ optimization level you like,
+ *   add -D_SECURE_SCL=0 to switch off iterator checking, which improves performance
+ *   - (optionally) set \c DEBUG_COMPILER=/MDd /Zi and DEBUG_LINKER=/DEBUG enable debugging
  * - Open the \c stxxl.vcproj file (VS Solution Object) in Visual Studio.
  *   The file is located in the \c STXXL_ROOT directory
  *   Press F7 to build the library.
@@ -420,7 +420,7 @@ my_example.bin: my_example.o
  *   (or choosing from 'Build' drop-down menu Rebuild Solution)
  * - (alternatively) Compile the library by executing \c nmake \c library_msvc
  *   and the tests by executing \c nmake \c tests_msvc,
- *   with all the appropriate environment set (e.&nbsp;by using the VS Command Shell)
+ *   with all the appropriate environment set (e.&nbsp;g. by using the VS Command Shell)
  *
  *
  * \section compile_apps Application compilation

@@ -35,10 +35,11 @@ namespace sort_helper
         STXXL_UNUSED(cmp);
     }
 
-    template <typename BIDTp_, typename ValTp_>
+    template <typename BlockTp_, typename ValTp_ = typename BlockTp_::value_type>
     struct trigger_entry
     {
-        typedef BIDTp_ bid_type;
+        typedef BlockTp_ block_type;
+        typedef typename block_type::bid_type bid_type;
         typedef ValTp_ value_type;
 
         bid_type bid;
@@ -50,10 +51,10 @@ namespace sort_helper
         }
     };
 
-    template <typename BIDTp_, typename ValTp_, typename ValueCmp_>
-    struct trigger_entry_cmp : public std::binary_function<trigger_entry<BIDTp_, ValTp_>, trigger_entry<BIDTp_, ValTp_>, bool>
+    template <typename TriggerEntryTp_, typename ValueCmp_>
+    struct trigger_entry_cmp : public std::binary_function<TriggerEntryTp_, TriggerEntryTp_, bool>
     {
-        typedef trigger_entry<BIDTp_, ValTp_> trigger_entry_type;
+        typedef TriggerEntryTp_ trigger_entry_type;
         ValueCmp_ cmp;
         trigger_entry_cmp(ValueCmp_ c) : cmp(c) { }
         trigger_entry_cmp(const trigger_entry_cmp & a) : cmp(a.cmp) { }
