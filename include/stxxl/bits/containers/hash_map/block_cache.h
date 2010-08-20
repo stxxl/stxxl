@@ -215,7 +215,7 @@ namespace hash_map
 
         ~block_cache()
         {
-            STXXL_VERBOSE1("hash_map::block_cache destructor addr=" << this)
+            STXXL_VERBOSE1("hash_map::block_cache destructor addr=" << this);
 
             typename bid_map_type::const_iterator i = bid_map_.begin();
             for ( ; i != bid_map_.end(); ++i)

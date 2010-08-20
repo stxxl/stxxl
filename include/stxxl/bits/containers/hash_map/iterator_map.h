@@ -81,7 +81,7 @@ namespace hash_map
 
         void register_iterator(iterator_base & it, size_type i_bucket)
         {
-            STXXL_VERBOSE2("hash_map::iterator_map register_iterator addr=" << &it << " bucket=" << i_bucket)
+            STXXL_VERBOSE2("hash_map::iterator_map register_iterator addr=" << &it << " bucket=" << i_bucket);
             it_map_.insert(pair_type(i_bucket, &it));
         }
 
@@ -94,7 +94,7 @@ namespace hash_map
 
         void unregister_iterator(iterator_base & it, size_type i_bucket)
         {
-            STXXL_VERBOSE2("hash_map::iterator_map unregister_iterator addr=" << &it << " bucket=" << i_bucket)
+            STXXL_VERBOSE2("hash_map::iterator_map unregister_iterator addr=" << &it << " bucket=" << i_bucket);
 
             std::pair<mmiterator_type, mmiterator_type> range = it_map_.equal_range(i_bucket);
             assert(range.first != range.second);
@@ -115,7 +115,7 @@ namespace hash_map
         //! \brief Update iterators with given key and bucket and make them point to the specified location in external memory (will be called during re-hashing)
         void fix_iterators_2ext(size_type i_bucket_old, const key_type & key, size_type i_bucket_new, size_type i_ext)
         {
-            STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2ext i_bucket=" << i_bucket_old << " key=" << key << ", new_i_ext=" << i_ext)
+            STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2ext i_bucket=" << i_bucket_old << " key=" << key << ", new_i_ext=" << i_ext);
 
             std::vector<iterator_base *> its2fix;
             __find(i_bucket_old, its2fix);
@@ -146,7 +146,7 @@ namespace hash_map
         //! \brief Update iterators with given key and bucket and make them point to the specified node in internal memory (will be called by insert_oblivious)
         void fix_iterators_2int(size_type i_bucket, const key_type & key, node_type * node)
         {
-            STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2int i_bucket=" << i_bucket << " key=" << key << " node=" << node)
+            STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2int i_bucket=" << i_bucket << " key=" << key << " node=" << node);
 
             std::vector<iterator_base *> its2fix;
             __find(i_bucket, its2fix);
@@ -171,7 +171,7 @@ namespace hash_map
         //! \brief Update iterators with given key and bucket and make them point to the end of the hash-map (called by erase and erase_oblivious)
         void fix_iterators_2end(size_type i_bucket, const key_type & key)
         {
-            STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2end i_bucket=" << i_bucket << " key=" << key)
+            STXXL_VERBOSE2("hash_map::iterator_map fix_iterators_2end i_bucket=" << i_bucket << " key=" << key);
 
             std::vector<iterator_base *> its2fix;
             __find(i_bucket, its2fix);
