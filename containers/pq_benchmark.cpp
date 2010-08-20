@@ -18,6 +18,7 @@
 //! DOI: 10.1002/spe.844
 
 
+#include <limits>
 #include <stxxl/priority_queue>
 
 #define TOTAL_PQ_MEM_SIZE    (768 * 1024 * 1024)
@@ -104,17 +105,13 @@ inline long long unsigned myrand()
 
 void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
 {
-    stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE / BLOCK_SIZE);
-    stxxl::write_pool<block_type> w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
-
-    pq_type PQ(p_pool, w_pool);
+    pq_type PQ(PREFETCH_POOL_SIZE, WRITE_POOL_SIZE);
 
     stxxl::uint64 i;
 
     my_record cur;
 
-    stxxl::stats * Stats = stxxl::stats::get_instance();
-    Stats->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
     stxxl::timer Timer;
     Timer.start();
@@ -137,10 +134,11 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     ////////////////////////////////////////////////
+
+    stats_begin = *stxxl::stats::get_instance();
     Timer.reset();
     Timer.start();
 
@@ -161,23 +159,19 @@ void run_stxxl_insert_all_delete_all(stxxl::uint64 ops)
     STXXL_MSG("Deletions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << *Stats;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
 
 
 void run_stxxl_intermixed(stxxl::uint64 ops)
 {
-    stxxl::prefetch_pool<block_type> p_pool(PREFETCH_POOL_SIZE / BLOCK_SIZE);
-    stxxl::write_pool<block_type> w_pool(WRITE_POOL_SIZE / BLOCK_SIZE);
-
-    pq_type PQ(p_pool, w_pool);
+    pq_type PQ(PREFETCH_POOL_SIZE, WRITE_POOL_SIZE);
 
     stxxl::uint64 i;
 
     my_record cur;
 
-    stxxl::stats * Stats = stxxl::stats::get_instance();
-    Stats->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
 
     stxxl::timer Timer;
     Timer.start();
@@ -200,10 +194,11 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     ////////////////////////////////////////////////
+
+    stats_begin = *stxxl::stats::get_instance();
     Timer.reset();
     Timer.start();
 
@@ -229,7 +224,7 @@ void run_stxxl_intermixed(stxxl::uint64 ops)
     STXXL_MSG("Deletions/Insertion elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << *Stats;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 }
 
 int main(int argc, char * argv[])

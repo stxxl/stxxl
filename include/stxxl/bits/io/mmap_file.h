@@ -13,16 +13,25 @@
 #ifndef STXXL_MMAP_FILE_HEADER
 #define STXXL_MMAP_FILE_HEADER
 
+#ifndef STXXL_HAVE_MMAP_FILE
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
 
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
+ #define STXXL_HAVE_MMAP_FILE 1
+#else
+ #define STXXL_HAVE_MMAP_FILE 0
+#endif
+#endif
+
+#if STXXL_HAVE_MMAP_FILE
 
 #include <sys/mman.h>
 
 #include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -34,17 +43,17 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of memory mapped access file
-class mmap_file : public ufs_file_base
+class mmap_file : public ufs_file_base, public disk_queued_file
 {
 public:
     //! \brief constructs file object
     //! \param filename path of file
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param disk disk(file) identifier
-    inline mmap_file(const std::string & filename, int mode, int disk = -1) :
-        ufs_file_base(filename, mode, disk)
+    inline mmap_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
+        ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }
-    void serve(const request * req) throw(io_error);
+    void serve(const request * req) throw (io_error);
     const char * io_type() const;
 };
 
@@ -52,6 +61,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif  // #if STXXL_HAVE_MMAP_FILE
 
-#endif // !STXXL_MMAP_FILE_HEADER
+#endif  // !STXXL_MMAP_FILE_HEADER

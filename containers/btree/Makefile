@@ -7,8 +7,6 @@ tests: $(TESTS_BTREE)
 
 STXXL_COMPILER_OPTIONS = $(STXXL_COMPILER_OPTIONS) -DSTXXL_VERBOSE_LEVEL=0
 
-TESTS_EXECUTABLES =  test_const_scan.$(EXEEXT) test_corr_insert_erase.$(EXEEXT) test_corr_insert_find.$(EXEEXT) test_corr_insert_scan.$(EXEEXT) test_btree.$(EXEEXT)
-
 test_const_scan: test_const_scan.$(EXEEXT)
 test_const_scan.$(EXEEXT): $(DEPENDENCIES) test_const_scan.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_const_scan.cpp
@@ -35,6 +33,6 @@ test_btree.$(EXEEXT): $(DEPENDENCIES) test_btree.cpp
 	$(LINKER) test_btree.$(OBJEXT) $(OUT)test_btree.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 clean:
-	$(RM) *.$(OBJEXT) $(TESTS_EXECUTABLES)
+	$(RM) $(CLEAN_TARGETS)
 
 	

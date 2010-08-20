@@ -19,7 +19,7 @@ SUBDIRS		+= doc/tutorial/examples
 
 FILES_IGNORE	:= ./doxymain.h
 FILES		:= $(filter-out $(FILES_IGNORE),$(wildcard $(foreach d, $(SUBDIRS), $d/*.h $d/*.cpp)))
-FILES		+= $(filter-out include/stxxl/bits,$(wildcard include/stxxl/*))
+FILES		+= $(filter-out include/stxxl/bits %.uncrustify %.diff,$(wildcard include/stxxl/*))
 
 
 all: uncrustify-test
@@ -50,7 +50,7 @@ UNCRUSTIFY_FLAGS+= -c $(UNCRUSTIFY_CFG) -l CPP
 %.diff: % %.uncrustify
 	@test -f $*
 	@test -f $*.uncrustify
-	diff -u $^ > $@ || test $$? == 1
+	diff -u $^ > $@ || test $$? = 1
 	test -s $@ || $(RM) $@
 
 %.uncrustify: % $(UNCRUSTIFY_CFG) #$(UNCRUSTIFY)

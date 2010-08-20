@@ -7,8 +7,9 @@ tests:
 
 lib: lib$(LIBNAME).$(LIBEXT)
 lib$(LIBNAME).$(LIBEXT): $(LIB_OBJECTS)
+	del lib$(LIBNAME).$(LIBEXT)
 	$(LIBGEN)lib$(LIBNAME).$(LIBEXT) $(LIB_OBJECTS)
 
 clean:
-	$(RM) lib$(LIBNAME).$(LIBEXT)
+	$(RM) $(CLEAN_TARGETS)
 

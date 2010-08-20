@@ -1,6 +1,8 @@
-TESTS			 = test_io gen_file test_cancel benchmark_disks flushbuffers benchmark_disk_and_flash
+TESTS			 = test_io gen_file test_cancel flushbuffers benchmark_disk_and_flash benchmark_configured_disks benchmark_random_block_access iobench_scatter_in_place verify_disks
 TESTS_NON_MSVC		 = sd_test
 TESTS_UNITTEST		 = unittest
+
+UTIL_BINARIES		 = benchmark_disks
 
 LIB_SRC			 = \
 	iostats.cpp \
@@ -8,9 +10,10 @@ LIB_SRC			 = \
 	request_waiters_impl_basic.cpp \
 	request_state_impl_basic.cpp \
 	request_impl_basic.cpp \
-	file_request_basic.cpp \
+	disk_queued_file.cpp \
 	request_queue_impl_worker.cpp \
 	request_queue_impl_qwqr.cpp \
+	request_queue_impl_1q.cpp \
 	ufs_file_base.cpp \
 	syscall_file.cpp \
 	mmap_file.cpp \

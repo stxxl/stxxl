@@ -21,8 +21,9 @@
 
 #ifdef BOOST_MSVC
 
-#include <stxxl/bits/io/file_request_basic.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/request.h>
+#include <windows.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -31,13 +32,13 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Base for Windows file system implementations
-class wfs_file_base : public file_request_basic
+class wfs_file_base : public virtual file
 {
 protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode
-    wfs_file_base(const std::string & filename, int mode, int disk);
+    wfs_file_base(const std::string & filename, int mode);
     offset_type _size();
 
 public:

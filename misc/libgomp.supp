@@ -1,0 +1,31 @@
+{
+   libgomp/gomp_new_team/malloc
+   Memcheck:Leak
+   fun:malloc
+   fun:gomp_malloc
+   fun:gomp_new_team
+   fun:GOMP_parallel_start
+}
+{
+   libgomp/gomp_team_start/malloc
+   Memcheck:Leak
+   fun:malloc
+   fun:gomp_malloc
+   fun:gomp_team_start
+}
+{
+   libgomp/gomp_team_start/realloc
+   Memcheck:Leak
+   fun:malloc
+   fun:realloc
+   fun:gomp_realloc
+   fun:gomp_team_start
+}
+{
+   libgomp/gomp_team_start/pthread_create
+   Memcheck:Leak
+   fun:calloc
+   fun:_dl_allocate_tls
+   fun:pthread_create@@GLIBC_2.2.5
+   fun:gomp_team_start
+}

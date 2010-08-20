@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-variants="stxxl mcstxxl pmstxxl"
+variants="stxxl mcstxxl pmstxxl stxxl_boost mcstxxl_boost pmstxxl_boost"
 
 ulimit -t 7200
 set -o pipefail
@@ -35,6 +35,7 @@ done
 for stxxl in $variants
 do
 	run common/stxxl_info
+	run mng/test_aligned
 done
 
 echo "==================== finished ===================="

@@ -37,11 +37,11 @@ using stxxl::timestamp;
 #define GB (1024 * 1024 * 1024)
 
 void run(char * buffer, file ** disks, stxxl::int64 offset, stxxl::int64 length,
-        unsigned hdd_blocks, unsigned hdd_bytes, unsigned ssd_blocks, unsigned ssd_bytes, unsigned repeats)
+         unsigned hdd_blocks, unsigned hdd_bytes, unsigned ssd_blocks, unsigned ssd_bytes, unsigned repeats)
 {
     unsigned i, j;
     double begin = timestamp(), end, elapsed;
-    request_ptr * reqs = new request_ptr[STXXL_MAX(hdd_blocks + ssd_blocks, 1U)];
+    request_ptr * reqs = new request_ptr[stxxl::STXXL_MAX(hdd_blocks + ssd_blocks, 1U)];
 
     struct diskinfo {
         unsigned id;
@@ -65,37 +65,35 @@ void run(char * buffer, file ** disks, stxxl::int64 offset, stxxl::int64 length,
     double volume = 0;
 
     for (unsigned repeat = 0; repeat < repeats; ++repeat) {
-
-    int r = 0;
-    char * buf = buffer;
-    for (i = 0; i < 2; i++)
-    {
-        for (j = 0; j < info[i].n; j++) {
-            stxxl::int64 bytes = info[i].bytes;
-            stxxl::int64 position = (bytes * (rand() & 0xffff)) % length;
-            reqs[r++] = disks[info[i].id]->aread(buf, offset + position, bytes,
-                                                   stxxl::default_completion_handler());
-            buf += bytes;
-            volume += bytes;
+        int r = 0;
+        char * buf = buffer;
+        for (i = 0; i < 2; i++)
+        {
+            for (j = 0; j < info[i].n; j++) {
+                stxxl::int64 bytes = info[i].bytes;
+                stxxl::int64 position = (bytes * (rand() & 0xffff)) % length;
+                reqs[r++] = disks[info[i].id]->aread(buf, offset + position, bytes,
+                                                     stxxl::default_completion_handler());
+                buf += bytes;
+                volume += bytes;
+            }
         }
-    }
 
-    wait_all(reqs, r);
-
+        wait_all(reqs, r);
     }
 
     end = timestamp();
     elapsed = end - begin;
 
-    std::cout << "B_d = " << info[0].bytes << "  B_f = " << info[1].bytes << "  n_d = " << info[0].n << "  n_f = " << info[1].n ;//<< std::endl;
-    std::cout << " Transferred " << (volume / MB) << " MB in " << elapsed << " seconds @ " << (volume / MB / elapsed) << " MB/s" << std::endl;
+    std::cout << "B_d = " << info[0].bytes << "  B_f = " << info[1].bytes << "  n_d = " << info[0].n << "  n_f = " << info[1].n; //<< std::endl;
+    std::cout << " Transferred " << (volume / MB) << " MiB in " << elapsed << " seconds @ " << (volume / MB / elapsed) << " MiB/s" << std::endl;
     delete[] reqs;
 }
 
 void usage(const char * argv0)
 {
     std::cout << "Usage: " << argv0 << " offset length diskfile flashfile" << std::endl;
-    std::cout << "    starting 'offset' and 'length' are given in GB" << std::endl;
+    std::cout << "    starting 'offset' and 'length' are given in GiB" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     exit(-1);
 }
@@ -145,7 +143,7 @@ int main(int argc, char * argv[])
         for (unsigned hdd_bytes = 4 * KB; hdd_bytes < 256 * MB; hdd_bytes <<= 1) {
             for (unsigned ssd_bytes = 128 * KB; ssd_bytes == 128 * KB; ssd_bytes <<= 1) {
                 for (unsigned hdd_blocks = 1; hdd_blocks == 1; ++hdd_blocks) {
-                    for (unsigned ssd_blocks = 0; ssd_blocks <= (STXXL_MAX(16U, 2 * hdd_bytes * hdd_blocks / ssd_bytes)); ++ssd_blocks) {
+                    for (unsigned ssd_blocks = 0; ssd_blocks <= (stxxl::STXXL_MAX(16U, 2 * hdd_bytes * hdd_blocks / ssd_bytes)); ++ssd_blocks) {
                         run((char *)buffer, disks, offset, length, hdd_blocks, hdd_bytes, ssd_blocks, ssd_bytes, 100);
                     }
                 }

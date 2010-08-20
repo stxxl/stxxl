@@ -12,15 +12,19 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iomanip>
 #include <stxxl/bits/io/wbtl_file.h>
+
+#if STXXL_HAVE_WBTL_FILE
+
+#include <algorithm>
+#include <iomanip>
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/common/debug.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/aligned_alloc>
 
 #ifndef STXXL_VERBOSE_WBTL
-#define STXXL_VERBOSE_WBTL STXXL_VERBOSE0
+#define STXXL_VERBOSE_WBTL STXXL_VERBOSE2
 #endif
 
 
@@ -31,9 +35,9 @@ wbtl_file::wbtl_file(
     file * backend_file,
     size_type write_buffer_size,
     int write_buffers,
-    int disk) :
-        file_request_basic(disk), storage(backend_file), sz(0), write_block_size(write_buffer_size),
-        free_bytes(0), curbuf(1), curpos(write_block_size)
+    int queue_id, int allocator_id) :
+    disk_queued_file(queue_id, allocator_id), storage(backend_file), sz(0), write_block_size(write_buffer_size),
+    free_bytes(0), curbuf(1), curpos(write_block_size)
 {
     assert(write_buffers == 2); // currently hardcoded
     write_buffer[0] = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
@@ -50,7 +54,7 @@ wbtl_file::~wbtl_file()
     storage = 0;
 }
 
-void wbtl_file::serve(const stxxl::request* req) throw(io_error)
+void wbtl_file::serve(const request * req) throw (io_error)
 {
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
@@ -92,31 +96,31 @@ void wbtl_file::set_size(offset_type newsize)
     }
 }
 
-#define FMT_A_S(_addr_,_size_) "0x" << std::hex << std::setfill('0') << std::setw(8) << (_addr_) << "/0x" << std::setw(8) << (_size_)
-#define FMT_A_C(_addr_,_size_) "0x" << std::setw(8) << (_addr_) << "(" << std::dec << (_size_) << ")"
+#define FMT_A_S(_addr_, _size_) "0x" << std::hex << std::setfill('0') << std::setw(8) << (_addr_) << "/0x" << std::setw(8) << (_size_)
+#define FMT_A_C(_addr_, _size_) "0x" << std::setw(8) << (_addr_) << "(" << std::dec << (_size_) << ")"
 #define FMT_A(_addr_) "0x" << std::setw(8) << (_addr_)
 
 // logical address
-void wbtl_file::delete_region(offset_type offset, size_type size)
+void wbtl_file::discard(offset_type offset, offset_type size)
 {
     scoped_mutex_lock mapping_lock(mapping_mutex);
     sortseq::iterator physical = address_mapping.find(offset);
-    STXXL_VERBOSE_WBTL("wbtl:delreg  l" << FMT_A_S(offset, size) << " @    p" << FMT_A(physical != address_mapping.end() ? physical->second : 0xffffffff));
+    STXXL_VERBOSE_WBTL("wbtl:discard l" << FMT_A_S(offset, size) << " @    p" << FMT_A(physical != address_mapping.end() ? physical->second : 0xffffffff));
     if (physical == address_mapping.end()) {
         // could be OK if the block was never written ...
-        //STXXL_ERRMSG("delete_region: mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
+        //STXXL_ERRMSG("discard: mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
     } else {
         offset_type physical_offset = physical->second;
         address_mapping.erase(physical);
         _add_free_region(physical_offset, size);
         place_map::iterator reverse = reverse_mapping.find(physical_offset);
         if (reverse == reverse_mapping.end()) {
-            STXXL_ERRMSG("delete_region: reverse mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
+            STXXL_ERRMSG("discard: reverse mapping not found: " << FMT_A_S(offset, size) << " ==> " << "???");
         } else {
             assert(offset == (reverse->second).first);
             reverse_mapping.erase(reverse);
         }
-        storage->delete_region(physical_offset, size);
+        storage->discard(physical_offset, size);
     }
 }
 
@@ -125,8 +129,8 @@ void wbtl_file::_add_free_region(offset_type offset, offset_type size)
 {
     // mapping_lock has to be aquired by caller
     STXXL_VERBOSE_WBTL("wbtl:addfre  p" << FMT_A_S(offset, size) << " F <= f" << FMT_A_C(free_bytes, free_space.size()));
-    size_type region_pos = offset;
-    size_type region_size = size;
+    offset_type region_pos = offset;
+    offset_type region_size = size;
     if (!free_space.empty())
     {
         sortseq::iterator succ = free_space.upper_bound(region_pos);
@@ -200,10 +204,10 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
     // map logical to physical address
     {
         scoped_mutex_lock mapping_lock(mapping_mutex);
-    sortseq::iterator physical = address_mapping.find(offset);
-    if (physical == address_mapping.end()) {
-        STXXL_ERRMSG("wbtl_read: mapping not found: " << FMT_A_S(offset, bytes) << " ==> " << "???");
-        //STXXL_THROW2(io_error, "wbtl_read of unmapped memory");
+        sortseq::iterator physical = address_mapping.find(offset);
+        if (physical == address_mapping.end()) {
+            STXXL_ERRMSG("wbtl_read: mapping not found: " << FMT_A_S(offset, bytes) << " ==> " << "???");
+            //STXXL_THROW2(io_error, "wbtl_read of unmapped memory");
             physical_offset = 0xffffffff;
         } else {
             physical_offset = physical->second;
@@ -241,6 +245,7 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
         req->wait(false);
     }
     STXXL_VERBOSE_WBTL("wbtl:sread   l" << FMT_A_S(offset, bytes) << " @    p" << FMT_A(physical_offset) << " " << std::dec << cached);
+    STXXL_UNUSED(cached);
 }
 
 void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
@@ -249,13 +254,13 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
     // is the block already mapped?
     {
         scoped_mutex_lock mapping_lock(mapping_mutex);
-    sortseq::iterator physical = address_mapping.find(offset);
-    STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ <= p" <<
-                       FMT_A_C(physical != address_mapping.end() ? physical->second : 0xffffffff, address_mapping.size()));
-    if (physical != address_mapping.end()) {
+        sortseq::iterator physical = address_mapping.find(offset);
+        STXXL_VERBOSE_WBTL("wbtl:swrite  l" << FMT_A_S(offset, bytes) << " @ <= p" <<
+                           FMT_A_C(physical != address_mapping.end() ? physical->second : 0xffffffff, address_mapping.size()));
+        if (physical != address_mapping.end()) {
             mapping_lock.unlock();
-        // FIXME: special case if we can replace it in the current writing block
-        delete_region(offset, bytes);
+            // FIXME: special case if we can replace it in the current writing block
+            discard(offset, bytes);
         }
     }
 
@@ -269,7 +274,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
             // mark remaining part as free
             if (curpos < write_block_size)
                 _add_free_region(buffer_address[curbuf] + curpos, write_block_size - curpos);
-            
+
             if (backend_request.get()) {
                 backend_request->wait(false);
             }
@@ -287,7 +292,7 @@ void wbtl_file::swrite(void * buffer, offset_type offset, size_type bytes)
     // write block into buffer
     memcpy(write_buffer[curbuf] + curpos, buffer, bytes);
     stats::get_instance()->write_cached(bytes);
-    
+
     scoped_mutex_lock mapping_lock(mapping_mutex);
     address_mapping[offset] = buffer_address[curbuf] + curpos;
     reverse_mapping[buffer_address[curbuf] + curpos] = place(offset, bytes);
@@ -300,7 +305,7 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
     // mapping_lock has to be aquired by caller
     sortseq::iterator space =
         std::find_if(free_space.begin(), free_space.end(),
-                     bind2nd(FirstFit(), write_block_size));
+                     bind2nd(FirstFit(), write_block_size) _STXXL_FORCE_SEQUENTIAL);
 
     if (space != free_space.end())
     {
@@ -322,7 +327,7 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
 }
 
 void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size,
-                      sortseq::iterator pred, sortseq::iterator succ)
+                                 sortseq::iterator pred, sortseq::iterator succ)
 {
     if (pred != free_space.end())
     {
@@ -337,7 +342,7 @@ void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size
         if (region_pos <= succ->first && region_pos + region_size > succ->first)
         {
             STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory "
-                 << "System info: S " << region_pos << " " << region_size << " " << succ->first);
+                        << "System info: S " << region_pos << " " << region_size << " " << succ->first);
         }
     }
 }
@@ -348,4 +353,6 @@ const char * wbtl_file::io_type() const
 }
 
 __STXXL_END_NAMESPACE
+
+#endif  // #if STXXL_HAVE_WBTL_FILE
 // vim: et:ts=4:sw=4

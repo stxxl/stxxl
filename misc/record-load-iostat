@@ -45,6 +45,7 @@ if [ "$1" = "-p" ]; then
 	shift
 fi
 
+if [ -z "$DONT_WAIT_FOR_LOW_LOAD" ]; then
 # wait at most 120 seconds for load to drop below 1.00
 loop=""
 load=`cut -d. -f1 /proc/loadavg`
@@ -57,6 +58,7 @@ do
 	load=`cut -d. -f1 /proc/loadavg`
 done
 echo " ==> `cut -d' ' -f1 /proc/loadavg`" >/dev/tty
+fi
 
 #run command passed as the argument concurrently to iostat
 #dump I/O stat every second

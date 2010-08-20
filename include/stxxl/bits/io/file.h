@@ -66,9 +66,10 @@
 #endif
 
 
+#include <cassert>
+
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/io/request.h>
@@ -85,8 +86,6 @@ __STXXL_BEGIN_NAMESPACE
 //! base on various file systems or even remote storage interfaces
 class file : private noncopyable
 {
-    int id;
-
     mutex request_ref_cnt_mutex;
     int request_ref_cnt;
 
@@ -94,7 +93,7 @@ protected:
     //! \brief Initializes file object
     //! \param _id file identifier
     //! \remark Called in implementations of file
-    file(int _id) : id(_id), request_ref_cnt(0) { }
+    file() : request_ref_cnt(0) { }
 
 public:
     // the offset of a request, also the size of the file
@@ -116,6 +115,10 @@ public:
         TRUNC = 32                          //!< once file is opened its length becomes zero
     };
 
+    static const int DEFAULT_QUEUE = -1;
+    static const int NO_QUEUE = -2;
+    static const int NO_ALLOCATOR = -1;
+
     //! \brief Schedules asynchronous read request to the file
     //! \param buffer pointer to memory buffer to read into
     //! \param pos starting file position to read
@@ -134,7 +137,7 @@ public:
     virtual request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
                                const completion_handler & on_cmpl) = 0;
 
-    virtual void serve(const request * req) throw(io_error) = 0;
+    virtual void serve(const request * req) throw (io_error) = 0;
 
     void add_request_ref()
     {
@@ -161,35 +164,38 @@ public:
     //! \brief Returns size of the file
     //! \return file size in bytes
     virtual offset_type size() = 0;
-    //! \brief deprecated, use \c stxxl::file::get_id() instead
-    __STXXL_DEPRECATED(int get_disk_number() const)
+    //! \brief Returns the identifier of the file's queue
+    //! \remark Files allocated on the same physical device usually share the same queue
+    //! \return integer identifier
+    virtual int get_queue_id() const = 0;
+    //! \brief Returns the file's allocator
+    //! \remark Files allocated on the same physical device usually share the same queue
+    //! \return integer identifier
+    virtual int get_allocator_id() const = 0;
+
+    virtual int get_physical_device_id() const
     {
-        return get_id();
-    }
-    //! \brief Returns file's identifier
-    //! \remark might be used as disk's id in case disk to file mapping
-    //! \return integer file identifier, passed as constructor parameter
-    int get_id() const
-    {
-        return id;
+        return get_queue_id();
     }
 
-    //! \brief Locks file for reading and writing (aquires a lock in the file system)
+    //! \brief Locks file for reading and writing (acquires a lock in the file system)
     virtual void lock() = 0;
 
     //! \brief Some specialized file types may need to know freed regions
-    virtual void delete_region(offset_type offset, size_type size)
+    virtual void discard(offset_type offset, offset_type size)
     {
-        UNUSED(offset);
-        UNUSED(size);
+        STXXL_UNUSED(offset);
+        STXXL_UNUSED(size);
     }
 
     virtual void export_files(offset_type offset, offset_type length, std::string prefix)
     {
-        UNUSED(offset);
-        UNUSED(length);
-        UNUSED(prefix);
+        STXXL_UNUSED(offset);
+        STXXL_UNUSED(length);
+        STXXL_UNUSED(prefix);
     }
+
+    virtual void remove() { }
 
     virtual ~file()
     {

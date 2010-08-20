@@ -92,16 +92,16 @@ int main(int argc, char ** argv)
         return -1;
     }
 
+    const unsigned int block_size = sizeof(my_type) * 4096;
     if (strcmp(argv[1], "generate") == 0) {
-        const my_type::key_type max_key = 1 * 1024 * 1024;
-        const unsigned int block_size = 1 * 1024 * 1024;
+        const my_type::key_type num_elements = 1 * 1024 * 1024;
         const unsigned int records_in_block = block_size / sizeof(my_type);
         stxxl::syscall_file f(argv[2], stxxl::file::CREAT | stxxl::file::RDWR);
         my_type * array = (my_type *)stxxl::aligned_alloc<BLOCK_ALIGN>(block_size);
         memset(array, 0, block_size);
 
-        my_type::key_type cur_key = max_key;
-        for (unsigned i = 0; i < max_key / records_in_block; i++)
+        my_type::key_type cur_key = num_elements;
+        for (unsigned i = 0; i < num_elements / records_in_block; i++)
         {
             for (unsigned j = 0; j < records_in_block; j++)
                 array[j]._key = cur_key--;
@@ -111,9 +111,12 @@ int main(int argc, char ** argv)
         }
         stxxl::aligned_dealloc<BLOCK_ALIGN>(array);
     } else {
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+        STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+#endif
         stxxl::syscall_file f(argv[2], stxxl::file::DIRECT | stxxl::file::RDWR);
         unsigned memory_to_use = 50 * 1024 * 1024;
-        typedef stxxl::vector<my_type> vector_type;
+        typedef stxxl::vector<my_type, 1, stxxl::lru_pager<8>, block_size> vector_type;
         vector_type v(&f);
 
         /*
@@ -128,10 +131,10 @@ int main(int argc, char ** argv)
         STXXL_MSG("Sorting...");
         if (strcmp(argv[1], "sort") == 0) {
             stxxl::sort(v.begin(), v.end(), Cmp(), memory_to_use);
-        /* stable_sort is not yet implemented
+#if 0       // stable_sort is not yet implemented
         } else if (strcmp(argv[1], "stable_sort") == 0) {
             stxxl::stable_sort(v.begin(), v.end(), memory_to_use);
-        */
+#endif
         } else if (strcmp(argv[1], "ksort") == 0) {
             stxxl::ksort(v.begin(), v.end(), memory_to_use);
         } else if (strcmp(argv[1], "stable_ksort") == 0) {

@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -23,7 +23,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-#define __STXXL_STRING(x) # x
+#define _STXXL_STRING(x) # x
 
 #ifdef BOOST_MSVC
  #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
@@ -48,6 +48,11 @@ __STXXL_BEGIN_NAMESPACE
     STXXL_THROW(std::invalid_argument, \
                 "function " << STXXL_PRETTY_FUNCTION_NAME, \
                 error_message)
+
+#define STXXL_THROW_UNREACHABLE() \
+    STXXL_THROW(stxxl::unreachable, \
+                "file: " << __FILE__ << ", line: " << __LINE__, \
+                "must be unreachable code")
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -79,7 +84,7 @@ inline bool helper_check_eq_0(INT res, const char * func_name, const char * expr
 }
 
 #define check_pthread_call(expr) \
-    stxxl::helper_check_eq_0<stxxl::resource_error>(expr, STXXL_PRETTY_FUNCTION_NAME, __STXXL_STRING(expr), true)
+    stxxl::helper_check_eq_0<stxxl::resource_error>(expr, STXXL_PRETTY_FUNCTION_NAME, _STXXL_STRING(expr), true)
 
 template <typename E, typename INT>
 inline bool helper_check_ge_0(INT res, const char * func_name)

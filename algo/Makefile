@@ -15,13 +15,6 @@ async_schedule.$(OBJEXT): async_schedule.cpp
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES) $(CONTAINER_FILES) $(ALGO_FILES)
 
 
-test_manyunits: test_manyunits.$(EXEEXT)
-test_manyunits.$(EXEEXT): test_manyunits1.cpp test_manyunits2.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_manyunits1.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_manyunits2.cpp
-	$(LINKER) test_manyunits1.$(OBJEXT) test_manyunits2.$(OBJEXT) $(OUT)test_manyunits.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-
-
 test_sort: test_sort.$(EXEEXT)
 test_sort.$(EXEEXT): test_sort.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_sort.cpp -DSTXXL_VERBOSE_LEVEL=0
@@ -44,12 +37,12 @@ test_ksort_all_parameters.$(EXEEXT): test_ksort_all_parameters.cpp $(DEPENDENCIE
 
 test_stable_ksort: test_stable_ksort.$(EXEEXT)
 test_stable_ksort.$(EXEEXT): test_stable_ksort.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_stable_ksort.cpp -DCOUNT_WAIT_TIME
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_stable_ksort.cpp
 	$(LINKER)  test_stable_ksort.$(OBJEXT) $(OUT)test_stable_ksort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_stable_ksort_all_parameters: test_stable_ksort_all_parameters.$(EXEEXT)
 test_stable_ksort_all_parameters.$(EXEEXT): test_stable_ksort_all_parameters.cpp $(DEPENDENCIES) # takes long to compile
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_stable_ksort_all_parameters.cpp -DCOUNT_WAIT_TIME
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_stable_ksort_all_parameters.cpp
 	$(LINKER)  test_stable_ksort_all_parameters.$(OBJEXT) $(OUT)test_stable_ksort_all_parameters.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 sort_file: sort_file.$(EXEEXT)
@@ -80,4 +73,4 @@ test_random_shuffle.$(EXEEXT): test_random_shuffle.cpp $(DEPENDENCIES)
 
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)

@@ -17,17 +17,17 @@
 __STXXL_BEGIN_NAMESPACE
 
 request::request(const completion_handler & on_compl,
-            file * file__,
-            void * buffer_,
-            offset_type offset_,
-            size_type bytes_,
-            request_type type_) :
-        on_complete(on_compl), ref_cnt(0),
-        file_(file__),
-        buffer(buffer_),
-        offset(offset_),
-        bytes(bytes_),
-        type(type_)
+                 file * file__,
+                 void * buffer_,
+                 offset_type offset_,
+                 size_type bytes_,
+                 request_type type_) :
+    on_complete(on_compl), ref_cnt(0),
+    file_(file__),
+    buffer(buffer_),
+    offset(offset_),
+    bytes(bytes_),
+    type(type_)
 {
     STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": creation, cnt: " << ref_cnt);
     file_->add_request_ref();
@@ -65,7 +65,7 @@ void request::check_alignment() const
 void request::check_nref_failed(bool after)
 {
     STXXL_ERRMSG("WARNING: serious error, reference to the request is lost " <<
-                 (after?"after ":"before") << " serve" <<
+                 (after ? "after " : "before") << " serve" <<
                  " nref=" << nref() <<
                  " this=" << this <<
                  " offset=" << offset <<
@@ -74,7 +74,7 @@ void request::check_nref_failed(bool after)
                  " type=" << ((type == READ) ? "READ" : "WRITE") <<
                  " file=" << get_file() <<
                  " iotype=" << get_file()->io_type()
-    );
+                 );
 }
 
 __STXXL_END_NAMESPACE

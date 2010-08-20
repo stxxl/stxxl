@@ -3,7 +3,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,7 +11,10 @@
 ############################################################################
 
 HOST		?= unknown
-SIZE		?= 100	# GB
+FILE_SIZE	?= $(or $(SIZE),100)	# GiB
+BLOCK_SIZE	?= $(or $(STEP),256)	# MiB
+BATCH_SIZE	?= 1	# blocks
+DIRECT_IO	?= yes	# unset to disable O_DIRECT
 
 disk2file	?= /stxxl/sd$1/stxxl
 
@@ -25,17 +28,39 @@ FLAGS_a_ro	?= R
 
 DISKS		?= abcd $(DISKS_1by1) ab a_ro
 
-DISKBENCH_BINDIR?= .
-DISKBENCH	?= benchmark_disks.stxxl.bin
+SIP_NUM_BLOCKS	?= 0
+SIP_CHUNK_BLOCKS?= 1
+SIP_BLOCK_SIZE	?= 0
 
+DISKBENCH_TITLE	?= STXXL Disk Benchmark $(DISKNAME) B=$(strip $(BATCH_SIZE))x$(call format_block_size,$(BLOCK_SIZE)) @ $(HOST)
+DISKAVG_TITLE	?= STXXL Disk Benchmark $(DISKNAME) @ $(HOST)
+
+DISKBENCH_BINDIR?= .
+MISC_BINDIR	?= $(DISKBENCH_BINDIR)/../misc
+DISKBENCH	?= benchmark_disks.stxxl.bin
+SCATTERINPLACE	?= iobench_scatter_in_place.stxxl.bin
+
+ECHO		?= echo
 pipefail	?= set -o pipefail;
 
 $(foreach d,$(DISKS_1by1),$(eval DISKS_$d ?= $d))
 
+ifeq ($(SHELL),/bin/sh)
+SHELL		 = bash
+endif
+
 define do-some-disks
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
-	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(SIZE) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(if $(filter y yes Y YES,$(DIRECT_IO)),,ND) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+
+endef
+
+define do-some-disks-sip
+	-$(pipefail) \
+	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
+	$(DISKBENCH_BINDIR)/$(SCATTERINPLACE) $(strip $(SIP_NUM_BLOCKS)) $(strip $(SIP_CHUNK_BLOCKS)) $(strip $(SIP_BLOCK_SIZE)) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+
 endef
 
 $(HOST)-%.cr.log:
@@ -61,29 +86,47 @@ $(HOST)-%.rdx.log: FLAGS_EX = R
 $(HOST)-%.rdx.log:
 	$(do-some-disks)
 
+# scatter-in-place
+$(HOST)-%.sip.log:
+	$(do-some-disks-sip)
+
 all: crx wr ex
 
 crx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.crx.log)
 cr: $(foreach d,$(DISKS_1by1),$(HOST)-$d.cr.log)
+cr+: $(foreach d,$(DISKS),$(HOST)-$d.crx.log)
 wr: $(foreach d,$(DISKS),$(HOST)-$d.wr.log)
+wrx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log)
+rdx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.rdx.log)
 ex: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 ex+: $(foreach d,$(DISKS),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
+sip: $(foreach d,$(DISKS_1by1),$(HOST)-$d.sip.log)
 
 plot: $(HOST).gnuplot
 	gnuplot $<
 
+dotplot: $(HOST).d.gnuplot
+	gnuplot $<
+
+avgplot: $(HOST)-avg.gnuplot
+	gnuplot $<
+
+avg3plot: $(HOST)-avg3.gnuplot
+	gnuplot $<
+
 # $1 = logfile, $2 = column
-extract_average	= $(if $(wildcard $1),$(shell tail -n 1 $1 | awk '{ print $$($2+1) }'),......)
+extract_average	= $(if $(wildcard $1),$(shell grep ' Average over ' $1 | awk '{ print $$($2+1) }'),......)
 
 # $1 = logfile, $2 = disk, $3 = column, $4 = label
 # (does not plot if avg = nan)
 define plotline
-	$(if $(filter nan,$(call extract_average,$1,$3)),,echo '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@ ;)
+	$(if $(wildcard $1),$(if $(filter nan,$(call extract_average,$1,$3)),,$(ECHO) '        "$1" using ($$3/1024):($$$3) w l title "$2 $4 ($(call extract_average,$1,$3))", \' >> $@))
+
 endef
 
 # $1 = logfile, $2 = disk
 define plotline-cr1
-	$(if $(wildcard $1),$(call plotline,$1,$2,7,cr1))
+	$(call plotline,$1,$2,7,cr1)
 endef
 define plotline-cr
 	$(call plotline,$1,$2,7,cr)
@@ -111,39 +154,88 @@ disks2label	?= sd[$1]
 DISKNAME	?= unknown disk
 PLOTXMAX	?= 475
 PLOTYMAX	?= 120
+AVGPLOTYMAX	?= $(PLOTYMAX)
+GNUPLOTFILEINFO	?= set label "$(HOST):$(patsubst $(HOME)/%,\\~/%,$(CURDIR))/" at character 0,-1 font ",6"
 
-$(HOST).gnuplot: Makefile $(wildcard *.log)
+fmt_block_size_2560000B		?= 2.5
+fmt_block_size_12800000B	?= 12.5
+fmt_block_size_51200000B	?= 50
+format_block_size = $(or $(fmt_block_size_$(strip $1)),$(strip $1))MiB
+
+$(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	$(RM) $@
-	echo 'set title "STXXL Disk Benchmark $(DISKNAME) @ $(HOST)"' >> $@
-	echo 'set xlabel "Disk offset [GB]"' >> $@
-	echo 'set ylabel "Bandwidth per disk [MB/s]"' >> $@
-	echo '' >> $@
+	$(ECHO) 'set title "$(DISKBENCH_TITLE)"' >> $@
+	$(ECHO) 'set xlabel "Disk offset [GiB]"' >> $@
+	$(ECHO) 'set ylabel "Bandwidth per disk [MiB/s]"' >> $@
+	$(ECHO) '' >> $@
 
-	echo 'plot [0:$(PLOTXMAX)] [0:$(PLOTYMAX)] \' >> $@
+	$(ECHO) 'plot [0:$(PLOTXMAX)] [0:$(PLOTYMAX)] \' >> $@
 	$(foreach d,$(DISKS_1by1),\
 		$(call plotline-cr1,$(HOST)-$d.cr1.log,$(call disk2label,$d)) \
 		$(call plotline-crx,$(HOST)-$d.crx.log,$(call disk2label,$d)) \
-		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
-		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
 		$(call plotline-cr,$(HOST)-$d.cr.log,$(call disk2label,$d)) \
+		$(call plotline-wr,$(HOST)-$d.wr1.log,$(call disk2label,$d)) \
+		$(call plotline-rd,$(HOST)-$d.wr1.log,$(call disk2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disk2label,$d)) \
-	)
-	$(foreach d,$(filter-out $(DISKS_1by1),$(DISKS)),\
 		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disk2label,$d)) \
 		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disk2label,$d)) \
+	)
+	$(foreach d,$(filter-out $(DISKS_1by1),$(DISKS)),\
+		$(call plotline-crx,$(HOST)-$d.crx.log,$(call disks2label,$d)) \
 		$(call plotline-wr,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
 		$(call plotline-rd,$(HOST)-$d.wr.log,$(call disks2label,$d)) \
+		$(call plotline-wrx,$(HOST)-$d.wrx.log,$(call disks2label,$d)) \
+		$(call plotline-rdx,$(HOST)-$d.rdx.log,$(call disks2label,$d)) \
 	)
-	echo '        "nothing" notitle' >> $@
+	$(ECHO) '        "nothing" notitle' >> $@
 
-	echo '' >> $@
-	echo 'pause mouse' >> $@
-	echo '' >> $@
-	echo 'set title "STXXL Disk Benchmark $(DISKNAME) \\@ $(HOST)"' >> $@
-	echo 'set term postscript enhanced color' >> $@
-	echo 'set output "$(HOST).ps"' >> $@
-	echo 'replot' >> $@
+	$(ECHO) '' >> $@
+	$(ECHO) 'pause -1' >> $@
+	$(ECHO) '' >> $@
+	$(ECHO) 'set title "$(subst _,\\_,$(subst @,\\@,$(DISKBENCH_TITLE)))"' >> $@
+	$(ECHO) 'set term postscript enhanced color solid 10' >> $@
+	$(ECHO) 'set output "$(HOST).ps"' >> $@
+	$(ECHO) '$(GNUPLOTFILEINFO)' >> $@
+	$(ECHO) 'replot' >> $@
+
+$(HOST).d.gnuplot: $(HOST).gnuplot
+	sed -e 's/ w l / w d lw 2 /' $< > $@
+
+$(HOST)-avg.dat: $(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *KB/*.log *MB/*.log)
+	$(MISC_BINDIR)/diskbench-avgdat.sh $(wildcard *KB *MB) > $@
+
+$(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
+	$(RM) $@
+	$(ECHO) 'set title "$(DISKAVG_TITLE)"' >> $@
+	$(ECHO) 'set xlabel "Block Size [MiB]"' >> $@
+	$(ECHO) 'set ylabel "Average Sequential Bandwidth [MiB/s]"' >> $@
+	$(ECHO) 'set key bottom' >> $@
+	$(ECHO) '' >> $@
+
+	$(ECHO) 'plot [] [0:$(AVGPLOTYMAX)] \' >> $@
+	$(ECHO) '        "$(HOST)-avg.dat" using 0:2:xtic(1) w lp lt 1 pt 1 title "crx", \' >> $@
+	$(ECHO) '        "$(HOST)-avg.dat" using 0:3:xtic(1) w lp lt 2 pt 2 title "wr", \' >> $@
+	$(ECHO) '        "$(HOST)-avg.dat" using 0:4:xtic(1) w lp lt 3 pt 3 title "rd", \' >> $@
+	$(ECHO) '        "$(HOST)-avg.dat" using 0:5:xtic(1) w lp lt 4 pt 4 title "wrx", \' >> $@
+	$(ECHO) '        "$(HOST)-avg.dat" using 0:6:xtic(1) w lp lt 5 pt 5 title "rdx", \' >> $@
+	$(ECHO) '        "nothing" notitle' >> $@
+
+	$(ECHO) '' >> $@
+	$(ECHO) 'pause -1' >> $@
+	$(ECHO) '' >> $@
+	$(ECHO) 'set term png size 800,600' >> $@
+	$(ECHO) 'set output "$(HOST)-avg.png"' >> $@
+	$(ECHO) 'replot' >> $@
+	$(ECHO) '' >> $@
+	$(ECHO) 'set title "$(subst _,\\_,$(subst @,\\@,$(DISKAVG_TITLE)))"' >> $@
+	$(ECHO) 'set term postscript enhanced color solid' >> $@
+	$(ECHO) 'set output "$(HOST)-avg.ps"' >> $@
+	$(ECHO) '$(GNUPLOTFILEINFO)' >> $@
+	$(ECHO) 'replot' >> $@
+
+$(HOST)-avg3.gnuplot: $(HOST)-avg.gnuplot
+	grep -v -E '0:[34]:xtic' $< | sed -e 's/"crx"/"create"/g;s/"wrx"/"write"/g;s/"rdx"/"read"/g;/set output/s/-avg\./-avg3./g' > $@
 
 -include iostat-plot.mk
 

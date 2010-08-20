@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <memory>
+#include <cassert>
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
@@ -26,6 +27,7 @@
 #include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/compat_unique_ptr.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/verbose.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -55,8 +57,10 @@ protected:
     virtual void delete_waiter(onoff_switch * sw) = 0;
     virtual void notify_waiters() = 0;
 
-public: // HACK!
+public:
+    // HACK!
     virtual void serve() = 0;
+
 protected:
     virtual void completed() = 0;
 
@@ -314,7 +318,7 @@ public:
 template <class request_iterator_>
 void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
-    for (; reqs_begin != reqs_end; ++reqs_begin)
+    for ( ; reqs_begin != reqs_end; ++reqs_begin)
         (request_ptr(*reqs_begin))->wait();
 }
 
@@ -340,7 +344,7 @@ typename std::iterator_traits<request_iterator_>::difference_type cancel_all(req
     typename std::iterator_traits<request_iterator_>::difference_type num_cancelled = 0;
     while (reqs_begin != reqs_end)
     {
-        if((request_ptr(*reqs_begin))->cancel())
+        if ((request_ptr(*reqs_begin))->cancel())
             ++num_cancelled;
         ++reqs_begin;
     }
@@ -373,7 +377,7 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 //! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
 inline bool poll_any(request_ptr req_array[], int count, int & index)
 {
-    request_ptr* res = poll_any(req_array, req_array + count);
+    request_ptr * res = poll_any(req_array, req_array + count);
     index = res - req_array;
     return res != (req_array + count);
 }
@@ -386,7 +390,7 @@ inline bool poll_any(request_ptr req_array[], int count, int & index)
 template <class request_iterator_>
 request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
-    stats::scoped_wait_timer wait_timer;
+    stats::scoped_wait_timer wait_timer(stats::WAIT_OP_ANY);
 
     onoff_switch sw;
 

@@ -13,10 +13,13 @@
 
 #include <stxxl/bits/io/ufs_file_base.h>
 
-#ifndef BOOST_MSVC
+#ifdef BOOST_MSVC
+ #include <windows.h>
+#else
  #include <unistd.h>
  #include <fcntl.h>
 #endif
+#include <cstdio>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -29,57 +32,64 @@ const char * ufs_file_base::io_type() const
 
 ufs_file_base::ufs_file_base(
     const std::string & filename,
-    int mode,
-    int disk) : file_request_basic(disk), file_des(-1), mode_(mode)
+    int mode) : file_des(-1), mode_(mode), filename(filename)
 {
-    int fmode = 0;
+    int flags = 0;
 
 #ifndef STXXL_DIRECT_IO_OFF
  #ifndef BOOST_MSVC
     if (mode & DIRECT)
-        fmode |= O_SYNC | O_RSYNC | O_DSYNC | O_DIRECT;
+        flags |= O_SYNC | O_RSYNC | O_DSYNC | O_DIRECT;
  #endif
 #endif
 
     if (mode & RDONLY)
-        fmode |= O_RDONLY;
+        flags |= O_RDONLY;
 
     if (mode & WRONLY)
-        fmode |= O_WRONLY;
+        flags |= O_WRONLY;
 
     if (mode & RDWR)
-        fmode |= O_RDWR;
+        flags |= O_RDWR;
 
     if (mode & CREAT)
-        fmode |= O_CREAT;
+        flags |= O_CREAT;
 
     if (mode & TRUNC)
-        fmode |= O_TRUNC;
+        flags |= O_TRUNC;
 
 #ifdef BOOST_MSVC
-    fmode |= O_BINARY;                     // the default in MS is TEXT mode
+    flags |= O_BINARY;                     // the default in MS is TEXT mode
 #endif
 
 #ifdef BOOST_MSVC
-    const int flags = S_IREAD | S_IWRITE;
+    const int perms = S_IREAD | S_IWRITE;
 #else
-    const int flags = S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP;
+    const int perms = S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP;
 #endif
 
-    if ((file_des = ::open(filename.c_str(), fmode, flags)) < 0)
-        STXXL_THROW2(io_error, "Filedescriptor=" << file_des << " filename=" << filename << " fmode=" << fmode);
+    if ((file_des = ::open(filename.c_str(), flags, perms)) < 0)
+        STXXL_THROW2(io_error, "::open() Filedescriptor=" << file_des << " filename=" << filename << " flags=" << flags);
 }
 
 ufs_file_base::~ufs_file_base()
 {
-    scoped_mutex_lock fd_lock(fd_mutex);
-    int res = ::close(file_des);
+    close();
+}
 
-    // if successful, reset file descriptor
-    if (res >= 0)
-        file_des = -1;
-    else
-        stxxl_function_error(io_error);
+void ufs_file_base::close()
+{
+    if (file_des != -1)
+    {
+        scoped_mutex_lock fd_lock(fd_mutex);
+        int res = ::close(file_des);
+
+        // if successful, reset file descriptor
+        if (res >= 0)
+            file_des = -1;
+        else
+            stxxl_function_error(io_error);
+    }
 }
 
 void ufs_file_base::lock()
@@ -129,16 +139,24 @@ void ufs_file_base::set_size(offset_type newsize)
             stxxl_win_lasterror_exit("SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
                                      " newsize=" << newsize << " ", io_error);
 
-            if (!SetEndOfFile(hfile))
-                stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
-                                         " newsize=" << newsize << " ", io_error);
+        if (!SetEndOfFile(hfile))
+            stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
+                                     " newsize=" << newsize << " ", io_error);
 #else
         stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
 #endif
     }
 
+#ifndef BOOST_MSVC
     if (newsize > cur_size)
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
+#endif
+}
+
+void ufs_file_base::remove()
+{
+    close();
+    ::remove(filename.c_str());
 }
 
 __STXXL_END_NAMESPACE

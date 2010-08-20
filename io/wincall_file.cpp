@@ -11,15 +11,18 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/wincall_file.h>
+
+#if STXXL_HAVE_WINCALL_FILE
+
 #include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/common/debug.h>
 
-#ifdef BOOST_MSVC
+#include <windows.h>
 
 __STXXL_BEGIN_NAMESPACE
 
 
-void wincall_file::serve(const request * req) throw(io_error)
+void wincall_file::serve(const request * req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
@@ -29,64 +32,70 @@ void wincall_file::serve(const request * req) throw(io_error)
     request::request_type type = req->get_type();
 
     if (bytes > 32 * 1024 * 1024) {
-        STXXL_ERRMSG("Using a block size larger than 32 MB may not work with the " << io_type() << " filetype");
+        STXXL_ERRMSG("Using a block size larger than 32 MiB may not work with the " << io_type() << " filetype");
     }
 
-        HANDLE handle = file_des;
-        LARGE_INTEGER desired_pos;
-        desired_pos.QuadPart = offset;
-        if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))
+    HANDLE handle = file_des;
+    LARGE_INTEGER desired_pos;
+    desired_pos.QuadPart = offset;
+    if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))
+    {
+        stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve()" <<
+                                 " offset=" << offset <<
+                                 " this=" << this <<
+                                 " buffer=" << buffer <<
+                                 " bytes=" << bytes <<
+                                 " type=" << ((type == request::READ) ? "READ" : "WRITE"),
+                                 io_error);
+    }
+    else
+    {
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+
+        if (type == request::READ)
         {
-            stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve()" <<
-                                     " offset=" << offset <<
-                                     " this=" << this <<
-                                     " buffer=" << buffer <<
-                                     " bytes=" << bytes <<
-                                     " type=" << ((type == request::READ) ? "READ" : "WRITE"),
-                                     io_error);
+            STXXL_DEBUGMON_DO(io_started(buffer));
+            DWORD NumberOfBytesRead = 0;
+            if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
+            {
+                stxxl_win_lasterror_exit("ReadFile" <<
+                                         " this=" << this <<
+                                         " offset=" << offset <<
+                                         " buffer=" << buffer <<
+                                         " bytes=" << bytes <<
+                                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                         " NumberOfBytesRead= " << NumberOfBytesRead,
+                                         io_error);
+            } else if (NumberOfBytesRead != bytes) {
+                stxxl_win_lasterror_exit(" partial read: missing " << (bytes - NumberOfBytesRead) << " out of " << bytes << " bytes",
+                                         io_error);
+            }
+
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
         else
         {
-            stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+            STXXL_DEBUGMON_DO(io_started(buffer));
 
-            if (type == request::READ)
+            DWORD NumberOfBytesWritten = 0;
+            if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
             {
-                STXXL_DEBUGMON_DO(io_started(buffer));
-                DWORD NumberOfBytesRead = 0;
-                if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
-                {
-                    stxxl_win_lasterror_exit("ReadFile" <<
-                                             " this=" << this <<
-                                             " offset=" << offset <<
-                                             " buffer=" << buffer <<
-                                             " bytes=" << bytes <<
-                                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                                             " NumberOfBytesRead= " << NumberOfBytesRead,
-                                             io_error);
-                }
-
-                STXXL_DEBUGMON_DO(io_finished(buffer));
+                stxxl_win_lasterror_exit("WriteFile" <<
+                                         " this=" << this <<
+                                         " offset=" << offset <<
+                                         " buffer=" << buffer <<
+                                         " bytes=" << bytes <<
+                                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                         " NumberOfBytesWritten= " << NumberOfBytesWritten,
+                                         io_error);
+            } else if (NumberOfBytesWritten != bytes) {
+                stxxl_win_lasterror_exit(" partial write: missing " << (bytes - NumberOfBytesWritten) << " out of " << bytes << " bytes",
+                                         io_error);
             }
-            else
-            {
-                STXXL_DEBUGMON_DO(io_started(buffer));
 
-                DWORD NumberOfBytesWritten = 0;
-                if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
-                {
-                    stxxl_win_lasterror_exit("WriteFile" <<
-                                             " this=" << this <<
-                                             " offset=" << offset <<
-                                             " buffer=" << buffer <<
-                                             " bytes=" << bytes <<
-                                             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                                             " NumberOfBytesWritten= " << NumberOfBytesWritten,
-                                             io_error);
-                }
-
-                STXXL_DEBUGMON_DO(io_finished(buffer));
-            }
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
+    }
 }
 
 const char * wincall_file::io_type() const
@@ -96,5 +105,5 @@ const char * wincall_file::io_type() const
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef BOOST_MSVC
+#endif  // #if STXXL_HAVE_WINCALL_FILE
 // vim: et:ts=4:sw=4

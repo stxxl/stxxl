@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/file_request_basic.h
+ *  include/stxxl/bits/io/disk_queued_file.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER_IO_FILE_REQUEST_BASIC
-#define STXXL_HEADER_IO_FILE_REQUEST_BASIC
+#ifndef STXXL_HEADER_IO_DISK_QUEUED_FILE
+#define STXXL_HEADER_IO_DISK_QUEUED_FILE
 
 #include <stxxl/bits/io/file.h>
 
@@ -22,10 +22,12 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of some file methods based on request_impl_basic
-class file_request_basic : public file
+class disk_queued_file : public virtual file
 {
+    int queue_id, allocator_id;
+
 public:
-    file_request_basic(int id) : file(id)
+    disk_queued_file(int queue_id, int allocator_id) : queue_id(queue_id), allocator_id(allocator_id)
     { }
     request_ptr aread(
         void * buffer,
@@ -37,11 +39,21 @@ public:
         offset_type pos,
         size_type bytes,
         const completion_handler & on_cmpl);
+
+    virtual int get_queue_id() const
+    {
+        return queue_id;
+    }
+
+    virtual int get_allocator_id() const
+    {
+        return allocator_id;
+    }
 };
 
 //! \}
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER_IO_FILE_REQUEST_BASIC
+#endif // !STXXL_HEADER_IO_DISK_QUEUED_FILE
 // vim: et:ts=4:sw=4

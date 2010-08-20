@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <limits>
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 
@@ -27,11 +28,6 @@ struct my_handler
         STXXL_MSG("Request completed: " << ptr);
     }
 };
-
-namespace stxxl
-{
-    std::string hr(uint64, const char * = 0);
-}
 
 int main(int argc, char ** argv)
 {
@@ -64,16 +60,29 @@ int main(int argc, char ** argv)
 
     wait_all(req, 16);
 
+    // check behaviour of having requests to the same location at the same time
+    for (i = 2; i < 16; i++)
+        req[i] = file2.awrite(buffer, 0, size, my_handler());
+    req[0] = file2.aread(buffer, 0, size, my_handler());
+    req[1] = file2.awrite(buffer, 0, size, my_handler());
+
+    wait_all(req, 16);
+
     stxxl::aligned_dealloc<4096>(buffer);
 
     std::cout << *(stxxl::stats::get_instance());
 
     stxxl::uint64 sz;
     for (sz = 123, i = 0; i < 20; ++i, sz *= 10)
-        STXXL_MSG(">>>" << stxxl::hr(sz) << "<<<");
+        STXXL_MSG(">>>" << stxxl::add_SI_multiplier(sz) << "<<<");
     for (sz = 123, i = 0; i < 20; ++i, sz *= 10)
-        STXXL_MSG(">>>" << stxxl::hr(sz, "B") << "<<<");
-    STXXL_MSG(">>>" << stxxl::hr((std::numeric_limits<stxxl::uint64>::max)(), "B") << "<<<");
+        STXXL_MSG(">>>" << stxxl::add_SI_multiplier(sz, "B") << "<<<");
+    STXXL_MSG(">>>" << stxxl::add_SI_multiplier((std::numeric_limits<stxxl::uint64>::max)(), "B") << "<<<");
+    for (sz = 123, i = 0; i < 20; ++i, sz *= 10)
+        STXXL_MSG(">>>" << stxxl::add_IEC_binary_multiplier(sz) << "<<<");
+    for (sz = 123, i = 0; i < 20; ++i, sz *= 10)
+        STXXL_MSG(">>>" << stxxl::add_IEC_binary_multiplier(sz, "B") << "<<<");
+    STXXL_MSG(">>>" << stxxl::add_IEC_binary_multiplier((std::numeric_limits<stxxl::uint64>::max)(), "B") << "<<<");
 
     unlink(tempfilename[0].c_str());
     unlink(tempfilename[1].c_str());

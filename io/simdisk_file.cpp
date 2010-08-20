@@ -11,10 +11,10 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/simdisk_file.h>
-#include <stxxl/bits/io/request_impl_basic.h>
 
-#ifndef BOOST_MSVC
-// mmap call does not exist in Windows
+#if STXXL_HAVE_SIMDISK_FILE
+
+#include <stxxl/bits/io/request_impl_basic.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -138,24 +138,24 @@ IC35L080AVVA07::IC35L080AVVA07()
      *
      * cout << "Zone " << i << " first sector: " << (*it).first_sector;
      * cout << " sectors: " << (*it).sectors << " sustained rate: " ;
-     * cout << (*it).sustained_data_rate/1000000 << " Mb/s"  << endl;
+     * cout << (*it).sustained_data_rate/1024/1024 << " MiB/s"  << endl;
      *
      * }
      *
      *
      * cout << "Last sector     : " << first_sect <<endl;
-     * cout << "Approx. capacity: " << (first_sect/1000000)*bytes_per_sector << " Mb" << endl;
+     * cout << "Approx. capacity: " << (first_sect/1024/1024)*bytes_per_sector << " MiB" << endl;
      */
 
-    std::cout << "Transfer 16 Mb from zone 0 : " <<
+    std::cout << "Transfer 16 MiB from zone 0 : " <<
     get_delay(0, 16 * 1024 * 1024) << " s" << std::endl;
-    std::cout << "Transfer 16 Mb from zone 30: " <<
+    std::cout << "Transfer 16 MiB from zone 30: " <<
     get_delay(file::offset_type(158204036) * file::offset_type(bytes_per_sector), 16 * 1024 * 1024) << " s" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 
-void sim_disk_file::serve(const request * req) throw(io_error)
+void sim_disk_file::serve(const request * req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
@@ -165,42 +165,42 @@ void sim_disk_file::serve(const request * req) throw(io_error)
     request::request_type type = req->get_type();
     double op_start = timestamp();
 
-        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
-        void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
-        if (mem == MAP_FAILED)
+    void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
+    if (mem == MAP_FAILED)
+    {
+        STXXL_THROW2(io_error,
+                     " Mapping failed." <<
+                     " Page size: " << sysconf(_SC_PAGESIZE) <<
+                     " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
+    }
+    else if (mem == 0)
+    {
+        stxxl_function_error(io_error);
+    }
+    else
+    {
+        if (type == request::READ)
         {
-            STXXL_THROW2(io_error,
-                         " Mapping failed." <<
-                         " Page size: " << sysconf(_SC_PAGESIZE) <<
-                         " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
+            memcpy(buffer, mem, bytes);
+        } else {
+            memcpy(mem, buffer, bytes);
         }
-        else if (mem == 0)
-        {
-            stxxl_function_error(io_error);
-        }
-        else
-        {
-            if (type == request::READ)
-            {
-                memcpy(buffer, mem, bytes);
-            } else {
-                memcpy(mem, buffer, bytes);
-            }
-            stxxl_check_ge_0(munmap(mem, bytes), io_error);
-        }
+        stxxl_check_ge_0(munmap(mem, bytes), io_error);
+    }
 
-        double delay = get_delay(offset, bytes);
+    double delay = get_delay(offset, bytes);
 
-        delay = delay - timestamp() + op_start;
+    delay = delay - timestamp() + op_start;
 
-        assert(delay > 0.0);
+    assert(delay > 0.0);
 
-        int seconds_to_wait = static_cast<int>(floor(delay));
-        if (seconds_to_wait)
-            sleep(seconds_to_wait);
+    int seconds_to_wait = static_cast<int>(floor(delay));
+    if (seconds_to_wait)
+        sleep(seconds_to_wait);
 
-        usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
+    usleep((unsigned long)((delay - seconds_to_wait) * 1000000.));
 }
 
 const char * sim_disk_file::io_type() const
@@ -222,5 +222,5 @@ void sim_disk_file::set_size(offset_type newsize)
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif  // #if STXXL_HAVE_SIMDISK_FILE
 // vim: et:ts=4:sw=4

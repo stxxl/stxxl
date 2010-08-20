@@ -16,11 +16,13 @@
 //! \c sorted_runs data structure
 //! using \c stream::use_push specialization of \c stream::runs_creator class
 
+#include <limits>
 #include <stxxl/stream>
 
+const unsigned long long megabyte = 1024 * 1024;
+const unsigned int block_size = 1 * megabyte;
 
 typedef unsigned value_type;
-
 
 struct Cmp : public std::binary_function<value_type, value_type, bool>
 {
@@ -41,6 +43,9 @@ struct Cmp : public std::binary_function<value_type, value_type, bool>
 
 int main()
 {
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+#endif
     // special parameter type
     typedef stxxl::stream::use_push<value_type> InputType;
     typedef stxxl::stream::runs_creator<InputType, Cmp, 4096, stxxl::RC> CreateRunsAlg;
@@ -69,8 +74,8 @@ int main()
     assert(stxxl::stream::check_sorted_runs(Runs, Cmp()));
 
     // merge the runs
-    stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 1024 * 128 / 10 * stxxl::sort_memory_usage_factor());
-    stxxl::vector<value_type> array;
+    stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 1024 * 512 / 10 + 12 * 4096);
+    stxxl::vector<value_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY> array;
     STXXL_MSG(size << " " << Runs.elements);
     STXXL_MSG("CRC: " << oldcrc);
     value_type crc(0);

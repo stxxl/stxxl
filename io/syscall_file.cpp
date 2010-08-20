@@ -18,7 +18,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void syscall_file::serve(const request * req) throw(io_error)
+void syscall_file::serve(const request * req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
@@ -27,58 +27,63 @@ void syscall_file::serve(const request * req) throw(io_error)
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
-        if (::lseek(file_des, offset, SEEK_SET) < 0)
+    if (::lseek(file_des, offset, SEEK_SET) < 0)
+    {
+        STXXL_THROW2(io_error,
+                     " this=" << this <<
+                     " call=::lseek(fd,offset,SEEK_SET)" <<
+                     " fd=" << file_des <<
+                     " offset=" << offset <<
+                     " buffer=" << buffer <<
+                     " bytes=" << bytes <<
+                     " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+    }
+    else
+    {
+        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+        int_type rc;
+
+        if (type == request::READ)
         {
-            STXXL_THROW2(io_error,
-                         " this=" << this <<
-                         " call=::lseek(fd,offset,SEEK_SET)" <<
-                         " fd=" << file_des <<
-                         " offset=" << offset <<
-                         " buffer=" << buffer <<
-                         " bytes=" << bytes <<
-                         " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+            STXXL_DEBUGMON_DO(io_started(buffer));
+
+            if ((rc = ::read(file_des, buffer, bytes)) < 0)
+            {
+                STXXL_THROW2(io_error,
+                             " this=" << this <<
+                             " call=::read(fd,buffer,bytes)" <<
+                             " fd=" << file_des <<
+                             " offset=" << offset <<
+                             " buffer=" << buffer <<
+                             " bytes=" << bytes <<
+                             " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+            } else if (size_type(rc) != bytes) {
+                STXXL_THROW2(io_error, " partial read: missing " << (bytes - rc) << " out of " << bytes << " bytes");
+            }
+
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
         else
         {
-            stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+            STXXL_DEBUGMON_DO(io_started(buffer));
 
-            if (type == request::READ)
+            if ((rc = ::write(file_des, buffer, bytes)) < 0)
             {
-                STXXL_DEBUGMON_DO(io_started(buffer));
-
-                if (::read(file_des, buffer, bytes) < 0)
-                {
-                    STXXL_THROW2(io_error,
-                                 " this=" << this <<
-                                 " call=::read(fd,buffer,bytes)" <<
-                                 " fd=" << file_des <<
-                                 " offset=" << offset <<
-                                 " buffer=" << buffer <<
-                                 " bytes=" << bytes <<
-                                 " type=" << ((type == request::READ) ? "READ" : "WRITE"));
-                }
-
-                STXXL_DEBUGMON_DO(io_finished(buffer));
+                STXXL_THROW2(io_error,
+                             " this=" << this <<
+                             " call=::write(fd,buffer,bytes)" <<
+                             " fd=" << file_des <<
+                             " offset=" << offset <<
+                             " buffer=" << buffer <<
+                             " bytes=" << bytes <<
+                             " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+            } else if (size_type(rc) != bytes) {
+                STXXL_THROW2(io_error, " partial write: missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
-            else
-            {
-                STXXL_DEBUGMON_DO(io_started(buffer));
 
-                if (::write(file_des, buffer, bytes) < 0)
-                {
-                    STXXL_THROW2(io_error,
-                                 " this=" << this <<
-                                 " call=::write(fd,buffer,bytes)" <<
-                                 " fd=" << file_des <<
-                                 " offset=" << offset <<
-                                 " buffer=" << buffer <<
-                                 " bytes=" << bytes <<
-                                 " type=" << ((type == request::READ) ? "READ" : "WRITE"));
-                }
-
-                STXXL_DEBUGMON_DO(io_finished(buffer));
-            }
+            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
+    }
 }
 
 const char * syscall_file::io_type() const

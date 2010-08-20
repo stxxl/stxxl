@@ -36,16 +36,16 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
     stxxl::uint64 records_to_sort = data_mem / sizeof(T);
     typedef stxxl::vector<T, 2, stxxl::lru_pager<8>, block_size, alloc_strategy_type> vector_type;
 
-    memory_to_use = STXXL_DIVRU(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
+    memory_to_use = stxxl::div_ceil(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
 
     vector_type v(records_to_sort);
     unsigned ndisks = stxxl::config::get_instance()->disks_number();
     STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(T));
-    STXXL_MSG("Total volume " << (records_to_sort * sizeof(T)) / MB << " MB");
-    STXXL_MSG("Using " << memory_to_use / MB << " MB");
+    STXXL_MSG("Total volume " << (records_to_sort * sizeof(T)) / MB << " MiB");
+    STXXL_MSG("Using " << memory_to_use / MB << " MiB");
     STXXL_MSG("Using " << ndisks << " disks");
     STXXL_MSG("Using " << alloc_strategy_type::name() << " allocation strategy ");
-    STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KB");
+    STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KiB");
 
     STXXL_MSG("Filling vector...");
     stxxl::generate(v.begin(), v.end(), stxxl::random_number32_r(), 32);
@@ -97,10 +97,13 @@ int main(int argc, char * argv[])
     if (argc < 6)
     {
         STXXL_ERRMSG("Usage: " << argv[0] <<
-                     " <MB to sort> <MB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>");
+                     " <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>");
         return -1;
     }
 
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+#endif
     stxxl::uint64 data_mem = stxxl::atoint64(argv[1]) * MB;
     int sort_mem = atoi(argv[2]) * MB;
     int strategy = atoi(argv[3]);

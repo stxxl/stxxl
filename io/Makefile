@@ -1,6 +1,8 @@
 include Makefile.common
 include ../make.settings
 
+tools: $(UTIL_BINARIES)
+
 tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
@@ -9,7 +11,7 @@ iostats.$(OBJEXT) \
 mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJEXT) \
 fileperblock_file.$(OBJEXT) request.$(OBJEXT) request_waiters_impl_basic.$(OBJEXT) \
 request_state_impl_basic.$(OBJEXT) request_impl_basic.$(OBJEXT) \
-file_request_basic.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) \
+disk_queued_file.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) request_queue_impl_1q.$(OBJEXT) \
 request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT)
 
 
@@ -59,14 +61,14 @@ request_state_impl_basic.$(OBJEXT): request_state_impl_basic.cpp
 request_impl_basic.$(OBJEXT): request_impl_basic.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_impl_basic.cpp
 
-request_impl_qwqr.$(OBJEXT): request_impl_qwqr.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_impl_qwqr.cpp
-
-file_request_basic.$(OBJEXT): file_request_basic.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c file_request_basic.cpp
+disk_queued_file.$(OBJEXT): disk_queued_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c disk_queued_file.cpp
 
 request_queue_impl_qwqr.$(OBJEXT): request_queue_impl_qwqr.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_qwqr.cpp
+
+request_queue_impl_1q.$(OBJEXT): request_queue_impl_1q.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_1q.cpp
 
 request_queue_impl_worker.$(OBJEXT): request_queue_impl_worker.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_worker.cpp
@@ -89,7 +91,7 @@ benchmark_disks: benchmark_disks.$(EXEEXT)
 benchmark_disks.$(EXEEXT): benchmark_disks.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_disks.cpp  
 	$(LINKER) benchmark_disks.$(OBJEXT) $(OUT)benchmark_disks.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
-	
+
 flushbuffers: flushbuffers.$(EXEEXT)
 flushbuffers.$(EXEEXT): flushbuffers.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c flushbuffers.cpp
@@ -115,6 +117,26 @@ benchmark_disk_and_flash.$(EXEEXT): benchmark_disk_and_flash.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_disk_and_flash.cpp
 	$(LINKER) benchmark_disk_and_flash.$(OBJEXT) $(OUT)benchmark_disk_and_flash.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
 
+benchmark_configured_disks: benchmark_configured_disks.$(EXEEXT)
+benchmark_configured_disks.$(EXEEXT): benchmark_configured_disks.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_configured_disks.cpp
+	$(LINKER) benchmark_configured_disks.$(OBJEXT) $(OUT)benchmark_configured_disks.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+benchmark_random_block_access: benchmark_random_block_access.$(EXEEXT)
+benchmark_random_block_access.$(EXEEXT): benchmark_random_block_access.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_random_block_access.cpp
+	$(LINKER) benchmark_random_block_access.$(OBJEXT) $(OUT)benchmark_random_block_access.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+iobench_scatter_in_place: iobench_scatter_in_place.$(EXEEXT)
+iobench_scatter_in_place.$(EXEEXT): iobench_scatter_in_place.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c iobench_scatter_in_place.cpp
+	$(LINKER) iobench_scatter_in_place.$(OBJEXT) $(OUT)iobench_scatter_in_place.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+verify_disks: verify_disks.$(EXEEXT)
+verify_disks.$(EXEEXT): verify_disks.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c verify_disks.cpp  
+	$(LINKER) verify_disks.$(OBJEXT) $(OUT)verify_disks.$(EXEEXT) $(STXXL_LINKER_OPTIONS) 
+
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)

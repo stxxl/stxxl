@@ -22,7 +22,7 @@ usage:
 	@echo "    library_g++ library_g++_pmode library_g++_mcstl library_icpc library_icpc_mcstl library_msvc"
 	@echo "    tests_g++   tests_g++_pmode   tests_g++_mcstl   tests_icpc   tests_icpc_mcstl   tests_msvc"
 	@echo "    clean_g++   clean_g++_pmode   clean_g++_mcstl   clean_icpc   clean_icpc_mcstl   clean_msvc"
-	@echo "    doxy clean_doxy"
+	@echo "    doxy clean_doxy  tutorial clean_tutorial  examples clean_examples"
 
 settings_gnu:
 	cmp -s make.settings.gnu make.settings || \
@@ -35,26 +35,32 @@ make.settings: make.settings.msvc
 
 
 config_gnu: settings_gnu
-	$(MAKE) -f Makefile.gnu config
+	$(MAKE) -f Makefile.gnu config STXXL_AUTOCONFIG=true
 
 
-library_g++: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=no
+_library_g++: settings_gnu
+	$(MAKE) -f Makefile.gnu library
 
-library_g++_pmode: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=yes USE_MCSTL=no
+library_g++: _library_g++
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=no USE_MCSTL=no
 
-library_g++_mcstl: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=yes
+library_g++_pmode: _library_g++
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=yes USE_MCSTL=no
 
-library_icpc: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=no USE_ICPC=yes
+library_g++_mcstl: _library_g++
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=no USE_MCSTL=yes
 
-library_icpc_pmode: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=yes USE_MCSTL=no USE_ICPC=yes
+_library_icpc: settings_gnu
+	$(MAKE) -f Makefile.gnu library USE_ICPC=yes
 
-library_icpc_mcstl: settings_gnu
-	$(MAKE) -f Makefile.gnu library USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
+library_icpc: _library_icpc
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=no USE_MCSTL=no USE_ICPC=yes
+
+library_icpc_pmode: _library_icpc
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=yes USE_MCSTL=no USE_ICPC=yes
+
+library_icpc_mcstl: _library_icpc
+	$(MAKE) -f Makefile.gnu library_utils USE_PMODE=no USE_MCSTL=yes USE_ICPC=yes
 
 library_msvc: settings_msvc
 	nmake /NOLOGO /F Makefile.msvc library
@@ -107,7 +113,7 @@ clean_msvc: settings_msvc
 clean: clean_g++ clean_g++_mcstl clean_icpc clean_icpc_mcstl
 	$(MAKE) -C test/compile-stxxl-headers clean
 
-distclean: clean_doxy clean_tutorial clean
+distclean: clean_doxy clean_tutorial clean_examples clean
 	$(RM) make.settings
 	$(RM) stxxl.log stxxl.errlog
 	$(RM) algo/stxxl.log algo/stxxl.errlog
@@ -126,8 +132,16 @@ clean_doxy:
 	$(RM) -r doc/doxy
 	$(RM) Doxyfile.bak
 
+tutorial:
+	$(MAKE) -C doc/tutorial
+
 clean_tutorial:
 	$(MAKE) -C doc/tutorial distclean
+
+examples:
+	$(MAKE) -C doc/tutorial/examples
+
+clean_examples:
 	$(MAKE) -C doc/tutorial/examples clean
 
 count:

@@ -22,8 +22,7 @@ struct bulk
 
 template <>
 struct bulk<0>
-{
-};
+{ };
 
 template <typename KEY, unsigned SIZE>
 struct my_type

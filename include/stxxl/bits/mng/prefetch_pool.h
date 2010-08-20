@@ -19,7 +19,6 @@
  #include <boost/config.hpp>
 #endif
 
-#include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/compat_hash_map.h>
 
@@ -121,17 +120,17 @@ public:
     bool hint(bid_type bid)
     {
         // if block is already hinted, no need to hint it again
-        if (busy_blocks.find(bid) != busy_blocks.end())
+        if (in_prefetching(bid)) {
+            STXXL_VERBOSE2("prefetch_pool::hint2 bid=" << bid << " was already cached");
             return true;
-
+        }
 
         if (free_blocks_size) //  only if we have a free block
         {
-            STXXL_VERBOSE2("prefetch_pool::hint bid= " << bid << " => prefetching");
-
             --free_blocks_size;
             block_type * block = free_blocks.back();
             free_blocks.pop_back();
+            STXXL_VERBOSE2("prefetch_pool::hint bid=" << bid << " => prefetching");
             request_ptr req = block->read(bid);
             busy_blocks[bid] = busy_entry(block, req);
             return true;
@@ -143,32 +142,50 @@ public:
     bool hint(bid_type bid, write_pool<block_type> & w_pool)
     {
         // if block is already hinted, no need to hint it again
-        if (busy_blocks.find(bid) != busy_blocks.end())
+        if (in_prefetching(bid)) {
+            STXXL_VERBOSE2("prefetch_pool::hint2 bid=" << bid << " was already cached");
             return true;
-
+        }
 
         if (free_blocks_size) //  only if we have a free block
         {
-            STXXL_VERBOSE2("prefetch_pool::hint2 bid= " << bid << " => prefetching");
             --free_blocks_size;
             block_type * block = free_blocks.back();
             free_blocks.pop_back();
-            request_ptr req = w_pool.get_request(bid);
-            if (req.valid())
+            if (w_pool.has_request(bid))
             {
-                block_type * w_block = w_pool.steal(bid);
-                STXXL_VERBOSE1("prefetch_pool::hint2 bid= " << bid << " was in write cache at " << w_block);
-                assert(w_block != 0);
+                busy_entry wp_request = w_pool.steal_request(bid);
+                STXXL_VERBOSE1("prefetch_pool::hint2 bid=" << bid << " was in write cache at " << wp_request.first);
+                assert(wp_request.first != 0);
                 w_pool.add(block);  //in exchange
-                busy_blocks[bid] = busy_entry(w_block, req);
+                busy_blocks[bid] = wp_request;
                 return true;
             }
-            req = block->read(bid);
+            STXXL_VERBOSE2("prefetch_pool::hint2 bid=" << bid << " => prefetching");
+            request_ptr req = block->read(bid);
             busy_blocks[bid] = busy_entry(block, req);
             return true;
         }
         STXXL_VERBOSE2("prefetch_pool::hint2 bid=" << bid << " => no free blocks for prefetching");
         return false;
+    }
+
+    bool invalidate(bid_type bid)
+    {
+        busy_blocks_iterator cache_el = busy_blocks.find(bid);
+        if (cache_el == busy_blocks.end())
+            return false;
+
+        // cancel request if it is a read request, there might be
+        // write requests 'stolen' from a write_pool that may not be cancelled
+        if (cache_el->second.second->get_type() == request::READ)
+            cache_el->second.second->cancel();
+        // finish the request
+        cache_el->second.second->wait();
+        ++free_blocks_size;
+        free_blocks.push_back(cache_el->second.first);
+        busy_blocks.erase(cache_el);
+        return true;
     }
 
     bool in_prefetching(bid_type bid)
@@ -200,6 +217,38 @@ public:
         request_ptr result = cache_el->second.second;
         busy_blocks.erase(cache_el);
         return result;
+    }
+
+    request_ptr read(block_type * & block, bid_type bid, write_pool<block_type> & w_pool)
+    {
+        // try cache
+        busy_blocks_iterator cache_el = busy_blocks.find(bid);
+        if (cache_el != busy_blocks.end())
+        {
+            // cached
+            STXXL_VERBOSE1("prefetch_pool::read bid=" << bid << " => copy in cache exists");
+            ++free_blocks_size;
+            free_blocks.push_back(block);
+            block = cache_el->second.first;
+            request_ptr result = cache_el->second.second;
+            busy_blocks.erase(cache_el);
+            return result;
+        }
+
+        // try w_pool cache
+        if (w_pool.has_request(bid))
+        {
+            busy_entry wp_request = w_pool.steal_request(bid);
+            STXXL_VERBOSE1("prefetch_pool::read bid=" << bid << " was in write cache at " << wp_request.first);
+            assert(wp_request.first != 0);
+            w_pool.add(block);  //in exchange
+            block = wp_request.first;
+            return wp_request.second;
+        }
+
+        // not cached
+        STXXL_VERBOSE1("prefetch_pool::read bid=" << bid << " => no copy in cache, retrieving to " << block);
+        return block->read(bid);
     }
 
     //! \brief Resizes size of the pool
@@ -247,3 +296,4 @@ namespace std
 }
 
 #endif // !STXXL_PREFETCH_POOL_HEADER
+// vim: et:ts=4:sw=4

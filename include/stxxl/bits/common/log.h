@@ -28,14 +28,10 @@ class logger : public singleton<logger>
 
     std::ofstream log_stream_;
     std::ofstream errlog_stream_;
+    std::ofstream * waitlog_stream_;
 
-    inline logger()
-    { 
-        const char* log_filename = getenv("STXXLLOGFILE");
-        log_stream_.open(log_filename == NULL ? "stxxl.log" : log_filename);
-        const char* errlog_filename = getenv("STXXLERRLOGFILE");
-        errlog_stream_.open(errlog_filename == NULL ? "stxxl.errlog" : errlog_filename);
-    }
+    logger();
+    ~logger();
 
 public:
     inline std::ofstream & log_stream()
@@ -46,6 +42,11 @@ public:
     inline std::ofstream & errlog_stream()
     {
         return errlog_stream_;
+    }
+
+    inline std::ofstream * waitlog_stream()
+    {
+        return waitlog_stream_;
     }
 };
 

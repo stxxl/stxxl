@@ -17,7 +17,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void mem_file::serve(const request * req) throw(io_error)
+void mem_file::serve(const request * req) throw (io_error)
 {
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
@@ -65,11 +65,11 @@ void mem_file::set_size(offset_type newsize)
         ptr = new char[sz = newsize];
 }
 
-void mem_file::delete_region(offset_type offset, size_type size)
+void mem_file::discard(offset_type offset, offset_type size)
 {
 #ifndef STXXL_MEMFILE_DONT_CLEAR_FREED_MEMORY
     // overwrite the freed region with uninitialized memory
-    STXXL_VERBOSE("delete_region at " << offset << " len " << size);
+    STXXL_VERBOSE("discard at " << offset << " len " << size);
     void * uninitialized = malloc(BLOCK_ALIGN);
     while (size >= BLOCK_ALIGN) {
         memcpy(ptr + offset, uninitialized, BLOCK_ALIGN);
@@ -80,8 +80,8 @@ void mem_file::delete_region(offset_type offset, size_type size)
         memcpy(ptr + offset, uninitialized, size);
     free(uninitialized);
 #else
-    UNUSED(offset);
-    UNUSED(size);
+    STXXL_UNUSED(offset);
+    STXXL_UNUSED(size);
 #endif
 }
 

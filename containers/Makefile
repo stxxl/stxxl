@@ -87,7 +87,6 @@ test_migr_stack.$(EXEEXT): test_migr_stack.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_migr_stack.cpp
 	$(LINKER)  test_migr_stack.$(OBJEXT) $(OUT)test_migr_stack.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-
 test_many_stacks: test_many_stacks.$(EXEEXT)
 test_many_stacks.$(EXEEXT): test_many_stacks.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_many_stacks.cpp -DSTXXL_VERBOSE_LEVEL=1
@@ -100,17 +99,17 @@ test_pqueue.$(EXEEXT): test_pqueue.cpp $(DEPENDENCIES)
 
 test_ext_merger: test_ext_merger.$(EXEEXT)
 test_ext_merger.$(EXEEXT): test_ext_merger.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ext_merger.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ext_merger.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  test_ext_merger.$(OBJEXT) $(OUT)test_ext_merger.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_ext_merger2: test_ext_merger2.$(EXEEXT)
 test_ext_merger2.$(EXEEXT): test_ext_merger2.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ext_merger2.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_ext_merger2.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  test_ext_merger2.$(OBJEXT) $(OUT)test_ext_merger2.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 bench_pqueue: bench_pqueue.$(EXEEXT)
 bench_pqueue.$(EXEEXT): bench_pqueue.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c bench_pqueue.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c bench_pqueue.cpp -DSTXXL_VERBOSE_LEVEL=0
 	$(LINKER)  bench_pqueue.$(OBJEXT) $(OUT)bench_pqueue.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
 
 monotonic_pq: monotonic_pq.$(EXEEXT)
@@ -118,9 +117,14 @@ monotonic_pq.$(EXEEXT): monotonic_pq.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c monotonic_pq.cpp
 	$(LINKER)  monotonic_pq.$(OBJEXT) $(OUT)monotonic_pq.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
 
+test_matrix: test_matrix.$(EXEEXT)
+test_matrix.$(EXEEXT): test_matrix.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_matrix.cpp -DSTXXL_VERBOSE_LEVEL=0
+	$(LINKER)  test_matrix.$(OBJEXT) $(OUT)test_matrix.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)
 	cd btree
 	$(MAKE) clean
 	cd ..

@@ -22,7 +22,6 @@
 #include <cstdlib>
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/common/utils.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -34,6 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 class malloc_stats
 {
 #if !defined(__APPLE__) && !defined(__FreeBSD__)
+
 public:
     typedef int return_type;
 
@@ -137,7 +137,7 @@ inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
     s << "=================================================================" << std::endl;
 #else
     s << "MALLOC statistics are not supported on this platform";
-    UNUSED(st);
+    STXXL_UNUSED(st);
 #endif
     return s;
 }

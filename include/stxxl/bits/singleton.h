@@ -18,6 +18,7 @@
 #include <stxxl/types>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/exithandler.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -52,7 +53,7 @@ singleton<INSTANCE, destroy_on_exit>::create_instance()
     if (!instance) {
         instance = new instance_type();
         if (destroy_on_exit)
-            atexit(destroy_instance);
+            register_exit_handler(destroy_instance);
     }
     return instance;
 }

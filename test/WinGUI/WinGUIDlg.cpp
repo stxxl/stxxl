@@ -53,7 +53,7 @@ CWinGUIDlg::CWinGUIDlg(CWnd * pParent /*=NULL*/)
     : CDialog(CWinGUIDlg::IDD, pParent)
       , m_Filename(_T("c:\\myfile"))
       , m_Format1(FALSE)
-      , m_Filesize(LONGLONG(1024) * LONGLONG(512 / 4)) // 1 GB
+      , m_Filesize(LONGLONG(1024) * LONGLONG(512 / 4)) // 1 GiB
       , m_Key(555)
       , m_MemUsage(128)
       , m_FilesizeMB(0)

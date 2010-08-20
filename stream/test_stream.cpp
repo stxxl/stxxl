@@ -15,6 +15,7 @@
 //! stream package. The example sorts characters of a string producing an
 //! array of sorted tuples (character, index position).
 
+#include <limits>
 #include <vector>
 #include <stxxl/stream>
 #include <stxxl/vector>
@@ -194,4 +195,6 @@ int main()
     std::sort(InternalArray.begin(), InternalArray.end(), cmp_int());
     stxxl::sort<1024 * 1024>(InternalArray.begin(), InternalArray.end(),
                              cmp_int(), 1024 * 1024 * 10, stxxl::RC());
+
+    return 0;
 }

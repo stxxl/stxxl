@@ -60,11 +60,11 @@ int main(int argc, char * argv[])
 {
     if (argc < 5)
     {
-        STXXL_MSG("Usage: " << argv[0] << " ncalls avcalls main logfile")
-        STXXL_MSG(" ncalls  - number of calls")
-        STXXL_MSG(" avcalls - average number of calls per client")
-        STXXL_MSG(" main    - memory to use (in MB)")
-        STXXL_MSG(" logfile - file name of the output")
+        STXXL_MSG("Usage: " << argv[0] << " ncalls avcalls main logfile");
+        STXXL_MSG(" ncalls  - number of calls");
+        STXXL_MSG(" avcalls - average number of calls per client");
+        STXXL_MSG(" main    - memory to use (in MiB)");
+        STXXL_MSG(" logfile - file name of the output");
 
         return 0;
     }
@@ -85,7 +85,7 @@ int main(int argc, char * argv[])
          number < nclients && calls_made < ncalls;
          ++number)
     {
-        unsigned serv = (std::min)((long long int)rnd(av_calls * 2), (ncalls - calls_made));
+        unsigned serv = std::min<long long int>(rnd(av_calls * 2), (ncalls - calls_made));
         LogEntry e;
         e.from = number;
 
@@ -117,8 +117,8 @@ int main(int argc, char * argv[])
 
     std::copy(log.begin(), log.end(), std::ostream_iterator<LogEntry>(out));
 
-    STXXL_MSG("\n" << calls_made << " calls made.")
-    STXXL_MSG("The log is written to '" << argv[4] << "'.")
+    STXXL_MSG("\n" << calls_made << " calls made.");
+    STXXL_MSG("The log is written to '" << argv[4] << "'.");
 
     return 0;
 }

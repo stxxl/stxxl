@@ -106,14 +106,14 @@ namespace priority_queue_local
 #define Merge3Case(a, b, c) \
     s ## a ## b ## c : \
     if (target == done) \
-        return;\
+        return; \
     *target = *source ## a; \
     ++target; \
     ++source ## a; \
     if (cmp(*source ## b, *source ## a)) \
-        goto s ## a ## b ## c;\
+        goto s ## a ## b ## c; \
     if (cmp(*source ## c, *source ## a)) \
-        goto s ## b ## a ## c;\
+        goto s ## b ## a ## c; \
     goto s ## b ## c ## a;
 
         // the order is chosen in such a way that
@@ -187,23 +187,23 @@ namespace priority_queue_local
 #define Merge4Case(a, b, c, d) \
     s ## a ## b ## c ## d : \
     if (target == done) \
-        return;\
+        return; \
     *target = *source ## a; \
     ++target; \
     ++source ## a; \
     if (cmp(*source ## c, *source ## a)) \
     { \
         if (cmp(*source ## b, *source ## a)) \
-            goto s ## a ## b ## c ## d;\
+            goto s ## a ## b ## c ## d; \
         else \
-            goto s ## b ## a ## c ## d;\
+            goto s ## b ## a ## c ## d; \
     } \
     else \
     { \
         if (cmp(*source ## d, *source ## a)) \
-            goto s ## b ## c ## a ## d;\
+            goto s ## b ## c ## a ## d; \
         else \
-            goto s ## b ## c ## d ## a;\
+            goto s ## b ## c ## d ## a; \
     }
 
         Merge4Case(0, 1, 2, 3);

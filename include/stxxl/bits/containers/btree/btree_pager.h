@@ -13,11 +13,12 @@
 #ifndef STXXL_CONTAINERS_BTREE__BTREE_PAGER_H
 #define STXXL_CONTAINERS_BTREE__BTREE_PAGER_H
 
-#include <memory>
 #include <list>
+#include <vector>
+#include <cassert>
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/compat_unique_ptr.h>
 
 
@@ -40,7 +41,7 @@ namespace btree
         lru_pager(unsigned_type npages) :
             npages_(npages),
             history(new list_type),
-            history_entry(npages_)
+            history_entry(npages_, history->begin())
         {
             for (unsigned_type i = 0; i < npages_; i++)
             {
@@ -56,7 +57,13 @@ namespace btree
         {
             assert(ipage < int_type(npages_));
             assert(ipage >= 0);
+#if defined(__GXX_EXPERIMENTAL_CXX0X__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) == 40500)
+            // HACK! Remove ASAP!
+            // work around C++ Standard Library Issue http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-active.html#1133
+            history->splice(history->begin(), std::move(*history), history_entry[ipage]);
+#else
             history->splice(history->begin(), *history, history_entry[ipage]);
+#endif
         }
         void swap(lru_pager & obj)
         {

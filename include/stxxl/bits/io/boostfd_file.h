@@ -15,9 +15,17 @@
 #ifndef STXXL_BOOSTFD_FILE_H_
 #define STXXL_BOOSTFD_FILE_H_
 
+#ifndef STXXL_HAVE_BOOSTFD_FILE
 #ifdef STXXL_BOOST_CONFIG // if boost is available
+ #define STXXL_HAVE_BOOSTFD_FILE 1
+#else
+ #define STXXL_HAVE_BOOSTFD_FILE 0
+#endif
+#endif
 
-#include <stxxl/bits/io/file_request_basic.h>
+#if STXXL_HAVE_BOOSTFD_FILE
+
+#include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/request.h>
 
 #include <boost/iostreams/device/file_descriptor.hpp>
@@ -29,7 +37,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation based on boost::iostreams::file_decriptor
-class boostfd_file : public file_request_basic
+class boostfd_file : public disk_queued_file
 {
     typedef boost::iostreams::file_descriptor fd_type;
 
@@ -40,12 +48,12 @@ protected:
     offset_type _size();
 
 public:
-    boostfd_file(const std::string & filename, int mode, int disk = -1);
+    boostfd_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR);
     ~boostfd_file();
     offset_type size();
     void set_size(offset_type newsize);
     void lock();
-    void serve(const request * req) throw(io_error);
+    void serve(const request * req) throw (io_error);
     const char * io_type() const;
 };
 
@@ -53,6 +61,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef STXXL_BOOST_CONFIG
+#endif  // #if STXXL_HAVE_BOOSTFD_FILE
 
-#endif // !STXXL_BOOSTFD_FILE_H_
+#endif  // !STXXL_BOOSTFD_FILE_H_

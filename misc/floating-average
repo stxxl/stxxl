@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
 ############################################################################
 #  misc/floating-average
@@ -33,36 +33,27 @@ while($line = <STDIN>)
   my $part;
   foreach $part(@parts)
   {
-    if($part =~ /^[+-]?\d+\.?\d*$/)
+    if($part =~ /^[+-]?\d+\.?\d*([eE][+-]?\d+)?$/)
     { #is number
       if($count_sum == $span)
       {
-        $sums[$c] -= $history[$line_number % $span][$c];
+        $sums[$c] -= $history[$line_number % $span][$c] || 0;
       }
       $history[$line_number % $span][$c] = $part;
       $sums[$c] += $history[$line_number % $span][$c];
-      if($count_sum == $span)
-      {
-        printf("%14.6f ", $sums[$c] / $span);
-      }
+      printf("%14.6f ", $sums[$c] / $count_sum);
       ++$c;
     }
     else
     {
-      if($count_sum == $span)
-      {
-        print(" $part ");
-      }
+      print(" $part ");
     }
   }
+  print("\n");
 
   if($count_sum < $span)
   {
     ++$count_sum;
-  }
-  else
-  {
-    print("\n");
   }
   ++$line_number;
 }

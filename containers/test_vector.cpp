@@ -20,7 +20,25 @@
 #include <stxxl/vector>
 #include <stxxl/scan>
 
-typedef stxxl::int64 int64;
+struct element  // 24 bytes, not a power of 2 intentionally
+{
+    stxxl::int64 key;
+    stxxl::int64 load0;
+    stxxl::int64 load1;
+
+    element & operator = (stxxl::int64 i)
+    {
+        key = i;
+        load0 = i + 42;
+        load1 = i ^ 42;
+        return *this;
+    }
+
+    bool operator == (const element & e2) const
+    {
+        return key == e2.key && load0 == e2.load0 && load1 == e2.load1;
+    }
+};
 
 struct counter
 {
@@ -54,11 +72,12 @@ int main()
     try
     {
         // use non-randomized striping to avoid side effects on random generator
-        typedef stxxl::VECTOR_GENERATOR<int64, 2, 2, (2 * 1024 * 1024), stxxl::striping>::result vector_type;
-        vector_type v(int64(64 * 1024 * 1024) / sizeof(int64));
+        typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (2 * 1024 * 1024), stxxl::striping>::result vector_type;
+        vector_type v(64 * 1024 * 1024 / sizeof(element));
 
         // test assignment const_iterator = iterator
         vector_type::const_iterator c_it = v.begin();
+        STXXL_UNUSED(c_it);
 
         unsigned int big_size = 1024 * 1024 * 2 * 16 * 16;
         typedef stxxl::vector<double> vec_big;
@@ -80,8 +99,8 @@ int main()
         // fill the vector with increasing sequence of integer numbers
         for (i = 0; i < v.size(); ++i)
         {
-            v[i] = i + offset;
-            assert(v[i] == int64(i + offset));
+            v[i].key = i + offset;
+            assert(v[i].key == stxxl::int64(i + offset));
         }
 
 
@@ -99,9 +118,7 @@ int main()
         std::swap(v, a);
 
         for (i = 0; i < v.size(); i++)
-        {
-            assert(v[i] == rnd());
-        }
+            assert(v[i].key == rnd());
 
         // check again
         STXXL_MSG("clear");
@@ -110,7 +127,7 @@ int main()
 
         stxxl::ran32State = 0xdeadbeef + 10;
 
-        v.resize(int64(64 * 1024 * 1024) / sizeof(int64));
+        v.resize(64 * 1024 * 1024 / sizeof(element));
 
         STXXL_MSG("write " << v.size() << " elements");
         stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
@@ -120,15 +137,16 @@ int main()
         STXXL_MSG("seq read of " << v.size() << " elements");
 
         for (i = 0; i < v.size(); i++)
-        {
-            assert(v[i] == rnd());
-        }
+            assert(v[i].key == rnd());
 
-        std::vector<stxxl::vector<int> > vector_of_stxxlvectors(2);
-        // test copy operator
-        vector_of_stxxlvectors[0] = vector_of_stxxlvectors[1];
+        STXXL_MSG("copy vector of " << v.size() << " elements");
 
-        assert(vector_of_stxxlvectors[0] == vector_of_stxxlvectors[1]);
+        vector_type v_copy0(v);
+        assert(v == v_copy0);
+
+        vector_type v_copy1;
+        v_copy1 = v;
+        assert(v == v_copy1);
     }
     catch (const std::exception & ex)
     {

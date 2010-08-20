@@ -13,9 +13,6 @@
 
 #define MCSTL_QUICKSORT_WORKAROUND 0
 
-#if !defined(STXXL_PARALLEL_MULTIWAY_MERGE)
-#define STXXL_PARALLEL_MULTIWAY_MERGE 1
-#endif
 #if !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
 #define STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD 0
 #endif
@@ -27,6 +24,7 @@
 #include <stxxl/vector>
 #include <stxxl/stream>
 #include <stxxl/scan>
+#include <stxxl/sort>
 
 #ifdef __MCSTL__
 #include <mcstl.h>
@@ -103,13 +101,13 @@ void linear_sort_normal(vector_type & input)
 {
     stxxl::unsigned_type sum1 = checksum(input);
 
-    stxxl::stats::get_instance()->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
 
     stxxl::sort(input.begin(), input.end(), cmp_less_key(), run_size);
 
     double stop = stxxl::timestamp();
-    std::cout << *(stxxl::stats::get_instance()) << std::endl;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     stxxl::unsigned_type sum2 = checksum(input);
 
@@ -124,7 +122,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
 {
     stxxl::unsigned_type sum1 = checksum(input);
 
-    stxxl::stats::get_instance()->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double start = stxxl::timestamp();
 
     typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
@@ -140,9 +138,10 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
     sort_stream_type sort_stream(input_stream, cl, run_size);
 
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
+    assert(o == output.end());
 
     double stop = stxxl::timestamp();
-    std::cout << *(stxxl::stats::get_instance()) << std::endl;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     stxxl::unsigned_type sum2 = checksum(output);
 
@@ -159,12 +158,15 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
 int main(int argc, const char ** argv)
 {
     if (argc < 6) {
-        std::cout << "Usage: " << argv[0] << " [n in megabytes] [p threads] [M in megabytes] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]" << std::endl;
+        std::cout << "Usage: " << argv[0] << " [n in MiB] [p threads] [M in MiB] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]" << std::endl;
         return -1;
     }
 
     stxxl::config::get_instance();
 
+#if STXXL_PARALLEL_MULTIWAY_MERGE
+    STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
+#endif
     unsigned long megabytes_to_process = atoi(argv[1]);
     int p = atoi(argv[2]);
     stxxl::unsigned_type memory_to_use = (stxxl::unsigned_type)atoi(argv[3]) * megabyte;
@@ -262,9 +264,9 @@ int main(int argc, const char ** argv)
     mcstl::HEURISTIC::multiway_merge_minimal_k = 2;
 #endif
 
-    std::cout << "Sorting " << megabytes_to_process << " MB of data ("
+    std::cout << "Sorting " << megabytes_to_process << " MiB of data ("
               << (megabytes_to_process * megabyte / sizeof(my_type)) << " elements) using "
-              << (memory_to_use / megabyte) << " MB of internal memory and "
+              << (memory_to_use / megabyte) << " MiB of internal memory and "
               << p << " thread(s), block size "
               << block_size << ", element size " << sizeof(my_type) << std::endl;
 
@@ -272,13 +274,13 @@ int main(int argc, const char ** argv)
         stxxl::int64(megabytes_to_process) * stxxl::int64(megabyte) / sizeof(my_type);
     vector_type input(n_records);
 
-    stxxl::stats::get_instance()->reset();
+    stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
     double generate_start = stxxl::timestamp();
 
     stxxl::generate(input.begin(), input.end(), stxxl::random_number64(), memory_to_use / STXXL_DEFAULT_BLOCK_SIZE(my_type));
 
     double generate_stop = stxxl::timestamp();
-    std::cout << *(stxxl::stats::get_instance()) << std::endl;
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
 
     std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
 

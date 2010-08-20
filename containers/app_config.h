@@ -17,6 +17,8 @@
 // <><><><><><><> Developer use  <><><><><><><> //
 // <><><><><><><><><><><><><><><><><><><><><><> //
 
+#define USE_LIBAIO 0
+
 // Set up some defaults for the test applications
 
 #include <portability.h>

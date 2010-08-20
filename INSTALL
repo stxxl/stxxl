@@ -21,11 +21,12 @@ QUICK INSTALLATION INSTRUCTIONS FOR POSIX COMPATIBLE SYSTEMS
 
 * Compile the library:
 
-  - without mcstl:    make library_g++
-  - with mcstl:       make library_g++_mcstl
+  - non-parallel:         make library_g++
+  - with mcstl:           make library_g++_mcstl
+  - with parallel mode:   make library_g++_pmode
 
 * Compile the test programs (optional)
 
-  - without mcstl:    make tests_g++
-  - with mcstl:       make tests_g++_mcstl
-
+  - non-parallel:         make tests_g++
+  - with mcstl:           make tests_g++_mcstl
+  - with parallel mode:   make tests_g++_pmode

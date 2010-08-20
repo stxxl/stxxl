@@ -179,8 +179,8 @@ typedef AMI_btree<bkey_t, el_t, less<bkey_t>, key_from_el> u_btree_t;
 
 void init()
 {
-    memset(max_key.keybuf, (std::numeric_limits<char>::max)(), KEY_SIZE);
-    memset(min_key.keybuf, (std::numeric_limits<char>::min)(), KEY_SIZE);
+    memset(max_key.keybuf, (std::numeric_limits<unsigned char>::max)(), KEY_SIZE);
+    memset(min_key.keybuf, (std::numeric_limits<unsigned char>::min)(), KEY_SIZE);
 }
 
 typedef stxxl::map<my_key, my_data, comp_type, NODE_BLOCK_SIZE, LEAF_BLOCK_SIZE> map_type;
@@ -428,8 +428,7 @@ void run_stxxl_map(stxxl::int64 ops)
 
     STXXL_MSG("Records in map: " << Map.size());
 
-    Stats->reset();
-
+    stxxl::stats_data stats_begin(*Stats);
     Timer.start();
 
     for (i = 0; i < n_inserts; ++i)
@@ -445,14 +444,14 @@ void run_stxxl_map(stxxl::int64 ops)
     STXXL_MSG("Insertions elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n_inserts) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 
     ////////////////////////////////////////////////
-    Timer.reset();
 
     const map_type & CMap(Map);     // const map reference
 
+    stats_begin = stxxl::stats_data(*Stats);
+    Timer.reset();
     Timer.start();
 
     for (i = 0; i < n_locates; ++i)
@@ -466,12 +465,12 @@ void run_stxxl_map(stxxl::int64 ops)
     STXXL_MSG("Locates elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n_locates) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 
     ////////////////////////////////////
-    Timer.reset();
 
+    stats_begin = stxxl::stats_data(*Stats);
+    Timer.reset();
     Timer.start();
 
     stxxl::int64 n_scanned = 0; //, skipped_qieries = 0;
@@ -491,6 +490,7 @@ void run_stxxl_map(stxxl::int64 ops)
         while (begin != beyond)
         {
             my_data tmp = begin->second;
+            stxxl::STXXL_UNUSED(tmp);
             ++n_scanned;
             ++begin;
         }
@@ -508,14 +508,14 @@ void run_stxxl_map(stxxl::int64 ops)
               " seconds : " << (double(n_scanned) / (Timer.mseconds() / 1000.)) <<
               " key/data pairs per sec, #queries " << n_range_queries << " #scanned elements: " << n_scanned);
 
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 
     //////////////////////////////////////
     ran32State = 0xdeadbeef;
     memset(element.first.keybuf, 'a', KEY_SIZE);
     memset(element.second.databuf, 'b', DATA_SIZE);
 
+    stats_begin = stxxl::stats_data(*Stats);
     Timer.reset();
     Timer.start();
 
@@ -531,8 +531,7 @@ void run_stxxl_map(stxxl::int64 ops)
     STXXL_MSG("Erase elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n_deletes) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 }
 
 class rand_key_gen
@@ -629,11 +628,11 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
 
     Timer.stop();
-    Stats->reset();
 
     STXXL_MSG("Finished sorting input. Elapsed time: " <<
               (Timer.mseconds() / 1000.) << " seconds.");
 
+    stxxl::stats_data stats_begin(*Stats);
     Timer.reset();
     Timer.start();
 
@@ -649,17 +648,16 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
     STXXL_MSG("Construction elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(n) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
 
-    using std::cout;
     Map.print_statistics(cout);
     Map.reset_statistics();
-    std::cout << *Stats;
-    Stats->reset();
-    ////////////////////////////////////////
-    Timer.reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 
+    ////////////////////////////////////////
 
     Map.disable_prefetching();
 
+    stats_begin = stxxl::stats_data(*Stats);
+    Timer.reset();
     Timer.start();
 
     for (i = 0; i < n_inserts; ++i)
@@ -677,19 +675,13 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     Map.print_statistics(cout);
     Map.reset_statistics();
-
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 
     ////////////////////////////////////
 
-
-    ////////////////////////////////////////////////
-    Timer.reset();
-
-
     const map_type & CMap(Map);     // const map reference
 
+    Timer.reset();
     Timer.start();
 
     for (i = 0; i < n_locates; ++i)
@@ -705,14 +697,14 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     Map.print_statistics(cout);
     Map.reset_statistics();
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 
     ////////////////////////////////////
-    Timer.reset();
 
     Map.enable_prefetching();
 
+    stats_begin = stxxl::stats_data(*Stats);
+    Timer.reset();
     Timer.start();
 
     stxxl::int64 n_scanned = 0; //, skipped_qieries = 0;
@@ -763,18 +755,18 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     Map.print_statistics(cout);
     Map.reset_statistics();
-
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 
     //////////////////////////////////////
+
     ran32State = 0xdeadbeef;
     memset(element.first.keybuf, 'a', KEY_SIZE);
     memset(element.second.databuf, 'b', DATA_SIZE);
 
-    Timer.reset();
     Map.disable_prefetching();
 
+    stats_begin = stxxl::stats_data(*Stats);
+    Timer.reset();
     Timer.start();
 
     for (i = n_deletes; i > 0; --i)
@@ -791,8 +783,7 @@ void run_stxxl_map_big(stxxl::int64 n, unsigned ops)
 
     Map.print_statistics(cout);
     Map.reset_statistics();
-    std::cout << *Stats;
-    Stats->reset();
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -986,6 +977,8 @@ void run_tpie_btree_big(stxxl::int64 n, unsigned ops)
     STXXL_MSG("Records in map: " << u_btree->size());
     STXXL_MSG("Erase elapsed time: " << (Timer.mseconds() / 1000.) <<
               " seconds : " << (double(ops) / (Timer.mseconds() / 1000.)) << " key/data pairs per sec");
+    delete u_btree;
+    delete is;
 }
 
 void run_bdb_btree_big(stxxl::int64 n, unsigned ops)

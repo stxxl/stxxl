@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/mng.h
+ *  mng/mng.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -15,6 +15,8 @@
 #include <stxxl/mng>
 #include <stxxl/bits/io/io.h>
 #include <stxxl/bits/version.h>
+#include <stxxl/bits/common/debug.h>
+#include <stxxl/bits/common/log.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -32,6 +34,7 @@ void DiskAllocator::dump()
     STXXL_ERRMSG("Total bytes: " << total);
 }
 
+
 void config::init(const char * config_path)
 {
     logger::get_instance();
@@ -43,9 +46,9 @@ void config::init(const char * config_path)
         STXXL_ERRMSG("Warning: no config file found.");
         STXXL_ERRMSG("Using default disk configuration.");
 #ifndef BOOST_MSVC
-        DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024, true };
+        DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024, true, false };
 #else
-        DiskEntry entry1 = { "", "wincall", 1000 * 1024 * 1024, true };
+        DiskEntry entry1 = { "", "wincall", 1000 * 1024 * 1024, true, false };
         char * tmpstr = new char[255];
         stxxl_check_ne_0(GetTempPath(255, tmpstr), resource_error);
         entry1.path = tmpstr;
@@ -79,8 +82,11 @@ void config::init(const char * config_path)
                 DiskEntry entry = {
                     tmp[0], tmp[2],
                     int64(atoi(tmp[1].c_str())) * int64(1024 * 1024),
+                    false,
                     false
                 };
+                if (entry.size == 0)
+                    entry.autogrow = true;
                 if (is_disk)
                     disks_props.push_back(entry);
                 else
@@ -112,7 +118,7 @@ void config::init(const char * config_path)
         {
             STXXL_MSG("Disk '" << (*it).path << "' is allocated, space: " <<
                       ((*it).size) / (1024 * 1024) <<
-                      " MB, I/O implementation: " << (*it).io_impl);
+                      " MiB, I/O implementation: " << (*it).io_impl);
         }
 #else
         int64 total_size = 0;
@@ -123,93 +129,110 @@ void config::init(const char * config_path)
 
         STXXL_MSG("" << disks_props.size() << " disks are allocated, total space: " <<
                   (total_size / (1024 * 1024)) <<
-                  " MB");
+                  " MiB");
 #endif
     }
 }
 
+
+class FileCreator
+{
+public:
+    virtual stxxl::file * create(const std::string & io_impl,
+                                 const std::string & filename,
+                                 int options, int physical_device_id, int allocator_id);
+
+    virtual ~FileCreator() { }
+};
+
 file * FileCreator::create(const std::string & io_impl,
-                                  const std::string & filename,
-                                  int options, int disk)
+                           const std::string & filename,
+                           int options, int physical_device_id, int allocator_id)
 {
     if (io_impl == "syscall")
     {
-        ufs_file_base * result = new syscall_file(filename, options, disk);
+        ufs_file_base * result = new syscall_file(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
     else if (io_impl == "fileperblock_syscall")
     {
-        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, disk);
+        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
-#ifndef BOOST_MSVC
+#if STXXL_HAVE_MMAP_FILE
     else if (io_impl == "mmap")
     {
-        ufs_file_base * result = new mmap_file(filename, options, disk);
+        ufs_file_base * result = new mmap_file(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
     else if (io_impl == "fileperblock_mmap")
     {
-        fileperblock_file<mmap_file> * result = new fileperblock_file<mmap_file>(filename, options, disk);
+        fileperblock_file<mmap_file> * result = new fileperblock_file<mmap_file>(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
+#endif
+#if STXXL_HAVE_SIMDISK_FILE
     else if (io_impl == "simdisk")
     {
-        ufs_file_base * result = new sim_disk_file(filename, options, disk);
+        ufs_file_base * result = new sim_disk_file(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
-#else
+#endif
+#if STXXL_HAVE_WINCALL_FILE
     else if (io_impl == "wincall")
     {
-        wfs_file_base * result = new wincall_file(filename, options, disk);
+        wfs_file_base * result = new wincall_file(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
     else if (io_impl == "fileperblock_wincall")
     {
-        fileperblock_file<wincall_file> * result = new fileperblock_file<wincall_file>(filename, options, disk);
+        fileperblock_file<wincall_file> * result = new fileperblock_file<wincall_file>(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
 #endif
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_HAVE_BOOSTFD_FILE
     else if (io_impl == "boostfd")
     {
-        boostfd_file* result = new boostfd_file(filename, options, disk);
+        boostfd_file * result = new boostfd_file(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
     else if (io_impl == "fileperblock_boostfd")
     {
-        fileperblock_file<boostfd_file> * result = new fileperblock_file<boostfd_file>(filename, options, disk);
+        fileperblock_file<boostfd_file> * result = new fileperblock_file<boostfd_file>(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
 #endif
     else if (io_impl == "memory")
     {
-        mem_file * result = new mem_file(disk);
+        mem_file * result = new mem_file(physical_device_id, allocator_id);
         result->lock();
         return result;
     }
+#if STXXL_HAVE_WBTL_FILE
     else if (io_impl == "wbtl")
     {
-        ufs_file_base * backend = new syscall_file(filename, options); // FIXME: ID
-        wbtl_file * result = new stxxl::wbtl_file(backend, 16 * 1024 * 1024, 2, disk);
+        ufs_file_base * backend = new syscall_file(filename, options, -1, -1); // FIXME: ID
+        wbtl_file * result = new stxxl::wbtl_file(backend, 16 * 1024 * 1024, 2, physical_device_id, allocator_id);
         result->lock();
         return result;
     }
+#endif
 
     STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
                 io_impl << " .");
 
     return NULL;
 }
+
 
 block_manager::block_manager()
 {
@@ -225,7 +248,9 @@ block_manager::block_manager()
     {
         disk_files[i] = fc.create(cfg->disk_io_impl(i),
                                   cfg->disk_path(i),
-                                  file::CREAT | file::RDWR | file::DIRECT, i);
+                                  file::CREAT | file::RDWR | file::DIRECT,
+                                  i,    // physical_device_id
+                                  i);   // allocator_id
         disk_files[i]->set_size(cfg->disk_size(i));
         disk_allocators[i] = new DiskAllocator(cfg->disk_size(i));
     }

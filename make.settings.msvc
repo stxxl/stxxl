@@ -19,20 +19,21 @@
 
 # change this path, do not leave spaces at the end of the line 
 STXXL_ROOT = "$(TOPDIR)"#
-include make.settings.local
 
 MAKE = nmake /NOLOGO
 COMPILER = cl
 LINKER = link
-OPT = /O2 /Ob2
 WARNINGS =
+OPT = /O2 /Ob2 # debug is off
+# OPT = /Od # debug is on
 DEBUG_COMPILER = /MD /DNDEBUG # debug is off
 # DEBUG_COMPILER  = /MDd /Zi # debug is on
 DEBUG_LINKER = /OPT:REF # debug is off
-# DEBUG_LINKER = /Zi # debug is on
+# DEBUG_LINKER = /DEBUG # debug is on
 
 LIBNAME = stxxl
 
+include make.settings.local
 
 #### TROUBLESHOOTING
 #
@@ -55,9 +56,6 @@ LIBNAME = stxxl
 #### STXXL OPTIONS ###############################################
 
 STXXL_SPECIFIC	 = \
-	-DSORT_OPTIMAL_PREFETCHING \
-	-DUSE_MALLOC_LOCK \
-	-DCOUNT_WAIT_TIME \
 	-I$(STXXL_ROOT)/include \
 	-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
@@ -101,11 +99,15 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/version.h \
 	$(HEADER_PATH)/compat_unique_ptr.h \
 	$(HEADER_PATH)/compat_hash_map.h \
-	$(HEADER_PATH)/compat_hash_set.h \
+	$(HEADER_PATH)/compat_type_traits.h \
 	$(HEADER_PATH)/parallel.h \
 	$(HEADER_PATH)/singleton.h \
 	$(HEADER_PATH)/defines.h \
+	$(HEADER_PATH)/verbose.h \
+	$(HEADER_PATH)/unused.h \
+	$(HEADER_PATH)/msvc_compatibility.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
+	$(HEADER_PATH)/common/new_alloc.h \
 	$(HEADER_PATH)/common/mutex.h \
 	$(HEADER_PATH)/common/rand.h \
 	$(HEADER_PATH)/common/semaphore.h \
@@ -123,7 +125,8 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/types.h \
 	$(HEADER_PATH)/common/settings.h \
 	$(HEADER_PATH)/common/seed.h  \
-	$(HEADER_PATH)/common/is_sorted.h 
+	$(HEADER_PATH)/common/is_sorted.h \
+	$(HEADER_PATH)/common/exithandler.h
 
 IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/io.h \
@@ -137,8 +140,9 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/request_queue.h \
 	$(HEADER_PATH)/io/request_queue_impl_worker.h \
 	$(HEADER_PATH)/io/request_queue_impl_qwqr.h \
+	$(HEADER_PATH)/io/request_queue_impl_1q.h \
 	$(HEADER_PATH)/io/file.h \
-	$(HEADER_PATH)/io/file_request_basic.h \
+	$(HEADER_PATH)/io/disk_queued_file.h \
 	$(HEADER_PATH)/io/ufs_file_base.h \
 	$(HEADER_PATH)/io/syscall_file.h \
 	$(HEADER_PATH)/io/mmap_file.h \
@@ -152,14 +156,20 @@ IO_LAYER_FILES	 = \
 
 MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/adaptor.h \
+	$(HEADER_PATH)/mng/block_alloc.h \
 	$(HEADER_PATH)/mng/block_alloc_interleaved.h \
 	$(HEADER_PATH)/mng/block_prefetcher.h \
 	$(HEADER_PATH)/mng/buf_istream.h \
 	$(HEADER_PATH)/mng/buf_ostream.h \
 	$(HEADER_PATH)/mng/buf_writer.h \
 	$(HEADER_PATH)/mng/mng.h \
+	$(HEADER_PATH)/mng/bid.h \
+	$(HEADER_PATH)/mng/typed_block.h \
+	$(HEADER_PATH)/mng/diskallocator.h \
+	$(HEADER_PATH)/mng/config.h \
 	$(HEADER_PATH)/mng/write_pool.h \
-	$(HEADER_PATH)/mng/prefetch_pool.h
+	$(HEADER_PATH)/mng/prefetch_pool.h \
+	$(HEADER_PATH)/mng/read_write_pool.h
 
 CONTAINER_FILES	 = \
 	$(HEADER_PATH)/containers/pager.h \
@@ -196,6 +206,8 @@ ALGO_FILES	 = \
 	$(HEADER_PATH)/algo/sort.h \
 	$(HEADER_PATH)/algo/async_schedule.h \
 	$(HEADER_PATH)/algo/ksort.h \
+	$(HEADER_PATH)/algo/sort_base.h \
+	$(HEADER_PATH)/algo/sort_helper.h \
 	$(HEADER_PATH)/algo/losertree.h \
 	$(HEADER_PATH)/algo/scan.h \
 	$(HEADER_PATH)/algo/stable_ksort.h \
@@ -203,7 +215,10 @@ ALGO_FILES	 = \
 
 STREAM_FILES	 = \
 	$(HEADER_PATH)/stream/stream.h \
-	$(HEADER_PATH)/stream/sort_stream.h
+	$(HEADER_PATH)/stream/sort_stream.h \
+	$(HEADER_PATH)/stream/choose.h \
+	$(HEADER_PATH)/stream/unique.h \
+	$(HEADER_PATH)/stream/sorted_runs.h
 
 ###################################################################
 
@@ -211,11 +226,13 @@ STREAM_FILES	 = \
 #### MISC #########################################################
 
 OBJEXT = obj # extension of object file
+LIBOBJEXT = obj # extension of object files for the library
 LIBEXT = lib # static library file extension
 EXEEXT = exe # executable file extension
 RM =     del # remove file command
 LIBGEN = lib /nologo /out:# library generation
 OUT    = /out:# output file for linking and compilation
+CLEAN_TARGETS = *.$(OBJEXT) *.$(EXEEXT) *.$(LIBEXT) *.exe.manifest *.pdb *.exp
 
 ###################################################################
 

@@ -19,8 +19,8 @@
  #include <boost/config.hpp>
 #endif
 
-#include <stxxl/bits/mng/mng.h>
-//#include <stxxl/bits/compat_hash_map.h>
+#include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/io/request.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -51,8 +51,6 @@ public:
 
         operator request_ptr () { return req; }
     };
-    //typedef typename compat_hash_map < bid_type, request_ptr , bid_hash >::result hash_map_type;
-    //typedef typename hash_map_type::iterator block_track_iterator;
     typedef typename std::list<block_type *>::iterator free_blocks_iterator;
     typedef typename std::list<busy_entry>::iterator busy_blocks_iterator;
 
@@ -61,8 +59,6 @@ protected:
     std::list<block_type *> free_blocks;
     // blocks that are in writing
     std::list<busy_entry> busy_blocks;
-
-    //hash_map_type block_track;
 
     unsigned_type free_blocks_size, busy_blocks_size;
 
@@ -116,17 +112,25 @@ public:
     //! \param bid location, where to write
     //! \warning \c block must be allocated dynamically with using \c new .
     //! \return request object of the write operation
-    request_ptr write(block_type * block, bid_type bid)
+    request_ptr write(block_type * & block, bid_type bid)
     {
+        STXXL_VERBOSE1("write_pool::write: " << block << " @ " << bid);
         for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
         {
-            if (i2->bid == bid && i2->block != block) {
+            if (i2->bid == bid) {
+                assert(i2->block != block);
                 STXXL_VERBOSE1("WAW dependency");
+                // try to cancel the obsolete request
+                i2->req->cancel();
+                // invalidate the bid of the stale write request,
+                // prevents prefetch_pool from stealing a stale block
+                i2->bid.storage = 0;
             }
         }
         request_ptr result = block->write(bid);
         ++busy_blocks_size;
         busy_blocks.push_back(busy_entry(block, result, bid));
+        block = NULL; // prevent caller from using the block any further
         return result;
     }
 
@@ -155,7 +159,7 @@ public:
     }
 
     // deprecated name for the steal()
-    __STXXL_DEPRECATED(block_type * get())
+    _STXXL_DEPRECATED(block_type * get())
     {
         return steal();
     }
@@ -171,7 +175,6 @@ public:
             while (--diff >= 0)
                 free_blocks.push_back(new block_type);
 
-
             return;
         }
 
@@ -179,7 +182,7 @@ public:
             delete steal();
     }
 
-    request_ptr get_request(bid_type bid)
+    _STXXL_DEPRECATED(request_ptr get_request(bid_type bid))
     {
         busy_blocks_iterator i2 = busy_blocks.begin();
         for ( ; i2 != busy_blocks.end(); ++i2)
@@ -190,8 +193,17 @@ public:
         return request_ptr();
     }
 
+    bool has_request(bid_type bid)
+    {
+        for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
+        {
+            if (i2->bid == bid)
+                return true;
+        }
+        return false;
+    }
 
-    block_type * steal(bid_type bid)
+    _STXXL_DEPRECATED(block_type * steal(bid_type bid))
     {
         busy_blocks_iterator i2 = busy_blocks.begin();
         for ( ; i2 != busy_blocks.end(); ++i2)
@@ -208,10 +220,32 @@ public:
         return NULL;
     }
 
-    void add(block_type * block)
+    // returns a block and a (potentially unfinished) I/O request associated with it
+    std::pair<block_type *, request_ptr> steal_request(bid_type bid)
+    {
+        for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
+        {
+            if (i2->bid == bid)
+            {
+                // remove busy block from list, request has not yet been waited for!
+                block_type * blk = i2->block;
+                request_ptr req = i2->req;
+                busy_blocks.erase(i2);
+                --busy_blocks_size;
+
+                // hand over block and (unfinished) request to caller
+                return std::pair<block_type *, request_ptr>(blk, req);
+            }
+        }
+        // not matching request found, return a dummy
+        return std::pair<block_type *, request_ptr>((block_type *)NULL, request_ptr());
+    }
+
+    void add(block_type * & block)
     {
         free_blocks.push_back(block);
         ++free_blocks_size;
+        block = NULL; // prevent caller from using the block any further
     }
 
 protected:
@@ -219,25 +253,21 @@ protected:
     {
         busy_blocks_iterator cur = busy_blocks.begin();
         int_type cnt = 0;
-#if STXXL_VERBOSE_LEVEL > 0
-        int_type busy_blocks_size_old = busy_blocks_size;
-#endif
-        for ( ; cur != busy_blocks.end(); ++cur)
+        while (cur != busy_blocks.end())
         {
             if (cur->req->poll())
             {
                 free_blocks.push_back(cur->block);
-                busy_blocks.erase(cur);
-                cur = busy_blocks.begin();
+                cur = busy_blocks.erase(cur);
                 ++cnt;
                 --busy_blocks_size;
                 ++free_blocks_size;
-                if (busy_blocks.empty())
-                    break;
+                continue;
             }
+            ++cur;
         }
         STXXL_VERBOSE1("write_pool::check_all_busy : " << cnt <<
-                       " are completed out of " << busy_blocks_size_old << " busy blocks");
+                       " are completed out of " << busy_blocks_size + cnt << " busy blocks");
     }
 };
 
@@ -257,3 +287,4 @@ namespace std
 }
 
 #endif // !STXXL_WRITE_POOL_HEADER
+// vim: et:ts=4:sw=4

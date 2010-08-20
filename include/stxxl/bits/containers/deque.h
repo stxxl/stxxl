@@ -13,6 +13,7 @@
 #ifndef _STXXL_DEQUE_H
 #define _STXXL_DEQUE_H
 
+#include <limits>
 #include <stxxl/vector>
 
 
@@ -397,7 +398,7 @@ public:
 //! The implementation wraps the elements around
 //! the end of the \c VectorType circularly.
 //! Template parameters:
-//! - \c T the element type
+//! - \c T type of the contained objects (POD with no references to internal memory)
 //! - \c VectorType the type of the underlying vector container,
 //! the default is \c stxxl::vector<T>
 template <class T, class VectorType = stxxl::vector<T> >
@@ -445,13 +446,12 @@ public:
     { }
 
     deque(size_type n)
-        : Vector((std::max)((size_type)(STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(T), 2 * n)),
+        : Vector(STXXL_MAX<size_type>(STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(T), 2 * n)),
           begin_o(0), end_o(n), size_(n)
     { }
 
-    ~deque()
-    {             // empty so far
-    }
+    ~deque()      // empty so far
+    { }
 
     iterator begin()
     {

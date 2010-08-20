@@ -16,20 +16,24 @@ test_stream1.$(EXEEXT): test_stream1.cpp $(DEPENDENCIES)
 
 test_sorted_runs: test_sorted_runs.$(EXEEXT)
 test_sorted_runs.$(EXEEXT): test_sorted_runs.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_sorted_runs.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_sorted_runs.cpp
 	$(LINKER)  test_sorted_runs.$(OBJEXT) $(OUT)test_sorted_runs.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_push_sort: test_push_sort.$(EXEEXT)
 test_push_sort.$(EXEEXT): test_push_sort.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_push_sort.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_push_sort.cpp
 	$(LINKER)  test_push_sort.$(OBJEXT) $(OUT)test_push_sort.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-	
+
 test_stream: test_stream.$(EXEEXT)
 test_stream.$(EXEEXT): test_stream.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_stream.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  test_stream.$(OBJEXT) $(OUT)test_stream.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_materialize: test_materialize.$(EXEEXT)
+test_materialize.$(EXEEXT): test_materialize.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_materialize.cpp -DSTXXL_VERBOSE_LEVEL=1
+	$(LINKER)  test_materialize.$(OBJEXT) $(OUT)test_materialize.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
-	$(RM) *.$(OBJEXT) test_stream.$(EXEEXT) test_sorted_runs.$(EXEEXT)
-	$(RM) test_push_sort.$(EXEEXT) test_stream1.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)

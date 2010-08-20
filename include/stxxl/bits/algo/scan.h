@@ -35,6 +35,9 @@ __STXXL_BEGIN_NAMESPACE
 template <typename _ExtIterator, typename _UnaryFunction>
 _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor, int_type nbuffers)
 {
+    if (_begin == _end)
+        return _functor;
+
     typedef buf_istream<typename _ExtIterator::block_type, typename _ExtIterator::bids_container_iterator> buf_istream_type;
 
     _begin.flush();     // flush container
@@ -86,6 +89,9 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 template <typename _ExtIterator, typename _UnaryFunction>
 _UnaryFunction for_each_m(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _functor, int_type nbuffers)
 {
+    if (_begin == _end)
+        return _functor;
+
     typedef buf_istream<typename _ExtIterator::block_type, typename _ExtIterator::bids_container_iterator> buf_istream_type;
     typedef buf_ostream<typename _ExtIterator::block_type, typename _ExtIterator::bids_container_iterator> buf_ostream_type;
 
@@ -207,6 +213,9 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
 template <typename _ExtIterator, typename _EqualityComparable>
 _ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityComparable & _value, int_type nbuffers)
 {
+    if (_begin == _end)
+        return _end;
+
     typedef buf_istream<typename _ExtIterator::block_type, typename _ExtIterator::bids_container_iterator> buf_istream_type;
 
     _begin.flush();     // flush container
@@ -238,3 +247,4 @@ _ExtIterator find(_ExtIterator _begin, _ExtIterator _end, const _EqualityCompara
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_SCAN_HEADER
+// vim: et:ts=4:sw=4

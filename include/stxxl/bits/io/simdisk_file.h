@@ -13,18 +13,27 @@
 #ifndef STXXL_SIMDISK_FILE_HEADER
 #define STXXL_SIMDISK_FILE_HEADER
 
+#ifndef STXXL_HAVE_SIMDISK_FILE
 #ifdef STXXL_BOOST_CONFIG
  #include <boost/config.hpp>
 #endif
 
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
+ #define STXXL_HAVE_SIMDISK_FILE 1
+#else
+ #define STXXL_HAVE_SIMDISK_FILE 0
+#endif
+#endif
+
+#if STXXL_HAVE_SIMDISK_FILE
 
 #include <set>
 #include <cmath>
 #include <sys/mman.h>
 
 #include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -39,22 +48,29 @@ class DiskGeometry : private noncopyable
     struct Zone
     {
         // manufactured data
-        //    int last_cyl;
-        //    int sect_per_track;
+#if 0
+        int last_cyl;
+        int sect_per_track;
+#endif
         // derived data
         int first_sector;
         int sectors;
-        double sustained_data_rate;             // in Mb/s
+        double sustained_data_rate;  // in MiB/s
         inline Zone(int _first_sector) : first_sector(_first_sector)
-        { }                                     // constructor for zone search
+        { }                          // constructor for zone search
 
         inline Zone(
-            //int _last_cyl,
-            //int _sect_per_track,
+#if 0
+            int _last_cyl,
+            int _sect_per_track,
+#endif
             int _first_sector,
-            int _sectors, double _rate) :
-            //last_cyl(_last_cyl),
-            //sect_per_track(_sect_per_track) ,
+            int _sectors,
+            double _rate) :
+#if 0
+            last_cyl(_last_cyl),
+            sect_per_track(_sect_per_track),
+#endif
             first_sector(_first_sector),
             sectors(_sectors),
             sustained_data_rate(_rate)
@@ -101,7 +117,7 @@ public:
 
 //! \brief Implementation of disk emulation
 //! \remark It is emulation of IBM IC35L080AVVA07 disk's timings
-class sim_disk_file : public ufs_file_base, public IC35L080AVVA07
+class sim_disk_file : public ufs_file_base, public disk_queued_file, public IC35L080AVVA07
 {
 public:
     //! \brief constructs file object
@@ -109,13 +125,13 @@ public:
     //! \attention filename must be resided at memory disk partition
     //! \param mode open mode, see \c stxxl::file::open_modes
     //! \param disk disk(file) identifier
-    inline sim_disk_file(const std::string & filename, int mode, int disk) : ufs_file_base(filename, mode, disk)
+    inline sim_disk_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     {
         std::cout << "Please, make sure that '" << filename <<
         "' is resided on swap memory partition!" <<
         std::endl;
     }
-    void serve(const request * req) throw(io_error);
+    void serve(const request * req) throw (io_error);
     void set_size(offset_type newsize);
     const char * io_type() const;
 };
@@ -124,6 +140,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifndef BOOST_MSVC
+#endif  // #if STXXL_HAVE_SIMDISK_FILE
 
-#endif // !STXXL_SIMDISK_FILE_HEADER
+#endif  // !STXXL_SIMDISK_FILE_HEADER

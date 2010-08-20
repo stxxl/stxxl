@@ -36,28 +36,27 @@ __STXXL_END_NAMESPACE
 
 #if defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) == 30400)
 
-namespace workaround_gcc_3_4 {
-
+namespace workaround_gcc_3_4
+{
     // std::swap in gcc 3.4 is broken, __tmp is declared const there
-    template<typename _Tp>
+    template <typename _Tp>
     inline void
-    swap(_Tp& __a, _Tp& __b)
+    swap(_Tp & __a, _Tp & __b)
     {
-      // concept requirements
-      __glibcxx_function_requires(_SGIAssignableConcept<_Tp>)
+        // concept requirements
+        __glibcxx_function_requires(_SGIAssignableConcept<_Tp>)
 
-      _Tp __tmp = __a;
-      __a = __b;
-      __b = __tmp;
+        _Tp __tmp = __a;
+        __a = __b;
+        __b = __tmp;
     }
-
 }
 
-namespace std {
-
+namespace std
+{
     // overload broken std::swap<auto_ptr> to call a working swap()
-    template<typename _Tp>
-    inline void swap(std::auto_ptr<_Tp>& a, std::auto_ptr<_Tp>& b)
+    template <typename _Tp>
+    inline void swap(std::auto_ptr<_Tp> & a, std::auto_ptr<_Tp> & b)
     {
         workaround_gcc_3_4::swap(a, b);
     }

@@ -6,7 +6,7 @@
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
 #  Copyright (C) 2002-2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
-#  Copyright (C) 2007-2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -54,36 +54,50 @@ lib-in-%:
 	$(MAKE) -C $* lib
 
 build-lib: SUBDIRS-lib
+	$(RM) $(LIBNAME).stamp
 	$(MAKE) -C lib
+	touch $(LIBNAME).stamp
+
+ifeq (,$(wildcard lib/lib$(LIBNAME).$(LIBEXT)))
+$(LIBNAME).stamp: build-lib
+else
+$(LIBNAME).stamp:
+	$(MAKE) -f Makefile.gnu build-lib
+endif
+
+build-lib-utils: $(LIBNAME).stamp
 	$(MAKE) -C common tools
 	$(MAKE) -C utils tools
+	$(MAKE) -C io tools
 
-$(LIBNAME).stamp: build-lib
-	$(RM) $@ $(LIBNAME).mk.tmp
-	echo 'STXXL_CXX			 = $(COMPILER)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS			 = $(stxxl_mk_cppflags)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS			 = $(stxxl_mk_ldlibs)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_STXXL		 = $(STXXL_SPECIFIC)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_STXXL		 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LIBDEPS			 = $(STXXL_LIBDEPS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_PARALLEL_MODE	 = $(PARALLEL_MODE_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_PARALLEL_MODE	 = $(PARALLEL_MODE_LDFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_MCSTL		 = $(MCSTL_CPPFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_MCSTL		 = $(MCSTL_LDFLAGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_CPPFLAGS_BOOST		 = $(BOOST_COMPILER_OPTIONS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_LDLIBS_BOOST		 = $(BOOST_LINKER_OPTIONS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_WARNFLAGS			 = $(WARNINGS)'	>> $(LIBNAME).mk.tmp
-	echo 'STXXL_DEBUGFLAGS		 = $(DEBUG)'	>> $(LIBNAME).mk.tmp
-	cmp -s $(LIBNAME).mk.tmp $(LIBNAME).mk || mv $(LIBNAME).mk.tmp $(LIBNAME).mk
-	$(RM) $(LIBNAME).mk.tmp
-	touch $@
+$(MODENAME).mk:
+	$(RM) $(MODENAME).mk.tmp
+	echo 'STXXL_CXX			 = $(COMPILER)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS			 = $(stxxl_mk_cppflags)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS			 = $(stxxl_mk_ldlibs)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_STXXL		 = $(STXXL_SPECIFIC)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS_STXXL		 = $(STXXL_LDFLAGS) $(STXXL_LDLIBS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LIBDEPS			 = $(STXXL_LIBDEPS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_PARALLEL_MODE	 = $(PARALLEL_MODE_CPPFLAGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS_PARALLEL_MODE	 = $(PARALLEL_MODE_LDFLAGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_MCSTL		 = $(MCSTL_CPPFLAGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS_MCSTL		 = $(MCSTL_LDFLAGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_CPPFLAGS_BOOST		 = $(BOOST_COMPILER_OPTIONS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_LDLIBS_BOOST		 = $(BOOST_LINKER_OPTIONS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_WARNFLAGS			 = $(WARNINGS)'	>> $(MODENAME).mk.tmp
+	echo 'STXXL_DEBUGFLAGS		 = $(DEBUG)'	>> $(MODENAME).mk.tmp
+	cmp -s $(MODENAME).mk.tmp $(MODENAME).mk || mv $(MODENAME).mk.tmp $(MODENAME).mk
+	$(RM) $(MODENAME).mk.tmp
 
-library: $(LIBNAME).stamp
+.PHONY: $(MODENAME).mk
+
+library: build-lib
+library_utils: $(LIBNAME).stamp build-lib-utils $(MODENAME).mk
 
 # skip recompilation of existing library
 library-fast:
 ifeq (,$(wildcard lib/lib$(LIBNAME).$(LIBEXT)))
-library-fast: library
+library-fast: library_utils
 endif
 
 ifneq (,$(wildcard .svn))
@@ -147,7 +161,11 @@ clean-in-%:
 
 clean: SUBDIRS-clean
 	$(RM) common/version_svn.defs
-	$(RM) $(LIBNAME).stamp $(LIBNAME).mk $(LIBNAME).mk.tmp
+	$(RM) $(LIBNAME).stamp $(MODENAME).stamp $(MODENAME).mk $(MODENAME).mk.tmp
+
+
+getmodesuffix:
+	@echo "$(LIBEXTRA)"
 
 
 ifneq (,$(wildcard .svn))

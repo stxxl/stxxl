@@ -44,28 +44,28 @@ int main(int argc, char ** argv)
     stxxl::request_ptr req[16];
 
     //without cancellation
-    stxxl::stats::get_instance()->reset();
+    stxxl::stats_data stats1(*stxxl::stats::get_instance());
     unsigned i = 0;
     for ( ; i < 16; i++)
         req[i] = file.awrite(buffer, i * size, size, my_handler());
     wait_all(req, 16);
-    std::cout << *(stxxl::stats::get_instance());
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats1;
 
     //with cancellation
-    stxxl::stats::get_instance()->reset();
-    for (unsigned i = 0 ; i < 16; i++)
+    stxxl::stats_data stats2(*stxxl::stats::get_instance());
+    for (unsigned i = 0; i < 16; i++)
         req[i] = file.awrite(buffer, i * size, size, my_handler());
     //cancel first half
     unsigned num_cancelled = cancel_all(req, req + 8);
     STXXL_MSG("Cancelled " << num_cancelled << " requests.");
     //cancel every second in second half
-    for (unsigned i = 8 ; i < 16; i += 2)
+    for (unsigned i = 8; i < 16; i += 2)
     {
-        if(req[i]->cancel())
+        if (req[i]->cancel())
             STXXL_MSG("Cancelled request " << &(*(req[i])));
     }
     wait_all(req, 16);
-    std::cout << *(stxxl::stats::get_instance());
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats2;
 
     stxxl::aligned_dealloc<4096>(buffer);
 

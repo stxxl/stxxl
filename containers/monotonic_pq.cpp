@@ -13,6 +13,7 @@
  **************************************************************************/
 
 #include <queue>
+#include <limits>
 
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL 1
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1
@@ -21,7 +22,7 @@
 #define TINY_PQ 0
 #define MANUAL_PQ 0
 
-#define SIDE_PQ 1
+#define SIDE_PQ 1       // compare with second, in-memory PQ (needs a lot of memory)
 
 #include <stxxl/priority_queue>
 #include <stxxl/timer>
@@ -72,11 +73,10 @@ struct my_type
 
 std::ostream & operator << (std::ostream & o, const my_type & obj)
 {
-    o << obj.key
+    o << obj.key;
 #if LOAD
-                        << "/" << obj.load
+    o << "/" << obj.load;
 #endif
-    ;
     return o;
 }
 
@@ -115,11 +115,11 @@ int main(int argc, char * argv[])
 {
     if (argc < 3)
     {
-        std::cout << "Usage: " << argv[0] << " [n in megabytes]"
+        std::cout << "Usage: " << argv[0] << " [n in MiB]"
 #if defined(__MCSTL__) || defined(_GLIBCXX_PARALLEL)
-                << " [p threads]"
+                  << " [p threads]"
 #endif
-                << std::endl;
+                  << std::endl;
         return -1;
     }
 
@@ -199,11 +199,11 @@ int main(int argc, char * argv[])
   __gnu_parallel::_Settings::set(parallel_settings);*/
 #endif
 
-    const stxxl::unsigned_type mem_for_queue = 2047 * mega;
-    const stxxl::unsigned_type mem_for_pools = 2047 * mega;
+    const stxxl::unsigned_type mem_for_queue = 512 * mega;
+    const stxxl::unsigned_type mem_for_pools = 512 * mega;
 
 #if TINY_PQ
-    stxxl::UNUSED(mem_for_queue);
+    stxxl::STXXL_UNUSED(mem_for_queue);
     const unsigned BufferSize1 = 32;               // equalize procedure call overheads etc.
     const unsigned N = (1 << 9) / sizeof(my_type); // minimal sequence length
     const unsigned IntKMAX = 8;                    // maximal arity for internal mergersq
@@ -225,7 +225,7 @@ int main(int argc, char * argv[])
             >
         > pq_type;
 #elif MANUAL_PQ
-    stxxl::UNUSED(mem_for_queue);
+    stxxl::STXXL_UNUSED(mem_for_queue);
     const unsigned BufferSize1 = 32;                    // equalize procedure call overheads etc.
     const unsigned N = (1 << 20) / sizeof(my_type);     // minimal sequence length
     const unsigned IntKMAX = 16;                        // maximal arity for internal mergersq
@@ -262,7 +262,7 @@ int main(int argc, char * argv[])
 
 /*  STXXL_MSG ( "Blocks fitting into internal memory m: "<<gen::m );
   STXXL_MSG ( "X : "<<gen::X );  //maximum number of internal elements //X = B * (settings::k - m) / settings::E,
-  STXXL_MSG ( "Expected internal memory consumption: "<< (gen::EConsumption / 1048576) << " MB");*/
+  STXXL_MSG ( "Expected internal memory consumption: "<< (gen::EConsumption / 1048576) << " MiB");*/
 #endif
     typedef pq_type::block_type block_type;
 
@@ -283,14 +283,12 @@ int main(int argc, char * argv[])
     stxxl::timer Timer;
     Timer.start();
 
-    stxxl::prefetch_pool<block_type> p_pool((mem_for_pools / 2) / block_type::raw_size);
-    stxxl::write_pool<block_type> w_pool((mem_for_pools / 2) / block_type::raw_size);
-    pq_type p(p_pool, w_pool);
+    pq_type p(mem_for_pools / 2, mem_for_pools / 2);
     stxxl::int64 nelements = stxxl::int64(megabytes * mega / sizeof(my_type)), i;
 
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
-    STXXL_MSG("Peak number of elements: " << nelements);
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
+    STXXL_MSG("Peak number of elements (n): " << nelements);
     STXXL_MSG("Max number of elements to contain: " << (stxxl::uint64(pq_type::N) * pq_type::IntKMAX * pq_type::IntKMAX * pq_type::ExtKMAX * pq_type::ExtKMAX));
     srand(5);
     my_cmp cmp;
@@ -308,13 +306,12 @@ int main(int argc, char * argv[])
     STXXL_MSG("op-sequence(monotonic pq): ( push, pop, push ) * n");
     for (i = 0; i < nelements; ++i)
     {
-        if ((i % (10 * mega)) == 0)
+        if ((i % mega) == 0)
             STXXL_MSG(
                 std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
                            << "Inserting element " << i << " top() == " << least.key << " @ "
-                           << std::setprecision(3) << Timer.seconds() << " sec"
+                           << std::setprecision(3) << Timer.seconds() << " s"
                            << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
-
 
         //monotone priority queue
         r = least.key + rand() % modulo;
@@ -331,12 +328,12 @@ int main(int argc, char * argv[])
         side_pq_least = side_pq.top();
         side_pq.pop();
         if (!(side_pq_least == least))
-            STXXL_MSG ( "Wrong result at  " << i << "  " << side_pq_least.key << " != " << least.key );
+            STXXL_MSG("Wrong result at  " << i << "  " << side_pq_least.key << " != " << least.key);
 #endif
 
         if (cmp(last_least, least))
         {
-            STXXL_MSG ( "Wrong order at  " << i << "  " << last_least.key << " > " << least.key );
+            STXXL_MSG("Wrong order at  " << i << "  " << last_least.key << " > " << least.key);
         }
         else
             last_least = least;
@@ -349,9 +346,9 @@ int main(int argc, char * argv[])
 #endif
     }
     Timer.stop();
-    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec");
+    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     stxxl::stats_data sd_middle(*stxxl::stats::get_instance());
     std::cout << sd_middle - sd_start;
     Timer.reset();
@@ -370,12 +367,12 @@ int main(int argc, char * argv[])
         side_pq.pop();
         if (!(side_pq_least == least))
         {
-            STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+            STXXL_VERBOSE1("" << side_pq_least << " != " << least);
         }
 #endif
         if (cmp(last_least, least))
         {
-            STXXL_MSG ( "Wrong result at " << i << "  " << last_least.key << " > " << least.key );
+            STXXL_MSG("Wrong result at " << i << "  " << last_least.key << " > " << least.key);
         }
         else
             last_least = least;
@@ -395,7 +392,7 @@ int main(int argc, char * argv[])
         side_pq.pop();
         if (!(side_pq_least == least))
         {
-            STXXL_VERBOSE0("" << side_pq_least << " != " << least);
+            STXXL_VERBOSE1("" << side_pq_least << " != " << least);
         }
 #endif
         if (cmp(last_least, least))
@@ -405,11 +402,11 @@ int main(int argc, char * argv[])
         else
             last_least = least;
 
-        if ((i % (10 * mega)) == 0)
+        if ((i % mega) == 0)
             STXXL_MSG(
                 std::fixed << std::setprecision(2) << std::setw(5) << (100.0 * i / nelements) << "% "
                            << "Popped element " << i << " == " << least.key << " @ "
-                           << std::setprecision(3) << Timer.seconds() << " sec"
+                           << std::setprecision(3) << Timer.seconds() << " s"
                            << std::setprecision(6) << std::resetiosflags(std::ios_base::floatfield));
     }
     STXXL_MSG("Last element " << i << " popped");
@@ -418,9 +415,9 @@ int main(int argc, char * argv[])
     if (sum_input != sum_output)
         STXXL_MSG("WRONG sum! " << sum_input << " - " << sum_output << " = " << (sum_output - sum_input) << " / " << (sum_input - sum_output));
 
-        STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
-        STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
-        std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - sd_middle;
+    STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
+    std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - sd_middle;
     std::cout << *stxxl::stats::get_instance();
 
     assert(sum_input == sum_output);

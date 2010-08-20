@@ -30,6 +30,7 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     typedef typename ExtIterator_::block_type block_type;
 
     STXXL_VERBOSE("stl_in_memory_sort, range: " << (last - first));
+    first.flush();
     unsigned_type nblocks = last.bid() - first.bid() + (last.block_offset() ? 1 : 0);
     simple_vector<block_type> blocks(nblocks);
     simple_vector<request_ptr> reqs(nblocks);
@@ -42,33 +43,12 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     wait_all(reqs.begin(), nblocks);
 
     unsigned_type last_block_correction = last.block_offset() ? (block_type::size - last.block_offset()) : 0;
-    if (block_type::has_filler)
-        std::sort(
-#if 1
-            ArrayOfSequencesIterator<
-                block_type, typename block_type::value_type, block_type::size
-                >(blocks.begin(), first.block_offset()),
-            ArrayOfSequencesIterator<
-                block_type, typename block_type::value_type, block_type::size
-                >(blocks.begin(), nblocks * block_type::size - last_block_correction),
-#else
-            TwoToOneDimArrayRowAdaptor<
-                block_type, typename block_type::value_type, block_type::size
-                >(blocks.begin(), first.block_offset()),
-            TwoToOneDimArrayRowAdaptor<
-                block_type, typename block_type::value_type, block_type::size
-                >(blocks.begin(), nblocks * block_type::size - last_block_correction),
-#endif
-            cmp);
-
-    else
-        std::sort(blocks[0].elem + first.block_offset(),
-                  blocks[nblocks].elem - last_block_correction, cmp);
-
+    std::sort(make_element_iterator(blocks.begin(), first.block_offset()),
+              make_element_iterator(blocks.begin(), nblocks * block_type::size - last_block_correction),
+              cmp);
 
     for (i = 0; i < nblocks; ++i)
         reqs[i] = blocks[i].write(*(first.bid() + i));
-
 
     wait_all(reqs.begin(), nblocks);
 }

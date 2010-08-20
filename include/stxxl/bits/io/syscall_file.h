@@ -14,6 +14,7 @@
 #define STXXL_SYSCALL_FILE_HEADER
 
 #include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -22,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implementation of file based on UNIX syscalls
-class syscall_file : public ufs_file_base
+class syscall_file : public ufs_file_base, public disk_queued_file
 {
 public:
     //! \brief constructs file object
@@ -33,9 +34,10 @@ public:
     syscall_file(
         const std::string & filename,
         int mode,
-        int disk = -1) : ufs_file_base(filename, mode, disk)
+        int queue_id = DEFAULT_QUEUE,
+        int allocator_id = NO_ALLOCATOR) : ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }
-    void serve(const request * req) throw(io_error);
+    void serve(const request * req) throw (io_error);
     const char * io_type() const;
 };
 

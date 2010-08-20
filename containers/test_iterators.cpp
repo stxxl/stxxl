@@ -24,11 +24,15 @@
 template <typename T>
 const char * _()
 {
-    return strchr(STXXL_PRETTY_FUNCTION_NAME, '[');
+    const char * start = strchr(STXXL_PRETTY_FUNCTION_NAME, '[');
+    if (start == NULL)
+        return "unknown";
+    else
+        return start;
 }
 
 template <typename I>
-void dump_iterator_info(I&)
+void dump_iterator_info(I &)
 {
     STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
     STXXL_MSG("  category:        " << _<typename std::iterator_traits<I>::iterator_category>());
@@ -39,7 +43,7 @@ void dump_iterator_info(I&)
 }
 
 template <typename C>
-void dump_container_info(C&)
+void dump_container_info(C &)
 {
     STXXL_MSG(STXXL_PRETTY_FUNCTION_NAME);
     STXXL_MSG("  value_type:      " << _<typename C::value_type>());
@@ -97,7 +101,7 @@ bool test_inc_dec_random(Iterator it)
 template <typename IteratorA, typename IteratorB, typename Category>
 struct test_comparison_lt_gt
 {
-    void operator() (IteratorA, IteratorB)
+    void operator () (IteratorA, IteratorB)
     {
         // operators <, <=, >=, > are not available in all iterator categories
     }
@@ -106,7 +110,7 @@ struct test_comparison_lt_gt
 template <typename IteratorA, typename IteratorB>
 struct test_comparison_lt_gt<IteratorA, IteratorB, std::random_access_iterator_tag>
 {
-    void operator() (IteratorA a, IteratorB b)
+    void operator () (IteratorA a, IteratorB b)
     {
         a < b;
         a <= b;
@@ -136,7 +140,7 @@ template <typename Iterator>
 void test_operators(Iterator it)
 {
     *it;
-    it.operator->();
+    it.operator -> ();
     test_comparison(it, it);
 }
 
@@ -397,13 +401,13 @@ int main()
     test_reverse(Map);
 #endif
 
-    std::deque<double> D(1);
+    std::deque<double> D(8);
     test(D);
     test_reverse(D);
     test_random_access(D);
     test_random_access_reverse(D);
 
-    stxxl::deque<double> Deque(1);
+    stxxl::deque<double> Deque(8);
     test(Deque);
     test_reverse(Deque);
     test_random_access(Deque);

@@ -122,7 +122,7 @@ void print_usage(const char * program)
 {
     std::cout << "Usage: " << program << " logfile main billfile" << std::endl;
     std::cout << " logfile  - file name of the input" << std::endl;
-    std::cout << " main     - memory to use (in MB)" << std::endl;
+    std::cout << " main     - memory to use (in MiB)" << std::endl;
     std::cout << " billfile - file name of the output" << std::endl;
 }
 

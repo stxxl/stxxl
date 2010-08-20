@@ -36,7 +36,7 @@ test_block_alloc_strategy.$(EXEEXT): test_block_alloc_strategy.cpp $(DEPENDENCIE
 
 test_write_pool: test_write_pool.$(EXEEXT)
 test_write_pool.$(EXEEXT): test_write_pool.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_write_pool.cpp -DSTXXL_VERBOSE_LEVEL=2
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_write_pool.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER) test_write_pool.$(OBJEXT) $(OUT)test_write_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_prefetch_pool: test_prefetch_pool.$(EXEEXT)
@@ -49,6 +49,21 @@ test_mng_recursive_alloc.$(EXEEXT): test_mng_recursive_alloc.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_mng_recursive_alloc.cpp -DSTXXL_VERBOSE_LEVEL=3
 	$(LINKER) test_mng_recursive_alloc.$(OBJEXT) $(OUT)test_mng_recursive_alloc.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_pool_pair: test_pool_pair.$(EXEEXT)
+test_pool_pair.$(EXEEXT): test_pool_pair.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_pool_pair.cpp
+	$(LINKER) test_pool_pair.$(OBJEXT) $(OUT)test_pool_pair.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+test_read_write_pool: test_read_write_pool.$(EXEEXT)
+test_read_write_pool.$(EXEEXT): test_read_write_pool.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_read_write_pool.cpp
+	$(LINKER) test_read_write_pool.$(OBJEXT) $(OUT)test_read_write_pool.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+test_aligned: test_aligned.$(EXEEXT)
+test_aligned.$(EXEEXT): test_aligned.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_aligned.cpp
+	$(LINKER) test_aligned.$(OBJEXT) $(OUT)test_aligned.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 unittest: unittest.$(EXEEXT) $(DEPENDENCIES)
 unittest.$(EXEEXT): unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
@@ -56,5 +71,5 @@ unittest.$(EXEEXT): unittest.cpp
 
 
 clean:
-	$(RM) *.$(OBJEXT) *.$(EXEEXT)
+	$(RM) $(CLEAN_TARGETS)
 	

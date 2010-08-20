@@ -332,7 +332,7 @@ namespace priority_queue_local
 
         // make all new entries free
         // and push them on the free stack
-        for (unsigned_type i = 2 * k - 1;  i >= k;  i--) // backwards
+        for (unsigned_type i = 2 * k - 1; i >= k; i--)   // backwards
         {
             current[i] = &sentinel;
             current_end[i] = &sentinel;
@@ -362,7 +362,7 @@ namespace priority_queue_local
         // compact all nonempty segments to the left
         unsigned_type pos = 0;
         unsigned_type last_empty = 0;
-        for ( ;  pos < k;  pos++)
+        for ( ; pos < k; pos++)
         {
             if (not_sentinel(*(current[pos])))
             {
@@ -371,7 +371,7 @@ namespace priority_queue_local
                 current_end[last_empty] = current_end[pos];
                 segment[last_empty] = segment[pos];
                 last_empty++;
-            }/*
+            } /*
                 else
                 {
                 if(segment[pos])
@@ -542,7 +542,7 @@ namespace priority_queue_local
                     std::make_pair(current[0], current_end[0]),
                     std::make_pair(current[1], current_end[1])
                 };
-                __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
+                parallel::multiway_merge_sentinel(seqs, seqs + 2, target, inv_cmp, length);
                 current[0] = seqs[0].first;
                 current[1] = seqs[1].first;
             }
@@ -568,7 +568,7 @@ namespace priority_queue_local
                     std::make_pair(current[2], current_end[2]),
                     std::make_pair(current[3], current_end[3])
                 };
-                __STXXL_PQ_multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
+                parallel::multiway_merge_sentinel(seqs, seqs + 4, target, inv_cmp, length);
                 current[0] = seqs[0].first;
                 current[1] = seqs[1].first;
                 current[2] = seqs[2].first;
@@ -627,7 +627,7 @@ namespace priority_queue_local
                     }
                 }
 
-                __STXXL_PQ_multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
+                parallel::multiway_merge_sentinel(seqs.begin(), seqs.end(), target, inv_cmp, length);
 
                 for (unsigned int i = 0; i < seqs.size(); ++i)
                 {
@@ -716,7 +716,7 @@ namespace priority_queue_local
 
 
             // go up the entry-tree
-            for (unsigned_type i = (winnerIndex + kReg) >> 1;  i > 0;  i >>= 1) {
+            for (unsigned_type i = (winnerIndex + kReg) >> 1; i > 0; i >>= 1) {
                 currentPos = entry + i;
                 currentKey = currentPos->key;
                 if (cmp(winnerKey, currentKey)) {

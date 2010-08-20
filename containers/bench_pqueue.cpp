@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <limits>
 #include <stxxl/priority_queue>
 
 
@@ -62,7 +63,7 @@ int main()
  */
 // typedef priority_queue<priority_queue_config<my_type,my_cmp,
 //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-    const unsigned volume = 3 * 1024 * 1024; // in KB
+    const unsigned volume = 3 * 1024 * 1024; // in KiB
     const unsigned mem_for_queue = 256 * 1024 * 1024;
     const unsigned mem_for_pools = 512 * 1024 * 1024;
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)> gen;
@@ -78,12 +79,10 @@ int main()
     stxxl::timer Timer;
     Timer.start();
 
-    stxxl::prefetch_pool<block_type> p_pool((mem_for_pools / 2) / block_type::raw_size);
-    stxxl::write_pool<block_type> w_pool((mem_for_pools / 2) / block_type::raw_size);
-    pq_type p(p_pool, w_pool);
+    pq_type p(mem_for_pools / 2, mem_for_pools / 2);
     stxxl::int64 nelements = stxxl::int64(volume / sizeof(my_type)) * 1024, i;
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     STXXL_MSG("Max elements: " << nelements);
     for (i = 0; i < nelements; i++)
     {
@@ -92,9 +91,9 @@ int main()
         p.push(my_type(nelements - i));
     }
     Timer.stop();
-    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " sec");
+    STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");
 
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     Timer.reset();
     Timer.start();
     for (i = 0; i < (nelements); ++i)
@@ -108,6 +107,6 @@ int main()
     }
     Timer.stop();
 
-    STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " sec");
-    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " bytes");
+    STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
+    STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
 }

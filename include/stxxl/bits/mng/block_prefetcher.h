@@ -43,6 +43,10 @@ template <typename block_type, typename bid_iterator_type>
 class block_prefetcher
 {
     block_prefetcher() { }
+    typedef typename block_type::bid_type bid_type;
+
+public:
+    typedef void (*callback_type)(const bid_type &);
 
 protected:
     bid_iterator_type consume_seq_begin;
@@ -58,15 +62,18 @@ protected:
 
     block_type * read_buffers;
     request_ptr * read_reqs;
+    bid_type * read_bids;
 
     onoff_switch * completed;
     int_type * pref_buffer;
+
+    callback_type do_after_fetch;
 
     block_type * wait(int_type iblock)
     {
         STXXL_VERBOSE1("block_prefetcher: waiting block " << iblock);
         {
-            stats::scoped_wait_timer wait_timer;
+            stats::scoped_wait_timer wait_timer(stats::WAIT_OP_READ);
 
             completed[iblock].wait_for_on();
         }
@@ -74,6 +81,8 @@ protected:
         int_type ibuffer = pref_buffer[iblock];
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);
         assert(ibuffer >= 0 && ibuffer < nreadblocks);
+        if (do_after_fetch)
+            do_after_fetch(read_bids[ibuffer]);
         return (read_buffers + ibuffer);
     }
 
@@ -88,7 +97,8 @@ public:
         bid_iterator_type _cons_begin,
         bid_iterator_type _cons_end,
         int_type * _pref_seq,
-        int_type _prefetch_buf_size
+        int_type _prefetch_buf_size,
+        callback_type do_after_fetch = NULL
         ) :
         consume_seq_begin(_cons_begin),
         consume_seq_end(_cons_end),
@@ -96,7 +106,8 @@ public:
         prefetch_seq(_pref_seq),
         nextread(STXXL_MIN(unsigned_type(_prefetch_buf_size), seq_length)),
         nextconsume(0),
-        nreadblocks(nextread)
+        nreadblocks(nextread),
+        do_after_fetch(do_after_fetch)
     {
         STXXL_VERBOSE1("block_prefetcher: seq_length=" << seq_length);
         STXXL_VERBOSE1("block_prefetcher: _prefetch_buf_size=" << _prefetch_buf_size);
@@ -105,6 +116,7 @@ public:
         int_type i;
         read_buffers = new block_type[nreadblocks];
         read_reqs = new request_ptr[nreadblocks];
+        read_bids = new bid_type[nreadblocks];
         pref_buffer = new int_type[seq_length];
 
         std::fill(pref_buffer, pref_buffer + seq_length, -1);
@@ -113,12 +125,15 @@ public:
 
         for (i = 0; i < nreadblocks; ++i)
         {
-            STXXL_VERBOSE1("block_prefetcher: reading block " << i
-                                                              << " prefetch_seq[" << i << "]=" << prefetch_seq[i]);
             assert(prefetch_seq[i] < int_type(seq_length));
             assert(prefetch_seq[i] >= 0);
+            read_bids[i] = *(consume_seq_begin + prefetch_seq[i]);
+            STXXL_VERBOSE1("block_prefetcher: reading block " << i <<
+                           " prefetch_seq[" << i << "]=" << prefetch_seq[i] <<
+                           " @ " << &read_buffers[i] <<
+                           " @ " << read_bids[i]);
             read_reqs[i] = read_buffers[i].read(
-                *(consume_seq_begin + prefetch_seq[i]),
+                read_bids[i],
                 set_switch_handler(*(completed + prefetch_seq[i])));
             pref_buffer[prefetch_seq[i]] = i;
         }
@@ -150,12 +165,13 @@ public:
             int_type next_2_prefetch = prefetch_seq[nextread++];
             STXXL_VERBOSE1("block_prefetcher: prefetching block " << next_2_prefetch);
 
-            assert(next_2_prefetch < int_type(seq_length) && next_2_prefetch >= 0);
+            assert((next_2_prefetch < int_type(seq_length)) && (next_2_prefetch >= 0));
             assert(!completed[next_2_prefetch].is_on());
 
             pref_buffer[next_2_prefetch] = ibuffer;
+            read_bids[ibuffer] = *(consume_seq_begin + next_2_prefetch);
             read_reqs[ibuffer] = read_buffers[ibuffer].read(
-                *(consume_seq_begin + next_2_prefetch),
+                read_bids[ibuffer],
                 set_switch_handler(*(completed + next_2_prefetch))
                 );
         }
@@ -168,6 +184,20 @@ public:
 
         return true;
     }
+
+    // no more consumable blocks available, but can't delete the prefetcher,
+    // because not all blocks may have been returned, yet
+    bool empty() const
+    {
+        return nextconsume >= seq_length;
+    }
+
+    // index of the next element in the consume sequence
+    unsigned_type pos() const
+    {
+        return nextconsume;
+    }
+
     //! \brief Frees used memory
     ~block_prefetcher()
     {
@@ -177,6 +207,7 @@ public:
 
 
         delete[] read_reqs;
+        delete[] read_bids;
         delete[] completed;
         delete[] pref_buffer;
         delete[] read_buffers;

@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 1999 Peter Sanders <sanders@mpi-sb.mpg.de>
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -14,15 +15,16 @@
 #ifndef STXXL_LOSERTREE_HEADER
 #define STXXL_LOSERTREE_HEADER
 
+#include <algorithm>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/verbose.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
 template <typename run_cursor_type,
-          typename run_cursor_cmp_type,
-          unsigned buffer_size>
+          typename run_cursor_cmp_type>
 class loser_tree : private noncopyable
 {
     int logK;
@@ -64,7 +66,7 @@ public:
         run_cursor_cmp_type c) : cmp(c)
     {
         int_type i;
-        logK = static_cast<int>(ceil(log(double(nruns)) / log(2.)));             // replace with something smart
+        logK = log2_ceil(nruns);
         int_type kReg = k = (1 << logK);
 
         STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
@@ -76,7 +78,6 @@ public:
         current = new run_cursor_type[kReg];
         for (i = 0; i < kReg; ++i)
             current[i].prefetcher() = p;
-
 #endif
         entry = new int_type[(kReg << 1)];
         // init cursors
@@ -112,19 +113,19 @@ public:
 
 private:
     template <unsigned LogK>
-    void multi_merge_unrolled(value_type * to)
+    void multi_merge_unrolled(value_type * out_first, value_type * out_last)
     {
         run_cursor_type * currentE, * winnerE;
         int_type * regEntry = entry;
-        value_type * done = to + buffer_size;
         int_type winnerIndex = regEntry[0];
 
-        while (LIKELY(to < done))
+        while (LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
-            *(to++) = winnerE->current();
+            *(out_first) = winnerE->current();
+            ++out_first;
 
-            (*winnerE)++;
+            ++(*winnerE);
 
 
 #define TreeStep(L) \
@@ -157,30 +158,29 @@ private:
         regEntry[0] = winnerIndex;
     }
 
-    void multi_merge_unrolled_0(value_type * to)
+    void multi_merge_unrolled_0(value_type * out_first, value_type * out_last)
     {
-        const value_type * done = to + buffer_size;
-        while (to < done)
+        while (LIKELY(out_first != out_last))
         {
-            *to = current->current();
-            ++to;
-            (*current)++;
+            *out_first = current->current();
+            ++out_first;
+            ++(*current);
         }
     }
 
-    void multi_merge_k(value_type * to)
+    void multi_merge_k(value_type * out_first, value_type * out_last)
     {
         run_cursor_type * currentE, * winnerE;
         int_type kReg = k;
-        value_type * done = to + buffer_size;
         int_type winnerIndex = entry[0];
 
-        while (LIKELY(to < done))
+        while (LIKELY(out_first != out_last))
         {
             winnerE = current + winnerIndex;
-            *(to++) = winnerE->current();
+            *(out_first) = winnerE->current();
+            ++out_first;
 
-            (*winnerE)++;
+            ++(*winnerE);
 
             for (int_type i = (winnerIndex + kReg) >> 1; i > 0; i >>= 1)
             {
@@ -198,45 +198,45 @@ private:
     }
 
 public:
-    void multi_merge(value_type * to)
+    void multi_merge(value_type * out_first, value_type * out_last)
     {
         switch (logK)
         {
         case 0:
-            multi_merge_unrolled_0(to);
+            multi_merge_unrolled_0(out_first, out_last);
             break;
         case 1:
-            multi_merge_unrolled<1>(to);
+            multi_merge_unrolled<1>(out_first, out_last);
             break;
         case 2:
-            multi_merge_unrolled<2>(to);
+            multi_merge_unrolled<2>(out_first, out_last);
             break;
         case 3:
-            multi_merge_unrolled<3>(to);
+            multi_merge_unrolled<3>(out_first, out_last);
             break;
         case 4:
-            multi_merge_unrolled<4>(to);
+            multi_merge_unrolled<4>(out_first, out_last);
             break;
         case 5:
-            multi_merge_unrolled<5>(to);
+            multi_merge_unrolled<5>(out_first, out_last);
             break;
         case 6:
-            multi_merge_unrolled<6>(to);
+            multi_merge_unrolled<6>(out_first, out_last);
             break;
         case 7:
-            multi_merge_unrolled<7>(to);
+            multi_merge_unrolled<7>(out_first, out_last);
             break;
         case 8:
-            multi_merge_unrolled<8>(to);
+            multi_merge_unrolled<8>(out_first, out_last);
             break;
         case 9:
-            multi_merge_unrolled<9>(to);
+            multi_merge_unrolled<9>(out_first, out_last);
             break;
         case 10:
-            multi_merge_unrolled<10>(to);
+            multi_merge_unrolled<10>(out_first, out_last);
             break;
         default:
-            multi_merge_k(to);
+            multi_merge_k(out_first, out_last);
             break;
         }
     }
@@ -247,13 +247,13 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <typename run_cursor_type,
-              typename run_cursor_cmp_type,
-              unsigned buffer_size>
-    void swap(stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type, buffer_size> & a,
-              stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type, buffer_size> & b)
+              typename run_cursor_cmp_type>
+    void swap(stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type> & a,
+              stxxl::loser_tree<run_cursor_type, run_cursor_cmp_type> & b)
     {
         a.swap(b);
     }
 }
 
 #endif // !STXXL_LOSERTREE_HEADER
+// vim: et:ts=4:sw=4

@@ -14,7 +14,7 @@
 #define STXXL_FILEPERBLOCK_FILE_HEADER
 
 #include <string>
-#include <stxxl/bits/io/file_request_basic.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -24,8 +24,8 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \brief Implementation of file based on other files, dynamically allocate one file per block.
 //! Allows for dynamic disk space consumption.
-template<class base_file_type>
-class fileperblock_file : public file_request_basic
+template <class base_file_type>
+class fileperblock_file : public disk_queued_file
 {
 private:
     std::string filename_prefix;
@@ -46,11 +46,12 @@ public:
     fileperblock_file(
         const std::string & filename_prefix,
         int mode,
-        int disk = -1);
+        int queue_id = DEFAULT_QUEUE,
+        int allocator_id = NO_ALLOCATOR);
 
     virtual ~fileperblock_file();
 
-    virtual void serve(const request * req) throw(io_error);
+    virtual void serve(const request * req) throw (io_error);
 
     //! \brief Changes the size of the file
     //! \param new_size value of the new file size
@@ -58,13 +59,13 @@ public:
 
     //! \brief Returns size of the file
     //! \return file size in length
-    virtual offset_type size() { return current_size;}
+    virtual offset_type size() { return current_size; }
 
     virtual void lock();
 
     //! \brief Frees the specified region.
     //! Actually deletes the corresponding file if the whole thing is deleted.
-    virtual void delete_region(offset_type offset, unsigned_type length);
+    virtual void discard(offset_type offset, offset_type length);
 
     //! Rename the file corresponding to the offset such that it is out of reach for deleting.
     virtual void export_files(offset_type offset, offset_type length, std::string filename);

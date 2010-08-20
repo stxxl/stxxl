@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+
+rm -f make.settings make.settings.local GNUmakefile
+
+echo "########## make ##########"
+make
+
+echo "########## make config_gnu ##########"
+rm -f make.settings.local
+make config_gnu || true
+test -f make.settings.local
+
+echo "################################################################"
+cat make.settings.local
+echo "################################################################"
+
+rm -f make.settings make.settings.local

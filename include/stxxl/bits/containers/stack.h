@@ -17,8 +17,10 @@
 #include <vector>
 
 #include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/common/simple_vector.h>
 #include <stxxl/bits/common/tmeta.h>
+#include <stxxl/bits/mng/read_write_pool.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
 
@@ -56,7 +58,7 @@ class normal_stack : private noncopyable
 public:
     typedef Config_ cfg;
     typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy;
+    typedef typename cfg::alloc_strategy alloc_strategy_type;
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
@@ -74,7 +76,7 @@ private:
     typename simple_vector<block_type>::iterator front_page;
     typename simple_vector<block_type>::iterator back_page;
     std::vector<bid_type> bids;
-    alloc_strategy alloc_strategy_;
+    alloc_strategy_type alloc_strategy;
 
 public:
     normal_stack() :
@@ -98,7 +100,7 @@ public:
         std::swap(front_page, obj.front_page);
         std::swap(back_page, obj.back_page);
         std::swap(bids, obj.bids);
-        std::swap(alloc_strategy_, obj.alloc_strategy_);
+        std::swap(alloc_strategy, obj.alloc_strategy);
     }
 
     //! \brief Construction from a stack
@@ -164,8 +166,7 @@ public:
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-            block_manager::get_instance()->new_blocks(
-                offset_allocator<alloc_strategy>(cur_bid - bids.begin(), alloc_strategy_), cur_bid, bids.end());
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
 
             simple_vector<request_ptr> requests(blocks_per_page);
 
@@ -258,7 +259,7 @@ class grow_shrink_stack : private noncopyable
 public:
     typedef Config_ cfg;
     typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy;
+    typedef typename cfg::alloc_strategy alloc_strategy_type;
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
@@ -277,7 +278,7 @@ private:
     typename simple_vector<block_type>::iterator overlap_buffers;
     simple_vector<request_ptr> requests;
     std::vector<bid_type> bids;
-    alloc_strategy alloc_strategy_;
+    alloc_strategy_type alloc_strategy;
 
 public:
     grow_shrink_stack() :
@@ -303,7 +304,7 @@ public:
         std::swap(overlap_buffers, obj.overlap_buffers);
         std::swap(requests, obj.requests);
         std::swap(bids, obj.bids);
-        std::swap(alloc_strategy_, obj.alloc_strategy_);
+        std::swap(alloc_strategy, obj.alloc_strategy);
     }
 
     //! \brief Construction from a stack
@@ -377,8 +378,7 @@ public:
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
-            block_manager::get_instance()->new_blocks(
-                offset_allocator<alloc_strategy>(cur_bid - bids.begin(), alloc_strategy_), cur_bid, bids.end());
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
 
             for (int i = 0; i < blocks_per_page; ++i, ++cur_bid)
             {
@@ -447,13 +447,14 @@ public:
 };
 
 //! \brief Efficient implementation that uses prefetching and overlapping using (shared) buffers pools
+//! \warning This is a single buffer stack! Each direction change (push() followed by pop() or vice versa) may cause one I/O.
 template <class Config_>
 class grow_shrink_stack2 : private noncopyable
 {
 public:
     typedef Config_ cfg;
     typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy;
+    typedef typename cfg::alloc_strategy alloc_strategy_type;
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,     // stack of this type has only one page
@@ -464,31 +465,48 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
+    typedef read_write_pool<block_type> pool_type;
+
     size_type size_;
     unsigned_type cache_offset;
     block_type * cache;
-    value_type current;
     std::vector<bid_type> bids;
-    alloc_strategy alloc_strategy_;
+    alloc_strategy_type alloc_strategy;
     unsigned_type pref_aggr;
-    prefetch_pool<block_type> & p_pool;
-    write_pool<block_type> & w_pool;
+    pool_type * owned_pool;
+    pool_type * pool;
 
 public:
     //! \brief Constructs stack
-    //! \param p_pool_ prefetch pool, that will be used for block prefetching
-    //! \param w_pool_ write pool, that will be used for block writing
+    //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     grow_shrink_stack2(
-        prefetch_pool<block_type> & p_pool_,
-        write_pool<block_type> & w_pool_,
+        pool_type & pool_,
         unsigned_type prefetch_aggressiveness = 0) :
         size_(0),
         cache_offset(0),
         cache(new block_type),
         pref_aggr(prefetch_aggressiveness),
-        p_pool(p_pool_),
-        w_pool(w_pool_)
+        owned_pool(NULL),
+        pool(&pool_)
+    {
+        STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
+    }
+
+    //! \brief Constructs stack
+    //! \param p_pool_ prefetch pool, that will be used for block prefetching
+    //! \param w_pool_ write pool, that will be used for block writing
+    //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
+    _STXXL_DEPRECATED(grow_shrink_stack2(
+        prefetch_pool<block_type> & p_pool_,
+        write_pool<block_type> & w_pool_,
+        unsigned_type prefetch_aggressiveness = 0)) :
+        size_(0),
+        cache_offset(0),
+        cache(new block_type),
+        pref_aggr(prefetch_aggressiveness),
+        owned_pool(new pool_type(p_pool_, w_pool_)),
+        pool(owned_pool)
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
@@ -498,12 +516,11 @@ public:
         std::swap(size_, obj.size_);
         std::swap(cache_offset, obj.cache_offset);
         std::swap(cache, obj.cache);
-        std::swap(current, obj.current);
         std::swap(bids, obj.bids);
-        std::swap(alloc_strategy_, obj.alloc_strategy_);
+        std::swap(alloc_strategy, obj.alloc_strategy);
         std::swap(pref_aggr, obj.pref_aggr);
-        //std::swap(p_pool,obj.p_pool);
-        //std::swap(w_pool,obj.w_pool);
+        std::swap(owned_pool, obj.owned_pool);
+        std::swap(pool, obj.pool);
     }
 
     virtual ~grow_shrink_stack2()
@@ -516,18 +533,18 @@ public:
             int_type i;
             for (i = bids_size - 1; i >= last_pref; --i)
             {
-                if (p_pool.in_prefetching(bids[i]))
-                    p_pool.read(cache, bids[i])->wait();
                 // clean the prefetch buffer
+                pool->invalidate(bids[i]);
             }
             typename std::vector<bid_type>::iterator cur = bids.begin();
             typename std::vector<bid_type>::const_iterator end = bids.end();
             for ( ; cur != end; ++cur)
             {
-                block_type * b = w_pool.steal(*cur);
+                // FIXME: read_write_pool needs something like cancel_write(bid)
+                block_type * b = NULL;  // w_pool.steal(*cur);
                 if (b)
                 {
-                    w_pool.add(cache); // return buffer
+                    pool->add(cache);   // return buffer
                     cache = b;
                 }
             }
@@ -536,8 +553,13 @@ public:
         catch (const io_error & ex)
         { }
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
+        delete owned_pool;
     }
-    size_type size() const { return size_; }
+
+    size_type size() const
+    {
+        return size_;
+    }
 
     bool empty() const
     {
@@ -555,21 +577,18 @@ public:
 
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
-            block_manager::get_instance()->new_blocks(
-                offset_allocator<alloc_strategy>(cur_bid - bids.begin(), alloc_strategy_), cur_bid, bids.end());
-            w_pool.write(cache, bids.back());
-            cache = w_pool.steal();
+            block_manager::get_instance()->new_blocks(alloc_strategy, cur_bid, bids.end(), cur_bid - bids.begin());
+            pool->write(cache, bids.back());
+            cache = pool->steal();
             const int_type bids_size = bids.size();
             const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr) - 1, (int_type)0);
             for (int_type i = bids_size - 2; i >= last_pref; --i)
             {
-                if (p_pool.in_prefetching(bids[i]))
-                    p_pool.read(cache, bids[i])->wait();
-                //  clean prefetch buffers
+                // clean prefetch buffers
+                pool->invalidate(bids[i]);
             }
             cache_offset = 0;
         }
-        current = val;
         (*cache)[cache_offset] = val;
         ++size_;
         ++cache_offset;
@@ -577,20 +596,23 @@ public:
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
     }
+
     value_type & top()
     {
         assert(size_ > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
-        return current;
+        return (*cache)[cache_offset - 1];
     }
+
     const value_type & top() const
     {
         assert(size_ > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
-        return current;
+        return (*cache)[cache_offset - 1];
     }
+
     void pop()
     {
         STXXL_VERBOSE3("grow_shrink_stack2::pop()");
@@ -603,35 +625,16 @@ public:
 
             bid_type last_block = bids.back();
             bids.pop_back();
-            /*block_type * b = w_pool.steal(last_block);
-               if(b)
-               {
-               STXXL_VERBOSE2("grow_shrink_stack2::pop() block is still in write buffer");
-               w_pool.add(cache);
-               cache = b;
-               }
-               else*/
-            {
-                //STXXL_VERBOSE2("grow_shrink_stack2::pop() block is no longer in write buffer"
-                //  ", reading from prefetch/read pool");
-                p_pool.read(cache, last_block)->wait();
-            }
+            pool->read(cache, last_block)->wait();
             block_manager::get_instance()->delete_block(last_block);
-            const int_type bids_size = bids.size();
-            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
-            for (int_type i = bids_size - 1; i >= last_pref; --i)
-            {
-                p_pool.hint(bids[i]); // prefetch
-            }
+            rehint();
             cache_offset = block_type::size + 1;
         }
 
         --cache_offset;
-        if (cache_offset > 0)
-            current = (*cache)[cache_offset - 1];
-
         --size_;
     }
+
     //! \brief Sets level of prefetch aggressiveness (number
     //! of blocks from the prefetch pool used for prefetching)
     //! \param new_p new value for the prefetch aggressiveness
@@ -643,26 +646,30 @@ public:
             const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
             for (int_type i = bids_size - new_p - 1; i >= last_pref; --i)
             {
-                if (p_pool.in_prefetching(bids[i]))
-                    p_pool.read(cache, bids[i])->wait();
-                //  clean prefetch buffers
-            }
-        }
-        else if (pref_aggr < new_p)
-        {
-            const int_type bids_size = bids.size();
-            const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(new_p), (int_type)0);
-            for (int_type i = bids_size - 1; i >= last_pref; --i)
-            {
-                p_pool.hint(bids[i]); // prefetch
+                // clean prefetch buffers
+                pool->invalidate(bids[i]);
             }
         }
         pref_aggr = new_p;
+        rehint();
     }
+
     //! \brief Returns number of blocks used for prefetching
     unsigned_type get_prefetch_aggr() const
     {
         return pref_aggr;
+    }
+
+private:
+    //! \brief hint the last pref_aggr external blocks
+    void rehint()
+    {
+        const int_type bids_size = bids.size();
+        const int_type last_pref = STXXL_MAX(int_type(bids_size) - int_type(pref_aggr), (int_type)0);
+        for (int_type i = bids_size - 1; i >= last_pref; --i)
+        {
+            pool->hint(bids[i]);  // prefetch
+        }
     }
 };
 
@@ -676,7 +683,6 @@ class migrating_stack : private noncopyable
 public:
     typedef typename ExternalStack::cfg cfg;
     typedef typename cfg::value_type value_type;
-    typedef typename cfg::alloc_strategy alloc_strategy;
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
@@ -722,42 +728,22 @@ public:
     bool empty() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            return int_impl->empty();
-
-
-        return ext_impl->empty();
+        return (int_impl) ? int_impl->empty() : ext_impl->empty();
     }
     size_type size() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            return int_impl->size();
-
-
-        return ext_impl->size();
+        return (int_impl) ? int_impl->size() : ext_impl->size();
     }
     value_type & top()
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            return int_impl->top();
-
-
-        return ext_impl->top();
+        return (int_impl) ? int_impl->top() : ext_impl->top();
     }
     const value_type & top() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            return int_impl->top();
-
-
-        return ext_impl->top();
+        return (int_impl) ? int_impl->top() : ext_impl->top();
     }
     void push(const value_type & val)
     {
@@ -783,19 +769,13 @@ public:
 
         if (int_impl)
             int_impl->pop();
-
         else
             ext_impl->pop();
     }
     virtual ~migrating_stack()
     {
-        assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-
-        if (int_impl)
-            delete int_impl;
-
-        else
-            delete ext_impl;
+        delete int_impl;
+        delete ext_impl;
     }
 };
 
@@ -811,7 +791,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //! \brief Stack type generator
 
 //! Template parameters:
-//!  - \c ValTp type of contained objects
+//!  - \c ValTp type of contained objects (POD with no references to internal memory)
 //!  - \c Externality one of
 //!    - \c external , \b external container, implementation is chosen according
 //!      to \c Behaviour parameter, is default
@@ -825,7 +805,7 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!  - \c BlocksPerPage defines how many blocks has one page of internal cache of an
 //!       \b external implementation, default is four. All \b external implementations have
 //!       \b two pages.
-//!  - \c BlkSz external block size in bytes, default is 2 MBytes
+//!  - \c BlkSz external block size in bytes, default is 2 MiB
 //!  - \c IntStackTp type of internal stack used for some implementations
 //!  - \c MigrCritSize threshold value for number of elements when
 //!    \c stxxl::migrating_stack migrates to the external memory
@@ -842,8 +822,8 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 //!    - \c STACK_GENERATOR<double,migrating,grow_shrink>::result migrating
 //!      grow-shrink stack of \c double's, internal implementation is \c std::stack<double> ,
 //!    - \c STACK_GENERATOR<double,migrating,grow_shrink,1,512*1024>::result migrating
-//!      grow-shrink stack of \c double's with 1 block per page and block size 512 KB
-//!      (total memory occupied = 1 MB).
+//!      grow-shrink stack of \c double's with 1 block per page and block size 512 KiB
+//!      (total memory occupied = 1 MiB).
 //! For configured stack method semantics see documentation of the STL \c std::stack.
 template <
     class ValTp,
@@ -910,3 +890,4 @@ namespace std
 }
 
 #endif // !STXXL_STACK_HEADER
+// vim: et:ts=4:sw=4

@@ -233,7 +233,7 @@ struct TwoToOneDimArrayAdaptorBase
 //////////////////////////////
 
 #define BLOCK_ADAPTOR_OPERATORS(two_to_one_dim_array_adaptor_base) \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & operator ++ ( \
         two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a) \
@@ -241,7 +241,7 @@ struct TwoToOneDimArrayAdaptorBase
         a.pos++; \
         return a; \
     } \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator ++ ( \
         two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a, int) \
@@ -250,7 +250,7 @@ struct TwoToOneDimArrayAdaptorBase
         a.pos++; \
         return tmp; \
     } \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & operator -- ( \
         two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a) \
@@ -258,7 +258,7 @@ struct TwoToOneDimArrayAdaptorBase
         a.pos--; \
         return a; \
     } \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator -- ( \
         two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a, int) \
@@ -267,7 +267,7 @@ struct TwoToOneDimArrayAdaptorBase
         a.pos--; \
         return tmp; \
     } \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & operator -= ( \
         two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a, \
@@ -276,7 +276,7 @@ struct TwoToOneDimArrayAdaptorBase
         a.pos -= off; \
         return a; \
     } \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & operator += ( \
         two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a, \
@@ -285,7 +285,7 @@ struct TwoToOneDimArrayAdaptorBase
         a.pos += off; \
         return a; \
     } \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator + ( \
         const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a, \
@@ -293,7 +293,7 @@ struct TwoToOneDimArrayAdaptorBase
     { \
         return two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>(a.array, a.pos + off); \
     } \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator + ( \
         typename two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>::_pos_type off, \
@@ -301,7 +301,7 @@ struct TwoToOneDimArrayAdaptorBase
     { \
         return two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type>(a.array, a.pos + off); \
     } \
-\
+ \
     template <unsigned _blk_sz, typename _run_type, class __pos_type> \
     inline two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> operator - ( \
         const two_to_one_dim_array_adaptor_base<_blk_sz, _run_type, __pos_type> & a, \
@@ -315,8 +315,8 @@ struct TwoToOneDimArrayAdaptorBase
 //////////////////////////
 template <class one_dim_array_type, class data_type,
           unsigned dim_size, class pos_type = blocked_index<dim_size> >
-struct TwoToOneDimArrayRowAdaptor : public
-                                    TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>
+struct TwoToOneDimArrayRowAdaptor :
+    public TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>
 {
     typedef TwoToOneDimArrayRowAdaptor<one_dim_array_type,
                                        data_type, dim_size, pos_type> _Self;
@@ -578,9 +578,63 @@ public:
     }
 };
 
+namespace helper
+{
+    template <typename BlockType, bool can_use_trivial_pointer>
+    class element_iterator_generator
+    { };
+
+    // default case for blocks with fillers or other data: use ArrayOfSequenceIterator
+    template <typename BlockType>
+    class element_iterator_generator<BlockType, false>
+    {
+        typedef BlockType block_type;
+        typedef typename block_type::value_type value_type;
+
+    public:
+        typedef ArrayOfSequencesIterator<block_type, value_type, block_type::size> iterator;
+
+        iterator operator () (block_type * blocks, unsigned_type offset) const
+        {
+            return iterator(blocks, offset);
+        }
+    };
+
+    // special case for completely filled blocks: use trivial pointers
+    template <typename BlockType>
+    class element_iterator_generator<BlockType, true>
+    {
+        typedef BlockType block_type;
+        typedef typename block_type::value_type value_type;
+
+    public:
+        typedef value_type * iterator;
+
+        iterator operator () (block_type * blocks, unsigned_type offset) const
+        {
+            return blocks[0].elem + offset;
+        }
+    };
+}
+
+template <typename BlockType>
+struct element_iterator_traits
+{
+    typedef typename helper::element_iterator_generator<BlockType, BlockType::has_only_data>::iterator element_iterator;
+};
+
+template <typename BlockType>
+inline
+typename element_iterator_traits<BlockType>::element_iterator
+make_element_iterator(BlockType * blocks, unsigned_type offset)
+{
+    helper::element_iterator_generator<BlockType, BlockType::has_only_data> iter_gen;
+    return iter_gen(blocks, offset);
+}
 
 //! \}
 
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_MNG_ADAPTOR_HEADER
+// vim: et:ts=4:sw=4

@@ -16,7 +16,6 @@
 #include <vector>
 #include <queue>
 
-#include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/io/disk_queues.h>
 
 

@@ -13,6 +13,7 @@
 #ifndef STXXL_CONTAINERS_BTREE__BTREE_H
 #define STXXL_CONTAINERS_BTREE__BTREE_H
 
+#include <limits>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/iterator_map.h>
@@ -331,7 +332,7 @@ namespace btree
             {
                 key_bid_vector_type ParentBids;
 
-                stxxl::uint64 nparents = STXXL_DIVRU(Bids.size(), stxxl::uint64(max_node_elements));
+                stxxl::uint64 nparents = div_ceil(Bids.size(), max_node_elements);
                 assert(nparents >= 2);
                 STXXL_VERBOSE1("btree bulk constructBids.size() " << Bids.size() << " nparents: " << nparents << " max_ns: "
                                                                   << max_node_elements);
