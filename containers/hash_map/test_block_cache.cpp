@@ -31,7 +31,7 @@ bool test_block_cache()
         const unsigned cache_size = 8;                                       // size of cache in blocks
 
 
-        typedef stxxl::typed_block<subblock_raw_size, value_type> subblock_type;
+        typedef stxxl::typed_block<subblock_raw_size, value_type, 0, int> subblock_type;
         typedef stxxl::typed_block<block_size * sizeof(subblock_type), subblock_type> block_type;
 
         const unsigned subblock_size = subblock_type::size;          // size in values

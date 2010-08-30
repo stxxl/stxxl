@@ -65,7 +65,8 @@ namespace hash_map
         enum { block_raw_size = BlkSize_ * SubBlkSize_, subblock_raw_size = SubBlkSize_ };        /* subblock- and block-size in bytes */
         enum { block_size = BlkSize_, subblock_size = SubBlkSize_ / sizeof(value_type) };         /* Subblock-size as number of elements, block-size as number of subblocks */
 
-        typedef typed_block<subblock_raw_size, value_type> subblock_type;                         /* a subblock consists of subblock_size values */
+        //TODO: typed_block<subblock_raw_size, value_type, 0, void> (the default) would be better, but fails due to wrong structure sizing
+        typedef typed_block<subblock_raw_size, value_type, 0, int> subblock_type;                         /* a subblock consists of subblock_size values */
         typedef typed_block<block_raw_size, subblock_type> block_type;                            /* a block consists of block_size subblocks    */
 
         typedef typename subblock_type::bid_type subblock_bid_type;                               /* block-identifier for subblocks */
