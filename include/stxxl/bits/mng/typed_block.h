@@ -193,11 +193,10 @@ public:
 
 //! \brief Block containing elements of fixed length
 
-//! Template parameters:
-//! - \c RawSize_ size of block in bytes
-//! - \c T_ type of block's records
-//! - \c NRef_ number of block references (BIDs) that can be stored in the block (default is 0)
-//! - \c InfoType_ type of per block information (default is no information - void)
+//! \tparam RawSize_ size of block in bytes
+//! \tparam T_ type of block's records
+//! \tparam NRef_ number of block references (BIDs) that can be stored in the block (default is 0)
+//! \tparam InfoType_ type of per block information (default is no information - void)
 //!
 //! The data array of type T_ is contained in the parent class \c stxxl::element_block, see related information there.
 //! The BID array of references is contained in the parent class \c stxxl::block_w_bids, see related information there.

@@ -38,11 +38,10 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \brief External FIFO queue container
 
-//! Template parameters:
-//! - ValTp type of the contained objects (POD with no references to internal memory)
-//! - BlkSz size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)
-//! - AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
-//! - SzTp size data type, default is \c stxxl::uint64
+//! \tparam ValTp type of the contained objects (POD with no references to internal memory)
+//! \tparam BlkSz size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)
+//! \tparam AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
+//! \tparam SzTp size data type, default is \c stxxl::uint64
 template <class ValTp,
           unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
