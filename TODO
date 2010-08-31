@@ -10,8 +10,6 @@
 
 * integrate unordered_map branch
 
-* doxygen: do not link every occurrence of 'file' to stxxl::file
-
 * allocation strategies: provide a method get_num_disks()
   and don't use stxxl::config::get_instance()->disks_number() inappropriately
 

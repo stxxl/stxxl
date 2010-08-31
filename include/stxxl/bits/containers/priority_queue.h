@@ -886,9 +886,8 @@ namespace priority_queue_local
 //! Implements a data structure from "Peter Sanders. Fast Priority Queues
 //! for Cached Memory. ALENEX'99" for external memory.
 //! <BR>
-//! Template parameters:
-//! - Tp_ type of the contained objects (POD with no references to internal memory)
-//! - Cmp_ the comparison type used to determine
+//! \tparam type of the contained objects (POD with no references to internal memory)
+//! \tparam the comparison type used to determine
 //! whether one element is smaller than another element.
 //! If Cmp_(x,y) is true, then x is smaller than y. The element
 //! returned by Q.top() is the largest element in the priority

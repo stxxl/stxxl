@@ -658,15 +658,14 @@ namespace stream
 
     //! \brief Processes (up to) 6 input streams using given operation functor
     //!
-    //! Template parameters:
-    //! - \c Operation_ type of the operation (type of an
+    //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 6 parameters)
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
-    //! - \c Input3_ type of the 3rd input
-    //! - \c Input4_ type of the 4th input
-    //! - \c Input5_ type of the 5th input
-    //! - \c Input6_ type of the 6th input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
+    //! \tparam Input3_ type of the 3rd input
+    //! \tparam Input4_ type of the 4th input
+    //! \tparam Input5_ type of the 5th input
+    //! \tparam Input6_ type of the 6th input
     template <class Operation_,
               class Input1_,
               class Input2_ = Stopper,
@@ -744,10 +743,9 @@ namespace stream
 
     //! \brief Processes an input stream using given operation functor
     //!
-    //! Template parameters:
-    //! - \c Operation_ type of the operation (type of an
+    //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 1 parameter)
-    //! - \c Input1_ type of the input
+    //! \tparam Input1_ type of the input
     //! \remark This is a specialization of \c transform .
     template <class Operation_,
               class Input1_
@@ -807,11 +805,10 @@ namespace stream
 
     //! \brief Processes 2 input streams using given operation functor
     //!
-    //! Template parameters:
-    //! - \c Operation_ type of the operation (type of an
+    //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 2 parameters)
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
     //! \remark This is a specialization of \c transform .
     template <class Operation_,
               class Input1_,
@@ -874,12 +871,11 @@ namespace stream
 
     //! \brief Processes 3 input streams using given operation functor
     //!
-    //! Template parameters:
-    //! - \c Operation_ type of the operation (type of an
+    //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 3 parameters)
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
-    //! - \c Input3_ type of the 3rd input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
+    //! \tparam Input3_ type of the 3rd input
     //! \remark This is a specialization of \c transform .
     template <class Operation_,
               class Input1_,
@@ -946,13 +942,12 @@ namespace stream
 
     //! \brief Processes 4 input streams using given operation functor
     //!
-    //! Template parameters:
-    //! - \c Operation_ type of the operation (type of an
+    //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 4 parameters)
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
-    //! - \c Input3_ type of the 3rd input
-    //! - \c Input4_ type of the 4th input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
+    //! \tparam Input3_ type of the 3rd input
+    //! \tparam Input4_ type of the 4th input
     //! \remark This is a specialization of \c transform .
     template <class Operation_,
               class Input1_,
@@ -1022,14 +1017,13 @@ namespace stream
 
     //! \brief Processes 5 input streams using given operation functor
     //!
-    //! Template parameters:
-    //! - \c Operation_ type of the operation (type of an
+    //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 5 parameters)
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
-    //! - \c Input3_ type of the 3rd input
-    //! - \c Input4_ type of the 4th input
-    //! - \c Input5_ type of the 5th input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
+    //! \tparam Input3_ type of the 3rd input
+    //! \tparam Input4_ type of the 4th input
+    //! \tparam Input5_ type of the 5th input
     //! \remark This is a specialization of \c transform .
     template <class Operation_,
               class Input1_,
@@ -1103,13 +1097,12 @@ namespace stream
 
     //! \brief Creates stream of 6-tuples from 6 input streams
     //!
-    //! Template parameters:
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
-    //! - \c Input3_ type of the 3rd input
-    //! - \c Input4_ type of the 4th input
-    //! - \c Input5_ type of the 5th input
-    //! - \c Input6_ type of the 6th input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
+    //! \tparam Input3_ type of the 3rd input
+    //! \tparam Input4_ type of the 4th input
+    //! \tparam Input5_ type of the 5th input
+    //! \tparam Input6_ type of the 6th input
     template <class Input1_,
               class Input2_,
               class Input3_ = Stopper,
@@ -1191,9 +1184,8 @@ namespace stream
 
     //! \brief Creates stream of 2-tuples (pairs) from 2 input streams
     //!
-    //! Template parameters:
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
     //! \remark A specialization of \c make_tuple .
     template <class Input1_,
               class Input2_
@@ -1259,10 +1251,9 @@ namespace stream
 
     //! \brief Creates stream of 3-tuples from 3 input streams
     //!
-    //! Template parameters:
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
-    //! - \c Input3_ type of the 3rd input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
+    //! \tparam Input3_ type of the 3rd input
     //! \remark A specialization of \c make_tuple .
     template <class Input1_,
               class Input2_,
@@ -1328,11 +1319,10 @@ namespace stream
 
     //! \brief Creates stream of 4-tuples from 4 input streams
     //!
-    //! Template parameters:
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
-    //! - \c Input3_ type of the 3rd input
-    //! - \c Input4_ type of the 4th input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
+    //! \tparam Input3_ type of the 3rd input
+    //! \tparam Input4_ type of the 4th input
     //! \remark A specialization of \c make_tuple .
     template <class Input1_,
               class Input2_,
@@ -1404,12 +1394,11 @@ namespace stream
 
     //! \brief Creates stream of 5-tuples from 5 input streams
     //!
-    //! Template parameters:
-    //! - \c Input1_ type of the 1st input
-    //! - \c Input2_ type of the 2nd input
-    //! - \c Input3_ type of the 3rd input
-    //! - \c Input4_ type of the 4th input
-    //! - \c Input5_ type of the 5th input
+    //! \tparam Input1_ type of the 1st input
+    //! \tparam Input2_ type of the 2nd input
+    //! \tparam Input3_ type of the 3rd input
+    //! \tparam Input4_ type of the 4th input
+    //! \tparam Input5_ type of the 5th input
     //! \remark A specialization of \c make_tuple .
     template <
         class Input1_,

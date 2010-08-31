@@ -167,12 +167,6 @@ public:
     //! \brief Per block information element
     info_type info;
 
-    enum
-    {
-        size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_))
-    };
-
-public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info is constructed"); }
 };
 
@@ -182,22 +176,43 @@ class block_w_info<T_, RawSize_, NBids_, void>:
 {
 public:
     typedef void info_type;
-    enum
-    {
-        size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_) / sizeof(T_))
-    };
 
-public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info<> is constructed"); }
 };
 
+//! \brief Contains per block filler for \c stxxl::typed_block , not intended for direct use
+template <typename BaseType_, unsigned FillSize_ = 0>
+class add_filler :
+    public BaseType_
+{
+private:
+    //! \brief Per block filler element
+    filler_struct__<FillSize_> filler;
+
+public:
+    add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] add_filler is constructed"); }
+};
+
+template <typename BaseType_>
+class add_filler<BaseType_, 0>:
+    public BaseType_
+{
+public:
+    add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] add_filler<> is constructed"); }
+};
+
+//! \brief Helper to compute the size of the filler , not intended for direct use
+template <typename Tp_, unsigned RawSize_>
+class expand_struct :
+    public add_filler<Tp_, RawSize_ - sizeof(Tp_)>
+{ };
+
 //! \brief Block containing elements of fixed length
 
-//! Template parameters:
-//! - \c RawSize_ size of block in bytes
-//! - \c T_ type of block's records
-//! - \c NRef_ number of block references (BIDs) that can be stored in the block (default is 0)
-//! - \c InfoType_ type of per block information (default is no information - void)
+//! \tparam RawSize_ size of block in bytes
+//! \tparam T_ type of block's records
+//! \tparam NRef_ number of block references (BIDs) that can be stored in the block (default is 0)
+//! \tparam InfoType_ type of per block information (default is no information - void)
 //!
 //! The data array of type T_ is contained in the parent class \c stxxl::element_block, see related information there.
 //! The BID array of references is contained in the parent class \c stxxl::block_w_bids, see related information there.
@@ -207,22 +222,23 @@ public:
 //! main thread to (2MB - system page size)
 template <unsigned RawSize_, class T_, unsigned NRef_ = 0, class InfoType_ = void>
 class typed_block :
-    public block_w_info<T_, RawSize_, NRef_, InfoType_>,
-    public filler_struct__<(RawSize_ - sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>))>
+    public expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_>
 {
+    typedef expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_> Base;
+
 public:
-    typedef T_ type;
     typedef T_ value_type;
-    typedef T_ & reference;
-    typedef const T_ & const_reference;
-    typedef type * pointer;
+    typedef value_type & reference;
+    typedef const value_type & const_reference;
+    typedef value_type * pointer;
     typedef pointer iterator;
-    typedef type const * const_iterator;
+    typedef const value_type * const_pointer;
+    typedef const_pointer const_iterator;
 
     enum constants
     {
         raw_size = RawSize_,                                        //!< size of block in bytes
-        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size,  //!< number of elements in block
+        size = Base::size,                                          //!< number of elements in block
         has_only_data = (raw_size == (size * sizeof(value_type)))   //!< no meta info, bids or (non-empty) fillers included in the block, allows value_type array addressing across block boundaries
     };
 

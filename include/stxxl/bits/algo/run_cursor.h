@@ -27,7 +27,7 @@ struct run_cursor
 
     run_cursor() : pos(0), buffer(NULL) { }
 
-    inline const typename block_type::type & current() const
+    inline typename block_type::const_reference current() const
     {
         return (*buffer)[pos];
     }
@@ -57,7 +57,6 @@ struct run_cursor2 : public run_cursor<block_type>
     typedef prefetcher_type_ prefetcher_type;
     typedef run_cursor2<block_type, prefetcher_type> _Self;
     typedef typename block_type::value_type value_type;
-
 
     using run_cursor<block_type>::pos;
     using run_cursor<block_type>::buffer;

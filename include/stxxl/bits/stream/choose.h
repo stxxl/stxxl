@@ -31,8 +31,7 @@ namespace stream
 
     //! \brief Creates stream from a tuple stream taking the first component of each tuple
     //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
+    //! \tparam Input_ type of the input tuple stream
     //!
     //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
     template <class Input_>
@@ -77,8 +76,7 @@ namespace stream
 
     //! \brief Creates stream from a tuple stream taking the second component of each tuple
     //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
+    //! \tparam Input_ type of the input tuple stream
     //!
     //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
     template <class Input_>
@@ -123,8 +121,7 @@ namespace stream
 
     //! \brief Creates stream from a tuple stream taking the third component of each tuple
     //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
+    //! \tparam Input_ type of the input tuple stream
     //!
     //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
     template <class Input_>
@@ -169,8 +166,7 @@ namespace stream
 
     //! \brief Creates stream from a tuple stream taking the fourth component of each tuple
     //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
+    //! \tparam Input_ type of the input tuple stream
     //!
     //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
     template <class Input_>
@@ -215,8 +211,7 @@ namespace stream
 
     //! \brief Creates stream from a tuple stream taking the fifth component of each tuple
     //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
+    //! \tparam Input_ type of the input tuple stream
     //!
     //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
     template <class Input_>
@@ -261,8 +256,7 @@ namespace stream
 
     //! \brief Creates stream from a tuple stream taking the sixth component of each tuple
     //!
-    //! Template parameters:
-    //! - \c Input_ type of the input tuple stream
+    //! \tparam Input_ type of the input tuple stream
     //!
     //! \remark Tuple stream is a stream which \c value_type is \c stxxl::tuple .
     template <class Input_>

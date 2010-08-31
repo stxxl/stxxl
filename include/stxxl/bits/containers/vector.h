@@ -713,14 +713,14 @@ public:
 //! \brief External vector container
 
 //! For semantics of the methods see documentation of the STL std::vector
-//! Template parameters:
-//!  - \c Tp_ type of contained objects (POD with no references to internal memory)
-//!  - \c PgSz_ number of blocks in a page
-//!  - \c PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages,
+//! \tparam Tp_ type of contained objects (POD with no references to internal memory)
+//! \tparam PgSz_ number of blocks in a page
+//! \tparam PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages,
 //!  default is \c lru_pager<8>
-//!  - \c BlkSize_ external block size in bytes, default is 2 MiB
-//!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
-//!  default is RC <BR>
+//! \tparam BlkSize_ external block size in bytes, default is 2 MiB
+//! \tparam AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+//!  default is RC
+//!
 //! Memory consumption: BlkSize_*x*PgSz_ bytes
 //! \warning Do not store references to the elements of an external vector. Such references
 //! might be invalidated during any following access to elements of the vector
@@ -1588,14 +1588,13 @@ bool is_sorted(
 
 //! \brief External vector type generator
 
-//! Parameters:
-//!  - \c Tp_ type of contained objects (POD with no references to internal memory)
-//!  - \c PgSz_ number of blocks in a page
-//!  - \c Pages_ number of pages
-//!  - \c BlkSize_ external block size in bytes, default is 2 MiB
-//!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+//!  \tparam Tp_ type of contained objects (POD with no references to internal memory)
+//!  \tparam PgSz_ number of blocks in a page
+//!  \tparam Pages_ number of pages
+//!  \tparam BlkSize_ external block size in bytes, default is 2 MiB
+//!  \tparam AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
 //!  default is RC
-//!  - \c Pager_ pager type:
+//!  \tparam Pager_ pager type:
 //!    - \c random ,
 //!    - \c lru , is default
 //!

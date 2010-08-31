@@ -1,6 +1,6 @@
 /*! \mainpage Documentation for STXXL library
  *
- *  \image html logo1.png
+ *  \image html layer_diagram.png
  *
  * <br><br>
  * The core of \c S<small>TXXL</small> is an implementation of the C++
