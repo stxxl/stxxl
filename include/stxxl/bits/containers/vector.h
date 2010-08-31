@@ -787,7 +787,7 @@ private:
     config * cfg;
     bool exported;
 
-    size_type size_from_file_length(stxxl::uint64 file_length)
+    size_type size_from_file_length(stxxl::uint64 file_length) const
     {
         stxxl::uint64 blocks_fit = file_length / stxxl::uint64(block_type::raw_size);
         size_type cur_size = blocks_fit * stxxl::uint64(block_type::size);
@@ -795,7 +795,7 @@ private:
         return (cur_size + rest / stxxl::uint64(sizeof(value_type)));
     }
 
-    stxxl::uint64 file_length()
+    stxxl::uint64 file_length() const
     {
         typedef stxxl::uint64 file_size_type;
         size_type cur_size = size();
@@ -1029,7 +1029,7 @@ public:
         if (!block_type::has_only_data)
         {
             std::ostringstream str_;
-            str_ << "The block size for a vector that is mapped to a file must me a multiple of the element size (" <<
+            str_ << "The block size for a vector that is mapped to a file must be a multiple of the element size (" <<
             sizeof(value_type) << ") and the page size (4096).";
             throw std::runtime_error(str_.str());
         }
