@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Creator: fig2dev Version 3.2 Patchlevel 5 -->
 
-<!-- CreationDate: Tue Aug 31 10:40:01 2010 -->
+<!-- CreationDate: Mon Aug 30 17:25:01 2010 -->
 
 <!-- Magnification: 1.050 -->
 
@@ -13,27 +13,245 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="7.2in"
-   height="5.6in"
-   viewBox="1441 1382 8597 6671"
-   id="svg3232"
+   width="649.07581"
+   height="485.04303"
+   viewBox="1441 1382 8611.2727 6420.0835"
+   id="svg2837"
    version="1.1"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="logo1.fig">
+   sodipodi:docname="logo1.svg.2010_08_31_10_33_54.0.svg">
   <metadata
-     id="metadata3454">
+     id="metadata3059">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
   <defs
-     id="defs3452" />
+     id="defs3057">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 252 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="648 : 252 : 1"
+       inkscape:persp3d-origin="324 : 168 : 1"
+       id="perspective3061" />
+    <defs
+       id="defs2845">
+      <pattern
+         id="tile1"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2848" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2850" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2852" />
+        <path
+           d="M 0   20 200 140"
+           id="path2854" />
+        <path
+           d="M 0   60 200 180"
+           id="path2856" />
+        <path
+           d="M 0  100 200 220"
+           id="path2858" />
+        <path
+           d="M 0  140 200 260"
+           id="path2860" />
+        <path
+           d="M 0  180 200 300"
+           id="path2862" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2870">
+      <pattern
+         id="tile2"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2873" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2875" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2877" />
+        <path
+           d="M 0   20 200 140"
+           id="path2879" />
+        <path
+           d="M 0   60 200 180"
+           id="path2881" />
+        <path
+           d="M 0  100 200 220"
+           id="path2883" />
+        <path
+           d="M 0  140 200 260"
+           id="path2885" />
+        <path
+           d="M 0  180 200 300"
+           id="path2887" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2895">
+      <pattern
+         id="tile3"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2898" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2900" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2902" />
+        <path
+           d="M 0   20 200 140"
+           id="path2904" />
+        <path
+           d="M 0   60 200 180"
+           id="path2906" />
+        <path
+           d="M 0  100 200 220"
+           id="path2908" />
+        <path
+           d="M 0  140 200 260"
+           id="path2910" />
+        <path
+           d="M 0  180 200 300"
+           id="path2912" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2920">
+      <pattern
+         id="tile4"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2923" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2925" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2927" />
+        <path
+           d="M 0   20 200 140"
+           id="path2929" />
+        <path
+           d="M 0   60 200 180"
+           id="path2931" />
+        <path
+           d="M 0  100 200 220"
+           id="path2933" />
+        <path
+           d="M 0  140 200 260"
+           id="path2935" />
+        <path
+           d="M 0  180 200 300"
+           id="path2937" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2945">
+      <pattern
+         id="tile5"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2948" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2950" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2952" />
+        <path
+           d="M 0   20 200 140"
+           id="path2954" />
+        <path
+           d="M 0   60 200 180"
+           id="path2956" />
+        <path
+           d="M 0  100 200 220"
+           id="path2958" />
+        <path
+           d="M 0  140 200 260"
+           id="path2960" />
+        <path
+           d="M 0  180 200 300"
+           id="path2962" />
+      </pattern>
+    </defs>
+    <defs
+       id="defs2970">
+      <pattern
+         id="tile6"
+         x="0"
+         y="0"
+         width="200"
+         height="200"
+         patternUnits="userSpaceOnUse">
+        <path
+           d="M 0 -100 200 20"
+           id="path2973" />
+        <path
+           d="M 0  -60 200 60"
+           id="path2975" />
+        <path
+           d="M 0  -20 200 100"
+           id="path2977" />
+        <path
+           d="M 0   20 200 140"
+           id="path2979" />
+        <path
+           d="M 0   60 200 180"
+           id="path2981" />
+        <path
+           d="M 0  100 200 220"
+           id="path2983" />
+        <path
+           d="M 0  140 200 260"
+           id="path2985" />
+        <path
+           d="M 0  180 200 300"
+           id="path2987" />
+      </pattern>
+    </defs>
+  </defs>
   <sodipodi:namedview
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -43,695 +261,275 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="640"
-     inkscape:window-height="480"
-     id="namedview3450"
+     inkscape:window-width="1272"
+     inkscape:window-height="994"
+     id="namedview3055"
      showgrid="false"
-     inkscape:zoom="0.625"
-     inkscape:cx="324"
-     inkscape:cy="252"
-     inkscape:window-x="0"
+     inkscape:zoom="1.1716723"
+     inkscape:cx="316.24323"
+     inkscape:cy="224.43148"
+     inkscape:window-x="1280"
      inkscape:window-y="0"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg3232" />
-  <g
-     style="stroke-width:.025in; stroke:black; fill:none"
-     id="g3234">
-    <!-- Line: box -->
-    <rect
-       x="2598"
-       y="7511"
-       width="7228"
-       height="519"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3236" />
-    <g
-       style="stroke:#000000; stroke-width:16"
-       id="g3238">
-      <defs
-         id="defs3240">
-        <pattern
-           id="tile1"
-           x="0"
-           y="0"
-           width="200"
-           height="200"
-           patternUnits="userSpaceOnUse">
-          <path
-             d="M 0 -100 200 20"
-             id="path3243" />
-          <path
-             d="M 0  -60 200 60"
-             id="path3245" />
-          <path
-             d="M 0  -20 200 100"
-             id="path3247" />
-          <path
-             d="M 0   20 200 140"
-             id="path3249" />
-          <path
-             d="M 0   60 200 180"
-             id="path3251" />
-          <path
-             d="M 0  100 200 220"
-             id="path3253" />
-          <path
-             d="M 0  140 200 260"
-             id="path3255" />
-          <path
-             d="M 0  180 200 300"
-             id="path3257" />
-        </pattern>
-      </defs>
-    </g>
-    <rect
-       x="2598"
-       y="7511"
-       width="7228"
-       height="519"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:url(#tile1); "
-       id="rect3259" />
-    <!-- Line: box -->
-    <rect
-       x="2503"
-       y="4015"
-       width="7417"
-       height="1511"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3261" />
-    <g
-       style="stroke:#000000; stroke-width:16"
-       id="g3263">
-      <defs
-         id="defs3265">
-        <pattern
-           id="tile2"
-           x="0"
-           y="0"
-           width="200"
-           height="200"
-           patternUnits="userSpaceOnUse">
-          <path
-             d="M 0 -100 200 20"
-             id="path3268" />
-          <path
-             d="M 0  -60 200 60"
-             id="path3270" />
-          <path
-             d="M 0  -20 200 100"
-             id="path3272" />
-          <path
-             d="M 0   20 200 140"
-             id="path3274" />
-          <path
-             d="M 0   60 200 180"
-             id="path3276" />
-          <path
-             d="M 0  100 200 220"
-             id="path3278" />
-          <path
-             d="M 0  140 200 260"
-             id="path3280" />
-          <path
-             d="M 0  180 200 300"
-             id="path3282" />
-        </pattern>
-      </defs>
-    </g>
-    <rect
-       x="2503"
-       y="4015"
-       width="7417"
-       height="1511"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:url(#tile2); "
-       id="rect3284" />
-    <!-- Line: box -->
-    <rect
-       x="2503"
-       y="5716"
-       width="7370"
-       height="1511"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3286" />
-    <g
-       style="stroke:#000000; stroke-width:16"
-       id="g3288">
-      <defs
-         id="defs3290">
-        <pattern
-           id="tile3"
-           x="0"
-           y="0"
-           width="200"
-           height="200"
-           patternUnits="userSpaceOnUse">
-          <path
-             d="M 0 -100 200 20"
-             id="path3293" />
-          <path
-             d="M 0  -60 200 60"
-             id="path3295" />
-          <path
-             d="M 0  -20 200 100"
-             id="path3297" />
-          <path
-             d="M 0   20 200 140"
-             id="path3299" />
-          <path
-             d="M 0   60 200 180"
-             id="path3301" />
-          <path
-             d="M 0  100 200 220"
-             id="path3303" />
-          <path
-             d="M 0  140 200 260"
-             id="path3305" />
-          <path
-             d="M 0  180 200 300"
-             id="path3307" />
-        </pattern>
-      </defs>
-    </g>
-    <rect
-       x="2503"
-       y="5716"
-       width="7370"
-       height="1511"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:url(#tile3); "
-       id="rect3309" />
-    <!-- Line: box -->
-    <rect
-       x="2456"
-       y="2314"
-       width="4251"
-       height="1511"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3311" />
-    <g
-       style="stroke:#000000; stroke-width:16"
-       id="g3313">
-      <defs
-         id="defs3315">
-        <pattern
-           id="tile4"
-           x="0"
-           y="0"
-           width="200"
-           height="200"
-           patternUnits="userSpaceOnUse">
-          <path
-             d="M 0 -100 200 20"
-             id="path3318" />
-          <path
-             d="M 0  -60 200 60"
-             id="path3320" />
-          <path
-             d="M 0  -20 200 100"
-             id="path3322" />
-          <path
-             d="M 0   20 200 140"
-             id="path3324" />
-          <path
-             d="M 0   60 200 180"
-             id="path3326" />
-          <path
-             d="M 0  100 200 220"
-             id="path3328" />
-          <path
-             d="M 0  140 200 260"
-             id="path3330" />
-          <path
-             d="M 0  180 200 300"
-             id="path3332" />
-        </pattern>
-      </defs>
-    </g>
-    <rect
-       x="2456"
-       y="2314"
-       width="4251"
-       height="1511"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:url(#tile4); "
-       id="rect3334" />
-    <!-- Line: box -->
-    <rect
-       x="6803"
-       y="2314"
-       width="3118"
-       height="1511"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3336" />
-    <g
-       style="stroke:#000000; stroke-width:16"
-       id="g3338">
-      <defs
-         id="defs3340">
-        <pattern
-           id="tile5"
-           x="0"
-           y="0"
-           width="200"
-           height="200"
-           patternUnits="userSpaceOnUse">
-          <path
-             d="M 0 -100 200 20"
-             id="path3343" />
-          <path
-             d="M 0  -60 200 60"
-             id="path3345" />
-          <path
-             d="M 0  -20 200 100"
-             id="path3347" />
-          <path
-             d="M 0   20 200 140"
-             id="path3349" />
-          <path
-             d="M 0   60 200 180"
-             id="path3351" />
-          <path
-             d="M 0  100 200 220"
-             id="path3353" />
-          <path
-             d="M 0  140 200 260"
-             id="path3355" />
-          <path
-             d="M 0  180 200 300"
-             id="path3357" />
-        </pattern>
-      </defs>
-    </g>
-    <rect
-       x="6803"
-       y="2314"
-       width="3118"
-       height="1511"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:url(#tile5); "
-       id="rect3359" />
-    <!-- Line: box -->
-    <rect
-       x="2551"
-       y="1511"
-       width="7322"
-       height="519"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3361" />
-    <g
-       style="stroke:#000000; stroke-width:16"
-       id="g3363">
-      <defs
-         id="defs3365">
-        <pattern
-           id="tile6"
-           x="0"
-           y="0"
-           width="200"
-           height="200"
-           patternUnits="userSpaceOnUse">
-          <path
-             d="M 0 -100 200 20"
-             id="path3368" />
-          <path
-             d="M 0  -60 200 60"
-             id="path3370" />
-          <path
-             d="M 0  -20 200 100"
-             id="path3372" />
-          <path
-             d="M 0   20 200 140"
-             id="path3374" />
-          <path
-             d="M 0   60 200 180"
-             id="path3376" />
-          <path
-             d="M 0  100 200 220"
-             id="path3378" />
-          <path
-             d="M 0  140 200 260"
-             id="path3380" />
-          <path
-             d="M 0  180 200 300"
-             id="path3382" />
-        </pattern>
-      </defs>
-    </g>
-    <rect
-       x="2551"
-       y="1511"
-       width="7322"
-       height="519"
-       rx="251"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; fill:url(#tile6); "
-       id="rect3384" />
-    <!-- Text -->
-    <g
-       transform="translate(2220,4629) rotate(-90.00021046)"
-       id="g3386">
-      <text
-         xml:space="preserve"
-         x="0"
-         y="0"
-         stroke="#000000"
-         fill="#000000"
-         font-family="Helvetica"
-         font-style="normal"
-         font-weight="bold"
-         font-size="441"
-         text-anchor="middle"
-         id="text3388">TXXL</text>
-    </g>
-    <!-- Text -->
-    <g
-       transform="translate(1700,5574) rotate(-270.00063138)"
-       id="g3390">
-      <text
-         xml:space="preserve"
-         x="0"
-         y="0"
-         stroke="#000000"
-         fill="#000000"
-         font-family="Helvetica"
-         font-style="normal"
-         font-weight="bold"
-         font-size="567"
-         text-anchor="middle"
-         id="text3392">S</text>
-    </g>
-    <!-- Line: box -->
-    <rect
-       x="2456"
-       y="3968"
-       width="7370"
-       height="1464"
-       rx="251"
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3394" />
-    <!-- Line: box -->
-    <rect
-       x="6803"
-       y="2259"
-       width="3023"
-       height="1472"
-       rx="173"
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3396" />
-    <!-- Line: box -->
-    <rect
-       x="2456"
-       y="2267"
-       width="4155"
-       height="1472"
-       rx="188"
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3398" />
-    <!-- Line: box -->
-    <rect
-       x="2503"
-       y="1417"
-       width="7321"
-       height="519"
-       rx="251"
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; fill:#008f8f; "
-       id="rect3400" />
-    <!-- Line: box -->
-    <rect
-       x="2504"
-       y="7417"
-       width="7274"
-       height="519"
-       rx="251"
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; fill:#008f8f; "
-       id="rect3402" />
-    <!-- Line: box -->
-    <rect
-       x="2456"
-       y="5669"
-       width="7322"
-       height="1464"
-       rx="251"
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; fill:#87cfff; "
-       id="rect3404" />
-    <!-- Line: box -->
-    <rect
-       x="1464"
-       y="2125"
-       width="8551"
-       height="5196"
-       rx="0"
-       style="stroke:#000000;stroke-width:16; stroke-linejoin:miter; stroke-linecap:butt; stroke-dasharray:62 62;"
-       id="rect3406" />
-    <!-- Line -->
-    <polyline
-       points="2456,4535 9826,4535 9118,4535 "
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; "
-       id="polyline3408" />
-    <!-- Line -->
-    <polyline
-       points="2457,6188 9778,6188 9293,6188 "
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; "
-       id="polyline3410" />
-    <!-- Line -->
-    <polyline
-       points="2456,2881 5905,2881 6614,2881 "
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; "
-       id="polyline3412" />
-    <!-- Line -->
-    <polyline
-       points="6803,2881 9307,2881 9826,2881 "
-       style="stroke:#000000;stroke-width:32; stroke-linejoin:miter; stroke-linecap:butt; "
-       id="polyline3414" />
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="6141"
-       y="6566"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="215"
-       text-anchor="middle"
-       id="text3416">files, I/O requests, disk queues,</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="6188"
-       y="5196"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="215"
-       text-anchor="middle"
-       id="text3418">block prefetcher, buffered block writer</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="6141"
-       y="6897"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="215"
-       text-anchor="middle"
-       id="text3420">completion handlers</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="6141"
-       y="6047"
-       stroke="#000000"
-       fill="#000000"
-       font-family="Helvetica"
-       font-style="normal"
-       font-weight="bold"
-       font-size="265"
-       text-anchor="middle"
-       id="text3422">Asynchronous I/O primitives layer</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="6188"
-       y="4393"
-       stroke="#000000"
-       fill="#000000"
-       font-family="Helvetica"
-       font-style="normal"
-       font-weight="bold"
-       font-size="265"
-       text-anchor="middle"
-       id="text3424">Block management layer</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="6188"
-       y="4866"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="215"
-       text-anchor="middle"
-       id="text3426">typed block, block manager, buffered streams,</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="2598"
-       y="3212"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="215"
-       text-anchor="start"
-       id="text3428">Containers:</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="4535"
-       y="2692"
-       stroke="#000000"
-       fill="#000000"
-       font-family="Helvetica"
-       font-style="normal"
-       font-weight="bold"
-       font-size="265"
-       text-anchor="middle"
-       id="text3430">STL-user layer</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="4440"
-       y="3118"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="164"
-       text-anchor="start"
-       id="text3432">vector, stack, set</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="4299"
-       y="3307"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="164"
-       text-anchor="start"
-       id="text3434">priority_queue, map</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="4251"
-       y="3543"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="164"
-       text-anchor="start"
-       id="text3436">sort, for_each, merge</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="7181"
-       y="3259"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="215"
-       text-anchor="start"
-       id="text3438">Pipelined sorting,</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="7133"
-       y="3543"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="215"
-       text-anchor="start"
-       id="text3440">zero-I/O scanning</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="8362"
-       y="2692"
-       stroke="#000000"
-       fill="#000000"
-       font-family="Helvetica"
-       font-style="normal"
-       font-weight="bold"
-       font-size="265"
-       text-anchor="middle"
-       id="text3442">Streaming layer</text>
-    <!-- Text -->
-    <text
-       xml:space="preserve"
-       x="2598"
-       y="3543"
-       stroke="#000000"
-       fill="#000000"
-       font-family="AvantGarde"
-       font-style="normal"
-       font-weight="normal"
-       font-size="215"
-       text-anchor="start"
-       id="text3444">Algorithms:</text>
-    <!-- Text -->
-    <!--  Operating system  -->
-    <text
-       xml:space="preserve"
-       x="6094"
-       y="7795"
-       stroke="#000000"
-       fill="#000000"
-       font-family="Helvetica"
-       font-style="normal"
-       font-weight="bold"
-       font-size="265"
-       text-anchor="middle"
-       id="text3446">Operating System</text>
-    <!-- Text -->
-    <!--  Operating system  -->
-    <text
-       xml:space="preserve"
-       x="6094"
-       y="1795"
-       stroke="#000000"
-       fill="#000000"
-       font-family="Helvetica"
-       font-style="normal"
-       font-weight="bold"
-       font-size="265"
-       text-anchor="middle"
-       id="text3448">Applications</text>
-  </g>
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2837"
+     units="mm"
+     fit-margin-top="3"
+     fit-margin-left="3"
+     fit-margin-right="3"
+     fit-margin-bottom="3" />
+  <text
+     xml:space="preserve"
+     x="-4743.2573"
+     y="2153.5093"
+     font-style="normal"
+     font-weight="bold"
+     font-size="441"
+     id="text2993"
+     style="font-size:441px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
+     transform="matrix(-3.6732199e-6,-1,1,-3.6732199e-6,0,0)">TXXL</text>
+  <text
+     xml:space="preserve"
+     x="-5500.8467"
+     y="2173.2422"
+     font-style="normal"
+     font-weight="bold"
+     font-size="567"
+     id="text2997"
+     style="font-size:567px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
+     transform="matrix(-1.101966e-5,-1,1,-1.101966e-5,0,0)">S</text>
+  <rect
+     id="rect2999"
+     style="fill:#87cfff;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="251"
+     height="1464"
+     width="7370"
+     y="4082.2478"
+     x="2389.5269"
+     ry="251" />
+  <rect
+     id="rect3001"
+     style="fill:#87cfff;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="173"
+     height="1472"
+     width="3023"
+     y="2373.2478"
+     x="6736.5269"
+     ry="173" />
+  <rect
+     id="rect3003"
+     style="fill:#87cfff;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="188"
+     height="1472"
+     width="4155"
+     y="2381.2478"
+     x="2389.5269"
+     ry="188" />
+  <rect
+     id="rect3005"
+     style="fill:#008f8f;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="251.00002"
+     height="519"
+     width="7370.0039"
+     y="1531.2478"
+     x="2389.5269"
+     ry="251" />
+  <rect
+     id="rect3007"
+     style="fill:#008f8f;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="251"
+     height="519"
+     width="7370.0039"
+     y="7133.2358"
+     x="2437.5269"
+     ry="251" />
+  <rect
+     id="rect3009"
+     style="fill:#87cfff;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     rx="251"
+     height="1124.3066"
+     width="7370.0039"
+     y="5783.2476"
+     x="2389.5269"
+     ry="251" />
+  <rect
+     id="rect3011"
+     style="fill:none;stroke:#000000;stroke-width:16;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:62, 62"
+     rx="0"
+     height="4754.3989"
+     width="8313.2148"
+     y="2273.2185"
+     x="1590.0198" />
+  <polyline
+     id="polyline3013"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="2456,4535 9826,4535 9118,4535 "
+     transform="translate(-66.473097,114.24891)" />
+  <polyline
+     id="polyline3015"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="2457,6188 9778,6188 9293,6188 "
+     transform="translate(-66.473097,114.24891)" />
+  <polyline
+     id="polyline3017"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="2456,2881 5905,2881 6614,2881 "
+     transform="translate(-66.473097,114.24891)" />
+  <polyline
+     id="polyline3019"
+     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     points="6803,2881 9307,2881 9826,2881 "
+     transform="translate(-66.473097,114.24891)" />
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3021"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="6680.2476"
+     x="6074.5269"
+     xml:space="preserve">files, I/O requests, disk queues, completion handlers</text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3023"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="5310.2476"
+     x="6121.5269"
+     xml:space="preserve">block prefetcher, buffered block writer</text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3025"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="7011.2476"
+     x="6074.5269"
+     xml:space="preserve" />
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
+     id="text3027"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="6161.2476"
+     x="6074.5269"
+     xml:space="preserve">Asynchronous I/O primitives layer</text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
+     id="text3029"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="4507.2476"
+     x="6121.5269"
+     xml:space="preserve">Block management layer</text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3031"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="4980.2476"
+     x="6121.5269"
+     xml:space="preserve">typed block, block manager, buffered streams,</text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3033"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="3326.2478"
+     x="2796.8662"
+     xml:space="preserve">Containers:</text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
+     id="text3035"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="2806.2478"
+     x="4468.5269"
+     xml:space="preserve">STL layer</text>
+  <text
+     style="font-size:164px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3037"
+     font-size="164"
+     font-weight="normal"
+     font-style="normal"
+     y="3232.2478"
+     x="4638.8687"
+     xml:space="preserve">vector, stack, set</text>
+  <text
+     style="font-size:164px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3039"
+     font-size="164"
+     font-weight="normal"
+     font-style="normal"
+     y="3421.2478"
+     x="4497.8687"
+     xml:space="preserve">priority_queue, map</text>
+  <text
+     style="font-size:164px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3041"
+     font-size="164"
+     font-weight="normal"
+     font-style="normal"
+     y="3657.2478"
+     x="4449.8687"
+     xml:space="preserve">sort, for_each, merge</text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3043"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="3373.2478"
+     x="7406.4028"
+     xml:space="preserve">Pipelined sorting,</text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3045"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="3657.2478"
+     x="7358.4028"
+     xml:space="preserve">zero-I/O scanning</text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
+     id="text3047"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="2806.2478"
+     x="8295.5273"
+     xml:space="preserve">Streaming layer</text>
+  <text
+     style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
+     id="text3049"
+     font-size="215"
+     font-weight="normal"
+     font-style="normal"
+     y="3657.2478"
+     x="2796.8662"
+     xml:space="preserve">Algorithms:</text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
+     id="text3051"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="7511.2358"
+     x="6027.5269"
+     xml:space="preserve">Operating System</text>
+  <text
+     style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
+     id="text3053"
+     font-size="265"
+     font-weight="bold"
+     font-style="normal"
+     y="1882.7146"
+     x="6054.061"
+     xml:space="preserve">Applications</text>
 </svg>
