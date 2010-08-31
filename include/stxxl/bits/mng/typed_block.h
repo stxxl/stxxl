@@ -194,7 +194,7 @@ public:
 };
 
 template <typename BaseType_>
-class add_filler<BaseType_, 0> :
+class add_filler<BaseType_, 0>:
     public BaseType_
 {
 public:
@@ -224,7 +224,8 @@ template <unsigned RawSize_, class T_, unsigned NRef_ = 0, class InfoType_ = voi
 class typed_block :
     public expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_>
 {
-    typedef expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_ > Base;
+    typedef expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_> Base;
+
 public:
     typedef T_ value_type;
     typedef value_type & reference;
