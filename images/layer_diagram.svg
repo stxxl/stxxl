@@ -13,13 +13,16 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="649.07581"
-   height="485.04303"
-   viewBox="1441 1382 8611.2727 6420.0835"
+   width="646.51501"
+   height="465.49869"
+   viewBox="1441 1382 8577.2987 6161.3924"
    id="svg2837"
    version="1.1"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="layer_diagram.svg">
+   sodipodi:docname="layer_diagram.svg"
+   inkscape:export-filename="/home/singler/code/stxxl/trunk/images/layer_diagram.png"
+   inkscape:export-xdpi="82.480003"
+   inkscape:export-ydpi="82.480003">
   <metadata
      id="metadata3059">
     <rdf:RDF>
@@ -28,7 +31,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -265,22 +268,22 @@
      inkscape:window-height="936"
      id="namedview3055"
      showgrid="false"
-     inkscape:zoom="1.1716723"
-     inkscape:cx="316.24323"
-     inkscape:cy="242.56073"
+     inkscape:zoom="0.82731493"
+     inkscape:cx="321.87004"
+     inkscape:cy="226.51891"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2837"
      units="mm"
-     fit-margin-top="3"
+     fit-margin-top="2"
      fit-margin-left="3"
      fit-margin-right="3"
      fit-margin-bottom="3" />
   <text
      xml:space="preserve"
-     x="-4743.2573"
-     y="2153.5093"
+     x="-4696.7891"
+     y="2153.5166"
      font-style="normal"
      font-weight="bold"
      font-size="441"
@@ -289,8 +292,8 @@
      transform="matrix(-3.6732199e-6,-1,1,-3.6732199e-6,0,0)">TXXL</text>
   <text
      xml:space="preserve"
-     x="-5500.8467"
-     y="2173.2422"
+     x="-5454.3784"
+     y="2173.2498"
      font-style="normal"
      font-weight="bold"
      font-size="567"
@@ -299,57 +302,57 @@
      transform="matrix(-1.101966e-5,-1,1,-1.101966e-5,0,0)">S</text>
   <rect
      id="rect2999"
-     style="fill:#87cfff;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     style="color:#000000;fill:#9eb0d5;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:32.00000043;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
      rx="251"
      height="1464"
      width="7370"
-     y="3949.5781"
-     x="2389.5269"
+     y="3903.1101"
+     x="2389.5339"
      ry="251" />
   <rect
      id="rect3001"
-     style="fill:#87cfff;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     style="color:#000000;fill:#9eb0d5;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:32.00000043;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
      rx="173"
      height="1472"
      width="3023"
-     y="2373.2478"
-     x="6736.5269"
+     y="2326.7798"
+     x="6736.5342"
      ry="173" />
   <rect
      id="rect3003"
-     style="fill:#87cfff;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     style="fill:#9eb0d5;fill-opacity:1;stroke:#000000;stroke-width:32.00000043000000005;stroke-linecap:butt;stroke-linejoin:miter;color:#000000;fill-rule:nonzero;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
      rx="188"
      height="1472"
      width="4155"
-     y="2381.2478"
-     x="2389.5269"
+     y="2334.7798"
+     x="2389.5339"
      ry="188" />
   <rect
      id="rect3005"
-     style="fill:#008f8f;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     style="fill:#4d6eb1;fill-opacity:1;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
      rx="251.00002"
      height="519"
      width="7370.0039"
-     y="1531.2478"
-     x="2389.5269"
+     y="1484.7797"
+     x="2389.5339"
      ry="251" />
   <rect
      id="rect3007"
-     style="fill:#008f8f;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     style="color:#000000;fill:#4d6eb1;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:32.00000043;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
      rx="251"
      height="519"
      width="7370.0039"
-     y="6920.9624"
-     x="2437.5269"
+     y="6874.4941"
+     x="2437.5339"
      ry="251" />
   <rect
      id="rect3009"
-     style="fill:#87cfff;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     style="color:#000000;fill:#9eb0d5;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:32.00000043;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
      rx="251"
      height="1124.3066"
      width="7370.0039"
-     y="5517.9058"
-     x="2389.5269"
+     y="5471.4375"
+     x="2389.5339"
      ry="251" />
   <rect
      id="rect3011"
@@ -357,36 +360,36 @@
      rx="0"
      height="4459.9976"
      width="8279.2451"
-     y="2273.2185"
-     x="1590.0198" />
+     y="2226.7505"
+     x="1590.0269" />
   <polyline
      id="polyline3013"
      style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
      points="2456,4535 9826,4535 9118,4535 "
-     transform="translate(-66.473097,-18.420844)" />
+     transform="translate(-66.465922,-64.889013)" />
   <polyline
      id="polyline3015"
-     style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
+     style="fill:none;stroke:#000000;stroke-width:31.93028641;stroke-linecap:butt;stroke-linejoin:miter"
      points="2457,6188 9778,6188 9293,6188 "
-     transform="translate(-66.473097,-151.0906)" />
+     transform="matrix(1.0043713,0,0,1,-77.206305,-197.55876)" />
   <polyline
      id="polyline3017"
      style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
      points="2456,2881 5905,2881 6614,2881 "
-     transform="translate(-66.473097,114.24891)" />
+     transform="translate(-66.465922,67.780745)" />
   <polyline
      id="polyline3019"
      style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
      points="6803,2881 9307,2881 9826,2881 "
-     transform="translate(-66.473097,114.24891)" />
+     transform="translate(-66.465922,67.780745)" />
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3021"
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="6414.9058"
-     x="6074.5269"
+     y="6368.4375"
+     x="6074.5342"
      xml:space="preserve"><tspan
        style="font-size:265.33950806px"
        id="tspan3245">files, I/O requests, disk queues, completion handlers</tspan></text>
@@ -396,8 +399,8 @@
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="5177.5767"
-     x="6121.5269"
+     y="5131.1084"
+     x="6121.5342"
      xml:space="preserve"><tspan
        style="font-size:265.33950806px"
        id="tspan3243">block prefetcher, buffered block writer</tspan></text>
@@ -407,8 +410,8 @@
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="7011.2476"
-     x="6074.5269"
+     y="6964.7793"
+     x="6074.5342"
      xml:space="preserve" />
   <text
      style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
@@ -416,8 +419,8 @@
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="5895.9058"
-     x="6074.5269"
+     y="5849.4375"
+     x="6074.5342"
      xml:space="preserve"><tspan
        style="font-size:371.47531128px"
        id="tspan3223">Asynchronous I/O Primitives</tspan></text>
@@ -427,8 +430,8 @@
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="4374.5767"
-     x="6121.5269"
+     y="4328.1084"
+     x="6121.5342"
      xml:space="preserve"><tspan
        style="font-size:371.47531128px"
        id="tspan3219">Block Management</tspan></text>
@@ -438,8 +441,8 @@
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="4847.5767"
-     x="6121.5269"
+     y="4801.1084"
+     x="6121.5342"
      xml:space="preserve"><tspan
        style="font-size:265.33950806px"
        id="tspan3241">typed block, block manager, buffered streams,</tspan></text>
@@ -449,10 +452,10 @@
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="3326.2478"
-     x="2796.8662"
+     y="3279.7798"
+     x="2796.8733"
      xml:space="preserve"><tspan
-       style="font-size:265.33950657px"
+       style="font-size:265.33950806px"
        id="tspan3227">Containers:</tspan></text>
   <text
      style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
@@ -460,8 +463,8 @@
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="2806.2478"
-     x="4468.5269"
+     y="2759.7798"
+     x="4468.5342"
      xml:space="preserve"><tspan
        style="font-size:371.47531128px"
        id="tspan3215">STL Interface</tspan></text>
@@ -471,8 +474,8 @@
      font-size="164"
      font-weight="normal"
      font-style="normal"
-     y="3205.7139"
-     x="4638.8687"
+     y="3159.2458"
+     x="4638.876"
      xml:space="preserve"><tspan
        style="font-size:199.00462341px"
        id="tspan3231">vector, stack, set</tspan></text>
@@ -482,8 +485,8 @@
      font-size="164"
      font-weight="normal"
      font-style="normal"
-     y="3421.2478"
-     x="4497.8687"
+     y="3374.7798"
+     x="4497.876"
      xml:space="preserve"><tspan
        style="font-size:199.00462341px"
        id="tspan3233">priority_queue, map</tspan></text>
@@ -493,8 +496,8 @@
      font-size="164"
      font-weight="normal"
      font-style="normal"
-     y="3710.3157"
-     x="4449.8687"
+     y="3663.8477"
+     x="4449.876"
      xml:space="preserve"><tspan
        style="font-size:199.00462341px"
        id="tspan3235">sort, for_each, merge</tspan></text>
@@ -504,8 +507,8 @@
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="3373.2478"
-     x="7326.8003"
+     y="3326.7798"
+     x="7326.8076"
      xml:space="preserve"><tspan
        style="font-size:265.33950806px"
        id="tspan3237">Pipelined sorting,</tspan></text>
@@ -515,8 +518,8 @@
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="3657.2478"
-     x="7278.8003"
+     y="3610.7798"
+     x="7278.8076"
      xml:space="preserve"><tspan
        style="font-size:265.33950806px"
        id="tspan3239">zero-I/O scanning</tspan></text>
@@ -526,8 +529,8 @@
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="2806.2478"
-     x="8242.459"
+     y="2759.7798"
+     x="8242.4658"
      xml:space="preserve"><tspan
        style="font-size:371.47531128px"
        id="tspan3217">Pipelining</tspan></text>
@@ -537,8 +540,8 @@
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="3710.3157"
-     x="2796.8662"
+     y="3663.8477"
+     x="2796.8733"
      xml:space="preserve"><tspan
        style="font-size:265.33950806px"
        id="tspan3229">Algorithms:</tspan></text>
@@ -548,8 +551,8 @@
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="7298.9624"
-     x="6027.5269"
+     y="7252.4941"
+     x="6027.5342"
      xml:space="preserve"><tspan
        style="font-size:371.47531128px"
        id="tspan3225">Operating System</tspan></text>
@@ -559,9 +562,9 @@
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="1882.7146"
-     x="6054.061"
+     y="1836.2465"
+     x="6054.0684"
      xml:space="preserve"><tspan
-       style="font-size:371.47530919px"
+       style="font-size:371.47531128px"
        id="tspan3221">Applications</tspan></text>
 </svg>
