@@ -26,10 +26,10 @@ distclean: clean
 else
 # automatically generate .pdf versions of the figures, needed by pdflatex
 
-tutorial.pdf: logo1.pdf vector.pdf
+tutorial.pdf: layer_diagram.pdf vector.pdf
 
 clean::
-	$(RM) logo1.pdf vector.pdf
+	$(RM) layer_diagram.pdf vector.pdf
 
 endif
 

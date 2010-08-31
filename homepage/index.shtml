@@ -50,7 +50,7 @@ another design priority is high performance.
 
             </td>
 			<td valign="top"><script type="text/javascript" src="http://www.ohloh.net/projects/11530/widgets/project_basic_stats"></script></td>
-            <td valign="top"> <img src="stxxl_layers.png" alt="stxxl layers" border="0" ></td>
+            <td valign="top"> <img src="layer_diagram.png" alt="stxxl layers" border="0" ></td>
           </tr>
         </tbody>
       </table>
