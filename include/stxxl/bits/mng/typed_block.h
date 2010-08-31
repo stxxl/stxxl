@@ -226,13 +226,13 @@ class typed_block :
 {
     typedef expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_ > Base;
 public:
-    typedef T_ type;
     typedef T_ value_type;
-    typedef T_ & reference;
-    typedef const T_ & const_reference;
-    typedef type * pointer;
+    typedef value_type & reference;
+    typedef const value_type & const_reference;
+    typedef value_type * pointer;
     typedef pointer iterator;
-    typedef type const * const_iterator;
+    typedef const value_type * const_pointer;
+    typedef const_pointer const_iterator;
 
     enum constants
     {
