@@ -288,6 +288,7 @@ include $(STXXL_ROOT)/$(STXXL_CONFIG)
 # use the variables from stxxl.mk
 CXX              = $(STXXL_CXX)
 CPPFLAGS        += $(STXXL_CPPFLAGS)
+LDLIBS          += $(STXXL_LDLIBS)
 
 # add your own optimization, warning, debug, ... flags
 # (these are *not* set in stxxl.mk)
@@ -296,7 +297,7 @@ CPPFLAGS        += -O3 -Wall -g -DFOO=BAR
 # build your application
 # (my_example.o is generated from my_example.cpp automatically)
 my_example.bin: my_example.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) my_example.o -o $@ $(STXXL_LDLIBS)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) my_example.o -o $@ $(LDLIBS)
 \endverbatim
  *
  * Before you try to run one of the \c S<small>TXXL</small> examples
