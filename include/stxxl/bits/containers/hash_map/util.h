@@ -33,7 +33,7 @@ namespace hash_map
         node<ValueType> * next_and_del_;
         ValueType value_;
 
-        bool deleted() { return ((int_type) next_and_del_ & 0x01) == 1; }
+        bool deleted() { return ((int_type)next_and_del_ & 0x01) == 1; }
         bool deleted(bool d)
         {
             next_and_del_ = (node<ValueType> *)(((int_type)next_and_del_ & ~0x01) | (int_type)d);
@@ -74,7 +74,6 @@ namespace hash_map
             i_subblock_(i_subblock)
         { }
     };
-
 
 
 //! \brief Used to scan external memory with prefetching.
@@ -239,9 +238,9 @@ namespace hash_map
         //! \brief Continue reading at given block and subblock.
         void skip_to(BidIt bid, size_t i_subblock)
         {
-			if (curr_bid_ == end_bid_)
-				return;
-		
+            if (curr_bid_ == end_bid_)
+                return;
+
             if (bid != curr_bid_)
                 dirty_ = false;
 

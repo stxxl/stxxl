@@ -83,7 +83,7 @@ void cmp_with_internal_map()
 //	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&hash_map::insert_oblivious), &map ));
 //	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&int_hash_map::insert), &int_map ));
     std::vector<value_type>::iterator val_it = values2.begin();
-    for (; val_it != values2.end(); ++val_it) {
+    for ( ; val_it != values2.end(); ++val_it) {
         map.insert_oblivious(*val_it);
         int_map.insert(*val_it);
     }
@@ -166,7 +166,7 @@ void basic_iterator_test()
     // seems bind1st has problems with a member that takes a reference
 //	std::for_each( values2.begin(), values2.end(), std::bind1st( std::mem_fun(&hash_map::insert_oblivious), &map ));
     std::vector<value_type>::iterator val_it = values2.begin();
-    for (; val_it != values2.end(); ++val_it)
+    for ( ; val_it != values2.end(); ++val_it)
         map.insert_oblivious(*val_it);
     assert(map.begin() != map.end());
     assert(map.size() == 2 * n_values);
@@ -325,7 +325,7 @@ void more_iterator_test()
     // --- initial import
     map.insert(values1.begin(), values1.end(), mem_to_sort);
     std::vector<value_type>::iterator val_it = values2.begin();
-    for (; val_it != values2.end(); ++val_it)
+    for ( ; val_it != values2.end(); ++val_it)
         map.insert_oblivious(*val_it);
 
     // --- store some iterators, rebuild and check

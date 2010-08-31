@@ -45,7 +45,7 @@ bool test_block_cache()
         stxxl::block_manager * bm = stxxl::block_manager::get_instance();
         bm->new_blocks(stxxl::striping(), bids.begin(), bids.end());
 
-		
+
         block_type * block = new block_type;
         for (unsigned i_block = 0; i_block < num_blocks; i_block++) {
             for (unsigned i_subblock = 0; i_subblock < block_size; i_subblock++) {
@@ -118,7 +118,7 @@ bool test_block_cache()
         assert(cache.release_block(bids[0]) == false);                                  // retrain-count should be 0, release fails
 
         subblock_type * kicked_subblock = cache.get_subblock(bids[1], 0);               // cache new block
-        for (unsigned i = 0; i < cache_size + 5; i++) {                                      // load other blocks, so that kicked_subblock, well, gets kicked
+        for (unsigned i = 0; i < cache_size + 5; i++) {                                 // load other blocks, so that kicked_subblock, well, gets kicked
             cache.prefetch_block(bids[i + 3]);
         }
         assert(cache.get_subblock(bids[1], 0) != kicked_subblock);                      // load kicked subblock again, should be at a different location

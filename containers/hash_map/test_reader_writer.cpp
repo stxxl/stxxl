@@ -48,7 +48,7 @@ void reader_writer_test()
         {
             writer_type writer(&bids, buffer_size, buffer_size / 2);
             unsigned i = 0;
-            for (; i < n_blocks * block_size * subblock_size; ++i)
+            for ( ; i < n_blocks * block_size * subblock_size; ++i)
                 writer.append(value_type(i, i));
             writer.flush();
 

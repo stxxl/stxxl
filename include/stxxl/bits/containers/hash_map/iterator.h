@@ -57,17 +57,17 @@ namespace hash_map
     protected:
         HashMap * map_;
         reader_type * reader_;
-        bool prefetch_;                         /* true if prefetching enabled; false by default, will be set to true when incrementing (see find_next()) */
-        size_type i_bucket_;                    /* index of current bucket */
-        source_type source_;                    /* source of current value: external or internal */
-        node_type * node_;                      /* current (source=internal) or old (src=external) internal node */
-        size_type i_external_;                  /* position of current (source=external) or next (source=internal) external value (see _ext_valid) */
-        key_type key_;                          /* key of current value */
+        bool prefetch_;                 /* true if prefetching enabled; false by default, will be set to true when incrementing (see find_next()) */
+        size_type i_bucket_;            /* index of current bucket */
+        source_type source_;            /* source of current value: external or internal */
+        node_type * node_;              /* current (source=internal) or old (src=external) internal node */
+        size_type i_external_;          /* position of current (source=external) or next (source=internal) external value (see _ext_valid) */
+        key_type key_;                  /* key of current value */
         bool ext_valid_;                /* true if i_external points to the current or next external value
                                                                    example: iterator was created by hash_map::find() and the value was found in internal memory
                                                                    => iterator pointing to internal node is created and location of next external value is unknown (_ext_valid == false)
                                                                    => when incrementing the iterator the external values will be scanned from the beginning of the bucket to find the valid external index */
-        bool end_;                              /* true if iterator equals end() */
+        bool end_;                      /* true if iterator equals end() */
 
     private:
         hash_map_iterator_base()
@@ -109,12 +109,12 @@ namespace hash_map
         hash_map_iterator_base(const hash_map_iterator_base & obj) :
             map_(obj.map_),
             reader_(NULL),
-            prefetch_(obj.prefetch_),			
+            prefetch_(obj.prefetch_),
             i_bucket_(obj.i_bucket_),
-			source_(obj.source_),
+            source_(obj.source_),
             node_(obj.node_),
             i_external_(obj.i_external_),
-            key_(obj.key_),   
+            key_(obj.key_),
             ext_valid_(obj.ext_valid_),
             end_(obj.end_)
         {

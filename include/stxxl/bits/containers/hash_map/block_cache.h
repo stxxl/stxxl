@@ -118,7 +118,7 @@ namespace hash_map
 
     private:
 /*		struct bid_eq
-		{
+                {
             bool operator () (const bid_type & a, const bid_type & b) const
             {
                 return (a.storage == b.storage && a.offset == b.offset);
@@ -159,10 +159,10 @@ namespace hash_map
 
         std::vector<block_type *> blocks_;                                              /* cached blocks         */
         std::vector<bid_type> bids_;                                                    /* bids of cached blocks */
-        std::vector<unsigned_type> retain_count_;                                            /* */
+        std::vector<unsigned_type> retain_count_;                                       /* */
         std::vector<bool> dirty_;                                                       /* true iff block has been altered while in cache */
         std::vector<unsigned_type> valid_subblock_;                                     /* valid_all or the actually loaded subblock's index */
-        std::vector<unsigned_type> free_blocks_;                                             /* free blocks as indices to blocks_-vector */
+        std::vector<unsigned_type> free_blocks_;                                        /* free blocks as indices to blocks_-vector */
         std::vector<request_ptr> reqs_;
 
         bid_map_type bid_map_;

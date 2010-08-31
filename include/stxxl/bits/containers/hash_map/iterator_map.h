@@ -20,8 +20,6 @@
 #include <stxxl/bits/containers/hash_map/iterator.h>
 
 
-
-
 __STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
@@ -47,7 +45,7 @@ namespace hash_map
 //            }
 //        };
 //        typedef __gnu_cxx::hash_multimap<size_type, iterator_base *, hasher> multimap_type;     // store iterators by bucket-index
-		typedef std::multimap<size_type, iterator_base *> multimap_type;
+        typedef std::multimap<size_type, iterator_base *> multimap_type;
 
         typedef typename multimap_type::value_type pair_type;                                   /* bucket-index and pointer to iterator_base */
         typedef typename multimap_type::iterator mmiterator_type;
@@ -68,9 +66,9 @@ namespace hash_map
 
 
         ~iterator_map()
-		{
-			it_map_.clear();
-		}
+        {
+            it_map_.clear();
+        }
 
 
         void register_iterator(iterator_base & it)
@@ -154,16 +152,16 @@ namespace hash_map
             typename std::vector<iterator_base *>::iterator it2fix = its2fix.begin();
             for ( ; it2fix != its2fix.end(); ++it2fix)
             {
-                if (!map_->__eq((**it2fix).key_, key))
+                if (!map_->__eq((** it2fix).key_, key))
                     continue;
 
-                assert((**it2fix).source_ == hash_map_type::src_external);
+                assert((** it2fix).source_ == hash_map_type::src_external);
 
-                (**it2fix).source_ = hash_map_type::src_internal;
-                (**it2fix).node_ = node;
-                (**it2fix).i_external_++;
-                if ((**it2fix).reader_)
-                    (**it2fix).reader_->operator ++ ();
+                (** it2fix).source_ = hash_map_type::src_internal;
+                (** it2fix).node_ = node;
+                (** it2fix).i_external_ ++;
+                if ((** it2fix).reader_)
+                    (** it2fix).reader_->operator ++ ();
             }
         }
 

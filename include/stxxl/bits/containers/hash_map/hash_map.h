@@ -30,7 +30,7 @@ __STXXL_BEGIN_NAMESPACE
 
 namespace hash_map
 {
-	//! \brief External memory hash-map
+    //! \brief External memory hash-map
     template <class Key_,
               class T_,
               class Hash_,
@@ -40,7 +40,7 @@ namespace hash_map
               class Alloc_ = std::allocator<std::pair<const Key_, T_> >
               >
     class hash_map : private noncopyable
-	{
+    {
     private:
         typedef hash_map<Key_, T_, Hash_, KeyCmp_, SubBlkSize_, BlkSize_> self_type;
 
@@ -132,8 +132,8 @@ namespace hash_map
         hash_map(InputIterator f, InputIterator l, size_type mem_to_sort = 256 *1024 *1024, size_type n = 10000, const hasher & hf = hasher(), const keycmp & cmp = keycmp(), size_type buffer_size = 100 *1024 *1024, const Alloc_ & a = Alloc_()) :
             hash_(hf),
             cmp_(cmp),
-          //  buckets_(n),
-			buckets_(0), // insert will determine a good size
+            //  buckets_(n),
+            buckets_(0),             // insert will determine a good size
             bids_(0),
             buffer_size_(0),
             iterator_map_(this),
@@ -167,8 +167,8 @@ namespace hash_map
         /* After using *oblivious_-methods only an estimate for the total number of elements can be given.
            This method accesses external memory to calculate the exact number.
         */
-        void __make_conscious() /* const */ // todo: make const again
-        {
+        void __make_conscious()
+        { /* const */                       // todo: make const again
             if (!oblivious_)
                 return;
 
@@ -467,7 +467,6 @@ namespace hash_map
             std::swap(block_cache_, obj.block_cache_);
         }
 
-
     private:
         // find statistics
         mutable size_type n_subblocks_loaded;
@@ -665,7 +664,6 @@ namespace hash_map
         //! \brief Bucket-index for values with given key.
 //        size_type bucket(const key_type & k) const { return __bkt_num(k); }
 
-
     public:
         //! \brief Average number of (sub)blocks occupied by a bucket.
         float load_factor() const { return (float)num_total_ / ((float)subblock_size * (float)buckets_.size()); }
@@ -709,7 +707,6 @@ namespace hash_map
                 __rebuild_buckets();
         }
 
-
     private:
         /* iterator pointing to the beginnning of the hash-map */
         template <class ItType>
@@ -742,7 +739,6 @@ namespace hash_map
 
         //! \brief Returns a const_iterator pointing to the end of the hash-map
         const_iterator end() const { return __end<const_iterator>(); }
-
 
     private:
         /* Allocate a new buffer-node */
@@ -1108,9 +1104,9 @@ namespace hash_map
             typedef HashingStream<old_values_stream, HashedValueExtractor> old_hashing_stream;                  // old values, that are to be stored in a certain (new) bucket
 
             #ifdef BOOST_MSVC
-             typedef typename stxxl::stream::streamify_traits<InputIterator>::stream_type   input_stream;                      // values to insert ("new values")
+            typedef typename stxxl::stream::streamify_traits<InputIterator>::stream_type input_stream;          // values to insert ("new values")
             #else
-             typedef __typeof__(stxxl::stream::streamify(f, l))              input_stream;                      // values to insert ("new values")
+            typedef __typeof__(stxxl::stream::streamify(f, l))              input_stream;                       // values to insert ("new values")
             #endif
             typedef AddHashStream<input_stream> new_values_stream;                                              // new values with added hash: (hash, (key, mapped))
             typedef stxxl::stream::sort<new_values_stream, Cmp> new_sorted_values_stream;                       // new values sorted by <hash-value, key>
