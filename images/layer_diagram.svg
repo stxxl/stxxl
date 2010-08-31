@@ -19,7 +19,7 @@
    id="svg2837"
    version="1.1"
    inkscape:version="0.48.0 r9654"
-   sodipodi:docname="logo1.svg.2010_08_31_10_33_54.0.svg">
+   sodipodi:docname="layer_diagram.svg">
   <metadata
      id="metadata3059">
     <rdf:RDF>
@@ -262,13 +262,13 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1272"
-     inkscape:window-height="994"
+     inkscape:window-height="936"
      id="namedview3055"
      showgrid="false"
      inkscape:zoom="1.1716723"
      inkscape:cx="316.24323"
      inkscape:cy="224.43148"
-     inkscape:window-x="1280"
+     inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg2837"
@@ -303,7 +303,7 @@
      rx="251"
      height="1464"
      width="7370"
-     y="4082.2478"
+     y="3949.5781"
      x="2389.5269"
      ry="251" />
   <rect
@@ -339,7 +339,7 @@
      rx="251"
      height="519"
      width="7370.0039"
-     y="7133.2358"
+     y="6920.9624"
      x="2437.5269"
      ry="251" />
   <rect
@@ -348,27 +348,27 @@
      rx="251"
      height="1124.3066"
      width="7370.0039"
-     y="5783.2476"
+     y="5517.9058"
      x="2389.5269"
      ry="251" />
   <rect
      id="rect3011"
      style="fill:none;stroke:#000000;stroke-width:16;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:62, 62"
      rx="0"
-     height="4754.3989"
-     width="8313.2148"
+     height="4459.9976"
+     width="8279.2451"
      y="2273.2185"
      x="1590.0198" />
   <polyline
      id="polyline3013"
      style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
      points="2456,4535 9826,4535 9118,4535 "
-     transform="translate(-66.473097,114.24891)" />
+     transform="translate(-66.473097,-18.420844)" />
   <polyline
      id="polyline3015"
      style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
      points="2457,6188 9778,6188 9293,6188 "
-     transform="translate(-66.473097,114.24891)" />
+     transform="translate(-66.473097,-151.0906)" />
   <polyline
      id="polyline3017"
      style="fill:none;stroke:#000000;stroke-width:32;stroke-linecap:butt;stroke-linejoin:miter"
@@ -385,18 +385,22 @@
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="6680.2476"
+     y="6414.9058"
      x="6074.5269"
-     xml:space="preserve">files, I/O requests, disk queues, completion handlers</text>
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px"
+       id="tspan3245">files, I/O requests, disk queues, completion handlers</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3023"
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="5310.2476"
+     y="5177.5767"
      x="6121.5269"
-     xml:space="preserve">block prefetcher, buffered block writer</text>
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px"
+       id="tspan3243">block prefetcher, buffered block writer</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3025"
@@ -412,27 +416,33 @@
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="6161.2476"
+     y="5895.9058"
      x="6074.5269"
-     xml:space="preserve">Asynchronous I/O primitives layer</text>
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px"
+       id="tspan3223">Asynchronous I/O primitives layer</tspan></text>
   <text
      style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
      id="text3029"
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="4507.2476"
+     y="4374.5767"
      x="6121.5269"
-     xml:space="preserve">Block management layer</text>
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px"
+       id="tspan3219">Block management layer</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3031"
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="4980.2476"
+     y="4847.5767"
      x="6121.5269"
-     xml:space="preserve">typed block, block manager, buffered streams,</text>
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px"
+       id="tspan3241">typed block, block manager, buffered streams,</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3033"
@@ -441,7 +451,9 @@
      font-style="normal"
      y="3326.2478"
      x="2796.8662"
-     xml:space="preserve">Containers:</text>
+     xml:space="preserve"><tspan
+       style="font-size:265.33950657px"
+       id="tspan3227">Containers:</tspan></text>
   <text
      style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
      id="text3035"
@@ -450,16 +462,20 @@
      font-style="normal"
      y="2806.2478"
      x="4468.5269"
-     xml:space="preserve">STL layer</text>
+     xml:space="preserve"><tspan
+       style="font-size:371.47530919px"
+       id="tspan3215">STL layer</tspan></text>
   <text
      style="font-size:164px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3037"
      font-size="164"
      font-weight="normal"
      font-style="normal"
-     y="3232.2478"
+     y="3205.7139"
      x="4638.8687"
-     xml:space="preserve">vector, stack, set</text>
+     xml:space="preserve"><tspan
+       style="font-size:199.00462341px"
+       id="tspan3231">vector, stack, set</tspan></text>
   <text
      style="font-size:164px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3039"
@@ -468,16 +484,20 @@
      font-style="normal"
      y="3421.2478"
      x="4497.8687"
-     xml:space="preserve">priority_queue, map</text>
+     xml:space="preserve"><tspan
+       style="font-size:199.00462341px"
+       id="tspan3233">priority_queue, map</tspan></text>
   <text
      style="font-size:164px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3041"
      font-size="164"
      font-weight="normal"
      font-style="normal"
-     y="3657.2478"
+     y="3710.3157"
      x="4449.8687"
-     xml:space="preserve">sort, for_each, merge</text>
+     xml:space="preserve"><tspan
+       style="font-size:199.00462341px"
+       id="tspan3235">sort, for_each, merge</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3043"
@@ -485,8 +505,10 @@
      font-weight="normal"
      font-style="normal"
      y="3373.2478"
-     x="7406.4028"
-     xml:space="preserve">Pipelined sorting,</text>
+     x="7326.8003"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px"
+       id="tspan3237">Pipelined sorting,</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3045"
@@ -494,8 +516,10 @@
      font-weight="normal"
      font-style="normal"
      y="3657.2478"
-     x="7358.4028"
-     xml:space="preserve">zero-I/O scanning</text>
+     x="7278.8003"
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px"
+       id="tspan3239">zero-I/O scanning</tspan></text>
   <text
      style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
      id="text3047"
@@ -503,26 +527,32 @@
      font-weight="bold"
      font-style="normal"
      y="2806.2478"
-     x="8295.5273"
-     xml:space="preserve">Streaming layer</text>
+     x="8242.459"
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px"
+       id="tspan3217">Streaming layer</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3049"
      font-size="215"
      font-weight="normal"
      font-style="normal"
-     y="3657.2478"
+     y="3710.3157"
      x="2796.8662"
-     xml:space="preserve">Algorithms:</text>
+     xml:space="preserve"><tspan
+       style="font-size:265.33950806px"
+       id="tspan3229">Algorithms:</tspan></text>
   <text
      style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
      id="text3051"
      font-size="265"
      font-weight="bold"
      font-style="normal"
-     y="7511.2358"
+     y="7298.9624"
      x="6027.5269"
-     xml:space="preserve">Operating System</text>
+     xml:space="preserve"><tspan
+       style="font-size:371.47531128px"
+       id="tspan3225">Operating System</tspan></text>
   <text
      style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
      id="text3053"
@@ -531,5 +561,7 @@
      font-style="normal"
      y="1882.7146"
      x="6054.061"
-     xml:space="preserve">Applications</text>
+     xml:space="preserve"><tspan
+       style="font-size:371.47530919px"
+       id="tspan3221">Applications</tspan></text>
 </svg>
