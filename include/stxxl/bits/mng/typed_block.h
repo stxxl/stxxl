@@ -191,6 +191,26 @@ public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info<> is constructed"); }
 };
 
+template <typename BaseType_, unsigned FillSize_ = 0>
+class add_filler :
+    public BaseType_
+{
+private:
+    //! \brief Per block filler element
+    filler_struct__<FillSize_> filler;
+
+public:
+    add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] add_filler is constructed"); }
+};
+
+template <typename BaseType_>
+class add_filler<BaseType_, 0> :
+    public BaseType_
+{
+public:
+    add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] add_filler<> is constructed"); }
+};
+
 //! \brief Block containing elements of fixed length
 
 //! \tparam RawSize_ size of block in bytes
@@ -206,8 +226,8 @@ public:
 //! main thread to (2MB - system page size)
 template <unsigned RawSize_, class T_, unsigned NRef_ = 0, class InfoType_ = void>
 class typed_block :
-    public block_w_info<T_, RawSize_, NRef_, InfoType_>,
-    public filler_struct__<(RawSize_ - sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>))>
+    public add_filler<block_w_info<T_, RawSize_, NRef_, InfoType_>,
+                      RawSize_ - sizeof(block_w_info<T_, RawSize_, NRef_, InfoType_>)>
 {
 public:
     typedef T_ type;
