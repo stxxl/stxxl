@@ -267,7 +267,7 @@
      showgrid="false"
      inkscape:zoom="1.1716723"
      inkscape:cx="316.24323"
-     inkscape:cy="224.43148"
+     inkscape:cy="242.56073"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -420,7 +420,7 @@
      x="6074.5269"
      xml:space="preserve"><tspan
        style="font-size:371.47531128px"
-       id="tspan3223">Asynchronous I/O primitives layer</tspan></text>
+       id="tspan3223">Asynchronous I/O Primitives</tspan></text>
   <text
      style="font-size:265px;font-style:normal;font-weight:bold;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:Helvetica"
      id="text3029"
@@ -431,7 +431,7 @@
      x="6121.5269"
      xml:space="preserve"><tspan
        style="font-size:371.47531128px"
-       id="tspan3219">Block management layer</tspan></text>
+       id="tspan3219">Block Management</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3031"
@@ -463,8 +463,8 @@
      y="2806.2478"
      x="4468.5269"
      xml:space="preserve"><tspan
-       style="font-size:371.47530919px"
-       id="tspan3215">STL layer</tspan></text>
+       style="font-size:371.47531128px"
+       id="tspan3215">STL Interface</tspan></text>
   <text
      style="font-size:164px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3037"
@@ -530,7 +530,7 @@
      x="8242.459"
      xml:space="preserve"><tspan
        style="font-size:371.47531128px"
-       id="tspan3217">Streaming layer</tspan></text>
+       id="tspan3217">Pipelining</tspan></text>
   <text
      style="font-size:215px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;stroke:#000000;stroke-width:0.025in;font-family:AvantGarde"
      id="text3049"
