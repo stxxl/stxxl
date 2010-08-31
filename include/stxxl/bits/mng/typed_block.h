@@ -167,12 +167,6 @@ public:
     //! \brief Per block information element
     info_type info;
 
-    enum
-    {
-        size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_))
-    };
-
-public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info is constructed"); }
 };
 
@@ -182,15 +176,11 @@ class block_w_info<T_, RawSize_, NBids_, void>:
 {
 public:
     typedef void info_type;
-    enum
-    {
-        size = ((RawSize_ - sizeof(BID<RawSize_>) * NBids_) / sizeof(T_))
-    };
 
-public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info<> is constructed"); }
 };
 
+//! \brief Contains per block filler for \c stxxl::typed_block , not intended for direct use
 template <typename BaseType_, unsigned FillSize_ = 0>
 class add_filler :
     public BaseType_
@@ -211,11 +201,11 @@ public:
     add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] add_filler<> is constructed"); }
 };
 
+//! \brief Helper to compute the size of the filler , not intended for direct use
 template <typename Tp_, unsigned RawSize_>
 class expand_struct :
     public add_filler<Tp_, RawSize_ - sizeof(Tp_)>
-{
-};
+{ };
 
 //! \brief Block containing elements of fixed length
 
@@ -234,6 +224,7 @@ template <unsigned RawSize_, class T_, unsigned NRef_ = 0, class InfoType_ = voi
 class typed_block :
     public expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_>
 {
+    typedef expand_struct<block_w_info<T_, RawSize_, NRef_, InfoType_>, RawSize_ > Base;
 public:
     typedef T_ type;
     typedef T_ value_type;
@@ -246,7 +237,7 @@ public:
     enum constants
     {
         raw_size = RawSize_,                                        //!< size of block in bytes
-        size = block_w_info<T_, RawSize_, NRef_, InfoType_>::size,  //!< number of elements in block
+        size = Base::size,                                          //!< number of elements in block
         has_only_data = (raw_size == (size * sizeof(value_type)))   //!< no meta info, bids or (non-empty) fillers included in the block, allows value_type array addressing across block boundaries
     };
 
