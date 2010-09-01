@@ -13,6 +13,8 @@
 #ifndef _STXXL_HASH_MAP_H_
 #define _STXXL_HASH_MAP_H_
 
+#include <functional>
+
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/mng/mng.h>
@@ -1078,7 +1080,7 @@ namespace hash_map
         /* Comparator object for values as required by stxxl::sort. Sorting is done lexicographically by <hash-value, key>
            Note: the hash-value has already been computed.
         */
-        struct Cmp
+        struct Cmp : public std::binary_function<std::pair<size_type, value_type>, std::pair<size_type, value_type>, bool>
         {
             self_type * map_;
             Cmp(self_type * map) : map_(map) { }
