@@ -1219,7 +1219,14 @@ public:
                 STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
                                                                    << file_length());
                 STXXL_VERBOSE1("~vector(): size of the vector is " << size());
-                _from->set_size(file_length());
+                try
+                {
+                    _from->set_size(file_length());
+                }
+                catch (...)
+                {
+                    STXXL_VERBOSE("Exception thrown in ~vector()...set_size()");
+                }
             }
         }
         delete _cache;
