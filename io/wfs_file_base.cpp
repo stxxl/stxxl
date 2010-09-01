@@ -24,7 +24,7 @@ const char * wfs_file_base::io_type() const
 
 wfs_file_base::wfs_file_base(
     const std::string & filename,
-    int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode)
+    int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename)
 {
     DWORD dwDesiredAccess = 0;
     DWORD dwShareMode = 0;
@@ -134,6 +134,12 @@ void wfs_file_base::set_size(offset_type newsize)
             stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
                                      " newsize=" << newsize << " ", io_error);
     }
+}
+
+void wfs_file_base::remove()
+{
+	close();
+	::DeleteFile(filename.c_str());
 }
 
 __STXXL_END_NAMESPACE

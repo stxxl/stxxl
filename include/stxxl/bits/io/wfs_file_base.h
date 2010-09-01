@@ -38,6 +38,7 @@ protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode
+    const std::string filename;
     wfs_file_base(const std::string & filename, int mode);
     offset_type _size();
     void close();
