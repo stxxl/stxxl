@@ -1156,7 +1156,7 @@ namespace stream
                     fill_current_block();
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-                    assert(stxxl::is_sorted(current_block->elem, current_block->elem + current_block->size, cmp));
+                    assert(stxxl::is_sorted(current_block->elem, current_block->elem + STXXL_MIN<size_type>(elements_remaining, current_block->size), cmp));
                     assert(!cmp(current_block->elem[0], current_value));
 #endif //STXXL_CHECK_ORDER_IN_SORTS
                     current_value = current_block->elem[0];
