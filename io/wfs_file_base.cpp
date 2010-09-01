@@ -123,16 +123,16 @@ void wfs_file_base::set_size(offset_type newsize)
 
     if (!(mode_ & RDONLY))
     {
-    LARGE_INTEGER desired_pos;
-    desired_pos.QuadPart = newsize;
+        LARGE_INTEGER desired_pos;
+        desired_pos.QuadPart = newsize;
 
-    if (!SetFilePointerEx(file_des, desired_pos, NULL, FILE_BEGIN))
-        stxxl_win_lasterror_exit("SetFilePointerEx in wfs_file_base::set_size(..) oldsize=" << cur_size <<
-                                 " newsize=" << newsize << " ", io_error);
+        if (!SetFilePointerEx(file_des, desired_pos, NULL, FILE_BEGIN))
+            stxxl_win_lasterror_exit("SetFilePointerEx in wfs_file_base::set_size(..) oldsize=" << cur_size <<
+                                     " newsize=" << newsize << " ", io_error);
 
-    if (!SetEndOfFile(file_des))
-        stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
-                                 " newsize=" << newsize << " ", io_error);
+        if (!SetEndOfFile(file_des))
+            stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
+                                     " newsize=" << newsize << " ", io_error);
     }
 }
 

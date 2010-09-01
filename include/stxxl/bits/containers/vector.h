@@ -1013,7 +1013,7 @@ public:
     //! \brief Construct vector from a file
     //! \param from file to be constructed from
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
-    //! The block size of the vector must me a multiple of the element size
+    //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(Tp_) and the page size (4096).
     vector(file * from, size_type size = size_type(-1)) :
         _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
