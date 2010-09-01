@@ -112,7 +112,7 @@ int main()
     // HERE streaming part begins (streamifying)
     // create input stream
 #ifdef BOOST_MSVC
-    typedef stxxl::stream::streamify_traits<input_array_type::iterator>::stream_type input_stream_type;
+    typedef stxxl::stream::streamify_traits<array_type::iterator>::stream_type input_stream_type;
 #else
     typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
 #endif
