@@ -113,6 +113,8 @@ void wfs_file_base::set_size(offset_type newsize)
     scoped_mutex_lock fd_lock(fd_mutex);
     offset_type cur_size = _size();
 
+    if (!(mode_ & RDONLY))
+    {
     LARGE_INTEGER desired_pos;
     desired_pos.QuadPart = newsize;
 
@@ -123,6 +125,7 @@ void wfs_file_base::set_size(offset_type newsize)
     if (!SetEndOfFile(file_des))
         stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
                                  " newsize=" << newsize << " ", io_error);
+    }
 }
 
 __STXXL_END_NAMESPACE
