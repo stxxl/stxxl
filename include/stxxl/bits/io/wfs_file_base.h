@@ -21,7 +21,7 @@
 
 #ifdef BOOST_MSVC
 
-#include <stxxl/bits/io/disk_queued_file.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
 #include <windows.h>
 
@@ -40,6 +40,7 @@ protected:
     int mode_;             // open mode
     wfs_file_base(const std::string & filename, int mode);
     offset_type _size();
+    void close();
 
 public:
     ~wfs_file_base();
@@ -47,6 +48,7 @@ public:
     void set_size(offset_type newsize);
     void lock();
     const char * io_type() const;
+    void remove();
 };
 
 //! \}

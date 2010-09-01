@@ -31,13 +31,13 @@ wfs_file_base::wfs_file_base(
     DWORD dwCreationDisposition = 0;
     DWORD dwFlagsAndAttributes = 0;
 
- #ifndef STXXL_DIRECT_IO_OFF
+#ifndef STXXL_DIRECT_IO_OFF
     if (mode & DIRECT)
     {
         dwFlagsAndAttributes |= FILE_FLAG_NO_BUFFERING;
         // TODO: try also FILE_FLAG_WRITE_THROUGH option ?
     }
- #endif
+#endif
 
     if (mode & RDONLY)
     {
@@ -60,7 +60,6 @@ wfs_file_base::wfs_file_base(
         // ignored
     }
 
-
     if (mode & TRUNC)
     {
         dwCreationDisposition |= TRUNCATE_EXISTING;
@@ -79,7 +78,16 @@ wfs_file_base::wfs_file_base(
 
 wfs_file_base::~wfs_file_base()
 {
+    close();
+}
+
+void wfs_file_base::close()
+{
     scoped_mutex_lock fd_lock(fd_mutex);
+
+    if (file_des == INVALID_HANDLE_VALUE)
+        return;
+
     if (!CloseHandle(file_des))
         stxxl_win_lasterror_exit("closing file (call of ::CloseHandle) ", io_error);
 
