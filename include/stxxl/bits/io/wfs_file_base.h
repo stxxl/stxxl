@@ -39,6 +39,7 @@ protected:
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode
     const std::string filename;
+    offset_type bytes_per_sector;
     wfs_file_base(const std::string & filename, int mode);
     offset_type _size();
     void close();
