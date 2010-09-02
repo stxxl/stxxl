@@ -27,7 +27,11 @@ void syscall_file::serve(const request * req) throw (io_error)
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
+#ifdef BOOST_MSVC
+    if (::_lseeki64(file_des, offset, SEEK_SET) < 0)
+#else
     if (::lseek(file_des, offset, SEEK_SET) < 0)
+#endif
     {
         STXXL_THROW2(io_error,
                      " this=" << this <<
