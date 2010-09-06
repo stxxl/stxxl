@@ -591,6 +591,21 @@ namespace stream
     }
 
 
+    //! \brief Reads stream content and discards it.
+    //! Useful where you do not need the processed stream anymore,
+    //! but are just interested in side effects, or just for debugging.
+    //! \param in input stream
+    template <class StreamAlgorithm_>
+    void discard(StreamAlgorithm_ & in)
+    {
+        while (!in.empty())
+        {
+            *in;
+            ++in;
+        }
+    }
+
+
     ////////////////////////////////////////////////////////////////////////
     //     GENERATE                                                       //
     ////////////////////////////////////////////////////////////////////////
