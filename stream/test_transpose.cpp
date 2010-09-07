@@ -14,6 +14,11 @@
 //! This is an example of how to use some basic algorithms from the
 //! stream package. The example transposes a 2D-matrix which is serialized
 //! as an 1D-vector.
+//!
+//! This transpose implementation is trivial, not neccessarily fast or
+//! efficient. There are more sophisticated and faster algorithms for external
+//! memory matrix transpostion than sorting, see e.g. J.S. Vitter: Algorithms
+//! and Data Structures for External Memory, Chapter 7.2.
 
 #include <limits>
 #include <vector>
@@ -92,10 +97,19 @@ void dump_upper_left(const Vector & v, unsigned rows, unsigned cols, unsigned nx
 
 int main()
 {
-    typedef stxxl::VECTOR_GENERATOR<unsigned>::result array_type;
-
     unsigned num_cols = 10000;
     unsigned num_rows = 5000;
+
+    // buffers for streamify and materialize,
+    // block size matches the block size of the input/output vector
+    unsigned numbuffers = 2 * stxxl::config::get_instance()->disks_number();
+
+    // RAM to be used for sorting (in bytes)
+    size_t memory_for_sorting = 1 << 28;
+
+    ///////////////////////////////////////////////////////////////////////
+
+    typedef stxxl::VECTOR_GENERATOR<unsigned>::result array_type;
 
     array_type input(num_rows * num_cols);
     array_type output(num_cols * num_rows);
@@ -116,7 +130,7 @@ int main()
 #else
     typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
 #endif
-    input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
+    input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end(), numbuffers);
 
     // create stream of destination indices
     typedef streamop_matrix_transpose destination_index_stream_type;
@@ -129,14 +143,14 @@ int main()
     // sort tuples by first entry (key)
     typedef cmp_tuple_first<tuple_stream_type::value_type> cmp_type;
     typedef stxxl::stream::sort<tuple_stream_type, cmp_type> sorted_tuple_stream_type;
-    sorted_tuple_stream_type sorted_tuple_stream(tuple_stream, cmp_type(), 1 << 28);
+    sorted_tuple_stream_type sorted_tuple_stream(tuple_stream, cmp_type(), memory_for_sorting);
 
     // discard the key we used for sorting, keep second entry of the tuple only (value)
     typedef stxxl::stream::choose<sorted_tuple_stream_type, 2> sorted_element_stream_type;
     sorted_element_stream_type sorted_element_stream(sorted_tuple_stream);
 
     // HERE streaming part ends (materializing)
-    array_type::iterator o = stxxl::stream::materialize(sorted_element_stream, output.begin(), output.end());
+    array_type::iterator o = stxxl::stream::materialize(sorted_element_stream, output.begin(), output.end(), numbuffers);
     assert(o == output.end());
     assert(sorted_element_stream.empty());
 
