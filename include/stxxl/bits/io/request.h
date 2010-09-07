@@ -303,10 +303,10 @@ public:
     request * get() const { return ptr; }
 
     //! \brief Returns true if object is initialized
-    bool valid() const { return ptr; }
+    bool valid() const { return ptr != NULL; }
 
     //! \brief Returns true if object is not initialized
-    bool empty() const { return !ptr; }
+    bool empty() const { return ptr == NULL; }
 };
 
 //! \brief Collection of functions to track statuses of a number of requests
