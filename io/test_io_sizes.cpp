@@ -39,7 +39,7 @@ int main(int argc, char ** argv)
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
     for (stxxl::unsigned_type size = 4096 ; size < max_size; size *= 2)
     {
-    	STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << " bytes are written at once" << std::endl);
+        STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being written at once" << std::endl);
         req = file->awrite(buffer, 0, size, stxxl::default_completion_handler());
         wait_all(&req, 1);
     }
