@@ -63,7 +63,7 @@ void syscall_file::serve(const request * req) throw (io_error)
 								 " offset=" << offset <<
 								 " buffer=" << buffer <<
 								 " bytes=" << bytes <<
-								 " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+								 " type=" << "READ");
 				}
 				bytes -= rc;
 				offset += rc;
@@ -83,7 +83,7 @@ void syscall_file::serve(const request * req) throw (io_error)
 								 " offset=" << offset <<
 								 " buffer=" << buffer <<
 								 " bytes=" << bytes <<
-								 " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+								 " type=" << "WRITE");
 				}
 				bytes -= rc;
 				offset += rc;
