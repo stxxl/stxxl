@@ -411,7 +411,8 @@ namespace hash_map
         node_type * node_;
         size_type i_external_;
 
-        HashedValue() { }
+        HashedValue() : i_bucket_(-1)
+        { }
 
         HashedValue(const value_type & value, size_type i_bucket, source_type src, node_type * node, size_type i_external) :
             value_(value),
