@@ -82,6 +82,11 @@ test_io.$(EXEEXT): test_io.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_io.cpp
 	$(LINKER) test_io.$(OBJEXT) $(OUT)test_io.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_io_sizes: test_io_sizes.$(EXEEXT)
+test_io_sizes.$(EXEEXT): test_io_sizes.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_io_sizes.cpp
+	$(LINKER) test_io_sizes.$(OBJEXT) $(OUT)test_io_sizes.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 test_cancel: test_cancel.$(EXEEXT)
 test_cancel.$(EXEEXT): test_cancel.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_cancel.cpp
