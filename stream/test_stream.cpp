@@ -121,6 +121,17 @@ struct cmp_int : std::binary_function<int, int, bool>
     }
 };
 
+template<typename T>
+struct identity : std::unary_function<T, T>
+{
+	typedef T value_type;
+
+	const T& operator()(const T& t)
+	{
+		return t;
+	}
+};
+
 int main()
 {
     input_array_type input;
@@ -163,8 +174,8 @@ int main()
     typedef stxxl::stream::runs_creator<tuple_stream_type, cmp_type, block_size> runs_creator_stream_type;
     runs_creator_stream_type runs_creator_stream(tuple_stream, cmp_type(), 128 * 1024);
     // 2. merge runs
-    typedef stxxl::stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type> runs_merger_stream_type;
-    runs_merger_stream_type sorted_stream(runs_creator_stream.result(), cmp_type(), 128 * 1024);
+    typedef stxxl::stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type> sorted_stream_type;
+    sorted_stream_type sorted_stream(runs_creator_stream.result(), cmp_type(), 128 * 1024);
 #else
     // sort tuples by character
     // (combination of the previous two steps in one algorithm: form runs and merge)
@@ -172,8 +183,12 @@ int main()
     sorted_stream_type sorted_stream(tuple_stream, cmp_type(), 128 * 1024);
 #endif
 
+    typedef stxxl::stream::transform<identity<stxxl::tuple<char, int> >, sorted_stream_type> transformed_stream_type;
+    identity<stxxl::tuple<char, int> > id;
+    transformed_stream_type transformed_stream(id, sorted_stream);
+
     // HERE streaming part ends (materializing)
-    output_array_type::iterator o = stxxl::stream::materialize(sorted_stream, output.begin(), output.end());
+    output_array_type::iterator o = stxxl::stream::materialize(transformed_stream, output.begin(), output.end());
     // or materialize(sorted_stream,output.begin());
     assert(o == output.end());
 
