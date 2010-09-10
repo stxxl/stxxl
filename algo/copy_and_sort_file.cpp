@@ -102,7 +102,7 @@ int main(int argc, char ** argv)
     output.resize(input.size());
 
 #ifdef BOOST_MSVC
-    typedef streamify_traits<vector_type::iterator>::stream_type input_stream_type;
+    typedef stxxl::stream::streamify_traits<vector_type::iterator>::stream_type input_stream_type;
 #else
     typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
 #endif
