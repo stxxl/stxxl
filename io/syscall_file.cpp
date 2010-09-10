@@ -27,70 +27,70 @@ void syscall_file::serve(const request * req) throw (io_error)
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
-	stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
     while (bytes > 0)
     {
 #ifdef BOOST_MSVC
-    	if (::_lseeki64(file_des, offset, SEEK_SET) < 0)
+        if (::_lseeki64(file_des, offset, SEEK_SET) < 0)
 #else
         if (::lseek(file_des, offset, SEEK_SET) < 0)
 #endif
-		{
-			STXXL_THROW2(io_error,
-						 " this=" << this <<
-						 " call=::lseek(fd,offset,SEEK_SET)" <<
-						 " fd=" << file_des <<
-						 " offset=" << offset <<
-						 " buffer=" << buffer <<
-						 " bytes=" << bytes <<
-						 " type=" << ((type == request::READ) ? "READ" : "WRITE"));
-		}
-		else
-		{
-			int_type rc;
+        {
+            STXXL_THROW2(io_error,
+                         " this=" << this <<
+                         " call=::lseek(fd,offset,SEEK_SET)" <<
+                         " fd=" << file_des <<
+                         " offset=" << offset <<
+                         " buffer=" << buffer <<
+                         " bytes=" << bytes <<
+                         " type=" << ((type == request::READ) ? "READ" : "WRITE"));
+        }
+        else
+        {
+            int_type rc;
 
-			if (type == request::READ)
-			{
-				STXXL_DEBUGMON_DO(io_started(buffer));
+            if (type == request::READ)
+            {
+                STXXL_DEBUGMON_DO(io_started(buffer));
 
-				if ((rc = ::read(file_des, buffer, bytes)) <= 0)
-				{
-					STXXL_THROW2(io_error,
-								 " this=" << this <<
-								 " call=::read(fd,buffer,bytes)" <<
-								 " fd=" << file_des <<
-								 " offset=" << offset <<
-								 " buffer=" << buffer <<
-								 " bytes=" << bytes <<
-								 " type=" << "READ");
-				}
-				bytes -= rc;
-				offset += rc;
+                if ((rc = ::read(file_des, buffer, bytes)) <= 0)
+                {
+                    STXXL_THROW2(io_error,
+                                 " this=" << this <<
+                                 " call=::read(fd,buffer,bytes)" <<
+                                 " fd=" << file_des <<
+                                 " offset=" << offset <<
+                                 " buffer=" << buffer <<
+                                 " bytes=" << bytes <<
+                                 " type=" << "READ");
+                }
+                bytes -= rc;
+                offset += rc;
 
-				STXXL_DEBUGMON_DO(io_finished(buffer));
-			}
-			else
-			{
-				STXXL_DEBUGMON_DO(io_started(buffer));
+                STXXL_DEBUGMON_DO(io_finished(buffer));
+            }
+            else
+            {
+                STXXL_DEBUGMON_DO(io_started(buffer));
 
-				if ((rc = ::write(file_des, buffer, bytes)) <= 0)
-				{
-					STXXL_THROW2(io_error,
-								 " this=" << this <<
-								 " call=::write(fd,buffer,bytes)" <<
-								 " fd=" << file_des <<
-								 " offset=" << offset <<
-								 " buffer=" << buffer <<
-								 " bytes=" << bytes <<
-								 " type=" << "WRITE");
-				}
-				bytes -= rc;
-				offset += rc;
+                if ((rc = ::write(file_des, buffer, bytes)) <= 0)
+                {
+                    STXXL_THROW2(io_error,
+                                 " this=" << this <<
+                                 " call=::write(fd,buffer,bytes)" <<
+                                 " fd=" << file_des <<
+                                 " offset=" << offset <<
+                                 " buffer=" << buffer <<
+                                 " bytes=" << bytes <<
+                                 " type=" << "WRITE");
+                }
+                bytes -= rc;
+                offset += rc;
 
-				STXXL_DEBUGMON_DO(io_finished(buffer));
-			}
-		}
+                STXXL_DEBUGMON_DO(io_finished(buffer));
+            }
+        }
     }
 }
 
