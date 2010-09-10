@@ -101,7 +101,11 @@ int main(int argc, char ** argv)
     vector_type output(&out_file);
     output.resize(input.size());
 
+#ifdef BOOST_MSVC
+    typedef streamify_traits<vector_type::iterator>::stream_type input_stream_type;
+#else
     typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
+#endif
     input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
 
     typedef Cmp comparator_type;
