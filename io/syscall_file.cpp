@@ -23,7 +23,7 @@ void syscall_file::serve(const request * req) throw (io_error)
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
+    char * buffer = static_cast<char *>(req->get_buffer());
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
@@ -67,6 +67,7 @@ void syscall_file::serve(const request * req) throw (io_error)
                 }
                 bytes -= rc;
                 offset += rc;
+                buffer += rc;
 
                 STXXL_DEBUGMON_DO(io_finished(buffer));
             }
@@ -87,6 +88,7 @@ void syscall_file::serve(const request * req) throw (io_error)
                 }
                 bytes -= rc;
                 offset += rc;
+                buffer += rc;
 
                 STXXL_DEBUGMON_DO(io_finished(buffer));
             }
