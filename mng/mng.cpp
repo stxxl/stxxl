@@ -135,16 +135,6 @@ void config::init(const char * config_path)
 }
 
 
-class FileCreator
-{
-public:
-    virtual stxxl::file * create(const std::string & io_impl,
-                                 const std::string & filename,
-                                 int options, int physical_device_id, int allocator_id);
-
-    virtual ~FileCreator() { }
-};
-
 file * FileCreator::create(const std::string & io_impl,
                            const std::string & filename,
                            int options, int physical_device_id, int allocator_id)
@@ -236,7 +226,6 @@ file * FileCreator::create(const std::string & io_impl,
 
 block_manager::block_manager()
 {
-    FileCreator fc;
     debugmon::get_instance();
     config * cfg = config::get_instance();
 
@@ -246,7 +235,7 @@ block_manager::block_manager()
 
     for (unsigned i = 0; i < ndisks; i++)
     {
-        disk_files[i] = fc.create(cfg->disk_io_impl(i),
+        disk_files[i] = FileCreator::create(cfg->disk_io_impl(i),
                                   cfg->disk_path(i),
                                   file::CREAT | file::RDWR | file::DIRECT,
                                   i,    // physical_device_id
