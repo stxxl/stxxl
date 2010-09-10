@@ -49,7 +49,7 @@ struct BID
 
     bool valid() const
     {
-        return storage;
+        return storage != NULL;
     }
 
     BID(file * s, stxxl::int64 o) : storage(s), offset(o)

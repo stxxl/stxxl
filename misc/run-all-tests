@@ -171,6 +171,7 @@ run stream/test_push_sort
 run stream/test_sorted_runs
 run stream/test_stream
 run stream/test_stream1
+run stream/test_transpose
 
 run io/unittest
 run mng/unittest

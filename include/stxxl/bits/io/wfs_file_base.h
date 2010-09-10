@@ -21,7 +21,7 @@
 
 #ifdef BOOST_MSVC
 
-#include <stxxl/bits/io/disk_queued_file.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
 #include <windows.h>
 
@@ -38,8 +38,11 @@ protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des
     HANDLE file_des;       // file descriptor
     int mode_;             // open mode
+    const std::string filename;
+    offset_type bytes_per_sector;
     wfs_file_base(const std::string & filename, int mode);
     offset_type _size();
+    void close();
 
 public:
     ~wfs_file_base();
@@ -47,6 +50,7 @@ public:
     void set_size(offset_type newsize);
     void lock();
     const char * io_type() const;
+    void remove();
 };
 
 //! \}

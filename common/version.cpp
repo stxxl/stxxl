@@ -16,7 +16,7 @@
 #include <boost/version.hpp>
 #endif
 
-#define STXXL_VERSION_STRING_MA_MI_PL "1.3.0"
+#define STXXL_VERSION_STRING_MA_MI_PL "1.3.1"
 
 // version.defs gets created if a snapshot/beta/rc/release is done
 #ifdef HAVE_VERSION_DEFS
@@ -50,6 +50,8 @@ const char * get_version_string()
 #endif
 #ifdef STXXL_VERSION_STRING_PHASE
            " (" STXXL_VERSION_STRING_PHASE ")"
+#else
+           " (prerelease)"
 #endif
 #ifdef STXXL_VERSION_STRING_COMMENT
            " (" STXXL_VERSION_STRING_COMMENT ")"

@@ -117,7 +117,6 @@ __STXXL_END_NAMESPACE
 
 #define stxxl_win_lasterror_exit(errmsg, exception_type) \
     { \
-        TCHAR szBuf[80]; \
         LPVOID lpMsgBuf; \
         DWORD dw = GetLastError(); \
         FormatMessage( \

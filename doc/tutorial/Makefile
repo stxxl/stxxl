@@ -9,11 +9,10 @@ ifeq (,$(LU_UTILS))
 # if LaTeX.mk is not available, fallback to our own rules
 
 tutorial.pdf: tutorial.tex tutorial.bib
-	latex tutorial
+	pdflatex tutorial
 	bibtex tutorial
-	latex tutorial
-	latex tutorial
-	dvipdf tutorial
+	pdflatex tutorial
+	pdflatex tutorial
 
 clean:
 	rm -rf *.bbl *.aux *~ *.dvi *.log *.toc *.blg *.idx
@@ -26,10 +25,10 @@ distclean: clean
 else
 # automatically generate .pdf versions of the figures, needed by pdflatex
 
-tutorial.pdf: logo1.pdf vector.pdf
+tutorial.pdf: layer_diagram.pdf vector.pdf
 
 clean::
-	$(RM) logo1.pdf vector.pdf
+	$(RM) layer_diagram.pdf vector.pdf
 
 endif
 

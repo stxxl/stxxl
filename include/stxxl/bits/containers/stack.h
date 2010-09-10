@@ -790,28 +790,27 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
 //! \brief Stack type generator
 
-//! Template parameters:
-//!  - \c ValTp type of contained objects (POD with no references to internal memory)
-//!  - \c Externality one of
+//!  \tparam ValTp type of contained objects (POD with no references to internal memory)
+//!  \tparam Externality one of
 //!    - \c external , \b external container, implementation is chosen according
 //!      to \c Behaviour parameter, is default
 //!    - \c migrating , migrates from internal implementation given by \c IntStackTp parameter
 //!      to external implementation given by \c Behaviour parameter when size exceeds \c MigrCritSize
 //!    - \c internal , choses \c IntStackTp implementation
-//!  - \c Behaviour ,  choses \b external implementation, one of:
+//!  \tparam Behaviour chooses \b external implementation, one of:
 //!    - \c normal , conservative version, implemented in \c stxxl::normal_stack , is default
 //!    - \c grow_shrink , efficient version, implemented in \c stxxl::grow_shrink_stack
 //!    - \c grow_shrink2 , efficient version, implemented in \c stxxl::grow_shrink_stack2
-//!  - \c BlocksPerPage defines how many blocks has one page of internal cache of an
+//!  \tparam BlocksPerPage defines how many blocks has one page of internal cache of an
 //!       \b external implementation, default is four. All \b external implementations have
 //!       \b two pages.
-//!  - \c BlkSz external block size in bytes, default is 2 MiB
-//!  - \c IntStackTp type of internal stack used for some implementations
-//!  - \c MigrCritSize threshold value for number of elements when
+//!  \tparam BlkSz external block size in bytes, default is 2 MiB
+//!  \tparam IntStackTp type of internal stack used for some implementations
+//!  \tparam MigrCritSize threshold value for number of elements when
 //!    \c stxxl::migrating_stack migrates to the external memory
-//!  - \c AllocStr one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+//!  \tparam  AllocStr one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
 //!    default is RC
-//!  - \c SzTp size type, default is \c stxxl::int64
+//!  \tparam SzTp size type, default is \c stxxl::int64
 //!
 //! Configured stack type is available as \c STACK_GENERATOR<>::result. <BR> <BR>
 //! Examples:

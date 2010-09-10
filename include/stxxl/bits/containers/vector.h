@@ -713,14 +713,14 @@ public:
 //! \brief External vector container
 
 //! For semantics of the methods see documentation of the STL std::vector
-//! Template parameters:
-//!  - \c Tp_ type of contained objects (POD with no references to internal memory)
-//!  - \c PgSz_ number of blocks in a page
-//!  - \c PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages,
+//! \tparam Tp_ type of contained objects (POD with no references to internal memory)
+//! \tparam PgSz_ number of blocks in a page
+//! \tparam PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages,
 //!  default is \c lru_pager<8>
-//!  - \c BlkSize_ external block size in bytes, default is 2 MiB
-//!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
-//!  default is RC <BR>
+//! \tparam BlkSize_ external block size in bytes, default is 2 MiB
+//! \tparam AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+//!  default is RC
+//!
 //! Memory consumption: BlkSize_*x*PgSz_ bytes
 //! \warning Do not store references to the elements of an external vector. Such references
 //! might be invalidated during any following access to elements of the vector
@@ -787,7 +787,7 @@ private:
     config * cfg;
     bool exported;
 
-    size_type size_from_file_length(stxxl::uint64 file_length)
+    size_type size_from_file_length(stxxl::uint64 file_length) const
     {
         stxxl::uint64 blocks_fit = file_length / stxxl::uint64(block_type::raw_size);
         size_type cur_size = blocks_fit * stxxl::uint64(block_type::size);
@@ -795,7 +795,7 @@ private:
         return (cur_size + rest / stxxl::uint64(sizeof(value_type)));
     }
 
-    stxxl::uint64 file_length()
+    stxxl::uint64 file_length() const
     {
         typedef stxxl::uint64 file_size_type;
         size_type cur_size = size();
@@ -1013,7 +1013,7 @@ public:
     //! \brief Construct vector from a file
     //! \param from file to be constructed from
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
-    //! The block size of the vector must me a multiple of the element size
+    //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(Tp_) and the page size (4096).
     vector(file * from, size_type size = size_type(-1)) :
         _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
@@ -1029,7 +1029,7 @@ public:
         if (!block_type::has_only_data)
         {
             std::ostringstream str_;
-            str_ << "The block size for a vector that is mapped to a file must me a multiple of the element size (" <<
+            str_ << "The block size for a vector that is mapped to a file must be a multiple of the element size (" <<
             sizeof(value_type) << ") and the page size (4096).";
             throw std::runtime_error(str_.str());
         }
@@ -1219,7 +1219,14 @@ public:
                 STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
                                                                    << file_length());
                 STXXL_VERBOSE1("~vector(): size of the vector is " << size());
-                _from->set_size(file_length());
+                try
+                {
+                    _from->set_size(file_length());
+                }
+                catch (...)
+                {
+                    STXXL_VERBOSE("Exception thrown in ~vector()...set_size()");
+                }
             }
         }
         delete _cache;
@@ -1588,14 +1595,13 @@ bool is_sorted(
 
 //! \brief External vector type generator
 
-//! Parameters:
-//!  - \c Tp_ type of contained objects (POD with no references to internal memory)
-//!  - \c PgSz_ number of blocks in a page
-//!  - \c Pages_ number of pages
-//!  - \c BlkSize_ external block size in bytes, default is 2 MiB
-//!  - \c AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+//!  \tparam Tp_ type of contained objects (POD with no references to internal memory)
+//!  \tparam PgSz_ number of blocks in a page
+//!  \tparam Pages_ number of pages
+//!  \tparam BlkSize_ external block size in bytes, default is 2 MiB
+//!  \tparam AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
 //!  default is RC
-//!  - \c Pager_ pager type:
+//!  \tparam Pager_ pager type:
 //!    - \c random ,
 //!    - \c lru , is default
 //!

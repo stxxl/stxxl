@@ -44,19 +44,29 @@ ufs_file_base::ufs_file_base(
 #endif
 
     if (mode & RDONLY)
+    {
         flags |= O_RDONLY;
+    }
 
     if (mode & WRONLY)
+    {
         flags |= O_WRONLY;
+    }
 
     if (mode & RDWR)
+    {
         flags |= O_RDWR;
+    }
 
     if (mode & CREAT)
+    {
         flags |= O_CREAT;
+    }
 
     if (mode & TRUNC)
+    {
         flags |= O_TRUNC;
+    }
 
 #ifdef BOOST_MSVC
     flags |= O_BINARY;                     // the default in MS is TEXT mode
@@ -79,17 +89,15 @@ ufs_file_base::~ufs_file_base()
 
 void ufs_file_base::close()
 {
-    if (file_des != -1)
-    {
-        scoped_mutex_lock fd_lock(fd_mutex);
-        int res = ::close(file_des);
+    scoped_mutex_lock fd_lock(fd_mutex);
 
-        // if successful, reset file descriptor
-        if (res >= 0)
-            file_des = -1;
-        else
-            stxxl_function_error(io_error);
-    }
+    if (file_des == -1)
+        return;
+
+    if (::close(file_des) < 0)
+        stxxl_function_error(io_error);
+
+    file_des = -1;
 }
 
 void ufs_file_base::lock()
@@ -110,8 +118,13 @@ void ufs_file_base::lock()
 
 file::offset_type ufs_file_base::_size()
 {
+#ifdef BOOST_MSVC
+    struct _stat64 st;
+    stxxl_check_ge_0(_fstat64(file_des, &st), io_error);
+#else
     struct stat st;
     stxxl_check_ge_0(::fstat(file_des, &st), io_error);
+#endif
     return st.st_size;
 }
 

@@ -397,9 +397,8 @@ public:
 //! It is an adaptor of the \c VectorType.
 //! The implementation wraps the elements around
 //! the end of the \c VectorType circularly.
-//! Template parameters:
-//! - \c T type of the contained objects (POD with no references to internal memory)
-//! - \c VectorType the type of the underlying vector container,
+//! \tparam T type of the contained objects (POD with no references to internal memory)
+//! \tparam VectorType the type of the underlying vector container,
 //! the default is \c stxxl::vector<T>
 template <class T, class VectorType = stxxl::vector<T> >
 class deque : private noncopyable
