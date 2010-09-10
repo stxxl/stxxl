@@ -81,6 +81,8 @@ $(call reduce_optimization,3,0,btree/test_btree,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,0,btree/test_btree,gcc_version_4.2,32-bit,any)
 $(call reduce_optimization,3,0,btree/test_const_scan,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,1,btree/test_const_scan,gcc_version_4.2,32-bit,any)
+$(call reduce_optimization,3,0,hash_map/test_block_cache,gcc_version_4.2,64-bit,any)
+$(call reduce_optimization,3,0,hash_map/test_block_cache,gcc_version_4.2,32-bit,any)
 else
 $(call reduce_optimization,3,0,berkeley_db_benchmark,gcc_version_4.2,64-bit,any)
 $(call reduce_optimization,3,0,berkeley_db_benchmark,gcc_version_4.2,32-bit,any)
