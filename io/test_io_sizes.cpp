@@ -33,8 +33,9 @@ int main(int argc, char ** argv)
 
     stxxl::file* file
 	    = stxxl::FileCreator::create(argv[1], argv[2], file::CREAT | file::RDWR | file::DIRECT);
-    stxxl::request_ptr req;
+    file->set_size(max_size);
 
+    stxxl::request_ptr req;
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
     for (stxxl::uint64 size = 4096 ; size < max_size; size *= 2)
     {
