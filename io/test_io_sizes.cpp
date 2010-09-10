@@ -12,6 +12,7 @@
 
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
+#include <stxxl/bits/mng/mng.h>
 
 //! \example io/test_io_size.cpp
 //! This tests the maximum chunk size that a file type can handle with a single request.
@@ -20,19 +21,18 @@ using stxxl::file;
 
 int main(int argc, char ** argv)
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        std::cout << "Usage: " << argv[0] << " tempdir maxsize" << std::endl;
+        std::cout << "Usage: " << argv[0] << "filetype tempfile maxsize" << std::endl;
         return -1;
     }
 
-    stxxl::uint64 max_size = stxxl::atoint64(argv[2]);
+    stxxl::uint64 max_size = stxxl::atoint64(argv[3]);
     char * buffer = (char *)stxxl::aligned_alloc<4096>(max_size);
     memset(buffer, 0, max_size);
 
-    std::string tempfilename = std::string(argv[1]) + "/test_io_sizes.dat";
-    stxxl::file* file;
-    file = new stxxl::syscall_file(tempfilename, file::CREAT | file::RDWR | file::DIRECT, 1);
+    stxxl::file* file
+	    = stxxl::FileCreator::create(argv[1], argv[2], file::CREAT | file::RDWR | file::DIRECT);
     stxxl::request_ptr req;
 
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
@@ -46,7 +46,9 @@ int main(int argc, char ** argv)
 
     stxxl::aligned_dealloc<4096>(buffer);
 
-    unlink(tempfilename.c_str());
+    file->remove();
+
+    delete file;
 
     return 0;
 }
