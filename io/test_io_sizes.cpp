@@ -27,9 +27,9 @@ int main(int argc, char ** argv)
         return -1;
     }
 
-    stxxl::uint64 max_size = stxxl::atoint64(argv[3]);
-    char * buffer = (char *)stxxl::aligned_alloc<4096>(max_size);
-    memset(buffer, 0, max_size);
+    using stxxl::uint64;
+    uint64 max_size = stxxl::atoint64(argv[3]);
+    uint64 * buffer = (uint64 *)stxxl::aligned_alloc<4096>(max_size);
 
     stxxl::file* file
 	    = stxxl::FileCreator::create(argv[1], argv[2], file::CREAT | file::RDWR | file::DIRECT);
@@ -38,9 +38,36 @@ int main(int argc, char ** argv)
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
     for (stxxl::uint64 size = 4096 ; size < max_size; size *= 2)
     {
-        STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being written at once" << std::endl);
+    	//generate data
+        for (uint64 i = 0; i < size / sizeof(uint64); ++i)
+        	buffer[i] = i;
+
+    	//write
+        STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being written at once");
         req = file->awrite(buffer, 0, size, stxxl::default_completion_handler());
         wait_all(&req, 1);
+
+        //fill with wrong data
+        for (uint64 i = 0; i < size / sizeof(uint64); ++i)
+        	buffer[i] = 0xFFFFFFFFFFFFFFFF;
+
+        //read again
+        STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being read at once");
+        req = file->aread(buffer, 0, size, stxxl::default_completion_handler());
+        wait_all(&req, 1);
+
+        //check
+        bool wrong = false;
+        for (uint64 i = 0; i < size / sizeof(uint64); ++i)
+        	if (buffer[i] != i)
+        	{
+                STXXL_ERRMSG("Read inconsistent data at position " << i * sizeof(uint64));
+                wrong = true;
+        		break;
+        	}
+
+        if (wrong)
+        	break;
     }
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats1;
 
