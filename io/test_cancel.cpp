@@ -35,36 +35,37 @@ int main(int argc, char ** argv)
         return -1;
     }
 
-    const int size = 64 * 1024 * 1024;
+    const stxxl::uint64 size = 64 * 1024 * 1024, num_blocks = 16;
     char * buffer = (char *)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
 
     std::string tempfilename = std::string(argv[1]) + "/test_cancel.dat";
     stxxl::syscall_file file(tempfilename, file::CREAT | file::RDWR | file::DIRECT, 1);
-    stxxl::request_ptr req[16];
+    file.set_size(num_blocks * size);
+    stxxl::request_ptr req[num_blocks];
 
     //without cancellation
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
     unsigned i = 0;
-    for ( ; i < 16; i++)
+    for ( ; i < num_blocks; i++)
         req[i] = file.awrite(buffer, i * size, size, my_handler());
-    wait_all(req, 16);
+    wait_all(req, num_blocks);
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats1;
 
     //with cancellation
     stxxl::stats_data stats2(*stxxl::stats::get_instance());
-    for (unsigned i = 0; i < 16; i++)
+    for (unsigned i = 0; i < num_blocks; i++)
         req[i] = file.awrite(buffer, i * size, size, my_handler());
     //cancel first half
     unsigned num_cancelled = cancel_all(req, req + 8);
     STXXL_MSG("Cancelled " << num_cancelled << " requests.");
     //cancel every second in second half
-    for (unsigned i = 8; i < 16; i += 2)
+    for (unsigned i = num_blocks / 2; i < num_blocks; i += 2)
     {
         if (req[i]->cancel())
             STXXL_MSG("Cancelled request " << &(*(req[i])));
     }
-    wait_all(req, 16);
+    wait_all(req, num_blocks);
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats2;
 
     stxxl::aligned_dealloc<4096>(buffer);
