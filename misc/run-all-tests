@@ -157,6 +157,8 @@ run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
 run algo/sort_file ksort "$STXXL_TMPDIR/sort_file.dat"
 run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
 run algo/sort_file stable_sort "$STXXL_TMPDIR/sort_file.dat"
+run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
+run algo/copy_and_sort_file "$STXXL_TMPDIR/sort_file.dat" "$STXXL_TMPDIR/sorted_file.dat"
 test -n "$WITH_STABLE_KSORT" && run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
 test -n "$WITH_STABLE_KSORT" && run algo/sort_file stable_ksort "$STXXL_TMPDIR/sort_file.dat"
 run algo/test_asch 3 100 1000 42
