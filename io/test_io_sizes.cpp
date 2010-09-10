@@ -18,7 +18,6 @@
 
 using stxxl::file;
 
-
 int main(int argc, char ** argv)
 {
     if (argc < 3)
@@ -27,7 +26,7 @@ int main(int argc, char ** argv)
         return -1;
     }
 
-    stxxl::unsigned_type max_size = atoll(argv[2]);
+    stxxl::uint64 max_size = stxxl::atoint64(argv[2]);
     char * buffer = (char *)stxxl::aligned_alloc<4096>(max_size);
     memset(buffer, 0, max_size);
 
@@ -37,7 +36,7 @@ int main(int argc, char ** argv)
     stxxl::request_ptr req;
 
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
-    for (stxxl::unsigned_type size = 4096 ; size < max_size; size *= 2)
+    for (stxxl::uint64 size = 4096 ; size < max_size; size *= 2)
     {
         STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being written at once" << std::endl);
         req = file->awrite(buffer, 0, size, stxxl::default_completion_handler());
