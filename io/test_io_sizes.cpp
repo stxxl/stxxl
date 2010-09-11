@@ -37,7 +37,7 @@ int main(int argc, char ** argv)
 
     stxxl::request_ptr req;
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
-    for (stxxl::uint64 size = 4096 ; size < max_size; size *= 2)
+    for (uint64 size = 4096 ; size < max_size; size *= 2)
     {
     	//generate data
         for (uint64 i = 0; i < size / sizeof(uint64); ++i)
@@ -50,7 +50,7 @@ int main(int argc, char ** argv)
 
         //fill with wrong data
         for (uint64 i = 0; i < size / sizeof(uint64); ++i)
-        	buffer[i] = 0xFFFFFFFFFFFFFFFF;
+        	buffer[i] = 0xFFFFFFFFFFFFFFFFull;
 
         //read again
         STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being read at once");
