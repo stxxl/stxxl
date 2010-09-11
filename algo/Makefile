@@ -49,7 +49,11 @@ sort_file: sort_file.$(EXEEXT)
 sort_file.$(EXEEXT): sort_file.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c sort_file.cpp
 	$(LINKER)  sort_file.$(OBJEXT) $(OUT)sort_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
-	
+
+copy_and_sort_file: copy_and_sort_file.$(EXEEXT)
+copy_and_sort_file.$(EXEEXT): copy_and_sort_file.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c copy_and_sort_file.cpp
+	$(LINKER) copy_and_sort_file.$(OBJEXT) $(OUT)copy_and_sort_file.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_asch: test_asch.$(EXEEXT)
 test_asch.$(EXEEXT): test_asch.cpp $(DEPENDENCIES)
