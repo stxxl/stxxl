@@ -1,1 +1,47 @@
-a { color: #4d6eb1 }
+/* CSS Document */
+/*----General Style----*/
+body {
+    width: 98%;
+    padding: 15px;
+    margin: 0px;
+    background: #fff;
+    color: #000;
+    font: arial, sans-serif;
+}
+
+div, p, ul, h2, img {
+    padding: 0px;
+    margin: 0px;
+}
+
+/*----Blue Line----*/
+p.whiteOnBlueBold {
+    padding: 3px;
+    background: #4d6eb1;
+    color: #FFFFFF;
+    font-variant: normal;
+    font-weight: bold;
+}
+
+p.whiteOnBlue {
+    padding: 3px;
+    background: #4d6eb1;
+    color: #FFFFFF;
+    font-variant: normal;
+}
+
+p.ordinary {
+    width: 98%;
+    position: relative;
+    padding: 10px;
+    background: #FFFFFF;
+    color: #000;
+    font-variant: inherit;
+    font-weight: normal;
+}
+
+ul.listPoint {
+    list-style-type: square;
+    list-style-position: inside;
+    padding: 7px;
+}
