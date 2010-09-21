@@ -155,7 +155,7 @@ DISKNAME	?= unknown disk
 PLOTXMAX	?= 475
 PLOTYMAX	?= 120
 AVGPLOTYMAX	?= $(PLOTYMAX)
-GNUPLOTFILEINFO	?= set label "$(HOST):$(patsubst $(HOME)/%,\\~/%,$(CURDIR))/" at character 0,-1 font ",6"
+GNUPLOTFILEINFO	?= set label "$(subst _,\\_,$(HOST):$(patsubst $(HOME)/%,\\~/%,$(CURDIR))/)" at character 0,-1 font ",6"
 
 fmt_block_size_2560000B		?= 2.5
 fmt_block_size_12800000B	?= 12.5
