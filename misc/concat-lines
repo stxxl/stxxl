@@ -14,11 +14,12 @@
 
 # Concatenate the lines of file $ARGV[0] which both satisfy regular expression $ARGV[1]
 
-open(INPUT, $ARGV[0]);
+$regex = $ARGV[0];
+shift;
 $former = '';
-while($line = <INPUT>)
+while($line = <>)
 {
-  if(!($line =~ /$ARGV[1]/) || !($former =~ /$ARGV[1]/))
+  if(!($line =~ /$regex/) || !($former =~ /$regex/))
   {
     print("\n");
   }
@@ -31,4 +32,3 @@ while($line = <INPUT>)
   $former = $line;
 }
 print("\n");
-close(INPUT);
