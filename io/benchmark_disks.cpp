@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -50,8 +50,6 @@ using stxxl::timestamp;
 
 //#define WATCH_TIMES
 
-#define CHECK_AFTER_READ 1
-
 
 #ifdef WATCH_TIMES
 void watch_times(request_ptr reqs[], unsigned n, double * out)
@@ -95,7 +93,7 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [nd] [r|w] [--] diskfile..." << std::endl;
+    std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [nd] [r|v|w] [--] diskfile..." << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
     std::cout << "     increase 'batch_size' (default 1)" << std::endl;
@@ -103,7 +101,8 @@ void usage(const char * argv0)
 #ifdef RAW_ACCESS
     std::cout << "    open mode: includes O_DIRECT unless the 'nd' flag is given" << std::endl;
 #endif
-    std::cout << "    ops: write and reread (default), (r)ead only, (w)rite only" << std::endl;
+    std::cout << "    ops: write, reread and check (default); (R)ead only w/o verification;" << std::endl;
+    std::cout << "         read only with (V)erification; (W)rite only" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     std::cout << "    Memory consumption: block_size * batch_size * num_disks" << std::endl;
     exit(-1);
@@ -128,7 +127,7 @@ int main(int argc, char * argv[])
     stxxl::int64 block_size = 0;
     stxxl::int64 batch_size = 0;
 
-    bool do_read = true, do_write = true;
+    bool do_read = true, do_write = true, do_verify = true;
     bool direct_io = true;
     int first_disk_arg = 3;
 
@@ -160,6 +159,10 @@ int main(int argc, char * argv[])
     }
 
     if (first_disk_arg < argc && (strcmp("r", argv[first_disk_arg]) == 0 || strcmp("R", argv[first_disk_arg]) == 0)) {
+        do_write = false;
+        do_verify = false;
+        ++first_disk_arg;
+    } else if (first_disk_arg < argc && (strcmp("v", argv[first_disk_arg]) == 0 || strcmp("V", argv[first_disk_arg]) == 0)) {
         do_write = false;
         ++first_disk_arg;
     } else if (first_disk_arg < argc && (strcmp("w", argv[first_disk_arg]) == 0 || strcmp("W", argv[first_disk_arg]) == 0)) {
@@ -330,7 +333,7 @@ int main(int argc, char * argv[])
             out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
 
-            if (CHECK_AFTER_READ && do_read) {
+            if (do_read && do_verify) {
                 for (unsigned i = 0; i < ndisks * current_step_size_int; i++)
                 {
                     if (buffer[i] != i)
