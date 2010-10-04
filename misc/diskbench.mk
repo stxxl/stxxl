@@ -3,7 +3,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -50,6 +50,7 @@ SHELL		 = bash
 endif
 
 define do-some-disks
+	$(if $(filter ???,$(strip $(BLOCK_SIZE))),$(error ERROR: BLOCK_SIZE=$(strip $(BLOCK_SIZE))))
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
 	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(if $(filter y yes Y YES,$(DIRECT_IO)),,ND) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
@@ -101,6 +102,9 @@ rdx: $(foreach d,$(DISKS_1by1),$(HOST)-$d.rdx.log)
 ex: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 ex+: $(foreach d,$(DISKS),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 sip: $(foreach d,$(DISKS_1by1),$(HOST)-$d.sip.log)
+
+all-sizes:
+	for d in $(wildcard 0016iMB 0064MB 0004MB 0256MB 0001MB 1024MB *MB) ; do make -C $$d cr+ wr ex+ ; done
 
 plot: $(HOST).gnuplot
 	gnuplot $<
