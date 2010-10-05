@@ -56,3 +56,7 @@
 
 * overhead: stream::sorted_runs is copy-initialized from locally created runs
 
+* retry incomplete I/Os for all file types (currently only syscall)
+
+* iostats: add support for splitting I/Os and truncating reads at EOF
+
