@@ -12,7 +12,6 @@
 
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/request_impl_basic.h>
-#include <stxxl/bits/common/debug.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -50,8 +49,6 @@ void syscall_file::serve(const request * req) throw (io_error)
 
         if (type == request::READ)
         {
-            STXXL_DEBUGMON_DO(io_started(buffer));
-
             if ((rc = ::read(file_des, buffer, bytes)) <= 0)
             {
                 STXXL_THROW2(io_error,
@@ -67,13 +64,9 @@ void syscall_file::serve(const request * req) throw (io_error)
             bytes -= rc;
             offset += rc;
             buffer += rc;
-
-            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
         else
         {
-            STXXL_DEBUGMON_DO(io_started(buffer));
-
             if ((rc = ::write(file_des, buffer, bytes)) <= 0)
             {
                 STXXL_THROW2(io_error,
@@ -89,8 +82,6 @@ void syscall_file::serve(const request * req) throw (io_error)
             bytes -= rc;
             offset += rc;
             buffer += rc;
-
-            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
     }
 }
