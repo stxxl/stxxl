@@ -106,11 +106,8 @@ void config::init(const char * config_path)
     disks_props.insert(disks_props.end(), flash_props.begin(), flash_props.end());
 
     if (disks_props.empty())
-    {
         STXXL_THROW(std::runtime_error, "config::config", "No disks found in '" << config_path << "' .");
-    }
-    else
-    {
+
 #ifdef STXXL_VERBOSE_DISKS
         for (std::vector<DiskEntry>::const_iterator it =
                  disks_props.begin(); it != disks_props.end();
@@ -131,7 +128,6 @@ void config::init(const char * config_path)
                   (total_size / (1024 * 1024)) <<
                   " MiB");
 #endif
-    }
 }
 
 
