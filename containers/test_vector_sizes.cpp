@@ -18,34 +18,41 @@ typedef int my_type;
 typedef stxxl::VECTOR_GENERATOR<my_type>::result vector_type;
 typedef vector_type::block_type block_type;
 
-void test(const char * fn, stxxl::unsigned_type sz, my_type ofs)
+void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    {
         stxxl::syscall_file f(fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
         vector_type v(&f);
         v.resize(sz);
         STXXL_MSG("writing " << v.size() << " elements");
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
             v[i] = ofs + i;
-    }
+}
 
-    {
+void test_rdwr(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
+{
         stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
         vector_type v(&f);
         STXXL_MSG("reading " << v.size() << " elements (RDWR)");
         assert(v.size() == sz);
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
             assert(v[i] == ofs + my_type(i));
-    }
+}
 
-    {
+void test_rdonly(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
+{
         stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
         vector_type v(&f);
         STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
         assert(v.size() == sz);
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
             assert(v[i] == ofs + my_type(i));
-    }
+}
+
+void test(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
+{
+    test_write(fn, ft, sz, ofs);
+    test_rdwr(fn, ft, sz, ofs);
+    test_rdonly(fn, ft, sz, ofs);
 }
 
 int main(int argc, char ** argv)
@@ -57,40 +64,44 @@ int main(int argc, char ** argv)
     }
 
     const char * fn = argv[1];
+    const char * ft = "syscall";
 
     // multiple of block size
-    test(argv[1], 4 * block_type::size, 100000000);
+    test(fn, ft, 4 * block_type::size, 100000000);
 
     // multiple of page size, but not block size
-    test(argv[1], 4 * block_type::size + 4096, 200000000);
+    test(fn, ft, 4 * block_type::size + 4096, 200000000);
 
     // multiple of neither block size nor page size
-    test(argv[1], 4 * block_type::size + 4096 + 23, 300000000);
+    test(fn, ft, 4 * block_type::size + 4096 + 23, 300000000);
 
+    // truncate 1 byte
     {
         stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        STXXL_MSG("file size is " << f.size() << " bytes");
         f.set_size(f.size() - 1);
+        STXXL_MSG("truncated to " << f.size() << " bytes");
     }
 
-    {
-        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
-        vector_type v(&f);
-        STXXL_MSG("reading " << v.size() << " elements (RDWR)");
-        for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
-            assert(v[i] == 300000000 + my_type(i));
-    }
+    // will truncate after the last complete element
+    test_rdwr(fn, ft, 4 * block_type::size + 4096 + 23 - 1, 300000000);
 
+    // truncate 1 more byte
     {
         stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        STXXL_MSG("file size is " << f.size() << " bytes");
         f.set_size(f.size() - 1);
+        STXXL_MSG("truncated to " << f.size() << " bytes");
     }
 
+    // will not truncate
+    test_rdonly(fn, ft, 4 * block_type::size + 4096 + 23 - 2, 300000000);
+
+    // check final size
     {
-        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
-        vector_type v(&f);
-        STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
-        for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
-            assert(v[i] == 300000000 + my_type(i));
+        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        STXXL_MSG("file size is " << f.size() << " bytes");
+        assert (f.size() == (4 * block_type::size + 4096 + 23 - 1) * sizeof(my_type) - 1);
     }
 }
 // vim: et:ts=4:sw=4
