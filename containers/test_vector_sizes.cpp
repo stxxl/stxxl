@@ -20,32 +20,41 @@ typedef vector_type::block_type block_type;
 
 void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-        stxxl::syscall_file f(fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
-        vector_type v(&f);
+    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
+    {
+        vector_type v(f);
         v.resize(sz);
         STXXL_MSG("writing " << v.size() << " elements");
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
             v[i] = ofs + i;
+    }
+    delete f;
 }
 
 void test_rdwr(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
-        vector_type v(&f);
+    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+    {
+        vector_type v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDWR)");
         assert(v.size() == sz);
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
             assert(v[i] == ofs + my_type(i));
+    }
+    delete f;
 }
 
 void test_rdonly(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
-        vector_type v(&f);
+    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
+    {
+        vector_type v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
         assert(v.size() == sz);
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
             assert(v[i] == ofs + my_type(i));
+    }
+    delete f;
 }
 
 void test(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
@@ -63,8 +72,14 @@ int main(int argc, char ** argv)
         return -1;
     }
 
+    stxxl::config::get_instance();
+
     const char * fn = argv[1];
     const char * ft = "syscall";
+    if (argc >= 3)
+        ft = argv[2];
+
+    STXXL_MSG("using " << ft << " file");
 
     // multiple of block size
     test(fn, ft, 4 * block_type::size, 100000000);
