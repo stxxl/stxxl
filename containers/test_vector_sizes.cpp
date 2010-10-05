@@ -56,6 +56,8 @@ int main(int argc, char ** argv)
         return -1;
     }
 
+    const char * fn = argv[1];
+
     // multiple of block size
     test(argv[1], 4 * block_type::size, 100000000);
 
@@ -64,5 +66,31 @@ int main(int argc, char ** argv)
 
     // multiple of neither block size nor page size
     test(argv[1], 4 * block_type::size + 4096 + 23, 300000000);
+
+    {
+        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        f.set_size(f.size() - 1);
+    }
+
+    {
+        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        vector_type v(&f);
+        STXXL_MSG("reading " << v.size() << " elements (RDWR)");
+        for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
+            assert(v[i] == 300000000 + my_type(i));
+    }
+
+    {
+        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+        f.set_size(f.size() - 1);
+    }
+
+    {
+        stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
+        vector_type v(&f);
+        STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
+        for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
+            assert(v[i] == 300000000 + my_type(i));
+    }
 }
 // vim: et:ts=4:sw=4
