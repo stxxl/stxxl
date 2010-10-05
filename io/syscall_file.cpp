@@ -64,6 +64,14 @@ void syscall_file::serve(const request * req) throw (io_error)
             bytes -= rc;
             offset += rc;
             buffer += rc;
+
+            if (bytes > 0 && offset == this->_size())
+            {
+                // read request extends past end-of-file
+                // fill reminder with zeroes
+                memset(buffer, 0, bytes);
+                bytes = 0;
+            }
         }
         else
         {
