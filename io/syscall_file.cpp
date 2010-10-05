@@ -41,7 +41,7 @@ void syscall_file::serve(const request * req) throw (io_error)
                          " call=::lseek(fd,offset,SEEK_SET)" <<
                          " fd=" << file_des <<
                          " offset=" << offset <<
-                         " buffer=" << (void*)buffer <<
+                         " buffer=" << (void *)buffer <<
                          " bytes=" << bytes <<
                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                          " rc= " << rc);
@@ -56,7 +56,7 @@ void syscall_file::serve(const request * req) throw (io_error)
                              " call=::read(fd,buffer,bytes)" <<
                              " fd=" << file_des <<
                              " offset=" << offset <<
-                             " buffer=" << (void*)buffer <<
+                             " buffer=" << (void *)buffer <<
                              " bytes=" << bytes <<
                              " type=" << "READ" <<
                              " rc= " << rc);
@@ -82,7 +82,7 @@ void syscall_file::serve(const request * req) throw (io_error)
                              " call=::write(fd,buffer,bytes)" <<
                              " fd=" << file_des <<
                              " offset=" << offset <<
-                             " buffer=" << (void*)buffer <<
+                             " buffer=" << (void *)buffer <<
                              " bytes=" << bytes <<
                              " type=" << "WRITE" <<
                              " rc= " << rc);

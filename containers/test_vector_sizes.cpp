@@ -116,7 +116,7 @@ int main(int argc, char ** argv)
     {
         stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
         STXXL_MSG("file size is " << f.size() << " bytes");
-        assert (f.size() == (4 * block_type::size + 4096 + 23 - 1) * sizeof(my_type) - 1);
+        assert(f.size() == (4 * block_type::size + 4096 + 23 - 1) * sizeof(my_type) - 1);
     }
 }
 // vim: et:ts=4:sw=4

@@ -121,15 +121,15 @@ struct cmp_int : std::binary_function<int, int, bool>
     }
 };
 
-template<typename T>
+template <typename T>
 struct identity : std::unary_function<T, T>
 {
-	typedef T value_type;
+    typedef T value_type;
 
-	const T& operator()(const T& t)
-	{
-		return t;
-	}
+    const T & operator () (const T & t)
+    {
+        return t;
+    }
 };
 
 int main()

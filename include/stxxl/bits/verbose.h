@@ -41,9 +41,9 @@ __STXXL_END_NAMESPACE
 
 #define _STXXL_PRINT(label, message, flags) \
     do { \
-      std::ostringstream str_; \
-      str_ << message; \
-      stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
+        std::ostringstream str_; \
+        str_ << message; \
+        stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
     } while (false)
 
 #define _STXXL_NOT_VERBOSE do { } while (false)
@@ -68,14 +68,14 @@ __STXXL_END_NAMESPACE
 #if STXXL_VERBOSE_LEVEL > -10
  #define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
 #else
- // Please do not report STXXL problems with STXXL_MSG disabled!
+// Please do not report STXXL problems with STXXL_MSG disabled!
  #define STXXL_MSG(x) _STXXL_NOT_VERBOSE
 #endif
 
 #if STXXL_VERBOSE_LEVEL > -100
  #define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", x, _STXXL_PRINT_FLAGS_ERROR)
 #else
- // Please do not report STXXL problems with STXXL_ERRMSG disabled!
+// Please do not report STXXL problems with STXXL_ERRMSG disabled!
  #define STXXL_ERRMSG(x) _STXXL_NOT_VERBOSE
 #endif
 

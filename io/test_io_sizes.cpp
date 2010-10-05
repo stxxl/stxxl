@@ -17,7 +17,6 @@
 //! \example io/test_io_size.cpp
 //! This tests the maximum chunk size that a file type can handle with a single request.
 
-using stxxl::file;
 
 int main(int argc, char ** argv)
 {
@@ -27,30 +26,32 @@ int main(int argc, char ** argv)
         return -1;
     }
 
+    using stxxl::file;
     using stxxl::uint64;
+
     uint64 max_size = stxxl::atoint64(argv[3]);
     uint64 * buffer = (uint64 *)stxxl::aligned_alloc<4096>(max_size);
 
-    stxxl::file* file
-	    = stxxl::FileCreator::create(argv[1], argv[2], file::CREAT | file::RDWR | file::DIRECT);
+    stxxl::file * file
+        = stxxl::FileCreator::create(argv[1], argv[2], file::CREAT | file::RDWR | file::DIRECT);
     file->set_size(max_size);
 
     stxxl::request_ptr req;
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
-    for (uint64 size = 4096 ; size < max_size; size *= 2)
+    for (uint64 size = 4096; size < max_size; size *= 2)
     {
-    	//generate data
+        //generate data
         for (uint64 i = 0; i < size / sizeof(uint64); ++i)
-        	buffer[i] = i;
+            buffer[i] = i;
 
-    	//write
+        //write
         STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being written at once");
         req = file->awrite(buffer, 0, size, stxxl::default_completion_handler());
         wait_all(&req, 1);
 
         //fill with wrong data
         for (uint64 i = 0; i < size / sizeof(uint64); ++i)
-        	buffer[i] = 0xFFFFFFFFFFFFFFFFull;
+            buffer[i] = 0xFFFFFFFFFFFFFFFFull;
 
         //read again
         STXXL_MSG(stxxl::add_IEC_binary_multiplier(size, "B") << "are being read at once");
@@ -60,15 +61,15 @@ int main(int argc, char ** argv)
         //check
         bool wrong = false;
         for (uint64 i = 0; i < size / sizeof(uint64); ++i)
-        	if (buffer[i] != i)
-        	{
+            if (buffer[i] != i)
+            {
                 STXXL_ERRMSG("Read inconsistent data at position " << i * sizeof(uint64));
                 wrong = true;
-        		break;
-        	}
+                break;
+            }
 
         if (wrong)
-        	break;
+            break;
     }
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats1;
 
@@ -80,3 +81,4 @@ int main(int argc, char ** argv)
 
     return 0;
 }
+// vim: et:ts=4:sw=4

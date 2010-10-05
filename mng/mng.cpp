@@ -109,24 +109,20 @@ void config::init(const char * config_path)
         STXXL_THROW(std::runtime_error, "config::config", "No disks found in '" << config_path << "' .");
 
 #ifdef STXXL_VERBOSE_DISKS
-        for (std::vector<DiskEntry>::const_iterator it =
-                 disks_props.begin(); it != disks_props.end();
-             it++)
-        {
-            STXXL_MSG("Disk '" << (*it).path << "' is allocated, space: " <<
-                      ((*it).size) / (1024 * 1024) <<
-                      " MiB, I/O implementation: " << (*it).io_impl);
-        }
+    for (std::vector<DiskEntry>::const_iterator it = disks_props.begin(); it != disks_props.end(); it++)
+    {
+        STXXL_MSG("Disk '" << (*it).path << "' is allocated, space: " <<
+                  ((*it).size) / (1024 * 1024) <<
+                  " MiB, I/O implementation: " << (*it).io_impl);
+    }
 #else
-        int64 total_size = 0;
-        for (std::vector<DiskEntry>::const_iterator it =
-                 disks_props.begin(); it != disks_props.end();
-             it++)
-            total_size += (*it).size;
+    int64 total_size = 0;
+    for (std::vector<DiskEntry>::const_iterator it = disks_props.begin(); it != disks_props.end(); it++)
+        total_size += (*it).size;
 
-        STXXL_MSG("" << disks_props.size() << " disks are allocated, total space: " <<
-                  (total_size / (1024 * 1024)) <<
-                  " MiB");
+    STXXL_MSG("" << disks_props.size() << " disks are allocated, total space: " <<
+              (total_size / (1024 * 1024)) <<
+              " MiB");
 #endif
 }
 
@@ -232,10 +228,10 @@ block_manager::block_manager()
     for (unsigned i = 0; i < ndisks; i++)
     {
         disk_files[i] = FileCreator::create(cfg->disk_io_impl(i),
-                                  cfg->disk_path(i),
-                                  file::CREAT | file::RDWR | file::DIRECT,
-                                  i,    // physical_device_id
-                                  i);   // allocator_id
+                                            cfg->disk_path(i),
+                                            file::CREAT | file::RDWR | file::DIRECT,
+                                            i,  // physical_device_id
+                                            i); // allocator_id
         disk_files[i]->set_size(cfg->disk_size(i));
         disk_allocators[i] = new DiskAllocator(cfg->disk_size(i));
     }

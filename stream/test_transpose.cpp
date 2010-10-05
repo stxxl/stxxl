@@ -35,7 +35,7 @@ public:
     typedef unsigned value_type;
 
     streamop_matrix_transpose(unsigned cut, unsigned repeat) : cut(cut), repeat(repeat), pos(0)
-    { };
+    { }
 
     value_type operator * () const
     {
