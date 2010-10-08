@@ -26,14 +26,13 @@ int main(int argc, char ** argv)
         return -1;
     }
 
-    using stxxl::file;
     using stxxl::uint64;
 
     uint64 max_size = stxxl::atoint64(argv[3]);
     uint64 * buffer = (uint64 *)stxxl::aligned_alloc<4096>(max_size);
 
     stxxl::file * file
-        = stxxl::FileCreator::create(argv[1], argv[2], file::CREAT | file::RDWR | file::DIRECT);
+        = stxxl::FileCreator::create(argv[1], argv[2], stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT);
     file->set_size(max_size);
 
     stxxl::request_ptr req;
