@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <cassert>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/unused.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -360,6 +361,7 @@ void classify_block(type * begin, type * end, type_key * & out, int_type * bucke
         out->key = key;
         bucket[ibucket]++;
     }
+    STXXL_UNUSED(K);
 }
 
 __STXXL_END_NAMESPACE

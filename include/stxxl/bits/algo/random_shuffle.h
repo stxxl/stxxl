@@ -52,6 +52,7 @@ void random_shuffle(ExtIterator_ first,
                     unsigned_type M,
                     AllocStrategy_ AS = STXXL_DEFAULT_ALLOC_STRATEGY())
 {
+    STXXL_UNUSED(AS);  // FIXME: Why is this not being used?
     typedef typename ExtIterator_::value_type value_type;
     typedef typename stxxl::STACK_GENERATOR<value_type, stxxl::external,
                                             stxxl::grow_shrink2, PageSize_,

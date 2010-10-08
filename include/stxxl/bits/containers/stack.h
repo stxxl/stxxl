@@ -733,7 +733,7 @@ public:
     size_type size() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-        return (int_impl) ? int_impl->size() : ext_impl->size();
+        return (int_impl) ? size_type(int_impl->size()) : ext_impl->size();
     }
     value_type & top()
     {
