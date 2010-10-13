@@ -78,8 +78,8 @@ $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
 	$(ECHO) 'set ytics nomirror' >> $@
 	$(ECHO) 'set y2tics' >> $@
 ))
-#	$(ECHO) 'set data style linespoints' >> $@
-	$(ECHO) 'set data style lines' >> $@
+#	$(ECHO) 'set style data linespoints' >> $@
+	$(ECHO) 'set style data lines' >> $@
 	$(ECHO) 'set macros' >> $@
 	$(ECHO) 'set pointsize 0.4' >> $@
 #	$(ECHO) 'set samples 1000' >> $@
@@ -101,7 +101,7 @@ $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
 	$(ECHO) '	"$*.waitlog" using 1:4 title "Wait Read" ls 5 axes x1y2$(comma) \' >> $@
 	$(ECHO) '	"$*.waitlog" using 1:5 title "Wait Write" ls 4 axes x1y2$(comma) \' >> $@
 ))
-	$(ECHO) '	"not.existing.dummy" using 08:15 notitle' >> $@
+	$(ECHO) '	"not.existing.dummy" using 8:15 notitle' >> $@
 )
 $(if $(filter cpu,$1),
 	$(ECHO) 'plot \' >> $@
@@ -110,7 +110,7 @@ $(if $(filter cpu,$1),
 	$(ECHO) '	"$<" using 0:4 title "Wait" ls 2$(comma) \' >> $@
 	$(ECHO) '	"$<" using 0:1 title "User" ls 1$(comma) \' >> $@
 	$(ECHO) '	"$<" using 0:3 title "System" ls 3$(comma) \' >> $@
-	$(ECHO) '	"not.existing.dummy" using 08:15 notitle' >> $@ 
+	$(ECHO) '	"not.existing.dummy" using 8:15 notitle' >> $@ 
 )
 	$(ECHO) '' >> $@
 	$(ECHO) 'pause -1' >> $@
