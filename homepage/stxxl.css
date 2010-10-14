@@ -6,7 +6,7 @@ body {
     margin: 0px;
     background: #fff;
     color: #000;
-    font: arial, sans-serif;
+    font-family: arial, sans-serif;
 }
 
 div, p, ul, h2, img {
