@@ -40,6 +40,6 @@ p.ordinary {
 }
 
 ul.listPoint {
-    list-style-position: inside;
     padding: 7px;
+    margin-left: 15px;
 }
