@@ -56,6 +56,8 @@ IOSTAT_PLOT_IO_WITH_UTILIZATION	?= no
 IOSTAT_PLOT_Y_LABEL.io		?= Bandwidth [MiB/s]
 IOSTAT_PLOT_Y_LABEL.cpu		?= CPU Usage [%]
 
+GNUPLOTFILEINFO			?= set label "$(subst _,\\_,$(HOST):$(patsubst $(HOME)/%,\\~/%,$(CURDIR))/)" at character 0,-1 font ",6"
+
 ECHO				?= echo
 
 # $1 = first, $2 = increment, $3 = last
@@ -117,6 +119,7 @@ $(if $(filter cpu,$1),
 	$(ECHO) '' >> $@
 	$(ECHO) 'set terminal postscript enhanced $(GPLT_COLOR_PS) 10' >> $@
 	$(ECHO) 'set output "$*.$(strip $1).eps"' >> $@
+	$(ECHO) '$(GNUPLOTFILEINFO)' >> $@
 	$(ECHO) 'replot' >> $@
 	$(ECHO) '' >> $@
 endef
