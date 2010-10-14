@@ -34,21 +34,12 @@ p.ordinary {
     width: 98%;
     position: relative;
     padding: 10px;
-    background: #FFFFFF;
     color: #000;
     font-variant: inherit;
     font-weight: normal;
 }
 
 ul.listPoint {
-    list-style-type: square;
     list-style-position: inside;
     padding: 7px;
 }
-
-p.javaScriptPos {
-    position: absolute;
-    right: 31px;
-    top: 345px;
-}
-
