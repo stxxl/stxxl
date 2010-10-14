@@ -108,10 +108,12 @@ $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
 $(if $(filter cpu,$1),
 	$(ECHO) 'plot \' >> $@
 	$(ECHO) '	"$(word 2,$^)" using 0:(100*($$1-$(IOSTAT_PLOT_LOAD_REDUCE))/$(strip $2)) title "Load (100% = $2)" ls 5$(comma) \' >> $@
-	$(ECHO) '	"$<" using 0:($$1+$$3+$$4) title "Total" ls 4$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:($$1+$$2+$$3+$$4) title "Total" ls 4$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:2 title "Nice" ls 6$(comma) \' >> $@
 	$(ECHO) '	"$<" using 0:4 title "Wait" ls 2$(comma) \' >> $@
 	$(ECHO) '	"$<" using 0:1 title "User" ls 1$(comma) \' >> $@
 	$(ECHO) '	"$<" using 0:3 title "System" ls 3$(comma) \' >> $@
+	$(ECHO) '	"$(word 2,$^)" using 0:(100*($$1-$(IOSTAT_PLOT_LOAD_REDUCE))/$(strip $2)) notitle ls 5$(comma) \' >> $@
 	$(ECHO) '	"not.existing.dummy" using 8:15 notitle' >> $@ 
 )
 	$(ECHO) '' >> $@
@@ -130,6 +132,7 @@ endef
 	$(if $(IOSTAT_PLOT_LINE_IGNORE_PATTERN),grep -v '$(IOSTAT_PLOT_LINE_IGNORE_PATTERN)' |) \
 	$(IOSTAT_PLOT_CONCAT_LINES) '$(IOSTAT_PLOT_LINE_IDENTIFIER)' | \
 	grep '$(IOSTAT_PLOT_LINE_IDENTIFIER)' | \
+	tail -n +2 | \
 	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.io) > $@
 
 define per-disk-plot-template
@@ -143,6 +146,7 @@ define per-disk-plot-template
 	$$(if $$(IOSTAT_PLOT_LINE_IGNORE_PATTERN),grep -v '$$(IOSTAT_PLOT_LINE_IGNORE_PATTERN)' |) \
 	$$(IOSTAT_PLOT_CONCAT_LINES) $$(IOSTAT_PLOT_LINE_IDENTIFIER) | \
 	grep "$$(IOSTAT_PLOT_LINE_IDENTIFIER)" | \
+	tail -n +2 | \
 	$$(IOSTAT_PLOT_FLOATING_AVERAGE) $$(IOSTAT_PLOT_AVERAGE.io) > $$@
 endef
 $(foreach disk, $(IOSTAT_PLOT_DISK_LIST),$(eval $(per-disk-plot-template)))
@@ -150,6 +154,7 @@ $(foreach disk, $(IOSTAT_PLOT_DISK_LIST),$(eval $(per-disk-plot-template)))
 %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).dat: %.iostat $(MAKEFILE_LIST)
 	$(pipefail) \
 	grep "$(IOSTAT_PLOT_CPU_LINE_IDENTIFIER)" $< | \
+	tail -n +2 | \
 	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.cpu) > $@
 
 %.io-$(IOSTAT_PLOT_AVERAGE.io).plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).dat $(MAKEFILE_LIST)
