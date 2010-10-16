@@ -35,6 +35,7 @@ IOSTAT_PLOT_CONCAT_LINES	?= $(IOSTAT_PLOT_BINDIR)/concat-lines
 IOSTAT_PLOT_FLOATING_AVERAGE	?= $(IOSTAT_PLOT_BINDIR)/floating-average
 
 IOSTAT_PLOT_LINE_IDENTIFIER	?= ^sd
+IOSTAT_PLOT_LINE_IGNORE_PATTERN	?=
 IOSTAT_PLOT_CPU_LINE_IDENTIFIER	?= ^$(space)$(space)$(space)
 IOSTAT_PLOT_DISKS		?= 8
 IOSTAT_PLOT_CPUS		?= 8
@@ -54,6 +55,8 @@ IOSTAT_PLOT_IO_WITH_UTILIZATION	?= no
 
 IOSTAT_PLOT_Y_LABEL.io		?= Bandwidth [MiB/s]
 IOSTAT_PLOT_Y_LABEL.cpu		?= CPU Usage [%]
+
+GNUPLOTFILEINFO			?= set label "$(subst _,\\_,$(HOST):$(patsubst $(HOME)/%,\\~/%,$(CURDIR))/)" at character 0,-1 font ",6"
 
 ECHO				?= echo
 
@@ -77,8 +80,8 @@ $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
 	$(ECHO) 'set ytics nomirror' >> $@
 	$(ECHO) 'set y2tics' >> $@
 ))
-#	$(ECHO) 'set data style linespoints' >> $@
-	$(ECHO) 'set data style lines' >> $@
+#	$(ECHO) 'set style data linespoints' >> $@
+	$(ECHO) 'set style data lines' >> $@
 	$(ECHO) 'set macros' >> $@
 	$(ECHO) 'set pointsize 0.4' >> $@
 #	$(ECHO) 'set samples 1000' >> $@
@@ -100,30 +103,36 @@ $(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
 	$(ECHO) '	"$*.waitlog" using 1:4 title "Wait Read" ls 5 axes x1y2$(comma) \' >> $@
 	$(ECHO) '	"$*.waitlog" using 1:5 title "Wait Write" ls 4 axes x1y2$(comma) \' >> $@
 ))
-	$(ECHO) '	"not.existing.dummy" using 08:15 notitle' >> $@
+	$(ECHO) '	"not.existing.dummy" using 8:15 notitle' >> $@
 )
 $(if $(filter cpu,$1),
 	$(ECHO) 'plot \' >> $@
 	$(ECHO) '	"$(word 2,$^)" using 0:(100*($$1-$(IOSTAT_PLOT_LOAD_REDUCE))/$(strip $2)) title "Load (100% = $2)" ls 5$(comma) \' >> $@
-	$(ECHO) '	"$<" using 0:($$1+$$3+$$4) title "Total" ls 4$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:($$1+$$2+$$3+$$4) title "Total" ls 4$(comma) \' >> $@
+	$(ECHO) '	"$<" using 0:2 title "Nice" ls 6$(comma) \' >> $@
 	$(ECHO) '	"$<" using 0:4 title "Wait" ls 2$(comma) \' >> $@
 	$(ECHO) '	"$<" using 0:1 title "User" ls 1$(comma) \' >> $@
 	$(ECHO) '	"$<" using 0:3 title "System" ls 3$(comma) \' >> $@
-	$(ECHO) '	"not.existing.dummy" using 08:15 notitle' >> $@ 
+	$(ECHO) '	"$(word 2,$^)" using 0:(100*($$1-$(IOSTAT_PLOT_LOAD_REDUCE))/$(strip $2)) notitle ls 5$(comma) \' >> $@
+	$(ECHO) '	"not.existing.dummy" using 8:15 notitle' >> $@ 
 )
 	$(ECHO) '' >> $@
 	$(ECHO) 'pause -1' >> $@
 	$(ECHO) '' >> $@
 	$(ECHO) 'set terminal postscript enhanced $(GPLT_COLOR_PS) 10' >> $@
 	$(ECHO) 'set output "$*.$(strip $1).eps"' >> $@
+	$(ECHO) '$(GNUPLOTFILEINFO)' >> $@
 	$(ECHO) 'replot' >> $@
 	$(ECHO) '' >> $@
 endef
 
 %.io-$(IOSTAT_PLOT_AVERAGE.io).dat: %.iostat $(MAKEFILE_LIST)
 	$(pipefail) \
-	$(IOSTAT_PLOT_CONCAT_LINES) $< $(IOSTAT_PLOT_LINE_IDENTIFIER) | \
-	grep "$(IOSTAT_PLOT_LINE_IDENTIFIER)" | \
+	cat $< | \
+	$(if $(IOSTAT_PLOT_LINE_IGNORE_PATTERN),grep -v '$(IOSTAT_PLOT_LINE_IGNORE_PATTERN)' |) \
+	$(IOSTAT_PLOT_CONCAT_LINES) '$(IOSTAT_PLOT_LINE_IDENTIFIER)' | \
+	grep '$(IOSTAT_PLOT_LINE_IDENTIFIER)' | \
+	tail -n +2 | \
 	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.io) > $@
 
 define per-disk-plot-template
@@ -133,8 +142,11 @@ define per-disk-plot-template
 
 %.$(disk).io-$$(IOSTAT_PLOT_AVERAGE.io).dat: %.iostat $$(MAKEFILE_LIST)
 	$$(pipefail) \
-	$$(IOSTAT_PLOT_CONCAT_LINES) $$< $$(IOSTAT_PLOT_LINE_IDENTIFIER) | \
+	cat $$< | \
+	$$(if $$(IOSTAT_PLOT_LINE_IGNORE_PATTERN),grep -v '$$(IOSTAT_PLOT_LINE_IGNORE_PATTERN)' |) \
+	$$(IOSTAT_PLOT_CONCAT_LINES) $$(IOSTAT_PLOT_LINE_IDENTIFIER) | \
 	grep "$$(IOSTAT_PLOT_LINE_IDENTIFIER)" | \
+	tail -n +2 | \
 	$$(IOSTAT_PLOT_FLOATING_AVERAGE) $$(IOSTAT_PLOT_AVERAGE.io) > $$@
 endef
 $(foreach disk, $(IOSTAT_PLOT_DISK_LIST),$(eval $(per-disk-plot-template)))
@@ -142,6 +154,7 @@ $(foreach disk, $(IOSTAT_PLOT_DISK_LIST),$(eval $(per-disk-plot-template)))
 %.cpu-$(IOSTAT_PLOT_AVERAGE.cpu).dat: %.iostat $(MAKEFILE_LIST)
 	$(pipefail) \
 	grep "$(IOSTAT_PLOT_CPU_LINE_IDENTIFIER)" $< | \
+	tail -n +2 | \
 	$(IOSTAT_PLOT_FLOATING_AVERAGE) $(IOSTAT_PLOT_AVERAGE.cpu) > $@
 
 %.io-$(IOSTAT_PLOT_AVERAGE.io).plot: %.io-$(IOSTAT_PLOT_AVERAGE.io).dat $(MAKEFILE_LIST)

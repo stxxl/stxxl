@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2005-2006 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -39,15 +39,14 @@ void print_msg(const char * label, const std::string & msg, unsigned flags);
 __STXXL_END_NAMESPACE
 
 
-#define _STXXL_ENFORCE_SEMICOLON stxxl::STXXL_UNUSED("expecting the next token to be a ';'")
-
 #define _STXXL_PRINT(label, message, flags) \
-    { std::ostringstream str_; \
-      str_ << message; \
-      stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
-    } _STXXL_ENFORCE_SEMICOLON
+    do { \
+        std::ostringstream str_; \
+        str_ << message; \
+        stxxl::print_msg(label, str_.str(), flags | _STXXL_PRNT_ADDNEWLINE); \
+    } while (false)
 
-#define _STXXL_NOT_VERBOSE { } _STXXL_ENFORCE_SEMICOLON
+#define _STXXL_NOT_VERBOSE do { } while (false)
 
 
 #ifdef STXXL_FORCE_VERBOSE_LEVEL
@@ -69,14 +68,14 @@ __STXXL_END_NAMESPACE
 #if STXXL_VERBOSE_LEVEL > -10
  #define STXXL_MSG(x) _STXXL_PRINT("STXXL-MSG", x, _STXXL_PRINT_FLAGS_DEFAULT)
 #else
- // Please do not report STXXL problems with STXXL_MSG disabled!
+// Please do not report STXXL problems with STXXL_MSG disabled!
  #define STXXL_MSG(x) _STXXL_NOT_VERBOSE
 #endif
 
 #if STXXL_VERBOSE_LEVEL > -100
  #define STXXL_ERRMSG(x) _STXXL_PRINT("STXXL-ERRMSG", x, _STXXL_PRINT_FLAGS_ERROR)
 #else
- // Please do not report STXXL problems with STXXL_ERRMSG disabled!
+// Please do not report STXXL problems with STXXL_ERRMSG disabled!
  #define STXXL_ERRMSG(x) _STXXL_NOT_VERBOSE
 #endif
 
@@ -116,7 +115,7 @@ __STXXL_END_NAMESPACE
 #ifdef BOOST_MSVC
 
 #define stxxl_win_lasterror_exit(errmsg, exception_type) \
-    { \
+    do { \
         LPVOID lpMsgBuf; \
         DWORD dw = GetLastError(); \
         FormatMessage( \
@@ -131,7 +130,7 @@ __STXXL_END_NAMESPACE
         str_ << "Error in " << errmsg << ", error code " << dw << ": " << ((char *)lpMsgBuf); \
         LocalFree(lpMsgBuf); \
         throw exception_type(str_.str()); \
-    } _STXXL_ENFORCE_SEMICOLON
+    } while (false)
 
 #endif
 

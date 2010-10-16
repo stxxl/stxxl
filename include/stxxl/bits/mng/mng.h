@@ -243,10 +243,10 @@ class FileCreator
 {
 public:
     static file * create(const std::string & io_impl,
-                           const std::string & filename,
-                           int options,
-                           int queue_id = file::DEFAULT_QUEUE,
-                           int allocator_id = file::NO_ALLOCATOR);
+                         const std::string & filename,
+                         int options,
+                         int queue_id = file::DEFAULT_QUEUE,
+                         int allocator_id = file::NO_ALLOCATOR);
 };
 
 //! \}

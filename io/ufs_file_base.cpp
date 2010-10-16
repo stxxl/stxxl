@@ -107,7 +107,7 @@ void ufs_file_base::lock()
 #else
     scoped_mutex_lock fd_lock(fd_mutex);
     struct flock lock_struct;
-    lock_struct.l_type = F_RDLCK | F_WRLCK;
+    lock_struct.l_type = (mode_ & RDONLY) ? F_RDLCK : F_RDLCK | F_WRLCK;
     lock_struct.l_whence = SEEK_SET;
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes

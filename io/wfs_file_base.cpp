@@ -68,7 +68,7 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
     }
 
     HANDLE file_des = ::CreateFile(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
-        dwCreationDisposition, dwFlagsAndAttributes, NULL);
+                                   dwCreationDisposition, dwFlagsAndAttributes, NULL);
 
     if (file_des == INVALID_HANDLE_VALUE)
         stxxl_win_lasterror_exit("CreateFile  filename=" << filename, io_error);
@@ -81,10 +81,10 @@ wfs_file_base::wfs_file_base(
     int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename)
 {
     file_des = open_file_impl(filename, mode);
-    if(!(mode_ & RDONLY) && (mode & DIRECT))
+    if (!(mode_ & RDONLY) && (mode & DIRECT))
     {
-        char buf[32768], *part;
-        if(!GetFullPathName(filename.c_str(), sizeof(buf), buf, &part))
+        char buf[32768], * part;
+        if (!GetFullPathName(filename.c_str(), sizeof(buf), buf, &part))
         {
             STXXL_ERRMSG("wfs_file_base::wfs_file_base(): GetFullPathName() error for file " << filename);
             bytes_per_sector = 512;
@@ -93,7 +93,7 @@ wfs_file_base::wfs_file_base(
         {
             part[0] = char();
             DWORD bytes_per_sector_;
-            if(!GetDiskFreeSpace(buf, NULL, &bytes_per_sector_, NULL, NULL))
+            if (!GetDiskFreeSpace(buf, NULL, &bytes_per_sector_, NULL, NULL))
             {
                 STXXL_ERRMSG("wfs_file_base::wfs_file_base(): GetDiskFreeSpace() error for path " << buf);
                 bytes_per_sector = 512;
@@ -178,15 +178,15 @@ void wfs_file_base::set_size(offset_type newsize)
                 stxxl_win_lasterror_exit("closing file (call of ::CloseHandle from set_size) ", io_error);
 
             file_des = INVALID_HANDLE_VALUE;
-            file_des = open_file_impl(filename, mode_ &~ TRUNC);
+            file_des = open_file_impl(filename, mode_ & ~TRUNC);
         }
     }
 }
 
 void wfs_file_base::remove()
 {
-	close();
-	::DeleteFile(filename.c_str());
+    close();
+    ::DeleteFile(filename.c_str());
 }
 
 __STXXL_END_NAMESPACE
