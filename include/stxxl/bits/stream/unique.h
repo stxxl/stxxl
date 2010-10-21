@@ -105,7 +105,7 @@ namespace stream
         }
 
         //! \brief Standard stream method
-        value_type & operator * () const
+        const value_type & operator * () const
         {
             return current;
         }
