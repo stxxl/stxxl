@@ -22,14 +22,6 @@ distclean: clean
 
 .PHONY: clean
 
-else
-# automatically generate .pdf versions of the figures, needed by pdflatex
-
-tutorial.pdf: layer_diagram.pdf vector.pdf
-
-clean::
-	$(RM) layer_diagram.pdf vector.pdf
-
 endif
 
 
