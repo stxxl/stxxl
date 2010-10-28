@@ -231,7 +231,11 @@ int main(int argc, char * argv[])
     const char * myself = strrchr(argv[0], '/');
     if (!myself || !*(++myself))
         myself = argv[0];
-    std::cout << "# " << myself << " " << myrev << std::endl;
+    std::cout << "# " << myself << " " << myrev;
+#ifdef STXXL_DIRECT_IO_OFF
+    std::cout << " STXXL_DIRECT_IO_OFF";
+#endif
+    std::cout << std::endl;
     std::cout << "# Step size: "
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
