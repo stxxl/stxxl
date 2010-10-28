@@ -86,6 +86,12 @@ wfs_file_base::wfs_file_base(
     int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename)
 {
     file_des = open_file_impl(filename, mode);
+
+    if (!(mode & NO_LOCK))
+    {
+        lock();
+    }
+
     if (!(mode_ & RDONLY) && (mode & DIRECT))
     {
         char buf[32768], * part;

@@ -87,6 +87,11 @@ ufs_file_base::ufs_file_base(
 
     if ((file_des = ::open(filename.c_str(), flags, perms)) < 0)
         STXXL_THROW2(io_error, "::open() Filedescriptor=" << file_des << " filename=" << filename << " flags=" << flags);
+
+    if (!(mode & NO_LOCK))
+    {
+        lock();
+    }
 }
 
 ufs_file_base::~ufs_file_base()
