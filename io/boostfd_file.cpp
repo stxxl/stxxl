@@ -116,13 +116,6 @@ boostfd_file::boostfd_file(
 {
     BOOST_IOS::openmode boostfd_mode;
 
- #ifndef STXXL_DIRECT_IO_OFF
-    if (mode & DIRECT)
-    {
-        // direct mode not supported in Boost
-    }
- #endif
-
     if (mode & RDONLY)
     {
         boostfd_mode = BOOST_IOS::in;
@@ -161,6 +154,18 @@ boostfd_file::boostfd_file(
             f.close();
             assert(boost::filesystem::exists(fspath));
         }
+    }
+
+ #ifndef STXXL_DIRECT_IO_OFF
+    if (mode & DIRECT)
+    {
+        // direct mode not supported in Boost
+    }
+ #endif
+
+    if (mode & SYNC)
+    {
+        // ???
     }
 
 #if (BOOST_VERSION >= 104100)
