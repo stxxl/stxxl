@@ -15,10 +15,6 @@
 #include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/io/file.h>
 
-#ifndef STXXL_THREAD_ID
-#define STXXL_THREAD_ID pthread_self()
-#endif
-
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -44,7 +40,6 @@ void request_impl_basic::serve()
 {
     check_nref();
     STXXL_VERBOSE2(
-        "[" << STXXL_THREAD_ID << "] " <<
         "request_impl_basic[" << this << "]::serve(): " <<
         buffer << " @ [" <<
         file_ << "|" << file_->get_allocator_id() << "]0x" <<
@@ -69,7 +64,6 @@ void request_impl_basic::serve()
 void request_impl_basic::completed()
 {
     STXXL_VERBOSE2(
-        "[" << STXXL_THREAD_ID << "] " <<
         "request_impl_basic[" << this << "]::completed()");
     _state.set_to(DONE);
     request_state_impl_basic::completed();
