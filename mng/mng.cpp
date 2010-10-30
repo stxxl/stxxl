@@ -225,7 +225,7 @@ block_manager::block_manager()
     disk_allocators = new DiskAllocator *[ndisks];
     disk_files = new file *[ndisks];
 
-    for (unsigned i = 0; i < ndisks; i++)
+    for (unsigned i = 0; i < ndisks; ++i)
     {
         disk_files[i] = FileCreator::create(cfg->disk_io_impl(i),
                                             cfg->disk_path(i),
@@ -240,8 +240,9 @@ block_manager::block_manager()
 block_manager::~block_manager()
 {
     STXXL_VERBOSE1("Block manager destructor");
-    for (unsigned i = 0; i < ndisks; i++)
+    for (unsigned i = ndisks; i > 0; )
     {
+        --i;
         delete disk_allocators[i];
         delete disk_files[i];
     }
