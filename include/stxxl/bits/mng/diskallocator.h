@@ -81,6 +81,7 @@ class DiskAllocator : private noncopyable
             return;
 
         disk_bytes += extend_bytes;
+        free_bytes += extend_bytes;
         storage->set_size(disk_bytes);
     }
 
@@ -162,6 +163,7 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
             begin->offset = pos;
             pos += begin->size;
         }
+        free_bytes -= requested_size;
 
         return;
     }
@@ -208,6 +210,7 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
         begin->offset = disk_bytes; // allocate at the end
         grow_file(BLK_SIZE);
+        free_bytes -= BLK_SIZE;
 
         return;
     }
