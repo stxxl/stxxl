@@ -22,6 +22,7 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/io/file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -63,6 +64,7 @@ protected:
     stxxl::int64 free_bytes;
     stxxl::int64 disk_bytes;
     bool autogrow;
+    stxxl::file * storage;
 
     void dump();
 
@@ -86,7 +88,7 @@ protected:
     }
 
 public:
-    inline DiskAllocator(stxxl::int64 disk_size);
+    inline DiskAllocator(stxxl::int64 disk_size, stxxl::file * storage);
 
     inline stxxl::int64 get_free_bytes() const
     {
@@ -117,10 +119,11 @@ public:
     void delete_block(const BID<BLK_SIZE> & bid);
 };
 
-DiskAllocator::DiskAllocator(stxxl::int64 disk_size) :
+DiskAllocator::DiskAllocator(stxxl::int64 disk_size, stxxl::file * storage) :
     free_bytes(disk_size),
     disk_bytes(disk_size),
-    autogrow(disk_size == 0)
+    autogrow(disk_size == 0),
+    storage(storage)
 {
     free_space[0] = disk_size;
 }

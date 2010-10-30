@@ -233,7 +233,7 @@ block_manager::block_manager()
                                             i,  // physical_device_id
                                             i); // allocator_id
         disk_files[i]->set_size(cfg->disk_size(i));
-        disk_allocators[i] = new DiskAllocator(cfg->disk_size(i));
+        disk_allocators[i] = new DiskAllocator(cfg->disk_size(i), disk_files[i]);
     }
 }
 
