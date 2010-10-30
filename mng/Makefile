@@ -10,6 +10,12 @@ lib: mng.$(OBJEXT)
 mng.$(OBJEXT): mng.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c mng.cpp
 
+config.$(OBJEXT): config.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c config.cpp
+
+diskallocator.$(OBJEXT): diskallocator.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c diskallocator.cpp
+
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES) $(MNG_LAYER_FILES)
 

@@ -73,6 +73,9 @@ request_queue_impl_1q.$(OBJEXT): request_queue_impl_1q.cpp
 request_queue_impl_worker.$(OBJEXT): request_queue_impl_worker.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_worker.cpp
 
+create_file.$(OBJEXT): create_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c create_file.cpp
+
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)
 
