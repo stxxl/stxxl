@@ -130,21 +130,22 @@ public:
 template <unsigned BLK_SIZE>
 void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 {
+    stxxl::int64 requested_size = 0;
+
+    for (typename BIDArray<BLK_SIZE>::iterator cur = begin; cur != end; ++cur)
+    {
+        STXXL_VERBOSE2("Asking for a block with size: " << (cur->size));
+        requested_size += cur->size;
+    }
+
     scoped_mutex_lock lock(mutex);
 
     STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<
                    ", blocks: " << (end - begin) <<
-                   " begin: " << ((void *)(begin)) << " end: " << ((void *)(end)));
-
-    stxxl::int64 requested_size = 0;
-
-    typename BIDArray<BLK_SIZE>::iterator cur = begin;
-    for ( ; cur != end; ++cur)
-    {
-        STXXL_VERBOSE2("Asking for a block with size: " << (cur->size));
-        requested_size += cur->size;
-    }
+                   " begin: " << static_cast<void *>(begin) <<
+                   " end: " << static_cast<void *>(end) <<
+                   ", requested_size=" << requested_size);
 
     if (free_bytes < requested_size)
     {
@@ -154,11 +155,12 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
                          " bytes free. Trying to extend the external memory space...");
         }
 
-        begin->offset = disk_bytes; // allocate at the end
+        stxxl::int64 pos = disk_bytes;  // allocate at the end
         grow_file(requested_size);
-        for (++begin; begin != end; ++begin)
+        for ( ; begin != end; ++begin)
         {
-            begin->offset = (begin - 1)->offset + (begin - 1)->size;
+            begin->offset = pos;
+            pos += begin->size;
         }
 
         return;
@@ -178,10 +180,11 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
         if (region_size > requested_size)
             free_space[region_pos + requested_size] = region_size - requested_size;
 
-        begin->offset = region_pos;
-        for (++begin; begin != end; ++begin)
+        stxxl::int64 pos = region_pos;
+        for ( ; begin != end; ++begin)
         {
-            begin->offset = (begin - 1)->offset + (begin - 1)->size;
+            begin->offset = pos;
+            pos += begin->size;
         }
         free_bytes -= requested_size;
         //dump();
