@@ -16,6 +16,9 @@
 #include <stxxl/bits/version.h>
 #include <stxxl/bits/common/log.h>
 
+#ifdef BOOST_MSVC
+ #include <windows.h>
+#endif
 
 __STXXL_BEGIN_NAMESPACE
 
