@@ -20,7 +20,7 @@ typedef vector_type::block_type block_type;
 
 void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
+    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
     {
         vector_type v(f);
         v.resize(sz);
@@ -34,7 +34,7 @@ void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_ty
 template <typename Vector>
 void test_rdwr(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
     {
         Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDWR)");
@@ -48,7 +48,7 @@ void test_rdwr(const char * fn, const char * ft, stxxl::unsigned_type sz, my_typ
 template <typename Vector>
 void test_rdonly(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
+    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
     {
         Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDONLY)");

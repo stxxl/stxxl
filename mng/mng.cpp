@@ -137,7 +137,7 @@ block_manager::block_manager()
 
     for (unsigned i = 0; i < ndisks; ++i)
     {
-        disk_files[i] = FileCreator::create(cfg->disk_io_impl(i),
+        disk_files[i] = create_file(cfg->disk_io_impl(i),
                                             cfg->disk_path(i),
                                             file::CREAT | file::RDWR | file::DIRECT,
                                             i,  // physical_device_id
