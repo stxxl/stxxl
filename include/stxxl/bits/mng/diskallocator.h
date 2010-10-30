@@ -32,8 +32,6 @@ __STXXL_BEGIN_NAMESPACE
 
 class DiskAllocator : private noncopyable
 {
-    stxxl::mutex mutex;
-
     typedef std::pair<stxxl::int64, stxxl::int64> place;
 
     struct FirstFit : public std::binary_function<place, stxxl::int64, bool>
@@ -46,25 +44,14 @@ class DiskAllocator : private noncopyable
         }
     };
 
-    struct OffCmp
-    {
-        bool operator () (const stxxl::int64 & off1, const stxxl::int64 & off2)
-        {
-            return off1 < off2;
-        }
-    };
-
-    DiskAllocator()
-    { }
-
-protected:
     typedef std::map<stxxl::int64, stxxl::int64> sortseq;
+
+    stxxl::mutex mutex;
     sortseq free_space;
-    //  sortseq used_space;
     stxxl::int64 free_bytes;
     stxxl::int64 disk_bytes;
-    bool autogrow;
     stxxl::file * storage;
+    bool autogrow;
 
     void dump();
 
@@ -97,7 +84,14 @@ protected:
     }
 
 public:
-    inline DiskAllocator(stxxl::int64 disk_size, stxxl::file * storage);
+    DiskAllocator(stxxl::int64 disk_size, stxxl::file * storage) :
+        free_bytes(disk_size),
+        disk_bytes(disk_size),
+        storage(storage),
+        autogrow(disk_size == 0)
+    {
+        free_space[0] = disk_size;
+    }
 
     inline stxxl::int64 get_free_bytes() const
     {
@@ -115,7 +109,10 @@ public:
     }
 
     template <unsigned BLK_SIZE>
-    stxxl::int64 new_blocks(BIDArray<BLK_SIZE> & bids);
+    stxxl::int64 new_blocks(BIDArray<BLK_SIZE> & bids)
+    {
+        return new_blocks(bids.begin(), bids.end());
+    }
 
     template <unsigned BLK_SIZE>
     stxxl::int64 new_blocks(BID<BLK_SIZE> * begin,
@@ -127,22 +124,6 @@ public:
     template <unsigned BLK_SIZE>
     void delete_block(const BID<BLK_SIZE> & bid);
 };
-
-DiskAllocator::DiskAllocator(stxxl::int64 disk_size, stxxl::file * storage) :
-    free_bytes(disk_size),
-    disk_bytes(disk_size),
-    autogrow(disk_size == 0),
-    storage(storage)
-{
-    free_space[0] = disk_size;
-}
-
-
-template <unsigned BLK_SIZE>
-stxxl::int64 DiskAllocator::new_blocks(BIDArray<BLK_SIZE> & bids)
-{
-    return new_blocks(bids.begin(), bids.end());
-}
 
 template <unsigned BLK_SIZE>
 stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
