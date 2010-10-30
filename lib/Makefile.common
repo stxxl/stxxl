@@ -20,6 +20,7 @@ LIB_OBJECTS = \
 	../io/fileperblock_file.$(LIBOBJEXT) \
  	../io/wbtl_file.$(LIBOBJEXT) \
  	../io/create_file.$(LIBOBJEXT) \
+	../mng/config.$(LIBOBJEXT) \
 	../mng/mng.$(LIBOBJEXT) \
 	../algo/async_schedule.$(LIBOBJEXT) \
 	../common/debug.$(LIBOBJEXT) \

@@ -2,4 +2,4 @@ TESTS			 = test_mng test_mng1 test_buf_streams test_write_pool test_prefetch_poo
 TESTS_NON_MSVC		 =
 TESTS_UNITTEST		 = unittest
 
-LIB_SRC			 = mng.cpp
+LIB_SRC			 = config.cpp mng.cpp
