@@ -22,6 +22,7 @@ LIB_OBJECTS = \
  	../io/create_file.$(LIBOBJEXT) \
 	../mng/config.$(LIBOBJEXT) \
 	../mng/mng.$(LIBOBJEXT) \
+	../mng/diskallocator.$(LIBOBJEXT) \
 	../algo/async_schedule.$(LIBOBJEXT) \
 	../common/debug.$(LIBOBJEXT) \
 	../common/rand.$(LIBOBJEXT) \

@@ -17,20 +17,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-void DiskAllocator::dump()
-{
-    int64 total = 0;
-    sortseq::const_iterator cur = free_space.begin();
-    STXXL_ERRMSG("Free regions dump:");
-    for ( ; cur != free_space.end(); ++cur)
-    {
-        STXXL_ERRMSG("Free chunk: begin: " << (cur->first) << " size: " << (cur->second));
-        total += cur->second;
-    }
-    STXXL_ERRMSG("Total bytes: " << total);
-}
-
-
 block_manager::block_manager()
 {
     debugmon::get_instance();
