@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -109,25 +110,25 @@ public:
     }
 
     template <unsigned BLK_SIZE>
-    stxxl::int64 new_blocks(BIDArray<BLK_SIZE> & bids)
+    void new_blocks(BIDArray<BLK_SIZE> & bids)
     {
-        return new_blocks(bids.begin(), bids.end());
+        new_blocks(bids.begin(), bids.end());
     }
 
     template <unsigned BLK_SIZE>
-    stxxl::int64 new_blocks(BID<BLK_SIZE> * begin,
-                            BID<BLK_SIZE> * end);
+    void new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end);
+
 #if 0
     template <unsigned BLK_SIZE>
     void delete_blocks(const BIDArray<BLK_SIZE> & bids);
 #endif
+
     template <unsigned BLK_SIZE>
     void delete_block(const BID<BLK_SIZE> & bid);
 };
 
 template <unsigned BLK_SIZE>
-stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
-                                       BID<BLK_SIZE> * end)
+void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 {
     scoped_mutex_lock lock(mutex);
 
@@ -160,7 +161,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
             begin->offset = (begin - 1)->offset + (begin - 1)->size;
         }
 
-        return disk_bytes;
+        return;
     }
 
     // dump();
@@ -185,7 +186,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
         free_bytes -= requested_size;
         //dump();
 
-        return disk_bytes;
+        return;
     }
 
     // no contiguous region found
@@ -205,7 +206,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
         begin->offset = disk_bytes; // allocate at the end
         grow_file(BLK_SIZE);
 
-        return disk_bytes;
+        return;
     }
 
     assert(requested_size > BLK_SIZE);
@@ -213,11 +214,9 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
 
     lock.unlock();
 
-    typename  BIDArray<BLK_SIZE>::iterator middle = begin + ((end - begin) / 2);
+    typename BIDArray<BLK_SIZE>::iterator middle = begin + ((end - begin) / 2);
     new_blocks(begin, middle);
     new_blocks(middle, end);
-
-    return disk_bytes;
 }
 
 
