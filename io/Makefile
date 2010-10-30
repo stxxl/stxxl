@@ -12,7 +12,7 @@ mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJ
 fileperblock_file.$(OBJEXT) request.$(OBJEXT) request_waiters_impl_basic.$(OBJEXT) \
 request_state_impl_basic.$(OBJEXT) request_impl_basic.$(OBJEXT) \
 disk_queued_file.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) request_queue_impl_1q.$(OBJEXT) \
-request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT)
+request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT) create_file.$(OBJEXT)
 
 
 

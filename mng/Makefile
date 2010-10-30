@@ -4,7 +4,7 @@ include ../make.settings
 tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
-lib: mng.$(OBJEXT)
+lib: mng.$(OBJEXT) config.$(OBJEXT) diskallocator.$(OBJEXT)
 
 
 mng.$(OBJEXT): mng.cpp
