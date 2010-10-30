@@ -333,7 +333,7 @@ void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size
     {
         if (pred->first <= region_pos && pred->first + pred->second > region_pos)
         {
-            STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory " <<
+            STXXL_THROW(bad_ext_alloc, "wbtl_file::check_corruption", "Error: double deallocation of external memory " <<
                         "System info: P " << pred->first << " " << pred->second << " " << region_pos);
         }
     }
@@ -341,7 +341,7 @@ void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size
     {
         if (region_pos <= succ->first && region_pos + region_size > succ->first)
         {
-            STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory "
+            STXXL_THROW(bad_ext_alloc, "wbtl_file::check_corruption", "Error: double deallocation of external memory "
                         << "System info: S " << region_pos << " " << region_size << " " << succ->first);
         }
     }
