@@ -35,6 +35,7 @@
 
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/mng/bid.h>
@@ -232,11 +233,16 @@ void block_manager::delete_blocks(
 class FileCreator
 {
 public:
+    _STXXL_DEPRECATED(
     static file * create(const std::string & io_impl,
                          const std::string & filename,
                          int options,
                          int queue_id = file::DEFAULT_QUEUE,
-                         int allocator_id = file::NO_ALLOCATOR);
+                         int allocator_id = file::NO_ALLOCATOR)
+    )
+    {
+        return create_file(io_impl, filename, options, queue_id, allocator_id);
+    }
 };
 
 //! \}

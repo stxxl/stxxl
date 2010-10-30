@@ -11,15 +11,15 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/mng>
+#include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/io.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-file * FileCreator::create(const std::string & io_impl,
-                           const std::string & filename,
-                           int options, int physical_device_id, int allocator_id)
+file * create_file(const std::string & io_impl,
+                   const std::string & filename,
+                   int options, int physical_device_id, int allocator_id)
 {
     if (io_impl == "syscall")
     {
