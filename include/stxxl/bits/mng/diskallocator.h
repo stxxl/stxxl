@@ -87,6 +87,15 @@ protected:
         }
     }
 
+    void grow_file(stxxl::int64 extend_bytes)
+    {
+        if (!extend_bytes)
+            return;
+
+        disk_bytes += extend_bytes;
+        storage->set_size(disk_bytes);
+    }
+
 public:
     inline DiskAllocator(stxxl::int64 disk_size, stxxl::file * storage);
 
@@ -164,11 +173,11 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
         }
 
         begin->offset = disk_bytes; // allocate at the end
+        grow_file(requested_size);
         for (++begin; begin != end; ++begin)
         {
             begin->offset = (begin - 1)->offset + (begin - 1)->size;
         }
-        disk_bytes += requested_size;
 
         return disk_bytes;
     }
@@ -213,7 +222,7 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
                      " bytes free. Trying to extend the external memory space...");
 
         begin->offset = disk_bytes; // allocate at the end
-        disk_bytes += BLK_SIZE;
+        grow_file(BLK_SIZE);
 
         return disk_bytes;
     }

@@ -177,17 +177,7 @@ void block_manager::new_blocks_int(
         if (bl[i])
         {
             disk_bids[i].resize(bl[i]);
-            const stxxl::int64 old_capacity =
-                disk_allocators[i]->get_total_bytes();
-            const stxxl::int64 new_capacity =
-                disk_allocators[i]->new_blocks(disk_bids[i]);
-            if (old_capacity != new_capacity)
-            {
-                // resize the file
-                disk_files[i]->set_size(new_capacity);
-                if (new_capacity != disk_allocators[i]->get_total_bytes())
-                    STXXL_ERRMSG("File resizing failed: actual size " << disk_allocators[i]->get_total_bytes() << " != requested size " << new_capacity);
-            }
+            disk_allocators[i]->new_blocks(disk_bids[i]);
         }
     }
 
