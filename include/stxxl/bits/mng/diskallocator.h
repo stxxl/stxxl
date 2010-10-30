@@ -86,12 +86,13 @@ class DiskAllocator : private noncopyable
     }
 
 public:
-    DiskAllocator(stxxl::int64 disk_size, stxxl::file * storage) :
-        free_bytes(disk_size),
-        disk_bytes(disk_size),
+    DiskAllocator(stxxl::file * storage, stxxl::int64 disk_size) :
+        free_bytes(0),
+        disk_bytes(0),
         storage(storage),
         autogrow(disk_size == 0)
     {
+        grow_file(disk_size);
         free_space[0] = disk_size;
     }
 
