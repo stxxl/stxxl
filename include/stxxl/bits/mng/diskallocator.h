@@ -238,9 +238,11 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
     //assert(bid.size);
 
     //dump();
-    stxxl::int64 region_pos = bid.offset;
-    stxxl::int64 region_size = bid.size;
-    STXXL_VERBOSE2("Deallocating a block with size: " << region_size << " position: " << region_pos);
+    const stxxl::int64 block_pos = bid.offset;
+    const stxxl::int64 block_size = bid.size;
+    STXXL_VERBOSE2("Deallocating a block with size: " << block_size << " position: " << block_pos);
+    stxxl::int64 region_pos = block_pos;
+    stxxl::int64 region_size = block_size;
     if (!free_space.empty())
     {
         sortseq::iterator succ = free_space.upper_bound(region_pos);
@@ -252,7 +254,7 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
         {
             if (pred == free_space.end())
             {
-                STXXL_ERRMSG("Error deallocating block at " << bid.offset << " size " << bid.size);
+                STXXL_ERRMSG("Error deallocating block at " << block_pos << " size " << block_size);
                 STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
                 STXXL_ERRMSG(((pred == free_space.begin()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
                 STXXL_ERRMSG(((pred == free_space.end()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
@@ -276,7 +278,7 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
 #if 0
                 if (pred == succ)
                 {
-                    STXXL_ERRMSG("Error deallocating block at " << bid.offset << " size " << bid.size);
+                    STXXL_ERRMSG("Error deallocating block at " << block_pos << " size " << block_size);
                     STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
                     STXXL_ERRMSG(((pred == free_space.begin()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
                     STXXL_ERRMSG(((pred == free_space.end()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
@@ -297,7 +299,7 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
                 {
                     if (pred == free_space.end())
                     {
-                        STXXL_ERRMSG("Error deallocating block at " << bid.offset << " size " << bid.size);
+                        STXXL_ERRMSG("Error deallocating block at " << block_pos << " size " << block_size);
                         STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
                         STXXL_ERRMSG(((pred == free_space.begin()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
                         STXXL_ERRMSG(((pred == free_space.end()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
@@ -328,7 +330,7 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
     }
 
     free_space[region_pos] = region_size;
-    free_bytes += stxxl::int64(bid.size);
+    free_bytes += block_size;
 
     //dump();
 }
