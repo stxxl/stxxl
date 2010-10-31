@@ -16,7 +16,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-void DiskAllocator::dump()
+void DiskAllocator::dump() const
 {
     int64 total = 0;
     sortseq::const_iterator cur = free_space.begin();
@@ -27,6 +27,19 @@ void DiskAllocator::dump()
         total += cur->second;
     }
     STXXL_ERRMSG("Total bytes: " << total);
+}
+
+void DiskAllocator::deallocation_error(
+        stxxl::int64 block_pos, stxxl::int64 block_size,
+        const sortseq::iterator & pred, const sortseq::iterator & succ) const
+{
+    STXXL_ERRMSG("Error deallocating block at " << block_pos << " size " << block_size);
+    STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
+    STXXL_ERRMSG(((pred == free_space.begin()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
+    STXXL_ERRMSG(((pred == free_space.end()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
+    STXXL_ERRMSG(((succ == free_space.begin()) ? "succ==free_space.begin()" : "succ!=free_space.begin()"));
+    STXXL_ERRMSG(((succ == free_space.end()) ? "succ==free_space.end()" : "succ!=free_space.end()"));
+    dump();
 }
 
 __STXXL_END_NAMESPACE
