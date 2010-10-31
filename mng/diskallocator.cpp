@@ -35,10 +35,20 @@ void DiskAllocator::deallocation_error(
 {
     STXXL_ERRMSG("Error deallocating block at " << block_pos << " size " << block_size);
     STXXL_ERRMSG(((pred == succ) ? "pred==succ" : "pred!=succ"));
-    STXXL_ERRMSG(((pred == free_space.begin()) ? "pred==free_space.begin()" : "pred!=free_space.begin()"));
-    STXXL_ERRMSG(((pred == free_space.end()) ? "pred==free_space.end()" : "pred!=free_space.end()"));
-    STXXL_ERRMSG(((succ == free_space.begin()) ? "succ==free_space.begin()" : "succ!=free_space.begin()"));
-    STXXL_ERRMSG(((succ == free_space.end()) ? "succ==free_space.end()" : "succ!=free_space.end()"));
+    if (pred == free_space.end()) {
+        STXXL_ERRMSG("pred==free_space.end()");
+    } else {
+        if (pred == free_space.begin())
+            STXXL_ERRMSG("pred==free_space.begin()");
+        STXXL_ERRMSG("pred: begin=" << pred->first << " size=" << pred->second);
+    }
+    if (succ == free_space.end()) {
+        STXXL_ERRMSG("succ==free_space.end()");
+    } else {
+        if (succ == free_space.begin())
+            STXXL_ERRMSG("succ==free_space.begin()");
+        STXXL_ERRMSG("succ: begin=" << succ->first << " size=" << succ->second);
+    }
     dump();
 }
 
