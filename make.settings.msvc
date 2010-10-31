@@ -155,7 +155,8 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/wbtl_file.h \
 	$(HEADER_PATH)/io/aio_request.h \
 	$(HEADER_PATH)/io/aio_queue.h \
-	$(HEADER_PATH)/io/aio_file.h
+	$(HEADER_PATH)/io/aio_file.h \
+	$(HEADER_PATH)/io/create_file.h
 
 MNG_LAYER_FILES	 = \
 	$(HEADER_PATH)/mng/adaptor.h \

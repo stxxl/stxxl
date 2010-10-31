@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -22,6 +23,7 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/io/file.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -31,8 +33,6 @@ __STXXL_BEGIN_NAMESPACE
 
 class DiskAllocator : private noncopyable
 {
-    stxxl::mutex mutex;
-
     typedef std::pair<stxxl::int64, stxxl::int64> place;
 
     struct FirstFit : public std::binary_function<place, stxxl::int64, bool>
@@ -45,23 +45,13 @@ class DiskAllocator : private noncopyable
         }
     };
 
-    struct OffCmp
-    {
-        bool operator () (const stxxl::int64 & off1, const stxxl::int64 & off2)
-        {
-            return off1 < off2;
-        }
-    };
-
-    DiskAllocator()
-    { }
-
-protected:
     typedef std::map<stxxl::int64, stxxl::int64> sortseq;
+
+    stxxl::mutex mutex;
     sortseq free_space;
-    //  sortseq used_space;
     stxxl::int64 free_bytes;
     stxxl::int64 disk_bytes;
+    stxxl::file * storage;
     bool autogrow;
 
     void dump();
@@ -85,8 +75,26 @@ protected:
         }
     }
 
+    void grow_file(stxxl::int64 extend_bytes)
+    {
+        if (!extend_bytes)
+            return;
+
+        disk_bytes += extend_bytes;
+        free_bytes += extend_bytes;
+        storage->set_size(disk_bytes);
+    }
+
 public:
-    inline DiskAllocator(stxxl::int64 disk_size);
+    DiskAllocator(stxxl::file * storage, stxxl::int64 disk_size) :
+        free_bytes(0),
+        disk_bytes(0),
+        storage(storage),
+        autogrow(disk_size == 0)
+    {
+        grow_file(disk_size);
+        free_space[0] = disk_size;
+    }
 
     inline stxxl::int64 get_free_bytes() const
     {
@@ -104,53 +112,42 @@ public:
     }
 
     template <unsigned BLK_SIZE>
-    stxxl::int64 new_blocks(BIDArray<BLK_SIZE> & bids);
+    void new_blocks(BIDArray<BLK_SIZE> & bids)
+    {
+        new_blocks(bids.begin(), bids.end());
+    }
 
     template <unsigned BLK_SIZE>
-    stxxl::int64 new_blocks(BID<BLK_SIZE> * begin,
-                            BID<BLK_SIZE> * end);
+    void new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end);
+
 #if 0
     template <unsigned BLK_SIZE>
     void delete_blocks(const BIDArray<BLK_SIZE> & bids);
 #endif
+
     template <unsigned BLK_SIZE>
     void delete_block(const BID<BLK_SIZE> & bid);
 };
 
-DiskAllocator::DiskAllocator(stxxl::int64 disk_size) :
-    free_bytes(disk_size),
-    disk_bytes(disk_size),
-    autogrow(disk_size == 0)
-{
-    free_space[0] = disk_size;
-}
-
-
 template <unsigned BLK_SIZE>
-stxxl::int64 DiskAllocator::new_blocks(BIDArray<BLK_SIZE> & bids)
+void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 {
-    return new_blocks(bids.begin(), bids.end());
-}
+    stxxl::int64 requested_size = 0;
 
-template <unsigned BLK_SIZE>
-stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
-                                       BID<BLK_SIZE> * end)
-{
+    for (typename BIDArray<BLK_SIZE>::iterator cur = begin; cur != end; ++cur)
+    {
+        STXXL_VERBOSE2("Asking for a block with size: " << (cur->size));
+        requested_size += cur->size;
+    }
+
     scoped_mutex_lock lock(mutex);
 
     STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<
                    ", blocks: " << (end - begin) <<
-                   " begin: " << ((void *)(begin)) << " end: " << ((void *)(end)));
-
-    stxxl::int64 requested_size = 0;
-
-    typename BIDArray<BLK_SIZE>::iterator cur = begin;
-    for ( ; cur != end; ++cur)
-    {
-        STXXL_VERBOSE2("Asking for a block with size: " << (cur->size));
-        requested_size += cur->size;
-    }
+                   " begin: " << static_cast<void *>(begin) <<
+                   " end: " << static_cast<void *>(end) <<
+                   ", requested_size=" << requested_size);
 
     if (free_bytes < requested_size)
     {
@@ -160,14 +157,16 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
                          " bytes free. Trying to extend the external memory space...");
         }
 
-        begin->offset = disk_bytes; // allocate at the end
-        for (++begin; begin != end; ++begin)
+        stxxl::int64 pos = disk_bytes;  // allocate at the end
+        grow_file(requested_size);
+        for ( ; begin != end; ++begin)
         {
-            begin->offset = (begin - 1)->offset + (begin - 1)->size;
+            begin->offset = pos;
+            pos += begin->size;
         }
-        disk_bytes += requested_size;
+        free_bytes -= requested_size;
 
-        return disk_bytes;
+        return;
     }
 
     // dump();
@@ -184,15 +183,16 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
         if (region_size > requested_size)
             free_space[region_pos + requested_size] = region_size - requested_size;
 
-        begin->offset = region_pos;
-        for (++begin; begin != end; ++begin)
+        stxxl::int64 pos = region_pos;
+        for ( ; begin != end; ++begin)
         {
-            begin->offset = (begin - 1)->offset + (begin - 1)->size;
+            begin->offset = pos;
+            pos += begin->size;
         }
         free_bytes -= requested_size;
         //dump();
 
-        return disk_bytes;
+        return;
     }
 
     // no contiguous region found
@@ -210,9 +210,10 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
                      " bytes free. Trying to extend the external memory space...");
 
         begin->offset = disk_bytes; // allocate at the end
-        disk_bytes += BLK_SIZE;
+        grow_file(BLK_SIZE);
+        free_bytes -= BLK_SIZE;
 
-        return disk_bytes;
+        return;
     }
 
     assert(requested_size > BLK_SIZE);
@@ -220,11 +221,9 @@ stxxl::int64 DiskAllocator::new_blocks(BID<BLK_SIZE> * begin,
 
     lock.unlock();
 
-    typename  BIDArray<BLK_SIZE>::iterator middle = begin + ((end - begin) / 2);
+    typename BIDArray<BLK_SIZE>::iterator middle = begin + ((end - begin) / 2);
     new_blocks(begin, middle);
     new_blocks(middle, end);
-
-    return disk_bytes;
 }
 
 

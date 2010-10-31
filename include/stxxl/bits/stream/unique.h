@@ -55,6 +55,7 @@ namespace stream
             ++input;
             while (!input.empty() && (binary_pred(current = *input, old_value)))
                 ++input;
+            return *this;
         }
 
         //! \brief Standard stream method
@@ -102,10 +103,11 @@ namespace stream
             ++input;
             while (!input.empty() && ((current = *input) == old_value))
                 ++input;
+            return *this;
         }
 
         //! \brief Standard stream method
-        value_type & operator * () const
+        const value_type & operator * () const
         {
             return current;
         }

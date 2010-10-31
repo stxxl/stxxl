@@ -17,6 +17,7 @@
 
 
 #include <stxxl/bits/algo/async_schedule.h>
+#include <stxxl/bits/io/file.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/parallel.h>
 
@@ -55,6 +56,15 @@ namespace async_schedule_local
     };
 
 
+    static inline int_type get_disk(int_type i, const int_type * disks, int_type D)
+    {
+        int_type disk = disks[i];
+        if (disk == file::NO_ALLOCATOR)
+            disk = D;  // remap to sentinel
+        assert(0 <= disk && disk <= D);
+        return disk;
+    }
+
     int_type simulate_async_write(
         const int_type * disks,
         const int_type L,
@@ -65,24 +75,23 @@ namespace async_schedule_local
         typedef std::priority_queue<sim_event, std::vector<sim_event>, sim_event_cmp> event_queue_type;
         typedef std::queue<int_type> disk_queue_type;
         assert(L >= D);
-        disk_queue_type * disk_queues = new disk_queue_type[D];
+        disk_queue_type * disk_queues = new disk_queue_type[D + 1];  // + sentinel for remapping NO_ALLOCATOR
         event_queue_type event_queue;
 
         int_type m = m_init;
         int_type i = L - 1;
         int_type oldtime = 0;
-        bool * disk_busy = new bool[D];
+        bool * disk_busy = new bool[D + 1];
 
         while (m && (i >= 0))
         {
-            int_type disk = disks[i];
-            assert(0 <= disk && disk < D);
+            int_type disk = get_disk(i, disks, D);
             disk_queues[disk].push(i);
             i--;
             m--;
         }
 
-        for (int_type ii = 0; ii < D; ii++)
+        for (int_type ii = 0; ii <= D; ii++)
             if (!disk_queues[ii].empty())
             {
                 int_type j = disk_queues[ii].front();
@@ -98,7 +107,7 @@ namespace async_schedule_local
             if (oldtime != cur.timestamp)
             {
                 // clear disk_busy
-                for (int_type i = 0; i < D; i++)
+                for (int_type i = 0; i <= D; i++)
                     disk_busy[i] = false;
 
                 oldtime = cur.timestamp;
@@ -110,8 +119,7 @@ namespace async_schedule_local
 
             if (i >= 0)
             {
-                int_type disk = disks[i];
-                assert(0 <= disk && disk < D);
+                int_type disk = get_disk(i, disks, D);
                 if (disk_busy[disk])
                 {
                     disk_queues[disk].push(i--);
@@ -123,7 +131,8 @@ namespace async_schedule_local
                         STXXL_VERBOSE1("c Block " << disk_queues[disk].front() << " scheduled for time " << cur.timestamp + 1);
                         event_queue.push(sim_event(cur.timestamp + 1, disk_queues[disk].front()));
                         disk_queues[disk].pop();
-                    } else
+                    }
+                    else
                     {
                         STXXL_VERBOSE1("a Block " << i << " scheduled for time " << cur.timestamp + 1);
                         event_queue.push(sim_event(cur.timestamp + 1, i--));
@@ -133,8 +142,7 @@ namespace async_schedule_local
             }
 
             // add next block to write
-            int_type disk = disks[cur.iblock];
-            assert(0 <= disk && disk < D);
+            int_type disk = get_disk(cur.iblock, disks, D);
             if (!disk_busy[disk] && !disk_queues[disk].empty())
             {
                 STXXL_VERBOSE1("b Block " << disk_queues[disk].front() << " scheduled for time " << cur.timestamp + 1);
@@ -145,7 +153,7 @@ namespace async_schedule_local
         }
 
         assert(i == -1);
-        for (int_type i = 0; i < D; i++)
+        for (int_type i = 0; i <= D; i++)
             assert(disk_queues[i].empty());
 
 
