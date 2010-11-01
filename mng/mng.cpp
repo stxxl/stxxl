@@ -29,10 +29,10 @@ block_manager::block_manager()
     for (unsigned i = 0; i < ndisks; ++i)
     {
         disk_files[i] = create_file(cfg->disk_io_impl(i),
-                                            cfg->disk_path(i),
-                                            file::CREAT | file::RDWR | file::DIRECT,
-                                            i,  // physical_device_id
-                                            i); // allocator_id
+                                    cfg->disk_path(i),
+                                    file::CREAT | file::RDWR | file::DIRECT,
+                                    i,          // physical_device_id
+                                    i);         // allocator_id
         disk_allocators[i] = new DiskAllocator(disk_files[i], cfg->disk_size(i));
     }
 }

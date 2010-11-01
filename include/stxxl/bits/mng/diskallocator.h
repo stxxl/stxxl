@@ -112,7 +112,7 @@ public:
     template <unsigned BLK_SIZE>
     void delete_blocks(const BIDArray<BLK_SIZE> & bids)
     {
-        for (unsigned i = 0 ; i < bids.size(); ++i)
+        for (unsigned i = 0; i < bids.size(); ++i)
             delete_block(bids[i]);
     }
 #endif
@@ -216,7 +216,6 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
     new_blocks(begin, middle);
     new_blocks(middle, end);
 }
-
 
 
 //! \}

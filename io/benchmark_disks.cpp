@@ -100,16 +100,16 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 void usage(const char * argv0)
 {
     std::cout << "Usage: " << argv0 << " [options] offset length [block_size [batch_size]] [r|v|w] [--] diskfile..." << std::endl;
-    std::cout << 
-        "Options:\n"
+    std::cout <<
+    "Options:\n"
 #ifdef RAW_ACCESS
-        "    --no-direct             open files without O_DIRECT\n"
+    "    --no-direct             open files without O_DIRECT\n"
 #endif
-        "    --sync                  open files with O_SYNC|O_DSYNC|O_RSYNC\n"
-        "    --file-type=syscall|mmap|wincall|boostfd|...    default: " << default_file_type << "\n"
-        "    --resize                resize the file size after opening,\n"
-        "                            needed e.g. for creating mmap files\n"
-        << std::endl;
+    "    --sync                  open files with O_SYNC|O_DSYNC|O_RSYNC\n"
+    "    --file-type=syscall|mmap|wincall|boostfd|...    default: " << default_file_type << "\n"
+    "    --resize                resize the file size after opening,\n"
+    "                            needed e.g. for creating mmap files\n"
+    << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
     std::cout << "    increase 'batch_size' (default 1)" << std::endl;
