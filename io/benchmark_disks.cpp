@@ -51,6 +51,12 @@ using stxxl::timestamp;
 //#define WATCH_TIMES
 
 
+#ifdef BOOST_MSVC
+const char * default_file_type = "wincall";
+#else
+const char * default_file_type = "syscall";
+#endif
+
 #ifdef WATCH_TIMES
 void watch_times(request_ptr reqs[], unsigned n, double * out)
 {
@@ -100,6 +106,7 @@ void usage(const char * argv0)
         "    --no-direct             open files without O_DIRECT\n"
 #endif
         "    --sync                  open files with O_SYNC|O_DSYNC|O_RSYNC\n"
+        "    --file-type=syscall|mmap|wincall|boostfd|...    default: " << default_file_type << "\n"
         << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
@@ -124,11 +131,7 @@ int main(int argc, char * argv[])
 {
     bool direct_io = true;
     bool sync_io = false;
-#ifdef BOOST_MSVC
-    const char * file_type = "wincall";
-#else
-    const char * file_type = "syscall";
-#endif
+    const char * file_type = default_file_type;
 
     int arg_curr = 1;
 
@@ -145,6 +148,15 @@ int main(int argc, char * argv[])
             direct_io = false;
         } else if (strcmp(arg, "--sync") == 0) {
             sync_io = true;
+        } else if (strcmp(arg, "--file-type") == 0) {
+            if (!arg_opt) {
+                ++arg_curr;
+                if (arg_curr < argc)
+                    arg_opt = argv[arg_curr];
+                else
+                    throw std::invalid_argument(std::string("missing argument for ") + arg);
+            }
+            file_type = arg_opt;
         } else if (strncmp(arg, "--", 2) == 0) {
             throw std::invalid_argument(std::string("unknown option ") + arg);
         } else {
@@ -275,6 +287,7 @@ int main(int argc, char * argv[])
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
               << block_size << " bytes)"
+              << " file_type=" << file_type
               << " O_DIRECT=" << (direct_io ? "yes" : "no")
               << " O_SYNC=" << (sync_io ? "yes" : "no")
               << std::endl;
