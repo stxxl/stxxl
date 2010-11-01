@@ -120,7 +120,16 @@ public:
 #endif
 
     template <unsigned BLK_SIZE>
-    void delete_block(const BID<BLK_SIZE> & bid);
+    void delete_block(const BID<BLK_SIZE> & bid)
+    {
+        scoped_mutex_lock lock(mutex);
+
+        STXXL_VERBOSE2("DiskAllocator::delete_block<" << BLK_SIZE <<
+                       ">(pos=" << bid.offset << ", size=" << bid.size <<
+                       "), free:" << free_bytes << " total:" << disk_bytes);
+
+        add_free_region(bid.offset, bid.size);
+    }
 };
 
 template <unsigned BLK_SIZE>
@@ -220,18 +229,6 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
     new_blocks(middle, end);
 }
 
-
-template <unsigned BLK_SIZE>
-void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
-{
-    scoped_mutex_lock lock(mutex);
-
-    STXXL_VERBOSE2("DiskAllocator::delete_block<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
-                                                                         << ", free:" << free_bytes << " total:" << disk_bytes);
-    STXXL_VERBOSE2("Deallocating a block with size: " << bid.size);
-
-    add_free_region(bid.offset, bid.size);
-}
 
 template <typename>
 void DiskAllocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size)
