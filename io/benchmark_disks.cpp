@@ -93,14 +93,18 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " [options] offset length [block_size [batch_size]] [nd] [r|v|w] [--] diskfile..." << std::endl;
+    std::cout << "Usage: " << argv0 << " [options] offset length [block_size [batch_size]] [r|v|w] [--] diskfile..." << std::endl;
+    std::cout << 
+        "Options:\n"
+#ifdef RAW_ACCESS
+        "    --no-direct             open files without O_DIRECT\n"
+#endif
+        "    --sync                  open files with O_SYNC|O_DSYNC|O_RSYNC\n"
+        << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
     std::cout << "    increase 'batch_size' (default 1)" << std::endl;
     std::cout << "    to submit several I/Os at once and report average rate" << std::endl;
-#ifdef RAW_ACCESS
-    std::cout << "    open mode: includes O_DIRECT unless the 'nd' flag is given" << std::endl;
-#endif
     std::cout << "    ops: write, reread and check (default); (R)ead only w/o verification;" << std::endl;
     std::cout << "         read only with (V)erification; (W)rite only" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
@@ -127,6 +131,28 @@ int main(int argc, char * argv[])
 #endif
 
     int arg_curr = 1;
+
+    // FIXME: use something like getopt() instead of reinventing the wheel,
+    // but there is some portability problem ...
+    while (arg_curr < argc) {
+        char * arg = argv[arg_curr];
+        char * arg_opt = strchr(argv[arg_curr], '=');
+        if (arg_opt) {
+            *arg_opt = 0;
+            ++arg_opt;  // skip '='
+        }
+        if (strcmp(arg, "--no-direct") == 0) {
+            direct_io = false;
+        } else if (strcmp(arg, "--sync") == 0) {
+            sync_io = true;
+        } else if (strncmp(arg, "--", 2) == 0) {
+            throw std::invalid_argument(std::string("unknown option ") + arg);
+        } else {
+            // remaining arguments are "old style" command line
+            break;
+        }
+        ++arg_curr;
+    }
 
     if (argc < arg_curr + 3)
         usage(argv[0]);
@@ -162,6 +188,7 @@ int main(int argc, char * argv[])
         batch_size = 1;
     }
 
+    // deprecated, use --no-direct instead
     if (first_disk_arg < argc && (strcmp("nd", argv[first_disk_arg]) == 0 || strcmp("ND", argv[first_disk_arg]) == 0)) {
         direct_io = false;
         ++first_disk_arg;
@@ -247,7 +274,10 @@ int main(int argc, char * argv[])
     std::cout << "# Step size: "
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
-              << block_size << " bytes)" << std::endl;
+              << block_size << " bytes)"
+              << " O_DIRECT=" << (direct_io ? "yes" : "no")
+              << " O_SYNC=" << (sync_io ? "yes" : "no")
+              << std::endl;
     timer t_total(true);
     try {
         while (offset + stxxl::int64(step_size) <= endpos || length == 0)
