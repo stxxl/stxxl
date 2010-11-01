@@ -15,6 +15,9 @@ FILE_SIZE	?= $(or $(SIZE),100)	# GiB
 BLOCK_SIZE	?= $(or $(STEP),256)	# MiB
 BATCH_SIZE	?= 1	# blocks
 DIRECT_IO	?= yes	# unset to disable O_DIRECT
+SYNC_IO		?= no   # set to 'yes' to enable O_SYNC|O_DSYNC|O_RSYNC
+FILE_TYPE	?= syscall
+FILE_RESIZE	?= no
 
 disk2file	?= /stxxl/sd$1/stxxl
 
@@ -49,11 +52,16 @@ ifeq ($(SHELL),/bin/sh)
 SHELL		 = bash
 endif
 
+DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(DIRECT_IO)),,--no-direct)
+DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(SYNC_IO)),--sync)
+DISKBENCH_FLAGS	+= --file-type $(strip $(FILE_TYPE))
+DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(FILE_RESIZE)),--resize)
+
 define do-some-disks
 	$(if $(filter ???,$(strip $(BLOCK_SIZE))),$(error ERROR: BLOCK_SIZE=$(strip $(BLOCK_SIZE))))
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
-	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(if $(filter y yes Y YES,$(DIRECT_IO)),,ND) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+	$(DISKBENCH_BINDIR)/$(DISKBENCH) $(DISKBENCH_FLAGS) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
 
 endef
 
@@ -159,7 +167,6 @@ DISKNAME	?= unknown disk
 PLOTXMAX	?= 475
 PLOTYMAX	?= 120
 AVGPLOTYMAX	?= $(PLOTYMAX)
-GNUPLOTFILEINFO	?= set label "$(subst _,\\_,$(HOST):$(patsubst $(HOME)/%,\\~/%,$(CURDIR))/)" at character 0,-1 font ",6"
 
 fmt_block_size_2560000B		?= 2.5
 fmt_block_size_12800000B	?= 12.5
