@@ -118,6 +118,13 @@ inline double throughput(double bytes, double seconds)
 
 int main(int argc, char * argv[])
 {
+    bool sync_io = false;
+#ifdef BOOST_MSVC
+    const char * file_type = "wincall";
+#else
+    const char * file_type = "syscall";
+#endif
+
     if (argc < 4)
         usage(argv[0]);
 
@@ -212,12 +219,11 @@ int main(int argc, char * argv[])
             openmode |= file::DIRECT;
 #endif
         }
+        if (sync_io) {
+            openmode |= file::SYNC;
+        }
 
-#ifdef BOOST_MSVC
-        disks[i] = new stxxl::wincall_file(disks_arr[i], openmode, i);
-#else
-        disks[i] = new stxxl::syscall_file(disks_arr[i], openmode, i);
-#endif
+        disks[i] = stxxl::create_file(file_type, disks_arr[i], openmode, i);
     }
 
 #ifdef DO_ONLY_READ
