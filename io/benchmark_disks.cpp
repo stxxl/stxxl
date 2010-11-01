@@ -93,10 +93,10 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [nd] [r|v|w] [--] diskfile..." << std::endl;
+    std::cout << "Usage: " << argv0 << " [options] offset length [block_size [batch_size]] [nd] [r|v|w] [--] diskfile..." << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
-    std::cout << "     increase 'batch_size' (default 1)" << std::endl;
+    std::cout << "    increase 'batch_size' (default 1)" << std::endl;
     std::cout << "    to submit several I/Os at once and report average rate" << std::endl;
 #ifdef RAW_ACCESS
     std::cout << "    open mode: includes O_DIRECT unless the 'nd' flag is given" << std::endl;
@@ -118,6 +118,7 @@ inline double throughput(double bytes, double seconds)
 
 int main(int argc, char * argv[])
 {
+    bool direct_io = true;
     bool sync_io = false;
 #ifdef BOOST_MSVC
     const char * file_type = "wincall";
@@ -125,18 +126,19 @@ int main(int argc, char * argv[])
     const char * file_type = "syscall";
 #endif
 
-    if (argc < 4)
+    int arg_curr = 1;
+
+    if (argc < arg_curr + 3)
         usage(argv[0]);
 
-    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
-    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
+    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[arg_curr]));
+    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[arg_curr + 1]));
     stxxl::int64 endpos = offset + length;
     stxxl::int64 block_size = 0;
     stxxl::int64 batch_size = 0;
 
     bool do_read = true, do_write = true, do_verify = true;
-    bool direct_io = true;
-    int first_disk_arg = 3;
+    int first_disk_arg = arg_curr + 2;
 
     if (first_disk_arg < argc)
         block_size = atoi(argv[first_disk_arg]);
