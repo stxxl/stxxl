@@ -107,6 +107,8 @@ void usage(const char * argv0)
 #endif
         "    --sync                  open files with O_SYNC|O_DSYNC|O_RSYNC\n"
         "    --file-type=syscall|mmap|wincall|boostfd|...    default: " << default_file_type << "\n"
+        "    --resize                resize the file size after opening,\n"
+        "                            needed e.g. for creating mmap files\n"
         << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
@@ -131,6 +133,7 @@ int main(int argc, char * argv[])
 {
     bool direct_io = true;
     bool sync_io = false;
+    bool resize_after_open = false;
     const char * file_type = default_file_type;
 
     int arg_curr = 1;
@@ -157,6 +160,8 @@ int main(int argc, char * argv[])
                     throw std::invalid_argument(std::string("missing argument for ") + arg);
             }
             file_type = arg_opt;
+        } else if (strcmp(arg, "--resize") == 0) {
+            resize_after_open = true;
         } else if (strncmp(arg, "--", 2) == 0) {
             throw std::invalid_argument(std::string("unknown option ") + arg);
         } else {
@@ -265,6 +270,8 @@ int main(int argc, char * argv[])
         }
 
         disks[i] = stxxl::create_file(file_type, disks_arr[i], openmode, i);
+        if (resize_after_open)
+            disks[i]->set_size(endpos);
     }
 
 #ifdef DO_ONLY_READ
