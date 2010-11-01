@@ -1178,7 +1178,6 @@ public:
         for ( ; i < n_pages; i++)
             non_free_slots[i] = true;
 
-
         while (!_free_slots.empty())
         {
             non_free_slots[_free_slots.front()] = false;
@@ -1199,15 +1198,21 @@ public:
             }
         }
     }
+
     ~vector()
     {
+        STXXL_VERBOSE("~vector()");
         try
         {
             flush();
         }
+        catch (io_error e)
+        {
+            STXXL_ERRMSG("io_error thrown in ~vector(): " << e.what());
+        }
         catch (...)
         {
-            STXXL_VERBOSE("Exception thrown in ~vector()");
+            STXXL_ERRMSG("Exception thrown in ~vector()");
         }
 
         if (!exported)
@@ -1225,7 +1230,7 @@ public:
                 }
                 catch (...)
                 {
-                    STXXL_VERBOSE("Exception thrown in ~vector()...set_size()");
+                    STXXL_ERRMSG("Exception thrown in ~vector()...set_size()");
                 }
             }
         }
