@@ -112,7 +112,11 @@ public:
 
 #if 0
     template <unsigned BLK_SIZE>
-    void delete_blocks(const BIDArray<BLK_SIZE> & bids);
+    void delete_blocks(const BIDArray<BLK_SIZE> & bids)
+    {
+        for (unsigned i = 0 ; i < bids.size(); ++i)
+            delete_block(bids[i]);
+    }
 #endif
 
     template <unsigned BLK_SIZE>
@@ -323,53 +327,6 @@ void DiskAllocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_s
 
     //dump();
 }
-
-#if 0
-template <unsigned BLK_SIZE>
-void DiskAllocator::delete_blocks(const BIDArray<BLK_SIZE> & bids)
-{
-    STXXL_VERBOSE2("DiskAllocator::delete_blocks<BLK_SIZE> BLK_SIZE=" << BLK_SIZE <<
-                   ", free:" << free_bytes << " total:" << disk_bytes);
-
-    unsigned i = 0;
-    for ( ; i < bids.size(); ++i)
-    {
-        stxxl::int64 region_pos = bids[i].offset;
-        stxxl::int64 region_size = bids[i].size;
-        STXXL_VERBOSE2("Deallocating a block with size: " << region_size);
-        assert(bids[i].size);
-
-        if (!free_space.empty())
-        {
-            sortseq::iterator succ =
-                free_space.upper_bound(region_pos);
-            sortseq::iterator pred = succ;
-            pred--;
-
-            if (succ != free_space.end()
-                && (*succ).first == region_pos + region_size)
-            {
-                // coalesce with successor
-
-                region_size += (*succ).second;
-                free_space.erase(succ);
-            }
-            if (pred != free_space.end()
-                && (*pred).first + (*pred).second == region_pos)
-            {
-                // coalesce with predecessor
-
-                region_size += (*pred).second;
-                region_pos = (*pred).first;
-                free_space.erase(pred);
-            }
-        }
-        free_space[region_pos] = region_size;
-    }
-    for (i = 0; i < bids.size(); ++i)
-        free_bytes += stxxl::int64(bids[i].size);
-}
-#endif
 
 //! \}
 
