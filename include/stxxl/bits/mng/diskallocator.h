@@ -60,6 +60,11 @@ class DiskAllocator : private noncopyable
         stxxl::int64 block_pos, stxxl::int64 block_size,
         const sortseq::iterator & pred, const sortseq::iterator & succ) const;
 
+    // expects the mutex to be locked
+    template <typename = int>
+    void add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size);
+
+    // expects the mutex to be locked
     void grow_file(stxxl::int64 extend_bytes)
     {
         if (!extend_bytes)
@@ -220,11 +225,15 @@ void DiskAllocator::delete_block(const BID<BLK_SIZE> & bid)
     STXXL_VERBOSE2("DiskAllocator::delete_block<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE
                                                                          << ", free:" << free_bytes << " total:" << disk_bytes);
     STXXL_VERBOSE2("Deallocating a block with size: " << bid.size);
-    //assert(bid.size);
 
+    add_free_region(bid.offset, bid.size);
+}
+
+template <typename>
+void DiskAllocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size)
+{
+    //assert(block_size);
     //dump();
-    const stxxl::int64 block_pos = bid.offset;
-    const stxxl::int64 block_size = bid.size;
     STXXL_VERBOSE2("Deallocating a block with size: " << block_size << " position: " << block_pos);
     stxxl::int64 region_pos = block_pos;
     stxxl::int64 region_size = block_size;
