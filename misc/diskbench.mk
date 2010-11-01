@@ -54,7 +54,7 @@ endif
 
 DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(DIRECT_IO)),,--no-direct)
 DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(SYNC_IO)),--sync)
-DISKBENCH_FLAGS	+= --file-type $(strip $(FILE_TYPE))
+DISKBENCH_FLAGS	+= --file-type=$(strip $(FILE_TYPE))
 DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(FILE_RESIZE)),--resize)
 
 define do-some-disks
@@ -204,8 +204,8 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	$(ECHO) '' >> $@
 	$(ECHO) 'pause -1' >> $@
 	$(ECHO) '' >> $@
-	$(ECHO) 'set title "$(subst _,\\_,$(subst @,\\@,$(DISKBENCH_TITLE)))"' >> $@
-	$(ECHO) 'set term postscript enhanced color solid 10' >> $@
+	$(ECHO) 'set title "$(call GNUPLOT_PS_STRING_ESCAPE,$(DISKBENCH_TITLE))"' >> $@
+	$(ECHO) 'set term postscript enhanced $(GNUPLOT_PS_COLOR) 10' >> $@
 	$(ECHO) 'set output "$(HOST).ps"' >> $@
 	$(ECHO) '$(GNUPLOTFILEINFO)' >> $@
 	$(ECHO) 'replot' >> $@
@@ -239,8 +239,8 @@ $(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
 	$(ECHO) 'set output "$(HOST)-avg.png"' >> $@
 	$(ECHO) 'replot' >> $@
 	$(ECHO) '' >> $@
-	$(ECHO) 'set title "$(subst _,\\_,$(subst @,\\@,$(DISKAVG_TITLE)))"' >> $@
-	$(ECHO) 'set term postscript enhanced color solid' >> $@
+	$(ECHO) 'set title "$(call GNUPLOT_PS_STRING_ESCAPE,$(DISKAVG_TITLE))"' >> $@
+	$(ECHO) 'set term postscript enhanced $(GNUPLOT_PS_COLOR)' >> $@
 	$(ECHO) 'set output "$(HOST)-avg.ps"' >> $@
 	$(ECHO) '$(GNUPLOTFILEINFO)' >> $@
 	$(ECHO) 'replot' >> $@
