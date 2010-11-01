@@ -60,18 +60,18 @@ class DiskAllocator : private noncopyable
         stxxl::int64 block_pos, stxxl::int64 block_size,
         const sortseq::iterator & pred, const sortseq::iterator & succ) const;
 
-    // expects the mutex to be locked
+    // expects the mutex to be locked to prevent concurrent access
     void add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size);
 
-    // expects the mutex to be locked
+    // expects the mutex to be locked to prevent concurrent access
     void grow_file(stxxl::int64 extend_bytes)
     {
         if (!extend_bytes)
             return;
 
+        storage->set_size(disk_bytes + extend_bytes);
+        add_free_region(disk_bytes, extend_bytes);
         disk_bytes += extend_bytes;
-        free_bytes += extend_bytes;
-        storage->set_size(disk_bytes);
     }
 
 public:
@@ -82,7 +82,6 @@ public:
         autogrow(disk_size == 0)
     {
         grow_file(disk_size);
-        free_space[0] = disk_size;
     }
 
     inline stxxl::int64 get_free_bytes() const
@@ -159,16 +158,7 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
                          " bytes free. Trying to extend the external memory space...");
         }
 
-        stxxl::int64 pos = disk_bytes;  // allocate at the end
         grow_file(requested_size);
-        for ( ; begin != end; ++begin)
-        {
-            begin->offset = pos;
-            pos += begin->size;
-        }
-        free_bytes -= requested_size;
-
-        return;
     }
 
     // dump();
@@ -188,11 +178,10 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
                      " bytes requested, " << free_bytes <<
                      " bytes free. Trying to extend the external memory space...");
 
-        begin->offset = disk_bytes; // allocate at the end
         grow_file(BLK_SIZE);
-        free_bytes -= BLK_SIZE;
 
-        return;
+        space = std::find_if(free_space.begin(), free_space.end(),
+                             bind2nd(FirstFit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
     }
 
     if (space != free_space.end())
@@ -223,7 +212,7 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
     lock.unlock();
 
-    typename BIDArray<BLK_SIZE>::iterator middle = begin + ((end - begin) / 2);
+    BID<BLK_SIZE> * middle = begin + ((end - begin) / 2);
     new_blocks(begin, middle);
     new_blocks(middle, end);
 }
