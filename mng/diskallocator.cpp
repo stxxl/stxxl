@@ -29,6 +29,7 @@ void DiskAllocator::dump() const
     STXXL_ERRMSG("Total bytes: " << total);
 }
 
+
 void DiskAllocator::deallocation_error(
         stxxl::int64 block_pos, stxxl::int64 block_size,
         const sortseq::iterator & pred, const sortseq::iterator & succ) const
@@ -50,6 +51,101 @@ void DiskAllocator::deallocation_error(
         STXXL_ERRMSG("succ: begin=" << succ->first << " size=" << succ->second);
     }
     dump();
+}
+
+
+void DiskAllocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size)
+{
+    //assert(block_size);
+    //dump();
+    STXXL_VERBOSE2("Deallocating a block with size: " << block_size << " position: " << block_pos);
+    stxxl::int64 region_pos = block_pos;
+    stxxl::int64 region_size = block_size;
+    if (!free_space.empty())
+    {
+        sortseq::iterator succ = free_space.upper_bound(region_pos);
+        sortseq::iterator pred = succ;
+        if (pred != free_space.begin())
+            pred--;
+        if (pred != free_space.end())
+        {
+            if (pred->first <= region_pos && pred->first + pred->second > region_pos)
+            {
+                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  in empty space [" << pred->first << " + " << pred->second << "]");
+            }
+        }
+        if (succ != free_space.end())
+        {
+            if (region_pos <= succ->first && region_pos + region_size > succ->first)
+            {
+                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  which overlaps empty space [" << succ->first << " + " << succ->second << "]");
+            }
+        }
+        if (succ == free_space.end())
+        {
+            if (pred == free_space.end())
+            {
+                deallocation_error(block_pos, block_size, pred, succ);
+                assert(pred != free_space.end());
+            }
+            if ((*pred).first + (*pred).second == region_pos)
+            {
+                // coalesce with predecessor
+                region_size += (*pred).second;
+                region_pos = (*pred).first;
+                free_space.erase(pred);
+            }
+        }
+        else
+        {
+            if (free_space.size() > 1)
+            {
+#if 0
+                if (pred == succ)
+                {
+                    deallocation_error(block_pos, block_size, pred, succ);
+                    assert(pred != succ);
+                }
+#endif
+                bool succ_is_not_the_first = (succ != free_space.begin());
+                if ((*succ).first == region_pos + region_size)
+                {
+                    // coalesce with successor
+                    region_size += (*succ).second;
+                    free_space.erase(succ);
+                }
+                if (succ_is_not_the_first)
+                {
+                    if (pred == free_space.end())
+                    {
+                        deallocation_error(block_pos, block_size, pred, succ);
+                        assert(pred != free_space.end());
+                    }
+                    if ((*pred).first + (*pred).second == region_pos)
+                    {
+                        // coalesce with predecessor
+                        region_size += (*pred).second;
+                        region_pos = (*pred).first;
+                        free_space.erase(pred);
+                    }
+                }
+            }
+            else
+            {
+                if ((*succ).first == region_pos + region_size)
+                {
+                    // coalesce with successor
+                    region_size += (*succ).second;
+                    free_space.erase(succ);
+                }
+            }
+        }
+    }
+
+    free_space[region_pos] = region_size;
+    free_bytes += block_size;
+
+    //dump();
 }
 
 __STXXL_END_NAMESPACE
