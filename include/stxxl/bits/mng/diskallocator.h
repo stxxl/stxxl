@@ -173,34 +173,11 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
     // dump();
 
-    sortseq::iterator space =
-        std::find_if(free_space.begin(), free_space.end(),
-                     bind2nd(FirstFit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
+    sortseq::iterator space;
+    space = std::find_if(free_space.begin(), free_space.end(),
+                         bind2nd(FirstFit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
 
-    if (space != free_space.end())
-    {
-        stxxl::int64 region_pos = (*space).first;
-        stxxl::int64 region_size = (*space).second;
-        free_space.erase(space);
-        if (region_size > requested_size)
-            free_space[region_pos + requested_size] = region_size - requested_size;
-
-        stxxl::int64 pos = region_pos;
-        for ( ; begin != end; ++begin)
-        {
-            begin->offset = pos;
-            pos += begin->size;
-        }
-        free_bytes -= requested_size;
-        //dump();
-
-        return;
-    }
-
-    // no contiguous region found
-    STXXL_VERBOSE1("Warning, when allocating an external memory space, no contiguous region found");
-    STXXL_VERBOSE1("It might harm the performance");
-    if (requested_size == BLK_SIZE)
+    if (space == free_space.end() && requested_size == BLK_SIZE)
     {
         assert(end - begin == 1);
 
@@ -217,6 +194,29 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
         return;
     }
+
+    if (space != free_space.end())
+    {
+        stxxl::int64 region_pos = (*space).first;
+        stxxl::int64 region_size = (*space).second;
+        free_space.erase(space);
+        if (region_size > requested_size)
+            free_space[region_pos + requested_size] = region_size - requested_size;
+
+        for (stxxl::int64 pos = region_pos; begin != end; ++begin)
+        {
+            begin->offset = pos;
+            pos += begin->size;
+        }
+        free_bytes -= requested_size;
+        //dump();
+
+        return;
+    }
+
+    // no contiguous region found
+    STXXL_VERBOSE1("Warning, when allocating an external memory space, no contiguous region found");
+    STXXL_VERBOSE1("It might harm the performance");
 
     assert(requested_size > BLK_SIZE);
     assert(end - begin > 1);
