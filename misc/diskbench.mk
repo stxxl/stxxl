@@ -36,7 +36,7 @@ SIP_CHUNK_BLOCKS?= 1
 SIP_BLOCK_SIZE	?= 0
 
 DISKBENCH_TITLE	?= STXXL Disk Benchmark $(DISKNAME) B=$(strip $(BATCH_SIZE))x$(call format_block_size,$(BLOCK_SIZE)) @ $(HOST)
-DISKAVG_TITLE	?= STXXL Disk Benchmark $(DISKNAME) @ $(HOST)
+DISKAVG_TITLE	?= STXXL Disk Benchmark $(DISKNAME) @ $(HOST)$(if $(DISKNAME2),\n$(DISKNAME2))
 
 DISKBENCH_BINDIR?= .
 MISC_BINDIR	?= $(DISKBENCH_BINDIR)/../misc
@@ -164,6 +164,7 @@ disk2label	?= sd$1
 disks2label	?= sd[$1]
 
 DISKNAME	?= unknown disk
+DISKNAME2	?=# optional second line describing the test environment
 PLOTXMAX	?= 475
 PLOTYMAX	?= 120
 AVGPLOTYMAX	?= $(PLOTYMAX)
