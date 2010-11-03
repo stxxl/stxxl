@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2010 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -51,42 +52,39 @@ int main()
     typedef stxxl::stream::runs_creator<InputType, Cmp, 4096, stxxl::RC> CreateRunsAlg;
     typedef CreateRunsAlg::sorted_runs_type SortedRunsType;
 
-    unsigned size = (30 * 1024 * 128 / (sizeof(value_type) * 2));
-
-    unsigned i = 0;
+    unsigned input_size = (50 * megabyte / sizeof(value_type));
 
     Cmp c;
-    CreateRunsAlg SortedRuns(c, 1024 * 128);
-    value_type oldcrc(0);
+    CreateRunsAlg SortedRuns(c, 10 * megabyte);
+    value_type checksum_before(0);
 
     stxxl::random_number32 rnd;
-    //stxxl::random_number<> rnd_max;
-    unsigned cnt = size;
-    while (cnt > 0)
+
+    for (unsigned cnt = input_size; cnt > 0; --cnt)
     {
-        const value_type tmp = rnd();
-        oldcrc += tmp;
-        SortedRuns.push(tmp);                   // push into the sorter
-        --cnt;
+        const value_type element = rnd();
+        checksum_before += element;
+        SortedRuns.push(element);                   // push into the sorter
     }
 
     SortedRunsType Runs = SortedRuns.result();  // get sorted_runs data structure
     assert(stxxl::stream::check_sorted_runs(Runs, Cmp()));
 
     // merge the runs
-    stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 1024 * 512 / 10 + 12 * 4096);
+    stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 10 * megabyte);
     stxxl::vector<value_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY> array;
-    STXXL_MSG(size << " " << Runs.elements);
-    STXXL_MSG("CRC: " << oldcrc);
-    value_type crc(0);
-    for (i = 0; i < size; ++i)
+    STXXL_MSG(input_size << " " << Runs.elements);
+    STXXL_MSG("checksum before: " << checksum_before);
+    value_type checksum_after(0);
+    for (unsigned i = 0; i < input_size; ++i)
     {
-        crc += *merger;
+        checksum_after += *merger;
         array.push_back(*merger);
         ++merger;
     }
-    STXXL_MSG("CRC: " << crc);
+    STXXL_MSG("checksum after:  " << checksum_after);
     assert(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
+    assert(checksum_before == checksum_after);
     assert(merger.empty());
 
     return 0;
