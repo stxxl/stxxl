@@ -36,13 +36,6 @@ ufs_file_base::ufs_file_base(
 {
     int flags = 0;
 
-#ifndef STXXL_DIRECT_IO_OFF
- #ifndef BOOST_MSVC
-    if (mode & DIRECT)
-        flags |= O_SYNC | O_RSYNC | O_DSYNC | O_DIRECT;
- #endif
-#endif
-
     if (mode & RDONLY)
     {
         flags |= O_RDONLY;
@@ -68,6 +61,20 @@ ufs_file_base::ufs_file_base(
         flags |= O_TRUNC;
     }
 
+#ifndef STXXL_DIRECT_IO_OFF
+    if (mode & DIRECT)
+    {
+        flags |= O_DIRECT;
+    }
+#endif
+
+    if (mode & SYNC)
+    {
+        flags |= O_RSYNC;
+        flags |= O_DSYNC;
+        flags |= O_SYNC;
+    }
+
 #ifdef BOOST_MSVC
     flags |= O_BINARY;                     // the default in MS is TEXT mode
 #endif
@@ -80,6 +87,11 @@ ufs_file_base::ufs_file_base(
 
     if ((file_des = ::open(filename.c_str(), flags, perms)) < 0)
         STXXL_THROW2(io_error, "::open() Filedescriptor=" << file_des << " filename=" << filename << " flags=" << flags);
+
+    if (!(mode & NO_LOCK))
+    {
+        lock();
+    }
 }
 
 ufs_file_base::~ufs_file_base()

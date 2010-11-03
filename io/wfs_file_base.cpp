@@ -29,14 +29,6 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
     DWORD dwCreationDisposition = 0;
     DWORD dwFlagsAndAttributes = 0;
 
-#ifndef STXXL_DIRECT_IO_OFF
-    if (mode & file::DIRECT)
-    {
-        dwFlagsAndAttributes |= FILE_FLAG_NO_BUFFERING;
-        // TODO: try also FILE_FLAG_WRITE_THROUGH option ?
-    }
-#endif
-
     if (mode & file::RDONLY)
     {
         dwFlagsAndAttributes |= FILE_ATTRIBUTE_READONLY;
@@ -67,6 +59,19 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
         dwCreationDisposition |= OPEN_ALWAYS;
     }
 
+#ifndef STXXL_DIRECT_IO_OFF
+    if (mode & file::DIRECT)
+    {
+        dwFlagsAndAttributes |= FILE_FLAG_NO_BUFFERING;
+        // TODO: try also FILE_FLAG_WRITE_THROUGH option ?
+    }
+#endif
+
+    if (mode & file::SYNC)
+    {
+        // ignored
+    }
+
     HANDLE file_des = ::CreateFile(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
                                    dwCreationDisposition, dwFlagsAndAttributes, NULL);
 
@@ -81,6 +86,12 @@ wfs_file_base::wfs_file_base(
     int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename)
 {
     file_des = open_file_impl(filename, mode);
+
+    if (!(mode & NO_LOCK))
+    {
+        lock();
+    }
+
     if (!(mode_ & RDONLY) && (mode & DIRECT))
     {
         char buf[32768], * part;

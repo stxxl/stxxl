@@ -175,7 +175,7 @@ private:
     {
         scoped_mutex_lock Lock(ref_cnt_mutex);
         ref_cnt++;
-        STXXL_VERBOSE3("request add_ref() " << static_cast<void *>(this) << ": adding reference, cnt: " << ref_cnt);
+        STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::add_ref(): added reference, ref_cnt=" << ref_cnt);
     }
 
     bool sub_ref()
@@ -184,7 +184,7 @@ private:
         {
             scoped_mutex_lock Lock(ref_cnt_mutex);
             val = --ref_cnt;
-            STXXL_VERBOSE3("request sub_ref() " << static_cast<void *>(this) << ": subtracting reference cnt: " << ref_cnt);
+            STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::sub_ref(): subtracted reference, ref_cnt=" << ref_cnt);
         }
         assert(val >= 0);
         return (val == 0);
@@ -208,6 +208,8 @@ inline std::ostream & operator << (std::ostream & out, const request & req)
 
 //! \brief A smart wrapper for \c request pointer.
 
+#define STXXL_VERBOSE_request_ptr(msg) STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_ptr::" << msg << " ptr=" << static_cast<void *>(ptr))
+
 //! Implemented as reference counting smart pointer.
 class request_ptr
 {
@@ -225,13 +227,13 @@ class request_ptr
         {
             if (ptr->sub_ref())
             {
-                STXXL_VERBOSE3("the last copy " << static_cast<void *>(ptr) << " this=" << static_cast<void *>(this));
+                STXXL_VERBOSE_request_ptr("sub_ref(): the last ref, deleting");
                 delete ptr;
                 ptr = NULL;
             }
             else
             {
-                STXXL_VERBOSE3("more copies " << static_cast<void *>(ptr) << " this=" << static_cast<void *>(this));
+                STXXL_VERBOSE_request_ptr("sub_ref(): more refs left");
             }
         }
     }
@@ -240,19 +242,19 @@ public:
     //! \brief Constructs an \c request_ptr from \c request pointer
     request_ptr(request * ptr_ = NULL) : ptr(ptr_)
     {
-        STXXL_VERBOSE3("create constructor (request =" << static_cast<void *>(ptr) << ") this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("(request*)");
         add_ref();
     }
     //! \brief Constructs an \c request_ptr from a \c request_ptr object
     request_ptr(const request_ptr & p) : ptr(p.ptr)
     {
-        STXXL_VERBOSE3("copy constructor (copying " << static_cast<void *>(ptr) << ") this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("(request_ptr&)");
         add_ref();
     }
     //! \brief Destructor
     ~request_ptr()
     {
-        STXXL_VERBOSE3("Destructor of a request_ptr pointing to " << static_cast<void *>(ptr) << " this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("~()");
         sub_ref();
     }
     //! \brief Assignment operator from \c request_ptr object
@@ -266,14 +268,14 @@ public:
     //! \return reference to itself
     request_ptr & operator = (request * p)
     {
-        STXXL_VERBOSE3("assign operator begin (assigning " << static_cast<void *>(p) << ") this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("operator=(request=" << static_cast<void *>(p) << ") {BEGIN}");
         if (p != ptr)
         {
             sub_ref();
             ptr = p;
             add_ref();
         }
-        STXXL_VERBOSE3("assign operator end (assigning " << static_cast<void *>(p) << ") this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("operator=(request=" << static_cast<void *>(p) << ") {END}");
         return *this;
     }
     //! \brief "Star" operator

@@ -20,7 +20,7 @@ typedef vector_type::block_type block_type;
 
 void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
+    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::CREAT | stxxl::file::DIRECT | stxxl::file::RDWR);
     {
         vector_type v(f);
         v.resize(sz);
@@ -31,11 +31,12 @@ void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_ty
     delete f;
 }
 
+template <typename Vector>
 void test_rdwr(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
+    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDWR);
     {
-        vector_type v(f);
+        Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDWR)");
         assert(v.size() == sz);
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
@@ -44,11 +45,12 @@ void test_rdwr(const char * fn, const char * ft, stxxl::unsigned_type sz, my_typ
     delete f;
 }
 
+template <typename Vector>
 void test_rdonly(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
-    stxxl::file * f = stxxl::FileCreator::create(ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
+    stxxl::file * f = stxxl::create_file(ft, fn, stxxl::file::DIRECT | stxxl::file::RDONLY);
     {
-        vector_type v(f);
+        Vector v(f);
         STXXL_MSG("reading " << v.size() << " elements (RDONLY)");
         assert(v.size() == sz);
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
@@ -60,8 +62,10 @@ void test_rdonly(const char * fn, const char * ft, stxxl::unsigned_type sz, my_t
 void test(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs)
 {
     test_write(fn, ft, sz, ofs);
-    test_rdwr(fn, ft, sz, ofs);
-    test_rdonly(fn, ft, sz, ofs);
+    test_rdwr<const vector_type>(fn, ft, sz, ofs);
+    test_rdwr<vector_type>(fn, ft, sz, ofs);
+    test_rdonly<const vector_type>(fn, ft, sz, ofs);
+    test_rdonly<vector_type>(fn, ft, sz, ofs);
 }
 
 int main(int argc, char ** argv)
@@ -79,16 +83,18 @@ int main(int argc, char ** argv)
     if (argc >= 3)
         ft = argv[2];
 
+    stxxl::unsigned_type start_elements = 42 * block_type::size;
+
     STXXL_MSG("using " << ft << " file");
 
     // multiple of block size
-    test(fn, ft, 4 * block_type::size, 100000000);
+    test(fn, ft, start_elements, 100000000);
 
     // multiple of page size, but not block size
-    test(fn, ft, 4 * block_type::size + 4096, 200000000);
+    test(fn, ft, start_elements + 4096, 200000000);
 
     // multiple of neither block size nor page size
-    test(fn, ft, 4 * block_type::size + 4096 + 23, 300000000);
+    test(fn, ft, start_elements + 4096 + 23, 300000000);
 
     // truncate 1 byte
     {
@@ -99,7 +105,7 @@ int main(int argc, char ** argv)
     }
 
     // will truncate after the last complete element
-    test_rdwr(fn, ft, 4 * block_type::size + 4096 + 23 - 1, 300000000);
+    test_rdwr<vector_type>(fn, ft, start_elements + 4096 + 23 - 1, 300000000);
 
     // truncate 1 more byte
     {
@@ -110,13 +116,13 @@ int main(int argc, char ** argv)
     }
 
     // will not truncate
-    test_rdonly(fn, ft, 4 * block_type::size + 4096 + 23 - 2, 300000000);
+    test_rdonly<vector_type>(fn, ft, start_elements + 4096 + 23 - 2, 300000000);
 
     // check final size
     {
         stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
         STXXL_MSG("file size is " << f.size() << " bytes");
-        assert(f.size() == (4 * block_type::size + 4096 + 23 - 1) * sizeof(my_type) - 1);
+        assert(f.size() == (start_elements + 4096 + 23 - 1) * sizeof(my_type) - 1);
     }
 }
 // vim: et:ts=4:sw=4
