@@ -15,6 +15,9 @@ FILE_SIZE	?= $(or $(SIZE),100)	# GiB
 BLOCK_SIZE	?= $(or $(STEP),256)	# MiB
 BATCH_SIZE	?= 1	# blocks
 DIRECT_IO	?= yes	# unset to disable O_DIRECT
+SYNC_IO		?= no   # set to 'yes' to enable O_SYNC|O_DSYNC|O_RSYNC
+FILE_TYPE	?= syscall
+FILE_RESIZE	?= no
 
 disk2file	?= /stxxl/sd$1/stxxl
 
@@ -33,7 +36,7 @@ SIP_CHUNK_BLOCKS?= 1
 SIP_BLOCK_SIZE	?= 0
 
 DISKBENCH_TITLE	?= STXXL Disk Benchmark $(DISKNAME) B=$(strip $(BATCH_SIZE))x$(call format_block_size,$(BLOCK_SIZE)) @ $(HOST)
-DISKAVG_TITLE	?= STXXL Disk Benchmark $(DISKNAME) @ $(HOST)
+DISKAVG_TITLE	?= STXXL Disk Benchmark $(DISKNAME) @ $(HOST)$(if $(DISKNAME2),\n$(DISKNAME2))
 
 DISKBENCH_BINDIR?= .
 MISC_BINDIR	?= $(DISKBENCH_BINDIR)/../misc
@@ -49,11 +52,16 @@ ifeq ($(SHELL),/bin/sh)
 SHELL		 = bash
 endif
 
+DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(DIRECT_IO)),,--no-direct)
+DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(SYNC_IO)),--sync)
+DISKBENCH_FLAGS	+= --file-type=$(strip $(FILE_TYPE))
+DISKBENCH_FLAGS	+= $(if $(filter y yes Y YES,$(FILE_RESIZE)),--resize)
+
 define do-some-disks
 	$(if $(filter ???,$(strip $(BLOCK_SIZE))),$(error ERROR: BLOCK_SIZE=$(strip $(BLOCK_SIZE))))
 	-$(pipefail) \
 	$(if $(IOSTAT_PLOT_RECORD_DATA),$(IOSTAT_PLOT_RECORD_DATA) -p $(@:.log=)) \
-	$(DISKBENCH_BINDIR)/$(DISKBENCH) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(if $(filter y yes Y YES,$(DIRECT_IO)),,ND) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
+	$(DISKBENCH_BINDIR)/$(DISKBENCH) $(DISKBENCH_FLAGS) 0 $(strip $(FILE_SIZE)) $(strip $(BLOCK_SIZE)) $(strip $(BATCH_SIZE)) $(FLAGS_$*) $(FLAGS_EX) $(foreach d,$(DISKS_$*),$(call disk2file,$d)) | tee $@
 
 endef
 
@@ -156,10 +164,10 @@ disk2label	?= sd$1
 disks2label	?= sd[$1]
 
 DISKNAME	?= unknown disk
+DISKNAME2	?=# optional second line describing the test environment
 PLOTXMAX	?= 475
 PLOTYMAX	?= 120
 AVGPLOTYMAX	?= $(PLOTYMAX)
-GNUPLOTFILEINFO	?= set label "$(subst _,\\_,$(HOST):$(patsubst $(HOME)/%,\\~/%,$(CURDIR))/)" at character 0,-1 font ",6"
 
 fmt_block_size_2560000B		?= 2.5
 fmt_block_size_12800000B	?= 12.5
@@ -197,8 +205,8 @@ $(HOST).gnuplot: $(MAKEFILE_LIST) $(wildcard *.log)
 	$(ECHO) '' >> $@
 	$(ECHO) 'pause -1' >> $@
 	$(ECHO) '' >> $@
-	$(ECHO) 'set title "$(subst _,\\_,$(subst @,\\@,$(DISKBENCH_TITLE)))"' >> $@
-	$(ECHO) 'set term postscript enhanced color solid 10' >> $@
+	$(ECHO) 'set title "$(call GNUPLOT_PS_STRING_ESCAPE,$(DISKBENCH_TITLE))"' >> $@
+	$(ECHO) 'set term postscript enhanced $(GNUPLOT_PS_COLOR) 10' >> $@
 	$(ECHO) 'set output "$(HOST).ps"' >> $@
 	$(ECHO) '$(GNUPLOTFILEINFO)' >> $@
 	$(ECHO) 'replot' >> $@
@@ -232,8 +240,8 @@ $(HOST)-avg.gnuplot: $(HOST)-avg.dat $(MAKEFILE_LIST)
 	$(ECHO) 'set output "$(HOST)-avg.png"' >> $@
 	$(ECHO) 'replot' >> $@
 	$(ECHO) '' >> $@
-	$(ECHO) 'set title "$(subst _,\\_,$(subst @,\\@,$(DISKAVG_TITLE)))"' >> $@
-	$(ECHO) 'set term postscript enhanced color solid' >> $@
+	$(ECHO) 'set title "$(call GNUPLOT_PS_STRING_ESCAPE,$(DISKAVG_TITLE))"' >> $@
+	$(ECHO) 'set term postscript enhanced $(GNUPLOT_PS_COLOR)' >> $@
 	$(ECHO) 'set output "$(HOST)-avg.ps"' >> $@
 	$(ECHO) '$(GNUPLOTFILEINFO)' >> $@
 	$(ECHO) 'replot' >> $@
