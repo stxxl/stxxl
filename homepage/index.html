@@ -9,32 +9,32 @@
         <p class="whiteOnBlueBold">
             STXXL 
         </p>
-	<p style="margin-top: 1ex">
-		<b>STXXL: Standard Template Library for Extra Large Data Sets.</b>
-	</p>
-	<table align="right">
+        <p style="margin-top: 1ex">
+                <b>STXXL: Standard Template Library for Extra Large Data Sets.</b>
+        </p>
+        <table align="right">
             <tr>
                 <td>
                         <script type="text/javascript" src="http://www.ohloh.net/p/11530/widgets/project_basic_stats.js">
                         </script>
                 </td>
                 <td>
-			<img src="layer_diagram.png" align="right" alt="Grafik"/>
+                        <img src="layer_diagram.png" align="right" alt="Grafik"/>
                 </td>
             </tr>
         </table>
-                    <p class="ordinary">
-                        The core of <b>STXXL</b>
-                        is an implementation of the C++ <a href="http://en.wikipedia.org/wiki/Standard_Template_Library">standard template library STL</a>
-                        for external memory (out-of-core) computations, i.e., <b>STXXL</b>
-                        implements containers and algorithms that can process <b>huge volumes of data</b>
-                        that only fit on disks. While the closeness to the STL supports ease of use and compatibility with existing applications, another design priority is high performance. [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">more info</a>] 
-                    </p>
-	<p class="ordinary" style="padding-bottom: 0px;">
+        <p class="ordinary">
+            The core of <b>STXXL</b>
+            is an implementation of the C++ <a href="http://en.wikipedia.org/wiki/Standard_Template_Library">standard template library STL</a>
+            for external memory (out-of-core) computations, i.e., <b>STXXL</b>
+            implements containers and algorithms that can process <b>huge volumes of data</b>
+            that only fit on disks. While the closeness to the STL supports ease of use and compatibility with existing applications, another design priority is high performance. [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">more info</a>] 
+        </p>
+        <p class="ordinary" style="padding-bottom: 0px;">
                     The key features of <b>STXXL</b>
                     are: 
-	</p>
-	<ul class="listPoint" style="margin-left: 20px;">
+        </p>
+        <ul style="margin-left: 20px;">
                     <li>
                         Transparent support of parallel disks. The library provides implementations of basic <b>parallel disk</b>
                         algorithms. <b>STXXL</b>
@@ -45,8 +45,8 @@
                         size (tested to up to dozens of terabytes). 
                     </li>
             <li>
-		Improved utilization of computer resources.
-		<b>STXXL</b>
+                Improved utilization of computer resources.
+                <b>STXXL</b>
                 implementations of external memory algorithms and data structures benefit from overlapping of I/O and computation. 
             </li>
             <li>
@@ -69,7 +69,7 @@
         </ul>
         <p>
             <b>Current contributors: </b>Andreas Beckmann, Johannes Singler 
-		<br/>
+                <br/>
             <b>Past contributors: </b>Roman Dementiev (author), Peter Sanders 
         </p>
         <br/>
@@ -103,7 +103,7 @@
             </tr>
             <tr>
                 <td>
-                    <ul class="listPoint">
+                    <ul>
                         <li>
                             Linux (kernel &gt;= 2.4.18)
                         </li>
@@ -113,8 +113,8 @@
                     g++ (3.3-4.5) 
                     <br/>
                     icpc (9.0-11.1) 
-		    <br/>
-		    clang++ (2.8)
+                    <br/>
+                    clang++ (2.8)
                 </td>
                 <td>
                     <a href="http://www.boost.org/">Boost</a>
@@ -129,7 +129,7 @@
             </tr>
             <tr>
                 <td>
-                    <ul class="listPoint">
+                    <ul>
                         <li>
                             Mac OS X 
                         </li>
@@ -141,7 +141,7 @@
             </tr>
             <tr>
                 <td>
-                    <ul class="listPoint">
+                    <ul>
                         <li>
                             FreeBSD 
                         </li>
@@ -153,7 +153,7 @@
             </tr>
             <tr>
                 <td>
-                    <ul class="listPoint">
+                    <ul>
                         <li>
                             Windows 2000/XP/Vista 
                         </li>
@@ -175,9 +175,25 @@
             Currently that sums to about 34,000 lines of code. 
         </p>
         <p class="whiteOnBlue">
+            Branches
+        </p>
+        <p class="ordinary">
+            Special features are maintained in up-to-date branches until they are merged into trunk.
+            Until inclusion into trunk, the interface may change without further notice.
+            Please refer to <a href="http://algo2.iti.kit.edu/stxxl/trunk/install-svn.html">Installing from subversion</a> for a description on how to build these branches.
+        </p>
+        <ul>
+            <li>
+                Support for Native Command Queuing (NCQ) on Linux: <a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/branches/kernelaio/">kernelaio</a>
+            </li>
+            <li>
+                Support for Asynchronous Pipelining/Streaming: <a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/branches/parallel_pipelining_integration/">parallel_pipelining_integration</a>
+            </li>
+        </ul>
+        <p class="whiteOnBlue">
             Major improvements in the latest release 
         </p>
-        <ul class="listPoint">
+        <ul>
             <li>
                 Improved support (e. g. priority queue) for the <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode </a>(successor of MCSTL), requires g++ 4.4 or later. 
             </li>
@@ -225,7 +241,7 @@
             </tr>
             <tr>
                 <td>
-                    <ul class="listPoint">
+                    <ul>
                         <li>
                             Installation manual: 
                         </li>
@@ -243,7 +259,7 @@
             </tr>
             <tr>
                 <td>
-                    <ul class="listPoint">
+                    <ul>
                         <li>
                             Programmer documentation: 
                         </li>
@@ -261,7 +277,7 @@
             </tr>
             <tr>
                 <td>
-                    <ul class="listPoint">
+                    <ul>
                         <li>
                             Download: [<a href="http://sourceforge.net/projects/stxxl/">sf.net page</a>] 
                         </li>
@@ -279,35 +295,35 @@
             </tr>
             <tr>
                 <td>
-                    <ul class="listPoint">
+                    <ul>
                         <li>
                             Subversion repository: 
-				<br/>
-				https://stxxl.svn.sourceforge.net/...
+                                <br/>
+                                https://stxxl.svn.sourceforge.net/...
                         </li>
                     </ul>
                 </td>
                 <td>
-			[<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.3.0/">Browse</a>]
-			[<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.3.0/">Checkout</a>]
-			<br/>
+                        [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.3.0/">Browse</a>]
+                        [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.3.0/">Checkout</a>]
+                        <br/>
                     .../svnroot/stxxl/tags/1.3.0/ 
                 </td>
                 <td>
-			[<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.2.1/">Browse</a>]
-			[<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.2.1/">Checkout</a>]
-			<br/>
+                        [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.2.1/">Browse</a>]
+                        [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.2.1/">Checkout</a>]
+                        <br/>
                     .../svnroot/stxxl/tags/1.2.1/ 
                 </td>
                 <td>
-			[<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/trunk/">Browse</a>]
-			[<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/trunk/">Checkout</a>]
-			<br/>
+                        [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/trunk/">Browse</a>]
+                        [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/trunk/">Checkout</a>]
+                        <br/>
                     .../svnroot/stxxl/trunk/ 
                 </td>
             </tr>
         </table>
-        <ul class="listPoint">
+        <ul>
             <li>
                 <b>FAQ </b>- Frequently Asked Questions [<a href="http://algo2.iti.kit.edu/stxxl/trunk/FAQ.html">html</a>] 
             </li>
@@ -327,7 +343,7 @@
         <p class="whiteOnBlue">
             Ongoing and completed projects using <b>STXXL</b>
         </p>
-        <ul class="listPoint">
+        <ul>
             <li>
                 External Memory Breadth-First Search (BFS) [<a href="http://algo2.iti.kit.edu/dementiev/files/ebfs.pdf">paper (pdf)</a>][<a href="http://www.mpi-inf.mpg.de/~ajwani/em_bfs/">project page</a>][<a href="http://www.mpi-inf.mpg.de/~ajwani/graph_gen/">graph generators</a>] 
             </li>

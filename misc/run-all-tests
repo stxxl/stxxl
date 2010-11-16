@@ -170,6 +170,7 @@ run algo/test_scan
 run algo/test_sort
 test -n "$WITH_STABLE_KSORT" && run algo/test_stable_ksort
 
+run stream/test_materialize
 run stream/test_push_sort
 run stream/test_sorted_runs
 run stream/test_stream
