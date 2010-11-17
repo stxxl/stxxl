@@ -60,3 +60,6 @@
 
 * iostats: add support for splitting I/Os and truncating reads at EOF
 
+* do not specify marginal properties such as allocation strategy as part of the template type.
+  instead, make such properties dynamically configurable using run-time polymorphism, 
+  which would incur only a negligible running time overhead (one virtual function call per block).
