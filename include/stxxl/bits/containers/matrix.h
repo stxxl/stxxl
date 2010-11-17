@@ -71,6 +71,18 @@ public:
 	}
 
 
+	//! \brief read in matrix from stream, assuming row-major order
+	template<class InputIterator>
+	void materialize_from_row_major(InputIterator& i)
+	{
+		while(!i.empty())
+		{
+			//do something with *i
+			++i;
+		}
+	}
+
+	//friend declaration
 	template<typename SomeValueType, unsigned SomeBlockSideLength, class LayoutA, class LayoutB, class LayoutC>
 	friend matrix<SomeValueType, SomeBlockSideLength, LayoutC>&
 	multiply(

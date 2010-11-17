@@ -11,13 +11,27 @@
  **************************************************************************/
 
 #include <stxxl/bits/containers/matrix.h>
+#include <stxxl/vector>
+#include <stxxl/stream>
 
 int main()
 {
-	const int rank = 10000;
-	stxxl::matrix<double> A(rank, rank), B(rank, rank), C(rank, rank);
+    const int rank = 10000;
+    stxxl::matrix<double> A(rank, rank), B(rank, rank), C(rank, rank);
 
-	stxxl::multiply(A, B, C);
+    typedef stxxl::VECTOR_GENERATOR<double>::result input_type;
+    input_type input(rank * rank);
 
-	return 0;
+#ifdef BOOST_MSVC
+    typedef stxxl::stream::streamify_traits<input_type::iterator>::stream_type input_stream_type;
+#else
+    typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;
+#endif
+    input_stream_type input_stream = stxxl::stream::streamify(input.begin(), input.end());
+
+    A.materialize_from_row_major(input_stream);
+
+    stxxl::multiply(A, B, C);
+
+    return 0;
 }
