@@ -268,10 +268,8 @@ template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
           unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
 class vector_iterator
 {
-    typedef vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_,
-                            BlkSize_, PgTp_, PgSz_> _Self;
-    typedef const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_,
-                                  BlkSize_, PgTp_, PgSz_> _CIterator;
+    typedef vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> _Self;
+    typedef const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> _CIterator;
 
     friend class const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>;
 
@@ -496,10 +494,8 @@ template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
           unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
 class const_vector_iterator
 {
-    typedef const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_,
-                                  BlkSize_, PgTp_, PgSz_> _Self;
-    typedef vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_,
-                            BlkSize_, PgTp_, PgSz_> _NonConstIterator;
+    typedef const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> _Self;
+    typedef vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> _NonConstIterator;
 
     friend class vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>;
 
@@ -765,10 +761,8 @@ public:
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
     typedef bid_vector<block_size> bids_container_type;
-    typedef typename bids_container_type::
-    iterator bids_container_iterator;
-    typedef typename bids_container_type::
-    const_iterator const_bids_container_iterator;
+    typedef typename bids_container_type::iterator bids_container_iterator;
+    typedef typename bids_container_type::const_iterator const_bids_container_iterator;
 
     typedef typed_block<BlkSize_, Tp_> block_type;
     typedef double_blocked_index<SzTp_, PgSz_, block_type::size> blocked_index_type;
@@ -878,11 +872,11 @@ public:
     {
         return size_type(_bids.size()) * block_type::raw_size;
     }
+
     void reserve(size_type n)
     {
         if (n <= capacity())
             return;
-
 
         unsigned_type old_bids_size = _bids.size();
         unsigned_type new_bids_size = div_ceil(n, block_type::size);
@@ -987,6 +981,7 @@ public:
         for (int_type i = 0; i < n_pages; ++i)
             _free_slots.push(i);
     }
+
     void push_back(const_reference obj)
     {
         size_type old_size = _size;
@@ -997,6 +992,7 @@ public:
     {
         resize(_size - 1);
     }
+
     reference back()
     {
         return element(_size - 1);
@@ -1013,6 +1009,7 @@ public:
     {
         return const_element(0);
     }
+
     //! \brief Construct vector from a file
     //! \param from file to be constructed from
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
@@ -1308,6 +1305,7 @@ private:
                 static_cast<typename bids_container_type::size_type>
                 (offset.get_block2() * PgSz_ + offset.get_block1()));
     }
+
     void read_page(int_type page_no, int_type cache_slot) const
     {
         if (_page_status[page_no] == uninitialized)
@@ -1343,6 +1341,7 @@ private:
         wait_all(reqs, last_block - page_no * page_size);
         delete[] reqs;
     }
+
     reference element(size_type offset)
     {
         #ifdef STXXL_RANGE_CHECK
