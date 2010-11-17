@@ -69,7 +69,33 @@ public:
 		}
 		delete[] blocks;
 	}
+
+
+	template<typename SomeValueType, unsigned SomeBlockSideLength, class LayoutA, class LayoutB, class LayoutC>
+	friend matrix<SomeValueType, SomeBlockSideLength, LayoutC>&
+	multiply(
+			const matrix<SomeValueType, SomeBlockSideLength, LayoutA>& A,
+			const matrix<SomeValueType, SomeBlockSideLength, LayoutB>& B,
+			matrix<SomeValueType, SomeBlockSideLength, LayoutC>& C
+			);
+
 };
+
+//! \brief multiply the matrices A and B, gaining C
+template<typename ValueType, unsigned BlockSideLength, class LayoutA, class LayoutB, class LayoutC>
+matrix<ValueType, BlockSideLength, LayoutC>&
+multiply(
+		const matrix<ValueType, BlockSideLength, LayoutA>& A,
+		const matrix<ValueType, BlockSideLength, LayoutB>& B,
+		matrix<ValueType, BlockSideLength, LayoutC>& C
+		)
+{
+	assert(A.num_cols == B.num_rows);
+	assert(C.num_rows == A.num_rows);
+	assert(C.num_cols == B.num_cols);
+
+	return C;
+}
 
 __STXXL_END_NAMESPACE
 

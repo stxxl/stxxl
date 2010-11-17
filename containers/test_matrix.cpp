@@ -15,7 +15,9 @@
 int main()
 {
 	const int rank = 10000;
-	stxxl::matrix<double> m(rank, rank);
+	stxxl::matrix<double> A(rank, rank), B(rank, rank), C(rank, rank);
+
+	stxxl::multiply(A, B, C);
 
 	return 0;
 }
