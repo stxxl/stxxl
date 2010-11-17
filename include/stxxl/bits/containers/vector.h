@@ -237,11 +237,9 @@ template <unsigned BlkSize_>
 class bid_vector : public std::vector<BID<BlkSize_> >
 {
 public:
-    enum
-    { block_size = BlkSize_ };
-    typedef bid_vector<block_size> _Self;
     typedef std::vector<BID<BlkSize_> > _Derived;
-    typedef unsigned size_type;
+    typedef typename _Derived::size_type size_type;
+    typedef typename _Derived::value_type bid_type;
 
     bid_vector(size_type _sz) : _Derived(_sz)
     { }
@@ -277,25 +275,23 @@ public:
     typedef _CIterator const_iterator;
     typedef _Self iterator;
 
-    typedef SzTp_ size_type;
-    typedef DiffTp_ difference_type;
     typedef unsigned block_offset_type;
     typedef vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_> vector_type;
     friend class vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_>;
-    typedef bid_vector<BlkSize_> bids_container_type;
+    typedef typename vector_type::bids_container_type bids_container_type;
     typedef typename bids_container_type::iterator bids_container_iterator;
-    typedef typed_block<BlkSize_, Tp_> block_type;
-    typedef BID<BlkSize_> bid_type;
+    typedef typename bids_container_type::bid_type bid_type;
+    typedef typename vector_type::block_type block_type;
     typedef typename vector_type::blocked_index_type blocked_index_type;
 
     typedef std::random_access_iterator_tag iterator_category;
+    typedef typename vector_type::size_type size_type;
+    typedef typename vector_type::difference_type difference_type;
     typedef typename vector_type::value_type value_type;
     typedef typename vector_type::reference reference;
     typedef typename vector_type::const_reference const_reference;
     typedef typename vector_type::pointer pointer;
     typedef typename vector_type::const_pointer const_pointer;
-
-    enum { block_size = BlkSize_ };
 
 protected:
     blocked_index_type offset;
@@ -481,12 +477,13 @@ public:
     {
         p_vector->flush();
     }
-    /*
+#if 0
        std::ostream & operator<< (std::ostream & o) const
        {
             o << "vectorpointer: "  << ((void*)p_vector) <<" offset: "<<offset;
             return o;
-       }*/
+    }
+#endif
 };
 
 //! \brief Const external vector iterator, model of \c ext_random_access_iterator concept
@@ -503,25 +500,23 @@ public:
     typedef _Self const_iterator;
     typedef _NonConstIterator iterator;
 
-    typedef SzTp_ size_type;
-    typedef DiffTp_ difference_type;
     typedef unsigned block_offset_type;
     typedef vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_> vector_type;
     friend class vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_>;
-    typedef bid_vector<BlkSize_> bids_container_type;
+    typedef typename vector_type::bids_container_type bids_container_type;
     typedef typename bids_container_type::iterator bids_container_iterator;
-    typedef typed_block<BlkSize_, Tp_> block_type;
-    typedef BID<BlkSize_> bid_type;
+    typedef typename bids_container_type::bid_type bid_type;
+    typedef typename vector_type::block_type block_type;
     typedef typename vector_type::blocked_index_type blocked_index_type;
 
     typedef std::random_access_iterator_tag iterator_category;
+    typedef typename vector_type::size_type size_type;
+    typedef typename vector_type::difference_type difference_type;
     typedef typename vector_type::value_type value_type;
     typedef typename vector_type::const_reference reference;
     typedef typename vector_type::const_reference const_reference;
     typedef typename vector_type::const_pointer pointer;
     typedef typename vector_type::const_pointer const_pointer;
-
-    enum { block_size = BlkSize_ };
 
 protected:
     blocked_index_type offset;
@@ -700,11 +695,13 @@ public:
         p_vector->flush();
     }
 
+#if 0
     std::ostream & operator << (std::ostream & o) const
     {
         o << "vector pointer: " << ((void *)p_vector) << " offset: " << offset;
         return o;
     }
+#endif
 };
 
 
