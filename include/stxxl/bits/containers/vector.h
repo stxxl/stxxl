@@ -288,6 +288,7 @@ public:
     typedef typename bids_container_type::iterator bids_container_iterator;
     typedef typed_block<BlkSize_, Tp_> block_type;
     typedef BID<BlkSize_> bid_type;
+    typedef typename vector_type::blocked_index_type blocked_index_type;
 
     typedef std::random_access_iterator_tag iterator_category;
     typedef typename vector_type::value_type value_type;
@@ -299,7 +300,7 @@ public:
     enum { block_size = BlkSize_ };
 
 protected:
-    double_blocked_index<SzTp_, PgSz_, block_type::size> offset;
+    blocked_index_type offset;
     vector_type * p_vector;
 
 private:
@@ -515,6 +516,7 @@ public:
     typedef typename bids_container_type::iterator bids_container_iterator;
     typedef typed_block<BlkSize_, Tp_> block_type;
     typedef BID<BlkSize_> bid_type;
+    typedef typename vector_type::blocked_index_type blocked_index_type;
 
     typedef std::random_access_iterator_tag iterator_category;
     typedef typename vector_type::value_type value_type;
@@ -526,7 +528,7 @@ public:
     enum { block_size = BlkSize_ };
 
 protected:
-    double_blocked_index<SzTp_, PgSz_, block_type::size> offset;
+    blocked_index_type offset;
     const vector_type * p_vector;
 
 private:
@@ -769,6 +771,7 @@ public:
     const_iterator const_bids_container_iterator;
 
     typedef typed_block<BlkSize_, Tp_> block_type;
+    typedef double_blocked_index<SzTp_, PgSz_, block_type::size> blocked_index_type;
 
 private:
     alloc_strategy_type alloc_strategy;
@@ -1173,7 +1176,7 @@ public:
 
     bool is_element_cached(size_type offset) const
     {
-        return is_page_cached(double_blocked_index<SzTp_, PgSz_, block_type::size>(offset));
+        return is_page_cached(blocked_index_type(offset));
     }
 
     void flush() const
@@ -1287,7 +1290,7 @@ private:
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
-    bids_container_iterator bid(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset)
+    bids_container_iterator bid(const blocked_index_type & offset)
     {
         return (_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
@@ -1299,7 +1302,7 @@ private:
                 static_cast<typename bids_container_type::size_type>
                 (offset / block_type::size));
     }
-    const_bids_container_iterator bid(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
+    const_bids_container_iterator bid(const blocked_index_type & offset) const
     {
         return (_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
@@ -1345,10 +1348,10 @@ private:
         #ifdef STXXL_RANGE_CHECK
         assert(offset < size());
         #endif
-        return element(double_blocked_index<SzTp_, PgSz_, block_type::size>(offset));
+        return element(blocked_index_type(offset));
     }
 
-    reference element(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset)
+    reference element(const blocked_index_type & offset)
     {
         #ifdef STXXL_RANGE_CHECK
         assert(offset.get_pos() < size());
@@ -1417,7 +1420,7 @@ private:
         page_externally_updated(offset / (block_type::size * page_size));
     }
 
-    void block_externally_updated(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
+    void block_externally_updated(const blocked_index_type & offset) const
     {
         page_externally_updated(offset.get_block2());
     }
@@ -1427,17 +1430,17 @@ private:
         page_externally_updated(offset / (block_type::size * page_size));
     }
 
-    _STXXL_DEPRECATED(void touch(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const)
+    _STXXL_DEPRECATED(void touch(const blocked_index_type & offset) const)
     {
         page_externally_updated(offset.get_block2());
     }
 
     const_reference const_element(size_type offset) const
     {
-        return const_element(double_blocked_index<SzTp_, PgSz_, block_type::size>(offset));
+        return const_element(blocked_index_type(offset));
     }
 
-    const_reference const_element(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
+    const_reference const_element(const blocked_index_type & offset) const
     {
         int_type page_no = offset.get_block2();
         assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
@@ -1478,7 +1481,7 @@ private:
         }
     }
 
-    bool is_page_cached(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
+    bool is_page_cached(const blocked_index_type & offset) const
     {
         int_type page_no = offset.get_block2();
         assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
