@@ -1171,6 +1171,11 @@ public:
         return const_element(offset);
     }
 
+    bool is_element_cached(size_type offset) const
+    {
+        return is_page_cached(double_blocked_index<SzTp_, PgSz_, block_type::size>(offset));
+    }
+
     void flush() const
     {
         simple_vector<bool> non_free_slots(n_pages);
@@ -1471,6 +1476,14 @@ private:
             pager.hit(cache_slot);
             return (*_cache)[cache_slot * page_size + offset.get_block1()][offset.get_offset()];
         }
+    }
+
+    bool is_page_cached(const double_blocked_index<SzTp_, PgSz_, block_type::size> & offset) const
+    {
+        int_type page_no = offset.get_block2();
+        assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
+        int_type cache_slot = _page_to_slot[page_no];
+        return (cache_slot >= 0);                           // on_disk == -1
     }
 };
 
