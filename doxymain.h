@@ -257,8 +257,10 @@ Controller::Controller()
  *   - if you want \c S<small>TXXL</small> to use the <a href="http://algo2.iti.kit.edu/singler/mcstl/">MCSTL</a>
  *     library (you should have the MCSTL library already installed)
  *     - change \c MCSTL_ROOT variable according to the MCSTL root path
- *     - use the targets \c library_g++_mcstl and \c tests_g++_mcstl
- *       instead of the ones listed below
+ *     - use the targets \c library_g++_mcstl and \c tests_g++_mcstl instead of the ones listed below
+ *   - if you want \c S<small>TXXL</small> to use the <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode</a>
+ *     - use GCC version 4.3 or later
+ *     - use the targets \c library_g++_pmode and \c tests_g++_pmode instead of the ones listed below
  *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like (default: \c -O3 )
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
  *     if you want to produce a debug version of the Stxxl library or Stxxl examples (default: not set)
