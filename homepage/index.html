@@ -51,8 +51,10 @@
             </li>
             <li>
                 Small constant factors in I/O volume. A unique library feature called <b>"pipelining"</b>
-                can save more than <b>half</b>
-                the number of I/Os in many applications. 
+                can save more than <b>half</b> the number of I/Os, by streaming data between algorithmic components, 
+                instead of temporarily storing them on disk.  
+                A development branch supports <b>asynchronous</b> execution of the algorithmic components, 
+                enabling high-level task parallelism.  
             </li>
             <li>
                 Shorter <b>development times</b>
@@ -65,6 +67,10 @@
                 moreover, the I/O complexity of the algorithms remains optimal in most of the cases. 
                 <br/>
                 [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">more info</a>] 
+            </li>
+            <li>
+                For internal computation, <b>parallel</b> algorithms from the MCSTL or the libstdc++ parallel mode are optionally utilized,
+                making the algorithms inherently benefit from <b>multi-core</b> parallelism. 
             </li>
         </ul>
         <p>
