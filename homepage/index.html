@@ -26,13 +26,12 @@
         <p>
             The core of <b>STXXL</b>
             is an implementation of the C++ <a href="http://en.wikipedia.org/wiki/Standard_Template_Library">standard template library STL</a>
-            for external memory (out-of-core) computations, i.e., <b>STXXL</b>
+            for external memory (out-of-core) computations, i.&nbsp;e., <b>STXXL</b>
             implements containers and algorithms that can process <b>huge volumes of data</b>
             that only fit on disks. While the closeness to the STL supports ease of use and compatibility with existing applications, another design priority is high performance. [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">more info</a>] 
         </p>
         <p style="padding-bottom: 0px;">
-                    The key features of <b>STXXL</b>
-                    are: 
+                    The key features of <b>STXXL</b> are: 
         </p>
         <ul style="margin-left: 20px;">
                     <li>
@@ -41,13 +40,11 @@
                         is the only external memory algorithm library supporting parallel disks. 
                     </li>
                     <li>
-                        The library is able to handle problems of <b>very large</b>
-                        size (tested to up to dozens of terabytes). 
+                        The library is able to handle problems of <b>very large</b> size (tested to up to dozens of terabytes). 
                     </li>
             <li>
                 Improved utilization of computer resources.
-                <b>STXXL</b>
-                implementations of external memory algorithms and data structures benefit from overlapping of I/O and computation. 
+                <b>STXXL</b> implementations of external memory algorithms and data structures benefit from overlapping of I/O and computation. 
             </li>
             <li>
                 Small constant factors in I/O volume. A unique library feature called <b>"pipelining"</b>
@@ -74,8 +71,7 @@
             </li>
         </ul>
         <p>
-            <b>Current contributors: </b>Andreas Beckmann, Johannes Singler 
-                <br/>
+            <b>Current contributors: </b>Andreas Beckmann, Johannes Singler<br/>
             <b>Past contributors: </b>Roman Dementiev (author), Peter Sanders 
         </p>
         <br/>
@@ -84,7 +80,7 @@
         </h2>
         <p>
             Questions concerning use and development of the <b>STXXL</b>
-            library and bug reports should be posted to the <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>. 
+            and bug reports should be posted to the <a href="http://sourceforge.net/projects/stxxl/forums">forums</a>. 
         </p>
         <h2>
             License 
@@ -177,7 +173,12 @@
             Current version 
         </h2>
         <p>
-            Version 1.3.0 (August 12, 2010) contains an implementation of the lower layers (memory management, disk virtualization, prefetching,...). From the higher layers, (pipelined) sorting with <a href="http://algo2.iti.kit.edu/singler/mcstl/">SMP and multi-core processor support</a>, (pipelined) scanning and containers (vectors, stacks, priority queues, maps (B+Tree), queues, deques) are supported. 
+            Version 1.3.0 (August 12, 2010) contains  
+            memory management, disk virtualization, prefetching, and so on, as the lower layers,
+            and as part of the higher layer 
+            (pipelined) sorting with
+            <a href="http://algo2.iti.kit.edu/singler/mcstl/">SMP and multi-core processor support</a>, 
+            (pipelined) scanning and containers (vectors, stacks, priority queues, maps (B+Tree), queues, deques). 
             Currently that sums to about 34,000 lines of code. 
         </p>
         <h2>
@@ -340,7 +341,7 @@
                 <b>Tutorial (draft) </b>[<a href="http://algo2.iti.kit.edu/dementiev/files/stxxl_tutorial.pdf">pdf</a>] 
             </li>
             <li>
-                MCSTL library homepage: [<a href="http://algo2.iti.kit.edu/singler/mcstl/">link</a>] (optional) 
+                MCSTL homepage: [<a href="http://algo2.iti.kit.edu/singler/mcstl/">link</a>] (optional) 
             </li>
             <li>
                 libstdc++ parallel mode homepage: [<a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">link</a>] (optional, comes with GCC) 
