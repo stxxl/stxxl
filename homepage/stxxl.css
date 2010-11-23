@@ -9,34 +9,38 @@ body {
     font-family: arial, sans-serif;
 }
 
-div, p, ul, h2, img {
+div, ul, img {
     padding: 0px;
     margin: 0px;
 }
 
-/*----Blue Line----*/
-p.whiteOnBlueBold {
+h1 {
     padding: 3px;
     background: #4d6eb1;
     color: #FFFFFF;
     font-variant: normal;
     font-weight: bold;
+    font-size: large;
+    margin: 0px;
 }
 
-p.whiteOnBlue {
+h2 {
     padding: 3px;
     background: #4d6eb1;
     color: #FFFFFF;
     font-variant: normal;
+    font-weight: normal;
+    font-size: medium;
+    margin: 0px;
 }
 
-p.ordinary {
+p {
     width: 98%;
     position: relative;
-    padding: 10px;
+    padding: 5px;
     color: #000;
     font-variant: inherit;
-    font-weight: normal;
+    margin: 0px;
 }
 
 ul {

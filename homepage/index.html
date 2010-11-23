@@ -6,9 +6,9 @@
         <link href="stxxl.css" rel="stylesheet" type="text/css"/>
     </head>
     <body>
-        <p class="whiteOnBlueBold">
+        <h1>
             STXXL 
-        </p>
+        </h1>
         <p style="margin-top: 1ex">
                 <b>STXXL: Standard Template Library for Extra Large Data Sets.</b>
         </p>
@@ -23,14 +23,14 @@
                 </td>
             </tr>
         </table>
-        <p class="ordinary">
+        <p>
             The core of <b>STXXL</b>
             is an implementation of the C++ <a href="http://en.wikipedia.org/wiki/Standard_Template_Library">standard template library STL</a>
             for external memory (out-of-core) computations, i.e., <b>STXXL</b>
             implements containers and algorithms that can process <b>huge volumes of data</b>
             that only fit on disks. While the closeness to the STL supports ease of use and compatibility with existing applications, another design priority is high performance. [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">more info</a>] 
         </p>
-        <p class="ordinary" style="padding-bottom: 0px;">
+        <p style="padding-bottom: 0px;">
                     The key features of <b>STXXL</b>
                     are: 
         </p>
@@ -73,22 +73,22 @@
             <b>Past contributors: </b>Roman Dementiev (author), Peter Sanders 
         </p>
         <br/>
-        <p class="whiteOnBlue">
+        <h2>
             Support 
-        </p>
-        <p class="ordinary">
+        </h2>
+        <p>
             Questions concerning use and development of the <b>STXXL</b>
             library and bug reports should be posted to the <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>. 
         </p>
-        <p class="whiteOnBlue">
+        <h2>
             License 
-        </p>
-        <p class="ordinary">
+        </h2>
+        <p>
             <b>STXXL</b> is free, open source, and available under the <a href="http://www.boost.org/LICENSE_1_0.txt">Boost Software License 1.0</a>.
         </p>
-        <p class="whiteOnBlue">
+        <h2>
             Platforms supported 
-        </p>
+        </h2>
         <table>
             <tr>
                 <td>
@@ -167,17 +167,17 @@
                 </td>
             </tr>
         </table>
-        <p class="whiteOnBlue">
+        <h2>
             Current version 
-        </p>
-        <p class="ordinary">
+        </h2>
+        <p>
             Version 1.3.0 (August 12, 2010) contains an implementation of the lower layers (memory management, disk virtualization, prefetching,...). From the higher layers, (pipelined) sorting with <a href="http://algo2.iti.kit.edu/singler/mcstl/">SMP and multi-core processor support</a>, (pipelined) scanning and containers (vectors, stacks, priority queues, maps (B+Tree), queues, deques) are supported. 
             Currently that sums to about 34,000 lines of code. 
         </p>
-        <p class="whiteOnBlue">
+        <h2>
             Branches
-        </p>
-        <p class="ordinary">
+        </h2>
+        <p>
             Special features are maintained in up-to-date branches until they are merged into trunk.
             Until inclusion into trunk, the interface may change without further notice.
             Please refer to <a href="http://algo2.iti.kit.edu/stxxl/trunk/install-svn.html">Installing from subversion</a> for a description on how to build these branches.
@@ -190,9 +190,9 @@
                 Support for Asynchronous Pipelining/Streaming: <a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/branches/parallel_pipelining_integration/">parallel_pipelining_integration</a>
             </li>
         </ul>
-        <p class="whiteOnBlue">
+        <h2>
             Major improvements in the latest release 
-        </p>
+        </h2>
         <ul>
             <li>
                 Improved support (e. g. priority queue) for the <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode </a>(successor of MCSTL), requires g++ 4.4 or later. 
@@ -222,9 +222,9 @@
                 For a detailed list, please read the the CHANGELOG file. 
             </li>
         </ul>
-        <p class="whiteOnBlue">
+        <h2>
             Links/Download 
-        </p>
+        </h2>
         <table>
             <tr>
                 <td>
@@ -340,9 +340,9 @@
                 libstdc++ parallel mode homepage: [<a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">link</a>] (optional, comes with GCC) 
             </li>
         </ul>
-        <p class="whiteOnBlue">
+        <h2>
             Ongoing and completed projects using <b>STXXL</b>
-        </p>
+        </h2>
         <ul>
             <li>
                 External Memory Breadth-First Search (BFS) [<a href="http://algo2.iti.kit.edu/dementiev/files/ebfs.pdf">paper (pdf)</a>][<a href="http://www.mpi-inf.mpg.de/~ajwani/em_bfs/">project page</a>][<a href="http://www.mpi-inf.mpg.de/~ajwani/graph_gen/">graph generators</a>] 
@@ -360,36 +360,36 @@
                 External Memory Hash-Tables 
             </li>
         </ul>
-        <p class="whiteOnBlue">
+        <h2>
             Publications 
-        </p>
-        <p class="ordinary">
+        </h2>
+        <p>
             A. Beckmann, R. Dementiev, J. Singler: Building A Parallel Pipelined External Memory Algorithm Library IPDPS 2009: International Parallel and Distributed Processing Symposium (May 2009, Rome, Italy) [<a href="http://algo2.iti.kit.edu/singler/publications/parallelstxxl-ipdps2009.pdf">full text</a>] 
         </p>
-        <p class="ordinary">
+        <p>
             R. Dementiev, L. Kettner, P. Sanders: STXXL: standard template library for XXL data sets, Software: Practice and Experience (August 2007, DOI: 10.1002/spe.844): [<a href="http://www3.interscience.wiley.com/cgi-bin/abstract/114300511/ABSTRACT">link</a>][<a href="http://algo2.iti.kit.edu/dementiev/files/stxxl_spe.pdf">preprint</a>] 
         </p>
-        <p class="ordinary">
+        <p>
             D. Ajwani, R. Dementiev, U. Meyer: A Computational Study of External-Memory BFS Algorithms. SODA2006: ACM-SIAM Symposium on Discrete Algorithms (January 2006, Miami, Florida, USA) [<a href="http://algo2.iti.kit.edu/dementiev/files/ebfs.pdf">pdf</a>] 
         </p>
-        <p class="ordinary">
+        <p>
             R. Dementiev, L. Kettner, P. Sanders: Stxxl: Standard Template Library for XXL Data Sets. ESA2005: 13th Annual European Symposium on Algorithms (October 2005, Palma de Mallorca, Spain) [<a href="http://algo2.iti.kit.edu/dementiev/files/DKS05.pdf">pdf</a>] (see also <a href="http://algo2.iti.kit.edu/dementiev/files/TRKA2005_18.pdf">the extended version</a>) 
         </p>
-        <p class="ordinary">
+        <p>
             R. Dementiev, L. Kettner, P. Sanders: Stxxl: Standard Template Library for XXL Data Sets. Technical Report 2005/18, Department of Informatics, University of Karlsruhe [<a href="http://algo2.iti.kit.edu/dementiev/files/TRKA2005_18.pdf">pdf</a>] [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">html</a>]
         </p>
-        <p class="ordinary">
+        <p>
             R. Dementiev, J. Kaerkkaeinen, J. Mehnert, P. Sanders: Better External Memory Suffix Array Construction ALENEX05: Algorithm Engineering and Experiments (January 2005, Vancouver , Canada): [<a href="http://algo2.iti.kit.edu/dementiev/files/DKMS05.pdf">pdf</a>][<a href="http://algo2.iti.kit.edu/dementiev/esuffix/instances.shtml">input instances</a>] 
         </p>
-        <p class="ordinary">
+        <p>
             R. Dementiev, P. Sanders, D. Schultes, and J. Sibeyn: Engineering an External Memory Minimum Spanning Tree Algorithm. TSC04: 3rd IFIP International Conference on Theoretical Computer Science (August 24-26, 2004, Toulouse): [<a href="http://algo2.iti.kit.edu/dementiev/files/emst.ps">ps</a>][<a href="http://algo2.iti.kit.edu/dementiev/files/emst.pdf">pdf</a>] 
         </p>
-        <p class="ordinary">
+        <p>
             R. Dementiev, P. Sanders: Asynchronous Parallel Disk Sorting. In 15th ACM Symposium on Parallelism in Algorithms and Architectures (June 7-9, 2003, San Diego, California, USA): pages 138-148 [<a href="http://algo2.iti.kit.edu/dementiev/files/DS03.pdf">pdf</a>] 
         </p>
-        <p class="whiteOnBlue">
+        <h2>
             <a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=131632&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
-        </p>
+        </h2>
     </body>
 </html>
 <!--
