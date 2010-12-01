@@ -16,6 +16,7 @@
  * - overlapping of I/O and computation
  * - prevention of OS file buffering overhead
  * - algorithm pipelining
+ * - utilization of multiple processor cores for internal computation
  *
  *
  * \section platforms Supported Operating Systems
