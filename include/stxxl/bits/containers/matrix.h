@@ -96,8 +96,70 @@ public:
 	
 };
 
-//! \brief multiply the matrices A and B, gaining C
 
+// a panel is a matrix containing blocks (type block_type) that resides in main memory
+template<typename block_type>
+struct panel
+{
+	block_type* blocks;
+	const unsigned_type max_height, max_width;
+	unsigned_type height, width;
+	
+	panel(const unsigned_type max_height, const unsigned_type max_width)
+		: max_height(max_height),
+			max_width(max_width)
+	{
+		blocks = new block_type[max_height*max_width];
+	}
+	
+	~panel()
+	{
+		delete[] blocks;
+	}
+	
+	// fill the blocks specified by height and width with zeros
+	void clear()
+	{
+		//todo code clear
+	}
+};
+
+// multiplies blocks of A and B, adds result to C
+// param pointer to block of A,B,C; elements in blocks have to be in row-major
+template <typename block_type, unsigned BlockSideLength>
+void multiply_block(const block_type& BlockA, const block_type& BlockB, block_type& BlockC)
+{
+        typedef typename block_type::value_type ValueType;
+        // get pointers to data
+        // TODO should  be block_type.iterator
+        ValueType* AElements = BlockA.begin;
+        ValueType* BElements = BlockB.begin;
+        ValueType* CElements = BlockC.begin;
+        for (unsigned_type row = 0; row < BlockSideLength; ++row)
+                for (unsigned_type col = 0; col < BlockSideLength; ++col)
+                        for (unsigned_type l = 0; l < BlockSideLength; ++l)
+                                *(CElements + row*BlockSideLength + col) +=
+                                                                *(AElements + row*BlockSideLength + l) * *(BElements + l*BlockSideLength + col);
+}
+
+// multiply panels from A and B, add result to C
+// param BlocksA pointer to first Block of A assumed in row-major
+template<typename block_type, unsigned BlockSideLength>
+void multiply_panel(const panel<block_type>& PanelA, const panel<block_type>& PanelB, panel<block_type>& PanelC)
+{
+        assert(PanelA.width == PanelB.height);
+        assert(PanelC.height == PanelA.height);
+        assert(PanelC.width == PanelB.width);
+
+        for (unsigned_type row = 0; row < PanelC.height; ++row)
+                for (unsigned_type col = 0; col < PanelC.width; ++col)
+                        for (unsigned_type l = 0; l < PanelA.width; ++l)
+                                multiply_block(*(PanelA.blocks + row*PanelA.width + l),
+                                                                *(PanelB.blocks + l*PanelB.width + col),
+                                                                *(PanelC.blocks + row*PanelC.width + col));
+}
+	
+//! \brief multiply the matrices A and B, gaining C
 template<typename ValueType, unsigned BlockSideLength, class LayoutA, class LayoutB, class LayoutC>
 matrix<ValueType, BlockSideLength, LayoutC>&
 multiply(
@@ -107,6 +169,9 @@ multiply(
 		unsigned_type MaxTempMemRaw
 		)
 {
+	typedef matrix<ValueType, BlockSideLength, LayoutA> MatrixA;
+	typedef typename MatrixA::block_type block_type;
+
 	/* // multiplies tiles of A and B, adds result to C
 	// param pointer to tile of A,B,C; elements in tiles have to be in row-major
 	void multiply_tile(ValueType* A, ValueType* B, ValueType* C)
@@ -116,38 +181,6 @@ multiply(
 				for (unsigned_type l = 0; l < tileLength; ++l)
 					*(C + row*tileWidth + col) += *(A + row*tileWidth + l) * *(B + l*tileLength + col);
   } */
-	
-	// multiplies blocks of A and B, adds result to C
-	// param pointer to block of A,B,C; elements in blocks have to be in row-major
-	void multiply_block(const block_type& BlockA, const block_type& BlockB, block_type& BlockC)
-	{
-		// get pointers to data
-		// TODO should  be block_type.iterator
-		ValueType* AElements = BlockA.begin;
-		ValueType* BElements = BlockB.begin;
-		ValueType* CElements = BlockC.begin;
-		for (unsigned_type row = 0; row < BlockSideLength; ++row)
-			for (unsigned_type col = 0; col < BlockSideLength; ++col)
-				for (unsigned_type l = 0; l < BlockSideLength; ++l)
-					*(CElements + row*BlockSideLength + col) += 
-									*(AElements + row*BlockSideLength + l) * *(BElements + l*BlockSideLength + col);
-  }
-	
-	// multiply panels from A and B, add result to C
-	// param BlocksA pointer to first Block of A assumed in row-major 
-	void multiply_panel(const panel& PanelA, const panel& PanelB, panel& PanelC)
-	{
-		assert(PanelA.width == PanelB.height);
-		assert(PanelC.height == PanelA.height);
-		assert(PanelC.width == PanelB.width);
-		
-		for (unsigned_type row = 0; row < PanelC.height; ++row)
-			for (unsigned_type col = 0; col < PanelC.width; ++col)
-				for (unsigned_type l = 0; l < PanelA.width; ++l)
-					multiply_block(*(PanelA.blocks + row*PanelA.width + l), 
-									*(PanelB.blocks + l*PanelB.width + col), 
-									*(PanelC.blocks + row*PanelC.width + col));
-	}
 	
 	assert(A.num_cols == B.num_rows);
 	assert(C.num_rows == A.num_rows);
@@ -165,9 +198,9 @@ multiply(
 					num_panels_2 = div_ceil(A.num_block_cols, panel_max_block_num_2),
 					num_panels_3 = div_ceil(C.num_block_cols, panel_max_block_num_3);
 	// reserve mem for a,b,c-panel
-	panel panelA(panel_max_block_num_1,panel_max_block_num_2);
-	panel panelB(panel_max_block_num_2,panel_max_block_num_3);
-	panel panelC(panel_max_block_num_1,panel_max_block_num_3);
+	panel<block_type> panelA(panel_max_block_num_1,panel_max_block_num_2);
+	panel<block_type> panelB(panel_max_block_num_2,panel_max_block_num_3);
+	panel<block_type> panelC(panel_max_block_num_1,panel_max_block_num_3);
 	
 	// multiply:
 	// iterate rows and cols (panel wise) of c
@@ -200,33 +233,6 @@ multiply(
 	
 	return C;
 }
-
-// a panel is a matrix containing blocks (type block_type) that resides in main memory
-struct panel
-{
-	block_type* blocks;
-	const unsigned_type max_height, max_width;
-	unsigned_type height, width;
-	
-	panel(const unsigned_type max_height, const unsigned_type max_width)
-		: max_height(max_height),
-			max_width(max_width)
-	{
-		blocks = new block_type[max_height*max_width];
-	}
-	
-	~panel()
-	{
-		delete[] blocks;
-	}
-	
-	// fill the blocks specified by height and width with zeros
-	void clear()
-	{
-		//todo code clear
-	}
-};
-
 
 __STXXL_END_NAMESPACE
 

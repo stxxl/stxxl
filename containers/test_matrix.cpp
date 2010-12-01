@@ -31,7 +31,8 @@ int main()
 
     A.materialize_from_row_major(input_stream);
 
-    stxxl::multiply(A, B, C);
+    const stxxl::unsigned_type internal_memory = 1ull * 1024 * 1024 * 1024;
+    stxxl::multiply(A, B, C, internal_memory);
 
     return 0;
 }
