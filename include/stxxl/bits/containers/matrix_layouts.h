@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/containers/matrix.h
+ *  include/stxxl/bits/containers/matrix_layouts.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -17,22 +17,24 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+// capsules a mapping {0,..,num_rows-1}x{0,..,num_cols-1} <-> {0,..,num_rows*num_cols-1}
 class RowMajor
 {
-	unsigned_type num_rows, num_cols;
-
+    unsigned_type num_rows, num_cols;
+    
 public:
-	RowMajor(unsigned_type num_rows, unsigned_type num_cols) : num_rows(num_rows), num_cols(num_cols) { }
-
+	RowMajor(unsigned_type num_rows, unsigned_type num_cols) 
+        : num_rows(num_rows), num_cols(num_cols) { }
+	
 	unsigned_type coords_to_index(unsigned_type row, unsigned_type col)
 	{
-		return row * num_cols + col;
+	    return row * num_cols + col;
 	}
-
+	
 	std::pair<unsigned_type, unsigned_type> index_to_coords(unsigned_type index)
 	{
-		std::pair<unsigned_type, unsigned_type> coords(index / num_cols, index % num_cols);
-		return coords;
+	    std::pair<unsigned_type, unsigned_type> coords(index / num_cols, index % num_cols);
+	    return coords;
 	}
 };
 
