@@ -30,14 +30,18 @@ class matrix
 {
     static const unsigned_type block_size = BlockSideLength * BlockSideLength;
     static const unsigned_type raw_block_size = block_size * sizeof(ValueType);
+public:
+    //typedef typename matrix<ValueType, BlockSideLength, Layout> matrix_type;
     typedef typed_block<raw_block_size, ValueType> block_type;
+private:
     typedef typename block_type::bid_type bid_type;
+    typedef typename block_type::iterator element_iterator_type;
     
     bid_type* bids;
     block_manager* bm;
-    unsigned_type num_rows, num_cols;
-    unsigned_type num_block_rows, num_block_cols;
-    Layout layout;
+    const unsigned_type num_rows, num_cols;
+    const unsigned_type num_block_rows, num_block_cols;
+    const Layout layout;
     
 public:
     matrix(unsigned_type num_rows, unsigned_type num_cols)
@@ -57,30 +61,71 @@ public:
         delete[] bids;
     }
     
-    bid_type& bid(unsigned_type row, unsigned_type col)
+    bid_type& bid(unsigned_type row, unsigned_type col) const
     {
         return *(bids + layout.coords_to_index(row, col));
+        int foo;  // this line is here to cause a compiler warning, to see if warnings are shown by the IDE 
     }
     
     //! \brief read in matrix from stream, assuming row-major order
     template<class InputIterator>
-    void materialize_from_row_major(InputIterator& i, unsigned_type max_temp_mem_raw)
+    void materialize_from_row_major(InputIterator& i, unsigned_type /*max_temp_mem_raw*/)
     {
-        //TODO write materialize_from_row_major
-                    
+        element_iterator_type current_element, first_element_of_row_in_block;
+        
         // if enough space
         // allocate one row of blocks (panel ?)
-        // iterate block-rows
-            // iterate element-rows
-            // iterate elements = element-col
-                // read element
-            //write block-row
+        block_type* row_of_blocks = new block_type[num_block_cols];
         
-        while(!i.empty())
+        // iterate block-rows therein element-rows therein block-cols therein element-col
+        // fill with elements from iterator rsp. padding with zeros 
+        for (unsigned_type b_row = 0; b_row < num_block_rows; ++b_row)
         {
-            //do something with *i
-            
-            ++i;
+            unsigned_type num_e_rows = (b_row < num_block_rows -1) 
+                    ? BlockSideLength : num_rows % BlockSideLength;
+            unsigned_type e_row;
+            // element-rows
+            for (e_row = 0; e_row < num_e_rows; ++e_row)
+                // block-cols
+                for (unsigned_type b_col = 0; b_col < num_block_cols; ++b_col)
+                {
+                    first_element_of_row_in_block = 
+                            row_of_blocks[b_col].begin() + e_row*BlockSideLength;
+                    unsigned_type num_e_cols = (b_col < num_block_cols -1) 
+                            ? BlockSideLength : num_cols % BlockSideLength;
+                    // element-cols
+                    for (current_element = first_element_of_row_in_block; 
+                            current_element < first_element_of_row_in_block + num_e_cols; 
+                            ++current_element)
+                    {
+                        // read element
+                        //todo if (i.empty()) throw exception
+                        *current_element = *i;
+                        ++i;
+                    }
+                    // padding element-cols
+                    for (; current_element < first_element_of_row_in_block + BlockSideLength; 
+                            ++current_element)
+                        *current_element = 0;
+                }
+            // padding element-rows
+            for (; e_row < BlockSideLength; ++e_row)
+                // padding block-cols
+                for (unsigned_type b_col = 0; b_col < num_block_cols; ++b_col)
+                {
+                    first_element_of_row_in_block = 
+                            row_of_blocks[b_col].begin() + e_row*BlockSideLength;
+                    // padding element-cols
+                    for (current_element = first_element_of_row_in_block; 
+                            current_element < first_element_of_row_in_block + BlockSideLength; 
+                            ++current_element)
+                        *current_element = 0;
+                }
+            //write block-row to disk
+            std::vector<request_ptr> requests;
+            for (unsigned_type col = 0; col < num_block_cols; ++col)
+                requests.push_back(row_of_blocks[col].write(bid(b_row, col)));
+            wait_all(requests.data(), requests.size());
         }
     }
     
@@ -104,12 +149,12 @@ public:
     typedef typename block_type::iterator element_iterator_type;
     
     block_type* blocks;
-    Layout layout;
+    const Layout layout;
     unsigned_type height, width;
     
     panel(const unsigned_type max_height, const unsigned_type max_width)
         : layout(max_height, max_width),
-          height(0), width(0)
+          height(max_height), width(max_width)
     {
         blocks = new block_type[max_height*max_width];
     }
@@ -128,13 +173,13 @@ public:
         for (unsigned_type row = 0; row < height; ++row)
             for (unsigned_type col = 0; col < width; ++col)
                 // iterate elements
-                for (elements = this[row, col].begin(); elements < this[row, col].end(); ++elements)
+                for (elements = block(row, col).begin(); elements < block(row, col).end(); ++elements)
                     // set element zero
                     *elements = 0;
     }
     
     // read the blocks specified by height and width
-    void read_sync(const matrix_type& from, unsigned_type first_row, unsigned_type first_col)
+    void read_sync(const matrix_type& from, unsigned_type first_row, unsigned_type first_col) const
     {
         std::vector<request_ptr> requests = read_async(from, first_row, first_col);
         
@@ -143,22 +188,21 @@ public:
     
     // read the blocks specified by height and width
     std::vector<request_ptr>& 
-    read_async(const matrix_type& from, unsigned_type first_row, unsigned_type first_col)
+    read_async(const matrix_type& from, unsigned_type first_row, unsigned_type first_col) const
     {
-        element_iterator_type elements;
-        std::vector<request_ptr> requests;
+        std::vector<request_ptr>* requests = new std::vector<request_ptr>; // todo is this the way to go?
         
         // iterate blocks
         for (unsigned_type row = 0; row < height; ++row)
             for (unsigned_type col = 0; col < width; ++col)
                 // post request and save pointer
-                requests.push_back(this[row, col].read(from.bid(first_row + row, first_col + col)));
+                (*requests).push_back(block(row, col).read(from.bid(first_row + row, first_col + col)));
         
-        return requests;
+        return *requests;
     }
     
     // write the blocks specified by height and width
-    void write_sync(matrix_type& to, unsigned_type first_row, unsigned_type first_col)
+    void write_sync(const matrix_type& to, unsigned_type first_row, unsigned_type first_col) const
     {
         std::vector<request_ptr> requests = write_async(to, first_row, first_col);
         
@@ -167,21 +211,20 @@ public:
     
     // read the blocks specified by height and width
     std::vector<request_ptr>& 
-    write_async(const matrix_type& to, unsigned_type first_row, unsigned_type first_col)
+    write_async(const matrix_type& to, unsigned_type first_row, unsigned_type first_col) const
     {
-        element_iterator_type elements;
-        std::vector<request_ptr> requests;
+        std::vector<request_ptr>* requests = new std::vector<request_ptr>; // todo is this the way to go?
         
         // iterate blocks
         for (unsigned_type row = 0; row < height; ++row)
             for (unsigned_type col = 0; col < width; ++col)
                 // post request and save pointer
-                requests.push_back(this[row, col].write(to.bid(first_row + row, first_col + col)));
+                (*requests).push_back(block(row, col).write(to.bid(first_row + row, first_col + col)));
         
-        return requests;
+        return *requests;
     }
     
-    block_type& operator [] (unsigned_type row, unsigned_type col)
+    block_type& block(unsigned_type row, unsigned_type col) const
     {
         return *(blocks + layout.coords_to_index(row, col));
     }
@@ -190,7 +233,7 @@ public:
 // multiplies blocks of A and B, adds result to C
 // param pointer to blocks of A,B,C; elements in blocks have to be in row-major
 template <typename block_type, unsigned BlockSideLength>
-void multiply_block(const block_type& BlockA, const block_type& BlockB, block_type& BlockC)
+void multiply_block(/*const*/ block_type& BlockA, /*const*/ block_type& BlockB, block_type& BlockC)
 {
     for (unsigned_type row = 0; row < BlockSideLength; ++row)
         for (unsigned_type col = 0; col < BlockSideLength; ++col)
@@ -204,6 +247,8 @@ void multiply_block(const block_type& BlockA, const block_type& BlockB, block_ty
 template<typename matrix_type, unsigned BlockSideLength>
 void multiply_panel(const panel<matrix_type>& PanelA, const panel<matrix_type>& PanelB, panel<matrix_type>& PanelC)
 {
+    typedef typename matrix_type::block_type block_type;
+    
     assert(PanelA.width == PanelB.height);
     assert(PanelC.height == PanelA.height);
     assert(PanelC.width == PanelB.width);
@@ -211,7 +256,7 @@ void multiply_panel(const panel<matrix_type>& PanelA, const panel<matrix_type>& 
     for (unsigned_type row = 0; row < PanelC.height; ++row)
         for (unsigned_type col = 0; col < PanelC.width; ++col)
             for (unsigned_type l = 0; l < PanelA.width; ++l)
-                multiply_block(PanelA[row, l], PanelB[l, col], PanelC[row, col]);
+                multiply_block<block_type, BlockSideLength>(PanelA.block(row, l), PanelB.block(l, col), PanelC.block(row, col));
 }
     
 //! \brief multiply the matrices A and B, gaining C
@@ -263,13 +308,13 @@ multiply(
                 panelA.width = panelB.height = (l < num_panels_2 -1) ? 
                         panel_max_block_num_2 : (A.num_block_cols-1) % panel_max_block_num_2 +1;
                 // load a,b-panel
-                panelA.read_sync(A, row * panel_max_block_num_1, l * panel_max_block_num_2);
+                panelA.read_sync(A, row*panel_max_block_num_1, l*panel_max_block_num_2);
                 panelB.read_sync(B, l * panel_max_block_num_2, col * panel_max_block_num_3);
                 // multiply and add to c
-                multiply_panel(panelA, panelB, panelC);
+                multiply_panel<matrix_type, BlockSideLength>(panelA, panelB, panelC);
             }
             // write c-panel
-            panel.write_sync(C, row * panel_max_block_num_1, col * panel_max_block_num_3);
+            panelC.write_sync(C, row * panel_max_block_num_1, col * panel_max_block_num_3);
         }
     }
     
