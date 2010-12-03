@@ -26,33 +26,27 @@ struct constant_one
 
 int main()
 {
-    const int rank = 1000;
-    stxxl::matrix<double> A(rank, rank), B(rank, rank), C(rank, rank);
+    const int rank = 1024;
+    stxxl::matrix<double, 1024> A(rank, rank), B(rank, rank), C(rank, rank);
 
     const stxxl::unsigned_type internal_memory = 1ull * 1024 * 1024 * 1024;
     
     clock_t start, end;
-    
-    start = clock();
     
     constant_one co;
     A.materialize_from_row_major(co, internal_memory);
     B.materialize_from_row_major(co, internal_memory);
     C.materialize_from_row_major(co, internal_memory);
     
-    end = clock();
-    std::cout << "Time required for materialize_from_row_major: " << (double)(end-start)/CLOCKS_PER_SEC 
-            << " seconds." << "\n\n";
-    
     STXXL_MSG("Multiplying two " << rank << "x" << rank << " matrices.");
 
-    start = clock();
-    
+    stxxl::stats_data stats_before(*stxxl::stats::get_instance());
+
     stxxl::multiply(A, B, C, internal_memory);
     
-    end = clock();
-    std::cout << "Time required for multiply: " << (double)(end-start)/CLOCKS_PER_SEC 
-            << " seconds." << "\n\n";
+    stxxl::stats_data stats_after(*stxxl::stats::get_instance());
+
+    std::cout << (stats_after - stats_before);
 
     return 0;
 }
