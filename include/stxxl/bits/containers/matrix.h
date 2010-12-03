@@ -235,23 +235,16 @@ public:
 template <typename block_type, unsigned BlockSideLength>
 void multiply_block(/*const*/ block_type& BlockA, /*const*/ block_type& BlockB, block_type& BlockC)
 {
-	STXXL_MSG("multiply_block");
+    STXXL_MSG("multiply_block");
 
-	typedef typename block_type::value_type value_type;
+    typedef typename block_type::value_type value_type;
 
-	value_type* a = BlockA.begin(), * b, * c = BlockC.begin();
-    for (unsigned_type row = 0; row < BlockSideLength; ++row)
-    {
-    	b = BlockB.begin();
-        for (unsigned_type col = 0; col < BlockSideLength; ++col)
-        {
-            for (unsigned_type l = 0; l < BlockSideLength; ++l)
-            	*c += a[l] * b[l*BlockSideLength];
-            ++c;
-            ++b;
-        }
-        a += BlockSideLength;
-    }
+    value_type* a = BlockA.begin(), * b = BlockB.begin(), * c = BlockC.begin();
+    for (unsigned_type k = 0; k < BlockSideLength; ++k)
+        #pragma omp parallel for
+        for (unsigned_type i = 0; i < BlockSideLength; ++i)
+            for (unsigned_type j = 0; j < BlockSideLength; ++j)
+            	c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
 }
 
 // multiply panels from A and B, add result to C
