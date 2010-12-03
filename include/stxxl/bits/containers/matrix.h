@@ -261,7 +261,7 @@ void multiply_panel(const panel<matrix_type>& PanelA, const panel<matrix_type>& 
     
 //! \brief multiply the matrices A and B, gaining C
 template<typename ValueType, unsigned BlockSideLength, class Layout>
-matrix<ValueType, BlockSideLength, Layout>&  //todo why not void ?
+matrix<ValueType, BlockSideLength, Layout>&
 multiply(
         const matrix<ValueType, BlockSideLength, Layout>& A,
         const matrix<ValueType, BlockSideLength, Layout>& B,
