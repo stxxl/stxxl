@@ -64,7 +64,7 @@ public:
     bid_type& bid(unsigned_type row, unsigned_type col) const
     {
         return *(bids + layout.coords_to_index(row, col));
-        int foo;  // this line is here to cause a compiler warning, to see if warnings are shown by the IDE 
+        int foo;  // this line is here to cause a compiler warning, to see if warnings are displayed by the IDE 
     }
     
     //! \brief read in matrix from stream, assuming row-major order
@@ -74,7 +74,7 @@ public:
         element_iterator_type current_element, first_element_of_row_in_block;
         
         // if enough space
-        // allocate one row of blocks (panel ?)
+        // allocate one row of blocks
         block_type* row_of_blocks = new block_type[num_block_cols];
         
         // iterate block-rows therein element-rows therein block-cols therein element-col
@@ -82,9 +82,9 @@ public:
         for (unsigned_type b_row = 0; b_row < num_block_rows; ++b_row)
         {
             unsigned_type num_e_rows = (b_row < num_block_rows -1) 
-                    ? BlockSideLength : num_rows % BlockSideLength;
-            unsigned_type e_row;
+                    ? BlockSideLength : (num_rows -1) % BlockSideLength +1;
             // element-rows
+            unsigned_type e_row;
             for (e_row = 0; e_row < num_e_rows; ++e_row)
                 // block-cols
                 for (unsigned_type b_col = 0; b_col < num_block_cols; ++b_col)
@@ -92,7 +92,7 @@ public:
                     first_element_of_row_in_block = 
                             row_of_blocks[b_col].begin() + e_row*BlockSideLength;
                     unsigned_type num_e_cols = (b_col < num_block_cols -1) 
-                            ? BlockSideLength : num_cols % BlockSideLength;
+                            ? BlockSideLength : (num_cols -1) % BlockSideLength +1;
                     // element-cols
                     for (current_element = first_element_of_row_in_block; 
                             current_element < first_element_of_row_in_block + num_e_cols; 
@@ -121,11 +121,56 @@ public:
                             ++current_element)
                         *current_element = 0;
                 }
-            //write block-row to disk
+            // write block-row to disk
             std::vector<request_ptr> requests;
             for (unsigned_type col = 0; col < num_block_cols; ++col)
                 requests.push_back(row_of_blocks[col].write(bid(b_row, col)));
             wait_all(requests.data(), requests.size());
+        }
+    }
+    
+    template<class OutputIterator>
+    void output_to_row_major(OutputIterator& i, unsigned_type /*max_temp_mem_raw*/) const
+    {
+        element_iterator_type current_element, first_element_of_row_in_block;
+        
+        // if enough space
+        // allocate one row of blocks
+        block_type* row_of_blocks = new block_type[num_block_cols];
+        
+        // iterate block-rows therein element-rows therein block-cols therein element-col
+        // write elements to iterator
+        for (unsigned_type b_row = 0; b_row < num_block_rows; ++b_row)
+        {
+            // read block-row from disk
+            std::vector<request_ptr> requests;
+            for (unsigned_type col = 0; col < num_block_cols; ++col)
+                requests.push_back(row_of_blocks[col].read(bid(b_row, col)));
+            wait_all(requests.data(), requests.size());
+            
+            unsigned_type num_e_rows = (b_row < num_block_rows -1) 
+                    ? BlockSideLength : (num_rows -1) % BlockSideLength +1;
+            // element-rows
+            unsigned_type e_row;
+            for (e_row = 0; e_row < num_e_rows; ++e_row)
+                // block-cols
+                for (unsigned_type b_col = 0; b_col < num_block_cols; ++b_col)
+                {
+                    first_element_of_row_in_block = 
+                            row_of_blocks[b_col].begin() + e_row*BlockSideLength;
+                    unsigned_type num_e_cols = (b_col < num_block_cols -1) 
+                            ? BlockSideLength : (num_cols -1) % BlockSideLength +1;
+                    // element-cols
+                    for (current_element = first_element_of_row_in_block; 
+                            current_element < first_element_of_row_in_block + num_e_cols; 
+                            ++current_element)
+                    {
+                        // write element
+                        //todo if (i.empty()) throw exception
+                        *i = *current_element;
+                        ++i;
+                    }
+                }
         }
     }
     
@@ -139,6 +184,46 @@ public:
             unsigned_type max_temp_mem_raw);
 };
 
+template <typename matrix_type>
+class matrix_row_major_iterator
+{
+    typedef typename matrix_type::block_type block_type;
+    
+    matrix_type* matrix;
+    block_type* row_of_blocks;
+    bool* dirty;
+    unsigned_type loaded_row_in_blocks,
+            current_element;
+    
+public:    
+    matrix_row_major_iterator(matrix_type& m)
+        : loaded_row_in_blocks(-1),
+          current_element(0)
+    {
+        matrix = &m;
+        // allocate one row of blocks
+        row_of_blocks = new block_type[m.num_block_cols];
+        dirty = new bool[m.num_block_cols];
+    }
+    
+    ~matrix_row_major_iterator()
+    {
+        //TODO write out
+        
+        delete[] row_of_blocks;
+        delete[] dirty;
+    }
+    
+    matrix_row_major_iterator& operator++()
+    {
+        ++current_element;
+        return *this;
+    }
+    
+    bool empty() const { return (current_element >= *matrix.num_rows * *matrix.num_cols); }
+    
+    int operator*() { return 1; }
+};
 
 //! \brief submatrix of a matrix containing blocks (type block_type) that reside in main memory
 template <typename matrix_type, class Layout = RowMajor>
@@ -235,8 +320,6 @@ public:
 template <typename block_type, unsigned BlockSideLength>
 void multiply_block(/*const*/ block_type& BlockA, /*const*/ block_type& BlockB, block_type& BlockC)
 {
-    STXXL_MSG("multiply_block");
-
     typedef typename block_type::value_type value_type;
 
     value_type* a = BlockA.begin(), * b = BlockB.begin(), * c = BlockC.begin();
