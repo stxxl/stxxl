@@ -125,12 +125,11 @@ public:
 
 int main()
 {
-    const int rank = 103;
-#define block_order 32
+    const int rank = 1024, block_order = 1024;
     
     const unsigned_type internal_memory = 4*4*8*block_order*block_order; //1ull * 1024 * 1024 * 1024;
     
-    switch (3)
+    switch (1)
     {
     case 0:
     {
@@ -152,7 +151,7 @@ int main()
     }
     case 1:
     {
-        matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        matrix<double, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         constant_one co;
         modulus_integers mi(rank, 0);
         iterator_compare<modulus_integers, unsigned_type> ic(mi);
@@ -234,7 +233,7 @@ int main()
         {
             STXXL_MSG("first errors:");
             for (unsigned int i = 0; i < 10 && i < ic.get_errors().size(); i++)
-                STXXL_MSG("" << ic.get_errors()[i].first << " " << ic.get_errors()[i].second);
+                STXXL_MSG("" << ic.get_errors()[i].first << " != " << ic.get_errors()[i].second);
         }
         break;
     }
