@@ -13,6 +13,10 @@
 #ifndef STXXL_MATRIX_HEADER
 #define STXXL_MATRIX_HEADER
 
+#ifndef STXXL_BLAS
+#define STXXL_BLAS 0
+#endif
+
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/containers/matrix_layouts.h>
@@ -64,7 +68,7 @@ public:
     bid_type& bid(unsigned_type row, unsigned_type col) const
     {
         return *(bids + layout.coords_to_index(row, col));
-        int foo;  // this line is here to cause a compiler warning, to see if warnings are displayed by the IDE 
+//        int foo;  // this line is here to cause a compiler warning, to see if warnings are displayed by the IDE
     }
     
     //! \brief read in matrix from stream, assuming row-major order
@@ -315,6 +319,55 @@ public:
     }
 };
 
+#if STXXL_BLAS
+extern "C" void dgemm_(void*, void*, void*, void*, void*, void*, void*, void*, void*, void*, void*, void*, void*);
+#endif
+
+
+//! \brief multiplies matrices A and B, adds result to C
+//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
+template<typename value_type, unsigned BlockSideLength>
+struct low_level_multiply;
+
+//! \brief multiplies matrices A and B, adds result to C, for double entries
+//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
+template<unsigned BlockSideLength>
+struct low_level_multiply<double, BlockSideLength>
+{
+    void operator()(double *a, double* b, double* c)
+    {
+    #if STXXL_BLAS
+        int n = BlockSideLength;
+        char transpose = 'N';
+        double alpha = 1.0;
+        double beta  = 0.0;
+
+        STXXL_MSG("dgemm");
+        dgemm_(&transpose, &transpose, &n, &n, &n, &alpha, a, &n, b, &n, &beta, c, &n);
+    #else
+        for (unsigned_type k = 0; k < BlockSideLength; ++k)
+            #pragma omp parallel for
+            for (unsigned_type i = 0; i < BlockSideLength; ++i)
+                for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                    c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
+    #endif
+    }
+};
+
+template <typename value_type, unsigned BlockSideLength>
+struct low_level_multiply
+{
+    void operator()(value_type *a, value_type* b, value_type* c)
+    {
+        for (unsigned_type k = 0; k < BlockSideLength; ++k)
+            #pragma omp parallel for
+            for (int_type i = 0; i < BlockSideLength; ++i)
+                for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                    c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
+    }
+};
+
+
 //! \brief multiplies blocks of A and B, adds result to C
 //! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
 template <typename block_type, unsigned BlockSideLength>
@@ -323,11 +376,8 @@ void multiply_block(/*const*/ block_type& BlockA, /*const*/ block_type& BlockB, 
     typedef typename block_type::value_type value_type;
 
     value_type* a = BlockA.begin(), * b = BlockB.begin(), * c = BlockC.begin();
-    for (unsigned_type k = 0; k < BlockSideLength; ++k)
-        #pragma omp parallel for
-        for (unsigned_type i = 0; i < BlockSideLength; ++i)
-            for (unsigned_type j = 0; j < BlockSideLength; ++j)
-            	c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
+    low_level_multiply<value_type, BlockSideLength> llm;
+    llm(a, b, c);
 }
 
 // multiply panels from A and B, add result to C
