@@ -340,9 +340,8 @@ struct low_level_multiply<double, BlockSideLength>
         int n = BlockSideLength;
         char transpose = 'N';
         double alpha = 1.0;
-        double beta  = 0.0;
+        double beta  = 1.0;
 
-        STXXL_MSG("dgemm");
         dgemm_(&transpose, &transpose, &n, &n, &n, &alpha, a, &n, b, &n, &beta, c, &n);
     #else
         for (unsigned_type k = 0; k < BlockSideLength; ++k)
