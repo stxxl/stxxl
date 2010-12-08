@@ -125,9 +125,9 @@ public:
 
 int main()
 {
-    const int rank = 1024, block_order = 1024;
+    const int rank = 100 * 1024, block_order = 2 * 1024;
     
-    const unsigned_type internal_memory = 4*4*8*block_order*block_order; //1ull * 1024 * 1024 * 1024;
+    const unsigned_type internal_memory = 4ull * 1024 * 1024 * 1024;
     
     switch (1)
     {
@@ -156,16 +156,19 @@ int main()
         modulus_integers mi(rank, 0);
         iterator_compare<modulus_integers, unsigned_type> ic(mi);
         
+        stats_data stats_before_construction(*stats::get_instance());
+        
         A.materialize_from_row_major(co, internal_memory);
         B.materialize_from_row_major(co, internal_memory);
         
-        STXXL_MSG("Multiplying two " << rank << "x" << rank << " matrices.");
-        stats_data stats_before(*stats::get_instance());
+        stats_data stats_before_mult(*stats::get_instance());
+        STXXL_MSG(stats_before_mult - stats_before_construction);
     
+        STXXL_MSG("Multiplying two " << rank << "x" << rank << " matrices.");
         multiply(A, B, C, internal_memory);
         
         stats_data stats_after(*stats::get_instance());
-        STXXL_MSG(stats_after - stats_before);
+        STXXL_MSG(stats_after - stats_before_mult);
         
         STXXL_MSG("testing correctness");
         C.output_to_row_major(ic, internal_memory);
@@ -210,7 +213,7 @@ int main()
     case 3:
     {
         matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
-        modulus_integers mi1(1, 1), mi2(rank*rank, -1);
+        modulus_integers mi1(1, 1), mi2((unsigned_type)rank*rank, -1);
         inverse_diagonal_matrix id(rank);
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
         
