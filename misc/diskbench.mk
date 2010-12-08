@@ -73,12 +73,16 @@ define do-some-disks-sip
 endef
 
 $(HOST)-%.cr.log:
-	$(RM) $(foreach d,$(DISKS_$*),$(call disk2file,$d))
+	$(if $(keep-old-file),,$(RM) $(foreach d,$(DISKS_$*),$(call disk2file,$d)))
 	$(do-some-disks)
 
 $(HOST)-%.crx.log: FLAGS_EX = W
 $(HOST)-%.crx.log:
-	$(RM) $(foreach d,$(DISKS_$*),$(call disk2file,$d))
+	$(if $(keep-old-file),,$(RM) $(foreach d,$(DISKS_$*),$(call disk2file,$d)))
+	$(do-some-disks)
+
+$(HOST)-%.crx.log: FLAGS_EX = W
+$(HOST)-%.crx.log:
 	$(do-some-disks)
 
 # interleaved write-read-test
@@ -113,6 +117,9 @@ sip: $(foreach d,$(DISKS_1by1),$(HOST)-$d.sip.log)
 
 all-sizes:
 	for d in $(wildcard 0016iMB 0064MB 0004MB 0256MB 0001MB 1024MB *MB) ; do make -C $$d cr+ wr ex+ ; done
+
+all-sizes-raw: keep-old-file=1
+all-sizes-raw: all-sizes
 
 plot: $(HOST).gnuplot
 	gnuplot $<
