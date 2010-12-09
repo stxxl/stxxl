@@ -14,8 +14,8 @@
 #include <stxxl/vector>
 #include <stxxl/stream>
 
-#include <time.h>
 #include <iostream>
+#include <limits>
 
 using namespace stxxl;
 
@@ -41,7 +41,7 @@ public:
     modulus_integers & operator ++ ()
     {
         counter += step;
-        if (modulus != 0)
+        if (modulus != 0 && counter >= modulus)
             counter %= modulus;
         return *this;
     }
@@ -214,7 +214,7 @@ int main()
     case 3:
     {
         matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
-        modulus_integers mi1(1, 1), mi2((unsigned_type)rank * rank, -1);
+        modulus_integers mi1(1, 1), mi2((unsigned_type)rank * rank, std::numeric_limits<unsigned_type>::max());
         inverse_diagonal_matrix id(rank);
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
 
