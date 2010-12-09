@@ -114,10 +114,10 @@ monotonic_pq.$(EXEEXT): monotonic_pq.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c monotonic_pq.cpp
 	$(LINKER)  monotonic_pq.$(OBJEXT) $(OUT)monotonic_pq.$(EXEEXT)  $(STXXL_LINKER_OPTIONS)
 
-test_matrix: test_matrix.$(EXEEXT)
-test_matrix.$(EXEEXT): test_matrix.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_matrix.cpp -DSTXXL_VERBOSE_LEVEL=0
-	$(LINKER)  test_matrix.$(OBJEXT) $(OUT)test_matrix.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+benchmark_naive_matrix: benchmark_naive_matrix.$(EXEEXT)
+benchmark_naive_matrix.$(EXEEXT): benchmark_naive_matrix.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c benchmark_naive_matrix.cpp -DSTXXL_VERBOSE_LEVEL=0
+	$(LINKER) benchmark_naive_matrix.$(OBJEXT) $(OUT)benchmark_naive_matrix.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_vector_sizes: test_vector_sizes.$(EXEEXT)
 test_vector_sizes.$(EXEEXT): test_vector_sizes.cpp $(DEPENDENCIES)
