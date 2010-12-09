@@ -132,7 +132,7 @@ public:
             std::vector<request_ptr> requests;
             for (unsigned_type col = 0; col < num_block_cols; ++col)
                 requests.push_back(row_of_blocks[col].write(bid(b_row, col)));
-            wait_all(requests.data(), requests.size());
+            wait_all(requests.begin(), requests.end());
         }
     }
 
@@ -153,7 +153,7 @@ public:
             std::vector<request_ptr> requests;
             for (unsigned_type col = 0; col < num_block_cols; ++col)
                 requests.push_back(row_of_blocks[col].read(bid(b_row, col)));
-            wait_all(requests.data(), requests.size());
+            wait_all(requests.begin(), requests.end());
 
             unsigned_type num_e_rows = (b_row < num_block_rows - 1)
                                        ? BlockSideLength : (num_rows - 1) % BlockSideLength + 1;
@@ -275,7 +275,7 @@ public:
     {
         std::vector<request_ptr> requests = read_async(from, first_row, first_col);
 
-        wait_all(requests.data(), requests.size());
+        wait_all(requests.begin(), requests.end());
     }
 
     // read the blocks specified by height and width
@@ -298,7 +298,7 @@ public:
     {
         std::vector<request_ptr> requests = write_async(to, first_row, first_col);
 
-        wait_all(requests.data(), requests.size());
+        wait_all(requests.begin(), requests.end());
     }
 
     // read the blocks specified by height and width
@@ -422,7 +422,7 @@ multiply(
 
     // preparation:
     // calculate panel size from blocksize and max_temp_mem_raw
-    unsigned_type panel_max_side_length_in_blocks = sqrt(max_temp_mem_raw / 3 / block_type::raw_size);
+    unsigned_type panel_max_side_length_in_blocks = sqrt(double(max_temp_mem_raw / 3 / block_type::raw_size));
     unsigned_type panel_max_num_1_in_blocks = panel_max_side_length_in_blocks,
         panel_max_num_2_in_blocks = panel_max_side_length_in_blocks,
         panel_max_num_3_in_blocks = panel_max_side_length_in_blocks,
