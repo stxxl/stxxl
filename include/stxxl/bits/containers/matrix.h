@@ -367,7 +367,7 @@ struct low_level_multiply
             #if STXXL_PARALLEL
             #pragma omp parallel for
             #endif
-            for (int_type i = 0; i < BlockSideLength; ++i)
+            for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
                 for (unsigned_type j = 0; j < BlockSideLength; ++j)
                     c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
     }
