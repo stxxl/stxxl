@@ -423,43 +423,55 @@ multiply(
     // preparation:
     // calculate panel size from blocksize and max_temp_mem_raw
     unsigned_type panel_max_side_length_in_blocks = sqrt(double(max_temp_mem_raw / 3 / block_type::raw_size));
-    unsigned_type panel_max_num_1_in_blocks = panel_max_side_length_in_blocks,
-        panel_max_num_2_in_blocks = panel_max_side_length_in_blocks,
-        panel_max_num_3_in_blocks = panel_max_side_length_in_blocks,
-        matrix_num_1_in_panels = div_ceil(C.num_block_rows, panel_max_num_1_in_blocks),
-        matrix_num_2_in_panels = div_ceil(A.num_block_cols, panel_max_num_2_in_blocks),
-        matrix_num_3_in_panels = div_ceil(C.num_block_cols, panel_max_num_3_in_blocks);
+    unsigned_type panel_max_num_n_in_blocks = panel_max_side_length_in_blocks, 
+            panel_max_num_l_in_blocks = panel_max_side_length_in_blocks, 
+            panel_max_num_m_in_blocks = panel_max_side_length_in_blocks,
+            matrix_num_n_in_panels = div_ceil(C.num_block_rows, panel_max_num_n_in_blocks),
+            matrix_num_l_in_panels = div_ceil(A.num_block_cols, panel_max_num_l_in_blocks),
+            matrix_num_m_in_panels = div_ceil(C.num_block_cols, panel_max_num_m_in_blocks);
+    /*  n, m and l denote the three dimensions of a matrix multiplication, according to the following ascii-art diagram:
+     * 
+     *                 +--m--+          
+     *  +----l-----+   |     |   +--m--+
+     *  |          |   |     |   |     |
+     *  n    A     | • l  B  | = n  C  |
+     *  |          |   |     |   |     |
+     *  +----------+   |     |   +-----+
+     *                 +-----+          
+     */
+    
     // reserve mem for a,b,c-panel
-    panel<matrix_type> panelA(panel_max_num_1_in_blocks, panel_max_num_2_in_blocks);
-    panel<matrix_type> panelB(panel_max_num_2_in_blocks, panel_max_num_3_in_blocks);
-    panel<matrix_type> panelC(panel_max_num_1_in_blocks, panel_max_num_3_in_blocks);
-
+    panel<matrix_type> panelA(panel_max_num_n_in_blocks, panel_max_num_l_in_blocks);
+    panel<matrix_type> panelB(panel_max_num_l_in_blocks, panel_max_num_m_in_blocks);
+    panel<matrix_type> panelC(panel_max_num_n_in_blocks, panel_max_num_m_in_blocks);
+    
     // multiply:
     // iterate rows and cols (panel wise) of c
-    for (unsigned_type panel_row = 0; panel_row < matrix_num_1_in_panels; ++panel_row)
-    {   // for each row
-        panelC.height = panelA.height = (panel_row < matrix_num_1_in_panels - 1) ?
-                                        panel_max_num_1_in_blocks : /*last row*/ (C.num_block_rows - 1) % panel_max_num_1_in_blocks + 1;
-        for (unsigned_type panel_col = 0; panel_col < matrix_num_3_in_panels; ++panel_col)
-        {   // for each column
-            // for each panel of C
-            panelC.width = panelB.width = (panel_col < matrix_num_3_in_panels - 1) ?
-                                          panel_max_num_3_in_blocks : (C.num_block_cols - 1) % panel_max_num_3_in_blocks + 1;
+    for (unsigned_type panel_row = 0; panel_row < matrix_num_n_in_panels; ++panel_row)
+    {	//for each row
+        panelC.height = panelA.height = (panel_row < matrix_num_n_in_panels -1) ?
+                panel_max_num_n_in_blocks : /*last row*/ (C.num_block_rows-1) % panel_max_num_n_in_blocks +1;
+        for (unsigned_type panel_col = 0; panel_col < matrix_num_m_in_panels; ++panel_col)
+        {	//for each column
+
+        	//for each panel of C
+            panelC.width = panelB.width = (panel_col < matrix_num_m_in_panels -1) ?
+                    panel_max_num_m_in_blocks : (C.num_block_cols-1) % panel_max_num_m_in_blocks +1;
             // initialize c-panel
             panelC.clear();
             // iterate a-row,b-col
-            for (unsigned_type l = 0; l < matrix_num_2_in_panels; ++l)
-            {   // scalar product over row/column
-                panelA.width = panelB.height = (l < matrix_num_2_in_panels - 1) ?
-                                               panel_max_num_2_in_blocks : (A.num_block_cols - 1) % panel_max_num_2_in_blocks + 1;
+            for (unsigned_type l = 0; l < matrix_num_l_in_panels; ++l)
+            {	//scalar product over row/column
+                panelA.width = panelB.height = (l < matrix_num_l_in_panels -1) ?
+                        panel_max_num_l_in_blocks : (A.num_block_cols-1) % panel_max_num_l_in_blocks +1;
                 // load a,b-panel
-                panelA.read_sync(A, panel_row * panel_max_num_1_in_blocks, l * panel_max_num_2_in_blocks);
-                panelB.read_sync(B, l * panel_max_num_2_in_blocks, panel_col * panel_max_num_3_in_blocks);
+                panelA.read_sync(A, panel_row*panel_max_num_n_in_blocks, l*panel_max_num_l_in_blocks);
+                panelB.read_sync(B, l * panel_max_num_l_in_blocks, panel_col * panel_max_num_m_in_blocks);
                 // multiply and add to c
                 multiply_panel<matrix_type, BlockSideLength>(panelA, panelB, panelC);
             }
             // write c-panel
-            panelC.write_sync(C, panel_row * panel_max_num_1_in_blocks, panel_col * panel_max_num_3_in_blocks);
+            panelC.write_sync(C, panel_row * panel_max_num_n_in_blocks, panel_col * panel_max_num_m_in_blocks);
         }
     }
 
