@@ -21,6 +21,7 @@
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/containers/matrix_layouts.h>
 
+
 __STXXL_BEGIN_NAMESPACE
 
 //! \brief External matrix container

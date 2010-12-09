@@ -13,7 +13,9 @@
 #ifndef MATRIX_LAYOUTS_H_
 #define MATRIX_LAYOUTS_H_
 
-#include <stxxl/bits/namespace.h>
+#include <utility>
+#include <stxxl/bits/common/types.h>
+
 
 __STXXL_BEGIN_NAMESPACE
 
