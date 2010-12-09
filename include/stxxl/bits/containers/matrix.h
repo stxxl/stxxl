@@ -347,7 +347,9 @@ struct low_level_multiply<double, BlockSideLength>
         dgemm_(&transpose, &transpose, &n, &n, &n, &alpha, a, &n, b, &n, &beta, c, &n);
     #else
         for (unsigned_type k = 0; k < BlockSideLength; ++k)
+            #if STXXL_PARALLEL
             #pragma omp parallel for
+            #endif
             for (unsigned_type i = 0; i < BlockSideLength; ++i)
                 for (unsigned_type j = 0; j < BlockSideLength; ++j)
                     c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
@@ -361,7 +363,9 @@ struct low_level_multiply
     void operator () (value_type * a, value_type * b, value_type * c)
     {
         for (unsigned_type k = 0; k < BlockSideLength; ++k)
+            #if STXXL_PARALLEL
             #pragma omp parallel for
+            #endif
             for (int_type i = 0; i < BlockSideLength; ++i)
                 for (unsigned_type j = 0; j < BlockSideLength; ++j)
                     c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
