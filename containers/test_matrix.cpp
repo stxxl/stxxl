@@ -126,9 +126,9 @@ public:
 
 int main()
 {
-    const int rank = 100 * 1024, block_order = 2 * 1024;
+    const int rank = 10 * 1024, block_order = 2 * 1024;
 
-    const unsigned_type internal_memory = 4ull * 1024 * 1024 * 1024;
+    const unsigned_type internal_memory = 256 * 1024 * 1024;
 
     switch (1)
     {
