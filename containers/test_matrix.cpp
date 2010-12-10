@@ -151,10 +151,10 @@ int main()
         break;
     }
     case 1:
-    {
+    {   //1-matrices
         matrix<double, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         constant_one co;
-        modulus_integers mi(rank, 0);
+        modulus_integers mi(rank, 0);   //expected result, no modulus
         iterator_compare<modulus_integers, unsigned_type> ic(mi);
 
         stats_data stats_before_construction(*stats::get_instance());
@@ -183,10 +183,10 @@ int main()
         break;
     }
     case 2:
-    {
+    {   //ascending times constant factor
         matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
-        modulus_integers mi1(1, 1), mi2(5, 5);
-        diagonal_matrix di(rank, 5);
+        modulus_integers mi1(1, 1), mi2(5, 5);  //ascending, 5 * ascending
+        diagonal_matrix di(rank, 5);    //multiply by 5
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
 
         A.materialize_from_row_major(mi1, internal_memory);
