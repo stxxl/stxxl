@@ -1401,8 +1401,8 @@ private:
     {
         // fails if offset is too large, out of bound access
         assert(page_no < _page_status.size());
-        assert(!(_page_status[page_no] & dirty) &&
-               "A dirty page has been marked as newly initialized. The page content will be lost.");
+        // "A dirty page has been marked as newly initialized. The page content will be lost."
+        assert(!(_page_status[page_no] & dirty));
         if (_page_to_slot[page_no] != on_disk) {
             // remove page from cache
             _free_slots.push(_page_to_slot[page_no]);
