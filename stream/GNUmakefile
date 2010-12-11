@@ -22,6 +22,13 @@ $(call reduce_optimization,3,0,test_transpose,Version_12.0,any,any)
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
+# ICPC 12.0: internal error: backend signals (issue 613286)
+$(call reduce_optimization,3,0,test_stream,Version_12.0,any,any)
+$(call reduce_optimization,3,0,test_stream1,Version_12.0,any,any)
+$(call reduce_optimization,3,0,test_sorted_runs,Version_12.0,any,any)
+$(call reduce_optimization,3,0,test_push_sort,Version_12.0,any,any)
+$(call reduce_optimization,3,0,test_transpose,Version_12.0,any,any)
+
 # ICPC 10.0: internal error: backend signals (issue 466173)
 $(call reduce_optimization,3,1,test_stream,Version_10.0,32-bit,any)
 $(call reduce_optimization,3,1,test_stream1,Version_10.0,32-bit,any)
