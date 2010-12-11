@@ -56,6 +56,8 @@
   GCC 3.4       |    x       -         x         -
   GCC 3.3       |    o       -         o         -
   GCC 2.95      |    -       -         -         -
+  ICPC 12.0.107 |    x¹    PMODE¹      x¹      PMODE¹
+  ICPC 12.0.107 |    x¹    MCSTL¹      x¹      MCSTL¹
 * ICPC 11.1.072 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 11.0.084 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 10.1.026 |    x¹    MCSTL¹      x¹      MCSTL¹
@@ -76,7 +78,8 @@
        gcc does not come in the correct version:
        icpc 9.0: use with gcc 3.x
        icpc 9.1: use with gcc before 4.2
-       icpc 10.x, 11.x with mcstl support: use with gcc 4.2
+       icpc 10.x, 11.x, 12.0 with mcstl support: use with gcc 4.2
+       icpc 12.0 with pmode support: use with gcc 4.3
  ²   = MCSTL has been superseded by the libstdc++ parallel mode in gcc 4.3,
        full support requires gcc 4.4 or later, only partial support in gcc 4.3
  ³   = with libstdc++ from gcc 4.2
