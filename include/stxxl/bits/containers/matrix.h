@@ -21,6 +21,13 @@
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/containers/matrix_layouts.h>
 
+#if STXXL_BLAS == 2
+extern "C" {
+#include "blas_includes/blas_dense.h"
+}
+#endif
+
+
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -322,7 +329,7 @@ public:
     }
 };
 
-#if STXXL_BLAS
+#if STXXL_BLAS == 1
 extern "C" void dgemm_(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 #endif
 
@@ -339,13 +346,18 @@ struct low_level_multiply<double, BlockSideLength>
 {
     void operator () (double * a, double * b, double * c)
     {
-    #if STXXL_BLAS
+    #if STXXL_BLAS == 1
         int n = BlockSideLength;
         char transpose = 'N';
         double alpha = 1.0;
         double beta = 1.0;
 
         dgemm_(&transpose, &transpose, &n, &n, &n, &alpha, a, &n, b, &n, &beta, c, &n);
+    #elif STXXL_BLAS == 2
+        BLAS_dgemm(blas_rowmajor, blas_no_trans,
+                blas_no_trans, BlockSideLength, BlockSideLength, BlockSideLength,
+                1.0, a, BlockSideLength, b,
+                BlockSideLength, 1.0, c, BlockSideLength);
     #else
         for (unsigned_type k = 0; k < BlockSideLength; ++k)
             #if STXXL_PARALLEL
