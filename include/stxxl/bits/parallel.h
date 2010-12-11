@@ -34,6 +34,7 @@
 #ifdef __MCSTL__
  #include <mcstl.h>
  #include <bits/mcstl_multiway_merge.h>
+ #include <stxxl/bits/compat_type_traits.h>
 #endif
 
 #if STXXL_PARALLEL
@@ -129,7 +130,8 @@ namespace parallel
 #elif defined(_GLIBCXX_PARALLEL)
         return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-        return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, length, false);
+        typedef typename make_signed<DiffType>::type difference_type;
+        return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, difference_type(length), false);
 #else
 #error "no implementation found for multiway_merge()"
 #endif
@@ -157,7 +159,8 @@ namespace parallel
 #elif defined(_GLIBCXX_PARALLEL)
         return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-        return mcstl::multiway_merge_sentinel(seqs_begin, seqs_end, target, comp, length, false);
+        typedef typename make_signed<DiffType>::type difference_type;
+        return mcstl::multiway_merge_sentinel(seqs_begin, seqs_end, target, comp, difference_type(length), false);
 #else
 #error "no implementation found for multiway_merge_sentinel()"
 #endif
