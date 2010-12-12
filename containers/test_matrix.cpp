@@ -126,7 +126,7 @@ public:
 
 int main()
 {
-    const int rank = 10 * 1024, block_order = 2 * 1024;
+    const int rank = 1000, block_order = 32;
 
     const unsigned_type internal_memory = 256 * 1024 * 1024;
 
