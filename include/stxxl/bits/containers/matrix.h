@@ -325,6 +325,13 @@ public:
 #if STXXL_BLAS == 1
 extern "C" void dgemm_(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 #elif STXXL_BLAS == 2
+enum blas_order_type {
+            blas_rowmajor = 101,
+            blas_colmajor = 102 };
+enum blas_trans_type {
+            blas_no_trans   = 111,
+            blas_trans      = 112,
+            blas_conj_trans = 113 };
 extern "C" void cblas_dgemm( enum blas_order_type order, enum blas_trans_type transa,
                  enum blas_trans_type transb, int m, int n, int k,
                  double alpha, const double *a, int lda, const double *b,
