@@ -324,6 +324,7 @@ public:
 
 #if STXXL_BLAS == 1
 extern "C" void dgemm_(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+
 #elif STXXL_BLAS == 2
 enum blas_order_type {
             blas_rowmajor = 101,
@@ -336,8 +337,28 @@ extern "C" void cblas_dgemm( enum blas_order_type order, enum blas_trans_type tr
                  enum blas_trans_type transb, int m, int n, int k,
                  double alpha, const double *a, int lda, const double *b,
                  int ldb, double beta, double *c, int ldc );
-#endif
 
+#elif  STXXL_BLAS == 3
+typedef int blas_int;
+extern "C" void dgemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const double *alpha, const double *a, const blas_int *lda, const double *b, const blas_int *ldb,
+        const double *beta, double *c, const blas_int *ldc);
+
+void dgemm_wrapper(const blas_int n, const blas_int k, const blas_int m,
+        const double alpha, const bool a_transposed, const double *a /*, const blas_int lda*/,
+                            const bool b_transposed, const double *b /*, const blas_int ldb*/,
+        const double beta,                                 double *c /*, const blas_int ldc*/)
+{
+    const char transa = a_transposed ? 'T' : 'N';
+    const char transb = b_transposed ? 'T' : 'N';
+    const blas_int &stride_in_a = transa ? n : k;
+    const blas_int &stride_in_b = transb ? k : m;
+    const blas_int &stride_in_c = m;
+    // blas expects matrices in column-major, so we calulate C^T = alpha * B^T * A^T + beta * C^T
+    dgemm_(&transb, &transa, &m, &n, &k, &alpha, b, &stride_in_b, a, &stride_in_a, &beta, c, &stride_in_c);
+}
+#endif
 
 //! \brief multiplies matrices A and B, adds result to C
 //! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
@@ -357,12 +378,17 @@ struct low_level_multiply<double, BlockSideLength>
         double alpha = 1.0;
         double beta = 1.0;
 
-        dgemm_(&transpose, &transpose, &n, &n, &n, &alpha, a, &n, b, &n, &beta, c, &n);
+        dgemm_(&transpose, &transpose, &n, &n, &n, &alpha, b, &n, a, &n, &beta, c, &n);
     #elif STXXL_BLAS == 2
         cblas_dgemm(blas_rowmajor, blas_no_trans,
                 blas_no_trans, BlockSideLength, BlockSideLength, BlockSideLength,
                 1.0, a, BlockSideLength, b,
                 BlockSideLength, 1.0, c, BlockSideLength);
+    #elif STXXL_BLAS == 3
+        dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
+                1.0, false, a,
+                     false, b,
+                1.0,        c);
     #else
         for (unsigned_type k = 0; k < BlockSideLength; ++k)
             #if STXXL_PARALLEL
@@ -441,25 +467,25 @@ multiply(
     // calculate panel size from blocksize and max_temp_mem_raw
     unsigned_type panel_max_side_length_in_blocks = sqrt(double(max_temp_mem_raw / 3 / block_type::raw_size));
     unsigned_type panel_max_num_n_in_blocks = panel_max_side_length_in_blocks, 
-            panel_max_num_l_in_blocks = panel_max_side_length_in_blocks, 
+            panel_max_num_k_in_blocks = panel_max_side_length_in_blocks, 
             panel_max_num_m_in_blocks = panel_max_side_length_in_blocks,
             matrix_num_n_in_panels = div_ceil(C.num_block_rows, panel_max_num_n_in_blocks),
-            matrix_num_l_in_panels = div_ceil(A.num_block_cols, panel_max_num_l_in_blocks),
+            matrix_num_k_in_panels = div_ceil(A.num_block_cols, panel_max_num_k_in_blocks),
             matrix_num_m_in_panels = div_ceil(C.num_block_cols, panel_max_num_m_in_blocks);
-    /*  n, m and l denote the three dimensions of a matrix multiplication, according to the following ascii-art diagram:
+    /*  n, k and m denote the three dimensions of a matrix multiplication, according to the following ascii-art diagram:
      * 
      *                 +--m--+          
-     *  +----l-----+   |     |   +--m--+
+     *  +----k-----+   |     |   +--m--+
      *  |          |   |     |   |     |
-     *  n    A     | • l  B  | = n  C  |
+     *  n    A     | • k  B  | = n  C  |
      *  |          |   |     |   |     |
      *  +----------+   |     |   +-----+
      *                 +-----+          
      */
     
     // reserve mem for a,b,c-panel
-    panel<matrix_type> panelA(panel_max_num_n_in_blocks, panel_max_num_l_in_blocks);
-    panel<matrix_type> panelB(panel_max_num_l_in_blocks, panel_max_num_m_in_blocks);
+    panel<matrix_type> panelA(panel_max_num_n_in_blocks, panel_max_num_k_in_blocks);
+    panel<matrix_type> panelB(panel_max_num_k_in_blocks, panel_max_num_m_in_blocks);
     panel<matrix_type> panelC(panel_max_num_n_in_blocks, panel_max_num_m_in_blocks);
     
     // multiply:
@@ -477,13 +503,13 @@ multiply(
             // initialize c-panel
             panelC.clear();
             // iterate a-row,b-col
-            for (unsigned_type l = 0; l < matrix_num_l_in_panels; ++l)
+            for (unsigned_type l = 0; l < matrix_num_k_in_panels; ++l)
             {	//scalar product over row/column
-                panelA.width = panelB.height = (l < matrix_num_l_in_panels -1) ?
-                        panel_max_num_l_in_blocks : (A.num_block_cols-1) % panel_max_num_l_in_blocks +1;
+                panelA.width = panelB.height = (l < matrix_num_k_in_panels -1) ?
+                        panel_max_num_k_in_blocks : (A.num_block_cols-1) % panel_max_num_k_in_blocks +1;
                 // load a,b-panel
-                panelA.read_sync(A, panel_row*panel_max_num_n_in_blocks, l*panel_max_num_l_in_blocks);
-                panelB.read_sync(B, l * panel_max_num_l_in_blocks, panel_col * panel_max_num_m_in_blocks);
+                panelA.read_sync(A, panel_row*panel_max_num_n_in_blocks, l*panel_max_num_k_in_blocks);
+                panelB.read_sync(B, l * panel_max_num_k_in_blocks, panel_col * panel_max_num_m_in_blocks);
                 // multiply and add to c
                 multiply_panel<matrix_type, BlockSideLength>(panelA, panelB, panelC);
             }
