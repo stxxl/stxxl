@@ -345,18 +345,29 @@ extern "C" void dgemm_(const char *transa, const char *transb,
         const double *alpha, const double *a, const blas_int *lda, const double *b, const blas_int *ldb,
         const double *beta, double *c, const blas_int *ldc);
 
+//! \brief calculates c = alpha * a * b + beta * c
+//! \param n height of a and c
+//! \param k width of a and height of b
+//! \param m width of b and c
+//! \param a_in_col_major if a is stored in column-major rather than row-major
+//! \param b_in_col_major if b is stored in column-major rather than row-major
+//! \param c_in_col_major if c is stored in column-major rather than row-major
 void dgemm_wrapper(const blas_int n, const blas_int k, const blas_int m,
-        const double alpha, const bool a_transposed, const double *a /*, const blas_int lda*/,
-                            const bool b_transposed, const double *b /*, const blas_int ldb*/,
-        const double beta,                                 double *c /*, const blas_int ldc*/)
+        const double alpha, const bool a_in_col_major, const double *a /*, const blas_int lda*/,
+                            const bool b_in_col_major, const double *b /*, const blas_int ldb*/,
+        const double beta,  const bool c_in_col_major,       double *c /*, const blas_int ldc*/)
 {
-    const char transa = a_transposed ? 'T' : 'N';
-    const char transb = b_transposed ? 'T' : 'N';
-    const blas_int &stride_in_a = transa ? n : k;
-    const blas_int &stride_in_b = transb ? k : m;
-    const blas_int &stride_in_c = m;
-    // blas expects matrices in column-major, so we calulate C^T = alpha * B^T * A^T + beta * C^T
-    dgemm_(&transb, &transa, &m, &n, &k, &alpha, b, &stride_in_b, a, &stride_in_a, &beta, c, &stride_in_c);
+    const blas_int &stride_in_a = a_in_col_major ? n : k;
+    const blas_int &stride_in_b = b_in_col_major ? k : m;
+    const blas_int &stride_in_c = c_in_col_major ? n : m;
+    const char transa = a_in_col_major xor c_in_col_major ? 'T' : 'N';
+    const char transb = b_in_col_major xor c_in_col_major ? 'T' : 'N';
+    if (c_in_col_major)
+        // blas expects matrices in column-major unless specified via transa rsp. transb
+        dgemm_(&transa, &transb, &n, &m, &k, &alpha, a, &stride_in_a, b, &stride_in_b, &beta, c, &stride_in_c);
+    else
+        // blas expects matrices in column-major, so we calulate c^T = alpha * b^T * a^T + beta * c^T
+        dgemm_(&transb, &transa, &m, &n, &k, &alpha, b, &stride_in_b, a, &stride_in_a, &beta, c, &stride_in_c);
 }
 #endif
 
@@ -388,7 +399,7 @@ struct low_level_multiply<double, BlockSideLength>
         dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
                 1.0, false, a,
                      false, b,
-                1.0,        c);
+                1.0, false, c);
     #else
         for (unsigned_type k = 0; k < BlockSideLength; ++k)
             #if STXXL_PARALLEL
