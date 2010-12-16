@@ -126,7 +126,7 @@ public:
 
 int main()
 {
-    const int rank = 1000, block_order = 32;
+    const int rank = 10000, block_order = 1024;
 
     const unsigned_type internal_memory = 256 * 1024 * 1024;
 
@@ -152,6 +152,7 @@ int main()
     }
     case 1:
     {   //1-matrices
+        ColumnMajor cm;
         matrix<double, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         constant_one co;
         modulus_integers mi(rank, 0);   //expected result, no modulus
