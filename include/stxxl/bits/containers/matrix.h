@@ -61,15 +61,16 @@ private:
     block_manager * bm;
     const unsigned_type num_rows, num_cols;
     const unsigned_type num_block_rows, num_block_cols;
-    const MatrixBlockLayout * layout;
+    MatrixBlockLayout * layout;
 
 public:
-    matrix(unsigned_type num_rows, unsigned_type num_cols, const MatrixBlockLayout * layout = NULL)
+    matrix(unsigned_type num_rows, unsigned_type num_cols, MatrixBlockLayout * given_layout = NULL)
         : num_rows(num_rows), num_cols(num_cols),
           num_block_rows(div_ceil(num_rows, BlockSideLength)),
           num_block_cols(div_ceil(num_cols, BlockSideLength)),
-          layout(layout != NULL ? layout : new RowMajor(num_block_rows, num_block_cols))
+          layout((given_layout != NULL) ? given_layout : new RowMajor)
     {
+        layout->set_dimensions(num_block_rows, num_block_cols);
         bm = block_manager::get_instance();
         bids = new bid_type[num_block_rows * num_block_cols];
         bm->new_blocks(striping(), bids, bids + num_block_rows * num_block_cols);
@@ -79,6 +80,7 @@ public:
     {
         bm->delete_blocks(bids, bids + num_block_rows * num_block_cols);
         delete[] bids;
+        delete layout;
     }
 
     bid_type & bid(unsigned_type row, unsigned_type col) const
