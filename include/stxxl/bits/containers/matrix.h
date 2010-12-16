@@ -24,20 +24,33 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//forward declaration
+template <typename ValueType, unsigned BlockSideLength>
+class matrix;
+
+//forward declaration for friend
+template <typename ValueType, unsigned BlockSideLength>
+matrix<ValueType, BlockSideLength> &
+multiply(
+    const matrix<ValueType, BlockSideLength> & A,
+    const matrix<ValueType, BlockSideLength> & B,
+    matrix<ValueType, BlockSideLength> & C,
+    unsigned_type max_temp_mem_raw
+    );
+
+
 //! \brief External matrix container
 
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of one square matrix block, default is 1024
 //!         BlockSideLength*BlockSideLength*sizeof(ValueType) must be divisible by 4096
-//! \tparam Layout layout in which the blocks are ordered on disk among each other
-template <typename ValueType, unsigned BlockSideLength = 1024, class Layout = RowMajor>
+template <typename ValueType, unsigned BlockSideLength = 1024>
 class matrix
 {
     static const unsigned_type block_size = BlockSideLength * BlockSideLength;
     static const unsigned_type raw_block_size = block_size * sizeof(ValueType);
 
 public:
-    //typedef typename matrix<ValueType, BlockSideLength, Layout> matrix_type;
     typedef typed_block<raw_block_size, ValueType> block_type;
 
 private:
@@ -48,14 +61,14 @@ private:
     block_manager * bm;
     const unsigned_type num_rows, num_cols;
     const unsigned_type num_block_rows, num_block_cols;
-    const Layout layout;
+    const MatrixBlockLayout * layout;
 
 public:
-    matrix(unsigned_type num_rows, unsigned_type num_cols)
+    matrix(unsigned_type num_rows, unsigned_type num_cols, const MatrixBlockLayout * layout = NULL)
         : num_rows(num_rows), num_cols(num_cols),
           num_block_rows(div_ceil(num_rows, BlockSideLength)),
           num_block_cols(div_ceil(num_cols, BlockSideLength)),
-          layout(num_block_rows, num_block_cols)
+          layout(layout != NULL ? layout : new RowMajor(num_block_rows, num_block_cols))
     {
         bm = block_manager::get_instance();
         bids = new bid_type[num_block_rows * num_block_cols];
@@ -70,8 +83,7 @@ public:
 
     bid_type & bid(unsigned_type row, unsigned_type col) const
     {
-        return *(bids + layout.coords_to_index(row, col));
-//        int foo;  // this line is here to cause a compiler warning, to see if warnings are displayed by the IDE
+        return *(bids + layout->coords_to_index(row, col));
     }
 
     //! \brief read in matrix from stream, assuming row-major order
@@ -181,13 +193,12 @@ public:
         }
     }
 
-    //friend declaration
-    template <typename SomeValueType, unsigned SomeBlockSideLength, class SomeLayout>
-    friend matrix<SomeValueType, SomeBlockSideLength, SomeLayout> &
-    multiply(
-        const matrix<SomeValueType, SomeBlockSideLength, SomeLayout> & A,
-        const matrix<SomeValueType, SomeBlockSideLength, SomeLayout> & B,
-        matrix<SomeValueType, SomeBlockSideLength, SomeLayout> & C,
+    friend
+    matrix<ValueType, BlockSideLength> &
+    multiply<>(
+        const matrix<ValueType, BlockSideLength> & A,
+        const matrix<ValueType, BlockSideLength> & B,
+        matrix<ValueType, BlockSideLength> & C,
         unsigned_type max_temp_mem_raw);
 };
 
@@ -233,7 +244,7 @@ public:
 };
 
 //! \brief submatrix of a matrix containing blocks (type block_type) that reside in main memory
-template <typename matrix_type, class Layout = RowMajor>
+template <typename matrix_type>
 class panel
 {
 public:
@@ -241,11 +252,11 @@ public:
     typedef typename block_type::iterator element_iterator_type;
 
     block_type * blocks;
-    const Layout layout;
+    const RowMajor layout;
     unsigned_type height, width;
 
     panel(const unsigned_type max_height, const unsigned_type max_width)
-        : layout(max_height, max_width),
+        : layout(max_width, max_height),
           height(max_height), width(max_width)
     {
         blocks = new block_type[max_height * max_width];
@@ -458,16 +469,16 @@ void multiply_panel(const panel<matrix_type> & PanelA, const panel<matrix_type> 
 }
 
 //! \brief multiply the matrices A and B, gaining C
-template <typename ValueType, unsigned BlockSideLength, class Layout>
-matrix<ValueType, BlockSideLength, Layout> &
+template <typename ValueType, unsigned BlockSideLength>
+matrix<ValueType, BlockSideLength> &
 multiply(
-    const matrix<ValueType, BlockSideLength, Layout> & A,
-    const matrix<ValueType, BlockSideLength, Layout> & B,
-    matrix<ValueType, BlockSideLength, Layout> & C,
+    const matrix<ValueType, BlockSideLength> & A,
+    const matrix<ValueType, BlockSideLength> & B,
+    matrix<ValueType, BlockSideLength> & C,
     unsigned_type max_temp_mem_raw
     )
 {
-    typedef matrix<ValueType, BlockSideLength, Layout> matrix_type;
+    typedef matrix<ValueType, BlockSideLength> matrix_type;
     typedef typename matrix_type::block_type block_type;
 
     assert(A.num_cols == B.num_rows);
