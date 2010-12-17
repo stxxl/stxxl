@@ -208,6 +208,7 @@ template <typename matrix_type>
 class matrix_row_major_iterator
 {
     typedef typename matrix_type::block_type block_type;
+    typedef typename matrix_type::value_type value_type;
 
     matrix_type * matrix;
     block_type * row_of_blocks;
@@ -226,6 +227,27 @@ public:
         dirty = new bool[m.num_block_cols];
     }
 
+    matrix_row_major_iterator(const matrix_row_major_iterator& other)
+    {
+        matrix = other.matrix;
+        row_of_blocks = NULL;
+        dirty = NULL;
+        loaded_row_in_blocks = -1;
+        current_element = other.current_element;
+    }
+
+    matrix_row_major_iterator& operator=(const matrix_row_major_iterator& other)
+    {
+
+        matrix = other.matrix;
+        row_of_blocks = NULL;
+        dirty = NULL;
+        loaded_row_in_blocks = -1;
+        current_element = other.current_element;
+
+        return *this;
+    }
+
     ~matrix_row_major_iterator()
     {
         //TODO write out
@@ -242,7 +264,9 @@ public:
 
     bool empty() const { return (current_element >= *matrix.num_rows * *matrix.num_cols); }
 
-    int operator * () { return 1; }
+    value_type& operator * () { return 1 /*TODO*/; }
+
+    const value_type& operator * () const { return 1 /*TODO*/; }
 };
 
 //! \brief submatrix of a matrix containing blocks (type block_type) that reside in main memory
@@ -337,7 +361,7 @@ public:
 
 #if STXXL_BLAS == 1
 extern "C" void dgemm_(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-
+//TODO: cleanup variants
 #elif STXXL_BLAS == 2
 enum blas_order_type {
             blas_rowmajor = 101,
@@ -525,6 +549,7 @@ multiply(
             panelC.width = panelB.width = (panel_col < matrix_num_m_in_panels -1) ?
                     panel_max_num_m_in_blocks : (C.num_block_cols-1) % panel_max_num_m_in_blocks +1;
             // initialize c-panel
+            //TODO: acquire panelC (uninitialized)
             panelC.clear();
             // iterate a-row,b-col
             for (unsigned_type l = 0; l < matrix_num_k_in_panels; ++l)
@@ -532,11 +557,16 @@ multiply(
                 panelA.width = panelB.height = (l < matrix_num_k_in_panels -1) ?
                         panel_max_num_k_in_blocks : (A.num_block_cols-1) % panel_max_num_k_in_blocks +1;
                 // load a,b-panel
+                //TODO: acquire panelA
                 panelA.read_sync(A, panel_row*panel_max_num_n_in_blocks, l*panel_max_num_k_in_blocks);
+                //TODO: acquire panelB
                 panelB.read_sync(B, l * panel_max_num_k_in_blocks, panel_col * panel_max_num_m_in_blocks);
                 // multiply and add to c
                 multiply_panel<matrix_type, BlockSideLength>(panelA, panelB, panelC);
+                //TODO: release panelA
+                //TODO: release panelB
             }
+            //TODO: release panelC (write)
             // write c-panel
             panelC.write_sync(C, panel_row * panel_max_num_n_in_blocks, panel_col * panel_max_num_m_in_blocks);
         }

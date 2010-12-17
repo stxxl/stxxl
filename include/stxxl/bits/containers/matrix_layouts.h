@@ -54,7 +54,7 @@ public:
 
     virtual std::pair<unsigned_type, unsigned_type> index_to_coords(unsigned_type index) const
     {
-        return std::make_pair(index / num_cols, index % num_cols);
+        return std::make_pair(index / num_cols, index % num_cols);     //(row, col)
     }
 };
 
@@ -72,7 +72,7 @@ public:
 
     virtual std::pair<unsigned_type, unsigned_type> index_to_coords(unsigned_type index) const
     {
-        return std::make_pair(index % num_rows, index / num_rows);
+        return std::make_pair(index % num_rows, index / num_rows);     //(row, col)
     }
 };
 
