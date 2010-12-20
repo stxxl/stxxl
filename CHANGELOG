@@ -12,8 +12,12 @@ Version 1.3.1 (unreleased)
   - change handling of (empty) filler elements in typed_block to fix
     mismatching struct size in nested blocks
 * Bugfixes
-  - allow prefetch schedule computation of vectors that are bound to a file
+  - Allow prefetch schedule computation of vectors that are bound to a file.
   - Fix race growing files during concurrent block allocation.
+  - Allow reading a block that spans over end-of-file, fill remainder with zeroes.
+* Platform Support 
+  - add ICPC 12.0, works with both MCSTL (GCC 4.2) and parallel mode (GCC 4.3 only)
+  - add CLANG++ 2.8
 
 ------------------------------------------
 Version 1.3 (12 August 2010)
@@ -78,7 +82,7 @@ Version 1.3 (12 August 2010)
     more strictly and throw errors instead of overallocating
   - Execute completion handler before notifying waiters, so far after. 
 * Deprecated methods:
-  - stxxl::stats::reset(), stxxl:.stats::_reset_io_wait_time():
+  - stxxl::stats::reset(), stxxl::stats::_reset_io_wait_time():
     use stxxl::stats_data instead to store snapshots of the counters and compute differences
 * Under-the-hood improvements
   - I/O layer cleanup
