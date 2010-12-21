@@ -478,10 +478,10 @@ public:
         p_vector->flush();
     }
 #if 0
-       std::ostream & operator<< (std::ostream & o) const
-       {
-            o << "vectorpointer: "  << ((void*)p_vector) <<" offset: "<<offset;
-            return o;
+    std::ostream & operator << (std::ostream & o) const
+    {
+        o << "vectorpointer: " << ((void *)p_vector) << " offset: " << offset;
+        return o;
     }
 #endif
 };

@@ -32,14 +32,14 @@ class set_switch_handler
     completion_handler on_compl;
 
 public:
-    set_switch_handler(onoff_switch & switch__, const completion_handler& on_compl)
-     : switch_(switch__), on_compl(on_compl)
+    set_switch_handler(onoff_switch & switch__, const completion_handler & on_compl)
+        : switch_(switch__), on_compl(on_compl)
     { }
 
     void operator () (request * req)
     {
-    	on_compl(req);	//call before setting switch to on, otherwise, user has no way to wait for the completion handler to be executed
-    	switch_.on();
+        on_compl(req);  //call before setting switch to on, otherwise, user has no way to wait for the completion handler to be executed
+        switch_.on();
     }
 };
 
