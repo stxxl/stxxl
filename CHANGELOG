@@ -8,11 +8,11 @@ Version 1.3.1 (unreleased)
     when opening files.
   - Lock files by default (if implemented for this file type), can by disabled
     via stxxl::file::NO_LOCK.
-  - block_prefetcher now takes a completion_handler instead of a raw function pointer.
-    Furthermore, the completion_handler is already executed after the read operation
-    completes, not only when the issuer waits for it to complete.  The I/O thread
-    issues the call to the completion_handler, so for multiple disks, this may happen
-    concurrently.  
+  - block_prefetcher now takes a completion_handler instead of a raw function
+    pointer.  Furthermore, the completion_handler is already executed after the
+    read operation completes, not only when the issuer waits for it to
+    complete.  The I/O thread issues the call to the completion_handler, so for
+    multiple disks, this may happen concurrently.  
 * Internal changes, not user visible
   - Change handling of (empty) filler elements in typed_block to fix
     mismatching struct size in nested blocks.
