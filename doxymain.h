@@ -108,10 +108,15 @@
  * \section questions Questions
  *
  * - Questions concerning use and development of the \c S<small>TXXL</small>
- * library and bug reports should be posted to the
+ * library should be posted to the
  * <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>.
  * Please search the forum before posting,
  * your question may have been answered before.
+ *
+ * \section bugreports Bug Reports
+ *
+ * - Bugs should be reported in the 
+ *   <b><a href="https://stxxl.ae.cs.uni-frankfurt.de/bugs/">Bugzilla Bug Tracker</a></b>
  *
  * - \link FAQ FAQ - Frequently Asked Questions \endlink
  *
