@@ -44,10 +44,6 @@ include make.settings.local
 #     -DSTXXL_CHECK_ORDER_IN_SORTS
 #
 # to the compile options.
-#
-# FIXME: documentation needed
-#
-#STXXL_SPECIFIC += -DSTXXL_DEBUGMON
 
 
 #### You usually shouldn't need to change the sections below #####
@@ -120,7 +116,6 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/tmeta.h \
 	$(HEADER_PATH)/common/log.h \
 	$(HEADER_PATH)/common/exceptions.h \
-	$(HEADER_PATH)/common/debug.h \
 	$(HEADER_PATH)/common/tuple.h \
 	$(HEADER_PATH)/common/types.h \
 	$(HEADER_PATH)/common/settings.h \

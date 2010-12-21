@@ -16,6 +16,7 @@ Version 1.3.1 (unreleased)
 * Internal changes, not user visible
   - Change handling of (empty) filler elements in typed_block to fix
     mismatching struct size in nested blocks.
+  - Removed debugmon which was very limited and disabled for a long time.
 * Bugfixes
   - Allow prefetch schedule computation of vectors that are bound to a file.
   - Fix race growing files during concurrent block allocation.
