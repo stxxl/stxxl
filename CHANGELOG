@@ -2,25 +2,31 @@ Version 1.3.1 (unreleased)
 
 * Possibly breaking changes
   - No longer open syscall files with O_SYNC|O_DSYNC|O_RSYNC by default when
-    doing direct I/O, to avoid a write performance decrease starting with Linux 
+    doing direct I/O, to avoid a write performance decrease starting with Linux
     kernel version 2.6.32.
     A stxxl::file::SYNC flag has been added to allow forcing the O_*SYNC flags
     when opening files.
   - Lock files by default (if implemented for this file type), can by disabled
     via stxxl::file::NO_LOCK.
 * Internal changes, not user visible
-  - change handling of (empty) filler elements in typed_block to fix
-    mismatching struct size in nested blocks
+  - Change handling of (empty) filler elements in typed_block to fix
+    mismatching struct size in nested blocks.
 * Bugfixes
   - Allow prefetch schedule computation of vectors that are bound to a file.
   - Fix race growing files during concurrent block allocation.
-  - Allow reading a block that spans over end-of-file, fill remainder with zeroes.
+  - Allow reading a block that spans over end-of-file, fill remainder with
+    zeroes.
 * Platform Support 
-  - add ICPC 12.0, works with both MCSTL (GCC 4.2) and parallel mode (GCC 4.3 only)
+  - add ICPC 12.0, works with both MCSTL (needs libstdc++ from GCC 4.2) and
+    parallel mode (needs libstdc++ from GCC 4.3 (not 4.4/4.5))
   - add CLANG++ 2.8
+* Under-the-hood improvements
+  - code cleanup
+* Documentation updates
+* Several new test programs
 
 ------------------------------------------
-Version 1.3 (12 August 2010)
+Version 1.3.0 (12 August 2010)
 
 * New file types
   - fileperblock_syscall/fileperblock_mmap/fileperblock_boostfd/fileperblock_wincall:
