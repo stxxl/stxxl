@@ -139,7 +139,7 @@ run containers/test_vector_export
 run containers/write_vector "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
 run containers/write_vector2 "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
 run containers/test_vector_sizes "$STXXL_TMPDIR/out"
-run containers/test_matrix
+run containers/benchmark_naive_matrix
 run containers/test_map 32
 run containers/test_map_random 2000
 run containers/btree/test_btree 10000
