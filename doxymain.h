@@ -227,7 +227,10 @@ Controller::Controller()
  *
  * \section q6 How can I credit STXXL, and thus foster its development?
  *
- * - For all users:  Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
+ * - For all users:
+ *   - Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
+ *   - Rate STXXL at heise Software-Verzeichnis (German): http://www.heise.de/software/download/stxxl/76072
+ *   - Rate STXXL at SourceForge: https://sourceforge.net/projects/stxxl/
  *
  * - For scientific work:  Cite the papers mentioned here: http://stxxl.sourceforge.net/
  *
