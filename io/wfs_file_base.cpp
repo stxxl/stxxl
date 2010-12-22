@@ -83,7 +83,7 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
 
 wfs_file_base::wfs_file_base(
     const std::string & filename,
-    int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename)
+    int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename), locked(false)
 {
     file_des = open_file_impl(filename, mode);
 
@@ -135,9 +135,13 @@ void wfs_file_base::close()
 
 void wfs_file_base::lock()
 {
+    if (locked)
+        return; //already locked
+
     scoped_mutex_lock fd_lock(fd_mutex);
     if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
         stxxl_win_lasterror_exit("LockFile ", io_error);
+    locked = true;
 }
 
 file::offset_type wfs_file_base::_size()
