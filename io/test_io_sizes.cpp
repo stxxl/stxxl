@@ -22,7 +22,7 @@ int main(int argc, char ** argv)
 {
     if (argc < 4)
     {
-        std::cout << "Usage: " << argv[0] << "filetype tempfile maxsize" << std::endl;
+        std::cout << "Usage: " << argv[0] << " filetype tempfile maxsize" << std::endl;
         return -1;
     }
 
