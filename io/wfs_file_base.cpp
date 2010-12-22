@@ -135,10 +135,9 @@ void wfs_file_base::close()
 
 void wfs_file_base::lock()
 {
-    if (locked)
-        return; //already locked
-
     scoped_mutex_lock fd_lock(fd_mutex);
+    if (locked)
+        return;  // already locked
     if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
         stxxl_win_lasterror_exit("LockFile ", io_error);
     locked = true;
