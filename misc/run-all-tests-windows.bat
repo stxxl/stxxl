@@ -27,8 +27,8 @@ io\flushbuffers 2 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 io\sd_test
 io\test_io "%STXXL_TMPDIR%"
 io\test_cancel "%STXXL_TMPDIR%"
+io\test_io_sizes wincall "%STXXL_TMPDIR%\out" 5368709120
 io\test_io_sizes syscall "%STXXL_TMPDIR%\out" 5368709120
-io\test_io_sizes mmap "%STXXL_TMPDIR%\out" 5368709120
 io\test_io_sizes boostfd "%STXXL_TMPDIR%\out" 5368709120
 io\benchmark_disk_and_flash 0 2 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 io\benchmark_configured_disks 2 128
