@@ -6,18 +6,15 @@ tools: $(UTIL_BINARIES)
 tests: $(TESTS)
 #tests: $(TESTS_NON_MSVC)
 
-lib: debug.$(OBJEXT) rand.$(OBJEXT) version.$(OBJEXT) seed.$(OBJEXT) exithandler.$(OBJEXT) verbose.$(OBJEXT) log.$(OBJEXT)
+lib: rand.$(OBJEXT) version.$(OBJEXT) seed.$(OBJEXT) exithandler.$(OBJEXT) verbose.$(OBJEXT) log.$(OBJEXT)
 
 
-debug.$(OBJEXT): debug.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c debug.cpp
-	
 rand.$(OBJEXT): rand.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c rand.cpp
-	
+
 version.$(OBJEXT): version.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c version.cpp
-	
+
 seed.$(OBJEXT): seed.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c seed.cpp
 

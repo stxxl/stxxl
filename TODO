@@ -20,13 +20,6 @@
 
 * debug stable_ksort in depth, there are still some crashing cases left
 
-* stxxl::debugmon: FIXME! broken design
-  - only works properly for blocks from the mng layer, doing I/Os on manually
-    allocated memory is expected to fail
-  - does not take into account array allocations with metadata overhead
-    (either register addresses that are recognized by delete[] or register
-    block addresses that are used for I/Os - you can't have both)
-
 * continue using the new approach for STXXL_VERBOSE:
   $(CXX) -DSTXXL_VERBOSE_FOO=STXXL_VERBOSEx
 

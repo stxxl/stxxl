@@ -398,10 +398,6 @@
 				Name="common"
 				>
 				<File
-					RelativePath=".\common\debug.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\common\log.cpp"
 					>
 				</File>
@@ -437,10 +433,6 @@
 				>
 				<File
 					RelativePath=".\include\stxxl\bits\common\aligned_alloc.h"
-					>
-				</File>
-				<File
-					RelativePath=".\include\stxxl\bits\common\debug.h"
 					>
 				</File>
 				<File

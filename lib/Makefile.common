@@ -24,7 +24,6 @@ LIB_OBJECTS = \
 	../mng/mng.$(LIBOBJEXT) \
 	../mng/diskallocator.$(LIBOBJEXT) \
 	../algo/async_schedule.$(LIBOBJEXT) \
-	../common/debug.$(LIBOBJEXT) \
 	../common/rand.$(LIBOBJEXT) \
 	../common/seed.$(LIBOBJEXT) \
 	../common/exithandler.$(LIBOBJEXT) \

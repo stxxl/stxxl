@@ -94,10 +94,6 @@ MODENAME	?= $(MODEBASE)$(LIBEXTRA)
 #
 # But for the best performance it is strongly recommended
 # to reconfigure the kernel for the support of the direct I/O.
-#
-# FIXME: documentation needed
-#
-#STXXL_SPECIFIC += -DSTXXL_DEBUGMON
 
 
 #### You usually shouldn't need to change the sections below #####
@@ -319,7 +315,7 @@ HEADER_FILES_BITS	+= msvc_compatibility.h
 HEADER_FILES_COMMON	+= aligned_alloc.h new_alloc.h
 HEADER_FILES_COMMON	+= mutex.h rand.h semaphore.h state.h
 HEADER_FILES_COMMON	+= timer.h utils.h error_handling.h simple_vector.h
-HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h debug.h tuple.h
+HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h tuple.h
 HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h exithandler.h
 
 HEADER_FILES_IO		+= io.h iostats.h completion_handler.h

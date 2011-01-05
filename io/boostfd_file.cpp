@@ -15,7 +15,6 @@
 #if STXXL_HAVE_BOOSTFD_FILE
 
 #include <stxxl/bits/io/request_impl_basic.h>
-#include <stxxl/bits/common/debug.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -54,8 +53,6 @@ void boostfd_file::serve(const request * req) throw (io_error)
 
     if (type == request::READ)
     {
-        STXXL_DEBUGMON_DO(io_started(buffer));
-
         try
         {
             std::streamsize rc = file_des.read((char *)buffer, bytes);
@@ -74,13 +71,9 @@ void boostfd_file::serve(const request * req) throw (io_error)
                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                          " : " << ex.what());
         }
-
-        STXXL_DEBUGMON_DO(io_finished(buffer));
     }
     else
     {
-        STXXL_DEBUGMON_DO(io_started(buffer));
-
         try
         {
             std::streamsize rc = file_des.write((char *)buffer, bytes);
@@ -99,8 +92,6 @@ void boostfd_file::serve(const request * req) throw (io_error)
                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
                          " : " << ex.what());
         }
-
-        STXXL_DEBUGMON_DO(io_finished(buffer));
     }
 }
 

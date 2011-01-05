@@ -12,14 +12,12 @@
  **************************************************************************/
 
 #include <stxxl/bits/mng/mng.h>
-#include <stxxl/bits/common/debug.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
 block_manager::block_manager()
 {
-    debugmon::get_instance();
     config * cfg = config::get_instance();
 
     ndisks = cfg->disks_number();

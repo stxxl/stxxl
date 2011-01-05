@@ -1351,8 +1351,7 @@ namespace stream
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             base(r, c, memory_to_use)
-        {
-        }
+        { }
     };
 
 

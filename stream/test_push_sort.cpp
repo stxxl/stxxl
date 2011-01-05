@@ -64,7 +64,7 @@ int main()
     {
         const value_type element = rnd();
         checksum_before += element;
-        SortedRuns.push(element);                   // push into the sorter
+        SortedRuns.push(element);               // push into the sorter
     }
 
     SortedRunsType Runs = SortedRuns.result();  // get sorted_runs data structure
