@@ -28,6 +28,7 @@
 #if STXXL_HAVE_AIO_FILE
 
 #include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/io/disk_queued_file.h>
 #include <stxxl/bits/io/aio_queue.h>
 
 
@@ -39,12 +40,11 @@ class aio_queue;
 //! \{
 
 //! \brief Implementation of \c file based on the Linux kernel interface for asynchronous I/O
-class aio_file : public ufs_file_base
+class aio_file : public ufs_file_base, public disk_queued_file
 {
     friend class aio_request;
 
 private:
-    int physical_device_id, allocator_id;
     int desired_queue_length;
     aio_queue * queue;
 
@@ -58,7 +58,7 @@ public:
     aio_file(
         const std::string & filename,
         int mode, int physical_device_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR, int desired_queue_length = 0) :
-        ufs_file_base(filename, mode), physical_device_id(physical_device_id), allocator_id(allocator_id), desired_queue_length(desired_queue_length)
+        ufs_file_base(filename, mode), disk_queued_file(physical_device_id, allocator_id), desired_queue_length(desired_queue_length)
     { }
 
     void serve(const request * req) throw (io_error);
@@ -67,21 +67,6 @@ public:
     request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
                        const completion_handler & on_cmpl);
     const char * io_type() const;
-
-    int get_queue_id() const
-    {
-        return physical_device_id;
-    }
-
-    int get_allocator_id() const
-    {
-        return allocator_id;
-    }
-
-    int get_physical_device_id() const
-    {
-        return physical_device_id;
-    }
 
     int get_desired_queue_length() const
     {

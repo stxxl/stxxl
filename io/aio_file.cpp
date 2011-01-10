@@ -17,20 +17,7 @@
 #include <stxxl/bits/io/aio_request.h>
 #include <stxxl/bits/io/disk_queues.h>
 
-
 __STXXL_BEGIN_NAMESPACE
-
-
-void aio_file::serve(const request * req) throw (io_error)
-{
-    STXXL_UNUSED(req);
-    STXXL_THROW_UNREACHABLE();
-}
-
-const char * aio_file::io_type() const
-{
-    return "aio";
-}
 
 request_ptr aio_file::aread(
     void * buffer,
@@ -40,7 +27,7 @@ request_ptr aio_file::aread(
 {
     request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes, request::READ);
 
-    disk_queues::get_instance()->add_request(req, physical_device_id);
+    disk_queues::get_instance()->add_request(req, get_queue_id());
 
     return req;
 }
@@ -53,9 +40,20 @@ request_ptr aio_file::awrite(
 {
     request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes, request::WRITE);
 
-    disk_queues::get_instance()->add_request(req, physical_device_id);
+    disk_queues::get_instance()->add_request(req, get_queue_id());
 
     return req;
+}
+
+void aio_file::serve(const request * req) throw (io_error)
+{
+    STXXL_UNUSED(req);
+    STXXL_THROW_UNREACHABLE();
+}
+
+const char * aio_file::io_type() const
+{
+    return "aio";
 }
 
 __STXXL_END_NAMESPACE
