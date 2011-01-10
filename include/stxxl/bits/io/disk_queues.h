@@ -54,9 +54,11 @@ public:
         if (queues.find(disk) == queues.end())
         {
             // create new request queue
+#if STXXL_HAVE_AIO_FILE
             if (dynamic_cast<aio_request*>(req.get()))
 	            queues[disk] = new aio_queue(dynamic_cast<aio_file*>(req->get_file())->get_desired_queue_length());
             else
+#endif
 	            queues[disk] = new request_queue_impl_qwqr();
         }
         queues[disk]->add_request(req);
