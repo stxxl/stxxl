@@ -63,7 +63,6 @@ int main(int argc, char ** argv)
     unsigned num_cancelled = cancel_all(req, req + num_blocks / 2);
     std::cout << "Successfully canceled " << num_cancelled << " requests." << std::endl;
     //cancel every second in second half
-    sleep(1);
     for (unsigned i = num_blocks / 2; i < num_blocks; i += 2)
     {
         std::cout << "Canceling request " << &(*(req[i])) << std::endl;
