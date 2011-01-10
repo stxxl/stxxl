@@ -11,6 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <sstream>
+
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/io.h>
 
@@ -48,9 +50,19 @@ file * create_file(const std::string & io_impl,
     }
 #endif
 #if STXXL_HAVE_AIO_FILE
-    else if (io_impl == "aio")
+    //aio can have the desired queue length immediately appended to "aio", e.g. "aio(5)"
+    else if (io_impl.find("aio") == 0)
     {
-        ufs_file_base * result = new aio_file(filename, options, physical_device_id, allocator_id);
+        int desired_queue_length = 0;
+
+        size_t opening = io_impl[3] == '(' ? 3 : std::string::npos, closing = io_impl.find_first_of(')');
+        if (opening != std::string::npos && closing != std::string::npos && opening + 1 < closing)
+        {
+            std::istringstream input(io_impl.substr(opening + 1, closing - opening - 1));
+            input >> desired_queue_length;
+        }
+
+        ufs_file_base * result = new aio_file(filename, options, physical_device_id, allocator_id, desired_queue_length);
         result->lock();
         return result;
     }

@@ -55,7 +55,7 @@ public:
         {
             // create new request queue
             if (dynamic_cast<aio_request*>(req.get()))
-	            queues[disk] = new aio_queue();
+	            queues[disk] = new aio_queue(dynamic_cast<aio_file*>(req->get_file())->get_desired_queue_length());
             else
 	            queues[disk] = new request_queue_impl_qwqr();
         }

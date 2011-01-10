@@ -45,6 +45,7 @@ class aio_file : public ufs_file_base
 
 private:
     int physical_device_id, allocator_id;
+    int desired_queue_length;
     aio_queue * queue;
 
     aio_queue * get_queue() { return queue; }
@@ -56,8 +57,8 @@ public:
     //! \param disk disk(file) identifier
     aio_file(
         const std::string & filename,
-        int mode, int physical_device_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
-        ufs_file_base(filename, mode), physical_device_id(physical_device_id), allocator_id(allocator_id)
+        int mode, int physical_device_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR, int desired_queue_length = 0) :
+        ufs_file_base(filename, mode), physical_device_id(physical_device_id), allocator_id(allocator_id), desired_queue_length(desired_queue_length)
     { }
 
     void serve(const request * req) throw (io_error);
@@ -80,6 +81,11 @@ public:
     int get_physical_device_id() const
     {
         return physical_device_id;
+    }
+
+    int get_desired_queue_length() const
+    {
+        return desired_queue_length;
     }
 };
 
