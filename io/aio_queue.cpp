@@ -34,13 +34,13 @@ aio_queue::aio_queue(int max_sim_requests) :
     sem(0), posted_free_sem(max_sim_requests), posted_sem(0),
     post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
 {
-    context = 0;
-
     if (max_sim_requests == 0)
-        max_events = std::max(config::get_instance()->disks_number(), 4u) * 64;
+        max_events = std::max(config::get_instance()->disks_number(), 4u) * 64; // 64 entries per disk should be enough
     else
         max_events = max_sim_requests;
 
+    // negotiate maximum number of simultaneous events with the OS
+    context = 0;
     int result;
     while ((result = syscall(SYS_io_setup, max_events, &context)) == -1 && errno == EAGAIN && max_events > 1)
         max_events <<= 1;               // try with half as many events
@@ -65,7 +65,7 @@ void aio_queue::add_request(request_ptr & req)
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
     if (post_thread_state() != RUNNING)
-        STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
+        STXXL_ERRMSG("Request submitted to stopped queue.");
 
     scoped_mutex_lock lock(waiting_mtx);
 
@@ -78,7 +78,7 @@ bool aio_queue::cancel_request(request_ptr & req)
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
     if (post_thread_state() != RUNNING)
-        STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
+        STXXL_ERRMSG("Request canceled in stopped queue.");
 
     bool was_still_in_queue = false;
     queue_type::iterator pos;
@@ -88,7 +88,7 @@ bool aio_queue::cancel_request(request_ptr & req)
         {
             waiting_requests.erase(pos);
             was_still_in_queue = true;
-            sem--;
+            sem--;  // will never block
         }
     }
     if (!was_still_in_queue)
@@ -96,6 +96,7 @@ bool aio_queue::cancel_request(request_ptr & req)
     return was_still_in_queue;
 }
 
+// internal routines, run by the posting thread
 void aio_queue::post_requests()
 {
     request_ptr req;
@@ -103,10 +104,10 @@ void aio_queue::post_requests()
 
     for ( ; ; )
     {
-        int num_waiting = sem--;
+        int num_currently_waiting_requests = sem--;    // might block until next request or message comes in
 
         // terminate if termination has been requested
-        if (post_thread_state() == TERMINATE && num_waiting == 0)
+        if (post_thread_state() == TERMINATE && num_currently_waiting_requests == 0)
             break;
 
         scoped_mutex_lock lock(waiting_mtx);
@@ -116,17 +117,19 @@ void aio_queue::post_requests()
             waiting_requests.pop_front();
             lock.unlock();
 
-            if (max_sim_requests != 0)
-                posted_free_sem--;
+            if (max_sim_requests != 0)  //unless unlimited
+                posted_free_sem--;  //might block because too many requests are posted
 
             while (!static_cast<aio_request *>(req.get())->post())
-            {
+            {   // post failed, so first handle events to make queues (more) empty
                 int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
                 if (num_events < 0)
-                    STXXL_THROW2(io_error, "io_getevents() nr_events=" << max_events);
+                    STXXL_THROW2(io_error, "io_getevents() nr_events=" << num_events);
 
                 handle_events(events, num_events, false);
             }
+
+            // request is finally posted
 
             {
                 scoped_mutex_lock lock(posted_mtx);
@@ -138,7 +141,7 @@ void aio_queue::post_requests()
         {
             lock.unlock();
 
-            sem++;
+            sem++;  // sem-- was premature, compensate for that
         }
     }
 
@@ -149,7 +152,7 @@ void aio_queue::handle_events(io_event * events, int num_events, bool canceled)
 {
     for (int e = 0; e < num_events; ++e)
     {
-        //unsigned_type is as long as a pointer, and like this, we avoid an icpc warning
+        // unsigned_type is as long as a pointer, and like this, we avoid an icpc warning
         request_ptr * r = reinterpret_cast<request_ptr *>(static_cast<unsigned_type>(events[e].data));
         static_cast<aio_request *>(r->get())->completed(canceled);
         delete r;         // release auto_ptr reference
@@ -159,6 +162,7 @@ void aio_queue::handle_events(io_event * events, int num_events, bool canceled)
     }
 }
 
+// internal routines, run by the waiting thread
 void aio_queue::wait_requests()
 {
     request_ptr req;
@@ -177,7 +181,7 @@ void aio_queue::wait_requests()
         if (num_events < 0)
             STXXL_THROW2(io_error, "io_getevents() nr_events=" << max_events);
 
-        posted_sem++;           // compensate for the one eaten too early above
+        posted_sem++;           // compensate for the one eaten prematurely above
 
         handle_events(events, num_events, false);
     }

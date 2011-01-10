@@ -30,18 +30,24 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Queue for aio_file(s)
+//!
+//! Only one queue exists in a program, i.e. it is a singleton.
 class aio_queue : public request_queue_impl_worker, public disk_queue, public singleton<aio_queue>
 {
     friend class aio_request;
 
 private:
-    aio_context_t context;
+    aio_context_t context;  // OS context
     typedef std::list<request_ptr> queue_type;
 
+    // "waiting" request have submitted to this queue, but not yet to the OS, those are "posted"
     mutex waiting_mtx, posted_mtx;
     queue_type waiting_requests, posted_requests;
-    int max_sim_requests, max_events;
-    semaphore sem, posted_free_sem, posted_sem;
+
+    int max_sim_requests, max_events;   // max number of simultaneous requests; max number of OS requests
+    semaphore sem, posted_free_sem, posted_sem; //number of requests in waitings_requests
+
+    // two threads, one for posting, one for waiting
     thread_type post_thread, wait_thread;
     state<thread_state> post_thread_state, wait_thread_state;
 
@@ -54,6 +60,9 @@ private:
     void wait_requests();
     void suspend();
 
+    // needed by aio_request
+    aio_context_t get_io_context() { return context; }
+
 public:
     // \param max_sim_requests max number of requests simultaneously submitted to disk, 0 means as many as possible
     aio_queue(int max_sim_requests = 0);
@@ -62,11 +71,6 @@ public:
     bool cancel_request(request_ptr & req);
     void complete_request(request_ptr & req);
     ~aio_queue();
-
-    aio_context_t get_io_context()
-    {
-        return context;
-    }
 };
 
 //! \}
