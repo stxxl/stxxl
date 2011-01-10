@@ -57,11 +57,12 @@ void aio_request::fill_control_block()
     cb.aio_offset = offset;
 }
 
+// returns false if post fails
 bool aio_request::post()
 {
     fill_control_block();
     iocb * cb_pointer = &cb;
-    double now = timestamp();	//io_submit might take a while, so we have to remember the current time before
+    double now = timestamp();	// io_submit might considerable time, so we have to remember the current time before
     int success = syscall(SYS_io_submit, aio_queue::get_instance()->get_io_context(), 1, &cb_pointer);
     if (success == 1)
     {

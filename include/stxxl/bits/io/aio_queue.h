@@ -50,6 +50,12 @@ private:
     // two threads, one for posting, one for waiting
     thread_type post_thread, wait_thread;
     state<thread_state> post_thread_state, wait_thread_state;
+    // Why do we need two threads, one for posting, and one for waiting?  Is one not enough?
+    // 1. User call cannot io_submit directly, since this tends to take considerable time sometimes
+    // 2. A single thread cannot wait for the user program to post requests
+    //    and the OS to produce I/O completion events at the same time
+    //    (IOCB_CMD_NOOP does not seem to help here either)
+
 
     static const priority_op _priority_op = WRITE;
 

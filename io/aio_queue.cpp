@@ -103,7 +103,7 @@ void aio_queue::post_requests()
     io_event * events = new io_event[max_events];
 
     for ( ; ; )
-    {
+    {   // as long as thread is running
         int num_currently_waiting_requests = num_waiting_requests--;    // might block until next request or message comes in
 
         // terminate if termination has been requested
@@ -121,7 +121,9 @@ void aio_queue::post_requests()
                 num_free_events--;  //might block because too many requests are posted
 
             while (!static_cast<aio_request *>(req.get())->post())
-            {   // post failed, so first handle events to make queues (more) empty
+            {   // post failed, so first handle events to make queues (more) empty, then try again
+
+                // wait for at least one event to complete, no time limit
                 int num_events = syscall(SYS_io_getevents, context, 1, max_events, events, NULL);
                 if (num_events < 0)
                     STXXL_THROW2(io_error, "io_getevents() nr_events=" << num_events);
@@ -158,7 +160,7 @@ void aio_queue::handle_events(io_event * events, int num_events, bool canceled)
         delete r;         // release auto_ptr reference
         if (max_sim_requests != 0)
             num_free_events++;
-        num_posted_requests--;
+        num_posted_requests--;  //will never block
     }
 }
 
@@ -169,8 +171,8 @@ void aio_queue::wait_requests()
     io_event * events = new io_event[max_events];
 
     for ( ; ; )
-    {
-        int num_currently_posted_requests = num_posted_requests--;
+    {   // as long as thread is running
+        int num_currently_posted_requests = num_posted_requests--;  // might block until next request is posted or message comes in
 
         // terminate if termination has been requested
         if (wait_thread_state() == TERMINATE && num_currently_posted_requests == 0)
@@ -181,7 +183,7 @@ void aio_queue::wait_requests()
         if (num_events < 0)
             STXXL_THROW2(io_error, "io_getevents() nr_events=" << max_events);
 
-        num_posted_requests++;           // compensate for the one eaten prematurely above
+        num_posted_requests++;  // compensate for the one eaten prematurely above
 
         handle_events(events, num_events, false);
     }
