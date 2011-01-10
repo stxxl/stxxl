@@ -40,7 +40,7 @@ void aio_request::completed(bool canceled)
         else
             stats::get_instance()->write_canceled(bytes);
     }
-    request_impl_basic::completed();
+    request_impl_basic::completed(canceled);
 }
 
 void aio_request::fill_control_block()
@@ -79,9 +79,15 @@ bool aio_request::post()
 
 bool aio_request::cancel()
 {
+    request_ptr req(this);
+    return aio_queue::get_instance()->cancel_request(req);
+}
+
+bool aio_request::cancel_aio()
+{
     io_event event;
     int result = syscall(SYS_io_cancel, aio_queue::get_instance()->get_io_context(), &cb, &event);
-    if (result == 0)
+    if (result == 0)    //successfully canceled
         aio_queue::get_instance()->handle_events(&event, 1, true);
     return result == 0;
 }

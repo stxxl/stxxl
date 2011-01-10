@@ -39,7 +39,7 @@ public:
 
 protected:
     void serve();
-    void completed();
+    void completed(bool canceled);
 
 public:
     const char * io_type() const;

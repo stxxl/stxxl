@@ -62,18 +62,19 @@ public:
     virtual void serve() = 0;
 
 protected:
-    virtual void completed() = 0;
+    virtual void completed(bool canceled) = 0;
 
 public:
     //! \brief Suspends calling thread until completion of the request
     virtual void wait(bool measure_time = true) = 0;
 
-    //! \brief Cancel request
-    //! The request is cancelled unless already being processed.
+    //! \brief Cancel a request.
+    //!
+    //! The request is canceled unless already being processed.
     //! However, cancellation cannot be guaranteed.
-    //! Cancelled requests must still be waited for in order to ensure correct
-    //! operation.
-    //! \return \c true iff the request was cancelled successfully
+    //! Canceled requests must still be waited for in order to ensure correct operation.
+    //! If the request was canceled successfully, the completion handler will not be called.
+    //! \return \c true iff the request was canceled successfully
     virtual bool cancel() = 0;
 
     //! \brief Polls the status of the request
@@ -113,7 +114,7 @@ protected:
     size_type bytes;
     request_type type;
 
-    void completed();
+    void completed(bool canceled);
 
     // returns number of references
     int nref()

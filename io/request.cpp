@@ -38,9 +38,10 @@ request::~request()
     STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::~(), ref_cnt=" << ref_cnt);
 }
 
-void request::completed()
+void request::completed(bool canceled)
 {
-    on_complete(this);
+    if (!canceled)
+        on_complete(this);
     notify_waiters();
     file_->delete_request_ref();
     file_ = 0;

@@ -47,7 +47,7 @@ aio_queue::aio_queue(int max_sim_requests) :
     if (result != 0)
         STXXL_THROW2(io_error, "io_setup() nr_events=" << max_events);
 
-    STXXL_VERBOSE1("Set up an aio queue with " << max_events << " entries.");
+    STXXL_MSG("Set up an aio queue with " << max_events << " entries.");
 
     start_thread(post_async, static_cast<void *>(this), post_thread, post_thread_state);
     start_thread(wait_async, static_cast<void *>(this), wait_thread, wait_thread_state);
@@ -80,20 +80,39 @@ bool aio_queue::cancel_request(request_ptr & req)
     if (post_thread_state() != RUNNING)
         STXXL_ERRMSG("Request canceled in stopped queue.");
 
-    bool was_still_in_queue = false;
     queue_type::iterator pos;
     {
         scoped_mutex_lock lock(waiting_mtx);
         if ((pos = std::find(waiting_requests.begin(), waiting_requests.end(), req _STXXL_FORCE_SEQUENTIAL)) != waiting_requests.end())
         {
             waiting_requests.erase(pos);
-            was_still_in_queue = true;
+
+            static_cast<aio_request *>(pos->get())->completed(true);
+
             num_waiting_requests--;  // will never block
+            return true;
         }
     }
-    if (!was_still_in_queue)
-        return req->cancel();
-    return was_still_in_queue;
+
+    scoped_mutex_lock lock(posted_mtx);
+    if ((pos = std::find(posted_requests.begin(), posted_requests.end(), req _STXXL_FORCE_SEQUENTIAL)) != posted_requests.end())
+    {
+        bool canceled_io_operation = (dynamic_cast<aio_request*>(req.get()))->cancel_aio();
+
+        if (canceled_io_operation)
+        {
+            posted_requests.erase(pos);
+
+            static_cast<aio_request *>(pos->get())->completed(true);
+
+            if (max_sim_requests != 0)
+                num_free_events++;
+            num_posted_requests--;  // will never block
+            return true;
+        }
+    }
+
+    return false;
 }
 
 // internal routines, run by the posting thread

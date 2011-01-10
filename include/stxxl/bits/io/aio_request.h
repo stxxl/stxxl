@@ -52,6 +52,7 @@ public:
 
     bool post();
     bool cancel();
+    bool cancel_aio();
     void completed(bool canceled);
     void completed() { completed(false); }
 

@@ -58,14 +58,14 @@ void request_impl_basic::serve()
 
     check_nref(true);
 
-    completed();
+    completed(false);
 }
 
-void request_impl_basic::completed()
+void request_impl_basic::completed(bool canceled)
 {
     STXXL_VERBOSE2("[" << static_cast<void *>(this) << "] request_impl_basic::completed()");
     _state.set_to(DONE);
-    request_state_impl_basic::completed();
+    request_state_impl_basic::completed(canceled);
     _state.set_to(READY2DIE);
 }
 
