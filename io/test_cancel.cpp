@@ -14,7 +14,7 @@
 #include <stxxl/aligned_alloc>
 
 //! \example io/test_cancel.cpp
-//! This tests the request cancellation mechanisms.
+//! This tests the request cancelation mechanisms.
 
 using stxxl::file;
 
@@ -44,7 +44,7 @@ int main(int argc, char ** argv)
     file->set_size(num_blocks * size);
     stxxl::request_ptr req[num_blocks];
 
-    //without cancellation
+    //without cancelation
     std::cout << "Posting " << num_blocks << " requests." << std::endl;
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
     unsigned i = 0;
@@ -53,15 +53,15 @@ int main(int argc, char ** argv)
     wait_all(req, num_blocks);
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats1;
 
-    //with cancellation
+    //with cancelation
     std::cout << "Posting " << num_blocks << " requests." << std::endl;
     stxxl::stats_data stats2(*stxxl::stats::get_instance());
     for (unsigned i = 0; i < num_blocks; i++)
         req[i] = file->awrite(buffer, i * size, size, print_completion());
     //cancel first half
     std::cout << "Canceling first " << num_blocks / 2 << " requests." << std::endl;
-    unsigned num_cancelled = cancel_all(req, req + num_blocks / 2);
-    std::cout << "Successfully canceled " << num_cancelled << " requests." << std::endl;
+    unsigned num_canceled = cancel_all(req, req + num_blocks / 2);
+    std::cout << "Successfully canceled " << num_canceled << " requests." << std::endl;
     //cancel every second in second half
     for (unsigned i = num_blocks / 2; i < num_blocks; i += 2)
     {
