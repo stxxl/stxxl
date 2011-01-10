@@ -36,7 +36,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of file based on the Linux kernel interface for asynchronous I/O
+//! \brief Implementation of \c file based on the Linux kernel interface for asynchronous I/O
 class aio_file : public ufs_file_base
 {
     friend class aio_request;
