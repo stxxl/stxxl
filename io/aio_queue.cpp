@@ -31,7 +31,7 @@ __STXXL_BEGIN_NAMESPACE
 
 aio_queue::aio_queue(int max_sim_requests) :
     max_sim_requests(max_sim_requests),
-    sem(0), posted_free_sem(max_sim_requests), posted_sem(0),
+    num_waiting_requests(0), num_free_events(max_sim_requests), num_posted_requests(0),
     post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
 {
     if (max_sim_requests == 0)
@@ -47,7 +47,7 @@ aio_queue::aio_queue(int max_sim_requests) :
     if (result != 0)
         STXXL_THROW2(io_error, "io_setup() nr_events=" << max_events);
 
-    //STXXL_MSG("Set up an aio queue with " << max_events << " entries.");
+    STXXL_VERBOSE1("Set up an aio queue with " << max_events << " entries.");
 
     start_thread(post_async, static_cast<void *>(this), post_thread, post_thread_state);
     start_thread(wait_async, static_cast<void *>(this), wait_thread, wait_thread_state);
@@ -55,8 +55,8 @@ aio_queue::aio_queue(int max_sim_requests) :
 
 aio_queue::~aio_queue()
 {
-    stop_thread(post_thread, post_thread_state, sem);
-    stop_thread(wait_thread, wait_thread_state, posted_sem);
+    stop_thread(post_thread, post_thread_state, num_waiting_requests);
+    stop_thread(wait_thread, wait_thread_state, num_posted_requests);
     syscall(SYS_io_destroy, context);
 }
 
@@ -70,7 +70,7 @@ void aio_queue::add_request(request_ptr & req)
     scoped_mutex_lock lock(waiting_mtx);
 
     waiting_requests.push_back(req);
-    sem++;
+    num_waiting_requests++;
 }
 
 bool aio_queue::cancel_request(request_ptr & req)
@@ -88,7 +88,7 @@ bool aio_queue::cancel_request(request_ptr & req)
         {
             waiting_requests.erase(pos);
             was_still_in_queue = true;
-            sem--;  // will never block
+            num_waiting_requests--;  // will never block
         }
     }
     if (!was_still_in_queue)
@@ -104,7 +104,7 @@ void aio_queue::post_requests()
 
     for ( ; ; )
     {
-        int num_currently_waiting_requests = sem--;    // might block until next request or message comes in
+        int num_currently_waiting_requests = num_waiting_requests--;    // might block until next request or message comes in
 
         // terminate if termination has been requested
         if (post_thread_state() == TERMINATE && num_currently_waiting_requests == 0)
@@ -118,7 +118,7 @@ void aio_queue::post_requests()
             lock.unlock();
 
             if (max_sim_requests != 0)  //unless unlimited
-                posted_free_sem--;  //might block because too many requests are posted
+                num_free_events--;  //might block because too many requests are posted
 
             while (!static_cast<aio_request *>(req.get())->post())
             {   // post failed, so first handle events to make queues (more) empty
@@ -134,14 +134,14 @@ void aio_queue::post_requests()
             {
                 scoped_mutex_lock lock(posted_mtx);
                 posted_requests.push_back(req);
-                posted_sem++;
+                num_posted_requests++;
             }
         }
         else
         {
             lock.unlock();
 
-            sem++;  // sem-- was premature, compensate for that
+            num_waiting_requests++;  // num_waiting_requests-- was premature, compensate for that
         }
     }
 
@@ -157,8 +157,8 @@ void aio_queue::handle_events(io_event * events, int num_events, bool canceled)
         static_cast<aio_request *>(r->get())->completed(canceled);
         delete r;         // release auto_ptr reference
         if (max_sim_requests != 0)
-            posted_free_sem++;
-        posted_sem--;
+            num_free_events++;
+        num_posted_requests--;
     }
 }
 
@@ -170,10 +170,10 @@ void aio_queue::wait_requests()
 
     for ( ; ; )
     {
-        int num_posted = posted_sem--;
+        int num_currently_posted_requests = num_posted_requests--;
 
         // terminate if termination has been requested
-        if (wait_thread_state() == TERMINATE && num_posted == 0)
+        if (wait_thread_state() == TERMINATE && num_currently_posted_requests == 0)
             break;
 
         // wait for at least one of them to finish
@@ -181,7 +181,7 @@ void aio_queue::wait_requests()
         if (num_events < 0)
             STXXL_THROW2(io_error, "io_getevents() nr_events=" << max_events);
 
-        posted_sem++;           // compensate for the one eaten prematurely above
+        num_posted_requests++;           // compensate for the one eaten prematurely above
 
         handle_events(events, num_events, false);
     }

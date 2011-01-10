@@ -45,7 +45,7 @@ private:
     queue_type waiting_requests, posted_requests;
 
     int max_sim_requests, max_events;   // max number of simultaneous requests; max number of OS requests
-    semaphore sem, posted_free_sem, posted_sem; //number of requests in waitings_requests
+    semaphore num_waiting_requests, num_free_events, num_posted_requests; //number of requests in waitings_requests
 
     // two threads, one for posting, one for waiting
     thread_type post_thread, wait_thread;
