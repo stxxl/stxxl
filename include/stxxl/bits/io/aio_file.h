@@ -33,6 +33,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+class aio_queue;
+
 //! \addtogroup fileimpl
 //! \{
 
@@ -43,13 +45,15 @@ class aio_file : public ufs_file_base
 
 private:
     int physical_device_id, allocator_id;
+    aio_queue * queue;
+
+    aio_queue * get_queue() { return queue; }
 
 public:
     //! \brief constructs file object
     //! \param filename path of file
-    //! \attention filename must be resqueue_ided at memory disk partition
     //! \param mode open mode, see \c stxxl::file::open_modes
-    //! \param disk disk(file) queue_identifier
+    //! \param disk disk(file) identifier
     aio_file(
         const std::string & filename,
         int mode, int physical_device_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
@@ -65,8 +69,7 @@ public:
 
     int get_queue_id() const
     {
-        STXXL_THROW_UNREACHABLE();
-        return NO_QUEUE;
+        return physical_device_id;
     }
 
     int get_allocator_id() const

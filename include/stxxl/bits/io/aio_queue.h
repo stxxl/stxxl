@@ -32,7 +32,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \brief Queue for aio_file(s)
 //!
 //! Only one queue exists in a program, i.e. it is a singleton.
-class aio_queue : public request_queue_impl_worker, public disk_queue, public singleton<aio_queue>
+class aio_queue : public request_queue_impl_worker
 {
     friend class aio_request;
 

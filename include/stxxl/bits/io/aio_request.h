@@ -47,7 +47,7 @@ public:
         request_type t) :
         request_impl_basic(on_cmpl, f, buf, off, b, t)
     {
-        assert(dynamic_cast<aio_file *>(file_));
+        assert(dynamic_cast<aio_file *>(f));
     }
 
     bool post();

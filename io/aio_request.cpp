@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/aio_request.h>
+#include <stxxl/bits/io/disk_queues.h>
 
 #if STXXL_HAVE_AIO_FILE
 
@@ -63,7 +64,8 @@ bool aio_request::post()
     fill_control_block();
     iocb * cb_pointer = &cb;
     double now = timestamp();	// io_submit might considerable time, so we have to remember the current time before
-    int success = syscall(SYS_io_submit, aio_queue::get_instance()->get_io_context(), 1, &cb_pointer);
+    aio_queue * queue = dynamic_cast<aio_queue*>(disk_queues::get_instance()->get_queue(get_file()->get_queue_id()));
+    int success = syscall(SYS_io_submit, queue->get_io_context(), 1, &cb_pointer);
     if (success == 1)
     {
     	if (type == READ)
@@ -80,15 +82,17 @@ bool aio_request::post()
 bool aio_request::cancel()
 {
     request_ptr req(this);
-    return aio_queue::get_instance()->cancel_request(req);
+    aio_queue * queue = dynamic_cast<aio_queue*>(disk_queues::get_instance()->get_queue(get_file()->get_queue_id()));
+    return queue->cancel_request(req);
 }
 
 bool aio_request::cancel_aio()
 {
     io_event event;
-    int result = syscall(SYS_io_cancel, aio_queue::get_instance()->get_io_context(), &cb, &event);
+    aio_queue * queue = dynamic_cast<aio_queue*>(disk_queues::get_instance()->get_queue(get_file()->get_queue_id()));
+    int result = syscall(SYS_io_cancel, queue->get_io_context(), &cb, &event);
     if (result == 0)    //successfully canceled
-        aio_queue::get_instance()->handle_events(&event, 1, true);
+        queue->handle_events(&event, 1, true);
     return result == 0;
 }
 

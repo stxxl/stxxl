@@ -20,6 +20,9 @@
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
+#include <stxxl/bits/io/aio_queue.h>
+#include <stxxl/bits/io/aio_request.h>
+
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -35,11 +38,8 @@ class disk_queues : public singleton<disk_queues>
 {
     friend class singleton<disk_queues>;
 
-    // 2 queues: write queue and read queue
-    typedef request_queue_impl_qwqr request_queue_type;
-
     typedef stxxl::int64 DISKID;
-    typedef std::map<DISKID, request_queue_type *> request_queue_map;
+    typedef std::map<DISKID, request_queue *> request_queue_map;
 
 protected:
     request_queue_map queues;
@@ -54,7 +54,10 @@ public:
         if (queues.find(disk) == queues.end())
         {
             // create new request queue
-            queues[disk] = new request_queue_type();
+            if (dynamic_cast<aio_request*>(req.get()))
+	            queues[disk] = new aio_queue();
+            else
+	            queues[disk] = new request_queue_impl_qwqr();
         }
         queues[disk]->add_request(req);
     }
@@ -75,6 +78,14 @@ public:
             return false;
     }
 
+    request_queue * get_queue(DISKID disk)
+    {
+        if (queues.find(disk) != queues.end())
+            return queues[disk];
+        else
+            return NULL;
+    }
+
     ~disk_queues()
     {
         // deallocate all queues
@@ -87,7 +98,7 @@ public:
     //!                 - READ, read requests are served before write requests within a disk queue
     //!                 - WRITE, write requests are served before read requests within a disk queue
     //!                 - NONE, read and write requests are served by turns, alternately
-    void set_priority_op(disk_queue::priority_op op)
+    void set_priority_op(request_queue::priority_op op)
     {
         for (request_queue_map::iterator i = queues.begin(); i != queues.end(); i++)
             i->second->set_priority_op(op);

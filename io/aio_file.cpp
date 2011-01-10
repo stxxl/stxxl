@@ -15,6 +15,7 @@
 #if STXXL_HAVE_AIO_FILE
 
 #include <stxxl/bits/io/aio_request.h>
+#include <stxxl/bits/io/disk_queues.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -39,7 +40,7 @@ request_ptr aio_file::aread(
 {
     request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes, request::READ);
 
-    aio_queue::get_instance()->add_request(req);
+    disk_queues::get_instance()->add_request(req, physical_device_id);
 
     return req;
 }
@@ -52,7 +53,7 @@ request_ptr aio_file::awrite(
 {
     request_ptr req = new aio_request(on_cmpl, this, buffer, pos, bytes, request::WRITE);
 
-    aio_queue::get_instance()->add_request(req);
+    disk_queues::get_instance()->add_request(req, physical_device_id);
 
     return req;
 }
