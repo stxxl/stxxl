@@ -53,8 +53,8 @@ public:
     bool post();
     bool cancel();
     bool cancel_aio();
-    void completed(bool canceled);
-    void completed() { completed(false); }
+    void completed(bool posted, bool canceled);
+    void completed(bool canceled) { completed(true, canceled); }
 
     const char * io_type() const;
 };

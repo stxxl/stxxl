@@ -87,7 +87,7 @@ bool aio_queue::cancel_request(request_ptr & req)
         {
             waiting_requests.erase(pos);
 
-            static_cast<aio_request *>(pos->get())->completed(true);
+            static_cast<aio_request *>(pos->get())->completed(false, true);
 
             num_waiting_requests--;  // will never block
             return true;
@@ -103,7 +103,7 @@ bool aio_queue::cancel_request(request_ptr & req)
         {
             posted_requests.erase(pos);
 
-            static_cast<aio_request *>(pos->get())->completed(true);
+            static_cast<aio_request *>(pos->get())->completed(true, true);
 
             if (max_sim_requests != 0)
                 num_free_events++;

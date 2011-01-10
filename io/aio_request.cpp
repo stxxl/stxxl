@@ -24,7 +24,7 @@ const char * aio_request::io_type() const
     return file_->io_type();
 }
 
-void aio_request::completed(bool canceled)
+void aio_request::completed(bool posted, bool canceled)
 {
     if (!canceled)
     {
@@ -33,7 +33,7 @@ void aio_request::completed(bool canceled)
         else
             stats::get_instance()->write_finished();
     }
-    else
+    else if (posted)
     {
         if (type == READ)
             stats::get_instance()->read_canceled(bytes);
