@@ -22,7 +22,7 @@ struct print_completion
 {
     void operator () (stxxl::request * ptr)
     {
-        STXXL_MSG("Request completed: " << ptr);
+        std::cout << "Request completed: " << ptr << std::endl;
     }
 };
 
@@ -45,6 +45,7 @@ int main(int argc, char ** argv)
     stxxl::request_ptr req[num_blocks];
 
     //without cancellation
+    std::cout << "Posting " << num_blocks << " requests." << std::endl;
     stxxl::stats_data stats1(*stxxl::stats::get_instance());
     unsigned i = 0;
     for ( ; i < num_blocks; i++)
@@ -53,17 +54,22 @@ int main(int argc, char ** argv)
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats1;
 
     //with cancellation
+    std::cout << "Posting " << num_blocks << " requests." << std::endl;
     stxxl::stats_data stats2(*stxxl::stats::get_instance());
     for (unsigned i = 0; i < num_blocks; i++)
         req[i] = file->awrite(buffer, i * size, size, print_completion());
     //cancel first half
-    unsigned num_cancelled = cancel_all(req, req + 8);
-    STXXL_MSG("Cancelled " << num_cancelled << " requests.");
+    std::cout << "Canceling first " << num_blocks / 2 << " requests." << std::endl;
+    unsigned num_cancelled = cancel_all(req, req + num_blocks / 2);
+    std::cout << "Successfully canceled " << num_cancelled << " requests." << std::endl;
     //cancel every second in second half
     for (unsigned i = num_blocks / 2; i < num_blocks; i += 2)
     {
+        std::cout << "Canceling request " << &(*(req[i])) << std::endl;
         if (req[i]->cancel())
-            STXXL_MSG("Cancelled request " << &(*(req[i])));
+            std::cout << "Request canceled: " << &(*(req[i])) << std::endl;
+        else
+            std::cout << "Request not canceled: " << &(*(req[i])) << std::endl;
     }
     wait_all(req, num_blocks);
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats2;
