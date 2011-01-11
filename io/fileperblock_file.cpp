@@ -58,7 +58,7 @@ void fileperblock_file<base_file_type>::serve(const request * req) throw (io_err
     base_file.set_size(req->get_size());
 
     serving_request * derived = new serving_request(default_completion_handler(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type());
-    request_ptr dummy = derived;
+    request_ptr dummy1(derived), dummy2(derived);    //to satisfy some reference count constraint
     derived->serve();
 }
 
