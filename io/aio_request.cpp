@@ -20,11 +20,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-const char * aio_request::io_type() const
-{
-    return file_->io_type();
-}
-
 void aio_request::completed(bool posted, bool canceled)
 {
     if (!canceled)
@@ -58,7 +53,8 @@ void aio_request::fill_control_block()
     cb.aio_offset = offset;
 }
 
-// returns false if post fails
+//! \brief Submits an I/O request to the OS
+//! \returns false if submission fails
 bool aio_request::post()
 {
     fill_control_block();
@@ -79,6 +75,9 @@ bool aio_request::post()
     return success == 1;
 }
 
+//! \brief Cancel the request
+//!
+//! Routine is called by user, as part of the request interface.
 bool aio_request::cancel()
 {
     request_ptr req(this);
@@ -86,6 +85,7 @@ bool aio_request::cancel()
     return queue->cancel_request(req);
 }
 
+//! \brief Cancel already posted request
 bool aio_request::cancel_aio()
 {
     io_event event;
