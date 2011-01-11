@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Request for aio_file
-class aio_request : public request_impl_basic
+class aio_request : public request_state_impl_basic
 {
     template <class base_file_type>
     friend class fileperblock_file;
@@ -45,7 +45,7 @@ public:
         offset_type off,
         size_type b,
         request_type t) :
-        request_impl_basic(on_cmpl, f, buf, off, b, t)
+        request_state_impl_basic(on_cmpl, f, buf, off, b, t)
     {
         assert(dynamic_cast<aio_file *>(f));
     }

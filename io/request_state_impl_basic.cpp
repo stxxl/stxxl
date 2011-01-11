@@ -71,5 +71,17 @@ bool request_state_impl_basic::poll()
     return s == DONE || s == READY2DIE;
 }
 
+void request_state_impl_basic::completed(bool canceled)
+{
+    STXXL_VERBOSE2("[" << static_cast<void *>(this) << "] request_impl_basic::completed()");
+    _state.set_to(DONE);
+    if (!canceled)
+        on_complete(this);
+    notify_waiters();
+    file_->delete_request_ref();
+    file_ = 0;
+    _state.set_to(READY2DIE);
+}
+
 __STXXL_END_NAMESPACE
 // vim: et:ts=4:sw=4

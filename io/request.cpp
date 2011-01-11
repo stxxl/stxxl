@@ -38,15 +38,6 @@ request::~request()
     STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::~(), ref_cnt=" << ref_cnt);
 }
 
-void request::completed(bool canceled)
-{
-    if (!canceled)
-        on_complete(this);
-    notify_waiters();
-    file_->delete_request_ref();
-    file_ = 0;
-}
-
 void request::check_alignment() const
 {
     if (offset % BLOCK_ALIGN != 0)
@@ -76,6 +67,11 @@ void request::check_nref_failed(bool after)
                  " file=" << get_file() <<
                  " iotype=" << get_file()->io_type()
                  );
+}
+
+const char * request::io_type() const
+{
+    return file_->io_type();
 }
 
 __STXXL_END_NAMESPACE

@@ -57,10 +57,6 @@ protected:
     virtual void delete_waiter(onoff_switch * sw) = 0;
     virtual void notify_waiters() = 0;
 
-public:
-    // HACK!
-    virtual void serve() = 0;
-
 protected:
     virtual void completed(bool canceled) = 0;
 
@@ -113,8 +109,6 @@ protected:
     offset_type offset;
     size_type bytes;
     request_type type;
-
-    void completed(bool canceled);
 
     // returns number of references
     int nref()
@@ -171,6 +165,8 @@ public:
         if (error.get())
             throw * (error.get());
     }
+
+    virtual const char * io_type() const;
 
 private:
     void add_ref()

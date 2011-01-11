@@ -52,6 +52,9 @@ public:
     void wait(bool measure_time = true);
     bool poll();
     bool cancel();
+
+protected:
+    void completed(bool canceled);
 };
 
 //! \}

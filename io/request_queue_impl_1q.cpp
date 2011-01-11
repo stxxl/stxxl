@@ -12,7 +12,7 @@
  **************************************************************************/
 
 #include <algorithm>
-#include <stxxl/bits/io/request_state_impl_basic.h>
+#include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/io/request_queue_impl_1q.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/parallel.h>
@@ -112,7 +112,7 @@ void * request_queue_impl_1q::worker(void * arg)
                 Lock.unlock();
 
                 //assert(req->nref() > 1);
-                req->serve();
+                dynamic_cast<request_impl_basic*>(req.get())->serve();
             }
             else
             {

@@ -27,6 +27,9 @@ class request_impl_basic : public request_state_impl_basic
 {
     template <class base_file_type>
     friend class fileperblock_file;
+    friend class request_queue_impl_qwqr;
+    friend class request_queue_impl_1q;
+    friend class aio_queue;
 
 public:
     request_impl_basic(
@@ -36,10 +39,9 @@ public:
         offset_type off,
         size_type b,
         request_type t);
-
+        
 protected:
-    void serve();
-    void completed(bool canceled);
+    virtual void serve();
 
 public:
     const char * io_type() const;
