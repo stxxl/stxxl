@@ -19,16 +19,13 @@
 #include <cassert>
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/compat_unique_ptr.h>
-#include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/io/request_interface.h>
+#include <stxxl/bits/io/iostats.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -165,7 +162,6 @@ inline std::ostream & operator << (std::ostream & out, const request & req)
 __STXXL_END_NAMESPACE
 
 #include <stxxl/bits/io/request_ptr.h>
-#include <stxxl/bits/io/request_operations.h>
 
 #endif // !STXXL_HEADER_IO_REQUEST
 // vim: et:ts=4:sw=4

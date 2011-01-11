@@ -34,6 +34,7 @@
 #endif
 
 #include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/noncopyable.h>

@@ -14,6 +14,7 @@
 #define STXXL_IO_HEADER
 
 #include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/mmap_file.h>

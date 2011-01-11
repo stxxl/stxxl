@@ -19,24 +19,13 @@
 #include <cassert>
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/io/iostats.h>
-#include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/common/switch.h>
-#include <stxxl/bits/common/exceptions.h>
-#include <stxxl/bits/io/completion_handler.h>
-#include <stxxl/bits/compat_unique_ptr.h>
-#include <stxxl/bits/common/error_handling.h>
-#include <stxxl/bits/verbose.h>
+#include <stxxl/bits/io/request_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
-
-class file;
-class request_ptr;
 
 //! \brief Collection of functions to track statuses of a number of requests
 
