@@ -22,7 +22,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Basic state implemenatition for most request implementations
+//! \brief Request with completion state.
 class request_with_state : public request
 {
 protected:

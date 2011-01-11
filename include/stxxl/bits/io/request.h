@@ -40,11 +40,11 @@ __STXXL_BEGIN_NAMESPACE
 class file;
 class request_ptr;
 
-//! \brief Defines interface of request
+//! \brief Functional interface of a request
 
 //! Since all library I/O operations are asynchronous,
-//! one needs to keep track of their status: whether
-//! an I/O completed or not.
+//! one needs to keep track of their status:
+//! e.g. whether an I/O operation completed or not.
 class request_interface : private noncopyable
 {
 public:
@@ -85,7 +85,7 @@ public:
     { }
 };
 
-//! \brief Basic properties of a request.
+//! \brief Request with basic properties like file and offset.
 class request : virtual public request_interface
 {
     friend int wait_any(request_ptr req_array[], int count);

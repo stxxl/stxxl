@@ -26,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-//! \brief Request for aio_file
+//! \brief Request for an aio_file.
 class aio_request : public request_with_waiters
 {
     template <class base_file_type>
