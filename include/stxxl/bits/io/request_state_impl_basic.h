@@ -17,7 +17,6 @@
 
 #include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/request.h>
-#include <stxxl/bits/io/request_waiters_impl_basic.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -26,7 +25,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic state implemenatition for most request implementations
-class request_state_impl_basic : public request, public request_waiters_impl_basic
+class request_state_impl_basic : public request
 {
 protected:
     //! states of request

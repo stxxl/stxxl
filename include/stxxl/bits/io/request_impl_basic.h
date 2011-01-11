@@ -14,7 +14,7 @@
 #ifndef STXXL_IO_REQUEST_IMPL_BASIC_HEADER
 #define STXXL_IO_REQUEST_IMPL_BASIC_HEADER
 
-#include <stxxl/bits/io/request_state_impl_basic.h>
+#include <stxxl/bits/io/request_waiters_impl_basic.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -23,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic implementation of request
-class request_impl_basic : public request_state_impl_basic
+class request_impl_basic : public request_waiters_impl_basic
 {
     template <class base_file_type>
     friend class fileperblock_file;
