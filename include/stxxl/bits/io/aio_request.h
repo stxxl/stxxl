@@ -18,7 +18,7 @@
 #if STXXL_HAVE_AIO_FILE
 
 #include <linux/aio_abi.h>
-#include <stxxl/bits/io/request_waiters_impl_basic.h>
+#include <stxxl/bits/io/request_with_waiters.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Request for aio_file
-class aio_request : public request_waiters_impl_basic
+class aio_request : public request_with_waiters
 {
     template <class base_file_type>
     friend class fileperblock_file;
@@ -45,7 +45,7 @@ public:
         offset_type off,
         size_type b,
         request_type t) :
-        request_waiters_impl_basic(on_cmpl, f, buf, off, b, t)
+        request_with_waiters(on_cmpl, f, buf, off, b, t)
     {
         assert(dynamic_cast<aio_file *>(f));
     }

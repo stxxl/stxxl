@@ -36,7 +36,7 @@ void aio_request::completed(bool posted, bool canceled)
         else
             stats::get_instance()->write_canceled(bytes);
     }
-    request_state_impl_basic::completed(canceled);
+    request_with_state::completed(canceled);
 }
 
 void aio_request::fill_control_block()

@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/mem_file.h>
-#include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/serving_request.h>
 
 
 __STXXL_BEGIN_NAMESPACE

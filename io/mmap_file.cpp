@@ -14,7 +14,7 @@
 
 #if STXXL_HAVE_MMAP_FILE
 
-#include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/serving_request.h>
 
 
 __STXXL_BEGIN_NAMESPACE

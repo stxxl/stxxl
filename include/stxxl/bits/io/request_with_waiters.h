@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/basic_waiters_request.h
+ *  include/stxxl/bits/io/request_with_waiters.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,14 +11,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER
-#define STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER
+#ifndef STXXL_HEADER_IO_REQUEST_WITH_WAITERS
+#define STXXL_HEADER_IO_REQUEST_WITH_WAITERS
 
 #include <set>
 
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/switch.h>
-#include <stxxl/bits/io/request_state_impl_basic.h>
+#include <stxxl/bits/io/request_with_state.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implements basic waiters.
-class request_waiters_impl_basic : public request_state_impl_basic
+class request_with_waiters : public request_with_state
 {
     mutex waiters_mutex;
     std::set<onoff_switch *> waiters;
@@ -41,14 +41,14 @@ protected:
     */
 
 public:
-    request_waiters_impl_basic(
+    request_with_waiters(
         const completion_handler & on_cmpl,
         file * f,
         void * buf,
         offset_type off,
         size_type b,
         request_type t) :
-        request_state_impl_basic(on_cmpl, f, buf, off, b, t)
+        request_with_state(on_cmpl, f, buf, off, b, t)
     { }
 
 };
@@ -57,4 +57,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER
+#endif // !STXXL_HEADER_IO_REQUEST_WITH_WAITERS

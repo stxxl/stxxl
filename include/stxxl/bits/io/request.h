@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_REQUEST_HEADER
-#define STXXL_REQUEST_HEADER
+#ifndef STXXL_HEADER_IO_REQUEST
+#define STXXL_HEADER_IO_REQUEST
 
 #include <iostream>
 #include <memory>
@@ -45,7 +45,7 @@ class request_ptr;
 //! Since all library I/O operations are asynchronous,
 //! one needs to keep track of their status: whether
 //! an I/O completed or not.
-class request_base : private noncopyable
+class request_interface : private noncopyable
 {
 public:
     typedef stxxl::uint64 offset_type;
@@ -81,12 +81,12 @@ public:
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
     virtual const char * io_type() const = 0;
 
-    virtual ~request_base()
+    virtual ~request_interface()
     { }
 };
 
 //! \brief Basic properties of a request.
-class request : virtual public request_base
+class request : virtual public request_interface
 {
     friend int wait_any(request_ptr req_array[], int count);
     template <class request_iterator_>
@@ -443,5 +443,5 @@ inline int wait_any(request_ptr req_array[], int count)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_REQUEST_HEADER
+#endif // !STXXL_HEADER_IO_REQUEST
 // vim: et:ts=4:sw=4

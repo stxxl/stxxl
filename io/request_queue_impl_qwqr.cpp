@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <algorithm>
-#include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/parallel.h>
@@ -144,7 +144,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
                 WriteLock.unlock();
 
                 //assert(req->nref() > 1);
-                dynamic_cast<request_impl_basic*>(req.get())->serve();
+                dynamic_cast<serving_request*>(req.get())->serve();
             }
             else
             {
@@ -173,7 +173,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
 
                 STXXL_VERBOSE2("queue: before serve request has " << req->nref() << " references ");
                 //assert(req->nref() > 1);
-                dynamic_cast<request_impl_basic*>(req.get())->serve();
+                dynamic_cast<serving_request*>(req.get())->serve();
                 STXXL_VERBOSE2("queue: after serve request has " << req->nref() << " references ");
             }
             else

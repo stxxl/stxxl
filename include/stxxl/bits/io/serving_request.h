@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/request_impl_basic.h
+ *  include/stxxl/bits/io/serving_request.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,10 +11,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO_REQUEST_IMPL_BASIC_HEADER
-#define STXXL_IO_REQUEST_IMPL_BASIC_HEADER
+#ifndef STXXL_HEADER_IO_SERVING_REQUEST
+#define STXXL_HEADER_IO_SERVING_REQUEST
 
-#include <stxxl/bits/io/request_waiters_impl_basic.h>
+#include <stxxl/bits/io/request_with_waiters.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -23,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic implementation of request
-class request_impl_basic : public request_waiters_impl_basic
+class serving_request : public request_with_waiters
 {
     template <class base_file_type>
     friend class fileperblock_file;
@@ -32,7 +32,7 @@ class request_impl_basic : public request_waiters_impl_basic
     friend class aio_queue;
 
 public:
-    request_impl_basic(
+    serving_request(
         const completion_handler & on_cmpl,
         file * f,
         void * buf,
@@ -51,4 +51,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO_REQUEST_IMPL_BASIC_HEADER
+#endif // !STXXL_HEADER_IO_SERVING_REQUEST

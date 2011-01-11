@@ -14,7 +14,7 @@
 
 #if STXXL_HAVE_WINCALL_FILE
 
-#include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/serving_request.h>
 
 #include <windows.h>
 

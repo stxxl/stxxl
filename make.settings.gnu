@@ -319,8 +319,8 @@ HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h tuple.h
 HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h exithandler.h
 
 HEADER_FILES_IO		+= io.h iostats.h completion_handler.h
-HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h
-HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h
+HEADER_FILES_IO		+= request.h request_with_waiters.h
+HEADER_FILES_IO		+= request_with_state.h serving_request.h
 HEADER_FILES_IO		+= disk_queues.h
 HEADER_FILES_IO		+= request_queue.h request_queue_impl_worker.h
 HEADER_FILES_IO		+= request_queue_impl_qwqr.h
