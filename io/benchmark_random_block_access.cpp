@@ -52,6 +52,7 @@ void usage(const char * argv0)
     std::cout << "    'span' is given in MiB" << std::endl;
     std::cout << "    'block_size' is given in KiB, must be a multiple of 4" << std::endl;
     std::cout << "        (only a few block sizes are compiled in)" << std::endl;
+    std::cout << "    [i]nitialize, [r]ead, and/or [w]rite (one string)" << std::endl;
     exit(-1);
 }
 

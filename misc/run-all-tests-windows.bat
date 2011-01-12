@@ -26,7 +26,13 @@ io\benchmark_disks 0 2 32 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 io\flushbuffers 2 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 io\sd_test
 io\test_io "%STXXL_TMPDIR%"
-io\test_cancel "%STXXL_TMPDIR%"
+io/test_cancel syscall "%STXXL_TMPDIR%\testdiskx"
+io/test_cancel fileperblock_syscall "%STXXL_TMPDIR%\testdiskx"
+io/test_cancel simdisk "%STXXL_TMPDIR%\testdiskx"
+io/test_cancel boostfd "%STXXL_TMPDIR%\testdiskx"
+io/test_cancel fileperblock_boostfd "%STXXL_TMPDIR%\testdiskx"
+io/test_cancel memory "%STXXL_TMPDIR%\testdiskx"
+io/test_cancel wbtl "%STXXL_TMPDIR%\testdiskx"
 io\test_io_sizes wincall "%STXXL_TMPDIR%\out" 5368709120
 io\test_io_sizes syscall "%STXXL_TMPDIR%\out" 5368709120
 io\test_io_sizes boostfd "%STXXL_TMPDIR%\out" 5368709120
