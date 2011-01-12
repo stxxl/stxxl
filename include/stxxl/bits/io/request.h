@@ -70,7 +70,7 @@ public:
 
     //! \brief Cancel request
     //! The request is cancelled unless already being processed.
-    //! However, cancellation cannot be guaranteed.
+    //! However, cancelation cannot be guaranteed.
     //! Cancelled requests must still be waited for in order to ensure correct
     //! operation.
     //! \return \c true iff the request was cancelled successfully
@@ -333,24 +333,24 @@ inline void wait_all(request_ptr req_array[], int count)
 }
 
 //! \brief Cancel requests
-//! The specified requests are cancelled unless already being processed.
-//! However, cancellation cannot be guaranteed.
+//! The specified requests are canceled unless already being processed.
+//! However, cancelation cannot be guaranteed.
 //! Cancelled requests must still be waited for in order to ensure correct
 //! operation.
 //! \param reqs_begin begin of request sequence
 //! \param reqs_end end of request sequence
-//! \return number of request cancelled
+//! \return number of request canceled
 template <class request_iterator_>
 typename std::iterator_traits<request_iterator_>::difference_type cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
-    typename std::iterator_traits<request_iterator_>::difference_type num_cancelled = 0;
+    typename std::iterator_traits<request_iterator_>::difference_type num_canceled = 0;
     while (reqs_begin != reqs_end)
     {
         if ((request_ptr(*reqs_begin))->cancel())
-            ++num_cancelled;
+            ++num_canceled;
         ++reqs_begin;
     }
-    return num_cancelled;
+    return num_canceled;
 }
 
 //! \brief Polls requests
