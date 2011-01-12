@@ -29,15 +29,14 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-aio_queue::aio_queue(int max_sim_requests) :
-    max_sim_requests(max_sim_requests),
-    num_waiting_requests(0), num_free_events(max_sim_requests), num_posted_requests(0),
+aio_queue::aio_queue(int desired_queue_length) :
+    num_waiting_requests(0), num_free_events(0), num_posted_requests(0),
     post_thread_state(NOT_RUNNING), wait_thread_state(NOT_RUNNING)
 {
-    if (max_sim_requests == 0)
-        max_events = std::max(config::get_instance()->disks_number(), 4u) * 64; // 64 entries per disk should be enough
+    if (desired_queue_length == 0)
+        max_events = 64; // default value, 64 entries per queue (i.e. usually per disk) should be enough
     else
-        max_events = max_sim_requests;
+        max_events = desired_queue_length;
 
     // negotiate maximum number of simultaneous events with the OS
     context = 0;
@@ -46,6 +45,9 @@ aio_queue::aio_queue(int max_sim_requests) :
         max_events <<= 1;               // try with half as many events
     if (result != 0)
         STXXL_THROW2(io_error, "io_setup() nr_events=" << max_events);
+
+    for(int e = 0; e < max_events; ++e)
+        num_free_events++;  //cannot set semaphore to value directly
 
     STXXL_MSG("Set up an aio queue with " << max_events << " entries.");
 
@@ -105,8 +107,7 @@ bool aio_queue::cancel_request(request_ptr & req)
 
             static_cast<aio_request *>(pos->get())->completed(true, true);
 
-            if (max_sim_requests != 0)
-                num_free_events++;
+            num_free_events++;
             num_posted_requests--;  // will never block
             return true;
         }
@@ -136,8 +137,7 @@ void aio_queue::post_requests()
             waiting_requests.pop_front();
             lock.unlock();
 
-            if (max_sim_requests != 0)  //unless unlimited
-                num_free_events--;  //might block because too many requests are posted
+            num_free_events--;  //might block because too many requests are posted
 
             while (!static_cast<aio_request *>(req.get())->post())
             {   // post failed, so first handle events to make queues (more) empty, then try again
@@ -177,8 +177,7 @@ void aio_queue::handle_events(io_event * events, int num_events, bool canceled)
         request_ptr * r = reinterpret_cast<request_ptr *>(static_cast<unsigned_type>(events[e].data));
         static_cast<aio_request *>(r->get())->completed(canceled);
         delete r;         // release auto_ptr reference
-        if (max_sim_requests != 0)
-            num_free_events++;
+        num_free_events++;
         num_posted_requests--;  //will never block
     }
 }

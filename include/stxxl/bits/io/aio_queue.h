@@ -44,7 +44,7 @@ private:
     mutex waiting_mtx, posted_mtx;
     queue_type waiting_requests, posted_requests;
 
-    int max_sim_requests, max_events;   // max number of simultaneous requests; max number of OS requests
+    int max_events;   // max number of OS requests
     semaphore num_waiting_requests, num_free_events, num_posted_requests; //number of requests in waitings_requests
 
     // two threads, one for posting, one for waiting
@@ -71,7 +71,7 @@ private:
 
 public:
     // \param max_sim_requests max number of requests simultaneously submitted to disk, 0 means as many as possible
-    aio_queue(int max_sim_requests = 0);
+    aio_queue(int desired_queue_length = 0);
 
     void add_request(request_ptr & req);
     bool cancel_request(request_ptr & req);
