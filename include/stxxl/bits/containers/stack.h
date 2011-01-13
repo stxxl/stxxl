@@ -16,6 +16,7 @@
 #include <stack>
 #include <vector>
 
+#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/common/simple_vector.h>

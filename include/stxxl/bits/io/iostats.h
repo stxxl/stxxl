@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>
