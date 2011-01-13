@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2004, 2005 Thomas Nowak <t.nowak@imail.de>
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
