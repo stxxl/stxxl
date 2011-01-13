@@ -15,6 +15,7 @@
 #if STXXL_HAVE_BOOSTFD_FILE
 
 #include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/iostats.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/fstream.hpp>

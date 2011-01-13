@@ -19,6 +19,8 @@
 
 
 #include <stxxl/stack>
+#include <stxxl/stats>
+#include <stxxl/timer>
 
 #define MEM_2_RESERVE    (768 * 1024 * 1024)
 

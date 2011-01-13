@@ -17,6 +17,7 @@
 #include <iomanip>
 
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/common/utils.h>
 
 #ifndef STXXL_VERBOSE_BLOCK_LIFE_CYCLE
 #define STXXL_VERBOSE_BLOCK_LIFE_CYCLE STXXL_VERBOSE2

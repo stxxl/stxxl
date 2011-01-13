@@ -12,6 +12,7 @@
 
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/iostats.h>
 
 
 __STXXL_BEGIN_NAMESPACE
