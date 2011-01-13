@@ -12,6 +12,7 @@
 
 #include <stxxl/bits/io/mem_file.h>
 #include <stxxl/bits/io/serving_request.h>
+#include <stxxl/bits/io/iostats.h>
 
 
 __STXXL_BEGIN_NAMESPACE

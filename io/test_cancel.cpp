@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2009-2011 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -38,7 +38,7 @@ int main(int argc, char ** argv)
     char * buffer = (char *)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
 
-    std::auto_ptr<stxxl::file> file(
+    stxxl::compat_unique_ptr<stxxl::file>::result file(
         stxxl::create_file(argv[1], argv[2], stxxl::file::CREAT | stxxl::file::RDWR | stxxl::file::DIRECT));
 
     file->set_size(num_blocks * size);
