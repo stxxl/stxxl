@@ -29,7 +29,7 @@ class singleton : private noncopyable
     typedef INSTANCE instance_type;
     typedef instance_type * instance_pointer;
 
-    static instance_pointer instance;
+    static volatile instance_pointer instance;
 
     static instance_pointer create_instance();
     static void destroy_instance();
@@ -68,7 +68,7 @@ void singleton<INSTANCE, destroy_on_exit>::destroy_instance()
 }
 
 template <typename INSTANCE, bool destroy_on_exit>
-INSTANCE * singleton<INSTANCE, destroy_on_exit>::instance = NULL;
+INSTANCE * volatile singleton<INSTANCE, destroy_on_exit>::instance = NULL;
 
 __STXXL_END_NAMESPACE
 
