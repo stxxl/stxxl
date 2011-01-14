@@ -89,6 +89,7 @@ XFAIL=1 run common/stxxl_info foo # returns -1 intentionally
 XFAIL=1 run common/stxxl_info foo bar # returns !0 if assertions are enabled
 run common/test_random
 run common/test_manyunits
+run common/test_globals
 
 run io/gen_file "$STXXL_TMPDIR/in"
 run utils/createdisks 1024 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"

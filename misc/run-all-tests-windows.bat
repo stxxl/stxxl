@@ -15,6 +15,7 @@ set STXXL_TMPDIR=.
 common\stxxl_info
 common\test_random
 common\test_manyunits
+common\test_globals
 
 io\gen_file "%STXXL_TMPDIR%\in"
 utils\createdisks 1024 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
