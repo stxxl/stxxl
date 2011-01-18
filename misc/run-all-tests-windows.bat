@@ -1,5 +1,5 @@
 :: ###########################################################################
-::  misc\run-all-tests-windows
+::  misc\run-all-tests-windows.bat
 ::
 ::  Part of the STXXL. See http://stxxl.sourceforge.net
 ::
@@ -14,19 +14,35 @@ set STXXL_TMPDIR=.
 
 common\stxxl_info
 common\test_random
+common\test_manyunits
+common\test_globals
 
 io\gen_file "%STXXL_TMPDIR%\in"
 utils\createdisks 1024 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 utils\createdisks 1000 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 utils\log2
-utils\off_t_size
 utils\pq_param
 
 io\benchmark_disks 0 2 32 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
 io\flushbuffers 2 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
-io\sd_test
 io\test_io "%STXXL_TMPDIR%"
-io\test_cancel "%STXXL_TMPDIR%"
+io\test_cancel syscall "%STXXL_TMPDIR%\testdiskx"
+io\test_cancel fileperblock_syscall "%STXXL_TMPDIR%\testdiskx"
+io\test_cancel boostfd "%STXXL_TMPDIR%\testdiskx"
+io\test_cancel fileperblock_boostfd "%STXXL_TMPDIR%\testdiskx"
+io\test_cancel memory "%STXXL_TMPDIR%\testdiskx"
+io\test_cancel wbtl "%STXXL_TMPDIR%\testdiskx"
+io\test_io_sizes wincall "%STXXL_TMPDIR%\out" 5368709120
+io\test_io_sizes syscall "%STXXL_TMPDIR%\out" 5368709120
+io\test_io_sizes boostfd "%STXXL_TMPDIR%\out" 5368709120
+::io\benchmark_disk_and_flash 0 2 "%STXXL_TMPDIR%\testdiskx" "%STXXL_TMPDIR%\testdisky"
+io\benchmark_configured_disks 2 128
+io\benchmark_random_block_access 2048 1024 1000000 i
+io\benchmark_random_block_access 2048 128 1000000 r
+io\benchmark_random_block_access 2048 128 1000000 w
+io\iobench_scatter_in_place 100 10 4096 "%STXXL_TMPDIR%\out"
+io\verify_disks 123456 0 2 w "%STXXL_TMPDIR%\out"
+io\verify_disks 123456 0 2 r "%STXXL_TMPDIR%\out"
 
 mng\test_block_alloc_strategy
 mng\test_buf_streams
@@ -83,7 +99,6 @@ algo\sort_file generate "%STXXL_TMPDIR%\sort_file.dat"
 algo\sort_file stable_sort "%STXXL_TMPDIR%\sort_file.dat"
 algo\test_asch 3 100 1000 42
 algo\test_ksort
-algo\test_manyunits
 algo\test_random_shuffle
 algo\test_scan
 algo\test_sort

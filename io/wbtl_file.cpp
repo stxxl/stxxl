@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <iomanip>
 #include <stxxl/bits/io/io.h>
-#include <stxxl/bits/common/debug.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/aligned_alloc>
 

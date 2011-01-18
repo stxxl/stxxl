@@ -25,6 +25,7 @@
 #define SIDE_PQ 1       // compare with second, in-memory PQ (needs a lot of memory)
 
 #include <stxxl/priority_queue>
+#include <stxxl/stats>
 #include <stxxl/timer>
 
 const stxxl::unsigned_type mega = 1024 * 1024;    //1 * 1024 does not work here

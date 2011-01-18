@@ -94,8 +94,7 @@ int main(int argc, char ** argv)
 
     typedef stxxl::vector<my_type, 1, stxxl::lru_pager<2>, block_size> vector_type;
 
-    // fixme: RDWR for input is BAD!
-    stxxl::syscall_file in_file(argv[2], stxxl::file::DIRECT | stxxl::file::RDWR);
+    stxxl::syscall_file in_file(argv[1], stxxl::file::DIRECT | stxxl::file::RDONLY);
     stxxl::syscall_file out_file(argv[2], stxxl::file::DIRECT | stxxl::file::RDWR | stxxl::file::CREAT);
     vector_type input(&in_file);
     vector_type output(&out_file);

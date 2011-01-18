@@ -4,6 +4,8 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2005 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -83,7 +85,7 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
 
 wfs_file_base::wfs_file_base(
     const std::string & filename,
-    int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename)
+    int mode) : file_des(INVALID_HANDLE_VALUE), mode_(mode), filename(filename), locked(false)
 {
     file_des = open_file_impl(filename, mode);
 
@@ -136,8 +138,11 @@ void wfs_file_base::close()
 void wfs_file_base::lock()
 {
     scoped_mutex_lock fd_lock(fd_mutex);
+    if (locked)
+        return;  // already locked
     if (LockFile(file_des, 0, 0, 0xffffffff, 0xffffffff) == 0)
         stxxl_win_lasterror_exit("LockFile ", io_error);
+    locked = true;
 }
 
 file::offset_type wfs_file_base::_size()

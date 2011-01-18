@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -47,41 +47,57 @@ struct remove_const<_Tp const>
 #endif
 
 #if defined(__GNUG__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 3)
-  // That's a small subset of what GCC 4.3 does.
+// That's a small subset of what GCC 4.3 does.
 
-  // Utility for finding the signed versions of unsigned integral types.
-  template<typename _Tp>
-    struct __make_signed
-    { typedef _Tp __type; };
+// Utility for finding the signed versions of unsigned integral types.
+template <typename _Tp>
+struct __make_signed
+{
+    typedef _Tp __type;
+};
 
-  template<>
-    struct __make_signed<char>
-    { typedef signed char __type; };
+template <>
+struct __make_signed<char>
+{
+    typedef signed char __type;
+};
 
-  template<>
-    struct __make_signed<unsigned char>
-    { typedef signed char __type; };
+template <>
+struct __make_signed<unsigned char>
+{
+    typedef signed char __type;
+};
 
-  template<>
-    struct __make_signed<unsigned short>
-    { typedef signed short __type; };
+template <>
+struct __make_signed<unsigned short>
+{
+    typedef signed short __type;
+};
 
-  template<>
-    struct __make_signed<unsigned int>
-    { typedef signed int __type; };
+template <>
+struct __make_signed<unsigned int>
+{
+    typedef signed int __type;
+};
 
-  template<>
-    struct __make_signed<unsigned long>
-    { typedef signed long __type; };
+template <>
+struct __make_signed<unsigned long>
+{
+    typedef signed long __type;
+};
 
-  template<>
-    struct __make_signed<unsigned long long>
-    { typedef signed long long __type; };
+template <>
+struct __make_signed<unsigned long long>
+{
+    typedef signed long long __type;
+};
 
 
-  template<typename _Tp>
-    struct make_signed 
-    { typedef typename __make_signed<_Tp>::__type type; };
+template <typename _Tp>
+struct make_signed
+{
+    typedef typename __make_signed<_Tp>::__type type;
+};
 #endif
 
 __STXXL_END_NAMESPACE

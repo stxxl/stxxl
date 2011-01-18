@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2005-2006 Roman Dementiev <dementiev@ira.uka.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -15,7 +16,7 @@
 #if STXXL_HAVE_WINCALL_FILE
 
 #include <stxxl/bits/io/request_impl_basic.h>
-#include <stxxl/bits/common/debug.h>
+#include <stxxl/bits/io/iostats.h>
 
 #include <windows.h>
 
@@ -54,7 +55,6 @@ void wincall_file::serve(const request * req) throw (io_error)
 
         if (type == request::READ)
         {
-            STXXL_DEBUGMON_DO(io_started(buffer));
             DWORD NumberOfBytesRead = 0;
             if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
             {
@@ -70,13 +70,9 @@ void wincall_file::serve(const request * req) throw (io_error)
                 stxxl_win_lasterror_exit(" partial read: missing " << (bytes - NumberOfBytesRead) << " out of " << bytes << " bytes",
                                          io_error);
             }
-
-            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
         else
         {
-            STXXL_DEBUGMON_DO(io_started(buffer));
-
             DWORD NumberOfBytesWritten = 0;
             if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
             {
@@ -92,8 +88,6 @@ void wincall_file::serve(const request * req) throw (io_error)
                 stxxl_win_lasterror_exit(" partial write: missing " << (bytes - NumberOfBytesWritten) << " out of " << bytes << " bytes",
                                          io_error);
             }
-
-            STXXL_DEBUGMON_DO(io_finished(buffer));
         }
     }
 }

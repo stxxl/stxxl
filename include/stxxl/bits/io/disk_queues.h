@@ -60,13 +60,13 @@ public:
     }
 
     //! \brief Cancel a request
-    //! The specified request is cancelled unless already being processed.
-    //! However, cancellation cannot be guaranteed.
+    //! The specified request is canceled unless already being processed.
+    //! However, cancelation cannot be guaranteed.
     //! Cancelled requests must still be waited for in order to ensure correct
     //! operation.
     //! \param req request to cancel
     //! \param disk disk number for disk that \c req was scheduled on
-    //! \return \c true iff the request was cancelled successfully
+    //! \return \c true iff the request was canceled successfully
     bool cancel_request(request_ptr & req, DISKID disk)
     {
         if (queues.find(disk) != queues.end())

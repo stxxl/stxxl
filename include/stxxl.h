@@ -35,8 +35,6 @@
 
 #include <stxxl/random>
 
-#include <stxxl/bits/common/debug.h>
-
 #include <stxxl/timer>
 
 #endif // STXXL_MAIN_HEADER

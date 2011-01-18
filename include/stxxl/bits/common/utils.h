@@ -31,15 +31,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-#ifdef BOOST_MSVC
-  #define _STXXL_DEPRECATED(x) __declspec(deprecated) x
-#elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 30400)
-// no __attribute__ ((__deprecated__)) in GCC 3.3
-  #define _STXXL_DEPRECATED(x) x
-#else
-  #define _STXXL_DEPRECATED(x) x __attribute__ ((__deprecated__))
-#endif
-
 ////////////////////////////////////////////////////////////////////////////
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)

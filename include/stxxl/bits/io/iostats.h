@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
+ *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/common/types.h>

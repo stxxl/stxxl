@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2002-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -1351,8 +1351,7 @@ namespace stream
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             base(r, c, memory_to_use)
-        {
-        }
+        { }
     };
 
 

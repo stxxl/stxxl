@@ -56,9 +56,9 @@
   GCC 3.4       |    x       -         x         -
   GCC 3.3       |    o       -         o         -
   GCC 2.95      |    -       -         -         -
-  ICPC 12.0.107 |    x¹    PMODE¹      x¹      PMODE¹
+  ICPC 12.0.107 |    x¹    PMODE°¹     x¹      PMODE°¹
   ICPC 12.0.107 |    x¹    MCSTL¹      x¹      MCSTL¹
-* ICPC 11.1.072 |    x¹    MCSTL¹      x¹      MCSTL¹
+* ICPC 11.1.075 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 11.0.084 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 10.1.026 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 10.0.026 |    x¹    MCSTL¹      x¹      MCSTL¹
@@ -74,6 +74,7 @@
  ?   = untested
  MCSTL = supports parallelization using the MCSTL library
  PMODE = supports parallelization using libstdc++ parallel mode
+ °   = needs workaround -D__aligned__=ignored
  ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
        gcc does not come in the correct version:
        icpc 9.0: use with gcc 3.x
@@ -107,10 +108,15 @@
  * \section questions Questions
  *
  * - Questions concerning use and development of the \c S<small>TXXL</small>
- * library and bug reports should be posted to the
+ * library should be posted to the
  * <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>.
  * Please search the forum before posting,
  * your question may have been answered before.
+ *
+ * \section bugreports Bug Reports
+ *
+ * - Bugs should be reported in the 
+ *   <b><a href="https://stxxl.ae.cs.uni-frankfurt.de/bugs/">Bugzilla Bug Tracker</a></b>
  *
  * - \link FAQ FAQ - Frequently Asked Questions \endlink
  *
@@ -221,7 +227,10 @@ Controller::Controller()
  *
  * \section q6 How can I credit STXXL, and thus foster its development?
  *
- * - For all users:  Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
+ * - For all users:
+ *   - Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
+ *   - Rate STXXL at heise Software-Verzeichnis (German): http://www.heise.de/software/download/stxxl/76072
+ *   - Rate STXXL at SourceForge: https://sourceforge.net/projects/stxxl/
  *
  * - For scientific work:  Cite the papers mentioned here: http://stxxl.sourceforge.net/
  *

@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -28,9 +28,9 @@ class singleton : private noncopyable
 {
     typedef INSTANCE instance_type;
     typedef instance_type * instance_pointer;
+    typedef volatile instance_pointer volatile_instance_pointer;
 
-    static instance_pointer instance;
-    static mutex instance_mutex; // prevent concurrent writes only
+    static volatile_instance_pointer instance;
 
     static instance_pointer create_instance();
     static void destroy_instance();
@@ -49,7 +49,8 @@ template <typename INSTANCE, bool destroy_on_exit>
 typename singleton<INSTANCE, destroy_on_exit>::instance_pointer
 singleton<INSTANCE, destroy_on_exit>::create_instance()
 {
-    scoped_mutex_lock instance_write_lock(instance_mutex);
+    static mutex create_mutex;
+    scoped_mutex_lock instance_write_lock(create_mutex);
     if (!instance) {
         instance = new instance_type();
         if (destroy_on_exit)
@@ -61,7 +62,6 @@ singleton<INSTANCE, destroy_on_exit>::create_instance()
 template <typename INSTANCE, bool destroy_on_exit>
 void singleton<INSTANCE, destroy_on_exit>::destroy_instance()
 {
-    scoped_mutex_lock instance_write_lock(instance_mutex);
     instance_pointer inst = instance;
     //instance = NULL;
     instance = reinterpret_cast<instance_pointer>(unsigned_type(-1));     // bomb if used again
@@ -69,10 +69,8 @@ void singleton<INSTANCE, destroy_on_exit>::destroy_instance()
 }
 
 template <typename INSTANCE, bool destroy_on_exit>
-INSTANCE * singleton<INSTANCE, destroy_on_exit>::instance = NULL;
-
-template <typename INSTANCE, bool destroy_on_exit>
-mutex singleton<INSTANCE, destroy_on_exit>::instance_mutex;
+typename singleton<INSTANCE, destroy_on_exit>::volatile_instance_pointer
+singleton<INSTANCE, destroy_on_exit>::instance = NULL;
 
 __STXXL_END_NAMESPACE
 

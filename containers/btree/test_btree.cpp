@@ -15,6 +15,7 @@
 #include <iostream>
 
 #include <stxxl/bits/containers/btree/btree.h>
+#include <stxxl/stats>
 #include <stxxl/timer>
 
 
