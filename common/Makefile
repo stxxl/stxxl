@@ -47,6 +47,11 @@ test_manyunits.$(EXEEXT): test_manyunits.cpp test_manyunits2.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_manyunits2.cpp
 	$(LINKER) test_manyunits.$(OBJEXT) test_manyunits2.$(OBJEXT) $(OUT)test_manyunits.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_globals: test_globals.$(EXEEXT)
+test_globals.$(EXEEXT): test_globals.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_globals.cpp
+	$(LINKER) test_globals.$(OBJEXT) $(OUT)test_globals.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) $(CLEAN_TARGETS)
