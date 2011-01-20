@@ -260,7 +260,7 @@ int main(int argc, char ** argv)
 
         filter_type0 filter0(output_stream, 0, counter);
 
-        filter_type1 filter1(filter0, -1, counter);
+        filter_type1 filter1(filter0, filter_type1::value_type(-1), counter);
 
         shuffle_type shuffled_stream(filter1);
 
