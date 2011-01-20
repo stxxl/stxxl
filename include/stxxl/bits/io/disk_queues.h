@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -20,10 +20,6 @@
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
-#include <stxxl/bits/io/aio_queue.h>
-#include <stxxl/bits/io/aio_request.h>
-#include <stxxl/bits/io/serving_request.h>
-
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -39,8 +35,11 @@ class disk_queues : public singleton<disk_queues>
 {
     friend class singleton<disk_queues>;
 
+    // 2 queues: write queue and read queue
+    typedef request_queue_impl_qwqr request_queue_type;
+
     typedef stxxl::int64 DISKID;
-    typedef std::map<DISKID, request_queue *> request_queue_map;
+    typedef std::map<DISKID, request_queue_type *> request_queue_map;
 
 protected:
     request_queue_map queues;
@@ -52,30 +51,15 @@ protected:
 public:
     void add_request(request_ptr & req, DISKID disk)
     {
-        request_queue_map::iterator qi = queues.find(disk);
-        request_queue * q;
-        if (qi == queues.end())
+#ifdef STXXL_HACK_SINGLE_IO_THREAD
+        disk = 42;
+#endif
+        if (queues.find(disk) == queues.end())
         {
             // create new request queue
-#if STXXL_HAVE_AIO_FILE
-            if (dynamic_cast<aio_request*>(req.get()))
-	            q = queues[disk] = new aio_queue(dynamic_cast<aio_file*>(req->get_file())->get_desired_queue_length());
-            else
-#endif
-	            q = queues[disk] = new request_queue_impl_qwqr();
+            queues[disk] = new request_queue_type();
         }
-        else
-            q = qi->second;
-
-#if STXXL_HAVE_AIO_FILE
-        if (!(
-            (dynamic_cast<aio_request*>(req.get()) && dynamic_cast<aio_queue*>(q)) ||
-            (dynamic_cast<serving_request*>(req.get()) && dynamic_cast<request_queue*>(q))))
-        {
-            STXXL_THROW2(io_error, "Tried to add request to incompatible queue.");
-        }
-#endif
-        q->add_request(req);
+        queues[disk]->add_request(req);
     }
 
     //! \brief Cancel a request
@@ -88,18 +72,13 @@ public:
     //! \return \c true iff the request was canceled successfully
     bool cancel_request(request_ptr & req, DISKID disk)
     {
+#ifdef STXXL_HACK_SINGLE_IO_THREAD
+        disk = 42;
+#endif
         if (queues.find(disk) != queues.end())
             return queues[disk]->cancel_request(req);
         else
             return false;
-    }
-
-    request_queue * get_queue(DISKID disk)
-    {
-        if (queues.find(disk) != queues.end())
-            return queues[disk];
-        else
-            return NULL;
     }
 
     ~disk_queues()
@@ -114,7 +93,7 @@ public:
     //!                 - READ, read requests are served before write requests within a disk queue
     //!                 - WRITE, write requests are served before read requests within a disk queue
     //!                 - NONE, read and write requests are served by turns, alternately
-    void set_priority_op(request_queue::priority_op op)
+    void set_priority_op(disk_queue::priority_op op)
     {
         for (request_queue_map::iterator i = queues.begin(); i != queues.end(); i++)
             i->second->set_priority_op(op);
