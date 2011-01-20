@@ -1,11 +1,12 @@
 /***************************************************************************
  *  stream/test_loop.cpp
  *
- *  (optional) short description
+ *  example for building a loop of stream operations
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2011 Jaroslaw Fedorowics <fedorow@cs.uni-frankfurt.de>
+ *  Copyright © 2011 Jaroslaw Fedorowicz <fedorow@cs.uni-frankfurt.de>
+ *  Copyright © 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -23,7 +24,7 @@
 #include <iostream>
 #include <limits>
 
-#include <stxxl/io>
+#include <stxxl/mng>
 #include <stxxl/vector>
 #include <stxxl/stream>
 
@@ -34,7 +35,8 @@ const stxxl::uint64 memory_to_use = 3ul * 1024 * 1024 * 1024;
 
 bool verbose;
 
-struct random_generator {
+struct random_generator
+{
     typedef stxxl::random_number32::value_type value_type;
     typedef stxxl::uint64 size_type;
     value_type current;
@@ -68,7 +70,8 @@ struct random_generator {
 };
 
 template <typename value_type>
-struct Cmp {
+struct Cmp : std::binary_function<value_type, value_type, bool>
+{
     bool operator () (const value_type & a, const value_type & b) const
     {
         return a < b;
@@ -84,7 +87,8 @@ struct Cmp {
 };
 
 template <typename Input>
-struct filter {
+struct filter
+{
     typedef typename Input::value_type value_type;
     typedef stxxl::uint64 size_type;
     Input & input;
@@ -123,7 +127,8 @@ struct filter {
 };
 
 template <typename Input>
-struct output {
+struct output
+{
     typedef typename Input::value_type value_type;
     Input & input;
 
@@ -150,7 +155,8 @@ struct output {
 };
 
 template <typename Input>
-struct shuffle {
+struct shuffle
+{
     typedef typename Input::value_type value_type;
     Input & input;
     value_type current, next;
