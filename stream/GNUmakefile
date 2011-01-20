@@ -19,6 +19,7 @@ $(call reduce_optimization,3,0,test_stream1,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_sorted_runs,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_push_sort,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_transpose,Version_12.0,any,any)
+$(call reduce_optimization,3,0,test_loop,Version_12.0,any,any)
 endif
 
 ifeq ($(strip $(USE_MCSTL)),yes)
