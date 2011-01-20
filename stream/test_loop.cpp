@@ -21,6 +21,7 @@
 //! A split sorter is used to cut the data flow (and type dependency) cycle.
 
 #include <iostream>
+#include <limits>
 
 #include <stxxl/io>
 #include <stxxl/vector>
