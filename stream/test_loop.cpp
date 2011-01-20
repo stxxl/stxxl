@@ -35,11 +35,12 @@ bool verbose;
 
 struct random_generator {
     typedef stxxl::random_number32::value_type value_type;
+    typedef stxxl::uint64 size_type;
     value_type current;
-    int count;
+    size_type count;
     stxxl::random_number32 rnd;
 
-    random_generator(int _count) : count(_count)
+    random_generator(size_type _count) : count(_count)
     {
         if (verbose) cout << "Random Stream: ";
         current = rnd();
@@ -84,9 +85,10 @@ struct Cmp {
 template <typename Input>
 struct filter {
     typedef typename Input::value_type value_type;
+    typedef stxxl::uint64 size_type;
     Input & input;
     value_type filter_value;
-    int & counter;
+    size_type & counter;
 
     void apply_filter()
     {
@@ -96,7 +98,7 @@ struct filter {
         }
     }
 
-    filter(Input & _input, value_type _filter_value, int & _counter) : input(_input), filter_value(_filter_value), counter(_counter)
+    filter(Input & _input, value_type _filter_value, size_type & _counter) : input(_input), filter_value(_filter_value), counter(_counter)
     {
         apply_filter();
     }
@@ -154,7 +156,7 @@ struct shuffle {
     bool even, is_empty;
 
     // from http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetKernighan
-    int count_bits(unsigned long v)
+    int count_bits(stxxl::uint64 v)
     {
         int c;
         for (c = 0; v; c++) {
@@ -231,7 +233,7 @@ int main(int argc, char ** argv)
 
     verbose = (argc == 3) && !strcmp(argv[2], "-v");
 
-    int total = atoi(argv[1]);
+    stxxl::uint64 total = atoi(argv[1]);
 
     input_generator_type input_stream(total);
 
@@ -239,7 +241,7 @@ int main(int argc, char ** argv)
 
     sorted_runs_type sorted_runs = runs_creator.result();
 
-    int counter = 0;
+    stxxl::uint64 counter = 0;
     int i;
 
     for (i = 0; counter < total - 1; ++i) {
