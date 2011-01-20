@@ -21,11 +21,10 @@
  *
  * \section platforms Supported Operating Systems
  * - Linux (kernel >= 2.4.18)
- * - Solaris
  * - Mac OS X
  * - FreeBSD
  * - other POSIX compatible systems should work, but have not been tested
- * - Windows 2000/XP/Vista
+ * - Windows 2000/XP/Vista/7
  *
  *
  * \section compilers Supported Compilers
@@ -65,6 +64,7 @@
   ICPC 9.1.053  |    x¹      -         x¹        -
   ICPC 9.0.032  |    x¹      -         x¹        -
   clang++ 2.8   |    x³      -         x³        -
+  MSVC 2010 10.0|    -       -         x         -
 * MSVC 2008 9.0 |    -       -         x         -
   MSVC 2005 8.0 |    -       -         x         -
 
