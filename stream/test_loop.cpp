@@ -29,6 +29,8 @@
 using std::cout;
 using std::endl;
 
+const stxxl::uint64 memory_to_use = 3ul * 1024 * 1024 * 1024;
+
 bool verbose;
 
 struct random_generator {
@@ -206,6 +208,17 @@ struct shuffle {
     }
 };
 
+typedef random_generator random_generator_type;
+typedef Cmp<random_generator_type::value_type> cmp;
+typedef stxxl::stream::runs_creator<random_generator_type, cmp> runs_creator_type0;
+typedef runs_creator_type0::sorted_runs_type sorted_runs_type;
+typedef stxxl::stream::runs_merger<sorted_runs_type, cmp> runs_merger_type;
+typedef output<runs_merger_type> output_type;
+typedef filter<output_type> filter_type0;
+typedef filter<filter_type0> filter_type1;
+typedef shuffle<filter_type1> shuffle_type;
+typedef stxxl::stream::runs_creator<shuffle_type, cmp> runs_creator_type1;
+
 int main(int argc, char ** argv)
 {
     if (argc < 2) {
@@ -213,48 +226,40 @@ int main(int argc, char ** argv)
         return EXIT_FAILURE;
     }
 
+    stxxl::block_manager::get_instance();
+
     verbose = (argc == 3) && !strcmp(argv[2], "-v");
+
     int total = atoi(argv[1]);
 
     random_generator random_stream(total);
 
-    typedef Cmp<random_generator::value_type> cmp;
+    runs_creator_type0 runs_creator(random_stream, cmp(), memory_to_use);
 
-    typedef stxxl::stream::runs_creator<random_generator, cmp> runs_creator_type;
-    runs_creator_type runs_creator(random_stream, cmp(), 3ul * 1024 * 1024 * 1024);
-
-    typedef runs_creator_type::sorted_runs_type sorted_runs_type;
     sorted_runs_type sorted_runs = runs_creator.result();
 
     int counter = 0;
     int i;
 
-    for (i = 0; counter < total - 1; i++) {
+    for (i = 0; counter < total - 1; ++i) {
         if (verbose) cout << "Iteration " << i << ": ";
 
-        typedef stxxl::stream::runs_merger<sorted_runs_type, cmp> runs_merger_type;
-        runs_merger_type runs_merger(sorted_runs, cmp(), 3ul * 1024 * 1024 * 1024);
+        runs_merger_type runs_merger(sorted_runs, cmp(), memory_to_use);
 
-        typedef output<runs_merger_type> output_type;
         output_type output_stream(runs_merger);
 
-        typedef filter<output_type> filter_type0;
         filter_type0 filter0(output_stream, 0, counter);
 
-        typedef filter<filter_type0> filter_type1;
         filter_type1 filter1(filter0, -1, counter);
 
-        typedef shuffle<filter_type1> shuffle_type;
         shuffle_type shuffled_stream(filter1);
 
-        typedef stxxl::stream::runs_creator<shuffle_type, cmp> runs_creator_type;
-        runs_creator_type runs_creator(shuffled_stream, cmp(), 3ul * 1024 * 1024 * 1024);
+        runs_creator_type1 runs_creator(shuffled_stream, cmp(), memory_to_use);
 
         sorted_runs = runs_creator.result();
     }
 
-    typedef stxxl::stream::runs_merger<sorted_runs_type, cmp> runs_merger_type;
-    runs_merger_type runs_merger(sorted_runs, cmp(), 3ul * 1024 * 1024 * 1024);
+    runs_merger_type runs_merger(sorted_runs, cmp(), memory_to_use);
 
     while (!runs_merger.empty()) {
         if (verbose) cout << "Iteration " << i << ": " << *runs_merger << endl;
