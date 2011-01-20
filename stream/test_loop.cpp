@@ -170,7 +170,8 @@ struct shuffle {
             current = *input;
             ++input;
             if (!input.empty()) {
-                unsigned long combined = current;
+                STXXL_STATIC_ASSERT(sizeof(value_type) == 4);
+                stxxl::uint64 combined = current;
                 combined = combined << 32 | *input;
                 combined = (1ul << count_bits(combined)) - 1;
                 current = combined >> 32;
@@ -208,9 +209,9 @@ struct shuffle {
     }
 };
 
-typedef random_generator random_generator_type;
-typedef Cmp<random_generator_type::value_type> cmp;
-typedef stxxl::stream::runs_creator<random_generator_type, cmp> runs_creator_type0;
+typedef random_generator input_generator_type;
+typedef Cmp<input_generator_type::value_type> cmp;
+typedef stxxl::stream::runs_creator<input_generator_type, cmp> runs_creator_type0;
 typedef runs_creator_type0::sorted_runs_type sorted_runs_type;
 typedef stxxl::stream::runs_merger<sorted_runs_type, cmp> runs_merger_type;
 typedef output<runs_merger_type> output_type;
@@ -232,9 +233,9 @@ int main(int argc, char ** argv)
 
     int total = atoi(argv[1]);
 
-    random_generator random_stream(total);
+    input_generator_type input_stream(total);
 
-    runs_creator_type0 runs_creator(random_stream, cmp(), memory_to_use);
+    runs_creator_type0 runs_creator(input_stream, cmp(), memory_to_use);
 
     sorted_runs_type sorted_runs = runs_creator.result();
 
