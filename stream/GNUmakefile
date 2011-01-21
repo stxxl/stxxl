@@ -37,4 +37,5 @@ $(call reduce_optimization,3,1,test_stream1,Version_10.0,32-bit,any)
 $(call reduce_optimization,3,0,test_sorted_runs,Version_10.0,32-bit,any)
 $(call reduce_optimization,3,0,test_push_sort,Version_10.0,32-bit,any)
 $(call reduce_optimization,3,1,test_transpose,Version_10.0,32-bit,any)
+$(call reduce_optimization,3,1,test_loop,Version_10.0,32-bit,any)
 endif
