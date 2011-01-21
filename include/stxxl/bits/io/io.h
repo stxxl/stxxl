@@ -29,7 +29,10 @@
 
 
 #ifdef BOOST_MSVC
- #pragma comment (lib, "libstxxl.lib")
+ #ifndef STXXL_LIBNAME
+  #define STXXL_LIBNAME "stxxl"
+ #endif
+ #pragma comment (lib, "lib" STXXL_LIBNAME ".lib")
 #endif
 
 //! \brief \c \<stxxl\> library namespace
