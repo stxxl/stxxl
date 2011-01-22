@@ -13,7 +13,7 @@ Version 1.3.1 (unreleased)
     read operation completes, not only when the issuer waits for it to
     complete.  The I/O thread issues the call to the completion_handler, so for
     multiple disks, this may happen concurrently.  
-* Internal changes, not user visible
+* Internal changes, not user-visible
   - Change handling of (empty) filler elements in typed_block to fix
     mismatching struct size in nested blocks.
   - Removed debugmon which was very limited and disabled for a long time.
@@ -23,6 +23,7 @@ Version 1.3.1 (unreleased)
   - Allow reading a block that spans over end-of-file, fill remainder with
     zeroes.
   - Crash at program termination when using global stxxl containers.
+  - Enable syscall_file to read/write >=4GiB of data in a single I/O operation.
 * New public header: stxxl/stats
 * Platform Support 
   - add ICPC 12.0, works with both MCSTL (needs libstdc++ from GCC 4.2) and
