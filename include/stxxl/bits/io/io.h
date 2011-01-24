@@ -28,13 +28,6 @@
 #include <stxxl/bits/io/iostats.h>
 
 
-#ifdef BOOST_MSVC
- #ifndef STXXL_LIBNAME
-  #define STXXL_LIBNAME "stxxl"
- #endif
- #pragma comment (lib, "lib" STXXL_LIBNAME ".lib")
-#endif
-
 //! \brief \c \<stxxl\> library namespace
 __STXXL_BEGIN_NAMESPACE
 

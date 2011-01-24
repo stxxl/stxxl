@@ -310,7 +310,7 @@ HEADER_FILES_BITS	+= namespace.h noncopyable.h version.h
 HEADER_FILES_BITS	+= compat_hash_map.h
 HEADER_FILES_BITS	+= compat_unique_ptr.h parallel.h singleton.h defines.h
 HEADER_FILES_BITS	+= verbose.h unused.h compat_type_traits.h
-HEADER_FILES_BITS	+= msvc_compatibility.h deprecated.h
+HEADER_FILES_BITS	+= msvc_compatibility.h deprecated.h libstxxl.h
 
 HEADER_FILES_COMMON	+= aligned_alloc.h new_alloc.h
 HEADER_FILES_COMMON	+= mutex.h rand.h semaphore.h state.h

@@ -68,6 +68,7 @@
 
 #include <cassert>
 
+#include <stxxl/bits/libstxxl.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/exceptions.h>
