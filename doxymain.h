@@ -99,7 +99,6 @@
  * \section installation Instructions on installation, usage, configuration
  *
  * - \link installation_linux_gcc Installation, usage, configuration (Linux/g++) \endlink
- * - \link installation_solaris_gcc Installation, usage, configuration (Solaris/g++) \endlink
  * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
@@ -242,7 +241,6 @@ Controller::Controller()
 /*!
  * \page install Instructions on Installation, usage, configuration
  * - \link installation_linux_gcc Installation, usage, configuration (Linux/g++) \endlink
- * - \link installation_solaris_gcc Installation, usage, configuration (Solaris/g++) \endlink
  * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
@@ -537,131 +535,6 @@ my_example.bin: my_example.o
  *
  * */
 
-
-/*!
- * \page installation_solaris_gcc Installation, usage, configuration (Solaris/g++)
- *
- * \section download Download and library compilation
- *
- * - Download the latest gzipped tarball from
- *   <a href="http://sourceforge.net/projects/stxxl/files/stxxl/">SourceForge</a>.
- * - Unpack in some directory executing: \c tar \c zfxv \c stxxl-x.y.z.tgz ,
- * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z ,
- * - Change \c make.settings.gnu or \c make.settings.local file according to your system configuration:
- *   - \c S<small>TXXL</small> root directory \c STXXL_ROOT variable
- *     ( \c directory_where_you_unpacked_the_tar_ball/stxxl-x.y.z )
- *   - if you want \c S<small>TXXL</small> to use <a href="http://www.boost.org">Boost</a> libraries
- *     (you should have the Boost libraries already installed)
- *     - change \c USE_BOOST variable to \c yes
- *     - change \c BOOST_ROOT variable according to the Boost root path
- *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like (default: \c -O3 )
- *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
- *     if you want to produce a debug version of the Stxxl library or Stxxl examples (default: not set)
- * - Run: \verbatim make library_g++ \endverbatim
- * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
- *
- *
- * \section compile_apps Application compilation
- *
- * After compiling the library, some Makefile variables are written to
- * \c stxxl.mk (\c mcstxxl.mk if you built with MCSTL) in your
- * \c STXXL_ROOT directory. This file should be included from your
- * application's Makefile.
- *
- * The following variables can be used:
- * - \c STXXL_CXX - the compiler used to build the \c S<small>TXXL</small>
- *      library, it's recommended to use the same to build your applications
- * - \c STXXL_CPPFLAGS - add these flags to the compile commands
- * - \c STXXL_LDLIBS - add these libraries to the link commands
- *
- * An example Makefile for an application using \c S<small>TXXL</small>:
- * \verbatim
-STXXL_ROOT      ?= .../stxxl
-STXXL_CONFIG    ?= stxxl.mk
-include $(STXXL_ROOT)/$(STXXL_CONFIG)
-
-# use the variables from stxxl.mk
-CXX              = $(STXXL_CXX)
-CPPFLAGS        += $(STXXL_CPPFLAGS)
-
-# add your own optimization, warning, debug, ... flags
-# (these are *not* set in stxxl.mk)
-CPPFLAGS        += -O3 -Wall -g -DFOO=BAR
-
-# build your application
-# (my_example.o is generated from my_example.cpp automatically)
-my_example.bin: my_example.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) my_example.o -o $@ $(STXXL_LDLIBS)
-\endverbatim
- *
- * Before you try to run one of the \c S<small>TXXL</small> examples
- * (or your own \c S<small>TXXL</small> program) you must configure the disk
- * space that will be used as external memory for the library. For instructions how to do that,
- * see the next section.
- *
- *
- * \section space Disk space
- *
- * To get best performance with \c S<small>TXXL</small> you should assign separate disks to it.
- * These disks should be used by the library only.
- * Since \c S<small>TXXL</small> is developed to exploit disk parallelism, the performance of your
- * external memory application will increase if you use more than one disk.
- * But from how many disks your application can benefit depends on how "I/O bound" it is.
- * With modern disk bandwidths
- * of about 50-75 MiB/s most of applications are I/O bound for one disk. This means that if you add another disk
- * the running time will be halved. Adding more disks might also increase performance significantly.
- *
- *
- * \section configuration Disk configuration file
- *
- * You must define the disk configuration for an
- * \c S<small>TXXL</small> program in a file named \c '.stxxl' that must reside
- * in the same directory where you execute the program.
- * You can change the default file name for the configuration
- * file by setting the environment variable \c STXXLCFG .
- *
- * Each line of the configuration file describes a disk.
- * A disk description uses the following format:<br>
- * \c disk=full_disk_filename,capacity,access_method
- *
- * Description of the parameters:
- * - \c full_disk_filename : full disk filename. In order to access disks S<small>TXXL</small> uses file
- *   access methods. Each disk is represented as a file. If you have a disk that is mounted in Unix
- *   to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be
- *   \c /mnt/disk0/some_file_name ,
- * - \c capacity : maximum capacity of the disk in megabytes
- * - \c access_method : \c S<small>TXXL</small> has a number of different
- *   file access implementations for POSIX systems, choose one of them:
- *   - \c syscall : use \c read and \c write system calls which perform disk transfers directly
- *     on user memory pages without superfluous copying (currently the fastest method)
- *   - \c mmap : \c use \c mmap and \c munmap system calls
- *   - \c boostfd : access the file using a Boost file descriptor
- *   - \c fileperblock_syscall, \c fileperblock_mmap, \c fileperblock_boostfd :
- *     same as above, but take a single file per block, using full_disk_filename as file name prefix.
- *     Usually provide worse performance than the standard variants,
- *     but release freed blocks to the file system immediately.
- *   - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point
- *     to a file on a RAM disk partition with sufficient space
- *   - \c memory : keeps all data in RAM, for quicker testing
- *   - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs),
- *     based on \c syscall
- *
- * See also the example configuration file \c 'config_example' included in the tarball.
- *
- *
- * \section excreation Precreating external memory files
- *
- * In order to get the maximum performance one should precreate disk files described in the configuration file,
- * before running \c S<small>TXXL</small> applications.
- *
- * The precreation utility is included in the set of \c S<small>TXXL</small>
- * utilities ( \c utils/createdisks.bin ). Run this utility
- * for each disk you have defined in the disk configuration file:
- * \verbatim utils/createdisks.bin capacity full_disk_filename... \endverbatim
- *
- * */
-
-
 /*!
  * \page install-svn Installing from subversion
  *
@@ -693,7 +566,6 @@ my_example.bin: my_example.o
  * \c \$(HOME)/path/to/stxxl-trunk
  *
  * - \link installation_linux_gcc Installation, usage, configuration (Linux/g++) \endlink
- * - \link installation_solaris_gcc Installation, usage, configuration (Solaris/g++) \endlink
  * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
  *
  * \section update Updating an existing subversion checkout
