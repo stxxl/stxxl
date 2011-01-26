@@ -14,7 +14,7 @@
 #include <stxxl/aligned_alloc>
 #include <stxxl/bits/mng/mng.h>
 
-//! \example io/test_io_size.cpp
+//! \example io/test_io_sizes.cpp
 //! This tests the maximum chunk size that a file type can handle with a single request.
 
 

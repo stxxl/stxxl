@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! \example algo/sort_file.cpp
+//! \example algo/copy_and_sort_file.cpp
 //! This example imports a file into an \c stxxl::vector without copying its
 //! content and then sorts it using stxxl::sort / stxxl::ksort / ...
 

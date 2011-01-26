@@ -11,6 +11,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! \example algo/test_parallel_sort.cpp
+//! This is an example of how to use the MCSTL-parallelized sorting algorithm.
+
 #define MCSTL_QUICKSORT_WORKAROUND 0
 
 #if !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
