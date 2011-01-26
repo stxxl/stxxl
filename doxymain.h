@@ -96,11 +96,11 @@
  * Other versions may work, too, but older versions will not get support.
  *
  *
- * \section installation Installation and Usage Instructions
+ * \section installation Instructions on installation, usage, configuration
  *
- * - \link installation_linux_gcc Installation (Linux/g++) \endlink
- * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
- * - \link installation_msvc Installation (Windows/MS Visual C++ 8.0) \endlink
+ * - \link installation_linux_gcc Installation, usage, configuration (Linux/g++) \endlink
+ * - \link installation_solaris_gcc Installation, usage, configuration (Solaris/g++) \endlink
+ * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
  *
@@ -240,17 +240,17 @@ Controller::Controller()
 
 
 /*!
- * \page install Installation
- * - \link installation_linux_gcc Installation (Linux/g++) \endlink
- * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
- * - \link installation_msvc Installation (Windows/MS Visual C++ 8.0) \endlink
+ * \page install Instructions on Installation, usage, configuration
+ * - \link installation_linux_gcc Installation, usage, configuration (Linux/g++) \endlink
+ * - \link installation_solaris_gcc Installation, usage, configuration (Solaris/g++) \endlink
+ * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
  */
 
 
 /*!
- * \page installation_linux_gcc Installation (Linux/g++ - Stxxl from version 1.1)
+ * \page installation_linux_gcc Installation, usage, configuration (Linux/g++)
  *
  * \section download Download and library compilation
  *
@@ -414,7 +414,7 @@ my_example.bin: my_example.o
 
 
 /*!
- * \page installation_msvc Installation (Windows/MS Visual C++ 8.0/9.0 - Stxxl from version 1.3)
+ * \page installation_msvc Installation, usage, configuration (Windows/MS Visual C++)
  *
  * \section download Download and library compilation
  *
@@ -539,7 +539,7 @@ my_example.bin: my_example.o
 
 
 /*!
- * \page installation_solaris_gcc Installation (Solaris/g++ - Stxxl from version 1.1)
+ * \page installation_solaris_gcc Installation, usage, configuration (Solaris/g++)
  *
  * \section download Download and library compilation
  *
@@ -685,16 +685,16 @@ my_example.bin: my_example.o
  * Run: \verbatim svn checkout https://stxxl.svn.sourceforge.net/svnroot/stxxl/trunk stxxl-trunk \endverbatim
  * Change to stxxl directory: \verbatim cd stxxl-trunk \endverbatim
  *
- * \section svn_continue_installation Continue Installation
+ * \section svn_continue_installation Continue as Usual
  *
  * Now follow the regular installation and usage instructions,
  * skipping over the tarball download and extraction parts.<br>
  * For the \c STXXL_ROOT variable value choose something like
  * \c \$(HOME)/path/to/stxxl-trunk
  *
- * - \link installation_linux_gcc Installation (Linux/g++) \endlink
- * - \link installation_solaris_gcc Installation (Solaris/g++) \endlink
- * - \link installation_msvc Installation (Windows/MS Visual C++ 8.0) \endlink
+ * - \link installation_linux_gcc Installation, usage, configuration (Linux/g++) \endlink
+ * - \link installation_solaris_gcc Installation, usage, configuration (Solaris/g++) \endlink
+ * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
  *
  * \section update Updating an existing subversion checkout
  *
