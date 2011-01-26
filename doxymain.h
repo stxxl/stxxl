@@ -98,8 +98,8 @@
  *
  * \section installation Instructions on installation, usage, configuration
  *
- * - \link installation_linux_gcc Installation, usage, configuration (Linux/Unix/g++) \endlink
- * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
+ * - \link installation_linux_gcc Installation, usage, configuration (Linux/Unix &ndash; g++/icpc/clang++) \endlink
+ * - \link installation_msvc Installation, usage, configuration (Windows &ndash; Microsoft Visual C++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
  *
@@ -240,15 +240,15 @@ Controller::Controller()
 
 /*!
  * \page install Instructions on Installation, usage, configuration
- * - \link installation_linux_gcc Installation, usage, configuration (Linux/Unix/g++) \endlink
- * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
+ * - \link installation_linux_gcc Installation, usage, configuration (Linux/Unix &ndash; g++/icpc/clang++) \endlink
+ * - \link installation_msvc Installation, usage, configuration (Windows &ndash; Microsoft Visual C++) \endlink
  *
  * - \link install-svn Installing from subversion \endlink
  */
 
 
 /*!
- * \page installation_linux_gcc Installation, usage, configuration (Linux/Unix/g++)
+ * \page installation_linux_gcc Installation, usage, configuration (Linux/Unix &ndash; g++/icpc/clang++)
  *
  * \section download Download and library compilation
  *
@@ -412,7 +412,7 @@ my_example.bin: my_example.o
 
 
 /*!
- * \page installation_msvc Installation, usage, configuration (Windows/MS Visual C++)
+ * \page installation_msvc Installation, usage, configuration (Windows &ndash; Microsoft Visual C++)
  *
  * \section download Download and library compilation
  *
@@ -565,8 +565,8 @@ my_example.bin: my_example.o
  * For the \c STXXL_ROOT variable value choose something like
  * \c \$(HOME)/path/to/stxxl-trunk
  *
- * - \link installation_linux_gcc Installation, usage, configuration (Linux/Unix/g++) \endlink
- * - \link installation_msvc Installation, usage, configuration (Windows/MS Visual C++) \endlink
+ * - \link installation_linux_gcc Installation, usage, configuration (Linux/Unix &ndash; g++/icpc/clang++) \endlink
+ * - \link installation_msvc Installation, usage, configuration (Windows &ndash; Microsoft Visual C++) \endlink
  *
  * \section update Updating an existing subversion checkout
  *
