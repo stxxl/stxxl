@@ -303,7 +303,8 @@ cleanup(T * b, int_type * bucket, int_type K)
             insertion_sort(c, cEnd);
             break;
         default:
-            std::sort(c, cEnd);
+            potentially_parallel::
+            sort(c, cEnd);
         }
         c = cEnd;
     }

@@ -103,9 +103,10 @@ namespace stream
         //! \brief Sort a specific run, contained in a sequences of blocks.
         void sort_run(block_type * run, unsigned_type elements)
         {
-            std::sort(make_element_iterator(run, 0),
-                      make_element_iterator(run, elements),
-                      cmp);
+            potentially_parallel::
+            sort(make_element_iterator(run, 0),
+                 make_element_iterator(run, elements),
+                 cmp);
         }
 
         void compute_result();
@@ -175,7 +176,8 @@ namespace stream
         {
             STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
             result_.elements = blocks1_length;
-            std::sort(result_.small_.begin(), result_.small_.end(), cmp);
+            potentially_parallel::
+            sort(result_.small_.begin(), result_.small_.end(), cmp);
             return;
         }
 #endif //STXXL_SMALL_INPUT_PSORT_OPT
@@ -436,9 +438,10 @@ namespace stream
 
         void sort_run(block_type * run, unsigned_type elements)
         {
-            std::sort(make_element_iterator(run, 0),
-                      make_element_iterator(run, elements),
-                      cmp);
+            potentially_parallel::
+            sort(make_element_iterator(run, 0),
+                 make_element_iterator(run, elements),
+                 cmp);
         }
 
         void compute_result()

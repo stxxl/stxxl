@@ -316,6 +316,33 @@ my_example.bin: my_example.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) my_example.o -o $@ $(LDLIBS)
 \endverbatim
  *
+ * \section parallel Enabling parallel execution
+ *
+ * To enable (shared-memory-)parallel execution of internal computation (in fact, sorting and merging, and random shuffling),
+ * you have several options:
+ * - Enable MCSTL in your program by setting the include path appropriately.
+ *   However, this has the implication that STL algorithms in your program will also be executed in parallel,
+ *   which may be undesirable.
+ *   These options are automatically used when you built STXXL using the \c *_mcstl target,
+ *   and your Makefile includes mcstxxl.mk.
+ * - Enable the g++ parallel mode for your program globally,
+ *   by defining _GLIBCXX_PARALLEL and enabling OpenMP (-D_GLIBCXX_PARALLEL -fopenmp).
+ *   However, this has the implication that STL algorithms in your program will also be executed in parallel,
+ *   which may be undesirable.
+ *   These options are automatically used when you built STXXL using the \c *_pmode target,
+ *   and your Makefile includes pmstxxl.mk.
+ * - Enable the g++ parallel mode specifically for your program,
+ *   by defining STXXL_PARALLEL_MODE_EXPLICIT, and enabling OpenMP (-DSTXXL_PARALLEL_MODE_EXPLICIT -fopenmp).
+ *   Compiling the library binary with this flag enabled is not really necessary,
+ *   since most time-consuming operations are used by generic routines and thus contained in the header files.
+ * The third option is recommended for a start.
+ *
+ * The number of threads to be used can be set by the environment variable OMP_NUM_THREADS or
+ * by calling omp_set_num_threads.
+ * Detailed tuning can be achieved as described
+ * <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/bk01pt03ch18s04.html#parallel_mode.design.tuning">here</a>.
+ *
+ *
  * \section space Disk space
  *
  * Before you try to run one of the \c S<small>TXXL</small> examples
