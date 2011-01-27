@@ -276,12 +276,13 @@ Controller::Controller()
  *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
  *     if you want to produce a debug version of the Stxxl library or Stxxl examples (default: not set)
  *   - for more variables to tune take a look at \c make.settings.gnu ,
- *     they are usually overridden by settings in \c make.settings.local
+ *     they are usually overridden by settings in \c make.settings.local,
+ *     using \c CPPFLAGS for example, you can add arbitrary compiler options and defines
  * - Run: \verbatim make library_g++ \endverbatim
  * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
  *
  *
- * \section compile_apps Application compilation
+ * \section build_apps Building an Application
  *
  * After compiling the library, some Makefile variables are written to
  * \c stxxl.mk (\c mcstxxl.mk if you built with MCSTL) in your
@@ -315,13 +316,11 @@ my_example.bin: my_example.o
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) my_example.o -o $@ $(LDLIBS)
 \endverbatim
  *
+ * \section space Disk space
+ *
  * Before you try to run one of the \c S<small>TXXL</small> examples
  * (or your own \c S<small>TXXL</small> program) you must configure the disk
- * space that will be used as external memory for the library. For instructions how to do that,
- * see the next section.
- *
- *
- * \section space Disk space
+ * space that will be used as external memory for the library.
  *
  * To get best performance with \c S<small>TXXL</small> you should assign separate disks to it.
  * These disks should be used by the library only.
@@ -335,20 +334,19 @@ my_example.bin: my_example.o
  *
  * \section filesystem Recommended file system
  *
- * Our library take benefit of direct user memory - disk transfers (direct access) which avoids
- * superfluous copies.
+ * The library benefits from direct transfers from user memory to disk, which saves superfluous copies.
  * We recommend to use the
- * \c XFS file system (<a href="http://oss.sgi.com/projects/xfs/">link</a>) that
- * gives good read and write performance for large files.
- * Note that file creation speed of \c XFS is slow, so that disk
- * files should be precreated.
+ * \c <a href="http://xfs.org">XFS</a> file system,
+ * which gives good read and write performance for large files.
+ * Note that file creation speed of \c XFS is a bit slower,
+ * so that disk files should be precreated for optimal performance.
  *
  * If the filesystems only use is to store one large \c S<small>TXXL</small> disk file,
  * we also recommend to add the following options to the \c mkfs.xfs command to gain maximum performance:
  * \verbatim -d agcount=1 -l size=512b \endverbatim
  *
- * The following filesystems have been reported not to support Direct I/O: \c tmpfs , \c glusterfs .
- * Since Direct I/O is enabled by default, you may recompile \c S<small>TXXL</small>
+ * The following filesystems have been reported not to support direct I/O: \c tmpfs , \c glusterfs .
+ * Since direct I/O is enabled by default, you may recompile \c S<small>TXXL</small>
  * with \c STXXL_DIRECT_IO_OFF defined to access files on these file systems.
  *
  *
@@ -439,7 +437,7 @@ my_example.bin: my_example.o
  *   with all the appropriate environment set (e.&nbsp;g. by using the VS Command Shell)
  *
  *
- * \section compile_apps Application compilation
+ * \section build_apps Building an application
  *
  * Programs using Stxxl can be compiled using options from \c compiler.options
  * file (in the \c STXXL_ROOT directory). The linking options for the VC++
