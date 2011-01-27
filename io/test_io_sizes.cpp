@@ -76,7 +76,7 @@ int main(int argc, char ** argv)
 
         file->remove();
     }
-    catch(stxxl::io_error e)
+    catch (stxxl::io_error e)
     {
         std::cerr << e.what() << std::endl;
     }

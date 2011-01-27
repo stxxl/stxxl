@@ -119,20 +119,17 @@ inline bool do_parallel_merge()
 
 namespace potentially_parallel
 {
-
 #ifdef STXXL_PARALLEL_MODE_EXPLICIT
-using __gnu_parallel::sort;
-using __gnu_parallel::random_shuffle;
+    using __gnu_parallel::sort;
+    using __gnu_parallel::random_shuffle;
 #else
-using std::sort;
-using std::random_shuffle;
+    using std::sort;
+    using std::random_shuffle;
 #endif
-
 }
 
 namespace parallel
 {
-
 #if STXXL_PARALLEL
 
 /** @brief Multi-way merging dispatcher.

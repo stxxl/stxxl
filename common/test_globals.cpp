@@ -14,7 +14,7 @@
 
 stxxl::vector<int> global_vector;
 
-int main ()
+int main()
 {
     return 0;
 }
