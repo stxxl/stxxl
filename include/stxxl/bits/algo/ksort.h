@@ -31,6 +31,7 @@
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/parallel.h>
 
 
 //#define INTERLEAVED_ALLOC
