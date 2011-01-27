@@ -319,23 +319,25 @@ my_example.bin: my_example.o
  * \section parallel Enabling parallel execution
  *
  * To enable (shared-memory-)parallel execution of internal computation (in fact, sorting and merging, and random shuffling),
- * you have several options:
- * - Enable MCSTL in your program by setting the include path appropriately.
- *   However, this has the implication that STL algorithms in your program will also be executed in parallel,
- *   which may be undesirable.
- *   These options are automatically used when you built STXXL using the \c *_mcstl target,
- *   and your Makefile includes mcstxxl.mk.
- * - Enable the g++ parallel mode for your program globally,
- *   by defining _GLIBCXX_PARALLEL and enabling OpenMP (-D_GLIBCXX_PARALLEL -fopenmp).
- *   However, this has the implication that STL algorithms in your program will also be executed in parallel,
- *   which may be undesirable.
- *   These options are automatically used when you built STXXL using the \c *_pmode target,
- *   and your Makefile includes pmstxxl.mk.
- * - Enable the g++ parallel mode specifically for your program,
- *   by defining STXXL_PARALLEL_MODE_EXPLICIT, and enabling OpenMP (-DSTXXL_PARALLEL_MODE_EXPLICIT -fopenmp).
+ * you have several options depending on the \ref compilers "compiler version" used:
+ * - Enable the g++ parallel mode specifically for STXXL,
+ *   by defining \c STXXL_PARALLEL_MODE_EXPLICIT and enabling OpenMP (\c -DSTXXL_PARALLEL_MODE_EXPLICIT \c -fopenmp)
+ *   during compilation of your program.
  *   Compiling the library binary with this flag enabled is not really necessary,
- *   since most time-consuming operations are used by generic routines and thus contained in the header files.
- * The third option is recommended for a start.
+ *   since the most time-consuming operations are called by the generic routines and thus contained in the header files.
+ * - Enable the g++ parallel mode for your program globally,
+ *   by defining \c _GLIBCXX_PARALLEL and enabling OpenMP (\c -D_GLIBCXX_PARALLEL \c -fopenmp).
+ *   This has the implication that STL algorithms in your program will also be executed in parallel,
+ *   which may have undesired side effects.
+ *   These options are automatically used when you built STXXL using the \c *_pmode target,
+ *   and your Makefile includes \c pmstxxl.mk.
+ * - Enable MCSTL in your program by setting the include path appropriately.
+ *   This implies that STL algorithms in your program will also be executed in parallel,
+ *   which may have undesired side effects.
+ *   These options are automatically used when you built STXXL using the \c *_mcstl target,
+ *   and your Makefile includes \c mcstxxl.mk.
+ *
+ * We recommend to try the first option at first.
  *
  * The number of threads to be used can be set by the environment variable OMP_NUM_THREADS or
  * by calling omp_set_num_threads.
