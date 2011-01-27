@@ -151,7 +151,7 @@ namespace parallel
                    Comparator comp,
                    DiffType length)
     {
-#if (defined(STXXL_PARALLEL_MODE) && (__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
+#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
         return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, length, comp);
 #elif defined(STXXL_PARALLEL_MODE)
         return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
@@ -180,7 +180,7 @@ namespace parallel
                             Comparator comp,
                             DiffType length)
     {
-#if (defined(STXXL_PARALLEL_MODE) && (__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
+#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
         return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);
 #elif defined(STXXL_PARALLEL_MODE)
         return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
