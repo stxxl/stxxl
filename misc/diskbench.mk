@@ -3,7 +3,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -38,8 +38,10 @@ SIP_BLOCK_SIZE	?= 0
 DISKBENCH_TITLE	?= STXXL Disk Benchmark $(DISKNAME) B=$(strip $(BATCH_SIZE))x$(call format_block_size,$(BLOCK_SIZE)) @ $(HOST)
 DISKAVG_TITLE	?= STXXL Disk Benchmark $(DISKNAME) @ $(HOST)$(if $(DISKNAME2),\n$(DISKNAME2))
 
-DISKBENCH_BINDIR?= .
-MISC_BINDIR	?= $(DISKBENCH_BINDIR)/../misc
+ifndef MISC_BINDIR
+MISC_BINDIR	:= $(dir $(lastword $(MAKEFILE_LIST)))
+endif
+DISKBENCH_BINDIR?= $(MISC_BINDIR)/../io
 DISKBENCH	?= benchmark_disks.stxxl.bin
 SCATTERINPLACE	?= iobench_scatter_in_place.stxxl.bin
 
@@ -117,8 +119,9 @@ ex: $(foreach d,$(DISKS_1by1),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 ex+: $(foreach d,$(DISKS),$(HOST)-$d.wrx.log $(HOST)-$d.rdx.log)
 sip: $(foreach d,$(DISKS_1by1),$(HOST)-$d.sip.log)
 
+all-sizes-targets	?= cr+ wr ex+
 all-sizes:
-	for d in $(wildcard 0016iMB 0064MB 0004MB 0256MB 0001MB 1024MB *MB) ; do make -C $$d cr+ wr ex+ ; done
+	for d in $(wildcard 0016iMB 0064MB 0004MB 0256MB 0001MB 1024MB *MB) ; do make -C $$d $(all-sizes-targets) ; done
 
 all-sizes-raw: keep-old-file=1
 all-sizes-raw: all-sizes
