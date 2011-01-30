@@ -259,25 +259,25 @@ Controller::Controller()
  * - Run: \verbatim make config_gnu \endverbatim to create a template \c make.settings.local file.
  *   Note: this will produce some warnings and abort with an error, which is intended.
  * - (optionally) change the \c make.settings.local file according to your system configuration:
- *   - (optionally) set \c STXXL_ROOT variable to \c S<small>TXXL</small> root directory
+ *   - (optionally) set the \c STXXL_ROOT variable to \c S<small>TXXL</small> root directory
  *     ( \c directory_where_you_unpacked_the_tar_ball/stxxl-x.y.z )
  *   - if you want \c S<small>TXXL</small> to use <a href="http://www.boost.org">Boost</a> libraries
  *     (you should have the Boost libraries already installed)
- *     - change \c USE_BOOST variable to \c yes
- *     - change \c BOOST_ROOT variable according to the Boost root path
- *   - if you want \c S<small>TXXL</small> to use the <a href="http://algo2.iti.kit.edu/singler/mcstl/">MCSTL</a>
- *     library (you should have the MCSTL library already installed)
- *     - change \c MCSTL_ROOT variable according to the MCSTL root path
- *     - use the targets \c library_g++_mcstl and \c tests_g++_mcstl instead of the ones listed below
+ *     - change the \c USE_BOOST variable to \c yes
+ *     - change the \c BOOST_ROOT variable to the Boost root path, unless Boost is installed in system default search paths.
  *   - if you want \c S<small>TXXL</small> to use the <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode</a>
  *     - use GCC version 4.3 or later
  *     - use the targets \c library_g++_pmode and \c tests_g++_pmode instead of the ones listed below
- *   - (optionally) set \c OPT variable to \c -O3 or other g++ optimization level you like (default: \c -O3 )
- *   - (optionally) set \c DEBUG variable to \c -g or other g++ debugging option
+ *   - if you want \c S<small>TXXL</small> to use the <a href="http://algo2.iti.kit.edu/singler/mcstl/">MCSTL</a>
+ *     library (you should have the MCSTL library already installed)
+ *     - change the \c MCSTL_ROOT variable to the MCSTL root path
+ *     - use the targets \c library_g++_mcstl and \c tests_g++_mcstl instead of the ones listed below
+ *   - (optionally) set the \c OPT variable to \c -O3 or other g++ optimization level you like (default: \c -O3 )
+ *   - (optionally) set the \c DEBUG variable to \c -g or other g++ debugging option
  *     if you want to produce a debug version of the Stxxl library or Stxxl examples (default: not set)
  *   - for more variables to tune take a look at \c make.settings.gnu ,
  *     they are usually overridden by settings in \c make.settings.local,
- *     using \c CPPFLAGS for example, you can add arbitrary compiler options and defines
+ *     using \c CPPFLAGS and \c LDFLAGS, for example, you can add arbitrary compiler and linker options
  * - Run: \verbatim make library_g++ \endverbatim
  * - Run: \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
  *
@@ -285,7 +285,7 @@ Controller::Controller()
  * \section build_apps Building an Application
  *
  * After compiling the library, some Makefile variables are written to
- * \c stxxl.mk (\c mcstxxl.mk if you built with MCSTL) in your
+ * \c stxxl.mk (\c pmstxxl.mk if you have built with parallel mode, \c mcstxxl.mk if you have built with MCSTL) in your
  * \c STXXL_ROOT directory. This file should be included from your
  * application's Makefile.
  *
@@ -322,7 +322,7 @@ my_example.bin: my_example.o
  * you have several options depending on the \ref compilers "compiler version" used:
  * - Enable the g++ parallel mode specifically for STXXL,
  *   by defining \c STXXL_PARALLEL_MODE_EXPLICIT and enabling OpenMP (\c -DSTXXL_PARALLEL_MODE_EXPLICIT \c -fopenmp)
- *   during compilation of your program.
+ *   during compilation and linkage of your program.
  *   Compiling the library binary with this flag enabled is not really necessary,
  *   since the most time-consuming operations are called by the generic routines and thus contained in the header files.
  * - Enable the g++ parallel mode for your program globally,
