@@ -250,12 +250,15 @@ Controller::Controller()
 /*!
  * \page installation_linux_gcc Installation, usage, configuration (Linux/Unix &ndash; g++/icpc/clang++)
  *
- * \section download Download and library compilation
+ * \section download_linux_gcc Download and Extraction
  *
  * - Download the latest gzipped tarball from
- *   <a href="http://sourceforge.net/projects/stxxl/files/stxxl/">SourceForge</a>.
- * - Unpack in some directory executing: \c tar \c zfxv \c stxxl-x.y.z.tgz ,
- * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z ,
+ *   <a href="http://sourceforge.net/projects/stxxl/files/stxxl/">SourceForge</a>
+ * - Unpack in some directory executing: \c tar \c zfxv \c stxxl-x.y.z.tgz
+ * - Change to \c stxxl directory: \c cd \c stxxl-x.y.z
+ *
+ * \section library_compilation_linux_gcc Library Compilation
+ *
  * - Run: \verbatim make config_gnu \endverbatim to create a template \c make.settings.local file.
  *   Note: this will produce some warnings and abort with an error, which is intended.
  * - (optionally) change the \c make.settings.local file according to your system configuration:
@@ -441,13 +444,16 @@ my_example.bin: my_example.o
 /*!
  * \page installation_msvc Installation, usage, configuration (Windows &ndash; Microsoft Visual C++)
  *
- * \section download Download and library compilation
+ * \section download_msvc Download and Extraction
  *
  * - Install the <a href="http://www.boost.org">Boost</a> libraries (required).
  * - Download the latest \c Stxxl zip file from
- *   <a href="http://sourceforge.net/projects/stxxl/files/stxxl/">SourceForge</a>.
- * - Unpack the zip file in some directory (e.&nbsp;g. \c 'C:\\' ),
- * - Change to \c stxxl base directory: \c cd \c stxxl-x.y.z ,
+ *   <a href="http://sourceforge.net/projects/stxxl/files/stxxl/">SourceForge</a>
+ * - Unpack the zip file in some directory (e.&nbsp;g. \c 'C:\\' )
+ * - Change to \c stxxl base directory: \c cd \c stxxl-x.y.z
+ *
+ * \section library_compilation_msvc Library Compilation
+ *
  * - Create \c make.settings.local in the base directory according to your system configuration:
  *   - set \c BOOST_ROOT variable according to the Boost root path, e.&nbsp;g.
  *     BOOST_ROOT = "C:\Program Files (x86)\boost\boost_1_40_0"#
@@ -459,7 +465,7 @@ my_example.bin: my_example.o
  *   The file is located in the \c STXXL_ROOT directory
  *   Press F7 to build the library.
  *   The library file (libstxxl.lib) should appear in \c STXXL_ROOT\\lib directory
- *   Or build the library and the \c stxxl test programs by pressing Ctrl-Alt-F7
+ *   Or build the library and the S<small>TXXL</small> test programs by pressing Ctrl-Alt-F7
  *   (or choosing from 'Build' drop-down menu Rebuild Solution)
  * - (alternatively) Compile the library by executing \c nmake \c library_msvc
  *   and the tests by executing \c nmake \c tests_msvc,
@@ -567,7 +573,7 @@ my_example.bin: my_example.o
  *
  * \section checkout Retrieving the source from subversion
  *
- * The \c S<small>TXXL</small> sourcecode is available in a subversion repository on sourceforge.net.<br>
+ * The \c S<small>TXXL</small> source code is available in a subversion repository on sourceforge.net.<br>
  * To learn more about subversion and (command line and graphical) subversion clients
  * visit <a href="http://subversion.tigris.org/">http://subversion.tigris.org/</a>.
  *
@@ -577,7 +583,7 @@ my_example.bin: my_example.o
  * Branches have URLs like
  * \c https://stxxl.svn.sourceforge.net/svnroot/stxxl/branches/foobar
  *
- * For the following example let's assume you want to download the latest trunk version
+ * For the following example let us assume you want to download the latest trunk version
  * using the command line client and store it in a directory called \c stxxl-trunk
  * (which should not exist, yet).
  * Otherwise replace URL and path to your needs.
@@ -588,23 +594,16 @@ my_example.bin: my_example.o
  * \section svn_continue_installation Continue as Usual
  *
  * Now follow the regular installation and usage instructions,
- * skipping over the tarball download and extraction parts.<br>
- * For the \c STXXL_ROOT variable value choose something like
- * \c \$(HOME)/path/to/stxxl-trunk
- *
- * - \link installation_linux_gcc Installation, usage, configuration (Linux/Unix &ndash; g++/icpc/clang++) \endlink
- * - \link installation_msvc Installation, usage, configuration (Windows &ndash; Microsoft Visual C++) \endlink
+ * starting from "Library Compilation":
+ * - \ref library_compilation_linux_gcc "Linux/Unix &ndash; g++/icpc/clang++"
+ * - \ref library_compilation_msvc "Windows &ndash; Microsoft Visual C++"
  *
  * \section update Updating an existing subversion checkout
  *
  * Once you have checked out the source code you can easily update it to the latest version later on.
  *
- * Change to stxxl directory:
- * \verbatim cd ...path/to/stxxl-trunk \endverbatim
- * Run
+ * In the S<small>TXXL</small> directory, run
  * \verbatim svn update \endverbatim
- * Usually you don't have to reconfigure anything, so just rebuild:
- * - \verbatim make library_g++ \endverbatim
- * - \verbatim make tests_g++ \endverbatim (optional, if you want to compile and run some test programs)
+ * and rebuild.
  * */
 
