@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2010 Raoul Steffen <R-Steffen@gmx.de>
+ *  Copyright (C) 2010, 2011 Raoul Steffen <R-Steffen@gmx.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -24,17 +24,264 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+
+// +-+-+-+-+-+ swapable_block stuff +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+//! \brief Internal block container with access-metadata. Not intended for direct use.
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSize number of contained objects
+template <typename ValueType, unsigned BlockSize>
+struct internal_block
+{
+    static const unsigned_type raw_block_size = BlockSize * sizeof(ValueType);
+    typedef typed_block<raw_block_size, ValueType> block_data_holder_type;
+
+    block_data_holder_type data;
+    bool dirty;
+    int_type reference_count;
+
+    internal_block() : data(), dirty(false), reference_count(0) {}
+};
+
+//! \brief Holds infomation to allocate, swap and reload a block of data. Use with block_scheduler.
+//! A swapable_block can be uninitialised, i.e. it holds no data.
+//! When access is required, is has to be aquired and released afterwards, so it can be swaped in and out as required.
+//! If the stored data is no longer needed, it can get uninitialized, freeing in- and external memory.
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSize number of contained objects
+template <typename ValueType, unsigned BlockSize>
+class swapable_block
+{
+protected:
+    typedef internal_block<ValueType, BlockSize> internal_block_type;
+public:
+    typedef typename internal_block_type::block_data_holder_type block_data_holder_type;
+protected:
+    typedef typename block_data_holder_type::bid_type external_block_type;
+
+    friend class block_scheduler;
+
+    external_block_type external_data;
+    internal_block_type * internal_data;
+
+    //! \brief create in uninitialized state
+    swapable_block()
+        : external_data(), internal_data(0) {}
+
+    //! \brief create in initialised, swaped out state
+    //! \param bid external_block with data, will be used as swap-space of this swapable_block
+    swapable_block(const external_block_type & bid)
+        : external_data(bid), internal_data(0) {}
+
+    ~swapable_block()
+    {
+        if (internal_data)
+            STXXL_ERRMSG("Destructing swapable_block that still holds internal_block.");
+    }
+
+    bool is_aquired() const
+    {
+        //todo
+        return false;
+    }
+
+public:
+    bool is_initialized() const
+    {
+        //todo
+        return false;
+    }
+
+    block_data_holder_type & get_reference()
+    {
+        //todo
+    }
+
+    void fill_default() {}
+
+    void fill(ValueType value)
+    {
+        //todo
+        // check aquired
+        // fill
+    }
+};
+
+//! \brief Swaps swapable_blocks and provides swapable_blocks for temporary storage.
+//! Tries to save I/Os by not reading blocks that already are in main memory.
+//! Features a simulation mode to record access patterns in a prediction sequence.
+//!   The prediction sequence can then be used for prefetching and swapping during a real run.
+//!   This will only work for algorithms with deterministic, data oblivious access patterns.
+//!   In simulation mode no I/O is perfomed; the data provided is accessible but undefined.
+//! \tparam SwapableBlockType Type of swapable_blocks to manage. Can be some specialised subclass.
+template <class SwapableBlockType>
+class block_scheduler
+{
+    typedef typename SwapableBlockType::block_data_holder_type block_data_holder_type;
+public:
+    typedef std::vector< std::pair<SwapableBlockType *, int> > prediction_sequence_type;
+
+protected:
+    int_type max_internal_blocks;
+
+public:
+    //! \brief Aquire the given block and return a reference to it's data.
+    //! Has to be in pairs with release. Pairs may be nested.
+    //! \param sblock Swapable block to aquire.
+    block_data_holder_type & aquire(SwapableBlockType * sblock)
+    {
+        //todo
+    }
+
+    //! \brief Release the given block.
+    //! Has to be in pairs with aquire. Pairs may be nested.
+    //! \param sblock Swapable block to release.
+    //! \param tainted If the data hab been changed, invalidating possible data in external storage.
+    void release(SwapableBlockType * sblock, bool tainted)
+    {
+        //todo
+    }
+
+    //! \brief Get a reference to given block's data. Block has to be already aquired.
+    //! \param sblock Swapable block to access.
+    block_data_holder_type & get_reference(SwapableBlockType * sblock) const
+    { return sblock->get_reference(); }
+
+    //! \brief Loose all data in the given block, freeing in- and external memory.
+    void deinitialize(SwapableBlockType * sblock)
+    {
+        //todo
+    }
+
+    //! \brief Allocate a temporary swapable_block. Returns a pointer to the block.
+    //! Temporary blocks are considered in prefetching. They may never be written to external memory if there is enough main memory.
+    SwapableBlockType * allocate_temporary_swapable_block()
+    {
+        //todo
+    }
+
+    //! \brief Free given no longer used temporary swapable_block.
+    //! \param sblock Temporary swapable_block to free.
+    void free_temporary_swapable_block(SwapableBlockType * sblock)
+    {
+        //todo
+    }
+
+    //! \brief Turn simulation mode on and reset prediction sequence to record.
+    void start_recording_prediction_sequence()
+    {
+        //todo
+    }
+
+    //! \brief Turn simulation mode off. Returns a reference to the recorded prediction sequence.
+    const prediction_sequence_type & stop_recording_prediction_sequence()
+    {
+        //todo
+    }
+
+    //! \brief Use the last used (or recorded) prediction sequence. May result in prefetching.
+    void start_using_prediction_sequence()
+    {
+        //todo
+    }
+
+    //! \brief Use the given prediction sequence. May result in prefetching.
+    //! \param new_ps prediction sequence to copy and use.
+    void start_using_prediction_sequence(const prediction_sequence_type & new_ps)
+    {
+        //todo
+    }
+
+    //! \brief Stop using the prediction sequence.
+    void stop_using_prediction_sequence()
+    {
+        //todo
+    }
+
+    //! \brief Returns if simulation mode is on, i.e. if a prediction sequence is beeing recorded.
+    bool is_in_simulation_mode() const
+    {
+        //todo
+        return false;
+    }
+};
+
+// +-+-+-+-+-+-+ matrix version with swapable_blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+//! \brief Specialised swapable_block that interprets uninitiazized as containing zeros.
+//! When initializing, all values are set to zero.
+template <typename ValueType, unsigned BlockSideLength>
+class matrix_swapable_block : public swapable_block<ValueType, BlockSideLength * BlockSideLength>
+{
+public:
+    bool is_zero_block() const
+    { return !this.is_initialized(); }
+
+    void fill_with_zeros()
+    { this.fill(0); }
+
+    void fill_default()
+    { fill_with_zeros(); }
+};
+
+//! \brief External container for the values of a matrix. Not intended for direct use.
+template <typename ValueType, unsigned BlockSideLength>
+struct matrix_data
+{
+    typedef matrix_swapable_block<ValueType, BlockSideLength> matrix_swapable_block_type;
+
+    std::vector<matrix_swapable_block_type * > blocks;
+    int_type height_in_blocks,
+             width_in_blocks;
+    bool transposed;
+
+    matrix_swapable_block_type * get_block(int_type row, int_type col)
+    {
+        //todo
+    }
+};
+
+//! \brief External matrix container.
+template <typename ValueType, unsigned BlockSideLength>
+class matrix
+{
+protected:
+    typedef matrix_data<ValueType, BlockSideLength> matrix_data_type;
+
+    int_type height,
+             width;
+    matrix_data_type data;
+
+    //! \brief Creates a new matrix of given height and width. Elements' values are set to zero.
+    //! \param new_height Height of the created matrix.
+    //! \param new_width Width of the created matrix.
+    matrix(int_type new_height, int_type new_width)
+    {
+        //todo
+    }
+
+    ~matrix()
+    {
+        //todo
+    }
+
+    //todo: standart container operations
+    // []; elem(row, col); row- and col-iterator; get/set row/col; get/set submatrix
+};
+
+// +-+-+-+-+-+-+ blocked-matrix version +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
 //forward declaration
 template <typename ValueType, unsigned BlockSideLength>
-class matrix;
+class blocked_matrix;
 
 //forward declaration for friend
 template <typename ValueType, unsigned BlockSideLength>
-matrix<ValueType, BlockSideLength> &
+blocked_matrix<ValueType, BlockSideLength> &
 multiply(
-    const matrix<ValueType, BlockSideLength> & A,
-    const matrix<ValueType, BlockSideLength> & B,
-    matrix<ValueType, BlockSideLength> & C,
+    const blocked_matrix<ValueType, BlockSideLength> & A,
+    const blocked_matrix<ValueType, BlockSideLength> & B,
+    blocked_matrix<ValueType, BlockSideLength> & C,
     unsigned_type max_temp_mem_raw
     );
 
@@ -45,7 +292,7 @@ multiply(
 //! \tparam BlockSideLength side length of one square matrix block, default is 1024
 //!         BlockSideLength*BlockSideLength*sizeof(ValueType) must be divisible by 4096
 template <typename ValueType, unsigned BlockSideLength = 1024>
-class matrix
+class blocked_matrix
 {
     static const unsigned_type block_size = BlockSideLength * BlockSideLength;
     static const unsigned_type raw_block_size = block_size * sizeof(ValueType);
@@ -64,7 +311,7 @@ private:
     MatrixBlockLayout * layout;
 
 public:
-    matrix(unsigned_type num_rows, unsigned_type num_cols, MatrixBlockLayout * given_layout = NULL)
+    blocked_matrix(unsigned_type num_rows, unsigned_type num_cols, MatrixBlockLayout * given_layout = NULL)
         : num_rows(num_rows), num_cols(num_cols),
           num_block_rows(div_ceil(num_rows, BlockSideLength)),
           num_block_cols(div_ceil(num_cols, BlockSideLength)),
@@ -76,7 +323,7 @@ public:
         bm->new_blocks(striping(), bids, bids + num_block_rows * num_block_cols);
     }
 
-    ~matrix()
+    ~blocked_matrix()
     {
         bm->delete_blocks(bids, bids + num_block_rows * num_block_cols);
         delete[] bids;
@@ -196,11 +443,11 @@ public:
     }
 
     friend
-    matrix<ValueType, BlockSideLength> &
+    blocked_matrix<ValueType, BlockSideLength> &
     multiply<>(
-        const matrix<ValueType, BlockSideLength> & A,
-        const matrix<ValueType, BlockSideLength> & B,
-        matrix<ValueType, BlockSideLength> & C,
+        const blocked_matrix<ValueType, BlockSideLength> & A,
+        const blocked_matrix<ValueType, BlockSideLength> & B,
+        blocked_matrix<ValueType, BlockSideLength> & C,
         unsigned_type max_temp_mem_raw);
 };
 
@@ -394,9 +641,9 @@ void dgemm_wrapper(const blas_int n, const blas_int k, const blas_int m,
                             const bool b_in_col_major, const double *b /*, const blas_int ldb*/,
         const double beta,  const bool c_in_col_major,       double *c /*, const blas_int ldc*/)
 {
-    const blas_int &stride_in_a = a_in_col_major ? n : k;
-    const blas_int &stride_in_b = b_in_col_major ? k : m;
-    const blas_int &stride_in_c = c_in_col_major ? n : m;
+    const blas_int& stride_in_a = a_in_col_major ? n : k;
+    const blas_int& stride_in_b = b_in_col_major ? k : m;
+    const blas_int& stride_in_c = c_in_col_major ? n : m;
     const char transa = a_in_col_major xor c_in_col_major ? 'T' : 'N';
     const char transb = b_in_col_major xor c_in_col_major ? 'T' : 'N';
     if (c_in_col_major)
@@ -496,15 +743,15 @@ void multiply_panel(const panel<matrix_type> & PanelA, const panel<matrix_type> 
 
 //! \brief multiply the matrices A and B, gaining C
 template <typename ValueType, unsigned BlockSideLength>
-matrix<ValueType, BlockSideLength> &
+blocked_matrix<ValueType, BlockSideLength> &
 multiply(
-    const matrix<ValueType, BlockSideLength> & A,
-    const matrix<ValueType, BlockSideLength> & B,
-    matrix<ValueType, BlockSideLength> & C,
+    const blocked_matrix<ValueType, BlockSideLength> & A,
+    const blocked_matrix<ValueType, BlockSideLength> & B,
+    blocked_matrix<ValueType, BlockSideLength> & C,
     unsigned_type max_temp_mem_raw
     )
 {
-    typedef matrix<ValueType, BlockSideLength> matrix_type;
+    typedef blocked_matrix<ValueType, BlockSideLength> matrix_type;
     typedef typename matrix_type::block_type block_type;
 
     assert(A.num_cols == B.num_rows);

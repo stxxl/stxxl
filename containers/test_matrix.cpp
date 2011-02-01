@@ -134,7 +134,7 @@ int main()
     {
     case 0:
     {
-        matrix<unsigned_type, block_order> A(rank, rank);
+        blocked_matrix<unsigned_type, block_order> A(rank, rank);
         modulus_integers mi1(1, 1), mi2(1, 1);
         iterator_compare<modulus_integers, unsigned_type> ic(mi1);
 
@@ -153,7 +153,7 @@ int main()
     case 1:
     {   //1-matrices
         ColumnMajor cm;
-        matrix<double, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<double, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         constant_one co;
         modulus_integers mi(rank, 0);   //expected result, no modulus
         iterator_compare<modulus_integers, unsigned_type> ic(mi);
@@ -185,7 +185,7 @@ int main()
     }
     case 2:
     {   //ascending times constant factor
-        matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         modulus_integers mi1(1, 1), mi2(5, 5);  //ascending, 5 * ascending
         diagonal_matrix di(rank, 5);    //multiply by 5
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
@@ -214,7 +214,7 @@ int main()
     }
     case 3:
     {
-        matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         modulus_integers mi1(1, 1), mi2((unsigned_type)rank * rank, std::numeric_limits<unsigned_type>::max());
         inverse_diagonal_matrix id(rank);
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
