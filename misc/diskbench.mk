@@ -83,10 +83,6 @@ $(HOST)-%.crx.log:
 	$(if $(keep-old-file),,$(RM) $(foreach d,$(DISKS_$*),$(call disk2file,$d)))
 	$(do-some-disks)
 
-$(HOST)-%.crx.log: FLAGS_EX = W
-$(HOST)-%.crx.log:
-	$(do-some-disks)
-
 # interleaved write-read-test
 $(HOST)-%.wr.log:
 	$(do-some-disks)
