@@ -77,6 +77,7 @@ public:
 template <typename ValueType, unsigned BlockSize>
 struct internal_block
 {
+protected:
     static const unsigned_type raw_block_size = BlockSize * sizeof(ValueType);
     typedef typed_block<raw_block_size, ValueType> block_data_holder_type;
 
@@ -85,6 +86,9 @@ struct internal_block
     int_type reference_count;
 
     internal_block() : data(), dirty(false), reference_count(0) {}
+
+    void reset()
+    { dirty = false; assert(reference_count == 0); }
 };
 
 //! \brief Holds infomation to allocate, swap and reload a block of data. Use with block_scheduler.
@@ -126,34 +130,39 @@ protected:
     bool is_intern() const
     { return internal_data; }
 
+    bool is_extern() const
+    { return external_data.valid(); }
+
     bool is_aquired() const
     { return internal_data && internal_data->reference_count > 0; }
 
     int_type & reference_count()
     { return internal_data->reference_count; }
 
+    bool & dirty()
+    { return internal_data->dirty; }
+
 public:
     bool is_initialized() const
-    { return internal_data || external_data.valid(); }
+    { return is_intern() || is_extern(); }
 
     block_data_holder_type & get_reference()
     {
 #if CHECK
-        if (is_aquired())
+        if (! is_aquired())
+        {
+            //todo error
+        }
 #endif
-            return internal_data->data;
-#if CHECK
-        //todo else throw ;
-#endif
+        return internal_data->data;
     }
 
     void fill_default() {}
 
-    void fill(ValueType value)
+    void fill(const ValueType value)
     {
-        // check aquired
+        // get_reference checks aquired
         block_data_holder_type & data = get_reference();
-        // fill
         for (int_type i = 0; i < BlockSize; ++i)
             data[i] = value;
     }
@@ -224,23 +233,28 @@ public:
     typedef std::vector< prediction_sequence_element<SwapableBlockType> > prediction_sequence_type;
 
 protected:
+    //! \brief holds free internal_blocks with attributes reset
     std::stack<internal_block_type * > free_internal_blocks;
     std::vector<SwapableBlockType> temporary_swapable_blocks;
+    //! \brief holds indices of free temporary swapable_blocks with attributes reset
     std::stack<temporary_swapable_blocks_index_type> free_temporary_swapable_blocks;
     prediction_sequence_type prediction_sequence;
-    // holds swapable blocks, whose internal block can be freed, i.e. that are internal but unaquired
-    fixed_priority_adressable_p_queue<SwapableBlockType *, displaceable_swapable_block_priority_type> displaceable_swapable_blocks; // todo: better name
+    //! \brief holds swapable blocks, whose internal block can be freed, i.e. that are internal but unaquired
+    fixed_priority_adressable_p_queue<SwapableBlockType *, displaceable_swapable_block_priority_type> displaceable_swapable_blocks; // todo: ? better name
     block_scheduler_mode mode;
-    internal_block_type * dummy_internal_block;
+    block_manager * bm;
 
 public:
     //! \brief create a block_scheduler with empty prediction sequence in simple mode.
     //! \param max_internal_memory Amount of internal memory (in sizeof(char)) the scheduler is allowed to use for aquireing, prefetching and caching.
     block_scheduler(int_type max_internal_memory)
-        : free_internal_blocks(div_ceil(max_internal_memory, sizeof(block_data_holder_type))),
-          displaceable_swapable_blocks(get_block_priority),
-          mode(simple)
+        : displaceable_swapable_blocks(get_block_priority),
+          mode(simple),
+          bm(block_manager::get_instance())
     {
+        //fill free_internal_blocks
+        for (int_type i = 0; i < div_ceil(max_internal_memory, sizeof(block_data_holder_type)); ++i)
+            free_internal_blocks.push(new internal_block_type);
         //todo
     }
 
@@ -261,7 +275,20 @@ protected:
         }
     }
 
-    displaceable_swapable_block_priority_type get_block_priority(const SwapableBlockType * block) const
+    temporary_swapable_blocks_index_type temporary_swapable_blocks_index(const SwapableBlockType * sblock) const
+    {
+        if (sblock < temporary_swapable_blocks.end())
+        {
+            temporary_swapable_blocks_index_type index = sblock - temporary_swapable_blocks.begin();
+        }
+        else
+        {
+            //todo
+            //error
+        }
+    }
+
+    displaceable_swapable_block_priority_type get_block_priority(const SwapableBlockType * sblock) const
     {
         //todo
         return 0;
@@ -321,7 +348,28 @@ public:
     {
         switch (mode) {
         case simple:
-            //todo
+            if (sblock->is_aquired())
+            {
+                sblock->dirty() |= tainted;
+                -- sblock->reference_count();
+                if (! sblock->is_aquired())
+                {
+                    // dirty or external -> displaceable, put in pq
+                    if (sblock->dirty() || sblock->is_extern())
+                        displaceable_swapable_blocks.insert(sblock);
+                    //else -> uninitialized, release internal block and put it in freelist
+                    else
+                    {
+                        free_internal_blocks.push(sblock->internal_data);
+                        sblock->internal_data = 0;
+                    }
+                }
+            }
+            else
+            {
+                //todo
+                //error
+            }
             break;
         case simulation:
             //todo
@@ -335,14 +383,52 @@ public:
     //! \brief Loose all data in the given block, freeing in- and external memory.
     void deinitialize(SwapableBlockType * sblock)
     {
-        //todo
+        switch (mode) {
+        case simple:
+            if (! sblock->is_aquired())
+            {
+                // reset and free internal_block
+                if (sblock->is_intern())
+                {
+                    sblock->internal_data->reset();
+                    free_internal_blocks.push(sblock->internal_data);
+                    sblock->internal_data = 0;
+                }
+                // free external_block (so that it becomes invalid and the disk-space can be used again)
+                if (sblock->is_extern())
+                {
+                    bm->delete_block(sblock->external_data);
+                }
+            }
+            else
+            {
+                //todo
+                //error
+            }
+            break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }
     }
 
     //! \brief Record a timestep in the prediction sequence to seperate consecutive aquire rsp. release-operations.
     //! Has an effect only in simulation mode.
     void explicit_timestep()
     {
-        //todo
+        switch (mode) {
+        case simple:
+            break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }
     }
 
     //! \brief Get a reference to given block's data. Block has to be already aquired.
@@ -351,56 +437,143 @@ public:
     { return sblock->get_reference(); }
 
     //! \brief Allocate a temporary swapable_block. Returns a pointer to the block.
-    //! Temporary blocks are considered in prefetching. They may never be written to external memory if there is enough main memory.
+    //! Temporary blocks are considered in scheduling. They may never be written to external memory if there is enough main memory.
     SwapableBlockType * allocate_temporary_swapable_block()
     {
-        //todo
+        switch (mode) {
+        case simple:
+            SwapableBlockType * sblock;
+            if (free_temporary_swapable_blocks.empty())
+            {
+                // create new temporary swapable_block
+                temporary_swapable_blocks.pushback();
+                sblock = temporary_swapable_blocks.back();
+            }
+            else
+            {
+                // take swapable_block from freelist
+                sblock = & temporary_swapable_blocks[free_temporary_swapable_blocks.top()];
+                free_temporary_swapable_blocks.pop();
+            }
+            return sblock;
+            break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }
     }
 
     //! \brief Free given no longer used temporary swapable_block.
     //! \param sblock Temporary swapable_block to free.
     void free_temporary_swapable_block(SwapableBlockType * sblock)
     {
-        //todo
+        switch (mode) {
+        case simple:
+            if (sblock->is_aquired())
+            {
+                //todo error or catch error on deinitialize
+            }
+
+            deinitialize(sblock);
+            free_temporary_swapable_blocks.push(temporary_swapable_blocks_index(sblock));
+            break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }
     }
 
     //! \brief Turn on simulation mode and reset prediction sequence.
     void start_recording_prediction_sequence()
     {
-        //todo
-        //set dummy_internal_block
+        switch (mode) {
+        case simple:
+            //todo
+            break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }
     }
 
     //! \brief Turn off simulation mode. Returns a reference to the recorded prediction sequence.
     const prediction_sequence_type & stop_recording_prediction_sequence()
     {
-        //todo
+        switch (mode) {
+        case simple:
+            //todo
+           break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }//todo
     }
 
     //! \brief Turn on execute mode. Use the last used (or recorded) prediction sequence.
     void start_using_prediction_sequence()
     {
-        //todo
+        switch (mode) {
+        case simple:
+            //todo
+           break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }//todo
     }
 
     //! \brief Turn on execute mode. Use the given prediction sequence.
     //! \param new_ps prediction sequence to copy and use.
     void start_using_prediction_sequence(const prediction_sequence_type & new_ps)
     {
-        //todo
+        switch (mode) {
+        case simple:
+            //todo
+           break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }//todo
     }
 
     //! \brief Turn off execute mode.
     void stop_using_prediction_sequence()
     {
-        //todo
+        switch (mode) {
+        case simple:
+            //todo
+           break;
+        case simulation:
+            //todo
+            break;
+        case execute:
+            //todo
+            break;
+        }//todo
     }
 
     //! \brief Returns if simulation mode is on, i.e. if a prediction sequence is beeing recorded.
     bool is_in_simulation_mode() const
     {
-        //todo
-        return false;
+        return mode == simulation;
     }
 };
 
