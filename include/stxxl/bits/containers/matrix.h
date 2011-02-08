@@ -183,7 +183,7 @@ class prediction_sequence_element
     typedef swapable_block_identifier<SwapableBlockType> swapable_block_identifier_type;
     typedef typename swapable_block_identifier_type::temporary_swapable_blocks_index_type temporary_swapable_blocks_index_type;
 
-    template <class SwapableBlockType, class DiskAssignFunctor>
+    template <class SBT, class DiskAssignFunctor>
     friend class block_scheduler;
 
 protected:
