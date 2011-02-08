@@ -102,6 +102,7 @@ public:
 protected:
     typedef typename block_data_holder_type::bid_type external_block_type;
 
+    template <class SwapableBlockType, class DiskAssignFunctor>
     friend class block_scheduler;
 
     external_block_type external_data;
@@ -182,6 +183,7 @@ class prediction_sequence_element
     typedef swapable_block_identifier<SwapableBlockType> swapable_block_identifier_type;
     typedef typename swapable_block_identifier_type::temporary_swapable_blocks_index_type temporary_swapable_blocks_index_type;
 
+    template <class SwapableBlockType, class DiskAssignFunctor>
     friend class block_scheduler;
 
 protected:
