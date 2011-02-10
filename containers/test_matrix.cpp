@@ -260,12 +260,12 @@ int main(int argc, char **argv)
     {
         typedef swapable_block<int_type, block_order> swapable_block_type;
         typedef block_scheduler<swapable_block_type> block_scheduler_type;
-        block_scheduler_type bs = block_scheduler_type(internal_memory);
+        block_scheduler_type bs(internal_memory);
         swapable_block_type sb[5];
-        bs.acquire(&sb[1]);
-        bs.acquire(&sb[2]);
-        bs.release(&sb[1],false);
-        bs.release(&sb[2],false);
+        bs.acquire(sb[1]);
+        bs.acquire(sb[2]);
+        bs.release(sb[1],false);
+        bs.release(sb[2],false);
 
         break;
     }
