@@ -72,9 +72,9 @@ void cmp_with_internal_map()
     std::vector<value_type> values1(n_values);
     std::vector<value_type> values2(n_values);
     std::vector<value_type> values3(n_values);
-    std::generate(values1.begin(), values1.end(), rand_pairs(rand32));
-    std::generate(values2.begin(), values2.end(), rand_pairs(rand32));
-    std::generate(values3.begin(), values3.end(), rand_pairs(rand32));
+    std::generate(values1.begin(), values1.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
+    std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
+    std::generate(values3.begin(), values3.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
 
     // --- initial import: create a nice mix of externally (values1) and internally (values2) stored values
     map.insert(values1.begin(), values1.end(), mem_to_sort);
@@ -155,8 +155,8 @@ void basic_iterator_test()
 
     std::vector<value_type> values1(n_values);
     std::vector<value_type> values2(n_values);
-    std::generate(values1.begin(), values1.end(), rand_pairs(rand32));
-    std::generate(values2.begin(), values2.end(), rand_pairs(rand32));
+    std::generate(values1.begin(), values1.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
+    std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
 
 
     // --- initial import: create a nice mix of externally (values1) and internally (values2) stored values
@@ -319,8 +319,8 @@ void more_iterator_test()
     stxxl::random_number32 rand32;
     std::vector<value_type> values1(n_values);
     std::vector<value_type> values2(n_values);
-    std::generate(values1.begin(), values1.end(), rand_pairs(rand32));
-    std::generate(values2.begin(), values2.end(), rand_pairs(rand32));
+    std::generate(values1.begin(), values1.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
+    std::generate(values2.begin(), values2.end(), rand_pairs(rand32) _STXXL_FORCE_SEQUENTIAL);
 
     // --- initial import
     map.insert(values1.begin(), values1.end(), mem_to_sort);
