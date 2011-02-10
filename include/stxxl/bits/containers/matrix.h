@@ -33,40 +33,33 @@ __STXXL_BEGIN_NAMESPACE
 
 // +-+-+-+-+-+ swapable_block stuff +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-// The priority must not change for handles in the queue! Otherwise they can not be found by remove.
-template <typename HandleType , typename PriorityType /* = HandleType::priority_type */> //todo default PriorityType
-class fixed_priority_adressable_p_queue
+template <typename ElementType>
+class priority_adressable_p_queue
 {
-    typedef PriorityType (* priority_function_type)(const HandleType);
-    typedef std::pair<PriorityType, HandleType> element_type;
-
-    const priority_function_type pf;
-    std::set<element_type> vals;
+    std::set<ElementType> vals;
 
 public:
-    fixed_priority_adressable_p_queue(priority_function_type priority_function)
-        : pf(priority_function) { }
-
     bool empty() const
     { return vals.empty(); }
 
-    void insert(const HandleType h)
-    {
-        const element_type e(pf(h), h);
-        vals.insert(e);
-    }
+    void insert(const ElementType & e)
+    { vals.insert(e); }
 
-    void remove(const HandleType h)
-    {
-        const element_type e(pf(h), h);
-        vals.erase(e);
-    }
+    void remove(const ElementType & e)
+    { vals.erase(e); }
 
-    HandleType pop()
+    ElementType pop_min()
     {
-        const HandleType h = vals.begin()->second;
+        const ElementType e = * vals.begin();
         vals.erase(vals.begin());
-        return h;
+        return e;
+    }
+
+    ElementType pop_max()
+    {
+        const ElementType e = * vals.rbegin();
+        vals.erase(vals.rbegin());
+        return e;
     }
 };
 
@@ -235,12 +228,15 @@ class block_scheduler
 
     typedef typename SwapableBlockType::internal_block_type internal_block_type;
     typedef typename SwapableBlockType::block_type block_type;
-    typedef unsigned_type displaceable_swapable_block_priority_type;
+    typedef unsigned_type evictable_block_priority_type;
+    typedef std::pair<evictable_block_priority_type, SwapableBlockType *> evictable_block_priority_element_type;
     typedef typename prediction_sequence_element<SwapableBlockType>::temporary_swapable_blocks_index_type temporary_swapable_blocks_index_type;
 public:
     typedef std::vector< prediction_sequence_element<SwapableBlockType> > prediction_sequence_type;
 
 protected:
+    const int_type max_internal_blocks;
+    int_type remaining_internal_blocks;
     //! \brief holds free internal_blocks with attributes reset
     std::stack<internal_block_type * > free_internal_blocks;
     //! \brief temporary blocks that will not be needed after algorithm termination
@@ -249,7 +245,7 @@ protected:
     std::stack<temporary_swapable_blocks_index_type> free_temporary_swapable_blocks;
     prediction_sequence_type prediction_sequence;
     //! \brief holds swapable blocks, whose internal block can be freed, i.e. that are internal but unacquired
-    fixed_priority_adressable_p_queue<SwapableBlockType *, displaceable_swapable_block_priority_type> evictable_blocks; // todo: ? better name
+    priority_adressable_p_queue<evictable_block_priority_element_type> evictable_blocks;
     Mode mode;
     block_manager * bm;
 
@@ -257,24 +253,27 @@ public:
     //! \brief create a block_scheduler with empty prediction sequence in simple mode.
     //! \param max_internal_memory Amount of internal memory (in bytes) the scheduler is allowed to use for acquiring, prefetching and caching.
     block_scheduler(int_type max_internal_memory)
-        : evictable_blocks(get_block_priority),
+        : max_internal_blocks(div_ceil(max_internal_memory, sizeof(block_type))),
+          remaining_internal_blocks(max_internal_blocks),
           mode(online),
           bm(block_manager::get_instance())
     {
-        //fill free_internal_blocks
-        for (int_type i = 0; i < div_ceil(max_internal_memory, sizeof(block_type)); ++i)
-            free_internal_blocks.push(new internal_block_type);
         //todo
     }
 
 protected:
     internal_block_type * get_free_internal_block()
     {
-        if ( ! free_internal_blocks.empty())
+        if (! free_internal_blocks.empty())
         {
-            internal_block_type * free_b = free_internal_blocks.top();
+            internal_block_type * iblock = free_internal_blocks.top();
             free_internal_blocks.pop();
-            return free_b;
+            return iblock;
+        }
+        else if (remaining_internal_blocks > 0)
+        {
+            -- remaining_internal_blocks;
+            return new internal_block_type;
         }
         else
         {
@@ -298,7 +297,7 @@ protected:
         }
     }
 
-    displaceable_swapable_block_priority_type get_block_priority(const SwapableBlockType * sblock) const
+    evictable_block_priority_type get_block_priority(const SwapableBlockType * sblock) const
     {
         //todo
         return 0;
@@ -322,7 +321,7 @@ public:
             {
                 if (! sblock->is_acquired())
                     // not acquired yet -> remove from pq
-                    evictable_blocks.remove(sblock);
+                    evictable_blocks.remove(evictable_block_priority_element_type(get_block_priority(sblock) ,sblock));
             }
             else if (sblock->is_initialized())
             {
@@ -364,9 +363,9 @@ public:
                 -- sblock->reference_count();
                 if (! sblock->is_acquired())
                 {
-                    // dirty or external -> displaceable, put in pq
+                    // dirty or external -> evictable, put in pq
                     if (sblock->dirty() || sblock->is_external())
-                        evictable_blocks.insert(sblock);
+                        evictable_blocks.insert(evictable_block_priority_element_type(get_block_priority(sblock) ,sblock));
                     //else -> uninitialized, release internal block and put it in freelist
                     else
                     {
