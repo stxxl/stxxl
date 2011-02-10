@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -121,6 +122,17 @@ struct cmp_int : std::binary_function<int, int, bool>
     }
 };
 
+template <typename T>
+struct identity : std::unary_function<T, T>
+{
+    typedef T value_type;
+
+    const T & operator () (const T & t)
+    {
+        return t;
+    }
+};
+
 int main()
 {
     input_array_type input;
@@ -157,23 +169,28 @@ int main()
     typedef make_tuple<input_stream_type, counter_stream_type> tuple_stream_type;
     tuple_stream_type tuple_stream(input_stream, counter_stream);
 
+    const stxxl::unsigned_type sorter_memory = 128 * 1024;
 #ifdef USE_FORMRUNS_N_MERGE
     // sort tuples by character
     // 1. form runs
     typedef stxxl::stream::runs_creator<tuple_stream_type, cmp_type, block_size> runs_creator_stream_type;
-    runs_creator_stream_type runs_creator_stream(tuple_stream, cmp_type(), 128 * 1024);
+    runs_creator_stream_type runs_creator_stream(tuple_stream, cmp_type(), sorter_memory);
     // 2. merge runs
-    typedef stxxl::stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type> runs_merger_stream_type;
-    runs_merger_stream_type sorted_stream(runs_creator_stream.result(), cmp_type(), 128 * 1024);
+    typedef stxxl::stream::runs_merger<runs_creator_stream_type::sorted_runs_type, cmp_type> sorted_stream_type;
+    sorted_stream_type sorted_stream(runs_creator_stream.result(), cmp_type(), sorter_memory);
 #else
     // sort tuples by character
     // (combination of the previous two steps in one algorithm: form runs and merge)
     typedef stxxl::stream::sort<tuple_stream_type, cmp_type, block_size> sorted_stream_type;
-    sorted_stream_type sorted_stream(tuple_stream, cmp_type(), 128 * 1024);
+    sorted_stream_type sorted_stream(tuple_stream, cmp_type(), sorter_memory);
 #endif
 
+    typedef stxxl::stream::transform<identity<stxxl::tuple<char, int> >, sorted_stream_type> transformed_stream_type;
+    identity<stxxl::tuple<char, int> > id;
+    transformed_stream_type transformed_stream(id, sorted_stream);
+
     // HERE streaming part ends (materializing)
-    output_array_type::iterator o = stxxl::stream::materialize(sorted_stream, output.begin(), output.end());
+    output_array_type::iterator o = stxxl::stream::materialize(transformed_stream, output.begin(), output.end());
     // or materialize(sorted_stream,output.begin());
     assert(o == output.end());
 
@@ -193,8 +210,9 @@ int main()
 
     std::vector<int> InternalArray(1024 * 1024);
     std::sort(InternalArray.begin(), InternalArray.end(), cmp_int());
+    //convenience function based on streaming
     stxxl::sort<1024 * 1024>(InternalArray.begin(), InternalArray.end(),
-                             cmp_int(), 1024 * 1024 * 10, stxxl::RC());
+                             cmp_int(), 1024 * 1024 * 31, stxxl::RC());
 
     return 0;
 }

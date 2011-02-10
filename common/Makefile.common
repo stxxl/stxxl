@@ -1,6 +1,6 @@
-TESTS			 = test_random test_manyunits
+TESTS			 = test_random test_manyunits test_globals
 TESTS_NON_MSVC		 =
 
-LIB_SRC			 = debug.cpp rand.cpp seed.cpp version.cpp exithandler.cpp verbose.cpp log.cpp
+LIB_SRC			 = rand.cpp seed.cpp version.cpp exithandler.cpp verbose.cpp log.cpp
 
 UTIL_BINARIES		 = stxxl_info

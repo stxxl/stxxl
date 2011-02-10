@@ -4,6 +4,8 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -12,76 +14,85 @@
 
 #include <stxxl/bits/io/syscall_file.h>
 #include <stxxl/bits/io/request_impl_basic.h>
-#include <stxxl/bits/common/debug.h>
+#include <stxxl/bits/io/iostats.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
+#ifdef BOOST_MSVC
+#define lseek _lseeki64
+#endif
 
 void syscall_file::serve(const request * req) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
+    char * buffer = static_cast<char *>(req->get_buffer());
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
-    if (::lseek(file_des, offset, SEEK_SET) < 0)
+    stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
+
+    while (bytes > 0)
     {
-        STXXL_THROW2(io_error,
-                     " this=" << this <<
-                     " call=::lseek(fd,offset,SEEK_SET)" <<
-                     " fd=" << file_des <<
-                     " offset=" << offset <<
-                     " buffer=" << buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << ((type == request::READ) ? "READ" : "WRITE"));
-    }
-    else
-    {
-        stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
         int_type rc;
+        if ((rc = ::lseek(file_des, offset, SEEK_SET) < 0))
+        {
+            STXXL_THROW2(io_error,
+                         " this=" << this <<
+                         " call=::lseek(fd,offset,SEEK_SET)" <<
+                         " fd=" << file_des <<
+                         " offset=" << offset <<
+                         " buffer=" << (void *)buffer <<
+                         " bytes=" << bytes <<
+                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                         " rc= " << rc);
+        }
 
         if (type == request::READ)
         {
-            STXXL_DEBUGMON_DO(io_started(buffer));
-
-            if ((rc = ::read(file_des, buffer, bytes)) < 0)
+            if ((rc = ::read(file_des, buffer, bytes)) <= 0)
             {
                 STXXL_THROW2(io_error,
                              " this=" << this <<
                              " call=::read(fd,buffer,bytes)" <<
                              " fd=" << file_des <<
                              " offset=" << offset <<
-                             " buffer=" << buffer <<
+                             " buffer=" << (void *)buffer <<
                              " bytes=" << bytes <<
-                             " type=" << ((type == request::READ) ? "READ" : "WRITE"));
-            } else if (size_type(rc) != bytes) {
-                STXXL_THROW2(io_error, " partial read: missing " << (bytes - rc) << " out of " << bytes << " bytes");
+                             " type=" << "READ" <<
+                             " rc= " << rc);
             }
+            bytes -= rc;
+            offset += rc;
+            buffer += rc;
 
-            STXXL_DEBUGMON_DO(io_finished(buffer));
+            if (bytes > 0 && offset == this->_size())
+            {
+                // read request extends past end-of-file
+                // fill reminder with zeroes
+                memset(buffer, 0, bytes);
+                bytes = 0;
+            }
         }
         else
         {
-            STXXL_DEBUGMON_DO(io_started(buffer));
-
-            if ((rc = ::write(file_des, buffer, bytes)) < 0)
+            if ((rc = ::write(file_des, buffer, bytes)) <= 0)
             {
                 STXXL_THROW2(io_error,
                              " this=" << this <<
                              " call=::write(fd,buffer,bytes)" <<
                              " fd=" << file_des <<
                              " offset=" << offset <<
-                             " buffer=" << buffer <<
+                             " buffer=" << (void *)buffer <<
                              " bytes=" << bytes <<
-                             " type=" << ((type == request::READ) ? "READ" : "WRITE"));
-            } else if (size_type(rc) != bytes) {
-                STXXL_THROW2(io_error, " partial write: missing " << (bytes - rc) << " out of " << bytes << " bytes");
+                             " type=" << "WRITE" <<
+                             " rc= " << rc);
             }
-
-            STXXL_DEBUGMON_DO(io_finished(buffer));
+            bytes -= rc;
+            offset += rc;
+            buffer += rc;
         }
     }
 }

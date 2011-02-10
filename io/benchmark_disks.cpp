@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2007-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -26,6 +26,7 @@
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 #include <stxxl/timer>
+#include <stxxl/bits/version.h>
 
 
 using stxxl::request_ptr;
@@ -50,8 +51,12 @@ using stxxl::timestamp;
 
 //#define WATCH_TIMES
 
-#define CHECK_AFTER_READ 1
 
+#ifdef BOOST_MSVC
+const char * default_file_type = "wincall";
+#else
+const char * default_file_type = "syscall";
+#endif
 
 #ifdef WATCH_TIMES
 void watch_times(request_ptr reqs[], unsigned n, double * out)
@@ -95,15 +100,23 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 void usage(const char * argv0)
 {
-    std::cout << "Usage: " << argv0 << " offset length [block_size [batch_size]] [nd] [r|w] [--] diskfile..." << std::endl;
+    std::cout << "Usage: " << argv0 << " [options] offset length [block_size [batch_size]] [r|v|w] [--] diskfile..." << std::endl;
+    std::cout <<
+    "Options:\n"
+#ifdef RAW_ACCESS
+    "    --no-direct             open files without O_DIRECT\n"
+#endif
+    "    --sync                  open files with O_SYNC|O_DSYNC|O_RSYNC\n"
+    "    --file-type=syscall|mmap|wincall|boostfd|...    default: " << default_file_type << "\n"
+    "    --resize                resize the file size after opening,\n"
+    "                            needed e.g. for creating mmap files\n"
+    << std::endl;
     std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
     std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
-    std::cout << "     increase 'batch_size' (default 1)" << std::endl;
+    std::cout << "    increase 'batch_size' (default 1)" << std::endl;
     std::cout << "    to submit several I/Os at once and report average rate" << std::endl;
-#ifdef RAW_ACCESS
-    std::cout << "    open mode: includes O_DIRECT unless the 'nd' flag is given" << std::endl;
-#endif
-    std::cout << "    ops: write and reread (default), (r)ead only, (w)rite only" << std::endl;
+    std::cout << "    ops: write, reread and check (default); (R)ead only w/o verification;" << std::endl;
+    std::cout << "         read only with (V)erification; (W)rite only" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     std::cout << "    Memory consumption: block_size * batch_size * num_disks" << std::endl;
     exit(-1);
@@ -119,18 +132,57 @@ inline double throughput(double bytes, double seconds)
 
 int main(int argc, char * argv[])
 {
-    if (argc < 4)
+    bool direct_io = true;
+    bool sync_io = false;
+    bool resize_after_open = false;
+    const char * file_type = default_file_type;
+
+    int arg_curr = 1;
+
+    // FIXME: use something like getopt() instead of reinventing the wheel,
+    // but there is some portability problem ...
+    while (arg_curr < argc) {
+        char * arg = argv[arg_curr];
+        char * arg_opt = strchr(argv[arg_curr], '=');
+        if (arg_opt) {
+            *arg_opt = 0;
+            ++arg_opt;  // skip '='
+        }
+        if (strcmp(arg, "--no-direct") == 0) {
+            direct_io = false;
+        } else if (strcmp(arg, "--sync") == 0) {
+            sync_io = true;
+        } else if (strcmp(arg, "--file-type") == 0) {
+            if (!arg_opt) {
+                ++arg_curr;
+                if (arg_curr < argc)
+                    arg_opt = argv[arg_curr];
+                else
+                    throw std::invalid_argument(std::string("missing argument for ") + arg);
+            }
+            file_type = arg_opt;
+        } else if (strcmp(arg, "--resize") == 0) {
+            resize_after_open = true;
+        } else if (strncmp(arg, "--", 2) == 0) {
+            throw std::invalid_argument(std::string("unknown option ") + arg);
+        } else {
+            // remaining arguments are "old style" command line
+            break;
+        }
+        ++arg_curr;
+    }
+
+    if (argc < arg_curr + 3)
         usage(argv[0]);
 
-    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[1]));
-    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[2]));
+    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[arg_curr]));
+    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[arg_curr + 1]));
     stxxl::int64 endpos = offset + length;
     stxxl::int64 block_size = 0;
     stxxl::int64 batch_size = 0;
 
-    bool do_read = true, do_write = true;
-    bool direct_io = true;
-    int first_disk_arg = 3;
+    bool do_read = true, do_write = true, do_verify = true;
+    int first_disk_arg = arg_curr + 2;
 
     if (first_disk_arg < argc)
         block_size = atoi(argv[first_disk_arg]);
@@ -154,12 +206,17 @@ int main(int argc, char * argv[])
         batch_size = 1;
     }
 
+    // deprecated, use --no-direct instead
     if (first_disk_arg < argc && (strcmp("nd", argv[first_disk_arg]) == 0 || strcmp("ND", argv[first_disk_arg]) == 0)) {
         direct_io = false;
         ++first_disk_arg;
     }
 
     if (first_disk_arg < argc && (strcmp("r", argv[first_disk_arg]) == 0 || strcmp("R", argv[first_disk_arg]) == 0)) {
+        do_write = false;
+        do_verify = false;
+        ++first_disk_arg;
+    } else if (first_disk_arg < argc && (strcmp("v", argv[first_disk_arg]) == 0 || strcmp("V", argv[first_disk_arg]) == 0)) {
         do_write = false;
         ++first_disk_arg;
     } else if (first_disk_arg < argc && (strcmp("w", argv[first_disk_arg]) == 0 || strcmp("W", argv[first_disk_arg]) == 0)) {
@@ -175,6 +232,17 @@ int main(int argc, char * argv[])
 
     if (!(first_disk_arg < argc))
         usage(argv[0]);
+
+    const char * myrev = "$Revision$";
+    const char * myself = strrchr(argv[0], '/');
+    if (!myself || !*(++myself))
+        myself = argv[0];
+    std::cout << "# " << myself << " " << myrev;
+#ifdef STXXL_DIRECT_IO_OFF
+    std::cout << " STXXL_DIRECT_IO_OFF";
+#endif
+    std::cout << std::endl;
+    std::cout << "# " << stxxl::get_version_string() << std::endl;
 
     for (int ii = first_disk_arg; ii < argc; ii++)
     {
@@ -209,12 +277,13 @@ int main(int argc, char * argv[])
             openmode |= file::DIRECT;
 #endif
         }
+        if (sync_io) {
+            openmode |= file::SYNC;
+        }
 
-#ifdef BOOST_MSVC
-        disks[i] = new stxxl::wincall_file(disks_arr[i], openmode, i);
-#else
-        disks[i] = new stxxl::syscall_file(disks_arr[i], openmode, i);
-#endif
+        disks[i] = stxxl::create_file(file_type, disks_arr[i], openmode, i);
+        if (resize_after_open)
+            disks[i]->set_size(endpos);
     }
 
 #ifdef DO_ONLY_READ
@@ -224,20 +293,19 @@ int main(int argc, char * argv[])
     do_read = false;
 #endif
 
-    const char * myrev = "$Revision$";
-    const char * myself = strrchr(argv[0], '/');
-    if (!myself || !*(++myself))
-        myself = argv[0];
-    std::cout << "# " << myself << " " << myrev << std::endl;
     std::cout << "# Step size: "
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
-              << block_size << " bytes)" << std::endl;
+              << block_size << " bytes)"
+              << " file_type=" << file_type
+              << " O_DIRECT=" << (direct_io ? "yes" : "no")
+              << " O_SYNC=" << (sync_io ? "yes" : "no")
+              << std::endl;
     timer t_total(true);
     try {
         while (offset + stxxl::int64(step_size) <= endpos || length == 0)
         {
-            const stxxl::int64 current_step_size = (length == 0) ? step_size : std::min<stxxl::int64>(step_size, endpos - offset);
+            const stxxl::int64 current_step_size = (length == 0) ? stxxl::int64(step_size) : std::min<stxxl::int64>(step_size, endpos - offset);
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
             const unsigned current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
 
@@ -330,7 +398,7 @@ int main(int argc, char * argv[])
             out_stat(begin, end, r_finish_times, ndisks, disks_arr);
 #endif
 
-            if (CHECK_AFTER_READ && do_read) {
+            if (do_read && do_verify) {
                 for (unsigned i = 0; i < ndisks * current_step_size_int; i++)
                 {
                     if (buffer[i] != i)

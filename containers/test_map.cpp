@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cmath>
 #include <stxxl/map>
+#include <stxxl/stats>
 
 typedef unsigned int key_type;
 typedef unsigned int data_type;

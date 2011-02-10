@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/mng/block_alloc.h>
 #include <stxxl/bits/mng/read_write_pool.h>
@@ -28,7 +29,9 @@
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/is_sorted.h>
 
-#if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 40400)
+#if STXXL_PARALLEL
+
+#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 40400)
 #undef STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
 #undef STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
 #undef STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
@@ -37,6 +40,7 @@
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER 0
 #endif
 
+// enable/disable parallel merging for certain cases, for performance tuning
 #ifndef STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_INTERNAL 1
 #endif
@@ -46,6 +50,8 @@
 #ifndef STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER
 #define STXXL_PARALLEL_PQ_MULTIWAY_MERGE_DELETE_BUFFER 1
 #endif
+
+#endif //STXXL_PARALLEL
 
 #if STXXL_PARALLEL && STXXL_PARALLEL_PQ_MULTIWAY_MERGE_EXTERNAL
 #define STXXL_PQ_EXTERNAL_LOSER_TREE 0 // no loser tree for the external sequences

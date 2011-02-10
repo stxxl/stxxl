@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -17,6 +18,7 @@
 #include <iomanip>
 
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/common/utils.h>
 
 #ifndef STXXL_VERBOSE_BLOCK_LIFE_CYCLE
 #define STXXL_VERBOSE_BLOCK_LIFE_CYCLE STXXL_VERBOSE2
@@ -49,7 +51,7 @@ struct BID
 
     bool valid() const
     {
-        return storage;
+        return storage != NULL;
     }
 
     BID(file * s, stxxl::int64 o) : storage(s), offset(o)

@@ -1,1 +1,49 @@
-a { color: #4d6eb1 }
+/* CSS Document */
+/*----General Style----*/
+body {
+    width: 98%;
+    padding: 15px;
+    margin: 0px;
+    background: #fff;
+    color: #000;
+    font-family: arial, sans-serif;
+}
+
+div, ul, img {
+    padding: 0px;
+    margin: 0px;
+}
+
+h1 {
+    padding: 3px;
+    background: #4d6eb1;
+    color: #FFFFFF;
+    font-variant: normal;
+    font-weight: bold;
+    font-size: large;
+    margin: 0px;
+}
+
+h2 {
+    padding: 3px;
+    background: #4d6eb1;
+    color: #FFFFFF;
+    font-variant: normal;
+    font-weight: normal;
+    font-size: medium;
+    margin: 0px;
+}
+
+p {
+    width: 98%;
+    position: relative;
+    padding: 5px;
+    color: #000;
+    font-variant: inherit;
+    margin: 0px;
+}
+
+ul {
+    padding: 7px;
+    margin-left: 15px;
+}

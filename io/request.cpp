@@ -29,13 +29,13 @@ request::request(const completion_handler & on_compl,
     bytes(bytes_),
     type(type_)
 {
-    STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": creation, cnt: " << ref_cnt);
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::(...), ref_cnt=" << ref_cnt);
     file_->add_request_ref();
 }
 
 request::~request()
 {
-    STXXL_VERBOSE3("request " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::~(), ref_cnt=" << ref_cnt);
 }
 
 void request::completed()

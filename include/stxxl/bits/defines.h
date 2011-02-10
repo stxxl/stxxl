@@ -5,7 +5,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -73,5 +73,13 @@
 // affects: programs
 // effect if defined: does not print error messages about possibly inefficient
 //          recursive merging
+
+//#define STXXL_HACK_SINGLE_IO_THREAD
+// default: not defined
+// used in: io/disk_queues.h
+// affects: programs
+// effect if defined: uses only a single I/O thread instead of one per disk
+//          used e.g. by EcoSort which puts input file, output file and
+//          scratch on a single disk (RAID0)
 
 #endif // !STXXL_DEFINES_HEADER

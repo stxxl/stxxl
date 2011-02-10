@@ -66,7 +66,7 @@ class completion_handler
 
 public:
     completion_handler() :
-        sp_impl_(static_cast<completion_handler_impl *>(NULL))
+        sp_impl_(static_cast<completion_handler_impl *>(0))
     { }
 
     completion_handler(const completion_handler & obj) :

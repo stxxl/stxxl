@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -34,11 +34,11 @@ __STXXL_BEGIN_NAMESPACE
 ////////////////////////////////////////////////////////////////////////////
 
 #define STXXL_THROW(exception_type, location, error_message) \
-    { \
+    do { \
         std::ostringstream msg_; \
         msg_ << "Error in " << location << ": " << error_message; \
         throw exception_type(msg_.str()); \
-    }
+    } while (false)
 
 #define STXXL_THROW2(exception_type, error_message) \
     STXXL_THROW(exception_type, "function " << STXXL_PRETTY_FUNCTION_NAME, \

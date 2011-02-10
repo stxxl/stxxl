@@ -16,6 +16,8 @@
 #include <algorithm>
 #include <cassert>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/unused.h>
+#include <stxxl/bits/parallel.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -302,7 +304,8 @@ cleanup(T * b, int_type * bucket, int_type K)
             insertion_sort(c, cEnd);
             break;
         default:
-            std::sort(c, cEnd);
+            potentially_parallel::
+            sort(c, cEnd);
         }
         c = cEnd;
     }
@@ -360,6 +363,7 @@ void classify_block(type * begin, type * end, type_key * & out, int_type * bucke
         out->key = key;
         bucket[ibucket]++;
     }
+    STXXL_UNUSED(K);
 }
 
 __STXXL_END_NAMESPACE

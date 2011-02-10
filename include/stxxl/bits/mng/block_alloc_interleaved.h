@@ -93,7 +93,7 @@ struct interleaved_RC : public interleaved_striping
                 perms[i][j] = j;
 
             random_number<random_uniform_fast> rnd;
-            std::random_shuffle(perms[i].begin(), perms[i].end(), rnd);
+            std::random_shuffle(perms[i].begin(), perms[i].end(), rnd _STXXL_FORCE_SEQUENTIAL);
         }
     }
 

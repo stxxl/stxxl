@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2002-2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -33,8 +33,10 @@
 #include <memory.h>
 #endif
 
+#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/mng/bid.h>
@@ -177,17 +179,7 @@ void block_manager::new_blocks_int(
         if (bl[i])
         {
             disk_bids[i].resize(bl[i]);
-            const stxxl::int64 old_capacity =
-                disk_allocators[i]->get_total_bytes();
-            const stxxl::int64 new_capacity =
-                disk_allocators[i]->new_blocks(disk_bids[i]);
-            if (old_capacity != new_capacity)
-            {
-                // resize the file
-                disk_files[i]->set_size(new_capacity);
-                if (new_capacity != disk_allocators[i]->get_total_bytes())
-                    STXXL_ERRMSG("File resizing failed: actual size " << disk_allocators[i]->get_total_bytes() << " != requested size " << new_capacity);
-            }
+            disk_allocators[i]->new_blocks(disk_bids[i]);
         }
     }
 
@@ -237,6 +229,22 @@ void block_manager::delete_blocks(
 #ifndef STXXL_DEFAULT_BLOCK_SIZE
     #define STXXL_DEFAULT_BLOCK_SIZE(type) (2 * 1024 * 1024) // use traits
 #endif
+
+
+class FileCreator
+{
+public:
+    _STXXL_DEPRECATED(
+    static file * create(const std::string & io_impl,
+                         const std::string & filename,
+                         int options,
+                         int queue_id = file::DEFAULT_QUEUE,
+                         int allocator_id = file::NO_ALLOCATOR)
+    )
+    {
+        return create_file(io_impl, filename, options, queue_id, allocator_id);
+    }
+};
 
 //! \}
 

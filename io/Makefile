@@ -12,7 +12,7 @@ mmap_file.$(OBJEXT) simdisk_file.$(OBJEXT) boostfd_file.$(OBJEXT) mem_file.$(OBJ
 fileperblock_file.$(OBJEXT) request.$(OBJEXT) request_waiters_impl_basic.$(OBJEXT) \
 request_state_impl_basic.$(OBJEXT) request_impl_basic.$(OBJEXT) \
 disk_queued_file.$(OBJEXT) request_queue_impl_qwqr.$(OBJEXT) request_queue_impl_1q.$(OBJEXT) \
-request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT)
+request_queue_impl_worker.$(OBJEXT) wbtl_file.$(OBJEXT) create_file.$(OBJEXT)
 
 
 
@@ -73,6 +73,9 @@ request_queue_impl_1q.$(OBJEXT): request_queue_impl_1q.cpp
 request_queue_impl_worker.$(OBJEXT): request_queue_impl_worker.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_queue_impl_worker.cpp
 
+create_file.$(OBJEXT): create_file.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c create_file.cpp
+
 
 DEPENDENCIES = $(COMMON_FILES) $(IO_LAYER_FILES)
 
@@ -81,6 +84,11 @@ test_io: test_io.$(EXEEXT)
 test_io.$(EXEEXT): test_io.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_io.cpp
 	$(LINKER) test_io.$(OBJEXT) $(OUT)test_io.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
+test_io_sizes: test_io_sizes.$(EXEEXT)
+test_io_sizes.$(EXEEXT): test_io_sizes.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_io_sizes.cpp
+	$(LINKER) test_io_sizes.$(OBJEXT) $(OUT)test_io_sizes.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_cancel: test_cancel.$(EXEEXT)
 test_cancel.$(EXEEXT): test_cancel.cpp $(DEPENDENCIES)

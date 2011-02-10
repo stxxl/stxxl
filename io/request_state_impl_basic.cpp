@@ -20,7 +20,7 @@ __STXXL_BEGIN_NAMESPACE
 
 request_state_impl_basic::~request_state_impl_basic()
 {
-    STXXL_VERBOSE3("request_state_impl_basic " << static_cast<void *>(this) << ": deletion, cnt: " << ref_cnt);
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_state_impl_basic::~(), ref_cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 
@@ -33,7 +33,7 @@ request_state_impl_basic::~request_state_impl_basic()
 
 void request_state_impl_basic::wait(bool measure_time)
 {
-    STXXL_VERBOSE3("request_state_impl_basic " << static_cast<void *>(this) << ": wait ");
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_state_impl_basic::wait()");
 
     stats::scoped_wait_timer wait_timer(get_type() == READ ? stats::WAIT_OP_READ : stats::WAIT_OP_WRITE, measure_time);
 
@@ -44,7 +44,7 @@ void request_state_impl_basic::wait(bool measure_time)
 
 bool request_state_impl_basic::cancel()
 {
-    STXXL_VERBOSE3("request_state_impl_basic " << this << ": cancel " << file_ << " " << buffer << " " << offset);
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_state_impl_basic::cancel() " << file_ << " " << buffer << " " << offset);
 
     if (file_)
     {

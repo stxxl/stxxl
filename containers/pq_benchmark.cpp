@@ -20,6 +20,8 @@
 
 #include <limits>
 #include <stxxl/priority_queue>
+#include <stxxl/stats>
+#include <stxxl/timer>
 
 #define TOTAL_PQ_MEM_SIZE    (768 * 1024 * 1024)
 

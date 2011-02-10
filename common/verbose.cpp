@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -17,6 +17,15 @@
 #include <stxxl/bits/common/log.h>
 #include <stxxl/bits/common/timer.h>
 #include <stxxl/bits/msvc_compatibility.h>
+
+
+#ifndef STXXL_THREAD_ID
+# ifdef BOOST_MSVC
+#  define STXXL_THREAD_ID (-1)
+# else
+#  define STXXL_THREAD_ID pthread_self()
+# endif
+#endif
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -45,6 +54,11 @@ void print_msg(const char * label, const std::string & msg, unsigned flags)
         s += '[';
         s += label;
         s += "] ";
+    }
+    if (flags & _STXXL_PRNT_THREAD_ID) {
+        char tstr[32];
+        snprintf(tstr, sizeof(tstr), "[T%ld] ", long(STXXL_THREAD_ID));
+        s += tstr;
     }
     s += msg;
     if (flags & _STXXL_PRNT_ADDNEWLINE)

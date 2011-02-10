@@ -87,9 +87,9 @@ void request_queue_impl_qwqr::add_request(request_ptr & req)
 bool request_queue_impl_qwqr::cancel_request(request_ptr & req)
 {
     if (req.empty())
-        STXXL_THROW_INVALID_ARGUMENT("Empty request cancelled disk_queue.");
+        STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
     if (_thread_state() != RUNNING)
-        STXXL_THROW_INVALID_ARGUMENT("Request cancelled to not running queue.");
+        STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
 
     bool was_still_in_queue = false;
     if (req.get()->get_type() == request::READ)

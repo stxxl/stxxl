@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,7 +16,6 @@
 
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/common/aligned_alloc.h>
-#include <stxxl/bits/common/debug.h>
 #include <stxxl/bits/mng/bid.h>
 
 #ifndef STXXL_VERBOSE_TYPED_BLOCK
@@ -295,13 +294,10 @@ public:
         #ifdef STXXL_VALGRIND_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
         #endif
-        // FIXME: these STXXL_DEBUGMON_DO calls do not look sane w.r.t. meta_info_size != 0
         char * tmp = (char *)result;
-        STXXL_DEBUGMON_DO(block_allocated(tmp, tmp + bytes, RawSize_));
         tmp += RawSize_;
         while (tmp < ((char *)result) + bytes)
         {
-            STXXL_DEBUGMON_DO(block_allocated(tmp, ((char *)result) + bytes, RawSize_));
             tmp += RawSize_;
         }
         return result;
@@ -316,13 +312,10 @@ public:
         #ifdef STXXL_VALGRIND_TYPED_BLOCK_INITIALIZE_ZERO
         memset(result, 0, bytes);
         #endif
-        // FIXME: these STXXL_DEBUGMON_DO calls do not look sane w.r.t. meta_info_size != 0
         char * tmp = (char *)result;
-        STXXL_DEBUGMON_DO(block_allocated(tmp, tmp + bytes, RawSize_));
         tmp += RawSize_;
         while (tmp < ((char *)result) + bytes)
         {
-            STXXL_DEBUGMON_DO(block_allocated(tmp, ((char *)result) + bytes, RawSize_));
             tmp += RawSize_;
         }
         return result;
@@ -335,13 +328,11 @@ public:
 
     static void operator delete (void * ptr)
     {
-        STXXL_DEBUGMON_DO(block_deallocated(ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 
     static void operator delete[] (void * ptr)
     {
-        STXXL_DEBUGMON_DO(block_deallocated(ptr));
         aligned_dealloc<BLOCK_ALIGN>(ptr);
     }
 

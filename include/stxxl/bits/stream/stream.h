@@ -4,6 +4,8 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2003-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -588,6 +590,21 @@ namespace stream
         out.flush();
 
         return out;
+    }
+
+
+    //! \brief Reads stream content and discards it.
+    //! Useful where you do not need the processed stream anymore,
+    //! but are just interested in side effects, or just for debugging.
+    //! \param in input stream
+    template <class StreamAlgorithm_>
+    void discard(StreamAlgorithm_ & in)
+    {
+        while (!in.empty())
+        {
+            *in;
+            ++in;
+        }
     }
 
 

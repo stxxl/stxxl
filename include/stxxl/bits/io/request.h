@@ -20,6 +20,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/common/types.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/switch.h>
@@ -70,7 +71,7 @@ public:
 
     //! \brief Cancel request
     //! The request is cancelled unless already being processed.
-    //! However, cancellation cannot be guaranteed.
+    //! However, cancelation cannot be guaranteed.
     //! Cancelled requests must still be waited for in order to ensure correct
     //! operation.
     //! \return \c true iff the request was cancelled successfully
@@ -175,7 +176,7 @@ private:
     {
         scoped_mutex_lock Lock(ref_cnt_mutex);
         ref_cnt++;
-        STXXL_VERBOSE3("request add_ref() " << static_cast<void *>(this) << ": adding reference, cnt: " << ref_cnt);
+        STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::add_ref(): added reference, ref_cnt=" << ref_cnt);
     }
 
     bool sub_ref()
@@ -184,7 +185,7 @@ private:
         {
             scoped_mutex_lock Lock(ref_cnt_mutex);
             val = --ref_cnt;
-            STXXL_VERBOSE3("request sub_ref() " << static_cast<void *>(this) << ": subtracting reference cnt: " << ref_cnt);
+            STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::sub_ref(): subtracted reference, ref_cnt=" << ref_cnt);
         }
         assert(val >= 0);
         return (val == 0);
@@ -208,6 +209,8 @@ inline std::ostream & operator << (std::ostream & out, const request & req)
 
 //! \brief A smart wrapper for \c request pointer.
 
+#define STXXL_VERBOSE_request_ptr(msg) STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_ptr::" << msg << " ptr=" << static_cast<void *>(ptr))
+
 //! Implemented as reference counting smart pointer.
 class request_ptr
 {
@@ -225,13 +228,13 @@ class request_ptr
         {
             if (ptr->sub_ref())
             {
-                STXXL_VERBOSE3("the last copy " << static_cast<void *>(ptr) << " this=" << static_cast<void *>(this));
+                STXXL_VERBOSE_request_ptr("sub_ref(): the last ref, deleting");
                 delete ptr;
                 ptr = NULL;
             }
             else
             {
-                STXXL_VERBOSE3("more copies " << static_cast<void *>(ptr) << " this=" << static_cast<void *>(this));
+                STXXL_VERBOSE_request_ptr("sub_ref(): more refs left");
             }
         }
     }
@@ -240,19 +243,19 @@ public:
     //! \brief Constructs an \c request_ptr from \c request pointer
     request_ptr(request * ptr_ = NULL) : ptr(ptr_)
     {
-        STXXL_VERBOSE3("create constructor (request =" << static_cast<void *>(ptr) << ") this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("(request*)");
         add_ref();
     }
     //! \brief Constructs an \c request_ptr from a \c request_ptr object
     request_ptr(const request_ptr & p) : ptr(p.ptr)
     {
-        STXXL_VERBOSE3("copy constructor (copying " << static_cast<void *>(ptr) << ") this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("(request_ptr&)");
         add_ref();
     }
     //! \brief Destructor
     ~request_ptr()
     {
-        STXXL_VERBOSE3("Destructor of a request_ptr pointing to " << static_cast<void *>(ptr) << " this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("~()");
         sub_ref();
     }
     //! \brief Assignment operator from \c request_ptr object
@@ -266,14 +269,14 @@ public:
     //! \return reference to itself
     request_ptr & operator = (request * p)
     {
-        STXXL_VERBOSE3("assign operator begin (assigning " << static_cast<void *>(p) << ") this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("operator=(request=" << static_cast<void *>(p) << ") {BEGIN}");
         if (p != ptr)
         {
             sub_ref();
             ptr = p;
             add_ref();
         }
-        STXXL_VERBOSE3("assign operator end (assigning " << static_cast<void *>(p) << ") this=" << static_cast<void *>(this));
+        STXXL_VERBOSE_request_ptr("operator=(request=" << static_cast<void *>(p) << ") {END}");
         return *this;
     }
     //! \brief "Star" operator
@@ -303,10 +306,10 @@ public:
     request * get() const { return ptr; }
 
     //! \brief Returns true if object is initialized
-    bool valid() const { return ptr; }
+    bool valid() const { return ptr != NULL; }
 
     //! \brief Returns true if object is not initialized
-    bool empty() const { return !ptr; }
+    bool empty() const { return ptr == NULL; }
 };
 
 //! \brief Collection of functions to track statuses of a number of requests
@@ -331,24 +334,24 @@ inline void wait_all(request_ptr req_array[], int count)
 }
 
 //! \brief Cancel requests
-//! The specified requests are cancelled unless already being processed.
-//! However, cancellation cannot be guaranteed.
+//! The specified requests are canceled unless already being processed.
+//! However, cancelation cannot be guaranteed.
 //! Cancelled requests must still be waited for in order to ensure correct
 //! operation.
 //! \param reqs_begin begin of request sequence
 //! \param reqs_end end of request sequence
-//! \return number of request cancelled
+//! \return number of request canceled
 template <class request_iterator_>
 typename std::iterator_traits<request_iterator_>::difference_type cancel_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 {
-    typename std::iterator_traits<request_iterator_>::difference_type num_cancelled = 0;
+    typename std::iterator_traits<request_iterator_>::difference_type num_canceled = 0;
     while (reqs_begin != reqs_end)
     {
         if ((request_ptr(*reqs_begin))->cancel())
-            ++num_cancelled;
+            ++num_canceled;
         ++reqs_begin;
     }
-    return num_cancelled;
+    return num_canceled;
 }
 
 //! \brief Polls requests

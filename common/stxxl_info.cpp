@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright © 2007 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
+ *  Copyright © 2007, 2010 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -19,10 +19,13 @@ int main(int argc, char **)
     stxxl::block_manager::get_instance();
     stxxl::stats::get_instance();
     stxxl::disk_queues::get_instance();
+#ifdef STXXL_PARALLEL_MODE
 #ifdef _GLIBCXX_PARALLEL
     STXXL_MSG("_GLIBCXX_PARALLEL, max threads = " << omp_get_max_threads());
+#else
+    STXXL_MSG("STXXL_PARALLEL_MODE, max threads = " << omp_get_max_threads());
 #endif
-#ifdef __MCSTL__
+#elif defined(__MCSTL__)
     STXXL_MSG("__MCSTL__, max threads = " << omp_get_max_threads());
 #endif
     STXXL_MSG("sizeof(unsigned int)   = " << sizeof(unsigned int));

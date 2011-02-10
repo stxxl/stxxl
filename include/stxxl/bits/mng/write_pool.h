@@ -20,6 +20,7 @@
 #endif
 
 #include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request.h>
 
 

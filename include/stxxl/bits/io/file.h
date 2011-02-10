@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -68,6 +68,7 @@
 
 #include <cassert>
 
+#include <stxxl/bits/libstxxl.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/exceptions.h>
@@ -112,28 +113,30 @@ public:
         RDWR = 4,                           //!< read and write of the file are allowed
         CREAT = 8,                          //!< in case file does not exist no error occurs and file is newly created
         DIRECT = 16,                        //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O
-        TRUNC = 32                          //!< once file is opened its length becomes zero
+        TRUNC = 32,                         //!< once file is opened its length becomes zero
+        SYNC = 64,                          //!< open the file with O_SYNC | O_DSYNC | O_RSYNC flags set
+        NO_LOCK = 128,                      //!< do not aquire an exclusive lock by default
     };
 
     static const int DEFAULT_QUEUE = -1;
     static const int NO_QUEUE = -2;
     static const int NO_ALLOCATOR = -1;
 
-    //! \brief Schedules asynchronous read request to the file
+    //! \brief Schedules an asynchronous read request to the file
     //! \param buffer pointer to memory buffer to read into
-    //! \param pos starting file position to read
+    //! \param pos file position to start read from
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
-    //! \return \c request_ptr object, that can be used to track the status of the operation
+    //! \return \c request_ptr request object, which can be used to track the status of the operation
     virtual request_ptr aread(void * buffer, offset_type pos, size_type bytes,
                               const completion_handler & on_cmpl) = 0;
 
-    //! \brief Schedules asynchronous write request to the file
+    //! \brief Schedules an asynchronous write request to the file
     //! \param buffer pointer to memory buffer to write from
     //! \param pos starting file position to write
     //! \param bytes number of bytes to transfer
     //! \param on_cmpl I/O completion handler
-    //! \return \c request_ptr object, that can be used to track the status of the operation
+    //! \return \c request_ptr request object, which can be used to track the status of the operation
     virtual request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
                                const completion_handler & on_cmpl) = 0;
 
@@ -159,18 +162,17 @@ public:
     }
 
     //! \brief Changes the size of the file
-    //! \param newsize value of the new file size
+    //! \param newsize new file size
     virtual void set_size(offset_type newsize) = 0;
     //! \brief Returns size of the file
     //! \return file size in bytes
     virtual offset_type size() = 0;
     //! \brief Returns the identifier of the file's queue
     //! \remark Files allocated on the same physical device usually share the same queue
-    //! \return integer identifier
+    //! \return queue number
     virtual int get_queue_id() const = 0;
     //! \brief Returns the file's allocator
-    //! \remark Files allocated on the same physical device usually share the same queue
-    //! \return integer identifier
+    //! \return allocator number
     virtual int get_allocator_id() const = 0;
 
     virtual int get_physical_device_id() const
@@ -181,7 +183,8 @@ public:
     //! \brief Locks file for reading and writing (acquires a lock in the file system)
     virtual void lock() = 0;
 
-    //! \brief Some specialized file types may need to know freed regions
+    //! \brief Discard a region of the file (mark it unused)
+    //! some specialized file types may need to know freed regions
     virtual void discard(offset_type offset, offset_type size)
     {
         STXXL_UNUSED(offset);

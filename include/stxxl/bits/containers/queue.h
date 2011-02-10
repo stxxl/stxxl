@@ -17,6 +17,7 @@
 #include <queue>
 #include <deque>
 
+#include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/common/simple_vector.h>
@@ -149,8 +150,8 @@ private:
         }
 
         front_block = back_block = pool->steal();
-        back_element = back_block->elem - 1;
-        front_element = back_block->elem;
+        back_element = back_block->begin() - 1;
+        front_element = back_block->begin();
         set_prefetch_aggr(blocks2prefetch_);
     }
 
@@ -176,7 +177,7 @@ public:
     //! \brief Adds an element in the queue
     void push(const value_type & val)
     {
-        if (back_element == back_block->elem + (block_type::size - 1))
+        if (back_element == back_block->begin() + (block_type::size - 1))
         {
             // back block is filled
             if (front_block == back_block)
@@ -203,7 +204,7 @@ public:
             }
             back_block = pool->steal();
 
-            back_element = back_block->elem;
+            back_element = back_block->begin();
             *back_element = val;
             ++size_;
             return;
@@ -218,7 +219,7 @@ public:
     {
         assert(!empty());
 
-        if (front_element == front_block->elem + (block_type::size - 1))
+        if (front_element == front_block->begin() + (block_type::size - 1))
         {
             // if there is only one block, it implies ...
             if (back_block == front_block)
@@ -228,8 +229,8 @@ public:
                 assert(back_element == front_element);
                 assert(bids.empty());
                 // reset everything
-                back_element = back_block->elem - 1;
-                front_element = back_block->elem;
+                back_element = back_block->begin() - 1;
+                front_element = back_block->begin();
                 size_ = 0;
                 return;
             }
@@ -242,7 +243,7 @@ public:
                 // the back_block is the next block
                 pool->add(front_block);
                 front_block = back_block;
-                front_element = back_block->elem;
+                front_element = back_block->begin();
                 return;
             }
             STXXL_VERBOSE1("queue::pop Case 5");
@@ -258,7 +259,7 @@ public:
                 pool->hint(bids[i + 1]);
             }
 
-            front_element = front_block->elem;
+            front_element = front_block->begin();
             req->wait();
 
             bm->delete_block(bids.front());

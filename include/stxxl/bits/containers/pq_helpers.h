@@ -124,7 +124,8 @@ namespace priority_queue_local
          */
         void sort_to(value_type * target)
         {
-            std::sort(heap.begin(), heap.begin() + current_size, comp);
+            potentially_parallel::
+            sort(heap.begin(), heap.begin() + current_size, comp);
             std::reverse_copy(heap.begin(), heap.begin() + current_size, target);
         }
 

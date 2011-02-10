@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002, 2005, 2008 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Ilja Andronov <sni4ok@yandex.ru>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -36,27 +37,44 @@ ufs_file_base::ufs_file_base(
 {
     int flags = 0;
 
-#ifndef STXXL_DIRECT_IO_OFF
- #ifndef BOOST_MSVC
-    if (mode & DIRECT)
-        flags |= O_SYNC | O_RSYNC | O_DSYNC | O_DIRECT;
- #endif
-#endif
-
     if (mode & RDONLY)
+    {
         flags |= O_RDONLY;
+    }
 
     if (mode & WRONLY)
+    {
         flags |= O_WRONLY;
+    }
 
     if (mode & RDWR)
+    {
         flags |= O_RDWR;
+    }
 
     if (mode & CREAT)
+    {
         flags |= O_CREAT;
+    }
 
     if (mode & TRUNC)
+    {
         flags |= O_TRUNC;
+    }
+
+#ifndef STXXL_DIRECT_IO_OFF
+    if (mode & DIRECT)
+    {
+        flags |= O_DIRECT;
+    }
+#endif
+
+    if (mode & SYNC)
+    {
+        flags |= O_RSYNC;
+        flags |= O_DSYNC;
+        flags |= O_SYNC;
+    }
 
 #ifdef BOOST_MSVC
     flags |= O_BINARY;                     // the default in MS is TEXT mode
@@ -70,6 +88,11 @@ ufs_file_base::ufs_file_base(
 
     if ((file_des = ::open(filename.c_str(), flags, perms)) < 0)
         STXXL_THROW2(io_error, "::open() Filedescriptor=" << file_des << " filename=" << filename << " flags=" << flags);
+
+    if (!(mode & NO_LOCK))
+    {
+        lock();
+    }
 }
 
 ufs_file_base::~ufs_file_base()
@@ -79,17 +102,15 @@ ufs_file_base::~ufs_file_base()
 
 void ufs_file_base::close()
 {
-    if (file_des != -1)
-    {
-        scoped_mutex_lock fd_lock(fd_mutex);
-        int res = ::close(file_des);
+    scoped_mutex_lock fd_lock(fd_mutex);
 
-        // if successful, reset file descriptor
-        if (res >= 0)
-            file_des = -1;
-        else
-            stxxl_function_error(io_error);
-    }
+    if (file_des == -1)
+        return;
+
+    if (::close(file_des) < 0)
+        stxxl_function_error(io_error);
+
+    file_des = -1;
 }
 
 void ufs_file_base::lock()
@@ -99,7 +120,7 @@ void ufs_file_base::lock()
 #else
     scoped_mutex_lock fd_lock(fd_mutex);
     struct flock lock_struct;
-    lock_struct.l_type = F_RDLCK | F_WRLCK;
+    lock_struct.l_type = (mode_ & RDONLY) ? F_RDLCK : F_RDLCK | F_WRLCK;
     lock_struct.l_whence = SEEK_SET;
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
@@ -110,8 +131,13 @@ void ufs_file_base::lock()
 
 file::offset_type ufs_file_base::_size()
 {
+#ifdef BOOST_MSVC
+    struct _stat64 st;
+    stxxl_check_ge_0(_fstat64(file_des, &st), io_error);
+#else
     struct stat st;
     stxxl_check_ge_0(::fstat(file_des, &st), io_error);
+#endif
     return st.st_size;
 }
 

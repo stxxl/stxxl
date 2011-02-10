@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2003-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -55,6 +56,7 @@ namespace stream
             ++input;
             while (!input.empty() && (binary_pred(current = *input, old_value)))
                 ++input;
+            return *this;
         }
 
         //! \brief Standard stream method
@@ -102,10 +104,11 @@ namespace stream
             ++input;
             while (!input.empty() && ((current = *input) == old_value))
                 ++input;
+            return *this;
         }
 
         //! \brief Standard stream method
-        value_type & operator * () const
+        const value_type & operator * () const
         {
             return current;
         }

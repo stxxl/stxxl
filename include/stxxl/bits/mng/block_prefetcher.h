@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,6 +19,7 @@
 
 #include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/iostats.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -29,10 +31,18 @@ __STXXL_BEGIN_NAMESPACE
 class set_switch_handler
 {
     onoff_switch & switch_;
+    completion_handler on_compl;
 
 public:
-    set_switch_handler(onoff_switch & switch__) : switch_(switch__) { }
-    void operator () (request * /*req*/) { switch_.on(); }
+    set_switch_handler(onoff_switch & switch__, const completion_handler & on_compl)
+        : switch_(switch__), on_compl(on_compl)
+    { }
+
+    void operator () (request * req)
+    {
+        on_compl(req);  //call before setting switch to on, otherwise, user has no way to wait for the completion handler to be executed
+        switch_.on();
+    }
 };
 
 //! \brief Encapsulates asynchronous prefetching engine
@@ -44,9 +54,6 @@ class block_prefetcher
 {
     block_prefetcher() { }
     typedef typename block_type::bid_type bid_type;
-
-public:
-    typedef void (*callback_type)(const bid_type &);
 
 protected:
     bid_iterator_type consume_seq_begin;
@@ -67,7 +74,7 @@ protected:
     onoff_switch * completed;
     int_type * pref_buffer;
 
-    callback_type do_after_fetch;
+    completion_handler do_after_fetch;
 
     block_type * wait(int_type iblock)
     {
@@ -81,8 +88,6 @@ protected:
         int_type ibuffer = pref_buffer[iblock];
         STXXL_VERBOSE1("block_prefetcher: returning buffer " << ibuffer);
         assert(ibuffer >= 0 && ibuffer < nreadblocks);
-        if (do_after_fetch)
-            do_after_fetch(read_bids[ibuffer]);
         return (read_buffers + ibuffer);
     }
 
@@ -98,7 +103,7 @@ public:
         bid_iterator_type _cons_end,
         int_type * _pref_seq,
         int_type _prefetch_buf_size,
-        callback_type do_after_fetch = NULL
+        completion_handler do_after_fetch = default_completion_handler()
         ) :
         consume_seq_begin(_cons_begin),
         consume_seq_end(_cons_end),
@@ -134,7 +139,7 @@ public:
                            " @ " << read_bids[i]);
             read_reqs[i] = read_buffers[i].read(
                 read_bids[i],
-                set_switch_handler(*(completed + prefetch_seq[i])));
+                set_switch_handler(*(completed + prefetch_seq[i]), do_after_fetch));
             pref_buffer[prefetch_seq[i]] = i;
         }
     }
@@ -172,7 +177,7 @@ public:
             read_bids[ibuffer] = *(consume_seq_begin + next_2_prefetch);
             read_reqs[ibuffer] = read_buffers[ibuffer].read(
                 read_bids[ibuffer],
-                set_switch_handler(*(completed + next_2_prefetch))
+                set_switch_handler(*(completed + next_2_prefetch), do_after_fetch)
                 );
         }
 

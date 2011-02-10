@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -132,9 +132,10 @@ namespace sort_local
             for (i = 0; i < run_size; ++i)
                 bm->delete_block(bids1[i]);
 
-            std::sort(make_element_iterator(Blocks1, 0),
-                      make_element_iterator(Blocks1, run_size * block_type::size),
-                      cmp);
+            potentially_parallel::
+            sort(make_element_iterator(Blocks1, 0),
+                 make_element_iterator(Blocks1, run_size * block_type::size),
+                 cmp);
 
             STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
             if (k > 0)
@@ -170,9 +171,10 @@ namespace sort_local
         for (i = 0; i < run_size; ++i)
             bm->delete_block(bids1[i]);
 
-        std::sort(make_element_iterator(Blocks1, 0),
-                  make_element_iterator(Blocks1, run_size * block_type::size),
-                  cmp);
+        potentially_parallel::
+        sort(make_element_iterator(Blocks1, 0),
+             make_element_iterator(Blocks1, run_size * block_type::size),
+             cmp);
 
         STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
         wait_all(write_reqs, m2);

@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -15,25 +15,31 @@
 
 
 #undef STXXL_PARALLEL
-#if defined(_GLIBCXX_PARALLEL) && defined (__MCSTL__)
-#error Both _GLIBCXX_PARALLEL and __MCSTL__ are defined
+#undef STXXL_PARALLEL_MODE
+
+#if defined(_GLIBCXX_PARALLEL) || defined (STXXL_PARALLEL_MODE_EXPLICIT)
+#define STXXL_PARALLEL_MODE
 #endif
-#if defined(_GLIBCXX_PARALLEL) || defined (__MCSTL__)
+
+#if defined(PARALLEL_MODE) && defined (__MCSTL__)
+#error (_GLIBCXX_PARALLEL or STXXL_PARALLEL_MODE_EXPLICIT) and __MCSTL__ are defined
+#endif
+#if defined(STXXL_PARALLEL_MODE) || defined (__MCSTL__)
 #define STXXL_PARALLEL 1
 #else
 #define STXXL_PARALLEL 0
 #endif
 
-
 #include <cassert>
 
-#ifdef _GLIBCXX_PARALLEL
+#ifdef STXXL_PARALLEL_MODE
  #include <omp.h>
 #endif
 
 #ifdef __MCSTL__
  #include <mcstl.h>
  #include <bits/mcstl_multiway_merge.h>
+ #include <stxxl/bits/compat_type_traits.h>
 #endif
 
 #if STXXL_PARALLEL
@@ -45,6 +51,7 @@
 
 
 #if defined(_GLIBCXX_PARALLEL)
+//use _STXXL_FORCE_SEQUENTIAL to tag calls which are not worthwhile parallelizing
 #define _STXXL_FORCE_SEQUENTIAL , __gnu_parallel::sequential_tag()
 #elif defined(__MCSTL__)
 #define _STXXL_FORCE_SEQUENTIAL , mcstl::sequential_tag()
@@ -65,7 +72,7 @@
 #define STXXL_PARALLEL_MULTIWAY_MERGE 0
 #endif
 
-#if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 40400)
+#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 40400)
 #undef STXXL_PARALLEL_MULTIWAY_MERGE
 #define STXXL_PARALLEL_MULTIWAY_MERGE 0
 #endif
@@ -78,12 +85,18 @@
 #define STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD 0
 #endif
 
+#ifdef STXXL_PARALLEL_MODE_EXPLICIT
+#include <parallel/algorithm>
+#else
+#include <algorithm>
+#endif
+
 
 __STXXL_BEGIN_NAMESPACE
 
 inline unsigned sort_memory_usage_factor()
 {
-#if STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD && defined(_GLIBCXX_PARALLEL)
+#if STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD && defined(STXXL_PARALLEL_MODE)
     return (__gnu_parallel::_Settings::get().sort_algorithm == __gnu_parallel::MWMS && omp_get_max_threads() > 1) ? 2 : 1;   //memory overhead for multiway mergesort
 #elif STXXL_PARALLEL && !STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD && defined(__MCSTL__)
     return (mcstl::SETTINGS::sort_algorithm == mcstl::SETTINGS::MWMS && mcstl::SETTINGS::num_threads > 1) ? 2 : 1;           //memory overhead for multiway mergesort
@@ -94,7 +107,7 @@ inline unsigned sort_memory_usage_factor()
 
 inline bool do_parallel_merge()
 {
-#if STXXL_PARALLEL_MULTIWAY_MERGE && defined(_GLIBCXX_PARALLEL)
+#if STXXL_PARALLEL_MULTIWAY_MERGE && defined(STXXL_PARALLEL_MODE)
     return !stxxl::SETTINGS::native_merge && omp_get_max_threads() >= 1;
 #elif STXXL_PARALLEL_MULTIWAY_MERGE && defined(__MCSTL__)
     return !stxxl::SETTINGS::native_merge && mcstl::SETTINGS::num_threads >= 1;
@@ -103,6 +116,17 @@ inline bool do_parallel_merge()
 #endif
 }
 
+
+namespace potentially_parallel
+{
+#ifdef STXXL_PARALLEL_MODE_EXPLICIT
+    using __gnu_parallel::sort;
+    using __gnu_parallel::random_shuffle;
+#else
+    using std::sort;
+    using std::random_shuffle;
+#endif
+}
 
 namespace parallel
 {
@@ -124,12 +148,13 @@ namespace parallel
                    Comparator comp,
                    DiffType length)
     {
-#if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
+#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
         return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, length, comp);
-#elif defined(_GLIBCXX_PARALLEL)
+#elif defined(STXXL_PARALLEL_MODE)
         return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-        return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, length, false);
+        typedef typename make_signed<DiffType>::type difference_type;
+        return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, difference_type(length), false);
 #else
 #error "no implementation found for multiway_merge()"
 #endif
@@ -152,12 +177,13 @@ namespace parallel
                             Comparator comp,
                             DiffType length)
     {
-#if defined(_GLIBCXX_PARALLEL) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
+#if defined(STXXL_PARALLEL_MODE) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
         return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, length, comp);
-#elif defined(_GLIBCXX_PARALLEL)
+#elif defined(STXXL_PARALLEL_MODE)
         return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-        return mcstl::multiway_merge_sentinel(seqs_begin, seqs_end, target, comp, length, false);
+        typedef typename make_signed<DiffType>::type difference_type;
+        return mcstl::multiway_merge_sentinel(seqs_begin, seqs_end, target, comp, difference_type(length), false);
 #else
 #error "no implementation found for multiway_merge_sentinel()"
 #endif

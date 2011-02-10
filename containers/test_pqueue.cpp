@@ -16,6 +16,7 @@
 
 #include <limits>
 #include <stxxl/priority_queue>
+#include <stxxl/timer>
 
 #define RECORD_SIZE 128
 

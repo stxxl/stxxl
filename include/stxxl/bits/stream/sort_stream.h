@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2002-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -103,9 +103,10 @@ namespace stream
         //! \brief Sort a specific run, contained in a sequences of blocks.
         void sort_run(block_type * run, unsigned_type elements)
         {
-            std::sort(make_element_iterator(run, 0),
-                      make_element_iterator(run, elements),
-                      cmp);
+            potentially_parallel::
+            sort(make_element_iterator(run, 0),
+                 make_element_iterator(run, elements),
+                 cmp);
         }
 
         void compute_result();
@@ -175,7 +176,8 @@ namespace stream
         {
             STXXL_VERBOSE1("basic_runs_creator: Small input optimization, input length: " << blocks1_length);
             result_.elements = blocks1_length;
-            std::sort(result_.small_.begin(), result_.small_.end(), cmp);
+            potentially_parallel::
+            sort(result_.small_.begin(), result_.small_.end(), cmp);
             return;
         }
 #endif //STXXL_SMALL_INPUT_PSORT_OPT
@@ -436,9 +438,10 @@ namespace stream
 
         void sort_run(block_type * run, unsigned_type elements)
         {
-            std::sort(make_element_iterator(run, 0),
-                      make_element_iterator(run, elements),
-                      cmp);
+            potentially_parallel::
+            sort(make_element_iterator(run, 0),
+                 make_element_iterator(run, elements),
+                 cmp);
         }
 
         void compute_result()
@@ -1156,7 +1159,7 @@ namespace stream
                     fill_current_block();
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-                    assert(stxxl::is_sorted(current_block->elem, current_block->elem + current_block->size, cmp));
+                    assert(stxxl::is_sorted(current_block->elem, current_block->elem + STXXL_MIN<size_type>(elements_remaining, current_block->size), cmp));
                     assert(!cmp(current_block->elem[0], current_value));
 #endif //STXXL_CHECK_ORDER_IN_SORTS
                     current_value = current_block->elem[0];
@@ -1351,8 +1354,7 @@ namespace stream
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(const sorted_runs_type & r, value_cmp c, unsigned_type memory_to_use) :
             base(r, c, memory_to_use)
-        {
-        }
+        { }
     };
 
 

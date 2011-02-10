@@ -25,6 +25,7 @@
 #define SIDE_PQ 1       // compare with second, in-memory PQ (needs a lot of memory)
 
 #include <stxxl/priority_queue>
+#include <stxxl/stats>
 #include <stxxl/timer>
 
 const stxxl::unsigned_type mega = 1024 * 1024;    //1 * 1024 does not work here
@@ -116,7 +117,7 @@ int main(int argc, char * argv[])
     if (argc < 3)
     {
         std::cout << "Usage: " << argv[0] << " [n in MiB]"
-#if defined(__MCSTL__) || defined(_GLIBCXX_PARALLEL)
+#if defined(__MCSTL__) || defined(STXXL_PARALLEL_MODE)
                   << " [p threads]"
 #endif
                   << std::endl;
@@ -176,8 +177,8 @@ int main(int argc, char * argv[])
     mcstl::SETTINGS::multiway_merge_oversampling = 10;
     mcstl::SETTINGS::multiway_merge_minimal_n = 1000;
     mcstl::SETTINGS::multiway_merge_minimal_k = 2;
-#elif defined(_GLIBCXX_PARALLEL)
-/*    int num_threads = atoi(argv[2]);
+#elif defined(STXXL_PARALLEL_MODE)
+    int num_threads = atoi(argv[2]);
     STXXL_MSG("Threads: " << num_threads);
 
     omp_set_num_threads(num_threads);
@@ -196,7 +197,7 @@ int main(int argc, char * argv[])
     parallel_settings.multiway_merge_oversampling = 10;
     parallel_settings.multiway_merge_minimal_n = 1000;
     parallel_settings.multiway_merge_minimal_k = 2;
-  __gnu_parallel::_Settings::set(parallel_settings);*/
+    __gnu_parallel::_Settings::set(parallel_settings);
 #endif
 
     const stxxl::unsigned_type mem_for_queue = 512 * mega;
