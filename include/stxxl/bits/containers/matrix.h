@@ -216,7 +216,7 @@ public:
 //! \brief Swaps swapable_blocks and provides swapable_blocks for temporary storage.
 //! Simple mode only tries to save I/Os through caching.
 //! Features a simulation mode to record access patterns in a prediction sequence.
-//!   The prediction sequence can then be used for prefetching during a run in execute mode.
+//!   The prediction sequence can then be used for prefetching during a run in offline mode.
 //!   This will only work for algorithms with deterministic, data oblivious access patterns.
 //!   In simulation mode no I/O is performed; the data provided is accessible but undefined.
 //! Execute mode does caching, prefetching and possibly other optimizations.
@@ -344,7 +344,7 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }
@@ -384,7 +384,7 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }
@@ -419,7 +419,7 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }
@@ -435,7 +435,7 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }
@@ -470,7 +470,7 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }
@@ -493,7 +493,7 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }
@@ -509,7 +509,7 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }
@@ -525,13 +525,13 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }//todo
     }
 
-    //! \brief Turn on execute mode. Use the last used (or recorded) prediction sequence.
+    //! \brief Turn on offline_lfd mode. Use the last used (or recorded) prediction sequence.
     void start_using_prediction_sequence()
     {
         switch (mode) {
@@ -541,13 +541,13 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }//todo
     }
 
-    //! \brief Turn on execute mode. Use the given prediction sequence.
+    //! \brief Turn on offline_lfd mode. Use the given prediction sequence.
     //! \param new_ps prediction sequence to copy and use.
     void start_using_prediction_sequence(const prediction_sequence_type & new_ps)
     {
@@ -558,13 +558,13 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }//todo
     }
 
-    //! \brief Turn off execute mode.
+    //! \brief Turn off offline_lfd mode.
     void stop_using_prediction_sequence()
     {
         switch (mode) {
@@ -574,7 +574,7 @@ public:
         case simulation:
             //todo
             break;
-        case execute:
+        case offline_lfd:
             //todo
             break;
         }//todo
