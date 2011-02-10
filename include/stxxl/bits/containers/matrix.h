@@ -63,7 +63,6 @@ public:
     }
 };
 
-
 //! \brief Internal block container with access-metadata. Not intended for direct use.
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSize number of contained objects
@@ -73,6 +72,11 @@ struct internal_block
 protected:
     static const unsigned_type raw_block_size = BlockSize * sizeof(ValueType);
     typedef typed_block<raw_block_size, ValueType> block_type;
+
+    template <typename VT, unsigned BS>
+    friend class swapable_block;
+    template <class SBT>
+    friend class block_scheduler;
 
     block_type data;
     bool dirty;
@@ -99,15 +103,16 @@ class swapable_block
 public:
     typedef internal_block<ValueType, BlockSize> internal_block_type;
     typedef typename internal_block_type::block_type block_type;
-protected:
     typedef typename block_type::bid_type external_block_type;
 
-    template <class SwapableBlockType, class DiskAssignFunctor>
+protected:
+    template <class SBT>
     friend class block_scheduler;
 
     external_block_type external_data;      //!external_data.valid if no associated space on disk
     internal_block_type * internal_data;    //NULL if there is no internal memory reserved
 
+public:
     //! \brief create in uninitialized state
     swapable_block()
         : external_data() /*!valid*/, internal_data(0) {}
@@ -123,6 +128,7 @@ protected:
             STXXL_ERRMSG("Destructing swapable_block that still holds internal_block.");
     }
 
+protected:
     bool is_internal() const
     { return internal_data; }
 
@@ -191,7 +197,7 @@ class prediction_sequence_element
     typedef swapable_block_identifier<SwapableBlockType> swapable_block_identifier_type;
     typedef typename swapable_block_identifier_type::temporary_swapable_blocks_index_type temporary_swapable_blocks_index_type;
 
-    template <class SBT, class DiskAssignFunctor>
+    template <class SBT>
     friend class block_scheduler;
 
 protected:
@@ -214,7 +220,7 @@ public:
 //!   In simulation mode no I/O is performed; the data provided is accessible but undefined.
 //! Execute mode does caching, prefetching and possibly other optimizations.
 //! \tparam SwapableBlockType Type of swapable_blocks to manage. Can be some specialized subclass.
-template <class SwapableBlockType, class DiskAssignFunctor>
+template <class SwapableBlockType>
 class block_scheduler
 {
     //! Mode the block scheduler currently works in
@@ -252,7 +258,7 @@ protected:
 public:
     //! \brief create a block_scheduler with empty prediction sequence in simple mode.
     //! \param max_internal_memory Amount of internal memory (in bytes) the scheduler is allowed to use for acquiring, prefetching and caching.
-    block_scheduler(int_type max_internal_memory)
+    explicit block_scheduler(int_type max_internal_memory)
         : max_internal_blocks(div_ceil(max_internal_memory, sizeof(block_type))),
           remaining_internal_blocks(max_internal_blocks),
           mode(online),
@@ -281,6 +287,7 @@ protected:
             //free block from pq intern_swapable_blocks
             //swap out
             //reset block
+            return 0;
         }
     }
 
@@ -347,6 +354,7 @@ public:
             //todo
             break;
         }
+        return sblock->get_reference();
     }
 
     //! \brief Release the given block.
@@ -986,23 +994,7 @@ public:
     }
 };
 
-#if STXXL_BLAS == 1
-extern "C" void dgemm_(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-//TODO: cleanup variants
-#elif STXXL_BLAS == 2
-enum blas_order_type {
-            blas_rowmajor = 101,
-            blas_colmajor = 102 };
-enum blas_trans_type {
-            blas_no_trans   = 111,
-            blas_trans      = 112,
-            blas_conj_trans = 113 };
-extern "C" void cblas_dgemm( enum blas_order_type order, enum blas_trans_type transa,
-                 enum blas_trans_type transb, int m, int n, int k,
-                 double alpha, const double *a, int lda, const double *b,
-                 int ldb, double beta, double *c, int ldc );
-
-#elif  STXXL_BLAS == 3
+#if STXXL_BLAS
 typedef int blas_int;
 extern "C" void dgemm_(const char *transa, const char *transb,
         const blas_int *m, const blas_int *n, const blas_int *k,
@@ -1047,19 +1039,7 @@ struct low_level_multiply<double, BlockSideLength>
 {
     void operator () (double * a, double * b, double * c)
     {
-    #if STXXL_BLAS == 1
-        int n = BlockSideLength;
-        char transpose = 'N';
-        double alpha = 1.0;
-        double beta = 1.0;
-
-        dgemm_(&transpose, &transpose, &n, &n, &n, &alpha, b, &n, a, &n, &beta, c, &n);
-    #elif STXXL_BLAS == 2
-        cblas_dgemm(blas_rowmajor, blas_no_trans,
-                blas_no_trans, BlockSideLength, BlockSideLength, BlockSideLength,
-                1.0, a, BlockSideLength, b,
-                BlockSideLength, 1.0, c, BlockSideLength);
-    #elif STXXL_BLAS == 3
+    #if STXXL_BLAS
         dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
                 1.0, false, a,
                      false, b,

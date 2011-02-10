@@ -14,6 +14,9 @@
 #include <stxxl/vector>
 #include <stxxl/stream>
 
+// Thanks Daniel Russel, Stanford University
+#include <Argument_helper.h>
+
 #include <iostream>
 #include <limits>
 
@@ -124,13 +127,24 @@ public:
     vector<error_type> & get_errors() { return errors; }
 };
 
-int main()
+int main(int argc, char **argv)
 {
-    const int rank = 10000, block_order = 1024;
+    const int block_order = 64;
 
-    const unsigned_type internal_memory = 256 * 1024 * 1024;
+    int test_case = -1;
+    int rank = 1000;
+    int_type internal_memory = 256 * 1024 * 1024;
 
-    switch (1)
+    dsr::Argument_helper ah;
+    ah.new_int("test_case", "number of the test case to run", test_case);
+    ah.new_named_int('r',  "rank", "integer","rank of the matrices", rank);
+    ah.new_named_int('m', "memory", "integer", "internal memory to use (in byte)", internal_memory);
+
+    ah.set_description("stxxl matrix test");
+    ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
+    ah.process(argc, argv);
+
+    switch (test_case)
     {
     case 0:
     {
@@ -244,7 +258,15 @@ int main()
     }
     case 4:
     {
-        STXXL_MSG("" << -1 / 3 << " " << -5 / 3);
+        typedef swapable_block<int_type, block_order> swapable_block_type;
+        typedef block_scheduler<swapable_block_type> block_scheduler_type;
+        block_scheduler_type bs = block_scheduler_type(internal_memory);
+        swapable_block_type sb[5];
+        bs.acquire(&sb[1]);
+        bs.acquire(&sb[2]);
+        bs.release(&sb[1],false);
+        bs.release(&sb[2],false);
+
         break;
     }
     }
