@@ -16,55 +16,26 @@
 #include <queue>
 #include <stack>
 #include <set>
+#include <list>
+#include <map>
 
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>
+#include <stxxl/bits/common/addressable_queues.h>
 
 __STXXL_BEGIN_NAMESPACE
 
-template <typename ElementType>
-class priority_adressable_p_queue
-{
-protected:
-    std::set<ElementType> vals;
-
-public:
-    bool empty() const
-    { return vals.empty(); }
-
-    void insert(const ElementType & e)
-    { vals.insert(e); }
-
-    void remove(const ElementType & e)
-    { vals.erase(e); }
-
-    ElementType pop_min()
-    {
-        const ElementType e = * vals.begin();
-        vals.erase(vals.begin());
-        return e;
-    }
-
-    ElementType pop_max()
-    {
-        const ElementType e = * vals.rbegin();
-        vals.erase(vals.rbegin());
-        return e;
-    }
-};
-
-//! \brief Holds information to allocate, swap and reload a block of data. Use with block_scheduler.
-//! A swapable_block can be uninitialized, i.e. it holds no data.
+//! \brief Holds information to allocate, swap and reload a block of data. Use with block_scheduler. Not intended for direct use.
+//! A swappable_block can be uninitialized, i.e. it holds no data.
 //! When access is required, is has to be acquired and released afterwards, so it can be swapped in and out as required.
 //! If the stored data is no longer needed, it can get uninitialized, freeing in- and external memory.
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSize number of contained objects
 template <typename ValueType, unsigned BlockSize>
-class swapable_block : private noncopyable
+class swappable_block : private noncopyable
 {
 protected:
     static const unsigned_type raw_block_size = BlockSize * sizeof(ValueType);
-public:
     typedef typed_block<raw_block_size, ValueType> internal_block_type;
     typedef typename internal_block_type::bid_type external_block_type;
 
@@ -73,46 +44,79 @@ protected:
 
     external_block_type external_data;      //!external_data.valid if no associated space on disk
     internal_block_type * internal_data;    //NULL if there is no internal memory reserved
-    int_type reference_count;
     bool dirty;
+    int_type reference_count;
 
-public:
+    static block_manager * bm;
+
     //! \brief create in uninitialized state
-    swapable_block()
-        : external_data() /*!valid*/, internal_data(0), reference_count(0), dirty(false) {}
+    swappable_block()
+        : external_data() /*!valid*/, internal_data(0), dirty(false), reference_count(0)
+    { bm = block_manager::get_instance(); }
 
     //! \brief create in initialized, swapped out state
-    //! \param bid external_block with data, will be used as swap-space of this swapable_block
-    swapable_block(const external_block_type & bid)
-        : external_data(bid), internal_data(0), reference_count(0), dirty(false) {}
+    //! \param bid external_block with data, will be used as swap-space of this swappable_block
+    swappable_block(const external_block_type & bid)
+        : external_data(bid), internal_data(0), dirty(false), reference_count(0)
+    { bm = block_manager::get_instance(); }
 
-    ~swapable_block()
+public:
+    ~swappable_block()
     {
         if (internal_data)
-        {
-            STXXL_ERRMSG("Destructing swapable_block that still holds internal_block.");
-            //todo delete?
-        }
+            STXXL_ERRMSG("Destructing swappable_block that still holds internal_block.");
         if (reference_count > 0)
-            STXXL_ERRMSG("Destructing swapable_block that is still referenced.");
+            STXXL_ERRMSG("Destructing swappable_block that is still referenced.");
         if (dirty)
-            STXXL_ERRMSG("Destructing swapable_block that is still dirty.");
+            STXXL_ERRMSG("Destructing swappable_block that is still dirty.");
+        if (external_data.valid())
+            STXXL_ERRMSG("Destructing swappable_block that still holds external_block.");
     }
 
 protected:
+    //! \brief If it has an internal_block. The internal_block implicitly holds valid data.
     bool is_internal() const
     { return internal_data; }
 
-    bool is_external() const
+    //! \brief If the external_block does not hold valid data.
+    bool is_dirty() const
+    { return dirty; }
+
+    //! \brief Invalidate external data if true.
+    bool make_dirty_if(bool make_dirty)
+    {
+        assert(is_acquired());
+        return dirty = make_dirty || dirty;
+    }
+
+    //! \brief If it has an external_block.
+    bool has_external_block() const
     { return external_data.valid(); }
 
+    //! \brief If it has an external_block that holds valid data.
+    bool is_external() const
+    { return has_external_block() && ! is_dirty(); }
+
+    //! \brief If it is acquired.
     bool is_acquired() const
     { return reference_count > 0; }
 
+    bool is_evictable() const
+    { return ! is_acquired() && is_internal(); }
+
 public:
+    //! \brief If it has some valid data (in- or external).
     bool is_initialized() const
     { return is_internal() || is_external(); }
 
+    //! \brief get a reference to the data-block. Has to be acquired.
+    const internal_block_type & get_internal_block() const
+    {
+        assert(is_acquired());
+        return * internal_data;
+    }
+
+    //! \brief get a reference to the data-block. Has to be acquired.
     internal_block_type & get_internal_block()
     {
         assert(is_acquired());
@@ -130,57 +134,76 @@ public:
         for (int_type i = 0; i < BlockSize; ++i)
             data[i] = value;
     }
+
+    request_ptr read_async(completion_handler on_cmpl = default_completion_handler())
+    {
+        assert(is_internal());
+        assert(has_external_block());
+        dirty = false;
+        return internal_data->read(external_data, on_cmpl);
+    }
+
+    void read_sync()
+    { read_async()->wait(); }
+
+    request_ptr clean_async(completion_handler on_cmpl = default_completion_handler())
+    {
+        if (! is_dirty())
+            return request_ptr();
+        if (! has_external_block())
+            bm->new_block(striping(), external_data);
+        dirty = false;
+        return internal_data->write(external_data, on_cmpl);
+    }
+
+    void clean_sync()
+    {
+        request_ptr rp = clean_async();
+        if (rp.valid())
+            rp->wait();
+    }
+
+    void attach_internal_block(internal_block_type * iblock)
+    {
+        assert(! is_internal());
+        internal_data = iblock;
+    }
+
+    internal_block_type * detach_internal_block()
+    {
+        assert(is_evictable());
+        clean_sync();
+        internal_block_type * iblock = internal_data;
+        internal_data = 0;
+        return iblock;
+    }
+
+    //! \brief Brings the block in uninitialized state, freeing external and internal memory.
+    //! Returns a pointer to the internal_block, NULL if it had none.
+    //! \return A pointer to the freeed internal_block, NULL if it had none.
+    internal_block_type * deinitialize()
+    {
+        assert(! is_acquired());
+        dirty = false;
+        // free external_block (so that it becomes invalid and the disk-space can be used again)
+        if (has_external_block())
+            bm->delete_block(external_data);
+        // free internal_block
+        internal_block_type * iblock = internal_data;
+        internal_data = 0;
+        return iblock;
+    }
 };
 
-enum block_scheduler_operation
-{
-    acquire,
-    release,
-    release_tainted,
-    deinitialize,
-    explicit_timestep
-};
-
-template <class SwapableBlockType>
-struct swapable_block_identifier
-{
-    typedef int_type temporary_swapable_blocks_index_type;
-
-    SwapableBlockType * persistent;
-    temporary_swapable_blocks_index_type temporary;
-};
-
-//a prediction sequence is a sequence of require and release operations
-template <class SwapableBlockType>
-class prediction_sequence_element
-{
-protected:
-    typedef swapable_block_identifier<SwapableBlockType> swapable_block_identifier_type;
-    typedef typename swapable_block_identifier_type::temporary_swapable_blocks_index_type temporary_swapable_blocks_index_type;
-
-    template <class SBT>
-    friend class block_scheduler;
-
-    block_scheduler_operation op;
-    swapable_block_identifier_type id;
-
-    prediction_sequence_element(block_scheduler_operation operation, temporary_swapable_blocks_index_type  temporary_swapable_block)
-        : op(operation), id(0,temporary_swapable_block) { }
-
-public:
-    prediction_sequence_element(block_scheduler_operation operation, SwapableBlockType *  swapable_block)
-        : op(operation), id(swapable_block,0) { }
-};
-
-//! \brief Swaps swapable_blocks and provides swapable_blocks for temporary storage.
+//! \brief Swaps swappable_blocks and provides swappable_blocks for temporary storage.
 //! Simple mode only tries to save I/Os through caching.
 //! Features a simulation mode to record access patterns in a prediction sequence.
 //!   The prediction sequence can then be used for prefetching during a run in offline mode.
 //!   This will only work for algorithms with deterministic, data oblivious access patterns.
 //!   In simulation mode no I/O is performed; the data provided is accessible but undefined.
 //! Execute mode does caching, prefetching and possibly other optimizations.
-//! \tparam SwapableBlockType Type of swapable_blocks to manage. Can be some specialized subclass.
-template <class SwapableBlockType>
+//! \tparam SwappableBlockType Type of swappable_blocks to manage. Can be some specialized subclass.
+template <class SwappableBlockType>
 class block_scheduler : private noncopyable
 {
 protected:
@@ -188,8 +211,13 @@ protected:
     // This constant limits the number of internal_blocks allocated at once.
     static const int_type max_internal_blocks_alloc_at_once = 128;
 
+public:
+    typedef typename SwappableBlockType::internal_block_type internal_block_type;
+    typedef typename SwappableBlockType::external_block_type external_block_type;
+    typedef int_type swappable_block_identifier_type;
+
     //! Mode the block scheduler currently works in
-    enum Mode
+    enum mode
     {
         online,         //serve requests immediately, without any prediction, LRU caching
         simulation,     //record prediction sequence only, do not serve requests, (returned blocks must not be accessed)
@@ -197,41 +225,58 @@ protected:
         //offline_lfd_prefetch     //serve requests based on prediction sequence, using longest-forward-distance caching, and prefetching
     };
 
-    typedef typename SwapableBlockType::internal_block_type internal_block_type;
-    typedef unsigned_type evictable_block_priority_type;
-    typedef std::pair<evictable_block_priority_type, SwapableBlockType *> evictable_block_priority_element_type;
-    typedef typename prediction_sequence_element<SwapableBlockType>::temporary_swapable_blocks_index_type temporary_swapable_blocks_index_type;
 public:
-    typedef std::vector< prediction_sequence_element<SwapableBlockType> > prediction_sequence_type;
+    // -------- prediction_sequence -------
+    enum block_scheduler_operation
+    {
+        op_acquire,
+        op_release,
+        op_release_dirty,
+        op_deinitialize,
+        op_explicit_timestep
+    };
+
+    class prediction_sequence_element
+    {
+    protected:
+        template <class SBT> friend class block_scheduler;
+
+        block_scheduler_operation op;
+        swappable_block_identifier_type id;
+        int_type time;
+
+    public:
+        prediction_sequence_element(block_scheduler_operation operation, swappable_block_identifier_type sblock_id, int_type timestamp)
+            : op(operation), id(sblock_id), time(timestamp) { }
+    };
+
+    typedef std::vector<prediction_sequence_element> prediction_sequence_type;
+    // ---- end prediction_sequence -------
 
 protected:
+//    typedef unsigned_type evictable_block_priority_type;
+//    typedef std::pair<evictable_block_priority_type, SwappableBlockType *> evictable_block_priority_element_type;
+
+    class block_scheduler_algorithm;
+
     const int_type max_internal_blocks;
     int_type remaining_internal_blocks;
+    //! \brief Stores pointers to arrays of internal_blocks. Used to deallocate them only.
+    std::stack<internal_block_type *> internal_blocks_blocks;
     //! \brief holds free internal_blocks with attributes reset
     std::stack<internal_block_type * > free_internal_blocks;
     //! \brief temporary blocks that will not be needed after algorithm termination
-    std::vector<SwapableBlockType> temporary_swapable_blocks;
-    //! \brief holds indices of free temporary swapable_blocks with attributes reset
-    std::stack<temporary_swapable_blocks_index_type> free_temporary_swapable_blocks;
+    std::vector<SwappableBlockType> swappable_blocks;
+    //! \brief holds indices of free swappable_blocks with attributes reset
+    std::stack<swappable_block_identifier_type> free_swappable_blocks;
     prediction_sequence_type prediction_sequence;
-    //! \brief holds swapable blocks, whose internal block can be freed, i.e. that are internal but unacquired
-    priority_adressable_p_queue<evictable_block_priority_element_type> evictable_blocks;
-    Mode mode;
+//    //! \brief holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired
+//    priority_addressable_p_queue<evictable_block_priority_element_type> evictable_blocks;
     block_manager * bm;
+    block_scheduler_algorithm * algo;
 
-public:
-    //! \brief create a block_scheduler with empty prediction sequence in simple mode.
-    //! \param max_internal_memory Amount of internal memory (in bytes) the scheduler is allowed to use for acquiring, prefetching and caching.
-    explicit block_scheduler(int_type max_internal_memory)
-        : max_internal_blocks(div_ceil(max_internal_memory, sizeof(internal_block_type))),
-          remaining_internal_blocks(max_internal_blocks),
-          mode(online),
-          bm(block_manager::get_instance())
-    {
-        //todo
-    }
-
-protected:
+    //! \brief Get an internal_block from the freelist or a newly allocated one if avalible.
+    //! \return Pointer to the internal_block. NULL if none avalible.
     internal_block_type * get_free_internal_block()
     {
         if (! free_internal_blocks.empty())
@@ -244,70 +289,95 @@ protected:
         else if (remaining_internal_blocks > 0)
         {
             // => more internal_blocks can be allocated
-            internal_block_type * iblocks[max_internal_blocks_alloc_at_once];
-            int_type i = 0; // invariant: i == number of newly allocated blocks not in the free-list
-            // allocate up to max_internal_blocks_alloc_at_once, but do not allocate anything else in between
-            while (i < max_internal_blocks_alloc_at_once && remaining_internal_blocks > 0)
-            {
-                --remaining_internal_blocks;
-                iblocks[i] = new internal_block_type;
-                ++i;
-            }
-            // put all but one block in the free-list (may cause allocation of list-space)
-            while (i > 1)
-                free_internal_blocks.push(iblocks[--i]);
-            // i == 1
-            return iblocks[0];
+            int_type num_blocks = std::min(max_internal_blocks_alloc_at_once ,remaining_internal_blocks);
+            internal_block_type * iblocks = new internal_block_type[num_blocks];
+            internal_blocks_blocks.push(iblocks);
+            for (int_type i = num_blocks - 1; i > 0; --i)
+                free_internal_blocks.push(iblocks + i);
+            return iblocks;
         }
         else
         {
-            //todo
-            //free block from pq intern_swapable_blocks
-            //swap out
-            //reset block
+            // => no internal_block avalible
             return 0;
         }
     }
 
-    temporary_swapable_blocks_index_type temporary_swapable_blocks_index(const SwapableBlockType & sblock) const
+    void return_free_internal_block(internal_block_type * iblock)
     {
-        assert(& sblock >= temporary_swapable_blocks.begin() && & sblock < temporary_swapable_blocks.end());
-        return & sblock - temporary_swapable_blocks.begin();
+        free_internal_blocks.push(iblock);
     }
 
-    evictable_block_priority_type get_block_priority(const SwapableBlockType & /*sblock*/) const
+protected:
+    friend class block_scheduler_algorithm;
+    class block_scheduler_algorithm : private noncopyable
     {
-        //todo
-        return 0;
-    }
+    protected:
+        template <class SBT> friend class block_scheduler;
 
-public:
-    //! \brief Acquire the given block.
-    //! Has to be in pairs with release. Pairs may be nested and interleaved.
-    //! \return Reference to the block's data.
-    //! \param sblock Swapable block to acquire.
-    internal_block_type & acquire(SwapableBlockType & sblock)
+        block_scheduler & bs;
+
+        block_scheduler_algorithm(block_scheduler & bs)
+            : bs(bs) {}
+
+        virtual ~block_scheduler_algorithm() {};
+
+        virtual internal_block_type & acquire(swappable_block_identifier_type sbid);
+        virtual void release(swappable_block_identifier_type sbid, bool dirty);
+        virtual void deinitialize(swappable_block_identifier_type sbid);
+        virtual void explicit_timestep();
+
+        virtual bool is_simulating() const = 0;
+    };
+
+    class block_scheduler_algorithm_online : public block_scheduler_algorithm
     {
-        switch (mode) {
-        case online:
-            // acquired => intern -> increase reference count
-            // intern but not acquired -> remove from evictable_blocks, increase reference count
-            // not intern => uninitialized or extern -> get internal_block, increase reference count
-            // uninitialized -> fill with default value
-            // extern -> read
+    protected:
+        typedef block_scheduler bs;
+        typedef block_scheduler_algorithm bsa;
+
+        template <class SBT> friend class block_scheduler;
+
+        addressable_fifo_queue<swappable_block_identifier_type> evictable_blocks;
+
+        block_scheduler_algorithm_online(block_scheduler & bs)
+                    : block_scheduler_algorithm(bs) {}
+
+        internal_block_type * get_free_internal_block()
+        {
+            // try do get a free internal_block
+            if (internal_block_type * iblock = bsa::bs.get_free_internal_block())
+                return iblock;
+            // evict block
+            return bsa::bs.swappable_blocks[evictable_blocks.pop()].detach_internal_block();
+        }
+
+        void return_free_internal_block(internal_block_type * iblock)
+        {
+            bsa::bs.return_free_internal_block(iblock);
+        }
+
+        virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
+        {
+            SwappableBlockType & sblock = bsa::bs.swappable_blocks[sbid];
+            /* acquired => internal -> increase reference count
+               internal but not acquired -> remove from evictable_blocks, increase reference count
+               not intern => uninitialized or external -> get internal_block, increase reference count
+               uninitialized -> fill with default value
+               external -> read */
             if (sblock.is_internal())
             {
                 if (! sblock.is_acquired())
-                    // not acquired yet -> remove from pq
-                    evictable_blocks.remove(evictable_block_priority_element_type(get_block_priority(sblock) ,& sblock));
+                    // not acquired yet -> remove from evictable_blocks
+                    evictable_blocks.erase(sbid);
             }
             else if (sblock.is_initialized())
             {
                 // => external but not internal
                 //get internal_block
-                sblock.internal_data = get_free_internal_block();
+                sblock.attach_internal_block(get_free_internal_block());
                 //load block synchronously
-                sblock.internal_data->read(sblock.external_data) ->wait();
+                sblock.read_sync();
             }
             else
             {
@@ -316,260 +386,146 @@ public:
                 sblock.internal_data = get_free_internal_block();
                 //initialize new block
                 sblock.fill_default();
+
             }
             //increase reference count
-            ++ sblock.reference_count;
-            break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
+            ++ sblock.reference_count; //*/
+            return sblock.get_internal_block();
         }
-        return sblock.get_internal_block();
+
+        virtual void release(const swappable_block_identifier_type sbid, const bool dirty)
+        {
+            SwappableBlockType & sblock = bsa::bs.swappable_blocks[sbid];
+            assert(sblock.is_acquired());
+            sblock.make_dirty_if(dirty);
+            -- sblock.reference_count;
+            if (! sblock.is_acquired())
+            {
+                if (sblock.dirty || sblock.is_external())
+                    // => evictable, put in pq
+                    evictable_blocks.insert(sbid);
+                else
+                    // => uninitialized, release internal block and put it in freelist
+                    return_free_internal_block(sblock.detach_internal_block());
+            }
+        }
+
+        virtual void deinitialize(swappable_block_identifier_type sbid)
+        {
+            SwappableBlockType & sblock = bsa::bs.swappable_blocks[sbid];
+            if (internal_block_type * iblock = sblock.deinitialize())
+                return_free_internal_block(iblock);
+        }
+
+        virtual void explicit_timestep() {};
+
+        bool is_simulating() const
+        { return false; }
+    };
+
+public:
+    //! \brief create a block_scheduler with empty prediction sequence in simple mode.
+    //! \param max_internal_memory Amount of internal memory (in bytes) the scheduler is allowed to use for acquiring, prefetching and caching.
+    explicit block_scheduler(int_type max_internal_memory)
+        : max_internal_blocks(div_ceil(max_internal_memory, sizeof(internal_block_type))),
+          remaining_internal_blocks(max_internal_blocks),
+          bm(block_manager::get_instance()),
+          algo(new block_scheduler_algorithm_online(*this))
+    { }
+
+    ~block_scheduler()
+    {
+        delete algo;
+
+        // clean swappable_blocks
+        std::vector<request_ptr> requests;
+        for (typename std::vector<SwappableBlockType>::iterator it = swappable_blocks.begin();
+                it != swappable_blocks.end(); ++it)
+            if (it->is_dirty())
+                requests.push_back(it->clean_async());
+        wait_all(requests.begin(), requests.end());
+
+        // free internal blocks
+        if (int_type nlost = free_internal_blocks.size() - max_internal_blocks + remaining_internal_blocks)
+            STXXL_ERRMSG(nlost << " internal_blocks are lost. They will get deallocated.");
+        while (! internal_blocks_blocks.empty())
+        {
+            delete [] internal_blocks_blocks.top();
+            internal_blocks_blocks.pop();
+        }
     }
+
+public:
+    //! \brief Acquire the given block.
+    //! Has to be in pairs with release. Pairs may be nested and interleaved.
+    //! \return Reference to the block's data.
+    //! \param sblock Swappable block to acquire.
+    internal_block_type & acquire(swappable_block_identifier_type sbid)
+    { return algo->acquire(sbid); }
 
     //! \brief Release the given block.
     //! Has to be in pairs with acquire. Pairs may be nested and interleaved.
-    //! \param sblock Swapable block to release.
+    //! \param sblock Swappable block to release.
     //! \param dirty If the data hab been changed, invalidating possible data in external storage.
-    void release(SwapableBlockType & sblock, bool dirty)
-    {
-        switch (mode) {
-        case online:
-            if (sblock.is_acquired())
-            {
-                sblock.dirty |= dirty;
-                -- sblock.reference_count;
-                if (! sblock.is_acquired())
-                {
-                    // dirty or external -> evictable, put in pq
-                    if (sblock.dirty || sblock.is_external())
-                        evictable_blocks.insert(evictable_block_priority_element_type(get_block_priority(sblock) ,& sblock));
-                    //else -> uninitialized, release internal block and put it in freelist
-                    else
-                    {
-                        free_internal_blocks.push(sblock.internal_data);
-                        sblock.internal_data = 0;
-                    }
-                }
-            }
-            else
-            {
-                //todo
-                //error
-            }
-            break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }
-    }
+    void release(swappable_block_identifier_type sbid, bool dirty)
+    { algo->release(sbid, dirty); }
 
     //! \brief Drop all data in the given block, freeing in- and external memory.
-    void deinitialize(SwapableBlockType & sblock)
-    {
-        switch (mode) {
-        case online:
-            if (! sblock.is_acquired())
-            {
-                // reset and free internal_block
-                if (sblock.is_internal())
-                {
-                    sblock.internal_data->reset();
-                    free_internal_blocks.push(sblock.internal_data);
-                    sblock.internal_data = 0;
-                }
-                // free external_block (so that it becomes invalid and the disk-space can be used again)
-                if (sblock.is_extern())
-                {
-                    bm->delete_block(sblock.external_data);
-                }
-            }
-            else
-            {
-                //todo
-                //error
-            }
-            break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }
-    }
+    void deinitialize(swappable_block_identifier_type sbid)
+    { algo->deinitialize(sbid); }
 
     //! \brief Record a timestep in the prediction sequence to seperate consecutive acquire rsp. release-operations.
     //! Has an effect only in simulation mode.
     void explicit_timestep()
-    {
-        switch (mode) {
-        case online:
-            break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }
-    }
+    { algo->explicit_timestep(); }
 
     //! \brief Get a const reference to given block's data. Block has to be already acquired.
-    //! \param sblock Swapable block to access.
-    const internal_block_type & get_internal_block(const SwapableBlockType & sblock) const
-    { return sblock.get_internal_block(); }
+    //! \param sblock Swappable block to access.
+    const internal_block_type & get_internal_block(swappable_block_identifier_type sbid) const
+    { return swappable_blocks[sbid].get_internal_block(); }
 
     //! \brief Get a reference to given block's data. Block has to be already acquired.
-    //! \param sblock Swapable block to access.
-    internal_block_type & get_internal_block(SwapableBlockType & sblock) const
-    { return sblock.get_internal_block(); }
+    //! \param sblock Swappable block to access.
+    internal_block_type & get_internal_block(swappable_block_identifier_type sbid)
+    { return swappable_blocks[sbid].get_internal_block(); }
 
-    //! \brief Allocate a temporary swapable_block. Returns a pointer to the block.
-    //! Temporary blocks are considered in scheduling. They may never be written to external memory if there is enough main memory.
-    SwapableBlockType * allocate_temporary_swapable_block()
+    //! \brief Allocate a swappable_block. Returns an identifier of the block.
+    swappable_block_identifier_type allocate_swappable_block()
     {
-        switch (mode) {
-        case online:
-            SwapableBlockType * sblock;
-            if (free_temporary_swapable_blocks.empty())
-            {
-                // create new temporary swapable_block
-                temporary_swapable_blocks.pushback();
-                sblock = temporary_swapable_blocks.back();
-            }
-            else
-            {
-                // take swapable_block from freelist
-                sblock = & temporary_swapable_blocks[free_temporary_swapable_blocks.top()];
-                free_temporary_swapable_blocks.pop();
-            }
-            return sblock;
-            break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
+        if (free_swappable_blocks.empty())
+        {
+            // create new swappable_block
+            swappable_blocks.pushback();
+            return swappable_blocks.size();
+        }
+        else
+        {
+            // take swappable_block from freelist
+            swappable_block_identifier_type sbid = free_swappable_blocks.top();
+            free_swappable_blocks.pop();
+            return sbid;
         }
     }
 
-    //! \brief Free given no longer used temporary swapable_block.
-    //! \param sblock Temporary swapable_block to free.
-    void free_temporary_swapable_block(SwapableBlockType * sblock)
+    //! \brief Free given no longer used temporary swappable_block.
+    //! \param sblock Temporary swappable_block to free.
+    void free_swappable_block(swappable_block_identifier_type sbid)
     {
-        switch (mode) {
-        case online:
-            if (sblock->is_acquired())
-            {
-                //todo error or catch error on deinitialize
-            }
-
-            deinitialize(sblock);
-            free_temporary_swapable_blocks.push(temporary_swapable_blocks_index(sblock));
-            break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }
+        algo->deinitialize(sbid);
+        free_swappable_blocks.push(sbid);
     }
 
     //! \brief Turn on simulation mode and reset prediction sequence.
-    void start_recording_prediction_sequence()
-    {
-        switch (mode) {
-        case online:
-            //todo
-            break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }
-    }
-
     //! \brief Turn off simulation mode. Returns a reference to the recorded prediction sequence.
-    const prediction_sequence_type & stop_recording_prediction_sequence()
-    {
-        switch (mode) {
-        case online:
-            //todo
-           break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }//todo
-    }
-
     //! \brief Turn on offline_lfd mode. Use the last used (or recorded) prediction sequence.
-    void start_using_prediction_sequence()
-    {
-        switch (mode) {
-        case online:
-            //todo
-           break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }//todo
-    }
-
     //! \brief Turn on offline_lfd mode. Use the given prediction sequence.
-    //! \param new_ps prediction sequence to copy and use.
-    void start_using_prediction_sequence(const prediction_sequence_type & new_ps)
-    {
-        switch (mode) {
-        case online:
-            //todo
-           break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }//todo
-    }
-
+        //! \param new_ps prediction sequence to copy and use.
     //! \brief Turn off offline_lfd mode.
-    void stop_using_prediction_sequence()
-    {
-        switch (mode) {
-        case online:
-            //todo
-           break;
-        case simulation:
-            //todo
-            break;
-        case offline_lfd:
-            //todo
-            break;
-        }//todo
-    }
 
     //! \brief Returns if simulation mode is on, i.e. if a prediction sequence is beeing recorded.
-    bool is_in_simulation_mode() const
-    {
-        return mode == simulation;
-    }
+    //! \return If simulation mode is on.
+    bool is_simulating() const
+    { return algo->is_simulating(); }
 };
 
 __STXXL_END_NAMESPACE

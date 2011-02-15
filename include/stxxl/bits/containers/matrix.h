@@ -25,12 +25,12 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-// +-+-+-+-+-+-+ matrix version with swapable_blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+
+// +-+-+-+-+-+-+ matrix version with swappable_blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-//! \brief Specialised swapable_block that interprets uninitiazized as containing zeros.
+//! \brief Specialised swappable_block that interprets uninitiazized as containing zeros.
 //! When initializing, all values are set to zero.
 template <typename ValueType, unsigned BlockSideLength>
-class matrix_swapable_block : public swapable_block<ValueType, BlockSideLength * BlockSideLength>
+class matrix_swappable_block : public swappable_block<ValueType, BlockSideLength * BlockSideLength>
 {
 public:
     bool is_zero_block() const
@@ -47,14 +47,14 @@ public:
 template <typename ValueType, unsigned BlockSideLength>
 struct matrix_data
 {
-    typedef matrix_swapable_block<ValueType, BlockSideLength> matrix_swapable_block_type;
+    typedef matrix_swappable_block<ValueType, BlockSideLength> matrix_swappable_block_type;
 
-    std::vector<matrix_swapable_block_type * > blocks;
+    std::vector<matrix_swappable_block_type * > blocks;
     int_type height_in_blocks,
              width_in_blocks;
     bool transposed;
 
-    matrix_swapable_block_type * get_block(int_type row, int_type col)
+    matrix_swappable_block_type * get_block(int_type row, int_type col)
     {
         //todo
     }

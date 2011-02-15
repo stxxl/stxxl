@@ -258,10 +258,10 @@ int main(int argc, char **argv)
     }
     case 4:
     {
-        typedef swapable_block<int_type, block_order> swapable_block_type;
-        typedef block_scheduler<swapable_block_type> block_scheduler_type;
+        typedef swappable_block<int_type, block_order> swappable_block_type;
+        typedef block_scheduler<swappable_block_type> block_scheduler_type;
         block_scheduler_type bs(internal_memory);
-        swapable_block_type sb[5];
+        block_scheduler_type::swappable_block_identifier_type sb[5];
         bs.acquire(sb[1]);
         bs.acquire(sb[2]);
         bs.release(sb[1],false);
