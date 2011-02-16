@@ -33,7 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \tparam BlockSize Number of objects in one block, default is 1024*1024.
 //!         BlockSize*sizeof(ValueType) must be divisible by 4096.
 template <typename ValueType, unsigned BlockSize>
-class swappable_block : private noncopyable
+class swappable_block /*: private noncopyable TODO*/
 {
 protected:
     static const unsigned_type raw_block_size = BlockSize * sizeof(ValueType);
@@ -51,15 +51,15 @@ protected:
 
 public:
     //! \brief Create in uninitialized state.
-    swappable_block(block_manager * new_bm = block_manager::get_instance())
+    swappable_block()
         : external_data() /*!valid*/, internal_data(0), dirty(false), reference_count(0)
-    { bm = new_bm; }
+    { bm = block_manager::get_instance(); }
 
     //! \brief Create in initialized, swapped out state.
     //! \param bid external_block with data, will be used as swap-space of this swappable_block
-    swappable_block(const external_block_type & bid, block_manager * new_bm = block_manager::get_instance())
+    swappable_block(const external_block_type & bid)
         : external_data(bid), internal_data(0), dirty(false), reference_count(0)
-    { bm = new_bm; }
+    { bm = block_manager::get_instance(); }
 
     ~swappable_block()
     {
@@ -215,7 +215,11 @@ public:
     }
 };
 
+template <typename ValueType, unsigned BlockSize>
+block_manager * swappable_block<ValueType, BlockSize>::bm;
+
 //! \brief Swaps swappable_blocks and provides swappable_blocks for temporary storage.
+//!
 //! Simple mode only tries to save I/Os through caching.
 //! Features a simulation mode to record access patterns in a prediction sequence.
 //!   The prediction sequence can then be used for prefetching during a run in offline mode.
@@ -344,11 +348,11 @@ protected:
 
         virtual ~block_scheduler_algorithm() {};
 
-        virtual internal_block_type & acquire(swappable_block_identifier_type sbid);
-        virtual void release(swappable_block_identifier_type sbid, bool dirty);
-        virtual void deinitialize(swappable_block_identifier_type sbid);
-        virtual external_block_type extract_external_block(swappable_block_identifier_type sbid);
-        virtual void explicit_timestep();
+        virtual internal_block_type & acquire(swappable_block_identifier_type sbid) = 0;
+        virtual void release(swappable_block_identifier_type sbid, bool dirty) = 0;
+        virtual void deinitialize(swappable_block_identifier_type sbid) = 0;
+        virtual external_block_type extract_external_block(swappable_block_identifier_type sbid) = 0;
+        virtual void explicit_timestep() = 0;
 
         virtual bool is_simulating() const = 0;
     };
@@ -356,8 +360,7 @@ protected:
     class block_scheduler_algorithm_online : public block_scheduler_algorithm
     {
     protected:
-        typedef block_scheduler bs;
-        typedef block_scheduler_algorithm bsa;
+        using block_scheduler_algorithm::bs;
 
         template <class SBT> friend class block_scheduler;
 
@@ -366,36 +369,36 @@ protected:
         block_scheduler_algorithm_online(block_scheduler & bs)
                     : block_scheduler_algorithm(bs)
         {
-            while(! bsa::bs.parked_evictable_blocks.empty())
+            while(! bs.parked_evictable_blocks.empty())
             {
-                evictable_blocks.insert(bsa::bs.parked_evictable_blocks.top());
-                bsa::bs.parked_evictable_blocks.pop();
+                evictable_blocks.insert(bs.parked_evictable_blocks.top());
+                bs.parked_evictable_blocks.pop();
             }
         }
 
         ~block_scheduler_algorithm_online()
         {
             while(! evictable_blocks.empty())
-                bsa::bs.parked_evictable_blocks.push(evictable_blocks.pop());
+                bs.parked_evictable_blocks.push(evictable_blocks.pop());
         }
 
         internal_block_type * get_free_internal_block()
         {
             // try do get a free internal_block
-            if (internal_block_type * iblock = bsa::bs.get_free_internal_block())
+            if (internal_block_type * iblock = bs.get_free_internal_block())
                 return iblock;
             // evict block
-            return bsa::bs.swappable_blocks[evictable_blocks.pop()].detach_internal_block();
+            return bs.swappable_blocks[evictable_blocks.pop()].detach_internal_block();
         }
 
         void return_free_internal_block(internal_block_type * iblock)
         {
-            bsa::bs.return_free_internal_block(iblock);
+            bs.return_free_internal_block(iblock);
         }
 
         virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
         {
-            SwappableBlockType & sblock = bsa::bs.swappable_blocks[sbid];
+            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
             /* acquired => internal -> increase reference count
                internal but not acquired -> remove from evictable_blocks, increase reference count
                not intern => uninitialized or external -> get internal_block, increase reference count
@@ -431,7 +434,7 @@ protected:
 
         virtual void release(const swappable_block_identifier_type sbid, const bool dirty)
         {
-            SwappableBlockType & sblock = bsa::bs.swappable_blocks[sbid];
+            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
             sblock.make_dirty_if(dirty);
             sblock.release();
             if (! sblock.is_acquired())
@@ -447,14 +450,14 @@ protected:
 
         virtual void deinitialize(swappable_block_identifier_type sbid)
         {
-            SwappableBlockType & sblock = bsa::bs.swappable_blocks[sbid];
+            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
             if (internal_block_type * iblock = sblock.deinitialize())
                 return_free_internal_block(iblock);
         }
 
         virtual external_block_type extract_external_block(swappable_block_identifier_type sbid)
         {
-            SwappableBlockType & sblock = bsa::bs.swappable_blocks[sbid];
+            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
             if (sblock.is_internal())
                 return_free_internal_block(sblock.detach_internal_block());
             return sblock.extract_external_block();
@@ -507,8 +510,7 @@ public:
     //! Has to be in pairs with release. Pairs may be nested and interleaved.
     //! \return Reference to the block's data.
     //! \param sblock Swappable block to acquire.
-    internal_block_type & acquire(swappable_block_identifier_type sbid)
-    { return algo->acquire(sbid); }
+    internal_block_type & acquire(swappable_block_identifier_type sbid);
 
     //! \brief Release the given block.
     //! Has to be in pairs with acquire. Pairs may be nested and interleaved.
@@ -545,7 +547,7 @@ public:
         if (free_swappable_blocks.empty())
         {
             // create new swappable_block
-            swappable_blocks.pushback();
+            swappable_blocks.resize(swappable_blocks.size() + 1);
             return swappable_blocks.size();
         }
         else
@@ -569,14 +571,19 @@ public:
     //! \brief Turn off simulation mode. Returns a reference to the recorded prediction sequence.
     //! \brief Turn on offline_lfd mode. Use the last used (or recorded) prediction sequence.
     //! \brief Turn on offline_lfd mode. Use the given prediction sequence.
-        //! \param new_ps prediction sequence to copy and use.
+    //! \param new_ps prediction sequence to copy and use.
     //! \brief Turn off offline_lfd mode.
 
-    //! \brief Returns if simulation mode is on, i.e. if a prediction sequence is beeing recorded.
+    //! \brief Returns if simulation mode is on, i.e. if a prediction sequence is being recorded.
     //! \return If simulation mode is on.
     bool is_simulating() const
     { return algo->is_simulating(); }
 };
+
+template <class SwappableBlockType>
+typename block_scheduler<SwappableBlockType>::internal_block_type & block_scheduler<SwappableBlockType>::acquire(swappable_block_identifier_type sbid)
+{ return algo->acquire(sbid); }
+
 
 __STXXL_END_NAMESPACE
 

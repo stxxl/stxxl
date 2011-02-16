@@ -24,7 +24,6 @@ using namespace stxxl;
 
 int main(int argc, char **argv)
 {
-    const int block_size = 1024;
     typedef int_type value_type;
 
     int test_case = -1;
@@ -32,13 +31,17 @@ int main(int argc, char **argv)
 
     dsr::Argument_helper ah;
     ah.new_int("test_case", "number of the test case to run", test_case);
-    ah.new_named_int('m', "memory", "integer", "internal memory to use (in byte)", internal_memory);
+    int internal_memory_megabyte;
+    ah.new_named_int('m', "memory", "integer", "internal memory to use (in megabytes)", internal_memory_megabyte);
 
     ah.set_description("stxxl matrix test");
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
     ah.process(argc, argv);
 
+    internal_memory = int_type(internal_memory_megabyte) * 1048576;
+
     /*
+    const int block_size = 1024;
     // call all functions
     typedef block_scheduler< swappable_block<value_type, block_size> > bs_t;
     bs_t bs(internal_memory);

@@ -138,11 +138,14 @@ int main(int argc, char **argv)
     dsr::Argument_helper ah;
     ah.new_int("test_case", "number of the test case to run", test_case);
     ah.new_named_int('r',  "rank", "integer","rank of the matrices", rank);
-    ah.new_named_int('m', "memory", "integer", "internal memory to use (in byte)", internal_memory);
+    int internal_memory_megabyte;
+    ah.new_named_int('m', "memory", "integer", "internal memory to use (in megabytes)", internal_memory_megabyte);
 
     ah.set_description("stxxl matrix test");
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
     ah.process(argc, argv);
+
+    internal_memory = int_type(internal_memory_megabyte) * 1048576;
 
     switch (test_case)
     {
@@ -262,10 +265,14 @@ int main(int argc, char **argv)
         typedef block_scheduler<swappable_block_type> block_scheduler_type;
         block_scheduler_type bs(internal_memory);
         block_scheduler_type::swappable_block_identifier_type sb[5];
+        sb[1] = bs.allocate_swappable_block();
+        sb[2] = bs.allocate_swappable_block();
         bs.acquire(sb[1]);
         bs.acquire(sb[2]);
         bs.release(sb[1],false);
         bs.release(sb[2],false);
+        bs.free_swappable_block(sb[1]);
+        bs.free_swappable_block(sb[2]);
 
         break;
     }
