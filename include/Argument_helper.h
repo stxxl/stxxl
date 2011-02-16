@@ -40,8 +40,10 @@ namespace dsr{
 		class FlagTarget;
 		class DoubleTarget;
 		class IntTarget;
-		class UIntTarget;
-		class StringTarget;
+        class UIntTarget;
+        class LongLongTarget;
+        class ULongLongTarget;
+        class StringTarget;
 		class CharTarget;
 		class StringVectorTarget;
 
@@ -63,6 +65,30 @@ namespace dsr{
 			const char *description,
 			int &dest);
 
+        void new_unsigned_int(const char *value_name, const char *description,
+            unsigned int &dest);
+        void new_optional_unsigned_int(const char *value_name, const char *description,
+            unsigned int &dest);
+        void new_named_unsigned_int(char key, const char *long_name,
+            const char *value_name, const char *description,
+            unsigned int &dest);
+
+		void new_long_long( const char *arg_description, const char *description, long long &dest);
+        void new_named_long_long(char key, const char *long_name,const char *value_name,
+            const char *description,
+            long long &dest);
+        void new_optional_long_long(const char *value_name,
+            const char *description,
+            long long &dest);
+
+        void new_unsigned_long_long(const char *value_name, const char *description,
+            unsigned long long &dest);
+        void new_optional_unsigned_long_long(const char *value_name, const char *description,
+            unsigned long long &dest);
+        void new_named_unsigned_long_long(char key, const char *long_name,
+            const char *value_name, const char *description,
+            unsigned long long &dest);
+
 		void new_double(const char *value_name,
 			const char *description,
 			double &dest);
@@ -83,15 +109,6 @@ namespace dsr{
 		void new_optional_char(const char *value_name,
 			const char *description,
 			char &dest);
-
-		void new_unsigned_int(const char *value_name, const char *description,
-			unsigned int &dest);
-		void new_optional_unsigned_int(const char *value_name, const char *description,
-			unsigned int &dest);
-		void new_named_unsigned_int(char key, const char *long_name,
-			const char *value_name, const char *description,
-			unsigned int &dest);
-
 
 
 		void new_named_string_vector(char key, const char *long_name,
@@ -353,6 +370,74 @@ namespace dsr {
     virtual ~UIntTarget(){}
   };
 
+  class Argument_helper::LongLongTarget: public Argument_target{
+  public:
+    long long &val;
+    LongLongTarget(const char *arg_descr,
+              const char *descr, long long &b): Argument_target(0, std::string(),
+                                                              std::string(descr),
+                                                              std::string(arg_descr)),
+                                              val(b){}
+    LongLongTarget(char k, const char *lname,
+              const char *arg_descr,
+              const char *descr, long long &b): Argument_target(k, std::string(lname),
+                                                              std::string(descr),
+                                                              std::string(arg_descr)),
+                                              val(b){}
+    virtual bool process(int &argc, const char **&argv){
+      if (argc==0){
+        std::cerr << "Missing value for argument." << std::endl;
+        return false;
+      }
+      if (sscanf(argv[0], "%ld", &val) ==1){
+        --argc;
+        ++argv;
+        return true;
+      }  else {
+        std::cerr << "Long Integer not found at " << argv[0] << std::endl;
+        return false;
+      }
+    }
+    virtual void write_value(std::ostream &out) const {
+      out << val;
+    }
+    virtual ~LongLongTarget(){}
+  };
+
+  class Argument_helper::ULongLongTarget: public Argument_target{
+  public:
+    unsigned long long &val;
+    ULongLongTarget(const char *arg_descr,
+               const char *descr, unsigned long long &b): Argument_target(0, std::string(),
+                                                               std::string(descr),
+                                                               std::string(arg_descr)),
+                                               val(b){}
+    ULongLongTarget(char k, const char *lname,
+               const char *arg_descr,
+               const char *descr, unsigned long long &b): Argument_target(k, std::string(lname),
+                                                               std::string(descr),
+                                                               std::string(arg_descr)),
+                                               val(b){}
+    virtual bool process(int &argc, const char **&argv){
+      if (argc==0){
+        std::cerr << "Missing value for argument." << std::endl;
+        return false;
+      }
+      if (sscanf(argv[0], "%lud", &val) ==1){
+        --argc;
+        ++argv;
+        return true;
+      } else {
+        std::cerr << "Unsigned long integer not found at " << argv[0] << std::endl;
+        return false;
+      }
+    }
+    virtual void write_value(std::ostream &out) const {
+      out << val;
+    }
+    virtual ~ULongLongTarget(){}
+  };
+
 
   class Argument_helper::CharTarget: public Argument_target{
   public:
@@ -385,7 +470,6 @@ namespace dsr {
     virtual ~CharTarget(){}
   };
 
-
   class Argument_helper::StringTarget: public Argument_target{
   public:
     std::string &val;
@@ -415,7 +499,6 @@ namespace dsr {
     }
     virtual ~StringTarget(){}
   };
-
 
   class Argument_helper::StringVectorTarget: public Argument_target{
   public:
@@ -583,6 +666,42 @@ namespace dsr {
   void Argument_helper::new_named_unsigned_int(char key, const char *long_name,
                                                const char *arg_description, const char *description,
                                                unsigned int &dest){
+    Argument_target *t= new UIntTarget(key, long_name, arg_description, description, dest);
+    new_argument_target(t);
+  };
+
+  void Argument_helper::new_long_long(const char *arg_description, const char *description,
+                                   long long &dest){
+    Argument_target *t= new IntTarget(arg_description, description, dest);
+    unnamed_arguments_.push_back(t);
+    all_arguments_.push_back(t);
+  };
+  void Argument_helper::new_optional_long_long(const char *arg_description, const char *description,
+                                            long long &dest){
+    Argument_target *t= new IntTarget(arg_description, description, dest);
+    optional_unnamed_arguments_.push_back(t);
+  };
+  void Argument_helper::new_named_long_long(char key, const char *long_name,
+                                         const char *arg_description, const char *description,
+                                         long long &dest){
+    Argument_target *t= new IntTarget(key, long_name, arg_description, description, dest);
+    new_argument_target(t);
+  };
+
+  void Argument_helper::new_unsigned_long_long(const char *arg_description, const char *description,
+                                        unsigned long long &dest){
+    Argument_target *t= new UIntTarget(arg_description, description, dest);
+    unnamed_arguments_.push_back(t);
+    all_arguments_.push_back(t);
+  };
+  void Argument_helper::new_optional_unsigned_long_long(const char *arg_description, const char *description,
+                                            unsigned long long &dest){
+    Argument_target *t= new UIntTarget(arg_description, description, dest);
+    optional_unnamed_arguments_.push_back(t);
+  };
+  void Argument_helper::new_named_unsigned_long_long(char key, const char *long_name,
+                                               const char *arg_description, const char *description,
+                                               unsigned long long &dest){
     Argument_target *t= new UIntTarget(key, long_name, arg_description, description, dest);
     new_argument_target(t);
   };
