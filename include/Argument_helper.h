@@ -5,6 +5,9 @@
 * Daniel Russel drussel@alumni.princeton.edu
 * Stanford University
 *
+* Support for long long and unsigned long long by
+* Raoul Steffen <R-Steffen@gmx.de>
+*
 *
 * This software is not subject to copyright protection and is in the
 * public domain. Neither Stanford nor the author assume any
@@ -389,14 +392,10 @@ namespace dsr {
         std::cerr << "Missing value for argument." << std::endl;
         return false;
       }
-      if (sscanf(argv[0], "%ld", &val) ==1){
+      val = strtoll(argv[0], 0, 10);
         --argc;
         ++argv;
         return true;
-      }  else {
-        std::cerr << "Long Integer not found at " << argv[0] << std::endl;
-        return false;
-      }
     }
     virtual void write_value(std::ostream &out) const {
       out << val;
@@ -423,14 +422,10 @@ namespace dsr {
         std::cerr << "Missing value for argument." << std::endl;
         return false;
       }
-      if (sscanf(argv[0], "%lud", &val) ==1){
+      val = strtoull(argv[0], 0, 10);
         --argc;
         ++argv;
         return true;
-      } else {
-        std::cerr << "Unsigned long integer not found at " << argv[0] << std::endl;
-        return false;
-      }
     }
     virtual void write_value(std::ostream &out) const {
       out << val;
@@ -672,37 +667,37 @@ namespace dsr {
 
   void Argument_helper::new_long_long(const char *arg_description, const char *description,
                                    long long &dest){
-    Argument_target *t= new IntTarget(arg_description, description, dest);
+    Argument_target *t= new LongLongTarget(arg_description, description, dest);
     unnamed_arguments_.push_back(t);
     all_arguments_.push_back(t);
   };
   void Argument_helper::new_optional_long_long(const char *arg_description, const char *description,
                                             long long &dest){
-    Argument_target *t= new IntTarget(arg_description, description, dest);
+    Argument_target *t= new LongLongTarget(arg_description, description, dest);
     optional_unnamed_arguments_.push_back(t);
   };
   void Argument_helper::new_named_long_long(char key, const char *long_name,
                                          const char *arg_description, const char *description,
                                          long long &dest){
-    Argument_target *t= new IntTarget(key, long_name, arg_description, description, dest);
+    Argument_target *t= new LongLongTarget(key, long_name, arg_description, description, dest);
     new_argument_target(t);
   };
 
   void Argument_helper::new_unsigned_long_long(const char *arg_description, const char *description,
                                         unsigned long long &dest){
-    Argument_target *t= new UIntTarget(arg_description, description, dest);
+    Argument_target *t= new ULongLongTarget(arg_description, description, dest);
     unnamed_arguments_.push_back(t);
     all_arguments_.push_back(t);
   };
   void Argument_helper::new_optional_unsigned_long_long(const char *arg_description, const char *description,
                                             unsigned long long &dest){
-    Argument_target *t= new UIntTarget(arg_description, description, dest);
+    Argument_target *t= new ULongLongTarget(arg_description, description, dest);
     optional_unnamed_arguments_.push_back(t);
   };
   void Argument_helper::new_named_unsigned_long_long(char key, const char *long_name,
                                                const char *arg_description, const char *description,
                                                unsigned long long &dest){
-    Argument_target *t= new UIntTarget(key, long_name, arg_description, description, dest);
+    Argument_target *t= new ULongLongTarget(key, long_name, arg_description, description, dest);
     new_argument_target(t);
   };
 
