@@ -235,6 +235,8 @@ public:
 template <typename ValueType, unsigned BlockSize>
 block_manager * swappable_block<ValueType, BlockSize>::bm;
 
+template <class SwappableBlockType> class block_scheduler_algorithm;
+
 //! \brief Swaps swappable_blocks and provides swappable_blocks for temporary storage.
 //!
 //! Simple mode only tries to save I/Os through caching.
@@ -295,10 +297,8 @@ public:
     // ---- end prediction_sequence -------
 
 protected:
-//    typedef unsigned_type evictable_block_priority_type;
-//    typedef std::pair<evictable_block_priority_type, SwappableBlockType *> evictable_block_priority_element_type;
-
-    class block_scheduler_algorithm;
+    template <class SBT> friend class block_scheduler_algorithm;
+    template <class SBT> friend class block_scheduler_algorithm_online;  // the specialization of a friend is not a friend
 
     const int_type max_internal_blocks;
     int_type remaining_internal_blocks;
@@ -313,10 +313,8 @@ protected:
     //! \brief holds indices of evictable swappable_blocks when no scheduling algorithm takes care about them
     std::stack<swappable_block_identifier_type> parked_evictable_blocks;
     prediction_sequence_type prediction_sequence;
-//    //! \brief holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired
-//    priority_addressable_p_queue<evictable_block_priority_element_type> evictable_blocks;
     block_manager * bm;
-    block_scheduler_algorithm * algo;
+    block_scheduler_algorithm<SwappableBlockType> * algo;
 
     //! \brief Get an internal_block from the freelist or a newly allocated one if avalible.
     //! \return Pointer to the internal_block. NULL if none avalible.
@@ -346,190 +344,17 @@ protected:
         }
     }
 
+    //! \brief Return an internal_block to the freelist.
     void return_free_internal_block(internal_block_type * iblock)
-    {
-        free_internal_blocks.push(iblock);
-    }
-
-protected:
-    friend class block_scheduler_algorithm;
-    class block_scheduler_algorithm : private noncopyable
-    {
-    protected:
-        template <class SBT> friend class block_scheduler;
-
-        block_scheduler & bs;
-
-        block_scheduler_algorithm(block_scheduler & bs)
-            : bs(bs) {}
-
-        virtual ~block_scheduler_algorithm() {};
-
-        virtual internal_block_type & acquire(swappable_block_identifier_type sbid) = 0;
-        virtual void release(const swappable_block_identifier_type sbid, const bool dirty) = 0;
-        virtual void deinitialize(swappable_block_identifier_type sbid) = 0;
-        virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock) = 0;
-        virtual external_block_type extract_external_block(swappable_block_identifier_type sbid) = 0;
-        virtual void explicit_timestep() = 0;
-
-        virtual bool is_simulating() const = 0;
-    };
-
-    class block_scheduler_algorithm_online : public block_scheduler_algorithm
-    {
-    protected:
-        using block_scheduler_algorithm::bs;
-
-        template <class SBT> friend class block_scheduler;
-
-        addressable_fifo_queue<swappable_block_identifier_type> evictable_blocks;
-
-        block_scheduler_algorithm_online(block_scheduler & bs)
-                    : block_scheduler_algorithm(bs)
-        {
-            while(! bs.parked_evictable_blocks.empty())
-            {
-                evictable_blocks.insert(bs.parked_evictable_blocks.top());
-                bs.parked_evictable_blocks.pop();
-            }
-        }
-
-        ~block_scheduler_algorithm_online()
-        {
-            while(! evictable_blocks.empty())
-                bs.parked_evictable_blocks.push(evictable_blocks.pop());
-        }
-
-        internal_block_type * get_free_internal_block()
-        {
-            // try do get a free internal_block
-            if (internal_block_type * iblock = bs.get_free_internal_block())
-                return iblock;
-            // evict block
-            return bs.swappable_blocks[evictable_blocks.pop()].detach_internal_block();
-        }
-
-        void return_free_internal_block(internal_block_type * iblock)
-        {
-            bs.return_free_internal_block(iblock);
-        }
-
-        virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
-        {
-            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
-            /* acquired => internal -> increase reference count
-               internal but not acquired -> remove from evictable_blocks, increase reference count
-               not intern => uninitialized or external -> get internal_block, increase reference count
-               uninitialized -> fill with default value
-               external -> read */
-            if (sblock.is_internal())
-            {
-                if (! sblock.is_acquired())
-                    // not acquired yet -> remove from evictable_blocks
-                    evictable_blocks.erase(sbid);
-            }
-            else if (sblock.is_initialized())
-            {
-                // => external but not internal
-                //get internal_block
-                sblock.attach_internal_block(get_free_internal_block());
-                //load block synchronously
-                sblock.read_sync();
-            }
-            else
-            {
-                // => ! sblock.is_initialized()
-                //get internal_block
-                sblock.attach_internal_block(get_free_internal_block());
-                //initialize new block
-                sblock.fill_default();
-
-            }
-            //increase reference count
-            sblock.acquire();
-            return sblock.get_internal_block();
-        }
-
-        virtual void release(const swappable_block_identifier_type sbid, const bool dirty)
-        {
-            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
-            sblock.make_dirty_if(dirty);
-            sblock.release();
-            if (! sblock.is_acquired())
-            {
-                if (sblock.is_dirty() || sblock.is_external())
-                    // => evictable, put in pq
-                    evictable_blocks.insert(sbid);
-                else
-                    // => uninitialized, release internal block and put it in freelist
-                    return_free_internal_block(sblock.detach_internal_block());
-            }
-        }
-
-        virtual void deinitialize(swappable_block_identifier_type sbid)
-        {
-            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
-            if (internal_block_type * iblock = sblock.deinitialize())
-                return_free_internal_block(iblock);
-        }
-
-        virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock)
-        {
-            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
-            sblock.initialize(eblock);
-        }
-
-        virtual external_block_type extract_external_block(swappable_block_identifier_type sbid)
-        {
-            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
-            if (sblock.is_internal())
-                return_free_internal_block(sblock.detach_internal_block());
-            return sblock.extract_external_block();
-        }
-
-        virtual void explicit_timestep() {};
-
-        bool is_simulating() const
-        { return false; }
-    };
+    { free_internal_blocks.push(iblock); }
 
 public:
     //! \brief create a block_scheduler with empty prediction sequence in simple mode.
     //! \param max_internal_memory Amount of internal memory (in bytes) the scheduler is allowed to use for acquiring, prefetching and caching.
-    explicit block_scheduler(int_type max_internal_memory)
-        : max_internal_blocks(div_ceil(max_internal_memory, sizeof(internal_block_type))),
-          remaining_internal_blocks(max_internal_blocks),
-          bm(block_manager::get_instance()),
-          algo(new block_scheduler_algorithm_online(*this))
-    { }
+    explicit block_scheduler(int_type max_internal_memory);
 
-    ~block_scheduler()
-    {
-        delete algo;
+    ~block_scheduler();
 
-        // clean swappable_blocks
-        std::vector<request_ptr> requests;
-        for (typename std::vector<SwappableBlockType>::iterator it = swappable_blocks.begin();
-                it != swappable_blocks.end(); ++it)
-            if (it->is_dirty())
-                requests.push_back(it->clean_async());
-        wait_all(requests.begin(), requests.end());
-        // free internal blocks
-        while (! parked_evictable_blocks.empty())
-        {
-            return_free_internal_block(swappable_blocks[parked_evictable_blocks.top()].detach_internal_block());
-            parked_evictable_blocks.pop();
-        }
-        if (int_type nlost = free_internal_blocks.size() - max_internal_blocks + remaining_internal_blocks)
-            STXXL_ERRMSG(nlost << " internal_blocks are lost. They will get deallocated.");
-        while (! internal_blocks_blocks.empty())
-        {
-            delete [] internal_blocks_blocks.top();
-            internal_blocks_blocks.pop();
-        }
-    }
-
-public:
     //! \brief Acquire the given block.
     //! Has to be in pairs with release. Pairs may be nested and interleaved.
     //! \return Reference to the block's data.
@@ -540,23 +365,18 @@ public:
     //! Has to be in pairs with acquire. Pairs may be nested and interleaved.
     //! \param sblock Swappable block to release.
     //! \param dirty If the data hab been changed, invalidating possible data in external storage.
-    void release(const swappable_block_identifier_type sbid, const bool dirty)
-    { algo->release(sbid, dirty); }
+    void release(const swappable_block_identifier_type sbid, const bool dirty);
 
     //! \brief Drop all data in the given block, freeing in- and external memory.
-    void deinitialize(swappable_block_identifier_type sbid)
-    { algo->deinitialize(sbid); }
+    void deinitialize(swappable_block_identifier_type sbid);
 
-    void initialize(swappable_block_identifier_type sbid, external_block_type eblock)
-    { algo->initialize(sbid, eblock); }
+    void initialize(swappable_block_identifier_type sbid, external_block_type eblock);
 
-    external_block_type extract_external_block(swappable_block_identifier_type sbid)
-    { return algo->extract_external_block(sbid); }
+    external_block_type extract_external_block(swappable_block_identifier_type sbid);
 
     //! \brief Record a timestep in the prediction sequence to seperate consecutive acquire rsp. release-operations.
     //! Has an effect only in simulation mode.
-    void explicit_timestep()
-    { algo->explicit_timestep(); }
+    void explicit_timestep();
 
     //! \brief Get a const reference to given block's data. Block has to be already acquired.
     //! \param sblock Swappable block to access.
@@ -592,27 +412,235 @@ public:
     //! \param sblock Temporary swappable_block to free.
     void free_swappable_block(swappable_block_identifier_type sbid)
     {
-        algo->deinitialize(sbid);
+        deinitialize(sbid);
         free_swappable_blocks.push(sbid);
     }
 
-    //! \brief Turn on simulation mode and reset prediction sequence.
-    //! \brief Turn off simulation mode. Returns a reference to the recorded prediction sequence.
-    //! \brief Turn on offline_lfd mode. Use the last used (or recorded) prediction sequence.
-    //! \brief Turn on offline_lfd mode. Use the given prediction sequence.
-    //! \param new_ps prediction sequence to copy and use.
-    //! \brief Turn off offline_lfd mode.
-
     //! \brief Returns if simulation mode is on, i.e. if a prediction sequence is being recorded.
     //! \return If simulation mode is on.
-    bool is_simulating() const
-    { return algo->is_simulating(); }
+    bool is_simulating() const;
 };
+
+template <class SwappableBlockType>
+class block_scheduler_algorithm : private noncopyable
+{
+protected:
+    typedef block_scheduler<SwappableBlockType> block_scheduler_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename block_scheduler_type::external_block_type external_block_type;
+    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
+
+    template <class SBT> friend class block_scheduler;
+
+    block_scheduler_type & bs;
+
+    block_scheduler_algorithm(block_scheduler_type & bs)
+        : bs(bs) {}
+
+    virtual ~block_scheduler_algorithm() {};
+
+    virtual internal_block_type & acquire(swappable_block_identifier_type sbid) = 0;
+    virtual void release(const swappable_block_identifier_type sbid, const bool dirty) = 0;
+    virtual void deinitialize(swappable_block_identifier_type sbid) = 0;
+    virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock) = 0;
+    virtual external_block_type extract_external_block(swappable_block_identifier_type sbid) = 0;
+    virtual void explicit_timestep() = 0;
+
+    virtual bool is_simulating() const = 0;
+};
+
+template <class SwappableBlockType>
+class block_scheduler_algorithm_online : public block_scheduler_algorithm<SwappableBlockType>
+{
+protected:
+    typedef block_scheduler<SwappableBlockType> block_scheduler_type;
+    typedef block_scheduler_algorithm<SwappableBlockType> block_scheduler_algorithm_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename block_scheduler_type::external_block_type external_block_type;
+    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
+
+    using block_scheduler_algorithm_type::bs;
+
+    template <class SBT> friend class block_scheduler;
+
+    //! \brief holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired
+    addressable_fifo_queue<swappable_block_identifier_type> evictable_blocks;
+
+    block_scheduler_algorithm_online(block_scheduler_type & bs)
+                : block_scheduler_algorithm_type(bs)
+    {
+        while(! bs.parked_evictable_blocks.empty())
+        {
+            evictable_blocks.insert(bs.parked_evictable_blocks.top());
+            bs.parked_evictable_blocks.pop();
+        }
+    }
+
+    ~block_scheduler_algorithm_online()
+    {
+        while(! evictable_blocks.empty())
+            bs.parked_evictable_blocks.push(evictable_blocks.pop());
+    }
+
+    internal_block_type * get_free_internal_block()
+    {
+        // try do get a free internal_block
+        if (internal_block_type * iblock = bs.get_free_internal_block())
+            return iblock;
+        // evict block
+        return bs.swappable_blocks[evictable_blocks.pop()].detach_internal_block();
+    }
+
+    void return_free_internal_block(internal_block_type * iblock)
+    {
+        bs.return_free_internal_block(iblock);
+    }
+
+    virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
+    {
+        SwappableBlockType & sblock = bs.swappable_blocks[sbid];
+        /* acquired => internal -> increase reference count
+           internal but not acquired -> remove from evictable_blocks, increase reference count
+           not intern => uninitialized or external -> get internal_block, increase reference count
+           uninitialized -> fill with default value
+           external -> read */
+        if (sblock.is_internal())
+        {
+            if (! sblock.is_acquired())
+                // not acquired yet -> remove from evictable_blocks
+                evictable_blocks.erase(sbid);
+        }
+        else if (sblock.is_initialized())
+        {
+            // => external but not internal
+            //get internal_block
+            sblock.attach_internal_block(get_free_internal_block());
+            //load block synchronously
+            sblock.read_sync();
+        }
+        else
+        {
+            // => ! sblock.is_initialized()
+            //get internal_block
+            sblock.attach_internal_block(get_free_internal_block());
+            //initialize new block
+            sblock.fill_default();
+
+        }
+        //increase reference count
+        sblock.acquire();
+        return sblock.get_internal_block();
+    }
+
+    virtual void release(const swappable_block_identifier_type sbid, const bool dirty)
+    {
+        SwappableBlockType & sblock = bs.swappable_blocks[sbid];
+        sblock.make_dirty_if(dirty);
+        sblock.release();
+        if (! sblock.is_acquired())
+        {
+            if (sblock.is_dirty() || sblock.is_external())
+                // => evictable, put in pq
+                evictable_blocks.insert(sbid);
+            else
+                // => uninitialized, release internal block and put it in freelist
+                return_free_internal_block(sblock.detach_internal_block());
+        }
+    }
+
+    virtual void deinitialize(swappable_block_identifier_type sbid)
+    {
+        SwappableBlockType & sblock = bs.swappable_blocks[sbid];
+        if (internal_block_type * iblock = sblock.deinitialize())
+            return_free_internal_block(iblock);
+    }
+
+    virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock)
+    {
+        SwappableBlockType & sblock = bs.swappable_blocks[sbid];
+        sblock.initialize(eblock);
+    }
+
+    virtual external_block_type extract_external_block(swappable_block_identifier_type sbid)
+    {
+        SwappableBlockType & sblock = bs.swappable_blocks[sbid];
+        if (sblock.is_internal())
+            return_free_internal_block(sblock.detach_internal_block());
+        return sblock.extract_external_block();
+    }
+
+    virtual void explicit_timestep() {};
+
+    bool is_simulating() const
+    { return false; }
+};
+
+// +-+-+-+-+-+-+ definitions of wrapping block_scheduler operations +-+-+-+-+-+-+-+-+-+-+-+-+
+
+template <class SwappableBlockType>
+block_scheduler<SwappableBlockType>::block_scheduler(int_type max_internal_memory)
+    : max_internal_blocks(div_ceil(max_internal_memory, sizeof(internal_block_type))),
+      remaining_internal_blocks(max_internal_blocks),
+      bm(block_manager::get_instance()),
+      algo(new block_scheduler_algorithm_online<SwappableBlockType>(*this))
+{ }
+
+template <class SwappableBlockType>
+block_scheduler<SwappableBlockType>::~block_scheduler()
+{
+    delete algo;
+
+    // clean swappable_blocks
+    std::vector<request_ptr> requests;
+    for (typename std::vector<SwappableBlockType>::iterator it = swappable_blocks.begin();
+            it != swappable_blocks.end(); ++it)
+        if (it->is_dirty())
+            requests.push_back(it->clean_async());
+    wait_all(requests.begin(), requests.end());
+    // free internal blocks
+    while (! parked_evictable_blocks.empty())
+    {
+        return_free_internal_block(swappable_blocks[parked_evictable_blocks.top()].detach_internal_block());
+        parked_evictable_blocks.pop();
+    }
+    if (int_type nlost = free_internal_blocks.size() - max_internal_blocks + remaining_internal_blocks)
+        STXXL_ERRMSG(nlost << " internal_blocks are lost. They will get deallocated.");
+    while (! internal_blocks_blocks.empty())
+    {
+        delete [] internal_blocks_blocks.top();
+        internal_blocks_blocks.pop();
+    }
+}
 
 template <class SwappableBlockType>
 typename block_scheduler<SwappableBlockType>::internal_block_type & block_scheduler<SwappableBlockType>::acquire(swappable_block_identifier_type sbid)
 { return algo->acquire(sbid); }
 
+template <class SwappableBlockType>
+void block_scheduler<SwappableBlockType>::release(const swappable_block_identifier_type sbid, const bool dirty)
+{ algo->release(sbid, dirty); }
+
+template <class SwappableBlockType>
+void block_scheduler<SwappableBlockType>::deinitialize(swappable_block_identifier_type sbid)
+{ algo->deinitialize(sbid); }
+
+template <class SwappableBlockType>
+void block_scheduler<SwappableBlockType>::initialize(swappable_block_identifier_type sbid, external_block_type eblock)
+{ algo->initialize(sbid, eblock); }
+
+template <class SwappableBlockType>
+typename block_scheduler<SwappableBlockType>::external_block_type block_scheduler<SwappableBlockType>::extract_external_block(swappable_block_identifier_type sbid)
+{ return algo->extract_external_block(sbid); }
+
+template <class SwappableBlockType>
+void block_scheduler<SwappableBlockType>::explicit_timestep()
+{ algo->explicit_timestep(); }
+
+template <class SwappableBlockType>
+bool block_scheduler<SwappableBlockType>::is_simulating() const
+{ return algo->is_simulating(); }
+
+// +-+-+-+-+ end definitions of wrapping block_scheduler operations +-+-+-+-+-+-+-+-+-+-+-+-+
 
 __STXXL_END_NAMESPACE
 
