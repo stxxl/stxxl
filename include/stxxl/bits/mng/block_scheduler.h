@@ -349,7 +349,7 @@ protected:
         virtual ~block_scheduler_algorithm() {};
 
         virtual internal_block_type & acquire(swappable_block_identifier_type sbid) = 0;
-        virtual void release(swappable_block_identifier_type sbid, bool dirty) = 0;
+        virtual void release(const swappable_block_identifier_type sbid, const bool dirty) = 0;
         virtual void deinitialize(swappable_block_identifier_type sbid) = 0;
         virtual external_block_type extract_external_block(swappable_block_identifier_type sbid) = 0;
         virtual void explicit_timestep() = 0;
@@ -516,7 +516,7 @@ public:
     //! Has to be in pairs with acquire. Pairs may be nested and interleaved.
     //! \param sblock Swappable block to release.
     //! \param dirty If the data hab been changed, invalidating possible data in external storage.
-    void release(swappable_block_identifier_type sbid, bool dirty)
+    void release(const swappable_block_identifier_type sbid, const bool dirty)
     { algo->release(sbid, dirty); }
 
     //! \brief Drop all data in the given block, freeing in- and external memory.
