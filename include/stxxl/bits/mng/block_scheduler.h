@@ -25,7 +25,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief Holds information to allocate, swap and reload a block of data. Use with block_scheduler. Not intended for direct use.
+//! \brief Holds information to allocate, swap and reload a block of data. Suggested to use with block_scheduler.
+//!
 //! A swappable_block can be uninitialized, i.e. it holds no data.
 //! When access is required, is has to be acquired and released afterwards, so it can be swapped in and out as required.
 //! If the stored data is no longer needed, it can get uninitialized, freeing in- and external memory.
@@ -55,18 +56,12 @@ public:
         : external_data() /*!valid*/, internal_data(0), dirty(false), reference_count(0)
     { bm = block_manager::get_instance(); }
 
-    //! \brief Create in initialized, swapped out state.
-    //! \param bid external_block with data, will be used as swap-space of this swappable_block
-    swappable_block(const external_block_type & bid)
-        : external_data(bid), internal_data(0), dirty(false), reference_count(0)
-    { bm = block_manager::get_instance(); }
-
     ~swappable_block()
     {
         if (internal_data)
             STXXL_ERRMSG("Destructing swappable_block that still holds internal_block.");
         if (reference_count > 0)
-            STXXL_ERRMSG("Destructing swappable_block that is still referenced.");
+            STXXL_ERRMSG("Destructing swappable_block that is still acquired.");
         if (dirty)
             STXXL_ERRMSG("Destructing swappable_block that is still dirty.");
         if (external_data.valid())
@@ -101,42 +96,47 @@ public:
     { return is_internal() || is_external(); }
 
     //! \brief Invalidate external data if true.
-    bool make_dirty_if(bool make_dirty)
+    //! \return is_dirty()
+    bool make_dirty_if(const bool make_dirty)
     {
         assert(is_acquired());
         return dirty = make_dirty || dirty;
     }
 
-    void acquire()
+    //! \brief Acquire the block, i.e. add a reference. Has to be internal.
+    //! \return A reference to the data-block.
+    internal_block_type & acquire()
     {
         assert(is_internal());
         ++ reference_count;
+        return * internal_data;
     }
 
+    //! \brief Release the block, i.e. subduct a reference. Has to be acquired.
     void release()
     {
         assert(is_acquired());
         -- reference_count;
     }
 
-    //! \brief get a reference to the data-block. Has to be acquired.
+    //! \brief Get a reference to the data-block. Has to be acquired.
     const internal_block_type & get_internal_block() const
     {
         assert(is_acquired());
         return * internal_data;
     }
 
-    //! \brief get a reference to the data-block. Has to be acquired.
+    //! \brief Get a reference to the data-block. Has to be acquired.
     internal_block_type & get_internal_block()
     {
         assert(is_acquired());
         return * internal_data;
     }
 
-    //! \brief fill block with default data, is supposed to be overwritten by subclass
+    //! \brief Fill block with default data, is supposed to be overwritten by subclass. Has to be internal.
     void fill_default() {}
 
-    //! \brief fill block with specific value
+    //! \brief Fill block with specific value. Has to be internal.
     void fill(const ValueType & value)
     {
         // get_internal_block checks acquired
@@ -145,6 +145,8 @@ public:
             data[i] = value;
     }
 
+    //! \brief Read asyncronusly from external_block to internal_block. Has to be internal and have an external_block.
+    //! \return A request pointer to the I/O.
     request_ptr read_async(completion_handler on_cmpl = default_completion_handler())
     {
         assert(is_internal());
@@ -153,9 +155,12 @@ public:
         return internal_data->read(external_data, on_cmpl);
     }
 
+    //! \brief Read syncronusly from external_block to internal_block. Has to be internal and have an external_block.
     void read_sync()
     { read_async()->wait(); }
 
+    //! \brief Write asyncronusly from internal_block to external_block if neccesary.
+    //! \return A request pointer to the I/O, an invalid request pointer if not neccesary.
     request_ptr clean_async(completion_handler on_cmpl = default_completion_handler())
     {
         if (! is_dirty())
@@ -166,6 +171,7 @@ public:
         return internal_data->write(external_data, on_cmpl);
     }
 
+    //! \brief Write syncronusly from internal_block to external_block if neccesary.
     void clean_sync()
     {
         request_ptr rp = clean_async();
@@ -173,12 +179,15 @@ public:
             rp->wait();
     }
 
+    //! \brief Attach an internal_block, making the block internal. Has to be not internal.
     void attach_internal_block(internal_block_type * iblock)
     {
         assert(! is_internal());
         internal_data = iblock;
     }
 
+    //! \brief Detach the internal_block. Writes to external_block if neccesary. Has to be evictable.
+    //! \return A pointer to the internal_block.
     internal_block_type * detach_internal_block()
     {
         assert(is_evictable());
@@ -204,7 +213,15 @@ public:
         return iblock;
     }
 
-    //! \brief Extract the blocks data in an external_block. The block gets uninitialized.
+    //! \brief Set the external_block that holds the swappable_block's data. The block gets initialized with it.
+    //! \param eblock The external_block holding initial data.
+    void initialize(const external_block_type eblock)
+    {
+        assert(! is_initialized());
+        external_data = eblock;
+    }
+
+    //! \brief Extract the swappable_blocks data in an external_block. The block gets uninitialized.
     //! \return The external_block that holds the swappable_block's data.
     external_block_type extract_external_block()
     {
@@ -351,6 +368,7 @@ protected:
         virtual internal_block_type & acquire(swappable_block_identifier_type sbid) = 0;
         virtual void release(const swappable_block_identifier_type sbid, const bool dirty) = 0;
         virtual void deinitialize(swappable_block_identifier_type sbid) = 0;
+        virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock) = 0;
         virtual external_block_type extract_external_block(swappable_block_identifier_type sbid) = 0;
         virtual void explicit_timestep() = 0;
 
@@ -455,6 +473,12 @@ protected:
                 return_free_internal_block(iblock);
         }
 
+        virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock)
+        {
+            SwappableBlockType & sblock = bs.swappable_blocks[sbid];
+            sblock.initialize(eblock);
+        }
+
         virtual external_block_type extract_external_block(swappable_block_identifier_type sbid)
         {
             SwappableBlockType & sblock = bs.swappable_blocks[sbid];
@@ -523,6 +547,9 @@ public:
     void deinitialize(swappable_block_identifier_type sbid)
     { algo->deinitialize(sbid); }
 
+    void initialize(swappable_block_identifier_type sbid, external_block_type eblock)
+    { algo->initialize(sbid, eblock); }
+
     external_block_type extract_external_block(swappable_block_identifier_type sbid)
     { return algo->extract_external_block(sbid); }
 
@@ -541,14 +568,16 @@ public:
     internal_block_type & get_internal_block(swappable_block_identifier_type sbid)
     { return swappable_blocks[sbid].get_internal_block(); }
 
-    //! \brief Allocate a swappable_block. Returns an identifier of the block.
+    //! \brief Allocate an uninitialized swappable_block.
+    //! \return An identifier of the block.
     swappable_block_identifier_type allocate_swappable_block()
     {
         if (free_swappable_blocks.empty())
         {
             // create new swappable_block
-            swappable_blocks.resize(swappable_blocks.size() + 1);
-            return swappable_blocks.size();
+            swappable_block_identifier_type sbid = swappable_blocks.size();
+            swappable_blocks.resize(sbid + 1);
+            return sbid;
         }
         else
         {
