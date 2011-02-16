@@ -72,6 +72,7 @@ GNUmakefile:
 	echo "#MCSTL=#empty" >> $@
 	echo "" >> $@
 	echo "all: lib header-compile-test tests" >> $@
+	echo "	@echo ALL DONE" >> $@
 	echo "" >> $@
 	echo "-include make.settings.local" >> $@
 	echo "include GNUmakefile.mk" >> $@

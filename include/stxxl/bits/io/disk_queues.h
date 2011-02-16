@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -51,6 +51,9 @@ protected:
 public:
     void add_request(request_ptr & req, DISKID disk)
     {
+#ifdef STXXL_HACK_SINGLE_IO_THREAD
+        disk = 42;
+#endif
         if (queues.find(disk) == queues.end())
         {
             // create new request queue
@@ -69,6 +72,9 @@ public:
     //! \return \c true iff the request was canceled successfully
     bool cancel_request(request_ptr & req, DISKID disk)
     {
+#ifdef STXXL_HACK_SINGLE_IO_THREAD
+        disk = 42;
+#endif
         if (queues.find(disk) != queues.end())
             return queues[disk]->cancel_request(req);
         else

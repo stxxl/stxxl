@@ -47,7 +47,7 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
     STXXL_MSG("Block size " << vector_type::block_type::raw_size / 1024 << " KiB");
 
     STXXL_MSG("Filling vector...");
-    std::generate(v.begin(), v.end(), stxxl::random_number64());
+    std::generate(v.begin(), v.end(), stxxl::random_number64() _STXXL_FORCE_SEQUENTIAL);
     //std::generate(v.begin(),v.end(),zero());
 
     STXXL_MSG("Sorting vector...");

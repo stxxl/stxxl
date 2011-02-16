@@ -108,3 +108,4 @@ stream\test_sorted_runs
 stream\test_stream
 stream\test_stream1
 stream\test_transpose
+stream\test_loop 100 -v

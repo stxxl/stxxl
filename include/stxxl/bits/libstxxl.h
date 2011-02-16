@@ -1,5 +1,5 @@
 /***************************************************************************
- *  common/test_globals.cpp
+ *  include/stxxl/bits/libstxxl.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,11 +10,18 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/vector>
+#ifndef STXXL_LIBSTXXL_H
+#define STXXL_LIBSTXXL_H
 
-stxxl::vector<int> global_vector;
+#ifdef STXXL_BOOST_CONFIG
+ #include <boost/config.hpp>
+#endif
 
-int main()
-{
-    return 0;
-}
+#ifdef BOOST_MSVC
+ #ifndef STXXL_LIBNAME
+  #define STXXL_LIBNAME "stxxl"
+ #endif
+ #pragma comment (lib, "lib" STXXL_LIBNAME ".lib")
+#endif
+
+#endif // !STXXL_IO_HEADER

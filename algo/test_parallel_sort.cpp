@@ -11,6 +11,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! \example algo/test_parallel_sort.cpp
+//! This is an example of how to use the parallelized sorting algorithm.
+//! Setting all the parameters in optional, just compiling with either MCSTL
+//! or parallel mode suffices.
+
 #define MCSTL_QUICKSORT_WORKAROUND 0
 
 #if !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
@@ -172,7 +177,7 @@ int main(int argc, const char ** argv)
     stxxl::unsigned_type memory_to_use = (stxxl::unsigned_type)atoi(argv[3]) * megabyte;
     run_size = memory_to_use;
     buffer_size = memory_to_use / 16;
-#ifdef _GLIBCXX_PARALLEL
+#ifdef STXXL_PARALLEL_MODE
     omp_set_num_threads(p);
     __gnu_parallel::_Settings parallel_settings(__gnu_parallel::_Settings::get());
 
@@ -222,8 +227,7 @@ int main(int argc, const char ** argv)
                __gnu_parallel::MWMS,
                __gnu_parallel::QS,
                __gnu_parallel::QS_BALANCED);
-#endif
-#ifdef __MCSTL__
+#elif defined(__MCSTL__)
     mcstl::HEURISTIC::num_threads = p;
     mcstl::HEURISTIC::force_sequential = false;
 

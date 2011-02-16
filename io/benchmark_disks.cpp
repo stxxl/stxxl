@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2007-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -26,6 +26,7 @@
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 #include <stxxl/timer>
+#include <stxxl/bits/version.h>
 
 
 using stxxl::request_ptr;
@@ -232,6 +233,17 @@ int main(int argc, char * argv[])
     if (!(first_disk_arg < argc))
         usage(argv[0]);
 
+    const char * myrev = "$Revision$";
+    const char * myself = strrchr(argv[0], '/');
+    if (!myself || !*(++myself))
+        myself = argv[0];
+    std::cout << "# " << myself << " " << myrev;
+#ifdef STXXL_DIRECT_IO_OFF
+    std::cout << " STXXL_DIRECT_IO_OFF";
+#endif
+    std::cout << std::endl;
+    std::cout << "# " << stxxl::get_version_string() << std::endl;
+
     for (int ii = first_disk_arg; ii < argc; ii++)
     {
         std::cout << "# Add disk: " << argv[ii] << std::endl;
@@ -281,15 +293,6 @@ int main(int argc, char * argv[])
     do_read = false;
 #endif
 
-    const char * myrev = "$Revision$";
-    const char * myself = strrchr(argv[0], '/');
-    if (!myself || !*(++myself))
-        myself = argv[0];
-    std::cout << "# " << myself << " " << myrev;
-#ifdef STXXL_DIRECT_IO_OFF
-    std::cout << " STXXL_DIRECT_IO_OFF";
-#endif
-    std::cout << std::endl;
     std::cout << "# Step size: "
               << step_size << " bytes per disk ("
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
