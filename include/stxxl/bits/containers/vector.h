@@ -1260,7 +1260,7 @@ public:
     }
 
     //! \brief Get the file associated with this vector, or NULL.
-    file * get_file()
+    file * get_file() const
     {
         return _from;
     }
