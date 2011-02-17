@@ -132,9 +132,10 @@ namespace sort_local
             for (i = 0; i < run_size; ++i)
                 bm->delete_block(bids1[i]);
 
-            std::sort(make_element_iterator(Blocks1, 0),
-                      make_element_iterator(Blocks1, run_size * block_type::size),
-                      cmp);
+            potentially_parallel::
+            sort(make_element_iterator(Blocks1, 0),
+                 make_element_iterator(Blocks1, run_size * block_type::size),
+                 cmp);
 
             STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
             if (k > 0)
@@ -170,9 +171,10 @@ namespace sort_local
         for (i = 0; i < run_size; ++i)
             bm->delete_block(bids1[i]);
 
-        std::sort(make_element_iterator(Blocks1, 0),
-                  make_element_iterator(Blocks1, run_size * block_type::size),
-                  cmp);
+        potentially_parallel::
+        sort(make_element_iterator(Blocks1, 0),
+             make_element_iterator(Blocks1, run_size * block_type::size),
+             cmp);
 
         STXXL_VERBOSE1("stxxl::create_runs start waiting write_reqs");
         wait_all(write_reqs, m2);

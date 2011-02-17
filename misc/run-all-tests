@@ -199,6 +199,8 @@ run stream/test_sorted_runs
 run stream/test_stream
 run stream/test_stream1
 run stream/test_transpose
+run stream/test_loop 100 -v
+run stream/test_loop 1000000
 
 run io/unittest
 run mng/unittest

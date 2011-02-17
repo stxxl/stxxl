@@ -14,7 +14,8 @@
 #include <stxxl/stream>
 #include <stxxl/vector>
 
-struct forty_two {
+struct forty_two
+{
     unsigned counter;
 
     forty_two() : counter(0) { }

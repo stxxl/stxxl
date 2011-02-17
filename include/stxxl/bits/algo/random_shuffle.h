@@ -135,7 +135,8 @@ void random_shuffle(ExtIterator_ first,
             }
 
             // shuffle
-            std::random_shuffle(temp_array, temp_array + size, rand);
+            potentially_parallel::
+            random_shuffle(temp_array, temp_array + size, rand);
 
             // write back
             for (j = 0; j < size; j++) {
@@ -292,7 +293,8 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
             }
 
             // shuffle
-            std::random_shuffle(temp_array, temp_array + size, rand);
+            potentially_parallel::
+            random_shuffle(temp_array, temp_array + size, rand);
 
             // write back
             for (j = 0; j < size; j++) {

@@ -32,6 +32,7 @@ DEBUG_LINKER = /OPT:REF # debug is off
 # DEBUG_LINKER = /DEBUG # debug is on
 
 LIBNAME = stxxl
+# if you change LIBNAME, add /DSTXXL_LIBNAME=\"$(LIBNAME)\" to the compiler options
 
 include make.settings.local
 
@@ -41,7 +42,7 @@ include make.settings.local
 # the sorters: stxxl::stream::sort, stxxl::stream::merge_runs,
 # stxxl::sort, and stxxl::ksort add
 #
-#     -DSTXXL_CHECK_ORDER_IN_SORTS
+#     /DSTXXL_CHECK_ORDER_IN_SORTS
 #
 # to the compile options.
 
@@ -63,7 +64,7 @@ STXXL_SPECIFIC	 = \
 MSVC_COMPILER_OPTIONS = /EHsc /EHs /wd4820 /wd4217 /wd4668 /wd4619 \
  /wd4625 /wd4626 /wd4355 /wd4996 -D_SCL_SECURE_NO_DEPRECATE \
  /F 16777216 /nologo
-MSVC_LINKER_OPTIONS = /LIBPATH:$(STXXL_ROOT)\lib\ libstxxl.lib \
+MSVC_LINKER_OPTIONS = /LIBPATH:$(STXXL_ROOT)\lib\ lib$(LIBNAME).lib \
  /LIBPATH:$(BOOST_ROOT)\lib\ /STACK:16777216 /NOLOGO
 
 ##################################################################
@@ -102,6 +103,7 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/verbose.h \
 	$(HEADER_PATH)/unused.h \
 	$(HEADER_PATH)/deprecated.h \
+	$(HEADER_PATH)/libstxxl.h \
 	$(HEADER_PATH)/msvc_compatibility.h \
 	$(HEADER_PATH)/common/aligned_alloc.h \
 	$(HEADER_PATH)/common/new_alloc.h \

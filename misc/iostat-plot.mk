@@ -3,7 +3,7 @@
 #
 #  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-#  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -29,7 +29,9 @@ empty	?=#
 space	?= $(empty) $(empty)
 comma	?= ,
 
-IOSTAT_PLOT_BINDIR		?= .
+ifndef IOSTAT_PLOT_BINDIR
+IOSTAT_PLOT_BINDIR		:= $(dir $(lastword $(MAKEFILE_LIST)))
+endif
 IOSTAT_PLOT_RECORD_DATA		?= $(IOSTAT_PLOT_BINDIR)/record-load-iostat
 IOSTAT_PLOT_CONCAT_LINES	?= $(IOSTAT_PLOT_BINDIR)/concat-lines
 IOSTAT_PLOT_FLOATING_AVERAGE	?= $(IOSTAT_PLOT_BINDIR)/floating-average
@@ -73,7 +75,7 @@ define template-iostat-gnuplot
 	$(ECHO) 'set title "$(subst _, ,$*) (avg=$(IOSTAT_PLOT_AVERAGE.$(strip $1)))"' >> $@
 	$(ECHO) 'set xlabel "Time [s]"' >> $@
 	$(ECHO) 'set ylabel "$(IOSTAT_PLOT_Y_LABEL.$(strip $1))"' >> $@
-$(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
+$(if $(and $(filter io,$1),$(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION))),
 	$(ECHO) 'set y2label "Utilization [%]"' >> $@
 	$(ECHO) 'set ytics nomirror' >> $@
 	$(ECHO) 'set y2tics' >> $@

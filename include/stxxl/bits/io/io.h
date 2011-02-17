@@ -30,10 +30,6 @@
 #include <stxxl/bits/io/iostats.h>
 
 
-#ifdef BOOST_MSVC
- #pragma comment (lib, "libstxxl.lib")
-#endif
-
 //! \brief \c \<stxxl\> library namespace
 __STXXL_BEGIN_NAMESPACE
 

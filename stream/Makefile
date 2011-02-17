@@ -39,6 +39,11 @@ test_transpose.$(EXEEXT): test_transpose.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_transpose.cpp
 	$(LINKER) test_transpose.$(OBJEXT) $(OUT)test_transpose.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_loop: test_loop.$(EXEEXT)
+test_loop.$(EXEEXT): test_loop.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_loop.cpp
+	$(LINKER) test_loop.$(OBJEXT) $(OUT)test_loop.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) $(CLEAN_TARGETS)
