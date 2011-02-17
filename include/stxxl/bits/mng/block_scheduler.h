@@ -252,7 +252,7 @@ class block_scheduler : private noncopyable
 protected:
     // tuning-parameter: To acquire blocks, internal memory has to be allocated.
     // This constant limits the number of internal_blocks allocated at once.
-    static const int_type max_internal_blocks_alloc_at_once = 128;
+    static const int_type max_internal_blocks_alloc_at_once;
 
 public:
     typedef typename SwappableBlockType::internal_block_type internal_block_type;
@@ -611,6 +611,9 @@ block_scheduler<SwappableBlockType>::~block_scheduler()
         internal_blocks_blocks.pop();
     }
 }
+
+template <class SwappableBlockType>
+const int_type block_scheduler<SwappableBlockType>::max_internal_blocks_alloc_at_once = 128;
 
 template <class SwappableBlockType>
 typename block_scheduler<SwappableBlockType>::internal_block_type & block_scheduler<SwappableBlockType>::acquire(swappable_block_identifier_type sbid)
