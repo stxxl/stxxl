@@ -151,6 +151,7 @@ public:
     {
         assert(is_internal());
         assert(has_external_block());
+        STXXL_MSG("reading block");
         dirty = false;
         return internal_data->read(external_data, on_cmpl);
     }
@@ -167,6 +168,7 @@ public:
             return request_ptr();
         if (! has_external_block())
             get_external_block();
+        STXXL_MSG("writing block");
         dirty = false;
         return internal_data->write(external_data, on_cmpl);
     }
@@ -329,9 +331,8 @@ protected:
         else if (remaining_internal_blocks > 0)
         {
             // => more internal_blocks can be allocated
-            /*int_type num_blocks = (max_internal_blocks_alloc_at_once < remaining_internal_blocks)
-            		? max_internal_blocks_alloc_at_once : remaining_internal_blocks;  // min */
             int_type num_blocks = std::min(max_internal_blocks_alloc_at_once, remaining_internal_blocks);
+            remaining_internal_blocks -= num_blocks;
             internal_block_type * iblocks = new internal_block_type[num_blocks];
             internal_blocks_blocks.push(iblocks);
             for (int_type i = num_blocks - 1; i > 0; --i)
@@ -422,6 +423,14 @@ public:
     //! \brief Returns if simulation mode is on, i.e. if a prediction sequence is being recorded.
     //! \return If simulation mode is on.
     bool is_simulating() const;
+
+    block_scheduler_algorithm<SwappableBlockType> * switch_algorithm_to(block_scheduler_algorithm<SwappableBlockType> * new_algo)
+    {
+        assert(&new_algo->bs == this);
+        const block_scheduler_algorithm<SwappableBlockType> * old_algo = algo;
+        algo = new_algo;
+        return old_algo;
+    }
 };
 
 template <class SwappableBlockType>
@@ -473,7 +482,7 @@ protected:
 
     using block_scheduler_algorithm_type::bs;
 
-    template <class SBT> friend class block_scheduler;
+    //template <class SBT> friend class block_scheduler;
 
     //! \brief holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired
     addressable_fifo_queue<swappable_block_identifier_type> evictable_blocks;
@@ -501,7 +510,9 @@ public:
     virtual ~block_scheduler_algorithm_online()
     {
         if (! evictable_blocks.empty())
-            STXXL_ERRMSG("Destructing swappable_block that still holds evictable block.");
+            STXXL_ERRMSG("Destructing block_scheduler_algorithm_online that still holds evictable blocks. They get deinitialized.");
+        while (! evictable_blocks.empty())
+            deinitialize(evictable_blocks.pop());
     }
 
     virtual bool evictable_blocks_empty()
@@ -512,7 +523,7 @@ public:
 
     internal_block_type * get_free_internal_block()
     {
-        // try do get a free internal_block
+        // try to get a free internal_block
         if (internal_block_type * iblock = bs.get_free_internal_block())
             return iblock;
         // evict block
@@ -577,6 +588,8 @@ public:
     virtual void deinitialize(swappable_block_identifier_type sbid)
     {
         SwappableBlockType & sblock = bs.swappable_blocks[sbid];
+        if (sblock.is_evictable())
+            evictable_blocks.erase(sbid);
         if (internal_block_type * iblock = sblock.deinitialize())
             return_free_internal_block(iblock);
     }
@@ -590,6 +603,8 @@ public:
     virtual external_block_type extract_external_block(swappable_block_identifier_type sbid)
     {
         SwappableBlockType & sblock = bs.swappable_blocks[sbid];
+        if (sblock.is_evictable())
+            evictable_blocks.erase(sbid);
         if (sblock.is_internal())
             return_free_internal_block(sblock.detach_internal_block());
         return sblock.extract_external_block();
@@ -600,7 +615,7 @@ public:
 
     virtual void explicit_timestep() {};
 
-    bool is_simulating() const
+    virtual bool is_simulating() const
     { return false; }
 };
 
@@ -611,27 +626,25 @@ block_scheduler<SwappableBlockType>::block_scheduler(const int_type max_internal
     : max_internal_blocks(div_ceil(max_internal_memory, sizeof(internal_block_type))),
       remaining_internal_blocks(max_internal_blocks),
       bm(block_manager::get_instance()),
-      algo(new block_scheduler_algorithm_online<SwappableBlockType>(*this))
-{ }
+      algo(0)
+{ algo = new block_scheduler_algorithm_online<SwappableBlockType>(*this); }
 
 template <class SwappableBlockType>
 block_scheduler<SwappableBlockType>::~block_scheduler()
 {
-    // clean swappable_blocks
-    std::vector<request_ptr> requests;
-    for (typename std::vector<SwappableBlockType>::iterator it = swappable_blocks.begin(); // evictable_blocks would suffice
-            it != swappable_blocks.end(); ++it)
-        if (it->is_dirty())
-            requests.push_back(it->clean_async());
-    wait_all(requests.begin(), requests.end());
-    // free internal blocks
-    while (! algo->evictable_blocks_empty())
-    {
-        swappable_blocks[algo->evictable_blocks_pop()].detach_internal_block();
-        ++ remaining_internal_blocks;
-    }
     delete algo;
-    if (int_type nlost = max_internal_blocks - remaining_internal_blocks - free_internal_blocks.size())
+    int_type num_freed_internal_blocks = 0;
+    if (free_swappable_blocks.size() != swappable_blocks.size())
+    {
+        // => not all swappable_blocks are free, at least deinitialize them
+        STXXL_ERRMSG("not all swappable_blocks are free, those not acquired get deinitialized");
+        for (typename std::vector<SwappableBlockType>::iterator it = swappable_blocks.begin(); // evictable_blocks would suffice
+                it != swappable_blocks.end(); ++it)
+            if (! it->is_acquired())
+                num_freed_internal_blocks += bool(it->deinitialize()); // count internal_blocks that get freed
+    }
+    if (int_type nlost = (max_internal_blocks - remaining_internal_blocks)
+            - (free_internal_blocks.size() + num_freed_internal_blocks))
         STXXL_ERRMSG(nlost << " internal_blocks are lost. They will get deallocated.");
     while (! internal_blocks_blocks.empty())
     {
