@@ -17,8 +17,8 @@
 #define STXXL_BLAS 0
 #endif
 
-#include <stxxl/bits/mng/mng.h>
-#include <stxxl/bits/mng/typed_block.h>
+//#include <stxxl/bits/mng/mng.h>
+//#include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/containers/matrix_layouts.h>
 #include <stxxl/bits/mng/block_scheduler.h>
 
@@ -27,34 +27,206 @@ __STXXL_BEGIN_NAMESPACE
 
 // +-+-+-+-+-+-+ matrix version with swappable_blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+/* index-variable naming convention:
+ * [MODIFIER_][UNIT_]DIMENSION[_in_[MODIFIER_]ENVIRONMENT]
+ *
+ * e.g.:
+ * block_row = number of row measured in rows consisting of blocks
+ * element_row_in_block = number of row measured in rows consisting of elements in the (row of) block(s)
+ *
+ * size-variable naming convention:
+ * [MODIFIER_][ENVIRONMENT_]DIMENSION[_in_UNITs]
+ *
+ * e.g.
+ * height_in_blocks
+ */
+
+template <typename ValueType, unsigned BlockSideLength> class matrix;
+
 //! \brief Specialised swappable_block that interprets uninitiazized as containing zeros.
 //! When initializing, all values are set to zero.
 template <typename ValueType, unsigned BlockSideLength>
 class matrix_swappable_block : public swappable_block<ValueType, BlockSideLength * BlockSideLength>
 {
+    using swappable_block<ValueType, BlockSideLength * BlockSideLength>::fill;
 public:
-    bool is_zero_block() const
-    { return !this.is_initialized(); }
-
-    void fill_with_zeros()
-    { this.fill(0); }
-
     void fill_default()
-    { fill_with_zeros(); }
+    { fill(0); }
 };
 
 //! \brief External container for the values of a (sub)matrix. Not intended for direct use.
+//!
+//! Stores blocks only, so all measures (height, width, row, col) are in blocks.
 template <typename ValueType, unsigned BlockSideLength>
-struct matrix_data
+class swappable_block_matrix : private noncopyable
 {
-    typedef matrix_swappable_block<ValueType, BlockSideLength> matrix_swappable_block_type;
+public:
+    typedef int_type size_type;
+    typedef int_type index_type;
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef block_scheduler< matrix_swappable_block<ValueType, BlockSideLength> > block_scheduler_type;
+    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
 
-    std::vector<matrix_swappable_block_type * > blocks;
-    int_type height_in_blocks,
-             width_in_blocks;
-    bool transposed;
+protected:
+    block_scheduler_type & bs;
 
-    matrix_swappable_block_type * get_block(int_type row, int_type col)
+    //! \brief height of the matrix in blocks
+    size_type height,
+    //! \brief width of the matrix in blocks
+            width,
+    //! \brief height copied from supermatrix
+            height_from_supermatrix,
+    //! \brief width copied from supermatrix
+            width_from_supermatrix;
+    //! \brief the matrice's blocks in row-major
+    std::vector<swappable_block_identifier_type> blocks;
+    //! \brief if the elements in each block are in col-major instead of row-major
+    bool elements_in_blocks_transposed;
+
+public:
+    //! \brief Create an empty swappable_block_matrix of given dimensions.
+    swappable_block_matrix(block_scheduler_type & bs, const size_type height_in_blocks, const size_type width_in_blocks)
+        : bs(bs),
+          height(height_in_blocks),
+          width(width_in_blocks),
+          height_from_supermatrix(0),
+          width_from_supermatrix(0),
+          blocks(height * width),
+          elements_in_blocks_transposed(false)
+    {
+        for (index_type row = 0; row < height; ++row)
+            for (index_type col = 0; col < width; ++col)
+                block(row, col) = bs.allocate_swappable_block();
+    }
+
+    //! \brief Create swappable_block_matrix of given dimensions that
+    //!        represents the submatrix of supermatrix starting at (row_in_blocks, col_in_blocks).
+    //!
+    //! If supermatrix is not large enough, the submatrix is padded with empty blocks.
+    //! The supermatrix must not be destructed before the submatrix.
+    swappable_block_matrix(swappable_block_matrix_type & supermatrix,
+            const size_type height_in_blocks, const size_type width_in_blocks,
+            const index_type from_row_in_blocks, const index_type from_col_in_blocks)
+        : bs(supermatrix.bs),
+          height(height_in_blocks),
+          width(width_in_blocks),
+          height_from_supermatrix(std::min(supermatrix.height - from_row_in_blocks, height)),
+          width_from_supermatrix(std::min(supermatrix.width - from_col_in_blocks, width)),
+          blocks(height * width),
+          elements_in_blocks_transposed(supermatrix.elements_in_blocks_transposed)
+    {
+        for (index_type row = 0; row < height_from_supermatrix; ++row)
+        {
+            for (index_type col = 0; col < width_from_supermatrix; ++col)
+                block(row, col) = supermatrix.block(row + from_row_in_blocks, col + from_col_in_blocks);
+            for (index_type col = width_from_supermatrix; col < width; ++col)
+                block(row, col) = bs.allocate_swappable_block();
+        }
+        for (index_type row = height_from_supermatrix; row < height; ++row)
+            for (index_type col = 0; col < width; ++col)
+                block(row, col) = bs.allocate_swappable_block();
+    }
+
+    ~swappable_block_matrix()
+    {
+        for (index_type row = 0; row < height_from_supermatrix; ++row)
+        {
+            for (index_type col = width_from_supermatrix; col < width; ++col)
+                bs.free_swappable_block(block(row, col));
+        }
+        for (index_type row = height_from_supermatrix; row < height; ++row)
+            for (index_type col = 0; col < width; ++col)
+                bs.free_swappable_block(block(row, col));
+    }
+
+    swappable_block_identifier_type & block(index_type row, index_type col)
+    { return blocks[row * width + col]; }
+
+    bool is_transposed()
+    { return elements_in_blocks_transposed; }
+
+    void transpose()
+    {
+        elements_in_blocks_transposed = ! elements_in_blocks_transposed;
+        //todo transpose blocks
+    }
+
+    void set_zero(); // deinitialize all blocks
+};
+
+template <typename ValueType, unsigned BlockSideLength>
+class matrix_iterator
+{
+protected:
+    typedef matrix<ValueType, BlockSideLength> matrix_type;
+    typedef typename matrix_type::swappable_block_matrix_type swappable_block_matrix_type;
+    typedef typename matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename matrix_type::elem_size_type elem_size_type;
+    typedef typename matrix_type::elem_index_type elem_index_type;
+    typedef typename matrix_type::block_size_type block_size_type;
+    typedef typename matrix_type::block_index_type block_index_type;
+
+    template <typename VT, unsigned BSL> friend class matrix;
+
+    matrix_type & m;
+    swappable_block_matrix_type & mdata;
+    block_scheduler_type & bs;
+    elem_index_type current_row,
+            current_col;
+    internal_block_type * current_iblock;
+
+    matrix_iterator(matrix_type matrix, const elem_index_type row, const elem_index_type col)
+        : m(matrix),
+          mdata(*matrix.data),
+          bs(mdata.bs),
+          current_row(row),
+          current_col(col),
+          current_iblock(0)
+    {}
+
+    void set_row(const elem_index_type new_row)
+    {
+        const block_index_type current_block_row = m.block_index_from_elem(current_row),
+                current_block_col = m.block_index_from_elem(current_col),
+                new_block_row = m.block_index_from_elem(new_row);
+        if (new_block_row != current_block_row && current_iblock)
+            bs.release(mdata.block(current_block_row, current_block_col));
+        current_row = new_row;
+    }
+
+    void set_col(const elem_index_type new_col)
+    {
+        const block_index_type current_block_row = m.block_index_from_elem(current_row),
+                current_block_col = m.block_index_from_elem(current_col),
+                new_block_col = m.block_index_from_elem(new_col);
+        if (new_block_col != current_block_col && current_iblock)
+            bs.release(mdata.block(current_block_row, current_block_col));
+        current_col = new_col;
+    }
+
+    void set_coordinates(const elem_index_type new_row, const elem_index_type new_col)
+    {
+        const block_index_type current_block_row = m.block_index_from_elem(current_row),
+                current_block_col = m.block_index_from_elem(current_col),
+                new_block_row = m.block_index_from_elem(new_row),
+                new_block_col = m.block_index_from_elem(new_col);
+        if ((new_block_col != current_block_col || new_block_row != current_block_row) && current_iblock)
+            bs.release(mdata.block(current_block_row, current_block_col));
+        current_row = new_row;
+        current_col = new_col;
+    }
+
+    elem_index_type get_row()
+    { return current_row(); }
+
+    elem_index_type get_col()
+    { return current_col(); }
+
+    std::pair<elem_index_type, elem_index_type> get_coordinates()
+    { return std::make_pair(current_row, current_col); }
+
+    ValueType & operator * ()
     {
         //todo
     }
@@ -62,27 +234,42 @@ struct matrix_data
 
 //! \brief External matrix container.
 template <typename ValueType, unsigned BlockSideLength>
-class matrix
+class matrix : private noncopyable
 {
 protected:
-    typedef matrix_data<ValueType, BlockSideLength> matrix_data_type;
+    typedef int_type elem_size_type;
+    typedef int_type elem_index_type;
+    typedef int_type elem_index_in_block_type;
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename swappable_block_matrix_type::size_type block_size_type;
+    typedef typename swappable_block_matrix_type::index_type block_index_type;
 
-    int_type height,
+    elem_size_type height,
              width;
-    matrix_data_type data;
+    swappable_block_matrix_type * data;
 
-    //! \brief Creates a new matrix of given height and width. Elements' values are set to zero.
-    //! \param new_height Height of the created matrix.
-    //! \param new_width Width of the created matrix.
-    matrix(int_type new_height, int_type new_width)
-    {
-        //todo
-    }
+public:
+    //! \brief Creates a new matrix of given dimensions. Elements' values are set to zero.
+    //! \param height height of the created matrix
+    //! \param width width of the created matrix
+    matrix(block_scheduler_type & bs, const elem_size_type height, const elem_size_type width)
+        : height(height),
+          width(width),
+          data(new swappable_block_matrix_type
+                  (bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength)))
+    {}
 
     ~matrix()
     {
-        //todo
+        delete data;
     }
+
+    block_index_type block_index_from_elem(elem_index_type ind)
+    { return ind / BlockSideLength; }
+
+    elem_index_in_block_type elem_index_in_block_from_elem(elem_index_type ind)
+    { return ind % BlockSideLength; }
 
     //todo: standart container operations
     // []; elem(row, col); row- and col-iterator; get/set row/col; get/set submatrix

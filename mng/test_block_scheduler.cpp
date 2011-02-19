@@ -11,8 +11,6 @@
  **************************************************************************/
 
 #include <stxxl/bits/mng/block_scheduler.h>
-//#include <stxxl/vector>
-//#include <stxxl/stream>
 
 // Thanks Daniel Russel, Stanford University
 #include <Argument_helper.h>

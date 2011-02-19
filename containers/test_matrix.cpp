@@ -261,22 +261,20 @@ int main(int argc, char **argv)
     }
     case 4:
     {
-        typedef swappable_block<int_type, block_order> swappable_block_type;
-        typedef block_scheduler<swappable_block_type> block_scheduler_type;
-        block_scheduler_type bs(internal_memory);
-        block_scheduler_type::swappable_block_identifier_type sb[5];
-        sb[1] = bs.allocate_swappable_block();
-        sb[2] = bs.allocate_swappable_block();
-        bs.acquire(sb[1]);
-        bs.acquire(sb[2]);
-        bs.release(sb[1],false);
-        bs.release(sb[2],false);
-        bs.free_swappable_block(sb[1]);
-        bs.free_swappable_block(sb[2]);
+        typedef int_type value_type;
 
+        typedef block_scheduler< matrix_swappable_block<value_type, block_order> > bst;
+        typedef matrix<value_type, block_order> mt;
+        bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
+        bst & bs = *b_s;
+        mt * m = new mt(bs, 5*block_order/2, 5*block_order/2);
+
+        delete m;
+        delete b_s;
         break;
     }
     }
+    STXXL_MSG("end test");
     return 0;
 }
 

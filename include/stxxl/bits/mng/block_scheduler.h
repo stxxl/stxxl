@@ -13,11 +13,7 @@
 #ifndef STXXL_BLOCK_SCHEDULER_HEADER
 #define STXXL_BLOCK_SCHEDULER_HEADER
 
-#include <queue>
 #include <stack>
-#include <set>
-#include <list>
-#include <map>
 
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>
@@ -141,8 +137,8 @@ public:
     {
         // get_internal_block checks acquired
         internal_block_type & data = get_internal_block();
-        for (int_type i = 0; i < BlockSize; ++i)
-            data[i] = value;
+        for (typename internal_block_type::iterator it = data.begin(); it != data.end(); ++it)
+            *it = value;
     }
 
     //! \brief Read asyncronusly from external_block to internal_block. Has to be internal and have an external_block.
@@ -675,7 +671,7 @@ block_scheduler<SwappableBlockType>::~block_scheduler()
     if (free_swappable_blocks.size() != swappable_blocks.size())
     {
         // => not all swappable_blocks are free, at least deinitialize them
-        STXXL_ERRMSG("not all swappable_blocks are free, those not acquired get deinitialized");
+        STXXL_ERRMSG("not all swappable_blocks are free, those not acquired will be deinitialized");
         for (typename std::vector<SwappableBlockType>::iterator it = swappable_blocks.begin(); // evictable_blocks would suffice
                 it != swappable_blocks.end(); ++it)
             if (! it->is_acquired())
