@@ -127,6 +127,11 @@ test_vector_sizes.$(EXEEXT): test_vector_sizes.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_vector_sizes.cpp
 	$(LINKER) test_vector_sizes.$(OBJEXT) $(OUT)test_vector_sizes.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_external_shared_ptr: test_external_shared_ptr.$(EXEEXT)
+test_external_shared_ptr.$(EXEEXT): test_external_shared_ptr.cpp $(DEPENDENCIES)
+        $(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_external_shared_ptr.cpp
+        $(LINKER)  test_external_shared_ptr.$(OBJEXT) $(OUT)test_external_shared_ptr.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) $(CLEAN_TARGETS)
