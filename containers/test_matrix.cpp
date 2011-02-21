@@ -265,9 +265,14 @@ int main(int argc, char **argv)
 
         typedef block_scheduler< matrix_swappable_block<value_type, block_order> > bst;
         typedef matrix<value_type, block_order> mt;
+        typedef mt::iterator mitt;
+
         bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
         bst & bs = *b_s;
         mt * m = new mt(bs, 5*block_order/2, 5*block_order/2);
+        value_type i = 1;
+        for (mitt mit = m->begin(); mit != m->end(); ++mit, ++i)
+            *mit = i;
 
         delete m;
         delete b_s;

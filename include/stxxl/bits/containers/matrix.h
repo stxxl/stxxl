@@ -67,21 +67,24 @@ public:
     typedef block_scheduler< matrix_swappable_block<ValueType, BlockSideLength> > block_scheduler_type;
     typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
 
-protected:
     block_scheduler_type & bs;
 
     //! \brief height of the matrix in blocks
-    size_type height,
+    const size_type height,
     //! \brief width of the matrix in blocks
-            width,
+                    width,
     //! \brief height copied from supermatrix
-            height_from_supermatrix,
+                    height_from_supermatrix,
     //! \brief width copied from supermatrix
-            width_from_supermatrix;
+                    width_from_supermatrix;
+protected:
     //! \brief the matrice's blocks in row-major
     std::vector<swappable_block_identifier_type> blocks;
     //! \brief if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
+
+    swappable_block_identifier_type & block(index_type row, index_type col)
+    { return blocks[row * width + col]; }
 
 public:
     //! \brief Create an empty swappable_block_matrix of given dimensions.
@@ -139,8 +142,8 @@ public:
                 bs.free_swappable_block(block(row, col));
     }
 
-    swappable_block_identifier_type & block(index_type row, index_type col)
-    { return blocks[row * width + col]; }
+    const swappable_block_identifier_type operator () (index_type row, index_type col)
+    { return block(row, col); }
 
     bool is_transposed()
     { return elements_in_blocks_transposed; }
@@ -158,6 +161,7 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix_iterator
 {
 protected:
+    typedef matrix_iterator<ValueType, BlockSideLength> matrix_iterator_type;
     typedef matrix<ValueType, BlockSideLength> matrix_type;
     typedef typename matrix_type::swappable_block_matrix_type swappable_block_matrix_type;
     typedef typename matrix_type::block_scheduler_type block_scheduler_type;
@@ -172,65 +176,274 @@ protected:
     matrix_type & m;
     swappable_block_matrix_type & mdata;
     block_scheduler_type & bs;
-    elem_index_type current_row,
-            current_col;
-    internal_block_type * current_iblock;
+    elem_index_type current_row, // \ both indices == -1 <=> empty iterator
+                    current_col; // /
+    block_index_type current_block_row,
+                     current_block_col;
+    internal_block_type * current_iblock; // NULL if block is not acquired
 
-    matrix_iterator(matrix_type matrix, const elem_index_type row, const elem_index_type col)
+    void acquire_current_iblock()
+    {
+        if (! current_iblock)
+            current_iblock = & bs.acquire(mdata(current_block_row, current_block_col));
+    }
+
+    void release_current_iblock()
+    {
+        if (current_iblock)
+            bs.release(mdata(current_block_row, current_block_col), true);
+    }
+
+    //! \brief create iterator pointing to given row and col
+    matrix_iterator(matrix_type & matrix, const elem_index_type start_row, const elem_index_type start_col)
         : m(matrix),
           mdata(*matrix.data),
           bs(mdata.bs),
-          current_row(row),
-          current_col(col),
+          current_row(start_row),
+          current_col(start_col),
+          current_iblock(0) {}
+
+    //! \brief create empty iterator
+    matrix_iterator(matrix_type & matrix)
+        : m(matrix),
+          mdata(*matrix.data),
+          bs(mdata.bs),
+          current_row(-1), // empty iterator
+          current_col(-1),
+          current_iblock(0) {}
+
+    ~matrix_iterator()
+    {
+        release_current_iblock();
+    }
+
+    void set_empty()
+    {
+        current_row = -1;
+        current_col = -1;
+    }
+public:
+    matrix_iterator(const matrix_iterator_type & other)
+        : m(other.m),
+          mdata(other.mdata),
+          bs(other.bs),
+          current_row(other.current_row),
+          current_col(other.current_col),
           current_iblock(0)
-    {}
+    {
+        if (other.current_iblock)
+            acquire_current_iblock();
+    }
+
+    matrix_iterator_type & operator = (const matrix_iterator_type & other)
+    {
+        assert(&m == &other.m);
+        set_coordinates(other.current_row, other.current_col);
+        if (other.current_iblock)
+            acquire_current_iblock();
+        return *this;
+    }
 
     void set_row(const elem_index_type new_row)
     {
-        const block_index_type current_block_row = m.block_index_from_elem(current_row),
-                current_block_col = m.block_index_from_elem(current_col),
-                new_block_row = m.block_index_from_elem(new_row);
-        if (new_block_row != current_block_row && current_iblock)
-            bs.release(mdata.block(current_block_row, current_block_col));
+        const block_index_type new_block_row = m.block_index_from_elem(new_row);
+        if (new_block_row != current_block_row)
+        {
+            release_current_iblock();
+            current_block_row = new_block_row;
+        }
         current_row = new_row;
     }
 
     void set_col(const elem_index_type new_col)
     {
-        const block_index_type current_block_row = m.block_index_from_elem(current_row),
-                current_block_col = m.block_index_from_elem(current_col),
-                new_block_col = m.block_index_from_elem(new_col);
-        if (new_block_col != current_block_col && current_iblock)
-            bs.release(mdata.block(current_block_row, current_block_col));
+        const block_index_type new_block_col = m.block_index_from_elem(new_col);
+        if (new_block_col != current_block_col)
+        {
+            release_current_iblock();
+            current_block_col = new_block_col;
+        }
         current_col = new_col;
     }
 
     void set_coordinates(const elem_index_type new_row, const elem_index_type new_col)
     {
-        const block_index_type current_block_row = m.block_index_from_elem(current_row),
-                current_block_col = m.block_index_from_elem(current_col),
-                new_block_row = m.block_index_from_elem(new_row),
+        const block_index_type new_block_row = m.block_index_from_elem(new_row),
                 new_block_col = m.block_index_from_elem(new_col);
-        if ((new_block_col != current_block_col || new_block_row != current_block_row) && current_iblock)
-            bs.release(mdata.block(current_block_row, current_block_col));
+        if (new_block_col != current_block_col || new_block_row != current_block_row)
+        {
+            release_current_iblock();
+            current_block_row = new_block_row;
+            current_block_col = new_block_col;
+        }
         current_row = new_row;
         current_col = new_col;
     }
 
-    elem_index_type get_row()
-    { return current_row(); }
+    void set_coordinates(const std::pair<elem_index_type, elem_index_type> new_coordinates)
+    { set_coordinates(new_coordinates.first, new_coordinates.second); }
 
-    elem_index_type get_col()
-    { return current_col(); }
+    elem_index_type get_row() const
+    { return current_row; }
 
-    std::pair<elem_index_type, elem_index_type> get_coordinates()
+    elem_index_type get_col() const
+    { return current_col; }
+
+    std::pair<elem_index_type, elem_index_type> get_coordinates() const
     { return std::make_pair(current_row, current_col); }
 
+    bool empty() const
+    { return current_row == -1 && current_col == -1; }
+
+    operator bool () const
+    { return ! empty(); }
+
+    bool operator == (const matrix_iterator_type & other) const
+    {
+        assert(&m == &other.m);
+        return current_row == other.current_row && current_col == other.current_col;
+    }
+
+    // do not store reference
     ValueType & operator * ()
     {
-        //todo
+        acquire_current_iblock();
+        return (*current_iblock)[m.elem_index_in_block_from_elem(current_row, current_col)];
     }
 };
+
+template <typename ValueType, unsigned BlockSideLength>
+class matrix_row_major_iterator : public matrix_iterator<ValueType, BlockSideLength>
+{
+protected:
+    typedef matrix_iterator<ValueType, BlockSideLength> matrix_iterator_type;
+    typedef matrix_row_major_iterator<ValueType, BlockSideLength> matrix_row_major_iterator_type;
+    typedef typename matrix_iterator_type::matrix_type matrix_type;
+    typedef typename matrix_iterator_type::elem_index_type elem_index_type;
+
+    template <typename VT, unsigned BSL> friend class matrix;
+
+    using matrix_iterator_type::m;
+    using matrix_iterator_type::get_row;
+    using matrix_iterator_type::get_col;
+    using matrix_iterator_type::set_col;
+    using matrix_iterator_type::set_coordinates;
+    using matrix_iterator_type::set_empty;
+
+    //! \brief create iterator pointing to given row and col
+    matrix_row_major_iterator(matrix_type & matrix, const elem_index_type start_row, const elem_index_type start_col)
+        : matrix_iterator_type(matrix, start_row, start_col) {}
+
+    //! \brief create empty iterator
+    matrix_row_major_iterator(matrix_type & matrix)
+    : matrix_iterator_type(matrix) {}
+
+public:
+    // Has to be not empty, else behavior is undefined.
+    matrix_row_major_iterator_type & operator ++ ()
+    {
+        if (get_col() + 1 < m.width)
+            // => not at the end of row, move right
+            set_col(get_col() + 1);
+        else if (get_row() + 1 < m.height)
+            // => at end of row but not last row, move to beginning of next row
+            set_coordinates(get_row() + 1, 0);
+        else
+            // => at end of matrix, set to empty-state
+            set_empty();
+        return *this;
+    }
+
+    // Has to be not empty, else behavior is undefined.
+    matrix_row_major_iterator_type & operator -- ()
+    {
+        if (get_col() - 1 >= 0)
+            // => not at the beginning of row, move left
+            set_col(get_col() - 1);
+        else if (get_row() - 1 >= 0)
+            // => at beginning of row but not first row, move to end of previous row
+            set_coordinates(get_row() - 1, m.width - 1);
+        else
+            // => at beginning of matrix, set to empty-state
+            set_empty();
+        return *this;
+    }
+};
+
+template <typename ValueType, unsigned BlockSideLength>
+class matrix_col_major_iterator : public matrix_iterator<ValueType, BlockSideLength>
+{
+protected:
+    typedef matrix_iterator<ValueType, BlockSideLength> matrix_iterator_type;
+    typedef matrix_col_major_iterator<ValueType, BlockSideLength> matrix_col_major_iterator_type;
+    typedef typename matrix_iterator_type::matrix_type matrix_type;
+    typedef typename matrix_iterator_type::elem_index_type elem_index_type;
+
+    template <typename VT, unsigned BSL> friend class matrix;
+
+    using matrix_iterator_type::m;
+    using matrix_iterator_type::get_row;
+    using matrix_iterator_type::get_col;
+    using matrix_iterator_type::set_row;
+    using matrix_iterator_type::set_coordinates;
+    using matrix_iterator_type::set_empty;
+
+    //! \brief create iterator pointing to given row and col
+    matrix_col_major_iterator(matrix_type & matrix, const elem_index_type start_row, const elem_index_type start_col)
+        : matrix_iterator_type(matrix, start_row, start_col) {}
+
+    //! \brief create empty iterator
+    matrix_col_major_iterator(matrix_type & matrix)
+        : matrix_iterator_type(matrix) {}
+
+public:
+    // Has to be not empty, else behavior is undefined.
+    matrix_col_major_iterator_type & operator ++ ()
+    {
+        if (get_row() + 1 < m.height)
+            // => not at the end of col, move down
+            set_row(get_row() + 1);
+        else if (get_col() + 1 < m.width)
+            // => at end of col but not last col, move to beginning of next col
+            set_coordinates(0, get_col() + 1);
+        else
+            // => at end of matrix, set to empty-state
+            set_empty();
+        return *this;
+    }
+
+    // Has to be not empty, else behavior is undefined.
+    matrix_col_major_iterator_type & operator -- ()
+    {
+        if (get_row() - 1 >= 0)
+            // => not at the beginning of col, move up
+            set_row(get_row() - 1);
+        else if (get_col() - 1 >= 0)
+            // => at beginning of col but not first col, move to end of previous col
+            set_coordinates(m.height - 1, get_col() - 1);
+        else
+            // => at beginning of matrix, set to empty-state
+            set_empty();
+        return *this;
+    }
+};
+
+/*template <typename ValueType, unsigned BlockSideLength>
+class matrix_reference : private matrix_iterator<ValueType, BlockSideLength>
+{
+    typedef matrix_reference<ValueType, BlockSideLength> matrix_reference_type;
+
+    using matrix_iterator<ValueType, BlockSideLength>:: operator *;
+public:
+    operator ValueType () const
+    { return operator * (); }
+
+    matrix_reference_type & operator = (const ValueType new_value)
+    {
+        operator * () = new_value;
+        return *this;
+    }
+}; //*/
 
 //! \brief External matrix container.
 template <typename ValueType, unsigned BlockSideLength>
@@ -245,9 +458,33 @@ protected:
     typedef typename swappable_block_matrix_type::size_type block_size_type;
     typedef typename swappable_block_matrix_type::index_type block_index_type;
 
-    elem_size_type height,
-             width;
+public:
+    typedef matrix_row_major_iterator<ValueType, BlockSideLength> row_major_iterator;
+    typedef matrix_col_major_iterator<ValueType, BlockSideLength> col_major_iterator;
+    typedef row_major_iterator iterator;
+
+protected:
+    template <typename VT, unsigned BSL> friend class matrix_iterator;
+
+public:
+    const elem_size_type height,
+                         width;
+protected:
     swappable_block_matrix_type * data;
+
+    static block_index_type block_index_from_elem(elem_index_type index)
+    { return index / BlockSideLength; }
+
+    static elem_index_in_block_type elem_index_in_block_from_elem(elem_index_type index)
+    { return index % BlockSideLength; }
+
+    // takes care about transposed
+    elem_index_in_block_type elem_index_in_block_from_elem(elem_index_type row, elem_index_type col)
+    {
+        return (data->is_transposed())
+                 ? row % BlockSideLength + col % BlockSideLength * BlockSideLength
+                 : row % BlockSideLength * BlockSideLength + col % BlockSideLength;
+    }
 
 public:
     //! \brief Creates a new matrix of given dimensions. Elements' values are set to zero.
@@ -265,14 +502,238 @@ public:
         delete data;
     }
 
-    block_index_type block_index_from_elem(elem_index_type ind)
-    { return ind / BlockSideLength; }
+    row_major_iterator begin()
+    { return row_major_iterator(*this, 0, 0); }
 
-    elem_index_in_block_type elem_index_in_block_from_elem(elem_index_type ind)
-    { return ind % BlockSideLength; }
+    row_major_iterator end()
+    { return row_major_iterator(*this); }
+
+    row_major_iterator begin_row_major()
+    { return row_major_iterator(*this, 0, 0); }
+
+    row_major_iterator end_row_major()
+    { return row_major_iterator(*this); }
+
+    col_major_iterator begin_col_major()
+    { return col_major_iterator(*this, 0, 0); }
+
+    col_major_iterator end_col_major()
+    { return col_major_iterator(*this); }
+
+    // do not store reference
+    ValueType & operator () (elem_index_type row, elem_index_type col)
+    { return *iterator(*this, row, col); }
 
     //todo: standart container operations
-    // []; elem(row, col); row- and col-iterator; get/set row/col; get/set submatrix
+    // get/set row/col; get/set submatrix
+
+    //maydo: col-major iterator, cheap iterator
+};
+
+/*  n, m and l denote the three dimensions of a matrix multiplication, according to the following ascii-art diagram:
+ *
+ *                 +--m--+
+ *  +----l-----+   |     |   +--m--+
+ *  |          |   |     |   |     |
+ *  n    A     | • l  B  | = n  C  |
+ *  |          |   |     |   |     |
+ *  +----------+   |     |   +-----+
+ *                 +-----+
+ *
+ * The index-variables are called i, j, k for dimension
+ *                                n, m, l .
+ */
+
+template <typename SwappableBlockMatrixType>
+struct matrix_multiply
+{
+
+};
+
+template <typename ValueType, unsigned BlockSideLength>
+struct swappable_block_matrix_approximative_quarterer
+{
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+
+    swappable_block_matrix_type  upleft,   upright,
+                                downleft, downright,
+            & ul, & ur, & dl, & dr;
+
+    swappable_block_matrix_approximative_quarterer(swappable_block_matrix_type & whole)
+        : upleft   (whole,                whole.height/2,               whole.width/2,              0,             0),
+          upright  (whole,                whole.height/2, whole.width - whole.width/2,              0, whole.width/2),
+          downleft (whole, whole.height - whole.height/2,               whole.width/2, whole.height/2,             0),
+          downright(whole, whole.height - whole.height/2, whole.width - whole.width/2, whole.height/2, whole.width/2),
+          ul(upleft), ur(upright), dl(downleft), dr(downright) {}
+};
+
+//! \brief calculates C = A * B + C
+// requires fitting dimensions
+template <typename ValueType, unsigned BlockSideLength>
+swappable_block_matrix<ValueType, BlockSideLength> &
+multyply_and_add_recursive(
+            const swappable_block_matrix<ValueType, BlockSideLength> A,
+            const swappable_block_matrix<ValueType, BlockSideLength> B,
+            swappable_block_matrix<ValueType, BlockSideLength> C)
+{
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::index_type index_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+
+    typedef swappable_block_matrix_approximative_quarterer<ValueType, BlockSideLength>
+            approximative_quarterer_type;
+
+    // todo remove assertion after securing earlyer
+    assert(C.height == A.height && C.width == B.width && A.width == B.height);
+
+    // base case
+    if (C.height == 1 || C.width == 1 || A.width == 1)
+        return multiply_and_add_naive(A, B, C);
+
+    // partition matrix
+    approximative_quarterer_type * qa = new approximative_quarterer_type(A),
+                                 * qb = new approximative_quarterer_type(B),
+                                 * qc = new approximative_quarterer_type(C);
+    // recursive multiplication
+    multyply_and_add_recursive(qa.ul, qb.ul, qc.ul);
+    multyply_and_add_recursive(qa.ur, qb.dl, qc.ul);
+    multyply_and_add_recursive(qa.ul, qb.ur, qc.ur);
+    multyply_and_add_recursive(qa.ur, qb.dr, qc.ur);
+    multyply_and_add_recursive(qa.dl, qb.ul, qc.dl);
+    multyply_and_add_recursive(qa.dr, qb.dl, qc.dl);
+    multyply_and_add_recursive(qa.dl, qb.ur, qc.dr);
+    multyply_and_add_recursive(qa.dr, qb.dr, qc.dr);
+    // delete partitioning
+    delete qa, qb, qc;
+}
+
+//! \brief multiplies matrices A and B, adds result to C
+//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
+template <typename ValueType, unsigned BlockSideLength>
+struct block_multiply;
+
+//! \brief calculates C = A * B + C
+// requires fitting dimensions
+template <typename ValueType, unsigned BlockSideLength>
+swappable_block_matrix<ValueType, BlockSideLength> &
+multyply_and_add_naive(
+            const swappable_block_matrix<ValueType, BlockSideLength> A,
+            const swappable_block_matrix<ValueType, BlockSideLength> B,
+            swappable_block_matrix<ValueType, BlockSideLength> C)
+{
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
+    typedef typename swappable_block_matrix_type::index_type index_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+
+    const size_type & n = C.height,
+                      m = C.width,
+                      l = A.width;
+    for (index_type i = 0; i < n; ++i)
+        for (index_type j = 0; j < m; ++j)
+            for (index_type k = 0; k < l; ++k)
+            {
+                const swappable_block_identifier_type a = A(i,k),
+                                                      b = B(k,j);
+                swappable_block_identifier_type c = C(i,j);
+                // calculate c = a * b + c
+                block_multiply<ValueType, BlockSideLength>::mult(a,b,c);
+            }
+}
+
+template <typename ValueType, unsigned BlockSideLength>
+swappable_block_matrix<ValueType, BlockSideLength> &
+multyply_and_add_swappable_block(
+            const swappable_block_matrix<ValueType, BlockSideLength> A,
+            const swappable_block_matrix<ValueType, BlockSideLength> B,
+            swappable_block_matrix<ValueType, BlockSideLength> C)
+{
+
+}
+
+#if STXXL_BLAS
+typedef int blas_int;
+extern "C" void dgemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const double *alpha, const double *a, const blas_int *lda, const double *b, const blas_int *ldb,
+        const double *beta, double *c, const blas_int *ldc);
+
+//! \brief calculates c = alpha * a * b + beta * c
+//! \param n height of a and c
+//! \param l width of a and height of b
+//! \param m width of b and c
+//! \param a_in_col_major if a is stored in column-major rather than row-major
+//! \param b_in_col_major if b is stored in column-major rather than row-major
+//! \param c_in_col_major if c is stored in column-major rather than row-major
+void dgemm_wrapper(const blas_int n, const blas_int l, const blas_int m,
+        const double alpha, const bool a_in_col_major, const double *a /*, const blas_int lda*/,
+                            const bool b_in_col_major, const double *b /*, const blas_int ldb*/,
+        const double beta,  const bool c_in_col_major,       double *c /*, const blas_int ldc*/)
+{
+    const blas_int& stride_in_a = a_in_col_major ? n : l;
+    const blas_int& stride_in_b = b_in_col_major ? l : m;
+    const blas_int& stride_in_c = c_in_col_major ? n : m;
+    const char transa = a_in_col_major xor c_in_col_major ? 'T' : 'N';
+    const char transb = b_in_col_major xor c_in_col_major ? 'T' : 'N';
+    if (c_in_col_major)
+        // blas expects matrices in column-major unless specified via transa rsp. transb
+        dgemm_(&transa, &transb, &n, &m, &l, &alpha, a, &stride_in_a, b, &stride_in_b, &beta, c, &stride_in_c);
+    else
+        // blas expects matrices in column-major, so we calulate c^T = alpha * b^T * a^T + beta * c^T
+        dgemm_(&transb, &transa, &m, &n, &l, &alpha, b, &stride_in_b, a, &stride_in_a, &beta, c, &stride_in_c);
+}
+
+//! \brief multiplies matrices A and B, adds result to C, for double entries
+//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
+template <unsigned BlockSideLength>
+struct block_multiply<double, BlockSideLength>
+{
+    typedef swappable_block_matrix<double, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
+
+    block_multiply(const swappable_block_identifier_type a,
+                   const swappable_block_identifier_type b,
+                   swappable_block_identifier_type c)
+    {
+        const bool & a_in_col_major,
+                   & b_in_col_major,
+                   & c_in_col_major;
+        const double * pa,
+                     * pb;
+        double * pc;
+        dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
+                1.0, a_in_col_major, pa,
+                     b_in_col_major, pb,
+                1.0, c_in_col_major, pc);
+    }
+
+    static void mult (const bool a_in_col_major, const double * a,
+                      const bool b_in_col_major, const double * b,
+                      const bool c_in_col_major, double * c)
+    {
+        dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
+                1.0, a_in_col_major, a,
+                     b_in_col_major, b,
+                1.0, c_in_col_major, c);
+    }
+};
+#endif
+
+template <typename ValueType, unsigned BlockSideLength>
+struct block_multiply
+{
+    static void mult (const bool a_in_col_major, const double * a,
+                      const bool b_in_col_major, const double * b,
+                      const bool c_in_col_major, double * c)
+    {
+        #if STXXL_PARALLEL
+        #pragma omp parallel for
+        #endif
+        for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+            for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                    c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
+    }
 };
 
 // +-+-+-+-+-+-+ blocked-matrix version +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -290,7 +751,6 @@ multiply(
     blocked_matrix<ValueType, BlockSideLength> & C,
     unsigned_type max_temp_mem_raw
     );
-
 
 //! \brief External matrix container
 
@@ -458,7 +918,7 @@ public:
 };
 
 template <typename matrix_type>
-class matrix_row_major_iterator
+class blocked_matrix_row_major_iterator
 {
     typedef typename matrix_type::block_type block_type;
     typedef typename matrix_type::value_type value_type;
@@ -470,7 +930,7 @@ class matrix_row_major_iterator
         current_element;
 
 public:
-    matrix_row_major_iterator(matrix_type & m)
+    blocked_matrix_row_major_iterator(matrix_type & m)
         : loaded_row_in_blocks(-1),
           current_element(0)
     {
@@ -480,7 +940,7 @@ public:
         dirty = new bool[m.num_block_cols];
     }
 
-    matrix_row_major_iterator(const matrix_row_major_iterator& other)
+    blocked_matrix_row_major_iterator(const blocked_matrix_row_major_iterator& other)
     {
         matrix = other.matrix;
         row_of_blocks = NULL;
@@ -489,7 +949,7 @@ public:
         current_element = other.current_element;
     }
 
-    matrix_row_major_iterator& operator=(const matrix_row_major_iterator& other)
+    blocked_matrix_row_major_iterator& operator=(const blocked_matrix_row_major_iterator& other)
     {
 
         matrix = other.matrix;
@@ -501,7 +961,7 @@ public:
         return *this;
     }
 
-    ~matrix_row_major_iterator()
+    ~blocked_matrix_row_major_iterator()
     {
         //TODO write out
 
@@ -509,7 +969,7 @@ public:
         delete[] dirty;
     }
 
-    matrix_row_major_iterator & operator ++ ()
+    blocked_matrix_row_major_iterator & operator ++ ()
     {
         ++current_element;
         return *this;
@@ -611,39 +1071,6 @@ public:
         return *(blocks + layout.coords_to_index(row, col));
     }
 };
-
-#if STXXL_BLAS
-typedef int blas_int;
-extern "C" void dgemm_(const char *transa, const char *transb,
-        const blas_int *m, const blas_int *n, const blas_int *k,
-        const double *alpha, const double *a, const blas_int *lda, const double *b, const blas_int *ldb,
-        const double *beta, double *c, const blas_int *ldc);
-
-//! \brief calculates c = alpha * a * b + beta * c
-//! \param n height of a and c
-//! \param k width of a and height of b
-//! \param m width of b and c
-//! \param a_in_col_major if a is stored in column-major rather than row-major
-//! \param b_in_col_major if b is stored in column-major rather than row-major
-//! \param c_in_col_major if c is stored in column-major rather than row-major
-void dgemm_wrapper(const blas_int n, const blas_int k, const blas_int m,
-        const double alpha, const bool a_in_col_major, const double *a /*, const blas_int lda*/,
-                            const bool b_in_col_major, const double *b /*, const blas_int ldb*/,
-        const double beta,  const bool c_in_col_major,       double *c /*, const blas_int ldc*/)
-{
-    const blas_int& stride_in_a = a_in_col_major ? n : k;
-    const blas_int& stride_in_b = b_in_col_major ? k : m;
-    const blas_int& stride_in_c = c_in_col_major ? n : m;
-    const char transa = a_in_col_major xor c_in_col_major ? 'T' : 'N';
-    const char transb = b_in_col_major xor c_in_col_major ? 'T' : 'N';
-    if (c_in_col_major)
-        // blas expects matrices in column-major unless specified via transa rsp. transb
-        dgemm_(&transa, &transb, &n, &m, &k, &alpha, a, &stride_in_a, b, &stride_in_b, &beta, c, &stride_in_c);
-    else
-        // blas expects matrices in column-major, so we calulate c^T = alpha * b^T * a^T + beta * c^T
-        dgemm_(&transb, &transa, &m, &n, &k, &alpha, b, &stride_in_b, a, &stride_in_a, &beta, c, &stride_in_c);
-}
-#endif
 
 //! \brief multiplies matrices A and B, adds result to C
 //! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
