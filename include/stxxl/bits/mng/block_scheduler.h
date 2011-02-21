@@ -147,7 +147,7 @@ public:
     {
         assert(is_internal());
         assert(has_external_block());
-        STXXL_MSG("reading block");
+        //STXXL_MSG("reading block");
         dirty = false;
         return internal_data->read(external_data, on_cmpl);
     }
@@ -164,7 +164,7 @@ public:
             return request_ptr();
         if (! has_external_block())
             get_external_block();
-        STXXL_MSG("writing block");
+        //STXXL_MSG("writing block");
         dirty = false;
         return internal_data->write(external_data, on_cmpl);
     }
@@ -444,6 +444,12 @@ public:
     //! \param new_prediction_sequence reference to new prediction_sequence to copy
     void set_prediction_sequence(const prediction_sequence_type & new_prediction_sequence)
     { prediction_sequence = new_prediction_sequence; }
+
+    void flush()
+    {
+        while (! algo->evictable_blocks_empty())
+            return_free_internal_block(swappable_blocks[algo->evictable_blocks_pop()].detach_internal_block());
+    }
 };
 
 template <class SwappableBlockType>
@@ -582,6 +588,7 @@ public:
             if (! sblock.is_acquired())
                 // not acquired yet -> remove from evictable_blocks
                 evictable_blocks.erase(sbid);
+            sblock.acquire();
         }
         else if (sblock.is_initialized())
         {
@@ -590,17 +597,19 @@ public:
             sblock.attach_internal_block(get_free_internal_block());
             //load block synchronously
             sblock.read_sync();
+            sblock.acquire();
         }
         else
         {
             // => ! sblock.is_initialized()
             //get internal_block
             sblock.attach_internal_block(get_free_internal_block());
+            sblock.acquire();
             //initialize new block
             sblock.fill_default();
         }
         //increase reference count
-        return sblock.acquire();
+        return sblock.get_internal_block();
     }
 
     virtual void release(swappable_block_identifier_type sbid, const bool dirty)

@@ -17,8 +17,6 @@
 #define STXXL_BLAS 0
 #endif
 
-//#include <stxxl/bits/mng/mng.h>
-//#include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/containers/matrix_layouts.h>
 #include <stxxl/bits/mng/block_scheduler.h>
 
@@ -66,20 +64,21 @@ public:
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
     typedef block_scheduler< matrix_swappable_block<ValueType, BlockSideLength> > block_scheduler_type;
     typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
+    typedef std::vector<swappable_block_identifier_type> blocks_type;
 
     block_scheduler_type & bs;
 
-    //! \brief height of the matrix in blocks
-    const size_type height,
-    //! \brief width of the matrix in blocks
-                    width,
-    //! \brief height copied from supermatrix
-                    height_from_supermatrix,
-    //! \brief width copied from supermatrix
-                    width_from_supermatrix;
 protected:
+    //! \brief height of the matrix in blocks
+    size_type height,
+    //! \brief width of the matrix in blocks
+              width,
+    //! \brief height copied from supermatrix
+              height_from_supermatrix,
+    //! \brief width copied from supermatrix
+              width_from_supermatrix;
     //! \brief the matrice's blocks in row-major
-    std::vector<swappable_block_identifier_type> blocks;
+    blocks_type blocks;
     //! \brief if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
 
@@ -103,10 +102,10 @@ public:
     }
 
     //! \brief Create swappable_block_matrix of given dimensions that
-    //!        represents the submatrix of supermatrix starting at (row_in_blocks, col_in_blocks).
+    //!        represents the submatrix of supermatrix starting at (from_row_in_blocks, from_col_in_blocks).
     //!
     //! If supermatrix is not large enough, the submatrix is padded with empty blocks.
-    //! The supermatrix must not be destructed before the submatrix.
+    //! The supermatrix must not be destructed or transposed before the submatrix is destructed.
     swappable_block_matrix(swappable_block_matrix_type & supermatrix,
             const size_type height_in_blocks, const size_type width_in_blocks,
             const index_type from_row_in_blocks, const index_type from_col_in_blocks)
@@ -142,19 +141,34 @@ public:
                 bs.free_swappable_block(block(row, col));
     }
 
+    const size_type & get_height() const
+    { return height; }
+
+    const size_type & get_width() const
+    { return width; }
+
     const swappable_block_identifier_type operator () (index_type row, index_type col)
     { return block(row, col); }
 
-    bool is_transposed()
+    const bool & is_transposed() const
     { return elements_in_blocks_transposed; }
 
-    void transpose()
-    {
+    void transpose();
+    /*{
         elements_in_blocks_transposed = ! elements_in_blocks_transposed;
-        //todo transpose blocks
-    }
+        // transpose matrix of blocks WRONG?
+        for (index_type row = 1; row < height; ++row)
+            for (index_type col = 0; col < row; ++col)
+                std::swap(block(row,col), block(col, row));
+        std::swap(height, width);
+        std::swap(height_from_supermatrix, width_from_supermatrix);
+    } //*/
 
-    void set_zero(); // deinitialize all blocks
+    void set_zero()
+    {
+        for (typename blocks_type::iterator it = blocks.begin(); it != blocks.end(); ++it)
+            bs.deinitialize(*it);
+    }
 };
 
 template <typename ValueType, unsigned BlockSideLength>
@@ -191,7 +205,10 @@ protected:
     void release_current_iblock()
     {
         if (current_iblock)
+        {
             bs.release(mdata(current_block_row, current_block_col), true);
+            current_iblock = 0;
+        }
     }
 
     //! \brief create iterator pointing to given row and col
@@ -201,6 +218,8 @@ protected:
           bs(mdata.bs),
           current_row(start_row),
           current_col(start_col),
+          current_block_row(m.block_index_from_elem(start_row)),
+          current_block_col(m.block_index_from_elem(start_col)),
           current_iblock(0) {}
 
     //! \brief create empty iterator
@@ -210,17 +229,17 @@ protected:
           bs(mdata.bs),
           current_row(-1), // empty iterator
           current_col(-1),
+          current_block_row(-1),
+          current_block_col(-1),
           current_iblock(0) {}
-
-    ~matrix_iterator()
-    {
-        release_current_iblock();
-    }
 
     void set_empty()
     {
+        release_current_iblock();
         current_row = -1;
         current_col = -1;
+        current_block_row = -1;
+        current_block_col = -1;
     }
 public:
     matrix_iterator(const matrix_iterator_type & other)
@@ -229,6 +248,8 @@ public:
           bs(other.bs),
           current_row(other.current_row),
           current_col(other.current_col),
+          current_block_row(other.current_block_row),
+          current_block_col(other.current_block_col),
           current_iblock(0)
     {
         if (other.current_iblock)
@@ -238,11 +259,14 @@ public:
     matrix_iterator_type & operator = (const matrix_iterator_type & other)
     {
         assert(&m == &other.m);
-        set_coordinates(other.current_row, other.current_col);
+        set_pos(other.current_row, other.current_col);
         if (other.current_iblock)
             acquire_current_iblock();
         return *this;
     }
+
+    ~matrix_iterator()
+    { release_current_iblock(); }
 
     void set_row(const elem_index_type new_row)
     {
@@ -266,7 +290,7 @@ public:
         current_col = new_col;
     }
 
-    void set_coordinates(const elem_index_type new_row, const elem_index_type new_col)
+    void set_pos(const elem_index_type new_row, const elem_index_type new_col)
     {
         const block_index_type new_block_row = m.block_index_from_elem(new_row),
                 new_block_col = m.block_index_from_elem(new_col);
@@ -280,8 +304,8 @@ public:
         current_col = new_col;
     }
 
-    void set_coordinates(const std::pair<elem_index_type, elem_index_type> new_coordinates)
-    { set_coordinates(new_coordinates.first, new_coordinates.second); }
+    void set_pos(const std::pair<elem_index_type, elem_index_type> new_pos)
+    { set_pos(new_pos.first, new_pos.second); }
 
     elem_index_type get_row() const
     { return current_row; }
@@ -289,7 +313,7 @@ public:
     elem_index_type get_col() const
     { return current_col; }
 
-    std::pair<elem_index_type, elem_index_type> get_coordinates() const
+    std::pair<elem_index_type, elem_index_type> get_pos() const
     { return std::make_pair(current_row, current_col); }
 
     bool empty() const
@@ -327,7 +351,7 @@ protected:
     using matrix_iterator_type::get_row;
     using matrix_iterator_type::get_col;
     using matrix_iterator_type::set_col;
-    using matrix_iterator_type::set_coordinates;
+    using matrix_iterator_type::set_pos;
     using matrix_iterator_type::set_empty;
 
     //! \brief create iterator pointing to given row and col
@@ -342,12 +366,12 @@ public:
     // Has to be not empty, else behavior is undefined.
     matrix_row_major_iterator_type & operator ++ ()
     {
-        if (get_col() + 1 < m.width)
+        if (get_col() + 1 < m.get_width())
             // => not at the end of row, move right
             set_col(get_col() + 1);
-        else if (get_row() + 1 < m.height)
+        else if (get_row() + 1 < m.get_height())
             // => at end of row but not last row, move to beginning of next row
-            set_coordinates(get_row() + 1, 0);
+            set_pos(get_row() + 1, 0);
         else
             // => at end of matrix, set to empty-state
             set_empty();
@@ -362,7 +386,7 @@ public:
             set_col(get_col() - 1);
         else if (get_row() - 1 >= 0)
             // => at beginning of row but not first row, move to end of previous row
-            set_coordinates(get_row() - 1, m.width - 1);
+            set_pos(get_row() - 1, m.get_width() - 1);
         else
             // => at beginning of matrix, set to empty-state
             set_empty();
@@ -385,7 +409,7 @@ protected:
     using matrix_iterator_type::get_row;
     using matrix_iterator_type::get_col;
     using matrix_iterator_type::set_row;
-    using matrix_iterator_type::set_coordinates;
+    using matrix_iterator_type::set_pos;
     using matrix_iterator_type::set_empty;
 
     //! \brief create iterator pointing to given row and col
@@ -400,12 +424,12 @@ public:
     // Has to be not empty, else behavior is undefined.
     matrix_col_major_iterator_type & operator ++ ()
     {
-        if (get_row() + 1 < m.height)
+        if (get_row() + 1 < m.get_height())
             // => not at the end of col, move down
             set_row(get_row() + 1);
-        else if (get_col() + 1 < m.width)
+        else if (get_col() + 1 < m.get_width())
             // => at end of col but not last col, move to beginning of next col
-            set_coordinates(0, get_col() + 1);
+            set_pos(0, get_col() + 1);
         else
             // => at end of matrix, set to empty-state
             set_empty();
@@ -420,7 +444,7 @@ public:
             set_row(get_row() - 1);
         else if (get_col() - 1 >= 0)
             // => at beginning of col but not first col, move to end of previous col
-            set_coordinates(m.height - 1, get_col() - 1);
+            set_pos(m.get_height() - 1, get_col() - 1);
         else
             // => at beginning of matrix, set to empty-state
             set_empty();
@@ -445,6 +469,14 @@ public:
     }
 }; //*/
 
+/* designated usage as:
+ * swappable_block_matrix_type &
+ * matrix_multiply(const swappable_block_matrix_type & A,
+ *                 const swappable_block_matrix_type & B,
+ *                 swappable_block_matrix_type & C)         */
+template <typename ValueType, unsigned BlockSideLength>
+struct matrix_multiply;
+
 //! \brief External matrix container.
 template <typename ValueType, unsigned BlockSideLength>
 class matrix : private noncopyable
@@ -453,12 +485,14 @@ protected:
     typedef int_type elem_size_type;
     typedef int_type elem_index_type;
     typedef int_type elem_index_in_block_type;
+    typedef matrix<ValueType, BlockSideLength> matrix_type;
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::size_type block_size_type;
     typedef typename swappable_block_matrix_type::index_type block_index_type;
 
 public:
+    typedef matrix_iterator<ValueType, BlockSideLength> arbitrary_iterator;
     typedef matrix_row_major_iterator<ValueType, BlockSideLength> row_major_iterator;
     typedef matrix_col_major_iterator<ValueType, BlockSideLength> col_major_iterator;
     typedef row_major_iterator iterator;
@@ -466,10 +500,8 @@ public:
 protected:
     template <typename VT, unsigned BSL> friend class matrix_iterator;
 
-public:
-    const elem_size_type height,
-                         width;
-protected:
+    elem_size_type height,
+                   width;
     swappable_block_matrix_type * data;
 
     static block_index_type block_index_from_elem(elem_index_type index)
@@ -502,6 +534,12 @@ public:
         delete data;
     }
 
+    const elem_size_type & get_height() const
+    { return height; }
+
+    const elem_size_type & get_width() const
+    { return width; }
+
     row_major_iterator begin()
     { return row_major_iterator(*this, 0, 0); }
 
@@ -520,9 +558,25 @@ public:
     col_major_iterator end_col_major()
     { return col_major_iterator(*this); }
 
+    arbitrary_iterator get_arbitrary_iterator()
+    { return arbitrary_iterator(*this); }
+
     // do not store reference
     ValueType & operator () (elem_index_type row, elem_index_type col)
     { return *iterator(*this, row, col); }
+
+    // todo how to make this beautiful?
+    matrix_type & make_product_of(const matrix_type & left, const matrix_type & right)
+    {
+        assert(height == left.get_height());
+        assert(width == right.get_width());
+        assert(left.get_width() == right.get_height());
+        matrix_multiply<ValueType, BlockSideLength>(*left.data, *right.data, *data);
+        return *this;
+    }
+
+    void set_zero()
+    { data->set_zero(); }
 
     //todo: standart container operations
     // get/set row/col; get/set submatrix
@@ -530,126 +584,146 @@ public:
     //maydo: col-major iterator, cheap iterator
 };
 
-/*  n, m and l denote the three dimensions of a matrix multiplication, according to the following ascii-art diagram:
- *
- *                 +--m--+
- *  +----l-----+   |     |   +--m--+
- *  |          |   |     |   |     |
- *  n    A     | • l  B  | = n  C  |
- *  |          |   |     |   |     |
- *  +----------+   |     |   +-----+
- *                 +-----+
- *
- * The index-variables are called i, j, k for dimension
- *                                n, m, l .
- */
-
-template <typename SwappableBlockMatrixType>
-struct matrix_multiply
-{
-
-};
-
-template <typename ValueType, unsigned BlockSideLength>
-struct swappable_block_matrix_approximative_quarterer
-{
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-
-    swappable_block_matrix_type  upleft,   upright,
-                                downleft, downright,
-            & ul, & ur, & dl, & dr;
-
-    swappable_block_matrix_approximative_quarterer(swappable_block_matrix_type & whole)
-        : upleft   (whole,                whole.height/2,               whole.width/2,              0,             0),
-          upright  (whole,                whole.height/2, whole.width - whole.width/2,              0, whole.width/2),
-          downleft (whole, whole.height - whole.height/2,               whole.width/2, whole.height/2,             0),
-          downright(whole, whole.height - whole.height/2, whole.width - whole.width/2, whole.height/2, whole.width/2),
-          ul(upleft), ur(upright), dl(downleft), dr(downright) {}
-};
-
-//! \brief calculates C = A * B + C
-// requires fitting dimensions
-template <typename ValueType, unsigned BlockSideLength>
-swappable_block_matrix<ValueType, BlockSideLength> &
-multyply_and_add_recursive(
-            const swappable_block_matrix<ValueType, BlockSideLength> A,
-            const swappable_block_matrix<ValueType, BlockSideLength> B,
-            swappable_block_matrix<ValueType, BlockSideLength> C)
-{
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::index_type index_type;
-    typedef typename swappable_block_matrix_type::size_type size_type;
-
-    typedef swappable_block_matrix_approximative_quarterer<ValueType, BlockSideLength>
-            approximative_quarterer_type;
-
-    // todo remove assertion after securing earlyer
-    assert(C.height == A.height && C.width == B.width && A.width == B.height);
-
-    // base case
-    if (C.height == 1 || C.width == 1 || A.width == 1)
-        return multiply_and_add_naive(A, B, C);
-
-    // partition matrix
-    approximative_quarterer_type * qa = new approximative_quarterer_type(A),
-                                 * qb = new approximative_quarterer_type(B),
-                                 * qc = new approximative_quarterer_type(C);
-    // recursive multiplication
-    multyply_and_add_recursive(qa.ul, qb.ul, qc.ul);
-    multyply_and_add_recursive(qa.ur, qb.dl, qc.ul);
-    multyply_and_add_recursive(qa.ul, qb.ur, qc.ur);
-    multyply_and_add_recursive(qa.ur, qb.dr, qc.ur);
-    multyply_and_add_recursive(qa.dl, qb.ul, qc.dl);
-    multyply_and_add_recursive(qa.dr, qb.dl, qc.dl);
-    multyply_and_add_recursive(qa.dl, qb.ur, qc.dr);
-    multyply_and_add_recursive(qa.dr, qb.dr, qc.dr);
-    // delete partitioning
-    delete qa, qb, qc;
-}
-
 //! \brief multiplies matrices A and B, adds result to C
 //! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
+/* designated usage as:
+ * void
+ * low_level_matrix_multiply_and_add(const double * a, bool a_in_col_major,
+                                     const double * b, bool b_in_col_major,
+                                     double * c, const bool c_in_col_major)  */
 template <typename ValueType, unsigned BlockSideLength>
-struct block_multiply;
+struct low_level_matrix_multiply_and_add;
 
-//! \brief calculates C = A * B + C
-// requires fitting dimensions
 template <typename ValueType, unsigned BlockSideLength>
-swappable_block_matrix<ValueType, BlockSideLength> &
-multyply_and_add_naive(
-            const swappable_block_matrix<ValueType, BlockSideLength> A,
-            const swappable_block_matrix<ValueType, BlockSideLength> B,
-            swappable_block_matrix<ValueType, BlockSideLength> C)
+struct matrix_multiply
 {
+    /*  n, m and l denote the three dimensions of a matrix multiplication, according to the following ascii-art diagram:
+     *
+     *                 +--m--+
+     *  +----l-----+   |     |   +--m--+
+     *  |          |   |     |   |     |
+     *  n    A     | • l  B  | = n  C  |
+     *  |          |   |     |   |     |
+     *  +----------+   |     |   +-----+
+     *                 +-----+
+     *
+     * The index-variables are called i, j, k for dimension
+     *                                n, m, l .
+     */
+
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+
+    swappable_block_matrix_type & result;
+
+    matrix_multiply(swappable_block_matrix_type & A,
+                    swappable_block_matrix_type & B,
+                    swappable_block_matrix_type & C)
+        : result(C)
+    {
+        C.set_zero();
+        recursive_multiply_and_add(A, B, C);
+    }
+
+    operator swappable_block_matrix_type & ()
+    { return result; }
+
+    ~matrix_multiply() {}
+
+    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
     typedef typename swappable_block_matrix_type::index_type index_type;
     typedef typename swappable_block_matrix_type::size_type size_type;
 
-    const size_type & n = C.height,
-                      m = C.width,
-                      l = A.width;
-    for (index_type i = 0; i < n; ++i)
-        for (index_type j = 0; j < m; ++j)
-            for (index_type k = 0; k < l; ++k)
-            {
-                const swappable_block_identifier_type a = A(i,k),
-                                                      b = B(k,j);
-                swappable_block_identifier_type c = C(i,j);
-                // calculate c = a * b + c
-                block_multiply<ValueType, BlockSideLength>::mult(a,b,c);
-            }
-}
+    struct swappable_block_matrix_approximative_quarterer
+    {
+        swappable_block_matrix_type  upleft,   upright,
+                                    downleft, downright,
+                & ul, & ur, & dl, & dr;
 
-template <typename ValueType, unsigned BlockSideLength>
-swappable_block_matrix<ValueType, BlockSideLength> &
-multyply_and_add_swappable_block(
-            const swappable_block_matrix<ValueType, BlockSideLength> A,
-            const swappable_block_matrix<ValueType, BlockSideLength> B,
-            swappable_block_matrix<ValueType, BlockSideLength> C)
-{
+        swappable_block_matrix_approximative_quarterer(swappable_block_matrix_type & whole)
+            : upleft   (whole,                      whole.get_height()/2,                     whole.get_width()/2,                    0,                   0),
+              upright  (whole,                      whole.get_height()/2, whole.get_width() - whole.get_width()/2,                    0, whole.get_width()/2),
+              downleft (whole, whole.get_height() - whole.get_height()/2,                     whole.get_width()/2, whole.get_height()/2,                   0),
+              downright(whole, whole.get_height() - whole.get_height()/2, whole.get_width() - whole.get_width()/2, whole.get_height()/2, whole.get_width()/2),
+              ul(upleft), ur(upright), dl(downleft), dr(downright) {}
+    };
 
-}
+    //! \brief calculates C = A * B + C
+    // requires fitting dimensions
+    static swappable_block_matrix_type &
+    recursive_multiply_and_add(swappable_block_matrix_type & A,
+                               swappable_block_matrix_type & B,
+                               swappable_block_matrix_type & C)
+    {
+        // todo remove assertion after securing earlyer
+        assert(C.get_height() == A.get_height() && C.get_width() == B.get_width() && A.get_width() == B.get_height());
+
+        // base case
+        if (C.get_height() == 1 || C.get_width() == 1 || A.get_width() == 1)
+            return naive_multiply_and_add(A, B, C);
+
+        // partition matrix
+        swappable_block_matrix_approximative_quarterer
+                * qa = new swappable_block_matrix_approximative_quarterer(A),
+                * qb = new swappable_block_matrix_approximative_quarterer(B),
+                * qc = new swappable_block_matrix_approximative_quarterer(C);
+        // recursive multiplication
+        recursive_multiply_and_add(qa->ul, qb->ul, qc->ul);
+        recursive_multiply_and_add(qa->ur, qb->dl, qc->ul);
+        recursive_multiply_and_add(qa->ul, qb->ur, qc->ur);
+        recursive_multiply_and_add(qa->ur, qb->dr, qc->ur);
+        recursive_multiply_and_add(qa->dl, qb->ul, qc->dl);
+        recursive_multiply_and_add(qa->dr, qb->dl, qc->dl);
+        recursive_multiply_and_add(qa->dl, qb->ur, qc->dr);
+        recursive_multiply_and_add(qa->dr, qb->dr, qc->dr);
+        // delete partitioning
+        delete qa;
+        delete qb;
+        delete qc;
+        return C;
+    }
+
+    //! \brief calculates C = A * B + C
+    // requires fitting dimensions
+    static swappable_block_matrix_type &
+    naive_multiply_and_add(swappable_block_matrix_type & A,
+                           swappable_block_matrix_type & B,
+                           swappable_block_matrix_type & C)
+    {
+        const size_type & n = C.get_height(),
+                          m = C.get_width(),
+                          l = A.get_width();
+        for (index_type i = 0; i < n; ++i)
+            for (index_type j = 0; j < m; ++j)
+                for (index_type k = 0; k < l; ++k)
+                    multiply_and_add_swappable_block(A(i,k), A.is_transposed(), A.bs,
+                                                     B(k,j), B.is_transposed(), B.bs,
+                                                     C(i,j), C.is_transposed(), C.bs);
+        return C;
+    }
+
+    static void multiply_and_add_swappable_block(
+            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a,
+            const swappable_block_identifier_type b, const bool b_is_transposed, block_scheduler_type & bs_b,
+            const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c)
+    {
+        // check if zero-block (== ! initialized)
+        if (! bs_a.is_initialized(a) || ! bs_b.is_initialized(b))
+            // => one factor is zero => product is zero
+            return;
+        // acquire
+        ValueType * ap = bs_a.acquire(a).begin(),
+                  * bp = bs_b.acquire(b).begin(),
+                  * cp = bs_c.acquire(c).begin();
+        // multiply
+        low_level_matrix_multiply_and_add<ValueType, BlockSideLength>
+                (ap, a_is_transposed, bp, b_is_transposed, cp, c_is_transposed);
+        // release
+        bs_a.release(a, false);
+        bs_b.release(b, false);
+        bs_c.release(c, true);
+    }
+};
 
 #if STXXL_BLAS
 typedef int blas_int;
@@ -666,9 +740,9 @@ extern "C" void dgemm_(const char *transa, const char *transb,
 //! \param b_in_col_major if b is stored in column-major rather than row-major
 //! \param c_in_col_major if c is stored in column-major rather than row-major
 void dgemm_wrapper(const blas_int n, const blas_int l, const blas_int m,
-        const double alpha, const bool a_in_col_major, const double *a /*, const blas_int lda*/,
-                            const bool b_in_col_major, const double *b /*, const blas_int ldb*/,
-        const double beta,  const bool c_in_col_major,       double *c /*, const blas_int ldc*/)
+        const double alpha, const bool a_in_col_major, const double *a,
+                            const bool b_in_col_major, const double *b,
+        const double beta,  const bool c_in_col_major,       double *c)
 {
     const blas_int& stride_in_a = a_in_col_major ? n : l;
     const blas_int& stride_in_b = b_in_col_major ? l : m;
@@ -684,32 +758,12 @@ void dgemm_wrapper(const blas_int n, const blas_int l, const blas_int m,
 }
 
 //! \brief multiplies matrices A and B, adds result to C, for double entries
-//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
 template <unsigned BlockSideLength>
-struct block_multiply<double, BlockSideLength>
+struct low_level_matrix_multiply_and_add<double, BlockSideLength>
 {
-    typedef swappable_block_matrix<double, BlockSideLength> swappable_block_matrix_type;
-    typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
-
-    block_multiply(const swappable_block_identifier_type a,
-                   const swappable_block_identifier_type b,
-                   swappable_block_identifier_type c)
-    {
-        const bool & a_in_col_major,
-                   & b_in_col_major,
-                   & c_in_col_major;
-        const double * pa,
-                     * pb;
-        double * pc;
-        dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
-                1.0, a_in_col_major, pa,
-                     b_in_col_major, pb,
-                1.0, c_in_col_major, pc);
-    }
-
-    static void mult (const bool a_in_col_major, const double * a,
-                      const bool b_in_col_major, const double * b,
-                      const bool c_in_col_major, double * c)
+    low_level_matrix_multiply_and_add(const double * a, bool a_in_col_major,
+                                      const double * b, bool b_in_col_major,
+                                      double * c, const bool c_in_col_major)
     {
         dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
                 1.0, a_in_col_major, a,
@@ -719,20 +773,67 @@ struct block_multiply<double, BlockSideLength>
 };
 #endif
 
+//! \brief multiplies matrices A and B, adds result to C, for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength>
-struct block_multiply
+struct low_level_matrix_multiply_and_add
 {
-    static void mult (const bool a_in_col_major, const double * a,
-                      const bool b_in_col_major, const double * b,
-                      const bool c_in_col_major, double * c)
+    low_level_matrix_multiply_and_add(const ValueType * a, bool a_in_col_major,
+                                      const ValueType * b, bool b_in_col_major,
+                                      ValueType * c, const bool c_in_col_major)
     {
-        #if STXXL_PARALLEL
-        #pragma omp parallel for
-        #endif
-        for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
-            for (unsigned_type k = 0; k < BlockSideLength; ++k)
-                for (unsigned_type j = 0; j < BlockSideLength; ++j)
-                    c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
+        if (c_in_col_major)
+        {
+            std::swap(a,b);
+            bool a_cm = ! b_in_col_major;
+            b_in_col_major = ! a_in_col_major;
+            a_in_col_major = a_cm;
+        }
+        if (! a_in_col_major)
+        {
+            if (! b_in_col_major)
+            {   // => both row-major
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                          c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
+            }
+            else
+            {   // => a row-major, b col-major
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+                    for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                        for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                          c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k + j * BlockSideLength];
+            }
+        }
+        else
+        {
+            if (! b_in_col_major)
+            {   // => a col-major, b row-major
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                          c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k * BlockSideLength + j];
+            }
+            else
+            {   // => both col-major
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                          c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k + j * BlockSideLength];
+            }
+        }
     }
 };
 

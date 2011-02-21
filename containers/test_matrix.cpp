@@ -129,17 +129,18 @@ public:
 
 int main(int argc, char **argv)
 {
-    const int block_order = 64;
+    const int small_block_order = 64; // must be a multiple of 64
+    const int block_order = 2048; // must be a multiple of 64
 
     int test_case = -1;
-    int rank = 1000;
+    int rank = 10000;
     int_type internal_memory = 256 * 1024 * 1024;
+    int internal_memory_megabyte = 265;
 
     dsr::Argument_helper ah;
-    ah.new_int("test_case", "number of the test case to run", test_case);
-    ah.new_named_int('r',  "rank", "integer","rank of the matrices", rank);
-    int internal_memory_megabyte;
-    ah.new_named_int('m', "memory", "integer", "internal memory to use (in megabytes)", internal_memory_megabyte);
+    ah.new_int("K", "number of the test case to run", test_case);
+    ah.new_named_int('r',  "rank", "N","rank of the matrices", rank);
+    ah.new_named_int('m', "memory", "L", "internal memory to use (in megabytes)", internal_memory_megabyte);
 
     ah.set_description("stxxl matrix test");
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
@@ -151,7 +152,7 @@ int main(int argc, char **argv)
     {
     case 0:
     {
-        blocked_matrix<unsigned_type, block_order> A(rank, rank);
+        blocked_matrix<unsigned_type, small_block_order> A(rank, rank);
         modulus_integers mi1(1, 1), mi2(1, 1);
         iterator_compare<modulus_integers, unsigned_type> ic(mi1);
 
@@ -170,7 +171,7 @@ int main(int argc, char **argv)
     case 1:
     {   //1-matrices
         ColumnMajor cm;
-        blocked_matrix<double, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<double, small_block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         constant_one co;
         modulus_integers mi(rank, 0);   //expected result, no modulus
         iterator_compare<modulus_integers, unsigned_type> ic(mi);
@@ -202,7 +203,7 @@ int main(int argc, char **argv)
     }
     case 2:
     {   //ascending times constant factor
-        blocked_matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<unsigned_type, small_block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         modulus_integers mi1(1, 1), mi2(5, 5);  //ascending, 5 * ascending
         diagonal_matrix di(rank, 5);    //multiply by 5
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
@@ -231,7 +232,7 @@ int main(int argc, char **argv)
     }
     case 3:
     {
-        blocked_matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<unsigned_type, small_block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         modulus_integers mi1(1, 1), mi2((unsigned_type)rank * rank, std::numeric_limits<unsigned_type>::max());
         inverse_diagonal_matrix id(rank);
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
@@ -261,7 +262,76 @@ int main(int argc, char **argv)
     }
     case 4:
     {
+        STXXL_MSG("multiplying two int_type matrices of rank " << rank << " block order " << small_block_order);
         typedef int_type value_type;
+
+        typedef block_scheduler< matrix_swappable_block<value_type, small_block_order> > bst;
+        typedef matrix<value_type, small_block_order> mt;
+        typedef mt::iterator mitt;
+
+        bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
+        bst & bs = *b_s;
+        mt * a = new mt(bs, rank, rank),
+           * b = new mt(bs, rank, rank),
+           * c = new mt(bs, rank, rank);
+
+        // ------ first run
+        for (mitt mit = a->begin(); mit != a->end(); ++mit)
+            *mit = 1;
+        for (mitt mit = b->begin(); mit != b->end(); ++mit)
+            *mit = 1;
+
+        STXXL_MSG("start mult");
+        c->make_product_of(*a, *b);
+        STXXL_MSG("end mult");
+
+        {
+            int_type num_err = 0;
+            for (mitt mit = c->begin(); mit != c->end(); ++mit)
+                num_err += (*mit != rank);
+            if (num_err)
+                STXXL_ERRMSG("c had " << num_err << " errors");
+        }
+
+        // ------ second run
+        {
+            int_type i = 1;
+            for (mitt mit = a->begin(); mit != a->end(); ++mit, ++i)
+                *mit = i;
+        }
+        {
+            mt::arbitrary_iterator mit = b->get_arbitrary_iterator();
+            for (int_type i = 0; i < b->get_height(); ++i)
+            {
+                mit.set_pos(i,i);
+                *mit = 1;
+            }
+        }
+
+        STXXL_MSG("start mult");
+        c->make_product_of(*a, *b);
+        STXXL_MSG("end mult");
+
+        {
+            int_type num_err = 0;
+            int_type i = 1;
+            for (mitt mit = a->begin(); mit != a->end(); ++mit, ++i)
+                num_err += (*mit != i);
+            if (num_err)
+                STXXL_ERRMSG("c had " << num_err << " errors");
+        }
+
+        delete a;
+        delete b;
+        delete c;
+        delete b_s;
+        break;
+    }
+    case 5:
+    {
+        STXXL_MSG("multiplying two double matrices of rank " << rank << " block order " << block_order);
+
+        typedef double value_type;
 
         typedef block_scheduler< matrix_swappable_block<value_type, block_order> > bst;
         typedef matrix<value_type, block_order> mt;
@@ -269,17 +339,76 @@ int main(int argc, char **argv)
 
         bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
         bst & bs = *b_s;
-        mt * m = new mt(bs, 5*block_order/2, 5*block_order/2);
-        value_type i = 1;
-        for (mitt mit = m->begin(); mit != m->end(); ++mit, ++i)
-            *mit = i;
+        mt * a = new mt(bs, rank, rank),
+           * b = new mt(bs, rank, rank),
+           * c = new mt(bs, rank, rank);
+        stats_data stats_before, stats_after;
 
-        delete m;
+        // ------ first run
+        for (mitt mit = a->begin(); mit != a->end(); ++mit)
+            *mit = 1;
+        for (mitt mit = b->begin(); mit != b->end(); ++mit)
+            *mit = 1;
+
+        bs.flush();
+        STXXL_MSG("start of first run (full matrices)");
+        stats_before = *stats::get_instance();
+        c->make_product_of(*a, *b);
+        bs.flush();
+        stats_after = *stats::get_instance();
+        STXXL_MSG("end of first run");
+
+        {
+            int_type num_err = 0;
+            for (mitt mit = c->begin(); mit != c->end(); ++mit)
+                num_err += (*mit != rank);
+            if (num_err)
+                STXXL_ERRMSG("c had " << num_err << " errors");
+        }
+        STXXL_MSG(stats_after - stats_before);
+
+        // ------ second run
+        {
+            int_type i = 1;
+            for (mitt mit = a->begin(); mit != a->end(); ++mit, ++i)
+                *mit = i;
+        }
+        {
+            mt::arbitrary_iterator mit = b->get_arbitrary_iterator();
+            for (int_type i = 0; i < b->get_height(); ++i)
+            {
+                mit.set_pos(i,i);
+                *mit = 1;
+            }
+        }
+        c->set_zero();
+
+        bs.flush();
+        STXXL_MSG("start of second run (one matrix is diagonal)");
+        stats_before = *stats::get_instance();
+        c->make_product_of(*a, *b);
+        bs.flush();
+        stats_after = *stats::get_instance();
+        STXXL_MSG("end of second run");
+
+        {
+            int_type num_err = 0;
+            int_type i = 1;
+            for (mitt mit = a->begin(); mit != a->end(); ++mit, ++i)
+                num_err += (*mit != i);
+            if (num_err)
+                STXXL_ERRMSG("c had " << num_err << " errors");
+        }
+        STXXL_MSG(stats_after - stats_before);
+
+        delete a;
+        delete b;
+        delete c;
         delete b_s;
         break;
     }
     }
-    STXXL_MSG("end test");
+    STXXL_MSG("end of test");
     return 0;
 }
 
