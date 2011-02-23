@@ -670,12 +670,12 @@ struct matrix_multiply
         // recursive multiplication
         recursive_multiply_and_add(qa->ul, qb->ul, qc->ul);
         recursive_multiply_and_add(qa->ur, qb->dl, qc->ul);
-        recursive_multiply_and_add(qa->ul, qb->ur, qc->ur);
         recursive_multiply_and_add(qa->ur, qb->dr, qc->ur);
-        recursive_multiply_and_add(qa->dl, qb->ul, qc->dl);
-        recursive_multiply_and_add(qa->dr, qb->dl, qc->dl);
+        recursive_multiply_and_add(qa->ul, qb->ur, qc->ur);
         recursive_multiply_and_add(qa->dl, qb->ur, qc->dr);
         recursive_multiply_and_add(qa->dr, qb->dr, qc->dr);
+        recursive_multiply_and_add(qa->dr, qb->dl, qc->dl);
+        recursive_multiply_and_add(qa->dl, qb->ul, qc->dl);
         // delete partitioning
         delete qa;
         delete qb;
