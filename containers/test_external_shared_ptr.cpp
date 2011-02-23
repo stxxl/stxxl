@@ -89,13 +89,6 @@ void test_vector()
         vector_type::const_iterator c_it = v.begin();
         STXXL_UNUSED(c_it);
 
-        unsigned int big_size = 1024 * 1024 * 2 * 16 * 16;
-        typedef stxxl::vector<double> vec_big;
-        vec_big my_vec(big_size);
-
-        vec_big::iterator big_it = my_vec.begin();
-        big_it += 6;
-
         test_const_iterator(v);
 
         stxxl::random_number32 rnd;
@@ -125,6 +118,7 @@ void test_vector()
             aep->key = rnd();
             element e(aep);
 
+            v[i].unwrap();
             v[i] = e;
 
             assert(v[i].get()->key == aep->key);
@@ -145,6 +139,9 @@ void test_vector()
 
         // check again
         STXXL_MSG("clear");
+
+        for (vector_type::iterator it = v.begin(); it != v.end(); ++it)
+                it->unwrap();
 
         v.clear();
 
@@ -179,6 +176,12 @@ void test_vector()
         vector_type v_copy1;
         v_copy1 = v;
         assert(v == v_copy1);
+
+        while (v.size() != 0) {
+            element e = v.back();
+            v.pop_back();
+            e.unwrap();
+        }
     }
     catch (const std::exception & ex)
     {
