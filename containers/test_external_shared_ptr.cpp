@@ -141,7 +141,7 @@ void test_vector()
         STXXL_MSG("clear");
 
         for (vector_type::iterator it = v.begin(); it != v.end(); ++it)
-                it->unwrap();
+            it->unwrap();
 
         v.clear();
 
@@ -295,7 +295,7 @@ void test_map()
 
 int main()
 {
-        test_vector();
-        test_map();
-        return 0;
+    test_vector();
+    test_map();
+    return 0;
 }

@@ -40,7 +40,7 @@ __STXXL_BEGIN_NAMESPACE
  * requirements. At the moment of writing the author is not aware of any
  * implementations of shared pointers that can't be used with this wrapper.
  */
-template<class P>
+template <class P>
 class external_shared_ptr
 {
 private:
@@ -56,7 +56,6 @@ private:
      * additional hints.
      */
     char data[sizeof(P)];
-    
 
 public:
     external_shared_ptr()
@@ -83,7 +82,7 @@ public:
          * Call the destructor to decrement the refcount. If this is
          * called more than once the results are undefined.
          */
-        P* p = reinterpret_cast<P*>((void*) data);
+        P * p = reinterpret_cast<P *>((void *)data);
         p->~P();
     }
 
@@ -92,14 +91,14 @@ public:
         /*
          * If this is called after unwrap() the behaviour is undefined
          */
-        P* p = reinterpret_cast<P*>((void*) data);
+        P * p = reinterpret_cast<P *>((void *)data);
         return *p;
     }
 
-    bool operator == (const external_shared_ptr& x) const
+    bool operator == (const external_shared_ptr & x) const
     {
-        P* p1 = reinterpret_cast<P*>((void*) data);
-        P* p2 = reinterpret_cast<P*>((void*) x.data);
+        P * p1 = reinterpret_cast<P *>((void *)data);
+        P * p2 = reinterpret_cast<P *>((void *)x.data);
 
         return *p1 == *p2;
     }
