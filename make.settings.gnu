@@ -7,7 +7,7 @@
 #
 #  Copyright (C) 2002-2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
 #  Copyright (C) 2006-2008 Johannes Singler <singler@ira.uka.de>
-#  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+#  Copyright (C) 2007-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
 #
 #  Distributed under the Boost Software License, Version 1.0.
 #  (See accompanying file LICENSE_1_0.txt or copy at
@@ -20,14 +20,18 @@ TOPDIR	?= $(error TOPDIR not defined) # DO NOT CHANGE! This is set elsewhere.
 # Change this file according to your paths.
 
 # Instead of modifying this file, you could also set your modified variables
-# in make.settings.local (needs to be created first).
+# in make.settings.local (needs to be created first, a template can be created
+# by running 'make config_gnu').
 -include $(TOPDIR)/make.settings.local
 
 
 USE_BOOST	?= no	# set 'yes' to use Boost libraries or 'no' to not use Boost libraries
 USE_MACOSX	?= no	# set 'yes' if you run Mac OS X, 'no' otherwise
 USE_FREEBSD	?= no	# set 'yes' if you run FreeBSD, 'no' otherwise
+USE_PARALLEL_MODE ?= no # set 'yes' to explicitly enable parallel mode for stxxl operations only
 ENABLE_SHARED	?= no   # set 'yes' to build a shared library instead of a static library (EXPERIMENTAL)
+
+# internal flags
 USE_PMODE	?= no	# will be overridden from main Makefile
 USE_MCSTL	?= no	# will be overridden from main Makefile
 USE_ICPC	?= no	# will be overridden from main Makefile
@@ -161,11 +165,12 @@ cmt	= \#
 $(shell echo '$(cmt)STXXL_ROOT	 = $(CURDIR:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
 MCSTL_ROOT	?= $(HOME)/work/mcstl
 $(shell echo '$(cmt)MCSTL_ROOT	 = $(MCSTL_ROOT:$(HOME)%=$$(HOME)%)' >> $(CURDIR)/make.settings.local)
-$(shell echo '$(cmt)COMPILER_GCC	 = g++-4.2' >> $(CURDIR)/make.settings.local)
+$(shell echo '$(cmt)COMPILER_GCC	 = g++' >> $(CURDIR)/make.settings.local)
 $(shell echo '$(cmt)COMPILER_GCC	 = g++-4.4 -std=c++0x' >> $(CURDIR)/make.settings.local)
 $(shell echo '$(cmt)COMPILER_ICPC	 = icpc' >> $(CURDIR)/make.settings.local)
 $(shell echo '$(cmt)USE_BOOST	 = no' >> $(CURDIR)/make.settings.local)
 $(shell echo '$(cmt)BOOST_ROOT	 = ' >> $(CURDIR)/make.settings.local)
+$(shell echo '$(cmt)USE_PARALLEL_MODE	 = no' >> $(CURDIR)/make.settings.local)
 ifeq (Darwin,$(strip $(shell uname)))
 $(shell echo 'USE_MACOSX	 = yes' >> $(CURDIR)/make.settings.local)
 else
@@ -248,6 +253,18 @@ OPENMPFLAG			?= -fopenmp
 PARALLEL_MODE_CPPFLAGS		+= $(OPENMPFLAG) -D_GLIBCXX_PARALLEL
 PARALLEL_MODE_LDFLAGS		+= $(OPENMPFLAG)
 
+else
+ifeq ($(strip $(USE_PARALLEL_MODE)),yes)
+
+OPENMPFLAG			?= -fopenmp
+
+EXPLICIT_PARALLEL_MODE_CPPFLAGS	+= $(OPENMPFLAG) -DSTXXL_PARALLEL_MODE_EXPLICIT
+EXPLICIT_PARALLEL_MODE_LDFLAGS	+= $(OPENMPFLAG)
+
+STXXL_SPECIFIC			+= $(EXPLICIT_PARALLEL_MODE_CPPFLAGS)
+STXXL_LDFLAGS			+= $(EXPLICIT_PARALLEL_MODE_LDFLAGS)
+
+endif
 endif
 
 ##################################################################
@@ -396,6 +413,7 @@ EXTRA_DEPS_COMPILE	?= $(DEPS_MAKEFILES)
 	$(COMPILE_STXXL)
 
 %.$(lo): PARALLEL_MODE_CPPFLAGS=
+%.$(lo): EXPLICIT_PARALLEL_MODE_CPPFLAGS=
 %.$(lo): MCSTL_CPPFLAGS=
 %.$(lo): STXXL_COMPILER_OPTIONS += $(STXXL_LIBRARY_SPECIFIC)
 %.$(lo): o=$(lo)
