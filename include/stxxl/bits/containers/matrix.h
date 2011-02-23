@@ -41,7 +41,7 @@ __STXXL_BEGIN_NAMESPACE
 
 template <typename ValueType, unsigned BlockSideLength> class matrix;
 
-//! \brief Specialised swappable_block that interprets uninitiazized as containing zeros.
+//! \brief Specialized swappable_block that interprets uninitialized as containing zeros.
 //! When initializing, all values are set to zero.
 template <typename ValueType, unsigned BlockSideLength>
 class matrix_swappable_block : public swappable_block<ValueType, BlockSideLength * BlockSideLength>
@@ -655,7 +655,7 @@ struct matrix_multiply
                                swappable_block_matrix_type & B,
                                swappable_block_matrix_type & C)
     {
-        // todo remove assertion after securing earlyer
+        // todo remove assertion after securing earlier
         assert(C.get_height() == A.get_height() && C.get_width() == B.get_width() && A.get_width() == B.get_height());
 
         // base case
@@ -753,7 +753,7 @@ void dgemm_wrapper(const blas_int n, const blas_int l, const blas_int m,
         // blas expects matrices in column-major unless specified via transa rsp. transb
         dgemm_(&transa, &transb, &n, &m, &l, &alpha, a, &stride_in_a, b, &stride_in_b, &beta, c, &stride_in_c);
     else
-        // blas expects matrices in column-major, so we calulate c^T = alpha * b^T * a^T + beta * c^T
+        // blas expects matrices in column-major, so we calculate c^T = alpha * b^T * a^T + beta * c^T
         dgemm_(&transb, &transa, &m, &n, &l, &alpha, b, &stride_in_b, a, &stride_in_a, &beta, c, &stride_in_c);
 }
 
