@@ -41,6 +41,64 @@ __STXXL_BEGIN_NAMESPACE
 
 template <typename ValueType, unsigned BlockSideLength> class matrix;
 
+struct matrix_operation_statistic : public singleton<matrix_operation_statistic>
+{
+    int_type block_multiplication_calls,
+             block_multiplications_saved_through_zero;
+
+    matrix_operation_statistic()
+        : block_multiplication_calls(0),
+          block_multiplications_saved_through_zero(0) {}
+};
+
+struct matrix_operation_statistic_data
+{
+    int_type block_multiplication_calls,
+             block_multiplications_saved_through_zero;
+
+    matrix_operation_statistic_data(const matrix_operation_statistic & stat = * matrix_operation_statistic::get_instance())
+        : block_multiplication_calls(stat.block_multiplication_calls),
+          block_multiplications_saved_through_zero(stat.block_multiplications_saved_through_zero) {}
+
+    matrix_operation_statistic_data & operator = (const matrix_operation_statistic & stat)
+    {
+        block_multiplication_calls = stat.block_multiplication_calls;
+        block_multiplications_saved_through_zero = stat.block_multiplications_saved_through_zero;
+        return *this;
+    }
+
+    void set()
+    { operator = (* matrix_operation_statistic::get_instance()); }
+
+    matrix_operation_statistic_data operator + (const matrix_operation_statistic_data & stat)
+    {
+        matrix_operation_statistic_data res(*this);
+        res.block_multiplication_calls += stat.block_multiplication_calls;
+        res.block_multiplications_saved_through_zero += stat.block_multiplications_saved_through_zero;
+        return res;
+    }
+
+    matrix_operation_statistic_data operator - (const matrix_operation_statistic_data & stat)
+    {
+        matrix_operation_statistic_data res(*this);
+        res.block_multiplication_calls -= stat.block_multiplication_calls;
+        res.block_multiplications_saved_through_zero -= stat.block_multiplications_saved_through_zero;
+        return res;
+    }
+};
+
+std::ostream & operator << (std::ostream & o, const matrix_operation_statistic_data & statsd)
+{
+    o << "matrix multiplication statistics" << std::endl;
+    o << "block multiplication calls                     : "
+            << statsd.block_multiplication_calls << std::endl;
+    o << "block multiplications saved through zero blocks: "
+            << statsd.block_multiplications_saved_through_zero << std::endl;
+    o << "block multiplications performed                : "
+            << statsd.block_multiplication_calls - statsd.block_multiplications_saved_through_zero << std::endl;
+    return o;
+}
+
 //! \brief Specialized swappable_block that interprets uninitialized as containing zeros.
 //! When initializing, all values are set to zero.
 template <typename ValueType, unsigned BlockSideLength>
@@ -584,6 +642,12 @@ public:
     //maydo: col-major iterator, cheap iterator
 };
 
+template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AExists, bool BExists>
+struct feedable_strassen_winograd;
+
+template <typename ValueType, unsigned BlockSideLength, unsigned Level>
+struct matrix_to_quadtree;
+
 //! \brief multiplies matrices A and B, adds result to C
 //! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
 /* designated usage as:
@@ -621,7 +685,7 @@ struct matrix_multiply
         : result(C)
     {
         C.set_zero();
-        recursive_multiply_and_add(A, B, C);
+        strassen_winograd_multiply_and_add(A, B, C);
     }
 
     operator swappable_block_matrix_type & ()
@@ -633,6 +697,110 @@ struct matrix_multiply
     typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
     typedef typename swappable_block_matrix_type::index_type index_type;
     typedef typename swappable_block_matrix_type::size_type size_type;
+
+    struct swappable_block_matrix_quarterer
+    {
+        swappable_block_matrix_type  upleft,   upright,
+                                    downleft, downright,
+                & ul, & ur, & dl, & dr;
+
+        swappable_block_matrix_quarterer(swappable_block_matrix_type & whole)
+            : upleft   (whole, whole.get_height()/2, whole.get_width()/2,                    0,                   0),
+              upright  (whole, whole.get_height()/2, whole.get_width()/2,                    0, whole.get_width()/2),
+              downleft (whole, whole.get_height()/2, whole.get_width()/2, whole.get_height()/2,                   0),
+              downright(whole, whole.get_height()/2, whole.get_width()/2, whole.get_height()/2, whole.get_width()/2),
+              ul(upleft), ur(upright), dl(downleft), dr(downright)
+        { assert(! (whole.get_height() % 2 | whole.get_width() % 2)); }
+    };
+
+    //! \brief calculates C = A * B + C
+    // requires fitting dimensions
+    static swappable_block_matrix_type &
+    strassen_winograd_multiply_and_add(swappable_block_matrix_type & A,
+                                       swappable_block_matrix_type & B,
+                                       swappable_block_matrix_type & C)
+    {
+        //todo
+        int_type p = log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+
+        swappable_block_matrix_type padded_a(A, round_up_to_power_of_two(A.get_height(), p),
+                                             round_up_to_power_of_two(A.get_width(), p), 0, 0),
+                                    padded_b(B, round_up_to_power_of_two(B.get_height(), p),
+                                             round_up_to_power_of_two(B.get_width(), p), 0, 0),
+                                    padded_c(C, round_up_to_power_of_two(C.get_height(), p),
+                                             round_up_to_power_of_two(C.get_width(), p), 0, 0);
+        switch (p)
+        {
+        case 0:
+            naive_multiply_and_add(A, B, C);
+            break;
+        case 1:
+            use_feedable_sw<1>(padded_a, padded_b, padded_c);
+            break;
+        case 2:
+            use_feedable_sw<2>(padded_a, padded_b, padded_c);
+            break;
+        case 3:
+            use_feedable_sw<3>(padded_a, padded_b, padded_c);
+            break;
+        default: // todo possibly more Levels
+            use_feedable_sw<4>(padded_a, padded_b, padded_c);
+            break;
+        }
+        return C;
+    }
+
+    // assumes input matrices to be padded
+    template <unsigned Level>
+    static void use_feedable_sw(swappable_block_matrix_type & A,
+                                swappable_block_matrix_type & B,
+                                swappable_block_matrix_type & C)
+    {
+        feedable_strassen_winograd<ValueType, BlockSideLength, Level, true, true>
+                fsw(A, 0, 0, C.bs, C.get_height(), C.get_width(), A.get_width(), B, 0, 0);
+        // preadditions for A
+        matrix_to_quadtree<ValueType, BlockSideLength, Level>
+                mtq_a (A);
+        for (index_type block_row = 0; block_row < mtq_a.get_height_in_blocks(); ++block_row)
+            for (index_type block_col = 0; block_col < mtq_a.get_width_in_blocks(); ++block_col)
+            {
+                fsw.begin_feeding_a_block(block_row, block_col,
+                        mtq_a.begin_reading_block(block_row, block_col));
+                for (int_type element_num_in_block = 0; element_num_in_block < int_type(BlockSideLength * BlockSideLength); ++element_num_in_block)
+                    fsw.feed_a_element(element_num_in_block, mtq_a.read_element(element_num_in_block));
+                fsw.end_feeding_a_block(block_row, block_col,
+                        mtq_a.end_reading_block(block_row, block_col));
+            }
+        // preadditions for B
+        matrix_to_quadtree<ValueType, BlockSideLength, Level>
+                mtq_b (B);
+        for (index_type block_row = 0; block_row < mtq_b.get_height_in_blocks(); ++block_row)
+            for (index_type block_col = 0; block_col < mtq_b.get_width_in_blocks(); ++block_col)
+            {
+                fsw.begin_feeding_b_block(block_row, block_col,
+                        mtq_b.begin_reading_block(block_row, block_col));
+                for (int_type element_num_in_block = 0; element_num_in_block < int_type(BlockSideLength * BlockSideLength); ++element_num_in_block)
+                    fsw.feed_b_element(element_num_in_block, mtq_b.read_element(element_num_in_block));
+                fsw.end_feeding_b_block(block_row, block_col,
+                        mtq_b.end_reading_block(block_row, block_col));
+            }
+        // recursive multiplications
+        fsw.multiply();
+        // postadditions
+        matrix_to_quadtree<ValueType, BlockSideLength, Level>
+                mtq_c (C);
+        for (index_type block_row = 0; block_row < mtq_c.get_height_in_blocks(); ++block_row)
+            for (index_type block_col = 0; block_col < mtq_c.get_width_in_blocks(); ++block_col)
+            {
+                mtq_c.begin_feeding_block(block_row, block_col,
+                        fsw.begin_reading_block(block_row, block_col));
+                for (int_type element_num_in_block = 0; element_num_in_block < int_type(BlockSideLength * BlockSideLength); ++element_num_in_block)
+                    mtq_c.feed_and_add_element(element_num_in_block, fsw.read_element(element_num_in_block));
+                mtq_c.end_feeding_block(block_row, block_col,
+                        fsw.end_reading_block(block_row, block_col));
+            }
+
+    }
 
     struct swappable_block_matrix_approximative_quarterer
     {
@@ -668,6 +836,7 @@ struct matrix_multiply
                 * qb = new swappable_block_matrix_approximative_quarterer(B),
                 * qc = new swappable_block_matrix_approximative_quarterer(C);
         // recursive multiplication
+        // The order of recursive calls is optimized to enhance locality. C has priority because it has to be read and written.
         recursive_multiply_and_add(qa->ul, qb->ul, qc->ul);
         recursive_multiply_and_add(qa->ur, qb->dl, qc->ul);
         recursive_multiply_and_add(qa->ur, qb->dr, qc->ur);
@@ -691,8 +860,8 @@ struct matrix_multiply
                            swappable_block_matrix_type & C)
     {
         const size_type & n = C.get_height(),
-                          m = C.get_width(),
-                          l = A.get_width();
+                        & m = C.get_width(),
+                        & l = A.get_width();
         for (index_type i = 0; i < n; ++i)
             for (index_type j = 0; j < m; ++j)
                 for (index_type k = 0; k < l; ++k)
@@ -707,22 +876,615 @@ struct matrix_multiply
             const swappable_block_identifier_type b, const bool b_is_transposed, block_scheduler_type & bs_b,
             const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c)
     {
+        ++ matrix_operation_statistic::get_instance()->block_multiplication_calls;
         // check if zero-block (== ! initialized)
         if (! bs_a.is_initialized(a) || ! bs_b.is_initialized(b))
+        {
             // => one factor is zero => product is zero
+            ++ matrix_operation_statistic::get_instance()->block_multiplications_saved_through_zero;
             return;
+        }
         // acquire
         ValueType * ap = bs_a.acquire(a).begin(),
                   * bp = bs_b.acquire(b).begin(),
                   * cp = bs_c.acquire(c).begin();
         // multiply
-        low_level_matrix_multiply_and_add<ValueType, BlockSideLength>
-                (ap, a_is_transposed, bp, b_is_transposed, cp, c_is_transposed);
+        if (! bs_c.is_simulating())
+            low_level_matrix_multiply_and_add<ValueType, BlockSideLength>
+                    (ap, a_is_transposed, bp, b_is_transposed, cp, c_is_transposed);
         // release
         bs_a.release(a, false);
         bs_b.release(b, false);
         bs_c.release(c, true);
     }
+};
+
+template <typename ValueType, unsigned Level>
+struct static_quadtree
+{
+    typedef static_quadtree<ValueType, Level - 1> smaller_static_quadtree;
+
+    smaller_static_quadtree ul, ur, dl, dr;
+
+    static_quadtree(smaller_static_quadtree ul, smaller_static_quadtree ur,
+            smaller_static_quadtree dl, smaller_static_quadtree dr)
+        : ul(ul), ur(ur), dl(dl), dr(dr) {}
+
+    static_quadtree() {}
+
+    static_quadtree & operator &= (const static_quadtree & right)
+    {
+        ul &= right.ul; ur &= right.ur; dl &= right.dl; dr &= right.dr;
+        return *this;
+    }
+
+    static_quadtree & operator += (const static_quadtree & right)
+    {
+        ul += right.ul; ur += right.ur; dl += right.dl; dr += right.dr;
+        return *this;
+    }
+
+    static_quadtree operator & (const static_quadtree & right) const
+    { return static_quadtree(ul & right.ul, ur & right.ur, dl & right.dl, dr & right.dr); }
+
+    static_quadtree operator + (const static_quadtree & right) const
+    { return static_quadtree(ul + right.ul, ur + right.ur, dl + right.dl, dr + right.dr); }
+
+    static_quadtree operator - (const static_quadtree & right) const
+    { return static_quadtree(ul - right.ul, ur - right.ur, dl - right.dl, dr - right.dr); }
+};
+
+template <typename ValueType>
+struct static_quadtree<ValueType, 0>
+{
+    ValueType val;
+
+    static_quadtree(const ValueType & v)
+        : val(v) {}
+
+    static_quadtree() {}
+
+    operator const ValueType & () const
+    { return val; }
+
+    operator ValueType & ()
+    { return val; }
+
+    static_quadtree & operator &= (const static_quadtree & right)
+    {
+        val &= right.val;
+        return *this;
+    }
+
+    static_quadtree & operator += (const static_quadtree & right)
+    {
+        val += right.val;
+        return *this;
+    }
+
+    static_quadtree operator ! () const
+    { return static_quadtree(! val); }
+
+    static_quadtree operator & (const static_quadtree & right) const
+    { return val & right.val; }
+
+    static_quadtree operator + (const static_quadtree & right) const
+    { return val + right.val; }
+
+    static_quadtree operator - (const static_quadtree & right) const
+    { return val - right.val; }
+
+    /* superfluous conversions
+    static_quadtree(const static_quadtree & sqt)
+        : val(sqt.val) {}
+
+    static_quadtree & operator = (const static_quadtree & sqt)
+    {
+        val = sqt.val;
+        return *this;
+    }
+
+    static_quadtree & operator = (const ValueType & v)
+    {
+        val = v;
+        return *this;
+    }*/
+};
+
+template <typename ValueType, unsigned BlockSideLength, bool AExists, bool BExists>
+struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExists>
+{
+    typedef static_quadtree<bool, 0> zbt;     // true <=> is a zero-block
+    typedef static_quadtree<ValueType, 0> vt;
+
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+    typedef typename swappable_block_matrix_type::index_type index_type;
+
+    swappable_block_matrix_type a, b, c;
+    const size_type n, m, l;
+    internal_block_type * iblock;
+
+    feedable_strassen_winograd(
+            swappable_block_matrix_type & existing_a, const index_type a_from_row, const index_type a_from_col,
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
+            swappable_block_matrix_type & existing_b, const index_type b_from_row, const index_type b_from_col)
+        : a(existing_a, n, l, a_from_row, a_from_col),
+          b(existing_b, n, l, b_from_row, b_from_col),
+          c(bs_c, n, m),
+          n(n), m(m), l(l),
+          iblock(0) {}
+
+    feedable_strassen_winograd(
+            swappable_block_matrix_type & existing_a, const index_type a_from_row, const index_type a_from_col,
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
+        : a(existing_a, n, l, a_from_row, a_from_col),
+          b(bs_c, n, l),
+          c(bs_c, n, m),
+          n(n), m(m), l(l),
+          iblock(0) {}
+
+    feedable_strassen_winograd(
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
+            swappable_block_matrix_type & existing_b, const index_type b_from_row, const index_type b_from_col)
+        : a(bs_c, n, l),
+          b(existing_b, n, l, b_from_row, b_from_col),
+          c(bs_c, n, m),
+          n(n), m(m), l(l),
+          iblock(0) {}
+
+    feedable_strassen_winograd(
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
+        : a(bs_c, n, l),
+          b(bs_c, n, l),
+          c(bs_c, n, m),
+          n(n), m(m), l(l),
+          iblock(0) {}
+
+    void begin_feeding_a_block(const index_type & block_row, const index_type & block_col, const zbt)
+    {
+        if (! AExists)
+            iblock = & a.bs.acquire(a(block_row, block_col));
+    }
+
+    void feed_a_element(const int_type element_num, const vt v)
+    {
+        if (! AExists)
+            (*iblock)[element_num] = v;
+    }
+
+    void end_feeding_a_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        if (! AExists)
+        {
+            a.bs.release(a(block_row, block_col), ! zb);
+            iblock = 0;
+        }
+    }
+
+    void begin_feeding_b_block(const index_type & block_row, const index_type & block_col, const zbt)
+    {
+        if (! BExists)
+            iblock = & b.bs.acquire(b(block_row, block_col));
+    }
+
+    void feed_b_element(const int_type element_num, const vt v)
+    {
+        if (! BExists)
+            (*iblock)[element_num] = v;
+    }
+
+    void end_feeding_b_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        if (! BExists)
+        {
+            b.bs.release(b(block_row, block_col), ! zb);
+            iblock = 0;
+        }
+    }
+
+    void multiply()
+    { matrix_multiply<ValueType, BlockSideLength>::strassen_winograd_multiply_and_add(a, b, c); }
+
+    zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
+    {
+        bool zb = ! c.bs.is_initialized(c(block_row, block_col));
+        iblock = & c.bs.acquire(c(block_row, block_col));
+        return zb;
+    }
+
+    vt read_element(const int_type element_num)
+    { return (*iblock)[element_num]; }
+
+    zbt end_reading_block(const index_type & block_row, const index_type & block_col)
+    {
+        c.bs.release(c(block_row, block_col), false);
+        iblock = 0;
+        return ! c.bs.is_initialized(c(block_row, block_col));
+    }
+};
+
+template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AExists, bool BExists>
+struct feedable_strassen_winograd
+{
+    typedef static_quadtree<bool, Level> zbt;     // true <=> is a zero-block
+    typedef static_quadtree<ValueType, Level> vt;
+
+    typedef feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, AExists, BExists> smaller_feedable_strassen_winograd_ab;
+    typedef feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, AExists, false> smaller_feedable_strassen_winograd_a;
+    typedef feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, false, BExists> smaller_feedable_strassen_winograd_b;
+    typedef feedable_strassen_winograd<ValueType, BlockSideLength, Level - 1, false, false> smaller_feedable_strassen_winograd_n;
+
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+    typedef typename swappable_block_matrix_type::index_type index_type;
+
+    const size_type n, m, l;
+    smaller_feedable_strassen_winograd_ab p1, p2;
+    smaller_feedable_strassen_winograd_n  p3, p4, p5;
+    smaller_feedable_strassen_winograd_b  p6;
+    smaller_feedable_strassen_winograd_a  p7;
+
+    feedable_strassen_winograd(
+            swappable_block_matrix_type & existing_a, const index_type a_from_row, const index_type a_from_col,
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
+            swappable_block_matrix_type & existing_b, const index_type b_from_row, const index_type b_from_col)
+        : n(n), m(m), l(l),
+          p1(existing_a, a_from_row,       a_from_col,       bs_c, n/2, m/2, l/2, existing_b, b_from_row,       b_from_col),
+          p2(existing_a, a_from_row,       a_from_col + l/2, bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col),
+          p3(                                                bs_c, n/2, m/2, l/2),
+          p4(                                                bs_c, n/2, m/2, l/2),
+          p5(                                                bs_c, n/2, m/2, l/2),
+          p6(                                                bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col + m/2),
+          p7(existing_a, a_from_row + n/2, a_from_col + l/2, bs_c, n/2, m/2, l/2) {}
+
+    feedable_strassen_winograd(
+            swappable_block_matrix_type & existing_a, const index_type a_from_row, const index_type a_from_col,
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
+        : n(n), m(m), l(l),
+          p1(existing_a, a_from_row,       a_from_col,       bs_c, n/2, m/2, l/2),
+          p2(existing_a, a_from_row,       a_from_col + l/2, bs_c, n/2, m/2, l/2),
+          p3(                                                bs_c, n/2, m/2, l/2),
+          p4(                                                bs_c, n/2, m/2, l/2),
+          p5(                                                bs_c, n/2, m/2, l/2),
+          p6(                                                bs_c, n/2, m/2, l/2),
+          p7(existing_a, a_from_row + n/2, a_from_col + l/2, bs_c, n/2, m/2, l/2) {}
+
+    feedable_strassen_winograd(
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
+            swappable_block_matrix_type & existing_b, const index_type b_from_row, const index_type b_from_col)
+        : n(n), m(m), l(l),
+          p1(bs_c, n/2, m/2, l/2, existing_b, b_from_row,       b_from_col),
+          p2(bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col),
+          p3(bs_c, n/2, m/2, l/2),
+          p4(bs_c, n/2, m/2, l/2),
+          p5(bs_c, n/2, m/2, l/2),
+          p6(bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col + m/2),
+          p7(bs_c, n/2, m/2, l/2) {}
+
+    feedable_strassen_winograd(
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
+        : n(n), m(m), l(l),
+          p1(bs_c, n/2, m/2, l/2),
+          p2(bs_c, n/2, m/2, l/2),
+          p3(bs_c, n/2, m/2, l/2),
+          p4(bs_c, n/2, m/2, l/2),
+          p5(bs_c, n/2, m/2, l/2),
+          p6(bs_c, n/2, m/2, l/2),
+          p7(bs_c, n/2, m/2, l/2) {}
+
+    void begin_feeding_a_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        typename zbt::smaller_static_quadtree s1 = zb.dl & zb.dr,
+                                              s2 = s1    & zb.ul,
+                                              s3 = zb.ul & zb.dl,
+                                              s4 = zb.ur & s2;
+        p1.begin_feeding_a_block(block_row, block_col, zb.ul);
+        p2.begin_feeding_a_block(block_row, block_col, zb.ur);
+        p3.begin_feeding_a_block(block_row, block_col, s1);
+        p4.begin_feeding_a_block(block_row, block_col, s2);
+        p5.begin_feeding_a_block(block_row, block_col, s3);
+        p6.begin_feeding_a_block(block_row, block_col, s4);
+        p7.begin_feeding_a_block(block_row, block_col, zb.dr);
+    }
+
+    void feed_a_element(const int_type element_num, const vt v)
+    {
+        typename vt::smaller_static_quadtree s1 = v.dl + v.dr,
+                                             s2 = s1   - v.ul,
+                                             s3 = v.ul - v.dl,
+                                             s4 = v.ur - s2;
+        p1.feed_a_element(element_num, v.ul);
+        p2.feed_a_element(element_num, v.ur);
+        p3.feed_a_element(element_num, s1);
+        p4.feed_a_element(element_num, s2);
+        p5.feed_a_element(element_num, s3);
+        p6.feed_a_element(element_num, s4);
+        p7.feed_a_element(element_num, v.dr);
+    }
+
+    void end_feeding_a_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        typename zbt::smaller_static_quadtree s1 = zb.dl & zb.dr,
+                                              s2 = s1    & zb.ul,
+                                              s3 = zb.ul & zb.dl,
+                                              s4 = zb.ur & s2;
+        p1.end_feeding_a_block(block_row, block_col, zb.ul);
+        p2.end_feeding_a_block(block_row, block_col, zb.ur);
+        p3.end_feeding_a_block(block_row, block_col, s1);
+        p4.end_feeding_a_block(block_row, block_col, s2);
+        p5.end_feeding_a_block(block_row, block_col, s3);
+        p6.end_feeding_a_block(block_row, block_col, s4);
+        p7.end_feeding_a_block(block_row, block_col, zb.dr);
+    }
+
+    void begin_feeding_b_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        typename zbt::smaller_static_quadtree t1 = zb.ur & zb.ul,
+                                              t2 = zb.dr & t1,
+                                              t3 = zb.dr & zb.ur,
+                                              t4 = zb.dl & t2;
+        p1.begin_feeding_b_block(block_row, block_col, zb.ul);
+        p2.begin_feeding_b_block(block_row, block_col, zb.dl);
+        p3.begin_feeding_b_block(block_row, block_col, t1);
+        p4.begin_feeding_b_block(block_row, block_col, t2);
+        p5.begin_feeding_b_block(block_row, block_col, t3);
+        p6.begin_feeding_b_block(block_row, block_col, zb.dr);
+        p7.begin_feeding_b_block(block_row, block_col, t4);
+    }
+
+    void feed_b_element(const int_type element_num, const vt v)
+    {
+        typename vt::smaller_static_quadtree t1 = v.ur - v.ul,
+                                             t2 = v.dr - t1,
+                                             t3 = v.dr - v.ur,
+                                             t4 = v.dl - t2;
+        p1.feed_b_element(element_num, v.ul);
+        p2.feed_b_element(element_num, v.dl);
+        p3.feed_b_element(element_num, t1);
+        p4.feed_b_element(element_num, t2);
+        p5.feed_b_element(element_num, t3);
+        p6.feed_b_element(element_num, v.dr);
+        p7.feed_b_element(element_num, t4);
+    }
+
+    void end_feeding_b_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        typename zbt::smaller_static_quadtree t1 = zb.ur & zb.ul,
+                                              t2 = zb.dr & t1,
+                                              t3 = zb.dr & zb.ur,
+                                              t4 = zb.dl & t2;
+        p1.begin_feeding_b_block(block_row, block_col, zb.ul);
+        p2.begin_feeding_b_block(block_row, block_col, zb.dl);
+        p3.begin_feeding_b_block(block_row, block_col, t1);
+        p4.begin_feeding_b_block(block_row, block_col, t2);
+        p5.begin_feeding_b_block(block_row, block_col, t3);
+        p6.begin_feeding_b_block(block_row, block_col, zb.dr);
+        p7.begin_feeding_b_block(block_row, block_col, t4);
+    }
+
+    void multiply()
+    {
+        p1.multiply();
+        p2.multiply();
+        p3.multiply();
+        p4.multiply();
+        p5.multiply();
+        p6.multiply();
+        p7.multiply();
+    }
+
+    zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
+    {
+        zbt r;
+        r.ur = r.ul = p1.begin_reading_block(block_row, block_col);
+        r.ul &= p2.begin_reading_block(block_row, block_col);
+        r.ur &= p4.begin_reading_block(block_row, block_col);
+        r.dr = r.dl = p5.begin_reading_block(block_row, block_col);
+        r.dl &= r.ur;
+        r.dl &= p7.begin_reading_block(block_row, block_col);
+        r.ur &= p3.begin_reading_block(block_row, block_col);
+        r.dr &= r.ur;
+        r.ur &= p6.begin_reading_block(block_row, block_col);
+        return r;
+    }
+
+    vt read_element(int_type element_num)
+    {
+        vt r;
+        r.ur = r.ul = p1.read_element(element_num);
+        r.ul += p2.read_element(element_num);
+        r.ur += p4.read_element(element_num);
+        r.dr = r.dl = p5.read_element(element_num);
+        r.dl += r.ur;
+        r.dl += p7.read_element(element_num);
+        r.ur += p3.read_element(element_num);
+        r.dr += r.ur;
+        r.ur += p6.read_element(element_num);
+        return r;
+    }
+
+    zbt end_reading_block(const index_type & block_row, const index_type & block_col)
+    {
+        zbt r;
+        r.ur = r.ul = p1.end_reading_block(block_row, block_col);
+        r.ul &= p2.end_reading_block(block_row, block_col);
+        r.ur &= p4.end_reading_block(block_row, block_col);
+        r.dr = r.dl = p5.end_reading_block(block_row, block_col);
+        r.dl &= r.ur;
+        r.dl &= p7.end_reading_block(block_row, block_col);
+        r.ur &= p3.end_reading_block(block_row, block_col);
+        r.dr &= r.ur;
+        r.ur &= p6.end_reading_block(block_row, block_col);
+        return r;
+    }
+};
+
+template <typename ValueType, unsigned BlockSideLength>
+struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
+{
+    typedef static_quadtree<bool, 0> zbt;     // true <=> is a zero-block
+    typedef static_quadtree<ValueType, 0> vt;
+
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+    typedef typename swappable_block_matrix_type::index_type index_type;
+
+    swappable_block_matrix_type m;
+    internal_block_type * iblock;
+
+    matrix_to_quadtree(swappable_block_matrix_type & matrix)
+        : m(matrix, matrix.get_height(), matrix.get_width(), 0, 0),
+          iblock(0) {}
+
+    matrix_to_quadtree(swappable_block_matrix_type & matrix,
+            const size_type height, const size_type width, const index_type from_row, const index_type from_col)
+        : m(matrix, height, width, from_row, from_col),
+          iblock(0) {}
+
+    void begin_feeding_block(const index_type & block_row, const index_type & block_col, const zbt)
+    { iblock = & m.bs.acquire(m(block_row, block_col)); }
+
+    void feed_element(const int_type element_num, const vt v)
+    { (*iblock)[element_num] = v; }
+
+    void feed_and_add_element(const int_type element_num, const vt v)
+    { (*iblock)[element_num] += v; }
+
+    void end_feeding_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        m.bs.release(m(block_row, block_col), ! zb);
+        iblock = 0;
+    }
+
+    zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
+    {
+        zbt zb = ! m.bs.is_initialized(m(block_row, block_col));
+        iblock = & m.bs.acquire(m(block_row, block_col));
+        return zb;
+    }
+
+    vt read_element(const int_type element_num)
+    { return (*iblock)[element_num]; }
+
+    zbt end_reading_block(const index_type & block_row, const index_type & block_col)
+    {
+        m.bs.release(m(block_row, block_col), false);
+        iblock = 0;
+        return  ! m.bs.is_initialized(m(block_row, block_col));
+    }
+
+    const size_type & get_height_in_blocks()
+    { return m.get_height(); }
+
+    const size_type & get_width_in_blocks()
+    { return m.get_width(); }
+};
+
+template <typename ValueType, unsigned BlockSideLength, unsigned Level>
+struct matrix_to_quadtree
+{
+    typedef static_quadtree<bool, Level> zbt;     // true <=> is a zero-block
+    typedef static_quadtree<ValueType, Level> vt;
+
+    typedef matrix_to_quadtree<ValueType, BlockSideLength, Level - 1> smaller_matrix_to_quadtree;
+
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+    typedef typename swappable_block_matrix_type::index_type index_type;
+
+    smaller_matrix_to_quadtree ul, ur, dl, dr;
+
+    matrix_to_quadtree(swappable_block_matrix_type & matrix)
+        : ul(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0,                    0),
+          ur(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0, matrix.get_width()/2),
+          dl(matrix, matrix.get_height()/2, matrix.get_width()/2, matrix.get_height()/2,                    0),
+          dr(matrix, matrix.get_height()/2, matrix.get_width()/2, matrix.get_height()/2, matrix.get_width()/2)
+    { assert(! (matrix.get_height() % 2 | matrix.get_width() % 2)); }
+
+    matrix_to_quadtree(swappable_block_matrix_type & matrix,
+            const size_type height, const size_type width, const index_type from_row, const index_type from_col)
+        : ul(matrix, height/2, width/2, from_row,            from_col),
+          ur(matrix, height/2, width/2, from_row,            from_col + width/2),
+          dl(matrix, height/2, width/2, from_row + height/2, from_col),
+          dr(matrix, height/2, width/2, from_row + height/2, from_col + width/2)
+    { assert(! (height % 2 | width % 2)); }
+
+    void begin_feeding_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        ul.begin_feeding_block(block_row, block_col, zb.ul);
+        ur.begin_feeding_block(block_row, block_col, zb.ur);
+        dl.begin_feeding_block(block_row, block_col, zb.dl);
+        dr.begin_feeding_block(block_row, block_col, zb.dr);
+    }
+
+    void feed_element(const int_type element_num, const vt v)
+    {
+        ul.feed_element(element_num, v.ul);
+        ur.feed_element(element_num, v.ur);
+        dl.feed_element(element_num, v.dl);
+        dr.feed_element(element_num, v.dr);
+    }
+
+    void feed_and_add_element(const int_type element_num, const vt v)
+    {
+        ul.feed_and_add_element(element_num, v.ul);
+        ur.feed_and_add_element(element_num, v.ur);
+        dl.feed_and_add_element(element_num, v.dl);
+        dr.feed_and_add_element(element_num, v.dr);
+    }
+
+    void end_feeding_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    {
+        ul.end_feeding_block(block_row, block_col, zb.ul);
+        ur.end_feeding_block(block_row, block_col, zb.ur);
+        dl.end_feeding_block(block_row, block_col, zb.dl);
+        dr.end_feeding_block(block_row, block_col, zb.dr);
+    }
+
+    zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
+    {
+        zbt zb;
+        zb.ul = ul.begin_reading_block(block_row, block_col);
+        zb.ur = ur.begin_reading_block(block_row, block_col);
+        zb.dl = dl.begin_reading_block(block_row, block_col);
+        zb.dr = dr.begin_reading_block(block_row, block_col);
+        return zb;
+    }
+
+    vt read_element(const int_type element_num)
+    {
+        vt v;
+        v.ul = ul.read_element(element_num);
+        v.ur = ur.read_element(element_num);
+        v.dl = dl.read_element(element_num);
+        v.dr = dr.read_element(element_num);
+        return v;
+    }
+
+    zbt end_reading_block(const index_type & block_row, const index_type & block_col)
+    {
+        zbt zb;
+        zb.ul = ul.end_reading_block(block_row, block_col);
+        zb.ur = ur.end_reading_block(block_row, block_col);
+        zb.dl = dl.end_reading_block(block_row, block_col);
+        zb.dr = dr.end_reading_block(block_row, block_col);
+        return zb;
+    }
+
+    const size_type & get_height_in_blocks()
+    { return ul.get_height_in_blocks(); }
+
+    const size_type & get_width_in_blocks()
+    { return ul.get_width_in_blocks(); }
 };
 
 #if STXXL_BLAS

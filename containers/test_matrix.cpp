@@ -152,7 +152,7 @@ int main(int argc, char **argv)
     {
     case 0:
     {
-        blocked_matrix<unsigned_type, small_block_order> A(rank, rank);
+        blocked_matrix<unsigned_type, block_order> A(rank, rank);
         modulus_integers mi1(1, 1), mi2(1, 1);
         iterator_compare<modulus_integers, unsigned_type> ic(mi1);
 
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
     case 1:
     {   //1-matrices
         ColumnMajor cm;
-        blocked_matrix<double, small_block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<double, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         constant_one co;
         modulus_integers mi(rank, 0);   //expected result, no modulus
         iterator_compare<modulus_integers, unsigned_type> ic(mi);
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
     }
     case 2:
     {   //ascending times constant factor
-        blocked_matrix<unsigned_type, small_block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         modulus_integers mi1(1, 1), mi2(5, 5);  //ascending, 5 * ascending
         diagonal_matrix di(rank, 5);    //multiply by 5
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
@@ -232,7 +232,7 @@ int main(int argc, char **argv)
     }
     case 3:
     {
-        blocked_matrix<unsigned_type, small_block_order> A(rank, rank), B(rank, rank), C(rank, rank);
+        blocked_matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
         modulus_integers mi1(1, 1), mi2((unsigned_type)rank * rank, std::numeric_limits<unsigned_type>::max());
         inverse_diagonal_matrix id(rank);
         iterator_compare<modulus_integers, unsigned_type> ic(mi2);
@@ -270,10 +270,13 @@ int main(int argc, char **argv)
         typedef mt::iterator mitt;
 
         bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
+        //bst * b_s = new bst(16*sizeof(value_type)*small_block_order*small_block_order); // the block_scheduler may use 16 blocks for caching
         bst & bs = *b_s;
         mt * a = new mt(bs, rank, rank),
            * b = new mt(bs, rank, rank),
            * c = new mt(bs, rank, rank);
+        stats_data stats_before, stats_after;
+        matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
         // ------ first run
         for (mitt mit = a->begin(); mit != a->end(); ++mit)
@@ -281,10 +284,18 @@ int main(int argc, char **argv)
         for (mitt mit = b->begin(); mit != b->end(); ++mit)
             *mit = 1;
 
+        bs.flush();
         STXXL_MSG("start mult");
+        matrix_stats_before.set();
+        stats_before = *stats::get_instance();
         c->make_product_of(*a, *b);
+        bs.flush();
+        stats_after = *stats::get_instance();
+        matrix_stats_after.set();
         STXXL_MSG("end mult");
 
+        STXXL_MSG(matrix_stats_after - matrix_stats_before);
+        STXXL_MSG(stats_after - stats_before);
         {
             int_type num_err = 0;
             for (mitt mit = c->begin(); mit != c->end(); ++mit)
@@ -300,6 +311,7 @@ int main(int argc, char **argv)
                 *mit = i;
         }
         {
+            b->set_zero();
             mt::arbitrary_iterator mit = b->get_arbitrary_iterator();
             for (int_type i = 0; i < b->get_height(); ++i)
             {
@@ -308,10 +320,18 @@ int main(int argc, char **argv)
             }
         }
 
+        bs.flush();
         STXXL_MSG("start mult");
+        matrix_stats_before.set();
+        stats_before = *stats::get_instance();
         c->make_product_of(*a, *b);
+        bs.flush();
+        stats_after = *stats::get_instance();
+        matrix_stats_after.set();
         STXXL_MSG("end mult");
 
+        STXXL_MSG(matrix_stats_after - matrix_stats_before);
+        STXXL_MSG(stats_after - stats_before);
         {
             int_type num_err = 0;
             int_type i = 1;
@@ -343,6 +363,7 @@ int main(int argc, char **argv)
            * b = new mt(bs, rank, rank),
            * c = new mt(bs, rank, rank);
         stats_data stats_before, stats_after;
+        matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
         // ------ first run
         for (mitt mit = a->begin(); mit != a->end(); ++mit)
@@ -352,12 +373,16 @@ int main(int argc, char **argv)
 
         bs.flush();
         STXXL_MSG("start of first run (full matrices)");
+        matrix_stats_before.set();
         stats_before = *stats::get_instance();
         c->make_product_of(*a, *b);
         bs.flush();
         stats_after = *stats::get_instance();
+        matrix_stats_after.set();
         STXXL_MSG("end of first run");
 
+        STXXL_MSG(matrix_stats_after - matrix_stats_before);
+        STXXL_MSG(stats_after - stats_before);
         {
             int_type num_err = 0;
             for (mitt mit = c->begin(); mit != c->end(); ++mit)
@@ -365,7 +390,6 @@ int main(int argc, char **argv)
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");
         }
-        STXXL_MSG(stats_after - stats_before);
 
         // ------ second run
         {
@@ -374,6 +398,7 @@ int main(int argc, char **argv)
                 *mit = i;
         }
         {
+            b->set_zero();
             mt::arbitrary_iterator mit = b->get_arbitrary_iterator();
             for (int_type i = 0; i < b->get_height(); ++i)
             {
@@ -381,16 +406,19 @@ int main(int argc, char **argv)
                 *mit = 1;
             }
         }
-        c->set_zero();
 
         bs.flush();
         STXXL_MSG("start of second run (one matrix is diagonal)");
+        matrix_stats_before.set();
         stats_before = *stats::get_instance();
         c->make_product_of(*a, *b);
         bs.flush();
         stats_after = *stats::get_instance();
+        matrix_stats_after.set();
         STXXL_MSG("end of second run");
 
+        STXXL_MSG(matrix_stats_after - matrix_stats_before);
+        STXXL_MSG(stats_after - stats_before);
         {
             int_type num_err = 0;
             int_type i = 1;
@@ -399,7 +427,6 @@ int main(int argc, char **argv)
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");
         }
-        STXXL_MSG(stats_after - stats_before);
 
         delete a;
         delete b;

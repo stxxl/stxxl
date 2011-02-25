@@ -13,6 +13,8 @@
 #ifndef STXXL_BLOCK_SCHEDULER_HEADER
 #define STXXL_BLOCK_SCHEDULER_HEADER
 
+//#define RW_VERBOSE
+
 #include <stack>
 
 #include <stxxl/bits/mng/mng.h>
@@ -27,7 +29,7 @@ __STXXL_BEGIN_NAMESPACE
 //! When access is required, is has to be acquired and released afterwards, so it can be swapped in and out as required.
 //! If the stored data is no longer needed, it can get uninitialized, freeing in- and external memory.
 //! \tparam ValueType type of contained objects (POD with no references to internal memory).
-//! \tparam BlockSize Number of objects in one block, default is 1024*1024.
+//! \tparam BlockSize Number of objects in one block.
 //!         BlockSize*sizeof(ValueType) must be divisible by 4096.
 template <typename ValueType, unsigned BlockSize>
 class swappable_block
@@ -147,7 +149,9 @@ public:
     {
         assert(is_internal());
         assert(has_external_block());
-        //STXXL_MSG("reading block");
+        #ifdef RW_VERBOSE
+        STXXL_MSG("reading block");
+        #endif
         dirty = false;
         return internal_data->read(external_data, on_cmpl);
     }
@@ -164,7 +168,9 @@ public:
             return request_ptr();
         if (! has_external_block())
             get_external_block();
-        //STXXL_MSG("writing block");
+        #ifdef RW_VERBOSE
+        STXXL_MSG("writing block");
+        #endif
         dirty = false;
         return internal_data->write(external_data, on_cmpl);
     }
@@ -302,6 +308,7 @@ protected:
     //! \brief holds indices of free swappable_blocks with attributes reset
     std::stack<swappable_block_identifier_type> free_swappable_blocks;
     prediction_sequence_type prediction_sequence;
+    internal_block_type dummy_internal_block;
     block_manager * bm;
     block_scheduler_algorithm<SwappableBlockType> * algo;
 
@@ -344,6 +351,11 @@ public:
     explicit block_scheduler(const int_type max_internal_memory);
 
     ~block_scheduler();
+
+    //! \brief Get the dummy internal_block. Can be used to direct access somewhere. Contents are accessible but undefined.
+    //! \return Reference to the dummy block.
+    internal_block_type & get_dummy_block()
+    { return dummy_internal_block; }
 
     //! \brief Acquire the given block.
     //! Has to be in pairs with release. Pairs may be nested and interleaved.
@@ -539,6 +551,7 @@ protected:
         if (internal_block_type * iblock = get_free_internal_block_from_block_scheduler())
             return iblock;
         // evict block
+        assert(! evictable_blocks.empty());
         return swappable_blocks[evictable_blocks.pop()].detach_internal_block();
     }
 
