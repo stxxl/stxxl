@@ -408,26 +408,28 @@ public:
     //! \return An identifier of the block.
     swappable_block_identifier_type allocate_swappable_block()
     {
+        swappable_block_identifier_type sbid;
         if (free_swappable_blocks.empty())
         {
             // create new swappable_block
-            swappable_block_identifier_type sbid = swappable_blocks.size();
+            sbid = swappable_blocks.size();
             swappable_blocks.resize(sbid + 1);
-            return sbid;
         }
         else
         {
             // take swappable_block from freelist
-            swappable_block_identifier_type sbid = free_swappable_blocks.top();
+            sbid = free_swappable_blocks.top();
             free_swappable_blocks.pop();
-            return sbid;
         }
+        //todo remove STXXL_MSG("allocating block " << sbid);
+        return sbid;
     }
 
     //! \brief Free given no longer used temporary swappable_block.
     //! \param sblock Temporary swappable_block to free.
     void free_swappable_block(swappable_block_identifier_type sbid)
     {
+        //todo remove STXXL_MSG("freeing block " << sbid);
         deinitialize(sbid);
         free_swappable_blocks.push(sbid);
     }
@@ -714,11 +716,17 @@ const int_type block_scheduler<SwappableBlockType>::max_internal_blocks_alloc_at
 
 template <class SwappableBlockType>
 typename block_scheduler<SwappableBlockType>::internal_block_type & block_scheduler<SwappableBlockType>::acquire(swappable_block_identifier_type sbid)
-{ return algo->acquire(sbid); }
+{
+    //todo remove STXXL_MSG("acquiring block " << sbid);
+    return algo->acquire(sbid);
+}
 
 template <class SwappableBlockType>
 void block_scheduler<SwappableBlockType>::release(swappable_block_identifier_type sbid, const bool dirty)
-{ algo->release(sbid, dirty); }
+{
+    algo->release(sbid, dirty);
+    //todo remove STXXL_MSG("releasing block " << sbid << " still acquired = " << swappable_blocks[sbid].is_acquired());
+}
 
 template <class SwappableBlockType>
 void block_scheduler<SwappableBlockType>::deinitialize(swappable_block_identifier_type sbid)

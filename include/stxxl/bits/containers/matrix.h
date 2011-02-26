@@ -685,7 +685,7 @@ struct matrix_multiply
         : result(C)
     {
         C.set_zero();
-        strassen_winograd_multiply_and_add(A, B, C);
+        multi_level_strassen_winograd_multiply_and_add(A, B, C);
     }
 
     operator swappable_block_matrix_type & ()
@@ -716,7 +716,7 @@ struct matrix_multiply
     //! \brief calculates C = A * B + C
     // requires fitting dimensions
     static swappable_block_matrix_type &
-    strassen_winograd_multiply_and_add(swappable_block_matrix_type & A,
+    multi_level_strassen_winograd_multiply_and_add(swappable_block_matrix_type & A,
                                        swappable_block_matrix_type & B,
                                        swappable_block_matrix_type & C)
     {
@@ -729,28 +729,37 @@ struct matrix_multiply
                                              round_up_to_power_of_two(B.get_width(), p), 0, 0),
                                     padded_c(C, round_up_to_power_of_two(C.get_height(), p),
                                              round_up_to_power_of_two(C.get_width(), p), 0, 0);
-        switch (p)
-        {
-        case 0:
-            naive_multiply_and_add(A, B, C);
-            break;
-        case 1:
-            use_feedable_sw<1>(padded_a, padded_b, padded_c);
-            break;
-        case 2:
-            use_feedable_sw<2>(padded_a, padded_b, padded_c);
-            break;
-        case 3:
-            use_feedable_sw<3>(padded_a, padded_b, padded_c);
-            break;
-        default: // todo possibly more Levels
-            use_feedable_sw<4>(padded_a, padded_b, padded_c);
-            break;
-        }
+        choose_level_for_feedable_sw(padded_a, padded_b, padded_c);
         return C;
     }
 
-    // assumes input matrices to be padded
+    // input matrices have to be padded
+    static void choose_level_for_feedable_sw(swappable_block_matrix_type & A,
+                                             swappable_block_matrix_type & B,
+                                             swappable_block_matrix_type & C)
+    {
+        switch (log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
+        {
+        default: // todo possibly more Levels
+            /*
+            use_feedable_sw<4>(A, B, C);
+            break;
+        case 3:
+            use_feedable_sw<3>(A, B, C);
+            break;
+        case 2:*/
+            use_feedable_sw<2>(A, B, C);
+            break;
+        case 1:
+            use_feedable_sw<1>(A, B, C);
+            break;
+        case 0:
+            naive_multiply_and_add(A, B, C);
+            break;
+        }
+    }
+
+    // input matrices have to be padded
     template <unsigned Level>
     static void use_feedable_sw(swappable_block_matrix_type & A,
                                 swappable_block_matrix_type & B,
@@ -766,8 +775,13 @@ struct matrix_multiply
             {
                 fsw.begin_feeding_a_block(block_row, block_col,
                         mtq_a.begin_reading_block(block_row, block_col));
-                for (int_type element_num_in_block = 0; element_num_in_block < int_type(BlockSideLength * BlockSideLength); ++element_num_in_block)
-                    fsw.feed_a_element(element_num_in_block, mtq_a.read_element(element_num_in_block));
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type element_row_in_block = 0; element_row_in_block < int_type(BlockSideLength); ++element_row_in_block)
+                    for (int_type element_col_in_block = 0; element_col_in_block < int_type(BlockSideLength); ++element_col_in_block)
+                        fsw.feed_a_element(element_row_in_block * BlockSideLength + element_col_in_block,
+                                mtq_a.read_element(element_row_in_block * BlockSideLength + element_col_in_block));
                 fsw.end_feeding_a_block(block_row, block_col,
                         mtq_a.end_reading_block(block_row, block_col));
             }
@@ -779,8 +793,13 @@ struct matrix_multiply
             {
                 fsw.begin_feeding_b_block(block_row, block_col,
                         mtq_b.begin_reading_block(block_row, block_col));
-                for (int_type element_num_in_block = 0; element_num_in_block < int_type(BlockSideLength * BlockSideLength); ++element_num_in_block)
-                    fsw.feed_b_element(element_num_in_block, mtq_b.read_element(element_num_in_block));
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type element_row_in_block = 0; element_row_in_block < int_type(BlockSideLength); ++element_row_in_block)
+                    for (int_type element_col_in_block = 0; element_col_in_block < int_type(BlockSideLength); ++element_col_in_block)
+                        fsw.feed_b_element(element_row_in_block * BlockSideLength + element_col_in_block,
+                                mtq_b.read_element(element_row_in_block * BlockSideLength + element_col_in_block));
                 fsw.end_feeding_b_block(block_row, block_col,
                         mtq_b.end_reading_block(block_row, block_col));
             }
@@ -794,8 +813,13 @@ struct matrix_multiply
             {
                 mtq_c.begin_feeding_block(block_row, block_col,
                         fsw.begin_reading_block(block_row, block_col));
-                for (int_type element_num_in_block = 0; element_num_in_block < int_type(BlockSideLength * BlockSideLength); ++element_num_in_block)
-                    mtq_c.feed_and_add_element(element_num_in_block, fsw.read_element(element_num_in_block));
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type element_row_in_block = 0; element_row_in_block < int_type(BlockSideLength); ++element_row_in_block)
+                    for (int_type element_col_in_block = 0; element_col_in_block < int_type(BlockSideLength); ++element_col_in_block)
+                        mtq_c.feed_and_add_element(element_row_in_block * BlockSideLength + element_col_in_block,
+                                fsw.read_element(element_row_in_block * BlockSideLength + element_col_in_block));
                 mtq_c.end_feeding_block(block_row, block_col,
                         fsw.end_reading_block(block_row, block_col));
             }
@@ -1086,7 +1110,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
     }
 
     void multiply()
-    { matrix_multiply<ValueType, BlockSideLength>::strassen_winograd_multiply_and_add(a, b, c); }
+    { matrix_multiply<ValueType, BlockSideLength>::choose_level_for_feedable_sw(a, b, c); }
 
     zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
     {
@@ -1258,13 +1282,13 @@ struct feedable_strassen_winograd
                                               t2 = zb.dr & t1,
                                               t3 = zb.dr & zb.ur,
                                               t4 = zb.dl & t2;
-        p1.begin_feeding_b_block(block_row, block_col, zb.ul);
-        p2.begin_feeding_b_block(block_row, block_col, zb.dl);
-        p3.begin_feeding_b_block(block_row, block_col, t1);
-        p4.begin_feeding_b_block(block_row, block_col, t2);
-        p5.begin_feeding_b_block(block_row, block_col, t3);
-        p6.begin_feeding_b_block(block_row, block_col, zb.dr);
-        p7.begin_feeding_b_block(block_row, block_col, t4);
+        p1.end_feeding_b_block(block_row, block_col, zb.ul);
+        p2.end_feeding_b_block(block_row, block_col, zb.dl);
+        p3.end_feeding_b_block(block_row, block_col, t1);
+        p4.end_feeding_b_block(block_row, block_col, t2);
+        p5.end_feeding_b_block(block_row, block_col, t3);
+        p6.end_feeding_b_block(block_row, block_col, zb.dr);
+        p7.end_feeding_b_block(block_row, block_col, t4);
     }
 
     void multiply()

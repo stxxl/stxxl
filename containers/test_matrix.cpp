@@ -335,7 +335,7 @@ int main(int argc, char **argv)
         {
             int_type num_err = 0;
             int_type i = 1;
-            for (mitt mit = a->begin(); mit != a->end(); ++mit, ++i)
+            for (mitt mit = c->begin(); mit != c->end(); ++mit, ++i)
                 num_err += (*mit != i);
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");
