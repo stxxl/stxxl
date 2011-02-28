@@ -17,6 +17,8 @@
 #define STXXL_BLAS 0
 #endif
 
+#include <complex>
+
 #include <stxxl/bits/containers/matrix_layouts.h>
 #include <stxxl/bits/mng/block_scheduler.h>
 
@@ -618,8 +620,7 @@ public:
     arbitrary_iterator get_arbitrary_iterator()
     { return arbitrary_iterator(*this); }
 
-    // do not store reference
-    ValueType & operator () (elem_index_type row, elem_index_type col)
+    ValueType operator () (elem_index_type row, elem_index_type col)
     { return *iterator(*this, row, col); }
 
     // todo how to make this beautiful?
@@ -1789,20 +1790,50 @@ struct matrix_to_quadtree
 typedef int blas_int;
 extern "C" void dgemm_(const char *transa, const char *transb,
         const blas_int *m, const blas_int *n, const blas_int *k,
-        const double *alpha, const double *a, const blas_int *lda, const double *b, const blas_int *ldb,
+        const double *alpha, const double *a, const blas_int *lda,
+        const double *b, const blas_int *ldb,
         const double *beta, double *c, const blas_int *ldc);
 
+extern "C" void sgemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const float *alpha, const float *a, const blas_int *lda,
+        const float *b, const blas_int *ldb,
+        const float *beta, float *c, const blas_int *ldc);
+
+typedef std::complex<float> blas_single_complex;
+extern "C" void zgemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const blas_single_complex *alpha, const blas_single_complex *a, const blas_int *lda,
+        const blas_single_complex *b, const blas_int *ldb,
+        const blas_single_complex *beta, blas_single_complex *c, const blas_int *ldc);
+
+typedef std::complex<double> blas_double_complex;
+extern "C" void cgemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const blas_double_complex *alpha, const blas_double_complex *a, const blas_int *lda,
+        const blas_double_complex *b, const blas_int *ldb,
+        const blas_double_complex *beta, blas_double_complex *c, const blas_int *ldc);
+
+template <typename ValueType>
+void gemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const ValueType *alpha, const ValueType *a, const blas_int *lda,
+        const ValueType *b, const blas_int *ldb,
+        const ValueType *beta, ValueType *c, const blas_int *ldc);
+
 //! \brief calculates c = alpha * a * b + beta * c
+//! \tparam ValueType type of elements
 //! \param n height of a and c
 //! \param l width of a and height of b
 //! \param m width of b and c
 //! \param a_in_col_major if a is stored in column-major rather than row-major
 //! \param b_in_col_major if b is stored in column-major rather than row-major
 //! \param c_in_col_major if c is stored in column-major rather than row-major
-void dgemm_wrapper(const blas_int n, const blas_int l, const blas_int m,
-        const double alpha, const bool a_in_col_major, const double *a,
-                            const bool b_in_col_major, const double *b,
-        const double beta,  const bool c_in_col_major,       double *c)
+template <typename ValueType>
+void gemm_wrapper(const blas_int n, const blas_int l, const blas_int m,
+        const ValueType alpha, const bool a_in_col_major, const ValueType *a,
+                               const bool b_in_col_major, const ValueType *b,
+        const ValueType beta,  const bool c_in_col_major,       ValueType *c)
 {
     const blas_int& stride_in_a = a_in_col_major ? n : l;
     const blas_int& stride_in_b = b_in_col_major ? l : m;
@@ -1811,11 +1842,43 @@ void dgemm_wrapper(const blas_int n, const blas_int l, const blas_int m,
     const char transb = b_in_col_major xor c_in_col_major ? 'T' : 'N';
     if (c_in_col_major)
         // blas expects matrices in column-major unless specified via transa rsp. transb
-        dgemm_(&transa, &transb, &n, &m, &l, &alpha, a, &stride_in_a, b, &stride_in_b, &beta, c, &stride_in_c);
+        gemm_(&transa, &transb, &n, &m, &l, &alpha, a, &stride_in_a, b, &stride_in_b, &beta, c, &stride_in_c);
     else
         // blas expects matrices in column-major, so we calculate c^T = alpha * b^T * a^T + beta * c^T
-        dgemm_(&transb, &transa, &m, &n, &l, &alpha, b, &stride_in_b, a, &stride_in_a, &beta, c, &stride_in_c);
+        gemm_(&transb, &transa, &m, &n, &l, &alpha, b, &stride_in_b, a, &stride_in_a, &beta, c, &stride_in_c);
 }
+
+template <>
+void gemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const double *alpha, const double *a, const blas_int *lda,
+        const double *b, const blas_int *ldb,
+        const double *beta, double *c, const blas_int *ldc)
+{ dgemm_(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc); }
+
+template <>
+void gemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const float *alpha, const float *a, const blas_int *lda,
+        const float *b, const blas_int *ldb,
+        const float *beta, float *c, const blas_int *ldc)
+{ sgemm_(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc); }
+
+template <>
+void gemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const blas_single_complex *alpha, const blas_single_complex *a, const blas_int *lda,
+        const blas_single_complex *b, const blas_int *ldb,
+        const blas_single_complex *beta, blas_single_complex *c, const blas_int *ldc)
+{ zgemm_(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc); }
+
+template <>
+void gemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const blas_double_complex *alpha, const blas_double_complex *a, const blas_int *lda,
+        const blas_double_complex *b, const blas_int *ldb,
+        const blas_double_complex *beta, blas_double_complex *c, const blas_int *ldc)
+{ cgemm_(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc); }
 
 //! \brief multiplies matrices A and B, adds result to C, for double entries
 template <unsigned BlockSideLength>
@@ -1825,7 +1888,52 @@ struct low_level_matrix_multiply_and_add<double, BlockSideLength>
                                       const double * b, bool b_in_col_major,
                                       double * c, const bool c_in_col_major)
     {
-        dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
+        gemm_wrapper<double>(BlockSideLength, BlockSideLength, BlockSideLength,
+                1.0, a_in_col_major, a,
+                     b_in_col_major, b,
+                1.0, c_in_col_major, c);
+    }
+};
+
+//! \brief multiplies matrices A and B, adds result to C, for float entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_multiply_and_add<float, BlockSideLength>
+{
+    low_level_matrix_multiply_and_add(const float * a, bool a_in_col_major,
+                                      const float * b, bool b_in_col_major,
+                                      float * c, const bool c_in_col_major)
+    {
+        gemm_wrapper<float>(BlockSideLength, BlockSideLength, BlockSideLength,
+                1.0, a_in_col_major, a,
+                     b_in_col_major, b,
+                1.0, c_in_col_major, c);
+    }
+};
+
+//! \brief multiplies matrices A and B, adds result to C, for complex<float> entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_multiply_and_add<blas_single_complex, BlockSideLength>
+{
+    low_level_matrix_multiply_and_add(const blas_single_complex * a, bool a_in_col_major,
+                                      const blas_single_complex * b, bool b_in_col_major,
+                                      blas_single_complex * c, const bool c_in_col_major)
+    {
+        gemm_wrapper<blas_single_complex>(BlockSideLength, BlockSideLength, BlockSideLength,
+                1.0, a_in_col_major, a,
+                     b_in_col_major, b,
+                1.0, c_in_col_major, c);
+    }
+};
+
+//! \brief multiplies matrices A and B, adds result to C, for complex<double> entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_multiply_and_add<blas_double_complex, BlockSideLength>
+{
+    low_level_matrix_multiply_and_add(const blas_double_complex * a, bool a_in_col_major,
+                                      const blas_double_complex * b, bool b_in_col_major,
+                                      blas_double_complex * c, const bool c_in_col_major)
+    {
+        gemm_wrapper<blas_double_complex>(BlockSideLength, BlockSideLength, BlockSideLength,
                 1.0, a_in_col_major, a,
                      b_in_col_major, b,
                 1.0, c_in_col_major, c);
@@ -2246,7 +2354,7 @@ struct low_level_multiply<double, BlockSideLength>
     void operator () (double * a, double * b, double * c)
     {
     #if STXXL_BLAS
-        dgemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
+        gemm_wrapper(BlockSideLength, BlockSideLength, BlockSideLength,
                 1.0, false, a,
                      false, b,
                 1.0, false, c);
