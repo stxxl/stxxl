@@ -41,46 +41,22 @@ __STXXL_BEGIN_NAMESPACE
 
 template <typename ValueType, unsigned BlockSideLength> class matrix;
 
-struct matrix_operation_statistic : public singleton<matrix_operation_statistic>
+struct matrix_operation_statistic_dataset
 {
     int_type block_multiplication_calls,
              block_multiplications_saved_through_zero,
              block_addition_calls,
              block_additions_saved_through_zero;
 
-    matrix_operation_statistic()
+    matrix_operation_statistic_dataset()
         : block_multiplication_calls(0),
           block_multiplications_saved_through_zero(0),
           block_addition_calls(0),
           block_additions_saved_through_zero(0) {}
-};
 
-struct matrix_operation_statistic_data
-{
-    int_type block_multiplication_calls,
-             block_multiplications_saved_through_zero,
-             block_addition_calls,
-             block_additions_saved_through_zero;
-
-    matrix_operation_statistic_data(const matrix_operation_statistic & stat = * matrix_operation_statistic::get_instance())
-        : block_multiplication_calls(stat.block_multiplication_calls),
-          block_multiplications_saved_through_zero(stat.block_multiplications_saved_through_zero) {}
-
-    matrix_operation_statistic_data & operator = (const matrix_operation_statistic & stat)
+    matrix_operation_statistic_dataset operator + (const matrix_operation_statistic_dataset & stat)
     {
-        block_multiplication_calls = stat.block_multiplication_calls;
-        block_multiplications_saved_through_zero = stat.block_multiplications_saved_through_zero;
-        block_addition_calls = stat.block_addition_calls;
-        block_additions_saved_through_zero = stat.block_multiplications_saved_through_zero;
-        return *this;
-    }
-
-    void set()
-    { operator = (* matrix_operation_statistic::get_instance()); }
-
-    matrix_operation_statistic_data operator + (const matrix_operation_statistic_data & stat)
-    {
-        matrix_operation_statistic_data res(*this);
+        matrix_operation_statistic_dataset res(*this);
         res.block_multiplication_calls += stat.block_multiplication_calls;
         res.block_multiplications_saved_through_zero += stat.block_multiplications_saved_through_zero;
         res.block_addition_calls += stat.block_addition_calls;
@@ -88,15 +64,42 @@ struct matrix_operation_statistic_data
         return res;
     }
 
-    matrix_operation_statistic_data operator - (const matrix_operation_statistic_data & stat)
+    matrix_operation_statistic_dataset operator - (const matrix_operation_statistic_dataset & stat)
     {
-        matrix_operation_statistic_data res(*this);
+        matrix_operation_statistic_dataset res(*this);
         res.block_multiplication_calls -= stat.block_multiplication_calls;
         res.block_multiplications_saved_through_zero -= stat.block_multiplications_saved_through_zero;
         res.block_addition_calls -= stat.block_addition_calls;
         res.block_additions_saved_through_zero -= stat.block_additions_saved_through_zero;
         return res;
     }
+};
+
+struct matrix_operation_statistic
+    : public singleton<matrix_operation_statistic>, public matrix_operation_statistic_dataset
+{};
+
+struct matrix_operation_statistic_data : public matrix_operation_statistic_dataset
+{
+    matrix_operation_statistic_data(const matrix_operation_statistic & stat = * matrix_operation_statistic::get_instance())
+        : matrix_operation_statistic_dataset(stat) {}
+
+    matrix_operation_statistic_data(const matrix_operation_statistic_dataset & stat)
+        : matrix_operation_statistic_dataset(stat) {}
+
+    matrix_operation_statistic_data & operator = (const matrix_operation_statistic & stat)
+    {
+        return *this = matrix_operation_statistic_data(stat);
+    }
+
+    void set()
+    { operator = (* matrix_operation_statistic::get_instance()); }
+
+    matrix_operation_statistic_data operator + (const matrix_operation_statistic_data & stat)
+    { return matrix_operation_statistic_data(matrix_operation_statistic_dataset(*this) + matrix_operation_statistic_dataset(stat)); }
+
+    matrix_operation_statistic_data operator - (const matrix_operation_statistic_data & stat)
+    { return matrix_operation_statistic_data(matrix_operation_statistic_dataset(*this) - matrix_operation_statistic_dataset(stat)); }
 };
 
 std::ostream & operator << (std::ostream & o, const matrix_operation_statistic_data & statsd)
@@ -626,7 +629,7 @@ public:
         assert(width == right.get_width());
         assert(left.get_width() == right.get_height());
         data->set_zero();
-        matrix_operations<ValueType, BlockSideLength>::multi_level_strassen_winograd_multiply_and_add(*left.data, *right.data, *data);
+        matrix_operations<ValueType, BlockSideLength>::strassen_winograd_multiply_and_add(*left.data, *right.data, *data);
         return *this;
     }
 
@@ -669,60 +672,64 @@ struct matrix_operations
 
     struct addition
     {
-        /* op(a,b,c) means c = a <op> b
+        /* op(c,a,b) means c = a <op> b  e.g. assign sum
+         * op(c,a)   means c <op>= a     e.g. add up
+         * op(a)     means <op>a         e.g. sign
          *
          * it should hold:
-         * op(0,b,c) <=> c = op(b)
-         * op(a,0,c) <=> c = a
+         * op(c,0,0) equivalent c = 0
+         * op(c=0,a) equivalent c = op(a)
+         * op(c,0)   equivalent {}
          */
 
-        inline ValueType operator () (ValueType & a) { return a; } // sign
-        inline ValueType & operator () (ValueType & a, ValueType & b) { return a += b; } // binary assignment
-        inline ValueType & operator () (ValueType & a, ValueType & b, ValueType & c) { return c = a + b; } // trinary assignment
+        inline ValueType & operator ()  (ValueType & c, const ValueType & a, const ValueType & b) { return c = a + b; }
+        inline ValueType & operator ()  (ValueType & c, const ValueType & a)                      { return     c += a; }
+        inline ValueType operator ()                   (const ValueType & a)                      { return       +a; }
     };
 
     struct subtraction
     {
-        inline ValueType operator () (ValueType & a) { return -a; } // sign
-        inline ValueType & operator () (ValueType & a, ValueType & b) { return a -= b; } // binary assignment
-        inline ValueType & operator () (ValueType & a, ValueType & b, ValueType & c) { return c = a - b; } // trinary assignment
+        inline ValueType & operator ()  (ValueType & c, const ValueType & a, const ValueType & b) { return c = a - b; }
+        inline ValueType & operator ()  (ValueType & c, const ValueType & a)                      { return     c -= a; }
+        inline ValueType operator ()                   (const ValueType & a)                      { return       -a; }
     };
 
-    // calculates C = A <op> B
+    // element_op<Op>(C,A,B) calculates C = A <Op> B
     template <class Op> static swappable_block_matrix_type &
-    op(swappable_block_matrix_type & A,
-       swappable_block_matrix_type & B,
-       swappable_block_matrix_type & C)
+    element_op(swappable_block_matrix_type & C,
+               swappable_block_matrix_type & A,
+               swappable_block_matrix_type & B)
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
-                op_swappable_block<Op>(
+                element_op_swappable_block<Op>(
+                        C(row, col), C.is_transposed(), C.bs,
                         A(row, col), A.is_transposed(), A.bs,
-                        B(row, col), B.is_transposed(), B.bs,
-                        C(row, col), C.is_transposed(), C.bs);
+                        B(row, col), B.is_transposed(), B.bs);
         return C;
     }
 
-    // calculates A = A <op> B
+    // element_op<Op>(C,A) calculates C <Op>= A
     template <class Op> static swappable_block_matrix_type &
-    op_up(swappable_block_matrix_type & A,
-          swappable_block_matrix_type & B)
+    element_op(swappable_block_matrix_type & C,
+               swappable_block_matrix_type & A)
     {
-        for (index_type row = 0; row < A.get_height(); ++row)
-            for (index_type col = 0; col < A.get_width(); ++col)
-                op_up_swappable_block<Op>(
-                        A(row, col), A.is_transposed(), A.bs,
-                        B(row, col), B.is_transposed(), B.bs);
+        for (index_type row = 0; row < C.get_height(); ++row)
+            for (index_type col = 0; col < C.get_width(); ++col)
+                element_op_swappable_block<Op>(
+                        C(row, col), C.is_transposed(), C.bs,
+                        A(row, col), A.is_transposed(), A.bs);
         return A;
     }
 
-    // calculates c = a + b
+    // calculates c = a <Op> b
     template <class Op> static void
-    op_swappable_block(
+    element_op_swappable_block(
+            const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c,
             const swappable_block_identifier_type a, bool a_is_transposed, block_scheduler_type & bs_a,
-            const swappable_block_identifier_type b, bool b_is_transposed, block_scheduler_type & bs_b,
-            const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c)
+            const swappable_block_identifier_type b, bool b_is_transposed, block_scheduler_type & bs_b)
     {
+        Op op;
         ++ matrix_operation_statistic::get_instance()->block_addition_calls;
         // check if zero-block (== ! initialized)
         if (! bs_a.is_initialized(a) && ! bs_b.is_initialized(b))
@@ -747,14 +754,14 @@ struct matrix_operations
                     #endif
                     for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                         for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                            ic[row * BlockSideLength + col] = Op(ib[row + col * BlockSideLength]);
+                            op(ic[row * BlockSideLength + col], 0, ib[row + col * BlockSideLength]);
                 else
                     #if STXXL_PARALLEL
                     #pragma omp parallel for
                     #endif
                     for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                         for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                            ic[row * BlockSideLength + col] = Op(ib[row * BlockSideLength + col]);
+                            op(ic[row * BlockSideLength + col], 0, ib[row * BlockSideLength + col]);
             }
             bs_b.release(b, false);
             bs_c.release(c, true);
@@ -772,14 +779,14 @@ struct matrix_operations
                     #endif
                     for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                         for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                            ic[row * BlockSideLength + col] = ia[row + col * BlockSideLength];
+                            op(ic[row * BlockSideLength + col], ia[row + col * BlockSideLength], 0);
                 else
                     #if STXXL_PARALLEL
                     #pragma omp parallel for
                     #endif
                     for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                         for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                            ic[row * BlockSideLength + col] = ia[row * BlockSideLength + col];
+                            op(ic[row * BlockSideLength + col], ia[row * BlockSideLength + col], 0);
             }
             bs_a.release(a, false);
             bs_c.release(c, true);
@@ -799,14 +806,14 @@ struct matrix_operations
                         #endif
                         for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                             for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                                Op(ia[row + col * BlockSideLength], ib[row + col * BlockSideLength], ic[row * BlockSideLength + col]);
+                                op(ic[row * BlockSideLength + col], ia[row + col * BlockSideLength], ib[row + col * BlockSideLength]);
                     else
                         #if STXXL_PARALLEL
                         #pragma omp parallel for
                         #endif
                         for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                             for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                                Op(ia[row + col * BlockSideLength], ib[row * BlockSideLength + col], ic[row * BlockSideLength + col]);
+                                op(ic[row * BlockSideLength + col], ia[row + col * BlockSideLength], ib[row * BlockSideLength + col]);
                 }
                 else
                 {
@@ -816,14 +823,14 @@ struct matrix_operations
                         #endif
                         for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                             for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                                Op(ia[row * BlockSideLength + col], ib[row + col * BlockSideLength], ic[row * BlockSideLength + col]);
+                                op(ic[row * BlockSideLength + col], ia[row * BlockSideLength + col], ib[row + col * BlockSideLength]);
                     else
                         #if STXXL_PARALLEL
                         #pragma omp parallel for
                         #endif
                         for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                             for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                                Op(ia[row * BlockSideLength + col], ib[row * BlockSideLength + col], ic[row * BlockSideLength + col]);
+                                op(ic[row * BlockSideLength + col], ia[row * BlockSideLength + col], ib[row * BlockSideLength + col]);
                 }
             }
             bs_a.release(a, false);
@@ -832,61 +839,63 @@ struct matrix_operations
         }
     }
 
-    // calculates a += b
+    // calculates c += a
     template <class Op> static void
-    op_up_swappable_block(
-            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a,
-            const swappable_block_identifier_type b, const bool b_is_transposed, block_scheduler_type & bs_b)
+    element_op_swappable_block(
+            const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c,
+            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a)
     {
+        Op op;
+
         ++ matrix_operation_statistic::get_instance()->block_addition_calls;
         // check if zero-block (== ! initialized)
-        if (! bs_b.is_initialized(b))
+        if (! bs_a.is_initialized(a))
         {
             // => b is zero => nothing to do
             ++ matrix_operation_statistic::get_instance()->block_additions_saved_through_zero;
             return;
         }
-        const bool a_is_zero = ! bs_a.is_initialized(a);
+        const bool c_is_zero = ! bs_c.is_initialized(c);
         // acquire
-        internal_block_type & ia = bs_a.acquire(a),
-                            & ib = bs_b.acquire(b);
+        internal_block_type & ic = bs_c.acquire(c),
+                            & ia = bs_a.acquire(a);
         // add
-        if (! bs_a.is_simulating())
+        if (! bs_c.is_simulating())
         {
-            if (a_is_zero)
-                if (a_is_transposed == b_is_transposed)
+            if (c_is_zero)
+                if (c_is_transposed == a_is_transposed)
                     #if STXXL_PARALLEL
                     #pragma omp parallel for
                     #endif
                     for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                         for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                            ia[row * BlockSideLength + col] = Op(ib[row * BlockSideLength + col]);
+                            ic[row * BlockSideLength + col] = op(ia[row * BlockSideLength + col]);
                 else
                     #if STXXL_PARALLEL
                     #pragma omp parallel for
                     #endif
                     for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                         for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                            ia[row * BlockSideLength + col] = Op(ib[row + col * BlockSideLength]);
+                            ic[row * BlockSideLength + col] = op(ia[row + col * BlockSideLength]);
             else
-                if (a_is_transposed == b_is_transposed)
+                if (c_is_transposed == a_is_transposed)
                     #if STXXL_PARALLEL
                     #pragma omp parallel for
                     #endif
                     for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                         for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                            Op(ia[row * BlockSideLength + col], ib[row * BlockSideLength + col]);
+                            op(ic[row * BlockSideLength + col], ia[row * BlockSideLength + col]);
                 else
                     #if STXXL_PARALLEL
                     #pragma omp parallel for
                     #endif
                     for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                         for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                            Op(ia[row * BlockSideLength + col], ib[row + col * BlockSideLength]);
+                            op(ic[row * BlockSideLength + col], ia[row + col * BlockSideLength]);
         }
         // release
-        bs_a.release(a, true);
-        bs_b.release(b, false);
+        bs_c.release(c, true);
+        bs_a.release(a, false);
     }
 
     // +-+ end addition +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1061,52 +1070,41 @@ struct matrix_operations
             return naive_multiply_and_add(A, B, C);
 
         // partition matrix
-        swappable_block_matrix_approximative_quarterer
-                * qa = new swappable_block_matrix_padding_quarterer(A),
-                * qb = new swappable_block_matrix_padding_quarterer(B),
-                * qc = new swappable_block_matrix_padding_quarterer(C);
+        swappable_block_matrix_padding_quarterer qa(A), qb(B), qc(C);
         // preadditions
-        swappable_block_matrix_type s1(C.bs, qa->ul.get_height(), qa->ul.get_width()),
-                                    s2(C.bs, qa->ul.get_height(), qa->ul.get_width()),
-                                    s3(C.bs, qa->ul.get_height(), qa->ul.get_width()),
-                                    s4(C.bs, qa->ul.get_height(), qa->ul.get_width()),
-                                    t1(C.bs, qb->ul.get_height(), qb->ul.get_width()),
-                                    t2(C.bs, qb->ul.get_height(), qb->ul.get_width()),
-                                    t3(C.bs, qb->ul.get_height(), qb->ul.get_width()),
-                                    t4(C.bs, qb->ul.get_height(), qb->ul.get_width());
-        op<subtraction>(qa->ul, qa->dl, s3);
-        op<addition>(qa->dl, qa->dr, s1);
-        op<subtraction>(s1, qa->ul, s2);
-        op<subtraction>(qa->ur, s2, s4);
-        op<subtraction>(qb->dr, qb->ur, t3);
-        op<subtraction>(qb->ur, qb->ul, t1);
-        op<subtraction>(qb->dr, t1, t2);
-        op<subtraction>(qb->dl, t2, t4);
+        swappable_block_matrix_type s1(C.bs, qa.ul.get_height(), qa.ul.get_width()),
+                                    s2(C.bs, qa.ul.get_height(), qa.ul.get_width()),
+                                    s3(C.bs, qa.ul.get_height(), qa.ul.get_width()),
+                                    s4(C.bs, qa.ul.get_height(), qa.ul.get_width()),
+                                    t1(C.bs, qb.ul.get_height(), qb.ul.get_width()),
+                                    t2(C.bs, qb.ul.get_height(), qb.ul.get_width()),
+                                    t3(C.bs, qb.ul.get_height(), qb.ul.get_width()),
+                                    t4(C.bs, qb.ul.get_height(), qb.ul.get_width());
+        element_op<subtraction>(s3, qa.ul, qa.dl);
+        element_op<addition>(s1, qa.dl, qa.dr);
+        element_op<subtraction>(s2, s1, qa.ul);
+        element_op<subtraction>(s4, qa.ur, s2);
+        element_op<subtraction>(t3, qb.dr, qb.ur);
+        element_op<subtraction>(t1, qb.ur, qb.ul);
+        element_op<subtraction>(t2, qb.dr, t1);
+        element_op<subtraction>(t4, qb.dl, t2);
         // recursive multiplications and postadditions
-        swappable_block_matrix_type px(C.bs, qc->ul.get_height(), qc->ul.get_width());
-
-        strassen_winograd_multiply_and_add(qa->ur, qb->dl, qc->ul); // p2
-        strassen_winograd_multiply_and_add(s4, qb->dr, qc->ur);  // p6
-        strassen_winograd_multiply_and_add(qa->dr, t4, qc->dl);  // p7
-
-        strassen_winograd_multiply_and_add(qa->ul, qb->ul, px);  // p1
-        op_up<addition>(qc->ul, px); // p1
-
-        strassen_winograd_multiply_and_add(s2, t2, px);  // p4
-        op_up<addition>(qc->ur, px);  // p1 + p4
-
-        strassen_winograd_multiply_and_add(s3, t3, px);  // p5
-        op_up<addition>(qc->dl, px);  // p1 + p4 + p5
-        op_up<addition>(qc->dr, px);  // p1 + p4 + p5
-
+        swappable_block_matrix_type px(C.bs, qc.ul.get_height(), qc.ul.get_width());
+        strassen_winograd_multiply_and_add(qa.ur, qb.dl, qc.ul); // p2
+        strassen_winograd_multiply_and_add(qa.ul, qb.ul, px); // p1
+        element_op<addition>(qc.ul, px);
+        strassen_winograd_multiply_and_add(s2, t2, px); // p4
+        element_op<addition>(qc.ur, px);
+        strassen_winograd_multiply_and_add(s3, t3, px); // p5
+        element_op<addition>(qc.dl, px);
+        element_op<addition>(qc.dr, px);
         px.set_zero();
-        strassen_winograd_multiply_and_add(s1, t1, px);  // p3
-        op_up<addition>(qc->ur, px);  // p3
-        op_up<addition>(qc->dr, px);  // p3
-
-        delete qa;
-        delete qb;
-        delete qc;
+        strassen_winograd_multiply_and_add(qa.dr, t4, qc.dl); // p7
+        strassen_winograd_multiply_and_add(s1, t1, px); // p3
+        element_op<addition>(qc.dr, px);
+        element_op<addition>(qc.ur, px);
+        strassen_winograd_multiply_and_add(s4, qb.dr, qc.ur); // p6
+        return C;
     }
 
     struct swappable_block_matrix_approximative_quarterer
@@ -1135,24 +1133,18 @@ struct matrix_operations
             return naive_multiply_and_add(A, B, C);
 
         // partition matrix
-        swappable_block_matrix_approximative_quarterer
-                * qa = new swappable_block_matrix_approximative_quarterer(A),
-                * qb = new swappable_block_matrix_approximative_quarterer(B),
-                * qc = new swappable_block_matrix_approximative_quarterer(C);
+        swappable_block_matrix_approximative_quarterer qa(A), qb(B), qc(C);
         // recursive multiplication
         // The order of recursive calls is optimized to enhance locality. C has priority because it has to be read and written.
-        recursive_multiply_and_add(qa->ul, qb->ul, qc->ul);
-        recursive_multiply_and_add(qa->ur, qb->dl, qc->ul);
-        recursive_multiply_and_add(qa->ur, qb->dr, qc->ur);
-        recursive_multiply_and_add(qa->ul, qb->ur, qc->ur);
-        recursive_multiply_and_add(qa->dl, qb->ur, qc->dr);
-        recursive_multiply_and_add(qa->dr, qb->dr, qc->dr);
-        recursive_multiply_and_add(qa->dr, qb->dl, qc->dl);
-        recursive_multiply_and_add(qa->dl, qb->ul, qc->dl);
+        recursive_multiply_and_add(qa.ul, qb.ul, qc.ul);
+        recursive_multiply_and_add(qa.ur, qb.dl, qc.ul);
+        recursive_multiply_and_add(qa.ur, qb.dr, qc.ur);
+        recursive_multiply_and_add(qa.ul, qb.ur, qc.ur);
+        recursive_multiply_and_add(qa.dl, qb.ur, qc.dr);
+        recursive_multiply_and_add(qa.dr, qb.dr, qc.dr);
+        recursive_multiply_and_add(qa.dr, qb.dl, qc.dl);
+        recursive_multiply_and_add(qa.dl, qb.ul, qc.dl);
         // delete partitioning
-        delete qa;
-        delete qb;
-        delete qc;
         return C;
     }
 
