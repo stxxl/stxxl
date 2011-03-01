@@ -317,7 +317,7 @@ HEADER_FILES_COMMON	+= mutex.h rand.h semaphore.h state.h
 HEADER_FILES_COMMON	+= timer.h utils.h error_handling.h simple_vector.h
 HEADER_FILES_COMMON	+= switch.h tmeta.h log.h exceptions.h tuple.h
 HEADER_FILES_COMMON	+= types.h settings.h seed.h is_sorted.h exithandler.h
-HEADER_FILES_COMMON	+= addressable_queues.h
+HEADER_FILES_COMMON	+= addressable_queues.h shared_object.h
 
 HEADER_FILES_IO		+= io.h iostats.h completion_handler.h
 HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h

@@ -267,7 +267,7 @@ int main(int argc, char **argv)
 
         typedef block_scheduler< matrix_swappable_block<value_type, small_block_order> > bst;
         typedef matrix<value_type, small_block_order> mt;
-        typedef mt::iterator mitt;
+        typedef mt::row_major_iterator mitt;
 
         bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
         //bst * b_s = new bst(16*sizeof(value_type)*small_block_order*small_block_order); // the block_scheduler may use 16 blocks for caching
@@ -288,7 +288,7 @@ int main(int argc, char **argv)
         STXXL_MSG("start mult");
         matrix_stats_before.set();
         stats_before = *stats::get_instance();
-        c->make_product_of(*a, *b);
+        *c = *a * *b;
         bs.flush();
         stats_after = *stats::get_instance();
         matrix_stats_after.set();
@@ -312,7 +312,7 @@ int main(int argc, char **argv)
         }
         {
             b->set_zero();
-            mt::arbitrary_iterator mit = b->get_arbitrary_iterator();
+            mt::iterator mit = b->begin();
             for (int_type i = 0; i < b->get_height(); ++i)
             {
                 mit.set_pos(i,i);
@@ -324,7 +324,7 @@ int main(int argc, char **argv)
         STXXL_MSG("start mult");
         matrix_stats_before.set();
         stats_before = *stats::get_instance();
-        c->make_product_of(*a, *b);
+        *c = *a * *b;
         bs.flush();
         stats_after = *stats::get_instance();
         matrix_stats_after.set();
@@ -355,7 +355,7 @@ int main(int argc, char **argv)
 
         typedef block_scheduler< matrix_swappable_block<value_type, block_order> > bst;
         typedef matrix<value_type, block_order> mt;
-        typedef mt::iterator mitt;
+        typedef mt::row_major_iterator mitt;
 
         bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
         bst & bs = *b_s;
@@ -375,7 +375,7 @@ int main(int argc, char **argv)
         STXXL_MSG("start of first run (full matrices)");
         matrix_stats_before.set();
         stats_before = *stats::get_instance();
-        c->make_product_of(*a, *b);
+        *c = *a * *b;
         bs.flush();
         stats_after = *stats::get_instance();
         matrix_stats_after.set();
@@ -399,7 +399,7 @@ int main(int argc, char **argv)
         }
         {
             b->set_zero();
-            mt::arbitrary_iterator mit = b->get_arbitrary_iterator();
+            mt::iterator mit = b->begin();
             for (int_type i = 0; i < b->get_height(); ++i)
             {
                 mit.set_pos(i,i);
@@ -411,7 +411,7 @@ int main(int argc, char **argv)
         STXXL_MSG("start of second run (one matrix is diagonal)");
         matrix_stats_before.set();
         stats_before = *stats::get_instance();
-        c->make_product_of(*a, *b);
+        *c = *a * *b;
         bs.flush();
         stats_after = *stats::get_instance();
         matrix_stats_after.set();

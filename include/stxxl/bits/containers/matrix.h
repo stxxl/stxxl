@@ -21,6 +21,7 @@
 
 #include <stxxl/bits/containers/matrix_layouts.h>
 #include <stxxl/bits/mng/block_scheduler.h>
+#include <stxxl/bits/common/shared_object.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -122,6 +123,9 @@ std::ostream & operator << (std::ostream & o, const matrix_operation_statistic_d
     return o;
 }
 
+template <typename ValueType, unsigned BlockSideLength>
+struct matrix_operations;
+
 //! \brief Specialized swappable_block that interprets uninitialized as containing zeros.
 //! When initializing, all values are set to zero.
 template <typename ValueType, unsigned BlockSideLength>
@@ -137,7 +141,7 @@ public:
 //!
 //! Stores blocks only, so all measures (height, width, row, col) are in blocks.
 template <typename ValueType, unsigned BlockSideLength>
-class swappable_block_matrix : private noncopyable
+class swappable_block_matrix : public shared_object
 {
 public:
     typedef int_type size_type;
@@ -148,6 +152,10 @@ public:
     typedef std::vector<swappable_block_identifier_type> blocks_type;
 
     block_scheduler_type & bs;
+
+private:
+    // assigning is not allowed
+    swappable_block_matrix_type & operator = (const swappable_block_matrix_type & other);
 
 protected:
     //! \brief height of the matrix in blocks
@@ -162,6 +170,8 @@ protected:
     blocks_type blocks;
     //! \brief if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
+
+    matrix_operations<ValueType, BlockSideLength> ops;
 
     swappable_block_identifier_type & block(index_type row, index_type col)
     { return blocks[row * width + col]; }
@@ -208,6 +218,22 @@ public:
         for (index_type row = height_from_supermatrix; row < height; ++row)
             for (index_type col = 0; col < width; ++col)
                 block(row, col) = bs.allocate_swappable_block();
+    }
+
+    swappable_block_matrix(const swappable_block_matrix_type & other)
+        : shared_object(other),
+          bs(other.bs),
+          height(other.height),
+          width(other.width),
+          height_from_supermatrix(0),
+          width_from_supermatrix(0),
+          blocks(height * width),
+          elements_in_blocks_transposed(false)
+    {
+        for (index_type row = 0; row < height; ++row)
+            for (index_type col = 0; col < width; ++col)
+                block(row, col) = bs.allocate_swappable_block();
+        ops.element_op<ops.addition>(*this, other);
     }
 
     ~swappable_block_matrix()
@@ -429,10 +455,6 @@ protected:
     template <typename VT, unsigned BSL> friend class matrix;
 
     using matrix_iterator_type::m;
-    using matrix_iterator_type::get_row;
-    using matrix_iterator_type::get_col;
-    using matrix_iterator_type::set_col;
-    using matrix_iterator_type::set_pos;
     using matrix_iterator_type::set_empty;
 
     //! \brief create iterator pointing to given row and col
@@ -444,6 +466,10 @@ protected:
     : matrix_iterator_type(matrix) {}
 
 public:
+    //! \brief convert from matrix_iterator
+    matrix_row_major_iterator(const matrix_iterator_type & matrix_iterator)
+        : matrix_iterator_type(matrix_iterator) {}
+
     // Has to be not empty, else behavior is undefined.
     matrix_row_major_iterator_type & operator ++ ()
     {
@@ -473,6 +499,11 @@ public:
             set_empty();
         return *this;
     }
+
+    using matrix_iterator_type::get_row;
+    using matrix_iterator_type::get_col;
+    using matrix_iterator_type::set_col;
+    using matrix_iterator_type::set_pos;
 };
 
 template <typename ValueType, unsigned BlockSideLength>
@@ -487,10 +518,6 @@ protected:
     template <typename VT, unsigned BSL> friend class matrix;
 
     using matrix_iterator_type::m;
-    using matrix_iterator_type::get_row;
-    using matrix_iterator_type::get_col;
-    using matrix_iterator_type::set_row;
-    using matrix_iterator_type::set_pos;
     using matrix_iterator_type::set_empty;
 
     //! \brief create iterator pointing to given row and col
@@ -502,6 +529,10 @@ protected:
         : matrix_iterator_type(matrix) {}
 
 public:
+    //! \brief convert from matrix_iterator
+    matrix_col_major_iterator(const matrix_iterator_type & matrix_iterator)
+        : matrix_iterator_type(matrix_iterator) {}
+
     // Has to be not empty, else behavior is undefined.
     matrix_col_major_iterator_type & operator ++ ()
     {
@@ -531,14 +562,16 @@ public:
             set_empty();
         return *this;
     }
-};
 
-template <typename ValueType, unsigned BlockSideLength>
-struct matrix_operations;
+    using matrix_iterator_type::get_row;
+    using matrix_iterator_type::get_col;
+    using matrix_iterator_type::set_row;
+    using matrix_iterator_type::set_pos;
+};
 
 //! \brief External matrix container.
 template <typename ValueType, unsigned BlockSideLength>
-class matrix : private noncopyable
+class matrix
 {
 protected:
     typedef int_type elem_size_type;
@@ -546,22 +579,24 @@ protected:
     typedef int_type elem_index_in_block_type;
     typedef matrix<ValueType, BlockSideLength> matrix_type;
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef shared_object_pointer<swappable_block_matrix_type> swappable_block_matrix_pointer_type;
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::size_type block_size_type;
     typedef typename swappable_block_matrix_type::index_type block_index_type;
 
 public:
-    typedef matrix_iterator<ValueType, BlockSideLength> arbitrary_iterator;
+    typedef matrix_iterator<ValueType, BlockSideLength> iterator;
     typedef matrix_row_major_iterator<ValueType, BlockSideLength> row_major_iterator;
     typedef matrix_col_major_iterator<ValueType, BlockSideLength> col_major_iterator;
-    typedef row_major_iterator iterator;
 
 protected:
     template <typename VT, unsigned BSL> friend class matrix_iterator;
 
     elem_size_type height,
                    width;
-    swappable_block_matrix_type * data;
+    swappable_block_matrix_pointer_type data;
+
+    matrix_operations<ValueType, BlockSideLength> ops;
 
     static block_index_type block_index_from_elem(elem_index_type index)
     { return index / BlockSideLength; }
@@ -588,10 +623,7 @@ public:
                   (bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength)))
     {}
 
-    ~matrix()
-    {
-        delete data;
-    }
+    ~matrix() {}
 
     const elem_size_type & get_height() const
     { return height; }
@@ -599,48 +631,79 @@ public:
     const elem_size_type & get_width() const
     { return width; }
 
-    row_major_iterator begin()
-    { return row_major_iterator(*this, 0, 0); }
+    iterator begin()
+    {
+        data.unify();
+        return iterator(*this, 0, 0);
+    }
 
-    row_major_iterator end()
-    { return row_major_iterator(*this); }
-
-    row_major_iterator begin_row_major()
-    { return row_major_iterator(*this, 0, 0); }
-
-    row_major_iterator end_row_major()
-    { return row_major_iterator(*this); }
-
-    col_major_iterator begin_col_major()
-    { return col_major_iterator(*this, 0, 0); }
-
-    col_major_iterator end_col_major()
-    { return col_major_iterator(*this); }
-
-    arbitrary_iterator get_arbitrary_iterator()
-    { return arbitrary_iterator(*this); }
+    iterator end()
+    {
+        data.unify();
+        return iterator(*this);
+    }
 
     ValueType operator () (elem_index_type row, elem_index_type col)
     { return *iterator(*this, row, col); }
 
-    // todo how to make this beautiful?
-    matrix_type & make_product_of(const matrix_type & left, const matrix_type & right)
+    void set_zero()
     {
-        assert(height == left.get_height());
-        assert(width == right.get_width());
-        assert(left.get_width() == right.get_height());
-        data->set_zero();
-        matrix_operations<ValueType, BlockSideLength>::strassen_winograd_multiply_and_add(*left.data, *right.data, *data);
+        if (data.unique())
+            data->set_zero();
+        else
+            data = new swappable_block_matrix_type
+                    (data->bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength));
+    }
+
+    matrix_type operator + (const matrix_type & right) const
+    {
+        assert(height == right.height && width == right.width);
+        matrix_type res(data->bs, height, width);
+        ops.element_op<ops.addition>(*res.data, *data, *right.data); // more efficient than copying this and then adding right
+        return res;
+    }
+
+    matrix_type operator - (const matrix_type & right) const
+    {
+        assert(height == right.height && width == right.width);
+        matrix_type res(data->bs, height, width);
+        ops.element_op<ops.subtraction>(*res.data, *data, *right.data); // more efficient than copying this and then subtracting right
+        return res;
+    }
+
+    matrix_type operator * (const matrix_type & right) const
+    {
+        assert(width == right.height);
+        matrix_type res(data->bs, height, right.width);
+        ops.recursive_multiply_and_add(*data, *right.data, *res.data);
+        return res;
+    }
+
+    matrix_type & operator += (const matrix_type & right)
+    {
+        assert(height == right.height && width == right.width);
+        data.unify();
+        ops.element_op<ops.addition>(*data, *right.data);
         return *this;
     }
 
-    void set_zero()
-    { data->set_zero(); }
+    matrix_type & operator -= (const matrix_type & right)
+    {
+        assert(height == right.height && width == right.width);
+        data.unify();
+        ops.element_op<ops.subtraction>(*data, *right.data);
+        return *this;
+    }
+
+    matrix_type & operator *= (const matrix_type & right)
+    { return *this = operator * (right); } // implicitly unifies by constructing a result-matrix
+
+    //todo * vector, construct from vector*vector
 
     //todo: standart container operations
     // get/set row/col; get/set submatrix
 
-    //maydo: col-major iterator, cheap iterator
+    //maydo: cheap iterator
 };
 
 template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AExists, bool BExists>
