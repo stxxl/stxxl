@@ -58,14 +58,16 @@ int main(int argc, char **argv)
     typedef int_type value_type;
 
     int test_case = -1;
-    int_type internal_memory = 256 * 1024 * 1024;
+    int internal_memory_megabytes = 256;
 
     dsr::Argument_helper ah;
     ah.new_named_int('t', "test-case", "I", "number of the test case to run", test_case);
-    ah.new_named_int('m', "memory", "N", "internal memory to use (in bytes)", internal_memory);
+    ah.new_named_int('m', "memory", "N", "internal memory to use (in megabytes)", internal_memory_megabytes);
     ah.set_description("stxxl block_scheduler test");
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
     ah.process(argc, argv);
+
+    int_type internal_memory = int_type(internal_memory_megabytes) * 1024 * 1024;
 
     typedef block_scheduler< swappable_block<value_type, block_size> > bst;
     typedef bst::swappable_block_identifier_type sbit;
