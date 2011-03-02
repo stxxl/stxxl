@@ -126,23 +126,147 @@ std::ostream & operator << (std::ostream & o, const matrix_operation_statistic_d
 
 //! \brief External column-vector container.
 template <typename ValueType>
-class column_vector : public vector<ValueType> {};
+class column_vector : public vector<ValueType>
+{
+    typedef column_vector<ValueType> column_vector_type;
+    typedef vector<ValueType> vector_type;
+public:
+    typedef typename vector_type::size_type size_type;
+
+    using vector_type::size;
+
+    column_vector_type operator + (const column_vector_type & right) const
+    {
+        assert(size() == right.size());
+        column_vector_type res(size());
+        for (size_type i = 0; i < size(); ++i)
+            res[i] = (*this)[i] + right[i];
+        return res;
+    }
+
+    column_vector_type operator - (const column_vector_type & right) const
+    {
+        assert(size() == right.size());
+        column_vector_type res(size());
+        for (size_type i = 0; i < size(); ++i)
+            res[i] = (*this)[i] - right[i];
+        return res;
+    }
+
+    column_vector_type operator * (const ValueType scalar) const
+    {
+        column_vector_type res(size());
+        for (size_type i = 0; i < size(); ++i)
+            res[i] = (*this)[i] * scalar;
+        return res;
+    }
+
+    column_vector_type & operator += (const column_vector_type & right)
+    {
+        assert(size() == right.size());
+        for (size_type i = 0; i < size(); ++i)
+            (*this)[i] += right[i];
+        return *this;
+    }
+
+    column_vector_type & operator -= (const column_vector_type & right)
+    {
+        assert(size() == right.size());
+        for (size_type i = 0; i < size(); ++i)
+            (*this)[i] -= right[i];
+        return *this;
+    }
+
+    column_vector_type & operator *= (const ValueType scalar)
+    {
+        for (size_type i = 0; i < size(); ++i)
+            (*this)[i] *= scalar;
+        return *this;
+    }
+
+    void set_zero()
+    {
+        for (typename vector_type::iterator it = vector_type::begin(); it != vector_type::end(); ++it)
+            *it = 0;
+    }
+};
 
 //! \brief External row-vector container.
 template <typename ValueType>
 class row_vector : public vector<ValueType>
 {
+    typedef row_vector<ValueType> row_vector_type;
+    typedef vector<ValueType> vector_type;
 public:
+    typedef typename vector_type::size_type size_type;
+
+    using vector_type::size;
+
+    row_vector_type operator + (const row_vector_type & right) const
+    {
+        assert(size() == right.size());
+        row_vector_type res(size());
+        for (size_type i = 0; i < size(); ++i)
+            res[i] = (*this)[i] + right[i];
+        return res;
+    }
+
+    row_vector_type operator - (const row_vector_type & right) const
+    {
+        assert(size() == right.size());
+        row_vector_type res(size());
+        for (size_type i = 0; i < size(); ++i)
+            res[i] = (*this)[i] - right[i];
+        return res;
+    }
+
+    row_vector_type operator * (const ValueType scalar) const
+    {
+        row_vector_type res(size());
+        for (size_type i = 0; i < size(); ++i)
+            res[i] = (*this)[i] * scalar;
+        return res;
+    }
+
     template <unsigned BlockSideLength>
-    row_vector<ValueType> operator * (const matrix<ValueType, BlockSideLength> & right)
+    row_vector_type operator * (const matrix<ValueType, BlockSideLength> & right) const
     { return right.multiply_from_left(*this); }
 
-    ValueType operator * (const column_vector<ValueType> & right)
+    ValueType operator * (const column_vector<ValueType> & right) const
     {
         ValueType res;
-        for (typename vector<ValueType>::size_type i = 0; i < *this.size(); ++i)
-            res += *this[i] * right[i];
+        for (size_type i = 0; i < *this.size(); ++i)
+            res += (*this)[i] * right[i];
         return res;
+    }
+
+    row_vector_type & operator += (const row_vector_type & right)
+    {
+        assert(size() == right.size());
+        for (size_type i = 0; i < size(); ++i)
+            (*this)[i] += right[i];
+        return *this;
+    }
+
+    row_vector_type & operator -= (const row_vector_type & right)
+    {
+        assert(size() == right.size());
+        for (size_type i = 0; i < size(); ++i)
+            (*this)[i] -= right[i];
+        return *this;
+    }
+
+    row_vector_type & operator *= (const ValueType scalar)
+    {
+        for (size_type i = 0; i < size(); ++i)
+            (*this)[i] *= scalar;
+        return *this;
+    }
+
+    void set_zero()
+    {
+        for (typename vector_type::iterator it = vector_type::begin(); it != vector_type::end(); ++it)
+            *it = 0;
     }
 };
 
@@ -259,8 +383,8 @@ public:
         for (index_type row = 0; row < height; ++row)
             for (index_type col = 0; col < width; ++col)
                 block(row, col) = bs.allocate_swappable_block();
-        // add to zero is copying
-        Ops::element_op(*this, other, typename Ops::addition());
+        // * 1 is copying
+        Ops::element_op(*this, other, typename Ops::scalar_multiplication(1));
     }
 
     ~swappable_block_matrix()
@@ -723,6 +847,13 @@ public:
         return res;
     }
 
+    matrix_type operator * (const ValueType scalar) const
+    {
+        matrix_type res(data->bs, height, width);
+        Ops::element_op(*res.data, *data, typename Ops::scalar_multiplication(scalar));
+        return res;
+    }
+
     matrix_type & operator += (const matrix_type & right)
     {
         assert(height == right.height && width == right.width);
@@ -742,12 +873,18 @@ public:
     matrix_type & operator *= (const matrix_type & right)
     { return *this = operator * (right); } // implicitly unifies by constructing a result-matrix
 
+    matrix_type & operator *= (const ValueType scalar)
+    {
+        data.unify();
+        Ops::element_op(*data, typename Ops::scalar_multiplication(scalar));
+        return *this;
+    }
+
     column_vector_type operator * (const column_vector_type & right) const
     {
         assert(right.size == width);
         column_vector_type res(height);
-        for (typename column_vector_type::iterator it = res.begin(); it != res.end(); ++it)
-            *it = 0;
+        res.set_zero();
         Ops::recursive_matrix_col_vector_multiply_and_add(*data, right, res);
         return res;
     }
@@ -756,8 +893,7 @@ public:
     {
         assert(left.size == height);
         row_vector_type res(width);
-        for (typename row_vector_type::iterator it = res.begin(); it != res.end(); ++it)
-            *it = 0;
+        res.set_zero();
         Ops::recursive_matrix_row_vector_multiply_and_add(left, *data, res);
         return res;
     }
@@ -822,31 +958,54 @@ struct matrix_operations
         inline ValueType operator ()                   (const ValueType & a)                      { return       -a; }
     };
 
+    struct scalar_multiplication
+    {
+        const ValueType s;
+
+        scalar_multiplication(const ValueType scalar = 1)
+            : s(scalar) {}
+
+        inline ValueType & operator ()  (ValueType & c, const ValueType & a, const ValueType &  ) { return c = a * s; }
+        inline ValueType & operator ()  (ValueType & c, const ValueType & a)                      { return c = a * s; }
+        inline ValueType operator ()                   (const ValueType & a)                      { return     a * s; }
+    };
+
     // element_op<Op>(C,A,B) calculates C = A <Op> B
     template <class Op> static swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
                swappable_block_matrix_type & A,
-               swappable_block_matrix_type & B, Op = Op())
+               swappable_block_matrix_type & B, Op op = Op())
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
-                element_op_swappable_block<Op>(
+                element_op_swappable_block(
                         C(row, col), C.is_transposed(), C.bs,
                         A(row, col), A.is_transposed(), A.bs,
-                        B(row, col), B.is_transposed(), B.bs);
+                        B(row, col), B.is_transposed(), B.bs, op);
         return C;
     }
 
     // element_op<Op>(C,A) calculates C <Op>= A
     template <class Op> static swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
-               const swappable_block_matrix_type & A, Op = Op())
+               const swappable_block_matrix_type & A, Op op = Op())
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
-                element_op_swappable_block<Op>(
+                element_op_swappable_block(
                         C(row, col), C.is_transposed(), C.bs,
-                        A(row, col), A.is_transposed(), A.bs);
+                        A(row, col), A.is_transposed(), A.bs, op);
+        return C;
+    }
+
+    // element_op<Op>(C) calculates C = <Op>C
+    template <class Op> static swappable_block_matrix_type &
+    element_op(swappable_block_matrix_type & C, Op op = Op())
+    {
+        for (index_type row = 0; row < C.get_height(); ++row)
+            for (index_type col = 0; col < C.get_width(); ++col)
+                element_op_swappable_block(
+                        C(row, col), C.is_transposed(), C.bs, op);
         return C;
     }
 
@@ -855,9 +1014,8 @@ struct matrix_operations
     element_op_swappable_block(
             const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c,
             const swappable_block_identifier_type a, bool a_is_transposed, block_scheduler_type & bs_a,
-            const swappable_block_identifier_type b, bool b_is_transposed, block_scheduler_type & bs_b)
+            const swappable_block_identifier_type b, bool b_is_transposed, block_scheduler_type & bs_b, Op op = Op())
     {
-        Op op;
         ++ matrix_operation_statistic::get_instance()->block_addition_calls;
         // check if zero-block (== ! initialized)
         if (! bs_a.is_initialized(a) && ! bs_b.is_initialized(b))
@@ -967,14 +1125,12 @@ struct matrix_operations
         }
     }
 
-    // calculates c += a
+    // calculates c <op>= a
     template <class Op> static void
     element_op_swappable_block(
             const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c,
-            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a)
+            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a, Op op = Op())
     {
-        Op op;
-
         ++ matrix_operation_statistic::get_instance()->block_addition_calls;
         // check if zero-block (== ! initialized)
         if (! bs_a.is_initialized(a))
@@ -1026,6 +1182,35 @@ struct matrix_operations
         bs_a.release(a, false);
     }
 
+    // calculates c = <op>c
+    template <class Op> static void
+    element_op_swappable_block(
+            const swappable_block_identifier_type c, const bool, block_scheduler_type & bs_c, Op op = Op())
+    {
+        ++ matrix_operation_statistic::get_instance()->block_addition_calls;
+        // check if zero-block (== ! initialized)
+        if (! bs_c.is_initialized(c))
+        {
+            // => b is zero => nothing to do
+            ++ matrix_operation_statistic::get_instance()->block_additions_saved_through_zero;
+            return;
+        }
+        // acquire
+        internal_block_type & ic = bs_c.acquire(c);
+        // add
+        if (! bs_c.is_simulating())
+        {
+            #if STXXL_PARALLEL
+            #pragma omp parallel for
+            #endif
+            for (int_type row = 0; row < int_type(BlockSideLength); ++row)
+                for (int_type col = 0; col < int_type(BlockSideLength); ++col)
+                    ic[row * BlockSideLength + col] = op(ic[row * BlockSideLength + col]);
+        }
+        // release
+        bs_c.release(c, true);
+    }
+
     // +-+ end addition +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
     // +-+-+-+ matrix multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1044,7 +1229,7 @@ struct matrix_operations
      *                                n, m, l .
      */
 
-    // assumes height and width divisible by 2
+    // requires height and width divisible by 2
     struct swappable_block_matrix_quarterer
     {
         swappable_block_matrix_type  upleft,   upright,
