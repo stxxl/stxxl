@@ -172,7 +172,6 @@ protected:
     bool elements_in_blocks_transposed;
 
     typedef matrix_operations<ValueType, BlockSideLength> Ops;
-    Ops ops;
 
     swappable_block_identifier_type & block(index_type row, index_type col)
     { return blocks[row * width + col]; }
@@ -237,8 +236,8 @@ public:
         for (index_type row = 0; row < height; ++row)
             for (index_type col = 0; col < width; ++col)
                 block(row, col) = bs.allocate_swappable_block();
-        //add to zero is copying
-        ops.element_op(*this, other, typename Ops::addition());
+        // add to zero is copying
+        Ops::element_op(*this, other, typename Ops::addition());
     }
 
     ~swappable_block_matrix()
@@ -602,7 +601,6 @@ protected:
     swappable_block_matrix_pointer_type data;
 
     typedef matrix_operations<ValueType, BlockSideLength> Ops;
-    Ops ops;
 
     static block_index_type block_index_from_elem(elem_index_type index)
     { return index / BlockSideLength; }
@@ -665,7 +663,7 @@ public:
     {
         assert(height == right.height && width == right.width);
         matrix_type res(data->bs, height, width);
-        ops.element_op(*res.data, *data, *right.data, typename Ops::addition()); // more efficient than copying this and then adding right
+        Ops::element_op(*res.data, *data, *right.data, typename Ops::addition()); // more efficient than copying this and then adding right
         return res;
     }
 
@@ -673,7 +671,7 @@ public:
     {
         assert(height == right.height && width == right.width);
         matrix_type res(data->bs, height, width);
-        ops.element_op(*res.data, *data, *right.data, typename Ops::subtraction()); // more efficient than copying this and then subtracting right
+        Ops::element_op(*res.data, *data, *right.data, typename Ops::subtraction()); // more efficient than copying this and then subtracting right
         return res;
     }
 
@@ -689,7 +687,7 @@ public:
     {
         assert(height == right.height && width == right.width);
         data.unify();
-        ops.element_op(*data, *right.data, typename Ops::addition());
+        Ops::element_op(*data, *right.data, typename Ops::addition());
         return *this;
     }
 
@@ -697,7 +695,7 @@ public:
     {
         assert(height == right.height && width == right.width);
         data.unify();
-        ops.element_op(*data, *right.data, typename Ops::subtraction());
+        Ops::element_op(*data, *right.data, typename Ops::subtraction());
         return *this;
     }
 
@@ -765,7 +763,7 @@ struct matrix_operations
     };
 
     // element_op<Op>(C,A,B) calculates C = A <Op> B
-    template <class Op> swappable_block_matrix_type &
+    template <class Op> static swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
                swappable_block_matrix_type & A,
                swappable_block_matrix_type & B, Op = Op())
@@ -780,7 +778,7 @@ struct matrix_operations
     }
 
     // element_op<Op>(C,A) calculates C <Op>= A
-    template <class Op> swappable_block_matrix_type &
+    template <class Op> static swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
                const swappable_block_matrix_type & A, Op = Op())
     {
@@ -1150,30 +1148,29 @@ struct matrix_operations
                                     t2(C.bs, qb.ul.get_height(), qb.ul.get_width()),
                                     t3(C.bs, qb.ul.get_height(), qb.ul.get_width()),
                                     t4(C.bs, qb.ul.get_height(), qb.ul.get_width());
-        matrix_operations ops;
-        ops.element_op<subtraction>(s3, qa.ul, qa.dl);
-        ops.element_op<addition>(s1, qa.dl, qa.dr);
-        ops.element_op<subtraction>(s2, s1, qa.ul);
-        ops.element_op<subtraction>(s4, qa.ur, s2);
-        ops.element_op<subtraction>(t3, qb.dr, qb.ur);
-        ops.element_op<subtraction>(t1, qb.ur, qb.ul);
-        ops.element_op<subtraction>(t2, qb.dr, t1);
-        ops.element_op<subtraction>(t4, qb.dl, t2);
+        element_op<subtraction>(s3, qa.ul, qa.dl);
+        element_op<addition>(s1, qa.dl, qa.dr);
+        element_op<subtraction>(s2, s1, qa.ul);
+        element_op<subtraction>(s4, qa.ur, s2);
+        element_op<subtraction>(t3, qb.dr, qb.ur);
+        element_op<subtraction>(t1, qb.ur, qb.ul);
+        element_op<subtraction>(t2, qb.dr, t1);
+        element_op<subtraction>(t4, qb.dl, t2);
         // recursive multiplications and postadditions
         swappable_block_matrix_type px(C.bs, qc.ul.get_height(), qc.ul.get_width());
         strassen_winograd_multiply_and_add(qa.ur, qb.dl, qc.ul); // p2
         strassen_winograd_multiply_and_add(qa.ul, qb.ul, px); // p1
-        ops.element_op<addition>(qc.ul, px);
+        element_op<addition>(qc.ul, px);
         strassen_winograd_multiply_and_add(s2, t2, px); // p4
-        ops.element_op<addition>(qc.ur, px);
+        element_op<addition>(qc.ur, px);
         strassen_winograd_multiply_and_add(s3, t3, px); // p5
-        ops.element_op<addition>(qc.dl, px);
-        ops.element_op<addition>(qc.dr, px);
+        element_op<addition>(qc.dl, px);
+        element_op<addition>(qc.dr, px);
         px.set_zero();
         strassen_winograd_multiply_and_add(qa.dr, t4, qc.dl); // p7
         strassen_winograd_multiply_and_add(s1, t1, px); // p3
-        ops.element_op<addition>(qc.dr, px);
-        ops.element_op<addition>(qc.ur, px);
+        element_op<addition>(qc.dr, px);
+        element_op<addition>(qc.ur, px);
         strassen_winograd_multiply_and_add(s4, qb.dr, qc.ur); // p6
         return C;
     }
