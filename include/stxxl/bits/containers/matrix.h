@@ -177,6 +177,9 @@ protected:
     swappable_block_identifier_type & block(index_type row, index_type col)
     { return blocks[row * width + col]; }
 
+    const swappable_block_identifier_type & block(index_type row, index_type col) const
+    { return blocks[row * width + col]; }
+
 public:
     //! \brief Create an empty swappable_block_matrix of given dimensions.
     swappable_block_matrix(block_scheduler_type & bs, const size_type height_in_blocks, const size_type width_in_blocks)
@@ -256,7 +259,7 @@ public:
     const size_type & get_width() const
     { return width; }
 
-    const swappable_block_identifier_type operator () (index_type row, index_type col)
+    const swappable_block_identifier_type operator () (index_type row, index_type col) const
     { return block(row, col); }
 
     const bool & is_transposed() const
@@ -646,7 +649,7 @@ public:
         return iterator(*this);
     }
 
-    ValueType operator () (elem_index_type row, elem_index_type col)
+    ValueType operator () (elem_index_type row, elem_index_type col) const
     { return *iterator(*this, row, col); }
 
     void set_zero()
@@ -765,7 +768,7 @@ struct matrix_operations
     template <class Op> swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
                swappable_block_matrix_type & A,
-               swappable_block_matrix_type & B, Op o)
+               swappable_block_matrix_type & B, Op)
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
@@ -779,14 +782,14 @@ struct matrix_operations
     // element_op<Op>(C,A) calculates C <Op>= A
     template <class Op> swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
-               const swappable_block_matrix_type & A, Op o)
+               const swappable_block_matrix_type & A, Op)
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
                 element_op_swappable_block<Op>(
                         C(row, col), C.is_transposed(), C.bs,
                         A(row, col), A.is_transposed(), A.bs);
-        return A;
+        return C;
     }
 
     // calculates c = a <Op> b
