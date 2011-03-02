@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
     ah.process(argc, argv);
 
-    int_type internal_memory = int_type(internal_memory_megabytes) * 1024 * 1024;
+    int_type internal_memory = int_type(internal_memory_megabytes) * 1048576;
 
     typedef block_scheduler< swappable_block<value_type, block_size> > bst;
     typedef bst::swappable_block_identifier_type sbit;

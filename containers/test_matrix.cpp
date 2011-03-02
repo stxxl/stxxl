@@ -134,8 +134,7 @@ int main(int argc, char **argv)
 
     int test_case = -1;
     int rank = 10000;
-    int_type internal_memory = 256 * 1024 * 1024;
-    int internal_memory_megabyte = 265;
+    int internal_memory_megabyte = 256;
 
     dsr::Argument_helper ah;
     ah.new_int("K", "number of the test case to run", test_case);
@@ -146,7 +145,7 @@ int main(int argc, char **argv)
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
     ah.process(argc, argv);
 
-    internal_memory = int_type(internal_memory_megabyte) * 1048576;
+    int_type internal_memory = int_type(internal_memory_megabyte) * 1048576;
 
     switch (test_case)
     {
