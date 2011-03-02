@@ -171,7 +171,8 @@ protected:
     //! \brief if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
 
-    matrix_operations<ValueType, BlockSideLength> ops;
+    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+    Ops ops;
 
     swappable_block_identifier_type & block(index_type row, index_type col)
     { return blocks[row * width + col]; }
@@ -233,7 +234,8 @@ public:
         for (index_type row = 0; row < height; ++row)
             for (index_type col = 0; col < width; ++col)
                 block(row, col) = bs.allocate_swappable_block();
-        ops.element_op<ops.addition>(*this, other);
+        //add to zero is copying
+        ops.element_op(*this, other, typename Ops::addition());
     }
 
     ~swappable_block_matrix()
@@ -596,7 +598,8 @@ protected:
                    width;
     swappable_block_matrix_pointer_type data;
 
-    matrix_operations<ValueType, BlockSideLength> ops;
+    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+    Ops ops;
 
     static block_index_type block_index_from_elem(elem_index_type index)
     { return index / BlockSideLength; }
@@ -659,7 +662,7 @@ public:
     {
         assert(height == right.height && width == right.width);
         matrix_type res(data->bs, height, width);
-        ops.element_op<ops.addition>(*res.data, *data, *right.data); // more efficient than copying this and then adding right
+        ops.element_op(*res.data, *data, *right.data, typename Ops::addition()); // more efficient than copying this and then adding right
         return res;
     }
 
@@ -667,7 +670,7 @@ public:
     {
         assert(height == right.height && width == right.width);
         matrix_type res(data->bs, height, width);
-        ops.element_op<ops.subtraction>(*res.data, *data, *right.data); // more efficient than copying this and then subtracting right
+        ops.element_op(*res.data, *data, *right.data, typename Ops::subtraction()); // more efficient than copying this and then subtracting right
         return res;
     }
 
@@ -675,7 +678,7 @@ public:
     {
         assert(width == right.height);
         matrix_type res(data->bs, height, right.width);
-        ops.recursive_multiply_and_add(*data, *right.data, *res.data);
+        Ops::recursive_multiply_and_add(*data, *right.data, *res.data);
         return res;
     }
 
@@ -683,7 +686,7 @@ public:
     {
         assert(height == right.height && width == right.width);
         data.unify();
-        ops.element_op<ops.addition>(*data, *right.data);
+        ops.element_op(*data, *right.data, typename Ops::addition());
         return *this;
     }
 
@@ -691,7 +694,7 @@ public:
     {
         assert(height == right.height && width == right.width);
         data.unify();
-        ops.element_op<ops.subtraction>(*data, *right.data);
+        ops.element_op(*data, *right.data, typename Ops::subtraction());
         return *this;
     }
 
@@ -759,10 +762,10 @@ struct matrix_operations
     };
 
     // element_op<Op>(C,A,B) calculates C = A <Op> B
-    template <class Op> static swappable_block_matrix_type &
+    template <class Op> swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
                swappable_block_matrix_type & A,
-               swappable_block_matrix_type & B)
+               swappable_block_matrix_type & B, Op o)
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
@@ -774,9 +777,9 @@ struct matrix_operations
     }
 
     // element_op<Op>(C,A) calculates C <Op>= A
-    template <class Op> static swappable_block_matrix_type &
+    template <class Op> swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
-               swappable_block_matrix_type & A)
+               const swappable_block_matrix_type & A, Op o)
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
