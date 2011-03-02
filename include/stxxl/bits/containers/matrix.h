@@ -768,7 +768,7 @@ struct matrix_operations
     template <class Op> swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
                swappable_block_matrix_type & A,
-               swappable_block_matrix_type & B, Op o = Op())
+               swappable_block_matrix_type & B, Op = Op())
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
@@ -782,7 +782,7 @@ struct matrix_operations
     // element_op<Op>(C,A) calculates C <Op>= A
     template <class Op> swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
-               const swappable_block_matrix_type & A, Op o = Op())
+               const swappable_block_matrix_type & A, Op = Op())
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
