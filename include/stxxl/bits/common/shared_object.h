@@ -13,7 +13,7 @@
 #ifndef STXXL_SHARED_OBJECT_HEADER
 #define STXXL_SHARED_OBJECT_HEADER
 
-//#include <cassert>
+#include <cassert>
 #include <stxxl/bits/namespace.h>
 
 __STXXL_BEGIN_NAMESPACE
