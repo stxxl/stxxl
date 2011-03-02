@@ -22,6 +22,7 @@
 #include <stxxl/bits/containers/matrix_layouts.h>
 #include <stxxl/bits/mng/block_scheduler.h>
 #include <stxxl/bits/common/shared_object.h>
+#include <stxxl/bits/containers/vector.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -123,6 +124,28 @@ std::ostream & operator << (std::ostream & o, const matrix_operation_statistic_d
     return o;
 }
 
+//! \brief External column-vector container.
+template <typename ValueType>
+class column_vector : public vector<ValueType> {};
+
+//! \brief External row-vector container.
+template <typename ValueType>
+class row_vector : public vector<ValueType>
+{
+public:
+    template <unsigned BlockSideLength>
+    row_vector<ValueType> operator * (const matrix<ValueType, BlockSideLength> & right)
+    { return right.multiply_from_left(*this); }
+
+    ValueType operator * (const column_vector<ValueType> & right)
+    {
+        ValueType res;
+        for (typename vector<ValueType>::size_type i = 0; i < *this.size(); ++i)
+            res += *this[i] * right[i];
+        return res;
+    }
+};
+
 template <typename ValueType, unsigned BlockSideLength>
 struct matrix_operations;
 
@@ -131,8 +154,9 @@ struct matrix_operations;
 template <typename ValueType, unsigned BlockSideLength>
 class matrix_swappable_block : public swappable_block<ValueType, BlockSideLength * BlockSideLength>
 {
-    using swappable_block<ValueType, BlockSideLength * BlockSideLength>::fill;
 public:
+    using swappable_block<ValueType, BlockSideLength * BlockSideLength>::fill;
+
     void fill_default()
     { fill(0); }
 };
@@ -150,6 +174,7 @@ public:
     typedef block_scheduler< matrix_swappable_block<ValueType, BlockSideLength> > block_scheduler_type;
     typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
     typedef std::vector<swappable_block_identifier_type> blocks_type;
+    typedef matrix_operations<ValueType, BlockSideLength> Ops;
 
     block_scheduler_type & bs;
 
@@ -170,8 +195,6 @@ protected:
     blocks_type blocks;
     //! \brief if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
-
-    typedef matrix_operations<ValueType, BlockSideLength> Ops;
 
     swappable_block_identifier_type & block(index_type row, index_type col)
     { return blocks[row * width + col]; }
@@ -264,16 +287,19 @@ public:
     const bool & is_transposed() const
     { return elements_in_blocks_transposed; }
 
-    void transpose();
-    /*{
-        elements_in_blocks_transposed = ! elements_in_blocks_transposed;
-        // transpose matrix of blocks WRONG?
+    void transpose()
+    {
+        // transpose matrix of blocks
+        blocks_type bl(blocks.size());
         for (index_type row = 1; row < height; ++row)
             for (index_type col = 0; col < row; ++col)
-                std::swap(block(row,col), block(col, row));
+                bl[col * height + row] = block(row,col);
+        bl.swap(blocks);
+        // swap dimensions
         std::swap(height, width);
         std::swap(height_from_supermatrix, width_from_supermatrix);
-    } //*/
+        elements_in_blocks_transposed = ! elements_in_blocks_transposed;
+    }
 
     void set_zero()
     {
@@ -580,13 +606,15 @@ class matrix
 protected:
     typedef int_type elem_size_type;
     typedef int_type elem_index_type;
-    typedef int_type elem_index_in_block_type;
     typedef matrix<ValueType, BlockSideLength> matrix_type;
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
     typedef shared_object_pointer<swappable_block_matrix_type> swappable_block_matrix_pointer_type;
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::size_type block_size_type;
     typedef typename swappable_block_matrix_type::index_type block_index_type;
+    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+    typedef column_vector<ValueType> column_vector_type;
+    typedef row_vector<ValueType> row_vector_type;
 
 public:
     typedef matrix_iterator<ValueType, BlockSideLength> iterator;
@@ -600,16 +628,14 @@ protected:
                    width;
     swappable_block_matrix_pointer_type data;
 
-    typedef matrix_operations<ValueType, BlockSideLength> Ops;
-
     static block_index_type block_index_from_elem(elem_index_type index)
     { return index / BlockSideLength; }
 
-    static elem_index_in_block_type elem_index_in_block_from_elem(elem_index_type index)
+    static int_type elem_index_in_block_from_elem(elem_index_type index)
     { return index % BlockSideLength; }
 
     // takes care about transposed
-    elem_index_in_block_type elem_index_in_block_from_elem(elem_index_type row, elem_index_type col)
+    int_type elem_index_in_block_from_elem(elem_index_type row, elem_index_type col)
     {
         return (data->is_transposed())
                  ? row % BlockSideLength + col % BlockSideLength * BlockSideLength
@@ -626,6 +652,13 @@ public:
           data(new swappable_block_matrix_type
                   (bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength)))
     {}
+
+    matrix(block_scheduler_type & bs, const column_vector_type & left, const row_vector_type & right)
+        : height(left.size()),
+          width(right.size()),
+          data(new swappable_block_matrix_type
+                  (bs, div_ceil(height, BlockSideLength), div_ceil(width, BlockSideLength)))
+    { Ops::recursive_matrix_from_vectors(*data, left, right); }
 
     ~matrix() {}
 
@@ -649,6 +682,13 @@ public:
 
     ValueType operator () (elem_index_type row, elem_index_type col) const
     { return *iterator(*this, row, col); }
+
+    void transpose()
+    {
+        data.unify();
+        data->transpose();
+        std::swap(height, width);
+    }
 
     void set_zero()
     {
@@ -702,12 +742,29 @@ public:
     matrix_type & operator *= (const matrix_type & right)
     { return *this = operator * (right); } // implicitly unifies by constructing a result-matrix
 
-    //todo * vector, construct from vector*vector
+    column_vector_type operator * (const column_vector_type & right) const
+    {
+        assert(right.size == width);
+        column_vector_type res(height);
+        for (typename column_vector_type::iterator it = res.begin(); it != res.end(); ++it)
+            *it = 0;
+        Ops::recursive_matrix_col_vector_multiply_and_add(*data, right, res);
+        return res;
+    }
+
+    row_vector_type multiply_from_left(const row_vector_type & left) const
+    {
+        assert(left.size == height);
+        row_vector_type res(width);
+        for (typename row_vector_type::iterator it = res.begin(); it != res.end(); ++it)
+            *it = 0;
+        Ops::recursive_matrix_row_vector_multiply_and_add(left, *data, res);
+        return res;
+    }
 
     //todo: standart container operations
-    // get/set row/col; get/set submatrix
 
-    //maydo: cheap iterator
+    //maydo: cheap iterator; get/set row/col; get/set submatrix
 };
 
 template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AExists, bool BExists>
@@ -735,6 +792,9 @@ struct matrix_operations
     typedef typename block_scheduler_type::internal_block_type internal_block_type;
     typedef typename swappable_block_matrix_type::index_type index_type;
     typedef typename swappable_block_matrix_type::size_type size_type;
+    typedef column_vector<ValueType> column_vector_type;
+    typedef row_vector<ValueType> row_vector_type;
+    typedef typename column_vector_type::size_type vector_size_type;
 
     // +-+-+-+ addition +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
@@ -968,7 +1028,7 @@ struct matrix_operations
 
     // +-+ end addition +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-    // +-+-+-+ multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    // +-+-+-+ matrix multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
     /*  n, m and l denote the three dimensions of a matrix multiplication, according to the following ascii-art diagram:
      *
@@ -1040,7 +1100,8 @@ struct matrix_operations
             use_feedable_sw<1>(A, B, C);
             break;
         case 0:
-            naive_multiply_and_add(A, B, C);
+            // base case
+            recursive_multiply_and_add(A, B, C);
             break;
         }
     }
@@ -1135,7 +1196,7 @@ struct matrix_operations
     {
         // base case
         if (C.get_height() == 1 || C.get_width() == 1 || A.get_width() == 1)
-            return naive_multiply_and_add(A, B, C);
+            return recursive_multiply_and_add(A, B, C);
 
         // partition matrix
         swappable_block_matrix_padding_quarterer qa(A), qb(B), qc(C);
@@ -1196,8 +1257,11 @@ struct matrix_operations
                                swappable_block_matrix_type & B,
                                swappable_block_matrix_type & C)
     {
+        // catch empty intervals
+        if (C.get_height() * C.get_width() * A.get_width() == 0)
+            return C;
         // base case
-        if (C.get_height() == 1 || C.get_width() == 1 || A.get_width() == 1)
+        if ((C.get_height() == 1) + (C.get_width() == 1) + (A.get_width() == 1) >= 2)
             return naive_multiply_and_add(A, B, C);
 
         // partition matrix
@@ -1212,7 +1276,7 @@ struct matrix_operations
         recursive_multiply_and_add(qa.dr, qb.dr, qc.dr);
         recursive_multiply_and_add(qa.dr, qb.dl, qc.dl);
         recursive_multiply_and_add(qa.dl, qb.ul, qc.dl);
-        // delete partitioning
+
         return C;
     }
 
@@ -1262,7 +1326,208 @@ struct matrix_operations
         bs_c.release(c, true);
     }
 
-    // +-+ end multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    // +-+ end matrix multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    // +-+-+-+ matrix-vector multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    //! \brief calculates z = A * x
+    static column_vector_type &
+    recursive_matrix_col_vector_multiply_and_add(swappable_block_matrix_type & A,
+                                         column_vector_type & x, column_vector_type & z,
+                                         vector_size_type offset_x = 0, vector_size_type offset_z = 0)
+    {
+        // catch empty intervals
+        if (A.get_height() * A.get_width() == 0)
+            return;
+        // base case
+        if (A.get_height() == 1 || A.get_width() == 1)
+            return naive_matrix_col_vector_multiply_and_add(A, x, z, offset_x, offset_z);
+
+        // partition matrix
+        swappable_block_matrix_approximative_quarterer qa(A);
+        // recursive multiplication
+        // The order of recursive calls is optimized to enhance locality.
+        recursive_matrix_col_vector_multiply_and_add(qa.ul, x, z, offset_x,                     offset_z                     );
+        recursive_matrix_col_vector_multiply_and_add(qa.ur, x, z, offset_x + qa.ul.get_width(), offset_z                     );
+        recursive_matrix_col_vector_multiply_and_add(qa.dr, x, z, offset_x + qa.ul.get_width(), offset_z + qa.ul.get_height());
+        recursive_matrix_col_vector_multiply_and_add(qa.dl, x, z, offset_x,                     offset_z + qa.ul.get_height());
+
+        return z;
+    }
+
+    static column_vector_type &
+    naive_matrix_col_vector_multiply_and_add(swappable_block_matrix_type & A,
+                                     column_vector_type & x, column_vector_type & z,
+                                     vector_size_type offset_x = 0, vector_size_type offset_z = 0)
+    {
+        for (index_type row = 0; row < A.get_height(); ++row)
+            for (index_type col = 0; col < A.get_width(); ++col)
+                matrix_col_vector_multiply_and_add_swappable_block(A(row, col), A.is_transposed(), A.bs,
+                        x, z, (offset_x + col) * BlockSideLength, (offset_z + row) * BlockSideLength);
+        return z;
+    }
+
+    static void matrix_col_vector_multiply_and_add_swappable_block(
+            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a,
+            column_vector_type & x, column_vector_type & z,
+            vector_size_type offset_x = 0, vector_size_type offset_z = 0)
+    {
+        // check if zero-block (== ! initialized)
+        if (! bs_a.is_initialized(a))
+        {
+            // => matrix is zero => product is zero
+            return;
+        }
+        // acquire
+        internal_block_type & ia = bs_a.acquire(a);
+        // multiply
+        if (! bs_a.is_simulating())
+        {
+            int_type row_limit = std::min(BlockSideLength, z.size() - offset_z),
+                     col_limit = std::min(BlockSideLength, x.size() - offset_x);
+            if (a_is_transposed)
+                for (int_type col = 0; col < col_limit; ++col)
+                    for (int_type row = 0; row < row_limit; ++row)
+                        z[offset_z + row] += x[offset_x + col] * ia[row + col * BlockSideLength];
+            else
+                for (int_type row = 0; row < row_limit; ++row)
+                    for (int_type col = 0; col < col_limit; ++col)
+                        z[offset_z + row] += x[offset_x + col] * ia[row * BlockSideLength + col];
+        }
+        // release
+        bs_a.release(a, false);
+    }
+
+    //! \brief calculates z = y * A
+    static column_vector_type &
+    recursive_matrix_row_vector_multiply_and_add(column_vector_type & y, swappable_block_matrix_type & A,
+                                         column_vector_type & z,
+                                         vector_size_type offset_y = 0, vector_size_type offset_z = 0)
+    {
+        // catch empty intervals
+        if (A.get_height() * A.get_width() == 0)
+            return;
+        // base case
+        if (A.get_height() == 1 || A.get_width() == 1)
+            return naive_matrix_row_vector_multiply_and_add(y, A, z, offset_y, offset_z);
+
+        // partition matrix
+        swappable_block_matrix_approximative_quarterer qa(A);
+        // recursive multiplication
+        // The order of recursive calls is optimized to enhance locality.
+        recursive_matrix_row_vector_multiply_and_add(y, qa.ul, z, offset_y,                      offset_z                    );
+        recursive_matrix_row_vector_multiply_and_add(y, qa.dl, z, offset_y + qa.ul.get_height(), offset_z                    );
+        recursive_matrix_row_vector_multiply_and_add(y, qa.dr, z, offset_y + qa.ul.get_height(), offset_z + qa.ul.get_width());
+        recursive_matrix_row_vector_multiply_and_add(y, qa.ur, z, offset_y,                      offset_z + qa.ul.get_width());
+
+        return z;
+    }
+
+    static column_vector_type &
+    naive_matrix_row_vector_multiply_and_add(column_vector_type & y, swappable_block_matrix_type & A,
+                                     column_vector_type & z,
+                                     vector_size_type offset_y = 0, vector_size_type offset_z = 0)
+    {
+        for (index_type row = 0; row < A.get_height(); ++row)
+            for (index_type col = 0; col < A.get_width(); ++col)
+                matrix_row_vector_multiply_and_add_swappable_block(y, A(row, col), A.is_transposed(), A.bs,
+                        z, (offset_y + row) * BlockSideLength, (offset_z + col) * BlockSideLength);
+        return z;
+    }
+
+    static void matrix_row_vector_multiply_and_add_swappable_block(column_vector_type & y,
+            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a,
+            column_vector_type & z,
+            vector_size_type offset_y = 0, vector_size_type offset_z = 0)
+    {
+        // check if zero-block (== ! initialized)
+        if (! bs_a.is_initialized(a))
+        {
+            // => matrix is zero => product is zero
+            return;
+        }
+        // acquire
+        internal_block_type & ia = bs_a.acquire(a);
+        // multiply
+        if (! bs_a.is_simulating())
+        {
+            int_type row_limit = std::min(BlockSideLength, y.size() - offset_y),
+                     col_limit = std::min(BlockSideLength, z.size() - offset_z);
+            if (a_is_transposed)
+                for (int_type col = 0; col < col_limit; ++col)
+                    for (int_type row = 0; row < row_limit; ++row)
+                        z[offset_z + col] += ia[row + col * BlockSideLength] * y[offset_y + row];
+            else
+                for (int_type row = 0; row < row_limit; ++row)
+                    for (int_type col = 0; col < col_limit; ++col)
+                        z[offset_z + col] += ia[row * BlockSideLength + col] * y[offset_y + row];
+        }
+        // release
+        bs_a.release(a, false);
+    }
+
+    // +-+ end matrix-vector multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    // +-+-+-+ vector-vector multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+    static void recursive_matrix_from_vectors(swappable_block_matrix_type A, const column_vector_type & l,
+            const row_vector_type & r, vector_size_type offset_l = 0, vector_size_type offset_r = 0)
+    {
+        // catch empty intervals
+        if (A.get_height() * A.get_width() == 0)
+            return;
+        // base case
+        if (A.get_height() == 1 || A.get_width() == 1)
+        {
+            naive_matrix_from_vectors(A, l, r, offset_l, offset_r);
+            return;
+        }
+
+        // partition matrix
+        swappable_block_matrix_approximative_quarterer qa(A);
+        // recursive creation
+        // The order of recursive calls is optimized to enhance locality.
+        recursive_matrix_from_vectors(qa.ul, l, r, offset_l,                      offset_r                    );
+        recursive_matrix_from_vectors(qa.ur, l, r, offset_l,                      offset_r + qa.ul.get_width());
+        recursive_matrix_from_vectors(qa.dr, l, r, offset_l + qa.ul.get_height(), offset_r + qa.ul.get_width());
+        recursive_matrix_from_vectors(qa.dl, l, r, offset_l + qa.ul.get_height(), offset_r                    );
+    }
+
+    static void naive_matrix_from_vectors(swappable_block_matrix_type A, const column_vector_type & l,
+            const row_vector_type & r, vector_size_type offset_l = 0, vector_size_type offset_r = 0)
+    {
+        for (index_type row = 0; row < A.get_height(); ++row)
+            for (index_type col = 0; col < A.get_width(); ++col)
+                matrix_from_vectors_swappable_block(A(row, col), A.is_transposed(), A.bs,
+                        l, r, (offset_l + row) * BlockSideLength, (offset_r + col) * BlockSideLength);
+    }
+
+    static void matrix_from_vectors_swappable_block(swappable_block_identifier_type a,
+            const bool a_is_transposed, block_scheduler_type & bs_a,
+            const column_vector_type & l, const row_vector_type & r,
+            vector_size_type offset_l, vector_size_type offset_r)
+    {
+        // acquire
+        internal_block_type & ia = bs_a.acquire(a);
+        // multiply
+        if (! bs_a.is_simulating())
+        {
+            int_type row_limit = std::min(BlockSideLength, l.size() - offset_l),
+                     col_limit = std::min(BlockSideLength, r.size() - offset_r);
+            if (a_is_transposed)
+                for (int_type col = 0; col < col_limit; ++col)
+                    for (int_type row = 0; row < row_limit; ++row)
+                        ia[row + col * BlockSideLength] = l[row + offset_l] * r[col + offset_r];
+            else
+                for (int_type row = 0; row < row_limit; ++row)
+                    for (int_type col = 0; col < col_limit; ++col)
+                        ia[row * BlockSideLength + col] = l[row + offset_l] * r[col + offset_r];
+        }
+        // release
+        bs_a.release(a, true);
+    }
+
+    // +-+ end vector-vector multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 };
 
 template <typename ValueType, unsigned Level>
@@ -1867,19 +2132,19 @@ extern "C" void sgemm_(const char *transa, const char *transb,
         const float *b, const blas_int *ldb,
         const float *beta, float *c, const blas_int *ldc);
 
-typedef std::complex<float> blas_single_complex;
-extern "C" void zgemm_(const char *transa, const char *transb,
-        const blas_int *m, const blas_int *n, const blas_int *k,
-        const blas_single_complex *alpha, const blas_single_complex *a, const blas_int *lda,
-        const blas_single_complex *b, const blas_int *ldb,
-        const blas_single_complex *beta, blas_single_complex *c, const blas_int *ldc);
-
 typedef std::complex<double> blas_double_complex;
-extern "C" void cgemm_(const char *transa, const char *transb,
+extern "C" void zgemm_(const char *transa, const char *transb,
         const blas_int *m, const blas_int *n, const blas_int *k,
         const blas_double_complex *alpha, const blas_double_complex *a, const blas_int *lda,
         const blas_double_complex *b, const blas_int *ldb,
         const blas_double_complex *beta, blas_double_complex *c, const blas_int *ldc);
+
+typedef std::complex<float> blas_single_complex;
+extern "C" void cgemm_(const char *transa, const char *transb,
+        const blas_int *m, const blas_int *n, const blas_int *k,
+        const blas_single_complex *alpha, const blas_single_complex *a, const blas_int *lda,
+        const blas_single_complex *b, const blas_int *ldb,
+        const blas_single_complex *beta, blas_single_complex *c, const blas_int *ldc);
 
 template <typename ValueType>
 void gemm_(const char *transa, const char *transb,
@@ -1934,17 +2199,17 @@ void gemm_(const char *transa, const char *transb,
 template <>
 void gemm_(const char *transa, const char *transb,
         const blas_int *m, const blas_int *n, const blas_int *k,
-        const blas_single_complex *alpha, const blas_single_complex *a, const blas_int *lda,
-        const blas_single_complex *b, const blas_int *ldb,
-        const blas_single_complex *beta, blas_single_complex *c, const blas_int *ldc)
+        const blas_double_complex *alpha, const blas_double_complex *a, const blas_int *lda,
+        const blas_double_complex *b, const blas_int *ldb,
+        const blas_double_complex *beta, blas_double_complex *c, const blas_int *ldc)
 { zgemm_(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc); }
 
 template <>
 void gemm_(const char *transa, const char *transb,
         const blas_int *m, const blas_int *n, const blas_int *k,
-        const blas_double_complex *alpha, const blas_double_complex *a, const blas_int *lda,
-        const blas_double_complex *b, const blas_int *ldb,
-        const blas_double_complex *beta, blas_double_complex *c, const blas_int *ldc)
+        const blas_single_complex *alpha, const blas_single_complex *a, const blas_int *lda,
+        const blas_single_complex *b, const blas_int *ldb,
+        const blas_single_complex *beta, blas_single_complex *c, const blas_int *ldc)
 { cgemm_(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc); }
 
 //! \brief multiplies matrices A and B, adds result to C, for double entries
