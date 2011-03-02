@@ -681,7 +681,7 @@ public:
     {
         assert(width == right.height);
         matrix_type res(data->bs, height, right.width);
-        Ops::recursive_multiply_and_add(*data, *right.data, *res.data);
+        Ops::strassen_winograd_multiply_and_add(*data, *right.data, *res.data);
         return res;
     }
 
@@ -768,7 +768,7 @@ struct matrix_operations
     template <class Op> swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
                swappable_block_matrix_type & A,
-               swappable_block_matrix_type & B, Op)
+               swappable_block_matrix_type & B, Op o = Op())
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
@@ -782,7 +782,7 @@ struct matrix_operations
     // element_op<Op>(C,A) calculates C <Op>= A
     template <class Op> swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
-               const swappable_block_matrix_type & A, Op)
+               const swappable_block_matrix_type & A, Op o = Op())
     {
         for (index_type row = 0; row < C.get_height(); ++row)
             for (index_type col = 0; col < C.get_width(); ++col)
@@ -1150,29 +1150,30 @@ struct matrix_operations
                                     t2(C.bs, qb.ul.get_height(), qb.ul.get_width()),
                                     t3(C.bs, qb.ul.get_height(), qb.ul.get_width()),
                                     t4(C.bs, qb.ul.get_height(), qb.ul.get_width());
-        element_op<subtraction>(s3, qa.ul, qa.dl);
-        element_op<addition>(s1, qa.dl, qa.dr);
-        element_op<subtraction>(s2, s1, qa.ul);
-        element_op<subtraction>(s4, qa.ur, s2);
-        element_op<subtraction>(t3, qb.dr, qb.ur);
-        element_op<subtraction>(t1, qb.ur, qb.ul);
-        element_op<subtraction>(t2, qb.dr, t1);
-        element_op<subtraction>(t4, qb.dl, t2);
+        matrix_operations ops;
+        ops.element_op<subtraction>(s3, qa.ul, qa.dl);
+        ops.element_op<addition>(s1, qa.dl, qa.dr);
+        ops.element_op<subtraction>(s2, s1, qa.ul);
+        ops.element_op<subtraction>(s4, qa.ur, s2);
+        ops.element_op<subtraction>(t3, qb.dr, qb.ur);
+        ops.element_op<subtraction>(t1, qb.ur, qb.ul);
+        ops.element_op<subtraction>(t2, qb.dr, t1);
+        ops.element_op<subtraction>(t4, qb.dl, t2);
         // recursive multiplications and postadditions
         swappable_block_matrix_type px(C.bs, qc.ul.get_height(), qc.ul.get_width());
         strassen_winograd_multiply_and_add(qa.ur, qb.dl, qc.ul); // p2
         strassen_winograd_multiply_and_add(qa.ul, qb.ul, px); // p1
-        element_op<addition>(qc.ul, px);
+        ops.element_op<addition>(qc.ul, px);
         strassen_winograd_multiply_and_add(s2, t2, px); // p4
-        element_op<addition>(qc.ur, px);
+        ops.element_op<addition>(qc.ur, px);
         strassen_winograd_multiply_and_add(s3, t3, px); // p5
-        element_op<addition>(qc.dl, px);
-        element_op<addition>(qc.dr, px);
+        ops.element_op<addition>(qc.dl, px);
+        ops.element_op<addition>(qc.dr, px);
         px.set_zero();
         strassen_winograd_multiply_and_add(qa.dr, t4, qc.dl); // p7
         strassen_winograd_multiply_and_add(s1, t1, px); // p3
-        element_op<addition>(qc.dr, px);
-        element_op<addition>(qc.ur, px);
+        ops.element_op<addition>(qc.dr, px);
+        ops.element_op<addition>(qc.ur, px);
         strassen_winograd_multiply_and_add(s4, qb.dr, qc.ur); // p6
         return C;
     }
