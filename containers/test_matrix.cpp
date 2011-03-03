@@ -266,6 +266,8 @@ int main(int argc, char **argv)
 
         typedef block_scheduler< matrix_swappable_block<value_type, small_block_order> > bst;
         typedef matrix<value_type, small_block_order> mt;
+        typedef mt::row_vector_type rvt;
+        typedef mt::column_vector_type cvt;
         typedef mt::row_major_iterator mitt;
 
         bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
@@ -331,13 +333,48 @@ int main(int argc, char **argv)
 
         STXXL_MSG(matrix_stats_after - matrix_stats_before);
         STXXL_MSG(stats_after - stats_before);
+        *c *= 3;
+        *c += *a;
         {
             int_type num_err = 0;
             int_type i = 1;
             for (mitt mit = c->begin(); mit != c->end(); ++mit, ++i)
-                num_err += (*mit != i);
+                num_err += (*mit != i * 3);
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");
+        }
+
+        {
+            cvt x(rank),
+                y;
+            int_type i = 0;
+            for (cvt::iterator it = x.begin(); it != x.end(); ++it)
+                *it = ++i;
+            y = *b * x;
+            y = y + x;
+            y += x;
+            y = y - x;
+            y -= x;
+            y = x * 5;
+            y *= 5;
+
+            rvt w(rank),
+                z;
+            i = 0;
+            for (rvt::iterator it = w.begin(); it != w.end(); ++it)
+                *it = ++i;
+            z = w * *b;
+            z = z + w;
+            z += w;
+            z = z - w;
+            z -= w;
+            z = w * 5;
+            z *= 5;
+
+            *a = mt(bs, x, w);
+
+            value_type v;
+            v = w * x;
         }
 
         delete a;

@@ -26,15 +26,15 @@ __STXXL_BEGIN_NAMESPACE
 template <class C>
 class shared_object_pointer
 {
-    C * ptr;
+    C mutable *  ptr;
 
-    void new_reference()
+    void new_reference() const
     { new_reference(ptr); }
 
-    void new_reference(C * o)
+    void new_reference(C * o) const
     { if (o) o->new_reference(); }
 
-    void delete_reference()
+    void delete_reference() const
     { if (ptr && ptr->delete_reference()) delete ptr; }
 
 public:
@@ -49,8 +49,19 @@ public:
         : ptr(shared_pointer.ptr)
     { new_reference(); }
 
+    const shared_object_pointer & operator = (const shared_object_pointer & shared_pointer) const
+    { return operator = (shared_pointer.ptr); }
+
     shared_object_pointer & operator = (const shared_object_pointer & shared_pointer)
     { return operator = (shared_pointer.ptr); }
+
+    const shared_object_pointer & operator = (C * pointer) const
+    {
+        new_reference(pointer);
+        delete_reference();
+        ptr = pointer;
+        return *this;
+    }
 
     shared_object_pointer & operator = (C * pointer)
     {
@@ -63,22 +74,40 @@ public:
     ~shared_object_pointer()
     { delete_reference(); }
 
-    C & operator * () const
+    const C & operator * () const
     {
         assert (ptr);
         return *ptr;
     }
 
-    C * operator -> () const
+    C & operator * ()
+    {
+        assert (ptr);
+        return *ptr;
+    }
+
+    const C * operator -> () const
     {
         assert(ptr);
         return ptr;
     }
 
-    operator C * () const
+    C * operator -> ()
+    {
+        assert(ptr);
+        return ptr;
+    }
+
+    operator const C * () const
     { return ptr; }
 
-    C * get() const
+    operator C * ()
+    { return ptr; }
+
+    const C * get() const
+    { return ptr; }
+
+    C * get()
     { return ptr; }
 
     bool operator == (const shared_object_pointer & shared_pointer) const
@@ -91,14 +120,14 @@ public:
     { return ptr; }
 
     bool empty() const
-    { return ! ptr == 0; }
+    { return ! ptr; }
 
     //! \brief if the object is referred by this shared_object_pointer only
     bool unique() const
     { return ptr && ptr->unique(); }
 
     //! \brief Make and refer a copy if the original object was shared.
-    void unify()
+    void unify() const
     {
         if (ptr && ! ptr->unique())
             operator = (new C(*ptr));
@@ -111,7 +140,7 @@ public:
 //!   to manage references and deletion, or just do normal new and delete.
 class shared_object
 {
-    int reference_count;
+    mutable int reference_count;
 
 public:
     shared_object()
@@ -119,6 +148,9 @@ public:
 
     shared_object(const shared_object &)
         : reference_count(0) {} // coping still creates a new object
+
+    const shared_object & operator = (const shared_object &) const
+    { return *this; } // changing the contents leaves pointers unchanged
 
     shared_object & operator = (const shared_object &)
     { return *this; } // changing the contents leaves pointers unchanged
@@ -130,13 +162,13 @@ private:
     template <class C> friend class shared_object_pointer;
 
     //! \brief Call whenever setting a pointer to the object
-    void new_reference()
+    void new_reference() const
     { ++reference_count; }
 
     //! \brief Call whenever resetting (i.e. overwriting) a pointer to the object.
     //! IMPORTANT: In case of self-assignment, call AFTER new_reference().
     //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
-    bool delete_reference()
+    bool delete_reference() const
     { return (! --reference_count); }
 
     //! \brief if the shared_object is referenced by only one shared_object_pointer
