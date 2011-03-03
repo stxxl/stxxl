@@ -324,7 +324,7 @@ CPPUNIT_LINKER_OPTIONS		+= -lcppunit -ldl
 #### DEPENDENCIES ################################################
 
 HEADER_FILES_BITS	+= namespace.h noncopyable.h version.h
-HEADER_FILES_BITS	+= compat_hash_map.h
+HEADER_FILES_BITS	+= compat_hash_map.h compat_shared_ptr.h
 HEADER_FILES_BITS	+= compat_unique_ptr.h parallel.h singleton.h defines.h
 HEADER_FILES_BITS	+= verbose.h unused.h compat_type_traits.h
 HEADER_FILES_BITS	+= msvc_compatibility.h deprecated.h libstxxl.h
