@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/compat_shared_ptr.h
+ *  include/stxxl/bits/compat/shared_ptr.h
  *
  *  compatibility interface to shared_ptr (C++0x, TR1 or boost)
  *
@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER__COMPAT_SHARED_PTR_H_
-#define STXXL_HEADER__COMPAT_SHARED_PTR_H_
+#ifndef STXXL_HEADER__COMPAT__SHARED_PTR_H_
+#define STXXL_HEADER__COMPAT__SHARED_PTR_H_
 
 
 #include <memory>
@@ -53,5 +53,5 @@ namespace compat {
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER__COMPAT_SHARED_PTR_H_
+#endif // !STXXL_HEADER__COMPAT__SHARED_PTR_H_
 // vim: et:ts=4:sw=4

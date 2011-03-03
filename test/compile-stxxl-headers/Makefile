@@ -35,6 +35,7 @@ STXXL_HEADERS		+= io mng stream
 STXXL_HEADERS		+= random timer mallocstats aligned_alloc types stats
 STXXL_BITS		+= $(HEADER_FILES_BITS)
 STXXL_BITS		+= $(HEADER_FILES_COMMON:%=common/%)
+STXXL_BITS		+= $(HEADER_FILES_COMPAT:%=compat/%)
 STXXL_BITS		+= $(HEADER_FILES_IO:%=io/%)
 STXXL_BITS		+= $(HEADER_FILES_MNG:%=mng/%)
 STXXL_BITS		+= $(HEADER_FILES_CONTAINERS:%=containers/%)
