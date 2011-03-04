@@ -297,8 +297,7 @@ class swappable_block_matrix : public shared_object
 {
 public:
     typedef int_type size_type;
-    typedef int_type index_type;
-    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef int_type elem_size_type;
     typedef block_scheduler< matrix_swappable_block<ValueType, BlockSideLength> > block_scheduler_type;
     typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
     typedef std::vector<swappable_block_identifier_type> blocks_type;
@@ -308,7 +307,7 @@ public:
 
 private:
     // assigning is not allowed
-    swappable_block_matrix_type & operator = (const swappable_block_matrix_type & other);
+    swappable_block_matrix & operator = (const swappable_block_matrix & other);
 
 protected:
     //! \brief height of the matrix in blocks
@@ -324,10 +323,7 @@ protected:
     //! \brief if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
 
-    swappable_block_identifier_type & block(index_type row, index_type col)
-    { return blocks[row * width + col]; }
-
-    const swappable_block_identifier_type & block(index_type row, index_type col) const
+    swappable_block_identifier_type & bl(const size_type row, const size_type col)
     { return blocks[row * width + col]; }
 
 public:
@@ -341,9 +337,9 @@ public:
           blocks(height * width),
           elements_in_blocks_transposed(false)
     {
-        for (index_type row = 0; row < height; ++row)
-            for (index_type col = 0; col < width; ++col)
-                block(row, col) = bs.allocate_swappable_block();
+        for (size_type row = 0; row < height; ++row)
+            for (size_type col = 0; col < width; ++col)
+                bl(row, col) = bs.allocate_swappable_block();
     }
 
     //! \brief Create swappable_block_matrix of given dimensions that
@@ -351,9 +347,9 @@ public:
     //!
     //! If supermatrix is not large enough, the submatrix is padded with empty blocks.
     //! The supermatrix must not be destructed or transposed before the submatrix is destructed.
-    swappable_block_matrix(swappable_block_matrix_type & supermatrix,
+    swappable_block_matrix(const swappable_block_matrix & supermatrix,
             const size_type height_in_blocks, const size_type width_in_blocks,
-            const index_type from_row_in_blocks, const index_type from_col_in_blocks)
+            const size_type from_row_in_blocks, const size_type from_col_in_blocks)
         : bs(supermatrix.bs),
           height(height_in_blocks),
           width(width_in_blocks),
@@ -362,19 +358,19 @@ public:
           blocks(height * width),
           elements_in_blocks_transposed(supermatrix.elements_in_blocks_transposed)
     {
-        for (index_type row = 0; row < height_from_supermatrix; ++row)
+        for (size_type row = 0; row < height_from_supermatrix; ++row)
         {
-            for (index_type col = 0; col < width_from_supermatrix; ++col)
-                block(row, col) = supermatrix.block(row + from_row_in_blocks, col + from_col_in_blocks);
-            for (index_type col = width_from_supermatrix; col < width; ++col)
-                block(row, col) = bs.allocate_swappable_block();
+            for (size_type col = 0; col < width_from_supermatrix; ++col)
+                bl(row, col) = supermatrix.block(row + from_row_in_blocks, col + from_col_in_blocks);
+            for (size_type col = width_from_supermatrix; col < width; ++col)
+                bl(row, col) = bs.allocate_swappable_block();
         }
-        for (index_type row = height_from_supermatrix; row < height; ++row)
-            for (index_type col = 0; col < width; ++col)
-                block(row, col) = bs.allocate_swappable_block();
+        for (size_type row = height_from_supermatrix; row < height; ++row)
+            for (size_type col = 0; col < width; ++col)
+                bl(row, col) = bs.allocate_swappable_block();
     }
 
-    swappable_block_matrix(const swappable_block_matrix_type & other)
+    swappable_block_matrix(const swappable_block_matrix & other)
         : shared_object(other),
           bs(other.bs),
           height(other.height),
@@ -384,33 +380,50 @@ public:
           blocks(height * width),
           elements_in_blocks_transposed(false)
     {
-        for (index_type row = 0; row < height; ++row)
-            for (index_type col = 0; col < width; ++col)
-                block(row, col) = bs.allocate_swappable_block();
+        for (size_type row = 0; row < height; ++row)
+            for (size_type col = 0; col < width; ++col)
+                bl(row, col) = bs.allocate_swappable_block();
         // * 1 is copying
         Ops::element_op(*this, other, typename Ops::scalar_multiplication(1));
     }
 
     ~swappable_block_matrix()
     {
-        for (index_type row = 0; row < height_from_supermatrix; ++row)
+        for (size_type row = 0; row < height_from_supermatrix; ++row)
         {
-            for (index_type col = width_from_supermatrix; col < width; ++col)
-                bs.free_swappable_block(block(row, col));
+            for (size_type col = width_from_supermatrix; col < width; ++col)
+                bs.free_swappable_block(bl(row, col));
         }
-        for (index_type row = height_from_supermatrix; row < height; ++row)
-            for (index_type col = 0; col < width; ++col)
-                bs.free_swappable_block(block(row, col));
+        for (size_type row = height_from_supermatrix; row < height; ++row)
+            for (size_type col = 0; col < width; ++col)
+                bs.free_swappable_block(bl(row, col));
     }
+
+    static size_type block_index_from_elem(elem_size_type index)
+    { return index / BlockSideLength; }
+
+    static int_type elem_index_in_block_from_elem(elem_size_type index)
+    { return index % BlockSideLength; }
+
+    // takes care about transposed
+    int_type elem_index_in_block_from_elem(elem_size_type row, elem_size_type col) const
+    {
+        return (is_transposed())
+                 ? row % BlockSideLength + col % BlockSideLength * BlockSideLength
+                 : row % BlockSideLength * BlockSideLength + col % BlockSideLength;
+    }
+
+    swappable_block_identifier_type block(const size_type row, const size_type col) const
+    { return blocks[row * width + col]; }
+
+    swappable_block_identifier_type operator () (const size_type row, const size_type col) const
+    { return block(row, col); }
 
     const size_type & get_height() const
     { return height; }
 
     const size_type & get_width() const
     { return width; }
-
-    const swappable_block_identifier_type operator () (index_type row, index_type col) const
-    { return block(row, col); }
 
     const bool & is_transposed() const
     { return elements_in_blocks_transposed; }
@@ -419,9 +432,9 @@ public:
     {
         // transpose matrix of blocks
         blocks_type bl(blocks.size());
-        for (index_type row = 1; row < height; ++row)
-            for (index_type col = 0; col < row; ++col)
-                bl[col * height + row] = block(row,col);
+        for (size_type row = 1; row < height; ++row)
+            for (size_type col = 0; col < row; ++col)
+                bl[col * height + row] = bl(row,col);
         bl.swap(blocks);
         // swap dimensions
         std::swap(height, width);
@@ -440,58 +453,50 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix_iterator
 {
 protected:
-    typedef matrix_iterator<ValueType, BlockSideLength> matrix_iterator_type;
     typedef matrix<ValueType, BlockSideLength> matrix_type;
     typedef typename matrix_type::swappable_block_matrix_type swappable_block_matrix_type;
     typedef typename matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename block_scheduler_type::internal_block_type internal_block_type;
     typedef typename matrix_type::elem_size_type elem_size_type;
-    typedef typename matrix_type::elem_index_type elem_index_type;
     typedef typename matrix_type::block_size_type block_size_type;
-    typedef typename matrix_type::block_index_type block_index_type;
 
     template <typename VT, unsigned BSL> friend class matrix;
+    template <typename VT, unsigned BSL> friend class const_matrix_iterator;
 
-    matrix_type & m;
-    swappable_block_matrix_type & mdata;
-    block_scheduler_type & bs;
-    elem_index_type current_row, // \ both indices == -1 <=> empty iterator
-                    current_col; // /
-    block_index_type current_block_row,
-                     current_block_col;
+    matrix_type * m;
+    elem_size_type current_row, // \ both indices == -1 <=> empty iterator
+                   current_col; // /
+    block_size_type current_block_row,
+                    current_block_col;
     internal_block_type * current_iblock; // NULL if block is not acquired
 
     void acquire_current_iblock()
     {
         if (! current_iblock)
-            current_iblock = & bs.acquire(mdata(current_block_row, current_block_col));
+            current_iblock = & m->data->bs.acquire(m->data->block(current_block_row, current_block_col));
     }
 
     void release_current_iblock()
     {
         if (current_iblock)
         {
-            bs.release(mdata(current_block_row, current_block_col), true);
+            m->data->bs.release(m->data->block(current_block_row, current_block_col), true);
             current_iblock = 0;
         }
     }
 
     //! \brief create iterator pointing to given row and col
-    matrix_iterator(matrix_type & matrix, const elem_index_type start_row, const elem_index_type start_col)
-        : m(matrix),
-          mdata(*matrix.data),
-          bs(mdata.bs),
+    matrix_iterator(matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
+        : m(&matrix),
           current_row(start_row),
           current_col(start_col),
-          current_block_row(m.block_index_from_elem(start_row)),
-          current_block_col(m.block_index_from_elem(start_col)),
+          current_block_row(m->data->block_index_from_elem(start_row)),
+          current_block_col(m->data->block_index_from_elem(start_col)),
           current_iblock(0) {}
 
     //! \brief create empty iterator
     matrix_iterator(matrix_type & matrix)
-        : m(matrix),
-          mdata(*matrix.data),
-          bs(mdata.bs),
+        : m(&matrix),
           current_row(-1), // empty iterator
           current_col(-1),
           current_block_row(-1),
@@ -507,10 +512,8 @@ protected:
         current_block_col = -1;
     }
 public:
-    matrix_iterator(const matrix_iterator_type & other)
+    matrix_iterator(const matrix_iterator & other)
         : m(other.m),
-          mdata(other.mdata),
-          bs(other.bs),
           current_row(other.current_row),
           current_col(other.current_col),
           current_block_row(other.current_block_row),
@@ -521,10 +524,10 @@ public:
             acquire_current_iblock();
     }
 
-    matrix_iterator_type & operator = (const matrix_iterator_type & other)
+    matrix_iterator & operator = (const matrix_iterator & other)
     {
-        assert(&m == &other.m);
         set_pos(other.current_row, other.current_col);
+        m = other.m;
         if (other.current_iblock)
             acquire_current_iblock();
         return *this;
@@ -533,9 +536,9 @@ public:
     ~matrix_iterator()
     { release_current_iblock(); }
 
-    void set_row(const elem_index_type new_row)
+    void set_row(const elem_size_type new_row)
     {
-        const block_index_type new_block_row = m.block_index_from_elem(new_row);
+        const block_size_type new_block_row = m->data->block_index_from_elem(new_row);
         if (new_block_row != current_block_row)
         {
             release_current_iblock();
@@ -544,9 +547,9 @@ public:
         current_row = new_row;
     }
 
-    void set_col(const elem_index_type new_col)
+    void set_col(const elem_size_type new_col)
     {
-        const block_index_type new_block_col = m.block_index_from_elem(new_col);
+        const block_size_type new_block_col = m->data->block_index_from_elem(new_col);
         if (new_block_col != current_block_col)
         {
             release_current_iblock();
@@ -555,10 +558,10 @@ public:
         current_col = new_col;
     }
 
-    void set_pos(const elem_index_type new_row, const elem_index_type new_col)
+    void set_pos(const elem_size_type new_row, const elem_size_type new_col)
     {
-        const block_index_type new_block_row = m.block_index_from_elem(new_row),
-                new_block_col = m.block_index_from_elem(new_col);
+        const block_size_type new_block_row = m->data->block_index_from_elem(new_row),
+                new_block_col = m->data->block_index_from_elem(new_col);
         if (new_block_col != current_block_col || new_block_row != current_block_row)
         {
             release_current_iblock();
@@ -569,16 +572,16 @@ public:
         current_col = new_col;
     }
 
-    void set_pos(const std::pair<elem_index_type, elem_index_type> new_pos)
+    void set_pos(const std::pair<elem_size_type, elem_size_type> new_pos)
     { set_pos(new_pos.first, new_pos.second); }
 
-    elem_index_type get_row() const
+    const elem_size_type & get_row() const
     { return current_row; }
 
-    elem_index_type get_col() const
+    const elem_size_type & get_col() const
     { return current_col; }
 
-    std::pair<elem_index_type, elem_index_type> get_pos() const
+    std::pair<elem_size_type, elem_size_type> get_pos() const
     { return std::make_pair(current_row, current_col); }
 
     bool empty() const
@@ -587,17 +590,16 @@ public:
     operator bool () const
     { return ! empty(); }
 
-    bool operator == (const matrix_iterator_type & other) const
+    bool operator == (const matrix_iterator & other) const
     {
-        assert(&m == &other.m);
-        return current_row == other.current_row && current_col == other.current_col;
+        return current_row == other.current_row && current_col == other.current_col && m == other.m;
     }
 
     // do not store reference
     ValueType & operator * ()
     {
         acquire_current_iblock();
-        return (*current_iblock)[m.elem_index_in_block_from_elem(current_row, current_col)];
+        return (*current_iblock)[m->data->elem_index_in_block_from_elem(current_row, current_col)];
     }
 };
 
@@ -606,9 +608,8 @@ class matrix_row_major_iterator : public matrix_iterator<ValueType, BlockSideLen
 {
 protected:
     typedef matrix_iterator<ValueType, BlockSideLength> matrix_iterator_type;
-    typedef matrix_row_major_iterator<ValueType, BlockSideLength> matrix_row_major_iterator_type;
     typedef typename matrix_iterator_type::matrix_type matrix_type;
-    typedef typename matrix_iterator_type::elem_index_type elem_index_type;
+    typedef typename matrix_iterator_type::elem_size_type elem_size_type;
 
     template <typename VT, unsigned BSL> friend class matrix;
 
@@ -616,12 +617,12 @@ protected:
     using matrix_iterator_type::set_empty;
 
     //! \brief create iterator pointing to given row and col
-    matrix_row_major_iterator(matrix_type & matrix, const elem_index_type start_row, const elem_index_type start_col)
+    matrix_row_major_iterator(matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
         : matrix_iterator_type(matrix, start_row, start_col) {}
 
     //! \brief create empty iterator
     matrix_row_major_iterator(matrix_type & matrix)
-    : matrix_iterator_type(matrix) {}
+        : matrix_iterator_type(matrix) {}
 
 public:
     //! \brief convert from matrix_iterator
@@ -629,12 +630,12 @@ public:
         : matrix_iterator_type(matrix_iterator) {}
 
     // Has to be not empty, else behavior is undefined.
-    matrix_row_major_iterator_type & operator ++ ()
+    matrix_row_major_iterator & operator ++ ()
     {
-        if (get_col() + 1 < m.get_width())
-            // => not at the end of row, move right
+        if (get_col() + 1 < m->get_width())
+            // => not matrix_row_major_iterator the end of row, move right
             set_col(get_col() + 1);
-        else if (get_row() + 1 < m.get_height())
+        else if (get_row() + 1 < m->get_height())
             // => at end of row but not last row, move to beginning of next row
             set_pos(get_row() + 1, 0);
         else
@@ -644,7 +645,7 @@ public:
     }
 
     // Has to be not empty, else behavior is undefined.
-    matrix_row_major_iterator_type & operator -- ()
+    matrix_row_major_iterator & operator -- ()
     {
         if (get_col() - 1 >= 0)
             // => not at the beginning of row, move left
@@ -669,9 +670,8 @@ class matrix_col_major_iterator : public matrix_iterator<ValueType, BlockSideLen
 {
 protected:
     typedef matrix_iterator<ValueType, BlockSideLength> matrix_iterator_type;
-    typedef matrix_col_major_iterator<ValueType, BlockSideLength> matrix_col_major_iterator_type;
     typedef typename matrix_iterator_type::matrix_type matrix_type;
-    typedef typename matrix_iterator_type::elem_index_type elem_index_type;
+    typedef typename matrix_iterator_type::elem_size_type elem_size_type;
 
     template <typename VT, unsigned BSL> friend class matrix;
 
@@ -679,7 +679,7 @@ protected:
     using matrix_iterator_type::set_empty;
 
     //! \brief create iterator pointing to given row and col
-    matrix_col_major_iterator(matrix_type & matrix, const elem_index_type start_row, const elem_index_type start_col)
+    matrix_col_major_iterator(matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
         : matrix_iterator_type(matrix, start_row, start_col) {}
 
     //! \brief create empty iterator
@@ -692,12 +692,12 @@ public:
         : matrix_iterator_type(matrix_iterator) {}
 
     // Has to be not empty, else behavior is undefined.
-    matrix_col_major_iterator_type & operator ++ ()
+    matrix_col_major_iterator & operator ++ ()
     {
-        if (get_row() + 1 < m.get_height())
+        if (get_row() + 1 < m->get_height())
             // => not at the end of col, move down
             set_row(get_row() + 1);
-        else if (get_col() + 1 < m.get_width())
+        else if (get_col() + 1 < m->get_width())
             // => at end of col but not last col, move to beginning of next col
             set_pos(0, get_col() + 1);
         else
@@ -707,14 +707,14 @@ public:
     }
 
     // Has to be not empty, else behavior is undefined.
-    matrix_col_major_iterator_type & operator -- ()
+    matrix_col_major_iterator & operator -- ()
     {
         if (get_row() - 1 >= 0)
             // => not at the beginning of col, move up
             set_row(get_row() - 1);
         else if (get_col() - 1 >= 0)
             // => at beginning of col but not first col, move to end of previous col
-            set_pos(m.get_height() - 1, get_col() - 1);
+            set_pos(m->get_height() - 1, get_col() - 1);
         else
             // => at beginning of matrix, set to empty-state
             set_empty();
@@ -727,48 +727,333 @@ public:
     using matrix_iterator_type::set_pos;
 };
 
+template <typename ValueType, unsigned BlockSideLength>
+class const_matrix_iterator
+{
+protected:
+    typedef matrix<ValueType, BlockSideLength> matrix_type;
+    typedef typename matrix_type::swappable_block_matrix_type swappable_block_matrix_type;
+    typedef typename matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename matrix_type::elem_size_type elem_size_type;
+    typedef typename matrix_type::block_size_type block_size_type;
+
+    template <typename VT, unsigned BSL> friend class matrix;
+
+    const matrix_type * m;
+    elem_size_type current_row, // \ both indices == -1 <=> empty iterator
+                   current_col; // /
+    block_size_type current_block_row,
+                    current_block_col;
+    internal_block_type * current_iblock; // NULL if block is not acquired
+
+    void acquire_current_iblock()
+    {
+        if (! current_iblock)
+            current_iblock = & m->data->bs.acquire(m->data->block(current_block_row, current_block_col));
+    }
+
+    void release_current_iblock()
+    {
+        if (current_iblock)
+        {
+            m->data->bs.release(m->data->block(current_block_row, current_block_col), false);
+            current_iblock = 0;
+        }
+    }
+
+    //! \brief create iterator pointing to given row and col
+    const_matrix_iterator(const matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
+        : m(&matrix),
+          current_row(start_row),
+          current_col(start_col),
+          current_block_row(m->data->block_index_from_elem(start_row)),
+          current_block_col(m->data->block_index_from_elem(start_col)),
+          current_iblock(0) {}
+
+    //! \brief create empty iterator
+    const_matrix_iterator(const matrix_type & matrix)
+        : m(&matrix),
+          current_row(-1), // empty iterator
+          current_col(-1),
+          current_block_row(-1),
+          current_block_col(-1),
+          current_iblock(0) {}
+
+    void set_empty()
+    {
+        release_current_iblock();
+        current_row = -1;
+        current_col = -1;
+        current_block_row = -1;
+        current_block_col = -1;
+    }
+public:
+    const_matrix_iterator(const matrix_iterator<ValueType, BlockSideLength> & other)
+        : m(other.m),
+          current_row(other.current_row),
+          current_col(other.current_col),
+          current_block_row(other.current_block_row),
+          current_block_col(other.current_block_col),
+          current_iblock(0)
+    {
+        if (other.current_iblock)
+            acquire_current_iblock();
+    }
+
+    const_matrix_iterator(const const_matrix_iterator & other)
+        : m(other.m),
+          current_row(other.current_row),
+          current_col(other.current_col),
+          current_block_row(other.current_block_row),
+          current_block_col(other.current_block_col),
+          current_iblock(0)
+    {
+        if (other.current_iblock)
+            acquire_current_iblock();
+    }
+
+    const_matrix_iterator & operator = (const const_matrix_iterator & other)
+    {
+        set_pos(other.current_row, other.current_col);
+        m = other.m;
+        if (other.current_iblock)
+            acquire_current_iblock();
+        return *this;
+    }
+
+    ~const_matrix_iterator()
+    { release_current_iblock(); }
+
+    void set_row(const elem_size_type new_row)
+    {
+        const block_size_type new_block_row = m->data->block_index_from_elem(new_row);
+        if (new_block_row != current_block_row)
+        {
+            release_current_iblock();
+            current_block_row = new_block_row;
+        }
+        current_row = new_row;
+    }
+
+    void set_col(const elem_size_type new_col)
+    {
+        const block_size_type new_block_col = m->data->block_index_from_elem(new_col);
+        if (new_block_col != current_block_col)
+        {
+            release_current_iblock();
+            current_block_col = new_block_col;
+        }
+        current_col = new_col;
+    }
+
+    void set_pos(const elem_size_type new_row, const elem_size_type new_col)
+    {
+        const block_size_type new_block_row = m->data->block_index_from_elem(new_row),
+                new_block_col = m->data->block_index_from_elem(new_col);
+        if (new_block_col != current_block_col || new_block_row != current_block_row)
+        {
+            release_current_iblock();
+            current_block_row = new_block_row;
+            current_block_col = new_block_col;
+        }
+        current_row = new_row;
+        current_col = new_col;
+    }
+
+    void set_pos(const std::pair<elem_size_type, elem_size_type> new_pos)
+    { set_pos(new_pos.first, new_pos.second); }
+
+    const elem_size_type & get_row() const
+    { return current_row; }
+
+    const elem_size_type & get_col() const
+    { return current_col; }
+
+    std::pair<elem_size_type, elem_size_type> get_pos() const
+    { return std::make_pair(current_row, current_col); }
+
+    bool empty() const
+    { return current_row == -1 && current_col == -1; }
+
+    operator bool () const
+    { return ! empty(); }
+
+    bool operator == (const const_matrix_iterator & other) const
+    {
+        return current_row == other.current_row && current_col == other.current_col && m == other.m;
+    }
+
+    // do not store reference
+    const ValueType & operator * ()
+    {
+        acquire_current_iblock();
+        return (*current_iblock)[m->data->elem_index_in_block_from_elem(current_row, current_col)];
+    }
+};
+
+template <typename ValueType, unsigned BlockSideLength>
+class const_matrix_row_major_iterator : public const_matrix_iterator<ValueType, BlockSideLength>
+{
+protected:
+    typedef const_matrix_iterator<ValueType, BlockSideLength> const_matrix_iterator_type;
+    typedef typename const_matrix_iterator_type::matrix_type matrix_type;
+    typedef typename const_matrix_iterator_type::elem_size_type elem_size_type;
+
+    template <typename VT, unsigned BSL> friend class matrix;
+
+    using const_matrix_iterator_type::m;
+    using const_matrix_iterator_type::set_empty;
+
+    //! \brief create iterator pointing to given row and col
+    const_matrix_row_major_iterator(const matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
+        : const_matrix_iterator_type(matrix, start_row, start_col) {}
+
+    //! \brief create empty iterator
+    const_matrix_row_major_iterator(const matrix_type & matrix)
+        : const_matrix_iterator_type(matrix) {}
+
+public:
+    //! \brief convert from matrix_iterator
+    const_matrix_row_major_iterator(const const_matrix_row_major_iterator & matrix_iterator)
+        : const_matrix_iterator_type(matrix_iterator) {}
+
+    //! \brief convert from matrix_iterator
+    const_matrix_row_major_iterator(const const_matrix_iterator_type & matrix_iterator)
+        : const_matrix_iterator_type(matrix_iterator) {}
+
+    // Has to be not empty, else behavior is undefined.
+    const_matrix_row_major_iterator & operator ++ ()
+    {
+        if (get_col() + 1 < m->get_width())
+            // => not matrix_row_major_iterator the end of row, move right
+            set_col(get_col() + 1);
+        else if (get_row() + 1 < m->get_height())
+            // => at end of row but not last row, move to beginning of next row
+            set_pos(get_row() + 1, 0);
+        else
+            // => at end of matrix, set to empty-state
+            set_empty();
+        return *this;
+    }
+
+    // Has to be not empty, else behavior is undefined.
+    const_matrix_row_major_iterator & operator -- ()
+    {
+        if (get_col() - 1 >= 0)
+            // => not at the beginning of row, move left
+            set_col(get_col() - 1);
+        else if (get_row() - 1 >= 0)
+            // => at beginning of row but not first row, move to end of previous row
+            set_pos(get_row() - 1, m.get_width() - 1);
+        else
+            // => at beginning of matrix, set to empty-state
+            set_empty();
+        return *this;
+    }
+
+    using const_matrix_iterator_type::get_row;
+    using const_matrix_iterator_type::get_col;
+    using const_matrix_iterator_type::set_col;
+    using const_matrix_iterator_type::set_pos;
+};
+
+template <typename ValueType, unsigned BlockSideLength>
+class const_matrix_col_major_iterator : public const_matrix_iterator<ValueType, BlockSideLength>
+{
+protected:
+    typedef const_matrix_iterator<ValueType, BlockSideLength> const_matrix_iterator_type;
+    typedef typename const_matrix_iterator_type::matrix_type matrix_type;
+    typedef typename const_matrix_iterator_type::elem_size_type elem_size_type;
+
+    template <typename VT, unsigned BSL> friend class matrix;
+
+    using const_matrix_iterator_type::m;
+    using const_matrix_iterator_type::set_empty;
+
+    //! \brief create iterator pointing to given row and col
+    const_matrix_col_major_iterator(const matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
+        : const_matrix_iterator_type(matrix, start_row, start_col) {}
+
+    //! \brief create empty iterator
+    const_matrix_col_major_iterator(const matrix_type & matrix)
+        : const_matrix_iterator_type(matrix) {}
+
+public:
+    //! \brief convert from matrix_iterator
+    const_matrix_col_major_iterator(const matrix_iterator<ValueType, BlockSideLength> & matrix_iterator)
+        : const_matrix_iterator_type(matrix_iterator) {}
+
+    //! \brief convert from matrix_iterator
+    const_matrix_col_major_iterator(const const_matrix_iterator_type & matrix_iterator)
+        : const_matrix_iterator_type(matrix_iterator) {}
+
+    // Has to be not empty, else behavior is undefined.
+    const_matrix_col_major_iterator & operator ++ ()
+    {
+        if (get_row() + 1 < m->get_height())
+            // => not at the end of col, move down
+            set_row(get_row() + 1);
+        else if (get_col() + 1 < m->get_width())
+            // => at end of col but not last col, move to beginning of next col
+            set_pos(0, get_col() + 1);
+        else
+            // => at end of matrix, set to empty-state
+            set_empty();
+        return *this;
+    }
+
+    // Has to be not empty, else behavior is undefined.
+    const_matrix_col_major_iterator & operator -- ()
+    {
+        if (get_row() - 1 >= 0)
+            // => not at the beginning of col, move up
+            set_row(get_row() - 1);
+        else if (get_col() - 1 >= 0)
+            // => at beginning of col but not first col, move to end of previous col
+            set_pos(m->get_height() - 1, get_col() - 1);
+        else
+            // => at beginning of matrix, set to empty-state
+            set_empty();
+        return *this;
+    }
+
+    using const_matrix_iterator_type::get_row;
+    using const_matrix_iterator_type::get_col;
+    using const_matrix_iterator_type::set_row;
+    using const_matrix_iterator_type::set_pos;
+};
+
 //! \brief External matrix container.
 template <typename ValueType, unsigned BlockSideLength>
 class matrix
 {
 protected:
-    typedef int_type elem_size_type;
-    typedef int_type elem_index_type;
     typedef matrix<ValueType, BlockSideLength> matrix_type;
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
     typedef shared_object_pointer<swappable_block_matrix_type> swappable_block_matrix_pointer_type;
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::size_type block_size_type;
-    typedef typename swappable_block_matrix_type::index_type block_index_type;
+    typedef typename swappable_block_matrix_type::elem_size_type elem_size_type;
     typedef matrix_operations<ValueType, BlockSideLength> Ops;
 
 public:
     typedef matrix_iterator<ValueType, BlockSideLength> iterator;
+    typedef const_matrix_iterator<ValueType, BlockSideLength> const_iterator;
     typedef matrix_row_major_iterator<ValueType, BlockSideLength> row_major_iterator;
     typedef matrix_col_major_iterator<ValueType, BlockSideLength> col_major_iterator;
+    typedef const_matrix_row_major_iterator<ValueType, BlockSideLength> const_row_major_iterator;
+    typedef const_matrix_col_major_iterator<ValueType, BlockSideLength> const_col_major_iterator;
     typedef column_vector<ValueType> column_vector_type;
     typedef row_vector<ValueType> row_vector_type;
 
 protected:
     template <typename VT, unsigned BSL> friend class matrix_iterator;
+    template <typename VT, unsigned BSL> friend class const_matrix_iterator;
 
     elem_size_type height,
                    width;
     swappable_block_matrix_pointer_type data;
-
-    static block_index_type block_index_from_elem(elem_index_type index)
-    { return index / BlockSideLength; }
-
-    static int_type elem_index_in_block_from_elem(elem_index_type index)
-    { return index % BlockSideLength; }
-
-    // takes care about transposed
-    int_type elem_index_in_block_from_elem(elem_index_type row, elem_index_type col)
-    {
-        return (data->is_transposed())
-                 ? row % BlockSideLength + col % BlockSideLength * BlockSideLength
-                 : row % BlockSideLength * BlockSideLength + col % BlockSideLength;
-    }
 
 public:
     //! \brief Creates a new matrix of given dimensions. Elements' values are set to zero.
@@ -801,15 +1086,29 @@ public:
         data.unify();
         return iterator(*this, 0, 0);
     }
+    const_iterator begin() const
+    { return const_iterator(*this, 0, 0); }
+    const_iterator cbegin() const
+    { return const_iterator(*this, 0, 0); }
 
     iterator end()
     {
         data.unify();
         return iterator(*this);
     }
+    const_iterator end() const
+    { return const_iterator(*this); }
+    const_iterator cend() const
+    { return const_iterator(*this); }
 
-    ValueType operator () (elem_index_type row, elem_index_type col) const
-    { return *iterator(*this, row, col); }
+    const_iterator operator () (const elem_size_type row, const elem_size_type col) const
+    { return const_iterator(*this, row, col); }
+
+    iterator operator () (const elem_size_type row, const elem_size_type col)
+    {
+        data.unify();
+        return iterator(*this, row, col);
+    }
 
     void transpose()
     {
@@ -930,7 +1229,6 @@ struct matrix_operations
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
     typedef typename block_scheduler_type::internal_block_type internal_block_type;
-    typedef typename swappable_block_matrix_type::index_type index_type;
     typedef typename swappable_block_matrix_type::size_type size_type;
     typedef column_vector<ValueType> column_vector_type;
     typedef row_vector<ValueType> row_vector_type;
@@ -977,11 +1275,11 @@ struct matrix_operations
     // element_op<Op>(C,A,B) calculates C = A <Op> B
     template <class Op> static swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C,
-               swappable_block_matrix_type & A,
-               swappable_block_matrix_type & B, Op op = Op())
+               const swappable_block_matrix_type & A,
+               const swappable_block_matrix_type & B, Op op = Op())
     {
-        for (index_type row = 0; row < C.get_height(); ++row)
-            for (index_type col = 0; col < C.get_width(); ++col)
+        for (size_type row = 0; row < C.get_height(); ++row)
+            for (size_type col = 0; col < C.get_width(); ++col)
                 element_op_swappable_block(
                         C(row, col), C.is_transposed(), C.bs,
                         A(row, col), A.is_transposed(), A.bs,
@@ -994,8 +1292,8 @@ struct matrix_operations
     element_op(swappable_block_matrix_type & C,
                const swappable_block_matrix_type & A, Op op = Op())
     {
-        for (index_type row = 0; row < C.get_height(); ++row)
-            for (index_type col = 0; col < C.get_width(); ++col)
+        for (size_type row = 0; row < C.get_height(); ++row)
+            for (size_type col = 0; col < C.get_width(); ++col)
                 element_op_swappable_block(
                         C(row, col), C.is_transposed(), C.bs,
                         A(row, col), A.is_transposed(), A.bs, op);
@@ -1006,8 +1304,8 @@ struct matrix_operations
     template <class Op> static swappable_block_matrix_type &
     element_op(swappable_block_matrix_type & C, Op op = Op())
     {
-        for (index_type row = 0; row < C.get_height(); ++row)
-            for (index_type col = 0; col < C.get_width(); ++col)
+        for (size_type row = 0; row < C.get_height(); ++row)
+            for (size_type col = 0; col < C.get_width(); ++col)
                 element_op_swappable_block(
                         C(row, col), C.is_transposed(), C.bs, op);
         return C;
@@ -1240,7 +1538,7 @@ struct matrix_operations
                                     downleft, downright,
                 & ul, & ur, & dl, & dr;
 
-        swappable_block_matrix_quarterer(swappable_block_matrix_type & whole)
+        swappable_block_matrix_quarterer(const swappable_block_matrix_type & whole)
             : upleft   (whole, whole.get_height()/2, whole.get_width()/2,                    0,                   0),
               upright  (whole, whole.get_height()/2, whole.get_width()/2,                    0, whole.get_width()/2),
               downleft (whole, whole.get_height()/2, whole.get_width()/2, whole.get_height()/2,                   0),
@@ -1255,7 +1553,7 @@ struct matrix_operations
                                     downleft, downright,
                 & ul, & ur, & dl, & dr;
 
-        swappable_block_matrix_padding_quarterer(swappable_block_matrix_type & whole)
+        swappable_block_matrix_padding_quarterer(const swappable_block_matrix_type & whole)
             : upleft   (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2),                              0,                             0),
               upright  (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2),                              0, div_ceil(whole.get_width(),2)),
               downleft (whole, div_ceil(whole.get_height(),2), div_ceil(whole.get_width(),2), div_ceil(whole.get_height(),2),                             0),
@@ -1269,7 +1567,7 @@ struct matrix_operations
                                     downleft, downright,
                 & ul, & ur, & dl, & dr;
 
-        swappable_block_matrix_approximative_quarterer(swappable_block_matrix_type & whole)
+        swappable_block_matrix_approximative_quarterer(const swappable_block_matrix_type & whole)
             : upleft   (whole,                      whole.get_height()/2,                     whole.get_width()/2,                    0,                   0),
               upright  (whole,                      whole.get_height()/2, whole.get_width() - whole.get_width()/2,                    0, whole.get_width()/2),
               downleft (whole, whole.get_height() - whole.get_height()/2,                     whole.get_width()/2, whole.get_height()/2,                   0),
@@ -1280,8 +1578,8 @@ struct matrix_operations
     //! \brief calculates C = A * B + C
     // requires fitting dimensions
     static swappable_block_matrix_type &
-    multi_level_strassen_winograd_multiply_and_add(swappable_block_matrix_type & A,
-                                                   swappable_block_matrix_type & B,
+    multi_level_strassen_winograd_multiply_and_add(const swappable_block_matrix_type & A,
+                                                   const swappable_block_matrix_type & B,
                                                    swappable_block_matrix_type & C)
     {
         int_type p = log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
@@ -1297,8 +1595,8 @@ struct matrix_operations
     }
 
     // input matrices have to be padded
-    static void choose_level_for_feedable_sw(swappable_block_matrix_type & A,
-                                             swappable_block_matrix_type & B,
+    static void choose_level_for_feedable_sw(const swappable_block_matrix_type & A,
+                                             const swappable_block_matrix_type & B,
                                              swappable_block_matrix_type & C)
     {
         switch (log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
@@ -1325,8 +1623,8 @@ struct matrix_operations
 
     // input matrices have to be padded
     template <unsigned Level>
-    static void use_feedable_sw(swappable_block_matrix_type & A,
-                                swappable_block_matrix_type & B,
+    static void use_feedable_sw(const swappable_block_matrix_type & A,
+                                const swappable_block_matrix_type & B,
                                 swappable_block_matrix_type & C)
     {
         feedable_strassen_winograd<ValueType, BlockSideLength, Level, true, true>
@@ -1334,8 +1632,8 @@ struct matrix_operations
         // preadditions for A
         matrix_to_quadtree<ValueType, BlockSideLength, Level>
                 mtq_a (A);
-        for (index_type block_row = 0; block_row < mtq_a.get_height_in_blocks(); ++block_row)
-            for (index_type block_col = 0; block_col < mtq_a.get_width_in_blocks(); ++block_col)
+        for (size_type block_row = 0; block_row < mtq_a.get_height_in_blocks(); ++block_row)
+            for (size_type block_col = 0; block_col < mtq_a.get_width_in_blocks(); ++block_col)
             {
                 fsw.begin_feeding_a_block(block_row, block_col,
                         mtq_a.begin_reading_block(block_row, block_col));
@@ -1352,8 +1650,8 @@ struct matrix_operations
         // preadditions for B
         matrix_to_quadtree<ValueType, BlockSideLength, Level>
                 mtq_b (B);
-        for (index_type block_row = 0; block_row < mtq_b.get_height_in_blocks(); ++block_row)
-            for (index_type block_col = 0; block_col < mtq_b.get_width_in_blocks(); ++block_col)
+        for (size_type block_row = 0; block_row < mtq_b.get_height_in_blocks(); ++block_row)
+            for (size_type block_col = 0; block_col < mtq_b.get_width_in_blocks(); ++block_col)
             {
                 fsw.begin_feeding_b_block(block_row, block_col,
                         mtq_b.begin_reading_block(block_row, block_col));
@@ -1372,8 +1670,8 @@ struct matrix_operations
         // postadditions
         matrix_to_quadtree<ValueType, BlockSideLength, Level>
                 mtq_c (C);
-        for (index_type block_row = 0; block_row < mtq_c.get_height_in_blocks(); ++block_row)
-            for (index_type block_col = 0; block_col < mtq_c.get_width_in_blocks(); ++block_col)
+        for (size_type block_row = 0; block_row < mtq_c.get_height_in_blocks(); ++block_row)
+            for (size_type block_col = 0; block_col < mtq_c.get_width_in_blocks(); ++block_col)
             {
                 mtq_c.begin_feeding_block(block_row, block_col,
                         fsw.begin_reading_block(block_row, block_col));
@@ -1393,8 +1691,8 @@ struct matrix_operations
     //! \brief calculates C = A * B + C
     // assumes fitting dimensions
     static swappable_block_matrix_type &
-    strassen_winograd_multiply_and_add(swappable_block_matrix_type & A,
-                                       swappable_block_matrix_type & B,
+    strassen_winograd_multiply_and_add(const swappable_block_matrix_type & A,
+                                       const swappable_block_matrix_type & B,
                                        swappable_block_matrix_type & C)
     {
         // base case
@@ -1442,8 +1740,8 @@ struct matrix_operations
     //! \brief calculates C = A * B + C
     // assumes fitting dimensions
     static swappable_block_matrix_type &
-    recursive_multiply_and_add(swappable_block_matrix_type & A,
-                               swappable_block_matrix_type & B,
+    recursive_multiply_and_add(const swappable_block_matrix_type & A,
+                               const swappable_block_matrix_type & B,
                                swappable_block_matrix_type & C)
     {
         // catch empty intervals
@@ -1472,16 +1770,16 @@ struct matrix_operations
     //! \brief calculates C = A * B + C
     // requires fitting dimensions
     static swappable_block_matrix_type &
-    naive_multiply_and_add(swappable_block_matrix_type & A,
-                           swappable_block_matrix_type & B,
+    naive_multiply_and_add(const swappable_block_matrix_type & A,
+                           const swappable_block_matrix_type & B,
                            swappable_block_matrix_type & C)
     {
         const size_type & n = C.get_height(),
                         & m = C.get_width(),
                         & l = A.get_width();
-        for (index_type i = 0; i < n; ++i)
-            for (index_type j = 0; j < m; ++j)
-                for (index_type k = 0; k < l; ++k)
+        for (size_type i = 0; i < n; ++i)
+            for (size_type j = 0; j < m; ++j)
+                for (size_type k = 0; k < l; ++k)
                     multiply_and_add_swappable_block(A(i,k), A.is_transposed(), A.bs,
                                                      B(k,j), B.is_transposed(), B.bs,
                                                      C(i,j), C.is_transposed(), C.bs);
@@ -1521,7 +1819,7 @@ struct matrix_operations
 
     //! \brief calculates z = A * x
     static column_vector_type &
-    recursive_matrix_col_vector_multiply_and_add(swappable_block_matrix_type & A,
+    recursive_matrix_col_vector_multiply_and_add(const swappable_block_matrix_type & A,
                                          const column_vector_type & x, column_vector_type & z,
                                          const vector_size_type offset_x = 0, const vector_size_type offset_z = 0)
     {
@@ -1549,8 +1847,8 @@ struct matrix_operations
                                      const column_vector_type & x, column_vector_type & z,
                                      const vector_size_type offset_x = 0, const vector_size_type offset_z = 0)
     {
-        for (index_type row = 0; row < A.get_height(); ++row)
-            for (index_type col = 0; col < A.get_width(); ++col)
+        for (size_type row = 0; row < A.get_height(); ++row)
+            for (size_type col = 0; col < A.get_width(); ++col)
                 matrix_col_vector_multiply_and_add_swappable_block(A(row, col), A.is_transposed(), A.bs,
                         x, z, (offset_x + col) * BlockSideLength, (offset_z + row) * BlockSideLength);
         return z;
@@ -1590,7 +1888,7 @@ struct matrix_operations
     //! \brief calculates z = y * A
     static row_vector_type &
     recursive_matrix_row_vector_multiply_and_add(const row_vector_type & y,
-            swappable_block_matrix_type & A, row_vector_type & z,
+            const swappable_block_matrix_type & A, row_vector_type & z,
             const vector_size_type offset_y = 0, const vector_size_type offset_z = 0)
     {
         // catch empty intervals
@@ -1617,8 +1915,8 @@ struct matrix_operations
                                      row_vector_type & z,
                                      const vector_size_type offset_y = 0, const vector_size_type offset_z = 0)
     {
-        for (index_type row = 0; row < A.get_height(); ++row)
-            for (index_type col = 0; col < A.get_width(); ++col)
+        for (size_type row = 0; row < A.get_height(); ++row)
+            for (size_type col = 0; col < A.get_width(); ++col)
                 matrix_row_vector_multiply_and_add_swappable_block(y, A(row, col), A.is_transposed(), A.bs,
                         z, (offset_y + row) * BlockSideLength, (offset_z + col) * BlockSideLength);
         return z;
@@ -1685,8 +1983,8 @@ struct matrix_operations
     static void naive_matrix_from_vectors(swappable_block_matrix_type A, const column_vector_type & l,
             const row_vector_type & r, vector_size_type offset_l = 0, vector_size_type offset_r = 0)
     {
-        for (index_type row = 0; row < A.get_height(); ++row)
-            for (index_type col = 0; col < A.get_width(); ++col)
+        for (size_type row = 0; row < A.get_height(); ++row)
+            for (size_type col = 0; col < A.get_width(); ++col)
                 matrix_from_vectors_swappable_block(A(row, col), A.is_transposed(), A.bs,
                         l, r, (offset_l + row) * BlockSideLength, (offset_r + col) * BlockSideLength);
     }
@@ -1793,22 +2091,6 @@ struct static_quadtree<ValueType, 0>
 
     static_quadtree operator - (const static_quadtree & right) const
     { return val - right.val; }
-
-    /* superfluous conversions
-    static_quadtree(const static_quadtree & sqt)
-        : val(sqt.val) {}
-
-    static_quadtree & operator = (const static_quadtree & sqt)
-    {
-        val = sqt.val;
-        return *this;
-    }
-
-    static_quadtree & operator = (const ValueType & v)
-    {
-        val = v;
-        return *this;
-    }*/
 };
 
 template <typename ValueType, unsigned BlockSideLength, bool AExists, bool BExists>
@@ -1821,16 +2103,15 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename block_scheduler_type::internal_block_type internal_block_type;
     typedef typename swappable_block_matrix_type::size_type size_type;
-    typedef typename swappable_block_matrix_type::index_type index_type;
 
     swappable_block_matrix_type a, b, c;
     const size_type n, m, l;
     internal_block_type * iblock;
 
     feedable_strassen_winograd(
-            swappable_block_matrix_type & existing_a, const index_type a_from_row, const index_type a_from_col,
+            swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
-            swappable_block_matrix_type & existing_b, const index_type b_from_row, const index_type b_from_col)
+            swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
         : a(existing_a, n, l, a_from_row, a_from_col),
           b(existing_b, n, l, b_from_row, b_from_col),
           c(bs_c, n, m),
@@ -1838,7 +2119,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
           iblock(0) {}
 
     feedable_strassen_winograd(
-            swappable_block_matrix_type & existing_a, const index_type a_from_row, const index_type a_from_col,
+            swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
         : a(existing_a, n, l, a_from_row, a_from_col),
           b(bs_c, n, l),
@@ -1848,7 +2129,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
 
     feedable_strassen_winograd(
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
-            swappable_block_matrix_type & existing_b, const index_type b_from_row, const index_type b_from_col)
+            swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
         : a(bs_c, n, l),
           b(existing_b, n, l, b_from_row, b_from_col),
           c(bs_c, n, m),
@@ -1863,7 +2144,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
           n(n), m(m), l(l),
           iblock(0) {}
 
-    void begin_feeding_a_block(const index_type & block_row, const index_type & block_col, const zbt)
+    void begin_feeding_a_block(const size_type & block_row, const size_type & block_col, const zbt)
     {
         if (! AExists)
             iblock = & a.bs.acquire(a(block_row, block_col));
@@ -1875,7 +2156,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
             (*iblock)[element_num] = v;
     }
 
-    void end_feeding_a_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void end_feeding_a_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         if (! AExists)
         {
@@ -1884,7 +2165,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
         }
     }
 
-    void begin_feeding_b_block(const index_type & block_row, const index_type & block_col, const zbt)
+    void begin_feeding_b_block(const size_type & block_row, const size_type & block_col, const zbt)
     {
         if (! BExists)
             iblock = & b.bs.acquire(b(block_row, block_col));
@@ -1896,7 +2177,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
             (*iblock)[element_num] = v;
     }
 
-    void end_feeding_b_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void end_feeding_b_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         if (! BExists)
         {
@@ -1908,7 +2189,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
     void multiply()
     { matrix_operations<ValueType, BlockSideLength>::choose_level_for_feedable_sw(a, b, c); }
 
-    zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
+    zbt begin_reading_block(const size_type & block_row, const size_type & block_col)
     {
         bool zb = ! c.bs.is_initialized(c(block_row, block_col));
         iblock = & c.bs.acquire(c(block_row, block_col));
@@ -1918,7 +2199,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
     vt read_element(const int_type element_num)
     { return (*iblock)[element_num]; }
 
-    zbt end_reading_block(const index_type & block_row, const index_type & block_col)
+    zbt end_reading_block(const size_type & block_row, const size_type & block_col)
     {
         c.bs.release(c(block_row, block_col), false);
         iblock = 0;
@@ -1941,7 +2222,6 @@ struct feedable_strassen_winograd
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename block_scheduler_type::internal_block_type internal_block_type;
     typedef typename swappable_block_matrix_type::size_type size_type;
-    typedef typename swappable_block_matrix_type::index_type index_type;
 
     const size_type n, m, l;
     smaller_feedable_strassen_winograd_ab p1, p2;
@@ -1950,9 +2230,9 @@ struct feedable_strassen_winograd
     smaller_feedable_strassen_winograd_a  p7;
 
     feedable_strassen_winograd(
-            swappable_block_matrix_type & existing_a, const index_type a_from_row, const index_type a_from_col,
+            swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
-            swappable_block_matrix_type & existing_b, const index_type b_from_row, const index_type b_from_col)
+            swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
         : n(n), m(m), l(l),
           p1(existing_a, a_from_row,       a_from_col,       bs_c, n/2, m/2, l/2, existing_b, b_from_row,       b_from_col),
           p2(existing_a, a_from_row,       a_from_col + l/2, bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col),
@@ -1963,7 +2243,7 @@ struct feedable_strassen_winograd
           p7(existing_a, a_from_row + n/2, a_from_col + l/2, bs_c, n/2, m/2, l/2) {}
 
     feedable_strassen_winograd(
-            swappable_block_matrix_type & existing_a, const index_type a_from_row, const index_type a_from_col,
+            swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
         : n(n), m(m), l(l),
           p1(existing_a, a_from_row,       a_from_col,       bs_c, n/2, m/2, l/2),
@@ -1976,7 +2256,7 @@ struct feedable_strassen_winograd
 
     feedable_strassen_winograd(
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
-            swappable_block_matrix_type & existing_b, const index_type b_from_row, const index_type b_from_col)
+            swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
         : n(n), m(m), l(l),
           p1(bs_c, n/2, m/2, l/2, existing_b, b_from_row,       b_from_col),
           p2(bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col),
@@ -1997,7 +2277,7 @@ struct feedable_strassen_winograd
           p6(bs_c, n/2, m/2, l/2),
           p7(bs_c, n/2, m/2, l/2) {}
 
-    void begin_feeding_a_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void begin_feeding_a_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         typename zbt::smaller_static_quadtree s1 = zb.dl & zb.dr,
                                               s2 = s1    & zb.ul,
@@ -2027,7 +2307,7 @@ struct feedable_strassen_winograd
         p7.feed_a_element(element_num, v.dr);
     }
 
-    void end_feeding_a_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void end_feeding_a_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         typename zbt::smaller_static_quadtree s1 = zb.dl & zb.dr,
                                               s2 = s1    & zb.ul,
@@ -2042,7 +2322,7 @@ struct feedable_strassen_winograd
         p7.end_feeding_a_block(block_row, block_col, zb.dr);
     }
 
-    void begin_feeding_b_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void begin_feeding_b_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         typename zbt::smaller_static_quadtree t1 = zb.ur & zb.ul,
                                               t2 = zb.dr & t1,
@@ -2072,7 +2352,7 @@ struct feedable_strassen_winograd
         p7.feed_b_element(element_num, t4);
     }
 
-    void end_feeding_b_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void end_feeding_b_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         typename zbt::smaller_static_quadtree t1 = zb.ur & zb.ul,
                                               t2 = zb.dr & t1,
@@ -2098,7 +2378,7 @@ struct feedable_strassen_winograd
         p7.multiply();
     }
 
-    zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
+    zbt begin_reading_block(const size_type & block_row, const size_type & block_col)
     {
         zbt r;
         r.ur = r.ul = p1.begin_reading_block(block_row, block_col);
@@ -2128,7 +2408,7 @@ struct feedable_strassen_winograd
         return r;
     }
 
-    zbt end_reading_block(const index_type & block_row, const index_type & block_col)
+    zbt end_reading_block(const size_type & block_row, const size_type & block_col)
     {
         zbt r;
         r.ur = r.ul = p1.end_reading_block(block_row, block_col);
@@ -2154,7 +2434,6 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename block_scheduler_type::internal_block_type internal_block_type;
     typedef typename swappable_block_matrix_type::size_type size_type;
-    typedef typename swappable_block_matrix_type::index_type index_type;
 
     swappable_block_matrix_type m;
     internal_block_type * iblock;
@@ -2164,11 +2443,11 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
           iblock(0) {}
 
     matrix_to_quadtree(swappable_block_matrix_type & matrix,
-            const size_type height, const size_type width, const index_type from_row, const index_type from_col)
+            const size_type height, const size_type width, const size_type from_row, const size_type from_col)
         : m(matrix, height, width, from_row, from_col),
           iblock(0) {}
 
-    void begin_feeding_block(const index_type & block_row, const index_type & block_col, const zbt)
+    void begin_feeding_block(const size_type & block_row, const size_type & block_col, const zbt)
     { iblock = & m.bs.acquire(m(block_row, block_col)); }
 
     void feed_element(const int_type element_num, const vt v)
@@ -2177,13 +2456,13 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
     void feed_and_add_element(const int_type element_num, const vt v)
     { (*iblock)[element_num] += v; }
 
-    void end_feeding_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void end_feeding_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         m.bs.release(m(block_row, block_col), ! zb);
         iblock = 0;
     }
 
-    zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
+    zbt begin_reading_block(const size_type & block_row, const size_type & block_col)
     {
         zbt zb = ! m.bs.is_initialized(m(block_row, block_col));
         iblock = & m.bs.acquire(m(block_row, block_col));
@@ -2193,7 +2472,7 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
     vt read_element(const int_type element_num)
     { return (*iblock)[element_num]; }
 
-    zbt end_reading_block(const index_type & block_row, const index_type & block_col)
+    zbt end_reading_block(const size_type & block_row, const size_type & block_col)
     {
         m.bs.release(m(block_row, block_col), false);
         iblock = 0;
@@ -2219,7 +2498,6 @@ struct matrix_to_quadtree
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename block_scheduler_type::internal_block_type internal_block_type;
     typedef typename swappable_block_matrix_type::size_type size_type;
-    typedef typename swappable_block_matrix_type::index_type index_type;
 
     smaller_matrix_to_quadtree ul, ur, dl, dr;
 
@@ -2231,14 +2509,14 @@ struct matrix_to_quadtree
     { assert(! (matrix.get_height() % 2 | matrix.get_width() % 2)); }
 
     matrix_to_quadtree(swappable_block_matrix_type & matrix,
-            const size_type height, const size_type width, const index_type from_row, const index_type from_col)
+            const size_type height, const size_type width, const size_type from_row, const size_type from_col)
         : ul(matrix, height/2, width/2, from_row,            from_col),
           ur(matrix, height/2, width/2, from_row,            from_col + width/2),
           dl(matrix, height/2, width/2, from_row + height/2, from_col),
           dr(matrix, height/2, width/2, from_row + height/2, from_col + width/2)
     { assert(! (height % 2 | width % 2)); }
 
-    void begin_feeding_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void begin_feeding_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         ul.begin_feeding_block(block_row, block_col, zb.ul);
         ur.begin_feeding_block(block_row, block_col, zb.ur);
@@ -2262,7 +2540,7 @@ struct matrix_to_quadtree
         dr.feed_and_add_element(element_num, v.dr);
     }
 
-    void end_feeding_block(const index_type & block_row, const index_type & block_col, const zbt zb)
+    void end_feeding_block(const size_type & block_row, const size_type & block_col, const zbt zb)
     {
         ul.end_feeding_block(block_row, block_col, zb.ul);
         ur.end_feeding_block(block_row, block_col, zb.ur);
@@ -2270,7 +2548,7 @@ struct matrix_to_quadtree
         dr.end_feeding_block(block_row, block_col, zb.dr);
     }
 
-    zbt begin_reading_block(const index_type & block_row, const index_type & block_col)
+    zbt begin_reading_block(const size_type & block_row, const size_type & block_col)
     {
         zbt zb;
         zb.ul = ul.begin_reading_block(block_row, block_col);
@@ -2290,7 +2568,7 @@ struct matrix_to_quadtree
         return v;
     }
 
-    zbt end_reading_block(const index_type & block_row, const index_type & block_col)
+    zbt end_reading_block(const size_type & block_row, const size_type & block_col)
     {
         zbt zb;
         zb.ul = ul.end_reading_block(block_row, block_col);

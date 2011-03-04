@@ -269,6 +269,7 @@ int main(int argc, char **argv)
         typedef mt::row_vector_type rvt;
         typedef mt::column_vector_type cvt;
         typedef mt::row_major_iterator mitt;
+        typedef mt::const_row_major_iterator cmitt;
 
         bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
         //bst * b_s = new bst(16*sizeof(value_type)*small_block_order*small_block_order); // the block_scheduler may use 16 blocks for caching
@@ -299,7 +300,7 @@ int main(int argc, char **argv)
         STXXL_MSG(stats_after - stats_before);
         {
             int_type num_err = 0;
-            for (mitt mit = c->begin(); mit != c->end(); ++mit)
+            for (cmitt mit = c->cbegin(); mit != c->cend(); ++mit)
                 num_err += (*mit != rank);
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");
@@ -338,8 +339,8 @@ int main(int argc, char **argv)
         {
             int_type num_err = 0;
             int_type i = 1;
-            for (mitt mit = c->begin(); mit != c->end(); ++mit, ++i)
-                num_err += (*mit != i * 3);
+            for (cmitt mit = c->cbegin(); mit != c->cend(); ++mit, ++i)
+                num_err += (*mit != i * 4);
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");
         }

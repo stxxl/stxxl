@@ -26,15 +26,15 @@ __STXXL_BEGIN_NAMESPACE
 template <class C>
 class shared_object_pointer
 {
-    C mutable *  ptr;
+    C * ptr;
 
-    void new_reference() const
+    void new_reference()
     { new_reference(ptr); }
 
-    void new_reference(C * o) const
+    void new_reference(C * o)
     { if (o) o->new_reference(); }
 
-    void delete_reference() const
+    void delete_reference()
     { if (ptr && ptr->delete_reference()) delete ptr; }
 
 public:
@@ -49,19 +49,8 @@ public:
         : ptr(shared_pointer.ptr)
     { new_reference(); }
 
-    const shared_object_pointer & operator = (const shared_object_pointer & shared_pointer) const
-    { return operator = (shared_pointer.ptr); }
-
     shared_object_pointer & operator = (const shared_object_pointer & shared_pointer)
     { return operator = (shared_pointer.ptr); }
-
-    const shared_object_pointer & operator = (C * pointer) const
-    {
-        new_reference(pointer);
-        delete_reference();
-        ptr = pointer;
-        return *this;
-    }
 
     shared_object_pointer & operator = (C * pointer)
     {
@@ -74,40 +63,22 @@ public:
     ~shared_object_pointer()
     { delete_reference(); }
 
-    const C & operator * () const
+    C & operator * () const
     {
         assert (ptr);
         return *ptr;
     }
 
-    C & operator * ()
-    {
-        assert (ptr);
-        return *ptr;
-    }
-
-    const C * operator -> () const
+    C * operator -> () const
     {
         assert(ptr);
         return ptr;
     }
 
-    C * operator -> ()
-    {
-        assert(ptr);
-        return ptr;
-    }
-
-    operator const C * () const
+    operator C * () const
     { return ptr; }
 
-    operator C * ()
-    { return ptr; }
-
-    const C * get() const
-    { return ptr; }
-
-    C * get()
+    C * get() const
     { return ptr; }
 
     bool operator == (const shared_object_pointer & shared_pointer) const
@@ -127,11 +98,95 @@ public:
     { return ptr && ptr->unique(); }
 
     //! \brief Make and refer a copy if the original object was shared.
-    void unify() const
+    void unify()
     {
         if (ptr && ! ptr->unique())
             operator = (new C(*ptr));
     }
+};
+
+//! \brief Behaves much like a Pointer, plus deleteing the referred object with it's last reference
+//!    and ability to unify, i.e. make and refer a copy if the original object was shared.
+//!
+//! Use with objects derived from shared_object.
+//! Similar to boost/shared_ptr.
+template <class C>
+class const_shared_object_pointer
+{
+    const C * ptr;
+
+    void new_reference()
+    { new_reference(ptr); }
+
+    void new_reference(const C * o)
+    { if (o) o->new_reference(); }
+
+    void delete_reference()
+    { if (ptr && ptr->delete_reference()) delete ptr; }
+
+public:
+    const_shared_object_pointer(const shared_object_pointer<C> & shared_pointer)
+        : ptr(shared_pointer.ptr)
+    { new_reference(); }
+
+    const_shared_object_pointer()
+        : ptr(0) {}
+
+    const_shared_object_pointer(const C * pointer)
+        : ptr(pointer)
+    { new_reference(); }
+
+    const_shared_object_pointer(const const_shared_object_pointer & shared_pointer)
+        : ptr(shared_pointer.ptr)
+    { new_reference(); }
+
+    const_shared_object_pointer & operator = (const const_shared_object_pointer & shared_pointer)
+    { return operator = (shared_pointer.ptr); }
+
+    const_shared_object_pointer & operator = (const C * pointer)
+    {
+        new_reference(pointer);
+        delete_reference();
+        ptr = pointer;
+        return *this;
+    }
+
+    ~const_shared_object_pointer()
+    { delete_reference(); }
+
+    const C & operator * () const
+    {
+        assert (ptr);
+        return *ptr;
+    }
+
+    const C * operator -> () const
+    {
+        assert(ptr);
+        return ptr;
+    }
+
+    operator const C * () const
+    { return ptr; }
+
+    const C * get() const
+    { return ptr; }
+
+    bool operator == (const const_shared_object_pointer & shared_pointer) const
+    { return ptr == shared_pointer.ptr; }
+
+    operator bool () const
+    { return ptr; }
+
+    bool valid() const
+    { return ptr; }
+
+    bool empty() const
+    { return ! ptr; }
+
+    //! \brief if the object is referred by this shared_object_pointer only
+    bool unique() const
+    { return ptr && ptr->unique(); }
 };
 
 //! \brief Provides reference counting abilities for use with shared_object_pointer.
