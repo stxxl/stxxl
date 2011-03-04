@@ -21,7 +21,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief A internal fifo queue that allows removing elements addressed with (a copy of) themself.
+//! \brief An internal fifo queue that allows removing elements addressed with (a copy of) themself.
 //! \tparam KeyType Type of contained elements.
 template <typename KeyType>
 class addressable_fifo_queue
@@ -101,14 +101,23 @@ public:
     }
 };
 
-/*
-//! \brief A internal priority queue that allows removing elements addressed with (a copy of) themself.
+//! \brief An internal priority queue that allows removing elements addressed with (a copy of) themself.
 //! \tparam KeyType Type of contained elements.
 //! \tparam PriorityType Type of Priority.
-template <typename KeyType, typename PriorityType>
+template < typename KeyType, typename PriorityType, class Cmp = std::less<PriorityType> >
 class addressable_priority_queue
 {
-    typedef std::set< std::pair<PriorityType, KeyType> > container_t;
+    struct cmp_prio : public PriorityType
+    {
+        cmp_prio() {}
+        cmp_prio(const PriorityType & p) : PriorityType(p) {}
+        operator       PriorityType & ()       { return *this; }
+        operator const PriorityType & () const { return *this; }
+
+        inline bool operator < (const cmp_prio & right) { return Cmp(*this, right); }
+    };
+
+    typedef std::set< std::pair<cmp_prio, KeyType> > container_t;
     typedef typename container_t::iterator container_iter_t;
     typedef std::map<KeyType, container_iter_t> meta_t;
     typedef typename meta_t::iterator meta_iter_t;
@@ -167,12 +176,12 @@ public:
         meta.erase(i);
     }
 
-    //! \brief Access top element in the queue.
+    //! \brief Access top (= min) element in the queue.
     //! \return Const reference to top element.
     const KeyType & top() const
     { return vals.begin()->second; }
 
-    //! \brief Remove top element from the queue.
+    //! \brief Remove top (= min) element from the queue.
     //! \return Top element.
     KeyType pop()
     {
