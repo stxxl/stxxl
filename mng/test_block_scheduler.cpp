@@ -133,11 +133,8 @@ int main(int argc, char **argv)
             bs.free_swappable_block(sbi2);
             bs.explicit_timestep();
 
-            block_scheduler_algorithm< swappable_block<value_type, block_size> > * other_algo;
-            other_algo = new block_scheduler_algorithm_simulation
-                    < swappable_block<value_type, block_size> >(bs);
-            other_algo =  bs.switch_algorithm_to(other_algo);
-            delete other_algo; other_algo = 0;
+            delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_simulation< swappable_block<value_type, block_size> >(bs));
             sbit sbi = bs.allocate_swappable_block();
             bs.acquire(sbi);
             bs.acquire(sbi);
@@ -148,17 +145,31 @@ int main(int argc, char **argv)
             bs.initialize(sbi, ebt());
             if (bs.is_simulating())
                 bs.extract_external_block(sbi);
+            else
+                bs.extract_external_block(sbi);
             bs.free_swappable_block(sbi);
-            bst::prediction_sequence_type ps = bs.get_prediction_sequence();
-            //for (bst::prediction_sequence_type::iterator it = ps.begin(); it != ps.end(); ++it)
-            //    STXXL_MSG("ps: " << it->id << " " << it->op << " " << it->time);
+            if (true)
             {
-                sbit sbis[10];
-                for (int_type i = 0; i < 10; ++i)
-                    sbis[i] = bs.allocate_swappable_block();
-                for (int_type i = 0; i < 10; ++i)
-                    bs.free_swappable_block(sbis[i]);
+                bst::prediction_sequence_type ps = bs.get_prediction_sequence();
+                for (bst::prediction_sequence_type::iterator it = ps.begin(); it != ps.end(); ++it)
+                    STXXL_MSG("id: " << it->id << " op: " << it->op << " t: " << it->time);
             }
+
+            delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_offline_lfd< swappable_block<value_type, block_size> >(bs));
+            sbi = bs.allocate_swappable_block();
+            bs.acquire(sbi);
+            bs.acquire(sbi);
+            bs.release(sbi,true);
+            bs.explicit_timestep();
+            bs.release(sbi,false);
+            bs.deinitialize(sbi);
+            bs.initialize(sbi, ebt());
+            if (bs.is_simulating())
+                bs.extract_external_block(sbi);
+            else
+                bs.extract_external_block(sbi);
+            bs.free_swappable_block(sbi);
 
             delete b_s;
 

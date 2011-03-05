@@ -107,17 +107,18 @@ public:
 template < typename KeyType, typename PriorityType, class Cmp = std::less<PriorityType> >
 class addressable_priority_queue
 {
-    struct cmp_prio : public PriorityType
+    struct cmp // like < for pair, but uses Cmp for < on first
     {
-        cmp_prio() {}
-        cmp_prio(const PriorityType & p) : PriorityType(p) {}
-        operator       PriorityType & ()       { return *this; }
-        operator const PriorityType & () const { return *this; }
-
-        inline bool operator < (const cmp_prio & right) { return Cmp(*this, right); }
+      bool operator()(const std::pair<PriorityType, KeyType> & left,
+              const std::pair<PriorityType, KeyType> & right) const
+      {
+          Cmp c;
+          return c(left.first, right.first) ||
+                  ((! c(right.first, left.first)) && left.second < right.second);
+      }
     };
 
-    typedef std::set< std::pair<cmp_prio, KeyType> > container_t;
+    typedef std::set<std::pair<PriorityType, KeyType>, cmp> container_t;
     typedef typename container_t::iterator container_iter_t;
     typedef std::map<KeyType, container_iter_t> meta_t;
     typedef typename meta_t::iterator meta_iter_t;
@@ -144,12 +145,12 @@ public:
     //! \return pair<handle, bool> Iterator to element; if element was newly inserted.
     std::pair<handle, bool> insert(const KeyType & e, const PriorityType o)
     {
-        std::pair<container_iter_t ,bool> & s = vals.insert(std::make_pair(o, e));
-        std::pair<handle, bool> & r = meta.insert(std::make_pair(e, s.first));
+        std::pair<container_iter_t ,bool> s = vals.insert(std::make_pair(o, e));
+        std::pair<handle, bool> r = meta.insert(std::make_pair(e, s.first));
         if (! r.second && s.second)
         {
             // was already in with different priority
-            vals.erease(r.first->second);
+            vals.erase(r.first->second);
             r.first->second = s.first;
         }
         return r;
@@ -187,12 +188,11 @@ public:
     {
         assert(! empty());
         const KeyType e = top();
-        meta.erease(e);
-        vals.erease(vals.begin());
+        meta.erase(e);
+        vals.erase(vals.begin());
         return e;
     }
 };
-//*/
 
 __STXXL_END_NAMESPACE
 
