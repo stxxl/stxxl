@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
- *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
+ *  Copyright (C) 2009, 2010 Johannes Singler <singler@kit.edu>
  *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
