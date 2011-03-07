@@ -17,6 +17,10 @@
 
 
 #include <memory>
+#if defined(__GNUC__) && !defined(__GXX_EXPERIMENTAL_CXX0X__) \
+    && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200)
+#include <tr1/memory>
+#endif
 #if defined(STXXL_BOOST_CONFIG)
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -31,15 +35,19 @@ __STXXL_BEGIN_NAMESPACE
     #define STXXL_HAVE_SHARED_PTR 1
 #endif
 
+#ifndef STXXL_HAVE_MAKE_SHARED
+    #define STXXL_HAVE_MAKE_SHARED 1
+#endif
+
 namespace compat {
-#if defined(__GXX_EXPERIMENTAL_CXX0X__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40400)
+#if defined(__GXX_EXPERIMENTAL_CXX0X__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40300)
     using std::shared_ptr;
     using std::make_shared;
     using std::allocate_shared;
-#elif defined(__GNUC__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40300)
+#elif defined(__GNUC__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200)
     using std::tr1::shared_ptr;
-    using std::tr1::make_shared;
-    using std::tr1::allocate_shared;
+    #undef STXXL_HAVE_MAKE_SHARED
+    #define STXXL_HAVE_MAKE_SHARED 0
 #elif defined(STXXL_BOOST_CONFIG)
     using boost::shared_ptr;
     using boost::make_shared;
@@ -48,6 +56,8 @@ namespace compat {
     // no shared_ptr implementation available
     #undef STXXL_HAVE_SHARED_PTR
     #define STXXL_HAVE_SHARED_PTR 0
+    #undef STXXL_HAVE_MAKE_SHARED
+    #define STXXL_HAVE_MAKE_SHARED 0
 #endif
 }
 
