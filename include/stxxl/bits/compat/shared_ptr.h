@@ -44,14 +44,14 @@ namespace compat {
     using std::shared_ptr;
     using std::make_shared;
     using std::allocate_shared;
-#elif defined(__GNUC__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200)
-    using std::tr1::shared_ptr;
-    #undef STXXL_HAVE_MAKE_SHARED
-    #define STXXL_HAVE_MAKE_SHARED 0
 #elif defined(STXXL_BOOST_CONFIG)
     using boost::shared_ptr;
     using boost::make_shared;
     using boost::allocate_shared;
+#elif defined(__GNUC__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200)
+    using std::tr1::shared_ptr;
+    #undef STXXL_HAVE_MAKE_SHARED
+    #define STXXL_HAVE_MAKE_SHARED 0
 #else
     // no shared_ptr implementation available
     #undef STXXL_HAVE_SHARED_PTR
