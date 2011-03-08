@@ -38,7 +38,7 @@ class file;
 class request_ptr;
 
 //! \brief Basic properties of a request.
-class request : virtual public request_base
+class request : virtual public request_interface
 {
     friend int wait_any(request_ptr req_array[], int count);
     template <class request_iterator_>

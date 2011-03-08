@@ -32,7 +32,7 @@ class onoff_switch;
 //! Since all library I/O operations are asynchronous,
 //! one needs to keep track of their status: whether
 //! an I/O completed or not.
-class request_base : private noncopyable
+class request_interface : private noncopyable
 {
 public:
     typedef stxxl::uint64 offset_type;
@@ -71,7 +71,7 @@ public:
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
     virtual const char * io_type() const = 0;
 
-    virtual ~request_base()
+    virtual ~request_interface()
     { }
 };
 

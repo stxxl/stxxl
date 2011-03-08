@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/switch.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_interface.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Implements basic waiters.
-class request_waiters_impl_basic : virtual public request_base
+class request_waiters_impl_basic : virtual public request_interface
 {
     mutex waiters_mutex;
     std::set<onoff_switch *> waiters;
