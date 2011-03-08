@@ -14,7 +14,7 @@
 SUBDIRS		+= .
 SUBDIRS		+= include include/stxxl include/stxxl/bits
 SUBDIRS		+= $(foreach d, algo common compat containers containers/btree io mng stream utils, include/stxxl/bits/$d)
-SUBDIRS		+= algo common containers containers/btree io mng stream utils
+SUBDIRS		+= algo common containers containers/btree io mng stream utils contrib
 SUBDIRS		+= doc/tutorial/examples
 
 FILES_IGNORE	:= ./doxymain.h
