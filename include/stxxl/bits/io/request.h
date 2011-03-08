@@ -57,6 +57,7 @@ protected:
 
     void completed();
 
+public:
     // returns number of references
     int nref()
     {
@@ -64,7 +65,6 @@ protected:
         return ref_cnt;
     }
 
-public:
     request(const completion_handler & on_compl,
             file * file__,
             void * buffer_,
