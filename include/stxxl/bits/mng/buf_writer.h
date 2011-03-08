@@ -16,6 +16,7 @@
 #include <vector>
 #include <queue>
 
+#include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/io/disk_queues.h>
 
 

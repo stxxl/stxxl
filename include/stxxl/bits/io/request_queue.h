@@ -14,7 +14,7 @@
 #define STXXL_IO_REQUEST_QUEUE_HEADER
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE

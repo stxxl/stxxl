@@ -21,9 +21,9 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/adaptor.h>
 #include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/mng/block_alloc_interleaved.h>
+#include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/intksort.h>

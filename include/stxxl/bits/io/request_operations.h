@@ -16,8 +16,9 @@
 #define STXXL_IO__REQUEST_OPERATIONS_H_
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/io/request_ptr.h>
 #include <stxxl/bits/io/iostats.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/common/switch.h>
 
 
 __STXXL_BEGIN_NAMESPACE
