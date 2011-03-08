@@ -58,7 +58,8 @@ public:
 template <unsigned npages_>
 class lru_pager : private noncopyable
 {
-    typedef std::list<int_type> list_type;
+    typedef unsigned_type size_type;
+    typedef std::list<size_type> list_type;
 
     list_type history;
     simple_vector<list_type::iterator> history_entry;
@@ -66,22 +67,25 @@ class lru_pager : private noncopyable
 public:
     enum { n_pages = npages_ };
 
-    lru_pager() : history_entry(npages_)
+    lru_pager() : history_entry(n_pages)
     {
-        for (unsigned_type i = 0; i < npages_; i++)
-            history_entry[i] = history.insert(history.end(), static_cast<int_type>(i));
+        for (size_type i = 0; i < n_pages; ++i)
+            history_entry[i] = history.insert(history.end(), i);
     }
+
     ~lru_pager() { }
-    int_type kick()
+
+    size_type kick()
     {
         return history.back();
     }
-    void hit(int_type ipage)
+
+    void hit(size_type ipage)
     {
-        assert(ipage < int_type(npages_));
-        assert(ipage >= 0);
+        assert(ipage < n_pages);
         history.splice(history.begin(), history, history_entry[ipage]);
     }
+
     void swap(lru_pager & obj)
     {
         std::swap(history, obj.history);
@@ -104,3 +108,4 @@ namespace std
 }
 
 #endif // !STXXL_PAGER_HEADER
+// vim: et:ts=4:sw=4
