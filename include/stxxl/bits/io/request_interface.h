@@ -39,9 +39,11 @@ public:
     typedef stxxl::unsigned_type size_type;
     enum request_type { READ, WRITE };
 
-protected:
+public:
     virtual bool add_waiter(onoff_switch * sw) = 0;
     virtual void delete_waiter(onoff_switch * sw) = 0;
+
+protected:
     virtual void notify_waiters() = 0;
 
 public:

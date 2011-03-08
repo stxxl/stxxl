@@ -40,11 +40,6 @@ class request_ptr;
 //! \brief Basic properties of a request.
 class request : virtual public request_interface
 {
-    friend int wait_any(request_ptr req_array[], int count);
-    template <class request_iterator_>
-    friend
-    request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end);
-    friend class request_queue_impl_qwqr;
     friend class request_ptr;
 
 protected:
