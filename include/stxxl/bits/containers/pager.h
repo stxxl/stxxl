@@ -42,7 +42,6 @@ class random_pager
 public:
     enum { n_pages = npages_ };
     random_pager() { }
-    ~random_pager() { }
     int_type kick()
     {
         return rnd(npages_);
@@ -73,8 +72,6 @@ public:
             history_entry[i] = history.insert(history.end(), i);
     }
 
-    ~lru_pager() { }
-
     size_type kick()
     {
         return history.back();
@@ -88,8 +85,8 @@ public:
 
     void swap(lru_pager & obj)
     {
-        std::swap(history, obj.history);
-        std::swap(history_entry, obj.history_entry);
+        history.swap(obj.history);
+        history_entry.swap(obj.history_entry);
     }
 };
 
@@ -111,8 +108,6 @@ public:
             history_entry[i] = history.insert(history.end(), i);
     }
 
-    ~lru_pager() { }
-
     size_type kick()
     {
         return history.back();
@@ -127,8 +122,8 @@ public:
     void swap(lru_pager & obj)
     {
         std::swap(n_pages, obj.n_pages);
-        std::swap(history, obj.history);
-        std::swap(history_entry, obj.history_entry);
+        history.swap(obj.history);
+        history_entry.swap(obj.history_entry);
     }
 };
 
