@@ -118,7 +118,7 @@ inline Integral log2_floor(Integral i)
 
 template <typename Integral, typename Integral2>
 inline
-typename remove_const<Integral>::type
+typename compat::remove_const<Integral>::type
 div_ceil(Integral __n, Integral2 __d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)

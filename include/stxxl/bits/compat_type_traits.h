@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
@@ -27,6 +27,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+namespace compat
+{
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 using std::remove_const;
 #elif defined(__GNUG__) && (__GNUC__ >= 4) && !defined(__ICC)
@@ -47,8 +49,8 @@ struct remove_const<_Tp const>
 };
 #endif
 
-#if defined(__GNUG__) && (__GNUC__ == 4) && (__GNUC_MINOR__ < 3)
-// That's a small subset of what GCC 4.3 does.
+#if defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) < 40300)
+// That is a small subset of what GCC 4.3 does:
 
 // Utility for finding the signed versions of unsigned integral types.
 template <typename _Tp>
@@ -100,6 +102,7 @@ struct make_signed
     typedef typename __make_signed<_Tp>::__type type;
 };
 #endif
+}  // namespace compat
 
 __STXXL_END_NAMESPACE
 

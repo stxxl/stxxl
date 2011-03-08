@@ -154,7 +154,7 @@ namespace parallel
 #elif defined(STXXL_PARALLEL_MODE)
         return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-        typedef typename make_signed<DiffType>::type difference_type;
+        typedef typename compat::make_signed<DiffType>::type difference_type;
         return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, difference_type(length), false);
 #else
 #error "no implementation found for multiway_merge()"
@@ -183,7 +183,7 @@ namespace parallel
 #elif defined(STXXL_PARALLEL_MODE)
         return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-        typedef typename make_signed<DiffType>::type difference_type;
+        typedef typename compat::make_signed<DiffType>::type difference_type;
         return mcstl::multiway_merge_sentinel(seqs_begin, seqs_end, target, comp, difference_type(length), false);
 #else
 #error "no implementation found for multiway_merge_sentinel()"
