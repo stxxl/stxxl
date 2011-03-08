@@ -14,6 +14,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/common/error_handling.h>
 
 #ifdef BOOST_MSVC
  #include <windows.h>
