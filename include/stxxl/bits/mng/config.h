@@ -88,7 +88,7 @@ public:
     //! \return range [begin, end) of flash device indices
     inline std::pair<unsigned, unsigned> flash_range() const
     {
-        return std::pair<unsigned, unsigned>(first_flash, disks_props.size());
+        return std::pair<unsigned, unsigned>(first_flash, (unsigned)disks_props.size());
     }
 
     //! \brief Returns path of disks
