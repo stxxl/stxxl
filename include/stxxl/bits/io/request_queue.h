@@ -22,18 +22,16 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-class disk_queue
+class request_queue : private noncopyable
 {
 public:
     enum priority_op { READ, WRITE, NONE };
-};
 
-class request_queue : private noncopyable
-{
 public:
     virtual void add_request(request_ptr & req) = 0;
     virtual bool cancel_request(request_ptr & req) = 0;
     virtual ~request_queue() { }
+    virtual void set_priority_op(priority_op p) { STXXL_UNUSED(p); }
 };
 
 //! \}

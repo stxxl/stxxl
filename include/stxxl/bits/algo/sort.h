@@ -90,7 +90,7 @@ namespace sort_local
         read_next_after_write_completed<block_type, bid_type> * next_run_reads =
             new read_next_after_write_completed<block_type, bid_type>[m2];
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
         int_type i;
         int_type run_size = 0;
@@ -548,7 +548,7 @@ namespace sort_local
 
         double io_wait_after_rf = stats::get_instance()->get_io_wait_time();
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
         const int_type merge_factor = optimal_merge_factor(nruns, _m);
         run_type ** new_runs;
