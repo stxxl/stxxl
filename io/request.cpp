@@ -11,6 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <ostream>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/file.h>
 
@@ -76,6 +77,16 @@ void request::check_nref_failed(bool after)
                  " file=" << get_file() <<
                  " iotype=" << get_file()->io_type()
                  );
+}
+
+std::ostream & request::print(std::ostream & out) const
+{
+    out << "File object address: " << static_cast<void *>(get_file());
+    out << " Buffer address: " << static_cast<void *>(get_buffer());
+    out << " File offset: " << get_offset();
+    out << " Transfer size: " << get_size() << " bytes";
+    out << " Type of transfer: " << ((get_type() == READ) ? "READ" : "WRITE");
+    return out;
 }
 
 __STXXL_END_NAMESPACE

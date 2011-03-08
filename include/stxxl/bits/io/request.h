@@ -15,7 +15,6 @@
 #ifndef STXXL_REQUEST_HEADER
 #define STXXL_REQUEST_HEADER
 
-#include <iostream>
 #include <cassert>
 
 #include <stxxl/bits/namespace.h>
@@ -83,15 +82,7 @@ public:
 
     void check_alignment() const;
 
-    virtual std::ostream & print(std::ostream & out) const
-    {
-        out << "File object address: " << (void *)get_file();
-        out << " Buffer address: " << (void *)get_buffer();
-        out << " File offset: " << get_offset();
-        out << " Transfer size: " << get_size() << " bytes";
-        out << " Type of transfer: " << ((get_type() == READ) ? "READ" : "WRITE");
-        return out;
-    }
+    std::ostream & print(std::ostream & out) const;
 
     //! \brief Inform the request object that an error occurred
     //! during the I/O execution
@@ -111,7 +102,7 @@ public:
     void check_errors() throw (stxxl::io_error)
     {
         if (error.get())
-            throw * (error.get());
+            throw *(error.get());
     }
 
 private:
