@@ -15,11 +15,11 @@
 #define STXXL_CONTAINERS_BTREE__BTREE_PAGER_H
 
 #include <list>
-#include <vector>
 #include <cassert>
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/simple_vector.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -32,10 +32,10 @@ namespace btree
         typedef std::list<int_type> list_type;
 
         list_type history;
-        std::vector<list_type::iterator> history_entry;
+        simple_vector<list_type::iterator> history_entry;
 
     public:
-        lru_pager() : npages_(0)
+        lru_pager() : npages_(0), history_entry(0)
         { }
 
         lru_pager(unsigned_type npages) :
