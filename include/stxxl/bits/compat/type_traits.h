@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/compat_type_traits.h
+ *  include/stxxl/bits/compat/type_traits.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

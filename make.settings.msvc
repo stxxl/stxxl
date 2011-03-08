@@ -96,7 +96,6 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/version.h \
 	$(HEADER_PATH)/compat_hash_map.h \
 	$(HEADER_PATH)/compat_unique_ptr.h \
-	$(HEADER_PATH)/compat_type_traits.h \
 	$(HEADER_PATH)/parallel.h \
 	$(HEADER_PATH)/singleton.h \
 	$(HEADER_PATH)/defines.h \
@@ -125,7 +124,8 @@ COMMON_FILES	 = \
 	$(HEADER_PATH)/common/seed.h  \
 	$(HEADER_PATH)/common/is_sorted.h \
 	$(HEADER_PATH)/common/exithandler.h \
-	$(HEADER_PATH)/compat/shared_ptr.h
+	$(HEADER_PATH)/compat/shared_ptr.h \
+	$(HEADER_PATH)/compat/type_traits.h
 
 IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/io.h \

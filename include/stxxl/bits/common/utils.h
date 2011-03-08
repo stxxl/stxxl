@@ -26,7 +26,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/compat_type_traits.h>
+#include <stxxl/bits/compat/type_traits.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
 

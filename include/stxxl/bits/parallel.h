@@ -40,7 +40,7 @@
 #ifdef __MCSTL__
  #include <mcstl.h>
  #include <bits/mcstl_multiway_merge.h>
- #include <stxxl/bits/compat_type_traits.h>
+ #include <stxxl/bits/compat/type_traits.h>
 #endif
 
 #if STXXL_PARALLEL
