@@ -189,7 +189,6 @@ CONTAINER_FILES	 = \
 	$(HEADER_PATH)/containers/btree/node_cache.h \
 	$(HEADER_PATH)/containers/btree/root_node.h \
 	$(HEADER_PATH)/containers/btree/node.h \
-	$(HEADER_PATH)/containers/btree/btree_pager.h \
 	$(HEADER_PATH)/containers/btree/iterator.h
 
 ALGO_FILES	 = \
