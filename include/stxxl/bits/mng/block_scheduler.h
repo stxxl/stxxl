@@ -528,7 +528,7 @@ public:
 };
 
 template <class SwappableBlockType>
-class block_scheduler_algorithm_online : public block_scheduler_algorithm<SwappableBlockType>
+class block_scheduler_algorithm_online_lru : public block_scheduler_algorithm<SwappableBlockType>
 {
 protected:
     typedef block_scheduler<SwappableBlockType> block_scheduler_type;
@@ -567,15 +567,15 @@ protected:
     }
 
 public:
-    block_scheduler_algorithm_online(block_scheduler_type & bs)
+    block_scheduler_algorithm_online_lru(block_scheduler_type & bs)
         : block_scheduler_algorithm_type(bs)
     { init(); }
 
-    block_scheduler_algorithm_online(block_scheduler_algorithm_type * old)
+    block_scheduler_algorithm_online_lru(block_scheduler_algorithm_type * old)
         : block_scheduler_algorithm_type(old)
     { init(); }
 
-    virtual ~block_scheduler_algorithm_online()
+    virtual ~block_scheduler_algorithm_online_lru()
     {
         if (! evictable_blocks.empty())
             STXXL_ERRMSG("Destructing block_scheduler_algorithm_online that still holds evictable blocks. They get deinitialized.");
@@ -992,7 +992,7 @@ public:
             // switch algorithm
             block_scheduler_algorithm_type * new_algo,
                                            * old_algo;
-            new_algo = new block_scheduler_algorithm_online<SwappableBlockType>(bs);
+            new_algo = new block_scheduler_algorithm_online_lru<SwappableBlockType>(bs);
             old_algo = bs.switch_algorithm_to(new_algo);
             // redirect call
             new_algo->release(sbid, dirty);
@@ -1049,7 +1049,7 @@ block_scheduler<SwappableBlockType>::block_scheduler(const int_type max_internal
       remaining_internal_blocks(max_internal_blocks),
       bm(block_manager::get_instance()),
       algo(0)
-{ algo = new block_scheduler_algorithm_online<SwappableBlockType>(*this); }
+{ algo = new block_scheduler_algorithm_online_lru<SwappableBlockType>(*this); }
 
 template <class SwappableBlockType>
 block_scheduler<SwappableBlockType>::~block_scheduler()

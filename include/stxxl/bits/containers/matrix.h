@@ -1201,6 +1201,37 @@ public:
         return res;
     }
 
+    //! \brief multiply with another matrix
+    //! \param algorithm allows to choose the applied algorithm
+    //! Available algorithms are: \n
+    //!    0: naive_multiply_and_add \n
+    //!    1: recursive_multiply_and_add \n
+    //!    2: strassen_winograd_multiply_and_add \n
+    //!    3: multi_level_strassen_winograd_multiply_and_add
+    matrix_type multiply (const matrix_type & right, const int_type algorithm = 2) const
+    {
+        assert(width == right.height);
+        matrix_type res(data->bs, height, right.width);
+        switch (algorithm)
+        {
+        case 0:
+            Ops::naive_multiply_and_add(*data, *right.data, *res.data);
+            break;
+        case 1:
+            Ops::recursive_multiply_and_add(*data, *right.data, *res.data);
+            break;
+        case 2:
+            Ops::strassen_winograd_multiply_and_add(*data, *right.data, *res.data);
+            break;
+        case 3:
+            Ops::multi_level_strassen_winograd_multiply_and_add(*data, *right.data, *res.data);
+            break;
+        default:
+            STXXL_ERRMSG("invalid multiplication-algorithm number");
+        }
+        return res;
+    }
+
     //todo: standart container operations
 
     //maydo: cheap iterator; get/set row/col; get/set submatrix
@@ -2109,9 +2140,9 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
     internal_block_type * iblock;
 
     feedable_strassen_winograd(
-            swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
+            const swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
-            swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
+            const swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
         : a(existing_a, n, l, a_from_row, a_from_col),
           b(existing_b, n, l, b_from_row, b_from_col),
           c(bs_c, n, m),
@@ -2119,7 +2150,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
           iblock(0) {}
 
     feedable_strassen_winograd(
-            swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
+            const swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
         : a(existing_a, n, l, a_from_row, a_from_col),
           b(bs_c, n, l),
@@ -2129,7 +2160,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
 
     feedable_strassen_winograd(
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
-            swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
+            const swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
         : a(bs_c, n, l),
           b(existing_b, n, l, b_from_row, b_from_col),
           c(bs_c, n, m),
@@ -2230,9 +2261,9 @@ struct feedable_strassen_winograd
     smaller_feedable_strassen_winograd_a  p7;
 
     feedable_strassen_winograd(
-            swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
+            const swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
-            swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
+            const swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
         : n(n), m(m), l(l),
           p1(existing_a, a_from_row,       a_from_col,       bs_c, n/2, m/2, l/2, existing_b, b_from_row,       b_from_col),
           p2(existing_a, a_from_row,       a_from_col + l/2, bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col),
@@ -2243,7 +2274,7 @@ struct feedable_strassen_winograd
           p7(existing_a, a_from_row + n/2, a_from_col + l/2, bs_c, n/2, m/2, l/2) {}
 
     feedable_strassen_winograd(
-            swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
+            const swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
         : n(n), m(m), l(l),
           p1(existing_a, a_from_row,       a_from_col,       bs_c, n/2, m/2, l/2),
@@ -2256,7 +2287,7 @@ struct feedable_strassen_winograd
 
     feedable_strassen_winograd(
             block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
-            swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
+            const swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
         : n(n), m(m), l(l),
           p1(bs_c, n/2, m/2, l/2, existing_b, b_from_row,       b_from_col),
           p2(bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col),
@@ -2438,11 +2469,11 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
     swappable_block_matrix_type m;
     internal_block_type * iblock;
 
-    matrix_to_quadtree(swappable_block_matrix_type & matrix)
+    matrix_to_quadtree(const swappable_block_matrix_type & matrix)
         : m(matrix, matrix.get_height(), matrix.get_width(), 0, 0),
           iblock(0) {}
 
-    matrix_to_quadtree(swappable_block_matrix_type & matrix,
+    matrix_to_quadtree(const swappable_block_matrix_type & matrix,
             const size_type height, const size_type width, const size_type from_row, const size_type from_col)
         : m(matrix, height, width, from_row, from_col),
           iblock(0) {}
@@ -2501,14 +2532,14 @@ struct matrix_to_quadtree
 
     smaller_matrix_to_quadtree ul, ur, dl, dr;
 
-    matrix_to_quadtree(swappable_block_matrix_type & matrix)
+    matrix_to_quadtree(const swappable_block_matrix_type & matrix)
         : ul(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0,                    0),
           ur(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0, matrix.get_width()/2),
           dl(matrix, matrix.get_height()/2, matrix.get_width()/2, matrix.get_height()/2,                    0),
           dr(matrix, matrix.get_height()/2, matrix.get_width()/2, matrix.get_height()/2, matrix.get_width()/2)
     { assert(! (matrix.get_height() % 2 | matrix.get_width() % 2)); }
 
-    matrix_to_quadtree(swappable_block_matrix_type & matrix,
+    matrix_to_quadtree(const swappable_block_matrix_type & matrix,
             const size_type height, const size_type width, const size_type from_row, const size_type from_col)
         : ul(matrix, height/2, width/2, from_row,            from_col),
           ur(matrix, height/2, width/2, from_row,            from_col + width/2),

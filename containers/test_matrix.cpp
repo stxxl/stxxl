@@ -130,16 +130,20 @@ public:
 int main(int argc, char **argv)
 {
     const int small_block_order = 64; // must be a multiple of 64
-    const int block_order = 2048; // must be a multiple of 64
+    const int block_order = 1024; // must be a multiple of 64
 
     int test_case = -1;
     int rank = 10000;
     int internal_memory_megabyte = 256;
+    int mult_algo_num = 2;
+    int sched_algo_num = 1;
 
     dsr::Argument_helper ah;
     ah.new_int("K", "number of the test case to run", test_case);
     ah.new_named_int('r',  "rank", "N","rank of the matrices", rank);
     ah.new_named_int('m', "memory", "L", "internal memory to use (in megabytes)", internal_memory_megabyte);
+    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N", mult_algo_num);
+    ah.new_named_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N", sched_algo_num);
 
     ah.set_description("stxxl matrix test");
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
@@ -386,7 +390,9 @@ int main(int argc, char **argv)
     }
     case 5:
     {
-        STXXL_MSG("multiplying two double matrices of rank " << rank << " block order " << block_order);
+        STXXL_MSG("multiplying two full double matrices of rank " << rank << ", block order " << block_order
+                << " using " << internal_memory_megabyte << "MiB internal memory, multiplication-algo "
+                << mult_algo_num << ", scheduling-algo " << sched_algo_num);
 
         typedef double value_type;
 
@@ -400,67 +406,59 @@ int main(int argc, char **argv)
            * b = new mt(bs, rank, rank),
            * c = new mt(bs, rank, rank);
         stats_data stats_before, stats_after;
-        matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
+        matrix_operation_statistic_data matrix_stats_before, matrix_stats_after, sim_matrix_stats_before;
 
-        // ------ first run
+        STXXL_MSG("writing input matrices");
         for (mitt mit = a->begin(); mit != a->end(); ++mit)
             *mit = 1;
         for (mitt mit = b->begin(); mit != b->end(); ++mit)
             *mit = 1;
 
         bs.flush();
-        STXXL_MSG("start of first run (full matrices)");
-        matrix_stats_before.set();
+        STXXL_MSG("start of multiplication");
+        sim_matrix_stats_before.set();
         stats_before = *stats::get_instance();
-        *c = *a * *b;
+        if (sched_algo_num > 0)
+        {
+            // all offline algos need a simulation-run
+            delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_simulation< matrix_swappable_block<value_type, block_order> >(bs));
+            *c = a->multiply(*b, mult_algo_num);
+        }
+        matrix_stats_before.set();
+        switch (sched_algo_num)
+        {
+        case 0:
+            delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_online_lru< matrix_swappable_block<value_type, block_order> >(bs));
+            break;
+        case 1:
+            delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_offline_lfd< matrix_swappable_block<value_type, block_order> >(bs));
+            break;
+        default:
+            STXXL_ERRMSG("invalid scheduling-algorithm number");
+        }
+        *c = a->multiply(*b, mult_algo_num);
         bs.flush();
         stats_after = *stats::get_instance();
         matrix_stats_after.set();
-        STXXL_MSG("end of first run");
+        STXXL_MSG("end of multiplication");
+        delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_online_lru< matrix_swappable_block<value_type, block_order> >(bs));
 
+        if (sched_algo_num > 0)
+        {
+            STXXL_MSG("simulated:");
+            STXXL_MSG(matrix_stats_before - sim_matrix_stats_before);
+        }
+        STXXL_MSG("real:");
         STXXL_MSG(matrix_stats_after - matrix_stats_before);
         STXXL_MSG(stats_after - stats_before);
         {
             int_type num_err = 0;
             for (mitt mit = c->begin(); mit != c->end(); ++mit)
                 num_err += (*mit != rank);
-            if (num_err)
-                STXXL_ERRMSG("c had " << num_err << " errors");
-        }
-
-        // ------ second run
-        {
-            int_type i = 1;
-            for (mitt mit = a->begin(); mit != a->end(); ++mit, ++i)
-                *mit = i;
-        }
-        {
-            b->set_zero();
-            mt::iterator mit = b->begin();
-            for (int_type i = 0; i < b->get_height(); ++i)
-            {
-                mit.set_pos(i,i);
-                *mit = 1;
-            }
-        }
-
-        bs.flush();
-        STXXL_MSG("start of second run (one matrix is diagonal)");
-        matrix_stats_before.set();
-        stats_before = *stats::get_instance();
-        *c = *a * *b;
-        bs.flush();
-        stats_after = *stats::get_instance();
-        matrix_stats_after.set();
-        STXXL_MSG("end of second run");
-
-        STXXL_MSG(matrix_stats_after - matrix_stats_before);
-        STXXL_MSG(stats_after - stats_before);
-        {
-            int_type num_err = 0;
-            int_type i = 1;
-            for (mitt mit = a->begin(); mit != a->end(); ++mit, ++i)
-                num_err += (*mit != i);
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");
         }
