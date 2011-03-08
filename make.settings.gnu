@@ -339,6 +339,7 @@ HEADER_FILES_COMPAT	+= shared_ptr.h
 HEADER_FILES_COMPAT	+= type_traits.h
 
 HEADER_FILES_IO		+= io.h iostats.h completion_handler.h
+HEADER_FILES_IO		+= request_interface.h
 HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h
 HEADER_FILES_IO		+= request_state_impl_basic.h request_impl_basic.h
 HEADER_FILES_IO		+= disk_queues.h

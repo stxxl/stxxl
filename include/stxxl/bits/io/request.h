@@ -20,8 +20,8 @@
 #include <cassert>
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/types.h>
+#include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/switch.h>
@@ -41,54 +41,6 @@ __STXXL_BEGIN_NAMESPACE
 
 class file;
 class request_ptr;
-
-//! \brief Defines interface of request
-
-//! Since all library I/O operations are asynchronous,
-//! one needs to keep track of their status: whether
-//! an I/O completed or not.
-class request_base : private noncopyable
-{
-public:
-    typedef stxxl::uint64 offset_type;
-    typedef stxxl::unsigned_type size_type;
-    enum request_type { READ, WRITE };
-
-protected:
-    virtual bool add_waiter(onoff_switch * sw) = 0;
-    virtual void delete_waiter(onoff_switch * sw) = 0;
-    virtual void notify_waiters() = 0;
-
-public:
-    // HACK!
-    virtual void serve() = 0;
-
-protected:
-    virtual void completed() = 0;
-
-public:
-    //! \brief Suspends calling thread until completion of the request
-    virtual void wait(bool measure_time = true) = 0;
-
-    //! \brief Cancel request
-    //! The request is cancelled unless already being processed.
-    //! However, cancelation cannot be guaranteed.
-    //! Cancelled requests must still be waited for in order to ensure correct
-    //! operation.
-    //! \return \c true iff the request was cancelled successfully
-    virtual bool cancel() = 0;
-
-    //! \brief Polls the status of the request
-    //! \return \c true if request is completed, otherwise \c false
-    virtual bool poll() = 0;
-
-    //! \brief Identifies the type of I/O implementation
-    //! \return pointer to null terminated string of characters, containing the name of I/O implementation
-    virtual const char * io_type() const = 0;
-
-    virtual ~request_base()
-    { }
-};
 
 //! \brief Basic properties of a request.
 class request : virtual public request_base
