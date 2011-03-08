@@ -17,8 +17,6 @@
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 #include <stxxl/timer>
-#include <stxxl/bits/common/utils.h>
-#include <stxxl/bits/msvc_compatibility.h>
 
 
 using stxxl::request_ptr;

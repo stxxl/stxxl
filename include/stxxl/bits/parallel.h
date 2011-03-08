@@ -3,7 +3,8 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2011 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -39,7 +40,7 @@
 #ifdef __MCSTL__
  #include <mcstl.h>
  #include <bits/mcstl_multiway_merge.h>
- #include <stxxl/bits/compat_type_traits.h>
+ #include <stxxl/bits/compat/type_traits.h>
 #endif
 
 #if STXXL_PARALLEL
@@ -153,7 +154,7 @@ namespace parallel
 #elif defined(STXXL_PARALLEL_MODE)
         return __gnu_parallel::multiway_merge(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-        typedef typename make_signed<DiffType>::type difference_type;
+        typedef typename compat::make_signed<DiffType>::type difference_type;
         return mcstl::multiway_merge(seqs_begin, seqs_end, target, comp, difference_type(length), false);
 #else
 #error "no implementation found for multiway_merge()"
@@ -182,7 +183,7 @@ namespace parallel
 #elif defined(STXXL_PARALLEL_MODE)
         return __gnu_parallel::multiway_merge_sentinels(seqs_begin, seqs_end, target, comp, length);
 #elif defined(__MCSTL__)
-        typedef typename make_signed<DiffType>::type difference_type;
+        typedef typename compat::make_signed<DiffType>::type difference_type;
         return mcstl::multiway_merge_sentinel(seqs_begin, seqs_end, target, comp, difference_type(length), false);
 #else
 #error "no implementation found for multiway_merge_sentinel()"
