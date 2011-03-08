@@ -4,6 +4,7 @@
 # --icpc=...
 # --with-mcstl
 # --with-pmode
+# --with-explicit-pmode
 # --with-extraflags=...
 # --with-werror
 # --with-boost
@@ -21,6 +22,7 @@ MAKE=make
 
 MCSTL=
 PMODE=
+EXPLICIT_PMODE=no
 
 USE_BOOST=no
 USE_MACOSX=no
@@ -48,7 +50,7 @@ case "`uname -s`" in
 		;;
 esac
 
-TEMP=`getopt --longoptions gcc:,icpc:,with-mcstl,with-pmode,with-extraflags:,with-werror,with-boost,with-tpie,with-ledasm,without-btree,without-unittest,with-debug: -- --foo "$@"`
+TEMP=`getopt --longoptions gcc:,icpc:,with-mcstl,with-pmode,with-explicit-pmode,with-extraflags:,with-werror,with-boost,with-tpie,with-ledasm,without-btree,without-unittest,with-debug: -- --foo "$@"`
 if [ $? != 0 ] ; then echo "getopt failed" >&2 ; exit 1 ; fi
 
 eval set -- "$TEMP"
@@ -71,6 +73,10 @@ while true ; do
 			;;
 		--with-pmode)
 			PMODE=pmode
+			shift
+			;;
+		--with-explicit-pmode)
+			EXPLICIT_PMODE=yes
 			shift
 			;;
 		--with-extraflags)
@@ -125,6 +131,7 @@ MCSTL_ROOT	 = \$(HOME)/work/mcstl
 TPIE_ROOT	 = \$(HOME)/work/lib/\$(UNAME_M)/tpie
 NICE		 =
 
+USE_PARALLEL_MODE= $EXPLICIT_PMODE
 PMODE		 =$PMODE
 MCSTL		 =$MCSTL
 
@@ -154,7 +161,15 @@ else
 	rm -f make.settings.local.tmp
 fi
 
+test ! -f GNUmakefile || mv GNUmakefile GNUmakefile.old
 $MAKE -f GNUmakefile.mk GNUmakefile
+if [ -f GNUmakefile.old ] ; then
+	if cmp -s GNUmakefile GNUmakefile.old ; then
+		mv GNUmakefile.old GNUmakefile
+	else
+		rm -f GNUmakefile.old
+	fi
+fi
 
 echo "#####################################################################"
 cat make.settings.local

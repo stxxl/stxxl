@@ -18,12 +18,11 @@
 #endif
 
 #include <stxxl/bits/compat_hash_map.h>
-
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_ptr.h>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>
-
-#include <stxxl/bits/containers/btree/btree_pager.h>
+#include <stxxl/bits/containers/pager.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -43,7 +42,7 @@ namespace btree
         typedef typename btree_type::key_compare key_compare;
 
         typedef typename btree_type::alloc_strategy_type alloc_strategy_type;
-        typedef stxxl::btree::lru_pager pager_type;
+        typedef stxxl::lru_pager<> pager_type;
 
     private:
         btree_type * btree_;
@@ -91,7 +90,7 @@ namespace btree
         typedef hash_map_type BID2node_type;
 
         BID2node_type BID2node_;
-        stxxl::btree::lru_pager pager_;
+        pager_type pager_;
         block_manager * bm;
         alloc_strategy_type alloc_strategy_;
 

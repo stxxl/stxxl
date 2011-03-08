@@ -5,7 +5,8 @@
  *
  *  Copyright (C) 2002, 2005, 2008 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Ilja Andronov <sni4ok@yandex.ru>
- *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -13,6 +14,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/common/error_handling.h>
 
 #ifdef BOOST_MSVC
  #include <windows.h>

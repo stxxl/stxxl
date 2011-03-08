@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2008, 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -23,9 +24,6 @@ __STXXL_BEGIN_NAMESPACE
 template <class _Tp /*, class _Alloc=__STL_DEFAULT_ALLOCATOR(_Tp) */>
 class simple_vector : private noncopyable
 {
-    simple_vector()
-    { }
-
 public:
     typedef unsigned_type size_type;
     typedef _Tp value_type;
@@ -41,11 +39,11 @@ public:
     typedef value_type & reference;
     typedef const value_type & const_reference;
 
-    simple_vector(size_type sz) : _size(sz)
+    simple_vector(size_type sz) : _size(sz), _array(NULL)
     {
-        //assert(sz);
         //    _array = _data_allocator.allocate(sz);
-        _array = new _Tp[sz];
+        if (size() > 0)
+            _array = new _Tp[size()];
     }
     void swap(simple_vector & obj)
     {

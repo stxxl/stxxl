@@ -12,7 +12,7 @@ Version 1.3.1 (unreleased)
     pointer.  Furthermore, the completion_handler is already executed after the
     read operation completes, not only when the issuer waits for it to
     complete.  The I/O thread issues the call to the completion_handler, so for
-    multiple disks, this may happen concurrently.  
+    multiple disks, this may happen concurrently.
 * Internal changes, not user-visible
   - Change handling of (empty) filler elements in typed_block to fix
     mismatching struct size in nested blocks.
@@ -23,11 +23,12 @@ Version 1.3.1 (unreleased)
   - Allow reading a block that spans over end-of-file, fill remainder with
     zeroes.
   - Crash at program termination when using global stxxl containers.
-  - Enable syscall_file to read/write >=4GiB of data in a single I/O operation.
+  - Enable syscall_file to read/write >=2GiB of data in a single I/O operation.
 * New public header: stxxl/stats
-* Parallel mode can be switched on for internal STXXL computation selectively, 
-  by defining STXXL_PARALLEL_MODE_EXPLICIT
-* Platform Support 
+* Parallel mode can be switched on for internal STXXL computation selectively
+  (i.e. without enabling it for the non-stxxl part of an application), by
+  setting USE_PARALLEL_MODE=yes in make.settings.local.
+* Platform Support
   - add ICPC 12.0, works with both MCSTL (needs libstdc++ from GCC 4.2) and
     parallel mode (needs libstdc++ from GCC 4.3 (not 4.4/4.5))
   - add CLANG++ 2.8
@@ -59,7 +60,7 @@ Version 1.3.0 (12 August 2010)
     (compile with -DSTXXL_WAIT_LOG_ENABLED and set STXXLWAITLOGFILE in the environment)
 * Parallel PQ
   - priority_queue now supports parallelized operations utilizing the libstdc++ parallel mode
-* Other new functionality 
+* Other new functionality
   - file requests can now be canceled (success not guaranteed), completion handlers are called anyway.
   - log file locations are now configurable by the environment variables
     STXXLLOGFILE and STXXLERRLOGFILE
@@ -76,7 +77,7 @@ Version 1.3.0 (12 August 2010)
   - optimal prefetch schedule
   - possible race condition while creating singleton instances
   - random_shuffle()
-* Platform Support 
+* Platform Support
   - add GCC 4.4 (parallel mode features not working in GCC 4.3 can now be used)
   - add GCC 4.5
   - initial support for GCC 4.6
@@ -84,7 +85,7 @@ Version 1.3.0 (12 August 2010)
   - add Boost 1.42
   - add FreeBSD
   - drop Solaris
-* New benchmarks 
+* New benchmarks
   - io/benchmark_disks: more command line paramaters for finer testing granularity
   - measure hard-disk and flash-disk combined performance and
     determine best block size pairs (io/benchmark_disk_and_flash)
@@ -101,7 +102,7 @@ Version 1.3.0 (12 August 2010)
     vector::alloc_strategy -> vector::alloc_strategy_type
   - stxxl::sort(..., M) and stxxl::stream::sort(..., M) now adhere to to the memory limit M
     more strictly and throw errors instead of overallocating
-  - Execute completion handler before notifying waiters, so far after. 
+  - Execute completion handler before notifying waiters, so far after.
 * Deprecated methods:
   - stxxl::stats::reset(), stxxl::stats::_reset_io_wait_time():
     use stxxl::stats_data instead to store snapshots of the counters and compute differences
@@ -109,7 +110,7 @@ Version 1.3.0 (12 August 2010)
   - I/O layer cleanup
   - aligned_alloc
 * Doxy now also lists undocumented members
-* stop requiring STXXL_ROOT to be a hard coded absolute path set in make.settings.local, 
+* stop requiring STXXL_ROOT to be a hard coded absolute path set in make.settings.local,
   a default of CURDIR works fine
 * document #defines in defines.h
   - switch on/off file types with STXXL_HAVE_xxx_FILE (to avoid platform compatibility problems)
@@ -247,14 +248,14 @@ Version 1.1.0 (31 July 2007)
   GCC 3.4       |    x           n/a
   GCC 3.3       |    o           n/a
   GCC 2.95      |    -           n/a
-  ICPC 9.1.051  |    x            x¹ 
+  ICPC 9.1.051  |    x            x¹
   ICPC 10.0.025 |    x            x¹
   MSVC 2005 8.0 |    x           n/a
     x = full support   o = partial support   - = unsupported
     n/a = compiler does not support OpenMP which is needed by MCSTL
-	¹ = does not work with STL GCC 4.2.0 (ICPC bug), workaround: 
-	    the first include in the program must be
-	    "stxxl/bits/common/intel_compatibility.h"
+      ¹ = does not work with STL GCC 4.2.0 (ICPC bug), workaround:
+          the first include in the program must be
+          "stxxl/bits/common/intel_compatibility.h"
 * pipelined stream::sort, stream::runs_creator and stream::runs_merger are parallelized using MCSTL
 * obsolete files removed
 * fixed include dependencies
@@ -271,7 +272,7 @@ Version 1.0e (4 June 2007)
 
 * Bugfix: for objects with the destructors, memory block were allocated in a non-aligned fashion
 * Internal CPU efficiency of Stxxl priority queue is improved (loser trees in external mergers are integrated)
-* Fixed bug with conversion of const/non-const iterators, implemented comparison and difference operations on const/non-const iterators (for vector, map, and deque) 
+* Fixed bug with conversion of const/non-const iterators, implemented comparison and difference operations on const/non-const iterators (for vector, map, and deque)
 * Added operator[] to vector and deque iterators
 * stxxl::random_shuffle added
 * improved Makefile structure (thanx to Andreas Beckmann)
@@ -322,7 +323,7 @@ Version 0.75 (23 March 2005)
 ------------------------------------------
 Version 0.7 (25 January 2005)
 
-* The implementation of pipelining is extended and improved 
+* The implementation of pipelining is extended and improved
 
 ------------------------------------------
 Version 0.6 (5 September 2004)
@@ -339,7 +340,7 @@ Version 0.5 (21 November 2003)
 ------------------------------------------
 Version 0.2 (Summer 2003)
 
-* The first public release 
+* The first public release
 
 * Vectors, stacks, sorting, scanning are available
 

@@ -4,7 +4,8 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2006 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2007, 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -25,7 +26,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/compat_type_traits.h>
+#include <stxxl/bits/compat/type_traits.h>
 #include <stxxl/bits/msvc_compatibility.h>
 
 
@@ -117,7 +118,7 @@ inline Integral log2_floor(Integral i)
 
 template <typename Integral, typename Integral2>
 inline
-typename remove_const<Integral>::type
+typename compat::remove_const<Integral>::type
 div_ceil(Integral __n, Integral2 __d)
 {
 #if 0  // ambiguous overload for std::div(unsigned_anything, unsigned_anything)

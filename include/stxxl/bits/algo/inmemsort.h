@@ -16,6 +16,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/simple_vector.h>
+#include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/algo/adaptor.h>
 #include <stxxl/bits/mng/adaptor.h>
 #include <stxxl/bits/parallel.h>

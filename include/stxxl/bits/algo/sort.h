@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -21,9 +21,9 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/adaptor.h>
 #include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/mng/block_alloc_interleaved.h>
+#include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/intksort.h>
