@@ -15,6 +15,8 @@
 #ifndef STXXL_IO__REQUEST_INTERFACE_H_
 #define STXXL_IO__REQUEST_INTERFACE_H_
 
+#include <ostream>
+
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/types.h>
@@ -72,6 +74,9 @@ public:
     //! \brief Identifies the type of I/O implementation
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
     virtual const char * io_type() const = 0;
+
+    //! \brief Identifies the type of I/O implementation
+    virtual std::ostream & print(std::ostream & out) const = 0;
 
     virtual ~request_interface()
     { }
