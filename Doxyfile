@@ -593,6 +593,7 @@ INPUT                  = doxymain.h \
                          include/stxxl/ \
                          include/stxxl/bits/algo/ \
                          include/stxxl/bits/common/ \
+                         include/stxxl/bits/compat/ \
                          include/stxxl/bits/containers/ \
                          include/stxxl/bits/containers/btree/ \
                          include/stxxl/bits/io/ \
