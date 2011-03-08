@@ -17,7 +17,7 @@
 
 
 #include <memory>
-#if defined(__GNUC__) && !defined(__GXX_EXPERIMENTAL_CXX0X__) \
+#if defined(__GNUG__) && !defined(__GXX_EXPERIMENTAL_CXX0X__) \
     && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) \
     && (!defined(__ICC) || (__ICC >= 1100))
 #include <tr1/memory>
@@ -40,8 +40,9 @@ __STXXL_BEGIN_NAMESPACE
     #define STXXL_HAVE_MAKE_SHARED 1
 #endif
 
-namespace compat {
-#if defined(__GXX_EXPERIMENTAL_CXX0X__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40300)
+namespace compat
+{
+#if defined(__GXX_EXPERIMENTAL_CXX0X__)
     using std::shared_ptr;
     using std::make_shared;
     using std::allocate_shared;
@@ -49,7 +50,7 @@ namespace compat {
     using boost::shared_ptr;
     using boost::make_shared;
     using boost::allocate_shared;
-#elif defined(__GNUC__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) \
+#elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) \
     && (!defined(__ICC) || (__ICC >= 1100))
     using std::tr1::shared_ptr;
     #undef STXXL_HAVE_MAKE_SHARED
@@ -61,7 +62,7 @@ namespace compat {
     #undef STXXL_HAVE_MAKE_SHARED
     #define STXXL_HAVE_MAKE_SHARED 0
 #endif
-}
+}  // namespace compat
 
 __STXXL_END_NAMESPACE
 
