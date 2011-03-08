@@ -4,7 +4,6 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2009-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
- *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,7 +15,7 @@
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 #include <type_traits>
-#elif defined(__GNUG__) && (__GNUC__ >= 4) && !defined(__ICC)
+#elif defined(__GNUG__) && (__GNUC__ >= 4)
 #include <tr1/type_traits>
 #elif defined(STXXL_BOOST_CONFIG)
 #include <boost/type_traits/remove_const.hpp>
@@ -31,7 +30,7 @@ namespace compat
 {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 using std::remove_const;
-#elif defined(__GNUG__) && (__GNUC__ >= 4) && !defined(__ICC)
+#elif defined(__GNUG__) && (__GNUC__ >= 4)
 using std::tr1::remove_const;
 #elif defined(STXXL_BOOST_CONFIG)
 using boost::remove_const;
