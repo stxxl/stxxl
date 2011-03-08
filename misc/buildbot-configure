@@ -161,7 +161,15 @@ else
 	rm -f make.settings.local.tmp
 fi
 
+test ! -f GNUmakefile || mv GNUmakefile GNUmakefile.old
 $MAKE -f GNUmakefile.mk GNUmakefile
+if [ -f GNUmakefile.old ] ; then
+	if cmp -s GNUmakefile GNUmakefile.old ; then
+		mv GNUmakefile.old GNUmakefile
+	else
+		rm -f GNUmakefile.old
+	fi
+fi
 
 echo "#####################################################################"
 cat make.settings.local
