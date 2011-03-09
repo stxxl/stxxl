@@ -50,3 +50,4 @@ public:
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO__SERVING_REQUEST_H_
+// vim: et:ts=4:sw=4

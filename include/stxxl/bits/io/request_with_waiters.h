@@ -46,3 +46,4 @@ protected:
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_IO__REQUEST_WITH_WAITERS_H_
+// vim: et:ts=4:sw=4
