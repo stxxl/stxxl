@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER_IO_REQUEST_INTERFACE
-#define STXXL_HEADER_IO_REQUEST_INTERFACE
+#ifndef STXXL_IO__REQUEST_INTERFACE_H_
+#define STXXL_IO__REQUEST_INTERFACE_H_
 
 #include <ostream>
 
@@ -79,7 +79,9 @@ public:
     { }
 };
 
+//! \}
+
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER_IO_REQUEST_INTERFACE
+#endif // !STXXL_IO__REQUEST_INTERFACE_H_
 // vim: et:ts=4:sw=4

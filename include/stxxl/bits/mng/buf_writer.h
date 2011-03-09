@@ -18,7 +18,6 @@
 
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/io/disk_queues.h>
-#include <stxxl/bits/io/request_operations.h>
 
 
 __STXXL_BEGIN_NAMESPACE
