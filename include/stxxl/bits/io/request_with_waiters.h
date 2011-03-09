@@ -26,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implements basic waiters.
+//! \brief Request that is aware of threads waiting for it to complete.
 class request_with_waiters : virtual public request_interface
 {
     mutex waiters_mutex;

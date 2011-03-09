@@ -29,11 +29,11 @@ __STXXL_BEGIN_NAMESPACE
 
 class onoff_switch;
 
-//! \brief Defines interface of request
+//! \brief Functional interface of a request
 
 //! Since all library I/O operations are asynchronous,
-//! one needs to keep track of their status: whether
-//! an I/O completed or not.
+//! one needs to keep track of their status:
+//! e.g. whether an I/O operation completed or not.
 class request_interface : private noncopyable
 {
 public:
@@ -59,12 +59,13 @@ public:
     //! \brief Suspends calling thread until completion of the request
     virtual void wait(bool measure_time = true) = 0;
 
-    //! \brief Cancel request
-    //! The request is cancelled unless already being processed.
+    //! \brief Cancel a request.
+    //!
+    //! The request is canceled unless already being processed.
     //! However, cancelation cannot be guaranteed.
-    //! Cancelled requests must still be waited for in order to ensure correct
-    //! operation.
-    //! \return \c true iff the request was cancelled successfully
+    //! Canceled requests must still be waited for in order to ensure correct operation.
+    //! If the request was canceled successfully, the completion handler will not be called.
+    //! \return \c true iff the request was canceled successfully
     virtual bool cancel() = 0;
 
     //! \brief Polls the status of the request

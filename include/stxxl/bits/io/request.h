@@ -35,7 +35,7 @@ __STXXL_BEGIN_NAMESPACE
 class file;
 class request_ptr;
 
-//! \brief Basic properties of a request.
+//! \brief Request with basic properties like file and offset.
 class request : virtual public request_interface
 {
     friend class request_ptr;

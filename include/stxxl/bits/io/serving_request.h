@@ -22,7 +22,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-//! \brief Basic implementation of request
+//! \brief Request which serves an I/O by calling the synchronous routine of the file.
 class serving_request : public request_with_state
 {
     template <class base_file_type>
