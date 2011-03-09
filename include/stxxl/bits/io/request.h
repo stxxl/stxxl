@@ -20,12 +20,12 @@
 #include <cassert>
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/compat_unique_ptr.h>
-#include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/io/iostats.h>
 
 
@@ -150,7 +150,7 @@ protected:
     }
 
 private:
-    void check_nref_failed(bool after = false);
+    void check_nref_failed(bool after);
 };
 
 inline std::ostream & operator << (std::ostream & out, const request & req)

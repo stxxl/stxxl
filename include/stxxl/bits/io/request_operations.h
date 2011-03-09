@@ -1,25 +1,24 @@
 /***************************************************************************
- *  include/stxxl/bits/io/reques_operations.h
+ *  include/stxxl/bits/io/request_operations.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER_IO_REQUEST_OPERATIONS
-#define STXXL_HEADER_IO_REQUEST_OPERATIONS
-
-#include <iostream>
-#include <memory>
-#include <cassert>
+#ifndef STXXL_IO__REQUEST_OPERATIONS_H_
+#define STXXL_IO__REQUEST_OPERATIONS_H_
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request_ptr.h>
+#include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/common/switch.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -118,7 +117,7 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
     {
         if ((request_ptr(*cur))->add_waiter(&sw))
         {
-            // already done
+            // request is already done, no waiter was added to the request
             result = cur;
 
             if (cur != reqs_begin)
@@ -161,5 +160,5 @@ inline int wait_any(request_ptr req_array[], int count)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER_IO_REQUEST_OPERATIONS
+#endif // !STXXL_IO__REQUEST_OPERATIONS_H_
 // vim: et:ts=4:sw=4

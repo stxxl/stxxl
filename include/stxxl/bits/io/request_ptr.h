@@ -4,22 +4,21 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER_IO_REQUEST_PTR
-#define STXXL_HEADER_IO_REQUEST_PTR
+#ifndef STXXL_IO__REQUEST_PTR_H_
+#define STXXL_IO__REQUEST_PTR_H_
 
-#include <iostream>
-#include <memory>
 #include <cassert>
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request.h>
+#include <stxxl/bits/verbose.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -132,7 +131,9 @@ public:
     bool empty() const { return ptr == NULL; }
 };
 
+//! \}
+
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER_IO_REQUEST_PTR
+#endif // !STXXL_IO__REQUEST_PTR_H_
 // vim: et:ts=4:sw=4
