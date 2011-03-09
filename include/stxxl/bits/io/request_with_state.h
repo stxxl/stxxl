@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/request_state_impl_basic.h
+ *  include/stxxl/bits/io/request_with_state.h
  *
  *  UNIX file system file base
  *

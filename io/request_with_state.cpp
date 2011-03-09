@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/request_state_impl_basic.cpp
+ *  io/request_with_state.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,7 +12,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/request_state_impl_basic.h>
+#include <stxxl/bits/io/request_with_state.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/disk_queues.h>
 

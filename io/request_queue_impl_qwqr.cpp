@@ -13,9 +13,8 @@
  **************************************************************************/
 
 #include <algorithm>
-#include <stxxl/bits/io/request_state_impl_basic.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_with_state.h>
 #include <stxxl/bits/parallel.h>
 
 
