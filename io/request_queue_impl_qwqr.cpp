@@ -13,9 +13,9 @@
  **************************************************************************/
 
 #include <algorithm>
-#include <stxxl/bits/io/serving_request.h>
+
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/parallel.h>
 
 

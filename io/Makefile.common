@@ -7,8 +7,8 @@ UTIL_BINARIES		 = benchmark_disks
 LIB_SRC			 = \
 	iostats.cpp \
 	request.cpp \
-	request_with_waiters.cpp \
 	request_with_state.cpp \
+	request_with_waiters.cpp \
 	serving_request.cpp \
 	aio_request.cpp \
 	disk_queued_file.cpp \

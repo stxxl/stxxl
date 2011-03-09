@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER_IO_REQUEST_WITH_WAITERS
-#define STXXL_HEADER_IO_REQUEST_WITH_WAITERS
+#ifndef STXXL_IO__REQUEST_WITH_WAITERS_H_
+#define STXXL_IO__REQUEST_WITH_WAITERS_H_
 
 #include <set>
 
@@ -57,4 +57,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER_IO_REQUEST_WITH_WAITERS
+#endif // !STXXL_IO__REQUEST_WITH_WAITERS_H_

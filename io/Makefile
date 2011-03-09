@@ -53,11 +53,11 @@ fileperblock_file.$(OBJEXT): fileperblock_file.cpp
 request.$(OBJEXT): request.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request.cpp
 
-request_with_waiters.$(OBJEXT): request_with_waiters.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_with_waiters.cpp
-
 request_with_state.$(OBJEXT): request_with_state.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_with_state.cpp
+
+request_with_waiters.$(OBJEXT): request_with_waiters.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_with_waiters.cpp
 
 serving_request.$(OBJEXT): serving_request.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c serving_request.cpp
