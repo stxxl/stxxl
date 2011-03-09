@@ -219,7 +219,7 @@ namespace ksort_local
         int_type * bucket2 = new int_type[k2];
         int_type i;
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
         for (i = 0; i < run_size; i++)
         {
@@ -598,7 +598,7 @@ namespace ksort_local
 
         double io_wait_after_rf = stats::get_instance()->get_io_wait_time();
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
         const int_type merge_factor = optimal_merge_factor(nruns, _m);
         run_type ** new_runs;

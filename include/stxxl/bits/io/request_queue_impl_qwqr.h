@@ -26,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-class request_queue_impl_qwqr : public request_queue_impl_worker, public disk_queue
+class request_queue_impl_qwqr : public request_queue_impl_worker
 {
 private:
     typedef request_queue_impl_qwqr self;

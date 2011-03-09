@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/request_state_impl_basic.cpp
+ *  io/request_with_state.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,16 +12,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/request_state_impl_basic.h>
+#include <stxxl/bits/io/request_with_state.h>
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/disk_queues.h>
 
 __STXXL_BEGIN_NAMESPACE
 
 
-request_state_impl_basic::~request_state_impl_basic()
+request_with_state::~request_with_state()
 {
-    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_state_impl_basic::~(), ref_cnt: " << ref_cnt);
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_with_state::~(), ref_cnt: " << ref_cnt);
 
     assert(_state() == DONE || _state() == READY2DIE);
 
@@ -32,9 +32,9 @@ request_state_impl_basic::~request_state_impl_basic()
     // _state.wait_for (READY2DIE); // does not make sense ?
 }
 
-void request_state_impl_basic::wait(bool measure_time)
+void request_with_state::wait(bool measure_time)
 {
-    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_state_impl_basic::wait()");
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_with_state::wait()");
 
     stats::scoped_wait_timer wait_timer(get_type() == READ ? stats::WAIT_OP_READ : stats::WAIT_OP_WRITE, measure_time);
 
@@ -43,9 +43,9 @@ void request_state_impl_basic::wait(bool measure_time)
     check_errors();
 }
 
-bool request_state_impl_basic::cancel()
+bool request_with_state::cancel()
 {
-    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_state_impl_basic::cancel() " << file_ << " " << buffer << " " << offset);
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request_with_state::cancel() " << file_ << " " << buffer << " " << offset);
 
     if (file_)
     {
@@ -63,7 +63,7 @@ bool request_state_impl_basic::cancel()
     return false;
 }
 
-bool request_state_impl_basic::poll()
+bool request_with_state::poll()
 {
     const request_state s = _state();
 

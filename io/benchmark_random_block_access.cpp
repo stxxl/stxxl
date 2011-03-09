@@ -108,9 +108,10 @@ void run_test(stxxl::int64 span, stxxl::int64 num_blocks, bool do_init, bool do_
             wait_all(reqs, num_blocks_in_span);
             end = timestamp();
             elapsed = end - begin;
-            std::cout << "Written " << num_blocks << " blocks in " << std::fixed << std::setw(5) << std::setprecision(2) << elapsed << " seconds: "
-                      << std::setw(5) << std::setprecision(1) << (double(num_blocks) / elapsed) << " blocks/s "
-                      << std::setw(5) << std::setprecision(1) << (double(num_blocks * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
+            std::cout << "Written "
+                      << std::setw(12) << num_blocks_in_span << " blocks in " << std::fixed << std::setw(9) << std::setprecision(2) << elapsed << " seconds: "
+                      << std::setw(9) << std::setprecision(1) << (double(num_blocks_in_span) / elapsed) << " blocks/s "
+                      << std::setw(7) << std::setprecision(1) << (double(num_blocks_in_span * raw_block_size) / MB / elapsed) << " MiB/s write " << std::endl;
         }
 
         std::cout << "Random block access..." << std::endl;

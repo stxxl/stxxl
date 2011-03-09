@@ -4,16 +4,15 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008, 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
- *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_REQUEST_HEADER
-#define STXXL_REQUEST_HEADER
+#ifndef STXXL_IO__REQUEST_H_
+#define STXXL_IO__REQUEST_H_
 
 #include <cassert>
 
@@ -36,7 +35,7 @@ __STXXL_BEGIN_NAMESPACE
 class file;
 class request_ptr;
 
-//! \brief Basic properties of a request.
+//! \brief Request with basic properties like file and offset.
 class request : virtual public request_interface
 {
     friend class request_ptr;
@@ -145,5 +144,5 @@ inline std::ostream & operator << (std::ostream & out, const request & req)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_REQUEST_HEADER
+#endif // !STXXL_IO__REQUEST_H_
 // vim: et:ts=4:sw=4

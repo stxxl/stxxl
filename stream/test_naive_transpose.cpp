@@ -1,5 +1,5 @@
 /***************************************************************************
- *  stream/test_transpose.cpp
+ *  stream/test_naive_transpose.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! \example stream/test_transpose.cpp
+//! \example stream/test_naive_transpose.cpp
 //! This is an example of how to use some basic algorithms from the
 //! stream package. The example transposes a 2D-matrix which is serialized
 //! as an 1D-vector.

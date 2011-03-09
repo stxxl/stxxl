@@ -15,8 +15,8 @@
 
 #if STXXL_HAVE_SIMDISK_FILE
 
-#include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -38,47 +38,47 @@ void DiskGeometry::add_zone(int & first_cyl, int last_cyl,
     first_cyl = last_cyl + 1;
 }
 
-double DiskGeometry::get_delay(file::offset_type /*offset*/, file::size_type size)                   // returns delay in s
+// returns delay in s
+double DiskGeometry::get_delay(file::offset_type offset, file::size_type size)
 {
-    /*
+#if 0
+    int first_sect = offset / bytes_per_sector;
+    int last_sect = (offset + size) / bytes_per_sector;
+    int sectors = size / bytes_per_sector;
+    double delay =
+        cmd_ovh + seek_time + rot_latency +
+        double(bytes_per_sector) /
+        double(interface_speed);
 
-       int first_sect = offset / bytes_per_sector;
-       int last_sect = (offset + size) / bytes_per_sector;
-       int sectors = size / bytes_per_sector;
-       double delay =
-            cmd_ovh + seek_time + rot_latency +
-            double (bytes_per_sector) /
-            double (interface_speed);
+    std::set<Zone, ZoneCmp>::iterator zone = zones.lower_bound(first_sect);
+    //std::cout << __PRETTY_FUNCTION__ << " " << (*zone).first_sector << std::endl;
+    while (1)
+    {
+        int from_this_zone =
+            last_sect - ((*zone).first_sector +
+                         (*zone).sectors);
+        if (from_this_zone <= 0)
+        {
+            delay += sectors * bytes_per_sector /
+                     ((*zone).sustained_data_rate);
+            break;
+        }
+        else
+        {
+            delay += from_this_zone *
+                     bytes_per_sector /
+                     ((*zone).sustained_data_rate);
+            zone++;
+            stxxl_nassert(zone == zones.end());
+            sectors -= from_this_zone;
+        }
+    }
 
-       std::set < Zone, ZoneCmp >::iterator zone =
-            zones.lower_bound (first_sect);
-       // cout << __PRETTY_FUNCTION__ << " " << (*zone).first_sector << endl;
-       while (1)
-       {
-            int from_this_zone =
-                    last_sect - ((*zone).first_sector +
-                                 (*zone).sectors);
-            if (from_this_zone <= 0)
-            {
-                    delay += sectors * bytes_per_sector /
-                            ((*zone).sustained_data_rate);
-                    break;
-            }
-            else
-            {
-                    delay += from_this_zone *
-                            bytes_per_sector /
-                            ((*zone).sustained_data_rate);
-                    zone++;
-                    stxxl_nassert (zone == zones.end ());
-                    sectors -= from_this_zone;
-            }
-       }
-
-       return delay;
-
-     */
+    return delay;
+#else
+    STXXL_UNUSED(offset);
     return double(size) / double(AVERAGE_SPEED);
+#endif
 }
 
 
@@ -131,23 +131,21 @@ IC35L080AVVA07::IC35L080AVVA07()
     add_zone(last_cyl, 54010, 471, first_sect);
     add_zone(last_cyl, 55571, 448, first_sect);
 
-    /*
-     * set<Zone,ZoneCmp>::iterator it=zones.begin();
-     * int i=0;
-     * for(;it!=zones.end();it++,i++)
-     * {
-     * //const int block_size = 128*3*1024* 4; // one cylinder
-     *
-     * cout << "Zone " << i << " first sector: " << (*it).first_sector;
-     * cout << " sectors: " << (*it).sectors << " sustained rate: " ;
-     * cout << (*it).sustained_data_rate/1024/1024 << " MiB/s"  << endl;
-     *
-     * }
-     *
-     *
-     * cout << "Last sector     : " << first_sect <<endl;
-     * cout << "Approx. capacity: " << (first_sect/1024/1024)*bytes_per_sector << " MiB" << endl;
-     */
+#if 0
+    set<Zone, ZoneCmp>::iterator it = zones.begin();
+    int i = 0;
+    for ( ; it != zones.end(); it++, i++)
+    {
+        //const int block_size = 128*3*1024* 4;  // one cylinder
+
+        std::cout << "Zone " << i << " first sector: " << (*it).first_sector;
+        std::cout << " sectors: " << (*it).sectors << " sustained rate: ";
+        std::cout << (*it).sustained_data_rate / 1024 / 1024 << " MiB/s" << std::endl;
+    }
+
+    std::cout << "Last sector     : " << first_sect << std::endl;
+    std::cout << "Approx. capacity: " << (first_sect / 1024 / 1024) * bytes_per_sector << " MiB" << std::endl;
+#endif
 
     std::cout << "Transfer 16 MiB from zone 0 : " <<
     get_delay(0, 16 * 1024 * 1024) << " s" << std::endl;

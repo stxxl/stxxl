@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/request_impl_basic.h
+ *  include/stxxl/bits/io/serving_request.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,10 +11,10 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO_REQUEST_IMPL_BASIC_HEADER
-#define STXXL_IO_REQUEST_IMPL_BASIC_HEADER
+#ifndef STXXL_IO__SERVING_REQUEST_H_
+#define STXXL_IO__SERVING_REQUEST_H_
 
-#include <stxxl/bits/io/request_state_impl_basic.h>
+#include <stxxl/bits/io/request_with_state.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -22,14 +22,14 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-//! \brief Basic implementation of request
-class request_impl_basic : public request_state_impl_basic
+//! \brief Request which serves an I/O by calling the synchronous routine of the file.
+class serving_request : public request_with_state
 {
     template <class base_file_type>
     friend class fileperblock_file;
 
 public:
-    request_impl_basic(
+    serving_request(
         const completion_handler & on_cmpl,
         file * f,
         void * buf,
@@ -49,4 +49,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO_REQUEST_IMPL_BASIC_HEADER
+#endif // !STXXL_IO__SERVING_REQUEST_H_
+// vim: et:ts=4:sw=4

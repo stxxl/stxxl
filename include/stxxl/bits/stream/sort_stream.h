@@ -207,7 +207,7 @@ namespace stream
         run.resize(cur_run_size);
         bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
         // fill the rest of the last block with max values
         fill_with_max_value(Blocks1, cur_run_size, blocks1_length);
@@ -466,7 +466,7 @@ namespace stream
             block_manager * bm = block_manager::get_instance();
             bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-            disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+            disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
             result_.runs_sizes.push_back(cur_el_reg);
 
@@ -548,7 +548,7 @@ namespace stream
             block_manager * bm = block_manager::get_instance();
             bm->new_blocks(AllocStr_(), make_bid_iterator(run.begin()), make_bid_iterator(run.end()));
 
-            disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+            disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
             result_.runs_sizes.push_back(el_in_run);
 
@@ -1011,7 +1011,7 @@ namespace stream
             assert(check_sorted_runs(r, cmp));
 #endif //STXXL_CHECK_ORDER_IN_SORTS
 
-            disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+            disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
             int_type disks_number = config::get_instance()->disks_number();
             unsigned_type min_prefetch_buffers = 2 * disks_number;

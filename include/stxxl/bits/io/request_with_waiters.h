@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/basic_waiters_request.h
+ *  include/stxxl/bits/io/request_with_waiters.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER
-#define STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER
+#ifndef STXXL_IO__REQUEST_WITH_WAITERS_H_
+#define STXXL_IO__REQUEST_WITH_WAITERS_H_
 
 #include <set>
 
@@ -26,8 +26,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implements basic waiters.
-class request_waiters_impl_basic : virtual public request_interface
+//! \brief Request that is aware of threads waiting for it to complete.
+class request_with_waiters : virtual public request_interface
 {
     mutex waiters_mutex;
     std::set<onoff_switch *> waiters;
@@ -45,4 +45,5 @@ protected:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_REQUEST_WAITERS_IMPL_BASIC_HEADER
+#endif // !STXXL_IO__REQUEST_WITH_WAITERS_H_
+// vim: et:ts=4:sw=4

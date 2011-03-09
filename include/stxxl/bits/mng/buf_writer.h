@@ -84,7 +84,7 @@ public:
         for (unsigned_type i = 0; i < nwriteblocks; i++)
             free_write_blocks.push_back(i);
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
     }
     //! \brief Returns free block from the internal buffer pool
     //! \return pointer to the block from the internal buffer pool
