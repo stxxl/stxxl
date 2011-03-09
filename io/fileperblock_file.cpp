@@ -19,7 +19,7 @@
 #include <stxxl/bits/io/mmap_file.h>
 #include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/wincall_file.h>
-#include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/common/aligned_alloc.h>
 
 __STXXL_BEGIN_NAMESPACE

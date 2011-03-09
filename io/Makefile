@@ -58,8 +58,8 @@ request_waiters_impl_basic.$(OBJEXT): request_waiters_impl_basic.cpp
 request_state_impl_basic.$(OBJEXT): request_state_impl_basic.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_state_impl_basic.cpp
 
-request_impl_basic.$(OBJEXT): request_impl_basic.cpp
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c request_impl_basic.cpp
+serving_request.$(OBJEXT): serving_request.cpp
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c serving_request.cpp
 
 disk_queued_file.$(OBJEXT): disk_queued_file.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c disk_queued_file.cpp

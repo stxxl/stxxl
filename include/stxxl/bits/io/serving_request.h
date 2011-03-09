@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/request_impl_basic.h
+ *  include/stxxl/bits/io/serving_request.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

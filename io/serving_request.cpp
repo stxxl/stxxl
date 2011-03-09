@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/request_impl_basic.cpp
+ *  io/serving_request.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,7 +12,7 @@
  **************************************************************************/
 
 #include <iomanip>
-#include <stxxl/bits/io/request_impl_basic.h>
+#include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/io/file.h>
 
 

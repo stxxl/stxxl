@@ -9,7 +9,7 @@ LIB_SRC			 = \
 	request.cpp \
 	request_waiters_impl_basic.cpp \
 	request_state_impl_basic.cpp \
-	request_impl_basic.cpp \
+	serving_request.cpp \
 	disk_queued_file.cpp \
 	request_queue_impl_worker.cpp \
 	request_queue_impl_qwqr.cpp \
