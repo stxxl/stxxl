@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/request.h>
-#include <stxxl/bits/io/request_waiters_impl_basic.h>
+#include <stxxl/bits/io/request_with_waiters.h>
 
 
 __STXXL_BEGIN_NAMESPACE

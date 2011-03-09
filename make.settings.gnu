@@ -340,10 +340,11 @@ HEADER_FILES_COMPAT	+= type_traits.h
 
 HEADER_FILES_IO		+= io.h iostats.h completion_handler.h
 HEADER_FILES_IO		+= request_interface.h
-HEADER_FILES_IO		+= request.h request_waiters_impl_basic.h
+HEADER_FILES_IO		+= request.h
 HEADER_FILES_IO		+= request_state_impl_basic.h
 HEADER_FILES_IO		+= request_ptr.h
 HEADER_FILES_IO		+= request_operations.h
+HEADER_FILES_IO		+= request_with_waiters.h
 HEADER_FILES_IO		+= serving_request.h
 HEADER_FILES_IO		+= disk_queues.h
 HEADER_FILES_IO		+= request_queue.h request_queue_impl_worker.h

@@ -133,10 +133,10 @@ IO_LAYER_FILES	 = \
 	$(HEADER_PATH)/io/completion_handler.h \
 	$(HEADER_PATH)/io/request_interface.h \
 	$(HEADER_PATH)/io/request.h \
-	$(HEADER_PATH)/io/request_waiters_impl_basic.h \
 	$(HEADER_PATH)/io/request_state_impl_basic.h \
 	$(HEADER_PATH)/io/request_ptr.h \
 	$(HEADER_PATH)/io/request_operations.h \
+	$(HEADER_PATH)/io/request_with_waiters.h \
 	$(HEADER_PATH)/io/serving_request.h \
 	$(HEADER_PATH)/io/disk_queues.h \
 	$(HEADER_PATH)/io/request_queue.h \

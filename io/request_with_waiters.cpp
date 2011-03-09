@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/request_waiters_impl_basic.cpp
+ *  io/request_with_waiters.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,7 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/request_waiters_impl_basic.h>
+#include <stxxl/bits/io/request_with_waiters.h>
 #include <algorithm>
 #include <stxxl/bits/parallel.h>
 

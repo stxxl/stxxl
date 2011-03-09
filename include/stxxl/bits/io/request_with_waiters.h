@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/io/basic_waiters_request.h
+ *  include/stxxl/bits/io/request_with_waiters.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

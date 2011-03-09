@@ -4,8 +4,8 @@ LIBVERSION	= 1.3.1
 LIB_OBJECTS = \
 	../io/iostats.$(LIBOBJEXT) \
 	../io/request.$(LIBOBJEXT) \
-	../io/request_waiters_impl_basic.$(LIBOBJEXT) \
 	../io/request_state_impl_basic.$(LIBOBJEXT) \
+	../io/request_with_waiters.$(LIBOBJEXT) \
 	../io/serving_request.$(LIBOBJEXT) \
 	../io/request_queue_impl_worker.$(LIBOBJEXT) \
 	../io/request_queue_impl_qwqr.$(LIBOBJEXT) \
