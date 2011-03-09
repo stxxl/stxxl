@@ -23,13 +23,13 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic implementation of request
-class request_impl_basic : public request_state_impl_basic
+class serving_request : public request_state_impl_basic
 {
     template <class base_file_type>
     friend class fileperblock_file;
 
 public:
-    request_impl_basic(
+    serving_request(
         const completion_handler & on_cmpl,
         file * f,
         void * buf,

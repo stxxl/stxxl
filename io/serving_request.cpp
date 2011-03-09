@@ -19,7 +19,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-request_impl_basic::request_impl_basic(
+serving_request::serving_request(
     const completion_handler & on_cmpl,
     file * f,
     void * buf,
@@ -36,11 +36,11 @@ request_impl_basic::request_impl_basic(
 #endif
 }
 
-void request_impl_basic::serve()
+void serving_request::serve()
 {
     check_nref();
     STXXL_VERBOSE2(
-        "[" << static_cast<void *>(this) << "] request_impl_basic::serve(): " <<
+        "[" << static_cast<void *>(this) << "] serving_request::serve(): " <<
         buffer << " @ [" <<
         file_ << "|" << file_->get_allocator_id() << "]0x" <<
         std::hex << std::setfill('0') << std::setw(8) <<
@@ -61,15 +61,15 @@ void request_impl_basic::serve()
     completed();
 }
 
-void request_impl_basic::completed()
+void serving_request::completed()
 {
-    STXXL_VERBOSE2("[" << static_cast<void *>(this) << "] request_impl_basic::completed()");
+    STXXL_VERBOSE2("[" << static_cast<void *>(this) << "] serving_request::completed()");
     _state.set_to(DONE);
     request_state_impl_basic::completed();
     _state.set_to(READY2DIE);
 }
 
-const char * request_impl_basic::io_type() const
+const char * serving_request::io_type() const
 {
     return file_->io_type();
 }

@@ -24,7 +24,7 @@ request_ptr disk_queued_file::aread(
     size_type bytes,
     const completion_handler & on_cmpl)
 {
-    request_ptr req = new request_impl_basic(on_cmpl, this,
+    request_ptr req = new serving_request(on_cmpl, this,
                                              buffer, pos, bytes,
                                              request::READ);
 
@@ -39,7 +39,7 @@ request_ptr disk_queued_file::awrite(
     size_type bytes,
     const completion_handler & on_cmpl)
 {
-    request_ptr req = new request_impl_basic(on_cmpl, this, buffer, pos, bytes,
+    request_ptr req = new serving_request(on_cmpl, this, buffer, pos, bytes,
                                              request::WRITE);
 
     disk_queues::get_instance()->add_request(req, get_queue_id());

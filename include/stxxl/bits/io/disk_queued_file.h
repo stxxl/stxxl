@@ -22,7 +22,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of some file methods based on request_impl_basic
+//! \brief Implementation of some file methods based on serving_request
 class disk_queued_file : public virtual file
 {
     int queue_id, allocator_id;
