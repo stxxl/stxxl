@@ -51,6 +51,7 @@ file * create_file(const std::string & io_impl,
 #if STXXL_HAVE_SIMDISK_FILE
     else if (io_impl == "simdisk")
     {
+        options &= ~stxxl::file::DIRECT;  // clear the DIRECT flag, this file is supposed to be on tmpfs
         ufs_file_base * result = new sim_disk_file(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;
