@@ -23,7 +23,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief Basic implementation of request
-class serving_request : public request_state_impl_basic
+class serving_request : public request_with_state
 {
     template <class base_file_type>
     friend class fileperblock_file;

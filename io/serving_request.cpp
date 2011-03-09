@@ -26,7 +26,7 @@ serving_request::serving_request(
     offset_type off,
     size_type b,
     request_type t) :
-    request_state_impl_basic(on_cmpl, f, buf, off, b, t)
+    request_with_state(on_cmpl, f, buf, off, b, t)
 {
 #ifdef STXXL_CHECK_BLOCK_ALIGNING
     // Direct I/O requires file system block size alignment for file offsets,
@@ -65,7 +65,7 @@ void serving_request::completed()
 {
     STXXL_VERBOSE2("[" << static_cast<void *>(this) << "] serving_request::completed()");
     _state.set_to(DONE);
-    request_state_impl_basic::completed();
+    request_with_state::completed();
     _state.set_to(READY2DIE);
 }
 
