@@ -68,7 +68,8 @@ int main()
         STXXL_MSG("current run size: " << run_size);
 
         std::vector<unsigned> tmp(run_size);            // create temp storage for current run
-        std::generate(tmp.begin(), tmp.end(), rnd _STXXL_FORCE_SEQUENTIAL);     // fill with random numbers
+        // fill with random numbers
+        std::generate(tmp.begin(), tmp.end(), rnd _STXXL_FORCE_SEQUENTIAL);
         std::sort(tmp.begin(), tmp.end(), c);           // sort
         for (unsigned j = 0; j < run_size; ++j)
         {

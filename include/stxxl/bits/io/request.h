@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER_IO_REQUEST
-#define STXXL_HEADER_IO_REQUEST
+#ifndef STXXL_IO__REQUEST_H_
+#define STXXL_IO__REQUEST_H_
 
 #include <cassert>
 
@@ -145,5 +145,5 @@ inline std::ostream & operator << (std::ostream & out, const request & req)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER_IO_REQUEST
+#endif // !STXXL_IO__REQUEST_H_
 // vim: et:ts=4:sw=4

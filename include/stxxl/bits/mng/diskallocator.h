@@ -217,7 +217,6 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
     new_blocks(middle, end);
 }
 
-
 //! \}
 
 __STXXL_END_NAMESPACE

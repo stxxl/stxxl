@@ -34,10 +34,10 @@ test_materialize.$(EXEEXT): test_materialize.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_materialize.cpp -DSTXXL_VERBOSE_LEVEL=1
 	$(LINKER)  test_materialize.$(OBJEXT) $(OUT)test_materialize.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
-test_transpose: test_transpose.$(EXEEXT)
-test_transpose.$(EXEEXT): test_transpose.cpp $(DEPENDENCIES)
-	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_transpose.cpp
-	$(LINKER) test_transpose.$(OBJEXT) $(OUT)test_transpose.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+test_naive_transpose: test_naive_transpose.$(EXEEXT)
+test_naive_transpose.$(EXEEXT): test_naive_transpose.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_naive_transpose.cpp
+	$(LINKER) test_naive_transpose.$(OBJEXT) $(OUT)test_naive_transpose.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_loop: test_loop.$(EXEEXT)
 test_loop.$(EXEEXT): test_loop.cpp $(DEPENDENCIES)
