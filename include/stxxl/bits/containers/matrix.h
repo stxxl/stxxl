@@ -238,7 +238,7 @@ public:
 
     ValueType operator * (const column_vector<ValueType> & right) const
     {
-        ValueType res;
+        ValueType res = 0;
         for (size_type i = 0; i < size(); ++i)
             res += (*this)[i] * right[i];
         return res;
