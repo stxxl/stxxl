@@ -15,7 +15,8 @@
 #ifndef STXXL_BID_HEADER
 #define STXXL_BID_HEADER
 
-#include <iostream>
+#include <cstring>
+#include <ostream>
 #include <iomanip>
 
 #include <stxxl/bits/io/file.h>

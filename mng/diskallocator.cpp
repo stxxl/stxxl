@@ -12,6 +12,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/mng/diskallocator.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -4,8 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008, 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
- *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -15,18 +14,15 @@
 #ifndef STXXL_HEADER_IO_REQUEST
 #define STXXL_HEADER_IO_REQUEST
 
-#include <iostream>
-#include <memory>
 #include <cassert>
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request_interface.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/common/exceptions.h>
-#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/compat_unique_ptr.h>
-#include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/verbose.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -42,11 +38,6 @@ class request_ptr;
 //! \brief Request with basic properties like file and offset.
 class request : virtual public request_interface
 {
-    friend int wait_any(request_ptr req_array[], int count);
-    template <class request_iterator_>
-    friend
-    request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_end);
-    friend class request_queue_impl_qwqr;
     friend class request_ptr;
     friend class aio_queue;
 
@@ -64,6 +55,7 @@ protected:
     size_type bytes;
     request_type type;
 
+public:
     // returns number of references
     int nref()
     {
@@ -71,7 +63,6 @@ protected:
         return ref_cnt;
     }
 
-public:
     request(const completion_handler & on_compl,
             file * file__,
             void * buffer_,
@@ -89,15 +80,7 @@ public:
 
     void check_alignment() const;
 
-    virtual std::ostream & print(std::ostream & out) const
-    {
-        out << "File object address: " << (void *)get_file();
-        out << " Buffer address: " << (void *)get_buffer();
-        out << " File offset: " << get_offset();
-        out << " Transfer size: " << get_size() << " bytes";
-        out << " Type of transfer: " << ((get_type() == READ) ? "READ" : "WRITE");
-        return out;
-    }
+    std::ostream & print(std::ostream & out) const;
 
     //! \brief Inform the request object that an error occurred
     //! during the I/O execution
@@ -117,7 +100,7 @@ public:
     void check_errors() throw (stxxl::io_error)
     {
         if (error.get())
-            throw * (error.get());
+            throw *(error.get());
     }
 
     virtual const char * io_type() const;
@@ -161,8 +144,6 @@ inline std::ostream & operator << (std::ostream & out, const request & req)
 //! \}
 
 __STXXL_END_NAMESPACE
-
-#include <stxxl/bits/io/request_ptr.h>
 
 #endif // !STXXL_HEADER_IO_REQUEST
 // vim: et:ts=4:sw=4

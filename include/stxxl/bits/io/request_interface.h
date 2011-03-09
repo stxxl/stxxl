@@ -4,7 +4,8 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2009, 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -14,14 +15,11 @@
 #ifndef STXXL_HEADER_IO_REQUEST_INTERFACE
 #define STXXL_HEADER_IO_REQUEST_INTERFACE
 
-#include <iostream>
-#include <memory>
-#include <cassert>
+#include <ostream>
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/common/switch.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -29,8 +27,10 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
+class onoff_switch;
+
 //! \brief Functional interface of a request
-//!
+
 //! Since all library I/O operations are asynchronous,
 //! one needs to keep track of their status:
 //! e.g. whether an I/O operation completed or not.
@@ -41,9 +41,11 @@ public:
     typedef stxxl::unsigned_type size_type;
     enum request_type { READ, WRITE };
 
-protected:
+public:
     virtual bool add_waiter(onoff_switch * sw) = 0;
     virtual void delete_waiter(onoff_switch * sw) = 0;
+
+protected:
     virtual void notify_waiters() = 0;
 
 protected:
@@ -69,6 +71,9 @@ public:
     //! \brief Identifies the type of I/O implementation
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
     virtual const char * io_type() const = 0;
+
+    //! \brief Identifies the type of I/O implementation
+    virtual std::ostream & print(std::ostream & out) const = 0;
 
     virtual ~request_interface()
     { }

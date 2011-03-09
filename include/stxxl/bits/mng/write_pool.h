@@ -22,7 +22,7 @@
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/deprecated.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_operations.h>
 
 
 __STXXL_BEGIN_NAMESPACE

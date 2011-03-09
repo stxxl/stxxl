@@ -19,7 +19,7 @@
 #include <queue>
 
 #include <stxxl/bits/common/switch.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_ptr.h>
 #include <stxxl/bits/io/iostats.h>
 
 

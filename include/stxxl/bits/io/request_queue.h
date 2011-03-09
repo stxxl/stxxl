@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2011 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -14,7 +15,7 @@
 #define STXXL_IO_REQUEST_QUEUE_HEADER
 
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/io/request.h>
+#include <stxxl/bits/io/request_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE

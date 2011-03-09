@@ -16,6 +16,7 @@
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/version.h>
 #include <stxxl/bits/common/log.h>
+#include <stxxl/bits/common/error_handling.h>
 
 #ifdef BOOST_MSVC
  #include <windows.h>

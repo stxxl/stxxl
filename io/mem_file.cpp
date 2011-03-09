@@ -10,8 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <cstring>
+
 #include <stxxl/bits/io/mem_file.h>
-#include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/io/iostats.h>
 
 

@@ -13,8 +13,8 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/syscall_file.h>
-#include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE
