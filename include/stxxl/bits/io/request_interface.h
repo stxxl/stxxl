@@ -37,8 +37,8 @@ class onoff_switch;
 class request_interface : private noncopyable
 {
 public:
-    typedef stxxl::uint64 offset_type;
-    typedef stxxl::unsigned_type size_type;
+    typedef stxxl::external_size_type offset_type;
+    typedef stxxl::internal_size_type size_type;
     enum request_type { READ, WRITE };
 
 public:
@@ -76,7 +76,7 @@ public:
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
     virtual const char * io_type() const = 0;
 
-    //! \brief Identifies the type of I/O implementation
+    //! \brief Dumps properties of a request
     virtual std::ostream & print(std::ostream & out) const = 0;
 
     virtual ~request_interface()

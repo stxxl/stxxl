@@ -1,8 +1,6 @@
 /***************************************************************************
  *  include/stxxl/bits/io/request_with_state.h
  *
- *  UNIX file system file base
- *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
