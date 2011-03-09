@@ -15,7 +15,6 @@
 
 #if STXXL_HAVE_SIMDISK_FILE
 
-#include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/io/iostats.h>
 
 
