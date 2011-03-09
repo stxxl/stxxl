@@ -129,8 +129,8 @@ public:
 
 int main(int argc, char **argv)
 {
-    const int small_block_order = 64; // must be a multiple of 64
-    const int block_order = 1024; // must be a multiple of 64
+    const int small_block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
+    const int block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
 
     int test_case = -1;
     int rank = 10000;
