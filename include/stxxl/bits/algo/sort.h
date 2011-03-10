@@ -649,9 +649,9 @@ namespace sort_local
    Model of \b Comparison concept must:
    - provide \b operator(a,b) that returns comparison result of two user types,
      must define strict weak ordering
-   - provide \b max_value method that returns a value that is \b greater than all
+   - provide \b max_value method that returns a value that is \b strictly \b greater than all
    other objects of user type,
-   - provide \b min_value method that returns a value that is \b less than all
+   - provide \b min_value method that returns a value that is \b strictly \b less than all
    other objects of user type,
 
    Example: comparator class \b my_less_int

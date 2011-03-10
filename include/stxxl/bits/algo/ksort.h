@@ -700,9 +700,9 @@ namespace ksort_local
    Model of \b Key \b extractor concept must:
    - define type \b key_type ,
    - provide \b operator() that returns key value of an object of user type
-   - provide \b max_value method that returns a value that is \b greater than all
+   - provide \b max_value method that returns a value that is \b strictly \b greater than all
    other objects of user type in respect to the key obtained by this key extractor ,
-   - provide \b min_value method that returns a value that is \b less than all
+   - provide \b min_value method that returns a value that is \b strictly \b less than all
    other objects of user type in respect to the key obtained by this key extractor ,
    - operator > , operator <, operator == and operator != on type \b key_type must be defined.
 
