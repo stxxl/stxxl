@@ -41,6 +41,8 @@ void mmap_file::serve(const request * req) throw (io_error)
     {
         STXXL_THROW2(io_error,
                      " Mapping failed." <<
+                     " path=" << filename <<
+                     " bytes=" << bytes <<
                      " Page size: " << sysconf(_SC_PAGESIZE) <<
                      " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
     }
