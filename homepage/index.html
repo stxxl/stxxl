@@ -176,13 +176,13 @@
             Current version 
         </h2>
         <p>
-            Version 1.3.0 (August 12, 2010) contains  
+            Version 1.3.1 (March 10, 2011) contains  
             memory management, disk virtualization, prefetching, and so on, as the lower layers,
             and as part of the higher layer 
             (pipelined) sorting with
             <a href="http://algo2.iti.kit.edu/singler/mcstl/">SMP and multi-core processor support</a>, 
             (pipelined) scanning and containers (vectors, stacks, priority queues, maps (B+Tree), queues, deques). 
-            Currently that sums to about 34,000 lines of code. 
+            Currently that sums to about 35,000 lines of code. 
         </p>
         <h2>
             Branches
@@ -211,19 +211,19 @@
         </h2>
         <ul>
             <li>
-                Improved support (e. g. priority queue) for the <a href="http://gcc.gnu.org/onlinedocs/libstdc++/manual/parallel_mode.html">libstdc++ parallel mode </a>(successor of MCSTL), requires g++ 4.4 or later. 
+                parallel mode can be turned on for stxxl algorithms selectively (i.e. without enabling it for the the non-stxxl part of an application)
             </li>
             <li>
                 support for latest compiler versions 
             </li>
             <li>
-                support for FreeBSD 
+                I/O-layer adjustments to avoid performance decrease with recent kernels
             </li>
             <li>
-                new file types: fileperblock (save space through early deallocation), wbtl (library-based write-combining for flash) 
+                support for arbitrarily large I/O requests (syscall file), will be split internally if necessary
             </li>
             <li>
-                Files can be made auto-growing (specified in .stxxl by a size of 0), they will be deleted on normal program termination. 
+                improve support for input files with a partial last block
             </li>
             <li>
                 many, many bug fixes 
@@ -264,10 +264,10 @@
                     </ul>
                 </td>
                 <td>
-                    [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.3.0/install.html">1.3.0</a>] 
+                    [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.3.1/install.html">1.3.1</a>] 
                 </td>
                 <td>
-                    [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.2.1/install.html">1.2.1</a>] 
+                    [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.3.0/install.html">1.3.0</a>] 
                 </td>
                 <td>
                     [<a href="http://algo2.iti.kit.edu/stxxl/trunk/install-svn.html">trunk</a>] 
@@ -282,10 +282,10 @@
                     </ul>
                 </td>
                 <td>
-                    [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.3.0/">1.3.0</a>] 
+                    [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.3.1/">1.3.1</a>] 
                 </td>
                 <td>
-                    [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.2.1/">1.2.1</a>] 
+                    [<a href="http://algo2.iti.kit.edu/stxxl/tags/1.3.0/">1.3.0</a>] 
                 </td>
                 <td>
                     [<a href="http://algo2.iti.kit.edu/stxxl/trunk/">trunk</a>] 
@@ -300,10 +300,10 @@
                     </ul>
                 </td>
                 <td>
-                    [<a href="http://sourceforge.net/projects/stxxl/files/">1.3.0</a>] tgz, zip (sf.net) 
+                    [<a href="http://sourceforge.net/projects/stxxl/files/">1.3.1</a>] tgz, zip (sf.net) 
                 </td>
                 <td>
-                    [<a href="http://sourceforge.net/projects/stxxl/files/stxxl/1.2.1/">1.2.1</a>] tgz, zip (sf.net) 
+                    [<a href="http://sourceforge.net/projects/stxxl/files/stxxl/1.3.0/">1.3.0</a>] tgz, zip (sf.net) 
                 </td>
                 <td>
                     subversion checkout 
@@ -320,16 +320,16 @@
                     </ul>
                 </td>
                 <td>
+                        [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.3.1/">Browse</a>]
+                        [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.3.1/">Checkout</a>]
+                        <br/>
+                    .../svnroot/stxxl/tags/1.3.1/ 
+                </td>
+                <td>
                         [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.3.0/">Browse</a>]
                         [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.3.0/">Checkout</a>]
                         <br/>
                     .../svnroot/stxxl/tags/1.3.0/ 
-                </td>
-                <td>
-                        [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/tags/1.2.1/">Browse</a>]
-                        [<a href="https://stxxl.svn.sourceforge.net/svnroot/stxxl/tags/1.2.1/">Checkout</a>]
-                        <br/>
-                    .../svnroot/stxxl/tags/1.2.1/ 
                 </td>
                 <td>
                         [<a href="http://stxxl.svn.sourceforge.net/viewvc/stxxl/trunk/">Browse</a>]
@@ -392,7 +392,7 @@
             R. Dementiev, L. Kettner, P. Sanders: Stxxl: Standard Template Library for XXL Data Sets. Technical Report 2005/18, Department of Informatics, University of Karlsruhe [<a href="http://algo2.iti.kit.edu/dementiev/files/TRKA2005_18.pdf">pdf</a>] [<a href="http://algo2.iti.kit.edu/dementiev/stxxl/report/">html</a>]
         </p>
         <p>
-            R. Dementiev, J. Kaerkkaeinen, J. Mehnert, P. Sanders: Better External Memory Suffix Array Construction ALENEX05: Algorithm Engineering and Experiments (January 2005, Vancouver , Canada): [<a href="http://algo2.iti.kit.edu/dementiev/files/DKMS05.pdf">pdf</a>][<a href="http://algo2.iti.kit.edu/dementiev/esuffix/instances.shtml">input instances</a>] 
+            R. Dementiev, J. Kaerkkaeinen, J. Mehnert, P. Sanders: Better External Memory Suffix Array Construction ALENEX05: Algorithm Engineering and Experiments (January 2005, Vancouver, Canada): [<a href="http://algo2.iti.kit.edu/dementiev/files/DKMS05.pdf">pdf</a>][<a href="http://algo2.iti.kit.edu/dementiev/esuffix/instances.shtml">input instances</a>] 
         </p>
         <p>
             R. Dementiev, P. Sanders, D. Schultes, and J. Sibeyn: Engineering an External Memory Minimum Spanning Tree Algorithm. TSC04: 3rd IFIP International Conference on Theoretical Computer Science (August 24-26, 2004, Toulouse): [<a href="http://algo2.iti.kit.edu/dementiev/files/emst.ps">ps</a>][<a href="http://algo2.iti.kit.edu/dementiev/files/emst.pdf">pdf</a>] 

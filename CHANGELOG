@@ -1,4 +1,4 @@
-Version 1.3.1 (unreleased)
+Version 1.3.1 (10 March 2011)
 
 * Possibly breaking changes
   - No longer open syscall files with O_SYNC|O_DSYNC|O_RSYNC by default when
@@ -24,7 +24,7 @@ Version 1.3.1 (unreleased)
     zeroes.
   - Crash at program termination when using global stxxl containers.
   - Enable syscall_file to read/write >=2GiB of data in a single I/O operation.
-* New public header: stxxl/stats
+* New public headers: stxxl/stats, stxxl/request
 * Parallel mode can be switched on for internal STXXL computation selectively
   (i.e. without enabling it for the non-stxxl part of an application), by
   setting USE_PARALLEL_MODE=yes in make.settings.local.
@@ -37,6 +37,7 @@ Version 1.3.1 (unreleased)
     and redefining STXXL_LIBNAME (defaults to "stxxl")
 * Under-the-hood improvements
   - code cleanup
+  - I/O-layer: renaming and reorganization of the request implementation
 * Documentation updates
 * Several new test programs
 * Several test programs improved
