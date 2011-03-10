@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -1051,7 +1051,9 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    assert(stxxl::is_sorted(first_, last_, ksort_local::key_comparison<value_type, KeyExtractor_>()));
+    typedef typename ExtIterator_::const_iterator const_iterator;
+    assert(stxxl::is_sorted(const_iterator(first_), const_iterator(last_),
+                            ksort_local::key_comparison<value_type, KeyExtractor_>()));
 #endif
 }
 

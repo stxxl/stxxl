@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -1020,7 +1020,8 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    assert(stxxl::is_sorted(first, last, cmp));
+    typedef typename ExtIterator_::const_iterator const_iterator;
+    assert(stxxl::is_sorted(const_iterator(first), const_iterator(last), cmp));
 #endif
 }
 
