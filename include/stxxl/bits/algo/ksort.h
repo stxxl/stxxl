@@ -705,6 +705,9 @@ namespace ksort_local
    - provide \b min_value method that returns a value that is \b strictly \b less than all
    other objects of user type in respect to the key obtained by this key extractor ,
    - operator > , operator <, operator == and operator != on type \b key_type must be defined.
+   - \b Note: when using unsigned integral types as key, the value 0 cannot
+   be used as a key value because it would
+   conflict with the sentinel value returned by \b min_value
 
    Example: extractor class \b GetWeight, that extracts weight from an \b Edge
  \verbatim

@@ -653,6 +653,9 @@ namespace sort_local
    other objects of user type,
    - provide \b min_value method that returns a value that is \b strictly \b less than all
    other objects of user type,
+   - \b Note: when using unsigned integral types as key in user types, the value 0
+   cannot be used as a key value of the data to be sorted because it would
+   conflict with the sentinel value returned by \b min_value
 
    Example: comparator class \b my_less_int
  \verbatim
