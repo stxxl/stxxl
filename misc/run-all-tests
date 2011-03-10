@@ -190,6 +190,7 @@ run algo/test_ksort
 run algo/test_random_shuffle
 run algo/test_scan
 run algo/test_sort
+run algo/test_bad_cmp
 test -n "$WITH_STABLE_KSORT" && run algo/test_stable_ksort
 
 run stream/test_materialize
