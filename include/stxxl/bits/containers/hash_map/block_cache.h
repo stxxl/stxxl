@@ -20,7 +20,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/compat_hash_map.h>
 #include <stxxl/bits/mng/mng.h>
-#include <stxxl/bits/containers/btree/btree_pager.h>
+#include <stxxl/bits/containers/pager.h>
 
 #include <vector>
 #include <list>
@@ -145,7 +145,7 @@ namespace hash_map
 #endif
         };
 
-        typedef stxxl::btree::lru_pager pager_type;
+        typedef stxxl::lru_pager<> pager_type;
         typedef cache_block_helper::write_buffer<block_type> write_buffer_type;
 
         typedef typename compat_hash_map<bid_type, unsigned_type, bid_hash>::result bid_map_type;
