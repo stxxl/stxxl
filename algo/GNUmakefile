@@ -12,6 +12,7 @@ include $(TOPDIR)/Makefile.subdir.gnu
 
 test_ksort.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=1 -DSTXXL_CHECK_ORDER_IN_SORTS
 test_sort.$o:		CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=0
+test_bad_cmp.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=0
 test_random_shuffle.$o:	CPPFLAGS += -DSTXXL_VERBOSE_LEVEL=0
 test_stable_ksort_all_parameters.$o:	CPPFLAGS += -DSTXXL_VERBOSE_STABLE_KSORT=STXXL_VERBOSE0 -DSTXXL_VERBOSE_LEVEL=0 -DSTXXL_CHECK_ORDER_IN_SORTS
 
@@ -21,6 +22,7 @@ ifeq ($(strip $(USE_PMODE)),yes)
 $(call reduce_optimization,3,0,test_sort,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_ksort,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_stable_ksort,Version_12.0,any,any)
+$(call reduce_optimization,3,0,test_bad_cmp,Version_12.0,any,any)
 $(call reduce_optimization,3,0,sort_file,Version_12.0,any,any)
 $(call reduce_optimization,3,0,copy_and_sort_file,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_parallel_sort,Version_12.0,any,any)
@@ -32,6 +34,7 @@ ifeq ($(strip $(USE_MCSTL)),yes)
 $(call reduce_optimization,3,0,test_sort,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_ksort,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_stable_ksort,Version_12.0,any,any)
+$(call reduce_optimization,3,0,test_bad_cmp,Version_12.0,any,any)
 $(call reduce_optimization,3,0,sort_file,Version_12.0,any,any)
 $(call reduce_optimization,3,0,copy_and_sort_file,Version_12.0,any,any)
 $(call reduce_optimization,3,0,test_parallel_sort,Version_12.0,any,any)

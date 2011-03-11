@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -700,11 +700,14 @@ namespace ksort_local
    Model of \b Key \b extractor concept must:
    - define type \b key_type ,
    - provide \b operator() that returns key value of an object of user type
-   - provide \b max_value method that returns a value that is \b greater than all
+   - provide \b max_value method that returns a value that is \b strictly \b greater than all
    other objects of user type in respect to the key obtained by this key extractor ,
-   - provide \b min_value method that returns a value that is \b less than all
+   - provide \b min_value method that returns a value that is \b strictly \b less than all
    other objects of user type in respect to the key obtained by this key extractor ,
    - operator > , operator <, operator == and operator != on type \b key_type must be defined.
+   - \b Note: when using unsigned integral types as key, the value 0 cannot
+   be used as a key value because it would
+   conflict with the sentinel value returned by \b min_value
 
    Example: extractor class \b GetWeight, that extracts weight from an \b Edge
  \verbatim
@@ -1051,7 +1054,9 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    assert(stxxl::is_sorted(first_, last_, ksort_local::key_comparison<value_type, KeyExtractor_>()));
+    typedef typename ExtIterator_::const_iterator const_iterator;
+    assert(stxxl::is_sorted(const_iterator(first_), const_iterator(last_),
+                            ksort_local::key_comparison<value_type, KeyExtractor_>()));
 #endif
 }
 

@@ -42,12 +42,13 @@ void syscall_file::serve(const request * req) throw (io_error)
             STXXL_THROW2(io_error,
                          " this=" << this <<
                          " call=::lseek(fd,offset,SEEK_SET)" <<
+                         " path=" << filename <<
                          " fd=" << file_des <<
                          " offset=" << offset <<
                          " buffer=" << (void *)buffer <<
                          " bytes=" << bytes <<
                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                         " rc= " << rc);
+                         " rc=" << rc);
         }
 
         if (type == request::READ)
@@ -57,12 +58,13 @@ void syscall_file::serve(const request * req) throw (io_error)
                 STXXL_THROW2(io_error,
                              " this=" << this <<
                              " call=::read(fd,buffer,bytes)" <<
+                             " path=" << filename <<
                              " fd=" << file_des <<
                              " offset=" << offset <<
                              " buffer=" << (void *)buffer <<
                              " bytes=" << bytes <<
                              " type=" << "READ" <<
-                             " rc= " << rc);
+                             " rc=" << rc);
             }
             bytes -= rc;
             offset += rc;
@@ -83,12 +85,13 @@ void syscall_file::serve(const request * req) throw (io_error)
                 STXXL_THROW2(io_error,
                              " this=" << this <<
                              " call=::write(fd,buffer,bytes)" <<
+                             " path=" << filename <<
                              " fd=" << file_des <<
                              " offset=" << offset <<
                              " buffer=" << (void *)buffer <<
                              " bytes=" << bytes <<
                              " type=" << "WRITE" <<
-                             " rc= " << rc);
+                             " rc=" << rc);
             }
             bytes -= rc;
             offset += rc;

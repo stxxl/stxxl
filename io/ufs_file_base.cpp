@@ -89,7 +89,7 @@ ufs_file_base::ufs_file_base(
 #endif
 
     if ((file_des = ::open(filename.c_str(), flags, perms)) < 0)
-        STXXL_THROW2(io_error, "::open() Filedescriptor=" << file_des << " filename=" << filename << " flags=" << flags);
+        STXXL_THROW2(io_error, "::open() rc=" << file_des << " path=" << filename << " flags=" << flags);
 
     if (!(mode & NO_LOCK))
     {
@@ -127,7 +127,7 @@ void ufs_file_base::lock()
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
     if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
-        STXXL_THROW2(io_error, "Filedescriptor=" << file_des);
+        STXXL_THROW2(io_error, "::fcntl(,F_SETLK,) path=" << filename << " fd=" << file_des);
 #endif
 }
 

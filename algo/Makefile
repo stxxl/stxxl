@@ -75,6 +75,11 @@ test_random_shuffle.$(EXEEXT): test_random_shuffle.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_random_shuffle.cpp -DSTXXL_VERBOSE_LEVEL=0
 	$(LINKER)  test_random_shuffle.$(OBJEXT) $(OUT)test_random_shuffle.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_bad_cmp: test_bad_cmp.$(EXEEXT)
+test_bad_cmp.$(EXEEXT): test_bad_cmp.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_bad_cmp.cpp -DSTXXL_VERBOSE_LEVEL=0
+	$(LINKER)  test_bad_cmp.$(OBJEXT) $(OUT)test_bad_cmp.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) $(CLEAN_TARGETS)
