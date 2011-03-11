@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
@@ -13,8 +13,8 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/syscall_file.h>
-#include <stxxl/bits/io/request_impl_basic.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -42,12 +42,13 @@ void syscall_file::serve(const request * req) throw (io_error)
             STXXL_THROW2(io_error,
                          " this=" << this <<
                          " call=::lseek(fd,offset,SEEK_SET)" <<
+                         " path=" << filename <<
                          " fd=" << file_des <<
                          " offset=" << offset <<
                          " buffer=" << (void *)buffer <<
                          " bytes=" << bytes <<
                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                         " rc= " << rc);
+                         " rc=" << rc);
         }
 
         if (type == request::READ)
@@ -57,12 +58,13 @@ void syscall_file::serve(const request * req) throw (io_error)
                 STXXL_THROW2(io_error,
                              " this=" << this <<
                              " call=::read(fd,buffer,bytes)" <<
+                             " path=" << filename <<
                              " fd=" << file_des <<
                              " offset=" << offset <<
                              " buffer=" << (void *)buffer <<
                              " bytes=" << bytes <<
                              " type=" << "READ" <<
-                             " rc= " << rc);
+                             " rc=" << rc);
             }
             bytes -= rc;
             offset += rc;
@@ -83,12 +85,13 @@ void syscall_file::serve(const request * req) throw (io_error)
                 STXXL_THROW2(io_error,
                              " this=" << this <<
                              " call=::write(fd,buffer,bytes)" <<
+                             " path=" << filename <<
                              " fd=" << file_des <<
                              " offset=" << offset <<
                              " buffer=" << (void *)buffer <<
                              " bytes=" << bytes <<
                              " type=" << "WRITE" <<
-                             " rc= " << rc);
+                             " rc=" << rc);
             }
             bytes -= rc;
             offset += rc;

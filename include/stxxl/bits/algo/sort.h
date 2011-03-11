@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -21,9 +21,9 @@
 #include <stxxl/bits/common/rand.h>
 #include <stxxl/bits/mng/adaptor.h>
 #include <stxxl/bits/common/simple_vector.h>
-#include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/common/settings.h>
 #include <stxxl/bits/mng/block_alloc_interleaved.h>
+#include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/intksort.h>
@@ -90,7 +90,7 @@ namespace sort_local
         read_next_after_write_completed<block_type, bid_type> * next_run_reads =
             new read_next_after_write_completed<block_type, bid_type>[m2];
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
         int_type i;
         int_type run_size = 0;
@@ -548,7 +548,7 @@ namespace sort_local
 
         double io_wait_after_rf = stats::get_instance()->get_io_wait_time();
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+        disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
         const int_type merge_factor = optimal_merge_factor(nruns, _m);
         run_type ** new_runs;
@@ -649,10 +649,13 @@ namespace sort_local
    Model of \b Comparison concept must:
    - provide \b operator(a,b) that returns comparison result of two user types,
      must define strict weak ordering
-   - provide \b max_value method that returns a value that is \b greater than all
+   - provide \b max_value method that returns a value that is \b strictly \b greater than all
    other objects of user type,
-   - provide \b min_value method that returns a value that is \b less than all
+   - provide \b min_value method that returns a value that is \b strictly \b less than all
    other objects of user type,
+   - \b Note: when using unsigned integral types as key in user types, the value 0
+   cannot be used as a key value of the data to be sorted because it would
+   conflict with the sentinel value returned by \b min_value
 
    Example: comparator class \b my_less_int
  \verbatim
@@ -1020,7 +1023,8 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    assert(stxxl::is_sorted(first, last, cmp));
+    typedef typename ExtIterator_::const_iterator const_iterator;
+    assert(stxxl::is_sorted(const_iterator(first), const_iterator(last), cmp));
 #endif
 }
 

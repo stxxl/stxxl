@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/request_waiters_impl_basic.cpp
+ *  io/request_with_waiters.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,14 +11,14 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/io/request_waiters_impl_basic.h>
+#include <stxxl/bits/io/request_with_waiters.h>
 #include <algorithm>
 #include <stxxl/bits/parallel.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-bool request_waiters_impl_basic::add_waiter(onoff_switch * sw)
+bool request_with_waiters::add_waiter(onoff_switch * sw)
 {
     // this lock needs to be obtained before poll(), otherwise a race
     // condition might occur: the state might change and notify_waiters()
@@ -36,13 +36,13 @@ bool request_waiters_impl_basic::add_waiter(onoff_switch * sw)
     return false;
 }
 
-void request_waiters_impl_basic::delete_waiter(onoff_switch * sw)
+void request_with_waiters::delete_waiter(onoff_switch * sw)
 {
     scoped_mutex_lock lock(waiters_mutex);
     waiters.erase(sw);
 }
 
-void request_waiters_impl_basic::notify_waiters()
+void request_with_waiters::notify_waiters()
 {
     scoped_mutex_lock lock(waiters_mutex);
     std::for_each(waiters.begin(),
@@ -52,7 +52,7 @@ void request_waiters_impl_basic::notify_waiters()
 }
 
 /*
-int request_waiters_impl_basic::nwaiters()
+int request_with_waiters::nwaiters()
 {
     scoped_mutex_lock lock(waiters_mutex);
     return waiters.size();

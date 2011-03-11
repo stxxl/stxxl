@@ -1,7 +1,8 @@
 #!/bin/sh
 
 svn ps svn:eol-style native [A-Z]*[A-Z]
-svn ps svn:eol-style native misc/*
+
+find misc -name .svn -prune -o -type f -exec svn ps svn:eol-style native {} \;
 
 find . -name .svn -prune -o \( -type f -a \( \
 		-name "*.h" \

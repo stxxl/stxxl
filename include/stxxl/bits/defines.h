@@ -20,6 +20,7 @@
 //#define STXXL_HAVE_BOOSTFD_FILE 0/1
 //#define STXXL_HAVE_WINCALL_FILE 0/1
 //#define STXXL_HAVE_WBTL_FILE 0/1
+#define STXXL_HAVE_AIO_FILE 0  // only available on the kernelaio branch
 // default: 0/1 (platform and type dependent)
 // used in: io/*_file.h, io/*_file.cpp, mng/mng.cpp
 // affects: library

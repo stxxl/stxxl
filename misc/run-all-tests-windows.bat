@@ -101,6 +101,7 @@ algo\test_ksort
 algo\test_random_shuffle
 algo\test_scan
 algo\test_sort
+algo\test_bad_cmp
 
 stream\test_push_sort
 stream\test_sorted_runs

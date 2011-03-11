@@ -4,7 +4,8 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2008,2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008, 2009 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -50,6 +51,7 @@ file * create_file(const std::string & io_impl,
 #if STXXL_HAVE_SIMDISK_FILE
     else if (io_impl == "simdisk")
     {
+        options &= ~stxxl::file::DIRECT;  // clear the DIRECT flag, this file is supposed to be on tmpfs
         ufs_file_base * result = new sim_disk_file(filename, options, physical_device_id, allocator_id);
         result->lock();
         return result;

@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -268,7 +269,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
     int64 * bucket_sizes = new int64[nbuckets];
 
-    disk_queues::get_instance()->set_priority_op(disk_queue::WRITE);
+    disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
 
     stable_ksort_local::distribute(
         bucket_bids,
@@ -315,7 +316,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         typedef buf_ostream<block_type, typename ExtIterator_::bids_container_iterator> buf_ostream_type;
         buf_ostream_type out(first.bid(), nwrite_buffers_bs);
 
-        disk_queues::get_instance()->set_priority_op(disk_queue::READ);
+        disk_queues::get_instance()->set_priority_op(request_queue::READ);
 
         if (first.block_offset())
         {

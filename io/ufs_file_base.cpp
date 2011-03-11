@@ -5,7 +5,8 @@
  *
  *  Copyright (C) 2002, 2005, 2008 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Ilja Andronov <sni4ok@yandex.ru>
- *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -13,6 +14,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/ufs_file_base.h>
+#include <stxxl/bits/common/error_handling.h>
 
 #ifdef BOOST_MSVC
  #include <windows.h>
@@ -87,7 +89,7 @@ ufs_file_base::ufs_file_base(
 #endif
 
     if ((file_des = ::open(filename.c_str(), flags, perms)) < 0)
-        STXXL_THROW2(io_error, "::open() Filedescriptor=" << file_des << " filename=" << filename << " flags=" << flags);
+        STXXL_THROW2(io_error, "::open() rc=" << file_des << " path=" << filename << " flags=" << flags);
 
     if (!(mode & NO_LOCK))
     {
@@ -125,7 +127,7 @@ void ufs_file_base::lock()
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
     if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
-        STXXL_THROW2(io_error, "Filedescriptor=" << file_des);
+        STXXL_THROW2(io_error, "::fcntl(,F_SETLK,) path=" << filename << " fd=" << file_des);
 #endif
 }
 

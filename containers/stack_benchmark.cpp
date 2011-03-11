@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2006 Roman Dementiev <dementiev@ira.uka.de>
- *  Copyright (C) 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -198,8 +198,8 @@ int main(int argc, char * argv[])
     int variant = atoi(argv[1]);
     stxxl::int64 volume = stxxl::atoint64(argv[2]);
 
-    STXXL_MSG("Allocating array with size " << MEM_2_RESERVE
-                                            << " bytes to prevent file buffering.");
+    STXXL_MSG("Allocating array with size " <<
+              MEM_2_RESERVE << " bytes to prevent file buffering.");
     int * array = new int[MEM_2_RESERVE / sizeof(int)];
     std::fill(array, array + (MEM_2_RESERVE / sizeof(int)), 0);
 

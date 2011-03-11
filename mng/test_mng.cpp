@@ -15,6 +15,7 @@
 //! \c stxxl::typed_block
 
 #include <iostream>
+#include <stxxl/request>
 #include <stxxl/mng>
 
 #define BLOCK_SIZE (1024 * 512)

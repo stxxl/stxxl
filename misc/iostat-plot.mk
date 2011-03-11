@@ -75,7 +75,7 @@ define template-iostat-gnuplot
 	$(ECHO) 'set title "$(subst _, ,$*) (avg=$(IOSTAT_PLOT_AVERAGE.$(strip $1)))"' >> $@
 	$(ECHO) 'set xlabel "Time [s]"' >> $@
 	$(ECHO) 'set ylabel "$(IOSTAT_PLOT_Y_LABEL.$(strip $1))"' >> $@
-$(if $(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION)),
+$(if $(and $(filter io,$1),$(filter yes,$(IOSTAT_PLOT_IO_WITH_UTILIZATION))),
 	$(ECHO) 'set y2label "Utilization [%]"' >> $@
 	$(ECHO) 'set ytics nomirror' >> $@
 	$(ECHO) 'set y2tics' >> $@

@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 1999 Peter Sanders <sanders@mpi-sb.mpg.de>
  *  Copyright (C) 2003, 2004, 2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2007, 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2007-2009 Johannes Singler <singler@ira.uka.de>
  *  Copyright (C) 2007, 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.

@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Copyright (C) 2010 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2009, 2010 Johannes Singler <singler@kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -68,7 +68,8 @@ int main()
         STXXL_MSG("current run size: " << run_size);
 
         std::vector<unsigned> tmp(run_size);            // create temp storage for current run
-        std::generate(tmp.begin(), tmp.end(), rnd _STXXL_FORCE_SEQUENTIAL);     // fill with random numbers
+        // fill with random numbers
+        std::generate(tmp.begin(), tmp.end(), rnd _STXXL_FORCE_SEQUENTIAL);
         std::sort(tmp.begin(), tmp.end(), c);           // sort
         for (unsigned j = 0; j < run_size; ++j)
         {

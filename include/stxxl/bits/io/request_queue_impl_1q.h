@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -25,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-class request_queue_impl_1q : public request_queue_impl_worker, public disk_queue
+class request_queue_impl_1q : public request_queue_impl_worker
 {
 private:
     typedef request_queue_impl_1q self;
