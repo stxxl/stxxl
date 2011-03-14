@@ -1163,7 +1163,7 @@ protected:
         }
     }
 
-    bool try_interrupt_read(write_scheduled_blocks_iterator & it, scheduled_blocks_reference & block_to_read_meta)
+    bool try_interrupt_read(write_scheduled_blocks_iterator & it, scheduled_blocks_reference block_to_read_meta)
     {
         // stop read
         it->second->shall_read = false;

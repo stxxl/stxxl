@@ -380,6 +380,7 @@ int main(int argc, char **argv)
 
             value_type v;
             v = w * x;
+            STXXL_UNUSED(v);
         }
 
         delete a;
