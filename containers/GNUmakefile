@@ -77,6 +77,8 @@ $(call reduce_optimization,3,0,monotonic_pq,Version_12.0,any,any)
 $(call reduce_optimization,3,0,pq_benchmark,Version_12.0,any,any)
 $(call reduce_optimization,3,0,btree/test_corr_insert_erase,Version_12.0,any,any)
 $(call reduce_optimization,3,0,btree/test_corr_insert_scan,Version_12.0,any,any)
+$(call reduce_optimization,3,0,hash_map/test_hash_map,Version_12.0,any,any)
+$(call reduce_optimization,3,0,hash_map/test_iterators,Version_12.0,any,any)
 $(call reduce_optimization,3,0,berkeley_db_benchmark,Version_12.0,any,any)
 endif
 
@@ -112,6 +114,8 @@ $(call reduce_optimization,3,0,btree/test_btree,Version_12.0,any,any)
 $(call reduce_optimization,3,0,btree/test_const_scan,Version_12.0,any,any)
 $(call reduce_optimization,3,0,btree/test_corr_insert_erase,Version_12.0,any,any)
 $(call reduce_optimization,3,0,btree/test_corr_insert_scan,Version_12.0,any,any)
+$(call reduce_optimization,3,0,hash_map/test_hash_map,Version_12.0,any,any)
+$(call reduce_optimization,3,0,hash_map/test_iterators,Version_12.0,any,any)
 $(call reduce_optimization,3,0,berkeley_db_benchmark,Version_12.0,any,any)
 
 # ICPC 11.0: internal error: 0_1374 (issue 539748)
