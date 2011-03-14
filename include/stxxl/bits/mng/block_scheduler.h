@@ -13,8 +13,6 @@
 #ifndef STXXL_BLOCK_SCHEDULER_HEADER
 #define STXXL_BLOCK_SCHEDULER_HEADER
 
-//#define RW_VERBOSE
-
 #include <stack>
 #include <limits>
 
@@ -42,27 +40,26 @@ public:
     typedef typename internal_block_type::bid_type external_block_type;
 
 protected:
-    mutable external_block_type external_data;      //!external_data.valid if no associated space on disk
-    mutable internal_block_type * internal_data;    //NULL if there is no internal memory reserved
-    mutable bool dirty;
-    mutable int_type reference_count;
+    external_block_type external_data;      //!external_data.valid if no associated space on disk
+    internal_block_type * internal_data;    //NULL if there is no internal memory reserved
+    bool dirty;
+    int_type reference_count;
 
-    static block_manager * bm;
+    static unsigned_type disk_allocation_offset;
 
-    void get_external_block() const
-    { bm->new_block(striping(), external_data); }
+    void get_external_block()
+    { block_manager::get_instance()->new_block(striping(), external_data, ++disk_allocation_offset); }
 
-    void free_external_block() const
+    void free_external_block()
     {
-        bm->delete_block(external_data);
+        block_manager::get_instance()->delete_block(external_data);
         external_data = external_block_type(); // make invalid
     }
 
 public:
     //! \brief Create in uninitialized state.
     swappable_block()
-        : external_data() /*!valid*/, internal_data(0), dirty(false), reference_count(0)
-    { bm = block_manager::get_instance(); }
+        : external_data() /*!valid*/, internal_data(0), dirty(false), reference_count(0) {}
 
     ~swappable_block() {}
 
@@ -104,15 +101,6 @@ public:
 
     //! \brief Acquire the block, i.e. add a reference. Has to be internal.
     //! \return A reference to the data-block.
-    const internal_block_type & acquire() const
-    {
-        assert(is_internal());
-        ++ reference_count;
-        return * internal_data;
-    }
-
-    //! \brief Acquire the block, i.e. add a reference. Has to be internal.
-    //! \return A reference to the data-block.
     internal_block_type & acquire()
     {
         assert(is_internal());
@@ -121,7 +109,7 @@ public:
     }
 
     //! \brief Release the block, i.e. subduct a reference. Has to be acquired.
-    void release() const
+    void release()
     {
         assert(is_acquired());
         -- reference_count;
@@ -155,7 +143,7 @@ public:
 
     //! \brief Read asyncronusly from external_block to internal_block. Has to be internal and have an external_block.
     //! \return A request pointer to the I/O.
-    request_ptr read_async(completion_handler on_cmpl = default_completion_handler()) const
+    request_ptr read_async(completion_handler on_cmpl = default_completion_handler())
     {
         assert(is_internal());
         assert(has_external_block());
@@ -167,12 +155,12 @@ public:
     }
 
     //! \brief Read syncronusly from external_block to internal_block. Has to be internal and have an external_block.
-    void read_sync() const
+    void read_sync()
     { read_async()->wait(); }
 
     //! \brief Write asyncronusly from internal_block to external_block if neccesary.
     //! \return A request pointer to the I/O, an invalid request pointer if not neccesary.
-    request_ptr clean_async(completion_handler on_cmpl = default_completion_handler()) const
+    request_ptr clean_async(completion_handler on_cmpl = default_completion_handler())
     {
         if (! is_dirty())
             return request_ptr();
@@ -186,7 +174,7 @@ public:
     }
 
     //! \brief Write syncronusly from internal_block to external_block if neccesary.
-    void clean_sync() const
+    void clean_sync()
     {
         request_ptr rp = clean_async();
         if (rp.valid())
@@ -194,7 +182,7 @@ public:
     }
 
     //! \brief Attach an internal_block, making the block internal. Has to be not internal.
-    void attach_internal_block(internal_block_type * iblock) const
+    void attach_internal_block(internal_block_type * iblock)
     {
         assert(! is_internal());
         internal_data = iblock;
@@ -202,7 +190,7 @@ public:
 
     //! \brief Detach the internal_block. Writes to external_block if neccesary. Has to be evictable.
     //! \return A pointer to the internal_block.
-    internal_block_type * detach_internal_block() const
+    internal_block_type * detach_internal_block()
     {
         assert(is_evictable());
         clean_sync();
@@ -247,7 +235,7 @@ public:
 };
 
 template <typename ValueType, unsigned BlockSize>
-block_manager * swappable_block<ValueType, BlockSize>::bm;
+unsigned_type swappable_block<ValueType, BlockSize>::disk_allocation_offset = 0;
 
 template <class SwappableBlockType> class block_scheduler_algorithm;
 
@@ -308,7 +296,7 @@ public:
 
     };
 
-    typedef std::vector<prediction_sequence_element> prediction_sequence_type;
+    typedef std::deque<prediction_sequence_element> prediction_sequence_type;
     // ---- end prediction_sequence -------
 
 protected:
@@ -1037,6 +1025,647 @@ public:
             evictable_blocks.erase(sbid);
         if (sblock.is_internal())
             return_free_internal_block(sblock.detach_internal_block());
+        return sblock.extract_external_block();
+    }
+};
+
+template <class Container> inline typename Container::value_type
+pop(Container c)
+{
+    typename Container::value_type r = c.top();
+    c.pop();
+    return r;
+}
+
+template <class Container> inline typename Container::value_type
+pop_front(Container c)
+{
+    typename Container::value_type r = c.front();
+    c.pop_front();
+    return r;
+}
+
+template <class Container> inline typename Container::value_type
+pop_back(Container c)
+{
+    typename Container::value_type r = c.back();
+    c.pop_back();
+    return r;
+}
+
+template <class Container> inline typename Container::value_type
+pop_begin(Container c)
+{
+    typename Container::value_type r = *c.begin();
+    c.erase(c.begin());
+    return r;
+}
+
+template <class SwappableBlockType>
+class block_scheduler_algorithm_offline_lru_prefetching : public block_scheduler_algorithm<SwappableBlockType>
+{
+protected:
+    struct scheduled_block_meta;
+    struct write_read_request;
+
+    typedef block_scheduler<SwappableBlockType> block_scheduler_type;
+    typedef block_scheduler_algorithm<SwappableBlockType> block_scheduler_algorithm_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename block_scheduler_type::external_block_type external_block_type;
+    typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
+    typedef typename block_scheduler_algorithm_type::time_type time_type;
+    typedef typename block_scheduler_type::prediction_sequence_type prediction_sequence_type;
+    typedef typename block_scheduler_type::block_scheduler_operation block_scheduler_operation;
+    typedef typename std::vector<SwappableBlockType>::iterator swappable_blocks_iterator;
+
+    typedef std::map<swappable_block_identifier_type, scheduled_block_meta> scheduled_blocks_type;
+    typedef typename scheduled_blocks_type::iterator scheduled_blocks_iterator;
+    typedef typename scheduled_blocks_type::reference scheduled_blocks_reference;
+    typedef std::map<swappable_block_identifier_type, write_read_request *> write_scheduled_blocks_type;
+    typedef typename write_scheduled_blocks_type::iterator write_scheduled_blocks_iterator;
+    typedef typename write_scheduled_blocks_type::reference write_scheduled_blocks_reference;
+
+    using block_scheduler_algorithm_type::bs;
+    using block_scheduler_algorithm_type::swappable_blocks;
+    using block_scheduler_algorithm_type::get_algorithm_from_block_scheduler;
+    using block_scheduler_algorithm_type::get_free_internal_block_from_block_scheduler;
+    using block_scheduler_algorithm_type::return_free_internal_block_to_block_scheduler;
+    using block_scheduler_algorithm_type::prediction_sequence;
+
+    struct write_read_request
+    {
+        bool write_done_soon; // set by read_after_write, checked by schedule_read()
+        bool shall_read; // checked by read_after_write, set by schedule_read()
+        swappable_blocks_iterator block_to_start_read; // used by read_after_write, set by schedule_read()
+        scheduled_blocks_iterator taker; // set by read_after_write
+        request_ptr write_req; // completes with read_after_write
+
+        write_read_request()
+            : write_done_soon(false),
+              shall_read(false),
+              block_to_start_read(),
+              taker(),
+              write_req(0) {}
+    };
+
+    struct read_after_write
+    {
+        write_read_request * wrr;
+
+        read_after_write(write_read_request * write_read_req)
+            : wrr(write_read_req) {}
+
+        void operator () (request *)
+        {
+            wrr->write_done_soon = true;
+            if (wrr->shall_read)
+                wrr->taker->second.read_req = wrr->block_to_start_read->read_async();
+        }
+    };
+
+    struct scheduled_block_meta
+    {
+        internal_block_type * reserved_iblock;
+        std::pair<bool, swappable_block_identifier_type> giver;
+        request_ptr read_req;
+        std::deque<block_scheduler_operation> operations; // invariant: not empty; front: last scheduled operation, back: upcoming operation
+
+        scheduled_block_meta(block_scheduler_operation op)
+            : reserved_iblock(0),
+              giver(false, 0),
+              read_req(0),
+              operations()
+        { operations.push_front(op); }
+    };
+
+    //! \brief Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
+    std::set<swappable_block_identifier_type> free_evictable_blocks;
+    //! \brief Holds not internal swappable_blocks, whose next access has already been scheduled.
+    scheduled_blocks_type scheduled_blocks;
+    //! \brief Holds swappable_blocks, whose internal block has been taken away but the clean did not finish yet.
+    write_scheduled_blocks_type write_scheduled_blocks;
+    //! \brief Number of acquire-operations between t_n and t_p. If any, the swappable_block shall keep its internal_block.
+
+    write_read_request * schedule_write(const swappable_block_identifier_type sbid)
+    {
+        SwappableBlockType & sblock = swappable_blocks[sbid];
+        write_read_request * wrr = new write_read_request;
+        wrr->write_req = sblock.clean_async(read_after_write(wrr));
+        if (wrr->write_req.valid())
+        {
+            assert(write_scheduled_blocks.insert(std::make_pair(sbid, wrr)).second);
+            return wrr;
+        }
+        else
+        {
+            delete wrr;
+            return 0;
+        }
+    }
+
+    bool try_interrupt_read(write_scheduled_blocks_iterator & it, scheduled_blocks_reference & block_to_read_meta)
+    {
+        // stop read
+        it->second->shall_read = false;
+        // check if stopped
+        if (! it->second->write_done_soon)
+            return true;
+        // => possibly to late
+        // wait
+        wait_on_write(it);
+        // check if read started
+        if (block_to_read_meta.second.read_req.valid())
+            // => read started, to late
+            return false;
+        else
+            // => just in time
+            return true;
+    }
+
+    void schedule_read(scheduled_blocks_iterator block_to_read)
+    {
+        // first check if block_to_read is still writing. do not read before write finished
+        write_scheduled_blocks_iterator it = write_scheduled_blocks.find(block_to_read->first);
+        if (it != write_scheduled_blocks.end())
+        {
+            scheduled_blocks_iterator other_block_to_read = it->second->taker;
+            // check if scheduled to read
+            if (it->second->shall_read)
+            {
+                if (try_interrupt_read(it, *other_block_to_read))
+                {
+                    // => interrupted, swap internal_blocks
+                    std::swap(other_block_to_read->second.giver, block_to_read->second.giver);
+                    if (other_block_to_read->second.giver.first)
+                    {
+                        write_scheduled_blocks_iterator it = write_scheduled_blocks.find(other_block_to_read->second.giver.second);
+                        if (it != write_scheduled_blocks.end())
+                            it->second->taker = other_block_to_read;
+                        else
+                            other_block_to_read->second.giver.first = false;
+                    }
+                    if (block_to_read->second.giver.first)
+                    {
+                        write_scheduled_blocks_iterator it = write_scheduled_blocks.find(block_to_read->second.giver.second);
+                        if (it != write_scheduled_blocks.end())
+                            it->second->taker = block_to_read;
+                        else
+                            block_to_read->second.giver.first = false;
+                    }
+
+                    internal_block_type * tmp_iblock = swappable_blocks[block_to_read->first].detach_internal_block();
+                    swappable_blocks[block_to_read->first].attach_internal_block(
+                            swappable_blocks[other_block_to_read->first].detach_internal_block());
+                    swappable_blocks[other_block_to_read->first].attach_internal_block(tmp_iblock);
+                    // => this block has its internal_block back, no need to read
+                    // reschedule other
+                    schedule_read(other_block_to_read);
+                    return;
+                }
+                // else => read already started, but write done -> read this
+            }
+            else
+            {
+                // => no read scheduled, swap internal_blocks
+                std::swap(other_block_to_read->second.giver, block_to_read->second.giver);
+                if (other_block_to_read->second.giver.first)
+                {
+                    write_scheduled_blocks_iterator it = write_scheduled_blocks.find(other_block_to_read->second.giver.second);
+                    if (it != write_scheduled_blocks.end())
+                        it->second->taker = other_block_to_read;
+                    else
+                        other_block_to_read->second.giver.first = false;
+                }
+                if (block_to_read->second.giver.first)
+                {
+                    write_scheduled_blocks_iterator it = write_scheduled_blocks.find(block_to_read->second.giver.second);
+                    if (it != write_scheduled_blocks.end())
+                        it->second->taker = block_to_read;
+                    else
+                        block_to_read->second.giver.first = false;
+                }
+
+                internal_block_type * tmp_iblock = swappable_blocks[block_to_read->first].detach_internal_block();
+                swappable_blocks[block_to_read->first].attach_internal_block(
+                        other_block_to_read->second.reserved_iblock);
+                other_block_to_read->second.reserved_iblock = tmp_iblock;
+                // => this block has its internal_block back, no need to read
+                return;
+            }
+        }
+
+        // schedule block_to_read to read
+        if (block_to_read->second.giver.first)
+        {
+            write_scheduled_blocks_iterator it = write_scheduled_blocks.find(block_to_read->second.giver.second);
+            if (it != write_scheduled_blocks.end())
+            {
+                // => there is a write scheduled
+                // tell the completion handler that we want a read
+                it->second->block_to_start_read = swappable_blocks.begin() + block_to_read->first;
+                it->second->taker = block_to_read;
+                it->second->shall_read = true;
+                // and check if it is not to late
+                if (it->second->write_done_soon)
+                {
+                    // => the completion handler may have missed our wish to read
+                    // so wait for it to finish and check
+                    wait_on_write(it);
+                    block_to_read->second.giver.first = false;
+                    if (block_to_read->second.read_req.valid())
+                        // read scheduled
+                        return;
+                }
+                else
+                    // read scheduled
+                    return;
+            }
+            else
+                block_to_read->second.giver.first = false;
+        }
+        // => read could not be scheduled through the completion handler
+        block_to_read->second.read_req = swappable_blocks[block_to_read->first].read_async();
+    }
+
+    void wait_on_write(write_scheduled_blocks_iterator & it)
+    {
+        it->second->write_req->wait();
+        delete it->second;
+        write_scheduled_blocks.erase(it);
+    }
+
+    void wait_on_write(const swappable_block_identifier_type & sbid)
+    {
+        write_scheduled_blocks_iterator it = write_scheduled_blocks.find(sbid);
+        if (it != write_scheduled_blocks.end())
+            wait_on_write(it);
+    }
+
+    void wait_on_write(scheduled_blocks_iterator & schedule_meta)
+    {
+        if (schedule_meta->second.giver.first)
+        {
+            wait_on_write(schedule_meta->second.giver.second);
+            schedule_meta->second.giver.first = false;
+        }
+    }
+
+    void wait_on_read(scheduled_blocks_iterator & schedule_meta)
+    {
+        wait_on_write(schedule_meta);
+        if (schedule_meta->second.read_req.valid())
+        {
+            schedule_meta->second.read_req->wait();
+            schedule_meta->second.read_req = 0;
+        }
+    }
+
+    // wait and return reserved internal_block
+    internal_block_type * get_ready_block(scheduled_blocks_iterator & schedule_meta)
+    {
+        wait_on_write(schedule_meta);
+        internal_block_type * r = schedule_meta->second.reserved_iblock;
+        schedule_meta->second.reserved_iblock = 0;
+        return r;
+    }
+
+    // assumes the current operation to be still in operations
+    bool shall_keep_internal_block(const scheduled_blocks_iterator & schedule_meta) const
+    {
+        // returns true iif there is an acquire scheduled or there is a deinitialize scheduled and the block is dirty
+        for (typename std::deque<block_scheduler_operation>::reverse_iterator
+                rit = schedule_meta->second.operations.rbegin() + 1;
+                rit != schedule_meta->second.operations.rend(); ++rit)
+            switch (*rit)
+            {
+            case block_scheduler_type::op_acquire:
+                return true; break;
+            case block_scheduler_type::op_release:
+            case block_scheduler_type::op_release_dirty:
+                break;
+            case block_scheduler_type::op_deinitialize:
+                if (swappable_blocks[schedule_meta->first].is_dirty()) return true; break;
+            case block_scheduler_type::op_initialize:
+            case block_scheduler_type::op_extract_external_block:
+                break;
+            }
+        return false;
+    }
+
+    // assumes the current operation to be still in operations
+    bool shall_be_cleaned(const scheduled_blocks_iterator & schedule_meta) const
+    {
+        // returns true iif there is an extract_external_block scheduled and no release_dirty, deinitialize or initialize before
+        for (typename std::deque<block_scheduler_operation>::reverse_iterator
+                rit = schedule_meta->second.operations.rbegin() + 1;
+                rit != schedule_meta->second.operations.rend(); ++rit)
+            switch (*rit)
+            {
+            case block_scheduler_type::op_acquire:
+            case block_scheduler_type::op_release:
+                break;
+            case block_scheduler_type::op_release_dirty:
+            case block_scheduler_type::op_deinitialize:
+            case block_scheduler_type::op_initialize:
+                return false; break;
+            case block_scheduler_type::op_extract_external_block:
+                return true; break;
+            }
+        return false;
+    }
+
+    // assumes the current operation to be still in operations
+    bool shall_be_read(const scheduled_blocks_iterator & schedule_meta) const
+    {
+        // returns true iif there is an acquire scheduled next and the block is initialized
+        return swappable_blocks[schedule_meta->first].is_initialized()
+                && schedule_meta->second.operations.rbegin() + 1 != schedule_meta->second.operations.rend()
+                && *(schedule_meta->second.operations.rbegin() + 1) == block_scheduler_type::op_acquire;
+    }
+
+    void operation_done(scheduled_blocks_iterator & schedule_meta)
+    {
+        schedule_meta->second.operations.pop_back();
+        if (schedule_meta->second.operations.empty())
+            scheduled_blocks.erase(schedule_meta);
+    }
+
+    block_scheduler_algorithm_type * give_up(std::string err_msg = "detected some error in the prediction sequence")
+    {
+        STXXL_ERRMSG("block_scheduler_algorithm_offline_lru_prefetching: " << err_msg << ". Switching to block_scheduler_algorithm_online.");
+        // switch algorithm
+        block_scheduler_algorithm_type * new_algo
+                = new block_scheduler_algorithm_online_lru<SwappableBlockType>(bs);
+        // and delete self
+        delete bs.switch_algorithm_to(new_algo);
+        return new_algo;
+    }
+
+    internal_block_type * get_free_internal_block()
+    {
+        // try to get a free internal_block
+        if (internal_block_type * iblock = get_free_internal_block_from_block_scheduler())
+            return iblock;
+        // evict block
+        assert(! free_evictable_blocks.empty()); // fails it there is not enough memory available
+        swappable_block_identifier_type r = free_evictable_blocks.back();
+        free_evictable_blocks.pop_back();
+        return swappable_blocks[r].detach_internal_block();
+    }
+
+    void return_free_internal_block(internal_block_type * iblock)
+    { return_free_internal_block_to_block_scheduler(iblock); }
+
+    void schedule_next_operations()
+    {
+        while (! prediction_sequence.empty())
+        {
+            // list operation in scheduled_blocks
+            std::pair<scheduled_blocks_iterator, bool> ins_res = scheduled_blocks.insert(
+                    std::make_pair(prediction_sequence.front().id, prediction_sequence.front().op));
+            scheduled_blocks_iterator schedule_meta = ins_res.first;
+            if (! ins_res.second)
+                schedule_meta->second.operations.push_front(prediction_sequence.front().op);
+            SwappableBlockType & sblock = swappable_blocks[prediction_sequence.front().id];
+
+            // do appropriate preparations
+            if (prediction_sequence.front().op == block_scheduler_type::op_acquire)
+            {
+                if (sblock.is_internal())
+                    free_evictable_blocks.erase(prediction_sequence.front().id);
+                else
+                    if (! schedule_meta->second.reserved_iblock)
+                    {
+                        // get internal_block
+                        if (! (schedule_meta->second.reserved_iblock = get_free_internal_block_from_block_scheduler()))
+                        {
+                            if (free_evictable_blocks.empty())
+                            {
+                                // => can not schedule acquire
+                                // remove operation from scheduled_blocks
+                                if (ins_res.second)
+                                    scheduled_blocks.erase(ins_res.first);
+                                else
+                                    schedule_meta->second.operations.pop_front();
+                                // stop scheduling
+                                break;
+                            }
+                            swappable_block_identifier_type giver = pop_begin(free_evictable_blocks);
+                            write_read_request * wrr = schedule_write(giver);
+                            schedule_meta->second.giver.first = wrr;
+                            schedule_meta->second.giver.second = giver;
+                            schedule_meta->second.reserved_iblock = swappable_blocks[giver].detach_internal_block();
+                            // todo set block_to_read_meta
+                            wrr->taker = schedule_meta;
+                        }
+                        // read if desired
+                        if (ins_res.second && sblock.is_initialized())
+                        {
+                            // => there is no operation scheduled for this block before this acquire and it is initialized
+                            // -> start prefetchig now
+                            sblock.attach_internal_block(schedule_meta->second.reserved_iblock);
+                            schedule_meta->second.reserved_iblock = 0;
+                            schedule_read(schedule_meta);
+                        }
+                    }
+            }
+
+            prediction_sequence.pop_front();
+        }
+    }
+
+    void init(block_scheduler_algorithm_type * old_algo)
+    {
+        if(old_algo)
+            // copy prediction sequence
+            prediction_sequence = old_algo->get_prediction_sequence();
+        if (get_algorithm_from_block_scheduler())
+            while (! get_algorithm_from_block_scheduler()->evictable_blocks_empty())
+                free_evictable_blocks.insert(get_algorithm_from_block_scheduler()->evictable_blocks_pop());
+        schedule_next_operations();
+    }
+
+    void deinit()
+    {
+        // empty scheduled_blocks
+        while (! scheduled_blocks.empty())
+        {
+            scheduled_blocks_iterator it = scheduled_blocks.begin();
+            wait_on_read(it);
+            if (it->second.reserved_iblock)
+                return_free_internal_block(it->second.reserved_iblock);
+            if (swappable_blocks[it->first].is_evictable())
+                free_evictable_blocks.insert(it->first);
+            scheduled_blocks.erase(it);
+        }
+        while (! write_scheduled_blocks.empty())
+        {
+            write_scheduled_blocks_iterator it = write_scheduled_blocks.begin();
+            wait_on_write(it);
+        }
+    }
+
+public:
+    block_scheduler_algorithm_offline_lru_prefetching(block_scheduler_type & bs)
+        : block_scheduler_algorithm_type(bs)
+    { init(get_algorithm_from_block_scheduler()); }
+
+    // It is possible to keep an old simulation-algorithm object and reuse it's prediction sequence
+    block_scheduler_algorithm_offline_lru_prefetching(block_scheduler_algorithm_type * old)
+        : block_scheduler_algorithm_type(old)
+    { init(old); }
+
+    virtual ~block_scheduler_algorithm_offline_lru_prefetching()
+    {
+        deinit();
+        if (! free_evictable_blocks.empty())
+            STXXL_ERRMSG("Destructing block_scheduler_algorithm_offline_lru_prefetching that still holds evictable blocks. They get deinitialized.");
+        while (! free_evictable_blocks.empty())
+        {
+            SwappableBlockType & sblock = swappable_blocks[pop_begin(free_evictable_blocks)];
+            if (internal_block_type * iblock = sblock.deinitialize())
+                return_free_internal_block(iblock);
+        }
+    }
+
+    virtual bool evictable_blocks_empty()
+    {
+        deinit();
+        return free_evictable_blocks.empty();
+    }
+
+    virtual swappable_block_identifier_type evictable_blocks_pop()
+    { return pop_begin(free_evictable_blocks); }
+
+    virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
+    {
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        if (schedule_meta == scheduled_blocks.end()
+                || schedule_meta->second.operations.back() != block_scheduler_type::op_acquire)
+            return give_up("acquire not scheduled or out of internal_blocks")->acquire(sbid);
+
+        SwappableBlockType & sblock = swappable_blocks[sbid];
+        /* acquired => internal -> increase reference count
+           not internal => uninitialized or external -> get internal_block, increase reference count
+           uninitialized -> fill with default value
+           external -> read */
+        if (sblock.is_internal())
+        {
+            wait_on_read(schedule_meta);
+            sblock.acquire();
+        }
+        else
+        {
+            assert(! sblock.is_initialized()); // initialized blocks should be scheduled to read and thus internal
+            //get internal_block
+            sblock.attach_internal_block(get_ready_block(schedule_meta));
+            sblock.acquire();
+            //initialize new block
+            sblock.fill_default();
+        }
+
+        operation_done(schedule_meta);
+        return sblock.get_internal_block();
+    }
+
+    virtual void release(swappable_block_identifier_type sbid, const bool dirty)
+    {
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        if (schedule_meta == scheduled_blocks.end()
+                || schedule_meta->second.operations.back() !=
+                        ((dirty) ? block_scheduler_type::op_release_dirty : block_scheduler_type::op_release))
+            return give_up("release not scheduled")->release(sbid, dirty);
+
+        SwappableBlockType & sblock = swappable_blocks[sbid];
+        sblock.make_dirty_if(dirty);
+        sblock.release();
+        if (! sblock.is_acquired())
+        {
+            if (sblock.is_dirty() || sblock.is_external())
+            {
+                // => evictable
+                if (shall_keep_internal_block(schedule_meta))
+                {
+                    // => swappable_block shall keep its internal_block
+                    // -> can be left as it is. it will stay in scheduled_blocks
+                    if (shall_be_cleaned(schedule_meta))
+                        schedule_write(sbid);
+                }
+                else
+                {
+                    // give block to scheduler
+                    free_evictable_blocks.insert(sbid);
+                    schedule_next_operations();
+                }
+            }
+            else
+            {
+                // => uninitialized
+                if (shall_keep_internal_block(schedule_meta))
+                    // => swappable_block shall keep its internal_block
+                    schedule_meta->second.reserved_iblock = sblock.detach_internal_block();
+                else
+                {
+                    // release internal block and give it to prefetcher
+                    return_free_internal_block(sblock.detach_internal_block());
+                    schedule_next_operations();
+                }
+            }
+        }
+        operation_done(schedule_meta);
+    }
+
+    virtual void deinitialize(swappable_block_identifier_type sbid)
+    {
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        if (schedule_meta == scheduled_blocks.end()
+                || schedule_meta->second.operations.back() != block_scheduler_type::op_deinitialize)
+            return give_up("deinitialize not scheduled")->deinitialize(sbid);
+
+        SwappableBlockType & sblock = swappable_blocks[sbid];
+        if (internal_block_type * iblock = sblock.deinitialize())
+        {
+            if (shall_keep_internal_block(schedule_meta))
+                // => swappable_block shall keep its internal_block
+                schedule_meta->second.reserved_iblock = iblock;
+            else
+            {
+                // release internal block and give it to prefetcher
+                return_free_internal_block(iblock);
+                schedule_next_operations();
+            }
+        }
+        operation_done(schedule_meta);
+    }
+
+    virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock)
+    {
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        if (schedule_meta == scheduled_blocks.end()
+                || schedule_meta->second.operations.back() != block_scheduler_type::op_initialize)
+            return give_up("initialize not scheduled")->initialize(sbid, eblock);
+
+        SwappableBlockType & sblock = swappable_blocks[sbid];
+        sblock.initialize(eblock);
+        if (shall_be_read(schedule_meta))
+        {
+            sblock.attach_internal_block(schedule_meta->second.reserved_iblock);
+            schedule_meta->second.reserved_iblock = 0;
+            schedule_read(schedule_meta);
+        }
+        operation_done(schedule_meta);
+    }
+
+    virtual external_block_type extract_external_block(swappable_block_identifier_type sbid)
+    {
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        if (schedule_meta == scheduled_blocks.end()
+                || schedule_meta->second.operations.back() != block_scheduler_type::op_extract_external_block)
+            return give_up("extract_external_block not scheduled")->extract_external_block(sbid);
+
+        SwappableBlockType & sblock = swappable_blocks[sbid];
+        wait_on_write(sbid);
+        operation_done(schedule_meta);
         return sblock.extract_external_block();
     }
 };

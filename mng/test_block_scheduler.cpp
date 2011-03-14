@@ -133,8 +133,9 @@ int main(int argc, char **argv)
             bs.free_swappable_block(sbi2);
             bs.explicit_timestep();
 
-            delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_simulation< swappable_block<value_type, block_size> >(bs));
+            block_scheduler_algorithm_simulation< swappable_block<value_type, block_size> > * asim =
+                    new block_scheduler_algorithm_simulation< swappable_block<value_type, block_size> >(bs);
+            delete bs.switch_algorithm_to(asim);
             sbit sbi = bs.allocate_swappable_block();
             bs.acquire(sbi);
             bs.acquire(sbi);
@@ -156,7 +157,23 @@ int main(int argc, char **argv)
             }
 
             delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lfd< swappable_block<value_type, block_size> >(bs));
+                    block_scheduler_algorithm_offline_lfd< swappable_block<value_type, block_size> >(asim));
+            sbi = bs.allocate_swappable_block();
+            bs.acquire(sbi);
+            bs.acquire(sbi);
+            bs.release(sbi,true);
+            bs.explicit_timestep();
+            bs.release(sbi,false);
+            bs.deinitialize(sbi);
+            bs.initialize(sbi, ebt());
+            if (bs.is_simulating())
+                bs.extract_external_block(sbi);
+            else
+                bs.extract_external_block(sbi);
+            bs.free_swappable_block(sbi);
+
+            delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_offline_lru_prefetching< swappable_block<value_type, block_size> >(asim));
             sbi = bs.allocate_swappable_block();
             bs.acquire(sbi);
             bs.acquire(sbi);
