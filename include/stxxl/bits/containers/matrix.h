@@ -1036,6 +1036,7 @@ protected:
     typedef typename swappable_block_matrix_type::size_type block_size_type;
     typedef typename swappable_block_matrix_type::elem_size_type elem_size_type;
     typedef matrix_operations<ValueType, BlockSideLength> Ops;
+    typedef matrix_swappable_block<ValueType, BlockSideLength> swappable_block_type;
 
 public:
     typedef matrix_iterator<ValueType, BlockSideLength> iterator;
@@ -1143,12 +1144,7 @@ public:
     }
 
     matrix_type operator * (const matrix_type & right) const
-    {
-        assert(width == right.height);
-        matrix_type res(data->bs, height, right.width);
-        Ops::strassen_winograd_multiply_and_add(*data, *right.data, *res.data);
-        return res;
-    }
+    { return multiply(right); }
 
     matrix_type operator * (const ValueType scalar) const
     {
@@ -1208,11 +1204,54 @@ public:
     //!    1: recursive_multiply_and_add \n
     //!    2: strassen_winograd_multiply_and_add \n
     //!    3: multi_level_strassen_winograd_multiply_and_add
-    matrix_type multiply (const matrix_type & right, const int_type algorithm = 2) const
+    matrix_type multiply (const matrix_type & right, const int_type multiplication_algorithm = 2, const int_type scheduling_algorithm = 2) const
     {
         assert(width == right.height);
+        assert(& data->bs == & right.data->bs);
         matrix_type res(data->bs, height, right.width);
-        switch (algorithm)
+
+        if (scheduling_algorithm > 0)
+        {
+            // all offline algos need a simulation-run
+            delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
+            switch (multiplication_algorithm)
+            {
+            case 0:
+                Ops::naive_multiply_and_add(*data, *right.data, *res.data);
+                break;
+            case 1:
+                Ops::recursive_multiply_and_add(*data, *right.data, *res.data);
+                break;
+            case 2:
+                Ops::strassen_winograd_multiply_and_add(*data, *right.data, *res.data);
+                break;
+            case 3:
+                Ops::multi_level_strassen_winograd_multiply_and_add(*data, *right.data, *res.data);
+                break;
+            default:
+                STXXL_ERRMSG("invalid multiplication-algorithm number");
+                break;
+            }
+        }
+        switch (scheduling_algorithm)
+        {
+        case 0:
+            delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+            break;
+        case 1:
+            delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
+            break;
+        case 2:
+            delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
+            break;
+        default:
+            STXXL_ERRMSG("invalid scheduling-algorithm number");
+        }
+        switch (multiplication_algorithm)
         {
         case 0:
             Ops::naive_multiply_and_add(*data, *right.data, *res.data);
@@ -1228,7 +1267,10 @@ public:
             break;
         default:
             STXXL_ERRMSG("invalid multiplication-algorithm number");
+            break;
         }
+        delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
         return res;
     }
 

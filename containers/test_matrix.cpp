@@ -419,34 +419,7 @@ int main(int argc, char **argv)
         STXXL_MSG("start of multiplication");
         sim_matrix_stats_before.set();
         stats_before = *stats::get_instance();
-        if (sched_algo_num > 0)
-        {
-            // all offline algos need a simulation-run
-            delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_simulation< matrix_swappable_block<value_type, block_order> >(bs));
-            *c = a->multiply(*b, mult_algo_num);
-        }
-        matrix_stats_before.set();
-        switch (sched_algo_num)
-        {
-        case 0:
-            delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_online_lru< matrix_swappable_block<value_type, block_order> >(bs));
-            break;
-        case 1:
-            delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lfd< matrix_swappable_block<value_type, block_order> >(bs));
-            break;
-        case 2:
-            delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lru_prefetching< matrix_swappable_block<value_type, block_order> >(bs));
-            break;
-        default:
-            STXXL_ERRMSG("invalid scheduling-algorithm number");
-        }
-        *c = a->multiply(*b, mult_algo_num);
-        delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_online_lru< matrix_swappable_block<value_type, block_order> >(bs));
+        *c = a->multiply(*b, mult_algo_num, sched_algo_num);
         bs.flush();
         stats_after = *stats::get_instance();
         matrix_stats_after.set();
