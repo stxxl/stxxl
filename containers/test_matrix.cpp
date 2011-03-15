@@ -142,8 +142,8 @@ int main(int argc, char **argv)
     ah.new_int("K", "number of the test case to run", test_case);
     ah.new_named_int('r',  "rank", "N","rank of the matrices", rank);
     ah.new_named_int('m', "memory", "L", "internal memory to use (in megabytes)", internal_memory_megabyte);
-    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N", mult_algo_num);
-    ah.new_named_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N", sched_algo_num);
+    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add", mult_algo_num);
+    ah.new_named_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching", sched_algo_num);
 
     ah.set_description("stxxl matrix test");
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
@@ -437,16 +437,20 @@ int main(int argc, char **argv)
             delete bs.switch_algorithm_to(new
                     block_scheduler_algorithm_offline_lfd< matrix_swappable_block<value_type, block_order> >(bs));
             break;
+        case 2:
+            delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_offline_lru_prefetching< matrix_swappable_block<value_type, block_order> >(bs));
+            break;
         default:
             STXXL_ERRMSG("invalid scheduling-algorithm number");
         }
         *c = a->multiply(*b, mult_algo_num);
+        delete bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_online_lru< matrix_swappable_block<value_type, block_order> >(bs));
         bs.flush();
         stats_after = *stats::get_instance();
         matrix_stats_after.set();
         STXXL_MSG("end of multiplication");
-        delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_online_lru< matrix_swappable_block<value_type, block_order> >(bs));
 
         if (sched_algo_num > 0)
         {
