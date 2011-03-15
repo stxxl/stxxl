@@ -588,7 +588,7 @@ public:
         SwappableBlockType & sblock = swappable_blocks[sbid];
         /* acquired => internal -> increase reference count
            internal but not acquired -> remove from evictable_blocks, increase reference count
-           not intern => uninitialized or external -> get internal_block, increase reference count
+           not internal => uninitialized or external -> get internal_block, increase reference count
            uninitialized -> fill with default value
            external -> read */
         if (sblock.is_internal())
@@ -1138,12 +1138,18 @@ protected:
 
     //! \brief Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
     std::set<swappable_block_identifier_type> free_evictable_blocks;
+    std::set<swappable_block_identifier_type> scheduled_evictable_blocks;
     //! \brief Holds not internal swappable_blocks, whose next access has already been scheduled.
     scheduled_blocks_type scheduled_blocks;
     //! \brief Holds swappable_blocks, whose internal block has been taken away but the clean did not finish yet.
     write_scheduled_blocks_type write_scheduled_blocks;
     typename prediction_sequence_type::iterator next_op_to_schedule;
 
+    //! \brief Schedule an internal, possibly dirty swappable_block to write.
+    //!
+    //! The block becomes not dirty. if it was dirty, an entry in write_scheduled_blocks is made referencing the write_read_request.
+    //! \param sbid block to write
+    //! \return pointer to the write_read_request
     write_read_request * schedule_write(const swappable_block_identifier_type sbid)
     {
         SwappableBlockType & sblock = swappable_blocks[sbid];
@@ -1151,7 +1157,8 @@ protected:
         wrr->write_req = sblock.clean_async(read_after_write(wrr));
         if (wrr->write_req.valid())
         {
-            assert(write_scheduled_blocks.insert(std::make_pair(sbid, wrr)).second);
+            bool t = write_scheduled_blocks.insert(std::make_pair(sbid, wrr)).second;
+            assert(t);
             return wrr;
         }
         else
@@ -1161,18 +1168,23 @@ protected:
         }
     }
 
-    bool try_interrupt_read(write_scheduled_blocks_iterator & it, scheduled_blocks_reference block_to_read_meta)
+    //! \brief try to interrupt a read scheduled in a write_read_request
+    //!
+    //! side-effect: possibly erases entry from write_scheduled_blocks, so the iterator writing_block may become invalid
+    //! \return if successful
+    bool try_interrupt_read(const write_scheduled_blocks_iterator & writing_block)
     {
         // stop read
-        it->second->shall_read = false;
+        writing_block->second->shall_read = false;
         // check if stopped
-        if (! it->second->write_done_soon)
+        if (! writing_block->second->write_done_soon)
             return true;
         // => possibly to late
+        scheduled_blocks_reference taker = *writing_block->second->taker;
         // wait
-        wait_on_write(it);
+        wait_on_write(writing_block);
         // check if read started
-        if (block_to_read_meta.second.read_req.valid())
+        if (taker.second.read_req.valid())
             // => read started, to late
             return false;
         else
@@ -1180,9 +1192,14 @@ protected:
             return true;
     }
 
+    //! \brief Schedule an internal and external block to read.
+    //!
+    //! If the giver is still writing, schedule read via its write_read_request.
     void schedule_read(scheduled_blocks_iterator block_to_read)
     {
         // first check if block_to_read is still writing. do not read before write finished
+        // wait_on_write(block_to_read->first);
+
         write_scheduled_blocks_iterator it = write_scheduled_blocks.find(block_to_read->first);
         if (it != write_scheduled_blocks.end())
         {
@@ -1190,7 +1207,7 @@ protected:
             // check if scheduled to read
             if (it->second->shall_read)
             {
-                if (try_interrupt_read(it, *other_block_to_read))
+                if (try_interrupt_read(it))
                 {
                     // => interrupted, swap internal_blocks
                     std::swap(other_block_to_read->second.giver, block_to_read->second.giver);
@@ -1255,20 +1272,20 @@ protected:
         // schedule block_to_read to read
         if (block_to_read->second.giver.first)
         {
-            write_scheduled_blocks_iterator it = write_scheduled_blocks.find(block_to_read->second.giver.second);
-            if (it != write_scheduled_blocks.end())
+            write_scheduled_blocks_iterator writing_block = write_scheduled_blocks.find(block_to_read->second.giver.second);
+            if (writing_block != write_scheduled_blocks.end())
             {
                 // => there is a write scheduled
                 // tell the completion handler that we want a read
-                it->second->block_to_start_read = swappable_blocks.begin() + block_to_read->first;
-                it->second->taker = block_to_read;
-                it->second->shall_read = true;
+                writing_block->second->block_to_start_read = swappable_blocks.begin() + block_to_read->first;
+                writing_block->second->taker = block_to_read;
+                writing_block->second->shall_read = true;
                 // and check if it is not to late
-                if (it->second->write_done_soon)
+                if (writing_block->second->write_done_soon)
                 {
                     // => the completion handler may have missed our wish to read
                     // so wait for it to finish and check
-                    wait_on_write(it);
+                    wait_on_write(writing_block);
                     block_to_read->second.giver.first = false;
                     if (block_to_read->second.read_req.valid())
                         // read scheduled
@@ -1285,21 +1302,30 @@ protected:
         block_to_read->second.read_req = swappable_blocks[block_to_read->first].read_async();
     }
 
-    void wait_on_write(write_scheduled_blocks_iterator & it)
+    //! \brief wait for the write to finish
+    //!
+    //! side-effect: erases entry from write_scheduled_blocks
+    void wait_on_write(const write_scheduled_blocks_iterator & writing_block)
     {
-        it->second->write_req->wait();
-        delete it->second;
-        write_scheduled_blocks.erase(it);
+        writing_block->second->write_req->wait();
+        delete writing_block->second;
+        write_scheduled_blocks.erase(writing_block);
     }
 
-    void wait_on_write(const swappable_block_identifier_type & sbid)
+    //! \brief wait for the write to finish
+    //!
+    //! side-effect: erases entry from write_scheduled_blocks
+    void wait_on_write(const swappable_block_identifier_type & writing_block)
     {
-        write_scheduled_blocks_iterator it = write_scheduled_blocks.find(sbid);
+        write_scheduled_blocks_iterator it = write_scheduled_blocks.find(writing_block);
         if (it != write_scheduled_blocks.end())
             wait_on_write(it);
     }
 
-    void wait_on_write(scheduled_blocks_iterator & schedule_meta)
+    //! \brief wait for the write of the giver to finish
+    //!
+    //! side-effect: erases entry from write_scheduled_blocks
+    void wait_on_write(const scheduled_blocks_iterator & schedule_meta)
     {
         if (schedule_meta->second.giver.first)
         {
@@ -1308,7 +1334,10 @@ protected:
         }
     }
 
-    void wait_on_read(scheduled_blocks_iterator & schedule_meta)
+    //! \brief wait for the read to finish
+    //!
+    //! side-effect: erases entry for the write of the giver from write_scheduled_blocks
+    void wait_on_read(const scheduled_blocks_iterator & schedule_meta)
     {
         wait_on_write(schedule_meta);
         if (schedule_meta->second.read_req.valid())
@@ -1318,8 +1347,10 @@ protected:
         }
     }
 
-    // wait and return reserved internal_block
-    internal_block_type * get_ready_block(scheduled_blocks_iterator & schedule_meta)
+    //! \brief wait for the write of the giver to finish and return reserved internal_block
+    //!
+    //! side-effect: erases entry for the write of the giver from write_scheduled_blocks
+    internal_block_type * get_ready_block(const scheduled_blocks_iterator & schedule_meta)
     {
         wait_on_write(schedule_meta);
         internal_block_type * r = schedule_meta->second.reserved_iblock;
@@ -1385,7 +1416,10 @@ protected:
     {
         schedule_meta->second.operations.pop_back();
         if (schedule_meta->second.operations.empty())
+        {
+            assert(! schedule_meta->second.giver.first);
             scheduled_blocks.erase(schedule_meta);
+        }
     }
 
     block_scheduler_algorithm_type * give_up(std::string err_msg = "detected some error in the prediction sequence")
@@ -1398,20 +1432,6 @@ protected:
         delete bs.switch_algorithm_to(new_algo);
         return new_algo;
     }
-
-    /*
-    internal_block_type * get_free_internal_block()
-    {
-        // try to get a free internal_block
-        if (internal_block_type * iblock = get_free_internal_block_from_block_scheduler())
-            return iblock;
-        // evict block
-        assert(! free_evictable_blocks.empty()); // fails it there is not enough memory available
-        swappable_block_identifier_type r = free_evictable_blocks.back();
-        free_evictable_blocks.pop_back();
-        return swappable_blocks[r].detach_internal_block();
-    }
-    */
 
     void return_free_internal_block(internal_block_type * iblock)
     { return_free_internal_block_to_block_scheduler(iblock); }
@@ -1432,13 +1452,18 @@ protected:
             if (next_op_to_schedule->op == block_scheduler_type::op_acquire)
             {
                 if (sblock.is_internal())
-                    free_evictable_blocks.erase(next_op_to_schedule->id);
+                {
+                    if (free_evictable_blocks.erase(next_op_to_schedule->id))
+                        scheduled_evictable_blocks.insert(next_op_to_schedule->id);
+                }
                 else
                     if (! schedule_meta->second.reserved_iblock)
                     {
-                        // get internal_block
+                        // => needs internal_block -> try to get one
+                        // from block_scheduler
                         if (! (schedule_meta->second.reserved_iblock = get_free_internal_block_from_block_scheduler()))
                         {
+                            // by evicting
                             if (free_evictable_blocks.empty())
                             {
                                 // => can not schedule acquire
@@ -1465,9 +1490,14 @@ protected:
                             // -> start prefetchig now
                             sblock.attach_internal_block(schedule_meta->second.reserved_iblock);
                             schedule_meta->second.reserved_iblock = 0;
+                            scheduled_evictable_blocks.insert(next_op_to_schedule->id);
                             schedule_read(schedule_meta);
                         }
                     }
+            }
+            else if (next_op_to_schedule->op == block_scheduler_type::op_deinitialize)
+            {
+
             }
 
             ++ next_op_to_schedule;
@@ -1489,14 +1519,14 @@ protected:
     void deinit()
     {
         // empty scheduled_blocks
+        free_evictable_blocks.insert(scheduled_evictable_blocks.begin(), scheduled_evictable_blocks.end());
+        scheduled_evictable_blocks.clear();
         while (! scheduled_blocks.empty())
         {
             scheduled_blocks_iterator it = scheduled_blocks.begin();
             wait_on_read(it);
             if (it->second.reserved_iblock)
                 return_free_internal_block(it->second.reserved_iblock);
-            if (swappable_blocks[it->first].is_evictable())
-                free_evictable_blocks.insert(it->first);
             scheduled_blocks.erase(it);
         }
         while (! write_scheduled_blocks.empty())
@@ -1550,11 +1580,18 @@ public:
 
         SwappableBlockType & sblock = swappable_blocks[sbid];
         /* acquired => internal -> increase reference count
+           internal but not acquired -> remove from scheduled_evictable_blocks, increase reference count
            not internal => uninitialized or external -> get internal_block, increase reference count
            uninitialized -> fill with default value
            external -> read */
         if (sblock.is_internal())
         {
+            if (! sblock.is_acquired())
+            {
+                // not acquired yet -> remove from scheduled_evictable_blocks
+                bool t = scheduled_evictable_blocks.erase(sbid);
+                assert(t);
+            }
             wait_on_read(schedule_meta);
             sblock.acquire();
         }
@@ -1595,7 +1632,7 @@ public:
                 if (shall_keep_internal_block(schedule_meta))
                 {
                     // => swappable_block shall keep its internal_block
-                    // -> can be left as it is. it will stay in scheduled_blocks
+                    scheduled_evictable_blocks.insert(sbid);
                     if (shall_be_cleaned(schedule_meta))
                         schedule_write(sbid);
                 }
@@ -1634,6 +1671,15 @@ public:
         prediction_sequence.pop_front();
 
         SwappableBlockType & sblock = swappable_blocks[sbid];
+        if (sblock.is_evictable())
+        {
+            bool t;
+            if (sblock.is_dirty())
+                t = scheduled_evictable_blocks.erase(sbid);
+            else
+                t = free_evictable_blocks.erase(sbid);
+            assert(t);
+        }
         if (internal_block_type * iblock = sblock.deinitialize())
         {
             if (shall_keep_internal_block(schedule_meta))
@@ -1665,6 +1711,7 @@ public:
         {
             sblock.attach_internal_block(schedule_meta->second.reserved_iblock);
             schedule_meta->second.reserved_iblock = 0;
+            scheduled_evictable_blocks.insert(sbid);
             schedule_read(schedule_meta);
         }
         operation_done(schedule_meta);
