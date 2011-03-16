@@ -328,14 +328,14 @@ protected:
 
 public:
     //! \brief Create an empty swappable_block_matrix of given dimensions.
-    swappable_block_matrix(block_scheduler_type & bs, const size_type height_in_blocks, const size_type width_in_blocks)
+    swappable_block_matrix(block_scheduler_type & bs, const size_type height_in_blocks, const size_type width_in_blocks, const bool transposed = false)
         : bs(bs),
           height(height_in_blocks),
           width(width_in_blocks),
           height_from_supermatrix(0),
           width_from_supermatrix(0),
           blocks(height * width),
-          elements_in_blocks_transposed(false)
+          elements_in_blocks_transposed(transposed)
     {
         for (size_type row = 0; row < height; ++row)
             for (size_type col = 0; col < width; ++col)
@@ -1203,7 +1203,8 @@ public:
     //!    0: naive_multiply_and_add \n
     //!    1: recursive_multiply_and_add \n
     //!    2: strassen_winograd_multiply_and_add \n
-    //!    3: multi_level_strassen_winograd_multiply_and_add
+    //!    3: multi_level_strassen_winograd_multiply_and_add \n
+    //!    4: strassen_winograd_multiply (optimized pre- and postadditions)
     matrix_type multiply (const matrix_type & right, const int_type multiplication_algorithm = 2, const int_type scheduling_algorithm = 2) const
     {
         assert(width == right.height);
@@ -1228,6 +1229,12 @@ public:
                 break;
             case 3:
                 Ops::multi_level_strassen_winograd_multiply_and_add(*data, *right.data, *res.data);
+                break;
+            case 4:
+                Ops::strassen_winograd_multiply(*data, *right.data, *res.data);
+                break;
+            case 5:
+                Ops::strassen_winograd_multiply_and_add_interleaved(*data, *right.data, *res.data);
                 break;
             default:
                 STXXL_ERRMSG("invalid multiplication-algorithm number");
@@ -1265,6 +1272,12 @@ public:
         case 3:
             Ops::multi_level_strassen_winograd_multiply_and_add(*data, *right.data, *res.data);
             break;
+        case 4:
+            Ops::strassen_winograd_multiply(*data, *right.data, *res.data);
+            break;
+        case 5:
+            Ops::strassen_winograd_multiply_and_add_interleaved(*data, *right.data, *res.data);
+            break;
         default:
             STXXL_ERRMSG("invalid multiplication-algorithm number");
             break;
@@ -1273,10 +1286,6 @@ public:
                     block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
         return res;
     }
-
-    //todo: standart container operations
-
-    //maydo: cheap iterator; get/set row/col; get/set submatrix
 };
 
 template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AExists, bool BExists>
@@ -1391,22 +1400,24 @@ struct matrix_operations
             const swappable_block_identifier_type a, bool a_is_transposed, block_scheduler_type & bs_a,
             const swappable_block_identifier_type b, bool b_is_transposed, block_scheduler_type & bs_b, Op op = Op())
     {
-        ++ matrix_operation_statistic::get_instance()->block_addition_calls;
+        if (! bs_c.is_simulating())
+            ++ matrix_operation_statistic::get_instance()->block_addition_calls;
         // check if zero-block (== ! initialized)
         if (! bs_a.is_initialized(a) && ! bs_b.is_initialized(b))
         {
             // => a and b are zero -> set c zero
             bs_c.deinitialize(c);
-            ++ matrix_operation_statistic::get_instance()->block_additions_saved_through_zero;
+            if (! bs_c.is_simulating())
+                ++ matrix_operation_statistic::get_instance()->block_additions_saved_through_zero;
             return;
         }
         a_is_transposed = a_is_transposed != c_is_transposed;
         b_is_transposed = b_is_transposed != c_is_transposed;
+        internal_block_type & ic = bs_c.acquire(c, true);
         if (! bs_a.is_initialized(a))
         {
             // a is zero -> copy b
-            internal_block_type & ib = bs_b.acquire(b),
-                                & ic = bs_c.acquire(c);
+            internal_block_type & ib = bs_b.acquire(b);
             if (! bs_c.is_simulating())
             {
                 if (b_is_transposed)
@@ -1425,13 +1436,11 @@ struct matrix_operations
                             op(ic[row * BlockSideLength + col], 0, ib[row * BlockSideLength + col]);
             }
             bs_b.release(b, false);
-            bs_c.release(c, true);
         }
         else if (! bs_b.is_initialized(b))
         {
             // b is zero -> copy a
-            internal_block_type & ia = bs_a.acquire(a),
-                                & ic = bs_c.acquire(c);
+            internal_block_type & ia = bs_a.acquire(a);
             if (! bs_c.is_simulating())
             {
                 if (a_is_transposed)
@@ -1450,13 +1459,11 @@ struct matrix_operations
                             op(ic[row * BlockSideLength + col], ia[row * BlockSideLength + col], 0);
             }
             bs_a.release(a, false);
-            bs_c.release(c, true);
         }
         else
         {
             internal_block_type & ia = bs_a.acquire(a),
-                                & ib = bs_b.acquire(b),
-                                & ic = bs_c.acquire(c);
+                                & ib = bs_b.acquire(b);
             if (! bs_c.is_simulating())
             {
                 if (a_is_transposed)
@@ -1496,8 +1503,8 @@ struct matrix_operations
             }
             bs_a.release(a, false);
             bs_b.release(b, false);
-            bs_c.release(c, true);
         }
+        bs_c.release(c, true);
     }
 
     // calculates c <op>= a
@@ -1506,17 +1513,19 @@ struct matrix_operations
             const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c,
             const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a, Op op = Op())
     {
-        ++ matrix_operation_statistic::get_instance()->block_addition_calls;
+        if (! bs_c.is_simulating())
+            ++ matrix_operation_statistic::get_instance()->block_addition_calls;
         // check if zero-block (== ! initialized)
         if (! bs_a.is_initialized(a))
         {
             // => b is zero => nothing to do
-            ++ matrix_operation_statistic::get_instance()->block_additions_saved_through_zero;
+            if (! bs_c.is_simulating())
+                ++ matrix_operation_statistic::get_instance()->block_additions_saved_through_zero;
             return;
         }
         const bool c_is_zero = ! bs_c.is_initialized(c);
         // acquire
-        internal_block_type & ic = bs_c.acquire(c),
+        internal_block_type & ic = bs_c.acquire(c, c_is_zero),
                             & ia = bs_a.acquire(a);
         // add
         if (! bs_c.is_simulating())
@@ -1562,12 +1571,14 @@ struct matrix_operations
     element_op_swappable_block(
             const swappable_block_identifier_type c, const bool, block_scheduler_type & bs_c, Op op = Op())
     {
-        ++ matrix_operation_statistic::get_instance()->block_addition_calls;
+        if (! bs_c.is_simulating())
+            ++ matrix_operation_statistic::get_instance()->block_addition_calls;
         // check if zero-block (== ! initialized)
         if (! bs_c.is_initialized(c))
         {
-            // => b is zero => nothing to do
-            ++ matrix_operation_statistic::get_instance()->block_additions_saved_through_zero;
+            // => c is zero => nothing to do
+            if (! bs_c.is_simulating())
+                ++ matrix_operation_statistic::get_instance()->block_additions_saved_through_zero;
             return;
         }
         // acquire
@@ -1584,6 +1595,108 @@ struct matrix_operations
         }
         // release
         bs_c.release(c, true);
+    }
+
+    // additions for strassen-winograd
+
+    static void
+    strassen_winograd_preaddition_a(swappable_block_matrix_type & a11,
+                                    swappable_block_matrix_type & a12,
+                                    swappable_block_matrix_type & a21,
+                                    swappable_block_matrix_type & a22,
+                                    swappable_block_matrix_type & s1,
+                                    swappable_block_matrix_type & s2,
+                                    swappable_block_matrix_type & s3,
+                                    swappable_block_matrix_type & s4)
+    {
+        for (size_type row = 0; row < a11.get_height(); ++row)
+            for (size_type col = 0; col < a11.get_width(); ++col)
+            {
+                op_swappable_block_nontransposed(s3, a11, subtraction(), a21, row, col);
+                op_swappable_block_nontransposed(s1, a21,    addition(), a22, row, col);
+                op_swappable_block_nontransposed(s2,  s1, subtraction(), a11, row, col);
+                op_swappable_block_nontransposed(s4, a12, subtraction(),  s2, row, col);
+            }
+    }
+
+    static void
+    strassen_winograd_preaddition_b(swappable_block_matrix_type & b11,
+                                    swappable_block_matrix_type & b12,
+                                    swappable_block_matrix_type & b21,
+                                    swappable_block_matrix_type & b22,
+                                    swappable_block_matrix_type & t1,
+                                    swappable_block_matrix_type & t2,
+                                    swappable_block_matrix_type & t3,
+                                    swappable_block_matrix_type & t4)
+    {
+        for (size_type row = 0; row < b11.get_height(); ++row)
+            for (size_type col = 0; col < b11.get_width(); ++col)
+            {
+                op_swappable_block_nontransposed(t3, b22, subtraction(), b12, row, col);
+                op_swappable_block_nontransposed(t1, b12, subtraction(), b11, row, col);
+                op_swappable_block_nontransposed(t2, b22, subtraction(),  t1, row, col);
+                op_swappable_block_nontransposed(t4, b21, subtraction(),  t2, row, col);
+            }
+    }
+
+    static void
+    strassen_winograd_postaddition(swappable_block_matrix_type & c11, // = p2
+                                   swappable_block_matrix_type & c12, // = p6
+                                   swappable_block_matrix_type & c21, // = p7
+                                   swappable_block_matrix_type & c22, // = p4
+                                   swappable_block_matrix_type & p1,
+                                   swappable_block_matrix_type & p3,
+                                   swappable_block_matrix_type & p5)
+    {
+        for (size_type row = 0; row < c11.get_height(); ++row)
+            for (size_type col = 0; col < c11.get_width(); ++col)
+            {
+                op_swappable_block_nontransposed(c11,     addition(),  p1, row, col); // (u1)
+                op_swappable_block_nontransposed( p1,     addition(), c22, row, col); // (u2)
+                op_swappable_block_nontransposed( p5,     addition(),  p1, row, col); // (u3)
+                op_swappable_block_nontransposed(c21,     addition(),  p5, row, col); // (u4)
+                op_swappable_block_nontransposed(c22, p5, addition(),  p3, row, col); // (u5)
+                op_swappable_block_nontransposed( p1,     addition(),  p3, row, col); // (u6)
+                op_swappable_block_nontransposed(c12,     addition(),  p1, row, col); // (u7)
+            }
+    }
+
+    // calculates c1 += a; c2 += a
+    template <class Op> static void
+    element_op_twice_nontransposed(swappable_block_matrix_type & c1,
+                     swappable_block_matrix_type & c2,
+                     const swappable_block_matrix_type & a, Op op = Op())
+    {
+        for (size_type row = 0; row < a.get_height(); ++row)
+            for (size_type col = 0; col < a.get_width(); ++col)
+            {
+                element_op_swappable_block(
+                        c1(row, col), false, c1.bs,
+                        a(row, col),  false, a.bs, op);
+                element_op_swappable_block(
+                        c2(row, col), false, c2.bs,
+                        a(row, col),  false, a.bs, op);
+            }
+    }
+
+    template <class Op> static void
+    op_swappable_block_nontransposed(swappable_block_matrix_type & c,
+            swappable_block_matrix_type & a, Op op, swappable_block_matrix_type & b,
+            size_type & row, size_type & col)
+    {
+        element_op_swappable_block(
+                        c(row, col), false, c.bs,
+                        a(row, col), false, a.bs,
+                        b(row, col), false, b.bs, op);
+    }
+
+    template <class Op> static void
+    op_swappable_block_nontransposed(swappable_block_matrix_type & c, Op op, swappable_block_matrix_type & a,
+            size_type & row, size_type & col)
+    {
+        element_op_swappable_block(
+                        c(row, col), false, c.bs,
+                        a(row, col), false, a.bs, op);
     }
 
     // +-+ end addition +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -1761,6 +1874,102 @@ struct matrix_operations
 
     }
 
+    //! \brief calculates C = A * B
+    // assumes fitting dimensions
+    static swappable_block_matrix_type &
+    strassen_winograd_multiply(const swappable_block_matrix_type & A,
+                               const swappable_block_matrix_type & B,
+                               swappable_block_matrix_type & C)
+    {
+        // base case
+        if (C.get_height() == 1 || C.get_width() == 1 || A.get_width() == 1)
+        {
+            C.set_zero();
+            return recursive_multiply_and_add(A, B, C);
+        }
+
+        // partition matrix
+        swappable_block_matrix_padding_quarterer qa(A), qb(B), qc(C);
+        // preadditions
+        swappable_block_matrix_type s1(C.bs, qa.ul.get_height(), qa.ul.get_width(), qa.ul.is_transposed()),
+                                    s2(C.bs, qa.ul.get_height(), qa.ul.get_width(), qa.ul.is_transposed()),
+                                    s3(C.bs, qa.ul.get_height(), qa.ul.get_width(), qa.ul.is_transposed()),
+                                    s4(C.bs, qa.ul.get_height(), qa.ul.get_width(), qa.ul.is_transposed()),
+                                    t1(C.bs, qb.ul.get_height(), qb.ul.get_width(), qb.ul.is_transposed()),
+                                    t2(C.bs, qb.ul.get_height(), qb.ul.get_width(), qb.ul.is_transposed()),
+                                    t3(C.bs, qb.ul.get_height(), qb.ul.get_width(), qb.ul.is_transposed()),
+                                    t4(C.bs, qb.ul.get_height(), qb.ul.get_width(), qb.ul.is_transposed());
+        strassen_winograd_preaddition_a(qa.ul, qa.ur, qa.dl, qa.dr, s1, s2, s3, s4);
+        strassen_winograd_preaddition_b(qb.ul, qb.ur, qb.dl, qb.dr, t1, t2, t3, t4);
+        // recursive multiplications
+        swappable_block_matrix_type p1(C.bs, qc.ul.get_height(), qc.ul.get_width(), qc.ul.is_transposed()),
+                                 // p2 stored in qc.ul
+                                    p3(C.bs, qc.ul.get_height(), qc.ul.get_width(), qc.ul.is_transposed()),
+                                 // p4 stored in qc.dr
+                                    p5(C.bs, qc.ul.get_height(), qc.ul.get_width(), qc.ul.is_transposed());
+                                 // p6 stored in qc.ur
+                                 // p7 stored in qc.dl
+        strassen_winograd_multiply(qa.ul, qb.ul,    p1);
+        strassen_winograd_multiply(qa.ur, qb.dl, qc.ul);
+        strassen_winograd_multiply(   s1,    t1,    p3);
+        strassen_winograd_multiply(   s2,    t2, qc.dr);
+        strassen_winograd_multiply(   s3,    t3,    p5);
+        strassen_winograd_multiply(   s4, qb.dr, qc.ur);
+        strassen_winograd_multiply(qa.dr,    t4, qc.dl);
+        // postadditions
+        strassen_winograd_postaddition(qc.ul, qc.ur, qc.dl, qc.dr, p1, p3, p5);
+        return C;
+    }
+
+    //! \brief calculates C = A * B + C
+    // assumes fitting dimensions
+    static swappable_block_matrix_type &
+    strassen_winograd_multiply_and_add_interleaved(const swappable_block_matrix_type & A,
+                                         const swappable_block_matrix_type & B,
+                                         swappable_block_matrix_type & C)
+    {
+        // base case
+        if (C.get_height() == 1 || C.get_width() == 1 || A.get_width() == 1)
+            return recursive_multiply_and_add(A, B, C);
+
+        // partition matrix
+        swappable_block_matrix_padding_quarterer qa(A), qb(B), qc(C);
+        // preadditions
+        swappable_block_matrix_type s1(C.bs, qa.ul.get_height(), qa.ul.get_width(), qa.ul.is_transposed()),
+                                    s2(C.bs, qa.ul.get_height(), qa.ul.get_width(), qa.ul.is_transposed()),
+                                    s3(C.bs, qa.ul.get_height(), qa.ul.get_width(), qa.ul.is_transposed()),
+                                    s4(C.bs, qa.ul.get_height(), qa.ul.get_width(), qa.ul.is_transposed()),
+                                    t1(C.bs, qb.ul.get_height(), qb.ul.get_width(), qb.ul.is_transposed()),
+                                    t2(C.bs, qb.ul.get_height(), qb.ul.get_width(), qb.ul.is_transposed()),
+                                    t3(C.bs, qb.ul.get_height(), qb.ul.get_width(), qb.ul.is_transposed()),
+                                    t4(C.bs, qb.ul.get_height(), qb.ul.get_width(), qb.ul.is_transposed());
+        strassen_winograd_preaddition_a(qa.ul, qa.ur, qa.dl, qa.dr, s1, s2, s3, s4);
+        strassen_winograd_preaddition_b(qb.ul, qb.ur, qb.dl, qb.dr, t1, t2, t3, t4);
+        // recursive multiplications and postadditions
+        swappable_block_matrix_type px(C.bs, qc.ul.get_height(), qc.ul.get_width(), qc.ul.is_transposed());
+        strassen_winograd_multiply_and_add_interleaved(qa.ur, qb.dl, qc.ul); // p2
+        strassen_winograd_multiply_and_add_interleaved(qa.ul, qb.ul, px); // p1
+        element_op<addition>(qc.ul, px);
+        strassen_winograd_multiply_and_add_interleaved(s2, t2, px); // p4
+        s2.set_zero();
+        t2.set_zero();
+        element_op<addition>(qc.ur, px);
+        strassen_winograd_multiply_and_add_interleaved(s3, t3, px); // p5
+        s3.set_zero();
+        t3.set_zero();
+        element_op_twice_nontransposed<addition>(qc.dl, qc.dr, px);
+        px.set_zero();
+        strassen_winograd_multiply_and_add_interleaved(qa.dr, t4, qc.dl); // p7
+        t4.set_zero();
+        strassen_winograd_multiply_and_add_interleaved(s1, t1, px); // p3
+        s1.set_zero();
+        t1.set_zero();
+        element_op_twice_nontransposed<addition>(qc.dr, qc.ur, px);
+        px.set_zero();
+        strassen_winograd_multiply_and_add_interleaved(s4, qb.dr, qc.ur); // p6
+        return C;
+    }
+
     //! \brief calculates C = A * B + C
     // assumes fitting dimensions
     static swappable_block_matrix_type &
@@ -1864,12 +2073,14 @@ struct matrix_operations
             const swappable_block_identifier_type b, const bool b_is_transposed, block_scheduler_type & bs_b,
             const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c)
     {
-        ++ matrix_operation_statistic::get_instance()->block_multiplication_calls;
+        if (! bs_c.is_simulating())
+            ++ matrix_operation_statistic::get_instance()->block_multiplication_calls;
         // check if zero-block (== ! initialized)
         if (! bs_a.is_initialized(a) || ! bs_b.is_initialized(b))
         {
             // => one factor is zero => product is zero
-            ++ matrix_operation_statistic::get_instance()->block_multiplications_saved_through_zero;
+            if (! bs_c.is_simulating())
+                ++ matrix_operation_statistic::get_instance()->block_multiplications_saved_through_zero;
             return;
         }
         // acquire
@@ -2068,7 +2279,7 @@ struct matrix_operations
             vector_size_type offset_l, vector_size_type offset_r)
     {
         // acquire
-        internal_block_type & ia = bs_a.acquire(a);
+        internal_block_type & ia = bs_a.acquire(a, true);
         // multiply
         if (! bs_a.is_simulating())
         {
@@ -2220,7 +2431,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
     void begin_feeding_a_block(const size_type & block_row, const size_type & block_col, const zbt)
     {
         if (! AExists)
-            iblock = & a.bs.acquire(a(block_row, block_col));
+            iblock = & a.bs.acquire(a(block_row, block_col), true);
     }
 
     void feed_a_element(const int_type element_num, const vt v)
@@ -2241,7 +2452,7 @@ struct feedable_strassen_winograd<ValueType, BlockSideLength, 0, AExists, BExist
     void begin_feeding_b_block(const size_type & block_row, const size_type & block_col, const zbt)
     {
         if (! BExists)
-            iblock = & b.bs.acquire(b(block_row, block_col));
+            iblock = & b.bs.acquire(b(block_row, block_col), true);
     }
 
     void feed_b_element(const int_type element_num, const vt v)

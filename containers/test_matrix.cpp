@@ -140,10 +140,10 @@ int main(int argc, char **argv)
 
     dsr::Argument_helper ah;
     ah.new_int("K", "number of the test case to run", test_case);
-    ah.new_named_int('r',  "rank", "N","rank of the matrices", rank);
-    ah.new_named_int('m', "memory", "L", "internal memory to use (in megabytes)", internal_memory_megabyte);
-    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add", mult_algo_num);
-    ah.new_named_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching", sched_algo_num);
+    ah.new_named_int('r',  "rank", "N","rank of the matrices   default", rank);
+    ah.new_named_int('m', "memory", "L", "internal memory to use (in megabytes)   default", internal_memory_megabyte);
+    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_2 (block-interleaved preadditions)\n  default", mult_algo_num);
+    ah.new_named_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default", sched_algo_num);
 
     ah.set_description("stxxl matrix test");
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
