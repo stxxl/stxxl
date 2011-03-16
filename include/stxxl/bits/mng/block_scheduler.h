@@ -361,7 +361,7 @@ public:
     //! Has to be in pairs with release. Pairs may be nested and interleaved.
     //! \return Reference to the block's data.
     //! \param sblock Swappable block to acquire.
-    internal_block_type & acquire(const swappable_block_identifier_type sbid);
+    internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false);
 
     //! \brief Release the given block.
     //! Has to be in pairs with acquire. Pairs may be nested and interleaved.
@@ -501,7 +501,7 @@ public:
     virtual swappable_block_identifier_type evictable_blocks_pop() = 0;
     virtual void swappable_blocks_resize(swappable_block_identifier_type /*size*/) {}
 
-    virtual internal_block_type & acquire(swappable_block_identifier_type sbid) = 0;
+    virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false) = 0;
     virtual void release(swappable_block_identifier_type sbid, const bool dirty) = 0;
     virtual void deinitialize(swappable_block_identifier_type sbid) = 0;
     virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock) = 0;
@@ -583,7 +583,7 @@ public:
     virtual swappable_block_identifier_type evictable_blocks_pop()
     { return evictable_blocks.pop(); }
 
-    virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
+    virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false)
     {
         SwappableBlockType & sblock = swappable_blocks[sbid];
         /* acquired => internal -> increase reference count
@@ -603,8 +603,9 @@ public:
             // => external but not internal
             //get internal_block
             sblock.attach_internal_block(get_free_internal_block());
-            //load block synchronously
-            sblock.read_sync();
+            if (! uninitialized)
+                //load block synchronously
+                sblock.read_sync();
             sblock.acquire();
         }
         else
@@ -614,7 +615,8 @@ public:
             sblock.attach_internal_block(get_free_internal_block());
             sblock.acquire();
             //initialize new block
-            sblock.fill_default();
+            if (! uninitialized)
+                sblock.fill_default();
         }
         return sblock.get_internal_block();
     }
@@ -737,7 +739,7 @@ public:
         return sbid;
     }
 
-    virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
+    virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool /*uninitialized*/ = false)
     {
         ++reference_counts[sbid];
         last_op_release = false;
@@ -938,7 +940,7 @@ public:
     virtual swappable_block_identifier_type evictable_blocks_pop()
     { return evictable_blocks.pop(); }
 
-    virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
+    virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false)
     {
         SwappableBlockType & sblock = swappable_blocks[sbid];
         /* acquired => internal -> increase reference count
@@ -958,8 +960,9 @@ public:
             // => external but not internal
             //get internal_block
             sblock.attach_internal_block(get_free_internal_block());
-            //load block synchronously
-            sblock.read_sync();
+            if (! uninitialized)
+                //load block synchronously
+                sblock.read_sync();
             sblock.acquire();
         }
         else
@@ -969,7 +972,8 @@ public:
             sblock.attach_internal_block(get_free_internal_block());
             sblock.acquire();
             //initialize new block
-            sblock.fill_default();
+            if (! uninitialized)
+                sblock.fill_default();
         }
         return sblock.get_internal_block();
     }
@@ -1358,12 +1362,11 @@ protected:
         return r;
     }
 
-    // assumes the current operation to be still in operations
-    bool shall_keep_internal_block(const scheduled_blocks_iterator & schedule_meta) const
+    bool shall_keep_internal_block(const scheduled_blocks_iterator & schedule_meta, const bool ignore_first = true) const
     {
         // returns true iif there is an acquire scheduled or there is a deinitialize scheduled and the block is dirty
         for (typename std::deque<block_scheduler_operation>::reverse_iterator
-                rit = schedule_meta->second.operations.rbegin() + 1;
+                rit = schedule_meta->second.operations.rbegin() + ignore_first;
                 rit != schedule_meta->second.operations.rend(); ++rit)
             switch (*rit)
             {
@@ -1476,6 +1479,11 @@ protected:
                                 break;
                             }
                             swappable_block_identifier_type giver = pop_begin(free_evictable_blocks);
+                            {
+                                scheduled_blocks_iterator giver_meta;
+                                assert((giver_meta = scheduled_blocks.find(giver)) == scheduled_blocks.end()
+                                        || ! shall_keep_internal_block(giver_meta, false));
+                            }
                             write_read_request * wrr = schedule_write(giver);
                             schedule_meta->second.giver.first = bool(wrr);
                             schedule_meta->second.giver.second = giver;
@@ -1497,7 +1505,7 @@ protected:
             }
             else if (next_op_to_schedule->op == block_scheduler_type::op_deinitialize)
             {
-                if (sblock.is_evictable())
+                if (sblock.is_dirty())
                     if (free_evictable_blocks.erase(next_op_to_schedule->id))
                         scheduled_evictable_blocks.insert(next_op_to_schedule->id);
             }
@@ -1570,7 +1578,7 @@ public:
     virtual swappable_block_identifier_type evictable_blocks_pop()
     { return pop_begin(free_evictable_blocks); }
 
-    virtual internal_block_type & acquire(swappable_block_identifier_type sbid)
+    virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false)
     {
         assert(prediction_sequence.front().op == block_scheduler_type::op_acquire);
         assert(prediction_sequence.front().id == sbid);
@@ -1604,7 +1612,8 @@ public:
             sblock.attach_internal_block(get_ready_block(schedule_meta));
             sblock.acquire();
             //initialize new block
-            sblock.fill_default();
+            if (! uninitialized)
+                sblock.fill_default();
         }
 
         operation_done(schedule_meta);
@@ -1676,10 +1685,16 @@ public:
         if (sblock.is_evictable())
         {
             bool t;
-//            if (sblock.is_dirty())
-                t = scheduled_evictable_blocks.erase(sbid)
-            +
-                 free_evictable_blocks.erase(sbid);
+            if (shall_keep_internal_block(schedule_meta, false))
+            {
+                if (! (t = scheduled_evictable_blocks.erase(sbid)))
+                {
+                    STXXL_ERRMSG("dirty block not scheduled on deinitialize");
+                    t = free_evictable_blocks.erase(sbid);
+                }
+            }
+            else
+                t = free_evictable_blocks.erase(sbid);
             assert(t);
         }
         if (internal_block_type * iblock = sblock.deinitialize())
@@ -1774,8 +1789,8 @@ template <class SwappableBlockType>
 const int_type block_scheduler<SwappableBlockType>::max_internal_blocks_alloc_at_once = 128;
 
 template <class SwappableBlockType>
-typename block_scheduler<SwappableBlockType>::internal_block_type & block_scheduler<SwappableBlockType>::acquire(const swappable_block_identifier_type sbid)
-{ return algo->acquire(sbid); }
+typename block_scheduler<SwappableBlockType>::internal_block_type & block_scheduler<SwappableBlockType>::acquire(const swappable_block_identifier_type sbid, const bool uninitialized)
+{ return algo->acquire(sbid, uninitialized); }
 
 template <class SwappableBlockType>
 void block_scheduler<SwappableBlockType>::release(const swappable_block_identifier_type sbid, const bool dirty)
