@@ -278,6 +278,7 @@ public:
     enum block_scheduler_operation
     {
         op_acquire,
+        op_acquire_uninitialized,
         op_release,
         op_release_dirty,
         op_deinitialize,
@@ -739,12 +740,16 @@ public:
         return sbid;
     }
 
-    virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool /*uninitialized*/ = false)
+    virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false)
     {
         ++reference_counts[sbid];
         last_op_release = false;
-        prediction_sequence.push_back(prediction_sequence_element_type
-                (block_scheduler_type::op_acquire, sbid, time_count));
+        if (uninitialized)
+            prediction_sequence.push_back(prediction_sequence_element_type
+                    (block_scheduler_type::op_acquire_uninitialized, sbid, time_count));
+        else
+            prediction_sequence.push_back(prediction_sequence_element_type
+                    (block_scheduler_type::op_acquire, sbid, time_count));
         return dummy_block;
     }
 
@@ -884,6 +889,7 @@ protected:
                 switch (it->op)
                 {
                 case (block_scheduler_type::op_acquire):
+                case (block_scheduler_type::op_acquire_uninitialized):
                     blocks_next_acquire[it->id] = std::make_pair(true, it->time);
                     break;
                 case (block_scheduler_type::op_release):
@@ -1364,13 +1370,14 @@ protected:
 
     bool shall_keep_internal_block(const scheduled_blocks_iterator & schedule_meta, const bool ignore_first = true) const
     {
-        // returns true iif there is an acquire scheduled or there is a deinitialize scheduled and the block is dirty
+        // returns true iif there is an acquire or acquire_uninitialized scheduled or there is a deinitialize scheduled and the block is dirty
         for (typename std::deque<block_scheduler_operation>::reverse_iterator
                 rit = schedule_meta->second.operations.rbegin() + ignore_first;
                 rit != schedule_meta->second.operations.rend(); ++rit)
             switch (*rit)
             {
             case block_scheduler_type::op_acquire:
+            case block_scheduler_type::op_acquire_uninitialized:
                 return true; break;
             case block_scheduler_type::op_release:
             case block_scheduler_type::op_release_dirty:
@@ -1394,6 +1401,7 @@ protected:
             switch (*rit)
             {
             case block_scheduler_type::op_acquire:
+            case block_scheduler_type::op_acquire_uninitialized:
             case block_scheduler_type::op_release:
                 break;
             case block_scheduler_type::op_release_dirty:
@@ -1406,13 +1414,12 @@ protected:
         return false;
     }
 
-    // assumes the current operation to be still in operations
-    bool shall_be_read(const scheduled_blocks_iterator & schedule_meta) const
+    bool shall_be_read(const scheduled_blocks_iterator & schedule_meta, const bool ignore_first = true) const
     {
         // returns true iif there is an acquire scheduled next and the block is initialized
         return swappable_blocks[schedule_meta->first].is_initialized()
-                && schedule_meta->second.operations.rbegin() + 1 != schedule_meta->second.operations.rend()
-                && *(schedule_meta->second.operations.rbegin() + 1) == block_scheduler_type::op_acquire;
+                && schedule_meta->second.operations.rbegin() + ignore_first != schedule_meta->second.operations.rend()
+                && *(schedule_meta->second.operations.rbegin() + ignore_first) == block_scheduler_type::op_acquire;
     }
 
     void operation_done(scheduled_blocks_iterator & schedule_meta)
@@ -1452,7 +1459,8 @@ protected:
             SwappableBlockType & sblock = swappable_blocks[next_op_to_schedule->id];
 
             // do appropriate preparations
-            if (next_op_to_schedule->op == block_scheduler_type::op_acquire)
+            if (next_op_to_schedule->op == block_scheduler_type::op_acquire
+                    || next_op_to_schedule->op == block_scheduler_type::op_acquire_uninitialized)
             {
                 if (sblock.is_internal())
                 {
@@ -1463,10 +1471,10 @@ protected:
                     if (! schedule_meta->second.reserved_iblock)
                     {
                         // => needs internal_block -> try to get one
-                        // from block_scheduler
+                        // -> try to get one from block_scheduler
                         if (! (schedule_meta->second.reserved_iblock = get_free_internal_block_from_block_scheduler()))
                         {
-                            // by evicting
+                            // -> try to get one by evicting
                             if (free_evictable_blocks.empty())
                             {
                                 // => can not schedule acquire
@@ -1492,7 +1500,7 @@ protected:
                                 wrr->taker = schedule_meta;
                         }
                         // read if desired
-                        if (ins_res.second && sblock.is_initialized())
+                        if (shall_be_read(schedule_meta, false))
                         {
                             // => there is no operation scheduled for this block before this acquire and it is initialized
                             // -> start prefetching now
@@ -1580,12 +1588,19 @@ public:
 
     virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false)
     {
-        assert(prediction_sequence.front().op == block_scheduler_type::op_acquire);
+        assert(prediction_sequence.front().op ==
+                ((uninitialized) ? block_scheduler_type::op_acquire_uninitialized : block_scheduler_type::op_acquire));
         assert(prediction_sequence.front().id == sbid);
         scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
         if (schedule_meta == scheduled_blocks.end()
-                || schedule_meta->second.operations.back() != block_scheduler_type::op_acquire)
-            return give_up("acquire not scheduled or out of internal_blocks")->acquire(sbid);
+                || schedule_meta->second.operations.back() !=
+                        ((uninitialized) ? block_scheduler_type::op_acquire_uninitialized : block_scheduler_type::op_acquire))
+        {
+            if (uninitialized)
+                return give_up("acquire_uninitialized not scheduled or out of internal_blocks")->acquire(sbid, uninitialized);
+            else
+                return give_up("acquire not scheduled or out of internal_blocks")->acquire(sbid, uninitialized);
+        }
         prediction_sequence.pop_front();
 
         SwappableBlockType & sblock = swappable_blocks[sbid];
@@ -1607,7 +1622,7 @@ public:
         }
         else
         {
-            assert(! sblock.is_initialized()); // initialized blocks should be scheduled to read and thus internal
+            assert(uninitialized || ! sblock.is_initialized()); // initialized blocks should be scheduled to read and thus internal
             //get internal_block
             sblock.attach_internal_block(get_ready_block(schedule_meta));
             sblock.acquire();
