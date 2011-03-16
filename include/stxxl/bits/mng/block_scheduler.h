@@ -1487,7 +1487,7 @@ protected:
                         if (ins_res.second && sblock.is_initialized())
                         {
                             // => there is no operation scheduled for this block before this acquire and it is initialized
-                            // -> start prefetchig now
+                            // -> start prefetching now
                             sblock.attach_internal_block(schedule_meta->second.reserved_iblock);
                             schedule_meta->second.reserved_iblock = 0;
                             scheduled_evictable_blocks.insert(next_op_to_schedule->id);
@@ -1497,7 +1497,9 @@ protected:
             }
             else if (next_op_to_schedule->op == block_scheduler_type::op_deinitialize)
             {
-
+                if (sblock.is_evictable())
+                    if (free_evictable_blocks.erase(next_op_to_schedule->id))
+                        scheduled_evictable_blocks.insert(next_op_to_schedule->id);
             }
 
             ++ next_op_to_schedule;
@@ -1674,10 +1676,10 @@ public:
         if (sblock.is_evictable())
         {
             bool t;
-            if (sblock.is_dirty())
-                t = scheduled_evictable_blocks.erase(sbid);
-            else
-                t = free_evictable_blocks.erase(sbid);
+//            if (sblock.is_dirty())
+                t = scheduled_evictable_blocks.erase(sbid)
+            +
+                 free_evictable_blocks.erase(sbid);
             assert(t);
         }
         if (internal_block_type * iblock = sblock.deinitialize())

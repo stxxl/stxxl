@@ -417,7 +417,7 @@ int main(int argc, char **argv)
 
         bs.flush();
         STXXL_MSG("start of multiplication");
-        sim_matrix_stats_before.set();
+        sim_matrix_stats_before.set();  //TODO: separate simulated from actual
         stats_before = *stats::get_instance();
         *c = a->multiply(*b, mult_algo_num, sched_algo_num);
         bs.flush();
