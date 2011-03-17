@@ -395,8 +395,8 @@ public:
         for (size_type row = 0; row < height; ++row)
             for (size_type col = 0; col < width; ++col)
                 bl(row, col) = bs.allocate_swappable_block();
-        // * 1 is copying
-        Ops::element_op(*this, other, typename Ops::scalar_multiplication(1));
+        // 0 + other is copying
+        Ops::element_op(*this, other, typename Ops::addition());
     }
 
     ~swappable_block_matrix()
@@ -1346,14 +1346,11 @@ struct matrix_operations
 
     struct scalar_multiplication
     {
-        const ValueType s;
-
-        scalar_multiplication(const ValueType scalar = 1)
-            : s(scalar) {}
-
-        inline ValueType & operator ()  (ValueType & c, const ValueType & a, const ValueType &  ) { return c = a * s; }
+        inline scalar_multiplication(const ValueType scalar = 1) : s(scalar) {}
         inline ValueType & operator ()  (ValueType & c, const ValueType & a)                      { return c = a * s; }
         inline ValueType operator ()                   (const ValueType & a)                      { return     a * s; }
+        inline operator const ValueType & ()                                                      { return         s; }
+        const ValueType s;
     };
 
     // element_op<Op>(C,A,B) calculates C = A <Op> B

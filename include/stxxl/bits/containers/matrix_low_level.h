@@ -21,6 +21,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+template <typename ValueType, unsigned BlockSideLength>
+struct matrix_operations;
+
 template <unsigned BlockSideLength, bool transposed>
 struct rmindex;
 
@@ -42,10 +45,10 @@ private:
     int_type i;
 };
 
+//! \brief c = a <op> b; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, bool b_transposed, class Op>
 struct low_level_matrix_op_3
 {
-    //! \brief c = a <op> b; for arbitrary entries
     low_level_matrix_op_3(ValueType * c, const ValueType * a, const ValueType * b, Op op = Op())
     {
         if (a)
@@ -80,10 +83,10 @@ struct low_level_matrix_op_3
     }
 };
 
+//! \brief c <op>= a; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, class Op>
 struct low_level_matrix_op_2
 {
-    //! \brief c <op>= a; for arbitrary entries
     low_level_matrix_op_2(ValueType * c, const ValueType * a, Op op = Op())
     {
         if (a)
@@ -97,7 +100,7 @@ struct low_level_matrix_op_2
     }
 };
 
-//! \brief c = a; for arbitrary entries
+//! \brief c = <op>a; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, class Op>
 struct low_level_matrix_op_1
 {
@@ -116,6 +119,390 @@ struct low_level_matrix_op_1
 
 #if STXXL_BLAS
 typedef int blas_int;
+typedef std::complex<double> blas_double_complex;
+typedef std::complex<float> blas_single_complex;
+
+// --- vector add (used as matrix-add) -----------------
+
+extern "C" void daxpy_(const blas_int *n, const double              *alpha, const double              *x, const blas_int *incx, double              *y, const blas_int *incy);
+extern "C" void saxpy_(const blas_int *n, const float               *alpha, const float               *x, const blas_int *incx, float               *y, const blas_int *incy);
+extern "C" void zaxpy_(const blas_int *n, const blas_double_complex *alpha, const blas_double_complex *x, const blas_int *incx, blas_double_complex *y, const blas_int *incy);
+extern "C" void caxpy_(const blas_int *n, const blas_single_complex *alpha, const blas_single_complex *x, const blas_int *incx, blas_single_complex *y, const blas_int *incy);
+extern "C" void dcopy_(const blas_int *n, const double              *x, const blas_int *incx, double              *y, const blas_int *incy);
+extern "C" void scopy_(const blas_int *n, const float               *x, const blas_int *incx, float               *y, const blas_int *incy);
+extern "C" void zcopy_(const blas_int *n, const blas_double_complex *x, const blas_int *incx, blas_double_complex *y, const blas_int *incy);
+extern "C" void ccopy_(const blas_int *n, const blas_single_complex *x, const blas_int *incx, blas_single_complex *y, const blas_int *incy);
+
+//! \brief c = a + b; for double entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_3<double, BlockSideLength, false, false, typename matrix_operations<double, BlockSideLength>::addition>
+{
+    low_level_matrix_op_3(double * c, const double * a, const double * b, typename matrix_operations<double, BlockSideLength>::addition = typename matrix_operations<double, BlockSideLength>::addition())
+    {
+        if (a)
+            if (b)
+            {
+                low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                        (c, a);
+                low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                        (c, b);
+            }
+            else
+                low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                        (c, a);
+        else
+        {
+            assert(b /* do not add nothing to nothing */);
+            low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                    (c, b);
+        }
+    }
+};
+//! \brief c = a - b; for double entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_3<double, BlockSideLength, false, false, typename matrix_operations<double, BlockSideLength>::subtraction>
+{
+    low_level_matrix_op_3(double * c, const double * a, const double * b,
+            typename matrix_operations<double, BlockSideLength>::subtraction = typename matrix_operations<double, BlockSideLength>::subtraction())
+    {
+        if (a)
+            if (b)
+            {
+                low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                        (c, a);
+                low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
+                        (c, b);
+            }
+            else
+                low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                        (c, a);
+        else
+        {
+            assert(b /* do not add nothing to nothing */);
+            low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
+                    (c, b);
+        }
+    }
+};
+//! \brief c += a; for double entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+{
+    low_level_matrix_op_2(double * c, const double * a,
+            typename matrix_operations<double, BlockSideLength>::addition = typename matrix_operations<double, BlockSideLength>::addition())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        const double one = 1.0;
+        if (a)
+            daxpy_(&size, &one, a, &int_one, c, &int_one);
+    }
+};
+//! \brief c -= a; for double entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
+{
+    low_level_matrix_op_2(double * c, const double * a,
+            typename matrix_operations<double, BlockSideLength>::subtraction = typename matrix_operations<double, BlockSideLength>::subtraction())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        const double minusone = -1.0;
+        if (a)
+            daxpy_(&size, &minusone, a, &int_one, c, &int_one);
+    }
+};
+//! \brief c = a; for double entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+{
+    low_level_matrix_op_1(double * c, const double * a,
+            typename matrix_operations<double, BlockSideLength>::addition = typename matrix_operations<double, BlockSideLength>::addition())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        dcopy_(&size, a, &int_one, c, &int_one);
+    }
+};
+
+//! \brief c = a + b; for float entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_3<float, BlockSideLength, false, false, typename matrix_operations<float, BlockSideLength>::addition>
+{
+    low_level_matrix_op_3(float * c, const float * a, const float * b, typename matrix_operations<float, BlockSideLength>::addition = typename matrix_operations<float, BlockSideLength>::addition())
+    {
+        if (a)
+            if (b)
+            {
+                low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                        (c, a);
+                low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                        (c, b);
+            }
+            else
+                low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                        (c, a);
+        else
+        {
+            assert(b /* do not add nothing to nothing */);
+            low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                    (c, b);
+        }
+    }
+};
+//! \brief c = a - b; for float entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_3<float, BlockSideLength, false, false, typename matrix_operations<float, BlockSideLength>::subtraction>
+{
+    low_level_matrix_op_3(float * c, const float * a, const float * b,
+            typename matrix_operations<float, BlockSideLength>::subtraction = typename matrix_operations<float, BlockSideLength>::subtraction())
+    {
+        if (a)
+            if (b)
+            {
+                low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                        (c, a);
+                low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
+                        (c, b);
+            }
+            else
+                low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                        (c, a);
+        else
+        {
+            assert(b /* do not add nothing to nothing */);
+            low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
+                    (c, b);
+        }
+    }
+};
+//! \brief c += a; for float entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+{
+    low_level_matrix_op_2(float * c, const float * a,
+            typename matrix_operations<float, BlockSideLength>::addition = typename matrix_operations<float, BlockSideLength>::addition())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        const float one = 1.0;
+        if (a)
+            saxpy_(&size, &one, a, &int_one, c, &int_one);
+    }
+};
+//! \brief c -= a; for float entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
+{
+    low_level_matrix_op_2(float * c, const float * a,
+            typename matrix_operations<float, BlockSideLength>::subtraction = typename matrix_operations<float, BlockSideLength>::subtraction())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        const float minusone = -1.0;
+        if (a)
+            saxpy_(&size, &minusone, a, &int_one, c, &int_one);
+    }
+};
+//! \brief c = a; for float entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+{
+    low_level_matrix_op_1(float * c, const float * a,
+            typename matrix_operations<float, BlockSideLength>::addition = typename matrix_operations<float, BlockSideLength>::addition())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        scopy_(&size, a, &int_one, c, &int_one);
+    }
+};
+
+//! \brief c = a + b; for blas_double_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_3<blas_double_complex, BlockSideLength, false, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+{
+    low_level_matrix_op_3(blas_double_complex * c, const blas_double_complex * a, const blas_double_complex * b, typename matrix_operations<blas_double_complex, BlockSideLength>::addition = typename matrix_operations<blas_double_complex, BlockSideLength>::addition())
+    {
+        if (a)
+            if (b)
+            {
+                low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                        (c, a);
+                low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                        (c, b);
+            }
+            else
+                low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                        (c, a);
+        else
+        {
+            assert(b /* do not add nothing to nothing */);
+            low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                    (c, b);
+        }
+    }
+};
+//! \brief c = a - b; for blas_double_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_3<blas_double_complex, BlockSideLength, false, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
+{
+    low_level_matrix_op_3(blas_double_complex * c, const blas_double_complex * a, const blas_double_complex * b,
+            typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction = typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction())
+    {
+        if (a)
+            if (b)
+            {
+                low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                        (c, a);
+                low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
+                        (c, b);
+            }
+            else
+                low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                        (c, a);
+        else
+        {
+            assert(b /* do not add nothing to nothing */);
+            low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
+                    (c, b);
+        }
+    }
+};
+//! \brief c += a; for blas_double_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+{
+    low_level_matrix_op_2(blas_double_complex * c, const blas_double_complex * a,
+            typename matrix_operations<blas_double_complex, BlockSideLength>::addition = typename matrix_operations<blas_double_complex, BlockSideLength>::addition())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        const blas_double_complex one = 1.0;
+        if (a)
+            zaxpy_(&size, &one, a, &int_one, c, &int_one);
+    }
+};
+//! \brief c -= a; for blas_double_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
+{
+    low_level_matrix_op_2(blas_double_complex * c, const blas_double_complex * a,
+            typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction = typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        const blas_double_complex minusone = -1.0;
+        if (a)
+            zaxpy_(&size, &minusone, a, &int_one, c, &int_one);
+    }
+};
+//! \brief c = a; for blas_double_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+{
+    low_level_matrix_op_1(blas_double_complex * c, const blas_double_complex * a,
+            typename matrix_operations<blas_double_complex, BlockSideLength>::addition = typename matrix_operations<blas_double_complex, BlockSideLength>::addition())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        zcopy_(&size, a, &int_one, c, &int_one);
+    }
+};
+
+//! \brief c = a + b; for blas_single_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_3<blas_single_complex, BlockSideLength, false, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+{
+    low_level_matrix_op_3(blas_single_complex * c, const blas_single_complex * a, const blas_single_complex * b, typename matrix_operations<blas_single_complex, BlockSideLength>::addition = typename matrix_operations<blas_single_complex, BlockSideLength>::addition())
+    {
+        if (a)
+            if (b)
+            {
+                low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                        (c, a);
+                low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                        (c, b);
+            }
+            else
+                low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                        (c, a);
+        else
+        {
+            assert(b /* do not add nothing to nothing */);
+            low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                    (c, b);
+        }
+    }
+};
+//! \brief c = a - b; for blas_single_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_3<blas_single_complex, BlockSideLength, false, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
+{
+    low_level_matrix_op_3(blas_single_complex * c, const blas_single_complex * a, const blas_single_complex * b,
+            typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction = typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction())
+    {
+        if (a)
+            if (b)
+            {
+                low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                        (c, a);
+                low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
+                        (c, b);
+            }
+            else
+                low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                        (c, a);
+        else
+        {
+            assert(b /* do not add nothing to nothing */);
+            low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
+                    (c, b);
+        }
+    }
+};
+//! \brief c += a; for blas_single_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+{
+    low_level_matrix_op_2(blas_single_complex * c, const blas_single_complex * a,
+            typename matrix_operations<blas_single_complex, BlockSideLength>::addition = typename matrix_operations<blas_single_complex, BlockSideLength>::addition())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        const blas_single_complex one = 1.0;
+        if (a)
+            caxpy_(&size, &one, a, &int_one, c, &int_one);
+    }
+};
+//! \brief c -= a; for blas_single_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
+{
+    low_level_matrix_op_2(blas_single_complex * c, const blas_single_complex * a,
+            typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction = typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        const blas_single_complex minusone = -1.0;
+        if (a)
+            caxpy_(&size, &minusone, a, &int_one, c, &int_one);
+    }
+};
+//! \brief c = a; for blas_single_complex entries
+template <unsigned BlockSideLength>
+struct low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+{
+    low_level_matrix_op_1(blas_single_complex * c, const blas_single_complex * a,
+            typename matrix_operations<blas_single_complex, BlockSideLength>::addition = typename matrix_operations<blas_single_complex, BlockSideLength>::addition())
+    {
+        const blas_int size = BlockSideLength * BlockSideLength;
+        const blas_int int_one = 1;
+        ccopy_(&size, a, &int_one, c, &int_one);
+    }
+};
+
+// --- matrix-matrix multiplication ---------------
+
 extern "C" void dgemm_(const char *transa, const char *transb,
         const blas_int *m, const blas_int *n, const blas_int *k,
         const double *alpha, const double *a, const blas_int *lda,
@@ -128,14 +515,12 @@ extern "C" void sgemm_(const char *transa, const char *transb,
         const float *b, const blas_int *ldb,
         const float *beta, float *c, const blas_int *ldc);
 
-typedef std::complex<double> blas_double_complex;
 extern "C" void zgemm_(const char *transa, const char *transb,
         const blas_int *m, const blas_int *n, const blas_int *k,
         const blas_double_complex *alpha, const blas_double_complex *a, const blas_int *lda,
         const blas_double_complex *b, const blas_int *ldb,
         const blas_double_complex *beta, blas_double_complex *c, const blas_int *ldc);
 
-typedef std::complex<float> blas_single_complex;
 extern "C" void cgemm_(const char *transa, const char *transb,
         const blas_int *m, const blas_int *n, const blas_int *k,
         const blas_single_complex *alpha, const blas_single_complex *a, const blas_int *lda,
