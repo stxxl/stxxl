@@ -5,7 +5,7 @@
  *
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
- *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -649,10 +649,13 @@ namespace sort_local
    Model of \b Comparison concept must:
    - provide \b operator(a,b) that returns comparison result of two user types,
      must define strict weak ordering
-   - provide \b max_value method that returns a value that is \b greater than all
+   - provide \b max_value method that returns a value that is \b strictly \b greater than all
    other objects of user type,
-   - provide \b min_value method that returns a value that is \b less than all
+   - provide \b min_value method that returns a value that is \b strictly \b less than all
    other objects of user type,
+   - \b Note: when using unsigned integral types as key in user types, the value 0
+   cannot be used as a key value of the data to be sorted because it would
+   conflict with the sentinel value returned by \b min_value
 
    Example: comparator class \b my_less_int
  \verbatim
@@ -1020,7 +1023,8 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    assert(stxxl::is_sorted(first, last, cmp));
+    typedef typename ExtIterator_::const_iterator const_iterator;
+    assert(stxxl::is_sorted(const_iterator(first), const_iterator(last), cmp));
 #endif
 }
 

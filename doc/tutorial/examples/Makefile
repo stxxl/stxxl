@@ -5,7 +5,7 @@ STXXL_MK ?= stxxl.mk
 
 CXX		 = $(STXXL_CXX)
 CPPFLAGS	+= -O3
-CPPFLAGS	+= -W -Wall
+CPPFLAGS	+= -Wall
 CPPFLAGS	+= $(STXXL_CPPFLAGS)
 
 

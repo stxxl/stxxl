@@ -103,13 +103,15 @@ run utils/pq_param
 
 run io/benchmark_disks 0 2 256 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run io/flushbuffers 2 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
+run io/benchmark_disk_and_flash 0 2 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 run io/sd_test
 run io/test_io "$STXXL_TMPDIR"
 run io/test_cancel syscall "$STXXL_TMPDIR/testdiskx"
 run io/test_cancel fileperblock_syscall "$STXXL_TMPDIR/testdiskx"
 run io/test_cancel mmap "$STXXL_TMPDIR/testdiskx"
 run io/test_cancel fileperblock_mmap "$STXXL_TMPDIR/testdiskx"
-run io/test_cancel simdisk "$STXXL_TMPDIR/testdiskx"
+run io/test_cancel simdisk "/tmp/testramdisk"
+rm -f "/tmp/testramdisk"
 run io/test_cancel boostfd "$STXXL_TMPDIR/testdiskx"
 run io/test_cancel fileperblock_boostfd "$STXXL_TMPDIR/testdiskx"
 run io/test_cancel memory "$STXXL_TMPDIR/testdiskx"
@@ -117,14 +119,13 @@ run io/test_cancel wbtl "$STXXL_TMPDIR/testdiskx"
 run io/test_io_sizes syscall "$STXXL_TMPDIR/out" 5368709120
 run io/test_io_sizes mmap "$STXXL_TMPDIR/out" 5368709120
 run io/test_io_sizes boostfd "$STXXL_TMPDIR/out" 5368709120
-run io/benchmark_disk_and_flash 0 2 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
 #run io/benchmark_configured_disks 2 128  # our disks are usually set to RAM
 run io/benchmark_random_block_access 2048 1024 1000000 i
 run io/benchmark_random_block_access 2048 128 1000000 r
 run io/benchmark_random_block_access 2048 128 1000000 w
-run io/iobench_scatter_in_place 100 10 4096 "$STXXL_TMPDIR/out"
 run io/verify_disks 123456 0 2 w "$STXXL_TMPDIR/out"
 run io/verify_disks 123456 0 2 r "$STXXL_TMPDIR/out"
+run io/iobench_scatter_in_place 100 10 4096 "$STXXL_TMPDIR/out"  # consumes out
 
 run mng/test_block_alloc_strategy
 run mng/test_buf_streams
@@ -191,6 +192,7 @@ run algo/test_ksort
 run algo/test_random_shuffle
 run algo/test_scan
 run algo/test_sort
+run algo/test_bad_cmp
 test -n "$WITH_STABLE_KSORT" && run algo/test_stable_ksort
 
 run stream/test_materialize
@@ -221,7 +223,8 @@ run containers/berkeley_db_benchmark 3 100
 run containers/berkeley_db_benchmark 4 100
 run containers/berkeley_db_benchmark 5 10000000
 
-#rm -rf $AMI_SINGLE_DEVICE
+rm -rf $AMI_SINGLE_DEVICE
+rm -f /var/tmp/bdb_file
 
 run containers/leda_sm_pq_benchmark 1 1000000
 run containers/leda_sm_pq_benchmark 2 1000000
