@@ -187,6 +187,40 @@ inline Integral round_up_to_power_of_two(Integral n, unsigned_type power)
 
 ////////////////////////////////////////////////////////////////////////////
 
+template <class Container>
+inline typename Container::value_type pop(Container & c)
+{
+    typename Container::value_type r = c.top();
+    c.pop();
+    return r;
+}
+
+template <class Container>
+inline typename Container::value_type pop_front(Container & c)
+{
+    typename Container::value_type r = c.front();
+    c.pop_front();
+    return r;
+}
+
+template <class Container>
+inline typename Container::value_type pop_back(Container & c)
+{
+    typename Container::value_type r = c.back();
+    c.pop_back();
+    return r;
+}
+
+template <class Container>
+inline typename Container::value_type pop_begin(Container & c)
+{
+    typename Container::value_type r = *c.begin();
+    c.erase(c.begin());
+    return r;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_UTILS_HEADER
