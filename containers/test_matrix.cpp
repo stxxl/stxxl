@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/containers/matrix.h>
+#include <stxxl/bits/containers/matrix_blocked.h>
 #include <stxxl/vector>
 #include <stxxl/stream>
 

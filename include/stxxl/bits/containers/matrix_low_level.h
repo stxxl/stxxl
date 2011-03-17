@@ -17,6 +17,8 @@
 #define STXXL_BLAS 0
 #endif
 
+#include <complex>
+
 #include <stxxl/bits/namespace.h>
 
 __STXXL_BEGIN_NAMESPACE
