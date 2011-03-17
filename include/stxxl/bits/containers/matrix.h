@@ -283,10 +283,21 @@ template <typename ValueType, unsigned BlockSideLength>
 class matrix_swappable_block : public swappable_block<ValueType, BlockSideLength * BlockSideLength>
 {
 public:
-    using swappable_block<ValueType, BlockSideLength * BlockSideLength>::fill;
+    typedef typename swappable_block<ValueType, BlockSideLength * BlockSideLength>::internal_block_type internal_block_type;
+
+    using swappable_block<ValueType, BlockSideLength * BlockSideLength>::get_internal_block;
 
     void fill_default()
-    { fill(0); }
+    {
+        // get_internal_block checks acquired
+        internal_block_type & data = get_internal_block();
+        #if STXXL_PARALLEL
+        #pragma omp parallel for
+        #endif
+        for (int_type row = 0; row < int_type(BlockSideLength); ++row)
+            for (int_type col = 0; col < int_type(BlockSideLength); ++col)
+                data[row * BlockSideLength + col] = 0;
+    }
 };
 
 //! \brief External container for the values of a (sub)matrix. Not intended for direct use.

@@ -133,15 +133,6 @@ public:
     //! \brief Fill block with default data, is supposed to be overwritten by subclass. Has to be internal.
     void fill_default() {}
 
-    //! \brief Fill block with specific value. Has to be internal.
-    void fill(const ValueType & value)
-    {
-        // get_internal_block checks acquired
-        internal_block_type & data = get_internal_block();
-        for (typename internal_block_type::iterator it = data.begin(); it != data.end(); ++it)
-            *it = value;
-    }
-
     //! \brief Read asyncronusly from external_block to internal_block. Has to be internal and have an external_block.
     //! \return A request pointer to the I/O.
     request_ptr read_async(completion_handler on_cmpl = default_completion_handler())
