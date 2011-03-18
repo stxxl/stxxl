@@ -17,9 +17,8 @@
 #define STXXL_BLAS 0
 #endif
 
-#include <stxxl/bits/mng/typed_block.h>
-#include <stxxl/bits/containers/matrix_layouts.h>
 #include <stxxl/bits/containers/vector.h>
+#include <stxxl/bits/containers/matrix_layouts.h>
 #include <stxxl/bits/containers/matrix_low_level.h>
 
 __STXXL_BEGIN_NAMESPACE

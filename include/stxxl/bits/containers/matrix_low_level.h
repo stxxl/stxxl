@@ -19,7 +19,8 @@
 
 #include <complex>
 
-#include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/parallel.h>
 
 __STXXL_BEGIN_NAMESPACE
 

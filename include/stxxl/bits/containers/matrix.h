@@ -13,10 +13,6 @@
 #ifndef STXXL_MATRIX_HEADER
 #define STXXL_MATRIX_HEADER
 
-#ifndef STXXL_BLAS
-#define STXXL_BLAS 0
-#endif
-
 #include <stxxl/bits/containers/vector.h>
 #include <stxxl/bits/common/shared_object.h>
 #include <stxxl/bits/mng/block_scheduler.h>

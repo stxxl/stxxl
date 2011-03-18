@@ -10,16 +10,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/containers/matrix.h>
-#include <stxxl/bits/containers/matrix_blocked.h>
-#include <stxxl/vector>
-#include <stxxl/stream>
+#include <iostream>
+#include <limits>
 
 // Thanks Daniel Russel, Stanford University
 #include <Argument_helper.h>
 
-#include <iostream>
-#include <limits>
+#include <stxxl/vector>
+#include <stxxl/stream>
+#include <stxxl/bits/containers/matrix.h>
+#include <stxxl/bits/containers/matrix_blocked.h>
 
 using namespace stxxl;
 
