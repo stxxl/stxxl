@@ -337,15 +337,15 @@ int main(int argc, char **argv)
         matrix_stats_after.set();
         STXXL_MSG("end mult");
 
-        STXXL_MSG(matrix_stats_after - matrix_stats_before);
-        STXXL_MSG(stats_after - stats_before);
         *c *= 3;
         *c += *a;
+        STXXL_MSG(matrix_stats_after - matrix_stats_before);
+        STXXL_MSG(stats_after - stats_before);
         {
             int_type num_err = 0;
             int_type i = 1;
             for (cmitt mit = c->cbegin(); mit != c->cend(); ++mit, ++i)
-                num_err += (*mit != i * 4);
+                num_err += (*mit != (i * 4));
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");
         }
@@ -408,7 +408,7 @@ int main(int argc, char **argv)
            * b = new mt(bs, rank, rank),
            * c = new mt(bs, rank, rank);
         stats_data stats_before, stats_after;
-        matrix_operation_statistic_data matrix_stats_before, matrix_stats_after, sim_matrix_stats_before;
+        matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
         STXXL_MSG("writing input matrices");
         for (mitt mit = a->begin(); mit != a->end(); ++mit)
@@ -418,7 +418,7 @@ int main(int argc, char **argv)
 
         bs.flush();
         STXXL_MSG("start of multiplication");
-        sim_matrix_stats_before.set();  //TODO: separate simulated from actual
+        matrix_stats_before.set();
         stats_before = *stats::get_instance();
         *c = a->multiply(*b, mult_algo_num, sched_algo_num);
         bs.flush();
@@ -426,12 +426,6 @@ int main(int argc, char **argv)
         matrix_stats_after.set();
         STXXL_MSG("end of multiplication");
 
-        if (sched_algo_num > 0)
-        {
-            STXXL_MSG("simulated:");
-            STXXL_MSG(matrix_stats_before - sim_matrix_stats_before);
-        }
-        STXXL_MSG("real:");
         STXXL_MSG(matrix_stats_after - matrix_stats_before);
         STXXL_MSG(stats_after - stats_before);
         {
@@ -452,5 +446,3 @@ int main(int argc, char **argv)
     STXXL_MSG("end of test");
     return 0;
 }
-
-// vim: et:ts=4:sw=4

@@ -124,6 +124,11 @@ test_matrix.$(EXEEXT): test_matrix.cpp $(DEPENDENCIES)
         $(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_matrix.cpp -DSTXXL_VERBOSE_LEVEL=0
         $(LINKER)  test_matrix.$(OBJEXT) $(OUT)test_matrix.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+matrix_benchmark: matrix_benchmark.$(EXEEXT)
+matrix_benchmark.$(EXEEXT): matrix_benchmark.cpp $(DEPENDENCIES)
+        $(COMPILER) $(STXXL_COMPILER_OPTIONS) -c matrix_benchmark.cpp -DSTXXL_VERBOSE_LEVEL=0
+        $(LINKER)  matrix_benchmark.$(OBJEXT) $(OUT)matrix_benchmark.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 test_vector_sizes: test_vector_sizes.$(EXEEXT)
 test_vector_sizes.$(EXEEXT): test_vector_sizes.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_vector_sizes.cpp

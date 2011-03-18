@@ -1605,20 +1605,15 @@ public:
 
     virtual internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false)
     {
+        assert(! prediction_sequence.empty());
         assert(prediction_sequence.front().op ==
                 ((uninitialized) ? block_scheduler_type::op_acquire_uninitialized : block_scheduler_type::op_acquire));
         assert(prediction_sequence.front().id == sbid);
-        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
-        if (schedule_meta == scheduled_blocks.end()
-                || schedule_meta->second.operations.back() !=
-                        ((uninitialized) ? block_scheduler_type::op_acquire_uninitialized : block_scheduler_type::op_acquire))
-        {
-            if (uninitialized)
-                return give_up("acquire_uninitialized not scheduled or out of internal_blocks")->acquire(sbid, uninitialized);
-            else
-                return give_up("acquire not scheduled or out of internal_blocks")->acquire(sbid, uninitialized);
-        }
         prediction_sequence.pop_front();
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        assert(schedule_meta != scheduled_blocks.end()); // acquire not scheduled or out of internal_blocks (i.e. not enough internal memory)
+        assert(schedule_meta->second.operations.back() ==
+                        ((uninitialized) ? block_scheduler_type::op_acquire_uninitialized : block_scheduler_type::op_acquire)); // acquire not scheduled or out of internal_blocks (i.e. not enough internal memory)
 
         SwappableBlockType & sblock = swappable_blocks[sbid];
         /* acquired => internal -> increase reference count
@@ -1654,15 +1649,15 @@ public:
 
     virtual void release(swappable_block_identifier_type sbid, const bool dirty)
     {
+        assert(! prediction_sequence.empty());
         assert(prediction_sequence.front().op ==
                 ((dirty) ? block_scheduler_type::op_release_dirty : block_scheduler_type::op_release));
         assert(prediction_sequence.front().id == sbid);
-        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
-        if (schedule_meta == scheduled_blocks.end()
-                || schedule_meta->second.operations.back() !=
-                        ((dirty) ? block_scheduler_type::op_release_dirty : block_scheduler_type::op_release))
-            return give_up("release not scheduled")->release(sbid, dirty);
         prediction_sequence.pop_front();
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        assert(schedule_meta != scheduled_blocks.end());
+        assert(schedule_meta->second.operations.back() ==
+                        ((dirty) ? block_scheduler_type::op_release_dirty : block_scheduler_type::op_release));
 
         SwappableBlockType & sblock = swappable_blocks[sbid];
         sblock.make_dirty_if(dirty);
@@ -1710,13 +1705,13 @@ public:
 
     virtual void deinitialize(swappable_block_identifier_type sbid)
     {
+        assert(! prediction_sequence.empty());
         assert(prediction_sequence.front().op == block_scheduler_type::op_deinitialize);
         assert(prediction_sequence.front().id == sbid);
-        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
-        if (schedule_meta == scheduled_blocks.end()
-                || schedule_meta->second.operations.back() != block_scheduler_type::op_deinitialize)
-            return give_up("deinitialize not scheduled")->deinitialize(sbid);
         prediction_sequence.pop_front();
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        assert(schedule_meta != scheduled_blocks.end());
+        assert(schedule_meta->second.operations.back() == block_scheduler_type::op_deinitialize);
 
         SwappableBlockType & sblock = swappable_blocks[sbid];
         if (sblock.is_evictable())
@@ -1752,13 +1747,13 @@ public:
 
     virtual void initialize(swappable_block_identifier_type sbid, external_block_type eblock)
     {
+        assert(! prediction_sequence.empty());
         assert(prediction_sequence.front().op == block_scheduler_type::op_initialize);
         assert(prediction_sequence.front().id == sbid);
-        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
-        if (schedule_meta == scheduled_blocks.end()
-                || schedule_meta->second.operations.back() != block_scheduler_type::op_initialize)
-            return give_up("initialize not scheduled")->initialize(sbid, eblock);
         prediction_sequence.pop_front();
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        assert(schedule_meta != scheduled_blocks.end());
+        assert(schedule_meta->second.operations.back() == block_scheduler_type::op_initialize);
 
         SwappableBlockType & sblock = swappable_blocks[sbid];
         sblock.initialize(eblock);
@@ -1774,13 +1769,13 @@ public:
 
     virtual external_block_type extract_external_block(swappable_block_identifier_type sbid)
     {
+        assert(! prediction_sequence.empty());
         assert(prediction_sequence.front().op == block_scheduler_type::op_extract_external_block);
         assert(prediction_sequence.front().id == sbid);
-        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
-        if (schedule_meta == scheduled_blocks.end()
-                || schedule_meta->second.operations.back() != block_scheduler_type::op_extract_external_block)
-            return give_up("extract_external_block not scheduled")->extract_external_block(sbid);
         prediction_sequence.pop_front();
+        scheduled_blocks_iterator schedule_meta = scheduled_blocks.find(sbid);
+        assert(schedule_meta != scheduled_blocks.end());
+        assert(schedule_meta->second.operations.back() == block_scheduler_type::op_extract_external_block);
 
         SwappableBlockType & sblock = swappable_blocks[sbid];
         wait_on_write(sbid);

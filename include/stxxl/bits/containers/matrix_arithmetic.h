@@ -756,7 +756,7 @@ struct matrix_operations
         for (size_type row = 0; row < C.get_height(); ++row)
             for (size_type col = 0; col < C.get_width(); ++col)
                 element_op_swappable_block(
-                        C(row, col), C.is_transposed(), C.bs, op);
+                        C(row, col), C.bs, op);
         return C;
     }
 
@@ -765,7 +765,7 @@ struct matrix_operations
     element_op_swappable_block(
             const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c,
             const swappable_block_identifier_type a, bool a_is_transposed, block_scheduler_type & bs_a,
-            const swappable_block_identifier_type b, bool b_is_transposed, block_scheduler_type & bs_b, Op = Op())
+            const swappable_block_identifier_type b, bool b_is_transposed, block_scheduler_type & bs_b, Op op = Op())
     {
         if (! bs_c.is_simulating())
             ++ matrix_operation_statistic::get_instance()->block_addition_calls;
@@ -788,9 +788,9 @@ struct matrix_operations
             if (! bs_c.is_simulating())
             {
                 if (b_is_transposed)
-                    low_level_matrix_op_3<ValueType, BlockSideLength, false, true, Op>(& ic[0], 0, & ib[0]);
+                    low_level_matrix_op_3<ValueType, BlockSideLength, false, true, Op>(& ic[0], 0, & ib[0], op);
                 else
-                    low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], 0, & ib[0]);
+                    low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], 0, & ib[0], op);
             }
             bs_b.release(b, false);
         }
@@ -801,9 +801,9 @@ struct matrix_operations
             if (! bs_c.is_simulating())
             {
                 if (a_is_transposed)
-                    low_level_matrix_op_3<ValueType, BlockSideLength, true, false, Op>(& ic[0], & ia[0], 0);
+                    low_level_matrix_op_3<ValueType, BlockSideLength, true, false, Op>(& ic[0], & ia[0], 0, op);
                 else
-                    low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], 0);
+                    low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], 0, op);
             }
             bs_a.release(a, false);
         }
@@ -816,16 +816,16 @@ struct matrix_operations
                 if (a_is_transposed)
                 {
                     if (b_is_transposed)
-                        low_level_matrix_op_3<ValueType, BlockSideLength, true, true, Op>(& ic[0], & ia[0], & ib[0]);
+                        low_level_matrix_op_3<ValueType, BlockSideLength, true, true, Op>(& ic[0], & ia[0], & ib[0], op);
                     else
-                        low_level_matrix_op_3<ValueType, BlockSideLength, true, false, Op>(& ic[0], & ia[0], & ib[0]);
+                        low_level_matrix_op_3<ValueType, BlockSideLength, true, false, Op>(& ic[0], & ia[0], & ib[0], op);
                 }
                 else
                 {
                     if (b_is_transposed)
-                        low_level_matrix_op_3<ValueType, BlockSideLength, false, true, Op>(& ic[0], & ia[0], & ib[0]);
+                        low_level_matrix_op_3<ValueType, BlockSideLength, false, true, Op>(& ic[0], & ia[0], & ib[0], op);
                     else
-                        low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], & ib[0]);
+                        low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], & ib[0], op);
                 }
             }
             bs_a.release(a, false);
@@ -838,7 +838,7 @@ struct matrix_operations
     template <class Op> static void
     element_op_swappable_block(
             const swappable_block_identifier_type c, const bool c_is_transposed, block_scheduler_type & bs_c,
-            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a, Op = Op())
+            const swappable_block_identifier_type a, const bool a_is_transposed, block_scheduler_type & bs_a, Op op = Op())
     {
         if (! bs_c.is_simulating())
             ++ matrix_operation_statistic::get_instance()->block_addition_calls;
@@ -859,14 +859,14 @@ struct matrix_operations
         {
             if (c_is_zero)
                 if (c_is_transposed == a_is_transposed)
-                    low_level_matrix_op_1<ValueType, BlockSideLength, false, Op>(& ic[0], & ia[0]);
+                    low_level_matrix_op_1<ValueType, BlockSideLength, false, Op>(& ic[0], & ia[0], op);
                 else
-                    low_level_matrix_op_1<ValueType, BlockSideLength, true, Op>(& ic[0], & ia[0]);
+                    low_level_matrix_op_1<ValueType, BlockSideLength, true, Op>(& ic[0], & ia[0], op);
             else
                 if (c_is_transposed == a_is_transposed)
-                    low_level_matrix_op_2<ValueType, BlockSideLength, false, Op>(& ic[0], & ia[0]);
+                    low_level_matrix_op_2<ValueType, BlockSideLength, false, Op>(& ic[0], & ia[0], op);
                 else
-                    low_level_matrix_op_2<ValueType, BlockSideLength, true, Op>(& ic[0], & ia[0]);
+                    low_level_matrix_op_2<ValueType, BlockSideLength, true, Op>(& ic[0], & ia[0], op);
         }
         // release
         bs_c.release(c, true);
@@ -876,7 +876,7 @@ struct matrix_operations
     // calculates c = <op>c
     template <class Op> static void
     element_op_swappable_block(
-            const swappable_block_identifier_type c, const bool, block_scheduler_type & bs_c, Op = Op())
+            const swappable_block_identifier_type c, block_scheduler_type & bs_c, Op op = Op())
     {
         if (! bs_c.is_simulating())
             ++ matrix_operation_statistic::get_instance()->block_addition_calls;
@@ -892,7 +892,7 @@ struct matrix_operations
         internal_block_type & ic = bs_c.acquire(c);
         // add
         if (! bs_c.is_simulating())
-            low_level_matrix_op_1<ValueType, BlockSideLength, false, Op>(& ic[0], & ic[0]);
+            low_level_matrix_op_1<ValueType, BlockSideLength, false, Op>(& ic[0], & ic[0], op);
         // release
         bs_c.release(c, true);
     }
@@ -1389,8 +1389,7 @@ struct matrix_operations
                   * cp = bs_c.acquire(c).begin();
         // multiply
         if (! bs_c.is_simulating())
-            low_level_matrix_multiply_and_add<ValueType, BlockSideLength>
-                    (ap, a_is_transposed, bp, b_is_transposed, cp, c_is_transposed);
+            low_level_matrix_multiply_and_add<ValueType, BlockSideLength> (ap, a_is_transposed, bp, b_is_transposed, cp, c_is_transposed);
         // release
         bs_a.release(a, false);
         bs_b.release(b, false);
