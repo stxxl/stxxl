@@ -27,6 +27,9 @@ __STXXL_BEGIN_NAMESPACE
 template <typename ValueType, unsigned BlockSideLength>
 struct matrix_operations;
 
+template <typename ValueType, unsigned BlockSideLength>
+struct low_level_matrix_multiply_and_add;
+
 template <unsigned BlockSideLength, bool transposed>
 struct rmindex;
 
@@ -121,7 +124,7 @@ struct low_level_matrix_op_1
 };
 
 #if STXXL_BLAS
-typedef int blas_int;
+typedef int_type blas_int;
 typedef std::complex<double> blas_double_complex;
 typedef std::complex<float> blas_single_complex;
 

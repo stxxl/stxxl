@@ -1389,7 +1389,8 @@ struct matrix_operations
                   * cp = bs_c.acquire(c).begin();
         // multiply
         if (! bs_c.is_simulating())
-            low_level_matrix_multiply_and_add<ValueType, BlockSideLength> (ap, a_is_transposed, bp, b_is_transposed, cp, c_is_transposed);
+            low_level_matrix_multiply_and_add<ValueType, BlockSideLength>
+                    (ap, a_is_transposed, bp, b_is_transposed, cp, c_is_transposed);
         // release
         bs_a.release(a, false);
         bs_b.release(b, false);
