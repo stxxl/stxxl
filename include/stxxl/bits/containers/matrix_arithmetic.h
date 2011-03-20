@@ -1087,7 +1087,7 @@ struct matrix_operations
     {
         switch (log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
         {
-        default: // todo possibly more Levels
+        default:
             /*
             use_feedable_sw<4>(A, B, C);
             break;

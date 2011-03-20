@@ -1491,7 +1491,7 @@ protected:
                                 else
                                     schedule_meta->second.operations.pop_front();
                                 // stop scheduling
-                                break;
+                                return;
                             }
                             swappable_block_identifier_type giver = pop_begin(free_evictable_blocks);
                             {
