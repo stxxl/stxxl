@@ -27,9 +27,6 @@ __STXXL_BEGIN_NAMESPACE
 template <typename ValueType, unsigned BlockSideLength>
 struct matrix_operations;
 
-template <typename ValueType, unsigned BlockSideLength>
-struct low_level_matrix_multiply_and_add;
-
 template <unsigned BlockSideLength, bool transposed>
 struct rmindex;
 
@@ -120,6 +117,76 @@ struct low_level_matrix_op_1
             for (int_type col = 0; col < int_type(BlockSideLength); ++col)
                 c[rmindex<BlockSideLength, false>(row, col)] =
                         op(a[rmindex<BlockSideLength, a_transposed>(row, col)]);
+    }
+};
+
+//! \brief multiplies matrices A and B, adds result to C, for arbitrary entries
+//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
+/* designated usage as:
+ * void
+ * low_level_matrix_multiply_and_add(const double * a, bool a_in_col_major,
+                                     const double * b, bool b_in_col_major,
+                                     double * c, const bool c_in_col_major)  */
+template <typename ValueType, unsigned BlockSideLength>
+struct low_level_matrix_multiply_and_add
+{
+    low_level_matrix_multiply_and_add(const ValueType * a, bool a_in_col_major,
+                                      const ValueType * b, bool b_in_col_major,
+                                      ValueType * c, const bool c_in_col_major)
+    {
+        if (c_in_col_major)
+        {
+            std::swap(a,b);
+            bool a_cm = ! b_in_col_major;
+            b_in_col_major = ! a_in_col_major;
+            a_in_col_major = a_cm;
+        }
+        if (! a_in_col_major)
+        {
+            if (! b_in_col_major)
+            {   // => both row-major
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                          c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
+            }
+            else
+            {   // => a row-major, b col-major
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+                    for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                        for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                          c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k + j * BlockSideLength];
+            }
+        }
+        else
+        {
+            if (! b_in_col_major)
+            {   // => a col-major, b row-major
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                          c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k * BlockSideLength + j];
+            }
+            else
+            {   // => both col-major
+                #if STXXL_PARALLEL
+                #pragma omp parallel for
+                #endif
+                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
+                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
+                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
+                          c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k + j * BlockSideLength];
+            }
+        }
     }
 };
 
@@ -598,76 +665,6 @@ void gemm_(const char *transa, const char *transb,
         const blas_single_complex *b, const blas_int *ldb,
         const blas_single_complex *beta, blas_single_complex *c, const blas_int *ldc)
 { cgemm_(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc); }
-
-//! \brief multiplies matrices A and B, adds result to C, for arbitrary entries
-//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
-/* designated usage as:
- * void
- * low_level_matrix_multiply_and_add(const double * a, bool a_in_col_major,
-                                     const double * b, bool b_in_col_major,
-                                     double * c, const bool c_in_col_major)  */
-template <typename ValueType, unsigned BlockSideLength>
-struct low_level_matrix_multiply_and_add
-{
-    low_level_matrix_multiply_and_add(const ValueType * a, bool a_in_col_major,
-                                      const ValueType * b, bool b_in_col_major,
-                                      ValueType * c, const bool c_in_col_major)
-    {
-        if (c_in_col_major)
-        {
-            std::swap(a,b);
-            bool a_cm = ! b_in_col_major;
-            b_in_col_major = ! a_in_col_major;
-            a_in_col_major = a_cm;
-        }
-        if (! a_in_col_major)
-        {
-            if (! b_in_col_major)
-            {   // => both row-major
-                #if STXXL_PARALLEL
-                #pragma omp parallel for
-                #endif
-                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
-                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
-                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
-                          c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k * BlockSideLength + j];
-            }
-            else
-            {   // => a row-major, b col-major
-                #if STXXL_PARALLEL
-                #pragma omp parallel for
-                #endif
-                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
-                    for (unsigned_type j = 0; j < BlockSideLength; ++j)
-                        for (unsigned_type k = 0; k < BlockSideLength; ++k)
-                          c[i * BlockSideLength + j] += a[i * BlockSideLength + k] * b[k + j * BlockSideLength];
-            }
-        }
-        else
-        {
-            if (! b_in_col_major)
-            {   // => a col-major, b row-major
-                #if STXXL_PARALLEL
-                #pragma omp parallel for
-                #endif
-                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
-                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
-                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
-                          c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k * BlockSideLength + j];
-            }
-            else
-            {   // => both col-major
-                #if STXXL_PARALLEL
-                #pragma omp parallel for
-                #endif
-                for (int_type i = 0; i < int_type(BlockSideLength); ++i)    //OpenMP does not like unsigned iteration variables
-                  for (unsigned_type k = 0; k < BlockSideLength; ++k)
-                      for (unsigned_type j = 0; j < BlockSideLength; ++j)
-                          c[i * BlockSideLength + j] += a[i + k * BlockSideLength] * b[k + j * BlockSideLength];
-            }
-        }
-    }
-};
 
 //! \brief multiplies matrices A and B, adds result to C, for double entries
 template <unsigned BlockSideLength>
