@@ -23,14 +23,9 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void wincall_file::serve(const request * req) throw (io_error)
+void wincall_file::serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
-    assert(req->get_file() == this);
-    offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
-    size_type bytes = req->get_size();
-    request::request_type type = req->get_type();
 
     if (bytes > 32 * 1024 * 1024) {
         STXXL_ERRMSG("Using a block size larger than 32 MiB may not work with the " << io_type() << " filetype");

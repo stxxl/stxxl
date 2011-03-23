@@ -55,7 +55,7 @@ public:
     inline mmap_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
         ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }
-    void serve(const request * req) throw (io_error);
+    void serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
     const char * io_type() const;
 };
 

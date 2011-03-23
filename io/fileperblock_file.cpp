@@ -19,6 +19,7 @@
 #include <stxxl/bits/io/mmap_file.h>
 #include <stxxl/bits/io/boostfd_file.h>
 #include <stxxl/bits/io/wincall_file.h>
+#include <stxxl/bits/io/aio_file.h>
 #include <stxxl/bits/io/serving_request.h>
 #include <stxxl/bits/common/aligned_alloc.h>
 
@@ -31,7 +32,7 @@ fileperblock_file<base_file_type>::fileperblock_file(
     int queue_id,
     int allocator_id)
     : disk_queued_file(queue_id, allocator_id), filename_prefix(filename_prefix), mode(mode),
-      lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, queue_id)
+      lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode)
 { }
 
 template <class base_file_type>
@@ -51,16 +52,11 @@ std::string fileperblock_file<base_file_type>::filename_for_block(unsigned_type 
 }
 
 template <class base_file_type>
-void fileperblock_file<base_file_type>::serve(const request * req) throw (io_error)
+void fileperblock_file<base_file_type>::serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
-    assert(req->get_file() == this);
-
-    base_file_type base_file(filename_for_block(req->get_offset()), mode, get_queue_id());
-    base_file.set_size(req->get_size());
-
-    serving_request * derived = new serving_request(default_completion_handler(), &base_file, req->get_buffer(), 0, req->get_size(), req->get_type());
-    request_ptr dummy1(derived), dummy2(derived);    //to satisfy some reference count constraint
-    derived->serve();
+    base_file_type base_file(filename_for_block(offset), mode);  //default queue
+    base_file.set_size(bytes);
+    base_file.serve(buffer, 0, bytes, type);
 }
 
 template <class base_file_type>
@@ -126,6 +122,10 @@ template class fileperblock_file<wincall_file>;
 
 #if STXXL_HAVE_BOOSTFD_FILE
 template class fileperblock_file<boostfd_file>;
+#endif
+
+#if STXXL_HAVE_AIO_FILE
+template class fileperblock_file<aio_file>;
 #endif
 
 __STXXL_END_NAMESPACE

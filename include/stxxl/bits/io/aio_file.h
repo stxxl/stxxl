@@ -57,11 +57,11 @@ public:
     //! \param disk disk(file) identifier
     aio_file(
         const std::string & filename,
-        int mode, int physical_device_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR, int desired_queue_length = 0) :
+        int mode, int physical_device_id = DEFAULT_AIO_QUEUE, int allocator_id = NO_ALLOCATOR, int desired_queue_length = 0) :
         ufs_file_base(filename, mode), disk_queued_file(physical_device_id, allocator_id), desired_queue_length(desired_queue_length)
     { }
 
-    void serve(const request * req) throw (io_error);
+    void serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
     request_ptr aread(void * buffer, offset_type pos, size_type bytes,
                       const completion_handler & on_cmpl);
     request_ptr awrite(void * buffer, offset_type pos, size_type bytes,

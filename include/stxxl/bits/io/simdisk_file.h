@@ -133,7 +133,7 @@ public:
         "' is resided on swap memory partition!" <<
         std::endl;
     }
-    void serve(const request * req) throw (io_error);
+    void serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error);
     void set_size(offset_type newsize);
     const char * io_type() const;
 };

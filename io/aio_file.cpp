@@ -45,10 +45,15 @@ request_ptr aio_file::awrite(
     return req;
 }
 
-void aio_file::serve(const request * req) throw (io_error)
+void aio_file::serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
-    STXXL_UNUSED(req);
-    STXXL_THROW_UNREACHABLE();
+    //req need not be an aio_request
+    if (type == request::READ)
+        aread (buffer, offset, bytes, default_completion_handler())
+                ->wait();
+    else
+        awrite(buffer, offset, bytes, default_completion_handler())
+                ->wait();
 }
 
 const char * aio_file::io_type() const

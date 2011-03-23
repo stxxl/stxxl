@@ -49,7 +49,7 @@ void serving_request::serve()
 
     try
     {
-        file_->serve(this);
+        file_->serve(buffer, offset, bytes, type);
     }
     catch (const io_error & ex)
     {

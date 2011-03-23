@@ -27,14 +27,9 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void boostfd_file::serve(const request * req) throw (io_error)
+void boostfd_file::serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
-    assert(req->get_file() == this);
-    offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
-    size_type bytes = req->get_size();
-    request::request_type type = req->get_type();
 
     try
     {

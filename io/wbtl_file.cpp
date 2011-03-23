@@ -54,14 +54,8 @@ wbtl_file::~wbtl_file()
     storage = 0;
 }
 
-void wbtl_file::serve(const request * req) throw (io_error)
+void wbtl_file::serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
-    assert(req->get_file() == this);
-    offset_type offset = req->get_offset();
-    void * buffer = req->get_buffer();
-    size_type bytes = req->get_size();
-    request::request_type type = req->get_type();
-
     if (type == request::READ)
     {
         //stats::scoped_read_timer read_timer(size());

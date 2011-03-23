@@ -117,11 +117,11 @@ public:
         DIRECT = 16,                        //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O
         TRUNC = 32,                         //!< once file is opened its length becomes zero
         SYNC = 64,                          //!< open the file with O_SYNC | O_DSYNC | O_RSYNC flags set
-        NO_LOCK = 128,                      //!< do not aquire an exclusive lock by default
+        NO_LOCK = 128,                      //!< do not acquire an exclusive lock by default
     };
 
     static const int DEFAULT_QUEUE = -1;
-    static const int NO_QUEUE = -2;
+    static const int DEFAULT_AIO_QUEUE = -2;
     static const int NO_ALLOCATOR = -1;
 
     //! \brief Schedules an asynchronous read request to the file
@@ -142,7 +142,7 @@ public:
     virtual request_ptr awrite(void * buffer, offset_type pos, size_type bytes,
                                const completion_handler & on_cmpl) = 0;
 
-    virtual void serve(const request * req) throw (io_error) = 0;
+    virtual void serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error) = 0;
 
     void add_request_ref()
     {

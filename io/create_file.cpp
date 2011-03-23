@@ -51,7 +51,9 @@ file * create_file(const std::string & io_impl,
 
         result = new aio_file(filename, options, physical_device_id, allocator_id, desired_queue_length);
     }
-#endif
+    else if (io_impl.find("fileperblock_aio") == 0)
+        result = new fileperblock_file<aio_file>(filename, options, physical_device_id, allocator_id); //default queue length, does not matter anyway
+    #endif
 #if STXXL_HAVE_SIMDISK_FILE
     else if (io_impl == "simdisk")
     {
