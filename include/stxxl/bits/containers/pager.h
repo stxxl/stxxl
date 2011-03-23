@@ -37,19 +37,25 @@ enum pager_type
 template <unsigned npages_>
 class random_pager
 {
+    typedef unsigned_type size_type;
+    size_type num_pages;
     random_number<random_uniform_fast> rnd;
 
 public:
     enum { n_pages = npages_ };
-    random_pager() { }
+    random_pager(size_type num_pages = n_pages) : num_pages(num_pages) { }
     int_type kick()
     {
-        return rnd(npages_);
+        return rnd(num_pages);
     }
     void hit(int_type ipage)
     {
-        assert(ipage < int_type(npages_));
+        assert(ipage < int_type(num_pages));
         assert(ipage >= 0);
+    }
+    size_type size () const
+    {
+        return num_pages;
     }
 };
 
@@ -66,9 +72,9 @@ class lru_pager : private noncopyable
 public:
     enum { n_pages = npages_ };
 
-    lru_pager() : history_entry(n_pages)
+    lru_pager(size_type num_pages = n_pages) : history_entry(num_pages)
     {
-        for (size_type i = 0; i < n_pages; ++i)
+        for (size_type i = 0; i < history.size(); ++i)
             history_entry[i] = history.insert(history.end(), i);
     }
 
@@ -79,7 +85,7 @@ public:
 
     void hit(size_type ipage)
     {
-        assert(ipage < n_pages);
+        assert(ipage < history_entry.size());
         history.splice(history.begin(), history, history_entry[ipage]);
     }
 
@@ -88,42 +94,10 @@ public:
         history.swap(obj.history);
         history_entry.swap(obj.history_entry);
     }
-};
 
-// specialization, size is specified at runtime
-template <>
-class lru_pager<0> : private noncopyable
-{
-    typedef unsigned_type size_type;
-    typedef std::list<size_type> list_type;
-
-    size_type n_pages;
-    list_type history;
-    simple_vector<list_type::iterator> history_entry;
-
-public:
-    lru_pager(size_type npages_ = 0) : n_pages(npages_), history_entry(n_pages)
+    size_type size () const
     {
-        for (size_type i = 0; i < n_pages; ++i)
-            history_entry[i] = history.insert(history.end(), i);
-    }
-
-    size_type kick()
-    {
-        return history.back();
-    }
-
-    void hit(size_type ipage)
-    {
-        assert(ipage < n_pages);
-        history.splice(history.begin(), history, history_entry[ipage]);
-    }
-
-    void swap(lru_pager & obj)
-    {
-        std::swap(n_pages, obj.n_pages);
-        history.swap(obj.history);
-        history_entry.swap(obj.history_entry);
+        return history_entry.size();
     }
 };
 
