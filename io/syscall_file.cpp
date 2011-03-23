@@ -23,9 +23,11 @@ __STXXL_BEGIN_NAMESPACE
 #define lseek _lseeki64
 #endif
 
-void syscall_file::serve(void * buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
+void syscall_file::serve(void * void_buffer, offset_type offset, size_type bytes, request::request_type type) throw (io_error)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
+
+    char * buffer = static_cast<char *>(void_buffer);   //allow byte-wise pointer arithmetic
 
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
