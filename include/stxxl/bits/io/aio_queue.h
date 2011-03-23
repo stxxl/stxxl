@@ -38,7 +38,7 @@ class aio_queue : public request_queue_impl_worker
 
 private:
     aio_context_t context;  // OS context
-    typedef std::list<request_ptr> queue_type;
+    typedef std::list<request_ptr> queue_type;  //storing aio_request* would drop ownership
 
     // "waiting" request have submitted to this queue, but not yet to the OS, those are "posted"
     mutex waiting_mtx, posted_mtx;

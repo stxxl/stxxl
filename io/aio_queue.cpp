@@ -68,6 +68,8 @@ void aio_queue::add_request(request_ptr & req)
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
     if (post_thread_state() != RUNNING)
         STXXL_ERRMSG("Request submitted to stopped queue.");
+    if (!dynamic_cast<aio_request*>(req.get()))
+        STXXL_ERRMSG("Non-AIO request submitted to AIO queue.");
 
     scoped_mutex_lock lock(waiting_mtx);
 
@@ -89,7 +91,8 @@ bool aio_queue::cancel_request(request_ptr & req)
         {
             waiting_requests.erase(pos);
 
-            static_cast<aio_request *>(pos->get())->completed(false, true);
+            //polymorphic_downcast
+            dynamic_cast<aio_request *>(pos->get())->completed(false, true); //canceled, not yet posted
 
             num_waiting_requests--;  // will never block
             return true;
@@ -99,13 +102,15 @@ bool aio_queue::cancel_request(request_ptr & req)
     scoped_mutex_lock lock(posted_mtx);
     if ((pos = std::find(posted_requests.begin(), posted_requests.end(), req _STXXL_FORCE_SEQUENTIAL)) != posted_requests.end())
     {
+        //polymorphic_downcast
         bool canceled_io_operation = (dynamic_cast<aio_request*>(req.get()))->cancel_aio();
 
         if (canceled_io_operation)
         {
             posted_requests.erase(pos);
 
-            static_cast<aio_request *>(pos->get())->completed(true, true);
+            //polymorphic_downcast
+            dynamic_cast<aio_request *>(pos->get())->completed(true, true); //canceled, already posted
 
             num_free_events++;
             num_posted_requests--;  // will never block
@@ -139,7 +144,8 @@ void aio_queue::post_requests()
 
             num_free_events--;  //might block because too many requests are posted
 
-            while (!static_cast<aio_request *>(req.get())->post())
+            //polymorphic_downcast
+            while (!dynamic_cast<aio_request *>(req.get())->post())
             {   // post failed, so first handle events to make queues (more) empty, then try again
 
                 // wait for at least one event to complete, no time limit
@@ -175,7 +181,7 @@ void aio_queue::handle_events(io_event * events, int num_events, bool canceled)
     {
         // unsigned_type is as long as a pointer, and like this, we avoid an icpc warning
         request_ptr * r = reinterpret_cast<request_ptr *>(static_cast<unsigned_type>(events[e].data));
-        static_cast<aio_request *>(r->get())->completed(canceled);
+        r->get()->completed(canceled);
         delete r;         // release auto_ptr reference
         num_free_events++;
         num_posted_requests--;  //will never block
