@@ -267,7 +267,7 @@ public:
     const value_type& operator * () const { return 1 /*TODO*/; }
 };
 
-//! \brief submatrix of a matrix containing blocks (type block_type) that reside in main memory
+//! \brief Submatrix residing in main memory
 template <typename matrix_type>
 class panel
 {
@@ -357,13 +357,13 @@ public:
     }
 };
 
-//! \brief multiplies matrices A and B, adds result to C
+//unspecialized declaration
+//! \brief Multiplies (internal) matrices A and B, adds result to C
 //! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
 template <typename value_type, unsigned BlockSideLength>
 struct low_level_multiply;
 
-//! \brief multiplies matrices A and B, adds result to C, for double entries
-//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
+//specialization for double, possibly using BLAS
 template <unsigned BlockSideLength>
 struct low_level_multiply<double, BlockSideLength>
 {
@@ -386,6 +386,7 @@ struct low_level_multiply<double, BlockSideLength>
     }
 };
 
+//general case
 template <typename value_type, unsigned BlockSideLength>
 struct low_level_multiply
 {
@@ -402,8 +403,8 @@ struct low_level_multiply
 };
 
 
-//! \brief multiplies blocks of A and B, adds result to C
-//! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
+//! \brief Multiply block matrices A and B, add result to C
+//! blocks are assumed to be in row-major order
 template <typename block_type, unsigned BlockSideLength>
 void multiply_block(/*const*/ block_type & BlockA, /*const*/ block_type & BlockB, block_type & BlockC)
 {
@@ -414,8 +415,8 @@ void multiply_block(/*const*/ block_type & BlockA, /*const*/ block_type & BlockB
     llm(a, b, c);
 }
 
-// multiply panels from A and B, add result to C
-// param BlocksA pointer to first Block of A assumed in row-major
+//! \brief Multiply panels from A and B, add result to C
+//! blocks are assumed to be in row-major order
 template <typename matrix_type, unsigned BlockSideLength>
 void multiply_panel(const panel<matrix_type> & PanelA, const panel<matrix_type> & PanelB, panel<matrix_type> & PanelC)
 {
@@ -431,7 +432,8 @@ void multiply_panel(const panel<matrix_type> & PanelA, const panel<matrix_type> 
                 multiply_block<block_type, BlockSideLength>(PanelA.block(row, l), PanelB.block(l, col), PanelC.block(row, col));
 }
 
-//! \brief multiply the matrices A and B, gaining C
+//! \brief Multiply the (external) matrices A and B, gaining C
+//! \param max_temp_mem_raw Maximum amount of internal memory to use.
 template <typename ValueType, unsigned BlockSideLength>
 blocked_matrix<ValueType, BlockSideLength> &
 multiply(

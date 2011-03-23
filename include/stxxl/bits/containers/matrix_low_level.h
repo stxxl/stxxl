@@ -24,25 +24,29 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//forward declaration
 template <typename ValueType, unsigned BlockSideLength>
 struct matrix_operations;
 
+//generic declaration
 template <unsigned BlockSideLength, bool transposed>
-struct rmindex;
+struct switch_major_index;
 
+//row-major specialization
 template <unsigned BlockSideLength>
-struct rmindex<BlockSideLength, false>
+struct switch_major_index<BlockSideLength, false>
 {
-    inline rmindex(const int_type row, const int_type col) : i(row * BlockSideLength + col) {}
+    inline switch_major_index(const int_type row, const int_type col) : i(row * BlockSideLength + col) {}
     inline operator int_type & () { return i; }
 private:
     int_type i;
 };
 
+//column-major specialization
 template <unsigned BlockSideLength>
-struct rmindex<BlockSideLength, true>
+struct switch_major_index<BlockSideLength, true>
 {
-    inline rmindex(const int_type row, const int_type col) : i(row + col * BlockSideLength) {}
+    inline switch_major_index(const int_type row, const int_type col) : i(row + col * BlockSideLength) {}
     inline operator int_type & () { return i; }
 private:
     int_type i;
@@ -50,9 +54,9 @@ private:
 
 //! \brief c = a <op> b; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, bool b_transposed, class Op>
-struct low_level_matrix_op_3
+struct low_level_matrix_binary_ass_op
 {
-    low_level_matrix_op_3(ValueType * c, const ValueType * a, const ValueType * b, Op op = Op())
+    low_level_matrix_binary_ass_op(ValueType * c, const ValueType * a, const ValueType * b, Op op = Op())
     {
         if (a)
             if (b)
@@ -61,17 +65,17 @@ struct low_level_matrix_op_3
                 #endif
                 for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                     for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                        op(c[rmindex<BlockSideLength, false>(row, col)],
-                                a[rmindex<BlockSideLength, a_transposed>(row, col)],
-                                b[rmindex<BlockSideLength, b_transposed>(row, col)]);
+                        op(c[switch_major_index<BlockSideLength, false>(row, col)],
+                                a[switch_major_index<BlockSideLength, a_transposed>(row, col)],
+                                b[switch_major_index<BlockSideLength, b_transposed>(row, col)]);
             else
                 #if STXXL_PARALLEL
                 #pragma omp parallel for
                 #endif
                 for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                     for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                        op(c[rmindex<BlockSideLength, false>(row, col)],
-                                a[rmindex<BlockSideLength, a_transposed>(row, col)], 0);
+                        op(c[switch_major_index<BlockSideLength, false>(row, col)],
+                                a[switch_major_index<BlockSideLength, a_transposed>(row, col)], 0);
         else
         {
             assert(b /* do not add nothing to nothing */);
@@ -80,17 +84,17 @@ struct low_level_matrix_op_3
             #endif
             for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                 for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                    op(c[rmindex<BlockSideLength, false>(row, col)],
-                                0, b[rmindex<BlockSideLength, b_transposed>(row, col)]);
+                    op(c[switch_major_index<BlockSideLength, false>(row, col)],
+                                0, b[switch_major_index<BlockSideLength, b_transposed>(row, col)]);
         }
     }
 };
 
 //! \brief c <op>= a; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, class Op>
-struct low_level_matrix_op_2
+struct low_level_matrix_unary_ass_op
 {
-    low_level_matrix_op_2(ValueType * c, const ValueType * a, Op op = Op())
+    low_level_matrix_unary_ass_op(ValueType * c, const ValueType * a, Op op = Op())
     {
         if (a)
             #if STXXL_PARALLEL
@@ -98,16 +102,16 @@ struct low_level_matrix_op_2
             #endif
             for (int_type row = 0; row < int_type(BlockSideLength); ++row)
                 for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                    op(c[rmindex<BlockSideLength, false>(row, col)],
-                            a[rmindex<BlockSideLength, a_transposed>(row, col)]);
+                    op(c[switch_major_index<BlockSideLength, false>(row, col)],
+                            a[switch_major_index<BlockSideLength, a_transposed>(row, col)]);
     }
 };
 
 //! \brief c = <op>a; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, class Op>
-struct low_level_matrix_op_1
+struct low_level_matrix_unary_op
 {
-    low_level_matrix_op_1(ValueType * c, const ValueType * a, Op op = Op())
+    low_level_matrix_unary_op(ValueType * c, const ValueType * a, Op op = Op())
     {
         assert(a);
         #if STXXL_PARALLEL
@@ -115,8 +119,8 @@ struct low_level_matrix_op_1
         #endif
         for (int_type row = 0; row < int_type(BlockSideLength); ++row)
             for (int_type col = 0; col < int_type(BlockSideLength); ++col)
-                c[rmindex<BlockSideLength, false>(row, col)] =
-                        op(a[rmindex<BlockSideLength, a_transposed>(row, col)]);
+                c[switch_major_index<BlockSideLength, false>(row, col)] =
+                        op(a[switch_major_index<BlockSideLength, a_transposed>(row, col)]);
     }
 };
 
@@ -208,60 +212,60 @@ extern "C" void ccopy_(const blas_int *n, const blas_single_complex *x, const bl
 
 //! \brief c = a + b; for double entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_3<double, BlockSideLength, false, false, typename matrix_operations<double, BlockSideLength>::addition>
+struct low_level_matrix_binary_ass_op<double, BlockSideLength, false, false, typename matrix_operations<double, BlockSideLength>::addition>
 {
-    low_level_matrix_op_3(double * c, const double * a, const double * b, typename matrix_operations<double, BlockSideLength>::addition = typename matrix_operations<double, BlockSideLength>::addition())
+    low_level_matrix_binary_ass_op(double * c, const double * a, const double * b, typename matrix_operations<double, BlockSideLength>::addition = typename matrix_operations<double, BlockSideLength>::addition())
     {
         if (a)
             if (b)
             {
-                low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
                         (c, a);
-                low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                low_level_matrix_unary_ass_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
                         (c, b);
             }
             else
-                low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
                         (c, a);
         else
         {
             assert(b /* do not add nothing to nothing */);
-            low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+            low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
                     (c, b);
         }
     }
 };
 //! \brief c = a - b; for double entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_3<double, BlockSideLength, false, false, typename matrix_operations<double, BlockSideLength>::subtraction>
+struct low_level_matrix_binary_ass_op<double, BlockSideLength, false, false, typename matrix_operations<double, BlockSideLength>::subtraction>
 {
-    low_level_matrix_op_3(double * c, const double * a, const double * b,
+    low_level_matrix_binary_ass_op(double * c, const double * a, const double * b,
             typename matrix_operations<double, BlockSideLength>::subtraction = typename matrix_operations<double, BlockSideLength>::subtraction())
     {
         if (a)
             if (b)
             {
-                low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
                         (c, a);
-                low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
+                low_level_matrix_unary_ass_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
                         (c, b);
             }
             else
-                low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+                low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
                         (c, a);
         else
         {
             assert(b /* do not add nothing to nothing */);
-            low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
+            low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
                     (c, b);
         }
     }
 };
 //! \brief c += a; for double entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+struct low_level_matrix_unary_ass_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
 {
-    low_level_matrix_op_2(double * c, const double * a,
+    low_level_matrix_unary_ass_op(double * c, const double * a,
             typename matrix_operations<double, BlockSideLength>::addition = typename matrix_operations<double, BlockSideLength>::addition())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -273,9 +277,9 @@ struct low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_ope
 };
 //! \brief c -= a; for double entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
+struct low_level_matrix_unary_ass_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
 {
-    low_level_matrix_op_2(double * c, const double * a,
+    low_level_matrix_unary_ass_op(double * c, const double * a,
             typename matrix_operations<double, BlockSideLength>::subtraction = typename matrix_operations<double, BlockSideLength>::subtraction())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -287,9 +291,9 @@ struct low_level_matrix_op_2<double, BlockSideLength, false, typename matrix_ope
 };
 //! \brief c = a; for double entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
+struct low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
 {
-    low_level_matrix_op_1(double * c, const double * a,
+    low_level_matrix_unary_op(double * c, const double * a,
             typename matrix_operations<double, BlockSideLength>::addition = typename matrix_operations<double, BlockSideLength>::addition())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -300,60 +304,60 @@ struct low_level_matrix_op_1<double, BlockSideLength, false, typename matrix_ope
 
 //! \brief c = a + b; for float entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_3<float, BlockSideLength, false, false, typename matrix_operations<float, BlockSideLength>::addition>
+struct low_level_matrix_binary_ass_op<float, BlockSideLength, false, false, typename matrix_operations<float, BlockSideLength>::addition>
 {
-    low_level_matrix_op_3(float * c, const float * a, const float * b, typename matrix_operations<float, BlockSideLength>::addition = typename matrix_operations<float, BlockSideLength>::addition())
+    low_level_matrix_binary_ass_op(float * c, const float * a, const float * b, typename matrix_operations<float, BlockSideLength>::addition = typename matrix_operations<float, BlockSideLength>::addition())
     {
         if (a)
             if (b)
             {
-                low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
                         (c, a);
-                low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                low_level_matrix_unary_ass_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
                         (c, b);
             }
             else
-                low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
                         (c, a);
         else
         {
             assert(b /* do not add nothing to nothing */);
-            low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+            low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
                     (c, b);
         }
     }
 };
 //! \brief c = a - b; for float entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_3<float, BlockSideLength, false, false, typename matrix_operations<float, BlockSideLength>::subtraction>
+struct low_level_matrix_binary_ass_op<float, BlockSideLength, false, false, typename matrix_operations<float, BlockSideLength>::subtraction>
 {
-    low_level_matrix_op_3(float * c, const float * a, const float * b,
+    low_level_matrix_binary_ass_op(float * c, const float * a, const float * b,
             typename matrix_operations<float, BlockSideLength>::subtraction = typename matrix_operations<float, BlockSideLength>::subtraction())
     {
         if (a)
             if (b)
             {
-                low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
                         (c, a);
-                low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
+                low_level_matrix_unary_ass_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
                         (c, b);
             }
             else
-                low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+                low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
                         (c, a);
         else
         {
             assert(b /* do not add nothing to nothing */);
-            low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
+            low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
                     (c, b);
         }
     }
 };
 //! \brief c += a; for float entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+struct low_level_matrix_unary_ass_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
 {
-    low_level_matrix_op_2(float * c, const float * a,
+    low_level_matrix_unary_ass_op(float * c, const float * a,
             typename matrix_operations<float, BlockSideLength>::addition = typename matrix_operations<float, BlockSideLength>::addition())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -365,9 +369,9 @@ struct low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_oper
 };
 //! \brief c -= a; for float entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
+struct low_level_matrix_unary_ass_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
 {
-    low_level_matrix_op_2(float * c, const float * a,
+    low_level_matrix_unary_ass_op(float * c, const float * a,
             typename matrix_operations<float, BlockSideLength>::subtraction = typename matrix_operations<float, BlockSideLength>::subtraction())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -379,9 +383,9 @@ struct low_level_matrix_op_2<float, BlockSideLength, false, typename matrix_oper
 };
 //! \brief c = a; for float entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
+struct low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
 {
-    low_level_matrix_op_1(float * c, const float * a,
+    low_level_matrix_unary_op(float * c, const float * a,
             typename matrix_operations<float, BlockSideLength>::addition = typename matrix_operations<float, BlockSideLength>::addition())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -392,60 +396,60 @@ struct low_level_matrix_op_1<float, BlockSideLength, false, typename matrix_oper
 
 //! \brief c = a + b; for blas_double_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_3<blas_double_complex, BlockSideLength, false, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+struct low_level_matrix_binary_ass_op<blas_double_complex, BlockSideLength, false, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
 {
-    low_level_matrix_op_3(blas_double_complex * c, const blas_double_complex * a, const blas_double_complex * b, typename matrix_operations<blas_double_complex, BlockSideLength>::addition = typename matrix_operations<blas_double_complex, BlockSideLength>::addition())
+    low_level_matrix_binary_ass_op(blas_double_complex * c, const blas_double_complex * a, const blas_double_complex * b, typename matrix_operations<blas_double_complex, BlockSideLength>::addition = typename matrix_operations<blas_double_complex, BlockSideLength>::addition())
     {
         if (a)
             if (b)
             {
-                low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
                         (c, a);
-                low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_ass_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
                         (c, b);
             }
             else
-                low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
                         (c, a);
         else
         {
             assert(b /* do not add nothing to nothing */);
-            low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+            low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
                     (c, b);
         }
     }
 };
 //! \brief c = a - b; for blas_double_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_3<blas_double_complex, BlockSideLength, false, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
+struct low_level_matrix_binary_ass_op<blas_double_complex, BlockSideLength, false, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
 {
-    low_level_matrix_op_3(blas_double_complex * c, const blas_double_complex * a, const blas_double_complex * b,
+    low_level_matrix_binary_ass_op(blas_double_complex * c, const blas_double_complex * a, const blas_double_complex * b,
             typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction = typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction())
     {
         if (a)
             if (b)
             {
-                low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
                         (c, a);
-                low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
+                low_level_matrix_unary_ass_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
                         (c, b);
             }
             else
-                low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
                         (c, a);
         else
         {
             assert(b /* do not add nothing to nothing */);
-            low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
+            low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
                     (c, b);
         }
     }
 };
 //! \brief c += a; for blas_double_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+struct low_level_matrix_unary_ass_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
 {
-    low_level_matrix_op_2(blas_double_complex * c, const blas_double_complex * a,
+    low_level_matrix_unary_ass_op(blas_double_complex * c, const blas_double_complex * a,
             typename matrix_operations<blas_double_complex, BlockSideLength>::addition = typename matrix_operations<blas_double_complex, BlockSideLength>::addition())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -457,9 +461,9 @@ struct low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typena
 };
 //! \brief c -= a; for blas_double_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
+struct low_level_matrix_unary_ass_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
 {
-    low_level_matrix_op_2(blas_double_complex * c, const blas_double_complex * a,
+    low_level_matrix_unary_ass_op(blas_double_complex * c, const blas_double_complex * a,
             typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction = typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -471,9 +475,9 @@ struct low_level_matrix_op_2<blas_double_complex, BlockSideLength, false, typena
 };
 //! \brief c = a; for blas_double_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
+struct low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
 {
-    low_level_matrix_op_1(blas_double_complex * c, const blas_double_complex * a,
+    low_level_matrix_unary_op(blas_double_complex * c, const blas_double_complex * a,
             typename matrix_operations<blas_double_complex, BlockSideLength>::addition = typename matrix_operations<blas_double_complex, BlockSideLength>::addition())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -484,60 +488,60 @@ struct low_level_matrix_op_1<blas_double_complex, BlockSideLength, false, typena
 
 //! \brief c = a + b; for blas_single_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_3<blas_single_complex, BlockSideLength, false, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+struct low_level_matrix_binary_ass_op<blas_single_complex, BlockSideLength, false, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
 {
-    low_level_matrix_op_3(blas_single_complex * c, const blas_single_complex * a, const blas_single_complex * b, typename matrix_operations<blas_single_complex, BlockSideLength>::addition = typename matrix_operations<blas_single_complex, BlockSideLength>::addition())
+    low_level_matrix_binary_ass_op(blas_single_complex * c, const blas_single_complex * a, const blas_single_complex * b, typename matrix_operations<blas_single_complex, BlockSideLength>::addition = typename matrix_operations<blas_single_complex, BlockSideLength>::addition())
     {
         if (a)
             if (b)
             {
-                low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
                         (c, a);
-                low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_ass_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
                         (c, b);
             }
             else
-                low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
                         (c, a);
         else
         {
             assert(b /* do not add nothing to nothing */);
-            low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+            low_level_matrix_unary_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
                     (c, b);
         }
     }
 };
 //! \brief c = a - b; for blas_single_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_3<blas_single_complex, BlockSideLength, false, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
+struct low_level_matrix_binary_ass_op<blas_single_complex, BlockSideLength, false, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
 {
-    low_level_matrix_op_3(blas_single_complex * c, const blas_single_complex * a, const blas_single_complex * b,
+    low_level_matrix_binary_ass_op(blas_single_complex * c, const blas_single_complex * a, const blas_single_complex * b,
             typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction = typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction())
     {
         if (a)
             if (b)
             {
-                low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
                         (c, a);
-                low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
+                low_level_matrix_unary_ass_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
                         (c, b);
             }
             else
-                low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+                low_level_matrix_unary_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
                         (c, a);
         else
         {
             assert(b /* do not add nothing to nothing */);
-            low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
+            low_level_matrix_unary_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
                     (c, b);
         }
     }
 };
 //! \brief c += a; for blas_single_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+struct low_level_matrix_unary_ass_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
 {
-    low_level_matrix_op_2(blas_single_complex * c, const blas_single_complex * a,
+    low_level_matrix_unary_ass_op(blas_single_complex * c, const blas_single_complex * a,
             typename matrix_operations<blas_single_complex, BlockSideLength>::addition = typename matrix_operations<blas_single_complex, BlockSideLength>::addition())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -549,9 +553,9 @@ struct low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typena
 };
 //! \brief c -= a; for blas_single_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
+struct low_level_matrix_unary_ass_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
 {
-    low_level_matrix_op_2(blas_single_complex * c, const blas_single_complex * a,
+    low_level_matrix_unary_ass_op(blas_single_complex * c, const blas_single_complex * a,
             typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction = typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction())
     {
         const blas_int size = BlockSideLength * BlockSideLength;
@@ -563,9 +567,9 @@ struct low_level_matrix_op_2<blas_single_complex, BlockSideLength, false, typena
 };
 //! \brief c = a; for blas_single_complex entries
 template <unsigned BlockSideLength>
-struct low_level_matrix_op_1<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
+struct low_level_matrix_unary_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
 {
-    low_level_matrix_op_1(blas_single_complex * c, const blas_single_complex * a,
+    low_level_matrix_unary_op(blas_single_complex * c, const blas_single_complex * a,
             typename matrix_operations<blas_single_complex, BlockSideLength>::addition = typename matrix_operations<blas_single_complex, BlockSideLength>::addition())
     {
         const blas_int size = BlockSideLength * BlockSideLength;

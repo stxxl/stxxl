@@ -23,11 +23,12 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief Holds information to allocate, swap and reload a block of data. Suggested to use with block_scheduler.
+//! \brief Virtualization of a block of data.
+//! Holds information for allocating and swapping. To use in cooperation with block_scheduler.
 //!
 //! A swappable_block can be uninitialized, i.e. it holds no data.
-//! When access is required, is has to be acquired and released afterwards, so it can be swapped in and out as required.
-//! If the stored data is no longer needed, it can get uninitialized, freeing in- and external memory.
+//! When access is required, is has to be acquired first, and released afterwards, so it can be swapped in and out as required.
+//! If the stored data is no longer needed, it can get uninitialized, freeing both internal and external memory.
 //! \tparam ValueType type of contained objects (POD with no references to internal memory).
 //! \tparam BlockSize Number of objects in one block.
 //!         BlockSize*sizeof(ValueType) must be divisible by 4096.
@@ -146,12 +147,12 @@ public:
         return internal_data->read(external_data, on_cmpl);
     }
 
-    //! \brief Read syncronusly from external_block to internal_block. Has to be internal and have an external_block.
+    //! \brief Read synchronously from external_block to internal_block. Has to be internal and have an external_block.
     void read_sync()
     { read_async()->wait(); }
 
-    //! \brief Write asyncronusly from internal_block to external_block if neccesary.
-    //! \return A request pointer to the I/O, an invalid request pointer if not neccesary.
+    //! \brief Write asyncronusly from internal_block to external_block if necessary.
+    //! \return A request pointer to the I/O, an invalid request pointer if not necessary.
     request_ptr clean_async(completion_handler on_cmpl = default_completion_handler())
     {
         if (! is_dirty())
@@ -165,7 +166,7 @@ public:
         return internal_data->write(external_data, on_cmpl);
     }
 
-    //! \brief Write syncronusly from internal_block to external_block if neccesary.
+    //! \brief Write synchronously from internal_block to external_block if necessary.
     void clean_sync()
     {
         request_ptr rp = clean_async();
@@ -180,7 +181,7 @@ public:
         internal_data = iblock;
     }
 
-    //! \brief Detach the internal_block. Writes to external_block if neccesary. Has to be evictable.
+    //! \brief Detach the internal_block. Writes to external_block if necessary. Has to be evictable.
     //! \return A pointer to the internal_block.
     internal_block_type * detach_internal_block()
     {
@@ -232,14 +233,14 @@ unsigned_type swappable_block<ValueType, BlockSize>::disk_allocation_offset = 0;
 template <class SwappableBlockType> class block_scheduler_algorithm;
 template <class SwappableBlockType> class block_scheduler_algorithm_online_lru;
 
-//! \brief Swaps swappable_blocks and provides swappable_blocks for temporary storage.
+//! \brief Schedules swapping of blocks and provides blocks for temporary storage.
 //!
-//! Simple mode only tries to save I/Os through caching.
-//! Features a simulation mode to record access patterns in a prediction sequence.
-//!   The prediction sequence can then be used for prefetching during a run in offline mode.
-//!   This will only work for algorithms with deterministic, data oblivious access patterns.
-//!   In simulation mode no I/O is performed; the data provided is accessible but undefined.
-//! Execute mode does caching, prefetching and possibly other optimizations.
+//! In simple mode, it tries to save I/Os through caching only.
+//! In simulation mode, it records access patterns into a prediction sequence.
+//! The prediction sequence can then be used for prefetching in the (offline) execute mode.
+//! This will only work for algorithms with deterministic, data oblivious access patterns.
+//! In simulation mode, no I/O is performed; the data provided is accessible but undefined.
+//! In execute mode, it does caching, prefetching, and possibly other optimizations.
 //! \tparam SwappableBlockType Type of swappable_blocks to manage. Can be some specialized subclass.
 template <class SwappableBlockType>
 class block_scheduler : private noncopyable
@@ -495,6 +496,7 @@ public:
 template <class SwappableBlockType>
 const int_type block_scheduler<SwappableBlockType>::max_internal_blocks_alloc_at_once = 128;
 
+//! \brief Interface of a block scheduling algorithm.
 template <class SwappableBlockType>
 class block_scheduler_algorithm : private noncopyable
 {
@@ -557,6 +559,7 @@ public:
         { return prediction_sequence; }
 };
 
+//! \brief Block scheduling algorithm caching via the least recently used policy (online).
 template <class SwappableBlockType>
 class block_scheduler_algorithm_online_lru : public block_scheduler_algorithm<SwappableBlockType>
 {
@@ -703,6 +706,7 @@ public:
     }
 };
 
+//! \brief Pseudo block scheduling algorithm only recording the request sequence.
 template <class SwappableBlockType>
 class block_scheduler_algorithm_simulation : public block_scheduler_algorithm<SwappableBlockType>
 {
@@ -844,6 +848,7 @@ public:
     { return true; }
 };
 
+//! \brief Block scheduling algorithm caching via the longest forward distance policy (offline).
 template <class SwappableBlockType>
 class block_scheduler_algorithm_offline_lfd : public block_scheduler_algorithm<SwappableBlockType>
 {
@@ -1080,6 +1085,8 @@ public:
     }
 };
 
+//! \brief Block scheduling algorithm caching via the least recently used policy (offline),
+//! and prefetching in addition.
 template <class SwappableBlockType>
 class block_scheduler_algorithm_offline_lru_prefetching : public block_scheduler_algorithm<SwappableBlockType>
 {

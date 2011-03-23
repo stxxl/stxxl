@@ -36,7 +36,9 @@ __STXXL_BEGIN_NAMESPACE
  * height_in_blocks
  */
 
-template <typename ValueType, unsigned BlockSideLength> class matrix;
+//forward declaration
+template <typename ValueType, unsigned BlockSideLength>
+class matrix;
 
 //! \brief External column-vector container.
 template <typename ValueType>
@@ -211,7 +213,7 @@ public:
     }
 };
 
-//! \brief External container for the values of a (sub)matrix. Not intended for direct use.
+//! \brief External container for a (sub)matrix. Not intended for direct use.
 //!
 //! Stores blocks only, so all measures (height, width, row, col) are in blocks.
 template <typename ValueType, unsigned BlockSideLength>

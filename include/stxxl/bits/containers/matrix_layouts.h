@@ -19,7 +19,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief block layout abstract base class (interface)
+//! \brief Interface for matrix block layout
 class MatrixBlockLayout
 {
 protected:
@@ -40,7 +40,7 @@ public:
     virtual std::pair<unsigned_type, unsigned_type> index_to_coords(unsigned_type index) const = 0;
 };
 
-//! \brief encapsulates a row-major mapping {0,..,num_rows-1}x{0,..,num_cols-1} <-> {0,..,num_rows*num_cols-1}
+//! \brief Row-major block mapping {0,..,num_rows-1}x{0,..,num_cols-1} <-> {0,..,num_rows*num_cols-1}
 class RowMajor : public MatrixBlockLayout
 {
 public:
@@ -58,7 +58,7 @@ public:
     }
 };
 
-//! \brief encapsulates a column-major mapping {0,..,num_rows-1}x{0,..,num_cols-1} <-> {0,..,num_rows*num_cols-1}
+//! \brief Column-major block mapping {0,..,num_rows-1}x{0,..,num_cols-1} <-> {0,..,num_rows*num_cols-1}
 class ColumnMajor : public MatrixBlockLayout
 {
 public:

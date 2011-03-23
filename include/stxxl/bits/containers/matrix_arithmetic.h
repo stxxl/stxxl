@@ -788,9 +788,9 @@ struct matrix_operations
             if (! bs_c.is_simulating())
             {
                 if (b_is_transposed)
-                    low_level_matrix_op_3<ValueType, BlockSideLength, false, true, Op>(& ic[0], 0, & ib[0], op);
+                    low_level_matrix_binary_ass_op<ValueType, BlockSideLength, false, true, Op>(& ic[0], 0, & ib[0], op);
                 else
-                    low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], 0, & ib[0], op);
+                    low_level_matrix_binary_ass_op<ValueType, BlockSideLength, false, false, Op>(& ic[0], 0, & ib[0], op);
             }
             bs_b.release(b, false);
         }
@@ -801,9 +801,9 @@ struct matrix_operations
             if (! bs_c.is_simulating())
             {
                 if (a_is_transposed)
-                    low_level_matrix_op_3<ValueType, BlockSideLength, true, false, Op>(& ic[0], & ia[0], 0, op);
+                    low_level_matrix_binary_ass_op<ValueType, BlockSideLength, true, false, Op>(& ic[0], & ia[0], 0, op);
                 else
-                    low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], 0, op);
+                    low_level_matrix_binary_ass_op<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], 0, op);
             }
             bs_a.release(a, false);
         }
@@ -816,16 +816,16 @@ struct matrix_operations
                 if (a_is_transposed)
                 {
                     if (b_is_transposed)
-                        low_level_matrix_op_3<ValueType, BlockSideLength, true, true, Op>(& ic[0], & ia[0], & ib[0], op);
+                        low_level_matrix_binary_ass_op<ValueType, BlockSideLength, true, true, Op>(& ic[0], & ia[0], & ib[0], op);
                     else
-                        low_level_matrix_op_3<ValueType, BlockSideLength, true, false, Op>(& ic[0], & ia[0], & ib[0], op);
+                        low_level_matrix_binary_ass_op<ValueType, BlockSideLength, true, false, Op>(& ic[0], & ia[0], & ib[0], op);
                 }
                 else
                 {
                     if (b_is_transposed)
-                        low_level_matrix_op_3<ValueType, BlockSideLength, false, true, Op>(& ic[0], & ia[0], & ib[0], op);
+                        low_level_matrix_binary_ass_op<ValueType, BlockSideLength, false, true, Op>(& ic[0], & ia[0], & ib[0], op);
                     else
-                        low_level_matrix_op_3<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], & ib[0], op);
+                        low_level_matrix_binary_ass_op<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], & ib[0], op);
                 }
             }
             bs_a.release(a, false);
@@ -859,14 +859,14 @@ struct matrix_operations
         {
             if (c_is_zero)
                 if (c_is_transposed == a_is_transposed)
-                    low_level_matrix_op_1<ValueType, BlockSideLength, false, Op>(& ic[0], & ia[0], op);
+                    low_level_matrix_unary_op<ValueType, BlockSideLength, false, Op>(& ic[0], & ia[0], op);
                 else
-                    low_level_matrix_op_1<ValueType, BlockSideLength, true, Op>(& ic[0], & ia[0], op);
+                    low_level_matrix_unary_op<ValueType, BlockSideLength, true, Op>(& ic[0], & ia[0], op);
             else
                 if (c_is_transposed == a_is_transposed)
-                    low_level_matrix_op_2<ValueType, BlockSideLength, false, Op>(& ic[0], & ia[0], op);
+                    low_level_matrix_unary_ass_op<ValueType, BlockSideLength, false, Op>(& ic[0], & ia[0], op);
                 else
-                    low_level_matrix_op_2<ValueType, BlockSideLength, true, Op>(& ic[0], & ia[0], op);
+                    low_level_matrix_unary_ass_op<ValueType, BlockSideLength, true, Op>(& ic[0], & ia[0], op);
         }
         // release
         bs_c.release(c, true);
@@ -892,7 +892,7 @@ struct matrix_operations
         internal_block_type & ic = bs_c.acquire(c);
         // add
         if (! bs_c.is_simulating())
-            low_level_matrix_op_1<ValueType, BlockSideLength, false, Op>(& ic[0], & ic[0], op);
+            low_level_matrix_unary_op<ValueType, BlockSideLength, false, Op>(& ic[0], & ic[0], op);
         // release
         bs_c.release(c, true);
     }
