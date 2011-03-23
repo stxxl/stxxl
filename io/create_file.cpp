@@ -24,31 +24,17 @@ file * create_file(const std::string & io_impl,
                    const std::string & filename,
                    int options, int physical_device_id, int allocator_id)
 {
+    file* result;
+
     if (io_impl == "syscall")
-    {
-        ufs_file_base * result = new syscall_file(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new syscall_file(filename, options, physical_device_id, allocator_id);
     else if (io_impl == "fileperblock_syscall")
-    {
-        fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new fileperblock_file<syscall_file>(filename, options, physical_device_id, allocator_id);
 #if STXXL_HAVE_MMAP_FILE
     else if (io_impl == "mmap")
-    {
-        ufs_file_base * result = new mmap_file(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new mmap_file(filename, options, physical_device_id, allocator_id);
     else if (io_impl == "fileperblock_mmap")
-    {
-        fileperblock_file<mmap_file> * result = new fileperblock_file<mmap_file>(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new fileperblock_file<mmap_file>(filename, options, physical_device_id, allocator_id);
 #endif
 #if STXXL_HAVE_AIO_FILE
     //aio can have the desired queue length immediately appended to "aio", e.g. "aio(5)"
@@ -63,68 +49,45 @@ file * create_file(const std::string & io_impl,
             input >> desired_queue_length;
         }
 
-        ufs_file_base * result = new aio_file(filename, options, physical_device_id, allocator_id, desired_queue_length);
-        result->lock();
-        return result;
+        result = new aio_file(filename, options, physical_device_id, allocator_id, desired_queue_length);
     }
 #endif
 #if STXXL_HAVE_SIMDISK_FILE
     else if (io_impl == "simdisk")
     {
         options &= ~stxxl::file::DIRECT;  // clear the DIRECT flag, this file is supposed to be on tmpfs
-        ufs_file_base * result = new sim_disk_file(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
+        result = new sim_disk_file(filename, options, physical_device_id, allocator_id);
     }
 #endif
 #if STXXL_HAVE_WINCALL_FILE
     else if (io_impl == "wincall")
-    {
-        wfs_file_base * result = new wincall_file(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new wincall_file(filename, options, physical_device_id, allocator_id);
     else if (io_impl == "fileperblock_wincall")
-    {
-        fileperblock_file<wincall_file> * result = new fileperblock_file<wincall_file>(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new fileperblock_file<wincall_file>(filename, options, physical_device_id, allocator_id);
 #endif
 #if STXXL_HAVE_BOOSTFD_FILE
     else if (io_impl == "boostfd")
-    {
-        boostfd_file * result = new boostfd_file(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new boostfd_file(filename, options, physical_device_id, allocator_id);
     else if (io_impl == "fileperblock_boostfd")
-    {
-        fileperblock_file<boostfd_file> * result = new fileperblock_file<boostfd_file>(filename, options, physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new fileperblock_file<boostfd_file>(filename, options, physical_device_id, allocator_id);
 #endif
     else if (io_impl == "memory")
-    {
-        mem_file * result = new mem_file(physical_device_id, allocator_id);
-        result->lock();
-        return result;
-    }
+        result = new mem_file(physical_device_id, allocator_id);
 #if STXXL_HAVE_WBTL_FILE
     else if (io_impl == "wbtl")
     {
         ufs_file_base * backend = new syscall_file(filename, options, -1, -1); // FIXME: ID
-        wbtl_file * result = new stxxl::wbtl_file(backend, 16 * 1024 * 1024, 2, physical_device_id, allocator_id);
-        result->lock();
-        return result;
+        result = new stxxl::wbtl_file(backend, 16 * 1024 * 1024, 2, physical_device_id, allocator_id);
     }
 #endif
+    else
+    {
+        STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
+                    io_impl << " .");
+    }
 
-    STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
-                io_impl << " .");
-
-    return NULL;
+    result->lock();
+    return result;
 }
 
 __STXXL_END_NAMESPACE
