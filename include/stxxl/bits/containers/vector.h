@@ -713,7 +713,7 @@ public:
 //! For semantics of the methods see documentation of the STL std::vector
 //! \tparam Tp_ type of contained objects (POD with no references to internal memory)
 //! \tparam PgSz_ number of blocks in a page
-//! \tparam PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages,
+//! \tparam PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is the default number of pages,
 //!  default is \c lru_pager<8>
 //! \tparam BlkSize_ external block size in bytes, default is 2 MiB
 //! \tparam AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
@@ -807,9 +807,6 @@ private:
 public:
     //! \brief Constructs external vector.
     //!
-    //! Use npages with lru_pager<0> to configure the cache at runtime.
-    //! Other pager types ignore this argument and configure the cache 
-    //! as usual.
     //! \param n Number of elements.
     //! \param npages Number of cached pages.
     vector(size_type n = 0, unsigned_type npages = pager_type().size()) :
@@ -858,7 +855,7 @@ public:
 
     void allocate_page_cache() const
     {
-        //  numpages() might be zero, if vector is used with lru_pager<0> type.
+        //  numpages() might be zero
         if (!_cache && numpages() > 0)
             _cache = new simple_vector<block_type> (numpages() * page_size);
     }
@@ -1025,9 +1022,6 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(Tp_) and the page size (4096).
-    //! Use npages with lru_pager<0> to configure the cache at runtime.
-    //! Other pager types ignore this argument and configure the cache 
-    //! as usual.
     vector(file * from, size_type size = size_type(-1), size_type npages = pager_type ().size ()) :
         _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
         _bids(div_ceil(_size, size_type(block_type::size))),
@@ -1295,7 +1289,7 @@ public:
         _size = n;
     }
 
-    //! Number of pages used by the (lru-) pager.
+    //! Number of pages used by the pager.
     inline int_type numpages() const
     {
       return pager.size ();

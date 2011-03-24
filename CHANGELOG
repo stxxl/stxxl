@@ -1,3 +1,9 @@
+Version 1.4.0 (unreleased)
+
+* More parameters dynamic at runtime
+  - Number of pages for vector
+
+------------------------------------------
 Version 1.3.2 (unreleased)
 
 ------------------------------------------
