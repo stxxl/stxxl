@@ -37,23 +37,26 @@ enum pager_type
 template <unsigned npages_>
 class random_pager
 {
+    enum { n_pages = npages_ };
+
     typedef unsigned_type size_type;
+
     size_type num_pages;
     random_number<random_uniform_fast> rnd;
 
 public:
-    enum { n_pages = npages_ };
     random_pager(size_type num_pages = n_pages) : num_pages(num_pages) { }
-    int_type kick()
+    size_type kick()
     {
-        return rnd(num_pages);
+        return rnd(size());
     }
-    void hit(int_type ipage)
+
+    void hit(size_type ipage)
     {
-        assert(ipage < int_type(num_pages));
-        assert(ipage >= 0);
+        assert(ipage < size());
     }
-    size_type size () const
+
+    size_type size() const
     {
         return num_pages;
     }
@@ -63,6 +66,8 @@ public:
 template <unsigned npages_ = 0>
 class lru_pager : private noncopyable
 {
+    enum { n_pages = npages_ };
+
     typedef unsigned_type size_type;
     typedef std::list<size_type> list_type;
 
@@ -70,11 +75,9 @@ class lru_pager : private noncopyable
     simple_vector<list_type::iterator> history_entry;
 
 public:
-    enum { n_pages = npages_ };
-
     lru_pager(size_type num_pages = n_pages) : history_entry(num_pages)
     {
-        for (size_type i = 0; i < history_entry.size(); ++i)
+        for (size_type i = 0; i < size(); ++i)
             history_entry[i] = history.insert(history.end(), i);
     }
 
@@ -85,7 +88,7 @@ public:
 
     void hit(size_type ipage)
     {
-        assert(ipage < history_entry.size());
+        assert(ipage < size());
         history.splice(history.begin(), history, history_entry[ipage]);
     }
 
@@ -95,7 +98,7 @@ public:
         history_entry.swap(obj.history_entry);
     }
 
-    size_type size () const
+    size_type size() const
     {
         return history_entry.size();
     }
