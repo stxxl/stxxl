@@ -74,7 +74,7 @@ public:
 
     lru_pager(size_type num_pages = n_pages) : history_entry(num_pages)
     {
-        for (size_type i = 0; i < history.size(); ++i)
+        for (size_type i = 0; i < history_entry.size(); ++i)
             history_entry[i] = history.insert(history.end(), i);
     }
 
