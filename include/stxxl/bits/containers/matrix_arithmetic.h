@@ -677,6 +677,10 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
 template <typename ValueType, unsigned BlockSideLength>
 struct matrix_operations
 {
+    // tuning-parameter: Only matrices larger than this (in blocks) are processed by Strassen-Winograd.
+    // You have to adapt choose_level_for_feedable_sw, too
+    static const int_type strassen_winograd_base_case_size;
+
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
@@ -1098,8 +1102,8 @@ struct matrix_operations
             use_feedable_sw<2>(A, B, C);
             break;
         case 1:
-            use_feedable_sw<1>(A, B, C);
-            break;
+            /*use_feedable_sw<1>(A, B, C);
+            break;*/
         case 0:
             // base case
             recursive_multiply_and_add(A, B, C);
@@ -1182,7 +1186,9 @@ struct matrix_operations
                                swappable_block_matrix_type & C)
     {
         // base case
-        if (C.get_height() == 1 || C.get_width() == 1 || A.get_width() == 1)
+        if (C.get_height() <= strassen_winograd_base_case_size
+                || C.get_width() <= strassen_winograd_base_case_size
+                || A.get_width() <= strassen_winograd_base_case_size)
         {
             C.set_zero();
             return recursive_multiply_and_add(A, B, C);
@@ -1229,7 +1235,9 @@ struct matrix_operations
                                          swappable_block_matrix_type & C)
     {
         // base case
-        if (C.get_height() == 1 || C.get_width() == 1 || A.get_width() == 1)
+        if (C.get_height() <= strassen_winograd_base_case_size
+                || C.get_width() <= strassen_winograd_base_case_size
+                || A.get_width() <= strassen_winograd_base_case_size)
             return recursive_multiply_and_add(A, B, C);
 
         // partition matrix
@@ -1278,7 +1286,9 @@ struct matrix_operations
                                        swappable_block_matrix_type & C)
     {
         // base case
-        if (C.get_height() == 1 || C.get_width() == 1 || A.get_width() == 1)
+        if (C.get_height() <= strassen_winograd_base_case_size
+                || C.get_width() <= strassen_winograd_base_case_size
+                || A.get_width() <= strassen_winograd_base_case_size)
             return recursive_multiply_and_add(A, B, C);
 
         // partition matrix
@@ -1600,6 +1610,9 @@ struct matrix_operations
 
     // +-+ end vector-vector multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 };
+
+template <typename ValueType, unsigned BlockSideLength>
+const int_type matrix_operations<ValueType, BlockSideLength>::strassen_winograd_base_case_size = 3;
 
 __STXXL_END_NAMESPACE
 

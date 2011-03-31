@@ -19,7 +19,6 @@
 #include <stxxl/vector>
 #include <stxxl/stream>
 #include <stxxl/bits/containers/matrix.h>
-#include <stxxl/bits/containers/matrix_blocked.h>
 
 using namespace stxxl;
 
@@ -154,116 +153,8 @@ int main(int argc, char **argv)
 
     switch (test_case)
     {
-    case 0:
-    {
-        blocked_matrix<unsigned_type, block_order> A(rank, rank);
-        modulus_integers mi1(1, 1), mi2(1, 1);
-        iterator_compare<modulus_integers, unsigned_type> ic(mi1);
-
-        STXXL_MSG("Writing and reading " << rank << "x" << rank << " matrix.");
-        A.materialize_from_row_major(mi2, internal_memory);
-        A.output_to_row_major(ic, internal_memory);
-        STXXL_MSG("" << ic.get_errors().size() << " errors");
-        if (ic.get_errors().size() != 0)
-        {
-            STXXL_MSG("first errors:");
-            for (unsigned int i = 0; i < 10 && i < ic.get_errors().size(); i++)
-                STXXL_MSG("" << ic.get_errors()[i].first << " " << ic.get_errors()[i].second);
-        }
-        break;
-    }
-    case 1:
-    {   //1-matrices
-        ColumnMajor cm;
-        blocked_matrix<double, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
-        constant_one co;
-        modulus_integers mi(rank, 0);   //expected result, no modulus
-        iterator_compare<modulus_integers, unsigned_type> ic(mi);
-
-        stats_data stats_before_construction(*stats::get_instance());
-
-        A.materialize_from_row_major(co, internal_memory);
-        B.materialize_from_row_major(co, internal_memory);
-
-        stats_data stats_before_mult(*stats::get_instance());
-        STXXL_MSG(stats_before_mult - stats_before_construction);
-
-        STXXL_MSG("Multiplying two " << rank << "x" << rank << " matrices.");
-        multiply(A, B, C, internal_memory);
-
-        stats_data stats_after(*stats::get_instance());
-        STXXL_MSG(stats_after - stats_before_mult);
-
-        STXXL_MSG("testing correctness");
-        C.output_to_row_major(ic, internal_memory);
-        STXXL_MSG("" << ic.get_errors().size() << " errors");
-        if (ic.get_errors().size() != 0)
-        {
-            STXXL_MSG("first errors:");
-            for (unsigned int i = 0; i < 10 && i < ic.get_errors().size(); i++)
-                STXXL_MSG("" << ic.get_errors()[i].first << " " << ic.get_errors()[i].second);
-        }
-        break;
-    }
-    case 2:
-    {   //ascending times constant factor
-        blocked_matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
-        modulus_integers mi1(1, 1), mi2(5, 5);  //ascending, 5 * ascending
-        diagonal_matrix di(rank, 5);    //multiply by 5
-        iterator_compare<modulus_integers, unsigned_type> ic(mi2);
-
-        A.materialize_from_row_major(mi1, internal_memory);
-        B.materialize_from_row_major(di, internal_memory);
-
-        STXXL_MSG("Multiplying two " << rank << "x" << rank << " matrices.");
-        stats_data stats_before(*stats::get_instance());
-
-        multiply(A, B, C, internal_memory);
-
-        stats_data stats_after(*stats::get_instance());
-        STXXL_MSG(stats_after - stats_before);
-
-        STXXL_MSG("testing correctness");
-        C.output_to_row_major(ic, internal_memory);
-        STXXL_MSG("" << ic.get_errors().size() << " errors");
-        if (ic.get_errors().size() != 0)
-        {
-            STXXL_MSG("first errors:");
-            for (unsigned int i = 0; i < 10 && i < ic.get_errors().size(); i++)
-                STXXL_MSG("" << ic.get_errors()[i].first << " " << ic.get_errors()[i].second);
-        }
-        break;
-    }
-    case 3:
-    {
-        blocked_matrix<unsigned_type, block_order> A(rank, rank), B(rank, rank), C(rank, rank);
-        modulus_integers mi1(1, 1), mi2((unsigned_type)rank * rank, std::numeric_limits<unsigned_type>::max());
-        inverse_diagonal_matrix id(rank);
-        iterator_compare<modulus_integers, unsigned_type> ic(mi2);
-
-        A.materialize_from_row_major(mi1, internal_memory);
-        B.materialize_from_row_major(id, internal_memory);
-
-        STXXL_MSG("Multiplying two " << rank << "x" << rank << " matrices twice.");
-        stats_data stats_before(*stats::get_instance());
-
-        multiply(A, B, C, internal_memory);
-        multiply(B, C, A, internal_memory);
-
-        stats_data stats_after(*stats::get_instance());
-        STXXL_MSG(stats_after - stats_before);
-
-        STXXL_MSG("testing correctness");
-        A.output_to_row_major(ic, internal_memory);
-        STXXL_MSG("" << ic.get_errors().size() << " errors");
-        if (ic.get_errors().size() != 0)
-        {
-            STXXL_MSG("first errors:");
-            for (unsigned int i = 0; i < 10 && i < ic.get_errors().size(); i++)
-                STXXL_MSG("" << ic.get_errors()[i].first << " != " << ic.get_errors()[i].second);
-        }
-        break;
-    }
+    default:
+        STXXL_ERRMSG("unknown testcase");
     case 4:
     {
         STXXL_MSG("multiplying two int_type matrices of rank " << rank << " block order " << small_block_order);
@@ -401,6 +292,7 @@ int main(int argc, char **argv)
         typedef block_scheduler< matrix_swappable_block<value_type, block_order> > bst;
         typedef matrix<value_type, block_order> mt;
         typedef mt::row_major_iterator mitt;
+        typedef mt::const_row_major_iterator cmitt;
 
         bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
         bst & bs = *b_s;
@@ -430,7 +322,7 @@ int main(int argc, char **argv)
         STXXL_MSG(stats_after - stats_before);
         {
             int_type num_err = 0;
-            for (mitt mit = c->begin(); mit != c->end(); ++mit)
+            for (cmitt mit = c->cbegin(); mit != c->cend(); ++mit)
                 num_err += (*mit != rank);
             if (num_err)
                 STXXL_ERRMSG("c had " << num_err << " errors");

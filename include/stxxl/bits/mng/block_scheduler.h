@@ -1562,6 +1562,9 @@ protected:
 
         // empty scheduled_blocks
         free_evictable_blocks.insert(scheduled_evictable_blocks.begin(), scheduled_evictable_blocks.end());
+        //for (typename std::set<swappable_block_identifier_type>::iterator it = scheduled_evictable_blocks.begin();
+        //        it != scheduled_evictable_blocks.end(); ++it)
+        //    free_evictable_blocks.insert(*it);
         scheduled_evictable_blocks.clear();
         while (! scheduled_blocks.empty())
         {
@@ -1635,8 +1638,8 @@ public:
                 // not acquired yet -> remove from scheduled_evictable_blocks
                 bool t = scheduled_evictable_blocks.erase(sbid);
                 assert(t);
+                wait_on_read(schedule_meta);
             }
-            wait_on_read(schedule_meta);
             sblock.acquire();
         }
         else

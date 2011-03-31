@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 {
 
     #ifndef STXXL_MATRIX_BLOCK_ORDER
-    const int block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
+    const int block_order = 1568; // must be a multiple of 32, assuming at least 4 bytes element size
     #else
     const int block_order = STXXL_MATRIX_BLOCK_ORDER; // must be a multiple of 32, assuming at least 4 bytes element size
     #endif
@@ -57,6 +57,7 @@ int main(int argc, char **argv)
     typedef block_scheduler< matrix_swappable_block<value_type, block_order> > bst;
     typedef matrix<value_type, block_order> mt;
     typedef mt::row_major_iterator mitt;
+    typedef mt::const_row_major_iterator cmitt;
 
     bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
     bst & bs = *b_s;
@@ -76,17 +77,22 @@ int main(int argc, char **argv)
     STXXL_MSG("start of multiplication");
     matrix_stats_before.set();
     stats_before = *stats::get_instance();
-    *c = a->multiply(*b, mult_algo_num, sched_algo_num);
+    if (mult_algo_num >= 0)
+        *c = a->multiply(*b, mult_algo_num, sched_algo_num);
+    else
+        *c = a->multiply_internal(*b, sched_algo_num);
     bs.flush();
     stats_after = *stats::get_instance();
     matrix_stats_after.set();
     STXXL_MSG("end of multiplication");
 
-    STXXL_MSG(matrix_stats_after - matrix_stats_before);
-    STXXL_MSG(stats_after - stats_before);
+    matrix_stats_after = matrix_stats_after - matrix_stats_before;
+    STXXL_MSG(matrix_stats_after);
+    stats_after = stats_after - stats_before;
+    STXXL_MSG(stats_after);
     {
         int_type num_err = 0;
-        for (mitt mit = c->begin(); mit != c->end(); ++mit)
+        for (cmitt mit = c->cbegin(); mit != c->cend(); ++mit)
             num_err += (*mit != rank);
         if (num_err)
             STXXL_ERRMSG("c had " << num_err << " errors");
@@ -98,5 +104,18 @@ int main(int argc, char **argv)
     delete b_s;
 
     STXXL_MSG("end of test");
+    std::cout << "@";
+    std::cout << " ra " << rank << " bo " << block_order << " im " << internal_memory_megabyte
+            << " ma " << mult_algo_num << " sa " << sched_algo_num;
+    std::cout << " mu " << matrix_stats_after.block_multiplication_calls
+            << " mus " << matrix_stats_after.block_multiplications_saved_through_zero
+            << " ad " << matrix_stats_after.block_addition_calls
+            << " ads " << matrix_stats_after.block_additions_saved_through_zero;
+    std::cout  << " t " << stats_after.get_elapsed_time()
+            << " r " << stats_after.get_reads() << " w " << stats_after.get_writes()
+            << " rt " << stats_after.get_read_time() << " rtp " << stats_after.get_pread_time()
+            << " wt " << stats_after.get_write_time() << " wtp " << stats_after.get_pwrite_time()
+            << " rw " << stats_after.get_wait_read_time() << " ww " << stats_after.get_wait_write_time();
+    std::cout << std::endl;
     return 0;
 }

@@ -1210,6 +1210,74 @@ public:
                     block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
         return res;
     }
+
+    matrix_type multiply_internal (const matrix_type & right, const int_type scheduling_algorithm = 2) const
+    {
+        assert(width == right.height);
+        assert(& data->bs == & right.data->bs);
+        matrix_type res(data->bs, height, right.width);
+
+        if (scheduling_algorithm > 0)
+        {
+            multiply_internal(right, res);
+        }
+        switch (scheduling_algorithm)
+        {
+        case 0:
+            delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+            break;
+        case 1:
+            delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_offline_lfd<swappable_block_type>(data->bs));
+            break;
+        case 2:
+            delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_offline_lru_prefetching<swappable_block_type>(data->bs));
+            break;
+        default:
+            STXXL_ERRMSG("invalid scheduling-algorithm number");
+        }
+        multiply_internal(right, res);
+        delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_online_lru<swappable_block_type>(data->bs));
+        return res;
+    }
+
+protected:
+    void multiply_internal(const matrix_type & right, matrix_type & res) const
+    {
+        ValueType * A,
+                  * B,
+                  * C;
+        ValueType * vit;
+        if (! res.data->bs.is_simulating())
+        {
+            A = new ValueType[height * width];
+            B = new ValueType[right.height * right.width];
+            C = new ValueType[res.height * res.width];
+        }
+        vit = A;
+        for(const_row_major_iterator mit = cbegin(); mit != cend(); ++mit, ++vit)
+            *vit = *mit;
+        vit = B;
+        for(const_row_major_iterator mit = right.cbegin(); mit != right.cend(); ++mit, ++vit)
+            *vit = *mit;
+        if (! res.data->bs.is_simulating())
+            gemm_wrapper(height, width, res.width,
+                    ValueType(1), false, A,
+                                  false, B,
+                    ValueType(0), false, C);
+        vit = C;
+        for(row_major_iterator mit = res.begin(); mit != res.end(); ++mit, ++vit)
+            *mit = *vit;
+        if (! res.data->bs.is_simulating())
+        {
+            delete A;
+            delete B;
+            delete C;
+        }
+    }
 };
 
 __STXXL_END_NAMESPACE
