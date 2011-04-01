@@ -1289,7 +1289,9 @@ public:
 
 protected:
     void multiply_internal(const matrix_type & right, matrix_type & res) const
+    #if STXXL_BLAS
     {
+
         ValueType * A,
                   * B,
                   * C;
@@ -1321,6 +1323,7 @@ protected:
             delete C;
         }
     }
+    #endif ;
 };
 
 __STXXL_END_NAMESPACE
