@@ -1289,12 +1289,11 @@ public:
 
 protected:
     void multiply_internal(const matrix_type & right, matrix_type & res) const
-    #if STXXL_BLAS
     {
 
-        ValueType * A,
-                  * B,
-                  * C;
+        ValueType * A = 0,
+                  * B = 0,
+                  * C = 0;
         ValueType * vit;
         if (! res.data->bs.is_simulating())
         {
@@ -1309,10 +1308,14 @@ protected:
         for(const_row_major_iterator mit = right.cbegin(); mit != right.cend(); ++mit, ++vit)
             *vit = *mit;
         if (! res.data->bs.is_simulating())
-            gemm_wrapper(height, width, res.width,
-                    ValueType(1), false, A,
-                                  false, B,
-                    ValueType(0), false, C);
+            #if STXXL_BLAS
+                gemm_wrapper(height, width, res.width,
+                        ValueType(1), false, A,
+                                      false, B,
+                        ValueType(0), false, C);
+            #else
+                assert(false);
+            #endif
         vit = C;
         for(row_major_iterator mit = res.begin(); mit != res.end(); ++mit, ++vit)
             *mit = *vit;
@@ -1323,7 +1326,6 @@ protected:
             delete C;
         }
     }
-    #endif ;
 };
 
 __STXXL_END_NAMESPACE

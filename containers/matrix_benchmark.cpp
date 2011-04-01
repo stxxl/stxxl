@@ -35,18 +35,24 @@ int main(int argc, char **argv)
     int internal_memory_megabyte = 256;
     int mult_algo_num = 5;
     int sched_algo_num = 2;
+    int internal_memory_byte = 0;
 
     dsr::Argument_helper ah;
     ah.new_named_int('r',  "rank", "N","rank of the matrices   default", rank);
     ah.new_named_int('m', "memory", "L", "internal memory to use (in megabytes)   default", internal_memory_megabyte);
-    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_2 (block-interleaved preadditions)\n  default", mult_algo_num);
+    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n  default", mult_algo_num);
     ah.new_named_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default", sched_algo_num);
+    ah.new_named_int('c', "memory-byte", "L", "internal memory to use (in bytes)   no default", internal_memory_byte);
 
     ah.set_description("stxxl matrix test");
     ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
     ah.process(argc, argv);
 
-    int_type internal_memory = int_type(internal_memory_megabyte) * 1048576;
+    int_type internal_memory;
+    if (internal_memory_byte)
+        internal_memory = internal_memory_byte;
+    else
+        internal_memory = int_type(internal_memory_megabyte) * 1048576;
 
     STXXL_MSG("multiplying two full double matrices of rank " << rank << ", block order " << block_order
             << " using " << internal_memory_megabyte << "MiB internal memory, multiplication-algo "
