@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2007, 2008 Andreas Beckmann <beckmann@mpi-inf.mpg.de>
+ *  Copyright (C) 2007, 2008, 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,7 +16,8 @@
 #include <boost/version.hpp>
 #endif
 
-#define STXXL_VERSION_STRING_MA_MI_PL "1.4.0"
+#define stringify(x) #x
+#define STXXL_VERSION_STRING_MA_MI_PL stringify(STXXL_VERSION_MAJOR) "." stringify(STXXL_VERSION_MINOR) "." stringify(STXXL_VERSION_PATCHLEVEL)
 
 // version.defs gets created if a snapshot/beta/rc/release is done
 #ifdef HAVE_VERSION_DEFS
@@ -30,6 +31,21 @@
 
 
 __STXXL_BEGIN_NAMESPACE
+
+int version_major()
+{
+    return STXXL_VERSION_MAJOR;
+};
+
+int version_minor()
+{
+    return STXXL_VERSION_MINOR;
+}
+
+int version_patchlevel()
+{
+    return STXXL_VERSION_PATCHLEVEL;
+}
 
 // FIXME: this currently only works for GNU-like systems,
 //        there are no details available on windows platform
