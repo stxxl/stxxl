@@ -18,6 +18,10 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+#ifndef STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS
+#define STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS 4
+#endif
+
 template <typename ValueType>
 class column_vector;
 
@@ -131,6 +135,12 @@ struct static_quadtree
         return *this;
     }
 
+    static_quadtree & operator -= (const static_quadtree & right)
+    {
+        ul -= right.ul; ur -= right.ur; dl -= right.dl; dr -= right.dr;
+        return *this;
+    }
+
     static_quadtree operator & (const static_quadtree & right) const
     { return static_quadtree(ul & right.ul, ur & right.ur, dl & right.dl, dr & right.dr); }
 
@@ -166,6 +176,12 @@ struct static_quadtree<ValueType, 0>
     static_quadtree & operator += (const static_quadtree & right)
     {
         val += right.val;
+        return *this;
+    }
+
+    static_quadtree & operator -= (const static_quadtree & right)
+    {
+        val -= right.val;
         return *this;
     }
 
@@ -674,6 +690,300 @@ struct matrix_to_quadtree<ValueType, BlockSideLength, 0>
     { return m.get_width(); }
 };
 
+template <typename ValueType, unsigned BlockSideLength, unsigned Level, bool AExists, bool BExists>
+struct feedable_strassen_winograd_block_grained
+{
+    typedef static_quadtree<bool, Level> zbt;     // true <=> is a zero-block
+    typedef static_quadtree<ValueType, Level> vt;
+
+    typedef feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, AExists, BExists> smaller_feedable_strassen_winograd_ab;
+    typedef feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, AExists, false> smaller_feedable_strassen_winograd_a;
+    typedef feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, false, BExists> smaller_feedable_strassen_winograd_b;
+    typedef feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level - 1, false, false> smaller_feedable_strassen_winograd_n;
+
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename block_scheduler_type::internal_block_type internal_block_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+
+    const size_type n, m, l;
+    smaller_feedable_strassen_winograd_ab p1, p2;
+    smaller_feedable_strassen_winograd_n  p3, p4, p5;
+    smaller_feedable_strassen_winograd_b  p6;
+    smaller_feedable_strassen_winograd_a  p7;
+
+    inline feedable_strassen_winograd_block_grained(
+            const swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
+            const swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
+        : n(n), m(m), l(l),
+          p1(existing_a, a_from_row,       a_from_col,       bs_c, n/2, m/2, l/2, existing_b, b_from_row,       b_from_col),
+          p2(existing_a, a_from_row,       a_from_col + l/2, bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col),
+          p3(                                                bs_c, n/2, m/2, l/2),
+          p4(                                                bs_c, n/2, m/2, l/2),
+          p5(                                                bs_c, n/2, m/2, l/2),
+          p6(                                                bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col + m/2),
+          p7(existing_a, a_from_row + n/2, a_from_col + l/2, bs_c, n/2, m/2, l/2) {}
+
+    inline feedable_strassen_winograd_block_grained(
+            const swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
+        : n(n), m(m), l(l),
+          p1(existing_a, a_from_row,       a_from_col,       bs_c, n/2, m/2, l/2),
+          p2(existing_a, a_from_row,       a_from_col + l/2, bs_c, n/2, m/2, l/2),
+          p3(                                                bs_c, n/2, m/2, l/2),
+          p4(                                                bs_c, n/2, m/2, l/2),
+          p5(                                                bs_c, n/2, m/2, l/2),
+          p6(                                                bs_c, n/2, m/2, l/2),
+          p7(existing_a, a_from_row + n/2, a_from_col + l/2, bs_c, n/2, m/2, l/2) {}
+
+    inline feedable_strassen_winograd_block_grained(
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
+            const swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
+        : n(n), m(m), l(l),
+          p1(bs_c, n/2, m/2, l/2, existing_b, b_from_row,       b_from_col),
+          p2(bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col),
+          p3(bs_c, n/2, m/2, l/2),
+          p4(bs_c, n/2, m/2, l/2),
+          p5(bs_c, n/2, m/2, l/2),
+          p6(bs_c, n/2, m/2, l/2, existing_b, b_from_row + l/2, b_from_col + m/2),
+          p7(bs_c, n/2, m/2, l/2) {}
+
+    inline feedable_strassen_winograd_block_grained(
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
+        : n(n), m(m), l(l),
+          p1(bs_c, n/2, m/2, l/2),
+          p2(bs_c, n/2, m/2, l/2),
+          p3(bs_c, n/2, m/2, l/2),
+          p4(bs_c, n/2, m/2, l/2),
+          p5(bs_c, n/2, m/2, l/2),
+          p6(bs_c, n/2, m/2, l/2),
+          p7(bs_c, n/2, m/2, l/2) {}
+
+    inline void feed_a(const size_type & row, const size_type & col, const swappable_block_matrix_type & bl)
+    {
+        // partition bl
+        typename Ops::swappable_block_matrix_quarterer qbl(bl);
+        // preadditions
+        swappable_block_matrix_type s1(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed()),
+                                    s2(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed()),
+                                    s3(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed()),
+                                    s4(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed());
+        Ops::strassen_winograd_preaddition_a(qbl.ul, qbl.ur, qbl.dl, qbl.dr, s1, s2, s3, s4);
+        // feed recursive
+        p1.feed_a(row, col, qbl.ul);
+        p2.feed_a(row, col, qbl.ur);
+        p3.feed_a(row, col, s1);
+        p4.feed_a(row, col, s2);
+        p5.feed_a(row, col, s3);
+        p6.feed_a(row, col, s4);
+        p7.feed_a(row, col, qbl.dr);
+    }
+
+    inline void feed_b(const size_type & row, const size_type & col, const swappable_block_matrix_type & bl)
+    {
+        // partition bl
+        typename Ops::swappable_block_matrix_quarterer qbl(bl);
+        // preadditions
+        swappable_block_matrix_type t1(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed()),
+                                    t2(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed()),
+                                    t3(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed()),
+                                    t4(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed());
+        Ops::strassen_winograd_preaddition_b(qbl.ul, qbl.ur, qbl.dl, qbl.dr, t1, t2, t3, t4);
+        // feed recursive
+        p1.feed_b(row, col, qbl.ul);
+        p2.feed_b(row, col, qbl.dl);
+        p3.feed_b(row, col, t1);
+        p4.feed_b(row, col, t2);
+        p5.feed_b(row, col, t3);
+        p6.feed_b(row, col, qbl.dr);
+        p7.feed_b(row, col, t4);
+    }
+
+    inline void multiply()
+    {
+        p1.multiply();
+        p2.multiply();
+        p3.multiply();
+        p4.multiply();
+        p5.multiply();
+        p6.multiply();
+        p7.multiply();
+    }
+
+    inline void read_and_add(const size_type & row, const size_type & col, const swappable_block_matrix_type & bl)
+    {
+        // partition bl
+        typename Ops::swappable_block_matrix_quarterer qbl(bl);
+        // postadditions
+        swappable_block_matrix_type px(bl.bs, qbl.ul.get_height(), qbl.ul.get_width(), qbl.ul.is_transposed());
+        p2.read_and_add(row, col, qbl.ul);
+        p1.read_and_add(row, col, px);
+        Ops::element_op(qbl.ul, px, typename Ops::addition());
+        p4.read_and_add(row, col, px);
+        Ops::element_op(qbl.ur, px, typename Ops::addition());
+        p5.read_and_add(row, col, px);
+        Ops::element_op_twice_nontransposed(qbl.dl, qbl.dr, px, typename Ops::addition());
+        px.set_zero();
+        p7.read_and_add(row, col, qbl.dl);
+        p3.read_and_add(row, col, px);
+        Ops::element_op_twice_nontransposed(qbl.dr, qbl.ur, px, typename Ops::addition());
+        p6.read_and_add(row, col, qbl.ur);
+    }
+
+    inline static unsigned_type get_num_temp_grains()
+    { return smaller_feedable_strassen_winograd_ab::get_num_temp_grains() + (4 ^ Level) * 2; }
+};
+
+template <typename ValueType, unsigned BlockSideLength, bool AExists, bool BExists>
+struct feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, 0, AExists, BExists>
+{
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
+    typedef typename swappable_block_matrix_type::swappable_block_identifier_type swappable_block_identifier_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+
+    typedef static_quadtree<swappable_block_identifier_type, 0> bt;
+
+    swappable_block_matrix_type a, b, c;
+
+    inline feedable_strassen_winograd_block_grained(
+            const swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
+            const swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
+        : a(existing_a, n, l, a_from_row, a_from_col),
+          b(existing_b, n, l, b_from_row, b_from_col),
+          c(bs_c, n, m) {}
+
+    inline feedable_strassen_winograd_block_grained(
+            const swappable_block_matrix_type & existing_a, const size_type a_from_row, const size_type a_from_col,
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
+        : a(existing_a, n, l, a_from_row, a_from_col),
+          b(bs_c, n, l),
+          c(bs_c, n, m) {}
+
+    inline feedable_strassen_winograd_block_grained(
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l,
+            const swappable_block_matrix_type & existing_b, const size_type b_from_row, const size_type b_from_col)
+        : a(bs_c, n, l),
+          b(existing_b, n, l, b_from_row, b_from_col),
+          c(bs_c, n, m) {}
+
+    inline feedable_strassen_winograd_block_grained(
+            block_scheduler_type & bs_c, const size_type n, const size_type m, const size_type l)
+        : a(bs_c, n, l),
+          b(bs_c, n, l),
+          c(bs_c, n, m) {}
+
+    inline void feed_a(const size_type & row, const size_type & col, const swappable_block_matrix_type & bl)
+    {
+        if (! AExists)
+        {
+            // copy bl to a from (row, col) (assuming a from (row, col) == 0)
+            swappable_block_matrix_type at(a, bl.get_height(), bl.get_width(), row, col);
+            Ops::element_op(at, bl, typename Ops::addition());
+        }
+    }
+
+    inline void feed_b(const size_type & row, const size_type & col, const swappable_block_matrix_type & bl)
+    {
+        if (! BExists)
+        {
+            // copy bl(0,0) to b(row, col) (assuming b from (row, col) == 0)
+            swappable_block_matrix_type bt(b, bl.get_height(), bl.get_width(), row, col);
+            Ops::element_op(bt, bl, typename Ops::addition());
+        }
+    }
+
+    inline void multiply()
+    {
+        matrix_operations<ValueType, BlockSideLength>::
+                multi_level_strassen_winograd_multiply_and_add_block_grained(a, b, c);
+        if (! AExists)
+            a.set_zero();
+        if (! BExists)
+            b.set_zero();
+    }
+
+
+    inline void read_and_add(const size_type & row, const size_type & col, swappable_block_matrix_type & bl)
+    {
+        // add c from (row, col) to bl
+        swappable_block_matrix_type ct(c, bl.get_height(), bl.get_width(), row, col);
+        Ops::element_op(bl, ct, typename Ops::addition());
+        ct.set_zero();
+    }
+
+    inline static unsigned_type get_num_temp_grains()
+    { return 0; }
+};
+
+template <typename ValueType, unsigned BlockSideLength, unsigned Level, unsigned Granularity>
+struct matrix_to_quadtree_block_grained
+{
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+
+    typedef matrix_to_quadtree_block_grained<ValueType, BlockSideLength, Level - 1, Granularity> smaller_matrix_to_quadtree_block_grained;
+
+    smaller_matrix_to_quadtree_block_grained ul, ur, dl, dr;
+
+    inline matrix_to_quadtree_block_grained(const swappable_block_matrix_type & matrix)
+        : ul(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0,                    0),
+          ur(matrix, matrix.get_height()/2, matrix.get_width()/2,                     0, matrix.get_width()/2),
+          dl(matrix, matrix.get_height()/2, matrix.get_width()/2, matrix.get_height()/2,                    0),
+          dr(matrix, matrix.get_height()/2, matrix.get_width()/2, matrix.get_height()/2, matrix.get_width()/2)
+    { assert(! (matrix.get_height() % 2 | matrix.get_width() % 2)); }
+
+    inline matrix_to_quadtree_block_grained(const swappable_block_matrix_type & matrix,
+            const size_type height, const size_type width, const size_type from_row, const size_type from_col)
+        : ul(matrix, height/2, width/2, from_row,            from_col),
+          ur(matrix, height/2, width/2, from_row,            from_col + width/2),
+          dl(matrix, height/2, width/2, from_row + height/2, from_col),
+          dr(matrix, height/2, width/2, from_row + height/2, from_col + width/2)
+    { assert(! (height % 2 | width % 2)); }
+
+    inline swappable_block_matrix_type operator () (const size_type & row, const size_type & col)
+    {
+        return swappable_block_matrix_type(ul(row, col), ur(row, col), dl(row, col), dr(row, col));
+    }
+
+    inline const size_type get_height()
+    { return ul.get_height(); }
+
+    inline const size_type get_width()
+    { return ul.get_width(); }
+};
+
+template <typename ValueType, unsigned BlockSideLength, unsigned Granularity>
+struct matrix_to_quadtree_block_grained<ValueType, BlockSideLength, 0, Granularity>
+{
+    typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
+    typedef typename swappable_block_matrix_type::size_type size_type;
+
+    swappable_block_matrix_type m;
+
+    inline matrix_to_quadtree_block_grained(const swappable_block_matrix_type & matrix)
+        : m(matrix, matrix.get_height(), matrix.get_width(), 0, 0) {}
+
+    inline matrix_to_quadtree_block_grained(const swappable_block_matrix_type & matrix,
+            const size_type height, const size_type width, const size_type from_row, const size_type from_col)
+        : m(matrix, height, width, from_row, from_col) {}
+
+    inline swappable_block_matrix_type operator () (const size_type & row, const size_type & col)
+    {
+        return swappable_block_matrix_type(m, Granularity, Granularity, row * Granularity, col * Granularity);
+    }
+
+    inline const size_type get_height()
+    { return div_ceil(m.get_height(), Granularity); }
+
+    inline const size_type get_width()
+    { return div_ceil(m.get_width(), Granularity); }
+};
+
 template <typename ValueType, unsigned BlockSideLength>
 struct matrix_operations
 {
@@ -903,7 +1213,7 @@ struct matrix_operations
 
     // additions for strassen-winograd
 
-    static void
+    inline static void
     strassen_winograd_preaddition_a(swappable_block_matrix_type & a11,
                                     swappable_block_matrix_type & a12,
                                     swappable_block_matrix_type & a21,
@@ -923,7 +1233,7 @@ struct matrix_operations
             }
     }
 
-    static void
+    inline static void
     strassen_winograd_preaddition_b(swappable_block_matrix_type & b11,
                                     swappable_block_matrix_type & b12,
                                     swappable_block_matrix_type & b21,
@@ -943,7 +1253,7 @@ struct matrix_operations
             }
     }
 
-    static void
+    inline static void
     strassen_winograd_postaddition(swappable_block_matrix_type & c11, // = p2
                                    swappable_block_matrix_type & c12, // = p6
                                    swappable_block_matrix_type & c21, // = p7
@@ -966,7 +1276,7 @@ struct matrix_operations
     }
 
     // calculates c1 += a; c2 += a
-    template <class Op> static void
+    template <class Op> inline static void
     element_op_twice_nontransposed(swappable_block_matrix_type & c1,
                      swappable_block_matrix_type & c2,
                      const swappable_block_matrix_type & a, Op op = Op())
@@ -983,7 +1293,7 @@ struct matrix_operations
             }
     }
 
-    template <class Op> static void
+    template <class Op> inline static void
     op_swappable_block_nontransposed(swappable_block_matrix_type & c,
             swappable_block_matrix_type & a, Op op, swappable_block_matrix_type & b,
             size_type & row, size_type & col)
@@ -994,7 +1304,7 @@ struct matrix_operations
                         b(row, col), false, b.bs, op);
     }
 
-    template <class Op> static void
+    template <class Op> inline static void
     op_swappable_block_nontransposed(swappable_block_matrix_type & c, Op op, swappable_block_matrix_type & a,
             size_type & row, size_type & col)
     {
@@ -1064,6 +1374,91 @@ struct matrix_operations
               downright(whole, whole.get_height() - whole.get_height()/2, whole.get_width() - whole.get_width()/2, whole.get_height()/2, whole.get_width()/2),
               ul(upleft), ur(upright), dl(downleft), dr(downright) {}
     };
+
+    //! \brief calculates C = A * B + C
+    // requires fitting dimensions
+    static swappable_block_matrix_type &
+    multi_level_strassen_winograd_multiply_and_add_block_grained(const swappable_block_matrix_type & A,
+                                                   const swappable_block_matrix_type & B,
+                                                   swappable_block_matrix_type & C)
+    {
+        int_type num_levels = log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())) /
+                                        strassen_winograd_base_case_size);
+        if (num_levels > 1)
+        {
+            if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS)
+                num_levels = STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS;
+            swappable_block_matrix_type padded_a(A, round_up_to_power_of_two(A.get_height(), num_levels),
+                                                 round_up_to_power_of_two(A.get_width(), num_levels), 0, 0),
+                                        padded_b(B, round_up_to_power_of_two(B.get_height(), num_levels),
+                                                 round_up_to_power_of_two(B.get_width(), num_levels), 0, 0),
+                                        padded_c(C, round_up_to_power_of_two(C.get_height(), num_levels),
+                                                 round_up_to_power_of_two(C.get_width(), num_levels), 0, 0);
+            switch (num_levels)
+            {
+            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 5)
+            case 5:
+                use_feedable_sw_block_grained<5>(padded_a, padded_a, padded_c);
+                break;
+            #endif
+            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 4)
+            case 4:
+                use_feedable_sw_block_grained<4>(padded_a, padded_a, padded_c);
+                break;
+            #endif
+            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 3)
+            case 3:
+                use_feedable_sw_block_grained<3>(padded_a, padded_a, padded_c);
+                break;
+            #endif
+            case 2:
+                use_feedable_sw_block_grained<2>(padded_a, padded_a, padded_c);
+                break;
+            }
+        }
+        else
+            // base case
+            strassen_winograd_multiply_and_add_interleaved(A, B, C);
+        return C;
+    }
+
+    // input matrices have to be padded
+    template <unsigned Level>
+    static void use_feedable_sw_block_grained(const swappable_block_matrix_type & A,
+                                const swappable_block_matrix_type & B,
+                                swappable_block_matrix_type & C)
+    {
+        const unsigned granularity = 1;
+
+        feedable_strassen_winograd_block_grained<ValueType, BlockSideLength, Level, true, true>
+                fsw(A, 0, 0, C.bs, C.get_height(), C.get_width(), A.get_width(), B, 0, 0);
+        // preadditions for A
+        {
+            matrix_to_quadtree_block_grained<ValueType, BlockSideLength, Level, granularity>
+                    mtq_a (A);
+            for (size_type row = 0; row < mtq_a.get_height(); ++row)
+                for (size_type col = 0; col < mtq_a.get_width(); ++col)
+                    fsw.feed_a(row, col, mtq_a(row, col));
+        }
+        // preadditions for B
+        {
+            matrix_to_quadtree_block_grained<ValueType, BlockSideLength, Level, granularity>
+                    mtq_b (B);
+            for (size_type row = 0; row < mtq_b.get_height(); ++row)
+                for (size_type col = 0; col < mtq_b.get_width(); ++col)
+                    fsw.feed_b(row, col, mtq_b(row, col));
+        }
+        // recursive multiplications
+        fsw.multiply();
+        // postadditions
+        {
+            matrix_to_quadtree_block_grained<ValueType, BlockSideLength, Level, granularity>
+                    mtq_c (C);
+            for (size_type row = 0; row < mtq_c.get_height(); ++row)
+                for (size_type col = 0; col < mtq_c.get_width(); ++col)
+                    fsw.read_and_add(row, col, mtq_c(row, col));
+        }
+    }
 
     //! \brief calculates C = A * B + C
     // requires fitting dimensions
@@ -1175,7 +1570,6 @@ struct matrix_operations
                 mtq_c.end_feeding_block(block_row, block_col,
                         fsw.end_reading_block(block_row, block_col));
             }
-
     }
 
     //! \brief calculates C = A * B
@@ -1611,6 +2005,7 @@ struct matrix_operations
     // +-+ end vector-vector multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 };
 
+// Adjust choose_level_for_feedable_sw, too!
 template <typename ValueType, unsigned BlockSideLength>
 const int_type matrix_operations<ValueType, BlockSideLength>::strassen_winograd_base_case_size = 3;
 

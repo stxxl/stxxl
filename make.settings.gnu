@@ -369,7 +369,7 @@ HEADER_FILES_CONTAINERS	+= pager.h stack.h vector.h priority_queue.h
 #EADER_FILES_CONTAINERS	+= pq_helpers.h pq_mergers.h pq_ext_merger.h
 #EADER_FILES_CONTAINERS	+= pq_losertree.h
 HEADER_FILES_CONTAINERS	+= queue.h map.h deque.h
-HEADER_FILES_CONTAINERS	+= matrix_blocked.h matrix_layouts.h matrix.h matrix_low_level.h matrix_arithmetic.h
+HEADER_FILES_CONTAINERS	+= matrix.h matrix_low_level.h matrix_arithmetic.h
 
 HEADER_FILES_CONTAINERS_BTREE	+= btree.h iterator_map.h leaf.h node_cache.h
 HEADER_FILES_CONTAINERS_BTREE	+= root_node.h node.h iterator.h

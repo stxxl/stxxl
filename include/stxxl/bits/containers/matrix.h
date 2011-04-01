@@ -294,6 +294,37 @@ public:
                 bl(row, col) = bs.allocate_swappable_block();
     }
 
+    //! \brief Create swappable_block_matrix that represents the combination matrix ul ur
+    //!                                                                             dl dr
+    //!
+    //! The submatrices are assumed to be of fitting dimensions and equal transposition.
+    //! The submatrices must not be destructed or transposed before the matrix is destructed.
+    swappable_block_matrix(const swappable_block_matrix & ul, const swappable_block_matrix & ur,
+                           const swappable_block_matrix & dl, const swappable_block_matrix & dr)
+        : bs(ul.bs),
+          height(ul.height + dl.height),
+          width(ul.width + ur.width),
+          height_from_supermatrix(height),
+          width_from_supermatrix(width),
+          blocks(height * width),
+          elements_in_blocks_transposed(ul.elements_in_blocks_transposed)
+    {
+        for (size_type row = 0; row < ul.height; ++row)
+        {
+            for (size_type col = 0; col < ul.width; ++col)
+                bl(row, col) = ul.block(row,             col);
+            for (size_type col = ul.width; col < width; ++col)
+                bl(row, col) = ur.block(row,             col - ul.width);
+        }
+        for (size_type row = ul.height; row < height; ++row)
+        {
+            for (size_type col = 0; col < ul.width; ++col)
+                bl(row, col) = dl.block(row - ul.height, col);
+            for (size_type col = ul.width; col < width; ++col)
+                bl(row, col) = dr.block(row - ul.height, col - ul.width);
+        }
+    }
+
     swappable_block_matrix(const swappable_block_matrix & other)
         : shared_object(other),
           bs(other.bs),
@@ -1122,13 +1153,16 @@ public:
     }
 
     //! \brief multiply with another matrix
-    //! \param algorithm allows to choose the applied algorithm
+    //! \param multiplication_algorithm allows to choose the applied algorithm
+    //! \param scheduling_algorithm  allows to choose the applied algorithm
     //! Available algorithms are: \n
     //!    0: naive_multiply_and_add \n
     //!    1: recursive_multiply_and_add \n
     //!    2: strassen_winograd_multiply_and_add \n
     //!    3: multi_level_strassen_winograd_multiply_and_add \n
-    //!    4: strassen_winograd_multiply (optimized pre- and postadditions)
+    //!    4: strassen_winograd_multiply (optimized pre- and postadditions) \n
+    //!    5: strassen_winograd_multiply_and_add_interleaved (optimized preadditions) \n
+    //!    6: multi_level_strassen_winograd_multiply_and_add_block_grained
     matrix_type multiply (const matrix_type & right, const int_type multiplication_algorithm = 2, const int_type scheduling_algorithm = 2) const
     {
         assert(width == right.height);
@@ -1159,6 +1193,9 @@ public:
                 break;
             case 5:
                 Ops::strassen_winograd_multiply_and_add_interleaved(*data, *right.data, *res.data);
+                break;
+            case 6:
+                Ops::multi_level_strassen_winograd_multiply_and_add_block_grained(*data, *right.data, *res.data);
                 break;
             default:
                 STXXL_ERRMSG("invalid multiplication-algorithm number");
@@ -1202,6 +1239,9 @@ public:
         case 5:
             Ops::strassen_winograd_multiply_and_add_interleaved(*data, *right.data, *res.data);
             break;
+        case 6:
+            Ops::multi_level_strassen_winograd_multiply_and_add_block_grained(*data, *right.data, *res.data);
+            break;
         default:
             STXXL_ERRMSG("invalid multiplication-algorithm number");
             break;
@@ -1219,6 +1259,9 @@ public:
 
         if (scheduling_algorithm > 0)
         {
+            // all offline algos need a simulation-run
+            delete data->bs.switch_algorithm_to(new
+                    block_scheduler_algorithm_simulation<swappable_block_type>(data->bs));
             multiply_internal(right, res);
         }
         switch (scheduling_algorithm)
