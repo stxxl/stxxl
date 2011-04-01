@@ -5,6 +5,7 @@ Version 1.4.0 (unreleased)
     stxxl::version_{major,minor,patchlevel}() for getting STXXL version
     information and an inline function check_library_version() to check at
     runtime for mismatching header and library versions.  (Bz:#6)
+    Available via <stxxl/version.h>
 * More parameters dynamic at runtime
   - Number of pages for vector
 

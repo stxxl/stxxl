@@ -12,7 +12,7 @@
 
 #include <stxxl/io>
 #include <stxxl/mng>
-#include <stxxl/bits/version.h>
+#include <stxxl/version.h>
 #include <stxxl/bits/compat/shared_ptr.h>
 
 int main(int argc, char **)
