@@ -125,8 +125,12 @@ boostfd_file::boostfd_file(
         boostfd_mode = BOOST_IOS::out | BOOST_IOS::in;
     }
 
+#if defined(BOOST_FILESYSTEM_VERSION) && (BOOST_FILESYSTEM_VERSION >= 3)
+    const boost::filesystem::path fspath(filename);
+#else
     const boost::filesystem::path fspath(filename,
                                          boost::filesystem::native);
+#endif
 
     if (mode & TRUNC)
     {
