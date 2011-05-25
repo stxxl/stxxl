@@ -16,7 +16,8 @@
 #include <boost/version.hpp>
 #endif
 
-#define stringify(x) #x
+#define stringify_(x) #x
+#define stringify(x) stringify_(x)
 #define STXXL_VERSION_STRING_MA_MI_PL stringify(STXXL_VERSION_MAJOR) "." stringify(STXXL_VERSION_MINOR) "." stringify(STXXL_VERSION_PATCHLEVEL)
 
 // version.defs gets created if a snapshot/beta/rc/release is done
