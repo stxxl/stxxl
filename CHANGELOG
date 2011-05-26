@@ -9,6 +9,7 @@ Version 1.4.0 (unreleased)
 * More parameters dynamic at runtime
   - Number of pages for vector
 * Platform Support
+  - add GCC 4.6
   - Boost 1.46: Boost Filesystem Version 3
 
 ------------------------------------------
