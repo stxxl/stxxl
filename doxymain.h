@@ -43,8 +43,10 @@
                 |  stxxl   stxxl     stxxl     stxxl
   compiler      |                   + boost   + boost
 ----------------+----------------------------------------
-  GCC 4.5 c++0x |    x     PMODE²      -         -
-  GCC 4.5       |    x     PMODE²      -         -
+  GCC 4.6 c++0x |    x     PMODE²      x       PMODE²
+  GCC 4.6       |    x     PMODE²      x       PMODE²
+  GCC 4.5 c++0x |    x     PMODE²      x       PMODE²
+  GCC 4.5       |    x     PMODE²      x       PMODE²
 * GCC 4.4 c++0x |    x     PMODE²      x       PMODE²
   GCC 4.4       |    x     PMODE²      x       PMODE²
   GCC 4.3 c++0x |    x     PMODE²      x       PMODE²
@@ -92,7 +94,7 @@
  * The <a href="http://www.boost.org">Boost</a> libraries are required on
  * Windows platforms using MSVC compiler and optional on other platforms.
  *
- * \c S<small>TXXL</small> has been tested with Boost 1.40.0 and 1.42.0.
+ * \c S<small>TXXL</small> has been tested with Boost 1.40.0, 1.42.0 and 1.46.1.
  * Other versions may work, too, but older versions will not get support.
  *
  *
