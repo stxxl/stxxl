@@ -4,6 +4,8 @@
     information and an inline function check_library_version() to check at
     runtime for mismatching header and library versions.  (Bz:#6)
     Available via <stxxl/version.h>
+* Platform Support
+  - Boost 1.46: Boost Filesystem Version 3
 
 Version 1.3.2 (unreleased)
 
