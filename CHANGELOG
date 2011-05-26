@@ -1,3 +1,10 @@
+* New Features
+  - Add defines STXXL_VERSION_{MAJOR,MINOR,PATCHLEVEL} and library routines
+    stxxl::version_{major,minor,patchlevel}() for getting STXXL version
+    information and an inline function check_library_version() to check at
+    runtime for mismatching header and library versions.  (Bz:#6)
+    Available via <stxxl/version.h>
+
 Version 1.3.2 (unreleased)
 
 ------------------------------------------
