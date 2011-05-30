@@ -65,7 +65,7 @@
   ICPC 10.0.026 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 9.1.053  |    x¹      -         x¹        -
   ICPC 9.0.032  |    x¹      -         x¹        -
-  clang++ 2.8   |    x³      -         x³        -
+  clang++ 2.9   |    x       -         x         -
   MSVC 2010 10.0|    -       -         x         -
 * MSVC 2008 9.0 |    -       -         x         -
   MSVC 2005 8.0 |    -       -         x         -
@@ -85,7 +85,6 @@
        icpc 12.0 with pmode support: use with gcc 4.3
  ²   = MCSTL has been superseded by the libstdc++ parallel mode in gcc 4.3,
        full support requires gcc 4.4 or later, only partial support in gcc 4.3
- ³   = with libstdc++ from gcc 4.2
 \endverbatim
  *
  *
