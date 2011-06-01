@@ -57,8 +57,8 @@
   GCC 3.4       |    x       -         x         -
   GCC 3.3       |    o       -         o         -
   GCC 2.95      |    -       -         -         -
-  ICPC 12.0.107 |    x¹    PMODE°¹     x¹      PMODE°¹
-  ICPC 12.0.107 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 12.0.191 |    x¹    PMODE°¹     x¹      PMODE°¹
+  ICPC 12.0.191 |    x¹    MCSTL¹      x¹      MCSTL¹
 * ICPC 11.1.075 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 11.0.084 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 10.1.026 |    x¹    MCSTL¹      x¹      MCSTL¹
