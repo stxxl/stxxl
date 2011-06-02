@@ -57,7 +57,7 @@
   GCC 3.4       |    x       -         x         -
   GCC 3.3       |    o       -         o         -
   GCC 2.95      |    -       -         -         -
-  ICPC 12.0.191 |    x¹    PMODE°¹     x¹      PMODE°¹
+  ICPC 12.0.191 |    x¹    PMODE¹      x¹      PMODE¹
   ICPC 12.0.191 |    x¹    MCSTL¹      x¹      MCSTL¹
 * ICPC 11.1.075 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 11.0.084 |    x¹    MCSTL¹      x¹      MCSTL¹
@@ -76,7 +76,6 @@
  ?   = untested
  MCSTL = supports parallelization using the MCSTL library
  PMODE = supports parallelization using libstdc++ parallel mode
- °   = needs workaround -D__aligned__=ignored
  ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
        gcc does not come in the correct version:
        icpc 9.0: use with gcc 3.x
