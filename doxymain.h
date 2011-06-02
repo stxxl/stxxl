@@ -43,12 +43,12 @@
                 |  stxxl   stxxl     stxxl     stxxl
   compiler      |                   + boost   + boost
 ----------------+----------------------------------------
-  GCC 4.6 c++0x |    x     PMODE²      x       PMODE²
-  GCC 4.6       |    x     PMODE²      x       PMODE²
-  GCC 4.5 c++0x |    x     PMODE²      x       PMODE²
-  GCC 4.5       |    x     PMODE²      x       PMODE²
-* GCC 4.4 c++0x |    x     PMODE²      x       PMODE²
-  GCC 4.4       |    x     PMODE²      x       PMODE²
+  GCC 4.6 c++0x |    x     PMODE       x       PMODE 
+  GCC 4.6       |    x     PMODE       x       PMODE 
+  GCC 4.5 c++0x |    x     PMODE       x       PMODE 
+  GCC 4.5       |    x     PMODE       x       PMODE 
+* GCC 4.4 c++0x |    x     PMODE       x       PMODE 
+  GCC 4.4       |    x     PMODE       x       PMODE 
   GCC 4.3 c++0x |    x     PMODE²      x       PMODE²
   GCC 4.3       |    x     PMODE²      x       PMODE²
   GCC 4.2       |    x     MCSTL       x       MCSTL
@@ -57,7 +57,7 @@
   GCC 3.4       |    x       -         x         -
   GCC 3.3       |    o       -         o         -
   GCC 2.95      |    -       -         -         -
-  ICPC 12.0.191 |    x¹    PMODE¹      x¹      PMODE¹
+  ICPC 12.0.191 |    x¹    PMODE¹²     x¹      PMODE¹²
   ICPC 12.0.191 |    x¹    MCSTL¹      x¹      MCSTL¹
 * ICPC 11.1.075 |    x¹    MCSTL¹      x¹      MCSTL¹
   ICPC 11.0.084 |    x¹    MCSTL¹      x¹      MCSTL¹
@@ -74,16 +74,17 @@
  o   = partial support
  -   = unsupported
  ?   = untested
- MCSTL = supports parallelization using the MCSTL library
  PMODE = supports parallelization using libstdc++ parallel mode
+ MCSTL = supports parallelization using the MCSTL library (superseded by
+       PMODE, introduced in gcc 4.3)
  ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
        gcc does not come in the correct version:
        icpc 9.0: use with gcc 3.x
        icpc 9.1: use with gcc before 4.2
        icpc 10.x, 11.x, 12.0 with mcstl support: use with gcc 4.2
        icpc 12.0 with pmode support: use with gcc 4.3
- ²   = MCSTL has been superseded by the libstdc++ parallel mode in gcc 4.3,
-       full support requires gcc 4.4 or later, only partial support in gcc 4.3
+ ²   = gcc 4.3 only provides partial support for the libstdc++ parallel mode,
+       full support requires gcc 4.4 or later
 \endverbatim
  *
  *
