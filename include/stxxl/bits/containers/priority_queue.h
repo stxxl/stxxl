@@ -329,6 +329,9 @@ public:
                 sizeof(ext_merger_type) * num_ext_groups +
                 dynam_alloc_mem);
     }
+
+    void dump_sizes() const;
+    void dump_params() const;
 };
 
 
@@ -676,6 +679,8 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
     if (spaceIsAvailable_)
     {
         finalLevel = level;
+        if ((level == total_num_groups - 1) && !ext_mergers[level - num_int_groups].is_space_available())
+            dump_sizes();
     }
     else
     {
@@ -793,6 +798,26 @@ void priority_queue<Config_>::empty_insert_heap()
     // special case if the tree was empty before
     if (delete_buffer_current_min == delete_buffer_end)
         refill_delete_buffer();
+}
+
+template <class Config_>
+void priority_queue<Config_>::dump_sizes() const
+{
+    STXXL_MSG("pq::size()\t= " << size());
+    STXXL_MSG("  insert_heap\t= " << insert_heap.size() - 1);
+    STXXL_MSG("  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min));
+    for (int i = 0; i < num_int_groups; ++i)
+        STXXL_MSG("  int grp " << i << " size=" << int_mergers[i].size() << " space=" << int_mergers[i].is_space_available());
+    for (int i = 0; i < num_ext_groups; ++i)
+        STXXL_MSG("  ext grp " << i << " size=" << ext_mergers[i].size() << " space=" << ext_mergers[i].is_space_available());
+    dump_params();
+}
+
+template <class Config_>
+void priority_queue<Config_>::dump_params() const
+{
+    STXXL_MSG("params: delete_buffer_size=" << delete_buffer_size << " N=" << N << " IntKMAX=" << IntKMAX << " num_int_groups=" << num_int_groups << " ExtKMAX=" << ExtKMAX << " num_ext_groups=" << num_ext_groups << " BlockSize=" << BlockSize);
+    STXXL_MSG("max capacity: " << (stxxl::uint64(N) * IntKMAX * IntKMAX * ExtKMAX * ExtKMAX));
 }
 
 namespace priority_queue_local
