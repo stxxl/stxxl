@@ -65,6 +65,9 @@ const char * get_version_string()
 #ifdef STXXL_VERSION_STRING_SVN_REVISION
            " (SVN r" STXXL_VERSION_STRING_SVN_REVISION ")"
 #endif
+#ifdef STXXL_VERSION_STRING_GIT_REVISION
+           " (GIT " STXXL_VERSION_STRING_GIT_REVISION ")"
+#endif
 #ifdef STXXL_VERSION_STRING_PHASE
            " (" STXXL_VERSION_STRING_PHASE ")"
 #else
