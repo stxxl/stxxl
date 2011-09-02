@@ -685,13 +685,32 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
 
     const bool spaceIsAvailable_ =
         (level < num_int_groups) ? int_mergers[level].is_space_available()
-        : ((level == total_num_groups - 1) ? true : (ext_mergers[level - num_int_groups]->is_space_available()));
+        : (ext_mergers[level - num_int_groups]->is_space_available());
 
     if (spaceIsAvailable_)
     {
         finalLevel = level;
-        if ((level == total_num_groups - 1) && !ext_mergers[level - num_int_groups]->is_space_available())
-            dump_sizes();
+    }
+    else if (level == total_num_groups - 1)
+    {
+        size_type capacity = N;
+        for (int i = 0; i < num_int_groups; ++i)
+            capacity *= IntKMAX;
+        for (int i = 0; i < num_ext_groups; ++i)
+            capacity *= ExtKMAX;
+        STXXL_ERRMSG("priority_queue OVERFLOW - all groups full, size=" << size() <<
+                     ", capacity(last externel group (" << num_int_groups + num_ext_groups - 1 << "))=" << capacity);
+        dump_sizes();
+
+        int extLevel = level - num_int_groups;
+        const size_type segmentSize = ext_mergers[extLevel]->size();
+        STXXL_VERBOSE1("Inserting segment into last level external: " << level << " " << segmentSize);
+        ext_merger_type * overflow_merger = new ext_merger_type;
+        overflow_merger->set_pool(pool);
+        overflow_merger->insert_segment(*ext_mergers[extLevel], segmentSize);
+        std::swap(ext_mergers[extLevel], overflow_merger);
+        delete overflow_merger;
+        finalLevel = level;
     }
     else
     {
