@@ -249,6 +249,7 @@ public:
     //! helps to speed up operations.
     priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem);
 
+#if 0
     //! \brief swap this priority queue with another one
     //! Implementation correctness is questionable.
     void swap(priority_queue & obj)
@@ -264,6 +265,9 @@ public:
             for (unsigned_type i2 = 0; i2 < (N + 1); ++i2)
                 std::swap(group_buffers[i1][i2], obj.group_buffers[i1][i2]);
 
+        STXXL_STATIC_ASSERT(false);
+        // Shoot yourself in the foot: group_buffer_current_mins contains pointers into group_buffers ...
+        // either recompute them or add/subtract (&this->group_buffers[0][0] - &obj->group_buffers[0][0])
         swap_1D_arrays(group_buffer_current_mins, obj.group_buffer_current_mins, total_num_groups);
         swap_1D_arrays(delete_buffer, obj.delete_buffer, delete_buffer_size + 1);
         std::swap(delete_buffer_current_min, obj.delete_buffer_current_min);
@@ -273,6 +277,7 @@ public:
         std::swap(num_active_groups, obj.num_active_groups);
         std::swap(size_, obj.size_);
     }
+#endif
 
     virtual ~priority_queue();
 
