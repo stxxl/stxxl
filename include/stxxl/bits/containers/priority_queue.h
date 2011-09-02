@@ -184,7 +184,7 @@ protected:
     int_merger_type int_mergers[num_int_groups];
     pool_type * pool;
     bool pool_owned;
-    ext_merger_type * ext_mergers;
+    ext_merger_type ** ext_mergers;
 
     // one delete buffer for each tree => group buffer
     value_type group_buffers[total_num_groups][N + 1];          // tree->group_buffers->delete_buffer (extra space for sentinel)
@@ -329,7 +329,7 @@ public:
             dynam_alloc_mem += int_mergers[i].mem_cons();
 
         for (int i = 0; i < num_ext_groups; ++i)
-            dynam_alloc_mem += ext_mergers[i].mem_cons();
+            dynam_alloc_mem += ext_mergers[i]->mem_cons();
 
 
         return (sizeof(*this) +
@@ -439,9 +439,11 @@ void priority_queue<Config_>::init()
 {
     assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
 
-    ext_mergers = new ext_merger_type[num_ext_groups];
-    for (unsigned_type j = 0; j < num_ext_groups; ++j)
-        ext_mergers[j].set_pool(pool);
+    ext_mergers = new ext_merger_type*[num_ext_groups];
+    for (unsigned_type j = 0; j < num_ext_groups; ++j) {
+        ext_mergers[j] = new ext_merger_type;
+        ext_mergers[j]->set_pool(pool);
+    }
 
     value_type sentinel = cmp.min_value();
     insert_heap.push(sentinel);                                // always keep the sentinel
@@ -461,6 +463,8 @@ priority_queue<Config_>::~priority_queue()
     if (pool_owned)
         delete pool;
 
+    for (unsigned_type j = 0; j < num_ext_groups; ++j)
+        delete ext_mergers[j];
     delete[] ext_mergers;
 }
 
@@ -476,7 +480,7 @@ unsigned_type priority_queue<Config_>::refill_group_buffer(unsigned_type group)
     unsigned_type length;
     size_type group_size = (group < num_int_groups) ?
                            int_mergers[group].size() :
-                           ext_mergers[group - num_int_groups].size();                         //elements left in segments
+                           ext_mergers[group - num_int_groups]->size();                        // elements left in segments
     unsigned_type left_elements = group_buffers[group] + N - group_buffer_current_mins[group]; //elements left in target buffer
     if (group_size + left_elements >= size_type(N))
     {                                                                                          // buffer will be filled completely
@@ -499,7 +503,7 @@ unsigned_type priority_queue<Config_>::refill_group_buffer(unsigned_type group)
         if (group < num_int_groups)
             int_mergers[group].multi_merge(target + left_elements, length);
         else
-            ext_mergers[group - num_int_groups].multi_merge(
+            ext_mergers[group - num_int_groups]->multi_merge(
                 target + left_elements,
                 target + left_elements + length);
     }
@@ -681,12 +685,12 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
 
     const bool spaceIsAvailable_ =
         (level < num_int_groups) ? int_mergers[level].is_space_available()
-        : ((level == total_num_groups - 1) ? true : (ext_mergers[level - num_int_groups].is_space_available()));
+        : ((level == total_num_groups - 1) ? true : (ext_mergers[level - num_int_groups]->is_space_available()));
 
     if (spaceIsAvailable_)
     {
         finalLevel = level;
-        if ((level == total_num_groups - 1) && !ext_mergers[level - num_int_groups].is_space_available())
+        if ((level == total_num_groups - 1) && !ext_mergers[level - num_int_groups]->is_space_available())
             dump_sizes();
     }
     else
@@ -711,13 +715,13 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
             {
                 const unsigned_type segmentSize = int_mergers[num_int_groups - 1].size();
                 STXXL_VERBOSE_PQ("make_space... Inserting segment into first level external: " << level << " " << segmentSize);
-                ext_mergers[0].insert_segment(int_mergers[num_int_groups - 1], segmentSize);
+                ext_mergers[0]->insert_segment(int_mergers[num_int_groups - 1], segmentSize);
             }
             else // from external to external tree
             {
-                const size_type segmentSize = ext_mergers[level - num_int_groups].size();
+                const size_type segmentSize = ext_mergers[level - num_int_groups]->size();
                 STXXL_VERBOSE_PQ("make_space... Inserting segment into second level external: " << level << " " << segmentSize);
-                ext_mergers[level - num_int_groups + 1].insert_segment(ext_mergers[level - num_int_groups], segmentSize);
+                ext_mergers[level - num_int_groups + 1]->insert_segment(*ext_mergers[level - num_int_groups], segmentSize);
             }
         }
     }
@@ -825,8 +829,8 @@ void priority_queue<Config_>::dump_sizes() const
         capacity *= ExtKMAX;
         STXXL_MSG("  grp " << i + num_int_groups << " ext" <<
                 " grpbuf=" << current_group_buffer_size(i + num_int_groups) <<
-                " size=" << ext_mergers[i].size() << "/" << capacity <<
-                " space=" << ext_mergers[i].is_space_available());
+                " size=" << ext_mergers[i]->size() << "/" << capacity <<
+                " space=" << ext_mergers[i]->is_space_available());
     }
     dump_params();
 }
