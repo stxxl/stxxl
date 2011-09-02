@@ -181,8 +181,15 @@ getmodesuffix:
 	@echo "$(LIBEXTRA)"
 
 
+define awkprog-get-stxxl-version
+/define STXXL_VERSION_MAJOR/ { a = $$3 }
+/define STXXL_VERSION_MINOR/ { b = $$3 }
+/define STXXL_VERSION_PATCHLEVEL/ { c = $$3 }
+END { print a "." b "." c }
+endef
+
 ifneq (,$(_have_svn_repo)$(_have_git_repo))
-VERSION		?= $(shell grep 'define *STXXL_VERSION_STRING_MA_MI_PL' common/version.cpp | cut -d'"' -f2)
+VERSION		?= $(shell awk '$(awkprog-get-stxxl-version)' include/stxxl/bits/version.h)
 PHASE		?= snapshot
 DATE		?= $(shell date "+%Y%m%d")
 REL_VERSION	:= $(VERSION)$(if $(strip $(DATE)),-$(DATE))
