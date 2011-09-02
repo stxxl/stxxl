@@ -803,13 +803,24 @@ void priority_queue<Config_>::empty_insert_heap()
 template <class Config_>
 void priority_queue<Config_>::dump_sizes() const
 {
+    unsigned_type capacity = N;
     STXXL_MSG("pq::size()\t= " << size());
-    STXXL_MSG("  insert_heap\t= " << insert_heap.size() - 1);
-    STXXL_MSG("  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min));
-    for (int i = 0; i < num_int_groups; ++i)
-        STXXL_MSG("  int grp " << i << " size=" << int_mergers[i].size() << " space=" << int_mergers[i].is_space_available());
-    for (int i = 0; i < num_ext_groups; ++i)
-        STXXL_MSG("  ext grp " << i << " size=" << ext_mergers[i].size() << " space=" << ext_mergers[i].is_space_available());
+    STXXL_MSG("  insert_heap\t= " << insert_heap.size() - 1 << "/" << capacity);
+    STXXL_MSG("  delete_buffer\t= " << (delete_buffer_end - delete_buffer_current_min) << "/" << delete_buffer_size);
+    for (int i = 0; i < num_int_groups; ++i) {
+        capacity *= IntKMAX;
+        STXXL_MSG("  grp " << i << " int" <<
+                " grpbuf=" << current_group_buffer_size(i) <<
+                " size=" << int_mergers[i].size() << "/" << capacity << 
+                " space=" << int_mergers[i].is_space_available());
+    }
+    for (int i = 0; i < num_ext_groups; ++i) {
+        capacity *= ExtKMAX;
+        STXXL_MSG("  grp " << i + num_int_groups << " ext" <<
+                " grpbuf=" << current_group_buffer_size(i + num_int_groups) <<
+                " size=" << ext_mergers[i].size() << "/" << capacity <<
+                " space=" << ext_mergers[i].is_space_available());
+    }
     dump_params();
 }
 
@@ -817,7 +828,6 @@ template <class Config_>
 void priority_queue<Config_>::dump_params() const
 {
     STXXL_MSG("params: delete_buffer_size=" << delete_buffer_size << " N=" << N << " IntKMAX=" << IntKMAX << " num_int_groups=" << num_int_groups << " ExtKMAX=" << ExtKMAX << " num_ext_groups=" << num_ext_groups << " BlockSize=" << BlockSize);
-    STXXL_MSG("max capacity: " << (stxxl::uint64(N) * IntKMAX * IntKMAX * ExtKMAX * ExtKMAX));
 }
 
 namespace priority_queue_local
