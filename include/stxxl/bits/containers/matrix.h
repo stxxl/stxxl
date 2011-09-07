@@ -1163,7 +1163,7 @@ public:
     //!    4: strassen_winograd_multiply (optimized pre- and postadditions) \n
     //!    5: strassen_winograd_multiply_and_add_interleaved (optimized preadditions) \n
     //!    6: multi_level_strassen_winograd_multiply_and_add_block_grained
-    matrix_type multiply (const matrix_type & right, const int_type multiplication_algorithm = 2, const int_type scheduling_algorithm = 2) const
+    matrix_type multiply (const matrix_type & right, const int_type multiplication_algorithm = 1, const int_type scheduling_algorithm = 2) const
     {
         assert(width == right.height);
         assert(& data->bs == & right.data->bs);
@@ -1290,17 +1290,10 @@ public:
 protected:
     void multiply_internal(const matrix_type & right, matrix_type & res) const
     {
-
-        ValueType * A = 0,
-                  * B = 0,
-                  * C = 0;
+        ValueType * A = new ValueType[height * width];
+        ValueType * B = new ValueType[right.height * right.width];
+        ValueType * C = new ValueType[res.height * res.width];
         ValueType * vit;
-        if (! res.data->bs.is_simulating())
-        {
-            A = new ValueType[height * width];
-            B = new ValueType[right.height * right.width];
-            C = new ValueType[res.height * res.width];
-        }
         vit = A;
         for(const_row_major_iterator mit = cbegin(); mit != cend(); ++mit, ++vit)
             *vit = *mit;
@@ -1314,17 +1307,14 @@ protected:
                                       false, B,
                         ValueType(0), false, C);
             #else
-                assert(false);
+                assert(false /* internal multiplication is only available for testing with blas */);
             #endif
         vit = C;
         for(row_major_iterator mit = res.begin(); mit != res.end(); ++mit, ++vit)
             *mit = *vit;
-        if (! res.data->bs.is_simulating())
-        {
-            delete A;
-            delete B;
-            delete C;
-        }
+        delete A;
+        delete B;
+        delete C;
     }
 };
 

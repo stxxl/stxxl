@@ -19,7 +19,10 @@
 __STXXL_BEGIN_NAMESPACE
 
 #ifndef STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS
-#define STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS 4
+#define STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS 3
+#endif
+#ifndef STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE
+#define STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE 2
 #endif
 
 template <typename ValueType>
@@ -966,11 +969,13 @@ struct matrix_to_quadtree_block_grained<ValueType, BlockSideLength, 0, Granulari
     swappable_block_matrix_type m;
 
     inline matrix_to_quadtree_block_grained(const swappable_block_matrix_type & matrix)
-        : m(matrix, matrix.get_height(), matrix.get_width(), 0, 0) {}
+        : m(matrix, matrix.get_height(), matrix.get_width(), 0, 0)
+    { assert(! (matrix.get_height() % Granularity | matrix.get_width() % Granularity)); }
 
     inline matrix_to_quadtree_block_grained(const swappable_block_matrix_type & matrix,
             const size_type height, const size_type width, const size_type from_row, const size_type from_col)
-        : m(matrix, height, width, from_row, from_col) {}
+        : m(matrix, height, width, from_row, from_col)
+    { assert(! (matrix.get_height() % Granularity | matrix.get_width() % Granularity)); }
 
     inline swappable_block_matrix_type operator () (const size_type & row, const size_type & col)
     {
@@ -978,10 +983,10 @@ struct matrix_to_quadtree_block_grained<ValueType, BlockSideLength, 0, Granulari
     }
 
     inline const size_type get_height()
-    { return div_ceil(m.get_height(), Granularity); }
+    { return m.get_height() / Granularity; }
 
     inline const size_type get_width()
-    { return div_ceil(m.get_width(), Granularity); }
+    { return m.get_width() / Granularity; }
 };
 
 template <typename ValueType, unsigned BlockSideLength>
@@ -1382,9 +1387,8 @@ struct matrix_operations
                                                    const swappable_block_matrix_type & B,
                                                    swappable_block_matrix_type & C)
     {
-        int_type num_levels = log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())) /
-                                        strassen_winograd_base_case_size);
-        if (num_levels > 1)
+        int_type num_levels = log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
         {
             if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS)
                 num_levels = STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS;
@@ -1396,23 +1400,28 @@ struct matrix_operations
                                                  round_up_to_power_of_two(C.get_width(), num_levels), 0, 0);
             switch (num_levels)
             {
-            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 5)
+            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 5 && 5 > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
             case 5:
                 use_feedable_sw_block_grained<5>(padded_a, padded_a, padded_c);
                 break;
             #endif
-            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 4)
+            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 4 && 4 > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
             case 4:
                 use_feedable_sw_block_grained<4>(padded_a, padded_a, padded_c);
                 break;
             #endif
-            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 3)
+            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 3 && 3 > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
             case 3:
                 use_feedable_sw_block_grained<3>(padded_a, padded_a, padded_c);
                 break;
             #endif
+            #if (STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS >= 2 && 2 > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
             case 2:
                 use_feedable_sw_block_grained<2>(padded_a, padded_a, padded_c);
+                break;
+            #endif
+            default:  // only here in case of wrong bounds
+                strassen_winograd_multiply_and_add_interleaved(A, B, C);
                 break;
             }
         }
