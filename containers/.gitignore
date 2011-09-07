@@ -1,0 +1,15 @@
+/*.d
+/*.dT
+/*.o
+/*.ilk
+/*.bin
+/*.obj
+/*.lib
+/*.exe
+/*.exe.manifest
+/*.exp
+/.swp
+/.*.swp
+/.stxxl
+/stxxl.log
+/stxxl.errlog

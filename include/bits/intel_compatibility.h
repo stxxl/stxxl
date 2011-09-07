@@ -31,4 +31,17 @@ T1 __in_icc_there_is_no__sync_fetch_and_add(T1 *, T2);
 
 #endif
 
+#if defined(__ICC) && (__ICC == 1200) \
+    && defined(__GNUG__) \
+    && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) == 40300) \
+    && defined(__x86_64)
+
+// work around issue 613263 (non-type template parameter not accepted as attribute value)
+// http://software.intel.com/en-us/forums/showthread.php?t=65041
+#define __aligned__ ignored
+#include <tr1/type_traits>
+#undef __aligned__
+
+#endif
+
 #endif // !STXXL_MCSTL_INTEL_COMPATIBILITY_HEADER_INCLUDED

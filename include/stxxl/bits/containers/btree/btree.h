@@ -336,6 +336,7 @@ namespace btree
                 assert(nparents >= 2);
                 STXXL_VERBOSE1("btree bulk constructBids.size() " << Bids.size() << " nparents: " << nparents << " max_ns: "
                                                                   << max_node_elements);
+                STXXL_UNUSED(nparents);
                 typename key_bid_vector_type::const_iterator it = Bids.begin();
 
                 do

@@ -198,7 +198,7 @@ namespace priority_queue_local
         }
 
         void insert_segment(Element * target, unsigned_type length); // insert segment beginning at target
-        unsigned_type size() { return size_; }
+        unsigned_type size() const { return size_; }
     };
 
 ///////////////////////// LoserTree ///////////////////////////////////

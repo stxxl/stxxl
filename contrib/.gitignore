@@ -1,0 +1,16 @@
+/*.d
+/*.dT
+/*.obj
+/*.ilk
+/*.bin
+/*.obj
+/*.lib
+/*.exe
+/*.exe.manifest
+/.swp
+/.*.swp
+/version.defs
+/version_svn.defs
+/.stxxl
+/stxxl.log
+/stxxl.errlog

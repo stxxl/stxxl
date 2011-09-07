@@ -12,6 +12,7 @@
 
 #include <stxxl/io>
 #include <stxxl/mng>
+#include <stxxl/version.h>
 #include <stxxl/bits/compat/shared_ptr.h>
 
 int main(int argc, char **)
@@ -20,6 +21,13 @@ int main(int argc, char **)
     stxxl::block_manager::get_instance();
     stxxl::stats::get_instance();
     stxxl::disk_queues::get_instance();
+
+    if (stxxl::check_library_version() != 0)
+        STXXL_ERRMSG("version mismatch between headers and library");
+    assert(stxxl::version_major() == STXXL_VERSION_MAJOR);
+    assert(stxxl::version_minor() == STXXL_VERSION_MINOR);
+    assert(stxxl::version_patchlevel() == STXXL_VERSION_PATCHLEVEL);
+
 #ifdef STXXL_PARALLEL_MODE
 #ifdef _GLIBCXX_PARALLEL
     STXXL_MSG("_GLIBCXX_PARALLEL, max threads = " << omp_get_max_threads());

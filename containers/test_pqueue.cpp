@@ -97,10 +97,12 @@ int main()
     Timer.stop();
     STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");
 
+#if 0
     // test swap
     pq_type p1(pool);
     std::swap(p, p1);
     std::swap(p, p1);
+#endif
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
     Timer.reset();

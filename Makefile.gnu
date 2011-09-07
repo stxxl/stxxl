@@ -100,7 +100,10 @@ ifeq (,$(wildcard lib/lib$(LIBNAME).$(LIBEXT)))
 library-fast: library_utils
 endif
 
-ifneq (,$(wildcard .svn))
+_have_svn_repo	:= $(wildcard .svn)
+_have_git_repo	:= $(wildcard .git)
+
+ifneq (,$(_have_svn_repo)$(_have_git_repo))
 lib-in-common: common/version_svn.defs
 
 GET_SVNVERSION		?= LC_ALL=POSIX svnversion $(realpath $1)
@@ -109,6 +112,8 @@ GET_SVN_INFO_SED	?= sed
 GET_SVN_INFO_DATE	?= $(call GET_SVN_INFO, $1) | $(GET_SVN_INFO_SED) -n -e '/Last Changed Date/{' -e 's/.*: //' -e 's/ .*//' -e 's/-//g' -e 'p' -e '}'
 GET_SVN_INFO_REV	?= $(call GET_SVN_INFO, $1) | $(GET_SVN_INFO_SED) -n -e '/Last Changed Rev/s/.*: //p'
 GET_SVN_INFO_BRANCH	?= $(call GET_SVN_INFO, $1) | $(GET_SVN_INFO_SED) -n -e '/URL/{' -e 's/.*\/svnroot\/stxxl//' -e '/branches/s/\/branches\///p' -e '}'
+
+ifneq (,$(_have_svn_repo))
 
 STXXL_SVN_BRANCH	:= $(shell $(call GET_SVN_INFO_BRANCH, .))
 
@@ -120,6 +125,13 @@ else
 # modified, mixed, ... checkout - use svnversion and today
 STXXL_VERSION_DATE	:= $(shell date "+%Y%m%d")
 STXXL_VERSION_SVN_REV	:= $(shell $(call GET_SVNVERSION, .))
+endif
+
+else # git
+
+STXXL_VERSION_GIT_REV	:= $(shell git describe --all --always --dirty --long)
+STXXL_VERSION_DATE	:= $(shell $(if $(findstring dirty,$(STXXL_VERSION_GIT_REV)),date "+%Y%m%d",git log -1 --date=short | awk '/^Date/ { gsub("-",""); print $$2 }'))
+
 endif
 
 # get the svn revision of the MCSTL, if possible
@@ -141,7 +153,8 @@ endif
 common/version_svn.defs:
 	$(RM) $@.$(LIBNAME).tmp
 	echo '#define STXXL_VERSION_STRING_DATE "$(STXXL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp
-	echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(STXXL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp
+	$(if $(STXXL_VERSION_SVN_REV),echo '#define STXXL_VERSION_STRING_SVN_REVISION "$(STXXL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp)
+	$(if $(STXXL_VERSION_GIT_REV),echo '#define STXXL_VERSION_STRING_GIT_REVISION "$(STXXL_VERSION_GIT_REV)"' >> $@.$(LIBNAME).tmp)
 	$(if $(STXXL_SVN_BRANCH), echo '#define STXXL_VERSION_STRING_SVN_BRANCH "$(STXXL_SVN_BRANCH)"' >> $@.$(LIBNAME).tmp)
 	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_DATE "$(MCSTL_VERSION_DATE)"' >> $@.$(LIBNAME).tmp)
 	$(if $(MCSTL_VERSION_SVN_REV), echo '#define MCSTL_VERSION_STRING_SVN_REVISION "$(MCSTL_VERSION_SVN_REV)"' >> $@.$(LIBNAME).tmp)
@@ -168,16 +181,28 @@ getmodesuffix:
 	@echo "$(LIBEXTRA)"
 
 
-ifneq (,$(wildcard .svn))
-VERSION		?= $(shell grep 'define *STXXL_VERSION_STRING_MA_MI_PL' common/version.cpp | cut -d'"' -f2)
+define awkprog-get-stxxl-version
+/define STXXL_VERSION_MAJOR/ { a = $$3 }
+/define STXXL_VERSION_MINOR/ { b = $$3 }
+/define STXXL_VERSION_PATCHLEVEL/ { c = $$3 }
+END { print a "." b "." c }
+endef
+
+ifneq (,$(_have_svn_repo)$(_have_git_repo))
+VERSION		?= $(shell awk '$(awkprog-get-stxxl-version)' include/stxxl/bits/version.h)
 PHASE		?= snapshot
 DATE		?= $(shell date "+%Y%m%d")
 REL_VERSION	:= $(VERSION)$(if $(strip $(DATE)),-$(DATE))
 release:
 	$(RM) -r reltmp stxxl-$(REL_VERSION).tar.gz stxxl-$(REL_VERSION).zip
 	mkdir reltmp
+ifneq (,$(_have_svn_repo))
 	svn export . reltmp/stxxl-$(REL_VERSION)
+else
+	git archive --prefix=stxxl-$(REL_VERSION)/ HEAD | tar xf - -C reltmp
+endif
 	$(RM) -r reltmp/stxxl-$(REL_VERSION)/homepage
+	find reltmp -name .gitignore -exec rm {} +
 	echo '#define STXXL_VERSION_STRING_PHASE "$(PHASE)"' > reltmp/stxxl-$(REL_VERSION)/common/version.defs
 	$(if $(strip $(DATE)),echo '#define STXXL_VERSION_STRING_DATE "$(DATE)"' >> reltmp/stxxl-$(REL_VERSION)/common/version.defs)
 	cd reltmp && tar cf - stxxl-$(REL_VERSION) | gzip -9 > ../stxxl-$(REL_VERSION).tar.gz && zip -r ../stxxl-$(REL_VERSION).zip stxxl-$(REL_VERSION)/* 
@@ -185,7 +210,11 @@ release:
 	@echo
 	@echo "Your release has been created in stxxl-$(REL_VERSION).tar.gz and stxxl-$(REL_VERSION).zip"
 	@echo "The following files are modified and not committed:"
+ifneq (,$(_have_svn_repo))
 	@svn status -q
+else
+	@git status -s
+endif
 endif
 
 

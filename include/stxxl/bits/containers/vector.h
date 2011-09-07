@@ -713,7 +713,7 @@ public:
 //! For semantics of the methods see documentation of the STL std::vector
 //! \tparam Tp_ type of contained objects (POD with no references to internal memory)
 //! \tparam PgSz_ number of blocks in a page
-//! \tparam PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is number of pages,
+//! \tparam PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is the default number of pages,
 //!  default is \c lru_pager<8>
 //! \tparam BlkSize_ external block size in bytes, default is 2 MiB
 //! \tparam AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
@@ -747,7 +747,6 @@ public:
     enum constants {
         block_size = BlkSize_,
         page_size = PgSz_,
-        n_pages = pager_type::n_pages,
         on_disk = -1
     };
 
@@ -806,12 +805,17 @@ private:
     }
 
 public:
-    vector(size_type n = 0) :
+    //! \brief Constructs external vector.
+    //!
+    //! \param n Number of elements.
+    //! \param npages Number of cached pages.
+    vector(size_type n = 0, unsigned_type npages = pager_type().size()) :
         _size(n),
         _bids(div_ceil(n, block_type::size)),
+        pager (npages),
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
-        _slot_to_page(n_pages),
+        _slot_to_page(npages),
         _cache(NULL),
         _from(NULL),
         exported(false)
@@ -828,7 +832,7 @@ public:
             _page_to_slot[i] = on_disk;
         }
 
-        for (i = 0; i < n_pages; ++i)
+        for (i = 0; i < numpages(); ++i)
             _free_slots.push(i);
 
         bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
@@ -851,8 +855,9 @@ public:
 
     void allocate_page_cache() const
     {
-        if (!_cache)
-            _cache = new simple_vector<block_type>(n_pages * page_size);
+        //  numpages() might be zero
+        if (!_cache && numpages() > 0)
+            _cache = new simple_vector<block_type> (numpages() * page_size);
     }
 
     // allows to free the cache, but you may not access any element until call allocate_pacge_cache() again
@@ -978,7 +983,7 @@ public:
             _free_slots.pop();
 
 
-        for (int_type i = 0; i < n_pages; ++i)
+        for (int_type i = 0; i < numpages(); ++i)
             _free_slots.push(i);
     }
 
@@ -1012,15 +1017,18 @@ public:
 
     //! \brief Construct vector from a file
     //! \param from file to be constructed from
+    //! \param size Number of elements.
+    //! \param npages Number of cached pages.
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(Tp_) and the page size (4096).
-    vector(file * from, size_type size = size_type(-1)) :
+    vector(file * from, size_type size = size_type(-1), size_type npages = pager_type ().size ()) :
         _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
         _bids(div_ceil(_size, size_type(block_type::size))),
+        pager(npages),
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
-        _slot_to_page(n_pages),
+        _slot_to_page(npages),
         _cache(NULL),
         _from(from),
         exported(false)
@@ -1046,7 +1054,7 @@ public:
             _page_to_slot[i] = on_disk;
         }
 
-        for (i = 0; i < n_pages; ++i)
+        for (i = 0; i < numpages(); ++i)
             _free_slots.push(i);
 
 
@@ -1064,9 +1072,10 @@ public:
     vector(const vector & obj) :
         _size(obj.size()),
         _bids(div_ceil(obj.size(), block_type::size)),
+        pager(obj.numpages ()),
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
-        _slot_to_page(n_pages),
+        _slot_to_page(obj.numpages ()),
         _cache(NULL),
         _from(NULL),
         exported(false)
@@ -1084,7 +1093,7 @@ public:
             _page_to_slot[i] = on_disk;
         }
 
-        for (i = 0; i < n_pages; ++i)
+        for (i = 0; i < numpages(); ++i)
             _free_slots.push(i);
 
         bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
@@ -1178,9 +1187,9 @@ public:
 
     void flush() const
     {
-        simple_vector<bool> non_free_slots(n_pages);
+        simple_vector<bool> non_free_slots(numpages());
         int_type i = 0;
-        for ( ; i < n_pages; i++)
+        for ( ; i < numpages(); i++)
             non_free_slots[i] = true;
 
         while (!_free_slots.empty())
@@ -1189,7 +1198,7 @@ public:
             _free_slots.pop();
         }
 
-        for (i = 0; i < n_pages; i++)
+        for (i = 0; i < numpages(); i++)
         {
             _free_slots.push(i);
             int_type page_no = _slot_to_page[i];
@@ -1278,6 +1287,12 @@ public:
         _page_status.resize(new_pages, valid_on_disk);
         _page_to_slot.resize(new_pages, on_disk);
         _size = n;
+    }
+
+    //! Number of pages used by the pager.
+    inline int_type numpages() const
+    {
+      return pager.size ();
     }
 
 private:
