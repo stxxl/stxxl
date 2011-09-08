@@ -23,6 +23,9 @@ test_aligned.$o:	OPT_LEVEL = 0
 
 
 ifeq ($(strip $(USE_MCSTL)),yes)
+# ICPC 12.0: internal error: backend signals (issue 613286)
+$(call reduce_optimization,3,0,test_block_scheduler,Version_12.0,any,any)
+
 # ICPC 11.0: internal error: 0_1374 (issue 539748)
 $(call reduce_optimization,3,0,test_block_alloc_strategy,Version_11.0,any,any)
 

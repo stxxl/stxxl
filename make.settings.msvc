@@ -186,6 +186,8 @@ CONTAINER_FILES	 = \
 	$(HEADER_PATH)/containers/queue.h \
 	$(HEADER_PATH)/containers/map.h \
 	$(HEADER_PATH)/containers/deque.h \
+	$(HEADER_PATH)/containers/matrix.h \
+	$(HEADER_PATH)/containers/matrix_layouts.h \
 	$(HEADER_PATH)/containers/btree/btree.h \
 	$(HEADER_PATH)/containers/btree/iterator_map.h \
 	$(HEADER_PATH)/containers/btree/leaf.h \

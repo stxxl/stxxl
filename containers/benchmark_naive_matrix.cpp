@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/benchmark_naive_matrix.cpp
+ *  containers/test_matrix.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! \example containers/benchmark_naive_matrix.cpp
+//! \example containers/test_matrix.cpp
 //! This is an example of how to represent a 2D matrix by using an \c stxxl::vector.
 //! DISCLAIMER: The approach is very basic and the matrix multiplication is NOT I/O-EFFICIENT.
 

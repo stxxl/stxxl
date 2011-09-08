@@ -174,6 +174,53 @@ inline void swap_1D_arrays(T * a, T * b, unsigned_type size)
 
 ////////////////////////////////////////////////////////////////////////////
 
+template <typename Integral>
+inline Integral round_up_to_power_of_two(Integral n, unsigned_type power)
+{
+    Integral pot = 1 << power, // = 0..0 1 0^power
+             mask = pot - 1;   // = 0..0 0 1^power
+    if (n & mask)  // n not divisible by pot
+        return (n & ~mask) + pot;
+    else
+        return n;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+template <class Container>
+inline typename Container::value_type pop(Container & c)
+{
+    typename Container::value_type r = c.top();
+    c.pop();
+    return r;
+}
+
+template <class Container>
+inline typename Container::value_type pop_front(Container & c)
+{
+    typename Container::value_type r = c.front();
+    c.pop_front();
+    return r;
+}
+
+template <class Container>
+inline typename Container::value_type pop_back(Container & c)
+{
+    typename Container::value_type r = c.back();
+    c.pop_back();
+    return r;
+}
+
+template <class Container>
+inline typename Container::value_type pop_begin(Container & c)
+{
+    typename Container::value_type r = *c.begin();
+    c.erase(c.begin());
+    return r;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_UTILS_HEADER

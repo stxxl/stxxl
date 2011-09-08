@@ -78,6 +78,7 @@ containers\test_vector_export
 containers\write_vector "%STXXL_TMPDIR%\in" "%STXXL_TMPDIR%\out"
 containers\write_vector2 "%STXXL_TMPDIR%\in" "%STXXL_TMPDIR%\out"
 containers\benchmark_naive_matrix
+containers\test_matrix
 containers\test_map 32
 containers\test_map_random 2000
 containers\btree\test_btree 10000

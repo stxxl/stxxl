@@ -75,6 +75,11 @@ unittest.$(EXEEXT): unittest.cpp
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) $(CPPUNIT_COMPILER_OPTIONS) -c unittest.cpp
 	$(LINKER) unittest.$(OBJEXT) $(OUT)unittest.$(EXEEXT) $(STXXL_LINKER_OPTIONS) $(CPPUNIT_LINKER_OPTIONS)
 
+test_block_scheduler: test_block_scheduler.$(EXEEXT)
+test_block_scheduler.$(EXEEXT): test_block_scheduler.cpp $(DEPENDENCIES)
+        $(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_block_scheduler.cpp -DSTXXL_VERBOSE_LEVEL=0
+        $(LINKER)  test_block_scheduler.$(OBJEXT) $(OUT)test_block_scheduler.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
+
 
 clean:
 	$(RM) $(CLEAN_TARGETS)
