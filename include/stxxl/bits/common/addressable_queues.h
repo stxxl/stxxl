@@ -21,7 +21,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief An internal fifo queue that allows removing elements addressed with (a copy of) themself.
+//! \brief An internal fifo queue that allows removing elements addressed with (a copy of) themselves.
 //! \tparam KeyType Type of contained elements.
 template <typename KeyType>
 class addressable_fifo_queue
@@ -101,7 +101,7 @@ public:
     }
 };
 
-//! \brief An internal priority queue that allows removing elements addressed with (a copy of) themself.
+//! \brief An internal priority queue that allows removing elements addressed with (a copy of) themselves.
 //! \tparam KeyType Type of contained elements.
 //! \tparam PriorityType Type of Priority.
 template < typename KeyType, typename PriorityType, class Cmp = std::less<PriorityType> >

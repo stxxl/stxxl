@@ -20,8 +20,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-// +-+-+-+-+-+-+ matrix version with swappable_blocks +-+-+-+-+-+-+-+-+-+-+-+-+-+
-
 /* index-variable naming convention:
  * [MODIFIER_][UNIT_]DIMENSION[_in_[MODIFIER_]ENVIRONMENT]
  *
@@ -40,7 +38,8 @@ __STXXL_BEGIN_NAMESPACE
 template <typename ValueType, unsigned BlockSideLength>
 class matrix;
 
-//! \brief External column-vector container.
+//! \brief external column-vector container for matrix multiplication
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
 template <typename ValueType>
 class column_vector : public vector<ValueType>
 {
@@ -50,6 +49,7 @@ public:
 
     using vector_type::size;
 
+    //! \param n number of elements
     column_vector(size_type n = 0)
         : vector_type(n) {}
 
@@ -109,7 +109,8 @@ public:
     }
 };
 
-//! \brief External row-vector container.
+//! \brief external row-vector container for matrix multiplication
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
 template <typename ValueType>
 class row_vector : public vector<ValueType>
 {
@@ -119,6 +120,7 @@ public:
 
     using vector_type::size;
 
+    //! \param n number of elements
     row_vector(size_type n = 0)
         : vector_type(n) {}
 
@@ -191,6 +193,9 @@ public:
 };
 
 //! \brief Specialized swappable_block that interprets uninitialized as containing zeros.
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
+//!
 //! When initializing, all values are set to zero.
 template <typename ValueType, unsigned BlockSideLength>
 class matrix_swappable_block : public swappable_block<ValueType, BlockSideLength * BlockSideLength>
@@ -214,6 +219,8 @@ public:
 };
 
 //! \brief External container for a (sub)matrix. Not intended for direct use.
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
 //!
 //! Stores blocks only, so all measures (height, width, row, col) are in blocks.
 template <typename ValueType, unsigned BlockSideLength>
@@ -238,15 +245,15 @@ protected:
     size_type height,
     //! \brief width of the matrix in blocks
               width,
-    //! \brief height copied from supermatrix
+    //! \brief height copied from supermatrix in blocks
               height_from_supermatrix,
-    //! \brief width copied from supermatrix
+    //! \brief width copied from supermatrix in blocks
               width_from_supermatrix;
     //! \brief the matrice's blocks in row-major
     blocks_type blocks;
     //! \brief if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
-
+    //! \brief get identifier of the block at (row, col)
     swappable_block_identifier_type & bl(const size_type row, const size_type col)
     { return blocks[row * width + col]; }
 
@@ -360,7 +367,7 @@ public:
     static int_type elem_index_in_block_from_elem(elem_size_type index)
     { return index % BlockSideLength; }
 
-    // takes care about transposed
+    // regards transposed
     int_type elem_index_in_block_from_elem(elem_size_type row, elem_size_type col) const
     {
         return (is_transposed())
@@ -380,6 +387,7 @@ public:
     const size_type & get_width() const
     { return width; }
 
+    //! \brief if the elements inside the blocks are in transposed order i.e. column-major
     const bool & is_transposed() const
     { return elements_in_blocks_transposed; }
 
@@ -404,6 +412,9 @@ public:
     }
 };
 
+//! \brief general iterator type that points to single elements inside a matrix
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
 class matrix_iterator
 {
@@ -466,6 +477,7 @@ protected:
         current_block_row = -1;
         current_block_col = -1;
     }
+
 public:
     matrix_iterator(const matrix_iterator & other)
         : m(other.m),
@@ -550,7 +562,8 @@ public:
         return current_row == other.current_row && current_col == other.current_col && m == other.m;
     }
 
-    // do not store reference
+    //! \brief Returns reference access to the element referenced by the iterator.
+    //! The reference is only valid so long as the iterator is not moved.
     ValueType & operator * ()
     {
         acquire_current_iblock();
@@ -558,6 +571,9 @@ public:
     }
 };
 
+//! \brief row-major iterator that points to single elements inside a matrix
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
 class matrix_row_major_iterator : public matrix_iterator<ValueType, BlockSideLength>
 {
@@ -620,6 +636,9 @@ public:
     using matrix_iterator_type::set_pos;
 };
 
+//! \brief column-major iterator that points to single elements inside a matrix
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
 class matrix_col_major_iterator : public matrix_iterator<ValueType, BlockSideLength>
 {
@@ -682,6 +701,9 @@ public:
     using matrix_iterator_type::set_pos;
 };
 
+//! \brief general const_iterator type that points to single elements inside a matrix
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
 class const_matrix_iterator
 {
@@ -839,7 +861,8 @@ public:
         return current_row == other.current_row && current_col == other.current_col && m == other.m;
     }
 
-    // do not store reference
+    //! \brief Returns reference access to the element referenced by the iterator.
+    //! The reference is only valid so long as the iterator is not moved.
     const ValueType & operator * ()
     {
         acquire_current_iblock();
@@ -847,6 +870,9 @@ public:
     }
 };
 
+//! \brief row-major const_iterator that points to single elements inside a matrix
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
 class const_matrix_row_major_iterator : public const_matrix_iterator<ValueType, BlockSideLength>
 {
@@ -913,6 +939,9 @@ public:
     using const_matrix_iterator_type::set_pos;
 };
 
+//! \brief column-major const_iterator that points to single elements inside a matrix
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
 class const_matrix_col_major_iterator : public const_matrix_iterator<ValueType, BlockSideLength>
 {
@@ -980,6 +1009,12 @@ public:
 };
 
 //! \brief External matrix container.
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam BlockSideLength side length of a matrix block
+//!
+//! Divides the matrix in square submatrices (blocks).
+//! Blocks can be swapped individually to and from external memory.
+//! They are only swapped if necessary to minimize I/O.
 template <typename ValueType, unsigned BlockSideLength>
 class matrix
 {
@@ -1155,14 +1190,15 @@ public:
     //! \brief multiply with another matrix
     //! \param multiplication_algorithm allows to choose the applied algorithm
     //! \param scheduling_algorithm  allows to choose the applied algorithm
+    //!
     //! Available algorithms are: \n
-    //!    0: naive_multiply_and_add \n
-    //!    1: recursive_multiply_and_add \n
-    //!    2: strassen_winograd_multiply_and_add \n
-    //!    3: multi_level_strassen_winograd_multiply_and_add \n
-    //!    4: strassen_winograd_multiply (optimized pre- and postadditions) \n
-    //!    5: strassen_winograd_multiply_and_add_interleaved (optimized preadditions) \n
-    //!    6: multi_level_strassen_winograd_multiply_and_add_block_grained
+    //!    0: naive_multiply_and_add (I/O inefficient, slow) \n
+    //!    1: recursive_multiply_and_add (recommended, default, stable time and I/O complexity) \n
+    //!    2: strassen_winograd_multiply_and_add (sometimes fast but unstable time and I/O complexity) \n
+    //!    3: multi_level_strassen_winograd_multiply_and_add (sometimes fast but unstable time and I/O complexity) \n
+    //!    4: strassen_winograd_multiply, optimized pre- and postadditions (sometimes fast but unstable time and I/O complexity) \n
+    //!    5: strassen_winograd_multiply_and_add_interleaved, optimized preadditions (sometimes fast but unstable time and I/O complexity) \n
+    //!    6: multi_level_strassen_winograd_multiply_and_add_block_grained (sometimes fast but unstable time and I/O complexity)
     matrix_type multiply (const matrix_type & right, const int_type multiplication_algorithm = 1, const int_type scheduling_algorithm = 2) const
     {
         assert(width == right.height);
@@ -1251,6 +1287,7 @@ public:
         return res;
     }
 
+    //! \brief Use internal memory multiplication. Designated for testing. May exceed memory limitations.
     matrix_type multiply_internal (const matrix_type & right, const int_type scheduling_algorithm = 2) const
     {
         assert(width == right.height);

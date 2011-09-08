@@ -113,6 +113,11 @@ std::ostream & operator << (std::ostream & o, const matrix_operation_statistic_d
     return o;
 }
 
+//! \brief A static_quadtree holds 4^Level elements arranged in a quad tree.
+//!
+//! Static quad trees are useful for recursive algorithms with fixed depth
+//!   that partition the in- and output and perform pre- and postcalculations on the partitions.
+//! The four children of one node are denoted as ul (up left), ur (up right), dl (down left), and dr (down right).
 template <typename ValueType, unsigned Level>
 struct static_quadtree
 {
@@ -993,7 +998,7 @@ template <typename ValueType, unsigned BlockSideLength>
 struct matrix_operations
 {
     // tuning-parameter: Only matrices larger than this (in blocks) are processed by Strassen-Winograd.
-    // You have to adapt choose_level_for_feedable_sw, too
+    // you have to adapt choose_level_for_feedable_sw, too
     static const int_type strassen_winograd_base_case_size;
 
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
@@ -1099,11 +1104,11 @@ struct matrix_operations
         }
         a_is_transposed = a_is_transposed != c_is_transposed;
         b_is_transposed = b_is_transposed != c_is_transposed;
-        internal_block_type & ic = bs_c.acquire(c, true);
         if (! bs_a.is_initialized(a))
         {
             // a is zero -> copy b
-            internal_block_type & ib = bs_b.acquire(b);
+            internal_block_type & ic = bs_c.acquire(c, true),
+                                & ib = bs_b.acquire(b);
             if (! bs_c.is_simulating())
             {
                 if (b_is_transposed)
@@ -1112,11 +1117,13 @@ struct matrix_operations
                     low_level_matrix_binary_ass_op<ValueType, BlockSideLength, false, false, Op>(& ic[0], 0, & ib[0], op);
             }
             bs_b.release(b, false);
+            bs_c.release(c, true);
         }
         else if (! bs_b.is_initialized(b))
         {
             // b is zero -> copy a
-            internal_block_type & ia = bs_a.acquire(a);
+            internal_block_type & ic = bs_c.acquire(c, true),
+                                & ia = bs_a.acquire(a);
             if (! bs_c.is_simulating())
             {
                 if (a_is_transposed)
@@ -1125,10 +1132,12 @@ struct matrix_operations
                     low_level_matrix_binary_ass_op<ValueType, BlockSideLength, false, false, Op>(& ic[0], & ia[0], 0, op);
             }
             bs_a.release(a, false);
+            bs_c.release(c, true);
         }
         else
         {
-            internal_block_type & ia = bs_a.acquire(a),
+            internal_block_type & ic = bs_c.acquire(c, true),
+                                & ia = bs_a.acquire(a),
                                 & ib = bs_b.acquire(b);
             if (! bs_c.is_simulating())
             {
@@ -1149,8 +1158,8 @@ struct matrix_operations
             }
             bs_a.release(a, false);
             bs_b.release(b, false);
+            bs_c.release(c, true);
         }
-        bs_c.release(c, true);
     }
 
     // calculates c <op>= a
