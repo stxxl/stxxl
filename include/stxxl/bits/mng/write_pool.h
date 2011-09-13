@@ -24,6 +24,8 @@
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
 
+#define STXXL_VERBOSE_WPOOL(msg) STXXL_VERBOSE1("write_pool[" << static_cast<void *>(this) << "]" << msg)
+
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -71,7 +73,10 @@ public:
     {
         unsigned_type i = 0;
         for ( ; i < init_size; ++i)
+        {
             free_blocks.push_back(new block_type);
+            STXXL_VERBOSE_WPOOL("  create block=" << free_blocks.back());
+        }
     }
 
     void swap(write_pool & obj)
@@ -85,10 +90,11 @@ public:
     //! \brief Waits for completion of all ongoing write requests and frees memory
     virtual ~write_pool()
     {
-        STXXL_VERBOSE2("write_pool::~write_pool free_blocks_size: " <<
+        STXXL_VERBOSE_WPOOL("::~write_pool free_blocks_size: " <<
                        free_blocks_size << " busy_blocks_size: " << busy_blocks_size);
         while (!free_blocks.empty())
         {
+            STXXL_VERBOSE_WPOOL("  delete free block=" << free_blocks.back());
             delete free_blocks.back();
             free_blocks.pop_back();
         }
@@ -98,6 +104,7 @@ public:
             for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
             {
                 i2->req->wait();
+                STXXL_VERBOSE_WPOOL("  delete busy block=" << free_blocks.back());
                 delete i2->block;
             }
         }
@@ -116,12 +123,12 @@ public:
     //! \return request object of the write operation
     request_ptr write(block_type * & block, bid_type bid)
     {
-        STXXL_VERBOSE1("write_pool::write: " << block << " @ " << bid);
+        STXXL_VERBOSE_WPOOL("::write: " << block << " @ " << bid);
         for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
         {
             if (i2->bid == bid) {
                 assert(i2->block != block);
-                STXXL_VERBOSE1("WAW dependency");
+                STXXL_VERBOSE_WPOOL("WAW dependency");
                 // try to cancel the obsolete request
                 i2->req->cancel();
                 // invalidate the bid of the stale write request,
@@ -143,13 +150,13 @@ public:
         assert(size() > 0);
         if (free_blocks_size)
         {
-            STXXL_VERBOSE1("write_pool::steal : " << free_blocks_size << " free blocks available");
+            STXXL_VERBOSE_WPOOL("::steal : " << free_blocks_size << " free blocks available, serve " << free_blocks.back());
             --free_blocks_size;
             block_type * p = free_blocks.back();
             free_blocks.pop_back();
             return p;
         }
-        STXXL_VERBOSE1("write_pool::steal : all " << busy_blocks_size << " are busy");
+        STXXL_VERBOSE_WPOOL("::steal : all " << busy_blocks_size << " are busy");
         busy_blocks_iterator completed = wait_any(busy_blocks.begin(), busy_blocks.end());
         assert(completed != busy_blocks.end()); // we got something reasonable from wait_any
         assert(completed->req->poll());         // and it is *really* completed
@@ -157,6 +164,7 @@ public:
         busy_blocks.erase(completed);
         --busy_blocks_size;
         check_all_busy();                       // for debug
+        STXXL_VERBOSE_WPOOL("  serve " << p);
         return p;
     }
 
@@ -175,7 +183,10 @@ public:
         {
             free_blocks_size += diff;
             while (--diff >= 0)
+            {
                 free_blocks.push_back(new block_type);
+                STXXL_VERBOSE_WPOOL("  create block=" << free_blocks.back());
+            }
 
             return;
         }
@@ -235,16 +246,19 @@ public:
                 busy_blocks.erase(i2);
                 --busy_blocks_size;
 
+                STXXL_VERBOSE_WPOOL("::steal_request block=" << blk);
                 // hand over block and (unfinished) request to caller
                 return std::pair<block_type *, request_ptr>(blk, req);
             }
         }
+        STXXL_VERBOSE_WPOOL("::steal_request NOT FOUND");
         // not matching request found, return a dummy
         return std::pair<block_type *, request_ptr>((block_type *)NULL, request_ptr());
     }
 
     void add(block_type * & block)
     {
+        STXXL_VERBOSE_WPOOL("::add " << block);
         free_blocks.push_back(block);
         ++free_blocks_size;
         block = NULL; // prevent caller from using the block any further
@@ -268,7 +282,7 @@ protected:
             }
             ++cur;
         }
-        STXXL_VERBOSE1("write_pool::check_all_busy : " << cnt <<
+        STXXL_VERBOSE_WPOOL("::check_all_busy : " << cnt <<
                        " are completed out of " << busy_blocks_size + cnt << " busy blocks");
     }
 };
