@@ -314,10 +314,9 @@ public:
 
     ~queue()
     {
-        pool->add(front_block);
         if (front_block != back_block)
             pool->add(back_block);
-
+        pool->add(front_block);
 
         if (delete_pool)
         {
