@@ -62,7 +62,7 @@ fi
 
 #run command passed as the argument concurrently to iostat
 #dump I/O stat every second
-iostat -x -m -t 1 >$OUTFILEPREFIX.iostat &
+iostat -x -m -t $IOSTAT_FLAGS 1 >$OUTFILEPREFIX.iostat &
 PID_IOSTAT=$!
 
 loadavg >$OUTFILEPREFIX.loadavg &
