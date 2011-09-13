@@ -156,4 +156,10 @@ int main()
             check(xqueue1, squeue1);
         }
     }
+
+    {
+        // test proper destruction of a single-block queue
+        stxxl::queue<int> q;
+        q.push(42);
+    }
 }
