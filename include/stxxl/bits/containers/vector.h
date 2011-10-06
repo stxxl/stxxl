@@ -30,6 +30,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+#define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void *>(this) << "]::" << msg)
+
 //! \weakgroup stlcont Containers
 //! \ingroup stllayer
 //! Containers with STL-compatible interface
@@ -903,7 +905,7 @@ public:
                 (*it).storage = _from;
                 (*it).offset = offset;
             }
-            STXXL_VERBOSE1("vector::reserve(): Changing size of file " << ((void *)_from) << " to "
+            STXXL_VERBOSE_VECTOR("reserve(): Changing size of file " << ((void *)_from) << " to "
                                                                        << offset);
             _from->set_size(offset);
         }
@@ -1204,7 +1206,7 @@ public:
             int_type page_no = _slot_to_page[i];
             if (non_free_slots[i])
             {
-                STXXL_VERBOSE1("vector: flushing page " << i << " at address "
+                STXXL_VERBOSE_VECTOR("flush(): flushing page " << i << " at address "
                                                         << (int64(page_no) * int64(block_type::size) * int64(page_size)));
                 write_page(page_no, i);
 
@@ -1215,7 +1217,7 @@ public:
 
     ~vector()
     {
-        STXXL_VERBOSE("~vector()");
+        STXXL_VERBOSE_VECTOR("~vector()");
         try
         {
             flush();
@@ -1235,9 +1237,9 @@ public:
                 bm->delete_blocks(_bids.begin(), _bids.end());
             else        // file must be truncated
             {
-                STXXL_VERBOSE1("~vector(): Changing size of file " << ((void *)_from) << " to "
+                STXXL_VERBOSE_VECTOR("~vector(): Changing size of file " << ((void *)_from) << " to "
                                                                    << file_length());
-                STXXL_VERBOSE1("~vector(): size of the vector is " << size());
+                STXXL_VERBOSE_VECTOR("~vector(): size of the vector is " << size());
                 try
                 {
                     _from->set_size(file_length());
@@ -1325,7 +1327,7 @@ private:
     {
         if (_page_status[page_no] == uninitialized)
             return;
-        STXXL_VERBOSE1("vector " << this << ": reading page_no=" << page_no << " cache_slot=" << cache_slot);
+        STXXL_VERBOSE_VECTOR("read_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
@@ -1342,10 +1344,11 @@ private:
     {
         if (!(_page_status[page_no] & dirty))
             return;
-        STXXL_VERBOSE1("vector " << this << ": writing page_no=" << page_no << " cache_slot=" << cache_slot);
+        STXXL_VERBOSE_VECTOR("write_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
         request_ptr * reqs = new request_ptr[page_size];
         int_type block_no = page_no * page_size;
         int_type last_block = STXXL_MIN(block_no + page_size, int_type(_bids.size()));
+        assert(block_no < last_block);
         int_type i = cache_slot * page_size, j = 0;
         for ( ; block_no < last_block; ++block_no, ++i, ++j)
         {
