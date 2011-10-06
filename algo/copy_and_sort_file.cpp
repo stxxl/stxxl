@@ -12,7 +12,8 @@
 
 //! \example algo/copy_and_sort_file.cpp
 //! This example imports a file into an \c stxxl::vector without copying its
-//! content and then sorts it using stxxl::sort / stxxl::ksort / ...
+//! content and then sorts it using \c stxxl::stream::sort while writing the
+//! sorted output to a different file.
 
 #include <limits>
 #include <stxxl/io>
