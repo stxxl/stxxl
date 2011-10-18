@@ -47,6 +47,10 @@ test_queue.$(EXEEXT): test_queue.cpp $(DEPENDENCIES)
 	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_queue.cpp
 	$(LINKER) test_queue.$(OBJEXT) $(OUT)test_queue.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
+test_queue: test_queue2.$(EXEEXT)
+test_queue.$(EXEEXT): test_queue2.cpp $(DEPENDENCIES)
+	$(COMPILER) $(STXXL_COMPILER_OPTIONS) -c test_queue2.cpp
+	$(LINKER) test_queue2.$(OBJEXT) $(OUT)test_queue2.$(EXEEXT) $(STXXL_LINKER_OPTIONS)
 
 test_map: test_map.$(EXEEXT)
 test_map.$(EXEEXT): test_map.cpp $(DEPENDENCIES)

@@ -71,6 +71,7 @@ containers\test_iterators
 containers\test_many_stacks 42
 containers\test_migr_stack
 containers\test_pqueue
+containers\test_pqueue2 200
 containers\test_queue
 containers\test_stack 1024
 containers\test_vector

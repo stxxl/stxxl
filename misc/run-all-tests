@@ -155,6 +155,7 @@ run containers/test_many_stacks 42
 run containers/test_migr_stack
 run containers/test_pqueue
 run containers/test_queue
+run containers/test_queue2 200
 run containers/test_stack 1024
 run containers/test_vector
 run containers/test_vector_export
