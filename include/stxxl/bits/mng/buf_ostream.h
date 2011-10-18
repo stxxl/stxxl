@@ -59,7 +59,7 @@ public:
     _Self & operator << (const_reference record)
     {
         current_blk->elem[current_elem++] = record;
-        if (current_elem >= block_type::size)
+        if (UNLIKELY(current_elem >= block_type::size))
         {
             current_elem = 0;
             current_blk = writer.write(current_blk, *(current_bid++));
@@ -86,7 +86,7 @@ public:
     _Self & operator ++ ()
     {
         ++current_elem;
-        if (current_elem >= block_type::size)
+        if (UNLIKELY(current_elem >= block_type::size))
         {
             current_elem = 0;
             current_blk = writer.write(current_blk, *(current_bid++));

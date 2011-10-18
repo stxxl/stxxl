@@ -97,7 +97,7 @@ public:
 
         record = current_blk->elem[current_elem++];
 
-        if (current_elem >= block_type::size)
+        if (UNLIKELY(current_elem >= block_type::size))
         {
             current_elem = 0;
 #ifdef BUF_ISTREAM_CHECK_END
@@ -134,7 +134,7 @@ public:
 
         current_elem++;
 
-        if (current_elem >= block_type::size)
+        if (UNLIKELY(current_elem >= block_type::size))
         {
             current_elem = 0;
 #ifdef BUF_ISTREAM_CHECK_END
