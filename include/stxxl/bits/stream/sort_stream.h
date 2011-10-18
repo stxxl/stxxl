@@ -529,7 +529,7 @@ namespace stream
         {
             assert(result_computed == false);
             unsigned_type cur_el_reg = cur_el;
-            if (cur_el_reg < el_in_run)
+            if (LIKELY(cur_el_reg < el_in_run))
             {
                 Blocks1[cur_el_reg / block_type::size][cur_el_reg % block_type::size] = val;
                 ++cur_el;
@@ -1147,7 +1147,7 @@ namespace stream
 
             --elements_remaining;
 
-            if (buffer_pos != out_block_type::size)
+            if (LIKELY(buffer_pos != out_block_type::size))
             {
                 current_value = current_block->elem[buffer_pos];
                 ++buffer_pos;

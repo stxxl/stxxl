@@ -163,7 +163,7 @@ public:
         assert(cache_offset <= 2 * blocks_per_page * block_type::size);
         //assert(cache_offset >= 0);
 
-        if (cache_offset == 2 * blocks_per_page * block_type::size) // cache overflow
+        if (UNLIKELY(cache_offset == 2 * blocks_per_page * block_type::size))  // cache overflow
         {
             STXXL_VERBOSE2("growing, size: " << size_);
 
@@ -205,7 +205,7 @@ public:
         assert(cache_offset > 0);
         assert(size_ > 0);
 
-        if (cache_offset == 1 && bids.size() >= blocks_per_page)
+        if (UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
         {
             STXXL_VERBOSE2("shrinking, size: " << size_);
 
@@ -375,7 +375,7 @@ public:
         assert(cache_offset <= blocks_per_page * block_type::size);
         //assert(cache_offset >= 0);
 
-        if (cache_offset == blocks_per_page * block_type::size) // cache overflow
+        if (UNLIKELY(cache_offset == blocks_per_page * block_type::size))  // cache overflow
         {
             STXXL_VERBOSE2("growing, size: " << size_);
 
@@ -415,7 +415,7 @@ public:
         assert(cache_offset > 0);
         assert(size_ > 0);
 
-        if (cache_offset == 1 && bids.size() >= blocks_per_page)
+        if (UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
         {
             STXXL_VERBOSE2("shrinking, size: " << size_);
 
@@ -574,7 +574,7 @@ public:
         STXXL_VERBOSE3("grow_shrink_stack2::push(" << val << ")");
         assert(cache_offset <= block_type::size);
 
-        if (cache_offset == block_type::size)
+        if (UNLIKELY(cache_offset == block_type::size))
         {
             STXXL_VERBOSE2("grow_shrink_stack2::push(" << val << ") growing, size: " << size_);
 
@@ -622,7 +622,7 @@ public:
         assert(size_ > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
-        if (cache_offset == 1 && (!bids.empty()))
+        if (UNLIKELY(cache_offset == 1 && (!bids.empty())))
         {
             STXXL_VERBOSE2("grow_shrink_stack2::pop() shrinking, size = " << size_);
 
@@ -755,7 +755,7 @@ public:
         if (int_impl)
         {
             int_impl->push(val);
-            if (int_impl->size() == critical_size)
+            if (UNLIKELY(int_impl->size() == critical_size))
             {
                 // migrate to external stack
                 ext_impl = new ext_stack_type(*int_impl);

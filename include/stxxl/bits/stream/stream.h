@@ -153,6 +153,9 @@ namespace stream
         vector_iterator2stream(InputIterator_ begin, InputIterator_ end, unsigned_type nbuffers = 0) :
             current_(begin), end_(end), in(static_cast<buf_istream_type *>(NULL))
         {
+            if (empty())
+                return;
+
             begin.flush();     // flush container
             typename InputIterator_::bids_container_iterator end_iter = end.bid() + ((end.block_offset()) ? 1 : 0);
 
@@ -189,7 +192,7 @@ namespace stream
             assert(end_ != current_);
             ++current_;
             ++(*in);
-            if (empty())
+            if (UNLIKELY(empty()))
                 delete_stream();
 
             return *this;

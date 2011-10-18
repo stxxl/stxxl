@@ -196,7 +196,7 @@ public:
     //! \brief Adds an element in the queue
     void push(const value_type & val)
     {
-        if (back_element == back_block->begin() + (block_type::size - 1))
+        if (UNLIKELY(back_element == back_block->begin() + (block_type::size - 1)))
         {
             // back block is filled
             if (front_block == back_block)
@@ -238,7 +238,7 @@ public:
     {
         assert(!empty());
 
-        if (front_element == front_block->begin() + (block_type::size - 1))
+        if (UNLIKELY(front_element == front_block->begin() + (block_type::size - 1)))
         {
             // if there is only one block, it implies ...
             if (back_block == front_block)
