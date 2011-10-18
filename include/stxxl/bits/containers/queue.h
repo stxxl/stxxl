@@ -204,6 +204,24 @@ public:
                 // is the same as the front block, must keep it memory
                 STXXL_VERBOSE1("queue::push Case 1");
             }
+            else if (size() < 2 * block_type::size)
+            {
+                STXXL_VERBOSE1("queue::push Case 1.5");
+                // only two blocks with a gap in the beginning, move elements within memory
+                assert(bids.empty());
+                size_t gap = front_element - front_block->begin();
+                assert(gap > 0);
+                std::copy(front_element, front_block->end(), front_block->begin());
+                std::copy(back_block->begin(), back_block->begin() + gap, front_block->begin() + (block_type::size - gap));
+                std::copy(back_block->begin() + gap, back_block->end(), back_block->begin());
+                front_element -= gap;
+                back_element -= gap;
+
+                ++back_element;
+                *back_element = val;
+                ++size_;
+                return;
+            }
             else
             {
                 STXXL_VERBOSE1("queue::push Case 2");

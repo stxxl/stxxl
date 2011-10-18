@@ -64,4 +64,6 @@ int main(int argc, char ** argv)
     }
     assert(q.empty());
     assert(in == out);
+
+    std::cout << *stxxl::stats::get_instance();
 }
