@@ -46,6 +46,7 @@ void stl_in_memory_sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrderin
     wait_all(reqs.begin(), nblocks);
 
     unsigned_type last_block_correction = last.block_offset() ? (block_type::size - last.block_offset()) : 0;
+    check_sort_settings();
     potentially_parallel::
     sort(make_element_iterator(blocks.begin(), first.block_offset()),
          make_element_iterator(blocks.begin(), nblocks * block_type::size - last_block_correction),

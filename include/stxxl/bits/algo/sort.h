@@ -132,6 +132,7 @@ namespace sort_local
             for (i = 0; i < run_size; ++i)
                 bm->delete_block(bids1[i]);
 
+            check_sort_settings();
             potentially_parallel::
             sort(make_element_iterator(Blocks1, 0),
                  make_element_iterator(Blocks1, run_size * block_type::size),
@@ -171,6 +172,7 @@ namespace sort_local
         for (i = 0; i < run_size; ++i)
             bm->delete_block(bids1[i]);
 
+        check_sort_settings();
         potentially_parallel::
         sort(make_element_iterator(Blocks1, 0),
              make_element_iterator(Blocks1, run_size * block_type::size),

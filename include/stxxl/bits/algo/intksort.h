@@ -304,6 +304,7 @@ cleanup(T * b, int_type * bucket, int_type K)
             insertion_sort(c, cEnd);
             break;
         default:
+	    check_sort_settings();
             potentially_parallel::
             sort(c, cEnd);
         }

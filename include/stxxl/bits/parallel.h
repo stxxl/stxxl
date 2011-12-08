@@ -106,6 +106,27 @@ inline unsigned sort_memory_usage_factor()
 #endif
 }
 
+inline void check_sort_settings()
+{
+#if STXXL_PARALLEL && defined(STXXL_PARALLEL_MODE) && !defined(STXXL_NO_WARN_OMP_NESTED)
+    static bool did_warn = false;
+    if (!did_warn) {
+        if (__gnu_parallel::_Settings::get().sort_algorithm != __gnu_parallel::MWMS) {
+            if (omp_get_max_threads() <= 2) {
+                did_warn = true;  // no problem with at most 2 threads, no need to check again
+            } else if (!omp_get_nested()) {
+                STXXL_ERRMSG("Inefficient settings detected. To get full potential from your CPU it is recommended to set OMP_NESTED=TRUE in the environment.");
+                did_warn = true;
+            }
+        }
+    }
+#elif STXXL_PARALLEL && defined(__MCSTL__)
+    // FIXME: can we check anything here?
+#else
+    // nothing to check
+#endif
+}
+
 inline bool do_parallel_merge()
 {
 #if STXXL_PARALLEL_MULTIWAY_MERGE && defined(STXXL_PARALLEL_MODE)
