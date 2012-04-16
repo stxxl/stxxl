@@ -1029,6 +1029,7 @@ namespace stream
                 STXXL_WARNMSG_RECURSIVE_SORT("efficiency decrease block size of run storage (a parameter of the run_creator)");
                 STXXL_WARNMSG_RECURSIVE_SORT("or increase the amount memory dedicated to the merger.");
                 STXXL_WARNMSG_RECURSIVE_SORT("m=" << input_buffers << " nruns=" << nruns << " prefetch_blocks=" << min_prefetch_buffers);
+                STXXL_WARNMSG_RECURSIVE_SORT("memory_to_use=" << memory_to_use << " bytes  block_type::raw_size=" << block_type::raw_size << " bytes");
 
                 // check whether we have enough memory to merge recursively
                 unsigned_type recursive_merge_buffers = memory_to_use / block_type::raw_size;
