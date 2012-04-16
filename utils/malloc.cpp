@@ -16,6 +16,7 @@
 #include <malloc.h>
 #endif
 #include <cstdlib>
+#include <unistd.h>
 #include <stxxl/bits/verbose.h>
 
 
