@@ -49,6 +49,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/settings.h>
+#include <stxxl/bits/verbose.h>
 
 
 #if defined(_GLIBCXX_PARALLEL)
