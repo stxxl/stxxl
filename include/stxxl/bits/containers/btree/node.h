@@ -91,8 +91,7 @@ namespace btree
         value_compare vcmp_;
 
 
-        template <class BIDType>
-        std::pair<key_type, bid_type> insert(const std::pair<key_type, BIDType> & splitter,
+        std::pair<key_type, bid_type> insert(const std::pair<key_type, bid_type> & splitter,
                                              const block_iterator & place2insert)
         {
             std::pair<key_type, bid_type> result(key_compare::max_value(), bid_type());
@@ -349,7 +348,7 @@ namespace btree
 
                 STXXL_VERBOSE1("btree::normal_node Inserting new value in *this");
 
-                splitter = insert(BotSplitter, it);
+                splitter = insert(std::make_pair(BotSplitter.first, bid_type(BotSplitter.second)), it);
 
                 return result;
             }

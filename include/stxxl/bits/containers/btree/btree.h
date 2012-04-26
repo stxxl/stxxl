@@ -106,8 +106,7 @@ namespace btree
         iterator end_iterator;
 
 
-        template <class BIDType>
-        void insert_into_root(const std::pair<key_type, BIDType> & splitter)
+        void insert_into_root(const std::pair<key_type, node_bid_type> & splitter)
         {
             std::pair<root_node_iterator_type, bool> result =
                 root_node_.insert(splitter);
@@ -488,7 +487,7 @@ namespace btree
 
                 STXXL_VERBOSE1("Inserting new value into root node");
 
-                insert_into_root(Splitter);
+                insert_into_root(std::make_pair(Splitter.first, node_bid_type(Splitter.second)));
 
                 assert(leaf_cache_.nfixed() == 0);
                 assert(node_cache_.nfixed() == 0);
