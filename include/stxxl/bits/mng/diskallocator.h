@@ -171,12 +171,14 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
     {
         assert(end - begin == 1);
 
-        STXXL_ERRMSG("Warning: Severe external memory space fragmentation!");
-        dump();
+        if (!autogrow) {
+            STXXL_ERRMSG("Warning: Severe external memory space fragmentation!");
+            dump();
 
-        STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
-                     " bytes requested, " << free_bytes <<
-                     " bytes free. Trying to extend the external memory space...");
+            STXXL_ERRMSG("External memory block allocation error: " << requested_size <<
+                         " bytes requested, " << free_bytes <<
+                         " bytes free. Trying to extend the external memory space...");
+        }
 
         grow_file(BLK_SIZE);
 
