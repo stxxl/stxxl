@@ -1,7 +1,0 @@
-TESTS			 = pq_param log2
-TESTS_NON_MSVC		 = malloc
-
-LIB_SRC			 =
-
-UTIL_BINARIES		 = createdisks
-UTIL_BINARIES_NON_MSVC	 = mlock

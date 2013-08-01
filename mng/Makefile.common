@@ -1,5 +1,0 @@
-TESTS			 = test_mng test_mng1 test_buf_streams test_write_pool test_prefetch_pool test_block_alloc_strategy test_mng_recursive_alloc test_pool_pair test_read_write_pool test_aligned test_block_scheduler
-TESTS_NON_MSVC		 =
-TESTS_UNITTEST		 = unittest
-
-LIB_SRC			 = config.cpp mng.cpp diskallocator.cpp

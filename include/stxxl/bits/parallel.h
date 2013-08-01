@@ -14,6 +14,7 @@
 #ifndef STXXL_PARALLEL_HEADER
 #define STXXL_PARALLEL_HEADER
 
+#include <stxxl/bits/config.h>
 
 #undef STXXL_PARALLEL
 #undef STXXL_PARALLEL_MODE

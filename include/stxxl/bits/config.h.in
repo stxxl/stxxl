@@ -1,0 +1,22 @@
+// -*- mode: c++ -*-
+/***************************************************************************
+ *  include/stxxl/bits/config.h.in
+ *
+ *  Template file processed by cmake to set all define switches for this build
+ *  according to the cmake build options.
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2012 Timo Bingmann <bingmann@kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+#ifndef STXXL_CONFIG_HEADER
+#define STXXL_CONFIG_HEADER
+
+#cmakedefine STXXL_PARALLEL_MODE_EXPLICIT
+
+#endif // !STXXL_CONFIG_HEADER
