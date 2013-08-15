@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/utils
+# Cmake file for stxxl/tools
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #
@@ -12,15 +12,11 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-stxxl_build_tool(pq_param)
-stxxl_build_tool(log2)
+add_subdirectory(algo)
+add_subdirectory(common)
+add_subdirectory(containers)
+add_subdirectory(io)
+add_subdirectory(mng)
+add_subdirectory(stream)
+add_subdirectory(utils)
 
-if (NOT MSVC)
-  stxxl_build_tool(malloc)
-endif (NOT MSVC)
-
-stxxl_build_tool(createdisks)
-
-if (NOT MSVC)
-  stxxl_build_tool(mlock)
-endif (NOT MSVC)

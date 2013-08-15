@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/mng
+# Cmake file for stxxl/tools/mng
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #

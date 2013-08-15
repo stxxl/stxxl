@@ -39,6 +39,8 @@ option(USE_BOOST "Use Boost libraries for threads,config,filesystem,random and d
 
 option(USE_GNU_PARALLEL "Use GNU parallel STL extensions" OFF)
 
+option(TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
+
 ###############################################################################
 # enable use of "make test"
 
@@ -139,7 +141,7 @@ add_subdirectory(lib)
 # macro for building stxxl programs
 macro(stxxl_build_tool PROGNAME)
 
-  add_executable(${PROGNAME} ${PROGNAME}.cpp)
+  add_executable(${PROGNAME} ${PROGNAME}.cpp ${ARGN})
   target_link_libraries(${PROGNAME} ${STXXL_LIBS})
 
 endmacro(stxxl_build_tool)
@@ -148,17 +150,27 @@ endmacro(stxxl_build_tool)
 macro(stxxl_build_test TESTNAME)
 
   if(BUILD_TESTS)
-    stxxl_build_tool(${TESTNAME})
-    add_test(${TESTNAME} ${TESTNAME})
+    stxxl_build_tool(${TESTNAME} ${ARGN})
   endif(BUILD_TESTS)
 
 endmacro(stxxl_build_test)
+
+# macro for registering stxxl tests
+macro(stxxl_test TESTNAME)
+
+  if(BUILD_TESTS)
+    set(TESTFULLNAME ${TESTNAME} ${ARGN})
+    string(REPLACE ";" "-" TESTFULLNAME "${TESTFULLNAME}") # stringify list
+    add_test(${TESTFULLNAME} ${TESTNAME} ${ARGN})
+  endif(BUILD_TESTS)
+
+endmacro(stxxl_test)
 
 # macro for building stxxl extra program
 macro(stxxl_build_extra_tool TESTNAME)
 
   if(BUILD_EXTRAS)
-    stxxl_build_tool(${TESTNAME})
+    stxxl_build_tool(${TESTNAME} ${ARGN})
   endif(BUILD_EXTRAS)
 
 endmacro(stxxl_build_extra_tool)
@@ -168,13 +180,12 @@ macro(stxxl_build_extra_test TESTNAME)
 
   if(BUILD_EXTRAS)
     stxxl_build_tool(${TESTNAME})
-    add_test(${TESTNAME} ${TESTNAME})
   endif(BUILD_EXTRAS)
 
 endmacro(stxxl_build_extra_test)
 
 # macro for setting additional defines for targets
-macro (add_define PROGNAME)
+macro(add_define PROGNAME)
 
   if(TARGET ${PROGNAME})
     set_property(TARGET ${PROGNAME} APPEND PROPERTY COMPILE_DEFINITIONS ${ARGN})
@@ -185,12 +196,39 @@ macro (add_define PROGNAME)
 endmacro (add_define TESTNAME)
 
 ###############################################################################
-# build extra binaries and tests
+# cmake script TRY_COMPILE all stxxl header files
 
-add_subdirectory(common)
-add_subdirectory(algo)
-add_subdirectory(containers)
-add_subdirectory(io)
-add_subdirectory(mng)
-add_subdirectory(stream)
-add_subdirectory(utils)
+if(TRY_COMPILE_HEADERS)
+
+  include(CheckCXXSourceCompiles)
+  set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include")
+
+  file(GLOB_RECURSE header_files FOLLOW_SYMLINKS "include/*")
+  set(T 0)
+
+  foreach(file ${header_files})
+    message("${file}")
+    check_cxx_source_compiles(
+      "#include \"${file}\"
+      int main() { return 0; }" Header_${T}_IsSelfContained)
+    math(EXPR T "${T} + 1")
+  endforeach()
+
+endif(TRY_COMPILE_HEADERS)
+
+###############################################################################
+# figure out STXXL_TMPDIR for tests
+
+if(DEFINED ENV{STXXL_TMPDIR})
+  set(STXXL_TMPDIR "$ENV{STXXL_TMPDIR}")
+else()
+  set(STXXL_TMPDIR ".")
+endif()
+
+message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
+
+###############################################################################
+# build tests and tools
+
+add_subdirectory(tools)
+

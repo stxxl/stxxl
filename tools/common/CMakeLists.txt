@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/common
+# Cmake file for stxxl/tools/common
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #

@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/stream
+# Cmake file for stxxl/tools/stream
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #

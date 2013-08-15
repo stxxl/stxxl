@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/containers/btree
+# Cmake file for stxxl/tools/containers/btree
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #

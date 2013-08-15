@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/algo
+# Cmake file for stxxl/tools/algo
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #

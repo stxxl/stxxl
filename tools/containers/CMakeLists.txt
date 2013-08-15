@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/containers
+# Cmake file for stxxl/tools/containers
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #
