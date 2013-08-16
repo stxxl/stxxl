@@ -113,17 +113,6 @@ run io/verify_disks 123456 0 2 w "$STXXL_TMPDIR/out"
 run io/verify_disks 123456 0 2 r "$STXXL_TMPDIR/out"
 run io/iobench_scatter_in_place 100 10 4096 "$STXXL_TMPDIR/out"  # consumes out
 
-run mng/test_block_alloc_strategy
-run mng/test_buf_streams
-run mng/test_mng
-run mng/test_mng1
-run mng/test_prefetch_pool
-run mng/test_write_pool
-run mng/test_pool_pair
-run mng/test_read_write_pool
-run mng/test_mng_recursive_alloc
-run mng/test_aligned
-
 run containers/bench_pqueue
 run containers/copy_file "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
 run containers/monotonic_pq 1000 1
@@ -190,8 +179,6 @@ run stream/test_stream1
 run stream/test_transpose
 run stream/test_loop 100 -v
 run stream/test_loop 1000000
-
-run mng/unittest
 
 rm -rf $AMI_SINGLE_DEVICE
 mkdir $AMI_SINGLE_DEVICE

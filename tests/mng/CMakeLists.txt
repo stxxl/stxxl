@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/tools/mng
+# Cmake file for stxxl/tests/mng/
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #
@@ -24,12 +24,23 @@ stxxl_build_test(test_prefetch_pool)
 stxxl_build_test(test_read_write_pool)
 stxxl_build_test(test_write_pool)
 
-#TODO: unit tests
+stxxl_test(test_aligned)
+stxxl_test(test_block_alloc_strategy)
+stxxl_test(test_block_scheduler)
+stxxl_test(test_buf_streams)
+stxxl_test(test_mng)
+stxxl_test(test_mng1)
+stxxl_test(test_mng_recursive_alloc)
+stxxl_test(test_pool_pair)
+stxxl_test(test_prefetch_pool)
+stxxl_test(test_read_write_pool)
+stxxl_test(test_write_pool)
+
 if(CPPUNIT_FOUND AND BUILD_BUILD_TESTS)
 
   add_executable(unittest_mng unittest.cpp)
   target_link_libraries(unittest_mng ${STXXL_LIBS} ${CPPUNIT_LIBRARIES})
-  add_build_test(unittest_mng unittest_mng)
+  stxxl_test(unittest_mng)
 
 endif(CPPUNIT_FOUND AND BUILD_BUILD_TESTS)
 
