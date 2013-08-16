@@ -61,10 +61,8 @@ int main()
         blk = pool.steal();
         pool.read(blk, bid)->wait();
 
-        if ((*blk)[0].integer != 23) {
-            STXXL_ERRMSG("WRITE-AFTER-WRITE COHERENCE FAILURE");
-        }
-
+        STXXL_CHECK2((*blk)[0].integer == 23,
+                     "WRITE-AFTER-WRITE COHERENCE FAILURE");
         pool.add(blk);
         bm->delete_block(bid);
     }
@@ -92,9 +90,8 @@ int main()
         // get the hinted block
         pool.read(blk, bid)->wait();
 
-        if ((*blk)[0].integer != 23) {
-            STXXL_ERRMSG("WRITE-AFTER-HINT COHERENCE FAILURE");
-        }
+        STXXL_CHECK2((*blk)[0].integer == 23,
+                     "WRITE-AFTER-HINT COHERENCE FAILURE");
 
         pool.add(blk);
         bm->delete_block(bid);
@@ -123,9 +120,8 @@ int main()
         // get the hinted block
         pool.read(blk, bid)->wait();
 
-        if ((*blk)[0].integer != 23) {
-            STXXL_ERRMSG("WRITE-AFTER-HINT COHERENCE FAILURE");
-        }
+        STXXL_CHECK2((*blk)[0].integer == 23,
+                     "WRITE-AFTER-HINT COHERENCE FAILURE");
 
         pool.add(blk);
         bm->delete_block(bid);

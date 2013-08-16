@@ -100,7 +100,7 @@ ufs_file_base::ufs_file_base(
 #ifndef STXXL_DIRECT_IO_OFF
     if ((mode & DIRECT) && errno == EINVAL)
     {
-        STXXL_ERRMSG("::open() error on path=" << filename << " flags=" << flags << ", trying without O_DIRECT.");
+        STXXL_ERRMSG("::open() error on path=" << filename << " flags=" << flags << ", retrying without O_DIRECT.");
 
         flags &= ~O_DIRECT;
 

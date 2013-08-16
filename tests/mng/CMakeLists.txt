@@ -36,13 +36,13 @@ stxxl_test(test_prefetch_pool)
 stxxl_test(test_read_write_pool)
 stxxl_test(test_write_pool)
 
-if(CPPUNIT_FOUND AND BUILD_BUILD_TESTS)
+if(CPPUNIT_FOUND AND BUILD_TESTS)
 
   add_executable(unittest_mng unittest.cpp)
   target_link_libraries(unittest_mng ${STXXL_LIBS} ${CPPUNIT_LIBRARIES})
   stxxl_test(unittest_mng)
 
-endif(CPPUNIT_FOUND AND BUILD_BUILD_TESTS)
+endif(CPPUNIT_FOUND AND BUILD_TESTS)
 
 add_define(test_mng "STXXL_VERBOSE_LEVEL=2")
 add_define(test_mng1 "STXXL_VERBOSE_LEVEL=2")

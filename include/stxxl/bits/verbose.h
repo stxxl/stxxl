@@ -111,6 +111,22 @@ __STXXL_END_NAMESPACE
  #define STXXL_VERBOSE3(x) _STXXL_NOT_VERBOSE
 #endif
 
+
+// STXXL_CHECK is an assertion macro for unit tests, which contrarily to
+// assert() also works in release builds. These macros should ONLY be used in
+// UNIT TESTS, not in the library source. Use usual assert() there.
+
+#define STXXL_CHECK(condition) \
+    do { if (!(condition)) { _STXXL_PRINT("STXXL-CHECK", \
+       #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+       _STXXL_PRINT_FLAGS_ERROR); abort(); } } while(0)
+
+#define STXXL_CHECK2(condition,text) \
+    do { if (!(condition)) { _STXXL_PRINT("STXXL-CHECK", \
+       text " - " #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+       _STXXL_PRINT_FLAGS_ERROR); abort(); } } while(0)
+
+
 ////////////////////////////////////////////////////////////////////////////
 
 #ifdef BOOST_MSVC
