@@ -88,13 +88,34 @@ ufs_file_base::ufs_file_base(
     const int perms = S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP;
 #endif
 
-    if ((file_des = ::open(filename.c_str(), flags, perms)) < 0)
-        STXXL_THROW2(io_error, "::open() rc=" << file_des << " path=" << filename << " flags=" << flags);
-
-    if (!(mode & NO_LOCK))
+    if ((file_des = ::open(filename.c_str(), flags, perms)) >= 0)
     {
-        lock();
+        // successfully opened file descriptor
+        if (!(mode & NO_LOCK))
+            lock();
+
+        return;
     }
+
+#ifndef STXXL_DIRECT_IO_OFF
+    if ((mode & DIRECT) && errno == EINVAL)
+    {
+        STXXL_ERRMSG("::open() error on path=" << filename << " flags=" << flags << ", trying without O_DIRECT.");
+
+        flags &= ~O_DIRECT;
+
+        if ((file_des = ::open(filename.c_str(), flags, perms)) >= 0)
+        {
+            // successfully opened file descriptor
+            if (!(mode & NO_LOCK))
+                lock();
+
+            return;
+        }
+    }
+#endif
+
+    STXXL_THROW2(io_error, "::open() rc=" << file_des << " path=" << filename << " flags=" << flags);
 }
 
 ufs_file_base::~ufs_file_base()
