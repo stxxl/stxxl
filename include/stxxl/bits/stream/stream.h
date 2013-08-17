@@ -580,6 +580,7 @@ namespace stream
 
         ConstExtIterator const_out = out;
 
+        // copy over items remaining in block from vector.
         while (const_out.block_offset())
         {
             *outstream = *const_out;             // might cause I/Os for loading the page that

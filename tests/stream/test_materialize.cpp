@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -13,19 +14,22 @@
 #include <vector>
 #include <stxxl/stream>
 #include <stxxl/vector>
+#include <stxxl/algorithm>
 
 struct forty_two
 {
-    unsigned counter;
+    unsigned counter, length;
 
-    forty_two() : counter(0) { }
+    forty_two(unsigned l) : counter(0), length(l) { }
 
-    bool empty() const { return !(counter < 42); }
+    bool empty() const { return !(counter < length); }
+
+    unsigned len() const { return length; }
 
     int operator * ()
     {
         assert(!empty());
-        return 42;
+        return counter;
     }
 
     forty_two & operator ++ ()
@@ -65,17 +69,84 @@ struct forty_two
                 unsigned_type nbuffers = 0);
 */
 
+int generate_0()
+{
+    return 0;
+}
+
+template <typename VectorType>
+void check_42_fill(VectorType& v, unsigned length)
+{
+    typename VectorType::const_iterator ci = v.begin();
+
+    for (unsigned i = 0; i < length; ++i)
+    {
+        STXXL_CHECK( *ci == (int)i );
+        ++ci;
+    }
+
+    for (unsigned i = length; i < v.size(); ++i)
+    {
+        STXXL_CHECK( *ci == 0 );
+        ++ci;
+    }
+
+    std::fill(v.begin(), v.end(), 0);
+}
+
 int main()
 {
     stxxl::config::get_instance();
-    forty_two _42;
-    std::vector<int> v(1000);
-    stxxl::stream::materialize(_42.reset(), v.begin());
-    stxxl::stream::materialize(_42.reset(), v.begin(), v.end());
 
-    stxxl::VECTOR_GENERATOR<int>::result xv(1000);
-    stxxl::stream::materialize(_42.reset(), xv.begin());
-    stxxl::stream::materialize(_42.reset(), xv.begin(), 42);
-    stxxl::stream::materialize(_42.reset(), xv.begin(), xv.end());
-    stxxl::stream::materialize(_42.reset(), xv.begin(), xv.end(), 42);
+    {
+        forty_two _42 (42);
+
+        // materialize into std vector
+        std::vector<int> v(1000);
+        std::generate(v.begin(), v.end(), generate_0);
+
+        stxxl::stream::materialize(_42.reset(), v.begin());
+        check_42_fill(v, _42.len());
+
+        stxxl::stream::materialize(_42.reset(), v.begin(), v.end());
+        check_42_fill(v, _42.len());
+    }
+    {
+        forty_two _42 (42);
+
+        // materialize into stxxl vector
+        stxxl::VECTOR_GENERATOR<int>::result v(1000);
+        stxxl::generate(v.begin(), v.end(), generate_0, 42);
+
+        stxxl::stream::materialize(_42.reset(), v.begin());
+        check_42_fill(v, _42.len());
+
+        stxxl::stream::materialize(_42.reset(), v.begin(), 42);
+        check_42_fill(v, _42.len());
+
+        stxxl::stream::materialize(_42.reset(), v.begin(), v.end());
+        check_42_fill(v, _42.len());
+
+        stxxl::stream::materialize(_42.reset(), v.begin(), v.end(), 42);
+        check_42_fill(v, _42.len());
+    }
+    {
+        forty_two _42mill (42 * 1000000);
+
+        // materialize into larger stxxl vector (to cross block boundaries)
+        stxxl::VECTOR_GENERATOR<int>::result v(100 * 1000000);
+        stxxl::generate(v.begin(), v.end(), generate_0, 42);
+
+        stxxl::stream::materialize(_42mill.reset(), v.begin());
+        check_42_fill(v, _42mill.len());
+
+        stxxl::stream::materialize(_42mill.reset(), v.begin(), 42);
+        check_42_fill(v, _42mill.len());
+
+        stxxl::stream::materialize(_42mill.reset(), v.begin(), v.end());
+        check_42_fill(v, _42mill.len());
+
+        stxxl::stream::materialize(_42mill.reset(), v.begin(), v.end(), 42);
+        check_42_fill(v, _42mill.len());
+    }
 }

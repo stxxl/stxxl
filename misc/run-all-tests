@@ -171,15 +171,6 @@ run algo/test_sort
 run algo/test_bad_cmp
 test -n "$WITH_STABLE_KSORT" && run algo/test_stable_ksort
 
-run stream/test_materialize
-run stream/test_push_sort
-run stream/test_sorted_runs
-run stream/test_stream
-run stream/test_stream1
-run stream/test_transpose
-run stream/test_loop 100 -v
-run stream/test_loop 1000000
-
 rm -rf $AMI_SINGLE_DEVICE
 mkdir $AMI_SINGLE_DEVICE
 

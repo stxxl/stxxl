@@ -79,9 +79,8 @@ int main()
         SortedRuns.finish();                            // finish current run
     }
 
-
     SortedRunsType Runs = SortedRuns.result();          // get sorted_runs data structure
-    assert(check_sorted_runs(Runs, Cmp()));
+    STXXL_CHECK(check_sorted_runs(Runs, Cmp()));
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), 10 * megabyte);
     stxxl::vector<value_type, 4, stxxl::lru_pager<8>, block_size, STXXL_DEFAULT_ALLOC_STRATEGY> array;
@@ -95,9 +94,9 @@ int main()
         ++merger;
     }
     STXXL_MSG("checksum after:  " << checksum_after);
-    assert(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
-    assert(checksum_before == checksum_after);
-    assert(merger.empty());
+    STXXL_CHECK(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
+    STXXL_CHECK(checksum_before == checksum_after);
+    STXXL_CHECK(merger.empty());
 
     return 0;
 }

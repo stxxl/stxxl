@@ -78,7 +78,7 @@ int main()
     Input in(size + 1);
     CreateRunsAlg SortedRuns(in, Cmp(), 1024 * 128 * MULT);
     SortedRunsType Runs = SortedRuns.result();
-    assert(stxxl::stream::check_sorted_runs(Runs, Cmp()));
+    STXXL_CHECK(stxxl::stream::check_sorted_runs(Runs, Cmp()));
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), MULT * 1024 * 128);
     stxxl::vector<Input::value_type> array;
@@ -87,15 +87,13 @@ int main()
     Input::value_type crc(0);
     for (unsigned i = 0; i < size; ++i)
     {
-        //STXXL_MSG(*merger<< " must be "<< i+2 << ((*merger != i+2)?" WARNING":""));
-        //assert(*merger == i+2);
         crc += *merger;
         array.push_back(*merger);
         ++merger;
     }
     STXXL_MSG("CRC: " << crc);
-    assert(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
-    assert(merger.empty());
+    STXXL_CHECK(stxxl::is_sorted(array.begin(), array.end(), Cmp()));
+    STXXL_CHECK(merger.empty());
 
     std::cout << *s;
 

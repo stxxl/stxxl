@@ -151,8 +151,8 @@ int main()
 
     // HERE streaming part ends (materializing)
     array_type::iterator o = stxxl::stream::materialize(sorted_element_stream, output.begin(), output.end(), numbuffers);
-    assert(o == output.end());
-    assert(sorted_element_stream.empty());
+    STXXL_CHECK(o == output.end());
+    STXXL_CHECK(sorted_element_stream.empty());
 
     stxxl::stats_data stats_after(*stxxl::stats::get_instance());
 

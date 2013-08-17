@@ -1428,6 +1428,10 @@ private:
             // remove page from cache
             _free_slots.push(_page_to_slot[page_no]);
             _page_to_slot[page_no] = on_disk;
+            STXXL_VERBOSE_VECTOR("page_externally_updated(): page_no=" << page_no << " flushed from cache.");
+        }
+        else {
+            STXXL_VERBOSE_VECTOR("page_externally_updated(): page_no=" << page_no << " no need to flush.");
         }
         _page_status[page_no] = valid_on_disk;
     }

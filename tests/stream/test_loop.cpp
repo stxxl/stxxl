@@ -31,7 +31,7 @@
 using std::cout;
 using std::endl;
 
-const stxxl::uint64 memory_to_use = 3ul * 1024 * 1024 * 1024;
+const stxxl::uint64 memory_to_use = 128ul * 1024 * 1024;
 
 bool verbose;
 
