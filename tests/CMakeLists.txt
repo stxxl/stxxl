@@ -14,3 +14,4 @@
 
 add_subdirectory(io)
 add_subdirectory(mng)
+add_subdirectory(stream)
