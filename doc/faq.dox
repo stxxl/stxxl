@@ -1,0 +1,108 @@
+/*!
+ * \page FAQ FAQ - Frequently Asked Questions
+ *
+ * \section FAQ-latest Latest version of this FAQ
+ * The most recent version of this FAQ can always be found
+ * <a href="http://algo2.iti.kit.edu/stxxl/trunk/FAQ.html">here</a>.
+ *
+ *
+ * \section q1 References to Elements in External Memory Data Structures
+ *
+ * You should not pass or store references to elements in an external memory
+ * data structure. When the reference is used, the block that contains the
+ * element may be no longer in internal memory.<br>
+ * Use/pass an iterator (reference) instead.<br>
+ * For an \c stxxl::vector with \c n pages and LRU replacement strategy, it
+ * can be guaranteed that the last \c n references
+ * obtained using \c stxxl::vector::operator[] or dereferencing
+ * an iterator are valid.
+ * However, if \c n is 1, even a single innocent-looking line like
+ * \verbatim std::cout << v[0] << " " << v[1000000] << std::endl; \endverbatim can lead to
+ * inconsistent results.
+ * <br>
+ *
+ *
+ * \section q2 Parameterizing STXXL Containers
+ *
+ * STXXL container types like stxxl::vector can be parameterized only with a value type that is a
+ * <a href="http://en.wikipedia.org/wiki/Plain_old_data_structures">POD</a>
+ * (i. e. no virtual functions, no user-defined copy assignment/destructor, etc.)
+ * and does not contain references (including pointers) to internal memory.
+ * Usually, "complex" data types do not satisfy this requirements.
+ *
+ * This is why stxxl::vector<std::vector<T> > and stxxl::vector<stxxl::vector<T> > are invalid.
+ * If appropriate, use std::vector<stxxl::vector<T> >, or emulate a two-dimensional array by
+ * doing index calculation.
+ *
+ *
+ * \section q3 Thread-Safety
+ *
+ * The I/O and block management layers are thread-safe (since release 1.1.1).
+ * The user layer data structures are not thread-safe.<br>
+ * I.e. you may access <b>different</b> \c S<small>TXXL</small> data structures from concurrent threads without problems,
+ * but you should not share a data structure between threads (without implementing proper locking yourself).<br>
+ * This is a design choice, having the data structures thread-safe would mean a significant performance loss.
+ *
+ *
+ * \section q4 I have configured several disks to use with STXXL. Why does STXXL fail complaining about the lack of space? According to my calclulations, the space on the disks should be sufficient.
+ *
+ * This may happen if the disks have different size. With the default parameters \c S<small>TXXL</small> containers use randomized block-to-disk allocation strategies
+ * that distribute data evenly between the disks but ignore the availability of free space on them. 
+ *
+ *
+ * \section q5 STXXL in a Microsoft CLR Library
+ *
+ * From STXXL user Christian, posted in the <a href="https://sourceforge.net/projects/stxxl/forums/forum/446474/topic/3407329">forum</a>:
+ *
+ * Precondition: I use STXXL in a Microsoft CLR Library (a special DLL). That means that managed code and native code (e.g. STXXL) have to co-exist in your library.
+ *
+ * Symptom: Application crashes at process exit, when the DLL is unloaded.
+ *
+ * Cause: STXXL's singleton classes use the \c atexit() function to destruct themselves at process exit. The exit handling will cause the process to crash at exit (still unclear if it's a bug or a feature of the MS runtime).
+ *
+ * Solution:
+ *
+ * 1.) Compiled STXXL static library with \c STXXL_NON_DEFAULT_EXIT_HANDLER defined.
+ *
+ * 2.) For cleanup, \c stxxl::run_exit_handlers() has now to be called manually. To get this done automatically:
+ *
+ * Defined a CLI singleton class "Controller":
+ *
+ * \verbatim
+public ref class Controller {
+private: 
+    static Controller^ instance = gcnew Controller;
+    Controller();
+};
+\endverbatim
+ *
+ *     Registered my own cleanup function in Controller's constructor which will manage to call \c stxxl::run_exit_handlers():
+ *
+ * \verbatim
+#pragma managed(push, off)
+static int myexitfn()
+{
+    stxxl::run_exit_handlers();
+    return 0;
+}
+#pragma managed(pop)
+
+Controller::Controller()
+{
+    onexit(myexitfn);
+}
+\endverbatim
+ *
+ *
+ * \section q6 How can I credit STXXL, and thus foster its development?
+ *
+ * - For all users:
+ *   - Sign up at Ohloh and add yourself as an STXXL user / rate STXXL: http://www.ohloh.net/p/stxxl
+ *   - Rate STXXL at heise Software-Verzeichnis (German): http://www.heise.de/software/download/stxxl/76072
+ *   - Rate STXXL at SourceForge: https://sourceforge.net/projects/stxxl/
+ *
+ * - For scientific work:  Cite the papers mentioned here: http://stxxl.sourceforge.net/
+ *
+ * - For industrial users:  Tell us the name of your company, so we can use it as a reference.
+ *
+ */

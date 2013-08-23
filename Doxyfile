@@ -26,13 +26,13 @@ DOXYFILE_ENCODING      = UTF-8
 # identify the project. Note that if you do not use Doxywizard you need
 # to put quotes around the project name if it contains spaces.
 
-PROJECT_NAME           = Stxxl
+PROJECT_NAME           = STXXL
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = 1.4.0
+PROJECT_NUMBER         = 1.4-dev
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer
@@ -52,7 +52,7 @@ PROJECT_LOGO           =
 # If a relative path is entered, it will be relative to the location
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = doc/doxy/
+OUTPUT_DIRECTORY       =
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create
 # 4096 sub-directories (in 2 levels) under the output directory of each output
@@ -668,7 +668,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = doxymain.h \
+INPUT                  = doc/ \
                          include/stxxl/ \
                          lib/
 
@@ -688,8 +688,7 @@ INPUT_ENCODING         = UTF-8
 # *.hxx *.hpp *.h++ *.idl *.odl *.cs *.php *.php3 *.inc *.m *.mm *.dox *.py
 # *.f90 *.f *.for *.vhd *.vhdl
 
-FILE_PATTERNS          = *.h \
-                         *.cpp
+FILE_PATTERNS          =
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
@@ -751,7 +750,7 @@ EXAMPLE_RECURSIVE      = YES
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = images/
+IMAGE_PATH             = doc/
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -888,7 +887,7 @@ GENERATE_HTML          = YES
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
 # put in front of it. If left blank `html' will be used as the default path.
 
-HTML_OUTPUT            = html
+HTML_OUTPUT            = doxygen-html
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for
 # each generated HTML page (for example: .htm,.php,.asp). If it is left blank
@@ -1302,7 +1301,7 @@ GENERATE_LATEX         = NO
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
 # put in front of it. If left blank `latex' will be used as the default path.
 
-LATEX_OUTPUT           = latex
+LATEX_OUTPUT           = doxygen-latex
 
 # The LATEX_CMD_NAME tag can be used to specify the LaTeX command name to be
 # invoked. If left blank `latex' will be used as the default command name.
@@ -1402,7 +1401,7 @@ GENERATE_RTF           = NO
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be
 # put in front of it. If left blank `rtf' will be used as the default path.
 
-RTF_OUTPUT             = rtf
+RTF_OUTPUT             = doxygen-rtf
 
 # If the COMPACT_RTF tag is set to YES Doxygen generates more compact
 # RTF documents. This may be useful for small projects and may help to

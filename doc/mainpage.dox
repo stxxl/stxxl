@@ -1,0 +1,129 @@
+/*! \mainpage Documentation for STXXL library
+ *
+ *  \image html layer_diagram.png
+ *
+ * <br><br>
+ * The core of \c S<small>TXXL</small> is an implementation of the C++
+ * standard template library STL for external memory (out-of-core)
+ * computations, i.e., \c S<small>TXXL</small> implements containers and algorithms
+ * that can process huge volumes of data that only fit on
+ * disks. While the compatibility to the STL supports
+ * ease of use and compatibility with existing applications,
+ * another design priority is high performance.
+ * Here is a selection of \c S<small>TXXL</small> performance features:
+ * - transparent support of multiple disks
+ * - variable block lengths
+ * - overlapping of I/O and computation
+ * - prevention of OS file buffering overhead
+ * - algorithm pipelining
+ * - utilization of multiple processor cores for internal computation
+ *
+ *
+ * \section platforms Supported Operating Systems
+ * - Linux (kernel >= 2.4.18)
+ * - Mac OS X
+ * - FreeBSD
+ * - other POSIX compatible systems should work, but have not been tested
+ * - Windows 2000/XP/Vista/7
+ *
+ *
+ * \section compilers Supported Compilers
+ *
+ * The following compilers have been tested in different
+ * \c S<small>TXXL</small> configurations.
+ * Other compilers might work, too, but we don't have the resources
+ * (systems, compilers or time) to test them.
+ * Feedback is welcome.
+ *
+ * The compilers marked with '*' are the developer's favorite choices
+ * and are most thoroughly tested.
+ *
+ * \verbatim
+                |         parallel            parallel
+                |  stxxl   stxxl     stxxl     stxxl
+  compiler      |                   + boost   + boost
+----------------+----------------------------------------
+  GCC 4.6 c++0x |    x     PMODE       x       PMODE 
+  GCC 4.6       |    x     PMODE       x       PMODE 
+  GCC 4.5 c++0x |    x     PMODE       x       PMODE 
+  GCC 4.5       |    x     PMODE       x       PMODE 
+* GCC 4.4 c++0x |    x     PMODE       x       PMODE 
+  GCC 4.4       |    x     PMODE       x       PMODE 
+  GCC 4.3 c++0x |    x     PMODE²      x       PMODE²
+  GCC 4.3       |    x     PMODE²      x       PMODE²
+  GCC 4.2       |    x     MCSTL       x       MCSTL
+  GCC 4.1       |    x       -         x         -
+  GCC 4.0       |    x       -         x         -
+  GCC 3.4       |    x       -         x         -
+  GCC 3.3       |    o       -         o         -
+  GCC 2.95      |    -       -         -         -
+  ICPC 12.0.191 |    x¹    PMODE¹²     x¹      PMODE¹²
+  ICPC 12.0.191 |    x¹    MCSTL¹      x¹      MCSTL¹
+* ICPC 11.1.075 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 11.0.084 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 10.1.026 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 10.0.026 |    x¹    MCSTL¹      x¹      MCSTL¹
+  ICPC 9.1.053  |    x¹      -         x¹        -
+  ICPC 9.0.032  |    x¹      -         x¹        -
+  clang++ 2.9   |    x       -         x         -
+  MSVC 2010 10.0|    -       -         x         -
+* MSVC 2008 9.0 |    -       -         x         -
+  MSVC 2005 8.0 |    -       -         x         -
+
+ x   = full support
+ o   = partial support
+ -   = unsupported
+ ?   = untested
+ PMODE = supports parallelization using libstdc++ parallel mode
+ MCSTL = supports parallelization using the MCSTL library (superseded by
+       PMODE, introduced in gcc 4.3)
+ ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
+       gcc does not come in the correct version:
+       icpc 9.0: use with gcc 3.x
+       icpc 9.1: use with gcc before 4.2
+       icpc 10.x, 11.x, 12.0 with mcstl support: use with gcc 4.2
+       icpc 12.0 with pmode support: use with gcc 4.3
+ ²   = gcc 4.3 only provides partial support for the libstdc++ parallel mode,
+       full support requires gcc 4.4 or later
+\endverbatim
+ *
+ *
+ * \section boost Supported BOOST versions
+ *
+ * The <a href="http://www.boost.org">Boost</a> libraries are required on
+ * Windows platforms using MSVC compiler and optional on other platforms.
+ *
+ * \c S<small>TXXL</small> has been tested with Boost 1.40.0, 1.42.0 and 1.46.1.
+ * Other versions may work, too, but older versions will not get support.
+ *
+ *
+ * \section installation Instructions on installation, usage, configuration
+ *
+ * - \link installation_linux_gcc Installation, usage, configuration (Linux/Unix &ndash; g++/icpc/clang++) \endlink
+ * - \link installation_msvc Installation, usage, configuration (Windows &ndash; Microsoft Visual C++) \endlink
+ *
+ * - \link install-svn Installing from subversion \endlink
+ *
+ *
+ * \section questions Questions
+ *
+ * - Questions concerning use and development of the \c S<small>TXXL</small>
+ * library should be posted to the
+ * <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>.
+ * Please search the forum before posting,
+ * your question may have been answered before.
+ *
+ * \section bugreports Bug Reports
+ *
+ * - Bugs should be reported in the 
+ *   <b><a href="https://stxxl.ae.cs.uni-frankfurt.de/bugs/">Bugzilla Bug Tracker</a></b>
+ *
+ * - \link FAQ FAQ - Frequently Asked Questions \endlink
+ *
+ *
+ * \section license License
+ *
+ * \c S<small>TXXL</small> is distributed under the Boost Software License, Version 1.0.<br>
+ * You can find a copy of the license in the accompanying file \c LICENSE_1_0.txt or online at
+ * <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
+ */
