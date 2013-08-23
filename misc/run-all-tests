@@ -119,36 +119,9 @@ run containers/stack_benchmark 1 1073741824
 run containers/stack_benchmark 2 1073741824
 run containers/stack_benchmark 3 1073741824
 run containers/stack_benchmark 4 1073741824
-run containers/test_deque 33333333
-run containers/test_ext_merger
-run containers/test_ext_merger2
-run containers/test_iterators
-run containers/test_many_stacks 42
-run containers/test_migr_stack
-run containers/test_pqueue
-run containers/test_queue
-run containers/test_queue2 200
-run containers/test_stack 1024
-run containers/test_vector
-run containers/test_vector_export
 run containers/write_vector "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
 run containers/write_vector2 "$STXXL_TMPDIR/in" "$STXXL_TMPDIR/out"
-run containers/test_vector_sizes "$STXXL_TMPDIR/out" syscall
-run containers/test_vector_sizes "$STXXL_TMPDIR/out" mmap
-run containers/test_vector_sizes "$STXXL_TMPDIR/out" boostfd
 run containers/benchmark_naive_matrix
-run containers/test_matrix
-run containers/test_map 32
-run containers/test_map_random 2000
-run containers/btree/test_btree 10000
-run containers/btree/test_btree 100000
-run containers/btree/test_btree 1000000
-run containers/btree/test_const_scan 10000
-run containers/btree/test_const_scan 100000
-run containers/btree/test_const_scan 1000000
-run containers/btree/test_corr_insert_erase 14
-run containers/btree/test_corr_insert_find 14
-run containers/btree/test_corr_insert_scan 14
 
 run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
 run algo/sort_file sort "$STXXL_TMPDIR/sort_file.dat"

@@ -1,7 +1,7 @@
 ###############################################################################
 # CMakeLists.txt
 #
-# Cmake file for stxxl/tools/containers/btree
+# Cmake file for stxxl/containers/btree
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #
@@ -17,3 +17,13 @@ stxxl_build_test(test_const_scan)
 stxxl_build_test(test_corr_insert_erase)
 stxxl_build_test(test_corr_insert_find)
 stxxl_build_test(test_corr_insert_scan)
+
+stxxl_test(test_btree 10000)
+stxxl_test(test_btree 100000)
+stxxl_test(test_btree 1000000)
+stxxl_test(test_const_scan 10000)
+stxxl_test(test_const_scan 100000)
+stxxl_test(test_const_scan 1000000)
+stxxl_test(test_corr_insert_erase 14)
+stxxl_test(test_corr_insert_find 14)
+stxxl_test(test_corr_insert_scan 14)
