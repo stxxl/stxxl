@@ -11,8 +11,8 @@
  **************************************************************************/
 
 #include <iostream>
-#include <cassert>
 #include <stxxl/random>
+#include <stxxl/bits/verbose.h>
 
 int main()
 {
@@ -46,6 +46,6 @@ int main()
     }
 
     stxxl::set_seed(42);
-    assert(stxxl::get_next_seed() == 42);
-    assert(stxxl::get_next_seed() != 42);
+    STXXL_CHECK(stxxl::get_next_seed() == 42);
+    STXXL_CHECK(stxxl::get_next_seed() != 42);
 }

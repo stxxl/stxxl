@@ -59,7 +59,7 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
     stxxl::stats_data after(*stxxl::stats::get_instance());
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG((stxxl::is_sorted(v.begin(), v.end()) ? "OK" : "WRONG"));
+    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end()));
 
     STXXL_MSG("Sorting: " << (after - before));
     STXXL_MSG("Total:   " << *stxxl::stats::get_instance());

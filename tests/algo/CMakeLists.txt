@@ -61,7 +61,7 @@ if(BUILD_EXTRAS)
 
 endif(BUILD_EXTRAS)
 
-if(USE_GNU_PARALLEL)
+if(USE_GNU_PARALLEL AND BUILD_EXTRAS)
 
   stxxl_build_test(test_parallel_sort)
 
@@ -79,7 +79,7 @@ if(USE_GNU_PARALLEL)
     endforeach(RAM)
   endforeach(DATA)
 
-endif(USE_GNU_PARALLEL)
+endif(USE_GNU_PARALLEL AND BUILD_EXTRAS)
 
 # Left-overs from GNUmakefile
 

@@ -28,13 +28,13 @@ struct forty_two
 
     int operator * ()
     {
-        assert(!empty());
+        STXXL_CHECK(!empty());
         return counter;
     }
 
     forty_two & operator ++ ()
     {
-        assert(!empty());
+        STXXL_CHECK(!empty());
         ++counter;
         return *this;
     }

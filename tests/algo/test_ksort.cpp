@@ -95,14 +95,14 @@ int main()
     }
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
+    STXXL_CHECK(!stxxl::is_sorted(v.begin(), v.end()));
 
     STXXL_MSG("Sorting...");
     stxxl::ksort(v.begin(), v.end(), get_key(), memory_to_use);
     //stxxl::ksort(v.begin(),v.end(),memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end())) ? "OK" : "WRONG"));
+    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end()));
     STXXL_MSG("Checking content...");
     my_type prev;
     for (vector_type::size_type i = 0; i < v.size(); i++)

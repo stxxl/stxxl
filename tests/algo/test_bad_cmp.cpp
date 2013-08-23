@@ -80,16 +80,18 @@ struct cmp : public std::less<my_type>
 };
 
 
-int main()
+int main(int argc, char* argv[])
 {
+    const stxxl::int_type SIZE = (argc >= 2) ? atoi(argv[1]) : 128;
+
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    unsigned memory_to_use = 128 * 1024 * 1024;
+    unsigned memory_to_use = SIZE * 1024 * 1024;
     typedef stxxl::vector<my_type> vector_type;
 
     const stxxl::int64 n_records =
-        stxxl::int64(384) * stxxl::int64(1024 * 1024) / sizeof(my_type);
+        stxxl::int64(SIZE * 2 + SIZE / 2) * stxxl::int64(1024 * 1024) / sizeof(my_type);
     vector_type v(n_records);
 
     stxxl::int64 aliens, not_stable;
@@ -102,13 +104,13 @@ int main()
     }
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end(), cmp())) ? "OK" : "WRONG"));
+    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
 
     STXXL_MSG("Sorting (using " << (memory_to_use >> 20) << " MiB of memory)...");
     stxxl::sort(v.begin(), v.end(), cmp(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end(), cmp())) ? "OK" : "WRONG"));
+    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -125,7 +127,7 @@ int main()
     stxxl::sort(v.begin() + bs - 1, v.end() - bs + 2, cmp(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end(), cmp())) ? "OK" : "WRONG"));
+    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {
@@ -148,7 +150,7 @@ int main()
     stxxl::sort(v.begin() + bs - 1, v.end() - bs + 2, cmp(), memory_to_use);
 
     STXXL_MSG("Checking order...");
-    STXXL_MSG(((stxxl::is_sorted(v.begin(), v.end(), cmp())) ? "OK" : "WRONG"));
+    STXXL_CHECK(stxxl::is_sorted(v.begin(), v.end(), cmp()));
 
     aliens = not_stable = 0;
     for (vector_type::size_type i = 0; i < v.size(); i++) {

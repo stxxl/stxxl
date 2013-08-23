@@ -118,7 +118,7 @@ void linear_sort_normal(vector_type & input)
 
     std::cout << sum1 << " ?= " << sum2 << std::endl;
 
-    STXXL_MSG((stxxl::is_sorted<vector_type::const_iterator>(input.begin(), input.end()) ? "OK" : "NOT SORTED"));
+    STXXL_CHECK(stxxl::is_sorted<vector_type::const_iterator>(input.begin(), input.end()));
 
     std::cout << "Linear sorting normal took " << (stop - start) << " seconds." << std::endl;
 }
@@ -143,7 +143,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
     sort_stream_type sort_stream(input_stream, cl, run_size);
 
     vector_type::iterator o = stxxl::stream::materialize(sort_stream, output.begin(), output.end());
-    assert(o == output.end());
+    STXXL_CHECK(o == output.end());
 
     double stop = stxxl::timestamp();
     std::cout << stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
@@ -154,7 +154,7 @@ void linear_sort_streamed(vector_type & input, vector_type & output)
     if (sum1 != sum2)
         STXXL_MSG("WRONG DATA");
 
-    STXXL_MSG((stxxl::is_sorted<vector_type::const_iterator>(output.begin(), output.end(), comparator_type()) ? "OK" : "NOT SORTED"));
+    STXXL_CHECK(stxxl::is_sorted<vector_type::const_iterator>(output.begin(), output.end(), comparator_type()));
 
     std::cout << "Linear sorting streamed took " << (stop - start) << " seconds." << std::endl;
 }
@@ -218,7 +218,7 @@ int main(int argc, const char ** argv)
     parallel_settings.multiway_merge_minimal_k = 2;
 
     __gnu_parallel::_Settings::set(parallel_settings);
-    assert(&__gnu_parallel::_Settings::get() != &parallel_settings);
+    STXXL_CHECK(&__gnu_parallel::_Settings::get() != &parallel_settings);
 
     if (0)
         printf("%d %p: mwms %d, q %d, qb %d",
@@ -288,7 +288,7 @@ int main(int argc, const char ** argv)
 
     std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
 
-    STXXL_MSG(((stxxl::is_sorted<vector_type::const_iterator>(input.begin(), input.end())) ? "OK" : "NOT SORTED"));
+    STXXL_CHECK(stxxl::is_sorted<vector_type::const_iterator>(input.begin(), input.end()));
 
     {
         vector_type output(n_records);

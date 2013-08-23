@@ -88,7 +88,7 @@ int main(int argc, char **argv)
 
             bst * b_s = new bst(internal_memory); // the block_scheduler may use internal_memory byte for caching
             bst & bs = *b_s;
-            assert(! bs.is_simulating()); // make sure is not just recording a prediction sequence
+            STXXL_CHECK(! bs.is_simulating()); // make sure is not just recording a prediction sequence
 
             sbit sbi1 = bs.allocate_swappable_block(); // allocate a swappable_block and store its identifier
             if (bs.is_initialized(sbi1)) // it should not be initialized

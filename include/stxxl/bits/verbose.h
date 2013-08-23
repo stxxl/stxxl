@@ -123,7 +123,7 @@ __STXXL_END_NAMESPACE
 
 #define STXXL_CHECK2(condition,text) \
     do { if (!(condition)) { _STXXL_PRINT("STXXL-CHECK", \
-       text " - " #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
+       text << " - " #condition " - FAILED @ " __FILE__ ":" << __LINE__, \
        _STXXL_PRINT_FLAGS_ERROR); abort(); } } while(0)
 
 

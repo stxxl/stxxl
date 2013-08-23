@@ -193,7 +193,7 @@ int main()
     // HERE streaming part ends (materializing)
     output_array_type::iterator o = stxxl::stream::materialize(transformed_stream, output.begin(), output.end());
     // or materialize(sorted_stream,output.begin());
-    assert(o == output.end());
+    STXXL_CHECK(o == output.end());
 
 
     STXXL_MSG("input string (character,position) :");
