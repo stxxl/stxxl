@@ -12,21 +12,4 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-stxxl_build_test(test_argument_helper)
-stxxl_build_test(test_globals)
-# TODO: test_manyunits and test_manyunits2 checks compilation with more than
-# one object file.
-stxxl_build_test(test_manyunits2)
-stxxl_build_test(test_random)
-
 stxxl_build_tool(stxxl_info)
-
-# Left-overs from GNUmakefile
-#
-# ifneq (,$(wildcard .svn ../.git))
-# version.$(lo): STXXL_COMPILER_OPTIONS += -DHAVE_VERSION_SVN_DEFS
-# endif
-#
-# ifneq (,$(wildcard version.defs))
-# version.$(lo): STXXL_COMPILER_OPTIONS += -DHAVE_VERSION_DEFS
-# endif

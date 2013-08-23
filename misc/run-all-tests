@@ -87,9 +87,6 @@ fi
 run common/stxxl_info
 XFAIL=1 run common/stxxl_info foo # returns -1 intentionally
 XFAIL=1 run common/stxxl_info foo bar # returns !0 if assertions are enabled
-run common/test_random
-run common/test_manyunits
-run common/test_globals
 
 run io/gen_file "$STXXL_TMPDIR/in"
 run utils/createdisks 1024 "$STXXL_TMPDIR/testdiskx" "$STXXL_TMPDIR/testdisky"
@@ -163,13 +160,6 @@ run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
 run algo/copy_and_sort_file "$STXXL_TMPDIR/sort_file.dat" "$STXXL_TMPDIR/sorted_file.dat"
 test -n "$WITH_STABLE_KSORT" && run algo/sort_file generate "$STXXL_TMPDIR/sort_file.dat"
 test -n "$WITH_STABLE_KSORT" && run algo/sort_file stable_ksort "$STXXL_TMPDIR/sort_file.dat"
-run algo/test_asch 3 100 1000 42
-run algo/test_ksort
-run algo/test_random_shuffle
-run algo/test_scan
-run algo/test_sort
-run algo/test_bad_cmp
-test -n "$WITH_STABLE_KSORT" && run algo/test_stable_ksort
 
 rm -rf $AMI_SINGLE_DEVICE
 mkdir $AMI_SINGLE_DEVICE
@@ -194,34 +184,5 @@ run containers/leda_sm_pq_benchmark 1 1000000
 run containers/leda_sm_pq_benchmark 2 1000000
 run containers/leda_sm_stack_benchmark 1 1073741824
 run containers/leda_sm_stack_benchmark 2 1073741824
-
-#algo/test_sort_all_parameters		<MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-#algo/test_ksort_all_parameters		<MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-#algo/test_stable_ksort_all_parameters	<MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-for data in 1024 ; do
-for ram in 384 ; do
-for strategy in 0 1 2 3 ; do
-for blk_size in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 ; do
-run algo/test_sort_all_parameters		$data $ram $strategy $blk_size 42
-run algo/test_ksort_all_parameters		$data $ram $strategy $blk_size 42
-test -n "$WITH_STABLE_KSORT" && \
-    run algo/test_stable_ksort_all_parameters	$data $ram $strategy $blk_size 42
-done
-done
-done
-done
-
-#algo/test_parallel_sort [n in MiB] [p threads] [M in MiB] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]
-for data in 768 ; do
-for ram in 128 ; do
-for threads in 1 2 3 4 ; do
-for sort in m q qb s ; do
-for merge in p s n ; do
-run algo/test_parallel_sort $data $threads $ram $sort $merge
-done
-done
-done
-done
-done
 
 exit 0
