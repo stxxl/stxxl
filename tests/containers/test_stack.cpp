@@ -24,7 +24,7 @@ template <typename stack_type>
 void test_lvalue_correctness(stack_type & stack, int a, int b)
 {
     int i;
-    assert(stack.empty());
+    STXXL_CHECK(stack.empty());
     for (i = 0; i < a; ++i)
         stack.push(i);
     for (i = 0; i < b; ++i)
@@ -38,7 +38,7 @@ void test_lvalue_correctness(stack_type & stack, int a, int b)
         stack.pop();
     if ((stack.top() != int(0xbeeff00d))) {
         STXXL_ERRMSG("STACK MISMATCH AFTER top() LVALUE MODIFICATION (0x" << std::hex << stack.top() << " != 0xbeeff00d)");
-        assert(stack.top() == int(0xbeeff00d));
+        STXXL_CHECK(stack.top() == int(0xbeeff00d));
     }
     for (i = 0; i < a; ++i)
         stack.pop();
@@ -53,22 +53,22 @@ void simple_test(stack_type & my_stack, int test_size)
     for (i = 0; i < test_size; i++)
     {
         my_stack.push(i);
-        assert(my_stack.top() == i);
-        assert(my_stack.size() == i + 1);
+        STXXL_CHECK(my_stack.top() == i);
+        STXXL_CHECK(my_stack.size() == i + 1);
     }
 
     for (i = test_size - 1; i >= 0; i--)
     {
-        assert(my_stack.top() == i);
+        STXXL_CHECK(my_stack.top() == i);
         my_stack.pop();
-        assert(my_stack.size() == i);
+        STXXL_CHECK(my_stack.size() == i);
     }
 
     for (i = 0; i < test_size; i++)
     {
         my_stack.push(i);
-        assert(my_stack.top() == i);
-        assert(my_stack.size() == i + 1);
+        STXXL_CHECK(my_stack.top() == i);
+        STXXL_CHECK(my_stack.size() == i + 1);
     }
 
     // test swap
@@ -78,9 +78,9 @@ void simple_test(stack_type & my_stack, int test_size)
 
     for (i = test_size - 1; i >= 0; i--)
     {
-        assert(my_stack.top() == i);
+        STXXL_CHECK(my_stack.top() == i);
         my_stack.pop();
-        assert(my_stack.size() == i);
+        STXXL_CHECK(my_stack.size() == i);
     }
 
     std::stack<int> int_stack;
@@ -88,17 +88,17 @@ void simple_test(stack_type & my_stack, int test_size)
     for (i = 0; i < test_size; i++)
     {
         int_stack.push(i);
-        assert(int_stack.top() == i);
-        assert(int(int_stack.size()) == i + 1);
+        STXXL_CHECK(int_stack.top() == i);
+        STXXL_CHECK(int(int_stack.size()) == i + 1);
     }
 
     stack_type my_stack1(int_stack);
 
     for (i = test_size - 1; i >= 0; i--)
     {
-        assert(my_stack1.top() == i);
+        STXXL_CHECK(my_stack1.top() == i);
         my_stack1.pop();
-        assert(my_stack1.size() == i);
+        STXXL_CHECK(my_stack1.size() == i);
     }
 
     STXXL_MSG("Test 1 passed.");
@@ -140,22 +140,22 @@ int main(int argc, char * argv[])
         for (i = 0; i < test_size; i++)
         {
             my_stack.push(i);
-            assert(my_stack.top() == i);
-            assert(my_stack.size() == i + 1);
+            STXXL_CHECK(my_stack.top() == i);
+            STXXL_CHECK(my_stack.size() == i + 1);
         }
         my_stack.set_prefetch_aggr(10);
         for (i = test_size - 1; i >= 0; i--)
         {
-            assert(my_stack.top() == i);
+            STXXL_CHECK(my_stack.top() == i);
             my_stack.pop();
-            assert(my_stack.size() == i);
+            STXXL_CHECK(my_stack.size() == i);
         }
 
         for (i = 0; i < test_size; i++)
         {
             my_stack.push(i);
-            assert(my_stack.top() == i);
-            assert(my_stack.size() == i + 1);
+            STXXL_CHECK(my_stack.top() == i);
+            STXXL_CHECK(my_stack.size() == i + 1);
         }
 
         // test swap
@@ -165,9 +165,9 @@ int main(int argc, char * argv[])
 
         for (i = test_size - 1; i >= 0; i--)
         {
-            assert(my_stack.top() == i);
+            STXXL_CHECK(my_stack.top() == i);
             my_stack.pop();
-            assert(my_stack.size() == i);
+            STXXL_CHECK(my_stack.size() == i);
         }
 
         STXXL_MSG("Test 2 passed.");

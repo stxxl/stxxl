@@ -92,7 +92,7 @@ int main(int argc, char * argv[])
              PERCENT_FIND +
              PERCENT_ITERATOR);
 
-    assert(a == 1000);
+    STXXL_CHECK(a == 1000);
 
     if (argc < 2)
     {
@@ -101,7 +101,7 @@ int main(int argc, char * argv[])
         return -1;
     }
     stxxl::uint64 MAX_STEP = atoi(argv[1]);
-    assert(MAX_STEP > 1000);
+    STXXL_CHECK(MAX_STEP > 1000);
     std_map_type stdmap;
     xxl_map_type xxlmap(NODE_BLOCK_SIZE * 4, LEAF_BLOCK_SIZE * 3);
 
@@ -131,8 +131,8 @@ int main(int argc, char * argv[])
                 stdmap.clear();
                 xxlmap.clear();
 
-                assert(stdmap.empty());
-                assert(xxlmap.empty());
+                STXXL_CHECK(stdmap.empty());
+                STXXL_CHECK(xxlmap.empty());
             }
         }
 
@@ -144,7 +144,7 @@ int main(int argc, char * argv[])
             std_map_type::size_type size1 = stdmap.size();
             xxl_map_type::size_type size2 = xxlmap.size();
 
-            assert(size1 == size2);
+            STXXL_CHECK(size1 == size2);
         }
 
         // *********************************************************
@@ -163,12 +163,12 @@ int main(int argc, char * argv[])
             stdmap.erase(stdmap.lower_bound(key1), stdmap.upper_bound(key2));
             xxlmap.erase(xxlmap.lower_bound(key1), xxlmap.upper_bound(key2));
 
-            assert(stdmap.size() == xxlmap.size());
+            STXXL_CHECK(stdmap.size() == xxlmap.size());
 
-            assert(stdmap.lower_bound(key1) == stdmap.end() ||
-                   stdmap.lower_bound(key1) == stdmap.upper_bound(key2));
-            assert(xxlmap.lower_bound(key1) == xxlmap.end() ||
-                   xxlmap.lower_bound(key1) == xxlmap.upper_bound(key2));
+            STXXL_CHECK(stdmap.lower_bound(key1) == stdmap.end() ||
+                        stdmap.lower_bound(key1) == stdmap.upper_bound(key2));
+            STXXL_CHECK(xxlmap.lower_bound(key1) == xxlmap.end() ||
+                        xxlmap.lower_bound(key1) == xxlmap.upper_bound(key2));
         }
 
         // *********************************************************
@@ -181,8 +181,8 @@ int main(int argc, char * argv[])
             stdmap.erase(key);
             xxlmap.erase(key);
 
-            assert(stxxl::not_there(stdmap, key));
-            assert(stxxl::not_there(xxlmap, key));
+            STXXL_CHECK(stxxl::not_there(stdmap, key));
+            STXXL_CHECK(stxxl::not_there(xxlmap, key));
         }
 
         // *********************************************************
@@ -195,7 +195,7 @@ int main(int argc, char * argv[])
             std_map_type::iterator stditer = stdmap.find(key);
             xxl_map_type::iterator xxliter = xxlmap.find(key);
 
-            assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
+            STXXL_CHECK(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
 
             if (stditer != stdmap.end())
                 stdmap.erase(stditer);
@@ -204,8 +204,8 @@ int main(int argc, char * argv[])
                 xxlmap.erase(xxliter);
 
 
-            assert(stxxl::not_there(stdmap, key));
-            assert(stxxl::not_there(xxlmap, key));
+            STXXL_CHECK(stxxl::not_there(stdmap, key));
+            STXXL_CHECK(stxxl::not_there(xxlmap, key));
         }
 
         // *********************************************************
@@ -217,8 +217,8 @@ int main(int argc, char * argv[])
             stdmap.insert(std::pair<key_type, data_type>(key, 2 * key));
             xxlmap.insert(std::pair<key_type, data_type>(key, 2 * key));
 
-            assert(stxxl::there(stdmap, key, 2 * key));
-            assert(stxxl::there(xxlmap, key, 2 * key));
+            STXXL_CHECK(stxxl::there(stdmap, key, 2 * key));
+            STXXL_CHECK(stxxl::there(xxlmap, key, 2 * key));
         }
 
         // *********************************************************
@@ -243,10 +243,10 @@ int main(int argc, char * argv[])
             xxlmap.insert(v2.begin(), v2.end());
 
             for (unsigned i = lower; i < upper; i++)
-                assert(stxxl::there(stdmap, i, 2 * i));
+                STXXL_CHECK(stxxl::there(stdmap, i, 2 * i));
 
             for (unsigned i = lower; i < upper; i++)
-                assert(stxxl::there(xxlmap, i, 2 * i));
+                STXXL_CHECK(stxxl::there(xxlmap, i, 2 * i));
         }
 
         // *********************************************************
@@ -266,9 +266,9 @@ int main(int argc, char * argv[])
                 std_map_type::iterator stditer = stdmap.lower_bound(key1);
                 xxl_map_type::iterator xxliter = xxlmap.lower_bound(key1);
 
-                assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
+                STXXL_CHECK(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
                 if (!stxxl::is_end(stdmap, stditer)) {
-                    assert(stxxl::is_same(*(stditer), *(xxliter)));
+                    STXXL_CHECK(stxxl::is_same(*(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -292,9 +292,9 @@ int main(int argc, char * argv[])
                 std_map_type::iterator stditer = stdmap.upper_bound(key1);
                 xxl_map_type::iterator xxliter = xxlmap.upper_bound(key1);
 
-                assert(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
+                STXXL_CHECK(stxxl::is_end(stdmap, stditer) == is_end(xxlmap, xxliter));
                 if (!stxxl::is_end(stdmap, stditer)) {
-                    assert(stxxl::is_same(*(stditer), *(xxliter)));
+                    STXXL_CHECK(stxxl::is_same(*(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -318,9 +318,9 @@ int main(int argc, char * argv[])
                 std_map_type::iterator stditer = stdmap.find(key1);
                 xxl_map_type::iterator xxliter = xxlmap.find(key1);
 
-                assert(stxxl::is_end(stdmap, stditer) == stxxl::is_end(xxlmap, xxliter));
+                STXXL_CHECK(stxxl::is_end(stdmap, stditer) == stxxl::is_end(xxlmap, xxliter));
                 if (!stxxl::is_end(stdmap, stditer)) {
-                    assert(stxxl::is_same(*(stditer), *(xxliter)));
+                    STXXL_CHECK(stxxl::is_same(*(stditer), *(xxliter)));
                 }
 
                 key1++;
@@ -340,18 +340,18 @@ int main(int argc, char * argv[])
 
             while (siter1 != stdmap.end())
             {
-                assert(xiter1 != xxlmap.end());
-                assert(stxxl::is_same(*(siter1++), *(xiter1++)));
+                STXXL_CHECK(xiter1 != xxlmap.end());
+                STXXL_CHECK(stxxl::is_same(*(siter1++), *(xiter1++)));
                 if (siter1 != stdmap.end()) {
-                    assert(!stxxl::is_same(*siter1, *siter2));
+                    STXXL_CHECK(!stxxl::is_same(*siter1, *siter2));
                 }
                 if (xiter1 != xxlmap.end()) {
-                    assert(!stxxl::is_same(*xiter1, *xiter2));
+                    STXXL_CHECK(!stxxl::is_same(*xiter1, *xiter2));
                 }
             }
-            assert(xiter1 == xxlmap.end());
-            assert(siter2 == stdmap.begin());
-            assert(xiter2 == xxlmap.begin());
+            STXXL_CHECK(xiter1 == xxlmap.end());
+            STXXL_CHECK(siter2 == stdmap.begin());
+            STXXL_CHECK(xiter2 == xxlmap.begin());
         }
     }
     return 0;

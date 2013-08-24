@@ -90,7 +90,7 @@ int main(int argc, char * argv[])
     stxxl::vector<int>::iterator NewEnd = std::unique(Values.begin(), Values.end());
     Values.resize(NewEnd - Values.begin());
 
-    assert(BTree.size() == Values.size());
+    STXXL_CHECK(BTree.size() == Values.size());
     STXXL_MSG("Size without duplicates: " << Values.size());
 
     STXXL_MSG("Comparing content");
@@ -100,12 +100,12 @@ int main(int argc, char * argv[])
 
     for ( ; vIt != Values.end(); ++vIt, ++bIt)
     {
-        assert(*vIt == bIt->first);
-        assert(double(bIt->first) + 1.0 == bIt->second);
-        assert(bIt != BTree.end());
+        STXXL_CHECK(*vIt == bIt->first);
+        STXXL_CHECK(double(bIt->first) + 1.0 == bIt->second);
+        STXXL_CHECK(bIt != BTree.end());
     }
 
-    assert(bIt == BTree.end());
+    STXXL_CHECK(bIt == BTree.end());
 
     STXXL_MSG("Test passed.");
 

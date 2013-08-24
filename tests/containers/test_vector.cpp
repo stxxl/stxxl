@@ -102,7 +102,7 @@ int main()
         for (i = 0; i < v.size(); ++i)
         {
             v[i].key = i + offset;
-            assert(v[i].key == stxxl::int64(i + offset));
+            STXXL_CHECK(v[i].key == stxxl::int64(i + offset));
         }
 
 
@@ -120,7 +120,7 @@ int main()
         std::swap(v, a);
 
         for (i = 0; i < v.size(); i++)
-            assert(v[i].key == rnd());
+            STXXL_CHECK(v[i].key == rnd());
 
         // check again
         STXXL_MSG("clear");
@@ -139,16 +139,16 @@ int main()
         STXXL_MSG("seq read of " << v.size() << " elements");
 
         for (i = 0; i < v.size(); i++)
-            assert(v[i].key == rnd());
+            STXXL_CHECK(v[i].key == rnd());
 
         STXXL_MSG("copy vector of " << v.size() << " elements");
 
         vector_type v_copy0(v);
-        assert(v == v_copy0);
+        STXXL_CHECK(v == v_copy0);
 
         vector_type v_copy1;
         v_copy1 = v;
-        assert(v == v_copy1);
+        STXXL_CHECK(v == v_copy1);
     }
     catch (const std::exception & ex)
     {

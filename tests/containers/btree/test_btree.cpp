@@ -59,117 +59,117 @@ int main(int argc, char * argv[])
     BTree1[10] = 100.;
     btree_type::iterator begin = BTree1.begin();
     btree_type::iterator end = BTree1.end();
-    assert(begin == BTree1.begin());
+    STXXL_CHECK(begin == BTree1.begin());
     BTree1[5] = 50.;
     btree_type::iterator nbegin = BTree1.begin();
     btree_type::iterator nend = BTree1.end();
-    assert(nbegin == BTree1.begin());
-    assert(begin != nbegin);
-    assert(end == nend);
-    assert(begin != end);
-    assert(nbegin != end);
-    assert(begin->first == 10);
-    assert(begin->second == 100);
-    assert(nbegin->first == 5);
-    assert(nbegin->second == 50);
+    STXXL_CHECK(nbegin == BTree1.begin());
+    STXXL_CHECK(begin != nbegin);
+    STXXL_CHECK(end == nend);
+    STXXL_CHECK(begin != end);
+    STXXL_CHECK(nbegin != end);
+    STXXL_CHECK(begin->first == 10);
+    STXXL_CHECK(begin->second == 100);
+    STXXL_CHECK(nbegin->first == 5);
+    STXXL_CHECK(nbegin->second == 50);
 
     BTree1[10] = 200.;
-    assert(begin->second == 200.);
+    STXXL_CHECK(begin->second == 200.);
 
     btree_type::iterator it = BTree1.find(5);
-    assert(it != BTree1.end());
-    assert(it->first == 5);
-    assert(it->second == 50.);
+    STXXL_CHECK(it != BTree1.end());
+    STXXL_CHECK(it->first == 5);
+    STXXL_CHECK(it->second == 50.);
     it = BTree1.find(6);
-    assert(it == BTree1.end());
+    STXXL_CHECK(it == BTree1.end());
     it = BTree1.find(1000);
-    assert(it == BTree1.end());
+    STXXL_CHECK(it == BTree1.end());
 
 
     int f = BTree1.erase(5);
-    assert(f == 1);
+    STXXL_CHECK(f == 1);
     f = BTree1.erase(6);
-    assert(f == 0);
+    STXXL_CHECK(f == 0);
     f = BTree1.erase(5);
-    assert(f == 0);
+    STXXL_CHECK(f == 0);
 
-    assert(BTree1.count(10) == 1);
-    assert(BTree1.count(5) == 0);
+    STXXL_CHECK(BTree1.count(10) == 1);
+    STXXL_CHECK(BTree1.count(5) == 0);
 
     it = BTree1.insert(BTree1.begin(), std::pair<int, double>(7, 70.));
-    assert(it->second == 70.);
-    assert(BTree1.size() == 2);
+    STXXL_CHECK(it->second == 70.);
+    STXXL_CHECK(BTree1.size() == 2);
     it = BTree1.insert(BTree1.begin(), std::pair<int, double>(10, 300.));
-    assert(it->second == 200.);
-    assert(BTree1.size() == 2);
+    STXXL_CHECK(it->second == 200.);
+    STXXL_CHECK(BTree1.size() == 2);
 
     // test lower_bound
 
     it = BTree1.lower_bound(6);
-    assert(it != BTree1.end());
-    assert(it->first == 7);
+    STXXL_CHECK(it != BTree1.end());
+    STXXL_CHECK(it->first == 7);
 
     it = BTree1.lower_bound(7);
-    assert(it != BTree1.end());
-    assert(it->first == 7);
+    STXXL_CHECK(it != BTree1.end());
+    STXXL_CHECK(it->first == 7);
 
     it = BTree1.lower_bound(8);
-    assert(it != BTree1.end());
-    assert(it->first == 10);
+    STXXL_CHECK(it != BTree1.end());
+    STXXL_CHECK(it->first == 10);
 
     it = BTree1.lower_bound(11);
-    assert(it == BTree1.end());
+    STXXL_CHECK(it == BTree1.end());
 
     // test upper_bound
 
     it = BTree1.upper_bound(6);
-    assert(it != BTree1.end());
-    assert(it->first == 7);
+    STXXL_CHECK(it != BTree1.end());
+    STXXL_CHECK(it->first == 7);
 
     it = BTree1.upper_bound(7);
-    assert(it != BTree1.end());
-    assert(it->first == 10);
+    STXXL_CHECK(it != BTree1.end());
+    STXXL_CHECK(it->first == 10);
 
     it = BTree1.upper_bound(8);
-    assert(it != BTree1.end());
-    assert(it->first == 10);
+    STXXL_CHECK(it != BTree1.end());
+    STXXL_CHECK(it->first == 10);
 
     it = BTree1.upper_bound(10);
-    assert(it == BTree1.end());
+    STXXL_CHECK(it == BTree1.end());
 
     it = BTree1.upper_bound(11);
-    assert(it == BTree1.end());
+    STXXL_CHECK(it == BTree1.end());
 
     // test equal_range
 
     std::pair<btree_type::iterator, btree_type::iterator> it_pair = BTree1.equal_range(1);
-    assert(BTree1.find(7) == it_pair.first);
-    assert(BTree1.find(7) == it_pair.second);
+    STXXL_CHECK(BTree1.find(7) == it_pair.first);
+    STXXL_CHECK(BTree1.find(7) == it_pair.second);
 
     it_pair = BTree1.equal_range(7);
-    assert(BTree1.find(7) == it_pair.first);
-    assert(BTree1.find(10) == it_pair.second);
+    STXXL_CHECK(BTree1.find(7) == it_pair.first);
+    STXXL_CHECK(BTree1.find(10) == it_pair.second);
 
     it_pair = BTree1.equal_range(8);
-    assert(BTree1.find(10) == it_pair.first);
-    assert(BTree1.find(10) == it_pair.second);
+    STXXL_CHECK(BTree1.find(10) == it_pair.first);
+    STXXL_CHECK(BTree1.find(10) == it_pair.second);
 
     it_pair = BTree1.equal_range(10);
-    assert(BTree1.find(10) == it_pair.first);
-    assert(BTree1.end() == it_pair.second);
+    STXXL_CHECK(BTree1.find(10) == it_pair.first);
+    STXXL_CHECK(BTree1.end() == it_pair.second);
 
     it_pair = BTree1.equal_range(11);
-    assert(BTree1.end() == it_pair.first);
-    assert(BTree1.end() == it_pair.second);
+    STXXL_CHECK(BTree1.end() == it_pair.first);
+    STXXL_CHECK(BTree1.end() == it_pair.second);
 
     //
 
     it = BTree1.lower_bound(0);
     BTree1.erase(it);
-    assert(BTree1.size() == 1);
+    STXXL_CHECK(BTree1.size() == 1);
 
     BTree1.clear();
-    assert(BTree1.size() == 0);
+    STXXL_CHECK(BTree1.size() == 0);
 
     for (unsigned int i = 0; i < nins / 2; ++i)
     {
@@ -192,7 +192,7 @@ int main(int argc, char * argv[])
     STXXL_MSG("Construction of BTree3 from BTree1 that has " << BTree1.size() << " elements");
     btree_type BTree3(BTree1.begin(), BTree1.end(), comp_type(), node_cache_size, leaf_cache_size);
 
-    assert(BTree3 == BTree1);
+    STXXL_CHECK(BTree3 == BTree1);
 
     STXXL_MSG("Bulk construction of BTree4 from BTree1 that has " << BTree1.size() << " elements");
     btree_type BTree4(BTree1.begin(), BTree1.end(), comp_type(), node_cache_size, leaf_cache_size, true);
@@ -200,34 +200,34 @@ int main(int argc, char * argv[])
     STXXL_MSG("Size of BTree1: " << BTree1.size());
     STXXL_MSG("Size of BTree4: " << BTree4.size());
 
-    assert(BTree4 == BTree1);
-    assert(BTree3 == BTree4);
+    STXXL_CHECK(BTree4 == BTree1);
+    STXXL_CHECK(BTree3 == BTree4);
 
     BTree4.begin()->second = 0;
-    assert(BTree3 != BTree4);
-    assert(BTree4 < BTree3);
+    STXXL_CHECK(BTree3 != BTree4);
+    STXXL_CHECK(BTree4 < BTree3);
 
     BTree4.begin()->second = 1000;
-    assert(BTree4 > BTree3);
+    STXXL_CHECK(BTree4 > BTree3);
 
-    assert(BTree3 != BTree4);
+    STXXL_CHECK(BTree3 != BTree4);
 
     it = BTree4.begin();
     ++it;
     STXXL_MSG("Size of Btree4 before erase: " << BTree4.size());
     BTree4.erase(it, BTree4.end());
     STXXL_MSG("Size of Btree4 after erase: " << BTree4.size());
-    assert(BTree4.size() == 1);
+    STXXL_CHECK(BTree4.size() == 1);
 
 
     STXXL_MSG("Size of Btree1 before erase: " << BTree1.size());
     BTree1.erase(BTree1.begin(), BTree1.end());
     STXXL_MSG("Size of Btree1 after erase: " << BTree1.size());
-    assert(BTree1.empty());
+    STXXL_CHECK(BTree1.empty());
 
     // a copy of BTree3
     btree_type BTree5(BTree3.begin(), BTree3.end(), comp_type(), node_cache_size, leaf_cache_size, true);
-    assert(BTree5 == BTree3);
+    STXXL_CHECK(BTree5 == BTree3);
 
     btree_type::iterator b3 = BTree3.begin();
     btree_type::iterator b4 = BTree4.begin();
@@ -236,13 +236,13 @@ int main(int argc, char * argv[])
 
     STXXL_MSG("Testing swapping operation (std::swap)");
     std::swap(BTree4, BTree3);
-    assert(b3 == BTree4.begin());
-    assert(b4 == BTree3.begin());
-    assert(e3 == BTree4.end());
-    assert(e4 == BTree3.end());
+    STXXL_CHECK(b3 == BTree4.begin());
+    STXXL_CHECK(b4 == BTree3.begin());
+    STXXL_CHECK(e3 == BTree4.end());
+    STXXL_CHECK(e4 == BTree3.end());
 
-    assert(BTree5 == BTree4);
-    assert(BTree5 != BTree3);
+    STXXL_CHECK(BTree5 == BTree4);
+    STXXL_CHECK(BTree5 != BTree3);
 
     btree_type::const_iterator cb = BTree3.begin();
     btree_type::const_iterator ce = BTree3.end();
@@ -259,7 +259,7 @@ int main(int argc, char * argv[])
 
     std::pair<btree_type::const_iterator, btree_type::const_iterator> cit_pair = CBTree3.equal_range(1);
 
-    assert(CBTree3.max_size() >= CBTree3.size());
+    STXXL_CHECK(CBTree3.max_size() >= CBTree3.size());
 
 
     CBTree3.key_comp();
@@ -294,7 +294,7 @@ int main(int argc, char * argv[])
     BTree5.disable_prefetching();
     BTree5.enable_prefetching();
     BTree5.prefetching_enabled();
-    assert(BTree5.prefetching_enabled());
+    STXXL_CHECK(BTree5.prefetching_enabled());
 
     STXXL_MSG("All tests passed successfully");
 

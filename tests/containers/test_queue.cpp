@@ -19,14 +19,14 @@ typedef unsigned my_type;
 template <class q1type, class q2type>
 void check(const q1type & q1, const q2type & q2)
 {
-    assert(q1.empty() == q2.empty());
-    assert(q1.size() == q2.size());
+    STXXL_CHECK(q1.empty() == q2.empty());
+    STXXL_CHECK(q1.size() == q2.size());
     if (!q1.empty())
     {
         if (q1.front() != q2.front() || q1.back() != q2.back())
             STXXL_MSG(q1.size() << ": (" << q1.front() << ", " << q1.back() << ") (" << q2.front() << ", " << q2.back() << ")" << (q1.front() == q2.front() ? "" : " FRONT"));
-        assert(q1.front() == q2.front());
-        assert(q1.back() == q2.back());
+        STXXL_CHECK(q1.front() == q2.front());
+        STXXL_CHECK(q1.back() == q2.back());
     }
 }
 

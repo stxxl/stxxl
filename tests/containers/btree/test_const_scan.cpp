@@ -29,7 +29,7 @@ struct comp_type : public std::less<int>
 
 struct my_type
 {
-    double data;
+    stxxl::uint64 data;
     char filler[24];
 };
 
@@ -51,32 +51,34 @@ typedef stxxl::btree::btree<int, my_type, comp_type,
 #define node_cache_size (25 * 1024 * 1024)
 #define leaf_cache_size (6 * LEAF_BLOCK_SIZE)
 
+stxxl::uint64 checksum = 0;
+
 void NC(btree_type & BTree)
 {
-    double sum = 0;
+    stxxl::uint64 sum = 0;
     stxxl::timer Timer1;
     Timer1.start();
-    btree_type::iterator it = BTree.begin();
-    btree_type::iterator end = BTree.end();
+    btree_type::iterator it = BTree.begin(), end = BTree.end();
     for ( ; it != end; ++it)
         sum += it->second.data;
 
     Timer1.stop();
     STXXL_MSG("Scanning with non const iterator: " << Timer1.mseconds() << " msec");
+    STXXL_CHECK(sum == checksum);
 }
 
 void C(btree_type & BTree)
 {
-    double sum = 0;
+    stxxl::uint64 sum = 0;
     stxxl::timer Timer1;
     Timer1.start();
-    btree_type::const_iterator it = BTree.begin();
-    btree_type::const_iterator end = BTree.end();
+    btree_type::const_iterator it = BTree.begin(), end = BTree.end();
     for ( ; it != end; ++it)
         sum += it->second.data;
 
     Timer1.stop();
     STXXL_MSG("Scanning with const iterator: " << Timer1.mseconds() << " msec");
+    STXXL_CHECK(sum == checksum);
 }
 
 int main(int argc, char * argv[])
@@ -100,6 +102,8 @@ int main(int argc, char * argv[])
     for (unsigned int i = 0; i < nins; ++i)
     {
         Data[i].first = i;
+        Data[i].second.data = i;
+        checksum += i;
     }
     {
         btree_type BTree1(Data.begin(), Data.end(), comp_type(), node_cache_size, leaf_cache_size, true);

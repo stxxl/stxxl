@@ -11,7 +11,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <cassert>
 #include <cstring>
 #include <deque>
 #include <map>
@@ -76,7 +75,7 @@ bool test_inc_dec(Iterator it)
     --i;
     i--;
 
-    assert(it == i);
+    STXXL_CHECK(it == i);
     return it == i;
 }
 
@@ -94,7 +93,7 @@ bool test_inc_dec_random(Iterator it)
     i--;
     i -= 2;
 
-    assert(it == i);
+    STXXL_CHECK(it == i);
     return it == i;
 }
 

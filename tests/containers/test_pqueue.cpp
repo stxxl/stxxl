@@ -96,6 +96,7 @@ int main()
     }
     Timer.stop();
     STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");
+    STXXL_CHECK(p.size() == (stxxl::uint64)nelements);
 
 #if 0
     // test swap
@@ -109,15 +110,18 @@ int main()
     Timer.start();
     for (i = 0; i < (nelements); ++i)
     {
-        assert(!p.empty());
+        STXXL_CHECK(!p.empty());
         //STXXL_MSG( p.top() );
-        assert(p.top().key == i + 1);
+        STXXL_CHECK(p.top().key == i + 1);
         p.pop();
         if ((i % (1024 * 1024)) == 0)
             STXXL_MSG("Element " << i << " popped");
     }
     Timer.stop();
-
     STXXL_MSG("Time spent for removing elements: " << Timer.seconds() << " s");
+
+    STXXL_CHECK(p.size() == 0);
+    STXXL_CHECK(p.empty());
+
     STXXL_MSG("Internal memory consumption of the priority queue: " << p.mem_cons() << " B");
 }

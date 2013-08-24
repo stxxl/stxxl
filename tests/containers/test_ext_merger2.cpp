@@ -67,7 +67,7 @@ int main()
         typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>::result pq_type;
         pq_type pq(mem_for_queue, mem_for_queue);
         pq.push(42);
-        assert(pq.top() == 42);
+        STXXL_CHECK(pq.top() == 42);
         pq.pop();
         pq.push(2);
         pq.push(0);
@@ -83,7 +83,10 @@ int main()
         x3 = pq.top();
         pq.pop();
         STXXL_MSG("Order: " << x0 << " " << x1 << " " << x2 << " " << x3);
-        assert(pq.empty());
+        STXXL_CHECK(x0 <= x1);
+        STXXL_CHECK(x1 <= x2);
+        STXXL_CHECK(x2 <= x3);
+        STXXL_CHECK(pq.empty());
     }
 
     if (1) { // ext_merger test
@@ -110,6 +113,7 @@ int main()
         while (merger.size() > 0) {
             int l = std::min<stxxl::uint64>(merger.size(), output.size());
             merger.multi_merge(output.begin(), output.begin() + l);
+            STXXL_CHECK(stxxl::is_sorted(output.begin(), output.begin() + l));
             STXXL_MSG("merged " << l << " elements: (" << *output.begin() << ", ..., " << *(output.begin() + l - 1) << ")");
         }
 
@@ -164,6 +168,7 @@ int main()
         while (loser.size() > 0) {
             int l = std::min<stxxl::uint64>(loser.size(), B + B / 2 + 1);
             loser.multi_merge(out, out + l);
+            STXXL_CHECK(stxxl::is_sorted(out, out + l));
             STXXL_MSG("merged " << l << " elements: (" << out[0] << ", ..., " << out[l - 1] << ")");
         }
 

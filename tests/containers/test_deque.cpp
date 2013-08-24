@@ -26,12 +26,12 @@ int main(int argc, char * argv[])
 
     stxxl::deque<int>::const_iterator b = Deque.begin();
     stxxl::deque<int>::const_iterator e = Deque.end();
-    assert(b == e);
+    STXXL_CHECK(b == e);
     Deque.push_front(1);
     Deque.push_front(2);
     Deque.push_front(3);
     b = Deque.begin();
-    assert(b != e);
+    STXXL_CHECK(b != e);
     Deque.push_back(5);
     std::copy(Deque.begin(), Deque.end(), std::ostream_iterator<int>(std::cout, " "));
 
@@ -88,19 +88,19 @@ int main(int argc, char * argv[])
             break;
         }
 
-        assert(XXLDeque.empty() == STDDeque.empty());
-        assert(XXLDeque.size() == STDDeque.size());
-        assert(XXLDeque.end() - XXLDeque.begin() == STDDeque.end() - STDDeque.begin());
-        //assert(std::equal(XXLDeque.begin(),XXLDeque.end(),STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
+        STXXL_CHECK(XXLDeque.empty() == STDDeque.empty());
+        STXXL_CHECK(XXLDeque.size() == STDDeque.size());
+        STXXL_CHECK(XXLDeque.end() - XXLDeque.begin() == STDDeque.end() - STDDeque.begin());
+        //STXXL_CHECK(std::equal(XXLDeque.begin(),XXLDeque.end(),STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
         if (XXLDeque.size() > 0)
         {
-            assert(XXLDeque.back() == STDDeque.back());
-            assert(XXLDeque.front() == STDDeque.front());
+            STXXL_CHECK(XXLDeque.back() == STDDeque.back());
+            STXXL_CHECK(XXLDeque.front() == STDDeque.front());
         }
 
         if (!(i % 100000))
         {
-            assert(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
+            STXXL_CHECK(std::equal(XXLDeque.begin(), XXLDeque.end(), STDDeque.begin() _STXXL_FORCE_SEQUENTIAL));
             STXXL_MSG("Operations done: " << i << " size: " << STDDeque.size());
         }
     }

@@ -75,6 +75,7 @@ int main()
     merger.insert_segment(dummy, 1024 * 4);
     merger.insert_segment(dummy, 1024 * 4);
     merger.multi_merge(output.begin(), output.end());
+    STXXL_CHECK(stxxl::is_sorted(output.begin(), output.end()));
 
     loser_tree<my_type, my_cmp, 8> loser;
     my_type * seq1 = make_sequence(dummy, 1024);
@@ -92,7 +93,7 @@ int main()
     loser.insert_segment(seq4, 1024);
 
     loser.multi_merge(out, out + 1024);
-    std::copy(out, out + 1024, std::ostream_iterator<my_type>(std::cout, "\n"));
+    STXXL_CHECK(stxxl::is_sorted(out, out + 1024));
 
     delete[] out;
 }

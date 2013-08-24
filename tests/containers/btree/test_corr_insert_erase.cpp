@@ -103,18 +103,18 @@ int main(int argc, char * argv[])
     for ( ; vIt != Values.end(); ++vIt)
     {
         btree_type::iterator bIt = BTree.find(*vIt);
-        assert(bIt != BTree.end());
+        STXXL_CHECK(bIt != BTree.end());
         bool f = BTree.erase((*vIt) + 1);       // erasing non-existent element
-        assert(f == 0);
+        STXXL_CHECK(f == 0);
         f = BTree.erase(*vIt);                  // erasing existing element
-        assert(f == 1);
+        STXXL_CHECK(f == 1);
         bIt = BTree.find(*vIt);                 // checking it is not there
-        assert(bIt == BTree.end());
+        STXXL_CHECK(bIt == BTree.end());
         f = BTree.erase(*vIt);                  // trying to erase it again
-        assert(f == 0);
+        STXXL_CHECK(f == 0);
     }
 
-    assert(BTree.empty());
+    STXXL_CHECK(BTree.empty());
 
     STXXL_MSG("Test passed.");
 

@@ -41,7 +41,7 @@ int main()
         for (i = 0; i < v.size(); ++i)
         {
             v[i] = i + offset;
-            assert(v[i] == int64(i + offset));
+            STXXL_CHECK(v[i] == int64(i + offset));
         }
 
         v.flush();

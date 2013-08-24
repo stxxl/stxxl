@@ -46,9 +46,7 @@ int main(int argc, char ** argv)
 
     STXXL_MSG("Block size " << BLOCK_SIZE / 1024 << " KiB");
     STXXL_MSG("Cache size " << (CACHE_SIZE * BLOCK_SIZE) / 1024 << " KiB");
-    int max_mult = 256;
-    if (argc > 1)
-        max_mult = atoi(argv[1]);
+    int max_mult = (argc > 1) ? atoi(argv[1]) : 256;
     for (int mult = 1; mult < max_mult; mult *= 2)
     {
         stats_begin = *stxxl::stats::get_instance();
@@ -63,6 +61,7 @@ int main(int argc, char ** argv)
         {
             Map[i] = i + 1;
         }
+        STXXL_CHECK(Map.size() == el);
         stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
         double writes = double(stats_elapsed.get_writes()) / double(el);
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
@@ -78,7 +77,8 @@ int main(int argc, char ** argv)
         {
             key_type key = myrandom() % el;
             map_type::const_iterator result = ConstMap.find(key);
-            assert((*result).second == key + 1);
+            STXXL_CHECK((*result).second == key + 1);
+            STXXL_CHECK(result->second == key + 1);
         }
         stats_elapsed = stxxl::stats_data(*stxxl::stats::get_instance()) - stats_begin;
         double reads = double(stats_elapsed.get_reads()) / logel;

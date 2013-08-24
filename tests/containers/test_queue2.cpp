@@ -40,7 +40,7 @@ int main(int argc, char ** argv)
 
         q.push(in++);
 
-	assert(q.front() == out);
+	STXXL_CHECK(q.front() == out);
         q.pop();
 	++out;
 
@@ -52,18 +52,18 @@ int main(int argc, char ** argv)
         if ((i % mega) == 0)
             STXXL_MSG("Remove " << i);
 
-	assert(q.front() == out);
+	STXXL_CHECK(q.front() == out);
         q.pop();
 	++out;
 
         q.push(in++);
 
-	assert(q.front() == out);
+	STXXL_CHECK(q.front() == out);
         q.pop();
 	++out;
     }
-    assert(q.empty());
-    assert(in == out);
+    STXXL_CHECK(q.empty());
+    STXXL_CHECK(in == out);
 
     std::cout << *stxxl::stats::get_instance();
 }
