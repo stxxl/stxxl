@@ -48,7 +48,7 @@ set(LIBSTXXL_SOURCES
 
   )
 
-if (NOT MSVC)
+if(NOT MSVC)
 
   # additional sources for non Visual Studio builds
   set(LIBSTXXL_SOURCES ${LIBSTXXL_SOURCES}
@@ -58,8 +58,8 @@ if (NOT MSVC)
 
     )
 
-endif (NOT MSVC)
+endif(NOT MSVC)
 
 add_library(stxxl ${LIBSTXXL_SOURCES})
 
-set_target_properties(stxxl PROPERTIES VERSION 1.4.0)
+set_target_properties(stxxl PROPERTIES VERSION 1.3.9999)

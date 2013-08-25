@@ -18,6 +18,8 @@
 */
 #ifdef _MSC_VER
 #define my_sscanf sscanf_s
+#define strtoll _strtoi64
+#define strtoull _strtoui64
 #else
 #define my_sscanf sscanf
 #endif

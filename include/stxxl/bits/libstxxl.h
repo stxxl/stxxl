@@ -21,7 +21,7 @@
  #ifndef STXXL_LIBNAME
   #define STXXL_LIBNAME "stxxl"
  #endif
- #pragma comment (lib, "lib" STXXL_LIBNAME ".lib")
+//-tb #pragma comment (lib, "lib" STXXL_LIBNAME ".lib")
 #endif
 
 #endif // !STXXL_IO_HEADER

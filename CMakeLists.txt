@@ -56,6 +56,13 @@ if(MSVC)
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
+  ### disable verbose warnings:
+  # warning C4127: conditional expression is constant
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4127")
+  # warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4290")
+  # warning C4250: '...' : inherits '...' via dominance
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250")
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall")
 endif()
@@ -80,19 +87,28 @@ endif (GMX_LARGEFILES)
 ###############################################################################
 # optional Boost libraries
 
-if(USE_BOOST)
+if(USE_BOOST OR MSVC)
 
-  find_package(Boost 1.36.0 COMPONENTS thread date_time iostreams system filesystem)
+  set(USE_BOOST ON)
+  set(Boost_USE_MULTITHREADED ON)
+
+  if(WIN32)
+    set(Boost_USE_STATIC_LIBS ON)
+  endif(WIN32)
+
+  find_package(Boost 1.36.0 REQUIRED COMPONENTS thread date_time chrono iostreams system filesystem)
 
   if(Boost_FOUND)
     # globally add boost include directories
     include_directories(${Boost_INCLUDE_DIRS})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSTXXL_BOOST_CONFIG -DSTXXL_BOOST_FILESYSTEM -DSTXXL_BOOST_RANDOM -DSTXXL_BOOST_THREADS -DSTXXL_BOOST_TIMESTAMP")
+  elseif(MSVC)
+    message(FATAL_ERROR "Boost libraries not found. STXXL requires Boost on Windows.")
   else()
     message(FATAL_ERROR "Boost libraries not found. Try compilation without them.")
   endif()
 
-endif(USE_BOOST)
+endif(USE_BOOST OR MSVC)
 
 ###############################################################################
 # optional GNU parallel STL mode
@@ -176,7 +192,7 @@ endif(BUILD_TESTS)
 configure_file(${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in ${PROJECT_BINARY_DIR}/include/stxxl/bits/config.h)
 
 # globally adds top-level include directories
-include_directories("${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/include/" "${PROJECT_BINARY_DIR}/include/")
 
 # for targets using stxxl library
 set(STXXL_LIBS ${STXXL_LIBS} stxxl ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
