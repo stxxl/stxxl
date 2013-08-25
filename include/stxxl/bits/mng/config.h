@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <unistd.h>
 
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/verbose.h>

@@ -14,11 +14,13 @@
 
 stxxl_build_test(test_argument_helper)
 stxxl_build_test(test_globals)
+stxxl_build_test(test_log2)
 stxxl_build_test(test_manyunits test_manyunits2)
 stxxl_build_test(test_random)
 
 stxxl_test(test_argument_helper)
 stxxl_test(test_globals)
+stxxl_test(test_log2)
 stxxl_test(test_manyunits)
 stxxl_test(test_random)
 

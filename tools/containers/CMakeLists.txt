@@ -24,3 +24,11 @@ stxxl_build_test(write_vector2)
 
 add_define(bench_pqueue "STXXL_VERBOSE_LEVEL=0")
 add_define(benchmark_naive_matrix "STXXL_VERBOSE_LEVEL=0")
+
+add_library(tpie STATIC IMPORTED)
+set_property(TARGET tpie PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/3rdparty/tpie_091905/lib/libtpie.a")
+
+include_directories("${PROJECT_SOURCE_DIR}/3rdparty/tpie_091905/include")
+stxxl_build_test(tpie_stack_benchmark)
+
+target_link_libraries(tpie_stack_benchmark ${STXXL_LIBS} tpie)

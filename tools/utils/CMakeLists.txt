@@ -13,7 +13,6 @@
 ###############################################################################
 
 stxxl_build_tool(pq_param)
-stxxl_build_tool(log2)
 
 if (NOT MSVC)
   stxxl_build_tool(malloc)
