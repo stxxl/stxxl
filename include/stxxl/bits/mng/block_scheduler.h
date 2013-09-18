@@ -471,6 +471,12 @@ public:
         return old_algo;
     }
 
+    //! \brief return the current algorithm
+    block_scheduler_algorithm<SwappableBlockType> * get_current_algorithm() const
+    {
+        return algo;
+    }
+
     //! \brief get the prediction_sequence
     //! \return reference to the prediction_sequence
     const prediction_sequence_type & get_prediction_sequence() const

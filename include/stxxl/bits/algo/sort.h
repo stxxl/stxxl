@@ -369,7 +369,6 @@ namespace sort_local
 
             typedef stxxl::int64 diff_type;
             typedef std::pair<typename block_type::iterator, typename block_type::iterator> sequence;
-            typedef typename std::vector<sequence>::size_type seqs_size_type;
             std::vector<sequence> seqs(nruns);
             std::vector<block_type *> buffers(nruns);
 

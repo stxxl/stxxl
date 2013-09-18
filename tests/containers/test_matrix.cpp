@@ -133,7 +133,7 @@ int main(int argc, char **argv)
     const int block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
 
     int test_case = -1;
-    int rank = 10000;
+    int rank = 2000;
     int internal_memory_megabyte = 256;
     int mult_algo_num = 2;
     int sched_algo_num = 1;

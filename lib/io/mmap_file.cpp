@@ -31,6 +31,8 @@ void mmap_file::serve(const request * req) throw (io_error)
     size_type bytes = req->get_size();
     request::request_type type = req->get_type();
 
+    //assert(offset + bytes <= _size());
+
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
 
     int prot = (type == request::READ) ? PROT_READ : PROT_WRITE;

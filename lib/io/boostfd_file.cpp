@@ -60,7 +60,7 @@ void boostfd_file::serve(const request * req) throw (io_error)
         {
             std::streamsize rc = file_des.read((char *)buffer, bytes);
             if (rc != std::streamsize(bytes)) {
-                STXXL_THROW2(io_error, " partial read: missing " << (bytes - rc) << " out of " << bytes << " bytes");
+                STXXL_THROW2(io_error, " partial read: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
         }
         catch (const std::exception & ex)
@@ -81,7 +81,7 @@ void boostfd_file::serve(const request * req) throw (io_error)
         {
             std::streamsize rc = file_des.write((char *)buffer, bytes);
             if (rc != std::streamsize(bytes)) {
-                STXXL_THROW2(io_error, " partial read: missing " << (bytes - rc) << " out of " << bytes << " bytes");
+                STXXL_THROW2(io_error, " partial write: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
         }
         catch (const std::exception & ex)
@@ -193,7 +193,9 @@ file::offset_type boostfd_file::size()
 void boostfd_file::set_size(offset_type newsize)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
+#ifndef NDEBUG
     offset_type oldsize = _size();
+#endif // NDEBUG
     file_des.seek(newsize, BOOST_IOS::beg);
     file_des.seek(0, BOOST_IOS::beg); // not important ?
     assert(_size() >= oldsize);

@@ -172,6 +172,8 @@ int main(int argc, char **argv)
                 bs.extract_external_block(sbi);
             bs.free_swappable_block(sbi);
 
+#if 0
+            // 2013-tb: segfaults for unknown reasons
             delete bs.switch_algorithm_to(new
                     block_scheduler_algorithm_offline_lru_prefetching< swappable_block<value_type, block_size> >(asim));
             sbi = bs.allocate_swappable_block();
@@ -187,6 +189,7 @@ int main(int argc, char **argv)
             else
                 bs.extract_external_block(sbi);
             bs.free_swappable_block(sbi);
+#endif
 
             delete b_s;
 

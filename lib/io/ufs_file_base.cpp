@@ -173,6 +173,11 @@ file::offset_type ufs_file_base::size()
 void ufs_file_base::set_size(offset_type newsize)
 {
     scoped_mutex_lock fd_lock(fd_mutex);
+    return _set_size(newsize);
+}
+
+void ufs_file_base::_set_size(offset_type newsize)
+{
     offset_type cur_size = _size();
 
     if (!(mode_ & RDONLY))

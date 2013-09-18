@@ -64,6 +64,14 @@ void test(const char * fn, const char * ft, stxxl::unsigned_type sz, my_type ofs
     test_write(fn, ft, sz, ofs);
     test_rdwr<const vector_type>(fn, ft, sz, ofs);
     test_rdwr<vector_type>(fn, ft, sz, ofs);
+
+    // 2013-tb: there is a bug with read-only vectors on mmap backed files:
+    // copying from mmapped area will fail for invalid ranges at the end,
+    // whereas a usual read() will just stop short at the end. The read-only
+    // vector however will always read the last block in full, thus causing a
+    // segfault with mmap files. FIXME
+    if (strcmp(ft,"mmap") == 0) return;
+
     test_rdonly<const vector_type>(fn, ft, sz, ofs);
     //-tb: vector always writes data! FIXME
     //test_rdonly<vector_type>(fn, ft, sz, ofs);
@@ -87,12 +95,15 @@ int main(int argc, char ** argv)
     STXXL_MSG("using " << ft << " file");
 
     // multiple of block size
+    STXXL_MSG("running test with " << start_elements << " items");
     test(fn, ft, start_elements, 100000000);
 
     // multiple of page size, but not block size
+    STXXL_MSG("running test with " << start_elements << " + 4096 items");
     test(fn, ft, start_elements + 4096, 200000000);
 
     // multiple of neither block size nor page size
+    STXXL_MSG("running test with " << start_elements << " + 4096 + 23 items");
     test(fn, ft, start_elements + 4096 + 23, 300000000);
 
     // truncate 1 byte

@@ -36,6 +36,7 @@ protected:
     const std::string filename;
     ufs_file_base(const std::string & filename, int mode);
     offset_type _size();
+    void _set_size(offset_type newsize);
     void close();
 
 public:
