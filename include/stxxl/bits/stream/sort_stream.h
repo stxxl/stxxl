@@ -768,7 +768,6 @@ namespace stream
     {
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         typedef typename RunsType_::block_type block_type;
-        typedef typename block_type::value_type value_type;
         STXXL_VERBOSE2("Elements: " << sruns.elements);
         unsigned_type nruns = sruns.runs.size();
         STXXL_VERBOSE2("Runs: " << nruns);

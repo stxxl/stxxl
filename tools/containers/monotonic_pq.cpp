@@ -265,8 +265,6 @@ int main(int argc, char * argv[])
   STXXL_MSG ( "X : "<<gen::X );  //maximum number of internal elements //X = B * (settings::k - m) / settings::E,
   STXXL_MSG ( "Expected internal memory consumption: "<< (gen::EConsumption / 1048576) << " MiB");*/
 #endif
-    typedef pq_type::block_type block_type;
-
     STXXL_MSG("Internal arity: " << pq_type::IntKMAX);
     STXXL_MSG("N : " << pq_type::N); //X / (AI * AI)
     STXXL_MSG("External arity: " << pq_type::ExtKMAX);

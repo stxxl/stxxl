@@ -138,7 +138,6 @@ namespace ksort_local
         input_bid_iterator & it,
         key_extractor keyobj)
     {
-        typedef typename block_type::bid_type bid_type;
         typedef typename block_type::type type;
 
         type * elem = cur_blk->elem;

@@ -58,7 +58,7 @@ endif(USE_BOOST)
 stxxl_build_test(test_map)
 stxxl_build_test(test_map_random)
 
-stxxl_test(test_map 32)
+stxxl_test(test_map 16)
 stxxl_test(test_map_random 2000)
 
 #TODO TESTS_BDB		 = berkeley_db_benchmark

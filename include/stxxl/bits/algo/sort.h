@@ -74,7 +74,6 @@ namespace sort_local
         int_type _m,
         value_cmp cmp)
     {
-        typedef typename block_type::value_type type;
         typedef typename block_type::bid_type bid_type;
         STXXL_VERBOSE1("stxxl::create_runs nruns=" << nruns << " m=" << _m);
 
@@ -301,7 +300,6 @@ namespace sort_local
     template <typename block_type, typename run_type, typename value_cmp>
     void merge_runs(run_type ** in_runs, int_type nruns, run_type * out_run, unsigned_type _m, value_cmp cmp)
     {
-        typedef typename block_type::value_type value_type;
         typedef typename run_type::value_type trigger_entry_type;
         typedef block_prefetcher<block_type, typename run_type::iterator> prefetcher_type;
         typedef run_cursor2<block_type, prefetcher_type> run_cursor_type;
@@ -511,7 +509,6 @@ namespace sort_local
                 value_cmp cmp
                 )
     {
-        typedef typename block_type::value_type type;
         typedef typename block_type::bid_type bid_type;
         typedef sort_helper::trigger_entry<block_type> trigger_entry_type;
         typedef simple_vector<trigger_entry_type> run_type;

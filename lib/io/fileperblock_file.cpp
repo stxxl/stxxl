@@ -102,7 +102,10 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
     ::rename(original.c_str(), filename.c_str());
 #ifndef BOOST_MSVC
     //TODO: implement on Windows
-    ::truncate(filename.c_str(), length);
+    if (::truncate(filename.c_str(), length) != 0) {
+        STXXL_THROW2(io_error,
+                     "Error doing truncate()");
+    }
 #endif
 }
 

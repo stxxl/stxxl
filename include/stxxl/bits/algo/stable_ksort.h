@@ -145,7 +145,6 @@ namespace stable_ksort_local
         typedef typename ExtIterator_::vector_type::value_type value_type;
         typedef typename value_type::key_type key_type;
         typedef typename ExtIterator_::block_type block_type;
-        typedef typename block_type::bid_type bid_type;
         typedef buf_istream<typename ExtIterator_::block_type,
                             typename ExtIterator_::bids_container_iterator> buf_istream_type;
 

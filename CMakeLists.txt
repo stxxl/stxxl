@@ -46,6 +46,12 @@ option(TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to
 
 enable_testing()
 
+include(CTest)
+set(CTEST_PROJECT_NAME "STXXL")
+
+find_program(CTEST_MEMORYCHECK_COMMAND NAMES "valgrind")
+#set(CTEST_MEMORYCHECK_SUPPRESSIONS_FILE ${CTEST_SOURCE_DIRECTORY}/tests/valgrind.supp)
+
 ###############################################################################
 # enable warnings
 

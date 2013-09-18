@@ -48,10 +48,12 @@ seed_generator_t & seed_generator()
 
 inline unsigned initial_seed()
 {
+#ifndef NDEBUG
     static bool initialized = false;
     assert(!initialized); // this should only be called once!
 
     initialized = true;
+#endif // NDEBUG
 #ifdef BOOST_MSVC
     // GetTickCount():  ms since system start
     return GetTickCount() ^ GetCurrentProcessId();

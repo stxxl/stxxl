@@ -6,6 +6,7 @@
  *  Copyright (C) 2002-2006 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007-2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2008 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -34,10 +35,18 @@ __STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
+#if defined(__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
+#  define STXXL_ATTRIBUTE_UNUSED __attribute__((unused))
+#else
+#  define STXXL_ATTRIBUTE_UNUSED
+#endif
+
+////////////////////////////////////////////////////////////////////////////
+
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 #define STXXL_STATIC_ASSERT(x) static_assert(x, #x)
 #else
-#define STXXL_STATIC_ASSERT(x) { typedef int static_assert_dummy_type[(x) ? 1 : -1]; }
+#define STXXL_STATIC_ASSERT(x) { typedef int static_assert_dummy_type[(x) ? 1 : -1] STXXL_ATTRIBUTE_UNUSED; }
 #endif
 
 ////////////////////////////////////////////////////////////////////////////

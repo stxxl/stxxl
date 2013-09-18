@@ -39,6 +39,7 @@ wbtl_file::wbtl_file(
     disk_queued_file(queue_id, allocator_id), storage(backend_file), sz(0), write_block_size(write_buffer_size),
     free_bytes(0), curbuf(1), curpos(write_block_size)
 {
+    STXXL_UNUSED(write_buffers);
     assert(write_buffers == 2); // currently hardcoded
     write_buffer[0] = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
     write_buffer[1] = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(write_block_size));
