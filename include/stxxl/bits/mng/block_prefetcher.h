@@ -99,6 +99,7 @@ public:
     //! \param _pref_seq gives the prefetch order, is a pointer to the integer array that contains
     //!        the indices of the blocks in the consumption sequence
     //! \param _prefetch_buf_size amount of prefetch buffers to use
+    //! \param do_after_fetch unknown
     block_prefetcher(
         bid_iterator_type _cons_begin,
         bid_iterator_type _cons_end,

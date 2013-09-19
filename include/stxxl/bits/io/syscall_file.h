@@ -29,10 +29,10 @@ class syscall_file : public ufs_file_base, public disk_queued_file
 {
 public:
     //! \brief constructs file object
-    //! \param filename path of file
-    //! \attention filename must be resided at memory disk partition
-    //! \param mode open mode, see \c stxxl::file::open_modes
-    //! \param disk disk(file) identifier
+    //! param filename path of file
+    //! attention filename must be resided at memory disk partition
+    //! param mode open mode, see \c stxxl::file::open_modes
+    //! param disk disk(file) identifier
     syscall_file(
         const std::string & filename,
         int mode,

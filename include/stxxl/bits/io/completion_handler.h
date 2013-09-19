@@ -59,7 +59,6 @@ public:
 //! object that can be passed as a parameter
 //! to asynchronous I/O calls \c stxxl::file::aread
 //! and \c stxxl::file::awrite .
-//! For an example of use see \link mng/test_mng.cpp mng/test_mng.cpp \endlink
 class completion_handler
 {
     compat_unique_ptr<completion_handler_impl>::result sp_impl_;

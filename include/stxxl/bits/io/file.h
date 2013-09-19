@@ -94,7 +94,6 @@ class file : private noncopyable
 
 protected:
     //! \brief Initializes file object
-    //! \param _id file identifier
     //! \remark Called in implementations of file
     file() : request_ref_cnt(0) { }
 

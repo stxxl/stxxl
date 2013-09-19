@@ -71,7 +71,6 @@ typename std::iterator_traits<request_iterator_>::difference_type cancel_all(req
 //! \brief Polls requests
 //! \param reqs_begin begin of request sequence to poll
 //! \param reqs_end end of request sequence to poll
-//! \param index contains index of the \b first completed request if any
 //! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
 template <class request_iterator_>
 request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_end)

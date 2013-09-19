@@ -49,9 +49,9 @@ class mmap_file : public ufs_file_base, public disk_queued_file
 {
 public:
     //! \brief constructs file object
-    //! \param filename path of file
-    //! \param mode open mode, see \c stxxl::file::open_modes
-    //! \param disk disk(file) identifier
+    //! param filename path of file
+    //! param mode open mode, see \c stxxl::file::open_modes
+    //! param disk disk(file) identifier
     inline mmap_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
         ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }

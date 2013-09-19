@@ -1048,6 +1048,7 @@ protected:
 
 public:
     //! \brief Creates a new matrix of given dimensions. Elements' values are set to zero.
+    //! \param bs block scheduler used
     //! \param height height of the created matrix
     //! \param width width of the created matrix
     matrix(block_scheduler_type & bs, const elem_size_type height, const elem_size_type width)
@@ -1188,6 +1189,7 @@ public:
     }
 
     //! \brief multiply with another matrix
+    //! \param right matrix to multiply with
     //! \param multiplication_algorithm allows to choose the applied algorithm
     //! \param scheduling_algorithm  allows to choose the applied algorithm
     //!

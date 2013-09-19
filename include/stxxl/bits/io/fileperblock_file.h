@@ -40,9 +40,8 @@ protected:
 
 public:
     //! \brief constructs file object
-    //! \param filename_prefix  filename prefix, numbering will be appended to it
-    //! \param mode open mode, see \c file::open_modes
-    //! \param disk disk(file) identifier
+    //! param filename_prefix  filename prefix, numbering will be appended to it
+    //! param mode open mode, see \c file::open_modes
     fileperblock_file(
         const std::string & filename_prefix,
         int mode,

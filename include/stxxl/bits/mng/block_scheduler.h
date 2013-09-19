@@ -380,13 +380,13 @@ public:
     //! \brief Acquire the given block.
     //! Has to be in pairs with release. Pairs may be nested and interleaved.
     //! \return Reference to the block's data.
-    //! \param sblock Swappable block to acquire.
+    //! param sbid Swappable block to acquire.
     internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false)
     { return algo->acquire(sbid, uninitialized); }
 
     //! \brief Release the given block.
     //! Has to be in pairs with acquire. Pairs may be nested and interleaved.
-    //! \param sblock Swappable block to release.
+    //! \param sbid Swappable block to release.
     //! \param dirty If the data has been changed, invalidating possible data in external storage.
     void release(const swappable_block_identifier_type sbid, const bool dirty)
     { algo->release(sbid, dirty); }
@@ -422,7 +422,7 @@ public:
     { algo->explicit_timestep(); }
 
     //! \brief Get a const reference to given block's data. Block has to be already acquired.
-    //! \param sblock Swappable block to access.
+    //! \param sbid Swappable block to access.
     internal_block_type & get_internal_block(const swappable_block_identifier_type sbid) const
     { return swappable_blocks[sbid].get_internal_block(); }
 
@@ -448,7 +448,7 @@ public:
     }
 
     //! \brief Free given no longer used temporary swappable_block.
-    //! \param sblock Temporary swappable_block to free.
+    //! \param sbid Temporary swappable_block to free.
     void free_swappable_block(const swappable_block_identifier_type sbid)
     {
         deinitialize(sbid);

@@ -78,8 +78,7 @@ class wbtl_file : public disk_queued_file
 
 public:
     //! \brief constructs file object
-    //! \param backend_file file object used as storage backend, will be deleted in ~wbtl_file()
-    //! \param disk disk(file) identifier
+    //! param backend_file file object used as storage backend, will be deleted in ~wbtl_file()
     wbtl_file(
         file * backend_file,
         size_type write_buffer_size,

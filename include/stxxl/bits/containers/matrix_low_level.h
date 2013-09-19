@@ -52,7 +52,7 @@ private:
     int_type i;
 };
 
-//! \brief c = a <op> b; for arbitrary entries
+//! \brief c = a [op] b; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, bool b_transposed, class Op>
 struct low_level_matrix_binary_ass_op
 {
@@ -90,7 +90,7 @@ struct low_level_matrix_binary_ass_op
     }
 };
 
-//! \brief c <op>= a; for arbitrary entries
+//! \brief c [op]= a; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, class Op>
 struct low_level_matrix_unary_ass_op
 {
@@ -107,7 +107,7 @@ struct low_level_matrix_unary_ass_op
     }
 };
 
-//! \brief c = <op>a; for arbitrary entries
+//! \brief c =[op] a; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, class Op>
 struct low_level_matrix_unary_op
 {
