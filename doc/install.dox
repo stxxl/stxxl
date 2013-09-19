@@ -1,75 +1,87 @@
-/*!
- * \page install-unix Compilation Installation on Unix Variants
- * Precondition: Make sure GNU Make, CMake, GNU Git and a C++ compiler are installed 
- * 1. Create a project directory and clone the newest S<small>TXXL</small> project repository: 
- \verbatim 
- $ mkdir project ; cd project 
- $ git clone https://github.com/bingmann/stxxl.git 
- \endverbatim
- * 2. Generate a file named CMakeLists.txt (inside your /project folder) by: \verbatim $ touch CMakeLists.txt \endverbatim
- * and fill the file with the following content: 
- * \verbatim
- # CMakeLists.tex
- project(sac-dev)
-  
- cmake_minimum_required(VERSION 2.8)
+/*! \page install-unix Compilation Installation on Unix Variants
 
- set(CMAKE_CXX_FLAGS "-std=c++0x")
+Precondition: Make sure GNU Make, CMake, GNU Git and a C++ compiler are installed 
+1. Create a project directory and clone the newest S<small>TXXL</small> project repository: 
 
- # disallow in-source builds
+\verbatim 
+$ mkdir project ; cd project 
+$ git clone https://github.com/bingmann/stxxl.git 
+\endverbatim
 
- if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
-   message(SEND_ERROR "In-source builds are not allowed.")
- endif("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+2. Generate a file named CMakeLists.txt (inside your /project folder) by: \verbatim $ touch CMakeLists.txt \endverbatim
+ and fill the file with the following content: 
 
- # Use OpenMP
+\verbatim
+# CMakeLists.tex
+project(sac-dev)
+ 
+cmake_minimum_required(VERSION 2.8)
 
- include(FindOpenMP)
+set(CMAKE_CXX_FLAGS "-std=c++0x")
 
- if(OPENMP_FOUND)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
- else()
-   message(FATAL_ERROR "OpenMP not found.")
- endif()
+# disallow in-source builds
 
- # Enable warnings
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+  message(SEND_ERROR "In-source builds are not allowed.")
+endif("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 
- set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -W -Wall -Wextra -march=native")
- set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+# Use OpenMP
 
- # Use zlib
+include(FindOpenMP)
 
- include(FindZLIB)
+if(OPENMP_FOUND)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+else()
+  message(FATAL_ERROR "OpenMP not found.")
+endif()
 
- add_subdirectory(stxxl)
+# Enable warnings
 
- include_directories(${ZLIB_INCLUDE_DIR})
-   \endverbatim
- * 3. Create a build directory and a source directory (inside your /project folder) by: \verbatim $ mkdir build ; mkdir src \endverbatim
- * 4. Change directory to the /src directory and create another CMakeLists.txt file: 
-   \verbatim $ cd src ; touch CMakeLists.txt \endverbatim 
- * filled with: 
- * \verbatim add_executable(main main.cc) 
-  include_directories("${PROJECT_BINARY_DIR}/stxxl/include" "${PROJECT_SOURCE_DIR}/stxxl/include" )
-  target_link_libraries(main stxxl ${ZLIB_LIBRARIES} -ldl)
-  set_property(TARGET main PROPERTY COMPILE_DEFINITIONS "STXXL_VERBOSE_LEVEL=0")  \endverbatim
- * Note that we assume that the main function resides in a file called main.cc which itself has to be in the /project/src/ directory. Consequently, this has possibly to be adapted manually for your 
-   indivual name choice. 
- * 5. Move to build directory by: \verbatim $ cd .. ; cd build \endverbatim
- * 6. Run cmake: 
- \verbatim 
- $ cmake .. 
- $ make 
- \endverbatim 
- * 7. The executable binary can now be found in /project/build/src
- * 8. IMPORTANT: Create a Disk Configuration File first!
- * You must define the disk configuration for an S<small>TXXL</small> program in a file named '.stxxl' that must reside in the same directory
- * where you execute the program (in our case this would be /project/build/src). A minimal configuration might be:
- * \verbatim disk=/tmp/stxxl,1000,syscall # full_disk_filename, maximum capacity of the disk in megabytes, access method  
-   [TODO] use syscall_unlink INSTEAD !!! touch /tmp/stxxl to create a file, the Stxxl is allowed to use as disk space \endverbatim
- * Please see [TODO] for further available options.
- * */
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -W -Wall -Wextra -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+
+# Use zlib
+
+include(FindZLIB)
+
+add_subdirectory(stxxl)
+
+include_directories(${ZLIB_INCLUDE_DIR})
+\endverbatim
+
+3. Create a build directory and a source directory (inside your /project folder) by: \verbatim $ mkdir build ; mkdir src \endverbatim
+4. Change directory to the /src directory and create another CMakeLists.txt file: 
+
+\verbatim $ cd src ; touch CMakeLists.txt \endverbatim 
+
+filled with: 
+
+\verbatim add_executable(main main.cc) 
+include_directories("${PROJECT_BINARY_DIR}/stxxl/include" "${PROJECT_SOURCE_DIR}/stxxl/include" )
+target_link_libraries(main stxxl ${ZLIB_LIBRARIES} -ldl)
+set_property(TARGET main PROPERTY COMPILE_DEFINITIONS "STXXL_VERBOSE_LEVEL=0")
+\endverbatim
+
+Note that we assume that the main function resides in a file called main.cc which itself has to be in the /project/src/ directory. Consequently, this has possibly to be adapted manually for your indivual name choice. 
+
+5. Move to build directory by: \verbatim $ cd .. ; cd build \endverbatim
+6. Run cmake: 
+
+\verbatim 
+$ cmake .. 
+$ make 
+\endverbatim 
+
+7. The executable binary can now be found in /project/build/src
+8. IMPORTANT: Create a Disk Configuration File first!
+You must define the disk configuration for an S<small>TXXL</small> program in a file named '.stxxl' that must reside in the same directory
+where you execute the program (in our case this would be /project/build/src). A minimal configuration might be:
+\verbatim disk=/tmp/stxxl,1000,syscall # full_disk_filename, maximum capacity of the disk in megabytes, access method  
+[TODO] use syscall_unlink INSTEAD !!! touch /tmp/stxxl to create a file, the Stxxl is allowed to use as disk space \endverbatim
+Please see [TODO] for further available options.
+
+*/
 
 
 

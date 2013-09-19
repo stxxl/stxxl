@@ -303,3 +303,4 @@ message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
 
 add_subdirectory(tests)
 add_subdirectory(tools)
+add_subdirectory(examples)
