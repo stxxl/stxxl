@@ -1,16 +1,9 @@
-/*! \mainpage Documentation for STXXL library
+-/*! \mainpage Welcome to S<small>TXXL</small> - the Standard Template Library for Extra Large Data Sets 
  *
- *  \image html layer_diagram.png
- *
- * <br><br>
- * The core of \c S<small>TXXL</small> is an implementation of the C++
- * standard template library STL for external memory (out-of-core)
- * computations, i.e., \c S<small>TXXL</small> implements containers and algorithms
- * that can process huge volumes of data that only fit on
- * disks. While the compatibility to the STL supports
- * ease of use and compatibility with existing applications,
- * another design priority is high performance.
- * Here is a selection of \c S<small>TXXL</small> performance features:
+ * The core of \c S<small>TXXL</small> is an implementation of the C++ standard template library STL for external memory (out-of-core)
+ * computations, i.e., \c S<small>TXXL</small> implements containers and algorithms that can process huge volumes of data that only fit on
+ * disks. While the compatibility to the STL supports  ease of use and compatibility with existing applications,
+ * another design priority is high performance. Here is a selection of \c S<small>TXXL</small> performance features:
  * - transparent support of multiple disks
  * - variable block lengths
  * - overlapping of I/O and computation
@@ -18,15 +11,34 @@
  * - algorithm pipelining
  * - utilization of multiple processor cores for internal computation
  *
+ * \section getting_started Getting Started
  *
- * \section platforms Supported Operating Systems
- * - Linux (kernel >= 2.4.18)
- * - Mac OS X
- * - FreeBSD
- * - other POSIX compatible systems should work, but have not been tested
- * - Windows 2000/XP/Vista/7
+ * This section will help you if you are using the S<small>TXXL</small> for the first time.
+ * 
+ * \link install-unix Compiling and Installing the S<small>TXXL</small> on Unix Variants \endlink
  *
+ * \link install-windows Compiling and Installing the S<small>TXXL</small> on Microsoft Windows \endlink
  *
+ * \link install-macos Compiling Installing the S<small>TXXL</small> on Mac OS \endlink
+ *
+ * \link overview Overview on S<small>TXXL</small>'s basic concepts \endlink
+ *
+ * \section usage_functionality Usage and Functionality
+ * 
+ * This section provides simple and detailed documented examples on S<small>TXXL</small>'s datastructures.
+ *
+ * \link external_vector External Memory Vector \endlink
+ *
+ * \link external_sorting External Memory Sorting \endlink
+ *
+ * \link external_pq External Memory Priority Queue \endlink
+ *
+ * \link external_queue External Memory Queue \endlink
+ *
+ * \link external_deque External Memory Deque \endlink
+ *
+ * \link external_stack External Memory Stack \endlink
+ * 
  * \section compilers Supported Compilers
  *
  * The following compilers have been tested in different
