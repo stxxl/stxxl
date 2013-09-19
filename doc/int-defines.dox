@@ -1,0 +1,131 @@
+/***************************************************************************
+ *  doc/int-defines.dox
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+/*! \page int-defines Overview over STXXL's macros
+
+This page gives an overview of some of STXXL's applications of preprocessor
+macros:
+
+- \subpage int-defines-logging "logging facilities"
+- \subpage int-defines-testing "macros for checking assertions"
+- \subpage int-defines-misc "miscellaneous macros"
+
+ */
+
+/*! \page int-defines-logging Logging Macros STXXL_MSG
+
+All STXXL components should output log or trace messages using the following
+macros. There are two basic methods for logging using ostream syntax:
+
+\code
+// for plain messages
+STXXL_MSG("text " << var)
+// for error messages
+STXXL_ERRMSG("error message " << reason)
+\endcode
+
+For debugging and tracing the following macros can be used for increasing
+levels of verbosity:
+
+\code
+// level 0 (for current debugging)
+STXXL_VERBOSE0("text " << var)
+// level 1,2 and 3 for more verbose debugging level
+STXXL_VERBOSE1("text " << var)
+STXXL_VERBOSE2("text " << var)
+STXXL_VERBOSE3("text " << var)
+\endcode
+
+A method used by some submodule authors to create their own levels of verbosity
+is to make their own debugging macros:
+
+\code
+#define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void *>(this) << "]::" << msg)
+\endcode
+
+*/
+
+/*! \page int-defines-testing Macros for Checking Assertions
+
+There are quite a bunch of macros for testing assertions. You must be careful
+to pick the right one depending on when and what you want to assert on.
+
+\section static Compile-time Assertions STXXL_STATIC_ASSERT
+
+To check specific conditions at compile time use STXXL_STATIC_ASSERT.
+
+\code
+struct item { int a,b,c,d; }
+STXXL_STATIC_ASSERT(sizeof(item) == 4 * sizeof(int));
+\endcode
+
+\section unittest Assertions in Unit Tests STXXL_CHECK
+
+Assertions in unit tests must use the following macros to ensure that the
+condition is also checked in release builds (where a plain \c "assert()" is
+void). These \c CHECK function should NOT be used to test return values, since
+we try to throw exceptions instead of aborting the program.
+
+\code
+// test a condition
+STXXL_CHECK( 2+2 == 4 );
+// test a condition and output a more verbose reason on failure
+STXXL_CHECK2( 2+2 == 4, "We cannot count!");
+\endcode
+
+\section plain Plain Assertions
+
+For the usual assertions, that should be removed in production code for
+performance, we use the standard \c "assert()" function.
+
+TODO: STXXL_THROW
+
+*/
+
+/*! \page int-defines-misc Miscellaneous Macros
+
+\section namespaces __STXXL_BEGIN_NAMESPACE
+
+A long, long time ago, not all compilers supported C++ namespaces, thus STXXL
+uses the macros __STXXL_BEGIN_NAMESPACE and __STXXL_END_NAMESPACE, which open
+and close the \c "namespace stxxl".
+
+\section unused STXXL_UNUSED
+
+STXXL_UNUSED is not actually a macro. It is a remedy against "unused variable"
+warnings, for whatever reason. Usage:
+
+\code
+void function(int x)
+{
+    STXXL_UNUSED(x);
+}
+\endcode
+
+\section likely LIKELY and UNLIKEY
+
+Some compilers have facilities to specify whether a condition is likely or
+unlikely to be true. This may have consequences on how to layout the assembler
+code better.
+
+\code
+if (LIKELY(x > 1)) { ... }
+if (UNLIKELY(x > 8)) { ... }
+\endcode
+
+\section deprecated Deprecated Functions
+
+Some compilers can warn the user about deprecated function by tagging them in
+the source. In STXXL we use the macro _STXXL_DEPRECATED(...) to enclose
+deprecated functions.
+
+*/

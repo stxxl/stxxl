@@ -69,7 +69,7 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4290")
   # warning C4250: '...' : inherits '...' via dominance
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250")
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall")
 endif()
 
