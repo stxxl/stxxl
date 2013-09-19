@@ -1,5 +1,5 @@
 ###############################################################################
-# CMakeLists.txt
+# examples/CMakeLists.txt
 #
 # Cmake file for stxxl/examples/
 #
@@ -12,5 +12,6 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
+add_subdirectory(algo)
 add_subdirectory(containers)
 

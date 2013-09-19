@@ -1,7 +1,7 @@
 ###############################################################################
-# CMakeLists.txt
+# examples/algo/CMakeLists.txt
 #
-# Cmake file for stxxl/tools/algo
+# Cmake file for stxxl/examples/algo
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #
@@ -12,5 +12,5 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-stxxl_build_extra_tool(sort_file)
-stxxl_build_extra_tool(copy_and_sort_file)
+stxxl_build_tool(copy_and_sort_file)
+stxxl_build_tool(sort_file)

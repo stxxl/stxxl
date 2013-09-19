@@ -12,7 +12,6 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-add_subdirectory(algo)
 add_subdirectory(common)
 add_subdirectory(containers)
 add_subdirectory(io)
