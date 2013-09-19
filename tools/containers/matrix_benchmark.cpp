@@ -14,7 +14,7 @@
 #include <limits>
 
 // Thanks Daniel Russel, Stanford University
-#include <Argument_helper.h>
+#include <contrib/argument_helper.h>
 
 #include <stxxl/vector>
 #include <stxxl/stream>

@@ -13,7 +13,7 @@
 #include <stxxl/bits/mng/block_scheduler.h>
 
 // Thanks Daniel Russel, Stanford University
-#include <Argument_helper.h>
+#include <contrib/argument_helper.h>
 
 #include <iostream>
 #include <limits>
