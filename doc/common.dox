@@ -1,5 +1,5 @@
 /***************************************************************************
- *  doc/int-defines.dox
+ *  doc/common.dox
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,18 +10,82 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-/*! \page int-defines Overview over STXXL's macros
+/*! \page common Common Utilities and Helpers found in STXXL
 
-This page gives an overview of some of STXXL's applications of preprocessor
-macros:
+A lots of basic utility classes and helper functions have accumulated in
+STXXL. Try are usually fundamental enough to be also used in an application
+program.  Before implementing a common software utility, please check the list
+below; it might already exist in STXXL:
 
-- \subpage int-defines-logging "logging facilities"
-- \subpage int-defines-testing "macros for checking assertions"
-- \subpage int-defines-misc "miscellaneous macros"
+- \subpage common_random "random number generators"
+- \subpage common_timer "timestamp and timer function"
+- \subpage common_simple_vector "a non-growing, non-initializing simple_vector"
+- \subpage common_thread_sync "synchronization primitives for multi-threading"
+- \subpage common_logging "logging macros"
+- \subpage common_assert "macros for checking assertions"
+- \subpage common_misc_macros "miscellaneous macros"
 
  */
 
-/*! \page int-defines-logging Logging Macros STXXL_MSG
+/*! \page common_random Random Number Generators
+
+See file common/rand.h
+
+TODO-df
+
+*/
+
+/*! \page common_timer Timestamp and Timer Classes
+
+See file common/timer.h
+
+TODO-df
+
+*/
+
+/*! \page common_simple_vector A non-growing, non-initializing Simpler Vector
+
+For applications where a std::vector is overkill, or one wishes to allocate an
+uninitialied POD array, the stxxl::simple_vector is a good method.
+
+*/
+
+/*! \page common_thread_sync Synchronization Primitives for Multi-Threading
+
+To support multi-threading, some parts of STXXL use synchronization primitives
+to ensure correct results. The primitives are based either on pthreads or on
+Boost classes.
+
+\section mutex Mutexes
+
+For simple mutual exclusion contexts, stxxl::mutex objects should be used
+together with scoped locks:
+
+\code
+class Something
+{
+    stxxl::mutex m_mtx;
+    void critical_function()
+    {
+        stxxl::scoped_mutex_lock lock(m_mtx);
+        // do something requiring locking
+    }
+};
+\endcode
+
+\section semaphore Semaphores
+
+Additionally stxxl::semaphore is available if counting is required.
+
+\section further Further Primitives: State and OnOff-Switch
+
+stxxl::state is a synchronized state switching mechanism?
+
+stxxl::onoff_switch is a two state semaphore thing?
+
+*/
+
+/*! \page common_logging Logging Macros STXXL_MSG
 
 All STXXL components should output log or trace messages using the following
 macros. There are two basic methods for logging using ostream syntax:
@@ -54,7 +118,7 @@ is to make their own debugging macros:
 
 */
 
-/*! \page int-defines-testing Macros for Checking Assertions
+/*! \page common_assert Macros for Checking Assertions
 
 There are quite a bunch of macros for testing assertions. You must be careful
 to pick the right one depending on when and what you want to assert on.
@@ -91,7 +155,7 @@ TODO: STXXL_THROW
 
 */
 
-/*! \page int-defines-misc Miscellaneous Macros
+/*! \page common_misc_macros Miscellaneous Macros
 
 \section namespaces __STXXL_BEGIN_NAMESPACE
 
