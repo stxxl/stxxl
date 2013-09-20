@@ -20,6 +20,7 @@ below; it might already exist in STXXL:
 - \subpage common_random "random number generators"
 - \subpage common_timer "timestamp and timer function"
 - \subpage common_simple_vector "a non-growing, non-initializing simple_vector"
+- \subpage common_counting_ptr "reference counted (shared) objects via counting_ptr"
 - \subpage common_thread_sync "synchronization primitives for multi-threading"
 - \subpage common_logging "logging macros"
 - \subpage common_assert "macros for checking assertions"
@@ -47,6 +48,54 @@ TODO-df
 
 For applications where a std::vector is overkill, or one wishes to allocate an
 uninitialied POD array, the stxxl::simple_vector is a good method.
+
+*/
+
+/*! \page common_counting_ptr Reference Counted (Shared) Objects
+
+Some objects in STXXL are reference counted. This is usually done for large
+objects, which should not be copied deeply in assignments. Instead, a reference
+counting pointer is used, which holds a handle while the pointer exists and
+deletes the object once all pointers go out of scope. Examples are matrices and
+sorted_runs.
+
+The method used is called stxxl::counting_ptr or intrusive reference counting.
+This is similar, but not identical to boost or TR1's shared_ptr.
+
+The stxxl::counting_ptr is accompanied by stxxl::counted_object, which contains
+the actual reference counter (a single integer). A reference counted object
+must derive from stxxl::counted_object:
+
+\code
+struct something : public stxxl::counted_object
+{
+};
+\endcode
+
+Code that now wishes to use pointers referencing this object, will typedef an
+stxxl::counting_ptr, which is used to increment and decrement the included
+reference counter automatically.
+
+\code
+typedef stxxl::counting_ptr<something> something_ptr
+{
+    // create new instance of something
+    something_ptr p1 = new something;
+    {
+        // create a new reference to the same instance (no deep copy!)
+        something_ptr p2 = p1;
+        // this block end will decrement the reference count, but not delete the object
+    }
+    // this block end will delete the object
+}
+\endcode
+
+The stxxl::counting_ptr can generally be used like a usual pointer or
+shared_ptr (see the docs for more).
+
+There is also stxxl::const_counting_ptr to return const objects (note that a
+const stxxl::counting_ptr will only render the pointer const, not the enclosed
+object).
 
 */
 

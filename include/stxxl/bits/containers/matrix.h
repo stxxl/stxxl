@@ -14,7 +14,7 @@
 #define STXXL_MATRIX_HEADER
 
 #include <stxxl/bits/containers/vector.h>
-#include <stxxl/bits/common/shared_object.h>
+#include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/mng/block_scheduler.h>
 #include <stxxl/bits/containers/matrix_arithmetic.h>
 
@@ -224,7 +224,7 @@ public:
 //!
 //! Stores blocks only, so all measures (height, width, row, col) are in blocks.
 template <typename ValueType, unsigned BlockSideLength>
-class swappable_block_matrix : public shared_object
+class swappable_block_matrix : public counted_object
 {
 public:
     typedef int_type size_type;
@@ -333,7 +333,7 @@ public:
     }
 
     swappable_block_matrix(const swappable_block_matrix & other)
-        : shared_object(other),
+        : counted_object(other),
           bs(other.bs),
           height(other.height),
           width(other.width),
@@ -1021,7 +1021,7 @@ class matrix
 protected:
     typedef matrix<ValueType, BlockSideLength> matrix_type;
     typedef swappable_block_matrix<ValueType, BlockSideLength> swappable_block_matrix_type;
-    typedef shared_object_pointer<swappable_block_matrix_type> swappable_block_matrix_pointer_type;
+    typedef counting_ptr<swappable_block_matrix_type> swappable_block_matrix_pointer_type;
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::size_type block_size_type;
     typedef typename swappable_block_matrix_type::elem_size_type elem_size_type;
