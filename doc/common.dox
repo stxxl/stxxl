@@ -33,17 +33,73 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 
 /** \page common_random Random Number Generators
 
-See file common/rand.h
+See file common/rand.h -> TODO-df
 
-TODO-df
+Measuring the time consumption of program sections are often of great interest. The Stxxl comes with several build-in pseudo random number generators as shown below:
+
+\code 
+
+stxxl::random_number32 rand32;  // integer values in [0, 2^32)
+stxxl::random_number64 rand64;  // integer values in [0, 2^64)
+stxxl::random_uniform_slow urand_slow;  // uniform values in [0.0, 1.0)
+stxxl::random_uniform_fast urand_fast;  // uniform values in [0.0, 1.0)
+stxxl::random_number<> n_rand;  // integer values in [0,N)
+
+unsigned int random32 = rand32();
+stxxl::uint64 random64 = rand64();
+double urandom_slow = urand_slow();
+double urandom_fast = urand_fast();
+unsigned int n_random = n_rand(123456789);
+
+STXXL_MSG("random 32 bit number: " << random32);
+STXXL_MSG("random 64 bit number: " << random64);
+STXXL_MSG("random number between [0.0, 1.0) (slow): " << urandom_slow);
+STXXL_MSG("random number between [0.0, 1.0) (fast): " << urandom_fast);
+STXXL_MSG("random number between [0,123456789): " << n_random);
+
+\endcode
+
 
 */
 
 /** \page common_timer Timestamp and Timer Classes
 
-See file common/timer.h
+See file common/timer.h -> TODO-df
 
-TODO-df
+Measuring the time certain parts of an algorithm or the entire algorithm consume will often be of great interest. The STXXL provides build-in time measurement class stxxl::timer which can be used as follows:
+
+\code
+#include <stxxl/timer>  // make timer class available
+
+stxxl::timer Timer;  // create Timer object
+
+Timer.start();
+
+// code section which shall be measured
+
+Timer.stop();
+
+// get results:
+STXXL_MSG(",easured time: " << (Timer.seconds()) << " (seconds), " << (Timer.mseconds()) << " (milliseconds), " << (Timer.useconds()) << " (microseconds))
+
+Timer.reset();  // reset clock to zero which allows to run start() again 
+
+\endcode
+
+As an alternative, one can also work on the timestamp itself:
+
+\code
+double start = stxxl::timestamp();
+
+// code section to be measured 
+
+double stop = stxxl::timestamp();
+
+STXXL_MSG("measured time: " << (stop - start) << " seconds.");
+\endcode
+
+
+
 
 */
 

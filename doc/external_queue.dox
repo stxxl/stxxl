@@ -1,0 +1,56 @@
+/*! \page external_queue stxxl::queue
+
+
+The Stxxl has an implementation of external memory "first in first out" (FIFO) queue. Its design is similar to stxxl::grow_shrink_stack2 (as described \ref external_stack "here"). 
+The implementation holds the head and the tail blocks in the main memory. Prefetch and write block pools might be used to overlap I/O and computation during queue operations.
+
+The stxxl::queue class expects up to four template parameter as ordered in the table below.
+
+parameters (optional if not required)                 | default value              | possible (permitted) values
+:-------------------------  			      | :------------------------: | :-------------------------------                  |
+value_type (required)       			      |         none               |  POD, with no reference to internal memory        |  
+block_size 					      |         2*1024*1024        |                                                   |
+alloc_strategy 					      |         stxxl::RC          |  stxxl::striping, stxxl::SR, stxxl::FR, stxxl::RC |
+size_type 					      |		stxxl::uint64      |                                                   |
+
+\n
+
+\snippet queue1.cpp example
+	  
+
+The stxxl::queue class provides three different constructors. 
+
+1. queue(D)
+  Creates wp_pool(D, D+2) i.e. write_pool of size D, and prefetch_pool of size D+2. blocks2prefetch stays by default(see table below)
+  In default case, the write_pool's size is set to ? and the prefetch_pool's size is set to 1. blocks2prefetch stays by default(see table below)
+  \code 
+  // write_pool size = 2, prefetch_pool size = 4, blocks2prefetch = number of blocks in the prefetch pool (i.e. 4)               
+  a_queue my_queue1(2);
+  \endcode
+
+2. queue(write_pool, prefetch_pool, blocks2prefetch)
+\code
+// write_pool size = 3, prefetch_pool size = 3, blocks2prefetch = number of blocks in the prefetch pool (i.e. 2)
+a_queue my_queue2(3, 3, 2);
+\endcode
+
+3. queue(wp_pool, blocks2prefetch) 
+\code
+// define write-prefetch pool
+stxxl::read_write_pool<a_queue::block_type> pool(3, 3);
+
+// write_pool size = 3, prefetch_pool size = 3, blocks2prefetch = number of blocks in the prefetch pool (i.e. 2)
+a_queue my_queue3(pool, 2);
+\endcode
+
+parameter					| default values    | note/recommendation								      |
+:-------------------------    	      		| :--------: 	    | :---------------------------------------------------------------------------------------|         		 
+D			      			| -1		    |  					     	       					      |
+write_pool		      			|  ?		    | must be at least 2, recommended at least 3					      |		     
+prefetch_pool		             		|  1	            | recommended at least 1								      | 		       
+blocks2prefetch                      		| -1                | a negative value means to use the number of blocks in the prefetch pool 		      |
+wp_pool = (write_pool, prefetch_pool)		| 		    |                                                                 	 		      |
+		     
+
+
+*/
