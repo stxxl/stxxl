@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,6 +19,7 @@
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/algo/adaptor.h>
+#include <stxxl/bits/common/counting_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -33,8 +35,8 @@ namespace stream
     ////////////////////////////////////////////////////////////////////////
 
     //! \brief All sorted runs of a sort operation.
-    template <typename TriggerEntryType>
-    struct sorted_runs
+    template <typename TriggerEntryType, typename CompareType>
+    struct sorted_runs : private noncopyable, public counted_object
     {
         typedef TriggerEntryType trigger_entry_type;
         typedef typename trigger_entry_type::block_type block_type;
@@ -44,41 +46,76 @@ namespace stream
         typedef stxxl::external_size_type size_type;
         typedef typename std::vector<run_type>::size_type run_index_type;
 
+        typedef CompareType cmp_type;
+
+        /// total number of elements in all runs
         size_type elements;
+
+        /// vector of runs (containing vectors of block ids)
         std::vector<run_type> runs;
+
+        /// vector of the number of elements in each individual run
         std::vector<size_type> runs_sizes;
 
-        // Optimization:
-        // if the input is small such that its total size is
-        // at most B (block_type::size)
-        // then input is sorted internally
-        // and kept in the array "small"
-        small_run_type small_;
+        //! \brief Small sort optimization:
+        // if the input is small such that its total size is at most B
+        // (block_type::size) then input is sorted internally and kept in the
+        // array "small_run"
+        small_run_type  small_run;
 
-        sorted_runs() : elements(0) { }
+    public:
+        sorted_runs()
+            : elements(0)
+        { }
 
-        const small_run_type & small_run() const
+        ~sorted_runs()
         {
-            return small_;
+            deallocate_blocks();
+        }
+        
+        /// Clear the internal state of the object: release all runs and reset.
+        void clear()
+        {
+            deallocate_blocks();
+
+            elements = 0;
+            runs.clear();
+            runs_sizes.clear();
+            small_run.clear();
         }
 
+        /// Add a new run with given number of elements
+        void add_run(const run_type& run, size_type run_size)
+        {
+            runs.push_back(run);
+            runs_sizes.push_back(run_size);
+            elements += run_size;
+        }
+
+        /// Swap contents with another object. This is used by the recursive
+        /// merger to swap in a sorted_runs object with fewer runs.
+        void swap(sorted_runs& b)
+        {
+            std::swap(elements, b.elements);
+            std::swap(runs, b.runs);
+            std::swap(runs_sizes, b.runs_sizes);
+            std::swap(small_run, b.small_run);
+        }
+
+    private:
         //! \brief Deallocates the blocks which the runs occupy
         //!
-        //! \remark Usually there is no need in calling this method,
-        //! since the \c runs_merger calls it when it is being destructed
+        //! \remark There is no need in calling this method, the blocks are
+        //! deallocated by the destructor. However, if you wish to reuse the
+        //! object, then this function can be used to clear its state.
         void deallocate_blocks()
         {
             block_manager * bm = block_manager::get_instance();
             for (unsigned_type i = 0; i < runs.size(); ++i)
-                bm->delete_blocks(make_bid_iterator(runs[i].begin()), make_bid_iterator(runs[i].end()));
-
-            runs.clear();
-        }
-
-        // returns number of elements in all runs together
-        size_type size() const
-        {
-            return elements;
+            {
+                bm->delete_blocks(make_bid_iterator(runs[i].begin()),
+                                  make_bid_iterator(runs[i].end()));
+            }
         }
     };
 

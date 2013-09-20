@@ -82,7 +82,7 @@ int main()
     // merge the runs
     stxxl::stream::runs_merger<SortedRunsType, Cmp> merger(Runs, Cmp(), MULT * 1024 * 128);
     stxxl::vector<Input::value_type> array;
-    STXXL_MSG(size << " " << Runs.elements);
+    STXXL_MSG(size << " " << Runs->elements);
     STXXL_MSG("CRC: " << in.crc);
     Input::value_type crc(0);
     for (unsigned i = 0; i < size; ++i)
