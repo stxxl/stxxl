@@ -46,7 +46,7 @@ count(type_key * a, type_key * aEnd, int_type * bucket, int_type K, typename typ
 }
 
 
-static void
+static inline void
 exclusive_prefix_sum(int_type * bucket, int_type K)
 {
     int_type sum = 0;

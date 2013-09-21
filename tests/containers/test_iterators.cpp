@@ -111,26 +111,26 @@ struct test_comparison_lt_gt<IteratorA, IteratorB, std::random_access_iterator_t
 {
     void operator () (IteratorA a, IteratorB b)
     {
-        a < b;
-        a <= b;
-        a > b;
-        a >= b;
+        STXXL_CHECK(! (a < b) );
+        STXXL_CHECK(  (a <= b) );
+        STXXL_CHECK(! (a > b) );
+        STXXL_CHECK(  (a >= b) );
 
-        b < a;
-        b <= a;
-        b > a;
-        b >= a;
+        STXXL_CHECK(! (b < a) );
+        STXXL_CHECK(  (b <= a) );
+        STXXL_CHECK(! (b > a) );
+        STXXL_CHECK(  (b >= a) );
     }
 };
 
 template <typename IteratorA, typename IteratorB>
 void test_comparison(IteratorA a, IteratorB b)
 {
-    a == b;
-    a != b;
+    STXXL_CHECK(  (a == b) );
+    STXXL_CHECK(! (a != b) );
 
-    b == a;
-    b != a;
+    STXXL_CHECK(  (b == a) );
+    STXXL_CHECK(! (b != a) );
 
     test_comparison_lt_gt<IteratorA, IteratorB, typename std::iterator_traits<IteratorA>::iterator_category>() (a, b);
 }

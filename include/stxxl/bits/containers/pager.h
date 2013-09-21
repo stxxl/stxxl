@@ -53,7 +53,7 @@ public:
 
     void hit(size_type ipage)
     {
-        assert(ipage < size());
+        STXXL_ASSERT(ipage < size());
     }
 
     size_type size() const

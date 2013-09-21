@@ -248,10 +248,10 @@ int main(int argc, char * argv[])
     btree_type::const_iterator ce = BTree3.end();
     const btree_type & CBTree3 = BTree3;
     cb = CBTree3.begin();
-    b3 == cb;
-    b3 != cb;
-    cb == b3;
-    cb != b3;
+    STXXL_CHECK( !(b3 == cb) );
+    STXXL_CHECK(  (b3 != cb) );
+    STXXL_CHECK( !(cb == b3) );
+    STXXL_CHECK(  (cb != b3) );
     ce = CBTree3.end();
     btree_type::const_iterator cit = CBTree3.find(0);
     cit = CBTree3.lower_bound(0);
