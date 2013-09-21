@@ -200,6 +200,11 @@ STXXL_CHECK2( 2+2 == 4, "We cannot count!");
 For the usual assertions, that should be removed in production code for
 performance, we use the standard \c "assert()" function.
 
+However, there is also \c STXXL_ASSERT(), which can be used as a replacement
+for \c assert(), when compiler warnings about unused variables or typedefs
+occur. The issue is that assert() completely removes the code, whereas
+STXXL_ASSERT() keeps the code encloses it inside \c if(0).
+
 TODO: STXXL_THROW
 
 */

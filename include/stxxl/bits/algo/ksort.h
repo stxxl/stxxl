@@ -1054,8 +1054,8 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
 #if STXXL_CHECK_ORDER_IN_SORTS
     typedef typename ExtIterator_::const_iterator const_iterator;
-    assert(stxxl::is_sorted(const_iterator(first_), const_iterator(last_),
-                            ksort_local::key_comparison<value_type, KeyExtractor_>()));
+    STXXL_ASSERT(stxxl::is_sorted(const_iterator(first_), const_iterator(last_),
+                                  ksort_local::key_comparison<value_type, KeyExtractor_>()));
 #endif
 }
 

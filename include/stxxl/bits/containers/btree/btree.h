@@ -110,7 +110,7 @@ namespace btree
         {
             std::pair<root_node_iterator_type, bool> result =
                 root_node_.insert(splitter);
-            assert(result.second == true);
+            STXXL_ASSERT(result.second == true);
             if (root_node_.size() > max_node_size)      // root overflow
             {
                 STXXL_VERBOSE1("btree::insert_into_root, overflow happened, splitting");

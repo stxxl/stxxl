@@ -120,8 +120,8 @@ namespace stream
 
     public:
         //! \brief Create the object
-        //! \param i input stream
-        //! \param c comparator object
+        //! \param input input stream
+        //! \param cmp comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
         basic_runs_creator(Input_ & input, CompareType_ cmp, unsigned_type memory_to_use)
             : m_input(input),
@@ -364,8 +364,8 @@ namespace stream
 
     public:
         //! \brief Creates the object
-        //! \param i input stream
-        //! \param c comparator object
+        //! \param input input stream
+        //! \param cmp comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
         runs_creator(Input_ & input, CompareType_ cmp, unsigned_type memory_to_use)
             : base(input, cmp, memory_to_use)
@@ -527,7 +527,7 @@ namespace stream
 
     public:
         //! \brief Creates the object
-        //! \param c comparator object
+        //! \param cmp comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
         runs_creator(CompareType_ cmp, unsigned_type memory_to_use) :
             m_cmp(cmp),
@@ -856,7 +856,6 @@ namespace stream
     {
         sort_helper::verify_sentinel_strict_weak_ordering(cmp);
         typedef typename RunsType_::element_type::block_type block_type;
-        typedef typename block_type::value_type value_type;
         STXXL_VERBOSE2("Elements: " << sruns->elements);
         unsigned_type nruns = sruns->runs.size();
         STXXL_VERBOSE2("Runs: " << nruns);
@@ -1469,8 +1468,8 @@ namespace stream
 
     public:
         //! \brief Creates a runs merger object
-        //! \param r input sorted runs object
-        //! \param c comparison object
+        //! \param sruns input sorted runs object
+        //! \param cmp comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(sorted_runs_type & sruns, value_cmp cmp, unsigned_type memory_to_use)
             : base(cmp, memory_to_use)
@@ -1479,7 +1478,7 @@ namespace stream
         }
 
         //! \brief Creates a runs merger object without initializing a round of sorted_runs
-        //! \param c comparison object
+        //! \param cmp comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(value_cmp cmp, unsigned_type memory_to_use)
             : base(cmp, memory_to_use)

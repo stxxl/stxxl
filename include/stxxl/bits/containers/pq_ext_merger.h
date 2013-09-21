@@ -370,7 +370,7 @@ namespace priority_queue_local
         // return winner index
         unsigned_type init_winner(unsigned_type root)
         {
-            if (root >= k)
+            if (root >= k || root >= arity_bound)
             {   // leaf reached
                 return root - k;
             }
@@ -380,6 +380,7 @@ namespace priority_queue_local
                 unsigned_type right = init_winner(2 * root + 1);
                 value_type lk = *(states[left]);
                 value_type rk = *(states[right]);
+                assert(root < arity_bound);
                 if (!(cmp(lk, rk)))
                 {   // right subtree looses
                     entry[root].index = right;
@@ -477,6 +478,7 @@ namespace priority_queue_local
 
             STXXL_VERBOSE1("ext_merger::double_k (after)  k=" << k << " log_k=" << log_k << " arity_bound=" << arity_bound << " arity=" << arity << " #free=" << free_segments.size());
             assert(!free_segments.empty());
+            assert(k <= arity_bound);
 
             // recompute loser tree information
             rebuild_loser_tree();

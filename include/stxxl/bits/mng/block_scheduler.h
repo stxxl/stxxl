@@ -1188,7 +1188,7 @@ protected:
         if (wrr->write_req.valid())
         {
             bool t = write_scheduled_blocks.insert(std::make_pair(sbid, wrr)).second;
-            assert(t);
+            STXXL_ASSERT(t);
             return wrr;
         }
         else
@@ -1643,7 +1643,7 @@ public:
             {
                 // not acquired yet -> remove from scheduled_evictable_blocks
                 bool t = scheduled_evictable_blocks.erase(sbid);
-                assert(t);
+                STXXL_ASSERT(t);
                 wait_on_read(schedule_meta);
             }
             sblock.acquire();
