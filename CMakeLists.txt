@@ -269,7 +269,9 @@ macro(add_define PROGNAME)
   if(TARGET ${PROGNAME})
     set_property(TARGET ${PROGNAME} APPEND PROPERTY COMPILE_DEFINITIONS ${ARGN})
   else()
-    message("Ignoring add_define(${PROGNAME} ${ARGN})")
+    if(BUILD_TESTS)
+      message("Ignoring add_define(${PROGNAME} ${ARGN}) for unknown target ${PROGNAME}")
+    endif(BUILD_TESTS)
   endif()
 
 endmacro (add_define TESTNAME)
@@ -283,14 +285,16 @@ if(TRY_COMPILE_HEADERS)
   set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include")
 
   file(GLOB_RECURSE header_files FOLLOW_SYMLINKS "include/*")
-  set(T 0)
+  list(REMOVE_ITEM header_files "${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in")
 
   foreach(file ${header_files})
-    message("${file}")
     check_cxx_source_compiles(
       "#include \"${file}\"
-      int main() { return 0; }" Header_${T}_IsSelfContained)
-    math(EXPR T "${T} + 1")
+      int main() { return 0; }" IsSelfContained-${file})
+
+    if(NOT IsSelfContained-${file})
+      message(SEND_ERROR "Compilation FAILED for ${file}")
+    endif()
   endforeach()
 
 endif(TRY_COMPILE_HEADERS)

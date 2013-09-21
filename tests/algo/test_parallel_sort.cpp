@@ -288,7 +288,7 @@ int main(int argc, const char ** argv)
 
     std::cout << "Generating took " << (generate_stop - generate_start) << " seconds." << std::endl;
 
-    STXXL_CHECK(stxxl::is_sorted<vector_type::const_iterator>(input.begin(), input.end()));
+    STXXL_CHECK(!stxxl::is_sorted<vector_type::const_iterator>(input.begin(), input.end()));
 
     {
         vector_type output(n_records);

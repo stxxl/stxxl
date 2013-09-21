@@ -16,6 +16,8 @@
 #ifndef STXXL_PQ_LOSERTREE_HEADER
 #define STXXL_PQ_LOSERTREE_HEADER
 
+#include <stxxl/bits/containers/pq_helpers.h>
+
 __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup stlcontinternals

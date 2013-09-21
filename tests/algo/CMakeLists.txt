@@ -93,7 +93,7 @@ if(USE_GNU_PARALLEL)
 
     foreach(SORT m q qb s)
       foreach(MERGE p s n)
-        stxxl_test(test_parallel_sort 768 4 128 ${SORT} ${MERGE})
+        stxxl_test(test_parallel_sort 512 4 128 ${SORT} ${MERGE})
       endforeach(MERGE)
     endforeach(SORT)
 

@@ -16,7 +16,7 @@
 #ifndef STXXL_PQ_EXT_MERGER_HEADER
 #define STXXL_PQ_EXT_MERGER_HEADER
 
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/containers/pq_helpers.h>
 
 __STXXL_BEGIN_NAMESPACE
 
