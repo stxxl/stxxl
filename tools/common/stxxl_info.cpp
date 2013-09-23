@@ -13,7 +13,6 @@
 #include <stxxl/io>
 #include <stxxl/mng>
 #include <stxxl/version.h>
-#include <stxxl/bits/compat/shared_ptr.h>
 
 int main(int argc, char **)
 {
@@ -48,8 +47,6 @@ int main(int argc, char **)
 #if defined(STXXL_HAVE_AIO_FILE)
     STXXL_MSG("STXXL_HAVE_AIO_FILE    = " << STXXL_HAVE_AIO_FILE);
 #endif
-    STXXL_MSG("STXXL_HAVE_SHARED_PTR  = " << STXXL_HAVE_SHARED_PTR);
-    STXXL_MSG("STXXL_HAVE_MAKE_SHARED = " << STXXL_HAVE_MAKE_SHARED);
 
     assert(argc < 3);          // give two extra arguments to check whether assertions are enabled
     return argc != 2 ? 0 : -1; // give one extra argument to get exit code -1
