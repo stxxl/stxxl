@@ -2,6 +2,7 @@
  *  doc/design.dox
  *
  *  Design of STXXL, all of this is from Roman's PhD thesis.
+ *  Edited by Timo Bingmann
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -13,124 +14,43 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+namespace stxxl {
+
 /*! \page design Design of STXXL
 
 \author Roman Dementiev
 \date written 2006
 
-STXXL is a layered library consisting of three layers (see following figure).
-The lowest layer, the Asynchronous I/O primitives layer (AIO layer), abstracts
-away the details of how asynchronous I/O is performed on a particular operating
-system. Other existing external memory algorithm libraries only rely on
-synchronous I/O APIs \cite CraMeh99 or allow reading ahead sequences stored in
-a file using the POSIX asynchronous I/O API \cite tpie_manual. These libraries
-also rely on uncontrolled operating system I/O caching and buffering in order
-to overlap I/O and computation in some way. However, this approach has
-significant performance penalties for accesses without locality.
-Unfortunately, the asynchronous I/O APIs are very different for different
-operating systems (e.g. POSIX AIO and Win32 Overlapped I/O). Therefore, we have
-introduced the AIO layer to make porting STXXL easy. Porting the whole library
-to a different platform requires only reimplementing the AIO layer using native
-file access methods and/or native multithreading mechanisms.
+STXXL is a layered library consisting of three layers (see following figure). The lowest layer, the Asynchronous I/O primitives layer (AIO layer), abstracts away the details of how asynchronous I/O is performed on a particular operating system. Other existing external memory algorithm libraries only rely on synchronous I/O APIs \cite CraMeh99 or allow reading ahead sequences stored in a file using the POSIX asynchronous I/O API \cite tpie_manual. These libraries also rely on uncontrolled operating system I/O caching and buffering in order to overlap I/O and computation in some way. However, this approach has significant performance penalties for accesses without locality. Unfortunately, the asynchronous I/O APIs are very different for different operating systems (e.g. POSIX AIO and Win32 Overlapped I/O). Therefore, we have introduced the AIO layer to make porting STXXL easy. Porting the whole library to a different platform requires only reimplementing the AIO layer using native file access methods and/or native multithreading mechanisms.
 
 \image html layer_diagram.png "The STXXL library structure"
 
-STXXL already has several implementations of the AIO layer which use different
-file access methods under POSIX/UNIX and Windows systems. Porting STXXL to
-Windows took only a few days. The main efforts were spent for writing the AIO
-layer using the native Windows calls. Rewriting the thread-related code was
-easy provided the Boost thread library; its interfaces are similar to POSIX
-threads. There were little header file and compiler-specific incompatibilities;
-those were solved by conditional compilation using the C++ preprocessor. The
-POSIX version of STXXL had run immediately on the all listed operating systems
-after changing some Linux-specific header file includes to more common POSIX
-headers.
+STXXL already has several implementations of the AIO layer which use different file access methods under POSIX/UNIX and Windows systems. Porting STXXL to Windows took only a few days. The main efforts were spent for writing the AIO layer using the native Windows calls. Rewriting the thread-related code was easy provided the Boost thread library; its interfaces are similar to POSIX threads. There were little header file and compiler-specific incompatibilities; those were solved by conditional compilation using the C++ preprocessor. The POSIX version of STXXL had run immediately on the all listed operating systems after changing some Linux-specific header file includes to more common POSIX headers.
 
-The Block Management layer (BM layer) provides a programming interface
-emulating the \b parallel disk model. The BM layer provides an abstraction for
-a fundamental concept in the external memory algorithm design --- a block of
-elements. The block manager implements block allocation/deallocation, allowing
-several block-to-disk assignment strategies: striping, randomized striping,
-randomized cycling, etc. The block management layer provides an implementation
-of parallel disk buffered writing \cite HutSanVit01b, optimal prefetching
-\cite HutSanVit01b, and block caching.  The implementations are fully asynchronous
-and designed to explicitly support overlapping between I/O and computation.
+The Block Management layer (BM layer) provides a programming interface emulating the \b parallel disk model. The BM layer provides an abstraction for a fundamental concept in the external memory algorithm design --- a block of elements. The block manager implements block allocation/deallocation, allowing several block-to-disk assignment strategies: striping, randomized striping, randomized cycling, etc. The block management layer provides an implementation of parallel disk buffered writing \cite HutSanVit01b, optimal prefetching \cite HutSanVit01b, and block caching. The implementations are fully asynchronous and designed to explicitly support overlapping between I/O and computation.
 
-The top of STXXL consists of two modules.  The STL-user layer provides external
-memory sorting, external memory stack, external memory priority queue,
-etc. which have (almost) the same interfaces (including syntax and semantics)
-as their STL counterparts. The Streaming layer provides efficient support for
-\b pipelining external memory algorithms.  Many external memory algorithms,
-implemented using this layer, can save a factor of 2--3 in I/Os.  For example,
-the algorithms for external memory suffix array construction implemented with
-this module \cite DKMS05 require only 1/3 of the number of I/Os which must be
-performed by implementations that use conventional data structures and
-algorithms (either from STXXL STL-user layer, LEDA-SM, or TPIE).  The win is
-due to an efficient interface that couples the input and the output of the
-algorithm--components (scans, sorts, etc.). The output from an algorithm is
-directly fed into another algorithm as input, without needing to store it on
-the disk in-between.  This generic pipelining interface is the first of this
-kind for external memory algorithms.
+The top of STXXL consists of two modules. The STL-user layer provides external memory sorting, external memory stack, external memory priority queue, etc. which have (almost) the same interfaces (including syntax and semantics) as their STL counterparts. The Streaming layer provides efficient support for \b pipelining external memory algorithms. Many external memory algorithms, implemented using this layer, can save a factor of 2--3 in I/Os. For example, the algorithms for external memory suffix array construction implemented with this module \cite DKMS05 require only 1/3 of the number of I/Os which must be performed by implementations that use conventional data structures and algorithms (either from STXXL STL-user layer, LEDA-SM, or TPIE). The win is due to an efficient interface that couples the input and the output of the algorithm--components (scans, sorts, etc.). The output from an algorithm is directly fed into another algorithm as input, without needing to store it on the disk in-between. This generic pipelining interface is the first of this kind for external memory algorithms.
 
 \section aio_layer The Asynchronous I/O primitives Layer
 
-The purpose of the AIO layer is to provide a unified approach to asynchronous
-I/O. The layer hides details of native asynchronous I/O interfaces of an
-operating system. Studying the patterns of I/O accesses of external memory
-algorithms and data structures, we have identified the following functionality
-that should be provided by the AIO layer:
+The purpose of the AIO layer is to provide a unified approach to asynchronous I/O. The layer hides details of native asynchronous I/O interfaces of an operating system. Studying the patterns of I/O accesses of external memory algorithms and data structures, we have identified the following functionality that should be provided by the AIO layer:
 
-- To issue read and write requests without having to wait for them to be
-completed.
+- To issue read and write requests without having to wait for them to be completed.
 
 - To wait for the completion of a subset of issued I/O requests.
 
-- To wait for the completion of at least one request from a subset of issued
-I/O requests.
+- To wait for the completion of at least one request from a subset of issued I/O requests.
 
 - To poll the completion status of any I/O request.
 
-- To assign a callback function to an I/O request which is called upon I/O
-completion (asynchronous notification of completion status), with the ability
-to co-relate callback events with the issued I/O requests.
+- To assign a callback function to an I/O request which is called upon I/O completion (asynchronous notification of completion status), with the ability to co-relate callback events with the issued I/O requests.
 
-The AIO layer exposes two user objects: stxxl::file and
-stxxl::request_ptr. Together with the I/O waiting functions stxxl::wait_all,
-stxxl::wait_any, and stxxl::poll_any they provide the functionality mentioned
-above. Using a stxxl::file object, the user can submit asynchronous read and
-asynchronous write requests (methods stxxl::file::aread and
-stxxl::file::awrite). These methods return a stxxl::request_ptr object which is
-used to track the status of the issued request. The AIO layer functions
-stxxl::wait_all, stxxl::wait_any, and stxxl::poll_any facilitate tracking a set
-of stxxl::request_ptr s. The last parameter of the methods stxxl::file::aread
-and stxxl::file::awrite is a reference to a callback function object (callback
-functor). The functor's stxxl::operator()(request_ptr) method is called when
-the I/O request is completed.
+The AIO layer exposes two user objects: stxxl::file and stxxl::request_ptr. Together with the I/O waiting functions stxxl::wait_all, stxxl::wait_any, and stxxl::poll_any they provide the functionality mentioned above. Using a stxxl::file object, the user can submit asynchronous read and asynchronous write requests (methods stxxl::file::aread and stxxl::file::awrite). These methods return a stxxl::request_ptr object which is used to track the status of the issued request. The AIO layer functions stxxl::wait_all, stxxl::wait_any, and stxxl::poll_any facilitate tracking a set of stxxl::request_ptr s. The last parameter of the methods stxxl::file::aread and stxxl::file::awrite is a reference to a callback function object (callback functor). The functor's stxxl::operator()(request_ptr) method is called when the I/O request is completed.
 
-As a part of the AIO layer, the STXXL library provides various I/O performance
-counters (stxxl::stats class). The class counts the number and the duration of
-the performed I/O operations as well as the transferred volume.  Read and write
-operations are counted separately. STXXL also measures the time spent by the
-processing thread(s) waiting for the completions of I/Os (I/O wait time). This
-metric helps to evaluate the degree and the impact of overlapping between I/O
-and computation in an application.
+As a part of the AIO layer, the STXXL library provides various I/O performance counters (stxxl::stats class). The class counts the number and the duration of the performed I/O operations as well as the transferred volume. Read and write operations are counted separately. STXXL also measures the time spent by the processing thread(s) waiting for the completions of I/Os (I/O wait time). This metric helps to evaluate the degree and the impact of overlapping between I/O and computation in an application.
 
 
-The following listing shows a simple example of how to use AIO objects to
-perform asynchronous I/O. All STXXL library objects are defined in the
-namespace stxxl. For convenience, in line 1 we bring all names from the STXXL
-namespace to the local scope. In Line 8 a file object \c myfile is
-constructed. stxxl::syscall_file is an implementation of the STXXL stxxl::file
-interface which uses UNIX/POSIX \c read and \c write system calls to perform
-I/O. The file named <tt>"storage"</tt> in the current directory is opened in
-read-only mode. In line 9 an asynchronous read of the 1 MB region of the file
-starting at position 0 is issued. The data will be read into the array \c
-mybuffer. When the read operation is completed, <tt>my_handler::operator()</tt>
-will be called with a pointer to the completed request. The execution stops at
-line 11 waiting for the completion of the issued read operation. Note that the
-work done in the function <tt>do_something1()</tt> is overlapped with reading.
-When the I/O is finished, one can process the read buffer (line 12) and free it
-(line 13).
+The following listing shows a simple example of how to use AIO objects to perform asynchronous I/O. All STXXL library objects are defined in the namespace stxxl. For convenience, in line 1 we bring all names from the STXXL namespace to the local scope. In Line 8 a file object \c myfile is constructed. stxxl::syscall_file is an implementation of the STXXL stxxl::file interface which uses UNIX/POSIX \c read and \c write system calls to perform I/O. The file named <tt>"storage"</tt> in the current directory is opened in read-only mode. In line 9 an asynchronous read of the 1 MB region of the file starting at position 0 is issued. The data will be read into the array \c mybuffer. When the read operation is completed, <tt>my_handler::operator()</tt> will be called with a pointer to the completed request. The execution stops at line 11 waiting for the completion of the issued read operation. Note that the work done in the function <tt>do_something1()</tt> is overlapped with reading. When the I/O is finished, one can process the read buffer (line 12) and free it (line 13).
 
 \code
 using namespace stxxl;
@@ -150,162 +70,33 @@ delete [] mybuffer; // free the buffer
 
 \subsection aio_impl AIO Layer Implementations
 
-There are several implementation strategies for the STXXL AIO layer.  Some
-asynchronous I/O related APIs (and underlying libraries implementing them)
-already exist. The most well known framework is POSIX AIO, which has an
-implementation on almost every UNIX/POSIX system. Its disadvantage is that it
-has only limited support for I/O completion event mechanism The Linux AIO
-kernel side implementation (http://freshmeat.net/projects/linux-aio/) of POSIX
-AIO does not have this deficit, but is not portable since it works under Linux
-only.
+There are several implementation strategies for the STXXL AIO layer. Some asynchronous I/O related APIs (and underlying libraries implementing them) already exist. The most well known framework is POSIX AIO, which has an implementation on almost every UNIX/POSIX system. Its disadvantage is that it has only limited support for I/O completion event mechanism The Linux AIO kernel side implementation (http://freshmeat.net/projects/linux-aio/) of POSIX AIO does not have this deficit, but is not portable since it works under Linux only.
 
-The STXXL AIO layer follows a different approach. It does not rely on any
-asynchronous I/O API. Instead we use synchronous I/O calls running
-asynchronously in separate threads. For each file there is one read and one
-write request queue and one thread. The main thread posts requests (invoking
-stxxl::file::aread and stxxl::file::awrite methods) to the file queues. The
-thread associated with the file executes the requests in FIFO order.  This
-approach is very flexible and it does not suffer from limitations of native
-asynchronous APIs.
+The STXXL AIO layer follows a different approach. It does not rely on any asynchronous I/O API. Instead we use synchronous I/O calls running asynchronously in separate threads. For each file there is one read and one write request queue and one thread. The main thread posts requests (invoking stxxl::file::aread and stxxl::file::awrite methods) to the file queues. The thread associated with the file executes the requests in FIFO order. This approach is very flexible and it does not suffer from limitations of native asynchronous APIs.
 
-Our POSIX implementation of the AIO layer is based on POSIX threads and
-supports several Unix file access methods: the \c syscall method uses \c read
-and \c write system calls, the \c mmap method uses memory mapping (\c mmap and
-\c munmap calls), the \c sim_disk method simulates I/O timings of a hard disk
-provided a big internal memory. To avoid superfluous copying of data between
-the user and kernel buffer memory, the \c syscall method has the option to use
-unbuffered file system access. These file access methods can also be used for
-raw disk I/O, bypassing the file system. In this case, instead of files, raw
-<b>device handles</b> are open. The <tt>read/write</tt> calls using direct
-access (\c O_DIRECT option) have shown the best performance under Linux.  The
-disadvantage of the \c mmap call is that programs using this method have less
-control over I/O: In most operating systems 4 KBytes data pages of a
-<tt>mmap</tt>ed file region are brought to the main memory "lazily", only when
-they are accessed for the first time. This means if one <tt>mmap</tt>s a 100
-KBytes block and touches only the first and the last element of the block then
-\b two I/Os are issued by the operating system. This will slow down many
-I/O-efficient algorithms, since for modern disks the seek time is much longer
-than the reading of 100 KBytes of contiguous data.
+Our POSIX implementation of the AIO layer is based on POSIX threads and supports several Unix file access methods: the \c syscall method uses \c read and \c write system calls, the \c mmap method uses memory mapping (\c mmap and \c munmap calls), the \c sim_disk method simulates I/O timings of a hard disk provided a big internal memory. To avoid superfluous copying of data between the user and kernel buffer memory, the \c syscall method has the option to use unbuffered file system access. These file access methods can also be used for raw disk I/O, bypassing the file system. In this case, instead of files, raw <b>device handles</b> are open. The <tt>read/write</tt> calls using direct access (\c O_DIRECT option) have shown the best performance under Linux. The disadvantage of the \c mmap call is that programs using this method have less control over I/O: In most operating systems 4 KBytes data pages of a <tt>mmap</tt>ed file region are brought to the main memory "lazily", only when they are accessed for the first time. This means if one <tt>mmap</tt>s a 100 KBytes block and touches only the first and the last element of the block then \b two I/Os are issued by the operating system. This will slow down many I/O-efficient algorithms, since for modern disks the seek time is much longer than the reading of 100 KBytes of contiguous data.
 
-The POSIX implementation does not need to be ported to other UNIX compatible
-systems, since POSIX threads is the standard threading API on all
-POSIX-compatible operating systems.
+The POSIX implementation does not need to be ported to other UNIX compatible systems, since POSIX threads is the standard threading API on all POSIX-compatible operating systems.
 
-Our Windows implementation is based on Boost threads, whose interfaces are very
-similar to POSIX threads.
+Our Windows implementation is based on Boost threads, whose interfaces are very similar to POSIX threads.
 
-AIO file and request implementation classes are derived from the generic
-stxxl::file and stxxl::request interface classes with C++ pure virtual
-functions. These functions are specialized for each access method in
-implementation classes to define the read, write, wait for I/O completion and
-other operations. The desired access method implementation for a file is chosen
-dynamically at running time. One can add the support of an additional access
-method (e.g. for a DAFS distributed filesystem) just providing classes
-implementing the stxxl::file and stxxl::request interfaces. We have decided to
-use the virtual function mechanism in the AIO layer because this mechanism is
-very flexible and <b>will not sacrifice</b> the performance of the library,
-since the virtual functions of the AIO layer need to be called only once per \b
-large chunk of data (i.e. \a B bytes). The inefficiencies of C++ virtual
-functions are well known. Similar to STL, the higher layers of STXXL do not
-rely on the running time polymorphism with virtual functions to avoid the high
-per-element penalties.
+AIO file and request implementation classes are derived from the generic stxxl::file and stxxl::request interface classes with C++ pure virtual functions. These functions are specialized for each access method in implementation classes to define the read, write, wait for I/O completion and other operations. The desired access method implementation for a file is chosen dynamically at running time. One can add the support of an additional access method (e.g. for a DAFS distributed filesystem) just providing classes implementing the stxxl::file and stxxl::request interfaces. We have decided to use the virtual function mechanism in the AIO layer because this mechanism is very flexible and <b>will not sacrifice</b> the performance of the library, since the virtual functions of the AIO layer need to be called only once per \b large chunk of data (i.e. \a B bytes). The inefficiencies of C++ virtual functions are well known. Similar to STL, the higher layers of STXXL do not rely on the running time polymorphism with virtual functions to avoid the high per-element penalties.
 
 \section mng_layer The Block-Management Layer
 
-The Block-Management (BM) layer provides an implementation of the central
-concept in I/O efficient algorithms and data structures: a block of elements
-(stxxl::typed_block object). Besides, it includes a toolbox for allocating,
-deallocating, buffered writing, prefetching, and caching of blocks.  The
-external memory manager (object stxxl::block_manager) is responsible for
-allocating and deallocating external memory space on disks. The manager
-supports four parallel disk allocation strategies: simple striping, fully
-randomized, simple randomized \cite BarGroVit97, and randomized cycling
-\cite VitHut01.
+The Block-Management (BM) layer provides an implementation of the central concept in I/O efficient algorithms and data structures: a block of elements (stxxl::typed_block object). Besides, it includes a toolbox for allocating, deallocating, buffered writing, prefetching, and caching of blocks. The external memory manager (object stxxl::block_manager) is responsible for allocating and deallocating external memory space on disks. The manager supports four parallel disk allocation strategies: simple striping, fully randomized, simple randomized \cite BarGroVit97, and randomized cycling \cite VitHut01.
 
-The BM layer also delivers a set of helper classes that efficiently implement
-frequently used sequential patterns of interaction with the (parallel disk)
-external memory. The optimal parallel disk queued writing \cite HutSanVit01b is
-implemented in the stxxl::buffered_writer class. The class operates on blocks.
-The stxxl::buf_ostream class is build on top of stxxl::buffered_writer and has
-a high level interface, similar to the interface of STL output iterators.
-Analogously, the classes stxxl::block_prefetcher and stxxl::buf_istream contain
-an implementation of an optimal parallel disk \b prefetching algorithm
-\cite HutSanVit01b. The helper objects of the BM layer support overlapping between
-I/O and computation, which means that they are able to perform I/O in the
-background, while the user thread is doing useful computations.
+The BM layer also delivers a set of helper classes that efficiently implement frequently used sequential patterns of interaction with the (parallel disk) external memory. The optimal parallel disk queued writing \cite HutSanVit01b is implemented in the stxxl::buffered_writer class. The class operates on blocks. The stxxl::buf_ostream class is build on top of stxxl::buffered_writer and has a high level interface, similar to the interface of STL output iterators. Analogously, the classes stxxl::block_prefetcher and stxxl::buf_istream contain an implementation of an optimal parallel disk \b prefetching algorithm \cite HutSanVit01b. The helper objects of the BM layer support overlapping between I/O and computation, which means that they are able to perform I/O in the background, while the user thread is doing useful computations.
 
-The BM layer views external memory as a set of large AIO files --- one for each
-disk. We will refer to these files as \b disks. The other approach would be to
-map a related subset of blocks (e.g. those belonging to the same data
-structure) to a separate file.  This approach has some performance problems.
-One of them is that since those (numerous) files are created dynamically,
-during the run of the program, the file system allocates the disk space on
-demand, that might in turn introduce severe uncontrolled disk space
-fragmentation.  Therefore we have chosen the "one-large-file-per-disk" approach
-as our major scheme. However, the design of our library does not forbid data
-structures to store their content in separate user data files (e.g., as an
-option, stxxl::vector can be mapped to a user file).
+The BM layer views external memory as a set of large AIO files --- one for each disk. We will refer to these files as \b disks. The other approach would be to map a related subset of blocks (e.g. those belonging to the same data structure) to a separate file. This approach has some performance problems. One of them is that since those (numerous) files are created dynamically, during the run of the program, the file system allocates the disk space on demand, that might in turn introduce severe uncontrolled disk space fragmentation. Therefore we have chosen the "one-large-file-per-disk" approach as our major scheme. However, the design of our library does not forbid data structures to store their content in separate user data files (e.g., as an option, stxxl::vector can be mapped to a user file).
 
-The external memory manager (object stxxl::block_manager) is responsible for
-allocating and deallocating external memory space on the disks.  The
-stxxl::block_manager reads information about available disks from the STXXL
-configuration file. This file contains the location of each disk file, the
-sizes of the disks, and the file access methods for each disk.  When allocating
-a bunch of blocks, a programmer can specify how the blocks will be assigned to
-disks, passing an allocation strategy function object.  The
-stxxl::block_manager implements the "first-fit" allocation heuristic
-\cite BicShaw2003. When an application requests several blocks from a disk, the
-manager tries to allocate the blocks contiguously. This reduces the bulk access
-time.
+The external memory manager (object stxxl::block_manager) is responsible for allocating and deallocating external memory space on the disks. The stxxl::block_manager reads information about available disks from the STXXL configuration file. This file contains the location of each disk file, the sizes of the disks, and the file access methods for each disk. When allocating a bunch of blocks, a programmer can specify how the blocks will be assigned to disks, passing an allocation strategy function object. The stxxl::block_manager implements the "first-fit" allocation heuristic \cite BicShaw2003. When an application requests several blocks from a disk, the manager tries to allocate the blocks contiguously. This reduces the bulk access time.
 
-On allocation requests, the stxxl::block_manager returns stxxl::BID objects --
-Block IDentifiers. An object of the type stxxl::BID describes the physical
-location of an allocated block, including the disk and offset of a region of
-storage on disk. One can load or store the data that resides at the location
-given by the stxxl::BID using asynchronous \c read and \c write methods of a
-stxxl::typed_block object.
+On allocation requests, the stxxl::block_manager returns stxxl::BID objects -- Block IDentifiers. An object of the type stxxl::BID describes the physical location of an allocated block, including the disk and offset of a region of storage on disk. One can load or store the data that resides at the location given by the stxxl::BID using asynchronous \c read and \c write methods of a stxxl::typed_block object.
 
-The full signature of the STXXL "block of elements" class is
-stxxl::typed_block<RawSize,T,NRef,InfoType>. The C++ template parameter RawSize
-defines the total size of the block in bytes.  Since block size is not a single
-global constant in the STXXL namespace, a programmer can simultaneously operate
-with several block types having different blocks sizes.  Such flexibility is
-often required for good performance. For example, B+-tree leaves might have a
-size different from the size of the internal nodes.  We have made the block
-size a template parameter and not a member variable for the sake of efficiency.
-The values of the template parameters are known to the compiler, therefore for
-the power of two values (a very common choice) it can replace many arithmetic
-operations, like divisions and multiplications, by more efficient <b>binary
-shifts</b>.  A critical requirement for many external memory data structures is
-that a block must be able to store links to other blocks. An STXXL block can
-store \c NRef objects of type stxxl::BID. Additionally, one can equip a block
-with a field of the type \c InfoType, that can hold some per-block
-information. Block elements of type \c T can easily be accessed by the array
-<tt>operator []</tt> and via random access iterators. The maximum number of
-elements available a block depends on the number of links and the sizes of \c
-T, \c InfoType and \c BID types.  This number is accessible as
-stxxl::typed_block::size.
+The full signature of the STXXL "block of elements" class is stxxl::typed_block<RawSize,T,NRef,InfoType>. The C++ template parameter RawSize defines the total size of the block in bytes. Since block size is not a single global constant in the STXXL namespace, a programmer can simultaneously operate with several block types having different blocks sizes. Such flexibility is often required for good performance. For example, B+-tree leaves might have a size different from the size of the internal nodes. We have made the block size a template parameter and not a member variable for the sake of efficiency. The values of the template parameters are known to the compiler, therefore for the power of two values (a very common choice) it can replace many arithmetic operations, like divisions and multiplications, by more efficient <b>binary shifts</b>. A critical requirement for many external memory data structures is that a block must be able to store links to other blocks. An STXXL block can store \c NRef objects of type stxxl::BID. Additionally, one can equip a block with a field of the type \c InfoType, that can hold some per-block information. Block elements of type \c T can easily be accessed by the array <tt>operator []</tt> and via random access iterators. The maximum number of elements available a block depends on the number of links and the sizes of \c T, \c InfoType and \c BID types. This number is accessible as stxxl::typed_block::size.
 
-In the following listing, we give an example of how to program block I/O using
-objects of the BM layer. In line 2 we define the type of block: its size is one
-megabyte and the type of elements is \c double. The pointer to the only
-instance of the singleton object stxxl::block_manager is obtained in line 5.
-Line 6 asks the block manager to allocate 32 blocks in external memory. The
-<tt>new_blocks</tt> call writes the allocated BIDs to the output iterator,
-given by the last parameter.  The <tt>std::back_inserter</tt> iterator adapter
-will insert the output BIDs at the end of the array \c bids. The manager
-assigns blocks to disks in a round-robin fashion as the <tt>striping()</tt>
-strategy suggests. Line 7 allocates 32 internal memory blocks. The internal
-memory allocator stxxl::new_alloc<block_type> of STXXL allocates blocks on a
-virtual memory page boundary, which is a requirement for unbuffered file
-access. Along lines 8--10 the elements of blocks are filled with some
-values. Then, the blocks are submitted for writing (lines 11-12). The request
-objects are stored in an <tt>std::vector</tt> for the further status tracking.
-As in the AIO example, I/O is overlapped with computations in the function
-<tt>do_something()</tt>. After the completion of all write requests (line 15)
-we perform some useful processing with the written data (function
-<tt>do_something1()</tt>). Finally we free the external memory space occupied
-by the 32 blocks (line 18).
+In the following listing, we give an example of how to program block I/O using objects of the BM layer. In line 2 we define the type of block: its size is one megabyte and the type of elements is \c double. The pointer to the only instance of the singleton object stxxl::block_manager is obtained in line 5. Line 6 asks the block manager to allocate 32 blocks in external memory. The <tt>new_blocks</tt> call writes the allocated BIDs to the output iterator, given by the last parameter. The <tt>std::back_inserter</tt> iterator adapter will insert the output BIDs at the end of the array \c bids. The manager assigns blocks to disks in a round-robin fashion as the <tt>striping()</tt> strategy suggests. Line 7 allocates 32 internal memory blocks. The internal memory allocator stxxl::new_alloc<block_type> of STXXL allocates blocks on a virtual memory page boundary, which is a requirement for unbuffered file access. Along lines 8--10 the elements of blocks are filled with some values. Then, the blocks are submitted for writing (lines 11-12). The request objects are stored in an <tt>std::vector</tt> for the further status tracking. As in the AIO example, I/O is overlapped with computations in the function <tt>do_something()</tt>. After the completion of all write requests (line 15) we perform some useful processing with the written data (function <tt>do_something1()</tt>). Finally we free the external memory space occupied by the 32 blocks (line 18).
 
 \code
 using namespace stxxl;
@@ -328,27 +119,268 @@ do_something1(bids.begin(),bids.end());
 bm->delete_blocks(bids.begin(), bids.end());
 \endcode
 
-\section userlayer STL-User Layer
+\section design_stl_ The STL-User Layer
 
-STXXL library was designed to ease the access to external memory algorithms and
-data structures for a programmer. We decided to equip our implementations of
-<b>out-of-memory</b> data structure and algorithms with well known generic
-interfaces of <b>internal memory</b> data structures and algorithms from the
-Standard Template Library. Currently we have implementation of the following
-data structures (in STL terminology \b containers): stxxl::vector,
-stxxl::stack, stxxl::priority\_queue. We have implemented a \b parallel disk
-sorter which have syntax of STL stxxl::sort \cite DemSan03. Our stxxl::ksort is
-a specialized implementation of stxxl::sort which efficiently sorts elements
-with integer keys. STXXL currently provides several implementations of scanning
-algorithms (stxxl::generate, stxxl::for\_each, stxxl::find) optimized for
-external memory. However, it is possible (with some constant factor degradation
-in the performance) to apply internal memory scanning algorithms from STL to
-STXXL containers, since STXXL containers have iterator based interfaces.
+STXXL library was designed to ease the access to external memory algorithms and data structures for a programmer. We decided to equip our implementations of <b>out-of-memory</b> data structure and algorithms with well known generic interfaces of <b>internal memory</b> data structures and algorithms from the Standard Template Library. Currently we have implementation of the following data structures (in STL terminology \subpage design_containers "containers"):
 
-STXXL has a restriction that the data types stored in the containers can not
-have pointers or references to other elements of external memory
-containers. The reason is that those pointers/references get invalidated when
-the blocks containing the elements they point/refer to are written on the
-disks.
+- \link design_vector stxxl::vector \endlink
+- \link design_stack stxxl::stack \endlink
+- \link design_queue stxxl::queue \endlink
+- \link design_deque stxxl::deque \endlink
+- \link design_pqueue stxxl::priority_queue \endlink
+- \link design_map stxxl::map \endlink
+
+We have implemented a \link design_algo_sorting \b parallel disk sorter \endlink which have syntax of STL stxxl::sort \cite DemSan03. Our stxxl::ksort is a specialized implementation of stxxl::sort which efficiently sorts elements with integer keys. STXXL currently provides several implementations of \subpage design_algo "scanning algorithms" (stxxl::generate, stxxl::for_each, stxxl::find) optimized for external memory. However, it is possible (with some constant factor degradation in the performance) to apply internal memory scanning algorithms from STL to STXXL containers, since STXXL containers have iterator based interfaces.
+
+\section design_pipeline_ The Algorithm Pipelining Layer
+
+The \subpage design_pipeline "pipelined processing technique" is very well known in the database world \cite SKS01. It is used to forward the output of one stage of an algorithm directly into the next step, without saving intermediate data to external memory.
 
 */
+
+/*! \page design_containers Design of STXXL Containers
+
+\section stl_general General Issues Concerning STXXL Containers
+
+STXXL has the restriction that the data types stored in the containers cannot have C/C++ pointers or references to other elements of external memory containers. The reason is that these pointers and references get invalidated when the blocks containing the elements they point/refer to are written to disk. To get around this problem, the links can be kept in the form of external memory iterators (e.g. stxxl::vector::iterator). The iterators remain valid while storing to and loading from the external memory. When dereferencing an external memory iterator, the pointed object is loaded from external memory by the library on demand (if the object is not in the cache of the data structure already).
+
+STXXL containers differ from STL containers in treating allocation and distinguishing between uninitialized and initialized memory. STXXL containers assume that the data types they store are plain old data types (POD). The constructors and destructors of the contained data types are not called when a container changes its size. The support of constructors and destructors would imply a significant I/O cost penalty, e.g. on the deallocation of a non-empty container, one has to load all contained objects and call their destructors. This restriction sounds more severe than it is, since external memory data structures cannot cope with custom dynamic memory management anyway, which is the common use of custom constructors/destructors. However, we plan to implement special versions of STXXL containers which will support not only PODs, and handle construction/destruction appropriately.
+
+\section design_vector Vector
+
+The most universal STXXL container is stxxl::vector. Vector is an array whose size can vary dynamically. The implementation of stxxl::vector is similar to the LEDA-SM array \cite CraMeh99. The content of a vector is striped block-wise over the disks, using an assignment strategy given as a template parameter. Some of the blocks are cached in a vector cache of fixed size (also a parameter). The replacement of cache blocks is controlled by a specified page-replacement strategy. STXXL has implementations of LRU and random replacement strategies. The user can provide his/her own strategy as well. The stxxl::vector has STL-compatible Random Access Iterators. One random access costs \f$ \mathcal{O}(1) \f$ I/Os in the worst case. Sequential scanning of the vector costs \f$ \mathcal{O}(1/DB) \f$ amortized I/Os per vector element.
+
+\section design_stack Stack
+
+An I/O efficient stack is perhaps the simplest external memory data structure. Four different implementations of a stack are available in STXXL. Some of the implementations (e.g. stxxl::grow_shrink_stack2) are optimized to prefetch data ahead and to queue writing, efficiently overlapping I/O and computation. The amortized I/O complexity for \c push and \c pop stack operations is \f$ \mathcal{O}(1/DB) \f$.
+
+The STXXL library contains four different variants of stacks, each implementation is specialized for a certain access pattern:
+
+1. stxxl::normal_stack is a general purpose implementation which is the best if the access pattern to the stack is an irregular mix of push'es and pop's, i.e. the stack grows and shrinks without a certain rule.
+2. stxxl::grow_shrink stack is a stack that is optimized for an access pattern where the insertions are (almost) not intermixed with the removals, and/or vice versa, the removals are (almost) not intermixed with the insertions. In short, the stack first grows to its maximal size, then shrinks, then grow again and so on, a pattern which can be described by \f$(push^{r_i}, push^{r_j})^k\f$ with \f$1 \leq j \leq k\f$ and large values for \f$r_i\f$ and \f$r_j\f$.
+3. stxxl::grow_shrink2 stack is a "grow-shrink" stack that allows the use of common prefetch and write buffer pools. The pools are shared between several "grow-shrink" stacks.
+4. stxxl::migrating stack is a stack that migrates from internal memory to external memory when its size exceeds a certain threshold (determined by parameter migrating_critical_size)
+
+To make use of stxxl::stack, one can use the generator template stxxl::STACK_GENERATOR which expects the parameters from left to right as shown in the table below.
+
+\section design_queue Queue
+
+STXXL also has an implementation of external memory FIFO stxxl::queue. Its design is similar to stxxl::grow_shrink_stack2. The implementation holds the head and the tail blocks in the main memory. Prefetch and write block pools might be used to overlap I/O and computation during stxxl::queue operations.
+
+\section design_deque Deque
+
+The STXXL implementation of external memory stxxl::deque is an adaptor of an (external memory) vector. This implementation wraps the elements around the end of the vector \b circularly. It provides the pop/push operations from/to the both ends of the stxxl::deque} in \f$ \mathcal{O}(1/DB) \f$ amortized I/Os if parameterized with a properly configured stxxl::vector.
+
+\section design_further Further Containers
+
+The following further containers are described on separate pages:
+
+- \subpage design_pqueue "Priority Queue"
+- \subpage design_map "Map -- B+-tree"
+- \subpage design_matrix "Matrix"
+
+*/
+
+/*! \page design_pqueue Priority Queue
+
+External memory priority queues are the central data structures for many I/O efficient graph algorithms \cite ZehPhd \cite ChiEtAl95 \cite MSS03. The main technique in these algorithms is time-forward processing \cite ChiEtAl95 \cite Arg95, easily realizable by an I/O efficient priority queue. I/O efficient priority queues also find application in large-scale discrete event simulation and online sorting. The STXXL implementation of priority queues is based on \cite San00b. An operation of this priority queue, called sequence heap, takes \f$ \mathcal{O}(\frac{1}{B}\log_{M/B}(I/B)) \f$ amortized I/Os, where \f$ I \f$ is the total number of insertions into the priority queue. This queue needs less than a third of I/Os used by other similar cache (I/O) efficient priority queues (e.g. \cite Brengel00 \cite FJKT97).
+
+A sequence heap maintains \f$ R \f$ <b>merge groups</b> \f$ G_1,\ldots, G_R \f$ where \f$ G_i \f$ holds up to \f$ k \f$ sorted sequences of size up to \f$ m k^{i-1} \f$, \f$ m << M \f$, see following figure. When group \f$ G_i \f$ overflows, all its sequences are merged, and the resulting sequence is put into group \f$ G_{i+1} \f$. Each group is equipped with a <b>group buffer</b> of size \f$ m \f$ to allow batched deletion from the sequences. The smallest elements of these buffers are deleted in small batches and stored in the <b>deletion buffer</b>. The elements are first inserted into the <b>insertion priority queue</b>. On deletion, one checks the minimum elements stored in the insertion priority queue and the deletion buffer.
+
+The difference of our implementation to \cite San00b is that a number of larger merge groups are explicitly kept in external memory. The sorted sequences in those groups only hold their \b first blocks in the main memory. The implementation supports parallel disks and overlaps I/O and computation. As in \cite San00b, the internal merging is based on loser trees \cite Knu98. However, our implementation does not use \b sentinel elements.
+
+\image html san00b_pqueue_small.png "The structure of STXXL priority queue"
+
+*/
+
+/*! \page design_map Map (B+-tree)
+
+stxxl::map is an STL interface for search trees with unique keys. Our implementation of stxxl::map is a variant of a B+-tree data structure \cite BM72 supporting the operations \c insert, \c erase, \c find, \c lower_bound and \c upper_bound in optimal \f$ \mathcal{O}(\log_{B}(n)) \f$ I/Os. Operations of stxxl::map use \a iterators to refer to the elements stored in the container, e.g. \c find and \c insert return an iterator pointing to the data. Iterators are used for range queries: an iterator pointing to the smallest element in the range is returned by \c lower_bound, the element which is next to the maximum element in the range is returned by \c upper_bound. Scanning through the elements of the query can be done by using \c operator++ or \c operator-- of the obtained iterators in \f$ \mathcal{O}(R/B) \f$ I/Os, where \f$ R \f$ is the number of elements in the result. Our current implementation does not exploit disk parallelism. The flexibility of the iterator-based access has some circumstances for an external memory implementation: iterators must return correct data after reorganizations in the data structure even when the pointed data is moved to a different external memory block.
+
+The way how iterators are used for accessing a stxxl::map is similar to the use of database <b>cursors</b> \cite BDB99. STXXL is the first C++ template library that provides an <b>I/O-efficient</b> search tree implementation with iterator-based access.
+
+In the following we briefly describe the architecture of the STXXL B+-tree implementation. A simplified UML class diagram of the implementation is depicted in the figure below.
+
+Our design allows to use different implementations for leaves and (internal) nodes. For example, leaves could be represented internally as sparse arrays \cite BDIW02 (currently, only the classic sorted array implementation is available). Leaves and nodes can have different external memory block sizes. Each leaf has links to the predecessor and successor leaves to speed up scanning. Our B+-tree is able to prefetch the neighbor leaves when scanning, obtaining a higher bandwidth by overlapping I/O and computation. The root node is always kept in the main memory and implemented as an std::map. To save I/Os, the most frequently used nodes and leaves are cached in corresponding node and leaf \a caches that are implemented in a single template class. An iterator keeps the block identifier (BID) of the external block where the pointed data element is contained, the offset of the data element in the block and a pointer to the B+-tree. In case of reorganizations of the data in external memory blocks (rebalancing, splitting, fusing blocks), all iterators pointing to the moved data have to be updated. For this purpose, the addresses of all instantiated iterators are kept in the iterator map object. The iterator map facilitates fast accounting of iterators, mapping BID and block offsets of iterators to its main memory addresses using an \a internal memory search tree. Therefore, the number of "alive" B+-tree iterators must be kept reasonably small. The parent pointers in leaves and nodes can be useful for finger search (The program can help the search tree finding an element by giving some "position close by" which was determined by an earlier search.) and insertions using a finger, however, that would require to store the whole B-tree path in the iterator data structure. This might make the iterator accounting very slow, therefore we do not maintain the parent links. The implementation can save I/Os when <tt>const_iterator</tt>s are used: no flushing of supposedly changed data is needed (e.g. when scanning or doing other read-only operations). Our implementation of B+-tree supports bulk bottom-up construction from the presorted data given by an iterator range in \f$ \mathcal{O}(n/B) \f$ I/Os.
+
+\image html btree_uml_small.png "The simplified UML class diagram of the B+-tree implementation."
+
+*/
+
+/*! \page design_matrix Matrix
+
+Currently undocumented. TODO
+
+*/
+
+/*! \page design_algo STXXL Algorithms
+
+The algorithms of the STL can be divided into two groups by their memory access pattern: <b>scanning</b> algorithms and <b>random access</b> algorithms.
+
+\section design_algo_scan Scanning Algorithms
+
+Scanning algorithms work with Input, Output, Forward, and Bidirectional iterators only. Since random access operations are not allowed with these kinds of iterators, the algorithms inherently exhibit a strong spatial locality of reference. STXXL containers and their iterators are STL-compatible, therefore one can directly apply STL scanning algorithms to them, and they will run I/O-efficiently (see the use of \c std::generate and \c std::unique algorithms in the following listing).
+
+Scanning algorithms are the majority of the STL algorithms (62 out of 71). STXXL also offers specialized implementations of some scanning algorithms (stxxl::for_each, stxxl::generate, etc.), which perform better in terms of constant factors in the I/O volume and internal CPU work. These implementations benefit from accessing lower level interfaces of the BM layer instead of using iterator interfaces, resulting in a smaller CPU overhead. Being aware of the sequential access pattern of the applied algorithm, the STXXL implementations can do prefetching and use queued writing, thereby leading to the overlapping of I/O with computation.
+
+\section design_algo_random Random Access Algorithms
+
+Random access algorithms require random access iterators, hence may perform (many) random I/Os. For such algorithms, STXXL provides specialized I/O efficient implementations that work with STL-user layer external memory containers. Currently, the library provides two implementations of sorting: an <tt>std::sort</tt>-like sorting routine -- stxxl::sort, and a sorter that exploits integer keys -- stxxl::ksort. Both sorters are implementations of parallel disk algorithms described in \subpage design_algo_sorting.
+
+*/
+
+/*! \page design_algo_sorting Parallel Disk Sorting
+
+\author Roman Dementiev
+\date written 2006
+
+The development of STXXL has been started with sorting, because it is \c the fundamental tool for I/O-efficient processing of large data sets. Therefore, an efficient implementation of sorting largely defines the performance of an external memory software library as a whole. To achieve the best performance our implementation \cite DemSan03 uses parallel disks, has an optimal I/O volume \f$ \mathcal{O}(\frac{N}{DB}\log_{M/B}\frac{N}{B}) \f$ (that matches the lower bound), and guarantees almost perfect overlap between I/O and computation.
+
+No previous implementation has all these properties, which are needed for a good practical sorting. LEDA-SM \cite CraMeh99 and TPIE \cite APV02 concentrate on single disk implementations. For the overlapping of I/O and computation they rely on prefetching and caching provided by the operating system, which is suboptimal since the system knows little about the application's access pattern.
+
+Barve and Vitter implemented a parallel disk algorithm \cite BarGroVit97 that can be viewed as the immediate ancestor of our algorithm. Innovations with respect to our sorting are: A different allocation strategy that enables better theoretical I/O bounds \cite HutSanVit01b \cite KalVar01; a prefetching algorithm that optimizes the number of I/O steps and never evicts data previously fetched; overlapping of I/O and computation; a completely asynchronous implementation that reacts flexibly to fluctuations in disk speeds; and an implementation that sorts many GBytes and does not have to limit internal memory size artificially to obtain a nontrivial number of runs. Additionally, our implementation is not a prototype, it has a generic interface and is a part of the software library STXXL.
+
+Algorithms in \cite Raj98 \cite ChaCor02 \cite ChaCorWis01 have the theoretical advantage of being deterministic. However, they need three passes over data even for not too large inputs.
+
+Prefetch buffers for disk load balancing and overlapping of I/O and computation have been intensively studied for external memory merge sort (\cite PaiVar92 \cite CaoFelKarLi96 \cite AlbGarLeo98 \cite HutSanVit01b \cite KalVar01 \cite KimKar00). But we have not seen results that guarantee overlapping of I/O and computation during the parallel disk merging of arbitrary runs.
+
+There are many good practical implementations of sorting (e.g. \cite NBCGL94 \cite Aga96 \cite NKG00 \cite Wyl99) that address parallel disks, overlapping of I/O and computation, and have a low internal overhead. However, we are not aware of fast implementations that give theoretical performance guarantees on achieving asymptotically optimal I/O. Most practical implementations use a form of striping that requires \f$ \Omega(\frac{N}{DB}\log_{\Theta(\frac{M}{DB})}\frac{N}{B}) \f$ I/Os rather than the optimal \f$ \Theta(\frac{N}{DB}\log_{\Theta(M/B)}\frac{N}{B}) \f$. This difference is usually considered insignificant for practical purposes. However, already on our experimental system we have to go somewhat below the block sizes that give the best performance if the input size is 128~GBytes. Another reduction of the block size by a factor of eight (we have eight disks) could increase the run time significantly. We are also not aware of high performance implementations that guarantee overlap of I/O and computation during merging for inputs such as the one described in \ref design_algo_sorting_merging.
+
+On the other hand, many of the practical merits of our implementation are at
+least comparable with the best current implementations: We are close to the
+peak performance of our system.
+
+\section design_algo_sorting_overlapping Multi-way Merge Sort with Overlapped I/Os
+
+Perhaps the most widely used external memory sorting algorithm is \f$ k \f$-way merge sort: During <b>run formation</b>, chunks of \f$ \Theta(M) \f$ elements are read, sorted internally, and written back to the disk as sorted \a runs. The runs are then merged into larger runs until only a single run is left. \f$ k = \mathcal{O}(M/B) \f$ runs can be sorted in a single pass by keeping up to \f$ B \f$ of the smallest elements of each run in internal memory. Using randomization, prediction of the order in which blocks are accessed, a prefetch buffer of \f$ \mathcal{O}(D) \f$ blocks, and an optimal prefetching strategy, it is possible to implement \f$ k \f$-way merging using \f$ D \f$ disks in a load balanced way \cite HutSanVit01b. However, the rate at which new blocks are requested is more difficult to predict so that this algorithm does not guarantee overlapping of I/O and computation. In this section, we derive a parallel disk algorithm that compensates these fluctuations in the block request rate by a FIFO buffer of \f$ k+\Theta(D) \f$ blocks.
+
+\subsection design_algo_sorting_runform Run Formation
+
+There are many ways to overlap I/O and run formation. We start with a very simple method that treats internal sorting as a black box and therefore can use the fastest available internal sorters. Two threads cooperate to build \f$ k \f$ runs of size \f$ M/2 \f$:
+
+\verbatim
+post a read request for runs 1 and 2
+thread A:                | thread B:
+for r:=1 to k do         | for r:=1 to k-2 do
+  wait until             |   wait until
+    run r is read        |     run r is written
+  sort run r             |   post a read for run r+2
+  post a write for run r |
+\endverbatim
+
+\image html overlapping_runformation_small.png "Overlapping I/O and computation during run formation."
+
+The figure above illustrates how I/O and computation is overlapped by this algorithm. Formalizing this figure, we can prove that using this approach an input of size \f$ N \f$ can be transformed into sorted runs of size \f$ M/2 - \mathcal{O}(DB) \f$ in time \f$ \max(2T_{\mathrm{sort}}(M/2)N/M,\frac{2LN}{DB}) + \mathcal{O}(\frac{LM}{DB}) \f$, where \f$ T_{\mathrm{sort}}(x) \f$ denotes the time for sorting \f$ x \f$ elements internally and where \f$ L \f$ is the time needed for a parallel I/O step.
+
+In \cite DemSan03 one can find an algorithm which generates longer runs of average length \f$ 2M \f$ and overlaps I/O and computation.
+
+\subsection design_algo_sorting_multiway Multi-way Merging
+
+We want to merge \f$ k \f$ sorted sequences comprising \f$ N' \f$ elements stored in \f$ N'/B \f$ blocks (In practical situations, where a single merging phase suffices, we will have \f$ N'=N \f$). In each iteration, the merging thread chooses the smallest remaining element from the \f$ k \f$ sequences and hands it over to the I/O thread. Prediction of read operations is based on the observation that the merging thread does not need to access a block until its smallest element becomes the smallest unread element. We therefore record the \b smallest keys of each block during run formation. By merging the resulting \f$ k \f$ sequences of smallest elements, we can produce a sequence \f$ \sigma \f$ of block identifiers that indicates the exact order in which blocks are logically read by the merging thread. The overhead for producing and storing the prediction data structure is negligible because its size is a factor at least \f$ B \f$ smaller than the input.
+
+The prediction sequence \f$ \sigma \f$ is used as follows. The merging thread maintains the invariant that it always buffers the \f$ k \f$ first blocks in \f$ \sigma \f$ that contain unselected elements, i.e., initially, the first \f$ k \f$ blocks from \f$ \sigma \f$ are read into these <b>merge buffers</b>. When the last element of a merge buffer block is selected, the now empty buffer frame is returned to the I/O thread and the next block in \f$ \sigma \f$ is read.
+
+The keys of the smallest elements in each buffer block are kept in a tournament tree data structure \cite Knu98 so that the currently smallest element can be selected in time \f$ \mathcal{O}(\log k) \f$. Hence, the total internal work for merging is \f$ \mathcal{O}(N'\log k) \f$.
+
+We have now defined multi-way merging from the point of view of the sorting algorithm. Our approach to merging slightly deviates from previous approaches that keep track of the run numbers of the merge blocks and pre-assign each merge block to the corresponding input sequence. In these approaches also the \b last key in the \b previous block decides about the position of a block in \f$ \sigma \f$. The correctness of our approach is shown in \cite DemSan03. With respect to performance, both approaches should be similar. Our approach is somewhat simpler, however --- note that the merging thread does not need to know anything about the \f$ k \f$ input runs and how they are allocated. Its only input is the prediction sequence \f$ \sigma \f$. In a sense, we are merging individual blocks and the order in \f$ \sigma \f$ makes sure that the overall effect is that the input runs are merged. A conceptual advantage is that data \b within a block decides about when a block is read.
+
+\subsection design_algo_sorting_merging Overlapping I/O and Merging
+
+\image html overlapping_merging_small.png "Data flow of overlapped parallel disk multi-way merging."
+
+Although we can predict the order in which blocks are read, we cannot easily predict how much internal work is done between two reads. For example, consider \f$ k \f$ identical runs storing the sequence \f$ \fboxsep0.5mm\framebox{$1^{B-1}2$}\framebox{$3^{B-1}4$}\framebox{$5^{B-1}6$} \cdots \f$. After initializing the merge buffers, the merging thread will consume \f$ k(B-1) \f$ values `1' before it posts another read. Then it will post one read after selecting each of the next \f$ k \f$ values (2). Then there will be a pause of another \f$ k(B-1) \f$ steps and another \f$ k \f$ reads are following each other quickly, etc. We explain how to overlap I/O and computation despite this irregularity using the I/O model of Aggarwal and Vitter \cite AggVit88 that allows access to \f$ D \f$ \b arbitrary blocks within one I/O step. To model overlapping of I/O and computation, we assume that an I/O step takes time \f$ L \f$ and can be done in parallel with internal computations. We maintain an <b>overlap buffer</b> that stores up to \f$ k+3D \f$ blocks in a FIFO manner (see figure above). Whenever the overlap buffer is non-empty, a read can be served from it without blocking. Writing is implemented using a <b>write buffer</b> FIFO with \f$ 2DB \f$ elements capacity. An <b>I/O thread</b> inputs or outputs \f$ D \f$ blocks in time \f$ L \f$ using the following strategy: Whenever no I/O is active and at least \f$ DB \f$ elements are present in the write buffer, an output step is started. When no I/O is active, less than \f$ D \f$ output blocks are available, and at least \f$ D \f$ overlap buffers are unused, then the next \f$ D \f$ blocks from \f$ \sigma \f$ are fetched into the overlap buffer. This strategy guarantees that merging \f$ k \f$ sorted sequences with a total of \f$ N' \f$ elements can be implemented to run in time \f$ \max\left(\frac{2LN'}{DB}, \ell N'\right)+\mathcal{O}(L\lceil\frac{k}{D}\rceil) \f$ where \f$ \ell \f$ is the time needed by the merging thread to produce one element of output and \f$ L \f$ is the time needed to input or output \f$ D \f$ arbitrary blocks \cite DemSan03.
+
+\subsection design_algo_sorting_scheduling Disk Scheduling
+
+The I/Os for the run formation and for the output of merging are perfectly balanced over all disks if all sequences are \b striped over the disks, i.e., sequences are stored in blocks of \f$ B \f$ elements each and the blocks numbered \f$ i,\ldots,i+D-1 \f$ in a sequence are stored on different disks for all \f$ i \f$. In particular, the original input and the final output of sorting can use any kind of striping.
+
+The merging algorithm presented above is optimal for the unrealistic model of Aggarwal and Vitter \cite AggVit88 which allows to access any \f$ D \f$ blocks in an I/O step. This facilitates good performance for fetching very irregularly placed input blocks. However, this model can be simulated using \f$ D \f$ independent disks using <b>randomized striping allocation</b> \cite VitHut01 and a prefetch buffer of size \f$ m = \Theta(D) \f$ blocks: In almost every input step, \f$ (1-\mathcal{O}(D/m))D \f$ blocks from prefetch sequence \f$ \sigma \f$ can be fetched \cite DemSan03.
+
+\section design_algo_sorting_impl Implementation Details
+
+<b>Run Formation.</b> We build runs of a size close to \f$ M/2 \f$ but there are some differences to the simple algorithm from \ref design_algo_sorting_runform. Overlapping of I/O and computation is achieved using the call-back mechanism supported by the I/O layer. Thus, the sorter remains portable over different operating systems with different interfaces to threading.
+
+We have two implementations with respect to the internal work: stxxl::sort is a comparison based sorting using std::sort from STL to sort the runs internally; stxxl::ksort exploits integer keys and has smaller internal memory bandwidth requirements for large elements with small key fields. After reading elements using DMA (i.e. the STXXL direct access), we extract pairs \f$ (\mathrm{key},\mathrm{pointerToElement}) \f$, sort these pairs, and only then move elements in sorted order to write buffers from where they are output using DMA.
+
+Furthermore, we exploit random keys. We use two passes of MSD (most significant digit) radix sort of the key-pointer pairs. The first pass uses the \f$ m \f$ most significant bits where \f$ m \f$ is a tuning parameter depending on the size of the processor caches and of the TLB (translation look-aside buffer). This pass consists of a counting phase that determines bucket sizes and a distribution phase that moves pairs. The counting phase is fused into a single loop with pair extraction. The second pass of radix sort uses a number of bits that brings us closest to an expected bucket size of two. This two-pass algorithm is much more cache efficient than a one-pass radix sort. (On our system we get a factor of 3.8 speedup over the one pass radix sort and a factor of 1.6 over STL's sort which in turn is faster than a hand tuned quicksort (for sorting \f$ 2^{21} \f$ pairs storing a random four byte key and a pointer). The remaining buckets are sorted using a comparison based algorithm: Optimal straight line code for \f$ n\leq 4 \f$, insertion sort for \f$ n \in \{ 5..16 \} \f$, and quicksort for \f$ n > 16 \f$.
+
+<b>Multi-way Merging.</b> We have adapted the tuned multi-way merger from \cite San00b, i.e. a tournament tree stores pointers to the current elements of each merge buffer.
+
+<b>Overlapping I/O and Computation.</b> We integrate the prefetch buffer and the overlap buffer to a <b>read buffer</b>. We distribute the buffer space between the two purposes of minimizing disk idle time and overlapping I/O and computation indirectly by computing an optimal prefetch sequence for a smaller buffer space.
+
+<b>Asynchronous I/O.</b> I/O is performed without any synchronization between the disks. The prefetcher computes a sequence \f$ \sigma' \f$ of blocks indicating the order in which blocks should be fetched. As soon as a buffer block becomes available for prefetching, it is used to generate an asynchronous read request for the next block in \f$ \sigma' \f$. The I/O layer of STXXL queues this request at the disk storing the block to be fetched. The thread for this disk serves the queued request in FIFO manner. All I/O is implemented without superfluous copying. STXXL opens files with the option \c O_DIRECT so that blocks are directly moved by DMA (direct memory access) to user memory. A fetched block then travels to the prefetch/overlap buffer and from there to a merge buffer simply by passing a pointer. Similarly, when an element is merged, it is directly moved from the merge buffer to the write buffer and a block of the write buffer is passed to the output queue of a disk simply by passing a pointer to the the I/O layer of STXXL that then uses \c write to output the data using DMA.
+
+*/
+
+namespace stream {
+
+/*! \page design_pipeline Algorithm Pipelining
+
+\author Roman Dementiev
+\date written 2006
+
+Usually, the interface of an external memory algorithm assumes that it reads the input from (an) external memory container(s) and writes output into (an) external memory container(s). The idea of pipelining is to equip the external memory algorithms with a new interface that allows them to feed the output as a data stream directly to the algorithm that consumes the output, rather than writing it to the external memory first. Logically, the input of an external memory algorithm does not have to reside in the external memory, rather, it could be a data stream produced by another external memory algorithm.
+
+Many external memory algorithms can be viewed as a data flow through a directed acyclic graph \f$ G \f$ with node set \f$ V = F \cup S \cup R \f$ and edge set \f$ E \f$. The <b>file nodes</b> \f$ F \f$ represent physical data sources and data sinks, which are stored on disks (e.g. in the external memory containers of the STL-user layer). A file node writes or/and reads one stream of elements. The <b>streaming nodes</b> \f$ S \f$ read zero, one or several streams and output zero, one or several new streams. Streaming nodes are equivalent to scan operations in non-pipelined external memory algorithms. The difference is that non-pipelined conventional scanning needs a linear number of I/Os, whereas streaming nodes usually do not perform any I/O, unless a node needs to access external memory data structures (stacks, priority queues, etc.). The sorting nodes \f$ R \f$ read a stream and output it in a sorted order. Edges \f$ E \f$ in the graph \f$ G \f$ denote the directions of data flow between nodes. The question "When is a pipelined execution of the computations in a data flow graph \f$ G \f$ possible in an I/O-efficient way?" is analyzed in \cite DKMS05.
+
+\section design_pipeline_streaming Streaming Layer
+
+The streaming layer provides a framework for the \b pipelined processing of large sequences. Many external memory algorithms implemented with the STXXL streaming layer save a factor of at least two in I/Os. To the best of our knowledge we are the first who apply the pipelining method systematically in the domain of external memory algorithms. We introduce it in the context of an external memory software library.
+
+In STXXL, all data flow node implementations have an \c stream interface which is similar to the STL Input iterators (Not be confused with the stream interface of the C++ \c iostream library.). As an input iterator, an \c stream object may be dereferenced to refer to some object and may be incremented to proceed to the next object in the stream. The reference obtained by dereferencing is read-only and must be convertible to the \c value_type of the \c stream. The concept of the \c stream also defines a boolean member function \c empty() which returns \c true iff the end of the stream is reached.
+
+Now we tabulate the valid expressions and the expression semantics of the \c stream concept in the style of the STL documentation.
+
+### Notation
+
+Symbol                | Semantics                                     |
+--------------------- | --------------------------------------------- |
+<tt>X, X1,...,Xn</tt> | A type that is a model of the <tt>stream</tt> |
+<tt>T</tt>            | The value type of <tt>X</tt>                  |
+<tt>s, s1,...,sn</tt> | Object of type <tt>X, X1,...,Xn</tt>          |
+<tt>t</tt>            | Object of type <tt>T</tt>                     |
+
+### Valid expressions
+
+Name                | Expression              | Type requirements                                             | Return type               |
+------------------- | ----------------------- | ------------------------------------------------------------- | ------------------------- |
+Constructor         | <tt>X s(s1,...,sn)</tt> | <tt>s1,....,sn</tt> are convertible to <tt>X1\&,...,Xn\&</tt> |                           |
+Dereference         | <tt>*s</tt>             |                                                               | Convertible to <tt>T</tt> |
+Member access       | <tt>s->m</tt>           | <tt>T</tt> is a type for which <tt>t.m</tt> is defined        |                           |
+Preincrement        | <tt>++s</tt>            |                                                               | <tt>X\&</tt>              |
+End of stream check | <tt>(*s).empty()</tt>   |                                                               | <tt>bool</tt>             |
+
+### Expression semantics
+
+Name          | Expression              | Precondition                                                | Semantics                       | Postcondition                               |
+------------- | ----------------------- | ----------------------------------------------------------- | --------------------------------| ------------------------------------------- |
+Constructor   | <tt>X s(s1,...,sn)</tt> | <tt>s1,...,sn</tt> are the \a n input streams of <tt>s</tt> |                                 |                                             |
+Dereference   | <tt>*s</tt>             | <tt>s</tt> is incrementable                                 |                                 |                                             |
+Member access | <tt>s->m</tt>           | <tt>s</tt> is incrementable                                 | Equivalent to <tt>(*s).m</tt>   |                                             |
+Preincrement  | <tt>++s</tt>            | <tt>s</tt> is incrementable                                 |                                 | <tt>s</tt> is incrementable or past-the-end |
+
+The binding of a \c stream object to its input streams (incoming edges in a data flow graph \f$ G \f$) happens at compile time, i.e. statically. The other approach would be to allow binding at running time using the C++ virtual function mechanism. However this would result in a severe performance penalty because most C++ compilers are not able to inline virtual functions. To avoid this disadvantage, we follow the static binding approach using C++ templates. For example, assuming that streams <tt>s1,...,sn</tt> are already constructed, construction of stream \c s with constructor <tt>X::X(X1\& s1,..., Xn\& sn)</tt> will bind \c s to its inputs <tt>s1,...,sn</tt>.
+
+After creating all node objects, the computation starts in a "lazy" fashion, first trying to evaluate the result of the topologically latest node. The node reads its intermediate input nodes, element by element, using the dereference and increment operator of the \c stream interface. The input nodes proceed in the same way, invoking the inputs needed to produce an output element. This process terminates when the result of the topologically latest node is computed. This style of pipelined execution scheduling is I/O efficient, it allows to keep the intermediate results in-memory without needing to store them in external memory.
+
+The Streaming layer of the STXXL library offers generic classes which implement the functionality of sorting, file, and streaming nodes:
+
+- File nodes: Function streamify() serves as an adaptor that converts a range of ForwardIterators into a compatible \c stream. Since iterators of stxxl::vector are RandomAccessIterators, streamify() can be used to read external memory. The set of (overloaded) materialize functions implement data sink nodes, they flush the content of a STXXL stream object to an output iterator.
+
+  The library also offers specializations of streamify() and stxxl::materialize for stxxl::vector, which are more efficient than the generic implementations due to the support of overlapping between I/O and computation.
+
+- Sort nodes: The Stream layer sort class is a generic pipelined sorter which has the interface of an \c stream. The input of the sorter may be an object complying to the \c stream interface. As the STL-user layer sorter, the pipelined sorter is an implementation of parallel disk merge sort \cite DemSan03 that overlaps I/O and computation.
+
+  The implementation of stream::sort relies on two classes that encapsulate the two phases of the algorithm: sorted run formation (class runs_creator) and run merging (runs_merger). The separate use of these classes breaks the pipelined data flow: the runs_creator must read the entire input to compute the sorted runs. This facilitates an efficient implementation of loops and recursions: the input for the next iteration or recursion can be the sorted runs stored on disks (\cite JensThesis \cite DKMS05).
+
+  The templated class runs_creator has several specializations which have input interfaces different from the \c stream interface: a specialization where elements to be sorted are <tt>push_back</tt>'ed into the runs_creator object and a specialization that accepts a set of presorted sequences. All specializations are compatible with the runs_merger.
+
+- Streaming nodes: In general, most of the implementation effort for algorithms with the streaming layer goes to the streaming nodes. The STXXL library exposes generic classes that help to accelerate coding the streaming node classes. For example stream::transform is similar to the std::transform algorithm: it reads \a n input streams <tt>s1,...,sn</tt> and returns the result of a user-given <tt>n</tt>-ary function object <tt>functor(*s1,...,*sn)</tt> as the next element of the output stream until one of the input streams gets empty.
+
+As mentioned above, STXXL allows streaming nodes to have more than one output. In this case, only one output of a streaming node can have the \c stream interface (it is an iterator). The other outputs can be passed to other nodes using a "push-item" interface. Such an interface have file nodes (e.g. the method \c push_back of stxxl::vector) and sorting nodes (<tt>push_back</tt>-specializations). Streaming nodes do not have such methods by definition, however, it is always possible to reimplement all streaming nodes between sorting and/or file nodes as a single streaming node that will \c push_back the output elements to the corresponding sorting/file nodes.
+
+*/
+
+} // namespace stream
+
+} // namespace stxxl
