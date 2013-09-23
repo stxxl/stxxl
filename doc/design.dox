@@ -1,0 +1,354 @@
+/***************************************************************************
+ *  doc/design.dox
+ *
+ *  Design of STXXL, all of this is from Roman's PhD thesis.
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+/*! \page design Design of STXXL
+
+\author Roman Dementiev
+\date written 2006
+
+STXXL is a layered library consisting of three layers (see following figure).
+The lowest layer, the Asynchronous I/O primitives layer (AIO layer), abstracts
+away the details of how asynchronous I/O is performed on a particular operating
+system. Other existing external memory algorithm libraries only rely on
+synchronous I/O APIs \cite CraMeh99 or allow reading ahead sequences stored in
+a file using the POSIX asynchronous I/O API \cite tpie_manual. These libraries
+also rely on uncontrolled operating system I/O caching and buffering in order
+to overlap I/O and computation in some way. However, this approach has
+significant performance penalties for accesses without locality.
+Unfortunately, the asynchronous I/O APIs are very different for different
+operating systems (e.g. POSIX AIO and Win32 Overlapped I/O). Therefore, we have
+introduced the AIO layer to make porting STXXL easy. Porting the whole library
+to a different platform requires only reimplementing the AIO layer using native
+file access methods and/or native multithreading mechanisms.
+
+\image html layer_diagram.png "The STXXL library structure"
+
+STXXL already has several implementations of the AIO layer which use different
+file access methods under POSIX/UNIX and Windows systems. Porting STXXL to
+Windows took only a few days. The main efforts were spent for writing the AIO
+layer using the native Windows calls. Rewriting the thread-related code was
+easy provided the Boost thread library; its interfaces are similar to POSIX
+threads. There were little header file and compiler-specific incompatibilities;
+those were solved by conditional compilation using the C++ preprocessor. The
+POSIX version of STXXL had run immediately on the all listed operating systems
+after changing some Linux-specific header file includes to more common POSIX
+headers.
+
+The Block Management layer (BM layer) provides a programming interface
+emulating the \b parallel disk model. The BM layer provides an abstraction for
+a fundamental concept in the external memory algorithm design --- a block of
+elements. The block manager implements block allocation/deallocation, allowing
+several block-to-disk assignment strategies: striping, randomized striping,
+randomized cycling, etc. The block management layer provides an implementation
+of parallel disk buffered writing \cite HutSanVit01b, optimal prefetching
+\cite HutSanVit01b, and block caching.  The implementations are fully asynchronous
+and designed to explicitly support overlapping between I/O and computation.
+
+The top of STXXL consists of two modules.  The STL-user layer provides external
+memory sorting, external memory stack, external memory priority queue,
+etc. which have (almost) the same interfaces (including syntax and semantics)
+as their STL counterparts. The Streaming layer provides efficient support for
+\b pipelining external memory algorithms.  Many external memory algorithms,
+implemented using this layer, can save a factor of 2--3 in I/Os.  For example,
+the algorithms for external memory suffix array construction implemented with
+this module \cite DKMS05 require only 1/3 of the number of I/Os which must be
+performed by implementations that use conventional data structures and
+algorithms (either from STXXL STL-user layer, LEDA-SM, or TPIE).  The win is
+due to an efficient interface that couples the input and the output of the
+algorithm--components (scans, sorts, etc.). The output from an algorithm is
+directly fed into another algorithm as input, without needing to store it on
+the disk in-between.  This generic pipelining interface is the first of this
+kind for external memory algorithms.
+
+\section aio_layer The Asynchronous I/O primitives Layer
+
+The purpose of the AIO layer is to provide a unified approach to asynchronous
+I/O. The layer hides details of native asynchronous I/O interfaces of an
+operating system. Studying the patterns of I/O accesses of external memory
+algorithms and data structures, we have identified the following functionality
+that should be provided by the AIO layer:
+
+- To issue read and write requests without having to wait for them to be
+completed.
+
+- To wait for the completion of a subset of issued I/O requests.
+
+- To wait for the completion of at least one request from a subset of issued
+I/O requests.
+
+- To poll the completion status of any I/O request.
+
+- To assign a callback function to an I/O request which is called upon I/O
+completion (asynchronous notification of completion status), with the ability
+to co-relate callback events with the issued I/O requests.
+
+The AIO layer exposes two user objects: stxxl::file and
+stxxl::request_ptr. Together with the I/O waiting functions stxxl::wait_all,
+stxxl::wait_any, and stxxl::poll_any they provide the functionality mentioned
+above. Using a stxxl::file object, the user can submit asynchronous read and
+asynchronous write requests (methods stxxl::file::aread and
+stxxl::file::awrite). These methods return a stxxl::request_ptr object which is
+used to track the status of the issued request. The AIO layer functions
+stxxl::wait_all, stxxl::wait_any, and stxxl::poll_any facilitate tracking a set
+of stxxl::request_ptr s. The last parameter of the methods stxxl::file::aread
+and stxxl::file::awrite is a reference to a callback function object (callback
+functor). The functor's stxxl::operator()(request_ptr) method is called when
+the I/O request is completed.
+
+As a part of the AIO layer, the STXXL library provides various I/O performance
+counters (stxxl::stats class). The class counts the number and the duration of
+the performed I/O operations as well as the transferred volume.  Read and write
+operations are counted separately. STXXL also measures the time spent by the
+processing thread(s) waiting for the completions of I/Os (I/O wait time). This
+metric helps to evaluate the degree and the impact of overlapping between I/O
+and computation in an application.
+
+
+The following listing shows a simple example of how to use AIO objects to
+perform asynchronous I/O. All STXXL library objects are defined in the
+namespace stxxl. For convenience, in line 1 we bring all names from the STXXL
+namespace to the local scope. In Line 8 a file object \c myfile is
+constructed. stxxl::syscall_file is an implementation of the STXXL stxxl::file
+interface which uses UNIX/POSIX \c read and \c write system calls to perform
+I/O. The file named <tt>"storage"</tt> in the current directory is opened in
+read-only mode. In line 9 an asynchronous read of the 1 MB region of the file
+starting at position 0 is issued. The data will be read into the array \c
+mybuffer. When the read operation is completed, <tt>my_handler::operator()</tt>
+will be called with a pointer to the completed request. The execution stops at
+line 11 waiting for the completion of the issued read operation. Note that the
+work done in the function <tt>do_something1()</tt> is overlapped with reading.
+When the I/O is finished, one can process the read buffer (line 12) and free it
+(line 13).
+
+\code
+using namespace stxxl;
+struct my_handler { // I/O completion handler
+    void operator () (request_ptr ptr) { 
+        std::cout << "Request '" << *ptr << "' completed." << std::endl;
+    }
+};
+char * mybuffer = new char[1024*1024]; // allocate 1MB buffer
+syscall_file myfile("./storage", file::RDONLY);
+request_ptr myreq = myfile.aread(mybuffer, 0, 1024*1024,my_handler());
+do_something1(); // do_something1() is overlapped with reading
+myreq->wait();	 // wait for read completion
+do_something2(mybuffer);// process the read buffer
+delete [] mybuffer; // free the buffer
+\endcode
+
+\subsection aio_impl AIO Layer Implementations
+
+There are several implementation strategies for the STXXL AIO layer.  Some
+asynchronous I/O related APIs (and underlying libraries implementing them)
+already exist. The most well known framework is POSIX AIO, which has an
+implementation on almost every UNIX/POSIX system. Its disadvantage is that it
+has only limited support for I/O completion event mechanism The Linux AIO
+kernel side implementation (http://freshmeat.net/projects/linux-aio/) of POSIX
+AIO does not have this deficit, but is not portable since it works under Linux
+only.
+
+The STXXL AIO layer follows a different approach. It does not rely on any
+asynchronous I/O API. Instead we use synchronous I/O calls running
+asynchronously in separate threads. For each file there is one read and one
+write request queue and one thread. The main thread posts requests (invoking
+stxxl::file::aread and stxxl::file::awrite methods) to the file queues. The
+thread associated with the file executes the requests in FIFO order.  This
+approach is very flexible and it does not suffer from limitations of native
+asynchronous APIs.
+
+Our POSIX implementation of the AIO layer is based on POSIX threads and
+supports several Unix file access methods: the \c syscall method uses \c read
+and \c write system calls, the \c mmap method uses memory mapping (\c mmap and
+\c munmap calls), the \c sim_disk method simulates I/O timings of a hard disk
+provided a big internal memory. To avoid superfluous copying of data between
+the user and kernel buffer memory, the \c syscall method has the option to use
+unbuffered file system access. These file access methods can also be used for
+raw disk I/O, bypassing the file system. In this case, instead of files, raw
+<b>device handles</b> are open. The <tt>read/write</tt> calls using direct
+access (\c O_DIRECT option) have shown the best performance under Linux.  The
+disadvantage of the \c mmap call is that programs using this method have less
+control over I/O: In most operating systems 4 KBytes data pages of a
+<tt>mmap</tt>ed file region are brought to the main memory "lazily", only when
+they are accessed for the first time. This means if one <tt>mmap</tt>s a 100
+KBytes block and touches only the first and the last element of the block then
+\b two I/Os are issued by the operating system. This will slow down many
+I/O-efficient algorithms, since for modern disks the seek time is much longer
+than the reading of 100 KBytes of contiguous data.
+
+The POSIX implementation does not need to be ported to other UNIX compatible
+systems, since POSIX threads is the standard threading API on all
+POSIX-compatible operating systems.
+
+Our Windows implementation is based on Boost threads, whose interfaces are very
+similar to POSIX threads.
+
+AIO file and request implementation classes are derived from the generic
+stxxl::file and stxxl::request interface classes with C++ pure virtual
+functions. These functions are specialized for each access method in
+implementation classes to define the read, write, wait for I/O completion and
+other operations. The desired access method implementation for a file is chosen
+dynamically at running time. One can add the support of an additional access
+method (e.g. for a DAFS distributed filesystem) just providing classes
+implementing the stxxl::file and stxxl::request interfaces. We have decided to
+use the virtual function mechanism in the AIO layer because this mechanism is
+very flexible and <b>will not sacrifice</b> the performance of the library,
+since the virtual functions of the AIO layer need to be called only once per \b
+large chunk of data (i.e. \a B bytes). The inefficiencies of C++ virtual
+functions are well known. Similar to STL, the higher layers of STXXL do not
+rely on the running time polymorphism with virtual functions to avoid the high
+per-element penalties.
+
+\section mng_layer The Block-Management Layer
+
+The Block-Management (BM) layer provides an implementation of the central
+concept in I/O efficient algorithms and data structures: a block of elements
+(stxxl::typed_block object). Besides, it includes a toolbox for allocating,
+deallocating, buffered writing, prefetching, and caching of blocks.  The
+external memory manager (object stxxl::block_manager) is responsible for
+allocating and deallocating external memory space on disks. The manager
+supports four parallel disk allocation strategies: simple striping, fully
+randomized, simple randomized \cite BarGroVit97, and randomized cycling
+\cite VitHut01.
+
+The BM layer also delivers a set of helper classes that efficiently implement
+frequently used sequential patterns of interaction with the (parallel disk)
+external memory. The optimal parallel disk queued writing \cite HutSanVit01b is
+implemented in the stxxl::buffered_writer class. The class operates on blocks.
+The stxxl::buf_ostream class is build on top of stxxl::buffered_writer and has
+a high level interface, similar to the interface of STL output iterators.
+Analogously, the classes stxxl::block_prefetcher and stxxl::buf_istream contain
+an implementation of an optimal parallel disk \b prefetching algorithm
+\cite HutSanVit01b. The helper objects of the BM layer support overlapping between
+I/O and computation, which means that they are able to perform I/O in the
+background, while the user thread is doing useful computations.
+
+The BM layer views external memory as a set of large AIO files --- one for each
+disk. We will refer to these files as \b disks. The other approach would be to
+map a related subset of blocks (e.g. those belonging to the same data
+structure) to a separate file.  This approach has some performance problems.
+One of them is that since those (numerous) files are created dynamically,
+during the run of the program, the file system allocates the disk space on
+demand, that might in turn introduce severe uncontrolled disk space
+fragmentation.  Therefore we have chosen the "one-large-file-per-disk" approach
+as our major scheme. However, the design of our library does not forbid data
+structures to store their content in separate user data files (e.g., as an
+option, stxxl::vector can be mapped to a user file).
+
+The external memory manager (object stxxl::block_manager) is responsible for
+allocating and deallocating external memory space on the disks.  The
+stxxl::block_manager reads information about available disks from the STXXL
+configuration file. This file contains the location of each disk file, the
+sizes of the disks, and the file access methods for each disk.  When allocating
+a bunch of blocks, a programmer can specify how the blocks will be assigned to
+disks, passing an allocation strategy function object.  The
+stxxl::block_manager implements the "first-fit" allocation heuristic
+\cite BicShaw2003. When an application requests several blocks from a disk, the
+manager tries to allocate the blocks contiguously. This reduces the bulk access
+time.
+
+On allocation requests, the stxxl::block_manager returns stxxl::BID objects --
+Block IDentifiers. An object of the type stxxl::BID describes the physical
+location of an allocated block, including the disk and offset of a region of
+storage on disk. One can load or store the data that resides at the location
+given by the stxxl::BID using asynchronous \c read and \c write methods of a
+stxxl::typed_block object.
+
+The full signature of the STXXL "block of elements" class is
+stxxl::typed_block<RawSize,T,NRef,InfoType>. The C++ template parameter RawSize
+defines the total size of the block in bytes.  Since block size is not a single
+global constant in the STXXL namespace, a programmer can simultaneously operate
+with several block types having different blocks sizes.  Such flexibility is
+often required for good performance. For example, B+-tree leaves might have a
+size different from the size of the internal nodes.  We have made the block
+size a template parameter and not a member variable for the sake of efficiency.
+The values of the template parameters are known to the compiler, therefore for
+the power of two values (a very common choice) it can replace many arithmetic
+operations, like divisions and multiplications, by more efficient <b>binary
+shifts</b>.  A critical requirement for many external memory data structures is
+that a block must be able to store links to other blocks. An STXXL block can
+store \c NRef objects of type stxxl::BID. Additionally, one can equip a block
+with a field of the type \c InfoType, that can hold some per-block
+information. Block elements of type \c T can easily be accessed by the array
+<tt>operator []</tt> and via random access iterators. The maximum number of
+elements available a block depends on the number of links and the sizes of \c
+T, \c InfoType and \c BID types.  This number is accessible as
+stxxl::typed_block::size.
+
+In the following listing, we give an example of how to program block I/O using
+objects of the BM layer. In line 2 we define the type of block: its size is one
+megabyte and the type of elements is \c double. The pointer to the only
+instance of the singleton object stxxl::block_manager is obtained in line 5.
+Line 6 asks the block manager to allocate 32 blocks in external memory. The
+<tt>new_blocks</tt> call writes the allocated BIDs to the output iterator,
+given by the last parameter.  The <tt>std::back_inserter</tt> iterator adapter
+will insert the output BIDs at the end of the array \c bids. The manager
+assigns blocks to disks in a round-robin fashion as the <tt>striping()</tt>
+strategy suggests. Line 7 allocates 32 internal memory blocks. The internal
+memory allocator stxxl::new_alloc<block_type> of STXXL allocates blocks on a
+virtual memory page boundary, which is a requirement for unbuffered file
+access. Along lines 8--10 the elements of blocks are filled with some
+values. Then, the blocks are submitted for writing (lines 11-12). The request
+objects are stored in an <tt>std::vector</tt> for the further status tracking.
+As in the AIO example, I/O is overlapped with computations in the function
+<tt>do_something()</tt>. After the completion of all write requests (line 15)
+we perform some useful processing with the written data (function
+<tt>do_something1()</tt>). Finally we free the external memory space occupied
+by the 32 blocks (line 18).
+
+\code
+using namespace stxxl;
+typedef typed_block<1024*1024,double> block_type;
+std::vector<block_type::bid_type> bids; //empty array of BIDs
+std::vector<request_ptr> requests;
+block_manager * bm = block_manager::get_instance ();
+bm->new_blocks<block_type>(32, striping(), std::back_inserter(bids));
+std::vector<block_type,new_alloc<block_type> > blocks(32);
+for (int ii = 0; ii < 32; ii++)
+    for (int jj=0; jj < block_type::size; jj++)
+        blocks[ii][jj] = some_value(ii,jj);
+for (int i = 0; i < 32; i++)
+    requests.push_back( blocks[i].write(bids[i]) );
+do_something();	// do_something() is overlapped with writing
+// wait until all I/Os finish
+wait_all(requests.begin(), requests.end());
+do_something1(bids.begin(),bids.end());
+// deallocate external memory
+bm->delete_blocks(bids.begin(), bids.end());
+\endcode
+
+\section userlayer STL-User Layer
+
+STXXL library was designed to ease the access to external memory algorithms and
+data structures for a programmer. We decided to equip our implementations of
+<b>out-of-memory</b> data structure and algorithms with well known generic
+interfaces of <b>internal memory</b> data structures and algorithms from the
+Standard Template Library. Currently we have implementation of the following
+data structures (in STL terminology \b containers): stxxl::vector,
+stxxl::stack, stxxl::priority\_queue. We have implemented a \b parallel disk
+sorter which have syntax of STL stxxl::sort \cite DemSan03. Our stxxl::ksort is
+a specialized implementation of stxxl::sort which efficiently sorts elements
+with integer keys. STXXL currently provides several implementations of scanning
+algorithms (stxxl::generate, stxxl::for\_each, stxxl::find) optimized for
+external memory. However, it is possible (with some constant factor degradation
+in the performance) to apply internal memory scanning algorithms from STL to
+STXXL containers, since STXXL containers have iterator based interfaces.
+
+STXXL has a restriction that the data types stored in the containers can not
+have pointers or references to other elements of external memory
+containers. The reason is that those pointers/references get invalidated when
+the blocks containing the elements they point/refer to are written on the
+disks.
+
+*/

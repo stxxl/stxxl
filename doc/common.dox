@@ -24,6 +24,7 @@ below; it might already exist in STXXL:
 - \subpage common_thread_sync "synchronization primitives for multi-threading"
 - \subpage common_logging "logging macros"
 - \subpage common_assert "macros for checking assertions"
+- \subpage common_types "signed and unsigned integer types"
 - \subpage common_misc_macros "miscellaneous macros"
 
  */
@@ -44,7 +45,7 @@ TODO-df
 
 */
 
-/*! \page common_simple_vector A non-growing, non-initializing Simpler Vector
+/*! \page common_simple_vector A Non-growing, Non-initializing Simpler Vector
 
 For applications where a std::vector is overkill, or one wishes to allocate an
 uninitialied POD array, the stxxl::simple_vector is a good method.
@@ -172,7 +173,7 @@ is to make their own debugging macros:
 There are quite a bunch of macros for testing assertions. You must be careful
 to pick the right one depending on when and what you want to assert on.
 
-\section static Compile-time Assertions STXXL_STATIC_ASSERT
+\section static Compile-time Assertions: STXXL_STATIC_ASSERT
 
 To check specific conditions at compile time use STXXL_STATIC_ASSERT.
 
@@ -181,7 +182,7 @@ struct item { int a,b,c,d; }
 STXXL_STATIC_ASSERT(sizeof(item) == 4 * sizeof(int));
 \endcode
 
-\section unittest Assertions in Unit Tests STXXL_CHECK
+\section unittest Assertions in Unit Tests: STXXL_CHECK
 
 Assertions in unit tests must use the following macros to ensure that the
 condition is also checked in release builds (where a plain \c "assert()" is
@@ -195,7 +196,7 @@ STXXL_CHECK( 2+2 == 4 );
 STXXL_CHECK2( 2+2 == 4, "We cannot count!");
 \endcode
 
-\section plain Plain Assertions
+\section plain Plain Assertions: assert
 
 For the usual assertions, that should be removed in production code for
 performance, we use the standard \c "assert()" function.
@@ -206,6 +207,18 @@ occur. The issue is that assert() completely removes the code, whereas
 STXXL_ASSERT() keeps the code encloses it inside \c if(0).
 
 TODO: STXXL_THROW
+
+*/
+
+/*! \page common_types Signed and Unsigned Integer Types
+
+STXXL provides two very important types: \c signed_type and \c
+unsigned_type. These should be used for general counting and indexing types, as
+they are defined to be the size of a register on the machines: on 32-bit
+machines the two types are 4 bytes size, while on a 64-bit machine the two
+types are 8 bytes in size!
+
+See the file common/types.h
 
 */
 

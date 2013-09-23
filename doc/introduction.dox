@@ -1,0 +1,92 @@
+/***************************************************************************
+ *  doc/intro-design.dox
+ *
+ *  Most of this is from the old TeX tutorial and papers.
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
+/*! \page introduction Introduction and Design
+
+There exist many applications that have to process data sets which can not fit
+into the main memory of a computer, but fit into external memory (e.g. hard
+disks). Examples hereof are Geographic Information Systems (GIS), Internet and
+telecommunication billing systems, Information Retrieval systems manipulating
+terabytes of data.
+
+The most of engineering efforts have been spent on designing algorithms which
+work on data that \b completely resides in the main memory. The algorithms
+assume that the execution time of any memory access is a \b small constant
+(1--20 ns). But it is no more true when an application needs to access external
+memory (EM). Because of the mechanical nature of the position seeking routine,
+a random hard disk access takes about 3--20 ms. This is about <b>1,000,000</b>
+longer than a main memory access. Since the I/Os are apparently the major
+bottleneck of applications that handle large data sets, they minimize the
+number of performed I/Os.  A new measure of program performance is becoming
+sound -- the I/O complexity.
+
+Vitter and Shriver \cite VitShr94both came up with a model for designing I/O
+efficient algorithms. In order to amortize the high cost of a random disk
+access, external data loaded in contiguous chunks of size <i>B</i>. (Modern
+disks after locating the position of the data on the surface can deliver the
+contiguous data blocks at speed 50-60 MiB/s. For example with the seek time 10
+ms, 1 MiB can be read or written in 10 + 1000 x 1/50 = 30 ms, 1 byte -- in
+10.02 ms.) To increase bandwidth external memory algorithms use multiple
+parallel disks. The algorithms try in each I/O step transfer <i>D</i> blocks
+between the main memory and disks (one block per each disk).
+
+I/O efficient algorithms have been developed for many problem domains,
+including fundamental ones like sorting, graph algorithms, string processing,
+computational geometry.
+
+However, there is the ever increasing gap between theoretical nouveau of
+external memory algorithms and their use in practice. Several EM software
+library projects (LEDA-SM \cite CraMeh99 and TPIE \cite APV02 ) attempted to
+reduce this gap. They offer frameworks which aim to speed up the process of
+implementing I/O efficient algorithms giving a high level abstraction away the
+details of how I/O is performed. Implementations of many EM algorithms and data
+structures are offered as well.
+
+Those projects are excellent proofs of EM paradigm, but have some drawbacks
+which \b impede their practical use.
+
+Therefore we started to develop STXXL library, which tries to avoid those
+obstacles. The objectives of STXXL project (distinguishing it from other
+libraries):
+
+- Make the library able to handle problems of <b>real world size</b> (up to
+dozens of terabytes).
+
+- Offer \b transparent support of parallel disks. This feature although
+announced has not been implemented in any library.
+
+- Implement \b parallel disk algorithms. LEDA-SM and TPIE libraries offer only
+implementations of single disk EM algorithms.
+
+- Use computer resources more efficiently. STXXL allows transparent \b
+overlapping of I/O and computation in many algorithms and data structures.
+
+- Care about constant factors in I/O volume. A unique library feature \b
+"pipelining" can \b half the number of I/Os performed by an algorithm.
+
+- Care about the <b>internal work</b>, improve the in-memory algorithms. Having
+many disks can hide the latency and increase the I/O bandwidth, s.t. internal
+work becomes a bottleneck.
+
+- Care about operating system overheads. Use <b>unbuffered disk access</b> to
+avoid superfluous copying of data.
+
+- Shorten <b>development times</b> providing well known interface for EM
+algorithms and data structures. We provide STL-compatible interfaces for our
+implementations.
+
+\author Roman Dementiev
+
+*/

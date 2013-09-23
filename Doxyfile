@@ -606,7 +606,7 @@ LAYOUT_FILE            =
 # feature you need bibtex and perl available in the search path. Do not use
 # file names with spaces, bibtex cannot handle them.
 
-CITE_BIB_FILES         =
+CITE_BIB_FILES         = doc/references.bib
 
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
