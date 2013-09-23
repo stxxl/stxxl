@@ -25,20 +25,20 @@ request::request(const completion_handler & on_compl,
                  offset_type offset_,
                  size_type bytes_,
                  request_type type_) :
-    on_complete(on_compl), ref_cnt(0),
+    on_complete(on_compl),
     file_(file__),
     buffer(buffer_),
     offset(offset_),
     bytes(bytes_),
     type(type_)
 {
-    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::(...), ref_cnt=" << ref_cnt);
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::(...), ref_cnt=" << get_reference_count());
     file_->add_request_ref();
 }
 
 request::~request()
 {
-    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::~(), ref_cnt=" << ref_cnt);
+    STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::~(), ref_cnt=" << get_reference_count());
 }
 
 void request::completed()
@@ -69,7 +69,7 @@ void request::check_nref_failed(bool after)
 {
     STXXL_ERRMSG("WARNING: serious error, reference to the request is lost " <<
                  (after ? "after " : "before") << " serve" <<
-                 " nref=" << nref() <<
+                 " nref=" << get_reference_count() <<
                  " this=" << this <<
                  " offset=" << offset <<
                  " buffer=" << buffer <<

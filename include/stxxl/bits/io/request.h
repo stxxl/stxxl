@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,7 +19,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request_interface.h>
-#include <stxxl/bits/common/mutex.h>
+#include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/io/completion_handler.h>
 #include <stxxl/bits/compat_unique_ptr.h>
@@ -33,19 +34,13 @@ __STXXL_BEGIN_NAMESPACE
 #define BLOCK_ALIGN 4096
 
 class file;
-class request_ptr;
 
 //! \brief Request with basic properties like file and offset.
-class request : virtual public request_interface
+class request : virtual public request_interface, public locking_counted_object
 {
-    friend class request_ptr;
-
 protected:
     completion_handler on_complete;
-    int ref_cnt;
     compat_unique_ptr<stxxl::io_error>::result error;
-
-    mutex ref_cnt_mutex;
 
 protected:
     file * file_;
@@ -57,12 +52,6 @@ protected:
     void completed();
 
 public:
-    // returns number of references
-    int nref()
-    {
-        scoped_mutex_lock Lock(ref_cnt_mutex);
-        return ref_cnt;
-    }
 
     request(const completion_handler & on_compl,
             file * file__,
@@ -104,30 +93,10 @@ public:
             throw *(error.get());
     }
 
-private:
-    void add_ref()
-    {
-        scoped_mutex_lock Lock(ref_cnt_mutex);
-        ref_cnt++;
-        STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::add_ref(): added reference, ref_cnt=" << ref_cnt);
-    }
-
-    bool sub_ref()
-    {
-        int val;
-        {
-            scoped_mutex_lock Lock(ref_cnt_mutex);
-            val = --ref_cnt;
-            STXXL_VERBOSE3("[" << static_cast<void *>(this) << "] request::sub_ref(): subtracted reference, ref_cnt=" << ref_cnt);
-        }
-        assert(val >= 0);
-        return (val == 0);
-    }
-
 protected:
     void check_nref(bool after = false)
     {
-        if (nref() < 2)
+        if (get_reference_count() < 2)
             check_nref_failed(after);
     }
 
@@ -139,6 +108,9 @@ inline std::ostream & operator << (std::ostream & out, const request & req)
 {
     return req.print(out);
 }
+
+//! \brief A smart wrapper for \c request pointer.
+typedef counting_ptr<request> request_ptr;
 
 //! \}
 

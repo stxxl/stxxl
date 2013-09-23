@@ -75,7 +75,6 @@
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/common/mutex.h>
 #include <stxxl/bits/io/request.h>
-#include <stxxl/bits/io/request_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE

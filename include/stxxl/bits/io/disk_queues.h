@@ -20,6 +20,7 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 
 
@@ -27,8 +28,6 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \addtogroup iolayer
 //! \{
-
-class request_ptr;
 
 //! \brief Encapsulates disk queues
 //! \remark is a singleton

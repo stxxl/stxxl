@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <stxxl/types>
+#include <stxxl/bits/common/mutex.h>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -363,6 +364,78 @@ public:
     //! Return the number of references to this object (for debugging)
     unsigned_type get_reference_count() const
     { return m_reference_count; }
+};
+
+/*!
+ * \brief Provides reference counting abilities for use with counting_ptr with
+ * mutex locking.
+ *
+ * Use as superclass of the actual object, this adds a reference_count
+ * value. Then either use counting_ptr as pointer to manage references and
+ * deletion, or just do normal new and delete.
+ *
+ * This class does thread-safe increment and decrement using scoped
+ * locked. TODO: we currently have no support for atomics; but when we do,
+ * replace this with an atomic_counted_object.
+ */
+class locking_counted_object
+{
+private:
+    //! the reference count is kept mutable to all const_counting_ptr() to
+    //! change the reference count.
+    mutable unsigned_type m_reference_count;
+
+    //! the mutex used to synchronize access to the reference counter.
+    mutable mutex m_reference_count_mutex;
+
+public:
+    //! new objects have zero reference count
+    locking_counted_object()
+        : m_reference_count(0) {}
+
+    //! coping still creates a new object with zero reference count
+    locking_counted_object(const locking_counted_object &)
+        : m_reference_count(0) {}
+
+    const locking_counted_object & operator = (const locking_counted_object &) const
+    { return *this; } // changing the contents leaves pointers unchanged
+
+    locking_counted_object & operator = (const locking_counted_object &)
+    { return *this; } // changing the contents leaves pointers unchanged
+
+    ~locking_counted_object()
+    { assert(m_reference_count == 0); }
+
+public:
+    //! Call whenever setting a pointer to the object
+    void inc_reference() const
+    {
+        scoped_mutex_lock lock(m_reference_count_mutex);
+        ++m_reference_count;
+    }
+
+    //! Call whenever resetting (i.e. overwriting) a pointer to the object.
+    //! IMPORTANT: In case of self-assignment, call AFTER inc_reference().
+    //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
+    bool dec_reference() const
+    {
+        scoped_mutex_lock lock(m_reference_count_mutex);
+        return (--m_reference_count == 0);
+    }
+
+    //! Test if the counted_object is referenced by only one counting_ptr.
+    bool unique() const
+    {
+        scoped_mutex_lock lock(m_reference_count_mutex);
+        return (m_reference_count == 1);
+    }
+
+    //! Return the number of references to this object (for debugging)
+    unsigned_type get_reference_count() const
+    {
+        scoped_mutex_lock lock(m_reference_count_mutex);
+        return m_reference_count;
+    }
 };
 
 __STXXL_END_NAMESPACE

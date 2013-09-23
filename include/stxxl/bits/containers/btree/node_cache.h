@@ -18,7 +18,7 @@
 #endif
 
 #include <stxxl/bits/compat_hash_map.h>
-#include <stxxl/bits/io/request_ptr.h>
+#include <stxxl/bits/io/request.h>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/containers/pager.h>

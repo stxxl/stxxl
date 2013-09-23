@@ -11,5 +11,4 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/request.h>
-#include <stxxl/bits/io/request_ptr.h>
 #include <stxxl/bits/io/request_operations.h>
