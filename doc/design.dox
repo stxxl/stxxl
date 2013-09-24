@@ -119,26 +119,23 @@ do_something1(bids.begin(),bids.end());
 bm->delete_blocks(bids.begin(), bids.end());
 \endcode
 
-\section design_stl_ The STL-User Layer
+# The STL-User Layer
 
-STXXL library was designed to ease the access to external memory algorithms and data structures for a programmer. We decided to equip our implementations of <b>out-of-memory</b> data structure and algorithms with well known generic interfaces of <b>internal memory</b> data structures and algorithms from the Standard Template Library. Currently we have implementation of the following data structures (in STL terminology \subpage design_containers "containers"):
+The documentation of \subpage design_stl "The STL-User Layer" is on a separate subpage.
 
-- \link design_vector stxxl::vector \endlink
-- \link design_stack stxxl::stack \endlink
-- \link design_queue stxxl::queue \endlink
-- \link design_deque stxxl::deque \endlink
-- \link design_pqueue stxxl::priority_queue \endlink
-- \link design_map stxxl::map \endlink
+# The Algorithm Pipelining Layer
 
-We have implemented a \link design_algo_sorting \b parallel disk sorter \endlink which have syntax of STL stxxl::sort \cite DemSan03. Our stxxl::ksort is a specialized implementation of stxxl::sort which efficiently sorts elements with integer keys. STXXL currently provides several implementations of \subpage design_algo "scanning algorithms" (stxxl::generate, stxxl::for_each, stxxl::find) optimized for external memory. However, it is possible (with some constant factor degradation in the performance) to apply internal memory scanning algorithms from STL to STXXL containers, since STXXL containers have iterator based interfaces.
-
-\section design_pipeline_ The Algorithm Pipelining Layer
-
-The \subpage design_pipeline "pipelined processing technique" is very well known in the database world \cite SKS01. It is used to forward the output of one stage of an algorithm directly into the next step, without saving intermediate data to external memory.
+The \subpage design_pipeline "Streaming layer" provides efficient support for
+external memory algorithms with mostly \b sequential I/O pattern, i.e. scan,
+sort, merge, etc. A user algorithm, implemented using this module can save many
+I/Os. The win is due to an efficient interface, that couples the input and the
+output of the algorithms-components (scans, sorts, etc.). The output from an
+algorithm is directly fed into another algorithm as the input, without the need
+to store it on the disk.
 
 */
 
-/*! \page design_containers Design of STXXL Containers
+/*! \page design_stl The STL-User Layer
 
 \section stl_general General Issues Concerning STXXL Containers
 
@@ -146,11 +143,136 @@ STXXL has the restriction that the data types stored in the containers cannot ha
 
 STXXL containers differ from STL containers in treating allocation and distinguishing between uninitialized and initialized memory. STXXL containers assume that the data types they store are plain old data types (POD). The constructors and destructors of the contained data types are not called when a container changes its size. The support of constructors and destructors would imply a significant I/O cost penalty, e.g. on the deallocation of a non-empty container, one has to load all contained objects and call their destructors. This restriction sounds more severe than it is, since external memory data structures cannot cope with custom dynamic memory management anyway, which is the common use of custom constructors/destructors. However, we plan to implement special versions of STXXL containers which will support not only PODs, and handle construction/destruction appropriately.
 
-\section design_vector Vector
+# STXXL Containers
 
-The most universal STXXL container is stxxl::vector. Vector is an array whose size can vary dynamically. The implementation of stxxl::vector is similar to the LEDA-SM array \cite CraMeh99. The content of a vector is striped block-wise over the disks, using an assignment strategy given as a template parameter. Some of the blocks are cached in a vector cache of fixed size (also a parameter). The replacement of cache blocks is controlled by a specified page-replacement strategy. STXXL has implementations of LRU and random replacement strategies. The user can provide his/her own strategy as well. The stxxl::vector has STL-compatible Random Access Iterators. One random access costs \f$ \mathcal{O}(1) \f$ I/Os in the worst case. Sequential scanning of the vector costs \f$ \mathcal{O}(1/DB) \f$ amortized I/Os per vector element.
+STXXL library was designed to ease the access to external memory algorithms and data structures for a programmer. We decided to equip our implementations of <b>out-of-memory</b> data structure and algorithms with well known generic interfaces of <b>internal memory</b> data structures and algorithms from the Standard Template Library. Currently we have implementation of the following data structures (in STL terminology "containers"):
 
-\section design_stack Stack
+- \subpage design_vector "stxxl::vector"
+- \subpage design_stack "stxxl::stack"
+- \subpage design_queue "stxxl::queue"
+- \subpage design_deque "stxxl::deque"
+- \subpage design_pqueue "stxxl::priority_queue"
+- \subpage design_map "stxxl::map"
+- \subpage design_matrix "stxxl::matrix"
+
+# STXXL Algorithms
+
+We have implemented a \link design_algo_sorting \b parallel disk sorter \endlink which have syntax of STL stxxl::sort \cite DemSan03. Our stxxl::ksort is a specialized implementation of stxxl::sort which efficiently sorts elements with integer keys. STXXL currently provides several implementations of \subpage design_algo "scanning algorithms" (stxxl::generate, stxxl::for_each, stxxl::find) optimized for external memory. However, it is possible (with some constant factor degradation in the performance) to apply internal memory scanning algorithms from STL to STXXL containers, since STXXL containers have iterator based interfaces.
+
+*/
+
+/*! \page design_vector Vector
+
+The most universal STXXL container is stxxl::vector. Vector is an array whose size can vary dynamically. The implementation of stxxl::vector is similar to the LEDA-SM array \cite CraMeh99. The content of a vector is striped block-wise over the disks, using an assignment strategy given as a template parameter. Some of the blocks are cached in a vector cache of fixed size (also a parameter). The replacement of cache blocks is controlled by a specified page-replacement strategy. STXXL has implementations of LRU and random replacement strategies. The user can provide his/her own strategy as well. The stxxl::vector has STL-compatible Random Access Iterators.
+
+- One random access costs \f$ \mathcal{O}(1) \f$ I/Os in the worst case. Same for insertion and removal at the end.
+- Sequential scanning of the vector costs \f$ \mathcal{O}(1/DB) \f$ amortized I/Os per vector element.
+
+\section design_vector_architecture The Architecture of stxxl::vector
+
+The stxxl::vector is organized as a collection of blocks residing on the external storage media (parallel disks). Access to the external blocks is organized through the fully associative \a cache which consist of some fixed amount of in-memory pages (The page is a collection of consecutive blocks. The number of blocks in the page is constant.). The schema of stxxl::vector is depicted in the following figure. When accessing an element the implementation of stxxl::vector access methods (<tt>[]</tt>operator, \c push_back, etc.) first checks whether the page to which the requested element belongs is in the vector's cache. If it is the case the reference to the element in the cache is returned. Otherwise the page is brought into the cache (If the page of the element has not been touched so far, this step is skipped. To keep an eye on such situations there is a special flag for each page.). If there was no free space in the cache, then some page is to be written out. Vector maintains a \a pager object, that tells which page to kick out. STXXL provides LRU and random paging strategies. The most efficient and default one is LRU. For each page vector maintains the \a dirty flag, which is set when \a non-constant reference to one of the page's elements was returned. The dirty flag is cleared each time when the page is read into the cache. The purpose of the flag is to track whether any element of the page is modified and therefore the page needs to be written to the disk(s) when it has to be evicted from the cache.
+
+\image html vector_architecture_small.png "The schema of stxxl::vector that consists of ten external memory pages and has a cache with the capacity of four pages. The first cache page is mapped to external page 1, the second page is mapped to external page 8, and the fourth cache page is mapped to page 5. The third page is not assigned to any external memory page."
+
+In the worst case scenario when vector elements are read/written in the random order each access takes 2 x blocks_per_page I/Os. The factor \a two shows up here because one has to write the replaced from cache page and read the required one). However the scanning of the array costs about \f$ n/B \f$ I/Os using constant vector iterators or const reference to the vector, where \a n is the number of elements to read or write (read-only access). Using non-const vector access methods leads to \f$ 2 \times n/B \f$ I/Os because every page becomes dirty when returning a non const reference.  If one needs only to sequentially write elements to the vector in \f$ n/B \f$ I/Os the currently fastest method is stxxl::generate. Sequential writing to an untouched before vector (e.g. when created using stxxl::vector(size_type n) constructor.) or alone adding elements at the end of the vector, using the push_back(const T\&) method, leads also to \f$ n/B \f$ I/Os.
+
+\code
+// Example of use
+stxxl::vector<int> V;
+V.push_back(3);
+assert(V.size() == 1 && V.capacity() >= 1 && V[0] == 3);
+\endcode
+
+\section design_vector_generator stxxl::VECTOR_GENERATOR
+
+Besides the type of the elements stxxl::vector has many other template parameters (block size, number of blocks per page, pager class, etc.). To make the configuration of the vector type easier STXXL provides special type generator template meta programs for its containers.
+
+The meta-program for stxxl::vector is called stxxl::VECTOR_GENERATOR.
+
+\code
+// Example of use
+typedef stxxl::VECTOR_GENERATOR<int>::result vector_type;
+vector_type V;
+V.push_back(3);
+assert(V.size() == 1 && V.capacity() >= 1 && V[0] == 3);
+\endcode
+
+The stxxl::VECTOR_GENERATOR has the following template parameters:
+
+\copydetails stxxl::VECTOR_GENERATOR
+
+### Notes:
+
+- All blocks of a page are read and written from/to disks together. Therefore to increase the I/O bandwidth, it is recommended to set the PageSize parameter to multiple of \f$ D \f$.
+
+- Memory consumption of constructed vector is BlockSize x CachePages x PageSize bytes (see below).
+
+- The configured vector type is available as VECTOR_GENERATOR<>::result.
+
+- Since there are defaults for the last five of the parameters, it is not necessary to specify them all.
+
+- Supported parallel disk assignment strategies:
+strategy           | identifier
+------------------ | ----------
+striping           | striping
+simple randomized  | SR
+fully randomized   | FR
+randomized cycling | RC
+
+- Supported paging strategies:
+strategy            | identifier 
+------------------- | ------
+random              | random
+least recently used | lru
+
+### Examples:
+
+- VECTOR_GENERATOR<double>::result -- external vector of \b double's with four blocks per page, the cache with eight pages, 2 MiB blocks, Random Allocation and lru cache replacement strategy.
+
+- VECTOR_GENERATOR<double,8>::result -- external vector of \b double's , with \b eight blocks per page, the cache with eight pages, 2 MiB blocks, Random Allocation and lru cache replacement strategy
+
+- VECTOR_GENERATOR<double,8,2,524288,SR>::result -- external vector of \b double's, with \b eight blocks per page, the cache
+with \b two pages, \b 512 KiB blocks, <b>Simple Randomized</b> allocation and lru cache replacement strategy
+
+\section design_vector_memory Internal Memory Consumption of stxxl::vector
+
+The cache of stxxl::vector largely dominates in its internal memory consumption. Other members consume very small fraction of stxx::vector's memory even when the vector size is large. Therefore, the internal memory consumption of stxxl::vector can be estimated as \f$ BlockSize \times CachePages \times PageSize \f$ bytes.
+
+\section design_vector_notes More Notes
+
+- In opposite to STL, stxxl::vector's iterators do not get invalidated when the vector is resized or reallocated.
+
+- Dereferencing a non-const iterator makes the page of the element to which the iterator points to \b dirty. This causes the page to be written back to the disks(s) when the page is to be kicked off from the cache (additional write I/Os). If you do not want this behavior, use const iterators instead. See following example:
+\code
+vector_type V;
+// ... fill the vector here
+
+vector_type::iterator iter = V.begin();
+// ... advance the iterator
+a = *iter; // causes write I/Os, although *iter is not changed
+
+vector_type::const_iterator citer = V.begin();
+// ... advance the iterator
+a = *citer; // read-only access, causes no write I/Os
+*citer = b; // does not compile, citer is const
+\endcode
+
+- Non const \c operator[] makes the page of the element \b dirty. This causes the page to be written back to the disks(s) when the page is to be kicked off from the cache (additional write I/Os). If you do not want this behavior, use const \c operator[]. For that you need to access the vector via a const reference to it. Example:
+\code
+vector_type V;
+// ... fill the vector here
+
+a = V[index]; // causes write I/Os, although V[index] is not changed
+
+const vector_type & CV = V; // const reference to V
+a = CV[index]; // read-only access, can cause no write I/Os
+CV[index] = b; // does not compile, CV is const
+\endcode
+This issue also concerns \c front() and \c back() methods.
+
+*/
+
+/*! \page design_stack Stack
 
 An I/O efficient stack is perhaps the simplest external memory data structure. Four different implementations of a stack are available in STXXL. Some of the implementations (e.g. stxxl::grow_shrink_stack2) are optimized to prefetch data ahead and to queue writing, efficiently overlapping I/O and computation. The amortized I/O complexity for \c push and \c pop stack operations is \f$ \mathcal{O}(1/DB) \f$.
 
@@ -163,21 +285,17 @@ The STXXL library contains four different variants of stacks, each implementatio
 
 To make use of stxxl::stack, one can use the generator template stxxl::STACK_GENERATOR which expects the parameters from left to right as shown in the table below.
 
-\section design_queue Queue
+*/
+
+/*! \page design_queue Queue
 
 STXXL also has an implementation of external memory FIFO stxxl::queue. Its design is similar to stxxl::grow_shrink_stack2. The implementation holds the head and the tail blocks in the main memory. Prefetch and write block pools might be used to overlap I/O and computation during stxxl::queue operations.
 
-\section design_deque Deque
+*/
 
-The STXXL implementation of external memory stxxl::deque is an adaptor of an (external memory) vector. This implementation wraps the elements around the end of the vector \b circularly. It provides the pop/push operations from/to the both ends of the stxxl::deque} in \f$ \mathcal{O}(1/DB) \f$ amortized I/Os if parameterized with a properly configured stxxl::vector.
+/*! \page design_deque Deque
 
-\section design_further Further Containers
-
-The following further containers are described on separate pages:
-
-- \subpage design_pqueue "Priority Queue"
-- \subpage design_map "Map -- B+-tree"
-- \subpage design_matrix "Matrix"
+The STXXL implementation of external memory stxxl::deque is an adaptor of an (external memory) vector. This implementation wraps the elements around the end of the vector \b circularly. It provides the pop/push operations from/to the both ends of the stxxl::deque in \f$ \mathcal{O}(1/DB) \f$ amortized I/Os if parameterized with a properly configured stxxl::vector.
 
 */
 
@@ -318,6 +436,8 @@ namespace stream {
 
 \author Roman Dementiev
 \date written 2006
+
+The pipelined processing technique is very well known in the database world \cite SKS01.
 
 Usually, the interface of an external memory algorithm assumes that it reads the input from (an) external memory container(s) and writes output into (an) external memory container(s). The idea of pipelining is to equip the external memory algorithms with a new interface that allows them to feed the output as a data stream directly to the algorithm that consumes the output, rather than writing it to the external memory first. Logically, the input of an external memory algorithm does not have to reside in the external memory, rather, it could be a data stream produced by another external memory algorithm.
 

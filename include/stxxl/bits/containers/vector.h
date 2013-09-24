@@ -238,11 +238,11 @@ public:
 };
 
 
-template <unsigned BlkSize_>
-class bid_vector : public std::vector<BID<BlkSize_> >
+template <unsigned BlockSize>
+class bid_vector : public std::vector<BID<BlockSize> >
 {
 public:
-    typedef std::vector<BID<BlkSize_> > _Derived;
+    typedef std::vector<BID<BlockSize> > _Derived;
     typedef typename _Derived::size_type size_type;
     typedef typename _Derived::value_type bid_type;
 
@@ -252,37 +252,37 @@ public:
 
 
 template <
-    typename Tp_,
-    unsigned PgSz_,
-    typename PgTp_,
-    unsigned BlkSize_,
-    typename AllocStr_,
-    typename SzTp_>
+    typename ValueType,
+    unsigned PageSize,
+    typename PagerType,
+    unsigned BlockSize,
+    typename AllocStr,
+    typename SizeType>
 class vector;
 
 
-template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
-          unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
+template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
+          unsigned BlockSize, typename PagerType, unsigned PageSize>
 class const_vector_iterator;
 
 
 //! External vector iterator, model of \c ext_random_access_iterator concept.
-template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
-          unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
+template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
+          unsigned BlockSize, typename PagerType, unsigned PageSize>
 class vector_iterator
 {
-    typedef vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> _Self;
-    typedef const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> _CIterator;
+    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> _Self;
+    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> _CIterator;
 
-    friend class const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>;
+    friend class const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>;
 
 public:
     typedef _CIterator const_iterator;
     typedef _Self iterator;
 
     typedef unsigned block_offset_type;
-    typedef vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_> vector_type;
-    friend class vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_>;
+    typedef vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType> vector_type;
+    friend class vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType>;
     typedef typename vector_type::bids_container_type bids_container_type;
     typedef typename bids_container_type::iterator bids_container_iterator;
     typedef typename bids_container_type::bid_type bid_type;
@@ -492,22 +492,22 @@ public:
 };
 
 //! Const external vector iterator, model of \c ext_random_access_iterator concept.
-template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
-          unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
+template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
+          unsigned BlockSize, typename PagerType, unsigned PageSize>
 class const_vector_iterator
 {
-    typedef const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> _Self;
-    typedef vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> _NonConstIterator;
+    typedef const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> _Self;
+    typedef vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> _NonConstIterator;
 
-    friend class vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>;
+    friend class vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>;
 
 public:
     typedef _Self const_iterator;
     typedef _NonConstIterator iterator;
 
     typedef unsigned block_offset_type;
-    typedef vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_> vector_type;
-    friend class vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_>;
+    typedef vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType> vector_type;
+    friend class vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType>;
     typedef typename vector_type::bids_container_type bids_container_type;
     typedef typename bids_container_type::iterator bids_container_iterator;
     typedef typename bids_container_type::bid_type bid_type;
@@ -710,51 +710,60 @@ public:
 };
 
 
-//! External vector container.
+//! \brief External vector container.
 //!
 //! For semantics of the methods see documentation of the STL std::vector
-//! \tparam Tp_ type of contained objects (POD with no references to internal memory)
-//! \tparam PgSz_ number of blocks in a page
-//! \tparam PgTp_ pager type, \c random_pager<x> or \c lru_pager<x>, where x is the default number of pages,
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
+//! \tparam PageSize number of blocks in a page
+//! \tparam PagerType pager type, \c random_pager<x> or \c lru_pager<x>, where x is the default number of pages,
 //!  default is \c lru_pager<8>
-//! \tparam BlkSize_ external block size in bytes, default is 2 MiB
-//! \tparam AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
+//! \tparam BlockSize external block size in bytes, default is 2 MiB
+//! \tparam AllocStr one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
 //!  default is RC
 //!
-//! Memory consumption: BlkSize_*x*PgSz_ bytes
+//! Memory consumption: BlockSize*x*PageSize bytes
 //! \warning Do not store references to the elements of an external vector. Such references
 //! might be invalidated during any following access to elements of the vector
 template <
-    typename Tp_,
-    unsigned PgSz_ = 4,
-    typename PgTp_ = lru_pager<8>,
-    unsigned BlkSize_ = STXXL_DEFAULT_BLOCK_SIZE(Tp_),
-    typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
-    typename SzTp_ = stxxl::uint64       // will be deprecated soon
+    typename ValueType,
+    unsigned PageSize = 4,
+    typename PagerType = lru_pager<8>,
+    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    typename AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+    typename SizeType = stxxl::uint64       // will be deprecated soon
     >
 class vector
 {
 public:
-    typedef Tp_ value_type;
+    //! The type of elements stored in the vector.
+    typedef ValueType value_type;
+    //! reference to value_type
     typedef value_type & reference;
+    //! constant reference to value_type
     typedef const value_type & const_reference;
+    //! pointer to value_type
     typedef value_type * pointer;
-    typedef SzTp_ size_type;
-    typedef stxxl::int64 difference_type;
+    //! constant pointer to value_type
     typedef const value_type * const_pointer;
+    //! an unsigned 64-bit integral type
+    typedef SizeType size_type;
+    typedef stxxl::int64 difference_type;
 
-    typedef PgTp_ pager_type;
-    typedef AllocStr_ alloc_strategy_type;
+    typedef PagerType pager_type;
+    typedef AllocStr alloc_strategy_type;
 
     enum constants {
-        block_size = BlkSize_,
-        page_size = PgSz_,
+        block_size = BlockSize,
+        page_size = PageSize,
         on_disk = -1
     };
 
+    //! iterator used to iterate through a vector, see \ref design_vector_notes.
     typedef vector_iterator<value_type, alloc_strategy_type, size_type,
                             difference_type, block_size, pager_type, page_size> iterator;
     friend class vector_iterator<value_type, alloc_strategy_type, size_type, difference_type, block_size, pager_type, page_size>;
+
+    //! constant iterator used to iterate through a vector, see \ref design_vector_notes.
     typedef const_vector_iterator<value_type, alloc_strategy_type,
                                   size_type, difference_type, block_size, pager_type, page_size> const_iterator;
     friend class const_vector_iterator<value_type, alloc_strategy_type, size_type, difference_type, block_size, pager_type, page_size>;
@@ -765,8 +774,9 @@ public:
     typedef typename bids_container_type::iterator bids_container_iterator;
     typedef typename bids_container_type::const_iterator const_bids_container_iterator;
 
-    typedef typed_block<BlkSize_, Tp_> block_type;
-    typedef double_blocked_index<SzTp_, PgSz_, block_type::size> blocked_index_type;
+    //! type of the block used in disk-memory transfers
+    typedef typed_block<BlockSize, ValueType> block_type;
+    typedef double_blocked_index<SizeType, PageSize, block_type::size> blocked_index_type;
 
 private:
     alloc_strategy_type alloc_strategy;
@@ -807,7 +817,7 @@ private:
     }
 
 public:
-    //! Constructs external vector.
+    //! \brief Constructs external vector with n elements.
     //!
     //! \param n Number of elements.
     //! \param npages Number of cached pages.
@@ -862,7 +872,7 @@ public:
             _cache = new simple_vector<block_type> (numpages() * page_size);
     }
 
-    // allows to free the cache, but you may not access any element until call allocate_pacge_cache() again
+    //! allows to free the cache, but you may not access any element until call allocate_pacge_cache() again
     void deallocate_page_cache() const
     {
         flush();
@@ -870,6 +880,8 @@ public:
         _cache = NULL;
     }
 
+    //! Return the number of elelemtsn for which \a external memory has been
+    //! allocated. capacity() is always greator than or equal to size().
     size_type capacity() const
     {
         return size_type(_bids.size()) * block_type::size;
@@ -880,6 +892,14 @@ public:
         return size_type(_bids.size()) * block_type::raw_size;
     }
 
+    /*! \brief Reserves at least n elements in external memory.
+     *
+     * If n is less than or equal to capacity(), this call has no
+     * effect. Otherwise, it is a request for allocation of additional \b
+     * external memory. If the request is successful, then capacity() is
+     * greater than or equal to n; otherwise capacity() is unchanged. In either
+     * case, size() is unchanged.
+     */
     void reserve(size_type n)
     {
         if (n <= capacity())
@@ -972,6 +992,7 @@ private:
     }
 
 public:
+    //! Erases all of the elements and deallocates all external memory that is occupied.
     void clear()
     {
         _size = 0;
@@ -989,41 +1010,47 @@ public:
             _free_slots.push(i);
     }
 
+    //! Append a new element at the end.
     void push_back(const_reference obj)
     {
         size_type old_size = _size;
         resize(old_size + 1);
         element(old_size) = obj;
     }
+    //! Removes the last element (without returning it, see back()).
     void pop_back()
     {
         resize(_size - 1);
     }
 
+    //! Returns a reference to the last element, see \ref design_vector_notes.
     reference back()
     {
         return element(_size - 1);
     }
+    //! Returns a reference to the first element, see \ref design_vector_notes.
     reference front()
     {
         return element(0);
     }
+    //! Returns a constant reference to the last element, see \ref design_vector_notes.
     const_reference back() const
     {
         return const_element(_size - 1);
     }
+    //! Returns a constant reference to the first element, see \ref design_vector_notes.
     const_reference front() const
     {
         return const_element(0);
     }
 
-    //! Construct vector from a file.
+    //! \brief Construct vector from a file.
     //! \param from file to be constructed from
     //! \param size Number of elements.
     //! \param npages Number of cached pages.
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
-    //! \c sizeof(Tp_) and the page size (4096).
+    //! \c sizeof(ValueType) and the page size (4096).
     vector(file * from, size_type size = size_type(-1), size_type npages = pager_type ().size ()) :
         _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
         _bids(div_ceil(_size, size_type(block_type::size))),
@@ -1071,6 +1098,7 @@ public:
         from->set_size(offset);
     }
 
+    //! copy-constructor
     vector(const vector & obj) :
         _size(obj.size()),
         _bids(div_ceil(obj.size(), block_type::size)),
@@ -1105,6 +1133,7 @@ public:
         std::copy(inbegin, inend, begin());
     }
 
+    //! assignment operator
     vector & operator = (const vector & obj)
     {
         if (&obj != this)
@@ -1115,34 +1144,42 @@ public:
         return *this;
     }
 
+    //! return the size of the vector.
     size_type size() const
     {
         return _size;
     }
+    //! true if the vector's size is zero.
     bool empty() const
     {
         return (!_size);
     }
+    //! returns an iterator pointing to the beginning of the vector, see \ref design_vector_notes.
     iterator begin()
     {
         return iterator(this, 0);
     }
+    //! returns a const_iterator pointing to the beginning of the vector, see \ref design_vector_notes.
     const_iterator begin() const
     {
         return const_iterator(this, 0);
     }
+    //! returns a const_iterator pointing to the beginning of the vector, see \ref design_vector_notes.
     const_iterator cbegin() const
     {
         return begin();
     }
+    //! returns an iterator pointing beyond the end of the vector, see \ref design_vector_notes.
     iterator end()
     {
         return iterator(this, _size);
     }
+    //! returns a const_iterator pointing beyond the end of the vector, see \ref design_vector_notes.
     const_iterator end() const
     {
         return const_iterator(this, _size);
     }
+    //! returns a const_iterator pointing beyond the end of the vector, see \ref design_vector_notes.
     const_iterator cend() const
     {
         return end();
@@ -1187,6 +1224,7 @@ public:
         return is_page_cached(blocked_index_type(offset));
     }
 
+    //! Flushes the cache pages to the external memory.
     void flush() const
     {
         simple_vector<bool> non_free_slots(numpages());
@@ -1253,8 +1291,8 @@ public:
         delete _cache;
     }
 
-    //! Export data such that it is persistent on the file system.
-    //! Resulting files will be numbered ascending.
+    //! Export data such that it is persistent on the file system. Resulting
+    //! files will be numbered ascending.
     void export_files(std::string filename_prefix)
     {
         int64 no = 0;
@@ -1308,7 +1346,7 @@ private:
     {
         return (_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
-                (offset.get_block2() * PgSz_ + offset.get_block1()));
+                (offset.get_block2() * PageSize + offset.get_block1()));
     }
     const_bids_container_iterator bid(const size_type & offset) const
     {
@@ -1320,7 +1358,7 @@ private:
     {
         return (_bids.begin() +
                 static_cast<typename bids_container_type::size_type>
-                (offset.get_block2() * PgSz_ + offset.get_block1()));
+                (offset.get_block2() * PageSize + offset.get_block1()));
     }
 
     void read_page(int_type page_no, int_type cache_slot) const
@@ -1512,91 +1550,91 @@ private:
 };
 
 template <
-    typename Tp_,
-    unsigned PgSz_,
-    typename PgTp_,
-    unsigned BlkSize_,
-    typename AllocStr_,
-    typename SzTp_>
-inline bool operator == (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                       AllocStr_, SzTp_> & a,
-                         stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                       AllocStr_, SzTp_> & b)
+    typename ValueType,
+    unsigned PageSize,
+    typename PagerType,
+    unsigned BlockSize,
+    typename AllocStr,
+    typename SizeType>
+inline bool operator == (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                       AllocStr, SizeType> & a,
+                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                       AllocStr, SizeType> & b)
 {
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
 }
 
 template <
-    typename Tp_,
-    unsigned PgSz_,
-    typename PgTp_,
-    unsigned BlkSize_,
-    typename AllocStr_,
-    typename SzTp_>
-inline bool operator != (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                       AllocStr_, SzTp_> & a,
-                         stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                       AllocStr_, SzTp_> & b)
+    typename ValueType,
+    unsigned PageSize,
+    typename PagerType,
+    unsigned BlockSize,
+    typename AllocStr,
+    typename SizeType>
+inline bool operator != (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                       AllocStr, SizeType> & a,
+                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                       AllocStr, SizeType> & b)
 {
     return !(a == b);
 }
 
 template <
-    typename Tp_,
-    unsigned PgSz_,
-    typename PgTp_,
-    unsigned BlkSize_,
-    typename AllocStr_,
-    typename SzTp_>
-inline bool operator < (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                      AllocStr_, SzTp_> & a,
-                        stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                      AllocStr_, SzTp_> & b)
+    typename ValueType,
+    unsigned PageSize,
+    typename PagerType,
+    unsigned BlockSize,
+    typename AllocStr,
+    typename SizeType>
+inline bool operator < (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                      AllocStr, SizeType> & a,
+                        stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                      AllocStr, SizeType> & b)
 {
     return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
 }
 
 template <
-    typename Tp_,
-    unsigned PgSz_,
-    typename PgTp_,
-    unsigned BlkSize_,
-    typename AllocStr_,
-    typename SzTp_>
-inline bool operator > (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                      AllocStr_, SzTp_> & a,
-                        stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                      AllocStr_, SzTp_> & b)
+    typename ValueType,
+    unsigned PageSize,
+    typename PagerType,
+    unsigned BlockSize,
+    typename AllocStr,
+    typename SizeType>
+inline bool operator > (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                      AllocStr, SizeType> & a,
+                        stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                      AllocStr, SizeType> & b)
 {
     return b < a;
 }
 
 template <
-    typename Tp_,
-    unsigned PgSz_,
-    typename PgTp_,
-    unsigned BlkSize_,
-    typename AllocStr_,
-    typename SzTp_>
-inline bool operator <= (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                       AllocStr_, SzTp_> & a,
-                         stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                       AllocStr_, SzTp_> & b)
+    typename ValueType,
+    unsigned PageSize,
+    typename PagerType,
+    unsigned BlockSize,
+    typename AllocStr,
+    typename SizeType>
+inline bool operator <= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                       AllocStr, SizeType> & a,
+                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                       AllocStr, SizeType> & b)
 {
     return !(b < a);
 }
 
 template <
-    typename Tp_,
-    unsigned PgSz_,
-    typename PgTp_,
-    unsigned BlkSize_,
-    typename AllocStr_,
-    typename SzTp_>
-inline bool operator >= (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                       AllocStr_, SzTp_> & a,
-                         stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
-                                       AllocStr_, SzTp_> & b)
+    typename ValueType,
+    unsigned PageSize,
+    typename PagerType,
+    unsigned BlockSize,
+    typename AllocStr,
+    typename SizeType>
+inline bool operator >= (stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                       AllocStr, SizeType> & a,
+                         stxxl::vector<ValueType, PageSize, PagerType, BlockSize,
+                                       AllocStr, SizeType> & b)
 {
     return !(a < b);
 }
@@ -1606,27 +1644,27 @@ inline bool operator >= (stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_,
 ////////////////////////////////////////////////////////////////////////////
 
 // specialization for stxxl::vector, to use only const_iterators
-template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
-          unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
+template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
+          unsigned BlockSize, typename PagerType, unsigned PageSize>
 bool is_sorted(
-    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __first,
-    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __last)
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __first,
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __last)
 {
     return is_sorted_helper(
-               stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__first),
-               stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__last));
+               stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
+               stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last));
 }
 
-template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
-          unsigned BlkSize_, typename PgTp_, unsigned PgSz_, typename _StrictWeakOrdering>
+template <typename ValueType, typename AllocStr, typename SizeType, typename DiffType,
+          unsigned BlockSize, typename PagerType, unsigned PageSize, typename _StrictWeakOrdering>
 bool is_sorted(
-    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __first,
-    stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> __last,
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __first,
+    stxxl::vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize> __last,
     _StrictWeakOrdering __comp)
 {
     return is_sorted_helper(
-               stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__first),
-               stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_>(__last),
+               stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__first),
+               stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last),
                __comp);
 }
 
@@ -1635,43 +1673,31 @@ bool is_sorted(
 //! \addtogroup stlcont
 //! \{
 
-//! External vector type generator.
-
-//!  \tparam Tp_ type of contained objects (POD with no references to internal memory)
-//!  \tparam PgSz_ number of blocks in a page
-//!  \tparam Pages_ number of pages
-//!  \tparam BlkSize_ external block size in bytes, default is 2 MiB
-//!  \tparam AllocStr_ one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
-//!  default is RC
-//!  \tparam Pager_ pager type:
-//!    - \c random ,
-//!    - \c lru , is default
+//! \brief External vector type generator.
 //!
-//! Memory consumption of constructed vector is BlkSize_*Pages_*PgSz_ bytes
-//! Configured vector type is available as \c STACK_GENERATOR<>::result. <BR> <BR>
-//! Examples:
-//!    - \c VECTOR_GENERATOR<double>::result external vector of \c double's ,
-//!    - \c VECTOR_GENERATOR<double,8>::result external vector of \c double's ,
-//!      with 8 blocks per page,
-//!    - \c VECTOR_GENERATOR<double,8,2,512*1024,RC,lru>::result external vector of \c double's ,
-//!      with 8 blocks per page, 2 pages, 512 KiB blocks, Random Cyclic allocation
-//!      and lru cache replacement strategy
+//! \tparam ValueType element type of contained objects (POD with no references to internal memory)
+//! \tparam PageSize number of blocks in a page, default: \b 4 (recommended >= D)
+//! \tparam CachePages number of pages in cache, default: \b 8 (recommended >= 2)
+//! \tparam BlockSize external block size \a B in bytes, default: <b>2 MiB</b>
+//! \tparam AllocStr parallel disk allocation strategies: \c striping, RC, SR, or FR. default: \b RC.
+//! \tparam Pager pager type: \c random or \c lru, default: \b lru.
+//!
 //! \warning Do not store references to the elements of an external vector. Such references
 //! might be invalidated during any following access to elements of the vector
 template <
-    typename Tp_,
-    unsigned PgSz_ = 4,
-    unsigned Pages_ = 8,
-    unsigned BlkSize_ = STXXL_DEFAULT_BLOCK_SIZE(Tp_),
-    typename AllocStr_ = STXXL_DEFAULT_ALLOC_STRATEGY,
-    pager_type Pager_ = lru
+    typename ValueType,
+    unsigned PageSize = 4,
+    unsigned CachePages = 8,
+    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
+    typename AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
+    pager_type Pager = lru
     >
 struct VECTOR_GENERATOR
 {
-    typedef typename IF<Pager_ == lru,
-                        lru_pager<Pages_>, random_pager<Pages_> >::result PagerType;
+    typedef typename IF<Pager == lru,
+                        lru_pager<CachePages>, random_pager<CachePages> >::result PagerType;
 
-    typedef vector<Tp_, PgSz_, PagerType, BlkSize_, AllocStr_> result;
+    typedef vector<ValueType, PageSize, PagerType, BlockSize, AllocStr> result;
 };
 
 
@@ -1683,14 +1709,14 @@ __STXXL_END_NAMESPACE
 namespace std
 {
     template <
-        typename Tp_,
-        unsigned PgSz_,
-        typename PgTp_,
-        unsigned BlkSize_,
-        typename AllocStr_,
-        typename SzTp_>
-    void swap(stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_> & a,
-              stxxl::vector<Tp_, PgSz_, PgTp_, BlkSize_, AllocStr_, SzTp_> & b)
+        typename ValueType,
+        unsigned PageSize,
+        typename PagerType,
+        unsigned BlockSize,
+        typename AllocStr,
+        typename SizeType>
+    void swap(stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType> & a,
+              stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, SizeType> & b)
     {
         a.swap(b);
     }
