@@ -22,7 +22,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! \brief Buffered output stream
+//! Buffered output stream.
 //!
 //! Writes data records to the stream of blocks.
 //! \remark Writing performed in the background, i.e. with overlapping of I/O and computation
@@ -43,7 +43,7 @@ public:
     typedef typename block_type::reference reference;
     typedef buf_ostream<block_type, bid_iterator_type> _Self;
 
-    //! \brief Constructs output stream object
+    //! Constructs output stream object.
     //! \param first_bid \c bid_iterator pointing to the first block of the stream
     //! \param nbuffers number of buffers for internal use
     buf_ostream(bid_iterator_type first_bid, int_type nbuffers) :
@@ -53,7 +53,7 @@ public:
         current_blk = writer.get_free_block();
     }
 
-    //! \brief Output stream operator, writes out \c record
+    //! Output stream operator, writes out \c record.
     //! \param record const reference to block record type, containing a value of record to write to the stream
     //! \return reference to itself (stream object)
     _Self & operator << (const_reference record)
@@ -67,21 +67,21 @@ public:
         return (*this);
     }
 
-    //! \brief Returns reference to the current record
+    //! Returns reference to the current record.
     //! \return reference to the current record
     reference current()
     {
         return current_blk->elem[current_elem];
     }
 
-    //! \brief Returns reference to the current record
+    //! Returns reference to the current record.
     //! \return reference to the current record
     reference operator * ()
     {
         return current_blk->elem[current_elem];
     }
 
-    //! \brief Moves to the next record in the stream
+    //! Moves to the next record in the stream.
     //! \return reference to itself after the advance
     _Self & operator ++ ()
     {
@@ -94,8 +94,7 @@ public:
         return (*this);
     }
 
-
-    //! \brief Deallocates internal objects
+    //! Deallocates internal objects.
     virtual ~buf_ostream()
     {
         assert(current_elem == 0);

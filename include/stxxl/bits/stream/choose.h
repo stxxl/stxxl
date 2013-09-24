@@ -19,7 +19,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief Stream package subnamespace
+//! Stream package subnamespace.
 namespace stream
 {
     ////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ namespace stream
     class choose
     { };
 
-    //! \brief Creates stream from a tuple stream taking the first component of each tuple
+    //! Creates stream from a tuple stream taking the first component of each tuple.
     //!
     //! \tparam Input_ type of the input tuple stream
     //!
@@ -43,14 +43,14 @@ namespace stream
         typedef typename Input_::value_type tuple_type;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename tuple_type::first_type value_type;
 
-        //! \brief Construction
+        //! Construction.
         choose(Input_ & in_) : in(in_)
         { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return (*in).first;
@@ -61,21 +61,21 @@ namespace stream
             return &(*in).first;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         choose & operator ++ ()
         {
             ++in;
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return in.empty();
         }
     };
 
-    //! \brief Creates stream from a tuple stream taking the second component of each tuple
+    //! Creates stream from a tuple stream taking the second component of each tuple.
     //!
     //! \tparam Input_ type of the input tuple stream
     //!
@@ -88,14 +88,14 @@ namespace stream
         typedef typename Input_::value_type tuple_type;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename tuple_type::second_type value_type;
 
-        //! \brief Construction
+        //! Construction.
         choose(Input_ & in_) : in(in_)
         { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return (*in).second;
@@ -106,21 +106,21 @@ namespace stream
             return &(*in).second;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         choose & operator ++ ()
         {
             ++in;
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return in.empty();
         }
     };
 
-    //! \brief Creates stream from a tuple stream taking the third component of each tuple
+    //! Creates stream from a tuple stream taking the third component of each tuple.
     //!
     //! \tparam Input_ type of the input tuple stream
     //!
@@ -133,14 +133,14 @@ namespace stream
         typedef typename Input_::value_type tuple_type;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename tuple_type::third_type value_type;
 
-        //! \brief Construction
+        //! Construction.
         choose(Input_ & in_) : in(in_)
         { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return (*in).third;
@@ -151,21 +151,21 @@ namespace stream
             return &(*in).third;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         choose & operator ++ ()
         {
             ++in;
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return in.empty();
         }
     };
 
-    //! \brief Creates stream from a tuple stream taking the fourth component of each tuple
+    //! Creates stream from a tuple stream taking the fourth component of each tuple.
     //!
     //! \tparam Input_ type of the input tuple stream
     //!
@@ -178,14 +178,14 @@ namespace stream
         typedef typename Input_::value_type tuple_type;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename tuple_type::fourth_type value_type;
 
-        //! \brief Construction
+        //! Construction.
         choose(Input_ & in_) : in(in_)
         { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return (*in).fourth;
@@ -196,21 +196,21 @@ namespace stream
             return &(*in).fourth;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         choose & operator ++ ()
         {
             ++in;
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return in.empty();
         }
     };
 
-    //! \brief Creates stream from a tuple stream taking the fifth component of each tuple
+    //! Creates stream from a tuple stream taking the fifth component of each tuple.
     //!
     //! \tparam Input_ type of the input tuple stream
     //!
@@ -223,14 +223,14 @@ namespace stream
         typedef typename Input_::value_type tuple_type;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename tuple_type::fifth_type value_type;
 
-        //! \brief Construction
+        //! Construction.
         choose(Input_ & in_) : in(in_)
         { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return (*in).fifth;
@@ -241,21 +241,21 @@ namespace stream
             return &(*in).fifth;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         choose & operator ++ ()
         {
             ++in;
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return in.empty();
         }
     };
 
-    //! \brief Creates stream from a tuple stream taking the sixth component of each tuple
+    //! Creates stream from a tuple stream taking the sixth component of each tuple.
     //!
     //! \tparam Input_ type of the input tuple stream
     //!
@@ -268,14 +268,14 @@ namespace stream
         typedef typename Input_::value_type tuple_type;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename tuple_type::sixth_type value_type;
 
-        //! \brief Construction
+        //! Construction.
         choose(Input_ & in_) : in(in_)
         { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return (*in).sixth;
@@ -286,20 +286,19 @@ namespace stream
             return &(*in).sixth;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         choose & operator ++ ()
         {
             ++in;
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return in.empty();
         }
     };
-
 
 //! \}
 }

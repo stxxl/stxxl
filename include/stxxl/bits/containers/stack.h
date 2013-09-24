@@ -48,8 +48,8 @@ struct stack_config_generator
 };
 
 
-//! \brief External stack container
-
+//! External stack container.
+//!
 //! Conservative implementation. Fits best if your access pattern consists of irregularly mixed
 //! push'es and pop's.
 //! For semantics of the methods see documentation of the STL \c std::stack. <BR>
@@ -106,7 +106,7 @@ public:
         std::swap(alloc_strategy, obj.alloc_strategy);
     }
 
-    //! \brief Construction from a stack
+    //! Construction from a stack.
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class stack_type>
@@ -251,8 +251,8 @@ private:
 };
 
 
-//! \brief Efficient implementation that uses prefetching and overlapping using internal buffers
-
+//! Efficient implementation that uses prefetching and overlapping using internal buffers.
+//!
 //! Use it if your access pattern consists of many repeated push'es and pop's
 //! For semantics of the methods see documentation of the STL \c std::stack.
 //! \warning The amortized complexity of operation is not O(1/DB), rather O(DB)
@@ -310,7 +310,7 @@ public:
         std::swap(alloc_strategy, obj.alloc_strategy);
     }
 
-    //! \brief Construction from a stack
+    //! Construction from a stack.
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class stack_type>
@@ -449,7 +449,7 @@ public:
     }
 };
 
-//! \brief Efficient implementation that uses prefetching and overlapping using (shared) buffers pools
+//! Efficient implementation that uses prefetching and overlapping using (shared) buffers pools.
 //! \warning This is a single buffer stack! Each direction change (push() followed by pop() or vice versa) may cause one I/O.
 template <class Config_>
 class grow_shrink_stack2 : private noncopyable
@@ -480,7 +480,7 @@ private:
     pool_type * pool;
 
 public:
-    //! \brief Constructs stack
+    //! Constructs stack.
     //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     grow_shrink_stack2(
@@ -496,7 +496,7 @@ public:
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
 
-    //! \brief Constructs stack
+    //! Constructs stack.
     //! \param p_pool_ prefetch pool, that will be used for block prefetching
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
@@ -638,8 +638,8 @@ public:
         --size_;
     }
 
-    //! \brief Sets level of prefetch aggressiveness (number
-    //! of blocks from the prefetch pool used for prefetching)
+    //! Sets level of prefetch aggressiveness (number
+    //! of blocks from the prefetch pool used for prefetching).
     //! \param new_p new value for the prefetch aggressiveness
     void set_prefetch_aggr(unsigned_type new_p)
     {
@@ -657,14 +657,14 @@ public:
         rehint();
     }
 
-    //! \brief Returns number of blocks used for prefetching
+    //! Returns number of blocks used for prefetching.
     unsigned_type get_prefetch_aggr() const
     {
         return pref_aggr;
     }
 
 private:
-    //! \brief hint the last pref_aggr external blocks
+    //! hint the last pref_aggr external blocks.
     void rehint()
     {
         const int_type bids_size = bids.size();
@@ -677,8 +677,8 @@ private:
 };
 
 
-//! \brief A stack that migrates from internal memory to external when its size exceeds a certain threshold
-
+//! A stack that migrates from internal memory to external when its size exceeds a certain threshold.
+//!
 //! For semantics of the methods see documentation of the STL \c std::stack.
 template <unsigned_type CritSize, class ExternalStack, class InternalStack>
 class migrating_stack : private noncopyable
@@ -715,13 +715,13 @@ public:
         std::swap(ext_impl, obj.ext_impl);
     }
 
-    //! \brief Returns true if current implementation is internal, otherwise false
+    //! Returns true if current implementation is internal, otherwise false.
     bool internal() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
         return int_impl;
     }
-    //! \brief Returns true if current implementation is external, otherwise false
+    //! Returns true if current implementation is external, otherwise false.
     bool external() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
@@ -791,8 +791,8 @@ public:
 enum stack_externality { external, migrating, internal };
 enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
-//! \brief Stack type generator
-
+//! Stack type generator.
+//!
 //!  \tparam ValTp type of contained objects (POD with no references to internal memory)
 //!  \tparam Externality one of
 //!    - \c external , \b external container, implementation is chosen according

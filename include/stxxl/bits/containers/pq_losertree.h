@@ -30,9 +30,9 @@ namespace priority_queue_local
 {
 //////////////////////////////////////////////////////////////////////
 // The data structure from Knuth, "Sorting and Searching", Section 5.4.1
-    /**
-     *!  \brief  Loser tree from Knuth, "Sorting and Searching", Section 5.4.1
-     *!  \param  KNKMAX  maximum arity of loser tree, has to be a power of two
+    /*!
+     * Loser tree from Knuth, "Sorting and Searching", Section 5.4.1
+     * \param  KNKMAX  maximum arity of loser tree, has to be a power of two
      */
     template <class ValTp_, class Cmp_, unsigned KNKMAX>
     class loser_tree : private noncopyable

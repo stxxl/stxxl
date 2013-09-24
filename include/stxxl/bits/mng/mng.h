@@ -52,8 +52,8 @@ __STXXL_BEGIN_NAMESPACE
 //! managing disks, and allocating and deallocating blocks of external storage
 //! \{
 
-//! \brief Block manager class
-
+//! Block manager class.
+//!
 //! Manages allocation and deallocation of blocks in multiple/single disk setting
 //! \remarks is a singleton
 class block_manager : public singleton<block_manager>
@@ -75,8 +75,8 @@ protected:
         BIDIteratorClass out);
 
 public:
-    //! \brief Allocates new blocks
-
+    //! Allocates new blocks.
+    //!
     //! Allocates new blocks according to the strategy
     //! given by \b functor and stores block identifiers
     //! to the range [ \b bidbegin, \b bidend)
@@ -133,15 +133,15 @@ public:
         new_blocks_int<BID<BLK_SIZE> >(1, functor, offset, &bid);
     }
 
-    //! \brief Deallocates blocks
-
+    //! Deallocates blocks.
+    //!
     //! Deallocates blocks in the range [ \b bidbegin, \b bidend)
     //! \param bidbegin iterator object of \b bid_iterator concept
     //! \param bidend iterator object of \b bid_iterator concept
     template <class BIDIteratorClass>
     void delete_blocks(const BIDIteratorClass & bidbegin, const BIDIteratorClass & bidend);
 
-    //! \brief Deallocates a block
+    //! Deallocates a block.
     //! \param bid block identifier
     template <unsigned BLK_SIZE>
     void delete_block(const BID<BLK_SIZE> & bid);

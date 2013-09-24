@@ -113,7 +113,7 @@ std::ostream & operator << (std::ostream & o, const matrix_operation_statistic_d
     return o;
 }
 
-//! \brief A static_quadtree holds 4^Level elements arranged in a quad tree.
+//! A static_quadtree holds 4^Level elements arranged in a quad tree.
 //!
 //! Static quad trees are useful for recursive algorithms with fixed depth
 //!   that partition the in- and output and perform pre- and postcalculations on the partitions.
@@ -1389,7 +1389,7 @@ struct matrix_operations
               ul(upleft), ur(upright), dl(downleft), dr(downright) {}
     };
 
-    //! \brief calculates C = A * B + C
+    //! calculates C = A * B + C
     // requires fitting dimensions
     static swappable_block_matrix_type &
     multi_level_strassen_winograd_multiply_and_add_block_grained(const swappable_block_matrix_type & A,
@@ -1478,7 +1478,7 @@ struct matrix_operations
         }
     }
 
-    //! \brief calculates C = A * B + C
+    //! calculates C = A * B + C
     // requires fitting dimensions
     static swappable_block_matrix_type &
     multi_level_strassen_winograd_multiply_and_add(const swappable_block_matrix_type & A,
@@ -1590,7 +1590,7 @@ struct matrix_operations
             }
     }
 
-    //! \brief calculates C = A * B
+    //! calculates C = A * B
     // assumes fitting dimensions
     static swappable_block_matrix_type &
     strassen_winograd_multiply(const swappable_block_matrix_type & A,
@@ -1639,7 +1639,7 @@ struct matrix_operations
         return C;
     }
 
-    //! \brief calculates C = A * B + C
+    //! calculates C = A * B + C
     // assumes fitting dimensions
     static swappable_block_matrix_type &
     strassen_winograd_multiply_and_add_interleaved(const swappable_block_matrix_type & A,
@@ -1690,7 +1690,7 @@ struct matrix_operations
         return C;
     }
 
-    //! \brief calculates C = A * B + C
+    //! calculates C = A * B + C
     // assumes fitting dimensions
     static swappable_block_matrix_type &
     strassen_winograd_multiply_and_add(const swappable_block_matrix_type & A,
@@ -1741,7 +1741,7 @@ struct matrix_operations
         return C;
     }
 
-    //! \brief calculates C = A * B + C
+    //! calculates C = A * B + C
     // assumes fitting dimensions
     static swappable_block_matrix_type &
     recursive_multiply_and_add(const swappable_block_matrix_type & A,
@@ -1771,7 +1771,7 @@ struct matrix_operations
         return C;
     }
 
-    //! \brief calculates C = A * B + C
+    //! calculates C = A * B + C
     // requires fitting dimensions
     static swappable_block_matrix_type &
     naive_multiply_and_add(const swappable_block_matrix_type & A,
@@ -1823,7 +1823,7 @@ struct matrix_operations
 
     // +-+-+-+ matrix-vector multiplication +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-    //! \brief calculates z = A * x
+    //! calculates z = A * x
     static column_vector_type &
     recursive_matrix_col_vector_multiply_and_add(const swappable_block_matrix_type & A,
                                          const column_vector_type & x, column_vector_type & z,
@@ -1891,7 +1891,7 @@ struct matrix_operations
         bs_a.release(a, false);
     }
 
-    //! \brief calculates z = y * A
+    //! calculates z = y * A
     static row_vector_type &
     recursive_matrix_row_vector_multiply_and_add(const row_vector_type & y,
             const swappable_block_matrix_type & A, row_vector_type & z,

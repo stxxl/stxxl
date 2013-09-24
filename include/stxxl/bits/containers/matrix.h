@@ -38,7 +38,7 @@ __STXXL_BEGIN_NAMESPACE
 template <typename ValueType, unsigned BlockSideLength>
 class matrix;
 
-//! \brief external column-vector container for matrix multiplication
+//! external column-vector container for matrix multiplication
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 template <typename ValueType>
 class column_vector : public vector<ValueType>
@@ -109,7 +109,7 @@ public:
     }
 };
 
-//! \brief external row-vector container for matrix multiplication
+//! external row-vector container for matrix multiplication
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 template <typename ValueType>
 class row_vector : public vector<ValueType>
@@ -192,7 +192,7 @@ public:
     }
 };
 
-//! \brief Specialized swappable_block that interprets uninitialized as containing zeros.
+//! Specialized swappable_block that interprets uninitialized as containing zeros.
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 //!
@@ -218,7 +218,7 @@ public:
     }
 };
 
-//! \brief External container for a (sub)matrix. Not intended for direct use.
+//! External container for a (sub)matrix. Not intended for direct use.
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 //!
@@ -241,24 +241,24 @@ private:
     swappable_block_matrix & operator = (const swappable_block_matrix & other);
 
 protected:
-    //! \brief height of the matrix in blocks
+    //! height of the matrix in blocks
     size_type height,
-    //! \brief width of the matrix in blocks
+    //! width of the matrix in blocks
               width,
-    //! \brief height copied from supermatrix in blocks
+    //! height copied from supermatrix in blocks
               height_from_supermatrix,
-    //! \brief width copied from supermatrix in blocks
+    //! width copied from supermatrix in blocks
               width_from_supermatrix;
-    //! \brief the matrice's blocks in row-major
+    //! the matrice's blocks in row-major
     blocks_type blocks;
-    //! \brief if the elements in each block are in col-major instead of row-major
+    //! if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
-    //! \brief get identifier of the block at (row, col)
+    //! get identifier of the block at (row, col)
     swappable_block_identifier_type & bl(const size_type row, const size_type col)
     { return blocks[row * width + col]; }
 
 public:
-    //! \brief Create an empty swappable_block_matrix of given dimensions.
+    //! Create an empty swappable_block_matrix of given dimensions.
     swappable_block_matrix(block_scheduler_type & bs, const size_type height_in_blocks, const size_type width_in_blocks, const bool transposed = false)
         : bs(bs),
           height(height_in_blocks),
@@ -273,8 +273,8 @@ public:
                 bl(row, col) = bs.allocate_swappable_block();
     }
 
-    //! \brief Create swappable_block_matrix of given dimensions that
-    //!        represents the submatrix of supermatrix starting at (from_row_in_blocks, from_col_in_blocks).
+    //! Create swappable_block_matrix of given dimensions that
+    //! represents the submatrix of supermatrix starting at (from_row_in_blocks, from_col_in_blocks).
     //!
     //! If supermatrix is not large enough, the submatrix is padded with empty blocks.
     //! The supermatrix must not be destructed or transposed before the submatrix is destructed.
@@ -301,8 +301,7 @@ public:
                 bl(row, col) = bs.allocate_swappable_block();
     }
 
-    //! \brief Create swappable_block_matrix that represents the combination matrix ul ur
-    //!                                                                             dl dr
+    //! Create swappable_block_matrix that represents the combination matrix ul ur dl dr.
     //!
     //! The submatrices are assumed to be of fitting dimensions and equal transposition.
     //! The submatrices must not be destructed or transposed before the matrix is destructed.
@@ -387,7 +386,7 @@ public:
     const size_type & get_width() const
     { return width; }
 
-    //! \brief if the elements inside the blocks are in transposed order i.e. column-major
+    //! if the elements inside the blocks are in transposed order i.e. column-major
     const bool & is_transposed() const
     { return elements_in_blocks_transposed; }
 
@@ -412,7 +411,7 @@ public:
     }
 };
 
-//! \brief general iterator type that points to single elements inside a matrix
+//! general iterator type that points to single elements inside a matrix
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
@@ -451,7 +450,7 @@ protected:
         }
     }
 
-    //! \brief create iterator pointing to given row and col
+    //! create iterator pointing to given row and col
     matrix_iterator(matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
         : m(&matrix),
           current_row(start_row),
@@ -460,7 +459,7 @@ protected:
           current_block_col(m->data->block_index_from_elem(start_col)),
           current_iblock(0) {}
 
-    //! \brief create empty iterator
+    //! create empty iterator
     matrix_iterator(matrix_type & matrix)
         : m(&matrix),
           current_row(-1), // empty iterator
@@ -562,7 +561,7 @@ public:
         return current_row == other.current_row && current_col == other.current_col && m == other.m;
     }
 
-    //! \brief Returns reference access to the element referenced by the iterator.
+    //! Returns reference access to the element referenced by the iterator.
     //! The reference is only valid so long as the iterator is not moved.
     ValueType & operator * ()
     {
@@ -571,7 +570,7 @@ public:
     }
 };
 
-//! \brief row-major iterator that points to single elements inside a matrix
+//! row-major iterator that points to single elements inside a matrix
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
@@ -587,16 +586,16 @@ protected:
     using matrix_iterator_type::m;
     using matrix_iterator_type::set_empty;
 
-    //! \brief create iterator pointing to given row and col
+    //! create iterator pointing to given row and col
     matrix_row_major_iterator(matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
         : matrix_iterator_type(matrix, start_row, start_col) {}
 
-    //! \brief create empty iterator
+    //! create empty iterator
     matrix_row_major_iterator(matrix_type & matrix)
         : matrix_iterator_type(matrix) {}
 
 public:
-    //! \brief convert from matrix_iterator
+    //! convert from matrix_iterator
     matrix_row_major_iterator(const matrix_iterator_type & matrix_iterator)
         : matrix_iterator_type(matrix_iterator) {}
 
@@ -636,7 +635,7 @@ public:
     using matrix_iterator_type::set_pos;
 };
 
-//! \brief column-major iterator that points to single elements inside a matrix
+//! column-major iterator that points to single elements inside a matrix
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
@@ -652,16 +651,16 @@ protected:
     using matrix_iterator_type::m;
     using matrix_iterator_type::set_empty;
 
-    //! \brief create iterator pointing to given row and col
+    //! create iterator pointing to given row and col
     matrix_col_major_iterator(matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
         : matrix_iterator_type(matrix, start_row, start_col) {}
 
-    //! \brief create empty iterator
+    //! create empty iterator
     matrix_col_major_iterator(matrix_type & matrix)
         : matrix_iterator_type(matrix) {}
 
 public:
-    //! \brief convert from matrix_iterator
+    //! convert from matrix_iterator
     matrix_col_major_iterator(const matrix_iterator_type & matrix_iterator)
         : matrix_iterator_type(matrix_iterator) {}
 
@@ -701,7 +700,7 @@ public:
     using matrix_iterator_type::set_pos;
 };
 
-//! \brief general const_iterator type that points to single elements inside a matrix
+//! general const_iterator type that points to single elements inside a matrix
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
@@ -739,7 +738,7 @@ protected:
         }
     }
 
-    //! \brief create iterator pointing to given row and col
+    //! create iterator pointing to given row and col
     const_matrix_iterator(const matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
         : m(&matrix),
           current_row(start_row),
@@ -748,7 +747,7 @@ protected:
           current_block_col(m->data->block_index_from_elem(start_col)),
           current_iblock(0) {}
 
-    //! \brief create empty iterator
+    //! create empty iterator
     const_matrix_iterator(const matrix_type & matrix)
         : m(&matrix),
           current_row(-1), // empty iterator
@@ -861,7 +860,7 @@ public:
         return current_row == other.current_row && current_col == other.current_col && m == other.m;
     }
 
-    //! \brief Returns reference access to the element referenced by the iterator.
+    //! Returns reference access to the element referenced by the iterator.
     //! The reference is only valid so long as the iterator is not moved.
     const ValueType & operator * ()
     {
@@ -870,7 +869,7 @@ public:
     }
 };
 
-//! \brief row-major const_iterator that points to single elements inside a matrix
+//! row-major const_iterator that points to single elements inside a matrix
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
@@ -886,20 +885,20 @@ protected:
     using const_matrix_iterator_type::m;
     using const_matrix_iterator_type::set_empty;
 
-    //! \brief create iterator pointing to given row and col
+    //! create iterator pointing to given row and col
     const_matrix_row_major_iterator(const matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
         : const_matrix_iterator_type(matrix, start_row, start_col) {}
 
-    //! \brief create empty iterator
+    //! create empty iterator
     const_matrix_row_major_iterator(const matrix_type & matrix)
         : const_matrix_iterator_type(matrix) {}
 
 public:
-    //! \brief convert from matrix_iterator
+    //! convert from matrix_iterator
     const_matrix_row_major_iterator(const const_matrix_row_major_iterator & matrix_iterator)
         : const_matrix_iterator_type(matrix_iterator) {}
 
-    //! \brief convert from matrix_iterator
+    //! convert from matrix_iterator
     const_matrix_row_major_iterator(const const_matrix_iterator_type & matrix_iterator)
         : const_matrix_iterator_type(matrix_iterator) {}
 
@@ -939,7 +938,7 @@ public:
     using const_matrix_iterator_type::set_pos;
 };
 
-//! \brief column-major const_iterator that points to single elements inside a matrix
+//! column-major const_iterator that points to single elements inside a matrix
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 template <typename ValueType, unsigned BlockSideLength>
@@ -955,20 +954,20 @@ protected:
     using const_matrix_iterator_type::m;
     using const_matrix_iterator_type::set_empty;
 
-    //! \brief create iterator pointing to given row and col
+    //! create iterator pointing to given row and col
     const_matrix_col_major_iterator(const matrix_type & matrix, const elem_size_type start_row, const elem_size_type start_col)
         : const_matrix_iterator_type(matrix, start_row, start_col) {}
 
-    //! \brief create empty iterator
+    //! create empty iterator
     const_matrix_col_major_iterator(const matrix_type & matrix)
         : const_matrix_iterator_type(matrix) {}
 
 public:
-    //! \brief convert from matrix_iterator
+    //! convert from matrix_iterator
     const_matrix_col_major_iterator(const matrix_iterator<ValueType, BlockSideLength> & matrix_iterator)
         : const_matrix_iterator_type(matrix_iterator) {}
 
-    //! \brief convert from matrix_iterator
+    //! convert from matrix_iterator
     const_matrix_col_major_iterator(const const_matrix_iterator_type & matrix_iterator)
         : const_matrix_iterator_type(matrix_iterator) {}
 
@@ -1008,7 +1007,7 @@ public:
     using const_matrix_iterator_type::set_pos;
 };
 
-//! \brief External matrix container.
+//! External matrix container.
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 //!
@@ -1047,7 +1046,7 @@ protected:
     swappable_block_matrix_pointer_type data;
 
 public:
-    //! \brief Creates a new matrix of given dimensions. Elements' values are set to zero.
+    //! Creates a new matrix of given dimensions. Elements' values are set to zero.
     //! \param bs block scheduler used
     //! \param height height of the created matrix
     //! \param width width of the created matrix
@@ -1188,7 +1187,7 @@ public:
         return res;
     }
 
-    //! \brief multiply with another matrix
+    //! multiply with another matrix
     //! \param right matrix to multiply with
     //! \param multiplication_algorithm allows to choose the applied algorithm
     //! \param scheduling_algorithm  allows to choose the applied algorithm
@@ -1289,7 +1288,7 @@ public:
         return res;
     }
 
-    //! \brief Use internal memory multiplication. Designated for testing. May exceed memory limitations.
+    //! Use internal memory multiplication. Designated for testing. May exceed memory limitations.
     matrix_type multiply_internal (const matrix_type & right, const int_type scheduling_algorithm = 2) const
     {
         assert(width == right.height);

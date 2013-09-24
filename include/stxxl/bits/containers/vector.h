@@ -266,7 +266,7 @@ template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
 class const_vector_iterator;
 
 
-//! \brief External vector iterator, model of \c ext_random_access_iterator concept
+//! External vector iterator, model of \c ext_random_access_iterator concept.
 template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
           unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
 class vector_iterator
@@ -491,7 +491,7 @@ public:
 #endif
 };
 
-//! \brief Const external vector iterator, model of \c ext_random_access_iterator concept
+//! Const external vector iterator, model of \c ext_random_access_iterator concept.
 template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
           unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
 class const_vector_iterator
@@ -710,8 +710,8 @@ public:
 };
 
 
-//! \brief External vector container
-
+//! External vector container.
+//!
 //! For semantics of the methods see documentation of the STL std::vector
 //! \tparam Tp_ type of contained objects (POD with no references to internal memory)
 //! \tparam PgSz_ number of blocks in a page
@@ -807,7 +807,7 @@ private:
     }
 
 public:
-    //! \brief Constructs external vector.
+    //! Constructs external vector.
     //!
     //! \param n Number of elements.
     //! \param npages Number of cached pages.
@@ -874,7 +874,7 @@ public:
     {
         return size_type(_bids.size()) * block_type::size;
     }
-    //! \brief Returns the number of bytes that the vector has allocated on disks
+    //! Returns the number of bytes that the vector has allocated on disks.
     size_type raw_capacity() const
     {
         return size_type(_bids.size()) * block_type::raw_size;
@@ -1017,7 +1017,7 @@ public:
         return const_element(0);
     }
 
-    //! \brief Construct vector from a file
+    //! Construct vector from a file.
     //! \param from file to be constructed from
     //! \param size Number of elements.
     //! \param npages Number of cached pages.
@@ -1253,7 +1253,7 @@ public:
         delete _cache;
     }
 
-    //! \brief Export data such that it is persistent on the file system.
+    //! Export data such that it is persistent on the file system.
     //! Resulting files will be numbered ascending.
     void export_files(std::string filename_prefix)
     {
@@ -1271,13 +1271,13 @@ public:
         exported = true;
     }
 
-    //! \brief Get the file associated with this vector, or NULL.
+    //! Get the file associated with this vector, or NULL.
     file * get_file() const
     {
         return _from;
     }
 
-    //! \brief Set the blocks and the size of this container explicitly.
+    //! Set the blocks and the size of this container explicitly.
     //! The vector must be completely empty before.
     template <typename ForwardIterator>
     void set_content(const ForwardIterator & bid_begin, const ForwardIterator & bid_end, size_type n)
@@ -1635,7 +1635,7 @@ bool is_sorted(
 //! \addtogroup stlcont
 //! \{
 
-//! \brief External vector type generator
+//! External vector type generator.
 
 //!  \tparam Tp_ type of contained objects (POD with no references to internal memory)
 //!  \tparam PgSz_ number of blocks in a page

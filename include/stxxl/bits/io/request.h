@@ -35,7 +35,7 @@ __STXXL_BEGIN_NAMESPACE
 
 class file;
 
-//! \brief Request with basic properties like file and offset.
+//! Request with basic properties like file and offset.
 class request : virtual public request_interface, public locking_counted_object
 {
 protected:
@@ -72,21 +72,21 @@ public:
 
     std::ostream & print(std::ostream & out) const;
 
-    //! \brief Inform the request object that an error occurred
-    //! during the I/O execution
+    //! Inform the request object that an error occurred during the I/O
+    //! execution.
     void error_occured(const char * msg)
     {
         error.reset(new stxxl::io_error(msg));
     }
 
-    //! \brief Inform the request object that an error occurred
-    //! during the I/O execution
+    //! Inform the request object that an error occurred during the I/O
+    //! execution.
     void error_occured(const std::string & msg)
     {
         error.reset(new stxxl::io_error(msg));
     }
 
-    //! \brief Rises an exception if there were error with the I/O
+    //! Rises an exception if there were error with the I/O.
     void check_errors() throw (stxxl::io_error)
     {
         if (error.get())
@@ -109,7 +109,7 @@ inline std::ostream & operator << (std::ostream & out, const request & req)
     return req.print(out);
 }
 
-//! \brief A smart wrapper for \c request pointer.
+//! A reference counting pointer for \c request.
 typedef counting_ptr<request> request_ptr;
 
 //! \}

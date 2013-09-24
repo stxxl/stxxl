@@ -30,7 +30,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! \brief Encapsulates asynchronous buffered block writing engine
+//! Encapsulates asynchronous buffered block writing engine.
 //!
 //! \c buffered_writer overlaps I/Os with filling of output buffer.
 template <typename block_type>
@@ -69,7 +69,7 @@ protected:
     batch_type batch_write_blocks;      // sorted sequence of blocks to write
 
 public:
-    //! \brief Constructs an object
+    //! Constructs an object.
     //! \param write_buf_size number of write buffers to use
     //! \param write_batch_size number of blocks to accumulate in
     //!        order to flush write requests (bulk buffered writing)
@@ -86,7 +86,7 @@ public:
 
         disk_queues::get_instance()->set_priority_op(request_queue::WRITE);
     }
-    //! \brief Returns free block from the internal buffer pool
+    //! Returns free block from the internal buffer pool.
     //! \return pointer to the block from the internal buffer pool
     block_type * get_free_block()
     {
@@ -123,7 +123,7 @@ public:
 
         return (write_buffers + ibuffer);
     }
-    //! \brief Submits block for writing
+    //! Submits block for writing.
     //! \param filled_block pointer to the block
     //! \remark parameter \c filled_block must be value returned by \c get_free_block() or \c write() methods
     //! \param bid block identifier, a place to write data of the \c filled_block
@@ -154,7 +154,7 @@ public:
 
         return get_free_block();
     }
-    //! \brief Flushes not yet written buffers
+    //! Flushes not yet written buffers.
     void flush()
     {
         int_type ibuffer;
@@ -186,7 +186,7 @@ public:
             free_write_blocks.push_back(i);
     }
 
-    //! \brief Flushes not yet written buffers and frees used memory
+    //! Flushes not yet written buffers and frees used memory.
     virtual ~buffered_writer()
     {
         int_type ibuffer;

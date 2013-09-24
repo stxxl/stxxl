@@ -23,7 +23,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 /*!
- * \brief Simpler non-growing vector without initialization.
+ * Simpler non-growing vector without initialization.
  *
  * simple_vector can be used a replacement for std::vector when only a
  * non-growing array is needed. The advantages of simple_vector are that it
@@ -54,7 +54,7 @@ public:
     typedef const value_type& const_reference;
 
 public:
-    /// allocate vector's memory
+    //! allocate vector's memory
     simple_vector(size_type sz)
         : m_size(sz), m_array(NULL)
     {

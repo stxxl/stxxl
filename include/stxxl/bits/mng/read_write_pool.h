@@ -22,8 +22,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup schedlayer
 //! \{
 
-
-//! \brief Implements dynamically resizable buffered writing and prefetched reading pool
+//! Implements dynamically resizable buffered writing and prefetched reading pool.
 template <typename BlockType>
 class read_write_pool : private noncopyable
 {
@@ -41,7 +40,7 @@ protected:
     bool delete_pools;
 
 public:
-    //! \brief Constructs pool
+    //! Constructs pool.
     //! \param init_size_prefetch initial number of blocks in the prefetch pool
     //! \param init_size_write initial number of blocks in the write pool
     explicit read_write_pool(size_type init_size_prefetch = 1, size_type init_size_write = 1) :
@@ -62,7 +61,7 @@ public:
         std::swap(delete_pools, obj.delete_pools);
     }
 
-    //! \brief Waits for completion of all ongoing requests and frees memory
+    //! Waits for completion of all ongoing requests and frees memory.
     virtual ~read_write_pool()
     {
         if (delete_pools) {
@@ -71,20 +70,20 @@ public:
         }
     }
 
-    //! \brief Returns number of blocks owned by the write_pool
+    //! Returns number of blocks owned by the write_pool.
     size_type size_write() const { return w_pool->size(); }
 
-    //! \brief Returns number of blocks owned by the prefetch_pool
+    //! Returns number of blocks owned by the prefetch_pool.
     size_type size_prefetch() const { return p_pool->size(); }
 
-    //! \brief Resizes size of the pool
+    //! Resizes size of the pool.
     //! \param new_size new size of the pool after the call
     void resize_write(size_type new_size)
     {
         w_pool->resize(new_size);
     }
 
-    //! \brief Resizes size of the pool
+    //! Resizes size of the pool.
     //! \param new_size new size of the pool after the call
     void resize_prefetch(size_type new_size)
     {
@@ -93,7 +92,7 @@ public:
 
     // WRITE POOL METHODS
 
-    //! \brief Passes a block to the pool for writing
+    //! Passes a block to the pool for writing.
     //! \param block block to write. Ownership of the block goes to the pool.
     //! \c block must be allocated dynamically with using \c new .
     //! \param bid location, where to write
@@ -111,7 +110,7 @@ public:
         return result;
     }
 
-    //! \brief Take out a block from the pool
+    //! Take out a block from the pool.
     //! \return pointer to the block. Ownership of the block goes to the caller.
     block_type * steal()
     {
@@ -125,7 +124,7 @@ public:
 
     // PREFETCH POOL METHODS
 
-    //! \brief Gives a hint for prefetching a block
+    //! Gives a hint for prefetching a block.
     //! \param bid address of a block to be prefetched
     //! \return \c true if there was a free block to do prefetch and prefetching
     //! was scheduled, \c false otherwise
@@ -142,7 +141,7 @@ public:
         return p_pool->invalidate(bid);
     }
 
-    //! \brief Reads block. If this block is cached block is not read but passed from the cache
+    //! Reads block. If this block is cached block is not read but passed from the cache.
     //! \param block block object, where data to be read to. If block was cached \c block 's
     //! ownership goes to the pool and block from cache is returned in \c block value.
     //! \param bid address of the block

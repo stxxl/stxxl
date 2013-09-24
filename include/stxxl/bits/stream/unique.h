@@ -19,7 +19,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief Stream package subnamespace
+//! Stream package subnamespace.
 namespace stream
 {
     ////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ namespace stream
 
     struct dummy_cmp_unique_ { };
 
-    //! \brief Equivalent to std::unique algorithms
+    //! Equivalent to std::unique algorithms.
     //!
     //! Removes consecutive duplicates from the stream.
     //! Uses BinaryPredicate to compare elements of the stream
@@ -40,7 +40,7 @@ namespace stream
         typename Input::value_type current;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Input::value_type value_type;
 
         unique(Input & input_, BinaryPredicate binary_pred_) : input(input_), binary_pred(binary_pred_)
@@ -49,7 +49,7 @@ namespace stream
                 current = *input;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         unique & operator ++ ()
         {
             value_type old_value = current;
@@ -59,26 +59,26 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type * operator -> () const
         {
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return input.empty();
         }
     };
 
-    //! \brief Equivalent to std::unique algorithms
+    //! Equivalent to std::unique algorithms.
     //!
     //! Removes consecutive duplicates from the stream.
     template <class Input>
@@ -88,7 +88,7 @@ namespace stream
         typename Input::value_type current;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Input::value_type value_type;
 
         unique(Input & input_) : input(input_)
@@ -97,7 +97,7 @@ namespace stream
                 current = *input;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         unique & operator ++ ()
         {
             value_type old_value = current;
@@ -107,19 +107,19 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type * operator -> () const
         {
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return input.empty();

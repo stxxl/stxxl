@@ -32,8 +32,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of file based on buffered writes and
-//!        block remapping via a translation layer.
+//! Implementation of file based on buffered writes and block remapping via a
+//! translation layer.
 class wbtl_file : public disk_queued_file
 {
     typedef std::pair<offset_type, offset_type> place;
@@ -77,7 +77,7 @@ class wbtl_file : public disk_queued_file
     };
 
 public:
-    //! \brief constructs file object
+    //! Constructs file object.
     //! param backend_file file object used as storage backend, will be deleted in ~wbtl_file()
     wbtl_file(
         file * backend_file,

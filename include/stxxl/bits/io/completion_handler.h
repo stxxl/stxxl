@@ -50,8 +50,8 @@ public:
     }
 };
 
-//! \brief Completion handler class (Loki-style)
-
+//! Completion handler class (Loki-style).
+//!
 //! In some situations one needs to execute
 //! some actions after completion of an I/O
 //! request. In these cases one can use
@@ -88,11 +88,11 @@ public:
     }
 };
 
-//! \brief Default completion handler class
+//! Default completion handler class.
 
 struct default_completion_handler
 {
-    //! \brief An operator that does nothing
+    //! An operator that does nothing.
     void operator () (request *) { }
 };
 

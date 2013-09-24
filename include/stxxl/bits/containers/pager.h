@@ -33,7 +33,7 @@ enum pager_type
     lru
 };
 
-//! \brief Pager with \b random replacement strategy
+//! Pager with \b random replacement strategy
 template <unsigned npages_>
 class random_pager
 {
@@ -62,7 +62,7 @@ public:
     }
 };
 
-//! \brief Pager with \b LRU replacement strategy
+//! Pager with \b LRU replacement strategy
 template <unsigned npages_ = 0>
 class lru_pager : private noncopyable
 {

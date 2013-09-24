@@ -29,7 +29,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup schedlayer
 //! \{
 
-//! \brief Implements dynamically resizable prefetching pool
+//! Implements dynamically resizable prefetching pool.
 template <class BlockType>
 class prefetch_pool : private noncopyable
 {
@@ -71,7 +71,7 @@ protected:
     unsigned_type free_blocks_size;
 
 public:
-    //! \brief Constructs pool
+    //! Constructs pool.
     //! \param init_size initial number of blocks in the pool
     explicit prefetch_pool(unsigned_type init_size = 1) : free_blocks_size(init_size)
     {
@@ -87,7 +87,7 @@ public:
         std::swap(free_blocks_size, obj.free_blocks_size);
     }
 
-    //! \brief Waits for completion of all ongoing read requests and frees memory
+    //! Waits for completion of all ongoing read requests and frees memory.
     virtual ~prefetch_pool()
     {
         while (!free_blocks.empty())
@@ -108,10 +108,12 @@ public:
         catch (...)
         { }
     }
-    //! \brief Returns number of owned blocks
-    unsigned_type size() const { return free_blocks_size + busy_blocks.size(); }
 
-    //! \brief Gives a hint for prefetching a block
+    //! Returns number of owned blocks.
+    unsigned_type size() const
+    { return free_blocks_size + busy_blocks.size(); }
+
+    //! Gives a hint for prefetching a block.
     //! \param bid address of a block to be prefetched
     //! \return \c true if there was a free block to do prefetch and prefetching
     //! was scheduled, \c false otherwise
@@ -194,7 +196,7 @@ public:
         return (busy_blocks.find(bid) != busy_blocks.end());
     }
 
-    //! \brief Reads block. If this block is cached block is not read but passed from the cache
+    //! Reads block. If this block is cached block is not read but passed from the cache.
     //! \param block block object, where data to be read to. If block was cached \c block 's
     //! ownership goes to the pool and block from cache is returned in \c block value.
     //! \param bid address of the block
@@ -252,7 +254,7 @@ public:
         return block->read(bid);
     }
 
-    //! \brief Resizes size of the pool
+    //! Resizes size of the pool.
     //! \param new_size desired size of the pool. If some
     //! blocks are used for prefetching, these blocks can't be freed.
     //! Only free blocks (not in prefetching) can be freed by reducing

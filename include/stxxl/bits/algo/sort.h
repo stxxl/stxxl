@@ -687,7 +687,7 @@ namespace sort_local
  */
 
 
-//! \brief Sort records comparison-based
+//! Sort records comparison-based
 //! \param first object of model of \c ext_random_access_iterator concept
 //! \param last object of model of \c ext_random_access_iterator concept
 //! \param cmp comparison object

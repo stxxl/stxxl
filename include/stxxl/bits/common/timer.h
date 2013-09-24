@@ -28,7 +28,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief Returns number of seconds since the epoch, high resolution.
+//! Returns number of seconds since the epoch, high resolution.
 inline double
 timestamp()
 {

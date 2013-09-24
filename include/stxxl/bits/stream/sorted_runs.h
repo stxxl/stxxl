@@ -34,7 +34,7 @@ namespace stream
     //     SORTED RUNS                                                    //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief All sorted runs of a sort operation.
+    //! All sorted runs of a sort operation.
     template <typename TriggerEntryType, typename CompareType>
     struct sorted_runs : private noncopyable, public counted_object
     {
@@ -48,16 +48,16 @@ namespace stream
 
         typedef CompareType cmp_type;
 
-        /// total number of elements in all runs
+        //! total number of elements in all runs
         size_type elements;
 
-        /// vector of runs (containing vectors of block ids)
+        //! vector of runs (containing vectors of block ids)
         std::vector<run_type> runs;
 
-        /// vector of the number of elements in each individual run
+        //! vector of the number of elements in each individual run
         std::vector<size_type> runs_sizes;
 
-        //! \brief Small sort optimization:
+        //! Small sort optimization:
         // if the input is small such that its total size is at most B
         // (block_type::size) then input is sorted internally and kept in the
         // array "small_run"
@@ -73,7 +73,7 @@ namespace stream
             deallocate_blocks();
         }
         
-        /// Clear the internal state of the object: release all runs and reset.
+        //! Clear the internal state of the object: release all runs and reset.
         void clear()
         {
             deallocate_blocks();
@@ -84,7 +84,7 @@ namespace stream
             small_run.clear();
         }
 
-        /// Add a new run with given number of elements
+        //! Add a new run with given number of elements
         void add_run(const run_type& run, size_type run_size)
         {
             runs.push_back(run);
@@ -92,8 +92,8 @@ namespace stream
             elements += run_size;
         }
 
-        /// Swap contents with another object. This is used by the recursive
-        /// merger to swap in a sorted_runs object with fewer runs.
+        //! Swap contents with another object. This is used by the recursive
+        //! merger to swap in a sorted_runs object with fewer runs.
         void swap(sorted_runs& b)
         {
             std::swap(elements, b.elements);
@@ -103,7 +103,7 @@ namespace stream
         }
 
     private:
-        //! \brief Deallocates the blocks which the runs occupy
+        //! Deallocates the blocks which the runs occupy.
         //!
         //! \remark There is no need in calling this method, the blocks are
         //! deallocated by the destructor. However, if you wish to reuse the

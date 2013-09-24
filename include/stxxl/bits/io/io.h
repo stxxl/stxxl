@@ -28,7 +28,7 @@
 #include <stxxl/bits/io/iostats.h>
 
 
-//! \brief \c \<stxxl\> library namespace
+//! \c STXXL library namespace
 __STXXL_BEGIN_NAMESPACE
 
 __STXXL_END_NAMESPACE

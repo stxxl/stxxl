@@ -48,7 +48,7 @@ public:
     filler_struct__() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] filler_struct__<> is constructed"); }
 };
 
-//! \brief Contains data elements for \c stxxl::typed_block , not intended for direct use
+//! Contains data elements for \c stxxl::typed_block , not intended for direct use.
 template <class T, unsigned Size_>
 class element_block
 {
@@ -77,44 +77,44 @@ public:
         return elem[i];
     }
 
-    //! \brief Returns \c iterator pointing to the first element
+    //! Returns \c iterator pointing to the first element.
     iterator begin()
     {
         return elem;
     }
 
-    //! \brief Returns \c const_iterator pointing to the first element
+    //! Returns \c const_iterator pointing to the first element.
     const_iterator begin() const
     {
         return elem;
     }
 
-    //! \brief Returns \c const_iterator pointing to the first element
+    //! Returns \c const_iterator pointing to the first element.
     const_iterator cbegin() const
     {
         return begin();
     }
 
-    //! \brief Returns \c iterator pointing to the end element
+    //! Returns \c iterator pointing to the end element.
     iterator end()
     {
         return elem + size;
     }
 
-    //! \brief Returns \c const_iterator pointing to the end element
+    //! Returns \c const_iterator pointing to the end element.
     const_iterator end() const
     {
         return elem + size;
     }
 
-    //! \brief Returns \c const_iterator pointing to the end element
+    //! Returns \c const_iterator pointing to the end element.
     const_iterator cend() const
     {
         return end();
     }
 };
 
-//! \brief Contains BID references for \c stxxl::typed_block , not intended for direct use
+//! Contains BID references for \c stxxl::typed_block , not intended for direct use.
 template <class T, unsigned Size_, unsigned RawSize_, unsigned NBids_ = 0>
 class block_w_bids : public element_block<T, Size_>
 {
@@ -154,16 +154,16 @@ public:
     block_w_bids() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_bids<> is constructed"); }
 };
 
-//! \brief Contains per block information for \c stxxl::typed_block , not intended for direct use
+//! Contains per block information for \c stxxl::typed_block , not intended for direct use.
 template <class T_, unsigned RawSize_, unsigned NBids_, class InfoType_ = void>
 class block_w_info :
     public block_w_bids<T_, ((RawSize_ - sizeof(BID<RawSize_>) * NBids_ - sizeof(InfoType_)) / sizeof(T_)), RawSize_, NBids_>
 {
 public:
-    //! \brief Type of per block information element
+    //! Type of per block information element.
     typedef InfoType_ info_type;
 
-    //! \brief Per block information element
+    //! Per block information element.
     info_type info;
 
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info is constructed"); }
@@ -179,13 +179,13 @@ public:
     block_w_info() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] block_w_info<> is constructed"); }
 };
 
-//! \brief Contains per block filler for \c stxxl::typed_block , not intended for direct use
+//! Contains per block filler for \c stxxl::typed_block , not intended for direct use.
 template <typename BaseType_, unsigned FillSize_ = 0>
 class add_filler :
     public BaseType_
 {
 private:
-    //! \brief Per block filler element
+    //! Per block filler element.
     filler_struct__<FillSize_> filler;
 
 public:
@@ -200,14 +200,14 @@ public:
     add_filler() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] add_filler<> is constructed"); }
 };
 
-//! \brief Helper to compute the size of the filler , not intended for direct use
+//! Helper to compute the size of the filler , not intended for direct use.
 template <typename Tp_, unsigned RawSize_>
 class expand_struct :
     public add_filler<Tp_, RawSize_ - sizeof(Tp_)>
 { };
 
-//! \brief Block containing elements of fixed length
-
+//! Block containing elements of fixed length.
+//!
 //! \tparam RawSize_ size of block in bytes
 //! \tparam T_ type of block's records
 //! \tparam NRef_ number of block references (BIDs) that can be stored in the block (default is 0)
@@ -261,7 +261,7 @@ public:
     }
 #endif
 
-    /*! \brief Writes block to the disk(s)
+    /*! Writes block to the disk(s).
      *! \param bid block identifier, points the file(disk) and position
      *! \param on_cmpl completion handler
      *! \return \c pointer_ptr object to track status I/O operation after the call
@@ -273,7 +273,7 @@ public:
         return bid.storage->awrite(this, bid.offset, raw_size, on_cmpl);
     }
 
-    /*! \brief Reads block from the disk(s)
+    /*! Reads block from the disk(s).
      *! \param bid block identifier, points the file(disk) and position
      *! \param on_cmpl completion handler
      *! \return \c pointer_ptr object to track status I/O operation after the call

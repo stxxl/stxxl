@@ -33,7 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! \brief Implements dynamically resizable buffered writing pool
+//! Implements dynamically resizable buffered writing pool.
 template <class BlockType>
 class write_pool : private noncopyable
 {
@@ -65,7 +65,7 @@ protected:
     std::list<busy_entry> busy_blocks;
 
 public:
-    //! \brief Constructs pool
+    //! Constructs pool.
     //! \param init_size initial number of blocks in the pool
     explicit write_pool(unsigned_type init_size = 1)
     {
@@ -82,7 +82,7 @@ public:
         std::swap(busy_blocks, obj.busy_blocks);
     }
 
-    //! \brief Waits for completion of all ongoing write requests and frees memory
+    //! Waits for completion of all ongoing write requests and frees memory.
     virtual ~write_pool()
     {
         STXXL_VERBOSE_WPOOL("::~write_pool free_blocks.size()=" << free_blocks.size() <<
@@ -107,10 +107,10 @@ public:
         { }
     }
 
-    //! \brief Returns number of owned blocks
+    //! Returns number of owned blocks.
     unsigned_type size() const { return free_blocks.size() + busy_blocks.size(); }
 
-    //! \brief Passes a block to the pool for writing
+    //! Passes a block to the pool for writing.
     //! \param block block to write. Ownership of the block goes to the pool.
     //! \c block must be allocated dynamically with using \c new .
     //! \param bid location, where to write
@@ -137,7 +137,7 @@ public:
         return result;
     }
 
-    //! \brief Take out a block from the pool
+    //! Take out a block from the pool.
     //! \return pointer to the block. Ownership of the block goes to the caller.
     block_type * steal()
     {
@@ -166,7 +166,7 @@ public:
         return steal();
     }
 
-    //! \brief Resizes size of the pool
+    //! Resizes size of the pool.
     //! \param new_size new size of the pool after the call
     void resize(unsigned_type new_size)
     {

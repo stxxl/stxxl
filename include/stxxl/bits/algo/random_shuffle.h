@@ -32,7 +32,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! \brief External equivalent of std::random_shuffle
+//! External equivalent of std::random_shuffle
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
 //! \param rand random number generator object (functor)
@@ -186,7 +186,7 @@ void random_shuffle(ExtIterator_ first,
     delete[] buckets;
 }
 
-//! \brief External equivalent of std::random_shuffle (specialization for stxxl::vector)
+//! External equivalent of std::random_shuffle (specialization for stxxl::vector)
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
 //! \param rand random number generator object (functor)
@@ -357,7 +357,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
     }
 }
 
-//! \brief External equivalent of std::random_shuffle (specialization for stxxl::vector)
+//! External equivalent of std::random_shuffle (specialization for stxxl::vector)
 //! \param first begin of the range to shuffle
 //! \param last end of the range to shuffle
 //! \param M number of bytes for internal use

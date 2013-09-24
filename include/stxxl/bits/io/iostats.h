@@ -38,7 +38,7 @@ __STXXL_BEGIN_NAMESPACE
 //!
 //! \{
 
-//! \brief Collects various I/O statistics
+//! Collects various I/O statistics.
 //! \remarks is a singleton
 class stats : public singleton<stats>
 {
@@ -262,102 +262,100 @@ public:
     };
 
 public:
-    //! \brief Returns total number of reads
+    //! Returns total number of reads.
     //! \return total number of reads
     unsigned get_reads() const
     {
         return reads;
     }
 
-    //! \brief Returns total number of writes
+    //! Returns total number of writes.
     //! \return total number of writes
     unsigned get_writes() const
     {
         return writes;
     }
 
-    //! \brief Returns number of bytes read from disks
+    //! Returns number of bytes read from disks.
     //! \return number of bytes read
     int64 get_read_volume() const
     {
         return volume_read;
     }
 
-    //! \brief Returns number of bytes written to the disks
+    //! Returns number of bytes written to the disks.
     //! \return number of bytes written
     int64 get_written_volume() const
     {
         return volume_written;
     }
 
-    //! \brief Returns total number of reads served from cache
+    //! Returns total number of reads served from cache.
     //! \return total number of cached reads
     unsigned get_cached_reads() const
     {
         return c_reads;
     }
 
-    //! \brief Returns total number of cached writes
+    //! Returns total number of cached writes.
     //! \return total number of cached writes
     unsigned get_cached_writes() const
     {
         return c_writes;
     }
 
-    //! \brief Returns number of bytes read from cache
+    //! Returns number of bytes read from cache.
     //! \return number of bytes read from cache
     int64 get_cached_read_volume() const
     {
         return c_volume_read;
     }
 
-    //! \brief Returns number of bytes written to the cache
+    //! Returns number of bytes written to the cache.
     //! \return number of bytes written to cache
     int64 get_cached_written_volume() const
     {
         return c_volume_written;
     }
 
-    //! \brief Time that would be spent in read syscalls if all parallel reads were serialized.
+    //! Time that would be spent in read syscalls if all parallel reads were serialized.
     //! \return seconds spent in reading
     double get_read_time() const
     {
         return t_reads;
     }
 
-    //! \brief Time that would be spent in write syscalls if all parallel writes were serialized.
+    //! Time that would be spent in write syscalls if all parallel writes were serialized.
     //! \return seconds spent in writing
     double get_write_time() const
     {
         return t_writes;
     }
 
-    //! \brief Period of time when at least one I/O thread was executing a read.
+    //! Period of time when at least one I/O thread was executing a read.
     //! \return seconds spent in reading
     double get_pread_time() const
     {
         return p_reads;
     }
 
-    //! \brief Period of time when at least one I/O thread was executing a write.
+    //! Period of time when at least one I/O thread was executing a write.
     //! \return seconds spent in writing
     double get_pwrite_time() const
     {
         return p_writes;
     }
 
-    //! \brief Period of time when at least one I/O thread was executing a read or a write.
+    //! Period of time when at least one I/O thread was executing a read or a write.
     //! \return seconds spent in I/O
     double get_pio_time() const
     {
         return p_ios;
     }
 
-    //! \brief I/O wait time counter
-    //! \return number of seconds spent in I/O waiting functions
-    //!  \link request::wait request::wait \endlink,
-    //!  \c wait_any and
-    //!  \c wait_all
+    //! I/O wait time counter.
+    //! \return number of seconds spent in I/O waiting functions \link
+    //! request::wait request::wait \endlink, \c wait_any and \c wait_all
     double get_io_wait_time() const
     {
         return t_waits;
@@ -373,7 +371,7 @@ public:
         return t_wait_write;
     }
 
-    //! \brief Return time of the last reset
+    //! Return time of the last reset.
     //! \return seconds passed from the last reset()
     double get_last_reset_time() const
     {
@@ -381,11 +379,11 @@ public:
     }
 
 #ifndef STXXL_IO_STATS_RESET_FORBIDDEN
-    //! \brief Resets I/O time counters (including I/O wait counter)
+    //! Resets I/O time counters (including I/O wait counter).
     _STXXL_DEPRECATED(void reset());
 #endif
 
-    //! \brief Resets I/O wait time counter
+    //! Resets I/O wait time counter.
     _STXXL_DEPRECATED(void _reset_io_wait_time());
 
     // for library use

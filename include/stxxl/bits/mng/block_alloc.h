@@ -28,7 +28,7 @@ __STXXL_BEGIN_NAMESPACE
 //! Standard allocation strategies encapsulated in functors
 //! \{
 
-//! \brief example disk allocation scheme functor
+//! Example disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct basic_allocation_strategy
 {
@@ -38,7 +38,7 @@ struct basic_allocation_strategy
     static const char * name();
 };
 
-//! \brief striping disk allocation scheme functor
+//! Striping disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct striping
 {
@@ -64,7 +64,7 @@ public:
     }
 };
 
-//! \brief fully randomized disk allocation scheme functor
+//! Fully randomized disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct FR : public striping
 {
@@ -89,7 +89,7 @@ public:
     }
 };
 
-//! \brief simple randomized disk allocation scheme functor
+//! Simple randomized disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct SR : public striping
 {
@@ -124,7 +124,7 @@ public:
     }
 };
 
-//! \brief randomized cycling disk allocation scheme functor
+//! Randomized cycling disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct RC : public striping
 {
@@ -190,7 +190,7 @@ struct RC_flash : public RC
     }
 };
 
-//! \brief 'single disk' disk allocation scheme functor
+//! 'Single disk' disk allocation scheme functor.
 //! \remarks model of \b allocation_strategy concept
 struct single_disk
 {
@@ -212,8 +212,8 @@ struct single_disk
     }
 };
 
-//! \brief Allocator functor adaptor
-
+//! Allocator functor adaptor.
+//!
 //! Gives offset to disk number sequence defined in constructor
 template <class BaseAllocator_>
 struct offset_allocator
@@ -221,19 +221,19 @@ struct offset_allocator
     BaseAllocator_ base;
     int_type offset;
 
-    //! \brief Creates functor based on instance of \c BaseAllocator_ functor
-    //! with offset \c offset_
+    //! Creates functor based on instance of \c BaseAllocator_ functor
+    //! with offset \c offset_.
     //! \param offset_ offset
     //! \param base_ used to create a copy
     offset_allocator(int_type offset_, const BaseAllocator_ & base_) : base(base_), offset(offset_)
     { }
 
-    //! \brief Creates functor based on instance of \c BaseAllocator_ functor
+    //! Creates functor based on instance of \c BaseAllocator_ functor.
     //! \param base_ used to create a copy
     offset_allocator(const BaseAllocator_ & base_) : base(base_), offset(0)
     { }
 
-    //! \brief Creates functor based on default \c BaseAllocator_ functor
+    //! Creates functor based on default \c BaseAllocator_ functor.
     offset_allocator() : offset(0)
     { }
 

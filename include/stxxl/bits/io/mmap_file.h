@@ -44,11 +44,11 @@ __STXXL_BEGIN_NAMESPACE
 //! for various file access methods
 //! \{
 
-//! \brief Implementation of memory mapped access file
+//! Implementation of memory mapped access file.
 class mmap_file : public ufs_file_base, public disk_queued_file
 {
 public:
-    //! \brief constructs file object
+    //! Constructs file object.
     //! param filename path of file
     //! param mode open mode, see \c stxxl::file::open_modes
     //! param disk disk(file) identifier

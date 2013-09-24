@@ -86,7 +86,7 @@ namespace std
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief External priority queue data structure
+//! External priority queue data structure
 template <class Config_>
 class priority_queue : private noncopyable
 {
@@ -104,12 +104,12 @@ public:
         ExtKMAX = Config::ExtKMAX
     };
 
-    //! \brief The type of object stored in the \b priority_queue
+    //! The type of object stored in the \b priority_queue.
     typedef typename Config::value_type value_type;
-    //! \brief Comparison object
+    //! Comparison object.
     typedef typename Config::comparator_type comparator_type;
     typedef typename Config::alloc_strategy_type alloc_strategy_type;
-    //! \brief An unsigned integral type (64 bit)
+    //! An unsigned integral type (64 bit).
     typedef stxxl::uint64 size_type;
     typedef typed_block<BlockSize, value_type> block_type;
     typedef read_write_pool<block_type> pool_type;
@@ -169,14 +169,14 @@ private:
     unsigned_type current_group_buffer_size(unsigned_type i) const { return &(group_buffers[i][N]) - group_buffer_current_mins[i]; }
 
 public:
-    //! \brief Constructs external priority queue object
+    //! Constructs external priority queue object.
     //! \param pool_ pool of blocks that will be used
     //! for data writing and prefetching for the disk<->memory transfers
     //! happening in the priority queue. Larger pool size
     //! helps to speed up operations.
     priority_queue(pool_type & pool_);
 
-    //! \brief Constructs external priority queue object
+    //! Constructs external priority queue object.
     //! \param p_pool_ pool of blocks that will be used
     //! for data prefetching for the disk<->memory transfers
     //! happening in the priority queue. Larger pool size
@@ -187,7 +187,7 @@ public:
     //! helps to speed up operations.
     _STXXL_DEPRECATED(priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_));
 
-    //! \brief Constructs external priority queue object
+    //! Constructs external priority queue object.
     //! \param p_pool_mem memory (in bytes) for prefetch pool that will be used
     //! for data prefetching for the disk<->memory transfers
     //! happening in the priority queue. Larger pool size
@@ -199,7 +199,7 @@ public:
     priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem);
 
 #if 0
-    //! \brief swap this priority queue with another one
+    //! swap this priority queue with another one.
     //! Implementation correctness is questionable.
     void swap(priority_queue & obj)
     {
@@ -230,15 +230,15 @@ public:
 
     virtual ~priority_queue();
 
-    //! \brief Returns number of elements contained
+    //! Returns number of elements contained.
     //! \return number of elements contained
     size_type size() const;
 
-    //! \brief Returns true if queue has no elements
+    //! Returns true if queue has no elements.
     //! \return \b true if queue has no elements, \b false otherwise
     bool empty() const { return (size() == 0); }
 
-    //! \brief Returns "largest" element
+    //! Returns "largest" element.
     //!
     //! Returns a const reference to the element at the
     //! top of the priority_queue. The element at the top is
@@ -251,7 +251,7 @@ public:
     //! Precondition: \c empty() is false.
     const value_type & top() const;
 
-    //! \brief Removes the element at the top
+    //! Removes the element at the top.
     //!
     //! Removes the element at the top of the priority_queue, that
     //! is, the largest element in the \b priority_queue.
@@ -259,15 +259,13 @@ public:
     //! Postcondition: \c size() will be decremented by 1.
     void pop();
 
-    //! \brief Inserts x into the priority_queue.
+    //! Inserts x into the priority_queue.
     //!
     //! Inserts x into the priority_queue. Postcondition:
     //! \c size() will be incremented by 1.
     void push(const value_type & obj);
 
-    //! \brief Returns number of bytes consumed by
-    //! the \b priority_queue
-    //! \brief number of bytes consumed by the \b priority_queue from
+    //! Number of bytes consumed by the \b priority_queue from
     //! the internal memory not including pools (see the constructor)
     unsigned_type mem_cons() const
     {
@@ -901,8 +899,8 @@ namespace priority_queue_local
 //! \addtogroup stlcont
 //! \{
 
-//! \brief Priority queue type generator
-
+//! Priority queue type generator.
+//!
 //! Implements a data structure from "Peter Sanders. Fast Priority Queues
 //! for Cached Memory. ALENEX'99" for external memory.
 //! <BR>

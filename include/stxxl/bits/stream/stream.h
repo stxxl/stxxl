@@ -30,7 +30,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief Stream package subnamespace
+//! Stream package subnamespace.
 namespace stream
 {
     //! \weakgroup streampack Stream package
@@ -63,7 +63,7 @@ namespace stream
     //     STREAMIFY                                                      //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief A model of stream that retrieves the data from an input iterator
+    //! A model of stream that retrieves the data from an input iterator.
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c iterator2stream .
     template <class InputIterator_>
@@ -72,7 +72,7 @@ namespace stream
         InputIterator_ current_, end_;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
 
         iterator2stream(InputIterator_ begin, InputIterator_ end) :
@@ -80,7 +80,7 @@ namespace stream
 
         iterator2stream(const iterator2stream & a) : current_(a.current_), end_(a.end_) { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return *current_;
@@ -91,7 +91,7 @@ namespace stream
             return &(*current_);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         iterator2stream & operator ++ ()
         {
             assert(end_ != current_);
@@ -99,7 +99,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return (current_ == end_);
@@ -107,7 +107,7 @@ namespace stream
     };
 
 
-    //! \brief Input iterator range to stream converter
+    //! Input iterator range to stream converter.
     //! \param begin iterator, pointing to the first value
     //! \param end iterator, pointing to the last + 1 position, i.e. beyond the range
     //! \return an instance of a stream object
@@ -117,15 +117,15 @@ namespace stream
         return iterator2stream<InputIterator_>(begin, end);
     }
 
-    //! \brief Traits class of \c streamify function
+    //! Traits class of \c streamify function.
     template <class InputIterator_>
     struct streamify_traits
     {
-        //! \brief return type (stream type) of \c streamify for \c InputIterator_
+        //! return type (stream type) of \c streamify for \c InputIterator_.
         typedef iterator2stream<InputIterator_> stream_type;
     };
 
-    //! \brief A model of stream that retrieves data from an external \c stxxl::vector iterator.
+    //! A model of stream that retrieves data from an external \c stxxl::vector iterator.
     //! It is more efficient than generic \c iterator2stream thanks to use of overlapping
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c vector_iterator2stream .
@@ -147,7 +147,7 @@ namespace stream
     public:
         typedef vector_iterator2stream<InputIterator_> Self_;
 
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
 
         vector_iterator2stream(InputIterator_ begin, InputIterator_ end, unsigned_type nbuffers = 0) :
@@ -175,7 +175,7 @@ namespace stream
         vector_iterator2stream(const Self_ & a) :
             current_(a.current_), end_(a.end_), in(a.in.release()) { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return **in;
@@ -186,7 +186,7 @@ namespace stream
             return &(**in);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         Self_ & operator ++ ()
         {
             assert(end_ != current_);
@@ -198,7 +198,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return (current_ == end_);
@@ -209,7 +209,7 @@ namespace stream
         }
     };
 
-    //! \brief Input external \c stxxl::vector iterator range to stream converter
+    //! Input external \c stxxl::vector iterator range to stream converter.
     //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
     //! \param begin iterator, pointing to the first value
     //! \param end iterator, pointing to the last + 1 position, i.e. beyond the range
@@ -237,7 +237,7 @@ namespace stream
         typedef vector_iterator2stream<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> > stream_type;
     };
 
-    //! \brief Input external \c stxxl::vector const iterator range to stream converter
+    //! Input external \c stxxl::vector const iterator range to stream converter.
     //! It is more efficient than generic input iterator \c streamify thanks to use of overlapping
     //! \param begin const iterator, pointing to the first value
     //! \param end const iterator, pointing to the last + 1 position, i.e. beyond the range
@@ -266,7 +266,7 @@ namespace stream
     };
 
 
-    //! \brief Version of  \c iterator2stream. Switches between \c vector_iterator2stream and \c iterator2stream .
+    //! Version of  \c iterator2stream. Switches between \c vector_iterator2stream and \c iterator2stream .
     //!
     //! small range switches between
     //! \c vector_iterator2stream and \c iterator2stream .
@@ -283,7 +283,7 @@ namespace stream
     public:
         typedef vector_iterator2stream_sr<InputIterator_> Self_;
 
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename std::iterator_traits<InputIterator_>::value_type value_type;
 
         vector_iterator2stream_sr(InputIterator_ begin, InputIterator_ end, unsigned_type nbuffers = 0)
@@ -304,7 +304,7 @@ namespace stream
 
         vector_iterator2stream_sr(const Self_ & a) : vec_it_stream(a.vec_it_stream), it_stream(a.it_stream) { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             if (it_stream)
@@ -321,7 +321,7 @@ namespace stream
             return &(**vec_it_stream);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         Self_ & operator ++ ()
         {
             if (it_stream)
@@ -334,7 +334,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             if (it_stream)
@@ -352,7 +352,7 @@ namespace stream
         }
     };
 
-    //! \brief Version of  \c streamify. Switches from \c vector_iterator2stream to \c iterator2stream for small ranges.
+    //! Version of  \c streamify. Switches from \c vector_iterator2stream to \c iterator2stream for small ranges.
     template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
               unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
     vector_iterator2stream_sr<stxxl::vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
@@ -366,7 +366,7 @@ namespace stream
                    (begin, end, nbuffers);
     }
 
-    //! \brief Version of  \c streamify. Switches from \c vector_iterator2stream to \c iterator2stream for small ranges.
+    //! Version of  \c streamify. Switches from \c vector_iterator2stream to \c iterator2stream for small ranges.
     template <typename Tp_, typename AllocStr_, typename SzTp_, typename DiffTp_,
               unsigned BlkSize_, typename PgTp_, unsigned PgSz_>
     vector_iterator2stream_sr<stxxl::const_vector_iterator<Tp_, AllocStr_, SzTp_, DiffTp_, BlkSize_, PgTp_, PgSz_> >
@@ -385,7 +385,7 @@ namespace stream
     //     MATERIALIZE                                                    //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Stores consecutively stream content to an output iterator
+    //! Stores consecutively stream content to an output iterator.
     //! \param in stream to be stored used as source
     //! \param out output iterator used as destination
     //! \return value of the output iterator after all increments,
@@ -405,7 +405,7 @@ namespace stream
     }
 
 
-    //! \brief Stores consecutively stream content to an output iterator range \b until end of the stream or end of the iterator range is reached
+    //! Stores consecutively stream content to an output iterator range \b until end of the stream or end of the iterator range is reached.
     //! \param in stream to be stored used as source
     //! \param outbegin output iterator used as destination
     //! \param outend output end iterator, pointing beyond the output range
@@ -428,7 +428,7 @@ namespace stream
     }
 
 
-    //! \brief Stores consecutively stream content to an output \c stxxl::vector iterator \b until end of the stream or end of the iterator range is reached
+    //! Stores consecutively stream content to an output \c stxxl::vector iterator \b until end of the stream or end of the iterator range is reached.
     //! \param in stream to be stored used as source
     //! \param outbegin output \c stxxl::vector iterator used as destination
     //! \param outend output end iterator, pointing beyond the output range
@@ -511,7 +511,7 @@ namespace stream
     }
 
 
-    //! \brief Stores consecutively stream content to an output \c stxxl::vector iterator
+    //! Stores consecutively stream content to an output \c stxxl::vector iterator.
     //! \param in stream to be stored used as source
     //! \param out output \c stxxl::vector iterator used as destination
     //! \param nbuffers number of blocks used for overlapped writing (0 is default,
@@ -597,7 +597,7 @@ namespace stream
     }
 
 
-    //! \brief Reads stream content and discards it.
+    //! Reads stream content and discards it.
     //! Useful where you do not need the processed stream anymore,
     //! but are just interested in side effects, or just for debugging.
     //! \param in input stream
@@ -616,14 +616,14 @@ namespace stream
     //     GENERATE                                                       //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief A model of stream that outputs data from an adaptable generator functor
+    //! A model of stream that outputs data from an adaptable generator functor.
     //! For convenience use \c streamify function instead of direct instantiation
     //! of \c generator2stream .
     template <class Generator_, typename T = typename Generator_::value_type>
     class generator2stream
     {
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef T value_type;
 
     private:
@@ -636,7 +636,7 @@ namespace stream
 
         generator2stream(const generator2stream & a) : gen_(a.gen_), current_(a.current_) { }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current_;
@@ -647,21 +647,21 @@ namespace stream
             return &current_;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         generator2stream & operator ++ ()
         {
             current_ = gen_();
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return false;
         }
     };
 
-    //! \brief Adaptable generator to stream converter
+    //! Adaptable generator to stream converter.
     //! \param gen_ generator object
     //! \return an instance of a stream object
     template <class Generator_>
@@ -677,7 +677,7 @@ namespace stream
 
     struct Stopper { };
 
-    //! \brief Processes (up to) 6 input streams using given operation functor
+    //! Processes (up to) 6 input streams using given operation functor.
     //!
     //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 6 parameters)
@@ -706,14 +706,14 @@ namespace stream
         Input6_ & i6;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_, Input5_ & i6_) :
             op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_), i6(i6_)
@@ -722,7 +722,7 @@ namespace stream
                 current = op(*i1, *i2, *i3, *i4, *i5, *i6);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -733,7 +733,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         transform & operator ++ ()
         {
             ++i1;
@@ -748,7 +748,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty() || i3.empty() ||
@@ -762,7 +762,7 @@ namespace stream
     //     TRANSFORM (1 input stream)                                     //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Processes an input stream using given operation functor
+    //! Processes an input stream using given operation functor.
     //!
     //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 1 parameter)
@@ -777,21 +777,21 @@ namespace stream
         Input1_ & i1;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         transform(Operation_ & o, Input1_ & i1_) : op(o), i1(i1_)
         {
             if (!empty())
                 current = op(*i1);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -802,7 +802,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         transform & operator ++ ()
         {
             ++i1;
@@ -812,7 +812,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty();
@@ -824,7 +824,7 @@ namespace stream
     //     TRANSFORM (2 input streams)                                    //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Processes 2 input streams using given operation functor
+    //! Processes 2 input streams using given operation functor.
     //!
     //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 2 parameters)
@@ -842,21 +842,21 @@ namespace stream
         Input2_ & i2;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_) : op(o), i1(i1_), i2(i2_)
         {
             if (!empty())
                 current = op(*i1, *i2);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -867,7 +867,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         transform & operator ++ ()
         {
             ++i1;
@@ -878,7 +878,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty();
@@ -890,7 +890,7 @@ namespace stream
     //     TRANSFORM (3 input streams)                                    //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Processes 3 input streams using given operation functor
+    //! Processes 3 input streams using given operation functor.
     //!
     //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 3 parameters)
@@ -911,14 +911,14 @@ namespace stream
         Input3_ & i3;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_) :
             op(o), i1(i1_), i2(i2_), i3(i3_)
         {
@@ -926,7 +926,7 @@ namespace stream
                 current = op(*i1, *i2, *i3);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -937,7 +937,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         transform & operator ++ ()
         {
             ++i1;
@@ -949,7 +949,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty() || i3.empty();
@@ -961,7 +961,7 @@ namespace stream
     //     TRANSFORM (4 input streams)                                    //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Processes 4 input streams using given operation functor
+    //! Processes 4 input streams using given operation functor.
     //!
     //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 4 parameters)
@@ -985,14 +985,14 @@ namespace stream
         Input4_ & i4;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_) :
             op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_)
         {
@@ -1000,7 +1000,7 @@ namespace stream
                 current = op(*i1, *i2, *i3, *i4);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -1011,7 +1011,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         transform & operator ++ ()
         {
             ++i1;
@@ -1024,7 +1024,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty() || i3.empty() || i4.empty();
@@ -1036,7 +1036,7 @@ namespace stream
     //     TRANSFORM (5 input streams)                                    //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Processes 5 input streams using given operation functor
+    //! Processes 5 input streams using given operation functor.
     //!
     //! \tparam Operation_ type of the operation (type of an
     //! adaptable functor that takes 5 parameters)
@@ -1063,14 +1063,14 @@ namespace stream
         Input5_ & i5;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Operation_::value_type value_type;
 
     private:
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         transform(Operation_ & o, Input1_ & i1_, Input2_ & i2_, Input3_ & i3_, Input4_ & i4_,
                   Input5_ & i5_) :
             op(o), i1(i1_), i2(i2_), i3(i3_), i4(i4_), i5(i5_)
@@ -1079,7 +1079,7 @@ namespace stream
                 current = op(*i1, *i2, *i3, *i4, *i5);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -1090,7 +1090,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         transform & operator ++ ()
         {
             ++i1;
@@ -1104,7 +1104,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty() || i3.empty() || i4.empty() || i5.empty();
@@ -1116,7 +1116,7 @@ namespace stream
     //     MAKE TUPLE                                                     //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Creates stream of 6-tuples from 6 input streams
+    //! Creates stream of 6-tuples from 6 input streams.
     //!
     //! \tparam Input1_ type of the 1st input
     //! \tparam Input2_ type of the 2nd input
@@ -1141,7 +1141,7 @@ namespace stream
         Input6_ & i6;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename stxxl::tuple<
             typename Input1_::value_type,
             typename Input2_::value_type,
@@ -1155,7 +1155,7 @@ namespace stream
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         make_tuple(
             Input1_ & i1_,
             Input2_ & i2_,
@@ -1170,7 +1170,7 @@ namespace stream
                 current = value_type(*i1, *i2, *i3, *i4, *i5, *i6);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -1181,7 +1181,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         make_tuple & operator ++ ()
         {
             ++i1;
@@ -1197,7 +1197,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty() || i3.empty() ||
@@ -1206,7 +1206,7 @@ namespace stream
     };
 
 
-    //! \brief Creates stream of 2-tuples (pairs) from 2 input streams
+    //! Creates stream of 2-tuples (pairs) from 2 input streams.
     //!
     //! \tparam Input1_ type of the 1st input
     //! \tparam Input2_ type of the 2nd input
@@ -1220,7 +1220,7 @@ namespace stream
         Input2_ & i2;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename stxxl::tuple<
             typename Input1_::value_type,
             typename Input2_::value_type
@@ -1230,7 +1230,7 @@ namespace stream
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         make_tuple(
             Input1_ & i1_,
             Input2_ & i2_
@@ -1243,7 +1243,7 @@ namespace stream
             }
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -1254,7 +1254,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         make_tuple & operator ++ ()
         {
             ++i1;
@@ -1266,14 +1266,14 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty();
         }
     };
 
-    //! \brief Creates stream of 3-tuples from 3 input streams
+    //! Creates stream of 3-tuples from 3 input streams.
     //!
     //! \tparam Input1_ type of the 1st input
     //! \tparam Input2_ type of the 2nd input
@@ -1290,7 +1290,7 @@ namespace stream
         Input3_ & i3;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename stxxl::tuple<
             typename Input1_::value_type,
             typename Input2_::value_type,
@@ -1301,7 +1301,7 @@ namespace stream
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         make_tuple(
             Input1_ & i1_,
             Input2_ & i2_,
@@ -1313,7 +1313,7 @@ namespace stream
                 current = value_type(*i1, *i2, *i3);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -1324,7 +1324,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         make_tuple & operator ++ ()
         {
             ++i1;
@@ -1337,14 +1337,14 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty() || i3.empty();
         }
     };
 
-    //! \brief Creates stream of 4-tuples from 4 input streams
+    //! Creates stream of 4-tuples from 4 input streams.
     //!
     //! \tparam Input1_ type of the 1st input
     //! \tparam Input2_ type of the 2nd input
@@ -1364,7 +1364,7 @@ namespace stream
         Input4_ & i4;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename stxxl::tuple<
             typename Input1_::value_type,
             typename Input2_::value_type,
@@ -1376,7 +1376,7 @@ namespace stream
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         make_tuple(
             Input1_ & i1_,
             Input2_ & i2_,
@@ -1389,7 +1389,7 @@ namespace stream
                 current = value_type(*i1, *i2, *i3, *i4);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -1400,7 +1400,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         make_tuple & operator ++ ()
         {
             ++i1;
@@ -1414,7 +1414,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty() || i3.empty() ||
@@ -1422,7 +1422,7 @@ namespace stream
         }
     };
 
-    //! \brief Creates stream of 5-tuples from 5 input streams
+    //! Creates stream of 5-tuples from 5 input streams.
     //!
     //! \tparam Input1_ type of the 1st input
     //! \tparam Input2_ type of the 2nd input
@@ -1446,7 +1446,7 @@ namespace stream
         Input5_ & i5;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename stxxl::tuple<
             typename Input1_::value_type,
             typename Input2_::value_type,
@@ -1459,7 +1459,7 @@ namespace stream
         value_type current;
 
     public:
-        //! \brief Construction
+        //! Construction.
         make_tuple(
             Input1_ & i1_,
             Input2_ & i2_,
@@ -1473,7 +1473,7 @@ namespace stream
                 current = value_type(*i1, *i2, *i3, *i4, *i5);
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             return current;
@@ -1484,7 +1484,7 @@ namespace stream
             return &current;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         make_tuple & operator ++ ()
         {
             ++i1;
@@ -1499,7 +1499,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return i1.empty() || i2.empty() || i3.empty() ||

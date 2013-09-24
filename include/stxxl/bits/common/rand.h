@@ -35,21 +35,21 @@ __STXXL_BEGIN_NAMESPACE
 
 extern unsigned ran32State;
 
-//! \brief Fast uniform [0, 2^32) pseudo-random generator
-//!        with period 2^32, random bits: 32.
+//! Fast uniform [0, 2^32) pseudo-random generator with period 2^32, random
+//! bits: 32.
 //! \warning Uses a global state and is not reentrant or thread-safe!
 struct random_number32
 {
     typedef unsigned value_type;
 
-    //! \brief Returns a random number from [0, 2^32)
+    //! Returns a random number from [0, 2^32)
     inline value_type operator () () const
     {
         return (ran32State = 1664525 * ran32State + 1013904223);
     }
 };
 
-//! \brief Set a seed value for \c random_number32.
+//! Set a seed value for \c random_number32.
 inline void srandom_number32(unsigned seed = 0)
 {
     if (!seed)
@@ -57,8 +57,8 @@ inline void srandom_number32(unsigned seed = 0)
     ran32State = seed;
 }
 
-//! \brief Fast uniform [0, 2^32) pseudo-random generator
-//!        with period 2^32, random bits: 32.
+//! Fast uniform [0, 2^32) pseudo-random generator with period 2^32, random
+//! bits: 32.
 //! Reentrant variant of random_number32 that keeps it's private state.
 struct random_number32_r
 {
@@ -72,14 +72,14 @@ struct random_number32_r
         state = seed;
     }
 
-    //! \brief Returns a random number from [0, 2^32)
+    //! Returns a random number from [0, 2^32)
     inline value_type operator () () const
     {
         return (state = 1664525 * state + 1013904223);
     }
 };
 
-//! \brief Fast uniform [0.0, 1.0) pseudo-random generator
+//! Fast uniform [0.0, 1.0) pseudo-random generator
 //! \warning Uses a global state and is not reentrant or thread-safe!
 struct random_uniform_fast
 {
@@ -89,15 +89,15 @@ struct random_uniform_fast
     random_uniform_fast(unsigned /*seed*/ = 0)
     { }
 
-    //! \brief Returns a random number from [0.0, 1.0)
+    //! Returns a random number from [0.0, 1.0)
     inline value_type operator () () const
     {
         return (double(rnd32()) * (0.5 / 0x80000000));
     }
 };
 
-//! \brief Slow and precise uniform [0.0, 1.0) pseudo-random generator
-//!        period: at least 2^48, random bits: at least 31
+//! Slow and precise uniform [0.0, 1.0) pseudo-random generator
+//! period: at least 2^48, random bits: at least 31
 //!
 //! \warning Seed is not the same as in the fast generator \c random_uniform_fast
 struct random_uniform_slow
@@ -129,7 +129,7 @@ struct random_uniform_slow
     }
 #endif
 
-    //! \brief Returns a random number from [0.0, 1.0)
+    //! Returns a random number from [0.0, 1.0)
     inline value_type operator () () const
     {
 #ifdef STXXL_BOOST_RANDOM
@@ -140,7 +140,7 @@ struct random_uniform_slow
     }
 };
 
-//! \brief Uniform [0, N) pseudo-random generator
+//! Uniform [0, N) pseudo-random generator
 template <class UniformRGen_ = random_uniform_fast>
 struct random_number
 {
@@ -150,14 +150,14 @@ struct random_number
     random_number(unsigned seed = 0) : uniform(seed)
     { }
 
-    //! \brief Returns a random number from [0, N)
+    //! Returns a random number from [0, N)
     inline value_type operator () (value_type N) const
     {
         return static_cast<value_type>(uniform() * double(N));
     }
 };
 
-//! \brief Slow and precise uniform [0, 2^64) pseudo-random generator
+//! Slow and precise uniform [0, 2^64) pseudo-random generator
 struct random_number64
 {
     typedef stxxl::uint64 value_type;
@@ -166,7 +166,7 @@ struct random_number64
     random_number64(unsigned seed = 0) : uniform(seed)
     { }
 
-    //! \brief Returns a random number from [0, 2^64)
+    //! Returns a random number from [0, 2^64)
     inline value_type operator () () const
     {
         return static_cast<value_type>(uniform() * (18446744073709551616.));

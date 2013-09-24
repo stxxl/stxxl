@@ -9,12 +9,12 @@
  *   Part of the STXXL and MCSTL.                                          *
  ***************************************************************************/
 
-/** @file intel_compatibility.h
- *  @brief Intel compiler compatibility work-around. */
+/*! @file intel_compatibility.h
+ * Intel compiler compatibility work-around. */
 
 #if defined(__ICC) && (__ICC < 1100)
 
-/** @brief Fake function that will cause linking failure if used. */
+/*! Fake function that will cause linking failure if used. */
 template <typename T1, typename T2>
 T1 __in_icc_there_is_no__sync_fetch_and_add(T1 *, T2);
 
@@ -24,8 +24,8 @@ T1 __in_icc_there_is_no__sync_fetch_and_add(T1 *, T2);
 #define __sync_fetch_and_add(ptr,addend) _InterlockedExchangeAdd(const_cast<void*>(reinterpret_cast<volatile void*>(ptr)), addend)
 #endif
 
-/** @brief Replacement of unknown atomic builtin function.
- *         Should work as long as it isn't instantiated. */
+/*! Replacement of unknown atomic builtin function.
+ *  Should work as long as it isn't instantiated. */
 #undef __sync_fetch_and_add
 #define __sync_fetch_and_add __in_icc_there_is_no__sync_fetch_and_add
 

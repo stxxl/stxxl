@@ -52,7 +52,7 @@ private:
     int_type i;
 };
 
-//! \brief c = a [op] b; for arbitrary entries
+//! c = a [op] b; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, bool b_transposed, class Op>
 struct low_level_matrix_binary_ass_op
 {
@@ -90,7 +90,7 @@ struct low_level_matrix_binary_ass_op
     }
 };
 
-//! \brief c [op]= a; for arbitrary entries
+//! c [op]= a; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, class Op>
 struct low_level_matrix_unary_ass_op
 {
@@ -107,7 +107,7 @@ struct low_level_matrix_unary_ass_op
     }
 };
 
-//! \brief c =[op] a; for arbitrary entries
+//! c =[op] a; for arbitrary entries
 template <typename ValueType, unsigned BlockSideLength, bool a_transposed, class Op>
 struct low_level_matrix_unary_op
 {
@@ -124,7 +124,7 @@ struct low_level_matrix_unary_op
     }
 };
 
-//! \brief multiplies matrices A and B, adds result to C, for arbitrary entries
+//! multiplies matrices A and B, adds result to C, for arbitrary entries
 //! param pointer to blocks of A,B,C; elements in blocks have to be in row-major
 /* designated usage as:
  * void
@@ -210,7 +210,7 @@ extern "C" void scopy_(const blas_int *n, const float               *x, const bl
 extern "C" void zcopy_(const blas_int *n, const blas_double_complex *x, const blas_int *incx, blas_double_complex *y, const blas_int *incy);
 extern "C" void ccopy_(const blas_int *n, const blas_single_complex *x, const blas_int *incx, blas_single_complex *y, const blas_int *incy);
 
-//! \brief c = a + b; for double entries
+//! c = a + b; for double entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_binary_ass_op<double, BlockSideLength, false, false, typename matrix_operations<double, BlockSideLength>::addition>
 {
@@ -235,7 +235,7 @@ struct low_level_matrix_binary_ass_op<double, BlockSideLength, false, false, typ
         }
     }
 };
-//! \brief c = a - b; for double entries
+//! c = a - b; for double entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_binary_ass_op<double, BlockSideLength, false, false, typename matrix_operations<double, BlockSideLength>::subtraction>
 {
@@ -261,7 +261,7 @@ struct low_level_matrix_binary_ass_op<double, BlockSideLength, false, false, typ
         }
     }
 };
-//! \brief c += a; for double entries
+//! c += a; for double entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_ass_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
 {
@@ -275,7 +275,7 @@ struct low_level_matrix_unary_ass_op<double, BlockSideLength, false, typename ma
             daxpy_(&size, &one, a, &int_one, c, &int_one);
     }
 };
-//! \brief c -= a; for double entries
+//! c -= a; for double entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_ass_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::subtraction>
 {
@@ -289,7 +289,7 @@ struct low_level_matrix_unary_ass_op<double, BlockSideLength, false, typename ma
             daxpy_(&size, &minusone, a, &int_one, c, &int_one);
     }
 };
-//! \brief c = a; for double entries
+//! c = a; for double entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix_operations<double, BlockSideLength>::addition>
 {
@@ -302,7 +302,7 @@ struct low_level_matrix_unary_op<double, BlockSideLength, false, typename matrix
     }
 };
 
-//! \brief c = a + b; for float entries
+//! c = a + b; for float entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_binary_ass_op<float, BlockSideLength, false, false, typename matrix_operations<float, BlockSideLength>::addition>
 {
@@ -327,7 +327,7 @@ struct low_level_matrix_binary_ass_op<float, BlockSideLength, false, false, type
         }
     }
 };
-//! \brief c = a - b; for float entries
+//! c = a - b; for float entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_binary_ass_op<float, BlockSideLength, false, false, typename matrix_operations<float, BlockSideLength>::subtraction>
 {
@@ -353,7 +353,7 @@ struct low_level_matrix_binary_ass_op<float, BlockSideLength, false, false, type
         }
     }
 };
-//! \brief c += a; for float entries
+//! c += a; for float entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_ass_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
 {
@@ -367,7 +367,7 @@ struct low_level_matrix_unary_ass_op<float, BlockSideLength, false, typename mat
             saxpy_(&size, &one, a, &int_one, c, &int_one);
     }
 };
-//! \brief c -= a; for float entries
+//! c -= a; for float entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_ass_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::subtraction>
 {
@@ -381,7 +381,7 @@ struct low_level_matrix_unary_ass_op<float, BlockSideLength, false, typename mat
             saxpy_(&size, &minusone, a, &int_one, c, &int_one);
     }
 };
-//! \brief c = a; for float entries
+//! c = a; for float entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_operations<float, BlockSideLength>::addition>
 {
@@ -394,7 +394,7 @@ struct low_level_matrix_unary_op<float, BlockSideLength, false, typename matrix_
     }
 };
 
-//! \brief c = a + b; for blas_double_complex entries
+//! c = a + b; for blas_double_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_binary_ass_op<blas_double_complex, BlockSideLength, false, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
 {
@@ -419,7 +419,7 @@ struct low_level_matrix_binary_ass_op<blas_double_complex, BlockSideLength, fals
         }
     }
 };
-//! \brief c = a - b; for blas_double_complex entries
+//! c = a - b; for blas_double_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_binary_ass_op<blas_double_complex, BlockSideLength, false, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
 {
@@ -445,7 +445,7 @@ struct low_level_matrix_binary_ass_op<blas_double_complex, BlockSideLength, fals
         }
     }
 };
-//! \brief c += a; for blas_double_complex entries
+//! c += a; for blas_double_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_ass_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
 {
@@ -459,7 +459,7 @@ struct low_level_matrix_unary_ass_op<blas_double_complex, BlockSideLength, false
             zaxpy_(&size, &one, a, &int_one, c, &int_one);
     }
 };
-//! \brief c -= a; for blas_double_complex entries
+//! c -= a; for blas_double_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_ass_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::subtraction>
 {
@@ -473,7 +473,7 @@ struct low_level_matrix_unary_ass_op<blas_double_complex, BlockSideLength, false
             zaxpy_(&size, &minusone, a, &int_one, c, &int_one);
     }
 };
-//! \brief c = a; for blas_double_complex entries
+//! c = a; for blas_double_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, typename matrix_operations<blas_double_complex, BlockSideLength>::addition>
 {
@@ -486,7 +486,7 @@ struct low_level_matrix_unary_op<blas_double_complex, BlockSideLength, false, ty
     }
 };
 
-//! \brief c = a + b; for blas_single_complex entries
+//! c = a + b; for blas_single_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_binary_ass_op<blas_single_complex, BlockSideLength, false, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
 {
@@ -511,7 +511,7 @@ struct low_level_matrix_binary_ass_op<blas_single_complex, BlockSideLength, fals
         }
     }
 };
-//! \brief c = a - b; for blas_single_complex entries
+//! c = a - b; for blas_single_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_binary_ass_op<blas_single_complex, BlockSideLength, false, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
 {
@@ -537,7 +537,7 @@ struct low_level_matrix_binary_ass_op<blas_single_complex, BlockSideLength, fals
         }
     }
 };
-//! \brief c += a; for blas_single_complex entries
+//! c += a; for blas_single_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_ass_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
 {
@@ -551,7 +551,7 @@ struct low_level_matrix_unary_ass_op<blas_single_complex, BlockSideLength, false
             caxpy_(&size, &one, a, &int_one, c, &int_one);
     }
 };
-//! \brief c -= a; for blas_single_complex entries
+//! c -= a; for blas_single_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_ass_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::subtraction>
 {
@@ -565,7 +565,7 @@ struct low_level_matrix_unary_ass_op<blas_single_complex, BlockSideLength, false
             caxpy_(&size, &minusone, a, &int_one, c, &int_one);
     }
 };
-//! \brief c = a; for blas_single_complex entries
+//! c = a; for blas_single_complex entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_unary_op<blas_single_complex, BlockSideLength, false, typename matrix_operations<blas_single_complex, BlockSideLength>::addition>
 {
@@ -611,7 +611,7 @@ void gemm_(const char *transa, const char *transb,
         const ValueType *b, const blas_int *ldb,
         const ValueType *beta, ValueType *c, const blas_int *ldc);
 
-//! \brief calculates c = alpha * a * b + beta * c
+//! calculates c = alpha * a * b + beta * c
 //! \tparam ValueType type of elements
 //! \param n height of a and c
 //! \param l width of a and height of b
@@ -670,7 +670,7 @@ void gemm_(const char *transa, const char *transb,
         const blas_single_complex *beta, blas_single_complex *c, const blas_int *ldc)
 { cgemm_(transa, transb, m, n, k, alpha, a, lda, b, ldb, beta, c, ldc); }
 
-//! \brief multiplies matrices A and B, adds result to C, for double entries
+//! multiplies matrices A and B, adds result to C, for double entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_multiply_and_add<double, BlockSideLength>
 {
@@ -685,7 +685,7 @@ struct low_level_matrix_multiply_and_add<double, BlockSideLength>
     }
 };
 
-//! \brief multiplies matrices A and B, adds result to C, for float entries
+//! multiplies matrices A and B, adds result to C, for float entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_multiply_and_add<float, BlockSideLength>
 {
@@ -700,7 +700,7 @@ struct low_level_matrix_multiply_and_add<float, BlockSideLength>
     }
 };
 
-//! \brief multiplies matrices A and B, adds result to C, for complex<float> entries
+//! multiplies matrices A and B, adds result to C, for complex<float> entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_multiply_and_add<blas_single_complex, BlockSideLength>
 {
@@ -715,7 +715,7 @@ struct low_level_matrix_multiply_and_add<blas_single_complex, BlockSideLength>
     }
 };
 
-//! \brief multiplies matrices A and B, adds result to C, for complex<double> entries
+//! multiplies matrices A and B, adds result to C, for complex<double> entries
 template <unsigned BlockSideLength>
 struct low_level_matrix_multiply_and_add<blas_double_complex, BlockSideLength>
 {

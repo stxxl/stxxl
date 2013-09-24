@@ -35,8 +35,8 @@ namespace btree
 //! \addtogroup stlcont
 //! \{
 
-//! \brief External associative container.
-
+//! External associative container.
+//!
 //! \tparam KeyType key type (POD with no references to internal memory)
 //! \tparam DataType data type (POD with no references to internal memory)
 //! \tparam CompareType comparison type used to determine
@@ -142,7 +142,7 @@ public:
     key_compare key_comp() const { return Impl.key_comp(); }
     value_compare value_comp() const { return Impl.value_comp(); }
 
-    //! \brief A constructor
+    //! A constructor
     //! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
     //! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
     map(unsigned_type node_cache_size_in_bytes,
@@ -150,7 +150,7 @@ public:
         ) : Impl(node_cache_size_in_bytes, leaf_cache_size_in_bytes)
     { }
 
-    //! \brief A constructor
+    //! A constructor
     //! \param c_ comparator object
     //! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
     //! \param leaf_cache_size_in_bytes size of leaf cache in bytes (btree implementation)
@@ -160,7 +160,7 @@ public:
         ) : Impl(c_, node_cache_size_in_bytes, leaf_cache_size_in_bytes)
     { }
 
-    //! \brief Constructs a map from a given input range
+    //! Constructs a map from a given input range
     //! \param b beginning of the range
     //! \param e end of the range
     //! \param node_cache_size_in_bytes size of node cache in bytes (btree implementation)
@@ -181,7 +181,7 @@ public:
                  range_sorted, node_fill_factor, leaf_fill_factor)
     { }
 
-    //! \brief Constructs a map from a given input range
+    //! Constructs a map from a given input range
     //! \param b beginning of the range
     //! \param e end of the range
     //! \param c_ comparator object
@@ -275,31 +275,31 @@ public:
         return Impl[k];
     }
 
-    //! \brief Enables leaf prefetching during scanning
+    //! Enables leaf prefetching during scanning
     void enable_prefetching()
     {
         Impl.enable_prefetching();
     }
 
-    //! \brief Disables leaf prefetching during scanning
+    //! Disables leaf prefetching during scanning
     void disable_prefetching()
     {
         Impl.disable_prefetching();
     }
 
-    //! \brief Returns the status of leaf prefetching during scanning
+    //! Returns the status of leaf prefetching during scanning
     bool prefetching_enabled()
     {
         return Impl.prefetching_enabled();
     }
 
-    //! \brief Prints cache statistics
+    //! Prints cache statistics
     void print_statistics(std::ostream & o) const
     {
         Impl.print_statistics(o);
     }
 
-    //! \brief Resets cache statistics
+    //! Resets cache statistics
     void reset_statistics()
     {
         Impl.reset_statistics();

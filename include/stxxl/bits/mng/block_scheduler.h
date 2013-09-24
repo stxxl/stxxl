@@ -23,7 +23,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief Virtualization of a block of data.
+//! Virtualization of a block of data.
 //! Holds information for allocating and swapping. To use in cooperation with block_scheduler.
 //!
 //! A swappable_block can be uninitialized, i.e. it holds no data.
@@ -59,41 +59,41 @@ protected:
     }
 
 public:
-    //! \brief Create in uninitialized state.
+    //! Create in uninitialized state.
     swappable_block()
         : external_data() /*!valid*/, internal_data(0), dirty(false), reference_count(0) {}
 
     ~swappable_block() {}
 
-    //! \brief If it has an internal_block. The internal_block implicitly holds valid data.
+    //! If it has an internal_block. The internal_block implicitly holds valid data.
     bool is_internal() const
     { return internal_data; }
 
-    //! \brief If the external_block does not hold valid data.
+    //! If the external_block does not hold valid data.
     bool is_dirty() const
     { return dirty; }
 
-    //! \brief If it has an external_block.
+    //! If it has an external_block.
     bool has_external_block() const
     { return external_data.valid(); }
 
-    //! \brief If it has an external_block that holds valid data.
+    //! If it has an external_block that holds valid data.
     bool is_external() const
     { return has_external_block() && ! is_dirty(); }
 
-    //! \brief If it is acquired.
+    //! If it is acquired.
     bool is_acquired() const
     { return reference_count > 0; }
 
-    //! \brief If it holds an internal_block but does not need it.
+    //! If it holds an internal_block but does not need it.
     bool is_evictable() const
     { return ! is_acquired() && is_internal(); }
 
-    //! \brief If it has some valid data (in- or external).
+    //! If it has some valid data (in- or external).
     bool is_initialized() const
     { return is_internal() || is_external(); }
 
-    //! \brief Invalidate external data if true.
+    //! Invalidate external data if true.
     //! \return is_dirty()
     bool make_dirty_if(const bool make_dirty)
     {
@@ -101,7 +101,7 @@ public:
         return dirty = make_dirty || dirty;
     }
 
-    //! \brief Acquire the block, i.e. add a reference. Has to be internal.
+    //! Acquire the block, i.e. add a reference. Has to be internal.
     //! \return A reference to the data-block.
     internal_block_type & acquire()
     {
@@ -110,31 +110,31 @@ public:
         return * internal_data;
     }
 
-    //! \brief Release the block, i.e. subduct a reference. Has to be acquired.
+    //! Release the block, i.e. subduct a reference. Has to be acquired.
     void release()
     {
         assert(is_acquired());
         -- reference_count;
     }
 
-    //! \brief Get a reference to the data-block. Has to be acquired.
+    //! Get a reference to the data-block. Has to be acquired.
     const internal_block_type & get_internal_block() const
     {
         assert(is_acquired());
         return * internal_data;
     }
 
-    //! \brief Get a reference to the data-block. Has to be acquired.
+    //! Get a reference to the data-block. Has to be acquired.
     internal_block_type & get_internal_block()
     {
         assert(is_acquired());
         return * internal_data;
     }
 
-    //! \brief Fill block with default data, is supposed to be overwritten by subclass. Has to be internal.
+    //! Fill block with default data, is supposed to be overwritten by subclass. Has to be internal.
     void fill_default() {}
 
-    //! \brief Read asyncronusly from external_block to internal_block. Has to be internal and have an external_block.
+    //! Read asyncronusly from external_block to internal_block. Has to be internal and have an external_block.
     //! \return A request pointer to the I/O.
     request_ptr read_async(completion_handler on_cmpl = default_completion_handler())
     {
@@ -147,11 +147,11 @@ public:
         return internal_data->read(external_data, on_cmpl);
     }
 
-    //! \brief Read synchronously from external_block to internal_block. Has to be internal and have an external_block.
+    //! Read synchronously from external_block to internal_block. Has to be internal and have an external_block.
     void read_sync()
     { read_async()->wait(); }
 
-    //! \brief Write asyncronusly from internal_block to external_block if necessary.
+    //! Write asyncronusly from internal_block to external_block if necessary.
     //! \return A request pointer to the I/O, an invalid request pointer if not necessary.
     request_ptr clean_async(completion_handler on_cmpl = default_completion_handler())
     {
@@ -166,7 +166,7 @@ public:
         return internal_data->write(external_data, on_cmpl);
     }
 
-    //! \brief Write synchronously from internal_block to external_block if necessary.
+    //! Write synchronously from internal_block to external_block if necessary.
     void clean_sync()
     {
         request_ptr rp = clean_async();
@@ -174,14 +174,14 @@ public:
             rp->wait();
     }
 
-    //! \brief Attach an internal_block, making the block internal. Has to be not internal.
+    //! Attach an internal_block, making the block internal. Has to be not internal.
     void attach_internal_block(internal_block_type * iblock)
     {
         assert(! is_internal());
         internal_data = iblock;
     }
 
-    //! \brief Detach the internal_block. Writes to external_block if necessary. Has to be evictable.
+    //! Detach the internal_block. Writes to external_block if necessary. Has to be evictable.
     //! \return A pointer to the internal_block.
     internal_block_type * detach_internal_block()
     {
@@ -192,7 +192,7 @@ public:
         return iblock;
     }
 
-    //! \brief Bring the block in uninitialized state, freeing external and internal memory.
+    //! Bring the block in uninitialized state, freeing external and internal memory.
     //! Returns a pointer to the internal_block, NULL if it had none.
     //! \return A pointer to the freed internal_block, NULL if it had none.
     internal_block_type * deinitialize()
@@ -208,7 +208,7 @@ public:
         return iblock;
     }
 
-    //! \brief Set the external_block that holds the swappable_block's data. The block gets initialized with it.
+    //! Set the external_block that holds the swappable_block's data. The block gets initialized with it.
     //! \param eblock The external_block holding initial data.
     void initialize(external_block_type eblock)
     {
@@ -216,7 +216,7 @@ public:
         external_data = eblock;
     }
 
-    //! \brief Extract the swappable_blocks data in an external_block. The block gets uninitialized.
+    //! Extract the swappable_blocks data in an external_block. The block gets uninitialized.
     //! \return The external_block that holds the swappable_block's data.
     external_block_type extract_external_block()
     {
@@ -233,7 +233,7 @@ unsigned_type swappable_block<ValueType, BlockSize>::disk_allocation_offset = 0;
 template <class SwappableBlockType> class block_scheduler_algorithm;
 template <class SwappableBlockType> class block_scheduler_algorithm_online_lru;
 
-//! \brief Schedules swapping of blocks and provides blocks for temporary storage.
+//! Schedules swapping of blocks and provides blocks for temporary storage.
 //!
 //! In simple mode, it tries to save I/Os through caching only.
 //! In simulation mode, it records access patterns into a prediction sequence.
@@ -299,19 +299,19 @@ protected:
 
     const int_type max_internal_blocks;
     int_type remaining_internal_blocks;
-    //! \brief Stores pointers to arrays of internal_blocks. Used to deallocate them only.
+    //! Stores pointers to arrays of internal_blocks. Used to deallocate them only.
     std::stack<internal_block_type *> internal_blocks_blocks;
-    //! \brief holds free internal_blocks with attributes reset
+    //! holds free internal_blocks with attributes reset.
     std::stack<internal_block_type * > free_internal_blocks;
-    //! \brief temporary blocks that will not be needed after algorithm termination
+    //! temporary blocks that will not be needed after algorithm termination.
     mutable std::vector<SwappableBlockType> swappable_blocks;
-    //! \brief holds indices of free swappable_blocks with attributes reset
+    //! holds indices of free swappable_blocks with attributes reset.
     std::priority_queue<swappable_block_identifier_type, std::vector<swappable_block_identifier_type>,
             std::greater<swappable_block_identifier_type> > free_swappable_blocks;
     block_manager * bm;
     block_scheduler_algorithm<SwappableBlockType> * algo;
 
-    //! \brief Get an internal_block from the freelist or a newly allocated one if available.
+    //! Get an internal_block from the freelist or a newly allocated one if available.
     //! \return Pointer to the internal_block. NULL if none available.
     internal_block_type * get_free_internal_block()
     {
@@ -340,12 +340,12 @@ protected:
         }
     }
 
-    //! \brief Return an internal_block to the freelist.
+    //! Return an internal_block to the freelist.
     void return_free_internal_block(internal_block_type * iblock)
     { free_internal_blocks.push(iblock); }
 
 public:
-    //! \brief create a block_scheduler with empty prediction sequence in simple mode.
+    //! Create a block_scheduler with empty prediction sequence in simple mode.
     //! \param max_internal_memory Amount of internal memory (in bytes) the scheduler is allowed to use for acquiring, prefetching and caching.
     explicit block_scheduler(const int_type max_internal_memory)
         : max_internal_blocks(div_ceil(max_internal_memory, sizeof(internal_block_type))),
@@ -377,25 +377,25 @@ public:
         }
     }
 
-    //! \brief Acquire the given block.
+    //! Acquire the given block.
     //! Has to be in pairs with release. Pairs may be nested and interleaved.
     //! \return Reference to the block's data.
     //! param sbid Swappable block to acquire.
     internal_block_type & acquire(const swappable_block_identifier_type sbid, const bool uninitialized = false)
     { return algo->acquire(sbid, uninitialized); }
 
-    //! \brief Release the given block.
+    //! Release the given block.
     //! Has to be in pairs with acquire. Pairs may be nested and interleaved.
     //! \param sbid Swappable block to release.
     //! \param dirty If the data has been changed, invalidating possible data in external storage.
     void release(const swappable_block_identifier_type sbid, const bool dirty)
     { algo->release(sbid, dirty); }
 
-    //! \brief Drop all data in the given block, freeing in- and external memory.
+    //! Drop all data in the given block, freeing in- and external memory.
     void deinitialize(const swappable_block_identifier_type sbid)
     { algo->deinitialize(sbid); }
 
-    //! \brief Initialize the swappable_block with the given external_block.
+    //! Initialize the swappable_block with the given external_block.
     //!
     //! It will use the the external_block for swapping and take care about it's deallocation. Has to be uninitialized.
     //! \param sbid identifier to the swappable_block
@@ -403,30 +403,30 @@ public:
     void initialize(const swappable_block_identifier_type sbid, external_block_type eblock)
     { algo->initialize(sbid, eblock); }
 
-    //! \brief deinitialize the swappable_block and return it's contents in an external_block.
+    //! Deinitialize the swappable_block and return it's contents in an external_block.
     //!
     //! \param sbid identifier to the swappable_block
     //! \return external_block a.k.a. bid
     external_block_type extract_external_block(const swappable_block_identifier_type sbid)
     { return algo->extract_external_block(sbid); }
 
-    //! \brief check if the swappable_block is initialized
+    //! check if the swappable_block is initialized.
     //! \param sbid identifier to the swappable_block
     //! \return if the swappable_block is initialized
     bool is_initialized(const swappable_block_identifier_type sbid) const
     { return algo->is_initialized(sbid); }
 
-    //! \brief Record a timestep in the prediction sequence to seperate consecutive acquire rsp. release-operations.
+    //! Record a timestep in the prediction sequence to seperate consecutive acquire rsp. release-operations.
     //! Has an effect only in simulation mode.
     void explicit_timestep()
     { algo->explicit_timestep(); }
 
-    //! \brief Get a const reference to given block's data. Block has to be already acquired.
+    //! Get a const reference to given block's data. Block has to be already acquired.
     //! \param sbid Swappable block to access.
     internal_block_type & get_internal_block(const swappable_block_identifier_type sbid) const
     { return swappable_blocks[sbid].get_internal_block(); }
 
-    //! \brief Allocate an uninitialized swappable_block.
+    //! Allocate an uninitialized swappable_block.
     //! \return An identifier of the block.
     swappable_block_identifier_type allocate_swappable_block()
     {
@@ -447,7 +447,7 @@ public:
         return sbid;
     }
 
-    //! \brief Free given no longer used temporary swappable_block.
+    //! Free given no longer used temporary swappable_block.
     //! \param sbid Temporary swappable_block to free.
     void free_swappable_block(const swappable_block_identifier_type sbid)
     {
@@ -455,12 +455,12 @@ public:
         free_swappable_blocks.push(sbid);
     }
 
-    //! \brief Returns if simulation mode is on, i.e. if a prediction sequence is being recorded.
+    //! Returns if simulation mode is on, i.e. if a prediction sequence is being recorded.
     //! \return If simulation mode is on.
     bool is_simulating() const
     { return algo->is_simulating(); }
 
-    //! \brief Switch the used algorithm, e.g. to simulation etc..
+    //! Switch the used algorithm, e.g. to simulation etc..
     //! \param new_algo Pointer to the new algorithm object. Has to be instantiated to the block scheduler (or the old algorithm object).
     //! \return Pointer to the old algorithm object.
     block_scheduler_algorithm<SwappableBlockType> * switch_algorithm_to(block_scheduler_algorithm<SwappableBlockType> * new_algo)
@@ -471,13 +471,13 @@ public:
         return old_algo;
     }
 
-    //! \brief return the current algorithm
+    //! Return the current algorithm.
     block_scheduler_algorithm<SwappableBlockType> * get_current_algorithm() const
     {
         return algo;
     }
 
-    //! \brief get the prediction_sequence
+    //! Get the prediction_sequence.
     //! \return reference to the prediction_sequence
     const prediction_sequence_type & get_prediction_sequence() const
     { return algo->get_prediction_sequence(); }
@@ -502,7 +502,7 @@ public:
 template <class SwappableBlockType>
 const int_type block_scheduler<SwappableBlockType>::max_internal_blocks_alloc_at_once = 128;
 
-//! \brief Interface of a block scheduling algorithm.
+//! Interface of a block scheduling algorithm.
 template <class SwappableBlockType>
 class block_scheduler_algorithm : private noncopyable
 {
@@ -523,12 +523,12 @@ protected:
     block_scheduler_algorithm * get_algorithm_from_block_scheduler()
     { return bs.algo; }
 
-    //! \brief Get an internal_block from the block_scheduler.
+    //! Get an internal_block from the block_scheduler.
     //! \return Pointer to the internal_block. NULL if none available.
     internal_block_type * get_free_internal_block_from_block_scheduler()
     { return bs.get_free_internal_block(); }
 
-    //! \brief Return an internal_block to the block_scheduler.
+    //! Return an internal_block to the block_scheduler.
     void return_free_internal_block_to_block_scheduler(internal_block_type * iblock)
     { bs.return_free_internal_block(iblock); }
 
@@ -565,7 +565,7 @@ public:
         { return prediction_sequence; }
 };
 
-//! \brief Block scheduling algorithm caching via the least recently used policy (online).
+//! Block scheduling algorithm caching via the least recently used policy (online).
 template <class SwappableBlockType>
 class block_scheduler_algorithm_online_lru : public block_scheduler_algorithm<SwappableBlockType>
 {
@@ -582,7 +582,7 @@ protected:
     using block_scheduler_algorithm_type::get_free_internal_block_from_block_scheduler;
     using block_scheduler_algorithm_type::return_free_internal_block_to_block_scheduler;
 
-    //! \brief Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
+    //! Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
     addressable_fifo_queue<swappable_block_identifier_type> evictable_blocks;
 
     internal_block_type * get_free_internal_block()
@@ -712,7 +712,7 @@ public:
     }
 };
 
-//! \brief Pseudo block scheduling algorithm only recording the request sequence.
+//! Pseudo block scheduling algorithm only recording the request sequence.
 template <class SwappableBlockType>
 class block_scheduler_algorithm_simulation : public block_scheduler_algorithm<SwappableBlockType>
 {
@@ -732,7 +732,7 @@ protected:
     using block_scheduler_algorithm_type::get_free_internal_block_from_block_scheduler;
     using block_scheduler_algorithm_type::return_free_internal_block_to_block_scheduler;
 
-    //! \brief Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
+    //! Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
     std::stack<swappable_block_identifier_type> evictable_blocks;
     time_type time_count;
     bool last_op_release;
@@ -854,7 +854,7 @@ public:
     { return true; }
 };
 
-//! \brief Block scheduling algorithm caching via the longest forward distance policy (offline).
+//! Block scheduling algorithm caching via the longest forward distance policy (offline).
 template <class SwappableBlockType>
 class block_scheduler_algorithm_offline_lfd : public block_scheduler_algorithm<SwappableBlockType>
 {
@@ -904,14 +904,16 @@ protected:
         { return p > right.p; }
     };
 
-    //! \brief Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
+    //! Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
     addressable_priority_queue<swappable_block_identifier_type, priority> evictable_blocks;
-    /*! \brief stores for the sequence of releases extracted from the prediction_sequence:
-            (true, timestamp of the blocks next acquire) if it is acquired next
-            (false, 0) if it is deinitialized next
-            (false, 1) if it is not accessed any more
-            (false, 2) if it is extracted next
-            (false, 3) if it is initialized next */
+    /*!
+     * Stores for the sequence of releases extracted from the prediction_sequence:
+     * (true, timestamp of the blocks next acquire) if it is acquired next
+     * (false, 0) if it is deinitialized next
+     * (false, 1) if it is not accessed any more
+     * (false, 2) if it is extracted next
+     * (false, 3) if it is initialized next
+     */
     std::deque< std::pair<bool, time_type> > next_use;
 
     internal_block_type * get_free_internal_block()
@@ -1091,8 +1093,8 @@ public:
     }
 };
 
-//! \brief Block scheduling algorithm caching via the least recently used policy (offline),
-//! and prefetching in addition.
+//! Block scheduling algorithm caching via the least recently used policy
+//! (offline), and prefetching in addition.
 template <class SwappableBlockType>
 class block_scheduler_algorithm_offline_lru_prefetching : public block_scheduler_algorithm<SwappableBlockType>
 {
@@ -1166,16 +1168,18 @@ protected:
         { operations.push_front(op); }
     };
 
-    //! \brief Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
+    //! Holds swappable blocks, whose internal block can be freed, i.e. that are internal but unacquired.
     std::set<swappable_block_identifier_type> free_evictable_blocks;
     std::set<swappable_block_identifier_type> scheduled_evictable_blocks;
-    //! \brief Holds not internal swappable_blocks, whose next access has already been scheduled.
+
+    //! Holds not internal swappable_blocks, whose next access has already been scheduled.
     scheduled_blocks_type scheduled_blocks;
-    //! \brief Holds swappable_blocks, whose internal block has been taken away but the clean did not finish yet.
+
+    //! Holds swappable_blocks, whose internal block has been taken away but the clean did not finish yet.
     write_scheduled_blocks_type write_scheduled_blocks;
     typename prediction_sequence_type::iterator next_op_to_schedule;
 
-    //! \brief Schedule an internal, possibly dirty swappable_block to write.
+    //! Schedule an internal, possibly dirty swappable_block to write.
     //!
     //! The block becomes not dirty. if it was dirty, an entry in write_scheduled_blocks is made referencing the write_read_request.
     //! \param sbid block to write
@@ -1198,7 +1202,7 @@ protected:
         }
     }
 
-    //! \brief try to interrupt a read scheduled in a write_read_request
+    //! Try to interrupt a read scheduled in a write_read_request.
     //!
     //! side-effect: possibly erases entry from write_scheduled_blocks, so the iterator writing_block may become invalid
     //! \return if successful
@@ -1222,7 +1226,7 @@ protected:
             return true;
     }
 
-    //! \brief Schedule an internal and external block to read.
+    //! Schedule an internal and external block to read.
     //!
     //! If the giver is still writing, schedule read via its write_read_request.
     void schedule_read(scheduled_blocks_iterator block_to_read)
@@ -1332,7 +1336,7 @@ protected:
         block_to_read->second.read_req = swappable_blocks[block_to_read->first].read_async();
     }
 
-    //! \brief wait for the write to finish
+    //! Wait for the write to finish.
     //!
     //! side-effect: erases entry from write_scheduled_blocks
     void wait_on_write(const write_scheduled_blocks_iterator & writing_block)
@@ -1342,7 +1346,7 @@ protected:
         write_scheduled_blocks.erase(writing_block);
     }
 
-    //! \brief wait for the write to finish
+    //! Wait for the write to finish.
     //!
     //! side-effect: erases entry from write_scheduled_blocks
     void wait_on_write(const swappable_block_identifier_type & writing_block)
@@ -1352,7 +1356,7 @@ protected:
             wait_on_write(it);
     }
 
-    //! \brief wait for the write of the giver to finish
+    //! Wait for the write of the giver to finish.
     //!
     //! side-effect: erases entry from write_scheduled_blocks
     void wait_on_write(const scheduled_blocks_iterator & schedule_meta)
@@ -1364,7 +1368,7 @@ protected:
         }
     }
 
-    //! \brief wait for the read to finish
+    //! Wait for the read to finish.
     //!
     //! side-effect: erases entry for the write of the giver from write_scheduled_blocks
     void wait_on_read(const scheduled_blocks_iterator & schedule_meta)
@@ -1377,7 +1381,7 @@ protected:
         }
     }
 
-    //! \brief wait for the write of the giver to finish and return reserved internal_block
+    //! Wait for the write of the giver to finish and return reserved internal_block.
     //!
     //! side-effect: erases entry for the write of the giver from write_scheduled_blocks
     internal_block_type * get_ready_block(const scheduled_blocks_iterator & schedule_meta)

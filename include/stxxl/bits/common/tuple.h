@@ -55,7 +55,7 @@ struct tuple_base
 };
 
 
-//! \brief k-Tuple data type
+//! k-Tuple data type
 //!
 //! (defined for k < 7)
 template <class T1,
@@ -87,17 +87,17 @@ struct tuple
                                                                       > > > > > > > >::result result;
     };
 
-    //! \brief First tuple component
+    //! First tuple component
     first_type first;
-    //! \brief Second tuple component
+    //! Second tuple component
     second_type second;
-    //! \brief Third tuple component
+    //! Third tuple component
     third_type third;
-    //! \brief Fourth tuple component
+    //! Fourth tuple component
     fourth_type fourth;
-    //! \brief Fifth tuple component
+    //! Fifth tuple component
     fifth_type fifth;
-    //! \brief Sixth tuple component
+    //! Sixth tuple component
     sixth_type sixth;
 
     tuple() { }
@@ -117,7 +117,7 @@ struct tuple
     { }
 };
 
-//! \brief Partial specialization for 1- \c tuple
+//! Partial specialization for 1- \c tuple
 template <class T1>
 struct tuple<T1, Plug, Plug, Plug, Plug>
 {
@@ -137,7 +137,7 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     { }
 };
 
-//! \brief Partial specialization for 2- \c tuple (equivalent to std::pair)
+//! Partial specialization for 2- \c tuple (equivalent to std::pair)
 template <class T1, class T2>
 struct tuple<T1, T2, Plug, Plug, Plug, Plug>
 {
@@ -166,7 +166,7 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
 };
 
 
-//! \brief Partial specialization for 3- \c tuple (triple)
+//! Partial specialization for 3- \c tuple (triple)
 template <class T1,
           class T2,
           class T3
@@ -203,7 +203,7 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
     { }
 };
 
-//! \brief Partial specialization for 4- \c tuple
+//! Partial specialization for 4- \c tuple
 template <class T1,
           class T2,
           class T3,
@@ -246,7 +246,7 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     { }
 };
 
-//! \brief Partial specialization for 5- \c tuple
+//! Partial specialization for 5- \c tuple
 template <class T1,
           class T2,
           class T3,

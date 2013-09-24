@@ -21,7 +21,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief An internal fifo queue that allows removing elements addressed with (a copy of) themselves.
+//! An internal fifo queue that allows removing elements addressed with (a copy of) themselves.
 //! \tparam KeyType Type of contained elements.
 template <typename KeyType>
 class addressable_fifo_queue
@@ -35,19 +35,19 @@ class addressable_fifo_queue
     meta_t meta;
 
 public:
-    //! \brief Type of handle to an entry. For use with insert and remove.
+    //! Type of handle to an entry. For use with insert and remove.
     typedef meta_iter_t handle;
 
-    //! \brief Create an empty queue.
+    //! Create an empty queue.
     addressable_fifo_queue() {}
     ~addressable_fifo_queue() {}
 
-    //! \brief Check if queue is empty.
+    //! Check if queue is empty.
     //! \return If queue is empty.
     bool empty() const
     { return vals.empty(); }
 
-    //! \brief Insert new element. If the element is already in, it is moved to the back.
+    //! Insert new element. If the element is already in, it is moved to the back.
     //! \param e Element to insert.
     //! \return pair<handle, bool> Iterator to element; if element was newly inserted.
     std::pair<handle, bool> insert(const KeyType & e)
@@ -63,7 +63,7 @@ public:
         return r;
     }
 
-    //! \brief Erase element from the queue.
+    //! Erase element from the queue.
     //! \param e Element to remove.
     //! \return If element was in.
     bool erase(const KeyType & e)
@@ -76,7 +76,7 @@ public:
         return true;
     }
 
-    //! \brief Erase element from the queue.
+    //! Erase element from the queue.
     //! \param i Iterator to element to remove.
     void erase(handle i)
     {
@@ -84,12 +84,12 @@ public:
         meta.erase(i);
     }
 
-    //! \brief Access top element in the queue.
+    //! Access top element in the queue.
     //! \return Const reference to top element.
     const KeyType & top() const
     { return vals.front(); }
 
-    //! \brief Remove top element from the queue.
+    //! Remove top element from the queue.
     //! \return Top element.
     KeyType pop()
     {
@@ -101,7 +101,7 @@ public:
     }
 };
 
-//! \brief An internal priority queue that allows removing elements addressed with (a copy of) themselves.
+//! An internal priority queue that allows removing elements addressed with (a copy of) themselves.
 //! \tparam KeyType Type of contained elements.
 //! \tparam PriorityType Type of Priority.
 template < typename KeyType, typename PriorityType, class Cmp = std::less<PriorityType> >
@@ -127,19 +127,19 @@ class addressable_priority_queue
     meta_t meta;
 
 public:
-    //! \brief Type of handle to an entry. For use with insert and remove.
+    //! Type of handle to an entry. For use with insert and remove.
     typedef meta_iter_t handle;
 
-    //! \brief Create an empty queue.
+    //! Create an empty queue.
     addressable_priority_queue() {}
     ~addressable_priority_queue() {}
 
-    //! \brief Check if queue is empty.
+    //! Check if queue is empty.
     //! \return If queue is empty.
     bool empty() const
     { return vals.empty(); }
 
-    //! \brief Insert new element. If the element is already in, it's priority is updated.
+    //! Insert new element. If the element is already in, it's priority is updated.
     //! \param e Element to insert.
     //! \param o Priority of element.
     //! \return pair<handle, bool> Iterator to element; if element was newly inserted.
@@ -156,7 +156,7 @@ public:
         return r;
     }
 
-    //! \brief Erase element from the queue.
+    //! Erase element from the queue.
     //! \param e Element to remove.
     //! \return If element was in.
     bool erase(const KeyType & e)
@@ -169,7 +169,7 @@ public:
         return true;
     }
 
-    //! \brief Erase element from the queue.
+    //! Erase element from the queue.
     //! \param i Iterator to element to remove.
     void erase(handle i)
     {
@@ -177,12 +177,12 @@ public:
         meta.erase(i);
     }
 
-    //! \brief Access top (= min) element in the queue.
+    //! Access top (= min) element in the queue.
     //! \return Const reference to top element.
     const KeyType & top() const
     { return vals.begin()->second; }
 
-    //! \brief Remove top (= min) element from the queue.
+    //! Remove top (= min) element from the queue.
     //! \return Top element.
     KeyType pop()
     {

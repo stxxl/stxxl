@@ -24,7 +24,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Request with completion state.
+//! Request with completion state.
 class request_with_state : public request, public request_with_waiters
 {
 protected:

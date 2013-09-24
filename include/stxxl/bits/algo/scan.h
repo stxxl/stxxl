@@ -24,7 +24,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup stlalgo
 //! \{
 
-//! \brief External equivalent of std::for_each
+//! External equivalent of std::for_each
 //! \remark The implementation exploits \c \<stxxl\> buffered streams (computation and I/O overlapped)
 //! \param _begin object of model of \c ext_random_access_iterator concept
 //! \param _end object of model of \c ext_random_access_iterator concept
@@ -78,7 +78,7 @@ _UnaryFunction for_each(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction _
 }
 
 
-//! \brief External equivalent of std::for_each (mutating)
+//! External equivalent of std::for_each (mutating)
 //! \remark The implementation exploits \c \<stxxl\> buffered streams (computation and I/O overlapped)
 //! \param _begin object of model of \c ext_random_access_iterator concept
 //! \param _end object of model of \c ext_random_access_iterator concept
@@ -140,7 +140,7 @@ _UnaryFunction for_each_m(_ExtIterator _begin, _ExtIterator _end, _UnaryFunction
 }
 
 
-//! \brief External equivalent of std::generate
+//! External equivalent of std::generate
 //! \remark The implementation exploits \c \<stxxl\> buffered streams (computation and I/O overlapped)
 //! \param _begin object of model of \c ext_random_access_iterator concept
 //! \param _end object of model of \c ext_random_access_iterator concept
@@ -203,7 +203,7 @@ void generate(_ExtIterator _begin, _ExtIterator _end, _Generator _generator, int
     _begin.flush();
 }
 
-//! \brief External equivalent of std::find
+//! External equivalent of std::find
 //! \remark The implementation exploits \c \<stxxl\> buffered streams (computation and I/O overlapped)
 //! \param _begin object of model of \c ext_random_access_iterator concept
 //! \param _end object of model of \c ext_random_access_iterator concept

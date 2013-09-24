@@ -13,7 +13,7 @@
  **************************************************************************/
 
 //! \file map_test_handlers.h
-//! \brief This file contains help functions for testing of stxxl::map.
+//! This file contains help functions for testing of stxxl::map.
 
 #ifndef STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_
 #define STXXL_TEST_HEADER__MAP_TEST_HANDLERS_H_

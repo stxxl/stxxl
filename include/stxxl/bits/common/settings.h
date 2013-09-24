@@ -10,9 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-/**
+/*!
  * @file settings.h
- * @brief Provides a static class to store runtime tuning parameters.
+ * Provides a static class to store runtime tuning parameters.
  */
 
 #ifndef STXXL_SETTINGS_HEADER

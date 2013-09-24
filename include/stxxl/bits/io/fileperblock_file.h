@@ -22,7 +22,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of file based on other files, dynamically allocate one file per block.
+//! Implementation of file based on other files, dynamically allocate one file per block.
 //! Allows for dynamic disk space consumption.
 template <class base_file_type>
 class fileperblock_file : public disk_queued_file
@@ -35,11 +35,11 @@ private:
     base_file_type lock_file;
 
 protected:
-    //! \brief Constructs a file name for a given block.
+    //! Constructs a file name for a given block.
     std::string filename_for_block(unsigned_type offset);
 
 public:
-    //! \brief constructs file object
+    //! Constructs file object.
     //! param filename_prefix  filename prefix, numbering will be appended to it
     //! param mode open mode, see \c file::open_modes
     fileperblock_file(
@@ -52,17 +52,17 @@ public:
 
     virtual void serve(const request * req) throw (io_error);
 
-    //! \brief Changes the size of the file
+    //! Changes the size of the file.
     //! \param new_size value of the new file size
     virtual void set_size(offset_type new_size) { current_size = new_size; }
 
-    //! \brief Returns size of the file
+    //! Returns size of the file.
     //! \return file size in length
     virtual offset_type size() { return current_size; }
 
     virtual void lock();
 
-    //! \brief Frees the specified region.
+    //! Frees the specified region.
     //! Actually deletes the corresponding file if the whole thing is deleted.
     virtual void discard(offset_type offset, offset_type length);
 

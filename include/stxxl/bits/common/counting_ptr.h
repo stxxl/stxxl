@@ -23,7 +23,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 /*!
- * \brief High-performance smart pointer used as a wrapping reference counting
+ * High-performance smart pointer used as a wrapping reference counting
  * pointer.
  *
  * This smart pointer class requires two functions in the templated type: void
@@ -163,7 +163,7 @@ template<class A> void swap(counting_ptr<A> & a1, counting_ptr<A> & a2)
 }
 
 /*!
- * \brief High-performance smart pointer used as a wrapping reference counting
+ * High-performance smart pointer used as a wrapping reference counting
  * pointer.
  *
  * This smart pointer class requires two functions in the templated type: void
@@ -312,7 +312,7 @@ template<class A> void swap(const_counting_ptr<A> & a1, const_counting_ptr<A> & 
 }
 
 /*!
- * \brief Provides reference counting abilities for use with counting_ptr.
+ * Provides reference counting abilities for use with counting_ptr.
  *
  * Use as superclass of the actual object, this adds a reference_count
  * value. Then either use counting_ptr as pointer to manage references and
@@ -367,8 +367,8 @@ public:
 };
 
 /*!
- * \brief Provides reference counting abilities for use with counting_ptr with
- * mutex locking.
+ * Provides reference counting abilities for use with counting_ptr with mutex
+ * locking.
  *
  * Use as superclass of the actual object, this adds a reference_count
  * value. Then either use counting_ptr as pointer to manage references and

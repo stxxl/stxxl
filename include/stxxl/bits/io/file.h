@@ -82,8 +82,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup iolayer
 //! \{
 
-//! \brief Defines interface of file
-
+//! Defines interface of file.
+//!
 //! It is a base class for different implementations that might
 //! base on various file systems or even remote storage interfaces
 class file : private noncopyable
@@ -92,18 +92,18 @@ class file : private noncopyable
     int request_ref_cnt;
 
 protected:
-    //! \brief Initializes file object
+    //! Initializes file object.
     //! \remark Called in implementations of file
     file() : request_ref_cnt(0) { }
 
 public:
-    // the offset of a request, also the size of the file
+    //! the offset of a request, also the size of the file
     typedef request::offset_type offset_type;
-    // the size of a request
+    //! the size of a request
     typedef request::size_type size_type;
 
-    //! \brief Definition of acceptable file open modes
-
+    //! Definition of acceptable file open modes.
+    //!
     //! Various open modes in a file system must be
     //! converted to this set of acceptable modes
     enum open_mode
@@ -122,7 +122,7 @@ public:
     static const int NO_QUEUE = -2;
     static const int NO_ALLOCATOR = -1;
 
-    //! \brief Schedules an asynchronous read request to the file
+    //! Schedules an asynchronous read request to the file.
     //! \param buffer pointer to memory buffer to read into
     //! \param pos file position to start read from
     //! \param bytes number of bytes to transfer
@@ -131,7 +131,7 @@ public:
     virtual request_ptr aread(void * buffer, offset_type pos, size_type bytes,
                               const completion_handler & on_cmpl) = 0;
 
-    //! \brief Schedules an asynchronous write request to the file
+    //! Schedules an asynchronous write request to the file.
     //! \param buffer pointer to memory buffer to write from
     //! \param pos starting file position to write
     //! \param bytes number of bytes to transfer
@@ -161,17 +161,20 @@ public:
         return request_ref_cnt;
     }
 
-    //! \brief Changes the size of the file
+    //! Changes the size of the file.
     //! \param newsize new file size
     virtual void set_size(offset_type newsize) = 0;
-    //! \brief Returns size of the file
+
+    //! Returns size of the file.
     //! \return file size in bytes
     virtual offset_type size() = 0;
-    //! \brief Returns the identifier of the file's queue
+
+    //! Returns the identifier of the file's queue.
     //! \remark Files allocated on the same physical device usually share the same queue
     //! \return queue number
     virtual int get_queue_id() const = 0;
-    //! \brief Returns the file's allocator
+
+    //! Returns the file's allocator.
     //! \return allocator number
     virtual int get_allocator_id() const = 0;
 
@@ -180,11 +183,11 @@ public:
         return get_queue_id();
     }
 
-    //! \brief Locks file for reading and writing (acquires a lock in the file system)
+    //! Locks file for reading and writing (acquires a lock in the file system).
     virtual void lock() = 0;
 
-    //! \brief Discard a region of the file (mark it unused)
-    //! some specialized file types may need to know freed regions
+    //! Discard a region of the file (mark it unused).
+    //! Some specialized file types may need to know freed regions
     virtual void discard(offset_type offset, offset_type size)
     {
         STXXL_UNUSED(offset);
@@ -207,7 +210,7 @@ public:
             STXXL_ERRMSG("stxxl::file is being deleted while there are still " << nr << " (unfinished) requests referencing it");
     }
 
-    //! \brief Identifies the type of I/O implementation
+    //! Identifies the type of I/O implementation.
     //! \return pointer to null terminated string of characters, containing the name of I/O implementation
     virtual const char * io_type() const
     {

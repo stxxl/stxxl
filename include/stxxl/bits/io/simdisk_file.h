@@ -117,12 +117,12 @@ public:
     IC35L080AVVA07();
 };
 
-//! \brief Implementation of disk emulation
+//! Implementation of disk emulation.
 //! \remark It is emulation of IBM IC35L080AVVA07 disk's timings
 class sim_disk_file : public ufs_file_base, public disk_queued_file, public IC35L080AVVA07
 {
 public:
-    //! \brief constructs file object
+    //! Constructs file object.
     //! param filename path of file
     //! \attention filename must be resided at memory disk partition
     //! param mode open mode, see \c stxxl::file::open_modes

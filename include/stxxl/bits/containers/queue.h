@@ -38,8 +38,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! \brief External FIFO queue container
-
+//! External FIFO queue container.
+//!
 //! \tparam ValTp type of the contained objects (POD with no references to internal memory)
 //! \tparam BlkSz size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)
 //! \tparam AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
@@ -78,8 +78,8 @@ private:
     unsigned_type blocks2prefetch;
 
 public:
-    //! \brief Constructs empty queue with own write and prefetch block pool
-
+    //! Constructs empty queue with own write and prefetch block pool.
+    //!
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
     //!           memory consumption will be 2 * D + 2 blocks 
     //!           (first and last block, D blocks as write cache, D block for prefetching)
@@ -96,8 +96,8 @@ public:
         init();
     }
 
-    //! \brief Constructs empty queue with own write and prefetch block pool
-
+    //! Constructs empty queue with own write and prefetch block pool.
+    //!
     //! \param w_pool_size  number of blocks in the write pool, must be at least 2, recommended at least 3
     //! \param p_pool_size  number of blocks in the prefetch pool, recommended at least 1
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
@@ -113,8 +113,8 @@ public:
         init(blocks2prefetch_);
     }
 
-    //! \brief Constructs empty queue
-
+    //! Constructs empty queue.
+    //!
     //! \param w_pool write pool
     //! \param p_pool prefetch pool
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
@@ -133,8 +133,8 @@ public:
         init(blocks2prefetch_);
     }
 
-    //! \brief Constructs empty queue
-
+    //! Constructs empty queue.
+    //!
     //! \param pool_ block write/prefetch pool
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
     //!                          default is number of blocks in the prefetch pool
@@ -175,8 +175,8 @@ private:
     }
 
 public:
-    //! \brief Defines the number of blocks to prefetch (\c front side)
-    //!        This method should be called whenever the prefetch pool is resized
+    //! Defines the number of blocks to prefetch (\c front side).
+    //! This method should be called whenever the prefetch pool is resized
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
     //!                          a negative value means to use the number of blocks in the prefetch pool
     void set_prefetch_aggr(int_type blocks2prefetch_)
@@ -187,13 +187,13 @@ public:
             blocks2prefetch = blocks2prefetch_;
     }
 
-    //! \brief Returns the number of blocks prefetched from the \c front side
+    //! Returns the number of blocks prefetched from the \c front side.
     unsigned_type get_prefetch_aggr() const
     {
         return blocks2prefetch;
     }
 
-    //! \brief Adds an element in the queue
+    //! Adds an element in the queue.
     void push(const value_type & val)
     {
         if (UNLIKELY(back_element == back_block->begin() + (block_type::size - 1)))
@@ -251,7 +251,7 @@ public:
         ++size_;
     }
 
-    //! \brief Removes element from the queue
+    //! Removes element from the queue.
     void pop()
     {
         assert(!empty());
@@ -308,40 +308,40 @@ public:
         --size_;
     }
 
-    //! \brief Returns the size of the queue
+    //! Returns the size of the queue.
     size_type size() const
     {
         return size_;
     }
 
-    //! \brief Returns \c true if queue is empty
+    //! Returns \c true if queue is empty.
     bool empty() const
     {
         return (size_ == 0);
     }
 
-    //! \brief Returns a mutable reference at the back of the queue
+    //! Returns a mutable reference at the back of the queue.
     value_type & back()
     {
         assert(!empty());
         return *back_element;
     }
 
-    //! \brief Returns a const reference at the back of the queue
+    //! Returns a const reference at the back of the queue.
     const value_type & back() const
     {
         assert(!empty());
         return *back_element;
     }
 
-    //! \brief Returns a mutable reference at the front of the queue
+    //! Returns a mutable reference at the front of the queue.
     value_type & front()
     {
         assert(!empty());
         return *front_element;
     }
 
-    //! \brief Returns a const reference at the front of the queue
+    //! Returns a const reference at the front of the queue.
     const value_type & front() const
     {
         assert(!empty());

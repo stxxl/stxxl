@@ -18,11 +18,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief set the global stxxl seed value
+//! set the global stxxl seed value
 void set_seed(unsigned seed);
 
-//! \brief get a seed value for prng initialization,
-//!        subsequent calls return a sequence of different values
+//! get a seed value for prng initialization, subsequent calls return a
+//! sequence of different values
 unsigned get_next_seed();
 
 __STXXL_END_NAMESPACE

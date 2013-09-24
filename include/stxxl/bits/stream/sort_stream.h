@@ -40,7 +40,7 @@ namespace stream
     //     CREATE RUNS                                                    //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Forms sorted runs of data from a stream
+    //! Forms sorted runs of data from a stream.
     //!
     //! \tparam Input_ type of the input stream
     //! \tparam CompareType_ type of comparison object used for sorting the runs
@@ -68,16 +68,16 @@ namespace stream
         typedef counting_ptr<sorted_runs_data_type> sorted_runs_type;
 
     protected:
-        Input_ & m_input;               /// reference to the input stream
-        CompareType_ m_cmp;              /// comparator used to sort block groups
+        Input_ & m_input;               //! reference to the input stream
+        CompareType_ m_cmp;              //! comparator used to sort block groups
 
     private:
 
-        sorted_runs_type m_result;      /// stores the result (sorted runs) as smart pointer
-        unsigned_type m_memsize;        /// memory for internal use in blocks
-        bool m_result_computed;         /// true iff result is already computed (used in 'result()' method)
+        sorted_runs_type m_result;      //! stores the result (sorted runs) as smart pointer
+        unsigned_type m_memsize;        //! memory for internal use in blocks
+        bool m_result_computed;         //! true iff result is already computed (used in 'result()' method)
 
-        /// Fetch data from input into blocks[first_idx,last_idx).
+        //! Fetch data from input into blocks[first_idx,last_idx).
         unsigned_type fetch(block_type * blocks, unsigned_type first_idx, unsigned_type last_idx)
         {
             typename element_iterator_traits<block_type>::element_iterator output =
@@ -92,7 +92,7 @@ namespace stream
             return curr_idx;
         }
 
-        ///  fill the rest of the block with max values
+        //!  fill the rest of the block with max values
         void fill_with_max_value(block_type * blocks, unsigned_type num_blocks, unsigned_type first_idx)
         {
             unsigned_type last_idx = num_blocks * block_type::size;
@@ -107,7 +107,7 @@ namespace stream
             }
         }
 
-        /// Sort a specific run, contained in a sequences of blocks.
+        //! Sort a specific run, contained in a sequences of blocks.
         void sort_run(block_type * run, unsigned_type elements)
         {
             check_sort_settings();
@@ -119,7 +119,7 @@ namespace stream
         void compute_result();
 
     public:
-        //! \brief Create the object
+        //! Create the object.
         //! \param input input stream
         //! \param cmp comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
@@ -137,7 +137,7 @@ namespace stream
             assert(m_memsize > 0);
         }
 
-        //! \brief Returns the sorted runs object
+        //! Returns the sorted runs object.
         //! \return Sorted runs object. The result is computed lazily, i.e. on the first call
         //! \remark Returned object is intended to be used by \c runs_merger object as input
         sorted_runs_type & result()
@@ -154,7 +154,7 @@ namespace stream
         }
     };
 
-    //! \brief Finish the results, i. e. create all runs.
+    //! Finish the results, i. e. create all runs.
     //!
     //! This is the main routine of this class.
     template <class Input_, class CompareType_, unsigned BlockSize_, class AllocStr_>
@@ -339,7 +339,7 @@ namespace stream
         delete[] ((Blocks1 < Blocks2) ? Blocks1 : Blocks2);
     }
 
-    //! \brief Forms sorted runs of data from a stream
+    //! Forms sorted runs of data from a stream.
     //!
     //! \tparam Input_ type of the input stream
     //! \tparam CompareType_ type of omparison object used for sorting the runs
@@ -363,7 +363,7 @@ namespace stream
         typedef typename base::sorted_runs_type sorted_runs_type;
 
     public:
-        //! \brief Creates the object
+        //! Creates the object.
         //! \param input input stream
         //! \param cmp comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
@@ -373,7 +373,7 @@ namespace stream
     };
 
 
-    //! \brief Input strategy for \c runs_creator class
+    //! Input strategy for \c runs_creator class.
     //!
     //! This strategy together with \c runs_creator class
     //! allows to create sorted runs
@@ -386,7 +386,7 @@ namespace stream
         typedef ValueType_ value_type;
     };
 
-    //! \brief Forms sorted runs of elements passed in push() method
+    //! Forms sorted runs of elements passed in push() method.
     //!
     //! A specialization of \c runs_creator that
     //! allows to create sorted runs
@@ -418,46 +418,46 @@ namespace stream
         typedef sorted_runs_type result_type;
 
     private:
-        /// comparator object to sort runs
+        //! comparator object to sort runs
         CompareType_ m_cmp;
 
         typedef typename sorted_runs_data_type::run_type run_type;
 
-        /// stores the result (sorted runs) in a reference counted object
+        //! stores the result (sorted runs) in a reference counted object
         sorted_runs_type m_result;
 
-        /// memory size in bytes to use
+        //! memory size in bytes to use
         const unsigned_type m_memory_to_use;
 
-        /// memory size in numberr of blocks for internal use
+        //! memory size in numberr of blocks for internal use
         const unsigned_type m_memsize;
 
-        /// m_memsize / 2
+        //! m_memsize / 2
         const unsigned_type m_m2;
 
-        /// true after the result() method was called for the first time
+        //! true after the result() method was called for the first time
         bool m_result_computed;
 
-        /// total number of elements in a run
+        //! total number of elements in a run
         const unsigned_type m_el_in_run;
 
-        /// current number of elements in the run m_blocks1
+        //! current number of elements in the run m_blocks1
         unsigned_type m_cur_el;
 
-        /// accumulation buffer of size m_m2 blocks, half the available memory size
+        //! accumulation buffer of size m_m2 blocks, half the available memory size
         block_type * m_blocks1;
 
-        /// accumulation buffer that is currently being written to disk
+        //! accumulation buffer that is currently being written to disk
         block_type * m_blocks2;
 
-        /// reference to write requests transporting the last accumulation buffer to disk
+        //! reference to write requests transporting the last accumulation buffer to disk
         request_ptr * m_write_reqs;
 
-        /// run object containing block ids of the run being written to disk
+        //! run object containing block ids of the run being written to disk
         run_type run;
 
     protected:
-        ///  fill the rest of the block with max values
+        //!  fill the rest of the block with max values
         void fill_with_max_value(block_type * blocks, unsigned_type num_blocks, unsigned_type first_idx)
         {
             unsigned_type last_idx = num_blocks * block_type::size;
@@ -472,7 +472,7 @@ namespace stream
             }
         }
 
-        /// Sort a specific run, contained in a sequences of blocks.
+        //! Sort a specific run, contained in a sequences of blocks.
         void sort_run(block_type * run, unsigned_type elements)
         {
             check_sort_settings();
@@ -526,7 +526,7 @@ namespace stream
         }
 
     public:
-        //! \brief Creates the object
+        //! Creates the object.
         //! \param cmp comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
         runs_creator(CompareType_ cmp, unsigned_type memory_to_use) :
@@ -553,7 +553,7 @@ namespace stream
             deallocate();
         }
 
-        //! \brief Clear current state and remove all items
+        //! Clear current state and remove all items.
         void clear()
         {
             if (!m_result)
@@ -571,7 +571,7 @@ namespace stream
             }
         }
 
-        //! \brief Allocates input buffers and clears result.
+        //! Allocates input buffers and clears result.
         void allocate()
         {
             if (!m_blocks1)
@@ -585,7 +585,7 @@ namespace stream
             clear();
         }
 
-        //! \brief Deallocates input buffers but not the current result.
+        //! Deallocates input buffers but not the current result.
         void deallocate()
         {
             result();   // finishes result
@@ -600,7 +600,7 @@ namespace stream
             }
         }
 
-        //! \brief Adds new element to the sorter
+        //! Adds new element to the sorter.
         //! \param val value to be added
         void push(const value_type & val)
         {
@@ -641,7 +641,7 @@ namespace stream
             push(val);
         }
 
-        //! \brief Returns the sorted runs object
+        //! Returns the sorted runs object.
         //! \return Sorted runs object.
         //! \remark Returned object is intended to be used by \c runs_merger object as input
         sorted_runs_type & result()
@@ -657,19 +657,19 @@ namespace stream
             return m_result;
         }
 
-        //! \brief number of items currently inserted.
+        //! number of items currently inserted.
         unsigned_type size() const
         {
             return m_result->elements + m_cur_el;
         }
 
-        //! \brief return comparator object
+        //! return comparator object.
         const cmp_type& cmp() const
         {
             return m_cmp;
         }
 
-        //! \brief return memory size used (in bytes)
+        //! return memory size used (in bytes).
         unsigned_type memory_used() const
         {
             return m_memory_to_use;
@@ -677,7 +677,7 @@ namespace stream
     };
 
 
-    //! \brief Input strategy for \c runs_creator class
+    //! Input strategy for \c runs_creator class.
     //!
     //! This strategy together with \c runs_creator class
     //! allows to create sorted runs
@@ -689,7 +689,7 @@ namespace stream
         typedef ValueType_ value_type;
     };
 
-    //! \brief Forms sorted runs of data taking elements in sorted order (element by element)
+    //! Forms sorted runs of data taking elements in sorted order (element by element).
     //!
     //! A specialization of \c runs_creator that
     //! allows to create sorted runs
@@ -738,7 +738,7 @@ namespace stream
         alloc_strategy_type alloc_strategy;  // needs to be reset after each run
 
     public:
-        //! \brief Creates the object
+        //! Creates the object.
         //! \param c comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes.
         //! Recommended value: 2 * block_size * D
@@ -759,7 +759,7 @@ namespace stream
             }
         }
 
-        //! \brief Adds new element to the current run
+        //! Adds new element to the current run.
         //! \param val value to be added to the current run
         void push(const value_type & val)
         {
@@ -793,7 +793,7 @@ namespace stream
             ++result_->elements;
         }
 
-        //! \brief Finishes current run and begins new one
+        //! Finishes current run and begins new one.
         void finish()
         {
             if (offset == 0 && iblock == 0) // current run is empty
@@ -834,7 +834,7 @@ namespace stream
             ++irun;
         }
 
-        //! \brief Returns the sorted runs object
+        //! Returns the sorted runs object.
         //! \return Sorted runs object
         //! \remark Returned object is intended to be used by \c runs_merger object as input
         sorted_runs_type & result()
@@ -847,7 +847,7 @@ namespace stream
     };
 
 
-    //! \brief Checker for the sorted runs object created by the \c runs_creator .
+    //! Checker for the sorted runs object created by the \c runs_creator .
     //! \param sruns sorted runs object
     //! \param cmp comparison object used for checking the order of elements in runs
     //! \return \c true if runs are sorted, \c false otherwise
@@ -901,7 +901,7 @@ namespace stream
     //     MERGE RUNS                                                     //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Merges sorted runs
+    //! Merges sorted runs.
     //!
     //! \tparam RunsType_ type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
     //! \tparam CompareType_ type of comparison object used for merging
@@ -932,41 +932,41 @@ namespace stream
         typedef typename std::vector<sequence>::size_type seqs_size_type;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename sorted_runs_data_type::value_type value_type;
 
     private:
-        /// comparator object to sort runs
+        //! comparator object to sort runs
         value_cmp m_cmp;
 
-        /// memory size in bytes to use
+        //! memory size in bytes to use
         unsigned_type   m_memory_to_use;
 
-        /// smart pointer to sorted_runs object
+        //! smart pointer to sorted_runs object
         sorted_runs_type m_sruns;
 
-        /// items remaining in input
+        //! items remaining in input
         size_type       m_elements_remaining;
 
-        /// memory buffer for merging from external streams
+        //! memory buffer for merging from external streams
         out_block_type*  m_buffer_block;
 
-        /// pointer into current memory buffer: this is either m_buffer_block or the small_runs vector
+        //! pointer into current memory buffer: this is either m_buffer_block or the small_runs vector
         const value_type* m_current_ptr;
 
-        /// pointer into current memory buffer: end after range of current values
+        //! pointer into current memory buffer: end after range of current values
         const value_type* m_current_end;
 
-        /// sequence of block needed for merging
+        //! sequence of block needed for merging
         run_type        m_consume_seq;
 
-        /// precalculated order of blocks in which they are prefetched
+        //! precalculated order of blocks in which they are prefetched
         int_type*       m_prefetch_seq;
 
-        /// prefetcher object
+        //! prefetcher object
         prefetcher_type * m_prefetcher;
 
-        /// loser tree used for native merging
+        //! loser tree used for native merging
         loser_tree_type * m_losers;
 
 #if STXXL_PARALLEL_MULTIWAY_MERGE
@@ -976,7 +976,7 @@ namespace stream
 #endif
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-        /// previous element to ensure the current output ordering
+        //! previous element to ensure the current output ordering
         value_type      m_last_element;
 #endif //STXXL_CHECK_ORDER_IN_SORTS
 
@@ -1072,7 +1072,7 @@ namespace stream
         }
 
     public:
-        //! \brief Creates a runs merger object
+        //! Creates a runs merger object.
         //! \param c comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
         basic_runs_merger(value_cmp c, unsigned_type memory_to_use)
@@ -1094,13 +1094,13 @@ namespace stream
             sort_helper::verify_sentinel_strict_weak_ordering(m_cmp);
         }
 
-        //! \brief Set memory amount to use for the merger in bytes
+        //! Set memory amount to use for the merger in bytes.
         void set_memory_to_use(unsigned_type memory_to_use)
         {
             m_memory_to_use = memory_to_use;
         }
 
-        //! \brief Initialize the runs merger object with a new round of sorted_runs
+        //! Initialize the runs merger object with a new round of sorted_runs.
         void initialize(const sorted_runs_type & sruns)
         {
             m_sruns = sruns;
@@ -1234,7 +1234,7 @@ namespace stream
             fill_buffer_block();
         }
 
-        //! \brief Deallocate temporary structures freeing memory prior to next initialize()
+        //! Deallocate temporary structures freeing memory prior to next initialize().
         void deallocate()
         {
             deallocate_prefetcher();
@@ -1242,32 +1242,32 @@ namespace stream
         }
 
     public:
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return (m_elements_remaining == 0);
         }
 
-        //! \brief Standard size method
+        //! Standard size method.
         size_type size() const
         {
             return m_elements_remaining;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             assert(!empty());
             return *m_current_ptr;
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type * operator -> () const
         {
             return &(operator * ());
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         basic_runs_merger & operator ++ ()  // preincrement operator
         {
             assert(!empty());
@@ -1296,7 +1296,7 @@ namespace stream
             return *this;
         }
 
-        //! \brief Destructor
+        //! Destructor.
         //! \remark Deallocates blocks of the input sorted runs object
         virtual ~basic_runs_merger()
         {
@@ -1446,7 +1446,7 @@ namespace stream
     }
 
 
-    //! \brief Merges sorted runs
+    //! Merges sorted runs.
     //!
     //! \tparam RunsType_ type of the sorted runs, available as \c runs_creator::sorted_runs_type ,
     //! \tparam CompareType_ type of comparison object used for merging
@@ -1467,7 +1467,7 @@ namespace stream
         typedef typename base::block_type       block_type;
 
     public:
-        //! \brief Creates a runs merger object
+        //! Creates a runs merger object.
         //! \param sruns input sorted runs object
         //! \param cmp comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
@@ -1477,7 +1477,7 @@ namespace stream
             this->initialize(sruns);
         }
 
-        //! \brief Creates a runs merger object without initializing a round of sorted_runs
+        //! Creates a runs merger object without initializing a round of sorted_runs.
         //! \param cmp comparison object
         //! \param memory_to_use amount of memory available for the merger in bytes
         runs_merger(value_cmp cmp, unsigned_type memory_to_use)
@@ -1491,7 +1491,7 @@ namespace stream
     //     SORT                                                           //
     ////////////////////////////////////////////////////////////////////////
 
-    //! \brief Produces sorted stream from input stream
+    //! Produces sorted stream from input stream.
     //!
     //! \tparam Input_ type of the input stream
     //! \tparam CompareType_ type of comparison object used for sorting the runs
@@ -1512,10 +1512,10 @@ namespace stream
         runs_merger_type merger;
 
     public:
-        //! \brief Standard stream typedef
+        //! Standard stream typedef.
         typedef typename Input_::value_type value_type;
 
-        //! \brief Creates the object
+        //! Creates the object.
         //! \param in input stream
         //! \param c comparator object
         //! \param memory_to_use memory amount that is allowed to used by the sorter in bytes
@@ -1526,7 +1526,7 @@ namespace stream
             sort_helper::verify_sentinel_strict_weak_ordering(c);
         }
 
-        //! \brief Creates the object
+        //! Creates the object.
         //! \param in input stream
         //! \param c comparator object
         //! \param m_memory_to_userc memory amount that is allowed to used by the runs creator in bytes
@@ -1539,13 +1539,13 @@ namespace stream
         }
 
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         bool empty() const
         {
             return merger.empty();
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         const value_type & operator * () const
         {
             assert(!empty());
@@ -1558,7 +1558,7 @@ namespace stream
             return merger.operator -> ();
         }
 
-        //! \brief Standard stream method
+        //! Standard stream method.
         sort & operator ++ ()
         {
             ++merger;
@@ -1566,7 +1566,7 @@ namespace stream
         }
     };
 
-    //! \brief Computes sorted runs type from value type and block size
+    //! Computes sorted runs type from value type and block size.
     //!
     //! \tparam ValueType_ type of values ins sorted runs
     //! \tparam BlockSize_ size of blocks where sorted runs stored
@@ -1589,8 +1589,8 @@ namespace stream
 //! \addtogroup stlalgo
 //! \{
 
-//! \brief Sorts range of any random access iterators externally
-
+//! Sorts range of any random access iterators externally.
+//!
 //! \param begin iterator pointing to the first element of the range
 //! \param end iterator pointing to the last+1 element of the range
 //! \param cmp comparison object

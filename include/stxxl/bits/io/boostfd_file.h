@@ -38,7 +38,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation based on boost::iostreams::file_decriptor
+//! Implementation based on boost::iostreams::file_decriptor.
 class boostfd_file : public disk_queued_file
 {
     typedef boost::iostreams::file_descriptor fd_type;

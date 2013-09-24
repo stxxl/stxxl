@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //! \ingroup mnglayer
 
-//! \brief Access point to disks properties
+//! Access point to disks properties.
 //! \remarks is a singleton
 class config : public singleton<config>
 {
@@ -71,28 +71,28 @@ class config : public singleton<config>
     void init(const char * config_path = "./.stxxl");
 
 public:
-    //! \brief Returns number of disks available to user
+    //! Returns number of disks available to user.
     //! \return number of disks
     inline unsigned disks_number() const
     {
         return disks_props.size();
     }
 
-    //! \brief Returns contiguous range of regular disks w/o flash devices in the array of all disks
+    //! Returns contiguous range of regular disks w/o flash devices in the array of all disks.
     //! \return range [begin, end) of regular disk indices
     inline std::pair<unsigned, unsigned> regular_disk_range() const
     {
         return std::pair<unsigned, unsigned>(0, first_flash);
     }
 
-    //! \brief Returns contiguous range of flash devices in the array of all disks
+    //! Returns contiguous range of flash devices in the array of all disks.
     //! \return range [begin, end) of flash device indices
     inline std::pair<unsigned, unsigned> flash_range() const
     {
         return std::pair<unsigned, unsigned>(first_flash, (unsigned)disks_props.size());
     }
 
-    //! \brief Returns path of disks
+    //! Returns path of disks.
     //! \param disk disk's identifier
     //! \return string that contains the disk's path name
     inline const std::string & disk_path(int disk) const
@@ -100,7 +100,7 @@ public:
         return disks_props[disk].path;
     }
 
-    //! \brief Returns disk size
+    //! Returns disk size.
     //! \param disk disk's identifier
     //! \return disk size in bytes
     inline stxxl::int64 disk_size(int disk) const
@@ -108,7 +108,7 @@ public:
         return disks_props[disk].size;
     }
 
-    //! \brief Returns name of I/O implementation of particular disk
+    //! Returns name of I/O implementation of particular disk.
     //! \param disk disk's identifier
     inline const std::string & disk_io_impl(int disk) const
     {

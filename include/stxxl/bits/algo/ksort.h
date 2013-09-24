@@ -732,7 +732,7 @@ namespace ksort_local
  */
 
 
-//! \brief Sort records with integer keys
+//! Sort records with integer keys
 //! \param first_ object of model of \c ext_random_access_iterator concept
 //! \param last_ object of model of \c ext_random_access_iterator concept
 //! \param keyobj \link key_extractor key extractor \endlink object
@@ -1078,7 +1078,7 @@ struct ksort_defaultkey
 };
 
 
-//! \brief Sort records with integer keys
+//! Sort records with integer keys
 //! \param first_ object of model of \c ext_random_access_iterator concept
 //! \param last_ object of model of \c ext_random_access_iterator concept
 //! \param M__ amount of buffers for internal use

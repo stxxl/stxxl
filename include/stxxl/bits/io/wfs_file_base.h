@@ -33,7 +33,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Base for Windows file system implementations
+//! Base for Windows file system implementations.
 class wfs_file_base : public virtual file
 {
 protected:

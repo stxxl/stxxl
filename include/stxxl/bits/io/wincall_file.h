@@ -38,11 +38,11 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Implementation of file based on Windows native I/O calls
+//! Implementation of file based on Windows native I/O calls.
 class wincall_file : public wfs_file_base, public disk_queued_file
 {
 public:
-    //! \brief constructs file object
+    //! Constructs file object.
     //! \param filename path of file
     //! \attention filename must be resided at memory disk partition
     //! \param mode open mode, see \c stxxl::file::open_modes

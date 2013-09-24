@@ -23,8 +23,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \brief IF template metaprogramming statement
-
+//! IF template metaprogramming statement.
+//!
 //! If \c Flag is \c true then \c IF<>::result is of type Type1
 //! otherwise of \c IF<>::result is of type Type2
 template <bool Flag, class Type1, class Type2>

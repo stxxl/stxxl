@@ -78,7 +78,7 @@ typedef boost::mutex::scoped_lock scoped_mutex_lock;
 
 #else
 
-//! \brief Aquire a lock that's valid until the end of scope
+//! Aquire a lock that's valid until the end of scope.
 class scoped_mutex_lock
 {
     mutex & mtx;

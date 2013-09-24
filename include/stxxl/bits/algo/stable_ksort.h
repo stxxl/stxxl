@@ -212,7 +212,7 @@ namespace stable_ksort_local
     }
 }
 
-//! \brief Sort records with integer keys
+//! Sort records with integer keys
 //! \param first object of model of \c ext_random_access_iterator concept
 //! \param last object of model of \c ext_random_access_iterator concept
 //! \param M amount of memory for internal use (in bytes)

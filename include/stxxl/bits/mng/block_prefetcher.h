@@ -46,7 +46,7 @@ public:
     }
 };
 
-//! \brief Encapsulates asynchronous prefetching engine
+//! Encapsulates asynchronous prefetching engine.
 //!
 //! \c block_prefetcher overlaps I/Os with consumption of read data.
 //! Utilizes optimal asynchronous prefetch scheduling (by Peter Sanders et.al.)
@@ -93,7 +93,7 @@ protected:
     }
 
 public:
-    //! \brief Constructs an object and immediately starts prefetching
+    //! Constructs an object and immediately starts prefetching.
     //! \param _cons_begin \c bid_iterator pointing to the \c bid of the first block to be consumed
     //! \param _cons_end \c bid_iterator pointing to the \c bid of the ( \b last + 1 ) block of consumption sequence
     //! \param _pref_seq gives the prefetch order, is a pointer to the integer array that contains
@@ -145,14 +145,14 @@ public:
             pref_buffer[prefetch_seq[i]] = i;
         }
     }
-    //! \brief Pulls next unconsumed block from the consumption sequence
+    //! Pulls next unconsumed block from the consumption sequence.
     //! \return Pointer to the already prefetched block from the internal buffer pool
     block_type * pull_block()
     {
         STXXL_VERBOSE1("block_prefetcher: pulling a block");
         return wait(nextconsume++);
     }
-    //! \brief Exchanges buffers between prefetcher and application
+    //! Exchanges buffers between prefetcher and application.
     //! \param buffer pointer to the consumed buffer. After call if return value is true \c buffer
     //!        contains valid pointer to the next unconsumed prefetched buffer.
     //! \remark parameter \c buffer must be value returned by \c pull_block() or \c block_consumed() methods
@@ -192,20 +192,20 @@ public:
         return true;
     }
 
-    // no more consumable blocks available, but can't delete the prefetcher,
-    // because not all blocks may have been returned, yet
+    //! No more consumable blocks available, but can't delete the prefetcher,
+    //! because not all blocks may have been returned, yet.
     bool empty() const
     {
         return nextconsume >= seq_length;
     }
 
-    // index of the next element in the consume sequence
+    //! Index of the next element in the consume sequence.
     unsigned_type pos() const
     {
         return nextconsume;
     }
 
-    //! \brief Frees used memory
+    //! Frees used memory.
     ~block_prefetcher()
     {
         for (int_type i = 0; i < nreadblocks; ++i)

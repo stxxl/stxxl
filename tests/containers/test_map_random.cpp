@@ -12,7 +12,7 @@
  **************************************************************************/
 
 //! \file containers/test_map_random.cpp
-//! \brief File for testing functionality of stxxl::map.
+//! File for testing functionality of stxxl::map.
 
 //! \example containers/test_map_random.cpp
 //! This is an example of use of \c stxxl::map container.

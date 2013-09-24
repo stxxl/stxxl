@@ -26,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup fileimpl
 //! \{
 
-//! \brief Base for UNIX file system implementations
+//! Base for UNIX file system implementations.
 class ufs_file_base : public virtual file
 {
 protected:

@@ -33,8 +33,8 @@ __STXXL_BEGIN_NAMESPACE
 //! \ingroup mnglayer
 //! \{
 
-//! \brief Block identifier class
-
+//! Block identifier class.
+//!
 //! Stores block identity, given by file and offset within the file
 template <unsigned SIZE>
 struct BID
@@ -81,8 +81,8 @@ struct BID
 };
 
 
-//! \brief Specialization of block identifier class (BID) for variable size block size
-
+//! Specialization of block identifier class (BID) for variable size block size.
+//!
 //! Stores block identity, given by file, offset within the file, and size of the block
 template <>
 struct BID<0>

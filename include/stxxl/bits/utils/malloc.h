@@ -28,7 +28,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-//! \brief Access to some useful malloc statistics
+//! Access to some useful malloc statistics.
 
 //! malloc is default C++ allocator
 class malloc_stats
@@ -38,77 +38,77 @@ class malloc_stats
 public:
     typedef int return_type;
 
-    //! \brief Returns number of bytes allocated from system not including mmapped regions
+    //! Returns number of bytes allocated from system not including mmapped regions.
     return_type from_system_nmmap() const
     {
         struct mallinfo info = mallinfo();
         return info.arena;
     }
 
-    //! \brief Returns number of free chunks
+    //! Returns number of free chunks.
     return_type free_chunks() const
     {
         struct mallinfo info = mallinfo();
         return info.ordblks;
     }
 
-    //! \brief Number of bytes allocated and in use
+    //! Number of bytes allocated and in use.
     return_type used() const
     {
         struct mallinfo info = mallinfo();
         return info.uordblks;
     }
 
-    //! \brief Number of bytes allocated but not in use
+    //! Number of bytes allocated but not in use.
     return_type not_used() const
     {
         struct mallinfo info = mallinfo();
         return info.fordblks;
     }
 
-    //! \brief Top-most, releasable (via malloc_trim) space (bytes)
+    //! Top-most, releasable (via malloc_trim) space (bytes).
     return_type releasable() const
     {
         struct mallinfo info = mallinfo();
         return info.keepcost;
     }
 
-    //! \brief Maximum total allocated space (bytes) (always 0 ?)
+    //! Maximum total allocated space (bytes) (always 0 ?).
     return_type max_allocated() const
     {
         struct mallinfo info = mallinfo();
         return info.usmblks;
     }
 
-    //! \brief Number of fastbin blocks
+    //! Number of fastbin blocks.
     return_type fastbin_blocks() const
     {
         struct mallinfo info = mallinfo();
         return info.smblks;
     }
 
-    //! \brief Space available in freed fastbin blocks (bytes)
+    //! Space available in freed fastbin blocks (bytes).
     return_type fastbin_free() const
     {
         struct mallinfo info = mallinfo();
         return info.fsmblks;
     }
 
-    //! \brief Returns number of bytes allocated from system using mmap
+    //! Returns number of bytes allocated from system using mmap.
     return_type from_system_mmap() const
     {
         struct mallinfo info = mallinfo();
         return info.hblkhd;
     }
 
-    //! \brief Number of chunks allocated via mmap()
+    //! Number of chunks allocated via mmap().
     return_type mmap_chunks() const
     {
         struct mallinfo info = mallinfo();
         return info.hblks;
     }
 
-    //! \brief Returns \b total number of bytes allocated from system including mmapped regions
+    //! Returns \b total number of bytes allocated from system including mmapped regions.
     return_type from_system_total() const
     {
         return from_system_nmmap() + from_system_mmap();
@@ -116,7 +116,7 @@ public:
 #endif
 };
 
-//! \brief Prints current malloc statistics in a convenient way
+//! Prints current malloc statistics in a convenient way.
 inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
 {
 #if !defined(__APPLE__) && !defined(__FreeBSD__)
