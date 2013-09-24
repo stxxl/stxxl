@@ -229,6 +229,9 @@ typedef filter<filter_type0> filter_type1;
 typedef shuffle<filter_type1> shuffle_type;
 typedef stxxl::stream::runs_creator<shuffle_type, cmp> runs_creator_type1;
 
+// force instantiation of whole chain
+template class stxxl::stream::runs_creator<shuffle_type, cmp>;
+
 int main(int argc, char ** argv)
 {
     if (argc < 2) {

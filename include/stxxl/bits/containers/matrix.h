@@ -396,7 +396,7 @@ public:
         blocks_type bl(blocks.size());
         for (size_type row = 1; row < height; ++row)
             for (size_type col = 0; col < row; ++col)
-                bl[col * height + row] = bl(row,col);
+                bl[col * height + row] = block(row,col);
         bl.swap(blocks);
         // swap dimensions
         std::swap(height, width);

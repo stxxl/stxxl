@@ -54,6 +54,10 @@ struct my_cmp : std::binary_function<my_type, my_type, bool> // greater
     }
 };
 
+// forced instantiation
+const unsigned volume = 1024 * 1024; // in KiB
+template class stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, 32 * 1024 * 1024, volume / sizeof(my_type)>;
+
 int main()
 {
 /*
@@ -67,7 +71,6 @@ int main()
  */
     //typedef priority_queue<priority_queue_config<my_type,my_cmp,
     //  32,512,64,3,(4*1024),0x7fffffff,1> > pq_type;
-    const unsigned volume = 1024 * 1024; // in KiB
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, 32 * 1024 * 1024, volume / sizeof(my_type)> gen;
     typedef gen::result pq_type;
     typedef pq_type::block_type block_type;

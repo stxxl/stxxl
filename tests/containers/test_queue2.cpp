@@ -16,6 +16,10 @@
 
 typedef stxxl::uint64 my_type;
 
+// forced instantiation
+//-tb: yields "deprecated" constructor warning
+//template class stxxl::queue<my_type>;
+
 int main(int argc, char ** argv)
 {
     if (argc < 2)

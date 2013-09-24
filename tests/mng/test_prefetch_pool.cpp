@@ -27,6 +27,9 @@ struct MyType
 
 typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
+// forced instantiation
+template class stxxl::prefetch_pool<block_type>;
+
 int main()
 {
     stxxl::prefetch_pool<block_type> pool(2);

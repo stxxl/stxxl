@@ -129,7 +129,7 @@ public:
         bm(block_manager::get_instance())
     {
         STXXL_VERBOSE_QUEUE("queue[" << this << "]::queue(pools)");
-        pool = new pool_type(w_pool, p_pool);
+        pool = new pool_type(p_pool, w_pool);
         init(blocks2prefetch_);
     }
 

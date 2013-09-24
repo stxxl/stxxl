@@ -19,6 +19,8 @@
 
 #include <stxxl/stack>
 
+// forced instantiation
+template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>;
 
 int main(int argc, char * argv[])
 {

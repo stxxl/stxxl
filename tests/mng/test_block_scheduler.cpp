@@ -52,6 +52,9 @@ int_type test_pattern_B(IBT & ib)
     return num_err;
 }
 
+// forced instantiation
+template class stxxl::block_scheduler< swappable_block<int_type, 1024> >;
+
 int main(int argc, char **argv)
 {
     const int block_size = 1024;

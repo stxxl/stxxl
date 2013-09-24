@@ -25,6 +25,11 @@ typedef stxxl::typed_block<BLOCK_SIZE, unsigned> block_type;
 typedef stxxl::buf_ostream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_ostream_type;
 typedef stxxl::buf_istream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator> buf_istream_type;
 
+ // forced instantiations
+template class stxxl::typed_block<BLOCK_SIZE, unsigned>;
+template class stxxl::buf_ostream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator>;
+template class stxxl::buf_istream<block_type, stxxl::BIDArray<BLOCK_SIZE>::iterator>;
+
 int main()
 {
     const unsigned nblocks = 64;

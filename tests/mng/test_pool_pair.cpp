@@ -27,6 +27,11 @@ struct MyType
 
 typedef stxxl::typed_block<BLOCK_SIZE, MyType> block_type;
 
+// forced instantiation
+template class stxxl::typed_block<BLOCK_SIZE, MyType>;
+template class stxxl::prefetch_pool<block_type>;
+template class stxxl::write_pool<block_type>;
+
 int main()
 {
     stxxl::block_manager * bm = stxxl::block_manager::get_instance();

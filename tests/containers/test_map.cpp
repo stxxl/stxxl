@@ -38,6 +38,9 @@ struct cmp : public std::less<key_type>
 
 typedef stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE> map_type;
 
+// forced instantiation
+template class stxxl::map<key_type, data_type, cmp, BLOCK_SIZE, BLOCK_SIZE>;
+
 int main(int argc, char ** argv)
 {
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());

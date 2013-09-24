@@ -127,6 +127,9 @@ public:
     vector<error_type> & get_errors() { return errors; }
 };
 
+// forced instantiation
+template class matrix<int_type, 32>;
+
 int main(int argc, char **argv)
 {
     const int small_block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size

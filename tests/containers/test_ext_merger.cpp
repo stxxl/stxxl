@@ -58,6 +58,10 @@ my_type * make_sequence(dummy_merger & dummy, int l)
     return seq;
 }
 
+// forced instantiation
+template class ext_merger<block_type, my_cmp, 5>;
+template class loser_tree<my_type, my_cmp, 8>;
+
 int main()
 {
     stxxl::read_write_pool<block_type> pool(1, 2);

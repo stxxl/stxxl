@@ -19,6 +19,12 @@
 
 #include <stxxl/stack>
 
+// forced instantiation
+template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::normal, 4, 4096>;
+template class stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096>;
+template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink, 4, 4096>;
+template class stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink2, 1, 4096>;
+
 
 template <typename stack_type>
 void test_lvalue_correctness(stack_type & stack, int a, int b)

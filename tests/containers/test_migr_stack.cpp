@@ -19,10 +19,12 @@
 
 #include <stxxl/stack>
 
+// forced instantiation
+const unsigned critical_size = 8 * 4096;
+template class stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<int>, critical_size>;
 
 int main()
 {
-    const unsigned critical_size = 8 * 4096;
     typedef stxxl::STACK_GENERATOR<int, stxxl::migrating, stxxl::normal, 4, 4096, std::stack<int>, critical_size>::result migrating_stack_type;
 
     STXXL_MSG("Starting test.");

@@ -14,6 +14,8 @@
 #include <iterator>
 #include <stxxl/deque>
 
+// forced instantiation
+template class stxxl::deque<int>;
 
 int main(int argc, char * argv[])
 {

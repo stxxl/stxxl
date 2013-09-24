@@ -30,6 +30,10 @@ void check(const q1type & q1, const q2type & q2)
     }
 }
 
+// forced instantiation
+//-tb: yields "deprecated" constructor warning
+//template class stxxl::queue<my_type>;
+
 int main()
 {
 #if 1

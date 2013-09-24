@@ -29,6 +29,9 @@ struct comp_type : public std::less<int>
 
 typedef stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR> btree_type;
 
+// forced instantiation
+template class stxxl::btree::btree<int, double, comp_type, 4096, 4096, stxxl::SR>;
+
 std::ostream & operator << (std::ostream & o, const std::pair<int, double> & obj)
 {
     o << obj.first << " " << obj.second;

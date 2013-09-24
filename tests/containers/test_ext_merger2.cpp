@@ -55,6 +55,12 @@ my_type * make_sequence(dummy_merger & dummy, int l)
     return seq;
 }
 
+// forced instantiation
+const unsigned volume = 3 * 1024 * 1024; // in KiB
+const unsigned mem_for_queue = 256 * 1024 * 1024;
+template class stxxl::PRIORITY_QUEUE_GENERATOR<my_type, my_cmp, mem_for_queue, volume / sizeof(my_type)>;
+template class stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5>;
+
 int main()
 {
     stxxl::config::get_instance();
