@@ -1,0 +1,32 @@
+/* Customization of doxygen's style for STXXL */
+
+/* space out lines slightly */
+body { 
+  line-height: 1.20em;
+}
+
+/* increase size of code snippets */
+div.fragment {
+  padding: 4px 6px;
+}
+
+div.fragment div.line {
+  line-height: 135%;
+}
+
+/* make heading smaller */
+h1 { font-size: 16pt; margin: 12pt 0px 8pt 0px; }
+h2 { font-size: 15pt; margin: 12pt 0px 8pt 0px; }
+h3 { font-size: 14pt; margin: 12pt 0px 8pt 0px; }
+h4 { font-size: 14pt; margin: 10pt 0px 6pt 0px; }
+
+/* limit maximum width of text content */
+div.contents {
+  max-width: 120ex;
+  text-align: justify;
+  hyphens: auto;
+  moz-hyphens: auto;
+  o-hyphens: auto;
+  -ms-hyphens: auto;
+  -webkit-hyphens: auto;
+}
