@@ -1,6 +1,9 @@
 /***************************************************************************
  *  include/stxxl/bits/containers/priority_queue.h
  *
+ *  Implements a data structure from "Peter Sanders. Fast Priority Queues for
+ *  Cached Memory. ALENEX'99" for external memory.
+ *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 1999 Peter Sanders <sanders@mpi-sb.mpg.de>
@@ -34,8 +37,8 @@ __STXXL_BEGIN_NAMESPACE
 // internal memory consumption >= N_*(KMAX_^IntLevels_) + ext
 
 template <
-    class Tp_,
-    class Cmp_,
+    class ValueType,
+    class CompareType,
     unsigned BufferSize1_ = 32,                    // equalize procedure call overheads etc.
     unsigned N_ = 512,                             // length of group 1 sequences
     unsigned IntKMAX_ = 64,                        // maximal arity for internal mergers
@@ -47,8 +50,8 @@ template <
     >
 struct priority_queue_config
 {
-    typedef Tp_ value_type;
-    typedef Cmp_ comparator_type;
+    typedef ValueType value_type;
+    typedef CompareType comparator_type;
     typedef AllocStr_ alloc_strategy_type;
     enum
     {
@@ -59,7 +62,7 @@ struct priority_queue_config
         num_ext_groups = ExtLevels_,
         BlockSize = BlockSize_,
         ExtKMAX = ExtKMAX_,
-        element_size = sizeof(Tp_)
+        element_size = sizeof(ValueType)
     };
 };
 
@@ -67,31 +70,31 @@ __STXXL_END_NAMESPACE
 
 namespace std
 {
-    template <class BlockType_,
-              class Cmp_,
-              unsigned Arity_,
-              class AllocStr_>
-    void swap(stxxl::priority_queue_local::ext_merger<BlockType_, Cmp_, Arity_, AllocStr_> & a,
-              stxxl::priority_queue_local::ext_merger<BlockType_, Cmp_, Arity_, AllocStr_> & b)
-    {
-        a.swap(b);
-    }
-    template <class ValTp_, class Cmp_, unsigned KNKMAX>
-    void swap(stxxl::priority_queue_local::loser_tree<ValTp_, Cmp_, KNKMAX> & a,
-              stxxl::priority_queue_local::loser_tree<ValTp_, Cmp_, KNKMAX> & b)
-    {
-        a.swap(b);
-    }
+template <class BlockType,
+          class CompareType,
+          unsigned Arity,
+          class AllocStr>
+void swap(stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity, AllocStr> & a,
+          stxxl::priority_queue_local::ext_merger<BlockType, CompareType, Arity, AllocStr> & b)
+{
+    a.swap(b);
+}
+template <class ValueType, class CompareType, unsigned KNKMAX>
+void swap(stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX> & a,
+          stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX> & b)
+{
+    a.swap(b);
+}
 }
 
 __STXXL_BEGIN_NAMESPACE
 
 //! External priority queue data structure
-template <class Config_>
+template <class ConfigType>
 class priority_queue : private noncopyable
 {
 public:
-    typedef Config_ Config;
+    typedef ConfigType Config;
     enum
     {
         delete_buffer_size = Config::delete_buffer_size,
@@ -104,13 +107,14 @@ public:
         ExtKMAX = Config::ExtKMAX
     };
 
-    //! The type of object stored in the \b priority_queue.
+    //! The type of object stored in the priority_queue.
     typedef typename Config::value_type value_type;
     //! Comparison object.
     typedef typename Config::comparator_type comparator_type;
     typedef typename Config::alloc_strategy_type alloc_strategy_type;
     //! An unsigned integral type (64 bit).
     typedef stxxl::uint64 size_type;
+    //! Type of the block used in disk-memory transfers
     typedef typed_block<BlockSize, value_type> block_type;
     typedef read_write_pool<block_type> pool_type;
 
@@ -240,33 +244,30 @@ public:
 
     //! Returns "largest" element.
     //!
-    //! Returns a const reference to the element at the
-    //! top of the priority_queue. The element at the top is
-    //! guaranteed to be the largest element in the \b priority queue,
-    //! as determined by the comparison function \b Config_::comparator_type
-    //! (the same as the second parameter of PRIORITY_QUEUE_GENERATOR utility
-    //! class). That is,
-    //! for every other element \b x in the priority_queue,
-    //! \b Config_::comparator_type(Q.top(), x) is false.
-    //! Precondition: \c empty() is false.
+    //! Returns a const reference to the element at the top of the
+    //! priority_queue. The element at the top is guaranteed to be the largest
+    //! element in the \b priority queue, as determined by the comparison
+    //! function \b comparator_type (the same as the second parameter of
+    //! PRIORITY_QUEUE_GENERATOR utility class). That is, for every other
+    //! element \b x in the priority_queue, \b comparator_type(Q.top(), x) is
+    //! false. Precondition: \c empty() is false.
     const value_type & top() const;
 
     //! Removes the element at the top.
     //!
-    //! Removes the element at the top of the priority_queue, that
-    //! is, the largest element in the \b priority_queue.
-    //! Precondition: \c empty() is \b false.
-    //! Postcondition: \c size() will be decremented by 1.
+    //! Removes the element at the top of the priority_queue, that is, the
+    //! largest element in the \b priority_queue. Precondition: \c empty() is
+    //! \b false. Postcondition: \c size() will be decremented by 1.
     void pop();
 
     //! Inserts x into the priority_queue.
     //!
-    //! Inserts x into the priority_queue. Postcondition:
-    //! \c size() will be incremented by 1.
+    //! Inserts x into the priority_queue. Postcondition: \c size() will be
+    //! incremented by 1.
     void push(const value_type & obj);
 
-    //! Number of bytes consumed by the \b priority_queue from
-    //! the internal memory not including pools (see the constructor)
+    //! Number of bytes consumed by the \b priority_queue from the internal
+    //! memory not including pools (see the constructor)
     unsigned_type mem_cons() const
     {
         unsigned_type dynam_alloc_mem = 0;
@@ -289,8 +290,8 @@ public:
 };
 
 
-template <class Config_>
-inline typename priority_queue<Config_>::size_type priority_queue<Config_>::size() const
+template <class ConfigType>
+inline typename priority_queue<ConfigType>::size_type priority_queue<ConfigType>::size() const
 {
     return size_ +
            insert_heap.size() - 1 +
@@ -298,20 +299,20 @@ inline typename priority_queue<Config_>::size_type priority_queue<Config_>::size
 }
 
 
-template <class Config_>
-inline const typename priority_queue<Config_>::value_type & priority_queue<Config_>::top() const
+template <class ConfigType>
+inline const typename priority_queue<ConfigType>::value_type & priority_queue<ConfigType>::top() const
 {
     assert(!insert_heap.empty());
 
-    const typename priority_queue<Config_>::value_type & t = insert_heap.top();
+    const typename priority_queue<ConfigType>::value_type & t = insert_heap.top();
     if (/*(!insert_heap.empty()) && */ cmp(*delete_buffer_current_min, t))
         return t;
     else
         return *delete_buffer_current_min;
 }
 
-template <class Config_>
-inline void priority_queue<Config_>::pop()
+template <class ConfigType>
+inline void priority_queue<ConfigType>::pop()
 {
     //STXXL_VERBOSE1("priority_queue::pop()");
     assert(!insert_heap.empty());
@@ -327,8 +328,8 @@ inline void priority_queue<Config_>::pop()
     }
 }
 
-template <class Config_>
-inline void priority_queue<Config_>::push(const value_type & obj)
+template <class ConfigType>
+inline void priority_queue<ConfigType>::push(const value_type & obj)
 {
     //STXXL_VERBOSE3("priority_queue::push("<< obj <<")");
     assert(int_mergers->not_sentinel(obj));
@@ -344,8 +345,8 @@ inline void priority_queue<Config_>::push(const value_type & obj)
 
 ////////////////////////////////////////////////////////////////
 
-template <class Config_>
-priority_queue<Config_>::priority_queue(pool_type & pool_) :
+template <class ConfigType>
+priority_queue<ConfigType>::priority_queue(pool_type & pool_) :
     pool(&pool_),
     pool_owned(false),
     delete_buffer_end(delete_buffer + delete_buffer_size),
@@ -357,8 +358,8 @@ priority_queue<Config_>::priority_queue(pool_type & pool_) :
 }
 
 // DEPRECATED
-template <class Config_>
-priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) :
+template <class ConfigType>
+priority_queue<ConfigType>::priority_queue(prefetch_pool<block_type> & p_pool_, write_pool<block_type> & w_pool_) :
     pool(new pool_type(p_pool_, w_pool_)),
     pool_owned(true),
     delete_buffer_end(delete_buffer + delete_buffer_size),
@@ -369,8 +370,8 @@ priority_queue<Config_>::priority_queue(prefetch_pool<block_type> & p_pool_, wri
     init();
 }
 
-template <class Config_>
-priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem) :
+template <class ConfigType>
+priority_queue<ConfigType>::priority_queue(unsigned_type p_pool_mem, unsigned_type w_pool_mem) :
     pool(new pool_type(p_pool_mem / BlockSize, w_pool_mem / BlockSize)),
     pool_owned(true),
     delete_buffer_end(delete_buffer + delete_buffer_size),
@@ -381,8 +382,8 @@ priority_queue<Config_>::priority_queue(unsigned_type p_pool_mem, unsigned_type 
     init();
 }
 
-template <class Config_>
-void priority_queue<Config_>::init()
+template <class ConfigType>
+void priority_queue<ConfigType>::init()
 {
     assert(!cmp(cmp.min_value(), cmp.min_value())); // verify strict weak ordering
 
@@ -403,8 +404,8 @@ void priority_queue<Config_>::init()
     }
 }
 
-template <class Config_>
-priority_queue<Config_>::~priority_queue()
+template <class ConfigType>
+priority_queue<ConfigType>::~priority_queue()
 {
     STXXL_VERBOSE_PQ("~priority_queue()");
     if (pool_owned)
@@ -418,8 +419,8 @@ priority_queue<Config_>::~priority_queue()
 //--------------------- Buffer refilling -------------------------------
 
 // refill group_buffers[j] and return number of elements found
-template <class Config_>
-unsigned_type priority_queue<Config_>::refill_group_buffer(unsigned_type group)
+template <class ConfigType>
+unsigned_type priority_queue<ConfigType>::refill_group_buffer(unsigned_type group)
 {
     STXXL_VERBOSE_PQ("refill_group_buffer(" << group << ")");
 
@@ -476,9 +477,8 @@ unsigned_type priority_queue<Config_>::refill_group_buffer(unsigned_type group)
     return length + left_elements;
 }
 
-
-template <class Config_>
-void priority_queue<Config_>::refill_delete_buffer()
+template <class ConfigType>
+void priority_queue<ConfigType>::refill_delete_buffer()
 {
     STXXL_VERBOSE_PQ("refill_delete_buffer()");
 
@@ -619,8 +619,8 @@ void priority_queue<Config_>::refill_delete_buffer()
 // check if space is available on level k and
 // empty this level if necessary leading to a recursive call.
 // return the level where space was finally available
-template <class Config_>
-unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
+template <class ConfigType>
+unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type level)
 {
     STXXL_VERBOSE_PQ("make_space_available(" << level << ")");
     unsigned_type finalLevel;
@@ -696,8 +696,8 @@ unsigned_type priority_queue<Config_>::make_space_available(unsigned_type level)
 
 
 // empty the insert heap into the main data structure
-template <class Config_>
-void priority_queue<Config_>::empty_insert_heap()
+template <class ConfigType>
+void priority_queue<ConfigType>::empty_insert_heap()
 {
     STXXL_VERBOSE_PQ("empty_insert_heap()");
     assert(insert_heap.size() == (N + 1));
@@ -777,8 +777,8 @@ void priority_queue<Config_>::empty_insert_heap()
         refill_delete_buffer();
 }
 
-template <class Config_>
-void priority_queue<Config_>::dump_sizes() const
+template <class ConfigType>
+void priority_queue<ConfigType>::dump_sizes() const
 {
     unsigned_type capacity = N;
     STXXL_MSG("pq::size()\t= " << size());
@@ -788,7 +788,7 @@ void priority_queue<Config_>::dump_sizes() const
         capacity *= IntKMAX;
         STXXL_MSG("  grp " << i << " int" <<
                 " grpbuf=" << current_group_buffer_size(i) <<
-                " size=" << int_mergers[i].size() << "/" << capacity << 
+                " size=" << int_mergers[i].size() << "/" << capacity <<
                 " space=" << int_mergers[i].is_space_available());
     }
     for (int i = 0; i < num_ext_groups; ++i) {
@@ -801,18 +801,18 @@ void priority_queue<Config_>::dump_sizes() const
     dump_params();
 }
 
-template <class Config_>
-void priority_queue<Config_>::dump_params() const
+template <class ConfigType>
+void priority_queue<ConfigType>::dump_params() const
 {
     STXXL_MSG("params: delete_buffer_size=" << delete_buffer_size << " N=" << N << " IntKMAX=" << IntKMAX << " num_int_groups=" << num_int_groups << " ExtKMAX=" << ExtKMAX << " num_ext_groups=" << num_ext_groups << " BlockSize=" << BlockSize);
 }
 
 namespace priority_queue_local
 {
-    struct Parameters_for_priority_queue_not_found_Increase_IntM
+    struct Parameters_for_priority_queue_not_found_Increase_IntMem
     {
         enum { fits = false };
-        typedef Parameters_for_priority_queue_not_found_Increase_IntM result;
+        typedef Parameters_for_priority_queue_not_found_Increase_IntMem result;
     };
 
     struct dummy
@@ -821,51 +821,51 @@ namespace priority_queue_local
         typedef dummy result;
     };
 
-    template <unsigned_type E_, unsigned_type IntM_, unsigned_type MaxS_, unsigned_type B_, unsigned_type m_, bool stop = false>
+    template <unsigned_type E_, unsigned_type IntMem_, unsigned_type MaxItems, unsigned_type B_, unsigned_type m_, bool stop = false>
     struct find_B_m
     {
-        typedef find_B_m<E_, IntM_, MaxS_, B_, m_, stop> Self;
+        typedef find_B_m<E_, IntMem_, MaxItems, B_, m_, stop> Self;
         enum {
-            k = IntM_ / B_,    // number of blocks that fit into M
-            element_size = E_, // element size
-            IntM = IntM_,
-            B = B_,            // block size
-            m = m_,            // number of blocks fitting into buffers
+            k = IntMem_ / B_,   // number of blocks that fit into M
+            element_size = E_,  // element size
+            IntMem = IntMem_,
+            B = B_,             // block size
+            m = m_,             // number of blocks fitting into buffers
             c = k - m_,
-            // memory occ. by block must be at least 10 times larger than size of ext sequence
+            // memory occupied by block must be at least 10 times larger than size of ext sequence
             // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
-            fits = c > 10 && ((k - m) * (m) * (m * B / (element_size * 4 * 1024))) >= MaxS_
-                   && ((MaxS_ < ((k - m) * m / (2 * element_size)) * 1024) || m >= 128),
+            fits = c > 10 && ((k - m) * (m) * (m * B / (element_size * 4 * 1024))) >= MaxItems
+                   && ((MaxItems < ((k - m) * m / (2 * element_size)) * 1024) || m >= 128),
             step = 1
         };
 
-        typedef typename find_B_m<element_size, IntM, MaxS_, B, m + step, fits || (m >= k - step)>::result candidate1;
-        typedef typename find_B_m<element_size, IntM, MaxS_, B / 2, 1, fits || candidate1::fits>::result candidate2;
+        typedef typename find_B_m<element_size, IntMem, MaxItems, B, m + step, fits || (m >= k - step)>::result candidate1;
+        typedef typename find_B_m<element_size, IntMem, MaxItems, B / 2, 1, fits || candidate1::fits>::result candidate2;
         typedef typename IF<fits, Self, typename IF<candidate1::fits, candidate1, candidate2>::result>::result result;
     };
 
     // specialization for the case when no valid parameters are found
-    template <unsigned_type E_, unsigned_type IntM_, unsigned_type MaxS_, bool stop>
-    struct find_B_m<E_, IntM_, MaxS_, 2048, 1, stop>
+    template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems, bool stop>
+    struct find_B_m<E_, IntMem, MaxItems, 2048, 1, stop>
     {
         enum { fits = false };
-        typedef Parameters_for_priority_queue_not_found_Increase_IntM result;
+        typedef Parameters_for_priority_queue_not_found_Increase_IntMem result;
     };
 
     // to speedup search
-    template <unsigned_type E_, unsigned_type IntM_, unsigned_type MaxS_, unsigned_type B_, unsigned_type m_>
-    struct find_B_m<E_, IntM_, MaxS_, B_, m_, true>
+    template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems, unsigned_type B_, unsigned_type m_>
+    struct find_B_m<E_, IntMem, MaxItems, B_, m_, true>
     {
         enum { fits = false };
         typedef dummy result;
     };
 
     // E_ size of element in bytes
-    template <unsigned_type E_, unsigned_type IntM_, unsigned_type MaxS_>
+    template <unsigned_type E_, unsigned_type IntMem, unsigned_type MaxItems>
     struct find_settings
     {
         // start from block size (8*1024*1024) bytes
-        typedef typename find_B_m<E_, IntM_, MaxS_, (8 * 1024 * 1024), 1>::result result;
+        typedef typename find_B_m<E_, IntMem, MaxItems, (8 * 1024 * 1024), 1>::result result;
     };
 
     struct Parameters_not_found_Try_to_change_the_Tune_parameter
@@ -874,17 +874,17 @@ namespace priority_queue_local
     };
 
 
-    template <unsigned_type AI_, unsigned_type X_, unsigned_type CriticalSize_>
+    template <unsigned_type AI_, unsigned_type X_, unsigned_type CriticalSize>
     struct compute_N
     {
-        typedef compute_N<AI_, X_, CriticalSize_> Self;
+        typedef compute_N<AI_, X_, CriticalSize> Self;
         enum
         {
             X = X_,
             AI = AI_,
             N = X / (AI * AI) // two stage internal
         };
-        typedef typename IF<(N >= CriticalSize_), Self, typename compute_N<AI / 2, X, CriticalSize_>::result>::result result;
+        typedef typename IF<(N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result result;
     };
 
     template <unsigned_type X_, unsigned_type CriticalSize_>
@@ -892,83 +892,42 @@ namespace priority_queue_local
     {
         typedef Parameters_not_found_Try_to_change_the_Tune_parameter result;
     };
-}
+} // namespace priority_queue_local
 
 //! \}
 
 //! \addtogroup stlcont
 //! \{
 
-//! Priority queue type generator.
+//! \brief Priority queue type generator, see \ref design_pqueue for details.
 //!
-//! Implements a data structure from "Peter Sanders. Fast Priority Queues
-//! for Cached Memory. ALENEX'99" for external memory.
-//! <BR>
-//! \tparam type of the contained objects (POD with no references to internal memory)
-//! \tparam the comparison type used to determine
-//! whether one element is smaller than another element.
-//! If Cmp_(x,y) is true, then x is smaller than y. The element
-//! returned by Q.top() is the largest element in the priority
-//! queue. That is, it has the property that, for every other
-//! element \b x in the priority queue, Cmp_(Q.top(), x) is false.
-//! Cmp_ must also provide min_value method, that returns value of type Tp_ that is
-//! smaller than any element of the queue \b x , i.e. Cmp_(Cmp_.min_value(),x) is
-//! always \b true . <BR>
-//! <BR>
-//! Example: comparison object for priority queue
-//! where \b top() returns the \b smallest contained integer:
-//! \verbatim
-//! struct CmpIntGreater
-//! {
-//!   bool operator () (const int & a, const int & b) const { return a>b; }
-//!   int min_value() const  { return std::numeric_limits<int>::max(); }
-//! };
-//! \endverbatim
-//! Example: comparison object for priority queue
-//! where \b top() returns the \b largest contained integer:
-//! \verbatim
-//! struct CmpIntLess
-//! {
-//!   bool operator () (const int & a, const int & b) const { return a<b; }
-//!   int min_value() const  { return std::numeric_limits<int>::min(); }
-//! };
-//! \endverbatim
-//! Note that Cmp_ must define strict weak ordering.
-//! (<A HREF="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">see what it is</A>)
-//! - \c IntM_ upper limit for internal memory consumption in bytes.
-//! - \c MaxS_ upper limit for number of elements contained in the priority queue (in 1024 units).
+//! \tparam ValueType type of the contained objects (POD with no references to internal memory)
+//!
+//! \tparam ComareType the comparator type used to determine whether one element is
+//! smaller than another element.
+//!
+//! \tparam IntMemory upper limit for internal memory consumption in bytes.
+//!
+//! \tparam MaxItems upper limit for number of elements contained in the priority queue (in 1024 units). <BR>
 //! Example: if you are sure that priority queue contains no more than
-//! one million elements in a time, then the right parameter is (1000000/1024)= 976 .
-//! - \c Tune_ tuning parameter. Try to play with it if the code does not compile
-//! (larger than default values might help). Code does not compile
-//! if no suitable internal parameters were found for given IntM_ and MaxS_.
-//! It might also happen that given IntM_ is too small for given MaxS_, try larger values.
-//! <BR>
-//! \c PRIORITY_QUEUE_GENERATOR is template meta program that searches
-//! for \b 7 configuration parameters of \b stxxl::priority_queue that both
-//! minimize internal memory consumption of the priority queue to
-//! match IntM_ and maximize performance of priority queue operations.
-//! Actual memory consumption might be larger (use
-//! \c stxxl::priority_queue::mem_cons() method to track it), since the search
-//! assumes rather optimistic schedule of push'es and pop'es for the
-//! estimation of the maximum memory consumption. To keep actual memory
-//! requirements low increase the value of MaxS_ parameter.
-//! <BR>
-//! For functioning a priority queue object requires two pools of blocks
-//! (See constructor of \c priority_queue ). To construct \c \<stxxl\> block
-//! pools you might need \b block \b type that will be used by priority queue.
-//! Note that block's size and hence it's type is generated by
-//! the \c PRIORITY_QUEUE_GENERATOR in compile type from IntM_, MaxS_ and sizeof(Tp_) and
-//! not given directly by user as a template parameter. Block type can be extracted as
-//! \c PRIORITY_QUEUE_GENERATOR<some_parameters>::result::block_type .
-//! For an example see p_queue.cpp .
-//! Configured priority queue type is available as \c PRIORITY_QUEUE_GENERATOR<>::result. <BR> <BR>
-template <class Tp_, class Cmp_, unsigned_type IntM_, unsigned MaxS_, unsigned Tune_ = 6>
+//! one million elements in a time, then the right parameter is (1000000 / 1024) = 976.
+//!
+//! \tparam Tune tuning parameter for meta-program search. <BR>
+//! Try to play with it if the code does not compile (larger than default
+//! values might help). Code does not compile if no suitable internal
+//! parameters were found for given IntMemory and MaxItems. It might also
+//! happen that given IntMemory is too small for given MaxItems, try larger
+//! values.
+template <class ValueType,
+          class CompareType,
+          unsigned_type IntMemory,
+          unsigned MaxItems,
+          unsigned Tune = 6>
 class PRIORITY_QUEUE_GENERATOR
 {
 public:
     // actual calculation of B, m, k and element_size
-    typedef typename priority_queue_local::find_settings<sizeof(Tp_), IntM_, MaxS_>::result settings;
+    typedef typename priority_queue_local::find_settings<sizeof(ValueType), IntMemory, MaxItems>::result settings;
     enum {
         B = settings::B,
         m = settings::m,
@@ -976,7 +935,7 @@ public:
         Buffer1Size = 32                                     // fixed
     };
     // derivation of N, AI, AE
-    typedef typename priority_queue_local::compute_N<(1 << Tune_), X, 4 * Buffer1Size>::result ComputeN;
+    typedef typename priority_queue_local::compute_N<(1 << Tune), X, 4 * Buffer1Size>::result ComputeN;
     enum
     {
         N = ComputeN::N,
@@ -985,18 +944,18 @@ public:
     };
     enum {
         // Estimation of maximum internal memory consumption (in bytes)
-        EConsumption = X * settings::element_size + settings::B * AE + ((MaxS_ / X) / AE) * settings::B * 1024
+        EConsumption = X * settings::element_size + settings::B * AE + ((MaxItems / X) / AE) * settings::B * 1024
     };
     /*
         unsigned BufferSize1_ = 32, // equalize procedure call overheads etc.
         unsigned N_ = 512,          // bandwidth
         unsigned IntKMAX_ = 64,     // maximal arity for internal mergers
         unsigned IntLevels_ = 4,
-        unsigned BlockSize_ = (2*1024*1024),
+        unsigned BlockSize = (2*1024*1024),
         unsigned ExtKMAX_ = 64,     // maximal arity for external mergers
         unsigned ExtLevels_ = 2,
      */
-    typedef priority_queue<priority_queue_config<Tp_, Cmp_, Buffer1Size, N, AI, 2, B, AE, 2> > result;
+    typedef priority_queue<priority_queue_config<ValueType, CompareType, Buffer1Size, N, AI, 2, B, AE, 2> > result;
 };
 
 //! \}
@@ -1004,15 +963,16 @@ public:
 __STXXL_END_NAMESPACE
 
 
-namespace std
+namespace std {
+
+template <class ConfigType>
+void swap(stxxl::priority_queue<ConfigType> & a,
+          stxxl::priority_queue<ConfigType> & b)
 {
-    template <class Config_>
-    void swap(stxxl::priority_queue<Config_> & a,
-              stxxl::priority_queue<Config_> & b)
-    {
-        a.swap(b);
-    }
+    a.swap(b);
 }
+
+} // namespace std
 
 #endif // !STXXL_PRIORITY_QUEUE_HEADER
 // vim: et:ts=4:sw=4

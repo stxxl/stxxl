@@ -870,7 +870,7 @@ public:
 enum stack_externality { external, migrating, internal };
 enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
-//! Stack type generator.
+//! \brief Stack type generator, see \ref design_stack for details.
 //!
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //!

@@ -16,7 +16,7 @@
 
 namespace stxxl {
 
-/*! \page design Design of STXXL
+/** \page design Design of STXXL
 
 \author Roman Dementiev
 \date written 2006
@@ -135,7 +135,7 @@ to store it on the disk.
 
 */
 
-/*! \page design_stl The STL-User Layer
+/** \page design_stl The STL-User Layer
 
 \section stl_general General Issues Concerning STXXL Containers
 
@@ -161,7 +161,7 @@ We have implemented a \link design_algo_sorting \b parallel disk sorter \endlink
 
 */
 
-/*! \page design_vector Vector
+/** \page design_vector Vector
 
 The most universal STXXL container is stxxl::vector. Vector is an array whose size can vary dynamically. The implementation of stxxl::vector is similar to the LEDA-SM array \cite CraMeh99. The content of a vector is striped block-wise over the disks, using an assignment strategy given as a template parameter. Some of the blocks are cached in a vector cache of fixed size (also a parameter). The replacement of cache blocks is controlled by a specified page-replacement strategy. STXXL has implementations of LRU and random replacement strategies. The user can provide his/her own strategy as well. The stxxl::vector has STL-compatible Random Access Iterators.
 
@@ -272,7 +272,7 @@ This issue also concerns \c front() and \c back() methods.
 
 */
 
-/*! \page design_stack Stack
+/** \page design_stack Stack
 
 The I/O efficient stack is perhaps the simplest external memory data structure. Stacks provide only restricted subset of sequence operations: insertion, removal, and inspection of the element at the top of the stack. Stacks are a "last in first out" (LIFO) data structures: the element at the top of a stack is the one that was most recently added. Stacks does not allow iteration through its elements.
 
@@ -349,7 +349,6 @@ The stxxl::migrating_stack extends the member set of stxxl::normal_stack. Additi
 
 \section design_stack_generator stxxl::STACK_GENERATOR
 
-
 To provide an easy way to choose and configure the stack
 implementations, STXXL offers a template meta program called
 stxxl::STACK_GENERATOR.
@@ -396,21 +395,28 @@ S.set_prefetch_aggressiveness(0);
 
 */
 
-/*! \page design_queue Queue
+/** \page design_queue Queue
 
 STXXL also has an implementation of external memory FIFO stxxl::queue. Its design is similar to stxxl::grow_shrink_stack2. The implementation holds the head and the tail blocks in the main memory. Prefetch and write block pools might be used to overlap I/O and computation during stxxl::queue operations.
 
 */
 
-/*! \page design_deque Deque
+/** \page design_deque Deque
 
 The STXXL implementation of external memory stxxl::deque is an adaptor of an (external memory) vector. This implementation wraps the elements around the end of the vector \b circularly. It provides the pop/push operations from/to the both ends of the stxxl::deque in \f$ \mathcal{O}(1/DB) \f$ amortized I/Os if parameterized with a properly configured stxxl::vector.
 
 */
 
-/*! \page design_pqueue Priority Queue
+/** \page design_pqueue Priority Queue
 
-External memory priority queues are the central data structures for many I/O efficient graph algorithms \cite ZehPhd \cite ChiEtAl95 \cite MSS03. The main technique in these algorithms is time-forward processing \cite ChiEtAl95 \cite Arg95, easily realizable by an I/O efficient priority queue. I/O efficient priority queues also find application in large-scale discrete event simulation and online sorting. The STXXL implementation of priority queues is based on \cite San00b. An operation of this priority queue, called sequence heap, takes \f$ \mathcal{O}(\frac{1}{B}\log_{M/B}(I/B)) \f$ amortized I/Os, where \f$ I \f$ is the total number of insertions into the priority queue. This queue needs less than a third of I/Os used by other similar cache (I/O) efficient priority queues (e.g. \cite Brengel00 \cite FJKT97).
+A priority queue is a data structure that provides a restricted subset of container functionality: it provides insertion of elements, and inspection and removal of the top element. It is guaranteed that the top element is the largest element in the priority queue, where the function object Cmp is used for comparisons. Priority queues do not allow iteration through its elements.
+
+External memory priority queues are the central data structures for many I/O efficient graph algorithms (\cite ZehPhd \cite ChiEtAl95 \cite MSS03). The main technique in these algorithms is time-forward processing (\cite ChiEtAl95 \cite Arg95), easily realizable by an I/O efficient priority queue. I/O efficient priority queues also find application in large-scale discrete event simulation and online sorting. The STXXL implementation of priority queues is based on \cite San00b. An operation of this priority queue, called sequence heap, takes \f$ \mathcal{O}(\frac{1}{B}\log_{M/B}(I/B)) \f$ amortized I/Os, where \f$ I \f$ is the total number of insertions into the priority queue. This queue needs less than a third of I/Os used by other similar cache (I/O) efficient priority queues (e.g. \cite Brengel00 \cite FJKT97). The amortized run time of the STXXL priority queue are
+operation | internal work               | I/O (amortized)
+--------- | --------------------------- | ------------------------
+insertion | \f$ \mathcal{O}(\log I) \f$ | \f$ \mathcal{O}(1/B) \f$
+deletion  | \f$ \mathcal{O}(\log I) \f$ | \f$ \mathcal{O}(1/B) \f$
+where \f$ I \f$ is the number of performed operations.
 
 A sequence heap maintains \f$ R \f$ <b>merge groups</b> \f$ G_1,\ldots, G_R \f$ where \f$ G_i \f$ holds up to \f$ k \f$ sorted sequences of size up to \f$ m k^{i-1} \f$, \f$ m << M \f$, see following figure. When group \f$ G_i \f$ overflows, all its sequences are merged, and the resulting sequence is put into group \f$ G_{i+1} \f$. Each group is equipped with a <b>group buffer</b> of size \f$ m \f$ to allow batched deletion from the sequences. The smallest elements of these buffers are deleted in small batches and stored in the <b>deletion buffer</b>. The elements are first inserted into the <b>insertion priority queue</b>. On deletion, one checks the minimum elements stored in the insertion priority queue and the deletion buffer.
 
@@ -418,9 +424,49 @@ The difference of our implementation to \cite San00b is that a number of larger 
 
 \image html san00b_pqueue_small.png "The structure of STXXL priority queue"
 
+\section design_pqueue_generator stxxl::PRIORITY_QUEUE_GENERATOR
+
+Since the stxxl::priority_queue has many setup parameters (internal memory buffer sizes, arity of mergers, number of internal and external memory merger groups, etc.) which are difficult to guess, STXXL provides a helper meta template program that searches for the optimum settings for user demands. This is necessary to limit the amount of main memory occupied by the different buffers of the data structure. The program is called stxxl::PRIORITY_QUEUE_GENERATOR.
+
+The stxxl::PRIORITY_QUEUE_GENERATOR has the following template parameters:
+
+\copydetails stxxl::PRIORITY_QUEUE_GENERATOR
+
+## Notes
+
+- If \c CompareType(x,y) is true, then x is smaller than y. The element returned by \c Q.top() is the largest element in the priority queue. That is, it has the property that, for every other element \b x in the priority queue, \c CompareType(Q.top(),x) is false. \c CompareType must also provide \c min_value() method, that returns value of type ValueType that is smaller than any element of the queue \b x, i.e. \c CompareType(CompareType.min_value(),x) is always \b true. <BR>
+Example: comparison object for priority queue
+where \c top() returns the \b smallest contained integer:
+\code
+struct CmpIntGreater
+{
+    bool operator () (const int & a, const int & b) const { return a > b; }
+    int min_value() const  { return std::numeric_limits<int>::max(); }
+};
+\endcode
+Example: comparison object for priority queue where \c top() returns the \b largest contained integer:
+\code
+struct CmpIntLess
+{
+    bool operator () (const int & a, const int & b) const { return a < b; }
+    int min_value() const  { return std::numeric_limits<int>::min(); }
+};
+\endcode
+Note that \c CompareType must define strict weak ordering. (<a href="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">see what it is</a>)
+
+- stxxl::PRIORITY_QUEUE_GENERATOR is template meta program that searches for \b 7 configuration parameters of \b stxxl::priority_queue that both minimize internal memory consumption of the priority queue to match \c IntMemory and maximize performance of priority queue operations.  Actual memory consumption might be larger (use stxxl::priority_queue::mem_cons() method to track it), since the search assumes rather optimistic schedule of push'es and pop'es for the estimation of the maximum memory consumption. To keep actual memory requirements low increase the value of \c MaxItems parameter.
+
+- For functioning a priority queue object requires two pools of blocks (See constructor of stxxl::priority_queue). To construct STXXL block pools you might need \b block_type that will be used by priority queue. Note that block's size and hence it's type is generated by the stxxl::PRIORITY_QUEUE_GENERATOR in compile type from \c IntMemory, \c MaxItems and \c sizeof(ValueType) and not given directly by user as a template parameter. Block type can be extracted as stxxl::PRIORITY_QUEUE_GENERATOR<>::result::block_type (see \ref example_pqueue).
+
+- The configured priority queue type is available as stxxl::PRIORITY_QUEUE_GENERATOR<>::result.
+
+\section design_pqueue_memory Internal Memory Consumption of stxxl::priority_queue
+
+Internal memory consumption of stxxl::priority_queue is bounded by the IntMemory template parameter in most situations.
+
 */
 
-/*! \page design_map Map (B+-tree)
+/** \page design_map Map (B+-tree)
 
 stxxl::map is an STL interface for search trees with unique keys. Our implementation of stxxl::map is a variant of a B+-tree data structure \cite BM72 supporting the operations \c insert, \c erase, \c find, \c lower_bound and \c upper_bound in optimal \f$ \mathcal{O}(\log_{B}(n)) \f$ I/Os. Operations of stxxl::map use \a iterators to refer to the elements stored in the container, e.g. \c find and \c insert return an iterator pointing to the data. Iterators are used for range queries: an iterator pointing to the smallest element in the range is returned by \c lower_bound, the element which is next to the maximum element in the range is returned by \c upper_bound. Scanning through the elements of the query can be done by using \c operator++ or \c operator-- of the obtained iterators in \f$ \mathcal{O}(R/B) \f$ I/Os, where \f$ R \f$ is the number of elements in the result. Our current implementation does not exploit disk parallelism. The flexibility of the iterator-based access has some circumstances for an external memory implementation: iterators must return correct data after reorganizations in the data structure even when the pointed data is moved to a different external memory block.
 
@@ -434,13 +480,13 @@ Our design allows to use different implementations for leaves and (internal) nod
 
 */
 
-/*! \page design_matrix Matrix
+/** \page design_matrix Matrix
 
 Currently undocumented. TODO
 
 */
 
-/*! \page design_algo STXXL Algorithms
+/** \page design_algo STXXL Algorithms
 
 The algorithms of the STL can be divided into two groups by their memory access pattern: <b>scanning</b> algorithms and <b>random access</b> algorithms.
 
@@ -456,7 +502,7 @@ Random access algorithms require random access iterators, hence may perform (man
 
 */
 
-/*! \page design_algo_sorting Parallel Disk Sorting
+/** \page design_algo_sorting Parallel Disk Sorting
 
 \author Roman Dementiev
 \date written 2006
@@ -541,7 +587,7 @@ Furthermore, we exploit random keys. We use two passes of MSD (most significant 
 
 namespace stream {
 
-/*! \page design_pipeline Algorithm Pipelining
+/** \page design_pipeline Algorithm Pipelining
 
 \author Roman Dementiev
 \date written 2006
