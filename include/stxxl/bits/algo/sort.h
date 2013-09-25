@@ -6,6 +6,7 @@
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2006 Johannes Singler <singler@ira.uka.de>
  *  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -641,68 +642,34 @@ namespace sort_local
     }
 }
 
-
-/*! \page comparison Comparison concept
-
-   Model of \b Comparison concept must:
-   - provide \b operator(a,b) that returns comparison result of two user types,
-     must define strict weak ordering
-   - provide \b max_value method that returns a value that is \b strictly \b greater than all
-   other objects of user type,
-   - provide \b min_value method that returns a value that is \b strictly \b less than all
-   other objects of user type,
-   - \b Note: when using unsigned integral types as key in user types, the value 0
-   cannot be used as a key value of the data to be sorted because it would
-   conflict with the sentinel value returned by \b min_value
-
-   Example: comparator class \b my_less_int
- \verbatim
-   struct my_less_int
-   {
-    bool operator() (int a, int b) const
-    {
-        return a < b;
-    }
-    int min_value() const { return std::numeric_limits<int>::min(); };
-    int max_value() const { return std::numeric_limits<int>::max(); };
-   };
- \endverbatim
-
-   Example: comparator class \b my_less, could be instantiated as e.g.
-      \b my_less<int> , \b my_less<unsigned long> , ...
- \verbatim
-   template <typename Tp>
-   struct my_less
-   {
-    typedef Tp value_type;
-    bool operator() (const value_type & a, const value_type & b) const
-    {
-        return a < b;
-    }
-    value_type min_value() const { return std::numeric_limits<value_type>::min(); };
-    value_type max_value() const { return std::numeric_limits<value_type>::max(); };
-   };
- \endverbatim
-
+/*!
+ * \brief Sort records comparison-based, see \ref design_algo_sort.
+ *
+ * stxxl::sort sorts the elements in [first, last) into ascending order,
+ * meaning that if \c i and \c j are any two valid iterators in [first, last)
+ * such that \c i precedes \c j, then \c *j is not less than \c *i. Note: as
+ * std::sort, stxxl::sort is not guaranteed to be stable. That is, suppose that
+ * \c *i and \c *j are equivalent: neither one is less than the other. It is
+ * not guaranteed that the relative order of these two elements will be
+ * preserved by stxxl::sort.
+ *
+ * The order is defined by the \c cmp parameter. The sorter's internal memory
+ * consumption is bounded by \a M bytes.
+ *
+ * \param first object of model of \c ext_random_access_iterator concept
+ * \param last object of model of \c ext_random_access_iterator concept
+ * \param cmp comparison object of \ref StrictWeakOrdering
+ * \param M amount of memory for internal use (in bytes)
  */
-
-
-//! Sort records comparison-based
-//! \param first object of model of \c ext_random_access_iterator concept
-//! \param last object of model of \c ext_random_access_iterator concept
-//! \param cmp comparison object
-//! \param M amount of memory for internal use (in bytes)
-//! \remark Implements external merge sort described in [Dementiev & Sanders'03]
-//! \remark non-stable
-template <typename ExtIterator_, typename StrictWeakOrdering_>
-void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsigned_type M)
+template <typename ExtIterator, typename StrictWeakOrdering>
+void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_type M)
 {
     sort_helper::verify_sentinel_strict_weak_ordering(cmp);
 
-    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator_::block_type> > run_type;
+    typedef simple_vector<sort_helper::trigger_entry<typename ExtIterator::block_type> > run_type;
 
-    typedef typename ExtIterator_::vector_type::value_type value_type;
-    typedef typename ExtIterator_::block_type block_type;
+    typedef typename ExtIterator::vector_type::value_type value_type;
+    typedef typename ExtIterator::block_type block_type;
 
     unsigned_type n = 0;
 
@@ -725,9 +692,9 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
             if (last.block_offset())              // first and last element are
             // not the first elements of their block
             {
-                typename ExtIterator_::block_type * first_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::block_type * last_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::bid_type first_bid, last_bid;
+                typename ExtIterator::block_type * first_block = new typename ExtIterator::block_type;
+                typename ExtIterator::block_type * last_block = new typename ExtIterator::block_type;
+                typename ExtIterator::bid_type first_bid, last_bid;
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
@@ -771,16 +738,16 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 
                 run_type * out =
                     sort_local::sort_blocks<
-                        typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy_type,
-                        typename ExtIterator_::bids_container_iterator>
+                        typename ExtIterator::block_type,
+                        typename ExtIterator::vector_type::alloc_strategy_type,
+                        typename ExtIterator::bids_container_iterator>
                         (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
-                first_block = new typename ExtIterator_::block_type;
-                last_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::block_type * sorted_first_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::block_type * sorted_last_block = new typename ExtIterator_::block_type;
+                first_block = new typename ExtIterator::block_type;
+                last_block = new typename ExtIterator::block_type;
+                typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
+                typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
                 request_ptr * reqs = new request_ptr[2];
 
                 reqs[0] = first_block->read(first_bid);
@@ -819,7 +786,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 
                 typename run_type::iterator it = out->begin();
                 ++it;
-                typename ExtIterator_::bids_container_iterator cur_bid = first.bid();
+                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
                 ++cur_bid;
 
                 for ( ; cur_bid != last.bid(); ++cur_bid, ++it)
@@ -842,8 +809,8 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
             {
                 // first element is
                 // not the first element of its block
-                typename ExtIterator_::block_type * first_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::bid_type first_bid;
+                typename ExtIterator::block_type * first_block = new typename ExtIterator::block_type;
+                typename ExtIterator::bid_type first_bid;
                 request_ptr req;
 
                 req = first_block->read(*first.bid());
@@ -870,15 +837,15 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 
                 run_type * out =
                     sort_local::sort_blocks<
-                        typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy_type,
-                        typename ExtIterator_::bids_container_iterator>
+                        typename ExtIterator::block_type,
+                        typename ExtIterator::vector_type::alloc_strategy_type,
+                        typename ExtIterator::bids_container_iterator>
                         (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
-                first_block = new typename ExtIterator_::block_type;
+                first_block = new typename ExtIterator::block_type;
 
-                typename ExtIterator_::block_type * sorted_first_block = new typename ExtIterator_::block_type;
+                typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
 
                 request_ptr * reqs = new request_ptr[2];
 
@@ -901,7 +868,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 
                 typename run_type::iterator it = out->begin();
                 ++it;
-                typename ExtIterator_::bids_container_iterator cur_bid = first.bid();
+                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
                 ++cur_bid;
 
                 for ( ; cur_bid != last.bid(); ++cur_bid, ++it)
@@ -925,8 +892,8 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
             if (last.block_offset())            // last is
             // not the first element of its block
             {
-                typename ExtIterator_::block_type * last_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::bid_type last_bid;
+                typename ExtIterator::block_type * last_block = new typename ExtIterator::block_type;
+                typename ExtIterator::bid_type last_bid;
                 request_ptr req;
                 unsigned_type i;
 
@@ -953,14 +920,14 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
 
                 run_type * out =
                     sort_local::sort_blocks<
-                        typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy_type,
-                        typename ExtIterator_::bids_container_iterator>
+                        typename ExtIterator::block_type,
+                        typename ExtIterator::vector_type::alloc_strategy_type,
+                        typename ExtIterator::bids_container_iterator>
                         (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
 
-                last_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::block_type * sorted_last_block = new typename ExtIterator_::block_type;
+                last_block = new typename ExtIterator::block_type;
+                typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
                 request_ptr * reqs = new request_ptr[2];
 
                 reqs[0] = last_block->read(last_bid);
@@ -981,7 +948,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                 *last.bid() = last_bid;
 
                 typename run_type::iterator it = out->begin();
-                typename ExtIterator_::bids_container_iterator cur_bid = first.bid();
+                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
 
                 for ( ; cur_bid != last.bid(); ++cur_bid, ++it)
                 {
@@ -1002,13 +969,13 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
                 n = last.bid() - first.bid();
 
                 run_type * out =
-                    sort_local::sort_blocks<typename ExtIterator_::block_type,
-                                            typename ExtIterator_::vector_type::alloc_strategy_type,
-                                            typename ExtIterator_::bids_container_iterator>
+                    sort_local::sort_blocks<typename ExtIterator::block_type,
+                                            typename ExtIterator::vector_type::alloc_strategy_type,
+                                            typename ExtIterator::bids_container_iterator>
                         (first.bid(), n, M / sort_memory_usage_factor() / block_type::raw_size, cmp);
 
                 typename run_type::iterator it = out->begin();
-                typename ExtIterator_::bids_container_iterator cur_bid = first.bid();
+                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
 
                 for ( ; cur_bid != last.bid(); ++cur_bid, ++it)
                 {
@@ -1021,7 +988,7 @@ void sort(ExtIterator_ first, ExtIterator_ last, StrictWeakOrdering_ cmp, unsign
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    typedef typename ExtIterator_::const_iterator const_iterator;
+    typedef typename ExtIterator::const_iterator const_iterator;
     assert(stxxl::is_sorted(const_iterator(first), const_iterator(last), cmp));
 #endif
 }

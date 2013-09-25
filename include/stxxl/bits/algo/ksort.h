@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -51,11 +52,11 @@ __STXXL_BEGIN_NAMESPACE
  */
 namespace ksort_local
 {
-    template <typename _BIDTp, typename _KeyTp>
+    template <typename BIDType, typename KeyType>
     struct trigger_entry
     {
-        typedef _BIDTp bid_type;
-        typedef _KeyTp key_type;
+        typedef BIDType bid_type;
+        typedef KeyType key_type;
 
         bid_type bid;
         key_type key;
@@ -67,16 +68,16 @@ namespace ksort_local
     };
 
 
-    template <typename _BIDTp, typename _KeyTp>
-    inline bool operator < (const trigger_entry<_BIDTp, _KeyTp> & a,
-                            const trigger_entry<_BIDTp, _KeyTp> & b)
+    template <typename BIDType, typename KeyType>
+    inline bool operator < (const trigger_entry<BIDType, KeyType> & a,
+                            const trigger_entry<BIDType, KeyType> & b)
     {
         return (a.key < b.key);
     }
 
-    template <typename _BIDTp, typename _KeyTp>
-    inline bool operator > (const trigger_entry<_BIDTp, _KeyTp> & a,
-                            const trigger_entry<_BIDTp, _KeyTp> & b)
+    template <typename BIDType, typename KeyType>
+    inline bool operator > (const trigger_entry<BIDType, KeyType> & a,
+                            const trigger_entry<BIDType, KeyType> & b)
     {
         return (a.key > b.key);
     }
@@ -693,93 +694,73 @@ namespace ksort_local
     }
 }
 
-
-/*! \page key_extractor Key extractor concept
-
-   Model of \b Key \b extractor concept must:
-   - define type \b key_type ,
-   - provide \b operator() that returns key value of an object of user type
-   - provide \b max_value method that returns a value that is \b strictly \b greater than all
-   other objects of user type in respect to the key obtained by this key extractor ,
-   - provide \b min_value method that returns a value that is \b strictly \b less than all
-   other objects of user type in respect to the key obtained by this key extractor ,
-   - operator > , operator <, operator == and operator != on type \b key_type must be defined.
-   - \b Note: when using unsigned integral types as key, the value 0 cannot
-   be used as a key value because it would
-   conflict with the sentinel value returned by \b min_value
-
-   Example: extractor class \b GetWeight, that extracts weight from an \b Edge
- \verbatim
-
-   struct Edge
-   {
-     unsigned src,dest,weight;
-     Edge(unsigned s,unsigned d,unsigned w):src(s),dest(d),weight(w){}
-   };
-
-   struct GetWeight
-   {
-    typedef unsigned key_type;
-    key_type operator() (const Edge & e) const
-    {
-        return e.weight;
-    }
-    Edge min_value() const { return Edge(0,0,(std::numeric_limits<key_type>::min)()); };
-    Edge max_value() const { return Edge(0,0,(std::numeric_limits<key_type>::max)()); };
-   };
- \endverbatim
-
+/*!
+ * \brief Sort records with integer keys, see \ref design_algo_ksort.
+ *
+ * stxxl::ksort sorts the elements in [first, last) into ascending order,
+ * meaning that if \c i and \c j are any two valid iterators in [first, last)
+ * such that \c i precedes \c j, then \c *j is not less than \c *i. Note: as
+ * std::sort and stxxl::sort, stxxl::ksort is not guaranteed to be stable. That
+ * is, suppose that \c *i and \c *j are equivalent: neither one is less than
+ * the other. It is not guaranteed that the relative order of these two
+ * elements will be preserved by stxxl::ksort.
+ * 
+ * The two versions of stxxl::ksort differ in how they define whether one
+ * element is less than another. The first version assumes that the elements
+ * have \c key() member function that returns an integral key (32 or 64 bit),
+ * as well as the minimum and the maximum element values. The second version
+ * compares objects extracting the keys using \c keyobj object, that is in turn
+ * provides min and max element values.
+ * 
+ * The sorter's internal memory consumption is bounded by \c M bytes.
+ *
+ * \param first object of model of \c ext_random_access_iterator concept
+ * \param last object of model of \c ext_random_access_iterator concept
+ * \param keyobj \link design_algo_ksort_key_extractor key extractor \endlink object
+ * \param M amount of memory for internal use (in bytes)
  */
-
-
-//! Sort records with integer keys
-//! \param first_ object of model of \c ext_random_access_iterator concept
-//! \param last_ object of model of \c ext_random_access_iterator concept
-//! \param keyobj \link key_extractor key extractor \endlink object
-//! \param M__ amount of memory for internal use (in bytes)
-//! \remark Order in the result is non-stable
-template <typename ExtIterator_, typename KeyExtractor_>
-void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsigned_type M__)
+template <typename ExtIterator, typename KeyExtractor>
+void ksort(ExtIterator first, ExtIterator last, KeyExtractor keyobj, unsigned_type M)
 {
-    typedef simple_vector<ksort_local::trigger_entry<typename ExtIterator_::bid_type,
-                                                     typename KeyExtractor_::key_type> > run_type;
-    typedef typename ExtIterator_::vector_type::value_type value_type;
-    typedef typename ExtIterator_::block_type block_type;
+    typedef simple_vector<ksort_local::trigger_entry<typename ExtIterator::bid_type,
+                                                     typename KeyExtractor::key_type> > run_type;
+    typedef typename ExtIterator::vector_type::value_type value_type;
+    typedef typename ExtIterator::block_type block_type;
 
 
     unsigned_type n = 0;
     block_manager * mng = block_manager::get_instance();
 
-    first_.flush();
+    first.flush();
 
-    if ((last_ - first_) * sizeof(value_type) < M__)
+    if ((last - first) * sizeof(value_type) < M)
     {
-        stl_in_memory_sort(first_, last_, ksort_local::key_comparison<value_type, KeyExtractor_>(keyobj));
+        stl_in_memory_sort(first, last, ksort_local::key_comparison<value_type, KeyExtractor>(keyobj));
     }
     else
     {
-        assert(2 * block_type::raw_size <= M__);
+        assert(2 * block_type::raw_size <= M);
 
-        if (first_.block_offset())
+        if (first.block_offset())
         {
-            if (last_.block_offset())            // first and last element reside
+            if (last.block_offset())            // first and last element reside
             // not in the beginning of the block
             {
-                typename ExtIterator_::block_type * first_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::block_type * last_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::bid_type first_bid, last_bid;
+                typename ExtIterator::block_type * first_block = new typename ExtIterator::block_type;
+                typename ExtIterator::block_type * last_block = new typename ExtIterator::block_type;
+                typename ExtIterator::bid_type first_bid, last_bid;
                 request_ptr req;
 
-                req = first_block->read(*first_.bid());
+                req = first_block->read(*first.bid());
                 mng->new_block(FR(), first_bid);                // try to overlap
                 mng->new_block(FR(), last_bid);
                 req->wait();
 
 
-                req = last_block->read(*last_.bid());
+                req = last_block->read(*last.bid());
 
                 unsigned_type i = 0;
-                for ( ; i < first_.block_offset(); i++)
+                for ( ; i < first.block_offset(); i++)
                 {
                     first_block->elem[i] = keyobj.min_value();
                 }
@@ -787,7 +768,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 req->wait();
 
                 req = first_block->write(first_bid);
-                for (i = last_.block_offset(); i < block_type::size; i++)
+                for (i = last.block_offset(); i < block_type::size; i++)
                 {
                     last_block->elem[i] = keyobj.max_value();
                 }
@@ -796,10 +777,10 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
                 req = last_block->write(last_bid);
 
-                n = last_.bid() - first_.bid() + 1;
+                n = last.bid() - first.bid() + 1;
 
-                std::swap(first_bid, *first_.bid());
-                std::swap(last_bid, *last_.bid());
+                std::swap(first_bid, *first.bid());
+                std::swap(last_bid, *last.bid());
 
                 req->wait();
 
@@ -808,17 +789,17 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
                 run_type * out =
                     ksort_local::ksort_blocks<
-                        typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy_type,
-                        typename ExtIterator_::bids_container_iterator,
-                        KeyExtractor_>
-                        (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                        typename ExtIterator::block_type,
+                        typename ExtIterator::vector_type::alloc_strategy_type,
+                        typename ExtIterator::bids_container_iterator,
+                        KeyExtractor>
+                        (first.bid(), n, M / block_type::raw_size, keyobj);
 
 
-                first_block = new typename ExtIterator_::block_type;
-                last_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::block_type * sorted_first_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::block_type * sorted_last_block = new typename ExtIterator_::block_type;
+                first_block = new typename ExtIterator::block_type;
+                last_block = new typename ExtIterator::block_type;
+                typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
+                typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
                 request_ptr * reqs = new request_ptr[2];
 
                 reqs[0] = first_block->read(first_bid);
@@ -828,7 +809,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 reqs[0] = last_block->read(last_bid);
                 reqs[1] = sorted_last_block->read(((*out)[out->size() - 1]).bid);
 
-                for (i = first_.block_offset(); i < block_type::size; i++)
+                for (i = first.block_offset(); i < block_type::size; i++)
                 {
                     first_block->elem[i] = sorted_first_block->elem[i];
                 }
@@ -836,7 +817,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
                 req = first_block->write(first_bid);
 
-                for (i = 0; i < last_.block_offset(); i++)
+                for (i = 0; i < last.block_offset(); i++)
                 {
                     last_block->elem[i] = sorted_last_block->elem[i];
                 }
@@ -849,15 +830,15 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 mng->delete_block(out->begin()->bid);
                 mng->delete_block((*out)[out->size() - 1].bid);
 
-                *first_.bid() = first_bid;
-                *last_.bid() = last_bid;
+                *first.bid() = first_bid;
+                *last.bid() = last_bid;
 
                 typename run_type::iterator it = out->begin();
                 it++;
-                typename ExtIterator_::bids_container_iterator cur_bid = first_.bid();
+                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
                 cur_bid++;
 
-                for ( ; cur_bid != last_.bid(); cur_bid++, it++)
+                for ( ; cur_bid != last.bid(); cur_bid++, it++)
                 {
                     *cur_bid = (*it).bid;
                 }
@@ -877,26 +858,26 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 // first element resides
                 // not in the beginning of the block
 
-                typename ExtIterator_::block_type * first_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::bid_type first_bid;
+                typename ExtIterator::block_type * first_block = new typename ExtIterator::block_type;
+                typename ExtIterator::bid_type first_bid;
                 request_ptr req;
 
-                req = first_block->read(*first_.bid());
+                req = first_block->read(*first.bid());
                 mng->new_block(FR(), first_bid);                // try to overlap
                 req->wait();
 
 
                 unsigned_type i = 0;
-                for ( ; i < first_.block_offset(); i++)
+                for ( ; i < first.block_offset(); i++)
                 {
                     first_block->elem[i] = keyobj.min_value();
                 }
 
                 req = first_block->write(first_bid);
 
-                n = last_.bid() - first_.bid();
+                n = last.bid() - first.bid();
 
-                std::swap(first_bid, *first_.bid());
+                std::swap(first_bid, *first.bid());
 
                 req->wait();
 
@@ -904,16 +885,16 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
                 run_type * out =
                     ksort_local::ksort_blocks<
-                        typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy_type,
-                        typename ExtIterator_::bids_container_iterator,
-                        KeyExtractor_>
-                        (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                        typename ExtIterator::block_type,
+                        typename ExtIterator::vector_type::alloc_strategy_type,
+                        typename ExtIterator::bids_container_iterator,
+                        KeyExtractor>
+                        (first.bid(), n, M / block_type::raw_size, keyobj);
 
 
-                first_block = new typename ExtIterator_::block_type;
+                first_block = new typename ExtIterator::block_type;
 
-                typename ExtIterator_::block_type * sorted_first_block = new typename ExtIterator_::block_type;
+                typename ExtIterator::block_type * sorted_first_block = new typename ExtIterator::block_type;
 
                 request_ptr * reqs = new request_ptr[2];
 
@@ -921,7 +902,7 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
                 reqs[1] = sorted_first_block->read((*(out->begin())).bid);
                 wait_all(reqs, 2);
 
-                for (i = first_.block_offset(); i < block_type::size; i++)
+                for (i = first.block_offset(); i < block_type::size; i++)
                 {
                     first_block->elem[i] = sorted_first_block->elem[i];
                 }
@@ -930,14 +911,14 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
                 mng->delete_block(out->begin()->bid);
 
-                *first_.bid() = first_bid;
+                *first.bid() = first_bid;
 
                 typename run_type::iterator it = out->begin();
                 it++;
-                typename ExtIterator_::bids_container_iterator cur_bid = first_.bid();
+                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
                 cur_bid++;
 
-                for ( ; cur_bid != last_.bid(); cur_bid++, it++)
+                for ( ; cur_bid != last.bid(); cur_bid++, it++)
                 {
                     *cur_bid = (*it).bid;
                 }
@@ -955,28 +936,28 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
         }
         else
         {
-            if (last_.block_offset())            // last element resides
+            if (last.block_offset())            // last element resides
             // not in the beginning of the block
             {
-                typename ExtIterator_::block_type * last_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::bid_type last_bid;
+                typename ExtIterator::block_type * last_block = new typename ExtIterator::block_type;
+                typename ExtIterator::bid_type last_bid;
                 request_ptr req;
                 unsigned_type i;
 
-                req = last_block->read(*last_.bid());
+                req = last_block->read(*last.bid());
                 mng->new_block(FR(), last_bid);
                 req->wait();
 
-                for (i = last_.block_offset(); i < block_type::size; i++)
+                for (i = last.block_offset(); i < block_type::size; i++)
                 {
                     last_block->elem[i] = keyobj.max_value();
                 }
 
                 req = last_block->write(last_bid);
 
-                n = last_.bid() - first_.bid() + 1;
+                n = last.bid() - first.bid() + 1;
 
-                std::swap(last_bid, *last_.bid());
+                std::swap(last_bid, *last.bid());
 
                 req->wait();
 
@@ -984,22 +965,22 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
                 run_type * out =
                     ksort_local::ksort_blocks<
-                        typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy_type,
-                        typename ExtIterator_::bids_container_iterator,
-                        KeyExtractor_>
-                        (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                        typename ExtIterator::block_type,
+                        typename ExtIterator::vector_type::alloc_strategy_type,
+                        typename ExtIterator::bids_container_iterator,
+                        KeyExtractor>
+                        (first.bid(), n, M / block_type::raw_size, keyobj);
 
 
-                last_block = new typename ExtIterator_::block_type;
-                typename ExtIterator_::block_type * sorted_last_block = new typename ExtIterator_::block_type;
+                last_block = new typename ExtIterator::block_type;
+                typename ExtIterator::block_type * sorted_last_block = new typename ExtIterator::block_type;
                 request_ptr * reqs = new request_ptr[2];
 
                 reqs[0] = last_block->read(last_bid);
                 reqs[1] = sorted_last_block->read(((*out)[out->size() - 1]).bid);
                 wait_all(reqs, 2);
 
-                for (i = 0; i < last_.block_offset(); i++)
+                for (i = 0; i < last.block_offset(); i++)
                 {
                     last_block->elem[i] = sorted_last_block->elem[i];
                 }
@@ -1008,12 +989,12 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
 
                 mng->delete_block((*out)[out->size() - 1].bid);
 
-                *last_.bid() = last_bid;
+                *last.bid() = last_bid;
 
                 typename run_type::iterator it = out->begin();
-                typename ExtIterator_::bids_container_iterator cur_bid = first_.bid();
+                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
 
-                for ( ; cur_bid != last_.bid(); cur_bid++, it++)
+                for ( ; cur_bid != last.bid(); cur_bid++, it++)
                 {
                     *cur_bid = (*it).bid;
                 }
@@ -1029,20 +1010,20 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
             else
             {
                 // first and last element reside in the beginning of blocks
-                n = last_.bid() - first_.bid();
+                n = last.bid() - first.bid();
 
                 run_type * out =
                     ksort_local::ksort_blocks<
-                        typename ExtIterator_::block_type,
-                        typename ExtIterator_::vector_type::alloc_strategy_type,
-                        typename ExtIterator_::bids_container_iterator,
-                        KeyExtractor_>
-                        (first_.bid(), n, M__ / block_type::raw_size, keyobj);
+                        typename ExtIterator::block_type,
+                        typename ExtIterator::vector_type::alloc_strategy_type,
+                        typename ExtIterator::bids_container_iterator,
+                        KeyExtractor>
+                        (first.bid(), n, M / block_type::raw_size, keyobj);
 
                 typename run_type::iterator it = out->begin();
-                typename ExtIterator_::bids_container_iterator cur_bid = first_.bid();
+                typename ExtIterator::bids_container_iterator cur_bid = first.bid();
 
-                for ( ; cur_bid != last_.bid(); cur_bid++, it++)
+                for ( ; cur_bid != last.bid(); cur_bid++, it++)
                 {
                     *cur_bid = (*it).bid;
                 }
@@ -1053,9 +1034,9 @@ void ksort(ExtIterator_ first_, ExtIterator_ last_, KeyExtractor_ keyobj, unsign
     }
 
 #if STXXL_CHECK_ORDER_IN_SORTS
-    typedef typename ExtIterator_::const_iterator const_iterator;
-    STXXL_ASSERT(stxxl::is_sorted(const_iterator(first_), const_iterator(last_),
-                                  ksort_local::key_comparison<value_type, KeyExtractor_>()));
+    typedef typename ExtIterator::const_iterator const_iterator;
+    STXXL_ASSERT(stxxl::is_sorted(const_iterator(first), const_iterator(last),
+                                  ksort_local::key_comparison<value_type, KeyExtractor>()));
 #endif
 }
 
@@ -1077,28 +1058,28 @@ struct ksort_defaultkey
     }
 };
 
-
-//! Sort records with integer keys
-//! \param first_ object of model of \c ext_random_access_iterator concept
-//! \param last_ object of model of \c ext_random_access_iterator concept
-//! \param M__ amount of buffers for internal use
-//! \remark Order in the result is non-stable
 /*!
-   Record's type must:
-   - provide \b max_value method that returns an object that is \b greater than all
-   other objects of user type ,
-   - provide \b min_value method that returns an object that is \b less than all
-   other objects of user type ,
-   - \b operator \b < that must define strict weak ordering on record's values
-    (<A HREF="http://www.sgi.com/tech/stl/StrictWeakOrdering.html">see what it is</A>).
+ * \brief Sort records with integer keys, see \ref design_algo_ksort.
+ *
+ * stxxl::ksort sorts the elements in [first, last) into ascending order,
+ * meaning that if \c i and \c j are any two valid iterators in [first, last)
+ * such that \c i precedes \c j, then \c *j is not less than \c *i. Note: as
+ * std::sort and stxxl::sort, stxxl::ksort is not guaranteed to be stable. That
+ * is, suppose that \c *i and \c *j are equivalent: neither one is less than
+ * the other. It is not guaranteed that the relative order of these two
+ * elements will be preserved by stxxl::ksort.
+ *
+ * \param first object of model of \c ext_random_access_iterator concept
+ * \param last object of model of \c ext_random_access_iterator concept
+ * \param M amount of buffers for internal use
+ * \remark Order in the result is non-stable
  */
-template <typename ExtIterator_>
-void ksort(ExtIterator_ first_, ExtIterator_ last_, unsigned_type M__)
+template <typename ExtIterator>
+void ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 {
-    ksort(first_, last_,
-          ksort_defaultkey<typename ExtIterator_::vector_type::value_type>(), M__);
+    ksort(first, last,
+          ksort_defaultkey<typename ExtIterator::vector_type::value_type>(), M);
 }
-
 
 //! \}
 
