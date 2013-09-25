@@ -55,7 +55,7 @@ The following listing shows a simple example of how to use AIO objects to perfor
 \code
 using namespace stxxl;
 struct my_handler { // I/O completion handler
-    void operator () (request_ptr ptr) { 
+    void operator () (request_ptr ptr) {
         std::cout << "Request '" << *ptr << "' completed." << std::endl;
     }
 };
@@ -63,7 +63,7 @@ char * mybuffer = new char[1024*1024]; // allocate 1MB buffer
 syscall_file myfile("./storage", file::RDONLY);
 request_ptr myreq = myfile.aread(mybuffer, 0, 1024*1024,my_handler());
 do_something1(); // do_something1() is overlapped with reading
-myreq->wait();	 // wait for read completion
+myreq->wait();   // wait for read completion
 do_something2(mybuffer);// process the read buffer
 delete [] mybuffer; // free the buffer
 \endcode
@@ -220,7 +220,7 @@ fully randomized   | FR
 randomized cycling | RC
 
 - Supported paging strategies:
-strategy            | identifier 
+strategy            | identifier
 ------------------- | ------
 random              | random
 least recently used | lru
@@ -274,16 +274,125 @@ This issue also concerns \c front() and \c back() methods.
 
 /*! \page design_stack Stack
 
-An I/O efficient stack is perhaps the simplest external memory data structure. Four different implementations of a stack are available in STXXL. Some of the implementations (e.g. stxxl::grow_shrink_stack2) are optimized to prefetch data ahead and to queue writing, efficiently overlapping I/O and computation. The amortized I/O complexity for \c push and \c pop stack operations is \f$ \mathcal{O}(1/DB) \f$.
+The I/O efficient stack is perhaps the simplest external memory data structure. Stacks provide only restricted subset of sequence operations: insertion, removal, and inspection of the element at the top of the stack. Stacks are a "last in first out" (LIFO) data structures: the element at the top of a stack is the one that was most recently added. Stacks does not allow iteration through its elements.
+
+The basic variant of EM stack keeps the top \a k elements in the main memory buffer, where \f$ k \leq 2B \f$. If the buffers get empty on a removal call, one block is brought from the disk to the buffers. Therefore at least \a B removals are required to make one I/O reading a block. Insertions cause no I/Os until the internal buffers get full. In this case to make space the first \a B elements are written to the disk. Thus a block write happens only after at least \a B insertions. If we choose the unit of disk transfer to be a multiple of <i>DB</i> (we denote it as a \a page), set the stack buffer size to <i>2D</i> pages, and evenly assign the blocks of a page to disks we obtain the following amortized running times of the basic operations of stxxl::stack
+
+operation            | internal work          | I/O (amortized)
+-------------------- | ---------------------- | -------------------------
+insertion at the end | \f$ \mathcal{O}(1) \f$ | \f$ \mathcal{O}(1/DB) \f$
+removal at the end   | \f$ \mathcal{O}(1) \f$ | \f$ \mathcal{O}(1/DB) \f$
 
 The STXXL library contains four different variants of stacks, each implementation is specialized for a certain access pattern:
 
-1. stxxl::normal_stack is a general purpose implementation which is the best if the access pattern to the stack is an irregular mix of push'es and pop's, i.e. the stack grows and shrinks without a certain rule.
-2. stxxl::grow_shrink stack is a stack that is optimized for an access pattern where the insertions are (almost) not intermixed with the removals, and/or vice versa, the removals are (almost) not intermixed with the insertions. In short, the stack first grows to its maximal size, then shrinks, then grow again and so on, a pattern which can be described by \f$(push^{r_i}, push^{r_j})^k\f$ with \f$1 \leq j \leq k\f$ and large values for \f$r_i\f$ and \f$r_j\f$.
+1. The stxxl::normal_stack is a general purpose implementation which is the best if the access pattern to the stack is an irregular mix of push'es and pop's, i.e. the stack grows and shrinks without a certain rule.
+
+2. The stxxl::grow_shrink stack is a stack that is optimized for an access pattern where the insertions are (almost) not intermixed with the removals, and/or vice versa, the removals are (almost) not intermixed with the insertions. In short, the stack first grows to its maximal size, then shrinks, then grow again and so on, a pattern which can be described by \f$(push^{r_i}, push^{r_j})^k\f$ with \f$1 \leq j \leq k\f$ and large values for \f$r_i\f$ and \f$r_j\f$.
+
 3. stxxl::grow_shrink2 stack is a "grow-shrink" stack that allows the use of common prefetch and write buffer pools. The pools are shared between several "grow-shrink" stacks.
+
 4. stxxl::migrating stack is a stack that migrates from internal memory to external memory when its size exceeds a certain threshold (determined by parameter migrating_critical_size)
 
 To make use of stxxl::stack, one can use the generator template stxxl::STACK_GENERATOR which expects the parameters from left to right as shown in the table below.
+
+\section design_stack_normal stxxl::normal_stack
+
+The stxxl::normal_stack is a general purpose implementation of the external memory stack. The stack has two pages, the size of the page in blocks is a configuration constant and can be given as a template parameter. The implementation of the methods follows the description given in the previous section.
+
+## Internal Memory Consumption of stxxl::normal_stack
+
+The cache of stxxl::normal_stack largely dominates in its internal memory consumption. Other members consume very small fraction of stxxl::normal_stack's memory even when the stack size is large. Therefore, the internal memory consumption of stxxl::normal_stack can be estimated as \f$ 2 \times BlockSize \times PageSize \f$ bytes, where \f$ BlockSize \f$ is the block size and \f$ PageSize \f$ is the page size in blocks (see \ref design_stack).
+
+\section design_stack_grow_shrink stxxl::grow_shrink_stack
+
+The stxxl::grow_shrink_stack specialization is optimized for an access pattern where the insertions are (almost) not intermixed with the removals, and/or vice versa, the removals are (almost) not intermixed with the insertions. In other words the stack first grows to its maximal size, then it shrinks, then it might again grow, then shrink, and so forth, i.e. the pattern is \f$ (push^{i_j}pop^{r_j})^k \f$, where \f$ k \in N \f$, \f$ 1 \leq j \leq k \f$, and \f$ i_j \f$, \f$ r_j \f$ are \a large.  The implementation efficiently exploits the knowledge of the access pattern that allows \b prefetching the blocks beforehand while the stack shrinks and <b>buffered writing</b> while the stack grows. Therefore the \b overlapping of I/O and computation is possible.
+
+## Internal Memory Consumption of stxxl::grow_shrink_stack
+
+The cache of stxxl::grow_shrink_stack largely dominates in its internal memory
+consumption. Other members consume very small fraction of
+stxxl::grow_shrink_stack's
+memory even when the stack size is large. Therefore, the internal
+memory consumption of stxxl::grow_shrink_stack can be estimated as
+\f$ 2 \times BlockSize \times PageSize \f$ bytes, where \f$ BlockSize \f$ is the
+block size and \f$ PageSize \f$ is the page size in blocks (see \ref design_stack).
+
+## Members of stxxl::grow_shrink_stack
+
+The stxxl::grow_shrink_stack has the same set of members as the stxxl::normal_stack. The running times of stxxl::grow_shrink_stack are the same as stxxl::normal_stack except that when the stack switches from growing to shrinking (or from shrinking to growing) \f$ PageSize \f$ I/Os can be spent additionally in the worst case. (This is for the single disk setting, if the page is perfectly striped over parallel disk the number of I/Os is \f$ PageSize \cdot D \f$.)
+
+\section design_stack_grow_shrink2 stxxl::grow_shrink_stack2
+
+The stxxl::grow_shrink_stack2 is optimized for the same kind of access pattern as stxxl::grow_shrink_stack. The difference is that each instance of stxxl::grow_shrink_stack uses an own internal buffer to overlap I/Os and computation, but stxxl::grow_shrink_stack2 is able to share the buffers from the pool used by several stacks.
+
+## Internal Memory Consumption of stxxl::grow_shrink_stack2
+
+Not counting the memory consumption of the shared blocks from the pools, the stack alone consumes about \f$ BlockSize \f$ bytes. It has a cache that consists of only a single block.
+
+## Members of stxxl::grow_shrink_stack2
+
+The stxxl::grow_shrink_stack2 has almost the same set of members as the stxxl::normal_stack, except that it does not have the default constructor. The stxxl::grow_shrink_stack2 requires prefetching and write pool objects (see stxxl::prefetch_pool, stxxl::write_pool and stxxl::read_write_pool) to be specified in the creation time.
+
+Consequently, the constructor requires a read_write_pool for prefetching and buffered writing. But it also has a second parameter, which tells how many blocks from the prefetching pool are used, this is called "prefetch_aggressiveness".
+
+\section design_stack_grow_migrating stxxl::migrating_stack
+
+The stxxl::migrating_stack is a stack that migrates from internal memory to external when its size exceeds a certain threshold (template parameter). The implementation of internal and external memory stacks can be arbitrary and given as a template parameters.
+
+## Internal Memory Consumption of stxxl::migrating_stack
+
+The stxxl::migrating_stack memory consumption depends on the memory consumption of the stack implementations given as template parameters. The current state is internal (external), the stxxl::migrating_stack consumes almost exactly the same space as internal (external) memory stack implementation. (The stxxl::migrating_stack needs only few pointers to maintain the switching from internal to external memory implementations.)
+
+## Members of stxxl::migrating_stack
+
+The stxxl::migrating_stack extends the member set of stxxl::normal_stack. Additionally, there are stxxl::migrating_stack::internal() and stxxl::migrating_stack::external(), which return true if the currently used implementation is internal or external.
+
+\section design_stack_generator stxxl::STACK_GENERATOR
+
+
+To provide an easy way to choose and configure the stack
+implementations, STXXL offers a template meta program called
+stxxl::STACK_GENERATOR.
+
+The stxxl::STACK_GENERATOR has the following template parameters:
+
+\copydetails stxxl::STACK_GENERATOR
+
+## Examples:
+
+- STACK_GENERATOR<double>::result external stack of \c double's
+- STACK_GENERATOR<double,internal>::result internal stack of \c double's
+- STACK_GENERATOR<double,external,grow_shrink>::result external grow-shrink stack of \c double's
+- STACK_GENERATOR<double,migrating,grow_shrink>::result migrating grow-shrink stack of \c double's, internal implementation is \c std::stack<double>
+- STACK_GENERATOR<double,migrating,grow_shrink,1,512*1024>::result migrating grow-shrink stack of \c double's with 1 block per page and block size 512 KiB (total memory occupied = 1 MiB)
+
+## Example for stxxl::grow_shrink_stack2
+
+TODO-df : but use read_write_pool instead of the two pools.
+
+\code
+typedef STACK_GENERATOR<int,external,grow_shrink2>::result stack_type;
+typedef stack_type::block_type block_type;
+
+stxxl::prefetch_pool p_pool(10); // 10 read buffers
+stxxl::write_pool w_pool(6);     // 6 write buffers
+stack_type S(p_pool,w_pool,0);   // no read buffers used
+
+for(long long i=0;i < max_value;++i)
+     S.push(i);
+
+S.set_prefetch_aggressiveness(5);
+
+/* give a hint that we are going to shrink the stack from now on,
+always prefetch 5 buffers beforehand */
+
+for(long long i=0; i< max_value;++i)
+        S.pop();
+
+S.set_prefetch_aggressiveness(0);
+// stop prefetching
+
+\endcode
 
 */
 

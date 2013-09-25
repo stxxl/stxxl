@@ -33,18 +33,18 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup stlcontinternals
 //! \{
 
-template <class ValTp,
+template <class ValueType,
           unsigned BlocksPerPage = 4,
-          unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
+          unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-          class SzTp = stxxl::int64>
+          class SizeType = stxxl::int64>
 struct stack_config_generator
 {
-    typedef ValTp value_type;
+    typedef ValueType value_type;
     enum { blocks_per_page = BlocksPerPage };
     typedef AllocStr alloc_strategy;
-    enum { block_size = BlkSz };
-    typedef SzTp size_type;
+    enum { block_size = BlockSize };
+    typedef SizeType size_type;
 };
 
 
@@ -53,21 +53,24 @@ struct stack_config_generator
 //! Conservative implementation. Fits best if your access pattern consists of irregularly mixed
 //! push'es and pop's.
 //! For semantics of the methods see documentation of the STL \c std::stack. <BR>
-//! To gain full bandwidth of disks \c Config_::BlocksPerPage must >= number of disks <BR>
+//! To gain full bandwidth of disks \c StackConfig::BlocksPerPage must >= number of disks <BR>
 //! \internal
-template <class Config_>
+template <class StackConfig>
 class normal_stack : private noncopyable
 {
 public:
-    typedef Config_ cfg;
+    typedef StackConfig cfg;
+    //! type of the elements stored in the stack
     typedef typename cfg::value_type value_type;
     typedef typename cfg::alloc_strategy alloc_strategy_type;
+    //! type for sizes (64-bit)
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
         block_size = cfg::block_size
     };
 
+    //! type of block used in disk-memory transfers
     typedef typed_block<block_size, value_type> block_type;
     typedef BID<block_size> bid_type;
 
@@ -82,6 +85,7 @@ private:
     alloc_strategy_type alloc_strategy;
 
 public:
+    //! Default constructor: creates empty stack.
     normal_stack() :
         size_(0),
         cache_offset(0),
@@ -106,7 +110,7 @@ public:
         std::swap(alloc_strategy, obj.alloc_strategy);
     }
 
-    //! Construction from a stack.
+    //! Copy-construction from a another stack of any type.
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class stack_type>
@@ -135,29 +139,43 @@ public:
         for (i = 0; i < sz; ++i)
             this->push(tmp[i]);
     }
+
     virtual ~normal_stack()
     {
         STXXL_VERBOSE(STXXL_PRETTY_FUNCTION_NAME);
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
+
+    //! Returns the number of elements contained in the stack
     size_type size() const
     {
         return size_;
     }
+
+    //! Returns true if the stack is empty.
     bool empty() const
     {
         return (!size_);
     }
+
+    //! Return mutable reference to the element at the top of the
+    //! stack. Precondition: stack is not empty().
     value_type & top()
     {
         assert(size_ > 0);
         return (*current_element);
     }
+
+    //! Return constant reference to the element at the top of the
+    //! stack. Precondition: stack is not empty().
     const value_type & top() const
     {
         assert(size_ > 0);
         return (*current_element);
     }
+
+    //! Inserts an element at the top of the stack. Postconditions: size() is
+    //! incremented by 1, and top() is the inserted element.
     void push(const value_type & val)
     {
         assert(cache_offset <= 2 * blocks_per_page * block_type::size);
@@ -199,6 +217,9 @@ public:
         ++size_;
         ++cache_offset;
     }
+
+    //! Removes the element at the top of the stack. Precondition: stack is not
+    //! empty(). Postcondition: size() is decremented.
     void pop()
     {
         assert(cache_offset <= 2 * blocks_per_page * block_type::size);
@@ -256,19 +277,22 @@ private:
 //! Use it if your access pattern consists of many repeated push'es and pop's
 //! For semantics of the methods see documentation of the STL \c std::stack.
 //! \warning The amortized complexity of operation is not O(1/DB), rather O(DB)
-template <class Config_>
+template <class StackConfig>
 class grow_shrink_stack : private noncopyable
 {
 public:
-    typedef Config_ cfg;
+    typedef StackConfig cfg;
+    //! type of the elements stored in the stack
     typedef typename cfg::value_type value_type;
     typedef typename cfg::alloc_strategy alloc_strategy_type;
+    //! type for sizes (64-bit)
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
         block_size = cfg::block_size,
     };
 
+    //! type of block used in disk-memory transfers
     typedef typed_block<block_size, value_type> block_type;
     typedef BID<block_size> bid_type;
 
@@ -284,6 +308,7 @@ private:
     alloc_strategy_type alloc_strategy;
 
 public:
+    //! Default constructor: creates empty stack.
     grow_shrink_stack() :
         size_(0),
         cache_offset(0),
@@ -310,7 +335,7 @@ public:
         std::swap(alloc_strategy, obj.alloc_strategy);
     }
 
-    //! Construction from a stack.
+    //! Copy-construction from a another stack of any type.
     //! \param stack_ stack object (could be external or internal, important is that it must
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class stack_type>
@@ -352,24 +377,37 @@ public:
         { }
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
+
+    //! Returns the number of elements contained in the stack
     size_type size() const
     {
         return size_;
     }
+
+    //! Returns true if the stack is empty.
     bool empty() const
     {
         return (!size_);
     }
+
+    //! Return mutable reference to the element at the top of the
+    //! stack. Precondition: stack is not empty().
     value_type & top()
     {
         assert(size_ > 0);
         return (*current_element);
     }
+
+    //! Return constant reference to the element at the top of the
+    //! stack. Precondition: stack is not empty().
     const value_type & top() const
     {
         assert(size_ > 0);
         return (*current_element);
     }
+
+    //! Inserts an element at the top of the stack. Postconditions: size() is
+    //! incremented by 1, and top() is the inserted element.
     void push(const value_type & val)
     {
         assert(cache_offset <= blocks_per_page * block_type::size);
@@ -409,6 +447,9 @@ public:
         ++size_;
         ++cache_offset;
     }
+
+    //! Removes the element at the top of the stack. Precondition: stack is not
+    //! empty(). Postcondition: size() is decremented.
     void pop()
     {
         assert(cache_offset <= blocks_per_page * block_type::size);
@@ -451,19 +492,22 @@ public:
 
 //! Efficient implementation that uses prefetching and overlapping using (shared) buffers pools.
 //! \warning This is a single buffer stack! Each direction change (push() followed by pop() or vice versa) may cause one I/O.
-template <class Config_>
+template <class StackConfig>
 class grow_shrink_stack2 : private noncopyable
 {
 public:
-    typedef Config_ cfg;
+    typedef StackConfig cfg;
+    //! type of the elements stored in the stack
     typedef typename cfg::value_type value_type;
     typedef typename cfg::alloc_strategy alloc_strategy_type;
+    //! type for sizes (64-bit)
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,     // stack of this type has only one page
         block_size = cfg::block_size,
     };
 
+    //! type of block used in disk-memory transfers
     typedef typed_block<block_size, value_type> block_type;
     typedef BID<block_size> bid_type;
 
@@ -480,23 +524,28 @@ private:
     pool_type * pool;
 
 public:
-    //! Constructs stack.
+    //! Default constructor: creates empty stack. The stack will use the
+    //! read_write_pool for prefetching and buffered writing.
     //! \param pool_ block write/prefetch pool
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     grow_shrink_stack2(
         pool_type & pool_,
-        unsigned_type prefetch_aggressiveness = 0) :
-        size_(0),
-        cache_offset(0),
-        cache(new block_type),
-        pref_aggr(prefetch_aggressiveness),
-        owned_pool(NULL),
-        pool(&pool_)
+        unsigned_type prefetch_aggressiveness = 0)
+        : size_(0),
+          cache_offset(0),
+          cache(new block_type),
+          pref_aggr(prefetch_aggressiveness),
+          owned_pool(NULL),
+          pool(&pool_)
     {
         STXXL_VERBOSE2("grow_shrink_stack2::grow_shrink_stack2(...)");
     }
 
-    //! Constructs stack.
+    //! Default constructor: creates empty stack. The stack will use the pair
+    //! of prefetch_pool and write_pool for prefetching and buffered writing.
+    //! This constructor is deprecated in favor of the read_write_pool
+    //! constructor.
+    //!
     //! \param p_pool_ prefetch pool, that will be used for block prefetching
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
@@ -559,16 +608,20 @@ public:
         delete owned_pool;
     }
 
+    //! Returns the number of elements contained in the stack
     size_type size() const
     {
         return size_;
     }
 
+    //! Returns true if the stack is empty.
     bool empty() const
     {
         return (!size_);
     }
 
+    //! Inserts an element at the top of the stack. Postconditions: size() is
+    //! incremented by 1, and top() is the inserted element.
     void push(const value_type & val)
     {
         STXXL_VERBOSE3("grow_shrink_stack2::push(" << val << ")");
@@ -600,6 +653,8 @@ public:
         assert(cache_offset <= block_type::size);
     }
 
+    //! Return mutable reference to the element at the top of the
+    //! stack. Precondition: stack is not empty().
     value_type & top()
     {
         assert(size_ > 0);
@@ -608,6 +663,8 @@ public:
         return (*cache)[cache_offset - 1];
     }
 
+    //! Return constant reference to the element at the top of the
+    //! stack. Precondition: stack is not empty().
     const value_type & top() const
     {
         assert(size_ > 0);
@@ -616,6 +673,8 @@ public:
         return (*cache)[cache_offset - 1];
     }
 
+    //! Removes the element at the top of the stack. Precondition: stack is not
+    //! empty(). Postcondition: size() is decremented.
     void pop()
     {
         STXXL_VERBOSE3("grow_shrink_stack2::pop()");
@@ -638,8 +697,8 @@ public:
         --size_;
     }
 
-    //! Sets level of prefetch aggressiveness (number
-    //! of blocks from the prefetch pool used for prefetching).
+    //! Sets level of prefetch aggressiveness (number of blocks from the
+    //! prefetch pool used for prefetching).
     //! \param new_p new value for the prefetch aggressiveness
     void set_prefetch_aggr(unsigned_type new_p)
     {
@@ -685,13 +744,14 @@ class migrating_stack : private noncopyable
 {
 public:
     typedef typename ExternalStack::cfg cfg;
+    //! type of the elements stored in the stack
     typedef typename cfg::value_type value_type;
+    //! type for sizes (64-bit)
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
         block_size = cfg::block_size
     };
-
 
     typedef InternalStack int_stack_type;
     typedef ExternalStack ext_stack_type;
@@ -702,12 +762,16 @@ private:
     int_stack_type * int_impl;
     ext_stack_type * ext_impl;
 
-    // not implemented yet
+    //! Copy-construction from a another stack of any type.
+    //! \warning not implemented yet!
     template <class stack_type>
     migrating_stack(const stack_type & stack_);
 
 public:
-    migrating_stack() : int_impl(new int_stack_type()), ext_impl(NULL) { }
+    //! Default constructor: creates empty stack.
+    migrating_stack()
+        : int_impl(new int_stack_type()), ext_impl(NULL)
+    { }
 
     void swap(migrating_stack & obj)
     {
@@ -728,26 +792,37 @@ public:
         return ext_impl;
     }
 
+    //! Returns true if the stack is empty.
     bool empty() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
         return (int_impl) ? int_impl->empty() : ext_impl->empty();
     }
+    //! Returns the number of elements contained in the stack
     size_type size() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
         return (int_impl) ? size_type(int_impl->size()) : ext_impl->size();
     }
+
+    //! Return mutable reference to the element at the top of the
+    //! stack. Precondition: stack is not empty().
     value_type & top()
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
         return (int_impl) ? int_impl->top() : ext_impl->top();
     }
+
+    //! Return constant reference to the element at the top of the
+    //! stack. Precondition: stack is not empty().
     const value_type & top() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
         return (int_impl) ? int_impl->top() : ext_impl->top();
     }
+
+    //! Inserts an element at the top of the stack. Postconditions: size() is
+    //! incremented by 1, and top() is the inserted element.
     void push(const value_type & val)
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
@@ -766,6 +841,9 @@ public:
         else
             ext_impl->push(val);
     }
+
+    //! Removes the element at the top of the stack. Precondition: stack is not
+    //! empty(). Postcondition: size() is decremented.
     void pop()
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
@@ -775,6 +853,7 @@ public:
         else
             ext_impl->pop();
     }
+
     virtual ~migrating_stack()
     {
         delete int_impl;
@@ -793,66 +872,62 @@ enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
 //! Stack type generator.
 //!
-//!  \tparam ValTp type of contained objects (POD with no references to internal memory)
-//!  \tparam Externality one of
-//!    - \c external , \b external container, implementation is chosen according
-//!      to \c Behaviour parameter, is default
-//!    - \c migrating , migrates from internal implementation given by \c IntStackTp parameter
-//!      to external implementation given by \c Behaviour parameter when size exceeds \c MigrCritSize
-//!    - \c internal , choses \c IntStackTp implementation
-//!  \tparam Behaviour chooses \b external implementation, one of:
-//!    - \c normal , conservative version, implemented in \c stxxl::normal_stack , is default
-//!    - \c grow_shrink , efficient version, implemented in \c stxxl::grow_shrink_stack
-//!    - \c grow_shrink2 , efficient version, implemented in \c stxxl::grow_shrink_stack2
-//!  \tparam BlocksPerPage defines how many blocks has one page of internal cache of an
-//!       \b external implementation, default is four. All \b external implementations have
-//!       \b two pages.
-//!  \tparam BlkSz external block size in bytes, default is 2 MiB
-//!  \tparam IntStackTp type of internal stack used for some implementations
-//!  \tparam MigrCritSize threshold value for number of elements when
-//!    \c stxxl::migrating_stack migrates to the external memory
-//!  \tparam  AllocStr one of allocation strategies: \c striping , \c RC , \c SR , or \c FR
-//!    default is RC
-//!  \tparam SzTp size type, default is \c stxxl::int64
+//! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //!
-//! Configured stack type is available as \c STACK_GENERATOR<>::result. <BR> <BR>
-//! Examples:
-//!    - \c STACK_GENERATOR<double>::result external stack of \c double's ,
-//!    - \c STACK_GENERATOR<double,internal>::result internal stack of \c double's ,
-//!    - \c STACK_GENERATOR<double,external,grow_shrink>::result external
-//!      grow-shrink stack of \c double's ,
-//!    - \c STACK_GENERATOR<double,migrating,grow_shrink>::result migrating
-//!      grow-shrink stack of \c double's, internal implementation is \c std::stack<double> ,
-//!    - \c STACK_GENERATOR<double,migrating,grow_shrink,1,512*1024>::result migrating
-//!      grow-shrink stack of \c double's with 1 block per page and block size 512 KiB
-//!      (total memory occupied = 1 MiB).
-//! For configured stack method semantics see documentation of the STL \c std::stack.
+//! \tparam Externality selects stack implementation, default: \b external. One of
+//!   - \c external, external container, implementation is chosen according to \c Behaviour parameter.
+//!   - \c migrating, migrates from internal implementation given by \c IntStackType parameter
+//!     to external implementation given by \c Behaviour parameter when size exceeds \c MigrCritSize
+//!   - \c internal, choses \c IntStackType implementation
+//!
+//! \tparam Behaviour chooses \b external implementation, default: \b stxxl::normal_stack. One of:
+//!   - \c normal, conservative version, implemented in \c stxxl::normal_stack
+//!   - \c grow_shrink, efficient version, implemented in \c stxxl::grow_shrink_stack
+//!   - \c grow_shrink2, efficient version, implemented in \c stxxl::grow_shrink_stack2
+//!
+//! \tparam BlocksPerPage defines how many blocks has one page of internal cache of an
+//!      \b external implementation, default is \b 4. All \b external implementations have
+//!      \b two pages.
+//!
+//! \tparam BlockSize external block size in bytes, default is <b>2 MiB</b>.
+//!
+//! \tparam IntStackType type of internal stack used for some implementations, default: \b std::stack.
+//!
+//! \tparam MigrCritSize threshold value for number of elements when
+//!   stxxl::migrating_stack migrates to the external memory, default: <b>2 x BlocksPerPage x BlockSize</b>.
+//!
+//! \tparam AllocStr one of allocation strategies: striping, RC, SR, or FR. Default is \b RC.
+//!
+//! \tparam SizeType size type, default is \b stxxl::int64.
+//!
+//! The configured stack type is available as STACK_GENERATOR<>::result.
+//!
 template <
-    class ValTp,
+    class ValueType,
     stack_externality Externality = external,
     stack_behaviour Behaviour = normal,
     unsigned BlocksPerPage = 4,
-    unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
+    unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
 
-    class IntStackTp = std::stack<ValTp>,
-    unsigned_type MigrCritSize = (2 * BlocksPerPage * BlkSz),
+    class IntStackType = std::stack<ValueType>,
+    unsigned_type MigrCritSize = (2 * BlocksPerPage * BlockSize),
 
     class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-    class SzTp = stxxl::int64
+    class SizeType = stxxl::int64
     >
 class STACK_GENERATOR
 {
-    typedef stack_config_generator<ValTp, BlocksPerPage, BlkSz, AllocStr, SzTp> cfg;
+    typedef stack_config_generator<ValueType, BlocksPerPage, BlockSize, AllocStr, SizeType> cfg;
 
     typedef typename IF<Behaviour == grow_shrink,
                         grow_shrink_stack<cfg>,
                         grow_shrink_stack2<cfg> >::result GrShrTp;
-    typedef typename IF<Behaviour == normal, normal_stack<cfg>, GrShrTp>::result ExtStackTp;
+    typedef typename IF<Behaviour == normal, normal_stack<cfg>, GrShrTp>::result ExtStackType;
     typedef typename IF<Externality == migrating,
-                        migrating_stack<MigrCritSize, ExtStackTp, IntStackTp>, ExtStackTp>::result MigrOrNotStackTp;
+                        migrating_stack<MigrCritSize, ExtStackType, IntStackType>, ExtStackType>::result MigrOrNotStackType;
 
 public:
-    typedef typename IF<Externality == internal, IntStackTp, MigrOrNotStackTp>::result result;
+    typedef typename IF<Externality == internal, IntStackType, MigrOrNotStackType>::result result;
 };
 
 //! \}
@@ -862,33 +937,33 @@ __STXXL_END_NAMESPACE
 
 namespace std
 {
-    template <class Config_>
-    void swap(stxxl::normal_stack<Config_> & a,
-              stxxl::normal_stack<Config_> & b)
-    {
-        a.swap(b);
-    }
+template <class StackConfig>
+void swap(stxxl::normal_stack<StackConfig> & a,
+          stxxl::normal_stack<StackConfig> & b)
+{
+    a.swap(b);
+}
 
-    template <class Config_>
-    void swap(stxxl::grow_shrink_stack<Config_> & a,
-              stxxl::grow_shrink_stack<Config_> & b)
-    {
-        a.swap(b);
-    }
+template <class StackConfig>
+void swap(stxxl::grow_shrink_stack<StackConfig> & a,
+          stxxl::grow_shrink_stack<StackConfig> & b)
+{
+    a.swap(b);
+}
 
-    template <class Config_>
-    void swap(stxxl::grow_shrink_stack2<Config_> & a,
-              stxxl::grow_shrink_stack2<Config_> & b)
-    {
-        a.swap(b);
-    }
+template <class StackConfig>
+void swap(stxxl::grow_shrink_stack2<StackConfig> & a,
+          stxxl::grow_shrink_stack2<StackConfig> & b)
+{
+    a.swap(b);
+}
 
-    template <stxxl::unsigned_type CritSize, class ExternalStack, class InternalStack>
-    void swap(stxxl::migrating_stack<CritSize, ExternalStack, InternalStack> & a,
-              stxxl::migrating_stack<CritSize, ExternalStack, InternalStack> & b)
-    {
-        a.swap(b);
-    }
+template <stxxl::unsigned_type CritSize, class ExternalStack, class InternalStack>
+void swap(stxxl::migrating_stack<CritSize, ExternalStack, InternalStack> & a,
+          stxxl::migrating_stack<CritSize, ExternalStack, InternalStack> & b)
+{
+    a.swap(b);
+}
 }
 
 #endif // !STXXL_STACK_HEADER
