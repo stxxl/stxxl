@@ -212,13 +212,19 @@ TODO: STXXL_THROW
 
 /*! \page common_types Signed and Unsigned Integer Types
 
-STXXL provides two very important types: \c signed_type and \c
-unsigned_type. These should be used for general counting and indexing types, as
-they are defined to be the size of a register on the machines: on 32-bit
-machines the two types are 4 bytes size, while on a 64-bit machine the two
-types are 8 bytes in size!
+STXXL provides two very important types: stxxl::int_type and stxxl::unsigned_type. These should be used for general counting and indexing types, as they are defined to be the size of a register on the machines: on 32-bit machines the two types are 4 bytes size, while on a 64-bit machine the two types are 8 bytes in size!
+
+The previous types are for general purpose counting. For real 64-bit integers, also on 32-bit machines, STXXL also provides a stxx::uint64 type (independent of other headers).
 
 See the file common/types.h
+
+\section common_types_uint uint40 and uint48 Unsigned Integer Types
+
+When storing file offsets in external memory, one often does not require full 64-bit indexes. Mostly, 40-bit or 48-bit are sufficient, if only < 1 TiB or < 16 TiB of data are processed. If one stores theses integers in five or six bytes, the total I/O volume can be reduced significantly.
+
+Since this issue occurs commonly in EM algorithms, STXXL provides two types: stxxl::uint40 and stxxl::uint48.
+
+See the file common/uint_types.h
 
 */
 
