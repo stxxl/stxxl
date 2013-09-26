@@ -15,6 +15,7 @@
 stxxl_build_test(test_cancel)
 stxxl_build_test(test_io)
 stxxl_build_test(test_io_sizes)
+stxxl_build_test(test_mmap)
 
 stxxl_test(test_io "${STXXL_TMPDIR}")
 
@@ -42,12 +43,5 @@ if(USE_BOOST)
   stxxl_test(test_io_sizes boostfd "${STXXL_TMPDIR}/testdisk1" 2147483648)
 endif(USE_BOOST)
 
-# unit tests
-if(CPPUNIT_FOUND AND BUILD_TESTS)
-
-  add_executable(unittest_io unittest.cpp)
-  target_link_libraries(unittest_io ${STXXL_LIBS} ${CPPUNIT_LIBRARIES})
-  stxxl_test(unittest_io)
-
-endif(CPPUNIT_FOUND AND BUILD_TESTS)
+stxxl_test(test_mmap)
 

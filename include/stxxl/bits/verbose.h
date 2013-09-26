@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2005-2006 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -145,6 +146,20 @@ __STXXL_END_NAMESPACE
        _STXXL_PRINT_FLAGS_ERROR); abort(); } } } while(0)
 
 #endif
+
+// STXXL_CHECK_THROW is an assertion macro for unit tests, which checks that
+// the enclosed code throws an exception.
+
+#define STXXL_CHECK_THROW(code,exception_type)                  \
+    do { bool t_ = false; try { code; }                         \
+        catch (const exception_type&) { t_ = true; }            \
+        if (t_) break;                                          \
+        _STXXL_PRINT("STXXL-CHECK-THROW",                       \
+                     #code " - NO EXCEPTION " #exception_type   \
+                     " @ " __FILE__ ":" << __LINE__,            \
+                     _STXXL_PRINT_FLAGS_ERROR);                 \
+        abort();                                                \
+    } while (0)
 
 ////////////////////////////////////////////////////////////////////////////
 

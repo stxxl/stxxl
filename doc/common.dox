@@ -196,6 +196,10 @@ STXXL_CHECK( 2+2 == 4 );
 STXXL_CHECK2( 2+2 == 4, "We cannot count!");
 \endcode
 
+Sometimes one also wants to check that a specific expression \b throws an
+exception. This checking can be done automatically using a <tt>try { } catch
+{}</tt> by using STXXL_CHECK_THROW.
+
 \section plain Plain Assertions: assert
 
 For the usual assertions, that should be removed in production code for
