@@ -21,7 +21,7 @@
 #include <stxxl/bits/common/types.h>
 
 #include <limits>
-#include <iosfwd>
+#include <ostream>
 
 #include <inttypes.h>
 #include <assert.h>

@@ -11,4 +11,4 @@
  **************************************************************************/
 
 #include <stxxl/bits/common/types.h>
-#include <stxxl/bits/common/uint_types.h>
+
