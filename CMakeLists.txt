@@ -115,7 +115,12 @@ if(USE_BOOST OR MSVC)
   if(Boost_FOUND)
     # globally add boost include directories
     include_directories(${Boost_INCLUDE_DIRS})
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSTXXL_BOOST_CONFIG -DSTXXL_BOOST_FILESYSTEM -DSTXXL_BOOST_RANDOM -DSTXXL_BOOST_THREADS -DSTXXL_BOOST_TIMESTAMP")
+    # set defines in <stxxl/bits/config.h>
+    set(STXXL_BOOST_CONFIG "1")
+    set(STXXL_BOOST_FILESYSTEM "1")
+    set(STXXL_BOOST_RANDOM "1")
+    set(STXXL_BOOST_THREADS "1")
+    set(STXXL_BOOST_TIMESTAMP "1")
   elseif(MSVC)
     message(FATAL_ERROR "Boost libraries not found. STXXL requires Boost on Windows.")
   else()

@@ -37,13 +37,13 @@ namespace priority_queue_local
 // require: at least length nonsentinel elements available in source0, source1
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
-    template <class InputIterator, class OutputIterator, class Cmp_>
+    template <class InputIterator, class OutputIterator, class CompareType>
     void merge_iterator(
         InputIterator & source0,
         InputIterator & source1,
         OutputIterator target,
         unsigned_type length,
-        Cmp_ cmp)
+        CompareType& cmp)
     {
         OutputIterator done = target + length;
 
@@ -69,14 +69,14 @@ namespace priority_queue_local
 // require: at least length nonsentinel elements available in source0, source1 and source2
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
-    template <class InputIterator, class OutputIterator, class Cmp_>
+    template <class InputIterator, class OutputIterator, class CompareType>
     void merge3_iterator(
         InputIterator & source0,
         InputIterator & source1,
         InputIterator & source2,
         OutputIterator target,
         unsigned_type length,
-        Cmp_ cmp)
+        CompareType& cmp)
     {
         OutputIterator done = target + length;
 
@@ -137,13 +137,13 @@ namespace priority_queue_local
 // require: at least length nonsentinel elements available in source0, source1, source2 and source3
 // require: target may overwrite one of the sources as long as
 //   *(sourcex + length) is before the end of sourcex
-    template <class InputIterator, class OutputIterator, class Cmp_>
+    template <class InputIterator, class OutputIterator, class CompareType>
     void merge4_iterator(
         InputIterator & source0,
         InputIterator & source1,
         InputIterator & source2,
         InputIterator & source3,
-        OutputIterator target, unsigned_type length, Cmp_ cmp)
+        OutputIterator target, unsigned_type length, CompareType& cmp)
     {
         OutputIterator done = target + length;
 
