@@ -1,11 +1,21 @@
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/mainpage.dox
+ *
+ *  Main page of STXXL doxygen tree. All doc pages should be linked here.
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
+
 /*! \mainpage Welcome to STXXL
 
-The core of STXXL is an implementation of the C++ standard template library STL
-for <b>external memory</b> (out-of-core) computations, i.e., STXXL implements
-containers and algorithms that can process huge volumes of data that only fit
-on disks. While the compatibility to the STL supports ease of use and
-compatibility with existing applications, another design priority is high
-performance. Here is a selection of STXXL performance features:
+The core of STXXL is an implementation of the C++ standard template library STL for <b>external memory</b> (out-of-core) computations, i.e., STXXL implements containers and algorithms that can process huge volumes of data that only fit on disks. While the compatibility to the STL supports ease of use and compatibility with existing applications, another design priority is high performance. Here is a selection of STXXL performance features:
 
 - transparent support of multiple disks
 - variable block lengths
@@ -14,24 +24,23 @@ performance. Here is a selection of STXXL performance features:
 - algorithm pipelining
 - utilization of multiple processor cores for internal computation
 
-See the \subpage introduction "introduction and design" page for a longer
-mission statement.
+See the \subpage introduction "introduction and design" page for a longer mission statement.
 
 \section getting_started Getting Started
 
-This section will help you if you are using the S<small>TXXL</small> for the first time.
+This section will help you if you are using the STXXL for the first time.
 
-\link install-unix Compiling and Installing the S<small>TXXL</small> on Unix Variants \endlink
+\subpage install_unix
 
-\link install-windows Compiling and Installing the S<small>TXXL</small> on Microsoft Windows \endlink
+\link install-windows Compiling and Installing the STXXL on Microsoft Windows \endlink
 
-\link install-macos Compiling Installing the S<small>TXXL</small> on Mac OS \endlink
+\link install-macos Compiling Installing the STXXL on Mac OS \endlink
 
-\link overview Overview on S<small>TXXL</small>'s basic concepts \endlink
+\subpage design "Design of STXXL concepts, containers and algorithms"
 
 \section usage_functionality Usage and Functionality
 
-This section provides simple and detailed documented examples on S<small>TXXL</small>'s datastructures.
+This section provides simple and detailed documented examples on STXXL's datastructures.
 
 \link external_vector External Memory Vector \endlink
 
@@ -55,23 +64,17 @@ This section provides simple and detailed documented examples on S<small>TXXL</s
 
 \section questions Questions
 
-- Questions concerning use and development of the STXXL library should be
-posted to the <b><a
-href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>.  Please
-search the forum before posting, your question may have been answered before.
+- Questions concerning use and development of the STXXL library should be posted to the <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>. Please search the forum before posting, your question may have been answered before.
 
 \section bugreports Bug Reports
 
-- Bugs should be reported in the 
-  <b><a href="https://stxxl.ae.cs.uni-frankfurt.de/bugs/">Bugzilla Bug Tracker</a></b>
+- Bugs should be reported in the <b><a href="https://stxxl.ae.cs.uni-frankfurt.de/bugs/">Bugzilla Bug Tracker</a></b>
 
 - \link FAQ FAQ - Frequently Asked Questions \endlink
 
 
 \section license License
 
-\c S<small>TXXL</small> is distributed under the Boost Software License, Version 1.0.<br>
-You can find a copy of the license in the accompanying file \c LICENSE_1_0.txt or online at
-<a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
+\c STXXL is distributed under the Boost Software License, Version 1.0.<br> You can find a copy of the license in the accompanying file \c LICENSE_1_0.txt or online at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
 
 */

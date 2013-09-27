@@ -1,87 +1,152 @@
-/*! \page install-unix Compilation Installation on Unix Variants
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/install.dox
+ *
+ *  Installation and Linking Instruction for STXXL using cmake
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
+ **************************************************************************/
 
-Precondition: Make sure GNU Make, CMake, GNU Git and a C++ compiler are installed 
-1. Create a project directory and clone the newest S<small>TXXL</small> project repository: 
+/** \page install_unix Compiling and Installing the STXXL on Linux/Unix Variants
 
-\verbatim 
-$ mkdir project ; cd project 
-$ git clone https://github.com/bingmann/stxxl.git 
+Precondition: Make sure GNU \c make, \c cmake >= 2.8, \c git and a C++ compiler are installed. See \ref faq_compilers on which systems and compilers are currently supported.
+
+There are two methods to use STXXL:
+- The first is recommended for small (prototype) projects consisting of only a single source file. It uses the \c local/ directory within the STXXL directory tree.
+- For larger projects, the STXXL library should be linked as a library inside a subdirectory, much the way most KDE libraries are used.
+
+There are quite some \ref install_build_options, which you can use in both setting.
+
+\section install_unix_local Simple Projects in local/
+
+1. Clone the STXXL project repository as <tt>\b my-project</tt>.
+\verbatim
+$ git clone https://github.com/bingmann/stxxl.git my-project
 \endverbatim
 
-2. Generate a file named CMakeLists.txt (inside your /project folder) by: \verbatim $ touch CMakeLists.txt \endverbatim
- and fill the file with the following content: 
-
+2. Compile the STXXL library in a \c build subdirectory, including the example in \c local/.
 \verbatim
-# CMakeLists.tex
-project(sac-dev)
- 
+$ mkdir my-project/build
+$ cd my-project/build
+$ cmake -DCMAKE_BUILD_TYPE=Debug ..
+<lots of output by cmake>
+$ make
+<lots of compilation messages>
+\endverbatim
+
+3. Run the example program \c test1 in \c local/
+\verbatim
+(inside my-project/build/)
+$ cd local
+$ ./test1
+<lots of output>
+\endverbatim
+
+For your own prototype project you can immediately start modifying \c test1.cpp or create a new .cpp in \c local/. The cmake scripts will automatically compile and link all \c .cpp files in \c local/ correctly with STXXL.
+
+\section install_unix_subproject Including STXXL as a Cmake Subproject
+
+The second method is for including STXXL in a larger program as a subproject. This is particularly easy with \c cmake: one can just \c add_directory(stxxl) in a CMakeLists.txt. The following guide shows how to start a simple cmake project and use STXXL in a subdirectory.
+
+The advantage of this method is that the STXXL is a subproject of your's. Thereby it will always be compiled with the <b>same set</b> of CFLAGS or CMAKE_BUILD_TYPE as your project. This is most convenient for debugging projects, as the STXXL has a lot of debug code. When running experiments or going into production, the whole project must be build with \c CMAKE_BUILD_TYPE=Release or similar to remove the debug code.
+
+1. Create an empty directory \c "my-project" and clone the STXXL inside it.
+\verbatim
+$ mkdir my-project
+$ cd my-project
+$ git clone https://github.com/bingmann/stxxl.git
+\endverbatim
+
+2. Create a file named \c CMakeLists.txt inside your \c my-project folder with the following sample content:
+\verbatim
+# CMakeLists.txt example for STXXL
+
+project(my-project)
 cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_CXX_FLAGS "-std=c++0x")
-
-# disallow in-source builds
-
+# Disallow in-source builds
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(SEND_ERROR "In-source builds are not allowed.")
 endif("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 
-# Use OpenMP
+# Enable warnings (always good)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall")
 
-include(FindOpenMP)
-
-if(OPENMP_FOUND)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-else()
-  message(FATAL_ERROR "OpenMP not found.")
-endif()
-
-# Enable warnings
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -W -Wall -Wextra -march=native")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
-
-# Use zlib
-
-include(FindZLIB)
-
+# Include the STXXL library in my-project
 add_subdirectory(stxxl)
 
-include_directories(${ZLIB_INCLUDE_DIR})
+# Add STXXL includes path
+include_directories(${STXXL_INCLUDES})
+
+# Build a program and link it with STXXL.
+add_executable(project main.cpp)
+target_link_libraries(project ${STXXL_LIBS})
 \endverbatim
 
-3. Create a build directory and a source directory (inside your /project folder) by: \verbatim $ mkdir build ; mkdir src \endverbatim
-4. Change directory to the /src directory and create another CMakeLists.txt file: 
-
-\verbatim $ cd src ; touch CMakeLists.txt \endverbatim 
-
-filled with: 
-
-\verbatim add_executable(main main.cc) 
-include_directories("${PROJECT_BINARY_DIR}/stxxl/include" "${PROJECT_SOURCE_DIR}/stxxl/include" )
-target_link_libraries(main stxxl ${ZLIB_LIBRARIES} -ldl)
-set_property(TARGET main PROPERTY COMPILE_DEFINITIONS "STXXL_VERBOSE_LEVEL=0")
+3. To show how that this build system works, we now copy the \c test1.cpp from STXXL to the new project as \c main.cpp and build it.
+\verbatim
+$ cp stxxl/local/test1.cpp main.cpp
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_BUILD_TYPE=Debug ..
+<lots of output by cmake>
+$ make
+<lots of compilation messages>
 \endverbatim
 
-Note that we assume that the main function resides in a file called main.cc which itself has to be in the /project/src/ directory. Consequently, this has possibly to be adapted manually for your indivual name choice. 
+4. Test the compilation by running \c project
+\verbatim
+$ ./project
+\endverbatim
 
-5. Move to build directory by: \verbatim $ cd .. ; cd build \endverbatim
-6. Run cmake: 
+\section install_unix_library Including STXXL as a Library
 
-\verbatim 
-$ cmake .. 
-$ make 
-\endverbatim 
+Since STXXL compiles into a static library plus template include files, there will some day be binary distributions of compiled versions. However, this is still in the future and not a high priority, since STXXL's interface is still evolving.
 
-7. The executable binary can now be found in /project/build/src
+\section install_build_options Options for Build Configuration
+
+STXXL has some optional features and compile switches that can be changed at build time.
+
+- Maybe the most important one is switching between \b Debug and \b Release builds. Debug builds are <b>very slow</b>, as STXXL contains many assertions (which are a feature not a bug). With \c cmake the mode is easily defined by using
+\verbatim
+$ cmake -DCMAKE_BUILD_TYPE=Debug ...
+<or>
+$ cmake -DCMAKE_BUILD_TYPE=Release ...
+\endverbatim
+The mode mostly changes CXXFLAGS.
+
+- Some parts of STXXL have been parallelized using the __gnu_parallel (aka MCSTL) library. Currently, with cmake one can only use the newer __gnu_parallel library by defining
+\verbatim
+$ cmake -DUSE_GNU_PARALLEL=ON ...
+\endverbatim
+when building. The cmake script will check availability of the corresponding header files.
+
+- Using Boost for file I/O, multi-threading support and more. Boost is required on Windows and is cmake tries to automatically find it. On Linux/Unix it is optional (and not recommended), but can be activated using
+\verbatim
+$ cmake -DUSE_BOOST=ON ...
+\endverbatim
+
+- STXXL contains a set of unit tests in \c tests/, which verify most of the libraries functionality. These programs are not built by default, because this makes it easier for STXXL to be used as cmake subproject (\ref install_unix_subproject). The test suite can be built and run using
+\verbatim
+$ cmake -DBUILD_TESTS=ON ...
+<compile>
+$ make test
+\endverbatim
+There is also a \c BUILD_EXTRAS configuration flag to build even more, longer running tests. Be advised that the test suite need quite some space on your disks.
+
+\section config_file
+
 8. IMPORTANT: Create a Disk Configuration File first!
 You must define the disk configuration for an S<small>TXXL</small> program in a file named '.stxxl' that must reside in the same directory
 where you execute the program (in our case this would be /project/build/src). A minimal configuration might be:
-\verbatim disk=/tmp/stxxl,1000,syscall # full_disk_filename, maximum capacity of the disk in megabytes, access method  
+\verbatim disk=/tmp/stxxl,1000,syscall # full_disk_filename, maximum capacity of the disk in megabytes, access method
 [TODO] use syscall_unlink INSTEAD !!! touch /tmp/stxxl to create a file, the Stxxl is allowed to use as disk space \endverbatim
 Please see [TODO] for further available options.
 
 */
-
-
-

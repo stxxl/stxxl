@@ -162,10 +162,15 @@ endif(USE_GNU_PARALLEL)
 configure_file(${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in ${PROJECT_BINARY_DIR}/include/stxxl/bits/config.h)
 
 # globally adds top-level include directories
-include_directories("${PROJECT_SOURCE_DIR}/include/" "${PROJECT_BINARY_DIR}/include/")
+set(STXXL_INCLUDES ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
+include_directories(${STXXL_INCLUDES})
 
 # for targets using stxxl library
-set(STXXL_LIBS ${STXXL_LIBS} stxxl ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+set(STXXL_LIBS stxxl ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+# export STXXL_INCLUDES and STXXL_LIBS to PARENT_SCOPE
+set(STXXL_INCLUDES "${STXXL_INCLUDES}" PARENT_SCOPE)
+set(STXXL_LIBS "${STXXL_LIBS}" PARENT_SCOPE)
 
 # build libstxxl in /lib
 add_subdirectory(lib)
@@ -272,3 +277,4 @@ message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
 add_subdirectory(tests)
 add_subdirectory(tools)
 add_subdirectory(examples)
+add_subdirectory(local)
