@@ -1,5 +1,5 @@
 /***************************************************************************
- *  doc/intro-design.dox
+ *  doc/introduction.dox
  *
  *  Most of this is from the old TeX tutorial and papers.
  *
@@ -13,7 +13,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-/*! \page introduction Introduction and Design
+/*! \page introduction Introduction to External Memory
 
 There exist many applications that have to process data sets which can not fit
 into the main memory of a computer, but fit into external memory (e.g. hard

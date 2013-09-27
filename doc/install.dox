@@ -149,4 +149,6 @@ where you execute the program (in our case this would be /project/build/src). A 
 [TODO] use syscall_unlink INSTEAD !!! touch /tmp/stxxl to create a file, the Stxxl is allowed to use as disk space \endverbatim
 Please see [TODO] for further available options.
 
+\author Timo Bingmann
+
 */

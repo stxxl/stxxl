@@ -126,13 +126,11 @@ The documentation of \subpage design_stl "The STL-User Layer" is on a separate s
 
 # The Algorithm Pipelining Layer
 
-The \subpage design_pipeline "Streaming layer" provides efficient support for
-external memory algorithms with mostly \b sequential I/O pattern, i.e. scan,
-sort, merge, etc. A user algorithm, implemented using this module can save many
-I/Os. The win is due to an efficient interface, that couples the input and the
-output of the algorithms-components (scans, sorts, etc.). The output from an
-algorithm is directly fed into another algorithm as the input, without the need
-to store it on the disk.
+The \subpage design_pipeline "Streaming layer" provides efficient support for external memory algorithms with mostly \b sequential I/O pattern, i.e. scan, sort, merge, etc. A user algorithm, implemented using this module can save many I/Os. The win is due to an efficient interface, that couples the input and the output of the algorithms-components (scans, sorts, etc.). The output from an algorithm is directly fed into another algorithm as the input, without the need to store it on the disk.
+
+# Common Helpers and Utilities
+
+Beyond the layered library, STXXL contains many small helpers commonly used in C++ like random numbers or shared pointers. See \subpage common "the common library" for short descriptions.
 
 */
 
