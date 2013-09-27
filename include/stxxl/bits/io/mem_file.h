@@ -29,6 +29,8 @@ class mem_file : public disk_queued_file
     char * ptr;
     offset_type sz;
 
+    mutex m_mutex;      // sequentialize function calls
+
 public:
     //! constructs file object.
     mem_file(

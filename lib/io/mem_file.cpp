@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -21,6 +22,8 @@ __STXXL_BEGIN_NAMESPACE
 
 void mem_file::serve(const request * req) throw (io_error)
 {
+    scoped_mutex_lock lock(m_mutex);
+
     assert(req->get_file() == this);
     offset_type offset = req->get_offset();
     void * buffer = req->get_buffer();
@@ -46,7 +49,7 @@ const char * mem_file::io_type() const
 
 mem_file::~mem_file()
 {
-    delete[] ptr;
+    free(ptr);
     ptr = NULL;
 }
 
@@ -62,13 +65,15 @@ file::offset_type mem_file::size()
 
 void mem_file::set_size(offset_type newsize)
 {
-    assert(ptr == NULL); // no resizing
-    if (ptr == NULL)
-        ptr = new char[sz = newsize];
+    scoped_mutex_lock lock(m_mutex);
+
+    ptr = (char*)realloc(ptr, newsize);
+    sz = newsize;
 }
 
 void mem_file::discard(offset_type offset, offset_type size)
 {
+    scoped_mutex_lock lock(m_mutex);
 #ifndef STXXL_MEMFILE_DONT_CLEAR_FREED_MEMORY
     // overwrite the freed region with uninitialized memory
     STXXL_VERBOSE("discard at " << offset << " len " << size);
