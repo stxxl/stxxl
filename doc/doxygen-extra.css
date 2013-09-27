@@ -15,10 +15,10 @@ div.fragment div.line {
 }
 
 /* make heading smaller */
-h1 { font-size: 16pt; margin: 12pt 0px 8pt 0px; }
-h2 { font-size: 15pt; margin: 12pt 0px 8pt 0px; }
-h3 { font-size: 14pt; margin: 12pt 0px 8pt 0px; }
-h4 { font-size: 14pt; margin: 10pt 0px 6pt 0px; }
+h1 { font-size: 16pt; margin: 12pt 0px 8pt 0px; text-align: left; }
+h2 { font-size: 15pt; margin: 12pt 0px 8pt 0px; text-align: left; }
+h3 { font-size: 14pt; margin: 12pt 0px 8pt 0px; text-align: left; }
+h4 { font-size: 14pt; margin: 10pt 0px 6pt 0px; text-align: left; }
 
 /* limit maximum width of text content */
 div.contents {

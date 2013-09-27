@@ -151,6 +151,22 @@ public:
         init(blocks2prefetch_);
     }
 
+    void swap(queue& obj)
+    {
+        std::swap(size_, obj.size_);
+        std::swap(delete_pool, obj.delete_pool);
+        std::swap(pool, obj.pool);
+        std::swap(front_block, obj.front_block);
+        std::swap(back_block, obj.back_block);
+        std::swap(front_element, obj.front_element);
+        std::swap(back_element, obj.back_element);
+        std::swap(alloc_strategy, obj.alloc_strategy);
+        std::swap(alloc_count, obj.alloc_count);
+        std::swap(bids, obj.bids);
+        std::swap(bm, obj.bm);
+        std::swap(blocks2prefetch, obj.blocks2prefetch);
+    }
+
 private:
     void init(int blocks2prefetch_ = -1)
     {
