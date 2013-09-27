@@ -87,6 +87,6 @@ avoid superfluous copying of data.
 algorithms and data structures. We provide STL-compatible interfaces for our
 implementations.
 
-\author Roman Dementiev
+\author Roman Dementiev (2006)
 
 */

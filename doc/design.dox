@@ -19,8 +19,7 @@ namespace stxxl {
 
 /** \page design Design of STXXL
 
-\author Roman Dementiev
-\date written 2006
+\author Roman Dementiev (2006)
 
 STXXL is a layered library consisting of three layers (see following figure). The lowest layer, the Asynchronous I/O primitives layer (AIO layer), abstracts away the details of how asynchronous I/O is performed on a particular operating system. Other existing external memory algorithm libraries only rely on synchronous I/O APIs \cite CraMeh99 or allow reading ahead sequences stored in a file using the POSIX asynchronous I/O API \cite tpie_manual. These libraries also rely on uncontrolled operating system I/O caching and buffering in order to overlap I/O and computation in some way. However, this approach has significant performance penalties for accesses without locality. Unfortunately, the asynchronous I/O APIs are very different for different operating systems (e.g. POSIX AIO and Win32 Overlapped I/O). Therefore, we have introduced the AIO layer to make porting STXXL easy. Porting the whole library to a different platform requires only reimplementing the AIO layer using native file access methods and/or native multithreading mechanisms.
 
@@ -552,8 +551,7 @@ Both sorters are implementations of parallel disk algorithms described in \subpa
 
 /** \page design_algo_sorting Parallel Disk Sorting
 
-\author Roman Dementiev
-\date written 2006
+\author Roman Dementiev (2006)
 
 The development of STXXL has been started with sorting, because it is \c the fundamental tool for I/O-efficient processing of large data sets. Therefore, an efficient implementation of sorting largely defines the performance of an external memory software library as a whole. To achieve the best performance our implementation \cite DemSan03 uses parallel disks, has an optimal I/O volume \f$ \mathcal{O}(\frac{N}{DB}\log_{M/B}\frac{N}{B}) \f$ (that matches the lower bound), and guarantees almost perfect overlap between I/O and computation.
 
@@ -1131,8 +1129,7 @@ namespace stream {
 
 /** \page design_pipeline Algorithm Pipelining
 
-\author Roman Dementiev
-\date written 2006
+\author Roman Dementiev (2006)
 
 The pipelined processing technique is very well known in the database world \cite SKS01.
 

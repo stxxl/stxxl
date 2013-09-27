@@ -49,6 +49,8 @@ Once compiled, you can read the following simple tutorial on how to use STXXL co
 
 \link external_stack External Memory Stack \endlink
 
+\subpage tutorial_stream
+
 # Design and More Information
 
 We have collected much documentation about the design of STXXL. Even more information is available as academic research papers, technical reports and theses.

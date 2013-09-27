@@ -159,7 +159,7 @@ disk=/tmp/stxxl,1G,syscall_unlink
 \endverbatim
 Please see \ref install_config for further available options.
 
-\author Timo Bingmann
+\author Timo Bingmann (2013)
 
 */
 
@@ -263,5 +263,7 @@ The precreation utility is included in the set of \c STXXL utilities ( \c utils/
 \verbatim
 utils/createdisks.bin capacity full_disk_filename...
 \endverbatim
+
+\author Timo Bingmann (2013)
 
 */

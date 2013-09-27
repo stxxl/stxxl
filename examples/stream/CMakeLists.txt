@@ -1,7 +1,5 @@
 ###############################################################################
-# examples/CMakeLists.txt
-#
-# Cmake file for stxxl/examples/
+# examples/stream/CMakeLists.txt
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #
@@ -12,7 +10,5 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-add_subdirectory(algo)
-add_subdirectory(containers)
-add_subdirectory(stream)
+stxxl_build_tool(stream1)
 
