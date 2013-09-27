@@ -138,7 +138,7 @@ int main(int argc, char ** argv)
 
     {
         stxxl::syscall_file f(fn, stxxl::file::DIRECT | stxxl::file::RDWR);
-        f.remove();
+        f.close_remove();
     }
 }
 // vim: et:ts=4:sw=4

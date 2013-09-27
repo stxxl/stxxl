@@ -201,7 +201,8 @@ public:
         STXXL_UNUSED(prefix);
     }
 
-    virtual void remove() { }
+    //! close and remove file
+    virtual void close_remove() { }
 
     virtual ~file()
     {

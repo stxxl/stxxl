@@ -199,7 +199,7 @@ void wfs_file_base::set_size(offset_type newsize)
     }
 }
 
-void wfs_file_base::remove()
+void wfs_file_base::close_remove()
 {
     close();
     ::DeleteFile(filename.c_str());

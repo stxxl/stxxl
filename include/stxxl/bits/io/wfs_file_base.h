@@ -53,7 +53,7 @@ public:
     void set_size(offset_type newsize);
     void lock();
     const char * io_type() const;
-    void remove();
+    void close_remove();
 };
 
 //! \}

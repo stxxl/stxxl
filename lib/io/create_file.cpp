@@ -28,6 +28,13 @@ file * create_file(const std::string & io_impl,
         result->lock();
         return result;
     }
+    else if (io_impl == "syscall_unlink")
+    {
+        ufs_file_base * result = new syscall_file(filename, options, physical_device_id, allocator_id);
+        result->lock();
+        result->unlink();
+        return result;
+    }
     else if (io_impl == "fileperblock_syscall")
     {
         fileperblock_file<syscall_file> * result = new fileperblock_file<syscall_file>(filename, options, physical_device_id, allocator_id);

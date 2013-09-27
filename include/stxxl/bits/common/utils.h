@@ -51,12 +51,16 @@ __STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline std::vector<std::string>
-split(const std::string & str, const std::string & sep)
+//! Split a string by given separator string. Returns a vector of strings with
+//! at least min_fields.
+static inline std::vector<std::string>
+split(const std::string & str, const std::string & sep, unsigned int min_fields)
 {
     std::vector<std::string> result;
-    if (str.empty())
+    if (str.empty()) {
+        result.resize(min_fields);
         return result;
+    }
 
     std::string::size_type CurPos(0), LastPos(0);
     while (1)
@@ -65,19 +69,19 @@ split(const std::string & str, const std::string & sep)
         if (CurPos == std::string::npos)
             break;
 
-        std::string sub =
+        result.push_back(
             str.substr(LastPos,
-                       std::string::size_type(CurPos -
-                                              LastPos));
-        if (sub.size())
-            result.push_back(sub);
+                       std::string::size_type(CurPos - LastPos))
+            );
 
         LastPos = CurPos + sep.size();
     }
 
     std::string sub = str.substr(LastPos);
-    if (sub.size())
-        result.push_back(sub);
+    result.push_back(sub);
+
+    if (result.size() < min_fields)
+        result.resize(min_fields);
 
     return result;
 }

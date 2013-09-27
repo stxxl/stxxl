@@ -47,14 +47,8 @@ class config : public singleton<config>
     // in disks_props, flash devices come after all regular disks
     unsigned first_flash;
 
-    config()
-    {
-        const char * cfg_path = getenv("STXXLCFG");
-        if (cfg_path)
-            init(cfg_path);
-        else
-            init();
-    }
+    //! searchs different locations for a disk configuration file
+    config();
 
     ~config()
     {
@@ -68,7 +62,8 @@ class config : public singleton<config>
         }
     }
 
-    void init(const char * config_path = "./.stxxl");
+    //! load disk configuration file
+    void init(const std::string& config_path = "./.stxxl");
 
 public:
     //! Returns number of disks available to user.

@@ -30,11 +30,10 @@ See the \subpage introduction "introduction to external memory" for a longer des
 
 This section will help you if you are using the STXXL for the first time.
 
-First you must compile the library. Pick one of the following instructions, depending on your host system:
+First you must compile the library. Pick one of the following \subpage install "build instructions", depending on your host system:
 
-- \subpage install_unix
-
-- \link install-windows Compiling and Installing the STXXL on Microsoft Windows \endlink
+- \ref install_unix
+- \ref install_windows
 
 Once compiled, you can read the following simple tutorial on how to use STXXL containers and algorithms:
 

@@ -13,6 +13,16 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+/** \page install Compilation and Configuration
+
+\subpage install_unix
+
+\subpage install_windows
+
+\subpage install_config
+
+*/
+
 /** \page install_unix Compiling and Installing the STXXL on Linux/Unix Variants
 
 Precondition: Make sure GNU \c make, \c cmake >= 2.8, \c git and a C++ compiler are installed. See \ref faq_compilers on which systems and compilers are currently supported.
@@ -140,15 +150,118 @@ $ make test
 \endverbatim
 There is also a \c BUILD_EXTRAS configuration flag to build even more, longer running tests. Be advised that the test suite need quite some space on your disks.
 
-\section config_file
+# Create a Disk Configuration File
 
-8. IMPORTANT: Create a Disk Configuration File first!
-You must define the disk configuration for an S<small>TXXL</small> program in a file named '.stxxl' that must reside in the same directory
-where you execute the program (in our case this would be /project/build/src). A minimal configuration might be:
-\verbatim disk=/tmp/stxxl,1000,syscall # full_disk_filename, maximum capacity of the disk in megabytes, access method
-[TODO] use syscall_unlink INSTEAD !!! touch /tmp/stxxl to create a file, the Stxxl is allowed to use as disk space \endverbatim
-Please see [TODO] for further available options.
+For STXXL is function beyond very simple examples, you must define the \link install_config disk configuration file \endlink. The simplest method is to create a file named \c '.stxxl' the same directory as you execute the program. A basic configuration might be:
+\verbatim
+# file path,maximum capacity of the disk,access method
+disk=/tmp/stxxl,1G,syscall_unlink
+\endverbatim
+Please see \ref install_config for further available options.
 
 \author Timo Bingmann
+
+*/
+
+/** \page install_windows Compiling and Installing the STXXL on Microsoft Windows
+
+TODO
+
+*/
+
+/** \page install_config Disk Configuration Files
+
+A main feature of the STXXL is to take advantage of parallel access to \b multiple disks. For this, you must define the disk configuration in a text file, commonly named \c '.stxxl', using the syntax described below.
+
+These are the locations STXXL will look for a disk configuration file, in decreasing order of precedence:
+- If the environment variable \c STXXLCFG specifies a file, this is used.
+- Then the current directory of the program is checked (<b>usual method</b>):
+  - first for <tt>.stxxl.$HOSTNAME</tt> (for host specific configuration),
+  - then for <tt>.stxxl</tt> (for general configuration).
+- Then the \c $HOME directory of the current user is checked
+  - first for <tt>$HOME/.stxxl.$HOSTNAME</tt> (for host specific configuration),
+  - then for <tt>$HOME/.stxxl</tt> (for general configuration).
+
+If no file is found at the locations above, STXXL will by default create a 1000 MiB file in \c /var/tmp/stxxl.
+
+On many distributions the \c $HOSTNAME variable is not exported. For the host specific configuration to work, you must add <tt>"export HOSTNAME"</tt> to your shell configuration (<tt>.bashrc</tt>).
+
+\section install_config_format Disk Configuration File Format
+
+Each line of the configuration file describes a disk. Lines starting with '#' are comments.
+
+A disk description uses the following format:
+\verbatim
+disk=full_disk_filename,capacity,access_method
+\endverbatim
+
+Description of the parameters:
+
+- \c full_disk_filename : full disk filename. In order to access disks STXXL uses \b file access methods. Each disk is represented as a file. If you have a disk that is mounted in Unix to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be \c /mnt/disk0/some_file_name ,
+
+- \c capacity : maximum capacity of the disk
+
+  - the following size suffixes are recognized:
+    - \c K, \c M, \c G, \c T, \c P (powers of 10),
+    - \c Ki, \c Mi, \c Gi, \c Ti, \c Pi (powers of 2).
+    - if a number has no suffix, \c M (megabyte) is assumed.
+
+  - 0 means autogrow, and the file will be deleted afterwards.
+
+- \c access_method : \c STXXL has a number of different file access implementations, choose one of them:
+
+  - \c syscall : use \c read and \c write system calls which perform disk transfers directly on user memory pages without superfluous copying (currently the fastest method)
+
+  - \c <b>syscall_unlink</b> : is a variant of \c syscall, which unlinks the file immediately after creation. This is possible on Unix system, as the file descriptor is kept open. This method is \b preferred, because even in the case of a program segfault, the file data is cleaned up by the kernel.
+
+  - \c wincall : on Windows, use direct calls to the Windows API.
+
+  - \c mmap : \c use \c mmap and \c munmap system calls
+
+  - \c boostfd : access the file using a Boost file descriptor
+
+  - \c fileperblock_syscall, \c fileperblock_mmap, \c fileperblock_boostfd : same as above, but take a single file per block, using full_disk_filename as file name prefix.  Usually provide worse performance than the standard variants, but release freed blocks to the file system immediately.
+
+  - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point to a file on a RAM disk partition with sufficient space
+
+  - \c memory : keeps all data in RAM, for quicker testing
+
+  - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs), based on \c syscall
+
+Example:
+\verbatim
+disk=/data01/stxxl,500G,syscall_unlink
+disk=/data02/stxxl,300G,syscall_unlink
+\endverbatim
+
+On Windows, one usually uses different disk drives and \c wincall.
+\verbatim
+disk=c:\stxxl,700G,wincall
+disk=d:\stxxl,200G,wincall
+\endverbatim
+
+\section install_config_filesystem Recommended file system
+
+The library benefits from direct transfers from user memory to disk, which saves superfluous copies.  We recommend to use the \c <a href="http://xfs.org">XFS</a> file system, which gives good read and write performance for large files.  Note that file creation speed of \c XFS is a bit slower, so that disk files should be precreated for optimal performance.
+
+If the filesystems only use is to store one large STXXL disk file, we also recommend to add the following options to the \c mkfs.xfs command to gain maximum performance:
+\verbatim
+-d agcount=1 -l size=512b
+\endverbatim
+
+The following filesystems have been reported not to support direct I/O: \c tmpfs , \c glusterfs .  By default, STXXL will first try to use direct I/O (\c O_DIRECT open flag). If that fails, it will print a warning and open the file without \c O_DIRECT.
+
+\section install_config_logfiles Log files
+
+STXXL produces two kinds of log files, a message and an error log. By setting the environment variables \c STXXLLOGFILE and \c STXXLERRLOGFILE, you can configure the location of these files. The default values are \c stxxl.log and \c stxxl.errlog, respectively.
+
+\section install_config_precreation Precreating External Memory Files
+
+In order to get the maximum performance one can precreate disk files described in the configuration file, before running STXXL applications.
+
+The precreation utility is included in the set of \c STXXL utilities ( \c utils/createdisks.bin ). Run this utility for each disk you have defined in the disk configuration file:
+\verbatim
+utils/createdisks.bin capacity full_disk_filename...
+\endverbatim
 
 */

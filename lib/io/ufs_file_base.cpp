@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/ufs_file_base.cpp
+ *  lib/io/ufs_file_base.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -7,6 +7,7 @@
  *  Copyright (C) 2008 Ilja Andronov <sni4ok@yandex.ru>
  *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -207,10 +208,16 @@ void ufs_file_base::_set_size(offset_type newsize)
 #endif
 }
 
-void ufs_file_base::remove()
+void ufs_file_base::close_remove()
 {
     close();
     ::remove(filename.c_str());
+}
+
+void ufs_file_base::unlink()
+{
+    if (::unlink(filename.c_str()) != 0)
+        STXXL_THROW2(io_error, "::unlink() path=" << filename << " fd=" << file_des);
 }
 
 __STXXL_END_NAMESPACE
