@@ -88,6 +88,82 @@ split(const std::string & str, const std::string & sep, unsigned int min_fields)
 
 ////////////////////////////////////////////////////////////////////////////
 
+//! Parse a string like "343KB" or "44 GiB" into the corresponding size in
+//! bytes. Returns the number of bytes and sets ok = true if the string could
+//! be parsed correctly.
+static inline int64 parse_filesize(const std::string& str, bool& ok)
+{
+    ok = false;
+
+    char* endptr;
+    int64 size = strtoul(str.c_str(), &endptr, 10);
+    if (!endptr) return 0; // parse failed, no number
+
+    while (endptr[0] == ' ') ++endptr; // skip over spaces
+
+    if ( endptr[0] == 0 ) // number parsed, no suffix defaults to MiB
+        size *= 1024 * 1024;
+    else if ( (endptr[0] == 'b' || endptr[0] == 'B') && endptr[1] == 0 ) // bytes
+        size *= 1;
+    else if (endptr[0] == 'k' || endptr[0] == 'K')
+    {
+        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
+            size *= 1000; // power of ten
+        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
+                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
+            size *= 1024; // power of two
+        else
+            return 0;
+    }
+    else if (endptr[0] == 'm' || endptr[0] == 'M')
+    {
+        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
+            size *= 1000 * 1000; // power of ten
+        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
+                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
+            size *= 1024 * 1024; // power of two
+        else
+            return 0;
+    }
+    else if (endptr[0] == 'g' || endptr[0] == 'G')
+    {
+        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
+            size *= 1000 * 1000 * 1000; // power of ten
+        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
+                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
+            size *= 1024 * 1024 * 1024; // power of two
+        else
+            return 0;
+    }
+    else if (endptr[0] == 't' || endptr[0] == 'T')
+    {
+        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
+            size *= int64(1000) * int64(1000) * int64(1000) * int64(1000); // power of ten
+        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
+                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
+            size *= int64(1024) * int64(1024) * int64(1024) * int64(1024); // power of two
+        else
+            return 0;
+    }
+    else if (endptr[0] == 'p' || endptr[0] == 'P')
+    {
+        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
+            size *= int64(1000) * int64(1000) * int64(1000) * int64(1000) * int64(1000); // power of ten
+        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
+                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
+            size *= int64(1024) * int64(1024) * int64(1024) * int64(1024) * int64(1024); // power of two
+        else
+            return 0;
+    }
+    else
+        return 0;
+
+    ok = true;
+    return size;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
 inline stxxl::int64 atoint64(const char * s)
 {
 #ifdef BOOST_MSVC

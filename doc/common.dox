@@ -24,6 +24,7 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_assert "macros for checking assertions"
 - \subpage common_types "signed and unsigned integer types"
 - \subpage common_misc_macros "miscellaneous macros"
+- \subpage common_misc_funcs "miscellaneous functions"
 
  */
 
@@ -231,5 +232,15 @@ if (UNLIKELY(x > 8)) { ... }
 \section deprecated Deprecated Functions
 
 Some compilers can warn the user about deprecated function by tagging them in the source. In STXXL we use the macro _STXXL_DEPRECATED(...) to enclose deprecated functions.
+
+*/
+
+/*! \page common_misc_funcs Miscellaneous Functions
+
+\section parse_filesize Parsing Filesizes with K, M, G suffixes
+
+Since with STXXL one often has to parse large file or disk sizes, there is a function called parse_filesize(), which accepts strings like "1 GiB" or "20 TB" as input.
+
+See the \ref install_config documentation page on the format of accepted file size strings.
 
 */

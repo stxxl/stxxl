@@ -32,65 +32,6 @@ static inline bool exist_file(const std::string& path)
     return in.good();
 }
 
-//! Parse a string like "343KB" or "44g" into the corresponding size in bytes
-static inline int64 parse_disksize(const std::string& str, bool& ok)
-{
-    ok = false;
-
-    char* endptr;
-    int64 size = strtoul(str.c_str(), &endptr, 10);
-    if (!endptr) return 0; // parse failed, no number
-
-    while (endptr[0] == ' ') ++endptr; // skip over spaces
-
-    if ( endptr[0] == 0 ) // number parsed, no suffix
-        size *= 1000 * 1000;
-    else if ( (endptr[0] == 'b' || endptr[0] == 'B') && endptr[1] == 0 ) // bytes
-        size *= 1;
-    // suffix powers of 10
-    else if ( (endptr[0] == 'k' || endptr[0] == 'K') &&
-              (endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) ) )
-        size *= 1000;
-    else if ( (endptr[0] == 'm' || endptr[0] == 'M') &&
-              (endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) ) )
-        size *= 1000 * 1000;
-    else if ( (endptr[0] == 'g' || endptr[0] == 'G') &&
-              (endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) ) )
-        size *= 1000 * 1000 * 1000;
-    else if ( (endptr[0] == 't' || endptr[0] == 'T') &&
-              (endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) ) )
-        size *= int64(1000) * int64(1000) * int64(1000) * int64(1000);
-    else if ( (endptr[0] == 'p' || endptr[0] == 'P') &&
-              (endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) ) )
-        size *= int64(1000) * int64(1000) * int64(1000) * int64(1000) * int64(1000);
-    // suffix powers of 2
-    else if ( (endptr[0] == 'k' || endptr[0] == 'K') &&
-              (endptr[1] == 'i' || endptr[0] == 'I') &&
-              (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-        size *= 1024;
-    else if ( (endptr[0] == 'm' || endptr[0] == 'M') &&
-              (endptr[1] == 'i' || endptr[0] == 'I') &&
-              (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-        size *= 1024 * 1024;
-    else if ( (endptr[0] == 'g' || endptr[0] == 'G') &&
-              (endptr[1] == 'i' || endptr[0] == 'I') &&
-              (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-        size *= 1024 * 1024 * 1024;
-    else if ( (endptr[0] == 't' || endptr[0] == 'T') &&
-              (endptr[1] == 'i' || endptr[0] == 'I') &&
-              (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-        size *= int64(1024) * int64(1024) * int64(1024) * int64(1024);
-    else if ( (endptr[0] == 'p' || endptr[0] == 'P') &&
-              (endptr[1] == 'i' || endptr[0] == 'I') &&
-              (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-        size *= int64(1024) * int64(1024) * int64(1024) * int64(1024) * int64(1024);
-    else
-        return 0;
-
-    ok = true;
-    return size;
-}
-
 config::config()
 {
     // check different locations for disk configuration files
@@ -187,7 +128,7 @@ void config::init(const std::string& config_path)
                 tmp = split(tmp[1], ",", 3);
                 DiskEntry entry = {
                     tmp[0], tmp[2],
-                    parse_disksize(tmp[1], ok),
+                    parse_filesize(tmp[1], ok),
                     false,
                     false
                 };
