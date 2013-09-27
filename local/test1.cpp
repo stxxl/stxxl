@@ -35,7 +35,7 @@ int main()
         vector.push_back(random());
     }
 
-    // sort vector using 1 MiB RAM
+    // sort vector using 16 MiB RAM
     stxxl::sort(vector.begin(), vector.end(), my_less_int(), 16*1024*1024);
 
     // output first and last items:

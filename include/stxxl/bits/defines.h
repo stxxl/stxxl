@@ -83,4 +83,12 @@
 //          used e.g. by EcoSort which puts input file, output file and
 //          scratch on a single disk (RAID0)
 
+//#define STXXL_MNG_COUNT_ALLOCATION 0/1
+// default: 1
+// used in: mng/mng.h
+// effect if defined: counts current, total and maximum allocation of bytes in
+// block manager. The numbers are exported via block_manager's get_
+// functions. This can be used to determine the maximum disk space required by
+// an application.
+
 #endif // !STXXL_DEFINES_HEADER

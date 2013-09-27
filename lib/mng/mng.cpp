@@ -33,6 +33,12 @@ block_manager::block_manager()
                                     i);         // allocator_id
         disk_allocators[i] = new DiskAllocator(disk_files[i], cfg->disk_size(i));
     }
+
+#if STXXL_MNG_COUNT_ALLOCATION
+    m_current_allocation = 0;
+    m_total_allocation = 0;
+    m_maximum_allocation = 0;
+#endif // STXXL_MNG_COUNT_ALLOCATION
 }
 
 block_manager::~block_manager()

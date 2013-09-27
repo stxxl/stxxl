@@ -14,7 +14,7 @@ div.fragment div.line {
   line-height: 135%;
 }
 
-/* make heading smaller */
+/* make heading smaller and quit justifying */
 h1 { font-size: 16pt; margin: 12pt 0px 8pt 0px; text-align: left; }
 h2 { font-size: 15pt; margin: 12pt 0px 8pt 0px; text-align: left; }
 h3 { font-size: 14pt; margin: 12pt 0px 8pt 0px; text-align: left; }
