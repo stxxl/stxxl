@@ -6,6 +6,7 @@
  *  Copyright (C) 2002-2008 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007-2009 Johannes Singler <singler@ira.uka.de>
  *  Copyright (C) 2008-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -26,6 +27,7 @@
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/mng/buf_ostream.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -313,6 +315,11 @@ public:
         offset(a.offset),
         p_vector(a.p_vector) { }
 
+    //! return pointer to vector containing iterator
+    vector_type* parent_vector() const
+    {
+        return p_vector;
+    }
     block_offset_type block_offset() const
     {
         return static_cast<block_offset_type>(offset.get_offset());
@@ -545,6 +552,11 @@ public:
         p_vector(a.p_vector)
     { }
 
+    //! return pointer to vector containing iterator
+    const vector_type* parent_vector() const
+    {
+        return p_vector;
+    }
     block_offset_type block_offset() const
     {
         return static_cast<block_offset_type>(offset.get_offset());
@@ -1667,6 +1679,211 @@ bool is_sorted(
                stxxl::const_vector_iterator<ValueType, AllocStr, SizeType, DiffType, BlockSize, PagerType, PageSize>(__last),
                __comp);
 }
+
+////////////////////////////////////////////////////////////////////////////
+
+/*!
+ * Buffered sequential writer to a vector using overlapped I/O.
+ *
+ * This buffered writer can be used to write a large sequential region of a
+ * vector using overlapped I/O. The object is created from an iterator range,
+ * which can then be written to using operator<<(), or with operator*() and
+ * operator++().
+ *
+ * The buffered writer is given one iterator in the constructor. When writing,
+ * this iterator advances in the vector and will \b enlarge the vector once it
+ * reaches the end(). The vector size is doubled each time; nevertheless, it is
+ * better to preinitialize the vector's size using stxxl::vector::resize().
+ */
+template <typename VectorType>
+class vector_bufwriter : public noncopyable
+{
+public:
+    //! template parameter: the vector type
+    typedef VectorType vector_type;
+
+    //! value type of the output vector
+    typedef typename vector_type::value_type value_type;
+
+    //! block type used in the vector
+    typedef typename vector_type::block_type block_type;
+
+    //! block identifier iterator of the vector
+    typedef typename vector_type::bids_container_iterator bids_container_iterator;
+
+    //! iterator type of vector
+    typedef typename vector_type::iterator vector_iterator_type;
+    typedef typename vector_type::const_iterator vector_const_iterator_type;
+
+    //! construct output buffered stream used for overlapped writing
+    typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;
+
+protected:
+
+    //! internal iterator into the vector.
+    vector_iterator_type        m_iter;
+
+    //! iterator to the current end of the vector.
+    vector_const_iterator_type  m_end;
+
+    //! boolean whether the vector was grown, will shorten at finish().
+    bool                        m_grown;
+
+    //! iterator into vector of the last block accessed (used to issue updates
+    //! when the block is switched).
+    vector_const_iterator_type  m_prevblk;
+
+    //! buffered output stream used to overlapped I/O.
+    buf_ostream_type*           m_bufout;
+
+    //! number of blocks to use as buffers.
+    unsigned_type               m_nbuffers;
+
+public:
+    //! Create overlapped writer beginning at the given iterator.
+    //! \param begin iterator to position were to start writing in vector
+    //! \param nbuffers number of buffers used for overlapped I/O (>= 2D recommended)
+    vector_bufwriter(vector_iterator_type begin,
+                     unsigned_type nbuffers = 0)
+        : m_iter(begin),
+          m_end( m_iter.parent_vector()->end() ),
+          m_grown(false),
+          m_bufout(NULL),
+          m_nbuffers(nbuffers)
+    {
+        if (m_nbuffers == 0)
+            m_nbuffers = 2 * config::get_instance()->disks_number();
+
+        assert( m_iter <= m_end );
+    }
+
+    //! Finish writing and flush output back to vector.
+    ~vector_bufwriter()
+    {
+        finish();
+    }
+
+    //! Return mutable reference to item at the position of the internal
+    //! iterator.
+    value_type & operator * ()
+    {
+        if (UNLIKELY(m_iter == m_end))
+        {
+            // iterator points to end of vector -> double vector's size
+
+            if (m_bufout) {
+                m_bufout->flush(); // flush overlap buffers
+                delete m_bufout;
+                m_bufout = NULL;
+
+                if (m_iter.block_offset() != 0)
+                    m_iter.block_externally_updated();
+            }
+
+            vector_type& v = *m_iter.parent_vector();
+            if (v.size() < 2 * block_type::size) {
+                v.resize(2 * block_type::size);
+            }
+            else {
+                v.resize(2 * v.size());
+            }
+            m_end = v.end();
+            m_grown = true;
+        }
+
+        assert( m_iter < m_end );
+
+        if (UNLIKELY(m_bufout == NULL))
+        {
+            if (m_iter.block_offset() != 0)
+            {
+                // output position is not at the start of the block, we
+                // continue to use the iterator initially passed to the
+                // constructor.
+                return *m_iter;
+            }
+            else
+            {
+                // output position is start of block: create buffered writer
+
+                m_iter.flush(); // flush container
+
+                // create buffered write stream for blocks
+                m_bufout = new buf_ostream_type(m_iter.bid(), m_nbuffers);
+                m_prevblk = m_iter;
+
+                // drop through to normal output into buffered writer
+            }
+        }
+
+        // if the pointer has finished a block, then we inform the vector that
+        // this block has been updated.
+        if (UNLIKELY(m_iter.block_offset() == 0)) {
+            if (m_prevblk != m_iter) {
+                m_prevblk.block_externally_updated();
+                m_prevblk = m_iter;
+            }
+        }
+
+        return m_bufout->operator*();
+    }
+
+    //! Advance internal iterator.
+    vector_bufwriter& operator ++ ()
+    {
+        // always advance internal iterator
+        ++m_iter;
+
+        // if buf_ostream active, advance that too
+        if (LIKELY(m_bufout != NULL)) m_bufout->operator++();
+
+        return *this;
+    }
+
+    //! Write value to the current position and advance the internal iterator.
+    vector_bufwriter& operator << (const value_type& v)
+    {
+        operator*() = v;
+        operator++();
+
+        return *this;
+    }
+
+    //! Finish writing and flush output back to vector.
+    void finish()
+    {
+        if (m_bufout)
+        {
+            // must finish the block started in the buffered writer: fill it with
+            // the data in the vector
+            vector_const_iterator_type const_out = m_iter;
+
+            while (const_out.block_offset() != 0)
+            {
+                m_bufout->operator*() = *const_out;
+                m_bufout->operator++();
+                ++const_out;
+            }
+
+            // inform the vector that the block has been updated.
+            if (m_prevblk != m_iter) {
+                m_prevblk.block_externally_updated();
+                m_prevblk = m_iter;
+            }
+
+            delete m_bufout;
+            m_bufout = NULL;
+        }
+
+        if (m_grown)
+        {
+            vector_type& v = *m_iter.parent_vector();
+            v.resize( m_iter - v.begin() );
+
+            m_grown = false;
+        }
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////////
 

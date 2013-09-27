@@ -159,9 +159,14 @@ STXXL library was designed to ease the access to external memory algorithms and 
 - \subpage design_stack "stxxl::stack"
 - \subpage design_queue "stxxl::queue"
 - \subpage design_deque "stxxl::deque"
-- \subpage design_pqueue "stxxl::priority_queue"
 - \subpage design_map "stxxl::map"
+
+Beyond these, STXXL also provides a set of containers that are not part of the STL:
+
+- \subpage design_pqueue "stxxl::priority_queue"
 - \subpage design_matrix "stxxl::matrix"
+- \ref stxxl::sorter
+- \ref stxxl::sequence
 
 */
 

@@ -26,11 +26,12 @@ __STXXL_BEGIN_NAMESPACE
 //!
 //! Writes data records to the stream of blocks.
 //! \remark Writing performed in the background, i.e. with overlapping of I/O and computation
-template <typename BlkTp_, typename BIDIteratorTp_>
+template <typename BlockType, typename BIDIteratorType>
 class buf_ostream
 {
-    typedef BlkTp_ block_type;
-    typedef BIDIteratorTp_ bid_iterator_type;
+public:
+    typedef BlockType block_type;
+    typedef BIDIteratorType bid_iterator_type;
 
 protected:
     buffered_writer<block_type> writer;
@@ -64,7 +65,7 @@ public:
             current_elem = 0;
             current_blk = writer.write(current_blk, *(current_bid++));
         }
-        return (*this);
+        return *this;
     }
 
     //! Returns reference to the current record.
@@ -91,7 +92,26 @@ public:
             current_elem = 0;
             current_blk = writer.write(current_blk, *(current_bid++));
         }
-        return (*this);
+        return *this;
+    }
+
+    //! Fill current block with padding and flush
+    _Self & fill(const_reference record)
+    {
+        while (current_elem != 0)
+        {
+            operator<< (record);
+        }
+        return *this;
+    }
+
+    //! Force flush of current block, for finishing writing within a block.
+    //! \warning Use with caution as the block may contain uninitialized data
+    _Self & flush()
+    {
+        current_elem = 0;
+        current_blk = writer.write(current_blk, *(current_bid++));
+        return *this;
     }
 
     //! Deallocates internal objects.

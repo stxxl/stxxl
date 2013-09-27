@@ -70,7 +70,7 @@ if(MSVC)
   # warning C4250: '...' : inherits '...' via dominance
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250")
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall ")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall")
 endif()
 
 # more template depth for some tests and compilers

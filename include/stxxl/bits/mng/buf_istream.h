@@ -32,12 +32,14 @@ __STXXL_BEGIN_NAMESPACE
 //!
 //! Reads data records from the stream of blocks.
 //! \remark Reading performed in the background, i.e. with overlapping of I/O and computation
-template <typename BlkTp_, typename BIDIteratorTp_>
+template <typename BlockType, typename BIDIteratorType>
 class buf_istream
 {
-    typedef BlkTp_ block_type;
-    typedef BIDIteratorTp_ bid_iterator_type;
+public:
+    typedef BlockType block_type;
+    typedef BIDIteratorType bid_iterator_type;
 
+private:
     buf_istream() { }
 
 protected:

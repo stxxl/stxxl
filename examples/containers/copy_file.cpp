@@ -17,7 +17,6 @@
 
 typedef unsigned char my_type;
 
-
 using stxxl::syscall_file;
 using stxxl::file;
 
@@ -31,8 +30,11 @@ int main(int argc, char * argv[])
 
     unlink(argv[2]);                                            // delete output file
 
-    syscall_file InputFile(argv[1], file::RDONLY);              // Input file object
-    syscall_file OutputFile(argv[2], file::RDWR | file::CREAT); // Output file object
+    stxxl::timer tm;
+    tm.start();
+
+    syscall_file InputFile(argv[1], file::RDONLY | file::DIRECT);              // Input file object
+    syscall_file OutputFile(argv[2], file::RDWR | file::CREAT | file::DIRECT); // Output file object
 
     typedef stxxl::vector<my_type> vector_type;
 
@@ -45,12 +47,13 @@ int main(int argc, char * argv[])
 
     vector_type::const_iterator it = InputVector.begin();       // creating const iterator
 
-
     for ( ; it != InputVector.end(); ++it)                      // iterate through InputVector
     {
         OutputVector.push_back(*it);                            // add the value pointed by 'it' to OutputVector
     }
 
+    std::cout << "Copied in " << tm.seconds() << " at "
+              << (double)InputVector.size() / tm.seconds() / 1024 / 1024 << " MiB/s" << std::endl;
 
     return 0;
 }
