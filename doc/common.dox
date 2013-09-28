@@ -13,6 +13,8 @@
 
 /*! \page common Common Utilities and Helpers found in STXXL
 
+\author Timo Bingmann (2013)
+
 A lots of basic utility classes and helper functions have accumulated in STXXL. Try are usually fundamental enough to be also used in an application program.  Before implementing a common software utility, please check the list below; it might already exist in STXXL:
 
 - \subpage common_random "random number generators"

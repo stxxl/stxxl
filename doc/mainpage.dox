@@ -35,21 +35,10 @@ First you must compile the library. Pick one of the following \subpage install "
 - \ref install_unix
 - \ref install_windows
 
-Once compiled, you can read the following simple tutorial on how to use STXXL containers and algorithms:
+Once compiled, you can read the following \subpage tutorial "simple tutorials" on how to use STXXL containers and algorithms:
 
-\link external_vector External Memory Vector \endlink
-
-\link external_sorting External Memory Sorting \endlink
-
-\link external_pq External Memory Priority Queue \endlink
-
-\link external_queue External Memory Queue \endlink
-
-\link external_deque External Memory Deque \endlink
-
-\link external_stack External Memory Stack \endlink
-
-\subpage tutorial_stream
+- \ref tutorial_pqueue
+- \ref tutorial_stream
 
 # Design and More Information
 

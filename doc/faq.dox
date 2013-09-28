@@ -119,7 +119,7 @@ Controller::Controller()
 
 - For industrial users:  Tell us the name of your company, so we can use it as a reference.
 
-\section q_compilers Supported Compilers
+\section faq_compilers Supported Compilers
 
 The following compilers have been tested in different
 \c S<small>TXXL</small> configurations.

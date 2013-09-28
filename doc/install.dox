@@ -25,6 +25,8 @@
 
 /** \page install_unix Compiling and Installing the STXXL on Linux/Unix Variants
 
+\author Timo Bingmann (2013)
+
 Precondition: Make sure GNU \c make, \c cmake >= 2.8, \c git and a C++ compiler are installed. See \ref faq_compilers on which systems and compilers are currently supported.
 
 There are two methods to use STXXL:
@@ -159,8 +161,6 @@ disk=/tmp/stxxl,1G,syscall_unlink
 \endverbatim
 Please see \ref install_config for further available options.
 
-\author Timo Bingmann (2013)
-
 */
 
 /** \page install_windows Compiling and Installing the STXXL on Microsoft Windows
@@ -170,6 +170,8 @@ TODO
 */
 
 /** \page install_config Disk Configuration Files
+
+\author Timo Bingmann (2013)
 
 A main feature of the STXXL is to take advantage of parallel access to \b multiple disks. For this, you must define the disk configuration in a text file, commonly named \c '.stxxl', using the syntax described below.
 
@@ -263,7 +265,5 @@ The precreation utility is included in the set of \c STXXL utilities ( \c utils/
 \verbatim
 utils/createdisks.bin capacity full_disk_filename...
 \endverbatim
-
-\author Timo Bingmann (2013)
 
 */
