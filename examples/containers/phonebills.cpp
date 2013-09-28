@@ -1,5 +1,5 @@
 /***************************************************************************
- *            phonebills.cpp
+ *  examples/containers/phonebills.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,7 +10,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl.h>       // Stxxl header
+#define USE_STXXL
+
+#include <stxxl.h>       // STXXL header
 #include <algorithm>     // for STL sort
 #include <vector>        // for STL vector
 
@@ -83,7 +85,6 @@ struct ProduceBill
     }
 };
 
-
 struct SortByCaller
 {
     // comparison function
@@ -99,6 +100,8 @@ struct SortByCaller
     {
         LogEntry e;
         e.from = (std::numeric_limits<long long int>::min)();
+        e.timestamp = (std::numeric_limits<time_t>::min)();
+        e.event = (std::numeric_limits<int>::min)();
         return e;
     }
     // max sentinel = value which is strictly larger that any input element
@@ -106,6 +109,8 @@ struct SortByCaller
     {
         LogEntry e;
         e.from = (std::numeric_limits<long long int>::max)();
+        e.timestamp = (std::numeric_limits<time_t>::max)();
+        e.event = (std::numeric_limits<int>::max)();
         return e;
     }
 };
@@ -116,7 +121,6 @@ typedef stxxl::vector<LogEntry> vector_type;
 #else
 typedef std::vector<LogEntry> vector_type;
 #endif
-
 
 void print_usage(const char * program)
 {
@@ -144,14 +148,14 @@ int main(int argc, char * argv[])
               std::back_inserter(v));
 
     // sort by callers
-  #ifndef USE_STXXL
+#ifndef USE_STXXL
 
     std::sort(v.begin(), v.end(), SortByCaller());
     std::fstream out(argv[3], std::ios::out);
     // output bills
     std::for_each(v.begin(), v.end(), ProduceBill(out));
 
-  #else
+#else
     const unsigned M = atol(argv[2]) * 1024 * 1024;
 
     stxxl::sort(v.begin(), v.end(), SortByCaller(), M);
@@ -159,7 +163,7 @@ int main(int argc, char * argv[])
     // output bills
     stxxl::for_each(v.begin(), v.end(), ProduceBill(out), M / vector_type::block_type::raw_size);
 
-  #endif
+#endif
 
     return 0;
 }

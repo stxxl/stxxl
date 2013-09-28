@@ -12,5 +12,7 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-stxxl_build_tool(vector1)
 stxxl_build_tool(copy_file)
+stxxl_build_tool(phonebills)
+stxxl_build_tool(phonebills_genlog)
+stxxl_build_tool(vector1)

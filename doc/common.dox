@@ -11,7 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-/*! \page common Common Utilities and Helpers found in STXXL
+/** \page common Common Utilities and Helpers
 
 \author Timo Bingmann (2013)
 
@@ -30,7 +30,7 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 
  */
 
-/*! \page common_random Random Number Generators
+/** \page common_random Random Number Generators
 
 See file common/rand.h
 
@@ -38,7 +38,7 @@ TODO-df
 
 */
 
-/*! \page common_timer Timestamp and Timer Classes
+/** \page common_timer Timestamp and Timer Classes
 
 See file common/timer.h
 
@@ -46,13 +46,13 @@ TODO-df
 
 */
 
-/*! \page common_simple_vector A Non-growing, Non-initializing Simpler Vector
+/** \page common_simple_vector A Non-growing, Non-initializing Simpler Vector
 
 For applications where a std::vector is overkill, or one wishes to allocate an uninitialied POD array, the stxxl::simple_vector is a good method.
 
 */
 
-/*! \page common_counting_ptr Reference Counted (Shared) Objects
+/** \page common_counting_ptr Reference Counted (Shared) Objects
 
 Some objects in STXXL are reference counted. This is usually done for large objects, which should not be copied deeply in assignments. Instead, a reference counting pointer is used, which holds a handle while the pointer exists and deletes the object once all pointers go out of scope. Examples are matrices and sorted_runs.
 
@@ -88,7 +88,7 @@ There is also stxxl::const_counting_ptr to return const objects (note that a con
 
 */
 
-/*! \page common_thread_sync Synchronization Primitives for Multi-Threading
+/** \page common_thread_sync Synchronization Primitives for Multi-Threading
 
 To support multi-threading, some parts of STXXL use synchronization primitives to ensure correct results. The primitives are based either on pthreads or on Boost classes.
 
@@ -120,7 +120,7 @@ stxxl::onoff_switch is a two state semaphore thing?
 
 */
 
-/*! \page common_logging Logging Macros STXXL_MSG
+/** \page common_logging Logging Macros STXXL_MSG
 
 All STXXL components should output log or trace messages using the following macros. There are two basic methods for logging using ostream syntax:
 
@@ -151,7 +151,7 @@ A method used by some submodule authors to create their own levels of verbosity 
 
 */
 
-/*! \page common_assert Macros for Checking Assertions
+/** \page common_assert Macros for Checking Assertions
 
 There are quite a bunch of macros for testing assertions. You must be careful to pick the right one depending on when and what you want to assert on.
 
@@ -187,7 +187,7 @@ TODO: STXXL_THROW
 
 */
 
-/*! \page common_types Signed and Unsigned Integer Types
+/** \page common_types Signed and Unsigned Integer Types
 
 STXXL provides two very important types: stxxl::int_type and stxxl::unsigned_type. These should be used for general counting and indexing types, as they are defined to be the size of a register on the machines: on 32-bit machines the two types are 4 bytes size, while on a 64-bit machine the two types are 8 bytes in size!
 
@@ -205,7 +205,7 @@ See the file common/uint_types.h
 
 */
 
-/*! \page common_misc_macros Miscellaneous Macros
+/** \page common_misc_macros Miscellaneous Macros
 
 \section namespaces __STXXL_BEGIN_NAMESPACE
 
@@ -237,7 +237,7 @@ Some compilers can warn the user about deprecated function by tagging them in th
 
 */
 
-/*! \page common_misc_funcs Miscellaneous Functions
+/** \page common_misc_funcs Miscellaneous Functions
 
 \section parse_filesize Parsing Filesizes with K, M, G suffixes
 
