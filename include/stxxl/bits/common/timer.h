@@ -15,6 +15,8 @@
 #ifndef STXXL_TIMER_HEADER
 #define STXXL_TIMER_HEADER
 
+#include <stxxl/bits/config.h>
+
 #ifdef STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>
  #include <cmath>

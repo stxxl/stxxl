@@ -15,9 +15,7 @@
 #ifndef STXXL_IO_REQUEST_QUEUE_IMPL_WORKER_HEADER
 #define STXXL_IO_REQUEST_QUEUE_IMPL_WORKER_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
 #ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
  #include <boost/thread/thread.hpp>

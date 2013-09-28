@@ -15,11 +15,9 @@
 #ifndef STXXL_WINCALL_FILE_HEADER
 #define STXXL_WINCALL_FILE_HEADER
 
-#ifndef STXXL_HAVE_WINCALL_FILE
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
+#ifndef STXXL_HAVE_WINCALL_FILE
 #ifdef BOOST_MSVC
  #define STXXL_HAVE_WINCALL_FILE 1
 #else

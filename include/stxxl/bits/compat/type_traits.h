@@ -13,6 +13,9 @@
 #ifndef STXXL_HEADER__COMPAT_TYPE_TRAITS_H_
 #define STXXL_HEADER__COMPAT_TYPE_TRAITS_H_
 
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/namespace.h>
+
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
 #include <type_traits>
 #elif defined(__GNUG__) && (__GNUC__ >= 4)
@@ -20,8 +23,6 @@
 #elif defined(STXXL_BOOST_CONFIG)
 #include <boost/type_traits/remove_const.hpp>
 #endif
-
-#include <stxxl/bits/namespace.h>
 
 
 __STXXL_BEGIN_NAMESPACE

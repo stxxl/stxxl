@@ -245,10 +245,12 @@ endmacro (add_define TESTNAME)
 if(TRY_COMPILE_HEADERS)
 
   include(CheckCXXSourceCompiles)
-  set(CMAKE_REQUIRED_INCLUDES "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}/include")
+  set(CMAKE_REQUIRED_INCLUDES ${STXXL_INCLUDES})
+  set(CMAKE_REQUIRED_LIBRARIES ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
   file(GLOB_RECURSE header_files FOLLOW_SYMLINKS "include/*")
   list(REMOVE_ITEM header_files "${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in")
+  list(SORT header_files)
 
   foreach(file ${header_files})
     check_cxx_source_compiles(
@@ -256,7 +258,7 @@ if(TRY_COMPILE_HEADERS)
       int main() { return 0; }" IsSelfContained-${file})
 
     if(NOT IsSelfContained-${file})
-      message(SEND_ERROR "Compilation FAILED for ${file}")
+      message(SEND_ERROR "Compilation FAILED for ${file}\n\nCompiler output:\n${OUTPUT}")
     endif()
   endforeach()
 

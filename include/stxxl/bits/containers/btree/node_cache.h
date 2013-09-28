@@ -13,10 +13,7 @@
 #ifndef STXXL_CONTAINERS_BTREE__NODE_CACHE_H
 #define STXXL_CONTAINERS_BTREE__NODE_CACHE_H
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/compat_hash_map.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/mng/mng.h>

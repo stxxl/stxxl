@@ -19,6 +19,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/exceptions.h>
+#include <stxxl/bits/config.h>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -16,10 +16,7 @@
 #ifndef STXXL_SORT_STREAM_HEADER
 #define STXXL_SORT_STREAM_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/stream/stream.h>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/algo/sort_base.h>

@@ -17,6 +17,8 @@
 #ifndef STXXL_BOOSTFD_FILE_H_
 #define STXXL_BOOSTFD_FILE_H_
 
+#include <stxxl/bits/config.h>
+
 #ifndef STXXL_HAVE_BOOSTFD_FILE
 #ifdef STXXL_BOOST_CONFIG // if boost is available
  #define STXXL_HAVE_BOOSTFD_FILE 1

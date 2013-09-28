@@ -31,4 +31,8 @@
 // cmake:   -DUSE_BOOST=ON
 // effect:  enables use of boost libraries in different parts of STXXL.
 
+#ifdef STXXL_BOOST_CONFIG
+  #include <boost/config.hpp>
+#endif
+
 #endif // !STXXL_CONFIG_HEADER

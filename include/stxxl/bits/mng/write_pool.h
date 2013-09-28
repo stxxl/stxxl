@@ -15,11 +15,7 @@
 #define STXXL_WRITE_POOL_HEADER
 
 #include <list>
-
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>

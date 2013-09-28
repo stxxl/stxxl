@@ -14,6 +14,7 @@
 #ifndef STXXL_MUTEX_HEADER
 #define STXXL_MUTEX_HEADER
 
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
 #ifdef STXXL_BOOST_THREADS

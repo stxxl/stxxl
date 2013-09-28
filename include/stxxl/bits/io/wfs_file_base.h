@@ -17,9 +17,7 @@
 #ifndef STXXL_WFSFILEBASE_HEADER
 #define STXXL_WFSFILEBASE_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
 #ifdef BOOST_MSVC
 

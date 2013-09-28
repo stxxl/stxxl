@@ -15,12 +15,12 @@
 #ifndef STXXL_NONCOPYABLE_HEADER
 #define STXXL_NONCOPYABLE_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
-#include <boost/noncopyable.hpp>
-#endif
-
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
+#ifdef STXXL_BOOST_CONFIG
+  #include <boost/noncopyable.hpp>
+#endif
 
 __STXXL_BEGIN_NAMESPACE
 

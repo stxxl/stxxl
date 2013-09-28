@@ -15,9 +15,7 @@
 #ifndef STXXL_IO_FILE_HEADER
 #define STXXL_IO_FILE_HEADER
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
 #if defined (__linux__)
  #define STXXL_CHECK_BLOCK_ALIGNING

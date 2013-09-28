@@ -21,10 +21,7 @@
 #include <cmath>
 #include <cstdlib>
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/compat/type_traits.h>

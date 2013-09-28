@@ -16,6 +16,8 @@
 #ifndef STXXL_HEADER__COMPAT_HASH_MAP_H_
 #define STXXL_HEADER__COMPAT_HASH_MAP_H_
 
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/namespace.h>
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
  #include <unordered_map>
@@ -27,9 +29,6 @@
 #else
  #include <ext/hash_map>
 #endif
-
-#include <stxxl/bits/namespace.h>
-
 
 __STXXL_BEGIN_NAMESPACE
 

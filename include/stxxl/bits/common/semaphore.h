@@ -13,6 +13,8 @@
 #ifndef STXXL_SEMAPHORE_HEADER
 #define STXXL_SEMAPHORE_HEADER
 
+#include <stxxl/bits/config.h>
+
 #ifdef STXXL_BOOST_THREADS
  #include <boost/thread/mutex.hpp>
  #include <boost/thread/condition.hpp>

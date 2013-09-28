@@ -15,11 +15,7 @@
 #define STXXL_PREFETCH_POOL_HEADER
 
 #include <list>
-
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
-
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/compat_hash_map.h>
 

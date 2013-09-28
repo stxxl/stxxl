@@ -15,6 +15,8 @@
 #ifndef STXXL_MNG_HEADER
 #define STXXL_MNG_HEADER
 
+#include <stxxl/bits/config.h>
+
 #include <memory>
 #include <iostream>
 #include <iomanip>
@@ -24,10 +26,6 @@
 #include <algorithm>
 #include <string>
 #include <cstdlib>
-
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
 
 #ifdef BOOST_MSVC
 #include <memory.h>

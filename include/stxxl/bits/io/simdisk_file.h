@@ -15,11 +15,9 @@
 #ifndef STXXL_SIMDISK_FILE_HEADER
 #define STXXL_SIMDISK_FILE_HEADER
 
-#ifndef STXXL_HAVE_SIMDISK_FILE
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
+#ifndef STXXL_HAVE_SIMDISK_FILE
 #ifndef BOOST_MSVC
 // mmap call does not exist in Windows
  #define STXXL_HAVE_SIMDISK_FILE 1

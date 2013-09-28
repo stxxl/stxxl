@@ -13,9 +13,7 @@
 #ifndef STXXL_HEADER__DEPRECATED_H
 #define STXXL_HEADER__DEPRECATED_H
 
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
 
 
 #ifdef BOOST_MSVC
