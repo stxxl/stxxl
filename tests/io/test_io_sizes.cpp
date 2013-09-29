@@ -79,6 +79,7 @@ int main(int argc, char ** argv)
     catch (stxxl::io_error e)
     {
         std::cerr << e.what() << std::endl;
+        throw;
     }
 
     stxxl::aligned_dealloc<4096>(buffer);

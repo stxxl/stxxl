@@ -18,8 +18,6 @@ stxxl_build_test(matrix_benchmark)
 stxxl_build_test(monotonic_pq)
 stxxl_build_test(pq_benchmark)
 stxxl_build_test(stack_benchmark)
-stxxl_build_test(write_vector)
-stxxl_build_test(write_vector2)
 
 add_define(bench_pqueue "STXXL_VERBOSE_LEVEL=0")
 add_define(benchmark_naive_matrix "STXXL_VERBOSE_LEVEL=0")

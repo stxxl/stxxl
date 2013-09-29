@@ -30,6 +30,7 @@ stxxl_build_test(test_stack)
 stxxl_build_test(test_vector)
 stxxl_build_test(test_vector_export)
 stxxl_build_test(test_vector_sizes)
+stxxl_build_test(test_vector_writer)
 
 add_define(test_many_stacks "STXXL_VERBOSE_LEVEL=1")
 add_define(test_ext_merger "STXXL_VERBOSE_LEVEL=0")
@@ -55,6 +56,7 @@ stxxl_test(test_vector_sizes "${STXXL_TMPDIR}/out" syscall)
 if(NOT MSVC)
   stxxl_test(test_vector_sizes "${STXXL_TMPDIR}/out" mmap)
 endif(NOT MSVC)
+stxxl_test(test_vector_writer)
 if(USE_BOOST)
   #-tb: boostfd does not work right with vector, because boostfd does not
   #correctly support set_size() (truncate and extending of files). FIXME

@@ -155,10 +155,12 @@ int main()
     catch (const std::exception & ex)
     {
         STXXL_MSG("Caught exception: " << ex.what());
+        throw;
     }
     catch (...)
     {
         STXXL_MSG("Caught unknown exception.");
+        throw;
     }
 
     return 0;

@@ -71,10 +71,11 @@ int main()
         test_typed_block_vector();
     } catch (std::exception e) {
         STXXL_MSG("OOPS: " << e.what());
-        return 1;
+        throw;
     } catch (char const * c) {
         STXXL_MSG("OOPS: " << c);
-        return 1;
+        throw;
     }
+    return 0;
 }
 // vim: et:ts=4:sw=4
