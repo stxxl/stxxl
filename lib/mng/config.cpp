@@ -18,16 +18,19 @@
 #include <stxxl/version.h>
 #include <stxxl/bits/common/log.h>
 #include <stxxl/bits/common/error_handling.h>
+#include <stxxl/bits/config.h>
 
 #ifdef BOOST_MSVC
- #include <windows.h>
+  #include <windows.h>
+#else
+  #include <unistd.h>
 #endif
 
 __STXXL_BEGIN_NAMESPACE
 
 static inline bool exist_file(const std::string& path)
 {
-    //STXXL_MSG("Checking " << path << " for disk configuration.");
+    STXXL_VERBOSE0("Checking " << path << " for disk configuration.");
     std::ifstream in(path.c_str());
     return in.good();
 }
@@ -43,9 +46,15 @@ config::config()
         return;
     }
 
-    // read environment
+#ifndef BOOST_MSVC
+    // read environment, unix style
     const char* hostname = getenv("HOSTNAME");
     const char* home = getenv("HOME");
+#else
+    // read environment, windows style
+    const char* hostname = getenv("COMPUTERNAME");
+    const char* home = getenv("APPDATA");
+#endif
 
     // check current directory
     {
@@ -80,6 +89,18 @@ config::config()
 
     // load default configuration
     init("");
+}
+
+config::~config()
+{
+    for (unsigned i = 0; i < disks_props.size(); ++i) {
+        if (disks_props[i].delete_on_exit || disks_props[i].autogrow) {
+            if (!disks_props[i].autogrow) {
+                STXXL_ERRMSG("Removing disk file created from default configuration: " << disks_props[i].path);
+            }
+            unlink(disks_props[i].path.c_str());
+        }
+    }
 }
 
 void config::init(const std::string& config_path)
@@ -121,9 +142,9 @@ void config::init(const std::string& config_path)
             if (line.size() == 0 || line[0] == '#') continue;
 
             std::vector<std::string> tmp = split(line, "=", 2);
-            bool is_disk, ok;
+            bool ok;
 
-            if ((is_disk = (tmp[0] == "disk")) || tmp[0] == "flash")
+            if (tmp[0] == "disk" || tmp[0] == "flash")
             {
                 tmp = split(tmp[1], ",", 3);
                 DiskEntry entry = {
@@ -138,7 +159,7 @@ void config::init(const std::string& config_path)
                 }
                 if (entry.size == 0)
                     entry.autogrow = true;
-                if (is_disk)
+                if (tmp[0] == "disk")
                     disks_props.push_back(entry);
                 else
                     flash_props.push_back(entry);

@@ -30,13 +30,13 @@ class fileperblock_file : public disk_queued_file
 private:
     std::string filename_prefix;
     int mode;
-    unsigned_type current_size;
+    offset_type current_size;
     bool lock_file_created;
     base_file_type lock_file;
 
 protected:
     //! Constructs a file name for a given block.
-    std::string filename_for_block(unsigned_type offset);
+    std::string filename_for_block(offset_type offset);
 
 public:
     //! Constructs file object.

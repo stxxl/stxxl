@@ -194,7 +194,7 @@ struct RC_flash : public RC
 //! \remarks model of \b allocation_strategy concept
 struct single_disk
 {
-    const int disk;
+    int disk;
     single_disk(int d, int = 0) : disk(d)
     { }
 

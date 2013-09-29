@@ -17,7 +17,7 @@
 
 #include <algorithm>
 #include <stxxl/bits/noncopyable.h>
-#include <stxxl/bits/common/types.h>
+#include <stxxl/bits/common/utils.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -34,8 +34,8 @@ template <typename ValueType>
 class simple_vector : private noncopyable
 {
 public:
-    typedef unsigned_type size_type;
     typedef ValueType value_type;
+    typedef size_t size_type;
 
 protected:
     //! size of allocated memory

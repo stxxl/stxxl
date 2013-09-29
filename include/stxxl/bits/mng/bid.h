@@ -105,7 +105,7 @@ struct BID<0>
 
     bool valid() const
     {
-        return storage;
+        return (storage != NULL);
     }
 };
 

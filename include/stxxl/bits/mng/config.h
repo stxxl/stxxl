@@ -17,7 +17,6 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
-#include <unistd.h>
 
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/verbose.h>
@@ -50,17 +49,8 @@ class config : public singleton<config>
     //! searchs different locations for a disk configuration file
     config();
 
-    ~config()
-    {
-        for (unsigned i = 0; i < disks_props.size(); ++i) {
-            if (disks_props[i].delete_on_exit || disks_props[i].autogrow) {
-                if (!disks_props[i].autogrow) {
-                    STXXL_ERRMSG("Removing disk file created from default configuration: " << disks_props[i].path);
-                }
-                unlink(disks_props[i].path.c_str());
-            }
-        }
-    }
+    //! deletes autogrow files
+    ~config();
 
     //! load disk configuration file
     void init(const std::string& config_path = "./.stxxl");

@@ -18,13 +18,16 @@ template class stxxl::uint_pair<uint8_t>;
 template class stxxl::uint_pair<uint16_t>;
 
 template <typename uint>
-void dotest()
+void dotest(unsigned int nbytes)
 {
     // simple initialize
     uint a = 42;
 
+    // check sizeof (again)
+    STXXL_CHECK( sizeof(a) == nbytes );
+
     // count up 1024 and down again
-    uint b = 0xFFFFFF00llu;
+    uint b = 0xFFFFFF00;
     uint b_save = b; 
 
     uint64_t b64 = b;
@@ -63,14 +66,14 @@ void dotest()
     STXXL_CHECK( a == uint(84) );
     STXXL_CHECK( a.ull() == 84 );
 
-    a += uint(0xFFFFFF00llu);
-    STXXL_CHECK( a.ull() == 84 + 0xFFFFFF00llu );
+    a += uint(0xFFFFFF00);
+    STXXL_CHECK( a.ull() == 84 + (unsigned long long)(0xFFFFFF00) );
 }
 
 int main()
 {
-    dotest<stxxl::uint40>();
-    dotest<stxxl::uint48>();
+    dotest<stxxl::uint40>(5);
+    dotest<stxxl::uint48>(6);
 
     return 0;
 }

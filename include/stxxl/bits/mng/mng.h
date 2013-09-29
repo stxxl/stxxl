@@ -42,7 +42,7 @@
 #include <stxxl/bits/mng/diskallocator.h>
 #include <stxxl/bits/mng/block_alloc.h>
 #include <stxxl/bits/mng/config.h>
-
+#include <stxxl/bits/common/utils.h>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -195,7 +195,7 @@ void block_manager::new_blocks_int(
 #if STXXL_MNG_COUNT_ALLOCATION
     m_total_allocation += nblocks * BIDType::size;
     m_current_allocation += nblocks * BIDType::size;
-    m_maximum_allocation = std::max(m_maximum_allocation, m_current_allocation);
+    m_maximum_allocation = STXXL_MAX(m_maximum_allocation, m_current_allocation);
 #endif // STXXL_MNG_COUNT_ALLOCATION
 
     memset(bl, 0, ndisks * sizeof(int_type));

@@ -97,6 +97,11 @@ struct random_uniform_fast
     }
 };
 
+#ifdef BOOST_MSVC
+#pragma warning(push)
+#pragma warning(disable:4512) // assignment operator could not be generated
+#endif
+
 //! Slow and precise uniform [0.0, 1.0) pseudo-random generator
 //! period: at least 2^48, random bits: at least 31
 //!
@@ -173,6 +178,10 @@ struct random_number64
         return static_cast<value_type>(uniform() * (18446744073709551616.));
     }
 };
+
+#ifdef BOOST_MSVC
+#pragma warning(pop) // assignment operator could not be generated
+#endif
 
 __STXXL_END_NAMESPACE
 

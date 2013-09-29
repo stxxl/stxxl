@@ -15,7 +15,6 @@
 stxxl_build_test(test_cancel)
 stxxl_build_test(test_io)
 stxxl_build_test(test_io_sizes)
-stxxl_build_test(test_mmap)
 
 stxxl_test(test_io "${STXXL_TMPDIR}")
 
@@ -43,5 +42,7 @@ if(USE_BOOST)
   stxxl_test(test_io_sizes boostfd "${STXXL_TMPDIR}/testdisk1" 2147483648)
 endif(USE_BOOST)
 
-stxxl_test(test_mmap)
-
+if(NOT MSVC)
+  stxxl_build_test(test_mmap)
+  stxxl_test(test_mmap)
+endif(NOT MSVC)

@@ -69,7 +69,7 @@ void test_const_iterator(const my_vec_type & x)
 }
 
 // forced instantiation
-template class stxxl::VECTOR_GENERATOR<element, 2, 2, (2 * 1024 * 1024), stxxl::striping>;
+template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (2 * 1024 * 1024), stxxl::striping>;
 
 int main()
 {

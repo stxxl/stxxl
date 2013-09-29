@@ -110,8 +110,6 @@ file * create_file(const std::string & io_impl,
 
     STXXL_THROW(std::runtime_error, "FileCreator::create", "Unsupported disk I/O implementation " <<
                 io_impl << " .");
-
-    return NULL;
 }
 
 __STXXL_END_NAMESPACE

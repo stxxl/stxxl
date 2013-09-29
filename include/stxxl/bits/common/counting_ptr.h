@@ -132,11 +132,11 @@ public:
 
     //! test for a non-NULL pointer
     bool valid() const
-    { return m_ptr; }
+    { return (m_ptr != NULL); }
 
     //! test for a NULL pointer
     bool empty() const
-    { return !m_ptr; }
+    { return (m_ptr == NULL); }
 
     //! if the object is referred by this counting_ptr only
     bool unique() const
@@ -337,9 +337,7 @@ public:
     counted_object(const counted_object &)
         : m_reference_count(0) {}
 
-    const counted_object & operator = (const counted_object &) const
-    { return *this; } // changing the contents leaves pointers unchanged
-
+    //! assignment operator, leaves pointers unchanged
     counted_object & operator = (const counted_object &)
     { return *this; } // changing the contents leaves pointers unchanged
 
@@ -397,9 +395,7 @@ public:
     locking_counted_object(const locking_counted_object &)
         : m_reference_count(0) {}
 
-    const locking_counted_object & operator = (const locking_counted_object &) const
-    { return *this; } // changing the contents leaves pointers unchanged
-
+    //! assignment operator, leaves pointers unchanged
     locking_counted_object & operator = (const locking_counted_object &)
     { return *this; } // changing the contents leaves pointers unchanged
 

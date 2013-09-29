@@ -12,6 +12,7 @@
  **************************************************************************/
 
 #include <cstring>
+#include <limits>
 
 #include <stxxl/bits/io/mem_file.h>
 #include <stxxl/bits/io/iostats.h>
@@ -66,8 +67,9 @@ file::offset_type mem_file::size()
 void mem_file::set_size(offset_type newsize)
 {
     scoped_mutex_lock lock(m_mutex);
+    assert(newsize <= std::numeric_limits<offset_type>::max());
 
-    ptr = (char*)realloc(ptr, newsize);
+    ptr = (char*)realloc(ptr, (size_t)newsize);
     sz = newsize;
 }
 
@@ -83,8 +85,9 @@ void mem_file::discard(offset_type offset, offset_type size)
         offset += BLOCK_ALIGN;
         size -= BLOCK_ALIGN;
     }
+    assert(size <= std::numeric_limits<offset_type>::max());
     if (size > 0)
-        memcpy(ptr + offset, uninitialized, size);
+        memcpy(ptr + offset, uninitialized, (size_t)size);
     free(uninitialized);
 #else
     STXXL_UNUSED(offset);

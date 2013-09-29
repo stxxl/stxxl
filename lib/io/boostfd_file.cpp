@@ -108,7 +108,7 @@ boostfd_file::boostfd_file(
     int mode,
     int queue_id, int allocator_id) : disk_queued_file(queue_id, allocator_id), mode_(mode)
 {
-    BOOST_IOS::openmode boostfd_mode;
+    BOOST_IOS::openmode boostfd_mode = 0;
 
     if (mode & RDONLY)
     {

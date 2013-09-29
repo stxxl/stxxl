@@ -13,9 +13,10 @@
 
 #include <cassert>
 #include <ctime>
-#ifdef STXXL_BOOST_CONFIG
- #include <boost/config.hpp>
-#endif
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/common/seed.h>
+#include <stxxl/bits/common/mutex.h>
+
 #ifdef BOOST_MSVC
  #include <io.h>
  #include <windows.h>
@@ -23,9 +24,6 @@
  #include <unistd.h>
  #include <sys/time.h>
 #endif
-
-#include <stxxl/bits/common/seed.h>
-#include <stxxl/bits/common/mutex.h>
 
 
 __STXXL_BEGIN_NAMESPACE

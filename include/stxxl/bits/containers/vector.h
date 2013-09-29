@@ -48,17 +48,18 @@ class double_blocked_index
 {
     static const size_type modulo12 = modulo1 * modulo2;
 
-    size_type pos, block1, block2, offset;
+    size_type pos;
+    unsigned_type block1, block2, offset;
 
     //! \invariant block2 * modulo12 + block1 * modulo1 + offset == pos && 0 <= block1 &lt; modulo2 && 0 <= offset &lt; modulo1
 
     void set(size_type pos)
     {
         this->pos = pos;
-        block2 = pos / modulo12;
+        block2 = (int_type)(pos / modulo12);
         pos -= block2 * modulo12;
-        block1 = pos / modulo1;
-        offset = (pos - block1 * modulo1);
+        block1 = (int_type)(pos / modulo1);
+        offset = (int_type)(pos - block1 * modulo1);
 
         assert(block2 * modulo12 + block1 * modulo1 + offset == this->pos);
         assert(/* 0 <= block1 && */ block1 < modulo2);
@@ -76,7 +77,7 @@ public:
         set(pos);
     }
 
-    double_blocked_index(size_type block2, size_type block1, size_type offset)
+    double_blocked_index(unsigned_type block2, unsigned_type block1, unsigned_type offset)
     {
         assert(/* 0 <= block1 && */ block1 < modulo2);
         assert(/* 0 <= offset && */ offset < modulo1);
@@ -223,17 +224,17 @@ public:
         return pos;
     }
 
-    const size_type & get_block2() const
+    const unsigned_type & get_block2() const
     {
         return block2;
     }
 
-    const size_type & get_block1() const
+    const unsigned_type & get_block1() const
     {
         return block1;
     }
 
-    const size_type & get_offset() const
+    const unsigned_type & get_offset() const
     {
         return offset;
     }
@@ -835,7 +836,7 @@ public:
     //! \param npages Number of cached pages.
     vector(size_type n = 0, unsigned_type npages = pager_type().size()) :
         _size(n),
-        _bids(div_ceil(n, block_type::size)),
+        _bids((size_t)div_ceil(n, block_type::size)),
         pager (npages),
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
@@ -848,15 +849,14 @@ public:
         cfg = config::get_instance();
 
         allocate_page_cache();
-        int_type all_pages = div_ceil(_bids.size(), page_size);
-        int_type i = 0;
-        for ( ; i < all_pages; ++i)
+        unsigned_type all_pages = div_ceil(_bids.size(), page_size);
+        for (unsigned_type i = 0; i < all_pages; ++i)
         {
             _page_status[i] = uninitialized;
             _page_to_slot[i] = on_disk;
         }
 
-        for (i = 0; i < numpages(); ++i)
+        for (unsigned_type i = 0; i < numpages(); ++i)
             _free_slots.push(i);
 
         bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
@@ -918,7 +918,7 @@ public:
             return;
 
         unsigned_type old_bids_size = _bids.size();
-        unsigned_type new_bids_size = div_ceil(n, block_type::size);
+        unsigned_type new_bids_size = (unsigned_type)div_ceil(n, block_type::size);
         unsigned_type new_pages = div_ceil(new_bids_size, page_size);
         _page_status.resize(new_pages, uninitialized);
         _page_to_slot.resize(new_pages, on_disk);
@@ -962,7 +962,7 @@ private:
         reserve(n);
         if (n < _size) {
             // mark excess pages as uninitialized and evict them from cache
-            unsigned_type first_page_to_evict = div_ceil(n, block_type::size * page_size);
+            unsigned_type first_page_to_evict = (unsigned_type)div_ceil(n, block_type::size * page_size);
             for (unsigned_type i = first_page_to_evict; i < _page_status.size(); ++i) {
                 if (_page_to_slot[i] != on_disk) {
                     _free_slots.push(_page_to_slot[i]);
@@ -1017,8 +1017,7 @@ public:
         while (!_free_slots.empty())
             _free_slots.pop();
 
-
-        for (int_type i = 0; i < numpages(); ++i)
+        for (unsigned_type i = 0; i < numpages(); ++i)
             _free_slots.push(i);
     }
 
@@ -1063,9 +1062,9 @@ public:
     //! \warning Only one \c vector can be assigned to a particular (physical) file.
     //! The block size of the vector must be a multiple of the element size
     //! \c sizeof(ValueType) and the page size (4096).
-    vector(file * from, size_type size = size_type(-1), size_type npages = pager_type ().size ()) :
+    vector(file * from, size_type size = size_type(-1), unsigned_type npages = pager_type ().size ()) :
         _size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
-        _bids(div_ceil(_size, size_type(block_type::size))),
+        _bids((size_t)div_ceil(_size, size_type(block_type::size))),
         pager(npages),
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
@@ -1087,15 +1086,14 @@ public:
         cfg = config::get_instance();
 
         allocate_page_cache();
-        int_type all_pages = div_ceil(_bids.size(), page_size);
-        int_type i = 0;
-        for ( ; i < all_pages; ++i)
+        unsigned_type all_pages = div_ceil(_bids.size(), page_size);
+        for (unsigned_type i = 0; i < all_pages; ++i)
         {
             _page_status[i] = valid_on_disk;
             _page_to_slot[i] = on_disk;
         }
 
-        for (i = 0; i < numpages(); ++i)
+        for (unsigned_type i = 0; i < numpages(); ++i)
             _free_slots.push(i);
 
 
@@ -1113,7 +1111,7 @@ public:
     //! copy-constructor
     vector(const vector & obj) :
         _size(obj.size()),
-        _bids(div_ceil(obj.size(), block_type::size)),
+        _bids((size_t)div_ceil(obj.size(), block_type::size)),
         pager(obj.numpages ()),
         _page_status(div_ceil(_bids.size(), page_size)),
         _page_to_slot(div_ceil(_bids.size(), page_size)),
@@ -1127,15 +1125,14 @@ public:
         cfg = config::get_instance();
 
         allocate_page_cache();
-        int_type all_pages = div_ceil(_bids.size(), page_size);
-        int_type i = 0;
-        for ( ; i < all_pages; ++i)
+        unsigned_type all_pages = div_ceil(_bids.size(), page_size);
+        for (unsigned_type i = 0; i < all_pages; ++i)
         {
             _page_status[i] = uninitialized;
             _page_to_slot[i] = on_disk;
         }
 
-        for (i = 0; i < numpages(); ++i)
+        for (unsigned_type i = 0; i < numpages(); ++i)
             _free_slots.push(i);
 
         bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
@@ -1240,8 +1237,8 @@ public:
     void flush() const
     {
         simple_vector<bool> non_free_slots(numpages());
-        int_type i = 0;
-        for ( ; i < numpages(); i++)
+
+        for (unsigned_type i = 0; i < numpages(); i++)
             non_free_slots[i] = true;
 
         while (!_free_slots.empty())
@@ -1250,7 +1247,7 @@ public:
             _free_slots.pop();
         }
 
-        for (i = 0; i < numpages(); i++)
+        for (unsigned_type i = 0; i < numpages(); i++)
         {
             _free_slots.push(i);
             int_type page_no = _slot_to_page[i];
@@ -1342,7 +1339,7 @@ public:
     }
 
     //! Number of pages used by the pager.
-    inline int_type numpages() const
+    inline unsigned_type numpages() const
     {
       return pager.size ();
     }
@@ -1413,7 +1410,7 @@ private:
     reference element(size_type offset)
     {
         #ifdef STXXL_RANGE_CHECK
-        assert(offset < size());
+        assert(offset < (size_type)size());
         #endif
         return element(blocked_index_type(offset));
     }
@@ -1423,8 +1420,8 @@ private:
         #ifdef STXXL_RANGE_CHECK
         assert(offset.get_pos() < size());
         #endif
-        int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
+        unsigned_type page_no = offset.get_block2();
+        assert(page_no < _page_to_slot.size());   // fails if offset is too large, out of bound access
         int_type cache_slot = _page_to_slot[page_no];
         if (cache_slot < 0)                                 // == on_disk
         {
@@ -1513,8 +1510,8 @@ private:
 
     const_reference const_element(const blocked_index_type & offset) const
     {
-        int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
+        unsigned_type page_no = offset.get_block2();
+        assert(page_no < _page_to_slot.size());   // fails if offset is too large, out of bound access
         int_type cache_slot = _page_to_slot[page_no];
         if (cache_slot < 0)                                 // == on_disk
         {
@@ -1554,8 +1551,8 @@ private:
 
     bool is_page_cached(const blocked_index_type & offset) const
     {
-        int_type page_no = offset.get_block2();
-        assert(page_no < int_type(_page_to_slot.size()));   // fails if offset is too large, out of bound access
+        unsigned_type page_no = offset.get_block2();
+        assert(page_no < _page_to_slot.size());   // fails if offset is too large, out of bound access
         int_type cache_slot = _page_to_slot[page_no];
         return (cache_slot >= 0);                           // on_disk == -1
     }

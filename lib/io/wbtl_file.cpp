@@ -323,8 +323,6 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
     }
 
     STXXL_THROW2(io_error, "OutOfSpace, probably fragmented");
-
-    return offset_type(-1);
 }
 
 void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size,

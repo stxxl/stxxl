@@ -15,6 +15,7 @@
 #ifndef STXXL_VERBOSE_HEADER
 #define STXXL_VERBOSE_HEADER
 
+#include <stdlib.h>
 #include <iostream>
 #include <sstream>
 #include <string>

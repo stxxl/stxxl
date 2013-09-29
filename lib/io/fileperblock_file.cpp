@@ -42,7 +42,7 @@ fileperblock_file<base_file_type>::~fileperblock_file()
 }
 
 template <class base_file_type>
-std::string fileperblock_file<base_file_type>::filename_for_block(unsigned_type offset)
+std::string fileperblock_file<base_file_type>::filename_for_block(offset_type offset)
 {
     std::ostringstream name;
     //enough for 1 billion blocks
@@ -106,6 +106,8 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
         STXXL_THROW2(io_error,
                      "Error doing truncate()");
     }
+#else
+	STXXL_UNUSED(length);
 #endif
 }
 

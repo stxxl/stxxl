@@ -69,6 +69,14 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4290")
   # warning C4250: '...' : inherits '...' via dominance
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250")
+  # warning C4512: assignment operator could not be generated (contains const members)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4512")
+  # disable lots of warnings about "unsecure" C runtime function
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  # disable lots of warnings about deprecated POSIX function names
+  add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+  # disable lots of warnings about "unsecure" STL functions
+  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall")
 endif()

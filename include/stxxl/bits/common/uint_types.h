@@ -16,15 +16,25 @@
 #ifndef STXXL_COMMON_UINT_TYPES_HEADER
 #define STXXL_COMMON_UINT_TYPES_HEADER
 
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/types.h>
 
 #include <limits>
 #include <ostream>
-
-#include <inttypes.h>
 #include <assert.h>
+
+#ifdef BOOST_MSVC
+  #include <boost/cstdint.hpp>
+  using boost::uint8_t;
+  using boost::uint16_t;
+  using boost::int32_t;
+  using boost::uint32_t;
+  using boost::uint64_t;
+#else
+  #include <inttypes.h>
+#endif
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -47,6 +57,9 @@ __STXXL_BEGIN_NAMESPACE
  * the lower/higher part. Not all arithmetic operations are supported, patches
  * welcome if you really need the operations.
  */
+#ifdef BOOST_MSVC
+#pragma pack(push, 1)
+#endif
 template <typename HighType>
 class uint_pair
 {
@@ -236,8 +249,13 @@ public:
         return uint_pair(std::numeric_limits<low_type>::max(),
                          std::numeric_limits<high_type>::max());
     }
-
-} __attribute__((packed));
+}
+#ifdef BOOST_MSVC
+    ;
+#pragma pack(pop)
+#else
+__attribute__((packed));
+#endif
 
 //! Construct a 40-bit unsigned integer stored in five bytes.
 typedef uint_pair<uint8_t> uint40;

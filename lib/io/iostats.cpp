@@ -330,7 +330,7 @@ std::string format_with_SI_IEC_unit_multiplier(uint64 number, const char * unit,
     std::ostringstream out;
     out << number << ' ';
     int scale = 0;
-    double number_d = number;
+    double number_d = (double)number;
     double multiplier_d = multiplier;
     while (number_d >= multiplier_d)
     {
