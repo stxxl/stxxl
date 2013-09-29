@@ -36,7 +36,7 @@ void syscall_file::serve(const request * req) throw (io_error)
 
     while (bytes > 0)
     {
-        size_type rc = ::lseek(file_des, offset, SEEK_SET);
+        off_t rc = ::lseek(file_des, offset, SEEK_SET);
         if (rc < 0)
         {
             STXXL_THROW2(io_error,

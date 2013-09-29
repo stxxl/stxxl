@@ -25,6 +25,7 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_logging "logging macros"
 - \subpage common_assert "macros for checking assertions"
 - \subpage common_types "signed and unsigned integer types"
+- \subpage common_log2 "calculating log_2(x)"
 - \subpage common_misc_macros "miscellaneous macros"
 - \subpage common_misc_funcs "miscellaneous functions"
 
@@ -184,6 +185,39 @@ For the usual assertions, that should be removed in production code for performa
 However, there is also \c STXXL_ASSERT(), which can be used as a replacement for \c assert(), when compiler warnings about unused variables or typedefs occur. The issue is that assert() completely removes the code, whereas STXXL_ASSERT() keeps the code encloses it inside \c if(0).
 
 TODO: STXXL_THROW
+
+*/
+
+/** \page common_log2 Calculating log2(x) for Integers and at Compile-Time
+
+STXXL provides three methods to calculate log2(x), which is often needed for binary trees, etc.
+
+The first is during \b compile-time using template meta-programming magic:
+
+\code
+#include <stxxl/bits/common/tmeta.h>
+
+std::cout << stxxl::LOG2<10000>::floor << std::endl;
+std::cout << stxxl::LOG2<10000>::ceil << std::endl;
+\endcode
+
+The second is for calculating log2(x) for \b integer arguments using simple bit shift arithmetic:
+
+\code
+#include <stxxl/bits/common/utils.h>
+
+std::cout << stxxl::ilog2_floor(10000) << std::endl;
+std::cout << stxxl::ilog2_ceil(10000) << std::endl;
+\endcode
+
+The third and probably least useful is to use conversion to \b double and \c math.h's facilities:
+
+\code
+#include <stxxl/bits/common/utils.h>
+
+std::cout << stxxl::log2_floor(10000) << std::endl;
+std::cout << stxxl::log2_ceil(10000) << std::endl;
+\endcode
 
 */
 

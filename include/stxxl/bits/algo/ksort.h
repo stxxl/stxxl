@@ -209,9 +209,9 @@ namespace ksort_local
         run = *runs;
         int_type run_size = (*runs)->size();
         key_type offset = 0;
-        const int log_k1 = log2_ceil((m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
-                                     (m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
-        const int log_k2 = log2_floor(m2 * Blocks1->size) - log_k1 - 1;
+        const int log_k1 = ilog2_ceil((m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) ?
+                                      (m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
+        const int log_k2 = ilog2_floor(m2 * Blocks1->size) - log_k1 - 1;
         STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
         const int_type k1 = 1 << log_k1;
         const int_type k2 = 1 << log_k2;

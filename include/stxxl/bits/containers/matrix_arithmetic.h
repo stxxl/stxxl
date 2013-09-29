@@ -1396,7 +1396,7 @@ struct matrix_operations
                                                    const swappable_block_matrix_type & B,
                                                    swappable_block_matrix_type & C)
     {
-        int_type num_levels = log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        int_type num_levels = ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
         if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_BASE_CASE)
         {
             if (num_levels > STXXL_MATRIX_MULTI_LEVEL_STRASSEN_WINOGRAD_MAX_NUM_LEVELS)
@@ -1485,7 +1485,7 @@ struct matrix_operations
                                                    const swappable_block_matrix_type & B,
                                                    swappable_block_matrix_type & C)
     {
-        int_type p = log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
+        int_type p = ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height())));
 
         swappable_block_matrix_type padded_a(A, round_up_to_power_of_two(A.get_height(), p),
                                              round_up_to_power_of_two(A.get_width(), p), 0, 0),
@@ -1502,7 +1502,7 @@ struct matrix_operations
                                              const swappable_block_matrix_type & B,
                                              swappable_block_matrix_type & C)
     {
-        switch (log2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
+        switch (ilog2_ceil(std::min(A.get_width(), std::min(C.get_width(), C.get_height()))))
         {
         default:
             /*

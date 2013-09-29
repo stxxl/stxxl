@@ -244,7 +244,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type ndisks = cfg->disks_number();
     const unsigned_type min_num_read_write_buffers = (write_buffers_multiple + read_buffers_multiple) * ndisks;
     const unsigned_type nmaxbuckets = m - min_num_read_write_buffers;
-    const unsigned_type lognbuckets = log2_floor(nmaxbuckets);
+    const unsigned_type lognbuckets = ilog2_floor(nmaxbuckets);
     const unsigned_type nbuckets = 1 << lognbuckets;
     const unsigned_type est_bucket_size = div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
@@ -350,7 +350,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
 
         key_type offset = 0;
-        const unsigned log_k1 = STXXL_MAX<unsigned>(log2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
+        const unsigned log_k1 = STXXL_MAX<unsigned>(ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
         unsigned_type k1 = 1 << log_k1;
         int_type * bucket1 = new int_type[k1];
 
@@ -363,7 +363,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         for (unsigned_type k = 0; k < nbuckets; k++)
         {
             nbucket_blocks = div_ceil(bucket_sizes[k], block_type::size);
-            const unsigned log_k1_k = STXXL_MAX<unsigned>(log2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
+            const unsigned log_k1_k = STXXL_MAX<unsigned>(ilog2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
             assert(log_k1_k <= log_k1);
             k1 = 1 << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);
@@ -396,7 +396,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                 type_key_ * cEnd = refs2 + bucket1[i];
                 type_key_ * dEnd = refs1 + bucket1[i];
 
-                const unsigned log_k2 = log2_floor(bucket1[i]) - 1;        // adaptive bucket size
+                const unsigned log_k2 = ilog2_floor(bucket1[i]) - 1;        // adaptive bucket size
                 const unsigned_type k2 = 1 << log_k2;
                 int_type * bucket2 = new int_type[k2];
                 const unsigned shift2 = shift1 - log_k2;

@@ -20,6 +20,7 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include <assert.h>
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -188,16 +189,40 @@ STXXL_MAX(const Tp & a, const Tp & b)
 
 ////////////////////////////////////////////////////////////////////////////
 
+//! calculate the log2 floor of an integral type using math.h
 template <typename Integral>
 inline Integral log2_ceil(Integral i)
 {
     return Integral(ceil(log2(i)));
 }
 
+//! calculate the log2 ceiling of an integral type using math.h
 template <typename Integral>
 inline Integral log2_floor(Integral i)
 {
     return Integral(log2(i));
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+//! calculate the log2 floor of an integer type (by repeated bit shifts)
+template <typename IntegerType>
+unsigned int ilog2_floor(IntegerType i)
+{
+    assert(i != 0);
+    unsigned int p = 0;
+    while (i >= 256) i >>= 8, p += 8;
+    while (i >>= 1) ++p;
+    return p;
+}
+
+//! calculate the log2 ceiling of an integer type (by repeated bit shifts)
+template <typename IntegerType>
+unsigned int ilog2_ceil(const IntegerType& i)
+{
+    assert(i != 0);
+    if (i <= 1) return 0;
+    return ilog2_floor(i - 1) + 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////

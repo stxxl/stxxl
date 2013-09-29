@@ -66,7 +66,7 @@ public:
         run_cursor_cmp_type c) : cmp(c)
     {
         int_type i;
-        logK = log2_ceil(nruns);
+        logK = ilog2_ceil(nruns);
         int_type kReg = k = (1 << logK);
 
         STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
