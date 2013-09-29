@@ -21,6 +21,7 @@
 
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/common/simple_vector.h>
 
 #ifndef STXXL_VERBOSE_BLOCK_LIFE_CYCLE
 #define STXXL_VERBOSE_BLOCK_LIFE_CYCLE STXXL_VERBOSE2
@@ -135,79 +136,18 @@ std::ostream & operator << (std::ostream & s, const BID<blk_sz> & bid)
     return s;
 }
 
-
-#if 0
 template <unsigned BLK_SIZE>
-class BIDArray : public std::vector<BID<BLK_SIZE> >
+class BIDArray : public simple_vector< BID<BLK_SIZE> >
 {
 public:
-    BIDArray(std::vector<BID<BLK_SIZE> >::size_type size = 0) : std::vector<BID<BLK_SIZE> >(size) { }
-};
-#endif
-
-template <unsigned BLK_SIZE>
-class BIDArray : private noncopyable
-{
-protected:
-    unsigned_type _size;
-    BID<BLK_SIZE> * array;
-
-public:
-    typedef BID<BLK_SIZE> & reference;
-    typedef BID<BLK_SIZE> * iterator;
-    typedef const BID<BLK_SIZE> * const_iterator;
-
-    BIDArray() : _size(0), array(NULL)
-    { }
-
-    iterator begin()
+    BIDArray()
+        : simple_vector< BID<BLK_SIZE> >()
     {
-        return array;
     }
 
-    iterator end()
+    BIDArray(unsigned_type size)
+        : simple_vector< BID<BLK_SIZE> >(size)
     {
-        return array + _size;
-    }
-
-    BIDArray(unsigned_type size) : _size(size)
-    {
-        array = new BID<BLK_SIZE>[size];
-    }
-
-    unsigned_type size() const
-    {
-        return _size;
-    }
-
-    reference operator [] (int_type i)
-    {
-        return array[i];
-    }
-
-    void resize(unsigned_type newsize)
-    {
-        if (array)
-        {
-            STXXL_MSG("Warning: resizing nonempty BIDArray");
-            BID<BLK_SIZE> * tmp = array;
-            array = new BID<BLK_SIZE>[newsize];
-            memcpy((void *)array, (void *)tmp,
-                   sizeof(BID<BLK_SIZE>) * (STXXL_MIN(_size, newsize)));
-            delete[] tmp;
-            _size = newsize;
-        }
-        else
-        {
-            array = new BID<BLK_SIZE>[newsize];
-            _size = newsize;
-        }
-    }
-
-    ~BIDArray()
-    {
-        if (array)
-            delete[] array;
     }
 };
 
