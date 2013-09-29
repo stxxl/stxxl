@@ -57,7 +57,7 @@ config::config()
         }
 
         if (exist_file(basepath)) {
-            init("./.stxxl");
+            init(basepath);
             return;
         }
     }
@@ -73,7 +73,7 @@ config::config()
         }
 
         if (exist_file(basepath)) {
-            init("./.stxxl");
+            init(basepath);
             return;
         }
     }
