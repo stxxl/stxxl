@@ -15,7 +15,7 @@
 
 namespace stxxl {
 
-/*! \page tutorial STXXL Tutorial
+/*! \page tutorial STXXL Tutorials
 
 This tutorial on the Standard Templete Library for Very Large Datasets (STXXL) is meant as an introduction to all those who use the STXXL for the first time - just basic knowledge in C++ is required. Note that the focus of this tutorial is on the most importatant features and is by no means exhaustive. If necessary, we refer to more advanced functionality which would go however beyond the scope of this introduction. 
 
@@ -23,29 +23,28 @@ Why do i need the STXXL? Imagine a situation where you want to work with a std::
 stxxl::vector solves the issue. The practical part about it: Stxxl containers work in a similar way as their internal counterparts from the Standard Template Library (STL) so that parts of this tutorial may 
 sound familiar to you. Naturally, the vector container is just an example - the same applies to other data structures.
 
-Before running the STXXL for the first time you may check \ref install-unix.
+Before running the STXXL for the first time you may check \ref install_unix.
 
 # Available tutorials on STXXL Containers
 
 This section introduces in all currently available STXXL containers.
 The practical part about it: STXXL containers work in a similar way as their internal counterparts from the Standard Template Library (STL) so that parts of this tutorial may sound familiar to you.
 
-- \subpage vector_tutorial "stxxl::vector Tutorial"
-- \subpage stack_tutorial "stxxl::stack Tutorial"
-- \subpage queue_tutorial "stxxl::queue Tutorial"
-- \subpage deque_tutorial "stxxl::deque Tutorial"
-- \subpage pqueue_tutorial "stxxl::priority_queue Tutorial"
-- \subpage map_tutorial "stxxl::map Tutorial"
-- \subpage matrix_tutorial "stxxl::matrix Tutorial"
+- \subpage tutorial_vector "stxxl::vector Tutorial"
+- \subpage tutorial_stack "stxxl::stack Tutorial"
+- \subpage tutorial_queue "stxxl::queue Tutorial"
+- \subpage tutorial_deque "stxxl::deque Tutorial"
+- \subpage tutorial_pqueue "stxxl::priority_queue Tutorial"
+- \subpage tutorial_map "stxxl::map Tutorial"
+- \subpage tutorial_matrix "stxxl::matrix Tutorial"
 
 For more information on the structure, the internal design and time / space complexity of the provided operations, see \ref design_stl.
 
+*/
 
-
-\page vector_tutorial Vector Tutorial
+/** \page tutorial_vector Vector Tutorial
 
 This page introduces into the usage of stxxl::vector container (to learn more about the structure of stxxl::vector, see section \ref design_vector).
-
 
 ### Creating a STXXL vector
 
@@ -137,7 +136,7 @@ The following links refer to more extensive STXXL vector examples:
 
 */
 
-/*! \page stack_tutorial Stack Tutorial
+/*! \page tutorial_stack Stack Tutorial
 
 This page introduces into the stxxl::stack container (to learn more about the structure of stxxl::stack, see section \ref design_stack).
 
@@ -209,7 +208,7 @@ The following page refers to more comprehensive grow-shrink-stack example.
 
 */
 
-/*! \page queue_tutorial Queue Tutorial
+/*! \page tutorial_queue Queue Tutorial
 
 This page introduces into the stxxl::queue Container (to learn more about the structure of stxxl::stack, see section \ref design_queue).
 
@@ -273,11 +272,11 @@ The following page refers to more comprehensive stxxl queue example.
 
 
 
-/*! \page deque_tutorial Deque Tutorial
+/*! \page tutorial_deque Deque Tutorial
 
 This page introduces into the stxxl::deque container (to learn more about the structure of stxxl::deque, see section \ref design_deque).
 
-The acronym Deque stands for "double-ended-queue", that means elements can be accessed, inserted and deleted on both ends of the data structure - in contrast to the stxxl::queue (see \ref queue_tutorial), 
+The acronym Deque stands for "double-ended-queue", that means elements can be accessed, inserted and deleted on both ends of the data structure - in contrast to the stxxl::queue (see \ref tutorial_queue), 
 where that's only possible on one of the two endings. 
 
 
@@ -374,7 +373,7 @@ The following page refers to more comprehensive STXXL deque example.
 
 
 
-/*! \page pqueue_tutorial Priority Queue Tutorial
+/*! \page tutorial_pqueue Priority Queue Tutorial
 
 This page introduces into the stxxl::priority_queue container (to learn more about the structure of stxxl::priority_queue, see section \ref design_pqueue).
 
@@ -481,7 +480,7 @@ The following page refers to a more comprehensive STXXL priority queue example.
 */
 
 
-/*! \page map_tutorial Map (B+-tree) Tutorial
+/*! \page tutorial_map Map (B+-tree) Tutorial
 
 This page introduces into the external associative container stxxl::map (for further information on the structure you may have a look at \ref design_map). 
 
@@ -500,7 +499,6 @@ map_type my_map((map_type::node_block_type::raw_size) * (3, map_type::leaf_block
 
 
 */
-
 
 
 
