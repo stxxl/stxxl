@@ -108,22 +108,11 @@ boostfd_file::boostfd_file(
     int mode,
     int queue_id, int allocator_id) : disk_queued_file(queue_id, allocator_id), mode_(mode)
 {
-    BOOST_IOS::openmode boostfd_mode = 0;
-
-    if (mode & RDONLY)
-    {
-        boostfd_mode = BOOST_IOS::in;
-    }
-
-    if (mode & WRONLY)
-    {
-        boostfd_mode = BOOST_IOS::out;
-    }
-
-    if (mode & RDWR)
-    {
-        boostfd_mode = BOOST_IOS::out | BOOST_IOS::in;
-    }
+    BOOST_IOS::openmode boostfd_mode =
+        (mode & RDWR) ? (BOOST_IOS::out | BOOST_IOS::in) :
+        (mode & WRONLY) ? (BOOST_IOS::out) :
+        (mode & RDONLY) ? (BOOST_IOS::in) :
+        BOOST_IOS::in;
 
 #if defined(BOOST_FILESYSTEM_VERSION) && (BOOST_FILESYSTEM_VERSION >= 3)
     const boost::filesystem::path fspath(filename);

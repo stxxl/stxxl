@@ -209,7 +209,6 @@ inline Integral log2_floor(Integral i)
 template <typename IntegerType>
 unsigned int ilog2_floor(IntegerType i)
 {
-    assert(i != 0);
     unsigned int p = 0;
     while (i >= 256) i >>= 8, p += 8;
     while (i >>= 1) ++p;
@@ -220,7 +219,6 @@ unsigned int ilog2_floor(IntegerType i)
 template <typename IntegerType>
 unsigned int ilog2_ceil(const IntegerType& i)
 {
-    assert(i != 0);
     if (i <= 1) return 0;
     return ilog2_floor(i - 1) + 1;
 }

@@ -16,7 +16,9 @@
 #define STXXL_SIMPLE_VECTOR_HEADER
 
 #include <algorithm>
+#include <string.h>
 #include <stxxl/bits/noncopyable.h>
+#include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
 
 
