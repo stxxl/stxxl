@@ -10,7 +10,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! [example]
 #include <stxxl/vector>
 #include <iostream>
 
@@ -19,7 +18,7 @@ int main()
   typedef stxxl::VECTOR_GENERATOR<int>::result vector;
   vector my_vector;
 
-  for (int i = 0; i < 10*1024*1024; i++) 
+  for (int i = 0; i < 1024*1024; i++) 
   {
     my_vector.push_back(i+2);
   }
@@ -34,4 +33,3 @@ int main()
 
   return 0;
 }
-//! [example]

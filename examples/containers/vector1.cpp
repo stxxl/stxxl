@@ -10,7 +10,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! [example]
 #include <stxxl/vector>
 #include <iostream>
 
@@ -40,13 +39,13 @@ int main()
   {
     //std::cout << *iter << " ";
     if (*iter % 2 == 0)  // is my_vector's current element even? 
-      { 
-	++counter;
-      }    
+    { 
+      ++counter;
+    }    
     iter++;
   }
     
   STXXL_MSG("found " << counter << " even numbers in V");
   return 0;
 }
-//! [example]
+
