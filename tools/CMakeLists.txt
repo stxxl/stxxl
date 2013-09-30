@@ -12,7 +12,9 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-add_subdirectory(common)
+stxxl_build_tool(stxxl_tool
+  benchmark_disks.cpp)
+
 add_subdirectory(containers)
 add_subdirectory(io)
 add_subdirectory(utils)

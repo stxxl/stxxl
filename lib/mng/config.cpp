@@ -142,7 +142,6 @@ void config::init(const std::string& config_path)
             if (line.size() == 0 || line[0] == '#') continue;
 
             std::vector<std::string> tmp = split(line, "=", 2);
-            bool ok;
 
             if (tmp[0] == "disk" || tmp[0] == "flash")
             {

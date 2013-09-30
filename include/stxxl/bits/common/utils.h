@@ -20,6 +20,7 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include <sstream>
 #include <assert.h>
 
 #include <stxxl/bits/config.h>
@@ -82,6 +83,35 @@ split(const std::string & str, const std::string & sep, unsigned int min_fields)
         result.resize(min_fields);
 
     return result;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+//! Wrap a long string at spaces into lines. Prefix is added unconditionally to
+//! each line. Lines are wrapped after wraplen characters if possible.
+static inline std::string string_wrap(const std::string& prefix, const std::string& text, unsigned int wraplen)
+{
+    std::string::size_type it = 0;
+    std::ostringstream os;
+    while (it != text.size())
+    {
+        if (text.size() - it > wraplen)
+        {
+            std::string::size_type spos = text.rfind(' ', it + wraplen);
+            if (spos <= it) { // forced line wrap
+                spos = it + wraplen;
+            }
+            os << prefix << text.substr(it, spos - it) << std::endl;
+            it = spos;
+            while (it != text.size() && text[it] == ' ') ++it;
+        }
+        else
+        {
+            os << prefix << text.substr(it) << std::endl;
+            it = text.size();
+        }
+    }
+    return os.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////

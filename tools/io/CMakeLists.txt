@@ -12,7 +12,6 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-stxxl_build_extra_tool(benchmark_configured_disks)
 stxxl_build_extra_tool(benchmark_disk_and_flash)
 stxxl_build_extra_tool(benchmark_disks)
 stxxl_build_extra_tool(benchmark_random_block_access)
