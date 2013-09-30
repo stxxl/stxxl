@@ -27,7 +27,7 @@ parameter. See \ref design_vector_generator for additional configuration paramet
 
 \code
 typedef stxxl::VECTOR_GENERATOR<int>::result vector;
-vector my_vector;  // creates empty vector 
+vector my_vector;  // creates empty vector object 
 \endcode
 
 ### Insert elements
@@ -89,6 +89,8 @@ std::cout << "vector empty? " << my_vector.empty() << std::endl;
 
 ### A minimal working example of STXXL's vector
 
+(See \ref examples/containers/vector_minimal1.cpp for the sourcecode of the following example).
+
 \code
 #include <stxxl/vector>
 #include <iostream>
@@ -115,10 +117,12 @@ int main()
 }
 \endcode
 
-See the Examples section in the tree view for more comprehensive stxxl::vector examples.
+
 
 \example examples/containers/vector_minimal1.cpp
+This example code is explained in the \ref tutorial_vector section.
 \example examples/containers/vector1.cpp
+This example code is explained in the \ref tutorial_vector section.
 
 */
 

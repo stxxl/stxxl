@@ -10,7 +10,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! [example]
 #include <stack>
 #include <stxxl/stack>
 
@@ -30,17 +29,17 @@ int main()
   for (int k = 0; k < 5; k++) {
     STXXL_MSG("push...");
     for (stxxl::int64 i = 0; i < number_of_elements; i++)
-      {
-        a_stack.push(random(123456789));
-      }
+    {
+      a_stack.push(random(123456789));
+    }
 
     STXXL_MSG("pop...");
     for (stxxl::int64 j = 0; j < number_of_elements - 1; j++)
-      {
-        a_stack.pop();
-      }
+    {
+      a_stack.pop();
+    }
   }
 
   return 0;
 }
-//! [example]
+
