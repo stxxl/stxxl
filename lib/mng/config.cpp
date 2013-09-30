@@ -149,11 +149,11 @@ void config::init(const std::string& config_path)
                 tmp = split(tmp[1], ",", 3);
                 DiskEntry entry = {
                     tmp[0], tmp[2],
-                    parse_filesize(tmp[1], ok),
+                    0,
                     false,
                     false
                 };
-                if (!ok) {
+                if (!parse_SI_IEC_filesize(tmp[1], entry.size)) {
                     STXXL_THROW(std::runtime_error, "config::config",
                                 "Invalid disk size '" << tmp[1] << "' in disk configuration file.");
                 }

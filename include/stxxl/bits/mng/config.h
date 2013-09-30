@@ -36,7 +36,7 @@ class config : public singleton<config>
     {
         std::string path;
         std::string io_impl;
-        stxxl::int64 size;
+        uint64 size;
         bool delete_on_exit;
         bool autogrow;
     };
