@@ -100,7 +100,7 @@ while (!my_stack.empty())
 
     assert(my_stack.top() == 8);
     my_stack.pop();
-
+c
     assert(my_stack.empty());
 
     return 0;
@@ -110,11 +110,12 @@ while (!my_stack.empty())
 
 See \ref examples/containers/stack1.cpp for the sourcecode of a more comprehensive example. 
 
+
 \example examples/containers/stack_minimal1.cpp
-This example code is explained in the \ref tutorial_stack section.
+This example code is explained in the \ref tutorial_stack section
 
 \example examples/containers/stack1.cpp
-This example code is explained in the \ref tutorial_stack section.
+This example code is explained in the \ref tutorial_stack section
 
 */
 

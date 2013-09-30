@@ -118,9 +118,11 @@ int main()
 \endcode
 
 
-
+See \ref examples/containers/vector1.cpp for the sourcecode of a more comprehensive example.
+                                                                                                                                                                                                               
 \example examples/containers/vector_minimal1.cpp
 This example code is explained in the \ref tutorial_vector section.
+
 \example examples/containers/vector1.cpp
 This example code is explained in the \ref tutorial_vector section.
 
