@@ -32,7 +32,6 @@
 
 using stxxl::request_ptr;
 using stxxl::file;
-using stxxl::timer;
 using stxxl::timestamp;
 
 
@@ -97,9 +96,8 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 #endif
 
 #define MB (1024 * 1024)
-#define GB (1024 * 1024 * 1024)
 
-void usage(const char * argv0)
+static int usage(const char * argv0)
 {
     std::cout << "Usage: " << argv0 << " [options] offset length [block_size [batch_size]] [r|v|w] [--] diskfile..." << std::endl;
     std::cout <<
@@ -120,18 +118,18 @@ void usage(const char * argv0)
     std::cout << "         read only with (V)erification; (W)rite only" << std::endl;
     std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
     std::cout << "    Memory consumption: block_size * batch_size * num_disks" << std::endl;
-    exit(-1);
+    return 0;
 }
 
 // returns throughput in MiB/s
-inline double throughput(double bytes, double seconds)
+static inline double throughput(double bytes, double seconds)
 {
     if (seconds == 0.0)
         return 0.0;
     return bytes / (1024 * 1024) / seconds;
 }
 
-int main(int argc, char * argv[])
+int benchmark_files(int argc, char * argv[])
 {
     bool direct_io = true;
     bool sync_io = false;
@@ -176,9 +174,17 @@ int main(int argc, char * argv[])
     if (argc < arg_curr + 3)
         usage(argv[0]);
 
-    stxxl::int64 offset = stxxl::int64(GB) * stxxl::int64(atoi(argv[arg_curr]));
-    stxxl::int64 length = stxxl::int64(GB) * stxxl::int64(atoi(argv[arg_curr + 1]));
-    stxxl::int64 endpos = offset + length;
+    stxxl::uint64 offset, length;
+
+    if (!stxxl::parse_SI_IEC_filesize(argv[arg_curr], offset)) {
+        std::cout << "Error parsing 'offset' size string." << std::endl;
+        return usage(argv[0]);
+    }
+    if (!stxxl::parse_SI_IEC_filesize(argv[arg_curr+1], length)) {
+        std::cout << "Error parsing 'length' size string." << std::endl;
+        return usage(argv[0]);
+    }
+    stxxl::uint64 endpos = offset + length;
     stxxl::int64 block_size = 0;
     stxxl::int64 batch_size = 0;
 
@@ -302,9 +308,9 @@ int main(int argc, char * argv[])
               << " O_DIRECT=" << (direct_io ? "yes" : "no")
               << " O_SYNC=" << (sync_io ? "yes" : "no")
               << std::endl;
-    timer t_total(true);
+    stxxl::timer t_total(true);
     try {
-        while (offset + stxxl::int64(step_size) <= endpos || length == 0)
+        while (offset + stxxl::uint64(step_size) <= endpos || length == 0)
         {
             const stxxl::int64 current_step_size = (length == 0) ? stxxl::int64(step_size) : std::min<stxxl::int64>(step_size, endpos - offset);
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);

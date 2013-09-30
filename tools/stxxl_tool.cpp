@@ -52,6 +52,8 @@ int stxxl_info(int, char **)
 }
 
 extern int benchmark_disks(int argc, char * argv[]);
+extern int benchmark_files(int argc, char * argv[]);
+extern int create_files(int argc, char * argv[]);
 
 struct SubTool
 {
@@ -67,6 +69,10 @@ struct SubTool subtools[] = {
     { "benchmark_disks", &benchmark_disks,
       "This program will benchmark the disks configured by the standard "
       ".stxxl disk configuration files mechanism." },
+    { "benchmark_files", &benchmark_files,
+      "Benchmark different file access methods, e.g. syscall or mmap_files." },
+    { "create_files", &create_files,
+      "Precreate large files to keep file system allocation time out to measurements." },
     { NULL, NULL, NULL }
 };
 

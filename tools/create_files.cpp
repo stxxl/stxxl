@@ -1,5 +1,5 @@
 /***************************************************************************
- *  utils/createdisks.cpp
+ *  tools/create_files.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -88,17 +88,23 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 #define MB (1024 * 1024)
 
-int main(int argc, char * argv[])
+int create_files(int argc, char * argv[])
 {
     if (argc < 3)
     {
-        STXXL_MSG("Usage: " << argv[0] << " filesize_in_MiB filename1 [filename2 [filename3 ...]]");
+        STXXL_MSG("Usage: " << argv[0] << " filesize filename1 [filename2 [filename3 ...]]");
         return -1;
     }
 
-    stxxl::int64 offset = 0;
-    stxxl::int64 length = stxxl::int64(atoi(argv[1])) * MB;
-    stxxl::int64 endpos = offset + length;
+    stxxl::uint64 offset = 0, length;
+
+    if (!stxxl::parse_SI_IEC_filesize(argv[1], length)) {
+        std::cout << "Error parsing 'filesize' size string." << std::endl;
+        STXXL_MSG("Usage: " << argv[0] << " filesize filename1 [filename2 [filename3 ...]]");
+        return -1;
+    }
+
+    stxxl::uint64 endpos = offset + length;
 
     std::vector<std::string> disks_arr;
 

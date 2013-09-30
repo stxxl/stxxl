@@ -18,8 +18,6 @@ if (NOT MSVC)
   stxxl_build_tool(malloc)
 endif (NOT MSVC)
 
-stxxl_build_tool(createdisks)
-
 if (NOT MSVC)
   stxxl_build_tool(mlock)
 endif (NOT MSVC)

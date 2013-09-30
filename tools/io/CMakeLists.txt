@@ -13,7 +13,6 @@
 ###############################################################################
 
 stxxl_build_extra_tool(benchmark_disk_and_flash)
-stxxl_build_extra_tool(benchmark_disks)
 stxxl_build_extra_tool(benchmark_random_block_access)
 stxxl_build_extra_tool(flushbuffers)
 stxxl_build_extra_tool(gen_file)
