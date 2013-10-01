@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/queue1.cpp
+ *  examples/containers/deque1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,7 +10,6 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! [example]
 #include <stxxl/deque>
 #include <iostream>
 
@@ -65,4 +64,4 @@ int main()
 
   return 0;
 }
-//! [example]
+
