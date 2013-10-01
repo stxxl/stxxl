@@ -15,7 +15,7 @@
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/tmeta.h>
-
+#include <limits>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -100,21 +100,42 @@ struct tuple
     //! Sixth tuple component
     sixth_type sixth;
 
+    //! Empty constructor
     tuple() { }
-    tuple(first_type fir,
-          second_type sec,
-          third_type thi,
-          fourth_type fou,
-          fifth_type fif,
-          sixth_type six
-          ) :
-        first(fir),
-        second(sec),
-        third(thi),
-        fourth(fou),
-        fifth(fif),
-        sixth(six)
+
+    //! Construct tuple from subitems
+    tuple(first_type _first,
+          second_type _second,
+          third_type _third,
+          fourth_type _fourth,
+          fifth_type _fifth,
+          sixth_type _sixth
+        )
+        : first(_first),
+          second(_second),
+          third(_third),
+          fourth(_fourth),
+          fifth(_fifth),
+          sixth(_sixth)
     { }
+
+    //! return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    { return tuple(std::numeric_limits<first_type>::min(),
+                   std::numeric_limits<second_type>::min(),
+                   std::numeric_limits<third_type>::min(),
+                   std::numeric_limits<fourth_type>::min(),
+                   std::numeric_limits<fifth_type>::min(),
+                   std::numeric_limits<sixth_type>::min()); }
+
+    //! return maximum value of tuple using numeric_limits
+    static tuple max_value()
+    { return tuple(std::numeric_limits<first_type>::max(),
+                   std::numeric_limits<second_type>::max(),
+                   std::numeric_limits<third_type>::max(),
+                   std::numeric_limits<fourth_type>::max(),
+                   std::numeric_limits<fifth_type>::max(),
+                   std::numeric_limits<sixth_type>::max()); }
 };
 
 //! Partial specialization for 1- \c tuple
@@ -132,9 +153,17 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
     };
 
     tuple() { }
-    tuple(first_type fi) :
-        first(fi)
+    tuple(first_type first_)
+        : first(first_)
     { }
+
+    //! return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    { return tuple(std::numeric_limits<first_type>::min()); }
+
+    //! return maximum value of tuple using numeric_limits
+    static tuple max_value()
+    { return tuple(std::numeric_limits<first_type>::max()); }
 };
 
 //! Partial specialization for 2- \c tuple (equivalent to std::pair)
@@ -157,12 +186,22 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
     second_type second;
 
     tuple() { }
-    tuple(first_type fi,
-          second_type se
-          ) :
-        first(fi),
-        second(se)
+    tuple(first_type first_,
+          second_type second_
+        )
+        : first(first_),
+          second(second_)
     { }
+
+    //! return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    { return tuple(std::numeric_limits<first_type>::min(),
+                   std::numeric_limits<second_type>::min()); }
+
+    //! return maximum value of tuple using numeric_limits
+    static tuple max_value()
+    { return tuple(std::numeric_limits<first_type>::max(),
+                   std::numeric_limits<second_type>::max()); }
 };
 
 
@@ -193,14 +232,26 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
     third_type third;
 
     tuple() { }
-    tuple(first_type fir,
-          second_type sec,
-          third_type thi
-          ) :
-        first(fir),
-        second(sec),
-        third(thi)
+    tuple(first_type _first,
+          second_type _second,
+          third_type _third
+        )
+        : first(_first),
+          second(_second),
+          third(_third)
     { }
+
+    //! return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    { return tuple(std::numeric_limits<first_type>::min(),
+                   std::numeric_limits<second_type>::min(),
+                   std::numeric_limits<third_type>::min()); }
+
+    //! return maximum value of tuple using numeric_limits
+    static tuple max_value()
+    { return tuple(std::numeric_limits<first_type>::max(),
+                   std::numeric_limits<second_type>::max(),
+                   std::numeric_limits<third_type>::max()); }
 };
 
 //! Partial specialization for 4- \c tuple
@@ -234,16 +285,30 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
     fourth_type fourth;
 
     tuple() { }
-    tuple(first_type fir,
-          second_type sec,
-          third_type thi,
-          fourth_type fou
-          ) :
-        first(fir),
-        second(sec),
-        third(thi),
-        fourth(fou)
+    tuple(first_type _first,
+          second_type _second,
+          third_type _third,
+          fourth_type _fourth
+        )
+        : first(_first),
+          second(_second),
+          third(_third),
+          fourth(_fourth)
     { }
+
+    //! return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    { return tuple(std::numeric_limits<first_type>::min(),
+                   std::numeric_limits<second_type>::min(),
+                   std::numeric_limits<third_type>::min(),
+                   std::numeric_limits<fourth_type>::min()); }
+
+    //! return maximum value of tuple using numeric_limits
+    static tuple max_value()
+    { return tuple(std::numeric_limits<first_type>::max(),
+                   std::numeric_limits<second_type>::max(),
+                   std::numeric_limits<third_type>::max(),
+                   std::numeric_limits<fourth_type>::max()); }
 };
 
 //! Partial specialization for 5- \c tuple
@@ -281,18 +346,34 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
     fifth_type fifth;
 
     tuple() { }
-    tuple(first_type fir,
-          second_type sec,
-          third_type thi,
-          fourth_type fou,
-          fifth_type fif
-          ) :
-        first(fir),
-        second(sec),
-        third(thi),
-        fourth(fou),
-        fifth(fif)
+    tuple(first_type _first,
+          second_type _second,
+          third_type _third,
+          fourth_type _fourth,
+          fifth_type _fifth
+        )
+        : first(_first),
+          second(_second),
+          third(_third),
+          fourth(_fourth),
+          fifth(_fifth)
     { }
+
+    //! return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    { return tuple(std::numeric_limits<first_type>::min(),
+                   std::numeric_limits<second_type>::min(),
+                   std::numeric_limits<third_type>::min(),
+                   std::numeric_limits<fourth_type>::min(),
+                   std::numeric_limits<fifth_type>::min()); }
+
+    //! return maximum value of tuple using numeric_limits
+    static tuple max_value()
+    { return tuple(std::numeric_limits<first_type>::max(),
+                   std::numeric_limits<second_type>::max(),
+                   std::numeric_limits<third_type>::max(),
+                   std::numeric_limits<fourth_type>::max(),
+                   std::numeric_limits<fifth_type>::max()); }
 };
 
 /*
