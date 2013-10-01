@@ -15,7 +15,7 @@
 
 namespace stxxl {
 
-/*! \page tutorial STXXL Tutorials
+/** \page tutorial Tutorials
 
 This tutorial on the Standard Templete Library for Very Large Datasets (STXXL) is meant as an introduction to all those who use the STXXL for the first time - just basic knowledge in C++ is required. Note that the focus of this tutorial is on the most importatant features and is by no means exhaustive. If necessary, we refer to more advanced functionality which would go however beyond the scope of this introduction. 
 
