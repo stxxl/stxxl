@@ -21,6 +21,7 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_timer "timestamp and timer function"
 - \subpage common_simple_vector "a non-growing, non-initializing simple_vector"
 - \subpage common_counting_ptr "reference counted (shared) objects via counting_ptr"
+- \subpage common_cmdline "command line parser"
 - \subpage common_thread_sync "synchronization primitives for multi-threading"
 - \subpage common_logging "logging macros"
 - \subpage common_assert "macros for checking assertions"
@@ -86,6 +87,55 @@ typedef stxxl::counting_ptr<something> something_ptr
 The stxxl::counting_ptr can generally be used like a usual pointer or shared_ptr (see the docs for more).
 
 There is also stxxl::const_counting_ptr to return const objects (note that a const stxxl::counting_ptr will only render the pointer const, not the enclosed object).
+
+*/
+
+/** \page common_cmdline Command Line Parser
+
+STXXL now contains a rather sophisticated command line parser for C++, stxxl::cmdline_parser, which enables rapid creation of complex command line constructions. Maybe most importantly for application with external memory: the parser will recognize byte sizes with SI/IEC suffixes like '2 GiB' and transform it appropriately.
+
+\snippet examples/common/cmdline.cpp example
+
+When running the program above without arguments, it will print:
+\verbatim
+$ ./cmdline
+Missing required argument for parameter 'filename'
+
+Usage: ./cmdline [options] <filename>
+
+This may some day be a useful program, which solves many serious problems of
+the real world and achives global peace.
+
+Author: Timo Bingmann <tb@panthema.net>
+
+Parameters:
+  filename  A filename to process
+Options:
+  -r, --rounds N  Run N rounds of the experiment.
+  -s, --size      Number of bytes to process.
+\endverbatim
+
+Nice output, notice the line wrapping of the description and formatting of parameters and arguments. These too are wrapped if the description is too long.
+
+We now try to give the program some arguments:
+\verbatim
+$ ./cmdline -s 2GiB -r 42 /dev/null
+Option -s, --size set to 2147483648.
+Option -r, --rounds N set to 42.
+Parameter filename set to "/dev/null".
+Command line parsed okay.
+Parameters:
+  filename        (string)            "/dev/null"
+Options:
+  -r, --rounds N  (unsigned integer)  42
+  -s, --size      (bytes)             2147483648
+\endverbatim
+The output shows pretty much what happens. The command line parser is by default in a verbose mode outputting all arguments and values parsed. The debug summary shows to have values the corresponding variables were set.
+
+One feature worth naming is that the parser also supports lists of strings, i.e. \c std::vector<std::string> via \c add_param_stringlist() and similar.
+
+\example examples/common/cmdline.cpp
+This example is documented in \ref common_cmdline tutorial.
 
 */
 

@@ -152,7 +152,7 @@ void config::init(const std::string& config_path)
                     false,
                     false
                 };
-                if (!parse_SI_IEC_filesize(tmp[1], entry.size)) {
+                if (!parse_SI_IEC_size(tmp[1], entry.size)) {
                     STXXL_THROW(std::runtime_error, "config::config",
                                 "Invalid disk size '" << tmp[1] << "' in disk configuration file.");
                 }

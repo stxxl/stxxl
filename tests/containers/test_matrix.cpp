@@ -13,12 +13,10 @@
 #include <iostream>
 #include <limits>
 
-// Thanks Daniel Russel, Stanford University
-#include <contrib/argument_helper.h>
-
 #include <stxxl/vector>
 #include <stxxl/stream>
 #include <stxxl/bits/containers/matrix.h>
+#include <stxxl/bits/common/cmdline.h>
 
 using namespace stxxl;
 
@@ -142,17 +140,21 @@ int main(int argc, char **argv)
     int sched_algo_num = 1;
     int internal_memory_byte = 0;
 
-    dsr::Argument_helper ah;
-    ah.new_int("K", "number of the test case to run", test_case);
-    ah.new_named_int('r',  "rank", "N","rank of the matrices   default", rank);
-    ah.new_named_int('m', "memory", "L", "internal memory to use (in megabytes)   default", internal_memory_megabyte);
-    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n  default", mult_algo_num);
-    ah.new_named_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default", sched_algo_num);
-    ah.new_named_int('c', "memory-byte", "L", "internal memory to use (in bytes)   no default", internal_memory_byte);
+    stxxl::cmdline_parser cp;
 
-    ah.set_description("stxxl matrix test");
-    ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
-    ah.process(argc, argv);
+    cp.set_description("stxxl matrix test");
+    cp.set_author("Raoul Steffen <R-Steffen@gmx.de>");
+
+    cp.add_param_int("K", "number of the test case to run", test_case);
+
+    cp.add_int('r',  "rank", "<N>","rank of the matrices, default: 2000", rank);
+    cp.add_int('m', "memory", "<L>", "internal memory to use (in megabytes), default: 256", internal_memory_megabyte);
+    cp.add_int('a', "mult-algo", "<N>", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n  default: 2", mult_algo_num);
+    cp.add_int('s', "scheduling-algo", "<N>", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default: 1", sched_algo_num);
+    cp.add_int('c', "memory-byte", "<L>", "internal memory to use (in bytes)   no default", internal_memory_byte);
+
+    if (!cp.process(argc, argv))
+        return 0;
 
     int_type internal_memory;
     if (internal_memory_byte)

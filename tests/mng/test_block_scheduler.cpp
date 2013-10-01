@@ -11,9 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/mng/block_scheduler.h>
-
-// Thanks Daniel Russel, Stanford University
-#include <contrib/argument_helper.h>
+#include <stxxl/bits/common/cmdline.h>
 
 #include <iostream>
 #include <limits>
@@ -63,12 +61,16 @@ int main(int argc, char **argv)
     int test_case = -1;
     int internal_memory_megabytes = 256;
 
-    dsr::Argument_helper ah;
-    ah.new_named_int('t', "test-case", "I", "number of the test case to run", test_case);
-    ah.new_named_int('m', "memory", "N", "internal memory to use (in megabytes)", internal_memory_megabytes);
-    ah.set_description("stxxl block_scheduler test");
-    ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
-    ah.process(argc, argv);
+    stxxl::cmdline_parser cp;
+
+    cp.add_int('t', "test-case", "I", "number of the test case to run", test_case);
+    cp.add_int('m', "memory", "N", "internal memory to use (in megabytes)", internal_memory_megabytes);
+
+    cp.set_description("stxxl block_scheduler test");
+    cp.set_author("Raoul Steffen, R-Steffen@gmx.de");
+
+    if (!cp.process(argc, argv))
+        return -1;
 
     int_type internal_memory = int_type(internal_memory_megabytes) * 1048576;
 

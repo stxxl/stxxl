@@ -14,6 +14,7 @@
 #include <stxxl/io>
 #include <stxxl/mng>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/version.h>
 
 int stxxl_info(int, char **)
@@ -51,9 +52,9 @@ int stxxl_info(int, char **)
     return 0;
 }
 
+extern int create_files(int argc, char * argv[]);
 extern int benchmark_disks(int argc, char * argv[]);
 extern int benchmark_files(int argc, char * argv[]);
-extern int create_files(int argc, char * argv[]);
 
 struct SubTool
 {
@@ -66,13 +67,13 @@ struct SubTool subtools[] = {
     { "info", &stxxl_info,
       "Print out information about the build system and which optional "
       "modules where compiled into STXXL." },
+    { "create_files", &create_files,
+      "Precreate large files to keep file system allocation time out to measurements." },
     { "benchmark_disks", &benchmark_disks,
       "This program will benchmark the disks configured by the standard "
       ".stxxl disk configuration files mechanism." },
     { "benchmark_files", &benchmark_files,
       "Benchmark different file access methods, e.g. syscall or mmap_files." },
-    { "create_files", &create_files,
-      "Precreate large files to keep file system allocation time out to measurements." },
     { NULL, NULL, NULL }
 };
 
@@ -83,9 +84,9 @@ int main_usage(const char* arg0)
 
     for (unsigned int i = 0; subtools[i].name; ++i)
     {
-        std::cout << "  " << subtools[i].name << std::endl
-                  << stxxl::string_wrap("      ", subtools[i].description, 74)
-                  << std::endl;
+        std::cout << "  " << subtools[i].name << std::endl;
+        stxxl::cmdline_parser::output_wrap(std::cout, subtools[i].description, 80, 6, 6);
+        std::cout << std::endl;
     }
 
     return 0;

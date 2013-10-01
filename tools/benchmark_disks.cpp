@@ -31,6 +31,7 @@
 
 #include <stxxl/io>
 #include <stxxl/mng>
+#include <stxxl/bits/common/cmdline.h>
 
 #ifndef BOOST_MSVC
  #include <unistd.h>
@@ -50,57 +51,21 @@ using stxxl::timestamp;
 
 #define MB (1024 * 1024)
 
-static int usage(const char * argv0)
-{
-    std::cout << "Usage: " << argv0 << " size [step] [r|w] [alloc]" << std::endl
-              << "Arguments:" << std::endl
-              << "  size    Amount of data to write/read from disks (e.g. 10GiB)" << std::endl
-              << "  step    Step size between block access (default: 8 MiB)" << std::endl
-              << "  r/w     Only read or write blocks (default: both write and read)" << std::endl
-              << "  alloc   Block allocation strategy: RC, SR, FR, striping. (default: RC)" << std::endl
-              << std::endl;
-
-    const char* desc =
-        "This program will benchmark the disks configured by the standard "
-        ".stxxl disk configuration files mechanism. Blocks of 8 MiB are "
-        "written and/or read in sequence using the block manager. The step "
-        "size describes the spacing of the operations and alloc the block "
-        "allocation strategy. If size == 0, then writing/reading operation "
-        "are done until an error occurs.";
-
-    std::cout << stxxl::string_wrap("", desc, 78);
-
-    return 0;
-}
-
 template <typename AllocStrategy>
-int benchmark_disks_alloc(int argc, char * argv[])
+int benchmark_disks_alloc(stxxl::uint64 length, stxxl::uint64 step_size,
+                          std::string optrw)
 {
-    if (argc < 2)
-        return usage(argv[0]);
-
-    // parse command line
-
-    stxxl::uint64 offset = 0, length, step_size = 0;
-    if (!stxxl::parse_SI_IEC_filesize(argv[1], length)) {
-        std::cout << "Error parsing 'size' size string." << std::endl;
-        return usage(argv[0]);
-    }
-    if (argc >= 3 && !stxxl::parse_SI_IEC_filesize(argv[2], step_size)) {
-        std::cout << "Error parsing 'step' size string." << std::endl;
-        return usage(argv[0]);
-    }
-    stxxl::uint64 endpos = offset + length;
+    stxxl::uint64 offset = 0, endpos = offset + length;
 
     if (length == 0)
         endpos = std::numeric_limits<stxxl::uint64>::max();
 
     bool do_read = true, do_write = true;
 
-    if (argc >= 4 && (strcmp("r", argv[3]) == 0 || strcmp("R", argv[3]) == 0))
+    if (optrw.size() && optrw.find('w') == std::string::npos)
         do_write = false;
 
-    if (argc >= 4 && (strcmp("w", argv[3]) == 0 || strcmp("W", argv[3]) == 0))
+    if (optrw.size() && optrw.find('r') == std::string::npos)
         do_read = false;
 
     // construct block type
@@ -231,23 +196,46 @@ int benchmark_disks_alloc(int argc, char * argv[])
 
 int benchmark_disks(int argc, char * argv[])
 {
-    if (argc < 2)
-        return usage(argv[0]);
+    // parse command line
 
-    if (argc >= 5)
+    stxxl::cmdline_parser cp;
+
+    stxxl::uint64 length, step_size = 0;
+    std::string optrw, allocstr;
+
+    cp.add_param_bytes("size", "Amount of data to write/read from disks (e.g. 10GiB)", length);
+    cp.add_opt_param_bytes("step", "Size of data written/read in one step (default: 8MiB)", step_size);
+    cp.add_opt_param_string("r|w", "Only read or write blocks (default: both write and read)", optrw);
+    cp.add_opt_param_string("alloc", "Block allocation strategy: RC, SR, FR, striping. (default: RC)", allocstr);
+
+    cp.set_description(
+        "This program will benchmark the disks configured by the standard "
+        ".stxxl disk configuration files mechanism. Blocks of 8 MiB are "
+        "written and/or read in sequence using the block manager. The step "
+        "size describes how many blocks are written/read in one step. The "
+        "are taken from block_manager using given the specified allocation "
+        "strategy. If size == 0, then writing/reading operation are done "
+        "until an error occurs. "
+        );
+
+    if (!cp.process(argc, argv))
+        return -1;
+
+    if (allocstr.size())
     {
-        if (strcmp(argv[4], "RC") == 0)
-            return benchmark_disks_alloc<stxxl::RC>(argc, argv);
-        if (strcmp(argv[4], "SR") == 0)
-            return benchmark_disks_alloc<stxxl::SR>(argc, argv);
-        if (strcmp(argv[4], "FR") == 0)
-            return benchmark_disks_alloc<stxxl::FR>(argc, argv);
-        if (strcmp(argv[4], "striping") == 0)
-            return benchmark_disks_alloc<stxxl::striping>(argc, argv);
+        if (allocstr == "RC")
+            return benchmark_disks_alloc<stxxl::RC>(length, step_size, optrw);
+        if (allocstr == "SR")
+            return benchmark_disks_alloc<stxxl::SR>(length, step_size, optrw);
+        if (allocstr == "FR")
+            return benchmark_disks_alloc<stxxl::FR>(length, step_size, optrw);
+        if (allocstr == "striping")
+            return benchmark_disks_alloc<stxxl::striping>(length, step_size, optrw);
 
-        std::cout << "Unknown allocation strategy '" << argv[4] << "'" << std::endl;
-        return usage(argv[0]);
+        std::cout << "Unknown allocation strategy '" << allocstr << "'" << std::endl;
+        cp.print_usage();
+        return -1;
     }
 
-    return benchmark_disks_alloc<STXXL_DEFAULT_ALLOC_STRATEGY>(argc, argv);
+    return benchmark_disks_alloc<STXXL_DEFAULT_ALLOC_STRATEGY>(length, step_size, optrw);
 }

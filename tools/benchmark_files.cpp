@@ -6,6 +6,7 @@
  *  Copyright (C) 2002-2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007-2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -28,6 +29,7 @@
 #include <stxxl/aligned_alloc>
 #include <stxxl/timer>
 #include <stxxl/bits/version.h>
+#include <stxxl/bits/common/cmdline.h>
 
 
 using stxxl::request_ptr;
@@ -97,30 +99,6 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 #define MB (1024 * 1024)
 
-static int usage(const char * argv0)
-{
-    std::cout << "Usage: " << argv0 << " [options] offset length [block_size [batch_size]] [r|v|w] [--] diskfile..." << std::endl;
-    std::cout <<
-    "Options:\n"
-#ifdef RAW_ACCESS
-    "    --no-direct             open files without O_DIRECT\n"
-#endif
-    "    --sync                  open files with O_SYNC|O_DSYNC|O_RSYNC\n"
-    "    --file-type=syscall|mmap|wincall|boostfd|...    default: " << default_file_type << "\n"
-    "    --resize                resize the file size after opening,\n"
-    "                            needed e.g. for creating mmap files\n"
-    << std::endl;
-    std::cout << "    starting 'offset' and 'length' are given in GiB," << std::endl;
-    std::cout << "    'block_size' (default 8) in MiB (in B if it has a suffix B)," << std::endl;
-    std::cout << "    increase 'batch_size' (default 1)" << std::endl;
-    std::cout << "    to submit several I/Os at once and report average rate" << std::endl;
-    std::cout << "    ops: write, reread and check (default); (R)ead only w/o verification;" << std::endl;
-    std::cout << "         read only with (V)erification; (W)rite only" << std::endl;
-    std::cout << "    length == 0 implies till end of space (please ignore the write error)" << std::endl;
-    std::cout << "    Memory consumption: block_size * batch_size * num_disks" << std::endl;
-    return 0;
-}
-
 // returns throughput in MiB/s
 static inline double throughput(double bytes, double seconds)
 {
@@ -131,114 +109,70 @@ static inline double throughput(double bytes, double seconds)
 
 int benchmark_files(int argc, char * argv[])
 {
-    bool direct_io = true;
-    bool sync_io = false;
-    bool resize_after_open = false;
-    const char * file_type = default_file_type;
-
-    int arg_curr = 1;
-
-    // FIXME: use something like getopt() instead of reinventing the wheel,
-    // but there is some portability problem ...
-    while (arg_curr < argc) {
-        char * arg = argv[arg_curr];
-        char * arg_opt = strchr(argv[arg_curr], '=');
-        if (arg_opt) {
-            *arg_opt = 0;
-            ++arg_opt;  // skip '='
-        }
-        if (strcmp(arg, "--no-direct") == 0) {
-            direct_io = false;
-        } else if (strcmp(arg, "--sync") == 0) {
-            sync_io = true;
-        } else if (strcmp(arg, "--file-type") == 0) {
-            if (!arg_opt) {
-                ++arg_curr;
-                if (arg_curr < argc)
-                    arg_opt = argv[arg_curr];
-                else
-                    throw std::invalid_argument(std::string("missing argument for ") + arg);
-            }
-            file_type = arg_opt;
-        } else if (strcmp(arg, "--resize") == 0) {
-            resize_after_open = true;
-        } else if (strncmp(arg, "--", 2) == 0) {
-            throw std::invalid_argument(std::string("unknown option ") + arg);
-        } else {
-            // remaining arguments are "old style" command line
-            break;
-        }
-        ++arg_curr;
-    }
-
-    if (argc < arg_curr + 3)
-        usage(argv[0]);
-
     stxxl::uint64 offset, length;
 
-    if (!stxxl::parse_SI_IEC_filesize(argv[arg_curr], offset)) {
-        std::cout << "Error parsing 'offset' size string." << std::endl;
-        return usage(argv[0]);
-    }
-    if (!stxxl::parse_SI_IEC_filesize(argv[arg_curr+1], length)) {
-        std::cout << "Error parsing 'length' size string." << std::endl;
-        return usage(argv[0]);
-    }
-    stxxl::uint64 endpos = offset + length;
-    stxxl::int64 block_size = 0;
-    stxxl::int64 batch_size = 0;
-
-    bool do_read = true, do_write = true, do_verify = true;
-    int first_disk_arg = arg_curr + 2;
-
-    if (first_disk_arg < argc)
-        block_size = atoi(argv[first_disk_arg]);
-    if (block_size > 0) {
-        int l = strlen(argv[first_disk_arg]);
-        if (argv[first_disk_arg][l - 1] == 'B' || argv[first_disk_arg][l - 1] == 'b') {
-            // suffix B means exact size
-        } else {
-            block_size *= MB;
-        }
-        ++first_disk_arg;
-    } else {
-        block_size = 8 * MB;
-    }
-
-    if (first_disk_arg < argc)
-        batch_size = atoi(argv[first_disk_arg]);
-    if (batch_size > 0) {
-        ++first_disk_arg;
-    } else {
-        batch_size = 1;
-    }
-
-    // deprecated, use --no-direct instead
-    if (first_disk_arg < argc && (strcmp("nd", argv[first_disk_arg]) == 0 || strcmp("ND", argv[first_disk_arg]) == 0)) {
-        direct_io = false;
-        ++first_disk_arg;
-    }
-
-    if (first_disk_arg < argc && (strcmp("r", argv[first_disk_arg]) == 0 || strcmp("R", argv[first_disk_arg]) == 0)) {
-        do_write = false;
-        do_verify = false;
-        ++first_disk_arg;
-    } else if (first_disk_arg < argc && (strcmp("v", argv[first_disk_arg]) == 0 || strcmp("V", argv[first_disk_arg]) == 0)) {
-        do_write = false;
-        ++first_disk_arg;
-    } else if (first_disk_arg < argc && (strcmp("w", argv[first_disk_arg]) == 0 || strcmp("W", argv[first_disk_arg]) == 0)) {
-        do_read = false;
-        ++first_disk_arg;
-    }
-
-    if (first_disk_arg < argc && strcmp("--", argv[first_disk_arg]) == 0) {
-        ++first_disk_arg;
-    }
+    bool no_direct_io = false;
+    bool sync_io = false;
+    bool resize_after_open = false;
+    std::string file_type = default_file_type;
+    stxxl::uint64 block_size = 0;
+    unsigned int batch_size = 1;
+    std::string opstr;
 
     std::vector<std::string> disks_arr;
 
-    if (!(first_disk_arg < argc))
-        usage(argv[0]);
+    stxxl::cmdline_parser cp;
+
+    cp.add_param_bytes("offset", "Starting offset to write in file.", offset);
+    cp.add_param_bytes("length", "Length to write in file.", length);
+    cp.add_param_stringlist("filename", "File path to run benchmark on.", disks_arr);
+
+#ifdef RAW_ACCESS
+    cp.add_flag(0, "no-direct", "", "open files without O_DIRECT", no_direct_io);
+#endif
+    cp.add_flag(0, "sync", "", "open files with O_SYNC|O_DSYNC|O_RSYNC", sync_io);
+    cp.add_flag(0, "resize", "", "resize the file size after opening, needed e.g. for creating mmap files", resize_after_open);
+
+    cp.add_bytes(0, "block_size", "", "block size for operations (default 8 MiB)", block_size);
+    cp.add_uint(0, "batch_size", "", "increase (default 1) to submit several I/Os at once and report average rate", batch_size);
+
+    cp.add_string('f', "file-type", "",
+                  "Method to open file (syscall|mmap|wincall|boostfd|...) default: " + file_type, file_type);
+
+    cp.add_string(0, "operations", "",
+                  "ops: write, reread and check (default); (R)ead only w/o verification; read only with (V)erification; (W)rite only", opstr);
+
+    cp.set_description("Open a file using one of STXXL's file abstractions and perform write/read/verify tests on the file. "
+                       "Block sizes and batch size can be adjusted via command line. "
+                       "If length == 0 , then operation will continue till end of space (please ignore the write error). "
+                       "Memory consumption: block_size * batch_size * num_disks");
+
+    if (!cp.process(argc,argv))
+        return -1;
+
+    stxxl::uint64 endpos = offset + length;
+
+    if (block_size == 0)
+        block_size = 8 * MB;
+
+    if (batch_size == 0)
+        batch_size = 1;
+
+    bool do_read = true, do_write = true, do_verify = true;
+
+    // deprecated, use --no-direct instead
+    if (opstr.size() && (opstr.find("nd") != std::string::npos || opstr.find("ND") != std::string::npos)) {
+        no_direct_io = true;
+    }
+
+    if (opstr.size() && (opstr.find('r') != std::string::npos || opstr.find('R') != std::string::npos)) {
+        do_write = false;
+        do_verify = false;
+    } else if (opstr.size() && (opstr.find('v') != std::string::npos || opstr.find('V') != std::string::npos)) {
+        do_write = false;
+    } else if (opstr.size() && (opstr.find('w') != std::string::npos || opstr.find('W') != std::string::npos)) {
+        do_read = false;
+    }
 
     const char * myrev = "$Revision$";
     const char * myself = strrchr(argv[0], '/');
@@ -251,10 +185,9 @@ int benchmark_files(int argc, char * argv[])
     std::cout << std::endl;
     std::cout << "# " << stxxl::get_version_string() << std::endl;
 
-    for (int ii = first_disk_arg; ii < argc; ii++)
+    for (size_t ii = 0; ii < disks_arr.size(); ii++)
     {
-        std::cout << "# Add disk: " << argv[ii] << std::endl;
-        disks_arr.push_back(argv[ii]);
+        std::cout << "# Add disk: " << disks_arr[ii] << std::endl;
     }
 
     const unsigned ndisks = disks_arr.size();
@@ -279,7 +212,7 @@ int benchmark_files(int argc, char * argv[])
     for (unsigned i = 0; i < ndisks; i++)
     {
         int openmode = file::CREAT | file::RDWR;
-        if (direct_io) {
+        if (!no_direct_io) {
 #ifdef RAW_ACCESS
             openmode |= file::DIRECT;
 #endif
@@ -305,7 +238,7 @@ int benchmark_files(int argc, char * argv[])
               << batch_size << " block" << (batch_size == 1 ? "" : "s") << " of "
               << block_size << " bytes)"
               << " file_type=" << file_type
-              << " O_DIRECT=" << (direct_io ? "yes" : "no")
+              << " O_DIRECT=" << (no_direct_io ? "no" : "yes")
               << " O_SYNC=" << (sync_io ? "yes" : "no")
               << std::endl;
     stxxl::timer t_total(true);

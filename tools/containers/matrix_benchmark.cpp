@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/matrix_benchmark.cpp
+ *  tests/containers/matrix_benchmark.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -13,18 +13,15 @@
 #include <iostream>
 #include <limits>
 
-// Thanks Daniel Russel, Stanford University
-#include <contrib/argument_helper.h>
-
 #include <stxxl/vector>
 #include <stxxl/stream>
+#include <stxxl/bits/common/cmdline.h>
 #include <stxxl/bits/containers/matrix.h>
 
 using namespace stxxl;
 
 int main(int argc, char **argv)
 {
-
     #ifndef STXXL_MATRIX_BLOCK_ORDER
     const int block_order = 1568; // must be a multiple of 32, assuming at least 4 bytes element size
     #else
@@ -32,30 +29,24 @@ int main(int argc, char **argv)
     #endif
 
     int rank = 10000;
-    int internal_memory_megabyte = 256;
+    uint64 internal_memory = 256 * 1024*1024;
     int mult_algo_num = 5;
     int sched_algo_num = 2;
-    int internal_memory_byte = 0;
 
-    dsr::Argument_helper ah;
-    ah.new_named_int('r',  "rank", "N","rank of the matrices   default", rank);
-    ah.new_named_int('m', "memory", "L", "internal memory to use (in megabytes)   default", internal_memory_megabyte);
-    ah.new_named_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n   -1: internal multiplication\n   -2: pure BLAS\n  default", mult_algo_num);
-    ah.new_named_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default", sched_algo_num);
-    ah.new_named_int('c', "memory-byte", "L", "internal memory to use (in bytes)   no default", internal_memory_byte);
+    stxxl::cmdline_parser cp;
+    cp.add_int('r',  "rank", "N","rank of the matrices, default: 10000", rank);
+    cp.add_bytes('m', "memory", "L", "internal memory to use, default: 256 MiB", internal_memory);
+    cp.add_int('a', "mult-algo", "N", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n   -1: internal multiplication\n   -2: pure BLAS\n  default: 5", mult_algo_num);
+    cp.add_int('s', "scheduling-algo", "N", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default: 2", sched_algo_num);
 
-    ah.set_description("stxxl matrix test");
-    ah.set_author("Raoul Steffen, R-Steffen@gmx.de");
-    ah.process(argc, argv);
+    cp.set_description("stxxl matrix test");
+    cp.set_author("Raoul Steffen <R-Steffen@gmx.de>");
 
-    int_type internal_memory;
-    if (internal_memory_byte)
-        internal_memory = internal_memory_byte;
-    else
-        internal_memory = int_type(internal_memory_megabyte) * 1048576;
+    if (!cp.process(argc, argv))
+        return -1;
 
     STXXL_MSG("multiplying two full double matrices of rank " << rank << ", block order " << block_order
-            << " using " << internal_memory_megabyte << "MiB internal memory, multiplication-algo "
+            << " using " << internal_memory /1024/1024 << "MiB internal memory, multiplication-algo "
             << mult_algo_num << ", scheduling-algo " << sched_algo_num);
 
     typedef double value_type;
@@ -145,7 +136,7 @@ int main(int argc, char **argv)
 
     STXXL_MSG("end of test");
     std::cout << "@";
-    std::cout << " ra " << rank << " bo " << block_order << " im " << internal_memory_megabyte
+    std::cout << " ra " << rank << " bo " << block_order << " im " << internal_memory/1024/1024
             << " ma " << mult_algo_num << " sa " << sched_algo_num;
     std::cout << " mu " << matrix_stats_after.block_multiplication_calls
             << " mus " << matrix_stats_after.block_multiplications_saved_through_zero

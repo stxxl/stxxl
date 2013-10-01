@@ -87,39 +87,10 @@ split(const std::string & str, const std::string & sep, unsigned int min_fields)
 
 ////////////////////////////////////////////////////////////////////////////
 
-//! Wrap a long string at spaces into lines. Prefix is added unconditionally to
-//! each line. Lines are wrapped after wraplen characters if possible.
-static inline std::string string_wrap(const std::string& prefix, const std::string& text, unsigned int wraplen)
-{
-    std::string::size_type it = 0;
-    std::ostringstream os;
-    while (it != text.size())
-    {
-        if (text.size() - it > wraplen)
-        {
-            std::string::size_type spos = text.rfind(' ', it + wraplen);
-            if (spos <= it) { // forced line wrap
-                spos = it + wraplen;
-            }
-            os << prefix << text.substr(it, spos - it) << std::endl;
-            it = spos;
-            while (it != text.size() && text[it] == ' ') ++it;
-        }
-        else
-        {
-            os << prefix << text.substr(it) << std::endl;
-            it = text.size();
-        }
-    }
-    return os.str();
-}
-
-////////////////////////////////////////////////////////////////////////////
-
 //! Parse a string like "343KB" or "44 GiB" into the corresponding size in
 //! bytes. Returns the number of bytes and sets ok = true if the string could
 //! be parsed correctly.
-static inline bool parse_SI_IEC_filesize(const std::string& str, uint64& size)
+static inline bool parse_SI_IEC_size(const std::string& str, uint64& size)
 {
     char* endptr;
     size = strtoul(str.c_str(), &endptr, 10);

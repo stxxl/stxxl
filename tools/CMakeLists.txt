@@ -13,9 +13,9 @@
 ###############################################################################
 
 stxxl_build_tool(stxxl_tool
+  create_files.cpp
   benchmark_disks.cpp
   benchmark_files.cpp
-  create_files.cpp
   )
 
 add_subdirectory(containers)

@@ -17,6 +17,7 @@
 
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
+#include <stxxl/bits/common/cmdline.h>
 
 #ifndef BOOST_MSVC
  #include <unistd.h>
@@ -90,33 +91,25 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 
 int create_files(int argc, char * argv[])
 {
-    if (argc < 3)
-    {
-        STXXL_MSG("Usage: " << argv[0] << " filesize filename1 [filename2 [filename3 ...]]");
-        return -1;
-    }
-
+    std::vector<std::string> disks_arr;
     stxxl::uint64 offset = 0, length;
 
-    if (!stxxl::parse_SI_IEC_filesize(argv[1], length)) {
-        std::cout << "Error parsing 'filesize' size string." << std::endl;
-        STXXL_MSG("Usage: " << argv[0] << " filesize filename1 [filename2 [filename3 ...]]");
+    stxxl::cmdline_parser cp;
+    cp.add_param_bytes("filesize", "Number of bytes to write to files.", length);
+    cp.add_param_stringlist("filename", "Paths to files to write.", disks_arr);
+
+    if (!cp.process(argc,argv))
         return -1;
-    }
 
     stxxl::uint64 endpos = offset + length;
 
-    std::vector<std::string> disks_arr;
-
-    for (int ii = 2; ii < argc; ++ii)
+    for (size_t i = 0; i < disks_arr.size(); ++i)
     {
-        unlink(argv[ii]);
-        std::cout << "# Add disk: " << argv[ii] << std::endl;
-        disks_arr.push_back(argv[ii]);
+        unlink(disks_arr[i].c_str());
+        std::cout << "# Add disk: " << disks_arr[i] << std::endl;
     }
 
     const unsigned ndisks = disks_arr.size();
-
 
 #ifdef BOOST_MSVC
     unsigned buffer_size = 64 * MB;
