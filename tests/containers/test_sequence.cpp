@@ -84,7 +84,7 @@ int main(int argc, char * argv[])
         {
             std::cout << "Complete check of reverse sequence/deque (size " << XXLDeque.size() << ")\n";
             stxxl::sequence<int>::reverse_stream stream = XXLDeque.get_reverse_stream();
-            std::deque<int>::const_reverse_iterator b = STDDeque.rbegin();
+            std::deque<int>::reverse_iterator b = STDDeque.rbegin();
 
             while ( !stream.empty() )
             {

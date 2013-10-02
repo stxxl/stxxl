@@ -16,6 +16,7 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <limits>
+#include <ostream>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -67,11 +68,17 @@ template <class T1,
           >
 struct tuple
 {
+    //! First tuple component type
     typedef T1 first_type;
+    //! Second tuple component type
     typedef T2 second_type;
+    //! Third tuple component type
     typedef T3 third_type;
+    //! Fourth tuple component type
     typedef T4 fourth_type;
+    //! Fifth tuple component type
     typedef T5 fifth_type;
+    //! Sixth tuple component type
     typedef T6 sixth_type;
 
     template <int I>
@@ -103,7 +110,7 @@ struct tuple
     //! Empty constructor
     tuple() { }
 
-    //! Construct tuple from subitems
+    //! Construct tuple from components
     tuple(first_type _first,
           second_type _second,
           third_type _third,
@@ -119,31 +126,45 @@ struct tuple
           sixth(_sixth)
     { }
 
-    //! return minimum value of tuple using numeric_limits
-    static tuple min_value()
-    { return tuple(std::numeric_limits<first_type>::min(),
-                   std::numeric_limits<second_type>::min(),
-                   std::numeric_limits<third_type>::min(),
-                   std::numeric_limits<fourth_type>::min(),
-                   std::numeric_limits<fifth_type>::min(),
-                   std::numeric_limits<sixth_type>::min()); }
+    //! Make tuple ostream-able
+    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    {
+        return os << '(' << t.first << ',' << t.second << ',' << t.third
+                  << ',' << t.fourth << ',' << t.fifth << ',' << t.sixth
+                  << ')';
+    }
 
-    //! return maximum value of tuple using numeric_limits
+    //! Return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    {
+        return tuple(std::numeric_limits<first_type>::min(),
+                     std::numeric_limits<second_type>::min(),
+                     std::numeric_limits<third_type>::min(),
+                     std::numeric_limits<fourth_type>::min(),
+                     std::numeric_limits<fifth_type>::min(),
+                     std::numeric_limits<sixth_type>::min());
+    }
+
+    //! Return maximum value of tuple using numeric_limits
     static tuple max_value()
-    { return tuple(std::numeric_limits<first_type>::max(),
-                   std::numeric_limits<second_type>::max(),
-                   std::numeric_limits<third_type>::max(),
-                   std::numeric_limits<fourth_type>::max(),
-                   std::numeric_limits<fifth_type>::max(),
-                   std::numeric_limits<sixth_type>::max()); }
+    {
+        return tuple(std::numeric_limits<first_type>::max(),
+                     std::numeric_limits<second_type>::max(),
+                     std::numeric_limits<third_type>::max(),
+                     std::numeric_limits<fourth_type>::max(),
+                     std::numeric_limits<fifth_type>::max(),
+                     std::numeric_limits<sixth_type>::max());
+    }
 };
 
 //! Partial specialization for 1- \c tuple
 template <class T1>
 struct tuple<T1, Plug, Plug, Plug, Plug>
 {
+    //! First tuple component type
     typedef T1 first_type;
 
+    //! First tuple component
     first_type first;
 
     template <int I>
@@ -152,25 +173,40 @@ struct tuple<T1, Plug, Plug, Plug, Plug>
         typedef typename IF<I == 1, first_type, void>::result result;
     };
 
+    //! Empty constructor
     tuple() { }
+
+    //! Initializing constructor
     tuple(first_type first_)
         : first(first_)
     { }
 
-    //! return minimum value of tuple using numeric_limits
-    static tuple min_value()
-    { return tuple(std::numeric_limits<first_type>::min()); }
+    //! Make tuple ostream-able
+    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    {
+        return os << '(' << t.first << ')';
+    }
 
-    //! return maximum value of tuple using numeric_limits
+    //! Return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    {
+        return tuple(std::numeric_limits<first_type>::min());
+    }
+
+    //! Return maximum value of tuple using numeric_limits
     static tuple max_value()
-    { return tuple(std::numeric_limits<first_type>::max()); }
+    {
+        return tuple(std::numeric_limits<first_type>::max());
+    }
 };
 
 //! Partial specialization for 2- \c tuple (equivalent to std::pair)
 template <class T1, class T2>
 struct tuple<T1, T2, Plug, Plug, Plug, Plug>
 {
+    //! First tuple component type
     typedef T1 first_type;
+    //! Second tuple component type
     typedef T2 second_type;
 
     template <int I>
@@ -182,26 +218,40 @@ struct tuple<T1, T2, Plug, Plug, Plug, Plug>
                                              > > >::result result;
     };
 
+    //! First tuple component
     first_type first;
+    //! Second tuple component
     second_type second;
 
+    //! Empty constructor
     tuple() { }
+
+    //! Initializing constructor
     tuple(first_type first_,
-          second_type second_
-        )
+          second_type second_)
         : first(first_),
           second(second_)
     { }
 
-    //! return minimum value of tuple using numeric_limits
-    static tuple min_value()
-    { return tuple(std::numeric_limits<first_type>::min(),
-                   std::numeric_limits<second_type>::min()); }
+    //! Make tuple ostream-able
+    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    {
+        return os << '(' << t.first << ',' << t.second << ')';
+    }
 
-    //! return maximum value of tuple using numeric_limits
+    //! Return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    {
+        return tuple(std::numeric_limits<first_type>::min(),
+                     std::numeric_limits<second_type>::min());
+    }
+
+    //! Return maximum value of tuple using numeric_limits
     static tuple max_value()
-    { return tuple(std::numeric_limits<first_type>::max(),
-                   std::numeric_limits<second_type>::max()); }
+    {
+        return tuple(std::numeric_limits<first_type>::max(),
+                     std::numeric_limits<second_type>::max());
+    }
 };
 
 
@@ -212,8 +262,11 @@ template <class T1,
           >
 struct tuple<T1, T2, T3, Plug, Plug, Plug>
 {
+    //! First tuple component type
     typedef T1 first_type;
+    //! Second tuple component type
     typedef T2 second_type;
+    //! Third tuple component type
     typedef T3 third_type;
 
     template <int I>
@@ -226,32 +279,47 @@ struct tuple<T1, T2, T3, Plug, Plug, Plug>
                                                   > > > >::result result;
     };
 
-
+    //! First tuple component
     first_type first;
+    //! Second tuple component
     second_type second;
+    //! Third tuple component
     third_type third;
 
+    //! Empty constructor
     tuple() { }
+
+    //! Construct tuple from components
     tuple(first_type _first,
           second_type _second,
-          third_type _third
-        )
+          third_type _third)
         : first(_first),
           second(_second),
           third(_third)
     { }
 
-    //! return minimum value of tuple using numeric_limits
-    static tuple min_value()
-    { return tuple(std::numeric_limits<first_type>::min(),
-                   std::numeric_limits<second_type>::min(),
-                   std::numeric_limits<third_type>::min()); }
+    //! Make tuple ostream-able
+    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    {
+        return os << '(' << t.first << ',' << t.second << ',' << t.third
+                  << ')';
+    }
 
-    //! return maximum value of tuple using numeric_limits
+    //! Return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    {
+        return tuple(std::numeric_limits<first_type>::min(),
+                     std::numeric_limits<second_type>::min(),
+                     std::numeric_limits<third_type>::min());
+    }
+
+    //! Return maximum value of tuple using numeric_limits
     static tuple max_value()
-    { return tuple(std::numeric_limits<first_type>::max(),
-                   std::numeric_limits<second_type>::max(),
-                   std::numeric_limits<third_type>::max()); }
+    {
+        return tuple(std::numeric_limits<first_type>::max(),
+                     std::numeric_limits<second_type>::max(),
+                     std::numeric_limits<third_type>::max());
+    }
 };
 
 //! Partial specialization for 4- \c tuple
@@ -262,9 +330,13 @@ template <class T1,
           >
 struct tuple<T1, T2, T3, T4, Plug, Plug>
 {
+    //! First tuple component type
     typedef T1 first_type;
+    //! Second tuple component type
     typedef T2 second_type;
+    //! Third tuple component type
     typedef T3 third_type;
+    //! Fourth tuple component type
     typedef T4 fourth_type;
 
     template <int I>
@@ -278,37 +350,53 @@ struct tuple<T1, T2, T3, T4, Plug, Plug>
                                                             > > > > > >::result result;
     };
 
-
+    //! First tuple component
     first_type first;
+    //! Second tuple component
     second_type second;
+    //! Third tuple component
     third_type third;
+    //! Fourth tuple component
     fourth_type fourth;
 
+    //! Empty constructor
     tuple() { }
+
+    //! Construct tuple from components
     tuple(first_type _first,
           second_type _second,
           third_type _third,
-          fourth_type _fourth
-        )
+          fourth_type _fourth)
         : first(_first),
           second(_second),
           third(_third),
           fourth(_fourth)
     { }
 
-    //! return minimum value of tuple using numeric_limits
-    static tuple min_value()
-    { return tuple(std::numeric_limits<first_type>::min(),
-                   std::numeric_limits<second_type>::min(),
-                   std::numeric_limits<third_type>::min(),
-                   std::numeric_limits<fourth_type>::min()); }
+    //! Make tuple ostream-able
+    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    {
+        return os << '(' << t.first << ',' << t.second << ',' << t.third
+                  << ',' << t.fourth << ')';
+    }
 
-    //! return maximum value of tuple using numeric_limits
+    //! Return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    {
+        return tuple(std::numeric_limits<first_type>::min(),
+                     std::numeric_limits<second_type>::min(),
+                     std::numeric_limits<third_type>::min(),
+                     std::numeric_limits<fourth_type>::min());
+    }
+
+    //! Return maximum value of tuple using numeric_limits
     static tuple max_value()
-    { return tuple(std::numeric_limits<first_type>::max(),
-                   std::numeric_limits<second_type>::max(),
-                   std::numeric_limits<third_type>::max(),
-                   std::numeric_limits<fourth_type>::max()); }
+    {
+        return tuple(std::numeric_limits<first_type>::max(),
+                     std::numeric_limits<second_type>::max(),
+                     std::numeric_limits<third_type>::max(),
+                     std::numeric_limits<fourth_type>::max());
+    }
 };
 
 //! Partial specialization for 5- \c tuple
@@ -320,10 +408,15 @@ template <class T1,
           >
 struct tuple<T1, T2, T3, T4, T5, Plug>
 {
+    //! First tuple component type
     typedef T1 first_type;
+    //! Second tuple component type
     typedef T2 second_type;
+    //! Third tuple component type
     typedef T3 third_type;
+    //! Fourth tuple component type
     typedef T4 fourth_type;
+    //! Fifth tuple component type
     typedef T5 fifth_type;
 
 
@@ -339,19 +432,26 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
                                                                  > > > > > > >::result result;
     };
 
+    //! First tuple component
     first_type first;
+    //! Second tuple component
     second_type second;
+    //! Third tuple component
     third_type third;
+    //! Fourth tuple component
     fourth_type fourth;
+    //! Fifth tuple component
     fifth_type fifth;
 
+    //! Empty constructor
     tuple() { }
+
+    //! Construct tuple from components
     tuple(first_type _first,
           second_type _second,
           third_type _third,
           fourth_type _fourth,
-          fifth_type _fifth
-        )
+          fifth_type _fifth)
         : first(_first),
           second(_second),
           third(_third),
@@ -359,21 +459,32 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
           fifth(_fifth)
     { }
 
-    //! return minimum value of tuple using numeric_limits
-    static tuple min_value()
-    { return tuple(std::numeric_limits<first_type>::min(),
-                   std::numeric_limits<second_type>::min(),
-                   std::numeric_limits<third_type>::min(),
-                   std::numeric_limits<fourth_type>::min(),
-                   std::numeric_limits<fifth_type>::min()); }
+    //! Make tuple ostream-able
+    friend std::ostream& operator<< (std::ostream& os, const tuple& t)
+    {
+        return os << '(' << t.first << ',' << t.second << ',' << t.third
+                  << ',' << t.fourth << ',' << t.fifth << ')';
+    }
 
-    //! return maximum value of tuple using numeric_limits
+    //! Return minimum value of tuple using numeric_limits
+    static tuple min_value()
+    {
+        return tuple(std::numeric_limits<first_type>::min(),
+                     std::numeric_limits<second_type>::min(),
+                     std::numeric_limits<third_type>::min(),
+                     std::numeric_limits<fourth_type>::min(),
+                     std::numeric_limits<fifth_type>::min());
+    }
+
+    //! Return maximum value of tuple using numeric_limits
     static tuple max_value()
-    { return tuple(std::numeric_limits<first_type>::max(),
-                   std::numeric_limits<second_type>::max(),
-                   std::numeric_limits<third_type>::max(),
-                   std::numeric_limits<fourth_type>::max(),
-                   std::numeric_limits<fifth_type>::max()); }
+    {
+        return tuple(std::numeric_limits<first_type>::max(),
+                     std::numeric_limits<second_type>::max(),
+                     std::numeric_limits<third_type>::max(),
+                     std::numeric_limits<fourth_type>::max(),
+                     std::numeric_limits<fifth_type>::max());
+    }
 };
 
 /*
@@ -383,6 +494,60 @@ struct tuple<T1, T2, T3, T4, T5, Plug>
    return NULL;
    }
 */
+
+template <typename TupleType>
+struct tuple_less1st
+{
+    typedef TupleType       value_type;
+
+    bool operator()(const value_type& a, const value_type& b) const {
+        return (a.first < b.first);
+    }
+
+    static value_type min_value() { return value_type::min_value(); }
+    static value_type max_value() { return value_type::max_value(); }
+};
+
+template <typename TupleType>
+struct tuple_greater1st
+{
+    typedef TupleType       value_type;
+
+    bool operator()(const value_type& a, const value_type& b) const {
+        return (a.first > b.first);
+    }
+
+    static value_type min_value() { return value_type::max_value(); }
+    static value_type max_value() { return value_type::min_value(); }
+};
+
+template <typename TupleType>
+struct tuple_less1st_less2nd
+{
+    typedef TupleType       value_type;
+
+    bool operator()(const value_type& a, const value_type& b) const {
+        if (a.first == b.first)
+            return (a.second < b.second);
+        return (a.first < b.first);
+    }
+
+    static value_type min_value() { return value_type::min_value(); }
+    static value_type max_value() { return value_type::max_value(); }
+};
+
+template <typename TupleType>
+struct tuple_less2nd
+{
+    typedef TupleType       value_type;
+
+    bool operator()(const value_type& a, const value_type& b) const {
+        return (a.second < b.second);
+    }
+
+    static value_type min_value() { return value_type::min_value(); }
+    static value_type max_value() { return value_type::max_value(); }
+};
 
 __STXXL_END_NAMESPACE
 

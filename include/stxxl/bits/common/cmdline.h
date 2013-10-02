@@ -70,6 +70,9 @@ protected:
         {
         }
 
+        //! empty virtual destructor
+        virtual ~argument() { }
+
         //! return formatted type name to user
         virtual const char* type_name() const = 0;
 
