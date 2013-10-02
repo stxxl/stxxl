@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 
+ *  Copyright (C) ?
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -14,25 +14,20 @@
 
 struct Cmp
 {
-  bool operator () (const int & a,
-                    const int & b) const
+  bool operator () (const int & a, const int & b) const
   { return a>b; }
+  
   int min_value() const
   { return (std::numeric_limits<int>::max)(); }
 };
 
-typedef stxxl::PRIORITY_QUEUE_GENERATOR<int,
-                                        Cmp,
-					/* use 64 MiB on main memory */         64*1024*1024,
-					/* 1 billion items at most  */          1024*1024
-                                        >::result pq_type;
+// use 64 GiB on main memory and 1 billion items at most
+typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, Cmp, 64*1024*1024, 1024*1024>::result pq_type;  
 typedef pq_type::block_type block_type;
 
-
 int main() {
-  // use 10 block read and write pools
-  // for enable overlapping of I/O and
-  // computation
+
+  // use 10 block read and write pools for enable overlapping of I/O and computation
   stxxl::prefetch_pool<block_type> p_pool(10);
   stxxl::write_pool<block_type>    w_pool(10);
   

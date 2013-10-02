@@ -49,7 +49,7 @@ struct ComparatorGreater
 
 The compare-operator () of two elements a and b returns true, if a is larger than b, otherwise false. Consequently, this priority queue serves it's <b> smallest element on top </b>. The additional min_value() function ensures that Comparator(min_value(),x) is true for each and every x.
 
-Likewise the minimum-on-top Comparator, we can easily define a <b> largest element on top </b> Comparator which stores the the largest contained integer on top as well: 
+iLikewise the minimum-on-top Comparator, we can easily define a <b> largest element on top </b> Comparator which stores the the largest contained integer on top as well: 
 
 \code
 struct ComparatorLess
@@ -104,7 +104,7 @@ To determine the size (i.e. the number of elements) of an instance, call size():
 std::cout << "priority queue stores: " << my_pqueue.size() << " elements" << std::endl;
 \endcode
 
-To check if the priority queue is empty, call empty() which returns true if so:
+To check if the priority queue is empty, call empty() which returns true in case:
 \code
 std::cout << "empty priority queue? " << my_pqueue.empty() << std::endl;
 \endcode
@@ -118,28 +118,23 @@ std::cout << "empty priority queue? " << my_pqueue.empty() << std::endl;
 
 struct Cmp
 {
-  bool operator () (const int & a,
-                    const int & b) const
+  bool operator () (const int & a, const int & b) const
   { return a>b; }
+  
   int min_value() const
   { return (std::numeric_limits<int>::max)(); }
 };
 
-typedef stxxl::PRIORITY_QUEUE_GENERATOR<int,
-                                        Cmp,
-/* use 64 MiB on main memory */         64*1024*1024,
-/* 1 billion items at most  */          1024*1024
-                                        >::result pq_type;
+// use 64 GiB on main memory and 1 billion items at most
+typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, Cmp, 64*1024*1024, 1024*1024>::result pq_type;
 typedef pq_type::block_type block_type;
 
-
 int main() {
-  // use 10 block read and write pools
-  // for enable overlapping of I/O and
-  // computation
+
+  // use 10 block read and write pools for enable overlapping of I/O and computation
   stxxl::prefetch_pool<block_type> p_pool(10);
   stxxl::write_pool<block_type>    w_pool(10);
-
+  
   pq_type Q(p_pool,w_pool);
   Q.push(1);
   Q.push(4);
@@ -149,7 +144,7 @@ int main() {
   Q.push(7);
 
   assert(Q.size() == 6);
-
+  
   assert(Q.top() == 8);
   Q.pop();
 
@@ -169,6 +164,8 @@ int main() {
   Q.pop();
 
   assert(Q.empty());
+  
+  return 0;
 }
 \endcode
 
