@@ -128,7 +128,7 @@ public:
 
     //! cast to bool check for a NULL pointer
     operator bool () const
-    { return m_ptr; }
+    { return valid(); }
 
     //! test for a non-NULL pointer
     bool valid() const

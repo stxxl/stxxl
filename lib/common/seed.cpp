@@ -17,7 +17,8 @@
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/common/mutex.h>
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
+ #define NOMINMAX
  #include <io.h>
  #include <windows.h>
 #else
@@ -52,7 +53,7 @@ inline unsigned initial_seed()
 
     initialized = true;
 #endif // NDEBUG
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
     // GetTickCount():  ms since system start
     return GetTickCount() ^ GetCurrentProcessId();
 #else

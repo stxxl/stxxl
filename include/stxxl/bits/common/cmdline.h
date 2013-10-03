@@ -351,12 +351,12 @@ public:
     //! unconditionally to each line. Lines are wrapped after wraplen
     //! characters if possible.
     static inline void
-    output_wrap(std::ostream& os, const std::string& text, unsigned int wraplen,
-                unsigned indent_first = 0, unsigned int indent_rest = 0,
-                unsigned int current = 0, unsigned int indent_newline = 0)
+    output_wrap(std::ostream& os, const std::string& text, size_t wraplen,
+                size_t indent_first = 0, size_t indent_rest = 0,
+                size_t current = 0, size_t indent_newline = 0)
     {
         std::string::size_type t = 0;
-        unsigned int indent = indent_first;
+        size_t indent = indent_first;
         while (t != text.size())
         {
             std::string::size_type to = t, lspace = t;
@@ -822,7 +822,7 @@ public:
     //! print nicely formatted result of processing
     void print_result(std::ostream& os = std::cerr)
     {
-        unsigned int maxlong = std::max(m_param_maxlong, m_opt_maxlong);
+        size_t maxlong = std::max(m_param_maxlong, m_opt_maxlong);
 
         if (m_paramlist.size())
         {

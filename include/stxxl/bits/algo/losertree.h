@@ -67,7 +67,7 @@ public:
     {
         int_type i;
         logK = ilog2_ceil(nruns);
-        int_type kReg = k = (1 << logK);
+        int_type kReg = k = (int_type(1) << logK);
 
         STXXL_VERBOSE2("loser_tree: logK=" << logK << " nruns=" << nruns << " K=" << kReg);
 
@@ -112,7 +112,7 @@ public:
     }
 
 private:
-    template <unsigned LogK>
+    template <int LogK>
     void multi_merge_unrolled(value_type * out_first, value_type * out_last)
     {
         run_cursor_type * currentE, * winnerE;
@@ -126,7 +126,6 @@ private:
             ++out_first;
 
             ++(*winnerE);
-
 
 #define TreeStep(L) \
     if (LogK >= L) \

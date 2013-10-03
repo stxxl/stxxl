@@ -55,7 +55,7 @@ protected:
     {
         stxxl::int64 offset;
         int_type ibuffer;
-        batch_entry(stxxl::int64 o, int b) : offset(o), ibuffer(b) { }
+        batch_entry(stxxl::int64 o, int_type b) : offset(o), ibuffer(b) { }
     };
     struct batch_entry_cmp
     {

@@ -100,14 +100,14 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
     filename.insert(0, original.substr(0, original.find_last_of("/") + 1));
     ::remove(filename.c_str());
     ::rename(original.c_str(), filename.c_str());
-#ifndef BOOST_MSVC
+#ifndef STXXL_WINDOWS
     //TODO: implement on Windows
     if (::truncate(filename.c_str(), length) != 0) {
         STXXL_THROW2(io_error,
                      "Error doing truncate()");
     }
 #else
-	STXXL_UNUSED(length);
+    STXXL_UNUSED(length);
 #endif
 }
 

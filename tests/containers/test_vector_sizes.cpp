@@ -26,7 +26,7 @@ void test_write(const char * fn, const char * ft, stxxl::unsigned_type sz, my_ty
         v.resize(sz);
         STXXL_MSG("writing " << v.size() << " elements");
         for (stxxl::unsigned_type i = 0; i < v.size(); ++i)
-            v[i] = ofs + i;
+            v[i] = ofs + (int)i;
     }
     delete f;
 }

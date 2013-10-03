@@ -58,7 +58,7 @@ class config : public singleton<config>
 public:
     //! Returns number of disks available to user.
     //! \return number of disks
-    inline unsigned disks_number() const
+    inline size_t disks_number() const
     {
         return disks_props.size();
     }
@@ -80,7 +80,7 @@ public:
     //! Returns path of disks.
     //! \param disk disk's identifier
     //! \return string that contains the disk's path name
-    inline const std::string & disk_path(int disk) const
+    inline const std::string & disk_path(size_t disk) const
     {
         return disks_props[disk].path;
     }
@@ -88,14 +88,14 @@ public:
     //! Returns disk size.
     //! \param disk disk's identifier
     //! \return disk size in bytes
-    inline stxxl::int64 disk_size(int disk) const
+    inline stxxl::int64 disk_size(size_t disk) const
     {
         return disks_props[disk].size;
     }
 
     //! Returns name of I/O implementation of particular disk.
     //! \param disk disk's identifier
-    inline const std::string & disk_io_impl(int disk) const
+    inline const std::string & disk_io_impl(size_t disk) const
     {
         return disks_props[disk].io_impl;
     }

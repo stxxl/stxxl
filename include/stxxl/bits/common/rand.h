@@ -20,7 +20,9 @@
 #include <stxxl/bits/common/types.h>
 #include <stxxl/bits/common/seed.h>
 
-#ifdef STXXL_BOOST_RANDOM
+#if STXXL_STD_RANDOM
+ #include <random>
+#elif STXXL_BOOST_RANDOM
  #include <boost/random.hpp>
 #endif
 
@@ -47,6 +49,12 @@ struct random_number32
     inline value_type operator () () const
     {
         return (ran32State = 1664525 * ran32State + 1013904223);
+    }
+
+    //! Returns a random number from [0, N)
+    inline value_type operator () (const value_type& N) const
+    {
+        return operator()() % N;
     }
 };
 
@@ -97,7 +105,7 @@ struct random_uniform_fast
     }
 };
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
 #pragma warning(push)
 #pragma warning(disable:4512) // assignment operator could not be generated
 #endif
@@ -109,7 +117,18 @@ struct random_uniform_fast
 struct random_uniform_slow
 {
     typedef double value_type;
-#ifdef STXXL_BOOST_RANDOM
+#if STXXL_STD_RANDOM
+    typedef std::default_random_engine gen_type;
+    mutable gen_type gen;
+    typedef std::uniform_real_distribution<> uni_type;
+    mutable uni_type uni;
+
+    random_uniform_slow(unsigned seed = 0)
+        : gen(seed ? seed : get_next_seed()),
+          uni(0.0,1.0)
+    {
+    }
+#elif STXXL_BOOST_RANDOM
     typedef boost::minstd_rand base_generator_type;
     base_generator_type generator;
     boost::uniform_real<> uni_dist;
@@ -121,24 +140,28 @@ struct random_uniform_slow
             seed = get_next_seed();
         uni.engine().seed(seed);
     }
-#else
+#elif STXXL_HAVE_ERAND48
     mutable unsigned short state48[3];
 
     random_uniform_slow(unsigned seed = 0)
     {
         if (!seed)
             seed = get_next_seed();
-        state48[0] = seed & 0xffff;
-        state48[1] = seed >> 16;
+        state48[0] = (unsigned short)(seed & 0xffff);
+        state48[1] = (unsigned short)(seed >> 16);
         state48[2] = 42;
         erand48(state48);
     }
+#else
+ #error "Could not find a slow and precise uniform [0,1) random generator"
 #endif
 
     //! Returns a random number from [0.0, 1.0)
     inline value_type operator () () const
     {
-#ifdef STXXL_BOOST_RANDOM
+#if STXXL_STD_RANDOM
+        return uni(gen);
+#elif STXXL_BOOST_RANDOM
         return uni();
 #else
         return erand48(state48);
@@ -177,9 +200,15 @@ struct random_number64
     {
         return static_cast<value_type>(uniform() * (18446744073709551616.));
     }
+
+    //! Returns a random number from [0, N)
+    inline value_type operator () (value_type N) const
+    {
+        return static_cast<value_type>(uniform() * double(N));
+    }
 };
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
 #pragma warning(pop) // assignment operator could not be generated
 #endif
 

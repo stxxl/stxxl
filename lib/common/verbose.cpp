@@ -20,7 +20,7 @@
 
 
 #ifndef STXXL_THREAD_ID
-# ifdef BOOST_MSVC
+# if STXXL_STD_THREADS || STXXL_BOOST_THREADS
 #  define STXXL_THREAD_ID (-1)
 # else
 #  define STXXL_THREAD_ID pthread_self()

@@ -29,6 +29,12 @@ add_define(test_ksort_all_parameters "STXXL_VERBOSE_STABLE_KSORT=STXXL_VERBOSE0"
 add_define(test_random_shuffle "STXXL_VERBOSE_LEVEL=0")
 add_define(test_sort "STXXL_VERBOSE_LEVEL=0")
 
+if(MSVC AND BUILD_TESTS)
+  # requires /bigobj flag to build
+  set_target_properties(test_ksort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
+  set_target_properties(test_sort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
+endif()
+
 stxxl_test(test_asch 3 100 1000 42)
 stxxl_test(test_bad_cmp 16)
 stxxl_test(test_ksort)

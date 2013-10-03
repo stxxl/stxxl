@@ -28,10 +28,10 @@ struct interleaved_striping
 {
 protected:
     int_type nruns;
-    int begindisk;
-    int diff;
+    unsigned_type begindisk;
+    unsigned_type diff;
 
-    interleaved_striping(int_type nruns, int begindisk, int diff)
+    interleaved_striping(int_type nruns, unsigned_type begindisk, unsigned_type diff)
         : nruns(nruns), begindisk(begindisk), diff(diff)
     { }
 
@@ -40,7 +40,7 @@ public:
         : nruns(_nruns), begindisk(strategy.begin), diff(strategy.diff)
     { }
 
-    int operator () (int_type i) const
+    unsigned_type operator () (unsigned_type i) const
     {
         return begindisk + (i / nruns) % diff;
     }
@@ -48,31 +48,33 @@ public:
 
 struct interleaved_FR : public interleaved_striping
 {
-    random_number<random_uniform_fast> rnd;
+    typedef random_number<random_uniform_fast> rnd_type;
+    rnd_type rnd;
 
     interleaved_FR(int_type _nruns, const FR & strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff)
     { }
 
-    int operator () (int_type /*i*/) const
+    unsigned_type operator () (unsigned_type /*i*/) const
     {
-        return begindisk + rnd(diff);
+        return begindisk + rnd(rnd_type::value_type(diff));
     }
 };
 
 struct interleaved_SR : public interleaved_striping
 {
+    typedef random_number<random_uniform_fast> rnd_type;
     std::vector<int> offsets;
 
     interleaved_SR(int_type _nruns, const SR & strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff)
     {
-        random_number<random_uniform_fast> rnd;
+        rnd_type rnd;
         for (int_type i = 0; i < nruns; i++)
-            offsets.push_back(rnd(diff));
+            offsets.push_back( rnd(rnd_type::value_type(diff)) );
     }
 
-    int operator () (int_type i) const
+    unsigned_type operator () (unsigned_type i) const
     {
         return begindisk + (i / nruns + offsets[i % nruns]) % diff;
     }
@@ -81,15 +83,15 @@ struct interleaved_SR : public interleaved_striping
 
 struct interleaved_RC : public interleaved_striping
 {
-    std::vector<std::vector<int> > perms;
+    std::vector< std::vector<unsigned_type> > perms;
 
     interleaved_RC(int_type _nruns, const RC & strategy)
         : interleaved_striping(_nruns, strategy.begin, strategy.diff),
-          perms(nruns, std::vector<int>(diff))
+          perms(nruns, std::vector<unsigned_type>(diff))
     {
         for (int_type i = 0; i < nruns; i++)
         {
-            for (int j = 0; j < diff; j++)
+            for (unsigned_type j = 0; j < diff; j++)
                 perms[i][j] = j;
 
             random_number<random_uniform_fast> rnd;
@@ -97,7 +99,7 @@ struct interleaved_RC : public interleaved_striping
         }
     }
 
-    int operator () (int_type i) const
+    unsigned_type operator () (unsigned_type i) const
     {
         return begindisk + perms[i % nruns][(i / nruns) % diff];
     }
@@ -109,7 +111,7 @@ struct first_disk_only : public interleaved_striping
         : interleaved_striping(_nruns, strategy.disk, 1)
     { }
 
-    int operator () (int_type) const
+    unsigned_type operator () (unsigned_type) const
     {
         return begindisk;
     }

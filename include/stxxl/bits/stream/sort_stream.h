@@ -1354,7 +1354,7 @@ namespace stream
                 if (runs2merge > 1) // non-trivial merge
                 {
                     // count the number of elements in the run
-                    unsigned_type elements_in_new_run = 0;
+                    size_type elements_in_new_run = 0;
                     for (unsigned_type i = nruns - runs_left; i < (nruns - runs_left + runs2merge); ++i)
                     {
                         elements_in_new_run += m_sruns->runs_sizes[i];
@@ -1607,11 +1607,11 @@ void sort(RandomAccessIterator begin,
           AllocStr AS)
 {
     STXXL_UNUSED(AS);
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
     typedef typename streamify_traits<RandomAccessIterator>::stream_type InputType;
 #else
     typedef __typeof__(stream::streamify(begin, end)) InputType;
-#endif //BOOST_MSVC
+#endif // STXXL_MSVC
     InputType Input(begin, end);
     typedef stream::sort<InputType, CmpType, BlockSize, AllocStr> sorter_type;
     sorter_type Sort(Input, cmp, MemSize);

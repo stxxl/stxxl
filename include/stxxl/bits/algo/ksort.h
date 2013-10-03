@@ -228,7 +228,7 @@ namespace ksort_local
         }
 
         unsigned_type k = 0;
-        const int shift1 = sizeof(key_type) * 8 - log_k1;
+        const int shift1 = (int)(sizeof(key_type) * 8 - log_k1);
         const int shift2 = shift1 - log_k2;
         STXXL_VERBOSE("shift1: " << shift1 << " shift2:" << shift2);
 
@@ -457,7 +457,7 @@ namespace ksort_local
         }
         std::stable_sort(consume_seq.begin(), consume_seq.end() _STXXL_SORT_TRIGGER_FORCE_SEQUENTIAL);
 
-        unsigned disks_number = config::get_instance()->disks_number();
+        size_t disks_number = config::get_instance()->disks_number();
 
 #ifdef PLAY_WITH_OPT_PREF
         const int_type n_write_buffers = 4 * disks_number;

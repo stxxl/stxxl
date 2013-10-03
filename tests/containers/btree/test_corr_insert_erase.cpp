@@ -72,7 +72,7 @@ int main(int argc, char * argv[])
 
     const stxxl::uint64 nins = 1ULL << log_nins;
 
-    stxxl::ran32State = time(NULL);
+    stxxl::ran32State = (unsigned int)time(NULL);
 
 
     stxxl::vector<int> Values(nins);
@@ -104,14 +104,14 @@ int main(int argc, char * argv[])
     {
         btree_type::iterator bIt = BTree.find(*vIt);
         STXXL_CHECK(bIt != BTree.end());
-        bool f = BTree.erase((*vIt) + 1);       // erasing non-existent element
-        STXXL_CHECK(f == 0);
-        f = BTree.erase(*vIt);                  // erasing existing element
-        STXXL_CHECK(f == 1);
-        bIt = BTree.find(*vIt);                 // checking it is not there
-        STXXL_CHECK(bIt == BTree.end());
-        f = BTree.erase(*vIt);                  // trying to erase it again
-        STXXL_CHECK(f == 0);
+        // erasing non-existent element
+        STXXL_CHECK( BTree.erase((*vIt) + 1) == 0 );
+        // erasing existing element
+        STXXL_CHECK( BTree.erase(*vIt) == 1 );
+        // checking it is not there
+        STXXL_CHECK( BTree.find(*vIt) == BTree.end() );
+        // trying to erase it again
+        STXXL_CHECK( BTree.erase(*vIt) == 0 );
     }
 
     STXXL_CHECK(BTree.empty());

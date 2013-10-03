@@ -289,7 +289,7 @@ public:
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,
-        block_size = cfg::block_size,
+        block_size = cfg::block_size
     };
 
     //! type of block used in disk-memory transfers
@@ -373,7 +373,7 @@ public:
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
         }
-        catch (const io_error & ex)
+        catch (const io_error &)
         { }
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
     }
@@ -504,7 +504,7 @@ public:
     typedef typename cfg::size_type size_type;
     enum {
         blocks_per_page = cfg::blocks_per_page,     // stack of this type has only one page
-        block_size = cfg::block_size,
+        block_size = cfg::block_size
     };
 
     //! type of block used in disk-memory transfers
@@ -602,7 +602,7 @@ public:
             }
             delete cache;
         }
-        catch (const io_error & ex)
+        catch (const io_error &)
         { }
         block_manager::get_instance()->delete_blocks(bids.begin(), bids.end());
         delete owned_pool;
@@ -783,13 +783,13 @@ public:
     bool internal() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-        return int_impl;
+        return (int_impl != NULL);
     }
     //! Returns true if current implementation is external, otherwise false.
     bool external() const
     {
         assert((int_impl && !ext_impl) || (!int_impl && ext_impl));
-        return ext_impl;
+        return (ext_impl != NULL);
     }
 
     //! Returns true if the stack is empty.

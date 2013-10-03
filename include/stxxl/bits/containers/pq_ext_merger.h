@@ -411,7 +411,7 @@ private:
     {
         if (node == 0)
         {                                    // winner part of root
-            *mask = 1 << (log_k - 1);
+            *mask = unsigned_type(1) << (log_k - 1);
             *winner_key = entry[0].key;
             *winner_index = entry[0].index;
             if (cmp(entry[node].key, new_key))
@@ -902,7 +902,7 @@ private:
         entry[0].key = winner_key;
     }
 
-    template <class OutputIterator, unsigned LogK>
+    template <class OutputIterator, int LogK>
     void multi_merge_f(OutputIterator begin, OutputIterator end)
     {
         OutputIterator done = end;

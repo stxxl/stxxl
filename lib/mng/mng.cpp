@@ -44,7 +44,7 @@ block_manager::block_manager()
 block_manager::~block_manager()
 {
     STXXL_VERBOSE1("Block manager destructor");
-    for (unsigned i = ndisks; i > 0; )
+    for (size_t i = ndisks; i > 0; )
     {
         --i;
         delete disk_allocators[i];

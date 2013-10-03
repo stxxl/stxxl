@@ -89,7 +89,7 @@ namespace priority_queue_local
         void multi_merge_k(Element * target, unsigned_type length);
 
 #if STXXL_PQ_INTERNAL_LOSER_TREE
-        template <unsigned LogK>
+        template <int LogK>
         void multi_merge_f(Element * target, unsigned_type length)
         {
             //Entry *currentPos;
@@ -126,7 +126,7 @@ namespace priority_queue_local
                 // update loser tree
 #define TreeStep(L) \
     if (1 << LogK >= 1 << L) { \
-        Entry * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> (((int(LogK - L) + 1) >= 0) ? ((LogK - L) + 1) : 0)); \
+        Entry * pos ## L = regEntry + ((winnerIndex + (1 << LogK)) >> ((LogK - L+1 >= 0) ? (LogK - L+1) : 0)); \
         Element key ## L = pos ## L->key; \
         if (cmp(winnerKey, key ## L)) { \
             unsigned_type index ## L = pos ## L->index; \
@@ -285,7 +285,7 @@ namespace priority_queue_local
         unsigned_type * mask)              // 1 << (ceil(log KNK) - dist-from-root)
     {
         if (node == 0) {                   // winner part of root
-            *mask = 1 << (logK - 1);
+            *mask = (unsigned_type)(1) << (logK - 1);
             *winnerKey = entry[0].key;
             *winnerIndex = entry[0].index;
             if (cmp(entry[node].key, newKey))

@@ -19,10 +19,11 @@
 
 #include <stxxl/bits/config.h>
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
 
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
+#define NOMINMAX
 #include <windows.h>
 
 
@@ -58,6 +59,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef BOOST_MSVC
+#endif // #ifdef STXXL_WINDOWS
 
 #endif // !STXXL_WFSFILEBASE_HEADER

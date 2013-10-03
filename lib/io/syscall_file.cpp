@@ -19,8 +19,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
 #define lseek _lseeki64
+#define off_t int64
 #endif
 
 void syscall_file::serve(const request * req) throw (io_error)
@@ -53,7 +54,12 @@ void syscall_file::serve(const request * req) throw (io_error)
 
         if (type == request::READ)
         {
+#if STXXL_MSVC
+            assert(bytes <= std::numeric_limits<unsigned int>::max());
+            if ((rc = ::read(file_des, buffer, (unsigned int)bytes)) <= 0)
+#else
             if ((rc = ::read(file_des, buffer, bytes)) <= 0)
+#endif
             {
                 STXXL_THROW2(io_error,
                              " this=" << this <<
@@ -80,7 +86,12 @@ void syscall_file::serve(const request * req) throw (io_error)
         }
         else
         {
+#if STXXL_MSVC
+            assert(bytes <= std::numeric_limits<unsigned int>::max());
+            if ((rc = ::write(file_des, buffer, (unsigned int)bytes)) <= 0)
+#else
             if ((rc = ::write(file_des, buffer, bytes)) <= 0)
+#endif
             {
                 STXXL_THROW2(io_error,
                              " this=" << this <<

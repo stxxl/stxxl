@@ -244,9 +244,9 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type ndisks = cfg->disks_number();
     const unsigned_type min_num_read_write_buffers = (write_buffers_multiple + read_buffers_multiple) * ndisks;
     const unsigned_type nmaxbuckets = m - min_num_read_write_buffers;
-    const unsigned_type lognbuckets = ilog2_floor(nmaxbuckets);
+    const unsigned int lognbuckets = ilog2_floor(nmaxbuckets);
     const unsigned_type nbuckets = 1 << lognbuckets;
-    const unsigned_type est_bucket_size = div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
+    const uint64 est_bucket_size = div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
         STXXL_ERRMSG("stxxl::stable_ksort: Not enough memory. Blocks available: " << m <<
@@ -354,8 +354,8 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
         unsigned_type k1 = 1 << log_k1;
         int_type * bucket1 = new int_type[k1];
 
-        const unsigned shift = sizeof(key_type) * 8 - lognbuckets;
-        const unsigned shift1 = shift - log_k1;
+        const unsigned int shift = (unsigned int)(sizeof(key_type) * 8 - lognbuckets);
+        const unsigned int shift1 = shift - log_k1;
 
         STXXL_VERBOSE_STABLE_KSORT("Classifying " << nbuckets << " buckets, max size:" << max_bucket_size_rec <<
                                    " block size:" << block_type::size << " log_k1:" << log_k1);
@@ -365,7 +365,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
             nbucket_blocks = div_ceil(bucket_sizes[k], block_type::size);
             const unsigned log_k1_k = STXXL_MAX<unsigned>(ilog2_ceil(bucket_sizes[k] * sizeof(type_key_) / STXXL_L2_SIZE), 1);
             assert(log_k1_k <= log_k1);
-            k1 = 1 << log_k1_k;
+            k1 = (unsigned_type)(1) << log_k1_k;
             std::fill(bucket1, bucket1 + k1, 0);
 
             STXXL_VERBOSE_STABLE_KSORT("Classifying bucket " << k << " size:" << bucket_sizes[k] <<

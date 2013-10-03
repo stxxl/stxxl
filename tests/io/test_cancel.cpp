@@ -61,7 +61,7 @@ int main(int argc, char ** argv)
         req[i] = file->awrite(buffer, i * size, size, print_completion());
     //cancel first half
     std::cout << "Canceling first " << num_blocks / 2 << " requests." << std::endl;
-    unsigned num_canceled = cancel_all(req, req + num_blocks / 2);
+    size_t num_canceled = cancel_all(req, req + num_blocks / 2);
     std::cout << "Successfully canceled " << num_canceled << " requests." << std::endl;
     //cancel every second in second half
     for (unsigned i = num_blocks / 2; i < num_blocks; i += 2)

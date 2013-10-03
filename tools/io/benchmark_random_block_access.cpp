@@ -26,11 +26,6 @@
 #include <stxxl/io>
 #include <stxxl/mng>
 
-#ifndef BOOST_MSVC
- #include <unistd.h>
-#endif
-
-
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
@@ -116,7 +111,7 @@ void run_test(stxxl::int64 span, stxxl::int64 num_blocks, bool do_init, bool do_
 
         std::cout << "Random block access..." << std::endl;
 
-        srand(time(NULL));
+        srand((unsigned int)time(NULL));
         std::random_shuffle(blocks.begin(), blocks.end());
 
         begin = timestamp();

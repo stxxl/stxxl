@@ -95,7 +95,7 @@ int main()
     {
         if ((i % (1024 * 1024)) == 0)
             STXXL_MSG("Inserting element " << i);
-        p.push(my_type(nelements - i));
+        p.push(my_type( int(nelements - i) ));
     }
     Timer.stop();
     STXXL_MSG("Time spent for filling: " << Timer.seconds() << " s");

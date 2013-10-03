@@ -109,7 +109,7 @@ void usage(const char * argv0)
 }
 
 // returns throughput in MiB/s
-inline double throughput(double bytes, double seconds)
+inline double throughput(stxxl::uint64 bytes, double seconds)
 {
     if (seconds == 0.0)
         return 0.0;
@@ -136,7 +136,7 @@ int main(int argc, char * argv[])
     if (first_disk_arg < argc)
         block_size = atoi(argv[first_disk_arg]);
     if (block_size > 0) {
-        int l = strlen(argv[first_disk_arg]);
+        size_t l = strlen(argv[first_disk_arg]);
         if (argv[first_disk_arg][l - 1] == 'B' || argv[first_disk_arg][l - 1] == 'b') {
             // suffix B means exact size
         } else {
@@ -183,10 +183,10 @@ int main(int argc, char * argv[])
         disks_arr.push_back(argv[ii]);
     }
 
-    const unsigned ndisks = disks_arr.size();
+    const size_t ndisks = disks_arr.size();
 
     const stxxl::unsigned_type step_size = block_size * batch_size;
-    const unsigned block_size_int = block_size / sizeof(int);
+    const stxxl::unsigned_type block_size_int = block_size / sizeof(int);
     const stxxl::int64 step_size_int = step_size / sizeof(int);
 
     unsigned * buffer = (unsigned *)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * ndisks);
@@ -211,7 +211,7 @@ int main(int argc, char * argv[])
 #endif
         }
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
         disks[i] = new stxxl::wincall_file(disks_arr[i], openmode, i);
 #else
         disks[i] = new stxxl::syscall_file(disks_arr[i], openmode, i);
@@ -241,7 +241,7 @@ int main(int argc, char * argv[])
         {
             const stxxl::int64 current_step_size = std::min<stxxl::int64>(step_size, endpos - offset);
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
-            const unsigned current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
+            const stxxl::unsigned_type current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
 
             std::cout << "Disk offset    " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
 
@@ -249,12 +249,12 @@ int main(int argc, char * argv[])
 
             if (do_write) {
                 // write block number (512 byte blocks) into each block at position 42 * sizeof(unsigned)
-                for (unsigned j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(unsigned), ++b)
+                for (stxxl::int64 j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(unsigned), ++b)
                 {
                     for (unsigned i = 0; i < ndisks; i++)
-                        buffer[current_step_size_int * i + j] = b;
+                        buffer[current_step_size_int * i + j] = (unsigned int)b;
                 }
-                for (unsigned i = 0; i < ndisks; i++)
+                for (size_t i = 0; i < ndisks; i++)
                 {
                     for (unsigned j = 0; j < current_num_blocks; j++)
                         reqs[i * current_num_blocks + j] =
@@ -341,8 +341,8 @@ int main(int argc, char * argv[])
             if (do_read) {
                 for (unsigned d = 0; d < ndisks; ++d) {
                     for (unsigned s = 0; s < (current_step_size >> 9); ++s) {
-                        unsigned i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
-                        unsigned b = (offset >> 9) + s;
+                        stxxl::unsigned_type i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
+                        stxxl::unsigned_type b = (offset >> 9) + s;
                         if (buffer[i] != b) {
                             verify_failed = true;
                             std::cout << "Error on disk " << d << " sector " << std::hex << std::setw(8) << b
@@ -352,13 +352,13 @@ int main(int argc, char * argv[])
                         buffer[i] = pattern;
                     }
                 }
-                for (unsigned i = 0; i < ndisks * current_step_size_int; i++)
+                for (stxxl::unsigned_type i = 0; i < ndisks * current_step_size_int; i++)
                 {
                     if (buffer[i] != pattern)
                     {
                         verify_failed = true;
-                        int ibuf = i / current_step_size_int;
-                        int pos = i % current_step_size_int;
+                        stxxl::unsigned_type ibuf = i / current_step_size_int;
+                        stxxl::unsigned_type pos = i % current_step_size_int;
 
                         std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
                                   << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << pattern

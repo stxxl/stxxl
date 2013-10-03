@@ -70,4 +70,6 @@ int main(int argc, char ** argv)
     STXXL_CHECK(in == out);
 
     std::cout << *stxxl::stats::get_instance();
+
+    return 0;
 }

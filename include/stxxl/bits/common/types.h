@@ -21,19 +21,20 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-#ifdef STXXL_BOOST_CONFIG
- #ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
+typedef __int8 int8;
+typedef unsigned __int8 uint8;
+typedef __int16 int16;
+typedef unsigned __int16 uint16;
 typedef __int32 int32;
 typedef unsigned __int32 uint32;
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
- #else
-typedef int int32;
-typedef unsigned int uint32;
-typedef long long int int64;
-typedef unsigned long long int uint64;
- #endif
 #else
+typedef char int8;
+typedef unsigned char uint8;
+typedef short int16;
+typedef unsigned short uint16;
 typedef int int32;
 typedef unsigned int uint32;
 typedef long long int int64;
@@ -51,8 +52,8 @@ struct choose_int_types
 template <>
 struct choose_int_types<4>  // for 32-bit processors/compilers
 {
-    typedef int int_type;
-    typedef unsigned unsigned_type;
+    typedef int32 int_type;
+    typedef uint32 unsigned_type;
 };
 
 template <>

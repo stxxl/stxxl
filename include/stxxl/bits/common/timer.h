@@ -23,6 +23,9 @@
 #ifdef STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>
  #include <cmath>
+#elif STXXL_WINDOWS
+ #define NOMINMAX
+ #include <windows.h>
 #else
  #include <ctime>
  #include <sys/time.h>
@@ -44,6 +47,8 @@ timestamp()
                  double(Duration.seconds()) +
                  double(Duration.fractional_seconds()) / (pow(10., Duration.num_fractional_digits()));
     return sec;
+#elif STXXL_WINDOWS
+    return GetTickCount() / 1000.0;
 #else
     struct timeval tp;
     gettimeofday(&tp, NULL);

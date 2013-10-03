@@ -54,7 +54,7 @@ using stxxl::timestamp;
 //#define WATCH_TIMES
 
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
 const char * default_file_type = "wincall";
 #else
 const char * default_file_type = "syscall";
@@ -100,7 +100,7 @@ void out_stat(double start, double end, double * times, unsigned n, const std::v
 #define MB (1024 * 1024)
 
 // returns throughput in MiB/s
-static inline double throughput(double bytes, double seconds)
+static inline double throughput(stxxl::int64 bytes, double seconds)
 {
     if (seconds == 0.0)
         return 0.0;
@@ -190,11 +190,11 @@ int benchmark_files(int argc, char * argv[])
         std::cout << "# Add disk: " << disks_arr[ii] << std::endl;
     }
 
-    const unsigned ndisks = disks_arr.size();
+    const size_t ndisks = disks_arr.size();
 
     const stxxl::unsigned_type step_size = block_size * batch_size;
-    const unsigned block_size_int = block_size / sizeof(int);
-    const stxxl::int64 step_size_int = step_size / sizeof(int);
+    const stxxl::uint64 block_size_int = block_size / sizeof(int);
+    const stxxl::uint64 step_size_int = step_size / sizeof(int);
 
     unsigned * buffer = (unsigned *)stxxl::aligned_alloc<BLOCK_ALIGN>(step_size * ndisks);
     file ** disks = new file *[ndisks];
@@ -245,9 +245,9 @@ int benchmark_files(int argc, char * argv[])
     try {
         while (offset + stxxl::uint64(step_size) <= endpos || length == 0)
         {
-            const stxxl::int64 current_step_size = (length == 0) ? stxxl::int64(step_size) : std::min<stxxl::int64>(step_size, endpos - offset);
-            const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
-            const unsigned current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
+            const stxxl::uint64 current_step_size = (length == 0) ? stxxl::int64(step_size) : std::min<stxxl::int64>(step_size, endpos - offset);
+            const stxxl::uint64 current_step_size_int = current_step_size / sizeof(int);
+            const stxxl::uint64 current_num_blocks = stxxl::div_ceil(current_step_size, block_size);
 
             std::cout << "Disk offset    " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
 
@@ -339,12 +339,12 @@ int benchmark_files(int argc, char * argv[])
 #endif
 
             if (do_read && do_verify) {
-                for (unsigned i = 0; i < ndisks * current_step_size_int; i++)
+                for (stxxl::uint64 i = 0; i < ndisks * current_step_size_int; i++)
                 {
                     if (buffer[i] != i)
                     {
-                        int ibuf = i / current_step_size_int;
-                        int pos = i % current_step_size_int;
+                        stxxl::int64 ibuf = i / current_step_size_int;
+                        stxxl::uint64 pos = i % current_step_size_int;
 
                         std::cout << "Error on disk " << ibuf << " position " << std::hex << std::setw(8) << offset + pos * sizeof(int)
                                   << "  got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << i

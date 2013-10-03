@@ -39,7 +39,7 @@ void test(stxxl::uint64 data_mem, unsigned memory_to_use)
     memory_to_use = stxxl::div_ceil(memory_to_use, vector_type::block_type::raw_size) * vector_type::block_type::raw_size;
 
     vector_type v(records_to_sort);
-    unsigned ndisks = stxxl::config::get_instance()->disks_number();
+    size_t ndisks = stxxl::config::get_instance()->disks_number();
     STXXL_MSG("Sorting " << records_to_sort << " records of size " << sizeof(T));
     STXXL_MSG("Total volume " << (records_to_sort * sizeof(T)) / MB << " MiB");
     STXXL_MSG("Using " << memory_to_use / MB << " MiB");

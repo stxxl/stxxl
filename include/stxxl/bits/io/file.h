@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
 // this is not stxxl/bits/io/io.h !
  #include <io.h>
 #else
@@ -113,7 +113,7 @@ public:
         DIRECT = 16,                        //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O
         TRUNC = 32,                         //!< once file is opened its length becomes zero
         SYNC = 64,                          //!< open the file with O_SYNC | O_DSYNC | O_RSYNC flags set
-        NO_LOCK = 128,                      //!< do not aquire an exclusive lock by default
+        NO_LOCK = 128                       //!< do not aquire an exclusive lock by default
     };
 
     static const int DEFAULT_QUEUE = -1;

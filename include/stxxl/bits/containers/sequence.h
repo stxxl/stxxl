@@ -117,7 +117,7 @@ public:
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
     //!           memory consumption will be 2 * D + 2 blocks 
     //!           (first and last block, D blocks as write cache, D block for prefetching)
-    explicit sequence(int D = -1) :
+    explicit sequence(int_type D = -1) :
         m_size(0),
         m_owns_pool(true),
         m_alloc_count(0),

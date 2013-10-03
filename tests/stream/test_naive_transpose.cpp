@@ -102,7 +102,7 @@ int main()
 
     // buffers for streamify and materialize,
     // block size matches the block size of the input/output vector
-    unsigned numbuffers = 2 * stxxl::config::get_instance()->disks_number();
+    size_t numbuffers = 2 * stxxl::config::get_instance()->disks_number();
 
     // RAM to be used for sorting (in bytes)
     size_t memory_for_sorting = 1 << 28;
@@ -125,7 +125,7 @@ int main()
 
     // HERE streaming part begins (streamifying)
     // create input stream
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
     typedef stxxl::stream::streamify_traits<array_type::iterator>::stream_type input_stream_type;
 #else
     typedef __typeof__(stxxl::stream::streamify(input.begin(), input.end())) input_stream_type;

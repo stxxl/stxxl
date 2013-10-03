@@ -67,7 +67,7 @@ public:
 
     //! If it has an internal_block. The internal_block implicitly holds valid data.
     bool is_internal() const
-    { return internal_data; }
+    { return (internal_data != NULL); }
 
     //! If the external_block does not hold valid data.
     bool is_dirty() const
@@ -364,8 +364,8 @@ public:
             STXXL_ERRMSG("not all swappable_blocks are free, those not acquired will be deinitialized");
             for (typename std::vector<SwappableBlockType>::iterator it = swappable_blocks.begin(); // evictable_blocks would suffice
                     it != swappable_blocks.end(); ++it)
-                if (! it->is_acquired())
-                    num_freed_internal_blocks += bool(it->deinitialize()); // count internal_blocks that get freed
+                if (! it->is_acquired() && it->deinitialize() )
+                    num_freed_internal_blocks ++; // count internal_blocks that get freed
         }
         if (int_type nlost = (max_internal_blocks - remaining_internal_blocks)
                 - (free_internal_blocks.size() + num_freed_internal_blocks))
@@ -1496,7 +1496,8 @@ protected:
                     {
                         // => needs internal_block -> try to get one
                         // -> try to get one from block_scheduler
-                        if (! (schedule_meta->second.reserved_iblock = get_free_internal_block_from_block_scheduler()))
+                        schedule_meta->second.reserved_iblock = get_free_internal_block_from_block_scheduler();
+                        if (! schedule_meta->second.reserved_iblock)
                         {
                             // -> try to get one by evicting
                             if (free_evictable_blocks.empty())
@@ -1517,7 +1518,7 @@ protected:
                                         || ! shall_keep_internal_block(giver_meta, false));
                             }
                             write_read_request * wrr = schedule_write(giver);
-                            schedule_meta->second.giver.first = bool(wrr);
+                            schedule_meta->second.giver.first = (wrr != NULL);
                             schedule_meta->second.giver.second = giver;
                             schedule_meta->second.reserved_iblock = swappable_blocks[giver].detach_internal_block();
                             if (wrr)
@@ -1646,8 +1647,8 @@ public:
             if (! sblock.is_acquired())
             {
                 // not acquired yet -> remove from scheduled_evictable_blocks
-                bool t = scheduled_evictable_blocks.erase(sbid);
-                STXXL_ASSERT(t);
+                size_t t = scheduled_evictable_blocks.erase(sbid);
+                STXXL_ASSERT(t != 0);
                 wait_on_read(schedule_meta);
             }
             sblock.acquire();
@@ -1736,18 +1737,18 @@ public:
         SwappableBlockType & sblock = swappable_blocks[sbid];
         if (sblock.is_evictable())
         {
-            bool t;
+            size_t t;
             if (shall_keep_internal_block(schedule_meta, false))
             {
-                if (! (t = scheduled_evictable_blocks.erase(sbid)))
-                {
+                t = scheduled_evictable_blocks.erase(sbid);
+                if (t == 0) {
                     STXXL_ERRMSG("dirty block not scheduled on deinitialize");
                     t = free_evictable_blocks.erase(sbid);
                 }
             }
             else
                 t = free_evictable_blocks.erase(sbid);
-            assert(t);
+            assert(t != 0);
         }
         if (internal_block_type * iblock = sblock.deinitialize())
         {

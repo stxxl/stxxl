@@ -15,7 +15,7 @@
 
 #include <stxxl/bits/config.h>
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
 
 #include <cmath>
 

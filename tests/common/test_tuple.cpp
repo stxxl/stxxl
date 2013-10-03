@@ -21,28 +21,28 @@ using stxxl::uint40;
 using stxxl::uint64;
 
 // force instantiation of some tuple types
-template class tuple<int>;
-template class tuple<int,int>;
-template class tuple<int,int,int>;
-template class tuple<int,int,int,int>;
-template class tuple<int,int,int,int,int>;
-template class tuple<int,int,int,int,int,int>;
+template struct tuple<int>;
+template struct tuple<int,int>;
+template struct tuple<int,int,int>;
+template struct tuple<int,int,int,int>;
+template struct tuple<int,int,int,int,int>;
+template struct tuple<int,int,int,int,int,int>;
 
 // force instantiation of more tuple types
-template class tuple<uint64>;
-template class tuple<uint64,uint64>;
-template class tuple<uint64,uint64,uint64>;
-template class tuple<uint64,uint64,uint64,uint64>;
-template class tuple<uint64,uint64,uint64,uint64,uint64>;
-template class tuple<uint64,uint64,uint64,uint64,uint64,uint64>;
+template struct tuple<uint64>;
+template struct tuple<uint64,uint64>;
+template struct tuple<uint64,uint64,uint64>;
+template struct tuple<uint64,uint64,uint64,uint64>;
+template struct tuple<uint64,uint64,uint64,uint64,uint64>;
+template struct tuple<uint64,uint64,uint64,uint64,uint64,uint64>;
 
 // force instantiation of even more tuple types
-template class tuple<uint40>;
-template class tuple<uint40,uint40>;
-template class tuple<uint40,uint40,uint40>;
-template class tuple<uint40,uint40,uint40,uint40>;
-template class tuple<uint40,uint40,uint40,uint40,uint40>;
-template class tuple<uint40,uint40,uint40,uint40,uint40,uint40>;
+template struct tuple<uint40>;
+template struct tuple<uint40,uint40>;
+template struct tuple<uint40,uint40,uint40>;
+template struct tuple<uint40,uint40,uint40,uint40>;
+template struct tuple<uint40,uint40,uint40,uint40,uint40>;
+template struct tuple<uint40,uint40,uint40,uint40,uint40,uint40>;
 
 void test1()
 {

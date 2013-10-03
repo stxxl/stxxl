@@ -258,7 +258,7 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
     // distribute input into random buckets
     int_type random_bucket = 0;
     for (i = 0; i < n; ++i, ++_cur) {
-        random_bucket = rand(k);
+        random_bucket = rand((unsigned)k);
         typename ExtIterator_::value_type tmp;
         in >> tmp;
         buckets[random_bucket]->push(tmp); // reading the current input element

@@ -19,7 +19,7 @@
 #include <stxxl/aligned_alloc>
 #include <stxxl/bits/common/cmdline.h>
 
-#ifndef BOOST_MSVC
+#ifndef STXXL_WINDOWS
  #include <unistd.h>
 #endif
 
@@ -109,9 +109,9 @@ int create_files(int argc, char * argv[])
         std::cout << "# Add disk: " << disks_arr[i] << std::endl;
     }
 
-    const unsigned ndisks = disks_arr.size();
+    const size_t ndisks = disks_arr.size();
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
     unsigned buffer_size = 64 * MB;
 #else
     unsigned buffer_size = 256 * MB;
@@ -137,7 +137,7 @@ int create_files(int argc, char * argv[])
 
     for (i = 0; i < ndisks; i++)
     {
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
  #ifdef RAW_ACCESS
         disks[i] = new stxxl::wincall_file(disks_arr[i],
                                            file::CREAT | file::RDWR | file::DIRECT, i);
@@ -158,8 +158,8 @@ int create_files(int argc, char * argv[])
 
     while (offset < endpos)
     {
-        const unsigned current_block_size = length ? std::min<stxxl::int64>(buffer_size, endpos - offset) : buffer_size;
-        const unsigned current_chunk_size = current_block_size / chunks;
+        const stxxl::int64 current_block_size = length ? std::min<stxxl::int64>(buffer_size, endpos - offset) : buffer_size;
+        const stxxl::int64 current_chunk_size = current_block_size / chunks;
 
         std::cout << "Disk offset " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
 

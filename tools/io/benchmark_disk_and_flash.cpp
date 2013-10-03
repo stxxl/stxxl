@@ -16,11 +16,6 @@
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 
-#ifndef BOOST_MSVC
- #include <unistd.h>
-#endif
-
-
 using stxxl::request_ptr;
 using stxxl::file;
 using stxxl::timestamp;
@@ -119,7 +114,7 @@ int main(int argc, char * argv[])
         disks_arr.push_back(argv[ii]);
     }
 
-    const unsigned ndisks = disks_arr.size();
+    const size_t ndisks = disks_arr.size();
     stxxl::int64 buffer_size = 1024 * MB;
     const stxxl::int64 buffer_size_int = buffer_size / sizeof(int);
 

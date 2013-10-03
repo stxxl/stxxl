@@ -313,7 +313,7 @@ namespace btree
             {
                 // already exists
                 return std::pair<iterator, bool>(
-                           iterator(btree_, my_bid(), it - block_->begin()),
+                           iterator(btree_, my_bid(), unsigned(it - block_->begin())),
                            false);
             }
 
@@ -326,7 +326,7 @@ namespace btree
             *it = x;
 
             std::vector<iterator_base *> Iterators2Fix;
-            btree_->iterator_map_.find(my_bid(), it - block_->begin(), size(), Iterators2Fix);
+            btree_->iterator_map_.find(my_bid(), unsigned(it - block_->begin()), size(), Iterators2Fix);
             typename std::vector<iterator_base *>::iterator it2fix = Iterators2Fix.begin();
             for ( ; it2fix != Iterators2Fix.end(); ++it2fix)
             {
@@ -337,7 +337,7 @@ namespace btree
 
             ++(block_->info.cur_size);
 
-            std::pair<iterator, bool> result(iterator(btree_, my_bid(), it - block_->begin()), true);
+            std::pair<iterator, bool> result(iterator(btree_, my_bid(), unsigned(it - block_->begin())), true);
 
             if (size() <= max_nelements())
             {
@@ -429,7 +429,7 @@ namespace btree
                 return btree_->end();
 
 
-            return iterator(btree_, my_bid(), lb - block_->begin());
+            return iterator(btree_, my_bid(), unsigned(lb - block_->begin()));
         }
 
         const_iterator find(const key_type & k) const
@@ -441,7 +441,7 @@ namespace btree
                 return btree_->end();
 
 
-            return const_iterator(btree_, my_bid(), lb - block_->begin());
+            return const_iterator(btree_, my_bid(), unsigned(lb - block_->begin()));
         }
 
         iterator lower_bound(const key_type & k)
@@ -457,7 +457,7 @@ namespace btree
                 return iterator(btree_, succ(), 0);
             }
 
-            return iterator(btree_, my_bid(), lb - block_->begin());
+            return iterator(btree_, my_bid(), unsigned(lb - block_->begin()));
         }
 
         const_iterator lower_bound(const key_type & k) const
@@ -472,7 +472,7 @@ namespace btree
                 return iterator(btree_, succ(), 0);
             }
 
-            return const_iterator(btree_, my_bid(), lb - block_->begin());
+            return const_iterator(btree_, my_bid(), unsigned(lb - block_->begin()));
         }
 
         iterator upper_bound(const key_type & k)
@@ -487,7 +487,7 @@ namespace btree
                 return iterator(btree_, succ(), 0);
             }
 
-            return iterator(btree_, my_bid(), lb - block_->begin());
+            return iterator(btree_, my_bid(), unsigned(lb - block_->begin()));
         }
 
         const_iterator upper_bound(const key_type & k) const
@@ -502,7 +502,7 @@ namespace btree
                 return const_iterator(btree_, succ(), 0);
             }
 
-            return const_iterator(btree_, my_bid(), lb - block_->begin());
+            return const_iterator(btree_, my_bid(), unsigned(lb - block_->begin()));
         }
 
         size_type erase(const key_type & k)
@@ -519,7 +519,7 @@ namespace btree
             std::copy(it + 1, block_->begin() + size(), it);
 
             std::vector<iterator_base *> Iterators2Fix;
-            btree_->iterator_map_.find(my_bid(), it + 1 - block_->begin(), size(), Iterators2Fix);
+            btree_->iterator_map_.find(my_bid(), unsigned(it + 1 - block_->begin()), size(), Iterators2Fix);
             typename std::vector<iterator_base *>::iterator it2fix = Iterators2Fix.begin();
             for ( ; it2fix != Iterators2Fix.end(); ++it2fix)
             {

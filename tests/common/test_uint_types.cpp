@@ -14,8 +14,8 @@
 #include <stxxl/bits/verbose.h>
 
 // forced instantiation
-template class stxxl::uint_pair<uint8_t>;
-template class stxxl::uint_pair<uint16_t>;
+template class stxxl::uint_pair<stxxl::uint8>;
+template class stxxl::uint_pair<stxxl::uint16>;
 
 template <typename uint>
 void dotest(unsigned int nbytes)
@@ -30,8 +30,8 @@ void dotest(unsigned int nbytes)
     uint b = 0xFFFFFF00;
     uint b_save = b; 
 
-    uint64_t b64 = b;
-    for (uint32_t i = 0; i < 1024; ++i)
+    stxxl::uint64 b64 = b;
+    for (stxxl::uint32 i = 0; i < 1024; ++i)
     {
         STXXL_CHECK( b.u64() == b64 );
         STXXL_CHECK( b.ull() == b64 );
@@ -41,7 +41,7 @@ void dotest(unsigned int nbytes)
 
     STXXL_CHECK( b != b_save );
 
-    for (uint32_t i = 0; i < 1024; ++i)
+    for (stxxl::uint32 i = 0; i < 1024; ++i)
     {
         STXXL_CHECK( b.u64() == b64 );
         STXXL_CHECK( b.ull() == b64 );

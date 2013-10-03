@@ -51,7 +51,7 @@ std::ostream & operator << (std::ostream & i, const LogEntry & entry)
 struct ProduceBill
 {
     std::ostream & out;
-    unsigned sum;
+    stxxl::uint64 sum;
     LogEntry last;
 
     ProduceBill(std::ostream & o_) : out(o_), sum(0) { last.from = -1; }

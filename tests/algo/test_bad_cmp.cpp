@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    unsigned memory_to_use = SIZE * 1024 * 1024;
+    stxxl::unsigned_type memory_to_use = SIZE * 1024 * 1024;
     typedef stxxl::vector<my_type> vector_type;
 
     const stxxl::int64 n_records =
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
     STXXL_MSG("Filling vector with min_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
     for (vector_type::size_type i = 0; i < v.size(); i++) {
         v[i]._key = 0;
-        v[i]._data = i + 1;
+        v[i]._data = (int)(i + 1);
     }
 
     STXXL_MSG("Checking order...");
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
             ++aliens;
         else if (v[i]._data != i + 1)
             ++not_stable;
-        v[i]._data = i + 1;
+        v[i]._data = (int)(i + 1);
     }
     STXXL_MSG("elements that were not in the input:     " << aliens);
     STXXL_MSG("elements not on their expected location: " << not_stable);
@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
             ++aliens;
         else if (v[i]._data != i + 1)
             ++not_stable;
-        v[i]._data = i + 1;
+        v[i]._data = (int)(i + 1);
     }
     STXXL_MSG("elements that were not in the input:     " << aliens);
     STXXL_MSG("elements not on their expected location: " << not_stable);
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
     STXXL_MSG("Filling vector with max_value..., input size = " << v.size() << " elements (" << ((v.size() * sizeof(my_type)) >> 20) << " MiB)");
     for (vector_type::size_type i = 0; i < v.size(); i++) {
         v[i]._key = unsigned(-1);
-        v[i]._data = i + 1;
+        v[i]._data = int(i + 1);
     }
 
     STXXL_MSG("Sorting subset (using " << (memory_to_use >> 20) << " MiB of memory)...");
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
             ++aliens;
         else if (v[i]._data != i + 1)
             ++not_stable;
-        v[i]._data = i + 1;
+        v[i]._data = int(i + 1);
     }
     STXXL_MSG("elements that were not in the input:     " << aliens);
     STXXL_MSG("elements not on their expected location: " << not_stable);

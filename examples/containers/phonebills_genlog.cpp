@@ -79,13 +79,13 @@ int main(int argc, char * argv[])
     vector_type log;
     log.reserve(2 * ncalls);
 
-    stxxl::random_number<> rnd;
+    stxxl::random_number64 rnd;
 
     for (long long int number = 0;
          number < nclients && calls_made < ncalls;
          ++number)
     {
-        unsigned serv = std::min<long long int>(rnd(av_calls * 2), (ncalls - calls_made));
+        long long int serv = std::min<long long int>(rnd(av_calls * 2), (ncalls - calls_made));
         LogEntry e;
         e.from = number;
 

@@ -132,7 +132,7 @@ public:
         // construct vector
         typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
     
-        unsigned vec_size = stxxl::div_ceil(length, sizeof(ValueType));
+        uint64 vec_size = stxxl::div_ceil(length, sizeof(ValueType));
 
         vector_type vec(vec_size);
 

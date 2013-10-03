@@ -20,7 +20,8 @@
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/config.h>
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
+  #define NOMINMAX
   #include <windows.h>
 #else
   #include <unistd.h>
@@ -46,7 +47,7 @@ config::config()
         return;
     }
 
-#ifndef BOOST_MSVC
+#ifndef STXXL_WINDOWS
     // read environment, unix style
     const char* hostname = getenv("HOSTNAME");
     const char* home = getenv("HOME");
@@ -113,7 +114,7 @@ void config::init(const std::string& config_path)
     {
         STXXL_ERRMSG("Warning: no config file found.");
         STXXL_ERRMSG("Using default disk configuration.");
-#ifndef BOOST_MSVC
+#ifndef STXXL_WINDOWS
         DiskEntry entry1 = { "/var/tmp/stxxl", "syscall", 1000 * 1024 * 1024, true, false };
 #else
         DiskEntry entry1 = { "", "wincall", 1000 * 1024 * 1024, true, false };
@@ -172,7 +173,7 @@ void config::init(const std::string& config_path)
     }
 
     // put flash devices after regular disks
-    first_flash = disks_props.size();
+    first_flash = (unsigned int)disks_props.size();
     disks_props.insert(disks_props.end(), flash_props.begin(), flash_props.end());
 
     if (disks_props.empty())

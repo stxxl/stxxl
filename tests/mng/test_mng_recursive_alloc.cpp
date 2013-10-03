@@ -20,11 +20,10 @@ template class stxxl::typed_block<BLOCK_SIZE, int>; // forced instantiation
 
 int main()
 {
-    unsigned i;
     stxxl::int64 totalsize = 0;
     stxxl::config * config = stxxl::config::get_instance();
 
-    for (i = 0; i < config->disks_number(); ++i)
+    for (size_t i = 0; i < config->disks_number(); ++i)
         totalsize += config->disk_size(i);
     stxxl::unsigned_type totalblocks = totalsize / block_type::raw_size;
 

@@ -6,6 +6,7 @@
  *  Copyright (C) 2002-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008, 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -15,19 +16,19 @@
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/io/request.h>
 
-#ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
+#if STXXL_BOOST_THREADS
  #include <boost/bind.hpp>
 #endif
 
-
+#include <iostream>
 __STXXL_BEGIN_NAMESPACE
 
 void request_queue_impl_worker::start_thread(void * (*worker)(void *), void * arg, thread_type & t, state<thread_state> & s)
-#ifdef STXXL_BOOST_THREADS
-#endif
 {
     assert(s() == NOT_RUNNING);
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+    t = new std::thread(worker, arg);
+#elif STXXL_BOOST_THREADS
     t = new boost::thread(boost::bind(worker, arg));
 #else
     check_pthread_call(pthread_create(&t, NULL, worker, arg));
@@ -40,7 +41,16 @@ void request_queue_impl_worker::stop_thread(thread_type & t, state<thread_state>
     assert(s() == RUNNING);
     s.set_to(TERMINATING);
     sem++;
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+#if STXXL_MSVC >= 1700
+    // skip join and delete of threads due to deadlock bug in CRT library,
+    // which occurs due to main() exiting before the threads do.
+#else
+    t->join();
+    delete t;
+#endif
+    t = NULL;
+#elif STXXL_BOOST_THREADS
     t->join();
     delete t;
     t = NULL;

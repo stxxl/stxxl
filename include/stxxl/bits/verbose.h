@@ -164,7 +164,7 @@ __STXXL_END_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
 
 #define stxxl_win_lasterror_exit(errmsg, exception_type) \
     do { \

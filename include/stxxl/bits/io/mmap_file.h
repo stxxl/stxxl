@@ -18,7 +18,7 @@
 #include <stxxl/bits/config.h>
 
 #ifndef STXXL_HAVE_MMAP_FILE
-#ifndef BOOST_MSVC
+#ifndef STXXL_WINDOWS
 // mmap call does not exist in Windows
  #define STXXL_HAVE_MMAP_FILE 1
 #else

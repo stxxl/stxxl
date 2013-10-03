@@ -166,4 +166,6 @@ int main()
         stxxl::queue<int> q;
         q.push(42);
     }
+
+    return 0;
 }

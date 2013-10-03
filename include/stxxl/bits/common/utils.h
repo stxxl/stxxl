@@ -162,7 +162,7 @@ static inline bool parse_SI_IEC_size(const std::string& str, uint64& size)
 
 inline stxxl::int64 atoint64(const char * s)
 {
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
     return _atoi64(s);
 #else
     return atoll(s);

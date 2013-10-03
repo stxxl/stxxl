@@ -17,16 +17,36 @@
 #ifndef STXXL_CONFIG_HEADER
 #define STXXL_CONFIG_HEADER
 
-#cmakedefine STXXL_PARALLEL_MODE_EXPLICIT
+#cmakedefine STXXL_POSIX_THREADS ${STXXL_POSIX_THREADS}
+// default: off
+// cmake:   detection of pthreads by cmake
+// effect:  uses POSIX thread and mutexes on linux
+
+#cmakedefine STXXL_STD_THREADS ${STXXL_STD_THREADS}
+// default: off
+// cmake:   detection of <thread> and <mutex>
+// effect:  uses std thread and mutex on windows or (forced on linux)
+
+#cmakedefine STXXL_WINDOWS ${STXXL_WINDOWS}
+// default: off
+// cmake:   detection of ms windows platform (32- or 64-bit)
+// effect:  enables windows-specific api calls (mingw or msvc)
+
+#cmakedefine STXXL_MSVC ${STXXL_MSVC}
+// default: off
+// cmake:   detection of ms visual c++ via cmake
+// effect:  enables msvc-specific headers and macros
+
+#cmakedefine STXXL_PARALLEL_MODE_EXPLICIT ${STXXL_PARALLEL_MODE_EXPLICIT}
 // default: off
 // cmake:   -DUSE_GNU_PARALLEL=ON
 // effect:  explicitly enables use of __gnu_parallel algorithms
 
-#cmakedefine STXXL_BOOST_CONFIG
-#cmakedefine STXXL_BOOST_FILESYSTEM
-#cmakedefine STXXL_BOOST_RANDOM
-#cmakedefine STXXL_BOOST_THREADS
-#cmakedefine STXXL_BOOST_TIMESTAMP
+#cmakedefine STXXL_BOOST_CONFIG ${STXXL_BOOST_CONFIG}
+#cmakedefine STXXL_BOOST_FILESYSTEM ${STXXL_BOOST_FILESYSTEM}
+#cmakedefine STXXL_BOOST_RANDOM ${STXXL_BOOST_RANDOM}
+#cmakedefine STXXL_BOOST_THREADS ${STXXL_BOOST_THREADS}
+#cmakedefine STXXL_BOOST_TIMESTAMP ${STXXL_BOOST_TIMESTAMP}
 // default: off
 // cmake:   -DUSE_BOOST=ON
 // effect:  enables use of boost libraries in different parts of STXXL.
@@ -34,5 +54,15 @@
 #ifdef STXXL_BOOST_CONFIG
   #include <boost/config.hpp>
 #endif
+
+#cmakedefine STXXL_STD_RANDOM ${STXXL_STD_RANDOM}
+// default: off
+// cmake:   detection of <random>
+// effect:  uses std random generator on windows or (forced on linux)
+
+#cmakedefine STXXL_HAVE_ERAND48 ${STXXL_HAVE_ERAND48}
+// default: off
+// cmake:   detection of erand48() function in <stdlib.h>
+// effect:  uses this random generator (default on linux)
 
 #endif // !STXXL_CONFIG_HEADER

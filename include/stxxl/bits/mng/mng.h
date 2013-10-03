@@ -27,7 +27,7 @@
 #include <string>
 #include <cstdlib>
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
 #include <memory.h>
 #endif
 
@@ -66,7 +66,7 @@ class block_manager : public singleton<block_manager>
     DiskAllocator ** disk_allocators;
     file ** disk_files;
 
-    unsigned ndisks;
+    size_t ndisks;
     block_manager();
 
 #if STXXL_MNG_COUNT_ALLOCATION
@@ -203,7 +203,7 @@ void block_manager::new_blocks_int(
     unsigned_type i;
     for (i = 0; i < nblocks; ++i)
     {
-        const int disk = functor(offset + i);
+        unsigned_type disk = functor(offset + i);
         disk_ptrs[i] = disk_files[disk];
         bl[disk]++;
     }

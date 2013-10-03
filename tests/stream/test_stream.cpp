@@ -149,7 +149,7 @@ int main()
 
     // HERE streaming part begins (streamifying)
     // create input stream
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
     typedef streamify_traits<input_array_type::iterator>::stream_type input_stream_type;
 #else
     typedef __typeof__(streamify(input.begin(), input.end())) input_stream_type;
@@ -159,7 +159,7 @@ int main()
 
 
     // create counter stream
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
     typedef stxxl::stream::generator2stream<counter_type> counter_stream_type;
 #else
     typedef __typeof__(streamify(counter_type())) counter_stream_type;

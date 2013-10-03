@@ -30,7 +30,7 @@ void log_i()
               << stxxl::LOG2<i>::floor << "\t"
               << stxxl::LOG2<i>::ceil << std::endl;
 
-#ifndef BOOST_MSVC
+#ifndef STXXL_MSVC
     std::cout << "\t\t"
               << log2l((long double)i) << "\t"
               << (unsigned_type)floorl(log2l(i)) << "\t"
@@ -43,7 +43,7 @@ void log_i()
         STXXL_CHECK( stxxl::LOG2<i>::floor == 0 );
         STXXL_CHECK( stxxl::LOG2<i>::ceil == 0 );
     }
-    else if (i <= (1UL << 59)) // does not work for higher powers
+    else if (i <= ((stxxl::uint64)(1) << 59)) // does not work for higher powers
     {
         std::cout << "\t\t"
                   << stxxl::ilog2_floor(i) << "\t"
@@ -54,7 +54,7 @@ void log_i()
         STXXL_CHECK( stxxl::LOG2<i>::floor == stxxl::ilog2_floor(i) );
         STXXL_CHECK( stxxl::LOG2<i>::ceil == stxxl::ilog2_ceil(i) );
 
-#ifndef BOOST_MSVC
+#ifndef STXXL_MSVC
         STXXL_CHECK( stxxl::LOG2_floor<i>::value == (unsigned_type)floorl(log2l(i)) );
         STXXL_CHECK( stxxl::LOG2<i>::floor == (unsigned_type)floorl(log2l(i)) );
         STXXL_CHECK( stxxl::LOG2<i>::ceil == (unsigned_type)ceill(log2l(i)) );

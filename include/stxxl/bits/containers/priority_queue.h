@@ -484,7 +484,7 @@ void priority_queue<ConfigType>::refill_delete_buffer()
 
     size_type total_group_size = 0;
     //num_active_groups is <= 4
-    for (int i = num_active_groups - 1; i >= 0; i--)
+    for (int i = (int)num_active_groups - 1; i >= 0; i--)
     {
         if ((group_buffers[i] + N) - group_buffer_current_mins[i] < delete_buffer_size)
         {
@@ -649,7 +649,7 @@ unsigned_type priority_queue<ConfigType>::make_space_available(unsigned_type lev
                      ", capacity(last externel group (" << num_int_groups + num_ext_groups - 1 << "))=" << capacity);
         dump_sizes();
 
-        int extLevel = level - num_int_groups;
+        unsigned_type extLevel = level - num_int_groups;
         const size_type segmentSize = ext_mergers[extLevel]->size();
         STXXL_VERBOSE1("Inserting segment into last level external: " << level << " " << segmentSize);
         ext_merger_type * overflow_merger = new ext_merger_type;

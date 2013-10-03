@@ -89,7 +89,7 @@ int main(int argc, char * argv[])
     STXXL_CHECK(it == BTree1.end());
 
 
-    int f = BTree1.erase(5);
+    stxxl::unsigned_type f = BTree1.erase(5);
     STXXL_CHECK(f == 1);
     f = BTree1.erase(6);
     STXXL_CHECK(f == 0);

@@ -18,7 +18,7 @@
 #include <stxxl/bits/config.h>
 
 #ifndef STXXL_HAVE_WINCALL_FILE
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
  #define STXXL_HAVE_WINCALL_FILE 1
 #else
  #define STXXL_HAVE_WINCALL_FILE 0

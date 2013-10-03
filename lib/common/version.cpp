@@ -36,7 +36,7 @@ __STXXL_BEGIN_NAMESPACE
 int version_major()
 {
     return STXXL_VERSION_MAJOR;
-};
+}
 
 int version_minor()
 {

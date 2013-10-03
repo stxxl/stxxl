@@ -63,7 +63,7 @@ namespace btree
                     longhash1(bid.offset + uint64(unsigned_type(bid.storage)));
                 return result;
             }
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
             bool operator () (const bid_type & a, const bid_type & b) const
             {
                 return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);

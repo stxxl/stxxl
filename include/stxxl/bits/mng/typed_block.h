@@ -72,7 +72,7 @@ public:
     element_block() { STXXL_VERBOSE_TYPED_BLOCK("[" << (void *)this << "] element_block is constructed"); }
 
     //! An operator to access elements in the block
-    reference operator [] (int i)
+    reference operator [] (size_t i)
     {
         return elem[i];
     }
@@ -131,7 +131,7 @@ public:
     bid_type ref[nbids];
 
     //! An operator to access bid references
-    bid_type & operator () (int i)
+    bid_type & operator () (size_t i)
     {
         return ref[i];
     }

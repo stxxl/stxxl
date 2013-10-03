@@ -42,7 +42,7 @@ void wait_all(request_iterator_ reqs_begin, request_iterator_ reqs_end)
 //! Suspends calling thread until \b all given requests are completed.
 //! \param req_array array of request_ptr objects
 //! \param count size of req_array
-inline void wait_all(request_ptr req_array[], int count)
+inline void wait_all(request_ptr req_array[], size_t count)
 {
     wait_all(req_array, req_array + count);
 }
@@ -91,7 +91,7 @@ request_iterator_ poll_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 //! \param count size of req_array
 //! \param index contains index of the \b first completed request if any
 //! \return \c true if any of requests is completed, then index contains valid value, otherwise \c false
-inline bool poll_any(request_ptr req_array[], int count, int & index)
+inline bool poll_any(request_ptr req_array[], size_t count, size_t & index)
 {
     request_ptr * res = poll_any(req_array, req_array + count);
     index = res - req_array;
@@ -150,7 +150,7 @@ request_iterator_ wait_any(request_iterator_ reqs_begin, request_iterator_ reqs_
 //! \param req_array array of \c request_ptr objects
 //! \param count size of req_array
 //! \return index in req_array pointing to the \b first completed request
-inline int wait_any(request_ptr req_array[], int count)
+inline size_t wait_any(request_ptr req_array[], size_t count)
 {
     return wait_any(req_array, req_array + count) - req_array;
 }

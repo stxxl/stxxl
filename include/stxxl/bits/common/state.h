@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,11 +17,16 @@
 
 #include <stxxl/bits/config.h>
 
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+ #include <mutex>
+ #include <condition_variable>
+#elif STXXL_BOOST_THREADS
  #include <boost/thread/mutex.hpp>
  #include <boost/thread/condition.hpp>
-#else
+#elif STXXL_POSIX_THREADS
  #include <pthread.h>
+#else
+ #error "Thread implementation not detected."
 #endif
 
 #include <stxxl/bits/noncopyable.h>
@@ -34,10 +40,15 @@ class state : private noncopyable
 {
     typedef Tp value_type;
 
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+    std::mutex mutex;
+    std::condition_variable cond;
+    typedef std::unique_lock<std::mutex> scoped_lock;
+#elif STXXL_BOOST_THREADS
     boost::mutex mutex;
     boost::condition cond;
-#else
+    typedef boost::mutex::scoped_lock scoped_lock;
+#elif STXXL_POSIX_THREADS
     pthread_mutex_t mutex;
     pthread_cond_t cond;
 #endif
@@ -46,7 +57,7 @@ class state : private noncopyable
 public:
     state(value_type s) : _state(s)
     {
-#ifndef STXXL_BOOST_THREADS
+#if STXXL_POSIX_THREADS
         check_pthread_call(pthread_mutex_init(&mutex, NULL));
         check_pthread_call(pthread_cond_init(&cond, NULL));
 #endif
@@ -54,7 +65,7 @@ public:
 
     ~state()
     {
-#ifndef STXXL_BOOST_THREADS
+#if STXXL_POSIX_THREADS
         int res = pthread_mutex_trylock(&mutex);
 
         if (res == 0 || res == EBUSY) {
@@ -68,8 +79,8 @@ public:
 
     void set_to(value_type new_state)
     {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(mutex);
+#if STXXL_STD_THREADS || STXXL_BOOST_THREADS
+        scoped_lock Lock(mutex);
         _state = new_state;
         Lock.unlock();
         cond.notify_all();
@@ -83,8 +94,8 @@ public:
 
     void wait_for(value_type needed_state)
     {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(mutex);
+#if STXXL_STD_THREADS || STXXL_BOOST_THREADS
+        scoped_lock Lock(mutex);
         while (needed_state != _state)
             cond.wait(Lock);
 
@@ -99,8 +110,8 @@ public:
 
     value_type operator () ()
     {
-#ifdef STXXL_BOOST_THREADS
-        boost::mutex::scoped_lock Lock(mutex);
+#if STXXL_STD_THREADS || STXXL_BOOST_THREADS
+        scoped_lock Lock(mutex);
         return _state;
 #else
         value_type res;

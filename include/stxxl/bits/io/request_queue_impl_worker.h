@@ -6,6 +6,7 @@
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008, 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -17,10 +18,14 @@
 
 #include <stxxl/bits/config.h>
 
-#ifdef STXXL_BOOST_THREADS // Use Portable Boost threads
+#if STXXL_STD_THREADS
+ #include <thread>
+#elif STXXL_BOOST_THREADS
  #include <boost/thread/thread.hpp>
-#else
+#elif STXXL_POSIX_THREADS
  #include <pthread.h>
+#else
+ #error "Thread implementation not detected."
 #endif
 
 #include <stxxl/bits/io/request_queue.h>
@@ -38,7 +43,9 @@ class request_queue_impl_worker : public request_queue
 protected:
     enum thread_state { NOT_RUNNING, RUNNING, TERMINATING, TERMINATE = TERMINATING };
 
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+    typedef std::thread * thread_type;
+#elif STXXL_BOOST_THREADS
     typedef boost::thread * thread_type;
 #else
     typedef pthread_t thread_type;

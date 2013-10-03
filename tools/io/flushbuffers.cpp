@@ -16,10 +16,6 @@
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 
-#ifndef BOOST_MSVC
- #include <unistd.h>
-#endif
-
 
 using stxxl::timestamp;
 using stxxl::file;
@@ -102,7 +98,7 @@ int main(int argc, char * argv[])
         disks_arr.push_back(argv[ii]);
     }
 
-    const unsigned ndisks = disks_arr.size();
+    const size_t ndisks = disks_arr.size();
     const unsigned buffer_size = 1024 * 1024 * 64;
     const unsigned buffer_size_int = buffer_size / sizeof(int);
     const unsigned chunks = 32;
@@ -114,7 +110,7 @@ int main(int argc, char * argv[])
     double * w_finish_times = new double[ndisks];
 #endif
 
-    int count = (end_offset - offset) / buffer_size;
+    stxxl::int64 count = (end_offset - offset) / buffer_size;
 
     unsigned i = 0, j = 0;
 

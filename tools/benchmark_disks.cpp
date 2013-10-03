@@ -33,10 +33,6 @@
 #include <stxxl/mng>
 #include <stxxl/bits/common/cmdline.h>
 
-#ifndef BOOST_MSVC
- #include <unistd.h>
-#endif
-
 using stxxl::timestamp;
 
 #ifdef BLOCK_ALIGN
@@ -78,7 +74,7 @@ int benchmark_disks_alloc(stxxl::uint64 length, stxxl::uint64 step_size,
 
     if (step_size == 0) step_size = raw_block_size;
 
-    unsigned num_blocks_per_step = stxxl::div_ceil(step_size, raw_block_size);
+    stxxl::uint64 num_blocks_per_step = stxxl::div_ceil(step_size, raw_block_size);
     step_size = num_blocks_per_step * raw_block_size;
 
     block_type * buffer = new block_type[num_blocks_per_step];
@@ -107,7 +103,7 @@ int benchmark_disks_alloc(stxxl::uint64 length, stxxl::uint64 step_size,
 #if CHECK_AFTER_READ
             const stxxl::int64 current_step_size_int = current_step_size / sizeof(int);
 #endif
-            const unsigned current_num_blocks_per_step = stxxl::div_ceil(current_step_size, raw_block_size);
+            const stxxl::uint64 current_num_blocks_per_step = stxxl::div_ceil(current_step_size, raw_block_size);
 
             std::cout << "Offset    " << std::setw(7) << offset / MB << " MiB: " << std::fixed;
 

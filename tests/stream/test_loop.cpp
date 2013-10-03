@@ -184,7 +184,7 @@ struct shuffle
                 combined = combined << 32 | *input;
                 combined = (1ul << count_bits(combined)) - 1;
                 current = combined >> 32;
-                next = combined;
+                next = (value_type)combined;
             }
         }
     }

@@ -42,7 +42,7 @@ void long_test()
 
     STXXL_MSG("Filling vector with increasing values...");
     stxxl::generate(STXXLVector.begin(), STXXLVector.end(),
-                    counter<stxxl::uint64>(), 4);
+                    counter<int>(), 4);
 
     stxxl::uint64 i;
 
@@ -74,7 +74,7 @@ void short_test()
     vector_type::size_type i;
     vector_type v(2048);
     for (i = 0; i < v.size(); ++i)
-        v[i] = i / 1024 + 1;
+        v[i] = (int)(i / 1024 + 1);
 
     std::cout << v.size() << std::endl;
     std::cout << "before shuffle:" << std::endl;

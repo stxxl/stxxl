@@ -91,7 +91,7 @@ namespace btree
         mutable leaf_cache_type leaf_cache_;
         iterator_map_type iterator_map_;
         size_type size_;
-        unsigned_type height_;
+        unsigned int height_;
         bool prefetching_enabled_;
         block_manager * bm_;
         alloc_strategy_type alloc_strategy_;
@@ -134,7 +134,7 @@ namespace btree
                     ++block_it;
                     ++it;
                 }
-                LeftNode->block().info.cur_size = half;
+                LeftNode->block().info.cur_size = (unsigned int)half;
                 key_type LeftKey = (LeftNode->block()[half - 1]).first;
 
                 block_it = RightNode->block().begin();
@@ -145,7 +145,7 @@ namespace btree
                     ++block_it;
                     ++it;
                 }
-                unsigned_type right_size = RightNode->block().info.cur_size = old_size - half;
+                unsigned_type right_size = RightNode->block().info.cur_size = (unsigned int)(old_size - half);
                 key_type RightKey = (RightNode->block()[right_size - 1]).first;
 
                 assert(old_size == RightNode->size() + LeftNode->size());

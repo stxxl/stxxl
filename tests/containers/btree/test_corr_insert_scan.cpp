@@ -71,7 +71,7 @@ int main(int argc, char * argv[])
 
     const stxxl::uint64 nins = 1ULL << log_nins;
 
-    stxxl::ran32State = time(NULL);
+    stxxl::ran32State = (unsigned int)time(NULL);
 
     stxxl::vector<int> Values(nins);
     STXXL_MSG("Generating " << nins << " random values");

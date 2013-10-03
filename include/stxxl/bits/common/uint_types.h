@@ -25,17 +25,6 @@
 #include <ostream>
 #include <assert.h>
 
-#ifdef BOOST_MSVC
-  #include <boost/cstdint.hpp>
-  using boost::uint8_t;
-  using boost::uint16_t;
-  using boost::int32_t;
-  using boost::uint32_t;
-  using boost::uint64_t;
-#else
-  #include <inttypes.h>
-#endif
-
 __STXXL_BEGIN_NAMESPACE
 
 /*!
@@ -57,7 +46,7 @@ __STXXL_BEGIN_NAMESPACE
  * the lower/higher part. Not all arithmetic operations are supported, patches
  * welcome if you really need the operations.
  */
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
 #pragma pack(push, 1)
 #endif
 template <typename HighType>
@@ -65,7 +54,7 @@ class uint_pair
 {
 public:
     //! lower part type, always 32-bit
-    typedef uint32_t low_type;
+    typedef uint32 low_type;
     //! higher part type, currently either 8-bit or 16-bit
     typedef HighType high_type;
 
@@ -126,13 +115,13 @@ public:
     }
 
     //! const from a simple 32-bit unsigned integer
-    inline uint_pair(const uint32_t& a)
+    inline uint_pair(const uint32& a)
         : low(a), high(0)
     {
     }
 
     //! const from a simple 32-bit signed integer
-    inline uint_pair(const int32_t& a)
+    inline uint_pair(const int32& a)
         : low(a), high(0)
     {
         assert(a >= 0);
@@ -159,10 +148,10 @@ public:
         return ull();
     }
 
-    //! return the number as a uint64_t
-    inline uint64_t u64() const
+    //! return the number as a uint64
+    inline uint64 u64() const
     {
-        return ((uint64_t)high) << low_bits | (uint64_t)low;
+        return ((uint64)high) << low_bits | (uint64)low;
     }
 
     //! prefix increment operator (directly manipulates the integer parts)
@@ -188,7 +177,7 @@ public:
     //! addition operator (uses 64-bit arithmetic)
     inline uint_pair& operator+= (const uint_pair& b)
     {
-        uint64_t add = low + b.low;
+        uint64 add = low + b.low;
         low = add & low_max();
         high += b.high + ((add >> low_bits) & high_max());
         return *this;
@@ -250,7 +239,7 @@ public:
                          std::numeric_limits<high_type>::max());
     }
 }
-#ifdef BOOST_MSVC
+#ifdef STXXL_MSVC
     ;
 #pragma pack(pop)
 #else
@@ -258,10 +247,10 @@ __attribute__((packed));
 #endif
 
 //! Construct a 40-bit unsigned integer stored in five bytes.
-typedef uint_pair<uint8_t> uint40;
+typedef uint_pair<uint8> uint40;
 
 //! Construct a 48-bit unsigned integer stored in six bytes.
-typedef uint_pair<uint16_t> uint48;
+typedef uint_pair<uint16> uint48;
 
 __STXXL_END_NAMESPACE
 
@@ -297,7 +286,7 @@ public:
     static const bool is_exact = true;
 
     //! unit_pair radix is binary
-    static const bool radix = 2;
+    static const int radix = 2;
 
     //! number of binary digits (bits) in uint_pair
     static const int digits = stxxl::uint_pair<HighType>::digits;

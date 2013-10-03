@@ -35,11 +35,22 @@ option(BUILD_TESTS "Build all stxxl test programs" OFF)
 
 option(BUILD_EXTRAS "Build all extra stxxl test and tool programs" OFF)
 
-option(USE_BOOST "Use Boost libraries for threads,config,filesystem,random and date_time" OFF)
-
-option(USE_GNU_PARALLEL "Use GNU parallel STL extensions" OFF)
+if(MSVC_VERSION LESS 1700)
+  # require boost for Visual C++ versions older than VC11 = MSVS 2012
+  set(USE_BOOST ON)
+else()
+  option(USE_BOOST "Use Boost libraries for threads,config,filesystem,random and date_time" OFF)
+endif()
 
 option(TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  option(USE_GNU_PARALLEL "Use GNU parallel STL extensions" OFF)
+endif()
+
+if(NOT MSVC)
+  option(USE_STD_THREADS "Force usage of C++ standard library thread support." OFF)
+endif()
 
 ###############################################################################
 # enable use of "make test"
@@ -51,6 +62,17 @@ set(CTEST_PROJECT_NAME "STXXL")
 
 find_program(CTEST_MEMORYCHECK_COMMAND NAMES "valgrind")
 #set(CTEST_MEMORYCHECK_SUPPRESSIONS_FILE ${CTEST_SOURCE_DIRECTORY}/tests/valgrind.supp)
+
+###############################################################################
+# check platform
+
+if(WIN32 OR WIN64)
+  set(STXXL_WINDOWS "1")
+endif()
+
+if(MSVC)
+  set(STXXL_MSVC ${MSVC_VERSION})
+endif()
 
 ###############################################################################
 # enable warnings
@@ -78,7 +100,7 @@ if(MSVC)
   # disable lots of warnings about "unsecure" STL functions
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -Wextra -pedantic -Wno-long-long")
 endif()
 
 # more template depth for some tests and compilers
@@ -86,19 +108,48 @@ endif()
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-ftemplate-depth=1024 CXX_HAS_TEMPLATE_DEPTH)
 if(CXX_HAS_TEMPLATE_DEPTH)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
 endif()
 
 ###############################################################################
-# find thread library
+# find thread and random library
 
-find_package(Threads)
+if(MSVC OR USE_STD_THREADS)
+
+  check_cxx_compiler_flag(-std=c++0x CXX_HAS_STD_CXX0X)
+  if(CXX_HAS_STD_CXX0X)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+  endif()
+
+  check_include_file_cxx(thread HAVE_STD_THREAD_H)
+  check_include_file_cxx(mutex HAVE_STD_MUTEX_H)
+
+  if(HAVE_STD_THREAD_H AND HAVE_STD_MUTEX_H)
+    set(STXXL_STD_THREADS "1")
+  endif()
+
+  # using <thread> also requires -pthread on gcc
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+  endif()
+
+  # also check for <random>
+  check_include_file_cxx(random STXXL_STD_RANDOM)
+
+else()
+  find_package(Threads REQUIRED)
+  set(STXXL_POSIX_THREADS "1")
+
+  include(CheckSymbolExists)
+  check_symbol_exists(erand48 "stdlib.h" STXXL_HAVE_ERAND48)
+
+endif()
 
 ###############################################################################
 # determine large file support
 
 include(gmxTestLargeFiles)
-GMX_TEST_LARGE_FILES (GMX_LARGEFILES)
+gmx_test_large_files(GMX_LARGEFILES)
 
 if (GMX_LARGEFILES)
   add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES)
@@ -109,7 +160,7 @@ endif (GMX_LARGEFILES)
 ###############################################################################
 # optional Boost libraries
 
-if(USE_BOOST OR MSVC)
+if(USE_BOOST)
 
   set(USE_BOOST ON)
   set(Boost_USE_MULTITHREADED ON)
@@ -129,13 +180,13 @@ if(USE_BOOST OR MSVC)
     set(STXXL_BOOST_RANDOM "1")
     set(STXXL_BOOST_THREADS "1")
     set(STXXL_BOOST_TIMESTAMP "1")
-  elseif(MSVC)
-    message(FATAL_ERROR "Boost libraries not found. STXXL requires Boost on Windows.")
+  elseif(MSVC_VERSION LESS 1700)
+    message(FATAL_ERROR "Boost libraries are required for MSVC < 2012.")
   else()
     message(FATAL_ERROR "Boost libraries not found. Try compilation without them.")
   endif()
 
-endif(USE_BOOST OR MSVC)
+endif(USE_BOOST)
 
 ###############################################################################
 # optional GNU parallel STL mode
@@ -162,6 +213,29 @@ if(USE_GNU_PARALLEL)
   endif()
 
 endif(USE_GNU_PARALLEL)
+
+###############################################################################
+# check if one thread and random library is available
+
+if(STXXL_STD_THREADS)
+  message("Using std::thread and other c++11 library functions.")
+  unset(STXXL_BOOST_THREADS)
+  unset(STXXL_POSIX_THREADS)
+elseif(STXXL_BOOST_THREADS)
+  message("Using boost::thread library functions.")
+  unset(STXXL_STD_THREADS)
+  unset(STXXL_POSIX_THREADS)
+elseif(STXXL_POSIX_THREADS)
+  message("Using POSIX pthread library functions.")
+  unset(STXXL_STD_THREADS)
+  unset(STXXL_BOOST_THREADS)
+else()
+  message(SEND_ERROR "Could not detect a thread library. Check the compilation documentation.")
+endif()
+
+if(NOT (STXXL_STD_RANDOM OR STXXL_BOOST_RANDOM OR STXXL_HAVE_ERAND48))
+  message(SEND_ERROR "Could not detect a random generator library. Check the compilation documentation.")
+endif()
 
 ###############################################################################
 # configure environment for building

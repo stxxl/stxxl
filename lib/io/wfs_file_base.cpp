@@ -14,7 +14,7 @@
 
 #include <stxxl/bits/io/wfs_file_base.h>
 
-#ifdef BOOST_MSVC
+#ifdef STXXL_WINDOWS
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -207,5 +207,5 @@ void wfs_file_base::close_remove()
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef BOOST_MSVC
+#endif // STXXL_WINDOWS
 // vim: et:ts=4:sw=4

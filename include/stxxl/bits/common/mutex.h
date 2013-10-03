@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -17,24 +18,28 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
-#ifdef STXXL_BOOST_THREADS
-
+#if STXXL_STD_THREADS
+ #include <mutex>
+#elif STXXL_BOOST_THREADS
  #include <boost/thread/mutex.hpp>
-
-#else
-
+#elif STXXL_POSIX_THREADS
  #include <pthread.h>
  #include <cerrno>
 
  #include <stxxl/bits/noncopyable.h>
  #include <stxxl/bits/common/error_handling.h>
-
+#else
+ #error "Thread implementation not detected."
 #endif
 
 
 __STXXL_BEGIN_NAMESPACE
 
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+
+typedef std::mutex mutex;
+
+#elif STXXL_BOOST_THREADS
 
 typedef boost::mutex mutex;
 
@@ -73,7 +78,11 @@ public:
 
 #endif
 
-#ifdef STXXL_BOOST_THREADS
+#if STXXL_STD_THREADS
+
+typedef std::unique_lock<std::mutex> scoped_mutex_lock;
+
+#elif STXXL_BOOST_THREADS
 
 typedef boost::mutex::scoped_lock scoped_mutex_lock;
 

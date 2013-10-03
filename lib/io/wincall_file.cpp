@@ -18,6 +18,7 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/error_handling.h>
 
+#define NOMINMAX
 #include <windows.h>
 
 __STXXL_BEGIN_NAMESPACE
@@ -56,7 +57,8 @@ void wincall_file::serve(const request * req) throw (io_error)
         if (type == request::READ)
         {
             DWORD NumberOfBytesRead = 0;
-            if (!ReadFile(handle, buffer, bytes, &NumberOfBytesRead, NULL))
+            assert(bytes <= std::numeric_limits<DWORD>::max());
+            if (!ReadFile(handle, buffer, (DWORD)bytes, &NumberOfBytesRead, NULL))
             {
                 stxxl_win_lasterror_exit("ReadFile" <<
                                          " this=" << this <<
@@ -74,7 +76,8 @@ void wincall_file::serve(const request * req) throw (io_error)
         else
         {
             DWORD NumberOfBytesWritten = 0;
-            if (!WriteFile(handle, buffer, bytes, &NumberOfBytesWritten, NULL))
+            assert(bytes <= std::numeric_limits<DWORD>::max());
+            if (!WriteFile(handle, buffer, (DWORD)bytes, &NumberOfBytesWritten, NULL))
             {
                 stxxl_win_lasterror_exit("WriteFile" <<
                                          " this=" << this <<
