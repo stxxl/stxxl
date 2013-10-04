@@ -250,11 +250,9 @@ include_directories(${STXXL_INCLUDES})
 # for targets using stxxl library
 set(STXXL_LIBS stxxl ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-# export STXXL_INCLUDES and STXXL_LIBS to PARENT_SCOPE
-if(PARENT_SCOPE)
-  set(STXXL_INCLUDES "${STXXL_INCLUDES}" PARENT_SCOPE)
-  set(STXXL_LIBS "${STXXL_LIBS}" PARENT_SCOPE)
-endif(PARENT_SCOPE)
+# export STXXL_INCLUDES and STXXL_LIBS to global CACHE
+set(STXXL_INCLUDES "${STXXL_INCLUDES}" CACHE STRING "Include paths for STXXL")
+set(STXXL_LIBS "${STXXL_LIBS}" CACHE STRING "Libraries to link for STXXL")
 
 # build libstxxl in /lib
 add_subdirectory(lib)
