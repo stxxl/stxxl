@@ -403,6 +403,18 @@ public:
     {
     }
 
+    //! Delete all added arguments
+    ~cmdline_parser()
+    {
+        for (size_t i = 0; i < m_optlist.size(); ++i)
+            delete m_optlist[i];
+        m_optlist.clear();
+
+        for (size_t i = 0; i < m_paramlist.size(); ++i)
+            delete m_paramlist[i];
+        m_paramlist.clear();
+    }
+
     //! Set description of program, text will be wrapped
     void set_description(const std::string& description)
     {
