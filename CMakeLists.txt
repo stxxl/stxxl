@@ -284,6 +284,7 @@ macro(stxxl_test TESTNAME)
     set(TESTFULLNAME ${TESTNAME} ${ARGN})
     string(REPLACE ";" "-" TESTFULLNAME "${TESTFULLNAME}") # stringify list
     add_test(${TESTFULLNAME} ${TESTNAME} ${ARGN})
+    set_tests_properties(${TESTFULLNAME} PROPERTIES TIMEOUT 3600)
   endif(BUILD_TESTS)
 
 endmacro(stxxl_test)
