@@ -14,25 +14,24 @@
 
 int main()
 {
-  typedef stxxl::STACK_GENERATOR<int>::result stack_type;
-  stack_type my_stack;
+    typedef stxxl::STACK_GENERATOR<int>::result stack_type;
+    stack_type my_stack;
 
-  my_stack.push(8);
-  my_stack.push(7);
-  my_stack.push(4);
-  assert(my_stack.size() == 3);
+    my_stack.push(8);
+    my_stack.push(7);
+    my_stack.push(4);
+    assert(my_stack.size() == 3);
 
-  assert(my_stack.top() == 4);
-  my_stack.pop();
+    assert(my_stack.top() == 4);
+    my_stack.pop();
 
-  assert(my_stack.top() == 7);
-  my_stack.pop();
+    assert(my_stack.top() == 7);
+    my_stack.pop();
 
-  assert(my_stack.top() == 8);
-  my_stack.pop();
+    assert(my_stack.top() == 8);
+    my_stack.pop();
 
-  assert(my_stack.empty());
+    assert(my_stack.empty());
 
-  return 0;
+    return 0;
 }
-

@@ -18,7 +18,7 @@ namespace stxxl {
 
 /** \page tutorial_map STXXL Map (B+-tree)
 
-This page introduces into the stxxl::map (for further information on the structure you may have a look at \ref design_map). 
+This page introduces into the stxxl::map (for further information on the structure you may have a look at \ref design_map).
 
 stxxl::map is an external associative container that stores elements formed by a combination of a unique key value and a data value, following a specific order.
 The map's key values are generally used to sort and uniquely identify the data values, while the data values store the content associated to this key.
@@ -34,34 +34,34 @@ To create a stxxl::map object, several template parameters are required. The fir
 typedef stxxl::map<int, char, CompareGreater, DATA_NODE_BLOCK_SIZE, DATA_LEAF_BLOCK_SIZE> map_type;
 
 // constructor map(node_cache_size_in_bytes, leaf_cache_size_in_bytes) to create map object named my_map
-map_type my_map((map_type::node_block_type::raw_size) * 3, (map_type::leaf_block_type::raw_size) * 3); 
+map_type my_map((map_type::node_block_type::raw_size) * 3, (map_type::leaf_block_type::raw_size) * 3);
 \endcode
 
 The comparator class has to be defined by hand (and before the map definition above) and looks like:
-\code 
+\code
 struct ComparatorGreater
 {
-   bool operator () (const int & a, const int & b) const 
+   bool operator () (const int & a, const int & b) const
    { return a>b; }
 
-   static int max_value() 
+   static int max_value()
    { return std::numeric_limits<int>::min(); }
 };
 \endcode
 
 If CompareGreater()(a,b) is true, then a is smaller than b. CompareType must also provide a static max_value method, that returns a value of type KeyType that is larger than any key stored in map, i.e. for all x in map holds CompareType()(x,CompareType::max_value())
- 
+
 Naturally, we can define a comparator class which returns true if b is smaller than a as follows:
 
 \code
 struct CompareLess
 {
-  bool operator () (const int & a, const int & b) const 
+  bool operator () (const int & a, const int & b) const
   { return a<b; }
-  
-  static int max_value() const  
+
+  static int max_value() const
   { return std::numeric_limits<int>::max(); }
-}; 
+};
 \endcode
 
 Note that CompareType must define a strict weak ordering.
@@ -76,7 +76,7 @@ my_map.insert(std::pair<int, char>(1, 'a'));
 my_map.insert(std::pair<int, char>(2, 'b'));
 my_map.insert(std::pair<int, char>(3, 'c'));
 my_map.insert(std::pair<int, char>(4, 'd'));
-\endcode  
+\endcode
 
 2. insertion with hint
 \code
@@ -86,18 +86,18 @@ my_map.insert(iter, std::pair<int, char>(6, 'x'));
 my_map.insert(iter, std::pair<int, char>(7, 'y'));
 my_map.insert(iter, std::pair<int, char>(8, 'z'));
 \endcode
- 
-3. range insertion 
+
+3. range insertion
 \code
 map_type anothermap((map_type::node_block_type::raw_size) * 3, (map_type::leaf_block_type::raw_size) * 3);
-anothermap.insert(my_map.begin(),my_map.find('c'));   // stores (1, 'a'), (2, 'b'), (3, 'c') 
+anothermap.insert(my_map.begin(),my_map.find('c'));   // stores (1, 'a'), (2, 'b'), (3, 'c')
 \endcode
 
 ### Access elements
 
 Random access is possible by using the []-operator:
 \code
-std::cout << "my_map[4] is " << my_map[4] << std::endl;  // prints 'd' 
+std::cout << "my_map[4] is " << my_map[4] << std::endl;  // prints 'd'
 \endcode
 
 Scanning a stxxl::map by an iterator works like
@@ -128,15 +128,15 @@ Note: lower_bound() works nearly equal to upper_bound(), except in the case that
 
 Removing elements out of the map is possible in three different ways:
 
-1. Erasing by iterator 
-\code 
+1. Erasing by iterator
+\code
 map_type::iter iter = my_map.find(7);
-my_map.erase(iter);                  
+my_map.erase(iter);
 \endcode
 
-2. Erasing by key 
+2. Erasing by key
 \code
-my_map.erase(8);   
+my_map.erase(8);
 \endcode
 
 3. Erasing by range
@@ -147,12 +147,12 @@ my_map.erase(iter, my_map.end());
 
 ### Determine size / Check whether the map is empty
 
-To determine the size (i.e. the number of elements) of an instance, call size(): 
+To determine the size (i.e. the number of elements) of an instance, call size():
 \code
 std::cout << "number of elements in my_map: " << my_map.size() << std::endl;
 \endcode
 
-To check if the priority queue is empty, call empty() which returns true in case: 
+To check if the priority queue is empty, call empty() which returns true in case:
 \code
 std::cout << "is my_map empty? " << my_map.empty() << std::endl;
 \endcode
@@ -168,11 +168,11 @@ std::cout << "is my_map empty? " << my_map.empty() << std::endl;
 #define DATA_LEAF_BLOCK_SIZE (4096)
 
 struct CompareGreater
-{ 
-  bool operator () (const int & a, const int & b) const 
+{
+  bool operator () (const int & a, const int & b) const
   { return a>b; }
-  
-  static int max_value() 
+
+  static int max_value()
   { return std::numeric_limits<int>::min(); }
 };
 
@@ -188,15 +188,15 @@ int main()
   my_map.insert(std::pair<int, char>(2, 'b'));
   my_map.insert(std::pair<int, char>(3, 'c'));
   my_map.insert(std::pair<int, char>(4, 'd'));
-    
-  my_map.erase(3);                      
- 
+
+  my_map.erase(3);
+
   map_type::iterator iter;
- 
-  std::cout << "my_map contains:\n";                                                                                                                                                                              
-  for (iter = my_map.begin(); iter != my_map.end(); ++iter)                                                                                                                                                          {                                                                                                                                                                                                              
-  std::cout << iter->first << " => " << iter->second << std::endl;                                                                                                                                               
-  }     
+
+  std::cout << "my_map contains:\n";
+  for (iter = my_map.begin(); iter != my_map.end(); ++iter)                                                                                                                                                          {
+  std::cout << iter->first << " => " << iter->second << std::endl;
+  }
 
   map_type::iterator iter_low, iter_up;
 

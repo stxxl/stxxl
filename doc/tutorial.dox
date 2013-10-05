@@ -17,10 +17,10 @@ namespace stxxl {
 
 /** \page tutorial Tutorials
 
-This tutorial on the Standard Templete Library for Very Large Datasets (STXXL) is meant as an introduction to all those who use the STXXL for the first time - just basic knowledge in C++ is required. Note that the focus of this tutorial is on the most importatant features and is by no means exhaustive. If necessary, we refer to more advanced functionality which would go however beyond the scope of this introduction. 
+This tutorial on the Standard Templete Library for Very Large Datasets (STXXL) is meant as an introduction to all those who use the STXXL for the first time - just basic knowledge in C++ is required. Note that the focus of this tutorial is on the most importatant features and is by no means exhaustive. If necessary, we refer to more advanced functionality which would go however beyond the scope of this introduction.
 
-Why do i need the STXXL? Imagine a situation where you want to work with a std::vector which does not fit into the internal memory completely. That is precisely the situation where the STXXL container 
-stxxl::vector solves the issue. The practical part about it: Stxxl containers work in a similar way as their internal counterparts from the Standard Template Library (STL) so that parts of this tutorial may 
+Why do i need the STXXL? Imagine a situation where you want to work with a std::vector which does not fit into the internal memory completely. That is precisely the situation where the STXXL container
+stxxl::vector solves the issue. The practical part about it: Stxxl containers work in a similar way as their internal counterparts from the Standard Template Library (STL) so that parts of this tutorial may
 sound familiar to you. Naturally, the vector container is just an example - the same applies to other data structures.
 
 Before running the STXXL for the first time you may check \ref install_unix.

@@ -13,40 +13,39 @@
 #include <stxxl/priority_queue>
 #include <iostream>
 
-// comparison struct for priority queue where top() returns the smallest contained value: 
+// comparison struct for priority queue where top() returns the smallest contained value:
 struct ComparatorGreater
 {
-  bool operator () (const int &a, const int &b) const 
-  { return (a>b); }
+    bool operator () (const int &a, const int &b) const
+    { return (a>b); }
 
-  int min_value() const
-  { return (std::numeric_limits<int>::max) (); }
+    int min_value() const
+    { return (std::numeric_limits<int>::max) (); }
 
 };
 
 int main()
 {
-  typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128*1024*1024, 1024*1024>::result pqueue_type;
-  typedef pqueue_type::block_type block_type;
- 
-  const unsigned int mem_for_pools = 32 * 1024 * 1024; 
-  stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);
-  pqueue_type my_pqueue(pool);  // creates stxxl priority queue instance with read-write-pool
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128*1024*1024, 1024*1024>::result pqueue_type;
+    typedef pqueue_type::block_type block_type;
 
-  my_pqueue.push(5);
-  my_pqueue.push(4);
-  my_pqueue.push(19);
-  my_pqueue.push(1);
-  assert(my_pqueue.size() == 4);
-  
-  assert(my_pqueue.top() == 1);
-  STXXL_MSG("Smallest inserted value in my: " << my_pqueue.top());
+    const unsigned int mem_for_pools = 32 * 1024 * 1024;
+    stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);
+    pqueue_type my_pqueue(pool);  // creates stxxl priority queue instance with read-write-pool
 
-  my_pqueue.pop();  // pop the 1 on top
-  
-  assert(my_pqueue.top() == 4);
-  STXXL_MSG("Smallest value after 1 pop(): " << my_pqueue.top());
-  
-  return 0;
+    my_pqueue.push(5);
+    my_pqueue.push(4);
+    my_pqueue.push(19);
+    my_pqueue.push(1);
+    assert(my_pqueue.size() == 4);
+
+    assert(my_pqueue.top() == 1);
+    STXXL_MSG("Smallest inserted value in my: " << my_pqueue.top());
+
+    my_pqueue.pop();  // pop the 1 on top
+
+    assert(my_pqueue.top() == 4);
+    STXXL_MSG("Smallest value after 1 pop(): " << my_pqueue.top());
+
+    return 0;
 }
-

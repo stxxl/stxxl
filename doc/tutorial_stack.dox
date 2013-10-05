@@ -1,17 +1,17 @@
-// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-                                                
-/***************************************************************************                                                
- *  doc/tutorial_stack.dox                                                                                                 
- *                                                                                                                          
- *  Usage Tutorial for STXXL                                                                                                
- *                                                                                                                          
- *  Part of the STXXL. See http://stxxl.sourceforge.net                                                                     
- *                                                                                                                          
- *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>                                                                      
- *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu> 
- *                                                                                                                        
- *  Distributed under the Boost Software License, Version 1.0.                                                              
- *  (See accompanying file LICENSE_1_0.txt or copy at                                                                       
- *  http://www.boost.org/LICENSE_1_0.txt)                                                                                   
+// -*- mode: c++; mode: visual-line; mode: flyspell; fill-column: 100000 -*-
+/***************************************************************************
+ *  doc/tutorial_stack.dox
+ *
+ *  Usage Tutorial for STXXL
+ *
+ *  Part of the STXXL. See http://stxxl.sourceforge.net
+ *
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
+ *
+ *  Distributed under the Boost Software License, Version 1.0.
+ *  (See accompanying file LICENSE_1_0.txt or copy at
+ *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
 namespace stxxl {
@@ -31,10 +31,10 @@ typedef stxxl::STACK_GENERATOR<int>::result stack;
 stack my_stack;  // create empty stack object
 \endcode
 
-Hint: STXXL stack provides specialized implementations for a certain access pattern. If the access pattern is known before, such a customization might gain a significant speedup. 
-The default stack is stxxl::normal_stack which is the best for a random sequence of push'es and pop's. See \ref design_stack section for more details. 
+Hint: STXXL stack provides specialized implementations for a certain access pattern. If the access pattern is known before, such a customization might gain a significant speedup.
+The default stack is stxxl::normal_stack which is the best for a random sequence of push'es and pop's. See \ref design_stack section for more details.
 
-### Insert / Access / Delete elements 
+### Insert / Access / Delete elements
 
 To insert an element on top of the stack call push():
 
@@ -59,7 +59,7 @@ my_stack.pop();  // removes element 5
 
 ### Determine size  / Check whether stack is empty
 
-To determine the size (i.e. the number of elements) of stack instance, call size(): 
+To determine the size (i.e. the number of elements) of stack instance, call size():
 
 \code
 std::cout << "size of stack: " << my_stack.size() << std::endl;
@@ -69,7 +69,7 @@ To check if the stack is empty, call empty() which returns true in case of empty
 
 \code
 // loop till stack is empty
-while (!my_stack.empty()) 
+while (!my_stack.empty())
 {
   // do something
 }
@@ -108,7 +108,7 @@ c
 \endcode
 
 
-See \ref examples/containers/stack1.cpp for the sourcecode of a more comprehensive example. 
+See \ref examples/containers/stack1.cpp for the sourcecode of a more comprehensive example.
 
 
 \example examples/containers/stack_minimal1.cpp

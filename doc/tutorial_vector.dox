@@ -7,6 +7,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -22,12 +23,12 @@ This section introduces into the STXXL vector container (to learn more about the
 ### Creating a STXXL vector
 
 Before we can use a STXXL vector, we first have to define and then to instantiate a vector object.
-To manage the configuration of the vector type we use the generator template. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only only stricly neccessary 
+To manage the configuration of the vector type we use the generator template. A minimal configuration is shown below - as one can see the value_type (integer in our case) is the only only stricly neccessary
 parameter. See \ref design_vector_generator for additional configuration parameters and information.
 
 \code
 typedef stxxl::VECTOR_GENERATOR<int>::result vector;
-vector my_vector;  // creates empty vector object 
+vector my_vector;  // creates empty vector object
 \endcode
 
 ### Insert elements
@@ -35,7 +36,7 @@ vector my_vector;  // creates empty vector object
 We can fill the vector by calling push_back() which appends a new value at the end:
 
 \code
-for (int i = 0; i < 1024*1024; i++) 
+for (int i = 0; i < 1024*1024; i++)
 {
   my_vector.push_back(i);
 }
@@ -44,7 +45,7 @@ for (int i = 0; i < 1024*1024; i++)
 
 ### Access elements
 
-To read and/or modify the values of a STXXL vector, simply use the []-operator: 
+To read and/or modify the values of a STXXL vector, simply use the []-operator:
 
 \code
 std::cout << "element at position 99: " << my_vector[99] << std::endl;
@@ -119,7 +120,7 @@ int main()
 
 
 See \ref examples/containers/vector1.cpp for the sourcecode of a more comprehensive example.
-                                                                                                                                                                                                               
+
 \example examples/containers/vector_minimal1.cpp
 This example code is explained in the \ref tutorial_vector section.
 

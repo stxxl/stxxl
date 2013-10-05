@@ -18,69 +18,69 @@
 
 struct TwoInteger
 {
-  int i, j;
-  
-  TwoInteger()
-  {}
-  
-  TwoInteger(int _i, int _j)
-      : i(_i), j(_j)
-  {}
+    int i, j;
+
+    TwoInteger()
+    {}
+
+    TwoInteger(int _i, int _j)
+        : i(_i), j(_j)
+    {}
 };
 
 struct TwoIntegerComparator
 {
-  bool operator()(const TwoInteger& a, const TwoInteger& b) const
-  {
-    return a.i < b.i;
-  }
-  
-  TwoInteger min_value() const {
-    return TwoInteger(std::numeric_limits<int>::min(), std::numeric_limits<int>::min());
-  }
-  
-  TwoInteger max_value() const {
-    return TwoInteger(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
-  }
+    bool operator()(const TwoInteger& a, const TwoInteger& b) const
+    {
+        return a.i < b.i;
+    }
+
+    TwoInteger min_value() const {
+        return TwoInteger(std::numeric_limits<int>::min(), std::numeric_limits<int>::min());
+    }
+
+    TwoInteger max_value() const {
+        return TwoInteger(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+    }
 };
 
 int main()
-{     
-  // template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>
-  typedef stxxl::sorter<TwoInteger, TwoIntegerComparator, 1*1024*1024> sorter_type;
+{
+    // template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>
+    typedef stxxl::sorter<TwoInteger, TwoIntegerComparator, 1*1024*1024> sorter_type;
 
-  // create sorter object (CompareType(), MainMemoryLimit)
-  sorter_type int_sorter(TwoIntegerComparator(), 64*1024*1024);
+    // create sorter object (CompareType(), MainMemoryLimit)
+    sorter_type int_sorter(TwoIntegerComparator(), 64*1024*1024);
 
-  srand(time(NULL));
+    srand(time(NULL));
 
-  stxxl::timer Timer1;
-  Timer1.start();
+    stxxl::timer Timer1;
+    Timer1.start();
 
-  // insert random numbers from [0,100000)
-  for (size_t i = 0; i < 100000; ++i)
-  {
-    int_sorter.push( TwoInteger(rand() % 100000, (int)i) );  // fill sorter container
-  }
-  
-  Timer1.stop();
-  
-  STXXL_MSG("push time: " << (Timer1.mseconds() / 1000));    
-  
-  stxxl::timer Timer2;
-  
-  Timer2.start();      
-  int_sorter.sort();  // switch to output state and sort
-  Timer2.stop();
-  
-  STXXL_MSG("sort time: " << (Timer2.mseconds() / 1000));
- 
-  // echo sorted elements 
-  while ( !int_sorter.empty() )
-  {
-    std::cout << int_sorter->i << " ";  // access value 
-    ++int_sorter;  
-  }
-  
-  return 0;
+    // insert random numbers from [0,100000)
+    for (size_t i = 0; i < 100000; ++i)
+    {
+        int_sorter.push( TwoInteger(rand() % 100000, (int)i) );  // fill sorter container
+    }
+
+    Timer1.stop();
+
+    STXXL_MSG("push time: " << (Timer1.mseconds() / 1000));
+
+    stxxl::timer Timer2;
+
+    Timer2.start();
+    int_sorter.sort();  // switch to output state and sort
+    Timer2.stop();
+
+    STXXL_MSG("sort time: " << (Timer2.mseconds() / 1000));
+
+    // echo sorted elements
+    while ( !int_sorter.empty() )
+    {
+        std::cout << int_sorter->i << " ";  // access value
+        ++int_sorter;
+    }
+
+    return 0;
 }

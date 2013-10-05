@@ -25,7 +25,7 @@ The STXXL sorter container combines the two functions of runs_creator and runs_m
 Before using a STXXL sorter, we initially have to define and then to instantiate a sorter object. Two template parameters are required to define a stxxl::sorter. ValueType defines the type of the contained objects (must be a POD with no references to internal memory) and CompareType is the type of comparison object used for sorting the runs (see example below).
 BlockSize and AllocStr are optional (see TODO for additional information). The more straightforward of the two sorter constructors expects the comparator object and memory_to_use (bytes) in ram for sorted runs as parameters.
 
-\code 
+\code
 // template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>
 typedef stxxl::sorter<int, my_comparator, 1*1024*1024> sorter_type;
 
@@ -56,7 +56,7 @@ struct my_comparator
 
 Note that CompareType must define strict weak ordering. \n
 \n
-The sorter container know two different kind of states - the input state and a output state. Insertion of elements are only allowed when the sorter is in the input state. After sorting is called, the container enters the output state and inserting elements is disallowed. 
+The sorter container know two different kind of states - the input state and a output state. Insertion of elements are only allowed when the sorter is in the input state. After sorting is called, the container enters the output state and inserting elements is disallowed.
 
 ### Insert elements
 
@@ -114,18 +114,18 @@ struct my_comparator
   {
     return a < b;
   }
-  
+
   int min_value() const {
     return std::numeric_limits<int>::min();
   }
-  
+
   int max_value() const {
     return std::numeric_limits<int>::max();
   }
 };
 
 int main()
-{     
+{
   // template parameter <ValueType, CompareType, BlockSize, AllocStr(optional)>
   typedef stxxl::sorter<int, my_comparator> sorter_type;
 
@@ -133,7 +133,7 @@ int main()
   sorter_type int_sorter(my_comparator(), 64*1024*1024);
 
   // fill sorter with elements order in descending order
-  for (size_t i = 10000; i > 0; i--) 
+  for (size_t i = 10000; i > 0; i--)
   {
     int_sorter.push(i);
   }
@@ -144,9 +144,9 @@ int main()
   while (!int_sorter.empty())
   {
   std::cout << *int_sorter << " ";
-    ++int_sorter; 
-  } 
- 
+    ++int_sorter;
+  }
+
   return 0;
 }
 \endcode
@@ -155,8 +155,8 @@ See \ref examples/containers/sorter1.cpp for the sourcecode of a more comprehens
 
 \example examples/containers/sorter_minimal1.cpp
 This example code is explained in the \ref tutorial_sorter section.
-                 
+
 \example examples/containers/sorter1.cpp
-This example code is explained in the \ref tutorial_sorter section. 
+This example code is explained in the \ref tutorial_sorter section.
 */
 } // namespace stxxl

@@ -15,30 +15,29 @@
 
 int main()
 {
-  typedef stxxl::deque<int> deque;
-  deque my_deque;
+    typedef stxxl::deque<int> deque;
+    deque my_deque;
 
-  my_deque.push_front(2);
-  my_deque.push_front(11);
-  my_deque.push_back(5);
-  my_deque.push_back(8);
-  // deque now stores: |11|2|5|8|
+    my_deque.push_front(2);
+    my_deque.push_front(11);
+    my_deque.push_back(5);
+    my_deque.push_back(8);
+    // deque now stores: |11|2|5|8|
 
-  std::cout << "return 'first' element: " << my_deque.front() << std::endl;  // prints 11 
-  std::cout << "return 'last' element: " << my_deque.back() << std::endl;  // prints 8  
-  std::cout << "random access: " << my_deque[2] << std::endl;  // prints 5
-  
-  // generate forward iterator 
-  stxxl::deque_iterator<deque> deque_iterator = my_deque.begin();
+    std::cout << "return 'first' element: " << my_deque.front() << std::endl;  // prints 11
+    std::cout << "return 'last' element: " << my_deque.back() << std::endl;  // prints 8
+    std::cout << "random access: " << my_deque[2] << std::endl;  // prints 5
 
-  // iterate over my_deque, access values and delete them afterwards
-  while (!my_deque.empty())
-  {
-    std::cout << *deque_iterator << " ";
-    ++deque_iterator; 
-    my_deque.pop_front();
-  }
+    // generate forward iterator
+    stxxl::deque_iterator<deque> deque_iterator = my_deque.begin();
 
-  return 0;
+    // iterate over my_deque, access values and delete them afterwards
+    while (!my_deque.empty())
+    {
+        std::cout << *deque_iterator << " ";
+        ++deque_iterator;
+        my_deque.pop_front();
+    }
+
+    return 0;
 }
-

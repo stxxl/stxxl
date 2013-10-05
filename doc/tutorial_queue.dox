@@ -21,12 +21,12 @@ This page introduces into the stxxl::queue Container (to learn more about the st
 
 ### Creating a STXXL queue
 
-Before using a STXXL queue, we initially have to define and then to instantiate a queue object. The implementation holds the head and the tail blocks in the main memory. Prefetch and write block pools might be used to overlap I/O and computation during queue operations. A minimal configuration is shown below - the value_type (integer in our example case) is the only stricly neccessary parameter. 
-The default configuration initializes a write_pool and a prefetch_pool of size 1. 
+Before using a STXXL queue, we initially have to define and then to instantiate a queue object. The implementation holds the head and the tail blocks in the main memory. Prefetch and write block pools might be used to overlap I/O and computation during queue operations. A minimal configuration is shown below - the value_type (integer in our example case) is the only stricly neccessary parameter.
+The default configuration initializes a write_pool and a prefetch_pool of size 1.
 
-\code 
+\code
 typedef stxxl::queue<int> queue;
-// create queue object with default parameters: 
+// create queue object with default parameters:
 // write_pool size = ?, prefetch_pool size = 1, blocks2prefetch = number of blocks in the prefetch pool (i.e. 1)
 queue my_queue;
 \endcode
@@ -39,11 +39,11 @@ To insert a new value at the beginning of the queue, call push().
 Accessing elements are possible on both endings of the queue, back() returns the value at the beginning, front() returns the value at the end. Deleting a value by pop() erases the first inserted element.
 
 \code
-my_queue.push(5);  // queue now stores: |5| 
+my_queue.push(5);  // queue now stores: |5|
 my_queue.push(9);  // queue now stores: |9|5|
 my_queue.push(1);  // queue now stores: |1|9|5|
-x = my_queue.back();  // x = 1  
-y = my_queue.front();  // y = 5  
+x = my_queue.back();  // x = 1
+y = my_queue.front();  // y = 5
 my_queue.pop();  // queue now stores: |1|9|
 \endcode
 
@@ -96,8 +96,8 @@ int main()
 \endcode
 
 
-See \ref examples/containers/queue1.cpp for the sourcecode of a more comprehensive example. 
-                                                                                                           
+See \ref examples/containers/queue1.cpp for the sourcecode of a more comprehensive example.
+
 \example examples/containers/queue_minimal1.cpp
 This example code is explained in the \ref tutorial_queue section.
 

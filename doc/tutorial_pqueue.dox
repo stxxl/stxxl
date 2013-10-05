@@ -20,26 +20,26 @@ namespace stxxl {
 This page introduces into the stxxl::priority_queue container (to learn more about the structure of stxxl::priority_queue, see section \ref design_pqueue).
 
 Basically, the priority queue provides insertion of new elements as well as access and deletion of the element on top.
-The invariant guarantees that the top element is the largest (or smallest if desired) of all inserted elements identified by comparison realized by the customizable comparator class. 
+The invariant guarantees that the top element is the largest (or smallest if desired) of all inserted elements identified by comparison realized by the customizable comparator class.
 
 ### Creating a STXXL priority queue
 
-To manage the configuration of the priority queue type, we use the generator template stxxl::PRIORITY_QUEUE_GENERATOR. This generator template expects a value type (which is an integer in our example), 
+To manage the configuration of the priority queue type, we use the generator template stxxl::PRIORITY_QUEUE_GENERATOR. This generator template expects a value type (which is an integer in our example),
 a class which we name Comparator(a,b) to compare two given elements a and b, a internal memory limit in bytes and the number of elements to be stored (in 1024 units). See section \ref design_pqueue_generator for additional configuration parameters and information.
 
 Thus the definition may look as follows:
 
-\code 
-// template parameter <value_type, CompareType, internal_memory_limit, number_of_elements> 
+\code
+// template parameter <value_type, CompareType, internal_memory_limit, number_of_elements>
 typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 64*1024*1024, 1024*1024>::result pqueue_type;
 \endcode
 
 The ComparatorGreater(a,b) class is needed to compare two given elements a and b and has to be defined by hand (and before the priority queue definition above):
 
-\code 
+\code
 struct ComparatorGreater
 {
-  bool operator () (const int &a, const int &b) const 
+  bool operator () (const int &a, const int &b) const
   { return (a>b); }
 
   int min_value() const
@@ -49,15 +49,15 @@ struct ComparatorGreater
 
 The compare-operator () of two elements a and b returns true, if a is larger than b, otherwise false. Consequently, this priority queue serves it's <b> smallest element on top </b>. The additional min_value() function ensures that Comparator(min_value(),x) is true for each and every x.
 
-iLikewise the minimum-on-top Comparator, we can easily define a <b> largest element on top </b> Comparator which stores the the largest contained integer on top as well: 
+iLikewise the minimum-on-top Comparator, we can easily define a <b> largest element on top </b> Comparator which stores the the largest contained integer on top as well:
 
 \code
 struct ComparatorLess
 {
-  bool operator () (const int & a, const int & b) const 
+  bool operator () (const int & a, const int & b) const
   { return a<b; }
 
-  int min_value() const 
+  int min_value() const
   { return std::numeric_limits<int>::min(); }
 };
 \endcode
@@ -66,7 +66,7 @@ Note that CompareType must define a strict weak ordering. These and some other d
 
 To create a STXXL priority queue instance, a resizable buffered writing and prefetched reading pool expected (to overlap I/O and computation) is needed:
 
-\code 
+\code
   typedef pqueue_type::block_type block_type;
   const unsigned int mem_for_pools = 16 * 1024 * 1024;  // restricts memory consumption of the pools
 
@@ -83,16 +83,16 @@ To insert a new element into the priority queue, call push():
 my_pqueue.push(5);
 \endcode
 
-The priority queue only allows to access the top element, which is the smallest or largest element (depending on the used comparator class) of all inserted elements. 
+The priority queue only allows to access the top element, which is the smallest or largest element (depending on the used comparator class) of all inserted elements.
 Calling top() on an instance returns this element:
 
 \code
-int x; 
-x = my_pqueue.top(); 
+int x;
+x = my_pqueue.top();
 \endcode
 
 Erasing elements is only possible on the top of the priority queue by calling pop().
-Note that after removing the element on top, the priority queue still holds the above mentioned property. 
+Note that after removing the element on top, the priority queue still holds the above mentioned property.
 
 \code
 my_pqueue.pop();
@@ -109,9 +109,9 @@ To check if the priority queue is empty, call empty() which returns true in case
 std::cout << "empty priority queue? " << my_pqueue.empty() << std::endl;
 \endcode
 
-### A minimal working example of STXXL's priority queue 
+### A minimal working example of STXXL's priority queue
 
-(See \ref examples/containers/pqueue_minimal1.cpp for the sourcecode of the following example).                                                                            
+(See \ref examples/containers/pqueue_minimal1.cpp for the sourcecode of the following example).
 
 \code
 #include <stxxl/priority_queue>
@@ -120,7 +120,7 @@ struct Cmp
 {
   bool operator () (const int & a, const int & b) const
   { return a>b; }
-  
+
   int min_value() const
   { return (std::numeric_limits<int>::max)(); }
 };
@@ -134,7 +134,7 @@ int main() {
   // use 10 block read and write pools for enable overlapping of I/O and computation
   stxxl::prefetch_pool<block_type> p_pool(10);
   stxxl::write_pool<block_type>    w_pool(10);
-  
+
   pq_type Q(p_pool,w_pool);
   Q.push(1);
   Q.push(4);
@@ -144,7 +144,7 @@ int main() {
   Q.push(7);
 
   assert(Q.size() == 6);
-  
+
   assert(Q.top() == 8);
   Q.pop();
 
@@ -164,20 +164,18 @@ int main() {
   Q.pop();
 
   assert(Q.empty());
-  
+
   return 0;
 }
 \endcode
 
-See \ref examples/containers/pqueue1.cpp for the sourcecode of another priority queue example. 
+See \ref examples/containers/pqueue1.cpp for the sourcecode of another priority queue example.
 
 \example examples/containers/pqueue_minimal1.cpp
 This example code is explained in the \ref tutorial_pqueue section
 
 \example examples/containers/pqueue1.cpp
 This example code is explained in the \ref tutorial_pqueue section
-
-
 
 */
 

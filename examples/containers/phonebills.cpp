@@ -10,7 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! [example] 
+//! [example]
 #define USE_STXXL
 
 #include <stxxl.h>       // STXXL header
@@ -168,4 +168,4 @@ int main(int argc, char * argv[])
 
     return 0;
 }
-//! [example] 
+//! [example]

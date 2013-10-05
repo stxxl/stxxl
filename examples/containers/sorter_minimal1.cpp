@@ -17,42 +17,42 @@
 
 struct my_comparator
 {
-  bool operator()(const int &a, const int &b) const
-  {
-    return a < b;
-  }
-  
-  int min_value() const {
-    return std::numeric_limits<int>::min();
-  }
-  
-  int max_value() const {
-    return std::numeric_limits<int>::max();
-  }
+    bool operator()(const int &a, const int &b) const
+    {
+        return a < b;
+    }
+
+    int min_value() const {
+        return std::numeric_limits<int>::min();
+    }
+
+    int max_value() const {
+        return std::numeric_limits<int>::max();
+    }
 };
 
 int main()
-{     
-  // template parameter <ValueType, CompareType, BlockSize, AllocStr(optional)>
-  typedef stxxl::sorter<int, my_comparator> sorter_type;
+{
+    // template parameter <ValueType, CompareType, BlockSize, AllocStr(optional)>
+    typedef stxxl::sorter<int, my_comparator> sorter_type;
 
-  // create sorter object (CompareType(), MainMemoryLimit)
-  sorter_type int_sorter(my_comparator(), 64*1024*1024);
+    // create sorter object (CompareType(), MainMemoryLimit)
+    sorter_type int_sorter(my_comparator(), 64*1024*1024);
 
-  // fill sorter with elements order in descending order
-  for (size_t i = 10000; i > 0; i--) 
-  {
-    int_sorter.push(i);
-  }
+    // fill sorter with elements order in descending order
+    for (size_t i = 10000; i > 0; i--)
+    {
+        int_sorter.push(i);
+    }
 
-  int_sorter.sort();  // sort elements (in ascending order)
+    int_sorter.sort();  // sort elements (in ascending order)
 
-  // walk through sorted values and print them out
-  while (!int_sorter.empty())
-  {
-    std::cout << *int_sorter << " ";
-    ++int_sorter; 
-  } 
- 
-  return 0;
+    // walk through sorted values and print them out
+    while (!int_sorter.empty())
+    {
+        std::cout << *int_sorter << " ";
+        ++int_sorter;
+    }
+
+    return 0;
 }
