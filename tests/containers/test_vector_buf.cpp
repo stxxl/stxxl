@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_vector_writer.cpp
+ *  containers/test_vector_buf.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -80,7 +80,7 @@ public:
 };
 
 template <typename ValueType>
-void test_vector_writer(uint64 size)
+void test_vector_buf(uint64 size)
 {
     typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
 
@@ -120,29 +120,66 @@ void test_vector_writer(uint64 size)
 
         check_vector(v);
     }
+
+    vector_type v(size);
+
     { // fill vector using materialize
 
         stxxl::scoped_print_timer tm("materialize");
-
-        vector_type v(size);
 
         MyStream<ValueType> stream;
         stxxl::stream::materialize(stream, v.begin(), v.end());
 
         check_vector(v);
     }
+    { // read vector using vector_bufreader
+        stxxl::scoped_print_timer tm("vector_bufreader");
+
+        stxxl::vector_bufreader<vector_type> reader(v.begin(), v.end());
+
+        for (uint64 i = 0; i < size; ++i)
+        {
+            STXXL_CHECK( !reader.empty() );
+            STXXL_CHECK( reader.size() == size - i );
+
+            ValueType v;
+            reader >> v;
+
+            STXXL_CHECK( v == ValueType(i) );
+            STXXL_CHECK( reader.size() == size - i-1 );
+        }
+
+        STXXL_CHECK( reader.empty() );
+
+        // rewind reader and read again
+        reader.rewind();
+
+        for (uint64 i = 0; i < size; ++i)
+        {
+            STXXL_CHECK( !reader.empty() );
+            STXXL_CHECK( reader.size() == size - i );
+
+            ValueType v;
+            reader >> v;
+
+            STXXL_CHECK( v == ValueType(i) );
+            STXXL_CHECK( reader.size() == size - i-1 );
+        }
+
+        STXXL_CHECK( reader.empty() );
+    }
 }
 
 int main()
 {
     STXXL_MSG("Testing stxxl::vector<int>");
-    test_vector_writer<int>(64 * 1024*1024);
+    test_vector_buf<int>(64 * 1024*1024);
 
     STXXL_MSG("Testing stxxl::vector<uint64>");
-    test_vector_writer<uint64>(64 * 1024*1024);
+    test_vector_buf<uint64>(64 * 1024*1024);
 
     STXXL_MSG("Testing stxxl::vector<my_type>");
-    test_vector_writer<my_type>(32 * 1024*1024);
+    test_vector_buf<my_type>(32 * 1024*1024);
 
     return 0;
 }
