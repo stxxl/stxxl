@@ -56,6 +56,7 @@ extern int create_files(int argc, char * argv[]);
 extern int benchmark_disks(int argc, char * argv[]);
 extern int benchmark_files(int argc, char * argv[]);
 extern int benchmark_sort(int argc, char * argv[]);
+extern int benchmark_disks_random(int argc, char * argv[]);
 
 struct SubTool
 {
@@ -77,6 +78,8 @@ struct SubTool subtools[] = {
       "Benchmark different file access methods, e.g. syscall or mmap_files." },
     { "benchmark_sort", &benchmark_sort,
       "Run benchmark tests of different sorting methods in STXXL" },
+    { "benchmark_disks_random", &benchmark_disks_random,
+      "Benchmark random block access time to .stxxl configured disks." },
     { NULL, NULL, NULL }
 };
 

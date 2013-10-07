@@ -56,13 +56,8 @@ int benchmark_disks_alloc(stxxl::uint64 length, stxxl::uint64 step_size,
     if (length == 0)
         endpos = std::numeric_limits<stxxl::uint64>::max();
 
-    bool do_read = true, do_write = true;
-
-    if (optrw.size() && optrw.find('w') == std::string::npos)
-        do_write = false;
-
-    if (optrw.size() && optrw.find('r') == std::string::npos)
-        do_read = false;
+    bool do_read = (optrw.find('r') != std::string::npos);
+    bool do_write = (optrw.find('w') != std::string::npos);
 
     // construct block type
 
@@ -197,7 +192,7 @@ int benchmark_disks(int argc, char * argv[])
     stxxl::cmdline_parser cp;
 
     stxxl::uint64 length, step_size = 0;
-    std::string optrw, allocstr;
+    std::string optrw = "rw", allocstr;
 
     cp.add_param_bytes("size", "Amount of data to write/read from disks (e.g. 10GiB)", length);
     cp.add_opt_param_bytes("step", "Size of data written/read in one step (default: 8MiB)", step_size);

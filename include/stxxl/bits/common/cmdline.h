@@ -611,7 +611,6 @@ public:
         {
             os << std::endl;
             output_wrap(os, m_description, m_linewrap);
-            os << std::endl;
         }
         if (m_author.size())
         {
@@ -658,11 +657,12 @@ private:
     void print_option_error(int argc, const char* const* argv, const argument* arg,
                             std::ostream& os)
     {
-        os << (argc == 0 ? "Missing " : "Invalid ") << "argument";
+        os << "Error: Argument ";
         if (argc != 0)
-            os << " \"" << argv[0] << "\"";
+            os << '"' << argv[0] << '"';
 
         os << " for " << arg->type_name() << " option " << arg->option_text()
+           << (argc == 0 ? " is missing!" : " is invalid!")
            << std::endl << std::endl;
 
         print_usage(os);
@@ -672,11 +672,12 @@ private:
     void print_param_error(int argc, const char* const* argv, const argument* arg,
                            std::ostream& os)
     {
-        os << (argc == 0 ? "Missing " : "Invalid ") << "argument";
+        os << "Error: Argument ";
         if (argc != 0)
-            os << " \"" << argv[0] << "\"";
+            os << '"' << argv[0] << '"';
 
         os << " for " << arg->type_name() << " parameter " << arg->param_text()
+           << (argc == 0 ? " is missing!" : " is invalid!")
            << std::endl << std::endl;
 
         print_usage(os);
@@ -741,7 +742,7 @@ public:
                         }
                         if (oi == m_optlist.end())
                         {
-                            os << "Unknown option \"" << arg << '"' << std::endl << std::endl;
+                            os << "Error: Unknown option \"" << arg << "\"." << std::endl << std::endl;
                             print_usage(os);
                             return false;
                         }
@@ -775,7 +776,7 @@ public:
                         }
                         if (oi == m_optlist.end())
                         {
-                            os << "Unknown option \"" << arg << '"' << std::endl << std::endl;
+                            os << "Error: Unknown option \"" << arg << "\"." << std::endl << std::endl;
                             print_usage(os);
                             return false;
                         }
@@ -803,7 +804,8 @@ public:
                 }
                 else
                 {
-                    os << "Invalid extra argument " << argv[0] << std::endl << std::endl;
+                    os << "Error: Unexpected extra argument \"" << argv[0] << "\"."
+                       << std::endl << std::endl;
                     --argc, ++argv;
                     print_usage(os);
                     return false;
@@ -817,8 +819,8 @@ public:
              it != m_paramlist.end(); ++it)
         {
             if ((*it)->m_required && !(*it)->m_found) {
-                os << "Missing required argument for parameter '"
-                   << (*it)->m_longkey << "'" << std::endl;
+                os << "Error: Argument for parameter "
+                   << (*it)->m_longkey << " is required!" << std::endl;
                 good = false;
             }
         }
