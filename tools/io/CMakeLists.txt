@@ -14,7 +14,3 @@
 
 stxxl_build_extra_tool(benchmark_disk_and_flash)
 stxxl_build_extra_tool(iobench_scatter_in_place)
-
-if(NOT MSVC)
-  stxxl_build_extra_tool(sd_test)
-endif(NOT MSVC)

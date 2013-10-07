@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/sd_test.cpp
+ *  tests/io/test_sim_disk.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
