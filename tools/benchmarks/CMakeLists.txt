@@ -22,12 +22,58 @@ stxxl_build_test(stack_benchmark)
 add_define(bench_pqueue "STXXL_VERBOSE_LEVEL=0")
 add_define(benchmark_naive_matrix "STXXL_VERBOSE_LEVEL=0")
 
-if(0)
-  add_library(tpie STATIC IMPORTED)
-  set_property(TARGET tpie PROPERTY IMPORTED_LOCATION "${PROJECT_SOURCE_DIR}/3rdparty/tpie_091905/lib/libtpie.a")
+if(BUILD_TESTS)
+  file(GLOB TPIE_DIR_GLOB RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "tpie_*")
 
-  include_directories("${PROJECT_SOURCE_DIR}/3rdparty/tpie_091905/include")
-  stxxl_build_test(tpie_stack_benchmark)
+  foreach(TPIE_TEST ${TPIE_DIR_GLOB})
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${TPIE_TEST}/lib/libtpie.a")
+      set(TPIE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${TPIE_TEST}")
+      break()
+    endif()
+  endforeach()
 
-  target_link_libraries(tpie_stack_benchmark ${STXXL_LIBS} tpie)
-endif(0)
+  if(EXISTS "${TPIE_DIR}/lib/libtpie.a")
+
+    message("Found compiled TPIE library at ${TPIE_DIR}")
+
+    add_library(tpie STATIC IMPORTED)
+    set_property(TARGET tpie PROPERTY IMPORTED_LOCATION "${TPIE_DIR}/lib/libtpie.a")
+
+    include_directories("${TPIE_DIR}/include")
+
+    stxxl_build_test(tpie_stack_benchmark)
+    target_link_libraries(tpie_stack_benchmark ${STXXL_LIBS} tpie)
+
+    # try to locate a Berkeley DB version
+    find_path(BERKELEYDB_INCLUDES db_cxx.h
+      /usr/local/include/db4.8
+      /usr/local/include/db4.7
+      /usr/local/include/db4.6
+      /usr/local/include/db4.5
+      /usr/local/include/db4
+      /usr/local/include/db
+      /usr/include/db4.8
+      /usr/include/db4.7
+      /usr/include/db4.6
+      /usr/include/db4.5
+      /usr/include/db4
+      /usr/include/db
+      )
+
+    find_library(BERKELEYDB_LIBRARIES NAMES db_cxx)
+
+    include(FindPackageHandleStandardArgs)
+    find_package_handle_standard_args(BERKELEYDB "Could not find Berkeley DB"
+      BERKELEYDB_INCLUDES BERKELEYDB_LIBRARIES)
+    mark_as_advanced(BERKELEYDB_INCLUDES BERKELEYDB_LIBRARIES)
+
+    if(BERKELEYDB_FOUND)
+      include_directories("${BERKELEYDB_INCLUDES}")
+
+      stxxl_build_test(berkeley_db_benchmark)
+      target_link_libraries(berkeley_db_benchmark ${STXXL_LIBS} tpie ${BERKELEYDB_LIBRARIES})
+    endif()
+  else()
+    message("Could not find TPIE, skipping extra benchmarks.")
+  endif()
+endif(BUILD_TESTS)
