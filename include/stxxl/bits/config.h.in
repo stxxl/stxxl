@@ -65,4 +65,15 @@
 // cmake:   detection of erand48() function in <stdlib.h>
 // effect:  uses this random generator (default on linux)
 
+#cmakedefine STXXL_HAVE_MALLINFO_PROTO ${STXXL_HAVE_MALLINFO_PROTO}
+// default: off
+// cmake:   detection of mallinfo() function in <malloc.h>
+// effect:  used by stxxl_tool/mallinfo for malloc stats
+
+#cmakedefine STXXL_HAVE_MLOCK_PROTO ${STXXL_HAVE_MLOCK_PROTO}
+// default: off
+// cmake:   detection of mlock() function in <sys/mman.h>
+// effect:  used by stxxl_tool/mlock for locking physical pages
+
+
 #endif // !STXXL_CONFIG_HEADER

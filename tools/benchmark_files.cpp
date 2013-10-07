@@ -247,10 +247,10 @@ int benchmark_files(int argc, char * argv[])
             if (do_write)
             {
                 // write block number (512 byte blocks) into each block at position 42 * sizeof(unsigned)
-                for (unsigned j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(unsigned), ++b)
+                for (stxxl::uint64 j = 42, b = offset >> 9; j < current_step_size_int; j += 512 / sizeof(unsigned), ++b)
                 {
                     for (unsigned i = 0; i < nfiles; i++)
-                        buffer[current_step_size_int * i + j] = b;
+                        buffer[current_step_size_int * i + j] = (unsigned int)b;
                 }
 
                 for (unsigned i = 0; i < nfiles; i++)
@@ -345,8 +345,8 @@ int benchmark_files(int argc, char * argv[])
                 for (unsigned d = 0; d < nfiles; ++d)
                 {
                     for (unsigned s = 0; s < (current_step_size >> 9); ++s) {
-                        unsigned i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
-                        unsigned b = (offset >> 9) + s;
+                        stxxl::uint64 i = d * current_step_size_int + s * (512 / sizeof(unsigned)) + 42;
+                        stxxl::uint64 b = (offset >> 9) + s;
                         if (buffer[i] != b)
                         {
                             verify_failed = true;
@@ -354,7 +354,7 @@ int benchmark_files(int argc, char * argv[])
                                       << " got: " << std::hex << std::setw(8) << buffer[i] << " wanted: " << std::hex << std::setw(8) << b
                                       << std::dec << std::endl;
                         }
-                        buffer[i] = (pattern ? pattern : i);
+                        buffer[i] = (pattern ? pattern : (unsigned int)i);
                     }
                 }
 

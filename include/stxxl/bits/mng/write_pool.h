@@ -95,7 +95,10 @@ public:
             for (busy_blocks_iterator i2 = busy_blocks.begin(); i2 != busy_blocks.end(); ++i2)
             {
                 i2->req->wait();
-                STXXL_VERBOSE_WPOOL("  delete busy block=" << free_blocks.back());
+                if (free_blocks.empty())
+                    STXXL_VERBOSE_WPOOL("  delete busy block=(empty)");
+                else
+                    STXXL_VERBOSE_WPOOL("  delete busy block=" << free_blocks.back());
                 delete i2->block;
             }
         }

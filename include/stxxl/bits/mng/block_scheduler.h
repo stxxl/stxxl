@@ -291,7 +291,7 @@ public:
 
     };
 
-    typedef std::deque<prediction_sequence_element> prediction_sequence_type;
+    typedef std::list<prediction_sequence_element> prediction_sequence_type;
     // ---- end prediction_sequence -------
 
 protected:

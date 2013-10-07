@@ -12,19 +12,19 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <iostream>
-#if !defined(__APPLE__) && !defined(__FreeBSD__)
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/verbose.h>
+
+#if STXXL_HAVE_MALLINFO_PROTO
+
 #include <malloc.h>
-#endif
+#include <iostream>
 #include <cstdlib>
 #include <unistd.h>
-#include <stxxl/bits/verbose.h>
 #include <stxxl/cmdline>
-
 
 void print_malloc_stats()
 {
-#if !defined(__APPLE__) && !defined(__FreeBSD__)
     struct mallinfo info = mallinfo();
     STXXL_MSG("MALLOC statistics BEGIN");
     STXXL_MSG("===============================================================");
@@ -39,9 +39,6 @@ void print_malloc_stats()
     STXXL_MSG("number of bytes allocated but not in use       : " << info.fordblks);
     STXXL_MSG("top-most, releasable (via malloc_trim) space   : " << info.keepcost);
     STXXL_MSG("================================================================");
-#else
-    STXXL_MSG("MALLOC statistics are not supported on this platform");
-#endif
 }
 
 int do_mallinfo(int argc, char * argv[])
@@ -81,3 +78,13 @@ int do_mallinfo(int argc, char * argv[])
 
     return 0;
 }
+
+#else // !STXXL_HAVE_MALLINFO_PROTO
+
+int do_mallinfo(int, char *[])
+{
+    STXXL_MSG("Sorry, mallinfo() statistics are not supported on this platform.");
+    return -1;
+}
+
+#endif // STXXL_HAVE_MALLINFO_PROTO

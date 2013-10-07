@@ -14,6 +14,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/verbose.h>
+
+#if STXXL_HAVE_MLOCK_PROTO
+
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -54,4 +59,15 @@ int do_mlock(int argc, char * argv[])
         return 1;
     }
 }
+
+#else // !STXXL_HAVE_MLOCK_PROTO
+
+int do_mlock(int, char *[])
+{
+    STXXL_MSG("Sorry, mlock() is not supported on this platform.");
+    return -1;
+}
+
+#endif // STXXL_HAVE_MLOCK_PROTO
+
 // vim: et:ts=4:sw=4

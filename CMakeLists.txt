@@ -218,7 +218,7 @@ endif(USE_GNU_PARALLEL)
 # check if one thread and random library is available
 
 if(STXXL_STD_THREADS)
-  message("Using std::thread and other c++11 library functions.")
+  message("Using std::thread and other C++11 library functions.")
   unset(STXXL_BOOST_THREADS)
   unset(STXXL_POSIX_THREADS)
 elseif(STXXL_BOOST_THREADS)
@@ -236,6 +236,13 @@ endif()
 if(NOT (STXXL_STD_RANDOM OR STXXL_BOOST_RANDOM OR STXXL_HAVE_ERAND48))
   message(SEND_ERROR "Could not detect a random generator library. Check the compilation documentation.")
 endif()
+
+###############################################################################
+# test for additional includes and features used by some stxxl_tool components
+
+include(CheckSymbolExists)
+check_symbol_exists(mallinfo "malloc.h" STXXL_HAVE_MALLINFO_PROTO)
+check_symbol_exists(mlock "sys/mman.h" STXXL_HAVE_MLOCK_PROTO)
 
 ###############################################################################
 # configure environment for building
