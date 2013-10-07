@@ -18,6 +18,8 @@ stxxl_build_tool(stxxl_tool
   benchmark_files.cpp
   benchmark_sort.cpp
   benchmark_disks_random.cpp
+  mlock.cpp
+  mallinfo.cpp
   )
 
 add_subdirectory(containers)

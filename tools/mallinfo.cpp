@@ -1,10 +1,11 @@
 /***************************************************************************
- *  utils/malloc.cpp
+ *  tools/mallinfo.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2003 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,6 +19,7 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/cmdline>
 
 
 void print_malloc_stats()
@@ -42,25 +44,40 @@ void print_malloc_stats()
 #endif
 }
 
-int main(int argc, char * argv[])
+int do_mallinfo(int argc, char * argv[])
 {
-    using std::cout;
-    using std::cerr;
-    using std::endl;
+    // parse command line
+    stxxl::cmdline_parser cp;
 
-    if (argc < 2)
-    {
-        cerr << "Usage: " << argv[0] << " bytes_to_allocate" << endl;
+    cp.set_description("Allocate some memory and mlock() it to consume physical memory. "
+                       "Needs to run as root to block more than 64 KiB in default settings."
+        );
+
+    stxxl::uint64 M;
+    cp.add_param_bytes("size", "Amount of memory to allocate (e.g. 1GiB)", M);
+
+    if (!cp.process(argc,argv))
         return -1;
-    }
+
     sbrk(128 * 1024 * 1024);
-    cout << "Nothing allocated" << endl;
+
+    std::cout << "Nothing allocated" << std::endl;
     print_malloc_stats();
-    const unsigned bytes = atoi(argv[1]);
-    char * ptr = new char[bytes];
-    cout << "Allocated " << bytes << " bytes" << endl;
+
+    char * ptr = new char[M];
+
+    std::cout << "Allocated " << M << " bytes" << std::endl;
     print_malloc_stats();
+
+    memset(ptr, 42, M);
+
+    std::cout << "Filled " << M << " bytes" << std::endl;
+    print_malloc_stats();
+
     delete[] ptr;
-    cout << "Deallocated " << endl;
+
+    std::cout << "Deallocated " << std::endl;
     print_malloc_stats();
+
+    return 0;
 }

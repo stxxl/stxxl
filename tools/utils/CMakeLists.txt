@@ -13,11 +13,3 @@
 ###############################################################################
 
 stxxl_build_tool(pq_param)
-
-if (NOT MSVC)
-  stxxl_build_tool(malloc)
-endif (NOT MSVC)
-
-if (NOT MSVC)
-  stxxl_build_tool(mlock)
-endif (NOT MSVC)

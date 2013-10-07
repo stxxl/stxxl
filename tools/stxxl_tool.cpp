@@ -57,30 +57,37 @@ extern int benchmark_disks(int argc, char * argv[]);
 extern int benchmark_files(int argc, char * argv[]);
 extern int benchmark_sort(int argc, char * argv[]);
 extern int benchmark_disks_random(int argc, char * argv[]);
+extern int do_mlock(int argc, char * argv[]);
+extern int do_mallinfo(int argc, char * argv[]);
 
 struct SubTool
 {
     const char* name;
     int (*func)(int argc, char* argv[]);
+    bool shortline;
     const char* description;
 };
 
 struct SubTool subtools[] = {
-    { "info", &stxxl_info,
+    { "info", &stxxl_info, false,
       "Print out information about the build system and which optional "
       "modules where compiled into STXXL." },
-    { "create_files", &create_files,
+    { "create_files", &create_files, false,
       "Precreate large files to keep file system allocation time out to measurements." },
-    { "benchmark_disks", &benchmark_disks,
+    { "benchmark_disks", &benchmark_disks, false,
       "This program will benchmark the disks configured by the standard "
       ".stxxl disk configuration files mechanism." },
-    { "benchmark_files", &benchmark_files,
+    { "benchmark_files", &benchmark_files, false,
       "Benchmark different file access methods, e.g. syscall or mmap_files." },
-    { "benchmark_sort", &benchmark_sort,
+    { "benchmark_sort", &benchmark_sort, false,
       "Run benchmark tests of different sorting methods in STXXL" },
-    { "benchmark_disks_random", &benchmark_disks_random,
+    { "benchmark_disks_random", &benchmark_disks_random, false,
       "Benchmark random block access time to .stxxl configured disks." },
-    { NULL, NULL, NULL }
+    { "mlock", &do_mlock, true,
+      "Lock physical memory." },
+    { "mallinfo", &do_mallinfo, true,
+      "Show mallinfo statistics." },
+    { NULL, NULL, false, NULL }
 };
 
 int main_usage(const char* arg0)
@@ -88,12 +95,29 @@ int main_usage(const char* arg0)
     std::cout << "Usage: " << arg0 << " <subtool> ..." << std::endl
               << "Available subtools: " <<  std::endl;
 
+    size_t shortlen = 0;
+
     for (unsigned int i = 0; subtools[i].name; ++i)
     {
+        if (!subtools[i].shortline) continue;
+        shortlen = std::max(shortlen, strlen(subtools[i].name));
+    }
+
+    for (unsigned int i = 0; subtools[i].name; ++i)
+    {
+        if (subtools[i].shortline) continue;
         std::cout << "  " << subtools[i].name << std::endl;
         stxxl::cmdline_parser::output_wrap(std::cout, subtools[i].description, 80, 6, 6);
         std::cout << std::endl;
     }
+
+    for (unsigned int i = 0; subtools[i].name; ++i)
+    {
+        if (!subtools[i].shortline) continue;
+        std::cout << "  " << std::left << std::setw(shortlen+2)
+                  << subtools[i].name << subtools[i].description << std::endl;
+    }
+    std::cout << std::endl;
 
     return 0;
 }
