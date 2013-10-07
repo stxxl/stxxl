@@ -253,8 +253,9 @@ protected:
     blocks_type blocks;
     //! if the elements in each block are in col-major instead of row-major
     bool elements_in_blocks_transposed;
+
     //! get identifier of the block at (row, col)
-    swappable_block_identifier_type & bl(const size_type row, const size_type col)
+    swappable_block_identifier_type& bl(const size_type row, const size_type col)
     { return blocks[row * width + col]; }
 
 public:
@@ -374,10 +375,12 @@ public:
                  : row % BlockSideLength * BlockSideLength + col % BlockSideLength;
     }
 
-    swappable_block_identifier_type block(const size_type row, const size_type col) const
+    //! get identifier of the block at (row, col)
+    const swappable_block_identifier_type& block(const size_type row, const size_type col) const
     { return blocks[row * width + col]; }
 
-    swappable_block_identifier_type operator () (const size_type row, const size_type col) const
+    //! get identifier of the block at (row, col)
+    const swappable_block_identifier_type& operator () (const size_type row, const size_type col) const
     { return block(row, col); }
 
     const size_type & get_height() const
@@ -393,11 +396,11 @@ public:
     void transpose()
     {
         // transpose matrix of blocks
-        blocks_type bl(blocks.size());
-        for (size_type row = 1; row < height; ++row)
-            for (size_type col = 0; col < row; ++col)
-                bl[col * height + row] = block(row,col);
-        bl.swap(blocks);
+        blocks_type bn(blocks.size());
+        for (size_type row = 0; row < height; ++row)
+            for (size_type col = 0; col < width; ++col)
+                bn[col * height + row] = bl(row,col);
+        bn.swap(blocks);
         // swap dimensions
         std::swap(height, width);
         std::swap(height_from_supermatrix, width_from_supermatrix);
