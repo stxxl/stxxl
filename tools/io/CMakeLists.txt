@@ -16,7 +16,6 @@ stxxl_build_extra_tool(benchmark_disk_and_flash)
 stxxl_build_extra_tool(flushbuffers)
 stxxl_build_extra_tool(gen_file)
 stxxl_build_extra_tool(iobench_scatter_in_place)
-stxxl_build_extra_tool(verify_disks)
 
 if(NOT MSVC)
   stxxl_build_extra_tool(sd_test)
