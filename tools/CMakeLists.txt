@@ -22,7 +22,6 @@ stxxl_build_tool(stxxl_tool
   mallinfo.cpp
   )
 
-add_subdirectory(containers)
-add_subdirectory(io)
-add_subdirectory(utils)
+add_subdirectory(benchmarks)
+add_subdirectory(extras)
 
