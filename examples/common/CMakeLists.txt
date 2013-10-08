@@ -10,4 +10,4 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-stxxl_build_tool(cmdline)
+stxxl_build_example(cmdline)

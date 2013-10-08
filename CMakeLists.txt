@@ -31,6 +31,8 @@ include(CheckIncludeFileCXX)
 ###############################################################################
 # compilation options
 
+option(BUILD_EXAMPLES "Build all stxxl examples" OFF)
+
 option(BUILD_TESTS "Build all stxxl test programs" OFF)
 
 option(BUILD_EXTRAS "Build all extra stxxl test and tool programs" OFF)
@@ -50,6 +52,10 @@ endif()
 
 if(NOT MSVC)
   option(USE_STD_THREADS "Force usage of C++ standard library thread support." OFF)
+endif()
+
+if(BUILD_TESTS)
+  set(BUILD_EXAMPLES ON)
 endif()
 
 ###############################################################################
@@ -289,6 +295,15 @@ macro(stxxl_build_tool PROGNAME)
 
 endmacro(stxxl_build_tool)
 
+# macro for building stxxl examples
+macro(stxxl_build_example TESTNAME)
+
+  if(BUILD_EXAMPLES)
+    stxxl_build_tool(${TESTNAME} ${ARGN})
+  endif(BUILD_EXAMPLES)
+
+endmacro(stxxl_build_example)
+
 # macro for building stxxl tests
 macro(stxxl_build_test TESTNAME)
 
@@ -318,15 +333,6 @@ macro(stxxl_build_extra_tool TESTNAME)
   endif(BUILD_EXTRAS)
 
 endmacro(stxxl_build_extra_tool)
-
-# macro for building stxxl extra tests
-macro(stxxl_build_extra_test TESTNAME)
-
-  if(BUILD_EXTRAS)
-    stxxl_build_tool(${TESTNAME})
-  endif(BUILD_EXTRAS)
-
-endmacro(stxxl_build_extra_test)
 
 # macro for setting additional defines for targets
 macro(add_define PROGNAME)
@@ -380,7 +386,7 @@ message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
 ###############################################################################
 # build tests and tools
 
-add_subdirectory(tests)
 add_subdirectory(tools)
 add_subdirectory(examples)
+add_subdirectory(tests)
 add_subdirectory(local)

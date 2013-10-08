@@ -10,5 +10,5 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-stxxl_build_tool(stream1)
+stxxl_build_example(stream1)
 
