@@ -24,6 +24,8 @@ This page gives a short introduction into the stream package. First the main abs
 
 All example code can be found in \ref examples/stream/stream1.cpp
 
+In \ref tutorial_stream_edgesort another example is given, where an existing algorithm is "pipelined".
+
 \section stream1 Abstraction, Interface and a Simple Example
 
 The stream package is built around the abstract notion of an object being able to produce a sequence of output values. Only three simple operations are necessary:
@@ -399,6 +401,108 @@ All three examples have the same output.
 
 \example examples/stream/stream1.cpp
 This example code is explain in the \ref tutorial_stream.
+
+*/
+
+/** \page tutorial_stream_edgesort Generating Random Graphs using Streams
+
+\author Roman Dementiev (2007)
+
+This page gives an example of how an application using "traditional" containers and algorithms can be converted into using pipelines streaming.
+
+The purpose of our example is to generate a huge random directed graph in a sorted edge array representation, i.e. the edges in the edge array must be sorted lexicographically. The definitions of the classes \c edge, \c random_edge and \c edge_cmp are in the following code listing.
+
+\code
+struct edge { // edge class
+    int src, dst; // nodes
+    edge() {}
+    edge(int src_, int dst_): src(src_), dst(dst_) {}
+    bool operator == (const edge & b) const {
+        return src == b.src && dst == b.dst;
+    }
+};
+struct random_edge { // random edge generator functor
+    edge operator () () const {
+        edge Edge(random() - 1, random() - 1);
+        while(Edge.dst == Edge.src)
+             Edge.dst = random() - 1 ; // no self-loops
+        return Edge;
+    }
+};
+struct edge_cmp { // edge comparison functor
+    edge min_value() const {
+        return edge(std::numeric_limits<int>::min(),0); };
+    edge max_value() const {
+        return edge(std::numeric_limits<int>::max(),0); };
+    bool operator () (const edge & a,
+                      const edge & b) const {
+        return a.src < b.src || (a.src == b.src && a.dst < b.dst);
+    }
+};
+\endcode
+
+A straightforward procedure to generate the graph is to: 1) generate a sequence of random edges, 2) sort the sequence, 3) remove duplicate edges from it. If we ignore definitions of helper classes the STL/STXXL code of the algorithm implementation is only five lines long:
+
+\code
+// create vector
+stxxl::vector<edge> ExtEdgeVec(10000000000ULL);
+// generate random edges
+stxxl::generate(ExtEdgeVec.begin(), ExtEdgeVec.end(), random_edge());
+// sort edges by source vertex
+stxxl::sort(ExtEdgeVec.begin(), ExtEdgeVec.end(), edge_cmp(), 512*1024*1024);
+// unify equal edges
+stxxl::vector<edge>::iterator NewEnd =  std::unique(ExtEdgeVec.begin(), ExtEdgeVec.end());
+ExtEdgeVec.resize(NewEnd - ExtEdgeVec.begin());
+\endcode
+
+Line 2 creates an STXXL external memory vector with 10 billion edges. Line 4 fills the vector with random edges (stxxl::generate from the STL is used). In the next line the STXXL external memory sorter sorts randomly generated edges using 512 megabytes of internal memory. The lexicographical order is defined by functor \c my_cmp, stxxl::sort also requires the comparison functor to provide upper and lower bounds for the elements being sorted. Line 8 deletes duplicate edges in the external memory vector with the help of the STL \c std::unique algorithm. The \c NewEnd vector iterator points to the right boundary of the range without duplicates. Finally (in the last line), we chop the vector at the \c NewEnd boundary.
+
+Now we count the number of I/Os performed by this example: external vector construction takes no I/Os; filling with random values requires a scan --- \f$ N/DB \f$ I/Os; sorting will take \f$ 4N/DB \f$ I/Os; duplicate removal needs no more than \f$ 2N/DB \f$ I/Os; chopping a vector is I/O-free. The total number of I/Os is \f$ 7N/DB \f$.
+
+# Pipelined random graph generation
+
+Now we <b>"pipeline"</b> the random graph generation example shown in the previous chapter. The data flow graph of the algorithm is presented in the following figure:
+
+\image html pipeline_randomgraph_small.png "Pipeline of Random Graph Generator"
+
+The following code listing shows the pipelined code of the algorithm, the definitions of \c edge, \c random_edge, and \c edge_cmp are assumed to be available from the listing in the previous section.
+
+\code
+using namespace stxxl;
+class random_edge_stream {
+    int64 counter;
+    edge current;
+    random_edge_stream();
+public:
+    typedef edge value_type;
+    random_edge_stream(int64 elements)
+        : counter(elements), current(random_edge()())
+    { }
+    const edge & operator * () const { return current; }
+    const edge * operator ->() const { return &current; }
+    random_edge_stream & operator ++ ()
+    {
+        --counter;
+        current = random_edge()();
+        return *this;
+    }
+    bool empty() const { return counter == 0; }
+};
+
+random_edge_stream RandomStream(10000000000ULL);
+typedef stream::sort<random_edge_stream, edge_cmp> sorted_stream;
+sorted_stream SortedStream(RandomStream, edge_cmp(), 512*1024*1024);
+typedef stream::unique<sorted_stream> unique_stream_type;
+unique_stream_type UniqueStream(SortedStream);
+stxxl::vector<edge> ExtEdgeVec(10000000000ULL);
+stxxl::vector<edge>::iterator NewEnd =
+    stream::materialize(UniqueStream, ExtEdgeVec.begin());
+ExtEdgeVec.resize(NewEnd - ExtEdgeVec.begin());
+\endcode
+
+Since the sorter of the streaming layer accepts an \c stream input, we do not need to output the random edges. Rather, we generate them on the fly. The \c random_edge_stream object (model of \c stream) supplies the sorter with a stream of random edges. We define the type of the sorter node as \c sorted_stream; it is parameterized by the type of the input stream and the type of the comparison function object. Then a \c SortedStream object is created and its input is attached to the \c RandomStream object's output.  The internal memory consumption of the sorter stream object is limited to 512 MB. The \c UniqueStream object filters the duplicates in its input edge stream. The generic \c stream::unique stream class stems from the STXXL library.  The stream::materialize function records the content of the \c UniqueStream into the external memory vector.  As in the previous non-pipelined version, we cut the vector at the \c NewEnd boundary.
+
+Let us count the number of I/Os the program performs: random edge generation by \c RandomStream costs no I/O; sorting in \c SortedStream needs to store the sorted runs and read them again to merge --- \f$ 2N/DB \f$ I/Os; \c UniqueStream deletes duplicates on the fly, it does not need any I/O; and materializing the final output can cost up to \f$ N/DB \f$ I/Os. All in all, the program only incurs \f$ 3N/DB \f$ I/Os, compared to \f$ 7N/DB \f$ for the non-pipelined code.
 
 */
 

@@ -35,12 +35,13 @@ First you must compile the library. Pick one of the following \subpage install "
 - \ref install_unix
 - \ref install_windows
 
-Once compiled, you can read the following \subpage tutorial "simple tutorials" on how to use STXXL containers and algorithms:
+Once compiled, you can read the following simple tutorials on how to use STXXL containers and algorithms:
 
 - \ref tutorial_vector
-  - \ref tutorial_vector_billing
+- \ref tutorial_stack
 - \ref tutorial_pqueue
-- \ref tutorial_stream
+
+See the corresponding page for a \subpage tutorial "complete list of all Tutorials".
 
 # Design and More Information
 
