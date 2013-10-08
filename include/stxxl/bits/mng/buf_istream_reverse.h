@@ -65,8 +65,8 @@ public:
     typedef buf_istream_reverse<block_type, bid_iterator_type> _Self;
 
     //! Constructs input stream object, reading [first,last) blocks in reverse.
-    //! \param _begin \c bid_iterator pointing to the first block of the stream
-    //! \param _end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
+    //! \param begin \c bid_iterator pointing to the first block of the stream
+    //! \param end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
     //! \param nbuffers number of buffers for internal use
     buf_istream_reverse(bid_iterator_type begin, bid_iterator_type end, int_type nbuffers)
         : current_elem(0),

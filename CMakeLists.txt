@@ -111,15 +111,29 @@ if(CXX_HAS_TEMPLATE_DEPTH)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
 endif()
 
+if(MSVC)
+  # Enable C++11 for MSVC 11 or greater
+  if(NOT (MSVC_VERSION LESS 1700))
+    set(STXXL_HAVE_CXX11 "1")
+  endif()
+else()
+  check_cxx_compiler_flag(-std=c++11 CXX_HAS_STD_CXX11)
+  if(CXX_HAS_STD_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(STXXL_HAVE_CXX11 "1")
+  else()
+    check_cxx_compiler_flag(-std=c++0x CXX_HAS_STD_CXX0X)
+    if(CXX_HAS_STD_CXX0X)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+      set(STXXL_HAVE_CXX11 "1")
+    endif()
+  endif()
+endif()
+
 ###############################################################################
 # find thread and random library
 
 if(MSVC OR USE_STD_THREADS)
-
-  check_cxx_compiler_flag(-std=c++0x CXX_HAS_STD_CXX0X)
-  if(CXX_HAS_STD_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-  endif()
 
   check_include_file_cxx(thread HAVE_STD_THREAD_H)
   check_include_file_cxx(mutex HAVE_STD_MUTEX_H)

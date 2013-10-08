@@ -31,7 +31,8 @@ This section introduces in all currently available STXXL containers.
 The practical part about it: STXXL containers which have an internal counterparts in the Standard Template Library (STL) work similar so that parts of this tutorial may sound familiar to you:
 
 - \subpage tutorial_vector "stxxl::vector tutorial"
-  - \subpage tutorial_vector_billing "example application of stxxl::vector and stxxl::sort"
+  - \subpage tutorial_vector_billing
+  - \subpage tutorial_vector_buf
 - \subpage tutorial_stack "stxxl::stack tutorial"
 - \subpage tutorial_queue "stxxl::queue tutorial"
 - \subpage tutorial_deque "stxxl::deque tutorial"

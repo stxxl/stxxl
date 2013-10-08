@@ -90,57 +90,57 @@ void test_vector_buf(uint64 size)
     { // fill vector using element access
         stxxl::scoped_print_timer tm("element access");
 
-        vector_type v(size);
+        vector_type vec(size);
 
         for (uint64 i = 0; i < size; ++i)
-            v[i] = ValueType(i);
+            vec[i] = ValueType(i);
 
-        check_vector(v);
+        check_vector(vec);
     }
     { // fill vector using iterator access
         stxxl::scoped_print_timer tm("iterator access");
 
-        vector_type v(size);
+        vector_type vec(size);
 
-        vector_iterator_type vi = v.begin();
+        vector_iterator_type vi = vec.begin();
 
         for (uint64 i = 0; i < size; ++i, ++vi)
             *vi = ValueType(i);
 
-        check_vector(v);
+        check_vector(vec);
     }
     { // fill vector using vector_bufwriter
         stxxl::scoped_print_timer tm("vector_bufwriter");
 
-        vector_type v(size);
+        vector_type vec(size);
 
-        stxxl::vector_bufwriter<vector_iterator_type> writer(v.begin());
+        typename vector_type::bufwriter_type writer(vec.begin());
 
         for (uint64 i = 0; i < size; ++i)
             writer << ValueType(i);
 
         writer.finish();
 
-        check_vector(v);
+        check_vector(vec);
     }
 
-    vector_type v(size);
+    vector_type vec(size);
 
     { // fill vector using materialize
 
         stxxl::scoped_print_timer tm("materialize");
 
         MyStream<ValueType> stream;
-        stxxl::stream::materialize(stream, v.begin(), v.end());
+        stxxl::stream::materialize(stream, vec.begin(), vec.end());
 
-        check_vector(v);
+        check_vector(vec);
     }
     { // read vector using vector_bufreader
         stxxl::scoped_print_timer tm("vector_bufreader");
 
-        const vector_type& vc = v;
+        const vector_type& cvec = vec;
 
-        stxxl::vector_bufreader<vector_const_iterator_type> reader(vc.begin(), vc.end());
+        typename vector_type::bufreader_type reader(cvec.begin(), cvec.end());
 
         for (uint64 i = 0; i < size; ++i)
         {
@@ -182,9 +182,9 @@ void test_vector_buf(uint64 size)
     { // read vector using vector_bufreader_reverse
         stxxl::scoped_print_timer tm("vector_bufreader_reverse");
 
-        const vector_type& vc = v;
+        const vector_type& cvec = vec;
 
-        stxxl::vector_bufreader_reverse<vector_const_iterator_type> reader(vc.begin(), vc.end());
+        typename vector_type::bufreader_reverse_type reader(cvec.begin(), cvec.end());
 
         for (uint64 i = 0; i < size; ++i)
         {
@@ -223,6 +223,37 @@ void test_vector_buf(uint64 size)
 
         STXXL_CHECK( reader.empty() );
     }
+#if (STXXL_MSVC && STXXL_HAVE_CXX11) || (defined(__GNUG__) && (__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40600)
+    { // read vector using C++11 for loop construct
+
+        stxxl::scoped_print_timer tm("C++11 for loop");
+
+        uint64 i = 0;
+
+        for(auto it : vec)
+        {
+            STXXL_CHECK( it == ValueType(i) );
+            ++i;
+        }
+
+        STXXL_CHECK( i == vec.size() );
+    }
+    { // read vector using C++11 for loop construct
+
+        stxxl::scoped_print_timer tm("C++11 bufreader for loop");
+        typedef typename vector_type::bufreader_type bufreader_type;
+
+        uint64 i = 0;
+
+        for(auto it : bufreader_type(vec))
+        {
+            STXXL_CHECK( it == ValueType(i) );
+            ++i;
+        }
+
+        STXXL_CHECK( i == vec.size() );
+    }
+#endif
 }
 
 int main()
