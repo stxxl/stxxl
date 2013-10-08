@@ -20,7 +20,7 @@ int main()
 
     for (int i = 0; i < 1024*1024; i++)
     {
-        my_vector.push_back(i+2);
+      my_vector.push_back(i+2);
     }
 
     std::cout << my_vector[99] << std::endl;
@@ -28,7 +28,7 @@ int main()
 
     while(!my_vector.empty())
     {
-        my_vector.pop_back();
+      my_vector.pop_back();
     }
 
     return 0;

@@ -386,7 +386,7 @@ See the \ref install_config documentation page on the format of accepted file si
 
 /** \page common_io_counter I/O Performance Counter
 
-The STXXL library provides various I/O performance counters (stxxl::stats class). 
+The STXXL library provides various I/O performance counters (stxxl::stats class) which can be used to get an extensive set of I/O statistics. They can be accessed as follows:
 
 \code
   // generate stats instance
