@@ -13,6 +13,7 @@
 #ifndef STXXL_BUF_OSTREAM_HEADER
 #define STXXL_BUF_OSTREAM_HEADER
 
+#include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/mng/buf_writer.h>
 
 
@@ -27,7 +28,7 @@ __STXXL_BEGIN_NAMESPACE
 //! Writes data records to the stream of blocks.
 //! \remark Writing performed in the background, i.e. with overlapping of I/O and computation
 template <typename BlockType, typename BIDIteratorType>
-class buf_ostream
+class buf_ostream : private noncopyable
 {
 public:
     typedef BlockType block_type;
@@ -115,7 +116,7 @@ public:
     }
 
     //! Deallocates internal objects.
-    virtual ~buf_ostream()
+    ~buf_ostream()
     {
         assert(current_elem == 0);
     }

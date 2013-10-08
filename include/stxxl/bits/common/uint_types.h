@@ -124,7 +124,10 @@ public:
     inline uint_pair(const int32& a)
         : low(a), high(0)
     {
-        assert(a >= 0);
+        if (a >= 0)
+            low = a;
+        else
+            low = a, high = high_max();
     }
 
     //! construct from an uint64 (unsigned long long)

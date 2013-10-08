@@ -1,17 +1,18 @@
 /***************************************************************************
- *  include/stxxl/bits/mng/buf_istream.h
+ *  include/stxxl/bits/mng/buf_istream_reverse.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BUF_ISTREAM_HEADER
-#define STXXL_BUF_ISTREAM_HEADER
+#ifndef STXXL_BUF_ISTREAM_REVERSE_HEADER
+#define STXXL_BUF_ISTREAM_REVERSE_HEADER
 
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/mng/block_prefetcher.h>
@@ -29,22 +30,26 @@ __STXXL_BEGIN_NAMESPACE
 #define BUF_ISTREAM_CHECK_END
 
 
-//! Buffered input stream.
+//! Buffered input stream, reading the items in the blocks in reverse order.
 //!
-//! Reads data records from the stream of blocks.
+//! Reads data records from the stream of blocks in reverse order.
 //! \remark Reading performed in the background, i.e. with overlapping of I/O and computation
 template <typename BlockType, typename BIDIteratorType>
-class buf_istream : private noncopyable
+class buf_istream_reverse : private noncopyable
 {
 public:
     typedef BlockType block_type;
     typedef BIDIteratorType bid_iterator_type;
 
+    //-tb note that we redefine the BID type here, because there is no way to
+    //-derive it from BIDIteratorType (which is usually just a POD pointer).
+    typedef BIDArray<block_type::raw_size> bid_vector_type;
+
 private:
-    buf_istream() { }
+    buf_istream_reverse() { }
 
 protected:
-    typedef block_prefetcher<block_type, bid_iterator_type> prefetcher_type;
+    typedef block_prefetcher<block_type, typename bid_vector_type::iterator> prefetcher_type;
     prefetcher_type * prefetcher;
     bid_iterator_type begin_bid, end_bid;
     int_type current_elem;
@@ -53,39 +58,42 @@ protected:
 #ifdef BUF_ISTREAM_CHECK_END
     bool not_finished;
 #endif
+    bid_vector_type bids_;
 
 public:
     typedef typename block_type::reference reference;
-    typedef buf_istream<block_type, bid_iterator_type> _Self;
+    typedef buf_istream_reverse<block_type, bid_iterator_type> _Self;
 
-    //! Constructs input stream object.
+    //! Constructs input stream object, reading [first,last) blocks in reverse.
     //! \param _begin \c bid_iterator pointing to the first block of the stream
     //! \param _end \c bid_iterator pointing to the ( \b last + 1 ) block of the stream
     //! \param nbuffers number of buffers for internal use
-    buf_istream(bid_iterator_type _begin, bid_iterator_type _end, int_type nbuffers) :
-        current_elem(0)
+    buf_istream_reverse(bid_iterator_type begin, bid_iterator_type end, int_type nbuffers)
+        : current_elem(0),
 #ifdef BUF_ISTREAM_CHECK_END
-        , not_finished(true)
+          not_finished(true),
 #endif
+          bids_(end - begin)
     {
-        //int_type i;
-        const unsigned_type ndisks = config::get_instance()->disks_number();
-        const int_type seq_length = _end - _begin;
-        prefetch_seq = new int_type[seq_length];
+        // copy list of bids in reverse
+        std::reverse_copy( begin, end, bids_.begin() );
 
-        // obvious schedule
-        //for(int_type i = 0; i< seq_length; ++i)
-        //	prefetch_seq[i] = i;
+        // calculate prefetch sequence
+        const unsigned_type ndisks = config::get_instance()->disks_number();
+
+        prefetch_seq = new int_type[bids_.size()];
 
         // optimal schedule
         nbuffers = STXXL_MAX(2 * ndisks, unsigned_type(nbuffers - 1));
-        compute_prefetch_schedule(_begin, _end, prefetch_seq,
+        compute_prefetch_schedule(bids_.begin(), bids_.end(), prefetch_seq,
                                   nbuffers, ndisks);
 
+        // create stream prefetcher
+        prefetcher = new prefetcher_type(bids_.begin(), bids_.end(), prefetch_seq, nbuffers);
 
-        prefetcher = new prefetcher_type(_begin, _end, prefetch_seq, nbuffers);
-
+        // fetch block: last in sequence
         current_blk = prefetcher->pull_block();
+        current_elem = block_type::size - 1;
     }
 
     //! Input stream operator, reads in \c record.
@@ -98,11 +106,11 @@ public:
         assert(not_finished);
 #endif
 
-        record = current_blk->elem[current_elem++];
+        record = current_blk->elem[current_elem--];
 
-        if (UNLIKELY(current_elem >= block_type::size))
+        if (UNLIKELY(current_elem < 0))
         {
-            current_elem = 0;
+            current_elem = block_type::size - 1;
 #ifdef BUF_ISTREAM_CHECK_END
             not_finished = prefetcher->block_consumed(current_blk);
 #else
@@ -125,7 +133,7 @@ public:
         return current_blk->elem[current_elem];
     }
 
-    //! Moves to the next record in the stream.
+    //! Moves to the _previous_ record in the stream.
     //! \return reference to itself after the advance
     _Self & operator ++ ()
     {
@@ -133,11 +141,11 @@ public:
         assert(not_finished);
 #endif
 
-        current_elem++;
+        current_elem--;
 
-        if (UNLIKELY(current_elem >= block_type::size))
+        if (UNLIKELY(current_elem < 0))
         {
-            current_elem = 0;
+            current_elem = block_type::size - 1;
 #ifdef BUF_ISTREAM_CHECK_END
             not_finished = prefetcher->block_consumed(current_blk);
 #else
@@ -148,7 +156,7 @@ public:
     }
 
     //! Frees used internal objects.
-    ~buf_istream()
+    ~buf_istream_reverse()
     {
         delete prefetcher;
         delete[] prefetch_seq;
@@ -159,4 +167,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_BUF_ISTREAM_HEADER
+#endif // !STXXL_BUF_ISTREAM_REVERSE_HEADER

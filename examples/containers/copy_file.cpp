@@ -71,7 +71,7 @@ void copy_file(const char* input_path, const char* output_path, unsigned int met
             input(InputVector.begin(), InputVector.end());
 
         // construct buffered output writer
-        stxxl::vector_bufwriter<vector_type> writer(OutputVector.begin());
+        stxxl::vector_bufwriter<vector_type::iterator> writer(OutputVector.begin());
 
         while (!input.empty()) // iterate through InputVector
         {

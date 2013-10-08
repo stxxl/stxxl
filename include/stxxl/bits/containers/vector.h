@@ -28,6 +28,7 @@
 #include <stxxl/bits/containers/pager.h>
 #include <stxxl/bits/common/is_sorted.h>
 #include <stxxl/bits/mng/buf_istream.h>
+#include <stxxl/bits/mng/buf_istream_reverse.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 
 
@@ -1694,24 +1695,21 @@ bool is_sorted(
  * Note that this buffered reader is inefficient for reading small ranges. This
  * is intentional, as one can just use operator[] on the vector for that.
  */
-template <typename VectorType>
+template <typename VectorIteratorType>
 class vector_bufreader : public noncopyable
 {
 public:
-    //! template parameter: the vector type
-    typedef VectorType vector_type;
+    //! template parameter: the vector iterator type
+    typedef VectorIteratorType vector_iterator_type;
 
     //! value type of the output vector
-    typedef typename vector_type::value_type value_type;
+    typedef typename vector_iterator_type::value_type value_type;
 
     //! block type used in the vector
-    typedef typename vector_type::block_type block_type;
+    typedef typename vector_iterator_type::block_type block_type;
 
     //! block identifier iterator of the vector
-    typedef typename vector_type::bids_container_iterator bids_container_iterator;
-
-    //! iterator type of vector, always constant
-    typedef typename vector_type::const_iterator vector_iterator_type;
+    typedef typename vector_iterator_type::bids_container_iterator bids_container_iterator;
 
     //! construct output buffered stream used for overlapped reading
     typedef buf_istream<block_type, bids_container_iterator> buf_istream_type;
@@ -1761,7 +1759,7 @@ public:
         if (m_bufin) delete m_bufin;
 
         // find last bid to read
-        bids_container_iterator end_bid = m_end.bid() + ((m_end.block_offset()) ? 1 : 0);
+        bids_container_iterator end_bid = m_end.bid() + (m_end.block_offset() ? 1 : 0);
 
         // construct buffered istream for range
         m_bufin = new buf_istream_type(m_begin.bid(), end_bid, m_nbuffers);
@@ -1817,7 +1815,7 @@ public:
     //! Return remaining size.
     size_t size() const
     {
-        assert(m_iter <= m_end);
+        assert(m_begin <= m_iter && m_iter <= m_end);
         return (m_end - m_iter);
     }
 
@@ -1825,6 +1823,160 @@ public:
     bool empty() const
     {
         return (m_iter == m_end);
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////
+
+/*!
+ * Buffered sequential reverse reader from a vector using overlapped I/O.
+ *
+ * This buffered reader can be used to read a large sequential region of a
+ * vector _in_reverse_ using overlapped I/O. The object is created from an
+ * iterator range, which can then be read to using operator<<(), or with
+ * operator*() and operator++(), where ++ actually goes to the preceding
+ * element.
+ *
+ * The interface also fulfills all requirements of a stream. Actually most of
+ * the code is identical to stream::vector_iterator2stream.
+ *
+ * Note that this buffered reader is inefficient for reading small ranges. This
+ * is intentional, as one can just use operator[] on the vector for that.
+ */
+template <typename VectorIteratorType>
+class vector_bufreader_reverse : public noncopyable
+{
+public:
+    //! template parameter: the vector iterator type
+    typedef VectorIteratorType vector_iterator_type;
+
+    //! value type of the output vector
+    typedef typename vector_iterator_type::value_type value_type;
+
+    //! block type used in the vector
+    typedef typename vector_iterator_type::block_type block_type;
+
+    //! block identifier iterator of the vector
+    typedef typename vector_iterator_type::bids_container_iterator bids_container_iterator;
+
+    //! construct output buffered stream used for overlapped reading
+    typedef buf_istream_reverse<block_type, bids_container_iterator> buf_istream_type;
+
+protected:
+    //! iterator to the beginning of the range.
+    vector_iterator_type        m_begin;
+
+    //! internal "current" iterator into the vector.
+    vector_iterator_type        m_iter;
+
+    //! iterator to the end of the range.
+    vector_iterator_type        m_end;
+
+    //! buffered input stream used to overlapped I/O.
+    buf_istream_type*           m_bufin;
+
+    //! number of blocks to use as buffers.
+    unsigned_type               m_nbuffers;
+
+public:
+
+    //! Create overlapped reader for the given iterator range.
+    //! \param begin iterator to position were to start reading in vector
+    //! \param end iterator to position were to end reading in vector
+    //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
+    vector_bufreader_reverse(vector_iterator_type begin, vector_iterator_type end, unsigned_type nbuffers = 0)
+        : m_begin(begin), m_end(end),
+          m_bufin(NULL),
+          m_nbuffers(nbuffers)
+    {
+        begin.flush(); // flush container
+
+        if (m_nbuffers == 0)
+            m_nbuffers = 2 * config::get_instance()->disks_number();
+
+        rewind();
+    }
+
+    //! Rewind stream back to begin. Note that this recreates the buffered
+    //! reader and is thus not cheap.
+    void rewind()
+    {
+        m_iter = m_end;
+        if (empty()) return;
+
+        if (m_bufin) delete m_bufin;
+
+        // find last bid to read
+        bids_container_iterator end_bid = m_end.bid() + (m_end.block_offset() ? 1 : 0);
+
+        // construct buffered istream_reverse for range
+        m_bufin = new buf_istream_type(m_begin.bid(), end_bid, m_nbuffers);
+
+        // skip to beginning of reverse sequence.
+        stxxl::int_type endoff = m_end.block_offset();
+        if (endoff == 0) {
+            // nothing to skip
+        }
+        else {
+            // else, let ifstream_reverse skip last elements at end of block,
+            // up to real end
+            for (; endoff != block_type::size; endoff++)
+                ++(*m_bufin);
+        }
+    }
+
+    //! Finish reading and free buffered reader.
+    ~vector_bufreader_reverse()
+    {
+        if (m_bufin) delete m_bufin;
+    }
+
+    //! Return constant reference to current item
+    const value_type & operator * () const
+    {
+        return *(*m_bufin);
+    }
+
+    //! Return constant pointer to current item
+    const value_type * operator -> () const
+    {
+        return &(*(*m_bufin));
+    }
+
+    //! Advance to next item (asserts if !empty()).
+    vector_bufreader_reverse & operator ++ ()
+    {
+        assert(!empty());
+        --m_iter;
+        ++(*m_bufin);
+
+        if (UNLIKELY(empty())) {
+            delete m_bufin; m_bufin = NULL;
+        }
+
+        return *this;
+    }
+
+    //! Read current item into variable and advance to next one.
+    vector_bufreader_reverse& operator >> (value_type& v)
+    {
+        v = operator*();
+        operator++();
+
+        return *this;
+    }
+
+    //! Return remaining size.
+    size_t size() const
+    {
+        assert(m_begin <= m_iter && m_iter <= m_end);
+        return (m_iter - m_begin);
+    }
+
+    //! Returns true once the whole range has been read.
+    bool empty() const
+    {
+        return (m_iter == m_begin);
     }
 };
 
@@ -1843,25 +1995,28 @@ public:
  * reaches the end(). The vector size is doubled each time; nevertheless, it is
  * better to preinitialize the vector's size using stxxl::vector::resize().
  */
-template <typename VectorType>
+template <typename VectorIteratorType>
 class vector_bufwriter : public noncopyable
 {
 public:
-    //! template parameter: the vector type
-    typedef VectorType vector_type;
+    //! template parameter: the vector iterator type
+    typedef VectorIteratorType iterator_type;
+
+    //! type of the output vector
+    typedef typename iterator_type::vector_type vector_type;
 
     //! value type of the output vector
-    typedef typename vector_type::value_type value_type;
+    typedef typename iterator_type::value_type value_type;
 
     //! block type used in the vector
-    typedef typename vector_type::block_type block_type;
+    typedef typename iterator_type::block_type block_type;
 
     //! block identifier iterator of the vector
-    typedef typename vector_type::bids_container_iterator bids_container_iterator;
+    typedef typename iterator_type::bids_container_iterator bids_container_iterator;
 
     //! iterator type of vector
-    typedef typename vector_type::iterator vector_iterator_type;
-    typedef typename vector_type::const_iterator vector_const_iterator_type;
+    typedef typename iterator_type::iterator vector_iterator_type;
+    typedef typename iterator_type::const_iterator vector_const_iterator_type;
 
     //! construct output buffered stream used for overlapped writing
     typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;

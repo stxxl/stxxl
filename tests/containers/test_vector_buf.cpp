@@ -84,6 +84,9 @@ void test_vector_buf(uint64 size)
 {
     typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
 
+    typedef typename vector_type::iterator vector_iterator_type;
+    typedef typename vector_type::const_iterator vector_const_iterator_type;
+
     { // fill vector using element access
         stxxl::scoped_print_timer tm("element access");
 
@@ -99,7 +102,7 @@ void test_vector_buf(uint64 size)
 
         vector_type v(size);
 
-        typename vector_type::iterator vi = v.begin();
+        vector_iterator_type vi = v.begin();
 
         for (uint64 i = 0; i < size; ++i, ++vi)
             *vi = ValueType(i);
@@ -111,7 +114,7 @@ void test_vector_buf(uint64 size)
 
         vector_type v(size);
 
-        stxxl::vector_bufwriter<vector_type> writer(v.begin());
+        stxxl::vector_bufwriter<vector_iterator_type> writer(v.begin());
 
         for (uint64 i = 0; i < size; ++i)
             writer << ValueType(i);
@@ -135,17 +138,22 @@ void test_vector_buf(uint64 size)
     { // read vector using vector_bufreader
         stxxl::scoped_print_timer tm("vector_bufreader");
 
-        stxxl::vector_bufreader<vector_type> reader(v.begin(), v.end());
+        const vector_type& vc = v;
+
+        stxxl::vector_bufreader<vector_const_iterator_type> reader(vc.begin(), vc.end());
 
         for (uint64 i = 0; i < size; ++i)
         {
             STXXL_CHECK( !reader.empty() );
             STXXL_CHECK( reader.size() == size - i );
 
+            ValueType pv = *reader;
+
             ValueType v;
             reader >> v;
 
             STXXL_CHECK( v == ValueType(i) );
+            STXXL_CHECK( pv == v );
             STXXL_CHECK( reader.size() == size - i-1 );
         }
 
@@ -159,10 +167,57 @@ void test_vector_buf(uint64 size)
             STXXL_CHECK( !reader.empty() );
             STXXL_CHECK( reader.size() == size - i );
 
+            ValueType pv = *reader;
+
             ValueType v;
             reader >> v;
 
             STXXL_CHECK( v == ValueType(i) );
+            STXXL_CHECK( pv == v );
+            STXXL_CHECK( reader.size() == size - i-1 );
+        }
+
+        STXXL_CHECK( reader.empty() );
+    }
+    { // read vector using vector_bufreader_reverse
+        stxxl::scoped_print_timer tm("vector_bufreader_reverse");
+
+        const vector_type& vc = v;
+
+        stxxl::vector_bufreader_reverse<vector_const_iterator_type> reader(vc.begin(), vc.end());
+
+        for (uint64 i = 0; i < size; ++i)
+        {
+            STXXL_CHECK( !reader.empty() );
+            STXXL_CHECK( reader.size() == size - i );
+
+            ValueType pv = *reader;
+
+            ValueType v;
+            reader >> v;
+
+            STXXL_CHECK( v == ValueType(size - i-1) );
+            STXXL_CHECK( pv == v );
+            STXXL_CHECK( reader.size() == size - i-1 );
+        }
+
+        STXXL_CHECK( reader.empty() );
+
+        // rewind reader and read again
+        reader.rewind();
+
+        for (uint64 i = 0; i < size; ++i)
+        {
+            STXXL_CHECK( !reader.empty() );
+            STXXL_CHECK( reader.size() == size - i );
+
+            ValueType pv = *reader;
+
+            ValueType v;
+            reader >> v;
+
+            STXXL_CHECK( v == ValueType(size - i-1) );
+            STXXL_CHECK( pv == v );
             STXXL_CHECK( reader.size() == size - i-1 );
         }
 
@@ -172,11 +227,14 @@ void test_vector_buf(uint64 size)
 
 int main()
 {
-    STXXL_MSG("Testing stxxl::vector<int>");
-    test_vector_buf<int>(64 * 1024*1024);
+    STXXL_MSG("Testing stxxl::vector<int> with even size");
+    test_vector_buf<int>(32 * 1024*1024);
+
+    STXXL_MSG("Testing stxxl::vector<int> with odd size");
+    test_vector_buf<int>(32 * 1024*1024 + 501 + 42);
 
     STXXL_MSG("Testing stxxl::vector<uint64>");
-    test_vector_buf<uint64>(64 * 1024*1024);
+    test_vector_buf<uint64>(32 * 1024*1024 + 501 + 42);
 
     STXXL_MSG("Testing stxxl::vector<my_type>");
     test_vector_buf<my_type>(32 * 1024*1024);
