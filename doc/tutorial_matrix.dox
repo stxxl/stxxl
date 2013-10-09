@@ -63,6 +63,16 @@ for (row_iterator it_A = A.begin(); it_A != A.end(); ++it_A)
 }
 \endcode
 
+
+### Determine size of matrix
+
+To detect the height and width of a given matrix C, we can call:
+
+\code
+std::cout << "height: " << C.get_height() << " - " << "width: " << C.get_width() << std::endl;
+\endcode
+
+
 ### Matrix Operations
 
 The STXXL Matrix container provides the following arithmetic operations:
@@ -140,7 +150,6 @@ int main()
 
 \example examples/containers/matrix_minimal1.cpp
 This example code is explained in the \ref tutorial_matrix section
-
 */
 
 } // namespace stxxl
