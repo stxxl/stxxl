@@ -16,37 +16,36 @@
 
 #include <sstream>
 
-using stxxl::tuple;
 using stxxl::uint40;
 using stxxl::uint64;
 
 // force instantiation of some tuple types
-template struct tuple<int>;
-template struct tuple<int,int>;
-template struct tuple<int,int,int>;
-template struct tuple<int,int,int,int>;
-template struct tuple<int,int,int,int,int>;
-template struct tuple<int,int,int,int,int,int>;
+template struct stxxl::tuple<int>;
+template struct stxxl::tuple<int,int>;
+template struct stxxl::tuple<int,int,int>;
+template struct stxxl::tuple<int,int,int,int>;
+template struct stxxl::tuple<int,int,int,int,int>;
+template struct stxxl::tuple<int,int,int,int,int,int>;
 
 // force instantiation of more tuple types
-template struct tuple<uint64>;
-template struct tuple<uint64,uint64>;
-template struct tuple<uint64,uint64,uint64>;
-template struct tuple<uint64,uint64,uint64,uint64>;
-template struct tuple<uint64,uint64,uint64,uint64,uint64>;
-template struct tuple<uint64,uint64,uint64,uint64,uint64,uint64>;
+template struct stxxl::tuple<uint64>;
+template struct stxxl::tuple<uint64,uint64>;
+template struct stxxl::tuple<uint64,uint64,uint64>;
+template struct stxxl::tuple<uint64,uint64,uint64,uint64>;
+template struct stxxl::tuple<uint64,uint64,uint64,uint64,uint64>;
+template struct stxxl::tuple<uint64,uint64,uint64,uint64,uint64,uint64>;
 
 // force instantiation of even more tuple types
-template struct tuple<uint40>;
-template struct tuple<uint40,uint40>;
-template struct tuple<uint40,uint40,uint40>;
-template struct tuple<uint40,uint40,uint40,uint40>;
-template struct tuple<uint40,uint40,uint40,uint40,uint40>;
-template struct tuple<uint40,uint40,uint40,uint40,uint40,uint40>;
+template struct stxxl::tuple<uint40>;
+template struct stxxl::tuple<uint40,uint40>;
+template struct stxxl::tuple<uint40,uint40,uint40>;
+template struct stxxl::tuple<uint40,uint40,uint40,uint40>;
+template struct stxxl::tuple<uint40,uint40,uint40,uint40,uint40>;
+template struct stxxl::tuple<uint40,uint40,uint40,uint40,uint40,uint40>;
 
 void test1()
 {
-    tuple<int,int> pair;
+    stxxl::tuple<int,int> pair;
     pair.first = 5;
     pair.second = 42;
 
@@ -54,7 +53,7 @@ void test1()
     oss1 << pair;
     STXXL_CHECK( oss1.str() == "(5,42)" );
 
-    pair = tuple<int,int>(1,2);
+    pair = stxxl::tuple<int,int>(1,2);
 
     std::ostringstream oss2;
     oss2 << pair;

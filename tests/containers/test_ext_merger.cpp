@@ -15,9 +15,6 @@
 #include <iterator>
 #include <stxxl/priority_queue>
 
-using stxxl::priority_queue_local::ext_merger;
-using stxxl::priority_queue_local::loser_tree;
-
 typedef int my_type;
 typedef stxxl::typed_block<4096, my_type> block_type;
 
@@ -59,8 +56,11 @@ my_type * make_sequence(dummy_merger & dummy, int l)
 }
 
 // forced instantiation
-template class ext_merger<block_type, my_cmp, 5>;
-template class loser_tree<my_type, my_cmp, 8>;
+template class stxxl::priority_queue_local::ext_merger<block_type, my_cmp, 5>;
+template class stxxl::priority_queue_local::loser_tree<my_type, my_cmp, 8>;
+
+using stxxl::priority_queue_local::ext_merger;
+using stxxl::priority_queue_local::loser_tree;
 
 int main()
 {
