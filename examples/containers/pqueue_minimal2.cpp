@@ -3,7 +3,7 @@
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) ?
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -29,10 +29,9 @@ typedef pq_type::block_type block_type;
 int main()
 {
     // use 10 block read and write pools for enable overlapping of I/O and computation
-    stxxl::prefetch_pool<block_type> p_pool(10);
-    stxxl::write_pool<block_type>    w_pool(10);
+    stxxl::read_write_pool<block_type> pool(10,10);
 
-    pq_type Q(p_pool,w_pool);
+    pq_type Q(pool);
     Q.push(1);
     Q.push(4);
     Q.push(2);
