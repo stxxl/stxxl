@@ -15,6 +15,7 @@
 #define STXXL_BUF_ISTREAM_REVERSE_HEADER
 
 #include <stxxl/bits/mng/config.h>
+#include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/mng/block_prefetcher.h>
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/algo/async_schedule.h>
