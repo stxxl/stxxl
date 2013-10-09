@@ -145,13 +145,13 @@ public:
         : m_message(message),
           m_timer(true)
     {
-        STXXL_MSG("Starting scoped timer " << message);
+        STXXL_MSG("Starting " << message);
     }
 
     //! on destruction: tell the time
     ~scoped_print_timer()
     {
-        STXXL_MSG("Finishing scoped timer " << m_message
+        STXXL_MSG("Finished " << m_message
                   << " after " << m_timer.seconds() << " seconds");
     }
 };

@@ -103,6 +103,8 @@ int main()
 {
     const size_t size = 128 * 1024*1024;
 
+    stxxl::block_manager::get_instance();
+
     test_vector_iterator(size);
     test_vector_buffered(size);
 

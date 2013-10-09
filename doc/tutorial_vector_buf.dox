@@ -39,22 +39,22 @@ Note that we must construct a buffered reader explicitly, because just writing \
 
 All source code from this example is available in \ref examples/containers/vector_buf.cpp. The program also check the sum results and measures the time. The following is an sample result:
 \verbatim
-[STXXL-MSG] Starting scoped timer vector iterator access
 [STXXL-MSG] STXXL v1.4.0 (prerelease)
 [STXXL-MSG] Disk '/data01/stxxl' is allocated, space: 162124 MiB, I/O implementation: syscall_unlink
 [STXXL-MSG] Disk '/data02/stxxl' is allocated, space: 228881 MiB, I/O implementation: syscall_unlink
 [STXXL-MSG] In total 2 disks are allocated, space: 391006 MiB
+[STXXL-MSG] Starting vector iterator access
 sum: 9007199187632128
-[STXXL-MSG] Finishing scoped timer vector iterator access after 13.0461 seconds
-[STXXL-MSG] Starting scoped timer vector buffered access
+[STXXL-MSG] Finished vector iterator access after 25.003 seconds
+[STXXL-MSG] Starting vector buffered access
 sum: 9007199187632128
-[STXXL-MSG] Finishing scoped timer vector buffered access after 6.80283 seconds
-[STXXL-MSG] Starting scoped timer vector C++11 loop access
+[STXXL-MSG] Finished vector buffered access after 13.7748 seconds
+[STXXL-MSG] Starting vector C++11 loop access
 sum: 9007199187632128
-[STXXL-MSG] Finishing scoped timer vector C++11 loop access after 6.79016 seconds
+[STXXL-MSG] Finished vector C++11 loop access after 13.731 seconds
 \endverbatim
 
-Obviously, buffered access to stxxl::vector is a lot more efficient: 6.8 seconds against 13.0.
+Obviously, buffered access to stxxl::vector is a lot more efficient: approx. 13.7 seconds against 24.8.
 
 As a last note: there is also vector_bufreader_reverse and vector::bufreader_reverse for buffered reading in reverse.
 
