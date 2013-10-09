@@ -31,7 +31,7 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_misc_funcs "miscellaneous functions"
 - \subpage common_io_counter "i/o performance counter"
 
- */
+*/
 
 /** \page common_random Random Number Generators
 
@@ -399,7 +399,6 @@ The STXXL library provides various I/O performance counters (stxxl::stats class)
 
   // substract current stats from stats at the beginning of the measurement
   std::cout << (stxxl::stats_data(*Stats) - stats_begin);
-
 \endcode
 
 
@@ -430,6 +429,15 @@ We can access individual I/O data in contrast to the whole content of Stats ostr
 std::cout << Stats->get_written_volume() << std::endl;  // print number of bytes written to the disks
 \endcode
 
+\b Hint: There's another statistical parameter which may be in developer's interest: the maximum number of bytes (the peak) allocated in external memory during program run. This parameter can be accessed by:
+
+\code
+stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+// lots of external work here...
+std::cout << "max: " << bm->get_maximum_allocation() << std::endl;  // max. number of bytes allocated until now
+\endcode
+
+\endcode                                             
 
 See stxxl::stats and stxxl::stats_data class reference for all provided individual functions.
 */
