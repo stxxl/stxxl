@@ -67,7 +67,8 @@ int benchmark_disks_alloc(stxxl::uint64 length, stxxl::uint64 step_size,
     typedef stxxl::typed_block<raw_block_size, unsigned> block_type;
     typedef stxxl::BID<raw_block_size> BID_type;
 
-    if (step_size == 0) step_size = raw_block_size;
+    if (step_size == 0)
+        step_size = raw_block_size * stxxl::config::get_instance()->disks_number();
 
     stxxl::uint64 num_blocks_per_step = stxxl::div_ceil(step_size, raw_block_size);
     step_size = num_blocks_per_step * raw_block_size;
@@ -195,7 +196,7 @@ int benchmark_disks(int argc, char * argv[])
     std::string optrw = "rw", allocstr;
 
     cp.add_param_bytes("size", "Amount of data to write/read from disks (e.g. 10GiB)", length);
-    cp.add_opt_param_bytes("step", "Size of data written/read in one step (default: 8MiB)", step_size);
+    cp.add_opt_param_bytes("step", "Size of data written/read in one step (default: D * 8MiB)", step_size);
     cp.add_opt_param_string("r|w", "Only read or write blocks (default: both write and read)", optrw);
     cp.add_opt_param_string("alloc", "Block allocation strategy: RC, SR, FR, striping. (default: RC)", allocstr);
 
