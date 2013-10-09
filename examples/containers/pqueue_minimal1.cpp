@@ -1,9 +1,9 @@
 /***************************************************************************
- *  examples/containers/pqueue1.cpp
+ *  examples/containers/pqueue_minimal1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) ?
+ *  Copyright (C) 2013 Daniel Feist <daniel.feist@student.kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,54 +11,42 @@
  **************************************************************************/
 
 #include <stxxl/priority_queue>
+#include <iostream>
+#include <limits>
 
-struct Cmp
+// comparison struct for priority queue where top() returns the smallest contained value:
+struct ComparatorGreater
 {
-    bool operator () (const int & a, const int & b) const
-    { return a>b; }
+    bool operator () (const int &a, const int &b) const
+    { return (a>b); }
 
     int min_value() const
-    { return (std::numeric_limits<int>::max)(); }
-};
+    { return (std::numeric_limits<int>::max) (); }
 
-// use 64 GiB on main memory and 1 billion items at most
-typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, Cmp, 64*1024*1024, 1024*1024>::result pq_type;
-typedef pq_type::block_type block_type;
+};
 
 int main()
 {
-    // use 10 block read and write pools for enable overlapping of I/O and computation
-    stxxl::read_write_pool<block_type> pool(10,10);
+    typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128*1024*1024, 1024*1024>::result pqueue_type;
+    typedef pqueue_type::block_type block_type;
 
-    pq_type Q(pool);
-    Q.push(1);
-    Q.push(4);
-    Q.push(2);
-    Q.push(8);
-    Q.push(5);
-    Q.push(7);
+    const unsigned int mem_for_pools = 32 * 1024 * 1024;
+    stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);
+    pqueue_type my_pqueue(pool);  // creates stxxl priority queue instance with read-write-pool
 
-    assert(Q.size() == 6);
+    my_pqueue.push(5);
+    my_pqueue.push(4);
+    my_pqueue.push(19);
+    my_pqueue.push(1);
+    assert(my_pqueue.size() == 4);
 
-    assert(Q.top() == 8);
-    Q.pop();
+    assert(my_pqueue.top() == 1);
+    STXXL_MSG("Smallest inserted value in my: " << my_pqueue.top());
 
-    assert(Q.top() == 7);
-    Q.pop();
+    my_pqueue.pop();  // pop the 1 on top
 
-    assert(Q.top() == 5);
-    Q.pop();
-
-    assert(Q.top() == 4);
-    Q.pop();
-
-    assert(Q.top() == 2);
-    Q.pop();
-
-    assert(Q.top() == 1);
-    Q.pop();
-
-    assert(Q.empty());
+    assert(my_pqueue.top() == 4);
+    STXXL_MSG("Smallest value after 1 pop(): " << my_pqueue.top());
 
     return 0;
 }

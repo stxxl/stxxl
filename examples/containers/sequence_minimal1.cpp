@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/vector_minimal1.cpp
+ *  examples/containers/sequence_minimal1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,26 +10,27 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/vector>
+#include <stxxl/sequence>
 #include <iostream>
 
 int main()
 {
-    typedef stxxl::VECTOR_GENERATOR<int>::result vector;
-    vector my_vector;
+  typedef stxxl::sequence<int> sequence_type;
+  sequence_type my_sequence;
 
-    for (int i = 0; i < 1024*1024; i++)
-    {
-      my_vector.push_back(i+2);
-    }
+  for (int i = 0; i < 10000; ++i) 
+  {
+    my_sequence.push_back(i);
+  }
+  
+  sequence_type::stream forward_stream = my_sequence.get_stream();
 
-    std::cout << my_vector[99] << std::endl;
-    my_vector[100] = 0;
-
-    while(!my_vector.empty())
-    {
-      my_vector.pop_back();
-    }
-
-    return 0;
+  while (!forward_stream.empty()) 
+  {
+    std::cout << *forward_stream << " ";
+    my_sequence.pop_back();
+    ++forward_stream;  
+  }
+  
+  return 0;
 }
