@@ -111,16 +111,19 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -Wextra -pedantic -Wno-long-long")
 endif()
 
-# more template depth for some tests and compilers
+###############################################################################
+# enable C++11 and more compiler features
 
+# more template depth for some tests and compilers
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-ftemplate-depth=1024 CXX_HAS_TEMPLATE_DEPTH)
 if(CXX_HAS_TEMPLATE_DEPTH)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
 endif()
 
+# enable C++11
 if(MSVC)
-  # Enable C++11 for MSVC 11 or greater
+  # MSVC 11 or greater has C++11 enabled
   if(NOT (MSVC_VERSION LESS 1700))
     set(STXXL_HAVE_CXX11 "1")
   endif()
@@ -178,6 +181,11 @@ if (GMX_LARGEFILES)
 else (NOT GMX_LARGEFILES)
   message(FATAL_ERROR "Large file support was not detectable.")
 endif (GMX_LARGEFILES)
+
+###############################################################################
+# check for C++11 <atomic> header support
+
+check_include_file_cxx(atomic STXXL_STD_ATOMIC)
 
 ###############################################################################
 # optional Boost libraries

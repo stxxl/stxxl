@@ -42,6 +42,11 @@
 // cmake:   detection of (experimental) C++11 support
 // effect:  enables some C++11 construct (currently only allowed in examples)
 
+#cmakedefine STXXL_STD_ATOMIC ${STXXL_STD_ATOMIC}
+// default: off
+// cmake:   detection of C++11 <atomic> header
+// effect:  enables use of std::atomic<> constructs
+
 #cmakedefine STXXL_PARALLEL_MODE_EXPLICIT ${STXXL_PARALLEL_MODE_EXPLICIT}
 // default: off
 // cmake:   -DUSE_GNU_PARALLEL=ON

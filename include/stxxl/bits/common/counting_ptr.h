@@ -18,7 +18,12 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <stxxl/types>
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
+
+#if STXXL_STD_ATOMIC
+#include <atomic>
+#endif
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -318,8 +323,7 @@ template<class A> void swap(const_counting_ptr<A> & a1, const_counting_ptr<A> & 
  * value. Then either use counting_ptr as pointer to manage references and
  * deletion, or just do normal new and delete.
  *
- * For thread-safe functions, this class could be copied and modified to
- * atomic_counted_object which uses an atomic reference counter!
+ * For thread-safe functions, use atomic_counted_object instead of this class!
  */
 class counted_object
 {
@@ -364,6 +368,72 @@ public:
     { return m_reference_count; }
 };
 
+#if STXXL_STD_ATOMIC
+
+/*!
+ * Provides reference counting abilities for use with counting_ptr with atomics
+ * operations.
+ *
+ * Use as superclass of the actual object, this adds a reference_count
+ * value. Then either use counting_ptr as pointer to manage references and
+ * deletion, or just do normal new and delete.
+ *
+ * This class does thread-safe increment and decrement using atomic operations
+ * on an integral type.
+ */
+class atomic_counted_object
+{
+private:
+    //! the reference count is kept mutable to all const_counting_ptr() to
+    //! change the reference count.
+    mutable std::atomic<unsigned_type> m_reference_count;
+
+public:
+    //! new objects have zero reference count
+    atomic_counted_object()
+        : m_reference_count(0) {}
+
+    //! coping still creates a new object with zero reference count
+    atomic_counted_object(const atomic_counted_object &)
+        : m_reference_count(0) {}
+
+    //! assignment operator, leaves pointers unchanged
+    atomic_counted_object & operator = (const atomic_counted_object &)
+    { return *this; } // changing the contents leaves pointers unchanged
+
+    ~atomic_counted_object()
+    { assert(m_reference_count == 0); }
+
+public:
+    //! Call whenever setting a pointer to the object
+    void inc_reference() const
+    {
+        ++m_reference_count;
+    }
+
+    //! Call whenever resetting (i.e. overwriting) a pointer to the object.
+    //! IMPORTANT: In case of self-assignment, call AFTER inc_reference().
+    //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
+    bool dec_reference() const
+    {
+        return (--m_reference_count == 0);
+    }
+
+    //! Test if the counted_object is referenced by only one counting_ptr.
+    bool unique() const
+    {
+        return (m_reference_count == 1);
+    }
+
+    //! Return the number of references to this object (for debugging)
+    unsigned_type get_reference_count() const
+    {
+        return m_reference_count;
+    }
+};
+
+#else // no C++11 <atomic> header found!
+
 /*!
  * Provides reference counting abilities for use with counting_ptr with mutex
  * locking.
@@ -372,11 +442,10 @@ public:
  * value. Then either use counting_ptr as pointer to manage references and
  * deletion, or just do normal new and delete.
  *
- * This class does thread-safe increment and decrement using scoped
- * locked. TODO: we currently have no support for atomics; but when we do,
- * replace this with an atomic_counted_object.
+ * This class does thread-safe increment and decrement using scoped locks. A
+ * faster version of this class is available using atomic operations.
  */
-class locking_counted_object
+class atomic_counted_object
 {
 private:
     //! the reference count is kept mutable to all const_counting_ptr() to
@@ -388,18 +457,18 @@ private:
 
 public:
     //! new objects have zero reference count
-    locking_counted_object()
+    atomic_counted_object()
         : m_reference_count(0) {}
 
     //! coping still creates a new object with zero reference count
-    locking_counted_object(const locking_counted_object &)
+    atomic_counted_object(const atomic_counted_object &)
         : m_reference_count(0) {}
 
     //! assignment operator, leaves pointers unchanged
-    locking_counted_object & operator = (const locking_counted_object &)
+    atomic_counted_object & operator = (const atomic_counted_object &)
     { return *this; } // changing the contents leaves pointers unchanged
 
-    ~locking_counted_object()
+    ~atomic_counted_object()
     { assert(m_reference_count == 0); }
 
 public:
@@ -433,6 +502,8 @@ public:
         return m_reference_count;
     }
 };
+
+#endif
 
 __STXXL_END_NAMESPACE
 
