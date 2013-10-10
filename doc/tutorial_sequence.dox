@@ -15,7 +15,7 @@
 namespace stxxl {
 /** \page tutorial_sequence STXXL Sequence
 
-This page introduces into the stxxl::sequence container (to learn more about the structure of stxxl::sequence, see section \ref design_sequence).
+This page introduces into the stxxl::sequence container (to learn more about the structure of stxxl::sequence, see section \ref stxxl::sequence).
 
 In reality, the STXXL sequence container is a STXXL deque container (see \ref design_deque) without random access. Deque stands for "double-ended-queue", that means elements can be accessed, inserted and deleted on both ends of the data structure. Consequently both containers are quite similar - however, the usage varies.
 

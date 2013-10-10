@@ -16,14 +16,14 @@
 namespace stxxl {
 /** \page tutorial_sorter STXXL Sorter
 
-This section introduces into the STXXL sorter container (to learn more about the structure of stxxl::sorter, see section TODO).
+This section introduces into the STXXL sorter container (to learn more about the structure of stxxl::sorter, see section \ref stxxl::sorter).
 
 The STXXL sorter container combines the two functions of runs_creator and runs_merger from the stream packages into a two-phase container. As a result, the STXXL sorter implements a external memory k-way merge sort to sort large amounts of data.
 
 ### Create a STXXL sorter
 
 Before using a STXXL sorter, we initially have to define and then to instantiate a sorter object. Two template parameters are required to define a stxxl::sorter. ValueType defines the type of the contained objects (must be a POD with no references to internal memory) and CompareType is the type of comparison object used for sorting the runs (see example below).
-BlockSize and AllocStr are optional (see TODO for additional information). The more straightforward of the two sorter constructors expects the comparator object and memory_to_use (bytes) in ram for sorted runs as parameters.
+BlockSize and AllocStr are optional (see \ref stxxl::sorter for additional information). The more straightforward of the two sorter constructors expects the comparator object and memory_to_use (bytes) in ram for sorted runs as parameters.
 
 \code
 // template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>

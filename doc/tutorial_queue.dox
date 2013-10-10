@@ -31,7 +31,7 @@ typedef stxxl::queue<int> queue;
 queue my_queue;
 \endcode
 
-The STXXL queue implementation provides three different types of constructors to customize your individual caching. See [TODO] more details. Additional optional template parameters are block_size, allocation_strategy, size_type, see [TODO] for further details.
+The STXXL queue implementation provides three different types of constructors to customize your individual caching. See \ref stxxl::queue more details. Additional optional template parameters are block_size, allocation_strategy, size_type, see \ref stxxl::queue for further details.
 
 ### Insert / Access / Delete elements
 

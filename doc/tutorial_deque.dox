@@ -32,7 +32,7 @@ typedef stxxl::deque<int> deque;
 deque my_deque;
 \endcode
 
-See \ref TODO for additional template parameter details.
+See \ref stxxl::deque for additional template parameter details.
 
 ### Insert elements
 
