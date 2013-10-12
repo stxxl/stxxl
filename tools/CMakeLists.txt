@@ -18,6 +18,7 @@ stxxl_build_tool(stxxl_tool
   benchmark_files.cpp
   benchmark_sort.cpp
   benchmark_disks_random.cpp
+  benchmark_pqueue.cpp
   mlock.cpp
   mallinfo.cpp
   )

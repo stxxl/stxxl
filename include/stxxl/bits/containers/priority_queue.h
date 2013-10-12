@@ -789,6 +789,7 @@ void priority_queue<ConfigType>::dump_sizes() const
         STXXL_MSG("  grp " << i << " int" <<
                 " grpbuf=" << current_group_buffer_size(i) <<
                 " size=" << int_mergers[i].size() << "/" << capacity <<
+                " (" << (int)(int_mergers[i].size() * 100.0 / capacity) << "%)" <<
                 " space=" << int_mergers[i].is_space_available());
     }
     for (int i = 0; i < num_ext_groups; ++i) {
@@ -796,6 +797,7 @@ void priority_queue<ConfigType>::dump_sizes() const
         STXXL_MSG("  grp " << i + num_int_groups << " ext" <<
                 " grpbuf=" << current_group_buffer_size(i + num_int_groups) <<
                 " size=" << ext_mergers[i]->size() << "/" << capacity <<
+                " (" << (int)(ext_mergers[i]->size() * 100.0 / capacity) << "%)" <<
                 " space=" << ext_mergers[i]->is_space_available());
     }
     dump_params();
@@ -903,7 +905,7 @@ namespace priority_queue_local
 //!
 //! \tparam ValueType type of the contained objects (POD with no references to internal memory)
 //!
-//! \tparam ComareType the comparator type used to determine whether one element is
+//! \tparam CompareType the comparator type used to determine whether one element is
 //! smaller than another element.
 //!
 //! \tparam IntMemory upper limit for internal memory consumption in bytes.
