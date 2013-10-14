@@ -163,7 +163,7 @@ public:
             STXXL_MSG("Finished " << m_message
                       << " after " << m_timer.seconds() << " seconds. "
                       << "Processed " << format_IEC_size(m_bytes) << "B"
-                      << " @ " << format_IEC_size(m_bytes / m_timer.seconds()) << "B/s");
+                      << " @ " << format_IEC_size(uint64(m_bytes / m_timer.seconds())) << "B/s");
     }
 };
 

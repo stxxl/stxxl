@@ -385,13 +385,17 @@ endif(TRY_COMPILE_HEADERS)
 ###############################################################################
 # figure out STXXL_TMPDIR for tests
 
-if(DEFINED ENV{STXXL_TMPDIR})
-  set(STXXL_TMPDIR "$ENV{STXXL_TMPDIR}")
-elseif(NOT DEFINED STXXL_TMPDIR)
-  set(STXXL_TMPDIR ".")
-endif()
+if(BUILD_TESTS)
 
-message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
+  if(DEFINED ENV{STXXL_TMPDIR})
+    set(STXXL_TMPDIR "$ENV{STXXL_TMPDIR}")
+  elseif(NOT DEFINED STXXL_TMPDIR)
+    set(STXXL_TMPDIR ".")
+  endif()
+
+  message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
+
+endif(BUILD_TESTS)
 
 ###############################################################################
 # build tests and tools
