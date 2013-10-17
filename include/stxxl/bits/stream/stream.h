@@ -30,7 +30,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! Stream package subnamespace.
+//! Stream package subnamespace. 
 namespace stream
 {
     //! \weakgroup streampack Stream package

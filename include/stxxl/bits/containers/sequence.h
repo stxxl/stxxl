@@ -34,9 +34,11 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup stlcont
 //! \{
 
+//! \brief External sequence or deque container without random access. \n
+//! <b> Introduction </b> to sequence container: see \ref tutorial_sequence tutorial. \n 
+//! <b> Design and Internals </b> of sequence container: see \ref TODO
+
 /**
- * \brief External sequence or deque container without random access
- *
  * Sequence is a primitive container consisting of only a sequence of blocks in
  * external memory. The sequence provides appending methods similar to a deque:
  * push_back and push_front; and also the corresponding pop functions. However,

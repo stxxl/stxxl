@@ -725,8 +725,10 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////
 
-//! \brief External vector container.
-//!
+//! \brief External vector container. \n
+//! <b> Introduction </b> to vector container: see \ref tutorial_vector tutorial. \n
+//! <b> Design and Internals </b> of vector container: see \ref design_vector
+//!  
 //! For semantics of the methods see documentation of the STL std::vector
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam PageSize number of blocks in a page

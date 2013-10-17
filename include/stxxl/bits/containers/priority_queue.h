@@ -89,7 +89,9 @@ void swap(stxxl::priority_queue_local::loser_tree<ValueType, CompareType, KNKMAX
 
 __STXXL_BEGIN_NAMESPACE
 
-//! External priority queue data structure
+//! External priority queue data structure \n
+//! <b> Introduction </b> to priority queue container: see \ref tutorial_pqueue tutorial. \n
+//! <b> Design and Internals </b> of priority queue container: see \ref design_pqueue.
 template <class ConfigType>
 class priority_queue : private noncopyable
 {
@@ -899,7 +901,9 @@ namespace priority_queue_local
 //! \addtogroup stlcont
 //! \{
 
-//! \brief Priority queue type generator, see \ref design_pqueue for details.
+//! \brief Priority queue type generator. \n
+//! <b> Introduction </b> to priority queue container: see \ref tutorial_pqueue tutorial. \n
+//! <b> Design and Internals </b> of priority queue container: see \ref design_pqueue.
 //!
 //! \tparam ValueType type of the contained objects (POD with no references to internal memory)
 //!

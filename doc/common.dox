@@ -287,7 +287,22 @@ For the usual assertions, that should be removed in production code for performa
 
 However, there is also \c STXXL_ASSERT(), which can be used as a replacement for \c assert(), when compiler warnings about unused variables or typedefs occur. The issue is that assert() completely removes the code, whereas STXXL_ASSERT() keeps the code encloses it inside \c if(0).
 
-TODO: STXXL_THROW
+
+\section stxxl_throw STXXL Exceptions 
+
+The STXXL provides several pre-defined build-in exception macros to detect run-time errors, see:
+
+1. STXXL_THROW()
+2. STXXL_THROW2()
+3. STXXL_THROW_INVALID_ARGUMENT()
+4. STXXL_THROW_UNREACHABLE()
+
+In addition, 
+
+1. stxxl_function_error()
+2. check_pthread_call()
+3. stxxl_check_ge_0()
+4. stxxl_check_ne_0()
 
 */
 
