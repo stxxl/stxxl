@@ -1,7 +1,5 @@
 ###############################################################################
-# examples/CMakeLists.txt
-#
-# Cmake file for stxxl/examples/
+# examples/applications/CMakeLists.txt
 #
 # Part of the STXXL. See http://stxxl.sourceforge.net
 #
@@ -12,9 +10,4 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-add_subdirectory(algo)
-add_subdirectory(applications)
-add_subdirectory(common)
-add_subdirectory(containers)
-add_subdirectory(stream)
-
+stxxl_build_example(skew3)

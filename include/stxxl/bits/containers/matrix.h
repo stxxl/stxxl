@@ -1010,7 +1010,10 @@ public:
     using const_matrix_iterator_type::set_pos;
 };
 
-//! External matrix container.
+//! External matrix container. \n
+//! <b> Introduction </b> to matrix container: see \ref tutorial_matrix tutorial. \n
+//! <b> Design and Internals </b> of matrix container: see \ref design_matrix.
+//!
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam BlockSideLength side length of a matrix block
 //!

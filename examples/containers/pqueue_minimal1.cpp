@@ -29,7 +29,9 @@ int main()
 {
     typedef stxxl::PRIORITY_QUEUE_GENERATOR<int, ComparatorGreater, 128*1024*1024, 1024*1024>::result pqueue_type;
     typedef pqueue_type::block_type block_type;
-
+    
+    // block_type::raw_size = 262144 bytes  
+    // use 64 block read and write pools each to enable overlapping between I/O and computation
     const unsigned int mem_for_pools = 32 * 1024 * 1024;
     stxxl::read_write_pool<block_type> pool((mem_for_pools / 2) / block_type::raw_size, (mem_for_pools / 2) / block_type::raw_size);
     pqueue_type my_pqueue(pool);  // creates stxxl priority queue instance with read-write-pool

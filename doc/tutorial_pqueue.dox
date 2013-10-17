@@ -64,7 +64,7 @@ struct ComparatorLess
 
 Note that CompareType must define a strict weak ordering. These and some other details are available in the Notes part of \ref design_pqueue_generator
 
-To create a STXXL priority queue instance, a resizable buffered writing and prefetched reading pool expected (to overlap I/O and computation) is needed:
+To create a STXXL priority queue instance, a resizable buffered writing and prefetched reading pool (to overlap I/O and computation) is needed:
 
 \code
   typedef pqueue_type::block_type block_type;

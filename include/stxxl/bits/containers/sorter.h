@@ -25,6 +25,10 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup stlcont
 //! \{
 
+//! External sorter container. \n
+//! <b> Introduction </b> to sorter container: see \ref tutorial_sorter tutorial. \n
+//! <b> Design and Internals </b> of sorter container: see \ref TODO
+
 /**
  * \brief External Sorter: use stream package objects to keep a sorted
  * container.
@@ -47,7 +51,7 @@ __STXXL_BEGIN_NAMESPACE
  * Using clear() the object can be reset into input state and all items are
  * destroyed.
  *
- * Added in STXX 1.4
+ * Added in STXXL 1.4
  *
  * \tparam ValueType   type of the contained objects (POD with no references to internal memory)
  * \tparam CompareType type of comparison object used for sorting the runs

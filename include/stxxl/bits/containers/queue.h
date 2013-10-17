@@ -38,7 +38,9 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 
-//! External FIFO queue container.
+//! External FIFO queue container. \n
+//! <b> Introduction </b> to queue container: see \ref tutorial_queue tutorial\n
+//! <b> Design and Internals </b> of queue container: see \ref design_queue.
 //!
 //! \tparam ValTp type of the contained objects (POD with no references to internal memory)
 //! \tparam BlkSz size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)

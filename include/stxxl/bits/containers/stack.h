@@ -49,7 +49,8 @@ struct stack_config_generator
 
 
 //! External stack container.
-//!
+//! <b> Introduction </b> to stack container: see \ref tutorial_stack tutorial. \n
+//! <b> Design and Internals </b> of stack container: see \ref design_stack
 //! Conservative implementation. Fits best if your access pattern consists of irregularly mixed
 //! push'es and pop's.
 //! For semantics of the methods see documentation of the STL \c std::stack. <BR>
@@ -870,7 +871,9 @@ public:
 enum stack_externality { external, migrating, internal };
 enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
-//! \brief Stack type generator, see \ref design_stack for details.
+//! \brief Stack type generator \n
+//! <b> Introduction </b> to stack container: see \ref tutorial_stack tutorial. \n
+//! <b> Design and Internals </b> of stack container: see \ref design_stack.
 //!
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //!

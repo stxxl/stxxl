@@ -35,7 +35,9 @@ namespace btree
 //! \addtogroup stlcont
 //! \{
 
-//! External associative container.
+//! External associative container (map). \n
+//! <b> Introduction </b> to map container: see \ref tutorial_map tutorial. \n
+//! <b> Design and Internals </b> of map container: see \ref design_map
 //!
 //! \tparam KeyType key type (POD with no references to internal memory)
 //! \tparam DataType data type (POD with no references to internal memory)

@@ -393,7 +393,9 @@ public:
 //! \addtogroup stlcont
 //! \{
 
-//! A deque container.
+//! A deque container. \n
+//! <b> Introduction </b> to deque container: see \ref tutorial_deque tutorial. \n
+//! <b> Design and Internals </b> of deque container: see \ref design_deque
 //!
 //! It is an adaptor of the \c VectorType.
 //! The implementation wraps the elements around
