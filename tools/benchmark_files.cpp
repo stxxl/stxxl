@@ -119,22 +119,22 @@ int benchmark_files(int argc, char * argv[])
     cp.add_param_bytes("length", "Length to write in file.", length);
     cp.add_param_stringlist("filename", "File path to run benchmark on.", files_arr);
 
-    cp.add_bytes('o', "offset", "", "Starting offset to write in file.", offset);
+    cp.add_bytes('o', "offset", "Starting offset to write in file.", offset);
 
-    cp.add_flag(0, "no-direct", "", "open files without O_DIRECT", no_direct_io);
-    cp.add_flag(0, "sync", "", "open files with O_SYNC|O_DSYNC|O_RSYNC", sync_io);
-    cp.add_flag(0, "resize", "", "resize the file size after opening, needed e.g. for creating mmap files", resize_after_open);
+    cp.add_flag(0, "no-direct", "open files without O_DIRECT", no_direct_io);
+    cp.add_flag(0, "sync", "open files with O_SYNC|O_DSYNC|O_RSYNC", sync_io);
+    cp.add_flag(0, "resize", "resize the file size after opening, needed e.g. for creating mmap files", resize_after_open);
 
-    cp.add_bytes(0, "block_size", "", "block size for operations (default 8 MiB)", block_size);
-    cp.add_uint(0, "batch_size", "", "increase (default 1) to submit several I/Os at once and report average rate", batch_size);
+    cp.add_bytes(0, "block_size", "block size for operations (default 8 MiB)", block_size);
+    cp.add_uint(0, "batch_size", "increase (default 1) to submit several I/Os at once and report average rate", batch_size);
 
-    cp.add_string('f', "file-type", "",
+    cp.add_string('f', "file-type",
                   "Method to open file (syscall|mmap|wincall|boostfd|...) default: " + file_type, file_type);
 
-    cp.add_string('p', "operations", "",
+    cp.add_string('p', "operations",
                   "[w]rite pattern, [r]ead without verification, read and [v]erify pattern (default: 'wv')", opstr);
 
-    cp.add_uint(0, "pattern", "",
+    cp.add_uint(0, "pattern",
                 "32-bit pattern to write (default: block index)", pattern);
 
     cp.set_description("Open a file using one of STXXL's file abstractions and perform write/read/verify tests on the file. "

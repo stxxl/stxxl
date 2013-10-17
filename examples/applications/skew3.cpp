@@ -1298,13 +1298,13 @@ int main(int argc, char* argv[])
     unsigned wordsize = 32;
 
     cp.add_param_string("input", "path to input file (or verbatim text)", input_filename);
-    cp.add_flag('c', "check", "", "Check suffix array for correctness.", check_flag);
-    cp.add_flag('t', "text", "", "Print out suffix array in readable text.", text_output_flag);
-    cp.add_string('o', "output", "", "Output suffix array to given path.", output_filename);
-    cp.add_flag('v', "verbatim", "", "Consider \"input\" as verbatim text to construct suffix array on.", input_verbatim);
-    cp.add_bytes('s', "size", "", "Cut input text to given size, e.g. 2 GiB.", sizelimit);
-    cp.add_bytes('M', "memuse", "", "Amount of RAM to use, default: 1 GiB.", ram_use);
-    cp.add_uint('w', "wordsize", "", "Set word size of suffix array to 16, 32, 40, 48 or 64 bit, default: 32-bit.", wordsize);
+    cp.add_flag('c', "check", "Check suffix array for correctness.", check_flag);
+    cp.add_flag('t', "text", "Print out suffix array in readable text.", text_output_flag);
+    cp.add_string('o', "output", "Output suffix array to given path.", output_filename);
+    cp.add_flag('v', "verbatim", "Consider \"input\" as verbatim text to construct suffix array on.", input_verbatim);
+    cp.add_bytes('s', "size", "Cut input text to given size, e.g. 2 GiB.", sizelimit);
+    cp.add_bytes('M', "memuse", "Amount of RAM to use, default: 1 GiB.", ram_use);
+    cp.add_uint('w', "wordsize", "Set word size of suffix array to 16, 32, 40, 48 or 64 bit, default: 32-bit.", wordsize);
 
     // process command line
     if (!cp.process(argc,argv))

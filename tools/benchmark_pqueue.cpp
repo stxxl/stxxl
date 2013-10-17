@@ -277,13 +277,13 @@ int benchmark_pqueue(int argc, char* argv[])
     cp.add_opt_param_bytes("size", "Amount of data to insert (e.g. 1GiB)", size);
 
     unsigned type = 1;
-    cp.add_uint('t', "type", "", "Value type of tested priority queue:\n 0 = pair of uint32,\n 1 = pair of uint64 (default),\n 2 = 24 byte struct", type);
+    cp.add_uint('t', "type", "Value type of tested priority queue:\n 0 = pair of uint32,\n 1 = pair of uint64 (default),\n 2 = 24 byte struct", type);
 
     unsigned pqconfig = 0;
-    cp.add_uint('p', "pq", "", "Priority queue configuration to test:\n 0 = small (256 MiB RAM, 4 GiB elements)\n 1 = medium (1 GiB RAM, 16 GiB elements) (default)\n 2 = big (8 GiB RAM, 64 GiB elements)", pqconfig);
+    cp.add_uint('p', "pq", "Priority queue configuration to test:\n 0 = small (256 MiB RAM, 4 GiB elements)\n 1 = medium (1 GiB RAM, 16 GiB elements) (default)\n 2 = big (8 GiB RAM, 64 GiB elements)", pqconfig);
 
     unsigned opseq = 0;
-    cp.add_uint('o', "opseq", "", "Operation sequence to perform:\n 0 = insert all, delete all (default)\n 1 = insert all, intermixed insert/delete", opseq);
+    cp.add_uint('o', "opseq", "Operation sequence to perform:\n 0 = insert all, delete all (default)\n 1 = insert all, intermixed insert/delete", opseq);
 
     if (!cp.process(argc,argv))
         return -1;

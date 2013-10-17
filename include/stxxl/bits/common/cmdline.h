@@ -96,7 +96,7 @@ protected:
         std::string option_text() const
         {
             std::string s;
-            if (m_key) { 
+            if (m_key) {
                 s += '-'; s += m_key; s += ", ";
             }
             s += "--";
@@ -369,7 +369,7 @@ public:
                 if (text[to] == ' ') lspace = to;
                 ++to;
             }
-            
+
             // go back to last space
             if (to != text.size() && text[to] != '\n' &&
                 lspace != t) to = lspace+1;
@@ -488,6 +488,30 @@ public:
             );
         calc_opt_max(m_optlist.back());
     }
+
+    //! add boolean option flag -key, --longkey with description and store to dest
+    void add_flag(char key, const std::string& longkey, const std::string& desc, bool& dest)
+    { return add_flag(key, longkey, "", desc, dest); }
+
+    //! add signed integer option -key, --longkey with description and store to dest
+    void add_int(char key, const std::string& longkey, const std::string& desc, int& dest)
+    { return add_int(key, longkey, "", desc, dest); }
+
+    //! add unsigned integer option -key, --longkey [keytype] with description and store to dest
+    void add_uint(char key, const std::string& longkey, const std::string& desc, unsigned int& dest)
+    { return add_uint(key, longkey, "", desc, dest); }
+
+    //! add SI/IEC suffixes byte size option -key, --longkey [keytype] and store to 64-bit dest
+    void add_bytes(char key, const std::string& longkey, const std::string& desc, stxxl::uint64& dest)
+    { return add_bytes(key, longkey, "", desc, dest); }
+
+    //! add string option -key, --longkey [keytype] and store to dest
+    void add_string(char key, const std::string& longkey, const std::string& desc, std::string& dest)
+    { return add_string(key, longkey, "", desc, dest); }
+
+    //! add string list option -key, --longkey [keytype] and store to dest
+    void add_stringlist(char key, const std::string& longkey, const std::string& desc, std::vector<std::string>& dest)
+    { return add_stringlist(key, longkey, "", desc, dest); }
 
     // ************************************************************************
 
