@@ -16,30 +16,52 @@
 
 using stxxl::uint64;
 
+void test_vector_element(uint64 size)
+{
+    stxxl::scoped_print_timer tm("vector element access", 2 * size * sizeof(uint64));
+
+//! [element]
+    typedef stxxl::VECTOR_GENERATOR<uint64>::result vector_type;
+
+    vector_type vec(size);
+
+    for (uint64 i = 0; i < vec.size(); ++i)
+        vec[i] = (i % 1024);
+
+    uint64 sum = 0;
+    for (uint64 i = 0; i < vec.size(); ++i)
+        sum += vec[i];
+//! [element]
+
+    std::cout << "sum: " << sum << std::endl;
+    STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
+}
+
 void test_vector_iterator(uint64 size)
 {
-    stxxl::scoped_print_timer tm("vector iterator access");
+    stxxl::scoped_print_timer tm("vector iterator access", 2 * size * sizeof(uint64));
 
 //! [iterator]
     typedef stxxl::VECTOR_GENERATOR<uint64>::result vector_type;
 
     vector_type vec(size);
 
-    for (uint64 i = 0; i < vec.size(); ++i)
-        vec[i] = i;
+    uint64 i = 0;
+    for (vector_type::iterator it = vec.begin(); it != vec.end(); ++it, ++i)
+        *it = (i % 1024);
 
     uint64 sum = 0;
-    for (uint64 i = 0; i < vec.size(); ++i)
-        sum += vec[i];
+    for (vector_type::const_iterator it = vec.begin(); it != vec.end(); ++it)
+        sum += *it;
 //! [iterator]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK( sum == size * (size-1) / 2 );
+    STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
 }
 
 void test_vector_buffered(uint64 size)
 {
-    stxxl::scoped_print_timer tm("vector buffered access");
+    stxxl::scoped_print_timer tm("vector buffered access", 2 * size * sizeof(uint64));
 
 //! [buffered]
     typedef stxxl::VECTOR_GENERATOR<uint64>::result vector_type;
@@ -50,7 +72,7 @@ void test_vector_buffered(uint64 size)
     vector_type::bufwriter_type writer(vec);
 
     for (uint64 i = 0; i < vec.size(); ++i)
-        writer << i;
+        writer << (i % 1024);
 
     // required to flush out the last block (or destruct the bufwriter)
     writer.finish();
@@ -65,13 +87,13 @@ void test_vector_buffered(uint64 size)
 //! [buffered]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK( sum == size * (size-1) / 2 );
+    STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
 }
 
 #if (STXXL_MSVC && STXXL_HAVE_CXX11) || (defined(__GNUG__) && (__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40600)
 void test_vector_cxx11(uint64 size)
 {
-    stxxl::scoped_print_timer tm("vector C++11 loop access");
+    stxxl::scoped_print_timer tm("vector C++11 loop access", 2 * size * sizeof(uint64));
 
     typedef stxxl::VECTOR_GENERATOR<uint64>::result vector_type;
 
@@ -81,7 +103,7 @@ void test_vector_cxx11(uint64 size)
         vector_type::bufwriter_type writer(vec);
 
         for (uint64 i = 0; i < vec.size(); ++i)
-            writer << i;
+            writer << (i % 1024);
     }
 
 //! [cxx11]
@@ -95,14 +117,18 @@ void test_vector_cxx11(uint64 size)
 //! [cxx11]
 
     std::cout << "sum: " << sum << std::endl;
-    STXXL_CHECK( sum == size * (size-1) / 2 );
+    STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
 }
 #endif
 
-int main()
+int main(int argc, char* argv[])
 {
-    const size_t size = 128 * 1024*1024;
+    int multi = (argc >= 2 ? atoi(argv[1]) : 4);
+    const uint64 size = multi * 1024*1024*1024llu / sizeof(uint64);
 
+    stxxl::block_manager::get_instance();
+
+    test_vector_element(size);
     test_vector_iterator(size);
     test_vector_buffered(size);
 

@@ -126,7 +126,7 @@ public:
 };
 
 // forced instantiation
-template class matrix<int_type, 32>;
+template class stxxl::matrix<int_type, 32>;
 
 int main(int argc, char **argv)
 {

@@ -20,8 +20,6 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
-#include <sstream>
-#include <assert.h>
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -90,73 +88,15 @@ split(const std::string & str, const std::string & sep, unsigned int min_fields)
 //! Parse a string like "343KB" or "44 GiB" into the corresponding size in
 //! bytes. Returns the number of bytes and sets ok = true if the string could
 //! be parsed correctly.
-static inline bool parse_SI_IEC_size(const std::string& str, uint64& size)
-{
-    char* endptr;
-    size = strtoul(str.c_str(), &endptr, 10);
-    if (!endptr) return false; // parse failed, no number
+bool parse_SI_IEC_size(const std::string& str, uint64& size);
 
-    while (endptr[0] == ' ') ++endptr; // skip over spaces
+//! Format a byte size using SI (K, M, G, T) suffixes (powers of ten). Returns
+//! "123 M" or similar.
+std::string format_SI_size(uint64 number);
 
-    if ( endptr[0] == 0 ) // number parsed, no suffix defaults to MiB
-        size *= 1024 * 1024;
-    else if ( (endptr[0] == 'b' || endptr[0] == 'B') && endptr[1] == 0 ) // bytes
-        size *= 1;
-    else if (endptr[0] == 'k' || endptr[0] == 'K')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= 1000; // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= 1024; // power of two
-        else
-            return false;
-    }
-    else if (endptr[0] == 'm' || endptr[0] == 'M')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= 1000 * 1000; // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= 1024 * 1024; // power of two
-        else
-            return false;
-    }
-    else if (endptr[0] == 'g' || endptr[0] == 'G')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= 1000 * 1000 * 1000; // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= 1024 * 1024 * 1024; // power of two
-        else
-            return false;
-    }
-    else if (endptr[0] == 't' || endptr[0] == 'T')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= int64(1000) * int64(1000) * int64(1000) * int64(1000); // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= int64(1024) * int64(1024) * int64(1024) * int64(1024); // power of two
-        else
-            return false;
-    }
-    else if (endptr[0] == 'p' || endptr[0] == 'P')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= int64(1000) * int64(1000) * int64(1000) * int64(1000) * int64(1000); // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= int64(1024) * int64(1024) * int64(1024) * int64(1024) * int64(1024); // power of two
-        else
-            return false;
-    }
-    else
-        return false;
-
-    return true;
-}
+//! Format a byte size using IEC (Ki, Mi, Gi, Ti) suffixes (powers of
+//! two). Returns "123 Ki" or similar.
+std::string format_IEC_size(uint64 number);
 
 ////////////////////////////////////////////////////////////////////////////
 

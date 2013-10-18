@@ -163,7 +163,44 @@ Please see \ref install_config for further available options.
 
 */
 
-/** \page install_windows Compiling and Installing the STXXL on Microsoft Windows
+/** \page install_windows Compiling and Installing the STXXL with Visual Studio
+
+\author Timo Bingmann (2013)
+
+## Prerequisites:
+
+- Microsoft Visual Studio >= 2012 (VC10). For older versions you need Boost (TODO).
+- cmake 2.8, visit http://www.cmake.org/
+- (a git client for development on the bleeding edge)
+
+## Unpack STXXL source code
+
+- Download the STXXL archive from http://stxxl.sourceforge.net <br>
+  or use your favorite git client to clone the development version: https://github.com/bingmann/stxxl.git
+
+## Use CMake to Generate Visual Studio Projects
+
+- Open the CMake GUI.
+- Fill in the <b>source code</b> field with the place of the STXXL source and pick a <b>build</b> directory.
+- Pressing <b>"Configure"</b> brings up a dialog box: select your Visual Studio version (MSVC 11 here). <br>
+  Note that you must select between 32- and 64-bit building here.
+- Press <b>"Generate"</b> to run the CMake platform checks and to generate the Visual Studio project files.
+
+\image html install_windows_cmake.png
+
+- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
+
+## Use Visual Studio to Build STXXL
+
+- Afterwards, use Visual Studio to open the <b>stxxl.sln</b> STXXL "Solution" containing the projects.
+- Building the <b>ALL_BUILD</b> will first compile the STXXL library sources and then <b>stxxl_tool</b> and the <b>test1</b> program in \c local/
+
+\image html install_windows_msvcbuild.png
+
+- You can immediately start working with STXXL by modifying the <b>test1.cpp</b> code in the \c local/ directory.
+- Simply switch Visual Studio into <b>Release</b> mode for building without assertions and extra checks.
+
+## Using STXXL as a Library inside a Project
 
 TODO
 

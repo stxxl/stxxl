@@ -57,6 +57,7 @@ extern int benchmark_disks(int argc, char * argv[]);
 extern int benchmark_files(int argc, char * argv[]);
 extern int benchmark_sort(int argc, char * argv[]);
 extern int benchmark_disks_random(int argc, char * argv[]);
+extern int benchmark_pqueue(int argc, char * argv[]);
 extern int do_mlock(int argc, char * argv[]);
 extern int do_mallinfo(int argc, char * argv[]);
 
@@ -83,6 +84,8 @@ struct SubTool subtools[] = {
       "Run benchmark tests of different sorting methods in STXXL" },
     { "benchmark_disks_random", &benchmark_disks_random, false,
       "Benchmark random block access time to .stxxl configured disks." },
+    { "benchmark_pqueue", &benchmark_pqueue, false,
+      "Benchmark priority queue implementation using sequence of operations." },
     { "mlock", &do_mlock, true,
       "Lock physical memory." },
     { "mallinfo", &do_mallinfo, true,

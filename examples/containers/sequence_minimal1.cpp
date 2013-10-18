@@ -18,19 +18,19 @@ int main()
   typedef stxxl::sequence<int> sequence_type;
   sequence_type my_sequence;
 
-  for (int i = 0; i < 10000; ++i) 
+  for (int i = 0; i < 10000; ++i)
   {
     my_sequence.push_back(i);
   }
-  
+
   sequence_type::stream forward_stream = my_sequence.get_stream();
 
-  while (!forward_stream.empty()) 
+  while (!forward_stream.empty())
   {
     std::cout << *forward_stream << " ";
     my_sequence.pop_back();
-    ++forward_stream;  
+    ++forward_stream;
   }
-  
+
   return 0;
 }

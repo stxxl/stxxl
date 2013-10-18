@@ -406,11 +406,11 @@ The STXXL library provides various I/O performance counters (stxxl::stats class)
 \code
   // generate stats instance
   stxxl::stats * Stats = stxxl::stats::get_instance();
- 
-  // start measurement here
-  stxxl::stats_data stats_begin(*Stats); 
 
-  // some computation ... 
+  // start measurement here
+  stxxl::stats_data stats_begin(*Stats);
+
+  // some computation ...
 
   // substract current stats from stats at the beginning of the measurement
   std::cout << (stxxl::stats_data(*Stats) - stats_begin);
@@ -421,14 +421,14 @@ The Stats ostream holds various measured I/O data:
 
 \code
 STXXL I/O statistics
- total number of reads                      : 2 
- average block size (read)                  : 2097152 (2.000 MiB) 
- number of bytes read from disks            : 4194304 (4.000 MiB) 
+ total number of reads                      : 2
+ average block size (read)                  : 2097152 (2.000 MiB)
+ number of bytes read from disks            : 4194304 (4.000 MiB)
  time spent in serving all read requests    : 0.062768 s @ 63.7268 MiB/s
  time spent in reading (parallel read time) : 0.062768 s @ 63.7268 MiB/s
- total number of writes                     : 2 
- average block size (write)                 : 2097152 (2.000 MiB) 
- number of bytes written to disks           : 4194304 (4.000 MiB) 
+ total number of writes                     : 2
+ average block size (write)                 : 2097152 (2.000 MiB)
+ number of bytes written to disks           : 4194304 (4.000 MiB)
  time spent in serving all write requests   : 0.0495751 s @ 80.6857 MiB/s
  time spent in writing (parallel write time): 0.0495751 s @ 80.6857 MiB/s
  time spent in I/O (parallel I/O time)      : 0.112343 s @ 71.2104 MiB/s
@@ -456,5 +456,3 @@ std::cout << "max: " << bm->get_maximum_allocation() << std::endl;  // max. numb
 
 See stxxl::stats and stxxl::stats_data class reference for all provided individual functions.
 */
-
-

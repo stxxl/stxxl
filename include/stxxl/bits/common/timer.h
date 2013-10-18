@@ -19,6 +19,7 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/verbose.h>
+#include <stxxl/bits/common/utils.h>
 
 #ifdef STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>
@@ -135,24 +136,34 @@ protected:
     //! message
     std::string m_message;
 
+    //! bytes processed
+    uint64 m_bytes;
+
     //! timer
     class timer m_timer;
 
 public:
 
     //! save message and start timer
-    scoped_print_timer(const std::string& message)
+    scoped_print_timer(const std::string& message, const uint64 bytes = 0)
         : m_message(message),
+          m_bytes(bytes),
           m_timer(true)
     {
-        STXXL_MSG("Starting scoped timer " << message);
+        STXXL_MSG("Starting " << message);
     }
 
     //! on destruction: tell the time
     ~scoped_print_timer()
     {
-        STXXL_MSG("Finishing scoped timer " << m_message
-                  << " after " << m_timer.seconds() << " seconds");
+        if (m_bytes == 0)
+            STXXL_MSG("Finished " << m_message
+                      << " after " << m_timer.seconds() << " seconds");
+        else
+            STXXL_MSG("Finished " << m_message
+                      << " after " << m_timer.seconds() << " seconds. "
+                      << "Processed " << format_IEC_size(m_bytes) << "B"
+                      << " @ " << format_IEC_size(uint64(m_bytes / m_timer.seconds())) << "B/s");
     }
 };
 

@@ -549,6 +549,92 @@ struct tuple_less2nd
     static value_type max_value() { return value_type::max_value(); }
 };
 
+
+/** 
+ * Counter for creating tuple indexes for example. 
+ */
+template <class valuetype>
+struct counter
+{
+public:
+    typedef valuetype value_type;
+
+protected:
+    value_type m_count;
+
+public:
+    counter(const value_type& start = 0)
+        : m_count(start)
+    {}
+
+    const value_type & operator*() const { 
+      return m_count;
+    }
+
+    counter& operator++ ()
+    {
+        ++m_count;
+        return *this;
+    }
+
+    bool empty() const { 
+      return false; 
+    }
+};
+
+
+/**
+ * Concatenates two tuple streams as streamA . streamB 
+ */
+template <class StreamA, class StreamB>
+class concatenate
+{
+public:
+    typedef typename StreamA::value_type value_type;
+
+private:
+    StreamA& A;
+    StreamB& B;
+
+public:
+
+    concatenate(StreamA& A_, StreamB& B_) : A(A_), B(B_) {
+        assert(!A.empty());
+        assert(!B.empty());
+    }
+
+    const value_type & operator*() const
+    {
+        assert(!empty());
+
+        if (!A.empty()) {
+            return *A;
+        }
+        else {  
+            return *B;
+        }
+    }
+
+    concatenate & operator++()
+    {
+        assert (!empty());
+
+        if(!A.empty()) {
+            ++A;
+        }
+        else if (!B.empty()) {
+            ++B;
+        }
+
+        return *this;
+    }
+
+    bool empty() const { 
+      return (A.empty() && B.empty()); 
+    }
+};
+
+
 __STXXL_END_NAMESPACE
 
 #endif // !STXXL_TUPLE_HEADER

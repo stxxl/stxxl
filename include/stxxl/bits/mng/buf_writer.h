@@ -18,6 +18,7 @@
 
 #include <stxxl/bits/io/request_operations.h>
 #include <stxxl/bits/io/disk_queues.h>
+#include <stxxl/bits/noncopyable.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -34,7 +35,7 @@ __STXXL_BEGIN_NAMESPACE
 //!
 //! \c buffered_writer overlaps I/Os with filling of output buffer.
 template <typename block_type>
-class buffered_writer
+class buffered_writer : private noncopyable
 {
     buffered_writer() { }
 

@@ -54,6 +54,8 @@ if(NOT MSVC)
   option(USE_STD_THREADS "Force usage of C++ standard library thread support." OFF)
 endif()
 
+option(NO_CXX11 "Build without C++11 flags" OFF)
+
 if(BUILD_TESTS)
   set(BUILD_EXAMPLES ON)
 endif()
@@ -109,20 +111,23 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -Wextra -pedantic -Wno-long-long")
 endif()
 
-# more template depth for some tests and compilers
+###############################################################################
+# enable C++11 and more compiler features
 
+# more template depth for some tests and compilers
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-ftemplate-depth=1024 CXX_HAS_TEMPLATE_DEPTH)
 if(CXX_HAS_TEMPLATE_DEPTH)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
 endif()
 
+# enable C++11
 if(MSVC)
-  # Enable C++11 for MSVC 11 or greater
+  # MSVC 11 or greater has C++11 enabled
   if(NOT (MSVC_VERSION LESS 1700))
     set(STXXL_HAVE_CXX11 "1")
   endif()
-else()
+elseif(NOT NO_CXX11)
   check_cxx_compiler_flag(-std=c++11 CXX_HAS_STD_CXX11)
   if(CXX_HAS_STD_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -176,6 +181,11 @@ if (GMX_LARGEFILES)
 else (NOT GMX_LARGEFILES)
   message(FATAL_ERROR "Large file support was not detectable.")
 endif (GMX_LARGEFILES)
+
+###############################################################################
+# check for C++11 <atomic> header support
+
+check_include_file_cxx(atomic STXXL_STD_ATOMIC)
 
 ###############################################################################
 # optional Boost libraries
@@ -375,13 +385,17 @@ endif(TRY_COMPILE_HEADERS)
 ###############################################################################
 # figure out STXXL_TMPDIR for tests
 
-if(DEFINED ENV{STXXL_TMPDIR})
-  set(STXXL_TMPDIR "$ENV{STXXL_TMPDIR}")
-elseif(NOT DEFINED STXXL_TMPDIR)
-  set(STXXL_TMPDIR ".")
-endif()
+if(BUILD_TESTS)
 
-message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
+  if(DEFINED ENV{STXXL_TMPDIR})
+    set(STXXL_TMPDIR "$ENV{STXXL_TMPDIR}")
+  elseif(NOT DEFINED STXXL_TMPDIR)
+    set(STXXL_TMPDIR ".")
+  endif()
+
+  message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
+
+endif(BUILD_TESTS)
 
 ###############################################################################
 # build tests and tools

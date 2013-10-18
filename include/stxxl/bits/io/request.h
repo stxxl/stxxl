@@ -36,7 +36,7 @@ __STXXL_BEGIN_NAMESPACE
 class file;
 
 //! Request with basic properties like file and offset.
-class request : virtual public request_interface, public locking_counted_object
+class request : virtual public request_interface, public atomic_counted_object
 {
 protected:
     completion_handler on_complete;

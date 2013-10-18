@@ -21,6 +21,7 @@
 #include <stxxl/bits/common/switch.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
+#include <stxxl/bits/noncopyable.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -51,7 +52,7 @@ public:
 //! \c block_prefetcher overlaps I/Os with consumption of read data.
 //! Utilizes optimal asynchronous prefetch scheduling (by Peter Sanders et.al.)
 template <typename block_type, typename bid_iterator_type>
-class block_prefetcher
+class block_prefetcher : private noncopyable
 {
     block_prefetcher() { }
     typedef typename block_type::bid_type bid_type;
