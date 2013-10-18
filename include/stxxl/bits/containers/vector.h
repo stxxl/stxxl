@@ -89,13 +89,13 @@ public:
         this->offset = offset;
         pos = block2 * modulo12 + block1 * modulo1 + offset;
     }
-
+    
     double_blocked_index & operator = (size_type pos)
     {
         set(pos);
         return *this;
     }
-
+    
     //pre-increment operator
     double_blocked_index & operator ++ ()
     {
@@ -855,6 +855,8 @@ private:
     }
 
 public:
+    /** @name Constructors/Destructors */
+    ///@{
     //! \brief Constructs external vector with n elements.
     //!
     //! \param n Number of elements.
@@ -886,7 +888,11 @@ public:
 
         bm->new_blocks(alloc_strategy, _bids.begin(), _bids.end(), 0);
     }
+    ///@}
 
+    /** @name Modifiers*/
+    ///@{
+    //! swap content
     void swap(vector & obj)
     {
         std::swap(alloc_strategy, obj.alloc_strategy);
@@ -901,7 +907,10 @@ public:
         std::swap(_from, obj._from);
         std::swap(exported, obj.exported);
     }
+    ///@}
 
+    /** @name Miscellaneous */
+    ///@{
     void allocate_page_cache() const
     {
         //  numpages() might be zero
@@ -916,7 +925,10 @@ public:
         delete _cache;
         _cache = NULL;
     }
-
+    ///@}
+    
+    /** @name Capacity */
+    ///@{
     //! Return the number of elelemtsn for which \a external memory has been
     //! allocated. capacity() is always greator than or equal to size().
     size_type capacity() const
@@ -928,7 +940,7 @@ public:
     {
         return size_type(_bids.size()) * block_type::raw_size;
     }
-
+   
     /*! \brief Reserves at least n elements in external memory.
      *
      * If n is less than or equal to capacity(), this call has no
@@ -967,7 +979,7 @@ public:
             _from->set_size(offset);
         }
     }
-
+    
     void resize(size_type n)
     {
         _resize(n);
@@ -980,7 +992,7 @@ public:
         else
             _resize(n);
     }
-
+    ///@}
 private:
     void _resize(size_type n)
     {
@@ -1029,6 +1041,8 @@ private:
     }
 
 public:
+    /** @name Modifiers */
+    ///@{
     //! Erases all of the elements and deallocates all external memory that is occupied.
     void clear()
     {
@@ -1045,7 +1059,7 @@ public:
         for (unsigned_type i = 0; i < numpages(); ++i)
             _free_slots.push(i);
     }
-
+    
     //! Append a new element at the end.
     void push_back(const_reference obj)
     {
@@ -1058,7 +1072,10 @@ public:
     {
         resize(_size - 1);
     }
+    ///@}
 
+    /** @name Operators */
+    ///@{
     //! Returns a reference to the last element, see \ref design_vector_notes.
     reference back()
     {
@@ -1079,7 +1096,10 @@ public:
     {
         return const_element(0);
     }
+    ///@}
 
+    /** @name Constructors/Destructors */
+    ///@{
     //! \brief Construct vector from a file.
     //! \param from file to be constructed from
     //! \param size Number of elements.
@@ -1166,8 +1186,11 @@ public:
         const_iterator inend = obj.end();
         std::copy(inbegin, inend, begin());
     }
-
+    ///@}
+    
     //! assignment operator
+    //! @name operators
+    ///@{ 
     vector & operator = (const vector & obj)
     {
         if (&obj != this)
@@ -1176,8 +1199,12 @@ public:
             this->swap(tmp);
         }
         return *this;
-    }
-
+    }   
+    ///@}
+       
+    
+    /** @name Capacity */
+    ///@{
     //! return the size of the vector.
     size_type size() const
     {
@@ -1188,6 +1215,10 @@ public:
     {
         return (!_size);
     }
+    ///@}
+    
+    /** @name Iterators */
+    ///@{
     //! returns an iterator pointing to the beginning of the vector, see \ref design_vector_notes.
     iterator begin()
     {
@@ -1218,7 +1249,6 @@ public:
     {
         return end();
     }
-
     reverse_iterator rbegin()
     {
         return reverse_iterator(end());
@@ -1243,7 +1273,10 @@ public:
     {
         return const_reverse_iterator(begin());
     }
+    ///@}
 
+    /** @name Operators */
+    ///@{
     reference operator [] (size_type offset)
     {
         return element(offset);
@@ -1252,12 +1285,14 @@ public:
     {
         return const_element(offset);
     }
-
     bool is_element_cached(size_type offset) const
     {
         return is_page_cached(blocked_index_type(offset));
     }
+    ///@}
 
+    /** @name Modifiers */
+    ///@{
     //! Flushes the cache pages to the external memory.
     void flush() const
     {
@@ -1286,7 +1321,11 @@ public:
             }
         }
     }
+    ///@}
 
+
+    /** @name Constructors/Destructors */
+    ///@{
     ~vector()
     {
         STXXL_VERBOSE_VECTOR("~vector()");
@@ -1324,7 +1363,10 @@ public:
         }
         delete _cache;
     }
-
+    ///@}
+    
+    /** @name Miscellaneous */
+    ///@{
     //! Export data such that it is persistent on the file system. Resulting
     //! files will be numbered ascending.
     void export_files(std::string filename_prefix)
@@ -1348,7 +1390,10 @@ public:
     {
         return _from;
     }
-
+    ///@}
+    
+    /** @name Capacity */
+    ///@{
     //! Set the blocks and the size of this container explicitly.
     //! The vector must be completely empty before.
     template <typename ForwardIterator>
@@ -1368,6 +1413,7 @@ public:
     {
       return pager.size ();
     }
+    ///@}
 
 private:
     bids_container_iterator bid(const size_type & offset)
