@@ -114,6 +114,8 @@ private:
     unsigned_type m_blocks2prefetch;
 
 public:
+    /** @name Constructors/Destructors */
+    ///@{
     //! Constructs empty sequence with own write and prefetch block pool
     //!
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
@@ -164,7 +166,10 @@ public:
         STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::sequence(pool)");
         init(blocks2prefetch);
     }
+    ///@}
 
+    /** @name Modifiers */
+    ///@{
     void swap(sequence& obj)
     {
         std::swap(m_size, obj.m_size);
@@ -180,6 +185,7 @@ public:
         std::swap(m_bm, obj.m_bm);
         std::swap(m_blocks2prefetch, obj.m_blocks2prefetch);
     }
+    ///@}
 
 private:
     void init(int blocks2prefetch = -1)
@@ -206,6 +212,8 @@ private:
     }
 
 public:
+    /** @name Miscellaneous */
+    ///@{
     //! Defines the number of blocks to prefetch (\c front side).
     //! This method should be called whenever the prefetch pool is resized
     //! \param blocks2prefetch  defines the number of blocks to prefetch (\c front side),
@@ -223,7 +231,10 @@ public:
     {
         return m_blocks2prefetch;
     }
+    ///@}
 
+    /** @name Modifiers */
+    ///@{
     //! Adds an element to the front of the sequence
     void push_front(const value_type & val)
     {
@@ -471,7 +482,10 @@ public:
             --m_size;
         }
     }
+    ///@}
 
+    /** @name Capacity */
+    ///@{
     //! Returns the size of the sequence
     size_type size() const
     {
@@ -483,7 +497,10 @@ public:
     {
         return (m_size == 0);
     }
+    ///@}
 
+    /** @name Operators */
+    ///@{
     //! Returns a mutable reference at the back of the sequence
     value_type & back()
     {
@@ -511,7 +528,10 @@ public:
         assert(!empty());
         return *m_front_element;
     }
+    ///@}
 
+    /** @name Constructors/Destructors */
+    ///@{
     ~sequence()
     {
         if (m_front_block != m_back_block)
@@ -525,6 +545,7 @@ public:
         if (!m_bids.empty())
             m_bm->delete_blocks(m_bids.begin(), m_bids.end());
     }
+    ///@}
 
     /********************************************************************************/
 
@@ -648,12 +669,15 @@ public:
             return *this;
         }
     };
-
+    
+    /** @name Miscellaneous */
+    ///@{
     //! construct a forward stream from this sequence
     stream get_stream()
     {
         return stream(*this);
     }
+    ///@}
 
     /********************************************************************************/
 
@@ -778,11 +802,14 @@ public:
         }
     };
 
+    /** @name Miscellaneous */
+    ///@{
     //! construct a reverse stream from this sequence
     reverse_stream get_reverse_stream()
     {
         return reverse_stream(*this);
     }
+    ///@}
 };
 
 //! \}

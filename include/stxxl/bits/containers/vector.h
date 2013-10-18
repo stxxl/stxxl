@@ -891,7 +891,7 @@ public:
     ///@}
 
     /** @name Modifiers*/
-    ///@{
+    ///@{ 
     //! swap content
     void swap(vector & obj)
     {
@@ -984,7 +984,6 @@ public:
     {
         _resize(n);
     }
-
     void resize(size_type n, bool shrink_capacity)
     {
         if (shrink_capacity)
@@ -1201,8 +1200,7 @@ public:
         return *this;
     }   
     ///@}
-       
-    
+     
     /** @name Capacity */
     ///@{
     //! return the size of the vector.

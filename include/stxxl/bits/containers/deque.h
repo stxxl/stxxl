@@ -444,6 +444,9 @@ private:
     }
 
 public:
+
+    /** @name Constructors/Destructors */
+    ///@{
     deque() : Vector((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(T)), begin_o(0), end_o(0), size_(0)
     { }
 
@@ -454,7 +457,10 @@ public:
 
     ~deque()      // empty so far
     { }
+    ///@}
 
+    /** @name Iterators */
+    ///@{
     iterator begin()
     {
         return iterator(this, begin_o);
@@ -479,7 +485,6 @@ public:
     {
         return end();
     }
-
     reverse_iterator rbegin()
     {
         return reverse_iterator(end());
@@ -504,7 +509,10 @@ public:
     {
         return const_reverse_iterator(begin());
     }
+    ///@}
 
+    /** @name Capacity */
+    ///{@
     size_type size() const
     {
         return size_;
@@ -519,7 +527,10 @@ public:
     {
         return size_ == 0;
     }
+    ///@}
 
+    /** @name Operators */
+    ///{
     reference operator [] (size_type n)
     {
         assert(n < size());
@@ -555,7 +566,10 @@ public:
         assert(!empty());
         return Vector[(end_o + Vector.size() - 1) % Vector.size()];
     }
+    ///@}
 
+    /** @name Modifiers */
+    ///@{
     void push_front(const T & el)
     {
         if ((begin_o + Vector.size() - 1) % Vector.size() == end_o)
@@ -594,7 +608,10 @@ public:
         end_o = (end_o + Vector.size() - 1) % Vector.size();
         --size_;
     }
+    ///@}
 
+    /** @name Modifiers */
+    ///@{
     void swap(deque & obj)
     {
         std::swap(Vector, obj.Vector);
@@ -611,7 +628,10 @@ public:
         end_o = 0;
         size_ = 0;
     }
+    ///@}
 
+    /** @name Capacity */
+    ///@{
     void resize(size_type n)
     {
         if (n < size())
@@ -641,6 +661,7 @@ public:
         }
     }
 };
+///@}
 
 template <class T, class VectorType>
 bool operator == (const deque<T, VectorType> & a, const deque<T, VectorType> & b)

@@ -99,6 +99,8 @@ protected:
 
 public:
 
+    /** @name Constructors */
+    ///@{
     //! Constructor allocation memory_to_use bytes in ram for sorted runs.
     sorter(const cmp_type& cmp, unsigned_type memory_to_use)
         : m_state(STATE_INPUT), 
@@ -114,7 +116,10 @@ public:
           m_runs_merger(cmp, merger_memory_to_use)
     {
     }
-
+    ///@}
+    
+    /** @name Modifiers */
+    ///@{
     //! Remove all items and return to input state.
     void clear()
     {
@@ -131,7 +136,10 @@ public:
         assert( m_state == STATE_INPUT );
         m_runs_creator.push(val);
     }
-    
+    ///@}
+  
+    /** @name Modus */
+    ///@{
     //! Finish push input state and deallocate input buffer.
     void finish()
     {
@@ -154,16 +162,10 @@ public:
 
         m_runs_creator.deallocate();
     }
+    ///@}
 
-    //! Number of items pushed or items remaining to be read.
-    unsigned_type size() const
-    {
-        if ( m_state == STATE_INPUT )
-            return m_runs_creator.size();
-        else
-            return m_runs_merger.size();
-    }
-
+    /** @name Modifiers */
+    ///@{
     //! Switch to output state, rewind() in case the output was already sorted.
     void sort()
     {
@@ -183,7 +185,10 @@ public:
         m_runs_merger.set_memory_to_use(merger_memory_to_use);
         sort();
     }
+    ///@}
 
+    /** @name Modus */
+    ///@{
     //! Switch to output state, rewind() in case the output was already sorted.
     void sort_reuse()
     {
@@ -202,8 +207,11 @@ public:
 
         m_state = STATE_INPUT;
         return sort();
-    }
+    }   
+    ///@}
 
+    /** @name Miscellaneous */
+    ///@{
     //! Change runs_creator memory usage
     void set_creator_memory_to_use(unsigned_type creator_memory_to_use)
     {
@@ -215,14 +223,28 @@ public:
     {
         m_runs_merger.set_memory_to_use(merger_memory_to_use);
     }
+    ///@}
 
+    /** @name Capacity */
+    ///@{
+    //! Number of items pushed or items remaining to be read.
+    unsigned_type size() const
+    {
+        if ( m_state == STATE_INPUT )
+            return m_runs_creator.size();
+        else
+            return m_runs_merger.size();
+    }
     //! Standard stream method
     bool empty() const
     {
         assert( m_state == STATE_OUTPUT );
         return m_runs_merger.empty();
     }
+    ///@}
 
+    /** @name Operators */
+    ///@{
     //! Standard stream method
     const value_type& operator * () const
     {
@@ -243,6 +265,7 @@ public:
         ++m_runs_merger;
         return *this;
     }
+    ///@}
 };
 
 //! \}
