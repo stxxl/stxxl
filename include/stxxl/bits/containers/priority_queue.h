@@ -825,23 +825,23 @@ namespace priority_queue_local
         typedef dummy result;
     };
 
-    template <unsigned_type E_, unsigned_type IntMem_, unsigned_type MaxItems, unsigned_type B_, unsigned_type m_, bool stop = false>
+    template <unsigned_type E_, internal_size_type IntMem_, external_size_type MaxItems, unsigned_type B_, unsigned_type m_, bool stop = false>
     struct find_B_m
     {
         typedef find_B_m<E_, IntMem_, MaxItems, B_, m_, stop> Self;
-        enum {
-            k = IntMem_ / B_,   // number of blocks that fit into M
-            element_size = E_,  // element size
-            IntMem = IntMem_,
-            B = B_,             // block size
-            m = m_,             // number of blocks fitting into buffers
-            c = k - m_,
-            // memory occupied by block must be at least 10 times larger than size of ext sequence
-            // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
-            fits = c > 10 && ((k - m) * (m) * (m * B / (element_size * 4 * 1024))) >= MaxItems
-                   && ((MaxItems < ((k - m) * m / (2 * element_size)) * 1024) || m >= 128),
-            step = 1
-        };
+
+        static const unsigned_type k = IntMem_ / B_;   // number of blocks that fit into M
+        static const unsigned_type element_size = E_;  // element size
+        static const internal_size_type IntMem = IntMem_;
+        static const unsigned_type B = B_;             // block size
+        static const external_size_type m = m_;             // number of blocks fitting into buffers
+        static const unsigned_type c = k - m_;
+        // memory occupied by block must be at least 10 times larger than size of ext sequence
+        // && satisfy memory req && if we have two ext mergers their degree must be at least 64=m/2
+        static const external_size_type fits = (c > 10) &&
+            (((k - m) * (m) * (m * B / (element_size * 4 * 1024))) >= MaxItems) &&
+            ((MaxItems < ((k - m) * m / (2 * element_size)) * 1024) || m >= 128);
+        static const unsigned_type step = 1;
 
         typedef typename find_B_m<element_size, IntMem, MaxItems, B, m + step, fits || (m >= k - step)>::result candidate1;
         typedef typename find_B_m<element_size, IntMem, MaxItems, B / 2, 1, fits || candidate1::fits>::result candidate2;
@@ -882,12 +882,11 @@ namespace priority_queue_local
     struct compute_N
     {
         typedef compute_N<AI_, X_, CriticalSize> Self;
-        enum
-        {
-            X = X_,
-            AI = AI_,
-            N = X / (AI * AI) // two stage internal
-        };
+
+        static const unsigned_type X = X_;
+        static const unsigned_type AI = AI_;
+        static const unsigned_type N = X / (AI * AI); // two stage internal
+
         typedef typename IF<(N >= CriticalSize), Self, typename compute_N<AI / 2, X, CriticalSize>::result>::result result;
     };
 
@@ -926,8 +925,8 @@ namespace priority_queue_local
 //! values.
 template <class ValueType,
           class CompareType,
-          unsigned_type IntMemory,
-          unsigned MaxItems,
+          internal_size_type IntMemory,
+          external_size_type MaxItems,
           unsigned Tune = 6>
 class PRIORITY_QUEUE_GENERATOR
 {
@@ -948,10 +947,10 @@ public:
         AI = ComputeN::AI,
         AE = (m / 2 < 2) ? 2 : (m / 2)            // at least 2
     };
-    enum {
-        // Estimation of maximum internal memory consumption (in bytes)
-        EConsumption = X * settings::element_size + settings::B * AE + ((MaxItems / X) / AE) * settings::B * 1024
-    };
+
+    // Estimation of maximum internal memory consumption (in bytes)
+    static const unsigned_type EConsumption = X * settings::element_size + settings::B * AE + ((MaxItems / X) / AE) * settings::B * 1024;
+
     /*
         unsigned BufferSize1_ = 32, // equalize procedure call overheads etc.
         unsigned N_ = 512,          // bandwidth
