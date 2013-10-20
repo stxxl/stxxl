@@ -124,7 +124,7 @@ void test_vector_cxx11(uint64 size)
 int main(int argc, char* argv[])
 {
     int multi = (argc >= 2 ? atoi(argv[1]) : 4);
-    const uint64 size = multi * 1024*1024*1024llu / sizeof(uint64);
+    const uint64 size = multi * 1024*1024 * uint64(1024) / sizeof(uint64);
 
     stxxl::block_manager::get_instance();
 

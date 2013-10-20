@@ -13,7 +13,7 @@
 #include <stxxl/sorter>
 #include <stxxl/stats>
 #include <stxxl/timer>
-#include <time.h>
+#include <stxxl/random>
 #include <limits>
 
 struct TwoInteger
@@ -52,7 +52,7 @@ int main()
     // create sorter object (CompareType(), MainMemoryLimit)
     sorter_type int_sorter(TwoIntegerComparator(), 64*1024*1024);
 
-    srand(time(NULL));
+    stxxl::random_number32 rand32;
 
     stxxl::timer Timer1;
     Timer1.start();
@@ -60,7 +60,7 @@ int main()
     // insert random numbers from [0,100000)
     for (size_t i = 0; i < 100000; ++i)
     {
-        int_sorter.push( TwoInteger(rand() % 100000, (int)i) );  // fill sorter container
+        int_sorter.push( TwoInteger(rand32() % 100000, (int)i) );  // fill sorter container
     }
 
     Timer1.stop();

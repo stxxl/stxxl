@@ -22,7 +22,6 @@ int main()
     unsigned int smaller_left = 0;
     unsigned int smaller_right = 0;
     stxxl::random_number32 rand32;
-    stxxl::random_number<> n_rand;
     stxxl::uint64 number_of_elements = (long long int)(1*64) * (long long int)(1024 * 1024);
 
     // fill deque with random integer values
@@ -35,7 +34,7 @@ int main()
     stxxl::deque_iterator<deque> deque_iterator = my_deque.begin();
 
     // Access random element x at position p(x) in the deque
-    p = n_rand(number_of_elements - 1);
+    p = rand32() % number_of_elements;
     x = my_deque[p];
 
     // Count number of smaller elements from the front to p(x) - 1

@@ -25,8 +25,8 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(SEND_ERROR "In-source builds are not allowed.")
 endif()
 
-# for testing for c++ system include files
-include(CheckIncludeFileCXX)
+# default to Debug building
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "CMake build type")
 
 ###############################################################################
 # compilation options
@@ -101,6 +101,8 @@ if(MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4250")
   # warning C4512: assignment operator could not be generated (contains const members)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4512")
+  # warning C4355: 'this' : used in base member initializer list
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4355")
   # disable lots of warnings about "unsecure" C runtime function
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   # disable lots of warnings about deprecated POSIX function names
@@ -143,6 +145,9 @@ endif()
 
 ###############################################################################
 # find thread and random library
+
+# for testing for c++ system include files
+include(CheckIncludeFileCXX)
 
 if(MSVC OR USE_STD_THREADS)
 
@@ -200,6 +205,9 @@ if(USE_BOOST)
   endif(WIN32)
 
   find_package(Boost 1.36.0 REQUIRED COMPONENTS thread date_time chrono iostreams system filesystem)
+
+  # force caching of variables to display them to the user
+  set(BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Boost installation root." FORCE)
 
   if(Boost_FOUND)
     # globally add boost include directories

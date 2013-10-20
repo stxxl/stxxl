@@ -1025,7 +1025,7 @@ public:
 
                 // store beginning of mod2-tuples of s^12 in mod2_pos
                 offset_type special = (concat_length != subp_size(text.size()));
-                offset_type mod2_pos = (subp_size(text.size()) >> 1) + (subp_size(text.size()) & 1) + special;
+                offset_type mod2_pos = offset_type( (subp_size(text.size()) >> 1) + (subp_size(text.size()) & 1) + special );
 
                 mod12_sorter_type isa1_pair(mod12cmp(), ram_use / 5);
                 mod12_sorter_type isa2_pair(mod12cmp(), ram_use / 5);

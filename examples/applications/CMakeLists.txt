@@ -11,3 +11,8 @@
 ###############################################################################
 
 stxxl_build_example(skew3)
+
+if(MSVC AND BUILD_TESTS)
+  # requires /bigobj flag to build
+  set_target_properties(skew3 PROPERTIES COMPILE_FLAGS /bigobj)
+endif()
