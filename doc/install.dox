@@ -19,11 +19,13 @@
 
 \subpage install_windows
 
+\subpage install_windows_boost
+
 \subpage install_config
 
 */
 
-/** \page install_unix Compiling and Installing the STXXL on Linux/Unix Variants
+/** \page install_unix Compiling and Installing STXXL on Linux/Unix Variants
 
 \author Timo Bingmann (2013)
 
@@ -154,7 +156,7 @@ There is also a \c BUILD_EXTRAS configuration flag to build even more, longer ru
 
 # Create a Disk Configuration File
 
-For STXXL is function beyond very simple examples, you must define the \link install_config disk configuration file \endlink. The simplest method is to create a file named \c '.stxxl' the same directory as you execute the program. A basic configuration might be:
+For STXXL is function beyond very simple examples, you must define the \link install_config disk configuration file \endlink. The simplest method is to create a file named <b><tt>'.stxxl'</tt></b> the same directory as you execute the program. A basic configuration might be:
 \verbatim
 # file path,maximum capacity of the disk,access method
 disk=/tmp/stxxl,1G,syscall_unlink
@@ -163,13 +165,14 @@ Please see \ref install_config for further available options.
 
 */
 
-/** \page install_windows Compiling and Installing the STXXL with Visual Studio
+/** \page install_windows Compiling and Installing STXXL with Visual Studio 2012 and newer (without Boost)
 
 \author Timo Bingmann (2013)
 
 ## Prerequisites:
 
-- Microsoft Visual Studio >= 2012 (VC10). For older versions you need Boost (TODO).
+- Microsoft <b>Visual Studio >= 2012 (VC11)</b>. \n
+  For older versions you need Boost, see \ref install_windows_boost.
 - cmake 2.8, visit http://www.cmake.org/
 - (a git client for development on the bleeding edge)
 
@@ -177,6 +180,7 @@ Please see \ref install_config for further available options.
 
 - Download the STXXL archive from http://stxxl.sourceforge.net <br>
   or use your favorite git client to clone the development version: https://github.com/bingmann/stxxl.git
+- Unpack the archive at a convenient location.
 
 ## Use CMake to Generate Visual Studio Projects
 
@@ -195,14 +199,76 @@ Please see \ref install_config for further available options.
 - Afterwards, use Visual Studio to open the <b>stxxl.sln</b> STXXL "Solution" containing the projects.
 - Building the <b>ALL_BUILD</b> will first compile the STXXL library sources and then <b>stxxl_tool</b> and the <b>test1</b> program in \c local/
 
-\image html install_windows_msvcbuild.png
+\image html install_windows_msvc11.png
 
 - You can immediately start working with STXXL by modifying the <b>test1.cpp</b> code in the \c local/ directory.
 - Simply switch Visual Studio into <b>Release</b> mode for building without assertions and extra checks.
+- To build the examples and test suite open up cmake, enable the check-boxes <b><tt>BUILD_EXAMPLES</tt></b> or <b><tt>BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
+
+\note For instruction on configuring disks on Windows, see \ref install_config
 
 ## Using STXXL as a Library inside a Project
 
 TODO
+
+*/
+
+/** \page install_windows_boost Compiling and Installing STXXL with Visual Studio 2010 and Boost
+
+\author Timo Bingmann (2013)
+
+## Prerequisites:
+
+- Microsoft Visual Studio <= 2010 (VC10). \n
+  For newer versions you \link install_windows don't need Boost \endlink anymore.
+- cmake 2.8, visit http://www.cmake.org/
+- (a git client for development on the bleeding edge)
+
+## Unpack STXXL source code
+
+- Download the STXXL archive from http://stxxl.sourceforge.net <br>
+  or use your favorite git client to clone the development version: https://github.com/bingmann/stxxl.git
+- Unpack the archive at a convenient location.
+
+## Download and Install Boost
+
+- We recommend the official binaries for MSVC. Visit http://sourceforge.net/projects/boost/files/boost-binaries/
+  and download the newest package for your compiler, e.g. <a href="http://sourceforge.net/projects/boost/files/boost-binaries/1.54.0/boost_1_54_0-msvc-10.0-64.exe/download">boost_1_54_0-msvc-10.0-64.exe</a>
+- When installing the package, make sure to install in directory \n
+  <b>C:\\Boost</b> \n
+  instead of the default location. This is the most easy way to enable the cmake auto-detection macros to find Boost.
+- The pre-compiled Boost libraries are then located at \n
+  <b>C:\\Boost\\lib64-msvc-10.0</b> or similar. \n
+  You must <b>rename</b> this directory to just <b>lib</b> for cmake to automatically find it.
+
+In summary, cmake only looks for Boost at a few locations: C:\\Boost for headers and C:\\Boost\\lib for library files. While it is possible to instruct cmake to look elsewhere for the necessary files, the easier way is to just rename the directories as required. Otherwise, the Boost location must be specified to cmake by setting the variables \c BOOST_ROOT, \c BOOST_INCLUDEDIR and \c BOOST_LIBRARYDIR in the dialog box each time.
+
+## Use CMake to Generate Visual Studio Projects
+
+- Open the CMake GUI.
+- Fill in the <b>source code</b> field with the place of the STXXL source and pick a <b>build</b> directory.
+- Pressing <b>"Configure"</b> brings up a dialog box: select your Visual Studio version (MSVC 10 here). <br>
+  Note that you must select between 32- and 64-bit building here.
+- Press <b>"Generate"</b> to run the CMake platform checks and to generate the Visual Studio project files.
+
+\image html install_windows_boost_cmake.png
+
+- If you get any error about cmake not being able to find Boost, refer to the previous section on the directories which cmake considers!
+
+- After generating the project, CMake presents a list of optional configuration switches. Maybe the most important are \c BUILD_TESTS and \c BUILD_EXAMPLES. By selecting them, additional subprojects are generated to build and run the unit tests for STXXL.
+
+## Use Visual Studio to Build STXXL
+
+- Afterwards, use Visual Studio to open the <b>stxxl.sln</b> STXXL "Solution" containing the projects.
+- Building the <b>ALL_BUILD</b> will first compile the STXXL library sources and then <b>stxxl_tool</b> and the <b>test1</b> program in \c local/
+
+\image html install_windows_boost_msvc10.png
+
+- You can immediately start working with STXXL by modifying the <b>test1.cpp</b> code in the \c local/ directory.
+- Simply switch Visual Studio into <b>Release</b> mode for building without assertions and extra checks.
+- To build the examples and test suite open up cmake, enable the check-boxes <b><tt>BUILD_EXAMPLES</tt></b> or <b><tt>BUILD_EXAMPLES</tt></b> and press "Generate" again. This will create many sub-projects in the Visual Studio solution.
+
+\note For instruction on configuring disks on Windows, see \ref install_config
 
 */
 
@@ -212,18 +278,29 @@ TODO
 
 A main feature of the STXXL is to take advantage of parallel access to \b multiple disks. For this, you must define the disk configuration in a text file, commonly named \c '.stxxl', using the syntax described below.
 
-These are the locations STXXL will look for a disk configuration file, in decreasing order of precedence:
-- If the environment variable \c STXXLCFG specifies a file, this is used.
-- Then the current directory of the program is checked (<b>usual method</b>):
-  - first for <tt>.stxxl.$HOSTNAME</tt> (for host specific configuration),
-  - then for <tt>.stxxl</tt> (for general configuration).
-- Then the \c $HOME directory of the current user is checked
-  - first for <tt>$HOME/.stxxl.$HOSTNAME</tt> (for host specific configuration),
-  - then for <tt>$HOME/.stxxl</tt> (for general configuration).
+If no file is found at the locations below, STXXL will by default create a 1000 MiB file in \c /var/tmp/stxxl.
 
-If no file is found at the locations above, STXXL will by default create a 1000 MiB file in \c /var/tmp/stxxl.
+These are the locations STXXL will look for a disk configuration file on <b>Linux/Unix systems</b>, in decreasing order of precedence:
+- If the environment variable <b><tt>STXXLCFG</tt></b> specifies a file, this is used.
+- Then the current directory of the program is checked:
+  - first for <b><tt>.stxxl.$HOSTNAME</tt></b> (for host specific configuration),
+  - then for <b><tt>.stxxl</tt></b> (for general configuration).
+- Then the \c $HOME directory of the current user is checked (<b>usual method</b>):
+  - first for <b><tt>$HOME/.stxxl.$HOSTNAME</tt></b> (for host specific configuration),
+  - then for <b><tt>$HOME/.stxxl</tt></b> (for general configuration).
 
-On many distributions the \c $HOSTNAME variable is not exported. For the host specific configuration to work, you must add <tt>"export HOSTNAME"</tt> to your shell configuration (<tt>.bashrc</tt>).
+\note On many Linux distributions the \c $HOSTNAME variable is not exported. For the host specific configuration to work, you must add <tt>"export HOSTNAME"</tt> to your shell configuration (<tt>.bashrc</tt>).
+
+On <b>Windows systems</b>, STXXL looks for a disk configuration file in the following directories:
+- If the environment variable <b><tt>STXXLCFG</tt></b> specifies a file, this is used.
+- Then the current directory of the program is checked:
+  - first for <b><tt>.stxxl.\%COMPUTERNAME\%</tt></b> (for host specific configuration),
+  - then for <b><tt>.stxxl</tt></b> (for general configuration).
+- Then the \c \%APPDATA\% directory of the current user is checked (<b>usual method</b>):
+  - first for <b><tt>\%APPDATA\%/.stxxl.\%COMPUTERNAME\%</tt></b> (for host specific configuration),
+  - then for <b><tt>\%APPDATA\%/.stxxl</tt></b> (for general configuration).
+  - in a default Windows 7 installation, \%APPDATA\% is <b><tt>C:\\Users\\<i>\<username\></i>\\AppData\\Roaming</tt></b> \n
+    You can visit your <tt>%APPDATA%</tt> directory by simply entering <b><tt>"%APPDATA%"</tt></b> in the Windows Explorer address/location line.
 
 \section install_config_format Disk Configuration File Format
 
@@ -275,8 +352,8 @@ disk=/data02/stxxl,300G,syscall_unlink
 
 On Windows, one usually uses different disk drives and \c wincall.
 \verbatim
-disk=c:\stxxl,700G,wincall
-disk=d:\stxxl,200G,wincall
+disk=c:\stxxl.tmp,700G,wincall
+disk=d:\stxxl.tmp,200G,wincall
 \endverbatim
 
 \section install_config_filesystem Recommended file system
@@ -285,7 +362,7 @@ The library benefits from direct transfers from user memory to disk, which saves
 
 If the filesystems only use is to store one large STXXL disk file, we also recommend to add the following options to the \c mkfs.xfs command to gain maximum performance:
 \verbatim
--d agcount=1 -l size=512b
+$ mkfs.xfs -d agcount=1 -l size=512b
 \endverbatim
 
 The following filesystems have been reported not to support direct I/O: \c tmpfs , \c glusterfs .  By default, STXXL will first try to use direct I/O (\c O_DIRECT open flag). If that fails, it will print a warning and open the file without \c O_DIRECT.
@@ -296,11 +373,11 @@ STXXL produces two kinds of log files, a message and an error log. By setting th
 
 \section install_config_precreation Precreating External Memory Files
 
-In order to get the maximum performance one can precreate disk files described in the configuration file, before running STXXL applications.
-
-The precreation utility is included in the set of \c STXXL utilities ( \c utils/createdisks.bin ). Run this utility for each disk you have defined in the disk configuration file:
+In order to get the maximum performance one can precreate disk files described in the configuration file, before running STXXL applications. The precreation utility is included in the set of STXXL utilities in \c stxxl_tool. Run this utility for each disk you have defined in the disk configuration file:
 \verbatim
-utils/createdisks.bin capacity full_disk_filename...
+$ stxxl_tool create_files <capacity> <full_disk_filename...>
+// for example:
+$ stxxl_tool create_files 1GiB /data01/stxxl
 \endverbatim
 
 */
