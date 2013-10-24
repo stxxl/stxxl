@@ -90,9 +90,14 @@ static inline void progress(const char* text, uint64 i, uint64 nelements)
 }
 
 template <typename PQType>
-void run_pqueue_insert_delete(PQType& pq, uint64 nelements)
+void run_pqueue_insert_delete(uint64 nelements, uint64 mem_for_pools)
 {
     typedef typename PQType::value_type ValueType;
+
+    // construct priority queue
+    PQType pq(mem_for_pools / 2, mem_for_pools / 2);
+
+    pq.dump_sizes();
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
@@ -136,9 +141,14 @@ void run_pqueue_insert_delete(PQType& pq, uint64 nelements)
 }
 
 template <typename PQType>
-void run_pqueue_insert_intermixed(PQType& pq, uint64 nelements)
+void run_pqueue_insert_intermixed(uint64 nelements, uint64 mem_for_pools)
 {
     typedef typename PQType::value_type ValueType;
+
+    // construct priority queue
+    PQType pq(mem_for_pools / 2, mem_for_pools / 2);
+
+    pq.dump_sizes();
 
     STXXL_MSG("Internal memory consumption of the priority queue: " << pq.mem_cons() << " B");
     stxxl::stats_data stats_begin(*stxxl::stats::get_instance());
@@ -220,11 +230,6 @@ int do_benchmark_pqueue(uint64 volume, int opseq)
     STXXL_MSG("external groups: " << pq_type::num_ext_groups);
     STXXL_MSG("X : " << gen::X);
 
-    // construct priority queue
-    pq_type pq(mem_for_pools / 2, mem_for_pools / 2);
-
-    pq.dump_sizes();
-
     if (volume == 0) volume = 2 * (mem_for_queue + mem_for_pools);
 
     stxxl::uint64 nelements = volume / sizeof(ValueType);
@@ -232,9 +237,14 @@ int do_benchmark_pqueue(uint64 volume, int opseq)
     STXXL_MSG("Number of elements: " << nelements);
 
     if (opseq == 0)
-        run_pqueue_insert_delete(pq, nelements);
+    {
+        run_pqueue_insert_delete<pq_type>(nelements, mem_for_pools);
+        run_pqueue_insert_intermixed<pq_type>(nelements, mem_for_pools);
+    }
     else if (opseq == 1)
-        run_pqueue_insert_intermixed(pq, nelements);
+        run_pqueue_insert_delete<pq_type>(nelements, mem_for_pools);
+    else if (opseq == 2)
+        run_pqueue_insert_intermixed<pq_type>(nelements, mem_for_pools);
     else
         STXXL_ERRMSG("Invalid operation sequence.");
 
@@ -245,10 +255,17 @@ template <typename ValueType>
 int do_benchmark_pqueue_config(unsigned pqconfig, uint64 size, unsigned opseq)
 {
     if (pqconfig == 0)
-        return do_benchmark_pqueue<ValueType, 128, 128, 16>(size, opseq);
+    {
+        do_benchmark_pqueue_config<ValueType>(1, size, opseq);
+        do_benchmark_pqueue_config<ValueType>(2, size, opseq);
+        do_benchmark_pqueue_config<ValueType>(3, size, opseq);
+        return 1;
+    }
     else if (pqconfig == 1)
-        return do_benchmark_pqueue<ValueType, 512, 512, 64>(size, opseq);
+        return do_benchmark_pqueue<ValueType, 128, 128, 16>(size, opseq);
     else if (pqconfig == 2)
+        return do_benchmark_pqueue<ValueType, 512, 512, 64>(size, opseq);
+    else if (pqconfig == 3)
         return do_benchmark_pqueue<ValueType, 4096, 4096, 512>(size, opseq);
     else
         return 0;
@@ -257,10 +274,17 @@ int do_benchmark_pqueue_config(unsigned pqconfig, uint64 size, unsigned opseq)
 int do_benchmark_pqueue_type(unsigned type, unsigned pqconfig, uint64 size, unsigned opseq)
 {
     if (type == 0)
-        return do_benchmark_pqueue_config<uint32_pair_type>(pqconfig, size, opseq);
+    {
+        do_benchmark_pqueue_type(1, pqconfig, size, opseq);
+        do_benchmark_pqueue_type(2, pqconfig, size, opseq);
+        do_benchmark_pqueue_type(3, pqconfig, size, opseq);
+        return 1;
+    }
     else if (type == 1)
-        return do_benchmark_pqueue_config<uint64_pair_type>(pqconfig, size, opseq);
+        return do_benchmark_pqueue_config<uint32_pair_type>(pqconfig, size, opseq);
     else if (type == 2)
+        return do_benchmark_pqueue_config<uint64_pair_type>(pqconfig, size, opseq);
+    else if (type == 3)
         return do_benchmark_pqueue_config<my_type>(pqconfig, size, opseq);
     else
         return 0;
@@ -276,17 +300,19 @@ int benchmark_pqueue(int argc, char* argv[])
     uint64 size = 0;
     cp.add_opt_param_bytes("size", "Amount of data to insert (e.g. 1GiB)", size);
 
-    unsigned type = 1;
-    cp.add_uint('t', "type", "Value type of tested priority queue:\n 0 = pair of uint32,\n 1 = pair of uint64 (default),\n 2 = 24 byte struct", type);
+    unsigned type = 2;
+    cp.add_uint('t', "type", "Value type of tested priority queue:\n 1 = pair of uint32,\n 2 = pair of uint64 (default),\n 3 = 24 byte struct\n 0 = all of the above", type);
 
-    unsigned pqconfig = 0;
-    cp.add_uint('p', "pq", "Priority queue configuration to test:\n 0 = small (256 MiB RAM, 4 GiB elements)\n 1 = medium (1 GiB RAM, 16 GiB elements) (default)\n 2 = big (8 GiB RAM, 64 GiB elements)", pqconfig);
+    unsigned pqconfig = 2;
+    cp.add_uint('p', "pq", "Priority queue configuration to test:\n 1 = small (256 MiB RAM, 4 GiB elements)\n 2 = medium (1 GiB RAM, 16 GiB elements) (default)\n 3 = big (8 GiB RAM, 64 GiB elements)\n 0 = all of the above", pqconfig);
 
-    unsigned opseq = 0;
-    cp.add_uint('o', "opseq", "Operation sequence to perform:\n 0 = insert all, delete all (default)\n 1 = insert all, intermixed insert/delete", opseq);
+    unsigned opseq = 1;
+    cp.add_uint('o', "opseq", "Operation sequence to perform:\n 1 = insert all, delete all (default)\n 2 = insert all, intermixed insert/delete\n 0 = all of the above", opseq);
 
     if (!cp.process(argc,argv))
         return -1;
+
+    stxxl::config::get_instance();
 
     if (!do_benchmark_pqueue_type(type, pqconfig, size, opseq))
     {

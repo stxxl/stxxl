@@ -202,8 +202,8 @@ int benchmark_sort(int argc, char * argv[])
         );
     cp.set_author("Timo Bingmann <tb@panthema.net>");
 
-    uint64 length;
-    cp.add_bytes('s', "size", "Amount of data to sort (e.g. 1GiB)", length);
+    uint64 length = 0;
+    cp.add_param_bytes("size", "Amount of data to sort (e.g. 1GiB)", length);
 
     uint64 memsize = 256 * MB;
     cp.add_bytes('M', "ram", "Amount of RAM to use when sorting, default: 256 MiB", length);
