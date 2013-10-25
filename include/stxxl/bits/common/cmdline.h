@@ -613,7 +613,7 @@ public:
 
     //! output nicely formatted usage information including description of all
     //! parameters and options.
-    void print_usage(std::ostream& os = std::cerr)
+    void print_usage(std::ostream& os = std::cout)
     {
         os << "Usage: " << m_progname
            << (m_optlist.size() ? " [options]" : "");
@@ -711,7 +711,7 @@ public:
 
     //! parse command line options as specified by the options and parameters added.
     //! \return true if command line is okay and all required parameters are present.
-    bool process(int argc, const char* const* argv, std::ostream& os = std::cerr)
+    bool process(int argc, const char* const* argv, std::ostream& os = std::cout)
     {
         m_progname = argv[0];
         --argc, ++argv;
@@ -858,7 +858,7 @@ public:
     }
 
     //! print nicely formatted result of processing
-    void print_result(std::ostream& os = std::cerr)
+    void print_result(std::ostream& os = std::cout)
     {
         size_t maxlong = std::max(m_param_maxlong, m_opt_maxlong);
 
