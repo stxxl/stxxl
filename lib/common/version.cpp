@@ -47,7 +47,7 @@ const char * get_version_string()
 #ifdef STXXL_VERSION_GIT_SHA1
            " (git " STXXL_VERSION_GIT_SHA1 ")"
 #endif // STXXL_VERSION_GIT_SHA1
-#ifdef STXXL_PARALLEL
+#if STXXL_PARALLEL
            " + gnu parallel(" stringify(__GLIBCXX__) ")"
 #endif // STXXL_PARALLEL
 #ifdef STXXL_BOOST_CONFIG

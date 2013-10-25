@@ -13,9 +13,10 @@
 
 #include <stxxl/io>
 #include <stxxl/mng>
+#include <stxxl/version.h>
 #include <stxxl/bits/common/utils.h>
 #include <stxxl/bits/common/cmdline.h>
-#include <stxxl/version.h>
+#include <stxxl/bits/parallel.h>
 
 int stxxl_info(int, char **)
 {
@@ -24,7 +25,7 @@ int stxxl_info(int, char **)
     stxxl::stats::get_instance();
     stxxl::disk_queues::get_instance();
 
-#ifdef STXXL_PARALLEL
+#if STXXL_PARALLEL
     STXXL_MSG("STXXL_PARALLEL, max threads = " << omp_get_max_threads());
 #endif
     STXXL_MSG("sizeof(unsigned int)   = " << sizeof(unsigned int));
