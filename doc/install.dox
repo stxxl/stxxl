@@ -41,7 +41,7 @@ There are quite some \ref install_build_options, which you can use in both setti
 
 1. Clone the STXXL project repository as <tt>\b my-project</tt>.
 \verbatim
-$ git clone https://github.com/bingmann/stxxl.git my-project
+$ git clone https://github.com/stxxl/stxxl.git my-project
 \endverbatim
 
 2. Compile the STXXL library in a \c build subdirectory, including the example in \c local/.
@@ -74,7 +74,7 @@ The advantage of this method is that the STXXL is a subproject of your's. Thereb
 \verbatim
 $ mkdir my-project
 $ cd my-project
-$ git clone https://github.com/bingmann/stxxl.git
+$ git clone https://github.com/stxxl/stxxl.git
 \endverbatim
 
 2. Create a file named \c CMakeLists.txt inside your \c my-project folder with the following sample content:
@@ -179,7 +179,7 @@ Please see \ref install_config for further available options.
 ## Unpack STXXL source code
 
 - Download the STXXL archive from http://stxxl.sourceforge.net <br>
-  or use your favorite git client to clone the development version: https://github.com/bingmann/stxxl.git
+  or use your favorite git client to clone the development version: https://github.com/stxxl/stxxl.git
 - Unpack the archive at a convenient location.
 
 ## Use CMake to Generate Visual Studio Projects
@@ -227,7 +227,7 @@ TODO
 ## Unpack STXXL source code
 
 - Download the STXXL archive from http://stxxl.sourceforge.net <br>
-  or use your favorite git client to clone the development version: https://github.com/bingmann/stxxl.git
+  or use your favorite git client to clone the development version: https://github.com/stxxl/stxxl.git
 - Unpack the archive at a convenient location.
 
 ## Download and Install Boost
