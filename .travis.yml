@@ -1,0 +1,12 @@
+language: cpp
+
+compiler:
+  - clang
+  - gcc
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake -DBUILD_TESTS=ON -DTRY_COMPILE_HEADERS=ON ..
+
+script: make && make test
