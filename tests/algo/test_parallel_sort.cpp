@@ -13,10 +13,8 @@
 
 //! \example algo/test_parallel_sort.cpp
 //! This is an example of how to use the parallelized sorting algorithm.
-//! Setting all the parameters in optional, just compiling with either MCSTL
-//! or parallel mode suffices.
-
-#define MCSTL_QUICKSORT_WORKAROUND 0
+//! Setting all the parameters in optional, just compiling with parallel mode
+//! suffices.
 
 #if !defined(STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD)
 #define STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD 0
@@ -31,17 +29,13 @@
 #include <stxxl/scan>
 #include <stxxl/sort>
 
-#ifdef __MCSTL__
-#include <mcstl.h>
-#endif
-
 
 const unsigned long long megabyte = 1024 * 1024;
 
 //const int block_size = STXXL_DEFAULT_BLOCK_SIZE(my_type);
 const int block_size = 4 * megabyte;
 
-#define RECORD_SIZE 16
+#define RECORD_SIZE 20
 #define MAGIC 123
 
 stxxl::unsigned_type run_size;
@@ -223,49 +217,10 @@ int main(int argc, const char ** argv)
     if (0)
         printf("%d %p: mwms %d, q %d, qb %d",
                __gnu_parallel::_Settings::get().sort_algorithm,
-               &__gnu_parallel::_Settings::get().sort_algorithm,
+               (void*)&__gnu_parallel::_Settings::get().sort_algorithm,
                __gnu_parallel::MWMS,
                __gnu_parallel::QS,
                __gnu_parallel::QS_BALANCED);
-#elif defined(__MCSTL__)
-    mcstl::HEURISTIC::num_threads = p;
-    mcstl::HEURISTIC::force_sequential = false;
-
-    mcstl::HEURISTIC::merge_splitting = mcstl::HEURISTIC::EXACT;
-    mcstl::HEURISTIC::merge_minimal_n = 10000;
-    mcstl::HEURISTIC::merge_oversampling = 10;
-
-    mcstl::HEURISTIC::multiway_merge_algorithm = mcstl::HEURISTIC::LOSER_TREE;
-    mcstl::HEURISTIC::multiway_merge_splitting = mcstl::HEURISTIC::EXACT;
-    mcstl::HEURISTIC::multiway_merge_oversampling = 10;
-    mcstl::HEURISTIC::multiway_merge_minimal_n = 10000;
-    mcstl::HEURISTIC::multiway_merge_minimal_k = 2;
-    if (!strcmp(argv[4], "q"))                                       //quicksort
-        mcstl::HEURISTIC::sort_algorithm = mcstl::HEURISTIC::QS;
-    else if (!strcmp(argv[4], "qb"))                                 //balanced quicksort
-        mcstl::HEURISTIC::sort_algorithm = mcstl::HEURISTIC::QS_BALANCED;
-    else if (!strcmp(argv[4], "m"))                                  //merge sort
-        mcstl::HEURISTIC::sort_algorithm = mcstl::HEURISTIC::MWMS;
-    else /*if(!strcmp(argv[4], "s"))*/                               //sequential (default)
-    {
-        mcstl::HEURISTIC::sort_algorithm = mcstl::HEURISTIC::QS;
-        mcstl::HEURISTIC::sort_minimal_n = memory_to_use;
-    }
-
-    if (!strcmp(argv[5], "p"))                                       //parallel
-    {
-        stxxl::SETTINGS::native_merge = false;
-        //mcstl::HEURISTIC::multiway_merge_minimal_n = 1024;	     //leave as default
-    }
-    else if (!strcmp(argv[5], "s"))                                  //sequential
-    {
-        stxxl::SETTINGS::native_merge = false;
-        mcstl::HEURISTIC::multiway_merge_minimal_n = memory_to_use;  //too much to be called
-    }
-    else /*if(!strcmp(argv[5], "n"))*/                               //native (default)
-        stxxl::SETTINGS::native_merge = true;
-
-    mcstl::HEURISTIC::multiway_merge_minimal_k = 2;
 #endif
 
     std::cout << "Sorting " << megabytes_to_process << " MiB of data ("

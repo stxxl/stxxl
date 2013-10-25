@@ -102,23 +102,3 @@ if(USE_GNU_PARALLEL)
   endif(NOT BUILD_EXTRAS)
 
 endif(USE_GNU_PARALLEL)
-
-# Left-overs from GNUmakefile
-
-# ifeq ($(strip $(USE_MCSTL)),yes)
-# # ICPC 11.0: internal error: 0_1374 (issue 539748)
-# $(call reduce_optimization,3,0,test_sort,Version_11.0,any,any)
-# $(call reduce_optimization,3,0,test_ksort,Version_11.0,any,any)
-# $(call reduce_optimization,3,0,sort_file,Version_11.0,any,any)
-# $(call reduce_optimization,3,0,test_parallel_sort,Version_11.0,any,any)
-#
-# # ICPC 10.0: internal error: backend signals (issue 466173)
-# $(call reduce_optimization,3,1,async_schedule,Version_10.0,32-bit,any,o)
-# $(call reduce_optimization,3,1,test_scan,Version_10.0,32-bit,any)
-# $(call reduce_optimization,3,1,test_sort,Version_10.0,32-bit,any)
-# $(call reduce_optimization,3,1,test_ksort,Version_10.0,32-bit,any)
-# $(call reduce_optimization,3,1,test_stable_ksort,Version_10.0,32-bit,any)
-# $(call reduce_optimization,3,1,sort_file,Version_10.0,32-bit,any)
-# $(call reduce_optimization,3,1,test_random_shuffle,Version_10.0,32-bit,any)
-# $(call reduce_optimization,3,1,test_parallel_sort,Version_10.0,32-bit,any)
-# endif

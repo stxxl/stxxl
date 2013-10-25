@@ -24,14 +24,8 @@ int stxxl_info(int, char **)
     stxxl::stats::get_instance();
     stxxl::disk_queues::get_instance();
 
-#ifdef STXXL_PARALLEL_MODE
-#ifdef _GLIBCXX_PARALLEL
-    STXXL_MSG("_GLIBCXX_PARALLEL, max threads = " << omp_get_max_threads());
-#else
-    STXXL_MSG("STXXL_PARALLEL_MODE, max threads = " << omp_get_max_threads());
-#endif
-#elif defined(__MCSTL__)
-    STXXL_MSG("__MCSTL__, max threads = " << omp_get_max_threads());
+#ifdef STXXL_PARALLEL
+    STXXL_MSG("STXXL_PARALLEL, max threads = " << omp_get_max_threads());
 #endif
     STXXL_MSG("sizeof(unsigned int)   = " << sizeof(unsigned int));
     STXXL_MSG("sizeof(unsigned_type)  = " << sizeof(stxxl::unsigned_type));

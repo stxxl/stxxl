@@ -47,7 +47,7 @@ endif()
 option(TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  option(USE_GNU_PARALLEL "Use GNU parallel STL extensions" OFF)
+  option(USE_GNU_PARALLEL "Use GNU parallel extensions for multi-core parallelism" ON)
 endif()
 
 if(NOT MSVC)

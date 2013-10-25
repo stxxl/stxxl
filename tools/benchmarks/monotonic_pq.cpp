@@ -117,7 +117,7 @@ int main(int argc, char * argv[])
     if (argc < 3)
     {
         std::cout << "Usage: " << argv[0] << " [n in MiB]"
-#if defined(__MCSTL__) || defined(STXXL_PARALLEL_MODE)
+#if defined(STXXL_PARALLEL)
                   << " [p threads]"
 #endif
                   << std::endl;
@@ -156,28 +156,7 @@ int main(int argc, char * argv[])
     STXXL_MSG("Flags:" << Flags);
 
     unsigned long megabytes = atoi(argv[1]);
-#ifdef __MCSTL__
-    int num_threads = atoi(argv[2]);
-    STXXL_MSG("Threads: " << num_threads);
-
-    mcstl::SETTINGS::num_threads = num_threads;
-    mcstl::SETTINGS::force_sequential = false;
-
-    mcstl::SETTINGS::sort_algorithm = mcstl::SETTINGS::QS_BALANCED;
-    mcstl::SETTINGS::sort_splitting = mcstl::SETTINGS::SAMPLING;
-    mcstl::SETTINGS::sort_minimal_n = 1000;
-    mcstl::SETTINGS::sort_mwms_oversampling = 10;
-
-    mcstl::SETTINGS::merge_splitting = mcstl::SETTINGS::SAMPLING;
-    mcstl::SETTINGS::merge_minimal_n = 1000;
-    mcstl::SETTINGS::merge_oversampling = 10;
-
-    mcstl::SETTINGS::multiway_merge_algorithm = mcstl::SETTINGS::LOSER_TREE;
-    mcstl::SETTINGS::multiway_merge_splitting = mcstl::SETTINGS::EXACT;
-    mcstl::SETTINGS::multiway_merge_oversampling = 10;
-    mcstl::SETTINGS::multiway_merge_minimal_n = 1000;
-    mcstl::SETTINGS::multiway_merge_minimal_k = 2;
-#elif defined(STXXL_PARALLEL_MODE)
+#if defined(STXXL_PARALLEL_MODE)
     int num_threads = atoi(argv[2]);
     STXXL_MSG("Threads: " << num_threads);
 
@@ -273,10 +252,6 @@ int main(int argc, char * argv[])
 
     STXXL_MSG("Data type size: " << sizeof(my_type));
     STXXL_MSG("");
-#ifdef __MCSTL__
-    STXXL_MSG("multiway_merge_minimal_k: " << mcstl::SETTINGS::multiway_merge_minimal_k);
-    STXXL_MSG("multiway_merge_minimal_n: " << mcstl::SETTINGS::multiway_merge_minimal_n);
-#endif
 
     stxxl::stats_data sd_start(*stxxl::stats::get_instance());
     stxxl::timer Timer;

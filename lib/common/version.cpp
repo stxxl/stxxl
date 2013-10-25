@@ -11,6 +11,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/version.h>
+#include <stxxl/bits/parallel.h>
 
 #ifdef STXXL_BOOST_CONFIG
 #include <boost/version.hpp>
@@ -76,15 +77,12 @@ const char * get_version_string()
 #ifdef STXXL_VERSION_STRING_COMMENT
            " (" STXXL_VERSION_STRING_COMMENT ")"
 #endif
-#ifdef __MCSTL__
-           " + MCSTL"
-#ifdef MCSTL_VERSION_STRING_DATE
-           " " MCSTL_VERSION_STRING_DATE
-#endif
-#ifdef MCSTL_VERSION_STRING_SVN_REVISION
-           " (SVN r" MCSTL_VERSION_STRING_SVN_REVISION ")"
-#endif
-#endif
+#ifdef STXXL_PARALLEL
+           " + GNU_PARALLEL"
+#ifdef __GLIBCXX__
+           "(" stringify(__GLIBCXX__) ")"
+#endif // __GLIBCXX__
+#endif // STXXL_PARALLEL
 #ifdef STXXL_BOOST_CONFIG
            " + Boost "
 #define Y(x) # x
