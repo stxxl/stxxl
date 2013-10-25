@@ -1,6 +1,6 @@
 # - Define macro to check large file support
 #
-#  GMX_TEST_LARGE_FILES(VARIABLE)
+#  TEST_LARGE_FILES(VARIABLE)
 #
 #  VARIABLE will be set to true if off_t is 64 bits, and fseeko/ftello present.
 #  This macro will also set defines necessary enable large file support, for instance
@@ -12,7 +12,7 @@
 #  However, it is YOUR job to make sure these defines are set in a cmakedefine so they
 #  end up in a config.h file that is included in your source if necessary!
 
-MACRO(GMX_TEST_LARGE_FILES VARIABLE)
+MACRO(TEST_LARGE_FILES VARIABLE)
   IF(NOT DEFINED ${VARIABLE})
 
     # On most platforms it is probably overkill to first test the flags for 64-bit off_t,
@@ -114,4 +114,4 @@ MACRO(GMX_TEST_LARGE_FILES VARIABLE)
     endif(FSEEKO_COMPILE_OK)
 
   ENDIF(NOT DEFINED ${VARIABLE})
-ENDMACRO(GMX_TEST_LARGE_FILES VARIABLE)
+ENDMACRO(TEST_LARGE_FILES VARIABLE)

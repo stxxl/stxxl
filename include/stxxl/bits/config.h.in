@@ -17,6 +17,17 @@
 #ifndef STXXL_CONFIG_HEADER
 #define STXXL_CONFIG_HEADER
 
+// the STXXL library version variables
+#define STXXL_VERSION_MAJOR ${STXXL_VERSION_MAJOR}
+#define STXXL_VERSION_MINOR ${STXXL_VERSION_MINOR}
+#define STXXL_VERSION_PATCH ${STXXL_VERSION_PATCH}
+#define STXXL_VERSION_STRING "${STXXL_VERSION_STRING}"
+#define STXXL_VERSION_PHASE "${STXXL_VERSION_PHASE}"
+
+// if this is a git repository, add the refspec and commit sha
+#cmakedefine STXXL_VERSION_GIT_REFSPEC "${STXXL_VERSION_GIT_REFSPEC}"
+#cmakedefine STXXL_VERSION_GIT_SHA1 "${STXXL_VERSION_GIT_SHA1}"
+
 #cmakedefine STXXL_POSIX_THREADS ${STXXL_POSIX_THREADS}
 // default: off
 // cmake:   detection of pthreads by cmake

@@ -41,7 +41,7 @@ int stxxl_info(int, char **)
 
     assert(stxxl::version_major() == STXXL_VERSION_MAJOR);
     assert(stxxl::version_minor() == STXXL_VERSION_MINOR);
-    assert(stxxl::version_patchlevel() == STXXL_VERSION_PATCHLEVEL);
+    assert(stxxl::version_patch() == STXXL_VERSION_PATCH);
 
     return 0;
 }

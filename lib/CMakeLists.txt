@@ -44,7 +44,7 @@ set(LIBSTXXL_SOURCES
   mng/config.cpp
   mng/diskallocator.cpp
   mng/mng.cpp
-  
+
   algo/async_schedule.cpp
 
   )
@@ -61,6 +61,29 @@ if(NOT MSVC)
 
 endif(NOT MSVC)
 
-add_library(stxxl ${LIBSTXXL_SOURCES})
+if(BUILD_SHARED_LIBS)
 
-set_target_properties(stxxl PROPERTIES VERSION 1.3.9999)
+  # build stxxl SHARED library and link all programs again it
+  add_library(stxxl SHARED ${LIBSTXXL_SOURCES})
+  set_target_properties(stxxl PROPERTIES VERSION "${STXXL_VERSION_STRING}")
+  install(TARGETS stxxl
+    ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
+    LIBRARY DESTINATION ${INSTALL_LIB_DIR})
+
+  if(BUILD_STATIC_LIBS)
+    # but also build STATIC library
+    add_library(stxxl_static STATIC ${LIBSTXXL_SOURCES})
+    set_target_properties(stxxl_static PROPERTIES OUTPUT_NAME "stxxl" VERSION "${STXXL_VERSION_STRING}")
+    install(TARGETS stxxl_static ARCHIVE DESTINATION ${INSTALL_LIB_DIR})
+  endif()
+
+else()
+
+  # build stxxl STATIC library and link all programs again it
+  add_library(stxxl STATIC ${LIBSTXXL_SOURCES})
+  set_target_properties(stxxl PROPERTIES VERSION "${STXXL_VERSION_STRING}")
+  install(TARGETS stxxl
+    ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
+    LIBRARY DESTINATION ${INSTALL_LIB_DIR})
+
+endif()

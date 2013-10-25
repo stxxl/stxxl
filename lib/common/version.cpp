@@ -11,24 +11,9 @@
  **************************************************************************/
 
 #include <stxxl/bits/version.h>
-#include <stxxl/bits/parallel.h>
 
 #ifdef STXXL_BOOST_CONFIG
 #include <boost/version.hpp>
-#endif
-
-#define stringify_(x) #x
-#define stringify(x) stringify_(x)
-#define STXXL_VERSION_STRING_MA_MI_PL stringify(STXXL_VERSION_MAJOR) "." stringify(STXXL_VERSION_MINOR) "." stringify(STXXL_VERSION_PATCHLEVEL)
-
-// version.defs gets created if a snapshot/beta/rc/release is done
-#ifdef HAVE_VERSION_DEFS
-#include "version.defs"
-#endif
-
-// version_svn.defs gets created if stxxl is built from SVN
-#ifdef HAVE_VERSION_SVN_DEFS
-#include "version_svn.defs"
 #endif
 
 
@@ -44,55 +29,35 @@ int version_minor()
     return STXXL_VERSION_MINOR;
 }
 
-int version_patchlevel()
+int version_patch()
 {
-    return STXXL_VERSION_PATCHLEVEL;
+    return STXXL_VERSION_PATCH;
 }
 
-// FIXME: this currently only works for GNU-like systems,
-//        there are no details available on windows platform
+#define stringify_(x) #x
+#define stringify(x) stringify_(x)
 
 const char * get_version_string()
 {
     return "STXXL"
-#ifdef STXXL_VERSION_STRING_SVN_BRANCH
-           " (branch: " STXXL_VERSION_STRING_SVN_BRANCH ")"
+           " v" STXXL_VERSION_STRING
+#ifdef STXXL_VERSION_PHASE
+           " (" STXXL_VERSION_PHASE ")"
 #endif
-           " v"
-           STXXL_VERSION_STRING_MA_MI_PL
-#ifdef STXXL_VERSION_STRING_DATE
-           "-" STXXL_VERSION_STRING_DATE
-#endif
-#ifdef STXXL_VERSION_STRING_SVN_REVISION
-           " (SVN r" STXXL_VERSION_STRING_SVN_REVISION ")"
-#endif
-#ifdef STXXL_VERSION_STRING_GIT_REVISION
-           " (GIT " STXXL_VERSION_STRING_GIT_REVISION ")"
-#endif
-#ifdef STXXL_VERSION_STRING_PHASE
-           " (" STXXL_VERSION_STRING_PHASE ")"
-#else
-           " (prerelease)"
-#endif
-#ifdef STXXL_VERSION_STRING_COMMENT
-           " (" STXXL_VERSION_STRING_COMMENT ")"
-#endif
+#ifdef STXXL_VERSION_GIT_SHA1
+           " (git " STXXL_VERSION_GIT_SHA1 ")"
+#endif // STXXL_VERSION_GIT_SHA1
 #ifdef STXXL_PARALLEL
-           " + GNU_PARALLEL"
-#ifdef __GLIBCXX__
-           "(" stringify(__GLIBCXX__) ")"
-#endif // __GLIBCXX__
+           " + gnu parallel(" stringify(__GLIBCXX__) ")"
 #endif // STXXL_PARALLEL
 #ifdef STXXL_BOOST_CONFIG
-           " + Boost "
-#define Y(x) # x
-#define X(x) Y(x)
-           X(BOOST_VERSION)
-#undef X
-#undef Y
+           " + Boost " stringify(BOOST_VERSION)
 #endif
     ;
 }
+
+#undef stringify
+#undef stringify_
 
 __STXXL_END_NAMESPACE
 

@@ -14,8 +14,8 @@
 
 project(stxxl)
 
-# require cmake 2.8.x
-cmake_minimum_required(VERSION 2.8)
+# require cmake 2.6.4 (but please use 2.8.x)
+cmake_minimum_required(VERSION 2.6.4)
 
 # for additional cmake scripts
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/misc/cmake)
@@ -28,14 +28,31 @@ endif()
 # default to Debug building
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "CMake build type")
 
+# STXXL version string
+set(STXXL_VERSION_MAJOR "1")
+set(STXXL_VERSION_MINOR "4")
+set(STXXL_VERSION_PATCH "0")
+set(STXXL_VERSION_STRING "${STXXL_VERSION_MAJOR}.${STXXL_VERSION_MINOR}.${STXXL_VERSION_PATCH}")
+set(STXXL_VERSION_PHASE "prerelease")
+
+# read .git directory (if it exists) and find git sha
+include(GetGitRevisionDescription)
+get_git_head_revision(STXXL_VERSION_GIT_REFSPEC STXXL_VERSION_GIT_SHA1)
+if(STXXL_VERSION_GIT_REFSPEC)
+  message("Detected git refspec ${STXXL_VERSION_GIT_REFSPEC} sha ${STXXL_VERSION_GIT_SHA1}")
+endif()
+
 ###############################################################################
 # compilation options
 
 option(BUILD_EXAMPLES "Build all stxxl examples" OFF)
 
 option(BUILD_TESTS "Build all stxxl test programs" OFF)
+if(BUILD_TESTS)
+  set(BUILD_EXAMPLES ON)
+endif()
 
-option(BUILD_EXTRAS "Build all extra stxxl test and tool programs" OFF)
+option(BUILD_EXTRAS "Build all extra stxxl tests and tool programs" OFF)
 
 if(MSVC_VERSION LESS 1700)
   # require boost for Visual C++ versions older than VC11 = MSVS 2012
@@ -44,11 +61,11 @@ else()
   option(USE_BOOST "Use Boost libraries for threads,config,filesystem,random and date_time" OFF)
 endif()
 
-option(TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
-
 if(CMAKE_COMPILER_IS_GNUCXX)
   option(USE_GNU_PARALLEL "Use GNU parallel extensions for multi-core parallelism" ON)
 endif()
+
+option(TRY_COMPILE_HEADERS "Test stxxl header files for self-sufficiency: try to compile them." OFF)
 
 if(NOT MSVC)
   option(USE_STD_THREADS "Force usage of C++ standard library thread support." OFF)
@@ -56,9 +73,16 @@ endif()
 
 option(NO_CXX11 "Build without C++11 flags" OFF)
 
-if(BUILD_TESTS)
-  set(BUILD_EXAMPLES ON)
+if(NOT MSVC)
+  # default to build shared libraries on non-MSVC platforms
+  option(BUILD_SHARED_LIBS "Build shared library version of libstxxl" ON)
+  option(BUILD_STATIC_LIBS "Build static library version of libstxxl" OFF)
 endif()
+
+# allow user to specify other installation paths
+set(INSTALL_BIN_DIR "bin" CACHE PATH "Installation directory for executables")
+set(INSTALL_LIB_DIR "lib" CACHE PATH "Installation directory for libraries")
+set(INSTALL_INCLUDE_DIR "include" CACHE PATH "Installation directory for header files")
 
 ###############################################################################
 # enable use of "make test"
@@ -70,6 +94,28 @@ set(CTEST_PROJECT_NAME "STXXL")
 
 find_program(CTEST_MEMORYCHECK_COMMAND NAMES "valgrind")
 #set(CTEST_MEMORYCHECK_SUPPRESSIONS_FILE ${CTEST_SOURCE_DIRECTORY}/tests/valgrind.supp)
+
+###############################################################################
+# enable use of "make package"
+
+# general package settings
+set(CPACK_PACKAGE_VENDOR "STXXL Maintainer Team")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Library of external memory algorithms")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE_1_0.txt")
+set(CPACK_PACKAGE_VERSION_MAJOR "${STXXL_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${STXXL_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${STXXL_VERSION_PATCH}")
+
+# source packaging
+set(CPACK_SOURCE_GENERATOR "TBZ2;ZIP")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+set(CPACK_SOURCE_IGNORE_FILES "/.travis.yml;/.git;${CPACK_SOURCE_IGNORE_FILES}")
+
+# binary packaging
+set(CPACK_GENERATOR "TBZ2")
+
+include(CPack)
 
 ###############################################################################
 # check platform
@@ -178,14 +224,14 @@ endif()
 ###############################################################################
 # determine large file support
 
-include(gmxTestLargeFiles)
-gmx_test_large_files(GMX_LARGEFILES)
+include(TestLargeFiles)
+test_large_files(HAVE_LARGEFILES)
 
-if (GMX_LARGEFILES)
+if (HAVE_LARGEFILES)
   add_definitions(-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGE_FILES)
-else (NOT GMX_LARGEFILES)
+else (NOT HAVE_LARGEFILES)
   message(FATAL_ERROR "Large file support was not detectable.")
-endif (GMX_LARGEFILES)
+endif (HAVE_LARGEFILES)
 
 ###############################################################################
 # check for C++11 <atomic> header support
@@ -413,6 +459,16 @@ if(BUILD_TESTS)
   message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
 
 endif(BUILD_TESTS)
+
+###############################################################################
+# install header files
+
+install(FILES include/stxxl.h DESTINATION ${INSTALL_INCLUDE_DIR})
+install(DIRECTORY include/stxxl DESTINATION ${INSTALL_INCLUDE_DIR})
+
+# also copy the config file with build options!
+install(FILES ${PROJECT_BINARY_DIR}/include/stxxl/bits/config.h
+  DESTINATION ${INSTALL_INCLUDE_DIR}/stxxl/bits/config.h)
 
 ###############################################################################
 # build tests and tools

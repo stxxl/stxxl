@@ -14,19 +14,18 @@
 #define STXXL_VERSION_HEADER
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/config.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-#define STXXL_VERSION_MAJOR             1
-#define STXXL_VERSION_MINOR             4
-#define STXXL_VERSION_PATCHLEVEL        0
+// STXXL_VERSION_MAJOR and more are defined in cmake generated config.h
 
 const char * get_version_string();
 
 int version_major();
 int version_minor();
-int version_patchlevel();
+int version_patch();
 
 inline int check_library_version()
 {
@@ -34,7 +33,7 @@ inline int check_library_version()
         return 1;
     if (version_minor() != STXXL_VERSION_MINOR)
         return 2;
-    if (version_patchlevel() != STXXL_VERSION_PATCHLEVEL)
+    if (version_patch() != STXXL_VERSION_PATCH)
         return 3;
     return 0;
 }

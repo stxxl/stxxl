@@ -23,6 +23,7 @@ stxxl_build_tool(stxxl_tool
   mallinfo.cpp
   )
 
+install(TARGETS stxxl_tool RUNTIME DESTINATION ${INSTALL_BIN_DIR})
+
 add_subdirectory(benchmarks)
 add_subdirectory(extras)
-
