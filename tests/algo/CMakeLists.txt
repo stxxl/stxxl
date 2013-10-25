@@ -43,28 +43,26 @@ stxxl_test(test_scan)
 stxxl_test(test_sort)
 stxxl_test(test_stable_ksort)
 
-if(BUILD_EXTRAS)
+### extra sort tests:
+#test_sort_all_parameters         <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+#test_ksort_all_parameters        <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+#test_stable_ksort_all_parameters <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+foreach(DATA 1024)
+  foreach(RAM 384)
+    foreach(STRATEGY 0 1 2 3)
+      foreach(BLK_SIZE 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14)
 
-  ### extra sort tests:
-  #test_sort_all_parameters         <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-  #test_ksort_all_parameters        <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-  #test_stable_ksort_all_parameters <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-  foreach(DATA 1024)
-    foreach(RAM 384)
-      foreach(STRATEGY 0 1 2 3)
-        foreach(BLK_SIZE 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14)
+        stxxl_extra_test(test_sort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
+        stxxl_extra_test(test_ksort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
+        #-tb not fully implemented
+        #stxxl_extra_test(test_stable_ksort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
 
-          stxxl_test(test_sort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
-          stxxl_test(test_ksort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
-          #-tb not fully implemented
-          #stxxl_test(test_stable_ksort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
+      endforeach(BLK_SIZE)
+    endforeach(STRATEGY)
+  endforeach(RAM)
+endforeach(DATA)
 
-        endforeach(BLK_SIZE)
-      endforeach(STRATEGY)
-    endforeach(RAM)
-  endforeach(DATA)
-
-else(BUILD_EXTRAS)
+if(NOT BUILD_EXTRAS)
 
   foreach(STRATEGY 0 1 2 3)
     stxxl_test(test_sort_all_parameters 512 192 ${STRATEGY} 10 42)
@@ -73,29 +71,27 @@ else(BUILD_EXTRAS)
     #stxxl_test(test_stable_ksort_all_parameters 512 192 ${STRATEGY} 10 42)
   endforeach(STRATEGY)
 
-endif(BUILD_EXTRAS)
+endif(NOT BUILD_EXTRAS)
 
 if(USE_GNU_PARALLEL)
 
   stxxl_build_test(test_parallel_sort)
 
-  if(BUILD_EXTRAS)
+  ### parallel sort tests
+  #algo/test_parallel_sort [n in MiB] [p threads] [M in MiB] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]
+  foreach(DATA 768)
+    foreach(RAM 128)
+      foreach(THREADS 1 2 3 4)
+        foreach(SORT m q qb s)
+          foreach(MERGE p s n)
+            stxxl_extra_test(test_parallel_sort ${DATA} ${THREADS} ${RAM} ${SORT} ${MERGE})
+          endforeach(MERGE)
+        endforeach(SORT)
+      endforeach(THREADS)
+    endforeach(RAM)
+  endforeach(DATA)
 
-    ### parallel sort tests
-    #algo/test_parallel_sort [n in MiB] [p threads] [M in MiB] [sorting algorithm: m | q | qb | s] [merging algorithm: p | s | n]
-    foreach(DATA 768)
-      foreach(RAM 128)
-        foreach(THREADS 1 2 3 4)
-          foreach(SORT m q qb s)
-            foreach(MERGE p s n)
-              stxxl_test(test_parallel_sort ${DATA} ${THREADS} ${RAM} ${SORT} ${MERGE})
-            endforeach(MERGE)
-          endforeach(SORT)
-        endforeach(THREADS)
-      endforeach(RAM)
-    endforeach(DATA)
-
-  else(BUILD_EXTRAS)
+  if(NOT BUILD_EXTRAS)
 
     foreach(SORT m q qb s)
       foreach(MERGE p s n)
@@ -103,7 +99,7 @@ if(USE_GNU_PARALLEL)
       endforeach(MERGE)
     endforeach(SORT)
 
-  endif(BUILD_EXTRAS)
+  endif(NOT BUILD_EXTRAS)
 
 endif(USE_GNU_PARALLEL)
 

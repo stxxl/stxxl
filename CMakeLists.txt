@@ -344,13 +344,22 @@ macro(stxxl_test TESTNAME)
 endmacro(stxxl_test)
 
 # macro for building stxxl extra program
-macro(stxxl_build_extra_tool TESTNAME)
+macro(stxxl_build_extra_tool)
 
   if(BUILD_EXTRAS)
-    stxxl_build_tool(${TESTNAME} ${ARGN})
+    stxxl_build_tool(${ARGN})
   endif(BUILD_EXTRAS)
 
 endmacro(stxxl_build_extra_tool)
+
+# macro for registering extra stxxl tests
+macro(stxxl_extra_test)
+
+  if(BUILD_EXTRAS)
+    stxxl_test(${ARGN})
+  endif(BUILD_EXTRAS)
+
+endmacro(stxxl_extra_test)
 
 # macro for setting additional defines for targets
 macro(add_define PROGNAME)

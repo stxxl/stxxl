@@ -67,10 +67,8 @@ endif(USE_BOOST)
 stxxl_build_test(test_map)
 stxxl_build_test(test_map_random)
 
-stxxl_test(test_map 16)
+stxxl_test(test_map 12)
 stxxl_test(test_map_random 2000)
 
-#TODO TESTS_BDB		 = berkeley_db_benchmark
-#TODO TESTS_LEDASM	 = leda_sm_pq_benchmark leda_sm_stack_benchmark
-#TODO TESTS_TPIE	 = tpie_stack_benchmark
-
+#-tb longer test for map
+stxxl_extra_test(test_map 16)
