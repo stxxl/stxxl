@@ -128,8 +128,9 @@ int main(int argc, char **argv)
             if (strcmp(subtools[i].name, argv[1]) == 0)
             {
                 // replace argv[1] with call string of subtool.
-                std::string progsub = std::string(argv[0]) + " " + argv[1];
-                argv[1] = (char*)progsub.c_str();
+                char progsub[256];
+                snprintf(progsub, sizeof(progsub), "%s %s", argv[0], argv[1]);
+                argv[1] = progsub;
                 return subtools[i].func(argc-1, argv+1);
             }
         }

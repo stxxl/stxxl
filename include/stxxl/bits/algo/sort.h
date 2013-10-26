@@ -242,6 +242,8 @@ namespace sort_local
                     for (unsigned_type k = 0; k < block_type::size; ++k)
                         STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k]);
 
+                    delete[] reqs;
+                    delete[] blocks;
                     return false;
                 }
 
@@ -263,6 +265,8 @@ namespace sort_local
                             STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
                         }
 
+                        delete[] reqs;
+                        delete[] blocks;
                         return false;
                     }
                 }
@@ -283,6 +287,8 @@ namespace sort_local
                         STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
                     }
 
+                    delete[] reqs;
+                    delete[] blocks;
                     return false;
                 }
 

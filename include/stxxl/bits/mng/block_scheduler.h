@@ -1513,9 +1513,8 @@ protected:
                             }
                             swappable_block_identifier_type giver = pop_begin(free_evictable_blocks);
                             {
-                                scheduled_blocks_iterator giver_meta;
-                                assert((giver_meta = scheduled_blocks.find(giver)) == scheduled_blocks.end()
-                                        || ! shall_keep_internal_block(giver_meta, false));
+                                assert(scheduled_blocks.find(giver) == scheduled_blocks.end() ||
+                                       !shall_keep_internal_block(scheduled_blocks.find(giver), false));
                             }
                             write_read_request * wrr = schedule_write(giver);
                             schedule_meta->second.giver.first = (wrr != NULL);

@@ -94,7 +94,7 @@ namespace stable_ksort_local
         alloc_strategy alloc_strategy_;
 
     public:
-        bid_sequence() { }
+        bid_sequence() : bids(NULL) { }
         bid_sequence(size_type size_)
         {
             bids = new simple_vector<bid_type>(size_);

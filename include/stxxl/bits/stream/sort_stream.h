@@ -867,12 +867,15 @@ namespace stream
                 reqs[j] = blocks[j].read(sruns->runs[irun][j].bid);
             }
             wait_all(reqs, reqs + nblocks);
+            delete[] reqs;
+
             for (unsigned_type j = 0; j < nblocks; ++j)
             {
                 if (cmp(blocks[j][0], sruns->runs[irun][j].value) ||
                     cmp(sruns->runs[irun][j].value, blocks[j][0])) //!=
                 {
                     STXXL_ERRMSG("check_sorted_runs  wrong trigger in the run");
+                    delete[] blocks;
                     return false;
                 }
             }
@@ -881,10 +884,10 @@ namespace stream
                                   cmp))
             {
                 STXXL_ERRMSG("check_sorted_runs  wrong order in the run");
+                delete[] blocks;
                 return false;
             }
 
-            delete[] reqs;
             delete[] blocks;
         }
 

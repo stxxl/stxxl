@@ -80,6 +80,7 @@ namespace btree
         void make_invalid()
         {
             btree_ = NULL;
+            pos = 0;
         }
 
         btree_iterator_base(const btree_iterator_base & obj)

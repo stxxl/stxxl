@@ -69,7 +69,7 @@ int main(int argc, char **argv)
         int_type * D = new int_type[int_mem_size];
         for(int_type i = 0; i < int_mem_size; ++i)
             D[i] = 1;
-        delete D;
+        delete [] D;
         #if STXXL_BLAS
             stats_before = *stats::get_instance();
             gemm_wrapper(rank, rank, rank,
@@ -80,9 +80,9 @@ int main(int argc, char **argv)
         #else
             STXXL_ERRMSG("internal multiplication is only available for testing with blas");
         #endif
-        delete A;
-        delete B;
-        delete C;
+        delete [] A;
+        delete [] B;
+        delete [] C;
     }
     else
     {

@@ -1356,9 +1356,9 @@ protected:
         vit = C;
         for(row_major_iterator mit = res.begin(); mit != res.end(); ++mit, ++vit)
             *mit = *vit;
-        delete A;
-        delete B;
-        delete C;
+        delete [] A;
+        delete [] B;
+        delete [] C;
     }
 };
 

@@ -380,6 +380,9 @@ namespace ksort_local
                     STXXL_MSG(" last  value: " << last << " with key" << keyext(last));
                     for (unsigned_type k = 0; k < block_type::size; ++k)
                         STXXL_MSG("Element " << k << " in the block is :" << blocks[0][k] << " key: " << keyext(blocks[0][k]));
+
+                    delete[] reqs;
+                    delete[] blocks;
                     return false;
                 }
 
@@ -401,6 +404,8 @@ namespace ksort_local
                             STXXL_MSG("BID " << (off + k) << " is: " << ((*runs[irun])[off + k].bid));
                         }
 
+                        delete[] reqs;
+                        delete[] blocks;
                         return false;
                     }
                 }
@@ -421,6 +426,8 @@ namespace ksort_local
                         STXXL_MSG("BID " << (k + off) << " is: " << ((*runs[irun])[k + off].bid));
                     }
 
+                    delete[] reqs;
+                    delete[] blocks;
                     return false;
                 }
                 last = blocks[nblocks - 1][block_type::size - 1];

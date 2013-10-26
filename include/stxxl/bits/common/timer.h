@@ -71,7 +71,7 @@ class timer
 
 public:
     inline timer(bool start_immediately = false)
-        : running(false), accumulated(0.)
+        : running(false), accumulated(0.), last_clock(0)
     {
         if (start_immediately) start();
     }

@@ -885,6 +885,7 @@ public:
             // output: ISA_1,2 for next level
             vmerge_sa = new merge_sa_type(*mod0_result, *mod1_result, *mod2_result);
 
+            // read first suffix
             result = *(*vmerge_sa);
         }
 
@@ -906,15 +907,24 @@ public:
                 ready = true;
 
                 assert(vmerge_sa != NULL);
-                delete vmerge_sa;
+                delete vmerge_sa; vmerge_sa = NULL;
 
                 assert(mod0_result != NULL && mod1_result != NULL && mod2_result != NULL);
-                delete mod0_result;
-                delete mod1_result;
-                delete mod2_result;
+                delete mod0_result; mod0_result = NULL;
+                delete mod1_result; mod1_result = NULL;
+                delete mod2_result; mod1_result = NULL;
             }
 
             return *this;
+        }
+
+        ~build_sa()
+        {
+            if (vmerge_sa) delete vmerge_sa;
+
+            if (mod0_result) delete mod0_result;
+            if (mod1_result) delete mod1_result;
+            if (mod2_result) delete mod2_result;
         }
 
         bool empty() const {
@@ -1109,6 +1119,11 @@ public:
                 delete out_sa; out_sa = NULL;
             }
             return *this;
+        }
+
+        ~algorithm()
+        {
+            if (out_sa) delete out_sa;
         }
 
         bool empty() const
