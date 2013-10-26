@@ -336,13 +336,13 @@ private:
     //! update maximum formatting width for new option
     void calc_opt_max(const argument* arg)
     {
-        m_opt_maxlong = std::max(arg->option_text().size()+2, m_opt_maxlong);
+        m_opt_maxlong = STXXL_MAX(arg->option_text().size()+2, m_opt_maxlong);
     }
 
     //! update maximum formatting width for new parameter
     void calc_param_max(const argument* arg)
     {
-        m_param_maxlong = std::max(arg->param_text().size()+2, m_param_maxlong);
+        m_param_maxlong = STXXL_MAX(arg->param_text().size()+2, m_param_maxlong);
     }
 
 public:
@@ -868,7 +868,7 @@ public:
         std::ios state(NULL);
         state.copyfmt(os);
 
-        size_t maxlong = std::max(m_param_maxlong, m_opt_maxlong);
+        size_t maxlong = STXXL_MAX(m_param_maxlong, m_opt_maxlong);
 
         if (m_paramlist.size())
         {
