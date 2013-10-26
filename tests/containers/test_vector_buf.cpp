@@ -85,7 +85,6 @@ void test_vector_buf(uint64 size)
     typedef typename stxxl::VECTOR_GENERATOR<ValueType>::result vector_type;
 
     typedef typename vector_type::iterator vector_iterator_type;
-    typedef typename vector_type::const_iterator vector_const_iterator_type;
 
     { // fill vector using element access
         stxxl::scoped_print_timer tm("element access");

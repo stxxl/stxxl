@@ -95,22 +95,15 @@ class scoped_mutex_lock
     bool is_locked;
 
 public:
-    scoped_mutex_lock(mutex & mtx_) : mtx(mtx_), is_locked(false)
+    scoped_mutex_lock(mutex & mtx_)
+        : mtx(mtx_), is_locked(true)
     {
-        lock();
+        mtx.lock();
     }
 
     ~scoped_mutex_lock()
     {
-        unlock();
-    }
-
-    void lock()
-    {
-        if (!is_locked) {
-            mtx.lock();
-            is_locked = true;
-        }
+        mtx.unlock();
     }
 
     void unlock()
