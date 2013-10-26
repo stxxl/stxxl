@@ -103,7 +103,7 @@ public:
 
     ~scoped_mutex_lock()
     {
-        mtx.unlock();
+        unlock();
     }
 
     void unlock()
