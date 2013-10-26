@@ -114,6 +114,8 @@ void DiskAllocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_s
                     // coalesce with successor
                     region_size += (*succ).second;
                     free_space.erase(succ);
+                    //-tb: set succ to pred afterwards due to iterator invalidation
+                    succ = pred;
                 }
                 if (succ_is_not_the_first)
                 {

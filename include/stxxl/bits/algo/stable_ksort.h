@@ -245,7 +245,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
     const unsigned_type min_num_read_write_buffers = (write_buffers_multiple + read_buffers_multiple) * ndisks;
     const unsigned_type nmaxbuckets = m - min_num_read_write_buffers;
     const unsigned int lognbuckets = ilog2_floor(nmaxbuckets);
-    const unsigned_type nbuckets = 1 << lognbuckets;
+    const unsigned_type nbuckets = unsigned_type(1) << lognbuckets;
     const uint64 est_bucket_size = div_ceil((last - first) / nbuckets, block_type::size);      //in blocks
 
     if (m < min_num_read_write_buffers + 2 || nbuckets < 2) {
@@ -351,7 +351,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
         key_type offset = 0;
         const unsigned log_k1 = STXXL_MAX<unsigned>(ilog2_ceil(max_bucket_size_rec * sizeof(type_key_) / STXXL_L2_SIZE), 1);
-        unsigned_type k1 = 1 << log_k1;
+        unsigned_type k1 = unsigned_type(1) << log_k1;
         int_type * bucket1 = new int_type[k1];
 
         const unsigned int shift = (unsigned int)(sizeof(key_type) * 8 - lognbuckets);
@@ -397,7 +397,7 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
                 type_key_ * dEnd = refs1 + bucket1[i];
 
                 const unsigned log_k2 = ilog2_floor(bucket1[i]) - 1;        // adaptive bucket size
-                const unsigned_type k2 = 1 << log_k2;
+                const unsigned_type k2 = unsigned_type(1) << log_k2;
                 int_type * bucket2 = new int_type[k2];
                 const unsigned shift2 = shift1 - log_k2;
 

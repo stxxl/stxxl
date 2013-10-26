@@ -615,6 +615,9 @@ public:
     //! parameters and options.
     void print_usage(std::ostream& os = std::cout)
     {
+        std::ios state(NULL);
+        state.copyfmt(os);
+
         os << "Usage: " << m_progname
            << (m_optlist.size() ? " [options]" : "");
 
@@ -673,6 +676,8 @@ public:
                             0, m_opt_maxlong+2, m_opt_maxlong+2, 8);
             }
         }
+
+        os.copyfmt(state);
     }
 
 private:
@@ -860,6 +865,9 @@ public:
     //! print nicely formatted result of processing
     void print_result(std::ostream& os = std::cout)
     {
+        std::ios state(NULL);
+        state.copyfmt(os);
+
         size_t maxlong = std::max(m_param_maxlong, m_opt_maxlong);
 
         if (m_paramlist.size())
@@ -901,6 +909,8 @@ public:
                 os << std::endl;
             }
         }
+
+        os.copyfmt(state);
     }
 };
 

@@ -102,7 +102,7 @@ ufs_file_base::ufs_file_base(
 #ifndef STXXL_DIRECT_IO_OFF
     if ((mode & DIRECT) && errno == EINVAL)
     {
-        STXXL_ERRMSG("::open() error on path=" << filename << " flags=" << flags << ", retrying without O_DIRECT.");
+        STXXL_ERRMSG(":open() error on path=" << filename << " flags=" << flags << ", retrying without O_DIRECT.");
 
         flags &= ~O_DIRECT;
 
@@ -117,7 +117,7 @@ ufs_file_base::ufs_file_base(
     }
 #endif
 
-    STXXL_THROW2(io_error, "::open() rc=" << file_des << " path=" << filename << " flags=" << flags);
+    STXXL_THROW2(io_error, "open() rc=" << file_des << " path=" << filename << " flags=" << flags);
 }
 
 ufs_file_base::~ufs_file_base()
@@ -150,7 +150,7 @@ void ufs_file_base::lock()
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
     if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
-        STXXL_THROW2(io_error, "::fcntl(,F_SETLK,) path=" << filename << " fd=" << file_des);
+        STXXL_THROW2(io_error, "fcntl(,F_SETLK,) path=" << filename << " fd=" << file_des);
 #endif
 }
 
@@ -212,13 +212,14 @@ void ufs_file_base::_set_size(offset_type newsize)
 void ufs_file_base::close_remove()
 {
     close();
-    ::remove(filename.c_str());
+    if (::remove(filename.c_str()) != 0)
+        STXXL_ERRMSG("remove() error on path=" << filename << " error=" << strerror(errno));
 }
 
 void ufs_file_base::unlink()
 {
     if (::unlink(filename.c_str()) != 0)
-        STXXL_THROW2(io_error, "::unlink() path=" << filename << " fd=" << file_des);
+        STXXL_THROW2(io_error, "unlink() path=" << filename << " fd=" << file_des);
 }
 
 __STXXL_END_NAMESPACE

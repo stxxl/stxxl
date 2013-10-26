@@ -1110,11 +1110,12 @@ public:
 
         algorithm & operator++()
         {
+            assert(out_sa);
             assert(!out_sa->empty());
 
             ++(*out_sa);
 
-            if ((out_sa != NULL) && (out_sa->empty())) {
+            if (out_sa->empty()) {
                 finished = true;
                 delete out_sa; out_sa = NULL;
             }

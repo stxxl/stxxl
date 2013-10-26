@@ -249,7 +249,7 @@ int main(int argc, char * argv[])
     }
 
     int version = atoi(argv[1]);
-    stxxl::int64 ops = stxxl::atoint64(argv[2]);
+    stxxl::uint64 ops = stxxl::atouint64(argv[2]);
 
 
     STXXL_MSG("Running version      : " << version);

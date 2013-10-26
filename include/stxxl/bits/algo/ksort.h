@@ -213,8 +213,8 @@ namespace ksort_local
                                       (m2 * block_type::size * sizeof(type_key_) / STXXL_L2_SIZE) : 2);
         const int log_k2 = ilog2_floor(m2 * Blocks1->size) - log_k1 - 1;
         STXXL_VERBOSE("log_k1: " << log_k1 << " log_k2:" << log_k2);
-        const int_type k1 = 1 << log_k1;
-        const int_type k2 = 1 << log_k2;
+        const int_type k1 = int_type(1) << log_k1;
+        const int_type k2 = int_type(1) << log_k2;
         int_type * bucket1 = new int_type[k1];
         int_type * bucket2 = new int_type[k2];
         int_type i;

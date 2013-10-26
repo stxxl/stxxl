@@ -196,7 +196,7 @@ int main(int argc, char * argv[])
     }
 
     int variant = atoi(argv[1]);
-    stxxl::int64 volume = stxxl::atoint64(argv[2]);
+    stxxl::uint64 volume = stxxl::atouint64(argv[2]);
 
     STXXL_MSG("Allocating array with size " <<
               MEM_2_RESERVE << " bytes to prevent file buffering.");

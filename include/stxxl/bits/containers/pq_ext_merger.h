@@ -166,7 +166,10 @@ protected:
             return (*block)[current];
         }
 
-        sequence_state() : bids(NULL), allocated(false)
+        sequence_state()
+            : block(NULL), current(0),
+              bids(NULL), merger(NULL),
+              allocated(false)
         { }
 
         ~sequence_state()

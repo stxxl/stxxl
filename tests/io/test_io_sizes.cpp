@@ -28,7 +28,7 @@ int main(int argc, char ** argv)
 
     using stxxl::uint64;
 
-    uint64 max_size = stxxl::atoint64(argv[3]);
+    uint64 max_size = stxxl::atouint64(argv[3]);
     uint64 * buffer = (uint64 *)stxxl::aligned_alloc<4096>(max_size);
 
     try

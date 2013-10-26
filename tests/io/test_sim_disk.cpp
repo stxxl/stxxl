@@ -60,10 +60,10 @@ int main()
     double sum2 = 0.;
     STXXL_MSG("Random write");
     const unsigned int times = 80;
+    stxxl::random_number<> rnd;
     for (i = 0; i < times; i++)
     {
-        stxxl::random_number<> rnd;
-        pos = rnd(disk_size / block_size) * block_size;
+        pos = (stxxl::int64)rnd(disk_size / block_size) * block_size;
         double begin = timestamp();
         req = file1.awrite(buffer, pos, block_size, stxxl::default_completion_handler());
         req->wait();

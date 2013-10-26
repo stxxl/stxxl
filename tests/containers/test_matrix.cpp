@@ -134,7 +134,7 @@ int main(int argc, char **argv)
     const int block_order = 32; // must be a multiple of 32, assuming at least 4 bytes element size
 
     int test_case = -1;
-    int rank = 2000;
+    int rank = 1000;
     int internal_memory_megabyte = 256;
     int mult_algo_num = 2;
     int sched_algo_num = 1;
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 
     cp.add_param_int("K", "number of the test case to run", test_case);
 
-    cp.add_int('r',  "rank", "<N>","rank of the matrices, default: 2000", rank);
+    cp.add_int('r',  "rank", "<N>","rank of the matrices, default: 1000", rank);
     cp.add_int('m', "memory", "<L>", "internal memory to use (in megabytes), default: 256", internal_memory_megabyte);
     cp.add_int('a', "mult-algo", "<N>", "use multiplication-algorithm number N\n  available are:\n   0: naive_multiply_and_add\n   1: recursive_multiply_and_add\n   2: strassen_winograd_multiply_and_add\n   3: multi_level_strassen_winograd_multiply_and_add\n   4: strassen_winograd_multiply (block-interleaved pre- and postadditions)\n   5: strassen_winograd_multiply_and_add_interleaved (block-interleaved preadditions)\n   6: multi_level_strassen_winograd_multiply_and_add_block_grained\n  default: 2", mult_algo_num);
     cp.add_int('s', "scheduling-algo", "<N>", "use scheduling-algorithm number N\n  available are:\n   0: online LRU\n   1: offline LFD\n   2: offline LRU prefetching\n  default: 1", sched_algo_num);
@@ -166,6 +166,7 @@ int main(int argc, char **argv)
     {
     default:
         STXXL_ERRMSG("unknown testcase");
+        break;
     case 4:
     {
         STXXL_MSG("multiplying two int_type matrices of rank " << rank << " block order " << small_block_order);

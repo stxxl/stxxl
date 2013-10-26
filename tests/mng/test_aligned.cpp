@@ -36,11 +36,12 @@ void test_typed_block()
     block_type * A = new block_type[4];
     block_type * B = new block_type[1];
     block_type * C = NULL;
-    //C = new block_type[0];
+    C = new block_type[0];
     delete a;
     a = b;
     b = 0;
-    delete b;
+    //-tb delete of NULL is a noop
+    //delete b;
     delete a;
     delete[] A;
     delete[] B;

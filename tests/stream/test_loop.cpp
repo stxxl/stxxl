@@ -243,7 +243,7 @@ int main(int argc, char ** argv)
 
     verbose = (argc == 3) && !strcmp(argv[2], "-v");
 
-    stxxl::uint64 total = atoi(argv[1]);
+    stxxl::uint64 total = stxxl::atouint64(argv[1]);
 
     input_generator_type input_stream(total);
 

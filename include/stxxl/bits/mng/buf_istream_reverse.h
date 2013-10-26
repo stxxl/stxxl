@@ -52,7 +52,6 @@ private:
 protected:
     typedef block_prefetcher<block_type, typename bid_vector_type::iterator> prefetcher_type;
     prefetcher_type * prefetcher;
-    bid_iterator_type begin_bid, end_bid;
     int_type current_elem;
     block_type * current_blk;
     int_type * prefetch_seq;

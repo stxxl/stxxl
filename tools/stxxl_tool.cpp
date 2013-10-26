@@ -118,6 +118,8 @@ int main_usage(const char* arg0)
 
 int main(int argc, char **argv)
 {
+    char progsub[256];
+
     if (stxxl::check_library_version() != 0)
         STXXL_ERRMSG("version mismatch between headers and library");
 
@@ -128,7 +130,6 @@ int main(int argc, char **argv)
             if (strcmp(subtools[i].name, argv[1]) == 0)
             {
                 // replace argv[1] with call string of subtool.
-                char progsub[256];
                 snprintf(progsub, sizeof(progsub), "%s %s", argv[0], argv[1]);
                 argv[1] = progsub;
                 return subtools[i].func(argc-1, argv+1);

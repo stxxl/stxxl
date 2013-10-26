@@ -116,8 +116,8 @@ public:
     void unlock()
     {
         if (is_locked) {
-            mtx.unlock();
             is_locked = false;
+            mtx.unlock();
         }
     }
 };

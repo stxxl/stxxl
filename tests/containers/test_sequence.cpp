@@ -17,13 +17,13 @@
 
 int main(int argc, char * argv[])
 {
-    stxxl::int64 ops = (argc >= 2) ? stxxl::atoint64(argv[1]) : 32*1024*1024;
+    stxxl::uint64 ops = (argc >= 2) ? stxxl::atouint64(argv[1]) : 32*1024*1024;
  
     stxxl::random_number32 random;
     stxxl::sequence<int> XXLDeque;
     std::deque<int> STDDeque;
 
-    for (stxxl::int64 i = 0; i < ops; ++i)
+    for (stxxl::uint64 i = 0; i < ops; ++i)
     {
         unsigned curOP = random() % 6;
         unsigned value = random();

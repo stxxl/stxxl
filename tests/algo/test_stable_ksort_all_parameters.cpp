@@ -103,7 +103,7 @@ int main(int argc, char * argv[])
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");
 #endif
-    stxxl::uint64 data_mem = stxxl::atoint64(argv[1]) * MB;
+    stxxl::uint64 data_mem = stxxl::atouint64(argv[1]) * MB;
     int sort_mem = atoi(argv[2]) * MB;
     int strategy = atoi(argv[3]);
     int block_size = atoi(argv[4]);

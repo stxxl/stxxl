@@ -31,14 +31,19 @@ fileperblock_file<base_file_type>::fileperblock_file(
     int queue_id,
     int allocator_id)
     : disk_queued_file(queue_id, allocator_id), filename_prefix(filename_prefix), mode(mode),
-      lock_file_created(false), lock_file(filename_prefix + "_fpb_lock", mode, queue_id)
+      current_size(0),
+      lock_file_created(false),
+      lock_file(filename_prefix + "_fpb_lock", mode, queue_id)
 { }
 
 template <class base_file_type>
 fileperblock_file<base_file_type>::~fileperblock_file()
 {
     if (lock_file_created)
-        ::remove((filename_prefix + "_fpb_lock").c_str());
+    {
+        if (::remove((filename_prefix + "_fpb_lock").c_str()) != 0)
+            STXXL_ERRMSG("remove() error on path=" << filename_prefix << "_fpb_lock error=" << strerror(errno));
+    }
 }
 
 template <class base_file_type>
@@ -85,9 +90,11 @@ void fileperblock_file<base_file_type>::discard(offset_type offset, offset_type 
 {
     STXXL_UNUSED(length);
 #ifdef STXXL_FILEPERBLOCK_NO_DELETE
-    ::truncate(filename_for_block(offset).c_str(), 0);
+    if (::truncate(filename_for_block(offset).c_str(), 0) != 0)
+        STXXL_ERRMSG("truncate() error on path=" << filename_for_block(offset) << " error=" << strerror(errno));
 #else
-    ::remove(filename_for_block(offset).c_str());
+    if (::remove(filename_for_block(offset).c_str()) != 0)
+        STXXL_ERRMSG("remove() error on path=" << filename_for_block(offset) << " error=" << strerror(errno));
 #endif
 
     STXXL_VERBOSE2("discard " << offset << " + " << length);
@@ -98,13 +105,16 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
 {
     std::string original(filename_for_block(offset));
     filename.insert(0, original.substr(0, original.find_last_of("/") + 1));
-    ::remove(filename.c_str());
-    ::rename(original.c_str(), filename.c_str());
+    if (::remove(filename.c_str()) != 0)
+        STXXL_ERRMSG("remove() error on path=" << filename << " error=" << strerror(errno));
+
+    if (::rename(original.c_str(), filename.c_str()) != 0)
+        STXXL_ERRMSG("rename() error on path=" << filename << " to=" << original << " error=" << strerror(errno));
+
 #ifndef STXXL_WINDOWS
     //TODO: implement on Windows
     if (::truncate(filename.c_str(), length) != 0) {
-        STXXL_THROW2(io_error,
-                     "Error doing truncate()");
+        STXXL_THROW2(io_error, "Error doing truncate()");
     }
 #else
     STXXL_UNUSED(length);

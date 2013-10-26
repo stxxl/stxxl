@@ -80,6 +80,9 @@ inline void * aligned_alloc(size_t size, size_t meta_info_size = 0)
     char * result = reserve_buffer + ALIGNMENT -
                     (((unsigned long)reserve_buffer) % (ALIGNMENT)) - meta_info_size;
     STXXL_VERBOSE2("stxxl::aligned_alloc<" << ALIGNMENT << ">() address " << (void *)result << " lost " << (result - buffer) << " bytes");
+    //-tb: check that there is space for one char* before the "result" pointer
+    // delivered to the user. this char* is set below to the beginning of the
+    // allocated area.
     assert(long(result - buffer) >= long(sizeof(char *)));
 
     // free unused memory behind the data area

@@ -69,10 +69,10 @@ int main(int argc, char * argv[])
         return 0;
     }
     unsigned M = atol(argv[3]) * 1024 * 1024;
-    const long long int ncalls = stxxl::atoint64(argv[1]);
+    const stxxl::uint64 ncalls = stxxl::atouint64(argv[1]);
     const int av_calls = atol(argv[2]);
-    const long long int nclients = ncalls / av_calls;
-    long long int calls_made = 0;
+    const stxxl::uint64 nclients = ncalls / av_calls;
+    stxxl::uint64 calls_made = 0;
 
     time_t now = time(NULL);
 
@@ -81,7 +81,7 @@ int main(int argc, char * argv[])
 
     stxxl::random_number64 rnd;
 
-    for (long long int number = 0;
+    for (stxxl::uint64 number = 0;
          number < nclients && calls_made < ncalls;
          ++number)
     {

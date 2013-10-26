@@ -79,8 +79,7 @@ struct run_cursor2 : public run_cursor<block_type>
         return prefetcher_;
     }
 
-    run_cursor2() { }
-    run_cursor2(prefetcher_type * p) : prefetcher_(p) { }
+    run_cursor2(prefetcher_type * p = NULL) : prefetcher_(p) { }
 #endif
 
     inline bool empty() const

@@ -100,12 +100,23 @@ std::string format_IEC_size(uint64 number);
 
 ////////////////////////////////////////////////////////////////////////////
 
-inline stxxl::int64 atoint64(const char * s)
+inline stxxl::int64 atoi64(const char * s)
 {
 #ifdef STXXL_MSVC
     return _atoi64(s);
 #else
     return atoll(s);
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+inline stxxl::uint64 atouint64(const char * s)
+{
+#ifdef STXXL_MSVC
+    return _strtoui64(s, NULL, 10);
+#else
+    return strtoull(s, NULL, 10);
 #endif
 }
 
@@ -225,7 +236,7 @@ inline void swap_1D_arrays(T * a, T * b, unsigned_type size)
 template <typename Integral>
 inline Integral round_up_to_power_of_two(Integral n, unsigned_type power)
 {
-    Integral pot = 1 << power, // = 0..0 1 0^power
+    Integral pot = Integral(1) << power, // = 0..0 1 0^power
              mask = pot - 1;   // = 0..0 0 1^power
     if (n & mask)  // n not divisible by pot
         return (n & ~mask) + pot;
