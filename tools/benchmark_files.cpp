@@ -173,7 +173,7 @@ int benchmark_files(int argc, char * argv[])
     const char * myself = strrchr(argv[0], '/');
     if (!myself || !*(++myself))
         myself = argv[0];
-    std::cout << "# " << myself << " " << stxxl::get_version_string();
+    std::cout << "# " << myself << " " << stxxl::get_version_string_long();
 #ifdef STXXL_DIRECT_IO_OFF
     std::cout << " STXXL_DIRECT_IO_OFF";
 #endif

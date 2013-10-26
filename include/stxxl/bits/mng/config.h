@@ -18,8 +18,9 @@
 #include <string>
 #include <cstdlib>
 
+#include <stxxl/version.h>
 #include <stxxl/bits/singleton.h>
-#include <stxxl/bits/verbose.h>
+#include <stxxl/bits/common/log.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -46,14 +47,23 @@ class config : public singleton<config>
     // in disks_props, flash devices come after all regular disks
     unsigned first_flash;
 
-    //! searchs different locations for a disk configuration file
-    config();
+    //! default configuration method
+    inline config()
+    {
+        logger::get_instance();
+        STXXL_MSG(get_version_string_long());
+        print_library_version_mismatch();
+        init_findconfig();
+    }
 
     //! deletes autogrow files
     ~config();
 
     //! load disk configuration file
     void init(const std::string& config_path = "./.stxxl");
+
+    //! searchs different locations for a disk configuration file
+    void init_findconfig();
 
 public:
     //! Returns number of disks available to user.

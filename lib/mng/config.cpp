@@ -16,7 +16,6 @@
 #include <fstream>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/version.h>
-#include <stxxl/bits/common/log.h>
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/config.h>
 
@@ -36,7 +35,7 @@ static inline bool exist_file(const std::string& path)
     return in.good();
 }
 
-config::config()
+void config::init_findconfig()
 {
     // check different locations for disk configuration files
 
@@ -106,8 +105,6 @@ config::~config()
 
 void config::init(const std::string& config_path)
 {
-    logger::get_instance();
-    STXXL_MSG(get_version_string());
     std::vector<DiskEntry> flash_props;
     std::ifstream cfg_file(config_path.c_str());
     if (!cfg_file)

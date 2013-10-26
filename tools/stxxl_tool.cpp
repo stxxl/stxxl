@@ -40,10 +40,6 @@ int stxxl_info(int, char **)
     STXXL_MSG("STXXL_HAVE_AIO_FILE    = " << STXXL_HAVE_AIO_FILE);
 #endif
 
-    assert(stxxl::version_major() == STXXL_VERSION_MAJOR);
-    assert(stxxl::version_minor() == STXXL_VERSION_MINOR);
-    assert(stxxl::version_patch() == STXXL_VERSION_PATCH);
-
     return 0;
 }
 
