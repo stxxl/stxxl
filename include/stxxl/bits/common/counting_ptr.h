@@ -21,9 +21,6 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/mutex.h>
 
-#if STXXL_STD_ATOMIC
-#include <atomic>
-#endif
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -368,7 +365,7 @@ public:
     { return m_reference_count; }
 };
 
-#if STXXL_STD_ATOMIC
+#if STXXL_HAVE_SYNC_ADD_AND_FETCH
 
 /*!
  * Provides reference counting abilities for use with counting_ptr with atomics
@@ -386,7 +383,7 @@ class atomic_counted_object
 private:
     //! the reference count is kept mutable to all const_counting_ptr() to
     //! change the reference count.
-    mutable std::atomic<unsigned_type> m_reference_count;
+    mutable unsigned_type m_reference_count;
 
 public:
     //! new objects have zero reference count
@@ -408,7 +405,7 @@ public:
     //! Call whenever setting a pointer to the object
     void inc_reference() const
     {
-        ++m_reference_count;
+        __sync_add_and_fetch(&m_reference_count, +1);
     }
 
     //! Call whenever resetting (i.e. overwriting) a pointer to the object.
@@ -416,7 +413,7 @@ public:
     //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
     bool dec_reference() const
     {
-        return (--m_reference_count == 0);
+        return (__sync_add_and_fetch(&m_reference_count, -1) == 0);
     }
 
     //! Test if the counted_object is referenced by only one counting_ptr.
@@ -432,7 +429,7 @@ public:
     }
 };
 
-#else // no C++11 <atomic> header found!
+#else // no atomic intrinsics found, use mutexes (slow)
 
 /*!
  * Provides reference counting abilities for use with counting_ptr with mutex

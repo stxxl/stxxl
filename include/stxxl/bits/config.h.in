@@ -53,10 +53,10 @@
 // cmake:   detection of (experimental) C++11 support
 // effect:  enables some C++11 construct (currently only allowed in examples)
 
-#cmakedefine STXXL_STD_ATOMIC ${STXXL_STD_ATOMIC}
+#cmakedefine STXXL_HAVE_SYNC_ADD_AND_FETCH ${STXXL_HAVE_SYNC_ADD_AND_FETCH}
 // default: off
-// cmake:   detection of C++11 <atomic> header
-// effect:  enables use of std::atomic<> constructs
+// cmake:   detection of __sync_add_and_fetch() intrinsic
+// effect:  enables use of atomics in counting_ptr
 
 #cmakedefine STXXL_PARALLEL_MODE_EXPLICIT ${STXXL_PARALLEL_MODE_EXPLICIT}
 // default: off

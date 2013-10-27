@@ -234,9 +234,12 @@ else (NOT HAVE_LARGEFILES)
 endif (HAVE_LARGEFILES)
 
 ###############################################################################
-# check for C++11 <atomic> header support
+# check for __sync_add_and_fetch
 
-check_include_file_cxx(atomic STXXL_STD_ATOMIC)
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles(
+  "int main() { int x; __sync_add_and_fetch(&x, +1); return 0; }"
+  STXXL_HAVE_SYNC_ADD_AND_FETCH)
 
 ###############################################################################
 # optional Boost libraries
