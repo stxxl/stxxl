@@ -40,7 +40,7 @@ if(BUILD_TESTS)
     include_directories("${TPIE_DIR}/include")
 
     stxxl_build_test(tpie_stack_benchmark)
-    target_link_libraries(tpie_stack_benchmark ${STXXL_LIBS} tpie)
+    target_link_libraries(tpie_stack_benchmark ${STXXL_LIBRARIES} tpie)
 
     # try to locate a Berkeley DB version
     find_path(BERKELEYDB_INCLUDES db_cxx.h
@@ -69,7 +69,7 @@ if(BUILD_TESTS)
       include_directories("${BERKELEYDB_INCLUDES}")
 
       stxxl_build_test(berkeley_db_benchmark)
-      target_link_libraries(berkeley_db_benchmark ${STXXL_LIBS} tpie ${BERKELEYDB_LIBRARIES})
+      target_link_libraries(berkeley_db_benchmark ${STXXL_LIBRARIES} tpie ${BERKELEYDB_LIBRARIES})
     endif()
   else()
     message("Could not find TPIE, skipping extra benchmarks.")

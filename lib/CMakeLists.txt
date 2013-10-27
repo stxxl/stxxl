@@ -61,29 +61,52 @@ if(NOT MSVC)
 
 endif(NOT MSVC)
 
+# tell top-level cmakelists which library we build
+set(STXXL_EXPORTED_LIBS stxxl)
+
+# we name debug library builds "stxxl_debug" and release builds "stxxl"
+string(TOLOWER "stxxl_${CMAKE_BUILD_TYPE}" STXXL_LIBNAME)
+if(STXXL_LIBNAME STREQUAL "stxxl_release" OR STXXL_LIBNAME STREQUAL "stxxl_")
+  set(STXXL_LIBNAME "stxxl")
+endif()
+
 if(BUILD_SHARED_LIBS)
 
   # build stxxl SHARED library and link all programs again it
   add_library(stxxl SHARED ${LIBSTXXL_SOURCES})
+  set_target_properties(stxxl PROPERTIES OUTPUT_NAME "${STXXL_LIBNAME}")
   set_target_properties(stxxl PROPERTIES VERSION "${STXXL_VERSION_STRING}")
   install(TARGETS stxxl
+    EXPORT stxxl-targets
     ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
     LIBRARY DESTINATION ${INSTALL_LIB_DIR})
 
   if(BUILD_STATIC_LIBS)
     # but also build STATIC library
     add_library(stxxl_static STATIC ${LIBSTXXL_SOURCES})
-    set_target_properties(stxxl_static PROPERTIES OUTPUT_NAME "stxxl" VERSION "${STXXL_VERSION_STRING}")
-    install(TARGETS stxxl_static ARCHIVE DESTINATION ${INSTALL_LIB_DIR})
+    set_target_properties(stxxl_static PROPERTIES OUTPUT_NAME "${STXXL_LIBNAME}")
+    set_target_properties(stxxl_static PROPERTIES VERSION "${STXXL_VERSION_STRING}")
+    install(TARGETS stxxl_static
+      EXPORT stxxl-targets
+      ARCHIVE DESTINATION ${INSTALL_LIB_DIR})
+
+    # we build both shared and static, export both
+    set(STXXL_EXPORTED_LIBS stxxl stxxl_static)
   endif()
 
 else()
 
   # build stxxl STATIC library and link all programs again it
   add_library(stxxl STATIC ${LIBSTXXL_SOURCES})
+  set_target_properties(stxxl PROPERTIES OUTPUT_NAME "${STXXL_LIBNAME}")
   set_target_properties(stxxl PROPERTIES VERSION "${STXXL_VERSION_STRING}")
   install(TARGETS stxxl
+    EXPORT stxxl-targets
     ARCHIVE DESTINATION ${INSTALL_LIB_DIR}
     LIBRARY DESTINATION ${INSTALL_LIB_DIR})
 
 endif()
+
+# export variables to top-level cmakelists
+set(STXXL_LIBNAME ${STXXL_LIBNAME} PARENT_SCOPE)
+set(STXXL_EXPORTED_LIBS ${STXXL_EXPORTED_LIBS} PARENT_SCOPE)

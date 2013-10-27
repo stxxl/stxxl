@@ -10,8 +10,8 @@ env:
     - OMP_NUM_THREADS=4
   matrix:
     # gcc builds (default configurations, uses gnu_parallel without boost)
-    - CMAKE_CC="gcc" CMAKE_CXX="g++"         CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug"
-    - CMAKE_CC="gcc" CMAKE_CXX="g++"         CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release"
+    - CMAKE_CC="gcc" CMAKE_CXX="g++"         CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug   -DNO_CXX11=ON"
+    - CMAKE_CC="gcc" CMAKE_CXX="g++"         CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Release -DNO_CXX11=ON"
     # gcc-4.8 builds
     - CMAKE_CC="gcc-4.8" CMAKE_CXX="g++-4.8" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug   -DUSE_GNU_PARALLEL=OFF"
     - CMAKE_CC="gcc-4.8" CMAKE_CXX="g++-4.8" CMAKE_ARGS="-DCMAKE_BUILD_TYPE=Debug   -DUSE_GNU_PARALLEL=ON"

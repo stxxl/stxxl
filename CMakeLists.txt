@@ -12,21 +12,25 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-project(stxxl)
-
 # require cmake 2.6.4 (but please use 2.8.x)
 cmake_minimum_required(VERSION 2.6.4)
+
+# the STXXL project
+project(stxxl)
 
 # for additional cmake scripts
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/misc/cmake)
 
-# disallow in-source builds
+# prohibit in-source builds
 if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
   message(SEND_ERROR "In-source builds are not allowed.")
 endif()
 
-# default to Debug building
-set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "CMake build type")
+# default to Debug building for single-config generators
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message("Defaulting CMAKE_BUILD_TYPE to Debug")
+  set(CMAKE_BUILD_TYPE "Debug")
+endif()
 
 # STXXL version string
 set(STXXL_VERSION_MAJOR "1")
@@ -39,7 +43,7 @@ set(STXXL_VERSION_PHASE "prerelease")
 include(GetGitRevisionDescription)
 get_git_head_revision(STXXL_VERSION_GIT_REFSPEC STXXL_VERSION_GIT_SHA1)
 if(STXXL_VERSION_GIT_REFSPEC)
-  message("Detected git refspec ${STXXL_VERSION_GIT_REFSPEC} sha ${STXXL_VERSION_GIT_SHA1}")
+  message(STATUS "Detected git refspec ${STXXL_VERSION_GIT_REFSPEC} sha ${STXXL_VERSION_GIT_SHA1}")
 endif()
 
 ###############################################################################
@@ -83,6 +87,14 @@ endif()
 set(INSTALL_BIN_DIR "bin" CACHE PATH "Installation directory for executables")
 set(INSTALL_LIB_DIR "lib" CACHE PATH "Installation directory for libraries")
 set(INSTALL_INCLUDE_DIR "include" CACHE PATH "Installation directory for header files")
+set(INSTALL_PKGCONFIG_DIR "lib/pkgconfig" CACHE PATH "Installation directory for pkg-config file")
+
+if(WIN32 AND NOT CYGWIN)
+  set(DEF_INSTALL_CMAKE_DIR "CMake")
+else()
+  set(DEF_INSTALL_CMAKE_DIR "lib/cmake/stxxl")
+endif()
+set(INSTALL_CMAKE_DIR "${DEF_INSTALL_CMAKE_DIR}" CACHE PATH "Installation directory for cmake files")
 
 ###############################################################################
 # enable use of "make test"
@@ -110,7 +122,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "${STXXL_VERSION_PATCH}")
 # source packaging
 set(CPACK_SOURCE_GENERATOR "TBZ2;ZIP")
 set(CPACK_SOURCE_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-set(CPACK_SOURCE_IGNORE_FILES "/.travis.yml;/.git;${CPACK_SOURCE_IGNORE_FILES}")
+set(CPACK_SOURCE_IGNORE_FILES "/\\\\..*$;${CPACK_SOURCE_IGNORE_FILES}")
 
 # binary packaging
 set(CPACK_GENERATOR "TBZ2")
@@ -223,6 +235,8 @@ endif()
 
 ###############################################################################
 # determine large file support
+#     note: these flags need not be exported, all file operations must be
+#     encapsulated within the library!
 
 include(TestLargeFiles)
 test_large_files(HAVE_LARGEFILES)
@@ -305,15 +319,15 @@ endif(USE_GNU_PARALLEL)
 # check if one thread and random library is available
 
 if(STXXL_STD_THREADS)
-  message("Using std::thread and other C++11 library functions.")
+  message(STATUS "Using std::thread and other C++11 library functions.")
   unset(STXXL_BOOST_THREADS)
   unset(STXXL_POSIX_THREADS)
 elseif(STXXL_BOOST_THREADS)
-  message("Using boost::thread library functions.")
+  message(STATUS "Using boost::thread library functions.")
   unset(STXXL_STD_THREADS)
   unset(STXXL_POSIX_THREADS)
 elseif(STXXL_POSIX_THREADS)
-  message("Using POSIX pthread library functions.")
+  message(STATUS "Using POSIX pthread library functions.")
   unset(STXXL_STD_THREADS)
   unset(STXXL_BOOST_THREADS)
 else()
@@ -337,16 +351,21 @@ check_symbol_exists(mlock "sys/mman.h" STXXL_HAVE_MLOCK_PROTO)
 # create config.h with define switches _inside binary dir_!
 configure_file(${PROJECT_SOURCE_DIR}/include/stxxl/bits/config.h.in ${PROJECT_BINARY_DIR}/include/stxxl/bits/config.h)
 
+# CXX_FLAGS required for compilation
+set(STXXL_CXX_FLAGS ${OpenMP_CXX_FLAGS})
+
 # globally adds top-level include directories
-set(STXXL_INCLUDES ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
-include_directories(${STXXL_INCLUDES})
+set(STXXL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include/ ${PROJECT_BINARY_DIR}/include/)
+include_directories(${STXXL_INCLUDE_DIRS})
 
 # for targets using stxxl library
-set(STXXL_LIBS stxxl ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+set(STXXL_EXTRA_LIBRARIES ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+set(STXXL_LIBRARIES stxxl ${STXXL_EXTRA_LIBRARIES})
 
-# export STXXL_INCLUDES and STXXL_LIBS to global CACHE
-set(STXXL_INCLUDES "${STXXL_INCLUDES}" CACHE STRING "Include paths for STXXL")
-set(STXXL_LIBS "${STXXL_LIBS}" CACHE STRING "Libraries to link for STXXL")
+# export STXXL_INCLUDE_DIRS and STXXL_LIBRARIES to global CACHE
+set(STXXL_CXX_FLAGS "${STXXL_CXX_FLAGS}" CACHE STRING "Compiler flags for STXXL")
+set(STXXL_INCLUDE_DIRS "${STXXL_INCLUDE_DIRS}" CACHE STRING "Include paths for STXXL")
+set(STXXL_LIBRARIES "${STXXL_LIBRARIES}" CACHE STRING "Libraries to link for STXXL")
 
 # build libstxxl in /lib
 add_subdirectory(lib)
@@ -358,7 +377,7 @@ add_subdirectory(lib)
 macro(stxxl_build_tool PROGNAME)
 
   add_executable(${PROGNAME} ${PROGNAME}.cpp ${ARGN})
-  target_link_libraries(${PROGNAME} ${STXXL_LIBS})
+  target_link_libraries(${PROGNAME} ${STXXL_LIBRARIES})
 
 endmacro(stxxl_build_tool)
 
@@ -429,7 +448,7 @@ endmacro (add_define TESTNAME)
 if(TRY_COMPILE_HEADERS)
 
   include(CheckCXXSourceCompiles)
-  set(CMAKE_REQUIRED_INCLUDES ${STXXL_INCLUDES})
+  set(CMAKE_REQUIRED_INCLUDES ${STXXL_INCLUDE_DIRS})
   set(CMAKE_REQUIRED_LIBRARIES ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
   file(GLOB_RECURSE header_files FOLLOW_SYMLINKS "include/*")
@@ -459,7 +478,7 @@ if(BUILD_TESTS)
     set(STXXL_TMPDIR ".")
   endif()
 
-  message("Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
+  message(STATUS "Using STXXL_TMPDIR ${STXXL_TMPDIR} for tests")
 
 endif(BUILD_TESTS)
 
@@ -471,7 +490,64 @@ install(DIRECTORY include/stxxl DESTINATION ${INSTALL_INCLUDE_DIR})
 
 # also copy the config file with build options!
 install(FILES ${PROJECT_BINARY_DIR}/include/stxxl/bits/config.h
-  DESTINATION ${INSTALL_INCLUDE_DIR}/stxxl/bits/config.h)
+  DESTINATION ${INSTALL_INCLUDE_DIR}/stxxl/bits/)
+
+###############################################################################
+# prepare pkg-config file
+
+configure_file(misc/cmake/stxxl.pc
+  "${PROJECT_BINARY_DIR}/${STXXL_LIBNAME}.pc" @ONLY)
+
+# copy the stxxl.pc file into lib/pkgconfig
+if(INSTALL_PKGCONFIG_DIR)
+  install(FILES ${PROJECT_BINARY_DIR}/${STXXL_LIBNAME}.pc
+    DESTINATION ${INSTALL_PKGCONFIG_DIR})
+endif()
+
+###############################################################################
+# export targets to cmake project config file
+
+if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.6)
+  # register package for use from the global CMake-registry
+  export(PACKAGE stxxl)
+endif()
+
+# add stxxl library targets to the build tree export set
+export(TARGETS ${STXXL_EXPORTED_LIBS} FILE "${PROJECT_BINARY_DIR}/stxxl-targets.cmake")
+
+# calculate absolute install paths
+foreach(dir LIB BIN INCLUDE CMAKE)
+  set(ABS_INSTALL_${dir}_DIR "${INSTALL_${dir}_DIR}")
+  if(NOT IS_ABSOLUTE "${ABS_INSTALL_${dir}_DIR}")
+    set(ABS_INSTALL_${dir}_DIR "${CMAKE_INSTALL_PREFIX}/${ABS_INSTALL_${dir}_DIR}")
+  endif()
+endforeach()
+
+# calculate final installed include path relative to cmake install path
+file(RELATIVE_PATH REL_INCLUDE_DIR "${ABS_INSTALL_CMAKE_DIR}" "${ABS_INSTALL_INCLUDE_DIR}")
+
+# create common stxxl-config.cmake file
+configure_file(misc/cmake/stxxl-version.cmake.in
+  "${PROJECT_BINARY_DIR}/stxxl-version.cmake" @ONLY)
+
+# create stxxl-version.cmake file for the build tree
+set(CONF_INCLUDE_DIRS "${STXXL_INCLUDE_DIRS}")
+configure_file(misc/cmake/stxxl-config.cmake.in
+  "${PROJECT_BINARY_DIR}/stxxl-config.cmake" @ONLY)
+
+# create stxxl-version.cmake file for the install tree
+set(CONF_INCLUDE_DIRS "\${STXXL_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+configure_file(misc/cmake/stxxl-config.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/stxxl-config.cmake" @ONLY)
+
+# install the stxxl-config.cmake and stxxl-version.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}/stxxl-version.cmake"
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/stxxl-config.cmake"
+  DESTINATION "${INSTALL_CMAKE_DIR}")
+
+# Install the export set for use with the install-tree
+install(EXPORT stxxl-targets DESTINATION "${INSTALL_CMAKE_DIR}")
 
 ###############################################################################
 # build tests and tools
