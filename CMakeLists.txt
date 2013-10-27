@@ -183,20 +183,16 @@ endif()
 
 # enable C++11
 if(MSVC)
-  # MSVC 11 or greater has C++11 enabled
-  if(NOT (MSVC_VERSION LESS 1700))
-    set(STXXL_HAVE_CXX11 "1")
-  endif()
+  # MSVC 11 or greater has C++11 automatically enabled
 elseif(NOT NO_CXX11)
+  # try -std= flags to enable C++11
   check_cxx_compiler_flag(-std=c++11 CXX_HAS_STD_CXX11)
   if(CXX_HAS_STD_CXX11)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    set(STXXL_HAVE_CXX11 "1")
   else()
     check_cxx_compiler_flag(-std=c++0x CXX_HAS_STD_CXX0X)
     if(CXX_HAS_STD_CXX0X)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-      set(STXXL_HAVE_CXX11 "1")
     endif()
   endif()
 endif()

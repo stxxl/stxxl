@@ -71,7 +71,7 @@ private:
     }
 
     //! number of bits in the lower integer part, used a bit shift value.
-    static const int low_bits = std::numeric_limits<low_type>::digits;
+    static const int low_bits = 8 * sizeof(low_type);
 
     //! return highest value storable in higher part, also used as a mask.
     static high_type high_max()
@@ -80,7 +80,7 @@ private:
     }
 
     //! number of bits in the higher integer part, used a bit shift value.
-    static const int high_bits = std::numeric_limits<high_type>::digits;
+    static const int high_bits = 8 * sizeof(high_type);
 
 public:
     //! number of binary digits (bits) in uint_pair
@@ -93,7 +93,6 @@ public:
     inline uint_pair()
     {
         // compile-time assertions about size of low_type
-        STXXL_STATIC_ASSERT( low_bits == 32 );
         STXXL_STATIC_ASSERT( 8 * sizeof(low_type) == 32 );
         // compile-time assertions about size of our data structure, this tests
         // packing of structures by the compiler

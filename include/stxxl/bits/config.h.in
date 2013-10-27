@@ -45,12 +45,16 @@
 
 #cmakedefine STXXL_MSVC ${STXXL_MSVC}
 // default: off
-// cmake:   detection of ms visual c++ via cmake
+// cmake:   detection of ms visual c++ via CMake (contains version number)
 // effect:  enables msvc-specific headers and macros
 
-#cmakedefine STXXL_HAVE_CXX11 ${STXXL_HAVE_CXX11}
+#if (__cplusplus >= 201103L) || __GXX_EXPERIMENTAL_CXX0X__ || (STXXL_MSVC >= 1700)
+  #define STXXL_HAVE_CXX11 1
+#else
+  #define STXXL_HAVE_CXX11 0
+#endif
 // default: off
-// cmake:   detection of (experimental) C++11 support
+// run-time: detection of (experimental) C++11 support
 // effect:  enables some C++11 construct (currently only allowed in examples)
 
 #cmakedefine STXXL_HAVE_SYNC_ADD_AND_FETCH ${STXXL_HAVE_SYNC_ADD_AND_FETCH}

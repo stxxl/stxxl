@@ -222,7 +222,7 @@ void test_vector_buf(uint64 size)
 
         STXXL_CHECK( reader.empty() );
     }
-#if (STXXL_MSVC && STXXL_HAVE_CXX11) || (defined(__GNUG__) && (__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40600)
+#if STXXL_HAVE_CXX11
     { // read vector using C++11 for loop construct
 
         stxxl::scoped_print_timer tm("C++11 for loop");
