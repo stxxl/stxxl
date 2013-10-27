@@ -224,7 +224,7 @@ public:
 //!
 //! Stores blocks only, so all measures (height, width, row, col) are in blocks.
 template <typename ValueType, unsigned BlockSideLength>
-class swappable_block_matrix : public counted_object
+class swappable_block_matrix : public atomic_counted_object
 {
 public:
     typedef int_type size_type;
@@ -333,7 +333,7 @@ public:
     }
 
     swappable_block_matrix(const swappable_block_matrix & other)
-        : counted_object(other),
+        : atomic_counted_object(other),
           bs(other.bs),
           height(other.height),
           width(other.width),

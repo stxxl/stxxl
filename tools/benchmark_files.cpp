@@ -242,7 +242,7 @@ int benchmark_files(int argc, char * argv[])
 
             std::cout << "File offset    " << std::setw(8) << offset / MB << " MiB: " << std::fixed;
 
-            double begin = timestamp(), end, elapsed;
+            double begin = timestamp(), end = begin, elapsed;
 
             if (do_write)
             {
@@ -295,7 +295,7 @@ int benchmark_files(int argc, char * argv[])
                       << std::setw(8) << std::setprecision(3) << (throughput(current_step_size, elapsed) * nfiles) << " MiB/s write,";
 
 
-            begin = timestamp();
+            begin = end = timestamp();
 
             if (do_read || do_verify)
             {
