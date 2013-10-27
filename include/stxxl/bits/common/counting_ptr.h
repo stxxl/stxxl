@@ -365,7 +365,7 @@ public:
     { return m_reference_count; }
 };
 
-#if STXXL_HAVE_SYNC_ADD_AND_FETCH
+#if STXXL_HAVE_SYNC_ADD_AND_FETCH || STXXL_MSVC
 
 /*!
  * Provides reference counting abilities for use with counting_ptr with atomics
@@ -383,7 +383,11 @@ class atomic_counted_object
 private:
     //! the reference count is kept mutable to all const_counting_ptr() to
     //! change the reference count.
+#if STXXL_MSVC
+    mutable long m_reference_count;
+#else
     mutable unsigned_type m_reference_count;
+#endif
 
 public:
     //! new objects have zero reference count
@@ -405,7 +409,11 @@ public:
     //! Call whenever setting a pointer to the object
     void inc_reference() const
     {
+#if STXXL_MSVC
+        _InterlockedIncrement(&m_reference_count);
+#else
         __sync_add_and_fetch(&m_reference_count, +1);
+#endif
     }
 
     //! Call whenever resetting (i.e. overwriting) a pointer to the object.
@@ -413,7 +421,11 @@ public:
     //! \return if the object has to be deleted (i.e. if it's reference count dropped to zero)
     bool dec_reference() const
     {
+#if STXXL_MSVC
+        return (_InterlockedDecrement(&m_reference_count) == 0);
+#else
         return (__sync_add_and_fetch(&m_reference_count, -1) == 0);
+#endif
     }
 
     //! Test if the counted_object is referenced by only one counting_ptr.

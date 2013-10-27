@@ -234,7 +234,7 @@ else (NOT HAVE_LARGEFILES)
 endif (HAVE_LARGEFILES)
 
 ###############################################################################
-# check for __sync_add_and_fetch
+# check for an atomic add-and-fetch intrinsic for counting_ptr
 
 include(CheckCXXSourceCompiles)
 check_cxx_source_compiles(
