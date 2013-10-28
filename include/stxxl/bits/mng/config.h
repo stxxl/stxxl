@@ -65,6 +65,9 @@ class config : public singleton<config>
     //! searchs different locations for a disk configuration file
     void init_findconfig();
 
+    //! replace key string in path names
+    static std::string path_replace(const std::string& path);
+
 public:
     //! Returns number of disks available to user.
     //! \return number of disks
@@ -98,7 +101,7 @@ public:
     //! Returns disk size.
     //! \param disk disk's identifier
     //! \return disk size in bytes
-    inline stxxl::int64 disk_size(size_t disk) const
+    inline stxxl::uint64 disk_size(size_t disk) const
     {
         return disks_props[disk].size;
     }

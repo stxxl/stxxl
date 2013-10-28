@@ -20,6 +20,7 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include <sstream>
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -81,6 +82,17 @@ split(const std::string & str, const std::string & sep, unsigned int min_fields)
         result.resize(min_fields);
 
     return result;
+}
+
+////////////////////////////////////////////////////////////////////////////
+
+//! Format any ostream-able type into a string
+template <typename Type>
+std::string to_str(const Type& t)
+{
+    std::ostringstream oss;
+    oss << t;
+    return oss.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////

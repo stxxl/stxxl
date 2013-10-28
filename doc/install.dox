@@ -361,11 +361,9 @@ In summary, CMake only looks for Boost at a few locations: C:\\Boost for headers
 
 \author Timo Bingmann (2013)
 
-A main feature of the STXXL is to take advantage of parallel access to \b multiple disks. For this, you must define the disk configuration in a text file, commonly named \c '.stxxl', using the syntax described below.
+A main feature of the STXXL is to take advantage of parallel access to <b>multiple disks</b>. For this, you must define the disk configuration in a text file, using the syntax described below. If no file is found at the locations below, STXXL will by default create a 1000 MiB file in \c /var/tmp/stxxl on Unix or in the user's temp directory on Windows.
 
-If no file is found at the locations below, STXXL will by default create a 1000 MiB file in \c /var/tmp/stxxl.
-
-These are the locations STXXL will look for a disk configuration file on <b>Linux/Unix systems</b>, in decreasing order of precedence:
+These are the locations STXXL will look for a disk configuration file on <b>Linux/Unix systems</b>, in order of precedence:
 - If the environment variable <b><tt>STXXLCFG</tt></b> specifies a file, this is used.
 - Then the current directory of the program is checked:
   - first for <b><tt>.stxxl.$HOSTNAME</tt></b> (for host specific configuration),
@@ -379,11 +377,11 @@ These are the locations STXXL will look for a disk configuration file on <b>Linu
 On <b>Windows systems</b>, STXXL looks for a disk configuration file in the following directories:
 - If the environment variable <b><tt>STXXLCFG</tt></b> specifies a file, this is used.
 - Then the current directory of the program is checked:
-  - first for <b><tt>.stxxl.\%COMPUTERNAME\%</tt></b> (for host specific configuration),
-  - then for <b><tt>.stxxl</tt></b> (for general configuration).
+  - first for <b><tt>.stxxl.\%COMPUTERNAME\%.txt</tt></b> (for host specific configuration),
+  - then for <b><tt>.stxxl.txt</tt></b> (for general configuration).
 - Then the \c \%APPDATA\% directory of the current user is checked (<b>usual method</b>):
-  - first for <b><tt>\%APPDATA\%/.stxxl.\%COMPUTERNAME\%</tt></b> (for host specific configuration),
-  - then for <b><tt>\%APPDATA\%/.stxxl</tt></b> (for general configuration).
+  - first for <b><tt>\%APPDATA\%/.stxxl.\%COMPUTERNAME\%.txt</tt></b> (for host specific configuration),
+  - then for <b><tt>\%APPDATA\%/.stxxl.txt</tt></b> (for general configuration).
   - in a default Windows 7 installation, \%APPDATA\% is <b><tt>C:\\Users\\<i>\<username\></i>\\AppData\\Roaming</tt></b> \n
     You can visit your <tt>%APPDATA%</tt> directory by simply entering <b><tt>"%APPDATA%"</tt></b> in the Windows Explorer address/location line.
 
@@ -398,7 +396,10 @@ disk=full_disk_filename,capacity,access_method
 
 Description of the parameters:
 
-- \c full_disk_filename : full disk filename. In order to access disks STXXL uses \b file access methods. Each disk is represented as a file. If you have a disk that is mounted in Unix to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be \c /mnt/disk0/some_file_name ,
+- \c full_disk_filename : full disk filename.
+  - In order to access disks STXXL uses <i>file-based access methods</i> (see below). Each disk is represented as a file
+  - If you have a disk that is mounted in Unix to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be \c /mnt/disk0/some_file_name. \n
+  - If the string contains <tt>"###"</tt> (three '#'), then these symbols are replaced by the current process id.
 
 - \c capacity : maximum capacity of the disk
 
@@ -413,7 +414,8 @@ Description of the parameters:
 
   - \c syscall : use \c read and \c write system calls which perform disk transfers directly on user memory pages without superfluous copying (currently the fastest method)
 
-  - \c <b>syscall_unlink</b> : is a variant of \c syscall, which unlinks the file immediately after creation. This is possible on Unix system, as the file descriptor is kept open. This method is \b preferred, because even in the case of a program segfault, the file data is cleaned up by the kernel.
+  - \c <b>syscall_unlink</b> : is a variant of \c syscall, which \b unlinks the file immediately after creation. \n
+    This is possible on Unix system, as the file descriptor is kept open. This method is \b preferred, because even in the case of a program segfault, the file data is cleaned up by the kernel.
 
   - \c wincall : on Windows, use direct calls to the Windows API.
 

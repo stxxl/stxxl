@@ -50,10 +50,12 @@ void config::init_findconfig()
     // read environment, unix style
     const char* hostname = getenv("HOSTNAME");
     const char* home = getenv("HOME");
+    const char* suffix = "";
 #else
     // read environment, windows style
     const char* hostname = getenv("COMPUTERNAME");
     const char* home = getenv("APPDATA");
+    const char* suffix = ".txt";
 #endif
 
     // check current directory
@@ -61,12 +63,12 @@ void config::init_findconfig()
         std::string basepath = "./.stxxl";
 
         if (hostname && exist_file(basepath + "." + hostname)) {
-            init(basepath + "." + hostname);
+            init(basepath + "." + hostname + suffix);
             return;
         }
 
         if (exist_file(basepath)) {
-            init(basepath);
+            init(basepath + suffix);
             return;
         }
     }
@@ -77,12 +79,12 @@ void config::init_findconfig()
         std::string basepath = std::string(home) + "/.stxxl";
 
         if (hostname && exist_file(basepath + "." + hostname)) {
-            init(basepath + "." + hostname);
+            init(basepath + "." + hostname + suffix);
             return;
         }
 
         if (exist_file(basepath)) {
-            init(basepath);
+            init(basepath + suffix);
             return;
         }
     }
@@ -101,6 +103,25 @@ config::~config()
             unlink(disks_props[i].path.c_str());
         }
     }
+}
+
+std::string config::path_replace(const std::string& p)
+{
+    std::string path = p;
+    std::string::size_type pos;
+
+    // replace ### -> pid
+    if ( (pos = path.find("###")) != std::string::npos )
+    {
+#ifndef STXXL_WINDOWS
+        int pid = getpid();
+#else
+        DWORD pid = GetCurrentProcessId();
+#endif
+        path.replace(pos, 3, to_str(pid));
+    }
+
+    return path;
 }
 
 void config::init(const std::string& config_path)
@@ -145,10 +166,11 @@ void config::init(const std::string& config_path)
             {
                 tmp = split(tmp[1], ",", 3);
                 DiskEntry entry = {
-                    tmp[0], tmp[2],
-                    0,
-                    false,
-                    false
+                    path_replace(tmp[0]), // path
+                    tmp[2],     // io_impl
+                    0,          // size
+                    false,      // delete_on_exit
+                    false       // autogrow
                 };
                 if (!parse_SI_IEC_size(tmp[1], entry.size)) {
                     STXXL_THROW(std::runtime_error, "config::config",
