@@ -223,10 +223,6 @@ if(MSVC OR USE_STD_THREADS)
 else()
   find_package(Threads REQUIRED)
   set(STXXL_POSIX_THREADS "1")
-
-  include(CheckSymbolExists)
-  check_symbol_exists(erand48 "stdlib.h" STXXL_HAVE_ERAND48)
-
 endif()
 
 ###############################################################################
@@ -328,10 +324,6 @@ elseif(STXXL_POSIX_THREADS)
   unset(STXXL_BOOST_THREADS)
 else()
   message(SEND_ERROR "Could not detect a thread library. Check the compilation documentation.")
-endif()
-
-if(NOT (STXXL_STD_RANDOM OR STXXL_BOOST_RANDOM OR STXXL_HAVE_ERAND48))
-  message(SEND_ERROR "Could not detect a random generator library. Check the compilation documentation.")
 endif()
 
 ###############################################################################

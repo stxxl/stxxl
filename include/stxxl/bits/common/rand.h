@@ -14,7 +14,8 @@
 #ifndef STXXL_RAND_HEADER
 #define STXXL_RAND_HEADER
 
-#include <cstdlib>
+#include <stdlib.h>
+#include <math.h>
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/types.h>
@@ -140,8 +141,54 @@ struct random_uniform_slow
             seed = get_next_seed();
         uni.engine().seed(seed);
     }
-#elif STXXL_HAVE_ERAND48
+#else
     mutable unsigned short state48[3];
+/*
+ * embedded erand48.c
+ *
+ * Copyright (c) 1993 Martin Birgmeier
+ * All rights reserved.
+ *
+ * You may redistribute unmodified or modified versions of this source
+ * code provided that the above copyright notice and this and the
+ * following conditions are retained.
+ *
+ * This software is provided ``as is'', and comes with no warranties
+ * of any kind. I shall in no event be liable for anything that happens
+ * to anyone/anything when using this software.
+ */
+    static void
+    _dorand48(unsigned short xseed[3])
+    {
+	unsigned long accu;
+	unsigned short temp[2];
+
+        static const unsigned short _mult[3] = { 0xe66d, 0xdeec, 0x0005 };
+        static const unsigned short _add = 0x000b;
+
+	accu = (unsigned long) _mult[0] * (unsigned long) xseed[0]
+            + (unsigned long) _add;
+	temp[0] = (unsigned short) accu;	/* lower 16 bits */
+	accu >>= sizeof(unsigned short) * 8;
+	accu += (unsigned long) _mult[0] * (unsigned long) xseed[1]
+            + (unsigned long) _mult[1] * (unsigned long) xseed[0];
+	temp[1] = (unsigned short) accu;	/* middle 16 bits */
+	accu >>= sizeof(unsigned short) * 8;
+	accu += _mult[0] * xseed[2] + _mult[1] * xseed[1] + _mult[2] * xseed[0];
+	xseed[0] = temp[0];
+	xseed[1] = temp[1];
+	xseed[2] = (unsigned short) accu;
+    }
+
+    static double
+    _erand48(unsigned short xseed[3])
+    {
+	_dorand48(xseed);
+	return ldexp((double) xseed[0], -48)
+            + ldexp((double) xseed[1], -32)
+            + ldexp((double) xseed[2], -16);
+    }
+/* end erand48.c */
 
     random_uniform_slow(unsigned seed = 0)
     {
@@ -150,10 +197,8 @@ struct random_uniform_slow
         state48[0] = (unsigned short)(seed & 0xffff);
         state48[1] = (unsigned short)(seed >> 16);
         state48[2] = 42;
-        erand48(state48);
+        _dorand48(state48);
     }
-#else
- #error "Could not find a slow and precise uniform [0,1) random generator"
 #endif
 
     //! Returns a random number from [0.0, 1.0)
@@ -164,7 +209,7 @@ struct random_uniform_slow
 #elif STXXL_BOOST_RANDOM
         return uni();
 #else
-        return erand48(state48);
+        return _erand48(state48);
 #endif
     }
 };
