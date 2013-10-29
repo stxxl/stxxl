@@ -1320,29 +1320,23 @@ int main(int argc, char* argv[])
     cp.add_flag('v', "verbatim", "Consider \"input\" as verbatim text to construct suffix array on.", input_verbatim);
     cp.add_bytes('s', "size", "Cut input text to given size, e.g. 2 GiB.", sizelimit);
     cp.add_bytes('M', "memuse", "Amount of RAM to use, default: 1 GiB.", ram_use);
-    cp.add_uint('w', "wordsize", "Set word size of suffix array to 16, 32, 40, 48 or 64 bit, default: 32-bit.", wordsize);
+    cp.add_uint('w', "wordsize", "Set word size of suffix array to 32, 40 or 64 bit, default: 32-bit.", wordsize);
 
     // process command line
     if (!cp.process(argc,argv))
         return -1;
 
-    if (wordsize == 16)
-        return process<uint16>(input_filename, output_filename, sizelimit,
-                               text_output_flag, check_flag, input_verbatim);
-    else if (wordsize == 32)
+    if (wordsize == 32)
         return process<uint32>(input_filename, output_filename, sizelimit,
                                text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 40)
         return process<uint40>(input_filename, output_filename, sizelimit,
                                text_output_flag, check_flag, input_verbatim);
-    else if (wordsize == 48)
-        return process<uint48>(input_filename, output_filename, sizelimit,
-                               text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 64)
         return process<uint64>(input_filename, output_filename, sizelimit,
                                text_output_flag, check_flag, input_verbatim);
     else
-        std::cerr << "Invalid wordsize for suffix array: 16, 32, 40, 48 or 64 are allowed." << std::endl;
+        std::cerr << "Invalid wordsize for suffix array: 32, 40 or 64 are allowed." << std::endl;
 
     return -1;
 }
