@@ -17,9 +17,8 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
-
-#include <string.h>
-#include <stdio.h>
+#include <cstring>
+#include <cstdio>
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/noncopyable.h>

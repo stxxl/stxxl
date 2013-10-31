@@ -51,7 +51,6 @@
  #if ! defined(O_DIRECT)
   #error O_DIRECT is not defined while __linux__ is - PLEASE REPORT THIS BUG
  #endif
-//#include <asm/fcntl.h>
 // FIXME: In which conditions is this not defined? Why only i386 and alpha? Why not amd64?
  #if !defined (O_DIRECT) && (defined (__alpha__) || defined (__i386__))
   #define O_DIRECT 040000       /* direct disk access */
@@ -63,7 +62,7 @@
 #endif
 
 
-#include <assert.h>
+#include <cassert>
 
 #include <stxxl/bits/libstxxl.h>
 #include <stxxl/bits/namespace.h>

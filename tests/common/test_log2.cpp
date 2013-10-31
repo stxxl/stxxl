@@ -12,8 +12,8 @@
  **************************************************************************/
 
 #include <iostream>
-#include <math.h>
-#include <assert.h>
+#include <cmath>
+#include <cassert>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/common/utils.h>

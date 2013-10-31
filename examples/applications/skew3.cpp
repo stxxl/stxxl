@@ -12,11 +12,11 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-#include <math.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <climits>
+#include <cmath>
 #include <iostream>
 #include <iomanip>
 #include <sstream>

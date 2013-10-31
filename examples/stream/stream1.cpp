@@ -17,7 +17,7 @@
 #include <stxxl/sorter>
 
 #include <vector>
-#include <limits.h>
+#include <climits>
 
 struct counter_object
 {

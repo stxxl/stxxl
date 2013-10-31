@@ -13,7 +13,7 @@
 
 #include <cstring>
 #include <limits>
-#include <assert.h>
+#include <cassert>
 
 #include <stxxl/bits/io/mem_file.h>
 #include <stxxl/bits/io/iostats.h>

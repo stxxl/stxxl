@@ -23,7 +23,7 @@
 
 #include <limits>
 #include <ostream>
-#include <assert.h>
+#include <cassert>
 
 __STXXL_BEGIN_NAMESPACE
 

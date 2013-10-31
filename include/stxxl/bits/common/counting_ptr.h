@@ -14,8 +14,8 @@
 #ifndef STXXL_COUNTING_PTR_HEADER
 #define STXXL_COUNTING_PTR_HEADER
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include <algorithm>
 #include <stxxl/types>
 #include <stxxl/bits/config.h>
