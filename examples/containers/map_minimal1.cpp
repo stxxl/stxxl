@@ -10,20 +10,23 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! [example]
 #include <stxxl/map>
 #include <iostream>
 
 #define DATA_NODE_BLOCK_SIZE (4096)
 #define DATA_LEAF_BLOCK_SIZE (4096)
 
+//! [comparator]
 struct CompareGreater
 {
     bool operator () (const int & a, const int & b) const
-    { return a>b; }
+    { return a > b; }
 
     static int max_value()
     { return std::numeric_limits<int>::min(); }
 };
+//! [comparator]
 
 int main()
 {
@@ -57,3 +60,4 @@ int main()
 
     return 0;
 }
+//! [example]

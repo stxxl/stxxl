@@ -53,15 +53,14 @@ As a part of the AIO layer, the STXXL library provides various I/O performance c
 The following listing shows a simple example of how to use AIO objects to perform asynchronous I/O. All STXXL library objects are defined in the namespace stxxl. For convenience, in line 1 we bring all names from the STXXL namespace to the local scope. In Line 8 a file object \c myfile is constructed. stxxl::syscall_file is an implementation of the STXXL stxxl::file interface which uses UNIX/POSIX \c read and \c write system calls to perform I/O. The file named <tt>"storage"</tt> in the current directory is opened in read-only mode. In line 9 an asynchronous read of the 1 MB region of the file starting at position 0 is issued. The data will be read into the array \c mybuffer. When the read operation is completed, <tt>my_handler::operator()</tt> will be called with a pointer to the completed request. The execution stops at line 11 waiting for the completion of the issued read operation. Note that the work done in the function <tt>do_something1()</tt> is overlapped with reading. When the I/O is finished, one can process the read buffer (line 12) and free it (line 13).
 
 \code
-using namespace stxxl;
 struct my_handler { // I/O completion handler
-    void operator () (request_ptr ptr) {
+    void operator () (stxxl::request_ptr ptr) {
         std::cout << "Request '" << *ptr << "' completed." << std::endl;
     }
 };
 char * mybuffer = new char[1024*1024]; // allocate 1MB buffer
-syscall_file myfile("./storage", file::RDONLY);
-request_ptr myreq = myfile.aread(mybuffer, 0, 1024*1024,my_handler());
+stxxl::syscall_file myfile("./storage", stxxl::file::RDONLY);
+stxxl::request_ptr myreq = myfile.aread(mybuffer, 0, 1024*1024, my_handler());
 do_something1(); // do_something1() is overlapped with reading
 myreq->wait();   // wait for read completion
 do_something2(mybuffer);// process the read buffer
@@ -99,13 +98,12 @@ The full signature of the STXXL "block of elements" class is stxxl::typed_block<
 In the following listing, we give an example of how to program block I/O using objects of the BM layer. In line 2 we define the type of block: its size is one megabyte and the type of elements is \c double. The pointer to the only instance of the singleton object stxxl::block_manager is obtained in line 5. Line 6 asks the block manager to allocate 32 blocks in external memory. The <tt>new_blocks</tt> call writes the allocated BIDs to the output iterator, given by the last parameter. The <tt>std::back_inserter</tt> iterator adapter will insert the output BIDs at the end of the array \c bids. The manager assigns blocks to disks in a round-robin fashion as the <tt>striping()</tt> strategy suggests. Line 7 allocates 32 internal memory blocks. The internal memory allocator stxxl::new_alloc<block_type> of STXXL allocates blocks on a virtual memory page boundary, which is a requirement for unbuffered file access. Along lines 8--10 the elements of blocks are filled with some values. Then, the blocks are submitted for writing (lines 11-12). The request objects are stored in an <tt>std::vector</tt> for the further status tracking. As in the AIO example, I/O is overlapped with computations in the function <tt>do_something()</tt>. After the completion of all write requests (line 15) we perform some useful processing with the written data (function <tt>do_something1()</tt>). Finally we free the external memory space occupied by the 32 blocks (line 18).
 
 \code
-using namespace stxxl;
-typedef typed_block<1024*1024,double> block_type;
+typedef stxxl::typed_block<1024*1024,double> block_type;
 std::vector<block_type::bid_type> bids; //empty array of BIDs
-std::vector<request_ptr> requests;
-block_manager * bm = block_manager::get_instance ();
-bm->new_blocks<block_type>(32, striping(), std::back_inserter(bids));
-std::vector<block_type,new_alloc<block_type> > blocks(32);
+std::vector<stxxl::request_ptr> requests;
+stxxl::block_manager * bm = stxxl::block_manager::get_instance ();
+bm->new_blocks<block_type>(32, stxxl::striping(), std::back_inserter(bids));
+std::vector< block_type, new_alloc<block_type> > blocks(32);
 for (int ii = 0; ii < 32; ii++)
     for (int jj=0; jj < block_type::size; jj++)
         blocks[ii][jj] = some_value(ii,jj);
@@ -113,7 +111,7 @@ for (int i = 0; i < 32; i++)
     requests.push_back( blocks[i].write(bids[i]) );
 do_something();	// do_something() is overlapped with writing
 // wait until all I/Os finish
-wait_all(requests.begin(), requests.end());
+stxxl::wait_all(requests.begin(), requests.end());
 do_something1(bids.begin(),bids.end());
 // deallocate external memory
 bm->delete_blocks(bids.begin(), bids.end());

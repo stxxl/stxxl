@@ -38,7 +38,7 @@ We can fill the vector by calling push_back() which appends a new value at the e
 \code
 for (int i = 0; i < 1024*1024; i++)
 {
-  my_vector.push_back(i);
+    my_vector.push_back(i);
 }
 // my_vector stores: 0 1 2 3 4 5 6 [...] 1024*1024
 \endcode
@@ -72,7 +72,7 @@ The operation pop_back() removes the last element of the vector (without returni
 \code
 // empty() returns true, if the vector is empty
 while (!my_vector.empty()) {
-  my_vector.pop_back();
+    my_vector.pop_back();
 }
 \endcode
 
@@ -92,32 +92,7 @@ std::cout << "vector empty? " << my_vector.empty() << std::endl;
 
 (See \ref examples/containers/vector_minimal1.cpp for the sourcecode of the following example).
 
-\code
-#include <stxxl/vector>
-#include <iostream>
-
-int main()
-{
-  typedef stxxl::VECTOR_GENERATOR<int>::result vector;
-  vector my_vector;
-
-  for (int i = 0; i < 10*1024*1024; i++)
-  {
-    my_vector.push_back(i+2);
-  }
-
-  std::cout << my_vector[99] << std::endl;
-  my_vector[100] = 0;
-
-  while(!my_vector.empty())
-  {
-    my_vector.pop_back();
-  }
-
-  return 0;
-}
-\endcode
-
+\snippet examples/containers/vector_minimal1.cpp example
 
 See \ref examples/containers/vector1.cpp for the sourcecode of a more comprehensive example.
 

@@ -468,14 +468,13 @@ Now we <b>"pipeline"</b> the random graph generation example shown in the previo
 The following code listing shows the pipelined code of the algorithm, the definitions of \c edge, \c random_edge, and \c edge_cmp are assumed to be available from the listing in the previous section.
 
 \code
-using namespace stxxl;
 class random_edge_stream {
-    int64 counter;
+    stxxl::int64 counter;
     edge current;
     random_edge_stream();
 public:
     typedef edge value_type;
-    random_edge_stream(int64 elements)
+    random_edge_stream(stxxl::int64 elements)
         : counter(elements), current(random_edge()())
     { }
     const edge & operator * () const { return current; }
@@ -490,13 +489,13 @@ public:
 };
 
 random_edge_stream RandomStream(10000000000ULL);
-typedef stream::sort<random_edge_stream, edge_cmp> sorted_stream;
+typedef stxxl::stream::sort<random_edge_stream, edge_cmp> sorted_stream;
 sorted_stream SortedStream(RandomStream, edge_cmp(), 512*1024*1024);
-typedef stream::unique<sorted_stream> unique_stream_type;
+typedef stxxl::stream::unique<sorted_stream> unique_stream_type;
 unique_stream_type UniqueStream(SortedStream);
 stxxl::vector<edge> ExtEdgeVec(10000000000ULL);
 stxxl::vector<edge>::iterator NewEnd =
-    stream::materialize(UniqueStream, ExtEdgeVec.begin());
+    stxxl::stream::materialize(UniqueStream, ExtEdgeVec.begin());
 ExtEdgeVec.resize(NewEnd - ExtEdgeVec.begin());
 \endcode
 

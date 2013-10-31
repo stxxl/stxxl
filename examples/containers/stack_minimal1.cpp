@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! [example]
 #include <stxxl/stack>
 
 int main()
@@ -35,3 +36,4 @@ int main()
 
     return 0;
 }
+//! [example]

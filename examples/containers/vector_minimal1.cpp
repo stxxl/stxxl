@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! [example]
 #include <stxxl/vector>
 #include <iostream>
 
@@ -33,3 +34,4 @@ int main()
 
     return 0;
 }
+//! [example]

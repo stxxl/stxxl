@@ -10,27 +10,27 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-//! [example]
 #define USE_STXXL
 
-#include <stxxl.h>       // STXXL header
-#include <algorithm>     // for STL sort
-#include <vector>        // for STL vector
+//! [prolog]
+#include <stxxl.h>      // STXXL header
+#include <algorithm>    // for STL std::sort
+#include <vector>       // for STL std::vector
+#include <fstream>      // for std::fstream
+#include <ctime>        // for time_t type
 
-#include <fstream>
-#include <ctime>
+#define CT_PER_MIN 2    // subscribers pay 2 cent per minute
 
-#define CT_PER_MIN 2
-
-struct LogEntry
+struct LogEntry // the event log data structure
 {
-    long long int from; // callers number
-    long long int to;   // destination number
+    long long int from; // callers number (64 bit integer)
+    long long int to;   // destination number (64 bit int)
     time_t timestamp;   // time of event
     int event;          // event type 1 - call started
                         //            2 - call ended
 };
 
+// input operator used for reading from the file
 std::istream & operator >> (std::istream & i, LogEntry & entry)
 {
     i >> entry.from;
@@ -40,6 +40,7 @@ std::istream & operator >> (std::istream & i, LogEntry & entry)
     return i;
 }
 
+// output operator used for writing to file
 std::ostream & operator << (std::ostream & i, const LogEntry & entry)
 {
     i << entry.from << " ";
@@ -49,11 +50,13 @@ std::ostream & operator << (std::ostream & i, const LogEntry & entry)
     return i;
 }
 
+// unary function used for producing the bills
 struct ProduceBill
 {
-    std::ostream & out;
-    stxxl::uint64 sum;
-    LogEntry last;
+    std::ostream & out; // stream for outputting
+    // the bills
+    unsigned sum;       // current subscribers debit
+    LogEntry last;      // the last record
 
     ProduceBill(std::ostream & o_) : out(o_), sum(0) { last.from = -1; }
 
@@ -99,29 +102,23 @@ struct SortByCaller
     // min sentinel = value which is strictly smaller that any input element
     static LogEntry min_value()
     {
-        LogEntry e;
-        e.from = (std::numeric_limits<long long int>::min)();
-        e.timestamp = (std::numeric_limits<time_t>::min)();
-        e.event = (std::numeric_limits<int>::min)();
-        return e;
+        LogEntry dummy;
+        dummy.from = std::numeric_limits<long long int>::min();
+        dummy.timestamp = std::numeric_limits<time_t>::min();
+        dummy.event = std::numeric_limits<int>::min();
+        return dummy;
     }
     // max sentinel = value which is strictly larger that any input element
     static LogEntry max_value()
     {
-        LogEntry e;
-        e.from = (std::numeric_limits<long long int>::max)();
-        e.timestamp = (std::numeric_limits<time_t>::max)();
-        e.event = (std::numeric_limits<int>::max)();
-        return e;
+        LogEntry dummy;
+        dummy.from = std::numeric_limits<long long int>::max();
+        dummy.timestamp = std::numeric_limits<time_t>::max();
+        dummy.event = std::numeric_limits<int>::max();
+        return dummy;
     }
 };
 
-
-#ifdef USE_STXXL
-typedef stxxl::vector<LogEntry> vector_type;
-#else
-typedef std::vector<LogEntry> vector_type;
-#endif
 
 void print_usage(const char * program)
 {
@@ -130,7 +127,13 @@ void print_usage(const char * program)
     std::cout << " main     - memory to use (in MiB)" << std::endl;
     std::cout << " billfile - file name of the output" << std::endl;
 }
+//! [prolog]
 
+#ifdef USE_STXXL
+typedef stxxl::vector<LogEntry> vector_type;
+#else
+typedef std::vector<LogEntry> vector_type;
+#endif
 
 int main(int argc, char * argv[])
 {

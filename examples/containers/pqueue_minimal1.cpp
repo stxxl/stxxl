@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *  examples/containers/pqueue_minimal1.cpp
  *
@@ -10,6 +11,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! [example]
 #include <stxxl/priority_queue>
 #include <iostream>
 #include <limits>
@@ -18,7 +20,7 @@
 struct ComparatorGreater
 {
     bool operator () (const int &a, const int &b) const
-    { return (a>b); }
+    { return (a > b); }
 
     int min_value() const
     { return (std::numeric_limits<int>::max) (); }
@@ -52,3 +54,4 @@ int main()
 
     return 0;
 }
+//! [example]

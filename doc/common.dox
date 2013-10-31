@@ -419,7 +419,7 @@ The STXXL library provides various I/O performance counters (stxxl::stats class)
 
 The Stats ostream holds various measured I/O data:
 
-\code
+\verbatim
 STXXL I/O statistics
  total number of reads                      : 2
  average block size (read)                  : 2097152 (2.000 MiB)
@@ -436,7 +436,7 @@ STXXL I/O statistics
  I/O wait4read time                         : 0.054934 s
  I/O wait4write time                        : 0.049638 s
  Time since the last reset                  : 0.605008 s
-\endcode
+\endverbatim
 
 We can access individual I/O data in contrast to the whole content of Stats ostream by:
 

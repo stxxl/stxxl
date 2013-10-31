@@ -10,6 +10,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! [example]
 #include <stxxl/sorter>
 #include <stxxl/stats>
 #include <stxxl/timer>
@@ -56,3 +57,4 @@ int main()
 
     return 0;
 }
+//! [example]
