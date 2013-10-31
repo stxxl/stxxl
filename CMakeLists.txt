@@ -197,6 +197,14 @@ elseif(NOT NO_CXX11)
   endif()
 endif()
 
+# check C++ compiler for C++11 features
+
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles(
+  "#include <vector>
+   int main() { std::vector<int> v(42); for (auto i : v) { ++i; } return 0; }"
+  STXXL_HAVE_CXX11_RANGE_FOR_LOOP)
+
 ###############################################################################
 # find thread and random library
 

@@ -90,7 +90,7 @@ void test_vector_buffered(uint64 size)
     STXXL_CHECK( sum == size / 1024 * (1024 * 1023 / 2) );
 }
 
-#if STXXL_HAVE_CXX11
+#if STXXL_HAVE_CXX11_RANGE_FOR_LOOP
 void test_vector_cxx11(uint64 size)
 {
     stxxl::scoped_print_timer tm("vector C++11 loop access", 2 * size * sizeof(uint64));
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
     test_vector_iterator(size);
     test_vector_buffered(size);
 
-#if STXXL_HAVE_CXX11
+#if STXXL_HAVE_CXX11_RANGE_FOR_LOOP
     test_vector_cxx11(size);
 #endif
 

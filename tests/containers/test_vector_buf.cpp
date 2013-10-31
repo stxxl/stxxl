@@ -222,7 +222,7 @@ void test_vector_buf(uint64 size)
 
         STXXL_CHECK( reader.empty() );
     }
-#if STXXL_HAVE_CXX11
+#if STXXL_HAVE_CXX11_RANGE_FOR_LOOP
     { // read vector using C++11 for loop construct
 
         stxxl::scoped_print_timer tm("C++11 for loop");
