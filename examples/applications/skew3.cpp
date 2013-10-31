@@ -29,7 +29,9 @@
 #include <stxxl/vector>
 #include <stxxl/bits/common/uint_types.h>
 
-using namespace stxxl;
+using stxxl::uint64;
+using stxxl::external_size_type;
+namespace stream = stxxl::stream;
 
 // 1 GiB ram used by external data structures / 1 MiB block size
 uint64 ram_use = 1024*1024*1024;
@@ -56,26 +58,26 @@ template <typename InputT, typename InputSA>
 bool sacheck(InputT& inputT, InputSA& inputSA)
 {
     typedef typename InputSA::value_type offset_type;
-    typedef tuple<offset_type, offset_type> pair_type;
-    typedef tuple<offset_type, offset_type, offset_type> triple_type;
+    typedef stxxl::tuple<offset_type, offset_type> pair_type;
+    typedef stxxl::tuple<offset_type, offset_type, offset_type> triple_type;
 
     // *** Pipeline Declaration ***
 
     // Build tuples with index: (SA[i]) -> (i, SA[i])
-    typedef counter<offset_type> index_counter_type;
+    typedef stxxl::counter<offset_type> index_counter_type;
     index_counter_type index_counter;
 
     typedef stream::make_tuple<index_counter_type, InputSA> tuple_index_sa_type;
     tuple_index_sa_type tuple_index_sa(index_counter, inputSA);
 
     // take (i, SA[i]) and sort to (ISA[i], i)
-    typedef tuple_less2nd<pair_type> pair_less_type;
+    typedef stxxl::tuple_less2nd<pair_type> pair_less_type;
     typedef typename stream::sort<tuple_index_sa_type, pair_less_type> build_isa_type;
 
     build_isa_type build_isa(tuple_index_sa, pair_less_type(), ram_use / 3);
 
     // build (ISA[i], T[i], ISA[i+1]) and sort to (i, T[SA[i]], ISA[SA[i]+1])
-    typedef tuple_less1st<triple_type> triple_less_type;  // comparison relation
+    typedef stxxl::tuple_less1st<triple_type> triple_less_type;  // comparison relation
 
     typedef typename stream::use_push<triple_type> triple_push_type;  // indicator use push()
     typedef typename stream::runs_creator<triple_push_type, triple_less_type> triple_rc_type;
@@ -198,12 +200,12 @@ class skew
 public:
 
     // 2-tuple, 3-tuple, 4-tuple (=quads), 5-tuple(=quints) definition
-    typedef tuple<offset_type, offset_type> skew_pair_type;
-    typedef tuple<offset_type, offset_type, offset_type> skew_triple_type;
-    typedef tuple<offset_type, offset_type, offset_type, offset_type> skew_quad_type;
-    typedef tuple<offset_type, offset_type, offset_type, offset_type, offset_type> skew_quint_type;
+    typedef stxxl::tuple<offset_type, offset_type> skew_pair_type;
+    typedef stxxl::tuple<offset_type, offset_type, offset_type> skew_triple_type;
+    typedef stxxl::tuple<offset_type, offset_type, offset_type, offset_type> skew_quad_type;
+    typedef stxxl::tuple<offset_type, offset_type, offset_type, offset_type, offset_type> skew_quint_type;
 
-    typedef typename VECTOR_GENERATOR<offset_type, 1, 2>::result offset_array_type;
+    typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2>::result offset_array_type;
     typedef stream::vector_iterator2stream<typename offset_array_type::iterator> offset_array_it_rg;
 
     /** Comparison function for the mod0 tuples. */
@@ -223,8 +225,8 @@ public:
         static value_type max_value() { return value_type::max_value(); }
     };
 
-    typedef tuple_less2nd<skew_quad_type> less_mod1;
-    typedef tuple_less2nd<skew_quint_type> less_mod2;
+    typedef stxxl::tuple_less2nd<skew_quad_type> less_mod1;
+    typedef stxxl::tuple_less2nd<skew_quint_type> less_mod2;
 
     /** Put the (0 mod 2) [which are the 1,2 mod 3 tuples] tuples at the begin. */
     struct less_skew
@@ -247,7 +249,7 @@ public:
     template <typename alphabet_type>
     struct less_quad
     {
-        typedef tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
+        typedef stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
 
         bool operator() (const value_type& a, const value_type& b) const
         {
@@ -338,7 +340,7 @@ public:
     class make_pairs
     {
     public:
-        typedef tuple<typename InputA::value_type, offset_type> value_type;
+        typedef stxxl::tuple<typename InputA::value_type, offset_type> value_type;
 
     private:
         InputA& A;
@@ -390,7 +392,7 @@ public:
     class make_quads
     {
     public:
-        typedef tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
+        typedef stxxl::tuple<offset_type, alphabet_type, alphabet_type, alphabet_type> value_type;
 
     private:
         Input & A;
@@ -722,7 +724,6 @@ public:
         static const unsigned int add_rank = 1;  // free first rank to mark ranks beyond end of input
 
     private:
-
         // mod1 types
         typedef typename stream::use_push < skew_quad_type > mod1_push_type;
         typedef typename stream::runs_creator < mod1_push_type, less_mod1> mod1_runs_type;
@@ -952,11 +953,11 @@ public:
     protected:
 
         // generate (i) sequence
-        typedef counter<offset_type> counter_stream_type;
+        typedef stxxl::counter<offset_type> counter_stream_type;
 
         // Sorter
-        typedef tuple_less1st<skew_pair_type> mod12cmp;
-        typedef sorter<skew_pair_type, mod12cmp> mod12_sorter_type;
+        typedef stxxl::tuple_less1st<skew_pair_type> mod12cmp;
+        typedef stxxl::sorter<skew_pair_type, mod12cmp> mod12_sorter_type;
 
         // Additional streaming items
         typedef stream::choose<mod12_sorter_type, 2> isa_second_type;
@@ -984,7 +985,7 @@ public:
             mod12_sorter_type m2_sorter(mod12cmp(), ram_use / 5);
 
             // sorted mod1 runs -concatenate- sorted mod2 runs
-            typedef concatenate <mod12_sorter_type, mod12_sorter_type> concatenation;
+            typedef stxxl::concatenate <mod12_sorter_type, mod12_sorter_type> concatenation;
 
             // (t_i) -> (i,t_i,t_{i+1},t_{i+2})
             offset_array_type text;
@@ -1193,15 +1194,17 @@ int process(const std::string& input_filename, const std::string& output_filenam
 {
     static const size_t block_size = sizeof(offset_type) * 1024 * 1024 / 2;
 
-    typedef typename VECTOR_GENERATOR<alphabet_type, 1, 2>::result alphabet_vector_type;
-    typedef typename VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_vector_type;
+    typedef typename stxxl::VECTOR_GENERATOR<alphabet_type, 1, 2>::result alphabet_vector_type;
+    typedef typename stxxl::VECTOR_GENERATOR<offset_type, 1, 2, block_size>::result offset_vector_type;
 
     // input and output files (if supplied via command line)
-    syscall_file *input_file = NULL, *output_file = NULL;
+    stxxl::syscall_file *input_file = NULL, *output_file = NULL;
 
     // input and output vectors for suffix array construction
     alphabet_vector_type input_vector;
     offset_vector_type output_vector;
+
+    using stxxl::file;
 
     if (input_verbatim)
     {
@@ -1212,7 +1215,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     else
     {
         // define input file object and map input_vector to input_file (no copying)
-        input_file = new syscall_file(input_filename, file::RDONLY | file::DIRECT);
+        input_file = new stxxl::syscall_file(input_filename, file::RDONLY | file::DIRECT);
         alphabet_vector_type file_input_vector(input_file);
         input_vector.swap( file_input_vector );
     }
@@ -1220,14 +1223,14 @@ int process(const std::string& input_filename, const std::string& output_filenam
     if (output_filename.size())
     {
         // define output file object and map output_vector to output_file
-        output_file = new syscall_file(output_filename, file::RDWR | file::CREAT | file::DIRECT);
+        output_file = new stxxl::syscall_file(output_filename, file::RDWR | file::CREAT | file::DIRECT);
         offset_vector_type file_output_vector(output_file);
         output_vector.swap( file_output_vector );
     }
 
     // I/O measurement
-    stats * Stats = stats::get_instance();
-    stats_data stats_begin(*Stats);
+    stxxl::stats * Stats = stxxl::stats::get_instance();
+    stxxl::stats_data stats_begin(*Stats);
 
     // construct skew class with bufreader input type
     typedef alphabet_vector_type::bufreader_type input_type;
@@ -1255,7 +1258,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
     stream::materialize(skew, output_vector.begin(), output_vector.end());
 
     std::cout << "output size = " << output_vector.size() << std::endl;
-    std::cout << (stats_data(*Stats) - stats_begin); // print i/o statistics
+    std::cout << (stxxl::stats_data(*Stats) - stats_begin); // print i/o statistics
 
     if (text_output_flag)
     {
@@ -1301,7 +1304,7 @@ int process(const std::string& input_filename, const std::string& output_filenam
 
 int main(int argc, char* argv[])
 {
-    cmdline_parser cp;
+    stxxl::cmdline_parser cp;
 
     cp.set_description("DC3 aka skew3 algorithm for external memory suffix array construction.");
     cp.set_author("Jens Mehnert <jmehnert@mpi-sb.mpg.de>, Timo Bingmann <tb@panthema.net>, Daniel Feist <daniel.feist@student.kit.edu>");
@@ -1327,14 +1330,14 @@ int main(int argc, char* argv[])
         return -1;
 
     if (wordsize == 32)
-        return process<uint32>(input_filename, output_filename, sizelimit,
-                               text_output_flag, check_flag, input_verbatim);
+        return process<stxxl::uint32>(input_filename, output_filename, sizelimit,
+                                      text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 40)
-        return process<uint40>(input_filename, output_filename, sizelimit,
-                               text_output_flag, check_flag, input_verbatim);
+        return process<stxxl::uint40>(input_filename, output_filename, sizelimit,
+                                      text_output_flag, check_flag, input_verbatim);
     else if (wordsize == 64)
-        return process<uint64>(input_filename, output_filename, sizelimit,
-                               text_output_flag, check_flag, input_verbatim);
+        return process<stxxl::uint64>(input_filename, output_filename, sizelimit,
+                                      text_output_flag, check_flag, input_verbatim);
     else
         std::cerr << "Invalid wordsize for suffix array: 32, 40 or 64 are allowed." << std::endl;
 

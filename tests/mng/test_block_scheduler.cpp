@@ -16,7 +16,7 @@
 #include <iostream>
 #include <limits>
 
-using namespace stxxl;
+using stxxl::int_type;
 
 template <class IBT>
 void set_pattern_A(IBT & ib)
@@ -51,7 +51,7 @@ int_type test_pattern_B(IBT & ib)
 }
 
 // forced instantiation
-template class stxxl::block_scheduler< swappable_block<int_type, 1024> >;
+template class stxxl::block_scheduler< stxxl::swappable_block<int_type, 1024> >;
 
 int main(int argc, char **argv)
 {
@@ -74,7 +74,8 @@ int main(int argc, char **argv)
 
     int_type internal_memory = int_type(internal_memory_megabytes) * 1048576;
 
-    typedef block_scheduler< swappable_block<value_type, block_size> > bst;
+    typedef stxxl::block_scheduler< stxxl::swappable_block<value_type, block_size> > bst;
+    typedef stxxl::swappable_block<value_type, block_size> swappable_block_type;
     typedef bst::swappable_block_identifier_type sbit;
     typedef bst::internal_block_type ibt;
     typedef bst::external_block_type ebt;
@@ -86,7 +87,7 @@ int main(int argc, char **argv)
         {   // ------------------- call all functions -----------------------
             STXXL_MSG("next test: call all functions");
             ebt ext_bl; // prepare an external_block with pattern A
-            block_manager::get_instance()->new_block(striping(), ext_bl);
+            stxxl::block_manager::get_instance()->new_block(stxxl::striping(), ext_bl);
             ibt * int_bl = new ibt;
             set_pattern_A(*int_bl);
             int_bl->write(ext_bl)->wait();
@@ -138,8 +139,8 @@ int main(int argc, char **argv)
             bs.free_swappable_block(sbi2);
             bs.explicit_timestep();
 
-            block_scheduler_algorithm_simulation< swappable_block<value_type, block_size> > * asim =
-                    new block_scheduler_algorithm_simulation< swappable_block<value_type, block_size> >(bs);
+            stxxl::block_scheduler_algorithm_simulation< swappable_block_type > * asim =
+                new stxxl::block_scheduler_algorithm_simulation< swappable_block_type >(bs);
             delete bs.switch_algorithm_to(asim);
             sbit sbi = bs.allocate_swappable_block();
             bs.acquire(sbi);
@@ -161,8 +162,8 @@ int main(int argc, char **argv)
                     STXXL_MSG("id: " << it->id << " op: " << it->op << " t: " << it->time);
             }
 
-            delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lfd< swappable_block<value_type, block_size> >(asim));
+            delete bs.switch_algorithm_to(
+                new stxxl::block_scheduler_algorithm_offline_lfd< swappable_block_type >(asim));
             sbi = bs.allocate_swappable_block();
             bs.acquire(sbi);
             bs.acquire(sbi);
@@ -179,8 +180,8 @@ int main(int argc, char **argv)
 
 #if 0
             // 2013-tb: segfaults for unknown reasons
-            delete bs.switch_algorithm_to(new
-                    block_scheduler_algorithm_offline_lru_prefetching< swappable_block<value_type, block_size> >(asim));
+            delete bs.switch_algorithm_to(
+                new stxxl::block_scheduler_algorithm_offline_lru_prefetching< swappable_block_type >(asim));
             sbi = bs.allocate_swappable_block();
             bs.acquire(sbi);
             bs.acquire(sbi);

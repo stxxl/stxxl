@@ -18,7 +18,8 @@
 #include <stxxl/bits/containers/matrix.h>
 #include <stxxl/bits/common/cmdline.h>
 
-using namespace stxxl;
+using stxxl::int_type;
+using stxxl::unsigned_type;
 
 struct constant_one
 {
@@ -101,7 +102,7 @@ class iterator_compare
 
     CompareIterator & compiter;
     ValueType current_value;
-    vector<error_type> errors;
+    stxxl::vector<error_type> errors;
 
 public:
     iterator_compare(CompareIterator & co)
@@ -122,7 +123,7 @@ public:
     ValueType & operator * () { return current_value; }
 
     unsigned_type get_num_errors() { return errors.size(); }
-    vector<error_type> & get_errors() { return errors; }
+    stxxl::vector<error_type> & get_errors() { return errors; }
 };
 
 // forced instantiation
@@ -172,8 +173,8 @@ int main(int argc, char **argv)
         STXXL_MSG("multiplying two int_type matrices of rank " << rank << " block order " << small_block_order);
         typedef int_type value_type;
 
-        typedef block_scheduler< matrix_swappable_block<value_type, small_block_order> > bst;
-        typedef matrix<value_type, small_block_order> mt;
+        typedef stxxl::block_scheduler< stxxl::matrix_swappable_block<value_type, small_block_order> > bst;
+        typedef stxxl::matrix<value_type, small_block_order> mt;
         typedef mt::row_vector_type rvt;
         typedef mt::column_vector_type cvt;
         typedef mt::row_major_iterator mitt;
@@ -185,8 +186,8 @@ int main(int argc, char **argv)
         mt * a = new mt(bs, rank, rank),
            * b = new mt(bs, rank, rank),
            * c = new mt(bs, rank, rank);
-        stats_data stats_before, stats_after;
-        matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
+        stxxl::stats_data stats_before, stats_after;
+        stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
         // ------ first run
         for (mitt mit = a->begin(); mit != a->end(); ++mit)
@@ -197,10 +198,10 @@ int main(int argc, char **argv)
         bs.flush();
         STXXL_MSG("start mult");
         matrix_stats_before.set();
-        stats_before = *stats::get_instance();
+        stats_before = *stxxl::stats::get_instance();
         *c = *a * *b;
         bs.flush();
-        stats_after = *stats::get_instance();
+        stats_after = *stxxl::stats::get_instance();
         matrix_stats_after.set();
         STXXL_MSG("end mult");
 
@@ -233,10 +234,10 @@ int main(int argc, char **argv)
         bs.flush();
         STXXL_MSG("start mult");
         matrix_stats_before.set();
-        stats_before = *stats::get_instance();
+        stats_before = *stxxl::stats::get_instance();
         *c = *a * *b;
         bs.flush();
-        stats_after = *stats::get_instance();
+        stats_after = *stxxl::stats::get_instance();
         matrix_stats_after.set();
         STXXL_MSG("end mult");
 
@@ -284,7 +285,7 @@ int main(int argc, char **argv)
 
             value_type v;
             v = w * x;
-            STXXL_UNUSED(v);
+            stxxl::STXXL_UNUSED(v);
         }
 
         delete a;
@@ -301,8 +302,8 @@ int main(int argc, char **argv)
 
         typedef double value_type;
 
-        typedef block_scheduler< matrix_swappable_block<value_type, block_order> > bst;
-        typedef matrix<value_type, block_order> mt;
+        typedef stxxl::block_scheduler< stxxl::matrix_swappable_block<value_type, block_order> > bst;
+        typedef stxxl::matrix<value_type, block_order> mt;
         typedef mt::row_major_iterator mitt;
         typedef mt::const_row_major_iterator cmitt;
 
@@ -311,8 +312,8 @@ int main(int argc, char **argv)
         mt * a = new mt(bs, rank, rank),
            * b = new mt(bs, rank, rank),
            * c = new mt(bs, rank, rank);
-        stats_data stats_before, stats_after;
-        matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
+        stxxl::stats_data stats_before, stats_after;
+        stxxl::matrix_operation_statistic_data matrix_stats_before, matrix_stats_after;
 
         STXXL_MSG("writing input matrices");
         for (mitt mit = a->begin(); mit != a->end(); ++mit)
@@ -323,13 +324,13 @@ int main(int argc, char **argv)
         bs.flush();
         STXXL_MSG("start of multiplication");
         matrix_stats_before.set();
-        stats_before = *stats::get_instance();
+        stats_before = *stxxl::stats::get_instance();
         if (mult_algo_num >= 0)
             *c = a->multiply(*b, mult_algo_num, sched_algo_num);
         else
             *c = a->multiply_internal(*b, sched_algo_num);
         bs.flush();
-        stats_after = *stats::get_instance();
+        stats_after = *stxxl::stats::get_instance();
         matrix_stats_after.set();
         STXXL_MSG("end of multiplication");
 
