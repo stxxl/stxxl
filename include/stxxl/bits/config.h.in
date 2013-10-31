@@ -28,6 +28,16 @@
 #cmakedefine STXXL_VERSION_GIT_REFSPEC "${STXXL_VERSION_GIT_REFSPEC}"
 #cmakedefine STXXL_VERSION_GIT_SHA1 "${STXXL_VERSION_GIT_SHA1}"
 
+#define STXXL_DIRECT_IO_OFF ${STXXL_DIRECT_IO_OFF}
+// default: 0/1 (platform dependent)
+// cmake:   detection of platform and flag
+// effect:  disables use of O_DIRECT flag on unsupported platforms
+
+#define STXXL_HAVE_MMAP_FILE ${STXXL_HAVE_MMAP_FILE}
+// default: 0/1 (platform dependent)
+// used in: io/mmap_file.h/cpp
+// effect:  enables/disables memory mapped file implementation
+
 #cmakedefine STXXL_POSIX_THREADS ${STXXL_POSIX_THREADS}
 // default: off
 // cmake:   detection of pthreads by cmake
@@ -80,11 +90,6 @@
 // default: off
 // cmake:   detection of <random>
 // effect:  uses std random generator on windows or (forced on linux)
-
-#cmakedefine STXXL_HAVE_ERAND48 ${STXXL_HAVE_ERAND48}
-// default: off
-// cmake:   detection of erand48() function in <stdlib.h>
-// effect:  uses this random generator (default on linux)
 
 #cmakedefine STXXL_HAVE_MALLINFO_PROTO ${STXXL_HAVE_MALLINFO_PROTO}
 // default: off

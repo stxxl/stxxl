@@ -30,7 +30,7 @@ __STXXL_BEGIN_NAMESPACE
 
 static inline bool exist_file(const std::string& path)
 {
-    STXXL_VERBOSE0("Checking " << path << " for disk configuration.");
+    STXXL_MSG("Checking " << path << " for disk configuration.");
     std::ifstream in(path.c_str());
     return in.good();
 }
@@ -62,12 +62,12 @@ void config::init_findconfig()
     {
         std::string basepath = "./.stxxl";
 
-        if (hostname && exist_file(basepath + "." + hostname)) {
+		if (hostname && exist_file(basepath + "." + hostname + suffix)) {
             init(basepath + "." + hostname + suffix);
             return;
         }
 
-        if (exist_file(basepath)) {
+		if (exist_file(basepath + suffix)) {
             init(basepath + suffix);
             return;
         }
@@ -78,12 +78,12 @@ void config::init_findconfig()
     {
         std::string basepath = std::string(home) + "/.stxxl";
 
-        if (hostname && exist_file(basepath + "." + hostname)) {
+		if (hostname && exist_file(basepath + "." + hostname + suffix)) {
             init(basepath + "." + hostname + suffix);
             return;
         }
 
-        if (exist_file(basepath)) {
+		if (exist_file(basepath + suffix)) {
             init(basepath + suffix);
             return;
         }
@@ -142,15 +142,15 @@ void config::init(const std::string& config_path)
         entry1.path += "stxxl";
         delete[] tmpstr;
 #endif
+        disks_props.push_back(entry1);
 #if 0
         DiskEntry entry2 =
         { "/tmp/stxxl1", "mmap", 100 * 1024 * 1024, true };
         DiskEntry entry3 =
         { "/tmp/stxxl2", "simdisk", 1000 * 1024 * 1024, false };
+        disks_props.push_back(entry2);
+        disks_props.push_back(entry3);
 #endif
-        disks_props.push_back(entry1);
-        //disks_props.push_back(entry2);
-        //disks_props.push_back(entry3);
     }
     else
     {

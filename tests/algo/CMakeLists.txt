@@ -15,25 +15,15 @@
 stxxl_build_test(test_asch)
 stxxl_build_test(test_bad_cmp)
 stxxl_build_test(test_ksort)
-stxxl_build_test(test_ksort_all_parameters)
 stxxl_build_test(test_random_shuffle)
 stxxl_build_test(test_scan)
 stxxl_build_test(test_sort)
-stxxl_build_test(test_sort_all_parameters)
 stxxl_build_test(test_stable_ksort)
-stxxl_build_test(test_stable_ksort_all_parameters)
 
 add_define(test_bad_cmp "STXXL_VERBOSE_LEVEL=0")
 add_define(test_ksort "STXXL_VERBOSE_LEVEL=1" "STXXL_CHECK_ORDER_IN_SORTS")
-add_define(test_ksort_all_parameters "STXXL_VERBOSE_STABLE_KSORT=STXXL_VERBOSE0" "STXXL_VERBOSE_LEVEL=0" "STXXL_CHECK_ORDER_IN_SORTS")
 add_define(test_random_shuffle "STXXL_VERBOSE_LEVEL=0")
 add_define(test_sort "STXXL_VERBOSE_LEVEL=0")
-
-if(MSVC AND BUILD_TESTS)
-  # requires /bigobj flag to build
-  set_target_properties(test_ksort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
-  set_target_properties(test_sort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
-endif()
 
 stxxl_test(test_asch 3 100 1000 42)
 stxxl_test(test_bad_cmp 16)
@@ -43,35 +33,51 @@ stxxl_test(test_scan)
 stxxl_test(test_sort)
 stxxl_test(test_stable_ksort)
 
-### extra sort tests:
-#test_sort_all_parameters         <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-#test_ksort_all_parameters        <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-#test_stable_ksort_all_parameters <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
-foreach(DATA 1024)
-  foreach(RAM 384)
+if(NOT CYGWIN AND NOT MINGW) #-tb too big to build on cygwin
+
+  stxxl_build_test(test_ksort_all_parameters)
+  stxxl_build_test(test_stable_ksort_all_parameters)
+  stxxl_build_test(test_sort_all_parameters)
+
+  add_define(test_ksort_all_parameters "STXXL_VERBOSE_STABLE_KSORT=STXXL_VERBOSE0" "STXXL_VERBOSE_LEVEL=0" "STXXL_CHECK_ORDER_IN_SORTS")
+
+  if(MSVC AND BUILD_TESTS)
+    # requires /bigobj flag to build
+    set_target_properties(test_ksort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
+    set_target_properties(test_sort_all_parameters PROPERTIES COMPILE_FLAGS /bigobj)
+  endif()
+
+  ### extra sort tests:
+  #test_sort_all_parameters         <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+  #test_ksort_all_parameters        <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+  #test_stable_ksort_all_parameters <MiB to sort> <MiB to use> <alloc_strategy [0..3]> <blk_size [0..14]> <seed>
+  foreach(DATA 1024)
+    foreach(RAM 384)
+      foreach(STRATEGY 0 1 2 3)
+        foreach(BLK_SIZE 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14)
+
+          stxxl_extra_test(test_sort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
+          stxxl_extra_test(test_ksort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
+          #-tb not fully implemented
+          #stxxl_extra_test(test_stable_ksort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
+
+        endforeach(BLK_SIZE)
+      endforeach(STRATEGY)
+    endforeach(RAM)
+  endforeach(DATA)
+
+  if(NOT BUILD_EXTRAS)
+
     foreach(STRATEGY 0 1 2 3)
-      foreach(BLK_SIZE 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14)
-
-        stxxl_extra_test(test_sort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
-        stxxl_extra_test(test_ksort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
-        #-tb not fully implemented
-        #stxxl_extra_test(test_stable_ksort_all_parameters ${DATA} ${RAM} ${STRATEGY} ${BLK_SIZE} 42)
-
-      endforeach(BLK_SIZE)
+      stxxl_test(test_sort_all_parameters 512 192 ${STRATEGY} 10 42)
+      stxxl_test(test_ksort_all_parameters 512 192 ${STRATEGY} 10 42)
+      #-tb not fully implemented
+      #stxxl_test(test_stable_ksort_all_parameters 512 192 ${STRATEGY} 10 42)
     endforeach(STRATEGY)
-  endforeach(RAM)
-endforeach(DATA)
 
-if(NOT BUILD_EXTRAS)
+  endif(NOT BUILD_EXTRAS)
 
-  foreach(STRATEGY 0 1 2 3)
-    stxxl_test(test_sort_all_parameters 512 192 ${STRATEGY} 10 42)
-    stxxl_test(test_ksort_all_parameters 512 192 ${STRATEGY} 10 42)
-    #-tb not fully implemented
-    #stxxl_test(test_stable_ksort_all_parameters 512 192 ${STRATEGY} 10 42)
-  endforeach(STRATEGY)
-
-endif(NOT BUILD_EXTRAS)
+endif()
 
 if(USE_GNU_PARALLEL)
 

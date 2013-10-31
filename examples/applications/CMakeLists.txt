@@ -10,9 +10,13 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
-stxxl_build_example(skew3)
+if(NOT CYGWIN AND NOT MINGW) #-tb too big to build on cygwin
 
-if(MSVC AND BUILD_TESTS)
-  # requires /bigobj flag to build
-  set_target_properties(skew3 PROPERTIES COMPILE_FLAGS /bigobj)
+  stxxl_build_example(skew3)
+
+  if(MSVC AND BUILD_TESTS)
+    # requires /bigobj flag to build
+    set_target_properties(skew3 PROPERTIES COMPILE_FLAGS /bigobj)
+  endif()
+
 endif()

@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
     char * buffer = (char *)stxxl::aligned_alloc<4096>(size);
     memset(buffer, 0, size);
 
-#ifndef STXXL_WINDOWS
+#if STXXL_HAVE_MMAP_FILE
     stxxl::mmap_file file1(tempfilename[0], file::CREAT | file::RDWR /* | file::DIRECT */, 0);
     file1.set_size(size * 1024);
 #endif

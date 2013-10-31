@@ -30,8 +30,6 @@
  #include <io.h>
 #else
  #include <unistd.h>
- #include <sys/resource.h>
- #include <sys/wait.h>
 #endif
 
 
@@ -65,7 +63,7 @@
 #endif
 
 
-#include <cassert>
+#include <assert.h>
 
 #include <stxxl/bits/libstxxl.h>
 #include <stxxl/bits/namespace.h>

@@ -17,15 +17,6 @@
 
 #include <stxxl/bits/config.h>
 
-#ifndef STXXL_HAVE_MMAP_FILE
-#ifndef STXXL_WINDOWS
-// mmap call does not exist in Windows
- #define STXXL_HAVE_MMAP_FILE 1
-#else
- #define STXXL_HAVE_MMAP_FILE 0
-#endif
-#endif
-
 #if STXXL_HAVE_MMAP_FILE
 
 #include <sys/mman.h>

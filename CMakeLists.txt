@@ -12,6 +12,8 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 ###############################################################################
 
+set(CMAKE_LEGACY_CYGWIN_WIN32 0) # needed to silence warning on cygwin
+
 # require cmake 2.6.4 (but please use 2.8.x)
 cmake_minimum_required(VERSION 2.6.4)
 
@@ -77,8 +79,12 @@ endif()
 
 option(NO_CXX11 "Build without C++11 flags" OFF)
 
-if(NOT MSVC)
-  # default to build shared libraries on non-MSVC platforms
+if(MSVC OR CYGWIN OR MINGW)
+  # shared libraries are not recommended (read: do not work well) on these platforms
+  set(BUILD_SHARED_LIBS OFF)
+  set(BUILD_STATIC_LIBS ON)
+else()
+  # default to build shared libraries on other platforms
   option(BUILD_SHARED_LIBS "Build shared library version of libstxxl" ON)
   option(BUILD_STATIC_LIBS "Build static library version of libstxxl" OFF)
 endif()
@@ -184,6 +190,8 @@ endif()
 # enable C++11
 if(MSVC)
   # MSVC 11 or greater has C++11 automatically enabled
+elseif(CYGWIN)
+  # C++11 is very restrictive on Cygwin
 elseif(NOT NO_CXX11)
   # try -std= flags to enable C++11
   check_cxx_compiler_flag(-std=c++11 CXX_HAS_STD_CXX11)
@@ -246,6 +254,42 @@ if (HAVE_LARGEFILES)
 else (NOT HAVE_LARGEFILES)
   message(FATAL_ERROR "Large file support was not detectable.")
 endif (HAVE_LARGEFILES)
+
+###############################################################################
+# check for O_DIRECT flag
+
+if(CYGWIN)
+  #-tb O_DIRECT messes up cygwin
+  set(STXXL_DIRECT_IO_OFF 1)
+else()
+
+  include(CheckCXXSourceCompiles)
+  check_cxx_source_compiles("
+#include <unistd.h>
+#include <fcntl.h>
+int main(int argc, char * argv[]) { argc = O_DIRECT; }
+" STXXL_HAVE_O_DIRECT)
+
+  if (STXXL_HAVE_O_DIRECT)
+    set(STXXL_DIRECT_IO_OFF 0)
+  else()
+    set(STXXL_DIRECT_IO_OFF 1)
+  endif()
+
+endif()
+
+if(STXXL_DIRECT_IO_OFF)
+  message(WARNING
+    "The open() flag O_DIRECT was disabled!\n"
+    "This means that STXXL cannot bypass the system cache on your system, which may degrade performance.")
+endif()
+
+###############################################################################
+# check for mmap() function in sys/mman.h
+
+include(CheckSymbolExists)
+set(STXXL_HAVE_MMAP_FILE 0)
+check_symbol_exists(mmap "sys/mman.h" STXXL_HAVE_MMAP_FILE)
 
 ###############################################################################
 # check for an atomic add-and-fetch intrinsic for counting_ptr

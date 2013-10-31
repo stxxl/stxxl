@@ -17,14 +17,16 @@
 #include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/common/error_handling.h>
 
-#ifdef STXXL_WINDOWS
- #define NOMINMAX
- #include <windows.h>
+#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
+  #ifndef NOMINMAX
+    #define NOMINMAX
+  #endif
+  #include <windows.h>
 #else
- #include <unistd.h>
- #include <fcntl.h>
+  #include <unistd.h>
+  #include <fcntl.h>
 #endif
-#include <cstdio>
+#include <stdio.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -66,7 +68,7 @@ ufs_file_base::ufs_file_base(
         flags |= O_TRUNC;
     }
 
-#ifndef STXXL_DIRECT_IO_OFF
+#if !defined(STXXL_DIRECT_IO_OFF)
     if (mode & DIRECT)
     {
         flags |= O_DIRECT;
@@ -84,7 +86,7 @@ ufs_file_base::ufs_file_base(
     flags |= O_BINARY;                     // the default in MS is TEXT mode
 #endif
 
-#ifdef STXXL_WINDOWS
+#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
     const int perms = S_IREAD | S_IWRITE;
 #else
     const int perms = S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP;
@@ -140,7 +142,7 @@ void ufs_file_base::close()
 
 void ufs_file_base::lock()
 {
-#ifdef STXXL_WINDOWS
+#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
     // not yet implemented
 #else
     scoped_mutex_lock fd_lock(fd_mutex);
@@ -156,7 +158,7 @@ void ufs_file_base::lock()
 
 file::offset_type ufs_file_base::_size()
 {
-#ifdef STXXL_WINDOWS
+#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
     struct _stat64 st;
     stxxl_check_ge_0(_fstat64(file_des, &st), io_error);
 #else
@@ -184,7 +186,7 @@ void ufs_file_base::_set_size(offset_type newsize)
 
     if (!(mode_ & RDONLY))
     {
-#ifdef STXXL_WINDOWS
+#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
         HANDLE hfile;
         stxxl_check_ge_0(hfile = (HANDLE) ::_get_osfhandle(file_des), io_error);
 
@@ -203,7 +205,7 @@ void ufs_file_base::_set_size(offset_type newsize)
 #endif
     }
 
-#ifndef STXXL_WINDOWS
+#if !defined(STXXL_WINDOWS)
     if (newsize > cur_size)
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
 #endif

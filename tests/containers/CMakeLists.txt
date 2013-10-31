@@ -54,9 +54,9 @@ stxxl_test(test_vector)
 stxxl_test(test_vector_buf)
 stxxl_test(test_vector_export)
 stxxl_test(test_vector_sizes "${STXXL_TMPDIR}/out" syscall)
-if(NOT MSVC)
+if(STXXL_HAVE_MMAP_FILE)
   stxxl_test(test_vector_sizes "${STXXL_TMPDIR}/out" mmap)
-endif(NOT MSVC)
+endif(STXXL_HAVE_MMAP_FILE)
 if(USE_BOOST)
   #-tb: boostfd does not work right with vector, because boostfd does not
   #correctly support set_size() (truncate and extending of files). FIXME
