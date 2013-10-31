@@ -27,7 +27,7 @@ install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get -qq update
   - if [ "$CMAKE_CXX" == "g++-4.8" ]; then sudo apt-get install g++-4.8; fi
-  - if [ "$USE_BOOST" == "ON" ]; then sudo apt-get install libboost1.48-all-dev; fi
+  - if [ "$USE_BOOST" == "ON" ]; then sudo apt-get install libboost-all-dev; fi
 
 before_script:
   - mkdir build && cd build && cmake -DCMAKE_C_COMPILER=$CMAKE_CC -DCMAKE_CXX_COMPILER=$CMAKE_CXX -DBUILD_TESTS=ON -DTRY_COMPILE_HEADERS=ON -DUSE_BOOST=$USE_BOOST $CMAKE_ARGS ..

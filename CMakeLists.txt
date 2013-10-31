@@ -267,7 +267,7 @@ if(USE_BOOST)
     set(Boost_USE_STATIC_LIBS ON)
   endif(WIN32)
 
-  find_package(Boost 1.36.0 REQUIRED COMPONENTS thread date_time chrono iostreams system filesystem)
+  find_package(Boost 1.36.0 REQUIRED COMPONENTS thread date_time iostreams system filesystem)
 
   # force caching of variables to display them to the user
   set(BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Boost installation root." FORCE)
