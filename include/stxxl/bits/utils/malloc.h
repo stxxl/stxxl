@@ -23,6 +23,8 @@
 #include <cstdlib>
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/config.h>
+#include <stxxl/bits/unused.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -33,7 +35,7 @@ __STXXL_BEGIN_NAMESPACE
 //! malloc is default C++ allocator
 class malloc_stats
 {
-#if !defined(__APPLE__) && !defined(__FreeBSD__)
+#if STXXL_HAVE_MALLINFO_PROTO
 
 public:
     typedef int return_type;
@@ -119,7 +121,7 @@ public:
 //! Prints current malloc statistics in a convenient way.
 inline std::ostream & operator << (std::ostream & s, const malloc_stats & st)
 {
-#if !defined(__APPLE__) && !defined(__FreeBSD__)
+#if STXXL_HAVE_MALLINFO_PROTO
     s << "MALLOC statistics" << std::endl;
     s << "=================================================================" << std::endl;
     s << "Space allocated from system not using mmap: " << st.from_system_nmmap() << " bytes" << std::endl;

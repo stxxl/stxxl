@@ -15,8 +15,11 @@
 #define STXXL_IOBASE_HEADER
 
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/config.h>
 
+#ifndef STXXL_MSVC
 #warning this is an obsolete header
+#endif
 
 __STXXL_BEGIN_NAMESPACE
 

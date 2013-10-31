@@ -50,8 +50,8 @@ int main()
 
     block_type * block = new block_type[2];
     STXXL_MSG(std::hex);
-    STXXL_MSG("Allocated block address    : " << (uintptr_t)(block));
-    STXXL_MSG("Allocated block address + 1: " << (uintptr_t)(block + 1));
+    STXXL_MSG("Allocated block address    : " << (stxxl::unsigned_type)(block));
+    STXXL_MSG("Allocated block address + 1: " << (stxxl::unsigned_type)(block + 1));
     STXXL_MSG(std::dec);
     unsigned i = 0;
     for (i = 0; i < block_type::size; ++i)

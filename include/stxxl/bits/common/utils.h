@@ -20,6 +20,7 @@
 #include <string>
 #include <cmath>
 #include <cstdlib>
+#include <algorithm>
 #include <sstream>
 
 #include <stxxl/bits/config.h>

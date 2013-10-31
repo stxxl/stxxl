@@ -261,6 +261,9 @@ endif (HAVE_LARGEFILES)
 if(CYGWIN)
   #-tb O_DIRECT messes up cygwin
   set(STXXL_DIRECT_IO_OFF 1)
+elseif(MSVC)
+  # have FILE_FLAG_NO_BUFFERING on Windows
+  set(STXXL_DIRECT_IO_OFF 0)
 else()
 
   include(CheckCXXSourceCompiles)
@@ -311,7 +314,14 @@ if(USE_BOOST)
     set(Boost_USE_STATIC_LIBS ON)
   endif(WIN32)
 
-  find_package(Boost 1.36.0 REQUIRED COMPONENTS thread date_time iostreams system filesystem)
+  find_package(Boost 1.40.0 REQUIRED)
+
+  if(Boost_VERSION GREATER 104699)
+    #-tb Boost >= 1.47.0 found, we must also link with libboost_chrono for MSVC to work.
+    find_package(Boost 1.47.0 REQUIRED COMPONENTS thread date_time chrono iostreams system filesystem)
+  else()
+    find_package(Boost 1.40.0 REQUIRED COMPONENTS thread date_time iostreams system filesystem)
+  endif()
 
   # force caching of variables to display them to the user
   set(BOOST_ROOT "${BOOST_ROOT}" CACHE PATH "Boost installation root." FORCE)
@@ -488,7 +498,7 @@ endmacro (add_define TESTNAME)
 if(TRY_COMPILE_HEADERS)
 
   include(CheckCXXSourceCompiles)
-  set(CMAKE_REQUIRED_INCLUDES ${STXXL_INCLUDE_DIRS})
+  set(CMAKE_REQUIRED_INCLUDES ${STXXL_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
   set(CMAKE_REQUIRED_LIBRARIES ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
   file(GLOB_RECURSE header_files FOLLOW_SYMLINKS "include/*")
