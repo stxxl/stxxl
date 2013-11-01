@@ -14,8 +14,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_WFSFILEBASE_HEADER
-#define STXXL_WFSFILEBASE_HEADER
+#ifndef STXXL_IO_WFS_FILE_BASE_HEADER
+#define STXXL_IO_WFS_FILE_BASE_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -61,4 +61,4 @@ __STXXL_END_NAMESPACE
 
 #endif // #ifdef STXXL_WINDOWS
 
-#endif // !STXXL_WFSFILEBASE_HEADER
+#endif // !STXXL_IO_WFS_FILE_BASE_HEADER

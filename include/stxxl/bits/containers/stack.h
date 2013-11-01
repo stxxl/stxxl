@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_STACK_HEADER
-#define STXXL_STACK_HEADER
+#ifndef STXXL_CONTAINERS_STACK_HEADER
+#define STXXL_CONTAINERS_STACK_HEADER
 
 #include <stack>
 #include <vector>
@@ -969,5 +969,5 @@ void swap(stxxl::migrating_stack<CritSize, ExternalStack, InternalStack> & a,
 }
 }
 
-#endif // !STXXL_STACK_HEADER
+#endif // !STXXL_CONTAINERS_STACK_HEADER
 // vim: et:ts=4:sw=4

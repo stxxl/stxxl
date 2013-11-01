@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SEED_HEADER
-#define STXXL_SEED_HEADER
+#ifndef STXXL_COMMON_SEED_HEADER
+#define STXXL_COMMON_SEED_HEADER
 
 #include <stxxl/bits/namespace.h>
 
@@ -27,4 +27,4 @@ unsigned get_next_seed();
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SEED_HEADER
+#endif // !STXXL_COMMON_SEED_HEADER

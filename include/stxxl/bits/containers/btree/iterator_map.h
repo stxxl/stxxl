@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
-#define STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H
+#ifndef STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER
+#define STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER
 
 #include <map>
 
@@ -163,4 +163,4 @@ namespace std
     }
 }
 
-#endif /* STXXL_CONTAINERS_BTREE__ITERATOR_MAP_H */
+#endif // !STXXL_CONTAINERS_BTREE_ITERATOR_MAP_HEADER

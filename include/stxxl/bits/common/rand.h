@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_RAND_HEADER
-#define STXXL_RAND_HEADER
+#ifndef STXXL_COMMON_RAND_HEADER
+#define STXXL_COMMON_RAND_HEADER
 
 #include <cstdlib>
 #include <cmath>
@@ -259,4 +259,4 @@ struct random_number64
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_RAND_HEADER
+#endif // !STXXL_COMMON_RAND_HEADER

@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SWITCH_HEADER
-#define STXXL_SWITCH_HEADER
+#ifndef STXXL_COMMON_SWITCH_HEADER
+#define STXXL_COMMON_SWITCH_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -152,4 +152,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SWITCH_HEADER
+#endif // !STXXL_COMMON_SWITCH_HEADER

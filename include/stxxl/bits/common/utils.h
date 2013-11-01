@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_UTILS_HEADER
-#define STXXL_UTILS_HEADER
+#ifndef STXXL_COMMON_UTILS_HEADER
+#define STXXL_COMMON_UTILS_HEADER
 
 #include <vector>
 #include <string>
@@ -295,5 +295,5 @@ inline typename Container::value_type pop_begin(Container & c)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_UTILS_HEADER
+#endif // !STXXL_COMMON_UTILS_HEADER
 // vim: et:ts=4:sw=4

@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BUF_OSTREAM_HEADER
-#define STXXL_BUF_OSTREAM_HEADER
+#ifndef STXXL_MNG_BUF_OSTREAM_HEADER
+#define STXXL_MNG_BUF_OSTREAM_HEADER
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/mng/buf_writer.h>
@@ -126,4 +126,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_BUF_OSTREAM_HEADER
+#endif // !STXXL_MNG_BUF_OSTREAM_HEADER

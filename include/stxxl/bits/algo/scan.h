@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SCAN_HEADER
-#define STXXL_SCAN_HEADER
+#ifndef STXXL_ALGO_SCAN_HEADER
+#define STXXL_ALGO_SCAN_HEADER
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/mng/buf_istream.h>
@@ -295,5 +295,5 @@ ExtIterator find(ExtIterator begin, ExtIterator end, const EqualityComparable & 
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SCAN_HEADER
+#endif // !STXXL_ALGO_SCAN_HEADER
 // vim: et:ts=4:sw=4

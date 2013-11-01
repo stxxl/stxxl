@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG__CONFIG_H
-#define STXXL_MNG__CONFIG_H
+#ifndef STXXL_MNG_CONFIG_HEADER
+#define STXXL_MNG_CONFIG_HEADER
 
 #include <vector>
 #include <string>
@@ -116,5 +116,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_MNG__CONFIG_H
+#endif // !STXXL_MNG_CONFIG_HEADER
 // vim: et:ts=4:sw=4

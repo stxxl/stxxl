@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_PQ_EXT_MERGER_HEADER
-#define STXXL_PQ_EXT_MERGER_HEADER
+#ifndef STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
+#define STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 
 #include <stxxl/bits/containers/pq_helpers.h>
 
@@ -1112,5 +1112,5 @@ protected:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_PQ_EXT_MERGER_HEADER
+#endif // !STXXL_CONTAINERS_PQ_EXT_MERGER_HEADER
 // vim: et:ts=4:sw=4

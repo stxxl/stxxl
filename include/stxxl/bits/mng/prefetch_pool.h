@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_PREFETCH_POOL_HEADER
-#define STXXL_PREFETCH_POOL_HEADER
+#ifndef STXXL_MNG_PREFETCH_POOL_HEADER
+#define STXXL_MNG_PREFETCH_POOL_HEADER
 
 #include <list>
 #include <stxxl/bits/config.h>
@@ -294,5 +294,5 @@ namespace std
     }
 }
 
-#endif // !STXXL_PREFETCH_POOL_HEADER
+#endif // !STXXL_MNG_PREFETCH_POOL_HEADER
 // vim: et:ts=4:sw=4

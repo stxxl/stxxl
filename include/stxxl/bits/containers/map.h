@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MAP_HEADER
-#define STXXL_MAP_HEADER
+#ifndef STXXL_CONTAINERS_MAP_HEADER
+#define STXXL_CONTAINERS_MAP_HEADER
 
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/containers/btree/btree.h>
@@ -463,4 +463,4 @@ namespace std
     }
 }
 
-#endif // !STXXL_MAP_HEADER
+#endif // !STXXL_CONTAINERS_MAP_HEADER

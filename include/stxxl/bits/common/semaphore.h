@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SEMAPHORE_HEADER
-#define STXXL_SEMAPHORE_HEADER
+#ifndef STXXL_COMMON_SEMAPHORE_HEADER
+#define STXXL_COMMON_SEMAPHORE_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -139,4 +139,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SEMAPHORE_HEADER
+#endif // !STXXL_COMMON_SEMAPHORE_HEADER

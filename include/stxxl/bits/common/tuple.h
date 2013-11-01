@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_TUPLE_HEADER
-#define STXXL_TUPLE_HEADER
+#ifndef STXXL_COMMON_TUPLE_HEADER
+#define STXXL_COMMON_TUPLE_HEADER
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/tmeta.h>
@@ -637,4 +637,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_TUPLE_HEADER
+#endif // !STXXL_COMMON_TUPLE_HEADER

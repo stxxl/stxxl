@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SEQUENCE_HEADER
-#define STXXL_SEQUENCE_HEADER
+#ifndef STXXL_CONTAINERS_SEQUENCE_HEADER
+#define STXXL_CONTAINERS_SEQUENCE_HEADER
 
 #include <deque>
 
@@ -790,5 +790,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SEQUENCE_HEADER
+#endif // !STXXL_CONTAINERS_SEQUENCE_HEADER
 // vim: et:ts=4:sw=4

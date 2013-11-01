@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_STABLE_KSORT_HEADER
-#define STXXL_STABLE_KSORT_HEADER
+#ifndef STXXL_ALGO_STABLE_KSORT_HEADER
+#define STXXL_ALGO_STABLE_KSORT_HEADER
 
 // it is a first try: distribution sort without sampling
 // I rework the stable_ksort when I would have a time
@@ -466,4 +466,4 @@ void stable_ksort(ExtIterator_ first, ExtIterator_ last, unsigned_type M)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_STABLE_KSORT_HEADER
+#endif // !STXXL_ALGO_STABLE_KSORT_HEADER

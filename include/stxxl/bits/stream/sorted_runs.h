@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_STREAM__SORTED_RUNS_H
-#define STXXL_STREAM__SORTED_RUNS_H
+#ifndef STXXL_STREAM_SORTED_RUNS_HEADER
+#define STXXL_STREAM_SORTED_RUNS_HEADER
 
 #include <vector>
 #include <stxxl/bits/mng/mng.h>
@@ -125,5 +125,5 @@ namespace stream
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_STREAM__SORTED_RUNS_H
+#endif // !STXXL_STREAM_SORTED_RUNS_HEADER
 // vim: et:ts=4:sw=4

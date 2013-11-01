@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SORT_HELPER_HEADER
-#define STXXL_SORT_HELPER_HEADER
+#ifndef STXXL_ALGO_SORT_HELPER_HEADER
+#define STXXL_ALGO_SORT_HELPER_HEADER
 
 #include <algorithm>
 #include <functional>
@@ -139,5 +139,5 @@ namespace sort_helper
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SORT_HELPER_HEADER
+#endif // !STXXL_ALGO_SORT_HELPER_HEADER
 // vim: et:ts=4:sw=4

@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MATRIX_LOW_LEVEL_HEADER
-#define STXXL_MATRIX_LOW_LEVEL_HEADER
+#ifndef STXXL_CONTAINERS_MATRIX_LOW_LEVEL_HEADER
+#define STXXL_CONTAINERS_MATRIX_LOW_LEVEL_HEADER
 
 #ifndef STXXL_BLAS
 #define STXXL_BLAS 0
@@ -733,4 +733,4 @@ struct low_level_matrix_multiply_and_add<blas_double_complex, BlockSideLength>
 
 __STXXL_END_NAMESPACE
 
-#endif /* STXXL_MATRIX_LOW_LEVEL_HEADER */
+#endif // !STXXL_CONTAINERS_MATRIX_LOW_LEVEL_HEADER

@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IOBASE_HEADER
-#define STXXL_IOBASE_HEADER
+#ifndef STXXL_IO_IOBASE_HEADER
+#define STXXL_IO_IOBASE_HEADER
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/config.h>
@@ -32,5 +32,5 @@ __STXXL_BEGIN_NAMESPACE
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IOBASE_HEADER
+#endif // !STXXL_IO_IOBASE_HEADER
 // vim: et:ts=4:sw=4

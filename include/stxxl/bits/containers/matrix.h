@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MATRIX_HEADER
-#define STXXL_MATRIX_HEADER
+#ifndef STXXL_CONTAINERS_MATRIX_HEADER
+#define STXXL_CONTAINERS_MATRIX_HEADER
 
 #include <stxxl/bits/containers/vector.h>
 #include <stxxl/bits/common/counting_ptr.h>
@@ -1364,5 +1364,5 @@ protected:
 
 __STXXL_END_NAMESPACE
 
-#endif /* STXXL_MATRIX_HEADER */
+#endif // !STXXL_CONTAINERS_MATRIX_HEADER
 // vim: et:ts=4:sw=4

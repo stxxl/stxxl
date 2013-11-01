@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_ADDRESSABLE_QUEUES_HEADER
-#define STXXL_ADDRESSABLE_QUEUES_HEADER
+#ifndef STXXL_COMMON_ADDRESSABLE_QUEUES_HEADER
+#define STXXL_COMMON_ADDRESSABLE_QUEUES_HEADER
 
 #include <set>
 #include <list>
@@ -196,4 +196,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif /* STXXL_ADDRESSABLE_QUEUES_HEADER */
+#endif // !STXXL_COMMON_ADDRESSABLE_QUEUES_HEADER

@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_TYPES_HEADER
-#define STXXL_TYPES_HEADER
+#ifndef STXXL_COMMON_TYPES_HEADER
+#define STXXL_COMMON_TYPES_HEADER
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -71,4 +71,4 @@ typedef uint64 external_size_type;         // may require external memory
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_TYPES_HEADER
+#endif // !STXXL_COMMON_TYPES_HEADER

@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__REQUEST_H_
-#define STXXL_IO__REQUEST_H_
+#ifndef STXXL_IO_REQUEST_HEADER
+#define STXXL_IO_REQUEST_HEADER
 
 #include <cassert>
 
@@ -116,5 +116,5 @@ typedef counting_ptr<request> request_ptr;
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO__REQUEST_H_
+#endif // !STXXL_IO_REQUEST_HEADER
 // vim: et:ts=4:sw=4

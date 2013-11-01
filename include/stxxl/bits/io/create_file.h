@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__CREATE_FILE_H_
-#define STXXL_IO__CREATE_FILE_H_
+#ifndef STXXL_IO_CREATE_FILE_HEADER
+#define STXXL_IO_CREATE_FILE_HEADER
 
 #include <stxxl/bits/io/file.h>
 
@@ -26,5 +26,5 @@ file * create_file(const std::string & io_impl,
 
 __STXXL_END_NAMESPACE
 
-#endif  // !STXXL_IO__CREATE_FILE_H_
+#endif // !STXXL_IO_CREATE_FILE_HEADER
 // vim: et:ts=4:sw=4

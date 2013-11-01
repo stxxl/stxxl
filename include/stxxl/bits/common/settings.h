@@ -10,13 +10,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#ifndef STXXL_COMMON_SETTINGS_HEADER
+#define STXXL_COMMON_SETTINGS_HEADER
+
 /*!
  * @file settings.h
  * Provides a static class to store runtime tuning parameters.
  */
-
-#ifndef STXXL_SETTINGS_HEADER
-#define STXXL_SETTINGS_HEADER
 
 #include <stxxl/bits/namespace.h>
 
@@ -37,4 +37,4 @@ typedef settings<> SETTINGS;
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SETTINGS_HEADER
+#endif // !STXXL_COMMON_SETTINGS_HEADER

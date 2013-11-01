@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_VECTOR_HEADER
-#define STXXL_VECTOR_HEADER
+#ifndef STXXL_CONTAINERS_VECTOR_HEADER
+#define STXXL_CONTAINERS_VECTOR_HEADER
 
 #include <vector>
 #include <queue>
@@ -2427,5 +2427,5 @@ void swap(stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, Siz
 
 } // namespace std
 
-#endif // !STXXL_VECTOR_HEADER
+#endif // !STXXL_CONTAINERS_VECTOR_HEADER
 // vim: et:ts=4:sw=4

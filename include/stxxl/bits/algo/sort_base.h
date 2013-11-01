@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SORT_BASE_HEADER
-#define STXXL_SORT_BASE_HEADER
+#ifndef STXXL_ALGO_SORT_BASE_HEADER
+#define STXXL_ALGO_SORT_BASE_HEADER
 
 #include <cmath>
 #include <stxxl/bits/common/types.h>
@@ -45,5 +45,5 @@ inline unsigned_type optimal_merge_factor(unsigned_type num_runs, unsigned_type 
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SORT_BASE_HEADER
+#endif // !STXXL_ALGO_SORT_BASE_HEADER
 // vim: et:ts=4:sw=4

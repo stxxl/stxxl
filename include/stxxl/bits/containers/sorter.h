@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SORTER_HEADER
-#define STXXL_SORTER_HEADER
+#ifndef STXXL_CONTAINERS_SORTER_HEADER
+#define STXXL_CONTAINERS_SORTER_HEADER
 
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/stream/sort_stream.h>
@@ -249,5 +249,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SORTER_HEADER
+#endif // !STXXL_CONTAINERS_SORTER_HEADER
 // vim: et:ts=4:sw=4

@@ -14,8 +14,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BOOSTFD_FILE_H_
-#define STXXL_BOOSTFD_FILE_H_
+#ifndef STXXL_IO_BOOSTFD_FILE_HEADER
+#define STXXL_IO_BOOSTFD_FILE_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -67,4 +67,4 @@ __STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_BOOSTFD_FILE
 
-#endif  // !STXXL_BOOSTFD_FILE_H_
+#endif // !STXXL_IO_BOOSTFD_FILE_HEADER

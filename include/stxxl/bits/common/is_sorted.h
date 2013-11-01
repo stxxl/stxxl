@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IS_SORTED_HEADER
-#define STXXL_IS_SORTED_HEADER
+#ifndef STXXL_COMMON_IS_SORTED_HEADER
+#define STXXL_COMMON_IS_SORTED_HEADER
 
 #include <stxxl/bits/namespace.h>
 
@@ -65,4 +65,4 @@ bool is_sorted(_ForwardIter __first, _ForwardIter __last,
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IS_SORTED_HEADER
+#endif // !STXXL_COMMON_IS_SORTED_HEADER

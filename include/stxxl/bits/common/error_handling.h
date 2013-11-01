@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_ERROR_HANDLING_HEADER
-#define STXXL_ERROR_HANDLING_HEADER
+#ifndef STXXL_COMMON_ERROR_HANDLING_HEADER
+#define STXXL_COMMON_ERROR_HANDLING_HEADER
 
 #include <sstream>
 #include <cerrno>
@@ -107,4 +107,4 @@ inline bool helper_check_ne_0(INT res, const char * func_name)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_ERROR_HANDLING_HEADER
+#endif // !STXXL_COMMON_ERROR_HANDLING_HEADER

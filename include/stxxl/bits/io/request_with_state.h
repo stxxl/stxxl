@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__REQUEST_WITH_STATE_H_
-#define STXXL_IO__REQUEST_WITH_STATE_H_
+#ifndef STXXL_IO_REQUEST_WITH_STATE_HEADER
+#define STXXL_IO_REQUEST_WITH_STATE_HEADER
 
 #include <stxxl/bits/common/state.h>
 #include <stxxl/bits/io/request.h>
@@ -57,5 +57,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO__REQUEST_WITH_STATE_H_
+#endif // !STXXL_IO_REQUEST_WITH_STATE_HEADER
 // vim: et:ts=4:sw=4

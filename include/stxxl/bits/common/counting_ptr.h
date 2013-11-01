@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_COUNTING_PTR_HEADER
-#define STXXL_COUNTING_PTR_HEADER
+#ifndef STXXL_COMMON_COUNTING_PTR_HEADER
+#define STXXL_COMMON_COUNTING_PTR_HEADER
 
 #include <cassert>
 #include <cstdlib>
@@ -516,4 +516,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // STXXL_COUNTING_PTR_HEADER
+#endif // !STXXL_COMMON_COUNTING_PTR_HEADER

@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER__COMPAT_UNIQUE_PTR_H_
-#define STXXL_HEADER__COMPAT_UNIQUE_PTR_H_
+#ifndef STXXL_COMPAT_UNIQUE_PTR_HEADER
+#define STXXL_COMPAT_UNIQUE_PTR_HEADER
 
 
 #include <memory>
@@ -64,4 +64,4 @@ namespace std
 
 #endif
 
-#endif // !STXXL_HEADER__COMPAT_UNIQUE_PTR_H_
+#endif // !STXXL_COMPAT_UNIQUE_PTR_HEADER

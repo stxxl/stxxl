@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER__DEPRECATED_H
-#define STXXL_HEADER__DEPRECATED_H
+#ifndef STXXL_DEPRECATED_HEADER
+#define STXXL_DEPRECATED_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -27,5 +27,5 @@
   #define _STXXL_DEPRECATED(x) x __attribute__ ((__deprecated__))
 #endif
 
-#endif // !STXXL_HEADER__DEPRECATED_H
+#endif // !STXXL_DEPRECATED_HEADER
 // vim: et:ts=4:sw=4

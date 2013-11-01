@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG_READ_WRITE_POOL_H
-#define STXXL_MNG_READ_WRITE_POOL_H
+#ifndef STXXL_MNG_READ_WRITE_POOL_HEADER
+#define STXXL_MNG_READ_WRITE_POOL_HEADER
 
 #include <stxxl/bits/mng/write_pool.h>
 #include <stxxl/bits/mng/prefetch_pool.h>
@@ -168,5 +168,5 @@ namespace std
     }
 }
 
-#endif // !STXXL_MNG_READ_WRITE_POOL_H
+#endif // !STXXL_MNG_READ_WRITE_POOL_HEADER
 // vim: et:ts=4:sw=4

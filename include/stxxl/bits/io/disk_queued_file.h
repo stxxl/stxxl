@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER_IO_DISK_QUEUED_FILE
-#define STXXL_HEADER_IO_DISK_QUEUED_FILE
+#ifndef STXXL_IO_DISK_QUEUED_FILE_HEADER
+#define STXXL_IO_DISK_QUEUED_FILE_HEADER
 
 #include <stxxl/bits/io/file.h>
 
@@ -56,5 +56,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER_IO_DISK_QUEUED_FILE
+#endif // !STXXL_IO_DISK_QUEUED_FILE_HEADER
 // vim: et:ts=4:sw=4

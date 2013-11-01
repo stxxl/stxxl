@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_PAGER_HEADER
-#define STXXL_PAGER_HEADER
+#ifndef STXXL_CONTAINERS_PAGER_HEADER
+#define STXXL_CONTAINERS_PAGER_HEADER
 
 #include <list>
 #include <cassert>
@@ -118,5 +118,5 @@ namespace std
     }
 }
 
-#endif // !STXXL_PAGER_HEADER
+#endif // !STXXL_CONTAINERS_PAGER_HEADER
 // vim: et:ts=4:sw=4

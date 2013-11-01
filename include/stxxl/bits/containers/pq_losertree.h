@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_PQ_LOSERTREE_HEADER
-#define STXXL_PQ_LOSERTREE_HEADER
+#ifndef STXXL_CONTAINERS_PQ_LOSERTREE_HEADER
+#define STXXL_CONTAINERS_PQ_LOSERTREE_HEADER
 
 #include <stxxl/bits/containers/pq_helpers.h>
 
@@ -742,5 +742,5 @@ namespace priority_queue_local
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_PQ_LOSERTREE_HEADER
+#endif // !STXXL_CONTAINERS_PQ_LOSERTREE_HEADER
 // vim: et:ts=4:sw=4

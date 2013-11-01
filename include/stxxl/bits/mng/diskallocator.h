@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_DISKALLOCATOR_HEADER
-#define STXXL_DISKALLOCATOR_HEADER
+#ifndef STXXL_MNG_DISKALLOCATOR_HEADER
+#define STXXL_MNG_DISKALLOCATOR_HEADER
 
 #include <vector>
 #include <map>
@@ -223,5 +223,5 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_DISKALLOCATOR_HEADER
+#endif // !STXXL_MNG_DISKALLOCATOR_HEADER
 // vim: et:ts=4:sw=4

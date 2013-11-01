@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_ALIGNED_ALLOC
-#define STXXL_ALIGNED_ALLOC
+#ifndef STXXL_COMMON_ALIGNED_ALLOC_HEADER
+#define STXXL_COMMON_ALIGNED_ALLOC_HEADER
 
 #include <cstdlib>
 #include <cassert>
@@ -123,5 +123,5 @@ aligned_dealloc(void * ptr)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_ALIGNED_ALLOC
+#endif // !STXXL_COMMON_ALIGNED_ALLOC_HEADER
 // vim: et:ts=4:sw=4

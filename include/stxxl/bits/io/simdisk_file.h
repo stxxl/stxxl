@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SIMDISK_FILE_HEADER
-#define STXXL_SIMDISK_FILE_HEADER
+#ifndef STXXL_IO_SIMDISK_FILE_HEADER
+#define STXXL_IO_SIMDISK_FILE_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -138,4 +138,4 @@ __STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_SIMDISK_FILE
 
-#endif  // !STXXL_SIMDISK_FILE_HEADER
+#endif // !STXXL_IO_SIMDISK_FILE_HEADER

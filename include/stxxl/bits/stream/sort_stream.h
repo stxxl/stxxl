@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SORT_STREAM_HEADER
-#define STXXL_SORT_STREAM_HEADER
+#ifndef STXXL_STREAM_SORT_STREAM_HEADER
+#define STXXL_STREAM_SORT_STREAM_HEADER
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/stream/stream.h>
@@ -1625,5 +1625,5 @@ void sort(RandomAccessIterator begin,
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SORT_STREAM_HEADER
+#endif // !STXXL_STREAM_SORT_STREAM_HEADER
 // vim: et:ts=4:sw=4

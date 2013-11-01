@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG__BLOCK_ALLOC_H
-#define STXXL_MNG__BLOCK_ALLOC_H
+#ifndef STXXL_MNG_BLOCK_ALLOC_HEADER
+#define STXXL_MNG_BLOCK_ALLOC_HEADER
 
 #include <algorithm>
 #include <stxxl/bits/parallel.h>
@@ -264,5 +264,5 @@ struct offset_allocator
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_MNG__BLOCK_ALLOC_H
+#endif // !STXXL_MNG_BLOCK_ALLOC_HEADER
 // vim: et:ts=4:sw=4

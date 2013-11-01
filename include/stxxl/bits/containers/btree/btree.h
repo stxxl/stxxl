@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_CONTAINERS_BTREE__BTREE_H
-#define STXXL_CONTAINERS_BTREE__BTREE_H
+#ifndef STXXL_CONTAINERS_BTREE_BTREE_HEADER
+#define STXXL_CONTAINERS_BTREE_BTREE_HEADER
 
 #include <limits>
 #include <stxxl/bits/namespace.h>
@@ -1160,4 +1160,4 @@ namespace std
     }
 }
 
-#endif /* STXXL_CONTAINERS_BTREE__BTREE_H */
+#endif // !STXXL_CONTAINERS_BTREE_BTREE_HEADER

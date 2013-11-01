@@ -319,4 +319,4 @@ public:
 
 } // namespace std
 
-#endif // STXXL_COMMON_UINT_TYPES_HEADER
+#endif // !STXXL_COMMON_UINT_TYPES_HEADER

@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_WRITE_POOL_HEADER
-#define STXXL_WRITE_POOL_HEADER
+#ifndef STXXL_MNG_WRITE_POOL_HEADER
+#define STXXL_MNG_WRITE_POOL_HEADER
 
 #include <list>
 #include <stxxl/bits/config.h>
@@ -287,5 +287,5 @@ namespace std
     }
 }
 
-#endif // !STXXL_WRITE_POOL_HEADER
+#endif // !STXXL_MNG_WRITE_POOL_HEADER
 // vim: et:ts=4:sw=4

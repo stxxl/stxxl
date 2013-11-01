@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER__COMPAT_TYPE_TRAITS_H_
-#define STXXL_HEADER__COMPAT_TYPE_TRAITS_H_
+#ifndef STXXL_COMPAT_TYPE_TRAITS_HEADER
+#define STXXL_COMPAT_TYPE_TRAITS_HEADER
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -106,4 +106,4 @@ namespace compat
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER__COMPAT_TYPE_TRAITS_H_
+#endif // !STXXL_COMPAT_TYPE_TRAITS_HEADER

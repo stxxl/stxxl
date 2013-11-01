@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO_HEADER
-#define STXXL_IO_HEADER
+#ifndef STXXL_IO_IO_HEADER
+#define STXXL_IO_IO_HEADER
 
 #include <stxxl/request>
 #include <stxxl/bits/io/file.h>
@@ -33,4 +33,4 @@ __STXXL_BEGIN_NAMESPACE
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO_HEADER
+#endif // !STXXL_IO_IO_HEADER

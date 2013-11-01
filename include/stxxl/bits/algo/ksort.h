@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_KSORT_HEADER
-#define STXXL_KSORT_HEADER
+#ifndef STXXL_ALGO_KSORT_HEADER
+#define STXXL_ALGO_KSORT_HEADER
 
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/common/rand.h>
@@ -1092,5 +1092,5 @@ void ksort(ExtIterator first, ExtIterator last, unsigned_type M)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_KSORT_HEADER
+#endif // !STXXL_ALGO_KSORT_HEADER
 // vim: et:ts=4:sw=4

@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_STATE_HEADER
-#define STXXL_STATE_HEADER
+#ifndef STXXL_COMMON_STATE_HEADER
+#define STXXL_COMMON_STATE_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -125,4 +125,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_STATE_HEADER
+#endif // !STXXL_COMMON_STATE_HEADER

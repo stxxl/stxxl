@@ -11,14 +11,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#ifndef STXXL_ALGO_ASYNC_SCHEDULE_HEADER
+#define STXXL_ALGO_ASYNC_SCHEDULE_HEADER
+
 // Implements the "prudent prefetching" as described in
 // D. Hutchinson, P. Sanders, J. S. Vitter: Duality between prefetching
 // and queued writing on parallel disks, 2005
 // DOI: 10.1137/S0097539703431573
-
-
-#ifndef STXXL_ASYNC_SCHEDULE_HEADER
-#define STXXL_ASYNC_SCHEDULE_HEADER
 
 #include <stxxl/bits/common/types.h>
 
@@ -76,5 +75,5 @@ void compute_prefetch_schedule(
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_ASYNC_SCHEDULE_HEADER
+#endif // !STXXL_ALGO_ASYNC_SCHEDULE_HEADER
 // vim: et:ts=4:sw=4

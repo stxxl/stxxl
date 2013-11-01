@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_CONTAINERS_BTREE__ITERATOR_H
-#define STXXL_CONTAINERS_BTREE__ITERATOR_H
+#ifndef STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
+#define STXXL_CONTAINERS_BTREE_ITERATOR_HEADER
 
 #include <iterator>
 #include <cassert>
@@ -374,4 +374,4 @@ namespace btree
 
 __STXXL_END_NAMESPACE
 
-#endif /* STXXL_CONTAINERS_BTREE__ITERATOR_H */
+#endif // !STXXL_CONTAINERS_BTREE_ITERATOR_HEADER

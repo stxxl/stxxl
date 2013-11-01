@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MALLOC_H
-#define STXXL_MALLOC_H
+#ifndef STXXL_UTILS_MALLOC_HEADER
+#define STXXL_UTILS_MALLOC_HEADER
 
 #include <ostream>
 #ifdef __FreeBSD__
@@ -150,4 +150,4 @@ class malloc_setup
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_MALLOC_H
+#endif // !STXXL_UTILS_MALLOC_HEADER

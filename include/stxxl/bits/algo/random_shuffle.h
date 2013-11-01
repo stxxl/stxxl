@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_RANDOM_SHUFFLE_HEADER
-#define STXXL_RANDOM_SHUFFLE_HEADER
+#ifndef STXXL_ALGO_RANDOM_SHUFFLE_HEADER
+#define STXXL_ALGO_RANDOM_SHUFFLE_HEADER
 
 // TODO: improve main memory consumption in recursion
 //        (free stacks buffers)
@@ -376,5 +376,5 @@ void random_shuffle(stxxl::vector_iterator<Tp_, AllocStrategy_, SzTp_, DiffTp_, 
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_RANDOM_SHUFFLE_HEADER
+#endif // !STXXL_ALGO_RANDOM_SHUFFLE_HEADER
 // vim: et:ts=4:sw=4

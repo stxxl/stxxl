@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_PQ_HELPERS_HEADER
-#define STXXL_PQ_HELPERS_HEADER
+#ifndef STXXL_CONTAINERS_PQ_HELPERS_HEADER
+#define STXXL_CONTAINERS_PQ_HELPERS_HEADER
 
 #include <vector>
 #include <algorithm>
@@ -257,5 +257,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_PQ_HELPERS_HEADER
+#endif // !STXXL_CONTAINERS_PQ_HELPERS_HEADER
 // vim: et:ts=4:sw=4

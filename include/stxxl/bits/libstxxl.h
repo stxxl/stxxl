@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_LIBSTXXL_H
-#define STXXL_LIBSTXXL_H
+#ifndef STXXL_LIBSTXXL_HEADER
+#define STXXL_LIBSTXXL_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -22,4 +22,4 @@
 //-tb #pragma comment (lib, "lib" STXXL_LIBNAME ".lib")
 #endif
 
-#endif // !STXXL_IO_HEADER
+#endif // !STXXL_LIBSTXXL_HEADER

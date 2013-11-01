@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_EXCEPTIONS_H_
-#define STXXL_EXCEPTIONS_H_
+#ifndef STXXL_COMMON_EXCEPTIONS_HEADER
+#define STXXL_COMMON_EXCEPTIONS_HEADER
 
 #include <iostream>
 #include <string>
@@ -85,5 +85,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_EXCEPTIONS_H_
+#endif // !STXXL_COMMON_EXCEPTIONS_HEADER
 // vim: et:ts=4:sw=4

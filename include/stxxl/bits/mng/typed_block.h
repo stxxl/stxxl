@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_TYPED_BLOCK_HEADER
-#define STXXL_TYPED_BLOCK_HEADER
+#ifndef STXXL_MNG_TYPED_BLOCK_HEADER
+#define STXXL_MNG_TYPED_BLOCK_HEADER
 
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/common/aligned_alloc.h>
@@ -360,5 +360,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_TYPED_BLOCK_HEADER
+#endif // !STXXL_MNG_TYPED_BLOCK_HEADER
 // vim: et:ts=4:sw=4

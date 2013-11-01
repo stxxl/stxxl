@@ -14,8 +14,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_META_TEMPLATE_PROGRAMMING
-#define STXXL_META_TEMPLATE_PROGRAMMING
+#ifndef STXXL_COMMON_TMETA_HEADER
+#define STXXL_COMMON_TMETA_HEADER
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/common/types.h>
@@ -162,4 +162,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_META_TEMPLATE_PROGRAMMING
+#endif // !STXXL_COMMON_TMETA_HEADER

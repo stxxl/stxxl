@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_HEADER__COMPAT_HASH_MAP_H_
-#define STXXL_HEADER__COMPAT_HASH_MAP_H_
+#ifndef STXXL_COMPAT_HASH_MAP_HEADER
+#define STXXL_COMPAT_HASH_MAP_HEADER
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -62,4 +62,4 @@ struct compat_hash_map {
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_HEADER__COMPAT_HASH_MAP_H_
+#endif // !STXXL_COMPAT_HASH_MAP_HEADER

@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_TIMER_HEADER
-#define STXXL_TIMER_HEADER
+#ifndef STXXL_COMMON_TIMER_HEADER
+#define STXXL_COMMON_TIMER_HEADER
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -169,5 +169,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_TIMER_HEADER
+#endif // !STXXL_COMMON_TIMER_HEADER
 // vim: et:ts=4:sw=4

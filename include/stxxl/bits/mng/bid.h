@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BID_HEADER
-#define STXXL_BID_HEADER
+#ifndef STXXL_MNG_BID_HEADER
+#define STXXL_MNG_BID_HEADER
 
 #include <cstring>
 #include <ostream>
@@ -161,5 +161,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_BID_HEADER
+#endif // !STXXL_MNG_BID_HEADER
 // vim: et:ts=4:sw=4

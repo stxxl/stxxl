@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_NEW_ALLOC_HEADER
-#define STXXL_NEW_ALLOC_HEADER
+#ifndef STXXL_COMMON_NEW_ALLOC_HEADER
+#define STXXL_COMMON_NEW_ALLOC_HEADER
 
 #include <memory>
 #include <limits>
@@ -140,5 +140,5 @@ inline bool operator != (const new_alloc<T1> &,
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_NEW_ALLOC_HEADER
+#endif // !STXXL_COMMON_NEW_ALLOC_HEADER
 // vim: et:ts=4:sw=4

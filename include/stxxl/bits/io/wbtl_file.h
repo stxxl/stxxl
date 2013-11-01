@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_WBTL_FILE_HEADER
-#define STXXL_WBTL_FILE_HEADER
+#ifndef STXXL_IO_WBTL_FILE_HEADER
+#define STXXL_IO_WBTL_FILE_HEADER
 
 #ifndef STXXL_HAVE_WBTL_FILE
 #define STXXL_HAVE_WBTL_FILE 1
@@ -110,4 +110,4 @@ __STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_WBTL_FILE
 
-#endif  // !STXXL_WBTL_FILE_HEADER
+#endif // !STXXL_IO_WBTL_FILE_HEADER

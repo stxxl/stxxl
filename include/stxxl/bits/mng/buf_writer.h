@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BUFFERED_WRITER_HEADER
-#define STXXL_BUFFERED_WRITER_HEADER
+#ifndef STXXL_MNG_BUF_WRITER_HEADER
+#define STXXL_MNG_BUF_WRITER_HEADER
 
 #include <vector>
 #include <queue>
@@ -221,4 +221,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_BUFFERED_WRITER_HEADER
+#endif // !STXXL_MNG_BUF_WRITER_HEADER

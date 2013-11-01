@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SORT_HEADER
-#define STXXL_SORT_HEADER
+#ifndef STXXL_ALGO_SORT_HEADER
+#define STXXL_ALGO_SORT_HEADER
 
 #include <functional>
 
@@ -1003,5 +1003,5 @@ void sort(ExtIterator first, ExtIterator last, StrictWeakOrdering cmp, unsigned_
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_SORT_HEADER
+#endif // !STXXL_ALGO_SORT_HEADER
 // vim: et:ts=4:sw=4

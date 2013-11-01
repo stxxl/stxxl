@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_FILEPERBLOCK_FILE_HEADER
-#define STXXL_FILEPERBLOCK_FILE_HEADER
+#ifndef STXXL_IO_FILEPERBLOCK_FILE_HEADER
+#define STXXL_IO_FILEPERBLOCK_FILE_HEADER
 
 #include <string>
 #include <stxxl/bits/io/disk_queued_file.h>
@@ -76,4 +76,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_FILEPERBLOCK_FILE_HEADER
+#endif // !STXXL_IO_FILEPERBLOCK_FILE_HEADER

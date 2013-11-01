@@ -13,8 +13,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_COMPLETION_HANDLER_HEADER
-#define STXXL_COMPLETION_HANDLER_HEADER
+#ifndef STXXL_IO_COMPLETION_HANDLER_HEADER
+#define STXXL_IO_COMPLETION_HANDLER_HEADER
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/compat_unique_ptr.h>
@@ -98,5 +98,5 @@ struct default_completion_handler
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_COMPLETION_HANDLER_HEADER
+#endif // !STXXL_IO_COMPLETION_HANDLER_HEADER
 // vim: et:ts=4:sw=4

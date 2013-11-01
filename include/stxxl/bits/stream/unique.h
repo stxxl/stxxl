@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_STREAM__UNIQUE_H
-#define STXXL_STREAM__UNIQUE_H
+#ifndef STXXL_STREAM_UNIQUE_HEADER
+#define STXXL_STREAM_UNIQUE_HEADER
 
 #include <stxxl/bits/namespace.h>
 
@@ -131,5 +131,5 @@ namespace stream
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_STREAM__UNIQUE_H
+#endif // !STXXL_STREAM_UNIQUE_HEADER
 // vim: et:ts=4:sw=4

@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_BLOCK_PREFETCHER_HEADER
-#define STXXL_BLOCK_PREFETCHER_HEADER
+#ifndef STXXL_MNG_BLOCK_PREFETCHER_HEADER
+#define STXXL_MNG_BLOCK_PREFETCHER_HEADER
 
 #include <vector>
 #include <queue>
@@ -226,4 +226,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_BLOCK_PREFETCHER_HEADER
+#endif // !STXXL_MNG_BLOCK_PREFETCHER_HEADER

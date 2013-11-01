@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MMAP_FILE_HEADER
-#define STXXL_MMAP_FILE_HEADER
+#ifndef STXXL_IO_MMAP_FILE_HEADER
+#define STXXL_IO_MMAP_FILE_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -54,4 +54,4 @@ __STXXL_END_NAMESPACE
 
 #endif  // #if STXXL_HAVE_MMAP_FILE
 
-#endif  // !STXXL_MMAP_FILE_HEADER
+#endif // !STXXL_IO_MMAP_FILE_HEADER

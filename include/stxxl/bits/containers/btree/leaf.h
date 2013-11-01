@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_CONTAINERS_BTREE__LEAF_H
-#define STXXL_CONTAINERS_BTREE__LEAF_H
+#ifndef STXXL_CONTAINERS_BTREE_LEAF_HEADER
+#define STXXL_CONTAINERS_BTREE_LEAF_HEADER
 
 #include <stxxl/bits/containers/btree/iterator.h>
 #include <stxxl/bits/containers/btree/node_cache.h>
@@ -701,4 +701,4 @@ namespace btree
 
 __STXXL_END_NAMESPACE
 
-#endif /* STXXL_CONTAINERS_BTREE__LEAF_H */
+#endif // !STXXL_CONTAINERS_BTREE_LEAF_HEADER

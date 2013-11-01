@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MUTEX_HEADER
-#define STXXL_MUTEX_HEADER
+#ifndef STXXL_COMMON_MUTEX_HEADER
+#define STXXL_COMMON_MUTEX_HEADER
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -119,4 +119,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_MUTEX_HEADER
+#endif // !STXXL_COMMON_MUTEX_HEADER

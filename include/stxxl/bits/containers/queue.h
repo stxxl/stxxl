@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_QUEUE_HEADER
-#define STXXL_QUEUE_HEADER
+#ifndef STXXL_CONTAINERS_QUEUE_HEADER
+#define STXXL_CONTAINERS_QUEUE_HEADER
 
 #include <vector>
 #include <queue>
@@ -386,5 +386,5 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_QUEUE_HEADER
+#endif // !STXXL_CONTAINERS_QUEUE_HEADER
 // vim: et:ts=4:sw=4

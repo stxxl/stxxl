@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_INTERLEAVED_ALLOC_HEADER
-#define STXXL_INTERLEAVED_ALLOC_HEADER
+#ifndef STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
+#define STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
 
 #include <vector>
 
@@ -167,5 +167,5 @@ struct interleaved_alloc_traits<single_disk>
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_INTERLEAVED_ALLOC_HEADER
+#endif // !STXXL_MNG_BLOCK_ALLOC_INTERLEAVED_HEADER
 // vim: et:ts=4:sw=4

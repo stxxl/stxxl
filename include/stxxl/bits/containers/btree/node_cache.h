@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_CONTAINERS_BTREE__NODE_CACHE_H
-#define STXXL_CONTAINERS_BTREE__NODE_CACHE_H
+#ifndef STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
+#define STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/compat_hash_map.h>
@@ -636,4 +636,4 @@ namespace std
     }
 }
 
-#endif /* STXXL_CONTAINERS_BTREE__NODE_CACHE_H */
+#endif // !STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER

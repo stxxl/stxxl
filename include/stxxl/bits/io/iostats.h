@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IOSTATS_HEADER
-#define STXXL_IOSTATS_HEADER
+#ifndef STXXL_IO_IOSTATS_HEADER
+#define STXXL_IO_IOSTATS_HEADER
 
 #ifndef STXXL_IO_STATS
  #define STXXL_IO_STATS 1
@@ -637,5 +637,5 @@ inline std::string add_SI_multiplier(uint64 number, const char * unit = "")
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IOSTATS_HEADER
+#endif // !STXXL_IO_IOSTATS_HEADER
 // vim: et:ts=4:sw=4

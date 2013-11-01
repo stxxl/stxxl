@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_LOG_HEADER
-#define STXXL_LOG_HEADER
+#ifndef STXXL_COMMON_LOG_HEADER
+#define STXXL_COMMON_LOG_HEADER
 
 #include <iostream>
 #include <fstream>
@@ -53,4 +53,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_LOG_HEADER
+#endif // !STXXL_COMMON_LOG_HEADER

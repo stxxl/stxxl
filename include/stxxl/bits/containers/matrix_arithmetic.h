@@ -10,8 +10,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MATRIX_ARITHMETIC_HEADER
-#define STXXL_MATRIX_ARITHMETIC_HEADER
+#ifndef STXXL_CONTAINERS_MATRIX_ARITHMETIC_HEADER
+#define STXXL_CONTAINERS_MATRIX_ARITHMETIC_HEADER
 
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/containers/matrix_low_level.h>
@@ -2029,4 +2029,4 @@ const int_type matrix_operations<ValueType, BlockSideLength>::strassen_winograd_
 
 __STXXL_END_NAMESPACE
 
-#endif /* STXXL_MATRIX_ARITHMETIC_HEADER */
+#endif // !STXXL_CONTAINERS_MATRIX_ARITHMETIC_HEADER

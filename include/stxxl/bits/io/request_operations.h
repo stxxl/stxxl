@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_IO__REQUEST_OPERATIONS_H_
-#define STXXL_IO__REQUEST_OPERATIONS_H_
+#ifndef STXXL_IO_REQUEST_OPERATIONS_HEADER
+#define STXXL_IO_REQUEST_OPERATIONS_HEADER
 
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request.h>
@@ -159,5 +159,5 @@ inline size_t wait_any(request_ptr req_array[], size_t count)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_IO__REQUEST_OPERATIONS_H_
+#endif // !STXXL_IO_REQUEST_OPERATIONS_HEADER
 // vim: et:ts=4:sw=4

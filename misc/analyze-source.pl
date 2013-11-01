@@ -20,6 +20,9 @@ my $email_multimap = 0;
 # launch emacsen for each error
 my $launch_emacs = 0;
 
+# write changes to files (dangerous!)
+my $write_changes = 0;
+
 use strict;
 use warnings;
 
@@ -36,18 +39,19 @@ sub expect_error($$$$) {
     system("emacsclient -n $path") if $launch_emacs;
 }
 
-sub expect($$$$) {
+sub expect($$\$$) {
     my ($path,$ln,$str,$expect) = @_;
 
-    if ($str ne $expect) {
-        expect_error($path,$ln,$str,$expect);
+    if ($$str ne $expect) {
+        expect_error($path,$ln,$$str,$expect);
+        $$str = $expect;
     }
 }
-sub expect_re($$$$) {
+sub expect_re($$\$$) {
     my ($path,$ln,$str,$expect) = @_;
 
-    if ($str !~ m/$expect/) {
-        expect_error($path,$ln,$str,"/$expect/");
+    if ($$str !~ m/$expect/) {
+        expect_error($path,$ln,$$str,"/$expect/");
     }
 }
 
@@ -101,6 +105,34 @@ sub process_cpp {
     expect($path, $i, $data[$i], " *  (See accompanying file LICENSE_1_0.txt or copy at\n"); ++$i;
     expect($path, $i, $data[$i], " *  http://www.boost.org/LICENSE_1_0.txt)\n"); ++$i;
     expect($path, $i, $data[$i], " ".('*'x74)."/\n"); ++$i;
+
+    # check include guard name
+    if ($path =~ m!^include/stxxl/bits/.*\.(h|h.in)$!)
+    {
+        expect($path, $i, $data[$i], "\n"); ++$i;
+
+        # construct include guard macro name: STXXL_FILE_NAME_HEADER
+        my $guard = $path;
+        $guard =~ s!include/stxxl/bits/!stxxl/!;
+        $guard =~ tr!/!_!;
+        $guard =~ s!\.h(\.in)?$!!;
+        $guard = uc($guard)."_HEADER";
+        #print $guard."\n";
+
+        expect($path, $i, $data[$i], "#ifndef $guard\n"); ++$i;
+        expect($path, $i, $data[$i], "#define $guard\n"); ++$i;
+
+        my $n = scalar(@data)-1;
+        if ($data[$n] =~ m!// vim:!) { --$n; } # skip vim
+        expect($path, $n, $data[$n], "#endif // !$guard\n");
+    }
+
+    if ($write_changes)
+    {
+        open(F, "> $path") or die("Cannot write $path: $!");
+        print(F join("", @data));
+        close(F);
+    }
 }
 
 sub process_pl_cmake {

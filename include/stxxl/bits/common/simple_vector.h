@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_SIMPLE_VECTOR_HEADER
-#define STXXL_SIMPLE_VECTOR_HEADER
+#ifndef STXXL_COMMON_SIMPLE_VECTOR_HEADER
+#define STXXL_COMMON_SIMPLE_VECTOR_HEADER
 
 #include <algorithm>
 #include <cstring>
@@ -169,4 +169,4 @@ namespace std
     }
 }
 
-#endif // !STXXL_SIMPLE_VECTOR_HEADER
+#endif // !STXXL_COMMON_SIMPLE_VECTOR_HEADER

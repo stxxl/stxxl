@@ -11,8 +11,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef _STXXL_DEQUE_H
-#define _STXXL_DEQUE_H
+#ifndef STXXL_CONTAINERS_DEQUE_HEADER
+#define STXXL_CONTAINERS_DEQUE_HEADER
 
 #include <limits>
 #include <stxxl/vector>
@@ -668,4 +668,4 @@ namespace std
     }
 }
 
-#endif /* _STXXL_DEQUE_H */
+#endif // !STXXL_CONTAINERS_DEQUE_HEADER
