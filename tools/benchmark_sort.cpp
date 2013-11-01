@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tools/benchmark_stream_sort.cpp
+ *  tools/benchmark_sort.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

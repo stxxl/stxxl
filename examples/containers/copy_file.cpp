@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/copy_file.cpp
+ *  examples/containers/copy_file.cpp
  *
  *  This example shows three methods to copy a file to another file using
  *  stxxl:vectors.

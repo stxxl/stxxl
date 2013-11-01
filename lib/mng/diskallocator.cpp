@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/diskallocator.cpp
+ *  lib/mng/diskallocator.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/syscall_file.cpp
+ *  lib/io/syscall_file.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

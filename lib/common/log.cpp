@@ -1,5 +1,5 @@
 /***************************************************************************
- *  common/log.cpp
+ *  lib/common/log.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

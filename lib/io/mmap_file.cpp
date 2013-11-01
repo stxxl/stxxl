@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/mmap_file.cpp
+ *  lib/io/mmap_file.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

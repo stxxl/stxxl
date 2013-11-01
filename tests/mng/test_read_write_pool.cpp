@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/test_read_write_pool.cpp
+ *  tests/mng/test_read_write_pool.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

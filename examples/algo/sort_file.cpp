@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/sort_file.cpp
+ *  examples/algo/sort_file.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

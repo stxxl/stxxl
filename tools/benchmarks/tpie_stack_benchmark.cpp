@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/tpie_stack_benchmark.cpp
+ *  tools/benchmarks/tpie_stack_benchmark.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

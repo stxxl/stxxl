@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/test_pool_pair.cpp
+ *  tests/mng/test_pool_pair.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

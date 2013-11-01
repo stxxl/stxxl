@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_block_scheduler.cpp
+ *  tests/mng/test_block_scheduler.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

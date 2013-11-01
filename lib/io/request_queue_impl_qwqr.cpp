@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/request_queue_impl_qwqr.cpp
+ *  lib/io/request_queue_impl_qwqr.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

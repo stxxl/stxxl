@@ -1,10 +1,10 @@
 /***************************************************************************
- *  utils/log2.cpp
+ *  tests/common/test_log2.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright © 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
- *  Copyright © 2013 Timo Bingmann <tb@panthema.net>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at

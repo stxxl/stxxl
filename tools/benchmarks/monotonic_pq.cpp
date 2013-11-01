@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/monotonic_pq.cpp
+ *  tools/benchmarks/monotonic_pq.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

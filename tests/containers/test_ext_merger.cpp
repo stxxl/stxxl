@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_ext_merger.cpp
+ *  tests/containers/test_ext_merger.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

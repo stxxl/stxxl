@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/request.cpp
+ *  lib/io/request.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

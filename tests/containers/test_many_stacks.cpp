@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_many_stacks.cpp
+ *  tests/containers/test_many_stacks.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

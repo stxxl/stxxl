@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/test_io_sizes.cpp
+ *  tests/io/test_io_sizes.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/request_with_state.cpp
+ *  lib/io/request_with_state.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

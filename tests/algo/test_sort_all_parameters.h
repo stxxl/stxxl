@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/test_sort_all_parameters.h
+ *  tests/algo/test_sort_all_parameters.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

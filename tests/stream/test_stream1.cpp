@@ -1,5 +1,5 @@
 /***************************************************************************
- *  stream/test_stream1.cpp
+ *  tests/stream/test_stream1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

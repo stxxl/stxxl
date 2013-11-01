@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/config.cpp
+ *  lib/mng/config.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

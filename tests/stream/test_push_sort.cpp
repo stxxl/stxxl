@@ -1,5 +1,5 @@
 /***************************************************************************
- *  stream/test_push_sort.cpp
+ *  tests/stream/test_push_sort.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

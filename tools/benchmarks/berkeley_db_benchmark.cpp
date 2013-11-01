@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/berkeley_db_benchmark.cpp
+ *  tools/benchmarks/berkeley_db_benchmark.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

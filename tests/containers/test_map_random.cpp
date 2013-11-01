@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_map_random.cpp
+ *  tests/containers/test_map_random.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

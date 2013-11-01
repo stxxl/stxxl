@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/containers/matrix_benchmark.cpp
+ *  tools/benchmarks/matrix_benchmark.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

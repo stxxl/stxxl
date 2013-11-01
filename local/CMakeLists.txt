@@ -1,16 +1,16 @@
-###############################################################################
-# local/CMakeLists.txt
+############################################################################
+#  local/CMakeLists.txt
 #
-# Cmake file which compiles and links all .cpp files in local/ with STXXL.
+#  CMake file which compiles and links all .cpp files in local/ with STXXL.
 #
-# Part of the STXXL. See http://stxxl.sourceforge.net
+#  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-# Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+#  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
 #
-# Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt)
-###############################################################################
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
 
 # find all .cpp files in current directory
 file(GLOB source_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.cpp")

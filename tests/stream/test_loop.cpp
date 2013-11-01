@@ -1,12 +1,12 @@
 /***************************************************************************
- *  stream/test_loop.cpp
+ *  tests/stream/test_loop.cpp
  *
  *  example for building a loop of stream operations
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright © 2011 Jaroslaw Fedorowicz <fedorow@cs.uni-frankfurt.de>
- *  Copyright © 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2011 Jaroslaw Fedorowicz <fedorow@cs.uni-frankfurt.de>
+ *  Copyright (C) 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at

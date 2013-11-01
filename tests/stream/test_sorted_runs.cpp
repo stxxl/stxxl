@@ -1,5 +1,5 @@
 /***************************************************************************
- *  stream/test_sorted_runs.cpp
+ *  tests/stream/test_sorted_runs.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

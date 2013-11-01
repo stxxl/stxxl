@@ -1,5 +1,5 @@
 /***************************************************************************
- *  common/test_globals.cpp
+ *  tests/common/test_globals.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

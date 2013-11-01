@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_map.cpp
+ *  tests/containers/test_map.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

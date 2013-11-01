@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/iostats.cpp
+ *  lib/io/iostats.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

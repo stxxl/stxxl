@@ -1,5 +1,5 @@
 /***************************************************************************
- *  common/test_manyunits2.cpp
+ *  tests/common/test_manyunits2.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

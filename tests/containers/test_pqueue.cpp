@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_pqueue.cpp
+ *  tests/containers/test_pqueue.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

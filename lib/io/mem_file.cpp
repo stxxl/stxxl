@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/mem_file.cpp
+ *  lib/io/mem_file.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

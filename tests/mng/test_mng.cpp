@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/test_mng.cpp
+ *  tests/mng/test_mng.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

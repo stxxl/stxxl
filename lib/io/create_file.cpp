@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/create_file.cpp
+ *  lib/io/create_file.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

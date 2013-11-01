@@ -1,5 +1,5 @@
 /***************************************************************************
- *  utils/pq_param.cpp
+ *  tools/extras/pq_param.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

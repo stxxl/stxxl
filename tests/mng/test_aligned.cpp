@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/test_aligned.cpp
+ *  tests/mng/test_aligned.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

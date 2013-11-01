@@ -1,5 +1,5 @@
 /***************************************************************************
- *  stream/test_materialize.cpp
+ *  tests/stream/test_materialize.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  mng/test_mng_recursive_alloc.cpp
+ *  tests/mng/test_mng_recursive_alloc.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

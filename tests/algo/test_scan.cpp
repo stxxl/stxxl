@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/test_scan.cpp
+ *  tests/algo/test_scan.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

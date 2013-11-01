@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/test_bad_cmp.cpp
+ *  tests/algo/test_bad_cmp.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

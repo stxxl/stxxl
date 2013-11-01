@@ -4,7 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2004 Jens Mehnert <jmehnert@mpi-sb.mpg.de>
- *  Copyright (C) 2012-2013 Timo Bingmann <bingmann@kit.edu>
+ *  Copyright (C) 2012-2013 Timo Bingmann <tb@panthema.net>
  *  Copyright (C) 2012-2013 Daniel Feist <daniel.feist@student.kit.edu>
  *
  *  Distributed under the Boost Software License, Version 1.0.

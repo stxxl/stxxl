@@ -1,5 +1,5 @@
 /***************************************************************************
- *  common/exithandler.cpp
+ *  lib/common/exithandler.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

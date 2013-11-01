@@ -1,16 +1,16 @@
-###############################################################################
-# CMakeLists.txt
+############################################################################
+#  CMakeLists.txt
 #
-# Base cmake file for building stxxl with different options.
+#  Base CMake file for building stxxl with different options.
 #
-# Part of the STXXL. See http://stxxl.sourceforge.net
+#  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-# Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+#  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
 #
-# Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt)
-###############################################################################
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # needed to silence warning on cygwin
 

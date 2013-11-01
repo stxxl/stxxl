@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_vector_sizes.cpp
+ *  tests/containers/test_vector_sizes.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

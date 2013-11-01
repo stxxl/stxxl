@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/iobench_scatter_in_place.cpp
+ *  tools/extras/iobench_scatter_in_place.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

@@ -1,14 +1,14 @@
-###############################################################################
-# examples/applications/CMakeLists.txt
+############################################################################
+#  examples/applications/CMakeLists.txt
 #
-# Part of the STXXL. See http://stxxl.sourceforge.net
+#  Part of the STXXL. See http://stxxl.sourceforge.net
 #
-# Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
+#  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
 #
-# Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt)
-###############################################################################
+#  Distributed under the Boost Software License, Version 1.0.
+#  (See accompanying file LICENSE_1_0.txt or copy at
+#  http://www.boost.org/LICENSE_1_0.txt)
+############################################################################
 
 if(NOT CYGWIN AND NOT MINGW) #-tb too big to build on cygwin
 

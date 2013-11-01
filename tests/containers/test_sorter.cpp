@@ -1,10 +1,9 @@
 /***************************************************************************
- *  tests/container/test_sorter.cpp
+ *  tests/containers/test_sorter.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
- *  Copyright (C) 2012 Timo Bingmann <bingmann@kit.edu>
- *  - based on algo/test_sort.cpp
+ *  Copyright (C) 2012 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at

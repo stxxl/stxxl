@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_queue.cpp
+ *  tests/containers/test_queue.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

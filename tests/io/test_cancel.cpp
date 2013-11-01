@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/test_cancel.cpp
+ *  tests/io/test_cancel.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

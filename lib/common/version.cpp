@@ -1,5 +1,5 @@
 /***************************************************************************
- *  common/version.cpp
+ *  lib/common/version.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

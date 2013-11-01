@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_vector_buf.cpp
+ *  tests/containers/test_vector_buf.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

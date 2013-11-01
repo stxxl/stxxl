@@ -1,5 +1,5 @@
 /***************************************************************************
- *  common/verbose.cpp
+ *  lib/common/verbose.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

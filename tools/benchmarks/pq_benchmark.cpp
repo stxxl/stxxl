@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/pq_benchmark.cpp
+ *  tools/benchmarks/pq_benchmark.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

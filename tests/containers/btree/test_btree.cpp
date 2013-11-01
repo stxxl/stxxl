@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/btree/test_btree.cpp
+ *  tests/containers/btree/test_btree.cpp
  *
  *  A very basic test
  *

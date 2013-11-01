@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/wfs_file_base.cpp
+ *  lib/io/wfs_file_base.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  algo/test_parallel_sort.cpp
+ *  tests/algo/test_parallel_sort.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

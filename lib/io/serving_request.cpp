@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/serving_request.cpp
+ *  lib/io/serving_request.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

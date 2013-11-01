@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/test_iterators.cpp
+ *  tests/containers/test_iterators.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

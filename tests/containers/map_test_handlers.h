@@ -1,5 +1,5 @@
 /***************************************************************************
- *  containers/map_test_handlers.h
+ *  tests/containers/map_test_handlers.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  io/wbtl_file.cpp
+ *  lib/io/wbtl_file.cpp
  *
  *  a write-buffered-translation-layer pseudo file
  *

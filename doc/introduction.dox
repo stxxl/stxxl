@@ -2,11 +2,11 @@
  *  doc/introduction.dox
  *
  *  Most of this is from the old TeX tutorial and papers.
+ *  Edited 2013 by Timo Bingmann <tb@panthema.net>
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007 Roman Dementiev <dementiev@mpi-sb.mpg.de>
- *  Edited 2013 by Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at

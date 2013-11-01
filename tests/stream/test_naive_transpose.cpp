@@ -1,5 +1,5 @@
 /***************************************************************************
- *  stream/test_naive_transpose.cpp
+ *  tests/stream/test_naive_transpose.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
