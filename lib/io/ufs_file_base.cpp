@@ -68,12 +68,14 @@ ufs_file_base::ufs_file_base(
         flags |= O_TRUNC;
     }
 
-#if !defined(STXXL_DIRECT_IO_OFF)
     if (mode & DIRECT)
     {
+#if !STXXL_DIRECT_IO_OFF
         flags |= O_DIRECT;
-    }
+#else
+        STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, the system does not support it.");
 #endif
+    }
 
     if (mode & SYNC)
     {
@@ -101,7 +103,7 @@ ufs_file_base::ufs_file_base(
         return;
     }
 
-#ifndef STXXL_DIRECT_IO_OFF
+#if !STXXL_DIRECT_IO_OFF
     if ((mode & DIRECT) && errno == EINVAL)
     {
         STXXL_ERRMSG(":open() error on path=" << filename << " flags=" << flags << ", retrying without O_DIRECT.");

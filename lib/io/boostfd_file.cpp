@@ -143,12 +143,11 @@ boostfd_file::boostfd_file(
         }
     }
 
- #ifndef STXXL_DIRECT_IO_OFF
     if (mode & DIRECT)
     {
         // direct mode not supported in Boost
+        STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, boostfd does not support it.");
     }
- #endif
 
     if (mode & SYNC)
     {

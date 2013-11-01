@@ -30,7 +30,7 @@ __STXXL_BEGIN_NAMESPACE
 
 static inline bool exist_file(const std::string& path)
 {
-    STXXL_MSG("Checking " << path << " for disk configuration.");
+    //STXXL_MSG("Checking " << path << " for disk configuration.");
     std::ifstream in(path.c_str());
     return in.good();
 }

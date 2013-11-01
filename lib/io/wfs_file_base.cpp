@@ -61,13 +61,15 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
         dwCreationDisposition |= OPEN_ALWAYS;
     }
 
-#ifndef STXXL_DIRECT_IO_OFF
     if (mode & file::DIRECT)
     {
+#if !STXXL_DIRECT_IO_OFF
         dwFlagsAndAttributes |= FILE_FLAG_NO_BUFFERING;
         // TODO: try also FILE_FLAG_WRITE_THROUGH option ?
-    }
+#else
+        STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, the system does not support it.");
 #endif
+    }
 
     if (mode & file::SYNC)
     {
