@@ -43,8 +43,15 @@ void request_queue_impl_worker::stop_thread(thread_type & t, state<thread_state>
     sem++;
 #if STXXL_STD_THREADS
 #if STXXL_MSVC >= 1700
-    // skip join and delete of threads due to deadlock bug in CRT library,
-    // which occurs due to main() exiting before the threads do.
+    // In the Visual C++ Runtime 2012 and 2013, there is a deadlock bug, which
+    // occurs when threads are joined after main() exits. All STXXL threads are
+    // created by singletons, which are global variables that are deleted after
+    // main() exits.
+    // https://connect.microsoft.com/VisualStudio/feedback/details/747145
+    // The simple fix applied here it to NOT join or delete threads. This
+    // leaves the thread resource dangling after program exit.
+    t->detach();
+    s.wait_for(TERMINATED);
 #else
     t->join();
     delete t;
@@ -57,6 +64,7 @@ void request_queue_impl_worker::stop_thread(thread_type & t, state<thread_state>
 #else
     check_pthread_call(pthread_join(t, NULL));
 #endif
+    assert(s() == TERMINATED);
     s.set_to(NOT_RUNNING);
 }
 

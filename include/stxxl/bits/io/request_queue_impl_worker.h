@@ -41,7 +41,7 @@ __STXXL_BEGIN_NAMESPACE
 class request_queue_impl_worker : public request_queue
 {
 protected:
-    enum thread_state { NOT_RUNNING, RUNNING, TERMINATING, TERMINATE = TERMINATING };
+    enum thread_state { NOT_RUNNING, RUNNING, TERMINATING, TERMINATED };
 
 #if STXXL_STD_THREADS
     typedef std::thread * thread_type;

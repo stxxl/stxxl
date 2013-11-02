@@ -35,7 +35,7 @@ private:
     mutex queue_mutex;
     queue_type queue;
 
-    state<thread_state> _thread_state;
+    state<thread_state> m_thread_state;
     thread_type thread;
     semaphore sem;
 

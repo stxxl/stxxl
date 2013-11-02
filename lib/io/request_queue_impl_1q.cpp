@@ -6,6 +6,7 @@
  *  Copyright (C) 2002-2005 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -37,17 +38,18 @@ struct file_offset_match : public std::binary_function<request_ptr, request_ptr,
     }
 };
 
-request_queue_impl_1q::request_queue_impl_1q(int n) : _thread_state(NOT_RUNNING), sem(0)
+request_queue_impl_1q::request_queue_impl_1q(int n)
+    : m_thread_state(NOT_RUNNING), sem(0)
 {
     STXXL_UNUSED(n);
-    start_thread(worker, static_cast<void *>(this), thread, _thread_state);
+    start_thread(worker, static_cast<void *>(this), thread, m_thread_state);
 }
 
 void request_queue_impl_1q::add_request(request_ptr & req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request submitted to disk_queue.");
-    if (_thread_state() != RUNNING)
+    if (m_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request submitted to not running queue.");
 
 #if STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
@@ -71,7 +73,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr & req)
 {
     if (req.empty())
         STXXL_THROW_INVALID_ARGUMENT("Empty request canceled disk_queue.");
-    if (_thread_state() != RUNNING)
+    if (m_thread_state() != RUNNING)
         STXXL_THROW_INVALID_ARGUMENT("Request canceled to not running queue.");
 
     bool was_still_in_queue = false;
@@ -91,7 +93,7 @@ bool request_queue_impl_1q::cancel_request(request_ptr & req)
 
 request_queue_impl_1q::~request_queue_impl_1q()
 {
-    stop_thread(thread, _thread_state, sem);
+    stop_thread(thread, m_thread_state, sem);
 }
 
 void * request_queue_impl_1q::worker(void * arg)
@@ -124,13 +126,15 @@ void * request_queue_impl_1q::worker(void * arg)
         }
 
         // terminate if it has been requested and queues are empty
-        if (pthis->_thread_state() == TERMINATE) {
+        if (pthis->m_thread_state() == TERMINATING) {
             if ((pthis->sem--) == 0)
                 break;
             else
                 pthis->sem++;
         }
     }
+
+    pthis->m_thread_state.set_to(TERMINATED);
 
     return NULL;
 }

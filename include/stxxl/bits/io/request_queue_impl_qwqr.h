@@ -6,6 +6,7 @@
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008, 2009 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -37,7 +38,7 @@ private:
     queue_type write_queue;
     queue_type read_queue;
 
-    state<thread_state> _thread_state;
+    state<thread_state> m_thread_state;
     thread_type thread;
     semaphore sem;
 
