@@ -79,17 +79,27 @@ endif()
 
 option(NO_CXX11 "Build without C++11 flags" OFF)
 
+### building shared and/or static libraries
+
 if(MSVC OR CYGWIN OR MINGW)
-  # shared libraries are not recommended (read: do not work well) on these platforms
-  set(BUILD_SHARED_LIBS OFF)
-  set(BUILD_STATIC_LIBS ON)
+  # shared libraries are not recommended (read: do not work) on these platforms
+  set(DEF_BUILD_SHARED_LIBS OFF)
+  set(DEF_BUILD_STATIC_LIBS ON)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+  # linking shared libraries does not work with Intel compiler
+  set(DEF_BUILD_SHARED_LIBS OFF)
+  set(DEF_BUILD_STATIC_LIBS ON)
 else()
-  # default to build shared libraries on other platforms
-  option(BUILD_SHARED_LIBS "Build shared library version of libstxxl" ON)
-  option(BUILD_STATIC_LIBS "Build static library version of libstxxl" OFF)
+  # default to build shared libraries
+  set(DEF_BUILD_SHARED_LIBS ON)
+  set(DEF_BUILD_STATIC_LIBS OFF)
 endif()
 
-# allow user to specify other installation paths
+option(BUILD_SHARED_LIBS "Build shared library version of libstxxl" ${DEF_BUILD_SHARED_LIBS})
+option(BUILD_STATIC_LIBS "Build static library version of libstxxl" ${DEF_BUILD_STATIC_LIBS})
+
+### allow user to specify other installation paths
+
 set(INSTALL_BIN_DIR "bin" CACHE PATH "Installation directory for executables")
 set(INSTALL_LIB_DIR "lib" CACHE PATH "Installation directory for libraries")
 set(INSTALL_INCLUDE_DIR "include" CACHE PATH "Installation directory for header files")
