@@ -1,5 +1,5 @@
 /***************************************************************************
- *  lib/mng/diskallocator.cpp
+ *  lib/mng/disk_allocator.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -11,13 +11,13 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/mng/diskallocator.h>
+#include <stxxl/bits/mng/disk_allocator.h>
 #include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE
 
-void DiskAllocator::dump() const
+void disk_allocator::dump() const
 {
     int64 total = 0;
     sortseq::const_iterator cur = free_space.begin();
@@ -31,7 +31,7 @@ void DiskAllocator::dump() const
 }
 
 
-void DiskAllocator::deallocation_error(
+void disk_allocator::deallocation_error(
     stxxl::int64 block_pos, stxxl::int64 block_size,
     const sortseq::iterator & pred, const sortseq::iterator & succ) const
 {
@@ -55,7 +55,7 @@ void DiskAllocator::deallocation_error(
 }
 
 
-void DiskAllocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size)
+void disk_allocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_size)
 {
     //assert(block_size);
     //dump();
@@ -72,14 +72,14 @@ void DiskAllocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_s
         {
             if (pred->first <= region_pos && pred->first + pred->second > region_pos)
             {
-                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  in empty space [" << pred->first << " + " << pred->second << "]");
+                STXXL_THROW(bad_ext_alloc, "disk_allocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  in empty space [" << pred->first << " + " << pred->second << "]");
             }
         }
         if (succ != free_space.end())
         {
             if (region_pos <= succ->first && region_pos + region_size > succ->first)
             {
-                STXXL_THROW(bad_ext_alloc, "DiskAllocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  which overlaps empty space [" << succ->first << " + " << succ->second << "]");
+                STXXL_THROW(bad_ext_alloc, "disk_allocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  which overlaps empty space [" << succ->first << " + " << succ->second << "]");
             }
         }
         if (succ == free_space.end())

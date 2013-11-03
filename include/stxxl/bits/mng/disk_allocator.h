@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/mng/diskallocator.h
+ *  include/stxxl/bits/mng/disk_allocator.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG_DISKALLOCATOR_HEADER
-#define STXXL_MNG_DISKALLOCATOR_HEADER
+#ifndef STXXL_MNG_DISK_ALLOCATOR_HEADER
+#define STXXL_MNG_DISK_ALLOCATOR_HEADER
 
 #include <vector>
 #include <map>
@@ -31,7 +31,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \ingroup mnglayer
 //! \{
 
-class DiskAllocator : private noncopyable
+class disk_allocator : private noncopyable
 {
     typedef std::pair<stxxl::int64, stxxl::int64> place;
 
@@ -75,7 +75,7 @@ class DiskAllocator : private noncopyable
     }
 
 public:
-    DiskAllocator(stxxl::file * storage, stxxl::int64 disk_size) :
+    disk_allocator(stxxl::file * storage, stxxl::int64 disk_size) :
         free_bytes(0),
         disk_bytes(0),
         storage(storage),
@@ -122,7 +122,7 @@ public:
     {
         scoped_mutex_lock lock(mutex);
 
-        STXXL_VERBOSE2("DiskAllocator::delete_block<" << BLK_SIZE <<
+        STXXL_VERBOSE2("disk_allocator::delete_block<" << BLK_SIZE <<
                        ">(pos=" << bid.offset << ", size=" << bid.size <<
                        "), free:" << free_bytes << " total:" << disk_bytes);
 
@@ -131,7 +131,7 @@ public:
 };
 
 template <unsigned BLK_SIZE>
-void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
+void disk_allocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 {
     stxxl::int64 requested_size = 0;
 
@@ -143,7 +143,7 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
     scoped_mutex_lock lock(mutex);
 
-    STXXL_VERBOSE2("DiskAllocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
+    STXXL_VERBOSE2("disk_allocator::new_blocks<BLK_SIZE>,  BLK_SIZE = " << BLK_SIZE <<
                    ", free:" << free_bytes << " total:" << disk_bytes <<
                    ", blocks: " << (end - begin) <<
                    " begin: " << static_cast<void *>(begin) <<
@@ -223,5 +223,5 @@ void DiskAllocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_MNG_DISKALLOCATOR_HEADER
+#endif // !STXXL_MNG_DISK_ALLOCATOR_HEADER
 // vim: et:ts=4:sw=4

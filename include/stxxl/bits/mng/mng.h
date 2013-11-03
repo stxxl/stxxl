@@ -39,7 +39,7 @@
 #include <stxxl/bits/noncopyable.h>
 #include <stxxl/bits/singleton.h>
 #include <stxxl/bits/mng/bid.h>
-#include <stxxl/bits/mng/diskallocator.h>
+#include <stxxl/bits/mng/disk_allocator.h>
 #include <stxxl/bits/mng/block_alloc.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/common/utils.h>
@@ -63,7 +63,7 @@ class block_manager : public singleton<block_manager>
 {
     friend class singleton<block_manager>;
 
-    DiskAllocator ** disk_allocators;
+    disk_allocator ** disk_allocators;
     file ** disk_files;
 
     size_t ndisks;

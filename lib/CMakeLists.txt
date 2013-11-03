@@ -42,7 +42,7 @@ set(LIBSTXXL_SOURCES
   io/wincall_file.cpp
 
   mng/config.cpp
-  mng/diskallocator.cpp
+  mng/disk_allocator.cpp
   mng/mng.cpp
 
   algo/async_schedule.cpp

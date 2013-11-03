@@ -21,7 +21,7 @@ block_manager::block_manager()
     config * cfg = config::get_instance();
 
     ndisks = cfg->disks_number();
-    disk_allocators = new DiskAllocator *[ndisks];
+    disk_allocators = new disk_allocator* [ndisks];
     disk_files = new file *[ndisks];
 
     for (unsigned i = 0; i < ndisks; ++i)
@@ -31,7 +31,7 @@ block_manager::block_manager()
                                     file::CREAT | file::RDWR | file::DIRECT,
                                     i,          // physical_device_id
                                     i);         // allocator_id
-        disk_allocators[i] = new DiskAllocator(disk_files[i], cfg->disk_size(i));
+        disk_allocators[i] = new disk_allocator(disk_files[i], cfg->disk_size(i));
     }
 
 #if STXXL_MNG_COUNT_ALLOCATION
