@@ -79,7 +79,7 @@ public:
         check_pthread_call(pthread_mutex_unlock(&m_mutex));
     }
     //! return platform specific handle
-    pthread_mutex_t native_handle()
+    pthread_mutex_t& native_handle()
     {
         return m_mutex;
     }
@@ -101,17 +101,17 @@ typedef boost::mutex::scoped_lock scoped_mutex_lock;
 class scoped_mutex_lock
 {
     //! mutex reference
-    mutex & m_mtx;
+    mutex & m_mutex;
 
     //! marker if already unlocked by this thread (needs no synchronization)
     bool is_locked;
 
 public:
     //! lock mutex
-    scoped_mutex_lock(mutex & m_mtx)
-        : m_mtx(mtx), is_locked(true)
+    scoped_mutex_lock(mutex& m)
+        : m_mutex(m), is_locked(true)
     {
-        m_mtx.lock();
+        m_mutex.lock();
     }
     //! unlock mutex hold when object goes out of scope.
     ~scoped_mutex_lock()
@@ -123,11 +123,11 @@ public:
     {
         if (is_locked) {
             is_locked = false;
-            m_mtx.unlock();
+            m_mutex.unlock();
         }
     }
     //! return platform specific handle
-    pthread_mutex_t native_handle()
+    pthread_mutex_t& native_handle()
     {
         return m_mutex.native_handle();;
     }

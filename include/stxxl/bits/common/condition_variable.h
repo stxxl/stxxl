@@ -15,6 +15,7 @@
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
+#include <stxxl/bits/common/mutex.h>
 
 #if STXXL_STD_THREADS
  #include <condition_variable>
@@ -72,7 +73,7 @@ public:
     //! wait for a signal on the condition variable
     void wait(scoped_mutex_lock& lock)
     {
-        check_pthread_call(pthread_cond_wait(&cond, lock.get_handle()));
+        check_pthread_call(pthread_cond_wait(&cond, &lock.native_handle()));
     }
 };
 
