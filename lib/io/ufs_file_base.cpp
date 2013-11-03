@@ -26,7 +26,7 @@
   #include <unistd.h>
   #include <fcntl.h>
 #endif
-#include <stdio.h>
+#include <cstdio>
 
 
 __STXXL_BEGIN_NAMESPACE

@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
+ *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -26,10 +27,17 @@
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/disk_queues.h>
 #include <stxxl/bits/io/iostats.h>
-
+#include <stxxl/bits/namespace.h>
 
 //! \c STXXL library namespace
 __STXXL_BEGIN_NAMESPACE
+
+//! \defgroup iolayer I/O primitives layer
+//! Group of classes which enable abstraction from operating system calls and support
+//! system-independent interfaces for asynchronous I/O.
+//! \{
+
+//! \}
 
 __STXXL_END_NAMESPACE
 
