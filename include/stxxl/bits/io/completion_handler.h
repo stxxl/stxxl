@@ -17,7 +17,7 @@
 #define STXXL_IO_COMPLETION_HANDLER_HEADER
 
 #include <stxxl/bits/namespace.h>
-#include <stxxl/bits/compat_unique_ptr.h>
+#include <stxxl/bits/compat/unique_ptr.h>
 
 
 __STXXL_BEGIN_NAMESPACE

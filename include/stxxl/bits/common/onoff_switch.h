@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/common/switch.h
+ *  include/stxxl/bits/common/onoff_switch.h
  *
  *  Kind of binary semaphore: initially OFF, then multiple waiters can attach
  *  to the switch, which get notified one-by-one when switched ON.
@@ -14,8 +14,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_COMMON_SWITCH_HEADER
-#define STXXL_COMMON_SWITCH_HEADER
+#ifndef STXXL_COMMON_ONOFF_SWITCH_HEADER
+#define STXXL_COMMON_ONOFF_SWITCH_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -83,4 +83,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_COMMON_SWITCH_HEADER
+#endif // !STXXL_COMMON_ONOFF_SWITCH_HEADER

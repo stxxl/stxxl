@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #ifndef STXXL_COMMON_CONDITION_VARIABLE_HEADER
-#define STXXL_COMMON_CONDITION_VARIABLE
+#define STXXL_COMMON_CONDITION_VARIABLE_HEADER
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
@@ -80,4 +80,4 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_COMMON_MUTEX_HEADER
+#endif // !STXXL_COMMON_CONDITION_VARIABLE_HEADER

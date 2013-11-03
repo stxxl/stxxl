@@ -22,7 +22,7 @@
 #include <stxxl/bits/common/counting_ptr.h>
 #include <stxxl/bits/common/exceptions.h>
 #include <stxxl/bits/io/completion_handler.h>
-#include <stxxl/bits/compat_unique_ptr.h>
+#include <stxxl/bits/compat/unique_ptr.h>
 #include <stxxl/bits/verbose.h>
 
 

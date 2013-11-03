@@ -14,7 +14,7 @@
 #define STXXL_CONTAINERS_BTREE_NODE_CACHE_HEADER
 
 #include <stxxl/bits/config.h>
-#include <stxxl/bits/compat_hash_map.h>
+#include <stxxl/bits/compat/hash_map.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/bits/mng/typed_block.h>

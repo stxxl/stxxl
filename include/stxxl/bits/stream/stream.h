@@ -21,7 +21,7 @@
 #include <stxxl/bits/common/tuple.h>
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/vector>
-#include <stxxl/bits/compat_unique_ptr.h>
+#include <stxxl/bits/compat/unique_ptr.h>
 
 
 #ifndef STXXL_VERBOSE_MATERIALIZE

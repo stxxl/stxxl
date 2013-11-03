@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/compat_unique_ptr.h
+ *  include/stxxl/bits/compat/unique_ptr.h
  *
  *  compatibility interface to unique_ptr (C++0x), previously auto_ptr
  *

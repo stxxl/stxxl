@@ -17,7 +17,7 @@
 #include <list>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/mng/write_pool.h>
-#include <stxxl/bits/compat_hash_map.h>
+#include <stxxl/bits/compat/hash_map.h>
 
 
 __STXXL_BEGIN_NAMESPACE

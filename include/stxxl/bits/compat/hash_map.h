@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/compat_hash_map.h
+ *  include/stxxl/bits/compat/hash_map.h
  *
  *  compatibility interface to C++ standard extension hash_map
  *
