@@ -20,6 +20,9 @@
 #include <stxxl/bits/io/request_with_state.h>
 #include <stxxl/bits/parallel.h>
 
+#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+ #include <windows.h>
+#endif
 
 #ifndef STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION
 #define STXXL_CHECK_FOR_PENDING_REQUESTS_ON_SUBMISSION 1
@@ -131,7 +134,6 @@ request_queue_impl_qwqr::~request_queue_impl_qwqr()
 void * request_queue_impl_qwqr::worker(void * arg)
 {
     self * pthis = static_cast<self *>(arg);
-    request_ptr req;
 
     bool write_phase = true;
     for ( ; ; )
@@ -143,7 +145,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
             scoped_mutex_lock WriteLock(pthis->write_mutex);
             if (!pthis->write_queue.empty())
             {
-                req = pthis->write_queue.front();
+                request_ptr req = pthis->write_queue.front();
                 pthis->write_queue.pop_front();
 
                 WriteLock.unlock();
@@ -171,7 +173,7 @@ void * request_queue_impl_qwqr::worker(void * arg)
 
             if (!pthis->read_queue.empty())
             {
-                req = pthis->read_queue.front();
+                request_ptr req = pthis->read_queue.front();
                 pthis->read_queue.pop_front();
 
                 ReadLock.unlock();
@@ -206,6 +208,12 @@ void * request_queue_impl_qwqr::worker(void * arg)
     }
 
     pthis->m_thread_state.set_to(TERMINATED);
+
+#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+    // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
+    // request_queue_impl_worker.cpp. -tb
+    ExitThread(NULL);
+#endif
 
     return NULL;
 }

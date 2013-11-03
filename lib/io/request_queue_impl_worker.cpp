@@ -13,6 +13,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+#include <stxxl/bits/config.h>
 #include <stxxl/bits/io/request_queue_impl_worker.h>
 #include <stxxl/bits/io/request.h>
 
@@ -56,9 +57,7 @@ void request_queue_impl_worker::stop_thread(thread_type & t, state<thread_state>
     // std::thread::native_handle() and access the WINAPI to terminate the
     // thread directly (after it finished handling its i/o requests).
 
-    s.wait_for(TERMINATED);
-
-    TerminateThread(t->native_handle(), NULL);
+    WaitForSingleObject(t->native_handle(), INFINITE);
     CloseHandle(t->native_handle());
 #else
     t->join();
