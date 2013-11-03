@@ -27,7 +27,7 @@ __STXXL_BEGIN_NAMESPACE
 
 //! External sorter container. \n
 //! <b> Introduction </b> to sorter container: see \ref tutorial_sorter tutorial. \n
-//! <b> Design and Internals </b> of sorter container: see \ref TODO
+//! <b> Design and Internals </b> of sorter container: see \ref design_sorter
 
 /**
  * \brief External Sorter: use stream package objects to keep a sorted

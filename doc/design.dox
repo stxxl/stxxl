@@ -167,8 +167,8 @@ Beyond these, STXXL also provides a set of containers that are not part of the S
 
 - \subpage design_pqueue "stxxl::priority_queue"
 - \subpage design_matrix "stxxl::matrix"
-- \ref stxxl::sorter
-- \ref stxxl::sequence
+- \subpage design_sorter "stxxl::sorter"
+- \subpage design_sequence "stxxl::sequence"
 
 */
 
@@ -505,7 +505,29 @@ Our design allows to use different implementations for leaves and (internal) nod
 
 /** \page design_matrix Matrix
 
-Currently undocumented. TODO
+Currently no documentation here.
+
+The matrix library was created as a student project and documented in the following thesis: http://algo2.iti.kit.edu/english/1919.php
+
+*/
+
+/** \page design_sequence Sequence
+
+The stxxl::sequence container is an external memory deque without facilities for random access.
+
+One can push and pop on both ends of an stxxl::sequence using the functions push_back(), pop_back, push_front() and pop_front. Only one block at each end is guaranteed to be in memory, but the sequence will automatically prefetch and overlap writes when many equal calls are done.
+
+There are no operator[] or other random access methods for the sequence.
+
+The only methods to access all elements are via streams: the sequence can be streamed from front-to-back and from back-to-front (in reverse). The functions sequence::get_stream and sequence::get_reverse_stream() are convenience access to these streams.
+
+*/
+
+/** \page design_sorter Sorter
+
+The stxxl::sorter is a "sorting container": a set of items can be inserted in arbitrary order, and after all are inserted, the set can be read as a sorted stream.
+
+See the \ref tutorial_sorter tutorial for more information.
 
 */
 
