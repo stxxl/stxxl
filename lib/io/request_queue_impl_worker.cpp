@@ -19,6 +19,9 @@
 #if STXXL_BOOST_THREADS
  #include <boost/bind.hpp>
 #endif
+#if STXXL_STD_THREADS && STXXL_MSVC >= 1700
+ #include <windows.h>
+#endif
 
 #include <iostream>
 __STXXL_BEGIN_NAMESPACE
@@ -44,14 +47,19 @@ void request_queue_impl_worker::stop_thread(thread_type & t, state<thread_state>
 #if STXXL_STD_THREADS
 #if STXXL_MSVC >= 1700
     // In the Visual C++ Runtime 2012 and 2013, there is a deadlock bug, which
-    // occurs when threads are joined after main() exits. All STXXL threads are
-    // created by singletons, which are global variables that are deleted after
-    // main() exits.
+    // occurs when threads are joined after main() exits. Apparently, Microsoft
+    // thinks this is not a big issue. It has not been fixed in VC++RT 2013.
     // https://connect.microsoft.com/VisualStudio/feedback/details/747145
-    // The simple fix applied here it to NOT join or delete threads. This
-    // leaves the thread resource dangling after program exit.
-    t->detach();
+    //
+    // All STXXL threads are created by singletons, which are global variables
+    // that are deleted after main() exits. The fix applied here it to use
+    // std::thread::native_handle() and access the WINAPI to terminate the
+    // thread directly (after it finished handling its i/o requests).
+
     s.wait_for(TERMINATED);
+
+    TerminateThread(t->native_handle(), NULL);
+    CloseHandle(t->native_handle());
 #else
     t->join();
     delete t;
