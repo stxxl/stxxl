@@ -18,7 +18,7 @@
 #include <stxxl/bits/namespace.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
-#include <stxxl/bits/common/switch.h>
+#include <stxxl/bits/common/onoff_switch.h>
 
 
 __STXXL_BEGIN_NAMESPACE

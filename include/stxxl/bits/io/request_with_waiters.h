@@ -17,7 +17,7 @@
 #include <set>
 
 #include <stxxl/bits/common/mutex.h>
-#include <stxxl/bits/common/switch.h>
+#include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/io/request_interface.h>
 
 

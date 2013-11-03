@@ -18,7 +18,7 @@
 #include <vector>
 #include <queue>
 
-#include <stxxl/bits/common/switch.h>
+#include <stxxl/bits/common/onoff_switch.h>
 #include <stxxl/bits/io/request.h>
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/noncopyable.h>
