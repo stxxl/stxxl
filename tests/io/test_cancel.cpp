@@ -13,6 +13,7 @@
 
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
+#include <cstring>
 
 //! \example io/test_cancel.cpp
 //! This tests the request cancelation mechanisms.

@@ -12,6 +12,7 @@
  **************************************************************************/
 
 #include <limits>
+#include <cstring>
 #include <stxxl/io>
 #include <stxxl/aligned_alloc>
 

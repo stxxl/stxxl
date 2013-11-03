@@ -14,6 +14,7 @@
 
 #include <stxxl/bits/io/create_file.h>
 #include <stxxl/bits/io/io.h>
+#include <stxxl/bits/common/error_handling.h>
 
 
 __STXXL_BEGIN_NAMESPACE

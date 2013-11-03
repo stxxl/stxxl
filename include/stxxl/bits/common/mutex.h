@@ -43,36 +43,45 @@ typedef std::mutex mutex;
 
 typedef boost::mutex mutex;
 
-#else
+#elif STXXL_POSIX_THREADS
 
 class mutex : private noncopyable
 {
-    pthread_mutex_t _mutex;
+    //! mutex handle
+    pthread_mutex_t m_mutex;
 
 public:
+    //! construct unlocked mutex
     mutex()
     {
-        check_pthread_call(pthread_mutex_init(&_mutex, NULL));
+        check_pthread_call(pthread_mutex_init(&m_mutex, NULL));
     }
-
+    //! destroy mutex handle
     ~mutex()
     {
-        int res = pthread_mutex_trylock(&_mutex);
+        int res = pthread_mutex_trylock(&m_mutex);
 
         if (res == 0 || res == EBUSY) {
-            check_pthread_call(pthread_mutex_unlock(&_mutex));
+            check_pthread_call(pthread_mutex_unlock(&m_mutex));
         } else
             stxxl_function_error(resource_error);
 
-        check_pthread_call(pthread_mutex_destroy(&_mutex));
+        check_pthread_call(pthread_mutex_destroy(&m_mutex));
     }
+    //! lock mutex, may block
     void lock()
     {
-        check_pthread_call(pthread_mutex_lock(&_mutex));
+        check_pthread_call(pthread_mutex_lock(&m_mutex));
     }
+    //! unlock mutex
     void unlock()
     {
-        check_pthread_call(pthread_mutex_unlock(&_mutex));
+        check_pthread_call(pthread_mutex_unlock(&m_mutex));
+    }
+    //! return platform specific handle
+    pthread_mutex_t native_handle()
+    {
+        return m_mutex;
     }
 };
 
@@ -91,27 +100,36 @@ typedef boost::mutex::scoped_lock scoped_mutex_lock;
 //! Aquire a lock that's valid until the end of scope.
 class scoped_mutex_lock
 {
-    mutex & mtx;
+    //! mutex reference
+    mutex & m_mtx;
+
+    //! marker if already unlocked by this thread (needs no synchronization)
     bool is_locked;
 
 public:
-    scoped_mutex_lock(mutex & mtx_)
-        : mtx(mtx_), is_locked(true)
+    //! lock mutex
+    scoped_mutex_lock(mutex & m_mtx)
+        : m_mtx(mtx), is_locked(true)
     {
-        mtx.lock();
+        m_mtx.lock();
     }
-
+    //! unlock mutex hold when object goes out of scope.
     ~scoped_mutex_lock()
     {
         unlock();
     }
-
+    //! unlock mutex hold prematurely
     void unlock()
     {
         if (is_locked) {
             is_locked = false;
-            mtx.unlock();
+            m_mtx.unlock();
         }
+    }
+    //! return platform specific handle
+    pthread_mutex_t native_handle()
+    {
+        return m_mutex.native_handle();;
     }
 };
 

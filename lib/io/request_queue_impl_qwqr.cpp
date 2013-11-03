@@ -15,6 +15,7 @@
 
 #include <algorithm>
 
+#include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/io/request_queue_impl_qwqr.h>
 #include <stxxl/bits/io/request_with_state.h>
 #include <stxxl/bits/parallel.h>

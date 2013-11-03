@@ -30,6 +30,7 @@
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/parallel.h>
 #include <stxxl/bits/common/is_sorted.h>
+#include <stxxl/bits/common/error_handling.h>
 
 #if STXXL_PARALLEL
 

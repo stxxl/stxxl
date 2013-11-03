@@ -14,6 +14,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/wbtl_file.h>
+#include <stxxl/bits/common/error_handling.h>
 
 #if STXXL_HAVE_WBTL_FILE
 
