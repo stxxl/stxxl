@@ -43,6 +43,7 @@
 #include <stxxl/bits/mng/block_alloc.h>
 #include <stxxl/bits/mng/config.h>
 #include <stxxl/bits/common/utils.h>
+#include <stxxl/bits/common/simple_vector.h>
 
 __STXXL_BEGIN_NAMESPACE
 
@@ -188,27 +189,20 @@ void block_manager::new_blocks_int(
     typedef BIDType bid_type;
     typedef BIDArray<bid_type::t_size> bid_array_type;
 
-    int_type * bl = new int_type[ndisks];
-    bid_array_type * disk_bids = new bid_array_type[ndisks];
-    file ** disk_ptrs = new file *[nblocks];
+    simple_vector<int_type> bl (ndisks);
+    simple_vector<bid_array_type> disk_bids (ndisks);
+    simple_vector<file*> disk_ptrs (nblocks);
 
-#if STXXL_MNG_COUNT_ALLOCATION
-    m_total_allocation += nblocks * BIDType::size;
-    m_current_allocation += nblocks * BIDType::size;
-    m_maximum_allocation = STXXL_MAX(m_maximum_allocation, m_current_allocation);
-#endif // STXXL_MNG_COUNT_ALLOCATION
+    bl.memzero();
 
-    memset(bl, 0, ndisks * sizeof(int_type));
-
-    unsigned_type i;
-    for (i = 0; i < nblocks; ++i)
+    for (unsigned_type i = 0; i < nblocks; ++i)
     {
         unsigned_type disk = functor(offset + i);
         disk_ptrs[i] = disk_files[disk];
         bl[disk]++;
     }
 
-    for (i = 0; i < ndisks; ++i)
+    for (unsigned_type i = 0; i < ndisks; ++i)
     {
         if (bl[i])
         {
@@ -217,20 +211,22 @@ void block_manager::new_blocks_int(
         }
     }
 
-    memset(bl, 0, ndisks * sizeof(int_type));
+    bl.memzero();
 
     OutputIterator it = out;
-    for (i = 0; i != nblocks; ++it, ++i)
+    for (unsigned_type i = 0; i != nblocks; ++it, ++i)
     {
         const int disk = disk_ptrs[i]->get_allocator_id();
-        bid_type bid(disk_ptrs[i], disk_bids[disk][bl[disk]++].offset);
+        bid_type bid(disk_ptrs[i], disk_bids[disk][ bl[disk]++ ].offset);
         *it = bid;
         STXXL_VERBOSE_BLOCK_LIFE_CYCLE("BLC:new    " << FMT_BID(bid));
     }
 
-    delete[] bl;
-    delete[] disk_bids;
-    delete[] disk_ptrs;
+#if STXXL_MNG_COUNT_ALLOCATION
+    m_total_allocation += nblocks * BIDType::size;
+    m_current_allocation += nblocks * BIDType::size;
+    m_maximum_allocation = STXXL_MAX(m_maximum_allocation, m_current_allocation);
+#endif // STXXL_MNG_COUNT_ALLOCATION
 }
 
 

@@ -96,17 +96,17 @@ public:
         }
     }
 
-    inline stxxl::int64 get_free_bytes() const
+    inline int64 get_free_bytes() const
     {
         return free_bytes;
     }
 
-    inline stxxl::int64 get_used_bytes() const
+    inline int64 get_used_bytes() const
     {
         return disk_bytes - free_bytes;
     }
 
-    inline stxxl::int64 get_total_bytes() const
+    inline int64 get_total_bytes() const
     {
         return disk_bytes;
     }

@@ -155,7 +155,11 @@ public:
             m_size = newsize;
         }
     }
-
+    //! Zero the whole array content.
+    void memzero()
+    {
+        memset(m_array, 0, m_size * sizeof(value_type));
+    }
 };
 __STXXL_END_NAMESPACE
 
