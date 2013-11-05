@@ -913,7 +913,7 @@ public:
                 assert(mod0_result != NULL && mod1_result != NULL && mod2_result != NULL);
                 delete mod0_result; mod0_result = NULL;
                 delete mod1_result; mod1_result = NULL;
-                delete mod2_result; mod1_result = NULL;
+                delete mod2_result; mod2_result = NULL;
             }
 
             return *this;

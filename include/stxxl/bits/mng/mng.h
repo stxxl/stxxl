@@ -268,22 +268,6 @@ void block_manager::delete_blocks(
     #define STXXL_DEFAULT_BLOCK_SIZE(type) (2 * 1024 * 1024) // use traits
 #endif
 
-
-class FileCreator
-{
-public:
-    _STXXL_DEPRECATED(
-    static file * create(const std::string & io_impl,
-                         const std::string & filename,
-                         int options,
-                         int queue_id = file::DEFAULT_QUEUE,
-                         int allocator_id = file::NO_ALLOCATOR)
-    )
-    {
-        return create_file(io_impl, filename, options, queue_id, allocator_id);
-    }
-};
-
 //! \}
 
 __STXXL_END_NAMESPACE
