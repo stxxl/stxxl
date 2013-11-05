@@ -391,17 +391,17 @@ Each line of the configuration file describes a disk. Lines starting with '#' ar
 
 A disk description uses the following format:
 \verbatim
-disk=full_disk_filename,capacity,access_method
+disk=<path>,<capacity>,<fileio> <options>
 \endverbatim
 
 Description of the parameters:
 
-- \c full_disk_filename : full disk filename.
+- <tt>\<path></tt> : full disk filename.
   - In order to access disks STXXL uses <i>file-based access methods</i> (see below). Each disk is represented as a file
   - If you have a disk that is mounted in Unix to the path /mnt/disk0/, then the correct value for the \c full_disk_filename would be \c /mnt/disk0/some_file_name. \n
   - If the string contains <tt>"###"</tt> (three '#'), then these symbols are replaced by the current process id.
 
-- \c capacity : maximum capacity of the disk
+- <tt>\<capacity></tt> : maximum capacity of the disk
 
   - the following size suffixes are recognized:
     - \c K, \c M, \c G, \c T, \c P (powers of 10),
@@ -410,14 +410,13 @@ Description of the parameters:
 
   - 0 means autogrow, and the file will be deleted afterwards.
 
-- \c access_method : \c STXXL has a number of different file access implementations, choose one of them:
+- <tt>\<fileio></tt> : \c STXXL has a number of different file access implementations, choose one of them:
 
   - \c syscall : use \c read and \c write system calls which perform disk transfers directly on user memory pages without superfluous copying (currently the fastest method)
 
-  - \c <b>syscall_unlink</b> : is a variant of \c syscall, which \b unlinks the file immediately after creation. \n
-    This is possible on Unix system, as the file descriptor is kept open. This method is \b preferred, because even in the case of a program segfault, the file data is cleaned up by the kernel.
-
   - \c wincall : on Windows, use direct calls to the Windows API.
+
+  - \c memory : keeps all data in RAM, for quicker testing
 
   - \c mmap : \c use \c mmap and \c munmap system calls
 
@@ -427,20 +426,34 @@ Description of the parameters:
 
   - \c simdisk : simulates timings of the IBM IC35L080AVVA07 disk, full_disk_filename must point to a file on a RAM disk partition with sufficient space
 
-  - \c memory : keeps all data in RAM, for quicker testing
-
   - \c wbtl : library-based write-combining (good for writing small blocks onto SSDs), based on \c syscall
+
+- <tt>\<options></tt> : additional options for file access implementation. Not all are available for every fileio method. The option order is unimportant.
+
+  - \c autogrow : enables automatic growth of the file beyond the specified capacity.
+
+  - \c direct, \c nodirect, \c direct=[yes/no/try] : disable buffering in system cache by passing O_DIRECT or similar flag to open. \n
+    This is \a recommended as it improves performance, however, not all filesystems support bypassing cache. With \c direct or \c direct=yes, STXXL will fail without direct access. With \c nodirect or \c direct=no it is disabled. The default is \c direct=try , which first attempts to open with O_DIRECT and falls back to opening without if it fails.
+
+  - \c unlink (or \c unlink_on_open) : unlink the file from the fs immediately after creation. \n
+    This is possible on Unix system, as the file descriptor is kept open. This method is \b preferred, because even in the case of a program segfault, the file data is cleaned up by the kernel.
+
+  - \c delete (or \c delete_on_exit) : delete file \a after the STXXL program exists \n
+    This is the more conservative version of unlink, which also works on Windows. However, if the program crashes, the file is not deleted.
+
+  - \c queue=# : assign the disk to a specific I/O request queue and thread. \n
+    Use this for multiple files that reside on the same physical disk.
 
 Example:
 \verbatim
-disk=/data01/stxxl,500G,syscall_unlink
-disk=/data02/stxxl,300G,syscall_unlink
+disk=/data01/stxxl,500G,syscall unlink
+disk=/data02/stxxl,300G,syscall unlink
 \endverbatim
 
 On Windows, one usually uses different disk drives and \c wincall.
 \verbatim
-disk=c:\stxxl.tmp,700G,wincall
-disk=d:\stxxl.tmp,200G,wincall
+disk=c:\stxxl.tmp,700G,wincall delete
+disk=d:\stxxl.tmp,200G,wincall delete
 \endverbatim
 
 \section install_config_filesystem Recommended file system

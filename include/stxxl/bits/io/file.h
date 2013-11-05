@@ -6,6 +6,7 @@
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2008, 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -103,14 +104,15 @@ public:
     //! converted to this set of acceptable modes
     enum open_mode
     {
-        RDONLY = 1,                         //!< only reading of the file is allowed
-        WRONLY = 2,                         //!< only writing of the file is allowed
-        RDWR = 4,                           //!< read and write of the file are allowed
-        CREAT = 8,                          //!< in case file does not exist no error occurs and file is newly created
-        DIRECT = 16,                        //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O
-        TRUNC = 32,                         //!< once file is opened its length becomes zero
-        SYNC = 64,                          //!< open the file with O_SYNC | O_DSYNC | O_RSYNC flags set
-        NO_LOCK = 128                       //!< do not aquire an exclusive lock by default
+        RDONLY = 1,       //!< only reading of the file is allowed
+        WRONLY = 2,       //!< only writing of the file is allowed
+        RDWR = 4,         //!< read and write of the file are allowed
+        CREAT = 8,        //!< in case file does not exist no error occurs and file is newly created
+        DIRECT = 16,      //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O
+        TRUNC = 32,       //!< once file is opened its length becomes zero
+        SYNC = 64,        //!< open the file with O_SYNC | O_DSYNC | O_RSYNC flags set
+        NO_LOCK = 128,    //!< do not aquire an exclusive lock by default
+        TRY_DIRECT = 256  //!< try to open with DIRECT flag, else print error and open without DIRECT.
     };
 
     static const int DEFAULT_QUEUE = -1;

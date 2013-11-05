@@ -31,7 +31,9 @@ fileperblock_file<base_file_type>::fileperblock_file(
     int mode,
     int queue_id,
     int allocator_id)
-    : disk_queued_file(queue_id, allocator_id), filename_prefix(filename_prefix), mode(mode),
+    : disk_queued_file(queue_id, allocator_id),
+      filename_prefix(filename_prefix),
+      mode(mode),
       current_size(0),
       lock_file_created(false),
       lock_file(filename_prefix + "_fpb_lock", mode, queue_id)

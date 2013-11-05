@@ -301,7 +301,6 @@ endif()
 # check for mmap() function in sys/mman.h
 
 include(CheckSymbolExists)
-set(STXXL_HAVE_MMAP_FILE 0)
 check_symbol_exists(mmap "sys/mman.h" STXXL_HAVE_MMAP_FILE)
 
 ###############################################################################
@@ -324,6 +323,7 @@ if(USE_BOOST)
     set(Boost_USE_STATIC_LIBS ON)
   endif(WIN32)
 
+  # first try to find the version
   find_package(Boost 1.40.0 REQUIRED)
 
   if(Boost_VERSION GREATER 104699)

@@ -6,6 +6,7 @@
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2007 Johannes Singler <singler@ira.uka.de>
  *  Copyright (C) 2009, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -24,6 +25,7 @@
 #include <stxxl/bits/mng/bid.h>
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/io/file.h>
+#include <stxxl/bits/mng/config.h>
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -35,7 +37,7 @@ class disk_allocator : private noncopyable
 {
     typedef std::pair<stxxl::int64, stxxl::int64> place;
 
-    struct FirstFit : public std::binary_function<place, stxxl::int64, bool>
+    struct first_fit : public std::binary_function<place, stxxl::int64, bool>
     {
         bool operator () (
             const place & entry,
@@ -51,6 +53,7 @@ class disk_allocator : private noncopyable
     sortseq free_space;
     stxxl::int64 free_bytes;
     stxxl::int64 disk_bytes;
+    stxxl::int64 cfg_bytes;
     stxxl::file * storage;
     bool autogrow;
 
@@ -75,13 +78,22 @@ class disk_allocator : private noncopyable
     }
 
 public:
-    disk_allocator(stxxl::file * storage, stxxl::int64 disk_size) :
-        free_bytes(0),
-        disk_bytes(0),
-        storage(storage),
-        autogrow(disk_size == 0)
+    disk_allocator(stxxl::file * storage, const disk_config& cfg)
+        : free_bytes(0),
+          disk_bytes(0),
+          cfg_bytes(cfg.size),
+          storage(storage),
+          autogrow(cfg.autogrow)
     {
-        grow_file(disk_size);
+        // initial growth to configured file size
+        grow_file(cfg.size);
+    }
+
+    ~disk_allocator()
+    {
+        if (disk_bytes > cfg_bytes) { // reduce to original size
+            storage->set_size(cfg_bytes);
+        }
     }
 
     inline stxxl::int64 get_free_bytes() const
@@ -165,7 +177,7 @@ void disk_allocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
 
     sortseq::iterator space;
     space = std::find_if(free_space.begin(), free_space.end(),
-                         bind2nd(FirstFit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
+                         bind2nd(first_fit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
 
     if (space == free_space.end() && requested_size == BLK_SIZE)
     {
@@ -183,7 +195,7 @@ void disk_allocator::new_blocks(BID<BLK_SIZE> * begin, BID<BLK_SIZE> * end)
         grow_file(BLK_SIZE);
 
         space = std::find_if(free_space.begin(), free_space.end(),
-                             bind2nd(FirstFit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
+                             bind2nd(first_fit(), requested_size) _STXXL_FORCE_SEQUENTIAL);
     }
 
     if (space != free_space.end())

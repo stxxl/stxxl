@@ -174,7 +174,7 @@ int benchmark_files(int argc, char * argv[])
     if (!myself || !*(++myself))
         myself = argv[0];
     std::cout << "# " << myself << " " << stxxl::get_version_string_long();
-#ifdef STXXL_DIRECT_IO_OFF
+#if STXXL_DIRECT_IO_OFF
     std::cout << " STXXL_DIRECT_IO_OFF";
 #endif
     std::cout << std::endl;

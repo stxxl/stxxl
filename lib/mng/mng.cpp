@@ -5,6 +5,7 @@
  *
  *  Copyright (C) 2002-2004 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008, 2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -18,20 +19,23 @@ __STXXL_BEGIN_NAMESPACE
 
 block_manager::block_manager()
 {
-    config * cfg = config::get_instance();
+    config * config = config::get_instance();
 
-    ndisks = cfg->disks_number();
+    ndisks = config->disks_number();
     disk_allocators = new disk_allocator* [ndisks];
     disk_files = new file *[ndisks];
 
     for (unsigned i = 0; i < ndisks; ++i)
     {
-        disk_files[i] = create_file(cfg->disk_io_impl(i),
-                                    cfg->disk_path(i),
-                                    file::CREAT | file::RDWR | file::DIRECT,
-                                    i,          // physical_device_id
-                                    i);         // allocator_id
-        disk_allocators[i] = new disk_allocator(disk_files[i], cfg->disk_size(i));
+        disk_config cfg = config->disk(i);
+
+        // assign queues in order of disks.
+        if (cfg.queue == file::DEFAULT_QUEUE)
+            cfg.queue = i;
+
+        disk_files[i] = create_file(cfg, file::CREAT | file::RDWR, i);
+
+        disk_allocators[i] = new disk_allocator(disk_files[i], cfg);
     }
 
 #if STXXL_MNG_COUNT_ALLOCATION

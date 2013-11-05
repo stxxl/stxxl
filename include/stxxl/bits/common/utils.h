@@ -51,9 +51,11 @@ __STXXL_BEGIN_NAMESPACE
 ////////////////////////////////////////////////////////////////////////////
 
 //! Split a string by given separator string. Returns a vector of strings with
-//! at least min_fields.
+//! at least min_fields and at most limit_fields
 static inline std::vector<std::string>
-split(const std::string & str, const std::string & sep, unsigned int min_fields)
+split(const std::string & str, const std::string & sep,
+      unsigned int min_fields = 0,
+      unsigned int limit_fields = std::numeric_limits<unsigned int>::max())
 {
     std::vector<std::string> result;
     if (str.empty()) {
@@ -64,6 +66,9 @@ split(const std::string & str, const std::string & sep, unsigned int min_fields)
     std::string::size_type CurPos(0), LastPos(0);
     while (1)
     {
+        if (result.size()+1 == limit_fields)
+            break;
+
         CurPos = str.find(sep, LastPos);
         if (CurPos == std::string::npos)
             break;
