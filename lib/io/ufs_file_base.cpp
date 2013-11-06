@@ -77,7 +77,7 @@ ufs_file_base::ufs_file_base(
 #if !STXXL_DIRECT_IO_OFF
         flags |= O_DIRECT;
 #else
-        if (!(flags & TRY_DIRECT)) {
+        if (!(mode & TRY_DIRECT)) {
             STXXL_ERRMSG("Error: open()ing " << filename << " with DIRECT mode requested, but the system does not support it.");
             file_des = -1;
             return;
