@@ -44,7 +44,7 @@ inline const char * get_version_string_long()
 #if STXXL_PARALLEL
            " + gnu parallel(" stringify(__GLIBCXX__) ")"
 #endif // STXXL_PARALLEL
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_BOOST_CONFIG
            " + Boost " stringify(BOOST_VERSION)
 #endif
     ;

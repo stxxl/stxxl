@@ -27,7 +27,7 @@
 #include <string>
 #include <cstdlib>
 
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
 #include <memory.h>
 #endif
 

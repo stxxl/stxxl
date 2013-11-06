@@ -26,7 +26,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
 // this is not stxxl/bits/io/io.h !
  #include <io.h>
 #else

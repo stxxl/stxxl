@@ -1610,7 +1610,7 @@ void sort(RandomAccessIterator begin,
           AllocStr AS)
 {
     STXXL_UNUSED(AS);
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
     typedef typename streamify_traits<RandomAccessIterator>::stream_type InputType;
 #else
     typedef __typeof__(stream::streamify(begin, end)) InputType;

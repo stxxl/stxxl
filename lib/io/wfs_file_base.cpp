@@ -14,7 +14,7 @@
 
 #include <stxxl/bits/io/wfs_file_base.h>
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
 
 __STXXL_BEGIN_NAMESPACE
 

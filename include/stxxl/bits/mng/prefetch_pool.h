@@ -42,7 +42,7 @@ protected:
                             size_t(bid.offset & 0xffffffff) + size_t(bid.offset >> 32);
             return result;
         }
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
         bool operator () (const bid_type & a, const bid_type & b) const
         {
             return (a.storage < b.storage) || (a.storage == b.storage && a.offset < b.offset);

@@ -18,13 +18,13 @@
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
 
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_BOOST_CONFIG
   #include <boost/noncopyable.hpp>
 #endif
 
 __STXXL_BEGIN_NAMESPACE
 
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_BOOST_CONFIG
 
 typedef boost::noncopyable noncopyable;
 

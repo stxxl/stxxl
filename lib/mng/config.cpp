@@ -20,7 +20,7 @@
 #include <stxxl/bits/mng/mng.h>
 #include <stxxl/version.h>
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
   #define NOMINMAX
   #include <windows.h>
 #else
@@ -47,7 +47,7 @@ void config::init_findconfig()
         return;
     }
 
-#ifndef STXXL_WINDOWS
+#if !STXXL_WINDOWS
     // read environment, unix style
     const char* hostname = getenv("HOSTNAME");
     const char* home = getenv("HOME");
@@ -115,7 +115,7 @@ void config::init(const std::string& config_path)
     {
         STXXL_ERRMSG("Warning: no config file found.");
         STXXL_ERRMSG("Using default disk configuration.");
-#ifndef STXXL_WINDOWS
+#if !STXXL_WINDOWS
         disk_config entry1("/var/tmp/stxxl", 1000 * 1024 * 1024, "syscall");
         entry1.delete_on_exit = true;
         entry1.autogrow = true;
@@ -242,7 +242,7 @@ void disk_config::parseline(const std::string& line)
         std::string::size_type pos;
         if ( (pos = path.find("###")) != std::string::npos )
         {
-#ifndef STXXL_WINDOWS
+#if !STXXL_WINDOWS
             int pid = getpid();
 #else
             DWORD pid = GetCurrentProcessId();

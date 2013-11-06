@@ -26,7 +26,7 @@ void testIO()
     const int size = 1024 * 384;
     char * buffer = static_cast<char *>(stxxl::aligned_alloc<BLOCK_ALIGN>(size));
     memset(buffer, 0, size);
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
     const char * paths[2] = { "data1", "data2" };
 #else
     const char * paths[2] = { "/var/tmp/data1", "/var/tmp/data2" };

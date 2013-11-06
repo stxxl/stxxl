@@ -176,7 +176,7 @@ int main(int argc, char * argv[])
 {
     STXXL_MSG("stxxl::pq block size: " << BLOCK_SIZE << " bytes");
 
-#ifdef STXXL_DIRECT_IO_OFF
+#if STXXL_DIRECT_IO_OFF
     STXXL_MSG("STXXL_DIRECT_IO_OFF is defined");
 #else
     STXXL_MSG("STXXL_DIRECT_IO_OFF is NOT defined");

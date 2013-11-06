@@ -46,7 +46,7 @@ using stxxl::timestamp;
 #define POLL_DELAY 1000
 
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
 const char * default_file_type = "wincall";
 #else
 const char * default_file_type = "syscall";

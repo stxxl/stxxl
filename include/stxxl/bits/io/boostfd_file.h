@@ -20,7 +20,7 @@
 #include <stxxl/bits/config.h>
 
 #ifndef STXXL_HAVE_BOOSTFD_FILE
-#ifdef STXXL_BOOST_CONFIG // if boost is available
+#if STXXL_BOOST_CONFIG // if boost is available
  #define STXXL_HAVE_BOOSTFD_FILE 1
 #else
  #define STXXL_HAVE_BOOSTFD_FILE 0

@@ -15,7 +15,7 @@
 
 #include <stxxl/bits/config.h>
 
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
 
 #include <cmath>
 
@@ -33,7 +33,7 @@ inline double log2(double x)
 // http://msdn.microsoft.com/en-us/library/85zk715d.aspx
 #define strtoull _strtoui64
 
-#endif
+#endif // STXXL_MSVC
 
 #endif // !STXXL_MSVC_COMPATIBILITY_HEADER
 // vim: et:ts=4:sw=4

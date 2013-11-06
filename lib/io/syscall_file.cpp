@@ -19,7 +19,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
 #define lseek _lseeki64
 #define off_t int64
 #endif

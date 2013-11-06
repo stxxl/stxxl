@@ -20,7 +20,7 @@
 #include <type_traits>
 #elif defined(__GNUG__) && (__GNUC__ >= 4)
 #include <tr1/type_traits>
-#elif defined(STXXL_BOOST_CONFIG)
+#elif STXXL_BOOST_CONFIG
 #include <boost/type_traits/remove_const.hpp>
 #endif
 
@@ -33,7 +33,7 @@ namespace compat
     using std::remove_const;
 #elif defined(__GNUG__) && (__GNUC__ >= 4)
     using std::tr1::remove_const;
-#elif defined(STXXL_BOOST_CONFIG)
+#elif STXXL_BOOST_CONFIG
     using boost::remove_const;
 #else
     template <typename _Tp>

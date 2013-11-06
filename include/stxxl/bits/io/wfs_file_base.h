@@ -19,7 +19,7 @@
 
 #include <stxxl/bits/config.h>
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
 
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
@@ -59,6 +59,6 @@ public:
 
 __STXXL_END_NAMESPACE
 
-#endif // #ifdef STXXL_WINDOWS
+#endif // STXXL_WINDOWS
 
 #endif // !STXXL_IO_WFS_FILE_BASE_HEADER

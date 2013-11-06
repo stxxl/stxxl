@@ -106,7 +106,7 @@ struct random_uniform_fast
     }
 };
 
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
 #pragma warning(push)
 #pragma warning(disable:4512) // assignment operator could not be generated
 #endif
@@ -253,7 +253,7 @@ struct random_number64
     }
 };
 
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
 #pragma warning(pop) // assignment operator could not be generated
 #endif
 

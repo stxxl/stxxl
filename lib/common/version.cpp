@@ -12,7 +12,7 @@
 
 #include <stxxl/bits/version.h>
 
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_BOOST_CONFIG
 #include <boost/version.hpp>
 #endif
 

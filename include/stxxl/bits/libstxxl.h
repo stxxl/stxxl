@@ -15,7 +15,7 @@
 
 #include <stxxl/bits/config.h>
 
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
  #ifndef STXXL_LIBNAME
   #define STXXL_LIBNAME "stxxl"
  #endif

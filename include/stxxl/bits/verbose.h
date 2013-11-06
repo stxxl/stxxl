@@ -164,7 +164,7 @@ __STXXL_END_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
-#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
+#if STXXL_WINDOWS || defined(__MINGW32__)
 
 #define stxxl_win_lasterror_exit(errmsg, exception_type) \
     do { \

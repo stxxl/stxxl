@@ -17,7 +17,7 @@
 #include <stxxl/bits/io/ufs_file_base.h>
 #include <stxxl/bits/common/error_handling.h>
 
-#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
+#if STXXL_WINDOWS || defined(__MINGW32__)
   #ifndef NOMINMAX
     #define NOMINMAX
   #endif
@@ -73,7 +73,14 @@ ufs_file_base::ufs_file_base(
 #if !STXXL_DIRECT_IO_OFF
         flags |= O_DIRECT;
 #else
-        STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, the system does not support it.");
+        if (!(flags & TRY_DIRECT)) {
+            STXXL_ERRMSG("Error: open()ing " << filename << " with DIRECT mode requested, but the system does not support it.");
+            file_des = -1;
+            return;
+        }
+        else {
+            STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, the system does not support it.");
+        }
 #endif
     }
 
@@ -84,11 +91,11 @@ ufs_file_base::ufs_file_base(
         flags |= O_SYNC;
     }
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
     flags |= O_BINARY;                     // the default in MS is TEXT mode
 #endif
 
-#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
+#if STXXL_WINDOWS || defined(__MINGW32__)
     const int perms = S_IREAD | S_IWRITE;
 #else
     const int perms = S_IREAD | S_IWRITE | S_IRGRP | S_IWGRP;
@@ -144,7 +151,7 @@ void ufs_file_base::close()
 
 void ufs_file_base::lock()
 {
-#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
+#if STXXL_WINDOWS || defined(__MINGW32__)
     // not yet implemented
 #else
     scoped_mutex_lock fd_lock(fd_mutex);
@@ -160,7 +167,7 @@ void ufs_file_base::lock()
 
 file::offset_type ufs_file_base::_size()
 {
-#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
+#if STXXL_WINDOWS || defined(__MINGW32__)
     struct _stat64 st;
     stxxl_check_ge_0(_fstat64(file_des, &st), io_error);
 #else
@@ -188,7 +195,7 @@ void ufs_file_base::_set_size(offset_type newsize)
 
     if (!(mode_ & RDONLY))
     {
-#if defined(STXXL_WINDOWS) || defined(__MINGW32__)
+#if STXXL_WINDOWS || defined(__MINGW32__)
         HANDLE hfile;
         stxxl_check_ge_0(hfile = (HANDLE) ::_get_osfhandle(file_des), io_error);
 
@@ -207,7 +214,7 @@ void ufs_file_base::_set_size(offset_type newsize)
 #endif
     }
 
-#if !defined(STXXL_WINDOWS)
+#if !STXXL_WINDOWS
     if (newsize > cur_size)
         stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
 #endif

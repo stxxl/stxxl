@@ -17,7 +17,7 @@
 #include <stxxl/bits/common/seed.h>
 #include <stxxl/bits/common/mutex.h>
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
  #define NOMINMAX
  #include <io.h>
  #include <windows.h>
@@ -53,7 +53,7 @@ inline unsigned initial_seed()
 
     initialized = true;
 #endif // NDEBUG
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
     // GetTickCount():  ms since system start
     return GetTickCount() ^ GetCurrentProcessId();
 #else

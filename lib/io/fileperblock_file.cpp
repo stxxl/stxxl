@@ -114,7 +114,7 @@ void fileperblock_file<base_file_type>::export_files(offset_type offset, offset_
     if (::rename(original.c_str(), filename.c_str()) != 0)
         STXXL_ERRMSG("rename() error on path=" << filename << " to=" << original << " error=" << strerror(errno));
 
-#ifndef STXXL_WINDOWS
+#if !STXXL_WINDOWS
     //TODO: implement on Windows
     if (::truncate(filename.c_str(), length) != 0) {
         STXXL_THROW2(io_error, "Error doing truncate()");

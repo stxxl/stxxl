@@ -19,7 +19,7 @@
 #include <stxxl/aligned_alloc>
 #include <stxxl/bits/common/cmdline.h>
 
-#ifndef STXXL_WINDOWS
+#if !STXXL_WINDOWS
  #include <unistd.h>
 #endif
 
@@ -111,7 +111,7 @@ int create_files(int argc, char * argv[])
 
     const size_t ndisks = disks_arr.size();
 
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
     unsigned buffer_size = 64 * MB;
 #else
     unsigned buffer_size = 256 * MB;
@@ -137,7 +137,7 @@ int create_files(int argc, char * argv[])
 
     for (i = 0; i < ndisks; i++)
     {
-#ifdef STXXL_WINDOWS
+#if STXXL_WINDOWS
  #ifdef RAW_ACCESS
         disks[i] = new stxxl::wincall_file(disks_arr[i],
                                            file::CREAT | file::RDWR | file::DIRECT, i);

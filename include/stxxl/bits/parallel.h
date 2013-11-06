@@ -19,7 +19,7 @@
 #undef STXXL_PARALLEL
 #undef STXXL_PARALLEL_MODE
 
-#if defined(_GLIBCXX_PARALLEL) || defined (STXXL_PARALLEL_MODE_EXPLICIT)
+#if defined(_GLIBCXX_PARALLEL) || STXXL_PARALLEL_MODE_EXPLICIT
 #define STXXL_PARALLEL_MODE
 #endif
 
@@ -77,7 +77,7 @@
 #define STXXL_NOT_CONSIDER_SORT_MEMORY_OVERHEAD 0
 #endif
 
-#ifdef STXXL_PARALLEL_MODE_EXPLICIT
+#if STXXL_PARALLEL_MODE_EXPLICIT
 #include <parallel/algorithm>
 #else
 #include <algorithm>
@@ -126,7 +126,7 @@ inline bool do_parallel_merge()
 
 namespace potentially_parallel
 {
-#ifdef STXXL_PARALLEL_MODE_EXPLICIT
+#if STXXL_PARALLEL_MODE_EXPLICIT
     using __gnu_parallel::sort;
     using __gnu_parallel::random_shuffle;
 #else

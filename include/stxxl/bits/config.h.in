@@ -28,7 +28,7 @@
 #cmakedefine STXXL_VERSION_GIT_REFSPEC "${STXXL_VERSION_GIT_REFSPEC}"
 #cmakedefine STXXL_VERSION_GIT_SHA1 "${STXXL_VERSION_GIT_SHA1}"
 
-#define STXXL_DIRECT_IO_OFF ${STXXL_DIRECT_IO_OFF}
+#cmakedefine STXXL_DIRECT_IO_OFF ${STXXL_DIRECT_IO_OFF}
 // default: 0/1 (platform dependent)
 // cmake:   detection of platform and flag
 // effect:  disables use of O_DIRECT flag on unsupported platforms
@@ -82,7 +82,7 @@
 // cmake:   -DUSE_BOOST=ON
 // effect:  enables use of boost libraries in different parts of STXXL.
 
-#ifdef STXXL_BOOST_CONFIG
+#if STXXL_BOOST_CONFIG
   #include <boost/config.hpp>
 #endif
 

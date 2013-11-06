@@ -121,7 +121,7 @@ std::string format_IEC_size(uint64 number);
 
 inline stxxl::int64 atoi64(const char * s)
 {
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
     return _atoi64(s);
 #else
     return atoll(s);
@@ -132,7 +132,7 @@ inline stxxl::int64 atoi64(const char * s)
 
 inline stxxl::uint64 atouint64(const char * s)
 {
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
     return _strtoui64(s, NULL, 10);
 #else
     return strtoull(s, NULL, 10);

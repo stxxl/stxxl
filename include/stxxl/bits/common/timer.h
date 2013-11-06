@@ -21,7 +21,7 @@
 #include <stxxl/bits/verbose.h>
 #include <stxxl/bits/common/utils.h>
 
-#ifdef STXXL_BOOST_TIMESTAMP
+#if STXXL_BOOST_TIMESTAMP
  #include <boost/date_time/posix_time/posix_time.hpp>
  #include <cmath>
 #elif STXXL_WINDOWS
@@ -39,7 +39,7 @@ __STXXL_BEGIN_NAMESPACE
 inline double
 timestamp()
 {
-#ifdef STXXL_BOOST_TIMESTAMP
+#if STXXL_BOOST_TIMESTAMP
     boost::posix_time::ptime MyTime = boost::posix_time::microsec_clock::local_time();
     boost::posix_time::time_duration Duration =
         MyTime - boost::posix_time::time_from_string("1970-01-01 00:00:00.000");

@@ -21,7 +21,7 @@
 
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
  #include <unordered_map>
-#elif defined(STXXL_MSVC)
+#elif STXXL_MSVC
  #include <hash_map>
 #elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) && \
     (!defined(__ICC) || (__ICC > 1110))
@@ -36,7 +36,7 @@ template <class _Tp>
 struct compat_hash {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
     typedef std::hash<_Tp> result;
-#elif defined(STXXL_MSVC)
+#elif STXXL_MSVC
     typedef stdext::hash_compare<_Tp> result;
 #elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) && \
     (!defined(__ICC) || (__ICC > 1110))
@@ -50,7 +50,7 @@ template <class _Key, class _Tp, class _Hash = typename compat_hash<_Key>::resul
 struct compat_hash_map {
 #if defined(__GXX_EXPERIMENTAL_CXX0X__)
     typedef std::unordered_map<_Key, _Tp, _Hash> result;
-#elif defined(STXXL_MSVC)
+#elif STXXL_MSVC
     typedef stdext::hash_map<_Key, _Tp, _Hash> result;
 #elif defined(__GNUG__) && ((__GNUC__ * 10000 + __GNUC_MINOR__ * 100) >= 40200) && \
     (!defined(__ICC) || (__ICC > 1110))

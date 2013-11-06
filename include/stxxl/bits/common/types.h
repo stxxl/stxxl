@@ -21,7 +21,7 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-#ifdef STXXL_MSVC
+#if STXXL_MSVC
 typedef __int8 int8;
 typedef unsigned __int8 uint8;
 typedef __int16 int16;
