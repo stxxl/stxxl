@@ -28,6 +28,10 @@
 #endif
 #include <cstdio>
 
+// for systems that don't know anything about block devices.
+#ifndef S_ISBLK
+  #define S_ISBLK(x) 0
+#endif
 
 __STXXL_BEGIN_NAMESPACE
 
