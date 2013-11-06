@@ -21,7 +21,9 @@
 #include <stxxl/version.h>
 
 #if STXXL_WINDOWS
-  #define NOMINMAX
+   #ifndef NOMINMAX
+    #define NOMINMAX
+  #endif
   #include <windows.h>
 #else
   #include <unistd.h>

@@ -23,7 +23,9 @@
 
 #include <stxxl/bits/io/file.h>
 #include <stxxl/bits/io/request.h>
-#define NOMINMAX
+#ifndef NOMINMAX
+  #define NOMINMAX
+#endif
 #include <windows.h>
 
 

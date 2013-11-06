@@ -22,14 +22,16 @@
 #include <stxxl/bits/common/utils.h>
 
 #if STXXL_BOOST_TIMESTAMP
- #include <boost/date_time/posix_time/posix_time.hpp>
- #include <cmath>
+  #include <boost/date_time/posix_time/posix_time.hpp>
+  #include <cmath>
 #elif STXXL_WINDOWS
- #define NOMINMAX
- #include <windows.h>
+  #ifndef NOMINMAX
+    #define NOMINMAX
+  #endif
+  #include <windows.h>
 #else
- #include <ctime>
- #include <sys/time.h>
+  #include <ctime>
+  #include <sys/time.h>
 #endif
 
 

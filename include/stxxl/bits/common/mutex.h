@@ -59,12 +59,18 @@ public:
     //! destroy mutex handle
     ~mutex()
     {
-        int res = pthread_mutex_trylock(&m_mutex);
+        // try simple delete first
+        int res = pthread_mutex_destroy(&m_mutex);
+        if (res == 0) return;
+
+        // try to lock and unlock mutex
+        res = pthread_mutex_trylock(&m_mutex);
 
         if (res == 0 || res == EBUSY) {
             check_pthread_call(pthread_mutex_unlock(&m_mutex));
-        } else
+        } else {
             stxxl_function_error(resource_error);
+        }
 
         check_pthread_call(pthread_mutex_destroy(&m_mutex));
     }

@@ -148,7 +148,7 @@ include(CPack)
 ###############################################################################
 # check platform
 
-if(WIN32 OR WIN64)
+if(WIN32 OR WIN64 OR MINGW)
   set(STXXL_WINDOWS "1")
 endif()
 

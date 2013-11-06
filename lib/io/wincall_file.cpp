@@ -18,7 +18,9 @@
 #include <stxxl/bits/io/iostats.h>
 #include <stxxl/bits/common/error_handling.h>
 
-#define NOMINMAX
+#ifndef NOMINMAX
+  #define NOMINMAX
+#endif
 #include <windows.h>
 
 __STXXL_BEGIN_NAMESPACE

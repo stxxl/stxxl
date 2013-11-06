@@ -23,6 +23,7 @@
 
 #include <iomanip>
 #include <vector>
+#include <time.h>
 
 #include <stxxl/io>
 #include <stxxl/mng>

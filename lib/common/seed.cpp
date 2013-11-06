@@ -18,12 +18,14 @@
 #include <stxxl/bits/common/mutex.h>
 
 #if STXXL_WINDOWS
- #define NOMINMAX
- #include <io.h>
- #include <windows.h>
+  #ifndef NOMINMAX
+    #define NOMINMAX
+  #endif
+  #include <io.h>
+  #include <windows.h>
 #else
- #include <unistd.h>
- #include <sys/time.h>
+  #include <unistd.h>
+  #include <sys/time.h>
 #endif
 
 

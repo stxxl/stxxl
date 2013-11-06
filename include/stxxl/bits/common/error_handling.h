@@ -57,14 +57,14 @@ __STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <typename E>
+template <typename Exception>
 inline void stxxl_util_function_error(const char * func_name, const char * expr = 0, const char * error = 0)
 {
     std::ostringstream str_;
-    str_ << "Error in function " << func_name << " " << (expr ? expr : strerror(errno));
+    str_ << "Error in function " << func_name << " : " << (expr ? expr : strerror(errno));
     if (error)
         str_ << " " << error;
-    throw E(str_.str());
+    throw Exception(str_.str());
 }
 
 #define stxxl_function_error(exception_type) \
