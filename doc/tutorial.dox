@@ -55,6 +55,21 @@ Furthermore, the stream pipeline component of STXXL is described in the followin
 
 For more information on the structure, the internal design and time / space complexity of the provided operations, see \ref design_stl.
 
+# More Examples
+
+The \c examples subdirectory of the STXXL tarballs contains more example code than those of the tutorials above. These are less documented but still contain useful code snippets and usage information.
+
+- The \c examples/applications directory is a collection of real external memory algorithms computing non-trivial output. We welcome contributions of interesting applications to this collection, currently included are:
+
+  - the DC3/skew3 suffix sorting algorithm \ref examples/applications/skew3.cpp
+
+- There is a collection of simple tools which copy and sort files containing integers or structs: \ref examples/containers/copy_file.cpp "copy_file.cpp", \ref examples/algo/sort_file.cpp "sort_file.cpp" and \ref examples/algo/copy_and_sort_file.cpp "copy_and_sort_file.cpp".
+
+\example examples/applications/skew3.cpp
+\example examples/algo/sort_file.cpp
+\example examples/algo/copy_and_sort_file.cpp
+
 */
+
 
 } // namespace stxxl

@@ -1,6 +1,11 @@
 /***************************************************************************
  *  examples/applications/skew3.cpp
  *
+ *  Implementation of the external memory suffix sorting algorithm DC3 aka
+ *  skew3 as described in Roman Dementiev, Juha Kaerkkaeinen, Jens Mehnert and
+ *  Peter Sanders. "Better External Memory Suffix Array Construction". Journal
+ *  of Experimental Algorithmics (JEA), volume 12, 2008.
+ *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2004 Jens Mehnert <jmehnert@mpi-sb.mpg.de>

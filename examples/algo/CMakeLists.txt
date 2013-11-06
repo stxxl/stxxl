@@ -11,4 +11,6 @@
 ############################################################################
 
 stxxl_build_example(copy_and_sort_file)
+stxxl_build_example(phonebills)
+stxxl_build_example(phonebills_genlog)
 stxxl_build_example(sort_file)
