@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/phonebills_genlog.cpp
+ *  examples/algo/phonebills_genlog.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

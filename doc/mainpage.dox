@@ -41,7 +41,7 @@ Once compiled, you can read the following simple tutorials on how to use STXXL c
 - \ref tutorial_stack
 - \ref tutorial_pqueue
 
-See the corresponding page for a \subpage tutorial "complete list of all Tutorials".
+See the corresponding page for a \subpage tutorial "complete list of all Tutorials and Examples".
 
 # Design and More Information
 

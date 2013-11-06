@@ -55,7 +55,7 @@ int main(int argc, char * argv[])
 
 To complete the code we need to define the log entry data type \c LogEntry, input operator \c >> for \c LogEntry, comparison functor \c SortByCaller, unary functor \c ProduceBills used for computing bills, and the \c print_usage function.
 
-\snippet examples/containers/phonebills.cpp prolog
+\snippet examples/algo/phonebills.cpp prolog
 
 # Going Large -- Use STXXL
 
@@ -97,16 +97,16 @@ int main(int argc, char * argv[])
 
 As you note the changes are minimal. Only the namespaces and some memory specific parameters had to be changed.
 
-See \ref examples/containers/phonebills.cpp for the full source code. The example program is automatically compiled when building STXXL, refer to \ref install on how to build programs with STXXL.
+See \ref examples/algo/phonebills.cpp for the full source code. The example program is automatically compiled when building STXXL, refer to \ref install on how to build programs with STXXL.
 
-The program \ref examples/containers/phonebills_genlog.cpp can be used to generate logs for processing with the phonebills example.
+The program \ref examples/algo/phonebills_genlog.cpp can be used to generate logs for processing with the phonebills example.
 
 Do not forget to configure you external memory space in file <tt>.stxxl</tt>. See \ref config.
 
-\example examples/containers/phonebills.cpp
+\example examples/algo/phonebills.cpp
 This example code is explain in \ref tutorial_vector_billing
 
-\example examples/containers/phonebills_genlog.cpp
+\example examples/algo/phonebills_genlog.cpp
 This example code is explain in \ref tutorial_vector_billing
 
 */
