@@ -42,14 +42,15 @@ void boostfd_file::serve(const request * req) throw (io_error)
     }
     catch (const std::exception & ex)
     {
-        STXXL_THROW2(io_error,
-                     "Error doing seek() in boostfd_request::serve()" <<
-                     " offset=" << offset <<
-                     " this=" << this <<
-                     " buffer=" << buffer <<
-                     " bytes=" << bytes <<
-                     " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                     " : " << ex.what());
+        STXXL_THROW_ERRNO
+            (io_error,
+             "Error doing seek() in boostfd_request::serve()" <<
+             " offset=" << offset <<
+             " this=" << this <<
+             " buffer=" << buffer <<
+             " bytes=" << bytes <<
+             " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+             " : " << ex.what());
     }
 
     stats::scoped_read_write_timer read_write_timer(bytes, type == request::WRITE);
@@ -60,19 +61,20 @@ void boostfd_file::serve(const request * req) throw (io_error)
         {
             std::streamsize rc = file_des.read((char *)buffer, bytes);
             if (rc != std::streamsize(bytes)) {
-                STXXL_THROW2(io_error, " partial read: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
+                STXXL_THROW_ERRNO(io_error, " partial read: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
         }
         catch (const std::exception & ex)
         {
-            STXXL_THROW2(io_error,
-                         "Error doing read() in boostfd_request::serve()" <<
-                         " offset=" << offset <<
-                         " this=" << this <<
-                         " buffer=" << buffer <<
-                         " bytes=" << bytes <<
-                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                         " : " << ex.what());
+            STXXL_THROW_ERRNO
+                (io_error,
+                 "Error doing read() in boostfd_request::serve()" <<
+                 " offset=" << offset <<
+                 " this=" << this <<
+                 " buffer=" << buffer <<
+                 " bytes=" << bytes <<
+                 " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                 " : " << ex.what());
         }
     }
     else
@@ -81,19 +83,20 @@ void boostfd_file::serve(const request * req) throw (io_error)
         {
             std::streamsize rc = file_des.write((char *)buffer, bytes);
             if (rc != std::streamsize(bytes)) {
-                STXXL_THROW2(io_error, " partial write: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
+                STXXL_THROW_ERRNO(io_error, " partial write: " << rc << " missing " << (bytes - rc) << " out of " << bytes << " bytes");
             }
         }
         catch (const std::exception & ex)
         {
-            STXXL_THROW2(io_error,
-                         "Error doing write() in boostfd_request::serve()" <<
-                         " offset=" << offset <<
-                         " this=" << this <<
-                         " buffer=" << buffer <<
-                         " bytes=" << bytes <<
-                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                         " : " << ex.what());
+            STXXL_THROW_ERRNO
+                (io_error,
+                 "Error doing write() in boostfd_request::serve()" <<
+                 " offset=" << offset <<
+                 " this=" << this <<
+                 " buffer=" << buffer <<
+                 " bytes=" << bytes <<
+                 " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                 " : " << ex.what());
         }
     }
 }

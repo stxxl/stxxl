@@ -170,10 +170,11 @@ void sim_disk_file::serve(const request * req) throw (io_error)
     void * mem = mmap(NULL, bytes, PROT_READ | PROT_WRITE, MAP_SHARED, file_des, offset);
     if (mem == MAP_FAILED)
     {
-        STXXL_THROW2(io_error,
-                     " Mapping failed." <<
-                     " Page size: " << sysconf(_SC_PAGESIZE) <<
-                     " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
+        STXXL_THROW_ERRNO
+            (io_error,
+             " Mapping failed." <<
+             " Page size: " << sysconf(_SC_PAGESIZE) <<
+             " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
     }
     else if (mem == 0)
     {

@@ -209,7 +209,7 @@ void wbtl_file::sread(void * buffer, offset_type offset, size_type bytes)
         sortseq::iterator physical = address_mapping.find(offset);
         if (physical == address_mapping.end()) {
             STXXL_ERRMSG("wbtl_read: mapping not found: " << FMT_A_S(offset, bytes) << " ==> " << "???");
-            //STXXL_THROW2(io_error, "wbtl_read of unmapped memory");
+            //STXXL_THROW_ERRNO(io_error, "wbtl_read of unmapped memory");
             physical_offset = 0xffffffff;
         } else {
             physical_offset = physical->second;
@@ -323,7 +323,7 @@ wbtl_file::offset_type wbtl_file::get_next_write_block()
         return region_pos;
     }
 
-    STXXL_THROW2(io_error, "OutOfSpace, probably fragmented");
+    STXXL_THROW_ERRNO(io_error, "OutOfSpace, probably fragmented");
 }
 
 void wbtl_file::check_corruption(offset_type region_pos, offset_type region_size,

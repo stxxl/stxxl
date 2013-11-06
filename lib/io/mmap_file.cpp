@@ -41,12 +41,12 @@ void mmap_file::serve(const request * req) throw (io_error)
     // STXXL_MSG("Mmaped to "<<mem<<" , buffer suggested at "<<buffer);
     if (mem == MAP_FAILED)
     {
-        STXXL_THROW2(io_error,
-                     " Mapping failed." <<
-                     " path=" << filename <<
-                     " bytes=" << bytes <<
-                     " Page size: " << sysconf(_SC_PAGESIZE) <<
-                     " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
+        STXXL_THROW_ERRNO(io_error,
+                          " Mapping failed." <<
+                          " path=" << filename <<
+                          " bytes=" << bytes <<
+                          " Page size: " << sysconf(_SC_PAGESIZE) <<
+                          " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
     }
     else if (mem == 0)
     {

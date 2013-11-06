@@ -293,7 +293,7 @@ However, there is also \c STXXL_ASSERT(), which can be used as a replacement for
 The STXXL provides several pre-defined build-in exception macros to detect run-time errors, see:
 
 1. STXXL_THROW()
-2. STXXL_THROW2()
+2. STXXL_THROW_ERRNO()
 3. STXXL_THROW_INVALID_ARGUMENT()
 4. STXXL_THROW_UNREACHABLE()
 

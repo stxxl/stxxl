@@ -128,7 +128,7 @@ ufs_file_base::ufs_file_base(
     }
 #endif
 
-    STXXL_THROW2(io_error, "open() rc=" << file_des << " path=" << filename << " flags=" << flags);
+    STXXL_THROW_ERRNO(io_error, "open() rc=" << file_des << " path=" << filename << " flags=" << flags);
 }
 
 ufs_file_base::~ufs_file_base()
@@ -161,7 +161,7 @@ void ufs_file_base::lock()
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
     if ((::fcntl(file_des, F_SETLK, &lock_struct)) < 0)
-        STXXL_THROW2(io_error, "fcntl(,F_SETLK,) path=" << filename << " fd=" << file_des);
+        STXXL_THROW_ERRNO(io_error, "fcntl(,F_SETLK,) path=" << filename << " fd=" << file_des);
 #endif
 }
 
@@ -230,7 +230,7 @@ void ufs_file_base::close_remove()
 void ufs_file_base::unlink()
 {
     if (::unlink(filename.c_str()) != 0)
-        STXXL_THROW2(io_error, "unlink() path=" << filename << " fd=" << file_des);
+        STXXL_THROW_ERRNO(io_error, "unlink() path=" << filename << " fd=" << file_des);
 }
 
 __STXXL_END_NAMESPACE
