@@ -22,6 +22,7 @@
 #include <cstdlib>
 #include <algorithm>
 #include <sstream>
+#include <limits>
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/namespace.h>
