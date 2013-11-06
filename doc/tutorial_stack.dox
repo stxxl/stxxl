@@ -77,16 +77,16 @@ while (!my_stack.empty())
 
 ### A minimal working example of STXXL's stack
 
-(See \ref examples/containers/stack_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/stack1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/stack_minimal1.cpp example
+\snippet examples/containers/stack1.cpp example
 
-See \ref examples/containers/stack1.cpp for the sourcecode of a more comprehensive example.
-
-\example examples/containers/stack_minimal1.cpp
-This example code is explained in the \ref tutorial_stack section
+See \ref examples/containers/stack2.cpp for the sourcecode of a more comprehensive example.
 
 \example examples/containers/stack1.cpp
+This example code is explained in the \ref tutorial_stack section
+
+\example examples/containers/stack2.cpp
 This example code is explained in the \ref tutorial_stack section
 
 */

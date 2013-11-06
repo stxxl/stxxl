@@ -97,11 +97,11 @@ std::cout << "empty sequence? " << my_sequence.empty() << std::endl;
 
 
 ### A minimal working example on STXXL's sequence
-(See \ref examples/containers/sequence_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/sequence1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/sequence_minimal1.cpp example
+\snippet examples/containers/sequence1.cpp example
 
-\example examples/containers/sequence_minimal1.cpp
+\example examples/containers/sequence1.cpp
 This example code is explained in the \ref tutorial_sequence section.
 
 */

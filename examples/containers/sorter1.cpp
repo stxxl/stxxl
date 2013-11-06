@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/sorter1.cpp
+ *  examples/containers/sorter_minimal1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,77 +10,51 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! [example]
 #include <stxxl/sorter>
 #include <stxxl/stats>
 #include <stxxl/timer>
-#include <stxxl/random>
 #include <limits>
 
-struct TwoInteger
+struct my_comparator
 {
-    int i, j;
-
-    TwoInteger()
-    {}
-
-    TwoInteger(int _i, int _j)
-        : i(_i), j(_j)
-    {}
-};
-
-struct TwoIntegerComparator
-{
-    bool operator()(const TwoInteger& a, const TwoInteger& b) const
+    bool operator()(const int &a, const int &b) const
     {
-        return a.i < b.i;
+        return a < b;
     }
 
-    TwoInteger min_value() const {
-        return TwoInteger(std::numeric_limits<int>::min(), std::numeric_limits<int>::min());
+    int min_value() const {
+        return std::numeric_limits<int>::min();
     }
 
-    TwoInteger max_value() const {
-        return TwoInteger(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
+    int max_value() const {
+        return std::numeric_limits<int>::max();
     }
 };
 
 int main()
 {
-    // template parameter <ValueType, CompareType, BlockSize(optional), AllocStr(optional)>
-    typedef stxxl::sorter<TwoInteger, TwoIntegerComparator, 1*1024*1024> sorter_type;
+    // template parameter <ValueType, CompareType, BlockSize, AllocStr(optional)>
+    typedef stxxl::sorter<int, my_comparator> sorter_type;
 
     // create sorter object (CompareType(), MainMemoryLimit)
-    sorter_type int_sorter(TwoIntegerComparator(), 64*1024*1024);
+    sorter_type int_sorter(my_comparator(), 64*1024*1024);
 
-    stxxl::random_number32 rand32;
-
-    stxxl::timer Timer1;
-    Timer1.start();
-
-    // insert random numbers from [0,100000)
-    for (size_t i = 0; i < 100000; ++i)
+    // fill sorter with elements order in descending order
+    for (int i = 10000; i > 0; i--)
     {
-        int_sorter.push( TwoInteger(rand32() % 100000, (int)i) );  // fill sorter container
+        int_sorter.push(i);
     }
 
-    Timer1.stop();
+    int_sorter.sort();  // sort elements (in ascending order)
 
-    STXXL_MSG("push time: " << (Timer1.mseconds() / 1000));
-
-    stxxl::timer Timer2;
-
-    Timer2.start();
-    int_sorter.sort();  // switch to output state and sort
-    Timer2.stop();
-
-    STXXL_MSG("sort time: " << (Timer2.mseconds() / 1000));
-
-    // echo sorted elements
-    while ( !int_sorter.empty() )
+    // walk through sorted values and print them out
+    while (!int_sorter.empty())
     {
-        std::cout << int_sorter->i << " ";  // access value
+        std::cout << *int_sorter << " ";
         ++int_sorter;
     }
 
     return 0;
 }
+//! [example]

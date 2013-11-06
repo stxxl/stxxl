@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/queue1.cpp
+ *  examples/containers/queue_minimal1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,42 +10,32 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+//! [example]
 #include <stxxl/queue>
 #include <iostream>
 
 int main()
 {
-    // template parameter <value_type, block_size, allocation_strategy, size_type>
-    typedef stxxl::queue<unsigned int> a_queue;
+    typedef stxxl::queue<unsigned int> queue;
+    queue my_queue;
 
-    // construct queue with default parameters
-    a_queue my_queue;
+    my_queue.push(5);
+    my_queue.push(11);
+    my_queue.push(3);
+    my_queue.push(7);
+    // my_queue now stores: |7|3|11|5|
 
-    unsigned int random;
-    stxxl::random_number32 rand32;  // define random number generator
-    stxxl::uint64 number_of_elements = (long long int)(1*64) * (long long int)(1024 * 1024);
+    assert(my_queue.size() == 4);
 
-    // push random values in the queue
-    for (stxxl::uint64 i = 0; i < number_of_elements; i++)
-    {
-        random = rand32();  // generate random integers from interval [0,2^32)
-        my_queue.push(random);
-    }
+    std::cout << "back element " << my_queue.back() << std::endl;  // prints out 7 (last inserted element)
+    assert(my_queue.back() == 7);
+    std::cout << "front element " << my_queue.front() << std::endl;  // prints out 5 (first inserted element)
+    assert(my_queue.front() == 5);
+    my_queue.pop();  // deletes element 5, queue now stores: |7|3|11|
 
-    unsigned int last_inserted = my_queue.back();
-    STXXL_MSG("last element inserted: " << last_inserted);
-
-    // identify smaller element than first_inserted, search in growth-direction (front->back)
-    while(!my_queue.empty())
-    {
-        if (last_inserted > my_queue.front())
-        {
-            STXXL_MSG("found smaller element: " << my_queue.front() << " than last inserted element");
-            break;
-        }
-        std::cout << my_queue.front() << " " << std::endl;
-        my_queue.pop();
-    }
+    std::cout << "front element " << my_queue.front() << std::endl;  // prints out 11
+    assert(my_queue.front() == 11);
 
     return 0;
 }
+//! [example]

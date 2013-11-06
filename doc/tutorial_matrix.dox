@@ -91,11 +91,11 @@ The STXXL Matrix container provides the following arithmetic operations:
 
 ### A minimal working example of STXXL's Matrix
 
-(See \ref examples/containers/matrix_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/matrix1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/matrix_minimal1.cpp example
+\snippet examples/containers/matrix1.cpp example
 
-\example examples/containers/matrix_minimal1.cpp
+\example examples/containers/matrix1.cpp
 This example code is explained in the \ref tutorial_matrix section
 */
 

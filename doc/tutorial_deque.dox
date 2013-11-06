@@ -102,16 +102,16 @@ std::cout << "empty deque? " << my_deque.empty() << std::endl;
 
 ### A minimal example on STXXL's deque
 
-(See \ref examples/containers/deque_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/deque1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/deque_minimal1.cpp example
+\snippet examples/containers/deque1.cpp example
 
-See \ref examples/containers/deque1.cpp for the sourcecode of a more comprehensive example.
-
-\example examples/containers/deque_minimal1.cpp
-This example code is explained in the \ref tutorial_deque section.
+See \ref examples/containers/deque2.cpp for the sourcecode of a more comprehensive example.
 
 \example examples/containers/deque1.cpp
+This example code is explained in the \ref tutorial_deque section.
+
+\example examples/containers/deque2.cpp
 This example code is explained in the \ref tutorial_deque section.
 
 */

@@ -111,16 +111,16 @@ std::cout << "empty priority queue? " << my_pqueue.empty() << std::endl;
 
 ### A minimal working example of STXXL's priority queue
 
-(See \ref examples/containers/pqueue_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/pqueue1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/pqueue_minimal1.cpp example
+\snippet examples/containers/pqueue1.cpp example
 
-See \ref examples/containers/pqueue_minimal2.cpp for the sourcecode of another small example.
+See \ref examples/containers/pqueue2.cpp for the sourcecode of another small example.
 
-\example examples/containers/pqueue_minimal1.cpp
+\example examples/containers/pqueue1.cpp
 This example code is explained in the \ref tutorial_pqueue section
 
-\example examples/containers/pqueue_minimal2.cpp
+\example examples/containers/pqueue2.cpp
 This example code is explained in the \ref tutorial_pqueue section
 
 */

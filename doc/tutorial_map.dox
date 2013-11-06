@@ -159,11 +159,11 @@ std::cout << "is my_map empty? " << my_map.empty() << std::endl;
 
 ### A minimal working example on STXXL Map
 
-(See \ref examples/containers/map_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/map1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/map_minimal1.cpp example
+\snippet examples/containers/map1.cpp example
 
-\example examples/containers/map_minimal1.cpp
+\example examples/containers/map1.cpp
 This example code is explained in the \ref tutorial_map section
 
 */

@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/stack1.cpp
+ *  examples/containers/stack_minimal1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -10,34 +10,30 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stack>
+//! [example]
 #include <stxxl/stack>
 
 int main()
 {
-    // template parameter <data_type, externality, behaviour, blocks_per_page, block_size, internal_stack_type, migrating_critical_size, allocation_strategy, size_type>
-    typedef stxxl::STACK_GENERATOR<int, stxxl::external, stxxl::grow_shrink, 4, 2*1024*1024>::result simple_stack;
+    typedef stxxl::STACK_GENERATOR<int>::result stack_type;
+    stack_type my_stack;
 
-    // create stack instance
-    simple_stack a_stack;
+    my_stack.push(8);
+    my_stack.push(7);
+    my_stack.push(4);
+    assert(my_stack.size() == 3);
 
-    stxxl::random_number<> random;
-    stxxl::uint64 number_of_elements = (long long int)(1*128) * (long long int)(1024 * 1024);
+    assert(my_stack.top() == 4);
+    my_stack.pop();
 
-    // routine: 1) push random values on stack and 2) pop all except the lowest value and start again
-    for (int k = 0; k < 5; k++) {
-        STXXL_MSG("push...");
-        for (stxxl::uint64 i = 0; i < number_of_elements; i++)
-        {
-            a_stack.push(random(123456789));
-        }
+    assert(my_stack.top() == 7);
+    my_stack.pop();
 
-        STXXL_MSG("pop...");
-        for (stxxl::uint64 j = 0; j < number_of_elements - 1; j++)
-        {
-            a_stack.pop();
-        }
-    }
+    assert(my_stack.top() == 8);
+    my_stack.pop();
+
+    assert(my_stack.empty());
 
     return 0;
 }
+//! [example]

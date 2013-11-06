@@ -101,16 +101,16 @@ std::cout << "is int_sorter empty? " << int_sorter.empty() << std::endl;
 
 ### A minimal working example of STXXL's sorter
 
-(See \ref examples/containers/sorter_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/sorter1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/sorter_minimal1.cpp example
+\snippet examples/containers/sorter1.cpp example
 
-See \ref examples/containers/sorter1.cpp for the sourcecode of a more comprehensive example.
-
-\example examples/containers/sorter_minimal1.cpp
-This example code is explained in the \ref tutorial_sorter section.
+See \ref examples/containers/sorter2.cpp for the sourcecode of a more comprehensive example.
 
 \example examples/containers/sorter1.cpp
+This example code is explained in the \ref tutorial_sorter section.
+
+\example examples/containers/sorter2.cpp
 This example code is explained in the \ref tutorial_sorter section.
 */
 } // namespace stxxl

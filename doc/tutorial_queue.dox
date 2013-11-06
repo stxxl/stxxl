@@ -63,16 +63,16 @@ std::cout << "queue empty? " << my_queue.empty() << std::endl;
 
 ### A minimal working example of STXXL's queue
 
-(See \ref examples/containers/queue_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/queue1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/queue_minimal1.cpp example
+\snippet examples/containers/queue1.cpp example
 
-See \ref examples/containers/queue1.cpp for the sourcecode of a more comprehensive example.
-
-\example examples/containers/queue_minimal1.cpp
-This example code is explained in the \ref tutorial_queue section.
+See \ref examples/containers/queue2.cpp for the sourcecode of a more comprehensive example.
 
 \example examples/containers/queue1.cpp
+This example code is explained in the \ref tutorial_queue section.
+
+\example examples/containers/queue2.cpp
 This example code is explained in the \ref tutorial_queue section.
 
 */

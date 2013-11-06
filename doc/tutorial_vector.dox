@@ -90,16 +90,16 @@ std::cout << "vector empty? " << my_vector.empty() << std::endl;
 
 ### A minimal working example of STXXL's vector
 
-(See \ref examples/containers/vector_minimal1.cpp for the sourcecode of the following example).
+(See \ref examples/containers/vector1.cpp for the sourcecode of the following example).
 
-\snippet examples/containers/vector_minimal1.cpp example
+\snippet examples/containers/vector1.cpp example
 
-See \ref examples/containers/vector1.cpp for the sourcecode of a more comprehensive example.
-
-\example examples/containers/vector_minimal1.cpp
-This example code is explained in the \ref tutorial_vector section.
+See \ref examples/containers/vector2.cpp for the sourcecode of a more comprehensive example.
 
 \example examples/containers/vector1.cpp
+This example code is explained in the \ref tutorial_vector section.
+
+\example examples/containers/vector2.cpp
 This example code is explained in the \ref tutorial_vector section.
 
 */
