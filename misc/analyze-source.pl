@@ -175,6 +175,17 @@ sub process_pl_cmake {
     expect($path, $i, $data[$i], ('#'x76)."\n"); ++$i;
 }
 
+### Main ###
+
+foreach my $arg (@ARGV) {
+    if ($arg eq "-w") { $write_changes = 1; }
+    elsif ($arg eq "-e") { $launch_emacs = 1; }
+    elsif ($arg eq "-m") { $email_multimap = 1; }
+    else {
+        print "Unknown parameter: $arg\n";
+    }
+}
+
 (-e "include/stxxl.h")
     or die("Please run this script in the STXXL source base directory.");
 
@@ -214,6 +225,8 @@ foreach my $file (@filelist)
     elsif ($file =~ m!^doc/images/.*\.(png|pdf|svg)$!) {
     }
     elsif ($file =~ m!^doc/[^/]*\.(xml|css|bib)$!) {
+    }
+    elsif ($file =~ m!^doxygen-html!) {
     }
     elsif ($file =~ m!README$!) {
     }

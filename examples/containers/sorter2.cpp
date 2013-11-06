@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/sorter1.cpp
+ *  examples/containers/sorter2.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

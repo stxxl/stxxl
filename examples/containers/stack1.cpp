@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/stack_minimal1.cpp
+ *  examples/containers/stack1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

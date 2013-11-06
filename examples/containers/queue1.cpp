@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/queue_minimal1.cpp
+ *  examples/containers/queue1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

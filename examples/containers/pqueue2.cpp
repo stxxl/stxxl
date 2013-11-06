@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/pqueue_minimal2.cpp
+ *  examples/containers/pqueue2.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

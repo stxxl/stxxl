@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/deque_minimal1.cpp
+ *  examples/containers/deque1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

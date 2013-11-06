@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/sequence_minimal1.cpp
+ *  examples/containers/sequence1.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *

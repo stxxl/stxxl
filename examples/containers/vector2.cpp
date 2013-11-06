@@ -1,5 +1,5 @@
 /***************************************************************************
- *  examples/containers/vector1.cpp
+ *  examples/containers/vector2.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
