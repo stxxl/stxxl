@@ -36,12 +36,12 @@ __STXXL_BEGIN_NAMESPACE
 
 #define STXXL_VERBOSE_VECTOR(msg) STXXL_VERBOSE1("vector[" << static_cast<const void *>(this) << "]::" << msg)
 
-//! \weakgroup stlcont Containers
+//! \defgroup stlcont Containers
 //! \ingroup stllayer
 //! Containers with STL-compatible interface
 
 
-//! \weakgroup stlcontinternals Internals
+//! \defgroup stlcontinternals Internals
 //! \ingroup stlcont
 //! \{
 

@@ -27,10 +27,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \weakgroup fileimpl File implementations
-//! \ingroup iolayer
-//! Implementations of \c stxxl::file and \c stxxl::request
-//! for various file access methods
+//! \addtogroup fileimpl
 //! \{
 
 //! Implementation of memory mapped access file.
@@ -38,9 +35,10 @@ class mmap_file : public ufs_file_base, public disk_queued_file
 {
 public:
     //! Constructs file object.
-    //! param filename path of file
-    //! param mode open mode, see \c stxxl::file::open_modes
-    //! param disk disk(file) identifier
+    //! \param filename path of file
+    //! \param mode open mode, see \c stxxl::file::open_modes
+    //! \param queue_id disk queue identifier
+    //! \param allocator_id linked disk_allocator
     inline mmap_file(const std::string & filename, int mode, int queue_id = DEFAULT_QUEUE, int allocator_id = NO_ALLOCATOR) :
         ufs_file_base(filename, mode), disk_queued_file(queue_id, allocator_id)
     { }

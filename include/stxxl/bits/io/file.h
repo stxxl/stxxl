@@ -216,6 +216,12 @@ public:
     }
 };
 
+//! \defgroup fileimpl File I/O Implementations
+//! Implementations of \c stxxl::file and \c stxxl::request
+//! for various file access methods
+//! \{
+//! \}
+
 //! \}
 
 __STXXL_END_NAMESPACE

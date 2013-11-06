@@ -23,7 +23,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \weakgroup schedlayer Block scheduling sublayer
+//! \defgroup schedlayer Block Scheduling Sublayer
 //! \ingroup mnglayer
 //! Group of classes which help in scheduling
 //! sequences of read and write requests

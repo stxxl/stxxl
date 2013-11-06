@@ -32,7 +32,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \ingroup mnglayer
+//! \addtogroup mnglayer
 //! \{
 
 //! Block identifier class.

@@ -22,10 +22,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \defgroup alloc Allocation Functors
 //! \ingroup mnglayer
-
-//! \weakgroup alloc Allocation functors
-//! Standard allocation strategies encapsulated in functors
+//! Standard allocation strategies encapsulated in functors.
 //! \{
 
 //! Example disk allocation scheme functor.

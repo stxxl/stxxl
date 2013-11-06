@@ -40,10 +40,10 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \weakgroup stllayer STL-user layer
+//! \defgroup stllayer STL-User Layer
 //! Layer which groups STL compatible algorithms and containers
 
-//! \weakgroup stlalgo Algorithms
+//! \defgroup stlalgo Algorithms
 //! \ingroup stllayer
 //! Algorithms with STL-compatible interface
 //! \{

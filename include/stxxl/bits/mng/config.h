@@ -26,7 +26,8 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \ingroup mnglayer
+//! \addtogroup mnglayer
+//! \{
 
 //! Encapsulate the configuration of one "disk". The disk is actually a file
 //! I/O object which block_manager uses to read/write blocks.
@@ -168,6 +169,8 @@ public:
         return disks_list[disk].io_impl;
     }
 };
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

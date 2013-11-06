@@ -26,7 +26,7 @@ __STXXL_BEGIN_NAMESPACE
 
 namespace stream
 {
-    //! \addtogroup streampack Stream package
+    //! \addtogroup streampack Stream Package
     //! \{
 
 

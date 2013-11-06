@@ -42,9 +42,9 @@ class wincall_file : public wfs_file_base, public disk_queued_file
 public:
     //! Constructs file object.
     //! \param filename path of file
-    //! \attention filename must be resided at memory disk partition
     //! \param mode open mode, see \c stxxl::file::open_modes
-    //! \param disk disk(file) identifier
+    //! \param queue_id disk queue identifier
+    //! \param allocator_id linked disk_allocator
     wincall_file(
         const std::string & filename,
         int mode,

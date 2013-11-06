@@ -34,7 +34,7 @@ __STXXL_BEGIN_NAMESPACE
 //! Stream package subnamespace. 
 namespace stream
 {
-    //! \weakgroup streampack Stream package
+    //! \defgroup streampack Stream Package
     //! Package that enables pipelining of consequent sorts
     //! and scans of the external data avoiding the saving the intermediate
     //! results on the disk, e.g. the output of a sort can be directly
