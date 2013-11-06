@@ -1,6 +1,10 @@
 /***************************************************************************
  *  local/test1.cpp
  *
+ *  This is an example file included in the local/ directory of STXXL. All .cpp
+ *  files in local/ are automatically compiled and linked with STXXL by CMake.
+ *  You can use this method for simple prototype applications.
+ *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
