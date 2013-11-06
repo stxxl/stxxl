@@ -101,5 +101,4 @@
 // cmake:   detection of mlock() function in <sys/mman.h>
 // effect:  used by stxxl_tool/mlock for locking physical pages
 
-
 #endif // !STXXL_CONFIG_HEADER
