@@ -51,18 +51,50 @@ We have collected much documentation about the design of STXXL. Even more inform
 
 If you plan to contribute code to STXXL, please read the \subpage coding_style.
 
-# Questions
+# FAQ, Troubleshooting and Bug Reports
+
+- \subpage faq
 
 - Questions concerning use and development of the STXXL library should be posted to the <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>. Please search the forum before posting, your question may have been answered before.
 
-# Bug Reports and FAQ
-
-- \subpage faq "FAQ - Frequently Asked Questions"
-
-- Bugs should be reported in the <b><a href="https://stxxl.ae.cs.uni-frankfurt.de/bugs/">Bugzilla Bug Tracker</a></b>
+- Bugs and pull requests should be reported via Github: http://github.com/stxxl/stxxl
 
 # License
 
-\c STXXL is distributed under the Boost Software License, Version 1.0.<br> You can find a copy of the license in the accompanying file \c LICENSE_1_0.txt or online at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
+\c STXXL is distributed under the Boost Software License, Version 1.0. \n
+You can find a copy of the license in the accompanying file \ref license or at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
+\subpage textfiles "&nbsp;"
 
 */
+
+/** \page textfiles Additional Text Files
+
+- \subpage readme
+- \subpage changelog
+- \subpage authors
+- \subpage license
+
+\page readme README
+
+\verbinclude README
+
+\page changelog ChangeLog
+
+\verbinclude CHANGELOG
+
+\page authors AUTHORS
+
+The following list of authors have contributed to STXXL:
+
+\verbinclude AUTHORS
+
+\page install INSTALL
+
+\verbinclude INSTALL
+
+\page license LICENSE_1_0.txt
+
+\verbinclude LICENSE_1_0.txt
+
+ */
+
