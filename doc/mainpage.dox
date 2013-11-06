@@ -49,6 +49,8 @@ We have collected much documentation about the design of STXXL. Even more inform
 
 - \subpage design "Design of STXXL concepts, containers and algorithms"
 
+If you plan to contribute code to STXXL, please read the \subpage coding_style.
+
 # Questions
 
 - Questions concerning use and development of the STXXL library should be posted to the <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>. Please search the forum before posting, your question may have been answered before.
