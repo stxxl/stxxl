@@ -8,6 +8,7 @@
  *  Copyright (C) 2002 Roman Dementiev <dementiev@mpi-sb.mpg.de>
  *  Copyright (C) 2008 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
  *  Copyright (C) 2009 Johannes Singler <singler@ira.uka.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -32,9 +33,11 @@ class ufs_file_base : public virtual file
 protected:
     mutex fd_mutex;        // sequentialize function calls involving file_des
     int file_des;          // file descriptor
-    int mode_;             // open mode
+    int m_mode;            // open mode
     const std::string filename;
+    bool m_is_device;      //!< is special device node
     ufs_file_base(const std::string & filename, int mode);
+    void _after_open();
     offset_type _size();
     void _set_size(offset_type newsize);
     void close();
@@ -48,6 +51,8 @@ public:
     void close_remove();
     //! unlink file without closing it.
     void unlink();
+    //! return true if file is special device node
+    bool is_device() const;
 };
 
 //! \}

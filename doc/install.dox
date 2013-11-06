@@ -160,7 +160,7 @@ See the README at http://github.com/stxxl/myproject
 For STXXL is function beyond very simple examples, you must define the \link install_config disk configuration file \endlink. The simplest method is to create a file named <b><tt>'.stxxl'</tt></b> the same directory as you execute the program. A basic configuration might be:
 \verbatim
 # file path,maximum capacity of the disk,access method
-disk=/tmp/stxxl,1G,syscall_unlink
+disk=/tmp/stxxl,1G,syscall unlink
 \endverbatim
 Please see \ref install_config for further available options.
 
@@ -458,7 +458,7 @@ disk=d:\stxxl.tmp,200G,wincall delete
 
 \section install_config_filesystem Recommended file system
 
-The library benefits from direct transfers from user memory to disk, which saves superfluous copies.  We recommend to use the \c <a href="http://xfs.org">XFS</a> file system, which gives good read and write performance for large files.  Note that file creation speed of \c XFS is a bit slower, so that disk files should be precreated for optimal performance.
+The library benefits from direct transfers from user memory to disk, which saves superfluous copies.  We recommend to use the <a href="http://xfs.org">XFS  file system</a>, which gives good read and write performance for large files. Note that file creation speed of \c XFS is a bit slower, so that disk files should be precreated for optimal performance.
 
 If the filesystems only use is to store one large STXXL disk file, we also recommend to add the following options to the \c mkfs.xfs command to gain maximum performance:
 \verbatim
@@ -466,6 +466,8 @@ $ mkfs.xfs -d agcount=1 -l size=512b
 \endverbatim
 
 The following filesystems have been reported not to support direct I/O: \c tmpfs , \c glusterfs .  By default, STXXL will first try to use direct I/O (\c O_DIRECT open flag). If that fails, it will print a warning and open the file without \c O_DIRECT.
+
+\note It is also possible to use raw disk devices with \c syscall. Just use \c disk=/dev/sda1 or similar. This will of course \b overwrite all data on the partitions! The I/O performance of raw disks is generally more stable and slightly higher than with file systems.
 
 \section install_config_logfiles Log files
 

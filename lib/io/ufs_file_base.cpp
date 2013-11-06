@@ -39,7 +39,7 @@ const char * ufs_file_base::io_type() const
 
 ufs_file_base::ufs_file_base(
     const std::string & filename,
-    int mode) : file_des(-1), mode_(mode), filename(filename)
+    int mode) : file_des(-1), m_mode(mode), filename(filename)
 {
     int flags = 0;
 
@@ -103,10 +103,7 @@ ufs_file_base::ufs_file_base(
 
     if ((file_des = ::open(filename.c_str(), flags, perms)) >= 0)
     {
-        // successfully opened file descriptor
-        if (!(mode & NO_LOCK))
-            lock();
-
+        _after_open();
         return;
     }
 
@@ -119,10 +116,7 @@ ufs_file_base::ufs_file_base(
 
         if ((file_des = ::open(filename.c_str(), flags, perms)) >= 0)
         {
-            // successfully opened file descriptor
-            if (!(mode & NO_LOCK))
-                lock();
-
+            _after_open();
             return;
         }
     }
@@ -134,6 +128,23 @@ ufs_file_base::ufs_file_base(
 ufs_file_base::~ufs_file_base()
 {
     close();
+}
+
+void ufs_file_base::_after_open()
+{
+    // stat file type
+#if STXXL_WINDOWS || defined(__MINGW32__)
+    struct _stat64 st;
+    stxxl_check_eq_0(_fstat64(file_des, &st), io_error);
+#else
+    struct stat st;
+    stxxl_check_eq_0(::fstat(file_des, &st), io_error);
+#endif
+    m_is_device = S_ISBLK(st.st_mode) ? true : false;
+
+    // successfully opened file descriptor
+    if (!(m_mode & NO_LOCK))
+        lock();
 }
 
 void ufs_file_base::close()
@@ -156,7 +167,7 @@ void ufs_file_base::lock()
 #else
     scoped_mutex_lock fd_lock(fd_mutex);
     struct flock lock_struct;
-    lock_struct.l_type = (mode_ & RDONLY) ? F_RDLCK : F_RDLCK | F_WRLCK;
+    lock_struct.l_type = (m_mode & RDONLY) ? F_RDLCK : F_RDLCK | F_WRLCK;
     lock_struct.l_whence = SEEK_SET;
     lock_struct.l_start = 0;
     lock_struct.l_len = 0; // lock all bytes
@@ -169,10 +180,10 @@ file::offset_type ufs_file_base::_size()
 {
 #if STXXL_WINDOWS || defined(__MINGW32__)
     struct _stat64 st;
-    stxxl_check_ge_0(_fstat64(file_des, &st), io_error);
+    stxxl_check_eq_0(_fstat64(file_des, &st), io_error);
 #else
     struct stat st;
-    stxxl_check_ge_0(::fstat(file_des, &st), io_error);
+    stxxl_check_eq_0(::fstat(file_des, &st), io_error);
 #endif
     return st.st_size;
 }
@@ -193,7 +204,7 @@ void ufs_file_base::_set_size(offset_type newsize)
 {
     offset_type cur_size = _size();
 
-    if (!(mode_ & RDONLY))
+    if (!(m_mode & RDONLY) && !m_is_device)
     {
 #if STXXL_WINDOWS || defined(__MINGW32__)
         HANDLE hfile;
@@ -223,14 +234,30 @@ void ufs_file_base::_set_size(offset_type newsize)
 void ufs_file_base::close_remove()
 {
     close();
+
+    if (m_is_device) {
+        STXXL_ERRMSG("remove() path=" << filename << " skipped as file is device node");
+        return;
+    }
+
     if (::remove(filename.c_str()) != 0)
         STXXL_ERRMSG("remove() error on path=" << filename << " error=" << strerror(errno));
 }
 
 void ufs_file_base::unlink()
 {
+    if (m_is_device) {
+        STXXL_ERRMSG("unlink() path=" << filename << " skipped as file is device node");
+        return;
+    }
+
     if (::unlink(filename.c_str()) != 0)
         STXXL_THROW_ERRNO(io_error, "unlink() path=" << filename << " fd=" << file_des);
+}
+
+bool ufs_file_base::is_device() const
+{
+    return m_is_device;
 }
 
 __STXXL_END_NAMESPACE
