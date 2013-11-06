@@ -211,8 +211,8 @@ void ufs_file_base::_set_size(offset_type newsize)
     if (!(m_mode & RDONLY) && !m_is_device)
     {
 #if STXXL_WINDOWS || defined(__MINGW32__)
-        HANDLE hfile;
-        stxxl_check_ge_0(hfile = (HANDLE) ::_get_osfhandle(file_des), io_error);
+        HANDLE hfile = (HANDLE)::_get_osfhandle(file_des);
+        stxxl_check_ne_0((hfile == INVALID_HANDLE_VALUE), io_error);
 
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = newsize;
@@ -225,7 +225,7 @@ void ufs_file_base::_set_size(offset_type newsize)
             stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
                                      " newsize=" << newsize << " ", io_error);
 #else
-        stxxl_check_ge_0(::ftruncate(file_des, newsize), io_error);
+        stxxl_check_eq_0(::ftruncate(file_des, newsize), io_error);
 #endif
     }
 
