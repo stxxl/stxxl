@@ -9,6 +9,7 @@ Version 1.4.0 (unreleased)
   - replaced adhoc Makefiles with CMake build system
   - CMake scripts can also output MSVC project files and more.
   - all component tests must register with CMake's test system -> run make test
+  - generates pkg-config and CMake's project config files
 
 * Greatly Improved Doxygen Documentation
   - integrated old LaTeX tutorial
@@ -68,6 +69,7 @@ Version 1.4.0 (unreleased)
   - used like boost::intrusive_ptr with a base class.
   - reimplementing request_ptr using just counting_ptr<request>.
   - (optionally) use atomic operations for thread-safe reference counting
+  - applying counting_ptr to stream::sorted_runs to avoid extra copying
 
 * New STXXL container "stxxl::sequence"
   - basically a deque container without random access to blocks.

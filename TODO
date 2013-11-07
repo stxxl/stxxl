@@ -1,8 +1,6 @@
 * asynchronous pipelining 
   (currently being developed in branch parallel_pipelining_integration)
 
-* replace build system, something with '$LIBNAME-config --libs --cflags ...' would be nice
-
 * if the stxxl disk files have been enlarged because more external memory
   was requested by the program, resize them afterwards to
   max(size_at_program_start, configured_size)
@@ -40,14 +38,7 @@
 * allow configuration of the block-managed disks using API calls, 
   not only through the configuration file.
 
-* separate library sources and tests/benchmarks
-  (e. g. to top level directories src/ and tests/)
-
 * abstract away block manager so every container can attach to a file.
-
-* overhead: stream::sorted_runs (which may be rather big) is copied into stream_runs_merger
-
-* overhead: stream::sorted_runs is copy-initialized from locally created runs
 
 * retry incomplete I/Os for all file types (currently only syscall)
 
