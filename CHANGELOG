@@ -1,7 +1,93 @@
 Version 1.4.0 (unreleased)
 
-* More parameters dynamic at runtime
-  - Number of pages for vector
+* Reorganized Directory Hierarchy
+  - separating old componented based directories into lib/ (libstxxl source
+    files), tests/ (for tests cases), examples/ (for tutorial and example code)
+    and tools/ (for stxxl_tool and more benchmarks).
+
+* CMake build system for cross-platform compilation
+  - replaced adhoc Makefiles with CMake build system
+  - CMake scripts can also output MSVC project files and more.
+  - all component tests must register with CMake's test system -> run make test
+
+* Greatly Improved Doxygen Documentation
+  - integrated old LaTeX tutorial
+  - newly written tutorials for almost all STXXL containers and algorithms
+  - embedded design documentation from Roman Dementiev's PhD thesis
+  - new compilation instructions for CMake build system
+
+* Improved .stxxl Config Options for File I/O Implementations
+  - looking for .stxxl in more places than just the current directory (see the
+    docs for which places exactly).
+  - parse file size with SI and IEC units, like "10GiB" in disk= config lines.
+  - parse additional file I/O implementation options.
+  - support for "unlink_on_open" (keep file descriptor but unlink file) and
+    "delete_at_exit" options.
+  - support for "direct=on/off/try" to turn off O_DIRECT for tmpfs and similar.
+
+* .stxxl Config Options Represented as disk_config Class
+  - all disk= config lines are parsed into disk_config objects.
+  - this is in preparation of programmatically adding disks (disk_config)
+    objects in the next release, instead of config via .stxxl files.
+
+* Command line parser stxxl::cmdline_parser
+  - stand-alone command line parser with ability to parse SI and IEC units for
+    "bytes sizes".
+  - automatically output nicely formatted help for all options and flags.
+  - using the cmdline_parser for all stxxl_tool subtools.
+
+* Created stxxl_tool from multiple small tools and benchmarks
+  - stxxl_tool is a collection of subtools, previous scattered around in the
+    directory hierarchy.
+  - goal is to have one tool installed in binary distribution together with
+    libstxxl library and includes.
+  - primary tool for standardized platform speed tests.
+  - provide good command line help on these subtools via cmdline_parser.
+
+* Adding skew3 as "real-world" STXXL application to examples subdirectory.
+  - enhanced integrated stxxl::tuple construction for this application.
+
+* Enable use of raw block devices on Linux
+  - these do provide more stable I/O throughput than even XFS.
+  - disable growing of these devices
+
+* Most platform configuration is now done by CMake and saved into the
+  <stxxl/bits/config.h> header file
+
+* Enhanced stxxl::block_manager to count maximum, current and total number of
+  bytes allocated in external memory.
+
+* Support Visual Studio 2012 and 2013 _without_ Boost by using std::thread
+  - VS 2012 and 2013 support STL threads, mutexes, condition_variables and
+    more, which are basically modeled after the Boost libraries. Thus we can
+    simply uses these included libraries instead of Boost.
+  - Fixed bad runtime deadlock bug occuring when joining std::threads after
+    main() exits. The bug persists in VS 2012 and 2013.
+
+* Implementing counting_ptr reference counted objects
+  - used like boost::intrusive_ptr with a base class.
+  - reimplementing request_ptr using just counting_ptr<request>.
+  - (optionally) use atomic operations for thread-safe reference counting
+
+* New STXXL container "stxxl::sequence"
+  - basically a deque container without random access to blocks.
+  - efficient {push/pop}_{front/back} at both ends.
+  - access to block sequence via stream and reverse_stream constructions
+
+* New STXXL container "stxxl::sorter"
+  - combination of stream::runs_creator and stream::runs_merger into a
+    convenient sorting container.
+
+* Added vector_bufreader and vector_bufwriter to overlapping I/O and
+  computation when accessing a stxxl::vector in scanning mode.
+  - documented problems of scanning in a vector
+  - C++11 range loop access support to stxxl::vector via vector_bufreader.
+
+* Added uint40 and uint48 types for integers with five and six bytes.
+
+* Adding STXXL_CHECK macros to always check outcomes in tests.
+
+* Various file renames (which are only possible at major version changes).
 
 ------------------------------------------
 Version 1.3.2 (unreleased)
@@ -366,9 +452,3 @@ Version 0.2 (Summer 2003)
 * The first public release
 
 * Vectors, stacks, sorting, scanning are available
-
-
-
-
-
-

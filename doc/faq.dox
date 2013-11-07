@@ -20,67 +20,41 @@
 
 The most recent version of this FAQ can always be found <a href="http://stxxl.sourceforge.net">here</a>.
 
-\section faq_compilers Supported Compilers
+\section faq_compilers Supported Compilers and Platforms
 
-The following compilers have been tested in different \c STXXL configurations.  Other compilers might work, too, but we don't have the resources (systems, compilers or time) to test them.  Feedback is welcome.
+The following compilers have been tested in different \c STXXL configurations.  Other compilers might work, too, but we don't have the resources (systems, compilers or time) to test them. Feedback is welcome.
+
+Please note that from STXXL 1.4.0 on, only 64-bit systems are fully supported. Compilation on 32-bit seems to work, but we cannot support it anymore.
 
 The compilers marked with '*' are the maintainers' favorite choices and are most thoroughly tested.
 
-\verbatim
-                |         parallel            parallel
-                |  stxxl   stxxl     stxxl     stxxl
-  compiler      |                   + boost   + boost
-----------------+----------------------------------------
-  GCC 4.6 c++0x |    x     PMODE       x       PMODE 
-  GCC 4.6       |    x     PMODE       x       PMODE 
-  GCC 4.5 c++0x |    x     PMODE       x       PMODE 
-  GCC 4.5       |    x     PMODE       x       PMODE 
-* GCC 4.4 c++0x |    x     PMODE       x       PMODE 
-  GCC 4.4       |    x     PMODE       x       PMODE 
-  GCC 4.3 c++0x |    x     PMODE²      x       PMODE²
-  GCC 4.3       |    x     PMODE²      x       PMODE²
-  GCC 4.2       |    x     MCSTL       x       MCSTL
-  GCC 4.1       |    x       -         x         -
-  GCC 4.0       |    x       -         x         -
-  GCC 3.4       |    x       -         x         -
-  GCC 3.3       |    o       -         o         -
-  GCC 2.95      |    -       -         -         -
-  ICPC 12.0.191 |    x¹    PMODE¹²     x¹      PMODE¹²
-  ICPC 12.0.191 |    x¹    MCSTL¹      x¹      MCSTL¹
-* ICPC 11.1.075 |    x¹    MCSTL¹      x¹      MCSTL¹
-  ICPC 11.0.084 |    x¹    MCSTL¹      x¹      MCSTL¹
-  ICPC 10.1.026 |    x¹    MCSTL¹      x¹      MCSTL¹
-  ICPC 10.0.026 |    x¹    MCSTL¹      x¹      MCSTL¹
-  ICPC 9.1.053  |    x¹      -         x¹        -
-  ICPC 9.0.032  |    x¹      -         x¹        -
-  clang++ 2.9   |    x       -         x         -
-  MSVC 2010 10.0|    -       -         x         -
-* MSVC 2008 9.0 |    -       -         x         -
-  MSVC 2005 8.0 |    -       -         x         -
+compiler           | supported options
+----------------   | --------------------------
+gcc 4.8.2          | stxxl parallel (boost) (c++0x)
+gcc 4.7.3 *        | stxxl parallel (boost) (c++0x)
+gcc 4.6.4          | stxxl parallel (boost) (c++0x)
+gcc 4.5.4          | stxxl parallel (boost) (c++0x)
+gcc 4.4.7          | stxxl parallel (boost) (c++0x)
+gcc 4.3.6          | stxxl (boost)
+gcc 4.1.2          | stxxl (boost)
+gcc 4.0.4          | stxxl (boost)
+gcc 3.4.6          | stxxl (boost)
+icpc 2013.5.192 *  | stxxl (boost) (c++0x)
+icpc 2011.13.367   | stxxl (boost) (c++0x)
+clang++ 3.0        | stxxl (boost) (c++0x)
+cygwin gcc 4.8.2   | stxxl parallel (boost) (c++0x)
+msvc 2013 12.0 *   | stxxl (boost) (c++11)
+msvc 2012 11.0     | stxxl (boost) (c++0x)
+msvc 2010 10.0     | stxxl boost required
 
- x   = full support
- o   = partial support
- -   = unsupported
- ?   = untested
- PMODE = supports parallelization using libstdc++ parallel mode
- MCSTL = supports parallelization using the MCSTL library (superseded by
-       PMODE, introduced in gcc 4.3)
- ¹   = you may have to add a -gcc-name=<gcc-x.y> option if the system default
-       gcc does not come in the correct version:
-       icpc 9.0: use with gcc 3.x
-       icpc 9.1: use with gcc before 4.2
-       icpc 10.x, 11.x, 12.0 with mcstl support: use with gcc 4.2
-       icpc 12.0 with pmode support: use with gcc 4.3
- ²   = gcc 4.3 only provides partial support for the libstdc++ parallel mode,
-       full support requires gcc 4.4 or later
-\endverbatim
+- The option "parallel" uses the __gnu_parallel extensions in some parts of STXXL. For all \c gcc versions >= 4.4 the __gnu_parallel extensions are ON by default. Support for MCSTL (predecessor of __gnu_parallel) was removed in 1.4.0.
 
+- Boost is optional and not recommended on all systems, except MSVC 2010. It provides no advantages on other platforms. \n
+  STXXL has been tested with Boost 1.40.0, 1.42.0 and 1.46.1. Other versions may work, too, but older versions will not get support.
 
-\section faq_boost Supported Boost versions
+- Support for C++0x and C++11 is integrated and automatically detected. No core parts of STXXL require C++11.
 
-The <a href="http://www.boost.org">Boost</a> libraries are required on Windows platforms using MSVC compiler and optional on other platforms.
-
-\c STXXL has been tested with Boost 1.40.0, 1.42.0 and 1.46.1. Other versions may work, too, but older versions will not get support.
+- All options are automatically detected by CMake.
 
 
 \section faq_credit How can I credit STXXL, and thus foster its development?

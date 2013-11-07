@@ -51,11 +51,13 @@ We have collected much documentation about the design of STXXL. Even more inform
 
 If you plan to contribute code to STXXL, please read the \subpage coding_style.
 
-# FAQ, Troubleshooting and Bug Reports
+# FAQ, Troubleshooting, Bugs and More
 
 - \subpage faq
 
 - Questions concerning use and development of the STXXL library should be posted to the <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>. Please search the forum before posting, your question may have been answered before.
+
+- See \ref faq_compilers when compilation fails.
 
 - Bugs and pull requests can be reported via Github: http://github.com/stxxl/stxxl
 
