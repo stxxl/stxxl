@@ -86,6 +86,8 @@ struct SubTool subtools[] = {
 
 int main_usage(const char* arg0)
 {
+    STXXL_MSG(stxxl::get_version_string_long());
+
     std::cout << "Usage: " << arg0 << " <subtool> ..." << std::endl
               << "Available subtools: " <<  std::endl;
 
