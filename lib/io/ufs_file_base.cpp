@@ -212,7 +212,7 @@ void ufs_file_base::_set_size(offset_type newsize)
     {
 #if STXXL_WINDOWS || defined(__MINGW32__)
         HANDLE hfile = (HANDLE)::_get_osfhandle(file_des);
-        stxxl_check_ne_0((hfile == INVALID_HANDLE_VALUE), io_error);
+        stxxl_check_eq_0((hfile == INVALID_HANDLE_VALUE), io_error);
 
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = newsize;
