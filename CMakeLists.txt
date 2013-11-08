@@ -184,7 +184,13 @@ if(MSVC)
   # disable lots of warnings about "unsecure" STL functions
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -Wextra -pedantic -Wno-long-long")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Wall -pedantic -Wno-long-long")
+  # detect -Wextra
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag(-Wextra CXX_HAS_FLAGS_WEXTRA)
+  if(CXX_HAS_FLAGS_WEXTRA)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+  endif()
 endif()
 
 ###############################################################################
@@ -324,13 +330,13 @@ if(USE_BOOST)
   endif(WIN32)
 
   # first try to find the version
-  find_package(Boost 1.40.0 REQUIRED)
+  find_package(Boost 1.34.0 REQUIRED)
 
   if(Boost_VERSION GREATER 104699)
     #-tb Boost >= 1.47.0 found, we must also link with libboost_chrono for MSVC to work.
     find_package(Boost 1.47.0 REQUIRED COMPONENTS thread date_time chrono iostreams system filesystem)
   else()
-    find_package(Boost 1.40.0 REQUIRED COMPONENTS thread date_time iostreams system filesystem)
+    find_package(Boost 1.34.0 REQUIRED COMPONENTS thread date_time iostreams system filesystem)
   endif()
 
   # force caching of variables to display them to the user
