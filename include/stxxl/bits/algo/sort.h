@@ -610,8 +610,8 @@ namespace sort_local
             else
             {
                 mng->new_blocks(interleaved_alloc_strategy(new_nruns, alloc_strategy()),
-                                RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>(new_runs, 0, new_nruns, blocks_in_new_run),
-                                RunsToBIDArrayAdaptor2<block_type::raw_size, run_type>(new_runs, _n, new_nruns, blocks_in_new_run));
+                                runs2bid_array_adaptor2<block_type::raw_size, run_type>(new_runs, 0, new_nruns, blocks_in_new_run),
+                                runs2bid_array_adaptor2<block_type::raw_size, run_type>(new_runs, _n, new_nruns, blocks_in_new_run));
             }
             // merge all
             runs_left = nruns;

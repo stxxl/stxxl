@@ -207,23 +207,23 @@ public:
     }
 
 template <class one_dim_array_type, class data_type, class pos_type>
-struct TwoToOneDimArrayAdaptorBase
+struct two2one_dim_array_adapter_base
     : public std::iterator<std::random_access_iterator_tag, data_type, unsigned_type>
 {
     one_dim_array_type * array;
     pos_type pos;
     typedef pos_type _pos_type;
-    typedef TwoToOneDimArrayAdaptorBase<one_dim_array_type,
-                                        data_type, pos_type> _Self;
+    typedef two2one_dim_array_adapter_base<one_dim_array_type,
+                                           data_type, pos_type> _Self;
 
 
-    TwoToOneDimArrayAdaptorBase()
+    two2one_dim_array_adapter_base()
     { }
 
-    TwoToOneDimArrayAdaptorBase(one_dim_array_type * a, pos_type p)
+    two2one_dim_array_adapter_base(one_dim_array_type * a, pos_type p)
         : array(a), pos(p)
     { }
-    TwoToOneDimArrayAdaptorBase(const TwoToOneDimArrayAdaptorBase & a)
+    two2one_dim_array_adapter_base(const two2one_dim_array_adapter_base & a)
         : array(a.array), pos(a.pos)
     { }
 
@@ -316,24 +316,24 @@ struct TwoToOneDimArrayAdaptorBase
 //////////////////////////
 template <class one_dim_array_type, class data_type,
           unsigned dim_size, class pos_type = blocked_index<dim_size> >
-struct TwoToOneDimArrayRowAdaptor :
-    public TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>
+struct two2one_dim_array_row_adapter :
+    public two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>
 {
-    typedef TwoToOneDimArrayRowAdaptor<one_dim_array_type,
-                                       data_type, dim_size, pos_type> _Self;
+    typedef two2one_dim_array_row_adapter<one_dim_array_type,
+                                          data_type, dim_size, pos_type> _Self;
 
-    typedef TwoToOneDimArrayAdaptorBase<one_dim_array_type,
-                                        data_type, pos_type> _Parent;
+    typedef two2one_dim_array_adapter_base<one_dim_array_type,
+                                           data_type, pos_type> _Parent;
     using _Parent::array;
     using _Parent::pos;
 
-    TwoToOneDimArrayRowAdaptor()
+    two2one_dim_array_row_adapter()
     { }
-    TwoToOneDimArrayRowAdaptor(one_dim_array_type * a, pos_type p)
-        : TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>(a, p)
+    two2one_dim_array_row_adapter(one_dim_array_type * a, pos_type p)
+        : two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>(a, p)
     { }
-    TwoToOneDimArrayRowAdaptor(const TwoToOneDimArrayRowAdaptor & a)
-        : TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>(a)
+    two2one_dim_array_row_adapter(const two2one_dim_array_row_adapter & a)
+        : two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>(a)
     { }
 
     data_type & operator * ()
@@ -362,20 +362,20 @@ struct TwoToOneDimArrayRowAdaptor :
 
 template <class one_dim_array_type, class data_type,
           unsigned dim_size, class pos_type = blocked_index<dim_size> >
-struct TwoToOneDimArrayColumnAdaptor
-    : public TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>
+struct two2one_dim_array_column_adapter
+    : public two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>
 {
-    typedef TwoToOneDimArrayColumnAdaptor<one_dim_array_type,
-                                          data_type, dim_size, pos_type> _Self;
+    typedef two2one_dim_array_column_adapter<one_dim_array_type,
+                                             data_type, dim_size, pos_type> _Self;
 
-    using TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>::pos;
-    using TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>::array;
+    using two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>::pos;
+    using two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>::array;
 
-    TwoToOneDimArrayColumnAdaptor(one_dim_array_type * a, pos_type p)
-        : TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>(a, p)
+    two2one_dim_array_column_adapter(one_dim_array_type * a, pos_type p)
+        : two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>(a, p)
     { }
-    TwoToOneDimArrayColumnAdaptor(const _Self & a)
-        : TwoToOneDimArrayAdaptorBase<one_dim_array_type, data_type, pos_type>(a)
+    two2one_dim_array_column_adapter(const _Self & a)
+        : two2one_dim_array_adapter_base<one_dim_array_type, data_type, pos_type>(a)
     { }
 
     data_type & operator * ()
@@ -405,7 +405,7 @@ struct TwoToOneDimArrayColumnAdaptor
 
 
 template <typename array_type, typename value_type, unsigned_type modulo>
-class ArrayOfSequencesIterator : public std::iterator<std::random_access_iterator_tag, value_type, unsigned_type>
+class array_of_sequences_iterator : public std::iterator<std::random_access_iterator_tag, value_type, unsigned_type>
 {
     unsigned_type pos;
     unsigned_type offset;
@@ -424,19 +424,19 @@ class ArrayOfSequencesIterator : public std::iterator<std::random_access_iterato
     }
 
 public:
-    ArrayOfSequencesIterator()
+    array_of_sequences_iterator()
     {
         this->arrays = NULL;
         set(0);
     }
 
-    ArrayOfSequencesIterator(array_type * arrays)
+    array_of_sequences_iterator(array_type * arrays)
     {
         this->arrays = arrays;
         set(0);
     }
 
-    ArrayOfSequencesIterator(array_type * arrays, unsigned_type pos)
+    array_of_sequences_iterator(array_type * arrays, unsigned_type pos)
     {
         this->arrays = arrays;
         set(pos);
@@ -448,7 +448,7 @@ public:
     }
 
     //pre-increment operator
-    ArrayOfSequencesIterator & operator ++ ()
+    array_of_sequences_iterator & operator ++ ()
     {
         ++pos;
         ++offset;
@@ -462,15 +462,15 @@ public:
     }
 
     //post-increment operator
-    ArrayOfSequencesIterator operator ++ (int)
+    array_of_sequences_iterator operator ++ (int)
     {
-        ArrayOfSequencesIterator former(*this);
+        array_of_sequences_iterator former(*this);
         operator ++ ();
         return former;
     }
 
     //pre-increment operator
-    ArrayOfSequencesIterator & operator -- ()
+    array_of_sequences_iterator & operator -- ()
     {
         --pos;
         if (offset == 0)
@@ -484,66 +484,66 @@ public:
     }
 
     //post-increment operator
-    ArrayOfSequencesIterator operator -- (int)
+    array_of_sequences_iterator operator -- (int)
     {
-        ArrayOfSequencesIterator former(*this);
+        array_of_sequences_iterator former(*this);
         operator -- ();
         return former;
     }
 
-    ArrayOfSequencesIterator & operator += (unsigned_type addend)
+    array_of_sequences_iterator & operator += (unsigned_type addend)
     {
         set(pos + addend);
         return *this;
     }
 
-    ArrayOfSequencesIterator & operator -= (unsigned_type addend)
+    array_of_sequences_iterator & operator -= (unsigned_type addend)
     {
         set(pos - addend);
         return *this;
     }
 
-    ArrayOfSequencesIterator operator + (unsigned_type addend) const
+    array_of_sequences_iterator operator + (unsigned_type addend) const
     {
-        return ArrayOfSequencesIterator(arrays, pos + addend);
+        return array_of_sequences_iterator(arrays, pos + addend);
     }
 
-    ArrayOfSequencesIterator operator - (unsigned_type subtrahend) const
+    array_of_sequences_iterator operator - (unsigned_type subtrahend) const
     {
-        return ArrayOfSequencesIterator(arrays, pos - subtrahend);
+        return array_of_sequences_iterator(arrays, pos - subtrahend);
     }
 
-    unsigned_type operator - (const ArrayOfSequencesIterator & subtrahend) const
+    unsigned_type operator - (const array_of_sequences_iterator & subtrahend) const
     {
         return pos - subtrahend.pos;
     }
 
-    bool operator == (const ArrayOfSequencesIterator & aoai) const
+    bool operator == (const array_of_sequences_iterator & aoai) const
     {
         return pos == aoai.pos;
     }
 
-    bool operator != (const ArrayOfSequencesIterator & aoai) const
+    bool operator != (const array_of_sequences_iterator & aoai) const
     {
         return pos != aoai.pos;
     }
 
-    bool operator < (const ArrayOfSequencesIterator & aoai) const
+    bool operator < (const array_of_sequences_iterator & aoai) const
     {
         return pos < aoai.pos;
     }
 
-    bool operator <= (const ArrayOfSequencesIterator & aoai) const
+    bool operator <= (const array_of_sequences_iterator & aoai) const
     {
         return pos <= aoai.pos;
     }
 
-    bool operator > (const ArrayOfSequencesIterator & aoai) const
+    bool operator > (const array_of_sequences_iterator & aoai) const
     {
         return pos > aoai.pos;
     }
 
-    bool operator >= (const ArrayOfSequencesIterator & aoai) const
+    bool operator >= (const array_of_sequences_iterator & aoai) const
     {
         return pos >= aoai.pos;
     }
@@ -585,7 +585,7 @@ namespace helper
     class element_iterator_generator
     { };
 
-    // default case for blocks with fillers or other data: use ArrayOfSequenceIterator
+    // default case for blocks with fillers or other data: use array_of_sequences_iterator
     template <typename BlockType>
     class element_iterator_generator<BlockType, false>
     {
@@ -593,7 +593,7 @@ namespace helper
         typedef typename block_type::value_type value_type;
 
     public:
-        typedef ArrayOfSequencesIterator<block_type, value_type, block_type::size> iterator;
+        typedef array_of_sequences_iterator<block_type, value_type, block_type::size> iterator;
 
         iterator operator () (block_type * blocks, unsigned_type offset) const
         {

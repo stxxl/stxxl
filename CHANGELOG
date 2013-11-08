@@ -281,8 +281,8 @@ Version 1.2.0 (05 July 2008)
 * stxxl::noncopyable, inspired by boost::noncopyable: inheriting from this
   class forbids copying of objects when this is undesirable
   - used in all classes that had implemented their own variants previously
-* stxxl::vector, all sorting functions: replaced TwoToOneDimArrayRowAdaptor
-  with ArrayOfSequencesIterator which is much faster, especially
+* stxxl::vector, all sorting functions: replaced two2one_dim_array_row_adapter
+  with array_of_sequences_iterator which is much faster, especially
   if blocks have padding
 * if required, verify that the sentinels satisfy a strict weak ordering
 * stxxl::vector: several operations sped up, several more implemented

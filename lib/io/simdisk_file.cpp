@@ -22,8 +22,8 @@
 __STXXL_BEGIN_NAMESPACE
 
 
-void DiskGeometry::add_zone(int & first_cyl, int last_cyl,
-                            int sec_per_track, int & first_sect)
+void simdisk_geometry::add_zone(int & first_cyl, int last_cyl,
+                                int sec_per_track, int & first_sect)
 {
     double rate =
         nsurfaces * sec_per_track * bytes_per_sector /
@@ -39,7 +39,7 @@ void DiskGeometry::add_zone(int & first_cyl, int last_cyl,
 }
 
 // returns delay in s
-double DiskGeometry::get_delay(file::offset_type offset, file::size_type size)
+double simdisk_geometry::get_delay(file::offset_type offset, file::size_type size)
 {
 #if 0
     int first_sect = offset / bytes_per_sector;

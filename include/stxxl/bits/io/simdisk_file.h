@@ -39,7 +39,7 @@ __STXXL_BEGIN_NAMESPACE
 
  #define AVERAGE_SPEED (15 * 1024 * 1024)
 
-class DiskGeometry : private noncopyable
+class simdisk_geometry : private noncopyable
 {
     struct Zone
     {
@@ -96,16 +96,16 @@ protected:
                   int sec_per_track, int & first_sect);
 
 public:
-    inline DiskGeometry()
+    inline simdisk_geometry()
     { }
     double get_delay(file::offset_type offset, file::size_type size);                // returns delay in s
 
-    inline ~DiskGeometry()
+    inline ~simdisk_geometry()
     { }
 };
 
 
-class IC35L080AVVA07 : public DiskGeometry              // IBM series 120GXP
+class IC35L080AVVA07 : public simdisk_geometry              // IBM series 120GXP
 {
 public:
     IC35L080AVVA07();
