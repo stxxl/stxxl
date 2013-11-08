@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007, 2008, 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -11,10 +12,6 @@
  **************************************************************************/
 
 #include <stxxl/bits/version.h>
-
-#if STXXL_BOOST_CONFIG
-#include <boost/version.hpp>
-#endif
 
 
 __STXXL_BEGIN_NAMESPACE
@@ -32,6 +29,11 @@ int version_minor()
 int version_patch()
 {
     return STXXL_VERSION_PATCH;
+}
+
+int version_int()
+{
+    return STXXL_VERSION_INT;
 }
 
 const char * get_library_version_string()

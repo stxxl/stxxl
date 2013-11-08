@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007, 2011 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -19,7 +20,10 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-// STXXL_VERSION_MAJOR and more are defined in cmake generated config.h
+// STXXL_VERSION_{MAJOR,MINOR,PATCH} are defined in cmake generated config.h
+
+// construct an integer version number, like "10400" for "1.4.0".
+#define STXXL_VERSION_INTEGER (STXXL_VERSION_MAJOR * 10000 + STXXL_VERSION_MINOR * 100 + STXXL_VERSION_PATCH)
 
 #define stringify_(x) #x
 #define stringify(x) stringify_(x)
@@ -53,9 +57,14 @@ inline const char * get_version_string_long()
 #undef stringify
 #undef stringify_
 
+//! return X if the STXXL library version is X.Y.Z
 int version_major();
+//! return Y if the STXXL library version is X.Y.Z
 int version_minor();
+//! return Z if the STXXL library version is X.Y.Z
 int version_patch();
+//! return integer version number of the STXXL library
+int version_integer();
 
 //! returns "X.Y.Z" version string of library
 const char * get_library_version_string();

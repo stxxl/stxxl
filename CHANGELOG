@@ -89,6 +89,11 @@ Version 1.4.0 (unreleased)
 
 * Adding STXXL_CHECK macros to always check outcomes in tests.
 
+* Reworking version.h
+  - add integer version like 10400 for 1.4.0
+  - add get_version_string() for longer version string with features
+  - check_library_version() for mismatch between headers and libraries
+
 * Various file renames (which are only possible at major version changes).
 
 ------------------------------------------
