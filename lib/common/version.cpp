@@ -31,9 +31,9 @@ int version_patch()
     return STXXL_VERSION_PATCH;
 }
 
-int version_int()
+int version_integer()
 {
-    return STXXL_VERSION_INT;
+    return STXXL_VERSION_INTEGER;
 }
 
 const char * get_library_version_string()
