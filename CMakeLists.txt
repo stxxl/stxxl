@@ -14,8 +14,8 @@
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # needed to silence warning on cygwin
 
-# require cmake 2.6.4 (but please use 2.8.x)
-cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
+# require cmake 2.6.2 (but please use 2.8.x)
+cmake_minimum_required(VERSION 2.6.2 FATAL_ERROR)
 
 # the STXXL project
 project(stxxl)
@@ -384,16 +384,16 @@ endif(USE_GNU_PARALLEL)
 
 if(STXXL_STD_THREADS)
   message(STATUS "Using std::thread and other C++11 library functions.")
-  unset(STXXL_BOOST_THREADS)
-  unset(STXXL_POSIX_THREADS)
+  set(STXXL_BOOST_THREADS 0)
+  set(STXXL_POSIX_THREADS 0)
 elseif(STXXL_BOOST_THREADS)
   message(STATUS "Using boost::thread library functions.")
-  unset(STXXL_STD_THREADS)
-  unset(STXXL_POSIX_THREADS)
+  set(STXXL_STD_THREADS 0)
+  set(STXXL_POSIX_THREADS 0)
 elseif(STXXL_POSIX_THREADS)
   message(STATUS "Using POSIX pthread library functions.")
-  unset(STXXL_STD_THREADS)
-  unset(STXXL_BOOST_THREADS)
+  set(STXXL_STD_THREADS 0)
+  set(STXXL_BOOST_THREADS 0)
 else()
   message(SEND_ERROR "Could not detect a thread library. Check the compilation documentation.")
 endif()
