@@ -11,7 +11,7 @@
  **************************************************************************/
 
 #include <iostream>
-#include <time.h>
+#include <ctime>
 
 #include <stxxl/bits/containers/btree/btree.h>
 #include <stxxl/scan>

@@ -15,9 +15,7 @@
 #define STXXL_UTILS_MALLOC_HEADER
 
 #include <ostream>
-#ifdef __FreeBSD__
-    #include <stdlib.h>
-#else
+#ifndef __FreeBSD__
     #include <malloc.h>
 #endif
 #include <cstdlib>

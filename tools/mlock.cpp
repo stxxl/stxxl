@@ -19,12 +19,12 @@
 
 #if STXXL_HAVE_MLOCK_PROTO
 
+#include <cerrno>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <errno.h>
 
 #include <stxxl/cmdline>
 

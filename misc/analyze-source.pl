@@ -69,7 +69,7 @@ sub process_cpp {
     # put all #include lines into the includemap
     foreach my $ln (@data)
     {
-        if ($ln =~ m!#\s*include\s*([<"]\S+[">])!) {
+        if ($ln =~ m!\s*#\s*include\s*([<"]\S+[">])!) {
             $includemap{$1}{$path} = 1;
         }
     }
@@ -243,6 +243,22 @@ if (0)
     {
         print "$inc => ".scalar(keys %{$includemap{$inc}})." [";
         print join(",", sort keys %{$includemap{$inc}}). "]\n";
+    }
+}
+
+# check includemap for C-style headers
+{
+
+    my @cheaders = qw(assert.h ctype.h errno.h fenv.h float.h inttypes.h
+                      limits.h locale.h math.h signal.h stdarg.h stddef.h
+                      stdlib.h stdio.h string.h time.h);
+
+    foreach my $ch (@cheaders)
+    {
+        $ch = "<$ch>";
+        next if !$includemap{$ch};
+        print "Replace c-style header $ch in\n";
+        print "    [".join(",", sort keys %{$includemap{$ch}}). "]\n";
     }
 }
 
