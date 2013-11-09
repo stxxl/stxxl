@@ -110,9 +110,8 @@ int main(int argc, char * argv[])
         long step = rnd() % 1000;
         int percent = 0;
 
-        if (i % (MAX_STEP / 1000) == 0)
+        if (i % (MAX_STEP / 100) == 0)
         {
-            STXXL_MSG("*****************************************************");
             STXXL_MSG("Step=" << i << " (" << (unsigned)stdmap.size() << ")");
         }
 
