@@ -322,7 +322,6 @@ check_cxx_source_compiles(
 
 if(USE_BOOST)
 
-  set(USE_BOOST ON)
   set(Boost_USE_MULTITHREADED ON)
 
   if(WIN32)
@@ -330,13 +329,16 @@ if(USE_BOOST)
   endif(WIN32)
 
   # first try to find the version
-  find_package(Boost 1.34.0 REQUIRED)
+  find_package(Boost 1.34.1 REQUIRED)
 
   if(Boost_VERSION GREATER 104699)
     #-tb Boost >= 1.47.0 found, we must also link with libboost_chrono for MSVC to work.
     find_package(Boost 1.47.0 REQUIRED COMPONENTS thread date_time chrono iostreams system filesystem)
+  elseif(Boost_VERSION GREATER 103499)
+    #-tb Boost >= 1.35.0 found, we must also link with libboost_system for MSVC to work.
+    find_package(Boost 1.35.0 REQUIRED COMPONENTS thread date_time iostreams system filesystem)
   else()
-    find_package(Boost 1.34.0 REQUIRED COMPONENTS thread date_time iostreams system filesystem)
+    find_package(Boost 1.34.1 REQUIRED COMPONENTS thread date_time iostreams filesystem)
   endif()
 
   # force caching of variables to display them to the user
