@@ -20,6 +20,11 @@
 
 __STXXL_BEGIN_NAMESPACE
 
+//! \defgroup matrix matrix
+//! Efficient external memory matrix operations
+//! \ingroup stlcont
+//! \{
+
 /* index-variable naming convention:
  * [MODIFIER_][UNIT_]DIMENSION[_in_[MODIFIER_]ENVIRONMENT]
  *
@@ -232,7 +237,7 @@ public:
     typedef block_scheduler< matrix_swappable_block<ValueType, BlockSideLength> > block_scheduler_type;
     typedef typename block_scheduler_type::swappable_block_identifier_type swappable_block_identifier_type;
     typedef std::vector<swappable_block_identifier_type> blocks_type;
-    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+    typedef matrix_local::matrix_operations<ValueType, BlockSideLength> Ops;
 
     block_scheduler_type & bs;
 
@@ -1030,7 +1035,7 @@ protected:
     typedef typename swappable_block_matrix_type::block_scheduler_type block_scheduler_type;
     typedef typename swappable_block_matrix_type::size_type block_size_type;
     typedef typename swappable_block_matrix_type::elem_size_type elem_size_type;
-    typedef matrix_operations<ValueType, BlockSideLength> Ops;
+    typedef matrix_local::matrix_operations<ValueType, BlockSideLength> Ops;
     typedef matrix_swappable_block<ValueType, BlockSideLength> swappable_block_type;
 
 public:
@@ -1361,6 +1366,8 @@ protected:
         delete [] C;
     }
 };
+
+//! \}
 
 __STXXL_END_NAMESPACE
 

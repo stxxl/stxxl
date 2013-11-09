@@ -34,6 +34,9 @@ class row_vector;
 template <typename ValueType, unsigned BlockSideLength>
 class swappable_block_matrix;
 
+//! \addtogroup matrix
+//! \{
+
 struct matrix_operation_statistic_dataset
 {
     int_type block_multiplication_calls,
@@ -112,6 +115,11 @@ std::ostream & operator << (std::ostream & o, const matrix_operation_statistic_d
             << statsd.block_addition_calls - statsd.block_additions_saved_through_zero << std::endl;
     return o;
 }
+
+//! \}
+
+//! \internal \brief matrix low-level operations and tools
+namespace matrix_local {
 
 //! A static_quadtree holds 4^Level elements arranged in a quad tree.
 //!
@@ -2026,6 +2034,8 @@ struct matrix_operations
 // Adjust choose_level_for_feedable_sw, too!
 template <typename ValueType, unsigned BlockSideLength>
 const int_type matrix_operations<ValueType, BlockSideLength>::strassen_winograd_base_case_size = 3;
+
+} // namespace matrix_local
 
 __STXXL_END_NAMESPACE
 

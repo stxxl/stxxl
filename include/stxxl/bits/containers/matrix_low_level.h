@@ -24,15 +24,20 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//forward declaration
+//! \addtogroup matrix
+//! \{
+
+namespace matrix_local {
+
+// forward declaration
 template <typename ValueType, unsigned BlockSideLength>
 struct matrix_operations;
 
-//generic declaration
+// generic declaration
 template <unsigned BlockSideLength, bool transposed>
 struct switch_major_index;
 
-//row-major specialization
+// row-major specialization
 template <unsigned BlockSideLength>
 struct switch_major_index<BlockSideLength, false>
 {
@@ -730,6 +735,10 @@ struct low_level_matrix_multiply_and_add<blas_double_complex, BlockSideLength>
     }
 };
 #endif
+
+} // namespace matrix_local
+
+//! \}
 
 __STXXL_END_NAMESPACE
 
