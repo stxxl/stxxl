@@ -34,7 +34,7 @@ __STXXL_BEGIN_NAMESPACE
  * height_in_blocks
  */
 
-//forward declaration
+// forward declaration
 template <typename ValueType, unsigned BlockSideLength>
 class matrix;
 
@@ -625,7 +625,7 @@ public:
             set_col(get_col() - 1);
         else if (get_row() - 1 >= 0)
             // => at beginning of row but not first row, move to end of previous row
-            set_pos(get_row() - 1, m.get_width() - 1);
+            set_pos(get_row() - 1, m->get_width() - 1);
         else
             // => at beginning of matrix, set to empty-state
             set_empty();
@@ -928,7 +928,7 @@ public:
             set_col(get_col() - 1);
         else if (get_row() - 1 >= 0)
             // => at beginning of row but not first row, move to end of previous row
-            set_pos(get_row() - 1, m.get_width() - 1);
+            set_pos(get_row() - 1, m->get_width() - 1);
         else
             // => at beginning of matrix, set to empty-state
             set_empty();

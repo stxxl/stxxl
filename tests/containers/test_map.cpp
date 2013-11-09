@@ -56,8 +56,10 @@ int main(int argc, char ** argv)
         const unsigned el = mult * (CACHE_ELEMENTS / 8);
         STXXL_MSG("Elements to insert " << el << " volume =" <<
                   (el * (sizeof(key_type) + sizeof(data_type))) / 1024 << " KiB");
+
+        // allocate map and insert elements
+
         map_type * DMap = new map_type(CACHE_SIZE * BLOCK_SIZE / 2, CACHE_SIZE * BLOCK_SIZE / 2);
-        //map_type  Map(CACHE_SIZE*BLOCK_SIZE/2,CACHE_SIZE*BLOCK_SIZE/2);
         map_type & Map = *DMap;
 
         for (unsigned i = 0; i < el; ++i)
@@ -70,6 +72,8 @@ int main(int argc, char ** argv)
         double logel = log(double(el)) / log(double(BLOCK_SIZE));
         STXXL_MSG("Logs: writes " << writes << " logel " << logel << " writes/logel " << (writes / logel));
         STXXL_MSG(stats_elapsed);
+
+        // search for keys
 
         stats_begin = *stxxl::stats::get_instance();
         STXXL_MSG("Doing search");
