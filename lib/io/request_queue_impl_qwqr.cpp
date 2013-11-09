@@ -213,9 +213,9 @@ void * request_queue_impl_qwqr::worker(void * arg)
     // Workaround for deadlock bug in Visual C++ Runtime 2012 and 2013, see
     // request_queue_impl_worker.cpp. -tb
     ExitThread(NULL);
-#endif
-
+#else
     return NULL;
+#endif
 }
 
 __STXXL_END_NAMESPACE
