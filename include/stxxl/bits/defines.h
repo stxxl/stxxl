@@ -91,4 +91,9 @@
 // functions. This can be used to determine the maximum disk space required by
 // an application.
 
+//#define STXXL_NO_DEPRECATED 0/1
+// default: 0
+// used in deprecated.h
+// turns off deprecated warnings for some forced template instantiations
+
 #endif // !STXXL_DEFINES_HEADER

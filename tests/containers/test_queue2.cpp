@@ -10,15 +10,17 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#define STXXL_VERBOSE_LEVEL 1
+#define STXXL_VERBOSE_LEVEL 0
+
+// stxxl::queue contains deprecated funtions
+#define STXXL_NO_DEPRECATED 1
 
 #include <stxxl/queue>
 
 typedef stxxl::uint64 my_type;
 
 // forced instantiation
-//-tb: yields "deprecated" constructor warning
-//template class stxxl::queue<my_type>;
+template class stxxl::queue<my_type>;
 
 int main(int argc, char ** argv)
 {

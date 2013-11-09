@@ -30,10 +30,6 @@ stxxl_build_test(test_vector_buf)
 stxxl_build_test(test_vector_export)
 stxxl_build_test(test_vector_sizes)
 
-add_define(test_many_stacks "STXXL_VERBOSE_LEVEL=1")
-add_define(test_ext_merger "STXXL_VERBOSE_LEVEL=0")
-add_define(test_ext_merger2 "STXXL_VERBOSE_LEVEL=0")
-
 stxxl_test(test_deque 3333333)
 stxxl_test(test_ext_merger)
 stxxl_test(test_ext_merger2)

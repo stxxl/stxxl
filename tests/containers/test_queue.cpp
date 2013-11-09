@@ -11,6 +11,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+// stxxl::queue contains deprecated funtions
+#define STXXL_NO_DEPRECATED 1
+
 #include <queue>
 #include <stxxl/queue>
 
@@ -31,8 +34,7 @@ void check(const q1type & q1, const q2type & q2)
 }
 
 // forced instantiation
-//-tb: yields "deprecated" constructor warning
-//template class stxxl::queue<my_type>;
+template class stxxl::queue<my_type>;
 
 int main()
 {
