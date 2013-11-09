@@ -30,3 +30,14 @@ div.contents {
   -ms-hyphens: auto;
   -webkit-hyphens: auto;
 }
+
+/* make links more blue */
+a {
+    color: #3D4A9C;
+    font-weight: normal;
+    text-decoration: none;
+}
+
+.contents a:visited {
+    color: #3D4A9C;
+}

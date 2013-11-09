@@ -54,7 +54,7 @@ Furthermore, the stream pipeline component of STXXL is described in the followin
 
 For more information on the structure, the internal design and time / space complexity of the provided operations, see \ref design_stl.
 
-# More Examples
+# More Examples and Real Applications
 
 The \c examples subdirectory of the STXXL tarballs contains more example code than those of the tutorials above. These are less documented but still contain useful code snippets and usage information.
 

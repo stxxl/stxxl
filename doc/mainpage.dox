@@ -55,48 +55,51 @@ If you plan to contribute code to STXXL, please read the \subpage coding_style.
 
 - \subpage faq
 
-- Questions concerning use and development of the STXXL library should be posted to the <b><a href="http://sourceforge.net/projects/stxxl/forums">FORUMS</a></b>. Please search the forum before posting, your question may have been answered before.
+- Questions concerning use and development of the STXXL library should be posted to the <a href="http://sourceforge.net/projects/stxxl/forums"><b>FORUMS</b></a>. Please search the forum before posting, your question may have been answered before.
 
 - See \ref faq_compilers when compilation fails.
 
-- Bugs and pull requests can be reported via Github: http://github.com/stxxl/stxxl
+- Bugs and pull requests can be reported via <a href="http://github.com/stxxl/stxxl"><b>Github</b></a>: http://github.com/stxxl/stxxl.
 
-- The STXXL source also contains \subpage stxxl_tool, a collection of simple tools and benchmarks.
+- Check the \ref textfiles_changelog for recent changes when switching version.
+
+- The STXXL source also contains \subpage stxxl_tool "stxxl_tool", a collection of simple tools and benchmarks.
 
 # License
 
 \c STXXL is distributed under the Boost Software License, Version 1.0. \n
-You can find a copy of the license in the accompanying file \ref license or at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
+You can find a copy of the license in the accompanying file \ref textfiles_license or at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
 \subpage textfiles "&nbsp;"
 
 */
 
 /** \page textfiles Additional Text Files
 
-- \subpage readme
-- \subpage changelog
-- \subpage authors
-- \subpage license
+- \subpage textfiles_readme
+- \subpage textfiles_changelog
+- \subpage textfiles_authors
+- \subpage textfiles_install
+- \subpage textfiles_license
 
-\page readme README
+\page textfiles_readme README
 
 \verbinclude README
 
-\page changelog ChangeLog
+\page textfiles_changelog ChangeLog
 
 \verbinclude CHANGELOG
 
-\page authors AUTHORS
+\page textfiles_authors AUTHORS
 
 The following list of authors have contributed to STXXL:
 
 \verbinclude AUTHORS
 
-\page install INSTALL
+\page textfiles_install INSTALL
 
 \verbinclude INSTALL
 
-\page license LICENSE_1_0.txt
+\page textfiles_license LICENSE_1_0.txt
 
 \verbinclude LICENSE_1_0.txt
 
