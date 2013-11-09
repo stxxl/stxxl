@@ -728,7 +728,7 @@ public:
 //! \brief External vector container. \n
 //! <b> Introduction </b> to vector container: see \ref tutorial_vector tutorial. \n
 //! <b> Design and Internals </b> of vector container: see \ref design_vector
-//!  
+//!
 //! For semantics of the methods see documentation of the STL std::vector
 //! \tparam ValueType type of contained objects (POD with no references to internal memory)
 //! \tparam PageSize number of blocks in a page
@@ -823,6 +823,7 @@ private:
     mutable pager_type pager;
 
     enum { valid_on_disk = 0, uninitialized = 1, dirty = 2 };
+    //! status of each page (valid_on_disk, uninitialized or dirty)
     mutable std::vector<unsigned char> _page_status;
     mutable std::vector<int_type> _page_to_slot;
     mutable simple_vector<int_type> _slot_to_page;
@@ -874,8 +875,8 @@ public:
         cfg = config::get_instance();
 
         allocate_page_cache();
-        unsigned_type all_pages = div_ceil(_bids.size(), page_size);
-        for (unsigned_type i = 0; i < all_pages; ++i)
+
+        for (unsigned_type i = 0; i < _page_status.size(); ++i)
         {
             _page_status[i] = uninitialized;
             _page_to_slot[i] = on_disk;
@@ -968,11 +969,16 @@ public:
         }
     }
 
+    //! Resize vector contents to n items.
+    //! \warning this will not call the constructor of objects in external memory!
     void resize(size_type n)
     {
         _resize(n);
     }
 
+    //! Resize vector contents to n items, and allow the allocated external
+    //! memory to shrink. Internal memory allocation remains unchanged.
+    //! \warning this will not call the constructor of objects in external memory!
     void resize(size_type n, bool shrink_capacity)
     {
         if (shrink_capacity)
@@ -982,6 +988,7 @@ public:
     }
 
 private:
+    //! Resize vector, only allow capacity growth.
     void _resize(size_type n)
     {
         reserve(n);
@@ -999,6 +1006,7 @@ private:
         _size = n;
     }
 
+    //! Resize vector, also allow reduction of external memory capacity.
     void _resize_shrink_capacity(size_type n)
     {
         unsigned_type old_bids_size = _bids.size();
@@ -1010,18 +1018,26 @@ private:
         }
         else if (new_bids_size < old_bids_size)
         {
+            unsigned_type new_pages_size = div_ceil(new_bids_size, page_size);
+
+            STXXL_VERBOSE_VECTOR("shrinking from " << old_bids_size << " to "
+                                 << new_bids_size << " blocks = from "
+                                 << _page_status.size() << " to "
+                                 << new_pages_size << " pages");
+
+            // release blocks
             if (_from != NULL)
                 _from->set_size(new_bids_size * block_type::raw_size);
             else
                 bm->delete_blocks(_bids.begin() + old_bids_size, _bids.end());
 
             _bids.resize(new_bids_size);
-            unsigned_type new_pages = div_ceil(new_bids_size, page_size);
-            _page_status.resize(new_pages);
 
-            unsigned_type first_page_to_evict = div_ceil(new_bids_size, page_size);
+            // don't resize _page_to_slot or _page_status, because it is still
+            // needed to check page status and match the mapping _slot_to_page
+
             // clear dirty flag, so these pages will be never written
-            std::fill(_page_status.begin() + first_page_to_evict,
+            std::fill(_page_status.begin() + new_pages_size,
                       _page_status.end(), (unsigned char)valid_on_disk);
         }
 
@@ -1111,8 +1127,8 @@ public:
         cfg = config::get_instance();
 
         allocate_page_cache();
-        unsigned_type all_pages = div_ceil(_bids.size(), page_size);
-        for (unsigned_type i = 0; i < all_pages; ++i)
+
+        for (unsigned_type i = 0; i < _page_status.size(); ++i)
         {
             _page_status[i] = valid_on_disk;
             _page_to_slot[i] = on_disk;
@@ -1150,8 +1166,8 @@ public:
         cfg = config::get_instance();
 
         allocate_page_cache();
-        unsigned_type all_pages = div_ceil(_bids.size(), page_size);
-        for (unsigned_type i = 0; i < all_pages; ++i)
+
+        for (unsigned_type i = 0; i < _page_status.size(); ++i)
         {
             _page_status[i] = uninitialized;
             _page_to_slot[i] = on_disk;
@@ -1279,7 +1295,7 @@ public:
             if (non_free_slots[i])
             {
                 STXXL_VERBOSE_VECTOR("flush(): flushing page " << i << " at address "
-                                                        << (int64(page_no) * int64(block_type::size) * int64(page_size)));
+                                     << (int64(page_no) * int64(block_type::size) * int64(page_size)));
                 write_page(page_no, i);
 
                 _page_to_slot[page_no] = on_disk;
@@ -1397,6 +1413,7 @@ private:
 
     void read_page(int_type page_no, int_type cache_slot) const
     {
+        assert(page_no < (int_type)_page_status.size());
         if (_page_status[page_no] == uninitialized)
             return;
         STXXL_VERBOSE_VECTOR("read_page(): page_no=" << page_no << " cache_slot=" << cache_slot);
@@ -1414,6 +1431,7 @@ private:
     }
     void write_page(int_type page_no, int_type cache_slot) const
     {
+        assert(page_no < (int_type)_page_status.size());
         if (!(_page_status[page_no] & dirty))
             return;
         STXXL_VERBOSE_VECTOR("write_page(): page_no=" << page_no << " cache_slot=" << cache_slot);

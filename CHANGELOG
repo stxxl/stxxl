@@ -96,6 +96,8 @@ Version 1.4.0 (unreleased)
 
 * Various file renames (which are only possible at major version changes).
 
+* Fixing bug in shrinking vector with vector::resize(n,true).
+
 ------------------------------------------
 Version 1.3.2 (unreleased)
 

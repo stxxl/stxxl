@@ -69,88 +69,111 @@ void test_const_iterator(const my_vec_type & x)
 }
 
 // forced instantiation
-template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (2 * 1024 * 1024), stxxl::striping>;
+template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (1024 * 1024), stxxl::striping>;
+
+
+void test_vector1()
+{
+    // use non-randomized striping to avoid side effects on random generator
+    typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (1024 * 1024), stxxl::striping>::result vector_type;
+    vector_type v(32 * 1024 * 1024 / sizeof(element));
+
+    // test assignment const_iterator = iterator
+    vector_type::const_iterator c_it = v.begin();
+    STXXL_UNUSED(c_it);
+
+    unsigned int big_size = 2*32 * 1024 * 1024;
+    typedef stxxl::vector<double> vec_big;
+    vec_big my_vec(big_size);
+
+    vec_big::iterator big_it = my_vec.begin();
+    big_it += 6;
+
+    test_const_iterator(v);
+
+    stxxl::random_number32 rnd;
+    int offset = rnd();
+
+    STXXL_MSG("write " << v.size() << " elements");
+
+    stxxl::ran32State = 0xdeadbeef;
+    vector_type::size_type i;
+
+    // fill the vector with increasing sequence of integer numbers
+    for (i = 0; i < v.size(); ++i)
+    {
+        v[i].key = i + offset;
+        STXXL_CHECK(v[i].key == stxxl::int64(i + offset));
+    }
+
+
+    // fill the vector with random numbers
+    stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
+    v.flush();
+
+    STXXL_MSG("seq read of " << v.size() << " elements");
+
+    stxxl::ran32State = 0xdeadbeef;
+
+    // testing swap
+    vector_type a;
+    std::swap(v, a);
+    std::swap(v, a);
+
+    for (i = 0; i < v.size(); i++)
+        STXXL_CHECK(v[i].key == rnd());
+
+    // check again
+    STXXL_MSG("clear");
+
+    v.clear();
+
+    stxxl::ran32State = 0xdeadbeef + 10;
+
+    v.resize(32 * 1024 * 1024 / sizeof(element));
+
+    STXXL_MSG("write " << v.size() << " elements");
+    stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
+
+    stxxl::ran32State = 0xdeadbeef + 10;
+
+    STXXL_MSG("seq read of " << v.size() << " elements");
+
+    for (i = 0; i < v.size(); i++)
+        STXXL_CHECK(v[i].key == rnd());
+
+    STXXL_MSG("copy vector of " << v.size() << " elements");
+
+    vector_type v_copy0(v);
+    STXXL_CHECK(v == v_copy0);
+
+    vector_type v_copy1;
+    v_copy1 = v;
+    STXXL_CHECK(v == v_copy1);
+}
+
+//! check vector::resize(n,true)
+void test_resize_shrink()
+{
+    typedef stxxl::VECTOR_GENERATOR<int, 2, 4, 4096>::result vector_type;
+    vector_type vector;
+
+    int n = 1 << 16;
+    vector.resize(n);
+
+    for(int i = 0; i < n; i += 100)
+        vector[i] = i;
+
+    vector.resize(1, true);
+    vector.flush();
+}
 
 int main()
 {
     try
     {
-        // use non-randomized striping to avoid side effects on random generator
-        typedef stxxl::VECTOR_GENERATOR<element, 2, 2, (2 * 1024 * 1024), stxxl::striping>::result vector_type;
-        vector_type v(64 * 1024 * 1024 / sizeof(element));
-
-        // test assignment const_iterator = iterator
-        vector_type::const_iterator c_it = v.begin();
-        STXXL_UNUSED(c_it);
-
-        unsigned int big_size = 1024 * 1024 * 2 * 16 * 16;
-        typedef stxxl::vector<double> vec_big;
-        vec_big my_vec(big_size);
-
-        vec_big::iterator big_it = my_vec.begin();
-        big_it += 6;
-
-        test_const_iterator(v);
-
-        stxxl::random_number32 rnd;
-        int offset = rnd();
-
-        STXXL_MSG("write " << v.size() << " elements");
-
-        stxxl::ran32State = 0xdeadbeef;
-        vector_type::size_type i;
-
-        // fill the vector with increasing sequence of integer numbers
-        for (i = 0; i < v.size(); ++i)
-        {
-            v[i].key = i + offset;
-            STXXL_CHECK(v[i].key == stxxl::int64(i + offset));
-        }
-
-
-        // fill the vector with random numbers
-        stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
-        v.flush();
-
-        STXXL_MSG("seq read of " << v.size() << " elements");
-
-        stxxl::ran32State = 0xdeadbeef;
-
-        // testing swap
-        vector_type a;
-        std::swap(v, a);
-        std::swap(v, a);
-
-        for (i = 0; i < v.size(); i++)
-            STXXL_CHECK(v[i].key == rnd());
-
-        // check again
-        STXXL_MSG("clear");
-
-        v.clear();
-
-        stxxl::ran32State = 0xdeadbeef + 10;
-
-        v.resize(64 * 1024 * 1024 / sizeof(element));
-
-        STXXL_MSG("write " << v.size() << " elements");
-        stxxl::generate(v.begin(), v.end(), stxxl::random_number32(), 4);
-
-        stxxl::ran32State = 0xdeadbeef + 10;
-
-        STXXL_MSG("seq read of " << v.size() << " elements");
-
-        for (i = 0; i < v.size(); i++)
-            STXXL_CHECK(v[i].key == rnd());
-
-        STXXL_MSG("copy vector of " << v.size() << " elements");
-
-        vector_type v_copy0(v);
-        STXXL_CHECK(v == v_copy0);
-
-        vector_type v_copy1;
-        v_copy1 = v;
-        STXXL_CHECK(v == v_copy1);
+        test_vector1();
+        test_resize_shrink();
     }
     catch (const std::exception & ex)
     {
