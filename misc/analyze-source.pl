@@ -74,6 +74,17 @@ sub process_cpp {
         }
     }
 
+    # check for assert() in test cases
+    if ($path =~ /^test/)
+    {
+        foreach my $ln (@data)
+        {
+            if ($ln =~ m!assert\(!) {
+                print("found assert() in test $path\n");
+            }
+        }
+    }
+
     # check source header
     my $i = 0;
     if ($data[$i] =~ m!// -.*- mode:!) { ++$i; } # emacs mode line

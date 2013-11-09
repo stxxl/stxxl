@@ -77,7 +77,7 @@ int main()
 
     sum = sum / double(times);
     sum2 = sum2 / double(times);
-    assert(sum2 - sum * sum >= 0.0);
+    STXXL_CHECK(sum2 - sum * sum >= 0.0);
     double err = sqrt(sum2 - sum * sum);
     STXXL_MSG("Standard Deviation: " << err << " s, " << 100. * (err / sum) << " %");
 

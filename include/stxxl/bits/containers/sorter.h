@@ -204,12 +204,6 @@ public:
         return sort();
     }
 
-    //! Change runs_creator memory usage
-    void set_creator_memory_to_use(unsigned_type creator_memory_to_use)
-    {
-        m_runs_creator.set_memory_to_use(creator_memory_to_use);
-    }
-
     //! Change runs_merger memory usage
     void set_merger_memory_to_use(unsigned_type merger_memory_to_use)
     {

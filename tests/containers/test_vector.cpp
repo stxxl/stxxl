@@ -170,21 +170,8 @@ void test_resize_shrink()
 
 int main()
 {
-    try
-    {
-        test_vector1();
-        test_resize_shrink();
-    }
-    catch (const std::exception & ex)
-    {
-        STXXL_MSG("Caught exception: " << ex.what());
-        throw;
-    }
-    catch (...)
-    {
-        STXXL_MSG("Caught unknown exception.");
-        throw;
-    }
+    test_vector1();
+    test_resize_shrink();
 
     return 0;
 }

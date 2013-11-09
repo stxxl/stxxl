@@ -126,7 +126,7 @@ int main(int argc, char ** argv)
     }
 
     // will not truncate
-    //-tb: vector already writes data! FIXME
+    //-tb: vector already writes data! TODO
     //test_rdonly<vector_type>(fn, ft, start_elements + 4096 + 23 - 2, 300000000);
 
     // check final size

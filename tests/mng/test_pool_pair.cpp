@@ -68,9 +68,8 @@ int main()
         blk = w_pool.steal();
         p_pool.read(blk, bid)->wait();
 
-        if ((*blk)[0].integer != 23) {
-            STXXL_ERRMSG("WRITE-AFTER-WRITE COHERENCE FAILURE");
-        }
+        STXXL_CHECK2((*blk)[0].integer == 23,
+                     "WRITE-AFTER-WRITE COHERENCE FAILURE");
 
         w_pool.add(blk);
         bm->delete_block(bid);
@@ -101,9 +100,8 @@ int main()
         // get the hinted block
         p_pool.read(blk, bid)->wait();
 
-        if ((*blk)[0].integer != 23) {
-            STXXL_ERRMSG("WRITE-AFTER-HINT COHERENCE FAILURE");
-        }
+        STXXL_CHECK2((*blk)[0].integer == 23,
+                     "WRITE-AFTER-HINT COHERENCE FAILURE");
 
         w_pool.add(blk);
         bm->delete_block(bid);
@@ -134,12 +132,13 @@ int main()
         // get the hinted block
         p_pool.read(blk, bid)->wait();
 
-        if ((*blk)[0].integer != 23) {
-            STXXL_ERRMSG("WRITE-AFTER-HINT COHERENCE FAILURE");
-        }
+        STXXL_CHECK2((*blk)[0].integer == 23,
+                     "WRITE-AFTER-HINT COHERENCE FAILURE");
 
         w_pool.add(blk);
         bm->delete_block(bid);
     }
+
+    return 0;
 }
 // vim: et:ts=4:sw=4

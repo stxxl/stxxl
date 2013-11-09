@@ -66,17 +66,10 @@ void test_typed_block_vector()
 
 int main()
 {
-    try {
-        test_typed_block();
-        test_aligned_alloc();
-        test_typed_block_vector();
-    } catch (std::exception e) {
-        STXXL_MSG("OOPS: " << e.what());
-        throw;
-    } catch (char const * c) {
-        STXXL_MSG("OOPS: " << c);
-        throw;
-    }
+    test_typed_block();
+    test_aligned_alloc();
+    test_typed_block_vector();
+
     return 0;
 }
 // vim: et:ts=4:sw=4

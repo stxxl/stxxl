@@ -17,6 +17,7 @@
 #include <iostream>
 #include <stxxl/request>
 #include <stxxl/mng>
+#include <stxxl/bits/verbose.h>
 
 #define BLOCK_SIZE (1024 * 512)
 
@@ -72,11 +73,9 @@ int main()
         reqs[i]->wait();
         for (int j = 0; j < block_type::size; ++j)
         {
-            if (j != block->elem[j].integer)
-            {
-                STXXL_MSG("Error in block " << std::hex << i << " pos: " << j
-                                            << " value read: " << block->elem[j].integer);
-            }
+            STXXL_CHECK2(j == block->elem[j].integer,
+                         "Error in block " << std::hex << i << " pos: " << j
+                         << " value read: " << block->elem[j].integer);
         }
     }
 

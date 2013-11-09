@@ -67,6 +67,7 @@ int main()
 
         STXXL_CHECK2((*blk)[0].integer == 23,
                      "WRITE-AFTER-WRITE COHERENCE FAILURE");
+
         pool.add(blk);
         bm->delete_block(bid);
     }
@@ -130,5 +131,7 @@ int main()
         pool.add(blk);
         bm->delete_block(bid);
     }
+
+    return 0;
 }
 // vim: et:ts=4:sw=4

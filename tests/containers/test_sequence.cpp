@@ -54,13 +54,13 @@ int main(int argc, char * argv[])
             break;
         }
 
-        assert(XXLDeque.empty() == STDDeque.empty());
-        assert(XXLDeque.size() == STDDeque.size());
+        STXXL_CHECK(XXLDeque.empty() == STDDeque.empty());
+        STXXL_CHECK(XXLDeque.size() == STDDeque.size());
 
         if (XXLDeque.size() > 0)
         {
-            assert(XXLDeque.back() == STDDeque.back());
-            assert(XXLDeque.front() == STDDeque.front());
+            STXXL_CHECK(XXLDeque.back() == STDDeque.back());
+            STXXL_CHECK(XXLDeque.front() == STDDeque.front());
         }
 
         if (!(i % 1000000))
@@ -71,12 +71,12 @@ int main(int argc, char * argv[])
 
             while ( !stream.empty() )
             {
-                assert( b != STDDeque.end() );
-                assert( *stream == *b );
+                STXXL_CHECK( b != STDDeque.end() );
+                STXXL_CHECK( *stream == *b );
                 ++stream; ++b;
             }
 
-            assert( b == STDDeque.end() );
+            STXXL_CHECK( b == STDDeque.end() );
         }
 
         if (!(i % 1000000))
@@ -87,12 +87,12 @@ int main(int argc, char * argv[])
 
             while ( !stream.empty() )
             {
-                assert( b != STDDeque.rend() );
-                assert( *stream == *b );
+                STXXL_CHECK( b != STDDeque.rend() );
+                STXXL_CHECK( *stream == *b );
                 ++stream; ++b;
             }
 
-            assert( b == STDDeque.rend() );
+            STXXL_CHECK( b == STDDeque.rend() );
         }
     }
 

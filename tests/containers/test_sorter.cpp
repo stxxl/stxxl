@@ -76,6 +76,8 @@ struct Comparator : public std::less<my_type>
     }
 };
 
+// forced instantiation
+template class stxxl::sorter<my_type, Comparator, 8192>;
 
 int main()
 {
@@ -104,10 +106,10 @@ int main()
         // finish input, switch to sorting stage.
         s.sort();
 
-        assert( *s == 0 );      ++s;
-        assert( *s == 23 );     ++s;
-        assert( *s == 42 );     ++s;
-        assert( s.empty() );
+        STXXL_CHECK( *s == 0 );      ++s;
+        STXXL_CHECK( *s == 23 );     ++s;
+        STXXL_CHECK( *s == 42 );     ++s;
+        STXXL_CHECK( s.empty() );
     }
 
     {
@@ -123,7 +125,7 @@ int main()
 
         for (stxxl::uint64 i = 0; i < n_records; i++)
         {
-            assert( s.size() == i );
+            STXXL_CHECK( s.size() == i );
 
             s.push( 1 + (rnd() % 0xfffffff) );
         }
@@ -133,8 +135,8 @@ int main()
 
         STXXL_MSG("Checking order...");
 
-        assert( !s.empty() );
-        assert( s.size() == n_records );
+        STXXL_CHECK( !s.empty() );
+        STXXL_CHECK( s.size() == n_records );
 
         my_type prev = *s;      // get first item
         ++s;
@@ -143,10 +145,10 @@ int main()
 
         while ( !s.empty() )
         {
-            assert( s.size() == count );
+            STXXL_CHECK( s.size() == count );
 
             if ( !(prev <= *s) ) STXXL_MSG("WRONG");
-            assert( prev <= *s );
+            STXXL_CHECK( prev <= *s );
 
             ++s; --count;
         }
@@ -157,8 +159,8 @@ int main()
 
         STXXL_MSG("Checking order again...");
         
-        assert( !s.empty() );
-        assert( s.size() == n_records );
+        STXXL_CHECK( !s.empty() );
+        STXXL_CHECK( s.size() == n_records );
 
         prev = *s;      // get first item
         ++s;
@@ -166,18 +168,17 @@ int main()
         while ( !s.empty() )
         {
             if ( !(prev <= *s) ) STXXL_MSG("WRONG");
-            assert( prev <= *s );
+            STXXL_CHECK( prev <= *s );
 
             ++s;
         }
         STXXL_MSG("OK");
 
-        assert( s.size() == 0 );
+        STXXL_CHECK( s.size() == 0 );
 
         STXXL_MSG("Done");
     }
 
     return 0;
 }
-
 // vim: et:ts=4:sw=4
