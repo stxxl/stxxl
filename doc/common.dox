@@ -11,6 +11,9 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
+namespace stxxl {
+
+////////////////////////////////////////////////////////////////////////////////
 /** \page common Common Utilities and Helpers
 
 \author Timo Bingmann (2013)
@@ -25,6 +28,7 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_thread_sync "synchronization primitives for multi-threading"
 - \subpage common_logging "logging macros"
 - \subpage common_assert "macros for checking assertions"
+- \subpage common_throw "macros for throwing exceptions"
 - \subpage common_types "signed and unsigned integer types"
 - \subpage common_log2 "calculating log_2(x)"
 - \subpage common_misc_macros "miscellaneous macros"
@@ -32,6 +36,8 @@ A lots of basic utility classes and helper functions have accumulated in STXXL. 
 - \subpage common_io_counter "i/o performance counter"
 
 */
+
+////////////////////////////////////////////////////////////////////////////////
 
 /** \page common_random Random Number Generators
 
@@ -62,6 +68,8 @@ STXXL_MSG("random number between [0,123456789): " << n_random);
 \endcode
 
 */
+
+////////////////////////////////////////////////////////////////////////////////
 
 /** \page common_timer Timestamp and Timer Classes
 
@@ -101,19 +109,23 @@ STXXL_MSG("measured time: " << (stop - start) << " seconds.");
 
 */
 
+////////////////////////////////////////////////////////////////////////////////
+
 /** \page common_simple_vector A Non-growing, Non-initializing Simpler Vector
 
-For applications where a std::vector is overkill, or one wishes to allocate an uninitialied POD array, the stxxl::simple_vector is a good method.
+For applications where a std::vector is overkill, or one wishes to allocate an uninitialied POD array, the simple_vector is a good method.
 
 */
+
+////////////////////////////////////////////////////////////////////////////////
 
 /** \page common_counting_ptr Reference Counted (Shared) Objects
 
 Some objects in STXXL are reference counted. This is usually done for large objects, which should not be copied deeply in assignments. Instead, a reference counting pointer is used, which holds a handle while the pointer exists and deletes the object once all pointers go out of scope. Examples are matrices and sorted_runs.
 
-The method used is called stxxl::counting_ptr or intrusive reference counting.  This is similar, but not identical to boost or TR1's shared_ptr.
+The method used is called counting_ptr or intrusive reference counting.  This is similar, but not identical to boost or TR1's shared_ptr.
 
-The stxxl::counting_ptr is accompanied by stxxl::counted_object, which contains the actual reference counter (a single integer). A reference counted object must derive from stxxl::counted_object:
+The counting_ptr is accompanied by counted_object, which contains the actual reference counter (a single integer). A reference counted object must derive from counted_object:
 
 \code
 struct something : public stxxl::counted_object
@@ -121,7 +133,7 @@ struct something : public stxxl::counted_object
 };
 \endcode
 
-Code that now wishes to use pointers referencing this object, will typedef an stxxl::counting_ptr, which is used to increment and decrement the included reference counter automatically.
+Code that now wishes to use pointers referencing this object, will typedef an counting_ptr, which is used to increment and decrement the included reference counter automatically.
 
 \code
 typedef stxxl::counting_ptr<something> something_ptr
@@ -137,15 +149,17 @@ typedef stxxl::counting_ptr<something> something_ptr
 }
 \endcode
 
-The stxxl::counting_ptr can generally be used like a usual pointer or shared_ptr (see the docs for more).
+The counting_ptr can generally be used like a usual pointer or shared_ptr (see the docs for more).
 
-There is also stxxl::const_counting_ptr to return const objects (note that a const stxxl::counting_ptr will only render the pointer const, not the enclosed object).
+There is also const_counting_ptr to return const objects (note that a const counting_ptr will only render the pointer const, not the enclosed object).
 
 */
 
+////////////////////////////////////////////////////////////////////////////////
+
 /** \page common_cmdline Command Line Parser
 
-STXXL now contains a rather sophisticated command line parser for C++, stxxl::cmdline_parser, which enables rapid creation of complex command line constructions. Maybe most importantly for application with external memory: the parser will recognize byte sizes with SI/IEC suffixes like '2 GiB' and transform it appropriately.
+STXXL now contains a rather sophisticated command line parser for C++, cmdline_parser, which enables rapid creation of complex command line constructions. Maybe most importantly for application with external memory: the parser will recognize byte sizes with SI/IEC suffixes like '2 GiB' and transform it appropriately.
 
 \snippet examples/common/cmdline.cpp example
 
@@ -185,12 +199,14 @@ Options:
 \endverbatim
 The output shows pretty much what happens. The command line parser is by default in a verbose mode outputting all arguments and values parsed. The debug summary shows to have values the corresponding variables were set.
 
-One feature worth naming is that the parser also supports lists of strings, i.e. \c std::vector<std::string> via \c add_param_stringlist() and similar.
+One feature worth naming is that the parser also supports lists of strings, i.e. \c std::vector<std::string> via cmdline_parser::add_param_stringlist() and similar.
 
 \example examples/common/cmdline.cpp
 This example is documented in \ref common_cmdline tutorial.
 
 */
+
+////////////////////////////////////////////////////////////////////////////////
 
 /** \page common_thread_sync Synchronization Primitives for Multi-Threading
 
@@ -224,6 +240,8 @@ stxxl::onoff_switch is a two state semaphore thing?
 
 */
 
+////////////////////////////////////////////////////////////////////////////////
+
 /** \page common_logging Logging Macros STXXL_MSG
 
 All STXXL components should output log or trace messages using the following macros. There are two basic methods for logging using ostream syntax:
@@ -255,11 +273,13 @@ A method used by some submodule authors to create their own levels of verbosity 
 
 */
 
+////////////////////////////////////////////////////////////////////////////////
+
 /** \page common_assert Macros for Checking Assertions
 
 There are quite a bunch of macros for testing assertions. You must be careful to pick the right one depending on when and what you want to assert on.
 
-\section static Compile-time Assertions: STXXL_STATIC_ASSERT
+# Compile-time Assertions: STXXL_STATIC_ASSERT
 
 To check specific conditions at compile time use STXXL_STATIC_ASSERT.
 
@@ -268,7 +288,7 @@ struct item { int a,b,c,d; }
 STXXL_STATIC_ASSERT(sizeof(item) == 4 * sizeof(int));
 \endcode
 
-\section unittest Assertions in Unit Tests: STXXL_CHECK
+# Assertions in Unit Tests: STXXL_CHECK
 
 Assertions in unit tests must use the following macros to ensure that the condition is also checked in release builds (where a plain \c "assert()" is void). These \c CHECK function should NOT be used to test return values, since we try to throw exceptions instead of aborting the program.
 
@@ -281,30 +301,51 @@ STXXL_CHECK2( 2+2 == 4, "We cannot count!");
 
 Sometimes one also wants to check that a specific expression \b throws an exception. This checking can be done automatically using a <tt>try { } catch {}</tt> by using STXXL_CHECK_THROW.
 
-\section plain Plain Assertions: assert
+# Plain Assertions: assert
 
 For the usual assertions, that should be removed in production code for performance, we use the standard \c "assert()" function.
 
 However, there is also \c STXXL_ASSERT(), which can be used as a replacement for \c assert(), when compiler warnings about unused variables or typedefs occur. The issue is that assert() completely removes the code, whereas STXXL_ASSERT() keeps the code encloses it inside \c if(0).
 
+*/
 
-\section stxxl_throw STXXL Exceptions
+////////////////////////////////////////////////////////////////////////////////
 
-The STXXL provides several pre-defined build-in exception macros to detect run-time errors, see:
+/** \page common_throw Macros for Throwing Exception
 
-1. STXXL_THROW()
-2. STXXL_THROW_ERRNO()
-3. STXXL_THROW_INVALID_ARGUMENT()
-4. STXXL_THROW_UNREACHABLE()
+The STXXL provides several pre-defined exception macros to detect run-time errors. The basic ones are:
 
-In addition,
+- STXXL_THROW(exception_type, error_message)
+- STXXL_THROW2(exception_type, location, error_message)
+- STXXL_THROW_ERRNO(exception_type, error_message)
+- STXXL_THROW_INVALID_ARGUMENT(error_message)
+- STXXL_THROW_UNREACHABLE(error_message)
 
-1. stxxl_function_error()
-2. check_pthread_call()
-3. stxxl_check_ge_0()
-4. stxxl_check_ne_0()
+In addition, we also defined \b conditional throw macros, which check the outcome of a function call:
+
+- STXXL_THROW_IF(expr, exception_type, error_message)
+- STXXL_THROW_NE_0(expr, exception_type, error_message)
+- STXXL_THROW_EQ_0(expr, exception_type, error_message)
+- STXXL_THROW_LT_0(expr, exception_type, error_message)
+
+For checking system calls which set errno, the following macros are used to also provide strerror information for the user:
+
+- STXXL_THROW_ERRNO_IF(expr, exception_type, error_message)
+- STXXL_THROW_ERRNO_NE_0(expr, exception_type, error_message)
+- STXXL_THROW_ERRNO_EQ_0(expr, exception_type, error_message)
+- STXXL_THROW_ERRNO_LT_0(expr, exception_type, error_message)
+
+For checking pthread system calls, a special macro is needed, because these do not set errno. Instead they return the errno value:
+
+- STXXL_CHECK_PTHREAD_CALL(pthread call)
+
+And for WINAPI calls there is a special macro to call GetLastError and format it in a nice way:
+
+- STXXL_THROW_WIN_LASTERROR(exception_type, error_message)
 
 */
+
+////////////////////////////////////////////////////////////////////////////////
 
 /** \page common_log2 Calculating log2(x) for Integers and at Compile-Time
 
@@ -339,6 +380,8 @@ std::cout << stxxl::log2_ceil(10000) << std::endl;
 
 */
 
+////////////////////////////////////////////////////////////////////////////////
+
 /** \page common_types Signed and Unsigned Integer Types
 
 STXXL provides two very important types: stxxl::int_type and stxxl::unsigned_type. These should be used for general counting and indexing types, as they are defined to be the size of a register on the machines: on 32-bit machines the two types are 4 bytes size, while on a 64-bit machine the two types are 8 bytes in size!
@@ -356,6 +399,8 @@ Since this issue occurs commonly in EM algorithms, STXXL provides two types: stx
 See the file common/uint_types.h
 
 */
+
+////////////////////////////////////////////////////////////////////////////////
 
 /** \page common_misc_macros Miscellaneous Macros
 
@@ -389,6 +434,8 @@ Some compilers can warn the user about deprecated function by tagging them in th
 
 */
 
+////////////////////////////////////////////////////////////////////////////////
+
 /** \page common_misc_funcs Miscellaneous Functions
 
 \section parse_filesize Parsing Filesizes with K, M, G suffixes
@@ -398,6 +445,8 @@ Since with STXXL one often has to parse large file or disk sizes, there is a fun
 See the \ref install_config documentation page on the format of accepted file size strings.
 
 */
+
+////////////////////////////////////////////////////////////////////////////////
 
 /** \page common_io_counter I/O Performance Counter
 
@@ -415,7 +464,6 @@ The STXXL library provides various I/O performance counters (stxxl::stats class)
   // substract current stats from stats at the beginning of the measurement
   std::cout << (stxxl::stats_data(*Stats) - stats_begin);
 \endcode
-
 
 The Stats ostream holds various measured I/O data:
 
@@ -453,4 +501,9 @@ std::cout << "max: " << bm->get_maximum_allocation() << std::endl;  // max. numb
 \endcode
 
 See stxxl::stats and stxxl::stats_data class reference for all provided individual functions.
+
 */
+
+////////////////////////////////////////////////////////////////////////////////
+
+} // namespace stxxl

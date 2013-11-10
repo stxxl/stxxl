@@ -35,7 +35,7 @@ void request_queue_impl_worker::start_thread(void * (*worker)(void *), void * ar
 #elif STXXL_BOOST_THREADS
     t = new boost::thread(boost::bind(worker, arg));
 #else
-    check_pthread_call(pthread_create(&t, NULL, worker, arg));
+    STXXL_CHECK_PTHREAD_CALL(pthread_create(&t, NULL, worker, arg));
 #endif
     s.set_to(RUNNING);
 }
@@ -69,7 +69,7 @@ void request_queue_impl_worker::stop_thread(thread_type & t, state<thread_state>
     delete t;
     t = NULL;
 #else
-    check_pthread_call(pthread_join(t, NULL));
+    STXXL_CHECK_PTHREAD_CALL(pthread_join(t, NULL));
 #endif
     assert(s() == TERMINATED);
     s.set_to(NOT_RUNNING);

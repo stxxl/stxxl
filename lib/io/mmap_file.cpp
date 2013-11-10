@@ -42,7 +42,7 @@ void mmap_file::serve(const request * req) throw (io_error)
     if (mem == MAP_FAILED)
     {
         STXXL_THROW_ERRNO(io_error,
-                          " Mapping failed." <<
+                          " mmap() failed." <<
                           " path=" << filename <<
                           " bytes=" << bytes <<
                           " Page size: " << sysconf(_SC_PAGESIZE) <<
@@ -50,7 +50,7 @@ void mmap_file::serve(const request * req) throw (io_error)
     }
     else if (mem == 0)
     {
-        stxxl_function_error(io_error);
+        STXXL_THROW_ERRNO(io_error, "mmap() returned NULL");
     }
     else
     {
@@ -62,7 +62,8 @@ void mmap_file::serve(const request * req) throw (io_error)
         {
             memcpy(mem, buffer, bytes);
         }
-        stxxl_check_ge_0(munmap(mem, bytes), io_error);
+        STXXL_THROW_ERRNO_NE_0(munmap(mem, bytes), io_error,
+                               "munmap() failed");
     }
 }
 

@@ -24,7 +24,6 @@
  #include <boost/thread/mutex.hpp>
 #elif STXXL_POSIX_THREADS
  #include <pthread.h>
- #include <cerrno>
 
  #include <stxxl/bits/noncopyable.h>
  #include <stxxl/bits/common/error_handling.h>
@@ -54,7 +53,7 @@ public:
     //! construct unlocked mutex
     mutex()
     {
-        check_pthread_call(pthread_mutex_init(&m_mutex, NULL));
+        STXXL_CHECK_PTHREAD_CALL(pthread_mutex_init(&m_mutex, NULL));
     }
     //! destroy mutex handle
     ~mutex()
@@ -67,22 +66,22 @@ public:
         res = pthread_mutex_trylock(&m_mutex);
 
         if (res == 0 || res == EBUSY) {
-            check_pthread_call(pthread_mutex_unlock(&m_mutex));
+            STXXL_CHECK_PTHREAD_CALL(pthread_mutex_unlock(&m_mutex));
         } else {
-            stxxl_function_error(resource_error);
+            STXXL_THROW_ERRNO2(resource_error, "pthread_mutex_trylock() failed", res);
         }
 
-        check_pthread_call(pthread_mutex_destroy(&m_mutex));
+        STXXL_CHECK_PTHREAD_CALL(pthread_mutex_destroy(&m_mutex));
     }
     //! lock mutex, may block
     void lock()
     {
-        check_pthread_call(pthread_mutex_lock(&m_mutex));
+        STXXL_CHECK_PTHREAD_CALL(pthread_mutex_lock(&m_mutex));
     }
     //! unlock mutex
     void unlock()
     {
-        check_pthread_call(pthread_mutex_unlock(&m_mutex));
+        STXXL_CHECK_PTHREAD_CALL(pthread_mutex_unlock(&m_mutex));
     }
     //! return platform specific handle
     pthread_mutex_t& native_handle()

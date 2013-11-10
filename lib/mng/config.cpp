@@ -127,7 +127,8 @@ void config::init(const std::string& config_path)
         entry1.autogrow = true;
 
         char * tmpstr = new char[255];
-        stxxl_check_ne_0(GetTempPath(255, tmpstr), resource_error);
+        if (GetTempPath(255, tmpstr) == 0)
+            STXXL_THROW_WIN_LASTERROR(resource_error, "GetTempPath()");
         entry1.path = tmpstr;
         entry1.path += "stxxl.tmp";
         delete[] tmpstr;
@@ -159,7 +160,7 @@ void config::init(const std::string& config_path)
     disks_list.insert(disks_list.end(), flash_list.begin(), flash_list.end());
 
     if (disks_list.empty()) {
-        STXXL_THROW(std::runtime_error, "config::config",
+        STXXL_THROW(std::runtime_error,
                     "No disks found in '" << config_path << "'.");
     }
 
@@ -219,7 +220,7 @@ void disk_config::parseline(const std::string& line)
         flash = true;
     }
     else {
-        STXXL_THROW(std::runtime_error, "disk_config::parseline",
+        STXXL_THROW(std::runtime_error,
                     "Unknown configuration token " << eqfield[0]);
     }
 
@@ -255,7 +256,7 @@ void disk_config::parseline(const std::string& line)
 
     // size:
     if (!parse_SI_IEC_size(cmfield[1], size)) {
-        STXXL_THROW(std::runtime_error, "disk_config::parseline",
+        STXXL_THROW(std::runtime_error,
                     "Invalid disk size '" << cmfield[1] << "' in disk configuration file.");
     }
 
@@ -310,7 +311,7 @@ void disk_config::parseline(const std::string& line)
             else if (eq[1] == "try")    direct = 2;
             else
             {
-                STXXL_THROW(std::runtime_error, "disk_config::parseline",
+                STXXL_THROW(std::runtime_error,
                             "Invalid parameter '" << *p << "' in disk configuration file.");
             }
         }
@@ -319,14 +320,14 @@ void disk_config::parseline(const std::string& line)
             char* endp;
             queue = strtoul(eq[1].c_str(), &endp, 10);
             if (endp && *endp != 0) {
-                STXXL_THROW(std::runtime_error, "disk_config::parseline",
+                STXXL_THROW(std::runtime_error,
                             "Invalid parameter '" << *p << "' in disk configuration file.");
             }
         }
         else if (*p == "unlink" || *p == "unlink_on_open")
         {
             if (!(io_impl == "syscall" || io_impl == "mmap") || io_impl == "wbtl") {
-                STXXL_THROW(std::runtime_error, "disk_config::parseline",
+                STXXL_THROW(std::runtime_error,
                             "Parameter '" << *p << "' invalid for fileio '" << io_impl << "' in disk configuration file.");
             }
 
@@ -334,7 +335,7 @@ void disk_config::parseline(const std::string& line)
         }
         else
         {
-            STXXL_THROW(std::runtime_error, "disk_config::parseline",
+            STXXL_THROW(std::runtime_error,
                         "Invalid optional parameter '" << *p << "' in disk configuration file.");
         }
     }

@@ -148,7 +148,7 @@ file * create_file(const disk_config& cfg, int mode, int disk_allocator_id)
     }
 #endif
 
-    STXXL_THROW(std::runtime_error, "create_file",
+    STXXL_THROW(std::runtime_error,
                 "Unsupported disk I/O implementation '" << cfg.io_impl << "'.");
 }
 

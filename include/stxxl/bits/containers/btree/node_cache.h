@@ -129,7 +129,7 @@ namespace btree
             STXXL_VERBOSE1("btree::node_cache constructor nodes=" << nnodes);
             if (nnodes < 3)
             {
-                STXXL_THROW(std::runtime_error, "btree::node_cache::node_cache", "Too few memory for a node cache (<3)");
+                STXXL_THROW2(std::runtime_error, "btree::node_cache::node_cache", "Too few memory for a node cache (<3)");
             }
             nodes_.reserve(nnodes);
             reqs_.resize(nnodes);

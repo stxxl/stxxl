@@ -53,27 +53,27 @@ public:
     //! initialize condition variable
     condition_variable()
     {
-        check_pthread_call(pthread_cond_init(&cond, NULL));
+        STXXL_CHECK_PTHREAD_CALL(pthread_cond_init(&cond, NULL));
     }
     //! destroy condition variable
     ~condition_variable()
     {
-        check_pthread_call(pthread_cond_destroy(&cond));
+        STXXL_CHECK_PTHREAD_CALL(pthread_cond_destroy(&cond));
     }
     //! notify one waiting thread
     void notify_one()
     {
-        check_pthread_call(pthread_cond_signal(&cond));
+        STXXL_CHECK_PTHREAD_CALL(pthread_cond_signal(&cond));
     }
     //! notify all waiting threads
     void notify_all()
     {
-        check_pthread_call(pthread_cond_broadcast(&cond));
+        STXXL_CHECK_PTHREAD_CALL(pthread_cond_broadcast(&cond));
     }
     //! wait for a signal on the condition variable
     void wait(scoped_mutex_lock& lock)
     {
-        check_pthread_call(pthread_cond_wait(&cond, &lock.native_handle()));
+        STXXL_CHECK_PTHREAD_CALL(pthread_cond_wait(&cond, &lock.native_handle()));
     }
 };
 

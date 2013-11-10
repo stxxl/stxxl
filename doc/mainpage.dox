@@ -49,7 +49,7 @@ We have collected much documentation about the design of STXXL. Even more inform
 
 - \subpage design "Design of STXXL concepts, containers and algorithms"
 
-If you plan to contribute code to STXXL, please read the \subpage coding_style.
+If you plan to contribute code to STXXL, please read the \subpage coding_style and use the \subpage common.
 
 # FAQ, Troubleshooting, Bugs and More
 

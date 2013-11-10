@@ -94,6 +94,9 @@ Version 1.4.0 (unreleased)
   - add get_version_string() for longer version string with features
   - check_library_version() for mismatch between headers and libraries
 
+* Reworking error_handling.h to throw much more useful exceptions with
+  errno information and more.
+
 * Various file renames (which are only possible at major version changes).
 
 * Fixing bug in shrinking vector with vector::resize(n,true).

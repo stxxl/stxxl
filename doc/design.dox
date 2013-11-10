@@ -127,7 +127,7 @@ The \subpage design_pipeline "Streaming layer" provides efficient support for ex
 
 # Common Helpers and Utilities
 
-Beyond the layered library, STXXL contains many small helpers commonly used in C++ like random numbers or shared pointers. See \subpage common "the common library" for short descriptions.
+Beyond the layered library, STXXL contains many small helpers commonly used in C++ like random numbers or shared pointers. See \ref common for short descriptions.
 
 */
 

@@ -160,9 +160,7 @@ namespace btree
                 STXXL_VERBOSE1("btree Increasing height to " << height_);
                 if (node_cache_.size() < (height_ - 1))
                 {
-                    STXXL_THROW(std::runtime_error, "btree::bulk_construction", "The height of the tree (" << height_ << ") has exceeded the required capacity ("
-                                                                                                           << (node_cache_.size() + 1) << ") of the node cache. " <<
-                                "Increase the node cache size.");
+                    STXXL_THROW2(std::runtime_error, "btree::bulk_construction", "The height of the tree (" << height_ << ") has exceeded the required capacity (" << (node_cache_.size() + 1) << ") of the node cache. Increase the node cache size.");
                 }
             }
         }
@@ -384,9 +382,7 @@ namespace btree
                 STXXL_VERBOSE1("Increasing height to " << height_);
                 if (node_cache_.size() < (height_ - 1))
                 {
-                    STXXL_THROW(std::runtime_error, "btree::bulk_construction", "The height of the tree (" << height_ << ") has exceeded the required capacity ("
-                                                                                                           << (node_cache_.size() + 1) << ") of the node cache. " <<
-                                "Increase the node cache size.");
+                    STXXL_THROW2(std::runtime_error, "btree::bulk_construction", "The height of the tree (" << height_ << ") has exceeded the required capacity (" << (node_cache_.size() + 1) << ") of the node cache. Increase the node cache size.");
                 }
             }
 

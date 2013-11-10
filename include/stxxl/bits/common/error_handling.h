@@ -4,6 +4,7 @@
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
  *  Copyright (C) 2007-2010 Andreas Beckmann <beckmann@cs.uni-frankfurt.de>
+ *  Copyright (C) 2013 Timo Bingmann <tb@panthema.net>
  *
  *  Distributed under the Boost Software License, Version 1.0.
  *  (See accompanying file LICENSE_1_0.txt or copy at
@@ -12,6 +13,10 @@
 
 #ifndef STXXL_COMMON_ERROR_HANDLING_HEADER
 #define STXXL_COMMON_ERROR_HANDLING_HEADER
+
+/** \file error_handling.h
+ * Macros for convenient error checking and reporting via exception.
+ */
 
 #include <sstream>
 #include <cerrno>
@@ -24,8 +29,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-#define _STXXL_STRING(x) # x
-
 #if STXXL_MSVC
  #define STXXL_PRETTY_FUNCTION_NAME __FUNCTION__
 #else
@@ -34,79 +37,125 @@ __STXXL_BEGIN_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
-#define STXXL_THROW(exception_type, location, error_message) \
-    do { \
-        std::ostringstream msg_; \
-        msg_ << "Error in " << location << ": " << error_message; \
-        throw exception_type(msg_.str()); \
+//! Throws exception_type with "Error in [location] : [error_message]"
+#define STXXL_THROW2(exception_type, location, error_message)           \
+    do {                                                                \
+        std::ostringstream msg;                                         \
+        msg << "Error in " << location << " : " << error_message;       \
+        throw exception_type(msg.str());                                \
     } while (false)
 
-#define STXXL_THROW_ERRNO(exception_type, error_message) \
-    STXXL_THROW(exception_type, "function " << STXXL_PRETTY_FUNCTION_NAME, \
-                "Info: " << error_message << " " << strerror(errno))
+//! Throws exception_type with "Error in [function] : [error_message]"
+#define STXXL_THROW(exception_type, error_message)                      \
+    STXXL_THROW2(exception_type,                                        \
+                 STXXL_PRETTY_FUNCTION_NAME,                            \
+                 error_message)
 
-#define STXXL_THROW_INVALID_ARGUMENT(error_message) \
-    STXXL_THROW(std::invalid_argument, \
-                "function " << STXXL_PRETTY_FUNCTION_NAME, \
-                error_message)
+//! Throws exception_type with "Error in [function] : [error_message] : [errno_value message]"
+#define STXXL_THROW_ERRNO2(exception_type, error_message, errno_value)  \
+    STXXL_THROW2(exception_type,                                        \
+                 STXXL_PRETTY_FUNCTION_NAME,                            \
+                 error_message << " : " << strerror(errno_value))
 
-#define STXXL_THROW_UNREACHABLE() \
-    STXXL_THROW(stxxl::unreachable, \
-                "file: " << __FILE__ << ", line: " << __LINE__, \
-                "must be unreachable code")
+//! Throws exception_type with "Error in [function] : [error_message] : [errno message]"
+#define STXXL_THROW_ERRNO(exception_type, error_message)                \
+    STXXL_THROW_ERRNO2(exception_type, error_message, errno)
+
+//! Throws std::invalid_argument with "Error in [function] : [error_message]"
+#define STXXL_THROW_INVALID_ARGUMENT(error_message)                     \
+    STXXL_THROW2(std::invalid_argument,                                 \
+                 STXXL_PRETTY_FUNCTION_NAME,                            \
+                 error_message)
+
+//! Throws stxxl::unreachable with "Error in file [file], line [line] : this code should never be reachable"
+#define STXXL_THROW_UNREACHABLE()                                       \
+    STXXL_THROW2(stxxl::unreachable,                                    \
+                 "file " << __FILE__ << ", line " << __LINE__,          \
+                 "this code should never be reachable")
 
 ////////////////////////////////////////////////////////////////////////////
 
-template <typename Exception>
-inline void stxxl_util_function_error(const char * func_name, const char * expr = 0, const char * error = 0)
-{
-    std::ostringstream str_;
-    str_ << "Error in function " << func_name << " : " << (expr ? expr : strerror(errno));
-    if (error)
-        str_ << " " << error;
-    throw Exception(str_.str());
-}
+//! Throws exception_type if (expr) with "Error in [function] : [error_message]"
+#define STXXL_THROW_IF(expr, exception_type, error_message)             \
+    do {                                                                \
+        if (expr) {                                                     \
+            STXXL_THROW(exception_type, error_message);                 \
+        }                                                               \
+    } while(false)
 
-#define stxxl_function_error(exception_type) \
-    stxxl::stxxl_util_function_error<exception_type>(STXXL_PRETTY_FUNCTION_NAME)
+//! Throws exception_type if (expr != 0) with "Error in [function] : [error_message]"
+#define STXXL_THROW_NE_0(expr, exception_type, error_message)           \
+    STXXL_THROW_IF((expr) != 0, exception_type, error_message)
 
-template <typename E>
-inline bool helper_check_success(bool success, const char * func_name, const char * expr = 0, const char * error = 0)
-{
-    if (!success)
-        stxxl_util_function_error<E>(func_name, expr, error);
-    return success;
-}
+//! Throws exception_type if (expr == 0) with "Error in [function] : [error_message]"
+#define STXXL_THROW_EQ_0(expr, exception_type, error_message)           \
+    STXXL_THROW_IF((expr) == 0, exception_type, error_message)
 
-template <typename E, typename INT>
-inline bool helper_check_eq_0(INT res, const char * func_name, const char * expr, bool res_2_strerror = false)
-{
-    return helper_check_success<E>(res == 0, func_name, expr, res_2_strerror ? strerror(res) : 0);
-}
+//! Throws exception_type if (expr < 0) with "Error in [function] : [error_message]"
+#define STXXL_THROW_LT_0(expr, exception_type, error_message)           \
+    STXXL_THROW_IF((expr) < 0, exception_type, error_message)
 
-#define check_pthread_call(expr) \
-    stxxl::helper_check_eq_0<stxxl::resource_error>(expr, STXXL_PRETTY_FUNCTION_NAME, _STXXL_STRING(expr), true)
+////////////////////////////////////////////////////////////////////////////
 
-#define stxxl_check_eq_0(expr, exception_type) \
-    stxxl::helper_check_eq_0<exception_type>(expr, STXXL_PRETTY_FUNCTION_NAME, _STXXL_STRING(expr), true)
+//! Throws exception_type if (expr) with "Error in [function] : [error_message] : [errno message]"
+#define STXXL_THROW_ERRNO_IF(expr, exception_type, error_message)       \
+    do {                                                                \
+        if (expr) {                                                     \
+            STXXL_THROW_ERRNO(exception_type, error_message);           \
+        }                                                               \
+    } while(false)
 
-template <typename E, typename INT>
-inline bool helper_check_ge_0(INT res, const char * func_name)
-{
-    return helper_check_success<E>(res >= 0, func_name);
-}
+//! Throws exception_type if (expr != 0) with "Error in [function] : [error_message] : [errno message]"
+#define STXXL_THROW_ERRNO_NE_0(expr, exception_type, error_message)     \
+    STXXL_THROW_ERRNO_IF((expr) != 0, exception_type, error_message)
 
-#define stxxl_check_ge_0(expr, exception_type) \
-    stxxl::helper_check_ge_0<exception_type>(expr, STXXL_PRETTY_FUNCTION_NAME)
+//! Throws exception_type if (expr == 0) with "Error in [function] : [error_message] : [errno message]"
+#define STXXL_THROW_ERRNO_EQ_0(expr, exception_type, error_message)     \
+    STXXL_THROW_ERRNO_IF((expr) == 0, exception_type, error_message)
 
-template <typename E, typename INT>
-inline bool helper_check_ne_0(INT res, const char * func_name)
-{
-    return helper_check_success<E>(res != 0, func_name);
-}
+//! Throws exception_type if (expr < 0) with "Error in [function] : [error_message] : [errno message]"
+#define STXXL_THROW_ERRNO_LT_0(expr, exception_type, error_message)     \
+    STXXL_THROW_ERRNO_IF((expr) < 0, exception_type, error_message)
 
-#define stxxl_check_ne_0(expr, exception_type) \
-    stxxl::helper_check_ne_0<exception_type>(expr, STXXL_PRETTY_FUNCTION_NAME)
+////////////////////////////////////////////////////////////////////////////
+
+//! Checks pthread call, if return != 0, throws stxxl::resource_error with "Error in [function] : [pthread_expr] : [errno message]
+#define STXXL_CHECK_PTHREAD_CALL(expr)                                  \
+    do {                                                                \
+        int res = (expr);                                               \
+        if (res != 0) {                                                 \
+            STXXL_THROW_ERRNO2(stxxl::resource_error, #expr, res);      \
+        }                                                               \
+    } while(false)
+
+////////////////////////////////////////////////////////////////////////////
+
+#if STXXL_WINDOWS || defined(__MINGW32__)
+
+//! Throws exception_type with "Error in [function] : [error_message] : [formatted GetLastError()]"
+#define STXXL_THROW_WIN_LASTERROR(exception_type, error_message)        \
+    do {                                                                \
+        LPVOID lpMsgBuf;                                                \
+        DWORD dw = GetLastError();                                      \
+        FormatMessage(                                                  \
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |                            \
+            FORMAT_MESSAGE_FROM_SYSTEM,                                 \
+            NULL,                                                       \
+            dw,                                                         \
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),                  \
+            (LPTSTR)&lpMsgBuf,                                          \
+            0, NULL);                                                   \
+        std::ostringstream str_;                                        \
+        str_ << "Error in " << STXXL_PRETTY_FUNCTION_NAME               \
+             << " : " << error_message                                  \
+             << " : error code " << dw << " : " << ((char *)lpMsgBuf);  \
+        LocalFree(lpMsgBuf);                                            \
+        throw exception_type(str_.str());                               \
+    } while (false)
+
+#endif
+
+////////////////////////////////////////////////////////////////////////////
 
 __STXXL_END_NAMESPACE
 

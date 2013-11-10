@@ -139,10 +139,12 @@ void ufs_file_base::_after_open()
     // stat file type
 #if STXXL_WINDOWS || defined(__MINGW32__)
     struct _stat64 st;
-    stxxl_check_eq_0(_fstat64(file_des, &st), io_error);
+    STXXL_THROW_ERRNO_NE_0(::_fstat64(file_des, &st), io_error,
+                           "_fstat64() path=" << filename << " fd=" << file_des);
 #else
     struct stat st;
-    stxxl_check_eq_0(::fstat(file_des, &st), io_error);
+    STXXL_THROW_ERRNO_NE_0(::fstat(file_des, &st), io_error,
+                           "fstat() path=" << filename << " fd=" << file_des);
 #endif
     m_is_device = S_ISBLK(st.st_mode) ? true : false;
 
@@ -159,7 +161,7 @@ void ufs_file_base::close()
         return;
 
     if (::close(file_des) < 0)
-        stxxl_function_error(io_error);
+        STXXL_THROW_ERRNO(io_error, "close() fd=" << file_des);
 
     file_des = -1;
 }
@@ -184,10 +186,12 @@ file::offset_type ufs_file_base::_size()
 {
 #if STXXL_WINDOWS || defined(__MINGW32__)
     struct _stat64 st;
-    stxxl_check_eq_0(_fstat64(file_des, &st), io_error);
+    STXXL_THROW_ERRNO_NE_0(::_fstat64(file_des, &st), io_error,
+                           "_fstat64() path=" << filename << " fd=" << file_des);
 #else
     struct stat st;
-    stxxl_check_eq_0(::fstat(file_des, &st), io_error);
+    STXXL_THROW_ERRNO_NE_0(::fstat(file_des, &st), io_error,
+                           "fstat() path=" << filename << " fd=" << file_des);
 #endif
     return st.st_size;
 }
@@ -212,26 +216,31 @@ void ufs_file_base::_set_size(offset_type newsize)
     {
 #if STXXL_WINDOWS || defined(__MINGW32__)
         HANDLE hfile = (HANDLE)::_get_osfhandle(file_des);
-        stxxl_check_eq_0((hfile == INVALID_HANDLE_VALUE), io_error);
+        STXXL_THROW_ERRNO_NE_0((hfile == INVALID_HANDLE_VALUE), io_error,
+                               "_get_osfhandle() path=" << filename << " fd=" << file_des);
 
         LARGE_INTEGER desired_pos;
         desired_pos.QuadPart = newsize;
 
         if (!SetFilePointerEx(hfile, desired_pos, NULL, FILE_BEGIN))
-            stxxl_win_lasterror_exit("SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
-                                     " newsize=" << newsize << " ", io_error);
+            STXXL_THROW_WIN_LASTERROR(io_error,
+                                      "SetFilePointerEx in ufs_file_base::set_size(..) oldsize=" << cur_size <<
+                                     " newsize=" << newsize << " ");
 
         if (!SetEndOfFile(hfile))
-            stxxl_win_lasterror_exit("SetEndOfFile oldsize=" << cur_size <<
-                                     " newsize=" << newsize << " ", io_error);
+            STXXL_THROW_WIN_LASTERROR(io_error,
+                                      "SetEndOfFile oldsize=" << cur_size <<
+                                     " newsize=" << newsize << " ");
 #else
-        stxxl_check_eq_0(::ftruncate(file_des, newsize), io_error);
+        STXXL_THROW_ERRNO_NE_0(::ftruncate(file_des, newsize), io_error,
+                               "ftruncate() path=" << filename << " fd=" << file_des);
 #endif
     }
 
 #if !STXXL_WINDOWS
     if (newsize > cur_size)
-        stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
+        STXXL_THROW_ERRNO_LT_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error,
+                               "lseek() path=" << filename << " fd=" << file_des << " pos=" << newsize - 1);
 #endif
 }
 

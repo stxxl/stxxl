@@ -72,14 +72,14 @@ void disk_allocator::add_free_region(stxxl::int64 block_pos, stxxl::int64 block_
         {
             if (pred->first <= region_pos && pred->first + pred->second > region_pos)
             {
-                STXXL_THROW(bad_ext_alloc, "disk_allocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  in empty space [" << pred->first << " + " << pred->second << "]");
+                STXXL_THROW2(bad_ext_alloc, "disk_allocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  in empty space [" << pred->first << " + " << pred->second << "]");
             }
         }
         if (succ != free_space.end())
         {
             if (region_pos <= succ->first && region_pos + region_size > succ->first)
             {
-                STXXL_THROW(bad_ext_alloc, "disk_allocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  which overlaps empty space [" << succ->first << " + " << succ->second << "]");
+                STXXL_THROW2(bad_ext_alloc, "disk_allocator::check_corruption", "Error: double deallocation of external memory, trying to deallocate region " << region_pos << " + " << region_size << "  which overlaps empty space [" << succ->first << " + " << succ->second << "]");
             }
         }
         if (succ == free_space.end())

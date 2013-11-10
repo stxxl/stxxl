@@ -44,13 +44,13 @@ void wincall_file::serve(const request * req) throw (io_error)
     desired_pos.QuadPart = offset;
     if (!SetFilePointerEx(handle, desired_pos, NULL, FILE_BEGIN))
     {
-        stxxl_win_lasterror_exit("SetFilePointerEx in wincall_request::serve()" <<
-                                 " offset=" << offset <<
-                                 " this=" << this <<
-                                 " buffer=" << buffer <<
-                                 " bytes=" << bytes <<
-                                 " type=" << ((type == request::READ) ? "READ" : "WRITE"),
-                                 io_error);
+        STXXL_THROW_WIN_LASTERROR(io_error,
+                                  "SetFilePointerEx in wincall_request::serve()" <<
+                                  " offset=" << offset <<
+                                  " this=" << this <<
+                                  " buffer=" << buffer <<
+                                  " bytes=" << bytes <<
+                                  " type=" << ((type == request::READ) ? "READ" : "WRITE"));
     }
     else
     {
@@ -62,17 +62,17 @@ void wincall_file::serve(const request * req) throw (io_error)
             assert(bytes <= std::numeric_limits<DWORD>::max());
             if (!ReadFile(handle, buffer, (DWORD)bytes, &NumberOfBytesRead, NULL))
             {
-                stxxl_win_lasterror_exit("ReadFile" <<
-                                         " this=" << this <<
-                                         " offset=" << offset <<
-                                         " buffer=" << buffer <<
-                                         " bytes=" << bytes <<
-                                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                                         " NumberOfBytesRead= " << NumberOfBytesRead,
-                                         io_error);
-            } else if (NumberOfBytesRead != bytes) {
-                stxxl_win_lasterror_exit(" partial read: missing " << (bytes - NumberOfBytesRead) << " out of " << bytes << " bytes",
-                                         io_error);
+                STXXL_THROW_WIN_LASTERROR(io_error,
+                                          "ReadFile" <<
+                                          " this=" << this <<
+                                          " offset=" << offset <<
+                                          " buffer=" << buffer <<
+                                          " bytes=" << bytes <<
+                                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                          " NumberOfBytesRead= " << NumberOfBytesRead);
+            }
+            else if (NumberOfBytesRead != bytes) {
+                STXXL_THROW_WIN_LASTERROR(io_error, " partial read: missing " << (bytes - NumberOfBytesRead) << " out of " << bytes << " bytes");
             }
         }
         else
@@ -81,17 +81,17 @@ void wincall_file::serve(const request * req) throw (io_error)
             assert(bytes <= std::numeric_limits<DWORD>::max());
             if (!WriteFile(handle, buffer, (DWORD)bytes, &NumberOfBytesWritten, NULL))
             {
-                stxxl_win_lasterror_exit("WriteFile" <<
-                                         " this=" << this <<
-                                         " offset=" << offset <<
-                                         " buffer=" << buffer <<
-                                         " bytes=" << bytes <<
-                                         " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
-                                         " NumberOfBytesWritten= " << NumberOfBytesWritten,
-                                         io_error);
-            } else if (NumberOfBytesWritten != bytes) {
-                stxxl_win_lasterror_exit(" partial write: missing " << (bytes - NumberOfBytesWritten) << " out of " << bytes << " bytes",
-                                         io_error);
+                STXXL_THROW_WIN_LASTERROR(io_error,
+                                          "WriteFile" <<
+                                          " this=" << this <<
+                                          " offset=" << offset <<
+                                          " buffer=" << buffer <<
+                                          " bytes=" << bytes <<
+                                          " type=" << ((type == request::READ) ? "READ" : "WRITE") <<
+                                          " NumberOfBytesWritten= " << NumberOfBytesWritten);
+            }
+            else if (NumberOfBytesWritten != bytes) {
+                STXXL_THROW_WIN_LASTERROR(io_error, " partial write: missing " << (bytes - NumberOfBytesWritten) << " out of " << bytes << " bytes");
             }
         }
     }

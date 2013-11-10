@@ -172,23 +172,26 @@ void sim_disk_file::serve(const request * req) throw (io_error)
     {
         STXXL_THROW_ERRNO
             (io_error,
-             " Mapping failed." <<
+             " mmap() failed." <<
              " Page size: " << sysconf(_SC_PAGESIZE) <<
              " offset modulo page size " << (offset % sysconf(_SC_PAGESIZE)));
     }
     else if (mem == 0)
     {
-        stxxl_function_error(io_error);
+        STXXL_THROW_ERRNO(io_error, "mmap() returned NULL");
     }
     else
     {
         if (type == request::READ)
         {
             memcpy(buffer, mem, bytes);
-        } else {
+        }
+        else
+        {
             memcpy(mem, buffer, bytes);
         }
-        stxxl_check_ge_0(munmap(mem, bytes), io_error);
+        STXXL_THROW_ERRNO_NE_0(munmap(mem, bytes), io_error,
+                               "munmap() failed");
     }
 
     double delay = get_delay(offset, bytes);
@@ -216,8 +219,10 @@ void sim_disk_file::set_size(offset_type newsize)
     scoped_mutex_lock fd_lock(fd_mutex);
     if (newsize > _size())
     {
-        stxxl_check_ge_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error);
-        stxxl_check_ge_0(::write(file_des, "", 1), io_error);
+        STXXL_THROW_ERRNO_LT_0(::lseek(file_des, newsize - 1, SEEK_SET), io_error,
+                               "lseek() fd=" << file_des << " pos=" << newsize-1);
+        STXXL_THROW_ERRNO_LT_0(::write(file_des, "", 1), io_error,
+                               "write() fd=" << file_des << " size=1");
     }
 }
 

@@ -164,28 +164,5 @@ __STXXL_END_NAMESPACE
 
 ////////////////////////////////////////////////////////////////////////////
 
-#if STXXL_WINDOWS || defined(__MINGW32__)
-
-#define stxxl_win_lasterror_exit(errmsg, exception_type) \
-    do { \
-        LPVOID lpMsgBuf; \
-        DWORD dw = GetLastError(); \
-        FormatMessage( \
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | \
-            FORMAT_MESSAGE_FROM_SYSTEM, \
-            NULL, \
-            dw, \
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), \
-            (LPTSTR)&lpMsgBuf, \
-            0, NULL); \
-        std::ostringstream str_; \
-        str_ << "Error in " << errmsg << ", error code " << dw << ": " << ((char *)lpMsgBuf); \
-        LocalFree(lpMsgBuf); \
-        throw exception_type(str_.str()); \
-    } while (false)
-
-#endif
-
-
 #endif // !STXXL_VERBOSE_HEADER
 // vim: et:ts=4:sw=4
