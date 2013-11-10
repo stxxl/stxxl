@@ -47,7 +47,7 @@ block_manager::block_manager()
                       (cfg.size) / (1024 * 1024) <<
                       " MiB, I/O implementation: " << cfg.fileio_string());
         }
-        catch (io_error& e)
+        catch (io_error&)
         {
             STXXL_MSG("Error allocating disk '" << cfg.path << "', space: " <<
                       (cfg.size) / (1024 * 1024) <<
