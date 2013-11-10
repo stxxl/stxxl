@@ -97,3 +97,27 @@
    that allows to check at runtime whether a file type (given as string) is
    available. Useful for tests that take a file type as parameter - they
    currently throw an exception "unsupported filetype".
+
+* Change the constructor
+  stxxl::vector<>::vector(stxxl::file*)
+  to
+  stxxl::vector<>::vector(shared_ptr<stxxl::file>)
+  so that ownership of the file can be transferred to the vector and cleanup
+  (closing etc.) of the file can happen automatically
+
+* materialize() that takes an empty vector as argument and grows it, including
+  allocating more blocks of fills the existing part of a vectorand once we came
+  to it's end automatically expands the vector (including proper resizes). This
+  approach should be more efficient (due to overlapping) than repeated
+  push_back()
+
+* streamop passthrough() useful if one wants to replace some streamop by a
+  no-op by just redefining one type needs peformance measurements, hopefully
+  has no impact on speed.
+
+* stream::discard() should not need to call in.operator*() - are there side
+  effects to be expected?
+  -> add a streamop "inspect" or so for this purpose
+  -> drop *in call from discard
+
+* add discard(StreamOp, unsigned_irgendwas n): discard at most n elements
