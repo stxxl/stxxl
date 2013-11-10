@@ -115,9 +115,13 @@ class config : public singleton<config>
     //! In disks_list, flash devices come after all regular disks
     unsigned first_flash;
 
+    //! Finished initializing config
+    bool is_initialized;
+
     //! Constructor: this must be inlined to print the header version
     //! string.
     inline config()
+        : is_initialized(false)
     {
         logger::get_instance();
         STXXL_MSG(get_version_string_long());
@@ -130,15 +134,21 @@ class config : public singleton<config>
     //! Search several places for a config file.
     void find_config();
 
+    //! If disk list is empty, then search different locations for a disk
+    //! configuration file, or load a default config if everything fails.
+    void initialize();
+
 public:
     //! \name Initialization Functions
     //! \{
 
-    //! If disk list is empty, then search different locations for a disk
-    //! configuration file, or load a default config if everything fails.
+    //! Check that initialize() was called.
     //! \note This function need not be called by the user, block_manager will
     //! always call it.
-    void initialize();
+    void check_initialized()
+    {
+        if (!is_initialized) initialize();
+    }
 
     //! Load disk configuration file.
     void load_config_file(const std::string& config_path);
@@ -164,8 +174,9 @@ public:
 
     //! Returns number of disks available to user.
     //! \return number of disks
-    inline size_t disks_number() const
+    inline size_t disks_number()
     {
+        check_initialized();
         return disks_list.size();
     }
 
@@ -173,6 +184,7 @@ public:
     //! \return range [begin, end) of regular disk indices
     inline std::pair<unsigned, unsigned> regular_disk_range() const
     {
+        assert(is_initialized);
         return std::pair<unsigned, unsigned>(0, first_flash);
     }
 
@@ -180,19 +192,22 @@ public:
     //! \return range [begin, end) of flash device indices
     inline std::pair<unsigned, unsigned> flash_range() const
     {
+        assert(is_initialized);
         return std::pair<unsigned, unsigned>(first_flash, (unsigned)disks_list.size());
     }
 
     //! Returns mutable disk_config structure for additional disk parameters
     inline disk_config & disk(size_t disk)
     {
-        return  disks_list[disk];
+        check_initialized();
+        return disks_list[disk];
     }
 
     //! Returns constant disk_config structure for additional disk parameters
     inline const disk_config & disk(size_t disk) const
     {
-        return  disks_list[disk];
+        assert(is_initialized);
+        return disks_list[disk];
     }
 
     //! Returns path of disks.
@@ -200,6 +215,7 @@ public:
     //! \return string that contains the disk's path name
     inline const std::string & disk_path(size_t disk) const
     {
+        assert(is_initialized);
         return disks_list[disk].path;
     }
 
@@ -208,6 +224,7 @@ public:
     //! \return disk size in bytes
     inline stxxl::uint64 disk_size(size_t disk) const
     {
+        assert(is_initialized);
         return disks_list[disk].size;
     }
 
@@ -215,6 +232,7 @@ public:
     //! \param disk disk's identifier
     inline const std::string & disk_io_impl(size_t disk) const
     {
+        assert(is_initialized);
         return disks_list[disk].io_impl;
     }
 

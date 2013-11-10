@@ -22,7 +22,7 @@ block_manager::block_manager()
     config * config = config::get_instance();
 
     // initialize config (may read config files now)
-    config->initialize();
+    config->check_initialized();
 
     // allocate disk_allocators
     ndisks = config->disks_number();

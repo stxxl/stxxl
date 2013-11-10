@@ -82,7 +82,7 @@ struct cmp : public std::less<my_type>
 
 int main(int argc, char* argv[])
 {
-    const stxxl::int_type SIZE = (argc >= 2) ? atoi(argv[1]) : 128;
+    const stxxl::int_type SIZE = (argc >= 2) ? atoi(argv[1]) : 16;
 
 #if STXXL_PARALLEL_MULTIWAY_MERGE
     STXXL_MSG("STXXL_PARALLEL_MULTIWAY_MERGE");

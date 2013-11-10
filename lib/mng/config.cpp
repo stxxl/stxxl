@@ -58,6 +58,8 @@ void config::initialize()
     {
         find_config();
     }
+
+    is_initialized = true;
 }
 
 void config::find_config()
@@ -171,6 +173,8 @@ void config::load_config_file(const std::string& config_path)
 
 uint64 config::total_size() const
 {
+    assert(is_initialized);
+
     uint64 total_size = 0;
 
     for (disk_list_type::const_iterator it = disks_list.begin();
