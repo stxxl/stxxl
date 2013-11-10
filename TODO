@@ -44,3 +44,56 @@
 * do not specify marginal properties such as allocation strategy as part of the template type.
   instead, make such properties dynamically configurable using run-time polymorphism,
   which would incur only a negligible running time overhead (one virtual function call per block).
+
+* If we get rid of the sentinels (at least for sorting), we can drop the
+  min_value()/max_value() requirement on the comparator and therefore
+  unmodified comparators could be used for stxxl.
+
+* Traditionally stxxl only supports PODs in external containers, e.g. nothing
+  that has non-trivial constructors, destructors or copy/assignemnt operators.
+  That is neccessary to allow fast operations by accessing the underlying
+  blocks directly without caring about copying/moving/otherwise manipulating
+  the content or uninitialized elements.
+
+  For some applications it could be helpful to have containers that take
+  non-POD elements, but you would probably lose the features you gain by having
+  direct access to the blocks.
+
+  Some discussion regarding using some shared_ptr<> in a stxxl::vector can be
+  found here: https://sourceforge.net/projects/stxxl/forums/forum/446474/topic/4099030
+
+* The following code is not correct:
+
+  file * f = create_file(..., RDONLY);
+  vector<> v(f);
+  v[42]; // non-const access, sets dirty flag
+
+  but the error message it produces is very unclear and may come very
+  asynchronous:
+
+  terminate called after throwing an instance of 'stxxl::io_error' what():
+  Error in function virtual void stxxl::mmap_file::serve(const
+  stxxl::request*): Info: Mapping failed. Page size: 4096 offset modulo page
+  size 0 Permission denied
+
+  Caused by stxxl::vector<> when swapping out a dirty page. Reproducible with
+  containers/test_vector_sizes.stxxl.bin
+
+  Possible solution: vector::write_page() should check if
+  vector-is-bound-to-a-file and file-is-opened-read-only throw "please use only
+  const access to a read only vector"
+
+* I've noticed that the destructor for stxxl::vector flushes any dirty data to
+  disk. Possibly that makes sense for a file-backed vector (I haven't looked at
+  how those work), but for a vector that uses the disks configured in .stxxl it
+  is wasted I/O as the data is immediately freed. For the moment I am working
+  around this by calling thevector.clear() immediately before destroying it,
+  which seems to prevent the writeback (based on querying the stats).
+
+* There should be a function like
+
+   bool supports_filetype(const char *)
+
+   that allows to check at runtime whether a file type (given as string) is
+   available. Useful for tests that take a file type as parameter - they
+   currently throw an exception "unsupported filetype".
