@@ -32,7 +32,7 @@ template class stxxl::const_matrix_row_major_iterator<int_type, 32>;
 template class stxxl::const_matrix_col_major_iterator<int_type, 32>;
 template class stxxl::column_vector<int_type>;
 template class stxxl::row_vector<int_type>;
-template class stxxl::matrix_local::matrix_operations<int_type, 32>;
+template struct stxxl::matrix_local::matrix_operations<int_type, 32>;
 
 struct constant_one
 {
