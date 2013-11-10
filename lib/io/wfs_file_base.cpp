@@ -13,6 +13,7 @@
  **************************************************************************/
 
 #include <stxxl/bits/io/wfs_file_base.h>
+#include <stxxl/bits/common/error_handling.h>
 
 #if STXXL_WINDOWS
 

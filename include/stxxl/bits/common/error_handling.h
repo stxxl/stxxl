@@ -138,19 +138,17 @@ __STXXL_BEGIN_NAMESPACE
         LPVOID lpMsgBuf;                                                \
         DWORD dw = GetLastError();                                      \
         FormatMessage(                                                  \
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |                            \
-            FORMAT_MESSAGE_FROM_SYSTEM,                                 \
-            NULL,                                                       \
-            dw,                                                         \
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, \
+            NULL, dw,                                                   \
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),                  \
             (LPTSTR)&lpMsgBuf,                                          \
             0, NULL);                                                   \
-        std::ostringstream str_;                                        \
-        str_ << "Error in " << STXXL_PRETTY_FUNCTION_NAME               \
-             << " : " << error_message                                  \
-             << " : error code " << dw << " : " << ((char *)lpMsgBuf);  \
+        std::ostringstream msg;                                         \
+        msg << "Error in " << STXXL_PRETTY_FUNCTION_NAME                \
+            << " : " << error_message                                   \
+            << " : error code " << dw << " : " << ((char *)lpMsgBuf);   \
         LocalFree(lpMsgBuf);                                            \
-        throw exception_type(str_.str());                               \
+        throw exception_type(msg.str());                                \
     } while (false)
 
 #endif
