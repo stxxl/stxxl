@@ -18,9 +18,8 @@
 __STXXL_BEGIN_NAMESPACE
 
 //! Parse a string like "343KB" or "  44 GiB  " into the corresponding size in
-//! bytes. Returns the number of bytes and sets ok = true if the string could
-//! be parsed correctly.
-bool parse_SI_IEC_size(const std::string& str, uint64& size)
+//! bytes.
+bool parse_SI_IEC_size(const std::string& str, uint64& size, char def_unit)
 {
     char* endptr;
     size = strtoul(str.c_str(), &endptr, 10);
@@ -43,13 +42,32 @@ bool parse_SI_IEC_size(const std::string& str, uint64& size)
     else if (endptr[0] == 'p' || endptr[0] == 'P')
         power = 5, ++endptr;
 
-    // switch to power of two
+    // switch to power of two (only if power was set above)
     if ( (endptr[0] == 'i' || endptr[0] == 'I') && power != 0 )
         base = 1024, ++endptr;
 
     // byte indicator
-    if ( endptr[0] == 'b' || endptr[0] == 'B' )
+    if ( endptr[0] == 'b' || endptr[0] == 'B' ) {
         ++endptr;
+    }
+    else if (power == 0)
+    {
+        // no explicit power indicator, and no 'b' or 'B' -> apply default unit
+        switch(def_unit)
+        {
+        default: break;
+        case 'k': power = 1; base = 1000; break;
+        case 'm': power = 2; base = 1000; break;
+        case 'g': power = 3; base = 1000; break;
+        case 't': power = 4; base = 1000; break;
+        case 'p': power = 5; base = 1000; break;
+        case 'K': power = 1; base = 1024; break;
+        case 'M': power = 2; base = 1024; break;
+        case 'G': power = 3; base = 1024; break;
+        case 'T': power = 4; base = 1024; break;
+        case 'P': power = 5; base = 1024; break;
+        }
+    }
 
     // skip over spaces
     while (endptr[0] == ' ') ++endptr;

@@ -274,8 +274,8 @@ void disk_config::parse_line(const std::string& line)
         }
     }
 
-    // size:
-    if (!parse_SI_IEC_size(cmfield[1], size)) {
+    // size: (default unit MiB)
+    if (!parse_SI_IEC_size(cmfield[1], size, 'M')) {
         STXXL_THROW(std::runtime_error,
                     "Invalid disk size '" << cmfield[1] << "' in disk configuration file.");
     }
