@@ -18,6 +18,7 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <cassert>
 
 #include <stxxl/version.h>
 #include <stxxl/bits/singleton.h>

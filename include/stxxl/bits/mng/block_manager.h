@@ -1,5 +1,5 @@
 /***************************************************************************
- *  include/stxxl/bits/mng/mng.h
+ *  include/stxxl/bits/mng/block_manager.h
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,8 +12,8 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#ifndef STXXL_MNG_MNG_HEADER
-#define STXXL_MNG_MNG_HEADER
+#ifndef STXXL_MNG_BLOCK_MANAGER_HEADER
+#define STXXL_MNG_BLOCK_MANAGER_HEADER
 
 #include <stxxl/bits/config.h>
 
@@ -274,5 +274,5 @@ void block_manager::delete_blocks(
 
 __STXXL_END_NAMESPACE
 
-#endif // !STXXL_MNG_MNG_HEADER
+#endif // !STXXL_MNG_BLOCK_MANAGER_HEADER
 // vim: et:ts=4:sw=4

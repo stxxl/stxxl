@@ -1,5 +1,5 @@
 /***************************************************************************
- *  lib/mng/mng.cpp
+ *  lib/mng/block_manager.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
@@ -12,7 +12,7 @@
  *  http://www.boost.org/LICENSE_1_0.txt)
  **************************************************************************/
 
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/block_manager.h>
 
 
 __STXXL_BEGIN_NAMESPACE

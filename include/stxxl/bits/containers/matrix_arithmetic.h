@@ -13,7 +13,7 @@
 #ifndef STXXL_CONTAINERS_MATRIX_ARITHMETIC_HEADER
 #define STXXL_CONTAINERS_MATRIX_ARITHMETIC_HEADER
 
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/containers/matrix_low_level.h>
 
 __STXXL_BEGIN_NAMESPACE

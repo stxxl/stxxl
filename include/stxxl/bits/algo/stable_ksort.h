@@ -18,7 +18,7 @@
 // I rework the stable_ksort when I would have a time
 
 
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/buf_istream.h>
 #include <stxxl/bits/mng/buf_ostream.h>
 #include <stxxl/bits/common/simple_vector.h>

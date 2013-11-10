@@ -17,7 +17,8 @@
 #include <stxxl/bits/common/error_handling.h>
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/io/file.h>
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/config.h>
+#include <stxxl/bits/common/utils.h>
 #include <stxxl/version.h>
 
 #if STXXL_WINDOWS

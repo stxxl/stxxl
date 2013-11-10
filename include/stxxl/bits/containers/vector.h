@@ -22,7 +22,7 @@
 
 #include <stxxl/bits/deprecated.h>
 #include <stxxl/bits/io/request_operations.h>
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/mng/typed_block.h>
 #include <stxxl/bits/common/tmeta.h>
 #include <stxxl/bits/containers/pager.h>

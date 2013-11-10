@@ -18,7 +18,7 @@
 
 #include <stxxl/bits/config.h>
 #include <stxxl/bits/stream/stream.h>
-#include <stxxl/bits/mng/mng.h>
+#include <stxxl/bits/mng/block_manager.h>
 #include <stxxl/bits/algo/sort_base.h>
 #include <stxxl/bits/algo/sort_helper.h>
 #include <stxxl/bits/algo/adaptor.h>

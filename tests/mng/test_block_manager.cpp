@@ -1,5 +1,5 @@
 /***************************************************************************
- *  tests/mng/test_mng.cpp
+ *  tests/mng/test_block_manager.cpp
  *
  *  Part of the STXXL. See http://stxxl.sourceforge.net
  *
