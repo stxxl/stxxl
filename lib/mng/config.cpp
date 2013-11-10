@@ -38,16 +38,36 @@ static inline bool exist_file(const std::string& path)
     return in.good();
 }
 
-void config::init_findconfig()
+config::~config()
 {
-    // check different locations for disk configuration files
+    for (disk_list_type::const_iterator it = disks_list.begin();
+         it != disks_list.end(); it++)
+    {
+        if (it->delete_on_exit)
+        {
+            STXXL_ERRMSG("Removing disk file: " << it->path);
+            unlink(it->path.c_str());
+        }
+    }
+}
+
+void config::initialize()
+{
+    // if disks_list is empty, then try to load disk configuration files
+    if (disks_list.size() == 0)
+    {
+        find_config();
+    }
+}
+
+void config::find_config()
+{
+    // check several locations for disk configuration files
 
     // check STXXLCFG environment path
     const char* stxxlcfg = getenv("STXXLCFG");
-    if (stxxlcfg && exist_file(stxxlcfg)) {
-        init(stxxlcfg);
-        return;
-    }
+    if (stxxlcfg && exist_file(stxxlcfg))
+        return load_config_file(stxxlcfg);
 
 #if !STXXL_WINDOWS
     // read environment, unix style
@@ -65,15 +85,11 @@ void config::init_findconfig()
     {
         std::string basepath = "./.stxxl";
 
-        if (hostname && exist_file(basepath + "." + hostname + suffix)) {
-            init(basepath + "." + hostname + suffix);
-            return;
-        }
+        if (hostname && exist_file(basepath + "." + hostname + suffix))
+            return load_config_file(basepath + "." + hostname + suffix);
 
-        if (exist_file(basepath + suffix)) {
-            init(basepath + suffix);
-            return;
-        }
+        if (exist_file(basepath + suffix))
+            return load_config_file(basepath + suffix);
     }
 
     // check home directory
@@ -81,79 +97,67 @@ void config::init_findconfig()
     {
         std::string basepath = std::string(home) + "/.stxxl";
 
-        if (hostname && exist_file(basepath + "." + hostname + suffix)) {
-            init(basepath + "." + hostname + suffix);
-            return;
-        }
+        if (hostname && exist_file(basepath + "." + hostname + suffix))
+            return load_config_file(basepath + "." + hostname + suffix);
 
-        if (exist_file(basepath + suffix)) {
-            init(basepath + suffix);
-            return;
-        }
+        if (exist_file(basepath + suffix))
+            return load_config_file(basepath + suffix);
     }
 
     // load default configuration
-    init("");
+    load_default_config();
 }
 
-config::~config()
+void config::load_default_config()
 {
-    for (disk_list_type::const_iterator it = disks_list.begin();
-         it != disks_list.end(); it++)
-    {
-        if (it->delete_on_exit)
-        {
-            STXXL_ERRMSG("Removing disk file: " << it->path);
-            unlink(it->path.c_str());
-        }
-    }
+    STXXL_ERRMSG("Warning: no config file found.");
+    STXXL_ERRMSG("Using default disk configuration.");
+#if !STXXL_WINDOWS
+    disk_config entry1("/var/tmp/stxxl", 1000 * 1024 * 1024, "syscall");
+    entry1.delete_on_exit = true;
+    entry1.autogrow = true;
+#else
+    disk_config entry1("", 1000 * 1024 * 1024, "wincall");
+    entry1.delete_on_exit = true;
+    entry1.autogrow = true;
+
+    char * tmpstr = new char[255];
+    if (GetTempPath(255, tmpstr) == 0)
+        STXXL_THROW_WIN_LASTERROR(resource_error, "GetTempPath()");
+    entry1.path = tmpstr;
+    entry1.path += "stxxl.tmp";
+    delete[] tmpstr;
+#endif
+    disks_list.push_back(entry1);
+
+    // no flash disks
+    first_flash = (unsigned int)disks_list.size();
 }
 
-void config::init(const std::string& config_path)
+void config::load_config_file(const std::string& config_path)
 {
     std::vector<disk_config> flash_list;
     std::ifstream cfg_file(config_path.c_str());
+
     if (!cfg_file)
+        return load_default_config();
+
+    std::string line;
+
+    while ( std::getline(cfg_file, line) )
     {
-        STXXL_ERRMSG("Warning: no config file found.");
-        STXXL_ERRMSG("Using default disk configuration.");
-#if !STXXL_WINDOWS
-        disk_config entry1("/var/tmp/stxxl", 1000 * 1024 * 1024, "syscall");
-        entry1.delete_on_exit = true;
-        entry1.autogrow = true;
-#else
-        disk_config entry1("", 1000 * 1024 * 1024, "wincall");
-        entry1.delete_on_exit = true;
-        entry1.autogrow = true;
+        // skip comments
+        if (line.size() == 0 || line[0] == '#') continue;
 
-        char * tmpstr = new char[255];
-        if (GetTempPath(255, tmpstr) == 0)
-            STXXL_THROW_WIN_LASTERROR(resource_error, "GetTempPath()");
-        entry1.path = tmpstr;
-        entry1.path += "stxxl.tmp";
-        delete[] tmpstr;
-#endif
-        disks_list.push_back(entry1);
+        disk_config entry;
+        entry.parse_line(line); // throws on errors
+
+        if (!entry.flash)
+            disks_list.push_back(entry);
+        else
+            flash_list.push_back(entry);
     }
-    else
-    {
-        std::string line;
-
-        while ( std::getline(cfg_file, line) )
-        {
-            // skip comments
-            if (line.size() == 0 || line[0] == '#') continue;
-
-            disk_config entry;
-            entry.parseline(line); // throws on errors
-
-            if (!entry.flash)
-                disks_list.push_back(entry);
-            else
-                flash_list.push_back(entry);
-        }
-        cfg_file.close();
-    }
+    cfg_file.close();
 
     // put flash devices after regular disks
     first_flash = (unsigned int)disks_list.size();
@@ -163,24 +167,19 @@ void config::init(const std::string& config_path)
         STXXL_THROW(std::runtime_error,
                     "No disks found in '" << config_path << "'.");
     }
+}
 
-    int64 total_size = 0;
+uint64 config::total_size() const
+{
+    uint64 total_size = 0;
+
     for (disk_list_type::const_iterator it = disks_list.begin();
          it != disks_list.end(); it++)
     {
-        STXXL_MSG("Disk '" << it->path << "' is allocated, space: " <<
-                  (it->size) / (1024 * 1024) <<
-                  " MiB, I/O implementation: " << it->fileio_string());
-
-        total_size += (*it).size;
+        total_size += it->size;
     }
 
-    if (disks_list.size() > 1)
-    {
-        STXXL_MSG("In total " << disks_list.size() << " disks are allocated, space: " <<
-                  (total_size / (1024 * 1024)) <<
-                  " MiB");
-    }
+    return total_size;
 }
 
 disk_config::disk_config()
@@ -190,6 +189,7 @@ disk_config::disk_config()
       direct(2),
       flash(false),
       queue(file::DEFAULT_QUEUE),
+      raw_device(false),
       unlink_on_open(false)
 {
 }
@@ -204,11 +204,26 @@ disk_config::disk_config(const std::string& _path, uint64 _size,
       direct(2),
       flash(false),
       queue(file::DEFAULT_QUEUE),
+      raw_device(false),
       unlink_on_open(false)
 {
+    parse_fileio();
 }
 
-void disk_config::parseline(const std::string& line)
+disk_config::disk_config(const std::string& line)
+    : size(0),
+      autogrow(false),
+      delete_on_exit(false),
+      direct(2),
+      flash(false),
+      queue(file::DEFAULT_QUEUE),
+      raw_device(false),
+      unlink_on_open(false)
+{
+    parse_line(line);
+}
+
+void disk_config::parse_line(const std::string& line)
 {
     // split off disk= or flash=
     std::vector<std::string> eqfield = split(line, "=", 2, 2);
@@ -267,6 +282,15 @@ void disk_config::parseline(const std::string& line)
 
     // io_impl:
     io_impl = cmfield[2];
+    parse_fileio();
+}
+
+void disk_config::parse_fileio()
+{
+    // skip over leading spaces
+    size_t leadspace = io_impl.find_first_not_of(' ');
+    if (leadspace > 0)
+        io_impl = io_impl.substr(leadspace);
 
     // split off extra fileio parameters
     size_t spacepos = io_impl.find(' ');
@@ -324,11 +348,18 @@ void disk_config::parseline(const std::string& line)
                             "Invalid parameter '" << *p << "' in disk configuration file.");
             }
         }
+        else if (*p == "raw_device")
+        {
+            if (!(io_impl == "syscall")) {
+                STXXL_THROW(std::runtime_error, "Parameter '" << *p << "' invalid for fileio '" << io_impl << "' in disk configuration file.");
+            }
+
+            raw_device = true;
+        }
         else if (*p == "unlink" || *p == "unlink_on_open")
         {
             if (!(io_impl == "syscall" || io_impl == "mmap") || io_impl == "wbtl") {
-                STXXL_THROW(std::runtime_error,
-                            "Parameter '" << *p << "' invalid for fileio '" << io_impl << "' in disk configuration file.");
+                STXXL_THROW(std::runtime_error, "Parameter '" << *p << "' invalid for fileio '" << io_impl << "' in disk configuration file.");
             }
 
             unlink_on_open = true;
@@ -369,6 +400,9 @@ std::string disk_config::fileio_string() const
 
     if (queue != file::DEFAULT_QUEUE)
         oss << " queue=" << queue;
+
+    if (raw_device)
+        oss << " raw_device";
 
     if (unlink_on_open)
         oss << " unlink_on_open";

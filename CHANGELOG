@@ -28,8 +28,8 @@ Version 1.4.0 (unreleased)
 
 * .stxxl Config Options Represented as disk_config Class
   - all disk= config lines are parsed into disk_config objects.
-  - this is in preparation of programmatically adding disks (disk_config)
-    objects in the next release, instead of config via .stxxl files.
+  - allow API calls to configure disks via stxxl::config::add_disk()
+  - delay config file load till config::initialize() is called by block_manager
 
 * Command line parser stxxl::cmdline_parser
   - stand-alone command line parser with ability to parse SI and IEC units for

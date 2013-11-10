@@ -34,7 +34,8 @@ __STXXL_BEGIN_NAMESPACE
 class disk_config
 {
 public:
-    // *** Basic Disk Configuration Parameters ***
+    //! \name Basic Disk Configuration Parameters
+    //! \{
 
     //! the file path used by the io implementation
     std::string path;
@@ -45,22 +46,31 @@ public:
     //! io implementation to access file
     std::string io_impl;
 
+    //! \}
+
 public:
     //! default constructor
     disk_config();
 
-    //! initializing constructor
-    disk_config(const std::string& path, uint64 size, const std::string& io_impl);
+    //! initializing constructor, also parses fileio parameter
+    disk_config(const std::string& path, uint64 size, const std::string& fileio);
+
+    //! initializing constructor, parse full line as in config files
+    disk_config(const std::string& line);
 
     //! parse a disk=\<path>,\<size>,\<fileio> options line into disk_config,
     //! throws std::runtime_error on parse errors.
-    void parseline(const std::string& line);
+    void parse_line(const std::string& line);
+
+    //! parse the "io_impl" parameter into the optional parameter fields.
+    void parse_fileio();
 
     //! return formatted fileio name and optional configuration parameters
     std::string fileio_string() const;
 
 public:
-    // *** Optional Disk/Fileio Configuration Parameters ***
+    //! \name Optional Disk / File I/O Implementation Parameters
+    //! \{
 
     //! autogrow file if more disk space is needed, automatically set if size == 0.
     bool autogrow;
@@ -80,11 +90,17 @@ public:
     //! different disks. queue=-1 -> default queue (one for each disk).
     int queue;
 
+    //! turned on by syscall fileio when the path points to a raw block device
+    bool raw_device;
+
     //! unlink file immediately after opening (available on most Unix)
     bool unlink_on_open;
+
+    //! \}
 };
 
-//! Access point to disks properties.
+//! Access point to disks properties. Since 1.4.0: no config files are read
+//! automatically!
 //! \remarks is a singleton
 class config : public singleton<config>
 {
@@ -96,29 +112,56 @@ class config : public singleton<config>
     //! list of configured disks
     disk_list_type disks_list;
 
-    // in disks_list, flash devices come after all regular disks
+    //! In disks_list, flash devices come after all regular disks
     unsigned first_flash;
 
-    //! default configuration method: this must be inlined to print the header
-    //! version string.
+    //! Constructor: this must be inlined to print the header version
+    //! string.
     inline config()
     {
         logger::get_instance();
         STXXL_MSG(get_version_string_long());
         print_library_version_mismatch();
-        init_findconfig();
     }
 
     //! deletes autogrow files
     ~config();
 
-    //! load disk configuration file
-    void init(const std::string& config_path);
-
-    //! searchs different locations for a disk configuration file
-    void init_findconfig();
+    //! Search several places for a config file.
+    void find_config();
 
 public:
+    //! \name Initialization Functions
+    //! \{
+
+    //! If disk list is empty, then search different locations for a disk
+    //! configuration file, or load a default config if everything fails.
+    //! \note This function need not be called by the user, block_manager will
+    //! always call it.
+    void initialize();
+
+    //! Load disk configuration file.
+    void load_config_file(const std::string& config_path);
+
+    //! Load default configuration.
+    void load_default_config();
+
+    //! Add a disk to the configuration list.
+    //!
+    //! \warning This function should only be used during initialization, as it
+    //! has no effect after construction of block_manager.
+    inline config& add_disk(const disk_config& cfg)
+    {
+        disks_list.push_back(cfg);
+        return *this;
+    }
+
+    //! \}
+
+public:
+    //! \name Query Functions
+    //! \{
+
     //! Returns number of disks available to user.
     //! \return number of disks
     inline size_t disks_number() const
@@ -140,7 +183,13 @@ public:
         return std::pair<unsigned, unsigned>(first_flash, (unsigned)disks_list.size());
     }
 
-    //! Returns disk_config structure for additional disk parameters
+    //! Returns mutable disk_config structure for additional disk parameters
+    inline disk_config & disk(size_t disk)
+    {
+        return  disks_list[disk];
+    }
+
+    //! Returns constant disk_config structure for additional disk parameters
     inline const disk_config & disk(size_t disk) const
     {
         return  disks_list[disk];
@@ -168,6 +217,11 @@ public:
     {
         return disks_list[disk].io_impl;
     }
+
+    //! Returns the total size over all disks
+    uint64 total_size() const;
+
+    //! \}
 };
 
 //! \}

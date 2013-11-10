@@ -21,21 +21,50 @@ block_manager::block_manager()
 {
     config * config = config::get_instance();
 
+    // initialize config (may read config files now)
+    config->initialize();
+
+    // allocate disk_allocators
     ndisks = config->disks_number();
     disk_allocators = new disk_allocator* [ndisks];
     disk_files = new file *[ndisks];
 
+    uint64 total_size = 0;
+
     for (unsigned i = 0; i < ndisks; ++i)
     {
-        disk_config cfg = config->disk(i);
+        disk_config& cfg = config->disk(i);
 
         // assign queues in order of disks.
         if (cfg.queue == file::DEFAULT_QUEUE)
             cfg.queue = i;
 
-        disk_files[i] = create_file(cfg, file::CREAT | file::RDWR, i);
+        try
+        {
+            disk_files[i] = create_file(cfg, file::CREAT | file::RDWR, i);
+
+            STXXL_MSG("Disk '" << cfg.path << "' is allocated, space: " <<
+                      (cfg.size) / (1024 * 1024) <<
+                      " MiB, I/O implementation: " << cfg.fileio_string());
+        }
+        catch (io_error& e)
+        {
+            STXXL_MSG("Error allocating disk '" << cfg.path << "', space: " <<
+                      (cfg.size) / (1024 * 1024) <<
+                      " MiB, I/O implementation: " << cfg.fileio_string());
+            throw;
+        }
+
+        total_size += cfg.size;
 
         disk_allocators[i] = new disk_allocator(disk_files[i], cfg);
+    }
+
+    if (ndisks > 1)
+    {
+        STXXL_MSG("In total " << ndisks << " disks are allocated, space: " <<
+                  (total_size / (1024 * 1024)) <<
+                  " MiB");
     }
 
 #if STXXL_MNG_COUNT_ALLOCATION
@@ -56,6 +85,26 @@ block_manager::~block_manager()
     }
     delete[] disk_allocators;
     delete[] disk_files;
+}
+
+uint64 block_manager::get_total_bytes() const
+{
+    uint64 total = 0;
+
+    for (unsigned i = 0; i < ndisks; ++i)
+        total += disk_allocators[i]->get_total_bytes();
+
+    return total;
+}
+
+uint64 block_manager::get_free_bytes() const
+{
+    uint64 total = 0;
+
+    for (unsigned i = 0; i < ndisks; ++i)
+        total += disk_allocators[i]->get_free_bytes();
+
+    return total;
 }
 
 __STXXL_END_NAMESPACE

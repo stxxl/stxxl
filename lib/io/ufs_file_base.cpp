@@ -35,7 +35,6 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-
 const char * ufs_file_base::io_type() const
 {
     return "ufs_base";

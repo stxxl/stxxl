@@ -30,7 +30,7 @@ file * create_file(const std::string & io_impl,
 class disk_config;
 
 //! create fileio object from disk_config parameter
-file * create_file(const disk_config& config, int mode,
+file * create_file(disk_config& config, int mode,
                    int disk_allocator_id = file::NO_ALLOCATOR);
 
 __STXXL_END_NAMESPACE

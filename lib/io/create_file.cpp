@@ -33,7 +33,7 @@ file * create_file(const std::string & io_impl,
     return create_file(cfg, options, disk_allocator_id);
 }
 
-file * create_file(const disk_config& cfg, int mode, int disk_allocator_id)
+file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
 {
     // apply disk_config settings to open mode
 
@@ -51,6 +51,22 @@ file * create_file(const disk_config& cfg, int mode, int disk_allocator_id)
         ufs_file_base * result =
             new syscall_file(cfg.path, mode, cfg.queue, disk_allocator_id);
         result->lock();
+
+        // if marked as device but file is not -> throw!
+        if (cfg.raw_device && !result->is_device())
+        {
+            delete result;
+            STXXL_THROW(io_error, "Disk " << cfg.path << " was expected to be raw block device, but it is a normal file!");
+        }
+
+        // if is raw_device -> get size and remove some flags.
+        if (result->is_device())
+        {
+            // if device
+            cfg.raw_device = true;
+            cfg.size = result->size();
+            cfg.autogrow = cfg.delete_on_exit = cfg.unlink_on_open = false;
+        }
 
         if (cfg.unlink_on_open)
             result->unlink();

@@ -441,6 +441,9 @@ Description of the parameters:
   - \c delete (or \c delete_on_exit) : delete file \a after the STXXL program exists \n
     This is the more conservative version of unlink, which also works on Windows. However, if the program crashes, the file is not deleted.
 
+  - \c raw_device : fail if the opened path is not a raw block device. \n
+    This flag is not required, raw devices are automatically detected.
+
   - \c queue=# : assign the disk to a specific I/O request queue and thread. \n
     Use this for multiple files that reside on the same physical disk.
 
@@ -456,7 +459,7 @@ disk=c:\stxxl.tmp,700G,wincall delete
 disk=d:\stxxl.tmp,200G,wincall delete
 \endverbatim
 
-\section install_config_filesystem Recommended file system
+\section install_config_filesystem Recommended: File System XFS or Raw Block Devices
 
 The library benefits from direct transfers from user memory to disk, which saves superfluous copies.  We recommend to use the <a href="http://xfs.org">XFS  file system</a>, which gives good read and write performance for large files. Note that file creation speed of \c XFS is a bit slower, so that disk files should be precreated for optimal performance.
 
@@ -467,19 +470,54 @@ $ mkfs.xfs -d agcount=1 -l size=512b
 
 The following filesystems have been reported not to support direct I/O: \c tmpfs , \c glusterfs .  By default, STXXL will first try to use direct I/O (\c O_DIRECT open flag). If that fails, it will print a warning and open the file without \c O_DIRECT.
 
-\note It is also possible to use raw disk devices with \c syscall. Just use \c disk=/dev/sda1 or similar. This will of course \b overwrite all data on the partitions! The I/O performance of raw disks is generally more stable and slightly higher than with file systems.
+\note It is also possible to use <b>raw disk devices</b> with \c syscall. \n
+Just use \c disk=/dev/sdb1 or similar. This will of course \b overwrite all data on the partitions! The I/O performance of raw disks is generally <b>more stable and slightly higher</b> than with file systems.
+\code
+disk=/dev/sdb1,0,syscall raw_device
+\endcode
+The \c raw_device flag is only for verification, STXXL will automatically detect raw block devices and also their size.
 
-\section install_config_logfiles Log files
+\section install_config_logfiles Log Files
 
 STXXL produces two kinds of log files, a message and an error log. By setting the environment variables \c STXXLLOGFILE and \c STXXLERRLOGFILE, you can configure the location of these files. The default values are \c stxxl.log and \c stxxl.errlog, respectively.
 
 \section install_config_precreation Precreating External Memory Files
 
-In order to get the maximum performance one can precreate disk files described in the configuration file, before running STXXL applications. The precreation utility is included in the set of STXXL utilities in \c stxxl_tool. Run this utility for each disk you have defined in the disk configuration file:
+In order to get the maximum performance one can precreate disk files described in the configuration file, before running STXXL applications. A precreation utility is included in the set of STXXL utilities in \c stxxl_tool. Run this utility for each disk you have defined in the disk configuration file:
 \verbatim
 $ stxxl_tool create_files <capacity> <full_disk_filename...>
 // for example:
 $ stxxl_tool create_files 1GiB /data01/stxxl
 \endverbatim
+
+\section install_config_user User-Supplied disk_config Structures
+
+With STXXL 1.4.0, the library can also be configured via the user application.
+
+All disk configuration is managed by the stxxl::config class, which contains a list of stxxl::disk_config objects. Each stxxl::disk_config object encapsulates one disk= lines from a config file, or one allocated disk.
+
+The disk configuration must be supplied to the STXXL library <b>before any other function calls</b>, because the stxxl::config object must be filled before any external memory blocks are allocated by stxxl::block_manager.
+
+\code
+int main()
+{
+    // get uninitialized config singleton
+    stxxl::config * cfg = stxxl::config::get_instance();
+
+    // create a disk_config structure.
+    stxxl::disk_config disk1("/tmp/stxxl.tmp", 100 * 1024 * 1024, "syscall unlink");
+    disk1.direct = 1; // force O_DIRECT
+
+    // add disk to config
+    config->add_disk(disk1);
+
+    // add another disk
+    config->add_disk( disk_config("disk=/tmp/stxxl-2.tmp, 10 GiB, syscall unlink") );
+
+    // ... add more disks
+
+    // use STXXL library as usual ...
+}
+\endcode
 
 */

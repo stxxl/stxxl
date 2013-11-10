@@ -90,6 +90,12 @@ protected:
         BIDIteratorClass out);
 
 public:
+    //! return total number of bytes available in all disks
+    uint64 get_total_bytes() const;
+
+    //! Return total number of free disk allocations
+    uint64 get_free_bytes() const;
+
     //! Allocates new blocks.
     //!
     //! Allocates new blocks according to the strategy

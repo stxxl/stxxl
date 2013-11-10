@@ -13,13 +13,13 @@
 #include <stxxl/mng>
 #include <stxxl/bits/verbose.h>
 
-int main()
+void test1()
 {
     // test disk_config parser:
 
     stxxl::disk_config cfg;
 
-    cfg.parseline("disk=/var/tmp/stxxl.tmp,100GiB,syscall unlink direct=on");
+    cfg.parse_line("disk=/var/tmp/stxxl.tmp, 100 GiB , syscall unlink direct=on");
 
     STXXL_CHECK( cfg.path == "/var/tmp/stxxl.tmp" );
     STXXL_CHECK( cfg.size == 100 * 1024 * 1024 * stxxl::uint64(1024) );
@@ -27,24 +27,72 @@ int main()
 
     // test disk_config parser:
 
-    cfg.parseline("disk=/var/tmp/stxxl.tmp,100GiB,wincall queue=5 delete_on_exit nodirect");
+    cfg.parse_line("disk=/var/tmp/stxxl.tmp, 100 , wincall queue=5 delete_on_exit nodirect");
 
     STXXL_CHECK( cfg.path == "/var/tmp/stxxl.tmp" );
-    STXXL_CHECK( cfg.size == 100 * 1024 * 1024 * stxxl::uint64(1024) );
+    STXXL_CHECK( cfg.size == 100 * 1024 * stxxl::uint64(1024) );
     STXXL_CHECK( cfg.fileio_string() == "wincall delete_on_exit direct=off queue=5" );
     STXXL_CHECK( cfg.queue == 5 );
 
     // bad configurations
 
     STXXL_CHECK_THROW(
-        cfg.parseline("disk=/var/tmp/stxxl.tmp,100GiB,wincall_fileperblock unlink direct=on"),
+        cfg.parse_line("disk=/var/tmp/stxxl.tmp, 100 GiB, wincall_fileperblock unlink direct=on"),
         std::runtime_error
         );
 
     STXXL_CHECK_THROW(
-        cfg.parseline("disk=/var/tmp/stxxl.tmp,0x,syscall"),
+        cfg.parse_line("disk=/var/tmp/stxxl.tmp,0x,syscall"),
         std::runtime_error
         );
+}
+
+void test2()
+{
+#if !STXXL_WINDOWS
+    // test user-supplied configuration
+
+    stxxl::config * config = stxxl::config::get_instance();
+
+    {
+        stxxl::disk_config disk1("/tmp/stxxl-1.tmp", 100 * 1024 * 1024, "syscall");
+        disk1.unlink_on_open = true;
+        disk1.direct = 0;
+
+        STXXL_CHECK( disk1.path == "/tmp/stxxl-1.tmp" );
+        STXXL_CHECK( disk1.size == 100 * 1024 * stxxl::uint64(1024) );
+        STXXL_CHECK( disk1.fileio_string() == "syscall direct=off unlink_on_open" );
+
+        config->add_disk(disk1);
+
+        stxxl::disk_config disk2("/tmp/stxxl-2.tmp", 200 * 1024 * 1024, "syscall direct=off");
+        disk2.unlink_on_open = true;
+
+        STXXL_CHECK( disk2.path == "/tmp/stxxl-2.tmp" );
+        STXXL_CHECK( disk2.size == 200 * 1024 * stxxl::uint64(1024) );
+        STXXL_CHECK( disk2.fileio_string() == "syscall direct=off unlink_on_open" );
+        STXXL_CHECK( disk2.direct == 0 );
+
+        config->add_disk(disk2);
+    }
+
+    STXXL_CHECK( config->disks_number() == 2 );
+    STXXL_CHECK( config->total_size() == 300 * 1024 * 1024 );
+
+    // construct block_manager with user-supplied config
+
+    stxxl::block_manager * bm = stxxl::block_manager::get_instance();
+
+    STXXL_CHECK( bm->get_total_bytes() == 300 * 1024 * 1024 );
+    STXXL_CHECK( bm->get_free_bytes() == 300 * 1024 * 1024 );
+
+#endif
+}
+
+int main()
+{
+    test1();
+    test2();
 
     return 0;
 }

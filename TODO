@@ -1,4 +1,4 @@
-* asynchronous pipelining 
+* asynchronous pipelining
   (currently being developed in branch parallel_pipelining_integration)
 
 * if the stxxl disk files have been enlarged because more external memory
@@ -31,12 +31,9 @@
   on the given speed of the disks
 
 * implement new disk queuing strategy that supports NCQ,
-  which is now widely available in HDDs/SSDs; 
-  probably most interesting for rather small block sizes 
+  which is now widely available in HDDs/SSDs;
+  probably most interesting for rather small block sizes
   (currently begin developed in branch kernelaio)
-
-* allow configuration of the block-managed disks using API calls, 
-  not only through the configuration file.
 
 * abstract away block manager so every container can attach to a file.
 
@@ -45,5 +42,5 @@
 * iostats: add support for splitting I/Os and truncating reads at EOF
 
 * do not specify marginal properties such as allocation strategy as part of the template type.
-  instead, make such properties dynamically configurable using run-time polymorphism, 
+  instead, make such properties dynamically configurable using run-time polymorphism,
   which would incur only a negligible running time overhead (one virtual function call per block).
