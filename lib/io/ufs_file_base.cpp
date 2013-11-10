@@ -184,16 +184,12 @@ void ufs_file_base::lock()
 
 file::offset_type ufs_file_base::_size()
 {
-#if STXXL_WINDOWS || defined(__MINGW32__)
-    struct _stat64 st;
-    STXXL_THROW_ERRNO_NE_0(::_fstat64(file_des, &st), io_error,
-                           "_fstat64() path=" << filename << " fd=" << file_des);
-#else
-    struct stat st;
-    STXXL_THROW_ERRNO_NE_0(::fstat(file_des, &st), io_error,
-                           "fstat() path=" << filename << " fd=" << file_des);
-#endif
-    return st.st_size;
+    off_t rc = ::lseek(file_des, 0, SEEK_END);
+    if (rc < 0)
+        STXXL_THROW_ERRNO(io_error, "lseek(fd,0,SEEK_END) path=" << filename << " fd=" << file_des);
+
+    // retrun value is already the total size
+    return rc;
 }
 
 file::offset_type ufs_file_base::size()
