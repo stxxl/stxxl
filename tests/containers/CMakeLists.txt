@@ -61,7 +61,7 @@ endif(USE_BOOST)
 stxxl_build_test(test_map)
 stxxl_build_test(test_map_random)
 
-stxxl_test(test_map 10)
+stxxl_test(test_map 12)
 stxxl_test(test_map_random 2000)
 
 #-tb longer test for map

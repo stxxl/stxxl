@@ -77,7 +77,7 @@ int main(int argc, char ** argv)
 
         stats_begin = *stxxl::stats::get_instance();
         STXXL_MSG("Doing search");
-        unsigned queries = el;
+        unsigned queries = el / 16;
         const map_type & ConstMap = Map;
         stxxl::random_number32 myrandom;
         for (unsigned i = 0; i < queries; ++i)
