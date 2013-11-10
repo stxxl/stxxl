@@ -65,10 +65,11 @@ If you plan to contribute code to STXXL, please read the \subpage coding_style a
 
 - The STXXL source also contains \subpage stxxl_tool "stxxl_tool", a collection of simple tools and benchmarks.
 
-# License
+# License and Authors
 
 \c STXXL is distributed under the Boost Software License, Version 1.0. \n
-You can find a copy of the license in the accompanying file \ref textfiles_license or at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>.
+You can find a copy of the license in the accompanying file \ref textfiles_license or at <a href="http://www.boost.org/LICENSE_1_0.txt">http://www.boost.org/LICENSE_1_0.txt</a>. \n
+Many people have contributed to STXXL, see all \ref textfiles_authors.
 \subpage textfiles "&nbsp;"
 
 */
@@ -102,6 +103,10 @@ The following list of authors have contributed to STXXL:
 \page textfiles_license LICENSE_1_0.txt
 
 \verbinclude LICENSE_1_0.txt
+
+\page textfiles_todo TODO
+
+\verbinclude TODO
 
  */
 
