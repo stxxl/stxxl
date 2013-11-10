@@ -17,7 +17,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! Parse a string like "343KB" or "44 GiB" into the corresponding size in
+//! Parse a string like "343KB" or "  44 GiB  " into the corresponding size in
 //! bytes. Returns the number of bytes and sets ok = true if the string could
 //! be parsed correctly.
 bool parse_SI_IEC_size(const std::string& str, uint64& size)
@@ -28,64 +28,37 @@ bool parse_SI_IEC_size(const std::string& str, uint64& size)
 
     while (endptr[0] == ' ') ++endptr; // skip over spaces
 
-    if ( endptr[0] == 0 ) // number parsed, no suffix defaults to MiB
-        size *= 1024 * 1024;
-    else if ( (endptr[0] == 'b' || endptr[0] == 'B') && endptr[1] == 0 ) // bytes
-        size *= 1;
-    else if (endptr[0] == 'k' || endptr[0] == 'K')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= 1000; // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= 1024; // power of two
-        else
-            return false;
-    }
-    else if (endptr[0] == 'm' || endptr[0] == 'M')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= 1000 * 1000; // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= 1024 * 1024; // power of two
-        else
-            return false;
-    }
-    else if (endptr[0] == 'g' || endptr[0] == 'G')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= 1000 * 1000 * 1000; // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= 1024 * 1024 * 1024; // power of two
-        else
-            return false;
-    }
-    else if (endptr[0] == 't' || endptr[0] == 'T')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= int64(1000) * int64(1000) * int64(1000) * int64(1000); // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= int64(1024) * int64(1024) * int64(1024) * int64(1024); // power of two
-        else
-            return false;
-    }
-    else if (endptr[0] == 'p' || endptr[0] == 'P')
-    {
-        if ( endptr[1] == 0 || ( (endptr[1] == 'b' || endptr[1] == 'B') && endptr[2] == 0) )
-            size *= int64(1000) * int64(1000) * int64(1000) * int64(1000) * int64(1000); // power of ten
-        else if ( (endptr[1] == 'i' || endptr[0] == 'I') &&
-                  (endptr[2] == 0 || ( (endptr[2] == 'b' || endptr[2] == 'B') && endptr[3] == 0) ) )
-            size *= int64(1024) * int64(1024) * int64(1024) * int64(1024) * int64(1024); // power of two
-        else
-            return false;
-    }
-    else
-        return false;
+    // multiply with base ^ power
+    unsigned int base = 1000;
+    unsigned int power = 0;
 
-    return true;
+    if (endptr[0] == 'k' || endptr[0] == 'K')
+        power = 1, ++endptr;
+    else if (endptr[0] == 'm' || endptr[0] == 'M')
+        power = 2, ++endptr;
+    else if (endptr[0] == 'g' || endptr[0] == 'G')
+        power = 3, ++endptr;
+    else if (endptr[0] == 't' || endptr[0] == 'T')
+        power = 4, ++endptr;
+    else if (endptr[0] == 'p' || endptr[0] == 'P')
+        power = 5, ++endptr;
+
+    // switch to power of two
+    if ( (endptr[0] == 'i' || endptr[0] == 'I') && power != 0 )
+        base = 1024, ++endptr;
+
+    // byte indicator
+    if ( endptr[0] == 'b' || endptr[0] == 'B' )
+        ++endptr;
+
+    // skip over spaces
+    while (endptr[0] == ' ') ++endptr;
+
+    // multiply size
+    for (unsigned int p = 0; p < power; ++p)
+        size *= base;
+
+    return (endptr[0] == 0);
 }
 
 std::string format_SI_size(uint64 number)
