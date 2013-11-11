@@ -15,7 +15,7 @@
 
 namespace stxxl {
 
-/** \page tutorial Tutorials
+/** \page tutorial Tutorials and Examples
 
 \authors Timo Bingmann, Daniel Feist (2013)
 
@@ -69,6 +69,5 @@ The \c examples subdirectory of the STXXL tarballs contains more example code th
 \example examples/algo/copy_and_sort_file.cpp
 
 */
-
 
 } // namespace stxxl

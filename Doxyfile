@@ -700,7 +700,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = *.png *.pdf *.eps *.svg *.bib *.xml *.css */CMakeLists.txt *.symbols
+EXCLUDE_PATTERNS       = *.png *.pdf *.eps *.svg *.bib *.xml *.xmi *.css */CMakeLists.txt *.symbols
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -955,7 +955,7 @@ HTML_COLORSTYLE_GAMMA  = 80
 # page will contain the date and time when the page was generated. Setting
 # this to NO can help when comparing the output of multiple runs.
 
-HTML_TIMESTAMP         = NO
+HTML_TIMESTAMP         = YES
 
 # If the HTML_DYNAMIC_SECTIONS tag is set to YES then the generated HTML
 # documentation will contain sections that can be hidden and shown after the
@@ -1684,7 +1684,7 @@ DOT_NUM_THREADS        = 0
 # the DOTFONTPATH environment variable or by setting DOT_FONTPATH to the
 # directory containing the font.
 
-DOT_FONTNAME           = FreeSans
+DOT_FONTNAME           =
 
 # The DOT_FONTSIZE tag can be used to set the size of the font of dot graphs.
 # The default size is 10pt.
