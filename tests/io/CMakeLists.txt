@@ -33,12 +33,12 @@ stxxl_test(test_cancel memory "${STXXL_TMPDIR}/testdisk1")
 # FIXME: asserts!
 #stxxl_test(test_cancel wbtl "${STXXL_TMPDIR}/testdisk1")
 
-stxxl_test(test_io_sizes syscall "${STXXL_TMPDIR}/testdisk1" 2147483648)
+stxxl_test(test_io_sizes syscall "${STXXL_TMPDIR}/testdisk1" 1073741824)
 if(STXXL_HAVE_MMAP_FILE)
-  stxxl_test(test_io_sizes mmap "${STXXL_TMPDIR}/testdisk1" 2147483648)
+  stxxl_test(test_io_sizes mmap "${STXXL_TMPDIR}/testdisk1" 1073741824)
 endif(STXXL_HAVE_MMAP_FILE)
 if(USE_BOOST)
-  stxxl_test(test_io_sizes boostfd "${STXXL_TMPDIR}/testdisk1" 2147483648)
+  stxxl_test(test_io_sizes boostfd "${STXXL_TMPDIR}/testdisk1" 1073741824)
 endif(USE_BOOST)
 
 if(STXXL_HAVE_MMAP_FILE)
