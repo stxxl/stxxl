@@ -68,10 +68,6 @@ void test_const_iterator(const my_vec_type & x)
     *i;
 }
 
-// forced instantiation
-template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (1024 * 1024), stxxl::striping>;
-
-
 void test_vector1()
 {
     // use non-randomized striping to avoid side effects on random generator
@@ -175,3 +171,18 @@ int main()
 
     return 0;
 }
+
+// forced instantiation
+template struct stxxl::VECTOR_GENERATOR<element, 2, 2, (1024 * 1024), stxxl::striping>;
+template class stxxl::vector<double>;
+template class stxxl::vector_iterator<double, STXXL_DEFAULT_ALLOC_STRATEGY, stxxl::uint64, stxxl::int64, STXXL_DEFAULT_BLOCK_SIZE(double), stxxl::lru_pager<8>, 4>;
+template class stxxl::const_vector_iterator<double, STXXL_DEFAULT_ALLOC_STRATEGY, stxxl::uint64, stxxl::int64, STXXL_DEFAULT_BLOCK_SIZE(double), stxxl::lru_pager<8>, 4>;
+
+//-tb bufreader instantiation work only for const_iterator!
+typedef stxxl::vector<double>::const_iterator const_vector_iterator;
+template class stxxl::vector_bufreader<const_vector_iterator>;
+template class stxxl::vector_bufreader_reverse<const_vector_iterator>;
+template class stxxl::vector_bufreader_iterator< stxxl::vector_bufreader<const_vector_iterator> >;
+
+typedef stxxl::vector<double>::iterator vector_iterator;
+template class stxxl::vector_bufwriter<vector_iterator>;

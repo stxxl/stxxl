@@ -1741,12 +1741,12 @@ class vector_bufreader_iterator;
  *
  * See \ref tutorial_vector_buf
  */
-template <typename VectorIteratorType>
+template <typename VectorIterator>
 class vector_bufreader : public noncopyable
 {
 public:
     //! template parameter: the vector iterator type
-    typedef VectorIteratorType vector_iterator;
+    typedef VectorIterator vector_iterator;
 
     //! value type of the output vector
     typedef typename vector_iterator::value_type value_type;
@@ -2009,12 +2009,12 @@ public:
  *
  * See \ref tutorial_vector_buf
  */
-template <typename VectorIteratorType>
+template <typename VectorIterator>
 class vector_bufreader_reverse : public noncopyable
 {
 public:
     //! template parameter: the vector iterator type
-    typedef VectorIteratorType vector_iterator;
+    typedef VectorIterator vector_iterator;
 
     //! value type of the output vector
     typedef typename vector_iterator::value_type value_type;
@@ -2182,12 +2182,12 @@ public:
  *
  * See \ref tutorial_vector_buf
  */
-template <typename VectorIteratorType>
+template <typename VectorIterator>
 class vector_bufwriter : public noncopyable
 {
 public:
     //! template parameter: the vector iterator type
-    typedef VectorIteratorType iterator;
+    typedef VectorIterator iterator;
 
     //! type of the output vector
     typedef typename iterator::vector_type vector_type;
