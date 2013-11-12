@@ -24,7 +24,9 @@ Version 1.4.0 (unreleased)
   - parse additional file I/O implementation options.
   - support for "unlink_on_open" (keep file descriptor but unlink file) and
     "delete_at_exit" options.
-  - support for "direct=on/off/try" to turn off O_DIRECT for tmpfs and similar.
+  - support for "direct=off/try/on" to turn off O_DIRECT for tmpfs and similar.
+  - the default open mode is now direct=try -> prints a warning if O_DIRECT is
+    unavailable on the system.
 
 * .stxxl Config Options Represented as disk_config Class
   - all disk= config lines are parsed into disk_config objects.

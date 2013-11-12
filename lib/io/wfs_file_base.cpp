@@ -68,7 +68,14 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
         dwFlagsAndAttributes |= FILE_FLAG_NO_BUFFERING;
         // TODO: try also FILE_FLAG_WRITE_THROUGH option ?
 #else
-        STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, the system does not support it.");
+        if (mode & REQUIRE_DIRECT) {
+            STXXL_ERRMSG("Error: open()ing " << filename << " with DIRECT mode required, but the system does not support it.");
+            file_des = INVALID_HANDLE_VALUE;
+            return;
+        }
+        else {
+            STXXL_MSG("Warning: open()ing " << filename << " without DIRECT mode, as the system does not support it.");
+        }
 #endif
     }
 
@@ -80,10 +87,25 @@ static HANDLE open_file_impl(const std::string & filename, int mode)
     HANDLE file_des = ::CreateFile(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
                                    dwCreationDisposition, dwFlagsAndAttributes, NULL);
 
-    if (file_des == INVALID_HANDLE_VALUE)
-        STXXL_THROW_WIN_LASTERROR(io_error, "CreateFile() filename=" << filename);
+    if (file_des != INVALID_HANDLE_VALUE)
+        return file_des;
 
-    return file_des;
+#if !STXXL_DIRECT_IO_OFF
+    if ((mode & DIRECT) && !(mode & REQUIRE_DIRECT))
+    {
+        STXXL_MSG("CreateFile() error on path=" << filename << " flags=" << flags << ", retrying without DIRECT mode.");
+
+        dwFlagsAndAttributes &= ~FILE_FLAG_NO_BUFFERING;
+
+        HANDLE file_des = ::CreateFile(filename.c_str(), dwDesiredAccess, dwShareMode, NULL,
+                                       dwCreationDisposition, dwFlagsAndAttributes, NULL);
+
+        if (file_des != INVALID_HANDLE_VALUE)
+            return file_des;
+    }
+#endif
+
+    STXXL_THROW_WIN_LASTERROR(io_error, "CreateFile() path=" << filename << " flags=" << flags);
 }
 
 wfs_file_base::wfs_file_base(

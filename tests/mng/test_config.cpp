@@ -27,12 +27,13 @@ void test1()
 
     // test disk_config parser:
 
-    cfg.parse_line("disk=/var/tmp/stxxl.tmp, 100 , wincall queue=5 delete_on_exit nodirect");
+    cfg.parse_line("disk=/var/tmp/stxxl.tmp, 100 , wincall queue=5 delete_on_exit direct=on");
 
     STXXL_CHECK( cfg.path == "/var/tmp/stxxl.tmp" );
     STXXL_CHECK( cfg.size == 100 * 1024 * stxxl::uint64(1024) );
-    STXXL_CHECK( cfg.fileio_string() == "wincall delete_on_exit direct=off queue=5" );
+    STXXL_CHECK( cfg.fileio_string() == "wincall delete_on_exit direct=on queue=5" );
     STXXL_CHECK( cfg.queue == 5 );
+    STXXL_CHECK( cfg.direct == 2 );
 
     // bad configurations
 

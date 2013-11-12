@@ -28,7 +28,7 @@ file * create_file(const std::string & io_impl,
     // construct temporary disk_config structure
     disk_config cfg(filename, 0, io_impl);
     cfg.queue = physical_device_id;
-    cfg.direct = (options & file::DIRECT) ? 2 : 0;
+    cfg.direct = (options & file::REQUIRE_DIRECT) ? 2 : (options & file::DIRECT) ? 1 : 0;
 
     return create_file(cfg, options, disk_allocator_id);
 }
@@ -37,12 +37,12 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
 {
     // apply disk_config settings to open mode
 
-    if (cfg.direct == 0)
-        mode &= ~file::DIRECT;
-    else if (cfg.direct == 1)
+    mode &= ~(file::DIRECT | file::REQUIRE_DIRECT); // clear DIRECT and REQUIRE_DIRECT
+
+    if (cfg.direct == 1)
         mode |= file::DIRECT;
-    else if (cfg.direct == 2) // set DIRECT for first try.
-        mode |= file::DIRECT | file::TRY_DIRECT;
+    else if (cfg.direct == 2)
+        mode |= file::DIRECT | file::REQUIRE_DIRECT;
 
     // *** Select fileio Implementation
 
@@ -109,7 +109,7 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
 #if STXXL_HAVE_SIMDISK_FILE
     else if (cfg.io_impl == "simdisk")
     {
-        mode &= ~file::DIRECT;  // clear the DIRECT flag, this file is supposed to be on tmpfs
+        mode &= ~(file::DIRECT | file::REQUIRE_DIRECT);  // clear the DIRECT flag, this file is supposed to be on tmpfs
         ufs_file_base * result =
             new sim_disk_file(cfg.path, mode, cfg.queue, disk_allocator_id);
         result->lock();

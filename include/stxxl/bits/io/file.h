@@ -34,10 +34,6 @@
 #endif
 
 
-//#ifdef __sun__
-//#define O_DIRECT 0
-//#endif
-
 #ifndef O_SYNC
  #define O_SYNC 0
 #endif
@@ -108,11 +104,12 @@ public:
         WRONLY = 2,       //!< only writing of the file is allowed
         RDWR = 4,         //!< read and write of the file are allowed
         CREAT = 8,        //!< in case file does not exist no error occurs and file is newly created
-        DIRECT = 16,      //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O
+        DIRECT = 16,      //!< I/Os proceed bypassing file system buffers, i.e. unbuffered I/O.
+                          //!< Tries to open with appropriate flags, if fails print warning and open normally.
         TRUNC = 32,       //!< once file is opened its length becomes zero
         SYNC = 64,        //!< open the file with O_SYNC | O_DSYNC | O_RSYNC flags set
         NO_LOCK = 128,    //!< do not aquire an exclusive lock by default
-        TRY_DIRECT = 256  //!< try to open with DIRECT flag, else print error and open without DIRECT.
+        REQUIRE_DIRECT = 256 //!< implies DIRECT, fail if opening with DIRECT flag does not work.
     };
 
     static const int DEFAULT_QUEUE = -1;

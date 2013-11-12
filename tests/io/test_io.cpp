@@ -49,11 +49,11 @@ int main(int argc, char ** argv)
     memset(buffer, 0, size);
 
 #if STXXL_HAVE_MMAP_FILE
-    stxxl::mmap_file file1(tempfilename[0], file::CREAT | file::RDWR /* | file::DIRECT */, 0);
+    stxxl::mmap_file file1(tempfilename[0], file::CREAT | file::RDWR | file::DIRECT, 0);
     file1.set_size(size * 1024);
 #endif
 
-    stxxl::syscall_file file2(tempfilename[1], file::CREAT | file::RDWR /* | file::DIRECT */, 1);
+    stxxl::syscall_file file2(tempfilename[1], file::CREAT | file::RDWR | file::DIRECT, 1);
 
     stxxl::request_ptr req[16];
     unsigned i;
