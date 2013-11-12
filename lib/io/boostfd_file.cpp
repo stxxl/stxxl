@@ -156,7 +156,7 @@ boostfd_file::boostfd_file(
     {
         // direct mode not supported in Boost
         STXXL_ERRMSG("Error: open()ing " << filename << " with REQUIRE_DIRECT mode, but boostfd does not support it.");
-        retrun;
+        return;
     }
 
     if (mode & SYNC)
