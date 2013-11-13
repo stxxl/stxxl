@@ -87,7 +87,7 @@ sub process_cpp {
 
     # check source header
     my $i = 0;
-    if ($data[$i] =~ m!// -.*- mode:!) { ++$i; } # emacs mode line
+    if ($data[$i] =~ m!// -.*- mode:!) { ++$i; } # skip emacs mode line
     expect($path, $i, $data[$i], "/".('*'x75)."\n"); ++$i;
     expect($path, $i, $data[$i], " *  $path\n"); ++$i;
     expect($path, $i, $data[$i], " *\n"); ++$i;

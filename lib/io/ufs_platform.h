@@ -1,5 +1,5 @@
 /***************************************************************************
- *  lib/stxxl/io/ufs_platform.h
+ *  lib/io/ufs_platform.h
  *
  *  Platform porting code local the I/O file implementations. This header is
  *  not part of STXXL's template library interface and must only be used inside
