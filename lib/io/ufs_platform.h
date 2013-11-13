@@ -33,6 +33,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+// required for ::remove()
+#include <cstdio>
+
 // for systems that don't know anything about block devices.
 #ifndef S_ISBLK
   #define S_ISBLK(x) 0

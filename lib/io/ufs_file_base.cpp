@@ -101,6 +101,7 @@ ufs_file_base::ufs_file_base(
         STXXL_MSG("open() error on path=" << filename << " flags=" << flags << ", retrying without O_DIRECT.");
 
         flags &= ~O_DIRECT;
+        m_mode &= ~DIRECT;
 
         if ((file_des = ::open(filename.c_str(), flags, perms)) >= 0)
         {
