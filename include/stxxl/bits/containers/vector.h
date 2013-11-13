@@ -331,7 +331,7 @@ public:
     //! \{
 
     //! return pointer to vector containing iterator
-    vector_type* parent_vector() const
+    vector_type * parent_vector() const
     {
         return p_vector;
     }
@@ -598,7 +598,7 @@ public:
     //! \{
 
     //! return pointer to vector containing iterator
-    const vector_type* parent_vector() const
+    const vector_type * parent_vector() const
     {
         return p_vector;
     }
@@ -865,10 +865,10 @@ public:
     typedef vector_bufreader_reverse<const_iterator> bufreader_reverse_type;
 
     //! \internal
-    class bid_vector : public std::vector< BID<block_size> >
+    class bid_vector : public std::vector<BID<block_size> >
     {
     public:
-        typedef std::vector< BID<block_size> > super_type;
+        typedef std::vector<BID<block_size> > super_type;
         typedef typename super_type::size_type size_type;
         typedef typename super_type::value_type bid_type;
 
@@ -933,7 +933,7 @@ public:
     //! \param npages Number of cached pages.
     vector(size_type n = 0, unsigned_type npages = pager_type().size())
         : m_size(n),
-          m_bids((size_t)div_ceil(n, block_type::size)),
+          m_bids((size_t) div_ceil(n, block_type::size)),
           m_pager(npages),
           m_page_status(div_ceil(m_bids.size(), page_size)),
           m_page_to_slot(div_ceil(m_bids.size(), page_size)),
@@ -978,7 +978,7 @@ public:
     {
         //  numpages() might be zero
         if (!m_cache && numpages() > 0)
-            m_cache = new simple_vector<block_type> (numpages() * page_size);
+            m_cache = new simple_vector<block_type>(numpages() * page_size);
     }
 
     //! allows to free the cache, but you may not access any element until call
@@ -1051,8 +1051,8 @@ public:
                 (*it).storage = m_from;
                 (*it).offset = offset;
             }
-            STXXL_VERBOSE_VECTOR("reserve(): Changing size of file "
-                                 << ((void *)m_from) << " to " << offset);
+            STXXL_VERBOSE_VECTOR("reserve(): Changing size of file " <<
+                                 ((void *)m_from) << " to " << offset);
             m_from->set_size(offset);
         }
     }
@@ -1110,10 +1110,10 @@ private:
         {
             unsigned_type new_pages_size = div_ceil(new_bids_size, page_size);
 
-            STXXL_VERBOSE_VECTOR("shrinking from " << old_bids_size << " to "
-                                 << new_bids_size << " blocks = from "
-                                 << m_page_status.size() << " to "
-                                 << new_pages_size << " pages");
+            STXXL_VERBOSE_VECTOR("shrinking from " << old_bids_size << " to " <<
+                                 new_bids_size << " blocks = from " <<
+                                 m_page_status.size() << " to " <<
+                                 new_pages_size << " pages");
 
             // release blocks
             if (m_from != NULL)
@@ -1202,7 +1202,7 @@ public:
     //! \c sizeof(ValueType) and the page size (4096).
     vector(file * from, size_type size = size_type(-1), unsigned_type npages = pager_type().size())
         : m_size((size == size_type(-1)) ? size_from_file_length(from->size()) : size),
-          m_bids((size_t)div_ceil(m_size, size_type(block_type::size))),
+          m_bids((size_t) div_ceil(m_size, size_type(block_type::size))),
           m_pager(npages),
           m_page_status(div_ceil(m_bids.size(), page_size)),
           m_page_to_slot(div_ceil(m_bids.size(), page_size)),
@@ -1248,11 +1248,11 @@ public:
     //! copy-constructor
     vector(const vector & obj)
         : m_size(obj.size()),
-          m_bids((size_t)div_ceil(obj.size(), block_type::size)),
-          m_pager(obj.numpages ()),
+          m_bids((size_t) div_ceil(obj.size(), block_type::size)),
+          m_pager(obj.numpages()),
           m_page_status(div_ceil(m_bids.size(), page_size)),
           m_page_to_slot(div_ceil(m_bids.size(), page_size)),
-          m_slot_to_page(obj.numpages ()),
+          m_slot_to_page(obj.numpages()),
           m_cache(NULL),
           m_from(NULL),
           m_exported(false)
@@ -1411,8 +1411,8 @@ public:
             int_type page_no = m_slot_to_page[i];
             if (non_free_slots[i])
             {
-                STXXL_VERBOSE_VECTOR("flush(): flushing page " << i << " at address "
-                                     << (int64(page_no) * int64(block_type::size) * int64(page_size)));
+                STXXL_VERBOSE_VECTOR("flush(): flushing page " << i << " at address " <<
+                                     (int64(page_no) * int64(block_type::size) * int64(page_size)));
                 write_page(page_no, i);
 
                 m_page_to_slot[page_no] = on_disk;
@@ -1443,8 +1443,8 @@ public:
             }
             else // file must be truncated
             {
-                STXXL_VERBOSE_VECTOR("~vector(): Changing size of file "
-                                     << ((void *)m_from) << " to " << file_length());
+                STXXL_VERBOSE_VECTOR("~vector(): Changing size of file " <<
+                                     ((void *)m_from) << " to " << file_length());
                 STXXL_VERBOSE_VECTOR("~vector(): size of the vector is " << size());
                 try
                 {
@@ -1500,7 +1500,7 @@ public:
     //! Number of pages used by the pager.
     inline unsigned_type numpages() const
     {
-      return m_pager.size ();
+        return m_pager.size();
     }
 
 private:
@@ -1584,9 +1584,9 @@ private:
         unsigned_type page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
         int_type cache_slot = m_page_to_slot[page_no];
-        if (cache_slot < 0)                                 // == on_disk
+        if (cache_slot < 0)                        // == on_disk
         {
-            if (m_free_slots.empty())                        // has to kick
+            if (m_free_slots.empty())              // has to kick
             {
                 int_type kicked_slot = m_pager.kick();
                 m_pager.hit(kicked_slot);
@@ -1664,9 +1664,9 @@ private:
         unsigned_type page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
         int_type cache_slot = m_page_to_slot[page_no];
-        if (cache_slot < 0)                                 // == on_disk
+        if (cache_slot < 0)                        // == on_disk
         {
-            if (m_free_slots.empty())                        // has to kick
+            if (m_free_slots.empty())              // has to kick
             {
                 int_type kicked_slot = m_pager.kick();
                 m_pager.hit(kicked_slot);
@@ -1705,7 +1705,7 @@ private:
         unsigned_type page_no = offset.get_block2();
         assert(page_no < m_page_to_slot.size());   // fails if offset is too large, out of bound access
         int_type cache_slot = m_page_to_slot[page_no];
-        return (cache_slot >= 0);                           // on_disk == -1
+        return (cache_slot >= 0);                  // on_disk == -1
     }
 };
 
@@ -1874,25 +1874,24 @@ public:
 
 protected:
     //! iterator to the beginning of the range.
-    vector_iterator             m_begin;
+    vector_iterator m_begin;
 
     //! internal "current" iterator into the vector.
-    vector_iterator             m_iter;
+    vector_iterator m_iter;
 
     //! iterator to the end of the range.
-    vector_iterator             m_end;
+    vector_iterator m_end;
 
     //! buffered input stream used to overlapped I/O.
-    buf_istream_type*           m_bufin;
+    buf_istream_type * m_bufin;
 
     //! number of blocks to use as buffers.
-    unsigned_type               m_nbuffers;
+    unsigned_type m_nbuffers;
 
     //! allow vector_bufreader_iterator to check m_iter against its current value
     friend class vector_bufreader_iterator<vector_bufreader>;
 
 public:
-
     //! Create overlapped reader for the given iterator range.
     //! \param begin iterator to position were to start reading in vector
     //! \param end iterator to position were to end reading in vector
@@ -1913,7 +1912,7 @@ public:
     //! Create overlapped reader for the whole vector's content.
     //! \param vec vector to read
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
-    vector_bufreader(const vector_type& vec, unsigned_type nbuffers = 0)
+    vector_bufreader(const vector_type & vec, unsigned_type nbuffers = 0)
         : m_begin(vec.begin()), m_end(vec.end()),
           m_bufin(NULL),
           m_nbuffers(nbuffers)
@@ -1974,17 +1973,18 @@ public:
         ++(*m_bufin);
 
         if (UNLIKELY(empty())) {
-            delete m_bufin; m_bufin = NULL;
+            delete m_bufin;
+            m_bufin = NULL;
         }
 
         return *this;
     }
 
     //! Read current item into variable and advance to next one.
-    vector_bufreader& operator >> (value_type& v)
+    vector_bufreader & operator >> (value_type & v)
     {
-        v = operator*();
-        operator++();
+        v = operator * ();
+        operator ++ ();
 
         return *this;
     }
@@ -2045,30 +2045,29 @@ public:
 
 protected:
     //! Buffered reader used to access elements in vector
-    vector_bufreader_type& m_bufreader;
+    vector_bufreader_type & m_bufreader;
 
     //! Use vector_iterator to reference a point in the vector.
     vector_iterator m_iter;
 
 public:
     //! Construct iterator using vector_iterator
-    vector_bufreader_iterator(vector_bufreader_type& bufreader, const vector_iterator& iter)
+    vector_bufreader_iterator(vector_bufreader_type & bufreader, const vector_iterator & iter)
         : m_bufreader(bufreader), m_iter(iter)
-    {
-    }
+    { }
 
     //! Return constant reference to current item
     const value_type & operator * () const
     {
         assert(m_bufreader.m_iter == m_iter);
-        return m_bufreader.operator*();
+        return m_bufreader.operator * ();
     }
 
     //! Return constant pointer to current item
     const value_type * operator -> () const
     {
         assert(m_bufreader.m_iter == m_iter);
-        return m_bufreader.operator->();
+        return m_bufreader.operator -> ();
     }
 
     //! Make bufreader advance to next item (asserts if !empty() or if iterator
@@ -2076,20 +2075,20 @@ public:
     vector_bufreader_iterator & operator ++ ()
     {
         assert(m_bufreader.m_iter == m_iter);
-        m_bufreader.operator++();
+        m_bufreader.operator ++ ();
         m_iter++;
         return *this;
     }
 
     //! Equality comparison operator
-    bool operator == (const vector_bufreader_iterator& vbi) const
+    bool operator == (const vector_bufreader_iterator & vbi) const
     {
         assert(&m_bufreader == &vbi.m_bufreader);
         return (m_iter == vbi.m_iter);
     }
 
     //! Inequality comparison operator
-    bool operator != (const vector_bufreader_iterator& vbi) const
+    bool operator != (const vector_bufreader_iterator & vbi) const
     {
         assert(&m_bufreader == &vbi.m_bufreader);
         return (m_iter != vbi.m_iter);
@@ -2139,22 +2138,21 @@ public:
 
 protected:
     //! iterator to the beginning of the range.
-    vector_iterator             m_begin;
+    vector_iterator m_begin;
 
     //! internal "current" iterator into the vector.
-    vector_iterator             m_iter;
+    vector_iterator m_iter;
 
     //! iterator to the end of the range.
-    vector_iterator             m_end;
+    vector_iterator m_end;
 
     //! buffered input stream used to overlapped I/O.
-    buf_istream_type*           m_bufin;
+    buf_istream_type * m_bufin;
 
     //! number of blocks to use as buffers.
-    unsigned_type               m_nbuffers;
+    unsigned_type m_nbuffers;
 
 public:
-
     //! Create overlapped reader for the given iterator range.
     //! \param begin iterator to position were to start reading in vector
     //! \param end iterator to position were to end reading in vector
@@ -2175,7 +2173,7 @@ public:
     //! Create overlapped reader for the whole vector's content.
     //! \param vec vector to read
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2*D recommended)
-    vector_bufreader_reverse(const vector_type& vec, unsigned_type nbuffers = 0)
+    vector_bufreader_reverse(const vector_type & vec, unsigned_type nbuffers = 0)
         : m_begin(vec.begin()), m_end(vec.end()),
           m_bufin(NULL),
           m_nbuffers(nbuffers)
@@ -2211,7 +2209,7 @@ public:
         else {
             // else, let ifstream_reverse skip last elements at end of block,
             // up to real end
-            for (; endoff != block_type::size; endoff++)
+            for ( ; endoff != block_type::size; endoff++)
                 ++(*m_bufin);
         }
     }
@@ -2242,17 +2240,18 @@ public:
         ++(*m_bufin);
 
         if (UNLIKELY(empty())) {
-            delete m_bufin; m_bufin = NULL;
+            delete m_bufin;
+            m_bufin = NULL;
         }
 
         return *this;
     }
 
     //! Read current item into variable and advance to next one.
-    vector_bufreader_reverse& operator >> (value_type& v)
+    vector_bufreader_reverse & operator >> (value_type & v)
     {
-        v = operator*();
-        operator++();
+        v = operator * ();
+        operator ++ ();
 
         return *this;
     }
@@ -2278,8 +2277,8 @@ public:
  *
  * This buffered writer can be used to write a large sequential region of a
  * vector using overlapped I/O. The object is created from an iterator range,
- * which can then be written to using operator<<(), or with operator*() and
- * operator++().
+ * which can then be written to using operator << (), or with operator * () and
+ * operator ++ ().
  *
  * The buffered writer is given one iterator in the constructor. When writing,
  * this iterator advances in the vector and will \b enlarge the vector once it
@@ -2315,25 +2314,24 @@ public:
     typedef buf_ostream<block_type, bids_container_iterator> buf_ostream_type;
 
 protected:
-
     //! internal iterator into the vector.
-    vector_iterator             m_iter;
+    vector_iterator m_iter;
 
     //! iterator to the current end of the vector.
-    vector_const_iterator       m_end;
+    vector_const_iterator m_end;
 
     //! boolean whether the vector was grown, will shorten at finish().
-    bool                        m_grown;
+    bool m_grown;
 
     //! iterator into vector of the last block accessed (used to issue updates
     //! when the block is switched).
-    vector_const_iterator       m_prevblk;
+    vector_const_iterator m_prevblk;
 
     //! buffered output stream used to overlapped I/O.
-    buf_ostream_type*           m_bufout;
+    buf_ostream_type * m_bufout;
 
     //! number of blocks to use as buffers.
-    unsigned_type               m_nbuffers;
+    unsigned_type m_nbuffers;
 
 public:
     //! Create overlapped writer beginning at the given iterator.
@@ -2342,7 +2340,7 @@ public:
     vector_bufwriter(vector_iterator begin,
                      unsigned_type nbuffers = 0)
         : m_iter(begin),
-          m_end( m_iter.parent_vector()->end() ),
+          m_end(m_iter.parent_vector()->end()),
           m_grown(false),
           m_bufout(NULL),
           m_nbuffers(nbuffers)
@@ -2350,16 +2348,16 @@ public:
         if (m_nbuffers == 0)
             m_nbuffers = 2 * config::get_instance()->disks_number();
 
-        assert( m_iter <= m_end );
+        assert(m_iter <= m_end);
     }
 
     //! Create overlapped writer for the vector's beginning
     //! \param vec vector to write
     //! \param nbuffers number of buffers used for overlapped I/O (>= 2D recommended)
-    vector_bufwriter(vector_type& vec,
+    vector_bufwriter(vector_type & vec,
                      unsigned_type nbuffers = 0)
         : m_iter(vec.begin()),
-          m_end( m_iter.parent_vector()->end() ),
+          m_end(m_iter.parent_vector()->end()),
           m_grown(false),
           m_bufout(NULL),
           m_nbuffers(nbuffers)
@@ -2367,7 +2365,7 @@ public:
         if (m_nbuffers == 0)
             m_nbuffers = 2 * config::get_instance()->disks_number();
 
-        assert( m_iter <= m_end );
+        assert(m_iter <= m_end);
     }
 
     //! Finish writing and flush output back to vector.
@@ -2393,7 +2391,7 @@ public:
                     m_iter.block_externally_updated();
             }
 
-            vector_type& v = *m_iter.parent_vector();
+            vector_type & v = *m_iter.parent_vector();
             if (v.size() < 2 * block_type::size) {
                 v.resize(2 * block_type::size);
             }
@@ -2404,7 +2402,7 @@ public:
             m_grown = true;
         }
 
-        assert( m_iter < m_end );
+        assert(m_iter < m_end);
 
         if (UNLIKELY(m_bufout == NULL))
         {
@@ -2438,26 +2436,26 @@ public:
             }
         }
 
-        return m_bufout->operator*();
+        return m_bufout->operator * ();
     }
 
     //! Advance internal iterator.
-    vector_bufwriter& operator ++ ()
+    vector_bufwriter & operator ++ ()
     {
         // always advance internal iterator
         ++m_iter;
 
         // if buf_ostream active, advance that too
-        if (LIKELY(m_bufout != NULL)) m_bufout->operator++();
+        if (LIKELY(m_bufout != NULL)) m_bufout->operator ++ ();
 
         return *this;
     }
 
     //! Write value to the current position and advance the internal iterator.
-    vector_bufwriter& operator << (const value_type& v)
+    vector_bufwriter & operator << (const value_type & v)
     {
-        operator*() = v;
-        operator++();
+        operator * () = v;
+        operator ++ ();
 
         return *this;
     }
@@ -2473,8 +2471,8 @@ public:
 
             while (const_out.block_offset() != 0)
             {
-                m_bufout->operator*() = *const_out;
-                m_bufout->operator++();
+                m_bufout->operator * () = *const_out;
+                m_bufout->operator ++ ();
                 ++const_out;
             }
 
@@ -2490,8 +2488,8 @@ public:
 
         if (m_grown)
         {
-            vector_type& v = *m_iter.parent_vector();
-            v.resize( m_iter - v.begin() );
+            vector_type & v = *m_iter.parent_vector();
+            v.resize(m_iter - v.begin());
 
             m_grown = false;
         }
@@ -2532,7 +2530,6 @@ struct VECTOR_GENERATOR
 __STXXL_END_NAMESPACE
 
 namespace std {
-
 template <
     typename ValueType,
     unsigned PageSize,
@@ -2545,7 +2542,6 @@ void swap(stxxl::vector<ValueType, PageSize, PagerType, BlockSize, AllocStr, Siz
 {
     a.swap(b);
 }
-
 } // namespace std
 
 #endif // !STXXL_CONTAINERS_VECTOR_HEADER

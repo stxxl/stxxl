@@ -23,8 +23,18 @@ my $launch_emacs = 0;
 # write changes to files (dangerous!)
 my $write_changes = 0;
 
+# function testing whether to uncrustify a path
+sub filter_uncrustify($) {
+    my ($path) = @_;
+
+    return 1 if $path eq "include/stxxl/bits/containers/vector.h";
+
+    return 0;
+}
+
 use strict;
 use warnings;
+use Text::Diff;
 
 my %includemap;
 my %authormap;
@@ -52,6 +62,31 @@ sub expect_re($$\$$) {
 
     if ($$str !~ m/$expect/) {
         expect_error($path,$ln,$$str,"/$expect/");
+    }
+}
+
+# run $text through a external pipe (@program)
+sub filter_program {
+    my $text = shift;
+    my @program = @_;
+
+    # fork and read output
+    my $child1 = open(my $fh, "-|") // die("$0: fork: $!");
+    if ($child1 == 0) {
+        # fork and print text
+        my $child2 = open(STDIN, "-|") // die("$0: fork: $!");
+        if ($child2 == 0) {
+            print $text;
+            exit;
+        }
+        else {
+            exec(@program) or die("$0: exec: $!");
+        }
+    }
+    else {
+        my @output = <$fh>;
+        close($fh) or warn("$0: close: $!");
+        return @output;
     }
 }
 
@@ -136,6 +171,18 @@ sub process_cpp {
         my $n = scalar(@data)-1;
         if ($data[$n] =~ m!// vim:!) { --$n; } # skip vim
         expect($path, $n, $data[$n], "#endif // !$guard\n");
+    }
+
+    # run uncrustify if in filter
+    if (filter_uncrustify($path))
+    {
+        my $data = join("", @data);
+        my @uncrust = filter_program($data, "uncrustify", "-q", "-c", "misc/uncrustify.cfg", "-l", "CPP");
+
+        if (@data != @uncrust) {
+            print diff(\@data, \@uncrust);
+            @data = @uncrust;
+        }
     }
 
     if ($write_changes)
