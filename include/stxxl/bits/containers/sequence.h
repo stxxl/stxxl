@@ -36,7 +36,7 @@ __STXXL_BEGIN_NAMESPACE
 //! \{
 
 //! \brief External sequence or deque container without random access. \n
-//! <b> Introduction </b> to sequence container: see \ref tutorial_sequence tutorial. \n 
+//! <b> Introduction </b> to sequence container: see \ref tutorial_sequence tutorial. \n
 //! <b> Design and Internals </b> of sequence container: see \ref design_queue
 
 /**
@@ -50,7 +50,7 @@ __STXXL_BEGIN_NAMESPACE
  * As with queue and stack, sequences of pushes and pops are made efficient
  * using overlapping or read-ahead via block pools. The stream access likewise
  * uses overlapped I/O, just like stream::vector_iterator2stream.
- * 
+ *
  * \tparam ValueType type of the contained objects (POD with no references to internal memory)
  * \tparam BlockSize size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)
  * \tparam AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
@@ -85,13 +85,13 @@ private:
     bool m_owns_pool;
 
     /// read_write_pool of blocks
-    pool_type* m_pool;
+    pool_type * m_pool;
 
     /// current front block of sequence
-    block_type* m_front_block;
+    block_type * m_front_block;
 
     /// current back block of sequence
-    block_type* m_back_block;
+    block_type * m_back_block;
 
     /// pointer to current front element in m_front_block
     value_type * m_front_element;
@@ -109,7 +109,7 @@ private:
     bid_deque_type m_bids;
 
     /// block manager used
-    block_manager* m_bm;
+    block_manager * m_bm;
 
     /// number of blocks to prefetch
     unsigned_type m_blocks2prefetch;
@@ -118,7 +118,7 @@ public:
     //! Constructs empty sequence with own write and prefetch block pool
     //!
     //! \param D  number of parallel disks, defaulting to the configured number of scratch disks,
-    //!           memory consumption will be 2 * D + 2 blocks 
+    //!           memory consumption will be 2 * D + 2 blocks
     //!           (first and last block, D blocks as write cache, D block for prefetching)
     explicit sequence(int_type D = -1) :
         m_size(0),
@@ -166,7 +166,7 @@ public:
         init(blocks2prefetch);
     }
 
-    void swap(sequence& obj)
+    void swap(sequence & obj)
     {
         std::swap(m_size, obj.m_size);
         std::swap(m_owns_pool, obj.m_owns_pool);
@@ -234,7 +234,7 @@ public:
             {
                 STXXL_VERBOSE1("sequence::push_front Case 0");
                 assert(m_front_block == m_back_block);
-                m_front_element = m_back_element = m_front_block->end()-1;
+                m_front_element = m_back_element = m_front_block->end() - 1;
                 *m_front_element = val;
                 ++m_size;
                 return;
@@ -251,9 +251,9 @@ public:
                 STXXL_VERBOSE1("sequence::push_front Case 1.5");
                 // only two blocks with a gap at the end, move elements within memory
                 assert(m_bids.empty());
-                size_t gap = m_back_block->end() - (m_back_element+1);
+                size_t gap = m_back_block->end() - (m_back_element + 1);
                 assert(gap > 0);
-                std::copy_backward(m_back_block->begin(), m_back_element+1, m_back_block->end());
+                std::copy_backward(m_back_block->begin(), m_back_element + 1, m_back_block->end());
                 std::copy_backward(m_front_block->end() - gap, m_front_block->end(), m_back_block->begin() + gap);
                 std::copy_backward(m_front_block->begin(), m_front_block->end() - gap, m_front_block->end());
                 m_front_element += gap;
@@ -283,7 +283,7 @@ public:
             }
 
             m_front_block = m_pool->steal();
-            m_front_element = m_front_block->end()-1;
+            m_front_element = m_front_block->end() - 1;
             *m_front_element = val;
             ++m_size;
         }
@@ -457,7 +457,7 @@ public:
             for (unsigned_type i = 1; i < m_blocks2prefetch && i < m_bids.size() - 1; ++i)
             {
                 STXXL_VERBOSE1("sequence::pop_front Case Hints");
-                m_pool->hint(m_bids[m_bids.size()-1 - i]);
+                m_pool->hint(m_bids[m_bids.size() - 1 - i]);
             }
 
             m_back_element = m_back_block->end() - 1;
@@ -532,26 +532,23 @@ public:
     class stream
     {
     public:
-
         typedef typename sequence::value_type value_type;
 
         typedef typename bid_deque_type::const_iterator bid_iter_type;
 
     protected:
+        const sequence & m_sequence;
 
-        const sequence&       m_sequence;
+        size_type m_size;
 
-        size_type           m_size;
+        value_type * m_current_element;
 
-        value_type*         m_current_element;
+        block_type * m_current_block;
 
-        block_type*         m_current_block;
-
-        bid_iter_type       m_next_bid;
+        bid_iter_type m_next_bid;
 
     public:
-
-        stream(const sequence& sequence)
+        stream(const sequence & sequence)
             : m_sequence(sequence),
               m_size(sequence.size())
         {
@@ -562,8 +559,8 @@ public:
 
         ~stream()
         {
-            if ( m_current_block != m_sequence.m_front_block &&
-                 m_current_block != m_sequence.m_back_block ) // give m_current_block back to pool
+            if (m_current_block != m_sequence.m_front_block &&
+                m_current_block != m_sequence.m_back_block)   // give m_current_block back to pool
                 m_sequence.m_pool->add(m_current_block);
         }
 
@@ -580,14 +577,14 @@ public:
         }
 
         //! standard stream method
-        const value_type& operator*() const
+        const value_type & operator * () const
         {
             assert(!empty());
             return *m_current_element;
         }
 
         //! standard stream method
-        stream& operator++()
+        stream & operator ++ ()
         {
             assert(!empty());
 
@@ -599,8 +596,8 @@ public:
                 if (m_size == 0)
                 {
                     STXXL_VERBOSE1("sequence::stream::operator++ last block finished clean at block end");
-                    assert( m_next_bid == m_sequence.m_bids.end() );
-                    assert( m_current_block == m_sequence.m_back_block );
+                    assert(m_next_bid == m_sequence.m_bids.end());
+                    assert(m_current_block == m_sequence.m_back_block);
                     // nothing to give back to sequence pool
                     m_current_element = NULL;
                     return *this;
@@ -608,7 +605,7 @@ public:
                 else if (m_size <= block_type::size)    // still items left in last partial block
                 {
                     STXXL_VERBOSE1("sequence::stream::operator++ reached last block");
-                    assert( m_next_bid == m_sequence.m_bids.end() );
+                    assert(m_next_bid == m_sequence.m_bids.end());
                     // the m_back_block is the next block
                     if (m_current_block != m_sequence.m_front_block) // give current_block back to pool
                         m_sequence.m_pool->add(m_current_block);
@@ -624,12 +621,12 @@ public:
 
                 STXXL_VERBOSE1("sequence::stream::operator++ default case: fetch next block");
 
-                assert( m_next_bid != m_sequence.m_bids.end() );
+                assert(m_next_bid != m_sequence.m_bids.end());
                 request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
                 STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::stream::operator++ read block " << m_current_block << " @ " << FMT_BID(*m_next_bid));
 
                 // give prefetching hints
-                bid_iter_type bid = m_next_bid+1;
+                bid_iter_type bid = m_next_bid + 1;
                 for (unsigned_type i = 0; i < m_sequence.m_blocks2prefetch && bid != m_sequence.m_bids.end(); ++i, ++bid)
                 {
                     STXXL_VERBOSE1("sequence::stream::operator++ giving prefetch hints");
@@ -661,26 +658,23 @@ public:
     class reverse_stream
     {
     public:
-
         typedef typename sequence::value_type value_type;
 
         typedef typename bid_deque_type::const_reverse_iterator bid_iter_type;
 
     protected:
+        const sequence & m_sequence;
 
-        const sequence&       m_sequence;
+        size_type m_size;
 
-        size_type           m_size;
+        value_type * m_current_element;
 
-        value_type*         m_current_element;
+        block_type * m_current_block;
 
-        block_type*         m_current_block;
-
-        bid_iter_type       m_next_bid;
+        bid_iter_type m_next_bid;
 
     public:
-
-        reverse_stream(const sequence& sequence)
+        reverse_stream(const sequence & sequence)
             : m_sequence(sequence),
               m_size(sequence.size())
         {
@@ -691,8 +685,8 @@ public:
 
         ~reverse_stream()
         {
-            if ( m_current_block != m_sequence.m_front_block &&
-                 m_current_block != m_sequence.m_back_block ) // give m_current_block back to pool
+            if (m_current_block != m_sequence.m_front_block &&
+                m_current_block != m_sequence.m_back_block)   // give m_current_block back to pool
                 m_sequence.m_pool->add(m_current_block);
         }
 
@@ -709,14 +703,14 @@ public:
         }
 
         //! standard stream method
-        const value_type& operator*() const
+        const value_type & operator * () const
         {
             assert(!empty());
             return *m_current_element;
         }
 
         //! standard stream method
-        reverse_stream& operator++()
+        reverse_stream & operator ++ ()
         {
             assert(!empty());
 
@@ -728,8 +722,8 @@ public:
                 if (m_size == 0)
                 {
                     STXXL_VERBOSE1("sequence::reverse_stream::operator++ last block finished clean at block begin");
-                    assert( m_next_bid == m_sequence.m_bids.rend() );
-                    assert( m_current_block == m_sequence.m_front_block );
+                    assert(m_next_bid == m_sequence.m_bids.rend());
+                    assert(m_current_block == m_sequence.m_front_block);
                     // nothing to give back to sequence pool
                     m_current_element = NULL;
                     return *this;
@@ -737,7 +731,7 @@ public:
                 else if (m_size <= block_type::size)
                 {
                     STXXL_VERBOSE1("sequence::reverse_stream::operator++ reached first block");
-                    assert( m_next_bid == m_sequence.m_bids.rend() );
+                    assert(m_next_bid == m_sequence.m_bids.rend());
                     // the m_back_block is the next block
                     if (m_current_block != m_sequence.m_back_block) // give current_block back to pool
                         m_sequence.m_pool->add(m_current_block);
@@ -753,12 +747,12 @@ public:
 
                 STXXL_VERBOSE1("sequence::reverse_stream::operator++ default case: fetch previous block");
 
-                assert( m_next_bid != m_sequence.m_bids.rend() );
+                assert(m_next_bid != m_sequence.m_bids.rend());
                 request_ptr req = m_sequence.m_pool->read(m_current_block, *m_next_bid);
                 STXXL_VERBOSE_SEQUENCE("sequence[" << this << "]::reverse_stream::operator++ read block " << m_current_block << " @ " << FMT_BID(*m_next_bid));
 
                 // give prefetching hints
-                bid_iter_type bid = m_next_bid+1;
+                bid_iter_type bid = m_next_bid + 1;
                 for (unsigned_type i = 0; i < m_sequence.m_blocks2prefetch && bid != m_sequence.m_bids.rend(); ++i, ++bid)
                 {
                     STXXL_VERBOSE1("sequence::reverse_stream::operator++ giving prefetch hints");

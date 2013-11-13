@@ -39,7 +39,7 @@ __STXXL_BEGIN_NAMESPACE
  * In the first phase the container is filled with unordered items via push(),
  * which are presorted internally into runs of size M. When the internal memory
  * overflows a runs is written to external memory in blocks of block_size.
- * 
+ *
  * When sort() is called the container enters the output phase and push() is
  * disallowed. After calling sort() the items can be read in sorted order using
  * operator*() to get the top item, operator++() to advance to the next one and
@@ -77,48 +77,44 @@ public:
     // *** Constructed Types
 
     //! runs creator type with push() method
-    typedef stream::runs_creator< stream::use_push<ValueType>, cmp_type,
-                                  block_size, alloc_strategy_type > runs_creator_type;
+    typedef stream::runs_creator<stream::use_push<ValueType>, cmp_type,
+                                 block_size, alloc_strategy_type> runs_creator_type;
 
     //! corresponding runs merger type
-    typedef stream::runs_merger< typename runs_creator_type::sorted_runs_type,
-                                 cmp_type, alloc_strategy_type > runs_merger_type;
+    typedef stream::runs_merger<typename runs_creator_type::sorted_runs_type,
+                                cmp_type, alloc_strategy_type> runs_merger_type;
 
 protected:
-
     // *** Object Attributes
 
     //! current state of sorter
     enum { STATE_INPUT, STATE_OUTPUT } m_state;
 
     //! runs creator object holding all items
-    runs_creator_type   m_runs_creator;
+    runs_creator_type m_runs_creator;
 
     //! runs merger reading items when in STATE_OUTPUT
-    runs_merger_type    m_runs_merger;
+    runs_merger_type m_runs_merger;
 
 public:
-
     //! Constructor allocation memory_to_use bytes in ram for sorted runs.
-    sorter(const cmp_type& cmp, unsigned_type memory_to_use)
-        : m_state(STATE_INPUT), 
+    sorter(const cmp_type & cmp, unsigned_type memory_to_use)
+        : m_state(STATE_INPUT),
           m_runs_creator(cmp, memory_to_use),
           m_runs_merger(cmp, memory_to_use)
-    {
-    }
+    { }
 
     //! Constructor variant with differently sizes runs_creator and runs_merger
-    sorter(const cmp_type& cmp, unsigned_type creator_memory_to_use, unsigned_type merger_memory_to_use)
-        : m_state(STATE_INPUT), 
+    sorter(const cmp_type & cmp, unsigned_type creator_memory_to_use, unsigned_type merger_memory_to_use)
+        : m_state(STATE_INPUT),
           m_runs_creator(cmp, creator_memory_to_use),
           m_runs_merger(cmp, merger_memory_to_use)
-    {
-    }
+    { }
 
     //! Remove all items and return to input state.
     void clear()
     {
-        if ( m_state == STATE_OUTPUT )
+        if (m_state == STATE_OUTPUT)
             m_runs_merger.deallocate();
 
         m_runs_creator.allocate();
@@ -128,10 +124,10 @@ public:
     //! Push another item (only callable during input state).
     void push(const value_type & val)
     {
-        assert( m_state == STATE_INPUT );
+        assert(m_state == STATE_INPUT);
         m_runs_creator.push(val);
     }
-    
+
     //! Finish push input state and deallocate input buffer.
     void finish()
     {
@@ -158,7 +154,7 @@ public:
     //! Number of items pushed or items remaining to be read.
     unsigned_type size() const
     {
-        if ( m_state == STATE_INPUT )
+        if (m_state == STATE_INPUT)
             return m_runs_creator.size();
         else
             return m_runs_merger.size();
@@ -187,7 +183,7 @@ public:
     //! Switch to output state, rewind() in case the output was already sorted.
     void sort_reuse()
     {
-        assert( m_state == STATE_INPUT );
+        assert(m_state == STATE_INPUT);
 
         m_runs_merger.initialize(m_runs_creator.result());
         m_state = STATE_OUTPUT;
@@ -196,7 +192,7 @@ public:
     //! Rewind output stream to beginning.
     void rewind()
     {
-        assert( m_state == STATE_OUTPUT );
+        assert(m_state == STATE_OUTPUT);
 
         m_runs_merger.deallocate();
 
@@ -213,27 +209,27 @@ public:
     //! Standard stream method
     bool empty() const
     {
-        assert( m_state == STATE_OUTPUT );
+        assert(m_state == STATE_OUTPUT);
         return m_runs_merger.empty();
     }
 
     //! Standard stream method
-    const value_type& operator * () const
+    const value_type & operator * () const
     {
-        assert( m_state == STATE_OUTPUT );
+        assert(m_state == STATE_OUTPUT);
         return *m_runs_merger;
     }
 
     //! Standard stream method
-    const value_type* operator -> () const
+    const value_type * operator -> () const
     {
         return &(operator * ());
     }
 
     //! Standard stream method (preincrement operator)
-    sorter& operator ++ ()
+    sorter & operator ++ ()
     {
-        assert( m_state == STATE_OUTPUT );
+        assert(m_state == STATE_OUTPUT);
         ++m_runs_merger;
         return *this;
     }
