@@ -72,7 +72,7 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \defgroup stlcontinternals Internals
+//! \defgroup stlcontinternals internals
 //! \ingroup stlcont
 //! Supporting internal classes
 //! \{

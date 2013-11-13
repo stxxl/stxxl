@@ -20,16 +20,15 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-namespace btree
-{
-    template <class KeyType,
-              class DataType,
-              class CompareType,
-              unsigned LogNodeSize,
-              unsigned LogLeafSize,
-              class PDAllocStrategy
-              >
-    class btree;
+namespace btree {
+template <class KeyType,
+          class DataType,
+          class CompareType,
+          unsigned LogNodeSize,
+          unsigned LogLeafSize,
+          class PDAllocStrategy
+          >
+class btree;
 }
 
 //! \addtogroup stlcont
@@ -446,21 +445,20 @@ inline bool operator >= (const map<KeyType, DataType, CompareType, RawNodeSize, 
 
 __STXXL_END_NAMESPACE
 
-namespace std
+namespace std {
+template <class KeyType,
+          class DataType,
+          class CompareType,
+          unsigned RawNodeSize,
+          unsigned RawLeafSize,
+          class PDAllocStrategy
+          >
+void swap(stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
+          stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b
+          )
 {
-    template <class KeyType,
-              class DataType,
-              class CompareType,
-              unsigned RawNodeSize,
-              unsigned RawLeafSize,
-              class PDAllocStrategy
-              >
-    void swap(stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & a,
-              stxxl::map<KeyType, DataType, CompareType, RawNodeSize, RawLeafSize, PDAllocStrategy> & b
-              )
-    {
-        a.swap(b);
-    }
+    a.swap(b);
+}
 }
 
 #endif // !STXXL_CONTAINERS_MAP_HEADER

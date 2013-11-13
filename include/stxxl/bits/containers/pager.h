@@ -108,14 +108,13 @@ public:
 
 __STXXL_END_NAMESPACE
 
-namespace std
+namespace std {
+template <unsigned npages_>
+void swap(stxxl::lru_pager<npages_> & a,
+          stxxl::lru_pager<npages_> & b)
 {
-    template <unsigned npages_>
-    void swap(stxxl::lru_pager<npages_> & a,
-              stxxl::lru_pager<npages_> & b)
-    {
-        a.swap(b);
-    }
+    a.swap(b);
+}
 }
 
 #endif // !STXXL_CONTAINERS_PAGER_HEADER

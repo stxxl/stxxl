@@ -31,7 +31,9 @@
 
 __STXXL_BEGIN_NAMESPACE
 
-//! \addtogroup stlcontinternals
+//! \defgroup stlcont_stack stack
+//! \ingroup stlcont
+//! External stack implementations
 //! \{
 
 template <class ValueType,
@@ -77,7 +79,7 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
-    size_type size_;
+    size_type m_size;
     unsigned_type cache_offset;
     value_type * current_element;
     simple_vector<block_type> cache;
@@ -89,7 +91,7 @@ private:
 public:
     //! Default constructor: creates empty stack.
     normal_stack() :
-        size_(0),
+        m_size(0),
         cache_offset(0),
         current_element(NULL),
         cache(blocks_per_page * 2),
@@ -102,7 +104,7 @@ public:
 
     void swap(normal_stack & obj)
     {
-        std::swap(size_, obj.size_);
+        std::swap(m_size, obj.m_size);
         std::swap(cache_offset, obj.cache_offset);
         std::swap(current_element, obj.current_element);
         std::swap(cache, obj.cache);
@@ -117,7 +119,7 @@ public:
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class stack_type>
     normal_stack(const stack_type & stack_) :
-        size_(0),
+        m_size(0),
         cache_offset(0),
         current_element(NULL),
         cache(blocks_per_page * 2),
@@ -151,20 +153,20 @@ public:
     //! Returns the number of elements contained in the stack
     size_type size() const
     {
-        return size_;
+        return m_size;
     }
 
     //! Returns true if the stack is empty.
     bool empty() const
     {
-        return (!size_);
+        return (!m_size);
     }
 
     //! Return mutable reference to the element at the top of the
     //! stack. Precondition: stack is not empty().
     value_type & top()
     {
-        assert(size_ > 0);
+        assert(m_size > 0);
         return (*current_element);
     }
 
@@ -172,7 +174,7 @@ public:
     //! stack. Precondition: stack is not empty().
     const value_type & top() const
     {
-        assert(size_ > 0);
+        assert(m_size > 0);
         return (*current_element);
     }
 
@@ -185,7 +187,7 @@ public:
 
         if (UNLIKELY(cache_offset == 2 * blocks_per_page * block_type::size))  // cache overflow
         {
-            STXXL_VERBOSE2("growing, size: " << size_);
+            STXXL_VERBOSE2("growing, size: " << m_size);
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -205,7 +207,7 @@ public:
 
             cache_offset = blocks_per_page * block_type::size + 1;
             current_element = &((*front_page)[0]);
-            ++size_;
+            ++m_size;
 
             wait_all(requests.begin(), blocks_per_page);
 
@@ -216,7 +218,7 @@ public:
 
         current_element = element(cache_offset);
         *current_element = val;
-        ++size_;
+        ++m_size;
         ++cache_offset;
     }
 
@@ -226,11 +228,11 @@ public:
     {
         assert(cache_offset <= 2 * blocks_per_page * block_type::size);
         assert(cache_offset > 0);
-        assert(size_ > 0);
+        assert(m_size > 0);
 
         if (UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
         {
-            STXXL_VERBOSE2("shrinking, size: " << size_);
+            STXXL_VERBOSE2("shrinking, size: " << m_size);
 
             simple_vector<request_ptr> requests(blocks_per_page);
 
@@ -245,7 +247,7 @@ public:
             std::swap(front_page, back_page);
 
             cache_offset = blocks_per_page * block_type::size;
-            --size_;
+            --m_size;
             current_element = &((*(back_page + (blocks_per_page - 1)))[block_type::size - 1]);
 
             wait_all(requests.begin(), blocks_per_page);
@@ -256,7 +258,7 @@ public:
             return;
         }
 
-        --size_;
+        --m_size;
 
         current_element = element((--cache_offset) - 1);
     }
@@ -299,7 +301,7 @@ public:
     typedef BID<block_size> bid_type;
 
 private:
-    size_type size_;
+    size_type m_size;
     unsigned_type cache_offset;
     value_type * current_element;
     simple_vector<block_type> cache;
@@ -312,7 +314,7 @@ private:
 public:
     //! Default constructor: creates empty stack.
     grow_shrink_stack() :
-        size_(0),
+        m_size(0),
         cache_offset(0),
         current_element(NULL),
         cache(blocks_per_page * 2),
@@ -326,7 +328,7 @@ public:
 
     void swap(grow_shrink_stack & obj)
     {
-        std::swap(size_, obj.size_);
+        std::swap(m_size, obj.m_size);
         std::swap(cache_offset, obj.cache_offset);
         std::swap(current_element, obj.current_element);
         std::swap(cache, obj.cache);
@@ -342,7 +344,7 @@ public:
     //! have a copy constructor, \c top() and \c pop() methods )
     template <class stack_type>
     grow_shrink_stack(const stack_type & stack_) :
-        size_(0),
+        m_size(0),
         cache_offset(0),
         current_element(NULL),
         cache(blocks_per_page * 2),
@@ -383,20 +385,20 @@ public:
     //! Returns the number of elements contained in the stack
     size_type size() const
     {
-        return size_;
+        return m_size;
     }
 
     //! Returns true if the stack is empty.
     bool empty() const
     {
-        return (!size_);
+        return (!m_size);
     }
 
     //! Return mutable reference to the element at the top of the
     //! stack. Precondition: stack is not empty().
     value_type & top()
     {
-        assert(size_ > 0);
+        assert(m_size > 0);
         return (*current_element);
     }
 
@@ -404,7 +406,7 @@ public:
     //! stack. Precondition: stack is not empty().
     const value_type & top() const
     {
-        assert(size_ > 0);
+        assert(m_size > 0);
         return (*current_element);
     }
 
@@ -417,7 +419,7 @@ public:
 
         if (UNLIKELY(cache_offset == blocks_per_page * block_type::size))  // cache overflow
         {
-            STXXL_VERBOSE2("growing, size: " << size_);
+            STXXL_VERBOSE2("growing, size: " << m_size);
 
             bids.resize(bids.size() + blocks_per_page);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - blocks_per_page;
@@ -437,7 +439,7 @@ public:
 
             cache_offset = 1;
             current_element = &((*cache_buffers)[0]);
-            ++size_;
+            ++m_size;
 
             *current_element = val;
 
@@ -446,7 +448,7 @@ public:
 
         current_element = &((*(cache_buffers + cache_offset / block_type::size))[cache_offset % block_type::size]);
         *current_element = val;
-        ++size_;
+        ++m_size;
         ++cache_offset;
     }
 
@@ -456,11 +458,11 @@ public:
     {
         assert(cache_offset <= blocks_per_page * block_type::size);
         assert(cache_offset > 0);
-        assert(size_ > 0);
+        assert(m_size > 0);
 
         if (UNLIKELY(cache_offset == 1 && bids.size() >= blocks_per_page))
         {
-            STXXL_VERBOSE2("shrinking, size: " << size_);
+            STXXL_VERBOSE2("shrinking, size: " << m_size);
 
             if (requests[0].get())
                 wait_all(requests.begin(), blocks_per_page);
@@ -470,7 +472,7 @@ public:
 
             if (bids.size() > blocks_per_page)
             {
-                STXXL_VERBOSE2("prefetching, size: " << size_);
+                STXXL_VERBOSE2("prefetching, size: " << m_size);
                 typename std::vector<bid_type>::const_iterator cur_bid = bids.end() - blocks_per_page;
                 for (int i = blocks_per_page - 1; i >= 0; --i)
                     requests[i] = (overlap_buffers + i)->read(*(--cur_bid));
@@ -480,13 +482,13 @@ public:
             bids.resize(bids.size() - blocks_per_page);
 
             cache_offset = blocks_per_page * block_type::size;
-            --size_;
+            --m_size;
             current_element = &((*(cache_buffers + (blocks_per_page - 1)))[block_type::size - 1]);
 
             return;
         }
 
-        --size_;
+        --m_size;
         unsigned_type cur_offset = (--cache_offset) - 1;
         current_element = &((*(cache_buffers + cur_offset / block_type::size))[cur_offset % block_type::size]);
     }
@@ -516,7 +518,7 @@ public:
 private:
     typedef read_write_pool<block_type> pool_type;
 
-    size_type size_;
+    size_type m_size;
     unsigned_type cache_offset;
     block_type * cache;
     std::vector<bid_type> bids;
@@ -533,7 +535,7 @@ public:
     grow_shrink_stack2(
         pool_type & pool_,
         unsigned_type prefetch_aggressiveness = 0)
-        : size_(0),
+        : m_size(0),
           cache_offset(0),
           cache(new block_type),
           pref_aggr(prefetch_aggressiveness),
@@ -552,10 +554,10 @@ public:
     //! \param w_pool_ write pool, that will be used for block writing
     //! \param prefetch_aggressiveness number of blocks that will be used from prefetch pool
     _STXXL_DEPRECATED(grow_shrink_stack2(
-        prefetch_pool<block_type> & p_pool_,
-        write_pool<block_type> & w_pool_,
-        unsigned_type prefetch_aggressiveness = 0)) :
-        size_(0),
+                          prefetch_pool<block_type> & p_pool_,
+                          write_pool<block_type> & w_pool_,
+                          unsigned_type prefetch_aggressiveness = 0)) :
+        m_size(0),
         cache_offset(0),
         cache(new block_type),
         pref_aggr(prefetch_aggressiveness),
@@ -567,7 +569,7 @@ public:
 
     void swap(grow_shrink_stack2 & obj)
     {
-        std::swap(size_, obj.size_);
+        std::swap(m_size, obj.m_size);
         std::swap(cache_offset, obj.cache_offset);
         std::swap(cache, obj.cache);
         std::swap(bids, obj.bids);
@@ -613,13 +615,13 @@ public:
     //! Returns the number of elements contained in the stack
     size_type size() const
     {
-        return size_;
+        return m_size;
     }
 
     //! Returns true if the stack is empty.
     bool empty() const
     {
-        return (!size_);
+        return (!m_size);
     }
 
     //! Inserts an element at the top of the stack. Postconditions: size() is
@@ -631,7 +633,7 @@ public:
 
         if (UNLIKELY(cache_offset == block_type::size))
         {
-            STXXL_VERBOSE2("grow_shrink_stack2::push(" << val << ") growing, size: " << size_);
+            STXXL_VERBOSE2("grow_shrink_stack2::push(" << val << ") growing, size: " << m_size);
 
             bids.resize(bids.size() + 1);
             typename std::vector<bid_type>::iterator cur_bid = bids.end() - 1;
@@ -648,7 +650,7 @@ public:
             cache_offset = 0;
         }
         (*cache)[cache_offset] = val;
-        ++size_;
+        ++m_size;
         ++cache_offset;
 
         assert(cache_offset > 0);
@@ -659,7 +661,7 @@ public:
     //! stack. Precondition: stack is not empty().
     value_type & top()
     {
-        assert(size_ > 0);
+        assert(m_size > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
         return (*cache)[cache_offset - 1];
@@ -669,7 +671,7 @@ public:
     //! stack. Precondition: stack is not empty().
     const value_type & top() const
     {
-        assert(size_ > 0);
+        assert(m_size > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
         return (*cache)[cache_offset - 1];
@@ -680,12 +682,12 @@ public:
     void pop()
     {
         STXXL_VERBOSE3("grow_shrink_stack2::pop()");
-        assert(size_ > 0);
+        assert(m_size > 0);
         assert(cache_offset > 0);
         assert(cache_offset <= block_type::size);
         if (UNLIKELY(cache_offset == 1 && (!bids.empty())))
         {
-            STXXL_VERBOSE2("grow_shrink_stack2::pop() shrinking, size = " << size_);
+            STXXL_VERBOSE2("grow_shrink_stack2::pop() shrinking, size = " << m_size);
 
             bid_type last_block = bids.back();
             bids.pop_back();
@@ -696,7 +698,7 @@ public:
         }
 
         --cache_offset;
-        --size_;
+        --m_size;
     }
 
     //! Sets level of prefetch aggressiveness (number of blocks from the
@@ -863,12 +865,6 @@ public:
     }
 };
 
-//! \}
-
-
-//! \addtogroup stlcont
-//! \{
-
 enum stack_externality { external, migrating, internal };
 enum stack_behaviour { normal, grow_shrink, grow_shrink2 };
 
@@ -939,8 +935,7 @@ public:
 __STXXL_END_NAMESPACE
 
 
-namespace std
-{
+namespace std {
 template <class StackConfig>
 void swap(stxxl::normal_stack<StackConfig> & a,
           stxxl::normal_stack<StackConfig> & b)

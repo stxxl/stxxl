@@ -27,7 +27,7 @@ my $write_changes = 0;
 sub filter_uncrustify($) {
     my ($path) = @_;
 
-    return 1 if $path =~ m"include/stxxl/bits/containers/(vector|sequence|sorter).h";
+    return 1 if $path =~ m"include/stxxl/bits/containers/(vector|sequence|sorter|queue|stack|deque|map|pager).h";
 
     return 0;
 }

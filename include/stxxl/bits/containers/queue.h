@@ -37,27 +37,26 @@ __STXXL_BEGIN_NAMESPACE
 //! \addtogroup stlcont
 //! \{
 
-
 //! External FIFO queue container. \n
 //! <b> Introduction </b> to queue container: see \ref tutorial_queue tutorial\n
 //! <b> Design and Internals </b> of queue container: see \ref design_queue.
 //!
-//! \tparam ValTp type of the contained objects (POD with no references to internal memory)
-//! \tparam BlkSz size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValTp)
+//! \tparam ValueType type of the contained objects (POD with no references to internal memory)
+//! \tparam BlockSize size of the external memory block in bytes, default is \c STXXL_DEFAULT_BLOCK_SIZE(ValueType)
 //! \tparam AllocStr parallel disk allocation strategy, default is \c STXXL_DEFAULT_ALLOC_STRATEGY
-//! \tparam SzTp size data type, default is \c stxxl::uint64
-template <class ValTp,
-          unsigned BlkSz = STXXL_DEFAULT_BLOCK_SIZE(ValTp),
+//! \tparam SizeType size data type, default is \c stxxl::uint64
+template <class ValueType,
+          unsigned BlockSize = STXXL_DEFAULT_BLOCK_SIZE(ValueType),
           class AllocStr = STXXL_DEFAULT_ALLOC_STRATEGY,
-          class SzTp = stxxl::uint64>
+          class SizeType = stxxl::uint64>
 class queue : private noncopyable
 {
 public:
-    typedef ValTp value_type;
+    typedef ValueType value_type;
     typedef AllocStr alloc_strategy_type;
-    typedef SzTp size_type;
+    typedef SizeType size_type;
     enum {
-        block_size = BlkSz
+        block_size = BlockSize
     };
 
     typedef typed_block<block_size, value_type> block_type;
@@ -66,7 +65,7 @@ public:
 private:
     typedef read_write_pool<block_type> pool_type;
 
-    size_type size_;
+    size_type m_size;
     bool delete_pool;
     pool_type * pool;
     block_type * front_block;
@@ -86,7 +85,7 @@ public:
     //!           memory consumption will be 2 * D + 2 blocks 
     //!           (first and last block, D blocks as write cache, D block for prefetching)
     explicit queue(int_type D = -1) :
-        size_(0),
+        m_size(0),
         delete_pool(true),
         alloc_count(0),
         bm(block_manager::get_instance())
@@ -105,7 +104,7 @@ public:
     //! \param blocks2prefetch_  defines the number of blocks to prefetch (\c front side),
     //!                          default is number of block in the prefetch pool
     explicit queue(unsigned_type w_pool_size, unsigned_type p_pool_size, int blocks2prefetch_ = -1) :
-        size_(0),
+        m_size(0),
         delete_pool(true),
         alloc_count(0),
         bm(block_manager::get_instance())
@@ -125,7 +124,7 @@ public:
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
     _STXXL_DEPRECATED(
     queue(write_pool<block_type> & w_pool, prefetch_pool<block_type> & p_pool, int blocks2prefetch_ = -1)) :
-        size_(0),
+        m_size(0),
         delete_pool(true),
         alloc_count(0),
         bm(block_manager::get_instance())
@@ -143,7 +142,7 @@ public:
     //!  \warning Number of blocks in the write pool must be at least 2, recommended at least 3
     //!  \warning Number of blocks in the prefetch pool recommended at least 1
     queue(pool_type & pool_, int blocks2prefetch_ = -1) :
-        size_(0),
+        m_size(0),
         delete_pool(false),
         pool(&pool_),
         alloc_count(0),
@@ -155,7 +154,7 @@ public:
 
     void swap(queue& obj)
     {
-        std::swap(size_, obj.size_);
+        std::swap(m_size, obj.m_size);
         std::swap(delete_pool, obj.delete_pool);
         std::swap(pool, obj.pool);
         std::swap(front_block, obj.front_block);
@@ -237,7 +236,7 @@ public:
 
                 ++back_element;
                 *back_element = val;
-                ++size_;
+                ++m_size;
                 return;
             }
             else
@@ -261,12 +260,12 @@ public:
 
             back_element = back_block->begin();
             *back_element = val;
-            ++size_;
+            ++m_size;
             return;
         }
         ++back_element;
         *back_element = val;
-        ++size_;
+        ++m_size;
     }
 
     //! Removes element from the queue.
@@ -286,12 +285,12 @@ public:
                 // reset everything
                 back_element = back_block->begin() - 1;
                 front_element = back_block->begin();
-                size_ = 0;
+                m_size = 0;
                 return;
             }
 
-            --size_;
-            if (size_ <= block_type::size)
+            --m_size;
+            if (m_size <= block_type::size)
             {
                 STXXL_VERBOSE1("queue::pop Case 4");
                 assert(bids.empty());
@@ -323,19 +322,19 @@ public:
         }
 
         ++front_element;
-        --size_;
+        --m_size;
     }
 
     //! Returns the size of the queue.
     size_type size() const
     {
-        return size_;
+        return m_size;
     }
 
     //! Returns \c true if queue is empty.
     bool empty() const
     {
-        return (size_ == 0);
+        return (m_size == 0);
     }
 
     //! Returns a mutable reference at the back of the queue.

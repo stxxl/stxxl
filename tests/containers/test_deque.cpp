@@ -14,9 +14,6 @@
 #include <iterator>
 #include <stxxl/deque>
 
-// forced instantiation
-template class stxxl::deque<int>;
-
 int main(int argc, char * argv[])
 {
     if (argc != 2) {
@@ -109,3 +106,9 @@ int main(int argc, char * argv[])
 
     return 0;
 }
+
+// forced instantiation
+template class stxxl::deque<int>;
+typedef stxxl::deque<int> deque_type;
+template class stxxl::deque_iterator<deque_type>;
+template class stxxl::const_deque_iterator<deque_type>;

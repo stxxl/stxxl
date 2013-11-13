@@ -57,96 +57,96 @@ public:
 
     difference_type operator - (const _Self & a) const
     {
-        size_type SelfAbsOffset = (Offset >= Deque->begin_o) ?
-                                  Offset : (Deque->Vector.size() + Offset);
-        size_type aAbsOffset = (a.Offset >= Deque->begin_o) ?
-                               a.Offset : (Deque->Vector.size() + a.Offset);
+        size_type SelfAbsOffset = (Offset >= Deque->m_begin) ?
+                                  Offset : (Deque->m_vector.size() + Offset);
+        size_type aAbsOffset = (a.Offset >= Deque->m_begin) ?
+                               a.Offset : (Deque->m_vector.size() + a.Offset);
 
         return SelfAbsOffset - aAbsOffset;
     }
 
     difference_type operator - (const const_iterator & a) const
     {
-        size_type SelfAbsOffset = (Offset >= Deque->begin_o) ?
-                                  Offset : (Deque->Vector.size() + Offset);
-        size_type aAbsOffset = (a.Offset >= Deque->begin_o) ?
-                               a.Offset : (Deque->Vector.size() + a.Offset);
+        size_type SelfAbsOffset = (Offset >= Deque->m_begin) ?
+                                  Offset : (Deque->m_vector.size() + Offset);
+        size_type aAbsOffset = (a.Offset >= Deque->m_begin) ?
+                               a.Offset : (Deque->m_vector.size() + a.Offset);
 
         return SelfAbsOffset - aAbsOffset;
     }
 
     _Self operator - (size_type op) const
     {
-        return _Self(Deque, (Offset + Deque->Vector.size() - op) % Deque->Vector.size());
+        return _Self(Deque, (Offset + Deque->m_vector.size() - op) % Deque->m_vector.size());
     }
 
     _Self operator + (size_type op) const
     {
-        return _Self(Deque, (Offset + op) % Deque->Vector.size());
+        return _Self(Deque, (Offset + op) % Deque->m_vector.size());
     }
 
     _Self & operator -= (size_type op)
     {
-        Offset = (Offset + Deque->Vector.size() - op) % Deque->Vector.size();
+        Offset = (Offset + Deque->m_vector.size() - op) % Deque->m_vector.size();
         return *this;
     }
 
     _Self & operator += (size_type op)
     {
-        Offset = (Offset + op) % Deque->Vector.size();
+        Offset = (Offset + op) % Deque->m_vector.size();
         return *this;
     }
 
     reference operator * ()
     {
-        return Deque->Vector[Offset];
+        return Deque->m_vector[Offset];
     }
 
     pointer operator -> ()
     {
-        return &(Deque->Vector[Offset]);
+        return &(Deque->m_vector[Offset]);
     }
 
     const_reference operator * () const
     {
-        return Deque->Vector[Offset];
+        return Deque->m_vector[Offset];
     }
 
     const_pointer operator -> () const
     {
-        return &(Deque->Vector[Offset]);
+        return &(Deque->m_vector[Offset]);
     }
 
     reference operator [] (size_type op)
     {
-        return Deque->Vector[(Offset + op) % Deque->Vector.size()];
+        return Deque->m_vector[(Offset + op) % Deque->m_vector.size()];
     }
 
     const_reference operator [] (size_type op) const
     {
-        return Deque->Vector[(Offset + op) % Deque->Vector.size()];
+        return Deque->m_vector[(Offset + op) % Deque->m_vector.size()];
     }
 
     _Self & operator ++ ()
     {
-        Offset = (Offset + 1) % Deque->Vector.size();
+        Offset = (Offset + 1) % Deque->m_vector.size();
         return *this;
     }
     _Self operator ++ (int)
     {
         _Self __tmp = *this;
-        Offset = (Offset + 1) % Deque->Vector.size();
+        Offset = (Offset + 1) % Deque->m_vector.size();
         return __tmp;
     }
     _Self & operator -- ()
     {
-        Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
+        Offset = (Offset + Deque->m_vector.size() - 1) % Deque->m_vector.size();
         return *this;
     }
     _Self operator -- (int)
     {
         _Self __tmp = *this;
-        Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
+        Offset = (Offset + Deque->m_vector.size() - 1) % Deque->m_vector.size();
         return __tmp;
     }
     bool operator == (const _Self & a) const
@@ -248,81 +248,81 @@ public:
 
     difference_type operator - (const _Self & a) const
     {
-        size_type SelfAbsOffset = (Offset >= Deque->begin_o) ?
-                                  Offset : (Deque->Vector.size() + Offset);
-        size_type aAbsOffset = (a.Offset >= Deque->begin_o) ?
-                               a.Offset : (Deque->Vector.size() + a.Offset);
+        size_type SelfAbsOffset = (Offset >= Deque->m_begin) ?
+                                  Offset : (Deque->m_vector.size() + Offset);
+        size_type aAbsOffset = (a.Offset >= Deque->m_begin) ?
+                               a.Offset : (Deque->m_vector.size() + a.Offset);
 
         return SelfAbsOffset - aAbsOffset;
     }
 
     difference_type operator - (const iterator & a) const
     {
-        size_type SelfAbsOffset = (Offset >= Deque->begin_o) ?
-                                  Offset : (Deque->Vector.size() + Offset);
-        size_type aAbsOffset = (a.Offset >= Deque->begin_o) ?
-                               a.Offset : (Deque->Vector.size() + a.Offset);
+        size_type SelfAbsOffset = (Offset >= Deque->m_begin) ?
+                                  Offset : (Deque->m_vector.size() + Offset);
+        size_type aAbsOffset = (a.Offset >= Deque->m_begin) ?
+                               a.Offset : (Deque->m_vector.size() + a.Offset);
 
         return SelfAbsOffset - aAbsOffset;
     }
 
     _Self operator - (size_type op) const
     {
-        return _Self(Deque, (Offset + Deque->Vector.size() - op) % Deque->Vector.size());
+        return _Self(Deque, (Offset + Deque->m_vector.size() - op) % Deque->m_vector.size());
     }
 
     _Self operator + (size_type op) const
     {
-        return _Self(Deque, (Offset + op) % Deque->Vector.size());
+        return _Self(Deque, (Offset + op) % Deque->m_vector.size());
     }
 
     _Self & operator -= (size_type op)
     {
-        Offset = (Offset + Deque->Vector.size() - op) % Deque->Vector.size();
+        Offset = (Offset + Deque->m_vector.size() - op) % Deque->m_vector.size();
         return *this;
     }
 
     _Self & operator += (size_type op)
     {
-        Offset = (Offset + op) % Deque->Vector.size();
+        Offset = (Offset + op) % Deque->m_vector.size();
         return *this;
     }
 
     const_reference operator * () const
     {
-        return Deque->Vector[Offset];
+        return Deque->m_vector[Offset];
     }
 
     const_pointer operator -> () const
     {
-        return &(Deque->Vector[Offset]);
+        return &(Deque->m_vector[Offset]);
     }
 
     const_reference operator [] (size_type op) const
     {
-        return Deque->Vector[(Offset + op) % Deque->Vector.size()];
+        return Deque->m_vector[(Offset + op) % Deque->m_vector.size()];
     }
 
     _Self & operator ++ ()
     {
-        Offset = (Offset + 1) % Deque->Vector.size();
+        Offset = (Offset + 1) % Deque->m_vector.size();
         return *this;
     }
     _Self operator ++ (int)
     {
         _Self __tmp = *this;
-        Offset = (Offset + 1) % Deque->Vector.size();
+        Offset = (Offset + 1) % Deque->m_vector.size();
         return __tmp;
     }
     _Self & operator -- ()
     {
-        Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
+        Offset = (Offset + Deque->m_vector.size() - 1) % Deque->m_vector.size();
         return *this;
     }
     _Self operator -- (int)
     {
         _Self __tmp = *this;
-        Offset = (Offset + Deque->Vector.size() - 1) % Deque->Vector.size();
+        Offset = (Offset + Deque->m_vector.size() - 1) % Deque->m_vector.size();
         return __tmp;
     }
     bool operator == (const _Self & a) const
@@ -400,23 +400,23 @@ public:
 //! It is an adaptor of the \c VectorType.
 //! The implementation wraps the elements around
 //! the end of the \c VectorType circularly.
-//! \tparam T type of the contained objects (POD with no references to internal memory)
+//! \tparam ValueType type of the contained objects (POD with no references to internal memory)
 //! \tparam VectorType the type of the underlying vector container,
-//! the default is \c stxxl::vector<T>
-template <class T, class VectorType = stxxl::vector<T> >
+//! the default is \c stxxl::vector<ValueType>
+template <class ValueType, class VectorType = stxxl::vector<ValueType> >
 class deque : private noncopyable
 {
-    typedef deque<T, VectorType> Self_;
+    typedef deque<ValueType, VectorType> Self_;
 
 public:
     typedef typename VectorType::size_type size_type;
     typedef typename VectorType::difference_type difference_type;
     typedef VectorType vector_type;
-    typedef T value_type;
-    typedef T * pointer;
+    typedef ValueType value_type;
+    typedef ValueType * pointer;
     typedef const value_type * const_pointer;
-    typedef T & reference;
-    typedef const T & const_reference;
+    typedef ValueType & reference;
+    typedef const ValueType & const_reference;
     typedef deque_iterator<Self_> iterator;
     typedef const_deque_iterator<Self_> const_iterator;
     typedef std::reverse_iterator<iterator> reverse_iterator;
@@ -426,30 +426,32 @@ public:
     friend class const_deque_iterator<Self_>;
 
 private:
-    VectorType Vector;
-    size_type begin_o, end_o, size_;
+    vector_type m_vector;
+    size_type m_begin, m_end, m_size;
 
     void double_array()
     {
-        const size_type old_size = Vector.size();
-        Vector.resize(2 * old_size);
-        if (begin_o > end_o)
+        const size_type old_size = m_vector.size();
+        m_vector.resize(2 * old_size);
+        if (m_begin > m_end)
         {                         // copy data to the new end of the vector
-            const size_type new_begin_o = old_size + begin_o;
-            std::copy(Vector.begin() + begin_o,
-                      Vector.begin() + old_size,
-                      Vector.begin() + new_begin_o);
-            begin_o = new_begin_o;
+            const size_type new_begin = old_size + m_begin;
+            std::copy(m_vector.begin() + m_begin,
+                      m_vector.begin() + old_size,
+                      m_vector.begin() + new_begin);
+            m_begin = new_begin;
         }
     }
 
 public:
-    deque() : Vector((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(T)), begin_o(0), end_o(0), size_(0)
+    deque()
+        : m_vector((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(value_type)),
+          m_begin(0), m_end(0), m_size(0)
     { }
 
     deque(size_type n)
-        : Vector(STXXL_MAX<size_type>(STXXL_DEFAULT_BLOCK_SIZE(T) / sizeof(T), 2 * n)),
-          begin_o(0), end_o(n), size_(n)
+        : m_vector(STXXL_MAX<size_type>(STXXL_DEFAULT_BLOCK_SIZE(ValueType) / sizeof(value_type), 2 * n)),
+          m_begin(0), m_end(n), m_size(n)
     { }
 
     ~deque()      // empty so far
@@ -457,15 +459,15 @@ public:
 
     iterator begin()
     {
-        return iterator(this, begin_o);
+        return iterator(this, m_begin);
     }
     iterator end()
     {
-        return iterator(this, end_o);
+        return iterator(this, m_end);
     }
     const_iterator begin() const
     {
-        return const_iterator(this, begin_o);
+        return const_iterator(this, m_begin);
     }
     const_iterator cbegin() const
     {
@@ -473,7 +475,7 @@ public:
     }
     const_iterator end() const
     {
-        return const_iterator(this, end_o);
+        return const_iterator(this, m_end);
     }
     const_iterator cend() const
     {
@@ -507,7 +509,7 @@ public:
 
     size_type size() const
     {
-        return size_;
+        return m_size;
     }
 
     size_type max_size() const
@@ -517,99 +519,99 @@ public:
 
     bool empty() const
     {
-        return size_ == 0;
+        return m_size == 0;
     }
 
     reference operator [] (size_type n)
     {
         assert(n < size());
-        return Vector[(begin_o + n) % Vector.size()];
+        return m_vector[(m_begin + n) % m_vector.size()];
     }
 
     const_reference operator [] (size_type n) const
     {
         assert(n < size());
-        return Vector[(begin_o + n) % Vector.size()];
+        return m_vector[(m_begin + n) % m_vector.size()];
     }
 
     reference front()
     {
         assert(!empty());
-        return Vector[begin_o];
+        return m_vector[m_begin];
     }
 
     const_reference front() const
     {
         assert(!empty());
-        return Vector[begin_o];
+        return m_vector[m_begin];
     }
 
     reference back()
     {
         assert(!empty());
-        return Vector[(end_o + Vector.size() - 1) % Vector.size()];
+        return m_vector[(m_end + m_vector.size() - 1) % m_vector.size()];
     }
 
     const_reference back() const
     {
         assert(!empty());
-        return Vector[(end_o + Vector.size() - 1) % Vector.size()];
+        return m_vector[(m_end + m_vector.size() - 1) % m_vector.size()];
     }
 
-    void push_front(const T & el)
+    void push_front(const value_type & el)
     {
-        if ((begin_o + Vector.size() - 1) % Vector.size() == end_o)
+        if ((m_begin + m_vector.size() - 1) % m_vector.size() == m_end)
         {
             // an overflow will occur: resize the array
             double_array();
         }
 
-        begin_o = (begin_o + Vector.size() - 1) % Vector.size();
-        Vector[begin_o] = el;
-        ++size_;
+        m_begin = (m_begin + m_vector.size() - 1) % m_vector.size();
+        m_vector[m_begin] = el;
+        ++m_size;
     }
 
-    void push_back(const T & el)
+    void push_back(const value_type & el)
     {
-        if ((end_o + 1) % Vector.size() == begin_o)
+        if ((m_end + 1) % m_vector.size() == m_begin)
         {
             // an overflow will occur: resize the array
             double_array();
         }
-        Vector[end_o] = el;
-        end_o = (end_o + 1) % Vector.size();
-        ++size_;
+        m_vector[m_end] = el;
+        m_end = (m_end + 1) % m_vector.size();
+        ++m_size;
     }
 
     void pop_front()
     {
         assert(!empty());
-        begin_o = (begin_o + 1) % Vector.size();
-        --size_;
+        m_begin = (m_begin + 1) % m_vector.size();
+        --m_size;
     }
 
     void pop_back()
     {
         assert(!empty());
-        end_o = (end_o + Vector.size() - 1) % Vector.size();
-        --size_;
+        m_end = (m_end + m_vector.size() - 1) % m_vector.size();
+        --m_size;
     }
 
     void swap(deque & obj)
     {
-        std::swap(Vector, obj.Vector);
-        std::swap(begin_o, obj.begin_o);
-        std::swap(end_o, obj.end_o);
-        std::swap(size_, obj.size_);
+        std::swap(m_vector, obj.m_vector);
+        std::swap(m_begin, obj.m_begin);
+        std::swap(m_end, obj.m_end);
+        std::swap(m_size, obj.m_size);
     }
 
     void clear()
     {
-        Vector.clear();
-        Vector.resize((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(T));
-        begin_o = 0;
-        end_o = 0;
-        size_ = 0;
+        m_vector.clear();
+        m_vector.resize((STXXL_DEFAULT_BLOCK_SIZE(T)) / sizeof(value_type));
+        m_begin = 0;
+        m_end = 0;
+        m_size = 0;
     }
 
     void resize(size_type n)
@@ -623,33 +625,33 @@ public:
         }
         else
         {
-            if (n + 1 > Vector.size())
+            if (n + 1 > m_vector.size())
             {                             // need to resize
-                const size_type old_size = Vector.size();
-                Vector.resize(2 * n);
-                if (begin_o > end_o)
+                const size_type old_size = m_vector.size();
+                m_vector.resize(2 * n);
+                if (m_begin > m_end)
                 {                         // copy data to the new end of the vector
-                    const size_type new_begin_o = Vector.size() - old_size + begin_o;
-                    std::copy(Vector.begin() + begin_o,
-                              Vector.begin() + old_size,
-                              Vector.begin() + new_begin_o);
-                    begin_o = new_begin_o;
+                    const size_type new_begin = m_vector.size() - old_size + m_begin;
+                    std::copy(m_vector.begin() + m_begin,
+                              m_vector.begin() + old_size,
+                              m_vector.begin() + new_begin);
+                    m_begin = new_begin;
                 }
             }
-            end_o = (end_o + n - size()) % Vector.size();
-            size_ = n;
+            m_end = (m_end + n - size()) % m_vector.size();
+            m_size = n;
         }
     }
 };
 
-template <class T, class VectorType>
-bool operator == (const deque<T, VectorType> & a, const deque<T, VectorType> & b)
+template <class ValueType, class VectorType>
+bool operator == (const deque<ValueType, VectorType> & a, const deque<ValueType, VectorType> & b)
 {
     return std::equal(a.begin(), a.end(), b.begin());
 }
 
-template <class T, class VectorType>
-bool operator < (const deque<T, VectorType> & a, const deque<T, VectorType> & b)
+template <class ValueType, class VectorType>
+bool operator < (const deque<ValueType, VectorType> & a, const deque<ValueType, VectorType> & b)
 {
     return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end());
 }
@@ -658,14 +660,13 @@ bool operator < (const deque<T, VectorType> & a, const deque<T, VectorType> & b)
 
 __STXXL_END_NAMESPACE
 
-namespace std
+namespace std {
+template <typename ValueType, typename VectorType>
+void swap(stxxl::deque<ValueType, VectorType> & a,
+          stxxl::deque<ValueType, VectorType> & b)
 {
-    template <typename T, typename VT>
-    void swap(stxxl::deque<T, VT> & a,
-              stxxl::deque<T, VT> & b)
-    {
-        a.swap(b);
-    }
+    a.swap(b);
+}
 }
 
 #endif // !STXXL_CONTAINERS_DEQUE_HEADER
