@@ -28,7 +28,10 @@ file * create_file(const std::string & io_impl,
     // construct temporary disk_config structure
     disk_config cfg(filename, 0, io_impl);
     cfg.queue = physical_device_id;
-    cfg.direct = (options & file::REQUIRE_DIRECT) ? 2 : (options & file::DIRECT) ? 1 : 0;
+    cfg.direct =
+        (options & file::REQUIRE_DIRECT) ? disk_config::DIRECT_ON :
+        (options & file::DIRECT) ? disk_config::DIRECT_TRY :
+        disk_config::DIRECT_OFF;
 
     return create_file(cfg, options, disk_allocator_id);
 }
@@ -39,10 +42,14 @@ file * create_file(disk_config& cfg, int mode, int disk_allocator_id)
 
     mode &= ~(file::DIRECT | file::REQUIRE_DIRECT); // clear DIRECT and REQUIRE_DIRECT
 
-    if (cfg.direct == 1)
-        mode |= file::DIRECT;
-    else if (cfg.direct == 2)
-        mode |= file::DIRECT | file::REQUIRE_DIRECT;
+    switch(cfg.direct) {
+    case disk_config::DIRECT_OFF:
+        break;
+    case disk_config::DIRECT_TRY:
+        mode |= file::DIRECT; break;
+    case disk_config::DIRECT_ON:
+        mode |= file::DIRECT | file::REQUIRE_DIRECT; break;
+    }
 
     // *** Select fileio Implementation
 

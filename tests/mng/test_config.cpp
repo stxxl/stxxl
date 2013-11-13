@@ -33,7 +33,7 @@ void test1()
     STXXL_CHECK( cfg.size == 100 * 1024 * stxxl::uint64(1024) );
     STXXL_CHECK( cfg.fileio_string() == "wincall delete_on_exit direct=on queue=5" );
     STXXL_CHECK( cfg.queue == 5 );
-    STXXL_CHECK( cfg.direct == 2 );
+    STXXL_CHECK( cfg.direct == stxxl::disk_config::DIRECT_ON );
 
     // bad configurations
 
@@ -58,7 +58,7 @@ void test2()
     {
         stxxl::disk_config disk1("/tmp/stxxl-1.tmp", 100 * 1024 * 1024, "syscall");
         disk1.unlink_on_open = true;
-        disk1.direct = 0;
+        disk1.direct = stxxl::disk_config::DIRECT_OFF;
 
         STXXL_CHECK( disk1.path == "/tmp/stxxl-1.tmp" );
         STXXL_CHECK( disk1.size == 100 * 1024 * stxxl::uint64(1024) );

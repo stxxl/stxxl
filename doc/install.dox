@@ -432,8 +432,8 @@ Description of the parameters:
 
   - \c autogrow : enables automatic growth of the file beyond the specified capacity.
 
-  - \c direct, \c nodirect, \c direct=[no/try/yes] : disable buffering in system cache by passing O_DIRECT or similar flag to open. \n
-    This is \a recommended as it improves performance, however, not all filesystems support bypassing cache. With \c direct or \c direct=yes, STXXL will fail without direct access. With \c nodirect or \c direct=no it is disabled. The default is \c direct=try , which first attempts to open with O_DIRECT and falls back to opening without if it fails.
+  - \c direct, \c nodirect, \c direct=[off/try/on] : disable buffering in system cache by passing O_DIRECT or similar flag to open. \n
+    This is \a recommended as it improves performance, however, not all filesystems support bypassing cache. With \c direct or \c direct=on, STXXL will fail without direct access. With \c nodirect or \c direct=off it is disabled. The default is \c direct=try , which first attempts to open with O_DIRECT and falls back to opening without if it fails.
 
   - \c unlink (or \c unlink_on_open) : unlink the file from the fs immediately after creation. \n
     This is possible on Unix system, as the file descriptor is kept open. This method is \b preferred, because even in the case of a program segfault, the file data is cleaned up by the kernel.
@@ -506,7 +506,7 @@ int main()
 
     // create a disk_config structure.
     stxxl::disk_config disk1("/tmp/stxxl.tmp", 100 * 1024 * 1024, "syscall unlink");
-    disk1.direct = 2; // force O_DIRECT
+    disk1.direct = stxxl::disk_config::DIRECT_ON; // force O_DIRECT
 
     // add disk to config
     config->add_disk(disk1);

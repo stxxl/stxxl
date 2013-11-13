@@ -191,7 +191,7 @@ disk_config::disk_config()
     : size(0),
       autogrow(false),
       delete_on_exit(false),
-      direct(1),
+      direct(DIRECT_TRY),
       flash(false),
       queue(file::DEFAULT_QUEUE),
       raw_device(false),
@@ -206,7 +206,7 @@ disk_config::disk_config(const std::string& _path, uint64 _size,
       io_impl(_io_impl),
       autogrow(false),
       delete_on_exit(false),
-      direct(1),
+      direct(DIRECT_TRY),
       flash(false),
       queue(file::DEFAULT_QUEUE),
       raw_device(false),
@@ -219,7 +219,7 @@ disk_config::disk_config(const std::string& line)
     : size(0),
       autogrow(false),
       delete_on_exit(false),
-      direct(1),
+      direct(DIRECT_TRY),
       flash(false),
       queue(file::DEFAULT_QUEUE),
       raw_device(false),
@@ -248,7 +248,7 @@ void disk_config::parse_line(const std::string& line)
 
     autogrow = false;
     delete_on_exit = false;
-    direct = 1; // try DIRECT, otherwise fallback
+    direct = DIRECT_TRY;
     // flash is already set
     queue = file::DEFAULT_QUEUE;
     unlink_on_open = false;
@@ -333,11 +333,13 @@ void disk_config::parse_fileio()
             // io_impl is not checked here, but I guess that is okay for DIRECT
             // since it depends highly platform _and_ build-time configuration.
 
-            if (*p == "direct")         direct = 2; // force ON
-            else if (*p == "nodirect")  direct = 0; // force OFF
-            else if (eq[1] == "off")    direct = 0;
-            else if (eq[1] == "try")    direct = 1;
-            else if (eq[1] == "on")     direct = 2;
+            if (*p == "direct")         direct = DIRECT_ON; // force ON
+            else if (*p == "nodirect")  direct = DIRECT_OFF; // force OFF
+            else if (eq[1] == "off")    direct = DIRECT_OFF;
+            else if (eq[1] == "try")    direct = DIRECT_TRY;
+            else if (eq[1] == "on")     direct = DIRECT_ON;
+            else if (eq[1] == "no")     direct = DIRECT_OFF;
+            else if (eq[1] == "yes")    direct = DIRECT_ON;
             else
             {
                 STXXL_THROW(std::runtime_error,
@@ -391,11 +393,11 @@ std::string disk_config::fileio_string() const
         oss << " delete_on_exit";
 
     // tristate direct variable: OFF, TRY, ON
-    if (direct == 0)
+    if (direct == DIRECT_OFF)
         oss << " direct=off";
-    else if (direct == 1)
+    else if (direct == DIRECT_TRY)
         ; // silenced: oss << " direct=try";
-    else if (direct == 2)
+    else if (direct == DIRECT_ON)
         oss << " direct=on";
     else
         assert(!"Invalid setting for 'direct' option.");
